@@ -1,0 +1,167 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { PanelLeftOpen, PanelLeftClose, Search, BellDot, ChevronDown } from 'lucide-react'
+import { LocationSelector } from './LocationSelector'
+import { cn } from '@/lib/utils'
+
+/* Figma 3636:57489 (Secretary) y 3605:56446 (Provider). Alto 64, fondo blanco.
+   El glifo ⌘ del buscador aparece solo en el frame Provider — en recepcionista
+   no está. Se replica esa diferencia tal cual. */
+/* Índice ficticio para que el buscador global devuelva resultados reales. */
+const INDICE = [
+  { label: 'Mara Otero', hint: 'Patient', to: '/patients/mara-otero' },
+  { label: 'Elias Aguirre', hint: 'Patient', to: '/patients/elias-aguirre' },
+  { label: 'Nadia Duarte', hint: 'Patient', to: '/patients/nadia-duarte' },
+  { label: 'Dashboard', hint: 'Page', to: '/' },
+  { label: 'Patients', hint: 'Page', to: '/patients' },
+  { label: 'Scheduling', hint: 'Page', to: '/scheduling' },
+  { label: 'Settings', hint: 'Page', to: '/settings' },
+]
+
+export function Topbar({
+  expanded,
+  onToggleSidebar,
+  showCommandHint = true,
+}: {
+  expanded: boolean
+  onToggleSidebar: () => void
+  showCommandHint?: boolean
+}) {
+  const ToggleIcon = expanded ? PanelLeftClose : PanelLeftOpen
+
+  return (
+    <header className="flex h-16 shrink-0 items-center gap-2 bg-white pr-3 pl-[13px] sm:gap-3 sm:pr-4">
+      {/* Left Section del Figma: greeting a la izquierda, grupo de controles
+          empujado contra su borde derecho (justify-between).
+          A medida que baja el ancho van cayendo, de menos a más importante:
+          el saludo, la locación, el nombre del perfil y por último el ancho
+          fijo del buscador. */}
+      <div className="flex min-w-0 flex-1 items-center justify-between gap-3 xl:gap-6">
+      <div className="flex min-w-0 shrink-0 items-center gap-2">
+        {/* Botón con borde, no un icono suelto. La flecha invierte su
+            dirección según el estado, con un pulso corto al presionar. */}
+        <button
+          type="button"
+          onClick={onToggleSidebar}
+          aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
+          aria-expanded={expanded}
+          className={cn(
+            'flex size-8 items-center justify-center rounded-md border border-[#e4e4e7] bg-white',
+            'text-[#3f3f46] transition-all duration-150 hover:bg-[#fafafa]',
+            'active:scale-90 motion-reduce:transition-none motion-reduce:active:scale-100',
+          )}
+        >
+          <ToggleIcon className="size-[18px] transition-transform duration-200" />
+        </button>
+
+        <p className="hidden items-center gap-1.5 text-[19px] whitespace-nowrap text-black lg:flex">
+          <span aria-hidden>👋</span> Hi! Dentist Sarah
+        </p>
+      </div>
+
+      <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-4 xl:gap-6">
+        <span className="hidden shrink-0 md:block">
+          <LocationSelector />
+        </span>
+
+        {/* Search */}
+        <GlobalSearch showCommandHint={showCommandHint} />
+
+
+        <button
+          type="button"
+          aria-label="Notifications"
+          className="shrink-0 text-[#3f3f46] transition-colors hover:text-black"
+        >
+          <BellDot className="size-5" />
+        </button>
+      </div>
+
+      </div>
+
+      {/* Perfil. El borde izquierdo es el divisor que separa del resto. */}
+      <div className="flex h-[42px] shrink-0 items-center border-l border-[#e4e4e7] pl-3 sm:pl-[18px]">
+        <button type="button" className="flex items-center gap-1.5">
+          <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold">
+            SS
+          </span>
+          {/* Los dos frames del Figma difieren acá: Provider usa nombre negro
+              medium + rol gris semibold; Secretary pone ambos en gris semibold.
+              Se toma la versión del Provider, que da jerarquía real. */}
+          <span className="hidden flex-col items-start text-[12px] leading-[1.35] sm:flex">
+            <span className="font-medium text-[#09090b]">Sarah Stone</span>
+            <span className="font-semibold text-[#71717a]">Dentist</span>
+          </span>
+          <ChevronDown className="hidden size-4 shrink-0 text-[#71717a] sm:block" />
+        </button>
+      </div>
+    </header>
+  )
+}
+
+
+function GlobalSearch({ showCommandHint }: { showCommandHint: boolean }) {
+  const [q, setQ] = useState('')
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  const resultados = useMemo(
+    () => (q.trim() ? INDICE.filter((i) => i.label.toLowerCase().includes(q.toLowerCase())) : []),
+    [q],
+  )
+
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [])
+
+  return (
+    <div ref={ref} className="relative w-full min-w-0 max-w-[304px]">
+      <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+      <input
+        value={q}
+        onChange={(e) => { setQ(e.target.value); setOpen(true) }}
+        onFocus={() => setOpen(true)}
+        placeholder="Search..."
+        className={cn(
+          'h-8 w-full rounded-md border border-[#e4e4e7] bg-white pl-9 text-[13px] font-medium',
+          'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa]',
+          'focus:border-dash-blue focus:outline-none',
+          showCommandHint ? 'pr-9' : 'pr-3',
+        )}
+      />
+      {showCommandHint && (
+        <span aria-hidden className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-[#71717a]">
+          ⌘
+        </span>
+      )}
+      {open && q.trim() && (
+        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-50 w-full overflow-hidden rounded-md border border-[#e4e4e7] bg-white py-1 shadow-lg">
+          {resultados.length === 0 ? (
+            <p className="px-3 py-2 text-[13px] text-[#a1a1aa]">No results for “{q}”</p>
+          ) : (
+            resultados.map((r) => (
+              <Link
+                key={r.to}
+                to={r.to}
+                onClick={() => { setOpen(false); setQ('') }}
+                className="flex items-center justify-between px-3 py-2 text-[13px] hover:bg-[#f4f4f5]"
+              >
+                <span className="text-[#09090b]">{r.label}</span>
+                <span className="text-[11px] text-[#a1a1aa]">{r.hint}</span>
+              </Link>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  )
+}

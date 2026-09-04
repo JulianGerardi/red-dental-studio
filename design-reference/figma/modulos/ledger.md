@@ -1,0 +1,79 @@
+# Ledger
+
+Figma 4582:28487 "Ledger — Screens": Empty State, Overview (Patient View),
+Overview (Guarantor View), y tres modales de acción -Credit (+) Adjustment,
+Credit (-) Adjustment, Enter Payment (-), este último en variante Single y
+Multiple Methods-.
+
+Hasta el 2026-09-04 esta pantalla no tenía frame propio: se armaba con el
+vocabulario del resto del sistema (tabla de Insurance/Documents, pills de
+estado, tira de métricas del dashboard) porque el Figma no la traía. Ese
+layout base se mantiene -es lo que pidió Julián al pedir esto: "respetando
+la estetica actual que armaste de ledger"-; lo que se agrega es lo que el
+frame sí define y antes no existía: las tres acciones y el toggle de vista.
+
+## Patient View / Guarantor View
+
+El toggle vive en la misma fila que los tres botones -alineados entre sí,
+no apilados- y usa el mismo tab-bar (`bg-[#f1f5f9]` + pill azul) que ya
+usan Employees y Location Detail, en vez de inventar un componente de
+segmented-control nuevo.
+
+Sin un segundo paciente en los datos, las dos vistas mostrarían la misma
+tabla y el toggle no demostraría nada. `Movimiento` suma un campo
+`paciente`; John Smith (guarantor) tiene sus 8 movimientos de siempre, y se
+agrega Emma Smith (dependiente) con 2 más. Patient View filtra a uno solo;
+Guarantor View muestra los dos. El saldo corre sobre la cuenta completa en
+los dos casos -no se reinicia por paciente-, así que una fila de Emma Smith
+en Guarantor View sigue la cuenta corriente de John Smith, no una propia.
+
+La tabla suma una columna **Patient** que antes no existía -sin ella, la
+distinción entre vistas no se leería en ningún lado-.
+
+## Anomalía: el botón dice Charge, el modal dice Credit
+
+"Charge Adjustment (+)" abre un modal titulado **"New Credit (+)
+Adjustment"** -así en el frame, no se corrige-. El campo que de verdad
+decide Charge vs Credit es "Type" adentro del modal, no el título: mismo
+tipo de desajuste botón/título ya documentado en Locations ("Edit hours"
+abre "New Availability").
+
+## Simplificaciones deliberadas
+
+- **"Amount" del modal Credit (-)** es texto libre. En el frame trae un
+  desplegable -elegís entre créditos sin aplicar existentes-, pero el resto
+  de la app no modela "créditos disponibles" como catálogo propio; inventar
+  una lista sólo para ese campo era más ficción que la que pide el resto del
+  sistema. Se documenta acá en vez de fingir el desplegable.
+- **La tabla "Ledger Transactions"** (compartida por Payment y Credit (-),
+  componente `LedgerAllocationTable`) usa las columnas que `Movimiento` ya
+  tiene -fecha, paciente, provider, código, descripción, monto- en vez de
+  las del frame que no existen en ningún otro lado de la app (Tooth,
+  Surface, Guar Estimate).
+- **"Amount not applied" / "Amount applied"** salen de lo que se tipea en el
+  input "Applied" de cada fila, no de un número fijo: en el frame esos dos
+  totales no coinciden con las filas que muestran ("Applied" en 0.00 en las
+  ocho filas pero "Amount applied" en $430.00), así que tomarlos como mock
+  literal habría sido replicar un dato inconsistente en vez de un
+  comportamiento real.
+- **Check / Bank-Branch** en "New Patient Payment (-)" sólo se muestran
+  cuando el método es "Check payment" -el frame los deja siempre visibles y
+  vacíos con cualquier método-.
+- **Guardar sí escribe en la tabla**: cada modal agrega una fila real a
+  `MOVIMIENTOS` -no sólo cierra con un toast-, con el mismo patrón de
+  "toda acción visible produce un efecto visible" que ya rige el resto de
+  la app.
+
+## La tabla quedaba cortada en el modal (2026-09-04)
+
+Las columnas fijas de `LedgerAllocationTable` (Date, Patient, Provider,
+Code, Charge, Applied, Balance) no tenían `shrink-0`: en flexbox, sin eso,
+un contenedor más angosto que la suma de columnas las achica a todas por
+igual en vez de desbordar. El resultado eran "Balance" y "Applied"
+recortados sin ningún indicio de que había más tabla para el costado.
+
+Se corrige en dos pasos: `shrink-0` en cada columna fija -ahora sí
+desbordan y `overflow-x-auto` puede hacer su trabajo-, y el modal
+(`NewPatientPaymentModal`, `NewCreditAdjustmentModal`) pasa de
+`max-w-[820px]` a `max-w-[1080px]` para que la tabla completa entre sin
+depender de ese scroll en el ancho de escritorio habitual.

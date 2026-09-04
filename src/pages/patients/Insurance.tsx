@@ -1,0 +1,316 @@
+import { useRef, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { ChevronLeft, GripVertical, CirclePlus, Search, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { EmptyState } from '@/components/ui/empty-state'
+import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { SelectField, DateTextField, TextArea, OptionCheckbox, FormFooter } from '@/components/patients/form'
+import {
+  NewSubscriptionModal, ManageSubscriptionModal, NewDependerModal,
+} from '@/components/patients/insurance/modals'
+import { PLANES, PLANES_HISTORICOS, SUSCRIPCION, RELACIONES, ORDENES, ELEGIBILIDAD, type PlanPaciente } from '@/data/insurance'
+import { aviso } from '@/components/ui/toaster'
+
+/* Figma 3817:865128 "Insurance", frames 3817:865704 y 3831:897436.
+
+   El breadcrumb del frame termina en "Documents" en azul aunque la pantalla
+   sea Insurance, y el título dice "Patients Plans". Se replican tal cual —
+   ver modulos/insurance.md, anomalías 60 a 66. */
+
+/* Pills con fondo tintado, como el resto del sistema. Muestreados del frame:
+   Primary y Self usan el azul #f0f5ff/#174596, Child el verde #f0fcf5/#1a804d,
+   Spouse el neutro #f5f5f5/#595959, Active el verde y Inactive el rojo
+   #fff2f2/#b22626. */
+const ORDEN_PILL = 'border-[#174596] bg-[#f0f5ff] text-[#174596]'
+const RELACION_PILL: Record<PlanPaciente['relacion'], string> = {
+  Child: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
+  Self: 'border-[#174596] bg-[#f0f5ff] text-[#174596]',
+  Spouse: 'border-[#a1a1aa] bg-[#f5f5f5] text-[#595959]',
+}
+const ESTADO_PILL: Record<PlanPaciente['estado'], string> = {
+  Active: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
+  Inactive: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
+}
+
+const COLS = {
+  handle: 'w-8',
+  order: 'w-[92px]',
+  carrier: 'w-[92px]',
+  plan: 'w-[124px]',
+  subscriber: 'w-[128px]',
+  relation: 'w-[92px]',
+  coverage: 'w-[148px]',
+  priority: 'w-[150px]',
+  status: 'w-[92px]',
+}
+
+function Pill({ tono, children }: { tono: string; children: React.ReactNode }) {
+  return (
+    <span className={cn('inline-flex rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', tono)}>
+      {children}
+    </span>
+  )
+}
+
+function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      onClick={() => onChange(!on)}
+      className="flex items-center gap-2 text-[13px] text-[#09090b]"
+    >
+      <span className={cn('flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors', on ? 'bg-dash-blue' : 'bg-[#d4d4d8]')}>
+        <span className={cn('size-3 rounded-full bg-white transition-transform', on && 'translate-x-3')} />
+      </span>
+      {label}
+    </button>
+  )
+}
+
+/* Fila de dato de la card de suscripción: icono, etiqueta chica y valor. */
+function FilaDato({ icon: Icon, label, value }: { icon: typeof ShieldHalf; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <Icon className="size-4 shrink-0 text-[#71717a]" strokeWidth={1.8} />
+      <span className="min-w-0 leading-tight">
+        <span className="block text-[11px] text-[#a1a1aa]">{label}</span>
+        <span className="block truncate text-[13px] text-[#09090b]">{value}</span>
+      </span>
+    </div>
+  )
+}
+
+export default function Insurance() {
+  const { id = 'john-smith' } = useParams()
+  const [historial, setHistorial] = useState(false)
+  const [planes, setPlanes] = useState(PLANES)
+  const [modal, setModal] = useState<'nueva' | 'gestionar' | 'dependiente' | null>(null)
+  const [d, setD] = useState({ relacion: '', orden: '', inicio: '', fin: '', elegibilidad: '', verificacion: '', notas: '' })
+  const [intentado, setIntentado] = useState(false)
+  const set = (k: keyof typeof d) => (v: string) => setD((p) => ({ ...p, [k]: v }))
+  const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? 'This field is required.' : undefined)
+
+  /* Las filas llevan grip: se reordenan arrastrando. */
+  const arrastrada = useRef<number | null>(null)
+  const soltar = (destino: number) => {
+    const origen = arrastrada.current
+    arrastrada.current = null
+    if (origen === null || origen === destino) return
+    setPlanes((prev) => {
+      const copia = [...prev]
+      const [fila] = copia.splice(origen, 1)
+      copia.splice(destino, 0, fila)
+      return copia
+    })
+    aviso.ok('Plan order updated.')
+  }
+
+  /* El switch suma los planes vencidos; no esconde los inactivos vigentes,
+     que el frame muestra con el switch apagado. */
+  const visibles = historial ? [...planes, ...PLANES_HISTORICOS] : planes
+
+  const guardar = () => {
+    setIntentado(true)
+    if (!d.relacion.trim() || !d.orden.trim() || !d.inicio.trim() || !d.elegibilidad.trim()) return
+    aviso.ok('Insurance information saved.')
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+      {/* El último tramo del breadcrumb dice "Documents" en una pantalla de
+          Insurance. Es del Figma. */}
+
+      {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
+          El breadcrumb completo repetía lo que ya dice el panel lateral. */}
+      <Link
+        to="/patients"
+        className="text-dash-blue mb-3 inline-flex items-center gap-1 text-sm hover:underline"
+      >
+        <ChevronLeft className="size-4" /> Patients
+      </Link>
+      <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-start">
+        <PatientSidePanel
+          name="John Smith" initials="JS" section="Insurance"
+          basePath={`/patients/${id}`} 
+        />
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h1 className="text-xl leading-[1.3] font-semibold text-[#09090b]">Patients Plans</h1>
+            <Switch on={historial} onChange={setHistorial} label="Show plan history" />
+          </div>
+
+          {/* Tabla de planes */}
+          <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+            <div className="min-w-[960px]">
+              <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
+                <span className={COLS.handle} />
+                <span className={COLS.order}>Order</span>
+                <span className={COLS.carrier}>Carrier</span>
+                <span className={COLS.plan}>Plan</span>
+                <span className={COLS.subscriber}>Subscriber</span>
+                <span className={COLS.relation}>Relation</span>
+                <span className={COLS.coverage}>Coverage Period</span>
+                <span className={COLS.priority}>Priority Period</span>
+                <span className={COLS.status}>Status</span>
+              </div>
+
+              {visibles.length === 0 ? (
+                <EmptyState icon={CreditCard} title="No plans yet" detail="Add a subscription to start tracking this patient's coverage." />
+              ) : (
+                visibles.map((p, i) => (
+                  <div
+                    key={p.id}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => soltar(i)}
+                    className="flex items-center gap-3 border-b border-[#e7e7e7] px-4 py-3 text-[13px] text-[#3f3f46] last:border-0"
+                  >
+                    <span
+                      draggable
+                      onDragStart={() => { arrastrada.current = i }}
+                      aria-label={`Reorder ${p.plan}`}
+                      className={cn(COLS.handle, 'cursor-grab text-[#a1a1aa] active:cursor-grabbing')}
+                    >
+                      <GripVertical className="size-4" />
+                    </span>
+                    <span className={COLS.order}><Pill tono={ORDEN_PILL}>{p.orden}</Pill></span>
+                    <span className={COLS.carrier}>{p.carrier}</span>
+                    <span className={COLS.plan}>{p.plan}</span>
+                    <span className={COLS.subscriber}>{p.subscriber}</span>
+                    <span className={COLS.relation}><Pill tono={RELACION_PILL[p.relacion]}>{p.relacion}</Pill></span>
+                    <span className={COLS.coverage}>{p.cobertura}</span>
+                    <span className={cn(COLS.priority, 'flex flex-col gap-0.5 leading-tight')}>
+                      {p.prioridad.map((t) => <span key={t}>{t}</span>)}
+                    </span>
+                    <span className={COLS.status}><Pill tono={ESTADO_PILL[p.estado]}>{p.estado}</Pill></span>
+                  </div>
+                ))
+              )}
+
+              {/* Dice 8 con cuatro filas a la vista: es del Figma. */}
+              <div className="flex h-[52px] items-center justify-between px-4">
+                <span className="text-xs font-semibold text-[#71717a]">Showing 8 of 8 insurances</span>
+                <div className="flex items-center gap-1">
+                  {['‹', '1', '2', '3', '›'].map((n) => (
+                    <button
+                      key={n}
+                      className={cn(
+                        'flex size-8 items-center justify-center rounded-md text-xs font-semibold',
+                        n === '1' ? 'bg-dash-blue text-white' : 'text-[#71717a] hover:bg-[#f4f4f5]',
+                      )}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Suscripción + datos del paciente */}
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            <section className="flex flex-col rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
+              <h2 className="text-sm font-semibold text-[#09090b]">Subscription Information</h2>
+              <p className="mt-0.5 text-[11px] text-[#71717a]">
+                Select an existing subscription or create new one.
+              </p>
+
+              <span className="mt-4 block text-xs font-medium text-[#09090b]">
+                Search for an existing subscription<span className="text-[#ff0608]">*</span>
+              </span>
+              <div className="relative mt-2">
+                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+                {/* Borde gris como todos los buscadores del sistema; el azul
+                    queda para el foco. El frame lo dibuja siempre azul porque
+                    lo capturó enfocado. */}
+                <input
+                  placeholder="Search result"
+                  className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setModal('nueva')}
+                className="text-dash-blue mt-2 flex items-center gap-1.5 self-end text-[13px] font-semibold hover:underline"
+              >
+                <CirclePlus className="size-4" /> Add New Subscription
+              </button>
+
+              <p className="mt-4 text-sm font-semibold text-[#09090b]">Select a subscription</p>
+              <div className="mt-3 flex flex-col gap-3">
+                <FilaDato icon={PersonStanding} label="Subscriber" value={SUSCRIPCION.subscriber} />
+                <FilaDato icon={PersonStanding} label="Subscriber ID" value={SUSCRIPCION.subscriberId} />
+                <FilaDato icon={ShieldHalf} label="Carrier" value={SUSCRIPCION.carrier} />
+                <FilaDato icon={Hospital} label="Plan" value={SUSCRIPCION.plan} />
+                <FilaDato icon={AArrowUp} label="Coverage Period" value={SUSCRIPCION.cobertura} />
+                <FilaDato icon={Eye} label="Dependents" value={SUSCRIPCION.dependientes} />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setModal('gestionar')}
+                className="bg-dash-blue hover:bg-dash-blue-hover mt-5 h-9 self-end rounded-md px-5 text-[13px] font-medium text-white transition-colors"
+              >
+                Manage Subscription
+              </button>
+            </section>
+
+            <section className="flex flex-col rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
+              <h2 className="text-sm font-semibold text-[#09090b]">Patient Information</h2>
+
+              <SelectField
+                className="mt-4" label="Relationship to Subscriber" required options={RELACIONES}
+                value={d.relacion} onChange={set('relacion')} error={req('relacion')}
+              />
+
+              {/* Caja de sólo lectura con el mismo rótulo que el select de
+                  abajo, y con "Cordination" mal escrito. Es del Figma. */}
+              <div className="mt-4 flex items-center gap-2.5 rounded-md bg-[#eff4ff] px-3 py-2">
+                <CreditCard className="size-4 shrink-0 text-[#71717a]" strokeWidth={1.8} />
+                <span className="leading-tight">
+                  <span className="block text-[11px] text-[#a1a1aa]">Cordination Order</span>
+                  <span className="block text-[13px] text-[#09090b]">Primary</span>
+                </span>
+              </div>
+
+              <SelectField
+                className="mt-4" label="Cordination Order" required options={ORDENES}
+                value={d.orden} onChange={set('orden')} error={req('orden')}
+              />
+
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <OptionCheckbox label="Assignment of Benefits" />
+                <OptionCheckbox label="Release of Information" />
+              </div>
+
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <DateTextField label="Coverage Start" required value={d.inicio} onChange={set('inicio')} error={req('inicio')} />
+                <DateTextField label="Coverage End" value={d.fin} onChange={set('fin')} />
+              </div>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <SelectField label="Eligibility" required options={ELEGIBILIDAD} value={d.elegibilidad} onChange={set('elegibilidad')} error={req('elegibilidad')} />
+                <DateTextField label="Verification Date" value={d.verificacion} onChange={set('verificacion')} />
+              </div>
+              <TextArea className="mt-4" label="Notes" placeholder="Add notes" value={d.notas} onChange={set('notas')} />
+
+              <div className="mt-5 flex justify-end gap-3">
+                <FormFooter onCancel={() => setD({ relacion: '', orden: '', inicio: '', fin: '', elegibilidad: '', verificacion: '', notas: '' })} onSave={guardar} />
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      {modal === 'nueva' && <NewSubscriptionModal onClose={() => setModal(null)} />}
+      {modal === 'gestionar' && (
+        <ManageSubscriptionModal
+          onNuevoDependiente={() => setModal('dependiente')}
+          onClose={() => setModal(null)}
+        />
+      )}
+      {modal === 'dependiente' && <NewDependerModal onClose={() => setModal('gestionar')} />}
+    </div>
+  )
+}
