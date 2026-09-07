@@ -77,3 +77,18 @@ desbordan y `overflow-x-auto` puede hacer su trabajo-, y el modal
 (`NewPatientPaymentModal`, `NewCreditAdjustmentModal`) pasa de
 `max-w-[820px]` a `max-w-[1080px]` para que la tabla completa entre sin
 depender de ese scroll en el ancho de escritorio habitual.
+
+## La tabla principal se ajusta a su propio componente (2026-09-07)
+
+Figma aisló la tabla de la pantalla de Ledger como componente propio -nodo
+`4588:84886`, "Ledger Transactions Table"- con siete columnas en un orden
+puntual: **Date, Patient, Type, Description, Provider, Amount, Balance**.
+La tabla de `Ledger.tsx` traía dos columnas de más que ese componente no
+tiene -Code y Status-, y el orden de Type estaba corrido -iba después de
+Provider, no después de Patient-.
+
+Se ajusta a las siete columnas y ese orden exacto. `codigo` y `estado`
+siguen en `Movimiento` -la búsqueda sigue filtrando por código, y "Insurance
+paid" en la tira de métricas sigue contando `estado === 'Denied'`-, sólo
+dejan de tener columna propia en la tabla: son datos que otras partes de la
+pantalla usan, no filas visibles de más.

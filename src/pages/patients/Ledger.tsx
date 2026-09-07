@@ -10,23 +10,20 @@ import { FilterMenu } from '@/components/dashboard/FilterMenu'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import {
   MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda,
-  type EstadoMovimiento, type Movimiento, type TipoMovimiento,
+  type Movimiento, type TipoMovimiento,
 } from '@/data/ledger'
 import { aviso } from '@/components/ui/toaster'
 import { NewPatientPaymentModal } from '@/components/patients/ledger/NewPatientPaymentModal'
 import { NewCreditAdjustmentModal } from '@/components/patients/ledger/NewCreditAdjustmentModal'
 import { NewChargeAdjustmentModal } from '@/components/patients/ledger/NewChargeAdjustmentModal'
 
-/* Figma 4582:28487 "Ledger — Screens". El Figma no traía esta pantalla hasta
-   ahora; el layout base -tira de métricas, buscador, tabla con pills de
-   Type/Status- viene de antes y se mantiene, pero arriba se suman las tres
-   acciones del frame y el toggle Patient/Guarantor View. Ver modulos/ledger.md. */
+/* Figma 4582:28487 "Ledger — Screens" (layout general) y 4588:84886 "Ledger
+   Transactions Table" (la tabla, aislada como componente propio y con orden
+   de columnas exacto: Date, Patient, Type, Description, Provider, Amount,
+   Balance -sin Code ni Status-). La tabla se ajusta a esas siete columnas y
+   ese orden; `codigo` y `estado` siguen en el dato -los usan la búsqueda y
+   la tira de métricas- pero ya no tienen columna propia. Ver modulos/ledger.md. */
 
-const ESTADO_PILL: Record<EstadoMovimiento, string> = {
-  Posted: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Pending: 'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
-  Denied: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
-}
 const TIPO_PILL: Record<TipoMovimiento, string> = {
   Charge: 'border-[#174596] bg-[#f0f5ff] text-[#174596]',
   Payment: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
@@ -35,15 +32,13 @@ const TIPO_PILL: Record<TipoMovimiento, string> = {
 }
 
 const COLS = {
-  fecha: 'w-[120px]',
-  paciente: 'w-[120px]',
-  codigo: 'w-[74px]',
-  desc: 'min-w-[200px] flex-1',
-  provider: 'w-[148px]',
-  tipo: 'w-[104px]',
-  monto: 'w-[104px] text-right',
-  saldo: 'w-[104px] text-right',
-  estado: 'w-[92px]',
+  fecha: 'w-[110px]',
+  paciente: 'w-[110px]',
+  tipo: 'w-[110px]',
+  desc: 'min-w-[220px] flex-1',
+  provider: 'w-[130px]',
+  monto: 'w-[90px] text-right',
+  saldo: 'w-[100px] text-right',
 }
 
 function Pill({ tono, children }: { tono: string; children: React.ReactNode }) {
@@ -192,17 +187,15 @@ export default function Ledger() {
           </div>
 
           <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
-            <div className="min-w-[1080px]">
+            <div className="min-w-[960px]">
               <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
                 <span className={COLS.fecha}>Date</span>
                 <span className={COLS.paciente}>Patient</span>
-                <span className={COLS.codigo}>Code</span>
+                <span className={COLS.tipo}>Type</span>
                 <span className={COLS.desc}>Description</span>
                 <span className={COLS.provider}>Provider</span>
-                <span className={COLS.tipo}>Type</span>
                 <span className={COLS.monto}>Amount</span>
                 <span className={COLS.saldo}>Balance</span>
-                <span className={COLS.estado}>Status</span>
               </div>
 
               {filas.length === 0 ? (
@@ -215,10 +208,9 @@ export default function Ledger() {
                   >
                     <span className={COLS.fecha}>{m.fecha}</span>
                     <span className={cn(COLS.paciente, 'truncate text-[#09090b]')}>{m.paciente}</span>
-                    <span className={cn(COLS.codigo, 'text-dash-blue font-medium')}>{m.codigo}</span>
+                    <span className={COLS.tipo}><Pill tono={TIPO_PILL[m.tipo]}>{m.tipo}</Pill></span>
                     <span className={cn(COLS.desc, 'truncate text-[#09090b]')}>{m.descripcion}</span>
                     <span className={cn(COLS.provider, 'truncate')}>{m.provider}</span>
-                    <span className={COLS.tipo}><Pill tono={TIPO_PILL[m.tipo]}>{m.tipo}</Pill></span>
                     {/* Los negativos bajan la cuenta: van en verde. */}
                     <span className={cn(COLS.monto, 'font-medium tabular-nums', m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]')}>
                       {moneda(m.monto)}
@@ -226,7 +218,6 @@ export default function Ledger() {
                     <span className={cn(COLS.saldo, 'font-semibold tabular-nums text-[#09090b]')}>
                       {moneda(m.saldo)}
                     </span>
-                    <span className={COLS.estado}><Pill tono={ESTADO_PILL[m.estado]}>{m.estado}</Pill></span>
                   </div>
                 ))
               )}

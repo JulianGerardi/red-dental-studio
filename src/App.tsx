@@ -24,6 +24,7 @@ import { SettingsLocationDetail } from '@/pages/settings/LocationDetail'
 import { SettingsNewLocation } from '@/pages/settings/NewLocation'
 import { SettingsEmployees, SettingsEmployeeDetail } from '@/pages/settings/Employees'
 import { SettingsNewEmployee } from '@/pages/settings/NewEmployee'
+import Help from '@/pages/Help'
 
 const SETTINGS_PLACEHOLDERS = [
   'account', 'roles', 'parameters',
@@ -65,9 +66,10 @@ export default function App() {
           {/* Las cuatro comparten el mismo placeholder en el original.
               /reports va al mismo sitio: en el original es un monitor de latencia
               interno ("API Monitor"), no una pantalla de producto. */}
-          {['billing', 'message', 'contacts', 'documents', 'reports', 'help'].map((p) => (
+          {['billing', 'message', 'contacts', 'documents', 'reports'].map((p) => (
             <Route key={p} path={p} element={<UnderConstruction />} />
           ))}
+          <Route path="help" element={<Help />} />
 
           <Route path="settings" element={<SettingsLayout />}>
             <Route index element={<Navigate to="/settings/general" replace />} />
