@@ -124,3 +124,31 @@ con `FormFooter` al pie de la página en vez de en el `footer` del modal-.
   Figma. Se suman 4 cargos más a John Smith y 2 a Emma Smith en
   `data/ledger.ts` para que las tablas de Payment y Credit Adjustment se
   vean tan pobladas como el frame.
+
+## Las 12 columnas de la tabla de aplicación, completas (2026-09-07)
+
+La primera versión de `LedgerAllocationTable` recortaba el frame -Figma
+4582:29618 y 4582:30251- a 8 columnas, sacando Tooth, Surface, Other Credit
+y Guar Estimate por no existir en ningún otro lado de la app. Julián pidió
+explícitamente no recortarla: van las 12.
+
+- **Tooth / Surface**: nuevos campos opcionales en `Movimiento`
+  (`diente`/`superficie`). Sólo los tiene un cargo restaurativo de pieza
+  puntual -la corona (D2740) y la resina de dos superficies (D2392)-; una
+  limpieza o una radiografía no van sobre un diente, así que quedan en
+  `undefined` y la tabla muestra "-".
+- **Other Credit / Guar Estimate**: no son datos guardados, se calculan por
+  código en el momento (`coberturaSeguro` en `LedgerAllocationTable.tsx`).
+  Diagnóstico y preventivo (D0/D1) los cubre el seguro al 100% -Other Credit
+  = el cargo entero, Guar Estimate = $0-; el resto, a mitad. Es el criterio
+  real de cobertura dental -preventivo cubierto, restaurativo con
+  coseguro-, no un número copiado de una fila.
+- Las 8 filas del frame repiten literalmente la misma persona y el mismo
+  código -Brent Crosby, D7450, "Remove Ben. O..."- ocho veces: es una fila
+  de prueba pegada en loop, el mismo tipo de anomalía que ya se documentó
+  con los placeholders de Radiography y de Rooms. Se listan los cargos
+  reales de la cuenta en su lugar, no el loop.
+- La tabla pasó a necesitar más ancho (`min-w-[1280px]`) para las 12
+  columnas; como ya no vive dentro de un modal con ancho fijo sino en la
+  página de Ledger, el `overflow-x-auto` de siempre alcanza sin tener que
+  ensanchar nada más.

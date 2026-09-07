@@ -20,6 +20,11 @@ export type Movimiento = {
   /* Positivo suma a la cuenta del paciente, negativo la baja. */
   monto: number
   estado: EstadoMovimiento
+  /* Sólo los cargos restaurativos de una pieza puntual los tienen -una
+     limpieza o una radiografía no van sobre un diente ni una superficie-.
+     Sin dato, la tabla de aplicación (`LedgerAllocationTable`) muestra "-". */
+  diente?: string
+  superficie?: string
 }
 
 /* John Smith es el guarantor de la cuenta; Emma Smith es su dependiente.
@@ -34,7 +39,7 @@ export const MOVIMIENTOS: Movimiento[] = [
   { id: 'm3', fecha: 'March 18, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'AETNA claim 8842-B', provider: 'AETNA', tipo: 'Insurance', monto: -140, estado: 'Posted' },
   { id: 'm4', fecha: 'March 20, 2025', paciente: 'John Smith', codigo: 'D0274', descripcion: 'Bitewings – four radiographic images', provider: 'Dr. Salgado', tipo: 'Charge', monto: 95, estado: 'Posted' },
   { id: 'm5', fecha: 'March 21, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Card payment ····4218', provider: 'Front desk', tipo: 'Payment', monto: -100, estado: 'Posted' },
-  { id: 'm6', fecha: 'March 24, 2025', paciente: 'John Smith', codigo: 'D2740', descripcion: 'Crown – porcelain/ceramic', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 1270, estado: 'Pending' },
+  { id: 'm6', fecha: 'March 24, 2025', paciente: 'John Smith', codigo: 'D2740', descripcion: 'Crown – porcelain/ceramic', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 1270, estado: 'Pending', diente: '19' },
   { id: 'm7', fecha: 'March 25, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'BCBS claim 1192-C', provider: 'BCBS', tipo: 'Insurance', monto: -640, estado: 'Denied' },
   { id: 'm8', fecha: 'March 26, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Courtesy adjustment', provider: 'Front desk', tipo: 'Adjustment', monto: -45, estado: 'Posted' },
   { id: 'm9', fecha: 'March 19, 2025', paciente: 'Emma Smith', codigo: 'D1120', descripcion: 'Prophylaxis – child', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 90, estado: 'Posted' },
@@ -43,7 +48,7 @@ export const MOVIMIENTOS: Movimiento[] = [
      nada-: la tabla de aplicación de los paneles de Payment/Credit se veía
      demasiado corta con sólo 4 cargos por paciente. */
   { id: 'm11', fecha: 'March 28, 2025', paciente: 'John Smith', codigo: 'D1206', descripcion: 'Topical fluoride varnish', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 45, estado: 'Posted' },
-  { id: 'm12', fecha: 'March 31, 2025', paciente: 'John Smith', codigo: 'D2392', descripcion: 'Resin composite – two surfaces', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 220, estado: 'Posted' },
+  { id: 'm12', fecha: 'March 31, 2025', paciente: 'John Smith', codigo: 'D2392', descripcion: 'Resin composite – two surfaces', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 220, estado: 'Posted', diente: '30', superficie: 'MO' },
   { id: 'm13', fecha: 'April 3, 2025', paciente: 'John Smith', codigo: 'D4341', descripcion: 'Periodontal scaling – per quadrant', provider: 'Dr. Salgado', tipo: 'Charge', monto: 310, estado: 'Posted' },
   { id: 'm14', fecha: 'April 7, 2025', paciente: 'John Smith', codigo: 'D0220', descripcion: 'Intraoral periapical – first image', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 38, estado: 'Posted' },
   { id: 'm15', fecha: 'March 30, 2025', paciente: 'Emma Smith', codigo: 'D1206', descripcion: 'Topical fluoride varnish', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 40, estado: 'Posted' },
