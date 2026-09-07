@@ -17,19 +17,7 @@ import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPayment
 import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
 import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
 
-/* Figma 4582:28487 "Ledger — Screens" (layout general) y 4588:84886 "Ledger
-   Transactions Table" (la tabla, aislada como componente propio y con orden
-   de columnas exacto: Date, Patient, Type, Description, Provider, Amount,
-   Balance -sin Code ni Status-). La tabla se ajusta a esas siete columnas y
-   ese orden; `codigo` y `estado` siguen en el dato -los usan la búsqueda y
-   la tira de métricas- pero ya no tienen columna propia.
-
-   Las tres acciones del frame -Patient Payment (-), Credit Adjustment (-),
-   Charge Adjustment (+)- eran botones que abrían un modal. Pasan a ser tabs
-   junto con "Transactions": mismo patrón de pestañas que ya usan Employees
-   y Location Detail, y misma conversión modal->pantalla que ya tuvieron
-   "New Location" y "New Employee". Guardar o cancelar vuelve al tab de
-   Transactions. Ver modulos/ledger.md. */
+/* Figma 4582:28487 / 4588:84886. Ver design-reference/figma/modulos/ledger.md. */
 
 const TIPO_PILL: Record<TipoMovimiento, string> = {
   Charge: 'border-[#174596] bg-[#f0f5ff] text-[#174596]',
@@ -75,10 +63,6 @@ export default function Ledger() {
   const [tipos, setTipos] = useState<string[]>([])
   const [tab, setTab] = useState<Tab>('transacciones')
 
-  /* Guarantor View muestra la cuenta completa; Patient View la recorta al
-     paciente que se está mirando. El saldo sigue siendo el de la cuenta
-     entera en los dos casos -no se reinicia por paciente-, así que se corre
-     sobre `movs` antes de filtrar por vista. */
   const conSaldoTotal = useMemo(() => conSaldo(movs), [movs])
   const delaVista = useMemo(
     () => (vista === 'Guarantor View' ? conSaldoTotal : conSaldoTotal.filter((m) => m.paciente === GUARANTOR)),
@@ -94,8 +78,6 @@ export default function Ledger() {
     [delaVista, q, tipos],
   )
 
-  /* Los totales salen de los movimientos de la vista activa, no de un mock
-     aparte. */
   const stats: Stat[] = useMemo(() => {
     const cargos = delaVista.filter((m) => m.tipo === 'Charge').reduce((a, m) => a + m.monto, 0)
     const seguro = delaVista.filter((m) => m.tipo === 'Insurance' && m.estado === 'Posted')

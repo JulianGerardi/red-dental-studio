@@ -3,27 +3,7 @@ import { CreditCard } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { moneda, type Movimiento } from '@/data/ledger'
 
-/* Card "Ledger Transactions" de los modales de Payment y Credit (-)
-   Adjustment (Figma 4582:29618, 4582:30251): la tabla de cargos contra los
-   que se puede aplicar el pago o el crédito, con un input de "Applied" por
-   fila y el resumen "Amount not applied" / "Amount applied" abajo a la
-   derecha.
-
-   Las doce columnas del frame -Transaction Date, Patient, Provider, Tooth,
-   Surface, Code, Description, Charge, Other Credit, Guar Estimate, Applied,
-   Balance- van todas. La primera versión las había recortado a ocho por no
-   tener Tooth/Surface/Other Credit/Guar Estimate en ningún otro lado de la
-   app; el pedido fue explícito en no achicar la tabla, así que ahora
-   `diente`/`superficie` viven en `Movimiento` (sólo en los cargos donde
-   aplican -una limpieza no tiene diente, una corona sí-) y "Other
-   Credit"/"Guar Estimate" se calculan por código: D0/D1 (diagnóstico y
-   preventivo) los cubre el seguro al 100%; el resto, a mitad -mismo criterio
-   real de cobertura dental, no un número inventado por fila-.
-
-   Las ocho filas del frame repiten literalmente la misma persona/código
-   -Brent Crosby, D7450, "Remove Ben. O..."- ocho veces: es una fila de
-   prueba pegada en loop, no contenido real. Se listan los cargos reales de
-   la cuenta en su lugar, como ya se documentó. */
+/* Figma 4582:29618 / 4582:30251. Ver design-reference/figma/modulos/ledger.md. */
 function coberturaSeguro(codigo: string) {
   const categoria = codigo.charAt(1)
   return categoria === '0' || categoria === '1' ? 1 : 0.5

@@ -6,13 +6,8 @@ import {
 import { DatePicker } from '@/components/ui/date-picker'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
 
-/* Figma 4582:25840 "Ledger — Credit Adjustment (+) Modal", ahora un tab de
-   Ledger en vez de un popup -misma conversión que "New Location"/"New
-   Employee" ya tuvieron-. El tab dice "Charge Adjustment (+)"; el título
-   que encabeza el panel sigue diciendo "New Credit (+) Adjustment" -así en
-   el frame, no se corrige: el mismo desajuste de nombres que ya se
-   documentó en Locations con "Edit hours"/"New Availability"-. El campo
-   "Type" es el que de verdad decide Charge vs Credit, no el título. */
+/* Figma 4582:25840. Título "New Credit (+) Adjustment" a propósito, ver
+   design-reference/figma/modulos/ledger.md. */
 
 const TIPOS_AJUSTE = ['Charge Adjustment', 'Credit Adjustment']
 const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado']

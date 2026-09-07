@@ -7,14 +7,8 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
 
-/* Figma 4582:30209 "Ledger — Credit Adjustment (-) Modal", ahora un tab en
-   vez de un popup. Sigue siendo el único de los tres con "Amount" como
-   desplegable en el frame -elegís entre los créditos sin aplicar que ya
-   tiene la cuenta-; acá no hay ese catálogo -el resto de la app no modela
-   "créditos disponibles" como lista propia-, así que el campo queda como
-   texto libre igual que en Charge Adjustment; la simplificación se
-   documenta, no se inventa una lista de créditos ficticia sólo para llenar
-   un desplegable. */
+/* Figma 4582:30209. "Amount" es texto libre por elección, ver
+   design-reference/figma/modulos/ledger.md. */
 
 const TIPOS_AJUSTE = ['Credit Adjustment', 'Charge Adjustment']
 

@@ -8,12 +8,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
 
-/* Figma 4582:29545 (Single Method) y 4582:29862 (Multiple Methods), ahora un
-   tab en vez de un popup. El "+" agrega otra fila de Amount/Payment
-   method/Check/Bank-Branch -un pago partido en más de un método-. Check y
-   Bank/Branch sólo importan con "Check payment": se ocultan con otro
-   método, a diferencia del frame que los deja siempre visibles pero
-   vacíos. */
+/* Figma 4582:29545 / 4582:29862. Ver design-reference/figma/modulos/ledger.md. */
 
 const METODOS = ['Check payment', 'Card payment', 'Cash payment', 'Electronic payment']
 

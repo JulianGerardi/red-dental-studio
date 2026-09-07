@@ -1,8 +1,4 @@
-/* Figma 4582:28487 "Ledger — Screens": Empty State, Overview (Patient View),
-   Overview (Guarantor View), y los tres modales de acción -Credit (+)
-   Adjustment, Credit (-) Adjustment, Enter Payment (-)-. Antes no había
-   pantalla y esto se armaba con el vocabulario del resto del sistema; ahora
-   el layout sigue el frame, sin perder esas piezas. Ver modulos/ledger.md. */
+/* Figma 4582:28487. Ver design-reference/figma/modulos/ledger.md. */
 
 export type TipoMovimiento = 'Charge' | 'Payment' | 'Adjustment' | 'Insurance'
 export type EstadoMovimiento = 'Posted' | 'Pending' | 'Denied'
@@ -10,26 +6,17 @@ export type EstadoMovimiento = 'Posted' | 'Pending' | 'Denied'
 export type Movimiento = {
   id: string
   fecha: string
-  /* El paciente del que es el cargo -no siempre el guarantor de la cuenta-.
-     Patient View filtra a uno solo; Guarantor View muestra a todos. */
   paciente: string
   codigo: string
   descripcion: string
   provider: string
   tipo: TipoMovimiento
-  /* Positivo suma a la cuenta del paciente, negativo la baja. */
   monto: number
   estado: EstadoMovimiento
-  /* Sólo los cargos restaurativos de una pieza puntual los tienen -una
-     limpieza o una radiografía no van sobre un diente ni una superficie-.
-     Sin dato, la tabla de aplicación (`LedgerAllocationTable`) muestra "-". */
   diente?: string
   superficie?: string
 }
 
-/* John Smith es el guarantor de la cuenta; Emma Smith es su dependiente.
-   Sin un segundo paciente, Guarantor View y Patient View mostrarían la misma
-   tabla y el toggle no tendría nada que demostrar. */
 export const GUARANTOR = 'John Smith'
 export const DEPENDIENTES = ['Emma Smith']
 
@@ -44,9 +31,6 @@ export const MOVIMIENTOS: Movimiento[] = [
   { id: 'm8', fecha: 'March 26, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Courtesy adjustment', provider: 'Front desk', tipo: 'Adjustment', monto: -45, estado: 'Posted' },
   { id: 'm9', fecha: 'March 19, 2025', paciente: 'Emma Smith', codigo: 'D1120', descripcion: 'Prophylaxis – child', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 90, estado: 'Posted' },
   { id: 'm10', fecha: 'March 22, 2025', paciente: 'Emma Smith', codigo: '—', descripcion: 'Electronic Payment', provider: 'Front desk', tipo: 'Payment', monto: -90, estado: 'Posted' },
-  /* De acá para abajo, cargos que suman a los de arriba -no reemplazan
-     nada-: la tabla de aplicación de los paneles de Payment/Credit se veía
-     demasiado corta con sólo 4 cargos por paciente. */
   { id: 'm11', fecha: 'March 28, 2025', paciente: 'John Smith', codigo: 'D1206', descripcion: 'Topical fluoride varnish', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 45, estado: 'Posted' },
   { id: 'm12', fecha: 'March 31, 2025', paciente: 'John Smith', codigo: 'D2392', descripcion: 'Resin composite – two surfaces', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 220, estado: 'Posted', diente: '30', superficie: 'MO' },
   { id: 'm13', fecha: 'April 3, 2025', paciente: 'John Smith', codigo: 'D4341', descripcion: 'Periodontal scaling – per quadrant', provider: 'Dr. Salgado', tipo: 'Charge', monto: 310, estado: 'Posted' },
@@ -60,10 +44,7 @@ export const TIPOS: TipoMovimiento[] = ['Charge', 'Payment', 'Adjustment', 'Insu
 export const moneda = (n: number) =>
   `${n < 0 ? '-' : ''}$${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
 
-/* El saldo corre en el orden en que se listan los movimientos, sobre la
-   cuenta completa del guarantor -no se reinicia por paciente-, así una
-   fila de Emma Smith en Guarantor View sigue la misma cuenta corriente que
-   las de John Smith. */
+/* Corre sobre la cuenta completa del guarantor, no se reinicia por paciente. */
 export function conSaldo(movs: Movimiento[]) {
   let saldo = 0
   return movs.map((m) => {
