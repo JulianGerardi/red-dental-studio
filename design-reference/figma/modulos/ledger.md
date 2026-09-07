@@ -168,3 +168,19 @@ Information"-, que el Figma no trae para estos dos pero permite el paralelo
 visual entre las tres cards, pedido explícito de Julián. El ícono
 (`CreditCard`) es el mismo que ya usa "Ledger Transactions" -Figma reusa un
 único glifo genérico para estos encabezados de card, no uno por tema-.
+
+## Columnas elegibles, para no depender del scroll (2026-09-07)
+
+Con las 12 columnas siempre puestas, `LedgerAllocationTable` pedía scroll
+horizontal en cualquier ancho razonable -mismo problema en Payment y en
+Credit Adjustment, comparten el componente-. Se agrega un botón "Columns"
+junto al título de la card, con un desplegable de checkboxes -mismo patrón
+visual que `FilterMenu`- para elegir qué columnas mostrar.
+
+Por defecto quedan visibles Transaction Date, Patient, Code, Description,
+Charge, Applied y Balance -entran sin scroll en cualquier ancho de
+escritorio-; Provider, Tooth, Surface, Other Credit y Guar Estimate quedan
+ocultas hasta que se piden. El ancho mínimo de la tabla ya no es un número
+fijo: se calcula sumando el ancho de las columnas visibles, así el
+`overflow-x-auto` sólo entra en juego si el usuario reactiva suficientes
+columnas como para necesitarlo.
