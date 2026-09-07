@@ -152,3 +152,19 @@ explícitamente no recortarla: van las 12.
   columnas; como ya no vive dentro de un modal con ancho fijo sino en la
   página de Ledger, el `overflow-x-auto` de siempre alcanza sin tener que
   ensanchar nada más.
+
+## `LedgerAllocationTable` no tenía el look de las otras tablas (2026-09-07)
+
+La cabecera y las filas se habían armado con valores propios -`h-9`, texto
+`11px`, fondo blanco, tres bordes grises distintos entre cabecera/filas
+(`#e4e4e7`, `#f1f1f4`)- en vez de los que ya usa toda tabla del sistema
+-Ledger, Employees, Locations-: cabecera `h-12` con fondo `#f9f9f9` y texto
+`text-xs`, filas `py-3` con texto `13px`, un solo gris de borde (`#e7e7e7`)
+para las dos. Se empareja a esos valores.
+
+De paso, **Credit Adjustment** y **Charge Adjustment** ganan la misma
+cabecera con ícono que ya tenía Payment -"Credit Information" y "Adjustment
+Information"-, que el Figma no trae para estos dos pero permite el paralelo
+visual entre las tres cards, pedido explícito de Julián. El ícono
+(`CreditCard`) es el mismo que ya usa "Ledger Transactions" -Figma reusa un
+único glifo genérico para estos encabezados de card, no uno por tema-.

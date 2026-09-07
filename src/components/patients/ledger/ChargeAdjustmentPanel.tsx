@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CreditCard } from 'lucide-react'
 import {
   TextField, SelectField, TextArea, FieldLabel, FormFooter,
 } from '@/components/patients/form'
@@ -55,7 +56,11 @@ export function ChargeAdjustmentPanel({
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-[#09090b]">
+          <CreditCard className="size-4" /> Adjustment Information
+        </h2>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2">
             <FieldLabel required>Transaction date</FieldLabel>
             <DatePicker value={fecha} onChange={setFecha} className="h-9 w-full" error={intentado && !fecha ? true : undefined} />

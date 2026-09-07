@@ -62,7 +62,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
         <>
           <div className="mt-3 overflow-x-auto">
             <div className="min-w-[1280px]">
-              <div className="flex h-9 items-center gap-3 border-b border-[#e4e4e7] text-[11px] font-semibold text-[#71717a]">
+              <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] text-xs font-semibold text-[#71717a]">
                 <span className={cn(COLS.fecha, 'shrink-0')}>Transaction Date</span>
                 <span className={cn(COLS.paciente, 'shrink-0')}>Patient</span>
                 <span className={cn(COLS.provider, 'shrink-0')}>Provider</span>
@@ -82,7 +82,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                 const otroCredito = m.monto * cobertura
                 const guarEstimado = m.monto - otroCredito
                 return (
-                  <div key={m.id} className="flex items-center gap-3 border-b border-[#f1f1f4] py-2 text-[13px] text-[#3f3f46] last:border-0">
+                  <div key={m.id} className="flex items-center gap-3 border-b border-[#e7e7e7] py-3 text-[13px] text-[#3f3f46] last:border-0">
                     <span className={cn(COLS.fecha, 'shrink-0')}>{m.fecha}</span>
                     <span className={cn(COLS.paciente, 'shrink-0 truncate')}>{m.paciente}</span>
                     <span className={cn(COLS.provider, 'shrink-0 truncate')}>{m.provider}</span>
