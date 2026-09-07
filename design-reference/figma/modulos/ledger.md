@@ -92,3 +92,35 @@ siguen en `Movimiento` -la búsqueda sigue filtrando por código, y "Insurance
 paid" en la tira de métricas sigue contando `estado === 'Denied'`-, sólo
 dejan de tener columna propia en la tabla: son datos que otras partes de la
 pantalla usan, no filas visibles de más.
+
+## Los tres botones pasan a ser tabs (2026-09-07)
+
+Pedido de Julián: "Patient Payment (-)", "Credit Adjustment (-)" y "Charge
+Adjustment (+)" dejan de ser botones que abren un modal y pasan a ser tabs,
+junto con un cuarto tab nuevo, "Transactions", que es la vista que ya
+existía (tira de métricas, buscador, tabla). Mismo tab-bar
+(`bg-[#f1f5f9]` + pill azul) que ya usan Employees y Location Detail, y la
+misma conversión modal→pantalla que ya tuvieron "New Location" y "New
+Employee": `NewPatientPaymentModal.tsx`, `NewCreditAdjustmentModal.tsx` y
+`NewChargeAdjustmentModal.tsx` se renombran a `PatientPaymentPanel.tsx`,
+`CreditAdjustmentPanel.tsx` y `ChargeAdjustmentPanel.tsx` -sin `ModalShell`,
+con `FormFooter` al pie de la página en vez de en el `footer` del modal-.
+
+- El **título de la página** (el `<h1>`) cambia según el tab activo, igual
+  que ya hace `Employees.tsx` con `{tab === 'Employee' ? 'Employee
+  Information' : tab}`: en "Transactions" dice "Ledger"; en los otros tres
+  dice el título real del modal de Figma -"New Patient Payment (-)", "New
+  Credit (-) Adjustment", "New Credit (+) Adjustment"-, preservando el
+  desajuste botón/título de este último (ver más arriba) aunque el tab en
+  sí se llame "Charge Adjustment (+)".
+- **Guardar o cancelar vuelve al tab de Transactions** -antes el modal se
+  cerraba sobre la tabla que ya estaba ahí atrás; ahora no hay "atrás", así
+  que el cambio de tab hace ese mismo trabajo-.
+- El toggle **Patient View / Guarantor View** y **Export statement** se
+  mudan a la fila de búsqueda/filtro, y sólo se muestran en el tab
+  Transactions -no tienen nada que hacer en un formulario de alta-.
+- Las tablas de aplicación (`LedgerAllocationTable`) traían sólo 4 cargos
+  por paciente en los datos de prueba, bastante menos que las capturas del
+  Figma. Se suman 4 cargos más a John Smith y 2 a Emma Smith en
+  `data/ledger.ts` para que las tablas de Payment y Credit Adjustment se
+  vean tan pobladas como el frame.

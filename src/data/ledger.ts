@@ -39,6 +39,15 @@ export const MOVIMIENTOS: Movimiento[] = [
   { id: 'm8', fecha: 'March 26, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Courtesy adjustment', provider: 'Front desk', tipo: 'Adjustment', monto: -45, estado: 'Posted' },
   { id: 'm9', fecha: 'March 19, 2025', paciente: 'Emma Smith', codigo: 'D1120', descripcion: 'Prophylaxis – child', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 90, estado: 'Posted' },
   { id: 'm10', fecha: 'March 22, 2025', paciente: 'Emma Smith', codigo: '—', descripcion: 'Electronic Payment', provider: 'Front desk', tipo: 'Payment', monto: -90, estado: 'Posted' },
+  /* De acá para abajo, cargos que suman a los de arriba -no reemplazan
+     nada-: la tabla de aplicación de los paneles de Payment/Credit se veía
+     demasiado corta con sólo 4 cargos por paciente. */
+  { id: 'm11', fecha: 'March 28, 2025', paciente: 'John Smith', codigo: 'D1206', descripcion: 'Topical fluoride varnish', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 45, estado: 'Posted' },
+  { id: 'm12', fecha: 'March 31, 2025', paciente: 'John Smith', codigo: 'D2392', descripcion: 'Resin composite – two surfaces', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 220, estado: 'Posted' },
+  { id: 'm13', fecha: 'April 3, 2025', paciente: 'John Smith', codigo: 'D4341', descripcion: 'Periodontal scaling – per quadrant', provider: 'Dr. Salgado', tipo: 'Charge', monto: 310, estado: 'Posted' },
+  { id: 'm14', fecha: 'April 7, 2025', paciente: 'John Smith', codigo: 'D0220', descripcion: 'Intraoral periapical – first image', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 38, estado: 'Posted' },
+  { id: 'm15', fecha: 'March 30, 2025', paciente: 'Emma Smith', codigo: 'D1206', descripcion: 'Topical fluoride varnish', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 40, estado: 'Posted' },
+  { id: 'm16', fecha: 'April 5, 2025', paciente: 'Emma Smith', codigo: 'D0150', descripcion: 'Comprehensive oral evaluation', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 75, estado: 'Posted' },
 ]
 
 export const TIPOS: TipoMovimiento[] = ['Charge', 'Payment', 'Adjustment', 'Insurance']
