@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { CreditCard, Columns3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { moneda, type Movimiento } from '@/data/ledger'
 
 /* Figma 4582:29618 / 4582:30251. Ver design-reference/figma/modulos/ledger.md. */
@@ -20,52 +21,24 @@ function ColumnPicker({
   ocultas: ColId[]
   onToggle: (id: ColId) => void
 }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    const onDown = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
-  }, [open])
-
   return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 rounded-md border border-[#e4e4e7] px-2.5 py-1.5 text-[12px] font-medium text-[#71717a] hover:bg-[#f4f4f5]"
-      >
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md border border-[#e4e4e7] px-2.5 py-1.5 text-[12px] font-medium text-[#71717a] hover:bg-[#f4f4f5]">
         <Columns3 className="size-3.5" /> Columns
-      </button>
-      {open && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+6px)] right-0 z-40 w-[190px] overflow-hidden rounded-lg border border-[#e4e4e7] bg-white py-1 shadow-lg">
-          {columnas.map((c) => {
-            const on = !ocultas.includes(c.id)
-            return (
-              <button
-                key={c.id}
-                type="button"
-                role="menuitemcheckbox"
-                aria-checked={on}
-                onClick={() => onToggle(c.id)}
-                className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]"
-              >
-                <span className={cn('flex size-4 shrink-0 items-center justify-center rounded-[3px] border', on ? 'bg-dash-blue border-dash-blue' : 'border-[#a1a1aa] bg-white')}>
-                  {on && (
-                    <svg viewBox="0 0 12 12" className="size-3 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M2 6.5 4.8 9 10 3.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                </span>
-                {c.label}
-              </button>
-            )
-          })}
-        </div>
-      )}
-    </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[190px]">
+        {columnas.map((c) => (
+          <DropdownMenuCheckboxItem
+            key={c.id}
+            checked={!ocultas.includes(c.id)}
+            onCheckedChange={() => onToggle(c.id)}
+            onSelect={(e) => e.preventDefault()}
+          >
+            {c.label}
+          </DropdownMenuCheckboxItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

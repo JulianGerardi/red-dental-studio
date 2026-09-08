@@ -1,5 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 /* ─────────────────────────────────────────────────────────────
    Design tokens extraídos de red.dev.confidentally.com
@@ -103,6 +107,7 @@
   --chart-4: 43 74% 66%;
   --chart-5: 27 87% 67%;
   --radius: .5rem;
+  --sidebar: 0 0% 100%;
 }
 
 .dark {
@@ -141,6 +146,8 @@
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
+  --sidebar: 240 5.9% 10%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 @theme inline {
@@ -246,16 +253,24 @@
   /* utilidad tipográfica custom del original */
   --text-small: 1rem;
   --text-small--line-height: 1.5rem;
+  --font-heading: var(--font-sans);
+  --color-sidebar: var(--sidebar);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    @apply border-border outline-ring/50;
   }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;
+  }
+  html {
+    @apply font-sans;
   }
 }
 

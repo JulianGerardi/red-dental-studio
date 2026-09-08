@@ -184,3 +184,15 @@ ocultas hasta que se piden. El ancho mínimo de la tabla ya no es un número
 fijo: se calcula sumando el ancho de las columnas visibles, así el
 `overflow-x-auto` sólo entra en juego si el usuario reactiva suficientes
 columnas como para necesitarlo.
+
+## El picker de columnas pasa a shadcn/ui real (2026-09-07)
+
+Julián pidió que el componente de columnas sea shadcn de verdad, no una
+imitación con `<div>`+estado propio -y que todo lo nuevo de acá en más se
+construya con esa librería-. Se instaló shadcn/ui (Radix + `components.json`,
+antes el proyecto sólo tenía el CSS con la convención de tokens de shadcn
+pero ningún componente corría sobre Radix) y `ColumnPicker` se reescribió
+sobre `DropdownMenu`/`DropdownMenuCheckboxItem` reales
+(`src/components/ui/dropdown-menu.tsx`). Mismos ids, mismo default
+visible/oculto; el manejo de apertura, click-afuera y Escape ya no es código
+propio, lo da Radix.
