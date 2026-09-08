@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { moneda, fechaCorta, type Movimiento } from '@/data/ledger'
 import { Pagination } from '@/components/patients/ledger/Pagination'
-import { useAnchoColumnas, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
+import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
 import { LedgerRowDetail, LedgerRowModal } from '@/components/patients/ledger/LedgerRowDetail'
 
 /* Figma 4582:29618 / 4582:30251. Ver design-reference/figma/modulos/ledger.md. */
@@ -102,6 +102,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const [expandidas, setExpandidas] = useState<string[]>([])
   const [enModal, setEnModal] = useState<Movimiento | null>(null)
   const anchos = useAnchoColumnas<ColId>(ANCHO_BASE)
+  const refVisible = useAnchoVisible<HTMLDivElement>()
 
   const alternarFila = (id: string) =>
     setExpandidas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
@@ -170,7 +171,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
         <p className="mt-3 text-[13px] text-[#71717a]">No open charges to apply this against.</p>
       ) : (
         <>
-          <div data-tabla-scroll className="mt-3 w-full overflow-x-auto rounded-md border border-[#e7e7e7]">
+          <div ref={refVisible} data-tabla-scroll className="mt-3 w-full overflow-x-auto rounded-md border border-[#e7e7e7]">
             <div style={{ minWidth: anchoMinimo }}>
               <div data-tabla-header className="group/fila flex items-center gap-1.5 bg-[#f9f9f9] px-3 py-2.5 text-[11px] font-semibold text-[#71717a]">
                 {columnasVisibles.map((c, i) => (
@@ -232,12 +233,12 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
             <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
               Showing {cargosPagina.length} of {cargos.length} transactions
               {anchos.avisando && (
-                <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] flex items-center gap-1.5 font-medium text-[#a1a1aa]">
+                <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-[#a1a1aa] lg:flex">
                   <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
                 </span>
               )}
               {anchos.hayCambios && (
-                <button type="button" onClick={anchos.resetear} className="text-dash-blue hover:underline">
+                <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">
                   Reset column widths
                 </button>
               )}

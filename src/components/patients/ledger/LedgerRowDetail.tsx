@@ -47,14 +47,22 @@ export function LedgerRowDetail({
 }) {
   return (
     <div className="border-t border-[#e7e7e7] bg-[#fafafa] px-3 py-3">
-      <Campos m={m} />
-      <button
-        type="button"
-        onClick={onVerTodo}
-        className="text-dash-blue mt-3 inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline"
-      >
-        <Maximize2 className="size-3.5" /> View full record
-      </button>
+      {/* La fila vive dentro del ancho mínimo de la tabla, que en pantallas
+          chicas es más ancho que la vista. Sin esto el detalle nacía de 864px
+          y había que scrollear para leerlo -lo contrario de para qué está-.
+          `sticky left-0` lo deja fijo en la parte visible mientras la tabla
+          se mueve, y el ancho sale de `--tabla-visible` (lo publica el
+          contenedor); cuando la tabla entra entera, ese valor ya es el 100%. */}
+      <div className="sticky left-0 w-[var(--tabla-visible,100%)]">
+        <Campos m={m} />
+        <button
+          type="button"
+          onClick={onVerTodo}
+          className="text-dash-blue mt-3 inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline"
+        >
+          <Maximize2 className="size-3.5" /> View full record
+        </button>
+      </div>
     </div>
   )
 }

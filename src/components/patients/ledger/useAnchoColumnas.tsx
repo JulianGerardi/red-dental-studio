@@ -12,14 +12,20 @@ let avisoMostrado = false
 export function useAnchoColumnas<T extends string>(base: Record<T, number>) {
   const [anchos, setAnchos] = useState<Partial<Record<T, number>>>({})
   const [arrastrando, setArrastrando] = useState<T | null>(null)
-  const [avisando, setAvisando] = useState(!avisoMostrado)
+  /* Abajo de `lg` no hay manijas, así que el aviso no se gasta ahí: si no,
+     entrar una vez desde el celular dejaba sin aviso al escritorio. */
+  const [avisando, setAvisando] = useState(
+    () => !avisoMostrado && window.matchMedia('(min-width: 1024px)').matches,
+  )
   const ref = useRef<{ id: T; x0: number; w0: number; max: number } | null>(null)
 
   useEffect(() => {
-    if (avisoMostrado) return
+    if (!avisando) return
     avisoMostrado = true
     const t = setTimeout(() => setAvisando(false), 2600)
     return () => clearTimeout(t)
+    // Sólo al montar: es un aviso de una vez, no reacciona a cambios.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   /* Techo del arrastre: ensanchar una columna no puede empujar a las
@@ -110,6 +116,33 @@ export function useAnchoColumnas<T extends string>(base: Record<T, number>) {
   }
 }
 
+/* Publica el ancho visible de la tabla como `--tabla-visible`, para que lo
+   que va adentro del contenedor scrolleado -el detalle de fila- pueda
+   anclarse a la parte que se ve en vez de al ancho total de la tabla.
+   Un `100vw` no alcanza: en tablet el contenedor mide bastante menos que
+   la ventana. */
+export function useAnchoVisible<T extends HTMLElement>() {
+  const ref = useRef<T>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const medir = () => el.style.setProperty('--tabla-visible', `${el.clientWidth}px`)
+    medir()
+    /* `ResizeObserver` cubre los cambios que no vienen de la ventana -por
+       ejemplo colapsar el panel del paciente-, y el `resize` cubre el caso
+       de la ventana aunque el observer venga demorado (sus callbacks van
+       atadas al ciclo de render y no corren con la pestaña sin pintar). */
+    const ro = new ResizeObserver(medir)
+    ro.observe(el)
+    window.addEventListener('resize', medir)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', medir)
+    }
+  }, [])
+  return ref
+}
+
 export function ManijaResize<T extends string>({
   id, label, estado, indice = 0,
 }: {
@@ -141,8 +174,11 @@ export function ManijaResize<T extends string>({
          28 de alto le dan un área de agarre real. Ojo: la celda que lo
          contiene no puede llevar `truncate` -su overflow:hidden recorta la
          manija y la vuelve inclickeable-. */
+      /* Sólo de `lg` para arriba: abajo la tabla ya se lee scrolleando, no
+         hay hover que revele la manija, y su `touch-none` se comía el
+         gesto de scroll horizontal si el dedo caía encima. */
       className={cn(
-        'group/manija absolute top-1/2 -right-[5px] z-10 flex h-[28px] w-[10px] -translate-y-1/2',
+        'group/manija absolute top-1/2 -right-[5px] z-10 hidden h-[28px] w-[10px] -translate-y-1/2 lg:flex',
         'cursor-col-resize touch-none items-center justify-center rounded-full',
         'transition-opacity duration-150 group-hover/fila:opacity-100',
         'focus-visible:opacity-100 focus-visible:outline-none',

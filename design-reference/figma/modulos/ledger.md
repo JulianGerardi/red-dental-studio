@@ -566,3 +566,46 @@ El cierre lleva 160ms de retardo para poder cruzar el hueco entre el botón y
 el panel sin que se escape, y el panel mismo mantiene abierto mientras el
 mouse está encima. Se le sacó el tooltip: con el panel abriéndose solo, el
 tooltip se le encimaba y decía menos que el propio panel.
+
+## Datos de estrés y repaso responsive (2026-09-08)
+
+Julián pidió datos más exigentes -descripciones y nombres largos, diente y
+superficie cargados, montos hasta USD 10.000- y recordó que todo tiene que
+quedar responsive sin cambiar cómo se ve en escritorio.
+
+**Datos.** `data/ledger.ts` suma 10 movimientos (m17-m26) con descripciones
+reales de códigos ADA largos ("Implant/abutment supported fixed denture for
+edentulous arch – maxillary"), un provider largo ("Dr. Konstantinos
+Papadopoulos"), un dependiente nuevo de nombre largo ("Maximiliano
+Fernández-Ugarte"), diente/superficie en casi todos -incluida una superficie
+de cinco letras (MODBL)- y montos de 1.180 a 9.850. Medido: con estos datos
+Description trunca 116-141px y Provider/Patient 31-77px, que es justo lo que
+hacía falta para ver el truncado, los tooltips y el ajuste de columnas
+trabajando. Las columnas de plata no necesitaron tocarse: `-$9,850.00` mide
+71px contra los 80 de Amount, y `$13,123.00` de saldo corrido mide 70 contra
+96 de Balance.
+
+**Responsive.** Tres cosas que estaban mal por debajo de `lg`:
+
+1. **Las manijas de resize seguían montadas** en mobile/tablet. Ahí no hay
+   hover que las revele, así que eran invisibles, y peor: su `touch-none`
+   se comía el gesto de scroll horizontal de la tabla si el dedo caía
+   encima. Pasan a `hidden lg:flex`. El aviso de texto y el link "Reset
+   column widths" siguen la misma regla, y el aviso ni se gasta abajo de
+   `lg` -si no, entrar una vez desde el celular dejaba sin aviso al
+   escritorio-.
+2. **El detalle de fila nacía del ancho de la tabla** (864px), no del
+   visible: en mobile había que scrollear para leerlo, o sea lo contrario de
+   para qué está. Ahora va `sticky left-0` con el ancho tomado de
+   `--tabla-visible`, una variable que el contenedor publica desde
+   `useAnchoVisible`. Verificado: 341 de 341 en mobile, 660 de 660 en tablet,
+   y sigue en su lugar con la tabla scrolleada 400px.
+3. Un `100vw` no servía para el punto 2 -en tablet el contenedor mide 660
+   contra 768 de ventana-, de ahí que la medida salga del contenedor real.
+
+`useAnchoVisible` escucha `ResizeObserver` **y** `resize` de ventana: el
+observer cubre los cambios que no vienen de la ventana (colapsar el panel del
+paciente) y el evento cubre el de ventana aunque el observer venga demorado.
+
+Escritorio quedó igual: mismos anchos de columna (112/112/96/230/112/80/96),
+sin scroll y con las manijas activas.

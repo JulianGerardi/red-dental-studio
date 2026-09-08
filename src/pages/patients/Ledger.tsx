@@ -14,7 +14,7 @@ import {
 } from '@/data/ledger'
 import { aviso } from '@/components/ui/toaster'
 import { Pagination } from '@/components/patients/ledger/Pagination'
-import { useAnchoColumnas, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
+import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
 import { LedgerRowDetail, LedgerRowModal } from '@/components/patients/ledger/LedgerRowDetail'
 import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
 import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
@@ -100,6 +100,7 @@ export default function Ledger() {
   const [expandidas, setExpandidas] = useState<string[]>([])
   const [enModal, setEnModal] = useState<Fila | null>(null)
   const anchos = useAnchoColumnas<ColLedger>(ANCHO_BASE)
+  const refVisible = useAnchoVisible<HTMLDivElement>()
 
   const alternarFila = (id: string) =>
     setExpandidas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
@@ -233,7 +234,7 @@ export default function Ledger() {
                 </div>
               </div>
 
-              <div data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+              <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
                 <div style={{ minWidth: anchoMinimo }}>
                   <div data-tabla-header className="group/fila flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
                     {COLUMNAS.map((c, i) => (
@@ -295,12 +296,12 @@ export default function Ledger() {
                     <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
                       Showing {filasPagina.length} of {filas.length} entries
                       {anchos.avisando && (
-                        <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] flex items-center gap-1.5 font-medium text-[#a1a1aa]">
+                        <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-[#a1a1aa] lg:flex">
                           <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
                         </span>
                       )}
                       {anchos.hayCambios && (
-                        <button type="button" onClick={anchos.resetear} className="text-dash-blue hover:underline">
+                        <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">
                           Reset column widths
                         </button>
                       )}
