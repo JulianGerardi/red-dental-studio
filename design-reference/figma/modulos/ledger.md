@@ -255,3 +255,31 @@ el mínimo a `min-w-[974px]`. Mismo patrón que ya usa `LedgerAllocationTable`
 (sus columnas fijas también llevan `shrink-0`, sólo `desc` es `flex-1`): si
 entra, entra completa; si no entra, se ve completa scrolleando -nunca
 recortada a la mitad de un carácter-.
+
+## `LedgerAllocationTable`: header que envuelve mal y demasiado gris (2026-09-08)
+
+Julián reportó tres cosas sobre Patient Payment y Credit Adjustment -las dos
+pestañas que usan `LedgerAllocationTable`, comparten el componente-:
+
+1. **"Transaction Date" se parte en dos líneas.** Esa columna medía
+   `w-[90px]`, pero el label completo necesita ~98px a `12px/600` -medido con
+   `canvas.measureText`, no a ojo-. Se sube a `w-[105px]` (y su `px: 105` en
+   el array de columnas, para que `anchoMinimo` seguía sumando bien).
+2. **La tabla "queda cortada".** Era el mismo síntoma que el bug anterior de
+   arriba pero acá no hay squish -esta tabla ya tenía `shrink-0`-: es que el
+   header partido a dos líneas hace parecer rota toda la fila. Arreglado el
+   punto 1, se resuelve solo.
+3. **"La columna principal tiene mucho padding gris."** `desc` es
+   `min-w-[160px] flex-1` sin techo: cuando la tarjeta tiene de sobra (7
+   columnas por defecto, bastante angostas), todo ese sobrante iba a parar a
+   `Description` -llegaba a 317px reales para mostrar textos de ~230px como
+   máximo (medido sobre las descripciones más largas de `data/ledger.ts`,
+   "Bitewings – four radiographic images")-, y como el header tiene fondo
+   gris de fila completa, ese sobrante se veía como una franja gris vacía
+   pegada al label. Se le pone techo -`max-w-[240px]`, con margen sobre el
+   máximo medido- vía un `pxMax` nuevo en `Columna` (default: el mismo `px`),
+   que ahora también arma un `anchoMaximo` para el wrapper de la fila
+   (`style={{ minWidth: anchoMinimo, maxWidth: anchoMaximo }}`): la fila deja
+   de estirarse más allá de lo que sus columnas realmente usan, así que el
+   sobrante de la tarjeta queda como fondo blanco liso *fuera* de la fila, no
+   como gris *adentro* del header.

@@ -58,7 +58,7 @@ function ColumnPicker({
   )
 }
 
-type Columna = { id: ColId; label: string; ancho: string; px: number; claseCelda?: string; bloqueada?: boolean; celda: (m: Movimiento, ap: number) => React.ReactNode }
+type Columna = { id: ColId; label: string; ancho: string; px: number; pxMax?: number; claseCelda?: string; bloqueada?: boolean; celda: (m: Movimiento, ap: number) => React.ReactNode }
 
 export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const [aplicado, setAplicado] = useState<Record<string, string>>({})
@@ -71,13 +71,13 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const totalAplicado = cargos.reduce((a, m) => a + (Number(aplicado[m.id]) || 0), 0)
 
   const columnas: Columna[] = [
-    { id: 'fecha', label: 'Transaction Date', ancho: 'w-[90px] shrink-0', px: 90, bloqueada: true, celda: (m) => m.fecha },
+    { id: 'fecha', label: 'Transaction Date', ancho: 'w-[105px] shrink-0', px: 105, bloqueada: true, celda: (m) => m.fecha },
     { id: 'paciente', label: 'Patient', ancho: 'w-[100px] shrink-0', px: 100, claseCelda: 'truncate', celda: (m) => m.paciente },
     { id: 'provider', label: 'Provider', ancho: 'w-[130px] shrink-0', px: 130, claseCelda: 'truncate', celda: (m) => m.provider },
     { id: 'diente', label: 'Tooth', ancho: 'w-[55px] shrink-0', px: 55, celda: (m) => m.diente ?? '-' },
     { id: 'superficie', label: 'Surface', ancho: 'w-[60px] shrink-0', px: 60, celda: (m) => m.superficie ?? '-' },
     { id: 'codigo', label: 'Code', ancho: 'w-[60px] shrink-0', px: 60, claseCelda: 'text-dash-blue font-medium', celda: (m) => m.codigo },
-    { id: 'desc', label: 'Description', ancho: 'min-w-[160px] flex-1', px: 160, claseCelda: 'truncate text-[#09090b]', celda: (m) => m.descripcion },
+    { id: 'desc', label: 'Description', ancho: 'min-w-[160px] max-w-[240px] flex-1', px: 160, pxMax: 240, claseCelda: 'truncate text-[#09090b]', celda: (m) => m.descripcion },
     { id: 'charge', label: 'Charge', ancho: 'w-[80px] shrink-0 text-right', px: 80, claseCelda: 'font-medium tabular-nums text-[#09090b]', celda: (m) => moneda(m.monto) },
     { id: 'otroCredito', label: 'Other Credit', ancho: 'w-[90px] shrink-0 text-right', px: 90, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * coberturaSeguro(m.codigo)) },
     { id: 'guarEstimado', label: 'Guar Estimate', ancho: 'w-[95px] shrink-0 text-right', px: 95, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * (1 - coberturaSeguro(m.codigo))) },
@@ -101,7 +101,12 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
     { id: 'balance', label: 'Balance', ancho: 'w-[85px] shrink-0 text-right', px: 85, claseCelda: 'font-semibold tabular-nums text-[#09090b]', bloqueada: true, celda: (m, ap) => moneda(Math.max(m.monto - ap, 0)) },
   ]
   const columnasVisibles = columnas.filter((c) => !ocultas.includes(c.id))
-  const anchoMinimo = columnasVisibles.reduce((a, c) => a + c.px, 0) + (columnasVisibles.length - 1) * 12
+  const gapsTotal = (columnasVisibles.length - 1) * 12
+  const anchoMinimo = columnasVisibles.reduce((a, c) => a + c.px, 0) + gapsTotal
+  /* Tope para que la fila no se estire más de lo que "Description" puede
+     usar -si no, el sobrante queda como una franja gris vacía al final del
+     header, ver design-reference/figma/modulos/ledger.md-. */
+  const anchoMaximo = columnasVisibles.reduce((a, c) => a + (c.pxMax ?? c.px), 0) + gapsTotal
 
   return (
     <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
@@ -117,7 +122,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
       ) : (
         <>
           <div className="mt-3 overflow-x-auto">
-            <div style={{ minWidth: anchoMinimo }}>
+            <div style={{ minWidth: anchoMinimo, maxWidth: anchoMaximo }}>
               <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] text-xs font-semibold text-[#71717a]">
                 {columnasVisibles.map((c) => (
                   <span key={c.id} className={c.ancho}>{c.label}</span>
