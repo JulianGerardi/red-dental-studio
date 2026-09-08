@@ -100,6 +100,9 @@ const ANCHO_MINIMO: Record<ColId, number> = {
   desc: 72, charge: 61, otroCredito: 61, guarEstimado: 61, applied: 58, balance: 61,
 }
 
+/** Techo de Description: pasado eso, el lugar que sobra va a las demás. */
+const MAX_ELASTICA = 240
+
 export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const [aplicado, setAplicado] = useState<Record<string, string>>({})
   /* Arrancan todas visibles: con los anchos del diseño de referencia las 12
@@ -167,15 +170,23 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
     (a, c) => a + (anchos.manual(c.id) ?? ANCHO_MINIMO[c.id]), 0,
   ) + (columnasVisibles.length - 1) * GAP + PADDING_FILA
 
-  /* Una columna movida a mano se queda donde la dejaron: no encoge. El
-     resto cede hasta su piso para que las 12 entren enteras. */
+  /* Una columna movida a mano se queda donde la dejaron: no encoge ni
+     crece. El resto cede hasta su piso para que las 12 entren enteras.
+     Al sobrar lugar -sobre todo cuando se ocultan columnas- Description se
+     lo queda primero (peso alto) hasta su techo, y recién ahí el excedente
+     se reparte entre las demás: sin el techo, esconder cuatro columnas la
+     estiraba a 350px y dejaba al resto igual de apretado. */
   const estilo = (c: Columna) => {
     const fijada = anchos.manual(c.id) !== undefined
+    if (fijada) {
+      return { width: anchos.ancho(c.id), minWidth: anchos.ancho(c.id), flexGrow: 0, flexShrink: 0 }
+    }
     return {
       width: anchos.ancho(c.id),
-      minWidth: fijada ? anchos.ancho(c.id) : ANCHO_MINIMO[c.id],
-      flexGrow: c.elastica && !fijada ? 1 : 0,
-      flexShrink: fijada ? 0 : 1,
+      minWidth: ANCHO_MINIMO[c.id],
+      maxWidth: c.elastica ? MAX_ELASTICA : undefined,
+      flexGrow: c.elastica ? 1000 : 1,
+      flexShrink: 1,
     }
   }
 
@@ -197,7 +208,11 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
         <p className="mt-3 text-[13px] text-[#71717a]">No open charges to apply this against.</p>
       ) : (
         <>
-          <TooltipProvider delayDuration={400}>
+          {/* `skipDelayDuration={0}`: sin esto Radix deja una ventana de gracia
+                  y al barrer la tabla el tooltip de la fila siguiente abre al
+                  instante -y alcanza a mostrar el contenido de la anterior-, que
+                  es el parpadeo que hacía imposible leerlo. */}
+              <TooltipProvider delayDuration={500} skipDelayDuration={0}>
           <div ref={refVisible} data-tabla-scroll className="mt-3 w-full overflow-x-auto rounded-md border border-[#e7e7e7]">
             <div style={{ minWidth: anchoMinimo }}>
               <div data-tabla-header className="group/fila flex items-center gap-1.5 bg-[#f9f9f9] px-3 py-2.5 text-[11px] font-semibold text-[#71717a]">

@@ -671,3 +671,53 @@ las manijas de resize quedan: viven en la cabecera, no en las filas.
 
 Delay de 400ms, para que recorrer la tabla con el mouse no dispare tooltips
 todo el tiempo.
+
+## Al ocultar columnas el espacio se reparte, no se apila (2026-09-08)
+
+Julián marcó que al usar el picker de columnas la tabla "debería ir
+acomodándose al container, porque si no queda mucho espacio". Medido: con
+las 12 columnas, Description está en 94px; al ocultar cuatro, los ~256px
+liberados iban **todos** a Description -saltaba a 350px- mientras el resto
+quedaba igual de apretado. La tabla llenaba el ancho, pero mal repartido.
+
+Ahora Description tiene techo (`MAX_ELASTICA`) y las demás columnas también
+pueden crecer:
+
+- Description conserva un `flexGrow` altísimo (1000) contra 1 del resto, así
+  que mientras haya poco excedente se lo lleva prácticamente todo -que es
+  como se comporta hoy en escritorio- pero deja de crecer en su techo.
+- Pasado ese techo, el sobrante se reparte entre las demás columnas.
+
+Números medidos con las mismas 8 columnas visibles:
+`76·76·72·52·350·64·72·64` → `92·92·88·68·240·80·88·80`. El total sigue
+llenando el contenedor exacto (892 = 892), pero ahora crecen todas.
+
+El techo se eligió para **no tocar el escritorio**: en Transactions es 280 y
+a 934px la columna llega a 230, o sea el mismo valor de siempre
+(112/112/96/230/112/80/96 verificado sin cambios). En la de allocation es
+240.
+
+## El total de Transactions no se parecía a las otras tablas (2026-09-08)
+
+En Payment y Credit Adjustment el total cierra con una cajita con borde
+(`<dl>` de dos filas, etiqueta con fondo gris a la izquierda). En
+Transactions, en cambio, el "Balance due" iba como texto suelto al lado de
+la paginación, adentro del contenedor de la tabla. Pasa a la misma cajita
+con borde, afuera y abajo a la derecha, igual que las otras dos.
+
+## El tooltip de fila parpadeaba (2026-09-08)
+
+Julián: "está muy rápido, no se logra a ver". Medido: con el mouse quieto el
+tooltip **no se cierra** -sigue abierto pasados 1,5s-, así que el problema
+no era la duración. Lo que pasaba es que Radix trae una ventana de gracia
+(`skipDelayDuration`, 300ms por defecto): al pasar de una fila a otra el
+tooltip siguiente abre **al instante**, y encima alcanza a mostrar el
+contenido de la fila anterior antes de actualizarse -verificado: parado
+sobre "BCBS claim" el tooltip todavía decía "Crown – porcelain/ceramic"-.
+Barriendo la tabla eso es un parpadeo permanente.
+
+Se pone `skipDelayDuration={0}` -cada tooltip espera su demora completa, no
+hay apertura instantánea- y la demora sube a 500ms, para que aparezca sólo
+cuando uno se detiene de verdad. Además `sideOffset={8}` lo despega de la
+fila: pegado, el puntero le quedaba encima y el tooltip peleaba con su
+propio disparador.

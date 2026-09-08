@@ -54,6 +54,11 @@ const ANCHO_MINIMO: Record<ColLedger, number> = {
   fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, saldo: 76,
 }
 
+/* Techo de Description: pasado eso, lo que sobra se reparte entre las
+   demás. 280 deja intacto el ancho de escritorio -a 934px la columna llega
+   a 230- y sólo entra en juego cuando se ocultan columnas. */
+const MAX_ELASTICA = 280
+
 type ColumnaLedger = {
   id: ColLedger; label: string
   elastica?: boolean; derecha?: boolean
@@ -115,15 +120,21 @@ export default function Ledger() {
   const alternarFila = (id: string) =>
     setExpandidas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
 
-  /* Una columna movida a mano se queda donde la dejaron: no encoge. El
-     resto cede hasta su piso para que la tabla entre entera. */
+  /* Una columna movida a mano se queda donde la dejaron: no encoge ni
+     crece. El resto cede hasta su piso para que la tabla entre entera, y al
+     sobrar lugar Description se lo queda primero (peso alto) hasta su
+     techo; recién ahí el excedente se reparte entre las demás. */
   const estilo = (c: ColumnaLedger) => {
     const fijada = anchos.manual(c.id) !== undefined
+    if (fijada) {
+      return { width: anchos.ancho(c.id), minWidth: anchos.ancho(c.id), flexGrow: 0, flexShrink: 0 }
+    }
     return {
       width: anchos.ancho(c.id),
-      minWidth: fijada ? anchos.ancho(c.id) : ANCHO_MINIMO[c.id],
-      flexGrow: c.elastica && !fijada ? 1 : 0,
-      flexShrink: fijada ? 0 : 1,
+      minWidth: ANCHO_MINIMO[c.id],
+      maxWidth: c.elastica ? MAX_ELASTICA : undefined,
+      flexGrow: c.elastica ? 1000 : 1,
+      flexShrink: 1,
     }
   }
   const anchoMinimo = COLUMNAS.reduce(
@@ -259,7 +270,11 @@ export default function Ledger() {
                 </div>
               </div>
 
-              <TooltipProvider delayDuration={400}>
+              {/* `skipDelayDuration={0}`: sin esto Radix deja una ventana de gracia
+                  y al barrer la tabla el tooltip de la fila siguiente abre al
+                  instante -y alcanza a mostrar el contenido de la anterior-, que
+                  es el parpadeo que hacía imposible leerlo. */}
+              <TooltipProvider delayDuration={500} skipDelayDuration={0}>
               <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
                 <div style={{ minWidth: anchoMinimo }}>
                   <div data-tabla-header className="group/fila flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
@@ -333,17 +348,23 @@ export default function Ledger() {
                         </button>
                       )}
                     </span>
-                    <div className="flex items-center gap-4">
-                      <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
-                      <span className="text-[13px] font-semibold text-[#09090b]">
-                        Balance due{' '}
-                        <span className="text-dash-blue">
-                          {moneda(delaVista.reduce((a, m) => a + m.monto, 0))}
-                        </span>
-                      </span>
-                    </div>
+                    <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
                   </div>
                 </div>
+              </div>
+
+              {/* Mismo bloque con borde que cierra las tablas de Payment y
+                  Credit Adjustment: antes acá el total iba como texto suelto
+                  al lado de la paginación y no se parecía a las otras. */}
+              <div className="mt-3 flex justify-end">
+                <dl className="w-fit overflow-hidden rounded-md border border-[#e4e4e7] text-[13px]">
+                  <div className="flex items-center">
+                    <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Balance due</dt>
+                    <dd className="text-dash-blue w-24 px-3 py-2 text-right font-semibold tabular-nums">
+                      {moneda(delaVista.reduce((a, m) => a + m.monto, 0))}
+                    </dd>
+                  </div>
+                </dl>
               </div>
               </TooltipProvider>
             </>

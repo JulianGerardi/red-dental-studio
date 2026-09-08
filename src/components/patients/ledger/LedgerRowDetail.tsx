@@ -16,7 +16,9 @@ export function FilaConTooltip({
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="top" align="start" className="max-w-sm bg-[#09090b] text-white">
+      {/* `sideOffset` lo despega de la fila: pegado, el puntero le queda
+          encima y el tooltip pelea con su propio disparador. */}
+      <TooltipContent side="top" align="start" sideOffset={8} className="max-w-sm bg-[#09090b] text-white">
         <span className="flex flex-col gap-0.5">
           <span className="font-semibold">{m.descripcion}</span>
           <span className="text-white/70">
