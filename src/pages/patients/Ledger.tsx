@@ -15,7 +15,7 @@ import {
 import { aviso } from '@/components/ui/toaster'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
-import { LedgerRowDetail, LedgerRowModal } from '@/components/patients/ledger/LedgerRowDetail'
+import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
 import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
 import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
 import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
@@ -42,6 +42,15 @@ type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' |
 
 const ANCHO_BASE: Record<ColLedger, number> = {
   fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, saldo: 96,
+}
+
+/* Piso de cada columna: hasta acá pueden encoger para que la tabla entre
+   entera cuando el menú lateral y el panel del paciente están abiertos, en
+   vez de desbordar y pedir scroll. Medidos contra el contenido real:
+   "March 17, 2025" 93px, la pastilla "Ins Payment" 86, "-$9,850.00" 71.
+   Patient/Description/Provider truncan y ya tienen tooltip. */
+const ANCHO_MINIMO: Record<ColLedger, number> = {
+  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, saldo: 76,
 }
 
 type ColumnaLedger = {
@@ -105,16 +114,20 @@ export default function Ledger() {
   const alternarFila = (id: string) =>
     setExpandidas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
 
-  const estilo = (c: ColumnaLedger) => ({
-    width: anchos.ancho(c.id),
-    /* La elástica puede ceder ancho cuando otra columna crece, pero nunca
-       por debajo de su mínimo: de ahí sale la holgura del arrastre. */
-    minWidth: c.elastica ? ANCHO_BASE[c.id] : undefined,
-    flexGrow: c.elastica && anchos.manual(c.id) === undefined ? 1 : 0,
-    flexShrink: c.elastica ? 1 : 0,
-  })
-  const anchoMinimo = COLUMNAS.reduce((a, c) => a + anchos.ancho(c.id), 0)
-    + (COLUMNAS.length - 1) * 12 + 24
+  /* Una columna movida a mano se queda donde la dejaron: no encoge. El
+     resto cede hasta su piso para que la tabla entre entera. */
+  const estilo = (c: ColumnaLedger) => {
+    const fijada = anchos.manual(c.id) !== undefined
+    return {
+      width: anchos.ancho(c.id),
+      minWidth: fijada ? anchos.ancho(c.id) : ANCHO_MINIMO[c.id],
+      flexGrow: c.elastica && !fijada ? 1 : 0,
+      flexShrink: fijada ? 0 : 1,
+    }
+  }
+  const anchoMinimo = COLUMNAS.reduce(
+    (a, c) => a + (anchos.manual(c.id) ?? ANCHO_MINIMO[c.id]), 0,
+  ) + (COLUMNAS.length - 1) * 12 + 24
 
   const conSaldoTotal = useMemo(() => conSaldo(movs), [movs])
   const delaVista = useMemo(
@@ -134,6 +147,14 @@ export default function Ledger() {
   const paginas = Math.max(1, Math.ceil(filas.length / TAM_PAGINA))
   const paginaActual = Math.min(pagina, paginas)
   const filasPagina = filas.slice((paginaActual - 1) * TAM_PAGINA, paginaActual * TAM_PAGINA)
+
+  /* "todas" es sobre lo que se ve en pantalla, no sobre la cuenta entera:
+     abrir 26 filas de golpe en una tabla paginada no le sirve a nadie. */
+  const todasAbiertas = filasPagina.length > 0 && filasPagina.every((m) => expandidas.includes(m.id))
+  const alternarTodas = () =>
+    setExpandidas((p) => (todasAbiertas
+      ? p.filter((id) => !filasPagina.some((m) => m.id === id))
+      : [...new Set([...p, ...filasPagina.map((m) => m.id)])]))
 
   const stats: Stat[] = useMemo(() => {
     const cargos = delaVista.filter((m) => m.tipo === 'Charge').reduce((a, m) => a + m.monto, 0)
@@ -207,6 +228,9 @@ export default function Ledger() {
                   />
                 </div>
                 <FilterMenu label="Filter entries" options={TIPOS} value={tipos} onChange={(v) => { setTipos(v); setPagina(1) }} />
+                {filasPagina.length > 0 && (
+                  <BotonExpandirTodo todasAbiertas={todasAbiertas} onToggle={alternarTodas} />
+                )}
 
                 <div className="ml-auto flex flex-wrap items-center gap-3">
                   <div className="flex w-fit shrink-0 items-center gap-1 rounded-lg bg-[#f1f5f9] p-1">

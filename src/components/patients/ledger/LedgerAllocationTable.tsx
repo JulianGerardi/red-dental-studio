@@ -8,7 +8,7 @@ import {
 import { moneda, fechaCorta, type Movimiento } from '@/data/ledger'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
-import { LedgerRowDetail, LedgerRowModal } from '@/components/patients/ledger/LedgerRowDetail'
+import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
 
 /* Figma 4582:29618 / 4582:30251. Ver design-reference/figma/modulos/ledger.md. */
 function coberturaSeguro(codigo: string) {
@@ -91,6 +91,14 @@ const ANCHO_BASE: Record<ColId, number> = {
   desc: 88, charge: 64, otroCredito: 68, guarEstimado: 76, applied: 72, balance: 64,
 }
 
+/* Piso de cada columna, para que las 12 entren aun con el menú lateral y el
+   panel del paciente abiertos. Medidos contra el contenido real a 12px:
+   "03/17/2025" 66, "MODBL" 44, "$9,850.00" 60. */
+const ANCHO_MINIMO: Record<ColId, number> = {
+  fecha: 66, paciente: 56, provider: 52, diente: 32, superficie: 45, codigo: 40,
+  desc: 72, charge: 61, otroCredito: 61, guarEstimado: 61, applied: 58, balance: 61,
+}
+
 export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const [aplicado, setAplicado] = useState<Record<string, string>>({})
   /* Arrancan todas visibles: con los anchos del diseño de referencia las 12
@@ -110,6 +118,14 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const paginas = Math.max(1, Math.ceil(cargos.length / TAM_PAGINA))
   const paginaActual = Math.min(pagina, paginas)
   const cargosPagina = cargos.slice((paginaActual - 1) * TAM_PAGINA, paginaActual * TAM_PAGINA)
+
+  /* "todas" es sobre lo que se ve en pantalla, no sobre la cuenta entera:
+     abrir 26 filas de golpe en una tabla paginada no le sirve a nadie. */
+  const todasAbiertas = cargosPagina.length > 0 && cargosPagina.every((m) => expandidas.includes(m.id))
+  const alternarTodas = () =>
+    setExpandidas((p) => (todasAbiertas
+      ? p.filter((id) => !cargosPagina.some((m) => m.id === id))
+      : [...new Set([...p, ...cargosPagina.map((m) => m.id)])]))
 
   const totalCargos = cargos.reduce((a, m) => a + m.monto, 0)
   const totalAplicado = cargos.reduce((a, m) => a + (Number(aplicado[m.id]) || 0), 0)
@@ -146,17 +162,21 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
     { id: 'balance', label: 'Balance', px: 64, derecha: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', bloqueada: true, celda: (m, ap) => moneda(Math.max(m.monto - ap, 0)) },
   ]
   const columnasVisibles = columnas.filter((c) => !ocultas.includes(c.id))
-  const anchoMinimo = columnasVisibles.reduce((a, c) => a + anchos.ancho(c.id), 0)
-    + (columnasVisibles.length - 1) * GAP + PADDING_FILA
+  const anchoMinimo = columnasVisibles.reduce(
+    (a, c) => a + (anchos.manual(c.id) ?? ANCHO_MINIMO[c.id]), 0,
+  ) + (columnasVisibles.length - 1) * GAP + PADDING_FILA
 
-  const estilo = (c: Columna) => ({
-    width: anchos.ancho(c.id),
-    /* La elástica puede ceder ancho cuando otra columna crece, pero nunca
-       por debajo de su mínimo: de ahí sale la holgura del arrastre. */
-    minWidth: c.elastica ? ANCHO_BASE[c.id] : undefined,
-    flexGrow: c.elastica && anchos.manual(c.id) === undefined ? 1 : 0,
-    flexShrink: c.elastica ? 1 : 0,
-  })
+  /* Una columna movida a mano se queda donde la dejaron: no encoge. El
+     resto cede hasta su piso para que las 12 entren enteras. */
+  const estilo = (c: Columna) => {
+    const fijada = anchos.manual(c.id) !== undefined
+    return {
+      width: anchos.ancho(c.id),
+      minWidth: fijada ? anchos.ancho(c.id) : ANCHO_MINIMO[c.id],
+      flexGrow: c.elastica && !fijada ? 1 : 0,
+      flexShrink: fijada ? 0 : 1,
+    }
+  }
 
   return (
     <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
@@ -164,7 +184,12 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
         <h2 className="flex items-center gap-2 text-sm font-bold text-[#09090b]">
           <CreditCard className="size-4" /> Ledger Transactions
         </h2>
-        <ColumnPicker columnas={columnas} ocultas={ocultas} onToggle={alternarCol} onReset={() => setOcultas([])} />
+        <div className="flex flex-wrap items-center gap-2">
+          {cargos.length > 0 && (
+            <BotonExpandirTodo todasAbiertas={todasAbiertas} onToggle={alternarTodas} />
+          )}
+          <ColumnPicker columnas={columnas} ocultas={ocultas} onToggle={alternarCol} onReset={() => setOcultas([])} />
+        </div>
       </div>
 
       {cargos.length === 0 ? (

@@ -609,3 +609,40 @@ paciente) y el evento cubre el de ventana aunque el observer venga demorado.
 
 Escritorio quedó igual: mismos anchos de columna (112/112/96/230/112/80/96),
 sin scroll y con las manijas activas.
+
+## Las columnas ceden en vez de desbordar, y "Expand all" (2026-09-08)
+
+Julián marcó que lo responsive era la tabla, no su contenido: con el menú
+lateral y el panel del paciente abiertos, la tabla pedía scroll en vez de
+entrar. Medido a 1280: el rail abierto son 234px y el panel 218, así que a
+la tabla le quedan 758 contra los 864 que necesitaba -106 de más-.
+
+**Mínimos por columna.** Antes las columnas eran `shrink-0`: o entraban o
+desbordaban. Ahora cada una tiene un piso (`ANCHO_MINIMO`) y puede ceder
+hasta ahí, medido contra el contenido real ("March 17, 2025" 93px, la
+pastilla "Ins Payment" 86, "-$9,850.00" 71). El `minWidth` del contenedor
+pasa a ser la suma de los **mínimos**, no de los anchos de diseño, así que
+el scroll recién aparece cuando ni los mínimos entran.
+
+Una columna movida a mano queda exceptuada: se queda en el ancho que le
+dejaron (`flexShrink: 0`), porque si el usuario la fijó no tiene sentido que
+el layout se la vuelva a achicar.
+
+Medido en la tabla de Transactions: a **758px entra entera sin scroll**
+(columnas 96/93/88/133/93/76/80), a 934 queda idéntica a antes
+(112/112/96/228/112/80/96, o sea escritorio sin cambios), y recién por
+debajo de ~704 cae en scroll.
+
+**Lo que sigue sin entrar.** La tabla de allocation son 12 columnas con
+montos de cinco cifras: sus mínimos suman 755 y en el peor caso (ambos
+menús abiertos) el hueco es de ~716, así que ahí todavía scrollea unos
+40px. Bajar más los mínimos dejaría Patient en ~44px, que muestra cinco
+letras y no es "que se vea bien". Para ese caso está el picker de columnas,
+que es justamente para lo que sirve: esconder Tooth/Surface/Other Credit
+recupera de sobra. Queda anotado por si Julián prefiere que se auto-oculten.
+
+**Expand all / Collapse all.** Botón nuevo (`BotonExpandirTodo`, compartido)
+al lado del título de cada tabla: abre o cierra de una todas las filas de la
+página. Opera sobre **la página visible**, no sobre las 26 entradas -abrir
+todo un ledger paginado no le sirve a nadie-, y el rótulo alterna según si
+ya están todas abiertas.

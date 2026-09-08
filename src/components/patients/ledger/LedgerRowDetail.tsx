@@ -1,6 +1,27 @@
-import { Maximize2 } from 'lucide-react'
+import { Maximize2, ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
 import { moneda, type Movimiento } from '@/data/ledger'
+
+/* Abrir/cerrar de una todas las filas que hay en pantalla. Va al lado del
+   título de cada tabla del Ledger. */
+export function BotonExpandirTodo({
+  todasAbiertas, onToggle,
+}: {
+  todasAbiertas: boolean
+  onToggle: () => void
+}) {
+  const Icono = todasAbiertas ? ChevronsDownUp : ChevronsUpDown
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="flex items-center gap-1.5 rounded-md border border-[#e4e4e7] px-2.5 py-1.5 text-[12px] font-medium text-[#71717a] hover:bg-[#f4f4f5]"
+    >
+      <Icono className="size-3.5" />
+      {todasAbiertas ? 'Collapse all' : 'Expand all'}
+    </button>
+  )
+}
 
 /* Con las filas cargadas de datos, la celda truncada no alcanza: la fila se
    despliega y muestra todo. Ver design-reference/figma/modulos/ledger.md. */
