@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Plus, FilePlus, Table2, Calendar, Check, X, ArrowUpRight, RotateCw } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
-import { SelectField, TextArea } from '@/components/patients/form'
+import { ModalShell, SelectField, TextArea, FormFooter } from '@/components/patients/form'
 import { Odontogram } from '@/components/clinical/Odontogram'
 import { makeMockExam } from '@/data/odontogram'
 import { ExamPanelHeader } from './dental/ExamPanelHeader'
@@ -9,8 +9,8 @@ import { ReviewList, type ExamReview } from './dental/ReviewList'
 import { ReviewExamDialog } from './dental/ReviewExamDialog'
 import { FindingCard } from './dental/FindingCard'
 import { FindingActionsMenu } from './dental/FindingActionsMenu'
-import { NewProcedureDrawer, type ProcedureDraft } from './dental/NewProcedureDrawer'
-import { EditProcedureDrawer } from './dental/EditProcedureDrawer'
+import { NewProcedureModal, type ProcedureDraft } from './dental/NewProcedureModal'
+import { EditProcedureModal } from './dental/EditProcedureModal'
 import { ConfirmProcedureDialog } from './dental/ConfirmProcedureDialog'
 import { useExamReviews } from './dental/useExamReviews'
 import { ACTIONS, type FindingAction } from './dental/actions'
@@ -63,7 +63,7 @@ function DentitionCard({ onPick, onDismiss }: { onPick: (d: 'permanent' | 'prima
   )
 }
 
-function ToothDetailDrawer({
+function ToothDetailModal({
   tooth, entries, onClose, onNotes, onAddProcedure,
 }: {
   tooth: number | null
@@ -74,57 +74,52 @@ function ToothDetailDrawer({
 }) {
   if (tooth === null) return null
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="motion-safe:animate-[panel-in_180ms_ease-out] relative flex h-full w-full flex-col bg-white sm:max-w-[480px]">
-        <div className="flex items-start justify-between gap-4 p-6 pb-0">
-          <h2 className="text-xl leading-none font-bold text-[#09090b]">Details for Tooth {tooth}#</h2>
-          <button type="button" aria-label="Close" onClick={onClose} className="flex size-7 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]">
-            <X className="size-4" />
-          </button>
-        </div>
-
-        <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-6 py-5">
-          {entries.length ? (
-            entries.map((h) => {
-              const style = STATUS_STYLE[h.status]
-              return (
-                <div key={h.id} className={`flex flex-col gap-2 rounded-md border-l-[3px] bg-white p-3 shadow-sm ${style.rail}`}>
-                  <div className="flex w-full items-center justify-between gap-2">
-                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${style.badge}`}>
-                      {style.good ? <Check className="size-2.5" strokeWidth={3} /> : <X className="size-2.5" />}
-                      {h.status}
-                    </span>
-                    <span className="text-dash-blue flex items-center gap-1 text-[10px] font-semibold">
-                      <Calendar className="size-2.5" /> {h.date}
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-0.5 text-xs">
-                    <p className="text-[#09090b]">provider: <span className="text-[#71717a]">{h.provider}</span></p>
-                    <p className="text-[#09090b]">Condition: <span className="text-[#71717a]">{h.condition}</span></p>
-                    <p className="text-[#09090b]">Surface: <span className="text-[#71717a]">{h.surfaces.join(', ') || '—'}</span></p>
-                  </div>
-                  <TextArea label="Notes" value={h.notes} onChange={(v) => onNotes(h.id, v)} placeholder="Document questions, answers, clarifications, or additional notes" />
-                </div>
-              )
-            })
-          ) : (
-            <div className="bg-dash-count-bg flex flex-1 flex-col items-center justify-center gap-1 rounded-xl px-6 py-16 text-center">
-              <p className="text-dash-blue text-xs font-medium">No entries available for this tooth.</p>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3 p-6 pt-0">
-          <button type="button" onClick={onClose} className="flex flex-1 items-center justify-center gap-1.5 rounded-md border border-[#e4e4e7] py-2 text-[13px] font-medium hover:bg-[#fafafa]">
+    <ModalShell
+      title={`Details for Tooth ${tooth}#`}
+      onClose={onClose}
+      width="max-w-[480px]"
+      footer={
+        <>
+          <button type="button" onClick={onClose} className="flex h-9 items-center gap-1.5 rounded-md border border-[#e4e4e7] bg-white px-6 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]">
             <X className="size-3" /> Close
           </button>
-          <button type="button" onClick={onAddProcedure} className="bg-dash-blue hover:bg-dash-blue-hover flex flex-1 items-center justify-center gap-1.5 rounded-md py-2 text-[13px] font-semibold text-white">
+          <button type="button" onClick={onAddProcedure} className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-6 text-[13px] font-medium whitespace-nowrap text-white">
             <Plus className="size-3" /> New Procedure
           </button>
-        </div>
+        </>
+      }
+    >
+      <div className="flex max-h-[50vh] flex-col gap-3 overflow-y-auto">
+        {entries.length ? (
+          entries.map((h) => {
+            const style = STATUS_STYLE[h.status]
+            return (
+              <div key={h.id} className={`flex flex-col gap-2 rounded-md border-l-[3px] bg-white p-3 shadow-sm ${style.rail}`}>
+                <div className="flex w-full items-center justify-between gap-2">
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${style.badge}`}>
+                    {style.good ? <Check className="size-2.5" strokeWidth={3} /> : <X className="size-2.5" />}
+                    {h.status}
+                  </span>
+                  <span className="text-dash-blue flex items-center gap-1 text-[10px] font-semibold">
+                    <Calendar className="size-2.5" /> {h.date}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5 text-xs">
+                  <p className="text-[#09090b]">provider: <span className="text-[#71717a]">{h.provider}</span></p>
+                  <p className="text-[#09090b]">Condition: <span className="text-[#71717a]">{h.condition}</span></p>
+                  <p className="text-[#09090b]">Surface: <span className="text-[#71717a]">{h.surfaces.join(', ') || '—'}</span></p>
+                </div>
+                <TextArea label="Notes" value={h.notes} onChange={(v) => onNotes(h.id, v)} placeholder="Document questions, answers, clarifications, or additional notes" />
+              </div>
+            )
+          })
+        ) : (
+          <div className="bg-dash-count-bg flex flex-col items-center justify-center gap-1 rounded-xl px-6 py-16 text-center">
+            <p className="text-dash-blue text-xs font-medium">No entries available for this tooth.</p>
+          </div>
+        )}
       </div>
-    </div>
+    </ModalShell>
   )
 }
 
@@ -133,28 +128,12 @@ function NewDocumentDialog({ open, onClose, onSave }: { open: boolean; onClose: 
   const [note, setNote] = useState('')
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-      <div className="motion-safe:animate-[loc-in_150ms_ease-out] w-full max-w-[380px] rounded-2xl bg-white p-5">
-        <div className="flex items-start justify-between gap-4">
-          <h2 className="text-base leading-none font-bold text-[#09090b]">New document</h2>
-          <button type="button" aria-label="Close" onClick={onClose} className="flex size-7 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]">
-            <X className="size-4" />
-          </button>
-        </div>
-        <div className="mt-4 flex flex-col gap-4">
-          <SelectField label="Type" required value={type} onChange={setType} options={DOCUMENT_TYPES} />
-          <TextArea label="Notes" value={note} onChange={setNote} placeholder="What should this document say?" />
-        </div>
-        <div className="mt-4 flex items-center justify-end gap-2">
-          <button type="button" onClick={onClose} className="flex items-center gap-1.5 rounded-md border border-[#e4e4e7] px-3 py-1.5 text-[13px] font-medium hover:bg-[#fafafa]">
-            <X className="size-3" /> Cancel
-          </button>
-          <button type="button" onClick={() => { onSave(type); onClose() }} className="bg-dash-blue hover:bg-dash-blue-hover flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-semibold text-white">
-            <Check className="size-3" /> Save
-          </button>
-        </div>
+    <ModalShell title="New document" onClose={onClose} width="max-w-[380px]" footer={<FormFooter onCancel={onClose} onSave={() => { onSave(type); onClose() }} />}>
+      <div className="flex flex-col gap-4">
+        <SelectField label="Type" required value={type} onChange={setType} options={DOCUMENT_TYPES} />
+        <TextArea label="Notes" value={note} onChange={setNote} placeholder="What should this document say?" />
       </div>
-    </div>
+    </ModalShell>
   )
 }
 
@@ -333,7 +312,7 @@ export function DentalAssessmentExam() {
         </div>
       </div>
 
-      <ToothDetailDrawer
+      <ToothDetailModal
         tooth={selectedTooth}
         entries={findings.filter((f) => f.tooth === selectedTooth)}
         onClose={() => setSelectedTooth(null)}
@@ -341,7 +320,7 @@ export function DentalAssessmentExam() {
         onAddProcedure={() => { const tooth = selectedTooth; setSelectedTooth(null); openProcedure(tooth) }}
       />
 
-      <NewProcedureDrawer
+      <NewProcedureModal
         open={procedureOpen}
         area={procedureFor !== null ? `Tooth ${procedureFor}` : 'Upper left'}
         teeth={procedureFor !== null ? neighbours(procedureFor) : quadrantTeeth(9)}
@@ -349,7 +328,7 @@ export function DentalAssessmentExam() {
         onSave={saveProcedure}
       />
 
-      <EditProcedureDrawer
+      <EditProcedureModal
         finding={editing}
         onClose={() => setEditing(null)}
         onSave={(patch) => setFindings((all) => all.map((f) => (f.id === editing?.id ? { ...f, ...patch } : f)))}

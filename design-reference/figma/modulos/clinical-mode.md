@@ -565,3 +565,26 @@ findings, pero clickeás una región de un diagrama en vez de un diente-. Los
 diagramas ya están embebidos como data URI en
 `src/assets/clinical/intra-oral-diagram.ts` y `extra-oral-diagram.ts`
 -mismo criterio que `panoramic.ts`-, listos para cuando se arme esa pantalla.
+
+## Corrección: nada de Drawer/Sheet (2026-09-08)
+
+Primera versión de "New Procedure", "Edit Finding" y el detalle de diente
+usaba `Sheet`/`SheetContent` -el panel deslizante desde el borde derecho-,
+copiado tal cual del proyecto hermano. Julián lo corrigió: red-clone no
+tiene ese patrón en ningún lado -ver [[feedback_no_drawer_pattern_in_red_clone]]
+en memoria-. Se reescriben los tres como `ModalShell` (el mismo contenedor
+de `NewAppointmentModal` en Scheduling, con `footer` propio por paso en el
+wizard), y de paso "New document" -que ya era un modal centrado, pero hecho
+a mano- pasa a usar `ModalShell` también en vez de duplicar ese markup.
+
+`NewProcedureDrawer.tsx` → `NewProcedureModal.tsx`,
+`EditProcedureDrawer.tsx` → `EditProcedureModal.tsx`,
+`ToothDetailDrawer` → `ToothDetailModal`. `src/components/ui/sheet.tsx` se
+borra: sin ningún uso en el proyecto, no tiene sentido dejarlo instalado
+como invitación a usarlo de nuevo.
+
+**Regla para lo que falta** (Intra Oral, Extra Oral, y cualquier otro
+módulo que se porte de acá en más): el contenedor de cada pantalla del
+original no se copia tal cual. Se mapea primero a lo que ya existe acá
+-página propia, tabs, `ModalShell` o `Dialog`- y recién ahí se escribe el
+componente.
