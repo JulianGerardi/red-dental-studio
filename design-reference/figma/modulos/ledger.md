@@ -303,3 +303,48 @@ contenedor gana `max-w-[994px]` junto al `min-w-[974px]` que ya tenía (974
 no hace falta un `anchoMaximo` calculado por JS como en la tabla de
 allocation -esta no tiene columnas para ocultar, el número es fijo- así que
 alcanza con la clase de Tailwind directamente.
+
+## Vuelta atrás del techo: el contenedor debe abrazar la tabla, no estirarse (2026-09-08)
+
+El fix anterior arregló el gris pero abrió otro: con `max-w-[994px]`/
+`anchoMaximo` puestos, el **contenedor** (`rounded-lg border`) seguía siendo
+`w-full` -sin clase de ancho, así que ocupa todo el `min-w-0 flex-1` de la
+página- mientras el contenido de adentro ya no. Resultado: un borde
+redondeado mucho más ancho que la tabla que envuelve, con blanco de sobra
+adentro del borde. Julián lo resumió así: *"la clave esta en el rounder de
+la tabla"* -el borde redondeado tiene que quedar pegado al contenido, no
+estirarse aparte-.
+
+Para resolverlo de raíz se miró el componente real de `dashboard-figma`
+(`src/components/ledger/LedgerTransactions.tsx` y `LedgerSection.tsx`, el
+mismo Figma pero con sus propios anchos) que Julián señaló como la
+referencia -*"en ese diseño las tablas entran mejor"*-. Ahí no hay ningún
+techo de `max-width`: `Description` es `min-w-[160px] flex-1` sin tope, y
+sus columnas fijas son bastante más angostas que las nuestras (`Date`/
+`Patient`/`Provider` en ~112px, `Amount`/`Balance` en 80-96px). El motivo por
+el que a ellos no se les nota el gris de sobra es doble: columnas más
+angostas de entrada, y el layout alrededor deja menos aire.
+
+Se adoptan las dos partes de esa lógica:
+
+1. **Se sacan los techos** (`max-w-[240px]`/`max-w-[994px]`/`anchoMaximo`/
+   `pxMax`) de las dos tablas -vuelven a ser un simple `min-w-[…px] flex-1`
+   en `desc`, sin cap, como en la referencia-.
+2. **El contenedor (`rounded-lg border`) pasa a `w-fit max-w-full`** en vez
+   de ancho completo. `w-fit` lo encoge a lo que su contenido realmente
+   necesita -sin nada empujándolo a estirarse, `desc` tampoco tiene motivo
+   para crecer más allá de su propio mínimo, ver el punto 3-; `max-w-full`
+   evita que se salga del layout cuando la página es angosta, y ahí
+   `overflow-x-auto` sigue entrando en juego igual que siempre. Aplicado a
+   ambas tablas: el `<div className="... rounded-lg border ...">` de
+   Transactions y el `<div className="mt-3 overflow-x-auto">` de
+   `LedgerAllocationTable` (éste último por dentro de la card, que sigue
+   siendo ancho completo -tiene el título y el botón de Columns, no sólo la
+   tabla-).
+3. **Anchos de columna medidos de nuevo con `canvas.measureText`** sobre el
+   contenido real de `data/ledger.ts` -no copiados literales de
+   `dashboard-figma`, que tiene sus propios datos-: `paciente` 110→90,
+   `tipo`/`provider`/`monto`/`saldo` bajan proporcionalmente en las dos
+   tablas (detalle exacto en el diff, no repetido acá). Con columnas más
+   angostas *y* el contenedor abrazando el contenido, `Description` ya no
+   tiene ni espacio de sobra para estirarse ni gris para mostrar de más.

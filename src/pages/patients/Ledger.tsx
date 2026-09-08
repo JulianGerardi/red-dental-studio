@@ -28,12 +28,12 @@ const TIPO_PILL: Record<TipoMovimiento, string> = {
 
 const COLS = {
   fecha: 'w-[110px] shrink-0',
-  paciente: 'w-[110px] shrink-0',
-  tipo: 'w-[110px] shrink-0',
-  desc: 'min-w-[220px] max-w-[240px] flex-1',
-  provider: 'w-[130px] shrink-0',
-  monto: 'w-[90px] shrink-0 text-right',
-  saldo: 'w-[100px] shrink-0 text-right',
+  paciente: 'w-[90px] shrink-0',
+  tipo: 'w-[95px] shrink-0',
+  desc: 'min-w-[220px] flex-1',
+  provider: 'w-[120px] shrink-0',
+  monto: 'w-[70px] shrink-0 text-right',
+  saldo: 'w-[80px] shrink-0 text-right',
 }
 
 function Pill({ tono, children }: { tono: string; children: React.ReactNode }) {
@@ -177,8 +177,8 @@ export default function Ledger() {
                 </div>
               </div>
 
-              <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
-                <div className="min-w-[974px] max-w-[994px]">
+              <div className="mt-4 w-fit max-w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+                <div className="min-w-[889px]">
                   <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
                     <span className={COLS.fecha}>Date</span>
                     <span className={COLS.paciente}>Patient</span>
