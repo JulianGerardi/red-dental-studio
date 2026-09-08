@@ -10,20 +10,28 @@ import { FilterMenu } from '@/components/dashboard/FilterMenu'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import {
   MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda,
-  type Movimiento, type TipoMovimiento,
+  type Movimiento,
 } from '@/data/ledger'
 import { aviso } from '@/components/ui/toaster'
+import { Pagination } from '@/components/patients/ledger/Pagination'
 import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
 import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
 import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
 
 /* Figma 4582:28487 / 4588:84886. Ver design-reference/figma/modulos/ledger.md. */
 
-const TIPO_PILL: Record<TipoMovimiento, string> = {
-  Charge: 'border-[#174596] bg-[#f0f5ff] text-[#174596]',
-  Payment: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Adjustment: 'border-[#a1a1aa] bg-[#f5f5f5] text-[#595959]',
-  Insurance: 'border-[#6633a6] bg-[#f5f0ff] text-[#6633a6]',
+/* El Figma agrupa Payment/Adjustment en un solo tipo cada uno, pero el
+   diseño de referencia de Confidentally 2.0 distingue paciente/seguro y
+   cargo/crédito en la propia celda -mismo dato (`tipo`+signo de `monto`),
+   sólo más específico al mostrarlo-. Charge muestra el código en vez de
+   una etiqueta genérica, igual que esa referencia. */
+function detalleTipo(m: Movimiento): { texto: string; tono: string } {
+  if (m.tipo === 'Charge') return { texto: m.codigo, tono: 'border-[#e4e4e7] bg-[#f5f5f5] text-[#71717a]' }
+  if (m.tipo === 'Insurance') return { texto: 'Ins Payment', tono: 'border-[#6633a6] bg-[#f5f0ff] text-[#6633a6]' }
+  if (m.tipo === 'Payment') return { texto: 'Pt Payment', tono: 'border-[#174596] bg-[#f0f5ff] text-[#174596]' }
+  return m.monto < 0
+    ? { texto: 'Credit Adj', tono: 'border-[#a1a1aa] bg-[#f5f5f5] text-[#595959]' }
+    : { texto: 'Charge Adj', tono: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]' }
 }
 
 const COLS = {
@@ -62,6 +70,7 @@ export default function Ledger() {
   const [q, setQ] = useState('')
   const [tipos, setTipos] = useState<string[]>([])
   const [tab, setTab] = useState<Tab>('transacciones')
+  const [pagina, setPagina] = useState(1)
 
   const conSaldoTotal = useMemo(() => conSaldo(movs), [movs])
   const delaVista = useMemo(
@@ -77,6 +86,10 @@ export default function Ledger() {
     ),
     [delaVista, q, tipos],
   )
+  const TAM_PAGINA = 8
+  const paginas = Math.max(1, Math.ceil(filas.length / TAM_PAGINA))
+  const paginaActual = Math.min(pagina, paginas)
+  const filasPagina = filas.slice((paginaActual - 1) * TAM_PAGINA, paginaActual * TAM_PAGINA)
 
   const stats: Stat[] = useMemo(() => {
     const cargos = delaVista.filter((m) => m.tipo === 'Charge').reduce((a, m) => a + m.monto, 0)
@@ -144,12 +157,12 @@ export default function Ledger() {
                   <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
                   <input
                     value={q}
-                    onChange={(e) => setQ(e.target.value)}
+                    onChange={(e) => { setQ(e.target.value); setPagina(1) }}
                     placeholder="Search by code, description or provider"
                     className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
                   />
                 </div>
-                <FilterMenu label="Filter entries" options={TIPOS} value={tipos} onChange={setTipos} />
+                <FilterMenu label="Filter entries" options={TIPOS} value={tipos} onChange={(v) => { setTipos(v); setPagina(1) }} />
 
                 <div className="ml-auto flex flex-wrap items-center gap-3">
                   <div className="flex w-fit shrink-0 items-center gap-1 rounded-lg bg-[#f1f5f9] p-1">
@@ -157,7 +170,7 @@ export default function Ledger() {
                       <button
                         key={v}
                         type="button"
-                        onClick={() => setVista(v)}
+                        onClick={() => { setVista(v); setPagina(1) }}
                         className={cn(
                           'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
                           vista === v ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
@@ -189,19 +202,21 @@ export default function Ledger() {
                     <span className={COLS.saldo}>Balance</span>
                   </div>
 
-                  {filas.length === 0 ? (
+                  {filasPagina.length === 0 ? (
                     <EmptyState icon={Receipt} title="No entries" detail="Nothing matches the current search or filters." />
                   ) : (
-                    filas.map((m) => (
+                    filasPagina.map((m) => {
+                      const tipo = detalleTipo(m)
+                      return (
                       <div
                         key={m.id}
                         className="flex items-center gap-3 border-b border-[#e7e7e7] px-4 py-3 text-[13px] text-[#3f3f46] last:border-0"
                       >
                         <span className={COLS.fecha}>{m.fecha}</span>
-                        <span className={cn(COLS.paciente, 'truncate text-[#09090b]')}>{m.paciente}</span>
-                        <span className={COLS.tipo}><Pill tono={TIPO_PILL[m.tipo]}>{m.tipo}</Pill></span>
-                        <span className={cn(COLS.desc, 'truncate text-[#09090b]')}>{m.descripcion}</span>
-                        <span className={cn(COLS.provider, 'truncate')}>{m.provider}</span>
+                        <span title={m.paciente} className={cn(COLS.paciente, 'truncate text-[#09090b]')}>{m.paciente}</span>
+                        <span className={COLS.tipo}><Pill tono={tipo.tono}>{tipo.texto}</Pill></span>
+                        <span title={m.descripcion} className={cn(COLS.desc, 'truncate text-[#09090b]')}>{m.descripcion}</span>
+                        <span title={m.provider} className={cn(COLS.provider, 'truncate')}>{m.provider}</span>
                         {/* Los negativos bajan la cuenta: van en verde. */}
                         <span className={cn(COLS.monto, 'font-medium tabular-nums', m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]')}>
                           {moneda(m.monto)}
@@ -210,19 +225,23 @@ export default function Ledger() {
                           {moneda(m.saldo)}
                         </span>
                       </div>
-                    ))
+                      )
+                    })
                   )}
 
-                  <div className="flex h-[52px] items-center justify-between px-4">
+                  <div className="flex h-[52px] flex-wrap items-center justify-between gap-3 px-4">
                     <span className="text-xs font-semibold text-[#71717a]">
-                      Showing {filas.length} of {delaVista.length} entries
+                      Showing {filasPagina.length} of {filas.length} entries
                     </span>
-                    <span className="text-[13px] font-semibold text-[#09090b]">
-                      Balance due{' '}
-                      <span className="text-dash-blue">
-                        {moneda(delaVista.reduce((a, m) => a + m.monto, 0))}
+                    <div className="flex items-center gap-4">
+                      <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
+                      <span className="text-[13px] font-semibold text-[#09090b]">
+                        Balance due{' '}
+                        <span className="text-dash-blue">
+                          {moneda(delaVista.reduce((a, m) => a + m.monto, 0))}
+                        </span>
                       </span>
-                    </span>
+                    </div>
                   </div>
                 </div>
               </div>

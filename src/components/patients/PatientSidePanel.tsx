@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Ban, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause,
+  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Ban, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
@@ -93,18 +93,31 @@ export function PatientSidePanel({
   const navigate = useNavigate()
   const [contacto, setContacto] = useState(false)
   const [foto, setFoto] = usePhoto(`patient-photo:${basePath}`)
+  /* Sólo colapsa en desktop -en angosto el panel ya es compacto por su
+     cuenta-, para liberar ancho cuando el contenido lo necesita (p.ej. las
+     tablas del Ledger). */
+  const [colapsado, setColapsado] = useState(false)
 
   return (
-    <aside className="w-full rounded-lg border border-[#e4e4e7] bg-white p-4 lg:w-[218px] lg:shrink-0">
-      <div className="flex items-center gap-3 lg:flex-col lg:gap-1.5">
+    <aside className={cn('w-full rounded-lg border border-[#e4e4e7] bg-white p-4 lg:shrink-0', colapsado ? 'lg:w-14' : 'lg:w-[218px]')}>
+      <button
+        type="button"
+        onClick={() => setColapsado((v) => !v)}
+        aria-label={colapsado ? 'Expand patient menu' : 'Collapse patient menu'}
+        className="hidden text-[#71717a] hover:text-black lg:mb-3 lg:flex lg:items-center lg:justify-center lg:w-full"
+      >
+        {colapsado ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
+      </button>
+
+      <div className={cn('flex items-center gap-3', colapsado ? 'lg:flex-col lg:justify-center' : 'lg:flex-col lg:gap-1.5')}>
         <EditableAvatar
           foto={foto}
           iniciales={initials}
           onChange={setFoto}
           label={name}
-          avatarClassName="bg-dash-blue-hover text-white size-[62px] rounded-full text-lg"
+          avatarClassName={cn('bg-dash-blue-hover text-white rounded-full', colapsado ? 'lg:size-8 lg:text-xs size-[62px] text-lg' : 'size-[62px] text-lg')}
         />
-        <div className="flex min-w-0 flex-col items-start gap-1.5 lg:items-center">
+        <div className={cn('flex min-w-0 flex-col items-start gap-1.5 lg:items-center', colapsado && 'lg:hidden')}>
           <p className="truncate text-lg font-bold text-[#09090b]">{name}</p>
           <span className="rounded-full border border-[#1a804d] bg-[#f0fcf5] px-2 py-[2px] text-[10px] font-semibold text-[#1a804d]">
             Active
@@ -113,7 +126,7 @@ export function PatientSidePanel({
         </div>
       </div>
 
-      <div className="mt-3 flex flex-col gap-2 sm:flex-row lg:flex-col">
+      <div className={cn('mt-3 flex flex-col gap-2 sm:flex-row lg:flex-col', colapsado && 'lg:hidden')}>
         <EncounterButton />
         <Link
           to="/patients/john-smith/clinical-mode"
@@ -134,21 +147,22 @@ export function PatientSidePanel({
           const clase = cn(
             'flex h-10 shrink-0 items-center gap-2 rounded-lg border px-3 text-left text-[13px] font-medium whitespace-nowrap',
             'lg:h-auto lg:shrink lg:gap-2.5 lg:rounded-md lg:border-0 lg:px-2.5 lg:py-2 lg:text-xs',
+            colapsado && 'lg:justify-center lg:px-0',
             section === key
               ? 'bg-dash-blue border-dash-blue text-white'
               : 'border-[#e4e4e7] bg-white text-[#09090b] hover:bg-[#f4f4f5] lg:bg-transparent',
           )
           const contenido = (
             <>
-              <Icon className="size-4 shrink-0 lg:size-3.5" /> {key}
+              <Icon className="size-4 shrink-0 lg:size-3.5" /> <span className={cn(colapsado && 'lg:hidden')}>{key}</span>
             </>
           )
           return to !== undefined ? (
-            <Link key={key} to={`${basePath}${to}`} className={clase}>
+            <Link key={key} to={`${basePath}${to}`} title={colapsado ? key : undefined} className={clase}>
               {contenido}
             </Link>
           ) : (
-            <button key={key} type="button" onClick={() => onSection?.(key)} className={clase}>
+            <button key={key} type="button" title={colapsado ? key : undefined} onClick={() => onSection?.(key)} className={clase}>
               {contenido}
             </button>
           )
@@ -161,7 +175,7 @@ export function PatientSidePanel({
       />
       </div>
 
-      <div className="grid gap-x-6 sm:grid-cols-2 lg:grid-cols-1">
+      <div className={cn('grid gap-x-6 sm:grid-cols-2 lg:grid-cols-1', colapsado && 'lg:hidden')}>
         <InfoBlock title="General" items={GENERAL} onEdit={onEditGeneral ?? (() => navigate('/patients/edit'))} />
         <InfoBlock title="Contact" items={CONTACT} onEdit={onEditContact ?? (() => setContacto(true))} />
       </div>

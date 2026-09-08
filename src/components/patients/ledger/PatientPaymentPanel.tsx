@@ -66,14 +66,15 @@ export function PatientPaymentPanel({
           <CreditCard className="size-4" /> Payment Information
         </h2>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="flex flex-col gap-2">
+        <div className="mt-4 flex flex-wrap gap-4">
+          <div className="flex w-full flex-col gap-2 sm:w-[200px]">
             <FieldLabel required>Transaction date</FieldLabel>
             <DatePicker value={fecha} onChange={setFecha} className="h-9 w-full" error={intentado && !fecha ? true : undefined} />
           </div>
           <SelectField
             label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
             error={intentado && !aplicaA.trim() ? 'This field is required.' : undefined}
+            className="w-full sm:w-[200px]"
           />
         </div>
 
@@ -122,10 +123,13 @@ export function PatientPaymentPanel({
           ))}
         </div>
 
-        <TextArea className="mt-4" label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
       </div>
 
       <LedgerAllocationTable cargos={cargosAplicables} />
+
+      <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
+        <TextArea label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
+      </div>
 
       <div className="flex justify-end gap-3">
         <FormFooter onCancel={onCancelar} onSave={guardar} />

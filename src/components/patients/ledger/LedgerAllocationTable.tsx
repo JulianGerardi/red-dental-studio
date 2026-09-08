@@ -5,6 +5,7 @@ import {
   DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { moneda, type Movimiento } from '@/data/ledger'
+import { Pagination } from '@/components/patients/ledger/Pagination'
 
 /* Figma 4582:29618 / 4582:30251. Ver design-reference/figma/modulos/ledger.md. */
 function coberturaSeguro(codigo: string) {
@@ -58,7 +59,7 @@ function ColumnPicker({
   )
 }
 
-type Columna = { id: ColId; label: string; ancho: string; px: number; claseCelda?: string; bloqueada?: boolean; celda: (m: Movimiento, ap: number) => React.ReactNode }
+type Columna = { id: ColId; label: string; ancho: string; px: number; claseCelda?: string; bloqueada?: boolean; titulo?: (m: Movimiento) => string; celda: (m: Movimiento, ap: number) => React.ReactNode }
 
 export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const [aplicado, setAplicado] = useState<Record<string, string>>({})
@@ -66,18 +67,24 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
      horizontal. Quedan afuera hasta que el usuario las pida desde "Columns". */
   const [ocultas, setOcultas] = useState<ColId[]>(['provider', 'diente', 'superficie', 'otroCredito', 'guarEstimado'])
   const alternarCol = (id: ColId) => setOcultas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+  const [pagina, setPagina] = useState(1)
+
+  const TAM_PAGINA = 5
+  const paginas = Math.max(1, Math.ceil(cargos.length / TAM_PAGINA))
+  const paginaActual = Math.min(pagina, paginas)
+  const cargosPagina = cargos.slice((paginaActual - 1) * TAM_PAGINA, paginaActual * TAM_PAGINA)
 
   const totalCargos = cargos.reduce((a, m) => a + m.monto, 0)
   const totalAplicado = cargos.reduce((a, m) => a + (Number(aplicado[m.id]) || 0), 0)
 
   const columnas: Columna[] = [
     { id: 'fecha', label: 'Transaction Date', ancho: 'w-[105px] shrink-0', px: 105, bloqueada: true, celda: (m) => m.fecha },
-    { id: 'paciente', label: 'Patient', ancho: 'w-[90px] shrink-0', px: 90, claseCelda: 'truncate', celda: (m) => m.paciente },
-    { id: 'provider', label: 'Provider', ancho: 'w-[120px] shrink-0', px: 120, claseCelda: 'truncate', celda: (m) => m.provider },
-    { id: 'diente', label: 'Tooth', ancho: 'w-[55px] shrink-0', px: 55, celda: (m) => m.diente ?? '-' },
-    { id: 'superficie', label: 'Surface', ancho: 'w-[60px] shrink-0', px: 60, celda: (m) => m.superficie ?? '-' },
+    { id: 'paciente', label: 'Patient', ancho: 'w-[90px] shrink-0', px: 90, claseCelda: 'truncate', titulo: (m) => m.paciente, celda: (m) => m.paciente },
+    { id: 'provider', label: 'Provider', ancho: 'w-[120px] shrink-0', px: 120, claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
+    { id: 'diente', label: 'Tooth', ancho: 'w-[55px] shrink-0', px: 55, celda: (m) => m.diente ?? '—' },
+    { id: 'superficie', label: 'Surface', ancho: 'w-[60px] shrink-0', px: 60, celda: (m) => m.superficie ?? '—' },
     { id: 'codigo', label: 'Code', ancho: 'w-[55px] shrink-0', px: 55, claseCelda: 'text-dash-blue font-medium', celda: (m) => m.codigo },
-    { id: 'desc', label: 'Description', ancho: 'min-w-[160px] flex-1', px: 160, claseCelda: 'truncate text-[#09090b]', celda: (m) => m.descripcion },
+    { id: 'desc', label: 'Description', ancho: 'min-w-[160px] flex-1', px: 160, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
     { id: 'charge', label: 'Charge', ancho: 'w-[70px] shrink-0 text-right', px: 70, claseCelda: 'font-medium tabular-nums text-[#09090b]', celda: (m) => moneda(m.monto) },
     { id: 'otroCredito', label: 'Other Credit', ancho: 'w-[80px] shrink-0 text-right', px: 80, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * coberturaSeguro(m.codigo)) },
     { id: 'guarEstimado', label: 'Guar Estimate', ancho: 'w-[90px] shrink-0 text-right', px: 90, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * (1 - coberturaSeguro(m.codigo))) },
@@ -123,12 +130,12 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                   <span key={c.id} className={c.ancho}>{c.label}</span>
                 ))}
               </div>
-              {cargos.map((m) => {
+              {cargosPagina.map((m) => {
                 const ap = Number(aplicado[m.id]) || 0
                 return (
                   <div key={m.id} className="flex items-center gap-3 border-b border-[#e7e7e7] py-3 text-[13px] text-[#3f3f46] last:border-0">
                     {columnasVisibles.map((c) => (
-                      <span key={c.id} className={cn(c.ancho, c.claseCelda)}>{c.celda(m, ap)}</span>
+                      <span key={c.id} title={c.titulo?.(m)} className={cn(c.ancho, c.claseCelda)}>{c.celda(m, ap)}</span>
                     ))}
                   </div>
                 )
@@ -136,17 +143,24 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
             </div>
           </div>
 
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <span className="text-xs font-semibold text-[#71717a]">
+              Showing {cargosPagina.length} of {cargos.length} transactions
+            </span>
+            <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
+          </div>
+
           <div className="mt-3 flex justify-end">
-            <div className="bg-dash-count-bg flex flex-col gap-1.5 rounded-md px-4 py-3 text-[13px]">
-              <span className="flex items-center justify-between gap-6">
-                <span className="text-[#71717a]">Amount not applied</span>
-                <span className="font-semibold tabular-nums text-[#09090b]">{moneda(Math.max(totalCargos - totalAplicado, 0))}</span>
-              </span>
-              <span className="flex items-center justify-between gap-6">
-                <span className="text-[#71717a]">Amount applied</span>
-                <span className="text-dash-blue font-semibold tabular-nums">{moneda(totalAplicado)}</span>
-              </span>
-            </div>
+            <dl className="w-fit overflow-hidden rounded-md border border-[#e4e4e7] text-[13px]">
+              <div className="flex items-center">
+                <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Amount not applied</dt>
+                <dd className="w-24 px-3 py-2 text-right font-semibold tabular-nums text-[#09090b]">{moneda(Math.max(totalCargos - totalAplicado, 0))}</dd>
+              </div>
+              <div className="flex items-center border-t border-[#e4e4e7]">
+                <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Amount applied</dt>
+                <dd className="text-dash-blue w-24 px-3 py-2 text-right font-semibold tabular-nums">{moneda(totalAplicado)}</dd>
+              </div>
+            </dl>
           </div>
         </>
       )}

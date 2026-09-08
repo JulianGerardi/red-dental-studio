@@ -55,22 +55,24 @@ export function ChargeAdjustmentPanel({
           <CreditCard className="size-4" /> Adjustment Information
         </h2>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="flex flex-col gap-2">
+        <div className="mt-4 flex flex-wrap gap-4">
+          <div className="flex w-full flex-col gap-2 sm:w-[200px]">
             <FieldLabel required>Transaction date</FieldLabel>
             <DatePicker value={fecha} onChange={setFecha} className="h-9 w-full" error={intentado && !fecha ? true : undefined} />
           </div>
           <TextField
             label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto}
             error={intentado && !monto.trim() ? 'This field is required.' : undefined}
+            className="w-full sm:w-[160px]"
           />
-          <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} />
-          <SelectField label="Provider" options={PROVIDERS} value={provider} onChange={setProvider} />
+          <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} className="w-full sm:w-[200px]" />
+          <SelectField label="Provider" options={PROVIDERS} value={provider} onChange={setProvider} className="w-full sm:w-[200px]" />
           <SelectField
             label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
             error={intentado && !aplicaA.trim() ? 'This field is required.' : undefined}
+            className="w-full sm:w-[200px]"
           />
-          <SelectField label="Visit date" options={visitas} value={visita} onChange={setVisita} />
+          <SelectField label="Visit date" options={visitas} value={visita} onChange={setVisita} className="w-full sm:w-[320px]" />
         </div>
         <TextArea className="mt-4" label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
       </div>

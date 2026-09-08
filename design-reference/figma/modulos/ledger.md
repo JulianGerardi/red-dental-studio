@@ -348,3 +348,55 @@ Se adoptan las dos partes de esa lógica:
    tablas (detalle exacto en el diff, no repetido acá). Con columnas más
    angostas *y* el contenedor abrazando el contenido, `Description` ya no
    tiene ni espacio de sobra para estirarse ni gris para mostrar de más.
+
+## Pasada grande contra las capturas de Confidentally 2.0 (2026-09-08)
+
+Julián pasó tres capturas puntuales -Transactions, y la de allocation dos
+veces (Patient Payment y Credit Adjustment, mismo componente)- más una
+lista corta de pendientes. Cambios, todos verificados contra esas capturas:
+
+**Columna "Type" de Transactions, con más matiz.** Antes era un lookup fijo
+por `tipo` (Charge/Payment/Adjustment/Insurance, un color cada uno). La
+referencia distingue paciente de seguro, y cargo de crédito dentro de
+Adjustment, y para Charge muestra el código en vez de una etiqueta. Mismo
+dato (`tipo` + signo de `monto`), función nueva `detalleTipo()` que deriva
+el texto/color -no hace falta tocar `Movimiento` ni `TIPOS`, que siguen
+filtrando por las 4 categorías anchas-.
+
+**Paginación en las dos tablas**, componente nuevo `Pagination.tsx` (mismo
+patrón que trae `dashboard-figma`, retipeado con nuestros tokens): 8 por
+página en Transactions, 5 en la de allocation -mismo tamaño que se veía en
+la captura-. El pie "Showing X of Y" ahora cuenta la página, no el total
+filtrado.
+
+**Caja de totales de la tabla de allocation**, de la pastilla
+`bg-dash-count-bg` a una `<dl>` con borde propio -dos filas, etiqueta con
+fondo gris a la izquierda, valor en negrita a la derecha-, calcada de la
+`dl` real de `dashboard-figma`.
+
+**Tooth/Surface** pasan de `-` a `—` (em dash) cuando no aplican, para que
+lea igual que la referencia.
+
+**Tooltips en las columnas que truncan** (`title` en Patient/Provider/
+Description de las dos tablas): con texto más largo que el ancho de la
+columna, el navegador ya muestra el texto completo al pasar el mouse.
+Probado inyectando una descripción larga a mano en vivo -no hay dato de
+prueba tan largo en `data/ledger.ts` todavía-.
+
+**Panel lateral del paciente, colapsable** (`PatientSidePanel.tsx`): botón
+nuevo arriba del avatar, sólo visible en desktop -en angosto el panel ya es
+compacto por su cuenta-. Colapsado baja a una tira de 56px con nav
+icon-only (`title` por accesibilidad) y esconde Start Encounter/Clinical
+Mode/General/Contact; son secundarios frente al objetivo real, que es
+liberar ancho para las tablas del Ledger. Estado local, no persiste al
+cambiar de pestaña del paciente -no pareció necesario agregar un segundo
+mecanismo de estado global sólo para esto-.
+
+**Formularios de Payment/Credit/Charge**: "Transaction date" y "Apply to"
+pasaban por `grid-cols-2`, que en una card ancha los estira a la mitad del
+ancho aunque el contenido sea corto. Pasan a `flex flex-wrap` con un ancho
+fijo por campo (200px los selects/fecha, 160 Amount, 320 Visit date, que sí
+necesita espacio real). En Patient Payment y Credit Adjustment, Notes sale
+de la card de arriba y pasa a su propia card -mismo estilo, debajo de la
+tabla de allocation, arriba del footer-. Charge Adjustment no tiene tabla
+de allocation ni pidió el split; sólo los anchos de campo.
