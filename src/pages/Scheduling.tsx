@@ -77,10 +77,11 @@ export default function Scheduling() {
     })
   }
 
-  /* Agendar una solicitud la saca de la lista y la pone en la grilla. El turno
-     puede caer en otro día que el que se está mirando: el sistema no cambia de
-     pantalla solo, lo ofrece en el toast. */
-  const agendarSolicitud = (s: Solicitud, d: { patient: string; date: string; start: string; end: string; status: string }) => {
+  /* Datos crudos del modal -> turno de la grilla. Compartido por "agendar una
+     solicitud" y por "New appointment" suelto: los dos arman el mismo tipo de
+     evento, sólo cambia qué pasa con la solicitud de origen (si hay una). */
+  type DatosGuardado = { patient: string; date: string; start: string; end: string; status: string; primary?: string; operatory?: string; reason?: string }
+  const construirEvento = (d: DatosGuardado): EventoConFecha => {
     const [dd, mm, yyyy] = d.date.split('-').map(Number)
     const dia = new Date(yyyy, mm - 1, dd)
     const desde = HORAS.indexOf(d.start)
@@ -88,17 +89,33 @@ export default function Scheduling() {
     const inicio = desde >= 0 ? Number(d.start.slice(0, 2)) : 9
     const duracion = desde >= 0 && hasta > desde ? hasta - desde : 1
     const estado = (d.status in BLOCK_STYLE ? d.status : 'Booked') as ApptState
-    setEventos((prev) => [
-      ...prev,
-      { start: inicio, duration: duracion, patient: d.patient, state: estado, fecha: dia },
-    ])
+    return {
+      start: inicio, duration: duracion, patient: d.patient, state: estado, fecha: dia,
+      provider: d.primary || 'Unassigned', room: d.operatory || 'Unassigned', reason: d.reason || 'Appointment',
+    }
+  }
+
+  /* Agendar una solicitud la saca de la lista y la pone en la grilla. El turno
+     puede caer en otro día que el que se está mirando: el sistema no cambia de
+     pantalla solo, lo ofrece en el toast. */
+  const agendarSolicitud = (s: Solicitud, d: DatosGuardado) => {
+    const nuevo = construirEvento(d)
+    setEventos((prev) => [...prev, nuevo])
     setSolicitudes((prev) => prev.filter((x) => x.id !== s.id))
-    const rotulo = dia.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    const rotulo = nuevo.fecha.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     aviso.ok(`${d.patient} scheduled for ${rotulo} at ${d.start}.`, {
       label: `Go to ${rotulo}`,
       onClick: () => { setFecha(dia); setView('Day') },
     })
     return true
+  }
+
+  /* "New appointment" suelto -sin solicitud de origen-: mismo armado de
+     evento, sin nada que sacar de la lista de espera. Antes no pasaba
+     `onGuardar` acá y el modal sólo mostraba un toast sin tocar la grilla. */
+  const crearTurno = (d: DatosGuardado) => {
+    setEventos((prev) => [...prev, construirEvento(d)])
+    return false
   }
 
   /* Las flechas y el rótulo siguen la vista, igual que en Google Calendar. */
@@ -297,11 +314,14 @@ export default function Scheduling() {
           hora={fmtExacta(detail.ev.start)}
           duracion={detail.ev.duration}
           fecha={detail.ev.fecha}
+          provider={detail.ev.provider}
+          room={detail.ev.room}
+          reason={detail.ev.reason}
           anchor={detail.rect}
           onClose={() => setDetail(null)}
         />
       )}
-      {panel === 'new' && <NewAppointmentModal onClose={() => setPanel(null)} />}
+      {panel === 'new' && <NewAppointmentModal onGuardar={crearTurno} onClose={() => setPanel(null)} />}
       {/* Agendar una solicitud es crear un turno, no editarlo: el modal es el
           mismo pero llega con lo que el paciente ya había pedido. */}
       {agendando && (

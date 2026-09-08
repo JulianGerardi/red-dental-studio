@@ -430,3 +430,26 @@ de Insurance o Treatment plans.
 La pill del sistema es una sola: `rounded-full border px-2 py-[2px]
 text-[11px] font-semibold`, con borde y texto del mismo color y fondo tintado.
 Las dos pasaron a esa.
+
+## "New appointment" no creaba nada (2026-09-07)
+
+Comparando contra un proyecto hermano de la misma spec (ver
+[[red-clone-dashboard-figma-sibling]] en memoria) aparecieron dos gaps reales,
+los dos en el mismo lugar de siempre -no en la lógica compartida, en lo que
+quedó sin conectar-.
+
+`CalendarEvent` no tenía `provider`/`room`/`reason`: el Appointment Details
+Drawer mostraba **"Dr. Smith" / "Operatory 2" / "Consultation · reaseon for
+the visit" fijos**, para cualquier turno que se clickeara. El formulario de
+"New Appointment" sí pide Primary Provider, Operatory y Reason -los datos
+existían-, sólo no llegaban al evento guardado. Se agregan los tres campos a
+`CalendarEvent`, a los 4 eventos semilla (que además repetían todos "Juan
+Perez" como paciente, mismo tipo de anomalía que ya se documentó con
+Radiography/Rooms) y al drawer, que ahora lee del turno real.
+
+Más grave: el botón suelto "New appointment" (a diferencia de "agendar una
+solicitud") **no pasaba `onGuardar`** — el modal mostraba su toast de éxito
+pero nunca tocaba `eventos`. Se factoriza `construirEvento` (antes vivía
+inline en `agendarSolicitud`) y se usa en los dos casos: agendar una
+solicitud saca a alguien de la cola de espera, crear uno suelto no, pero los
+dos arman el mismo tipo de evento.

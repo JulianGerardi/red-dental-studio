@@ -59,6 +59,9 @@ export function AppointmentDetailsDrawer({
   hora,
   duracion,
   fecha,
+  provider,
+  room,
+  reason,
   anchor,
   onClose,
 }: {
@@ -68,6 +71,9 @@ export function AppointmentDetailsDrawer({
   hora: string
   duracion: number
   fecha: Date
+  provider: string
+  room: string
+  reason: string
   anchor: DOMRect
   onClose: () => void
 }) {
@@ -164,10 +170,9 @@ export function AppointmentDetailsDrawer({
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <Fila icono={User}>Dr. Smith</Fila>
-          <Fila icono={DoorOpen}>Operatory 2</Fila>
-          {/* "Reaseon" es el typo del Figma; se replica tal cual. */}
-          <Fila icono={ClipboardList}>Consultation · reaseon for the visit</Fila>
+          <Fila icono={User}>{provider}</Fila>
+          <Fila icono={DoorOpen}>{room}</Fila>
+          <Fila icono={ClipboardList}>{reason}</Fila>
           <Fila icono={Activity}>Encounter open</Fila>
         </div>
 
