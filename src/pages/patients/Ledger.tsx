@@ -14,6 +14,8 @@ import {
 } from '@/data/ledger'
 import { aviso } from '@/components/ui/toaster'
 import { Pagination } from '@/components/patients/ledger/Pagination'
+import { useAnchoColumnas, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
+import { LedgerRowDetail, LedgerRowModal } from '@/components/patients/ledger/LedgerRowDetail'
 import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
 import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
 import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
@@ -35,16 +37,38 @@ function detalleTipo(m: Movimiento): { texto: string; tono: string } {
 }
 
 /* Anchos del diseño de referencia (Confidentally 2.0): 112/112/96 · desc
-   flex-1 · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding. */
-const COLS = {
-  fecha: 'w-28 shrink-0',
-  paciente: 'w-28 shrink-0',
-  tipo: 'w-24 shrink-0',
-  desc: 'min-w-[160px] flex-1',
-  provider: 'w-28 shrink-0',
-  monto: 'w-20 shrink-0 text-right',
-  saldo: 'w-24 shrink-0 text-right',
+   elástica · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding. */
+type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'saldo'
+
+const ANCHO_BASE: Record<ColLedger, number> = {
+  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, saldo: 96,
 }
+
+type ColumnaLedger = {
+  id: ColLedger; label: string
+  elastica?: boolean; derecha?: boolean
+  claseCelda?: string
+  titulo?: (m: Fila) => string
+  celda: (m: Fila) => React.ReactNode
+}
+type Fila = Movimiento & { saldo: number }
+
+const COLUMNAS: ColumnaLedger[] = [
+  { id: 'fecha', label: 'Date', celda: (m) => m.fecha },
+  { id: 'paciente', label: 'Patient', claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.paciente, celda: (m) => m.paciente },
+  {
+    id: 'tipo', label: 'Type',
+    celda: (m) => { const t = detalleTipo(m); return <Pill tono={t.tono}>{t.texto}</Pill> },
+  },
+  { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
+  { id: 'provider', label: 'Provider', claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
+  /* Los negativos bajan la cuenta: van en verde. */
+  {
+    id: 'monto', label: 'Amount', derecha: true, claseCelda: 'font-medium tabular-nums',
+    celda: (m) => <span className={m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]'}>{moneda(m.monto)}</span>,
+  },
+  { id: 'saldo', label: 'Balance', derecha: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', celda: (m) => moneda(m.saldo) },
+]
 
 function Pill({ tono, children }: { tono: string; children: React.ReactNode }) {
   return (
@@ -73,6 +97,20 @@ export default function Ledger() {
   const [tipos, setTipos] = useState<string[]>([])
   const [tab, setTab] = useState<Tab>('transacciones')
   const [pagina, setPagina] = useState(1)
+  const [expandidas, setExpandidas] = useState<string[]>([])
+  const [enModal, setEnModal] = useState<Fila | null>(null)
+  const anchos = useAnchoColumnas<ColLedger>(ANCHO_BASE)
+
+  const alternarFila = (id: string) =>
+    setExpandidas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+
+  const estilo = (c: ColumnaLedger) => ({
+    width: anchos.ancho(c.id),
+    flexGrow: c.elastica && anchos.manual(c.id) === undefined ? 1 : 0,
+    flexShrink: 0,
+  })
+  const anchoMinimo = COLUMNAS.reduce((a, c) => a + anchos.ancho(c.id), 0)
+    + (COLUMNAS.length - 1) * 12 + 24
 
   const conSaldoTotal = useMemo(() => conSaldo(movs), [movs])
   const delaVista = useMemo(
@@ -193,47 +231,70 @@ export default function Ledger() {
               </div>
 
               <div className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
-                <div className="min-w-[864px]">
-                  <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
-                    <span className={COLS.fecha}>Date</span>
-                    <span className={COLS.paciente}>Patient</span>
-                    <span className={COLS.tipo}>Type</span>
-                    <span className={COLS.desc}>Description</span>
-                    <span className={COLS.provider}>Provider</span>
-                    <span className={COLS.monto}>Amount</span>
-                    <span className={COLS.saldo}>Balance</span>
+                <div style={{ minWidth: anchoMinimo }}>
+                  <div className="group/fila flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
+                    {COLUMNAS.map((c) => (
+                      <span
+                        key={c.id}
+                        style={estilo(c)}
+                        className={cn('relative flex items-center', c.derecha && 'justify-end')}
+                      >
+                        <span className="truncate">{c.label}</span>
+                        <ManijaResize id={c.id} label={c.label} estado={anchos} />
+                      </span>
+                    ))}
                   </div>
 
                   {filasPagina.length === 0 ? (
                     <EmptyState icon={Receipt} title="No entries" detail="Nothing matches the current search or filters." />
                   ) : (
                     filasPagina.map((m) => {
-                      const tipo = detalleTipo(m)
+                      const abierta = expandidas.includes(m.id)
                       return (
-                      <div
-                        key={m.id}
-                        className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]"
-                      >
-                        <span className={COLS.fecha}>{m.fecha}</span>
-                        <span title={m.paciente} className={cn(COLS.paciente, 'truncate text-[#09090b]')}>{m.paciente}</span>
-                        <span className={COLS.tipo}><Pill tono={tipo.tono}>{tipo.texto}</Pill></span>
-                        <span title={m.descripcion} className={cn(COLS.desc, 'truncate text-[#09090b]')}>{m.descripcion}</span>
-                        <span title={m.provider} className={cn(COLS.provider, 'truncate')}>{m.provider}</span>
-                        {/* Los negativos bajan la cuenta: van en verde. */}
-                        <span className={cn(COLS.monto, 'font-medium tabular-nums', m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]')}>
-                          {moneda(m.monto)}
-                        </span>
-                        <span className={cn(COLS.saldo, 'font-semibold tabular-nums text-[#09090b]')}>
-                          {moneda(m.saldo)}
-                        </span>
+                      <div key={m.id} className="border-t border-[#e7e7e7]">
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          aria-expanded={abierta}
+                          aria-label={`Toggle details for ${m.descripcion}`}
+                          onClick={(e) => {
+                            if ((e.target as HTMLElement).closest('[role="separator"]')) return
+                            alternarFila(m.id)
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.target !== e.currentTarget) return
+                            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
+                          }}
+                          className={cn(
+                            'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-[#3f3f46] hover:bg-[#fafafa]',
+                            abierta && 'bg-[#fafafa]',
+                          )}
+                        >
+                          {COLUMNAS.map((c) => (
+                            <span
+                              key={c.id}
+                              title={c.titulo?.(m)}
+                              style={estilo(c)}
+                              className={cn('relative', c.derecha && 'text-right', c.claseCelda)}
+                            >
+                              {c.celda(m)}
+                            </span>
+                          ))}
+                        </div>
+                        {abierta && <LedgerRowDetail m={m} onVerTodo={() => setEnModal(m)} />}
                       </div>
                       )
                     })
                   )}
 
                   <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
-                    <span className="text-xs font-semibold text-[#71717a]">
+                    <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
                       Showing {filasPagina.length} of {filas.length} entries
+                      {anchos.hayCambios && (
+                        <button type="button" onClick={anchos.resetear} className="text-dash-blue hover:underline">
+                          Reset column widths
+                        </button>
+                      )}
                     </span>
                     <div className="flex items-center gap-4">
                       <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
@@ -279,6 +340,8 @@ export default function Ledger() {
           )}
         </div>
       </div>
+
+      {enModal && <LedgerRowModal m={enModal} onClose={() => setEnModal(null)} />}
     </div>
   )
 }

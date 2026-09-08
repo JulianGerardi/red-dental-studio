@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Ban, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen,
+  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Ban, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen, IdCard,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { aviso } from '@/components/ui/toaster'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
@@ -39,13 +40,15 @@ function InfoBlock({
   title,
   items,
   onEdit,
+  className,
 }: {
   title: string
   items: { icon: LucideIcon; label: string; value: string }[]
   onEdit: () => void
+  className?: string
 }) {
   return (
-    <div className="mt-5">
+    <div className={cn('mt-5', className)}>
       <div className="flex items-center justify-between border-b border-[#e4e4e7] pb-1.5">
         <span className="text-[13px] font-semibold text-[#09090b]">{title}</span>
         <button
@@ -129,16 +132,28 @@ export function PatientSidePanel({
       </button>
 
       <div className={cn('flex items-center gap-3 lg:flex-col lg:gap-1.5', colapsado && 'lg:gap-0')}>
-        <EditableAvatar
-          foto={foto}
-          iniciales={initials}
-          onChange={setFoto}
-          label={name}
-          avatarClassName={cn(
-            'bg-dash-blue-hover rounded-full text-white size-[62px] text-lg',
-            colapsado && 'lg:size-9 lg:text-[11px]',
-          )}
-        />
+        {/* Colapsado el pill "Active" no entra, pero el estado del paciente
+            no es un dato que se pueda perder: pasa a un punto verde sobre el
+            avatar, con el nombre y la edad en el tooltip. */}
+        <div className="relative">
+          <EditableAvatar
+            foto={foto}
+            iniciales={initials}
+            onChange={setFoto}
+            label={name}
+            avatarClassName={cn(
+              'bg-dash-blue-hover rounded-full text-white size-[62px] text-lg',
+              colapsado && 'lg:size-9 lg:text-[11px]',
+            )}
+          />
+          {colapsado && conTooltip(`${name} · Active · 50 years`, (
+            <span
+              tabIndex={0}
+              aria-label={`${name}, Active, 50 years`}
+              className="absolute right-0 bottom-0 hidden size-3 rounded-full border-2 border-white bg-[#1e9850] lg:block"
+            />
+          ))}
+        </div>
         <div className={cn('flex min-w-0 flex-col items-start gap-1.5 lg:items-center', colapsado && 'lg:hidden')}>
           <p className="truncate text-lg font-bold text-[#09090b]">{name}</p>
           <span className="rounded-full border border-[#1a804d] bg-[#f0fcf5] px-2 py-[2px] text-[10px] font-semibold text-[#1a804d]">
@@ -159,19 +174,34 @@ export function PatientSidePanel({
         </Link>
       </div>
 
-      {/* Colapsado, Clinical Mode sigue disponible como ícono: es la acción
-          principal del panel, no un dato secundario que se pueda esconder. */}
+      {/* Colapsado, Clinical Mode y los datos del paciente siguen
+          disponibles como íconos: son contenido del panel, no adorno que se
+          pueda esconder. General/Contact se leen desde un popover. */}
       {colapsado && (
-        <div className="mt-2 hidden lg:block">
+        <div className="mt-2 hidden flex-col items-center gap-1 lg:flex">
           {conTooltip('Clinical Mode', (
             <Link
               to="/patients/john-smith/clinical-mode"
               aria-label="Clinical Mode"
-              className="text-dash-blue mx-auto flex size-9 items-center justify-center rounded-md bg-[#eef5ff]"
+              className="text-dash-blue flex size-9 items-center justify-center rounded-md bg-[#eef5ff]"
             >
               <Eye className="size-4" />
             </Link>
           ))}
+          <Popover>
+            {conTooltip('Patient information', (
+              <PopoverTrigger
+                aria-label="Patient information"
+                className="flex size-9 items-center justify-center rounded-md text-[#09090b] hover:bg-[#f4f4f5]"
+              >
+                <IdCard className="size-4" />
+              </PopoverTrigger>
+            ))}
+            <PopoverContent side="right" align="start" className="w-64 p-4">
+              <InfoBlock className="mt-0" title="General" items={GENERAL} onEdit={onEditGeneral ?? (() => navigate('/patients/edit'))} />
+              <InfoBlock title="Contact" items={CONTACT} onEdit={onEditContact ?? (() => setContacto(true))} />
+            </PopoverContent>
+          </Popover>
         </div>
       )}
 

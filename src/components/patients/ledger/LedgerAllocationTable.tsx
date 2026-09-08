@@ -7,6 +7,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { moneda, fechaCorta, type Movimiento } from '@/data/ledger'
 import { Pagination } from '@/components/patients/ledger/Pagination'
+import { useAnchoColumnas, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
+import { LedgerRowDetail, LedgerRowModal } from '@/components/patients/ledger/LedgerRowDetail'
 
 /* Figma 4582:29618 / 4582:30251. Ver design-reference/figma/modulos/ledger.md. */
 function coberturaSeguro(codigo: string) {
@@ -69,7 +71,10 @@ function ColumnPicker({
 }
 
 type Columna = {
-  id: ColId; label: string; ancho: string; px: number
+  id: ColId; label: string; px: number
+  /** Crece con la tabla mientras no se la arrastre a mano. */
+  elastica?: boolean
+  derecha?: boolean
   claseCelda?: string; bloqueada?: boolean
   titulo?: (m: Movimiento) => string
   celda: (m: Movimiento, ap: number) => React.ReactNode
@@ -81,6 +86,11 @@ const TAM_PAGINA = 5
 const GAP = 6
 const PADDING_FILA = 24
 
+const ANCHO_BASE: Record<ColId, number> = {
+  fecha: 76, paciente: 76, provider: 72, diente: 40, superficie: 48, codigo: 52,
+  desc: 88, charge: 64, otroCredito: 68, guarEstimado: 76, applied: 72, balance: 64,
+}
+
 export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const [aplicado, setAplicado] = useState<Record<string, string>>({})
   /* Arrancan todas visibles: con los anchos del diseño de referencia las 12
@@ -89,6 +99,12 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const [ocultas, setOcultas] = useState<ColId[]>([])
   const alternarCol = (id: ColId) => setOcultas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
   const [pagina, setPagina] = useState(1)
+  const [expandidas, setExpandidas] = useState<string[]>([])
+  const [enModal, setEnModal] = useState<Movimiento | null>(null)
+  const anchos = useAnchoColumnas<ColId>(ANCHO_BASE)
+
+  const alternarFila = (id: string) =>
+    setExpandidas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
 
   const paginas = Math.max(1, Math.ceil(cargos.length / TAM_PAGINA))
   const paginaActual = Math.min(pagina, paginas)
@@ -98,18 +114,18 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const totalAplicado = cargos.reduce((a, m) => a + (Number(aplicado[m.id]) || 0), 0)
 
   const columnas: Columna[] = [
-    { id: 'fecha', label: 'Date', ancho: 'w-[76px] shrink-0', px: 76, bloqueada: true, claseCelda: 'text-[#3f3f46]', celda: (m) => fechaCorta(m.fecha) },
-    { id: 'paciente', label: 'Patient', ancho: 'w-[76px] shrink-0', px: 76, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.paciente, celda: (m) => m.paciente },
-    { id: 'provider', label: 'Provider', ancho: 'w-[72px] shrink-0', px: 72, claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
-    { id: 'diente', label: 'Tooth', ancho: 'w-[40px] shrink-0', px: 40, celda: (m) => m.diente ?? '—' },
-    { id: 'superficie', label: 'Surface', ancho: 'w-[48px] shrink-0', px: 48, celda: (m) => m.superficie ?? '—' },
-    { id: 'codigo', label: 'Code', ancho: 'w-[52px] shrink-0', px: 52, claseCelda: 'text-dash-blue font-medium', celda: (m) => m.codigo },
-    { id: 'desc', label: 'Description', ancho: 'min-w-[88px] flex-1', px: 88, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
-    { id: 'charge', label: 'Charge', ancho: 'w-[64px] shrink-0 text-right', px: 64, claseCelda: 'font-medium tabular-nums text-[#09090b]', celda: (m) => moneda(m.monto) },
-    { id: 'otroCredito', label: 'Other Credit', ancho: 'w-[68px] shrink-0 text-right', px: 68, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * coberturaSeguro(m.codigo)) },
-    { id: 'guarEstimado', label: 'Guar Estimate', ancho: 'w-[76px] shrink-0 text-right', px: 76, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * (1 - coberturaSeguro(m.codigo))) },
+    { id: 'fecha', label: 'Date', px: 76, bloqueada: true, claseCelda: 'text-[#3f3f46]', celda: (m) => fechaCorta(m.fecha) },
+    { id: 'paciente', label: 'Patient', px: 76, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.paciente, celda: (m) => m.paciente },
+    { id: 'provider', label: 'Provider', px: 72, claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
+    { id: 'diente', label: 'Tooth', px: 40, celda: (m) => m.diente ?? '—' },
+    { id: 'superficie', label: 'Surface', px: 48, celda: (m) => m.superficie ?? '—' },
+    { id: 'codigo', label: 'Code', px: 52, claseCelda: 'text-dash-blue font-medium', celda: (m) => m.codigo },
+    { id: 'desc', label: 'Description', px: 88, elastica: true, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
+    { id: 'charge', label: 'Charge', px: 64, derecha: true, claseCelda: 'font-medium tabular-nums text-[#09090b]', celda: (m) => moneda(m.monto) },
+    { id: 'otroCredito', label: 'Other Credit', px: 68, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * coberturaSeguro(m.codigo)) },
+    { id: 'guarEstimado', label: 'Guar Estimate', px: 76, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * (1 - coberturaSeguro(m.codigo))) },
     {
-      id: 'applied', label: 'Applied', ancho: 'w-[72px] shrink-0', px: 72, bloqueada: true,
+      id: 'applied', label: 'Applied', px: 72, bloqueada: true,
       celda: (m) => (
         <input
           value={aplicado[m.id] ?? ''}
@@ -126,11 +142,17 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
         />
       ),
     },
-    { id: 'balance', label: 'Balance', ancho: 'w-[64px] shrink-0 text-right', px: 64, claseCelda: 'font-semibold tabular-nums text-[#09090b]', bloqueada: true, celda: (m, ap) => moneda(Math.max(m.monto - ap, 0)) },
+    { id: 'balance', label: 'Balance', px: 64, derecha: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', bloqueada: true, celda: (m, ap) => moneda(Math.max(m.monto - ap, 0)) },
   ]
   const columnasVisibles = columnas.filter((c) => !ocultas.includes(c.id))
-  const anchoMinimo = columnasVisibles.reduce((a, c) => a + c.px, 0)
+  const anchoMinimo = columnasVisibles.reduce((a, c) => a + anchos.ancho(c.id), 0)
     + (columnasVisibles.length - 1) * GAP + PADDING_FILA
+
+  const estilo = (c: Columna) => ({
+    width: anchos.ancho(c.id),
+    flexGrow: c.elastica && anchos.manual(c.id) === undefined ? 1 : 0,
+    flexShrink: 0,
+  })
 
   return (
     <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
@@ -147,18 +169,55 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
         <>
           <div className="mt-3 w-full overflow-x-auto rounded-md border border-[#e7e7e7]">
             <div style={{ minWidth: anchoMinimo }}>
-              <div className="flex items-center gap-1.5 bg-[#f9f9f9] px-3 py-2.5 text-[11px] font-semibold text-[#71717a]">
+              <div className="group/fila flex items-center gap-1.5 bg-[#f9f9f9] px-3 py-2.5 text-[11px] font-semibold text-[#71717a]">
                 {columnasVisibles.map((c) => (
-                  <span key={c.id} className={cn(c.ancho, 'whitespace-nowrap')}>{c.label}</span>
+                  <span
+                    key={c.id}
+                    style={estilo(c)}
+                    className={cn('relative flex items-center', c.derecha && 'justify-end')}
+                  >
+                    <span className="truncate">{c.label}</span>
+                    <ManijaResize id={c.id} label={c.label} estado={anchos} />
+                  </span>
                 ))}
               </div>
               {cargosPagina.map((m) => {
                 const ap = Number(aplicado[m.id]) || 0
+                const abierta = expandidas.includes(m.id)
                 return (
-                  <div key={m.id} className="flex items-center gap-1.5 border-t border-[#e7e7e7] px-3 py-2.5 text-[12px] text-[#3f3f46]">
-                    {columnasVisibles.map((c) => (
-                      <span key={c.id} title={c.titulo?.(m)} className={cn(c.ancho, c.claseCelda)}>{c.celda(m, ap)}</span>
-                    ))}
+                  <div key={m.id} className="border-t border-[#e7e7e7]">
+                    {/* La fila entera abre el detalle, salvo cuando el click
+                        cae en el input de "Applied" o en una manija. */}
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={abierta}
+                      aria-label={`Toggle details for ${m.descripcion}`}
+                      onClick={(e) => {
+                        if ((e.target as HTMLElement).closest('input, [role="separator"]')) return
+                        alternarFila(m.id)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.target !== e.currentTarget) return
+                        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
+                      }}
+                      className={cn(
+                        'group/fila flex cursor-pointer items-center gap-1.5 px-3 py-2.5 text-[12px] text-[#3f3f46] hover:bg-[#fafafa]',
+                        abierta && 'bg-[#fafafa]',
+                      )}
+                    >
+                      {columnasVisibles.map((c) => (
+                        <span
+                          key={c.id}
+                          title={c.titulo?.(m)}
+                          style={estilo(c)}
+                          className={cn('relative', c.derecha && 'text-right', c.claseCelda)}
+                        >
+                          {c.celda(m, ap)}
+                        </span>
+                      ))}
+                    </div>
+                    {abierta && <LedgerRowDetail m={m} onVerTodo={() => setEnModal(m)} />}
                   </div>
                 )
               })}
@@ -166,8 +225,13 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
           </div>
 
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-            <span className="text-xs font-semibold text-[#71717a]">
+            <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
               Showing {cargosPagina.length} of {cargos.length} transactions
+              {anchos.hayCambios && (
+                <button type="button" onClick={anchos.resetear} className="text-dash-blue hover:underline">
+                  Reset column widths
+                </button>
+              )}
             </span>
             <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
           </div>
@@ -186,6 +250,8 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
           </div>
         </>
       )}
+
+      {enModal && <LedgerRowModal m={enModal} onClose={() => setEnModal(null)} />}
     </div>
   )
 }

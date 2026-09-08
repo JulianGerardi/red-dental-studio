@@ -467,3 +467,52 @@ alinear nada. Se rehízo:
   accesibilidad, que mostraba `link [ref_19]` sin texto.
 
 Colapsar libera 160px reales para la tabla (892 → 1052 a 1280 de viewport).
+
+## Columnas redimensionables y detalle de fila (2026-09-08)
+
+Pedido de Julián: poder achicar/agrandar cada columna a mano para leer datos
+largos, y algún modo de ver la fila completa. Eligió "las dos": fila
+expandible inline **y** modal.
+
+**Resize** (`useAnchoColumnas.tsx`, compartido por las dos tablas — dos call
+sites reales, no una abstracción especulativa). Manija en el borde derecho de
+cada cabecera; arrastre con pointer events, y flechas ←/→ mueven de a 16px
+para que no quede sólo al alcance del mouse. Los anchos arrancan en los del
+diseño y aparece un link "Reset column widths" en el pie apenas se toca algo.
+La columna elástica (`Description`) crece con la tabla hasta que se la
+arrastra; ahí pasa a ancho fijo (`flexGrow: 0`), que es lo que uno espera al
+fijarla a mano.
+
+Dos bugs encontrados armando esto, los dos por la misma causa —la manija vive
+dentro de la celda de cabecera—:
+1. La celda llevaba `truncate`, y su `overflow:hidden` **recortaba la manija**
+   dejándola inclickeable. Se pasa el `truncate` a un span interno y la celda
+   queda `relative flex items-center`, sin overflow.
+2. `h-full` en la manija daba **17px** (la altura de la caja de línea del
+   texto, no la de la fila). Pasa a alto fijo de 28px centrado, y 10px de
+   ancho, para tener área de agarre real.
+
+**Detalle de fila** (`LedgerRowDetail.tsx`): click en cualquier lugar de la
+fila la despliega abajo con todos los campos (Description arriba, después
+Transaction date/Patient/Type/Code/Provider/Status/Tooth/Surface/Amount/
+Balance en tres columnas). Adentro, "View full record" abre el mismo
+contenido en un `ModalShell`. El click se ignora si cae en el input de
+"Applied" o en una manija de resize —si no, tipear un monto abría el
+detalle—. Con teclado, Enter/Espacio sobre la fila hace lo mismo.
+
+El modal es de **sólo lectura**: lleva un único botón "Close", no el par
+Cancel/Save —que implicaría que hay algo para guardar—. Es la excepción
+razonable a la regla de "Cancel y Save siempre juntos", que aplica a
+formularios.
+
+## El rail colapsado perdía datos del paciente (2026-09-08)
+
+Julián marcó que al colapsar faltaban "el de information y si el paciente
+está activo". Los dos vuelven, adaptados al ancho del rail:
+
+- **Estado**: el pill "Active" no entra en 60px, así que pasa a un punto
+  verde sobre el avatar, con `Nombre · Active · 50 years` en el tooltip y en
+  el `aria-label`.
+- **General/Contact**: botón nuevo con ícono que abre un `Popover`
+  (shadcn/Radix, recién instalado) con los dos bloques completos, incluidos
+  sus lápices de edición, que siguen funcionando igual que expandidos.
