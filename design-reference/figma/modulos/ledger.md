@@ -646,3 +646,28 @@ al lado del título de cada tabla: abre o cierra de una todas las filas de la
 página. Opera sobre **la página visible**, no sobre las 26 entradas -abrir
 todo un ledger paginado no le sirve a nadie-, y el rótulo alterna según si
 ya están todas abiertas.
+
+## El Confibot tapaba Cancel/Save, y tooltip por fila (2026-09-08)
+
+**Confibot.** Vive fijo en la esquina inferior derecha (`fixed right-4
+bottom-4`), justo donde caen los Cancel/Save de los formularios de Payment,
+Credit y Charge Adjustment: quedaban abajo del FAB y costaba clickearlos. Se
+reserva su alto una sola vez, en el `main` del `AppShell`
+(`pb-24 sm:pb-28`), en vez de parchear cada pantalla: cualquier control que
+termine al pie de cualquier página queda por encima. Verificado midiendo
+solapamiento real entre los rects de Save/Cancel y los dos botones del
+Confibot: ya no se tocan.
+
+**Tooltip por fila.** Cada fila de las dos tablas muestra al pasar el mouse
+un resumen de tres líneas -descripción, después paciente · provider ·
+código · diente/superficie, y abajo monto · estado · balance- para leerla
+entera sin abrirla. Sale del mismo `Movimiento`, no hay dato nuevo.
+
+Reemplaza a los `title` que tenían las celdas que truncan: con los dos
+puestos, parar el mouse sobre Description mostraba **dos tooltips
+distintos** -el nativo de la celda y el de la fila-. El resumen incluye el
+texto completo de esas columnas, así que no se pierde nada. Los `title` de
+las manijas de resize quedan: viven en la cabecera, no en las filas.
+
+Delay de 400ms, para que recorrer la tabla con el mouse no dispare tooltips
+todo el tiempo.

@@ -1,6 +1,38 @@
 import { Maximize2, ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { moneda, type Movimiento } from '@/data/ledger'
+
+/* Resumen de la fila al pasar el mouse, para leerla completa sin abrirla.
+   Reemplaza a los `title` que tenían las celdas que truncan: con los dos
+   puestos aparecían dos tooltips distintos sobre la misma celda. */
+export function FilaConTooltip({
+  m, children,
+}: {
+  m: Movimiento & { saldo?: number }
+  children: React.ReactNode
+}) {
+  const pieza = [m.diente && `Tooth ${m.diente}`, m.superficie].filter(Boolean).join(' · ')
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent side="top" align="start" className="max-w-sm bg-[#09090b] text-white">
+        <span className="flex flex-col gap-0.5">
+          <span className="font-semibold">{m.descripcion}</span>
+          <span className="text-white/70">
+            {m.paciente} · {m.provider}
+            {m.codigo !== '—' && ` · ${m.codigo}`}
+            {pieza && ` · ${pieza}`}
+          </span>
+          <span className="tabular-nums text-white/70">
+            {moneda(m.monto)} · {m.estado}
+            {m.saldo !== undefined && ` · balance ${moneda(m.saldo)}`}
+          </span>
+        </span>
+      </TooltipContent>
+    </Tooltip>
+  )
+}
 
 /* Abrir/cerrar de una todas las filas que hay en pantalla. Va al lado del
    título de cada tabla del Ledger. */

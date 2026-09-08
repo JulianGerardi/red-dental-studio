@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { FilterMenu } from '@/components/dashboard/FilterMenu'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import {
   MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda,
@@ -15,7 +16,7 @@ import {
 import { aviso } from '@/components/ui/toaster'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
-import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
+import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip } from '@/components/patients/ledger/LedgerRowDetail'
 import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
 import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
 import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
@@ -258,6 +259,7 @@ export default function Ledger() {
                 </div>
               </div>
 
+              <TooltipProvider delayDuration={400}>
               <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
                 <div style={{ minWidth: anchoMinimo }}>
                   <div data-tabla-header className="group/fila flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
@@ -281,6 +283,7 @@ export default function Ledger() {
                       const abierta = expandidas.includes(m.id)
                       return (
                       <div key={m.id} className="border-t border-[#e7e7e7]">
+                        <FilaConTooltip m={m}>
                         <div
                           role="button"
                           tabIndex={0}
@@ -302,7 +305,6 @@ export default function Ledger() {
                           {COLUMNAS.map((c) => (
                             <span
                               key={c.id}
-                              title={c.titulo?.(m)}
                               style={estilo(c)}
                               className={cn('relative', c.derecha && 'text-right', c.claseCelda)}
                             >
@@ -310,6 +312,7 @@ export default function Ledger() {
                             </span>
                           ))}
                         </div>
+                        </FilaConTooltip>
                         {abierta && <LedgerRowDetail m={m} onVerTodo={() => setEnModal(m)} />}
                       </div>
                       )
@@ -342,6 +345,7 @@ export default function Ledger() {
                   </div>
                 </div>
               </div>
+              </TooltipProvider>
             </>
           )}
 

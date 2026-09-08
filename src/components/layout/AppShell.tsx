@@ -21,7 +21,10 @@ export function AppShell() {
       <Sidebar expanded={expanded} onClose={() => setExpanded(false)} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar expanded={expanded} onToggleSidebar={() => setExpanded((v) => !v)} />
-        <main className="bg-page-background flex-1 overflow-x-hidden">
+        {/* El Confibot vive fijo en la esquina inferior derecha, justo donde
+            caen los Cancel/Save de los formularios. Se reserva su alto acá
+            -una sola vez, en el shell- para que ningún control quede debajo. */}
+        <main className="bg-page-background flex-1 overflow-x-hidden pb-24 sm:pb-28">
           <Outlet />
         </main>
       </div>

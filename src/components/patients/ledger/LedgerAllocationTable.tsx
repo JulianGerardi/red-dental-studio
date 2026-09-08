@@ -8,7 +8,8 @@ import {
 import { moneda, fechaCorta, type Movimiento } from '@/data/ledger'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
-import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
+import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip } from '@/components/patients/ledger/LedgerRowDetail'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 /* Figma 4582:29618 / 4582:30251. Ver design-reference/figma/modulos/ledger.md. */
 function coberturaSeguro(codigo: string) {
@@ -196,6 +197,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
         <p className="mt-3 text-[13px] text-[#71717a]">No open charges to apply this against.</p>
       ) : (
         <>
+          <TooltipProvider delayDuration={400}>
           <div ref={refVisible} data-tabla-scroll className="mt-3 w-full overflow-x-auto rounded-md border border-[#e7e7e7]">
             <div style={{ minWidth: anchoMinimo }}>
               <div data-tabla-header className="group/fila flex items-center gap-1.5 bg-[#f9f9f9] px-3 py-2.5 text-[11px] font-semibold text-[#71717a]">
@@ -218,6 +220,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                   <div key={m.id} className="border-t border-[#e7e7e7]">
                     {/* La fila entera abre el detalle, salvo cuando el click
                         cae en el input de "Applied" o en una manija. */}
+                    <FilaConTooltip m={m}>
                     <div
                       role="button"
                       tabIndex={0}
@@ -239,7 +242,6 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                       {columnasVisibles.map((c) => (
                         <span
                           key={c.id}
-                          title={c.titulo?.(m)}
                           style={estilo(c)}
                           className={cn('relative', c.derecha && 'text-right', c.claseCelda)}
                         >
@@ -247,12 +249,14 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                         </span>
                       ))}
                     </div>
+                    </FilaConTooltip>
                     {abierta && <LedgerRowDetail m={m} onVerTodo={() => setEnModal(m)} />}
                   </div>
                 )
               })}
             </div>
           </div>
+          </TooltipProvider>
 
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
             <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
