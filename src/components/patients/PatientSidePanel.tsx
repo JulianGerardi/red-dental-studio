@@ -117,6 +117,7 @@ export function PatientSidePanel({
         <EncounterButton />
         <Link
           to="/patients/john-smith/clinical-mode"
+          data-tour="pat-clinical-mode"
           className="text-dash-blue flex w-full items-center justify-center gap-2 rounded-md bg-[#eef5ff] py-2 text-[13px] font-medium"
         >
           <Eye className="size-3.5" /> Clinical Mode
@@ -128,7 +129,7 @@ export function PatientSidePanel({
           y un degradado a la derecha que avisa que sigue— y los bloques de
           datos van a dos columnas. */}
       <div className="relative mt-3 lg:mt-0">
-      <nav className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 lg:mx-0 lg:mt-3 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:px-0 lg:pb-0">
+      <nav data-tour="pat-tabs" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 lg:mx-0 lg:mt-3 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:px-0 lg:pb-0">
         {NAV.map(({ key, icon: Icon, to }) => {
           const clase = cn(
             'flex h-10 shrink-0 items-center gap-2 rounded-lg border px-3 text-left text-[13px] font-medium whitespace-nowrap',

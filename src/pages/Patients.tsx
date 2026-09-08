@@ -42,7 +42,7 @@ export default function Patients() {
             </p>
           </div>
 
-          <div className="relative">
+          <div className="relative" data-tour="pat-search">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
             <input
               value={query}
@@ -56,6 +56,7 @@ export default function Patients() {
         <button
           type="button"
           onClick={() => setModal('new')}
+          data-tour="pat-new"
           className="bg-dash-blue hover:bg-dash-blue-hover flex h-[33px] shrink-0 items-center justify-center gap-2 rounded-md px-5 text-[13px] font-medium text-white transition-colors"
         >
           <Plus className="size-3.5" /> New Patient

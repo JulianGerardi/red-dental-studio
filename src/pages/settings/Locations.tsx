@@ -53,6 +53,7 @@ export function SettingsLocations() {
         </div>
         <Link
           to="/settings/locations/new"
+          data-tour="set-locations"
           className="bg-dash-blue hover:bg-dash-blue-hover ml-auto flex h-9 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
         >
           <Plus className="size-4" /> New location

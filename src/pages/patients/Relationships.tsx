@@ -208,6 +208,7 @@ export default function Relationships() {
                   entra. Este botón es una decisión propia — anomalía 42. */}
               <Link
                 to={`/patients/${id}/relationships/new`}
+                data-tour="pat-add-relationship"
                 className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
               >
                 <Plus className="size-4" /> Add Relationship

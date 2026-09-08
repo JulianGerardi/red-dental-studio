@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
+import { Confibot } from '@/components/help/Confibot'
+import { useHelp } from '@/components/help/HelpProvider'
 
 export function AppShell() {
   const [expanded, setExpanded] = useState(false)
   const { pathname } = useLocation()
+  const { showOnScreen } = useHelp()
 
   /* En mobile el sidebar es un panel encima del contenido: al navegar se
      cierra solo, si no queda tapando la pantalla a la que acabás de entrar. */
@@ -22,6 +25,7 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+      <Confibot onShowOnScreen={showOnScreen} />
     </div>
   )
 }

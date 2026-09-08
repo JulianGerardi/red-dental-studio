@@ -42,6 +42,7 @@ export function FilterMenu({
         type="button"
         aria-label={label}
         aria-expanded={open}
+        data-tour="dash-filter"
         onClick={() => setOpen((v) => !v)}
         className={cn(
           'relative rounded-md p-1.5 text-[#09090b] transition-colors hover:bg-[#f4f4f5]',

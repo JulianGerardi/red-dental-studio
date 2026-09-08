@@ -25,6 +25,7 @@ import { SettingsNewLocation } from '@/pages/settings/NewLocation'
 import { SettingsEmployees, SettingsEmployeeDetail } from '@/pages/settings/Employees'
 import { SettingsNewEmployee } from '@/pages/settings/NewEmployee'
 import Help from '@/pages/Help'
+import { HelpProvider } from '@/components/help/HelpProvider'
 
 const SETTINGS_PLACEHOLDERS = [
   'account', 'roles', 'parameters',
@@ -41,6 +42,7 @@ export default function App() {
     <PatientsProvider>
     <Toaster />
     <Router>
+      <HelpProvider>
       <Routes>
         {/* Auth, fuera del shell */}
         <Route path="/login" element={<Login />} />
@@ -88,6 +90,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      </HelpProvider>
     </Router>
     </PatientsProvider>
   )

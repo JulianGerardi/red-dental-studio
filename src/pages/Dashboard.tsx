@@ -171,13 +171,15 @@ export default function Dashboard() {
           </p>
           <PageTitle size="lg">Dashboard</PageTitle>
         </div>
-        <StatStrip stats={stats} />
+        <div data-tour="dash-stats">
+          <StatStrip stats={stats} />
+        </div>
       </div>
 
       {/* La fecha manda sobre las tres columnas, así que vive acá arriba y no
           adentro de Appointments: metida en una de las tres, parecía filtrar
           sólo esa. */}
-      <div className="mt-4 flex flex-wrap items-center gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-2" data-tour="dash-date">
         <DatePicker value={date} onChange={setDate} marked={diasConDatos} />
         {/* Volver a hoy sin tener que abrir el calendario y buscar el día.
             Desaparece cuando ya estás en hoy: no tendría nada que hacer. */}

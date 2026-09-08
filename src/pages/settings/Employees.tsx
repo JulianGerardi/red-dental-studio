@@ -122,6 +122,7 @@ export function SettingsEmployees() {
         )}
         <Link
           to="/settings/team/new"
+          data-tour="set-team"
           className="bg-dash-blue hover:bg-dash-blue-hover ml-auto flex h-9 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
         >
           <CirclePlus className="size-4" /> New Employee

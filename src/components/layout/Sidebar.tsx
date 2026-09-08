@@ -156,7 +156,7 @@ function SettingsItem({
       {/* El chevron es un botón aparte y no un icono adentro del link: dentro,
           cancelar la navegación dependía de que el preventDefault ganara la
           carrera contra el Link, y en touch terminaba navegando igual. */}
-      <div className={cn(clase(activo), 'w-full')}>
+      <div className={cn(clase(activo), 'w-full')} data-tour="settings-menu">
         <NavLink to="/settings" title="Settings" className="flex min-w-0 flex-1 items-center gap-3">
           <Settings className="size-4 shrink-0" />
           <span className={cn(mostrarLabel ? '' : 'md:hidden')}>Settings</span>

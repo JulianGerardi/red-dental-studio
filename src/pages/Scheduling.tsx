@@ -215,6 +215,7 @@ export default function Scheduling() {
           )}
           <button
             onClick={() => setPanel('new')}
+            data-tour="sched-new"
             className="bg-dash-blue hover:bg-dash-blue-hover flex h-8 items-center gap-1.5 rounded-md px-4 text-xs font-medium text-white transition-colors"
           >
             <Plus className="size-3.5" /> New appointment
