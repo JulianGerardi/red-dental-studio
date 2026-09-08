@@ -283,3 +283,23 @@ pestañas que usan `LedgerAllocationTable`, comparten el componente-:
    de estirarse más allá de lo que sus columnas realmente usan, así que el
    sobrante de la tarjeta queda como fondo blanco liso *fuera* de la fila, no
    como gris *adentro* del header.
+
+## La tabla de Transactions tenía el mismo bug de `desc`, sin que se notara (2026-09-08)
+
+Julián pidió que esta tabla -la de arriba- tenga "el mismo diseño y la misma
+lógica" que la de Transactions. Antes de tocar nada se midió cómo se
+comporta hoy Transactions con la ventana más ancha (1536px): su columna
+`desc` (`min-w-[220px] flex-1`, sin techo) llegaba a **358px** -peor que los
+317px que tenía `LedgerAllocationTable` antes del fix de arriba-. Es el
+mismo bug, sólo que a 1280px (el ancho en el que se venía mirando) el propio
+`min-w-[974px]` del contenedor ya fuerza scroll y no deja lugar para que
+`desc` se estire, así que nunca se notó ahí.
+
+Con eso confirmado, iguales las dos: `COLS.desc` pasa a `min-w-[220px]
+max-w-[240px] flex-1` -mismo techo de 240px que ya tiene la de allocation,
+tiene sentido: las descripciones salen del mismo `MOVIMIENTOS`- y el
+contenedor gana `max-w-[994px]` junto al `min-w-[974px]` que ya tenía (974
++ los 20px extra que el techo de 240 -vs. el mínimo de 220- le agrega). Acá
+no hace falta un `anchoMaximo` calculado por JS como en la tabla de
+allocation -esta no tiene columnas para ocultar, el número es fijo- así que
+alcanza con la clase de Tailwind directamente.
