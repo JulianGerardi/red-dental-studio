@@ -44,6 +44,16 @@ export const TIPOS: TipoMovimiento[] = ['Charge', 'Payment', 'Adjustment', 'Insu
 export const moneda = (n: number) =>
   `${n < 0 ? '-' : ''}$${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
 
+/* La tabla de allocation muestra 12 columnas a la vez: ahí la fecha va
+   numérica (04/20/2026) como en el diseño de referencia, no "March 17, 2025",
+   que sola se come 30px más. */
+export function fechaCorta(fecha: string) {
+  const d = new Date(fecha)
+  if (Number.isNaN(d.getTime())) return fecha
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${p(d.getMonth() + 1)}/${p(d.getDate())}/${d.getFullYear()}`
+}
+
 /* Corre sobre la cuenta completa del guarantor, no se reinicia por paciente. */
 export function conSaldo(movs: Movimiento[]) {
   let saldo = 0

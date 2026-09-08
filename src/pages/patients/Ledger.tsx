@@ -34,14 +34,16 @@ function detalleTipo(m: Movimiento): { texto: string; tono: string } {
     : { texto: 'Charge Adj', tono: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]' }
 }
 
+/* Anchos del diseño de referencia (Confidentally 2.0): 112/112/96 · desc
+   flex-1 · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding. */
 const COLS = {
-  fecha: 'w-[110px] shrink-0',
-  paciente: 'w-[90px] shrink-0',
-  tipo: 'w-[95px] shrink-0',
-  desc: 'min-w-[220px] flex-1',
-  provider: 'w-[120px] shrink-0',
-  monto: 'w-[70px] shrink-0 text-right',
-  saldo: 'w-[80px] shrink-0 text-right',
+  fecha: 'w-28 shrink-0',
+  paciente: 'w-28 shrink-0',
+  tipo: 'w-24 shrink-0',
+  desc: 'min-w-[160px] flex-1',
+  provider: 'w-28 shrink-0',
+  monto: 'w-20 shrink-0 text-right',
+  saldo: 'w-24 shrink-0 text-right',
 }
 
 function Pill({ tono, children }: { tono: string; children: React.ReactNode }) {
@@ -190,9 +192,9 @@ export default function Ledger() {
                 </div>
               </div>
 
-              <div className="mt-4 w-fit max-w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
-                <div className="min-w-[889px]">
-                  <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
+              <div className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+                <div className="min-w-[864px]">
+                  <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
                     <span className={COLS.fecha}>Date</span>
                     <span className={COLS.paciente}>Patient</span>
                     <span className={COLS.tipo}>Type</span>
@@ -210,7 +212,7 @@ export default function Ledger() {
                       return (
                       <div
                         key={m.id}
-                        className="flex items-center gap-3 border-b border-[#e7e7e7] px-4 py-3 text-[13px] text-[#3f3f46] last:border-0"
+                        className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]"
                       >
                         <span className={COLS.fecha}>{m.fecha}</span>
                         <span title={m.paciente} className={cn(COLS.paciente, 'truncate text-[#09090b]')}>{m.paciente}</span>
@@ -229,7 +231,7 @@ export default function Ledger() {
                     })
                   )}
 
-                  <div className="flex h-[52px] flex-wrap items-center justify-between gap-3 px-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
                     <span className="text-xs font-semibold text-[#71717a]">
                       Showing {filasPagina.length} of {filas.length} entries
                     </span>

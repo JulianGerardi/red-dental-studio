@@ -400,3 +400,70 @@ necesita espacio real). En Patient Payment y Credit Adjustment, Notes sale
 de la card de arriba y pasa a su propia card -mismo estilo, debajo de la
 tabla de allocation, arriba del footer-. Charge Adjustment no tiene tabla
 de allocation ni pidió el split; sólo los anchos de campo.
+
+## Las tablas, esta vez copiando los anchos reales de la referencia (2026-09-08)
+
+Julián marcó que las tablas seguían mal: *"no es como las tablas que te pase
+que entran bien sin que tengas que reducir columnas, aparte la tabla en sí
+debe ocupar fill container"*. Tenía razón y el error era mío: había leído
+`LedgerTransactions.tsx`/`LedgerSection.tsx` del proyecto de referencia pero
+no había copiado **lo que más importaba**, sus anchos de columna.
+
+Dos datos concretos que me faltaban:
+
+1. **`useColumns` arranca con `new Set()`** — o sea, **todas** las columnas
+   visibles. Nosotros arrancábamos ocultando cinco. El picker de columnas
+   ahí es para achicar si querés, no para tapar un default que no entraba.
+2. **Sus columnas son mucho más angostas.** En la tabla de allocation:
+   `Date`/`Patient` 76, `Provider` 44, `Tooth` 40, `Surface` 48, `Code` 52,
+   `Description` `min-w-[88px] flex-1`, `Charge` 56, `Other Credit` 68,
+   `Guar Estimate` 76, `Applied` 72, `Balance` 60 — con `gap-1.5` (6px) y
+   `px-3`, no `gap-3`/`px-4`. Y el texto es 11px en la cabecera / 12px en
+   las filas, no 12/13.
+
+Con esos números las 12 columnas entran en ~890px, que es lo que la card
+tiene disponible a 1280 de viewport. Por eso allá no necesitan ocultar nada.
+
+También usan **fecha numérica** (`04/20/2026`) en la tabla de allocation
+—por eso les entra en 76px—, mientras que en Transactions va larga
+(`May 20, 2026`, columna `w-28`). Se agrega `fechaCorta()` en `data/ledger.ts`
+y la tabla de allocation la usa; Transactions sigue con el formato largo.
+
+Cambios aplicados a las dos tablas:
+
+- **`w-full` en el contenedor** (fill container), y `Description` con
+  `flex-1` sin techo: cuando sobra ancho lo absorbe la descripción, que es
+  justo lo que hace la referencia. Se revierte el `w-fit` de la vuelta
+  anterior —era un parche a un problema que en realidad venían causando las
+  columnas anchas—.
+- **Anchos de la referencia**, adaptados sólo donde nuestro contenido lo
+  exige: `Provider` va 72 en vez de 44 (ellos muestran "3 Hyg", nosotros
+  "Dr. Elena Martinez"), `Charge`/`Balance` 64 en vez de 56/60 (nuestros
+  montos llegan a `$1,270.00`). El resto es literal.
+- **Todas las columnas visibles por defecto** en la tabla de allocation.
+  El botón "Columns" gana el badge `visibles/total` y el rótulo "Show
+  columns", como la referencia.
+- Cabecera `text-[11px] py-2.5`, filas `text-[12px] py-2.5` con `border-t`
+  (no `border-b` + `last:border-0`), `px-3`, `gap-1.5`. Transactions queda
+  en `gap-3`/13px porque tiene 7 columnas y ese es su valor de referencia.
+
+## Panel del paciente colapsado, prolijo y con tooltips (2026-09-08)
+
+La primera versión del colapso quedaba desprolija: se hacía a fuerza de
+`lg:hidden` sueltos sobre el layout expandido, sin achicar el padding ni
+alinear nada. Se rehízo:
+
+- `lg:w-[60px] lg:p-2`, con el botón de toggle, el avatar (`lg:size-9`), el
+  ícono de Clinical Mode y los seis ítems de nav todos en 36×36 y centrados
+  (`centerOffset: 0` medido en vivo para los cuatro grupos).
+- **Clinical Mode sobrevive al colapso** como ícono: es la acción principal
+  del panel, no un dato secundario.
+- **Tooltips reales** (`components/ui/tooltip.tsx`, shadcn/Radix recién
+  instalado) en cada ítem y en Clinical Mode, sólo cuando está colapsado
+  —expandido el ítem ya dice qué es—.
+- **`aria-label` cuando está colapsado**: el label va oculto por CSS, así
+  que sin eso los links quedaban sin nombre accesible y el tooltip, que es
+  puramente visual, no alcanzaba. Detectado leyendo el árbol de
+  accesibilidad, que mostraba `link [ref_19]` sin texto.
+
+Colapsar libera 160px reales para la tabla (892 → 1052 a 1280 de viewport).

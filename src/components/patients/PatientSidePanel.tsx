@@ -4,6 +4,7 @@ import {
   ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Ban, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { aviso } from '@/components/ui/toaster'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
@@ -98,24 +99,45 @@ export function PatientSidePanel({
      tablas del Ledger). */
   const [colapsado, setColapsado] = useState(false)
 
+  /* Envuelve en tooltip sólo cuando el rail está colapsado: expandido el
+     ítem ya dice qué es y un tooltip encima sería ruido. */
+  const conTooltip = (texto: string, hijo: React.ReactNode) =>
+    colapsado ? (
+      <Tooltip>
+        <TooltipTrigger asChild>{hijo}</TooltipTrigger>
+        <TooltipContent side="right" className="bg-[#09090b] text-white">
+          {texto}
+        </TooltipContent>
+      </Tooltip>
+    ) : (
+      hijo
+    )
+
   return (
-    <aside className={cn('w-full rounded-lg border border-[#e4e4e7] bg-white p-4 lg:shrink-0', colapsado ? 'lg:w-14' : 'lg:w-[218px]')}>
+    <TooltipProvider delayDuration={150}>
+    <aside className={cn('w-full rounded-lg border border-[#e4e4e7] bg-white p-4 lg:shrink-0', colapsado ? 'lg:w-[60px] lg:p-2' : 'lg:w-[218px]')}>
       <button
         type="button"
         onClick={() => setColapsado((v) => !v)}
         aria-label={colapsado ? 'Expand patient menu' : 'Collapse patient menu'}
-        className="hidden text-[#71717a] hover:text-black lg:mb-3 lg:flex lg:items-center lg:justify-center lg:w-full"
+        className={cn(
+          'hidden rounded-md text-[#71717a] hover:bg-[#f4f4f5] hover:text-black lg:mb-2 lg:flex lg:size-9 lg:items-center lg:justify-center',
+          colapsado ? 'lg:mx-auto' : 'lg:ml-auto',
+        )}
       >
         {colapsado ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
       </button>
 
-      <div className={cn('flex items-center gap-3', colapsado ? 'lg:flex-col lg:justify-center' : 'lg:flex-col lg:gap-1.5')}>
+      <div className={cn('flex items-center gap-3 lg:flex-col lg:gap-1.5', colapsado && 'lg:gap-0')}>
         <EditableAvatar
           foto={foto}
           iniciales={initials}
           onChange={setFoto}
           label={name}
-          avatarClassName={cn('bg-dash-blue-hover text-white rounded-full', colapsado ? 'lg:size-8 lg:text-xs size-[62px] text-lg' : 'size-[62px] text-lg')}
+          avatarClassName={cn(
+            'bg-dash-blue-hover rounded-full text-white size-[62px] text-lg',
+            colapsado && 'lg:size-9 lg:text-[11px]',
+          )}
         />
         <div className={cn('flex min-w-0 flex-col items-start gap-1.5 lg:items-center', colapsado && 'lg:hidden')}>
           <p className="truncate text-lg font-bold text-[#09090b]">{name}</p>
@@ -137,35 +159,54 @@ export function PatientSidePanel({
         </Link>
       </div>
 
+      {/* Colapsado, Clinical Mode sigue disponible como ícono: es la acción
+          principal del panel, no un dato secundario que se pueda esconder. */}
+      {colapsado && (
+        <div className="mt-2 hidden lg:block">
+          {conTooltip('Clinical Mode', (
+            <Link
+              to="/patients/john-smith/clinical-mode"
+              aria-label="Clinical Mode"
+              className="text-dash-blue mx-auto flex size-9 items-center justify-center rounded-md bg-[#eef5ff]"
+            >
+              <Eye className="size-4" />
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* Apilado el panel ocupa toda la pantalla antes del contenido. En
           angosto la nav pasa a una tira horizontal —con altura de toque real
           y un degradado a la derecha que avisa que sigue— y los bloques de
           datos van a dos columnas. */}
       <div className="relative mt-3 lg:mt-0">
-      <nav data-tour="pat-tabs" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 lg:mx-0 lg:mt-3 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:px-0 lg:pb-0">
+      <nav data-tour="pat-tabs" className={cn(
+        '-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 lg:mx-0 lg:mt-3 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:px-0 lg:pb-0',
+        colapsado && 'lg:mt-2 lg:items-center lg:gap-1',
+      )}>
         {NAV.map(({ key, icon: Icon, to }) => {
           const clase = cn(
             'flex h-10 shrink-0 items-center gap-2 rounded-lg border px-3 text-left text-[13px] font-medium whitespace-nowrap',
             'lg:h-auto lg:shrink lg:gap-2.5 lg:rounded-md lg:border-0 lg:px-2.5 lg:py-2 lg:text-xs',
-            colapsado && 'lg:justify-center lg:px-0',
+            colapsado && 'lg:size-9 lg:justify-center lg:gap-0 lg:p-0',
             section === key
               ? 'bg-dash-blue border-dash-blue text-white'
               : 'border-[#e4e4e7] bg-white text-[#09090b] hover:bg-[#f4f4f5] lg:bg-transparent',
           )
           const contenido = (
             <>
-              <Icon className="size-4 shrink-0 lg:size-3.5" /> <span className={cn(colapsado && 'lg:hidden')}>{key}</span>
+              <Icon className={cn('size-4 shrink-0 lg:size-3.5', colapsado && 'lg:size-4')} />
+              <span className={cn(colapsado && 'lg:hidden')}>{key}</span>
             </>
           )
-          return to !== undefined ? (
-            <Link key={key} to={`${basePath}${to}`} title={colapsado ? key : undefined} className={clase}>
-              {contenido}
-            </Link>
+          /* Colapsado el label va oculto por CSS, así que sin aria-label el
+             ítem queda sin nombre accesible: el tooltip es sólo visual. */
+          const item = to !== undefined ? (
+            <Link to={`${basePath}${to}`} aria-label={colapsado ? key : undefined} className={clase}>{contenido}</Link>
           ) : (
-            <button key={key} type="button" title={colapsado ? key : undefined} onClick={() => onSection?.(key)} className={clase}>
-              {contenido}
-            </button>
+            <button type="button" aria-label={colapsado ? key : undefined} onClick={() => onSection?.(key)} className={clase}>{contenido}</button>
           )
+          return <div key={key} className="contents">{conTooltip(key, item)}</div>
         })}
       </nav>
       {/* Degradado que avisa que la tira sigue. */}
@@ -182,6 +223,7 @@ export function PatientSidePanel({
 
       {contacto && <EditContactModal onClose={() => setContacto(false)} />}
     </aside>
+    </TooltipProvider>
   )
 }
 
