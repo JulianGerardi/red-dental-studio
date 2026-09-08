@@ -721,3 +721,25 @@ hay apertura instantánea- y la demora sube a 500ms, para que aparezca sólo
 cuando uno se detiene de verdad. Además `sideOffset={8}` lo despega de la
 fila: pegado, el puntero le quedaba encima y el tooltip peleaba con su
 propio disparador.
+
+## El resumen pasa adentro de la tabla (2026-09-08)
+
+Julián: "el resumen debe estar al finalizar la tabla, no abajo del paginado
+ni afuera del background general". En las tres tablas la cajita de totales
+colgaba **afuera** del contenedor con borde, debajo de todo. Ahora es la
+última sección **adentro** de ese contenedor, separada por su propio
+`border-t`, y el paginado queda debajo de ella. De paso, en la tabla de
+allocation el pie "Showing X of Y" + paginado también entra al contenedor:
+antes estaba suelto afuera, distinto de Transactions.
+
+## El tooltip de fila ya no tapa filas (2026-09-08)
+
+Iba con `side="top"`, y como la fila ocupa todo el ancho de la tabla el
+tooltip caía sí o sí sobre la fila de arriba. Pasa a `side="right"`: ahí no
+hay lugar -la fila llega al borde derecho- así que Radix lo voltea al margen
+izquierdo, **fuera** de la tabla. Medido: el tooltip queda en x 39-311 con la
+tabla arrancando en 320, y la lista de filas tapadas da vacía.
+
+Además, con la fila desplegada el tooltip no aparece: el detalle ya está a la
+vista y repetirlo flotando encima sólo estorba (`abierta` corta el render del
+`Tooltip`, no sólo lo esconde).

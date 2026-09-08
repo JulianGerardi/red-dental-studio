@@ -235,7 +235,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                   <div key={m.id} className="border-t border-[#e7e7e7]">
                     {/* La fila entera abre el detalle, salvo cuando el click
                         cae en el input de "Applied" o en una manija. */}
-                    <FilaConTooltip m={m}>
+                    <FilaConTooltip m={m} abierta={abierta}>
                     <div
                       role="button"
                       tabIndex={0}
@@ -269,39 +269,41 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                   </div>
                 )
               })}
+
+              {/* El resumen cierra la tabla: adentro del mismo borde y
+                  arriba del paginado, no suelto afuera de la card. */}
+              <div className="flex justify-end border-t border-[#e7e7e7] px-3 py-3">
+                <dl className="w-fit overflow-hidden rounded-md border border-[#e4e4e7] text-[13px]">
+                  <div className="flex items-center">
+                    <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Amount not applied</dt>
+                    <dd className="w-24 px-3 py-2 text-right font-semibold tabular-nums text-[#09090b]">{moneda(Math.max(totalCargos - totalAplicado, 0))}</dd>
+                  </div>
+                  <div className="flex items-center border-t border-[#e4e4e7]">
+                    <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Amount applied</dt>
+                    <dd className="text-dash-blue w-24 px-3 py-2 text-right font-semibold tabular-nums">{moneda(totalAplicado)}</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
+                <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
+                  Showing {cargosPagina.length} of {cargos.length} transactions
+                  {anchos.avisando && (
+                    <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-[#a1a1aa] lg:flex">
+                      <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
+                    </span>
+                  )}
+                  {anchos.hayCambios && (
+                    <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">
+                      Reset column widths
+                    </button>
+                  )}
+                </span>
+                <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
+              </div>
             </div>
           </div>
           </TooltipProvider>
-
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-            <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
-              Showing {cargosPagina.length} of {cargos.length} transactions
-              {anchos.avisando && (
-                <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-[#a1a1aa] lg:flex">
-                  <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
-                </span>
-              )}
-              {anchos.hayCambios && (
-                <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">
-                  Reset column widths
-                </button>
-              )}
-            </span>
-            <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
-          </div>
-
-          <div className="mt-3 flex justify-end">
-            <dl className="w-fit overflow-hidden rounded-md border border-[#e4e4e7] text-[13px]">
-              <div className="flex items-center">
-                <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Amount not applied</dt>
-                <dd className="w-24 px-3 py-2 text-right font-semibold tabular-nums text-[#09090b]">{moneda(Math.max(totalCargos - totalAplicado, 0))}</dd>
-              </div>
-              <div className="flex items-center border-t border-[#e4e4e7]">
-                <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Amount applied</dt>
-                <dd className="text-dash-blue w-24 px-3 py-2 text-right font-semibold tabular-nums">{moneda(totalAplicado)}</dd>
-              </div>
-            </dl>
-          </div>
         </>
       )}
 

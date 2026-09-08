@@ -298,7 +298,7 @@ export default function Ledger() {
                       const abierta = expandidas.includes(m.id)
                       return (
                       <div key={m.id} className="border-t border-[#e7e7e7]">
-                        <FilaConTooltip m={m}>
+                        <FilaConTooltip m={m} abierta={abierta}>
                         <div
                           role="button"
                           tabIndex={0}
@@ -334,6 +334,19 @@ export default function Ledger() {
                     })
                   )}
 
+                  {/* El resumen cierra la tabla: adentro del mismo borde y
+                      arriba del paginado, no suelto afuera de la card. */}
+                  <div className="flex justify-end border-t border-[#e7e7e7] px-3 py-3">
+                    <dl className="w-fit overflow-hidden rounded-md border border-[#e4e4e7] text-[13px]">
+                      <div className="flex items-center">
+                        <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Balance due</dt>
+                        <dd className="text-dash-blue w-24 px-3 py-2 text-right font-semibold tabular-nums">
+                          {moneda(delaVista.reduce((a, m) => a + m.monto, 0))}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+
                   <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
                     <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
                       Showing {filasPagina.length} of {filas.length} entries
@@ -351,20 +364,6 @@ export default function Ledger() {
                     <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
                   </div>
                 </div>
-              </div>
-
-              {/* Mismo bloque con borde que cierra las tablas de Payment y
-                  Credit Adjustment: antes acá el total iba como texto suelto
-                  al lado de la paginación y no se parecía a las otras. */}
-              <div className="mt-3 flex justify-end">
-                <dl className="w-fit overflow-hidden rounded-md border border-[#e4e4e7] text-[13px]">
-                  <div className="flex items-center">
-                    <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Balance due</dt>
-                    <dd className="text-dash-blue w-24 px-3 py-2 text-right font-semibold tabular-nums">
-                      {moneda(delaVista.reduce((a, m) => a + m.monto, 0))}
-                    </dd>
-                  </div>
-                </dl>
               </div>
               </TooltipProvider>
             </>

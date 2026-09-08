@@ -7,18 +7,23 @@ import { moneda, type Movimiento } from '@/data/ledger'
    Reemplaza a los `title` que tenían las celdas que truncan: con los dos
    puestos aparecían dos tooltips distintos sobre la misma celda. */
 export function FilaConTooltip({
-  m, children,
+  m, abierta, children,
 }: {
   m: Movimiento & { saldo?: number }
+  /** Con la fila desplegada el detalle ya está a la vista: sobra el tooltip. */
+  abierta?: boolean
   children: React.ReactNode
 }) {
   const pieza = [m.diente && `Tooth ${m.diente}`, m.superficie].filter(Boolean).join(' · ')
+  if (abierta) return <>{children}</>
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      {/* `sideOffset` lo despega de la fila: pegado, el puntero le queda
-          encima y el tooltip pelea con su propio disparador. */}
-      <TooltipContent side="top" align="start" sideOffset={8} className="max-w-sm bg-[#09090b] text-white">
+      {/* Al costado, no arriba ni abajo: la fila ocupa todo el ancho de la
+          tabla, así que un tooltip vertical le tapa sí o sí los datos de la
+          fila vecina. `side="right"` no tiene lugar y Radix lo voltea al
+          margen izquierdo, fuera de la tabla. */}
+      <TooltipContent side="right" align="center" sideOffset={8} collisionPadding={12} className="max-w-sm bg-[#09090b] text-white">
         <span className="flex flex-col gap-0.5">
           <span className="font-semibold">{m.descripcion}</span>
           <span className="text-white/70">
