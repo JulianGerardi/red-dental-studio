@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  Search, MoreVertical, CirclePlus, Trash2, FileText, Pencil, Ban, Delete, X,
+  Search, MoreVertical, CirclePlus, Trash2, FileText, Pencil, Ban,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -13,9 +13,10 @@ import { usePhoto } from '@/lib/usePhoto'
 import { EMPLEADOS, type Empleado } from '@/data/employees'
 import { Card, Toggle } from '@/components/settings/primitives'
 import {
-  SelectField, TextField, DateField, DateTextField, FormFooter, LinkPersonCheckbox, FieldLabel,
+  SelectField, TextField, DateField, DateTextField, FormFooter,
 } from '@/components/patients/form'
 import { RolesLocation } from '@/components/settings/RolesLocation'
+import { LinkExistingPerson } from '@/components/settings/LinkExistingPerson'
 import { NewHoursModal } from '@/components/settings/NewHoursModal'
 
 /* Settings → Employees. La lista es propia —el Figma de 3864:235190 sólo
@@ -290,14 +291,9 @@ export function SettingsEmployeeDetail() {
   const [toggles, setToggles] = useState({ primario: true, firma: true, locum: true })
   const [credenciales, setCredenciales] = useState([0, 1, 2])
   const [vincular, setVincular] = useState(false)
-  const [busqueda, setBusqueda] = useState('')
   const [vinculado, setVinculado] = useState<Empleado | null>(null)
   const [foto, setFoto] = usePhoto(`employee-photo:${empleado.id}`)
   const [nuevaHora, setNuevaHora] = useState(false)
-  const proveedores = EMPLEADOS.filter((e) => e.esProvider && e.id !== empleado.id)
-  const resultados = busqueda.trim() && !vinculado
-    ? proveedores.filter((p) => p.nombre.toLowerCase().includes(busqueda.trim().toLowerCase()))
-    : []
 
   const tabsVisibles: readonly Tab[] = esProvider ? TABS : TABS_BASE
   const alternarProvider = (v: boolean) => {
@@ -362,83 +358,13 @@ export function SettingsEmployeeDetail() {
 
               <h3 className="mt-5 text-sm font-bold text-[#09090b]">General Information</h3>
               <div className="mt-3 flex flex-col gap-3">
-                <LinkPersonCheckbox
-                  checked={vincular}
-                  onChange={(v) => {
-                    setVincular(v)
-                    if (!v) { setBusqueda(''); setVinculado(null) }
-                  }}
+                <LinkExistingPerson
+                  vincular={vincular}
+                  onVincular={setVincular}
+                  excluirId={empleado.id}
+                  vinculado={vinculado}
+                  onSeleccionar={setVinculado}
                 />
-
-                {/* Vincular a un provider ya dado de alta, no cargar uno de
-                    cero: por eso busca sobre `EMPLEADOS` filtrado a
-                    providers, no un directorio propio. */}
-                {vincular && (
-                  <div className="flex flex-col gap-2">
-                    <FieldLabel required>Person</FieldLabel>
-                    <div className="flex items-center gap-2">
-                      <div className="relative flex-1">
-                        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
-                        <input
-                          value={busqueda}
-                          onChange={(e) => { setBusqueda(e.target.value); setVinculado(null) }}
-                          placeholder="Search providers..."
-                          className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-9 pl-9 text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
-                        />
-                        {busqueda && (
-                          <button
-                            type="button"
-                            aria-label="Clear search"
-                            onClick={() => { setBusqueda(''); setVinculado(null) }}
-                            className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-0.5 text-[#a1a1aa] hover:text-[#71717a]"
-                          >
-                            <X className="size-4" />
-                          </button>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        aria-label="Reset selection"
-                        onClick={() => { setBusqueda(''); setVinculado(null) }}
-                        className="bg-dash-blue hover:bg-dash-blue-hover flex size-9 shrink-0 items-center justify-center rounded-md text-white transition-colors"
-                      >
-                        <Delete className="size-4" />
-                      </button>
-                    </div>
-
-                    {resultados.map((p) => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => { setVinculado(p); setBusqueda(p.nombre) }}
-                        className="flex items-center gap-3 rounded-lg border border-[#e4e4e7] bg-white p-3 text-left hover:bg-[#fafafa]"
-                      >
-                        <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">
-                          {p.iniciales}
-                        </span>
-                        <span className="min-w-0 leading-tight">
-                          <span className="block text-[13px] font-semibold text-[#09090b]">{p.nombre}</span>
-                          <span className="block text-[11px] text-[#71717a]">DOB: {p.cumpleanos}</span>
-                        </span>
-                      </button>
-                    ))}
-
-                    {vinculado && (
-                      <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-[#eff6ff] p-3">
-                        <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">
-                          {vinculado.iniciales}
-                        </span>
-                        <span className="min-w-0 leading-tight">
-                          <span className="block text-[13px] font-bold text-[#09090b] uppercase">{vinculado.nombre}</span>
-                          <span className="block text-[11px] text-[#71717a]">
-                            <span className="text-[#a1a1aa]">DOB:</span> {vinculado.cumpleanos}
-                            <span className="text-[#a1a1aa]"> Email:</span> {vinculado.email}
-                          </span>
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
 
               {/* Con el checkbox tildado esta info sale del provider elegido
