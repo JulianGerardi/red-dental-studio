@@ -185,6 +185,20 @@ fijo: se calcula sumando el ancho de las columnas visibles, así el
 `overflow-x-auto` sólo entra en juego si el usuario reactiva suficientes
 columnas como para necesitarlo.
 
+Transaction Date, Applied y Balance no se pueden ocultar -aparecen
+deshabilitadas en el desplegable-: son las tres columnas sin las que la tabla
+deja de tener sentido.
+
+## Tope en "Applied" (2026-09-07)
+
+El input de "Applied" no tenía techo: se podía tipear cualquier número, más
+alto que el propio cargo. `Balance` ya lo mostraba bien igual -tiene su
+propio `Math.max(...,0)`- pero el estado guardado quedaba mal (ej: $500
+aplicados a un cargo de $85). Se agrega un tope por fila: si lo tipeado supera
+`monto`, se guarda `monto` en su lugar; por debajo del tope se guarda tal cual
+se tipeó, para no interrumpir un decimal a medio escribir (".5" antes de
+completar "0.50").
+
 ## El picker de columnas pasa a shadcn/ui real (2026-09-07)
 
 Julián pidió que el componente de columnas sea shadcn de verdad, no una

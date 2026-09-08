@@ -17,7 +17,7 @@ type ColId =
 function ColumnPicker({
   columnas, ocultas, onToggle,
 }: {
-  columnas: { id: ColId; label: string }[]
+  columnas: { id: ColId; label: string; bloqueada?: boolean }[]
   ocultas: ColId[]
   onToggle: (id: ColId) => void
 }) {
@@ -31,6 +31,7 @@ function ColumnPicker({
           <DropdownMenuCheckboxItem
             key={c.id}
             checked={!ocultas.includes(c.id)}
+            disabled={c.bloqueada}
             onCheckedChange={() => onToggle(c.id)}
             onSelect={(e) => e.preventDefault()}
           >
@@ -42,7 +43,7 @@ function ColumnPicker({
   )
 }
 
-type Columna = { id: ColId; label: string; ancho: string; px: number; claseCelda?: string; celda: (m: Movimiento, ap: number) => React.ReactNode }
+type Columna = { id: ColId; label: string; ancho: string; px: number; claseCelda?: string; bloqueada?: boolean; celda: (m: Movimiento, ap: number) => React.ReactNode }
 
 export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const [aplicado, setAplicado] = useState<Record<string, string>>({})
@@ -55,7 +56,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const totalAplicado = cargos.reduce((a, m) => a + (Number(aplicado[m.id]) || 0), 0)
 
   const columnas: Columna[] = [
-    { id: 'fecha', label: 'Transaction Date', ancho: 'w-[90px] shrink-0', px: 90, celda: (m) => m.fecha },
+    { id: 'fecha', label: 'Transaction Date', ancho: 'w-[90px] shrink-0', px: 90, bloqueada: true, celda: (m) => m.fecha },
     { id: 'paciente', label: 'Patient', ancho: 'w-[100px] shrink-0', px: 100, claseCelda: 'truncate', celda: (m) => m.paciente },
     { id: 'provider', label: 'Provider', ancho: 'w-[130px] shrink-0', px: 130, claseCelda: 'truncate', celda: (m) => m.provider },
     { id: 'diente', label: 'Tooth', ancho: 'w-[55px] shrink-0', px: 55, celda: (m) => m.diente ?? '-' },
@@ -66,18 +67,23 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
     { id: 'otroCredito', label: 'Other Credit', ancho: 'w-[90px] shrink-0 text-right', px: 90, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * coberturaSeguro(m.codigo)) },
     { id: 'guarEstimado', label: 'Guar Estimate', ancho: 'w-[95px] shrink-0 text-right', px: 95, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * (1 - coberturaSeguro(m.codigo))) },
     {
-      id: 'applied', label: 'Applied', ancho: 'w-[90px] shrink-0 text-right', px: 90,
+      id: 'applied', label: 'Applied', ancho: 'w-[90px] shrink-0 text-right', px: 90, bloqueada: true,
       celda: (m) => (
         <input
           value={aplicado[m.id] ?? ''}
-          onChange={(e) => setAplicado((p) => ({ ...p, [m.id]: e.target.value.replace(/[^0-9.]/g, '') }))}
+          onChange={(e) => {
+            const limpio = e.target.value.replace(/[^0-9.]/g, '')
+            const numero = Number(limpio)
+            const final = Number.isFinite(numero) && numero > m.monto ? String(m.monto) : limpio
+            setAplicado((p) => ({ ...p, [m.id]: final }))
+          }}
           placeholder="0.00"
           aria-label={`Applied to ${m.descripcion}`}
           className="focus:border-dash-blue h-8 w-full rounded-md border border-[#e4e4e7] bg-white px-2 text-right text-[13px] tabular-nums placeholder:text-[#a1a1aa] focus:outline-none"
         />
       ),
     },
-    { id: 'balance', label: 'Balance', ancho: 'w-[85px] shrink-0 text-right', px: 85, claseCelda: 'font-semibold tabular-nums text-[#09090b]', celda: (m, ap) => moneda(Math.max(m.monto - ap, 0)) },
+    { id: 'balance', label: 'Balance', ancho: 'w-[85px] shrink-0 text-right', px: 85, claseCelda: 'font-semibold tabular-nums text-[#09090b]', bloqueada: true, celda: (m, ap) => moneda(Math.max(m.monto - ap, 0)) },
   ]
   const columnasVisibles = columnas.filter((c) => !ocultas.includes(c.id))
   const anchoMinimo = columnasVisibles.reduce((a, c) => a + c.px, 0) + (columnasVisibles.length - 1) * 12
