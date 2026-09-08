@@ -516,3 +516,53 @@ está activo". Los dos vuelven, adaptados al ancho del rail:
 - **General/Contact**: botón nuevo con ícono que abre un `Popover`
   (shadcn/Radix, recién instalado) con los dos bloques completos, incluidos
   sus lápices de edición, que siguen funcionando igual que expandidos.
+
+## Manijas de resize: diseño, aviso y límites (2026-09-08)
+
+Julián pidió que la manija se vea mejor y que el sistema avise que la tabla
+se puede ajustar; después sumó dos requisitos que resultaron los más
+importantes: poder volver una columna a su estado normal, y que ajustar una
+columna no empuje a las últimas fuera de la tabla.
+
+**Diseño de la manija.** Antes era una línea de 1px. Ahora es una cápsula de
+3px redondeada, gris en reposo, que crece de 16 a 22px y se pinta de azul al
+pasar el mouse; arrastrando queda azul de 26px. Mientras se arrastra baja una
+**guía vertical** por toda la tabla (`h-[1200px]` recortada por el
+`overflow` del contenedor) para ver dónde va a quedar el corte. Una columna
+ya tocada a mano deja la manija visible y semiazul, así se distingue de las
+que siguen con el ancho de diseño.
+
+**Aviso inicial.** Al montar la primera tabla de la sesión, las manijas se
+muestran solas en cascada de izquierda a derecha (`col-hint`, 60ms de
+retardo por columna) y en el pie aparece "Drag column edges to resize ·
+double-click to reset". Dura 2.4s y corre **una sola vez por sesión**
+(bandera a nivel de módulo, no por componente: si no, cada tabla del Ledger
+lo repetía). Respeta `prefers-reduced-motion`.
+
+Trampa encontrada acá: la animación estaba con `fill: both`, y eso **deja
+fijada la opacidad final (0)** pisando al `group-hover`; las manijas
+quedaban invisibles para siempre después del aviso. Se corrió sin `fill`.
+
+**Doble click para volver atrás.** Doble click en una manija devuelve esa
+columna sola a su ancho de diseño (`soltarUna`); el link "Reset column
+widths" del pie sigue estando para volver todas juntas. Con teclado,
+Enter o Backspace sobre la manija hace lo mismo.
+
+**Techo del arrastre.** Es el requisito que más cambia el comportamiento:
+ensanchar una columna ya no puede empujar a Balance fuera de la vista
+-si hay que scrollear para encontrarlo, se pierde más de lo que se gana-.
+El máximo se mide sobre el DOM en el momento de agarrar (así las columnas
+ocultas por el picker no entran en la cuenta): espacio libre del contenedor
+más lo que la columna elástica pueda ceder hasta su mínimo. Verificado: con
+la tabla llena, arrastrar Patient 344px la agranda sólo 70 -hasta que
+Description toca su mínimo- y ahí frena, con `scrollWidth === clientWidth` y
+Balance entero adentro de la tabla.
+
+## El popover de información abre con el mouse encima (2026-09-08)
+
+En el rail colapsado, el botón de información abría sólo con click. Pasa a
+abrir también al pasar el mouse: es información de consulta, no una acción.
+El cierre lleva 160ms de retardo para poder cruzar el hueco entre el botón y
+el panel sin que se escape, y el panel mismo mantiene abierto mientras el
+mouse está encima. Se le sacó el tooltip: con el panel abriéndose solo, el
+tooltip se le encimaba y decía menos que el propio panel.

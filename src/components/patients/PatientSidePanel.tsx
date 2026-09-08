@@ -101,6 +101,16 @@ export function PatientSidePanel({
      cuenta-, para liberar ancho cuando el contenido lo necesita (p.ej. las
      tablas del Ledger). */
   const [colapsado, setColapsado] = useState(false)
+  const [info, setInfo] = useState(false)
+  const cierre = useRef<number | null>(null)
+  const abrirInfo = () => {
+    if (cierre.current) window.clearTimeout(cierre.current)
+    setInfo(true)
+  }
+  const cerrarInfo = () => {
+    if (cierre.current) window.clearTimeout(cierre.current)
+    cierre.current = window.setTimeout(() => setInfo(false), 160)
+  }
 
   /* Envuelve en tooltip sólo cuando el rail está colapsado: expandido el
      ítem ya dice qué es y un tooltip encima sería ruido. */
@@ -188,16 +198,30 @@ export function PatientSidePanel({
               <Eye className="size-4" />
             </Link>
           ))}
-          <Popover>
-            {conTooltip('Patient information', (
-              <PopoverTrigger
-                aria-label="Patient information"
-                className="flex size-9 items-center justify-center rounded-md text-[#09090b] hover:bg-[#f4f4f5]"
-              >
-                <IdCard className="size-4" />
-              </PopoverTrigger>
-            ))}
-            <PopoverContent side="right" align="start" className="w-64 p-4">
+          {/* Abre con el mouse encima además de con click: es información de
+              consulta, no una acción, y a esa altura del rail el usuario
+              está apenas paseando. El cierre va con retardo para poder
+              cruzar el hueco entre el botón y el panel sin que se escape. */}
+          <Popover open={info} onOpenChange={setInfo}>
+            {/* Sin tooltip: abriendo con el mouse encima, el panel ya dice
+                qué es y el tooltip se le encimaba. */}
+            <PopoverTrigger
+              aria-label="Patient information"
+              onMouseEnter={abrirInfo}
+              onMouseLeave={cerrarInfo}
+              onFocus={abrirInfo}
+              className="flex size-9 items-center justify-center rounded-md text-[#09090b] hover:bg-[#f4f4f5]"
+            >
+              <IdCard className="size-4" />
+            </PopoverTrigger>
+            <PopoverContent
+              side="right"
+              align="start"
+              onOpenAutoFocus={(e) => e.preventDefault()}
+              onMouseEnter={abrirInfo}
+              onMouseLeave={cerrarInfo}
+              className="w-64 p-4"
+            >
               <InfoBlock className="mt-0" title="General" items={GENERAL} onEdit={onEditGeneral ?? (() => navigate('/patients/edit'))} />
               <InfoBlock title="Contact" items={CONTACT} onEdit={onEditContact ?? (() => setContacto(true))} />
             </PopoverContent>

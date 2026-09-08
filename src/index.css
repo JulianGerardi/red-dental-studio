@@ -423,8 +423,27 @@ body { font-family: var(--font-sans); }
   to   { background-position: 200% 50%; }
 }
 
+/* Las manijas de las columnas se muestran solas una vez, en cascada de
+   izquierda a derecha, para que se note que la tabla se puede ajustar.
+   Después vuelven a aparecer sólo con el mouse encima. */
+@keyframes col-hint {
+  0%   { opacity: 0; }
+  18%  { opacity: 1; }
+  55%  { opacity: 1; }
+  80%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* El agarre crece un toque al pasar por encima: avisa que es arrastrable
+   antes de que el usuario apriete. */
+@keyframes col-grip-in {
+  from { transform: scaleY(0.55); }
+  to   { transform: scaleY(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  [class*="tour-"], [style*="tour-"], [style*="coach-spotlight"], [class*="confibot-sheen"] {
+  [class*="tour-"], [style*="tour-"], [style*="coach-spotlight"], [class*="confibot-sheen"],
+  [style*="col-hint"], [class*="col-grip-in"] {
     animation: none !important;
   }
 }

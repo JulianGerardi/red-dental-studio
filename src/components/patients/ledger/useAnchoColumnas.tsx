@@ -1,7 +1,10 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 const MINIMO = 40
+/* El aviso de "esto se puede ajustar" corre una sola vez por sesión: la
+   primera tabla que se monta lo muestra, el resto ya no. */
+let avisoMostrado = false
 
 /* Ancho por columna arrastrable a mano. Las dos tablas del Ledger lo usan:
    arrancan con el ancho del diseño y el usuario puede ensanchar la columna
@@ -9,7 +12,31 @@ const MINIMO = 40
 export function useAnchoColumnas<T extends string>(base: Record<T, number>) {
   const [anchos, setAnchos] = useState<Partial<Record<T, number>>>({})
   const [arrastrando, setArrastrando] = useState<T | null>(null)
-  const ref = useRef<{ id: T; x0: number; w0: number } | null>(null)
+  const [avisando, setAvisando] = useState(!avisoMostrado)
+  const ref = useRef<{ id: T; x0: number; w0: number; max: number } | null>(null)
+
+  useEffect(() => {
+    if (avisoMostrado) return
+    avisoMostrado = true
+    const t = setTimeout(() => setAvisando(false), 2600)
+    return () => clearTimeout(t)
+  }, [])
+
+  /* Techo del arrastre: ensanchar una columna no puede empujar a las
+     últimas fuera de la tabla -si Balance se esconde, encontrarlo cuesta
+     más que lo que se ganó-. Se mide sobre el DOM en el momento de agarrar,
+     así las columnas ocultas no entran en la cuenta. La holgura sale del
+     espacio libre del contenedor más lo que la columna elástica pueda ceder. */
+  const techo = (celda: HTMLElement, w0: number) => {
+    const header = celda.closest('[data-tabla-header]') as HTMLElement | null
+    const scroll = header?.closest('[data-tabla-scroll]') as HTMLElement | null
+    if (!header || !scroll) return Infinity
+    const libre = scroll.clientWidth - header.getBoundingClientRect().width
+    const elastica = header.querySelector('[data-elastica]') as HTMLElement | null
+    if (!elastica || elastica === celda) return w0 + libre
+    const cede = Math.max(0, elastica.getBoundingClientRect().width - (parseFloat(getComputedStyle(elastica).minWidth) || 0))
+    return w0 + libre + cede
+  }
 
   /* La columna elástica (Description) no tiene ancho fijo hasta que se la
      toca: hasta entonces crece con la tabla. Por eso el ancho inicial del
@@ -19,17 +46,24 @@ export function useAnchoColumnas<T extends string>(base: Record<T, number>) {
     e.stopPropagation()
     const celda = e.currentTarget.parentElement
     const w0 = celda ? celda.getBoundingClientRect().width : base[id]
-    ref.current = { id, x0: e.clientX, w0 }
+    ref.current = { id, x0: e.clientX, w0, max: celda ? techo(celda, w0) : Infinity }
     setArrastrando(id)
+    setAvisando(false)
+    /* Mientras se arrastra, el cursor y la selección son del documento
+       entero: si no, el cursor parpadea al salirse de la manija y el
+       arrastre selecciona texto de la tabla. */
+    document.body.classList.add('cursor-col-resize', 'select-none')
 
     const mover = (ev: PointerEvent) => {
       const a = ref.current
       if (!a) return
-      setAnchos((p) => ({ ...p, [a.id]: Math.max(MINIMO, Math.round(a.w0 + ev.clientX - a.x0)) }))
+      const bruto = a.w0 + ev.clientX - a.x0
+      setAnchos((p) => ({ ...p, [a.id]: Math.round(Math.min(a.max, Math.max(MINIMO, bruto))) }))
     }
     const soltar = () => {
       ref.current = null
       setArrastrando(null)
+      document.body.classList.remove('cursor-col-resize', 'select-none')
       window.removeEventListener('pointermove', mover)
       window.removeEventListener('pointerup', soltar)
     }
@@ -40,13 +74,27 @@ export function useAnchoColumnas<T extends string>(base: Record<T, number>) {
   /* Con teclado: flechas mueven de a 16px, para no dejar la función sólo
      al alcance del mouse. */
   const porTeclado = (id: T, e: React.KeyboardEvent<HTMLElement>) => {
+    const celda = e.currentTarget.parentElement
+    if (e.key === 'Enter' || e.key === 'Backspace') {
+      e.preventDefault()
+      soltarUna(id)
+      return
+    }
     const paso = e.key === 'ArrowLeft' ? -16 : e.key === 'ArrowRight' ? 16 : 0
     if (!paso) return
     e.preventDefault()
-    const celda = e.currentTarget.parentElement
     const actual = anchos[id] ?? (celda ? celda.getBoundingClientRect().width : base[id])
-    setAnchos((p) => ({ ...p, [id]: Math.max(MINIMO, Math.round(actual + paso)) }))
+    const max = celda ? techo(celda, actual) : Infinity
+    setAnchos((p) => ({ ...p, [id]: Math.round(Math.min(max, Math.max(MINIMO, actual + paso))) }))
   }
+
+  /** Devuelve una sola columna a su ancho de diseño (doble click). */
+  const soltarUna = (id: T) =>
+    setAnchos((p) => {
+      const n = { ...p }
+      delete n[id]
+      return n
+    })
 
   return {
     /** Ancho fijado a mano, o `undefined` si sigue con el del diseño. */
@@ -54,39 +102,70 @@ export function useAnchoColumnas<T extends string>(base: Record<T, number>) {
     ancho: (id: T) => anchos[id] ?? base[id],
     hayCambios: Object.keys(anchos).length > 0,
     resetear: () => setAnchos({}),
+    soltarUna,
     arrastrando,
+    avisando,
     empezar,
     porTeclado,
   }
 }
 
 export function ManijaResize<T extends string>({
-  id, label, estado,
+  id, label, estado, indice = 0,
 }: {
   id: T
   label: string
   estado: ReturnType<typeof useAnchoColumnas<T>>
+  /** Posición de la columna, para escalonar el aviso inicial. */
+  indice?: number
 }) {
+  const activa = estado.arrastrando === id
+  const tocada = estado.manual(id) !== undefined
+
   return (
     <span
       role="separator"
       aria-orientation="vertical"
       aria-label={`Resize ${label} column`}
+      title={`Drag to resize ${label}${tocada ? ' · Double-click to reset' : ''}`}
       tabIndex={0}
       onPointerDown={(e) => estado.empezar(id, e)}
+      onDoubleClick={(e) => { e.stopPropagation(); estado.soltarUna(id) }}
       onKeyDown={(e) => estado.porTeclado(id, e)}
       onClick={(e) => e.stopPropagation()}
+      /* Sin `fill`: con `both` la animación deja fijada la opacidad final
+         (0) y pisa al `group-hover`, dejando la manija invisible para
+         siempre después del aviso. */
+      style={estado.avisando ? { animation: `col-hint 2.4s ease-in-out ${indice * 60}ms 1` } : undefined}
       /* -right-[5px] lo deja en el gap entre columnas, y 10px de ancho por
          28 de alto le dan un área de agarre real. Ojo: la celda que lo
          contiene no puede llevar `truncate` -su overflow:hidden recorta la
          manija y la vuelve inclickeable-. */
       className={cn(
-        'absolute top-1/2 -right-[5px] z-10 flex h-[28px] w-[10px] -translate-y-1/2 cursor-col-resize touch-none items-center justify-center',
-        'opacity-0 transition-opacity group-hover/fila:opacity-100 focus-visible:opacity-100 focus-visible:outline-none',
-        estado.arrastrando === id && 'opacity-100',
+        'group/manija absolute top-1/2 -right-[5px] z-10 flex h-[28px] w-[10px] -translate-y-1/2',
+        'cursor-col-resize touch-none items-center justify-center rounded-full',
+        'transition-opacity duration-150 group-hover/fila:opacity-100',
+        'focus-visible:opacity-100 focus-visible:outline-none',
+        activa || tocada ? 'opacity-100' : 'opacity-0',
       )}
     >
-      <span className={cn('h-4 w-px bg-[#d4d4d8]', estado.arrastrando === id && 'bg-dash-blue h-full w-[2px]')} />
+      {/* Guía que baja por toda la tabla mientras se arrastra: el recorte
+          del contenedor con overflow la corta justo al pie. */}
+      {activa && (
+        <span className="bg-dash-blue/25 pointer-events-none absolute -top-[120px] left-1/2 h-[1200px] w-[2px] -translate-x-1/2" />
+      )}
+      <span
+        className={cn(
+          'relative w-[3px] rounded-full transition-[height,background-color] duration-150',
+          'motion-safe:animate-[col-grip-in_150ms_ease-out]',
+          activa
+            ? 'bg-dash-blue h-[26px]'
+            : cn(
+              'group-hover/manija:bg-dash-blue h-[16px] group-hover/manija:h-[22px]',
+              tocada ? 'bg-dash-blue/50' : 'bg-[#d4d4d8]',
+            ),
+        )}
+      />
     </span>
   )
 }

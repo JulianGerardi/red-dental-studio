@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  ChevronLeft, Search, Receipt, CreditCard, Wallet, Download,
+  ChevronLeft, Search, Receipt, CreditCard, Wallet, Download, MoveHorizontal,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -106,8 +106,11 @@ export default function Ledger() {
 
   const estilo = (c: ColumnaLedger) => ({
     width: anchos.ancho(c.id),
+    /* La elástica puede ceder ancho cuando otra columna crece, pero nunca
+       por debajo de su mínimo: de ahí sale la holgura del arrastre. */
+    minWidth: c.elastica ? ANCHO_BASE[c.id] : undefined,
     flexGrow: c.elastica && anchos.manual(c.id) === undefined ? 1 : 0,
-    flexShrink: 0,
+    flexShrink: c.elastica ? 1 : 0,
   })
   const anchoMinimo = COLUMNAS.reduce((a, c) => a + anchos.ancho(c.id), 0)
     + (COLUMNAS.length - 1) * 12 + 24
@@ -230,17 +233,18 @@ export default function Ledger() {
                 </div>
               </div>
 
-              <div className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+              <div data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
                 <div style={{ minWidth: anchoMinimo }}>
-                  <div className="group/fila flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
-                    {COLUMNAS.map((c) => (
+                  <div data-tabla-header className="group/fila flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
+                    {COLUMNAS.map((c, i) => (
                       <span
                         key={c.id}
+                        data-elastica={c.elastica || undefined}
                         style={estilo(c)}
                         className={cn('relative flex items-center', c.derecha && 'justify-end')}
                       >
                         <span className="truncate">{c.label}</span>
-                        <ManijaResize id={c.id} label={c.label} estado={anchos} />
+                        <ManijaResize id={c.id} label={c.label} estado={anchos} indice={i} />
                       </span>
                     ))}
                   </div>
@@ -290,6 +294,11 @@ export default function Ledger() {
                   <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
                     <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
                       Showing {filasPagina.length} of {filas.length} entries
+                      {anchos.avisando && (
+                        <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] flex items-center gap-1.5 font-medium text-[#a1a1aa]">
+                          <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
+                        </span>
+                      )}
                       {anchos.hayCambios && (
                         <button type="button" onClick={anchos.resetear} className="text-dash-blue hover:underline">
                           Reset column widths
