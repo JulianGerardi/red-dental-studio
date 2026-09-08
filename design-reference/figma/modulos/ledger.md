@@ -748,6 +748,12 @@ vista y repetirlo flotando encima sólo estorba (`abierta` corta el render del
 
 El botón estaba siempre, aun con todo cerrado, donde no hay nada que
 colapsar. Pedido de Julián: que esté "desde cuando presiono una fila". Ahora
-`BotonExpandirTodo` devuelve `null` si no hay ninguna fila abierta en la
-página; al abrir la primera aparece como "Expand all" -quedan otras por
-abrir- y pasa a "Collapse all" cuando están todas.
+`BotonExpandirTodo` devuelve `null` si no hay ninguna fila abierta.
+
+Segunda corrección, del mismo día: al principio con una sola fila abierta el
+botón decía "Expand all", así que para cerrar esa fila había que abrirlas
+todas primero -"si no me hacés abrir todos para que yo pueda colapsarlo"-.
+Ahora **Collapse all está desde la primera fila abierta**, y "Expand all" lo
+acompaña sólo mientras queden filas por abrir. `alternarTodas` se parte en
+`expandirTodo` y `colapsarTodo`: un botón que alterna no sirve cuando las
+dos acciones tienen que estar disponibles a la vez.

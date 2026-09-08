@@ -36,6 +36,25 @@ const CONTACT = [
   { icon: MapPin, label: 'Address', value: '123 Biscayne Blvd' },
 ]
 
+/* Mismo mecanismo que `useEstadoEncuentro` de más abajo y por el mismo
+   motivo: el panel se remonta en cada pantalla del paciente. */
+let colapsadoGlobal = false
+const oyentesColapso = new Set<() => void>()
+
+function useColapso() {
+  const [, redibujar] = useState(0)
+  useEffect(() => {
+    const f = () => redibujar((n) => n + 1)
+    oyentesColapso.add(f)
+    return () => { oyentesColapso.delete(f) }
+  }, [])
+  const set = (v: boolean | ((p: boolean) => boolean)) => {
+    colapsadoGlobal = typeof v === 'function' ? v(colapsadoGlobal) : v
+    oyentesColapso.forEach((f) => f())
+  }
+  return [colapsadoGlobal, set] as const
+}
+
 function InfoBlock({
   title,
   items,
@@ -99,8 +118,10 @@ export function PatientSidePanel({
   const [foto, setFoto] = usePhoto(`patient-photo:${basePath}`)
   /* Sólo colapsa en desktop -en angosto el panel ya es compacto por su
      cuenta-, para liberar ancho cuando el contenido lo necesita (p.ej. las
-     tablas del Ledger). */
-  const [colapsado, setColapsado] = useState(false)
+     tablas del Ledger). El estado vive fuera de React, igual que el del
+     botón de encuentro: el panel se vuelve a montar en cada pantalla del
+     paciente, así que con `useState` volvía a abrirse al cambiar de ítem. */
+  const [colapsado, setColapsado] = useColapso()
   const [info, setInfo] = useState(false)
   const cierre = useRef<number | null>(null)
   const abrirInfo = () => {

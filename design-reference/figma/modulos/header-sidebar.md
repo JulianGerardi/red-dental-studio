@@ -84,3 +84,34 @@ Help center → `/help`, y **Log out → `/login`** con su toast. Ese Log out es
 además, la única puerta de entrada al login desde la app: antes `/login`
 existía como ruta pero no había forma de llegar sin escribir la URL, que es
 por lo que Julián no lo veía.
+
+## Notificaciones: banner arriba + campana (2026-09-08)
+
+Pedido de Julián. Son **tareas pendientes**, no avisos de paso: quedan hasta
+que se resuelven -para lo efímero ya están los toasts-.
+
+**Banner**, arriba de todo y debajo del header. Muestra una por vez con
+flechas ‹ › y el contador al medio. Probado tal cual lo describió:
+"1 of 2 · Document awaiting your signature" → siguiente → "2 of 2 · Referral
+expires today" → anterior → vuelve a la primera.
+
+**El cursor se recorta al descartar**, así nunca queda apuntando a algo que
+ya no existe: verificado parado en "2 of 2", descartando esa, y el banner
+pasa a mostrar la que queda en vez de vaciarse. Con una sola pendiente las
+flechas y el contador desaparecen -no hay entre qué moverse-.
+
+**La campana aloja las mismas**: no es una lista aparte. Lleva el número de
+pendientes como badge, las lista con su detalle, cada una se puede descartar
+desde ahí, y sin pendientes dice "You're all caught up".
+
+El estado vive en `AppShell`, no en cada pantalla: tiene que sobrevivir a la
+navegación y lo comparten banner y campana.
+
+## El panel del paciente se re-abría al cambiar de ítem (2026-09-08)
+
+Colapsabas el panel, clickeabas otra sección y volvía a aparecer expandido.
+El motivo: `colapsado` era `useState`, y el panel **se vuelve a montar en
+cada pantalla del paciente** -cada página renderiza su propia instancia-.
+Se pasa al mismo mecanismo fuera de React que ya usaba el botón de encuentro
+en ese archivo, y por la misma razón. Verificado: colapsar en Ledger, ir a
+Treatments, sigue en 60px.

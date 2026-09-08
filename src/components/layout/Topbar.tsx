@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   PanelLeftOpen, PanelLeftClose, Search, BellDot, ChevronDown,
-  CircleUserRound, CreditCard, CircleHelp, Info, LogOut,
+  CircleUserRound, CreditCard, CircleHelp, Info, LogOut, X,
 } from 'lucide-react'
 import { LocationSelector } from './LocationSelector'
+import type { Notificacion } from '@/data/notificaciones'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -30,10 +31,14 @@ export function Topbar({
   expanded,
   onToggleSidebar,
   showCommandHint = true,
+  notificaciones = [],
+  onDescartarNotificacion,
 }: {
   expanded: boolean
   onToggleSidebar: () => void
   showCommandHint?: boolean
+  notificaciones?: Notificacion[]
+  onDescartarNotificacion?: (id: string) => void
 }) {
   const ToggleIcon = expanded ? PanelLeftClose : PanelLeftOpen
 
@@ -76,13 +81,7 @@ export function Topbar({
         <GlobalSearch showCommandHint={showCommandHint} />
 
 
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="shrink-0 text-[#3f3f46] transition-colors hover:text-black"
-        >
-          <BellDot className="size-5" />
-        </button>
+        <Campana items={notificaciones} onDescartar={onDescartarNotificacion} />
       </div>
 
       </div>
@@ -143,6 +142,62 @@ function MenuCuenta() {
         >
           <LogOut className="size-4 shrink-0" /> Log out
         </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+/* La campana aloja las mismas tareas que muestra el banner de arriba: es el
+   lugar donde van a parar, no una lista aparte. Sin pendientes queda la
+   campana sola, sin punto. */
+function Campana({
+  items, onDescartar,
+}: {
+  items: Notificacion[]
+  onDescartar?: (id: string) => void
+}) {
+  const navigate = useNavigate()
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label={items.length ? `Notifications (${items.length})` : 'Notifications'}
+        className="relative shrink-0 rounded-md p-1 text-[#3f3f46] transition-colors hover:bg-[#f4f4f5] hover:text-black"
+      >
+        <BellDot className="size-5" />
+        {items.length > 0 && (
+          <span className="bg-dash-blue absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full text-[9px] font-semibold text-white">
+            {items.length}
+          </span>
+        )}
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-[320px]">
+        <DropdownMenuLabel className="text-[13px] font-bold text-[#09090b]">
+          Notifications {items.length > 0 && <span className="font-normal text-[#71717a]">({items.length})</span>}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {items.length === 0 ? (
+          <p className="px-2 py-6 text-center text-[13px] text-[#a1a1aa]">You&apos;re all caught up.</p>
+        ) : (
+          items.map((n) => (
+            <DropdownMenuItem key={n.id} onSelect={() => navigate(n.to)} className="items-start gap-2.5 py-2.5">
+              <n.icon className="text-dash-blue mt-0.5 size-4 shrink-0" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[13px] font-semibold text-[#09090b]">{n.titulo}</span>
+                <span className="block text-[12px] leading-snug text-[#71717a]">{n.detalle}</span>
+              </span>
+              <button
+                type="button"
+                aria-label={`Dismiss: ${n.titulo}`}
+                onClick={(e) => { e.stopPropagation(); onDescartar?.(n.id) }}
+                className="mt-0.5 shrink-0 text-[#a1a1aa] hover:text-[#09090b]"
+              >
+                <X className="size-3.5" />
+              </button>
+            </DropdownMenuItem>
+          ))
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

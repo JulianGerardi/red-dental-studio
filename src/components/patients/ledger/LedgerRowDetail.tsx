@@ -45,23 +45,29 @@ export function FilaConTooltip({
    título de cada tabla del Ledger, y sólo desde que hay algo abierto: con
    todo cerrado no hay nada que colapsar y el botón era ruido. */
 export function BotonExpandirTodo({
-  todasAbiertas, hayAlgunaAbierta, onToggle,
+  todasAbiertas, hayAlgunaAbierta, onExpandirTodo, onColapsarTodo,
 }: {
   todasAbiertas: boolean
   hayAlgunaAbierta: boolean
-  onToggle: () => void
+  onExpandirTodo: () => void
+  onColapsarTodo: () => void
 }) {
   if (!hayAlgunaAbierta) return null
-  const Icono = todasAbiertas ? ChevronsDownUp : ChevronsUpDown
+  const clase = 'flex items-center gap-1.5 rounded-md border border-[#e4e4e7] px-2.5 py-1.5 text-[12px] font-medium text-[#71717a] hover:bg-[#f4f4f5]'
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className="flex items-center gap-1.5 rounded-md border border-[#e4e4e7] px-2.5 py-1.5 text-[12px] font-medium text-[#71717a] hover:bg-[#f4f4f5]"
-    >
-      <Icono className="size-3.5" />
-      {todasAbiertas ? 'Collapse all' : 'Expand all'}
-    </button>
+    <span className="flex items-center gap-2">
+      {/* Colapsar está desde la primera fila abierta: obligar a expandir
+          todo para poder cerrar una sola no tiene sentido. "Expand all"
+          acompaña mientras queden filas por abrir. */}
+      <button type="button" onClick={onColapsarTodo} className={clase}>
+        <ChevronsDownUp className="size-3.5" /> Collapse all
+      </button>
+      {!todasAbiertas && (
+        <button type="button" onClick={onExpandirTodo} className={clase}>
+          <ChevronsUpDown className="size-3.5" /> Expand all
+        </button>
+      )}
+    </span>
   )
 }
 

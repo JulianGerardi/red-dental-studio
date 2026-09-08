@@ -127,10 +127,10 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
      abrir 26 filas de golpe en una tabla paginada no le sirve a nadie. */
   const todasAbiertas = cargosPagina.length > 0 && cargosPagina.every((m) => expandidas.includes(m.id))
   const hayAlgunaAbierta = cargosPagina.some((m) => expandidas.includes(m.id))
-  const alternarTodas = () =>
-    setExpandidas((p) => (todasAbiertas
-      ? p.filter((id) => !cargosPagina.some((m) => m.id === id))
-      : [...new Set([...p, ...cargosPagina.map((m) => m.id)])]))
+  const expandirTodo = () =>
+    setExpandidas((p) => [...new Set([...p, ...cargosPagina.map((m) => m.id)])])
+  const colapsarTodo = () =>
+    setExpandidas((p) => p.filter((id) => !cargosPagina.some((m) => m.id === id)))
 
   const totalCargos = cargos.reduce((a, m) => a + m.monto, 0)
   const totalAplicado = cargos.reduce((a, m) => a + (Number(aplicado[m.id]) || 0), 0)
@@ -199,7 +199,8 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
         </h2>
         <div className="flex flex-wrap items-center gap-2">
           {cargos.length > 0 && (
-            <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta} onToggle={alternarTodas} />
+            <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
+                  onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
           )}
           <ColumnPicker columnas={columnas} ocultas={ocultas} onToggle={alternarCol} onReset={() => setOcultas([])} />
         </div>

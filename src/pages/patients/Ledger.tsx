@@ -164,10 +164,10 @@ export default function Ledger() {
      abrir 26 filas de golpe en una tabla paginada no le sirve a nadie. */
   const todasAbiertas = filasPagina.length > 0 && filasPagina.every((m) => expandidas.includes(m.id))
   const hayAlgunaAbierta = filasPagina.some((m) => expandidas.includes(m.id))
-  const alternarTodas = () =>
-    setExpandidas((p) => (todasAbiertas
-      ? p.filter((id) => !filasPagina.some((m) => m.id === id))
-      : [...new Set([...p, ...filasPagina.map((m) => m.id)])]))
+  const expandirTodo = () =>
+    setExpandidas((p) => [...new Set([...p, ...filasPagina.map((m) => m.id)])])
+  const colapsarTodo = () =>
+    setExpandidas((p) => p.filter((id) => !filasPagina.some((m) => m.id === id)))
 
   const stats: Stat[] = useMemo(() => {
     const cargos = delaVista.filter((m) => m.tipo === 'Charge').reduce((a, m) => a + m.monto, 0)
@@ -242,7 +242,8 @@ export default function Ledger() {
                 </div>
                 <FilterMenu label="Filter entries" options={TIPOS} value={tipos} onChange={(v) => { setTipos(v); setPagina(1) }} />
                 {filasPagina.length > 0 && (
-                  <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta} onToggle={alternarTodas} />
+                  <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
+                  onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
                 )}
 
                 <div className="ml-auto flex flex-wrap items-center gap-3">
