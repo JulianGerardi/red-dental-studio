@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { CreditCard, Columns3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import {
+  DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { moneda, type Movimiento } from '@/data/ledger'
 
 /* Figma 4582:29618 / 4582:30251. Ver design-reference/figma/modulos/ledger.md. */
@@ -15,11 +17,12 @@ type ColId =
   | 'desc' | 'charge' | 'otroCredito' | 'guarEstimado' | 'applied' | 'balance'
 
 function ColumnPicker({
-  columnas, ocultas, onToggle,
+  columnas, ocultas, onToggle, onReset,
 }: {
   columnas: { id: ColId; label: string; bloqueada?: boolean }[]
   ocultas: ColId[]
   onToggle: (id: ColId) => void
+  onReset: () => void
 }) {
   return (
     <DropdownMenu>
@@ -38,6 +41,18 @@ function ColumnPicker({
             {c.label}
           </DropdownMenuCheckboxItem>
         ))}
+        {ocultas.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <button
+              type="button"
+              onClick={onReset}
+              className="text-dash-blue w-full rounded-md px-1.5 py-1 text-left text-sm font-semibold hover:bg-[#f4f4f5]"
+            >
+              Show all columns
+            </button>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )
@@ -94,7 +109,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
         <h2 className="flex items-center gap-2 text-sm font-bold text-[#09090b]">
           <CreditCard className="size-4" /> Ledger Transactions
         </h2>
-        <ColumnPicker columnas={columnas} ocultas={ocultas} onToggle={alternarCol} />
+        <ColumnPicker columnas={columnas} ocultas={ocultas} onToggle={alternarCol} onReset={() => setOcultas([])} />
       </div>
 
       {cargos.length === 0 ? (

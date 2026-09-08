@@ -184,7 +184,7 @@ export const TOPICS: Topic[] = [
 ]
 
 function normalizar(texto: string) {
-  return texto.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  return texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
 /** Coincidencia por palabras, para que una pregunta llana caiga en el tema correcto. */

@@ -210,3 +210,48 @@ sobre `DropdownMenu`/`DropdownMenuCheckboxItem` reales
 (`src/components/ui/dropdown-menu.tsx`). Mismos ids, mismo default
 visible/oculto; el manejo de apertura, click-afuera y Escape ya no es código
 propio, lo da Radix.
+
+## `FilterMenu` se empareja con `ColumnPicker`, y gana "clean all" (2026-09-08)
+
+Julián notó que los filtros de Ledger "no tienen el mismo diseño": el embudo
+de "Filter entries" (`src/components/dashboard/FilterMenu.tsx`, compartido
+con el Dashboard) seguía siendo el dropdown a mano de antes de la migración a
+shadcn -`useState`/`useRef`/`useEffect` propios para abrir/cerrar y click-
+afuera, checkbox dibujado con un SVG a medida-, mientras que el "Columns" de
+al lado (`LedgerAllocationTable`) ya corría sobre `DropdownMenu` real desde
+el fix anterior. Dos componentes visualmente distintos para el mismo tipo de
+control. Se reescribe `FilterMenu` sobre los mismos primitivos
+(`DropdownMenu`/`DropdownMenuCheckboxItem`/`DropdownMenuSeparator`), mismo
+`onSelect={(e) => e.preventDefault()}` para que tildar varias opciones
+seguidas no cierre el menú -API externa intacta, los dos call sites
+(`Dashboard.tsx`, `Ledger.tsx`) no cambian-.
+
+`FilterMenu` ya tenía su "Clear filter" cuando hay algo tildado; lo que le
+faltaba a `ColumnPicker` era el equivalente para columnas. Se agrega "Show
+all columns" -mismo lugar, mismo estilo de link, debajo de un
+`DropdownMenuSeparator`-, visible sólo si `ocultas.length > 0`, y que limpia
+todas las columnas ocultas de un saque (no reaparecen Transaction Date/
+Applied/Balance porque nunca se ocultan, son las bloqueadas). Con esto el
+"clean all" pedido existe en los dos pickers, con el mismo aspecto.
+
+## La tabla de Transactions se achicaba mal en la última columna (2026-09-08)
+
+El otro reclamo -"al final de la última columna la tabla queda rara"- era un
+bug real en la tabla principal de Transactions (`src/pages/patients/
+Ledger.tsx`), no en `LedgerAllocationTable`. Sus columnas fijas (`COLS.fecha`,
+`.paciente`, `.tipo`, `.provider`, `.monto`, `.saldo`) tenían `w-[Npx]` pero
+nunca `shrink-0`; dentro del `flex` de la fila, cuando el panel del paciente
+deja menos ancho del que la tabla necesita, el navegador las achica a todas
+un par de píxeles para que la fila entre en el `min-w-[960px]` del
+contenedor -y ese `960px` ya estaba mal calculado: la suma real de columnas
+(870) + gaps (`gap-3` × 6 = 72) + el padding de la fila (`px-4` × 2 = 32) da
+974, no 960-. El resultado visible: "Balance" recortada a "Balanc", "$85.00"
+a "$85.0", en cualquier ancho de pantalla donde el panel lateral del
+paciente está presente (o sea, siempre que se mira una ficha).
+
+Se agrega `shrink-0` a las seis columnas fijas -sólo `desc` sigue con
+`flex-1`, para que sea la que absorbe el espacio sobra o falta- y se corrige
+el mínimo a `min-w-[974px]`. Mismo patrón que ya usa `LedgerAllocationTable`
+(sus columnas fijas también llevan `shrink-0`, sólo `desc` es `flex-1`): si
+entra, entra completa; si no entra, se ve completa scrolleando -nunca
+recortada a la mitad de un carácter-.

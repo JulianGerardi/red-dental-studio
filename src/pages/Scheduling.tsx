@@ -105,7 +105,7 @@ export default function Scheduling() {
     const rotulo = nuevo.fecha.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     aviso.ok(`${d.patient} scheduled for ${rotulo} at ${d.start}.`, {
       label: `Go to ${rotulo}`,
-      onClick: () => { setFecha(dia); setView('Day') },
+      onClick: () => { setFecha(nuevo.fecha); setView('Day') },
     })
     return true
   }
