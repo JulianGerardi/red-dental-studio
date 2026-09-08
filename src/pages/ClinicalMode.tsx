@@ -8,6 +8,7 @@ import { Odontogram } from '@/components/clinical/Odontogram'
 import { makeMockExam } from '@/data/odontogram'
 import { ClinicalTopBar } from '@/components/clinical/ClinicalTopBar'
 import { ClinicalToolbar } from '@/components/clinical/ClinicalToolbar'
+import { DentalAssessmentExam } from '@/components/clinical/DentalAssessmentExam'
 import { TreatmentPlanList } from '@/components/clinical/TreatmentPlanList'
 import { ProblemList } from '@/components/clinical/ProblemList'
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
@@ -128,7 +129,9 @@ export default function ClinicalMode() {
           ? <RadiographyPanel />
           : pestana === 'Treatment Plan'
             ? <TreatmentPlanSection />
-            : (
+            : pestana === 'DentAssmt'
+              ? <DentalAssessmentExam />
+              : (
           <div className="rounded-xl border border-[#e4e4e7] bg-white">
             <EmptyState
               icon={Stethoscope}

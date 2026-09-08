@@ -525,3 +525,43 @@ Medido a 1280: huecos de 12 / 12 / 12 y uno de 86 antes del grupo final, que
 termina en 1232, el borde del contenido. Es donde lo pone la captura.
 
 En el telefono el grupo final ocupa la fila entera, como el resto.
+
+## DentAssmt, primer examen real (2026-09-08)
+
+`EXAMENES` ya tenía `DentAssmt`/`Intra Oral`/`Extra Oral` en la lista desde
+antes, cayendo los tres en el placeholder genérico "Planned" -nunca se habían
+construido-. Se porta DentAssmt completo desde el proyecto hermano (ver
+[[red-clone-dashboard-figma-sibling]] en memoria): un panel de findings con
+menú de acciones (Monitor, Treat, Treated, Discard, Delete...), confirmación
+antes de cada cambio de estado, un wizard de 3 pasos para cargar un
+procedimiento (elegir código → superficie → vincular findings) y firma de
+revisión del exam.
+
+**Diferencia grande con el original**: ellos arman el chart con una imagen
+PNG (1042×797) y hotspots invisibles encima calculados a mano por porcentaje.
+Acá se reusa **nuestro `Odontogram` real** -ya existe, ya opera, y es
+justamente lo que este mismo archivo documentaba como decisión desde el
+principio: "no una foto"-. Clickear un diente en DentAssmt abre su detalle en
+vez de pintar superficies -eso vive adentro de "New Procedure", con su propia
+rueda de superficies-.
+
+**La rueda de superficies es propia, no la del proyecto hermano**: ellos
+usan un vocabulario distinto (BC/B/O/P/PC/D/M). Acá va la rueda rediseñada
+con las 7 superficies que ya modela `odontogram.ts` (MB/B/DB/O/ML/L/DL), en
+el mismo orden, como 6 sectores iguales alrededor del círculo oclusal.
+
+**Simplificación documentada**: el drawer de edición del original es un
+wizard de 2 pasos con estimados en dólares por finding y un segundo paso
+para re-vincular findings/diagnósticos. Acá "Edit" cubre proveedor,
+superficies y notas en una sola pantalla -no hay ningún otro lado de la app
+que modele "estimado de costo" por finding, y re-vincular ya se hace desde
+"New Procedure"-.
+
+**"Delete" pasa a ser deshacible**: el original dice "This can't be undone".
+Como toda eliminación en esta app, ahora sale con Undo en el toast.
+
+Pendiente para otra vuelta: **Intra Oral** y **Extra Oral** -mismo panel de
+findings, pero clickeás una región de un diagrama en vez de un diente-. Los
+diagramas ya están embebidos como data URI en
+`src/assets/clinical/intra-oral-diagram.ts` y `extra-oral-diagram.ts`
+-mismo criterio que `panoramic.ts`-, listos para cuando se arme esa pantalla.
