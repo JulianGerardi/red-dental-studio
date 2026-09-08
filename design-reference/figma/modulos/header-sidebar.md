@@ -66,3 +66,21 @@ y popovers del contenido usan `z-50` y lo siguen tapando, que es lo correcto.
 Es el mismo tipo de bug que el `overflow-y-auto` que recortaba el flotante: en
 los dos casos una propiedad del contenedor cambia lo que puede hacer un hijo
 absoluto.
+
+## Menú de cuenta en el header (2026-09-08)
+
+La flecha al lado del nombre no abría nada. Ahora despliega el menú que pasó
+Julián en captura: título **My Account**, separador, **Profile · Suscription
+· Support**, separador, **Help center · Log out**. Mismo `DropdownMenu` de
+shadcn que ya usan el picker de columnas y los filtros.
+
+**"Suscription" va con esa ortografía a propósito.** Así está en el diseño y
+acá el contenido se replica tal cual -misma regla que dejó "Start Enconter"
+en el panel del paciente y el título "New Credit (+) Adjustment" en un botón
+que dice "Charge Adjustment (+)"-.
+
+Destinos: Profile → `/settings/account`, Suscription → `/billing`, Support y
+Help center → `/help`, y **Log out → `/login`** con su toast. Ese Log out es,
+además, la única puerta de entrada al login desde la app: antes `/login`
+existía como ruta pero no había forma de llegar sin escribir la URL, que es
+por lo que Julián no lo veía.

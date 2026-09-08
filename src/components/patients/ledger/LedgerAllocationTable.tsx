@@ -126,6 +126,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   /* "todas" es sobre lo que se ve en pantalla, no sobre la cuenta entera:
      abrir 26 filas de golpe en una tabla paginada no le sirve a nadie. */
   const todasAbiertas = cargosPagina.length > 0 && cargosPagina.every((m) => expandidas.includes(m.id))
+  const hayAlgunaAbierta = cargosPagina.some((m) => expandidas.includes(m.id))
   const alternarTodas = () =>
     setExpandidas((p) => (todasAbiertas
       ? p.filter((id) => !cargosPagina.some((m) => m.id === id))
@@ -198,7 +199,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
         </h2>
         <div className="flex flex-wrap items-center gap-2">
           {cargos.length > 0 && (
-            <BotonExpandirTodo todasAbiertas={todasAbiertas} onToggle={alternarTodas} />
+            <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta} onToggle={alternarTodas} />
           )}
           <ColumnPicker columnas={columnas} ocultas={ocultas} onToggle={alternarCol} onReset={() => setOcultas([])} />
         </div>

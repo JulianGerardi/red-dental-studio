@@ -42,13 +42,16 @@ export function FilaConTooltip({
 }
 
 /* Abrir/cerrar de una todas las filas que hay en pantalla. Va al lado del
-   título de cada tabla del Ledger. */
+   título de cada tabla del Ledger, y sólo desde que hay algo abierto: con
+   todo cerrado no hay nada que colapsar y el botón era ruido. */
 export function BotonExpandirTodo({
-  todasAbiertas, onToggle,
+  todasAbiertas, hayAlgunaAbierta, onToggle,
 }: {
   todasAbiertas: boolean
+  hayAlgunaAbierta: boolean
   onToggle: () => void
 }) {
+  if (!hayAlgunaAbierta) return null
   const Icono = todasAbiertas ? ChevronsDownUp : ChevronsUpDown
   return (
     <button

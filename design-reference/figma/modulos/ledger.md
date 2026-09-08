@@ -743,3 +743,11 @@ tabla arrancando en 320, y la lista de filas tapadas da vacía.
 Además, con la fila desplegada el tooltip no aparece: el detalle ya está a la
 vista y repetirlo flotando encima sólo estorba (`abierta` corta el render del
 `Tooltip`, no sólo lo esconde).
+
+## "Expand all" aparece recién al abrir una fila (2026-09-08)
+
+El botón estaba siempre, aun con todo cerrado, donde no hay nada que
+colapsar. Pedido de Julián: que esté "desde cuando presiono una fila". Ahora
+`BotonExpandirTodo` devuelve `null` si no hay ninguna fila abierta en la
+página; al abrir la primera aparece como "Expand all" -quedan otras por
+abrir- y pasa a "Collapse all" cuando están todas.

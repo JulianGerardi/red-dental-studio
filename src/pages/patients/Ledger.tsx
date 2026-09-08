@@ -163,6 +163,7 @@ export default function Ledger() {
   /* "todas" es sobre lo que se ve en pantalla, no sobre la cuenta entera:
      abrir 26 filas de golpe en una tabla paginada no le sirve a nadie. */
   const todasAbiertas = filasPagina.length > 0 && filasPagina.every((m) => expandidas.includes(m.id))
+  const hayAlgunaAbierta = filasPagina.some((m) => expandidas.includes(m.id))
   const alternarTodas = () =>
     setExpandidas((p) => (todasAbiertas
       ? p.filter((id) => !filasPagina.some((m) => m.id === id))
@@ -241,7 +242,7 @@ export default function Ledger() {
                 </div>
                 <FilterMenu label="Filter entries" options={TIPOS} value={tipos} onChange={(v) => { setTipos(v); setPagina(1) }} />
                 {filasPagina.length > 0 && (
-                  <BotonExpandirTodo todasAbiertas={todasAbiertas} onToggle={alternarTodas} />
+                  <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta} onToggle={alternarTodas} />
                 )}
 
                 <div className="ml-auto flex flex-wrap items-center gap-3">
