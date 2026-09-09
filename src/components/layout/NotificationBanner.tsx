@@ -20,19 +20,23 @@ export function NotificationBanner({
   const mover = (paso: number) => onCursor((cursor + paso + items.length) % items.length)
 
   return (
-    <div className="flex items-center gap-3 border-b border-[#e4e4e7] bg-[#eef5ff] px-4 py-2.5 sm:px-6">
-      <span className="text-dash-blue flex size-7 shrink-0 items-center justify-center rounded-full bg-white">
+    /* Ámbar, no azul: es el par de "atención" que ya usan GuarantorBanner y
+       NewHoursModal (`#fffbeb` con `#b45309`), el mismo que el badge
+       `warning`. El azul lo dejaba leer como información, no como algo
+       pendiente de hacer. */
+    <div className="flex items-center gap-3 border-b border-[#fde68a] bg-[#fffbeb] px-4 py-2.5 sm:px-6">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-[#b45309]">
         <Icono className="size-3.5" />
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[13px] font-semibold text-[#09090b]">{actual.titulo}</span>
-        <span className="hidden truncate text-[12px] text-[#3f3f46] sm:block">{actual.detalle}</span>
+        <span className="block truncate text-[13px] font-semibold text-[#b45309]">{actual.titulo}</span>
+        <span className="hidden truncate text-[12px] text-[#92400e] sm:block">{actual.detalle}</span>
       </span>
 
       <Link
         to={actual.to}
-        className="text-dash-blue hidden shrink-0 text-[12px] font-semibold hover:underline sm:inline"
+        className="hidden shrink-0 text-[12px] font-semibold text-[#b45309] hover:underline sm:inline"
       >
         {actual.accion}
       </Link>
@@ -44,18 +48,18 @@ export function NotificationBanner({
             type="button"
             onClick={() => mover(-1)}
             aria-label="Previous notification"
-            className="text-dash-blue flex size-6 items-center justify-center rounded-md hover:bg-white"
+            className="flex size-6 items-center justify-center rounded-md text-[#b45309] hover:bg-white"
           >
             <ChevronLeft className="size-4" />
           </button>
-          <span className="text-[11px] font-semibold whitespace-nowrap text-[#3f3f46] tabular-nums">
+          <span className="text-[11px] font-semibold whitespace-nowrap text-[#92400e] tabular-nums">
             {cursor + 1} of {items.length}
           </span>
           <button
             type="button"
             onClick={() => mover(1)}
             aria-label="Next notification"
-            className="text-dash-blue flex size-6 items-center justify-center rounded-md hover:bg-white"
+            className="flex size-6 items-center justify-center rounded-md text-[#b45309] hover:bg-white"
           >
             <ChevronRight className="size-4" />
           </button>
@@ -66,7 +70,7 @@ export function NotificationBanner({
         type="button"
         onClick={() => onDescartar(actual.id)}
         aria-label={`Dismiss: ${actual.titulo}`}
-        className={cn('flex size-6 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-white hover:text-[#09090b]')}
+        className={cn('flex size-6 shrink-0 items-center justify-center rounded-md text-[#b45309]/70 hover:bg-white hover:text-[#b45309]')}
       >
         <X className="size-4" />
       </button>

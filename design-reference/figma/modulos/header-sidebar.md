@@ -107,6 +107,12 @@ desde ahí, y sin pendientes dice "You're all caught up".
 El estado vive en `AppShell`, no en cada pantalla: tiene que sobrevivir a la
 navegación y lo comparten banner y campana.
 
+**Color: ámbar, no azul** (pedido de Julián). Se reusa el par de "atención"
+que el proyecto ya tenía -`#fffbeb` de fondo con `#b45309`, el mismo que
+usan `GuarantorBanner` y `NewHoursModal` y el que declara el badge
+`warning`- en vez de inventar un amarillo nuevo. El azul lo hacía leer como
+información; en ámbar se lee como algo pendiente de hacer.
+
 ## El panel del paciente se re-abría al cambiar de ítem (2026-09-08)
 
 Colapsabas el panel, clickeabas otra sección y volvía a aparecer expandido.
