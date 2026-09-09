@@ -30,7 +30,7 @@ import Help from '@/pages/Help'
 import { HelpProvider } from '@/components/help/HelpProvider'
 
 const SETTINGS_PLACEHOLDERS = [
-  'account', 'roles', 'parameters',
+  'roles', 'parameters',
   'finance', 'finance/fee-schedule', 'finance/carriers', 'finance/coverage-table',
   'libraries', 'patient-portal', 'security', 'preferences',
 ]

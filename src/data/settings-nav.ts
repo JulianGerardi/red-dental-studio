@@ -10,7 +10,9 @@ export type SettingsNavItem = {
 
 export const SETTINGS_NAV: SettingsNavItem[] = [
   { to: '/settings/general', label: 'General', icon: 'house' },
-  { to: '/settings/account', label: 'Account', icon: 'user-cog' },
+  /* Un solo ítem: el Figma lo llama "Accounts" y antes había además un
+     "Account" en singular que era un placeholder vacío. Dos entradas casi
+     iguales en el mismo menú sólo hacen entrar a la que no es. */
   { to: '/settings/accounts', label: 'Accounts', icon: 'user-cog' },
   { to: '/settings/locations', label: 'Locations', icon: 'building' },
   { to: '/settings/team', label: 'Employees', icon: 'users' },
