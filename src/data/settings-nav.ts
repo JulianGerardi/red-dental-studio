@@ -11,6 +11,7 @@ export type SettingsNavItem = {
 export const SETTINGS_NAV: SettingsNavItem[] = [
   { to: '/settings/general', label: 'General', icon: 'house' },
   { to: '/settings/account', label: 'Account', icon: 'user-cog' },
+  { to: '/settings/accounts', label: 'Accounts', icon: 'user-cog' },
   { to: '/settings/locations', label: 'Locations', icon: 'building' },
   { to: '/settings/team', label: 'Employees', icon: 'users' },
   { to: '/settings/roles', label: 'Roles', icon: 'shield-check' },
@@ -23,6 +24,7 @@ export const SETTINGS_NAV: SettingsNavItem[] = [
       { to: '/settings/finance/coverage-table', label: 'Coverage Table' },
     ],
   },
+  { to: '/settings/ledger', label: 'Ledger', icon: 'credit-card' },
   { to: '/settings/libraries', label: 'Libraries', icon: 'library' },
   { to: '/settings/patient-portal', label: 'Patient Portal', icon: 'circle-user' },
   { to: '/settings/security', label: 'Security', icon: 'lock' },

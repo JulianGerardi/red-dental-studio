@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Search, Trash2, Plus, MapPin } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
+import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 
 /* Settings → Locations. La tabla de entrada: nombre, empleados, salas e
    información de contacto. El detalle de cada fila —Information / Working
@@ -38,10 +39,19 @@ export function SettingsLocations() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">Locations</h1>
-      <p className="mt-1 text-sm text-[#71717a]">Set your location name. Add the location you need.</p>
-
-      <div className="mt-5 flex flex-wrap items-center gap-3">
+      <SettingsPageHeader
+        titulo="Locations"
+        bajada="Set your location name. Add the location you need."
+        accion={(
+          <Link
+            to="/settings/locations/new"
+            data-tour="set-locations"
+            className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 shrink-0 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
+          >
+            <Plus className="size-4" /> New location
+          </Link>
+        )}
+      >
         <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
           <input
@@ -51,14 +61,7 @@ export function SettingsLocations() {
             className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
           />
         </div>
-        <Link
-          to="/settings/locations/new"
-          data-tour="set-locations"
-          className="bg-dash-blue hover:bg-dash-blue-hover ml-auto flex h-9 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
-        >
-          <Plus className="size-4" /> New location
-        </Link>
-      </div>
+      </SettingsPageHeader>
 
       <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
         <div className="min-w-[760px]">

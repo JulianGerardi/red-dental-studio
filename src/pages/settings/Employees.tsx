@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
+import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { usePhoto } from '@/lib/usePhoto'
 import { EMPLEADOS, type Empleado } from '@/data/employees'
 import { Card, Toggle } from '@/components/settings/primitives'
@@ -102,10 +103,19 @@ export function SettingsEmployees() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">Employees</h1>
-      <p className="mt-1 text-sm text-[#71717a]">Everyone with access to the practice, across every location.</p>
-
-      <div className="mt-5 flex flex-wrap items-center gap-3">
+      <SettingsPageHeader
+        titulo="Employees"
+        bajada="Everyone with access to the practice, across every location."
+        accion={(
+          <Link
+            to="/settings/team/new"
+            data-tour="set-team"
+            className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 shrink-0 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
+          >
+            <CirclePlus className="size-4" /> New Employee
+          </Link>
+        )}
+      >
         <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
           <input
@@ -120,14 +130,7 @@ export function SettingsEmployees() {
             {seleccion.length} selected
           </span>
         )}
-        <Link
-          to="/settings/team/new"
-          data-tour="set-team"
-          className="bg-dash-blue hover:bg-dash-blue-hover ml-auto flex h-9 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
-        >
-          <CirclePlus className="size-4" /> New Employee
-        </Link>
-      </div>
+      </SettingsPageHeader>
 
       <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
         <div className="min-w-[840px]">

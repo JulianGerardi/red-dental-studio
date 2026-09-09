@@ -1,0 +1,208 @@
+import { useMemo, useState } from 'react'
+import { Search, Plus, MoreVertical, Building2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { EmptyState } from '@/components/ui/empty-state'
+import { aviso } from '@/components/ui/toaster'
+import { Pagination } from '@/components/patients/ledger/Pagination'
+import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
+/* Settings → Accounts. Ver design-reference/figma/modulos/settings-accounts.md. */
+
+type EstadoCuenta = 'Active' | 'Draft' | 'Pending'
+
+const ESTADO_PILL: Record<EstadoCuenta, string> = {
+  Active: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
+  Draft: 'border-[#a1a1aa] bg-[#f5f5f5] text-[#595959]',
+  Pending: 'border-[#b45309] bg-[#fffbeb] text-[#b45309]',
+}
+
+type Cuenta = {
+  id: string
+  nombre: string
+  plan: string
+  suscripcion: string
+  vence: string
+  estadoSuscripcion: string
+  locaciones: number
+  empleados: number
+  licencias: string
+  duenos: string
+  estado: EstadoCuenta
+}
+
+/* El guion largo es el vacío del diseño: hay cuentas sin plan, sin dueño y
+   sin licencias, y se replican así en vez de inventarles un valor. */
+const CUENTAS: Cuenta[] = [
+  { id: 'c1', nombre: 'aasdasda', plan: 'testing betsy', suscripcion: 'BET', vence: '09/30/2026', estadoSuscripcion: 'ACTIVE', locaciones: 0, empleados: 0, licencias: '5', duenos: '—', estado: 'Active' },
+  { id: 'c2', nombre: 'alo com dieam', plan: '—', suscripcion: '—', vence: '', estadoSuscripcion: '', locaciones: 0, empleados: 0, licencias: '—', duenos: 'jojojo jojojo', estado: 'Draft' },
+  { id: 'c3', nombre: 'Betsy account', plan: 'Prueba Red', suscripcion: 'PBR', vence: '11/30/2026', estadoSuscripcion: 'ACTIVE', locaciones: 1, empleados: 2, licencias: '170', duenos: 'Betsy Owner owww', estado: 'Active' },
+  { id: 'c4', nombre: 'betsy test owner', plan: '—', suscripcion: '—', vence: '', estadoSuscripcion: '', locaciones: 0, empleados: 0, licencias: '—', duenos: 'bridge youandl', estado: 'Draft' },
+  { id: 'c5', nombre: 'bla bla bla', plan: '—', suscripcion: '—', vence: '', estadoSuscripcion: '', locaciones: 0, empleados: 0, licencias: '—', duenos: '—', estado: 'Draft' },
+  { id: 'c6', nombre: 'caba', plan: 'testing betsy', suscripcion: 'BET', vence: '07/31/2026', estadoSuscripcion: 'CANCELLED', locaciones: 0, empleados: 0, licencias: '5', duenos: '—', estado: 'Active' },
+  { id: 'c7', nombre: 'clinic 002', plan: 'Confidentally Basic Pack', suscripcion: 'CBP', vence: '11/28/2026', estadoSuscripcion: 'ACTIVE', locaciones: 0, empleados: 0, licencias: '3', duenos: '—', estado: 'Pending' },
+  { id: 'c8', nombre: 'clinic 003', plan: 'Confidentally Basic Pack', suscripcion: 'CBP', vence: '07/24/2027', estadoSuscripcion: 'ACTIVE', locaciones: 0, empleados: 0, licencias: '3', duenos: 'jonatan ale', estado: 'Pending' },
+  { id: 'c9', nombre: 'clinic007', plan: 'Prueba Red', suscripcion: 'PBR', vence: '01/31/2027', estadoSuscripcion: 'ACTIVE', locaciones: 1, empleados: 1, licencias: '170', duenos: 'juan quintero', estado: 'Active' },
+  { id: 'c10', nombre: 'Clinica de Abril', plan: 'Confidentally Premium Abril', suscripcion: 'ABR', vence: '08/07/2026', estadoSuscripcion: 'EXPIRED', locaciones: 0, empleados: 0, licencias: '12', duenos: 'Maria Viola', estado: 'Pending' },
+  { id: 'c11', nombre: 'Clinica Norte', plan: 'Prueba Red', suscripcion: 'PBR', vence: '02/28/2027', estadoSuscripcion: 'ACTIVE', locaciones: 2, empleados: 6, licencias: '40', duenos: 'Nadia Duarte', estado: 'Active' },
+  { id: 'c12', nombre: 'Consultorio Sur', plan: 'Confidentally Basic Pack', suscripcion: 'CBP', vence: '05/12/2027', estadoSuscripcion: 'ACTIVE', locaciones: 1, empleados: 3, licencias: '8', duenos: 'Elias Aguirre', estado: 'Pending' },
+]
+
+const FILTROS = ['All', 'Active', 'Draft', 'Pending'] as const
+
+const COLS = {
+  nombre: 'w-[120px] shrink-0',
+  plan: 'w-[130px] shrink-0',
+  suscripcion: 'w-[90px] shrink-0',
+  vence: 'w-[95px] shrink-0',
+  estadoSub: 'w-[110px] shrink-0',
+  locaciones: 'w-[80px] shrink-0',
+  empleados: 'w-[85px] shrink-0',
+  licencias: 'w-[75px] shrink-0',
+  duenos: 'min-w-[110px] flex-1',
+  estado: 'w-[85px] shrink-0',
+  acciones: 'w-[60px] shrink-0 text-right',
+}
+
+export function SettingsAccounts() {
+  const [q, setQ] = useState('')
+  const [filtro, setFiltro] = useState<(typeof FILTROS)[number]>('All')
+  const [porPagina, setPorPagina] = useState(10)
+  const [pagina, setPagina] = useState(1)
+
+  const filtradas = useMemo(
+    () => CUENTAS.filter(
+      (c) =>
+        (filtro === 'All' || c.estado === filtro) &&
+        `${c.nombre} ${c.plan} ${c.duenos}`.toLowerCase().includes(q.trim().toLowerCase()),
+    ),
+    [q, filtro],
+  )
+  const paginas = Math.max(1, Math.ceil(filtradas.length / porPagina))
+  const actual = Math.min(pagina, paginas)
+  const visibles = filtradas.slice((actual - 1) * porPagina, actual * porPagina)
+  const desde = filtradas.length === 0 ? 0 : (actual - 1) * porPagina + 1
+
+  return (
+    <div className="px-4 py-6 sm:px-8">
+      <SettingsPageHeader
+        titulo="Accounts overview"
+        bajada="View and manage all accounts across the platform."
+        accion={(
+          <button
+            type="button"
+            onClick={() => aviso.info('New account — coming soon.')}
+            className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 shrink-0 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
+          >
+            <Plus className="size-4" /> New Account
+          </button>
+        )}
+      >
+        <div className="relative min-w-0 flex-1 sm:max-w-[300px]">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+          <input
+            value={q}
+            onChange={(e) => { setQ(e.target.value); setPagina(1) }}
+            placeholder="Search..."
+            className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+          />
+        </div>
+        {/* El diseño trae un botón "Search" al lado del campo aunque el
+            filtrado ya corre mientras se tipea. Se replica, y hace foco. */}
+        <button
+          type="button"
+          onClick={() => setPagina(1)}
+          className="bg-dash-blue hover:bg-dash-blue-hover h-9 shrink-0 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
+        >
+          Search
+        </button>
+        <select
+          value={filtro}
+          onChange={(e) => { setFiltro(e.target.value as typeof filtro); setPagina(1) }}
+          aria-label="Filter by status"
+          className="focus:border-dash-blue h-9 shrink-0 rounded-md border border-[#e4e4e7] bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none"
+        >
+          {FILTROS.map((f) => <option key={f} value={f}>{f}</option>)}
+        </select>
+      </SettingsPageHeader>
+
+      <div className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+        <div className="min-w-[1080px]">
+          <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
+            <span className={COLS.nombre}>Name</span>
+            <span className={COLS.plan}>Plan</span>
+            <span className={COLS.suscripcion}>Subscription</span>
+            <span className={COLS.vence}>Expires on</span>
+            <span className={COLS.estadoSub}>Subscription Status</span>
+            <span className={COLS.locaciones}>Locations</span>
+            <span className={COLS.empleados}>Employees</span>
+            <span className={COLS.licencias}>Licenses</span>
+            <span className={COLS.duenos}>Owners</span>
+            <span className={COLS.estado}>Status</span>
+            <span className={COLS.acciones}>Actions</span>
+          </div>
+
+          {visibles.length === 0 ? (
+            <EmptyState icon={Building2} title="No accounts" detail="Nothing matches the current search or filter." />
+          ) : (
+            visibles.map((c) => (
+              <div key={c.id} className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]">
+                <span className={cn(COLS.nombre, 'truncate text-[#09090b]')} title={c.nombre}>{c.nombre}</span>
+                <span className={cn(COLS.plan, 'truncate font-medium text-[#09090b]')} title={c.plan}>{c.plan}</span>
+                <span className={COLS.suscripcion}>{c.suscripcion}</span>
+                <span className={COLS.vence}>{c.vence}</span>
+                <span className={COLS.estadoSub}>{c.estadoSuscripcion}</span>
+                <span className={COLS.locaciones}>{c.locaciones}</span>
+                <span className={COLS.empleados}>{c.empleados}</span>
+                <span className={COLS.licencias}>{c.licencias}</span>
+                <span className={cn(COLS.duenos, 'truncate')} title={c.duenos}>{c.duenos}</span>
+                <span className={COLS.estado}>
+                  <span className={cn('inline-flex rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', ESTADO_PILL[c.estado])}>
+                    {c.estado}
+                  </span>
+                </span>
+                <span className={cn(COLS.acciones, 'flex justify-end')}>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      aria-label={`Actions for ${c.nombre}`}
+                      className="flex size-7 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] hover:text-[#09090b]"
+                    >
+                      <MoreVertical className="size-4" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-[170px]">
+                      <DropdownMenuItem onSelect={() => aviso.info(`Editing ${c.nombre}.`)}>Edit account</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => aviso.info(`Licenses for ${c.nombre}.`)}>Manage licenses</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => aviso.warn(`${c.nombre} suspended.`)}>Suspend</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </span>
+              </div>
+            ))
+          )}
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
+            <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
+              Showing {desde} to {desde === 0 ? 0 : desde + visibles.length - 1} of {filtradas.length} results
+              {/* "Mostrar" en castellano en una pantalla en inglés: así viene
+                  en el diseño y el contenido se replica tal cual. */}
+              <span className="flex items-center gap-2 font-normal">
+                Mostrar:
+                <select
+                  value={porPagina}
+                  onChange={(e) => { setPorPagina(Number(e.target.value)); setPagina(1) }}
+                  aria-label="Rows per page"
+                  className="focus:border-dash-blue h-7 rounded-md border border-[#e4e4e7] bg-white px-2 text-[12px] focus:outline-none"
+                >
+                  {[10, 25, 50].map((n) => <option key={n} value={n}>{n}</option>)}
+                </select>
+              </span>
+            </span>
+            <Pagination pagina={actual} paginas={paginas} onChange={setPagina} />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
