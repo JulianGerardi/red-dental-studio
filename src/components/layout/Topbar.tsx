@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   PanelLeftOpen, PanelLeftClose, Search, BellDot, ChevronDown,
-  CircleUserRound, CreditCard, CircleHelp, Info, LogOut, X,
+  CircleUserRound, CreditCard, CircleHelp, Info, LogOut, EyeOff,
 } from 'lucide-react'
 import { LocationSelector } from './LocationSelector'
 import type { Notificacion } from '@/data/notificaciones'
@@ -32,13 +32,15 @@ export function Topbar({
   onToggleSidebar,
   showCommandHint = true,
   notificaciones = [],
-  onDescartarNotificacion,
+  ocultasDelBanner = [],
+  onVolverAlBanner,
 }: {
   expanded: boolean
   onToggleSidebar: () => void
   showCommandHint?: boolean
   notificaciones?: Notificacion[]
-  onDescartarNotificacion?: (id: string) => void
+  ocultasDelBanner?: string[]
+  onVolverAlBanner?: (id: string) => void
 }) {
   const ToggleIcon = expanded ? PanelLeftClose : PanelLeftOpen
 
@@ -81,7 +83,7 @@ export function Topbar({
         <GlobalSearch showCommandHint={showCommandHint} />
 
 
-        <Campana items={notificaciones} onDescartar={onDescartarNotificacion} />
+        <Campana items={notificaciones} ocultas={ocultasDelBanner} onVolverAlBanner={onVolverAlBanner} />
       </div>
 
       </div>
@@ -147,14 +149,15 @@ function MenuCuenta() {
   )
 }
 
-/* La campana aloja las mismas tareas que muestra el banner de arriba: es el
-   lugar donde van a parar, no una lista aparte. Sin pendientes queda la
-   campana sola, sin punto. */
+/* La campana es donde viven las tareas: acá están todas, incluidas las que
+   se sacaron del banner. Nada se borra desde acá -siguen pendientes hasta
+   que se completen-; lo que sí se puede es volver a ponerlas en el banner. */
 function Campana({
-  items, onDescartar,
+  items, ocultas, onVolverAlBanner,
 }: {
   items: Notificacion[]
-  onDescartar?: (id: string) => void
+  ocultas: string[]
+  onVolverAlBanner?: (id: string) => void
 }) {
   const navigate = useNavigate()
 
@@ -181,20 +184,23 @@ function Campana({
           <p className="px-2 py-6 text-center text-[13px] text-[#a1a1aa]">You&apos;re all caught up.</p>
         ) : (
           items.map((n) => (
-            <DropdownMenuItem key={n.id} onSelect={() => navigate(n.to)} className="items-start gap-2.5 py-2.5">
-              <n.icon className="text-dash-blue mt-0.5 size-4 shrink-0" />
+            /* Abrirla desde acá la devuelve al banner además de llevarte a
+               la tarea: vuelve al estado de siempre, sin nada escondido. */
+            <DropdownMenuItem
+              key={n.id}
+              onSelect={() => { onVolverAlBanner?.(n.id); navigate(n.to) }}
+              className="items-start gap-2.5 py-2.5"
+            >
+              <n.icon className="mt-0.5 size-4 shrink-0 text-[#b45309]" />
               <span className="min-w-0 flex-1">
                 <span className="block text-[13px] font-semibold text-[#09090b]">{n.titulo}</span>
                 <span className="block text-[12px] leading-snug text-[#71717a]">{n.detalle}</span>
+                {ocultas.includes(n.id) && (
+                  <span className="mt-1 flex items-center gap-1 text-[11px] font-medium text-[#a1a1aa]">
+                    <EyeOff className="size-3" /> Hidden from banner
+                  </span>
+                )}
               </span>
-              <button
-                type="button"
-                aria-label={`Dismiss: ${n.titulo}`}
-                onClick={(e) => { e.stopPropagation(); onDescartar?.(n.id) }}
-                className="mt-0.5 shrink-0 text-[#a1a1aa] hover:text-[#09090b]"
-              >
-                <X className="size-3.5" />
-              </button>
             </DropdownMenuItem>
           ))
         )}

@@ -7,12 +7,13 @@ import type { Notificacion } from '@/data/notificaciones'
    flechas ‹ › y el contador al medio; queda hasta que se descarta.
    Ver design-reference/figma/modulos/header-sidebar.md. */
 export function NotificationBanner({
-  items, cursor, onCursor, onDescartar,
+  items, cursor, onCursor, onOcultar,
 }: {
   items: Notificacion[]
   cursor: number
   onCursor: (i: number) => void
-  onDescartar: (id: string) => void
+  /** Saca la tarea del banner; sigue pendiente y sigue en la campana. */
+  onOcultar: (id: string) => void
 }) {
   if (items.length === 0) return null
   const actual = items[cursor]
@@ -68,8 +69,9 @@ export function NotificationBanner({
 
       <button
         type="button"
-        onClick={() => onDescartar(actual.id)}
-        aria-label={`Dismiss: ${actual.titulo}`}
+        onClick={() => onOcultar(actual.id)}
+        aria-label={`Hide from banner: ${actual.titulo}`}
+        title="Hide from banner — stays in notifications"
         className={cn('flex size-6 shrink-0 items-center justify-center rounded-md text-[#b45309]/70 hover:bg-white hover:text-[#b45309]')}
       >
         <X className="size-4" />

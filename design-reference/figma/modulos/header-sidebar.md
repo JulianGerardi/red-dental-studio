@@ -95,10 +95,22 @@ flechas ‹ › y el contador al medio. Probado tal cual lo describió:
 "1 of 2 · Document awaiting your signature" → siguiente → "2 of 2 · Referral
 expires today" → anterior → vuelve a la primera.
 
-**El cursor se recorta al descartar**, así nunca queda apuntando a algo que
-ya no existe: verificado parado en "2 of 2", descartando esa, y el banner
-pasa a mostrar la que queda en vez de vaciarse. Con una sola pendiente las
-flechas y el contador desaparecen -no hay entre qué moverse-.
+**El cursor se recorta al ocultar**, así nunca queda apuntando a algo que ya
+no se muestra: verificado parado en "2 of 2", ocultando esa, y el banner pasa
+a mostrar la que queda en vez de vaciarse. Con una sola pendiente las flechas
+y el contador desaparecen -no hay entre qué moverse-.
+
+**La X del banner no borra: oculta.** Corrección de Julián. La tarea sigue
+pendiente y sigue en la campana -borrarla de verdad sería dar por hecha una
+tarea que nadie completó-, así que la X sólo la saca del banner y avisa con
+un toast ("Moved to notifications"). Por eso el badge de la campana **no
+baja** al ocultar: verificado, queda en 2 con una sola en el banner.
+
+**Abrirla desde la campana la devuelve al banner**, además de llevar a la
+tarea: vuelve al estado de siempre, sin nada escondido. Mientras está oculta,
+la campana se lo dice con un "Hidden from banner" debajo del detalle. La
+campana ya no tiene X propia: no hay forma de borrar una tarea sin
+completarla, que es justo lo que Julián pidió.
 
 **La campana aloja las mismas**: no es una lista aparte. Lleva el número de
 pendientes como badge, las lista con su detalle, cada una se puede descartar
