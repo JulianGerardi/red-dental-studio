@@ -65,7 +65,7 @@ export function SettingsLocations() {
 
       <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
         <div className="min-w-[760px]">
-          <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
+          <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
             <span className="w-[180px]">Location name</span>
             <span className="w-[100px]">Employees</span>
             <span className="w-[80px]">Room</span>
@@ -88,7 +88,7 @@ export function SettingsLocations() {
             visibles.map((l) => (
               <div
                 key={l.id}
-                className="flex items-center gap-3 border-b border-[#e7e7e7] px-4 py-3 text-[13px] text-[#3f3f46] last:border-0"
+                className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]"
               >
                 {/* El nombre es el acceso, como en la tabla de pacientes. */}
                 <Link
@@ -115,7 +115,7 @@ export function SettingsLocations() {
           )}
 
           {visibles.length > 0 && (
-            <div className="flex h-[52px] items-center px-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
               <span className="text-xs font-semibold text-[#71717a]">
                 Showing {visibles.length} of {filas.length} locations
               </span>

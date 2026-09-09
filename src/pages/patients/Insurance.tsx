@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ChevronLeft, GripVertical, CirclePlus, Search, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
+import { Pagination } from '@/components/patients/ledger/Pagination'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { SelectField, DateTextField, TextArea, OptionCheckbox, FormFooter } from '@/components/patients/form'
 import {
@@ -145,7 +146,7 @@ export default function Insurance() {
           {/* Tabla de planes */}
           <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
             <div className="min-w-[960px]">
-              <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
+              <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
                 <span className={COLS.handle} />
                 <span className={COLS.order}>Order</span>
                 <span className={COLS.carrier}>Carrier</span>
@@ -165,7 +166,7 @@ export default function Insurance() {
                     key={p.id}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={() => soltar(i)}
-                    className="flex items-center gap-3 border-b border-[#e7e7e7] px-4 py-3 text-[13px] text-[#3f3f46] last:border-0"
+                    className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]"
                   >
                     <span
                       draggable
@@ -189,22 +190,14 @@ export default function Insurance() {
                 ))
               )}
 
-              {/* Dice 8 con cuatro filas a la vista: es del Figma. */}
-              <div className="flex h-[52px] items-center justify-between px-4">
-                <span className="text-xs font-semibold text-[#71717a]">Showing 8 of 8 insurances</span>
-                <div className="flex items-center gap-1">
-                  {['‹', '1', '2', '3', '›'].map((n) => (
-                    <button
-                      key={n}
-                      className={cn(
-                        'flex size-8 items-center justify-center rounded-md text-xs font-semibold',
-                        n === '1' ? 'bg-dash-blue text-white' : 'text-[#71717a] hover:bg-[#f4f4f5]',
-                      )}
-                    >
-                      {n}
-                    </button>
-                  ))}
-                </div>
+              {/* El Figma dice "8 of 8" con cuatro filas a la vista; el
+                  contador ahora cuenta las que hay. La paginación dibujada
+                  no tenía onClick: se usa el componente compartido. */}
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
+                <span className="text-xs font-semibold text-[#71717a]">
+                  Showing {visibles.length} of {visibles.length} insurances
+                </span>
+                <Pagination pagina={1} paginas={1} onChange={() => {}} />
               </div>
             </div>
           </div>

@@ -109,15 +109,6 @@ export function SettingsAccounts() {
             className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
           />
         </div>
-        {/* El diseño trae un botón "Search" al lado del campo aunque el
-            filtrado ya corre mientras se tipea. Se replica, y hace foco. */}
-        <button
-          type="button"
-          onClick={() => setPagina(1)}
-          className="bg-dash-blue hover:bg-dash-blue-hover h-9 shrink-0 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
-        >
-          Search
-        </button>
         <select
           value={filtro}
           onChange={(e) => { setFiltro(e.target.value as typeof filtro); setPagina(1) }}
