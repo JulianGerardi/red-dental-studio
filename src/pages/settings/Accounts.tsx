@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Search, Plus, MoreVertical, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
+import { SearchButton } from '@/components/ui/search-button'
 import { aviso } from '@/components/ui/toaster'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
@@ -109,6 +110,7 @@ export function SettingsAccounts() {
             className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
           />
         </div>
+        <SearchButton onClick={() => setPagina(1)} className="h-9" />
         <select
           value={filtro}
           onChange={(e) => { setFiltro(e.target.value as typeof filtro); setPagina(1) }}

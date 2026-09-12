@@ -2,29 +2,12 @@ import { useMemo, useState } from 'react'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
+import { SearchButton } from '@/components/ui/search-button'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 
 /* Settings → Ledger. Figma 4293:57917.
    Ver design-reference/figma/modulos/settings-ledger.md. */
-
-const PILL = {
-  insurance: 'border-[#6633a6] bg-[#f5f0ff] text-[#6633a6]',
-  patient: 'border-[#174596] bg-[#f0f5ff] text-[#174596]',
-  credit: 'border-[#6633a6] bg-[#f5f0ff] text-[#6633a6]',
-  charge: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
-  produccion: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  colecciones: 'border-[#b45309] bg-[#fffbeb] text-[#b45309]',
-  activo: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-}
-
-function Pill({ tono, children }: { tono: string; children: React.ReactNode }) {
-  return (
-    <span className={cn('inline-flex rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', tono)}>
-      {children}
-    </span>
-  )
-}
 
 function Switch({ on, onChange, label }: { on: boolean; onChange: () => void; label: string }) {
   return (
@@ -127,23 +110,6 @@ export function SettingsLedgerOptions() {
         /* La bajada del frame es la de Locations, copiada tal cual. Se
            replica: el contenido va como está. */
         bajada="Set your location name. Add the location you need."
-        accion={(
-          <div className="flex w-fit shrink-0 items-center gap-1 rounded-lg bg-[#f1f5f9] p-1">
-            {TABS.map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => cambiarTab(t)}
-                className={cn(
-                  'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-                  tab === t ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
-                )}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-        )}
       >
         <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
@@ -156,6 +122,15 @@ export function SettingsLedgerOptions() {
             className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
           />
         </div>
+        <SearchButton onClick={() => setPagina(1)} className="h-9" />
+        <select
+          value={tab}
+          onChange={(e) => cambiarTab(e.target.value as Tab)}
+          aria-label="View"
+          className="focus:border-dash-blue h-9 shrink-0 rounded-md border border-[#e4e4e7] bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none"
+        >
+          {TABS.map((t) => <option key={t} value={t}>{t}</option>)}
+        </select>
       </SettingsPageHeader>
 
       <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-[#f1f5f9] p-1">
@@ -204,15 +179,9 @@ export function SettingsLedgerOptions() {
               <div key={a.id} className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]">
                 <span className="w-[160px] shrink-0 truncate text-[#09090b]" title={a.tipo}>{a.tipo}</span>
                 <span className="min-w-[180px] flex-1 truncate" title={a.descripcion}>{a.descripcion}</span>
-                <span className="w-[100px] shrink-0">
-                  <Pill tono={a.categoria === 'Insurance' ? PILL.insurance : PILL.patient}>{a.categoria}</Pill>
-                </span>
-                <span className="w-[90px] shrink-0">
-                  <Pill tono={a.direccion === 'Credit' ? PILL.credit : PILL.charge}>{a.direccion}</Pill>
-                </span>
-                <span className="w-[100px] shrink-0">
-                  <Pill tono={a.impacto === 'Production' ? PILL.produccion : PILL.colecciones}>{a.impacto}</Pill>
-                </span>
+                <span className="w-[100px] shrink-0 truncate">{a.categoria}</span>
+                <span className="w-[90px] shrink-0 truncate">{a.direccion}</span>
+                <span className="w-[100px] shrink-0 truncate">{a.impacto}</span>
                 <span className="flex w-[70px] shrink-0 justify-end">
                   <Switch on={!apagados.includes(a.id)} onChange={() => alternar(a.id)} label={`Enable ${a.tipo}`} />
                 </span>
@@ -222,12 +191,8 @@ export function SettingsLedgerOptions() {
             (visibles as Metodo[]).map((m) => (
               <div key={m.id} className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]">
                 <span className="min-w-[200px] flex-1 truncate text-[#09090b]" title={m.nombre}>{m.nombre}</span>
-                <span className="w-[110px] shrink-0">
-                  <Pill tono={m.tipo === 'Insurance' ? PILL.insurance : PILL.patient}>{m.tipo}</Pill>
-                </span>
-                <span className="w-[90px] shrink-0">
-                  <Pill tono={PILL.activo}>Active</Pill>
-                </span>
+                <span className="w-[110px] shrink-0 truncate">{m.tipo}</span>
+                <span className="w-[90px] shrink-0 truncate">Active</span>
                 <span className="flex w-[70px] shrink-0 justify-end">
                   <Switch on={!apagados.includes(m.id)} onChange={() => alternar(m.id)} label={`Enable ${m.nombre}`} />
                 </span>

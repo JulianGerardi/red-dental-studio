@@ -93,3 +93,13 @@ Dos cosas que aparecieron al hacerlo:
 Estaba replicado del diseño pero Julián lo marcó como redundante: el filtrado
 ya corre mientras se tipea, así que el botón no hacía nada que el campo no
 hiciera solo. Queda el campo.
+
+## El botón "Search" vuelve, y a más pantallas (2026-09-12)
+
+Julián pidió que el botón volviera "al lado del search para los inputs de
+search que están al inicio de las tablas", nombrando **Patient, Accounts,
+Locations, Employee, Ledger**. Vuelve como `SearchButton`
+(`src/components/ui/search-button.tsx`), compartido entre las cinco: en
+Accounts y en el buscador de Transactions del Ledger de paciente repite el
+`onClick={() => setPagina(1)}` original; en Locations, Employees y Patients
+-que no paginan- hace foco en el campo en vez de no hacer nada.

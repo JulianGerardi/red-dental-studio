@@ -34,3 +34,20 @@ Method Type · Status · Actions.
 5. El sidebar del frame trae ítems que no existían en `SETTINGS_NAV`
    -Accounts, Insurance setting, Ledger-. Se agregaron Accounts y Ledger, que
    son los que Julián pidió; "Insurance setting" queda pendiente.
+
+## Tabs → select, pastillas → texto (2026-09-12)
+
+Dos pedidos de Julián, los dos se apartan del frame a propósito:
+
+1. *"en vez de tabs pondría los filtros como tenemos en accounts"*: el par de
+   tabs **Adjustments Types / Payment Method** -que elegían qué tabla se
+   mostraba, no filtraban una lista- deja el slot `accion` del header y se
+   convierte en un `<select>` con el mismo estilo que el filtro de estado de
+   Accounts, ahora en la fila del buscador junto al `SearchButton`. La tira de
+   filtros de abajo (All · Charge · Credit... / All · Patient · Insurance) no
+   cambia: son filtros de la tabla, no la vista.
+2. *"las pills que van en ledger settings... no lo haría en forma de pill sino
+   en forma de texto, así no queda colorido"*: se sacan `Pill` y el mapa
+   `PILL` de colores por categoría; Category, Direction, Impact, Method Type y
+   Status se muestran como texto plano (`text-[#3f3f46]`), igual que cualquier
+   otra celda de la tabla.

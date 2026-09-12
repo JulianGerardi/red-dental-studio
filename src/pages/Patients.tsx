@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, Search, Plus } from 'lucide-react'
 import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTable'
 import { usePatients } from '@/data/patientsStore'
 import { PageTitle } from '@/components/ui/page-title'
+import { SearchButton } from '@/components/ui/search-button'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
 
 
@@ -16,6 +17,7 @@ export default function Patients() {
   const [query, setQuery] = useState('')
   const [modal, setModal] = useState<'new' | null>(null)
   const [editando, setEditando] = useState<PatientRow | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const rows = useMemo(
     () => patients.filter((r) => r.name.toLowerCase().includes(query.toLowerCase())),
@@ -24,33 +26,22 @@ export default function Patients() {
 
   return (
     <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
-      {/* Page Header: título+search a la izquierda, botón alineado abajo a la
-          derecha. En angosto el botón baja debajo del bloque de título. */}
-      <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
-        <div className="flex w-full flex-col gap-[15px] sm:w-[320px] sm:shrink-0">
-          {/* Era un <button> sin acción. Ahora es el mismo link que en el
-              resto de las pantallas del módulo. */}
-          <Link to="/patients" className="flex items-center gap-1 self-start text-sm text-[#0056ef]">
-            Patients <ChevronDown className="size-[15px]" />
-          </Link>
+      {/* Era un <button> sin acción. Ahora es el mismo link que en el
+          resto de las pantallas del módulo. */}
+      <Link to="/patients" className="flex items-center gap-1 self-start text-sm text-[#0056ef]">
+        Patients <ChevronDown className="size-[15px]" />
+      </Link>
 
-          <div className="flex flex-col gap-[9px]">
-            <PageTitle>Patients</PageTitle>
-            {/* Copy de locación en una pantalla de pacientes: es del Figma. */}
-            <p className="text-xs leading-[17px] text-[#a3a3a3]">
-              Set your location name. Add the location you need.
-            </p>
-          </div>
-
-          <div className="relative" data-tour="pat-search">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by Name or Last Name"
-              className="focus:border-dash-blue h-8 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
-            />
-          </div>
+      {/* Misma disposición que el resto de las listas: el botón principal va
+          en la fila del título -antes quedaba abajo, al lado del buscador- y
+          la búsqueda pasa a su propia fila. */}
+      <div className="mt-[15px] flex flex-wrap items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-[9px]">
+          <PageTitle>Patients</PageTitle>
+          {/* Copy de locación en una pantalla de pacientes: es del Figma. */}
+          <p className="text-xs leading-[17px] text-[#a3a3a3]">
+            Set your location name. Add the location you need.
+          </p>
         </div>
 
         <button
@@ -61,6 +52,20 @@ export default function Patients() {
         >
           <Plus className="size-3.5" /> New Patient
         </button>
+      </div>
+
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <div className="relative w-full sm:w-[320px]" data-tour="pat-search">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by Name or Last Name"
+            className="focus:border-dash-blue h-8 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+          />
+        </div>
+        <SearchButton onClick={() => inputRef.current?.focus()} className="h-8" />
       </div>
 
       <div className="mt-4">
