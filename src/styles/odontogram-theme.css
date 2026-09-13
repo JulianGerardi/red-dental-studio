@@ -1,0 +1,173 @@
+/* Ajustes propios encima del CSS acotado de react-advanced-odontogram.
+   El paquete se tematiza con los `--odon-*` (eso va en OdontogramEmbed), pero
+   la forma -radios, tipografía, alturas, el header de su demo- no sale de
+   variables: eso se corrige acá.
+
+   Se importa DESPUÉS de odontogram-scoped.css para poder pisarlo. */
+
+/* La librería trae el header de su propia demo -marca, idioma, modo oscuro,
+   GitHub-. Adentro de una ficha clínica no va: la app ya tiene su header. */
+.odonto-embed .topbar {
+  display: none;
+}
+
+/* Pedido de Julián: fuera la columna de controles entera (Controls,
+   Statuses, Tooth details, Orthodontics, Caries, Diagnoses) y el resumen
+   "Tooth information". Empujaban el gráfico fuera de pantalla y obligaban a
+   scrollear para verlo. El alta de hallazgos y procedimientos ya vive en el
+   panel de Findings y en "New Procedure", así que acá el odontograma queda
+   como lo que se mira, no como un formulario. */
+.odonto-embed .panel,
+.odonto-embed .tooth-info {
+  display: none;
+}
+
+/* Su layout es de app a pantalla completa; acá vive en un panel. */
+.odonto-embed .layout {
+  padding: 0;
+  gap: 12px;
+}
+
+.odonto-embed {
+  font-family: inherit;
+  background: transparent;
+}
+
+/* La librería apila su chart y sus controles recién abajo de 1100px de
+   viewport, pero acá el que manda es el ancho del panel -el listado de
+   findings ya se come 300-, así que el chart quedaba en 325px y con scroll.
+   Se apila siempre: `main.layout` gana por especificidad sin !important. */
+.odonto-embed main.layout {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Radios, bordes y tipografía del sistema. */
+.odonto-embed .card,
+.odonto-embed .chart,
+.odonto-embed .panel {
+  border-radius: 12px;
+  border: 1px solid #e4e4e7;
+  box-shadow: none;
+}
+
+.odonto-embed .btn,
+.odonto-embed .btn-sm,
+.odonto-embed .chart-mode-btn {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.odonto-embed .btn-ghost {
+  background: #fff;
+  border: 1px solid #e4e4e7;
+}
+
+.odonto-embed .btn-ghost:hover {
+  background: #fafafa;
+}
+
+/* El azul de la app para los estados activos, en vez del suyo. */
+.odonto-embed .chart-mode-btn.is-active,
+.odonto-embed .btn-toggle[aria-pressed='true'] {
+  background: #1d56bc;
+  color: #fff;
+}
+
+.odonto-embed .chart-title,
+.odonto-embed .card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #09090b;
+}
+
+.odonto-embed .chart-hint,
+.odonto-embed .panel-subtitle {
+  font-size: 12px;
+  color: #71717a;
+}
+
+
+/* Los selects venían con la pastilla celeste de la librería. */
+.odonto-embed select {
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid #e4e4e7;
+  background-color: #fff;
+  color: #09090b;
+  font-weight: 400;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.odonto-embed select:focus {
+  outline: none;
+  border-color: #1d56bc;
+}
+
+/* Los segmentados de la librería (tabs Odontogram/Periodontal y el par
+   Status/Plan) no coincidían entre sí ni con los del resto de la app: unos
+   con radio 6 y otros 8, y el inactivo en su gris. Se igualan al segmentado
+   que ya usan Billing y el Ledger: caja #f1f5f9 con radio 8 y pastillas de
+   radio 6. */
+.odonto-embed .chart-mode-toggle {
+  background: #f1f5f9;
+  border: 0;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.odonto-embed .chart-mode-btn {
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.odonto-embed .chart-mode-btn:hover {
+  background: transparent;
+  color: #3f3f46;
+}
+
+.odonto-embed .chart-mode-btn.is-active,
+.odonto-embed .chart-mode-btn.is-active:hover {
+  background: #1d56bc;
+  color: #fff;
+}
+
+/* Los cinco toggles de vista del chart venían con radio 8 y fondo lavanda. */
+.odonto-embed .btn-icon,
+.odonto-embed .chart-actions button {
+  border-radius: 6px;
+}
+
+.odonto-embed .btn.btn-toggle.btn-icon[aria-pressed='true'] {
+  background: #f0f5ff;
+  border: 1px solid #1d56bc;
+  color: #1d56bc;
+}
+
+.odonto-embed .btn.btn-toggle.btn-icon[aria-pressed='false'] {
+  background: #fff;
+  border: 1px solid #e4e4e7;
+}
+
+/* "Diagnoses" es un botón suelto, no una tab: que lea como los secundarios
+   de la app y no como una tab más. */
+.odonto-embed .perio-launch-bar .btn {
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #e4e4e7;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  color: #3f3f46;
+}
+
+.odonto-embed .perio-launch-bar .btn:hover {
+  background: #fafafa;
+}

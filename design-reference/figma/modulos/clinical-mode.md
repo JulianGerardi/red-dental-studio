@@ -637,3 +637,60 @@ detalle, y pintar superficies sigue viviendo adentro de "New Procedure" con
 su propia rueda. La referencia edita el diente desde un panel lateral
 permanente; acá eso chocaría con el panel de Findings que ya ocupa esa
 columna.
+
+## Corrección: se usa la librería real, no una reinterpretación (2026-09-13)
+
+La sección de arriba describe un odontograma dibujado a mano imitando la
+referencia. **Julián lo rechazó dos veces**: *"sigue mal, no podés
+simplemente tomar el repositorio de github y pegar eso... es justamente eso
+lo que quiero, que esté igual a lo que te pasé pero con la estética de
+nuestro sistema"*. O sea: la librería de verdad, no una versión propia
+parecida.
+
+Ahora DentAssmt monta **`react-advanced-odontogram`** (MIT, (c) Zoltán Dul,
+`ZoliQua/React-Odontogram-Modul`) vía npm, envuelto en
+`src/components/clinical/OdontogramEmbed.tsx`.
+
+Tres cosas que hubo que resolver para que conviva con esta app:
+
+1. **Su CSS es el de una app entera, no el de un componente**: trae `*`,
+   `html, body` y clases genéricas (`.btn`, `.card`, `.title`, `.pill`).
+   Importado tal cual pisaba media app. `scripts/scope-odontogram-css.mjs`
+   (postcss, `npm run odontogram:css`) reescribe los 650 selectores
+   acotándolos a `.odonto-embed` y genera `src/styles/odontogram-scoped.css`,
+   que es lo que se importa. Verificado que Billing, Patients y Dashboard
+   quedan intactos.
+2. **La paleta** sale de los `--odon-*` que la librería expone por
+   `themeConfig`, mapeados a los tokens de la app (azul `#1d56bc`, borde
+   `#e4e4e7`, texto `#09090b`). Lo que no sale de variables -radios,
+   tipografía, el header de su demo con marca/idioma/GitHub, los selects con
+   pastilla celeste- se corrige en `src/styles/odontogram-theme.css`.
+3. **Su layout responde al viewport, no al contenedor**: apila chart y
+   controles recién abajo de 1100px de viewport, así que en nuestro panel
+   -que es más angosto que la ventana- el chart quedaba en 325px con scroll.
+   Se fuerza `display:flex; flex-direction:column` en `main.layout`.
+
+**Qué se sacó, por pedido de Julián**: *"toda la parte de Controls, Status,
+Tooth details, Orthodontics, Caries, Diagnoses, sacala, y sacá la Tooth
+information: me dificulta estar scrolleando y no ver el gráfico"*. Esa
+columna y el resumen de texto empujaban el odontograma fuera de pantalla
+-la página medía 2269px de alto-. Ocultos los dos, el examen entero entra en
+una pantalla (906px) y el gráfico se ve completo, que es para lo que está.
+Cargar hallazgos y procedimientos sigue viviendo donde ya vivía: el panel de
+Findings y el wizard de "New Procedure".
+
+También se perdió el modal "Details for Tooth N#" propio: la librería maneja
+la interacción con la pieza. El panel de Findings, New Procedure y la firma
+de revisión del exam **no cambiaron**.
+
+**Detalle que costó encontrar**: `themeConfig` aplica los `--odon-*` sobre
+el nodo interno de la librería, pero el CSS acotado los lee en
+`.odonto-embed` -el wrapper, que está más arriba-, así que las variables no
+llegaban y quedaban los colores de fábrica. Se declaran también como estilo
+inline del wrapper. Los segmentados (tabs y Status/Plan) además no
+coincidían entre sí -radio 6 contra 8- ni con los de Billing/Ledger: se
+igualan en `odontogram-theme.css`.
+
+**Costo**: el bundle pasa de ~1 MB a ~5,4 MB (la librería arrastra jsPDF,
+html2canvas y fuentes Noto para el export en PDF). El artifact de una sola
+página sigue entrando en el límite de 16 MB, pero conviene tenerlo presente.

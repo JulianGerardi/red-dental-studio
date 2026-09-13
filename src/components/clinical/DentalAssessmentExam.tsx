@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { Plus, FilePlus, Table2, Calendar, Check, X, ArrowUpRight, RotateCw } from 'lucide-react'
+import { Plus, FilePlus, Table2, X, ArrowUpRight, RotateCw } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { ModalShell, SelectField, TextArea, FormFooter } from '@/components/patients/form'
-import { Odontogram } from '@/components/clinical/Odontogram'
-import { makeMockExam } from '@/data/odontogram'
+import { OdontogramEmbed } from '@/components/clinical/OdontogramEmbed'
 import { ExamPanelHeader } from './dental/ExamPanelHeader'
 import { ReviewList, type ExamReview } from './dental/ReviewList'
 import { ReviewExamDialog } from './dental/ReviewExamDialog'
@@ -63,65 +62,6 @@ function DentitionCard({ onPick, onDismiss }: { onPick: (d: 'permanent' | 'prima
   )
 }
 
-function ToothDetailModal({
-  tooth, entries, onClose, onNotes, onAddProcedure,
-}: {
-  tooth: number | null
-  entries: Finding[]
-  onClose: () => void
-  onNotes: (id: string, notes: string) => void
-  onAddProcedure: () => void
-}) {
-  if (tooth === null) return null
-  return (
-    <ModalShell
-      title={`Details for Tooth ${tooth}#`}
-      onClose={onClose}
-      width="max-w-[480px]"
-      footer={
-        <>
-          <button type="button" onClick={onClose} className="flex h-9 items-center gap-1.5 rounded-md border border-[#e4e4e7] bg-white px-6 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]">
-            <X className="size-3" /> Close
-          </button>
-          <button type="button" onClick={onAddProcedure} className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-6 text-[13px] font-medium whitespace-nowrap text-white">
-            <Plus className="size-3" /> New Procedure
-          </button>
-        </>
-      }
-    >
-      <div className="flex max-h-[50vh] flex-col gap-3 overflow-y-auto">
-        {entries.length ? (
-          entries.map((h) => {
-            const style = STATUS_STYLE[h.status]
-            return (
-              <div key={h.id} className={`flex flex-col gap-2 rounded-md border-l-[3px] bg-white p-3 shadow-sm ${style.rail}`}>
-                <div className="flex w-full items-center justify-between gap-2">
-                  <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${style.badge}`}>
-                    {style.good ? <Check className="size-2.5" strokeWidth={3} /> : <X className="size-2.5" />}
-                    {h.status}
-                  </span>
-                  <span className="text-dash-blue flex items-center gap-1 text-[10px] font-semibold">
-                    <Calendar className="size-2.5" /> {h.date}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-0.5 text-xs">
-                  <p className="text-[#09090b]">provider: <span className="text-[#71717a]">{h.provider}</span></p>
-                  <p className="text-[#09090b]">Condition: <span className="text-[#71717a]">{h.condition}</span></p>
-                  <p className="text-[#09090b]">Surface: <span className="text-[#71717a]">{h.surfaces.join(', ') || '—'}</span></p>
-                </div>
-                <TextArea label="Notes" value={h.notes} onChange={(v) => onNotes(h.id, v)} placeholder="Document questions, answers, clarifications, or additional notes" />
-              </div>
-            )
-          })
-        ) : (
-          <div className="bg-dash-count-bg flex flex-col items-center justify-center gap-1 rounded-xl px-6 py-16 text-center">
-            <p className="text-dash-blue text-xs font-medium">No entries available for this tooth.</p>
-          </div>
-        )}
-      </div>
-    </ModalShell>
-  )
-}
 
 function NewDocumentDialog({ open, onClose, onSave }: { open: boolean; onClose: () => void; onSave: (type: string) => void }) {
   const [type, setType] = useState(DOCUMENT_TYPES[0])
@@ -139,12 +79,10 @@ function NewDocumentDialog({ open, onClose, onSave }: { open: boolean; onClose: 
 
 export function DentalAssessmentExam() {
   const [findings, setFindings] = useState<Finding[]>(INITIAL_FINDINGS)
-  const [exam, setExam] = useState(makeMockExam)
   /* El chart sólo aparece una vez elegida la dentición. */
   const [dentition, setDentition] = useState<'permanent' | 'primary' | null>(null)
   const [dentitionCardOpen, setDentitionCardOpen] = useState(true)
   const [dentitionPrompt, setDentitionPrompt] = useState<null | 'procedure' | 'table'>(null)
-  const [selectedTooth, setSelectedTooth] = useState<number | null>(null)
   const [procedureFor, setProcedureFor] = useState<number | null>(null)
   const [procedureOpen, setProcedureOpen] = useState(false)
   const [editing, setEditing] = useState<Finding | null>(null)
@@ -207,17 +145,16 @@ export function DentalAssessmentExam() {
   function resolveDentition(d: 'permanent' | 'primary') {
     const next = dentitionPrompt
     setDentition(d)
-    setExam((e) => ({ ...e, temporary: d === 'primary' }))
     setDentitionPrompt(null)
     if (next === 'procedure') setProcedureOpen(true)
     if (next === 'table') setView('table')
   }
 
   return (
-    <div className="flex w-full flex-col gap-4 lg:h-[calc(100vh-260px)] lg:min-h-[420px] lg:flex-row lg:items-stretch">
-      <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-xl border border-[#e4e4e7] bg-white p-4 lg:order-1 lg:w-[336px]">
+    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-start">
+      <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-xl border border-[#e4e4e7] bg-white p-4 lg:order-1 lg:w-[300px]">
         <ExamPanelHeader tab={reviewState.tab} onTabChange={reviewState.setTab} onNewReview={reviewState.openDialog} />
-        <div className="flex w-full flex-col gap-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+        <div className="flex w-full flex-col gap-3 lg:max-h-[70vh] lg:overflow-y-auto">
           {reviewState.tab === 'Findings' ? (
             findings.map((f) => (
               <FindingCard
@@ -231,7 +168,7 @@ export function DentalAssessmentExam() {
         </div>
       </div>
 
-      <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-auto rounded-xl border border-[#e4e4e7] p-4 lg:order-2" style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fbfefc' }}>
+      <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-[#e4e4e7] p-4 lg:order-2 lg:pr-20" style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fbfefc' }}>
         {dentition && view === 'table' ? (
           <div className="w-full overflow-x-auto rounded-lg border border-[#e4e4e7] bg-white">
             <div className="min-w-[720px]">
@@ -261,13 +198,7 @@ export function DentalAssessmentExam() {
             </div>
           </div>
         ) : dentition ? (
-          <Odontogram
-            exam={exam}
-            selected={selectedTooth !== null ? [selectedTooth] : []}
-            onToggle={(n) => setSelectedTooth(n)}
-            onSurface={(n) => setSelectedTooth(n)}
-            findings={findings}
-          />
+          <OdontogramEmbed />
         ) : (
           <div className="flex w-full max-w-[560px] flex-col items-center gap-4 self-center">
             <div className="flex w-full items-center justify-between gap-3 rounded-lg bg-white px-4 py-3 shadow-sm">
@@ -313,13 +244,6 @@ export function DentalAssessmentExam() {
         </div>
       </div>
 
-      <ToothDetailModal
-        tooth={selectedTooth}
-        entries={findings.filter((f) => f.tooth === selectedTooth)}
-        onClose={() => setSelectedTooth(null)}
-        onNotes={(id, notes) => setFindings((all) => all.map((f) => (f.id === id ? { ...f, notes } : f)))}
-        onAddProcedure={() => { const tooth = selectedTooth; setSelectedTooth(null); openProcedure(tooth) }}
-      />
 
       <NewProcedureModal
         open={procedureOpen}
