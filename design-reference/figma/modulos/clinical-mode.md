@@ -670,14 +670,22 @@ Tres cosas que hubo que resolver para que conviva con esta app:
    -que es más angosto que la ventana- el chart quedaba en 325px con scroll.
    Se fuerza `display:flex; flex-direction:column` en `main.layout`.
 
-**Qué se sacó, por pedido de Julián**: *"toda la parte de Controls, Status,
-Tooth details, Orthodontics, Caries, Diagnoses, sacala, y sacá la Tooth
-information: me dificulta estar scrolleando y no ver el gráfico"*. Esa
-columna y el resumen de texto empujaban el odontograma fuera de pantalla
--la página medía 2269px de alto-. Ocultos los dos, el examen entero entra en
-una pantalla (906px) y el gráfico se ve completo, que es para lo que está.
-Cargar hallazgos y procedimientos sigue viviendo donde ya vivía: el panel de
-Findings y el wizard de "New Procedure".
+**Los controles al costado, no debajo**. Primero se ocultaron -Julián:
+*"me dificulta estar scrolleando y no ver el gráfico"*- pero enseguida
+aclaró que no iban eliminados: *"sin eso cómo le agrego al diente que tiene
+caries o algún sangrado"*. Son justamente el formulario con el que se marca
+la pieza, así que tienen que verse **al mismo tiempo** que el gráfico:
+
+- `main.layout` vuelve a ser la grilla de la librería (chart + panel de
+  340), pero decidida por **container query** sobre el ancho del panel del
+  examen, no por media query sobre la ventana -ese fue el error de la
+  primera vuelta: la librería apila recién abajo de 1100px de *viewport*, y
+  acá lo que manda es el contenedor-.
+- El **chart queda sticky** y la **columna de controles también**, con su
+  propio scroll: se puede bajar a leer "Tooth information" sin perder de
+  vista ni el odontograma ni los controles.
+- El listado de Findings de la izquierda se **pliega** con un botón, para
+  liberar los 300px que esa columna necesita en pantallas de 1440.
 
 También se perdió el modal "Details for Tooth N#" propio: la librería maneja
 la interacción con la pieza. El panel de Findings, New Procedure y la firma

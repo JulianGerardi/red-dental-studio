@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Plus, FilePlus, Table2, X, ArrowUpRight, RotateCw } from 'lucide-react'
+import { Plus, FilePlus, Table2, X, ArrowUpRight, RotateCw, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { ModalShell, SelectField, TextArea, FormFooter } from '@/components/patients/form'
 import { OdontogramEmbed } from '@/components/clinical/OdontogramEmbed'
@@ -89,6 +90,9 @@ export function DentalAssessmentExam() {
   const [confirming, setConfirming] = useState<{ action: Exclude<FindingAction, 'edit'>; finding: Finding } | null>(null)
   const [documentOpen, setDocumentOpen] = useState(false)
   const [view, setView] = useState<'chart' | 'table'>('chart')
+  /* El odontograma y su columna de controles necesitan el ancho: el
+     listado se puede plegar sin perderlo de vista. */
+  const [panelAbierto, setPanelAbierto] = useState(true)
   const reviewState = useExamReviews(INITIAL_REVIEWS, HOY)
 
   function openProcedure(tooth: number | null) {
@@ -152,20 +156,37 @@ export function DentalAssessmentExam() {
 
   return (
     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-start">
-      <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-xl border border-[#e4e4e7] bg-white p-4 lg:order-1 lg:w-[300px]">
-        <ExamPanelHeader tab={reviewState.tab} onTabChange={reviewState.setTab} onNewReview={reviewState.openDialog} />
-        <div className="flex w-full flex-col gap-3 lg:max-h-[70vh] lg:overflow-y-auto">
-          {reviewState.tab === 'Findings' ? (
-            findings.map((f) => (
-              <FindingCard
-                key={f.id} finding={f}
-                action={<FindingActionsMenu finding={f} onEdit={() => setEditing(f)} onAction={(action) => setConfirming({ action, finding: f })} />}
-              />
-            ))
-          ) : (
-            <ReviewList reviews={reviewState.reviews} />
-          )}
-        </div>
+      <div className={cn(
+        'order-2 flex w-full shrink-0 flex-col gap-3 rounded-xl border border-[#e4e4e7] bg-white p-3 lg:order-1',
+        panelAbierto ? 'lg:w-[300px]' : 'lg:w-[52px]',
+      )}>
+        <button
+          type="button"
+          onClick={() => setPanelAbierto((v) => !v)}
+          aria-expanded={panelAbierto}
+          title={panelAbierto ? 'Collapse findings' : 'Expand findings'}
+          className="flex size-7 shrink-0 items-center justify-center self-end rounded-md text-[#71717a] hover:bg-[#f4f4f5]"
+        >
+          {panelAbierto ? <PanelLeftClose className="size-4" /> : <PanelLeftOpen className="size-4" />}
+        </button>
+
+        {panelAbierto && (
+          <>
+            <ExamPanelHeader tab={reviewState.tab} onTabChange={reviewState.setTab} onNewReview={reviewState.openDialog} />
+            <div className="flex w-full flex-col gap-3 lg:max-h-[70vh] lg:overflow-y-auto">
+              {reviewState.tab === 'Findings' ? (
+                findings.map((f) => (
+                  <FindingCard
+                    key={f.id} finding={f}
+                    action={<FindingActionsMenu finding={f} onEdit={() => setEditing(f)} onAction={(action) => setConfirming({ action, finding: f })} />}
+                  />
+                ))
+              ) : (
+                <ReviewList reviews={reviewState.reviews} />
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-[#e4e4e7] p-4 lg:order-2 lg:pr-20" style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fbfefc' }}>

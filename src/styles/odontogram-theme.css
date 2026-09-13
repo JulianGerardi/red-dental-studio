@@ -11,15 +11,39 @@
   display: none;
 }
 
-/* Pedido de Julián: fuera la columna de controles entera (Controls,
-   Statuses, Tooth details, Orthodontics, Caries, Diagnoses) y el resumen
-   "Tooth information". Empujaban el gráfico fuera de pantalla y obligaban a
-   scrollear para verlo. El alta de hallazgos y procedimientos ya vive en el
-   panel de Findings y en "New Procedure", así que acá el odontograma queda
-   como lo que se mira, no como un formulario. */
-.odonto-embed .panel,
-.odonto-embed .tooth-info {
-  display: none;
+/* Controls, Statuses, Tooth details, Orthodontics, Caries, Diagnoses y el
+   resumen "Tooth information" van al costado, no debajo: son con lo que se
+   le marca caries o sangrado a una pieza, así que tienen que estar a la
+   vista **al mismo tiempo** que el gráfico. El chart queda pegado arriba
+   (sticky) y esa columna scrollea sola. */
+.odonto-embed main.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+/* Container query, no media query: lo que decide es el ancho del panel del
+   examen, no el de la ventana -ese fue el error de la primera vuelta-. */
+@container (min-width: 1080px) {
+  .odonto-embed main.layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+
+  /* La columna de controles se queda pegada y scrollea sola: así se puede
+     leer "Tooth information" -que va debajo del chart- sin perder de vista
+     ni el gráfico ni los controles con los que se marca la pieza. */
+  .odonto-embed .panel {
+    position: sticky;
+    top: 4px;
+    max-height: calc(100vh - 190px);
+    overflow-y: auto;
+  }
+}
+
+/* El gráfico no se pierde de vista mientras se usa la columna de al lado. */
+.odonto-embed .chart {
+  position: sticky;
+  top: 4px;
 }
 
 /* Su layout es de app a pantalla completa; acá vive en un panel. */
@@ -31,15 +55,8 @@
 .odonto-embed {
   font-family: inherit;
   background: transparent;
-}
-
-/* La librería apila su chart y sus controles recién abajo de 1100px de
-   viewport, pero acá el que manda es el ancho del panel -el listado de
-   findings ya se come 300-, así que el chart quedaba en 325px y con scroll.
-   Se apila siempre: `main.layout` gana por especificidad sin !important. */
-.odonto-embed main.layout {
-  display: flex;
-  flex-direction: column;
+  /* Habilita las container queries de abajo. */
+  container-type: inline-size;
 }
 
 /* Radios, bordes y tipografía del sistema. */
