@@ -702,3 +702,27 @@ igualan en `odontogram-theme.css`.
 **Costo**: el bundle pasa de ~1 MB a ~5,4 MB (la librería arrastra jsPDF,
 html2canvas y fuentes Noto para el export en PDF). El artifact de una sola
 página sigue entrando en el límite de 16 MB, pero conviene tenerlo presente.
+
+## Los controles, en un flotante paso a paso (2026-09-13)
+
+Idea de Julián, después de probar la columna al costado: *"toda la parte de
+Controls, Status lo haría estilo carrusel, entonces vas paso por paso y queda
+todo más chico, y podemos agregarle un ícono flotante más donde estén estas
+funcionalidades... de esta manera vemos todo el gráfico"*.
+
+Cómo quedó:
+
+- Un **FAB más** en la columna del examen -un chevron, no un "+"- abre y
+  cierra el panel. El "+" sigue siendo New Procedure.
+- El panel es **flotante** y muestra **una sección por vez**: Controls,
+  Statuses, Tooth details, Orthodontics, Caries, Fillings, Root and
+  periodontium, Diagnoses y Tooth information. Nueve pasos, con
+  anterior/siguiente y el contador en la barra de abajo.
+- Se puede **minimizar**: queda sólo la barra y el odontograma se ve entero
+  sin perder en qué paso estabas.
+- Las secciones son nodos que dibuja la librería, así que se descubren del
+  DOM y se muestran/ocultan por índice. Un `MutationObserver` las vuelve a
+  leer porque la librería monta y desmonta cards según la pieza activa
+  -Orthodontics sólo aparece en piezas elegibles-. Los títulos salen de
+  `.card-title` **sacando los botones de adentro**: si no, el paso se llama
+  "Statuses−" o "Tooth detailsReset".

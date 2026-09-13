@@ -12,51 +12,57 @@
 }
 
 /* Controls, Statuses, Tooth details, Orthodontics, Caries, Diagnoses y el
-   resumen "Tooth information" van al costado, no debajo: son con lo que se
-   le marca caries o sangrado a una pieza, así que tienen que estar a la
-   vista **al mismo tiempo** que el gráfico. El chart queda pegado arriba
-   (sticky) y esa columna scrollea sola. */
+   resumen "Tooth information" no van ni debajo ni al costado: van en un
+   panel **flotante** que abre un FAB del examen y que se recorre de a un
+   paso (idea de Julián). Así el odontograma se ve entero siempre y el panel
+   ocupa lo mínimo. El paso visible lo decide OdontogramEmbed. */
 .odonto-embed main.layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  align-items: start;
 }
 
-/* Container query, no media query: lo que decide es el ancho del panel del
-   examen, no el de la ventana -ese fue el error de la primera vuelta-. */
-@container (min-width: 1080px) {
-  .odonto-embed main.layout {
-    grid-template-columns: minmax(0, 1fr) 340px;
-  }
-
-  /* La columna de controles se queda pegada y scrollea sola: así se puede
-     leer "Tooth information" -que va debajo del chart- sin perder de vista
-     ni el gráfico ni los controles con los que se marca la pieza. */
-  .odonto-embed .panel {
-    position: sticky;
-    top: 4px;
-    max-height: calc(100vh - 190px);
-    overflow-y: auto;
-  }
+.odonto-embed .panel,
+.odonto-embed .tooth-info {
+  display: none;
 }
 
-/* El gráfico no se pierde de vista mientras se usa la columna de al lado. */
-.odonto-embed .chart {
-  position: sticky;
-  top: 4px;
+/* Las dos cajas comparten geometría: como sólo una está visible por vez,
+   nunca se pisan, y la barra de pasos -que es nuestra y va aparte- calza
+   justo abajo. `right: 88px` deja libre la columna de FABs. */
+.odonto-embed.controles-abiertos .panel,
+.odonto-embed.controles-abiertos .tooth-info {
+  display: block;
+  position: fixed;
+  right: 88px;
+  bottom: 72px;
+  z-index: 45;
+  width: 340px;
+  max-height: min(52vh, 430px);
+  overflow-y: auto;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px 12px 0 0;
+  background: #fff;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.14);
 }
 
-/* Su layout es de app a pantalla completa; acá vive en un panel. */
-.odonto-embed .layout {
+/* El resumen se muestra solo, sin la cabecera de selección de la librería. */
+.odonto-embed.controles-abiertos.en-resumen .panel {
+  display: none;
+}
+
+/* Adentro del flotante las cards no repiten borde ni sombra. */
+.odonto-embed.controles-abiertos .panel .card {
+  border: 0;
+  box-shadow: none;
   padding: 0;
-  gap: 12px;
 }
 
-.odonto-embed {
-  font-family: inherit;
-  background: transparent;
-  /* Habilita las container queries de abajo. */
-  container-type: inline-size;
+.odonto-embed.controles-abiertos .panel-header {
+  padding: 0 0 8px;
+  border-bottom: 1px solid #f1f1f4;
+  margin-bottom: 8px;
 }
 
 /* Radios, bordes y tipografía del sistema. */
@@ -187,4 +193,39 @@
 
 .odonto-embed .perio-launch-bar .btn:hover {
   background: #fafafa;
+}
+
+/* Tipografía y color del sistema adentro del flotante: la librería usa su
+   propia escala y sus grises. */
+.odonto-embed.controles-abiertos .panel .card-title,
+.odonto-embed.controles-abiertos .tooth-info .card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #09090b;
+}
+
+.odonto-embed.controles-abiertos .panel label,
+.odonto-embed.controles-abiertos .panel .row > span,
+.odonto-embed.controles-abiertos .panel .panel-subtitle {
+  font-size: 12px;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .panel select,
+.odonto-embed.controles-abiertos .panel .btn {
+  font-size: 12px;
+}
+
+.odonto-embed.controles-abiertos .tooth-info,
+.odonto-embed.controles-abiertos .tooth-info p,
+.odonto-embed.controles-abiertos .tooth-info td,
+.odonto-embed.controles-abiertos .tooth-info th {
+  font-size: 12px;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .tooth-info-overview {
+  font-size: 13px;
+  font-weight: 600;
+  color: #09090b;
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, FilePlus, Table2, X, ArrowUpRight, RotateCw, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Plus, FilePlus, Table2, X, ArrowUpRight, RotateCw, PanelLeftClose, PanelLeftOpen, ChevronUp, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { ModalShell, SelectField, TextArea, FormFooter } from '@/components/patients/form'
@@ -90,9 +90,10 @@ export function DentalAssessmentExam() {
   const [confirming, setConfirming] = useState<{ action: Exclude<FindingAction, 'edit'>; finding: Finding } | null>(null)
   const [documentOpen, setDocumentOpen] = useState(false)
   const [view, setView] = useState<'chart' | 'table'>('chart')
-  /* El odontograma y su columna de controles necesitan el ancho: el
-     listado se puede plegar sin perderlo de vista. */
+  /* El listado se puede plegar para darle todo el ancho al odontograma. */
   const [panelAbierto, setPanelAbierto] = useState(true)
+  /* Los controles del odontograma salen en un flotante, no en columna. */
+  const [controlesAbiertos, setControlesAbiertos] = useState(false)
   const reviewState = useExamReviews(INITIAL_REVIEWS, HOY)
 
   function openProcedure(tooth: number | null) {
@@ -219,7 +220,7 @@ export function DentalAssessmentExam() {
             </div>
           </div>
         ) : dentition ? (
-          <OdontogramEmbed />
+          <OdontogramEmbed controlesAbiertos={controlesAbiertos} onCerrarControles={() => setControlesAbiertos(false)} />
         ) : (
           <div className="flex w-full max-w-[560px] flex-col items-center gap-4 self-center">
             <div className="flex w-full items-center justify-between gap-3 rounded-lg bg-white px-4 py-3 shadow-sm">
@@ -254,6 +255,13 @@ export function DentalAssessmentExam() {
           </button>
           <button type="button" aria-label="New document" onClick={() => setDocumentOpen(true)} className="flex size-11 items-center justify-center rounded-full border border-[#e4e4e7] bg-white text-[#09090b] shadow-md hover:bg-[#fafafa]">
             <FilePlus className="size-4" />
+          </button>
+          <button
+            type="button" aria-label="Tooth controls" aria-pressed={controlesAbiertos}
+            onClick={() => setControlesAbiertos((v) => !v)}
+            className={`flex size-11 items-center justify-center rounded-full shadow-md ${controlesAbiertos ? 'bg-dash-blue text-white' : 'border border-[#e4e4e7] bg-white text-[#09090b] hover:bg-[#fafafa]'}`}
+          >
+            {controlesAbiertos ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
           </button>
           <button
             type="button" aria-label={view === 'table' ? 'View chart' : 'View table'} aria-pressed={view === 'table'}
