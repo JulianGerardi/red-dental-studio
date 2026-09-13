@@ -231,7 +231,7 @@ export function DentalAssessmentExam() {
         </div>
       </div>
 
-      <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-y-auto rounded-xl border border-[#e4e4e7] p-4 lg:order-2" style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fbfefc' }}>
+      <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-auto rounded-xl border border-[#e4e4e7] p-4 lg:order-2" style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fbfefc' }}>
         {dentition && view === 'table' ? (
           <div className="w-full overflow-x-auto rounded-lg border border-[#e4e4e7] bg-white">
             <div className="min-w-[720px]">
@@ -266,6 +266,7 @@ export function DentalAssessmentExam() {
             selected={selectedTooth !== null ? [selectedTooth] : []}
             onToggle={(n) => setSelectedTooth(n)}
             onSurface={(n) => setSelectedTooth(n)}
+            findings={findings}
           />
         ) : (
           <div className="flex w-full max-w-[560px] flex-col items-center gap-4 self-center">

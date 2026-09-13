@@ -588,3 +588,52 @@ módulo que se porte de acá en más): el contenedor de cada pantalla del
 original no se copia tal cual. Se mapea primero a lo que ya existe acá
 -página propia, tabs, `ModalShell` o `Dialog`- y recién ahí se escribe el
 componente.
+
+## Odontograma con estilo propio (2026-09-13)
+
+Julián pasó como referencia **react-advanced-odontogram**
+(`ZoliQua/React-Odontogram-Modul`, demo en react-odontogram-modul.vercel.app):
+*"necesito que el dentall assestment sea como el que te pase pero adecuado a
+nuestro estilo"*. No se instala el paquete ni se copia su código -es un
+módulo npm genérico, con su propia paleta, numeración FDI y un montón de
+features que acá no van-; se reimplementa lo que define visualmente a ese
+odontograma, con nuestros tonos y sobre nuestro modelo de datos.
+
+**Lo que se portó** (`src/components/clinical/dental/ToothGlyph.tsx`):
+
+1. **Dos vistas por pieza**, que es lo que más distingue a la referencia de
+   la grilla abstracta que teníamos: la **anatómica** -corona, encía, raíces
+   y conductos- y la **oclusal** con las superficies. La anatómica se dibuja
+   en este orden: raíces, encía encima del arranque, corona al frente. Sin
+   ese orden las raíces flotan sobre el rosa y los molares leen como orejas
+   de conejo -pasó en las dos primeras vueltas-.
+2. **Forma por tipo de pieza**, deducida de la posición en la arcada
+   (1-3 y 14-16 molares · 4-5 y 12-13 premolares · 6 y 11 caninos · 7-10
+   incisivos): el molar lleva una masa de raíz bifurcada, el canino la raíz
+   más larga, el incisivo la corona en cincel.
+3. **El número de la pieza codifica su estado**, como el "bold blue /
+   bold italic red" de la referencia, pero calculado con **nuestros propios
+   estados de Finding**: rojo si hay uno sin resolver
+   (Active/Monitoring/In Treatment), azul si tiene alguno cerrado, gris si
+   no tiene nada. El esmalte lleva el mismo tinte, muy suave.
+4. **La vista oclusal con esquinas en diagonal**, el patrón clásico del
+   odontograma. La referencia parte la mesa en 5 (M/D/B/L/O); acá se
+   respetan las **7 superficies que ya modela `odontogram.ts`**
+   (MB · B · DB / O / ML · L · DL), así que cada banda va partida en tres y
+   la mesa oclusal ocupa el ancho completo.
+
+**Lo que no se portó, y por qué**: el modelo **Status/Plan de dos capas con
+diff** duplica lo que ya hace el flujo de Findings y procedimientos de esta
+app; la **carta periodontal** completa es un módulo clínico aparte, no una
+feature del gráfico; **dentición primaria/mixta**, el generador de prótesis
+("Upper 12-22 zirconia"), **export FHIR/JSON**, multi-idioma y el tour
+guiado son features de un paquete npm genérico, no de una clínica con su
+propio backend. La **selección múltiple** y los toggles de visibilidad
+(ocultar oclusal, muelas del juicio, hueso, pulpa) quedan pendientes: son
+baratos y suman, pero no son el gráfico.
+
+**El flujo de interacción no cambió**: clickear una pieza sigue abriendo su
+detalle, y pintar superficies sigue viviendo adentro de "New Procedure" con
+su propia rueda. La referencia edita el diente desde un panel lateral
+permanente; acá eso chocaría con el panel de Findings que ya ocupa esa
+columna.
