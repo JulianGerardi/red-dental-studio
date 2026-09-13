@@ -249,7 +249,7 @@ export function DentalAssessmentExam() {
           </>
         )}
 
-        <div className="absolute right-4 bottom-4 flex flex-col gap-2">
+        <div className="fixed right-6 bottom-6 z-40 flex flex-col gap-2">
           <button type="button" aria-label="New procedure" onClick={() => openProcedure(null)} className="bg-dash-blue hover:bg-dash-blue-hover flex size-11 items-center justify-center rounded-full text-white shadow-md">
             <Plus className="size-4" />
           </button>

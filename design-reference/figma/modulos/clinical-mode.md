@@ -735,3 +735,20 @@ Cómo quedó:
   -Orthodontics sólo aparece en piezas elegibles-. Los títulos salen de
   `.card-title` **sacando los botones de adentro**: si no, el paso se llama
   "Statuses−" o "Tooth detailsReset".
+
+### Ajustes del panel (2026-09-13, misma vuelta)
+
+- **Los FAB no se mueven**: estaban `absolute` contra la card del examen, así
+  que subían y bajaban al abrir o cerrar el panel. Pasan a `fixed`.
+- **Las filas van en varias columnas** (`repeat(auto-fit, minmax(300px,1fr))`
+  sobre la card): apiladas de a una dejaban media card vacía y obligaban a
+  scrollear. Los selectores de superficie y las tiras de checkboxes siguen
+  ocupando la fila entera.
+- **Las filas sin contenido se colapsan**. La librería deja en el DOM filas
+  que quedan vacías según la pieza activa; en una grilla seguían ocupando su
+  celda. `OdontogramEmbed` mide el alto real y les pone `.odonto-vacio`,
+  limpiando la marca antes de cada medición para que reaparezcan cuando
+  vuelven a tener contenido. De 14 hijos pasan a 5 visibles en Tooth details.
+- **Cuidado con el `display` inline del carrusel**: al paso activo hay que
+  *sacarle* la propiedad, no ponerle `block`. Con `block` se pisaba el `grid`
+  de la card y las filas volvían a apilarse -costó encontrarlo-.

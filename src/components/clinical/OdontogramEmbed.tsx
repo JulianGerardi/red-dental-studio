@@ -98,21 +98,47 @@ export function OdontogramEmbed({
     )
   }, [])
 
+  /* Varias filas de la librería quedan sin contenido según la pieza
+     activa: siguen ocupando su celda de la grilla y dejaban la card llena
+     de huecos. Se miden y se colapsan; primero se limpia la marca para que
+     una fila que vuelve a tener contenido reaparezca. */
+  const colapsarVacias = useCallback((nodo: HTMLElement) => {
+    const hijos = [...nodo.children] as HTMLElement[]
+    hijos.forEach((h) => h.classList.remove('odonto-vacio'))
+    requestAnimationFrame(() => {
+      hijos.forEach((h) => {
+        if (h.clientHeight === 0 && getComputedStyle(h).display !== 'none') h.classList.add('odonto-vacio')
+      })
+    })
+  }, [])
+
   useEffect(() => {
     const raiz = ref.current
     if (!raiz) return
     releer()
-    const observer = new MutationObserver(releer)
+    const observer = new MutationObserver(() => {
+      releer()
+      const visible = [...raiz.querySelectorAll<HTMLElement>('.panel-body > .card, .panel-body > div > .card')]
+        .find((c) => c.style.display !== 'none')
+      if (visible) colapsarVacias(visible)
+    })
     observer.observe(raiz, { childList: true, subtree: true })
     return () => observer.disconnect()
-  }, [releer])
+  }, [releer, colapsarVacias])
 
   /* Un solo paso a la vez: es lo que mantiene el panel chico. */
   useEffect(() => {
     pasos.forEach(({ nodo }, i) => {
-      nodo.style.display = controlesAbiertos && !minimizado && i === paso ? 'block' : 'none'
+      /* El activo se deja sin `display` inline: si no, el `block` pisa el
+         `grid` con el que la card acomoda sus filas en varias columnas. */
+      if (controlesAbiertos && !minimizado && i === paso) {
+        nodo.style.removeProperty('display')
+        colapsarVacias(nodo)
+      } else {
+        nodo.style.display = 'none'
+      }
     })
-  }, [pasos, paso, controlesAbiertos, minimizado])
+  }, [pasos, paso, controlesAbiertos, minimizado, colapsarVacias])
 
   useEffect(() => {
     if (pasos.length > 0 && paso > pasos.length - 1) setPaso(0)

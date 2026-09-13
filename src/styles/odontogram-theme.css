@@ -40,7 +40,7 @@
   max-width: none;
   margin: 12px 0 0;
   padding: 14px;
-  max-height: 300px;
+  max-height: 340px;
   overflow-y: auto;
   border: 1px solid #e4e4e7;
   border-radius: 12px 12px 0 0;
@@ -48,11 +48,29 @@
   background: #fff;
 }
 
-/* Adentro del flotante las cards no repiten borde ni sombra. */
+/* Adentro del panel las cards no repiten borde ni sombra, y sus filas van
+   en varias columnas: apiladas de a una dejaban media card vacía a la
+   derecha y obligaban a scrollear. */
 .odonto-embed.controles-abiertos .panel .card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  align-content: start;
+  gap: 10px 24px;
   border: 0;
   box-shadow: none;
   padding: 0;
+}
+
+.odonto-embed.controles-abiertos .panel .card > .card-title {
+  grid-column: 1 / -1;
+}
+
+/* Lo que no es un par label+control -selectores de superficie, tiras de
+   checkboxes- ocupa la fila entera: partido en columnas queda ilegible. */
+.odonto-embed.controles-abiertos .panel .card > .row:not(:has(> select)),
+.odonto-embed.controles-abiertos .panel .card > .surface-grid,
+.odonto-embed.controles-abiertos .panel .card > .inline-checks {
+  grid-column: 1 / -1;
 }
 
 .odonto-embed.controles-abiertos .panel-header {
@@ -230,11 +248,28 @@
    una grilla con la columna de label fija los alinea. */
 .odonto-embed.controles-abiertos .panel .row:has(> select) {
   display: grid;
-  grid-template-columns: 132px minmax(0, 360px);
+  grid-template-columns: 124px minmax(0, 1fr);
   align-items: center;
   gap: 10px;
 }
 
 .odonto-embed.controles-abiertos .panel .row:has(> select) > select {
   width: 100%;
+}
+
+/* Filas que quedan sin contenido según la pieza activa: sin esto ocupan su
+   celda de la grilla y llenan la card de huecos. La marca la pone
+   OdontogramEmbed midiendo el alto real, y se limpia en cada cambio. */
+.odonto-embed .odonto-vacio {
+  display: none;
+}
+
+/* El panel de la librería está pensado para ocupar el alto de su columna;
+   acá va debajo del gráfico y tiene que medir lo que mide su contenido. */
+.odonto-embed.controles-abiertos .panel,
+.odonto-embed.controles-abiertos .panel-body,
+.odonto-embed.controles-abiertos .panel-header {
+  min-height: 0;
+  height: auto;
+  flex: none;
 }
