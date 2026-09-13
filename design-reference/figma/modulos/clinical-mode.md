@@ -714,12 +714,21 @@ Cómo quedó:
 
 - Un **FAB más** en la columna del examen -un chevron, no un "+"- abre y
   cierra el panel. El "+" sigue siendo New Procedure.
-- El panel es **flotante** y muestra **una sección por vez**: Controls,
+- El panel va **debajo del gráfico, en el flujo**, no flotando encima:
+  flotando tapaba justo lo que se está mirando. Muestra **una sección por
+  vez**: Controls,
   Statuses, Tooth details, Orthodontics, Caries, Fillings, Root and
   periodontium, Diagnoses y Tooth information. Nueve pasos, con
   anterior/siguiente y el contador en la barra de abajo.
 - Se puede **minimizar**: queda sólo la barra y el odontograma se ve entero
   sin perder en qué paso estabas.
+- Las filas de la librería son `<div class="row"><span>Label</span><select>`,
+  y como cada label mide distinto los selects arrancaban en distinta x. Se
+  alinean con una grilla de columna fija (`:has(> select)`), con el control
+  acotado a 360 para que no se estire a todo el ancho.
+- `main.layout` va en **flex column**: con `grid-template-columns: 1fr` el
+  panel se iba igual a una columna implícita y terminaba al costado,
+  apretando el chart. Pasó dos veces, queda anotado.
 - Las secciones son nodos que dibuja la librería, así que se descubren del
   DOM y se muestran/ocultan por índice. Un `MutationObserver` las vuelve a
   leer porque la librería monta y desmonta cards según la pieza activa

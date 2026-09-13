@@ -137,8 +137,8 @@ export function OdontogramEmbed({
 
       {controlesAbiertos && pasos.length > 0 && (
         <div className={cn(
-          'fixed right-[88px] bottom-6 z-50 flex h-12 w-[340px] items-center justify-between gap-1 border border-[#e4e4e7] bg-white px-2 shadow-[0_12px_32px_rgb(0_0_0/0.14)]',
-          minimizado ? 'rounded-xl' : 'rounded-b-xl border-t-0',
+          'flex h-12 w-full items-center justify-between gap-1 border border-[#e4e4e7] bg-white px-2',
+          minimizado ? 'mt-3 rounded-xl' : 'rounded-b-xl border-t-0',
         )}>
           <button
             type="button"

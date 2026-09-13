@@ -16,9 +16,11 @@
    panel **flotante** que abre un FAB del examen y que se recorre de a un
    paso (idea de Julián). Así el odontograma se ve entero siempre y el panel
    ocupa lo mínimo. El paso visible lo decide OdontogramEmbed. */
+/* Flex y no grid: con `grid-template-columns: 1fr` el panel se iba igual a
+   una columna implícita y terminaba al costado, apretando el chart. */
 .odonto-embed main.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
 }
 
 .odonto-embed .panel,
@@ -26,30 +28,24 @@
   display: none;
 }
 
-/* Las dos cajas comparten geometría: como sólo una está visible por vez,
-   nunca se pisan, y la barra de pasos -que es nuestra y va aparte- calza
-   justo abajo. `right: 88px` deja libre la columna de FABs. */
+/* El panel va **debajo del gráfico**, en el flujo, no encima: flotando
+   sobre el chart tapaba justo lo que se está mirando (pedido de Julián).
+   Como sólo se ve un paso por vez, ocupa poco. Las dos cajas -el panel de
+   la librería y el resumen- comparten estilo porque nunca se muestran
+   juntas. */
 .odonto-embed.controles-abiertos .panel,
 .odonto-embed.controles-abiertos .tooth-info {
   display: block;
-  position: fixed;
-  right: 88px;
-  bottom: 72px;
-  z-index: 45;
-  width: 340px;
-  max-height: min(52vh, 430px);
+  width: 100%;
+  max-width: none;
+  margin: 12px 0 0;
+  padding: 14px;
+  max-height: 300px;
   overflow-y: auto;
-  margin: 0;
-  padding: 12px;
   border: 1px solid #e4e4e7;
   border-radius: 12px 12px 0 0;
+  border-bottom: 0;
   background: #fff;
-  box-shadow: 0 12px 32px rgb(0 0 0 / 0.14);
-}
-
-/* El resumen se muestra solo, sin la cabecera de selección de la librería. */
-.odonto-embed.controles-abiertos.en-resumen .panel {
-  display: none;
 }
 
 /* Adentro del flotante las cards no repiten borde ni sombra. */
@@ -228,4 +224,17 @@
   font-size: 13px;
   font-weight: 600;
   color: #09090b;
+}
+
+/* Los selects arrancaban en distinta x porque cada label mide distinto:
+   una grilla con la columna de label fija los alinea. */
+.odonto-embed.controles-abiertos .panel .row:has(> select) {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 360px);
+  align-items: center;
+  gap: 10px;
+}
+
+.odonto-embed.controles-abiertos .panel .row:has(> select) > select {
+  width: 100%;
 }

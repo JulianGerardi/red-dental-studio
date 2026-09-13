@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, FilePlus, Table2, X, ArrowUpRight, RotateCw, PanelLeftClose, PanelLeftOpen, ChevronUp, ChevronDown } from 'lucide-react'
+import { Plus, FilePlus, Table2, X, ArrowUpRight, RotateCw, PanelLeftClose, PanelLeftOpen, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { ModalShell, SelectField, TextArea, FormFooter } from '@/components/patients/form'
@@ -261,7 +261,7 @@ export function DentalAssessmentExam() {
             onClick={() => setControlesAbiertos((v) => !v)}
             className={`flex size-11 items-center justify-center rounded-full shadow-md ${controlesAbiertos ? 'bg-dash-blue text-white' : 'border border-[#e4e4e7] bg-white text-[#09090b] hover:bg-[#fafafa]'}`}
           >
-            {controlesAbiertos ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
+            <SlidersHorizontal className="size-4" />
           </button>
           <button
             type="button" aria-label={view === 'table' ? 'View chart' : 'View table'} aria-pressed={view === 'table'}
