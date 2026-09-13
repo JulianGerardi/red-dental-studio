@@ -190,7 +190,7 @@ export function DentalAssessmentExam() {
         )}
       </div>
 
-      <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-[#e4e4e7] p-4 lg:order-2 lg:pr-20" style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fbfefc' }}>
+      <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-[#e4e4e7] p-4 lg:order-2 lg:pr-20" data-examen style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fbfefc' }}>
         {dentition && view === 'table' ? (
           <div className="w-full overflow-x-auto rounded-lg border border-[#e4e4e7] bg-white">
             <div className="min-w-[720px]">
@@ -249,7 +249,12 @@ export function DentalAssessmentExam() {
           </>
         )}
 
-        <div className="fixed right-6 bottom-6 z-40 flex flex-col gap-2">
+        <div
+          className="absolute right-4 z-30 flex flex-col gap-2"
+          /* Pegada al pie del gráfico: así no se mueve cuando el panel de
+             controles se abre debajo y estira la card. */
+          style={{ top: 'calc(var(--odonto-chart-fin, 620px) - 196px)' }}
+        >
           <button type="button" aria-label="New procedure" onClick={() => openProcedure(null)} className="bg-dash-blue hover:bg-dash-blue-hover flex size-11 items-center justify-center rounded-full text-white shadow-md">
             <Plus className="size-4" />
           </button>

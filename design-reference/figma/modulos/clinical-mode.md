@@ -738,8 +738,15 @@ Cómo quedó:
 
 ### Ajustes del panel (2026-09-13, misma vuelta)
 
-- **Los FAB no se mueven**: estaban `absolute` contra la card del examen, así
-  que subían y bajaban al abrir o cerrar el panel. Pasan a `fixed`.
+- **Los FAB no se mueven y siguen donde estaban**: anclados al pie de la
+  card subían y bajaban al abrir el panel, y llevados a `fixed` se iban al
+  borde de la ventana. Ahora `OdontogramEmbed` publica el pie del **gráfico**
+  como `--odonto-chart-fin` (ResizeObserver sobre `.chart`) y la botonera se
+  posiciona contra esa variable: medido, queda a 486px del tope de la card
+  con el panel cerrado, abierto y minimizado.
+- **Las cards de abajo van en blanco**, no con el verde del fondo punteado
+  del examen: la librería las pinta con su propio `--card` y sobre ese fondo
+  quedaban verdosas.
 - **Las filas van en varias columnas** (`repeat(auto-fit, minmax(300px,1fr))`
   sobre la card): apiladas de a una dejaban media card vacía y obligaban a
   scrollear. Los selectores de superficie y las tiras de checkboxes siguen

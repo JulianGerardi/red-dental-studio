@@ -45,6 +45,19 @@
   border: 1px solid #e4e4e7;
   border-radius: 12px 12px 0 0;
   border-bottom: 0;
+  /* Blanco, no el verde del fondo punteado del examen. */
+  background: #fff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+/* Todo lo de adentro también en blanco: la librería pinta sus cards con su
+   propio `--card` y sobre el fondo del examen quedaba verdoso. */
+.odonto-embed.controles-abiertos .panel,
+.odonto-embed.controles-abiertos .panel-body,
+.odonto-embed.controles-abiertos .panel-header,
+.odonto-embed.controles-abiertos .panel .card,
+.odonto-embed.controles-abiertos .tooth-info,
+.odonto-embed.controles-abiertos .tooth-info .card {
   background: #fff;
 }
 
