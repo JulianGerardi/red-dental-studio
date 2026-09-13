@@ -759,3 +759,25 @@ Cómo quedó:
 - **Cuidado con el `display` inline del carrusel**: al paso activo hay que
   *sacarle* la propiedad, no ponerle `block`. Con `block` se pisaba el `grid`
   de la card y las filas volvían a apilarse -costó encontrarlo-.
+
+### Rediseño del panel (2026-09-13, comentario en el artifact)
+
+Julián comentó sobre el `aside` de controles: *"se ve mal y no está alineado
+a nuestra plataforma, hacerlo mejor, mantené la lógica, sólo enfocate en el
+diseño"*. Sólo CSS, ningún id ni handler de la librería tocado:
+
+- **Cabecera de card**: título a la izquierda y acciones a la derecha con una
+  línea debajo. El botón de plegar flotaba suelto contra el borde.
+- **Botones** (Reset, Reset mouth, Primary dentition, OK...) con el
+  secundario de la app: 28-32px, borde `#e4e4e7`, radio 6, texto 12/500.
+- **Campos**: label 12/500 en `#09090b` como `FieldLabel`, y selects e
+  inputs a 36px con nuestro borde, radio y sombra.
+- **Tiras de checkboxes y toggles** como pastillas, con el azul de la app
+  para el estado activo.
+- **Tabla del resumen** con la cabecera gris del resto de las tablas, sin el
+  celeste de la librería y sin cursivas.
+- Los grupos que no son par label+control (`status-actions`,
+  `status-extra-row`, `select-actions`) van a lo ancho y en línea: repartidos
+  en las columnas de la grilla partían "Add: [select] OK" en dos renglones.
+  **Ojo con la especificidad**: hay que nombrarlos `.row.status-extra-row`,
+  porque si no gana `.row:has(> select)`, que suma la del argumento.

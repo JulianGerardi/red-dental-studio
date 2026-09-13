@@ -286,3 +286,170 @@
   height: auto;
   flex: none;
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Rediseño del panel de controles (pedido por comentario en el artifact:
+   "se ve mal y no está alineado a nuestra plataforma"). Sólo diseño: la
+   lógica y los ids de la librería quedan intactos.
+   ───────────────────────────────────────────────────────────────────── */
+
+/* Cabecera de cada card: título a la izquierda, acciones a la derecha y una
+   línea. Antes el botón de plegar flotaba suelto contra el borde. */
+.odonto-embed.controles-abiertos .panel .card > .card-title,
+.odonto-embed.controles-abiertos .tooth-info > .card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 4px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid #f1f1f4;
+  font-size: 13px;
+  font-weight: 700;
+  color: #09090b;
+}
+
+/* Los botones de la cabecera, como los secundarios de la app. */
+.odonto-embed.controles-abiertos .panel .card-title .btn,
+.odonto-embed.controles-abiertos .panel .card-title .icon-btn {
+  height: 28px;
+  min-width: 28px;
+  padding: 0 10px;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .panel .card-title .btn:hover,
+.odonto-embed.controles-abiertos .panel .card-title .icon-btn:hover {
+  background: #fafafa;
+}
+
+/* Label de campo: mismo peso y color que `FieldLabel` del resto de la app. */
+.odonto-embed.controles-abiertos .panel .row > span:first-child {
+  font-size: 12px;
+  font-weight: 500;
+  color: #09090b;
+}
+
+/* Controles: la altura y el borde de nuestros inputs. */
+.odonto-embed.controles-abiertos .panel select,
+.odonto-embed.controles-abiertos .panel input[type='text'],
+.odonto-embed.controles-abiertos .panel input[type='number'] {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  font-size: 13px;
+  color: #09090b;
+}
+
+/* Tiras de checkboxes y toggles: pastillas, no botones sueltos. */
+.odonto-embed.controles-abiertos .panel .inline-checks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.odonto-embed.controles-abiertos .panel .inline-checks label,
+.odonto-embed.controles-abiertos .panel .btn-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .panel .btn-toggle[aria-pressed='true'] {
+  border-color: #1d56bc;
+  background: #f0f5ff;
+  color: #1d56bc;
+}
+
+/* Botones de acción de Statuses (Reset mouth, Primary dentition...). */
+.odonto-embed.controles-abiertos .panel .status-actions .btn,
+.odonto-embed.controles-abiertos .panel .select-actions .btn {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .panel .status-actions .btn:hover,
+.odonto-embed.controles-abiertos .panel .select-actions .btn:hover {
+  background: #fafafa;
+  border-color: #d4d4d8;
+}
+
+/* La tabla del resumen, con la misma cabecera que el resto de las tablas
+   de la app -gris, no el celeste de la librería- y sin cursivas. */
+.odonto-embed.controles-abiertos .tooth-info-table th,
+.odonto-embed.controles-abiertos .tooth-info-table td {
+  border: 1px solid #e7e7e7;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .tooth-info-table thead th {
+  background: #f9f9f9;
+  font-size: 11px;
+  font-weight: 600;
+  color: #71717a;
+  text-transform: none;
+}
+
+.odonto-embed.controles-abiertos .tooth-info-empty,
+.odonto-embed.controles-abiertos .tooth-info-line em,
+.odonto-embed.controles-abiertos .tooth-info em,
+.odonto-embed.controles-abiertos .tooth-info i {
+  font-style: normal;
+  color: #a1a1aa;
+}
+
+.odonto-embed.controles-abiertos .tooth-info-heading {
+  font-weight: 600;
+  color: #09090b;
+}
+
+/* La leyenda en cursiva de abajo de la tabla. */
+.odonto-embed.controles-abiertos .tooth-info-list {
+  font-size: 11px;
+  color: #a1a1aa;
+}
+
+/* Estas dos filas son grupos, no pares label+control: van a lo ancho y en
+   línea, no repartidas en las columnas de la grilla. */
+/* `.row` incluido a propósito: sin él gana `.row:has(> select)` de arriba,
+   que las vuelve a partir en label + control. */
+.odonto-embed.controles-abiertos .panel .row.status-actions,
+.odonto-embed.controles-abiertos .panel .row.status-extra-row,
+.odonto-embed.controles-abiertos .panel .row.select-actions,
+.odonto-embed.controles-abiertos .panel .status-actions,
+.odonto-embed.controles-abiertos .panel .select-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.odonto-embed.controles-abiertos .panel .row.status-extra-row select {
+  flex: 1 1 240px;
+  max-width: 340px;
+}
