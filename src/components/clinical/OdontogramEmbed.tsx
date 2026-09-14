@@ -249,39 +249,44 @@ export function OdontogramEmbed({
 
       {controlesAbiertos && pasos.length > 0 && (
         <div className={cn(
-          'flex h-10 w-full items-center justify-between gap-1 border border-[#e4e4e7] bg-white px-2',
+          'flex h-10 w-full items-center gap-2 border border-[#e4e4e7] bg-white px-2',
           minimizado ? 'mt-3 rounded-xl' : 'rounded-b-xl border-t-0',
         )}>
-          <button
-            type="button"
-            aria-label="Previous section"
-            disabled={paso === 0}
-            onClick={() => setPaso((p) => Math.max(0, p - 1))}
-            className="flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
-          >
-            <ChevronLeft className="size-4" />
-          </button>
+          {/* Los dos chevrones van juntos, como un paginador: separados a los
+              extremos de la barra costaba saltar de paso. */}
+          <span className="flex shrink-0 items-center">
+            <button
+              type="button"
+              aria-label="Previous section"
+              disabled={paso === 0}
+              onClick={() => setPaso((p) => Math.max(0, p - 1))}
+              className="flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <button
+              type="button"
+              aria-label="Next section"
+              disabled={paso === pasos.length - 1}
+              onClick={() => setPaso((p) => Math.min(pasos.length - 1, p + 1))}
+              className="flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
+            >
+              <ChevronRight className="size-4" />
+            </button>
+          </span>
 
           <span className="min-w-0 flex-1 text-center">
-            <span className="block truncate text-[12px] font-semibold text-[#09090b]">
-              {minimizado && pendientes.length > 0 ? `${pendientes.length} section${pendientes.length > 1 ? 's' : ''} left` : actual?.titulo}
+            <span className="block truncate text-[12px] font-semibold text-[#09090b]" title={minimizado ? tocados.join(' · ') : undefined}>
+              {minimizado
+                ? (tocados.length > 0 ? `Set: ${tocados.slice(0, 3).join(' · ')}${tocados.length > 3 ? ` +${tocados.length - 3}` : ''}` : 'Nothing set yet')
+                : actual?.titulo}
             </span>
             <span className="block truncate text-[10px] text-[#a1a1aa]" title={minimizado ? pendientes.join(' · ') : undefined}>
-              {minimizado && pendientes.length > 0
-                ? pendientes.slice(0, 3).join(' · ') + (pendientes.length > 3 ? ` +${pendientes.length - 3}` : '')
+              {minimizado
+                ? (pendientes.length > 0 ? `${pendientes.length} left: ${pendientes.slice(0, 2).join(' · ')}${pendientes.length > 2 ? '…' : ''}` : 'All sections visited')
                 : `${paso + 1} of ${pasos.length}`}
             </span>
           </span>
-
-          <button
-            type="button"
-            aria-label="Next section"
-            disabled={paso === pasos.length - 1}
-            onClick={() => setPaso((p) => Math.min(pasos.length - 1, p + 1))}
-            className="flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
-          >
-            <ChevronRight className="size-4" />
-          </button>
 
           <button
             type="button"

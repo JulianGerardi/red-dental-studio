@@ -987,3 +987,21 @@ checkbox, superficie o botón-, y al minimizar la barra pasa a decir
 "7 sections left" con los nombres ("Controls · Statuses · Tooth details +4",
 y el resto en el `title`). "Tooth information" no cuenta: es un resumen, no
 algo para completar.
+
+### Ajustes del panel (2026-09-14)
+
+- **La cruz de superficies va al lado de los campos**, no debajo: la fila es
+  un flex y los selects ocupan lo que sobra.
+- **Chevron propio en los selects**: `appearance: none` y el `ChevronDown`
+  de la app encima, para no mostrar la flecha del sistema.
+- **Los chevrones de paso van juntos**, como un paginador. Separados a los
+  extremos de la barra costaba saltar de sección.
+- **Minimizado muestra las dos caras**: arriba lo cargado
+  ("Set: Caries · Fillings") y abajo lo que falta ("7 left: Controls ·
+  Statuses…"), con la lista completa en el `title`.
+
+Sobre *"no aparece lo que seleccioné"*: no pude reproducirlo. Probado elegir
+un valor, cambiar de paso y volver, y minimizar y restaurar: el select
+siempre conserva lo elegido y coincide con el de la librería. Se interpretó
+como "al minimizar no veo lo que cargué", que es lo que resuelve el resumen
+de arriba.

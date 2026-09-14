@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Check, TriangleAlert } from 'lucide-react'
+import { Check, ChevronDown, TriangleAlert } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
 import { cn } from '@/lib/utils'
 
@@ -222,23 +222,27 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
         </p>
       )}
 
+      <div className="flex flex-wrap items-start gap-6">
       {selects.length > 0 && (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,280px))] gap-x-6 gap-y-4">
+        <div className="grid min-w-0 flex-1 grid-cols-[repeat(auto-fill,minmax(200px,280px))] gap-x-6 gap-y-4">
           {selects.map((c) => (
             <label key={c.clave} className="flex min-w-0 flex-col gap-1.5">
               <span className="truncate text-[11px] font-medium text-[#71717a]">{c.label}</span>
+              <span className="relative block">
               <select
                 value={c.valor}
                 disabled={c.off}
                 onChange={(e) => { elegirEnSelect(c.el, e.target.value); releer(); onTocar?.() }}
                 className={cn(
-                  'h-9 w-full min-w-0 rounded-md border px-2.5 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors',
+                  'h-9 w-full min-w-0 appearance-none rounded-md border pr-8 pl-2.5 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors',
                   'focus:border-dash-blue focus:ring-2 focus:ring-[#1d56bc]/20 focus:outline-none',
                   c.off ? 'border-[#e4e4e7] bg-[#fafafa] text-[#a1a1aa]' : 'border-[#e4e4e7] bg-white text-[#09090b] hover:border-[#d4d4d8]',
                 )}
               >
                 {c.opciones.map((o) => <option key={o.v} value={o.v}>{o.t}</option>)}
               </select>
+              <ChevronDown className={cn('pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2', c.off ? 'text-[#d4d4d8]' : 'text-black')} />
+              </span>
             </label>
           ))}
         </div>
@@ -255,6 +259,7 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
           bloqueo={sinMaterial ? 'Choose a filling type first — marking a surface before that has no effect.' : undefined}
         />
       ))}
+      </div>
 
       {checks.length > 0 && (
         <div className="flex flex-wrap gap-2">
