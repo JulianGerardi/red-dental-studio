@@ -879,3 +879,26 @@ la librería.
   `reset|clear|edentulous` piden confirmación antes, con el botón de
   confirmar en rojo. Son los únicos que efectivamente vacían la
   configuración.
+
+### El panel escribía sólo en el DOM (bug real, 2026-09-13)
+
+Julián reportó *"cuando cierro, la configuración vuelve al default"*.
+Comprobado con el propio resumen de la librería: marcar una superficie no
+cambiaba `Caries: No carious teeth.`, o sea que **el panel no llegaba a su
+estado**. Estaba poniendo `.checked` / `.value` a mano y disparando un
+`change` sintético: eso cambia el DOM, la librería no se entera y en el
+siguiente render vuelve todo atrás.
+
+Ahora los controles se accionan **como lo haría una persona**: los
+checkboxes con `el.click()` -que dispara el flujo nativo completo- y los
+selects con el setter nativo de `HTMLSelectElement.value` más `input` y
+`change`. Verificado con el resumen, que pasa a
+`Caries: 1 (O) – superficial, 2 (O) – superficial, ...`, y con un cierre y
+reapertura del panel: el estado queda.
+
+**Lección**: para saber si una escritura entró en la librería no sirve leer
+de vuelta el mismo nodo que escribiste -eso siempre da true-; hay que mirar
+algo que produzca ella, como el resumen.
+
+También, el botón marcado se guarda **por sección** (`accionPorPaso`): al
+volver a un paso tiene que seguir elegido lo que se dejó.

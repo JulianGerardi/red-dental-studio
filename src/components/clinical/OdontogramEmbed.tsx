@@ -199,10 +199,10 @@ export function OdontogramEmbed({
           }
         >
           <p className="text-[13px] leading-relaxed text-[#3f3f46]">
-            Todo lo que cargaste en el odontograma queda guardado: cerrar sólo
-            esconde los controles y los volvés a abrir con el mismo botón.
-            Lo que sí borra la configuración son <strong className="font-semibold text-[#09090b]">Reset</strong> y
-            {' '}<strong className="font-semibold text-[#09090b]">Clear selection</strong>, que avisan aparte.
+            Everything charted stays as it is — closing only hides the controls,
+            and the same button brings them back. What does clear it is{' '}
+            <strong className="font-semibold text-[#09090b]">Reset</strong> or{' '}
+            <strong className="font-semibold text-[#09090b]">Clear selection</strong>, which ask first.
           </p>
         </ModalShell>
       )}

@@ -99,11 +99,20 @@ function leerControles(card: HTMLElement): Control[] {
   return lista
 }
 
-/** Escribe sobre el control real y dispara el evento que la librería escucha. */
-function aplicar(el: HTMLElement, cambio: () => void, evento: 'change' | 'click') {
-  cambio()
-  if (evento === 'click') el.click()
-  else el.dispatchEvent(new Event('change', { bubbles: true }))
+/* Los controles reales se accionan **como lo haría una persona**, no
+   escribiéndoles el valor a mano: poner `.checked` o `.value` y disparar un
+   `change` sintético cambia el DOM pero no siempre entra en el estado de la
+   librería, y al re-renderizar volvía todo al default. */
+function tocarCheckbox(el: HTMLInputElement) {
+  el.click()
+}
+
+function elegirEnSelect(el: HTMLSelectElement, valor: string) {
+  const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value')?.set
+  if (setter) setter.call(el, valor)
+  else el.value = valor
+  el.dispatchEvent(new Event('input', { bubbles: true }))
+  el.dispatchEvent(new Event('change', { bubbles: true }))
 }
 
 /* Las cinco superficies en cruz -vestibular arriba, lingual/palatina abajo,
@@ -129,7 +138,7 @@ function CruzSuperficies({ celdas, onCambio }: { celdas: Celda[]; onCambio: () =
             aria-checked={c.activo}
             aria-label={c.nombre}
             title={c.nombre}
-            onClick={() => { c.el.checked = !c.el.checked; c.el.dispatchEvent(new Event('change', { bubbles: true })); onCambio() }}
+            onClick={() => { tocarCheckbox(c.el); onCambio() }}
             className={cn(
               'flex items-center justify-center rounded-md border text-[13px] font-semibold transition-colors',
               LUGAR[c.pos] ?? '',
@@ -156,17 +165,15 @@ function CruzSuperficies({ celdas, onCambio }: { celdas: Celda[]; onCambio: () =
 export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vacio?: React.ReactNode }) {
   const [controles, setControles] = useState<Control[]>([])
   /* La librería no marca sus botones de selección rápida -probado: no tocan
-     ni clase ni aria-pressed-, así que el "cuál aprieté" lo lleva el panel. */
-  const [accionActiva, setAccionActiva] = useState<string | null>(null)
+     ni clase ni aria-pressed-, así que el "cuál aprieté" lo lleva el panel.
+     Se guarda **por sección**: al volver a un paso tiene que seguir marcado
+     lo que se había dejado elegido. */
+  const [accionPorPaso, setAccionPorPaso] = useState<Record<string, string | null>>({})
   /* Reset y Clear sí borran lo cargado: se confirman antes. */
   const [confirmando, setConfirmando] = useState<Extract<Control, { tipo: 'accion' }> | null>(null)
 
   const releer = useCallback(() => {
     setControles(card ? leerControles(card) : [])
-  }, [card])
-
-  useEffect(() => {
-    setAccionActiva(null)
   }, [card])
 
   useEffect(() => {
@@ -177,6 +184,10 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
     observer.observe(card, { childList: true, subtree: true, attributes: true })
     return () => observer.disconnect()
   }, [card, releer])
+
+  const clavePaso = card?.id || card?.querySelector('.card-title')?.textContent?.trim() || 'paso'
+  const accionActiva = accionPorPaso[clavePaso] ?? null
+  const marcarAccion = (clave: string | null) => setAccionPorPaso((p) => ({ ...p, [clavePaso]: clave }))
 
   const cruces = controles.filter((c): c is Extract<Control, { tipo: 'cruz' }> => c.tipo === 'cruz')
   const selects = controles.filter((c): c is Extract<Control, { tipo: 'select' }> => c.tipo === 'select')
@@ -197,7 +208,7 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
               <select
                 value={c.valor}
                 disabled={c.off}
-                onChange={(e) => aplicar(c.el, () => { c.el.value = e.target.value }, 'change')}
+                onChange={(e) => { elegirEnSelect(c.el, e.target.value); releer() }}
                 className={cn(
                   'h-9 w-full min-w-0 rounded-md border px-2.5 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors',
                   'focus:border-dash-blue focus:ring-2 focus:ring-[#1d56bc]/20 focus:outline-none',
@@ -222,7 +233,7 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
               role="checkbox"
               aria-checked={c.activo}
               disabled={c.off}
-              onClick={() => aplicar(c.el, () => { c.el.checked = !c.el.checked }, 'change')}
+              onClick={() => { tocarCheckbox(c.el); releer() }}
               className={cn(
                 'flex h-8 items-center gap-2 rounded-md border px-2.5 text-[12px] transition-colors disabled:opacity-50',
                 c.activo ? 'border-dash-blue bg-dash-count-bg text-dash-blue font-medium' : 'border-[#e4e4e7] bg-white text-[#3f3f46] hover:bg-[#fafafa]',
@@ -250,8 +261,8 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
               <button
                 type="button"
                 onClick={() => {
-                  aplicar(confirmando.el, () => {}, 'click')
-                  setAccionActiva(/clear/i.test(confirmando.label) ? null : confirmando.clave)
+                  confirmando.el.click()
+                  marcarAccion(/clear/i.test(confirmando.label) ? null : confirmando.clave)
                   setConfirmando(null)
                 }}
                 className="h-9 rounded-md bg-[#b22626] px-5 text-[13px] font-medium text-white hover:bg-[#961f1f]"
@@ -278,8 +289,8 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
               aria-pressed={accionActiva === c.clave}
               onClick={() => {
                 if (/reset|clear|edentulous/i.test(c.label)) { setConfirmando(c); return }
-                aplicar(c.el, () => {}, 'click')
-                setAccionActiva(c.clave)
+                c.el.click()
+                marcarAccion(c.clave)
               }}
               className={cn(
                 'h-8 rounded-md border px-3 text-[12px] font-medium transition-colors disabled:opacity-50',
