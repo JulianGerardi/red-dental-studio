@@ -843,3 +843,22 @@ Verificado de punta a punta con un render automatizado: apretar nuestro
 botón "All" deja `activeToothLabel` en "32 teeth" y habilita los campos, y
 elegir "Radix" en nuestro select escribe `radix` en el `#substrateSelect` de
 la librería.
+
+### Estados y separación del panel propio (2026-09-13)
+
+- **Los campos ya no van pegados**: la grilla pasa a
+  `auto-fill, minmax(200px, 280px)` con 24px de separación, en vez de
+  estirarse a todo el ancho.
+- **El botón apretado queda en azul**. La librería **no marca** sus botones
+  de selección rápida -comprobado: al clickear "Teeth" no cambia ni la clase
+  ni `aria-pressed`-, así que el estado lo lleva `OdontogramPanel` y se
+  limpia al cambiar de paso. "Clear selection" no queda marcado, porque
+  deshace la selección en vez de elegir algo.
+- **Foco azul en los campos**: borde `#1d56bc` y anillo de 3px. La regla va
+  en `odontogram-theme.css` y no en clases de Tailwind porque el CSS de la
+  librería es **sin capa** y le gana a las utilidades, que van en `@layer`.
+  Ese es el motivo de fondo de varias peleas de especificidad de esta vuelta.
+- **Los labels ya no arrastran el texto de las `<option>`**: al leer la
+  etiqueta hay que saltear el propio control y cualquier nodo que lo
+  contenga; si no, "Incisal wear" salía como
+  "Incisal wearnoneAttrition (tooth-to-tooth)Erosion...".

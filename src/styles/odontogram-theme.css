@@ -611,3 +611,13 @@
   border-radius: 12px 12px 0 0;
   background: #fff;
 }
+
+/* El foco de los selects venía con el azul de fábrica de la librería
+   (#3b7bff). Va acá y no en clases de Tailwind porque el CSS de la
+   librería es sin capa y le gana a las utilidades, que sí van en `@layer`. */
+.odonto-embed select:focus,
+.odonto-embed select:focus-visible {
+  border-color: #1d56bc;
+  box-shadow: 0 0 0 3px rgb(29 86 188 / 0.18);
+  outline: none;
+}

@@ -20,13 +20,18 @@ type Control =
 
 const visible = (el: HTMLElement) => el.offsetParent !== null || el.getClientRects().length > 0
 
-/** El texto propio del contenedor, sin el de los controles que tiene adentro. */
-function etiquetaDe(contenedor: Element | null, porDefecto: string) {
+/** El texto propio del contenedor, salteando el control -y cualquier nodo
+    que lo contenga-: si no, el label se come el texto de las `<option>`. */
+function etiquetaDe(contenedor: Element | null, control: Element, porDefecto: string) {
   if (!contenedor) return porDefecto
   const texto = [...contenedor.childNodes]
-    .filter((n) => n.nodeType === Node.TEXT_NODE || (n instanceof HTMLElement && ['SPAN', 'LABEL', 'STRONG'].includes(n.tagName)))
+    .filter((n) => {
+      if (n === control || n.contains(control)) return false
+      return n.nodeType === Node.TEXT_NODE || (n instanceof HTMLElement && ['SPAN', 'LABEL', 'STRONG', 'B'].includes(n.tagName))
+    })
     .map((n) => n.textContent ?? '')
     .join(' ')
+    .replace(/\s+/g, ' ')
     .trim()
   return texto || porDefecto
 }
@@ -40,7 +45,7 @@ function leerControles(card: HTMLElement): Control[] {
       tipo: 'select',
       off: el.disabled,
       clave: el.id || `sel-${i}`,
-      label: etiquetaDe(el.closest('.row'), 'Option'),
+      label: etiquetaDe(el.closest('.row') ?? el.parentElement, el, 'Option'),
       valor: el.value,
       opciones: [...el.options].map((o) => ({ v: o.value, t: o.textContent ?? o.value })),
       el,
@@ -53,7 +58,7 @@ function leerControles(card: HTMLElement): Control[] {
       tipo: 'check',
       off: el.disabled,
       clave: el.id || `chk-${i}`,
-      label: etiquetaDe(el.closest('label') ?? el.parentElement, 'Option'),
+      label: etiquetaDe(el.closest('label') ?? el.parentElement, el, 'Option'),
       activo: el.checked,
       el,
     })
@@ -79,9 +84,16 @@ function aplicar(el: HTMLElement, cambio: () => void, evento: 'change' | 'click'
 
 export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vacio?: React.ReactNode }) {
   const [controles, setControles] = useState<Control[]>([])
+  /* La librería no marca sus botones de selección rápida -probado: no tocan
+     ni clase ni aria-pressed-, así que el "cuál aprieté" lo lleva el panel. */
+  const [accionActiva, setAccionActiva] = useState<string | null>(null)
 
   const releer = useCallback(() => {
     setControles(card ? leerControles(card) : [])
+  }, [card])
+
+  useEffect(() => {
+    setAccionActiva(null)
   }, [card])
 
   useEffect(() => {
@@ -104,7 +116,7 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
   return (
     <div className="flex flex-col gap-4">
       {selects.length > 0 && (
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-x-4 gap-y-3">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,280px))] gap-x-6 gap-y-4">
           {selects.map((c) => (
             <label key={c.clave} className="flex min-w-0 flex-col gap-1.5">
               <span className="truncate text-[11px] font-medium text-[#71717a]">{c.label}</span>
@@ -113,8 +125,9 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
                 disabled={c.off}
                 onChange={(e) => aplicar(c.el, () => { c.el.value = e.target.value }, 'change')}
                 className={cn(
-                  'focus:border-dash-blue h-9 w-full min-w-0 rounded-md border border-[#e4e4e7] px-2.5 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none',
-                  c.off ? 'bg-[#fafafa] text-[#a1a1aa]' : 'bg-white text-[#09090b]',
+                  'h-9 w-full min-w-0 rounded-md border px-2.5 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors',
+                  'focus:border-dash-blue focus:ring-2 focus:ring-[#1d56bc]/20 focus:outline-none',
+                  c.off ? 'border-[#e4e4e7] bg-[#fafafa] text-[#a1a1aa]' : 'border-[#e4e4e7] bg-white text-[#09090b] hover:border-[#d4d4d8]',
                 )}
               >
                 {c.opciones.map((o) => <option key={o.v} value={o.v}>{o.t}</option>)}
@@ -155,8 +168,18 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
               key={c.clave}
               type="button"
               disabled={c.off}
-              onClick={() => aplicar(c.el, () => {}, 'click')}
-              className="h-8 rounded-md border border-[#e4e4e7] bg-white px-3 text-[12px] font-medium text-[#3f3f46] transition-colors hover:bg-[#fafafa] disabled:opacity-50"
+              aria-pressed={accionActiva === c.clave}
+              onClick={() => {
+                aplicar(c.el, () => {}, 'click')
+                /* "Clear selection" no queda marcado: deshace la selección. */
+                setAccionActiva(/clear/i.test(c.label) ? null : c.clave)
+              }}
+              className={cn(
+                'h-8 rounded-md border px-3 text-[12px] font-medium transition-colors disabled:opacity-50',
+                accionActiva === c.clave
+                  ? 'border-dash-blue bg-dash-blue text-white'
+                  : 'border-[#e4e4e7] bg-white text-[#3f3f46] hover:bg-[#fafafa]',
+              )}
             >
               {c.label}
             </button>
