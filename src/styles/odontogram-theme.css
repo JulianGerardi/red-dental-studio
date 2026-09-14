@@ -272,9 +272,12 @@
 
 /* Filas que quedan sin contenido según la pieza activa: sin esto ocupan su
    celda de la grilla y llenan la card de huecos. La marca la pone
-   OdontogramEmbed midiendo el alto real, y se limpia en cada cambio. */
+   OdontogramEmbed midiendo el alto real, y se limpia en cada cambio.
+   Va con `!important` a propósito: es una utilidad cuyo único trabajo es
+   ganar, y las reglas de layout de más abajo -`.inline-checks` y compañía-
+   son más específicas y la pisaban. */
 .odonto-embed .odonto-vacio {
-  display: none;
+  display: none !important;
 }
 
 /* El panel de la librería está pensado para ocupar el alto de su columna;
@@ -510,3 +513,70 @@
 }
 
 /* La barra de pasos, al tono. */
+
+/* ─── Rediseño del contenido del panel (2ª vuelta) ───────────────────────
+   Lo que fallaba no eran los colores sino la disposición: cada card repetía
+   el título que ya está en la barra de pasos, los pares label+control se
+   comían un ancho enorme y la card quedaba con medio panel vacío. */
+
+/* 1. El título de la card sale: lo dice la barra de abajo. Queda sólo la
+      fila de acciones (Reset, Clear selection), chica y a la derecha. */
+.odonto-embed.controles-abiertos .panel .card > .card-title,
+.odonto-embed.controles-abiertos .tooth-info > .card-title {
+  justify-content: flex-end;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-height: 0;
+}
+
+.odonto-embed.controles-abiertos .panel .card > .card-title > :not(button),
+.odonto-embed.controles-abiertos .tooth-info > .card-title > :not(button) {
+  display: none;
+}
+
+/* 2. Label arriba del control, como los formularios de la app: el par en
+      línea obligaba a una columna de label fija y desperdiciaba el ancho. */
+.odonto-embed.controles-abiertos .panel .row:has(> select) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.odonto-embed.controles-abiertos .panel .row:has(> select) > span:first-child {
+  font-size: 11px;
+  font-weight: 500;
+  color: #71717a;
+}
+
+/* 3. Con el label arriba entran más columnas y más angostas. */
+.odonto-embed.controles-abiertos .panel .card {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px 16px;
+}
+
+/* 4. La card mide lo que mide su contenido: dentro de un `.panel-body` en
+      columna se estiraba hasta el fondo y ese era el vacío. */
+.odonto-embed.controles-abiertos .panel .card {
+  flex: none;
+  align-self: start;
+}
+
+.odonto-embed.controles-abiertos .panel-body {
+  display: block;
+}
+
+.odonto-embed.controles-abiertos .panel,
+.odonto-embed.controles-abiertos .tooth-info {
+  height: auto;
+  max-height: min(34vh, 260px);
+  padding: 12px;
+}
+
+/* Los selects se tocaban entre sí: cada uno tiene que caber en su celda. */
+.odonto-embed.controles-abiertos .panel .row:has(> select) > select {
+  width: 100%;
+  min-width: 0;
+}

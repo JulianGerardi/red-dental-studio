@@ -792,3 +792,24 @@ diseño"*. Sólo CSS, ningún id ni handler de la librería tocado:
   odontograma aparece directo al entrar a la pestaña.
 - **Panel más compacto**: techo de 300px, controles de 32px, cabeceras de 12
   y pastillas de 26. El panel acompaña al gráfico, no es la pantalla.
+
+### El panel, rediseñado de verdad (2026-09-13, 2ª vuelta)
+
+Retocar colores no alcanzó -*"lo sigo viendo igual, quiero algo diferente"*-
+porque el problema era la **disposición**, no la paleta:
+
+1. **Cada card repetía el título que ya está en la barra de pasos**
+   ("Tooth details" arriba y abajo). Se saca el texto del `.card-title` y
+   queda sólo su fila de acciones (Reset, Clear selection), chica y a la
+   derecha.
+2. **El par label+control en línea** obligaba a una columna de label fija y
+   se comía el ancho. Ahora el label va **arriba** del control, como los
+   formularios de la app, y entran 3-4 campos por fila
+   (`auto-fit, minmax(180px, 1fr)`).
+3. **El vacío de media card** eran las filas que la librería deja sin
+   contenido: `.odonto-vacio` las colapsa, pero la regla la **pisaban las de
+   layout de más abajo** (`.inline-checks`, más específicas). Va con
+   `!important`, que acá se justifica: es una utilidad cuyo único trabajo es
+   ganarle al CSS de un tercero.
+
+Resultado medido: la card pasa de 204px a 75 y el panel de 299 a ~200.
