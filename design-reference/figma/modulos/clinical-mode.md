@@ -1014,3 +1014,40 @@ de página**: era `#fafbfe`, el mismo que el Figma usa en el dashboard, y
 pasa a blanco **sólo en Clinical Mode**. Las otras pantallas siguen con el
 `#fafbfe` del diseño; si el pedido era global, se cambia el
 `--page-background` de `index.css` y listo.
+
+### Las caras linguales/palatinas (2026-09-14)
+
+Pedido de Julián: que se vea la cara de atrás del diente, en el medio del
+gráfico. La librería **sólo dibuja vestibular y oclusal**, así que lo que se
+carga en la superficie lingual no se veía en ninguna parte -se guardaba, pero
+no se mostraba-.
+
+Se suman **dos filas propias en el medio**: vestibular · oclusal · lingual —
+lingual · oclusal · vestibular. Decidido con Julián: se suman, no reemplazan
+la oclusal, y el dibujo es **propio y anatómico**, no la vestibular espejada
+-la cara lingual tiene lo suyo: el cíngulo de los anteriores, las cúspides
+linguales de los posteriores-.
+
+Cómo está hecho (`FilasLinguales.tsx` + `LingualTooth.tsx`):
+
+- Se inyectan celdas en `#toothGrid` y se dibuja adentro con portales. Se
+  puede porque la librería arma la grilla **una sola vez** (`buildGrid` en su
+  init) y después actualiza las celdas en su lugar.
+- El estado de la cara lingual se lee de la **celda oclusal**, que es la
+  única que la dibuja: ahí viven `#caries-lingual` y los
+  `#filling-…-lingual`, que se prenden con `display`. El resumen por diente
+  (`getToothStateSummary`) no distingue superficie y no sirve para esto.
+- El redibujo se engancha al `onStateChange` de la librería; la selección,
+  que no pasa por ahí, con un observer de clases con `requestAnimationFrame`.
+
+Tres cosas que costaron y conviene no repetir:
+
+1. **El observer se auto-disparaba**: con `subtree`+`attributes` sobre la
+   raíz, nuestros propios portales lo despertaban y la página se colgaba. El
+   de reinserción mira sólo los hijos directos de la grilla.
+2. **El modelo de las filas es la vestibular, no la oclusal**: la oclusal
+   deja celdas de relleno en los anteriores -no tienen cara oclusal- y los
+   incisivos y caninos se quedaban sin cara lingual, que sí tienen.
+3. **`after` sobre un ancla fijo inserta al revés y `before` no**: recorrer
+   las dos filas igual dejaba la inferior espejada respecto de sus columnas.
+   Verificado que las cuatro filas coinciden diente por diente.

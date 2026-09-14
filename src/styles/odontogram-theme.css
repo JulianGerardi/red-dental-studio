@@ -612,3 +612,13 @@
   box-shadow: 0 0 0 3px rgb(29 86 188 / 0.18);
   outline: none;
 }
+
+/* Las celdas de cara lingual que insertamos en la grilla: mismo alto y
+   borde que las de la librería, para que la fila no desentone. */
+.odonto-embed .tooth-tile.lingual-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  cursor: pointer;
+}
