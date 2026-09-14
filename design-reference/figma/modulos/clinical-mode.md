@@ -1005,3 +1005,12 @@ un valor, cambiar de paso y volver, y minimizar y restaurar: el select
 siempre conserva lo elegido y coincide con el de la librería. Se interpretó
 como "al minimizar no veo lo que cargué", que es lo que resuelve el resumen
 de arriba.
+
+### Fondo blanco en Clinical Mode (2026-09-14)
+
+Comentario en el artifact: *"esto debe estar en blanco"*. Quedó anclado al
+`body`, sin señalar ningún elemento, así que se interpretó como el **fondo
+de página**: era `#fafbfe`, el mismo que el Figma usa en el dashboard, y
+pasa a blanco **sólo en Clinical Mode**. Las otras pantallas siguen con el
+`#fafbfe` del diseño; si el pedido era global, se cambia el
+`--page-background` de `index.css` y listo.
