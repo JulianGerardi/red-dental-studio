@@ -126,10 +126,14 @@ const LUGAR: Record<string, string> = {
   lingual: 'col-start-2 row-start-3',
 }
 
-function CruzSuperficies({ celdas, onCambio }: { celdas: Celda[]; onCambio: () => void }) {
+function CruzSuperficies({ celdas, onCambio, bloqueo }: { celdas: Celda[]; onCambio: () => void; bloqueo?: string }) {
   return (
-    <div className="flex items-center gap-4">
-      <div className="grid size-[132px] shrink-0 grid-cols-3 grid-rows-3 gap-1">
+    <div className="flex flex-col gap-2">
+      {bloqueo && (
+        <p className="bg-dash-count-bg text-dash-blue rounded-md px-3 py-2 text-[12px] font-medium">{bloqueo}</p>
+      )}
+      <div className="flex items-center gap-4">
+      <div className={cn('grid size-[132px] shrink-0 grid-cols-3 grid-rows-3 gap-1', bloqueo && 'pointer-events-none opacity-40')}>
         {celdas.map((c) => (
           <button
             key={c.pos}
@@ -151,18 +155,24 @@ function CruzSuperficies({ celdas, onCambio }: { celdas: Celda[]; onCambio: () =
           </button>
         ))}
       </div>
-      <ul className="flex flex-col gap-1 text-[11px] text-[#71717a]">
+      <ul className={cn('flex flex-col gap-1 text-[11px] text-[#71717a]', bloqueo && 'opacity-40')}>
         {celdas.map((c) => (
           <li key={c.pos} className={cn(c.activo && 'text-dash-blue font-medium')}>
             <span className="inline-block w-4 font-semibold">{c.letra}</span> {c.nombre}
           </li>
         ))}
       </ul>
+      </div>
     </div>
   )
 }
 
-export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vacio?: React.ReactNode }) {
+export function OdontogramPanel({ card, vacio, onTocar }: {
+  card: HTMLElement | null
+  vacio?: React.ReactNode
+  /** Avisa que en este paso se cambió algo, para el resumen de pendientes. */
+  onTocar?: () => void
+}) {
   const [controles, setControles] = useState<Control[]>([])
   /* La librería no marca sus botones de selección rápida -probado: no tocan
      ni clase ni aria-pressed-, así que el "cuál aprieté" lo lleva el panel.
@@ -201,6 +211,8 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
   /* Sin pieza elegida la librería deshabilita todo. Sin un aviso parecía que
      el panel no andaba: se tocaba una superficie y no pasaba nada. */
   const sinPieza = selects.length > 0 && selects.every((c) => c.off)
+  const material = card?.querySelector<HTMLSelectElement>('#fillingSelect')
+  const sinMaterial = !!material && material.value === 'none'
 
   return (
     <div className="flex flex-col gap-4">
@@ -218,7 +230,7 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
               <select
                 value={c.valor}
                 disabled={c.off}
-                onChange={(e) => { elegirEnSelect(c.el, e.target.value); releer() }}
+                onChange={(e) => { elegirEnSelect(c.el, e.target.value); releer(); onTocar?.() }}
                 className={cn(
                   'h-9 w-full min-w-0 rounded-md border px-2.5 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors',
                   'focus:border-dash-blue focus:ring-2 focus:ring-[#1d56bc]/20 focus:outline-none',
@@ -232,7 +244,17 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
         </div>
       )}
 
-      {cruces.map((c) => <CruzSuperficies key={c.clave} celdas={c.celdas} onCambio={releer} />)}
+      {cruces.map((c) => (
+        <CruzSuperficies
+          key={c.clave}
+          celdas={c.celdas}
+          onCambio={() => { releer(); onTocar?.() }}
+          /* En Fillings marcar la superficie con el tipo en "No filling" no
+             hace nada, y elegir el tipo después tampoco lo recupera: hay que
+             elegir el material primero. Comprobado contra el resumen. */
+          bloqueo={sinMaterial ? 'Choose a filling type first — marking a surface before that has no effect.' : undefined}
+        />
+      ))}
 
       {checks.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -243,7 +265,7 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
               role="checkbox"
               aria-checked={c.activo}
               disabled={c.off}
-              onClick={() => { tocarCheckbox(c.el); releer() }}
+              onClick={() => { tocarCheckbox(c.el); releer(); onTocar?.() }}
               className={cn(
                 'flex h-8 items-center gap-2 rounded-md border px-2.5 text-[12px] transition-colors disabled:opacity-50',
                 c.activo ? 'border-dash-blue bg-dash-count-bg text-dash-blue font-medium' : 'border-[#e4e4e7] bg-white text-[#3f3f46] hover:bg-[#fafafa]',
@@ -301,6 +323,7 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
                 if (/reset|clear|edentulous/i.test(c.label)) { setConfirmando(c); return }
                 c.el.click()
                 marcarAccion(c.clave)
+                onTocar?.()
               }}
               className={cn(
                 'h-8 rounded-md border px-3 text-[12px] font-medium transition-colors disabled:opacity-50',

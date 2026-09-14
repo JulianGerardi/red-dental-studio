@@ -82,6 +82,8 @@ export function OdontogramEmbed({
   const [minimizado, setMinimizado] = useState(false)
   const [confirmandoCierre, setConfirmandoCierre] = useState(false)
   const [reinicio, setReinicio] = useState(0)
+  /* Pasos en los que se cambió algo: el resto queda como pendiente. */
+  const [tocados, setTocados] = useState<string[]>([])
 
   /* La cruz descarta: vuelve el odontograma al default. Para guardar lo
      hecho y sacar los controles de en medio está el minimizar. Se apoya en
@@ -91,6 +93,7 @@ export function OdontogramEmbed({
     ref.current?.querySelector<HTMLButtonElement>('#btnResetAll')?.click()
     clearSelection()
     setPaso(0)
+    setTocados([])
     /* Remonta el panel: así se olvida qué botón estaba marcado. */
     setReinicio((n) => n + 1)
     onCerrarControles()
@@ -179,6 +182,10 @@ export function OdontogramEmbed({
   }, [pasos])
 
   const actual = pasos[paso]
+  /* Lo que quedó sin tocar; el resumen se muestra al minimizar. */
+  const pendientes = pasos
+    .filter((pa) => !pa.nodo.classList.contains('tooth-info') && !tocados.includes(pa.titulo))
+    .map((pa) => pa.titulo)
   const esInfo = !!actual?.nodo.classList.contains('tooth-info')
 
   return (
@@ -230,7 +237,13 @@ export function OdontogramEmbed({
         <div className="mt-3 w-full rounded-t-xl border border-b-0 border-[#e4e4e7] bg-white p-4">
           {esInfo
             ? <ToothInfoPanel nodo={actual.nodo} />
-            : <OdontogramPanel key={reinicio} card={actual.nodo} />}
+            : (
+              <OdontogramPanel
+                key={reinicio}
+                card={actual.nodo}
+                onTocar={() => setTocados((t) => (t.includes(actual.titulo) ? t : [...t, actual.titulo]))}
+              />
+            )}
         </div>
       )}
 
@@ -250,8 +263,14 @@ export function OdontogramEmbed({
           </button>
 
           <span className="min-w-0 flex-1 text-center">
-            <span className="block truncate text-[12px] font-semibold text-[#09090b]">{actual?.titulo}</span>
-            <span className="block text-[10px] text-[#a1a1aa]">{paso + 1} of {pasos.length}</span>
+            <span className="block truncate text-[12px] font-semibold text-[#09090b]">
+              {minimizado && pendientes.length > 0 ? `${pendientes.length} section${pendientes.length > 1 ? 's' : ''} left` : actual?.titulo}
+            </span>
+            <span className="block truncate text-[10px] text-[#a1a1aa]" title={minimizado ? pendientes.join(' · ') : undefined}>
+              {minimizado && pendientes.length > 0
+                ? pendientes.slice(0, 3).join(' · ') + (pendientes.length > 3 ? ` +${pendientes.length - 3}` : '')
+                : `${paso + 1} of ${pasos.length}`}
+            </span>
           </span>
 
           <button

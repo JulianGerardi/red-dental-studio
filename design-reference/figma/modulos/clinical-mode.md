@@ -963,3 +963,27 @@ Nota para depurar esto en el futuro: el primer `[data-tooth]` del chart es
 el **18 en FDI**, que con nuestra numeración universal se muestra como
 **1**. Recortar una captura por `data-tooth` sin tener eso en cuenta lleva a
 mirar el diente equivocado y creer que no se pintó nada -me pasó-.
+
+### Fillings: el orden importa, y ahora se avisa (2026-09-14)
+
+*"Fillings and restorative no funciona"*. Comprobado contra el resumen, el
+problema es de **orden**, no de la integración:
+
+- Marcar una superficie con Type en "No filling" no hace nada.
+- Y elegir el material **después** tampoco lo recupera: la marca se perdió.
+
+O sea que el único orden que funciona es material → superficie, que es el
+inverso del natural (primero dónde, después qué). Ahora, mientras
+`#fillingSelect` está en `none`, la cruz va apagada y el panel lo dice:
+*"Choose a filling type first — marking a surface before that has no
+effect."* Al elegir material el aviso desaparece y marcar la superficie
+registra `Fillings: 1 (O)`.
+
+### Pendientes al minimizar (2026-09-14)
+
+Pedido de Julián: al esconder la card, que avise qué quedó sin completar.
+El panel marca como *tocada* cada sección donde se cambió algo -select,
+checkbox, superficie o botón-, y al minimizar la barra pasa a decir
+"7 sections left" con los nombres ("Controls · Statuses · Tooth details +4",
+y el resto en el `title`). "Tooth information" no cuenta: es un resumen, no
+algo para completar.
