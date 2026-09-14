@@ -946,3 +946,20 @@ El FAB de "New procedure" estaba azul fijo, como si estuviera prendido. Los
 cuatro botones de la columna van neutros -blanco con borde- y el azul queda
 reservado a los que **sí** tienen estado: los controles cuando el panel está
 abierto y la tabla cuando es la vista elegida.
+
+### "No me marca las caries" (2026-09-14)
+
+Verificado que **sí marca**: seleccionando una pieza y tocando una
+superficie, el diente muestra la lesión negra en la vista anatómica y en la
+oclusal -igual que la referencia, donde la caries también se dibuja en
+negro- y el resumen pasa a `Caries: 1 (O) – superficial`.
+
+Lo que faltaba era el paso previo: **sin pieza elegida la librería
+deshabilita todos los campos**, así que se tocaba una superficie y no pasaba
+nada. Ahora, cuando están todos deshabilitados, el panel lo dice:
+*"Pick a tooth on the chart to edit it"*.
+
+Nota para depurar esto en el futuro: el primer `[data-tooth]` del chart es
+el **18 en FDI**, que con nuestra numeración universal se muestra como
+**1**. Recortar una captura por `data-tooth` sin tener eso en cuenta lleva a
+mirar el diente equivocado y creer que no se pintó nada -me pasó-.

@@ -198,8 +198,18 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
     return <div className="px-1 py-6 text-center text-[13px] text-[#a1a1aa]">{vacio ?? 'Nothing to set for this tooth.'}</div>
   }
 
+  /* Sin pieza elegida la librería deshabilita todo. Sin un aviso parecía que
+     el panel no andaba: se tocaba una superficie y no pasaba nada. */
+  const sinPieza = selects.length > 0 && selects.every((c) => c.off)
+
   return (
     <div className="flex flex-col gap-4">
+      {sinPieza && (
+        <p className="bg-dash-count-bg text-dash-blue rounded-md px-3 py-2 text-[12px] font-medium">
+          Pick a tooth on the chart to edit it — these fields stay off until then.
+        </p>
+      )}
+
       {selects.length > 0 && (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,280px))] gap-x-6 gap-y-4">
           {selects.map((c) => (
