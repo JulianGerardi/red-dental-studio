@@ -939,3 +939,10 @@ pesen lo mismo que un hallazgo real.
 
 Con eso el nodo de la librería se manda fuera de pantalla igual que el
 panel: **ninguno de los nueve pasos usa ya su markup**.
+
+### El azul es sólo estado activo (2026-09-13)
+
+El FAB de "New procedure" estaba azul fijo, como si estuviera prendido. Los
+cuatro botones de la columna van neutros -blanco con borde- y el azul queda
+reservado a los que **sí** tienen estado: los controles cuando el panel está
+abierto y la tabla cuando es la vista elegida.

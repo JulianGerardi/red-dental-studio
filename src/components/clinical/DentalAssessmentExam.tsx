@@ -175,7 +175,7 @@ export function DentalAssessmentExam() {
              controles se abre debajo y estira la card. */
           style={{ top: 'calc(var(--odonto-chart-fin, 620px) - 196px)' }}
         >
-          <button type="button" aria-label="New procedure" onClick={() => openProcedure(null)} className="bg-dash-blue hover:bg-dash-blue-hover flex size-11 items-center justify-center rounded-full text-white shadow-md">
+          <button type="button" aria-label="New procedure" onClick={() => openProcedure(null)} className="flex size-11 items-center justify-center rounded-full border border-[#e4e4e7] bg-white text-[#09090b] shadow-md hover:bg-[#fafafa]">
             <Plus className="size-4" />
           </button>
           <button type="button" aria-label="New document" onClick={() => setDocumentOpen(true)} className="flex size-11 items-center justify-center rounded-full border border-[#e4e4e7] bg-white text-[#09090b] shadow-md hover:bg-[#fafafa]">
