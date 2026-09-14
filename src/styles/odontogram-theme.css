@@ -589,7 +589,8 @@
    `display:none` a propósito: hay que poder medir qué controles están
    visibles para espejarlos, y con `display:none` todos miden cero.
    El resumen "Tooth information" sí se muestra tal cual: es texto. */
-.odonto-embed.controles-abiertos .panel {
+.odonto-embed.controles-abiertos .panel,
+.odonto-embed.controles-abiertos .tooth-info {
   position: absolute !important;
   left: -10000px !important;
   top: 0 !important;
@@ -599,18 +600,8 @@
   pointer-events: none;
 }
 
-.odonto-embed.controles-abiertos.en-resumen .tooth-info {
-  display: block;
-  width: 100%;
-  margin: 12px 0 0;
-  padding: 14px;
-  max-height: min(34vh, 260px);
-  overflow-y: auto;
-  border: 1px solid #e4e4e7;
-  border-bottom: 0;
-  border-radius: 12px 12px 0 0;
-  background: #fff;
-}
+/* El resumen también lo dibuja un componente propio (`ToothInfoPanel`), así
+   que el nodo de la librería queda oculto como el resto del panel. */
 
 /* El foco de los selects venía con el azul de fábrica de la librería
    (#3b7bff). Va acá y no en clases de Tailwind porque el CSS de la

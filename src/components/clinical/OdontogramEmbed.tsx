@@ -4,6 +4,7 @@ import { ModalShell } from '@/components/patients/form'
 import { OdontogramShell, clearSelection, type OdontogramThemeConfig } from 'react-advanced-odontogram'
 import { cn } from '@/lib/utils'
 import { OdontogramPanel } from '@/components/clinical/dental/OdontogramPanel'
+import { ToothInfoPanel } from '@/components/clinical/dental/ToothInfoPanel'
 import '@/styles/odontogram-scoped.css'
 import '@/styles/odontogram-theme.css'
 
@@ -225,9 +226,11 @@ export function OdontogramEmbed({
         </ModalShell>
       )}
 
-      {controlesAbiertos && !minimizado && actual && !esInfo && (
+      {controlesAbiertos && !minimizado && actual && (
         <div className="mt-3 w-full rounded-t-xl border border-b-0 border-[#e4e4e7] bg-white p-4">
-          <OdontogramPanel key={reinicio} card={actual.nodo} />
+          {esInfo
+            ? <ToothInfoPanel nodo={actual.nodo} />
+            : <OdontogramPanel key={reinicio} card={actual.nodo} />}
         </div>
       )}
 

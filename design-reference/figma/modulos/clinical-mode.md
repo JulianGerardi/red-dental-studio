@@ -925,3 +925,17 @@ Verificado con el resumen de la librería: minimizar deja
 "1 of 9" y el botón "Teeth" sin marcar.
 
 También se saca el botón de plegar el listado de Findings.
+
+### "Tooth information" también pasa a ser nuestro (2026-09-13)
+
+Era el último paso que seguía con el markup de la librería -numeración en
+rojo itálica, la leyenda de negritas, los hallazgos como párrafos largos-.
+`ToothInfoPanel` lee ese nodo -que sigue siendo la fuente, con su
+`MutationObserver` para los cambios del chart- y lo muestra como ficha:
+titular, la tabla de arcadas con la cabecera gris del resto de la app, y los
+hallazgos en columnas de rótulo + valor. Los renglones sin dato -los que la
+librería escribe empezando en "No"/"no"- van en gris claro, para que no
+pesen lo mismo que un hallazgo real.
+
+Con eso el nodo de la librería se manda fuera de pantalla igual que el
+panel: **ninguno de los nueve pasos usa ya su markup**.
