@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, X } from 'lucide-react'
+import { ModalShell } from '@/components/patients/form'
 import { OdontogramShell, type OdontogramThemeConfig } from 'react-advanced-odontogram'
 import { cn } from '@/lib/utils'
 import { OdontogramPanel } from '@/components/clinical/dental/OdontogramPanel'
@@ -78,6 +79,7 @@ export function OdontogramEmbed({
   const [paso, setPaso] = useState(0)
   /* Minimizado deja sólo la barra: el gráfico se ve entero sin cerrar nada. */
   const [minimizado, setMinimizado] = useState(false)
+  const [confirmandoCierre, setConfirmandoCierre] = useState(false)
 
   /* Las secciones son las cards que dibuja la librería más el resumen
      "Tooth information", que vive en otra columna. Se releen porque la
@@ -176,6 +178,35 @@ export function OdontogramEmbed({
     >
       <OdontogramShell themeConfig={TEMA} language="en" numberingSystem="UNIVERSAL" />
 
+      {confirmandoCierre && (
+        <ModalShell
+          title="Close the controls?"
+          onClose={() => setConfirmandoCierre(false)}
+          width="max-w-[420px]"
+          footer={
+            <>
+              <button type="button" onClick={() => setConfirmandoCierre(false)} className="h-9 rounded-md border border-[#e4e4e7] bg-white px-5 text-[13px] font-medium hover:bg-[#fafafa]">
+                Keep open
+              </button>
+              <button
+                type="button"
+                onClick={() => { setConfirmandoCierre(false); onCerrarControles() }}
+                className="bg-dash-blue hover:bg-dash-blue-hover h-9 rounded-md px-5 text-[13px] font-medium text-white"
+              >
+                Close
+              </button>
+            </>
+          }
+        >
+          <p className="text-[13px] leading-relaxed text-[#3f3f46]">
+            Todo lo que cargaste en el odontograma queda guardado: cerrar sólo
+            esconde los controles y los volvés a abrir con el mismo botón.
+            Lo que sí borra la configuración son <strong className="font-semibold text-[#09090b]">Reset</strong> y
+            {' '}<strong className="font-semibold text-[#09090b]">Clear selection</strong>, que avisan aparte.
+          </p>
+        </ModalShell>
+      )}
+
       {controlesAbiertos && !minimizado && actual && !esInfo && (
         <div className="mt-3 w-full rounded-t-xl border border-b-0 border-[#e4e4e7] bg-white p-4">
           <OdontogramPanel card={actual.nodo} />
@@ -225,7 +256,7 @@ export function OdontogramEmbed({
           <button
             type="button"
             aria-label="Close controls"
-            onClick={onCerrarControles}
+            onClick={() => setConfirmandoCierre(true)}
             className="flex size-7 shrink-0 items-center justify-center rounded-md border border-[#e4e4e7] text-[#71717a] hover:bg-[#f4f4f5]"
           >
             <X className="size-3.5" />

@@ -862,3 +862,20 @@ la librería.
   etiqueta hay que saltear el propio control y cualquier nodo que lo
   contenga; si no, "Incisal wear" salía como
   "Incisal wearnoneAttrition (tooth-to-tooth)Erosion...".
+
+### Cruz de superficies y confirmaciones (2026-09-13)
+
+- **El selector de superficies pasa a ser nuestro**. En la librería es un
+  `.surface-cross` con cinco `label.surface-cell.pos-*`, cada una con su
+  checkbox. `CruzSuperficies` lo redibuja como la cruz de un odontograma
+  -vestibular arriba, lingual/palatina abajo, mesial y distal a los costados,
+  oclusal al medio- con la referencia al lado, y cada celda escribe sobre su
+  checkbox real. Esos checkboxes se excluyen del listado genérico para que no
+  salgan además como pastillas sueltas.
+- **Cerrar no pierde nada**: el botón X abre una confirmación que lo dice
+  explícitamente -lo cargado queda en el odontograma, cerrar sólo esconde los
+  controles-. Verificado que "Keep open" deja todo como estaba.
+- **Lo que sí borra, avisa**: los botones cuyo nombre cae en
+  `reset|clear|edentulous` piden confirmación antes, con el botón de
+  confirmar en rojo. Son los únicos que efectivamente vacían la
+  configuración.

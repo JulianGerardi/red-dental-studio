@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Check } from 'lucide-react'
+import { Check, TriangleAlert } from 'lucide-react'
+import { ModalShell } from '@/components/patients/form'
 import { cn } from '@/lib/utils'
 
 /* Panel de controles del odontograma, dibujado con los componentes de esta
@@ -13,7 +14,10 @@ import { cn } from '@/lib/utils'
    que la librería reacciona igual que si la hubieran tocado a ella.
    Ver design-reference/figma/modulos/clinical-mode.md. */
 
+type Celda = { pos: string; letra: string; nombre: string; activo: boolean; el: HTMLInputElement }
+
 type Control =
+  | { tipo: 'cruz'; clave: string; celdas: Celda[] }
   | { tipo: 'select'; clave: string; label: string; valor: string; opciones: { v: string; t: string }[]; off: boolean; el: HTMLSelectElement }
   | { tipo: 'check'; clave: string; label: string; activo: boolean; off: boolean; el: HTMLInputElement }
   | { tipo: 'accion'; clave: string; label: string; off: boolean; el: HTMLButtonElement }
@@ -39,6 +43,26 @@ function etiquetaDe(contenedor: Element | null, control: Element, porDefecto: st
 function leerControles(card: HTMLElement): Control[] {
   const lista: Control[] = []
 
+  /* El selector de superficies es una cruz de 5 celdas, no cinco checkboxes
+     sueltos: se lee aparte para poder dibujarlo como corresponde. */
+  ;[...card.querySelectorAll<HTMLElement>('.surface-cross')].forEach((cruz, i) => {
+    const celdas = [...cruz.querySelectorAll<HTMLLabelElement>('.surface-cell')]
+      .map((celda) => {
+        const input = celda.querySelector<HTMLInputElement>('input[type="checkbox"]')
+        if (!input) return null
+        const pos = [...celda.classList].find((c) => c.startsWith('pos-'))?.slice(4) ?? ''
+        return {
+          pos,
+          letra: celda.querySelector('.surf-letter')?.textContent?.trim() || pos.charAt(0).toUpperCase(),
+          nombre: celda.querySelector('.surf-name')?.textContent?.trim() || pos,
+          activo: input.checked,
+          el: input,
+        }
+      })
+      .filter((c): c is Celda => c !== null)
+    if (celdas.length) lista.push({ tipo: 'cruz', clave: cruz.id || `cruz-${i}`, celdas })
+  })
+
   card.querySelectorAll<HTMLSelectElement>('select').forEach((el, i) => {
     if (!visible(el)) return
     lista.push({
@@ -53,7 +77,7 @@ function leerControles(card: HTMLElement): Control[] {
   })
 
   card.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach((el, i) => {
-    if (!visible(el)) return
+    if (!visible(el) || el.closest('.surface-cross')) return
     lista.push({
       tipo: 'check',
       off: el.disabled,
@@ -82,11 +106,60 @@ function aplicar(el: HTMLElement, cambio: () => void, evento: 'change' | 'click'
   else el.dispatchEvent(new Event('change', { bubbles: true }))
 }
 
+/* Las cinco superficies en cruz -vestibular arriba, lingual/palatina abajo,
+   mesial y distal a los costados y la oclusal al medio-, que es como se
+   lee un odontograma. Cada celda escribe sobre su checkbox real. */
+const LUGAR: Record<string, string> = {
+  buccal: 'col-start-2 row-start-1',
+  mesial: 'col-start-1 row-start-2',
+  occlusal: 'col-start-2 row-start-2',
+  distal: 'col-start-3 row-start-2',
+  lingual: 'col-start-2 row-start-3',
+}
+
+function CruzSuperficies({ celdas, onCambio }: { celdas: Celda[]; onCambio: () => void }) {
+  return (
+    <div className="flex items-center gap-4">
+      <div className="grid size-[132px] shrink-0 grid-cols-3 grid-rows-3 gap-1">
+        {celdas.map((c) => (
+          <button
+            key={c.pos}
+            type="button"
+            role="checkbox"
+            aria-checked={c.activo}
+            aria-label={c.nombre}
+            title={c.nombre}
+            onClick={() => { c.el.checked = !c.el.checked; c.el.dispatchEvent(new Event('change', { bubbles: true })); onCambio() }}
+            className={cn(
+              'flex items-center justify-center rounded-md border text-[13px] font-semibold transition-colors',
+              LUGAR[c.pos] ?? '',
+              c.activo
+                ? 'border-dash-blue bg-dash-blue text-white'
+                : 'border-[#e4e4e7] bg-white text-[#71717a] hover:border-[#1d56bc] hover:text-[#1d56bc]',
+            )}
+          >
+            {c.letra}
+          </button>
+        ))}
+      </div>
+      <ul className="flex flex-col gap-1 text-[11px] text-[#71717a]">
+        {celdas.map((c) => (
+          <li key={c.pos} className={cn(c.activo && 'text-dash-blue font-medium')}>
+            <span className="inline-block w-4 font-semibold">{c.letra}</span> {c.nombre}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vacio?: React.ReactNode }) {
   const [controles, setControles] = useState<Control[]>([])
   /* La librería no marca sus botones de selección rápida -probado: no tocan
      ni clase ni aria-pressed-, así que el "cuál aprieté" lo lleva el panel. */
   const [accionActiva, setAccionActiva] = useState<string | null>(null)
+  /* Reset y Clear sí borran lo cargado: se confirman antes. */
+  const [confirmando, setConfirmando] = useState<Extract<Control, { tipo: 'accion' }> | null>(null)
 
   const releer = useCallback(() => {
     setControles(card ? leerControles(card) : [])
@@ -105,6 +178,7 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
     return () => observer.disconnect()
   }, [card, releer])
 
+  const cruces = controles.filter((c): c is Extract<Control, { tipo: 'cruz' }> => c.tipo === 'cruz')
   const selects = controles.filter((c): c is Extract<Control, { tipo: 'select' }> => c.tipo === 'select')
   const checks = controles.filter((c): c is Extract<Control, { tipo: 'check' }> => c.tipo === 'check')
   const acciones = controles.filter((c): c is Extract<Control, { tipo: 'accion' }> => c.tipo === 'accion')
@@ -137,6 +211,8 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
         </div>
       )}
 
+      {cruces.map((c) => <CruzSuperficies key={c.clave} celdas={c.celdas} onCambio={releer} />)}
+
       {checks.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {checks.map((c) => (
@@ -161,6 +237,37 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
         </div>
       )}
 
+      {confirmando && (
+        <ModalShell
+          title={confirmando.label}
+          onClose={() => setConfirmando(null)}
+          width="max-w-[420px]"
+          footer={
+            <>
+              <button type="button" onClick={() => setConfirmando(null)} className="h-9 rounded-md border border-[#e4e4e7] bg-white px-5 text-[13px] font-medium hover:bg-[#fafafa]">
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  aplicar(confirmando.el, () => {}, 'click')
+                  setAccionActiva(/clear/i.test(confirmando.label) ? null : confirmando.clave)
+                  setConfirmando(null)
+                }}
+                className="h-9 rounded-md bg-[#b22626] px-5 text-[13px] font-medium text-white hover:bg-[#961f1f]"
+              >
+                {confirmando.label}
+              </button>
+            </>
+          }
+        >
+          <p className="flex items-start gap-2 text-[13px] leading-relaxed text-[#3f3f46]">
+            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-[#99660d]" />
+            This clears everything charted for the current selection — surfaces, conditions and restorations. It cannot be undone.
+          </p>
+        </ModalShell>
+      )}
+
       {acciones.length > 0 && (
         <div className="flex flex-wrap gap-2 border-t border-[#f1f1f4] pt-3">
           {acciones.map((c) => (
@@ -170,9 +277,9 @@ export function OdontogramPanel({ card, vacio }: { card: HTMLElement | null; vac
               disabled={c.off}
               aria-pressed={accionActiva === c.clave}
               onClick={() => {
+                if (/reset|clear|edentulous/i.test(c.label)) { setConfirmando(c); return }
                 aplicar(c.el, () => {}, 'click')
-                /* "Clear selection" no queda marcado: deshace la selección. */
-                setAccionActiva(/clear/i.test(c.label) ? null : c.clave)
+                setAccionActiva(c.clave)
               }}
               className={cn(
                 'h-8 rounded-md border px-3 text-[12px] font-medium transition-colors disabled:opacity-50',
