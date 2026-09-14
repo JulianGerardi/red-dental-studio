@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, X } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, TriangleAlert, X } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
 import { OdontogramShell, type OdontogramThemeConfig } from 'react-advanced-odontogram'
 import { cn } from '@/lib/utils'
@@ -80,6 +80,14 @@ export function OdontogramEmbed({
   /* Minimizado deja sólo la barra: el gráfico se ve entero sin cerrar nada. */
   const [minimizado, setMinimizado] = useState(false)
   const [confirmandoCierre, setConfirmandoCierre] = useState(false)
+
+  /* La cruz descarta: vuelve el odontograma al default. Para guardar lo
+     hecho y sacar los controles de en medio está el minimizar. Se apoya en
+     el "Reset mouth" de la librería, que es quien sabe cuál es el default. */
+  const descartarYCerrar = () => {
+    ref.current?.querySelector<HTMLButtonElement>('#btnResetAll')?.click()
+    onCerrarControles()
+  }
 
   /* Las secciones son las cards que dibuja la librería más el resumen
      "Tooth information", que vive en otra columna. Se releen porque la
@@ -180,29 +188,33 @@ export function OdontogramEmbed({
 
       {confirmandoCierre && (
         <ModalShell
-          title="Close the controls?"
+          title="Discard and close?"
           onClose={() => setConfirmandoCierre(false)}
-          width="max-w-[420px]"
+          width="max-w-[440px]"
           footer={
             <>
               <button type="button" onClick={() => setConfirmandoCierre(false)} className="h-9 rounded-md border border-[#e4e4e7] bg-white px-5 text-[13px] font-medium hover:bg-[#fafafa]">
-                Keep open
+                Cancel
               </button>
               <button
                 type="button"
-                onClick={() => { setConfirmandoCierre(false); onCerrarControles() }}
-                className="bg-dash-blue hover:bg-dash-blue-hover h-9 rounded-md px-5 text-[13px] font-medium text-white"
+                onClick={() => { setConfirmandoCierre(false); descartarYCerrar() }}
+                className="h-9 rounded-md bg-[#b22626] px-5 text-[13px] font-medium text-white hover:bg-[#961f1f]"
               >
-                Close
+                Discard and close
               </button>
             </>
           }
         >
-          <p className="text-[13px] leading-relaxed text-[#3f3f46]">
-            Everything charted stays as it is — closing only hides the controls,
-            and the same button brings them back. What does clear it is{' '}
-            <strong className="font-semibold text-[#09090b]">Reset</strong> or{' '}
-            <strong className="font-semibold text-[#09090b]">Clear selection</strong>, which ask first.
+          <p className="flex items-start gap-2 text-[13px] leading-relaxed text-[#3f3f46]">
+            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-[#b22626]" />
+            <span>
+              This returns the whole chart to its default: every surface, condition
+              and restoration you set is removed. It cannot be undone.
+              <br />
+              To put the controls away without losing anything, use the{' '}
+              <strong className="font-semibold text-[#09090b]">minimize</strong> arrow instead.
+            </span>
           </p>
         </ModalShell>
       )}

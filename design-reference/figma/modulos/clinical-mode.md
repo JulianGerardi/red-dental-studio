@@ -902,3 +902,20 @@ algo que produzca ella, como el resumen.
 
 También, el botón marcado se guarda **por sección** (`accionPorPaso`): al
 volver a un paso tiene que seguir elegido lo que se dejó.
+
+### Cerrar descarta, minimizar guarda (2026-09-13)
+
+Quedaron como dos gestos distintos, que era la confusión de antes:
+
+- **La cruz descarta**: confirma primero -en rojo, avisando que no se puede
+  deshacer- y devuelve el odontograma al default. Se apoya en el
+  `#btnResetAll` de la librería, que es quien sabe cuál es ese default.
+- **El chevron minimiza**: esconde los controles sin tocar nada, y el propio
+  aviso de la cruz remite a él para el caso de "sacarlo de en medio sin
+  perder lo hecho".
+
+Verificado con el resumen de la librería: minimizar deja
+`Caries: 1 (O) – superficial, ...` y descartar vuelve a
+`Caries: No carious teeth.`.
+
+También se saca el botón de plegar el listado de Findings.
