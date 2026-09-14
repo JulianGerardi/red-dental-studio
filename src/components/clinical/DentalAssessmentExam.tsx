@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, FilePlus, Table2, X, ArrowUpRight, RotateCw, PanelLeftClose, PanelLeftOpen, SlidersHorizontal } from 'lucide-react'
+import { Plus, FilePlus, Table2, PanelLeftClose, PanelLeftOpen, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { ModalShell, SelectField, TextArea, FormFooter } from '@/components/patients/form'
@@ -39,29 +39,6 @@ const INITIAL_REVIEWS: ExamReview[] = [
   { id: 'R-1', date: 'January 12, 2026', provider: 'Daniel Anderson', note: 'Charting checked against the radiographs. Caries on tooth 3 confirmed, the rest of the arch is unremarkable. Cleared for treatment planning.' },
 ]
 
-function DentitionCard({ onPick, onDismiss }: { onPick: (d: 'permanent' | 'primary') => void; onDismiss?: () => void }) {
-  return (
-    <>
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-xl font-bold text-[#09090b]">Initial Patient Dentition</p>
-        {onDismiss && (
-          <button type="button" aria-label="Dismiss" onClick={onDismiss} className="flex size-7 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]">
-            <X className="size-4" />
-          </button>
-        )}
-      </div>
-      <p className="mt-1 text-sm text-[#a1a1aa]">Choose one of the options to continue.</p>
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button type="button" onClick={() => onPick('permanent')} className="bg-dash-blue hover:bg-dash-blue-hover flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-white">
-          <ArrowUpRight className="size-3.5" /> Permanent dentition
-        </button>
-        <button type="button" onClick={() => onPick('primary')} className="text-dash-blue flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold hover:bg-[#f4f4f5]">
-          <ArrowUpRight className="size-3.5" /> Primary dentition
-        </button>
-      </div>
-    </>
-  )
-}
 
 
 function NewDocumentDialog({ open, onClose, onSave }: { open: boolean; onClose: () => void; onSave: (type: string) => void }) {
@@ -81,9 +58,6 @@ function NewDocumentDialog({ open, onClose, onSave }: { open: boolean; onClose: 
 export function DentalAssessmentExam() {
   const [findings, setFindings] = useState<Finding[]>(INITIAL_FINDINGS)
   /* El chart sólo aparece una vez elegida la dentición. */
-  const [dentition, setDentition] = useState<'permanent' | 'primary' | null>(null)
-  const [dentitionCardOpen, setDentitionCardOpen] = useState(true)
-  const [dentitionPrompt, setDentitionPrompt] = useState<null | 'procedure' | 'table'>(null)
   const [procedureFor, setProcedureFor] = useState<number | null>(null)
   const [procedureOpen, setProcedureOpen] = useState(false)
   const [editing, setEditing] = useState<Finding | null>(null)
@@ -97,7 +71,6 @@ export function DentalAssessmentExam() {
   const reviewState = useExamReviews(INITIAL_REVIEWS, HOY)
 
   function openProcedure(tooth: number | null) {
-    if (!dentition) { setProcedureFor(tooth); setDentitionPrompt('procedure'); return }
     setProcedureFor(tooth)
     setProcedureOpen(true)
   }
@@ -147,13 +120,6 @@ export function DentalAssessmentExam() {
     ? findings.filter((f) => f.id !== confirming.finding.id && f.area === confirming.finding.area)
     : []
 
-  function resolveDentition(d: 'permanent' | 'primary') {
-    const next = dentitionPrompt
-    setDentition(d)
-    setDentitionPrompt(null)
-    if (next === 'procedure') setProcedureOpen(true)
-    if (next === 'table') setView('table')
-  }
 
   return (
     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-start">
@@ -191,7 +157,7 @@ export function DentalAssessmentExam() {
       </div>
 
       <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-[#e4e4e7] p-4 lg:order-2 lg:pr-20" data-examen style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fbfefc' }}>
-        {dentition && view === 'table' ? (
+        {view === 'table' ? (
           <div className="w-full overflow-x-auto rounded-lg border border-[#e4e4e7] bg-white">
             <div className="min-w-[720px]">
               <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
@@ -219,34 +185,8 @@ export function DentalAssessmentExam() {
               })}
             </div>
           </div>
-        ) : dentition ? (
-          <OdontogramEmbed controlesAbiertos={controlesAbiertos} onCerrarControles={() => setControlesAbiertos(false)} />
         ) : (
-          <div className="flex w-full max-w-[560px] flex-col items-center gap-4 self-center">
-            <div className="flex w-full items-center justify-between gap-3 rounded-lg bg-white px-4 py-3 shadow-sm">
-              <span className="flex flex-col">
-                <span className="text-sm font-semibold text-[#09090b]">Not found detection</span>
-                <span className="text-sm text-[#71717a]">Try again</span>
-              </span>
-              <button type="button" onClick={() => setDentitionCardOpen(true)} className="bg-dash-blue hover:bg-dash-blue-hover flex items-center gap-1.5 rounded-md px-3 py-2 text-[13px] font-semibold text-white">
-                <RotateCw className="size-3.5" /> Try again
-              </button>
-            </div>
-            {dentitionCardOpen && dentitionPrompt === null && (
-              <div className="w-full rounded-2xl bg-white p-5 shadow-sm">
-                <DentitionCard onPick={setDentition} onDismiss={() => setDentitionCardOpen(false)} />
-              </div>
-            )}
-          </div>
-        )}
-
-        {dentitionPrompt !== null && (
-          <>
-            <button type="button" aria-label="Dismiss" onClick={() => setDentitionPrompt(null)} className="absolute inset-0 z-10 cursor-default" />
-            <div className="absolute right-4 bottom-20 z-20 w-[min(400px,calc(100%-2rem))] rounded-2xl bg-white p-5 shadow-lg">
-              <DentitionCard onDismiss={() => setDentitionPrompt(null)} onPick={resolveDentition} />
-            </div>
-          </>
+          <OdontogramEmbed controlesAbiertos={controlesAbiertos} onCerrarControles={() => setControlesAbiertos(false)} />
         )}
 
         <div
@@ -270,7 +210,7 @@ export function DentalAssessmentExam() {
           </button>
           <button
             type="button" aria-label={view === 'table' ? 'View chart' : 'View table'} aria-pressed={view === 'table'}
-            onClick={() => { if (!dentition) { setDentitionPrompt('table'); return } setView((v) => (v === 'table' ? 'chart' : 'table')) }}
+            onClick={() => setView((v) => (v === 'table' ? 'chart' : 'table'))}
             className={`flex size-11 items-center justify-center rounded-full shadow-md ${view === 'table' ? 'bg-dash-blue text-white' : 'border border-[#e4e4e7] bg-white text-[#09090b] hover:bg-[#fafafa]'}`}
           >
             <Table2 className="size-4" />

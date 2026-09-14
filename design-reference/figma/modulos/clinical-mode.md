@@ -781,3 +781,14 @@ diseño"*. Sólo CSS, ningún id ni handler de la librería tocado:
   en las columnas de la grilla partían "Add: [select] OK" en dos renglones.
   **Ojo con la especificidad**: hay que nombrarlos `.row.status-extra-row`,
   porque si no gana `.row:has(> select)`, que suma la del argumento.
+
+### Fuera el gate de dentición, panel más chico (2026-09-13)
+
+- **Se saca el gate de entrada de DentAssmt**: la card "Initial Patient
+  Dentition" con Permanent/Primary y la fila "Not found detection · Try
+  again". Pedido de Julián. Eran de la spec del proyecto hermano, pero la
+  librería ya trae Primary/Mixed/Edentulous en su panel de Statuses, así que
+  preguntarlo antes de mostrar nada sólo tapaba el gráfico. Ahora el
+  odontograma aparece directo al entrar a la pestaña.
+- **Panel más compacto**: techo de 300px, controles de 32px, cabeceras de 12
+  y pastillas de 26. El panel acompaña al gráfico, no es la pantalla.

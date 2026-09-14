@@ -453,3 +453,60 @@
   flex: 1 1 240px;
   max-width: 340px;
 }
+
+/* ── Panel más compacto (pedido de Julián: "que no sea tan grande") ──
+   El panel es un accesorio del gráfico, no la pantalla: baja la altura de
+   los controles, los espacios y el techo de la card. */
+.odonto-embed.controles-abiertos .panel,
+.odonto-embed.controles-abiertos .tooth-info {
+  max-height: min(38vh, 300px);
+  padding: 12px 14px;
+}
+
+.odonto-embed.controles-abiertos .panel .card {
+  gap: 8px 20px;
+}
+
+.odonto-embed.controles-abiertos .panel .card > .card-title,
+.odonto-embed.controles-abiertos .tooth-info > .card-title {
+  margin: 0 0 2px;
+  padding: 0 0 8px;
+  font-size: 12px;
+}
+
+.odonto-embed.controles-abiertos .panel select,
+.odonto-embed.controles-abiertos .panel input[type='text'],
+.odonto-embed.controles-abiertos .panel input[type='number'] {
+  height: 32px;
+  font-size: 12px;
+}
+
+.odonto-embed.controles-abiertos .panel .row:has(> select) {
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.odonto-embed.controles-abiertos .panel .card-title .btn,
+.odonto-embed.controles-abiertos .panel .card-title .icon-btn {
+  height: 26px;
+  min-width: 26px;
+  font-size: 11px;
+}
+
+.odonto-embed.controles-abiertos .panel .row.status-actions .btn,
+.odonto-embed.controles-abiertos .panel .row.status-extra-row .btn,
+.odonto-embed.controles-abiertos .panel .status-actions .btn,
+.odonto-embed.controles-abiertos .panel .select-actions .btn {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.odonto-embed.controles-abiertos .panel .inline-checks label,
+.odonto-embed.controles-abiertos .panel .btn-toggle {
+  height: 26px;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+/* La barra de pasos, al tono. */

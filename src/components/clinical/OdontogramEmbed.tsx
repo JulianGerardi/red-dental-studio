@@ -179,7 +179,7 @@ export function OdontogramEmbed({
 
       {controlesAbiertos && pasos.length > 0 && (
         <div className={cn(
-          'flex h-12 w-full items-center justify-between gap-1 border border-[#e4e4e7] bg-white px-2',
+          'flex h-10 w-full items-center justify-between gap-1 border border-[#e4e4e7] bg-white px-2',
           minimizado ? 'mt-3 rounded-xl' : 'rounded-b-xl border-t-0',
         )}>
           <button
@@ -187,14 +187,14 @@ export function OdontogramEmbed({
             aria-label="Previous section"
             disabled={paso === 0}
             onClick={() => setPaso((p) => Math.max(0, p - 1))}
-            className="flex size-8 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
+            className="flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
           >
             <ChevronLeft className="size-4" />
           </button>
 
           <span className="min-w-0 flex-1 text-center">
-            <span className="block truncate text-[13px] font-semibold text-[#09090b]">{actual?.titulo}</span>
-            <span className="block text-[11px] text-[#a1a1aa]">{paso + 1} of {pasos.length}</span>
+            <span className="block truncate text-[12px] font-semibold text-[#09090b]">{actual?.titulo}</span>
+            <span className="block text-[10px] text-[#a1a1aa]">{paso + 1} of {pasos.length}</span>
           </span>
 
           <button
@@ -202,7 +202,7 @@ export function OdontogramEmbed({
             aria-label="Next section"
             disabled={paso === pasos.length - 1}
             onClick={() => setPaso((p) => Math.min(pasos.length - 1, p + 1))}
-            className="flex size-8 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
+            className="flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
           >
             <ChevronRight className="size-4" />
           </button>
@@ -212,7 +212,7 @@ export function OdontogramEmbed({
             aria-label={minimizado ? 'Expand controls' : 'Minimize controls'}
             aria-pressed={minimizado}
             onClick={() => setMinimizado((v) => !v)}
-            className="flex size-8 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]"
+            className="flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]"
           >
             {minimizado ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
           </button>
@@ -221,7 +221,7 @@ export function OdontogramEmbed({
             type="button"
             aria-label="Close controls"
             onClick={onCerrarControles}
-            className="flex size-8 shrink-0 items-center justify-center rounded-md border border-[#e4e4e7] text-[#71717a] hover:bg-[#f4f4f5]"
+            className="flex size-7 shrink-0 items-center justify-center rounded-md border border-[#e4e4e7] text-[#71717a] hover:bg-[#f4f4f5]"
           >
             <X className="size-3.5" />
           </button>
