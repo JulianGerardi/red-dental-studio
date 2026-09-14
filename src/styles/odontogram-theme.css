@@ -580,3 +580,34 @@
   width: 100%;
   min-width: 0;
 }
+
+
+/* ─── El panel de la librería sale de pantalla ───────────────────────────
+   Los controles ahora los dibuja `OdontogramPanel` con los componentes de
+   esta app; el panel original sigue montado -su lógica y sus ids son los
+   que mandan- pero fuera de vista. Se manda a la izquierda en vez de
+   `display:none` a propósito: hay que poder medir qué controles están
+   visibles para espejarlos, y con `display:none` todos miden cero.
+   El resumen "Tooth information" sí se muestra tal cual: es texto. */
+.odonto-embed.controles-abiertos .panel {
+  position: absolute !important;
+  left: -10000px !important;
+  top: 0 !important;
+  width: 420px !important;
+  max-height: none !important;
+  overflow: visible !important;
+  pointer-events: none;
+}
+
+.odonto-embed.controles-abiertos.en-resumen .tooth-info {
+  display: block;
+  width: 100%;
+  margin: 12px 0 0;
+  padding: 14px;
+  max-height: min(34vh, 260px);
+  overflow-y: auto;
+  border: 1px solid #e4e4e7;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: #fff;
+}

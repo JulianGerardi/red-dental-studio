@@ -813,3 +813,33 @@ porque el problema era la **disposición**, no la paleta:
    ganarle al CSS de un tercero.
 
 Resultado medido: la card pasa de 204px a 75 y el panel de 299 a ~200.
+
+### El panel pasa a ser nuestro (2026-09-13, 3ª vuelta)
+
+Estilar el markup de la librería no alcanzaba -*"sigo viendo la misma card
+horrenda"*-, así que el panel **se dibuja con nuestros componentes**:
+`src/components/clinical/dental/OdontogramPanel.tsx`.
+
+Cómo funciona, que es lo no obvio:
+
+- La librería sigue montada y con toda su lógica, pero su `aside.panel` se
+  manda **fuera de pantalla** (`position:absolute; left:-10000px`), **no** a
+  `display:none`: hace falta que siga teniendo layout para poder saber qué
+  controles están visibles y espejarlos. Con `display:none` todos miden cero.
+- `leerControles()` recorre la card activa y arma un modelo de sus
+  `select`, `input[type=checkbox]` y `button` reales -con su label, su valor
+  y si están deshabilitados-.
+- Se redibujan con nuestro diseño, y cada interacción **escribe sobre el
+  control original y dispara su evento** (`change` o `click`), así que la
+  librería reacciona igual que si la hubieran tocado a ella.
+- Un `MutationObserver` sobre la card refresca el modelo: la librería
+  reescribe sus controles al cambiar de pieza o de estado.
+
+Los controles deshabilitados **se muestran igual**, en gris: hasta elegir
+una pieza la librería los deja inactivos, y esconderlos dejaba la card casi
+vacía -que era justo la queja-.
+
+Verificado de punta a punta con un render automatizado: apretar nuestro
+botón "All" deja `activeToothLabel` en "32 teeth" y habilita los campos, y
+elegir "Radix" en nuestro select escribe `radix` en el `#substrateSelect` de
+la librería.

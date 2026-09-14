@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, X } from 'lucide-react'
 import { OdontogramShell, type OdontogramThemeConfig } from 'react-advanced-odontogram'
 import { cn } from '@/lib/utils'
+import { OdontogramPanel } from '@/components/clinical/dental/OdontogramPanel'
 import '@/styles/odontogram-scoped.css'
 import '@/styles/odontogram-theme.css'
 
@@ -161,9 +162,7 @@ export function OdontogramEmbed({
   }, [pasos])
 
   const actual = pasos[paso]
-  /* Con el resumen abierto la cabecera del panel de la librería -la
-     selección de piezas- no viene a cuento: acompaña a las cards. */
-  const enResumen = !!actual?.nodo.classList.contains('tooth-info')
+  const esInfo = !!actual?.nodo.classList.contains('tooth-info')
 
   return (
     <div
@@ -171,11 +170,17 @@ export function OdontogramEmbed({
       className={cn(
         'odonto-embed w-full',
         controlesAbiertos && !minimizado && 'controles-abiertos',
-        controlesAbiertos && !minimizado && enResumen && 'en-resumen',
+        controlesAbiertos && !minimizado && esInfo && 'en-resumen',
       )}
       style={VARIABLES}
     >
       <OdontogramShell themeConfig={TEMA} language="en" numberingSystem="UNIVERSAL" />
+
+      {controlesAbiertos && !minimizado && actual && !esInfo && (
+        <div className="mt-3 w-full rounded-t-xl border border-b-0 border-[#e4e4e7] bg-white p-4">
+          <OdontogramPanel card={actual.nodo} />
+        </div>
+      )}
 
       {controlesAbiertos && pasos.length > 0 && (
         <div className={cn(
