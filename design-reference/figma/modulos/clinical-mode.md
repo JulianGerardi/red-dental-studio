@@ -914,8 +914,14 @@ Quedaron como dos gestos distintos, que era la confusión de antes:
   aviso de la cruz remite a él para el caso de "sacarlo de en medio sin
   perder lo hecho".
 
+Descartar deja todo como recién entrado: además del reset, llama al
+`clearSelection()` que la librería exporta -si no, las piezas quedaban
+elegidas- y el carrusel vuelve al paso 1 con el panel remontado, así no
+queda ningún botón marcado.
+
 Verificado con el resumen de la librería: minimizar deja
-`Caries: 1 (O) – superficial, ...` y descartar vuelve a
-`Caries: No carious teeth.`.
+`Caries: 1 (O) – superficial, ...`; descartar vuelve a
+`Caries: No carious teeth.`, con `activeToothLabel` en "—", el paso en
+"1 of 9" y el botón "Teeth" sin marcar.
 
 También se saca el botón de plegar el listado de Findings.

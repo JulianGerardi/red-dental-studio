@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, TriangleAlert, X } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
-import { OdontogramShell, type OdontogramThemeConfig } from 'react-advanced-odontogram'
+import { OdontogramShell, clearSelection, type OdontogramThemeConfig } from 'react-advanced-odontogram'
 import { cn } from '@/lib/utils'
 import { OdontogramPanel } from '@/components/clinical/dental/OdontogramPanel'
 import '@/styles/odontogram-scoped.css'
@@ -80,12 +80,18 @@ export function OdontogramEmbed({
   /* Minimizado deja sólo la barra: el gráfico se ve entero sin cerrar nada. */
   const [minimizado, setMinimizado] = useState(false)
   const [confirmandoCierre, setConfirmandoCierre] = useState(false)
+  const [reinicio, setReinicio] = useState(0)
 
   /* La cruz descarta: vuelve el odontograma al default. Para guardar lo
      hecho y sacar los controles de en medio está el minimizar. Se apoya en
-     el "Reset mouth" de la librería, que es quien sabe cuál es el default. */
+     el "Reset mouth" de la librería, que es quien sabe cuál es el default,
+     y en su `clearSelection()`, porque si no las piezas quedan elegidas. */
   const descartarYCerrar = () => {
     ref.current?.querySelector<HTMLButtonElement>('#btnResetAll')?.click()
+    clearSelection()
+    setPaso(0)
+    /* Remonta el panel: así se olvida qué botón estaba marcado. */
+    setReinicio((n) => n + 1)
     onCerrarControles()
   }
 
@@ -221,7 +227,7 @@ export function OdontogramEmbed({
 
       {controlesAbiertos && !minimizado && actual && !esInfo && (
         <div className="mt-3 w-full rounded-t-xl border border-b-0 border-[#e4e4e7] bg-white p-4">
-          <OdontogramPanel card={actual.nodo} />
+          <OdontogramPanel key={reinicio} card={actual.nodo} />
         </div>
       )}
 
