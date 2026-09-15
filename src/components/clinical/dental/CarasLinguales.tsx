@@ -40,8 +40,10 @@ export function CarasLinguales({ raiz }: { raiz: HTMLElement | null }) {
       celda.replaceChildren(copia)
       celda.classList.add('cara-lingual')
       celda.setAttribute(MARCA, numero)
-      /* Sigue el estado de selección de su pieza. */
-      celda.classList.toggle('esta-activa', modelo.classList.contains('active'))
+      /* Se le pone la clase `active` de la librería, no una propia: así
+         estas celdas se marcan exactamente igual que cualquier otra cuando
+         la pieza está seleccionada, sin duplicar estilos. */
+      celda.classList.toggle('active', modelo.classList.contains('active'))
 
       if (!celda.dataset.caraLista) {
         celda.dataset.caraLista = 'si'
@@ -75,7 +77,7 @@ export function CarasLinguales({ raiz }: { raiz: HTMLElement | null }) {
       observer.disconnect()
       raiz.querySelectorAll<HTMLElement>(`[${MARCA}]`).forEach((celda) => {
         celda.replaceChildren()
-        celda.classList.remove('cara-lingual', 'esta-activa')
+        celda.classList.remove('cara-lingual', 'active')
         celda.removeAttribute(MARCA)
         delete celda.dataset.caraLista
       })

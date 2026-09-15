@@ -1041,3 +1041,20 @@ Detalles que importan:
 - Se vuelve a copiar con el `onStateChange` de la librería, y la selección
   -que no pasa por ahí- con un observer de clases diferido con
   `requestAnimationFrame`, porque ese observer también ve nuestros cambios.
+
+### Las caras nuevas aceptan condiciones (2026-09-14)
+
+Verificado de punta a punta que desde una de esas 12 celdas se puede cargar
+lo mismo que desde cualquier diente: seleccionar deja `activeToothLabel` en
+la pieza, "Tooth condition" escribe `radix` en el `#substrateSelect`,
+"Restoration" deja `Prosthetics: 6: Crown – zirconia` -idéntico a hacerlo
+desde el diente de arriba, que da `Prosthetics: 1: …`- y marcar una
+superficie registra `Caries: 6 (L) – superficial`.
+
+Lo que sí faltaba era **mostrarse seleccionadas**: ahora se les pone la clase
+`active` de la librería en vez de una propia, así heredan exactamente el
+mismo contorno azul punteado que el resto y no hay dos estilos de selección.
+
+Nota de depuración: los selects del panel están dentro de un `span` -el que
+posiciona el chevron-, así que un locator `label > select` no los encuentra.
+Dos pruebas dieron falsos negativos por eso antes de notarlo.
