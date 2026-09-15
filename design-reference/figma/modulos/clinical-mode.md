@@ -1223,3 +1223,32 @@ apenas, y por eso todo el selector se sentía "amontonado" -no se
 distinguía dónde terminaba un botón y empezaba el siguiente-. Se repone el
 blanco con una regla `.odonto-embed .perio-overlay-switch-btn.is-active`
 -gana por tener un ancestro de más, sin necesitar `!important`-.
+
+### El "fill container" era del PANEL, no de la grilla sola (2026-09-16, noche)
+
+Julián mandó una captura de su pantalla real -mucho más ancha que la del
+navegador con la que se venía probando- con flechas a mano marcando un
+hueco vacío a la derecha de toda la sección "Periodontal Status". El
+`max-width: 750px` de la corrección anterior estaba puesto sólo en
+`.perio-tabs-cuerpo` (la grilla): en una pantalla angosta eso alcanza para
+que todo se vea prolijo, pero en una ancha el selector "None/PD/CAL…" y
+los tabs -que no tenían ningún techo- seguían estirándose al ancho
+completo del panel mientras la grilla, ya achicada, quedaba corta: quedaba
+un descalce entre filas de la MISMA tarjeta, no un problema de la grilla
+en sí.
+
+El techo se movió al panel entero (`.perio-inline-panel`, el `#perioInlinePanel`
+que contiene el título, el selector de superposición, los tabs y la
+grilla), así todo se achica junto y no hay ancho que no coincida con otro
+dentro de la misma sección. Verificado con la ventana en 1800px: el
+selector, los tabs y la grilla terminan los tres en el mismo borde
+derecho.
+
+**Las caries seguían viéndose negras en algunas caras (labial, mesial,
+incisal, distal, lingual).** El `fill` sí daba rojo -se verificó de nuevo,
+en las cinco superficies-, pero el `stroke` horneado en el SVG
+(`stroke:#000`) no se había tocado: con el relleno a `opacity:0.45` -así
+codifica la profundidad ICDAS, eso no se toca- un contorno negro sólido es
+lo que más pesa a la vista, y de lejos la mancha se leía negra con apenas
+un tinte rojo. Se agregó `stroke: #dc2626 !important` a la misma regla del
+`fill`.

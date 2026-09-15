@@ -671,16 +671,24 @@
   background: #fafafa;
 }
 
-/* El `max-width` es lo que le da un tamaño concreto para rellenar: sin él,
-   las columnas en `fr` de `ajustarColumnas` ocuparían el ancho entero del
-   panel -volviendo al gráfico de ~195px de siempre-. Con esto, en pantallas
-   más angostas que 750px el `fr` sigue rellenando sin dejar hueco ni pedir
-   scroll; en las más anchas, no crece más allá de este techo. */
 .odonto-embed .perio-tabs-cuerpo {
-  max-width: 750px;
   overflow-x: auto;
   border: 1px solid #e7e7e7;
   border-radius: 8px;
+}
+
+/* El `max-width` es lo que le da un tamaño concreto para que las columnas
+   en `fr` de `ajustarColumnas` tengan algo que rellenar -sin él ocuparían
+   el ancho entero del panel, volviendo al gráfico de ~195px de siempre-.
+   Va en el PANEL ENTERO (`.perio-inline-panel`, título + selector de
+   superposición + tabs + grilla), no sólo en `.perio-tabs-cuerpo`: puesto
+   sólo ahí, en una pantalla ancha el selector "None/PD/CAL…" y los tabs
+   seguían estirados al ancho completo mientras la grilla quedaba angosta,
+   y quedaba un hueco vacío a la derecha de toda la sección -exactamente lo
+   que Julián marcó con flechas en una captura-. Con el techo acá, todo el
+   panel se achica junto y no hay descalce entre una fila y otra. */
+.odonto-embed .perio-inline-panel {
+  max-width: 750px;
 }
 
 /* El trazo de "Buccal/Palatal/Lingual PD": arrastrar por el gráfico carga
@@ -697,11 +705,19 @@
    `.caries-clon` es la marca que deja `CarasLinguales.tsx` en las 12 caras
    nuevas: ahí no hay `id` -se le sacan todos para no romper los
    `getElementById` de la librería-, así que el selector por `id` no las
-   alcanza y quedaban en negro. */
+   alcanza y quedaban en negro.
+
+   También el `stroke`: algunas caras (buccal, lingual) traen además un
+   contorno negro sólido horneado (`stroke:#000`), y con el relleno a
+   opacity 0.45 -así codifica la profundidad ICDAS, no se toca- ese borde
+   negro es lo que más se ve: de lejos la mancha se leía negra con apenas
+   un tinte rojo, no roja. Puesto en el mismo rojo, el contorno deja de
+   competir con el relleno. */
 .odonto-embed [id^="caries-"],
 .odonto-embed [id^="subcaries-"],
 .odonto-embed .caries-clon {
   fill: #dc2626 !important;
+  stroke: #dc2626 !important;
 }
 
 /* El "None" del selector de superposición (arriba de cada tab) quedaba
