@@ -5,7 +5,7 @@ import { OdontogramShell, clearSelection, type OdontogramThemeConfig } from 'rea
 import { cn } from '@/lib/utils'
 import { OdontogramPanel } from '@/components/clinical/dental/OdontogramPanel'
 import { ToothInfoPanel } from '@/components/clinical/dental/ToothInfoPanel'
-import { FilasLinguales } from '@/components/clinical/dental/FilasLinguales'
+import { CarasLinguales } from '@/components/clinical/dental/CarasLinguales'
 import '@/styles/odontogram-scoped.css'
 import '@/styles/odontogram-theme.css'
 
@@ -200,7 +200,7 @@ export function OdontogramEmbed({
       style={VARIABLES}
     >
       <OdontogramShell themeConfig={TEMA} language="en" numberingSystem="UNIVERSAL" />
-      <FilasLinguales raiz={ref.current} />
+      <CarasLinguales raiz={ref.current} />
 
       {confirmandoCierre && (
         <ModalShell

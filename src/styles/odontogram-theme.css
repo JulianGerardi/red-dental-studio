@@ -613,12 +613,23 @@
   outline: none;
 }
 
-/* Las celdas de cara lingual que insertamos en la grilla: mismo alto y
-   borde que las de la librería, para que la fila no desentone. */
-.odonto-embed .tooth-tile.lingual-view {
+/* Las caras lingual/palatina que llenan los 12 cuadrados vacíos de los
+   anteriores: la misma pieza de arriba, más chica. */
+.odonto-embed .tooth-tile.occl-view.cara-lingual {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2px;
   cursor: pointer;
+}
+
+/* Se acota por alto, no por ancho: el dibujo es más alto que la celda y
+   limitando el ancho quedaba recortado arriba y abajo. */
+.odonto-embed .tooth-tile.occl-view.cara-lingual svg {
+  height: 82%;
+  width: auto;
+  max-width: 100%;
+}
+
+.odonto-embed .tooth-tile.occl-view.cara-lingual.esta-activa svg {
+  filter: drop-shadow(0 0 0 #1d56bc);
 }
