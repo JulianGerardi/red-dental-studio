@@ -229,9 +229,13 @@ export function OdontogramEmbed({
         />
       )}
 
-      {/* Debajo del "Dental chart", no en un modal: un modal lo tapaba. */}
+      {/* Flotante fijo a la derecha -no inline abajo del chart, ni modal-:
+          Julián quiere compararlo mientras scrollea la grilla de Periodontal
+          Status, así que tiene que seguir a la vista y no taparla (no hay
+          fondo oscuro, y la grilla sigue siendo clickeable atrás). Cierra
+          y la página vuelve al layout normal, sin nada reservado. */}
       {infoAbierto && (infoNodo || perioNodo) && (
-        <div className="mt-3 w-full rounded-xl border border-[#e4e4e7] bg-white p-4">
+        <div className="fixed top-20 right-4 z-40 w-96 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-[#e4e4e7] bg-white p-4 shadow-xl">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-[13px] font-semibold text-[#09090b]">Tooth information</span>
             <button

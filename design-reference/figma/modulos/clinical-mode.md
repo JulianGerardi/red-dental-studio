@@ -1489,3 +1489,27 @@ Verificado cargando un "Buccal PD" real (5mm) en un sitio: el bloque
 "Periodontal summary" del panel pasa de puros "–"/"0%" a "Avg PD 5",
 "Charted sites 1", "Max PD 5" al instante, y el punto rojo del ícono
 prende -estando en Periodontal Status-. Cero errores de consola.
+
+### El panel pasa de inline a flotante fijo a la derecha (2026-09-16)
+
+Con el resumen periodontal en vivo (arriba) surgió el caso de uso real:
+Julián quiere ir cargando sitios en la grilla -que es larga, se scrollea
+mucho- mientras compara contra el "Periodontal summary". Con el panel
+inline de más arriba (debajo del "Dental chart") tenía que scrollear
+hasta el final cada vez para verlo, lejos de la grilla que estaba
+cargando.
+
+Pasa a `position: fixed` -`top-20 right-4`, `max-h-[calc(100vh-6rem)]`
+con su propio scroll-, así que queda anclado a la ventana y no a la
+página: sigue a la vista mientras se scrollea la grilla, sin tapar nada
+(no tiene fondo oscuro, la grilla sigue clickeable atrás) y sin
+reservar espacio en el layout -al cerrarlo, todo vuelve exactamente a
+como estaba-. Sigue sin ser modal, que es lo que Julián había pedido
+explícitamente evitar en primer lugar: no atenúa el resto de la
+pantalla ni bloquea interactuar con el gráfico.
+
+Verificado: se scrolleó la grilla de Periodontal Status con el panel
+abierto y quedó fijo en el mismo lugar de la pantalla; se cargó un sitio
+con el panel abierto y el valor se actualizó ahí mismo sin cerrarlo; al
+cerrar, la página quedó igual que antes de abrirlo. Cero errores de
+consola.
