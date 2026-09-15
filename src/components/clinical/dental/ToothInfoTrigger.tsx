@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { Info } from 'lucide-react'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
-import { ToothInfoPanel, useResumenDental, hayHallazgo } from '@/components/clinical/dental/ToothInfoPanel'
+import { ToothInfoPanel, useResumenDental, usePerioResumen, hayHallazgo } from '@/components/clinical/dental/ToothInfoPanel'
 import { BOTON_ICONO_REDONDO } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
@@ -36,22 +36,29 @@ import { cn } from '@/lib/utils'
    pidió así porque un modal tapaba el gráfico- y eso lo dibuja
    `OdontogramEmbed`, no este componente: acá sólo vive el botón. El
    puntito rojo avisa que hay algo para ver: `hayHallazgo` (en
-   `ToothInfoPanel.tsx`) descarta los renglones "no recorded X" Y el caso
-   especial de "Periodontal status" sano, que no arranca con "no" pero
-   tampoco es un hallazgo.
+   `ToothInfoPanel.tsx`) descarta los renglones "no recorded X" y el caso
+   especial de "Periodontal status" sano, y también prende si ya hay
+   sitios cargados en el sondaje (`perioNodo`, ver abajo).
+
+   `perioNodo` es `.perio-summary-card` -Avg PD/CAL/BOP%/etc.-, que
+   Julián pidió mostrar acá: sólo existe en el DOM mientras se ve
+   Periodontal Status, así que llega en `null` en Odontogram y el bloque
+   correspondiente del panel no se dibuja.
    Ver design-reference/figma/modulos/clinical-mode.md. */
 
 export function ToothInfoTrigger({
-  nodo, contenedor, abierto, onToggle,
+  nodo, perioNodo, contenedor, abierto, onToggle,
 }: {
-  nodo: HTMLElement
+  nodo: HTMLElement | null
+  perioNodo: HTMLElement | null
   contenedor: HTMLElement
   abierto: boolean
   onToggle: () => void
 }) {
   const envoltorio = useRef<HTMLSpanElement>(null)
   const resumen = useResumenDental(nodo)
-  const hayNotificacion = hayHallazgo(resumen)
+  const perio = usePerioResumen(perioNodo)
+  const hayNotificacion = hayHallazgo(resumen, perio)
 
   useLayoutEffect(() => {
     const el = envoltorio.current
@@ -85,7 +92,7 @@ export function ToothInfoTrigger({
           </button>
         </HoverCardTrigger>
         <HoverCardContent side="bottom" align="end" className="w-96 max-h-[70vh] overflow-y-auto">
-          <ToothInfoPanel nodo={nodo} />
+          <ToothInfoPanel nodo={nodo} perioNodo={perioNodo} />
         </HoverCardContent>
       </HoverCard>
     </span>

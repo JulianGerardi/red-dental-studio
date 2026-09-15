@@ -1444,3 +1444,48 @@ appliance → Bracket): el punto aparece al instante y el renglón
 "Orthodontics" pasa de gris a texto normal en el panel; sacando el
 aparato, el punto se apaga. En el examen sano de base (sin tocar nada)
 el punto no aparece.
+
+### El panel también muestra el resumen de Periodontal Status (2026-09-16)
+
+Julián mandó una captura de la card "Summary" (Avg PD, Avg CAL, BOP%,
+Charted sites, Worst CAL, Max PD, Max furcation, PI%) pidiendo que sea
+"lo que vas marcando en el periodontal" -el resumen en vivo del sondaje,
+no un texto fijo-.
+
+La librería ya la dibuja sola: es `.perio-summary-card` (título
+"Summary" + `.perio-fullgrid-summary-item` con label/value,
+`role="status"`), con los mismos textos -se encontraron las claves de
+i18n `perio.summary.avgPd`, `.avgCal`, `.maxFurcation`, etc. en
+`node_modules/react-advanced-odontogram`-. No hubo que calcular nada:
+alcanzó con leerla igual que `.tooth-info`.
+
+**Bug encontrado al cablearlo**: `.perio-summary-card` sólo existe en el
+DOM mientras se ve la vista Periodontal Status -la librería la saca por
+completo al volver a Odontogram, igual que hace con `.chart-actions` a
+la inversa-. Pero **`.tooth-info` es al revés: sólo existe en
+Odontogram, no en Periodontal Status** -esto no se había notado antes
+porque nunca se probó el ícono estando parado en esa vista-. Como
+`ToothInfoTrigger`/`OdontogramEmbed` exigían `infoNodo` (`.tooth-info`)
+para dibujar el botón, **el ícono entero desaparecía en Periodontal
+Status**, justo la vista donde el nuevo resumen es más útil.
+
+Arreglo: `nodo` (`.tooth-info`) pasa a ser `HTMLElement | null` en
+`ToothInfoTrigger`, `ToothInfoPanel` y `useResumenDental`; el botón se
+dibuja si hay `infoNodo` **o** `perioNodo` (antes exigía sólo el
+primero). `OdontogramEmbed` relee `.perio-summary-card` en el mismo
+`releer()` que ya usaba para `.tooth-info`/`.perio-launch-bar`, guardado
+en `perioNodo`.
+
+`hayHallazgo` -el punto rojo- ahora también prende con `Charted sites`
+> 0 en el resumen periodontal, no sólo con hallazgos del odontograma.
+Un matiz conocido, no arreglado: como `.perio-summary-card` no existe
+fuera de Periodontal Status, el punto por sondaje sólo se ve estando en
+esa vista -si ya se cargaron sitios y se vuelve a Odontogram, el punto
+se apaga hasta que algo en `.tooth-info` amerite prenderlo por su
+cuenta-. Aceptable: no hay de dónde leer ese dato en Odontogram, la
+librería no lo deja en el DOM.
+
+Verificado cargando un "Buccal PD" real (5mm) en un sitio: el bloque
+"Periodontal summary" del panel pasa de puros "–"/"0%" a "Avg PD 5",
+"Charted sites 1", "Max PD 5" al instante, y el punto rojo del ícono
+prende -estando en Periodontal Status-. Cero errores de consola.

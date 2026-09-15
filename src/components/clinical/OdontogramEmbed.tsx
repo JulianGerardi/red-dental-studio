@@ -83,6 +83,7 @@ export function OdontogramEmbed({
   const [pasos, setPasos] = useState<Paso[]>([])
   const [infoNodo, setInfoNodo] = useState<HTMLElement | null>(null)
   const [barraNodo, setBarraNodo] = useState<HTMLElement | null>(null)
+  const [perioNodo, setPerioNodo] = useState<HTMLElement | null>(null)
   const [infoAbierto, setInfoAbierto] = useState(false)
   const [paso, setPaso] = useState(0)
   /* Minimizado deja sólo la barra: el gráfico se ve entero sin cerrar nada. */
@@ -111,10 +112,12 @@ export function OdontogramEmbed({
      (`ToothInfoTrigger`), que se porta adentro de `.perio-launch-bar` -la
      barra donde viven los tabs Odontogram/Periodontal Status-, en el lugar
      que dejó libre el botón "Diagnoses" (se saca por CSS, ver
-     odontogram-theme.css). Se releen porque la librería monta y desmonta
-     cards según la pieza activa -Orthodontics, por ejemplo, sólo aparece
-     en piezas elegibles- y porque esa barra se vuelve a armar al cambiar
-     de vista. */
+     odontogram-theme.css). `perioNodo` (`.perio-summary-card`, con el
+     Avg PD/CAL/BOP%/etc. de lo cargado en Periodontal Status) se agrega
+     al mismo panel: es lo que Julián pidió mostrar ahí. Se releen porque
+     la librería monta y desmonta cards según la pieza activa -Orthodontics,
+     por ejemplo, sólo aparece en piezas elegibles- y porque esa barra (y
+     el summary) se vuelven a armar al cambiar de vista. */
   const releer = useCallback(() => {
     const raiz = ref.current
     if (!raiz) return
@@ -131,6 +134,10 @@ export function OdontogramEmbed({
     setInfoNodo((previo) => (previo === info ? previo : info))
     const barra = raiz.querySelector<HTMLElement>('.perio-launch-bar')
     setBarraNodo((previo) => (previo === barra ? previo : barra))
+    /* Sólo existe mientras se ve Periodontal Status -la librería la saca
+       del DOM por completo al volver a Odontogram-. */
+    const perio = raiz.querySelector<HTMLElement>('.perio-summary-card')
+    setPerioNodo((previo) => (previo === perio ? previo : perio))
   }, [])
 
   /* Varias filas de la librería quedan sin contenido según la pieza
@@ -212,9 +219,10 @@ export function OdontogramEmbed({
       <CarasLinguales raiz={ref.current} />
       <PeriodontalTabs raiz={ref.current} />
       <PerioPdArrastre raiz={ref.current} />
-      {infoNodo && barraNodo && (
+      {barraNodo && (infoNodo || perioNodo) && (
         <ToothInfoTrigger
           nodo={infoNodo}
+          perioNodo={perioNodo}
           contenedor={barraNodo}
           abierto={infoAbierto}
           onToggle={() => setInfoAbierto((v) => !v)}
@@ -222,7 +230,7 @@ export function OdontogramEmbed({
       )}
 
       {/* Debajo del "Dental chart", no en un modal: un modal lo tapaba. */}
-      {infoAbierto && infoNodo && (
+      {infoAbierto && (infoNodo || perioNodo) && (
         <div className="mt-3 w-full rounded-xl border border-[#e4e4e7] bg-white p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-[13px] font-semibold text-[#09090b]">Tooth information</span>
@@ -235,7 +243,7 @@ export function OdontogramEmbed({
               <X className="size-3.5" />
             </button>
           </div>
-          <ToothInfoPanel nodo={infoNodo} />
+          <ToothInfoPanel nodo={infoNodo} perioNodo={perioNodo} />
         </div>
       )}
 
