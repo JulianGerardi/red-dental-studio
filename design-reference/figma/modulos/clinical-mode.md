@@ -1181,3 +1181,45 @@ diente con problema en `Odontogram.tsx`. Verificado leyendo el `fill`
 computado del `<path>` real tras activar una cara con caries desde el
 propio checkbox de la librería (`#chk-caries-{surface}`), no sólo mirando
 la pantalla.
+
+### Tres correcciones más sobre lo de arriba (2026-09-16, tarde)
+
+**El gráfico no rellenaba el panel.** El `0.6` fijo de `ajustarColumnas`
+multiplicaba lo que la librería hubiera calculado ANTES -que, según el
+ancho real de pantalla de quien mira la app, puede no ser lo mismo que se
+vio acá al probar-, así que en una ventana más ancha quedaba un hueco vacío
+a la derecha del gráfico y de todas las filas, y en una más angosta pedía
+scroll horizontal. Se cambió a que las columnas de dientes sean `fr` -osea
+que reparten TODO el ancho disponible, no un número de px fijo- y a poner
+el techo en el contenedor (`.perio-tabs-cuerpo { max-width: 750px }`), no
+en las columnas. Así el ancho real depende sólo de la pantalla de quien
+mira, no de la que se usó para calcular un factor.
+
+Un `fr` a secas casi rompe esto: por default vale `minmax(auto, 1fr)`, y
+ese `auto` es el min-content de la celda más ancha de esa columna en
+CUALQUIER fila (un checkbox, un número). Con contenido que no quiere
+achicarse la grilla "explota" mucho más ancha que el contenedor en vez de
+repartir de verdad -se vio en vivo: gráfico de 3727px en un panel de
+741px-. La solución es `minmax(0, Nfr)`, que saca ese piso. Verificado con
+`getBoundingClientRect()` en tres anchos de ventana (480, ~750 y 1400px):
+el borde derecho del SVG coincide con el del contenedor en los tres, sin
+hueco y sin overflow.
+
+**Algunas caries quedaban en negro.** No todas: las de las 12 caras
+lingual/palatinas nuevas (`CarasLinguales.tsx`). Esas caras son un
+`cloneNode` del SVG lateral **al que se le sacan todos los `id`** -para no
+duplicar los que la librería resuelve con `getElementById`-, así que el
+selector por `id` del fix de caries no las alcanzaba: quedaban con el
+`style="fill:#0a1018"` original de la librería. Antes de sacar el `id`,
+si empieza con `caries-`/`subcaries-` se le deja la clase `.caries-clon`,
+que `odontogram-theme.css` pinta igual que las demás.
+
+**"None" no se leía al seleccionarlo.** El CSS scopeado de la librería
+trae DOS reglas para `.perio-overlay-switch-btn.is-active` -la primera
+pone el texto en blanco, más abajo en la misma hoja (mismo peso: una sola
+clase de estado) otra lo vuelve a poner en `#0b1220`, casi negro, sobre el
+mismo fondo azul de fábrica-. Con el botón activo así, el texto se leía
+apenas, y por eso todo el selector se sentía "amontonado" -no se
+distinguía dónde terminaba un botón y empezaba el siguiente-. Se repone el
+blanco con una regla `.odonto-embed .perio-overlay-switch-btn.is-active`
+-gana por tener un ancestro de más, sin necesitar `!important`-.

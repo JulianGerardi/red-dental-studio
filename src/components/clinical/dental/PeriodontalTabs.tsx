@@ -19,18 +19,24 @@ import { cn } from '@/lib/utils'
 
 const TITULOS = ['Maxillary', 'Mandibular']
 
-/* Ancho de la columna de rótulos ("Miller Class", "Buccal BOP"…) y escala
-   de las columnas de dientes: ambos van inline en el `gridTemplateColumns`
-   de la arcada, que la librería recalcula sola (`ROW_LABEL_WIDTH = 220` en
-   su código) pero SIN reaccionar a cambios de tamaño del contenedor -se
+/* Ancho de la columna de rótulos ("Miller Class", "Buccal BOP"…) y ancho de
+   las columnas de dientes: van inline en el `gridTemplateColumns` de la
+   arcada, que la librería recalcula sola (`ROW_LABEL_WIDTH = 220` en su
+   código) pero SIN reaccionar a cambios de tamaño del contenedor -se
    probó angostar el `.perio-fullgrid-scroll` y no vuelve a correr el
-   ajuste-, así que hay que pisarlo. Angostar las columnas de dientes de
-   paso es lo que también achica el gráfico de dientes+curva sin
-   deformarlo: esa fila comparte la MISMA grilla, y su SVG mide
-   `width:100%; height:auto` -el alto sale solo de un ancho más chico,
-   manteniendo la proporción real del diente-. */
+   ajuste, ni con `max-width` ni con un resize real de ventana-, así que
+   hay que pisarlo.
+
+   Las columnas de dientes pasan a `fr` en vez de un px fijo: así rellenan
+   TODO el ancho disponible del panel -el `max-width` de
+   `.perio-tabs-cuerpo`, en el CSS- en vez de quedarse en un tamaño fijo
+   que en una pantalla más ancha deja un hueco vacío a la derecha, o en una
+   más angosta obliga a scrollear. Angostar el panel de paso es lo que
+   también achica el gráfico de dientes+curva sin deformarlo: esa fila
+   comparte la MISMA grilla, y su SVG mide `width:100%; height:auto` -el
+   alto sale solo de un ancho más chico, manteniendo la proporción real del
+   diente-. */
 const ANCHO_ROTULO = 130
-const ESCALA_DIENTES = 0.6
 
 function ajustarColumnas(arco: HTMLElement) {
   const aplicar = () => {
@@ -38,9 +44,16 @@ function ajustarColumnas(arco: HTMLElement) {
     if (!actual) return
     if (actual === arco.dataset.columnasPropias) return
     const partes = actual.split(' ')
+    /* `minmax(0, Nfr)`, no `Nfr` a secas: un track `fr` sin mínimo explícito
+       vale `minmax(auto, Nfr)` -su "auto" es el min-content del contenido
+       más ancho de esa columna en CUALQUIER fila-, así que con checkboxes o
+       números que no quieren achicarse más de cierto punto la grilla
+       "explota" mucho más ancha que el contenedor en vez de repartir el
+       espacio de verdad. Con el mínimo en 0 el reparto es proporcional
+       siempre, sin ese piso. */
     const nuevas = [
       `${ANCHO_ROTULO}px`,
-      ...partes.slice(1).map((p) => `${(parseFloat(p) * ESCALA_DIENTES).toFixed(2)}px`),
+      ...partes.slice(1).map((p) => `minmax(0, ${parseFloat(p).toFixed(2)}fr)`),
     ].join(' ')
     arco.style.gridTemplateColumns = nuevas
     arco.dataset.columnasPropias = nuevas

@@ -671,7 +671,13 @@
   background: #fafafa;
 }
 
+/* El `max-width` es lo que le da un tamaño concreto para rellenar: sin él,
+   las columnas en `fr` de `ajustarColumnas` ocuparían el ancho entero del
+   panel -volviendo al gráfico de ~195px de siempre-. Con esto, en pantallas
+   más angostas que 750px el `fr` sigue rellenando sin dejar hueco ni pedir
+   scroll; en las más anchas, no crece más allá de este techo. */
 .odonto-embed .perio-tabs-cuerpo {
+  max-width: 750px;
   overflow-x: auto;
   border: 1px solid #e7e7e7;
   border-radius: 8px;
@@ -687,9 +693,23 @@
    diente con problema en el odontograma principal (Odontogram.tsx)-, no
    del casi-negro #0a1018 que trae la librería horneado en el SVG de cada
    pieza. Va con `!important` porque ese color es un `style` inline en el
-   propio `<path>`, no una regla de CSS: gana cualquier selector sin él. */
+   propio `<path>`, no una regla de CSS: gana cualquier selector sin él.
+   `.caries-clon` es la marca que deja `CarasLinguales.tsx` en las 12 caras
+   nuevas: ahí no hay `id` -se le sacan todos para no romper los
+   `getElementById` de la librería-, así que el selector por `id` no las
+   alcanza y quedaban en negro. */
 .odonto-embed [id^="caries-"],
-.odonto-embed [id^="subcaries-"] {
+.odonto-embed [id^="subcaries-"],
+.odonto-embed .caries-clon {
   fill: #dc2626 !important;
+}
+
+/* El "None" del selector de superposición (arriba de cada tab) quedaba
+   ilegible al activarse: el CSS de la librería trae DOS reglas para
+   `.is-active` -una pone el texto en blanco, la otra (más abajo en la
+   hoja, misma especificidad) lo vuelve a poner casi negro sobre el mismo
+   fondo azul-. Se repone el blanco. */
+.odonto-embed .perio-overlay-switch-btn.is-active {
+  color: #fff;
 }
 

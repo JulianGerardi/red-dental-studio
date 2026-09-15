@@ -33,9 +33,15 @@ export function CarasLinguales({ raiz }: { raiz: HTMLElement | null }) {
       if (!original || !numero) return
 
       const copia = original.cloneNode(true) as SVGElement
-      /* Sin ids: duplicarlos rompería los `getElementById` de la librería. */
+      /* Sin ids: duplicarlos rompería los `getElementById` de la librería.
+         Antes de sacarlos, las caries/subcaries quedan marcadas con una
+         clase propia -el rojo de `odontogram-theme.css` apunta a `id`, que
+         acá ya no existe-. */
       copia.removeAttribute('id')
-      copia.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'))
+      copia.querySelectorAll('[id]').forEach((n) => {
+        if (/^(caries|subcaries)-/.test(n.id)) n.classList.add('caries-clon')
+        n.removeAttribute('id')
+      })
 
       celda.replaceChildren(copia)
       celda.classList.add('cara-lingual')
