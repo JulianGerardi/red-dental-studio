@@ -74,7 +74,7 @@ export function ToothInfoTrigger({
             onClick={onToggle}
             className={cn(
               BOTON_ICONO_REDONDO,
-              'relative ml-4 size-8',
+              'relative ml-2',
               abierto && 'border-[#1d56bc] bg-[#f0f5ff] text-[#1d56bc] hover:bg-[#f0f5ff]',
             )}
           >
