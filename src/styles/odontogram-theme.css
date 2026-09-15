@@ -209,20 +209,10 @@
   border: 1px solid #e4e4e7;
 }
 
-/* "Diagnoses" es un botón suelto, no una tab: que lea como los secundarios
-   de la app y no como una tab más. */
-.odonto-embed .perio-launch-bar .btn {
-  height: 32px;
-  border-radius: 6px;
-  border: 1px solid #e4e4e7;
-  background: #fff;
-  font-size: 12px;
-  font-weight: 500;
-  color: #3f3f46;
-}
-
-.odonto-embed .perio-launch-bar .btn:hover {
-  background: #fafafa;
+/* Julián pidió sacar el botón "Diagnoses" de la barra de tabs: el ícono de
+   "Tooth information" (`ToothInfoTrigger`) ocupa su lugar. */
+.odonto-embed .perio-launch-bar #openCaseDiagnosesBtn {
+  display: none;
 }
 
 /* Tipografía y color del sistema adentro del flotante: la librería usa su

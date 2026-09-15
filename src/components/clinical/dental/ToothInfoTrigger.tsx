@@ -3,19 +3,19 @@ import { Info } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { ToothInfoPanel } from '@/components/clinical/dental/ToothInfoPanel'
+import { BOTON_ICONO_REDONDO } from '@/lib/estilos'
+import { cn } from '@/lib/utils'
 
 /* "Tooth information" deja de ser un paso más del panel flotante: ahora es
-   un ícono propio. Julián pidió que viva en la MISMA fila que los botones
-   de la propia librería (vista oclusal, cordales, hueso, pulpa, limpiar
-   selección) -no arriba, pisando los tabs Odontogram/Periodontal/
-   Diagnoses-, del mismo tamaño. El botón usa las mismas clases de esos
-   botones (`btn btn-ghost btn-icon`) en vez de copiarles el tamaño a mano:
-   así hereda el `min-width: 44px` que la librería les da, sin duplicar el
-   numerito.
+   un ícono propio, redondo (mismo estilo que "Add condition",
+   `BOTON_ICONO_REDONDO`). Julián lo quiere en la barra de tabs
+   Odontogram/Periodontal Status, donde antes estaba "Diagnoses" -ese botón
+   se saca por CSS (ver odontogram-theme.css)-, no en la fila de íconos del
+   gráfico (vista oclusal, cordales, hueso, pulpa, limpiar selección).
 
    No se arma con `createPortal` -se probó primero así, y React tira
    "Target container is not a DOM element" cada vez que se cambia de tab:
-   la librería saca `.chart-actions` del DOM en el momento del cambio, y el
+   la librería rearma `.perio-launch-bar` en ese momento, y el
    `MutationObserver` que lo nota (en `OdontogramEmbed`) corre un paso
    después, así que el portal llega a intentar reconciliar contra un
    contenedor que ya no está. En cambio, React renderiza este `<span>` en
@@ -58,7 +58,7 @@ export function ToothInfoTrigger({ nodo, contenedor }: { nodo: HTMLElement; cont
               type="button"
               aria-label="Tooth information"
               onClick={() => setAbierto(true)}
-              className="btn btn-ghost btn-icon"
+              className={cn(BOTON_ICONO_REDONDO, 'ml-4 size-8')}
             >
               <Info className="size-4" />
             </button>

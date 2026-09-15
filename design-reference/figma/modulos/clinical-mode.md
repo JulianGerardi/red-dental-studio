@@ -1373,3 +1373,34 @@ Status. Queda anotado como tarea aparte (mismo arreglo: cambiar el
 `createPortal` por el patrón de mover un nodo ya renderizado con
 `useLayoutEffect`), no se tocó en esta sesión por no ser parte del
 pedido.
+
+### Corrección: el ícono va en la barra de tabs, no en `.chart-actions` (2026-09-16)
+
+Interpretación errónea de la sesión anterior: "alineado, del mismo
+tamaño, en la fila de conditions" se leyó como "adentro de
+`.chart-actions`". Julián mandó de nuevo la captura de referencia -el
+ícono "i" redondo, solo, a la derecha de los tabs Odontogram/
+Periodontal Status, en su propia línea- y aclaró: "no quiero que esté
+en la misma fila" (la de vista oclusal/cordales/hueso/pulpa/limpiar
+selección). El punto 1 de esa captura ("saca el boton de diagnostic")
+tampoco se había hecho: pedía sacar el botón **"Diagnoses"**
+(`#openCaseDiagnosesBtn`) directamente, no sólo separar el ícono de él.
+
+Arreglo real:
+- `#openCaseDiagnosesBtn` se oculta por CSS (`display:none` en
+  `odontogram-theme.css`, scopeado a `.perio-launch-bar`) — Diagnoses
+  ya no está en la UI.
+- `ToothInfoTrigger` se porta ahora a `.perio-launch-bar` (la barra que
+  contiene el toggle Odontogram/Periodontal Status), no a
+  `.chart-actions`. Mismo mecanismo `useLayoutEffect` + `appendChild`
+  de más arriba, mismo motivo (esa barra también se rearma al cambiar
+  de tab). En `OdontogramEmbed.tsx` el estado se renombró
+  `accionesNodo` → `barraNodo` para que el nombre no mienta.
+- El botón dejó las clases de la librería (`btn btn-ghost btn-icon`) y
+  volvió a `BOTON_ICONO_REDONDO` -el mismo estilo circular que "Add
+  condition"-, con `ml-4 size-8` para separarlo del toggle y que entre
+  en la altura de la barra (32px, la misma que tenían los tabs).
+
+Verificado con el mismo test de 4 cambios de tab seguidos: cero errores
+en consola, `.perio-launch-bar` conserva el ícono enganchado, y
+`#openCaseDiagnosesBtn` queda en `display:none` en todo momento.
