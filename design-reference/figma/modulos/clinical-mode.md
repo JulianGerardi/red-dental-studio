@@ -1313,3 +1313,63 @@ redundante-, y su función se sumó al "+" de "New procedure": clickearlo
 abre el modal de New Procedure y de una vez deja `controlesAbiertos` en
 `true`, así que al cerrar el modal (Cancel o Save) el panel del diente ya
 está ahí, sin un segundo click.
+
+### El ícono se muda a la fila de botones de la librería (2026-09-16)
+
+El ícono de "Tooth information" quedó al lado de los tabs Odontogram/
+Periodontal Status/Diagnoses -pisando "Diagnoses", que quedaba cortado
+("Diagno…")-. Julián mandó una captura pidiendo sacarlo de ahí y ponerlo
+alineado, del mismo tamaño, en la fila de "conditions" -los botones
+propios de la librería a la derecha del título "Dental chart": vista
+oclusal, cordales, hueso, pulpa, limpiar selección (`.chart-actions`, con
+sus botones `btn btn-ghost btn-icon`, `min-width:44px` puesto por la
+librería)-.
+
+`OdontogramEmbed.tsx` ahora también relee `.chart-actions` (mismo
+mecanismo que `infoNodo`, guardado en `accionesNodo`) y se lo pasa a
+`ToothInfoTrigger`, que arma su botón con las mismas clases de la
+librería en vez de copiarles el tamaño a mano.
+
+**Bug real encontrado en el camino, ya solucionado**: la primera versión
+portaba el botón adentro de `.chart-actions` con `createPortal`. Al
+cambiar de tab (Odontogram → Periodontal Status) React tiraba, siempre,
+un error sin capturar: `"Target container is not a DOM element"`. La
+causa: `.chart-actions` es de la librería, que lo saca del DOM en el
+mismo instante del cambio de tab -de forma síncrona-, mientras que el
+`MutationObserver` que lo nota en React corre recién en el siguiente
+tick; el portal llega a intentar reconciliar contra un contenedor que ya
+no está.
+
+Un chequeo de guardia (`contenedor instanceof Element` antes de
+`createPortal`) NO alcanzó: el error seguía, y un log confirmó que el
+componente ni siquiera se estaba re-renderizando con un valor viejo -la
+falla es interna a cómo React limpia un portal al desmontarlo, no algo
+que se pueda frenar filtrando el valor de la prop-.
+
+La solución real, en `ToothInfoTrigger.tsx`: nada de `createPortal`. El
+botón se renderiza normal, adentro del propio árbol de React (como
+cualquier otro hijo de `OdontogramEmbed`), y un `useLayoutEffect` lo
+MUEVE con `appendChild` directo a `.chart-actions` -React sigue el nodo
+por su propia referencia, no le importa dónde vive en el DOM en cada
+momento-. Al desmontar, ese mismo efecto lo devuelve a su padre
+original ANTES de que React intente sacarlo: React borra sus nodos
+buscándolos en el padre donde él los montó, así que si el nodo ya no
+está ahí (porque lo moví) tira `NotFoundError: the node to be removed is
+not a child of this node`. Tiene que ser `useLayoutEffect`, no
+`useEffect`: la limpieza de un efecto pasivo corre DESPUÉS de que React
+ya sacó sus nodos durante el commit -se probó, y ese timing tardío no
+alcanza a devolver el nodo a tiempo-.
+
+Verificado con 5 cambios de tab seguidos (Odontogram/Periodontal
+Status/Diagnoses en cualquier orden) sin un solo error en consola, y con
+el ícono re-enganchándose solo cada vez -un único botón vivo en todo
+momento, nunca duplicado-.
+
+**Bug hermano, sin arreglar todavía**: `PeriodontalTabs.tsx` tiene el
+MISMO problema -porta con `createPortal` adentro de
+`.perio-fullgrid-scroll`, que la librería también saca del DOM al
+cambiar de tab-. Se reprodujo el mismo error saliendo de Periodontal
+Status. Queda anotado como tarea aparte (mismo arreglo: cambiar el
+`createPortal` por el patrón de mover un nodo ya renderizado con
+`useLayoutEffect`), no se tocó en esta sesión por no ser parte del
+pedido.

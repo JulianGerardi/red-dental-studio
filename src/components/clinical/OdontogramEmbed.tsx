@@ -81,6 +81,7 @@ export function OdontogramEmbed({
   const ref = useRef<HTMLDivElement>(null)
   const [pasos, setPasos] = useState<Paso[]>([])
   const [infoNodo, setInfoNodo] = useState<HTMLElement | null>(null)
+  const [accionesNodo, setAccionesNodo] = useState<HTMLElement | null>(null)
   const [paso, setPaso] = useState(0)
   /* Minimizado deja sólo la barra: el gráfico se ve entero sin cerrar nada. */
   const [minimizado, setMinimizado] = useState(false)
@@ -105,9 +106,13 @@ export function OdontogramEmbed({
 
   /* Las secciones son las cards que dibuja la librería. "Tooth information"
      ya no es una más: se lee aparte (`infoNodo`) para el ícono propio
-     (`ToothInfoTrigger`). Se releen porque la librería monta y desmonta
-     cards según la pieza activa -Orthodontics, por ejemplo, sólo aparece en
-     piezas elegibles-. */
+     (`ToothInfoTrigger`), que se porta adentro de `.chart-actions` -la fila
+     de botones de la propia librería (vista oclusal, cordales, hueso,
+     pulpa, limpiar selección)-, así que también se relee ese contenedor.
+     Se releen porque la librería monta y desmonta cards según la pieza
+     activa -Orthodontics, por ejemplo, sólo aparece en piezas elegibles- y
+     porque `.chart-actions` sólo existe en la vista Odontogram, no en
+     Periodontal Status ni Diagnoses. */
   const releer = useCallback(() => {
     const raiz = ref.current
     if (!raiz) return
@@ -122,6 +127,8 @@ export function OdontogramEmbed({
     )
     const info = raiz.querySelector<HTMLElement>('.tooth-info')
     setInfoNodo((previo) => (previo === info ? previo : info))
+    const acciones = raiz.querySelector<HTMLElement>('.chart-actions')
+    setAccionesNodo((previo) => (previo === acciones ? previo : acciones))
   }, [])
 
   /* Varias filas de la librería quedan sin contenido según la pieza
@@ -194,7 +201,7 @@ export function OdontogramEmbed({
     <div
       ref={ref}
       className={cn(
-        'odonto-embed relative w-full',
+        'odonto-embed w-full',
         controlesAbiertos && !minimizado && 'controles-abiertos',
       )}
       style={VARIABLES}
@@ -203,7 +210,7 @@ export function OdontogramEmbed({
       <CarasLinguales raiz={ref.current} />
       <PeriodontalTabs raiz={ref.current} />
       <PerioPdArrastre raiz={ref.current} />
-      {infoNodo && <ToothInfoTrigger nodo={infoNodo} />}
+      {infoNodo && accionesNodo && <ToothInfoTrigger nodo={infoNodo} contenedor={accionesNodo} />}
 
       {confirmandoCierre && (
         <ModalShell
