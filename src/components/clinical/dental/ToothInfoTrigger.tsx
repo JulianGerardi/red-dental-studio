@@ -72,7 +72,11 @@ export function ToothInfoTrigger({
             aria-label={hayNotificacion ? 'Tooth information (new finding)' : 'Tooth information'}
             aria-pressed={abierto}
             onClick={onToggle}
-            className={cn(BOTON_ICONO_REDONDO, 'relative ml-4 size-8')}
+            className={cn(
+              BOTON_ICONO_REDONDO,
+              'relative ml-4 size-8',
+              abierto && 'border-[#1d56bc] bg-[#f0f5ff] text-[#1d56bc] hover:bg-[#f0f5ff]',
+            )}
           >
             <Info className="size-4" />
             {hayNotificacion && (
