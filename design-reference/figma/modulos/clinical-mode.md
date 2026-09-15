@@ -1252,3 +1252,25 @@ codifica la profundidad ICDAS, eso no se toca- un contorno negro sólido es
 lo que más pesa a la vista, y de lejos la mancha se leía negra con apenas
 un tinte rojo. Se agregó `stroke: #dc2626 !important` a la misma regla del
 `fill`.
+
+### El techo de 750px también sobraba: fill container real (2026-09-16, más tarde)
+
+Julián pidió aplicarle "fill container" a la tabla, sin más. El
+`max-width: 750px` del arreglo anterior evitaba el descalce entre filas
+-eso estaba bien-, pero seguía siendo un techo inventado: en una pantalla
+angosta la tabla quedaba más chica de lo necesario, y en una ancha dejaba
+un hueco vacío al lado de la tarjeta (comparado con las demás pestañas,
+que sí ocupan todo el ancho). Se sacó el `max-width` y se puso
+`width: 100%` en `.perio-inline-panel` y en `.perio-tabs-cuerpo`: la tabla
+ahora ocupa el ancho real que le da la pantalla de quien mira, ni más ni
+menos, igual que el resto de la app. Las columnas siguen en `fr`
+(`ajustarColumnas`), así que reparten ESE ancho -sea cual sea- en vez de
+uno fijo calculado en otra pantalla.
+
+Es un trade-off consciente: en una pantalla muy ancha el gráfico vuelve a
+crecer -si el panel mide 1000px en vez de 750px, el gráfico crece con
+él-, pero ya no hay ningún ancho inventado por esta sesión que no
+coincida con el de al lado. Verificado en 700px (angosto) y 1800px
+(ancho): panel, selector, tabs y grilla terminan los tres en el mismo
+borde en ambos casos, y el ancho de la tabla coincide con el ancho real
+del contenedor que le da la página (998px a 1800px de ventana, no 750).

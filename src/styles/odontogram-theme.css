@@ -672,23 +672,21 @@
 }
 
 .odonto-embed .perio-tabs-cuerpo {
+  width: 100%;
   overflow-x: auto;
   border: 1px solid #e7e7e7;
   border-radius: 8px;
 }
 
-/* El `max-width` es lo que le da un tamaño concreto para que las columnas
-   en `fr` de `ajustarColumnas` tengan algo que rellenar -sin él ocuparían
-   el ancho entero del panel, volviendo al gráfico de ~195px de siempre-.
-   Va en el PANEL ENTERO (`.perio-inline-panel`, título + selector de
-   superposición + tabs + grilla), no sólo en `.perio-tabs-cuerpo`: puesto
-   sólo ahí, en una pantalla ancha el selector "None/PD/CAL…" y los tabs
-   seguían estirados al ancho completo mientras la grilla quedaba angosta,
-   y quedaba un hueco vacío a la derecha de toda la sección -exactamente lo
-   que Julián marcó con flechas en una captura-. Con el techo acá, todo el
-   panel se achica junto y no hay descalce entre una fila y otra. */
+/* La tabla entera (selector de superposición + tabs + grilla) rellena el
+   ancho real de la pantalla de quien mira -ni un `max-width` fijo, que en
+   una pantalla ancha dejaba un hueco vacío al lado de la tabla y la
+   achicaba de más en una angosta, ni el ancho de fábrica de la librería,
+   que no reacciona a un resize (ver más abajo). Las columnas de dientes
+   siguen en `fr` (`ajustarColumnas`), así que se reparten ESTE ancho
+   completo en vez de uno fijo calculado en otra pantalla. */
 .odonto-embed .perio-inline-panel {
-  max-width: 750px;
+  width: 100%;
 }
 
 /* El trazo de "Buccal/Palatal/Lingual PD": arrastrar por el gráfico carga
