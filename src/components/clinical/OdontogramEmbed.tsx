@@ -7,6 +7,8 @@ import { OdontogramPanel } from '@/components/clinical/dental/OdontogramPanel'
 import { ToothInfoPanel } from '@/components/clinical/dental/ToothInfoPanel'
 import { CarasLinguales } from '@/components/clinical/dental/CarasLinguales'
 import { PeriodontalAccordion } from '@/components/clinical/dental/PeriodontalAccordion'
+import { PerioGraficoAchicado } from '@/components/clinical/dental/PerioGraficoAchicado'
+import { PerioPdArrastre } from '@/components/clinical/dental/PerioPdArrastre'
 import '@/styles/odontogram-scoped.css'
 import '@/styles/odontogram-theme.css'
 
@@ -203,6 +205,8 @@ export function OdontogramEmbed({
       <OdontogramShell themeConfig={TEMA} language="en" numberingSystem="UNIVERSAL" />
       <CarasLinguales raiz={ref.current} />
       <PeriodontalAccordion raiz={ref.current} />
+      <PerioGraficoAchicado raiz={ref.current} />
+      <PerioPdArrastre raiz={ref.current} />
 
       {confirmandoCierre && (
         <ModalShell

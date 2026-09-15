@@ -677,3 +677,18 @@
   border-top: 1px solid #e7e7e7;
 }
 
+/* El gráfico de dientes+curva medía ~195px de alto -su relación de aspecto
+   natural- y era lo más alto de cada desplegable. Se lo baja a 96px;
+   `PerioGraficoAchicado` habilita que el SVG estire en vez de dejar
+   franjas vacías a los costados. */
+.odonto-embed .perio-tooth-arch {
+  height: 96px;
+}
+
+/* El trazo de "Buccal PD": arrastrar por el gráfico carga los 48 sitios de
+   un tirón (`PerioPdArrastre`). La cruz es la misma pista visual del video
+   de referencia. */
+.odonto-embed .perio-fullgrid-graphic-cell:has(.perio-tooth-arch-buccal) {
+  cursor: crosshair;
+}
+

@@ -1087,3 +1087,51 @@ la librería) también es un valor que escribe JS, no CSS: va inline en el
 primer track cada vez que la librería lo recalcula (en cada resize del
 panel); las filas ya estaban preparadas para que un rótulo largo pase a dos
 líneas en vez de cortarse, así que no se pierde texto.
+
+### Gráfico más chico y carga de "Buccal PD" al arrastre (2026-09-15)
+
+Dos pedidos con un video de referencia (otra app armada sobre la misma
+librería): achicar el gráfico de dientes+curva de cada arcada, y agregar la
+posibilidad de cargar "Buccal PD" arrastrando el mouse en vez de tipear
+cada sitio.
+
+**El gráfico** (`.perio-tooth-arch`, 688x130 de viewBox) se dibuja a
+`height:auto` -entra al 100% del ancho y el alto sale de esa proporción-,
+~195px. `PerioGraficoAchicado.tsx` no tiene una prop para bajarlo: le saca
+el `preserveAspectRatio` por default ("meet", que ajusta por el lado que
+sobra y deja franjas vacías a los costados) y lo fuerza a `"none"` para que
+estire al alto nuevo (96px, puesto por CSS en `.perio-tooth-arch`) usando
+el ancho entero. El diente y la curva quedan un poco más achatados, pero
+las columnas siguen alineadas con el resto de las filas.
+
+**El arrastre** (`PerioPdArrastre.tsx`) reconstruye lo que se ve en el
+video: apretar sobre el gráfico y mover el mouse carga la fila "Buccal PD"
+de un trazo, con la altura del cursor como profundidad (1-15mm, el mismo
+rango del `input` de la librería) del sitio que tiene debajo. No hay nada
+de esto en la librería instalada (2.5.0, la última publicada -se revisó
+también la rama principal en GitHub, sin tagear, y tampoco está ahí-): es
+un overlay propio, igual en espíritu a `OdontogramPanel`.
+
+Dos decisiones de la implementación:
+
+- **Un punto por sitio, no por diente.** Cada diente tiene 3 sitios
+  bucales (MB/B/DB) con su propio `input`; el arrastre no los agrupa, sólo
+  recorre los 48 inputs de la fila en el orden del DOM -que es el orden en
+  que se ven-, así que la curva sale tan fina como en el video de
+  referencia (48 puntos por arcada, no 16).
+- **La escala se mide en vivo, no se hardcodea.** El eje del gráfico dibuja
+  sus propias etiquetas ("5"/"10"/"15" en `.perio-mm-grid text"`); se toman
+  dos de esas etiquetas por sus `getBoundingClientRect()` reales y de ahí
+  sale la recta píxel↔mm. Así da igual el alto que tenga el gráfico -sirve
+  para el 96px de ahora sin acoplarse a ese número-, y si la librería
+  cambia el layout del eje, se recalibra sola.
+
+Si el mouse saltea sitios entre dos eventos de un arrastre rápido, se
+interpola el valor entre el sitio anterior y el actual en vez de dejar
+escalones. "Buccal CAL" no se toca directamente: ya sale igual a "Buccal
+PD" porque la librería lo deriva sola cuando "Buccal GM" está en cero.
+
+Verificado con un arrastre real (`computer.left_click_drag`, no sólo
+disparando eventos por JS) en las dos arcadas y después de cerrar y volver
+a abrir la pestaña -la grilla se reconstruye pero los valores cargados
+sobreviven, y el arrastre se reengancha solo a los inputs nuevos-.
