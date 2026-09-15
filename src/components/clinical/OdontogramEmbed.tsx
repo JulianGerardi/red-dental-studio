@@ -5,6 +5,7 @@ import { OdontogramShell, clearSelection, type OdontogramThemeConfig } from 'rea
 import { cn } from '@/lib/utils'
 import { OdontogramPanel } from '@/components/clinical/dental/OdontogramPanel'
 import { ToothInfoTrigger } from '@/components/clinical/dental/ToothInfoTrigger'
+import { ToothInfoPanel } from '@/components/clinical/dental/ToothInfoPanel'
 import { CarasLinguales } from '@/components/clinical/dental/CarasLinguales'
 import { PeriodontalTabs } from '@/components/clinical/dental/PeriodontalTabs'
 import { PerioPdArrastre } from '@/components/clinical/dental/PerioPdArrastre'
@@ -82,6 +83,7 @@ export function OdontogramEmbed({
   const [pasos, setPasos] = useState<Paso[]>([])
   const [infoNodo, setInfoNodo] = useState<HTMLElement | null>(null)
   const [barraNodo, setBarraNodo] = useState<HTMLElement | null>(null)
+  const [infoAbierto, setInfoAbierto] = useState(false)
   const [paso, setPaso] = useState(0)
   /* Minimizado deja sólo la barra: el gráfico se ve entero sin cerrar nada. */
   const [minimizado, setMinimizado] = useState(false)
@@ -210,7 +212,32 @@ export function OdontogramEmbed({
       <CarasLinguales raiz={ref.current} />
       <PeriodontalTabs raiz={ref.current} />
       <PerioPdArrastre raiz={ref.current} />
-      {infoNodo && barraNodo && <ToothInfoTrigger nodo={infoNodo} contenedor={barraNodo} />}
+      {infoNodo && barraNodo && (
+        <ToothInfoTrigger
+          nodo={infoNodo}
+          contenedor={barraNodo}
+          abierto={infoAbierto}
+          onToggle={() => setInfoAbierto((v) => !v)}
+        />
+      )}
+
+      {/* Debajo del "Dental chart", no en un modal: un modal lo tapaba. */}
+      {infoAbierto && infoNodo && (
+        <div className="mt-3 w-full rounded-xl border border-[#e4e4e7] bg-white p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-[13px] font-semibold text-[#09090b]">Tooth information</span>
+            <button
+              type="button"
+              aria-label="Close tooth information"
+              onClick={() => setInfoAbierto(false)}
+              className="flex size-7 shrink-0 items-center justify-center rounded-md border border-[#e4e4e7] text-[#71717a] hover:bg-[#f4f4f5]"
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
+          <ToothInfoPanel nodo={infoNodo} />
+        </div>
+      )}
 
       {confirmandoCierre && (
         <ModalShell

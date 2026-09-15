@@ -1,8 +1,7 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { Info } from 'lucide-react'
-import { ModalShell } from '@/components/patients/form'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
-import { ToothInfoPanel } from '@/components/clinical/dental/ToothInfoPanel'
+import { ToothInfoPanel, useResumenDental, hayHallazgo } from '@/components/clinical/dental/ToothInfoPanel'
 import { BOTON_ICONO_REDONDO } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
@@ -33,11 +32,26 @@ import { cn } from '@/lib/utils'
    error-. La de `useLayoutEffect` corre en el mismo commit, a tiempo.
 
    Al pasar el mouse adelanta el resumen en un hover card; al clickear lo
-   abre entero en un modal. Ver design-reference/figma/modulos/clinical-mode.md. */
+   despliega debajo del "Dental chart" -no en un modal flotante, Julián lo
+   pidió así porque un modal tapaba el gráfico- y eso lo dibuja
+   `OdontogramEmbed`, no este componente: acá sólo vive el botón. El
+   puntito rojo avisa que hay algo para ver: `hayHallazgo` (en
+   `ToothInfoPanel.tsx`) descarta los renglones "no recorded X" Y el caso
+   especial de "Periodontal status" sano, que no arranca con "no" pero
+   tampoco es un hallazgo.
+   Ver design-reference/figma/modulos/clinical-mode.md. */
 
-export function ToothInfoTrigger({ nodo, contenedor }: { nodo: HTMLElement; contenedor: HTMLElement }) {
-  const [abierto, setAbierto] = useState(false)
+export function ToothInfoTrigger({
+  nodo, contenedor, abierto, onToggle,
+}: {
+  nodo: HTMLElement
+  contenedor: HTMLElement
+  abierto: boolean
+  onToggle: () => void
+}) {
   const envoltorio = useRef<HTMLSpanElement>(null)
+  const resumen = useResumenDental(nodo)
+  const hayNotificacion = hayHallazgo(resumen)
 
   useLayoutEffect(() => {
     const el = envoltorio.current
@@ -50,30 +64,26 @@ export function ToothInfoTrigger({ nodo, contenedor }: { nodo: HTMLElement; cont
   }, [contenedor])
 
   return (
-    <>
-      <span ref={envoltorio} style={{ display: 'contents' }}>
-        <HoverCard openDelay={150}>
-          <HoverCardTrigger asChild>
-            <button
-              type="button"
-              aria-label="Tooth information"
-              onClick={() => setAbierto(true)}
-              className={cn(BOTON_ICONO_REDONDO, 'ml-4 size-8')}
-            >
-              <Info className="size-4" />
-            </button>
-          </HoverCardTrigger>
-          <HoverCardContent side="bottom" align="end" className="w-96 max-h-[70vh] overflow-y-auto">
-            <ToothInfoPanel nodo={nodo} />
-          </HoverCardContent>
-        </HoverCard>
-      </span>
-
-      {abierto && (
-        <ModalShell title="Tooth information" onClose={() => setAbierto(false)} width="max-w-[480px]">
+    <span ref={envoltorio} style={{ display: 'contents' }}>
+      <HoverCard openDelay={150}>
+        <HoverCardTrigger asChild>
+          <button
+            type="button"
+            aria-label={hayNotificacion ? 'Tooth information (new finding)' : 'Tooth information'}
+            aria-pressed={abierto}
+            onClick={onToggle}
+            className={cn(BOTON_ICONO_REDONDO, 'relative ml-4 size-8')}
+          >
+            <Info className="size-4" />
+            {hayNotificacion && (
+              <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-[#dc2626] ring-2 ring-white" />
+            )}
+          </button>
+        </HoverCardTrigger>
+        <HoverCardContent side="bottom" align="end" className="w-96 max-h-[70vh] overflow-y-auto">
           <ToothInfoPanel nodo={nodo} />
-        </ModalShell>
-      )}
-    </>
+        </HoverCardContent>
+      </HoverCard>
+    </span>
   )
 }

@@ -1404,3 +1404,43 @@ Arreglo real:
 Verificado con el mismo test de 4 cambios de tab seguidos: cero errores
 en consola, `.perio-launch-bar` conserva el ícono enganchado, y
 `#openCaseDiagnosesBtn` queda en `display:none` en todo momento.
+
+### "Tooth information" pasa de modal a panel debajo del chart, y punto rojo de notificación (2026-09-16)
+
+Dos pedidos cortos de Julián sobre el mismo ícono:
+
+1. Que clickearlo **no abra un modal** -tapaba el gráfico- sino que
+   despliegue el panel **debajo del "Dental chart"**, como un acordeón
+   más (en el mismo lugar donde ya aparecía el panel de Controls/
+   Statuses/Tooth details/etc al elegir una pieza).
+2. Un **punto rojo** sobre el ícono cuando hay algo cargado para ver,
+   así el usuario no tiene que abrirlo "por las dudas".
+
+**Cambio de estructura**: `ToothInfoTrigger` ya no guarda el estado
+`abierto` ni dibuja el `ModalShell` -sólo dibuja el botón redondo (lo
+que se porta a `.perio-launch-bar`)-. El estado (`infoAbierto`) y el
+panel expandido ahora viven en `OdontogramEmbed`, justo después de
+`<OdontogramShell>`, como una card más (mismo estilo que el panel de
+controles): así el botón puede vivir adentro de la barra de tabs -que
+se porta con `appendChild`- mientras el panel que abre vive en su lugar
+natural del árbol, sin que un modal tenga que salir de ese mismo
+`<span>` portado.
+
+**Punto rojo**: se extrajo la lectura del resumen (`leerResumen`, en
+`ToothInfoPanel.tsx`) a un hook exportado, `useResumenDental(nodo)`, que
+usan tanto `ToothInfoPanel` (para pintar la ficha) como
+`ToothInfoTrigger` (para decidir el punto). "Hay algo para ver" no es
+sólo "algún renglón no vacío": se agregó `hayHallazgo(resumen)` porque
+**"Periodontal status" es la excepción** -sano se lee "the periodontium
+is healthy", un texto que no arranca con "no" y que el `sinDato` del
+panel (pensado sólo para atenuar visualmente, no para esto) contaba
+como si fuera un hallazgo real. Sin ese caso especial, el punto rojo
+quedaba prendido SIEMPRE, incluso en un examen sano recién empezado -se
+detectó probando en frío, con el examen mock sin tocar-. `hayHallazgo`
+descarta ese renglón cuando el valor contiene "healthy".
+
+Verificado marcando un aparato de ortodoncia real en una pieza (Ortho
+appliance → Bracket): el punto aparece al instante y el renglón
+"Orthodontics" pasa de gris a texto normal en el panel; sacando el
+aparato, el punto se apaga. En el examen sano de base (sin tocar nada)
+el punto no aparece.

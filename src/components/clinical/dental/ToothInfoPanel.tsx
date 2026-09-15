@@ -8,12 +8,30 @@ import { cn } from '@/lib/utils'
 
 type Arcada = { arcada: string; piezas: string }
 type Linea = { rotulo: string; valor: string; vacio: boolean }
-type Resumen = { titular: string; columna: string; arcadas: Arcada[]; lineas: Linea[] }
+export type Resumen = { titular: string; columna: string; arcadas: Arcada[]; lineas: Linea[] }
 
 /* La librería escribe los renglones sin dato con un texto que arranca en
    "No"/"no" ("No carious teeth.", "no recorded wear"): sirve para
    apagarlos visualmente en vez de darles el mismo peso que a un hallazgo. */
 const sinDato = (valor: string) => /^no\b/i.test(valor.trim())
+
+/* "Periodontal status" es la excepción: sano se lee "the periodontium is
+   healthy", no "no ...", así que `sinDato` lo cuenta como si tuviera
+   hallazgo. Lo usa `hayHallazgo` (el punto rojo del ícono) para no avisar
+   de un examen sano. */
+const saludable = (valor: string) => /\bhealthy\b/i.test(valor)
+
+/** Hay algo para ver -y ameritar el punto rojo del ícono- si algún
+    renglón tiene dato real Y, si es el de periodontal, ese dato no es
+    "sano". */
+export function hayHallazgo(resumen: Resumen | null) {
+  if (!resumen) return false
+  return resumen.lineas.some((l) => {
+    if (l.vacio) return false
+    if (l.rotulo === 'Periodontal status') return !saludable(l.valor)
+    return true
+  })
+}
 
 function leerResumen(nodo: HTMLElement): Resumen {
   const tabla = nodo.querySelector('table')
@@ -34,7 +52,10 @@ function leerResumen(nodo: HTMLElement): Resumen {
   }
 }
 
-export function ToothInfoPanel({ nodo }: { nodo: HTMLElement }) {
+/* La usan tanto el panel como el ícono -para el punto rojo de "hay algo
+   nuevo para ver"-, así que leen el mismo resumen en vez de cada uno
+   observar `nodo` por su cuenta. */
+export function useResumenDental(nodo: HTMLElement) {
   const [resumen, setResumen] = useState<Resumen | null>(null)
 
   const releer = useCallback(() => setResumen(leerResumen(nodo)), [nodo])
@@ -47,6 +68,11 @@ export function ToothInfoPanel({ nodo }: { nodo: HTMLElement }) {
     return () => observer.disconnect()
   }, [nodo, releer])
 
+  return resumen
+}
+
+export function ToothInfoPanel({ nodo }: { nodo: HTMLElement }) {
+  const resumen = useResumenDental(nodo)
   if (!resumen) return null
 
   return (
