@@ -630,3 +630,50 @@
   max-width: 100%;
 }
 
+/* ─── Periodontal Status en dos desplegables ─────────────────────────────
+   Las arcadas 1-16 y 32-17 venían una abajo de la otra en un solo scroll
+   larguísimo; `PeriodontalAccordion` las separa en dos secciones propias.
+   El borde y el radio quedan en cada sección, no acá: con los dos se veía
+   un marco doble. */
+.odonto-embed .perio-fullgrid-scroll.perio-acordeon-raiz {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: visible;
+  border: none;
+}
+
+.odonto-embed .perio-acordeon-seccion {
+  border: 1px solid #e7e7e7;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.odonto-embed .perio-acordeon-cabecera {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f9f9f9;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #09090b;
+  cursor: pointer;
+}
+
+.odonto-embed .perio-acordeon-cabecera:hover {
+  background: #f4f4f5;
+}
+
+.odonto-embed .perio-acordeon-cabecera svg {
+  color: #71717a;
+}
+
+.odonto-embed .perio-acordeon-cuerpo {
+  overflow-x: auto;
+  border-top: 1px solid #e7e7e7;
+}
+

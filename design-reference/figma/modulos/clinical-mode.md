@@ -1058,3 +1058,32 @@ mismo contorno azul punteado que el resto y no hay dos estilos de selección.
 Nota de depuración: los selects del panel están dentro de un `span` -el que
 posiciona el chevron-, así que un locator `label > select` no los encuentra.
 Dos pruebas dieron falsos negativos por eso antes de notarlo.
+
+### Periodontal Status en dos desplegables (2026-09-15)
+
+El tab traía las dos arcadas -dientes 1 a 16, después 32 a 17- una abajo de
+la otra dentro de un mismo scroll (`.perio-fullgrid-scroll`), con las ~17
+filas de cada una (Miller Class, BOP, CAL, GM, PD, Furcation, el gráfico de
+dientes, Plaque, PI, GI, Mobility, CEJ, Root concavity, KG, GT) apiladas:
+para llegar a la segunda arcada había que bajar más de 1000px. Julián pidió
+partirlo justo donde el número de diente pasa de 16 a 32 -que es exactamente
+la frontera entre arcadas- y volver cada mitad un desplegable, además de
+angostar la columna de rótulos de la izquierda.
+
+La grilla la arma la librería con DOM plano (`buildArch` en `PerioChart.tsx`
+del paquete), no JSX, así que no hay prop para partirla. `PeriodontalAccordion.tsx`
+saca los dos `.perio-fullgrid-arch` (330 celdas interactivas cada uno) del
+scroller y los reinserta -la pieza real, no una copia, para no perder sus
+listeners- adentro de dos secciones propias ("Maxillary" / "Mandibular", los
+mismos rótulos que ya usa el tab Odontogram), colapsables de forma
+independiente. Igual que "Periodontal Status" en general, el tab se
+desmonta entero al cambiar a otro (no es un `display:none`), así que cada
+vez que se reabre aparece un scroller nuevo con sus arcadas enteras: se
+detecta por mutaciones en la raíz y se reparte una vez por montaje.
+
+El ancho de la columna de rótulos (`ROW_LABEL_WIDTH = 220` en el código de
+la librería) también es un valor que escribe JS, no CSS: va inline en el
+`gridTemplateColumns` de cada arcada. Se angosta a 130px pisando sólo ese
+primer track cada vez que la librería lo recalcula (en cada resize del
+panel); las filas ya estaban preparadas para que un rótulo largo pase a dos
+líneas en vez de cortarse, así que no se pierde texto.
