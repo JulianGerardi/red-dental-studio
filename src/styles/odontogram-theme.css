@@ -630,65 +630,66 @@
   max-width: 100%;
 }
 
-/* ─── Periodontal Status en dos desplegables ─────────────────────────────
+/* ─── Periodontal Status en tabs ──────────────────────────────────────────
    Las arcadas 1-16 y 32-17 venían una abajo de la otra en un solo scroll
-   larguísimo; `PeriodontalAccordion` las separa en dos secciones propias.
-   El borde y el radio quedan en cada sección, no acá: con los dos se veía
-   un marco doble. */
-.odonto-embed .perio-fullgrid-scroll.perio-acordeon-raiz {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+   larguísimo; `PeriodontalTabs` las separa en dos tabs -Maxillary/
+   Mandibular- para no scrollear ni entre arcadas ni dentro de una. Las
+   columnas de dientes las achica el propio componente (pisa el
+   `gridTemplateColumns` de la librería); acá sólo va el cromo del tab. */
+.odonto-embed .perio-fullgrid-scroll.perio-tabs-raiz {
+  display: block;
   overflow: visible;
   border: none;
 }
 
-.odonto-embed .perio-acordeon-seccion {
-  border: 1px solid #e7e7e7;
-  border-radius: 8px;
-  overflow: hidden;
+.odonto-embed .perio-tabs-cabecera {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
-.odonto-embed .perio-acordeon-cabecera {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 14px;
-  background: #f9f9f9;
-  border: none;
+.odonto-embed .perio-tabs-boton {
+  padding: 7px 16px;
+  border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
-  color: #09090b;
   cursor: pointer;
 }
 
-.odonto-embed .perio-acordeon-cabecera:hover {
-  background: #f4f4f5;
+.odonto-embed .perio-tabs-boton-activo {
+  background: #1d56bc;
+  color: #fff;
 }
 
-.odonto-embed .perio-acordeon-cabecera svg {
-  color: #71717a;
+.odonto-embed .perio-tabs-boton-inactivo {
+  background: #fff;
+  border: 1px solid #e4e4e7;
+  color: #09090b;
 }
 
-.odonto-embed .perio-acordeon-cuerpo {
+.odonto-embed .perio-tabs-boton-inactivo:hover {
+  background: #fafafa;
+}
+
+.odonto-embed .perio-tabs-cuerpo {
   overflow-x: auto;
-  border-top: 1px solid #e7e7e7;
+  border: 1px solid #e7e7e7;
+  border-radius: 8px;
 }
 
-/* El gráfico de dientes+curva medía ~195px de alto -su relación de aspecto
-   natural- y era lo más alto de cada desplegable. Se lo baja a 96px;
-   `PerioGraficoAchicado` habilita que el SVG estire en vez de dejar
-   franjas vacías a los costados. */
-.odonto-embed .perio-tooth-arch {
-  height: 96px;
-}
-
-/* El trazo de "Buccal PD": arrastrar por el gráfico carga los 48 sitios de
-   un tirón (`PerioPdArrastre`). La cruz es la misma pista visual del video
-   de referencia. */
-.odonto-embed .perio-fullgrid-graphic-cell:has(.perio-tooth-arch-buccal) {
+/* El trazo de "Buccal/Palatal/Lingual PD": arrastrar por el gráfico carga
+   los 48 sitios de esa fila de un tirón (`PerioPdArrastre`). */
+.odonto-embed .perio-fullgrid-graphic-cell:has(.perio-tooth-arch) {
   cursor: crosshair;
+}
+
+/* Las caries se pintan de rojo -el mismo #dc2626 que ya usa el número de
+   diente con problema en el odontograma principal (Odontogram.tsx)-, no
+   del casi-negro #0a1018 que trae la librería horneado en el SVG de cada
+   pieza. Va con `!important` porque ese color es un `style` inline en el
+   propio `<path>`, no una regla de CSS: gana cualquier selector sin él. */
+.odonto-embed [id^="caries-"],
+.odonto-embed [id^="subcaries-"] {
+  fill: #dc2626 !important;
 }
 

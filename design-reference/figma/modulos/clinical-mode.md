@@ -1095,43 +1095,89 @@ librería): achicar el gráfico de dientes+curva de cada arcada, y agregar la
 posibilidad de cargar "Buccal PD" arrastrando el mouse en vez de tipear
 cada sitio.
 
-**El gráfico** (`.perio-tooth-arch`, 688x130 de viewBox) se dibuja a
-`height:auto` -entra al 100% del ancho y el alto sale de esa proporción-,
-~195px. `PerioGraficoAchicado.tsx` no tiene una prop para bajarlo: le saca
-el `preserveAspectRatio` por default ("meet", que ajusta por el lado que
-sobra y deja franjas vacías a los costados) y lo fuerza a `"none"` para que
-estire al alto nuevo (96px, puesto por CSS en `.perio-tooth-arch`) usando
-el ancho entero. El diente y la curva quedan un poco más achatados, pero
-las columnas siguen alineadas con el resto de las filas.
-
 **El arrastre** (`PerioPdArrastre.tsx`) reconstruye lo que se ve en el
-video: apretar sobre el gráfico y mover el mouse carga la fila "Buccal PD"
-de un trazo, con la altura del cursor como profundidad (1-15mm, el mismo
-rango del `input` de la librería) del sitio que tiene debajo. No hay nada
-de esto en la librería instalada (2.5.0, la última publicada -se revisó
+video: apretar sobre el gráfico y mover el mouse carga la fila de un
+trazo, con la altura del cursor como profundidad (1-15mm, el mismo rango
+del `input` de la librería) del sitio que tiene debajo. No hay nada de
+esto en la librería instalada (2.5.0, la última publicada -se revisó
 también la rama principal en GitHub, sin tagear, y tampoco está ahí-): es
 un overlay propio, igual en espíritu a `OdontogramPanel`.
 
 Dos decisiones de la implementación:
 
-- **Un punto por sitio, no por diente.** Cada diente tiene 3 sitios
-  bucales (MB/B/DB) con su propio `input`; el arrastre no los agrupa, sólo
-  recorre los 48 inputs de la fila en el orden del DOM -que es el orden en
-  que se ven-, así que la curva sale tan fina como en el video de
-  referencia (48 puntos por arcada, no 16).
+- **Un punto por sitio, no por diente.** Cada diente tiene 3 sitios por
+  cara (MB/B/DB o ML/L/DL) con su propio `input`; el arrastre no los
+  agrupa, sólo recorre los 48 inputs de la fila en el orden del DOM -que es
+  el orden en que se ven-, así que la curva sale tan fina como en el video
+  de referencia (48 puntos por arcada, no 16).
 - **La escala se mide en vivo, no se hardcodea.** El eje del gráfico dibuja
-  sus propias etiquetas ("5"/"10"/"15" en `.perio-mm-grid text"`); se toman
+  sus propias etiquetas ("5"/"10"/"15" en `.perio-mm-grid text`); se toman
   dos de esas etiquetas por sus `getBoundingClientRect()` reales y de ahí
-  sale la recta píxel↔mm. Así da igual el alto que tenga el gráfico -sirve
-  para el 96px de ahora sin acoplarse a ese número-, y si la librería
-  cambia el layout del eje, se recalibra sola.
+  sale la recta píxel↔mm. Así da igual el alto que tenga el gráfico, y si
+  la librería cambia el layout del eje, se recalibra sola.
 
 Si el mouse saltea sitios entre dos eventos de un arrastre rápido, se
 interpola el valor entre el sitio anterior y el actual en vez de dejar
 escalones. "Buccal CAL" no se toca directamente: ya sale igual a "Buccal
 PD" porque la librería lo deriva sola cuando "Buccal GM" está en cero.
 
-Verificado con un arrastre real (`computer.left_click_drag`, no sólo
-disparando eventos por JS) en las dos arcadas y después de cerrar y volver
-a abrir la pestaña -la grilla se reconstruye pero los valores cargados
-sobreviven, y el arrastre se reengancha solo a los inputs nuevos-.
+**Primer intento del gráfico más chico, descartado.** Achicarlo pisando el
+alto del SVG (`.perio-tooth-arch`, viewBox 688x130, `height:auto` por
+defecto) con `preserveAspectRatio="none"` lo estiraba: el diente quedaba
+deformado. Julián lo marcó -*"el gráfico quedó deformado, debería estar
+como antes"*- y pidió que se achique sin perder la forma, y que la arcada
+entre en pantalla sin scroll. La solución real está en la sección
+siguiente (2026-09-16): angostar las COLUMNAS en vez de estirar el SVG.
+
+### Tabs para las arcadas, columnas angostas de verdad y caries en rojo (2026-09-16)
+
+Tres correcciones sobre lo del día anterior, con la app abierta y
+señalando qué estaba mal.
+
+**Por qué angostar el contenedor no achicaba el gráfico.** Antes de
+resolverlo bien se probó la vía "obvia": angostar el `.perio-fullgrid-
+scroll` (con `max-width` o con un resize real de ventana) y dejar que la
+librería reacomode sola sus columnas -tiene un `ResizeObserver` sobre ese
+mismo contenedor para eso, `applyArchColumns` en su código-. No pasó nada:
+con la ventana en 500px el SVG seguía midiendo 1030px, sin importar cuánto
+se esperara. El `ResizeObserver` existe en el bundle instalado (se
+confirmó en el JS minificado), pero no reacciona en esta integración -no
+se llegó a determinar por qué-, así que no es un camino confiable.
+
+**La solución que sí funciona:** pisar directamente el
+`gridTemplateColumns` de la arcada, la MISMA técnica que ya angostaba la
+columna de rótulos a 130px, extendida a las columnas de dientes (factor
+0.6). Como todas las filas -incluida la del gráfico- comparten esa única
+grilla, angostar las columnas angosta parejo toda la arcada; y como el SVG
+del gráfico sigue en `width:100%; height:auto` (se sacó el
+`preserveAspectRatio:"none"` del intento anterior), su alto sale solo de
+ese ancho más chico, sin deformar nada. De 195px bajó a ~117px con las
+proporciones intactas -verificado con `getBoundingClientRect()`, no a
+ojo-. Vive en `PeriodontalTabs.tsx` (`ajustarColumnas`); ya no hace falta
+el archivo aparte que sólo tocaba el SVG.
+
+**Maxillary/Mandibular pasaron de desplegables a tabs.** Julián pidió tabs
+explícitamente -*"en vez de dropdowns que sea en forma de tabs"*- para no
+scrollear ni entre arcadas ni dentro de una. `PeriodontalAccordion.tsx` se
+reemplazó por `PeriodontalTabs.tsx`: mismo mecanismo de mudar los dos
+`.perio-fullgrid-arch` reales fuera del `.perio-fullgrid-scroll` de la
+librería, pero a dos paneles mutuamente excluyentes en vez de dos
+secciones colapsables independientes.
+
+**El arrastre ahora funciona en los dos gráficos de cada arcada, no sólo
+el bucal.** Cada arcada tiene un segundo gráfico -"Palatal" en Maxillary,
+"Lingual / Palatal" en Mandibular- que antes no tenía el trazo enganchado.
+`PerioPdArrastre.tsx` ahora saca el aspecto ("buccal"/"palatal") del
+propio nombre de clase del SVG (`perio-tooth-arch-{aspecto}`) en vez de
+tenerlo hardcodeado, y arma el selector de inputs con ese mismo valor -es
+el que ya usa `data-perio-aspect`, así que no hay mapeo propio-.
+
+**Las caries se pintan de rojo.** El color no es una regla de CSS: viene
+horneado como `style="fill:#0a1018"` inline en cada `<path id="caries-
+{surface}">` del SVG de la pieza (assets de la librería). Se pisa con
+`!important` -`.odonto-embed [id^="caries-"], [id^="subcaries-"] { fill:
+#dc2626 !important }`-, reusando el mismo rojo que ya usa el número de
+diente con problema en `Odontogram.tsx`. Verificado leyendo el `fill`
+computado del `<path>` real tras activar una cara con caries desde el
+propio checkbox de la librería (`#chk-caries-{surface}`), no sólo mirando
+la pantalla.

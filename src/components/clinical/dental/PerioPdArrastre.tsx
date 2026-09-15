@@ -1,16 +1,25 @@
 import { useEffect } from 'react'
 
-/* Arrastrar sobre el gráfico de la arcada carga "Buccal PD" de un trazo,
-   en vez de tipear cada sitio: al apretar y mover el mouse por el dibujo,
-   la altura del cursor pasa a ser la profundidad (1-15mm) del sitio que
-   tiene debajo, y la curva se redibuja sola porque la librería la arma a
-   partir de esos mismos inputs. Pedido por Julián con un video de
-   referencia. Ver design-reference/figma/modulos/clinical-mode.md.
+/* Arrastrar sobre el gráfico de la arcada carga "Buccal PD" -o "Palatal
+   PD"/"Lingual PD" en el gráfico de abajo, misma mecánica- de un trazo, en
+   vez de tipear cada sitio: al apretar y mover el mouse por el dibujo, la
+   altura del cursor pasa a ser la profundidad (1-15mm) del sitio que tiene
+   debajo, y la curva se redibuja sola porque la librería la arma a partir
+   de esos mismos inputs. Pedido por Julián con un video de referencia.
+   Ver design-reference/figma/modulos/clinical-mode.md.
 
-   Cada diente tiene 3 sitios bucales (MB/B/DB): el arrastre no distingue
-   diente de sitio, sólo recorre los 48 inputs de la fila en el orden en
-   que están en el DOM -que es el orden en que se ven-, así que cada sitio
-   es un punto propio de la curva, igual que en el video de referencia. */
+   Cada diente tiene 3 sitios por cara (MB/B/DB o ML/L/DL): el arrastre no
+   distingue diente de sitio, sólo recorre los 48 inputs de la fila en el
+   orden en que están en el DOM -que es el orden en que se ven-, así que
+   cada sitio es un punto propio de la curva, igual que en el video de
+   referencia.
+
+   Los dos gráficos de una arcada (`.perio-tooth-arch-buccal` y
+   `.perio-tooth-arch-palatal`) se activan igual: el aspecto ("buccal" /
+   "palatal") sale del propio nombre de clase del SVG, y con eso se arma el
+   selector de los inputs de esa fila -son el mismo valor que ya usa la
+   librería en `data-perio-aspect`, así que no hay mapeo propio que
+   mantener-. */
 
 const MINIMO = 1
 const MAXIMO = 15
@@ -97,9 +106,12 @@ function activar(celdaGrafico: HTMLElement) {
 
   celdaGrafico.addEventListener('pointerdown', (e) => {
     const svg = celdaGrafico.querySelector<SVGSVGElement>('svg')
-    entradas = [...arco.querySelectorAll<HTMLInputElement>(
-      '.perio-fullgrid-cell[data-perio-aspect="buccal"][data-perio-field="pd"] input',
-    )]
+    const aspecto = svg?.getAttribute('class')?.match(/perio-tooth-arch-(\w+)/)?.[1]
+    entradas = aspecto
+      ? [...arco.querySelectorAll<HTMLInputElement>(
+        `.perio-fullgrid-cell[data-perio-aspect="${aspecto}"][data-perio-field="pd"] input`,
+      )]
+      : []
     aValor = svg ? calibrarEscala(svg) : null
     if (entradas.length === 0 || !aValor) return
     e.preventDefault()
@@ -115,7 +127,7 @@ export function PerioPdArrastre({ raiz }: { raiz: HTMLElement | null }) {
     if (!raiz) return
     const revisar = () => {
       raiz.querySelectorAll<HTMLElement>('.perio-fullgrid-graphic-cell').forEach((celda) => {
-        if (celda.querySelector('svg.perio-tooth-arch-buccal')) activar(celda)
+        if (celda.querySelector('.perio-tooth-arch')) activar(celda)
       })
     }
     revisar()
