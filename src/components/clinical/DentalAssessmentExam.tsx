@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, FilePlus, Table2, SlidersHorizontal } from 'lucide-react'
+import { Plus, FilePlus, Table2 } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { ModalShell, SelectField, TextArea, FormFooter } from '@/components/patients/form'
 import { OdontogramEmbed } from '@/components/clinical/OdontogramEmbed'
@@ -67,9 +67,14 @@ export function DentalAssessmentExam() {
   const [controlesAbiertos, setControlesAbiertos] = useState(false)
   const reviewState = useExamReviews(INITIAL_REVIEWS, HOY)
 
+  /* El "+" abre New Procedure y de una vez deja los controles del diente
+     listos: al cerrar el modal (Cancel o Save) el panel ya está ahí,
+     sin un botón aparte para "Tooth controls" -se sacó, quedaba
+     redundante con esto-. */
   function openProcedure(tooth: number | null) {
     setProcedureFor(tooth)
     setProcedureOpen(true)
+    setControlesAbiertos(true)
   }
 
   function saveProcedure(draft: ProcedureDraft) {
@@ -180,13 +185,6 @@ export function DentalAssessmentExam() {
           </button>
           <button type="button" aria-label="New document" onClick={() => setDocumentOpen(true)} className="flex size-11 items-center justify-center rounded-full border border-[#e4e4e7] bg-white text-[#09090b] shadow-md hover:bg-[#fafafa]">
             <FilePlus className="size-4" />
-          </button>
-          <button
-            type="button" aria-label="Tooth controls" aria-pressed={controlesAbiertos}
-            onClick={() => setControlesAbiertos((v) => !v)}
-            className={`flex size-11 items-center justify-center rounded-full shadow-md ${controlesAbiertos ? 'bg-dash-blue text-white' : 'border border-[#e4e4e7] bg-white text-[#09090b] hover:bg-[#fafafa]'}`}
-          >
-            <SlidersHorizontal className="size-4" />
           </button>
           <button
             type="button" aria-label={view === 'table' ? 'View chart' : 'View table'} aria-pressed={view === 'table'}

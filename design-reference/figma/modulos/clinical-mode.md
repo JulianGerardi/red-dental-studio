@@ -1274,3 +1274,42 @@ coincida con el de al lado. Verificado en 700px (angosto) y 1800px
 (ancho): panel, selector, tabs y grilla terminan los tres en el mismo
 borde en ambos casos, y el ancho de la tabla coincide con el ancho real
 del contenedor que le da la página (998px a 1800px de ventana, no 750).
+
+### "Tooth information" pasa de paso del carrusel a ícono propio (2026-09-16)
+
+Julián pidió sacar "Tooth information" de la lista de pasos del panel
+flotante (Controls/Statuses/.../Diagnoses/Tooth information, que se recorre
+con los chevrones) y ponerlo en un ícono circular propio -mismo
+`BOTON_ICONO_REDONDO` que "Add condition" en Radiography- arriba a la
+derecha del gráfico: al pasar el mouse adelanta el resumen en un hover
+card (`ToothInfoTrigger.tsx`, con el `HoverCard` de shadcn -se instaló para
+esto, `npx shadcn add hover-card`, con los mismos dos bugs de siempre del
+CLI: file en `@/components/ui/` en vez de `src/`, e import de `cn` desde
+`"cn"` en vez de `@/lib/utils`-), y al clickear lo abre entero en un
+`ModalShell`.
+
+`OdontogramEmbed.tsx` ya no mete el nodo `.tooth-info` en `pasos`: lo lee
+aparte en su propio estado (`infoNodo`), con el mismo mecanismo -mismo
+`releer()`, misma comparación para no re-renderizar de más-. El nodo real
+de la librería sigue siendo la fuente (`ToothInfoPanel.tsx` no cambió), y
+sigue **siempre** en `display:none` en CSS -antes sólo se mostraba con
+`.controles-abiertos`, y las docenas de reglas de estilo que tenía para
+cuando SÍ se mostraba inline quedaron sin efecto pero sin tocar, por si
+algún día vuelve a mostrarse así-.
+
+Verificado en vivo que "Tooth information" es un resumen del EXAMEN
+entero, no de la pieza seleccionada -muestra "32 permanent teeth", una
+tabla de arcadas y hallazgos agregados (Caries/Fillings/Root canal/
+Diagnoses/...), y ese contenido no cambia según qué diente esté
+`.active`, pero sí se actualiza solo al marcar una condición real (se
+probó marcando una caries y viendo aparecer "Caries: 7 (L) – superficial"
+en el resumen)-. Es el comportamiento de siempre de la librería, no algo
+que haya cambiado esta sesión: antes se veía igual, sólo que como último
+paso del carrusel en vez de acá.
+
+De paso, un pedido corto sobre el mismo examen: el FAB "Tooth controls"
+(el de los sliders, que abría el panel de controles) se sacó -quedaba
+redundante-, y su función se sumó al "+" de "New procedure": clickearlo
+abre el modal de New Procedure y de una vez deja `controlesAbiertos` en
+`true`, así que al cerrar el modal (Cancel o Save) el panel del diente ya
+está ahí, sin un segundo click.

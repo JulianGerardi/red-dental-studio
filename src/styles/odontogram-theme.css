@@ -11,11 +11,19 @@
   display: none;
 }
 
-/* Controls, Statuses, Tooth details, Orthodontics, Caries, Diagnoses y el
-   resumen "Tooth information" no van ni debajo ni al costado: van en un
-   panel **flotante** que abre un FAB del examen y que se recorre de a un
-   paso (idea de Julián). Así el odontograma se ve entero siempre y el panel
-   ocupa lo mínimo. El paso visible lo decide OdontogramEmbed. */
+/* Controls, Statuses, Tooth details, Orthodontics, Caries y Diagnoses no
+   van ni debajo ni al costado: van en un panel **flotante** que abre un
+   FAB del examen y que se recorre de a un paso (idea de Julián). Así el
+   odontograma se ve entero siempre y el panel ocupa lo mínimo. El paso
+   visible lo decide OdontogramEmbed.
+
+   "Tooth information" (`.tooth-info`) ya NO es un paso más: queda SIEMPRE
+   oculto acá -es sólo la fuente de datos que lee `ToothInfoPanel`-, y se
+   muestra aparte con un ícono propio (`ToothInfoTrigger`, hover card +
+   modal). Todas las reglas de `.controles-abiertos .tooth-info*` de más
+   abajo quedaron sin efecto por eso -tenerlas no hace daño, `display:none`
+   les gana-, pero no se tocan por si el día de mañana vuelve a mostrarse
+   inline. */
 /* Flex y no grid: con `grid-template-columns: 1fr` el panel se iba igual a
    una columna implícita y terminaba al costado, apretando el chart. */
 .odonto-embed main.layout {
@@ -30,11 +38,8 @@
 
 /* El panel va **debajo del gráfico**, en el flujo, no encima: flotando
    sobre el chart tapaba justo lo que se está mirando (pedido de Julián).
-   Como sólo se ve un paso por vez, ocupa poco. Las dos cajas -el panel de
-   la librería y el resumen- comparten estilo porque nunca se muestran
-   juntas. */
-.odonto-embed.controles-abiertos .panel,
-.odonto-embed.controles-abiertos .tooth-info {
+   Como sólo se ve un paso por vez, ocupa poco. */
+.odonto-embed.controles-abiertos .panel {
   display: block;
   width: 100%;
   max-width: none;
@@ -55,9 +60,7 @@
 .odonto-embed.controles-abiertos .panel,
 .odonto-embed.controles-abiertos .panel-body,
 .odonto-embed.controles-abiertos .panel-header,
-.odonto-embed.controles-abiertos .panel .card,
-.odonto-embed.controles-abiertos .tooth-info,
-.odonto-embed.controles-abiertos .tooth-info .card {
+.odonto-embed.controles-abiertos .panel .card {
   background: #fff;
 }
 

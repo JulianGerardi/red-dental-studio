@@ -4,7 +4,7 @@ import { ModalShell } from '@/components/patients/form'
 import { OdontogramShell, clearSelection, type OdontogramThemeConfig } from 'react-advanced-odontogram'
 import { cn } from '@/lib/utils'
 import { OdontogramPanel } from '@/components/clinical/dental/OdontogramPanel'
-import { ToothInfoPanel } from '@/components/clinical/dental/ToothInfoPanel'
+import { ToothInfoTrigger } from '@/components/clinical/dental/ToothInfoTrigger'
 import { CarasLinguales } from '@/components/clinical/dental/CarasLinguales'
 import { PeriodontalTabs } from '@/components/clinical/dental/PeriodontalTabs'
 import { PerioPdArrastre } from '@/components/clinical/dental/PerioPdArrastre'
@@ -71,15 +71,16 @@ function tituloDe(nodo: HTMLElement, porDefecto: string) {
 export function OdontogramEmbed({
   controlesAbiertos, onCerrarControles,
 }: {
-  /** Controls, Statuses, Tooth details, Orthodontics, Caries, Diagnoses y
-      Tooth information viven en un panel flotante que abre el FAB del
-      examen, y se recorren de a uno: así el gráfico queda entero a la vista
-      y el panel no empuja nada. */
+  /** Controls, Statuses, Tooth details, Orthodontics, Caries y Diagnoses
+      viven en un panel flotante que abre el FAB del examen, y se recorren
+      de a uno: así el gráfico queda entero a la vista y el panel no empuja
+      nada. "Tooth information" va aparte, en `ToothInfoTrigger`. */
   controlesAbiertos: boolean
   onCerrarControles: () => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const [pasos, setPasos] = useState<Paso[]>([])
+  const [infoNodo, setInfoNodo] = useState<HTMLElement | null>(null)
   const [paso, setPaso] = useState(0)
   /* Minimizado deja sólo la barra: el gráfico se ve entero sin cerrar nada. */
   const [minimizado, setMinimizado] = useState(false)
@@ -102,24 +103,25 @@ export function OdontogramEmbed({
     onCerrarControles()
   }
 
-  /* Las secciones son las cards que dibuja la librería más el resumen
-     "Tooth information", que vive en otra columna. Se releen porque la
-     librería monta y desmonta cards según la pieza activa -Orthodontics,
-     por ejemplo, sólo aparece en piezas elegibles-. */
+  /* Las secciones son las cards que dibuja la librería. "Tooth information"
+     ya no es una más: se lee aparte (`infoNodo`) para el ícono propio
+     (`ToothInfoTrigger`). Se releen porque la librería monta y desmonta
+     cards según la pieza activa -Orthodontics, por ejemplo, sólo aparece en
+     piezas elegibles-. */
   const releer = useCallback(() => {
     const raiz = ref.current
     if (!raiz) return
     const cabecera = raiz.querySelector<HTMLElement>('.panel-header')
     const cards = [...raiz.querySelectorAll<HTMLElement>('.panel-body > .card, .panel-body > div > .card')]
-    const info = raiz.querySelector<HTMLElement>('.tooth-info')
     /* La cabecera -selección de piezas- es un paso más: dejarla siempre
        visible hacía el flotante el doble de alto. */
     const lista: Paso[] = cabecera ? [{ titulo: 'Controls', nodo: cabecera }] : []
     cards.forEach((nodo) => lista.push({ titulo: tituloDe(nodo, 'Details'), nodo }))
-    if (info) lista.push({ titulo: tituloDe(info, 'Tooth information'), nodo: info })
     setPasos((previos) =>
       previos.length === lista.length && previos.every((p, i) => p.nodo === lista[i].nodo) ? previos : lista,
     )
+    const info = raiz.querySelector<HTMLElement>('.tooth-info')
+    setInfoNodo((previo) => (previo === info ? previo : info))
   }, [])
 
   /* Varias filas de la librería quedan sin contenido según la pieza
@@ -186,18 +188,14 @@ export function OdontogramEmbed({
 
   const actual = pasos[paso]
   /* Lo que quedó sin tocar; el resumen se muestra al minimizar. */
-  const pendientes = pasos
-    .filter((pa) => !pa.nodo.classList.contains('tooth-info') && !tocados.includes(pa.titulo))
-    .map((pa) => pa.titulo)
-  const esInfo = !!actual?.nodo.classList.contains('tooth-info')
+  const pendientes = pasos.filter((pa) => !tocados.includes(pa.titulo)).map((pa) => pa.titulo)
 
   return (
     <div
       ref={ref}
       className={cn(
-        'odonto-embed w-full',
+        'odonto-embed relative w-full',
         controlesAbiertos && !minimizado && 'controles-abiertos',
-        controlesAbiertos && !minimizado && esInfo && 'en-resumen',
       )}
       style={VARIABLES}
     >
@@ -205,6 +203,7 @@ export function OdontogramEmbed({
       <CarasLinguales raiz={ref.current} />
       <PeriodontalTabs raiz={ref.current} />
       <PerioPdArrastre raiz={ref.current} />
+      {infoNodo && <ToothInfoTrigger nodo={infoNodo} />}
 
       {confirmandoCierre && (
         <ModalShell
@@ -241,15 +240,11 @@ export function OdontogramEmbed({
 
       {controlesAbiertos && !minimizado && actual && (
         <div className="mt-3 w-full rounded-t-xl border border-b-0 border-[#e4e4e7] bg-white p-4">
-          {esInfo
-            ? <ToothInfoPanel nodo={actual.nodo} />
-            : (
-              <OdontogramPanel
-                key={reinicio}
-                card={actual.nodo}
-                onTocar={() => setTocados((t) => (t.includes(actual.titulo) ? t : [...t, actual.titulo]))}
-              />
-            )}
+          <OdontogramPanel
+            key={reinicio}
+            card={actual.nodo}
+            onTocar={() => setTocados((t) => (t.includes(actual.titulo) ? t : [...t, actual.titulo]))}
+          />
         </div>
       )}
 
