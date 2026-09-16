@@ -19,7 +19,7 @@ export type PatientRow = {
   status: PatientStatus
 }
 
-const STATUS_TONO: Record<PatientStatus, PillTone> = {
+export const STATUS_TONO: Record<PatientStatus, PillTone> = {
   Completed: 'success',
   Proposed: 'warning',
   'In Progress': 'info',

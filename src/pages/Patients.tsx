@@ -2,10 +2,35 @@ import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, Search, Plus } from 'lucide-react'
 import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTable'
+import { PatientCard } from '@/components/patients/PatientCard'
 import { usePatients } from '@/data/patientsStore'
 import { PageTitle } from '@/components/ui/page-title'
 import { SearchButton } from '@/components/ui/search-button'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
+
+/* La lista todavía no guarda fecha de alta ni de última visita: "Recent" usa
+   el orden del array -`addPatient` inserta al principio- y "Active" toma el
+   status del plan de tratamiento (todo lo que no está "Completed"), que es
+   el único dato de estado que existe hoy por paciente. */
+const CANTIDAD_ESTANTE = 4
+
+function EstantePacientes({
+  titulo, filas, onEdit,
+}: {
+  titulo: string
+  filas: PatientRow[]
+  onEdit: (row: PatientRow) => void
+}) {
+  if (filas.length === 0) return null
+  return (
+    <div className="mt-5">
+      <h2 className="text-sm font-bold text-[#09090b]">{titulo}</h2>
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {filas.map((r) => <PatientCard key={r.id} row={r} onEdit={onEdit} />)}
+      </div>
+    </div>
+  )
+}
 
 
 /* Figma 3638:59529 "Patients — List".
@@ -23,6 +48,14 @@ export default function Patients() {
     () => patients.filter((r) => r.name.toLowerCase().includes(query.toLowerCase())),
     [patients, query],
   )
+
+  /* Los estantes muestran siempre el mismo pulso de la cuenta: no se filtran
+     por la búsqueda, igual que las cards de resumen de Billing. */
+  const activos = useMemo(
+    () => patients.filter((r) => r.status !== 'Completed').slice(0, CANTIDAD_ESTANTE),
+    [patients],
+  )
+  const recientes = useMemo(() => patients.slice(0, CANTIDAD_ESTANTE), [patients])
 
   return (
     <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
@@ -53,6 +86,9 @@ export default function Patients() {
           <Plus className="size-3.5" /> New Patient
         </button>
       </div>
+
+      <EstantePacientes titulo="Active Patients" filas={activos} onEdit={setEditando} />
+      <EstantePacientes titulo="Recent Patients" filas={recientes} onEdit={setEditando} />
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <div className="relative w-full sm:w-[320px]" data-tour="pat-search">
