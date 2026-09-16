@@ -165,11 +165,11 @@ export default function PatientDetail() {
                   {INSURANCE.map((r) => (
                     <tr key={r.order} className="border-b border-[#e4e4e7] text-[13px] last:border-0">
                       <td className="px-4 py-4"><Pill tone="info">{r.order}</Pill></td>
-                      <td className="px-4 py-4 text-[#09090b]">{r.carrier}</td>
-                      <td className="px-4 py-4 text-[#09090b]">{r.plan}</td>
-                      <td className="px-4 py-4 text-[#09090b]">{r.subscriber}</td>
+                      <td className="px-4 py-4 text-[#3f3f46]">{r.carrier}</td>
+                      <td className="px-4 py-4 text-[#3f3f46]">{r.plan}</td>
+                      <td className="px-4 py-4 text-[#3f3f46]">{r.subscriber}</td>
                       <td className="px-4 py-4"><Pill tone={RELACION_TONO[r.relation] ?? 'neutral'}>{r.relation}</Pill></td>
-                      <td className="px-4 py-4 text-[#09090b]">{r.period}</td>
+                      <td className="px-4 py-4 text-[#3f3f46]">{r.period}</td>
                       <td className="px-4 py-4">
                         <RowActionsMenu label={`${r.order} insurance plan`}>
                           <DropdownMenuItem asChild>
