@@ -1,6 +1,7 @@
 import { PageTitle } from '@/components/ui/page-title'
 import { TextField, SelectField, OptionCheckbox, FormFooter, ModalShell } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3640:72713 "Patients — Edit Patient (Full Page)".
    Tres secciones a 1088 de ancho: General (2×2 + 1 full), Demography
@@ -71,7 +72,7 @@ export function EditPatientModal({ onClose }: { onClose: () => void }) {
 
 export default function EditPatientPage() {
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
       <div className="flex flex-col gap-[15px]">
         <PageTitle>Edit Patient</PageTitle>
       </div>

@@ -13,6 +13,7 @@ import {
 } from '@/data/billing'
 import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
 import { Pill, type PillTone } from '@/components/ui/pill'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 4481:9881 "Billing". Ver design-reference/figma/modulos/billing.md.
    Las 4 pantallas del frame son estados de una sola vista: vacía, poblada,
@@ -71,7 +72,7 @@ export default function Billing() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <PageTitle>Billing</PageTitle>
         <div className="flex flex-wrap items-center gap-2">

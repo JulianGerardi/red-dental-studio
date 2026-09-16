@@ -6,6 +6,7 @@ import { aviso } from '@/components/ui/toaster'
 import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { Pill, type PillTone } from '@/components/ui/pill'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3753:80195 "Patient Profile — Documents". */
 
@@ -40,7 +41,7 @@ export default function Documents() {
   const todas = sel.length === filas.length && filas.length > 0
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
 
       {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
           El breadcrumb completo repetía lo que ya dice el panel lateral. */}

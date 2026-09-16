@@ -7,6 +7,7 @@ import { usePatients } from '@/data/patientsStore'
 import { PageTitle } from '@/components/ui/page-title'
 import { SearchButton } from '@/components/ui/search-button'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* La lista todavía no guarda fecha de alta ni de última visita: "Recent" usa
    el orden del array -`addPatient` inserta al principio- y "Active" toma el
@@ -58,7 +59,7 @@ export default function Patients() {
   const recientes = useMemo(() => patients.slice(0, CANTIDAD_ESTANTE), [patients])
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
       {/* Era un <button> sin acción. Ahora es el mismo link que en el
           resto de las pantallas del módulo. */}
       <Link to="/patients" className="flex items-center gap-1 self-start text-sm text-[#0056ef]">

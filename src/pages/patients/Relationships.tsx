@@ -10,6 +10,7 @@ import { aviso } from '@/components/ui/toaster'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3712:60564 (poblado) y 3712:59142 (vacío). */
 
@@ -135,7 +136,7 @@ export default function Relationships() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
 
       {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
           El breadcrumb completo repetía lo que ya dice el panel lateral. */}

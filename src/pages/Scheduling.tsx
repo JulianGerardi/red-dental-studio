@@ -20,6 +20,7 @@ import {
 } from '@/components/scheduling/CalendarViews'
 import { StatusLegend } from '@/components/scheduling/StatusLegend'
 import { EmptyState } from '@/components/ui/empty-state'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 
 /* Interruptor de lo que está en el tablero pero todavía no se usa. En false
@@ -141,7 +142,7 @@ export default function Scheduling() {
   })()
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
       <Link to="/scheduling" className="flex items-center gap-1 text-sm text-[#0056ef]">
         Scheduling <ChevronDown className="size-[15px]" />
       </Link>

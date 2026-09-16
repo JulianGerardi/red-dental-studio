@@ -12,6 +12,7 @@ import {
 } from '@/components/patients/insurance/modals'
 import { PLANES, PLANES_HISTORICOS, SUSCRIPCION, RELACIONES, ORDENES, ELEGIBILIDAD, type PlanPaciente } from '@/data/insurance'
 import { aviso } from '@/components/ui/toaster'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3817:865128 "Insurance", frames 3817:865704 y 3831:897436.
 
@@ -111,7 +112,7 @@ export default function Insurance() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
       {/* El último tramo del breadcrumb dice "Documents" en una pantalla de
           Insurance. Es del Figma. */}
 

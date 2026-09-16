@@ -13,6 +13,7 @@ import { EditContactModal } from '@/pages/patients/EditContactModal'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3646:58836 "Patient Dashboard". */
 
@@ -86,7 +87,7 @@ export default function PatientDetail() {
   const [apptTab, setApptTab] = useState<'Next' | 'Next Appointments'>('Next')
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
 
       {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
           El breadcrumb completo repetía lo que ya dice el panel lateral. */}

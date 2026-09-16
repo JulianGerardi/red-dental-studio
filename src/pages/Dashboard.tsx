@@ -20,6 +20,7 @@ import {
 import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
 import { formatDMY } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 4430:57451 — rediseño del dashboard.
    Cambios respecto de la versión anterior (3605:56445 / 3636:57488):
@@ -163,7 +164,7 @@ export default function Dashboard() {
   const diaSemana = date.toLocaleDateString('en-US', { weekday: 'long' })
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <p className="text-dash-blue text-sm">

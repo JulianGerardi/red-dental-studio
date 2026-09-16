@@ -22,6 +22,7 @@ import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip } fr
 import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
 import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
 import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 4582:28487 / 4588:84886. Ver design-reference/figma/modulos/ledger.md. */
 
@@ -185,7 +186,7 @@ export default function Ledger() {
   const tituloActivo = TABS.find((t) => t.id === tab)?.titulo ?? 'Ledger'
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
       <Link
         to="/patients"
         className="text-dash-blue mb-3 inline-flex items-center gap-1 text-sm hover:underline"
