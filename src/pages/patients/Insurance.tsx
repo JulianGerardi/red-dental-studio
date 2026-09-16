@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { Pill, type PillTone } from '@/components/ui/pill'
 import { SelectField, DateTextField, TextArea, OptionCheckbox, FormFooter } from '@/components/patients/form'
 import {
   NewSubscriptionModal, ManageSubscriptionModal, NewDependerModal,
@@ -19,18 +20,17 @@ import { aviso } from '@/components/ui/toaster'
    ver modulos/insurance.md, anomalías 60 a 66. */
 
 /* Pills con fondo tintado, como el resto del sistema. Muestreados del frame:
-   Primary y Self usan el azul #f0f5ff/#174596, Child el verde #f0fcf5/#1a804d,
-   Spouse el neutro #f5f5f5/#595959, Active el verde y Inactive el rojo
-   #fff2f2/#b22626. */
-const ORDEN_PILL = 'border-[#174596] bg-[#f0f5ff] text-[#174596]'
-const RELACION_PILL: Record<PlanPaciente['relacion'], string> = {
-  Child: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Self: 'border-[#174596] bg-[#f0f5ff] text-[#174596]',
-  Spouse: 'border-[#a1a1aa] bg-[#f5f5f5] text-[#595959]',
+   Primary y Self usan el azul, Child el verde, Spouse el neutro, Active el
+   verde e Inactive el rojo — los mismos seis tonos de `Pill`. */
+const ORDEN_TONO: PillTone = 'info'
+const RELACION_TONO: Record<PlanPaciente['relacion'], PillTone> = {
+  Child: 'success',
+  Self: 'info',
+  Spouse: 'neutral',
 }
-const ESTADO_PILL: Record<PlanPaciente['estado'], string> = {
-  Active: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Inactive: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
+const ESTADO_TONO: Record<PlanPaciente['estado'], PillTone> = {
+  Active: 'success',
+  Inactive: 'danger',
 }
 
 const COLS = {
@@ -43,14 +43,6 @@ const COLS = {
   coverage: 'w-[148px]',
   priority: 'w-[150px]',
   status: 'w-[92px]',
-}
-
-function Pill({ tono, children }: { tono: string; children: React.ReactNode }) {
-  return (
-    <span className={cn('inline-flex rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', tono)}>
-      {children}
-    </span>
-  )
 }
 
 function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
@@ -176,16 +168,16 @@ export default function Insurance() {
                     >
                       <GripVertical className="size-4" />
                     </span>
-                    <span className={COLS.order}><Pill tono={ORDEN_PILL}>{p.orden}</Pill></span>
+                    <span className={COLS.order}><Pill tone={ORDEN_TONO}>{p.orden}</Pill></span>
                     <span className={COLS.carrier}>{p.carrier}</span>
                     <span className={COLS.plan}>{p.plan}</span>
                     <span className={COLS.subscriber}>{p.subscriber}</span>
-                    <span className={COLS.relation}><Pill tono={RELACION_PILL[p.relacion]}>{p.relacion}</Pill></span>
+                    <span className={COLS.relation}><Pill tone={RELACION_TONO[p.relacion]}>{p.relacion}</Pill></span>
                     <span className={COLS.coverage}>{p.cobertura}</span>
                     <span className={cn(COLS.priority, 'flex flex-col gap-0.5 leading-tight')}>
                       {p.prioridad.map((t) => <span key={t}>{t}</span>)}
                     </span>
-                    <span className={COLS.status}><Pill tono={ESTADO_PILL[p.estado]}>{p.estado}</Pill></span>
+                    <span className={COLS.status}><Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill></span>
                   </div>
                 ))
               )}

@@ -1,25 +1,26 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, EllipsisVertical, Pencil, Plus, Trash2, Calendar, Phone, Mail, MapPin, Users, type LucideIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { ChevronLeft, Pencil, Plus, Trash2, Calendar, Phone, Mail, MapPin, Users, type LucideIcon } from 'lucide-react'
 import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { EmptyState } from '@/components/ui/empty-state'
 import { EditRelationshipModal } from '@/components/patients/EditRelationshipModal'
 import { DIRECTORIO } from '@/pages/patients/AddRelationship'
 import { aviso } from '@/components/ui/toaster'
+import { Pill, type PillTone } from '@/components/ui/pill'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 
 /* Figma 3712:60564 (poblado) y 3712:59142 (vacío). */
 
 type Badge = 'Legal contact' | 'Financial contact' | 'Household'
-/* Muestreados del frame. Coinciden con el resto del sistema: el par
-   #f0f2ff / #174596 es el mismo de "Busy" en Scheduling y "Primary" en la
-   tabla de Insurance. Legal contact usa #f0f5ff, dos unidades distinto de
-   Household (#f0f2ff) — inconsistencia menor del propio Figma. */
-const BADGE: Record<Badge, string> = {
-  'Legal contact': 'border-[#174596] bg-[#f0f5ff] text-[#174596]',
-  'Financial contact': 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Household: 'border-[#174596] bg-[#f0f2ff] text-[#174596]',
+/* Household usaba #f0f2ff -dos unidades distinto del resto de las pills
+   azules del sistema (#f0f5ff)-: inconsistencia menor del propio Figma que
+   la pill compartida ya no reproduce. */
+const BADGE_TONO: Record<Badge, PillTone> = {
+  'Legal contact': 'info',
+  'Financial contact': 'success',
+  Household: 'info',
 }
 
 /* El Figma dibuja el elipsis pero nunca muestra su menú. Lleva las dos
@@ -33,53 +34,15 @@ function MenuAcciones({
   onEdit: () => void
   onDelete: () => void
 }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
-    document.addEventListener('mousedown', onDown)
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('mousedown', onDown)
-      document.removeEventListener('keydown', onKey)
-    }
-  }, [open])
-
   return (
-    <div ref={ref} className="relative ml-auto">
-      <button
-        type="button"
-        aria-label={`Actions for ${nombre}`}
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className={cn('rounded p-1 text-[#09090b] hover:bg-[#f4f4f5]', open && 'bg-[#f4f4f5]')}
-      >
-        <EllipsisVertical className="size-4" />
-      </button>
-      {open && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-full right-0 z-20 mt-1 w-44 overflow-hidden rounded-md border border-[#e4e4e7] bg-white py-1 shadow-lg">
-          <button
-            type="button"
-            onClick={() => { setOpen(false); onEdit() }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]"
-          >
-            <Pencil className="size-3.5" /> Edit relationship
-          </button>
-          <button
-            type="button"
-            onClick={() => { setOpen(false); onDelete() }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-[#dc2626] hover:bg-[#fff2f2]"
-          >
-            <Trash2 className="size-3.5" /> Delete relationship
-          </button>
-        </div>
-      )}
-    </div>
+    <RowActionsMenu label={nombre} className="ml-auto">
+      <DropdownMenuItem onSelect={onEdit}>
+        <Pencil className="size-4 shrink-0" /> Edit relationship
+      </DropdownMenuItem>
+      <DropdownMenuItem variant="destructive" onSelect={onDelete}>
+        <Trash2 className="size-4 shrink-0" /> Delete relationship
+      </DropdownMenuItem>
+    </RowActionsMenu>
   )
 }
 
@@ -134,11 +97,7 @@ function PersonaCard({
           <span className="block text-xs text-[#71717a]">{p.rol}</span>
         </span>
         <span className="flex flex-wrap items-center gap-2">
-          {p.badges.map((b) => (
-            <span key={b} className={cn('rounded-full border px-2.5 py-[2px] text-[11px] font-medium', BADGE[b])}>
-              {b}
-            </span>
-          ))}
+          {p.badges.map((b) => <Pill key={b} tone={BADGE_TONO[b]}>{b}</Pill>)}
         </span>
         {onEdit && onDelete && <MenuAcciones nombre={p.name} onEdit={onEdit} onDelete={onDelete} />}
       </header>

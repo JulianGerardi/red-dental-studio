@@ -1,10 +1,12 @@
 import { useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Search, Trash2, Plus, MapPin } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Search, Pencil, Trash2, Plus, MapPin } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { SearchButton } from '@/components/ui/search-button'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 
 /* Settings → Locations. La tabla de entrada: nombre, empleados, salas e
    información de contacto. El detalle de cada fila —Information / Working
@@ -21,6 +23,7 @@ export const LOCACIONES: Locacion[] = [
 ]
 
 export function SettingsLocations() {
+  const navigate = useNavigate()
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(LOCACIONES)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -74,7 +77,7 @@ export function SettingsLocations() {
             <span className="w-[100px]">Employees</span>
             <span className="w-[80px]">Room</span>
             <span className="min-w-0 flex-1">Information</span>
-            <span className="w-[72px] text-right">Action</span>
+            <span className="w-[60px] text-right">Actions</span>
           </div>
 
           {visibles.length === 0 ? (
@@ -104,15 +107,15 @@ export function SettingsLocations() {
                 <span className="w-[100px]">{l.empleados}</span>
                 <span className="w-[80px]">{l.salas}</span>
                 <span className="min-w-0 flex-1 truncate">{l.info}</span>
-                <span className="flex w-[72px] justify-end">
-                  <button
-                    type="button"
-                    aria-label={`Delete ${l.nombre}`}
-                    onClick={() => borrar(l)}
-                    className="rounded p-1.5 text-[#09090b] transition-colors hover:bg-[#fff2f2] hover:text-[#dc2626]"
-                  >
-                    <Trash2 className="size-4" />
-                  </button>
+                <span className="flex w-[60px] justify-end">
+                  <RowActionsMenu label={l.nombre}>
+                    <DropdownMenuItem onSelect={() => navigate(`/settings/locations/${l.id}`)}>
+                      <Pencil className="size-4 shrink-0" /> Edit location
+                    </DropdownMenuItem>
+                    <DropdownMenuItem variant="destructive" onSelect={() => borrar(l)}>
+                      <Trash2 className="size-4 shrink-0" /> Delete location
+                    </DropdownMenuItem>
+                  </RowActionsMenu>
                 </span>
               </div>
             ))

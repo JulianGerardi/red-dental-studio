@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { Link, useParams } from 'react-router-dom'
 import { ChevronLeft, Search, Download, FileText } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { Pill, type PillTone } from '@/components/ui/pill'
 
 /* Figma 3753:80195 "Patient Profile — Documents". */
 
@@ -18,9 +18,9 @@ const DOCS: Doc[] = [
   { name: 'Isacc Cihtepin.doc', firma: 'Signed', fecha: 'Aug 1, 2026' },
 ]
 
-const FIRMA = {
-  Signed: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  'Pending Signature': 'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
+const FIRMA_TONO: Record<Doc['firma'], PillTone> = {
+  Signed: 'success',
+  'Pending Signature': 'warning',
 }
 
 export default function Documents() {
@@ -119,9 +119,7 @@ export default function Documents() {
                   <span className="truncate text-[#52525b]">{d.name}</span>
                 </span>
                 <span className="w-[200px]">
-                  <span className={cn('rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', FIRMA[d.firma])}>
-                    {d.firma}
-                  </span>
+                  <Pill tone={FIRMA_TONO[d.firma]}>{d.firma}</Pill>
                 </span>
                 <span className="w-[140px] text-right text-[#52525b]">{d.fecha}</span>
               </div>

@@ -1,14 +1,13 @@
 import { useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  Search, MoreVertical, CirclePlus, Trash2, FileText, Pencil, Ban,
+  Search, CirclePlus, Trash2, FileText, Pencil, Ban,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { SearchButton } from '@/components/ui/search-button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
-import { ICONO_SUELTO } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { usePhoto } from '@/lib/usePhoto'
@@ -20,6 +19,9 @@ import {
 import { RolesLocation } from '@/components/settings/RolesLocation'
 import { LinkExistingPerson } from '@/components/settings/LinkExistingPerson'
 import { NewHoursModal } from '@/components/settings/NewHoursModal'
+import { Pill } from '@/components/ui/pill'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 
 /* Settings → Employees. La lista es propia —el Figma de 3864:235190 sólo
    tiene la ficha de un empleado, no la tabla que lleva hasta ahí—, con las
@@ -31,31 +33,11 @@ import { NewHoursModal } from '@/components/settings/NewHoursModal'
    locación, así que se mudó para acá. */
 
 function EstadoPill({ estado }: { estado: Empleado['estado'] }) {
-  return (
-    <span
-      className={cn(
-        'rounded-full border px-2 py-[2px] text-[11px] font-semibold',
-        estado === 'Active'
-          ? 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]'
-          : 'border-[#71717a] bg-[#f4f4f5] text-[#71717a]',
-      )}
-    >
-      {estado}
-    </span>
-  )
+  return <Pill tone={estado === 'Active' ? 'success' : 'neutral'}>{estado}</Pill>
 }
 
 function ProviderPill({ si }: { si: boolean }) {
-  return (
-    <span
-      className={cn(
-        'rounded-full px-2 py-[2px] text-[11px] font-semibold',
-        si ? 'bg-dash-count-bg text-dash-blue-hover' : 'bg-[#f4f4f5] text-[#71717a]',
-      )}
-    >
-      {si ? 'Yes' : 'No'}
-    </span>
-  )
+  return <Pill tone={si ? 'info' : 'neutral'}>{si ? 'Yes' : 'No'}</Pill>
 }
 
 const COLS = {
@@ -72,7 +54,6 @@ export function SettingsEmployees() {
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(EMPLEADOS)
   const [seleccion, setSeleccion] = useState<string[]>([])
-  const [menuAbierto, setMenuAbierto] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const visibles = useMemo(
@@ -191,59 +172,33 @@ export function SettingsEmployees() {
                   <span className={COLS.estado}>
                     <EstadoPill estado={e.estado} />
                   </span>
-                  <span className={cn('relative', COLS.acciones)}>
-                    <button
-                      type="button"
-                      aria-label={`Actions for ${e.nombre}`}
-                      aria-expanded={menuAbierto === e.id}
-                      onClick={() => setMenuAbierto((p) => (p === e.id ? null : e.id))}
-                      className={ICONO_SUELTO}
-                    >
-                      <MoreVertical className="size-4" />
-                    </button>
-                    {menuAbierto === e.id && (
-                      <div className="absolute top-full right-0 z-30 mt-1 w-[220px] rounded-lg border border-[#e4e4e7] bg-white p-2 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
-                        <p className="px-2 pt-1 pb-2 text-[15px] font-bold text-[#09090b]">Actions</p>
-                        <Link
-                          to={`/settings/team/${e.id}`}
-                          onClick={() => setMenuAbierto(null)}
-                          className="flex items-center gap-2.5 rounded px-2 py-2 text-left text-[13px] font-medium text-[#09090b] hover:bg-[#f4f4f5]"
-                        >
+                  <span className={COLS.acciones}>
+                    <RowActionsMenu label={e.nombre}>
+                      <DropdownMenuItem asChild>
+                        <Link to={`/settings/team/${e.id}`}>
                           <Pencil className="size-4 shrink-0" /> Edit Employee
                         </Link>
-                        {/* "Delete Employee" borra la fila de verdad. Las
-                            otras tres son del mismo peso en el frame —mismo
-                            ícono de "prohibido"— pero necesitarían estados de
-                            cuenta que el sistema todavía no tiene. */}
-                        <button
-                          type="button"
-                          onClick={() => { setMenuAbierto(null); borrar(e) }}
-                          className="flex w-full items-center gap-2.5 rounded px-2 py-2 text-left text-[13px] font-medium text-[#dc2626] hover:bg-[#fff2f2]"
+                      </DropdownMenuItem>
+                      {/* "Delete Employee" borra la fila de verdad. Las
+                          otras tres son del mismo peso en el frame —mismo
+                          ícono de "prohibido"— pero necesitarían estados de
+                          cuenta que el sistema todavía no tiene. */}
+                      <DropdownMenuItem variant="destructive" onSelect={() => borrar(e)}>
+                        <Ban className="size-4 shrink-0" /> Delete Employee
+                      </DropdownMenuItem>
+                      {(['Suspend Employee', 'Terminate Employee', 'Disable'] as const).map((accion) => (
+                        <DropdownMenuItem
+                          key={accion}
+                          variant="destructive"
+                          onSelect={() => aviso.info(`${accion} is not available in this release.`)}
                         >
-                          <Ban className="size-4 shrink-0" /> Delete Employee
-                        </button>
-                        {(['Suspend Employee', 'Terminate Employee', 'Disable'] as const).map((accion) => (
-                          <button
-                            key={accion}
-                            type="button"
-                            onClick={() => {
-                              setMenuAbierto(null)
-                              aviso.info(`${accion} is not available in this release.`)
-                            }}
-                            className="flex w-full items-center gap-2.5 rounded px-2 py-2 text-left text-[13px] font-medium text-[#dc2626] hover:bg-[#fff2f2]"
-                          >
-                            <Ban className="size-4 shrink-0" /> {accion}
-                          </button>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => { setMenuAbierto(null); quitarRolProvider(e) }}
-                          className="flex w-full items-center gap-2.5 rounded px-2 py-2 text-left text-[13px] font-medium text-[#dc2626] hover:bg-[#fff2f2]"
-                        >
-                          <Trash2 className="size-4 shrink-0" /> Remove Provider Role
-                        </button>
-                      </div>
-                    )}
+                          <Ban className="size-4 shrink-0" /> {accion}
+                        </DropdownMenuItem>
+                      ))}
+                      <DropdownMenuItem variant="destructive" onSelect={() => quitarRolProvider(e)}>
+                        <Trash2 className="size-4 shrink-0" /> Remove Provider Role
+                      </DropdownMenuItem>
+                    </RowActionsMenu>
                   </span>
                 </div>
               )

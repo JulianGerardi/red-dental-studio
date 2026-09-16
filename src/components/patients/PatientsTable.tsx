@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
-import { EllipsisVertical, Pencil } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
+import { Pill, type PillTone } from '@/components/ui/pill'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 
 /* Figma 3638:61352 — la capa se llama `table/referral-table`: es el componente
    de referrals reusado para pacientes. De ahí sale el "referrals" del footer. */
@@ -17,10 +19,10 @@ export type PatientRow = {
   status: PatientStatus
 }
 
-const STATUS: Record<PatientStatus, string> = {
-  Completed: 'bg-[#f0fcf5] border-[#1a804d] text-[#1a804d]',
-  Proposed: 'bg-[#fffaf0] border-[#99660d] text-[#99660d]',
-  'In Progress': 'bg-[#f0f2ff] border-[#174596] text-[#174596]',
+const STATUS_TONO: Record<PatientStatus, PillTone> = {
+  Completed: 'success',
+  Proposed: 'warning',
+  'In Progress': 'info',
 }
 
 /* Anchos fijos por celda; el sobrante se reparte con justify-between,
@@ -36,7 +38,7 @@ const COLS = {
 function HeadCell({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
     <div className={cn('flex h-full items-center', className)}>
-      <span className="text-xs font-semibold text-[#71717a]">{children}</span>
+      <span className="text-[11px] font-semibold text-[#71717a]">{children}</span>
     </div>
   )
 }
@@ -44,7 +46,7 @@ function HeadCell({ className, children }: { className?: string; children: React
 function Cell({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
     <div className={cn('flex h-full items-center', className)}>
-      <span className="truncate text-xs leading-[1.4] font-semibold text-[#71717a]">{children}</span>
+      <span className="truncate text-[13px] text-[#3f3f46]">{children}</span>
     </div>
   )
 }
@@ -78,14 +80,14 @@ export function PatientsTable({
           )}
         >
           <div className={cn('flex h-full items-center gap-2.5', COLS.name)}>
-            <span className="bg-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-xs leading-[1.4] font-semibold text-[#fafafa]">
+            <span className="bg-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold text-[#fafafa]">
               {r.initials}
             </span>
             {/* El nombre es el acceso al dashboard del paciente. */}
             <Link
               to={`/patients/${r.id}`}
               onClick={(e) => e.stopPropagation()}
-              className="truncate text-xs font-semibold text-[#0056ef] hover:underline"
+              className="text-dash-blue truncate text-[13px] font-semibold hover:underline"
             >
               {r.name}
             </Link>
@@ -93,17 +95,14 @@ export function PatientsTable({
           <Cell className={COLS.birthday}>{r.birthday}</Cell>
           <Cell className={COLS.email}>{r.email}</Cell>
           <div className={cn('flex h-full items-center', COLS.status)}>
-            <span
-              className={cn(
-                'inline-flex items-center justify-center rounded-full border px-2 py-[3px] text-xs font-semibold',
-                STATUS[r.status],
-              )}
-            >
-              {r.status}
-            </span>
+            <Pill tone={STATUS_TONO[r.status]}>{r.status}</Pill>
           </div>
           <div className={cn('flex h-full items-center justify-center', COLS.actions)}>
-            <RowMenu label={r.name} onEdit={() => onRowAction?.(r)} />
+            <RowActionsMenu label={r.name}>
+              <DropdownMenuItem onSelect={() => onRowAction?.(r)}>
+                <Pencil className="size-4 shrink-0" /> Edit
+              </DropdownMenuItem>
+            </RowActionsMenu>
           </div>
         </div>
       ))}
@@ -128,54 +127,6 @@ export function PatientsTable({
         </div>
       </div>
     </div>
-    </div>
-  )
-}
-
-/* El kebab despliega las acciones de la fila; hoy sólo Edit. */
-function RowMenu({ label, onEdit }: { label: string; onEdit: () => void }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
-    document.addEventListener('mousedown', onDown)
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('mousedown', onDown)
-      document.removeEventListener('keydown', onKey)
-    }
-  }, [open])
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        aria-label={`Actions for ${label}`}
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className={cn('rounded p-1 text-[#09090b] hover:bg-[#f4f4f5]', open && 'bg-[#f4f4f5]')}
-      >
-        <EllipsisVertical className="size-4" />
-      </button>
-      {open && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-full right-0 z-20 mt-1 w-32 overflow-hidden rounded-md border border-[#e4e4e7] bg-white py-1 shadow-lg">
-          <button
-            type="button"
-            onClick={() => {
-              setOpen(false)
-              onEdit()
-            }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]"
-          >
-            <Pencil className="size-3.5" /> Edit
-          </button>
-        </div>
-      )}
     </div>
   )
 }

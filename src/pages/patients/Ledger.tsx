@@ -15,6 +15,7 @@ import {
   type Movimiento,
 } from '@/data/ledger'
 import { aviso } from '@/components/ui/toaster'
+import { Pill, type PillTone } from '@/components/ui/pill'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
 import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip } from '@/components/patients/ledger/LedgerRowDetail'
@@ -29,13 +30,13 @@ import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjust
    cargo/crédito en la propia celda -mismo dato (`tipo`+signo de `monto`),
    sólo más específico al mostrarlo-. Charge muestra el código en vez de
    una etiqueta genérica, igual que esa referencia. */
-function detalleTipo(m: Movimiento): { texto: string; tono: string } {
-  if (m.tipo === 'Charge') return { texto: m.codigo, tono: 'border-[#e4e4e7] bg-[#f5f5f5] text-[#71717a]' }
-  if (m.tipo === 'Insurance') return { texto: 'Ins Payment', tono: 'border-[#6633a6] bg-[#f5f0ff] text-[#6633a6]' }
-  if (m.tipo === 'Payment') return { texto: 'Pt Payment', tono: 'border-[#174596] bg-[#f0f5ff] text-[#174596]' }
+function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
+  if (m.tipo === 'Charge') return { texto: m.codigo, tono: 'neutral' }
+  if (m.tipo === 'Insurance') return { texto: 'Ins Payment', tono: 'purple' }
+  if (m.tipo === 'Payment') return { texto: 'Pt Payment', tono: 'info' }
   return m.monto < 0
-    ? { texto: 'Credit Adj', tono: 'border-[#a1a1aa] bg-[#f5f5f5] text-[#595959]' }
-    : { texto: 'Charge Adj', tono: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]' }
+    ? { texto: 'Credit Adj', tono: 'neutral' }
+    : { texto: 'Charge Adj', tono: 'danger' }
 }
 
 /* Anchos del diseño de referencia (Confidentally 2.0): 112/112/96 · desc
@@ -74,7 +75,7 @@ const COLUMNAS: ColumnaLedger[] = [
   { id: 'paciente', label: 'Patient', claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.paciente, celda: (m) => m.paciente },
   {
     id: 'tipo', label: 'Type',
-    celda: (m) => { const t = detalleTipo(m); return <Pill tono={t.tono}>{t.texto}</Pill> },
+    celda: (m) => { const t = detalleTipo(m); return <Pill tone={t.tono}>{t.texto}</Pill> },
   },
   { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
   { id: 'provider', label: 'Provider', claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
@@ -85,14 +86,6 @@ const COLUMNAS: ColumnaLedger[] = [
   },
   { id: 'saldo', label: 'Balance', derecha: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', celda: (m) => moneda(m.saldo) },
 ]
-
-function Pill({ tono, children }: { tono: string; children: React.ReactNode }) {
-  return (
-    <span className={cn('inline-flex rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', tono)}>
-      {children}
-    </span>
-  )
-}
 
 const VISTAS = ['Patient View', 'Guarantor View'] as const
 type Vista = (typeof VISTAS)[number]

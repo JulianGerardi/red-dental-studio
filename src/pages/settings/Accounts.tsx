@@ -1,23 +1,23 @@
 import { useMemo, useState } from 'react'
-import { Search, Plus, MoreVertical, Building2 } from 'lucide-react'
+import { Search, Plus, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { SearchButton } from '@/components/ui/search-button'
 import { aviso } from '@/components/ui/toaster'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { Pill, type PillTone } from '@/components/ui/pill'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 
 /* Settings → Accounts. Ver design-reference/figma/modulos/settings-accounts.md. */
 
 type EstadoCuenta = 'Active' | 'Draft' | 'Pending'
 
-const ESTADO_PILL: Record<EstadoCuenta, string> = {
-  Active: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Draft: 'border-[#a1a1aa] bg-[#f5f5f5] text-[#595959]',
-  Pending: 'border-[#b45309] bg-[#fffbeb] text-[#b45309]',
+const ESTADO_TONO: Record<EstadoCuenta, PillTone> = {
+  Active: 'success',
+  Draft: 'neutral',
+  Pending: 'warning',
 }
 
 type Cuenta = {
@@ -152,24 +152,14 @@ export function SettingsAccounts() {
                 <span className={COLS.licencias}>{c.licencias}</span>
                 <span className={cn(COLS.duenos, 'truncate')} title={c.duenos}>{c.duenos}</span>
                 <span className={COLS.estado}>
-                  <span className={cn('inline-flex rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', ESTADO_PILL[c.estado])}>
-                    {c.estado}
-                  </span>
+                  <Pill tone={ESTADO_TONO[c.estado]}>{c.estado}</Pill>
                 </span>
                 <span className={cn(COLS.acciones, 'flex justify-end')}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      aria-label={`Actions for ${c.nombre}`}
-                      className="flex size-7 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] hover:text-[#09090b]"
-                    >
-                      <MoreVertical className="size-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-[170px]">
-                      <DropdownMenuItem onSelect={() => aviso.info(`Editing ${c.nombre}.`)}>Edit account</DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => aviso.info(`Licenses for ${c.nombre}.`)}>Manage licenses</DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => aviso.warn(`${c.nombre} suspended.`)}>Suspend</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <RowActionsMenu label={c.nombre}>
+                    <DropdownMenuItem onSelect={() => aviso.info(`Editing ${c.nombre}.`)}>Edit account</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => aviso.info(`Licenses for ${c.nombre}.`)}>Manage licenses</DropdownMenuItem>
+                    <DropdownMenuItem variant="destructive" onSelect={() => aviso.warn(`${c.nombre} suspended.`)}>Suspend</DropdownMenuItem>
+                  </RowActionsMenu>
                 </span>
               </div>
             ))
