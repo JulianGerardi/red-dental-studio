@@ -4,9 +4,14 @@ import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ICONO_SUELTO } from '@/lib/estilos'
-import { PROBLEMAS, ESTADO_PILL, type Problema } from '@/data/clinical-mode'
+import { PROBLEMAS, type Problema } from '@/data/clinical-mode'
+import { Pill, type PillTone } from '@/components/ui/pill'
 
 const POR_PAGINA = 3
+
+const ESTADO_TONO: Record<Problema['estado'], PillTone> = {
+  Active: 'success', Resolved: 'neutral', Monitoring: 'warning',
+}
 
 /* En el frame los encabezados se parten en dos líneas —"Dat e", "Toot h",
    "Surf ace"— porque las columnas quedaron más angostas que las palabras. Es
@@ -57,7 +62,7 @@ export function ProblemList() {
           <div className="mt-3 -mx-4 overflow-x-auto px-4">
             <table className="w-full min-w-[720px] border-collapse">
               <thead>
-                <tr className="border-y border-[#f1f1f4]">
+                <tr className="border-y border-[#f1f1f4] bg-[#f9f9f9]">
                   {COLUMNAS.map((c) => (
                     <th
                       key={c}
@@ -74,8 +79,8 @@ export function ProblemList() {
                     <td className="h-12 px-3 text-[13px] whitespace-nowrap text-[#09090b]">{p.fecha}</td>
                     <td className="px-3 text-[13px] text-[#09090b]">{p.superficie}</td>
                     <td className="px-3 text-[13px] whitespace-nowrap text-[#09090b]">{p.condicion}</td>
-                    <td className="px-3 text-[13px] whitespace-nowrap text-[#52525b]">{p.examen}</td>
-                    <td className="px-3 text-[13px] whitespace-nowrap text-[#52525b]">{p.proveedor}</td>
+                    <td className="px-3 text-[13px] whitespace-nowrap text-[#3f3f46]">{p.examen}</td>
+                    <td className="px-3 text-[13px] whitespace-nowrap text-[#3f3f46]">{p.proveedor}</td>
                     <td className="px-3">
                       <button
                         onClick={() => setNota(nota?.id === p.id ? null : p)}
@@ -88,11 +93,7 @@ export function ProblemList() {
                         <Info className="size-3.5" />
                       </button>
                     </td>
-                    <td className="px-3">
-                      <span className={cn('rounded-full border px-2 py-[2px] text-[11px] font-semibold', ESTADO_PILL[p.estado])}>
-                        {p.estado}
-                      </span>
-                    </td>
+                    <td className="px-3"><Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill></td>
                     <td className="px-3">
                       <button
                         onClick={() => aviso.info('Editing a problem is not available in this release.')}

@@ -12,27 +12,20 @@ import {
   STATS_BILLING, STATS_HOY, FILTROS_ACTIVIDAD, type FiltroActividad, type TipoAjusteBilling,
 } from '@/data/billing'
 import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
+import { Pill, type PillTone } from '@/components/ui/pill'
 
 /* Figma 4481:9881 "Billing". Ver design-reference/figma/modulos/billing.md.
    Las 4 pantallas del frame son estados de una sola vista: vacía, poblada,
    con el modal "Post payment" encima y con un paciente elegido -acá son
    `filas.length === 0`, el modal y `seleccionado`, no rutas separadas. */
 
-function detalleTipo(m: Movimiento): { texto: string; tono: string } {
-  if (m.tipo === 'Charge') return { texto: m.codigo, tono: 'border-[#e4e4e7] bg-[#f5f5f5] text-[#71717a]' }
-  if (m.tipo === 'Insurance') return { texto: 'Ins Payment', tono: 'border-[#6633a6] bg-[#f5f0ff] text-[#6633a6]' }
-  if (m.tipo === 'Payment') return { texto: 'Pt Payment', tono: 'border-[#174596] bg-[#f0f5ff] text-[#174596]' }
+function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
+  if (m.tipo === 'Charge') return { texto: m.codigo, tono: 'neutral' }
+  if (m.tipo === 'Insurance') return { texto: 'Ins Payment', tono: 'purple' }
+  if (m.tipo === 'Payment') return { texto: 'Pt Payment', tono: 'info' }
   return m.monto < 0
-    ? { texto: 'Credit Adj', tono: 'border-[#a1a1aa] bg-[#f5f5f5] text-[#595959]' }
-    : { texto: 'Charge Adj', tono: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]' }
-}
-
-function Pill({ tono, children }: { tono: string; children: React.ReactNode }) {
-  return (
-    <span className={cn('inline-flex rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', tono)}>
-      {children}
-    </span>
-  )
+    ? { texto: 'Credit Adj', tono: 'neutral' }
+    : { texto: 'Charge Adj', tono: 'danger' }
 }
 
 function Stat({ label, value, caption }: { label: string; value: string; caption: string }) {
@@ -195,11 +188,11 @@ export default function Billing() {
                     >
                       <span className="w-[104px] shrink-0">{m.fecha}</span>
                       <span className="w-[124px] shrink-0 truncate text-[#09090b]" title={m.paciente}>{m.paciente}</span>
-                      <span className="w-[92px] shrink-0">{m.tipo === 'Charge' ? t.texto : <Pill tono={t.tono}>{t.texto}</Pill>}</span>
+                      <span className="w-[92px] shrink-0">{m.tipo === 'Charge' ? t.texto : <Pill tone={t.tono}>{t.texto}</Pill>}</span>
                       <span className="min-w-[160px] flex-1 truncate" title={m.descripcion}>{m.descripcion}</span>
                       <span className="w-[124px] shrink-0 truncate" title={m.provider}>{m.provider}</span>
                       <span className={cn('w-[88px] shrink-0 text-right font-medium tabular-nums', m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]')}>{moneda(m.monto)}</span>
-                      <span className="text-dash-blue w-[92px] shrink-0 text-right font-semibold tabular-nums">{moneda(m.saldo)}</span>
+                      <span className="w-[92px] shrink-0 text-right font-semibold tabular-nums text-[#09090b]">{moneda(m.saldo)}</span>
                     </div>
                   )
                 })}
