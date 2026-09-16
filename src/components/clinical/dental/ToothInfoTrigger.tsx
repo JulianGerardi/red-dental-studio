@@ -32,10 +32,10 @@ import { cn } from '@/lib/utils'
    error-. La de `useLayoutEffect` corre en el mismo commit, a tiempo.
 
    Al pasar el mouse adelanta el resumen en un hover card; al clickear lo
-   despliega en un flotante fijo a la derecha de la pantalla -sigue a la
-   vista al scrollear, para poder compararlo mientras se carga el sondaje
-   periodontal- y eso lo dibuja `OdontogramEmbed`, no este componente: acá
-   sólo vive el botón. El puntito rojo avisa que hay algo para ver: `hayHallazgo` (en
+   despliega inline -en Periodontal Status, arriba de los tabs Maxillary/
+   Mandibular; en Odontogram, debajo del "Dental chart"- y eso lo dibuja
+   `OdontogramEmbed` (`PanelArribaDeTabs`), no este componente: acá sólo
+   vive el botón. El puntito rojo avisa que hay algo para ver: `hayHallazgo` (en
    `ToothInfoPanel.tsx`) descarta los renglones "no recorded X" y el caso
    especial de "Periodontal status" sano, y también prende si ya hay
    sitios cargados en el sondaje (`perioNodo`, ver abajo).

@@ -1513,3 +1513,47 @@ abierto y quedó fijo en el mismo lugar de la pantalla; se cargó un sitio
 con el panel abierto y el valor se actualizó ahí mismo sin cerrarlo; al
 cerrar, la página quedó igual que antes de abrirlo. Cero errores de
 consola.
+
+### El flotante fijo tampoco sirvió: pasa a inline arriba de los tabs (2026-09-16)
+
+El `position: fixed` de más arriba resultó ser justo lo que Julián NO
+quería: "fijo del lado derecho **no flotante**, que no tape el
+gráfico". Un fixed sigue siendo un overlay -sombra, se superpone a lo
+que tenga debajo-, así que angostar el chart con una columna no alcanza
+del todo: el panel corta contenido igual en pantallas más chicas. Y de
+paso se encontró que `sticky` (probado como alternativa a `fixed` para
+la misma columna) tampoco servía: se "despegaba" mucho antes de lo
+esperado y quedaba clavado arriba de la ventana en vez de acompañar el
+scroll -no se investigó la causa raíz porque el pedido cambió antes de
+terminar de depurarlo-.
+
+Julián lo resolvió con un pedido más simple y más preciso: que aparezca
+**arriba de los tabs Maxillary/Mandibular**. Eso saca de encima toda la
+necesidad de `fixed`/`sticky`: es contenido inline más, en su lugar
+natural, entre la barra "Periodontal Status" (con "None/PD/CAL/
+Recession/...") y los tabs de arcada -nunca se superpone a nada porque
+no es un overlay, es parte del documento-.
+
+El truco es DÓNDE insertarlo: `.perio-tabs-cabecera` -los botones
+Maxillary/Mandibular- no es de la librería, es de `PeriodontalTabs.tsx`
+(este mismo proyecto), que la arma con `createPortal` dentro de
+`.perio-fullgrid-scroll` cada vez que se entra a Periodontal Status. Se
+la lee igual que `.perio-summary-card`/`.tooth-info` (`releer()` en
+`OdontogramEmbed`, guardada en `tabsPerioNodo`) y se le agregó un
+componente nuevo, `PanelArribaDeTabs`, que mueve el panel real con
+`insertBefore(panel, cabecera)` -mismo patrón de `useLayoutEffect` +
+mover-el-nodo-y-devolverlo-al-desmontar que ya usa `ToothInfoTrigger`
+para `.perio-launch-bar`, con el mismo motivo: no se puede `createPortal`
+a ciegas porque la librería/`PeriodontalTabs` puede sacar
+`.perio-tabs-cabecera` del DOM en cualquier cambio de vista.
+
+En Odontogram no hay tabs Maxillary/Mandibular -`tabsPerioNodo` da
+`null`-, así que ahí el panel vuelve a ser inline simple, debajo del
+"Dental chart", como en la primera versión (antes del flotante).
+
+Verificado: abrir el panel en Periodontal Status lo muestra pegado
+arriba de "Maxillary | Mandibular", angostando en cero el gráfico de
+abajo (nada se superpone, todo se ve completo). Cambiar de tab
+(Odontogram ↔ Periodontal Status) varias veces seguidas con el panel
+abierto y cerrado en distintos momentos: cero errores de consola, el
+panel reaparece en el lugar correcto cada vez.

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, TriangleAlert, X } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
 import { OdontogramShell, clearSelection, type OdontogramThemeConfig } from 'react-advanced-odontogram'
@@ -69,6 +69,31 @@ function tituloDe(nodo: HTMLElement, porDefecto: string) {
   return texto || porDefecto
 }
 
+/* Mete el panel de "Tooth information" arriba de los tabs Maxillary/
+   Mandibular (`ancla`, `.perio-tabs-cabecera`) en vez de flotarlo o
+   ponerlo al costado: así queda a la vista de una, entre la barra de
+   "Periodontal Status" y la grilla, sin superponerse a nada. Mismo
+   patrón que `ToothInfoTrigger` -mover el nodo real con
+   `useLayoutEffect`, devolverlo antes de que React lo desmonte- porque
+   `.perio-tabs-cabecera` es de `PeriodontalTabs.tsx`, que la rearma con
+   cada cambio de vista. */
+function PanelArribaDeTabs({ ancla, children }: { ancla: HTMLElement; children: React.ReactNode }) {
+  const envoltorio = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    const el = envoltorio.current
+    const padre = ancla.parentElement
+    if (!el || !padre) return
+    const origen = el.parentElement
+    padre.insertBefore(el, ancla)
+    return () => {
+      if (origen && el.parentElement !== origen) origen.appendChild(el)
+    }
+  }, [ancla])
+
+  return <div ref={envoltorio}>{children}</div>
+}
+
 export function OdontogramEmbed({
   controlesAbiertos, onCerrarControles,
 }: {
@@ -84,6 +109,7 @@ export function OdontogramEmbed({
   const [infoNodo, setInfoNodo] = useState<HTMLElement | null>(null)
   const [barraNodo, setBarraNodo] = useState<HTMLElement | null>(null)
   const [perioNodo, setPerioNodo] = useState<HTMLElement | null>(null)
+  const [tabsPerioNodo, setTabsPerioNodo] = useState<HTMLElement | null>(null)
   const [infoAbierto, setInfoAbierto] = useState(false)
   const [paso, setPaso] = useState(0)
   /* Minimizado deja sólo la barra: el gráfico se ve entero sin cerrar nada. */
@@ -138,6 +164,10 @@ export function OdontogramEmbed({
        del DOM por completo al volver a Odontogram-. */
     const perio = raiz.querySelector<HTMLElement>('.perio-summary-card')
     setPerioNodo((previo) => (previo === perio ? previo : perio))
+    /* `.perio-tabs-cabecera` (Maxillary/Mandibular) es de `PeriodontalTabs`,
+       no de la librería: ancla de `PanelArribaDeTabs`. */
+    const tabs = raiz.querySelector<HTMLElement>('.perio-tabs-cabecera')
+    setTabsPerioNodo((previo) => (previo === tabs ? previo : tabs))
   }, [])
 
   /* Varias filas de la librería quedan sin contenido según la pieza
@@ -206,6 +236,28 @@ export function OdontogramEmbed({
   /* Lo que quedó sin tocar; el resumen se muestra al minimizar. */
   const pendientes = pasos.filter((pa) => !tocados.includes(pa.titulo)).map((pa) => pa.titulo)
 
+  /* En Periodontal Status va arriba de los tabs Maxillary/Mandibular
+     (`PanelArribaDeTabs`, ver más arriba): a la vista de una entre la
+     barra de "Periodontal Status" y la grilla, sin taparla ni flotar
+     encima. En Odontogram no hay esos tabs -`tabsPerioNodo` da `null`-,
+     así que va inline debajo del "Dental chart", como antes. */
+  const panelInfo = infoAbierto && (infoNodo || perioNodo) && (
+    <div className="mb-3 w-full rounded-xl border border-[#e4e4e7] bg-white p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <span className="text-[13px] font-semibold text-[#09090b]">Tooth information</span>
+        <button
+          type="button"
+          aria-label="Close tooth information"
+          onClick={() => setInfoAbierto(false)}
+          className="flex size-7 shrink-0 items-center justify-center rounded-md border border-[#e4e4e7] text-[#71717a] hover:bg-[#f4f4f5]"
+        >
+          <X className="size-3.5" />
+        </button>
+      </div>
+      <ToothInfoPanel nodo={infoNodo} perioNodo={perioNodo} />
+    </div>
+  )
+
   return (
     <div
       ref={ref}
@@ -228,27 +280,9 @@ export function OdontogramEmbed({
           onToggle={() => setInfoAbierto((v) => !v)}
         />
       )}
-
-      {/* Flotante fijo a la derecha -no inline abajo del chart, ni modal-:
-          Julián quiere compararlo mientras scrollea la grilla de Periodontal
-          Status, así que tiene que seguir a la vista y no taparla (no hay
-          fondo oscuro, y la grilla sigue siendo clickeable atrás). Cierra
-          y la página vuelve al layout normal, sin nada reservado. */}
-      {infoAbierto && (infoNodo || perioNodo) && (
-        <div className="fixed top-20 right-4 z-40 w-96 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-[#e4e4e7] bg-white p-4 shadow-xl">
-          <div className="mb-3 flex items-center justify-between">
-            <span className="text-[13px] font-semibold text-[#09090b]">Tooth information</span>
-            <button
-              type="button"
-              aria-label="Close tooth information"
-              onClick={() => setInfoAbierto(false)}
-              className="flex size-7 shrink-0 items-center justify-center rounded-md border border-[#e4e4e7] text-[#71717a] hover:bg-[#f4f4f5]"
-            >
-              <X className="size-3.5" />
-            </button>
-          </div>
-          <ToothInfoPanel nodo={infoNodo} perioNodo={perioNodo} />
-        </div>
+      {panelInfo && (tabsPerioNodo
+        ? <PanelArribaDeTabs ancla={tabsPerioNodo}>{panelInfo}</PanelArribaDeTabs>
+        : panelInfo
       )}
 
       {confirmandoCierre && (
