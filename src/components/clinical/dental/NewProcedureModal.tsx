@@ -22,6 +22,14 @@ export type ProcedureDraft = {
   diagnoses: string[]
 }
 
+/* Julián pidió sacar el tab "Diagnostics" (la lista de condiciones/
+   diagnósticos, ej. "Chronic enamel dental caries") del paso 3 por ahora.
+   El markup y el estado (`diagnoses`, `DIAGNOSES`) se dejan tal cual, sólo se
+   deja de dibujar el botón que lleva ahí -con eso alcanza, `tab` nunca pasa
+   a 'Diagnostics' si no hay cómo clickearlo-. Volver a mostrarlo es poner
+   esto en `true`. */
+const CONDICIONES = false
+
 /* Modal, no drawer: en red-clone un formulario complejo se resuelve con
    `ModalShell` (ver NewAppointmentModal de Scheduling), nunca con un panel
    deslizante -eso no es un patrón que use este proyecto. Ver
@@ -247,16 +255,18 @@ export function NewProcedureModal({
 
         {step === 3 && (
           <div className="flex w-full flex-col items-start gap-4">
-            <div className="flex items-center gap-1 rounded-lg bg-[#f1f5f9] p-1">
-              {(['Findings', 'Diagnostics'] as const).map((t) => (
-                <button
-                  key={t} type="button" onClick={() => setTab(t)}
-                  className={`h-8 rounded-md px-3 text-xs font-medium ${tab === t ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]'}`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
+            {CONDICIONES && (
+              <div className="flex items-center gap-1 rounded-lg bg-[#f1f5f9] p-1">
+                {(['Findings', 'Diagnostics'] as const).map((t) => (
+                  <button
+                    key={t} type="button" onClick={() => setTab(t)}
+                    className={`h-8 rounded-md px-3 text-xs font-medium ${tab === t ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]'}`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="flex w-full flex-col gap-1">
               <p className="text-sm font-bold text-[#09090b]">{tab === 'Findings' ? 'Link Findings' : 'Add Diagnostic'}</p>
