@@ -11,7 +11,7 @@ import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import { OperatoryCard } from '@/components/dashboard/OperatoryCard'
 import { PendingTaskCard } from '@/components/dashboard/PendingTaskCard'
 import {
-  DIAS, DIA_VACIO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
+  DIAS, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
   type DiaDashboard, type Origen,
 } from '@/components/dashboard/dashboard-data'
 import {
@@ -37,10 +37,7 @@ import { CONTENEDOR_PAGINA } from '@/lib/estilos'
    encabezado, tira de stats, sala de espera, salas y tareas. Los datos por
    día están en dashboard-data.ts. */
 
-/* El chip del Figma dice 30-02-2026, una fecha que no existe. Al volverse
-   filtro real no puede ser el valor seleccionado, así que el default pasa a
-   28-02-2026. Ver README.md, anomalía 4. */
-const DEFAULT_DATE = new Date(2026, 1, 28)
+const DEFAULT_DATE = HOY_DEMO
 
 function BotonFiltro({
   label, options, value, onChange,
