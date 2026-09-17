@@ -119,10 +119,13 @@ export function AppointmentCard({
 /* Una fila, no una card de dos pisos: avatar, nombre y hora/provider abajo
    en gris, y una flecha a Scheduling en vez del menú -acá no hay nada para
    editar in situ. Mismo tamaño de trigger que el kebab de las tablas
-   (`ICONO_SUELTO`), para que quede a la par de PatientCard al lado. */
+   (`ICONO_SUELTO`), para que quede a la par de PatientCard al lado -misma
+   sombra que esa card también: la `shadow-inner-card` de acá abajo es de
+   `InnerCard`, pensada para las cards grandes del Dashboard, y sin borde en
+   una fila chica se veía como una línea cortada en vez de una sombra. */
 function AppointmentCardCompacta({ appt }: { appt: Appointment }) {
   return (
-    <InnerCard className="flex items-center gap-2.5 p-2.5">
+    <InnerCard className="flex items-center gap-2.5 border border-[#e4e4e7] p-2.5 shadow-[0_1px_3px_rgb(0_0_0/0.08)]">
       <span className="bg-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold text-white">
         {appt.initials}
       </span>

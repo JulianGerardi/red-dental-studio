@@ -8,7 +8,10 @@ import { STATUS_TONO, type PatientRow } from '@/components/patients/PatientsTabl
 /* Card chica para el costado de Patients.tsx -ver Patients.tsx-: una fila,
    no la card de dos pisos de antes. Mismo avatar, nombre-link, pill y menú
    que ya tiene cada fila de la tabla; el cumpleaños queda afuera -ya está en
-   la tabla de al lado- para que la card entre en un renglón. */
+   la tabla de al lado- para que la card entre en un renglón.
+   La sombra es la misma que usa `SolicitudCard` en Scheduling para sus cards
+   chicas -la `shadow-inner-card` del Dashboard se pensó para cards grandes y
+   acá, sin borde, se veía como una línea cortada en vez de una sombra. */
 
 export function PatientCard({
   row, onEdit,
@@ -17,7 +20,7 @@ export function PatientCard({
   onEdit: (row: PatientRow) => void
 }) {
   return (
-    <article className="flex items-center gap-2.5 rounded-lg border border-[#e4e4e7] bg-white p-2.5">
+    <article className="flex items-center gap-2.5 rounded-lg border border-[#e4e4e7] bg-white p-2.5 shadow-[0_1px_3px_rgb(0_0_0/0.08)]">
       <span className="bg-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold text-[#fafafa]">
         {row.initials}
       </span>

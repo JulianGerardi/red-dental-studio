@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, Search, Plus, CalendarDays, Users } from 'lucide-react'
+import { ChevronDown, ChevronRight, Search, Plus, CalendarDays, Users } from 'lucide-react'
 import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTable'
 import { PatientCard } from '@/components/patients/PatientCard'
 import { usePatients } from '@/data/patientsStore'
@@ -12,6 +12,7 @@ import { Panel } from '@/components/dashboard/primitives'
 import { AppointmentCard } from '@/components/dashboard/AppointmentCard'
 import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { cn } from '@/lib/utils'
 
 /* Barra lateral junto a la tabla, no arriba: reemplaza al estante de
    "Active"/"Recent Patients" en grilla de la vuelta anterior. Mismos paneles
@@ -25,6 +26,38 @@ import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 const CANTIDAD_TURNOS = 4
 const CANTIDAD_PACIENTES = 4
 
+/* Globo con el total -no el filtrado ni el visible- al lado del título del
+   panel, mismo color que el de notificaciones de la campana. */
+function Globo({ n }: { n: number }) {
+  return (
+    <span className="bg-dash-blue flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold text-white">
+      {n}
+    </span>
+  )
+}
+
+/* "View all" en el header del panel, mismo lugar y estilo que "All treatment"
+   en TreatmentPlanList. Se esconde solo si no hay nada de más para mostrar. */
+function BotonVerTodos({
+  total, cantidad, mostrando, onToggle,
+}: {
+  total: number
+  cantidad: number
+  mostrando: boolean
+  onToggle: () => void
+}) {
+  if (total <= cantidad) return null
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="text-dash-blue flex shrink-0 items-center gap-0.5 text-[12px] font-semibold hover:underline"
+    >
+      {mostrando ? 'Show less' : 'View all'}
+      <ChevronRight className={cn('size-3.5 transition-transform', mostrando && 'rotate-90')} />
+    </button>
+  )
+}
 
 /* Figma 3638:59529 "Patients — List".
    Los formatos de fecha mezclados ("April 2" / "Jan 15" / "June 2" / "Jun 3")
@@ -35,6 +68,9 @@ export default function Patients() {
   const [query, setQuery] = useState('')
   const [modal, setModal] = useState<'new' | null>(null)
   const [editando, setEditando] = useState<PatientRow | null>(null)
+  const [buscarTurno, setBuscarTurno] = useState('')
+  const [verTodosTurnos, setVerTodosTurnos] = useState(false)
+  const [verTodosPacientes, setVerTodosPacientes] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const contenidoRef = useRef<HTMLDivElement>(null)
 
@@ -61,12 +97,23 @@ export default function Patients() {
   )
 
   /* La barra lateral muestra siempre el mismo pulso de la cuenta: no se
-     filtra por la búsqueda, igual que las cards de resumen de Billing. */
-  const recientes = useMemo(() => patients.slice(0, CANTIDAD_PACIENTES), [patients])
-  const turnosHoy = useMemo(
-    () => datosDelDia(HOY_DEMO).appointments.slice(0, CANTIDAD_TURNOS),
-    [],
+     filtra por la búsqueda de la tabla, igual que las cards de resumen de
+     Billing. "View all" saca el tope de a uno; buscar en Today Appointments
+     también lo saca -no tendría sentido recortar un resultado que se buscó
+     a propósito-. */
+  const recientesVisibles = useMemo(
+    () => (verTodosPacientes ? patients : patients.slice(0, CANTIDAD_PACIENTES)),
+    [patients, verTodosPacientes],
   )
+  const turnosHoyTodos = useMemo(() => datosDelDia(HOY_DEMO).appointments, [])
+  const turnosFiltrados = useMemo(
+    () => turnosHoyTodos.filter((a) => a.name.toLowerCase().includes(buscarTurno.toLowerCase())),
+    [turnosHoyTodos, buscarTurno],
+  )
+  const buscandoTurno = buscarTurno.length > 0
+  const turnosVisibles = buscandoTurno || verTodosTurnos
+    ? turnosFiltrados
+    : turnosFiltrados.slice(0, CANTIDAD_TURNOS)
 
   return (
     <div className={CONTENEDOR_PAGINA}>
@@ -127,21 +174,52 @@ export default function Patients() {
             bloques le gana altura a los otros. Sin tope en mobile: ahí la
             barra va debajo de la tabla y puede ser tan alta como haga falta. */}
         <div className="flex w-full flex-col gap-4 lg:w-[336px] lg:shrink-0 lg:max-h-[var(--patients-alto,none)] lg:overflow-hidden">
-          <Panel title="Today Appointments" className="flex-1" bodyClassName="min-h-0 gap-3 overflow-y-auto">
-            {turnosHoy.length === 0 ? (
-              <EmptyState
-                icon={CalendarDays}
-                title="No appointments today"
-                detail="Your schedule is clear for today."
-                className="py-6"
+          <Panel
+            title={<>Today Appointments <Globo n={turnosHoyTodos.length} /></>}
+            className="flex-1"
+            bodyClassName="min-h-0 gap-2"
+            controls={
+              <BotonVerTodos
+                total={turnosHoyTodos.length} cantidad={CANTIDAD_TURNOS}
+                mostrando={verTodosTurnos} onToggle={() => setVerTodosTurnos((v) => !v)}
               />
-            ) : (
-              turnosHoy.map((a, i) => <AppointmentCard key={i} appt={a} compact />)
-            )}
+            }
+          >
+            <div className="relative shrink-0">
+              <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-[#a1a1aa]" />
+              <input
+                value={buscarTurno}
+                onChange={(e) => setBuscarTurno(e.target.value)}
+                placeholder="Search today's appointments"
+                className="focus:border-dash-blue h-8 w-full rounded-md border border-[#e4e4e7] bg-white pr-2 pl-8 text-[12px] placeholder:text-[#a1a1aa] focus:outline-none"
+              />
+            </div>
+            <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+              {turnosVisibles.length === 0 ? (
+                <EmptyState
+                  icon={CalendarDays}
+                  title={buscandoTurno ? 'No matching appointments' : 'No appointments today'}
+                  detail={buscandoTurno ? 'Try a different name.' : 'Your schedule is clear for today.'}
+                  className="py-6"
+                />
+              ) : (
+                turnosVisibles.map((a, i) => <AppointmentCard key={i} appt={a} compact />)
+              )}
+            </div>
           </Panel>
 
-          <Panel title="Recent Patients" className="flex-1" bodyClassName="min-h-0 gap-3 overflow-y-auto">
-            {recientes.length === 0 ? (
+          <Panel
+            title={<>Recent Patients <Globo n={patients.length} /></>}
+            className="flex-1"
+            bodyClassName="min-h-0 gap-3 overflow-y-auto"
+            controls={
+              <BotonVerTodos
+                total={patients.length} cantidad={CANTIDAD_PACIENTES}
+                mostrando={verTodosPacientes} onToggle={() => setVerTodosPacientes((v) => !v)}
+              />
+            }
+          >
+            {recientesVisibles.length === 0 ? (
               <EmptyState
                 icon={Users}
                 title="No patients yet"
@@ -149,7 +227,7 @@ export default function Patients() {
                 className="py-6"
               />
             ) : (
-              recientes.map((r) => <PatientCard key={r.id} row={r} onEdit={setEditando} />)
+              recientesVisibles.map((r) => <PatientCard key={r.id} row={r} onEdit={setEditando} />)
             )}
           </Panel>
         </div>
