@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   Check, X, EllipsisVertical, Pencil, User, DoorClosed, Clock, ArrowRight,
 } from 'lucide-react'
@@ -26,6 +27,7 @@ export function AppointmentCard({
   activa,
   onSelect,
   onEdit,
+  compact,
 }: {
   appt: Appointment
   /** Identifica la card entre los dos paneles. */
@@ -34,6 +36,10 @@ export function AppointmentCard({
   activa?: boolean
   onSelect?: (appt: Appointment, el: HTMLElement, id?: string) => void
   onEdit?: (appt: Appointment) => void
+  /** Versión chica para una lista angosta -el costado de Patients-: sin los
+      chips TR/CC, sin el botón de Check Out y con una flecha a Scheduling en
+      vez del menú de edición. Misma card, no una nueva. */
+  compact?: boolean
 }) {
   const accion = appt.accion ?? 'Check Out'
 
@@ -66,15 +72,26 @@ export function AppointmentCard({
           </span>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1.5">
-          <span className="flex h-8 items-center gap-1 rounded-lg bg-[#ddf0e5] px-2 text-[13px] text-[#09090b]">
-            TR <Check className="text-dash-ok-fg size-4" strokeWidth={2.5} />
-          </span>
-          <span className="flex h-8 items-center gap-1 rounded-lg bg-[#fbe5e5] px-2 text-[13px] text-[#09090b]">
-            CC <X className="size-4 text-[#dc2626]" strokeWidth={2.5} />
-          </span>
-          <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
-        </div>
+        {compact ? (
+          <Link
+            to="/scheduling"
+            aria-label={`View ${appt.name}'s appointment`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#e4e4e7] bg-white text-[#09090b] shadow-sm hover:bg-[#f4f4f5]"
+          >
+            <ArrowRight className="size-4" />
+          </Link>
+        ) : (
+          <div className="flex shrink-0 items-center gap-1.5">
+            <span className="flex h-8 items-center gap-1 rounded-lg bg-[#ddf0e5] px-2 text-[13px] text-[#09090b]">
+              TR <Check className="text-dash-ok-fg size-4" strokeWidth={2.5} />
+            </span>
+            <span className="flex h-8 items-center gap-1 rounded-lg bg-[#fbe5e5] px-2 text-[13px] text-[#09090b]">
+              CC <X className="size-4 text-[#dc2626]" strokeWidth={2.5} />
+            </span>
+            <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
+          </div>
+        )}
       </div>
 
       {/* Fila 2: los dos campos y, al costado, la caja de hora con el alto
@@ -90,18 +107,20 @@ export function AppointmentCard({
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation()
-          accion === 'Cancel'
-            ? aviso.warn(`Appointment for ${appt.name} was cancelled.`)
-            : aviso.ok(`${appt.name} checked out.`)
-        }}
-        className="bg-dash-blue hover:bg-dash-blue-hover flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold text-white transition-colors"
-      >
-        {accion} <ArrowRight className="size-4" />
-      </button>
+      {!compact && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            accion === 'Cancel'
+              ? aviso.warn(`Appointment for ${appt.name} was cancelled.`)
+              : aviso.ok(`${appt.name} checked out.`)
+          }}
+          className="bg-dash-blue hover:bg-dash-blue-hover flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold text-white transition-colors"
+        >
+          {accion} <ArrowRight className="size-4" />
+        </button>
+      )}
     </InnerCard>
   )
 }

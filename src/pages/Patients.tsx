@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, Search, Plus, CalendarDays, Users } from 'lucide-react'
 import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTable'
@@ -8,7 +8,6 @@ import { PageTitle } from '@/components/ui/page-title'
 import { SearchButton } from '@/components/ui/search-button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
-import { aviso } from '@/components/ui/toaster'
 import { Panel } from '@/components/dashboard/primitives'
 import { AppointmentCard } from '@/components/dashboard/AppointmentCard'
 import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
@@ -17,13 +16,14 @@ import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 /* Barra lateral junto a la tabla, no arriba: reemplaza al estante de
    "Active"/"Recent Patients" en grilla de la vuelta anterior. Mismos paneles
    que el Dashboard -Panel + AppointmentCard- para Today Appointments, así la
-   card de turno es una sola en todo el sistema y no una versión propia acá.
-   La card de turno pesa ~220px contra los ~45px de una fila de tabla: con
-   los mismos 4 elementos que el estante anterior la barra triplicaba el
-   alto de la tabla. Se recorta a 2 turnos y 3 pacientes para que la barra
-   no le gane tanto lugar a la tabla, que sigue siendo el contenido principal. */
-const CANTIDAD_TURNOS = 2
-const CANTIDAD_PACIENTES = 3
+   card de turno es una sola en todo el sistema y no una versión propia acá,
+   en su variante `compact` (sin los chips TR/CC ni Check Out).
+   La altura de la barra la fija la tabla, no el contenido: se mide con
+   ResizeObserver -mismo patrón que `useAnchoVisible` en ledger- y se publica
+   como variable CSS; cada panel es `flex-1` con scroll propio adentro de esa
+   altura, así ninguno de los tres bloques queda más alto que los otros. */
+const CANTIDAD_TURNOS = 4
+const CANTIDAD_PACIENTES = 4
 
 
 /* Figma 3638:59529 "Patients — List".
@@ -36,6 +36,24 @@ export default function Patients() {
   const [modal, setModal] = useState<'new' | null>(null)
   const [editando, setEditando] = useState<PatientRow | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const contenidoRef = useRef<HTMLDivElement>(null)
+
+  /* La barra lateral no tiene alto propio: toma el de este bloque -búsqueda
+     + tabla-, que es su hermano en la fila. La variable se publica en el
+     padre común porque un hijo no ve el CSS custom property de su hermano. */
+  useEffect(() => {
+    const el = contenidoRef.current
+    if (!el) return
+    const medir = () => el.parentElement?.style.setProperty('--patients-alto', `${el.getBoundingClientRect().height}px`)
+    medir()
+    const ro = new ResizeObserver(medir)
+    ro.observe(el)
+    window.addEventListener('resize', medir)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', medir)
+    }
+  }, [])
 
   const rows = useMemo(
     () => patients.filter((r) => r.name.toLowerCase().includes(query.toLowerCase())),
@@ -81,7 +99,7 @@ export default function Patients() {
       </div>
 
       <div className="mt-5 flex flex-col gap-5 lg:flex-row lg:items-start">
-        <div className="min-w-0 flex-1">
+        <div ref={contenidoRef} className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative w-full sm:w-[320px]" data-tour="pat-search">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
@@ -103,9 +121,13 @@ export default function Patients() {
         </div>
 
         {/* Al costado de la tabla, no arriba: mismo Panel que usa el Dashboard,
-            para que la card de turno sea la misma en las dos pantallas. */}
-        <div className="flex w-full flex-col gap-4 lg:w-[336px] lg:shrink-0">
-          <Panel title="Today Appointments" bodyClassName="gap-3">
+            para que la card de turno sea la misma en las dos pantallas. La
+            altura tope sale de --patients-alto (ver el effect de arriba) y
+            cada panel es flex-1 con scroll propio, así ninguno de los tres
+            bloques le gana altura a los otros. Sin tope en mobile: ahí la
+            barra va debajo de la tabla y puede ser tan alta como haga falta. */}
+        <div className="flex w-full flex-col gap-4 lg:w-[336px] lg:shrink-0 lg:max-h-[var(--patients-alto,none)] lg:overflow-hidden">
+          <Panel title="Today Appointments" className="flex-1" bodyClassName="min-h-0 gap-3 overflow-y-auto">
             {turnosHoy.length === 0 ? (
               <EmptyState
                 icon={CalendarDays}
@@ -114,16 +136,11 @@ export default function Patients() {
                 className="py-6"
               />
             ) : (
-              turnosHoy.map((a, i) => (
-                <AppointmentCard
-                  key={i} appt={a}
-                  onEdit={() => aviso.info('Use Scheduling to edit this appointment.')}
-                />
-              ))
+              turnosHoy.map((a, i) => <AppointmentCard key={i} appt={a} compact />)
             )}
           </Panel>
 
-          <Panel title="Recent Patients" bodyClassName="gap-3">
+          <Panel title="Recent Patients" className="flex-1" bodyClassName="min-h-0 gap-3 overflow-y-auto">
             {recientes.length === 0 ? (
               <EmptyState
                 icon={Users}
