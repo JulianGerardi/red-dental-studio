@@ -671,6 +671,21 @@
   border-radius: 8px;
 }
 
+/* El scroll de la grilla -~330 celdas por arcada- queda adentro del panel en
+   vez de estirar toda la pantalla. La librería ya trae los encabezados de
+   diente con `position: sticky; top: 0` esperando justo esto: sin un
+   contenedor con overflow-y, ese sticky no tiene de dónde agarrarse. Mismo
+   criterio que el panel de Findings/Reviews de al lado (`lg:max-h-[70vh]`
+   en DentalAssessmentExam.tsx): sólo desde `lg`, porque abajo de eso la
+   página ya scrollea entera y un segundo scroll adentro estorba más de lo
+   que ayuda. */
+@media (min-width: 1024px) {
+  .odonto-embed .perio-tabs-cuerpo {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}
+
 /* La tabla entera (selector de superposición + tabs + grilla) rellena el
    ancho real de la pantalla de quien mira -ni un `max-width` fijo, que en
    una pantalla ancha dejaba un hueco vacío al lado de la tabla y la

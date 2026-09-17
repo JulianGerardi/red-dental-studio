@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { InnerCard, StatusPill } from './primitives'
 import { cn } from '@/lib/utils'
+import { ICONO_SUELTO } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 
 export type Appointment = {
@@ -36,11 +37,14 @@ export function AppointmentCard({
   activa?: boolean
   onSelect?: (appt: Appointment, el: HTMLElement, id?: string) => void
   onEdit?: (appt: Appointment) => void
-  /** Versión chica para una lista angosta -el costado de Patients-: sin los
-      chips TR/CC, sin el botón de Check Out y con una flecha a Scheduling en
-      vez del menú de edición. Misma card, no una nueva. */
+  /** Versión chica para una lista angosta -el costado de Patients-: una fila
+      con nombre + hora/provider, sin los chips TR/CC, sin el "Check In" y
+      sin el botón de Check Out. Es otro layout, no el mismo con partes
+      escondidas -por eso vive en su propio componente más abajo. */
   compact?: boolean
 }) {
+  if (compact) return <AppointmentCardCompacta appt={appt} />
+
   const accion = appt.accion ?? 'Check Out'
 
   return (
@@ -72,26 +76,15 @@ export function AppointmentCard({
           </span>
         </div>
 
-        {compact ? (
-          <Link
-            to="/scheduling"
-            aria-label={`View ${appt.name}'s appointment`}
-            onClick={(e) => e.stopPropagation()}
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#e4e4e7] bg-white text-[#09090b] shadow-sm hover:bg-[#f4f4f5]"
-          >
-            <ArrowRight className="size-4" />
-          </Link>
-        ) : (
-          <div className="flex shrink-0 items-center gap-1.5">
-            <span className="flex h-8 items-center gap-1 rounded-lg bg-[#ddf0e5] px-2 text-[13px] text-[#09090b]">
-              TR <Check className="text-dash-ok-fg size-4" strokeWidth={2.5} />
-            </span>
-            <span className="flex h-8 items-center gap-1 rounded-lg bg-[#fbe5e5] px-2 text-[13px] text-[#09090b]">
-              CC <X className="size-4 text-[#dc2626]" strokeWidth={2.5} />
-            </span>
-            <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
-          </div>
-        )}
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span className="flex h-8 items-center gap-1 rounded-lg bg-[#ddf0e5] px-2 text-[13px] text-[#09090b]">
+            TR <Check className="text-dash-ok-fg size-4" strokeWidth={2.5} />
+          </span>
+          <span className="flex h-8 items-center gap-1 rounded-lg bg-[#fbe5e5] px-2 text-[13px] text-[#09090b]">
+            CC <X className="size-4 text-[#dc2626]" strokeWidth={2.5} />
+          </span>
+          <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
+        </div>
       </div>
 
       {/* Fila 2: los dos campos y, al costado, la caja de hora con el alto
@@ -107,20 +100,42 @@ export function AppointmentCard({
         </div>
       </div>
 
-      {!compact && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            accion === 'Cancel'
-              ? aviso.warn(`Appointment for ${appt.name} was cancelled.`)
-              : aviso.ok(`${appt.name} checked out.`)
-          }}
-          className="bg-dash-blue hover:bg-dash-blue-hover flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold text-white transition-colors"
-        >
-          {accion} <ArrowRight className="size-4" />
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          accion === 'Cancel'
+            ? aviso.warn(`Appointment for ${appt.name} was cancelled.`)
+            : aviso.ok(`${appt.name} checked out.`)
+        }}
+        className="bg-dash-blue hover:bg-dash-blue-hover flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold text-white transition-colors"
+      >
+        {accion} <ArrowRight className="size-4" />
+      </button>
+    </InnerCard>
+  )
+}
+
+/* Una fila, no una card de dos pisos: avatar, nombre y hora/provider abajo
+   en gris, y una flecha a Scheduling en vez del menú -acá no hay nada para
+   editar in situ. Mismo tamaño de trigger que el kebab de las tablas
+   (`ICONO_SUELTO`), para que quede a la par de PatientCard al lado. */
+function AppointmentCardCompacta({ appt }: { appt: Appointment }) {
+  return (
+    <InnerCard className="flex items-center gap-2.5 p-2.5">
+      <span className="bg-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold text-white">
+        {appt.initials}
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="truncate text-[13px] font-semibold text-[#09090b]">{appt.name}</span>
+        <span className="flex items-center gap-1 text-[11px] text-[#71717a]">
+          <Clock className="size-3 shrink-0" />
+          <span className="truncate">{appt.time} · {appt.provider}</span>
+        </span>
+      </span>
+      <Link to="/scheduling" aria-label={`View ${appt.name}'s appointment`} className={ICONO_SUELTO}>
+        <ArrowRight className="size-4" />
+      </Link>
     </InnerCard>
   )
 }
