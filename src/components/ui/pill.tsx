@@ -17,9 +17,16 @@ const TONO: Record<PillTone, string> = {
   purple: 'border-[#6633a6] bg-[#f5f0ff] text-[#6633a6]',
 }
 
-export function Pill({ tone, className, children }: { tone: PillTone; className?: string; children: ReactNode }) {
+const TAMANO = {
+  md: 'px-2.5 py-[3px] text-[11px]',
+  sm: 'px-2 py-[1px] text-[10px]',
+}
+
+export function Pill({
+  tone, size = 'md', className, children,
+}: { tone: PillTone; size?: keyof typeof TAMANO; className?: string; children: ReactNode }) {
   return (
-    <span className={cn('inline-flex items-center rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', TONO[tone], className)}>
+    <span className={cn('inline-flex items-center rounded-full border font-semibold', TAMANO[size], TONO[tone], className)}>
       {children}
     </span>
   )

@@ -32,7 +32,7 @@ export function PatientCard({
           >
             {row.name}
           </Link>
-          <Pill tone={STATUS_TONO[row.status]} className="shrink-0">{row.status}</Pill>
+          <Pill tone={STATUS_TONO[row.status]} size="sm" className="shrink-0">{row.status}</Pill>
         </span>
         <span className="flex items-center gap-1 text-[11px] text-[#71717a]">
           <Mail className="size-3 shrink-0" />
