@@ -1,7 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { PanelLeftOpen, PanelLeftClose, Search, BellDot, ChevronDown } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import {
+  PanelLeftOpen, PanelLeftClose, Search, BellDot, ChevronDown,
+  CircleUserRound, CreditCard, CircleHelp, Info, LogOut, EyeOff,
+} from 'lucide-react'
 import { LocationSelector } from './LocationSelector'
+import type { Notificacion } from '@/data/notificaciones'
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { aviso } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
 
 /* Figma 3636:57489 (Secretary) y 3605:56446 (Provider). Alto 64, fondo blanco.
@@ -22,10 +31,16 @@ export function Topbar({
   expanded,
   onToggleSidebar,
   showCommandHint = true,
+  notificaciones = [],
+  ocultasDelBanner = [],
+  onVolverAlBanner,
 }: {
   expanded: boolean
   onToggleSidebar: () => void
   showCommandHint?: boolean
+  notificaciones?: Notificacion[]
+  ocultasDelBanner?: string[]
+  onVolverAlBanner?: (id: string) => void
 }) {
   const ToggleIcon = expanded ? PanelLeftClose : PanelLeftOpen
 
@@ -68,37 +83,131 @@ export function Topbar({
         <GlobalSearch showCommandHint={showCommandHint} />
 
 
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="shrink-0 text-[#3f3f46] transition-colors hover:text-black"
-        >
-          <BellDot className="size-5" />
-        </button>
+        <Campana items={notificaciones} ocultas={ocultasDelBanner} onVolverAlBanner={onVolverAlBanner} />
       </div>
 
       </div>
 
       {/* Perfil. El borde izquierdo es el divisor que separa del resto. */}
       <div className="flex h-[42px] shrink-0 items-center border-l border-[#e4e4e7] pl-3 sm:pl-[18px]">
-        <button type="button" className="flex items-center gap-1.5">
-          <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold">
-            SS
-          </span>
-          {/* Los dos frames del Figma difieren acá: Provider usa nombre negro
-              medium + rol gris semibold; Secretary pone ambos en gris semibold.
-              Se toma la versión del Provider, que da jerarquía real. */}
-          <span className="hidden flex-col items-start text-[12px] leading-[1.35] sm:flex">
-            <span className="font-medium text-[#09090b]">Sarah Stone</span>
-            <span className="font-semibold text-[#71717a]">Dentist</span>
-          </span>
-          <ChevronDown className="hidden size-4 shrink-0 text-[#71717a] sm:block" />
-        </button>
+        <MenuCuenta />
       </div>
     </header>
   )
 }
 
+
+/* La flecha del perfil abría nada. Ahora despliega el menú de cuenta que
+   pasó Julián: Profile · Suscription · Support, separador, Help center ·
+   Log out. "Suscription" va con esa ortografía a propósito -así está en el
+   diseño, y acá el contenido se replica tal cual-. */
+const CUENTA = [
+  { label: 'Profile', icon: CircleUserRound, to: '/settings/accounts' },
+  { label: 'Suscription', icon: CreditCard, to: '/billing' },
+  { label: 'Support', icon: CircleHelp, to: '/help' },
+]
+
+function MenuCuenta() {
+  const navigate = useNavigate()
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-1 py-1 transition-colors hover:bg-[#f4f4f5]">
+        <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold">
+          SS
+        </span>
+        {/* Los dos frames del Figma difieren acá: Provider usa nombre negro
+            medium + rol gris semibold; Secretary pone ambos en gris semibold.
+            Se toma la versión del Provider, que da jerarquía real. */}
+        <span className="hidden flex-col items-start text-[12px] leading-[1.35] sm:flex">
+          <span className="font-medium text-[#09090b]">Sarah Stone</span>
+          <span className="font-semibold text-[#71717a]">Dentist</span>
+        </span>
+        <ChevronDown className="hidden size-4 shrink-0 text-[#71717a] sm:block" />
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-[248px]">
+        <DropdownMenuLabel className="text-[15px] font-bold text-[#09090b]">My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {CUENTA.map(({ label, icon: Icon, to }) => (
+          <DropdownMenuItem key={label} onSelect={() => navigate(to)} className="gap-2.5 py-2 text-[13px]">
+            <Icon className="size-4 shrink-0" /> {label}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => navigate('/help')} className="gap-2.5 py-2 text-[13px]">
+          <Info className="size-4 shrink-0" /> Help center
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onSelect={() => { aviso.ok('Signed out.'); navigate('/login') }}
+          className="gap-2.5 py-2 text-[13px]"
+        >
+          <LogOut className="size-4 shrink-0" /> Log out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+/* La campana es donde viven las tareas: acá están todas, incluidas las que
+   se sacaron del banner. Nada se borra desde acá -siguen pendientes hasta
+   que se completen-; lo que sí se puede es volver a ponerlas en el banner. */
+function Campana({
+  items, ocultas, onVolverAlBanner,
+}: {
+  items: Notificacion[]
+  ocultas: string[]
+  onVolverAlBanner?: (id: string) => void
+}) {
+  const navigate = useNavigate()
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label={items.length ? `Notifications (${items.length})` : 'Notifications'}
+        className="relative shrink-0 rounded-md p-1 text-[#3f3f46] transition-colors hover:bg-[#f4f4f5] hover:text-black"
+      >
+        <BellDot className="size-5" />
+        {items.length > 0 && (
+          <span className="bg-dash-blue absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full text-[9px] font-semibold text-white">
+            {items.length}
+          </span>
+        )}
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-[320px]">
+        <DropdownMenuLabel className="text-[13px] font-bold text-[#09090b]">
+          Notifications {items.length > 0 && <span className="font-normal text-[#71717a]">({items.length})</span>}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {items.length === 0 ? (
+          <p className="px-2 py-6 text-center text-[13px] text-[#a1a1aa]">You&apos;re all caught up.</p>
+        ) : (
+          items.map((n) => (
+            /* Abrirla desde acá la devuelve al banner además de llevarte a
+               la tarea: vuelve al estado de siempre, sin nada escondido. */
+            <DropdownMenuItem
+              key={n.id}
+              onSelect={() => { onVolverAlBanner?.(n.id); navigate(n.to) }}
+              className="items-start gap-2.5 py-2.5"
+            >
+              <n.icon className="mt-0.5 size-4 shrink-0 text-[#b45309]" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[13px] font-semibold text-[#09090b]">{n.titulo}</span>
+                <span className="block text-[12px] leading-snug text-[#71717a]">{n.detalle}</span>
+                {ocultas.includes(n.id) && (
+                  <span className="mt-1 flex items-center gap-1 text-[11px] font-medium text-[#a1a1aa]">
+                    <EyeOff className="size-3" /> Hidden from banner
+                  </span>
+                )}
+              </span>
+            </DropdownMenuItem>
+          ))
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
 function GlobalSearch({ showCommandHint }: { showCommandHint: boolean }) {
   const [q, setQ] = useState('')

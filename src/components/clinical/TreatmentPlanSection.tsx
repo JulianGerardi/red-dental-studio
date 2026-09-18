@@ -14,6 +14,7 @@ import {
 } from '@/data/treatment-plan'
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { SelectField } from '@/components/patients/form'
+import { Pill, type PillTone } from '@/components/ui/pill'
 
 /* Figma 4118:220403 "Treatment Plan — Section (Cases, Workflow & Dialogs)":
    el rail de estados, la tabla de no asignados, el caso con sus visitas y los
@@ -21,10 +22,8 @@ import { SelectField } from '@/components/patients/form'
 
 const COLUMNAS = ['Date', 'Surface', 'Tooth', 'Location', 'Procedure', 'Provider', 'Fee', 'Status', 'Actions']
 
-const ESTADO_PILL: Record<Procedimiento['estado'], string> = {
-  Planned: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Completed: 'border-[#174596] bg-[#f0f5ff] text-[#174596]',
-  Removed: 'border-[#595959] bg-[#f5f5f5] text-[#595959]',
+const ESTADO_TONO: Record<Procedimiento['estado'], PillTone> = {
+  Planned: 'success', Completed: 'info', Removed: 'neutral',
 }
 
 /* ── Diálogos ─────────────────────────────────────────────────────── */
@@ -402,7 +401,7 @@ function TablaProcedimientos({
     <div className="overflow-x-auto">
       <table className="w-full min-w-[860px] border-collapse">
         <thead>
-          <tr className="border-y border-[#f1f1f4] bg-[#fafafa]">
+          <tr className="border-y border-[#f1f1f4] bg-[#f9f9f9]">
             {conCasillas && (
               <th className="w-10 px-3">
                 <Casilla
@@ -446,13 +445,9 @@ function TablaProcedimientos({
               <td className="px-3 text-[13px] whitespace-nowrap text-[#09090b]">
                 {p.codigo} {p.nombre}
               </td>
-              <td className="px-3 text-[13px] whitespace-nowrap text-[#52525b]">{p.proveedor}</td>
-              <td className="px-3 text-[13px] whitespace-nowrap text-[#52525b] tabular-nums">{p.fee}</td>
-              <td className="px-3">
-                <span className={cn('rounded-full border px-2 py-[2px] text-[11px] font-semibold', ESTADO_PILL[p.estado])}>
-                  {p.estado}
-                </span>
-              </td>
+              <td className="px-3 text-[13px] whitespace-nowrap text-[#3f3f46]">{p.proveedor}</td>
+              <td className="px-3 text-[13px] whitespace-nowrap text-[#3f3f46] tabular-nums">{p.fee}</td>
+              <td className="px-3"><Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill></td>
               <td className="px-3">
                 <span className="flex items-center gap-1">
                   <button

@@ -17,3 +17,15 @@ export const BOTON_ICONO_REDONDO =
     mismo peso que el texto que acompaña; en gris parecía deshabilitado. */
 export const ICONO_SUELTO =
   'flex size-7 shrink-0 items-center justify-center rounded-md text-[#09090b] transition-colors hover:bg-[#f4f4f5]'
+
+/* Contenedor de página del módulo de Patients (Dashboard, Scheduling,
+   Billing, Patients y todo /patients/:id/*): a 1400px fijo, una pantalla de
+   1920 o más dejaba una franja vacía a la derecha sin usar. El tope no
+   desaparece del todo -a diferencia de Settings, que no tiene uno- porque
+   varias de estas pantallas reparten contenido con `justify-between`: sin
+   techo, en un monitor gigante esos huecos se estiran y la fila se ve rota,
+   el mismo problema que ya está documentado (y resuelto con su propio tope)
+   en `ClinicalMode.tsx`. `2xl:` sólo entra a partir de 1536px de viewport,
+   así que no cambia nada en las pantallas de todos los días. */
+export const CONTENEDOR_PAGINA =
+  'mx-auto w-full max-w-[1400px] 2xl:max-w-[1800px] px-4 py-6 sm:px-6'

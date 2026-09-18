@@ -8,6 +8,7 @@ import {
   TextField, SelectField, FieldLabel, FieldError, OptionCheckbox, FormFooter,
 } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3716:61372 (buscar), 3716:62815 (persona existente elegida) y
    3716:63601 (persona nueva). No son tres pantallas distintas: son estados
@@ -98,7 +99,7 @@ export default function AddRelationship() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
 
       {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
           El breadcrumb completo repetía lo que ya dice el panel lateral. */}

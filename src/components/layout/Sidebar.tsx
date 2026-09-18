@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   GalleryVerticalEnd, House, Users, CalendarRange, CreditCard,
-  MessageSquare, Phone, Files, ChartPie, CircleHelp, Settings,
+  MessageSquare, Phone, Files, ChartPie, CircleHelp, Settings, Bot,
   ChevronRight, ChevronDown, type LucideIcon,
 } from 'lucide-react'
 import { SETTINGS_NAV } from '@/data/settings-nav'
+import { useHelp } from '@/components/help/HelpProvider'
 import { cn } from '@/lib/utils'
 
 type NavItem = { to: string; label: string; icon: LucideIcon; end?: boolean }
@@ -33,6 +34,8 @@ export function Sidebar({
   expanded: boolean
   onClose?: () => void
 }) {
+  const { confibotAbierto, toggleConfibot } = useHelp()
+
   /* En mobile el panel siempre está abierto de ancho completo, así que los
      ítems van con label; el modo icono es sólo para el rail de escritorio. */
   const item = (active: boolean) =>
@@ -100,6 +103,19 @@ export function Sidebar({
             <span className={cn(expanded ? '' : 'md:hidden')}>{label}</span>
           </NavLink>
         ))}
+        {/* No es una ruta: abre la hoja de chat de Confibot, que antes vivía
+            flotando solo sobre la pantalla y tapaba otros botones flotantes
+            -el de Appointment requests en Scheduling, por ejemplo-. */}
+        <button
+          type="button"
+          title="Confibot"
+          aria-pressed={confibotAbierto}
+          onClick={toggleConfibot}
+          className={item(confibotAbierto)}
+        >
+          <Bot className="size-4 shrink-0" />
+          <span className={cn(expanded ? '' : 'md:hidden')}>Confibot</span>
+        </button>
       </nav>
 
       <div className={cn('mt-auto flex flex-col pb-6', expanded ? '' : 'md:items-center')}>
@@ -156,7 +172,7 @@ function SettingsItem({
       {/* El chevron es un botón aparte y no un icono adentro del link: dentro,
           cancelar la navegación dependía de que el preventDefault ganara la
           carrera contra el Link, y en touch terminaba navegando igual. */}
-      <div className={cn(clase(activo), 'w-full')}>
+      <div className={cn(clase(activo), 'w-full')} data-tour="settings-menu">
         <NavLink to="/settings" title="Settings" className="flex min-w-0 flex-1 items-center gap-3">
           <Settings className="size-4 shrink-0" />
           <span className={cn(mostrarLabel ? '' : 'md:hidden')}>Settings</span>

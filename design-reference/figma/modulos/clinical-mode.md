@@ -525,3 +525,1035 @@ Medido a 1280: huecos de 12 / 12 / 12 y uno de 86 antes del grupo final, que
 termina en 1232, el borde del contenido. Es donde lo pone la captura.
 
 En el telefono el grupo final ocupa la fila entera, como el resto.
+
+## DentAssmt, primer examen real (2026-09-08)
+
+`EXAMENES` ya tenía `DentAssmt`/`Intra Oral`/`Extra Oral` en la lista desde
+antes, cayendo los tres en el placeholder genérico "Planned" -nunca se habían
+construido-. Se porta DentAssmt completo desde el proyecto hermano (ver
+[[red-clone-dashboard-figma-sibling]] en memoria): un panel de findings con
+menú de acciones (Monitor, Treat, Treated, Discard, Delete...), confirmación
+antes de cada cambio de estado, un wizard de 3 pasos para cargar un
+procedimiento (elegir código → superficie → vincular findings) y firma de
+revisión del exam.
+
+**Diferencia grande con el original**: ellos arman el chart con una imagen
+PNG (1042×797) y hotspots invisibles encima calculados a mano por porcentaje.
+Acá se reusa **nuestro `Odontogram` real** -ya existe, ya opera, y es
+justamente lo que este mismo archivo documentaba como decisión desde el
+principio: "no una foto"-. Clickear un diente en DentAssmt abre su detalle en
+vez de pintar superficies -eso vive adentro de "New Procedure", con su propia
+rueda de superficies-.
+
+**La rueda de superficies es propia, no la del proyecto hermano**: ellos
+usan un vocabulario distinto (BC/B/O/P/PC/D/M). Acá va la rueda rediseñada
+con las 7 superficies que ya modela `odontogram.ts` (MB/B/DB/O/ML/L/DL), en
+el mismo orden, como 6 sectores iguales alrededor del círculo oclusal.
+
+**Simplificación documentada**: el drawer de edición del original es un
+wizard de 2 pasos con estimados en dólares por finding y un segundo paso
+para re-vincular findings/diagnósticos. Acá "Edit" cubre proveedor,
+superficies y notas en una sola pantalla -no hay ningún otro lado de la app
+que modele "estimado de costo" por finding, y re-vincular ya se hace desde
+"New Procedure"-.
+
+**"Delete" pasa a ser deshacible**: el original dice "This can't be undone".
+Como toda eliminación en esta app, ahora sale con Undo en el toast.
+
+Pendiente para otra vuelta: **Intra Oral** y **Extra Oral** -mismo panel de
+findings, pero clickeás una región de un diagrama en vez de un diente-. Los
+diagramas ya están embebidos como data URI en
+`src/assets/clinical/intra-oral-diagram.ts` y `extra-oral-diagram.ts`
+-mismo criterio que `panoramic.ts`-, listos para cuando se arme esa pantalla.
+
+## Corrección: nada de Drawer/Sheet (2026-09-08)
+
+Primera versión de "New Procedure", "Edit Finding" y el detalle de diente
+usaba `Sheet`/`SheetContent` -el panel deslizante desde el borde derecho-,
+copiado tal cual del proyecto hermano. Julián lo corrigió: red-clone no
+tiene ese patrón en ningún lado -ver [[feedback_no_drawer_pattern_in_red_clone]]
+en memoria-. Se reescriben los tres como `ModalShell` (el mismo contenedor
+de `NewAppointmentModal` en Scheduling, con `footer` propio por paso en el
+wizard), y de paso "New document" -que ya era un modal centrado, pero hecho
+a mano- pasa a usar `ModalShell` también en vez de duplicar ese markup.
+
+`NewProcedureDrawer.tsx` → `NewProcedureModal.tsx`,
+`EditProcedureDrawer.tsx` → `EditProcedureModal.tsx`,
+`ToothDetailDrawer` → `ToothDetailModal`. `src/components/ui/sheet.tsx` se
+borra: sin ningún uso en el proyecto, no tiene sentido dejarlo instalado
+como invitación a usarlo de nuevo.
+
+**Regla para lo que falta** (Intra Oral, Extra Oral, y cualquier otro
+módulo que se porte de acá en más): el contenedor de cada pantalla del
+original no se copia tal cual. Se mapea primero a lo que ya existe acá
+-página propia, tabs, `ModalShell` o `Dialog`- y recién ahí se escribe el
+componente.
+
+## Odontograma con estilo propio (2026-09-13)
+
+Julián pasó como referencia **react-advanced-odontogram**
+(`ZoliQua/React-Odontogram-Modul`, demo en react-odontogram-modul.vercel.app):
+*"necesito que el dentall assestment sea como el que te pase pero adecuado a
+nuestro estilo"*. No se instala el paquete ni se copia su código -es un
+módulo npm genérico, con su propia paleta, numeración FDI y un montón de
+features que acá no van-; se reimplementa lo que define visualmente a ese
+odontograma, con nuestros tonos y sobre nuestro modelo de datos.
+
+**Lo que se portó** (`src/components/clinical/dental/ToothGlyph.tsx`):
+
+1. **Dos vistas por pieza**, que es lo que más distingue a la referencia de
+   la grilla abstracta que teníamos: la **anatómica** -corona, encía, raíces
+   y conductos- y la **oclusal** con las superficies. La anatómica se dibuja
+   en este orden: raíces, encía encima del arranque, corona al frente. Sin
+   ese orden las raíces flotan sobre el rosa y los molares leen como orejas
+   de conejo -pasó en las dos primeras vueltas-.
+2. **Forma por tipo de pieza**, deducida de la posición en la arcada
+   (1-3 y 14-16 molares · 4-5 y 12-13 premolares · 6 y 11 caninos · 7-10
+   incisivos): el molar lleva una masa de raíz bifurcada, el canino la raíz
+   más larga, el incisivo la corona en cincel.
+3. **El número de la pieza codifica su estado**, como el "bold blue /
+   bold italic red" de la referencia, pero calculado con **nuestros propios
+   estados de Finding**: rojo si hay uno sin resolver
+   (Active/Monitoring/In Treatment), azul si tiene alguno cerrado, gris si
+   no tiene nada. El esmalte lleva el mismo tinte, muy suave.
+4. **La vista oclusal con esquinas en diagonal**, el patrón clásico del
+   odontograma. La referencia parte la mesa en 5 (M/D/B/L/O); acá se
+   respetan las **7 superficies que ya modela `odontogram.ts`**
+   (MB · B · DB / O / ML · L · DL), así que cada banda va partida en tres y
+   la mesa oclusal ocupa el ancho completo.
+
+**Lo que no se portó, y por qué**: el modelo **Status/Plan de dos capas con
+diff** duplica lo que ya hace el flujo de Findings y procedimientos de esta
+app; la **carta periodontal** completa es un módulo clínico aparte, no una
+feature del gráfico; **dentición primaria/mixta**, el generador de prótesis
+("Upper 12-22 zirconia"), **export FHIR/JSON**, multi-idioma y el tour
+guiado son features de un paquete npm genérico, no de una clínica con su
+propio backend. La **selección múltiple** y los toggles de visibilidad
+(ocultar oclusal, muelas del juicio, hueso, pulpa) quedan pendientes: son
+baratos y suman, pero no son el gráfico.
+
+**El flujo de interacción no cambió**: clickear una pieza sigue abriendo su
+detalle, y pintar superficies sigue viviendo adentro de "New Procedure" con
+su propia rueda. La referencia edita el diente desde un panel lateral
+permanente; acá eso chocaría con el panel de Findings que ya ocupa esa
+columna.
+
+## Corrección: se usa la librería real, no una reinterpretación (2026-09-13)
+
+La sección de arriba describe un odontograma dibujado a mano imitando la
+referencia. **Julián lo rechazó dos veces**: *"sigue mal, no podés
+simplemente tomar el repositorio de github y pegar eso... es justamente eso
+lo que quiero, que esté igual a lo que te pasé pero con la estética de
+nuestro sistema"*. O sea: la librería de verdad, no una versión propia
+parecida.
+
+Ahora DentAssmt monta **`react-advanced-odontogram`** (MIT, (c) Zoltán Dul,
+`ZoliQua/React-Odontogram-Modul`) vía npm, envuelto en
+`src/components/clinical/OdontogramEmbed.tsx`.
+
+Tres cosas que hubo que resolver para que conviva con esta app:
+
+1. **Su CSS es el de una app entera, no el de un componente**: trae `*`,
+   `html, body` y clases genéricas (`.btn`, `.card`, `.title`, `.pill`).
+   Importado tal cual pisaba media app. `scripts/scope-odontogram-css.mjs`
+   (postcss, `npm run odontogram:css`) reescribe los 650 selectores
+   acotándolos a `.odonto-embed` y genera `src/styles/odontogram-scoped.css`,
+   que es lo que se importa. Verificado que Billing, Patients y Dashboard
+   quedan intactos.
+2. **La paleta** sale de los `--odon-*` que la librería expone por
+   `themeConfig`, mapeados a los tokens de la app (azul `#1d56bc`, borde
+   `#e4e4e7`, texto `#09090b`). Lo que no sale de variables -radios,
+   tipografía, el header de su demo con marca/idioma/GitHub, los selects con
+   pastilla celeste- se corrige en `src/styles/odontogram-theme.css`.
+3. **Su layout responde al viewport, no al contenedor**: apila chart y
+   controles recién abajo de 1100px de viewport, así que en nuestro panel
+   -que es más angosto que la ventana- el chart quedaba en 325px con scroll.
+   Se fuerza `display:flex; flex-direction:column` en `main.layout`.
+
+**Los controles al costado, no debajo**. Primero se ocultaron -Julián:
+*"me dificulta estar scrolleando y no ver el gráfico"*- pero enseguida
+aclaró que no iban eliminados: *"sin eso cómo le agrego al diente que tiene
+caries o algún sangrado"*. Son justamente el formulario con el que se marca
+la pieza, así que tienen que verse **al mismo tiempo** que el gráfico:
+
+- `main.layout` vuelve a ser la grilla de la librería (chart + panel de
+  340), pero decidida por **container query** sobre el ancho del panel del
+  examen, no por media query sobre la ventana -ese fue el error de la
+  primera vuelta: la librería apila recién abajo de 1100px de *viewport*, y
+  acá lo que manda es el contenedor-.
+- El **chart queda sticky** y la **columna de controles también**, con su
+  propio scroll: se puede bajar a leer "Tooth information" sin perder de
+  vista ni el odontograma ni los controles.
+- El listado de Findings de la izquierda se **pliega** con un botón, para
+  liberar los 300px que esa columna necesita en pantallas de 1440.
+
+También se perdió el modal "Details for Tooth N#" propio: la librería maneja
+la interacción con la pieza. El panel de Findings, New Procedure y la firma
+de revisión del exam **no cambiaron**.
+
+**Detalle que costó encontrar**: `themeConfig` aplica los `--odon-*` sobre
+el nodo interno de la librería, pero el CSS acotado los lee en
+`.odonto-embed` -el wrapper, que está más arriba-, así que las variables no
+llegaban y quedaban los colores de fábrica. Se declaran también como estilo
+inline del wrapper. Los segmentados (tabs y Status/Plan) además no
+coincidían entre sí -radio 6 contra 8- ni con los de Billing/Ledger: se
+igualan en `odontogram-theme.css`.
+
+**Costo**: el bundle pasa de ~1 MB a ~5,4 MB (la librería arrastra jsPDF,
+html2canvas y fuentes Noto para el export en PDF). El artifact de una sola
+página sigue entrando en el límite de 16 MB, pero conviene tenerlo presente.
+
+## Los controles, en un flotante paso a paso (2026-09-13)
+
+Idea de Julián, después de probar la columna al costado: *"toda la parte de
+Controls, Status lo haría estilo carrusel, entonces vas paso por paso y queda
+todo más chico, y podemos agregarle un ícono flotante más donde estén estas
+funcionalidades... de esta manera vemos todo el gráfico"*.
+
+Cómo quedó:
+
+- Un **FAB más** en la columna del examen -un chevron, no un "+"- abre y
+  cierra el panel. El "+" sigue siendo New Procedure.
+- El panel va **debajo del gráfico, en el flujo**, no flotando encima:
+  flotando tapaba justo lo que se está mirando. Muestra **una sección por
+  vez**: Controls,
+  Statuses, Tooth details, Orthodontics, Caries, Fillings, Root and
+  periodontium, Diagnoses y Tooth information. Nueve pasos, con
+  anterior/siguiente y el contador en la barra de abajo.
+- Se puede **minimizar**: queda sólo la barra y el odontograma se ve entero
+  sin perder en qué paso estabas.
+- Las filas de la librería son `<div class="row"><span>Label</span><select>`,
+  y como cada label mide distinto los selects arrancaban en distinta x. Se
+  alinean con una grilla de columna fija (`:has(> select)`), con el control
+  acotado a 360 para que no se estire a todo el ancho.
+- `main.layout` va en **flex column**: con `grid-template-columns: 1fr` el
+  panel se iba igual a una columna implícita y terminaba al costado,
+  apretando el chart. Pasó dos veces, queda anotado.
+- Las secciones son nodos que dibuja la librería, así que se descubren del
+  DOM y se muestran/ocultan por índice. Un `MutationObserver` las vuelve a
+  leer porque la librería monta y desmonta cards según la pieza activa
+  -Orthodontics sólo aparece en piezas elegibles-. Los títulos salen de
+  `.card-title` **sacando los botones de adentro**: si no, el paso se llama
+  "Statuses−" o "Tooth detailsReset".
+
+### Ajustes del panel (2026-09-13, misma vuelta)
+
+- **Los FAB no se mueven y siguen donde estaban**: anclados al pie de la
+  card subían y bajaban al abrir el panel, y llevados a `fixed` se iban al
+  borde de la ventana. Ahora `OdontogramEmbed` publica el pie del **gráfico**
+  como `--odonto-chart-fin` (ResizeObserver sobre `.chart`) y la botonera se
+  posiciona contra esa variable: medido, queda a 486px del tope de la card
+  con el panel cerrado, abierto y minimizado.
+- **Las cards de abajo van en blanco**, no con el verde del fondo punteado
+  del examen: la librería las pinta con su propio `--card` y sobre ese fondo
+  quedaban verdosas.
+- **Las filas van en varias columnas** (`repeat(auto-fit, minmax(300px,1fr))`
+  sobre la card): apiladas de a una dejaban media card vacía y obligaban a
+  scrollear. Los selectores de superficie y las tiras de checkboxes siguen
+  ocupando la fila entera.
+- **Las filas sin contenido se colapsan**. La librería deja en el DOM filas
+  que quedan vacías según la pieza activa; en una grilla seguían ocupando su
+  celda. `OdontogramEmbed` mide el alto real y les pone `.odonto-vacio`,
+  limpiando la marca antes de cada medición para que reaparezcan cuando
+  vuelven a tener contenido. De 14 hijos pasan a 5 visibles en Tooth details.
+- **Cuidado con el `display` inline del carrusel**: al paso activo hay que
+  *sacarle* la propiedad, no ponerle `block`. Con `block` se pisaba el `grid`
+  de la card y las filas volvían a apilarse -costó encontrarlo-.
+
+### Rediseño del panel (2026-09-13, comentario en el artifact)
+
+Julián comentó sobre el `aside` de controles: *"se ve mal y no está alineado
+a nuestra plataforma, hacerlo mejor, mantené la lógica, sólo enfocate en el
+diseño"*. Sólo CSS, ningún id ni handler de la librería tocado:
+
+- **Cabecera de card**: título a la izquierda y acciones a la derecha con una
+  línea debajo. El botón de plegar flotaba suelto contra el borde.
+- **Botones** (Reset, Reset mouth, Primary dentition, OK...) con el
+  secundario de la app: 28-32px, borde `#e4e4e7`, radio 6, texto 12/500.
+- **Campos**: label 12/500 en `#09090b` como `FieldLabel`, y selects e
+  inputs a 36px con nuestro borde, radio y sombra.
+- **Tiras de checkboxes y toggles** como pastillas, con el azul de la app
+  para el estado activo.
+- **Tabla del resumen** con la cabecera gris del resto de las tablas, sin el
+  celeste de la librería y sin cursivas.
+- Los grupos que no son par label+control (`status-actions`,
+  `status-extra-row`, `select-actions`) van a lo ancho y en línea: repartidos
+  en las columnas de la grilla partían "Add: [select] OK" en dos renglones.
+  **Ojo con la especificidad**: hay que nombrarlos `.row.status-extra-row`,
+  porque si no gana `.row:has(> select)`, que suma la del argumento.
+
+### Fuera el gate de dentición, panel más chico (2026-09-13)
+
+- **Se saca el gate de entrada de DentAssmt**: la card "Initial Patient
+  Dentition" con Permanent/Primary y la fila "Not found detection · Try
+  again". Pedido de Julián. Eran de la spec del proyecto hermano, pero la
+  librería ya trae Primary/Mixed/Edentulous en su panel de Statuses, así que
+  preguntarlo antes de mostrar nada sólo tapaba el gráfico. Ahora el
+  odontograma aparece directo al entrar a la pestaña.
+- **Panel más compacto**: techo de 300px, controles de 32px, cabeceras de 12
+  y pastillas de 26. El panel acompaña al gráfico, no es la pantalla.
+
+### El panel, rediseñado de verdad (2026-09-13, 2ª vuelta)
+
+Retocar colores no alcanzó -*"lo sigo viendo igual, quiero algo diferente"*-
+porque el problema era la **disposición**, no la paleta:
+
+1. **Cada card repetía el título que ya está en la barra de pasos**
+   ("Tooth details" arriba y abajo). Se saca el texto del `.card-title` y
+   queda sólo su fila de acciones (Reset, Clear selection), chica y a la
+   derecha.
+2. **El par label+control en línea** obligaba a una columna de label fija y
+   se comía el ancho. Ahora el label va **arriba** del control, como los
+   formularios de la app, y entran 3-4 campos por fila
+   (`auto-fit, minmax(180px, 1fr)`).
+3. **El vacío de media card** eran las filas que la librería deja sin
+   contenido: `.odonto-vacio` las colapsa, pero la regla la **pisaban las de
+   layout de más abajo** (`.inline-checks`, más específicas). Va con
+   `!important`, que acá se justifica: es una utilidad cuyo único trabajo es
+   ganarle al CSS de un tercero.
+
+Resultado medido: la card pasa de 204px a 75 y el panel de 299 a ~200.
+
+### El panel pasa a ser nuestro (2026-09-13, 3ª vuelta)
+
+Estilar el markup de la librería no alcanzaba -*"sigo viendo la misma card
+horrenda"*-, así que el panel **se dibuja con nuestros componentes**:
+`src/components/clinical/dental/OdontogramPanel.tsx`.
+
+Cómo funciona, que es lo no obvio:
+
+- La librería sigue montada y con toda su lógica, pero su `aside.panel` se
+  manda **fuera de pantalla** (`position:absolute; left:-10000px`), **no** a
+  `display:none`: hace falta que siga teniendo layout para poder saber qué
+  controles están visibles y espejarlos. Con `display:none` todos miden cero.
+- `leerControles()` recorre la card activa y arma un modelo de sus
+  `select`, `input[type=checkbox]` y `button` reales -con su label, su valor
+  y si están deshabilitados-.
+- Se redibujan con nuestro diseño, y cada interacción **escribe sobre el
+  control original y dispara su evento** (`change` o `click`), así que la
+  librería reacciona igual que si la hubieran tocado a ella.
+- Un `MutationObserver` sobre la card refresca el modelo: la librería
+  reescribe sus controles al cambiar de pieza o de estado.
+
+Los controles deshabilitados **se muestran igual**, en gris: hasta elegir
+una pieza la librería los deja inactivos, y esconderlos dejaba la card casi
+vacía -que era justo la queja-.
+
+Verificado de punta a punta con un render automatizado: apretar nuestro
+botón "All" deja `activeToothLabel` en "32 teeth" y habilita los campos, y
+elegir "Radix" en nuestro select escribe `radix` en el `#substrateSelect` de
+la librería.
+
+### Estados y separación del panel propio (2026-09-13)
+
+- **Los campos ya no van pegados**: la grilla pasa a
+  `auto-fill, minmax(200px, 280px)` con 24px de separación, en vez de
+  estirarse a todo el ancho.
+- **El botón apretado queda en azul**. La librería **no marca** sus botones
+  de selección rápida -comprobado: al clickear "Teeth" no cambia ni la clase
+  ni `aria-pressed`-, así que el estado lo lleva `OdontogramPanel` y se
+  limpia al cambiar de paso. "Clear selection" no queda marcado, porque
+  deshace la selección en vez de elegir algo.
+- **Foco azul en los campos**: borde `#1d56bc` y anillo de 3px. La regla va
+  en `odontogram-theme.css` y no en clases de Tailwind porque el CSS de la
+  librería es **sin capa** y le gana a las utilidades, que van en `@layer`.
+  Ese es el motivo de fondo de varias peleas de especificidad de esta vuelta.
+- **Los labels ya no arrastran el texto de las `<option>`**: al leer la
+  etiqueta hay que saltear el propio control y cualquier nodo que lo
+  contenga; si no, "Incisal wear" salía como
+  "Incisal wearnoneAttrition (tooth-to-tooth)Erosion...".
+
+### Cruz de superficies y confirmaciones (2026-09-13)
+
+- **El selector de superficies pasa a ser nuestro**. En la librería es un
+  `.surface-cross` con cinco `label.surface-cell.pos-*`, cada una con su
+  checkbox. `CruzSuperficies` lo redibuja como la cruz de un odontograma
+  -vestibular arriba, lingual/palatina abajo, mesial y distal a los costados,
+  oclusal al medio- con la referencia al lado, y cada celda escribe sobre su
+  checkbox real. Esos checkboxes se excluyen del listado genérico para que no
+  salgan además como pastillas sueltas.
+- **Cerrar no pierde nada**: el botón X abre una confirmación que lo dice
+  explícitamente -lo cargado queda en el odontograma, cerrar sólo esconde los
+  controles-. Verificado que "Keep open" deja todo como estaba.
+- **Lo que sí borra, avisa**: los botones cuyo nombre cae en
+  `reset|clear|edentulous` piden confirmación antes, con el botón de
+  confirmar en rojo. Son los únicos que efectivamente vacían la
+  configuración.
+
+### El panel escribía sólo en el DOM (bug real, 2026-09-13)
+
+Julián reportó *"cuando cierro, la configuración vuelve al default"*.
+Comprobado con el propio resumen de la librería: marcar una superficie no
+cambiaba `Caries: No carious teeth.`, o sea que **el panel no llegaba a su
+estado**. Estaba poniendo `.checked` / `.value` a mano y disparando un
+`change` sintético: eso cambia el DOM, la librería no se entera y en el
+siguiente render vuelve todo atrás.
+
+Ahora los controles se accionan **como lo haría una persona**: los
+checkboxes con `el.click()` -que dispara el flujo nativo completo- y los
+selects con el setter nativo de `HTMLSelectElement.value` más `input` y
+`change`. Verificado con el resumen, que pasa a
+`Caries: 1 (O) – superficial, 2 (O) – superficial, ...`, y con un cierre y
+reapertura del panel: el estado queda.
+
+**Lección**: para saber si una escritura entró en la librería no sirve leer
+de vuelta el mismo nodo que escribiste -eso siempre da true-; hay que mirar
+algo que produzca ella, como el resumen.
+
+También, el botón marcado se guarda **por sección** (`accionPorPaso`): al
+volver a un paso tiene que seguir elegido lo que se dejó.
+
+### Cerrar descarta, minimizar guarda (2026-09-13)
+
+Quedaron como dos gestos distintos, que era la confusión de antes:
+
+- **La cruz descarta**: confirma primero -en rojo, avisando que no se puede
+  deshacer- y devuelve el odontograma al default. Se apoya en el
+  `#btnResetAll` de la librería, que es quien sabe cuál es ese default.
+- **El chevron minimiza**: esconde los controles sin tocar nada, y el propio
+  aviso de la cruz remite a él para el caso de "sacarlo de en medio sin
+  perder lo hecho".
+
+Descartar deja todo como recién entrado: además del reset, llama al
+`clearSelection()` que la librería exporta -si no, las piezas quedaban
+elegidas- y el carrusel vuelve al paso 1 con el panel remontado, así no
+queda ningún botón marcado.
+
+Verificado con el resumen de la librería: minimizar deja
+`Caries: 1 (O) – superficial, ...`; descartar vuelve a
+`Caries: No carious teeth.`, con `activeToothLabel` en "—", el paso en
+"1 of 9" y el botón "Teeth" sin marcar.
+
+También se saca el botón de plegar el listado de Findings.
+
+### "Tooth information" también pasa a ser nuestro (2026-09-13)
+
+Era el último paso que seguía con el markup de la librería -numeración en
+rojo itálica, la leyenda de negritas, los hallazgos como párrafos largos-.
+`ToothInfoPanel` lee ese nodo -que sigue siendo la fuente, con su
+`MutationObserver` para los cambios del chart- y lo muestra como ficha:
+titular, la tabla de arcadas con la cabecera gris del resto de la app, y los
+hallazgos en columnas de rótulo + valor. Los renglones sin dato -los que la
+librería escribe empezando en "No"/"no"- van en gris claro, para que no
+pesen lo mismo que un hallazgo real.
+
+Con eso el nodo de la librería se manda fuera de pantalla igual que el
+panel: **ninguno de los nueve pasos usa ya su markup**.
+
+### El azul es sólo estado activo (2026-09-13)
+
+El FAB de "New procedure" estaba azul fijo, como si estuviera prendido. Los
+cuatro botones de la columna van neutros -blanco con borde- y el azul queda
+reservado a los que **sí** tienen estado: los controles cuando el panel está
+abierto y la tabla cuando es la vista elegida.
+
+### "No me marca las caries" (2026-09-14)
+
+Verificado que **sí marca**: seleccionando una pieza y tocando una
+superficie, el diente muestra la lesión negra en la vista anatómica y en la
+oclusal -igual que la referencia, donde la caries también se dibuja en
+negro- y el resumen pasa a `Caries: 1 (O) – superficial`.
+
+Lo que faltaba era el paso previo: **sin pieza elegida la librería
+deshabilita todos los campos**, así que se tocaba una superficie y no pasaba
+nada. Ahora, cuando están todos deshabilitados, el panel lo dice:
+*"Pick a tooth on the chart to edit it"*.
+
+Nota para depurar esto en el futuro: el primer `[data-tooth]` del chart es
+el **18 en FDI**, que con nuestra numeración universal se muestra como
+**1**. Recortar una captura por `data-tooth` sin tener eso en cuenta lleva a
+mirar el diente equivocado y creer que no se pintó nada -me pasó-.
+
+### Fillings: el orden importa, y ahora se avisa (2026-09-14)
+
+*"Fillings and restorative no funciona"*. Comprobado contra el resumen, el
+problema es de **orden**, no de la integración:
+
+- Marcar una superficie con Type en "No filling" no hace nada.
+- Y elegir el material **después** tampoco lo recupera: la marca se perdió.
+
+O sea que el único orden que funciona es material → superficie, que es el
+inverso del natural (primero dónde, después qué). Ahora, mientras
+`#fillingSelect` está en `none`, la cruz va apagada y el panel lo dice:
+*"Choose a filling type first — marking a surface before that has no
+effect."* Al elegir material el aviso desaparece y marcar la superficie
+registra `Fillings: 1 (O)`.
+
+### Pendientes al minimizar (2026-09-14)
+
+Pedido de Julián: al esconder la card, que avise qué quedó sin completar.
+El panel marca como *tocada* cada sección donde se cambió algo -select,
+checkbox, superficie o botón-, y al minimizar la barra pasa a decir
+"7 sections left" con los nombres ("Controls · Statuses · Tooth details +4",
+y el resto en el `title`). "Tooth information" no cuenta: es un resumen, no
+algo para completar.
+
+### Ajustes del panel (2026-09-14)
+
+- **La cruz de superficies va al lado de los campos**, no debajo: la fila es
+  un flex y los selects ocupan lo que sobra.
+- **Chevron propio en los selects**: `appearance: none` y el `ChevronDown`
+  de la app encima, para no mostrar la flecha del sistema.
+- **Los chevrones de paso van juntos**, como un paginador. Separados a los
+  extremos de la barra costaba saltar de sección.
+- **Minimizado muestra las dos caras**: arriba lo cargado
+  ("Set: Caries · Fillings") y abajo lo que falta ("7 left: Controls ·
+  Statuses…"), con la lista completa en el `title`.
+
+Sobre *"no aparece lo que seleccioné"*: no pude reproducirlo. Probado elegir
+un valor, cambiar de paso y volver, y minimizar y restaurar: el select
+siempre conserva lo elegido y coincide con el de la librería. Se interpretó
+como "al minimizar no veo lo que cargué", que es lo que resuelve el resumen
+de arriba.
+
+### Fondo blanco en Clinical Mode (2026-09-14)
+
+Comentario en el artifact: *"esto debe estar en blanco"*. Quedó anclado al
+`body`, sin señalar ningún elemento, así que se interpretó como el **fondo
+de página**: era `#fafbfe`, el mismo que el Figma usa en el dashboard, y
+pasa a blanco **sólo en Clinical Mode**. Las otras pantallas siguen con el
+`#fafbfe` del diseño; si el pedido era global, se cambia el
+`--page-background` de `index.css` y listo.
+
+### Las caras linguales/palatinas (2026-09-14)
+
+Pedido de Julián: que se vea la otra cara del diente, en el medio del
+gráfico. La librería sólo dibuja vestibular y oclusal.
+
+**Primer intento, descartado**: se agregaron dos filas nuevas con un dibujo
+anatómico propio de la cara lingual. Julián lo rechazó -*"te quedó raro"*- y
+aclaró el pedido real: **no había que agregar filas**, sino llenar los **12
+cuadrados que ya estaban vacíos** con *"una copia fiel del dibujo de arriba,
+como el 6, 7, 8, 9, 10, 11, pero más chicos"*.
+
+Esos 12 huecos son los `.tooth-tile.occl-view.placeholder` de los seis
+anteriores de cada arcada: no tienen cara oclusal, así que la fila los dejaba
+en blanco. `CarasLinguales.tsx` los llena con una **copia del SVG que ya
+dibuja la librería** para esa misma pieza -no un dibujo aparte, así no se
+despega del original ni hay dos versiones que mantener-, acotada por alto al
+82% para que entre entera, y clickeable: seleccionar desde ahí es lo que
+permite cargarle condiciones como a cualquier otro diente.
+
+Detalles que importan:
+
+- **Se le sacan todos los `id` a la copia**: duplicarlos rompería los
+  `getElementById` con los que la librería resuelve sus propios controles.
+- Se vuelve a copiar con el `onStateChange` de la librería, y la selección
+  -que no pasa por ahí- con un observer de clases diferido con
+  `requestAnimationFrame`, porque ese observer también ve nuestros cambios.
+
+### Las caras nuevas aceptan condiciones (2026-09-14)
+
+Verificado de punta a punta que desde una de esas 12 celdas se puede cargar
+lo mismo que desde cualquier diente: seleccionar deja `activeToothLabel` en
+la pieza, "Tooth condition" escribe `radix` en el `#substrateSelect`,
+"Restoration" deja `Prosthetics: 6: Crown – zirconia` -idéntico a hacerlo
+desde el diente de arriba, que da `Prosthetics: 1: …`- y marcar una
+superficie registra `Caries: 6 (L) – superficial`.
+
+Lo que sí faltaba era **mostrarse seleccionadas**: ahora se les pone la clase
+`active` de la librería en vez de una propia, así heredan exactamente el
+mismo contorno azul punteado que el resto y no hay dos estilos de selección.
+
+Nota de depuración: los selects del panel están dentro de un `span` -el que
+posiciona el chevron-, así que un locator `label > select` no los encuentra.
+Dos pruebas dieron falsos negativos por eso antes de notarlo.
+
+### Periodontal Status en dos desplegables (2026-09-15)
+
+El tab traía las dos arcadas -dientes 1 a 16, después 32 a 17- una abajo de
+la otra dentro de un mismo scroll (`.perio-fullgrid-scroll`), con las ~17
+filas de cada una (Miller Class, BOP, CAL, GM, PD, Furcation, el gráfico de
+dientes, Plaque, PI, GI, Mobility, CEJ, Root concavity, KG, GT) apiladas:
+para llegar a la segunda arcada había que bajar más de 1000px. Julián pidió
+partirlo justo donde el número de diente pasa de 16 a 32 -que es exactamente
+la frontera entre arcadas- y volver cada mitad un desplegable, además de
+angostar la columna de rótulos de la izquierda.
+
+La grilla la arma la librería con DOM plano (`buildArch` en `PerioChart.tsx`
+del paquete), no JSX, así que no hay prop para partirla. `PeriodontalAccordion.tsx`
+saca los dos `.perio-fullgrid-arch` (330 celdas interactivas cada uno) del
+scroller y los reinserta -la pieza real, no una copia, para no perder sus
+listeners- adentro de dos secciones propias ("Maxillary" / "Mandibular", los
+mismos rótulos que ya usa el tab Odontogram), colapsables de forma
+independiente. Igual que "Periodontal Status" en general, el tab se
+desmonta entero al cambiar a otro (no es un `display:none`), así que cada
+vez que se reabre aparece un scroller nuevo con sus arcadas enteras: se
+detecta por mutaciones en la raíz y se reparte una vez por montaje.
+
+El ancho de la columna de rótulos (`ROW_LABEL_WIDTH = 220` en el código de
+la librería) también es un valor que escribe JS, no CSS: va inline en el
+`gridTemplateColumns` de cada arcada. Se angosta a 130px pisando sólo ese
+primer track cada vez que la librería lo recalcula (en cada resize del
+panel); las filas ya estaban preparadas para que un rótulo largo pase a dos
+líneas en vez de cortarse, así que no se pierde texto.
+
+### Gráfico más chico y carga de "Buccal PD" al arrastre (2026-09-15)
+
+Dos pedidos con un video de referencia (otra app armada sobre la misma
+librería): achicar el gráfico de dientes+curva de cada arcada, y agregar la
+posibilidad de cargar "Buccal PD" arrastrando el mouse en vez de tipear
+cada sitio.
+
+**El arrastre** (`PerioPdArrastre.tsx`) reconstruye lo que se ve en el
+video: apretar sobre el gráfico y mover el mouse carga la fila de un
+trazo, con la altura del cursor como profundidad (1-15mm, el mismo rango
+del `input` de la librería) del sitio que tiene debajo. No hay nada de
+esto en la librería instalada (2.5.0, la última publicada -se revisó
+también la rama principal en GitHub, sin tagear, y tampoco está ahí-): es
+un overlay propio, igual en espíritu a `OdontogramPanel`.
+
+Dos decisiones de la implementación:
+
+- **Un punto por sitio, no por diente.** Cada diente tiene 3 sitios por
+  cara (MB/B/DB o ML/L/DL) con su propio `input`; el arrastre no los
+  agrupa, sólo recorre los 48 inputs de la fila en el orden del DOM -que es
+  el orden en que se ven-, así que la curva sale tan fina como en el video
+  de referencia (48 puntos por arcada, no 16).
+- **La escala se mide en vivo, no se hardcodea.** El eje del gráfico dibuja
+  sus propias etiquetas ("5"/"10"/"15" en `.perio-mm-grid text`); se toman
+  dos de esas etiquetas por sus `getBoundingClientRect()` reales y de ahí
+  sale la recta píxel↔mm. Así da igual el alto que tenga el gráfico, y si
+  la librería cambia el layout del eje, se recalibra sola.
+
+Si el mouse saltea sitios entre dos eventos de un arrastre rápido, se
+interpola el valor entre el sitio anterior y el actual en vez de dejar
+escalones. "Buccal CAL" no se toca directamente: ya sale igual a "Buccal
+PD" porque la librería lo deriva sola cuando "Buccal GM" está en cero.
+
+**Primer intento del gráfico más chico, descartado.** Achicarlo pisando el
+alto del SVG (`.perio-tooth-arch`, viewBox 688x130, `height:auto` por
+defecto) con `preserveAspectRatio="none"` lo estiraba: el diente quedaba
+deformado. Julián lo marcó -*"el gráfico quedó deformado, debería estar
+como antes"*- y pidió que se achique sin perder la forma, y que la arcada
+entre en pantalla sin scroll. La solución real está en la sección
+siguiente (2026-09-16): angostar las COLUMNAS en vez de estirar el SVG.
+
+### Tabs para las arcadas, columnas angostas de verdad y caries en rojo (2026-09-16)
+
+Tres correcciones sobre lo del día anterior, con la app abierta y
+señalando qué estaba mal.
+
+**Por qué angostar el contenedor no achicaba el gráfico.** Antes de
+resolverlo bien se probó la vía "obvia": angostar el `.perio-fullgrid-
+scroll` (con `max-width` o con un resize real de ventana) y dejar que la
+librería reacomode sola sus columnas -tiene un `ResizeObserver` sobre ese
+mismo contenedor para eso, `applyArchColumns` en su código-. No pasó nada:
+con la ventana en 500px el SVG seguía midiendo 1030px, sin importar cuánto
+se esperara. El `ResizeObserver` existe en el bundle instalado (se
+confirmó en el JS minificado), pero no reacciona en esta integración -no
+se llegó a determinar por qué-, así que no es un camino confiable.
+
+**La solución que sí funciona:** pisar directamente el
+`gridTemplateColumns` de la arcada, la MISMA técnica que ya angostaba la
+columna de rótulos a 130px, extendida a las columnas de dientes (factor
+0.6). Como todas las filas -incluida la del gráfico- comparten esa única
+grilla, angostar las columnas angosta parejo toda la arcada; y como el SVG
+del gráfico sigue en `width:100%; height:auto` (se sacó el
+`preserveAspectRatio:"none"` del intento anterior), su alto sale solo de
+ese ancho más chico, sin deformar nada. De 195px bajó a ~117px con las
+proporciones intactas -verificado con `getBoundingClientRect()`, no a
+ojo-. Vive en `PeriodontalTabs.tsx` (`ajustarColumnas`); ya no hace falta
+el archivo aparte que sólo tocaba el SVG.
+
+**Maxillary/Mandibular pasaron de desplegables a tabs.** Julián pidió tabs
+explícitamente -*"en vez de dropdowns que sea en forma de tabs"*- para no
+scrollear ni entre arcadas ni dentro de una. `PeriodontalAccordion.tsx` se
+reemplazó por `PeriodontalTabs.tsx`: mismo mecanismo de mudar los dos
+`.perio-fullgrid-arch` reales fuera del `.perio-fullgrid-scroll` de la
+librería, pero a dos paneles mutuamente excluyentes en vez de dos
+secciones colapsables independientes.
+
+**El arrastre ahora funciona en los dos gráficos de cada arcada, no sólo
+el bucal.** Cada arcada tiene un segundo gráfico -"Palatal" en Maxillary,
+"Lingual / Palatal" en Mandibular- que antes no tenía el trazo enganchado.
+`PerioPdArrastre.tsx` ahora saca el aspecto ("buccal"/"palatal") del
+propio nombre de clase del SVG (`perio-tooth-arch-{aspecto}`) en vez de
+tenerlo hardcodeado, y arma el selector de inputs con ese mismo valor -es
+el que ya usa `data-perio-aspect`, así que no hay mapeo propio-.
+
+**Las caries se pintan de rojo.** El color no es una regla de CSS: viene
+horneado como `style="fill:#0a1018"` inline en cada `<path id="caries-
+{surface}">` del SVG de la pieza (assets de la librería). Se pisa con
+`!important` -`.odonto-embed [id^="caries-"], [id^="subcaries-"] { fill:
+#dc2626 !important }`-, reusando el mismo rojo que ya usa el número de
+diente con problema en `Odontogram.tsx`. Verificado leyendo el `fill`
+computado del `<path>` real tras activar una cara con caries desde el
+propio checkbox de la librería (`#chk-caries-{surface}`), no sólo mirando
+la pantalla.
+
+### Tres correcciones más sobre lo de arriba (2026-09-16, tarde)
+
+**El gráfico no rellenaba el panel.** El `0.6` fijo de `ajustarColumnas`
+multiplicaba lo que la librería hubiera calculado ANTES -que, según el
+ancho real de pantalla de quien mira la app, puede no ser lo mismo que se
+vio acá al probar-, así que en una ventana más ancha quedaba un hueco vacío
+a la derecha del gráfico y de todas las filas, y en una más angosta pedía
+scroll horizontal. Se cambió a que las columnas de dientes sean `fr` -osea
+que reparten TODO el ancho disponible, no un número de px fijo- y a poner
+el techo en el contenedor (`.perio-tabs-cuerpo { max-width: 750px }`), no
+en las columnas. Así el ancho real depende sólo de la pantalla de quien
+mira, no de la que se usó para calcular un factor.
+
+Un `fr` a secas casi rompe esto: por default vale `minmax(auto, 1fr)`, y
+ese `auto` es el min-content de la celda más ancha de esa columna en
+CUALQUIER fila (un checkbox, un número). Con contenido que no quiere
+achicarse la grilla "explota" mucho más ancha que el contenedor en vez de
+repartir de verdad -se vio en vivo: gráfico de 3727px en un panel de
+741px-. La solución es `minmax(0, Nfr)`, que saca ese piso. Verificado con
+`getBoundingClientRect()` en tres anchos de ventana (480, ~750 y 1400px):
+el borde derecho del SVG coincide con el del contenedor en los tres, sin
+hueco y sin overflow.
+
+**Algunas caries quedaban en negro.** No todas: las de las 12 caras
+lingual/palatinas nuevas (`CarasLinguales.tsx`). Esas caras son un
+`cloneNode` del SVG lateral **al que se le sacan todos los `id`** -para no
+duplicar los que la librería resuelve con `getElementById`-, así que el
+selector por `id` del fix de caries no las alcanzaba: quedaban con el
+`style="fill:#0a1018"` original de la librería. Antes de sacar el `id`,
+si empieza con `caries-`/`subcaries-` se le deja la clase `.caries-clon`,
+que `odontogram-theme.css` pinta igual que las demás.
+
+**"None" no se leía al seleccionarlo.** El CSS scopeado de la librería
+trae DOS reglas para `.perio-overlay-switch-btn.is-active` -la primera
+pone el texto en blanco, más abajo en la misma hoja (mismo peso: una sola
+clase de estado) otra lo vuelve a poner en `#0b1220`, casi negro, sobre el
+mismo fondo azul de fábrica-. Con el botón activo así, el texto se leía
+apenas, y por eso todo el selector se sentía "amontonado" -no se
+distinguía dónde terminaba un botón y empezaba el siguiente-. Se repone el
+blanco con una regla `.odonto-embed .perio-overlay-switch-btn.is-active`
+-gana por tener un ancestro de más, sin necesitar `!important`-.
+
+### El "fill container" era del PANEL, no de la grilla sola (2026-09-16, noche)
+
+Julián mandó una captura de su pantalla real -mucho más ancha que la del
+navegador con la que se venía probando- con flechas a mano marcando un
+hueco vacío a la derecha de toda la sección "Periodontal Status". El
+`max-width: 750px` de la corrección anterior estaba puesto sólo en
+`.perio-tabs-cuerpo` (la grilla): en una pantalla angosta eso alcanza para
+que todo se vea prolijo, pero en una ancha el selector "None/PD/CAL…" y
+los tabs -que no tenían ningún techo- seguían estirándose al ancho
+completo del panel mientras la grilla, ya achicada, quedaba corta: quedaba
+un descalce entre filas de la MISMA tarjeta, no un problema de la grilla
+en sí.
+
+El techo se movió al panel entero (`.perio-inline-panel`, el `#perioInlinePanel`
+que contiene el título, el selector de superposición, los tabs y la
+grilla), así todo se achica junto y no hay ancho que no coincida con otro
+dentro de la misma sección. Verificado con la ventana en 1800px: el
+selector, los tabs y la grilla terminan los tres en el mismo borde
+derecho.
+
+**Las caries seguían viéndose negras en algunas caras (labial, mesial,
+incisal, distal, lingual).** El `fill` sí daba rojo -se verificó de nuevo,
+en las cinco superficies-, pero el `stroke` horneado en el SVG
+(`stroke:#000`) no se había tocado: con el relleno a `opacity:0.45` -así
+codifica la profundidad ICDAS, eso no se toca- un contorno negro sólido es
+lo que más pesa a la vista, y de lejos la mancha se leía negra con apenas
+un tinte rojo. Se agregó `stroke: #dc2626 !important` a la misma regla del
+`fill`.
+
+### El techo de 750px también sobraba: fill container real (2026-09-16, más tarde)
+
+Julián pidió aplicarle "fill container" a la tabla, sin más. El
+`max-width: 750px` del arreglo anterior evitaba el descalce entre filas
+-eso estaba bien-, pero seguía siendo un techo inventado: en una pantalla
+angosta la tabla quedaba más chica de lo necesario, y en una ancha dejaba
+un hueco vacío al lado de la tarjeta (comparado con las demás pestañas,
+que sí ocupan todo el ancho). Se sacó el `max-width` y se puso
+`width: 100%` en `.perio-inline-panel` y en `.perio-tabs-cuerpo`: la tabla
+ahora ocupa el ancho real que le da la pantalla de quien mira, ni más ni
+menos, igual que el resto de la app. Las columnas siguen en `fr`
+(`ajustarColumnas`), así que reparten ESE ancho -sea cual sea- en vez de
+uno fijo calculado en otra pantalla.
+
+Es un trade-off consciente: en una pantalla muy ancha el gráfico vuelve a
+crecer -si el panel mide 1000px en vez de 750px, el gráfico crece con
+él-, pero ya no hay ningún ancho inventado por esta sesión que no
+coincida con el de al lado. Verificado en 700px (angosto) y 1800px
+(ancho): panel, selector, tabs y grilla terminan los tres en el mismo
+borde en ambos casos, y el ancho de la tabla coincide con el ancho real
+del contenedor que le da la página (998px a 1800px de ventana, no 750).
+
+### "Tooth information" pasa de paso del carrusel a ícono propio (2026-09-16)
+
+Julián pidió sacar "Tooth information" de la lista de pasos del panel
+flotante (Controls/Statuses/.../Diagnoses/Tooth information, que se recorre
+con los chevrones) y ponerlo en un ícono circular propio -mismo
+`BOTON_ICONO_REDONDO` que "Add condition" en Radiography- arriba a la
+derecha del gráfico: al pasar el mouse adelanta el resumen en un hover
+card (`ToothInfoTrigger.tsx`, con el `HoverCard` de shadcn -se instaló para
+esto, `npx shadcn add hover-card`, con los mismos dos bugs de siempre del
+CLI: file en `@/components/ui/` en vez de `src/`, e import de `cn` desde
+`"cn"` en vez de `@/lib/utils`-), y al clickear lo abre entero en un
+`ModalShell`.
+
+`OdontogramEmbed.tsx` ya no mete el nodo `.tooth-info` en `pasos`: lo lee
+aparte en su propio estado (`infoNodo`), con el mismo mecanismo -mismo
+`releer()`, misma comparación para no re-renderizar de más-. El nodo real
+de la librería sigue siendo la fuente (`ToothInfoPanel.tsx` no cambió), y
+sigue **siempre** en `display:none` en CSS -antes sólo se mostraba con
+`.controles-abiertos`, y las docenas de reglas de estilo que tenía para
+cuando SÍ se mostraba inline quedaron sin efecto pero sin tocar, por si
+algún día vuelve a mostrarse así-.
+
+Verificado en vivo que "Tooth information" es un resumen del EXAMEN
+entero, no de la pieza seleccionada -muestra "32 permanent teeth", una
+tabla de arcadas y hallazgos agregados (Caries/Fillings/Root canal/
+Diagnoses/...), y ese contenido no cambia según qué diente esté
+`.active`, pero sí se actualiza solo al marcar una condición real (se
+probó marcando una caries y viendo aparecer "Caries: 7 (L) – superficial"
+en el resumen)-. Es el comportamiento de siempre de la librería, no algo
+que haya cambiado esta sesión: antes se veía igual, sólo que como último
+paso del carrusel en vez de acá.
+
+De paso, un pedido corto sobre el mismo examen: el FAB "Tooth controls"
+(el de los sliders, que abría el panel de controles) se sacó -quedaba
+redundante-, y su función se sumó al "+" de "New procedure": clickearlo
+abre el modal de New Procedure y de una vez deja `controlesAbiertos` en
+`true`, así que al cerrar el modal (Cancel o Save) el panel del diente ya
+está ahí, sin un segundo click.
+
+### El ícono se muda a la fila de botones de la librería (2026-09-16)
+
+El ícono de "Tooth information" quedó al lado de los tabs Odontogram/
+Periodontal Status/Diagnoses -pisando "Diagnoses", que quedaba cortado
+("Diagno…")-. Julián mandó una captura pidiendo sacarlo de ahí y ponerlo
+alineado, del mismo tamaño, en la fila de "conditions" -los botones
+propios de la librería a la derecha del título "Dental chart": vista
+oclusal, cordales, hueso, pulpa, limpiar selección (`.chart-actions`, con
+sus botones `btn btn-ghost btn-icon`, `min-width:44px` puesto por la
+librería)-.
+
+`OdontogramEmbed.tsx` ahora también relee `.chart-actions` (mismo
+mecanismo que `infoNodo`, guardado en `accionesNodo`) y se lo pasa a
+`ToothInfoTrigger`, que arma su botón con las mismas clases de la
+librería en vez de copiarles el tamaño a mano.
+
+**Bug real encontrado en el camino, ya solucionado**: la primera versión
+portaba el botón adentro de `.chart-actions` con `createPortal`. Al
+cambiar de tab (Odontogram → Periodontal Status) React tiraba, siempre,
+un error sin capturar: `"Target container is not a DOM element"`. La
+causa: `.chart-actions` es de la librería, que lo saca del DOM en el
+mismo instante del cambio de tab -de forma síncrona-, mientras que el
+`MutationObserver` que lo nota en React corre recién en el siguiente
+tick; el portal llega a intentar reconciliar contra un contenedor que ya
+no está.
+
+Un chequeo de guardia (`contenedor instanceof Element` antes de
+`createPortal`) NO alcanzó: el error seguía, y un log confirmó que el
+componente ni siquiera se estaba re-renderizando con un valor viejo -la
+falla es interna a cómo React limpia un portal al desmontarlo, no algo
+que se pueda frenar filtrando el valor de la prop-.
+
+La solución real, en `ToothInfoTrigger.tsx`: nada de `createPortal`. El
+botón se renderiza normal, adentro del propio árbol de React (como
+cualquier otro hijo de `OdontogramEmbed`), y un `useLayoutEffect` lo
+MUEVE con `appendChild` directo a `.chart-actions` -React sigue el nodo
+por su propia referencia, no le importa dónde vive en el DOM en cada
+momento-. Al desmontar, ese mismo efecto lo devuelve a su padre
+original ANTES de que React intente sacarlo: React borra sus nodos
+buscándolos en el padre donde él los montó, así que si el nodo ya no
+está ahí (porque lo moví) tira `NotFoundError: the node to be removed is
+not a child of this node`. Tiene que ser `useLayoutEffect`, no
+`useEffect`: la limpieza de un efecto pasivo corre DESPUÉS de que React
+ya sacó sus nodos durante el commit -se probó, y ese timing tardío no
+alcanza a devolver el nodo a tiempo-.
+
+Verificado con 5 cambios de tab seguidos (Odontogram/Periodontal
+Status/Diagnoses en cualquier orden) sin un solo error en consola, y con
+el ícono re-enganchándose solo cada vez -un único botón vivo en todo
+momento, nunca duplicado-.
+
+**Bug hermano, sin arreglar todavía**: `PeriodontalTabs.tsx` tiene el
+MISMO problema -porta con `createPortal` adentro de
+`.perio-fullgrid-scroll`, que la librería también saca del DOM al
+cambiar de tab-. Se reprodujo el mismo error saliendo de Periodontal
+Status. Queda anotado como tarea aparte (mismo arreglo: cambiar el
+`createPortal` por el patrón de mover un nodo ya renderizado con
+`useLayoutEffect`), no se tocó en esta sesión por no ser parte del
+pedido.
+
+### Corrección: el ícono va en la barra de tabs, no en `.chart-actions` (2026-09-16)
+
+Interpretación errónea de la sesión anterior: "alineado, del mismo
+tamaño, en la fila de conditions" se leyó como "adentro de
+`.chart-actions`". Julián mandó de nuevo la captura de referencia -el
+ícono "i" redondo, solo, a la derecha de los tabs Odontogram/
+Periodontal Status, en su propia línea- y aclaró: "no quiero que esté
+en la misma fila" (la de vista oclusal/cordales/hueso/pulpa/limpiar
+selección). El punto 1 de esa captura ("saca el boton de diagnostic")
+tampoco se había hecho: pedía sacar el botón **"Diagnoses"**
+(`#openCaseDiagnosesBtn`) directamente, no sólo separar el ícono de él.
+
+Arreglo real:
+- `#openCaseDiagnosesBtn` se oculta por CSS (`display:none` en
+  `odontogram-theme.css`, scopeado a `.perio-launch-bar`) — Diagnoses
+  ya no está en la UI.
+- `ToothInfoTrigger` se porta ahora a `.perio-launch-bar` (la barra que
+  contiene el toggle Odontogram/Periodontal Status), no a
+  `.chart-actions`. Mismo mecanismo `useLayoutEffect` + `appendChild`
+  de más arriba, mismo motivo (esa barra también se rearma al cambiar
+  de tab). En `OdontogramEmbed.tsx` el estado se renombró
+  `accionesNodo` → `barraNodo` para que el nombre no mienta.
+- El botón dejó las clases de la librería (`btn btn-ghost btn-icon`) y
+  volvió a `BOTON_ICONO_REDONDO` -el mismo estilo circular que "Add
+  condition"-, con `ml-4 size-8` para separarlo del toggle y que entre
+  en la altura de la barra (32px, la misma que tenían los tabs).
+
+Verificado con el mismo test de 4 cambios de tab seguidos: cero errores
+en consola, `.perio-launch-bar` conserva el ícono enganchado, y
+`#openCaseDiagnosesBtn` queda en `display:none` en todo momento.
+
+### "Tooth information" pasa de modal a panel debajo del chart, y punto rojo de notificación (2026-09-16)
+
+Dos pedidos cortos de Julián sobre el mismo ícono:
+
+1. Que clickearlo **no abra un modal** -tapaba el gráfico- sino que
+   despliegue el panel **debajo del "Dental chart"**, como un acordeón
+   más (en el mismo lugar donde ya aparecía el panel de Controls/
+   Statuses/Tooth details/etc al elegir una pieza).
+2. Un **punto rojo** sobre el ícono cuando hay algo cargado para ver,
+   así el usuario no tiene que abrirlo "por las dudas".
+
+**Cambio de estructura**: `ToothInfoTrigger` ya no guarda el estado
+`abierto` ni dibuja el `ModalShell` -sólo dibuja el botón redondo (lo
+que se porta a `.perio-launch-bar`)-. El estado (`infoAbierto`) y el
+panel expandido ahora viven en `OdontogramEmbed`, justo después de
+`<OdontogramShell>`, como una card más (mismo estilo que el panel de
+controles): así el botón puede vivir adentro de la barra de tabs -que
+se porta con `appendChild`- mientras el panel que abre vive en su lugar
+natural del árbol, sin que un modal tenga que salir de ese mismo
+`<span>` portado.
+
+**Punto rojo**: se extrajo la lectura del resumen (`leerResumen`, en
+`ToothInfoPanel.tsx`) a un hook exportado, `useResumenDental(nodo)`, que
+usan tanto `ToothInfoPanel` (para pintar la ficha) como
+`ToothInfoTrigger` (para decidir el punto). "Hay algo para ver" no es
+sólo "algún renglón no vacío": se agregó `hayHallazgo(resumen)` porque
+**"Periodontal status" es la excepción** -sano se lee "the periodontium
+is healthy", un texto que no arranca con "no" y que el `sinDato` del
+panel (pensado sólo para atenuar visualmente, no para esto) contaba
+como si fuera un hallazgo real. Sin ese caso especial, el punto rojo
+quedaba prendido SIEMPRE, incluso en un examen sano recién empezado -se
+detectó probando en frío, con el examen mock sin tocar-. `hayHallazgo`
+descarta ese renglón cuando el valor contiene "healthy".
+
+Verificado marcando un aparato de ortodoncia real en una pieza (Ortho
+appliance → Bracket): el punto aparece al instante y el renglón
+"Orthodontics" pasa de gris a texto normal en el panel; sacando el
+aparato, el punto se apaga. En el examen sano de base (sin tocar nada)
+el punto no aparece.
+
+### El panel también muestra el resumen de Periodontal Status (2026-09-16)
+
+Julián mandó una captura de la card "Summary" (Avg PD, Avg CAL, BOP%,
+Charted sites, Worst CAL, Max PD, Max furcation, PI%) pidiendo que sea
+"lo que vas marcando en el periodontal" -el resumen en vivo del sondaje,
+no un texto fijo-.
+
+La librería ya la dibuja sola: es `.perio-summary-card` (título
+"Summary" + `.perio-fullgrid-summary-item` con label/value,
+`role="status"`), con los mismos textos -se encontraron las claves de
+i18n `perio.summary.avgPd`, `.avgCal`, `.maxFurcation`, etc. en
+`node_modules/react-advanced-odontogram`-. No hubo que calcular nada:
+alcanzó con leerla igual que `.tooth-info`.
+
+**Bug encontrado al cablearlo**: `.perio-summary-card` sólo existe en el
+DOM mientras se ve la vista Periodontal Status -la librería la saca por
+completo al volver a Odontogram, igual que hace con `.chart-actions` a
+la inversa-. Pero **`.tooth-info` es al revés: sólo existe en
+Odontogram, no en Periodontal Status** -esto no se había notado antes
+porque nunca se probó el ícono estando parado en esa vista-. Como
+`ToothInfoTrigger`/`OdontogramEmbed` exigían `infoNodo` (`.tooth-info`)
+para dibujar el botón, **el ícono entero desaparecía en Periodontal
+Status**, justo la vista donde el nuevo resumen es más útil.
+
+Arreglo: `nodo` (`.tooth-info`) pasa a ser `HTMLElement | null` en
+`ToothInfoTrigger`, `ToothInfoPanel` y `useResumenDental`; el botón se
+dibuja si hay `infoNodo` **o** `perioNodo` (antes exigía sólo el
+primero). `OdontogramEmbed` relee `.perio-summary-card` en el mismo
+`releer()` que ya usaba para `.tooth-info`/`.perio-launch-bar`, guardado
+en `perioNodo`.
+
+`hayHallazgo` -el punto rojo- ahora también prende con `Charted sites`
+> 0 en el resumen periodontal, no sólo con hallazgos del odontograma.
+Un matiz conocido, no arreglado: como `.perio-summary-card` no existe
+fuera de Periodontal Status, el punto por sondaje sólo se ve estando en
+esa vista -si ya se cargaron sitios y se vuelve a Odontogram, el punto
+se apaga hasta que algo en `.tooth-info` amerite prenderlo por su
+cuenta-. Aceptable: no hay de dónde leer ese dato en Odontogram, la
+librería no lo deja en el DOM.
+
+Verificado cargando un "Buccal PD" real (5mm) en un sitio: el bloque
+"Periodontal summary" del panel pasa de puros "–"/"0%" a "Avg PD 5",
+"Charted sites 1", "Max PD 5" al instante, y el punto rojo del ícono
+prende -estando en Periodontal Status-. Cero errores de consola.
+
+### El panel pasa de inline a flotante fijo a la derecha (2026-09-16)
+
+Con el resumen periodontal en vivo (arriba) surgió el caso de uso real:
+Julián quiere ir cargando sitios en la grilla -que es larga, se scrollea
+mucho- mientras compara contra el "Periodontal summary". Con el panel
+inline de más arriba (debajo del "Dental chart") tenía que scrollear
+hasta el final cada vez para verlo, lejos de la grilla que estaba
+cargando.
+
+Pasa a `position: fixed` -`top-20 right-4`, `max-h-[calc(100vh-6rem)]`
+con su propio scroll-, así que queda anclado a la ventana y no a la
+página: sigue a la vista mientras se scrollea la grilla, sin tapar nada
+(no tiene fondo oscuro, la grilla sigue clickeable atrás) y sin
+reservar espacio en el layout -al cerrarlo, todo vuelve exactamente a
+como estaba-. Sigue sin ser modal, que es lo que Julián había pedido
+explícitamente evitar en primer lugar: no atenúa el resto de la
+pantalla ni bloquea interactuar con el gráfico.
+
+Verificado: se scrolleó la grilla de Periodontal Status con el panel
+abierto y quedó fijo en el mismo lugar de la pantalla; se cargó un sitio
+con el panel abierto y el valor se actualizó ahí mismo sin cerrarlo; al
+cerrar, la página quedó igual que antes de abrirlo. Cero errores de
+consola.
+
+### El flotante fijo tampoco sirvió: pasa a inline arriba de los tabs (2026-09-16)
+
+El `position: fixed` de más arriba resultó ser justo lo que Julián NO
+quería: "fijo del lado derecho **no flotante**, que no tape el
+gráfico". Un fixed sigue siendo un overlay -sombra, se superpone a lo
+que tenga debajo-, así que angostar el chart con una columna no alcanza
+del todo: el panel corta contenido igual en pantallas más chicas. Y de
+paso se encontró que `sticky` (probado como alternativa a `fixed` para
+la misma columna) tampoco servía: se "despegaba" mucho antes de lo
+esperado y quedaba clavado arriba de la ventana en vez de acompañar el
+scroll -no se investigó la causa raíz porque el pedido cambió antes de
+terminar de depurarlo-.
+
+Julián lo resolvió con un pedido más simple y más preciso: que aparezca
+**arriba de los tabs Maxillary/Mandibular**. Eso saca de encima toda la
+necesidad de `fixed`/`sticky`: es contenido inline más, en su lugar
+natural, entre la barra "Periodontal Status" (con "None/PD/CAL/
+Recession/...") y los tabs de arcada -nunca se superpone a nada porque
+no es un overlay, es parte del documento-.
+
+El truco es DÓNDE insertarlo: `.perio-tabs-cabecera` -los botones
+Maxillary/Mandibular- no es de la librería, es de `PeriodontalTabs.tsx`
+(este mismo proyecto), que la arma con `createPortal` dentro de
+`.perio-fullgrid-scroll` cada vez que se entra a Periodontal Status. Se
+la lee igual que `.perio-summary-card`/`.tooth-info` (`releer()` en
+`OdontogramEmbed`, guardada en `tabsPerioNodo`) y se le agregó un
+componente nuevo, `PanelArribaDeTabs`, que mueve el panel real con
+`insertBefore(panel, cabecera)` -mismo patrón de `useLayoutEffect` +
+mover-el-nodo-y-devolverlo-al-desmontar que ya usa `ToothInfoTrigger`
+para `.perio-launch-bar`, con el mismo motivo: no se puede `createPortal`
+a ciegas porque la librería/`PeriodontalTabs` puede sacar
+`.perio-tabs-cabecera` del DOM en cualquier cambio de vista.
+
+En Odontogram no hay tabs Maxillary/Mandibular -`tabsPerioNodo` da
+`null`-, así que ahí el panel vuelve a ser inline simple, debajo del
+"Dental chart", como en la primera versión (antes del flotante).
+
+Verificado: abrir el panel en Periodontal Status lo muestra pegado
+arriba de "Maxillary | Mandibular", angostando en cero el gráfico de
+abajo (nada se superpone, todo se ve completo). Cambiar de tab
+(Odontogram ↔ Periodontal Status) varias veces seguidas con el panel
+abierto y cerrado en distintos momentos: cero errores de consola, el
+panel reaparece en el lugar correcto cada vez.

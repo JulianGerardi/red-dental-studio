@@ -1,8 +1,12 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Search, Trash2, Plus, MapPin } from 'lucide-react'
+import { useMemo, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Search, Pencil, Trash2, Plus, MapPin } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { SearchButton } from '@/components/ui/search-button'
 import { aviso } from '@/components/ui/toaster'
+import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 
 /* Settings → Locations. La tabla de entrada: nombre, empleados, salas e
    información de contacto. El detalle de cada fila —Information / Working
@@ -19,8 +23,10 @@ export const LOCACIONES: Locacion[] = [
 ]
 
 export function SettingsLocations() {
+  const navigate = useNavigate()
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(LOCACIONES)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const visibles = useMemo(
     () => filas.filter((l) => `${l.nombre} ${l.info}`.toLowerCase().includes(q.trim().toLowerCase())),
@@ -38,35 +44,40 @@ export function SettingsLocations() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">Locations</h1>
-      <p className="mt-1 text-sm text-[#71717a]">Set your location name. Add the location you need.</p>
-
-      <div className="mt-5 flex flex-wrap items-center gap-3">
+      <SettingsPageHeader
+        titulo="Locations"
+        bajada="Set your location name. Add the location you need."
+        accion={(
+          <Link
+            to="/settings/locations/new"
+            data-tour="set-locations"
+            className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 shrink-0 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
+          >
+            <Plus className="size-4" /> New location
+          </Link>
+        )}
+      >
         <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
           <input
+            ref={inputRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search locations"
             className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
           />
         </div>
-        <Link
-          to="/settings/locations/new"
-          className="bg-dash-blue hover:bg-dash-blue-hover ml-auto flex h-9 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
-        >
-          <Plus className="size-4" /> New location
-        </Link>
-      </div>
+        <SearchButton onClick={() => inputRef.current?.focus()} className="h-9" />
+      </SettingsPageHeader>
 
       <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
         <div className="min-w-[760px]">
-          <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
+          <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
             <span className="w-[180px]">Location name</span>
             <span className="w-[100px]">Employees</span>
             <span className="w-[80px]">Room</span>
             <span className="min-w-0 flex-1">Information</span>
-            <span className="w-[72px] text-right">Action</span>
+            <span className="w-[60px] text-right">Actions</span>
           </div>
 
           {visibles.length === 0 ? (
@@ -84,7 +95,7 @@ export function SettingsLocations() {
             visibles.map((l) => (
               <div
                 key={l.id}
-                className="flex items-center gap-3 border-b border-[#e7e7e7] px-4 py-3 text-[13px] text-[#3f3f46] last:border-0"
+                className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]"
               >
                 {/* El nombre es el acceso, como en la tabla de pacientes. */}
                 <Link
@@ -96,22 +107,22 @@ export function SettingsLocations() {
                 <span className="w-[100px]">{l.empleados}</span>
                 <span className="w-[80px]">{l.salas}</span>
                 <span className="min-w-0 flex-1 truncate">{l.info}</span>
-                <span className="flex w-[72px] justify-end">
-                  <button
-                    type="button"
-                    aria-label={`Delete ${l.nombre}`}
-                    onClick={() => borrar(l)}
-                    className="rounded p-1.5 text-[#09090b] transition-colors hover:bg-[#fff2f2] hover:text-[#dc2626]"
-                  >
-                    <Trash2 className="size-4" />
-                  </button>
+                <span className="flex w-[60px] justify-end">
+                  <RowActionsMenu label={l.nombre}>
+                    <DropdownMenuItem onSelect={() => navigate(`/settings/locations/${l.id}`)}>
+                      <Pencil className="size-4 shrink-0" /> Edit location
+                    </DropdownMenuItem>
+                    <DropdownMenuItem variant="destructive" onSelect={() => borrar(l)}>
+                      <Trash2 className="size-4 shrink-0" /> Delete location
+                    </DropdownMenuItem>
+                  </RowActionsMenu>
                 </span>
               </div>
             ))
           )}
 
           {visibles.length > 0 && (
-            <div className="flex h-[52px] items-center px-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
               <span className="text-xs font-semibold text-[#71717a]">
                 Showing {visibles.length} of {filas.length} locations
               </span>

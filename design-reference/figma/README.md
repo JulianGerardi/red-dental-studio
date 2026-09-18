@@ -275,6 +275,15 @@ Ver `modulos/clinical-mode.md`. Takeover con barra de catorce controles, diez
 pestanas y el Overview maquetado; los nueve examenes cuelgan de sus propios
 tableros. Anomalias 67 a 74.
 
+## Billing (2026-09-12)
+
+Nodo `4481:9881`, módulo nuevo de nivel superior (`/billing`), no el
+"Relationships & Billing" del tab de un paciente. Cuatro pantallas que son
+en realidad estados de una sola vista -vacía, poblada, con el modal "Post
+payment" y con un paciente seleccionado. Ver `modulos/billing.md`, con el
+detalle de por qué los datos de fila no replican el relleno duplicado del
+Figma. Anomalías 75 a 90.
+
 ## Responsive
 
 El Figma sólo tiene el frame de 1200. La app funciona de **320 a 1440+** sin

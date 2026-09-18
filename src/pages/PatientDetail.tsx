@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, ChevronDown, EllipsisVertical, PersonStanding, Clipboard, Pill, ClipboardList, MapPin, Clock, type LucideIcon } from 'lucide-react'
+import { ChevronLeft, ChevronDown, PersonStanding, Clipboard, Pill as PillIcon, ClipboardList, MapPin, Clock, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
@@ -10,13 +10,17 @@ import { aviso } from '@/components/ui/toaster'
 import { PendingTaskCard, type PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
+import { Pill, type PillTone } from '@/components/ui/pill'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3646:58836 "Patient Dashboard". */
 
 const CLINICAL: { label: Categoria; icon: LucideIcon }[] = [
   { label: 'Allergies', icon: PersonStanding },
   { label: 'Medical Conditions', icon: Clipboard },
-  { label: 'Medication', icon: Pill },
+  { label: 'Medication', icon: PillIcon },
   { label: 'Past Surgery and Hospitalization', icon: ClipboardList },
 ]
 
@@ -24,6 +28,10 @@ const INSURANCE = [
   { order: 'Primary', carrier: 'AETNA', plan: 'Dental PPO', subscriber: 'Janet Johnson', relation: 'Child', period: 'Annual' },
   { order: 'Secondary', carrier: 'AETNA', plan: 'Dental PPO', subscriber: 'Janet Johnson', relation: 'Child', period: 'Annual' },
 ]
+
+/* Mismos tonos que la tabla completa de Insurance (src/pages/patients/Insurance.tsx):
+   el orden siempre en azul, la relación varía. */
+const RELACION_TONO: Record<string, PillTone> = { Child: 'success', Self: 'info', Spouse: 'neutral' }
 
 const TASKS: PendingTask[] = Array.from({ length: 6 }, () => ({
   kind: 'Referrals', state: 'Requested', person: 'Elena Marquez', initials: 'EM',
@@ -79,7 +87,7 @@ export default function PatientDetail() {
   const [apptTab, setApptTab] = useState<'Next' | 'Next Appointments'>('Next')
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
 
       {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
           El breadcrumb completo repetía lo que ya dice el panel lateral. */}
@@ -148,7 +156,7 @@ export default function PatientDetail() {
             <div className="mt-4 overflow-x-auto rounded-lg border border-[#e4e4e7]">
               <table className="w-full min-w-[720px] text-xs">
                 <thead>
-                  <tr className="border-b border-[#e4e4e7] text-[#71717a]">
+                  <tr className="border-b border-[#e4e4e7] bg-[#f9f9f9] text-[11px] text-[#71717a]">
                     {['Order', 'Carrier', 'Plan', 'Subscriber', 'Relation', 'Coverage Period', 'Actions'].map((h) => (
                       <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
                     ))}
@@ -156,23 +164,20 @@ export default function PatientDetail() {
                 </thead>
                 <tbody>
                   {INSURANCE.map((r) => (
-                    <tr key={r.order} className="border-b border-[#e4e4e7] last:border-0">
+                    <tr key={r.order} className="border-b border-[#e4e4e7] text-[13px] last:border-0">
+                      <td className="px-4 py-4"><Pill tone="info">{r.order}</Pill></td>
+                      <td className="px-4 py-4 text-[#3f3f46]">{r.carrier}</td>
+                      <td className="px-4 py-4 text-[#3f3f46]">{r.plan}</td>
+                      <td className="px-4 py-4 text-[#3f3f46]">{r.subscriber}</td>
+                      <td className="px-4 py-4"><Pill tone={RELACION_TONO[r.relation] ?? 'neutral'}>{r.relation}</Pill></td>
+                      <td className="px-4 py-4 text-[#3f3f46]">{r.period}</td>
                       <td className="px-4 py-4">
-                        <span className={cn('rounded-full border px-2.5 py-[3px] text-[11px] font-semibold',
-                          r.order === 'Primary' ? 'border-[#174596] bg-[#f0f2ff] text-[#174596]' : 'border-[#a1a1aa] bg-[#f4f4f5] text-[#52525b]')}>
-                          {r.order}
-                        </span>
+                        <RowActionsMenu label={`${r.order} insurance plan`}>
+                          <DropdownMenuItem asChild>
+                            <Link to={`/patients/${id}/insurance`}>View plan</Link>
+                          </DropdownMenuItem>
+                        </RowActionsMenu>
                       </td>
-                      <td className="px-4 py-4 text-[#09090b]">{r.carrier}</td>
-                      <td className="px-4 py-4 text-[#09090b]">{r.plan}</td>
-                      <td className="px-4 py-4 text-[#09090b]">{r.subscriber}</td>
-                      <td className="px-4 py-4">
-                        <span className="rounded-full border border-[#1a804d] bg-[#f0fcf5] px-2.5 py-[3px] text-[11px] font-semibold text-[#1a804d]">
-                          {r.relation}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-[#09090b]">{r.period}</td>
-                      <td className="px-4 py-4"><EllipsisVertical className="size-4 text-[#09090b]" /></td>
                     </tr>
                   ))}
                 </tbody>

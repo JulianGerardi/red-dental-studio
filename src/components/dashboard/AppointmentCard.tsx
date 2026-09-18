@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   Check, X, EllipsisVertical, Pencil, User, DoorClosed, Clock, ArrowRight,
 } from 'lucide-react'
 import { InnerCard, StatusPill } from './primitives'
 import { cn } from '@/lib/utils'
+import { ICONO_SUELTO } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 
 export type Appointment = {
@@ -26,6 +28,7 @@ export function AppointmentCard({
   activa,
   onSelect,
   onEdit,
+  compact,
 }: {
   appt: Appointment
   /** Identifica la card entre los dos paneles. */
@@ -34,7 +37,14 @@ export function AppointmentCard({
   activa?: boolean
   onSelect?: (appt: Appointment, el: HTMLElement, id?: string) => void
   onEdit?: (appt: Appointment) => void
+  /** Versión chica para una lista angosta -el costado de Patients-: una fila
+      con nombre + hora/provider, sin los chips TR/CC, sin el "Check In" y
+      sin el botón de Check Out. Es otro layout, no el mismo con partes
+      escondidas -por eso vive en su propio componente más abajo. */
+  compact?: boolean
 }) {
+  if (compact) return <AppointmentCardCompacta appt={appt} />
+
   const accion = appt.accion ?? 'Check Out'
 
   return (
@@ -102,6 +112,33 @@ export function AppointmentCard({
       >
         {accion} <ArrowRight className="size-4" />
       </button>
+    </InnerCard>
+  )
+}
+
+/* Una fila, no una card de dos pisos: avatar, nombre y hora/provider abajo
+   en gris, y una flecha a Scheduling en vez del menú -acá no hay nada para
+   editar in situ. Mismo tamaño de trigger que el kebab de las tablas
+   (`ICONO_SUELTO`), para que quede a la par de PatientCard al lado -misma
+   sombra que esa card también: la `shadow-inner-card` de acá abajo es de
+   `InnerCard`, pensada para las cards grandes del Dashboard, y sin borde en
+   una fila chica se veía como una línea cortada en vez de una sombra. */
+function AppointmentCardCompacta({ appt }: { appt: Appointment }) {
+  return (
+    <InnerCard className="flex items-center gap-2.5 border border-[#e4e4e7] p-2.5 shadow-[0_1px_3px_rgb(0_0_0/0.08)]">
+      <span className="bg-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold text-white">
+        {appt.initials}
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="truncate text-[13px] font-semibold text-[#09090b]">{appt.name}</span>
+        <span className="flex items-center gap-1 text-[11px] text-[#71717a]">
+          <Clock className="size-3 shrink-0" />
+          <span className="truncate">{appt.time} · {appt.provider}</span>
+        </span>
+      </span>
+      <Link to="/scheduling" aria-label={`View ${appt.name}'s appointment`} className={ICONO_SUELTO}>
+        <ArrowRight className="size-4" />
+      </Link>
     </InnerCard>
   )
 }

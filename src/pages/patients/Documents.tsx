@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
+import { Pagination } from '@/components/patients/ledger/Pagination'
 import { Link, useParams } from 'react-router-dom'
 import { ChevronLeft, Search, Download, FileText } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { Pill, type PillTone } from '@/components/ui/pill'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3753:80195 "Patient Profile — Documents". */
 
@@ -17,9 +19,9 @@ const DOCS: Doc[] = [
   { name: 'Isacc Cihtepin.doc', firma: 'Signed', fecha: 'Aug 1, 2026' },
 ]
 
-const FIRMA = {
-  Signed: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  'Pending Signature': 'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
+const FIRMA_TONO: Record<Doc['firma'], PillTone> = {
+  Signed: 'success',
+  'Pending Signature': 'warning',
 }
 
 export default function Documents() {
@@ -27,14 +29,19 @@ export default function Documents() {
   const [q, setQ] = useState('')
   const [sel, setSel] = useState<number[]>([])
 
+  const [pagina, setPagina] = useState(1)
   const filas = useMemo(
     () => DOCS.filter((d) => d.name.toLowerCase().includes(q.toLowerCase())),
     [q],
   )
+  const TAM_PAGINA = 8
+  const paginas = Math.max(1, Math.ceil(filas.length / TAM_PAGINA))
+  const paginaActual = Math.min(pagina, paginas)
+  const filasPagina = filas.slice((paginaActual - 1) * TAM_PAGINA, paginaActual * TAM_PAGINA)
   const todas = sel.length === filas.length && filas.length > 0
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
 
       {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
           El breadcrumb completo repetía lo que ya dice el panel lateral. */}
@@ -78,9 +85,9 @@ export default function Documents() {
             </button>
           </div>
 
-          <div className="mt-3 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+          <div className="mt-3 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
             <div className="min-w-[620px]">
-            <div className="flex h-11 items-center border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
+            <div className="flex items-center bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
               <span className="w-10">
                 <input
                   type="checkbox"
@@ -94,8 +101,8 @@ export default function Documents() {
               <span className="w-[140px] text-right">Last Update</span>
             </div>
 
-            {filas.map((d, i) => (
-              <div key={i} className="flex h-14 items-center border-b border-[#e7e7e7] px-4 text-[13px] last:border-0">
+            {filasPagina.map((d, i) => (
+              <div key={i} className="flex items-center border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]">
                 <span className="w-10">
                   <input
                     type="checkbox"
@@ -113,31 +120,21 @@ export default function Documents() {
                   <span className="truncate text-[#52525b]">{d.name}</span>
                 </span>
                 <span className="w-[200px]">
-                  <span className={cn('rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', FIRMA[d.firma])}>
-                    {d.firma}
-                  </span>
+                  <Pill tone={FIRMA_TONO[d.firma]}>{d.firma}</Pill>
                 </span>
                 <span className="w-[140px] text-right text-[#52525b]">{d.fecha}</span>
               </div>
             ))}
 
-            <div className="flex h-[52px] items-center justify-between border-t border-[#e7e7e7] px-4">
-              {/* Dice "referrals" en una tabla de documentos: el componente
-                  `table/referral-table` reusado otra vez. */}
-              <span className="text-xs font-semibold text-[#71717a]">Showing 3 of 15 referrals</span>
-              <div className="flex items-center gap-1">
-                {['‹', '1', '2', '3', '4', '5', '›'].map((p) => (
-                  <button
-                    key={p}
-                    className={cn(
-                      'flex size-8 items-center justify-center rounded-md text-xs font-semibold',
-                      p === '1' ? 'bg-dash-blue text-white' : 'text-[#71717a] hover:bg-[#f4f4f5]',
-                    )}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
+            {/* El Figma dice "Showing 3 of 15 referrals" en una tabla de
+                documentos -reusa el componente de referrals-. El contador
+                ahora cuenta documentos de verdad y el paginado funciona: los
+                botones dibujados no tenían onClick. */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
+              <span className="text-xs font-semibold text-[#71717a]">
+                Showing {filasPagina.length} of {filas.length} documents
+              </span>
+              <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
             </div>
             </div>
           </div>

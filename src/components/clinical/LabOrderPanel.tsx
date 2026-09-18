@@ -4,7 +4,13 @@ import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ICONO_SUELTO } from '@/lib/estilos'
-import { ORDENES, ORDEN_PILL } from '@/data/clinical-mode'
+import { ORDENES, type EstadoOrden } from '@/data/clinical-mode'
+import { Pill, type PillTone } from '@/components/ui/pill'
+
+const ORDEN_TONO: Record<EstadoOrden, PillTone> = {
+  Pending: 'warning', Canceled: 'danger', Rejected: 'danger',
+  Delayed: 'warning', Requested: 'purple', Delivered: 'success',
+}
 
 /* Figma 4070:148911 "Lab Order — Section (List, Detail & New Laboratory
    Modal)". Acá está el listado, que es donde cae la pestaña. El detalle y el
@@ -66,7 +72,7 @@ export function LabOrderPanel() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[880px] border-collapse">
             <thead>
-              <tr className="border-y border-[#f1f1f4]">
+              <tr className="border-y border-[#f1f1f4] bg-[#f9f9f9]">
                 {COLUMNAS.map((c) => (
                   <th key={c} className="h-10 px-3 text-left text-[11px] font-semibold whitespace-nowrap text-[#71717a]">
                     {c}
@@ -93,15 +99,11 @@ export function LabOrderPanel() {
                       <span className="text-[13px] text-[#09090b]">{o.paciente}</span>
                     </span>
                   </td>
-                  <td className="px-3">
-                    <span className={cn('rounded-full border px-2 py-[2px] text-[11px] font-semibold', ORDEN_PILL[o.estado])}>
-                      {o.estado}
-                    </span>
-                  </td>
-                  <td className="px-3 text-[13px] whitespace-nowrap text-[#52525b]">{o.actualizado}</td>
-                  <td className="px-3 text-[13px] whitespace-nowrap text-[#52525b]">{o.creado}</td>
+                  <td className="px-3"><Pill tone={ORDEN_TONO[o.estado]}>{o.estado}</Pill></td>
+                  <td className="px-3 text-[13px] whitespace-nowrap text-[#3f3f46]">{o.actualizado}</td>
+                  <td className="px-3 text-[13px] whitespace-nowrap text-[#3f3f46]">{o.creado}</td>
                   {/* El frame pinta de rojo las que vencen pronto. */}
-                  <td className={cn('px-3 text-[13px] whitespace-nowrap', o.urgente ? 'font-semibold text-[#b22626]' : 'text-[#52525b]')}>
+                  <td className={cn('px-3 text-[13px] whitespace-nowrap', o.urgente ? 'font-semibold text-[#b22626]' : 'text-[#3f3f46]')}>
                     {o.vence}
                   </td>
                   <td className="px-3">

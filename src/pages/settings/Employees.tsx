@@ -1,22 +1,27 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  Search, MoreVertical, CirclePlus, Trash2, FileText, Pencil, Ban, Delete, X,
+  Search, CirclePlus, Trash2, FileText, Pencil, Ban,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
+import { SearchButton } from '@/components/ui/search-button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
-import { ICONO_SUELTO } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
+import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { usePhoto } from '@/lib/usePhoto'
 import { EMPLEADOS, type Empleado } from '@/data/employees'
 import { Card, Toggle } from '@/components/settings/primitives'
 import {
-  SelectField, TextField, DateField, DateTextField, FormFooter, LinkPersonCheckbox, FieldLabel,
+  SelectField, TextField, DateField, DateTextField, FormFooter,
 } from '@/components/patients/form'
 import { RolesLocation } from '@/components/settings/RolesLocation'
+import { LinkExistingPerson } from '@/components/settings/LinkExistingPerson'
 import { NewHoursModal } from '@/components/settings/NewHoursModal'
+import { Pill } from '@/components/ui/pill'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 
 /* Settings → Employees. La lista es propia —el Figma de 3864:235190 sólo
    tiene la ficha de un empleado, no la tabla que lleva hasta ahí—, con las
@@ -28,31 +33,11 @@ import { NewHoursModal } from '@/components/settings/NewHoursModal'
    locación, así que se mudó para acá. */
 
 function EstadoPill({ estado }: { estado: Empleado['estado'] }) {
-  return (
-    <span
-      className={cn(
-        'rounded-full border px-2 py-[2px] text-[11px] font-semibold',
-        estado === 'Active'
-          ? 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]'
-          : 'border-[#71717a] bg-[#f4f4f5] text-[#71717a]',
-      )}
-    >
-      {estado}
-    </span>
-  )
+  return <Pill tone={estado === 'Active' ? 'success' : 'neutral'}>{estado}</Pill>
 }
 
 function ProviderPill({ si }: { si: boolean }) {
-  return (
-    <span
-      className={cn(
-        'rounded-full px-2 py-[2px] text-[11px] font-semibold',
-        si ? 'bg-dash-count-bg text-dash-blue-hover' : 'bg-[#f4f4f5] text-[#71717a]',
-      )}
-    >
-      {si ? 'Yes' : 'No'}
-    </span>
-  )
+  return <Pill tone={si ? 'info' : 'neutral'}>{si ? 'Yes' : 'No'}</Pill>
 }
 
 const COLS = {
@@ -69,7 +54,7 @@ export function SettingsEmployees() {
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(EMPLEADOS)
   const [seleccion, setSeleccion] = useState<string[]>([])
-  const [menuAbierto, setMenuAbierto] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const visibles = useMemo(
     () => filas.filter((e) => `${e.nombre} ${e.email} ${e.cargo}`.toLowerCase().includes(q.trim().toLowerCase())),
@@ -101,35 +86,40 @@ export function SettingsEmployees() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">Employees</h1>
-      <p className="mt-1 text-sm text-[#71717a]">Everyone with access to the practice, across every location.</p>
-
-      <div className="mt-5 flex flex-wrap items-center gap-3">
+      <SettingsPageHeader
+        titulo="Employees"
+        bajada="Everyone with access to the practice, across every location."
+        accion={(
+          <Link
+            to="/settings/team/new"
+            data-tour="set-team"
+            className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 shrink-0 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
+          >
+            <CirclePlus className="size-4" /> New Employee
+          </Link>
+        )}
+      >
         <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
           <input
+            ref={inputRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search employees"
             className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
           />
         </div>
+        <SearchButton onClick={() => inputRef.current?.focus()} className="h-9" />
         {seleccion.length > 0 && (
           <span className="bg-dash-count-bg text-dash-blue-hover flex h-9 items-center rounded-md px-3 text-[13px] font-semibold">
             {seleccion.length} selected
           </span>
         )}
-        <Link
-          to="/settings/team/new"
-          className="bg-dash-blue hover:bg-dash-blue-hover ml-auto flex h-9 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
-        >
-          <CirclePlus className="size-4" /> New Employee
-        </Link>
-      </div>
+      </SettingsPageHeader>
 
       <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
         <div className="min-w-[840px]">
-          <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
+          <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
             <span className={COLS.check}>
               <Checkbox on={todasVisibles} onChange={alternarTodas} label="Select all employees" />
             </span>
@@ -158,7 +148,7 @@ export function SettingsEmployees() {
                 <div
                   key={e.id}
                   className={cn(
-                    'flex items-center gap-3 border-b border-[#e7e7e7] px-4 py-3 text-[13px] text-[#3f3f46] last:border-0',
+                    'flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]',
                     marcada && 'bg-dash-count-bg',
                   )}
                 >
@@ -182,59 +172,33 @@ export function SettingsEmployees() {
                   <span className={COLS.estado}>
                     <EstadoPill estado={e.estado} />
                   </span>
-                  <span className={cn('relative', COLS.acciones)}>
-                    <button
-                      type="button"
-                      aria-label={`Actions for ${e.nombre}`}
-                      aria-expanded={menuAbierto === e.id}
-                      onClick={() => setMenuAbierto((p) => (p === e.id ? null : e.id))}
-                      className={ICONO_SUELTO}
-                    >
-                      <MoreVertical className="size-4" />
-                    </button>
-                    {menuAbierto === e.id && (
-                      <div className="absolute top-full right-0 z-30 mt-1 w-[220px] rounded-lg border border-[#e4e4e7] bg-white p-2 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
-                        <p className="px-2 pt-1 pb-2 text-[15px] font-bold text-[#09090b]">Actions</p>
-                        <Link
-                          to={`/settings/team/${e.id}`}
-                          onClick={() => setMenuAbierto(null)}
-                          className="flex items-center gap-2.5 rounded px-2 py-2 text-left text-[13px] font-medium text-[#09090b] hover:bg-[#f4f4f5]"
-                        >
+                  <span className={COLS.acciones}>
+                    <RowActionsMenu label={e.nombre}>
+                      <DropdownMenuItem asChild>
+                        <Link to={`/settings/team/${e.id}`}>
                           <Pencil className="size-4 shrink-0" /> Edit Employee
                         </Link>
-                        {/* "Delete Employee" borra la fila de verdad. Las
-                            otras tres son del mismo peso en el frame —mismo
-                            ícono de "prohibido"— pero necesitarían estados de
-                            cuenta que el sistema todavía no tiene. */}
-                        <button
-                          type="button"
-                          onClick={() => { setMenuAbierto(null); borrar(e) }}
-                          className="flex w-full items-center gap-2.5 rounded px-2 py-2 text-left text-[13px] font-medium text-[#dc2626] hover:bg-[#fff2f2]"
+                      </DropdownMenuItem>
+                      {/* "Delete Employee" borra la fila de verdad. Las
+                          otras tres son del mismo peso en el frame —mismo
+                          ícono de "prohibido"— pero necesitarían estados de
+                          cuenta que el sistema todavía no tiene. */}
+                      <DropdownMenuItem variant="destructive" onSelect={() => borrar(e)}>
+                        <Ban className="size-4 shrink-0" /> Delete Employee
+                      </DropdownMenuItem>
+                      {(['Suspend Employee', 'Terminate Employee', 'Disable'] as const).map((accion) => (
+                        <DropdownMenuItem
+                          key={accion}
+                          variant="destructive"
+                          onSelect={() => aviso.info(`${accion} is not available in this release.`)}
                         >
-                          <Ban className="size-4 shrink-0" /> Delete Employee
-                        </button>
-                        {(['Suspend Employee', 'Terminate Employee', 'Disable'] as const).map((accion) => (
-                          <button
-                            key={accion}
-                            type="button"
-                            onClick={() => {
-                              setMenuAbierto(null)
-                              aviso.info(`${accion} is not available in this release.`)
-                            }}
-                            className="flex w-full items-center gap-2.5 rounded px-2 py-2 text-left text-[13px] font-medium text-[#dc2626] hover:bg-[#fff2f2]"
-                          >
-                            <Ban className="size-4 shrink-0" /> {accion}
-                          </button>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => { setMenuAbierto(null); quitarRolProvider(e) }}
-                          className="flex w-full items-center gap-2.5 rounded px-2 py-2 text-left text-[13px] font-medium text-[#dc2626] hover:bg-[#fff2f2]"
-                        >
-                          <Trash2 className="size-4 shrink-0" /> Remove Provider Role
-                        </button>
-                      </div>
-                    )}
+                          <Ban className="size-4 shrink-0" /> {accion}
+                        </DropdownMenuItem>
+                      ))}
+                      <DropdownMenuItem variant="destructive" onSelect={() => quitarRolProvider(e)}>
+                        <Trash2 className="size-4 shrink-0" /> Remove Provider Role
+                      </DropdownMenuItem>
+                    </RowActionsMenu>
                   </span>
                 </div>
               )
@@ -242,7 +206,7 @@ export function SettingsEmployees() {
           )}
 
           {visibles.length > 0 && (
-            <div className="flex h-[52px] items-center px-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
               <span className="text-xs font-semibold text-[#71717a]">
                 Showing {visibles.length} of {filas.length} employees
               </span>
@@ -290,14 +254,9 @@ export function SettingsEmployeeDetail() {
   const [toggles, setToggles] = useState({ primario: true, firma: true, locum: true })
   const [credenciales, setCredenciales] = useState([0, 1, 2])
   const [vincular, setVincular] = useState(false)
-  const [busqueda, setBusqueda] = useState('')
   const [vinculado, setVinculado] = useState<Empleado | null>(null)
   const [foto, setFoto] = usePhoto(`employee-photo:${empleado.id}`)
   const [nuevaHora, setNuevaHora] = useState(false)
-  const proveedores = EMPLEADOS.filter((e) => e.esProvider && e.id !== empleado.id)
-  const resultados = busqueda.trim() && !vinculado
-    ? proveedores.filter((p) => p.nombre.toLowerCase().includes(busqueda.trim().toLowerCase()))
-    : []
 
   const tabsVisibles: readonly Tab[] = esProvider ? TABS : TABS_BASE
   const alternarProvider = (v: boolean) => {
@@ -362,83 +321,13 @@ export function SettingsEmployeeDetail() {
 
               <h3 className="mt-5 text-sm font-bold text-[#09090b]">General Information</h3>
               <div className="mt-3 flex flex-col gap-3">
-                <LinkPersonCheckbox
-                  checked={vincular}
-                  onChange={(v) => {
-                    setVincular(v)
-                    if (!v) { setBusqueda(''); setVinculado(null) }
-                  }}
+                <LinkExistingPerson
+                  vincular={vincular}
+                  onVincular={setVincular}
+                  excluirId={empleado.id}
+                  vinculado={vinculado}
+                  onSeleccionar={setVinculado}
                 />
-
-                {/* Vincular a un provider ya dado de alta, no cargar uno de
-                    cero: por eso busca sobre `EMPLEADOS` filtrado a
-                    providers, no un directorio propio. */}
-                {vincular && (
-                  <div className="flex flex-col gap-2">
-                    <FieldLabel required>Person</FieldLabel>
-                    <div className="flex items-center gap-2">
-                      <div className="relative flex-1">
-                        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
-                        <input
-                          value={busqueda}
-                          onChange={(e) => { setBusqueda(e.target.value); setVinculado(null) }}
-                          placeholder="Search providers..."
-                          className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-9 pl-9 text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
-                        />
-                        {busqueda && (
-                          <button
-                            type="button"
-                            aria-label="Clear search"
-                            onClick={() => { setBusqueda(''); setVinculado(null) }}
-                            className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-0.5 text-[#a1a1aa] hover:text-[#71717a]"
-                          >
-                            <X className="size-4" />
-                          </button>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        aria-label="Reset selection"
-                        onClick={() => { setBusqueda(''); setVinculado(null) }}
-                        className="bg-dash-blue hover:bg-dash-blue-hover flex size-9 shrink-0 items-center justify-center rounded-md text-white transition-colors"
-                      >
-                        <Delete className="size-4" />
-                      </button>
-                    </div>
-
-                    {resultados.map((p) => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => { setVinculado(p); setBusqueda(p.nombre) }}
-                        className="flex items-center gap-3 rounded-lg border border-[#e4e4e7] bg-white p-3 text-left hover:bg-[#fafafa]"
-                      >
-                        <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">
-                          {p.iniciales}
-                        </span>
-                        <span className="min-w-0 leading-tight">
-                          <span className="block text-[13px] font-semibold text-[#09090b]">{p.nombre}</span>
-                          <span className="block text-[11px] text-[#71717a]">DOB: {p.cumpleanos}</span>
-                        </span>
-                      </button>
-                    ))}
-
-                    {vinculado && (
-                      <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-[#eff6ff] p-3">
-                        <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">
-                          {vinculado.iniciales}
-                        </span>
-                        <span className="min-w-0 leading-tight">
-                          <span className="block text-[13px] font-bold text-[#09090b] uppercase">{vinculado.nombre}</span>
-                          <span className="block text-[11px] text-[#71717a]">
-                            <span className="text-[#a1a1aa]">DOB:</span> {vinculado.cumpleanos}
-                            <span className="text-[#a1a1aa]"> Email:</span> {vinculado.email}
-                          </span>
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
 
               {/* Con el checkbox tildado esta info sale del provider elegido

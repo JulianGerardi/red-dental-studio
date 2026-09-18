@@ -1,0 +1,737 @@
+/* Ajustes propios encima del CSS acotado de react-advanced-odontogram.
+   El paquete se tematiza con los `--odon-*` (eso va en OdontogramEmbed), pero
+   la forma -radios, tipografía, alturas, el header de su demo- no sale de
+   variables: eso se corrige acá.
+
+   Se importa DESPUÉS de odontogram-scoped.css para poder pisarlo. */
+
+/* La librería trae el header de su propia demo -marca, idioma, modo oscuro,
+   GitHub-. Adentro de una ficha clínica no va: la app ya tiene su header. */
+.odonto-embed .topbar {
+  display: none;
+}
+
+/* Controls, Statuses, Tooth details, Orthodontics, Caries y Diagnoses no
+   van ni debajo ni al costado: van en un panel **flotante** que abre un
+   FAB del examen y que se recorre de a un paso (idea de Julián). Así el
+   odontograma se ve entero siempre y el panel ocupa lo mínimo. El paso
+   visible lo decide OdontogramEmbed.
+
+   "Tooth information" (`.tooth-info`) ya NO es un paso más: queda SIEMPRE
+   oculto acá -es sólo la fuente de datos que lee `ToothInfoPanel`-, y se
+   muestra aparte con un ícono propio (`ToothInfoTrigger`, hover card +
+   modal). Todas las reglas de `.controles-abiertos .tooth-info*` de más
+   abajo quedaron sin efecto por eso -tenerlas no hace daño, `display:none`
+   les gana-, pero no se tocan por si el día de mañana vuelve a mostrarse
+   inline. */
+/* Flex y no grid: con `grid-template-columns: 1fr` el panel se iba igual a
+   una columna implícita y terminaba al costado, apretando el chart. */
+.odonto-embed main.layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.odonto-embed .panel,
+.odonto-embed .tooth-info {
+  display: none;
+}
+
+/* El panel va **debajo del gráfico**, en el flujo, no encima: flotando
+   sobre el chart tapaba justo lo que se está mirando (pedido de Julián).
+   Como sólo se ve un paso por vez, ocupa poco. */
+.odonto-embed.controles-abiertos .panel {
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin: 12px 0 0;
+  padding: 14px;
+  max-height: 340px;
+  overflow-y: auto;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 0;
+  /* Blanco, no el verde del fondo punteado del examen. */
+  background: #fff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+/* Todo lo de adentro también en blanco: la librería pinta sus cards con su
+   propio `--card` y sobre el fondo del examen quedaba verdoso. */
+.odonto-embed.controles-abiertos .panel,
+.odonto-embed.controles-abiertos .panel-body,
+.odonto-embed.controles-abiertos .panel-header,
+.odonto-embed.controles-abiertos .panel .card {
+  background: #fff;
+}
+
+/* Adentro del panel las cards no repiten borde ni sombra, y sus filas van
+   en varias columnas: apiladas de a una dejaban media card vacía a la
+   derecha y obligaban a scrollear. */
+.odonto-embed.controles-abiertos .panel .card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  align-content: start;
+  gap: 10px 24px;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.odonto-embed.controles-abiertos .panel .card > .card-title {
+  grid-column: 1 / -1;
+}
+
+/* Lo que no es un par label+control -selectores de superficie, tiras de
+   checkboxes- ocupa la fila entera: partido en columnas queda ilegible. */
+.odonto-embed.controles-abiertos .panel .card > .row:not(:has(> select)),
+.odonto-embed.controles-abiertos .panel .card > .surface-grid,
+.odonto-embed.controles-abiertos .panel .card > .inline-checks {
+  grid-column: 1 / -1;
+}
+
+.odonto-embed.controles-abiertos .panel-header {
+  padding: 0 0 8px;
+  border-bottom: 1px solid #f1f1f4;
+  margin-bottom: 8px;
+}
+
+/* Radios, bordes y tipografía del sistema. */
+.odonto-embed .card,
+.odonto-embed .chart,
+.odonto-embed .panel {
+  border-radius: 12px;
+  border: 1px solid #e4e4e7;
+  box-shadow: none;
+}
+
+.odonto-embed .btn,
+.odonto-embed .btn-sm,
+.odonto-embed .chart-mode-btn {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.odonto-embed .btn-ghost {
+  background: #fff;
+  border: 1px solid #e4e4e7;
+}
+
+.odonto-embed .btn-ghost:hover {
+  background: #fafafa;
+}
+
+/* El azul de la app para los estados activos, en vez del suyo. */
+.odonto-embed .chart-mode-btn.is-active,
+.odonto-embed .btn-toggle[aria-pressed='true'] {
+  background: #1d56bc;
+  color: #fff;
+}
+
+.odonto-embed .chart-title,
+.odonto-embed .card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #09090b;
+}
+
+.odonto-embed .chart-hint,
+.odonto-embed .panel-subtitle {
+  font-size: 12px;
+  color: #71717a;
+}
+
+
+/* Los selects venían con la pastilla celeste de la librería. */
+.odonto-embed select {
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid #e4e4e7;
+  background-color: #fff;
+  color: #09090b;
+  font-weight: 400;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.odonto-embed select:focus {
+  outline: none;
+  border-color: #1d56bc;
+}
+
+/* Los segmentados de la librería (tabs Odontogram/Periodontal y el par
+   Status/Plan) no coincidían entre sí ni con los del resto de la app: unos
+   con radio 6 y otros 8, y el inactivo en su gris. Se igualan al segmentado
+   que ya usan Billing y el Ledger: caja #f1f5f9 con radio 8 y pastillas de
+   radio 6. */
+.odonto-embed .chart-mode-toggle {
+  background: #f1f5f9;
+  border: 0;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.odonto-embed .chart-mode-btn {
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.odonto-embed .chart-mode-btn:hover {
+  background: transparent;
+  color: #3f3f46;
+}
+
+.odonto-embed .chart-mode-btn.is-active,
+.odonto-embed .chart-mode-btn.is-active:hover {
+  background: #1d56bc;
+  color: #fff;
+}
+
+/* Los cinco toggles de vista del chart venían con radio 8 y fondo lavanda. */
+.odonto-embed .btn-icon,
+.odonto-embed .chart-actions button {
+  border-radius: 6px;
+}
+
+.odonto-embed .btn.btn-toggle.btn-icon[aria-pressed='true'] {
+  background: #f0f5ff;
+  border: 1px solid #1d56bc;
+  color: #1d56bc;
+}
+
+.odonto-embed .btn.btn-toggle.btn-icon[aria-pressed='false'] {
+  background: #fff;
+  border: 1px solid #e4e4e7;
+}
+
+/* Julián pidió sacar el botón "Diagnoses" de la barra de tabs: el ícono de
+   "Tooth information" (`ToothInfoTrigger`) ocupa su lugar. */
+.odonto-embed .perio-launch-bar #openCaseDiagnosesBtn {
+  display: none;
+}
+
+/* Tipografía y color del sistema adentro del flotante: la librería usa su
+   propia escala y sus grises. */
+.odonto-embed.controles-abiertos .panel .card-title,
+.odonto-embed.controles-abiertos .tooth-info .card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #09090b;
+}
+
+.odonto-embed.controles-abiertos .panel label,
+.odonto-embed.controles-abiertos .panel .row > span,
+.odonto-embed.controles-abiertos .panel .panel-subtitle {
+  font-size: 12px;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .panel select,
+.odonto-embed.controles-abiertos .panel .btn {
+  font-size: 12px;
+}
+
+.odonto-embed.controles-abiertos .tooth-info,
+.odonto-embed.controles-abiertos .tooth-info p,
+.odonto-embed.controles-abiertos .tooth-info td,
+.odonto-embed.controles-abiertos .tooth-info th {
+  font-size: 12px;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .tooth-info-overview {
+  font-size: 13px;
+  font-weight: 600;
+  color: #09090b;
+}
+
+/* Los selects arrancaban en distinta x porque cada label mide distinto:
+   una grilla con la columna de label fija los alinea. */
+.odonto-embed.controles-abiertos .panel .row:has(> select) {
+  display: grid;
+  grid-template-columns: 124px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.odonto-embed.controles-abiertos .panel .row:has(> select) > select {
+  width: 100%;
+}
+
+/* Filas que quedan sin contenido según la pieza activa: sin esto ocupan su
+   celda de la grilla y llenan la card de huecos. La marca la pone
+   OdontogramEmbed midiendo el alto real, y se limpia en cada cambio.
+   Va con `!important` a propósito: es una utilidad cuyo único trabajo es
+   ganar, y las reglas de layout de más abajo -`.inline-checks` y compañía-
+   son más específicas y la pisaban. */
+.odonto-embed .odonto-vacio {
+  display: none !important;
+}
+
+/* El panel de la librería está pensado para ocupar el alto de su columna;
+   acá va debajo del gráfico y tiene que medir lo que mide su contenido. */
+.odonto-embed.controles-abiertos .panel,
+.odonto-embed.controles-abiertos .panel-body,
+.odonto-embed.controles-abiertos .panel-header {
+  min-height: 0;
+  height: auto;
+  flex: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Rediseño del panel de controles (pedido por comentario en el artifact:
+   "se ve mal y no está alineado a nuestra plataforma"). Sólo diseño: la
+   lógica y los ids de la librería quedan intactos.
+   ───────────────────────────────────────────────────────────────────── */
+
+/* Cabecera de cada card: título a la izquierda, acciones a la derecha y una
+   línea. Antes el botón de plegar flotaba suelto contra el borde. */
+.odonto-embed.controles-abiertos .panel .card > .card-title,
+.odonto-embed.controles-abiertos .tooth-info > .card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 4px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid #f1f1f4;
+  font-size: 13px;
+  font-weight: 700;
+  color: #09090b;
+}
+
+/* Los botones de la cabecera, como los secundarios de la app. */
+.odonto-embed.controles-abiertos .panel .card-title .btn,
+.odonto-embed.controles-abiertos .panel .card-title .icon-btn {
+  height: 28px;
+  min-width: 28px;
+  padding: 0 10px;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .panel .card-title .btn:hover,
+.odonto-embed.controles-abiertos .panel .card-title .icon-btn:hover {
+  background: #fafafa;
+}
+
+/* Label de campo: mismo peso y color que `FieldLabel` del resto de la app. */
+.odonto-embed.controles-abiertos .panel .row > span:first-child {
+  font-size: 12px;
+  font-weight: 500;
+  color: #09090b;
+}
+
+/* Controles: la altura y el borde de nuestros inputs. */
+.odonto-embed.controles-abiertos .panel select,
+.odonto-embed.controles-abiertos .panel input[type='text'],
+.odonto-embed.controles-abiertos .panel input[type='number'] {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  font-size: 13px;
+  color: #09090b;
+}
+
+/* Tiras de checkboxes y toggles: pastillas, no botones sueltos. */
+.odonto-embed.controles-abiertos .panel .inline-checks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.odonto-embed.controles-abiertos .panel .inline-checks label,
+.odonto-embed.controles-abiertos .panel .btn-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .panel .btn-toggle[aria-pressed='true'] {
+  border-color: #1d56bc;
+  background: #f0f5ff;
+  color: #1d56bc;
+}
+
+/* Botones de acción de Statuses (Reset mouth, Primary dentition...). */
+.odonto-embed.controles-abiertos .panel .status-actions .btn,
+.odonto-embed.controles-abiertos .panel .select-actions .btn {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .panel .status-actions .btn:hover,
+.odonto-embed.controles-abiertos .panel .select-actions .btn:hover {
+  background: #fafafa;
+  border-color: #d4d4d8;
+}
+
+/* La tabla del resumen, con la misma cabecera que el resto de las tablas
+   de la app -gris, no el celeste de la librería- y sin cursivas. */
+.odonto-embed.controles-abiertos .tooth-info-table th,
+.odonto-embed.controles-abiertos .tooth-info-table td {
+  border: 1px solid #e7e7e7;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: #3f3f46;
+}
+
+.odonto-embed.controles-abiertos .tooth-info-table thead th {
+  background: #f9f9f9;
+  font-size: 11px;
+  font-weight: 600;
+  color: #71717a;
+  text-transform: none;
+}
+
+.odonto-embed.controles-abiertos .tooth-info-empty,
+.odonto-embed.controles-abiertos .tooth-info-line em,
+.odonto-embed.controles-abiertos .tooth-info em,
+.odonto-embed.controles-abiertos .tooth-info i {
+  font-style: normal;
+  color: #a1a1aa;
+}
+
+.odonto-embed.controles-abiertos .tooth-info-heading {
+  font-weight: 600;
+  color: #09090b;
+}
+
+/* La leyenda en cursiva de abajo de la tabla. */
+.odonto-embed.controles-abiertos .tooth-info-list {
+  font-size: 11px;
+  color: #a1a1aa;
+}
+
+/* Estas dos filas son grupos, no pares label+control: van a lo ancho y en
+   línea, no repartidas en las columnas de la grilla. */
+/* `.row` incluido a propósito: sin él gana `.row:has(> select)` de arriba,
+   que las vuelve a partir en label + control. */
+.odonto-embed.controles-abiertos .panel .row.status-actions,
+.odonto-embed.controles-abiertos .panel .row.status-extra-row,
+.odonto-embed.controles-abiertos .panel .row.select-actions,
+.odonto-embed.controles-abiertos .panel .status-actions,
+.odonto-embed.controles-abiertos .panel .select-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.odonto-embed.controles-abiertos .panel .row.status-extra-row select {
+  flex: 1 1 240px;
+  max-width: 340px;
+}
+
+/* ── Panel más compacto (pedido de Julián: "que no sea tan grande") ──
+   El panel es un accesorio del gráfico, no la pantalla: baja la altura de
+   los controles, los espacios y el techo de la card. */
+.odonto-embed.controles-abiertos .panel,
+.odonto-embed.controles-abiertos .tooth-info {
+  max-height: min(38vh, 300px);
+  padding: 12px 14px;
+}
+
+.odonto-embed.controles-abiertos .panel .card {
+  gap: 8px 20px;
+}
+
+.odonto-embed.controles-abiertos .panel .card > .card-title,
+.odonto-embed.controles-abiertos .tooth-info > .card-title {
+  margin: 0 0 2px;
+  padding: 0 0 8px;
+  font-size: 12px;
+}
+
+.odonto-embed.controles-abiertos .panel select,
+.odonto-embed.controles-abiertos .panel input[type='text'],
+.odonto-embed.controles-abiertos .panel input[type='number'] {
+  height: 32px;
+  font-size: 12px;
+}
+
+.odonto-embed.controles-abiertos .panel .row:has(> select) {
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.odonto-embed.controles-abiertos .panel .card-title .btn,
+.odonto-embed.controles-abiertos .panel .card-title .icon-btn {
+  height: 26px;
+  min-width: 26px;
+  font-size: 11px;
+}
+
+.odonto-embed.controles-abiertos .panel .row.status-actions .btn,
+.odonto-embed.controles-abiertos .panel .row.status-extra-row .btn,
+.odonto-embed.controles-abiertos .panel .status-actions .btn,
+.odonto-embed.controles-abiertos .panel .select-actions .btn {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.odonto-embed.controles-abiertos .panel .inline-checks label,
+.odonto-embed.controles-abiertos .panel .btn-toggle {
+  height: 26px;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+/* La barra de pasos, al tono. */
+
+/* ─── Rediseño del contenido del panel (2ª vuelta) ───────────────────────
+   Lo que fallaba no eran los colores sino la disposición: cada card repetía
+   el título que ya está en la barra de pasos, los pares label+control se
+   comían un ancho enorme y la card quedaba con medio panel vacío. */
+
+/* 1. El título de la card sale: lo dice la barra de abajo. Queda sólo la
+      fila de acciones (Reset, Clear selection), chica y a la derecha. */
+.odonto-embed.controles-abiertos .panel .card > .card-title,
+.odonto-embed.controles-abiertos .tooth-info > .card-title {
+  justify-content: flex-end;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-height: 0;
+}
+
+.odonto-embed.controles-abiertos .panel .card > .card-title > :not(button),
+.odonto-embed.controles-abiertos .tooth-info > .card-title > :not(button) {
+  display: none;
+}
+
+/* 2. Label arriba del control, como los formularios de la app: el par en
+      línea obligaba a una columna de label fija y desperdiciaba el ancho. */
+.odonto-embed.controles-abiertos .panel .row:has(> select) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.odonto-embed.controles-abiertos .panel .row:has(> select) > span:first-child {
+  font-size: 11px;
+  font-weight: 500;
+  color: #71717a;
+}
+
+/* 3. Con el label arriba entran más columnas y más angostas. */
+.odonto-embed.controles-abiertos .panel .card {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px 16px;
+}
+
+/* 4. La card mide lo que mide su contenido: dentro de un `.panel-body` en
+      columna se estiraba hasta el fondo y ese era el vacío. */
+.odonto-embed.controles-abiertos .panel .card {
+  flex: none;
+  align-self: start;
+}
+
+.odonto-embed.controles-abiertos .panel-body {
+  display: block;
+}
+
+.odonto-embed.controles-abiertos .panel,
+.odonto-embed.controles-abiertos .tooth-info {
+  height: auto;
+  max-height: min(34vh, 260px);
+  padding: 12px;
+}
+
+/* Los selects se tocaban entre sí: cada uno tiene que caber en su celda. */
+.odonto-embed.controles-abiertos .panel .row:has(> select) > select {
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* ─── El panel de la librería sale de pantalla ───────────────────────────
+   Los controles ahora los dibuja `OdontogramPanel` con los componentes de
+   esta app; el panel original sigue montado -su lógica y sus ids son los
+   que mandan- pero fuera de vista. Se manda a la izquierda en vez de
+   `display:none` a propósito: hay que poder medir qué controles están
+   visibles para espejarlos, y con `display:none` todos miden cero.
+   El resumen "Tooth information" sí se muestra tal cual: es texto. */
+.odonto-embed.controles-abiertos .panel,
+.odonto-embed.controles-abiertos .tooth-info {
+  position: absolute !important;
+  left: -10000px !important;
+  top: 0 !important;
+  width: 420px !important;
+  max-height: none !important;
+  overflow: visible !important;
+  pointer-events: none;
+}
+
+/* El resumen también lo dibuja un componente propio (`ToothInfoPanel`), así
+   que el nodo de la librería queda oculto como el resto del panel. */
+
+/* El foco de los selects venía con el azul de fábrica de la librería
+   (#3b7bff). Va acá y no en clases de Tailwind porque el CSS de la
+   librería es sin capa y le gana a las utilidades, que sí van en `@layer`. */
+.odonto-embed select:focus,
+.odonto-embed select:focus-visible {
+  border-color: #1d56bc;
+  box-shadow: 0 0 0 3px rgb(29 86 188 / 0.18);
+  outline: none;
+}
+
+/* Las caras lingual/palatina que llenan los 12 cuadrados vacíos de los
+   anteriores: la misma pieza de arriba, más chica. */
+.odonto-embed .tooth-tile.occl-view.cara-lingual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Se acota por alto, no por ancho: el dibujo es más alto que la celda y
+   limitando el ancho quedaba recortado arriba y abajo. */
+.odonto-embed .tooth-tile.occl-view.cara-lingual svg {
+  height: 82%;
+  width: auto;
+  max-width: 100%;
+}
+
+/* ─── Periodontal Status en tabs ──────────────────────────────────────────
+   Las arcadas 1-16 y 32-17 venían una abajo de la otra en un solo scroll
+   larguísimo; `PeriodontalTabs` las separa en dos tabs -Maxillary/
+   Mandibular- para no scrollear ni entre arcadas ni dentro de una. Las
+   columnas de dientes las achica el propio componente (pisa el
+   `gridTemplateColumns` de la librería); acá sólo va el cromo del tab. */
+.odonto-embed .perio-fullgrid-scroll.perio-tabs-raiz {
+  display: block;
+  overflow: visible;
+  border: none;
+}
+
+.odonto-embed .perio-tabs-cabecera {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.odonto-embed .perio-tabs-boton {
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.odonto-embed .perio-tabs-boton-activo {
+  background: #1d56bc;
+  color: #fff;
+}
+
+.odonto-embed .perio-tabs-boton-inactivo {
+  background: #fff;
+  border: 1px solid #e4e4e7;
+  color: #09090b;
+}
+
+.odonto-embed .perio-tabs-boton-inactivo:hover {
+  background: #fafafa;
+}
+
+.odonto-embed .perio-tabs-cuerpo {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e7e7e7;
+  border-radius: 8px;
+}
+
+/* El scroll de la grilla -~330 celdas por arcada- queda adentro del panel en
+   vez de estirar toda la pantalla. La librería ya trae los encabezados de
+   diente con `position: sticky; top: 0` esperando justo esto: sin un
+   contenedor con overflow-y, ese sticky no tiene de dónde agarrarse. Mismo
+   criterio que el panel de Findings/Reviews de al lado (`lg:max-h-[70vh]`
+   en DentalAssessmentExam.tsx): sólo desde `lg`, porque abajo de eso la
+   página ya scrollea entera y un segundo scroll adentro estorba más de lo
+   que ayuda. */
+@media (min-width: 1024px) {
+  .odonto-embed .perio-tabs-cuerpo {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}
+
+/* La tabla entera (selector de superposición + tabs + grilla) rellena el
+   ancho real de la pantalla de quien mira -ni un `max-width` fijo, que en
+   una pantalla ancha dejaba un hueco vacío al lado de la tabla y la
+   achicaba de más en una angosta, ni el ancho de fábrica de la librería,
+   que no reacciona a un resize (ver más abajo). Las columnas de dientes
+   siguen en `fr` (`ajustarColumnas`), así que se reparten ESTE ancho
+   completo en vez de uno fijo calculado en otra pantalla. */
+.odonto-embed .perio-inline-panel {
+  width: 100%;
+}
+
+/* El trazo de "Buccal/Palatal/Lingual PD": arrastrar por el gráfico carga
+   los 48 sitios de esa fila de un tirón (`PerioPdArrastre`). */
+.odonto-embed .perio-fullgrid-graphic-cell:has(.perio-tooth-arch) {
+  cursor: crosshair;
+}
+
+/* Las caries se pintan de rojo -el mismo #dc2626 que ya usa el número de
+   diente con problema en el odontograma principal (Odontogram.tsx)-, no
+   del casi-negro #0a1018 que trae la librería horneado en el SVG de cada
+   pieza. Va con `!important` porque ese color es un `style` inline en el
+   propio `<path>`, no una regla de CSS: gana cualquier selector sin él.
+   `.caries-clon` es la marca que deja `CarasLinguales.tsx` en las 12 caras
+   nuevas: ahí no hay `id` -se le sacan todos para no romper los
+   `getElementById` de la librería-, así que el selector por `id` no las
+   alcanza y quedaban en negro.
+
+   También el `stroke`: algunas caras (buccal, lingual) traen además un
+   contorno negro sólido horneado (`stroke:#000`), y con el relleno a
+   opacity 0.45 -así codifica la profundidad ICDAS, no se toca- ese borde
+   negro es lo que más se ve: de lejos la mancha se leía negra con apenas
+   un tinte rojo, no roja. Puesto en el mismo rojo, el contorno deja de
+   competir con el relleno. */
+.odonto-embed [id^="caries-"],
+.odonto-embed [id^="subcaries-"],
+.odonto-embed .caries-clon {
+  fill: #dc2626 !important;
+  stroke: #dc2626 !important;
+}
+
+/* El "None" del selector de superposición (arriba de cada tab) quedaba
+   ilegible al activarse: el CSS de la librería trae DOS reglas para
+   `.is-active` -una pone el texto en blanco, la otra (más abajo en la
+   hoja, misma especificidad) lo vuelve a poner casi negro sobre el mismo
+   fondo azul-. Se repone el blanco. */
+.odonto-embed .perio-overlay-switch-btn.is-active {
+  color: #fff;
+}
+

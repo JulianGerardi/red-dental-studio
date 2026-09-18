@@ -4,6 +4,7 @@ import { ChevronLeft, Calendar, DollarSign, Circle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3768:803852 (poblado) y 3769:808875 (vacío).
    Sección "Patient Profile — Treatment Plan & Documents". */
@@ -98,7 +99,7 @@ export default function Treatments() {
   const [vacio, setVacio] = useState(false)
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
 
       {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
           El breadcrumb completo repetía lo que ya dice el panel lateral. */}

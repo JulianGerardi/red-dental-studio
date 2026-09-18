@@ -17,6 +17,7 @@ import NotFound from '@/pages/NotFound'
 import { PatientsProvider } from '@/data/patientsStore'
 import { Toaster } from '@/components/ui/toaster'
 import Scheduling from '@/pages/Scheduling'
+import Billing from '@/pages/Billing'
 import UnderConstruction from '@/pages/UnderConstruction'
 import { SettingsLayout, SettingsGeneral, SettingsPlaceholder } from '@/pages/Settings'
 import { SettingsLocations } from '@/pages/settings/Locations'
@@ -24,9 +25,13 @@ import { SettingsLocationDetail } from '@/pages/settings/LocationDetail'
 import { SettingsNewLocation } from '@/pages/settings/NewLocation'
 import { SettingsEmployees, SettingsEmployeeDetail } from '@/pages/settings/Employees'
 import { SettingsNewEmployee } from '@/pages/settings/NewEmployee'
+import { SettingsAccounts } from '@/pages/settings/Accounts'
+import { SettingsLedgerOptions } from '@/pages/settings/LedgerOptions'
+import Help from '@/pages/Help'
+import { HelpProvider } from '@/components/help/HelpProvider'
 
 const SETTINGS_PLACEHOLDERS = [
-  'account', 'roles', 'parameters',
+  'roles', 'parameters',
   'finance', 'finance/fee-schedule', 'finance/carriers', 'finance/coverage-table',
   'libraries', 'patient-portal', 'security', 'preferences',
 ]
@@ -40,6 +45,7 @@ export default function App() {
     <PatientsProvider>
     <Toaster />
     <Router>
+      <HelpProvider>
       <Routes>
         {/* Auth, fuera del shell */}
         <Route path="/login" element={<Login />} />
@@ -61,13 +67,15 @@ export default function App() {
           <Route path="patients/:id/relationships" element={<Relationships />} />
           <Route path="patients/:id/relationships/new" element={<AddRelationship />} />
           <Route path="scheduling" element={<Scheduling />} />
+          <Route path="billing" element={<Billing />} />
 
-          {/* Las cuatro comparten el mismo placeholder en el original.
+          {/* Las tres comparten el mismo placeholder en el original.
               /reports va al mismo sitio: en el original es un monitor de latencia
               interno ("API Monitor"), no una pantalla de producto. */}
-          {['billing', 'message', 'contacts', 'documents', 'reports', 'help'].map((p) => (
+          {['message', 'contacts', 'documents', 'reports'].map((p) => (
             <Route key={p} path={p} element={<UnderConstruction />} />
           ))}
+          <Route path="help" element={<Help />} />
 
           <Route path="settings" element={<SettingsLayout />}>
             <Route index element={<Navigate to="/settings/general" replace />} />
@@ -78,6 +86,8 @@ export default function App() {
             <Route path="team" element={<SettingsEmployees />} />
             <Route path="team/new" element={<SettingsNewEmployee />} />
             <Route path="team/:employeeId" element={<SettingsEmployeeDetail />} />
+            <Route path="accounts" element={<SettingsAccounts />} />
+            <Route path="ledger" element={<SettingsLedgerOptions />} />
             {SETTINGS_PLACEHOLDERS.map((p) => (
               <Route key={p} path={p} element={<SettingsPlaceholder />} />
             ))}
@@ -86,6 +96,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      </HelpProvider>
     </Router>
     </PatientsProvider>
   )

@@ -66,3 +66,70 @@ y popovers del contenido usan `z-50` y lo siguen tapando, que es lo correcto.
 Es el mismo tipo de bug que el `overflow-y-auto` que recortaba el flotante: en
 los dos casos una propiedad del contenedor cambia lo que puede hacer un hijo
 absoluto.
+
+## Menú de cuenta en el header (2026-09-08)
+
+La flecha al lado del nombre no abría nada. Ahora despliega el menú que pasó
+Julián en captura: título **My Account**, separador, **Profile · Suscription
+· Support**, separador, **Help center · Log out**. Mismo `DropdownMenu` de
+shadcn que ya usan el picker de columnas y los filtros.
+
+**"Suscription" va con esa ortografía a propósito.** Así está en el diseño y
+acá el contenido se replica tal cual -misma regla que dejó "Start Enconter"
+en el panel del paciente y el título "New Credit (+) Adjustment" en un botón
+que dice "Charge Adjustment (+)"-.
+
+Destinos: Profile → `/settings/account`, Suscription → `/billing`, Support y
+Help center → `/help`, y **Log out → `/login`** con su toast. Ese Log out es,
+además, la única puerta de entrada al login desde la app: antes `/login`
+existía como ruta pero no había forma de llegar sin escribir la URL, que es
+por lo que Julián no lo veía.
+
+## Notificaciones: banner arriba + campana (2026-09-08)
+
+Pedido de Julián. Son **tareas pendientes**, no avisos de paso: quedan hasta
+que se resuelven -para lo efímero ya están los toasts-.
+
+**Banner**, arriba de todo y debajo del header. Muestra una por vez con
+flechas ‹ › y el contador al medio. Probado tal cual lo describió:
+"1 of 2 · Document awaiting your signature" → siguiente → "2 of 2 · Referral
+expires today" → anterior → vuelve a la primera.
+
+**El cursor se recorta al ocultar**, así nunca queda apuntando a algo que ya
+no se muestra: verificado parado en "2 of 2", ocultando esa, y el banner pasa
+a mostrar la que queda en vez de vaciarse. Con una sola pendiente las flechas
+y el contador desaparecen -no hay entre qué moverse-.
+
+**La X del banner no borra: oculta.** Corrección de Julián. La tarea sigue
+pendiente y sigue en la campana -borrarla de verdad sería dar por hecha una
+tarea que nadie completó-, así que la X sólo la saca del banner y avisa con
+un toast ("Moved to notifications"). Por eso el badge de la campana **no
+baja** al ocultar: verificado, queda en 2 con una sola en el banner.
+
+**Abrirla desde la campana la devuelve al banner**, además de llevar a la
+tarea: vuelve al estado de siempre, sin nada escondido. Mientras está oculta,
+la campana se lo dice con un "Hidden from banner" debajo del detalle. La
+campana ya no tiene X propia: no hay forma de borrar una tarea sin
+completarla, que es justo lo que Julián pidió.
+
+**La campana aloja las mismas**: no es una lista aparte. Lleva el número de
+pendientes como badge, las lista con su detalle, cada una se puede descartar
+desde ahí, y sin pendientes dice "You're all caught up".
+
+El estado vive en `AppShell`, no en cada pantalla: tiene que sobrevivir a la
+navegación y lo comparten banner y campana.
+
+**Color: ámbar, no azul** (pedido de Julián). Se reusa el par de "atención"
+que el proyecto ya tenía -`#fffbeb` de fondo con `#b45309`, el mismo que
+usan `GuarantorBanner` y `NewHoursModal` y el que declara el badge
+`warning`- en vez de inventar un amarillo nuevo. El azul lo hacía leer como
+información; en ámbar se lee como algo pendiente de hacer.
+
+## El panel del paciente se re-abría al cambiar de ítem (2026-09-08)
+
+Colapsabas el panel, clickeabas otra sección y volvía a aparecer expandido.
+El motivo: `colapsado` era `useState`, y el panel **se vuelve a montar en
+cada pantalla del paciente** -cada página renderiza su propia instancia-.
+Se pasa al mismo mecanismo fuera de React que ya usaba el botón de encuentro
+en ese archivo, y por la misma razón. Verificado: colapsar en Ledger, ir a
+Treatments, sigue en 60px.

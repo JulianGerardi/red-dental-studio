@@ -8,6 +8,7 @@ import { Odontogram } from '@/components/clinical/Odontogram'
 import { makeMockExam } from '@/data/odontogram'
 import { ClinicalTopBar } from '@/components/clinical/ClinicalTopBar'
 import { ClinicalToolbar } from '@/components/clinical/ClinicalToolbar'
+import { DentalAssessmentExam } from '@/components/clinical/DentalAssessmentExam'
 import { TreatmentPlanList } from '@/components/clinical/TreatmentPlanList'
 import { ProblemList } from '@/components/clinical/ProblemList'
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
@@ -128,7 +129,9 @@ export default function ClinicalMode() {
           ? <RadiographyPanel />
           : pestana === 'Treatment Plan'
             ? <TreatmentPlanSection />
-            : (
+            : pestana === 'DentAssmt'
+              ? <DentalAssessmentExam />
+              : (
           <div className="rounded-xl border border-[#e4e4e7] bg-white">
             <EmptyState
               icon={Stethoscope}
@@ -148,8 +151,11 @@ export default function ClinicalMode() {
        Las dos barras llegan al borde derecho repartiendo el sobrante en sus
        huecos: ningún botón cambia de tamaño y la estructura aguanta a cualquier
        ancho. El tope de 1440 existe por eso mismo: sin él, a 1920 los huecos de
-       la botonera se van a 90px y la fila se desarma. */
-    <div className="min-h-svh bg-[#fafbfe] p-4 sm:p-[30px] lg:px-12">
+       la botonera se van a 90px y la fila se desarma.
+
+       El fondo va en blanco por pedido de Julián en un comentario del
+       artifact; el Figma usa el #fafbfe del resto de las pantallas. */
+    <div className="min-h-svh bg-white p-4 sm:p-[30px] lg:px-12">
       <div className="mx-auto w-full max-w-[1440px]">
       <ClinicalTopBar
         volverA={`/patients/${patient.id}`}

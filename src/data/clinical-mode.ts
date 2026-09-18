@@ -109,12 +109,6 @@ export const PROBLEMAS: Problema[] = [
   { id: 'p7', fecha: '2024/11/05', pieza: 19, superficie: 'DL', condicion: 'Carries',     examen: 'Intra Oral',        proveedor: 'Perez Martinez',  nota: 'Recurrent caries under old amalgam.', estado: 'Active' },
 ]
 
-export const ESTADO_PILL: Record<Problema['estado'], string> = {
-  Active: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Resolved: 'border-[#595959] bg-[#f5f5f5] text-[#595959]',
-  Monitoring: 'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
-}
-
 /* Los dos textos del panel lateral que abren las pills verdes de la barra. */
 export const PANELES = {
   TR: {
@@ -148,15 +142,6 @@ export const ULTIMA_CONDICION = {
 
 export type EstadoOrden =
   | 'Pending' | 'Canceled' | 'Rejected' | 'Delayed' | 'Requested' | 'Delivered'
-
-export const ORDEN_PILL: Record<EstadoOrden, string> = {
-  Pending:   'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
-  Canceled:  'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
-  Rejected:  'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
-  Delayed:   'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
-  Requested: 'border-[#6633a6] bg-[#f5f0ff] text-[#6633a6]',
-  Delivered: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-}
 
 export type OrdenLab = {
   id: string
