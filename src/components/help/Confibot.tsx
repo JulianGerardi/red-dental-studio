@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bot, X, ArrowUp, Sparkles, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react'
+import { Bot, X, ArrowUp, Sparkles, ChevronRight } from 'lucide-react'
 import { TOPICS, MODULES, puntuarTema } from './topics'
 
 /* Sin IA real: sólo búsqueda por palabras clave sobre TOPICS -decisión de
@@ -44,9 +44,13 @@ function buscarRespuesta(consulta: string): Mensaje {
     : { de: 'bot', texto: 'I couldn\'t find that one. I know about the dashboard, scheduling, patients, clinical mode and settings — try naming one of those.' }
 }
 
-export function Confibot({ onShowOnScreen }: { onShowOnScreen: (topicId: string) => void }) {
-  const [abierto, setAbierto] = useState(false)
-  const [recogido, setRecogido] = useState(false)
+export function Confibot({
+  abierto, onClose, onShowOnScreen,
+}: {
+  abierto: boolean
+  onClose: () => void
+  onShowOnScreen: (topicId: string) => void
+}) {
   const [borrador, setBorrador] = useState('')
   const [historial, setHistorial] = useState<Mensaje[]>(() => cargarHistorial())
   const listaRef = useRef<HTMLDivElement>(null)
@@ -68,44 +72,11 @@ export function Confibot({ onShowOnScreen }: { onShowOnScreen: (topicId: string)
     setHistorial((h) => [...h, { de: 'user', texto: q }, buscarRespuesta(q)])
   }
 
-  if (!abierto) {
-    if (recogido) {
-      return (
-        <button
-          type="button" onClick={() => setRecogido(false)} aria-label="Bring Confibot back"
-          className="fixed right-4 bottom-0 z-40 flex h-8 items-center gap-1.5 rounded-t-xl bg-[linear-gradient(110deg,#1d56bc,#4d8bff,#0043c7,#1d56bc)] bg-[length:200%_100%] px-3 text-white shadow-lg hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] sm:right-6"
-        >
-          <ChevronUp className="size-4 shrink-0" />
-          <span className="text-[13px] font-semibold">Confibot</span>
-        </button>
-      )
-    }
-    return (
-      <div className="fixed right-4 bottom-4 z-40 flex flex-col items-end gap-1 sm:right-6 sm:bottom-6">
-        <button
-          type="button" onClick={() => setRecogido(true)} aria-label="Tuck Confibot away"
-          className="flex size-6 items-center justify-center rounded-full border border-[#e4e4e7] bg-white text-[#71717a] shadow-sm hover:text-[#09090b]"
-        >
-          <ChevronDown className="size-3.5" />
-        </button>
-        <div className="group relative">
-          <span
-            aria-hidden
-            className="pointer-events-none absolute -inset-[5px] rounded-full bg-[linear-gradient(110deg,#1d56bc,#2f74f5,#0049d1,#1d56bc)] bg-[length:200%_100%] opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] group-focus-within:opacity-100"
-          />
-          <button
-            type="button" onClick={() => setAbierto(true)} aria-label="Open Confibot"
-            className="relative flex h-12 items-center rounded-full bg-[linear-gradient(110deg,#1d56bc,#2f74f5,#0049d1,#1d56bc)] bg-[length:200%_100%] px-3.5 text-white shadow-lg ring-white transition-[padding,box-shadow] duration-300 group-hover:pr-5 group-hover:ring-2 group-focus-within:pr-5 group-focus-within:ring-2"
-          >
-            <Bot className="size-5 shrink-0" />
-            <span className="max-w-0 overflow-hidden text-sm font-semibold whitespace-nowrap opacity-0 transition-all duration-300 group-hover:ml-2 group-hover:max-w-[90px] group-hover:opacity-100 group-focus-within:ml-2 group-focus-within:max-w-[90px] group-focus-within:opacity-100">
-              Confibot
-            </span>
-          </button>
-        </div>
-      </div>
-    )
-  }
+  /* El disparador ya no flota sobre la pantalla -tapaba otros botones
+     flotantes, como el de Appointment requests en Scheduling-: ahora vive en
+     el menú (Sidebar.tsx) y acá sólo queda la hoja de chat, montada nada más
+     mientras está abierta. */
+  if (!abierto) return null
 
   const preguntas = historial.filter((m) => m.de === 'user').length
 
@@ -123,7 +94,7 @@ export function Confibot({ onShowOnScreen }: { onShowOnScreen: (topicId: string)
             <span className="block text-[11px] text-[#a1a1aa]">Here to explain the app</span>
           </span>
           <button
-            type="button" aria-label="Close Confibot" onClick={() => setAbierto(false)}
+            type="button" aria-label="Close Confibot" onClick={onClose}
             className="ml-auto flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]"
           >
             <X className="size-4" />
@@ -154,7 +125,7 @@ export function Confibot({ onShowOnScreen }: { onShowOnScreen: (topicId: string)
                   return (
                     <button
                       key={id} type="button"
-                      onClick={() => { onShowOnScreen(t.id); setAbierto(false) }}
+                      onClick={() => { onShowOnScreen(t.id); onClose() }}
                       className="group flex w-full items-center gap-2 rounded-lg border border-[#e4e4e7] bg-white px-3 py-2 text-left hover:border-[#1d56bc]"
                     >
                       <span className="min-w-0 flex-1">

@@ -174,7 +174,7 @@ export default function Scheduling() {
                 onClick={() => setView(v)}
                 className={cn(
                   'h-8 rounded-md px-4 text-xs font-medium transition-colors',
-                  view === v ? 'bg-dash-blue text-white' : 'text-[#a3a9b8] hover:text-[#71717a]',
+                  view === v ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
                 )}
               >
                 {v}

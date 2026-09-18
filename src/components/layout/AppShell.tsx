@@ -11,7 +11,7 @@ import { aviso } from '@/components/ui/toaster'
 export function AppShell() {
   const [expanded, setExpanded] = useState(false)
   const { pathname } = useLocation()
-  const { showOnScreen } = useHelp()
+  const { showOnScreen, confibotAbierto, closeConfibot } = useHelp()
 
   /* Las notificaciones viven acá y no en cada pantalla: son tareas del
      usuario, tienen que sobrevivir a la navegación y las comparten el
@@ -61,14 +61,11 @@ export function AppShell() {
           onCursor={setCursor}
           onOcultar={ocultarDelBanner}
         />
-        {/* El Confibot vive fijo en la esquina inferior derecha, justo donde
-            caen los Cancel/Save de los formularios. Se reserva su alto acá
-            -una sola vez, en el shell- para que ningún control quede debajo. */}
-        <main className="bg-page-background flex-1 overflow-x-hidden pb-24 sm:pb-28">
+        <main className="bg-page-background flex-1 overflow-x-hidden">
           <Outlet />
         </main>
       </div>
-      <Confibot onShowOnScreen={showOnScreen} />
+      <Confibot abierto={confibotAbierto} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
     </div>
   )
 }

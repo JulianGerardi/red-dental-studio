@@ -416,13 +416,6 @@ body { font-family: var(--font-sans); }
   55%,100% { transform: translate(0, 0) scale(1); }
 }
 
-/* El botón de Confibot: el azul recorre el degradé mientras está el mouse
-   encima, para que se lea como vivo y no pintado. */
-@keyframes confibot-sheen {
-  from { background-position: 0% 50%; }
-  to   { background-position: 200% 50%; }
-}
-
 /* Las manijas de las columnas se muestran solas una vez, en cascada de
    izquierda a derecha, para que se note que la tabla se puede ajustar.
    Después vuelven a aparecer sólo con el mouse encima. */
@@ -458,7 +451,7 @@ body { font-family: var(--font-sans); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [class*="tour-"], [style*="tour-"], [style*="coach-spotlight"], [class*="confibot-sheen"],
+  [class*="tour-"], [style*="tour-"], [style*="coach-spotlight"],
   [style*="col-hint"], [class*="col-grip-in"], [class*="login-fila"], [class*="login-diente"] {
     animation: none !important;
   }

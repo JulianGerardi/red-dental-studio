@@ -7,7 +7,12 @@ import { CoachMark } from './CoachMark'
    (Clinical Mode) navegan a una ruta que vive fuera del shell, y el
    CoachMark tiene que sobrevivir ese salto. Ver
    design-reference/figma/modulos/help.md. */
-const HelpContext = createContext<{ showOnScreen: (topicId: string) => void } | null>(null)
+const HelpContext = createContext<{
+  showOnScreen: (topicId: string) => void
+  confibotAbierto: boolean
+  toggleConfibot: () => void
+  closeConfibot: () => void
+} | null>(null)
 
 export function useHelp() {
   const ctx = useContext(HelpContext)
@@ -21,6 +26,11 @@ export function HelpProvider({ children }: { children: ReactNode }) {
   const coaching = coachingId ? (TOPICS.find((t) => t.id === coachingId) ?? null) : null
   const hermanos = coaching ? TOPICS.filter((t) => t.module === coaching.module) : []
   const indice = coaching ? hermanos.findIndex((t) => t.id === coaching.id) : -1
+  /* El Confibot ya no flota solo sobre la pantalla -tapaba otros botones
+     flotantes, como el de Appointment requests en Scheduling-: el disparador
+     vive en el menú (ver Sidebar.tsx) y este estado es lo único que los
+     conecta. */
+  const [confibotAbierto, setConfibotAbierto] = useState(false)
 
   function showOnScreen(topicId: string) {
     const tema = TOPICS.find((t) => t.id === topicId)
@@ -30,7 +40,14 @@ export function HelpProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <HelpContext.Provider value={{ showOnScreen }}>
+    <HelpContext.Provider
+      value={{
+        showOnScreen,
+        confibotAbierto,
+        toggleConfibot: () => setConfibotAbierto((v) => !v),
+        closeConfibot: () => setConfibotAbierto(false),
+      }}
+    >
       {children}
       {coaching && (
         <CoachMark
