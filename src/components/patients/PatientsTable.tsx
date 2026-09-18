@@ -8,7 +8,9 @@ import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 /* Figma 3638:61352 — la capa se llama `table/referral-table`: es el componente
    de referrals reusado para pacientes. De ahí sale el "referrals" del footer. */
 
-export type PatientStatus = 'Completed' | 'Proposed' | 'In Progress'
+/* Pedido explícito de Julián: reemplazar el status de tratamiento
+   (Completed/Proposed/In Progress) por si el paciente está activo o no. */
+export type PatientStatus = 'Active' | 'Inactive'
 
 export type PatientRow = {
   id: string
@@ -20,9 +22,8 @@ export type PatientRow = {
 }
 
 export const STATUS_TONO: Record<PatientStatus, PillTone> = {
-  Completed: 'success',
-  Proposed: 'warning',
-  'In Progress': 'info',
+  Active: 'success',
+  Inactive: 'neutral',
 }
 
 /* Anchos fijos por celda; el sobrante se reparte con justify-between,
