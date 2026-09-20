@@ -2,37 +2,199 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, GalleryVerticalEnd, CalendarRange, Wallet, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import capturaDashboard from '@/assets/login/dashboard.png'
-import capturaLedger from '@/assets/login/ledger.png'
-import capturaDental from '@/assets/login/dental.png'
+import { Pill, type PillTone } from '@/components/ui/pill'
+import { EVENTS, type ApptState } from '@/components/scheduling/calendar-data'
+import { MOVIMIENTOS, conSaldo, moneda, GUARANTOR } from '@/data/ledger'
+import { MANDIBULAR } from '@/data/odontogram'
 
 /* Figma 3749:72258. Ver design-reference/figma/modulos/login.md.
-   El panel de la izquierda lo pinta azul liso; acá lleva ese mismo azul pero
-   mostrando pantallas reales de la app -misma idea que el login del proyecto
-   hermano, con nuestros datos y nuestros tokens-.
+   El panel de la izquierda lo pinta azul liso; acá lleva widgets propios con
+   datos reales de la app (misma fuente que Scheduling/Ledger/Dental
+   Assessment) en vez de una captura de pantalla -eso se probó y no convenció:
+   se veía como una foto recortada, no como parte del producto-.
 
-   Antes había una miniatura de cada pantalla armada a mano -filas, texto
-   propio a 7-12px- que Julián vio "muy chico" y con el texto grande de
-   arriba desalineado entre slides. Ahora son capturas reales (Dashboard,
-   Ledger y Dental Assessment del propio dev server, PNG en src/assets/login),
-   así el tamaño de letra es el mismo que en la app y no algo redibujado. */
+   Julián pidió volver a este camino (componentes armados a mano, no capturas)
+   pero con "otro estilo": la primera versión tenía texto a 7-12px, ilegible.
+   Acá los mismos datos van más grandes, con el componente Pill real de la
+   app para los estados en vez de badges de un solo uso. */
 const PITCH = [
   {
     lead: 'Your whole day,', acento: 'at a glance.',
     nota: 'Appointments, rooms and the waiting list together from the first coffee.',
-    img: capturaDashboard, icon: CalendarRange,
+    icon: CalendarRange,
   },
   {
     lead: 'Every charge,', acento: 'accounted for.',
     nota: 'Charges, insurance and payments running on one balance you can trust.',
-    img: capturaLedger, icon: Wallet,
+    icon: Wallet,
   },
   {
     lead: 'Chart a tooth', acento: 'in one click.',
     nota: 'Findings land on the piece you are already looking at.',
-    img: capturaDental, icon: Check,
+    icon: Check,
   },
 ]
+
+function Tarjeta({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="w-full rounded-2xl bg-white p-5 shadow-[0_18px_50px_rgb(9_20_54/0.22)]">
+      {children}
+    </div>
+  )
+}
+
+function Rotulo({ children, nota }: { children: React.ReactNode; nota: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-[11px] font-semibold tracking-wide text-[#a1a1aa] uppercase">{children}</span>
+      <span className="text-dash-blue truncate text-[12px] font-semibold">{nota}</span>
+    </div>
+  )
+}
+
+/* Fila compartida por Agenda y Ledger -mismo recorte: avatar/ícono + texto +
+   etiqueta- para que las tres tarjetas se sientan una sola familia visual. */
+function Fila({
+  avatar, titulo, subtitulo, delay, children,
+}: {
+  avatar: React.ReactNode
+  titulo: string
+  subtitulo: string
+  delay: number
+  children?: React.ReactNode
+}) {
+  return (
+    <div
+      style={{ animationDelay: `${delay}ms` }}
+      className="motion-safe:animate-[login-fila_5.2s_ease-out_infinite] flex items-center gap-3 rounded-xl border border-[#f1f1f4] px-3.5 py-3"
+    >
+      {avatar}
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[13px] font-bold text-[#09090b]">{titulo}</span>
+        <span className="block truncate text-[11px] text-[#a1a1aa]">{subtitulo}</span>
+      </span>
+      {children}
+    </div>
+  )
+}
+
+const ESTADO_TONO: Record<ApptState, PillTone> = {
+  Proposed: 'warning',
+  'Check-in': 'success',
+  Booked: 'info',
+  'In progress': 'purple',
+  Fulfilled: 'success',
+  'No-show': 'neutral',
+  Cancelled: 'neutral',
+}
+
+/** Turnos del día, salidos del mismo `EVENTS` que dibuja el calendario. */
+function PanelAgenda() {
+  const filas = EVENTS.slice(0, 3)
+  return (
+    <Tarjeta>
+      <Rotulo nota={`${EVENTS.length} today`}>Today&apos;s appointments</Rotulo>
+      <div className="mt-3 flex flex-col gap-2">
+        {filas.map((e, i) => (
+          <Fila
+            key={e.patient}
+            delay={i * 320}
+            avatar={
+              <span className="bg-dash-blue/10 text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold">
+                {e.patient.split(' ').slice(0, 2).map((p) => p[0]).join('')}
+              </span>
+            }
+            titulo={e.patient}
+            subtitulo={`${e.room} · ${e.reason}`}
+          >
+            <Pill tone={ESTADO_TONO[e.state]} size="sm" className="shrink-0">{e.state}</Pill>
+          </Fila>
+        ))}
+      </div>
+    </Tarjeta>
+  )
+}
+
+/** Las últimas líneas del ledger, con el saldo que corre de verdad. */
+function PanelLedger() {
+  const filas = conSaldo(MOVIMIENTOS).slice(-3)
+  const saldo = MOVIMIENTOS.reduce((a, m) => a + m.monto, 0)
+  return (
+    <Tarjeta>
+      <Rotulo nota={GUARANTOR}>Ledger</Rotulo>
+      <div className="mt-3 flex flex-col gap-2">
+        {filas.map((m, i) => (
+          <Fila
+            key={m.id}
+            delay={i * 320}
+            avatar={
+              <span className="text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f0f5ff] text-[9px] font-bold">
+                {m.codigo === '—' ? m.tipo.slice(0, 3).toUpperCase() : m.codigo}
+              </span>
+            }
+            titulo={m.descripcion}
+            subtitulo={m.provider}
+          >
+            <span className={cn('shrink-0 text-[12px] font-semibold tabular-nums', m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]')}>
+              {moneda(m.monto)}
+            </span>
+          </Fila>
+        ))}
+      </div>
+      <div className="mt-3 flex items-center justify-between rounded-xl bg-[#f6f8fc] px-3.5 py-3">
+        <span className="text-[11px] text-[#71717a]">Balance due</span>
+        <span className="text-dash-blue text-[16px] leading-none font-extrabold tabular-nums">{moneda(saldo)}</span>
+      </div>
+    </Tarjeta>
+  )
+}
+
+/* Las piezas que el panel marca como cargadas. Fijas a propósito: es una
+   vitrina, no el odontograma real. */
+const CARGADAS = new Set([19, 30, 32])
+
+/** La arcada inferior, llenándose diente por diente. */
+function PanelOdontograma() {
+  return (
+    <Tarjeta>
+      <Rotulo nota="Mandibular">Dental assessment</Rotulo>
+      <div className="mt-3.5 flex justify-between gap-1">
+        {MANDIBULAR.map((n, i) => (
+          <span
+            key={n}
+            style={{ animationDelay: `${i * 90}ms` }}
+            className={cn(
+              'motion-safe:animate-[login-diente_5.2s_ease-out_infinite] flex h-9 flex-1 items-end justify-center rounded-[6px] pb-1 text-[8px] font-bold',
+              CARGADAS.has(n) ? 'bg-dash-blue text-white' : 'bg-[#f1f5f9] text-[#a1a1aa]',
+            )}
+          >
+            {n}
+          </span>
+        ))}
+      </div>
+      <div className="mt-3 flex flex-col gap-2">
+        {[
+          { code: 'D2740', label: 'Crown – porcelain/ceramic', pieza: 'Tooth 19 · ML' },
+          { code: 'D7240', label: 'Removal of impacted tooth', pieza: 'Tooth 32 · DL' },
+        ].map((f, i) => (
+          <Fila
+            key={f.code}
+            delay={1400 + i * 320}
+            avatar={
+              <span className="text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f0f5ff] text-[9px] font-bold">
+                {f.code}
+              </span>
+            }
+            titulo={f.label}
+            subtitulo={f.pieza}
+          />
+        ))}
+      </div>
+    </Tarjeta>
+  )
+}
+
+const PANELES = [PanelAgenda, PanelLedger, PanelOdontograma]
 
 export default function Login() {
   const navigate = useNavigate()
@@ -40,33 +202,18 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [clave, setClave] = useState('')
   const [slide, setSlide] = useState(0)
-  /* Sube en cada cambio de slide -automático o manual- sólo para que la
-     barra de progreso del activo se remonte y arranque de cero; el número
-     en sí no significa nada. */
-  const [tick, setTick] = useState(0)
 
-  /* Depende de `slide` para reiniciar el timer cuando el usuario toca una
-     barra a mano: si no, el próximo auto-avance podía llegar a mitad de
-     camino y la barra de progreso quedaba desincronizada del cambio real. */
   useEffect(() => {
-    const id = setTimeout(() => {
-      setSlide((s) => (s + 1) % PITCH.length)
-      setTick((t) => t + 1)
-    }, 5200)
-    return () => clearTimeout(id)
-  }, [slide])
-
-  const irA = (i: number) => {
-    setSlide(i)
-    setTick((t) => t + 1)
-  }
+    const id = setInterval(() => setSlide((s) => (s + 1) % PITCH.length), 5200)
+    return () => clearInterval(id)
+  }, [])
 
   const activo = PITCH[slide]
+  const Panel = PANELES[slide]
 
   return (
     <div className="flex min-h-svh bg-white">
-      {/* Panel del Figma: azul de punta a punta. Acá lleva las pantallas
-          reales de la app en vez de un campo liso. */}
+      {/* Panel del Figma: azul de punta a punta. */}
       <div className="relative hidden w-[46%] shrink-0 flex-col items-center overflow-hidden bg-[linear-gradient(150deg,#1d56bc_0%,#2f74f5_45%,#0043c7_100%)] px-10 py-12 lg:flex">
         <span aria-hidden className="pointer-events-none absolute -top-24 -left-24 size-[420px] rounded-full bg-white/10 blur-3xl" />
         <span aria-hidden className="pointer-events-none absolute -right-32 -bottom-32 size-[420px] rounded-full bg-white/10 blur-3xl" />
@@ -96,53 +243,24 @@ export default function Login() {
           ))}
         </div>
 
-        {/* Captura real de la app (Dashboard/Ledger/Dental Assessment del
-            propio dev server, ver src/assets/login) en vez de una miniatura
-            redibujada a mano. Se remonta en cada slide para que la entrada
-            arranque de cero y no quede congelada en el último cuadro. */}
-        <div className="relative flex w-full max-w-[420px] min-h-0 flex-1 items-center justify-center">
-          <div
-            key={slide}
-            className="motion-safe:animate-[login-fila_600ms_ease-out] w-full overflow-hidden rounded-2xl bg-white shadow-[0_18px_50px_rgb(9_20_54/0.22)]"
-          >
-            {/* El zoom lento va en la imagen y no en la tarjeta: la tarjeta
-                sólo entra una vez, la imagen sigue "respirando" todo el
-                tiempo que queda en pantalla. */}
-            <img
-              src={activo.img}
-              alt=""
-              className="motion-safe:animate-[login-zoom_5200ms_ease-out_forwards] aspect-[3/2] w-full object-cover object-top"
-            />
-          </div>
-          <span
-            key={`badge-${slide}`}
-            className="text-dash-blue motion-safe:animate-[login-badge-in_450ms_cubic-bezier(0.34,1.56,0.64,1)_both] absolute -top-3 -left-6 flex size-9 items-center justify-center rounded-full bg-white shadow-[0_10px_24px_rgb(9_20_54/0.25)]"
-          >
+        {/* Se remonta en cada slide para que la entrada arranque de cero y el
+            panel no quede congelado en el último cuadro. */}
+        <div className="relative flex w-full max-w-[360px] min-h-0 flex-1 items-center justify-center">
+          <Panel key={slide} />
+          <span className="text-dash-blue absolute -top-3 -left-6 flex size-9 items-center justify-center rounded-full bg-white shadow-[0_10px_24px_rgb(9_20_54/0.25)]">
             <activo.icon className="size-4" />
           </span>
         </div>
 
-        {/* Barras de progreso -como historias-, no puntos: cada una se llena
-            a la par del auto-avance en vez de sólo prender/apagar, así el
-            carrusel se ve activo aunque nadie lo toque. */}
-        <div className="relative mt-4 flex w-full max-w-[420px] shrink-0 items-center gap-1.5">
+        <div className="relative mt-4 flex shrink-0 items-center gap-1.5">
           {PITCH.map((p, i) => (
             <button
               key={p.lead}
               type="button"
-              onClick={() => irA(i)}
+              onClick={() => setSlide(i)}
               aria-label={`Show ${p.acento}`}
-              className="h-1 flex-1 overflow-hidden rounded-full bg-white/25"
-            >
-              {i === slide ? (
-                <span
-                  key={tick}
-                  className="motion-safe:animate-[login-progress_5200ms_linear_forwards] block h-full rounded-full bg-white motion-reduce:w-full"
-                />
-              ) : (
-                <span className={cn('block h-full rounded-full bg-white transition-[width]', i < slide ? 'w-full' : 'w-0')} />
-              )}
-            </button>
+              className={cn('h-1 rounded-full transition-all duration-500', i === slide ? 'w-8 bg-white' : 'w-5 bg-white/35')}
+            />
           ))}
         </div>
       </div>
