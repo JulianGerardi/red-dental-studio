@@ -7,6 +7,7 @@ import { Confibot } from '@/components/help/Confibot'
 import { useHelp } from '@/components/help/HelpProvider'
 import { NOTIFICACIONES } from '@/data/notificaciones'
 import { aviso } from '@/components/ui/toaster'
+import { PatientInSessionPopup } from '@/components/patients/PatientInSessionPopup'
 
 export function AppShell() {
   const [expanded, setExpanded] = useState(false)
@@ -65,6 +66,10 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+      {/* Sólo en la sección de Patients -no tiene sentido en Dashboard o
+          Scheduling, donde ya se ve la agenda completa-. ClinicalMode queda
+          afuera a propósito: ese sí es "estar viendo a un paciente ahora". */}
+      {pathname.startsWith('/patients') && <PatientInSessionPopup />}
       <Confibot abierto={confibotAbierto} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
     </div>
   )
