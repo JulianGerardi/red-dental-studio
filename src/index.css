@@ -434,9 +434,9 @@ body { font-family: var(--font-sans); }
   to   { transform: scaleY(1); }
 }
 
-/* Panel del login: las filas entran escalonadas y los dientes se van
-   marcando, para que la vitrina se lea como la app trabajando y no como una
-   captura. Ver design-reference/figma/modulos/login.md. */
+/* Panel del login: la captura de cada slide entra con un fundido + un
+   deslizamiento chico, para que el cambio de pantalla no sea un corte seco.
+   Ver design-reference/figma/modulos/login.md. */
 @keyframes login-fila {
   0%   { opacity: 0; transform: translateY(6px); }
   14%  { opacity: 1; transform: translateY(0); }
@@ -444,15 +444,31 @@ body { font-family: var(--font-sans); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes login-diente {
-  0%   { opacity: 0.35; transform: scaleY(0.8); }
-  18%  { opacity: 1; transform: scaleY(1); }
-  100% { opacity: 1; transform: scaleY(1); }
+/* Zoom lento sobre la captura mientras está en pantalla -"Ken Burns"- para
+   que no quede como una foto fija, aunque nadie la toque. Dura lo mismo que
+   el auto-avance (5200ms) para que el zoom termine justo cuando cambia. */
+@keyframes login-zoom {
+  from { transform: scale(1); }
+  to   { transform: scale(1.06); }
+}
+
+/* La insignia (el ícono redondo) entra con un rebote chico en vez de
+   aparecer de golpe, para acompañar el cambio de captura. */
+@keyframes login-badge-in {
+  0%   { opacity: 0; transform: scale(0.4) rotate(-10deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Barra de progreso por slide -como historias-: se llena a la par del
+   auto-avance, así el usuario ve cuánto falta para el próximo cambio. */
+@keyframes login-progress {
+  from { width: 0%; }
+  to   { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   [class*="tour-"], [style*="tour-"], [style*="coach-spotlight"],
-  [style*="col-hint"], [class*="col-grip-in"], [class*="login-fila"], [class*="login-diente"] {
+  [style*="col-hint"], [class*="col-grip-in"], [class*="login-fila"] {
     animation: none !important;
   }
 }
