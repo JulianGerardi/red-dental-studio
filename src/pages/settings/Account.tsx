@@ -106,14 +106,17 @@ export function SettingsAccount() {
         {tab === 'Information' && (
           <>
             <Card title="General Information">
+              {/* Mismo recorte que el avatar de Owner -cuadrado con esquinas
+                  redondeadas, arriba de los campos, no metido adentro del
+                  grid-: son dos identidades visuales (cuenta y dueño) y
+                  tenían dos tratamientos distintos por error. */}
+              <div className="mb-4 flex items-center gap-3">
+                <EditableAvatar foto={logo} iniciales="" onChange={setLogo} label="Account logo" avatarClassName="bg-dash-count-bg size-11 rounded-lg" />
+              </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <TextField label="Name" value={general.nombre} onChange={(v) => setGeneral((g) => ({ ...g, nombre: v }))} />
                 <TextField label="Subdomain" placeholder="Placeholder" value={general.subdominio} onChange={(v) => setGeneral((g) => ({ ...g, subdominio: v }))} />
                 <TextField label="Fee Schedule Name" placeholder="Placeholder" value={general.feeSchedule} onChange={(v) => setGeneral((g) => ({ ...g, feeSchedule: v }))} />
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-medium text-[#09090b]">Logo</span>
-                  <EditableAvatar foto={logo} iniciales="" onChange={setLogo} label="Account logo" avatarClassName="bg-[#f1f5f9] size-16 rounded-full" />
-                </div>
               </div>
             </Card>
 
