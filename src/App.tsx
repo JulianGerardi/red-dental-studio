@@ -26,6 +26,8 @@ import { SettingsNewLocation } from '@/pages/settings/NewLocation'
 import { SettingsEmployees, SettingsEmployeeDetail } from '@/pages/settings/Employees'
 import { SettingsNewEmployee } from '@/pages/settings/NewEmployee'
 import { SettingsAccounts } from '@/pages/settings/Accounts'
+import { SettingsAccount } from '@/pages/settings/Account'
+import { SettingsConsents } from '@/pages/settings/Consents'
 import { SettingsLedgerOptions } from '@/pages/settings/LedgerOptions'
 import Help from '@/pages/Help'
 import { HelpProvider } from '@/components/help/HelpProvider'
@@ -87,6 +89,8 @@ export default function App() {
             <Route path="team/new" element={<SettingsNewEmployee />} />
             <Route path="team/:employeeId" element={<SettingsEmployeeDetail />} />
             <Route path="accounts" element={<SettingsAccounts />} />
+            <Route path="account" element={<SettingsAccount />} />
+            <Route path="consents" element={<SettingsConsents />} />
             <Route path="ledger" element={<SettingsLedgerOptions />} />
             {SETTINGS_PLACEHOLDERS.map((p) => (
               <Route key={p} path={p} element={<SettingsPlaceholder />} />

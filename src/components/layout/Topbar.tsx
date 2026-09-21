@@ -102,7 +102,7 @@ export function Topbar({
    Log out. "Suscription" va con esa ortografía a propósito -así está en el
    diseño, y acá el contenido se replica tal cual-. */
 const CUENTA = [
-  { label: 'Profile', icon: CircleUserRound, to: '/settings/accounts' },
+  { label: 'Profile', icon: CircleUserRound, to: '/settings/account' },
   { label: 'Suscription', icon: CreditCard, to: '/billing' },
   { label: 'Support', icon: CircleHelp, to: '/help' },
 ]
