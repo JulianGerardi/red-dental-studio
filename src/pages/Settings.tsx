@@ -1,6 +1,7 @@
 import { Outlet, useLocation, Link } from 'react-router-dom'
 import {
-  UserCog, Building2, Users, ShieldCheck, SlidersHorizontal, CreditCard, Library, CircleUser, Lock, type LucideIcon,
+  UserCog, Building2, Users, ShieldCheck, SlidersHorizontal, CreditCard, Library, CircleUser, Lock,
+  FileSignature, type LucideIcon,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -13,7 +14,7 @@ import { EMPLEADOS } from '@/data/employees'
 const ICONS: Record<string, LucideIcon> = {
   'user-cog': UserCog, building: Building2, users: Users, 'shield-check': ShieldCheck,
   sliders: SlidersHorizontal, 'credit-card': CreditCard, library: Library,
-  'circle-user': CircleUser, lock: Lock,
+  'circle-user': CircleUser, lock: Lock, 'file-signature': FileSignature,
 }
 
 
