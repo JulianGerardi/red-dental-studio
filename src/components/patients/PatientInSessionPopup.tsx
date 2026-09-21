@@ -27,15 +27,18 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
    3. Moverla debajo de la campana (arriba a la derecha) no alcanzaba: ahí
       arriba empieza el panel "Today Appointments", así que una card fija de
       este tamaño terminaba tapándole el encabezado igual -no hay hueco
-      vacío ahí, sólo se corre el problema unos px.
-   Por eso ahora es un `DropdownMenu`, el mismo patrón que ya usa la propia
-   campana de notificaciones (Topbar.tsx): la píldora vive fija arriba a la
-   derecha y no tapa nada en reposo -es angosta-, y el detalle con foto,
-   cronómetro y acciones sólo se superpone al contenido mientras el usuario
-   lo tiene abierto a propósito, exactamente como el dropdown de la campana.
+      vacío ahí, sólo se corre el problema unos px-, y además competía con el
+      botón "+ New Patient", que vive en esa misma esquina.
+   Por eso el disparador vive como una pestaña angosta pegada al borde
+   derecho, centrada verticalmente -lejos del header y de cualquier botón,
+   estática: no se mueve ni de acá ni con el scroll-, sólo el avatar y el
+   punto en vivo, nada de texto. Es un `DropdownMenu`, el mismo patrón que ya
+   usa la campana de notificaciones (Topbar.tsx): el detalle con foto,
+   cronómetro y acciones sale hacia la izquierda sólo mientras el usuario lo
+   tiene abierto a propósito, y se cierra solo al hacer clic afuera.
    Julián también notó que este dato ya se ve en el Waiting Room del
    Dashboard -no necesita ser protagonista todo el tiempo, encaja con volverlo
-   una píldora chica en vez de una card siempre expandida. */
+   una pestaña chica en vez de una card siempre expandida. */
 export function PatientInSessionPopup() {
   const enCurso = useMemo(
     () => datosDelDia(HOY_DEMO).appointments.filter((a) => !a.completado),
@@ -60,19 +63,18 @@ export function PatientInSessionPopup() {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={`Currently being seen: ${actual.name}`}
-        className="fixed top-32 right-6 z-30 flex items-center gap-2 rounded-full border border-[#e4e4e7] bg-white py-2 pr-4 pl-2 shadow-[0_8px_24px_rgb(0_0_0/0.16)] transition-shadow hover:shadow-[0_10px_28px_rgb(0_0_0/0.22)]"
+        className="fixed top-1/2 right-0 z-30 flex -translate-y-1/2 items-center rounded-l-xl border border-r-0 border-[#e4e4e7] bg-white py-3 pr-2.5 pl-3 shadow-[0_8px_24px_rgb(0_0_0/0.16)] transition-shadow hover:shadow-[0_10px_28px_rgb(0_0_0/0.22)]"
       >
-        <span className="relative flex size-7 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[9px] font-bold text-[#17723c]">
+        <span className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[10px] font-bold text-[#17723c]">
           {actual.initials}
           <span className="absolute -top-0.5 -right-0.5 flex size-3 items-center justify-center">
             <span className="absolute size-full animate-ping rounded-full bg-[#1e9850] opacity-75 motion-reduce:animate-none" />
             <span className="relative size-2 rounded-full bg-[#1e9850]" />
           </span>
         </span>
-        <span className="text-[12px] font-semibold text-[#09090b]">Currently being seen</span>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" sideOffset={8} className="w-[300px] bg-white p-4">
+      <DropdownMenuContent side="left" align="center" sideOffset={10} className="w-[300px] bg-white p-4">
         <div className="flex items-start gap-3">
           <span className="relative flex size-9 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[11px] font-bold text-[#17723c]">
             {actual.initials}
