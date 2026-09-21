@@ -10,6 +10,7 @@ import { SETTINGS_NAV } from '@/data/settings-nav'
 import { Breadcrumb, type Miga } from '@/components/ui/breadcrumb'
 import { LOCACIONES } from '@/pages/settings/Locations'
 import { EMPLEADOS } from '@/data/employees'
+import { CUENTAS } from '@/pages/settings/Accounts'
 
 const ICONS: Record<string, LucideIcon> = {
   'user-cog': UserCog, building: Building2, users: Users, 'shield-check': ShieldCheck,
@@ -56,6 +57,11 @@ function migasDe(pathname: string): Miga[] {
       const emp = EMPLEADOS.find((e) => e.id === detalleEmpleado[1])
       migas.push({ label: emp?.nombre ?? detalleEmpleado[1] })
     }
+  }
+  const detalleCuenta = pathname.match(/^\/settings\/accounts\/([^/]+)$/)
+  if (detalleCuenta) {
+    const cuenta = CUENTAS.find((c) => c.id === detalleCuenta[1])
+    migas.push({ label: cuenta?.nombre ?? detalleCuenta[1] })
   }
   return migas
 }

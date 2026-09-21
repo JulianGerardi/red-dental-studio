@@ -89,6 +89,7 @@ export default function App() {
             <Route path="team/new" element={<SettingsNewEmployee />} />
             <Route path="team/:employeeId" element={<SettingsEmployeeDetail />} />
             <Route path="accounts" element={<SettingsAccounts />} />
+            <Route path="accounts/:accountId" element={<SettingsAccount />} />
             <Route path="account" element={<SettingsAccount />} />
             <Route path="consents" element={<SettingsConsents />} />
             <Route path="ledger" element={<SettingsLedgerOptions />} />

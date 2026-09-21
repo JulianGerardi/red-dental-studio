@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Search, Plus, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -10,17 +11,22 @@ import { Pill, type PillTone } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 
-/* Settings → Accounts. Ver design-reference/figma/modulos/settings-accounts.md. */
+/* Settings → Accounts. Ver design-reference/figma/modulos/settings-accounts.md.
 
-type EstadoCuenta = 'Active' | 'Draft' | 'Pending'
+   `Cuenta`, `CUENTAS` y el tono de `estado` se exportan: Julián marcó que en
+   el sitio real (red.dev.confidentally.com/settings/account) entrar a una
+   cuenta de esta lista lleva a SU configuración -las mismas tres pestañas
+   Information/Subscription/Owner que ve el usuario logueado para la propia,
+   en pages/settings/Account.tsx-, no a un placeholder. */
+export type EstadoCuenta = 'Active' | 'Draft' | 'Pending'
 
-const ESTADO_TONO: Record<EstadoCuenta, PillTone> = {
+export const ESTADO_TONO: Record<EstadoCuenta, PillTone> = {
   Active: 'success',
   Draft: 'neutral',
   Pending: 'warning',
 }
 
-type Cuenta = {
+export type Cuenta = {
   id: string
   nombre: string
   plan: string
@@ -36,7 +42,7 @@ type Cuenta = {
 
 /* El guion largo es el vacío del diseño: hay cuentas sin plan, sin dueño y
    sin licencias, y se replican así en vez de inventarles un valor. */
-const CUENTAS: Cuenta[] = [
+export const CUENTAS: Cuenta[] = [
   { id: 'c1', nombre: 'aasdasda', plan: 'testing betsy', suscripcion: 'BET', vence: '09/30/2026', estadoSuscripcion: 'ACTIVE', locaciones: 0, empleados: 0, licencias: '5', duenos: '—', estado: 'Active' },
   { id: 'c2', nombre: 'alo com dieam', plan: '—', suscripcion: '—', vence: '', estadoSuscripcion: '', locaciones: 0, empleados: 0, licencias: '—', duenos: 'jojojo jojojo', estado: 'Draft' },
   { id: 'c3', nombre: 'Betsy account', plan: 'Prueba Red', suscripcion: 'PBR', vence: '11/30/2026', estadoSuscripcion: 'ACTIVE', locaciones: 1, empleados: 2, licencias: '170', duenos: 'Betsy Owner owww', estado: 'Active' },
@@ -142,7 +148,9 @@ export function SettingsAccounts() {
           ) : (
             visibles.map((c) => (
               <div key={c.id} className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]">
-                <span className={cn(COLS.nombre, 'truncate text-[#09090b]')} title={c.nombre}>{c.nombre}</span>
+                <Link to={`/settings/accounts/${c.id}`} className={cn(COLS.nombre, 'text-dash-blue truncate font-medium hover:underline')} title={c.nombre}>
+                  {c.nombre}
+                </Link>
                 <span className={cn(COLS.plan, 'truncate font-medium text-[#09090b]')} title={c.plan}>{c.plan}</span>
                 <span className={COLS.suscripcion}>{c.suscripcion}</span>
                 <span className={COLS.vence}>{c.vence}</span>
