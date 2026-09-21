@@ -66,10 +66,10 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
-      {/* Sólo en la sección de Patients -no tiene sentido en Dashboard o
-          Scheduling, donde ya se ve la agenda completa-. ClinicalMode queda
-          afuera a propósito: ese sí es "estar viendo a un paciente ahora". */}
-      {pathname.startsWith('/patients') && <PatientInSessionPopup />}
+      {/* Activo en toda la app, no sólo en Patients -Julián lo pidió así: quiere
+          saber quién está en el sillón esté donde esté navegando-. ClinicalMode
+          queda afuera igual porque ese layout no pasa por AppShell. */}
+      <PatientInSessionPopup />
       <Confibot abierto={confibotAbierto} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
     </div>
   )

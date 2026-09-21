@@ -9,8 +9,9 @@ import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
    reconstruye igual para que "View chart" caiga en la misma ruta. */
 const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
 
-/* Indicador de "quién está en el sillón ahora", en la sección de Patients
-   (ver AppShell.tsx). Usa los mismos turnos de hoy que el panel "Today
+/* Indicador de "quién está en el sillón ahora", activo en toda la app (ver
+   AppShell.tsx) -Julián lo quiere visible esté donde esté navegando, no sólo
+   en Patients-. Usa los mismos turnos de hoy que el panel "Today
    Appointments" de Patients.tsx -mismo `datosDelDia(HOY_DEMO)`-, así que no
    es un dato inventado aparte: un turno de hoy que todavía no está
    completado.
