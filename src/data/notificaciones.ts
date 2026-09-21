@@ -19,7 +19,10 @@ export const NOTIFICACIONES: Notificacion[] = [
     titulo: 'Document awaiting your signature',
     detalle: 'Consent form for Mara Otero — sent 2 days ago.',
     accion: 'Review',
-    to: '/documents',
+    /* Antes iba a /documents -un placeholder que no tiene nada de
+       consentimientos-. Julián pidió conectarla con Settings → Consents,
+       que sí existe. */
+    to: '/settings/consents',
     icon: FileSignature,
   },
   {
