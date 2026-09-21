@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, GalleryVerticalEnd, CalendarRange, Wallet, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Pill, type PillTone } from '@/components/ui/pill'
+import { Panel } from '@/components/dashboard/primitives'
 import { EVENTS, type ApptState } from '@/components/scheduling/calendar-data'
 import { MOVIMIENTOS, conSaldo, moneda, GUARANTOR } from '@/data/ledger'
 import { MANDIBULAR } from '@/data/odontogram'
@@ -34,23 +35,6 @@ const PITCH = [
     icon: Check,
   },
 ]
-
-function Tarjeta({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="w-full rounded-2xl bg-white p-5 shadow-[0_18px_50px_rgb(9_20_54/0.22)]">
-      {children}
-    </div>
-  )
-}
-
-function Rotulo({ children, nota }: { children: React.ReactNode; nota: string }) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-[11px] font-semibold tracking-wide text-[#a1a1aa] uppercase">{children}</span>
-      <span className="text-dash-blue truncate text-[12px] font-semibold">{nota}</span>
-    </div>
-  )
-}
 
 /* Fila compartida por Agenda y Ledger -mismo recorte: avatar/ícono + texto +
    etiqueta- para que las tres tarjetas se sientan una sola familia visual. */
@@ -88,30 +72,33 @@ const ESTADO_TONO: Record<ApptState, PillTone> = {
   Cancelled: 'neutral',
 }
 
-/** Turnos del día, salidos del mismo `EVENTS` que dibuja el calendario. */
+/** Turnos del día, salidos del mismo `EVENTS` que dibuja el calendario. Mismo
+    `Panel` que usa el resto del sistema -no una tarjeta propia-, así el
+    encabezado, el radio y la sombra son un componente y no una imitación. */
 function PanelAgenda() {
   const filas = EVENTS.slice(0, 3)
   return (
-    <Tarjeta>
-      <Rotulo nota={`${EVENTS.length} today`}>Today&apos;s appointments</Rotulo>
-      <div className="mt-3 flex flex-col gap-2">
-        {filas.map((e, i) => (
-          <Fila
-            key={e.patient}
-            delay={i * 320}
-            avatar={
-              <span className="bg-dash-blue/10 text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold">
-                {e.patient.split(' ').slice(0, 2).map((p) => p[0]).join('')}
-              </span>
-            }
-            titulo={e.patient}
-            subtitulo={`${e.room} · ${e.reason}`}
-          >
-            <Pill tone={ESTADO_TONO[e.state]} size="sm" className="shrink-0">{e.state}</Pill>
-          </Fila>
-        ))}
-      </div>
-    </Tarjeta>
+    <Panel
+      title="Today's Appointments"
+      controls={<span className="text-dash-blue shrink-0 text-[12px] font-semibold">{EVENTS.length} today</span>}
+      bodyClassName="gap-2"
+    >
+      {filas.map((e, i) => (
+        <Fila
+          key={e.patient}
+          delay={i * 320}
+          avatar={
+            <span className="bg-dash-blue/10 text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold">
+              {e.patient.split(' ').slice(0, 2).map((p) => p[0]).join('')}
+            </span>
+          }
+          titulo={e.patient}
+          subtitulo={`${e.room} · ${e.reason}`}
+        >
+          <Pill tone={ESTADO_TONO[e.state]} size="sm" className="shrink-0">{e.state}</Pill>
+        </Fila>
+      ))}
+    </Panel>
   )
 }
 
@@ -120,32 +107,33 @@ function PanelLedger() {
   const filas = conSaldo(MOVIMIENTOS).slice(-3)
   const saldo = MOVIMIENTOS.reduce((a, m) => a + m.monto, 0)
   return (
-    <Tarjeta>
-      <Rotulo nota={GUARANTOR}>Ledger</Rotulo>
-      <div className="mt-3 flex flex-col gap-2">
-        {filas.map((m, i) => (
-          <Fila
-            key={m.id}
-            delay={i * 320}
-            avatar={
-              <span className="text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f0f5ff] text-[9px] font-bold">
-                {m.codigo === '—' ? m.tipo.slice(0, 3).toUpperCase() : m.codigo}
-              </span>
-            }
-            titulo={m.descripcion}
-            subtitulo={m.provider}
-          >
-            <span className={cn('shrink-0 text-[12px] font-semibold tabular-nums', m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]')}>
-              {moneda(m.monto)}
+    <Panel
+      title="Ledger"
+      controls={<span className="text-dash-blue shrink-0 truncate text-[12px] font-semibold">{GUARANTOR}</span>}
+      bodyClassName="gap-2"
+    >
+      {filas.map((m, i) => (
+        <Fila
+          key={m.id}
+          delay={i * 320}
+          avatar={
+            <span className="text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f0f5ff] text-[9px] font-bold">
+              {m.codigo === '—' ? m.tipo.slice(0, 3).toUpperCase() : m.codigo}
             </span>
-          </Fila>
-        ))}
-      </div>
-      <div className="mt-3 flex items-center justify-between rounded-xl bg-[#f6f8fc] px-3.5 py-3">
+          }
+          titulo={m.descripcion}
+          subtitulo={m.provider}
+        >
+          <span className={cn('shrink-0 text-[12px] font-semibold tabular-nums', m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]')}>
+            {moneda(m.monto)}
+          </span>
+        </Fila>
+      ))}
+      <div className="mt-1 flex items-center justify-between rounded-xl bg-[#f6f8fc] px-3.5 py-3">
         <span className="text-[11px] text-[#71717a]">Balance due</span>
         <span className="text-dash-blue text-[16px] leading-none font-extrabold tabular-nums">{moneda(saldo)}</span>
       </div>
-    </Tarjeta>
+    </Panel>
   )
 }
 
@@ -156,9 +144,8 @@ const CARGADAS = new Set([19, 30, 32])
 /** La arcada inferior, llenándose diente por diente. */
 function PanelOdontograma() {
   return (
-    <Tarjeta>
-      <Rotulo nota="Mandibular">Dental assessment</Rotulo>
-      <div className="mt-3.5 flex justify-between gap-1">
+    <Panel title="Dental Assessment" controls={<span className="text-dash-blue shrink-0 text-[12px] font-semibold">Mandibular</span>} bodyClassName="gap-3">
+      <div className="flex justify-between gap-1">
         {MANDIBULAR.map((n, i) => (
           <span
             key={n}
@@ -172,7 +159,7 @@ function PanelOdontograma() {
           </span>
         ))}
       </div>
-      <div className="mt-3 flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         {[
           { code: 'D2740', label: 'Crown – porcelain/ceramic', pieza: 'Tooth 19 · ML' },
           { code: 'D7240', label: 'Removal of impacted tooth', pieza: 'Tooth 32 · DL' },
@@ -190,11 +177,11 @@ function PanelOdontograma() {
           />
         ))}
       </div>
-    </Tarjeta>
+    </Panel>
   )
 }
 
-const PANELES = [PanelAgenda, PanelLedger, PanelOdontograma]
+const WIDGETS = [PanelAgenda, PanelLedger, PanelOdontograma]
 
 export default function Login() {
   const navigate = useNavigate()
@@ -209,7 +196,7 @@ export default function Login() {
   }, [])
 
   const activo = PITCH[slide]
-  const Panel = PANELES[slide]
+  const Widget = WIDGETS[slide]
 
   return (
     <div className="flex min-h-svh bg-white">
@@ -243,13 +230,21 @@ export default function Login() {
           ))}
         </div>
 
-        {/* Se remonta en cada slide para que la entrada arranque de cero y el
-            panel no quede congelado en el último cuadro. */}
-        <div className="relative flex w-full max-w-[360px] min-h-0 flex-1 items-center justify-center">
-          <Panel key={slide} />
-          <span className="text-dash-blue absolute -top-3 -left-6 flex size-9 items-center justify-center rounded-full bg-white shadow-[0_10px_24px_rgb(9_20_54/0.25)]">
-            <activo.icon className="size-4" />
-          </span>
+        {/* flex-1 + items-center centra este bloque en el alto que sobra,
+            que cambia según el widget (el odontograma es más alto que el
+            ledger). La insignia va en un wrapper propio -relative, sin
+            flex-1- que se ajusta al tamaño real del widget: antes colgaba
+            directo de este contenedor externo, así que quedaba anclada a SU
+            esquina -no a la de la tarjeta-, y con espacio de sobra arriba
+            terminaba flotando cerca del título de arriba en vez de pegada
+            a la tarjeta. */}
+        <div className="flex w-full max-w-[360px] min-h-0 flex-1 items-center justify-center">
+          <div key={slide} className="relative w-full motion-safe:animate-[login-fila_600ms_ease-out]">
+            <Widget />
+            <span className="text-dash-blue absolute -top-3 -left-3 flex size-9 items-center justify-center rounded-full bg-white shadow-[0_10px_24px_rgb(9_20_54/0.25)]">
+              <activo.icon className="size-4" />
+            </span>
+          </div>
         </div>
 
         <div className="relative mt-4 flex shrink-0 items-center gap-1.5">
