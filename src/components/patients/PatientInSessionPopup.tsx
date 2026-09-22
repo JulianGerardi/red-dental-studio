@@ -26,6 +26,18 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
       su lugar cada fila muestra la hora del turno, que ya es un dato real.
       "Check out" ahora es por fila y lo saca de la lista (estado local
       `ocultos`, por índice: son datos de demo, no hay id detrás).
+   1b. Primera versión de la lista: filas apretadas -8px de alto entre ellas,
+      sin línea divisoria- y el punto verde animado repetido en cada avatar.
+      Julián marcó las dos cosas: sin jerarquía (todo el texto pesaba igual,
+      la room -el dato que justifica la lista- se perdía en una línea gris
+      junto al provider) y el `animate-ping` de cada fila, repetido varias
+      veces a la vez, mareaba en vez de comunicar "en vivo". Ahora: nombre en
+      negro/negrita arriba, la room como chip de color abajo -es el dato que
+      distingue una fila de otra-, provider en gris al lado del chip, hora y
+      Check out a la derecha; filas separadas por una línea, no por gap. El
+      ping se saca de cada fila -"en vivo" ya lo dice el label verde de
+      arriba- y se deja sólo en el avatar de la pestaña cerrada, donde es un
+      único aviso con sentido ("hay algo pasando"), no un parpadeo por fila.
    2. Era una card fija abajo a la derecha que tapaba filas de la tabla o de
       Recent Patients, y cerrarla con la X la perdía hasta recargar.
    3. Moverla debajo de la campana (arriba a la derecha) no alcanzaba: ahí
@@ -78,14 +90,14 @@ export function PatientInSessionPopup() {
   return (
     <div ref={ref} className="fixed top-1/2 right-0 z-30 -translate-y-1/2">
       {/* El ancho es lo único que anima: crece desde la pestaña (54px, sólo
-          el avatar del primero) hasta la card completa (320px), siempre
+          el avatar del primero) hasta la card completa (336px), siempre
           pegada al mismo borde derecho -por eso el ancla es `right-0` y no
           `left`, así el lado del avatar no se mueve, sólo se abre hacia la
           izquierda-. */}
       <div
         className={cn(
           'flex items-stretch overflow-hidden rounded-l-xl border border-r-0 border-[#e4e4e7] bg-white shadow-[0_8px_24px_rgb(0_0_0/0.16)] transition-[width] duration-300 ease-out',
-          abierto ? 'w-[320px]' : 'w-[54px]',
+          abierto ? 'w-[336px]' : 'w-[54px]',
         )}
       >
         <button
@@ -124,39 +136,45 @@ export function PatientInSessionPopup() {
             muchos no hay que seguir agrandando la card-. */}
         <div
           className={cn(
-            'flex min-w-[266px] flex-col gap-2 overflow-hidden py-3 pr-3 transition-[opacity,max-height] duration-200',
-            abierto ? 'max-h-[248px] opacity-100 delay-100' : 'pointer-events-none max-h-0 opacity-0',
+            'flex min-w-[280px] flex-col gap-2 overflow-hidden py-3 pr-3 transition-[opacity,max-height] duration-200',
+            abierto ? 'max-h-[320px] opacity-100 delay-100' : 'pointer-events-none max-h-0 opacity-0',
           )}
         >
-          <div className="flex items-center gap-1.5 px-1 text-[10px] font-semibold tracking-wide text-[#1e9850] uppercase">
-            <Radio className="size-3" /> Currently being seen
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-[#1e9850] uppercase">
+              <Radio className="size-3" /> Currently being seen
+            </div>
+            <span className="text-[10px] font-semibold text-[#a1a1aa]">{visibles.length}</span>
           </div>
 
-          <div className="flex flex-col gap-0.5 overflow-y-auto">
+          <div className="flex flex-col divide-y divide-[#f1f1f4] overflow-y-auto">
             {visibles.map((p) => {
               const i = enCurso.indexOf(p)
               return (
-                <div key={i} className="group flex items-center gap-2 rounded-lg py-1 pr-1 pl-1 hover:bg-[#fafafa]">
-                  <span className="relative flex size-7 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[9px] font-bold text-[#17723c]">
+                <div key={i} className="group flex items-center gap-2.5 py-2.5 first:pt-0.5 last:pb-0.5">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[10px] font-bold text-[#17723c]">
                     {p.initials}
-                    <span className="absolute -top-0.5 -right-0.5 flex size-2.5 items-center justify-center">
-                      <span className="absolute size-full animate-ping rounded-full bg-[#1e9850] opacity-75 motion-reduce:animate-none" />
-                      <span className="relative size-1.5 rounded-full bg-[#1e9850]" />
-                    </span>
                   </span>
                   <Link to={`/patients/${slug(p.name)}`} className="min-w-0 flex-1">
-                    <p className="truncate text-[12px] font-bold text-[#09090b] group-hover:underline">{p.name}</p>
-                    <p className="truncate text-[10.5px] text-[#71717a]">{p.operatory} · {p.provider}</p>
+                    <p className="truncate text-[12.5px] font-bold text-[#09090b] group-hover:underline">{p.name}</p>
+                    <div className="mt-1 flex min-w-0 items-center gap-1.5">
+                      <span className="bg-dash-count-bg text-dash-blue-hover shrink-0 rounded-full px-1.5 py-[1px] text-[10px] font-semibold whitespace-nowrap">
+                        {p.operatory}
+                      </span>
+                      <span className="truncate text-[10.5px] text-[#71717a]">{p.provider}</span>
+                    </div>
                   </Link>
-                  <span className="shrink-0 text-[10.5px] whitespace-nowrap text-[#a1a1aa]">{p.time}</span>
-                  <button
-                    type="button"
-                    aria-label={`Check out ${p.name}`}
-                    onClick={() => setOcultos((prev) => new Set(prev).add(i))}
-                    className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#a1a1aa] hover:bg-[#eef1f5] hover:text-[#09090b]"
-                  >
-                    <LogOut className="size-3.5" />
-                  </button>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="text-[10px] whitespace-nowrap text-[#a1a1aa]">{p.time}</span>
+                    <button
+                      type="button"
+                      aria-label={`Check out ${p.name}`}
+                      onClick={() => setOcultos((prev) => new Set(prev).add(i))}
+                      className="flex size-6 items-center justify-center rounded-md text-[#a1a1aa] hover:bg-[#eef1f5] hover:text-[#09090b]"
+                    >
+                      <LogOut className="size-3.5" />
+                    </button>
+                  </div>
                 </div>
               )
             })}
