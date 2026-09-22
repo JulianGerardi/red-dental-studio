@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { cn } from '@/lib/utils'
 import { ModalShell } from '@/components/patients/form'
 import { moneda, type Movimiento } from '@/data/ledger'
 
@@ -8,7 +9,12 @@ import { moneda, type Movimiento } from '@/data/ledger'
    y editable sólo en la tabla de abajo, donde se elige a qué cargos
    abiertos mandar lo que todavía no se aplicó. Por eso el encabezado usa
    el mismo patrón dt/dd de sólo-lectura de `LedgerRowModal` (Campos) en vez
-   de inputs deshabilitados: son datos, no un formulario a medio llenar. */
+   de inputs deshabilitados: son datos, no un formulario a medio llenar.
+
+   Segunda vuelta: la selección pasó de "escribir un número" a un checkbox
+   por fila -tildarlo carga el máximo que entra, el input queda para
+   ajustarlo a mano-, y todo el azul/violeta original se corrigió a azul:
+   Julián marcó que el violeta no es un color que use el resto de la app. */
 
 function fuenteDeCredito(m: Movimiento) {
   const sufijo = m.descripcion.match(/····\d+/)?.[0]
@@ -28,6 +34,7 @@ export function AplicarCreditoModal({
 }) {
   const disponible = m.creditoDisponible ?? 0
   const [aplicado, setAplicado] = useState<Record<string, string>>({})
+  const [seleccionados, setSeleccionados] = useState<Set<string>>(() => new Set())
 
   const totalAplicado = cargos.reduce((a, c) => a + (Number(aplicado[c.id]) || 0), 0)
   const restante = Math.max(disponible - totalAplicado, 0)
@@ -43,6 +50,21 @@ export function AplicarCreditoModal({
     const otrasFilas = totalAplicado - (Number(aplicado[id]) || 0)
     const maximo = Math.min(saldoCargo, Math.max(disponible - otrasFilas, 0))
     setAplicado((p) => ({ ...p, [id]: numero > maximo ? String(maximo) : limpio }))
+  }
+
+  /* El checkbox es la forma de elegir qué cargos nuevos entran en esta
+     aplicación -no el input solo-: tildarlo carga de una el máximo que
+     entra (mismo tope de `cambiar`), destildarlo lo vacía. El input sigue
+     ahí para bajar el número a mano, pero sólo con la fila tildada. */
+  const alternarSeleccion = (c: Movimiento) => {
+    const yaEstaba = seleccionados.has(c.id)
+    setSeleccionados((prev) => {
+      const siguiente = new Set(prev)
+      if (yaEstaba) siguiente.delete(c.id); else siguiente.add(c.id)
+      return siguiente
+    })
+    if (yaEstaba) setAplicado((p) => ({ ...p, [c.id]: '' }))
+    else cambiar(c.id, String(c.monto), c.monto)
   }
 
   const aplicar = () => {
@@ -72,15 +94,15 @@ export function AplicarCreditoModal({
       )}
     >
       <div className="flex flex-col gap-4">
-        <div className="flex items-start justify-between gap-4 rounded-lg border border-[#e4d7fb] bg-[#f8f5ff] px-4 py-3">
+        <div className="flex items-start justify-between gap-4 rounded-lg border border-[#c7d9fb] bg-[#f0f5ff] px-4 py-3">
           <div className="min-w-0">
             <p className="text-[11px] text-[#71717a]">Credit source</p>
-            <p className="truncate text-[15px] font-bold text-[#6633a6]">{fuenteDeCredito(m)}</p>
+            <p className="text-dash-blue truncate text-[15px] font-bold">{fuenteDeCredito(m)}</p>
             <p className="mt-0.5 text-[11px] text-[#71717a]">Scope: Patient · {m.paciente}</p>
           </div>
           <div className="shrink-0 text-right">
             <p className="text-[11px] text-[#71717a]">Available credit</p>
-            <p className="text-[17px] font-bold text-[#6633a6]">{moneda(disponible)}</p>
+            <p className="text-dash-blue text-[17px] font-bold">{moneda(disponible)}</p>
           </div>
         </div>
 
@@ -115,8 +137,9 @@ export function AplicarCreditoModal({
                entran en 375px, y a diferencia de la tabla del Ledger esto
                vive adentro de un modal, sin el ancho de página completo. */
             <div className="overflow-x-auto">
-            <div className="min-w-[560px]">
+            <div className="min-w-[600px]">
               <div className="flex h-9 items-center gap-3 border-t border-[#e7e7e7] bg-[#f9f9f9] px-3 text-[10px] font-semibold tracking-wide text-[#71717a] uppercase">
+                <span className="w-[18px] shrink-0" />
                 <span className="w-[92px] shrink-0">Date</span>
                 <span className="w-[56px] shrink-0">Code</span>
                 <span className="min-w-0 flex-1">Description</span>
@@ -126,10 +149,20 @@ export function AplicarCreditoModal({
               </div>
               <div className="max-h-[240px] overflow-y-auto">
                 {cargos.map((c) => {
+                  const marcado = seleccionados.has(c.id)
                   const valor = Number(aplicado[c.id]) || 0
                   const despues = Math.max(c.monto - valor, 0)
                   return (
-                    <div key={c.id} className="flex items-center gap-3 border-t border-[#f1f1f4] px-3 py-2 text-[12.5px] text-[#3f3f46]">
+                    <div key={c.id} className={cn('flex items-center gap-3 border-t border-[#f1f1f4] px-3 py-2 text-[12.5px] text-[#3f3f46]', marcado && 'bg-[#f7faff]')}>
+                      <span className="w-[18px] shrink-0">
+                        <input
+                          type="checkbox"
+                          checked={marcado}
+                          onChange={() => alternarSeleccion(c)}
+                          aria-label={`Select ${c.descripcion}`}
+                          className="accent-dash-blue size-[15px]"
+                        />
+                      </span>
                       <span className="w-[92px] shrink-0">{c.fecha}</span>
                       <span className="text-dash-blue w-[56px] shrink-0 font-medium">{c.codigo}</span>
                       <span className="min-w-0 flex-1 truncate">{c.descripcion}</span>
@@ -138,10 +171,11 @@ export function AplicarCreditoModal({
                         <input
                           value={aplicado[c.id] ?? ''}
                           onChange={(e) => cambiar(c.id, e.target.value, c.monto)}
+                          disabled={!marcado}
                           inputMode="decimal"
                           placeholder="0.00"
                           aria-label={`Applied to ${c.descripcion}`}
-                          className="focus:border-dash-blue h-7 w-full rounded-md border border-[#e4e4e7] bg-white px-2 text-right text-[12px] tabular-nums placeholder:text-[#a1a1aa] focus:outline-none"
+                          className="focus:border-dash-blue h-7 w-full rounded-md border border-[#e4e4e7] bg-white px-2 text-right text-[12px] tabular-nums placeholder:text-[#a1a1aa] focus:outline-none disabled:bg-[#f4f4f5] disabled:text-[#a1a1aa]"
                         />
                       </span>
                       <span className="w-[96px] shrink-0 text-right font-medium tabular-nums">{moneda(despues)}</span>

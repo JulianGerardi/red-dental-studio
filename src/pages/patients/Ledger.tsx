@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  ChevronLeft, Search, Receipt, CreditCard, Wallet, Download, MoveHorizontal,
+  ChevronLeft, Search, Receipt, CreditCard, Wallet, PiggyBank, Download, MoveHorizontal,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -49,12 +49,21 @@ function tieneCredito(m: Movimiento) {
   return (m.tipo === 'Payment' || (m.tipo === 'Adjustment' && m.monto < 0)) && (m.creditoDisponible ?? 0) > 0
 }
 
+/* No es un `tipo` real -es una condición sobre `creditoDisponible`-, así que
+   se agrega como una opción más al lado de Charge/Payment/Adjustment/
+   Insurance en el mismo filtro, no como un filtro aparte. */
+const FILTRO_CREDITO = 'Unapplied Credits'
+const OPCIONES_FILTRO = [...TIPOS, FILTRO_CREDITO]
+
 /* Anchos del diseño de referencia (Confidentally 2.0): 112/112/96 · desc
-   elástica · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding. */
-type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'saldo'
+   elástica · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding.
+   `credito` es nuestra -no viene de esa referencia-, bloqueada como fecha y
+   saldo: es la única forma de llegar a "Apply credit", así que no debería
+   poder ocultarse por accidente. */
+type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'saldo' | 'credito'
 
 const ANCHO_BASE: Record<ColLedger, number> = {
-  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, saldo: 96,
+  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, saldo: 96, credito: 190,
 }
 
 /* Piso de cada columna: hasta acá pueden encoger para que la tabla entre
@@ -63,7 +72,7 @@ const ANCHO_BASE: Record<ColLedger, number> = {
    "March 17, 2025" 93px, la pastilla "Ins Payment" 86, "-$9,850.00" 71.
    Patient/Description/Provider truncan y ya tienen tooltip. */
 const ANCHO_MINIMO: Record<ColLedger, number> = {
-  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, saldo: 76,
+  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, saldo: 76, credito: 170,
 }
 
 /* Techo de Description: pasado eso, lo que sobra se reparte entre las
@@ -87,32 +96,7 @@ const COLUMNAS: ColumnaLedger[] = [
     id: 'tipo', label: 'Type',
     celda: (m) => { const t = detalleTipo(m); return <Pill tone={t.tono}>{t.texto}</Pill> },
   },
-  {
-    id: 'desc', label: 'Description', elastica: true, claseCelda: 'text-[#09090b]', titulo: (m) => m.descripcion,
-    /* El texto trunca en su propia línea -no en toda la celda- porque acá
-       abajo puede sumarse el pill de crédito: si el `truncate` quedara en
-       el contenedor, esa segunda línea se recortaría con él. */
-    celda: (m) => (
-      <div className="flex min-w-0 flex-col gap-1.5 py-0.5">
-        <span className="truncate">{m.descripcion}</span>
-        {tieneCredito(m) && (
-          <div className="flex flex-wrap items-center gap-2">
-            <Pill tone="purple">
-              <span className="mr-1.5 inline-block size-1.5 rounded-full bg-[#6633a6]" />
-              Credit available · {moneda(m.creditoDisponible ?? 0)}
-            </Pill>
-            <button
-              type="button"
-              data-apply-credit
-              className="h-6 shrink-0 rounded-md border border-[#e4d7fb] bg-white px-2.5 text-[11px] font-semibold text-[#6633a6] hover:bg-[#f8f5ff]"
-            >
-              Apply credit
-            </button>
-          </div>
-        )}
-      </div>
-    ),
-  },
+  { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
   { id: 'provider', label: 'Provider', claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
   /* Los negativos bajan la cuenta: van en verde. */
   {
@@ -120,6 +104,29 @@ const COLUMNAS: ColumnaLedger[] = [
     celda: (m) => <span className={m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]'}>{moneda(m.monto)}</span>,
   },
   { id: 'saldo', label: 'Balance', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', celda: (m) => moneda(m.saldo) },
+  {
+    /* Julián no la quería adentro de Description -"se ve todo junto"-, ni
+       como pill: va sola al final de la tabla, con el mismo azul del resto
+       de la app (nada de violeta) y sin caja alrededor del monto. */
+    id: 'credito', label: '', bloqueada: true,
+    celda: (m) => {
+      if (!tieneCredito(m)) return null
+      return (
+        <div className="flex items-center justify-end gap-2">
+          <span className="text-dash-blue text-[12.5px] font-semibold whitespace-nowrap tabular-nums">
+            {moneda(m.creditoDisponible ?? 0)} available
+          </span>
+          <button
+            type="button"
+            data-apply-credit
+            className="h-7 shrink-0 rounded-md border border-[#c7d9fb] bg-[#f0f5ff] px-2.5 text-[11px] font-semibold text-dash-blue hover:bg-[#e3edff]"
+          >
+            Apply credit
+          </button>
+        </div>
+      )
+    },
+  },
 ]
 
 const VISTAS = ['Patient View', 'Guarantor View'] as const
@@ -196,7 +203,7 @@ export default function Ledger() {
   const filas = useMemo(
     () => delaVista.filter(
       (m) =>
-        (tipos.length === 0 || tipos.includes(m.tipo)) &&
+        (tipos.length === 0 || tipos.includes(m.tipo) || (tipos.includes(FILTRO_CREDITO) && tieneCredito(m))) &&
         `${m.codigo} ${m.descripcion} ${m.provider} ${m.paciente}`.toLowerCase().includes(q.trim().toLowerCase()),
     ),
     [delaVista, q, tipos],
@@ -221,10 +228,15 @@ export default function Ledger() {
       .reduce((a, m) => a + m.monto, 0)
     const saldo = delaVista.reduce((a, m) => a + m.monto, 0)
     const denegados = delaVista.filter((m) => m.estado === 'Denied').length
+    const credito = delaVista.filter(tieneCredito).reduce((a, m) => a + (m.creditoDisponible ?? 0), 0)
     return [
       { label: 'Total charges', value: moneda(cargos), nota: `${delaVista.filter((m) => m.tipo === 'Charge').length} procedures`, icon: Receipt, bg: '#eef2ff', fg: '#1d56bc' },
       { label: 'Insurance paid', value: moneda(-seguro), nota: denegados ? `${denegados} denied` : 'all posted', icon: CreditCard, bg: '#f5f3ff', fg: '#8b5cf6' },
       { label: 'Patient balance', value: moneda(saldo), nota: 'due on next visit', icon: Wallet, bg: '#fff7ed', fg: '#f97316' },
+      /* bg/fg: StatStrip los ignora a propósito -las cuatro comparten el
+         mismo azul del ícono, ver su propio comentario-, quedan sólo por
+         las dudas de que algún día se lean. */
+      { label: 'Unapplied credits', value: moneda(credito), nota: 'Available to apply', icon: PiggyBank, bg: '#eef2ff', fg: '#1d56bc' },
     ]
   }, [delaVista])
 
@@ -287,7 +299,7 @@ export default function Ledger() {
                   />
                 </div>
                 <SearchButton onClick={() => setPagina(1)} className="h-9" />
-                <FilterMenu label="Filter entries" options={TIPOS} value={tipos} onChange={(v) => { setTipos(v); setPagina(1) }} />
+                <FilterMenu label="Filter entries" options={OPCIONES_FILTRO} value={tipos} onChange={(v) => { setTipos(v); setPagina(1) }} />
                 {filasPagina.length > 0 && (
                   <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
                   onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
@@ -362,7 +374,7 @@ export default function Ledger() {
                           onClick={(e) => {
                             if ((e.target as HTMLElement).closest('[role="separator"]')) return
                             /* El botón "Apply credit" vive adentro de la celda de
-                               Description -no tiene sentido un handler propio por
+                               credito -no tiene sentido un handler propio por
                                columna sólo para esto-, así que se intercepta acá
                                igual que el `separator` del resize de columnas. */
                             if ((e.target as HTMLElement).closest('[data-apply-credit]')) { setEnCredito(m); return }
@@ -373,12 +385,7 @@ export default function Ledger() {
                             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
                           }}
                           className={cn(
-                            /* items-start, no items-center: la celda de Description
-                               puede tener una segunda línea (pill + Apply credit) y
-                               con center el resto de las columnas quedaba pisado
-                               contra el medio de esa fila más alta. Con start, las
-                               filas de una sola línea se ven igual que antes. */
-                            'group/fila flex cursor-pointer items-start gap-3 px-3 py-3 text-[13px] text-[#3f3f46] hover:bg-[#fafafa]',
+                            'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-[#3f3f46] hover:bg-[#fafafa]',
                             abierta && 'bg-[#fafafa]',
                           )}
                         >

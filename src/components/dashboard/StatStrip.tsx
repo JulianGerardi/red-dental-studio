@@ -24,11 +24,17 @@ export const STATS: Stat[] = [
 
 export function StatStrip({ stats = STATS }: { stats?: Stat[] }) {
   return (
-    /* En angosto la tira ocupa todo el ancho y reparte las tres métricas en
+    /* En angosto la tira ocupa todo el ancho y reparte las métricas en
        columnas: el sentido del componente es verlas de un vistazo, y con
        scroll horizontal había que arrastrar para enterarse de que existían.
-       Desde lg vuelve a la fila compacta del Figma, alineada a la derecha. */
-    <div className="shadow-stat grid w-full grid-cols-3 rounded-xl bg-white lg:flex lg:w-fit lg:max-w-full lg:items-center lg:px-2">
+       Desde lg vuelve a la fila compacta del Figma, alineada a la derecha.
+       Ledger suma una cuarta (Unapplied credits) -grid-cols-3 la partía
+       3+1 en dos filas desparejas-, así que el mobile grid se adapta a
+       cuántas hay en vez de asumir siempre tres. */
+    <div className={cn(
+      'shadow-stat grid w-full rounded-xl bg-white lg:flex lg:w-fit lg:max-w-full lg:items-center lg:px-2',
+      stats.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3',
+    )}>
       {stats.map(({ label, value, nota, icon: Icon }, i) => (
         <div
           key={label}
