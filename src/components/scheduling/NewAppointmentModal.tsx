@@ -13,12 +13,18 @@ import { aviso } from '@/components/ui/toaster'
 /* Figma 4430:61940 "Scheduling — Calendar (New Appointment Modal)".
 
    Rediseño sobre 3862:220908: las cards "Patient and Scheduling", "Details" y
-   "Providers" se fundieron en una sola columna izquierda, y la derecha pasó a
-   tener el bloque **Link to treatment plan visit** arriba de "Additional".
-   Additional Provider además perdió el asterisco.
+   "Providers" se fundieron en Patient + Scheduling, y Additional Provider
+   perdió el asterisco.
 
-   La columna de horarios sigue a la derecha. Ahora es hermana del formulario
-   dentro de un mismo frame (757 + 190 = 947), o sea pegada y sin montarse.
+   Julián pidió después separar el modal en dos pasos (no viene del Figma):
+   paso 1 es Patient + Scheduling + Additional, paso 2 es el link al treatment
+   plan -antes vivían los dos en la misma pantalla, apretados uno al lado del
+   otro-. `paso` maneja cuál se ve; "Continue" valida los obligatorios del
+   paso 1 antes de dejar pasar al 2.
+
+   La columna de horarios sigue a la derecha del formulario, hermana suya
+   dentro de un mismo frame (757 + 190 = 947), pegada y sin montarse. Sólo
+   aparece en el paso 1, que es el único con campos de horario.
 
    La dispara **ASAP**: es el único checkbox tildado en el frame donde la
    columna aparece. Es una inferencia — ver README.md, Desviaciones. */
@@ -89,9 +95,14 @@ export function NewAppointmentModal({
      disparador raro para algo que sólo tiene que ver con "mostrame dónde cae
      el turno"-. Ahora sale al tocar cualquier campo de Scheduling (el
      `onFocus` de React burbujea, así que uno solo alcanza para todo el
-     grupo), y ASAP lo sigue mostrando también, no lo reemplaza. */
+     grupo), y ASAP lo sigue mostrando también, no lo reemplaza. Sólo aplica
+     en el paso 1 -en el 2 no hay campos de horario que lo disparen-. */
   const [tocoHorario, setTocoHorario] = useState(false)
-  const mostrarPanel = asap || tocoHorario
+  /* Julián pidió separar el modal en dos pasos: primero paciente/proveedor/
+     horario, recién después el link al treatment plan -antes iba todo junto
+     en una sola pantalla larga-. */
+  const [paso, setPaso] = useState<1 | 2>(1)
+  const mostrarPanel = paso === 1 && (asap || tocoHorario)
   const set = (k: keyof typeof VACIO) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   const req = (k: keyof typeof VACIO) =>
     intentado && !d[k].trim() ? 'This field is required.' : undefined
@@ -106,6 +117,12 @@ export function NewAppointmentModal({
   /* Additional Provider dejó de ser obligatorio en este frame. */
   const obligatorios: (keyof typeof VACIO)[] =
     ['patient', 'primary', 'date', 'start', 'end', 'operatory', 'status']
+
+  const continuar = () => {
+    setIntentado(true)
+    if (obligatorios.some((k) => !d[k].trim())) return
+    setPaso(2)
+  }
 
   const guardar = () => {
     setIntentado(true)
@@ -125,7 +142,13 @@ export function NewAppointmentModal({
     <ModalShell
       title={titulo}
       onClose={onClose}
-      footer={<FormFooter onCancel={onClose} onSave={guardar} />}
+      footer={
+        paso === 1 ? (
+          <FormFooter onCancel={onClose} onSave={continuar} saveLabel="Continue" />
+        ) : (
+          <FormFooter onCancel={() => setPaso(1)} onSave={guardar} cancelLabel="Back" />
+        )
+      }
       aside={
         mostrarPanel ? (
           <AppointmentSlotPicker
@@ -137,107 +160,113 @@ export function NewAppointmentModal({
         ) : undefined
       }
     >
-      {/* minmax(0,…): sin eso una fila ancha de la columna derecha empuja y
-          desarma la izquierda. Patient y Scheduling eran una sola card -diez
-          campos, la más larga de todo el modal, y encima con el turno
-          apretada contra "Link to treatment plan visit" al lado-. Separadas
-          quedan del mismo alto que las dos de la derecha, así ninguna columna
-          le gana a la otra en largo. */}
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.13fr)]">
-        <div className="flex flex-col gap-6">
-          <SectionCard title="Patient">
-            <p className="-mt-2 text-[11px] text-[#71717a]">
-              Complete the details below to schedule the appointment.
-            </p>
-            <SearchField
-              label="Patient" required placeholder="Search by Name" options={PACIENTES}
-              value={d.patient} onChange={set('patient')} error={req('patient')}
-            />
-            <SearchField
-              label="Primary Provider" required placeholder="Search by Name" options={PROVIDERS}
-              value={d.primary} onChange={set('primary')} error={req('primary')}
-            />
-            <SearchField
-              label="Additional Provider" placeholder="Search by Name" options={PROVIDERS}
-              value={d.additional} onChange={set('additional')}
-            />
-            <SelectField
-              label="Requestor" placeholder="Who is requesting?"
-              value={d.requestor} onChange={set('requestor')}
-            />
-            <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />
-          </SectionCard>
+      <p className="-mt-2 mb-4 text-[10px] font-semibold tracking-wide text-[#71717a] uppercase">
+        Step {paso} of 2 — {paso === 1 ? 'Patient & Scheduling' : 'Treatment Plan'}
+      </p>
 
-          {/* onFocus -no onClick- porque el primer campo suele ser el
-              DatePicker, que abre un popover en vez de "clickearse" él
-              mismo; onFocus de React burbujea, así que uno solo alcanza para
-              todo el grupo. Una vez que aparece, se queda -no tiene sentido
-              que el panel entre y salga cada vez que el foco se mueve dentro
-              del mismo grupo de campos-. */}
-          <div onFocus={() => setTocoHorario(true)}>
-          <SectionCard title="Scheduling">
-            {/* El Figma dibuja Date como un select con la fecha 12-03-2025 de
-                placeholder; acá es el calendario, que es lo que hace falta para
-                reprogramar. Los dos campos de hora sí conservan ese placeholder
-                raro del frame. */}
-            <div className="flex flex-col gap-2">
-              <FieldLabel required>Date</FieldLabel>
-              <DatePicker
-                value={fecha}
-                onChange={(nueva) => set('date')(formatDMY(nueva))}
-                placeholder="12-03-2025"
-                error={!!req('date')}
-                className="h-9 w-full"
+      {paso === 1 ? (
+        /* minmax(0,…): sin eso una fila ancha de la columna derecha empuja y
+            desarma la izquierda. Patient y Scheduling eran una sola card -diez
+            campos, la más larga de todo el modal, y encima con el turno
+            apretada contra "Link to treatment plan visit" al lado-. Separadas
+            quedan del mismo alto que las dos de la derecha, así ninguna columna
+            le gana a la otra en largo. */
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.13fr)]">
+          <div className="flex flex-col gap-6">
+            <SectionCard title="Patient">
+              <p className="-mt-2 text-[11px] text-[#71717a]">
+                Complete the details below to schedule the appointment.
+              </p>
+              <SearchField
+                label="Patient" required placeholder="Search by Name" options={PACIENTES}
+                value={d.patient} onChange={set('patient')} error={req('patient')}
               />
-              <FieldError>{req('date')}</FieldError>
-            </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <SelectField
-                label="Start Time" required placeholder="12-03-2025" options={HORAS.slice(0, -1)}
-                value={d.start} onChange={set('start')} error={req('start')}
+              <SearchField
+                label="Primary Provider" required placeholder="Search by Name" options={PROVIDERS}
+                value={d.primary} onChange={set('primary')} error={req('primary')}
+              />
+              <SearchField
+                label="Additional Provider" placeholder="Search by Name" options={PROVIDERS}
+                value={d.additional} onChange={set('additional')}
               />
               <SelectField
-                label="End Time" required placeholder="12-03-2025" options={HORAS.slice(1)}
-                value={d.end} onChange={set('end')} error={req('end')}
+                label="Requestor" placeholder="Who is requesting?"
+                value={d.requestor} onChange={set('requestor')}
               />
+              <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />
+            </SectionCard>
+
+            {/* onFocus -no onClick- porque el primer campo suele ser el
+                DatePicker, que abre un popover en vez de "clickearse" él
+                mismo; onFocus de React burbujea, así que uno solo alcanza para
+                todo el grupo. Una vez que aparece, se queda -no tiene sentido
+                que el panel entre y salga cada vez que el foco se mueve dentro
+                del mismo grupo de campos-. */}
+            <div onFocus={() => setTocoHorario(true)}>
+            <SectionCard title="Scheduling">
+              {/* El Figma dibuja Date como un select con la fecha 12-03-2025 de
+                  placeholder; acá es el calendario, que es lo que hace falta para
+                  reprogramar. Los dos campos de hora sí conservan ese placeholder
+                  raro del frame. */}
+              <div className="flex flex-col gap-2">
+                <FieldLabel required>Date</FieldLabel>
+                <DatePicker
+                  value={fecha}
+                  onChange={(nueva) => set('date')(formatDMY(nueva))}
+                  placeholder="12-03-2025"
+                  error={!!req('date')}
+                  className="h-9 w-full"
+                />
+                <FieldError>{req('date')}</FieldError>
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <SelectField
+                  label="Start Time" required placeholder="12-03-2025" options={HORAS.slice(0, -1)}
+                  value={d.start} onChange={set('start')} error={req('start')}
+                />
+                <SelectField
+                  label="End Time" required placeholder="12-03-2025" options={HORAS.slice(1)}
+                  value={d.end} onChange={set('end')} error={req('end')}
+                />
+              </div>
+              <SelectField
+                label="Operatory" required value={d.operatory}
+                onChange={set('operatory')} error={req('operatory')}
+              />
+              <SelectField
+                label="Status" required value={d.status}
+                onChange={set('status')} error={req('status')}
+              />
+            </SectionCard>
             </div>
-            <SelectField
-              label="Operatory" required value={d.operatory}
-              onChange={set('operatory')} error={req('operatory')}
-            />
-            <SelectField
-              label="Status" required value={d.status}
-              onChange={set('status')} error={req('status')}
-            />
-          </SectionCard>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <SectionCard title="Additional">
+              <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
+              <OptionCheckbox label="Follow-up" defaultChecked={false} />
+              <OptionCheckbox label="Premedicate" defaultChecked={false} />
+              <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
+            </SectionCard>
           </div>
         </div>
+      ) : (
+        /* El link a un plan de tratamiento pasó a ser su propio paso -antes
+           vivía apretado al lado de Patient/Scheduling-. Llegar acá ya
+           implica que el paciente está elegido (es obligatorio en el paso 1),
+           así que no hace falta re-chequear d.patient. */
+        <SectionCard title="Link to treatment plan visit">
+          <p className="text-[13px] font-bold text-[#09090b]">Treatment plans</p>
+          {PLANES.map((p) => (
+            <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />
+          ))}
 
-        <div className="flex flex-col gap-6">
-          {/* Sin paciente elegido no hay a quién buscarle un plan de
-              tratamiento -aparece recién cuando tiene sentido, no antes-. */}
-          {d.patient && (
-            <SectionCard title="Link to treatment plan visit">
-              <p className="text-[13px] font-bold text-[#09090b]">Treatment plans</p>
-              {PLANES.map((p) => (
-                <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />
-              ))}
-
-              <p className="mt-1 text-[13px] font-bold text-[#09090b]">Visit</p>
-              {VISITAS.map((v) => (
-                <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />
-              ))}
-            </SectionCard>
-          )}
-
-          <SectionCard title="Additional">
-            <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
-            <OptionCheckbox label="Follow-up" defaultChecked={false} />
-            <OptionCheckbox label="Premedicate" defaultChecked={false} />
-            <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
-          </SectionCard>
-        </div>
-      </div>
+          <p className="mt-1 text-[13px] font-bold text-[#09090b]">Visit</p>
+          {VISITAS.map((v) => (
+            <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />
+          ))}
+        </SectionCard>
+      )}
     </ModalShell>
   )
 }

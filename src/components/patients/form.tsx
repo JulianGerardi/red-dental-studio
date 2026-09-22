@@ -462,7 +462,14 @@ export function ModalShell({
 /* Cancel y Save van SIEMPRE en la misma fila, uno al lado del otro. El par
    trae su propio contenedor en vez de depender del flex de quien lo use: así
    no hay contenedor angosto, columna ni wrap que los separe. */
-export function FormFooter({ onCancel, onSave }: { onCancel: () => void; onSave?: () => void }) {
+export function FormFooter({
+  onCancel, onSave, cancelLabel = 'Cancel', saveLabel = 'Save',
+}: {
+  onCancel: () => void
+  onSave?: () => void
+  cancelLabel?: string
+  saveLabel?: string
+}) {
   return (
     <div className="flex shrink-0 flex-nowrap items-center justify-end gap-3">
       <button
@@ -470,14 +477,14 @@ export function FormFooter({ onCancel, onSave }: { onCancel: () => void; onSave?
         onClick={onCancel}
         className="h-9 shrink-0 rounded-md border border-[#e4e4e7] bg-white px-6 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]"
       >
-        Cancel
+        {cancelLabel}
       </button>
       <button
         type="button"
         onClick={onSave}
         className="bg-dash-blue hover:bg-dash-blue-hover h-9 shrink-0 rounded-md px-6 text-[13px] font-medium whitespace-nowrap text-white transition-colors"
       >
-        Save
+        {saveLabel}
       </button>
     </div>
   )
