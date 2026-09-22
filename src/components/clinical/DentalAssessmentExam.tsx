@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Plus, FilePlus, Table2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { ModalShell, SelectField, TextArea, FormFooter } from '@/components/patients/form'
 import { OdontogramEmbed } from '@/components/clinical/OdontogramEmbed'
@@ -23,6 +24,10 @@ import { STATUS_STYLE, neighbours, quadrantTeeth, type Finding } from './dental/
    design-reference/figma/modulos/clinical-mode.md. */
 
 const HOY = 'May 14, 2026'
+
+/* Mismo estilo que los botones de ClinicalToolbar.tsx: la fila que sigue
+   debajo es una continuación de esa botonera, no un elemento nuevo. */
+const BOTON_TOOLBAR = 'flex h-9 items-center gap-1.5 rounded-lg border border-[#e4e4e7] bg-white px-3.5 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]'
 
 const INITIAL_FINDINGS: Finding[] = [
   { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: HOY, status: 'Discarded', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [] },
@@ -124,7 +129,30 @@ export function DentalAssessmentExam() {
 
 
   return (
-    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-start">
+    <div className="flex w-full flex-col gap-4">
+      {/* Antes eran 3 botones circulares flotando sobre el gráfico -tapaban
+          el chart al abrirse el panel de controles-. Julián pidió sacarlos
+          de ahí y ponerlos con nombre completo debajo de la botonera larga
+          (ClinicalToolbar, en ClinicalMode.tsx): misma función, nueva
+          posición. */}
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" onClick={() => openProcedure(null)} className={BOTON_TOOLBAR}>
+          <Plus className="size-4" /> Add Procedure
+        </button>
+        <button type="button" onClick={() => setDocumentOpen(true)} className={BOTON_TOOLBAR}>
+          <FilePlus className="size-4" /> Add Document
+        </button>
+        <button
+          type="button"
+          aria-pressed={view === 'table'}
+          onClick={() => setView((v) => (v === 'table' ? 'chart' : 'table'))}
+          className={cn(BOTON_TOOLBAR, view === 'table' && 'border-dash-blue bg-dash-count-bg text-dash-blue-hover')}
+        >
+          <Table2 className="size-4" /> {view === 'table' ? 'View Chart' : 'View Problem List'}
+        </button>
+      </div>
+
+      <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-start">
       <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-xl border border-[#e4e4e7] bg-white p-3 lg:order-1 lg:w-[300px]">
         <ExamPanelHeader tab={reviewState.tab} onTabChange={reviewState.setTab} onNewReview={reviewState.openDialog} />
         <div className="flex w-full flex-col gap-3 lg:max-h-[70vh] lg:overflow-y-auto">
@@ -141,7 +169,7 @@ export function DentalAssessmentExam() {
         </div>
       </div>
 
-      <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-[#e4e4e7] p-4 lg:order-2 lg:pr-20" data-examen style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fbfefc' }}>
+      <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-[#e4e4e7] p-4 lg:order-2" data-examen style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fafbfe' }}>
         {view === 'table' ? (
           <div className="w-full overflow-x-auto rounded-lg border border-[#e4e4e7] bg-white">
             <div className="min-w-[720px]">
@@ -173,29 +201,8 @@ export function DentalAssessmentExam() {
         ) : (
           <OdontogramEmbed controlesAbiertos={controlesAbiertos} onCerrarControles={() => setControlesAbiertos(false)} />
         )}
-
-        <div
-          className="absolute right-4 z-30 flex flex-col gap-2"
-          /* Pegada al pie del gráfico: así no se mueve cuando el panel de
-             controles se abre debajo y estira la card. */
-          style={{ top: 'calc(var(--odonto-chart-fin, 620px) - 196px)' }}
-        >
-          <button type="button" aria-label="New procedure" onClick={() => openProcedure(null)} className="flex size-11 items-center justify-center rounded-full border border-[#e4e4e7] bg-white text-[#09090b] shadow-md hover:bg-[#fafafa]">
-            <Plus className="size-4" />
-          </button>
-          <button type="button" aria-label="New document" onClick={() => setDocumentOpen(true)} className="flex size-11 items-center justify-center rounded-full border border-[#e4e4e7] bg-white text-[#09090b] shadow-md hover:bg-[#fafafa]">
-            <FilePlus className="size-4" />
-          </button>
-          <button
-            type="button" aria-label={view === 'table' ? 'View chart' : 'View table'} aria-pressed={view === 'table'}
-            onClick={() => setView((v) => (v === 'table' ? 'chart' : 'table'))}
-            className={`flex size-11 items-center justify-center rounded-full shadow-md ${view === 'table' ? 'bg-dash-blue text-white' : 'border border-[#e4e4e7] bg-white text-[#09090b] hover:bg-[#fafafa]'}`}
-          >
-            <Table2 className="size-4" />
-          </button>
-        </div>
       </div>
-
+      </div>
 
       <NewProcedureModal
         open={procedureOpen}

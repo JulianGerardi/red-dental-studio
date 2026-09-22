@@ -109,6 +109,42 @@ export function ClinicalTopBar({
   const cuenta = (c: Contador) =>
     CATEGORIA_DE[c.id] ? items[CATEGORIA_DE[c.id]].length : c.items.length
 
+  /* Medications se saca del racimo de contadores -quedaba pegado a
+     edad/sexo/altura/peso y a nombre del paciente, todo junto- y pasa a vivir
+     al lado del ícono de nota (el "paper"), como pidió Julián. */
+  const medicacion = CONTADORES.find((c) => c.id === 'medications')!
+  const otrosContadores = CONTADORES.filter((c) => c.id !== 'medications')
+
+  const contadorBoton = (c: Contador) => {
+    const Icono = ICONO_CONTADOR[c.icono]
+    const on = flot?.tipo === 'contador' && flot.c.id === c.id
+    return (
+      <button
+        key={c.id}
+        title={c.titulo}
+        aria-label={`${c.titulo}: ${cuenta(c)}`}
+        aria-expanded={on}
+        onClick={(e) =>
+          setFlot(on ? null : { tipo: 'contador', c, rect: e.currentTarget.getBoundingClientRect() })
+        }
+        className={cn(
+          /* Cápsula más alta que en el export: con 18.17 el ícono queda en
+             12px y no se distingue de qué es cada contador. */
+          'flex h-[26px] shrink-0 items-center gap-[4px] rounded-full border border-[#E5E7EB] bg-[#F9FAFB] px-[6px] transition-colors hover:bg-[#f1f5ff]',
+          on && 'border-dash-blue bg-dash-count-bg',
+        )}
+      >
+        <Icono className="text-dash-blue size-[16px]" />
+        {/* El cero va en gris: un contador vacío no es una novedad. */}
+        {/* El export pinta el badge de azul también con 0: no se separa el
+            caso vacío. */}
+        <span className="bg-dash-blue flex size-[17px] items-center justify-center rounded-full text-[9px] leading-none text-white">
+          {cuenta(c)}
+        </span>
+      </button>
+    )
+  }
+
   const guardarItem = (cat: Categoria) => (it: ClinicalItem) =>
     setItems((prev) => {
       const lista = prev[cat]
@@ -188,40 +224,10 @@ export function ClinicalTopBar({
       </span>
       </span>
 
-      {/* Grupo 1: los contadores, gap 6. */}
+      {/* Grupo 1: los contadores, gap 6. Medications no está -vive en el
+          grupo 4, al lado del ícono de nota-. */}
       <span className="flex items-center gap-[6px] max-lg:flex-wrap lg:shrink-0">
-
-      {/* Los contadores son botones como los demás: caja blanca, borde gris y
-          el ícono en negro. Sueltos y en azul no se leían como algo apretable. */}
-      {CONTADORES.map((c) => {
-        const Icono = ICONO_CONTADOR[c.icono]
-        const on = flot?.tipo === 'contador' && flot.c.id === c.id
-        return (
-          <button
-            key={c.id}
-            title={c.titulo}
-            aria-label={`${c.titulo}: ${cuenta(c)}`}
-            aria-expanded={on}
-            onClick={(e) =>
-              setFlot(on ? null : { tipo: 'contador', c, rect: e.currentTarget.getBoundingClientRect() })
-            }
-            className={cn(
-              /* Cápsula más alta que en el export: con 18.17 el ícono queda en
-                 12px y no se distingue de qué es cada contador. */
-              'flex h-[26px] shrink-0 items-center gap-[4px] rounded-full border border-[#E5E7EB] bg-[#F9FAFB] px-[6px] transition-colors hover:bg-[#f1f5ff]',
-              on && 'border-dash-blue bg-dash-count-bg',
-            )}
-          >
-            <Icono className="text-dash-blue size-[16px]" />
-            {/* El cero va en gris: un contador vacío no es una novedad. */}
-            {/* El export pinta el badge de azul también con 0: no se separa el
-                caso vacío. */}
-            <span className="bg-dash-blue flex size-[17px] items-center justify-center rounded-full text-[9px] leading-none text-white">
-              {cuenta(c)}
-            </span>
-          </button>
-        )
-      })}
+      {otrosContadores.map(contadorBoton)}
       </span>
 
       {/* Grupo 2, "detail-info-bar": cuatro celdas de 15.71 de alto separadas
@@ -250,11 +256,13 @@ export function ClinicalTopBar({
         </span>
       </span>
 
-      {/* Grupo 4: el botón de nota y Start Enconter, gap 9. Es el único que se
-          corre: `ml-auto` manda el sobrante acá y deja los otros cuatro grupos
-          pegados con su hueco de 12. Repartirlo entre todos —`justify-between`—
-          separaba las piezas casi el doble. */}
+      {/* Grupo 4: Medications, el botón de nota y Start Enconter, gap 9. Es
+          el único que se corre: `ml-auto` manda el sobrante acá y deja los
+          otros cuatro grupos pegados con su hueco de 12. Repartirlo entre
+          todos —`justify-between`— separaba las piezas casi el doble. */}
       <span className="flex shrink-0 items-center gap-[9px] max-lg:w-full lg:ml-auto">
+
+      {contadorBoton(medicacion)}
 
       <button
         onClick={() => aviso.info('Clinical note is not available in this release.')}
