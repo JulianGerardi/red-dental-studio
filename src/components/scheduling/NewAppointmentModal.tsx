@@ -256,18 +256,25 @@ export function NewAppointmentModal({
         /* El link a un plan de tratamiento pasó a ser su propio paso -antes
            vivía apretado al lado de Patient/Scheduling-. Llegar acá ya
            implica que el paciente está elegido (es obligatorio en el paso 1),
-           así que no hace falta re-chequear d.patient. */
-        <SectionCard title="Link to treatment plan visit">
-          <p className="text-[13px] font-bold text-[#09090b]">Treatment plans</p>
-          {PLANES.map((p) => (
-            <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />
-          ))}
+           así que no hace falta re-chequear d.patient.
 
-          <p className="mt-1 text-[13px] font-bold text-[#09090b]">Visit</p>
-          {VISITAS.map((v) => (
-            <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />
-          ))}
-        </SectionCard>
+           Treatment plans y Visit iban los dos adentro de una sola card, uno
+           debajo del otro sin más separación que un título -Julián pidió
+           partirlo en dos filas, cada una su propia card, para que se lea
+           como dos pasos distintos y no como una lista larga. */
+        <div className="flex flex-col gap-6">
+          <SectionCard title="Treatment plans">
+            {PLANES.map((p) => (
+              <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />
+            ))}
+          </SectionCard>
+
+          <SectionCard title="Visit">
+            {VISITAS.map((v) => (
+              <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />
+            ))}
+          </SectionCard>
+        </div>
       )}
     </ModalShell>
   )
