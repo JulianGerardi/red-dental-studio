@@ -109,12 +109,6 @@ export function ClinicalTopBar({
   const cuenta = (c: Contador) =>
     CATEGORIA_DE[c.id] ? items[CATEGORIA_DE[c.id]].length : c.items.length
 
-  /* Medications se saca del racimo de contadores -quedaba pegado a
-     edad/sexo/altura/peso y a nombre del paciente, todo junto- y pasa a vivir
-     al lado del ícono de nota (el "paper"), como pidió Julián. */
-  const medicacion = CONTADORES.find((c) => c.id === 'medications')!
-  const otrosContadores = CONTADORES.filter((c) => c.id !== 'medications')
-
   const contadorBoton = (c: Contador) => {
     const Icono = ICONO_CONTADOR[c.icono]
     const on = flot?.tipo === 'contador' && flot.c.id === c.id
@@ -224,14 +218,28 @@ export function ClinicalTopBar({
       </span>
       </span>
 
-      {/* Grupo 1: los contadores, gap 6. Medications no está -vive en el
-          grupo 4, al lado del ícono de nota-. */}
+      {/* Grupo 1: los contadores, gap 6 -Medications incluido, en su lugar
+          original-. */}
       <span className="flex items-center gap-[6px] max-lg:flex-wrap lg:shrink-0">
-      {otrosContadores.map(contadorBoton)}
+      {CONTADORES.map(contadorBoton)}
       </span>
 
-      {/* Grupo 2, "detail-info-bar": cuatro celdas de 15.71 de alto separadas
-          por una regla a la derecha —la última no lleva—, texto de 11.79. */}
+      {/* Grupo 4: la info del paciente (edad/sexo/altura/peso + avatar y
+          nombre), el botón de nota y Start Enconter, gap 9. Julián pidió esto
+          al revés de como había quedado: lo que se sacaba del racimo de
+          contadores -por pesado, no por chico- era este bloque, no
+          Medications. Es el único grupo que se corre: `ml-auto` manda el
+          sobrante acá y deja los demás pegados con su hueco de 12. */}
+      <span className="flex shrink-0 items-center gap-[9px] max-lg:w-full max-lg:flex-wrap lg:ml-auto">
+
+      {/* Subgrupo de info del paciente: detail-info-bar + user-info-bar
+          envuelven juntos, como una sola unidad, separados del botón de nota
+          y Start Enconter -si compartieran una sola fila sin wrap propio, el
+          `max-lg:flex-1` del pill de abajo lo aplastaría contra lo que sobre
+          en esa línea en vez de mandarlo a la suya-. */}
+      <span className="flex items-center gap-[9px] max-lg:flex-wrap">
+      {/* "detail-info-bar": cuatro celdas de 15.71 de alto separadas por una
+          regla a la derecha —la última no lleva—, texto de 11.79. */}
       <span className="flex h-[15.71px] items-center gap-[3.93px] max-lg:flex-wrap lg:shrink-0">
         {CONSTANTES.map((c, i) => (
           <span
@@ -246,7 +254,7 @@ export function ClinicalTopBar({
         ))}
       </span>
 
-      {/* Grupo 3, "user-info-bar": avatar de 23.71 y el nombre en 11.95/600. */}
+      {/* "user-info-bar": avatar de 23.71 y el nombre en 11.95/600. */}
       <span className="flex shrink-0 items-center gap-[3.19px]">
         <span className="bg-dash-count-bg text-dash-blue-hover flex size-[23.71px] items-center justify-center rounded-full text-[10px] font-semibold">
           JP
@@ -255,15 +263,12 @@ export function ClinicalTopBar({
           Julio Perez
         </span>
       </span>
+      </span>
 
-      {/* Grupo 4: Medications, el botón de nota y Start Enconter, gap 9. Es
-          el único que se corre: `ml-auto` manda el sobrante acá y deja los
-          otros cuatro grupos pegados con su hueco de 12. Repartirlo entre
-          todos —`justify-between`— separaba las piezas casi el doble. */}
-      <span className="flex shrink-0 items-center gap-[9px] max-lg:w-full lg:ml-auto">
-
-      {contadorBoton(medicacion)}
-
+      {/* Subgrupo del botón de nota + Start Enconter: en su propia fila el
+          pill puede volver a ocupar todo el ancho que sobre (`max-lg:flex-1`
+          adentro), en vez de repartirse contra la info del paciente. */}
+      <span className="flex shrink-0 items-center gap-[9px] max-lg:w-full">
       <button
         onClick={() => aviso.info('Clinical note is not available in this release.')}
         aria-label="Clinical note"
@@ -293,6 +298,7 @@ export function ClinicalTopBar({
           <ChevronDown className={cn('size-[15.71px] transition-transform', abierto && 'rotate-180')} />
         </button>
       </div>
+      </span>
       </span>
 
       {abierto && (
