@@ -165,14 +165,12 @@ export function NewAppointmentModal({
       </p>
 
       {paso === 1 ? (
-        /* minmax(0,…): sin eso una fila ancha de la columna derecha empuja y
-            desarma la izquierda. Patient y Scheduling eran una sola card -diez
-            campos, la más larga de todo el modal, y encima con el turno
-            apretada contra "Link to treatment plan visit" al lado-. Separadas
-            quedan del mismo alto que las dos de la derecha, así ninguna columna
-            le gana a la otra en largo. */
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.13fr)]">
-          <div className="flex flex-col gap-6">
+        /* Julián pidió Patient y Scheduling lado a lado -eran la columna
+           izquierda entera, apiladas- y Additional abajo de las dos, ocupando
+           todo el ancho: así entra toda la info del paso de un vistazo, sin
+           tener que bajar por una columna angosta. */
+        <div className="flex flex-col gap-6">
+          <div className="grid gap-6 lg:grid-cols-2">
             <SectionCard title="Patient">
               <p className="-mt-2 text-[11px] text-[#71717a]">
                 Complete the details below to schedule the appointment.
@@ -241,14 +239,12 @@ export function NewAppointmentModal({
             </div>
           </div>
 
-          <div className="flex flex-col gap-6">
-            <SectionCard title="Additional">
-              <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
-              <OptionCheckbox label="Follow-up" defaultChecked={false} />
-              <OptionCheckbox label="Premedicate" defaultChecked={false} />
-              <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
-            </SectionCard>
-          </div>
+          <SectionCard title="Additional">
+            <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
+            <OptionCheckbox label="Follow-up" defaultChecked={false} />
+            <OptionCheckbox label="Premedicate" defaultChecked={false} />
+            <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
+          </SectionCard>
         </div>
       ) : (
         /* El link a un plan de tratamiento pasó a ser su propio paso -antes
