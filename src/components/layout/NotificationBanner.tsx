@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ANCHO_PAGINA } from '@/lib/estilos'
 import type { Notificacion } from '@/data/notificaciones'
 
 /* Banner de tareas pendientes, arriba de todo. Muestra una por vez con
@@ -25,7 +26,8 @@ export function NotificationBanner({
        NewHoursModal (`#fffbeb` con `#b45309`), el mismo que el badge
        `warning`. El azul lo dejaba leer como información, no como algo
        pendiente de hacer. */
-    <div className="flex items-center gap-3 border-b border-[#fde68a] bg-[#fffbeb] px-4 py-2.5 sm:px-6">
+    <div className="border-b border-[#fde68a] bg-[#fffbeb]">
+      <div className={cn(ANCHO_PAGINA, 'flex items-center gap-3 px-4 py-2.5 sm:px-6')}>
       <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-[#b45309]">
         <Icono className="size-3.5" />
       </span>
@@ -76,6 +78,7 @@ export function NotificationBanner({
       >
         <X className="size-4" />
       </button>
+      </div>
     </div>
   )
 }

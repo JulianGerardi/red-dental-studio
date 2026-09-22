@@ -17,6 +17,7 @@ import {
 import { aviso } from '@/components/ui/toaster'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { Pagination } from '@/components/patients/ledger/Pagination'
+import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
 import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip } from '@/components/patients/ledger/LedgerRowDetail'
 import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
@@ -64,7 +65,7 @@ const MAX_ELASTICA = 280
 
 type ColumnaLedger = {
   id: ColLedger; label: string
-  elastica?: boolean; derecha?: boolean
+  elastica?: boolean; derecha?: boolean; bloqueada?: boolean
   claseCelda?: string
   titulo?: (m: Fila) => string
   celda: (m: Fila) => React.ReactNode
@@ -72,7 +73,7 @@ type ColumnaLedger = {
 type Fila = Movimiento & { saldo: number }
 
 const COLUMNAS: ColumnaLedger[] = [
-  { id: 'fecha', label: 'Date', celda: (m) => m.fecha },
+  { id: 'fecha', label: 'Date', bloqueada: true, celda: (m) => m.fecha },
   { id: 'paciente', label: 'Patient', claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.paciente, celda: (m) => m.paciente },
   {
     id: 'tipo', label: 'Type',
@@ -85,7 +86,7 @@ const COLUMNAS: ColumnaLedger[] = [
     id: 'monto', label: 'Amount', derecha: true, claseCelda: 'font-medium tabular-nums',
     celda: (m) => <span className={m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]'}>{moneda(m.monto)}</span>,
   },
-  { id: 'saldo', label: 'Balance', derecha: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', celda: (m) => moneda(m.saldo) },
+  { id: 'saldo', label: 'Balance', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', celda: (m) => moneda(m.saldo) },
 ]
 
 const VISTAS = ['Patient View', 'Guarantor View'] as const
@@ -108,6 +109,9 @@ export default function Ledger() {
   const [tab, setTab] = useState<Tab>('transacciones')
   const [pagina, setPagina] = useState(1)
   const [expandidas, setExpandidas] = useState<string[]>([])
+  const [ocultas, setOcultas] = useState<ColLedger[]>([])
+  const alternarCol = (id: ColLedger) =>
+    setOcultas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
   const [enModal, setEnModal] = useState<Fila | null>(null)
   const anchos = useAnchoColumnas<ColLedger>(ANCHO_BASE)
   const refVisible = useAnchoVisible<HTMLDivElement>()
@@ -132,9 +136,11 @@ export default function Ledger() {
       flexShrink: 1,
     }
   }
-  const anchoMinimo = COLUMNAS.reduce(
+  const columnasVisibles = COLUMNAS.filter((c) => !ocultas.includes(c.id))
+
+  const anchoMinimo = columnasVisibles.reduce(
     (a, c) => a + (anchos.manual(c.id) ?? ANCHO_MINIMO[c.id]), 0,
-  ) + (COLUMNAS.length - 1) * 12 + 24
+  ) + (columnasVisibles.length - 1) * 12 + 24
 
   const conSaldoTotal = useMemo(() => conSaldo(movs), [movs])
   const delaVista = useMemo(
@@ -258,6 +264,12 @@ export default function Ledger() {
                       </button>
                     ))}
                   </div>
+                  <ColumnPicker
+                    columnas={COLUMNAS}
+                    ocultas={ocultas}
+                    onToggle={alternarCol}
+                    onReset={() => setOcultas([])}
+                  />
                   <button
                     type="button"
                     onClick={() => aviso.ok('Statement exported.')}
@@ -276,7 +288,7 @@ export default function Ledger() {
               <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
                 <div style={{ minWidth: anchoMinimo }}>
                   <div data-tabla-header className="group/fila flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
-                    {COLUMNAS.map((c, i) => (
+                    {columnasVisibles.map((c, i) => (
                       <span
                         key={c.id}
                         data-elastica={c.elastica || undefined}
@@ -315,7 +327,7 @@ export default function Ledger() {
                             abierta && 'bg-[#fafafa]',
                           )}
                         >
-                          {COLUMNAS.map((c) => (
+                          {columnasVisibles.map((c) => (
                             <span
                               key={c.id}
                               style={estilo(c)}

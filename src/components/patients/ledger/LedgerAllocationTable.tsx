@@ -1,10 +1,7 @@
 import { useState } from 'react'
-import { CreditCard, Columns3, MoveHorizontal } from 'lucide-react'
+import { CreditCard, MoveHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import {
-  DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel,
-  DropdownMenuSeparator, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { ColumnPicker } from './ColumnPicker'
 import { moneda, fechaCorta, type Movimiento } from '@/data/ledger'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
@@ -21,55 +18,6 @@ type ColId =
   | 'fecha' | 'paciente' | 'provider' | 'diente' | 'superficie' | 'codigo'
   | 'desc' | 'charge' | 'otroCredito' | 'guarEstimado' | 'applied' | 'balance'
 
-function ColumnPicker({
-  columnas, ocultas, onToggle, onReset,
-}: {
-  columnas: { id: ColId; label: string; bloqueada?: boolean }[]
-  ocultas: ColId[]
-  onToggle: (id: ColId) => void
-  onReset: () => void
-}) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md border border-[#e4e4e7] px-2.5 py-1.5 text-[12px] font-medium text-[#71717a] hover:bg-[#f4f4f5]">
-        <Columns3 className="size-3.5" /> Columns
-        {ocultas.length > 0 && (
-          <span className="text-dash-blue rounded-full bg-[#eef5ff] px-1.5 text-[10px] font-bold">
-            {columnas.length - ocultas.length}/{columnas.length}
-          </span>
-        )}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[200px]">
-        <DropdownMenuLabel className="text-[11px] tracking-wide text-[#71717a] uppercase">
-          Show columns
-        </DropdownMenuLabel>
-        {columnas.map((c) => (
-          <DropdownMenuCheckboxItem
-            key={c.id}
-            checked={!ocultas.includes(c.id)}
-            disabled={c.bloqueada}
-            onCheckedChange={() => onToggle(c.id)}
-            onSelect={(e) => e.preventDefault()}
-          >
-            {c.label}
-          </DropdownMenuCheckboxItem>
-        ))}
-        {ocultas.length > 0 && (
-          <>
-            <DropdownMenuSeparator />
-            <button
-              type="button"
-              onClick={onReset}
-              className="text-dash-blue w-full rounded-md px-1.5 py-1 text-left text-sm font-semibold hover:bg-[#f4f4f5]"
-            >
-              Show all columns
-            </button>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
 
 type Columna = {
   id: ColId; label: string; px: number

@@ -1,4 +1,6 @@
 import { Outlet, useLocation, Link } from 'react-router-dom'
+import { cn } from '@/lib/utils'
+import { ANCHO_PAGINA } from '@/lib/estilos'
 import {
   UserCog, Building2, Users, ShieldCheck, SlidersHorizontal, CreditCard, Library, CircleUser, Lock,
   FileSignature, type LucideIcon,
@@ -73,7 +75,11 @@ export function SettingsLayout() {
     /* El sidebar propio de Settings se fue —sus pantallas cuelgan del menú
        flotante del rail—. El breadcrumb vive acá y en ningún otro lado: cuando
        además lo dibujaba cada pantalla, quedaban dos. */
-    <div className="min-h-full">
+    /* Settings era la única sección sin tope de ancho: en un monitor grande
+       sus cards se estiraban hasta 800px mientras el resto de la app cortaba
+       a 1400/1800. Ahora comparte el ancho, y la barra de arriba se alinea
+       con todas las pantallas por igual. */
+    <div className={cn(ANCHO_PAGINA, 'min-h-full')}>
       {migas.length > 0 && (
         <div className="px-4 pt-5 sm:px-8">
           <Breadcrumb items={migas} />

@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { aviso } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
+import { ANCHO_PAGINA } from '@/lib/estilos'
 
 /* Figma 3636:57489 (Secretary) y 3605:56446 (Provider). Alto 64, fondo blanco.
    El glifo ⌘ del buscador aparece solo en el frame Provider — en recepcionista
@@ -45,7 +46,8 @@ export function Topbar({
   const ToggleIcon = expanded ? PanelLeftClose : PanelLeftOpen
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 bg-white pr-3 pl-[13px] sm:gap-3 sm:pr-4">
+    <header className="h-16 shrink-0 bg-white">
+      <div className={cn(ANCHO_PAGINA, 'flex h-full items-center gap-2 pr-3 pl-[13px] sm:gap-3 sm:pr-4')}>
       {/* Left Section del Figma: greeting a la izquierda, grupo de controles
           empujado contra su borde derecho (justify-between).
           A medida que baja el ancho van cayendo, de menos a más importante:
@@ -91,6 +93,7 @@ export function Topbar({
       {/* Perfil. El borde izquierdo es el divisor que separa del resto. */}
       <div className="flex h-[42px] shrink-0 items-center border-l border-[#e4e4e7] pl-3 sm:pl-[18px]">
         <MenuCuenta />
+      </div>
       </div>
     </header>
   )

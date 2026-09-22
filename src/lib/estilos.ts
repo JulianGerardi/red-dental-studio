@@ -27,5 +27,6 @@ export const ICONO_SUELTO =
    el mismo problema que ya está documentado (y resuelto con su propio tope)
    en `ClinicalMode.tsx`. `2xl:` sólo entra a partir de 1536px de viewport,
    así que no cambia nada en las pantallas de todos los días. */
-export const CONTENEDOR_PAGINA =
-  'mx-auto w-full max-w-[1400px] 2xl:max-w-[1800px] px-4 py-6 sm:px-6'
+export const ANCHO_PAGINA = 'mx-auto w-full max-w-[1400px] 2xl:max-w-[1800px]'
+
+export const CONTENEDOR_PAGINA = `${ANCHO_PAGINA} px-4 py-6 sm:px-6`
