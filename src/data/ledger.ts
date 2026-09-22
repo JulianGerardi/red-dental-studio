@@ -71,6 +71,14 @@ export const TIPOS: TipoMovimiento[] = ['Charge', 'Payment', 'Adjustment', 'Insu
 export const moneda = (n: number) =>
   `${n < 0 ? '-' : ''}$${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
 
+/* Sólo Pt Payment y Credit Adj pueden tener plata sin aplicar todavía -son
+   los dos tipos que "entran" dinero a la cuenta-. Charge Adj resta, no deja
+   remanente para aplicar. Vive acá (no en Ledger.tsx) porque también la usa
+   el detalle expandido de la fila. */
+export function tieneCredito(m: Movimiento) {
+  return (m.tipo === 'Payment' || (m.tipo === 'Adjustment' && m.monto < 0)) && (m.creditoDisponible ?? 0) > 0
+}
+
 /* La tabla de allocation muestra 12 columnas a la vez: ahí la fecha va
    numérica (04/20/2026) como en el diseño de referencia, no "March 17, 2025",
    que sola se come 30px más. */

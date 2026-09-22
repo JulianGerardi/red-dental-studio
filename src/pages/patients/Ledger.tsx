@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  ChevronLeft, Search, Receipt, CreditCard, Wallet, PiggyBank, Download, MoveHorizontal,
+  ChevronLeft, Search, Receipt, CreditCard, Wallet, PiggyBank, HandCoins, Download, MoveHorizontal,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -11,7 +11,7 @@ import { FilterMenu } from '@/components/dashboard/FilterMenu'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import {
-  MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda,
+  MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda, tieneCredito,
   type Movimiento,
 } from '@/data/ledger'
 import { aviso } from '@/components/ui/toaster'
@@ -42,13 +42,6 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
     : { texto: 'Charge Adj', tono: 'danger' }
 }
 
-/* Sólo Pt Payment y Credit Adj pueden tener plata sin aplicar todavía -son
-   los dos tipos que "entran" dinero a la cuenta-. Charge Adj resta, no deja
-   remanente para aplicar. */
-function tieneCredito(m: Movimiento) {
-  return (m.tipo === 'Payment' || (m.tipo === 'Adjustment' && m.monto < 0)) && (m.creditoDisponible ?? 0) > 0
-}
-
 /* No es un `tipo` real -es una condición sobre `creditoDisponible`-, así que
    se agrega como una opción más al lado de Charge/Payment/Adjustment/
    Insurance en el mismo filtro, no como un filtro aparte. */
@@ -62,7 +55,7 @@ const OPCIONES_FILTRO = [...TIPOS, FILTRO_CREDITO]
 type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'credito' | 'saldo'
 
 const ANCHO_BASE: Record<ColLedger, number> = {
-  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, credito: 96, saldo: 96,
+  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, credito: 112, saldo: 96,
 }
 
 /* Piso de cada columna: hasta acá pueden encoger para que la tabla entre
@@ -71,7 +64,7 @@ const ANCHO_BASE: Record<ColLedger, number> = {
    "March 17, 2025" 93px, la pastilla "Ins Payment" 86, "-$9,850.00" 71.
    Patient/Description/Provider truncan y ya tienen tooltip. */
 const ANCHO_MINIMO: Record<ColLedger, number> = {
-  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, credito: 84, saldo: 76,
+  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, credito: 96, saldo: 76,
 }
 
 /* Techo de Description: pasado eso, lo que sobra se reparte entre las
@@ -104,9 +97,11 @@ const COLUMNAS: ColumnaLedger[] = [
   },
   {
     /* Tercera vuelta: al lado de Amount, no en Description ni al final de
-       la tabla -Julián la quería ahí específicamente-. El monto disponible
-       y el chanchito van juntos como botón: es la única forma de llegar a
-       "Apply credit" ahora que salió de Description. */
+       la tabla -Julián la quería ahí específicamente-. Con pinta de botón
+       de verdad (fondo y borde, no sólo texto azul) para que se note que es
+       clickeable, e ícono de mano con monedas -el chanchito ya significa
+       "ahorro/disponible" en el stat card de arriba, acá hace falta uno que
+       diga "aplicar", no "guardar". */
     id: 'credito', label: 'Credit', derecha: true,
     celda: (m) => {
       if (!tieneCredito(m)) return null
@@ -116,10 +111,10 @@ const COLUMNAS: ColumnaLedger[] = [
           data-apply-credit
           title={`${m.descripcion} · ${moneda(m.creditoDisponible ?? 0)} available`}
           aria-label={`Apply credit from ${m.descripcion}`}
-          className="text-dash-blue inline-flex items-center gap-1 text-[12.5px] font-semibold tabular-nums hover:underline"
+          className="border-dash-blue/25 text-dash-blue inline-flex items-center gap-1.5 rounded-md border bg-[#f0f5ff] px-2 py-1 text-[12px] font-semibold tabular-nums hover:bg-[#e3edff]"
         >
           {moneda(m.creditoDisponible ?? 0)}
-          <PiggyBank className="size-3.5 shrink-0" />
+          <HandCoins className="size-3.5 shrink-0" />
         </button>
       )
     },
@@ -398,7 +393,13 @@ export default function Ledger() {
                           ))}
                         </div>
                         </FilaConTooltip>
-                        {abierta && <LedgerRowDetail m={m} onVerTodo={() => setEnModal(m)} />}
+                        {abierta && (
+                          <LedgerRowDetail
+                            m={m}
+                            onVerTodo={() => setEnModal(m)}
+                            onAplicarCredito={tieneCredito(m) ? () => setEnCredito(m) : undefined}
+                          />
+                        )}
                       </div>
                       )
                     })

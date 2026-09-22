@@ -1,7 +1,7 @@
-import { Maximize2, ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
+import { Maximize2, ChevronsDownUp, ChevronsUpDown, HandCoins } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { moneda, type Movimiento } from '@/data/ledger'
+import { moneda, tieneCredito, type Movimiento } from '@/data/ledger'
 
 /* Resumen de la fila al pasar el mouse, para leerla completa sin abrirla.
    Reemplaza a los `title` que tenían las celdas que truncan: con los dos
@@ -86,6 +86,7 @@ function campos(m: Movimiento & { saldo?: number }) {
     { label: 'Surface', valor: m.superficie ?? '—' },
     { label: 'Amount', valor: moneda(m.monto) },
     ...(m.saldo !== undefined ? [{ label: 'Balance', valor: moneda(m.saldo) }] : []),
+    ...(tieneCredito(m) ? [{ label: 'Credit available', valor: moneda(m.creditoDisponible ?? 0) }] : []),
   ]
 }
 
@@ -109,10 +110,13 @@ function Campos({ m }: { m: Movimiento & { saldo?: number } }) {
 }
 
 export function LedgerRowDetail({
-  m, onVerTodo,
+  m, onVerTodo, onAplicarCredito,
 }: {
   m: Movimiento & { saldo?: number }
   onVerTodo: () => void
+  /** Sólo viene si la fila tiene crédito sin aplicar -ver `tieneCredito` en
+      Ledger.tsx-, así que alcanza con chequear que exista. */
+  onAplicarCredito?: () => void
 }) {
   return (
     <div className="border-t border-[#e7e7e7] bg-[#fafafa] px-3 py-3">
@@ -124,13 +128,24 @@ export function LedgerRowDetail({
           contenedor); cuando la tabla entra entera, ese valor ya es el 100%. */}
       <div className="sticky left-0 w-[var(--tabla-visible,100%)]">
         <Campos m={m} />
-        <button
-          type="button"
-          onClick={onVerTodo}
-          className="text-dash-blue mt-3 inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline"
-        >
-          <Maximize2 className="size-3.5" /> View full record
-        </button>
+        <div className="mt-3 flex flex-wrap items-center gap-4">
+          <button
+            type="button"
+            onClick={onVerTodo}
+            className="text-dash-blue inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline"
+          >
+            <Maximize2 className="size-3.5" /> View full record
+          </button>
+          {onAplicarCredito && (
+            <button
+              type="button"
+              onClick={onAplicarCredito}
+              className="text-dash-blue inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline"
+            >
+              <HandCoins className="size-3.5" /> Apply credit
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
