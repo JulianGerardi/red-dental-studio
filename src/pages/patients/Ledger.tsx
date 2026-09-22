@@ -56,11 +56,13 @@ const FILTRO_CREDITO = 'Unapplied Credits'
 const OPCIONES_FILTRO = [...TIPOS, FILTRO_CREDITO]
 
 /* Anchos del diseño de referencia (Confidentally 2.0): 112/112/96 · desc
-   elástica · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding. */
-type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'saldo'
+   elástica · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding.
+   `credito` es nuestra -no viene de esa referencia-, bloqueada como fecha y
+   saldo: es la única forma de llegar a "Apply credit". */
+type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'credito' | 'saldo'
 
 const ANCHO_BASE: Record<ColLedger, number> = {
-  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, saldo: 96,
+  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, credito: 96, saldo: 96,
 }
 
 /* Piso de cada columna: hasta acá pueden encoger para que la tabla entre
@@ -69,7 +71,7 @@ const ANCHO_BASE: Record<ColLedger, number> = {
    "March 17, 2025" 93px, la pastilla "Ins Payment" 86, "-$9,850.00" 71.
    Patient/Description/Provider truncan y ya tienen tooltip. */
 const ANCHO_MINIMO: Record<ColLedger, number> = {
-  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, saldo: 76,
+  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, credito: 84, saldo: 76,
 }
 
 /* Techo de Description: pasado eso, lo que sobra se reparte entre las
@@ -93,37 +95,34 @@ const COLUMNAS: ColumnaLedger[] = [
     id: 'tipo', label: 'Type',
     celda: (m) => { const t = detalleTipo(m); return <Pill tone={t.tono}>{t.texto}</Pill> },
   },
-  {
-    /* Segunda vuelta: Julián no quería una columna nueva -"que la fila sea
-       como la teníamos antes"-, así que "Apply credit" vuelve a vivir en
-       Description, pero como un botón cuadrado con ícono en vez del texto
-       largo con pill que se veía "todo junto". El nombre completo y el
-       crédito disponible aparecen recién al pasar el mouse (title nativo),
-       no todo el tiempo ocupando espacio en la fila. */
-    id: 'desc', label: 'Description', elastica: true, claseCelda: 'flex items-center gap-1.5 text-[#09090b]',
-    titulo: (m) => m.descripcion,
-    celda: (m) => (
-      <>
-        <span className="min-w-0 flex-1 truncate">{m.descripcion}</span>
-        {tieneCredito(m) && (
-          <button
-            type="button"
-            data-apply-credit
-            title={`${m.descripcion} · ${moneda(m.creditoDisponible ?? 0)} available`}
-            aria-label={`Apply credit from ${m.descripcion}`}
-            className="flex size-6 shrink-0 items-center justify-center rounded-md border border-[#c7d9fb] bg-[#f0f5ff] text-dash-blue hover:bg-[#e3edff]"
-          >
-            <PiggyBank className="size-3.5" />
-          </button>
-        )}
-      </>
-    ),
-  },
+  { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
   { id: 'provider', label: 'Provider', claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
   /* Los negativos bajan la cuenta: van en verde. */
   {
     id: 'monto', label: 'Amount', derecha: true, claseCelda: 'font-medium tabular-nums',
     celda: (m) => <span className={m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]'}>{moneda(m.monto)}</span>,
+  },
+  {
+    /* Tercera vuelta: al lado de Amount, no en Description ni al final de
+       la tabla -Julián la quería ahí específicamente-. El monto disponible
+       y el chanchito van juntos como botón: es la única forma de llegar a
+       "Apply credit" ahora que salió de Description. */
+    id: 'credito', label: 'Credit', derecha: true,
+    celda: (m) => {
+      if (!tieneCredito(m)) return null
+      return (
+        <button
+          type="button"
+          data-apply-credit
+          title={`${m.descripcion} · ${moneda(m.creditoDisponible ?? 0)} available`}
+          aria-label={`Apply credit from ${m.descripcion}`}
+          className="text-dash-blue inline-flex items-center gap-1 text-[12.5px] font-semibold tabular-nums hover:underline"
+        >
+          {moneda(m.creditoDisponible ?? 0)}
+          <PiggyBank className="size-3.5 shrink-0" />
+        </button>
+      )
+    },
   },
   { id: 'saldo', label: 'Balance', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', celda: (m) => moneda(m.saldo) },
 ]
@@ -373,7 +372,7 @@ export default function Ledger() {
                           onClick={(e) => {
                             if ((e.target as HTMLElement).closest('[role="separator"]')) return
                             /* El botón "Apply credit" vive adentro de la celda de
-                               Description -no tiene sentido un handler propio por
+                               credito -no tiene sentido un handler propio por
                                columna sólo para esto-, así que se intercepta acá
                                igual que el `separator` del resize de columnas. */
                             if ((e.target as HTMLElement).closest('[data-apply-credit]')) { setEnCredito(m); return }
