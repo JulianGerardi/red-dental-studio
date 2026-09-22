@@ -23,6 +23,7 @@ import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip } fr
 import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
 import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
 import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
+import { AplicarCreditoModal } from '@/components/patients/ledger/AplicarCreditoModal'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 4582:28487 / 4588:84886. Ver design-reference/figma/modulos/ledger.md. */
@@ -39,6 +40,13 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
   return m.monto < 0
     ? { texto: 'Credit Adj', tono: 'neutral' }
     : { texto: 'Charge Adj', tono: 'danger' }
+}
+
+/* Sólo Pt Payment y Credit Adj pueden tener plata sin aplicar todavía -son
+   los dos tipos que "entran" dinero a la cuenta-. Charge Adj resta, no deja
+   remanente para aplicar. */
+function tieneCredito(m: Movimiento) {
+  return (m.tipo === 'Payment' || (m.tipo === 'Adjustment' && m.monto < 0)) && (m.creditoDisponible ?? 0) > 0
 }
 
 /* Anchos del diseño de referencia (Confidentally 2.0): 112/112/96 · desc
@@ -79,7 +87,32 @@ const COLUMNAS: ColumnaLedger[] = [
     id: 'tipo', label: 'Type',
     celda: (m) => { const t = detalleTipo(m); return <Pill tone={t.tono}>{t.texto}</Pill> },
   },
-  { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
+  {
+    id: 'desc', label: 'Description', elastica: true, claseCelda: 'text-[#09090b]', titulo: (m) => m.descripcion,
+    /* El texto trunca en su propia línea -no en toda la celda- porque acá
+       abajo puede sumarse el pill de crédito: si el `truncate` quedara en
+       el contenedor, esa segunda línea se recortaría con él. */
+    celda: (m) => (
+      <div className="flex min-w-0 flex-col gap-1.5 py-0.5">
+        <span className="truncate">{m.descripcion}</span>
+        {tieneCredito(m) && (
+          <div className="flex flex-wrap items-center gap-2">
+            <Pill tone="purple">
+              <span className="mr-1.5 inline-block size-1.5 rounded-full bg-[#6633a6]" />
+              Credit available · {moneda(m.creditoDisponible ?? 0)}
+            </Pill>
+            <button
+              type="button"
+              data-apply-credit
+              className="h-6 shrink-0 rounded-md border border-[#e4d7fb] bg-white px-2.5 text-[11px] font-semibold text-[#6633a6] hover:bg-[#f8f5ff]"
+            >
+              Apply credit
+            </button>
+          </div>
+        )}
+      </div>
+    ),
+  },
   { id: 'provider', label: 'Provider', claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
   /* Los negativos bajan la cuenta: van en verde. */
   {
@@ -113,11 +146,23 @@ export default function Ledger() {
   const alternarCol = (id: ColLedger) =>
     setOcultas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
   const [enModal, setEnModal] = useState<Fila | null>(null)
+  const [enCredito, setEnCredito] = useState<Fila | null>(null)
   const anchos = useAnchoColumnas<ColLedger>(ANCHO_BASE)
   const refVisible = useAnchoVisible<HTMLDivElement>()
 
   const alternarFila = (id: string) =>
     setExpandidas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+
+  /* Aplicar crédito no genera un movimiento nuevo -esa plata ya está
+     contada en el saldo desde que el Payment/Adjustment se registró-, sólo
+     descuenta lo aplicado del remanente de la transacción de origen. */
+  const aplicarCredito = (id: string, monto: number) => {
+    setMovs((prev) => prev.map((mv) =>
+      mv.id === id ? { ...mv, creditoDisponible: Math.max((mv.creditoDisponible ?? 0) - monto, 0) } : mv,
+    ))
+    aviso.ok(`${moneda(monto)} of credit applied.`)
+    setEnCredito(null)
+  }
 
   /* Una columna movida a mano se queda donde la dejaron: no encoge ni
      crece. El resto cede hasta su piso para que la tabla entre entera, y al
@@ -316,6 +361,11 @@ export default function Ledger() {
                           aria-label={`Toggle details for ${m.descripcion}`}
                           onClick={(e) => {
                             if ((e.target as HTMLElement).closest('[role="separator"]')) return
+                            /* El botón "Apply credit" vive adentro de la celda de
+                               Description -no tiene sentido un handler propio por
+                               columna sólo para esto-, así que se intercepta acá
+                               igual que el `separator` del resize de columnas. */
+                            if ((e.target as HTMLElement).closest('[data-apply-credit]')) { setEnCredito(m); return }
                             alternarFila(m.id)
                           }}
                           onKeyDown={(e) => {
@@ -323,7 +373,12 @@ export default function Ledger() {
                             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
                           }}
                           className={cn(
-                            'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-[#3f3f46] hover:bg-[#fafafa]',
+                            /* items-start, no items-center: la celda de Description
+                               puede tener una segunda línea (pill + Apply credit) y
+                               con center el resto de las columnas quedaba pisado
+                               contra el medio de esa fila más alta. Con start, las
+                               filas de una sola línea se ven igual que antes. */
+                            'group/fila flex cursor-pointer items-start gap-3 px-3 py-3 text-[13px] text-[#3f3f46] hover:bg-[#fafafa]',
                             abierta && 'bg-[#fafafa]',
                           )}
                         >
@@ -410,6 +465,14 @@ export default function Ledger() {
       </div>
 
       {enModal && <LedgerRowModal m={enModal} onClose={() => setEnModal(null)} />}
+      {enCredito && (
+        <AplicarCreditoModal
+          m={enCredito}
+          cargos={cargosDeLaCuenta.filter((c) => c.paciente === enCredito.paciente)}
+          onClose={() => setEnCredito(null)}
+          onAplicar={(monto) => aplicarCredito(enCredito.id, monto)}
+        />
+      )}
     </div>
   )
 }

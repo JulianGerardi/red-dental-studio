@@ -15,6 +15,10 @@ export type Movimiento = {
   estado: EstadoMovimiento
   diente?: string
   superficie?: string
+  /** Sólo Payment y Adjustment(crédito, monto<0): cuánto de ese dinero
+      todavía no se aplicó a ningún cargo. Julián pidió poder verlo en la
+      fila y aplicarlo desde un modal -ver AplicarCreditoModal-. */
+  creditoDisponible?: number
 }
 
 export const GUARANTOR = 'John Smith'
@@ -30,10 +34,16 @@ export const MOVIMIENTOS: Movimiento[] = [
   { id: 'm5', fecha: 'March 21, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Card payment ····4218', provider: 'Front desk', tipo: 'Payment', monto: -100, estado: 'Posted' },
   { id: 'm6', fecha: 'March 24, 2025', paciente: 'John Smith', codigo: 'D2740', descripcion: 'Crown – porcelain/ceramic', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 1270, estado: 'Pending', diente: '19' },
   { id: 'm7', fecha: 'March 25, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'BCBS claim 1192-C', provider: 'BCBS', tipo: 'Insurance', monto: -640, estado: 'Denied' },
+  /* Sólo $50 de los $200 se aplicaron a un cargo hasta ahora -quedan $150
+     disponibles-. Mismos números que el mock de referencia de Julián. */
+  { id: 'm27', fecha: 'March 25, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Check payment ····1234', provider: 'Front desk', tipo: 'Payment', monto: -200, estado: 'Posted', creditoDisponible: 150 },
   { id: 'm8', fecha: 'March 26, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Courtesy adjustment', provider: 'Front desk', tipo: 'Adjustment', monto: -45, estado: 'Posted' },
   { id: 'm9', fecha: 'March 19, 2025', paciente: 'Emma Smith', codigo: 'D1120', descripcion: 'Prophylaxis – child', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 90, estado: 'Posted' },
   { id: 'm10', fecha: 'March 22, 2025', paciente: 'Emma Smith', codigo: '—', descripcion: 'Electronic Payment', provider: 'Front desk', tipo: 'Payment', monto: -90, estado: 'Posted' },
   { id: 'm11', fecha: 'March 28, 2025', paciente: 'John Smith', codigo: 'D1206', descripcion: 'Topical fluoride varnish', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 45, estado: 'Posted' },
+  /* Credit Adjustment con crédito sin aplicar todavía: mismo mecanismo que
+     m27, para probar el indicador en el otro tipo que lo puede tener. */
+  { id: 'm28', fecha: 'March 29, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Overpayment credit adjustment', provider: 'Front desk', tipo: 'Adjustment', monto: -80, estado: 'Posted', creditoDisponible: 80 },
   { id: 'm12', fecha: 'March 31, 2025', paciente: 'John Smith', codigo: 'D2392', descripcion: 'Resin composite – two surfaces', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 220, estado: 'Posted', diente: '30', superficie: 'MO' },
   { id: 'm13', fecha: 'April 3, 2025', paciente: 'John Smith', codigo: 'D4341', descripcion: 'Periodontal scaling – per quadrant', provider: 'Dr. Salgado', tipo: 'Charge', monto: 310, estado: 'Posted' },
   { id: 'm14', fecha: 'April 7, 2025', paciente: 'John Smith', codigo: 'D0220', descripcion: 'Intraoral periapical – first image', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 38, estado: 'Posted' },
