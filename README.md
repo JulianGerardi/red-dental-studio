@@ -1,32 +1,54 @@
-# React + TypeScript + Vite
+# red-clone
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Rediseño de la UI de [Confidentally](https://red.dev.confidentally.com) (software de gestión para clínicas dentales). React + Vite + TypeScript + Tailwind v4, con mock data propia (no hay backend real).
 
-Currently, two official plugins are available:
+## Correr el proyecto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev      # dev server, http://localhost:5182
+npm run build    # type-check (tsc -b) + build de producción
+npm run lint     # oxlint
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Estructura
+
+```
+src/
+  pages/            una por ruta (Dashboard.tsx, Scheduling.tsx, Patients.tsx, ...)
+    clinical/        sub-páginas de Clinical Mode
+    patients/        sub-páginas de detalle de paciente (Insurance, Ledger, ...)
+    settings/        sub-páginas de Settings
+  components/        agrupados por feature, un folder por página/módulo grande
+    scheduling/       ← Appointment (ver abajo)
+    clinical/         odontograma, exámenes, procedimientos
+    patients/         forms y primitivas compartidas (ModalShell, SectionCard, FormFooter, ...)
+    dashboard/        cards del Dashboard
+    settings/         forms de Settings
+    layout/           AppShell, Sidebar, Topbar
+    ui/               shadcn/ui (botones, inputs, toaster, ...)
+  data/               mock data (pacientes, turnos, catálogos)
+  lib/                utils compartidos (cn, etc.)
+
+design-reference/      capturas y notas del Figma original, por módulo
+INVENTORY.md            relevamiento del sitio real (red.dev.confidentally.com) vs esta réplica
+```
+
+## Appointment / Scheduling
+
+Todo lo de turnos vive en:
+
+- **`src/pages/Scheduling.tsx`** — la página del calendario (Day/Week/Month, "New appointment", solicitudes).
+- **`src/components/scheduling/`**
+  - `NewAppointmentModal.tsx` — modal de alta/edición, wizard de 2 pasos (Patient & Scheduling → Treatment Plan).
+  - `AppointmentSlotPicker.tsx` — panel lateral de horarios que aparece al tocar fecha/hora.
+  - `TreatmentPlanPicker.tsx` — cards de plan de tratamiento y fila de visita del paso 2.
+  - `CalendarViews.tsx`, `AppointmentDetailsDrawer.tsx`, `StatusLegend.tsx`, `ViewFiltersPanel.tsx` — resto del calendario.
+  - `calendar-data.ts`, `requests-data.ts` — mock data de turnos y solicitudes.
+- **`src/components/patients/PatientInSessionPopup.tsx`** — indicador "Currently being seen" (pestaña fija al borde derecho, en toda la app), lista los turnos de hoy sin completar.
+- Referencia de diseño: `design-reference/figma/modulos/scheduling.md` + capturas en `design-reference/figma/scheduling-*.png`.
+
+## Notas
+
+- Lock de pestaña única: no aplica acá (es del sitio real, ver INVENTORY.md).
+- Los datos son 100% mock (`src/data/`); no hay API ni persistencia real.
