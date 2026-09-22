@@ -112,11 +112,18 @@ export function PatientInSessionPopup() {
             el contenido queda recortado por el `overflow-hidden` de arriba
             en vez de forzar a la caja a ser más ancha. La opacidad entra un
             toque después que el ancho -`delay-100`- para que no se vea el
-            texto aplastándose mientras todavía no hay lugar. */}
+            texto aplastándose mientras todavía no hay lugar.
+
+            `max-h` (con su propio overflow-hidden) es lo que evita que este
+            bloque, siempre presente en el DOM, estire la fila entera -y con
+            ella el botón del avatar, por `items-stretch`- a su alto natural
+            aunque esté cerrado y en ancho 0: cerrado cuenta como 0 de alto,
+            así la pestaña vuelve a medir lo mismo que el botón solo, como al
+            principio. */}
         <div
           className={cn(
-            'flex min-w-[266px] flex-col justify-center gap-3 py-3 pr-4 transition-opacity duration-200',
-            abierto ? 'opacity-100 delay-100' : 'pointer-events-none opacity-0',
+            'flex min-w-[266px] flex-col justify-center gap-3 overflow-hidden py-3 pr-4 transition-[opacity,max-height] duration-200',
+            abierto ? 'max-h-[190px] opacity-100 delay-100' : 'pointer-events-none max-h-0 opacity-0',
           )}
         >
           <div className="min-w-0">
