@@ -240,9 +240,15 @@ export function NewAppointmentModal({
           </div>
 
           <SectionCard title="Additional">
-            <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
-            <OptionCheckbox label="Follow-up" defaultChecked={false} />
-            <OptionCheckbox label="Premedicate" defaultChecked={false} />
+            {/* Los tres iban uno debajo del otro -SectionCard los apila por
+                default- y hacían bastante scroll para algo que es sólo tres
+                casilleros cortos. Van en fila; cada uno en flex-1 para que
+                `OptionCheckbox` (que ya es w-full) reparta el ancho parejo. */}
+            <div className="flex flex-wrap gap-3">
+              <div className="min-w-[160px] flex-1"><OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} /></div>
+              <div className="min-w-[160px] flex-1"><OptionCheckbox label="Follow-up" defaultChecked={false} /></div>
+              <div className="min-w-[160px] flex-1"><OptionCheckbox label="Premedicate" defaultChecked={false} /></div>
+            </div>
             <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
           </SectionCard>
         </div>
