@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, LogOut, Radio } from 'lucide-react'
+import { LogOut, Radio } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
 
@@ -17,12 +17,15 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
    completado.
 
    Historial de esta pieza, todo por comentarios de Julián:
-   1. Rotaba sola cada 14s con un timer. No tiene sentido: en la app real
-      esto cambia cuando el provider hace el check-out del turno, no solo.
-      Ahora el reloj sólo cuenta "en el sillón hace"; pasar al siguiente es
-      la acción del botón "Check out" de abajo -mismo verbo que ya usa el
-      botón del Dashboard-. Al llegar al final vuelve al primero: es una
-      vitrina de demo, no una cola que se vacía.
+   1. Al principio mostraba un paciente a la vez con un cronómetro de "en el
+      sillón hace", y "Check out" pasaba al siguiente. Julián lo corrigió: un
+      provider puede tener varios pacientes en curso a la vez, cada uno en su
+      room -no son una cola de a uno-, así que ahora lista TODOS los turnos
+      de `enCurso`, uno abajo del otro. El cronómetro se cae con el cambio
+      -no tiene sentido un solo reloj para varios pacientes en paralelo-; en
+      su lugar cada fila muestra la hora del turno, que ya es un dato real.
+      "Check out" ahora es por fila y lo saca de la lista (estado local
+      `ocultos`, por índice: son datos de demo, no hay id detrás).
    2. Era una card fija abajo a la derecha que tapaba filas de la tabla o de
       Recent Patients, y cerrarla con la X la perdía hasta recargar.
    3. Moverla debajo de la campana (arriba a la derecha) no alcanzaba: ahí
@@ -49,16 +52,9 @@ export function PatientInSessionPopup() {
     () => datosDelDia(HOY_DEMO).appointments.filter((a) => !a.completado),
     [],
   )
-  const [indice, setIndice] = useState(0)
-  const [segundos, setSegundos] = useState(0)
+  const [ocultos, setOcultos] = useState<Set<number>>(() => new Set())
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    setSegundos(0)
-    const id = setInterval(() => setSegundos((s) => s + 1), 1000)
-    return () => clearInterval(id)
-  }, [indice])
 
   useEffect(() => {
     if (!abierto) return
@@ -74,18 +70,18 @@ export function PatientInSessionPopup() {
     }
   }, [abierto])
 
-  if (enCurso.length === 0) return null
+  const visibles = enCurso.filter((_, i) => !ocultos.has(i))
+  if (visibles.length === 0) return null
 
-  const actual = enCurso[indice]
-  const mm = String(Math.floor(segundos / 60)).padStart(2, '0')
-  const ss = String(segundos % 60).padStart(2, '0')
+  const primero = visibles[0]
 
   return (
     <div ref={ref} className="fixed top-1/2 right-0 z-30 -translate-y-1/2">
       {/* El ancho es lo único que anima: crece desde la pestaña (54px, sólo
-          el avatar) hasta la card completa (320px), siempre pegada al mismo
-          borde derecho -por eso el ancla es `right-0` y no `left`, así el
-          lado del avatar no se mueve, sólo se abre hacia la izquierda-. */}
+          el avatar del primero) hasta la card completa (320px), siempre
+          pegada al mismo borde derecho -por eso el ancla es `right-0` y no
+          `left`, así el lado del avatar no se mueve, sólo se abre hacia la
+          izquierda-. */}
       <div
         className={cn(
           'flex items-stretch overflow-hidden rounded-l-xl border border-r-0 border-[#e4e4e7] bg-white shadow-[0_8px_24px_rgb(0_0_0/0.16)] transition-[width] duration-300 ease-out',
@@ -96,11 +92,15 @@ export function PatientInSessionPopup() {
           type="button"
           onClick={() => setAbierto((v) => !v)}
           aria-expanded={abierto}
-          aria-label={`Currently being seen: ${actual.name}`}
+          aria-label={
+            visibles.length > 1
+              ? `Currently being seen: ${visibles.length} patients`
+              : `Currently being seen: ${primero.name}`
+          }
           className="flex shrink-0 items-center py-3 pr-2.5 pl-3 hover:bg-[#fafafa]"
         >
           <span className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[10px] font-bold text-[#17723c]">
-            {actual.initials}
+            {primero.initials}
             <span className="absolute -top-0.5 -right-0.5 flex size-3 items-center justify-center">
               <span className="absolute size-full animate-ping rounded-full bg-[#1e9850] opacity-75 motion-reduce:animate-none" />
               <span className="relative size-2 rounded-full bg-[#1e9850]" />
@@ -118,43 +118,48 @@ export function PatientInSessionPopup() {
             bloque, siempre presente en el DOM, estire la fila entera -y con
             ella el botón del avatar, por `items-stretch`- a su alto natural
             aunque esté cerrado y en ancho 0: cerrado cuenta como 0 de alto,
-            así la pestaña vuelve a medir lo mismo que el botón solo, como al
-            principio. */}
+            así la pestaña vuelve a medir lo mismo que el botón solo. La
+            lista interna tiene su propio scroll -el ancho de la caja no
+            cambia con la cantidad de pacientes, así que si un provider tiene
+            muchos no hay que seguir agrandando la card-. */}
         <div
           className={cn(
-            'flex min-w-[266px] flex-col justify-center gap-3 overflow-hidden py-3 pr-4 transition-[opacity,max-height] duration-200',
-            abierto ? 'max-h-[190px] opacity-100 delay-100' : 'pointer-events-none max-h-0 opacity-0',
+            'flex min-w-[266px] flex-col gap-2 overflow-hidden py-3 pr-3 transition-[opacity,max-height] duration-200',
+            abierto ? 'max-h-[248px] opacity-100 delay-100' : 'pointer-events-none max-h-0 opacity-0',
           )}
         >
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-[#1e9850] uppercase">
-              <Radio className="size-3" /> Currently being seen
-            </div>
-            <p className="truncate text-[13px] font-bold text-[#09090b]">{actual.name}</p>
-            <p className="truncate text-[11px] text-[#71717a]">{actual.operatory} · {actual.provider}</p>
+          <div className="flex items-center gap-1.5 px-1 text-[10px] font-semibold tracking-wide text-[#1e9850] uppercase">
+            <Radio className="size-3" /> Currently being seen
           </div>
 
-          <div className="flex items-center justify-between rounded-lg bg-[#f6f8fc] px-3 py-2">
-            <span className="text-[11px] text-[#71717a]">In chair for</span>
-            <span className="text-dash-blue text-[13px] font-bold tabular-nums">{mm}:{ss}</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Link
-              to={`/patients/${slug(actual.name)}`}
-              className="border-dash-blue text-dash-blue flex h-8 flex-1 items-center justify-center gap-1 rounded-md border text-[12px] font-semibold whitespace-nowrap hover:bg-[#f0f5ff]"
-            >
-              View chart <ArrowRight className="size-3.5" />
-            </Link>
-            {enCurso.length > 1 && (
-              <button
-                type="button"
-                onClick={() => setIndice((i) => (i + 1) % enCurso.length)}
-                className="bg-dash-blue hover:bg-dash-blue-hover flex h-8 flex-1 items-center justify-center gap-1 rounded-md text-[12px] font-semibold whitespace-nowrap text-white"
-              >
-                Check out <LogOut className="size-3.5" />
-              </button>
-            )}
+          <div className="flex flex-col gap-0.5 overflow-y-auto">
+            {visibles.map((p) => {
+              const i = enCurso.indexOf(p)
+              return (
+                <div key={i} className="group flex items-center gap-2 rounded-lg py-1 pr-1 pl-1 hover:bg-[#fafafa]">
+                  <span className="relative flex size-7 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[9px] font-bold text-[#17723c]">
+                    {p.initials}
+                    <span className="absolute -top-0.5 -right-0.5 flex size-2.5 items-center justify-center">
+                      <span className="absolute size-full animate-ping rounded-full bg-[#1e9850] opacity-75 motion-reduce:animate-none" />
+                      <span className="relative size-1.5 rounded-full bg-[#1e9850]" />
+                    </span>
+                  </span>
+                  <Link to={`/patients/${slug(p.name)}`} className="min-w-0 flex-1">
+                    <p className="truncate text-[12px] font-bold text-[#09090b] group-hover:underline">{p.name}</p>
+                    <p className="truncate text-[10.5px] text-[#71717a]">{p.operatory} · {p.provider}</p>
+                  </Link>
+                  <span className="shrink-0 text-[10.5px] whitespace-nowrap text-[#a1a1aa]">{p.time}</span>
+                  <button
+                    type="button"
+                    aria-label={`Check out ${p.name}`}
+                    onClick={() => setOcultos((prev) => new Set(prev).add(i))}
+                    className="flex size-6 shrink-0 items-center justify-center rounded-md text-[#a1a1aa] hover:bg-[#eef1f5] hover:text-[#09090b]"
+                  >
+                    <LogOut className="size-3.5" />
+                  </button>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>
