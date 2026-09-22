@@ -259,10 +259,10 @@ export function NewAppointmentModal({
            así que no hace falta re-chequear d.patient.
 
            Treatment plans y Visit iban los dos adentro de una sola card, uno
-           debajo del otro sin más separación que un título -Julián pidió
-           partirlo en dos filas, cada una su propia card, para que se lea
-           como dos pasos distintos y no como una lista larga. */
-        <div className="flex flex-col gap-6">
+           debajo del otro. Primero se separaron en dos filas, pero Julián
+           las quería lado a lado -Treatment a la izquierda, Visit a la
+           derecha-, igual que Patient/Scheduling en el paso 1. */
+        <div className="grid gap-6 lg:grid-cols-2">
           <SectionCard title="Treatment plans">
             {PLANES.map((p) => (
               <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />
