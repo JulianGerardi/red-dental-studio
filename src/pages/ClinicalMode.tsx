@@ -65,7 +65,7 @@ export default function ClinicalMode() {
       {/* Fondo punteado: es el del frame y da la sensación de mesa de trabajo. */}
       <div
         className="overflow-x-auto p-4 pb-16"
-        style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fbfefc' }}
+        style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fafbfe' }}
       >
         <div className={cn('mx-auto', ampliado ? 'min-w-[900px]' : 'min-w-[720px] max-w-[900px]')}>
           <Odontogram exam={exam} selected={seleccion} onToggle={alternarPieza} onSurface={pintarSuperficie} />
@@ -153,9 +153,11 @@ export default function ClinicalMode() {
        ancho. El tope de 1440 existe por eso mismo: sin él, a 1920 los huecos de
        la botonera se van a 90px y la fila se desarma.
 
-       El fondo va en blanco por pedido de Julián en un comentario del
-       artifact; el Figma usa el #fafbfe del resto de las pantallas. */
-    <div className="min-h-svh bg-white p-4 sm:p-[30px] lg:px-12">
+       El fondo había quedado en blanco por un pedido anterior de Julián;
+       ahora pidió volver al #fafbfe del resto de las pantallas -mismo token
+       `bg-page-background` que usa AppShell, definido en :root así que
+       funciona igual en este take-over sin shell-. */
+    <div className="bg-page-background min-h-svh p-4 sm:p-[30px] lg:px-12">
       <div className="mx-auto w-full max-w-[1440px]">
       <ClinicalTopBar
         volverA={`/patients/${patient.id}`}

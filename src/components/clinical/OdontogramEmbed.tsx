@@ -216,22 +216,6 @@ export function OdontogramEmbed({
     if (pasos.length > 0 && paso > pasos.length - 1) setPaso(0)
   }, [pasos, paso])
 
-  /* La botonera va anclada al pie del **gráfico**, no al de la card: si no,
-     al abrir el panel la card crece y los botones se van para abajo. Se
-     publica el alto del chart como variable para que el examen la use. */
-  useEffect(() => {
-    const raiz = ref.current
-    if (!raiz) return
-    const chart = raiz.querySelector<HTMLElement>('.chart')
-    const destino = raiz.closest<HTMLElement>('[data-examen]')
-    if (!chart || !destino) return
-    const medir = () => destino.style.setProperty('--odonto-chart-fin', `${chart.offsetTop + chart.offsetHeight}px`)
-    medir()
-    const observer = new ResizeObserver(medir)
-    observer.observe(chart)
-    return () => observer.disconnect()
-  }, [pasos])
-
   const actual = pasos[paso]
   /* Lo que quedó sin tocar; el resumen se muestra al minimizar. */
   const pendientes = pasos.filter((pa) => !tocados.includes(pa.titulo)).map((pa) => pa.titulo)
