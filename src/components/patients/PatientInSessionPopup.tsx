@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { LogOut, Radio } from 'lucide-react'
+import { ChevronRight, LogOut, Radio, UserRound } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
 
@@ -38,6 +38,20 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
       ping se saca de cada fila -"en vivo" ya lo dice el label verde de
       arriba- y se deja sólo en el avatar de la pestaña cerrada, donde es un
       único aviso con sentido ("hay algo pasando"), no un parpadeo por fila.
+   1c. Segunda vuelta: con jerarquía pero el botón del avatar seguía
+      estirado a lo alto por `items-stretch` -un ícono chico centrado en un
+      montón de blanco-. Julián pidió dos cosas más: un ícono de colapsar
+      arriba en vez de dejar ese hueco, y sacar el punto verde también de la
+      pestaña cerrada -"esa animación del círculo" pasa al stroke de toda la
+      caja, tipo indicador "vivo" de un panel de IA (glow suave en el
+      borde, `session-live` en index.css) en vez de un punto que titila.
+      `items-start` en la fila hace que el botón ya no se estire; abierto,
+      ese mismo botón cambia el avatar por un chevron de colapsar (con
+      `items-start` queda del tamaño justo, no ocupa la fila entera). El
+      glow sólo corre si `visibles.length` > 0 -nadie en curso, nada que
+      avisar-. Y la pestaña ya no desaparece en 0: capaz entra un paciente
+      más, así que el ícono queda con un ícono neutro y la lista muestra un
+      estado vacío en vez de desmontar todo el componente.
    2. Era una card fija abajo a la derecha que tapaba filas de la tabla o de
       Recent Patients, y cerrarla con la X la perdía hasta recargar.
    3. Moverla debajo de la campana (arriba a la derecha) no alcanzaba: ahí
@@ -83,41 +97,65 @@ export function PatientInSessionPopup() {
   }, [abierto])
 
   const visibles = enCurso.filter((_, i) => !ocultos.has(i))
-  if (visibles.length === 0) return null
-
+  const hayEnCurso = visibles.length > 0
   const primero = visibles[0]
 
   return (
     <div ref={ref} className="fixed top-1/2 right-0 z-30 -translate-y-1/2">
-      {/* El ancho es lo único que anima: crece desde la pestaña (54px, sólo
-          el avatar del primero) hasta la card completa (336px), siempre
-          pegada al mismo borde derecho -por eso el ancla es `right-0` y no
-          `left`, así el lado del avatar no se mueve, sólo se abre hacia la
-          izquierda-. */}
+      {/* El ancho es lo único que anima: crece desde la pestaña (54px) hasta
+          la card completa (336px), siempre pegada al mismo borde derecho
+          -por eso el ancla es `right-0` y no `left`, así el lado del avatar
+          no se mueve, sólo se abre hacia la izquierda-.
+
+          `items-start` en vez de `items-stretch`: con stretch, el botón del
+          avatar se estiraba a lo alto de toda la card abierta -un ícono
+          chico centrado en un montón de blanco de más-. Con start, el botón
+          se queda en su tamaño natural sin importar cuánto mida el
+          contenido de al lado.
+
+          El glow (`session-live`, en index.css) reemplaza el punto verde
+          animado: un aviso en el borde de toda la caja en vez de un punto
+          que titila, y sólo corre si hay alguien en curso -si `visibles`
+          queda en 0 la caja se queda quieta, sin apagarse del todo. */}
       <div
         className={cn(
-          'flex items-stretch overflow-hidden rounded-l-xl border border-r-0 border-[#e4e4e7] bg-white shadow-[0_8px_24px_rgb(0_0_0/0.16)] transition-[width] duration-300 ease-out',
+          'flex items-start overflow-hidden rounded-l-xl border border-r-0 border-[#e4e4e7] bg-white shadow-[0_8px_24px_rgb(0_0_0/0.16)] transition-[width] duration-300 ease-out',
           abierto ? 'w-[336px]' : 'w-[54px]',
+          hayEnCurso && 'motion-safe:animate-[session-live_2.6s_ease-in-out_infinite]',
         )}
       >
+        {/* Mismo botón siempre, pero lo que muestra depende del estado: el
+            avatar (o un ícono neutro si no hay nadie en curso) cerrado, un
+            chevron de "colapsar" abierto -así hay algo útil arriba en vez de
+            repetir un avatar que ya está abajo, en cada fila de la lista-. */}
         <button
           type="button"
           onClick={() => setAbierto((v) => !v)}
           aria-expanded={abierto}
           aria-label={
-            visibles.length > 1
-              ? `Currently being seen: ${visibles.length} patients`
-              : `Currently being seen: ${primero.name}`
+            abierto
+              ? 'Collapse'
+              : hayEnCurso
+                ? visibles.length > 1
+                  ? `Currently being seen: ${visibles.length} patients`
+                  : `Currently being seen: ${primero.name}`
+                : 'Currently being seen: no patients'
           }
           className="flex shrink-0 items-center py-3 pr-2.5 pl-3 hover:bg-[#fafafa]"
         >
-          <span className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[10px] font-bold text-[#17723c]">
-            {primero.initials}
-            <span className="absolute -top-0.5 -right-0.5 flex size-3 items-center justify-center">
-              <span className="absolute size-full animate-ping rounded-full bg-[#1e9850] opacity-75 motion-reduce:animate-none" />
-              <span className="relative size-2 rounded-full bg-[#1e9850]" />
+          {abierto ? (
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full text-[#71717a]">
+              <ChevronRight className="size-4" />
             </span>
-          </span>
+          ) : hayEnCurso ? (
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[10px] font-bold text-[#17723c]">
+              {primero.initials}
+            </span>
+          ) : (
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f4f4f5] text-[#a1a1aa]">
+              <UserRound className="size-4" />
+            </span>
+          )}
         </button>
 
         {/* min-w mayor al hueco que deja la pestaña cerrada a propósito: así
@@ -127,13 +165,10 @@ export function PatientInSessionPopup() {
             texto aplastándose mientras todavía no hay lugar.
 
             `max-h` (con su propio overflow-hidden) es lo que evita que este
-            bloque, siempre presente en el DOM, estire la fila entera -y con
-            ella el botón del avatar, por `items-stretch`- a su alto natural
-            aunque esté cerrado y en ancho 0: cerrado cuenta como 0 de alto,
-            así la pestaña vuelve a medir lo mismo que el botón solo. La
-            lista interna tiene su propio scroll -el ancho de la caja no
-            cambia con la cantidad de pacientes, así que si un provider tiene
-            muchos no hay que seguir agrandando la card-. */}
+            bloque, siempre presente en el DOM, cuente para el alto de la
+            fila aunque esté cerrado y en ancho 0: cerrado cuenta como 0 de
+            alto. La lista interna tiene su propio scroll -el ancho de la
+            caja no cambia con la cantidad de pacientes-. */}
         <div
           className={cn(
             'flex min-w-[280px] flex-col gap-2 overflow-hidden py-3 pr-3 transition-[opacity,max-height] duration-200',
@@ -144,41 +179,45 @@ export function PatientInSessionPopup() {
             <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-[#1e9850] uppercase">
               <Radio className="size-3" /> Currently being seen
             </div>
-            <span className="text-[10px] font-semibold text-[#a1a1aa]">{visibles.length}</span>
+            {hayEnCurso && <span className="text-[10px] font-semibold text-[#a1a1aa]">{visibles.length}</span>}
           </div>
 
-          <div className="flex flex-col divide-y divide-[#f1f1f4] overflow-y-auto">
-            {visibles.map((p) => {
-              const i = enCurso.indexOf(p)
-              return (
-                <div key={i} className="group flex items-center gap-2.5 py-2.5 first:pt-0.5 last:pb-0.5">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[10px] font-bold text-[#17723c]">
-                    {p.initials}
-                  </span>
-                  <Link to={`/patients/${slug(p.name)}`} className="min-w-0 flex-1">
-                    <p className="truncate text-[12.5px] font-bold text-[#09090b] group-hover:underline">{p.name}</p>
-                    <div className="mt-1 flex min-w-0 items-center gap-1.5">
-                      <span className="bg-dash-count-bg text-dash-blue-hover shrink-0 rounded-full px-1.5 py-[1px] text-[10px] font-semibold whitespace-nowrap">
-                        {p.operatory}
-                      </span>
-                      <span className="truncate text-[10.5px] text-[#71717a]">{p.provider}</span>
+          {hayEnCurso ? (
+            <div className="flex flex-col divide-y divide-[#f1f1f4] overflow-y-auto">
+              {visibles.map((p) => {
+                const i = enCurso.indexOf(p)
+                return (
+                  <div key={i} className="group flex items-center gap-2.5 py-2.5 first:pt-0.5 last:pb-0.5">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[10px] font-bold text-[#17723c]">
+                      {p.initials}
+                    </span>
+                    <Link to={`/patients/${slug(p.name)}`} className="min-w-0 flex-1">
+                      <p className="truncate text-[12.5px] font-bold text-[#09090b] group-hover:underline">{p.name}</p>
+                      <div className="mt-1 flex min-w-0 items-center gap-1.5">
+                        <span className="bg-dash-count-bg text-dash-blue-hover shrink-0 rounded-full px-1.5 py-[1px] text-[10px] font-semibold whitespace-nowrap">
+                          {p.operatory}
+                        </span>
+                        <span className="truncate text-[10.5px] text-[#71717a]">{p.provider}</span>
+                      </div>
+                    </Link>
+                    <div className="flex shrink-0 flex-col items-end gap-1">
+                      <span className="text-[10px] whitespace-nowrap text-[#a1a1aa]">{p.time}</span>
+                      <button
+                        type="button"
+                        aria-label={`Check out ${p.name}`}
+                        onClick={() => setOcultos((prev) => new Set(prev).add(i))}
+                        className="flex size-6 items-center justify-center rounded-md text-[#a1a1aa] hover:bg-[#eef1f5] hover:text-[#09090b]"
+                      >
+                        <LogOut className="size-3.5" />
+                      </button>
                     </div>
-                  </Link>
-                  <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span className="text-[10px] whitespace-nowrap text-[#a1a1aa]">{p.time}</span>
-                    <button
-                      type="button"
-                      aria-label={`Check out ${p.name}`}
-                      onClick={() => setOcultos((prev) => new Set(prev).add(i))}
-                      className="flex size-6 items-center justify-center rounded-md text-[#a1a1aa] hover:bg-[#eef1f5] hover:text-[#09090b]"
-                    >
-                      <LogOut className="size-3.5" />
-                    </button>
                   </div>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          ) : (
+            <p className="px-1 py-3 text-[11.5px] text-[#a1a1aa]">No patients currently being seen.</p>
+          )}
         </div>
       </div>
     </div>

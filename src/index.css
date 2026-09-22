@@ -367,6 +367,18 @@ body { font-family: var(--font-sans); }
   0%, 100% { box-shadow: 0 0 0 0 rgba(29,86,188,.35); }
   50%      { box-shadow: 0 0 0 6px rgba(29,86,188,0); }
 }
+
+/* "Currently being seen" (PatientInSessionPopup): antes el aviso de "en
+   vivo" era un punto verde con `animate-ping` en cada avatar -repetido en
+   toda la lista, mareaba en vez de comunicar-. Julián lo pidió como un glow
+   en el borde de toda la pestaña, estilo indicador "vivo" de un panel de
+   IA: una respiración suave, no un tilde que aparece y desaparece de golpe.
+   Incluye la sombra de reposo en los dos extremos para no pisar el
+   `shadow-[...]` de Tailwind que la pestaña ya trae. */
+@keyframes session-live {
+  0%, 100% { box-shadow: 0 8px 24px rgba(0,0,0,.16), 0 0 0 0 rgba(30,152,80,.45); }
+  50%      { box-shadow: 0 8px 24px rgba(0,0,0,.16), 0 0 14px 3px rgba(30,152,80,.55); }
+}
 @keyframes tour-card-in {
   0%, 8%   { opacity: 0; transform: translateY(10px); }
   22%,100% { opacity: 1; transform: translateY(0); }
