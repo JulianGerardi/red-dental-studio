@@ -1,12 +1,20 @@
+import { useState } from 'react'
 import { Pencil } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
+import { Pagination } from '@/components/patients/ledger/Pagination'
 
 /* Figma 3638:61352 — la capa se llama `table/referral-table`: es el componente
-   de referrals reusado para pacientes. De ahí sale el "referrals" del footer. */
+   de referrals reusado para pacientes, y de ahí venía un pie que decía
+   "Showing 6 of 18 referrals" con 11 filas a la vista y flechas que no
+   hacían nada. Confidentally 2.0 ya no arrastra esa etiqueta en esta
+   pantalla, y Accounts acá mismo cuenta de verdad: el pie ahora dice lo que
+   hay y el pager funciona, con el mismo componente que usan Ledger y
+   Accounts. */
+const POR_PAGINA = 10
 
 /* Pedido explícito de Julián: reemplazar el status de tratamiento
    (Completed/Proposed/In Progress) por si el paciente está activo o no. */
@@ -59,6 +67,12 @@ export function PatientsTable({
   rows: PatientRow[]
   onRowAction?: (row: PatientRow) => void
 }) {
+  const [pagina, setPagina] = useState(1)
+  const paginas = Math.max(1, Math.ceil(rows.length / POR_PAGINA))
+  const actual = Math.min(pagina, paginas)
+  const visibles = rows.slice((actual - 1) * POR_PAGINA, actual * POR_PAGINA)
+  const desde = rows.length === 0 ? 0 : (actual - 1) * POR_PAGINA + 1
+
   return (
     /* Las columnas suman 872: en pantallas angostas la tabla scrollea sola en
        vez de recortarse contra el borde. */
@@ -72,7 +86,7 @@ export function PatientsTable({
         <HeadCell className={COLS.actions}>Actions</HeadCell>
       </div>
 
-      {rows.map((r, i) => (
+      {visibles.map((r, i) => (
         <div
           key={`${r.email}-${i}`}
           className={cn(
@@ -109,23 +123,10 @@ export function PatientsTable({
       ))}
 
       <div className="flex h-[52px] w-full items-center justify-between border-t border-[#e7e7e7] bg-white px-4">
-        {/* El texto dice "referrals" y "6" con 11 filas a la vista: es del
-            Figma, por reuso del componente de referrals. Se deja tal cual. */}
-        <p className="text-xs font-semibold text-[#71717a]">Showing 6 of 18 referrals</p>
-        <div className="flex items-center gap-1">
-          {['‹', '1', '2', '3', '›'].map((p) => (
-            <button
-              key={p}
-              type="button"
-              className={cn(
-                'flex size-8 items-center justify-center rounded-md text-xs font-semibold',
-                p === '1' ? 'bg-dash-blue text-[#fafafa]' : 'text-[#71717a] hover:bg-[#f4f4f5]',
-              )}
-            >
-              {p}
-            </button>
-          ))}
-        </div>
+        <p className="text-xs font-semibold text-[#71717a]">
+          Showing {desde} to {desde === 0 ? 0 : desde + visibles.length - 1} of {rows.length} patients
+        </p>
+        <Pagination pagina={actual} paginas={paginas} onChange={setPagina} />
       </div>
     </div>
     </div>
