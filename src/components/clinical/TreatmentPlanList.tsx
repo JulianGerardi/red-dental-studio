@@ -1,11 +1,12 @@
-import { FileText, ChevronRight, CircleCheck } from 'lucide-react'
+import { ChevronRight, CircleCheck } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { PLANES, type Plan } from '@/data/clinical-mode'
 
-/* Card de 4235:135661: profesional arriba con su documento, una regla, el
-   nombre del plan con la pill, los tres datos y el porcentaje grande con la
-   barra. El orden de los datos es Created On / Total Procedures / Total Amount,
-   distinto al del tablero viejo. */
+/* Card de 4235:135661: profesional arriba, una regla, el nombre del plan con
+   la pill, los tres datos y el porcentaje grande con la barra. El orden de los
+   datos es Created On / Total Procedures / Total Amount, distinto al del
+   tablero viejo. El frame dibuja además un ícono de documento a la derecha del
+   profesional: se sacó a pedido de Julián. */
 /* La etiqueta va en una sola línea. Partida en dos —"Total / Procedures"—
    desalineaba las tres cajas entre sí y apretaba la card entera. */
 function Dato({ label, valor, azul }: { label: string; valor: string; azul?: boolean }) {
@@ -29,13 +30,6 @@ function PlanCard({ p }: { p: Plan }) {
           <span className="block truncate text-[13px] font-bold text-[#09090b]">{p.doctor}</span>
           <span className="block text-[12px] text-[#71717a]">{p.rol}</span>
         </span>
-        <button
-          onClick={() => aviso.info('The plan document is not available in this release.')}
-          aria-label={`Open ${p.nombre} document`}
-          className="shrink-0 text-[#52525b] hover:opacity-70"
-        >
-          <FileText className="size-4" />
-        </button>
       </div>
 
       <div className="my-3 h-px bg-[#f1f1f4]" />

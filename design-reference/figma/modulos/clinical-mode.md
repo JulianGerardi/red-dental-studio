@@ -65,7 +65,7 @@ hasta 7752px de ancho.
 
 ## Overview
 
-- **Treatment Plan**: cuatro planes con profesional, documento, nombre, pill
+- **Treatment Plan**: cuatro planes con profesional, nombre, pill
   "Available", tres datos (Created On en azul / Total Procedures / Total
   Amount) y el porcentaje grande con la barra. La columna scrollea sola para no
   estirar la pagina al doble del alto del odontograma.
