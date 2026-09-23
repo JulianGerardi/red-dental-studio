@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  ChevronLeft, Search, Receipt, CreditCard, Wallet, PiggyBank, Download, MoveHorizontal,
+  ChevronLeft, Search, Receipt, CreditCard, Wallet, HandCoins, Download, MoveHorizontal,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -40,23 +40,6 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
   return m.monto < 0
     ? { texto: 'Credit Adj', tono: 'neutral' }
     : { texto: 'Charge Adj', tono: 'danger' }
-}
-
-/* Anillo de 16px: el arco es la parte del pago que sigue sin aplicar. El
-   color viene de `currentColor` para que el botón que lo envuelve lo tiña. */
-function AnilloCredito({ restante, total, className }: { restante: number; total: number; className?: string }) {
-  const radio = 6
-  const circunferencia = 2 * Math.PI * radio
-  const fraccion = total > 0 ? Math.min(restante / total, 1) : 0
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" className={className}>
-      <circle cx="8" cy="8" r={radio} fill="none" stroke="currentColor" strokeOpacity={0.2} strokeWidth={2} />
-      <circle
-        cx="8" cy="8" r={radio} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"
-        strokeDasharray={`${circunferencia * fraccion} ${circunferencia}`} transform="rotate(-90 8 8)"
-      />
-    </svg>
-  )
 }
 
 /* No es un `tipo` real -es una condición sobre `creditoDisponible`-, así que
@@ -105,9 +88,9 @@ const COLUMNAS: ColumnaLedger[] = [
   },
   {
     /* Cuarta vuelta: el crédito sin aplicar vive en Description como un
-       anillo -sin columna ni texto extra-: lo que queda del pago contra lo
-       que entró. Al pasar el mouse por la fila el anillo se vuelve el chip
-       "$150.00 left · Apply". Es el mismo botón en los dos estados. */
+       botón de ícono -sin columna ni texto extra en reposo-. Al pasar el
+       mouse por la fila se le suma "$150.00 left · Apply": es el mismo
+       botón, con el mismo borde y fondo, en los dos estados. */
     id: 'desc', label: 'Description', elastica: true, claseCelda: 'flex items-center gap-2 text-[#09090b]',
     titulo: (m) => m.descripcion,
     celda: (m) => (
@@ -118,12 +101,10 @@ const COLUMNAS: ColumnaLedger[] = [
             type="button"
             data-apply-credit
             aria-label={`Apply ${moneda(m.creditoDisponible ?? 0)} credit from ${m.descripcion}`}
-            className="text-dash-blue group/credito flex shrink-0 items-center rounded-md"
+            className="text-dash-blue flex shrink-0 items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-[#f0f5ff] px-1.5 py-1 text-[12px] font-medium whitespace-nowrap tabular-nums hover:bg-[#e3edff]"
           >
-            <AnilloCredito restante={m.creditoDisponible ?? 0} total={Math.abs(m.monto)} className="group-hover/fila:hidden" />
-            <span className="hidden rounded-md border border-[#c7d9fb] bg-[#f0f5ff] px-2 py-0.5 text-[12px] font-medium whitespace-nowrap tabular-nums group-hover/fila:inline group-hover/credito:bg-[#e3edff]">
-              {moneda(m.creditoDisponible ?? 0)} left · Apply
-            </span>
+            <HandCoins className="size-3.5 shrink-0" />
+            <span className="hidden group-hover/fila:inline">{moneda(m.creditoDisponible ?? 0)} left · Apply</span>
           </button>
         )}
       </>
@@ -245,7 +226,7 @@ export default function Ledger() {
       /* bg/fg: StatStrip los ignora a propósito -las cuatro comparten el
          mismo azul del ícono, ver su propio comentario-, quedan sólo por
          las dudas de que algún día se lean. */
-      { label: 'Unapplied credits', value: moneda(credito), nota: 'Available to apply', icon: PiggyBank, bg: '#eef2ff', fg: '#1d56bc' },
+      { label: 'Unapplied credits', value: moneda(credito), nota: 'Available to apply', icon: HandCoins, bg: '#eef2ff', fg: '#1d56bc' },
     ]
   }, [delaVista])
 
