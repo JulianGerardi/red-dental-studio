@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   Search, Plus, Bold, Italic, Underline, Heading1, Heading2,
   Pilcrow, List, ListOrdered, X, MapPin, Eye, Send, Power, PowerOff,
+  User, Stethoscope, CalendarDays, ClipboardList, type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Pill } from '@/components/ui/pill'
@@ -120,6 +121,18 @@ const BORRADOR_VACIO: Borrador = { titulo: '', procedimientos: [], naturaleza: '
 const aBorrador = (t: ConsentTemplate): Borrador => ({
   titulo: t.titulo, procedimientos: t.procedimientos, naturaleza: t.naturaleza, riesgos: t.riesgos,
 })
+
+/* Un dato del encabezado del preview con su ícono a la izquierda -paciente,
+   proveedor, cita y procedimiento-. El ícono es chico y sin caja para no
+   comerle ancho al texto: la columna del preview mide ~144px. */
+function DatoConIcono({ icono: Icono, children }: { icono: LucideIcon; children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-1.5">
+      <Icono className="text-dash-blue mt-px size-3.5 shrink-0" />
+      <div className="min-w-0">{children}</div>
+    </div>
+  )
+}
 
 /* Toolbar decorativo: mismo trato que el botón "Select File" de Documents en
    Employees.tsx -avisa que no está disponible en vez de fingir que hace
@@ -456,25 +469,25 @@ export function SettingsConsents() {
           <h3 className="text-[17px] leading-tight font-bold text-[#09090b]">{borrador.titulo || 'Untitled Consent'}</h3>
 
           <div className="mt-3 grid grid-cols-2 gap-3 text-[12px]">
-            <div>
+            <DatoConIcono icono={User}>
               <p className="font-bold text-[#09090b]">Sarah Stone</p>
               <p className="text-[#71717a]">DOB: 04/02/1991</p>
               <p className="text-[#71717a]">Patient ID: 12345432</p>
-            </div>
-            <div>
+            </DatoConIcono>
+            <DatoConIcono icono={Stethoscope}>
               <p className="font-bold text-[#09090b]">John Lorem</p>
               <p className="text-[#71717a]">Provider</p>
-            </div>
-            <div>
+            </DatoConIcono>
+            <DatoConIcono icono={CalendarDays}>
               <p className="font-bold text-[#09090b]">{CITA}</p>
               <p className="text-[#71717a]">Appointment</p>
-            </div>
-            <div>
-              <p className="truncate font-bold text-[#09090b]">
+            </DatoConIcono>
+            <DatoConIcono icono={ClipboardList}>
+              <p className="font-bold text-[#09090b]">
                 {borrador.procedimientos.length > 0 ? procedimiento(borrador.procedimientos[0])?.nombre : '—'}
               </p>
               <p className="text-[#71717a]">Procedure</p>
-            </div>
+            </DatoConIcono>
           </div>
 
           {!vistaPaciente && (
