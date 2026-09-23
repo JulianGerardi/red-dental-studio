@@ -147,6 +147,11 @@ export function SettingsConsents() {
   const [templates, setTemplates] = useState(TEMPLATES_INICIALES)
   const [q, setQ] = useState('')
   const [filtro, setFiltro] = useState<Filtro>('Active')
+  /* Templates recién activados/desactivados: se quedan en la lista aunque ya
+     no cumplan el filtro, para que se vea el interruptor cambiar en vez de
+     que la tarjeta desaparezca de golpe. Se limpia al cambiar de filtro o
+     de búsqueda. */
+  const [fijados, setFijados] = useState<string[]>([])
   const [actualId, setActualId] = useState<string | null>('t1')
   const [borrador, setBorrador] = useState<Borrador>(aBorrador(TEMPLATES_INICIALES[0]))
   const [intentado, setIntentado] = useState(false)
@@ -154,7 +159,7 @@ export function SettingsConsents() {
   const [vistaPaciente, setVistaPaciente] = useState(false)
 
   const visibles = templates.filter(
-    (t) => coincideFiltro(t, filtro) && t.titulo.toLowerCase().includes(q.trim().toLowerCase()),
+    (t) => (coincideFiltro(t, filtro) || fijados.includes(t.id)) && t.titulo.toLowerCase().includes(q.trim().toLowerCase()),
   )
   const actual = templates.find((t) => t.id === actualId)
 
@@ -162,6 +167,7 @@ export function SettingsConsents() {
     const t = templates.find((x) => x.id === id)
     if (!t) return
     setTemplates((ts) => ts.map((x) => (x.id === id ? { ...x, activo: !x.activo } : x)))
+    setFijados((f) => (f.includes(id) ? f : [...f, id]))
     aviso.ok(`Consent template ${t.activo ? 'deactivated' : 'activated'}.`)
   }
 
@@ -228,7 +234,7 @@ export function SettingsConsents() {
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
             <input
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={(e) => { setQ(e.target.value); setFijados([]) }}
               placeholder="Search templates..."
               className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
             />
@@ -239,7 +245,7 @@ export function SettingsConsents() {
               <button
                 key={f}
                 type="button"
-                onClick={() => setFiltro(f)}
+                onClick={() => { setFiltro(f); setFijados([]) }}
                 className={cn(
                   'h-7 flex-1 rounded-md text-xs font-medium transition-colors',
                   filtro === f ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
