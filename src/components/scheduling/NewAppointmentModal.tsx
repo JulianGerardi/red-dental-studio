@@ -32,11 +32,6 @@ import { aviso } from '@/components/ui/toaster'
 const PACIENTES = ['John Smith', 'Noah James Smith', 'Maria Abril Viola', 'Elias Aguirre']
 const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado', 'Sarah Stone']
 
-const PLANES: Plan[] = [
-  { id: 'p1', estado: 'Accepted', date: '27, August 2025', doctor: 'Dr. Emily Chen', therapy: 'Comprehensive Implant Therapy', visitas: 2, procedimientos: 3 },
-  { id: 'p2', estado: 'Inprogress', date: '27, August 2025', doctor: 'Dr. Emily Chen', therapy: 'Comprehensive Implant Therapy', visitas: 2, procedimientos: 3 },
-]
-
 const VISITAS: Visita[] = [
   {
     id: 'v1', name: 'Visit 1', total: '$1,270.00',
@@ -55,6 +50,41 @@ const VISITAS: Visita[] = [
     id: 'v2', name: 'Visit 2', total: '$860.00',
     procedimientos: ['D0120 – Periodic oral evaluation', 'D1110 – Prophylaxis – adult'],
   },
+  /* Las tres siguientes siguen el hilo de la Comprehensive Implant Therapy:
+     cirugía, pilar y corona. */
+  {
+    id: 'v3', name: 'Visit 3', total: '$2,480.00',
+    procedimientos: [
+      'D6010 – Surgical placement of implant body',
+      'D6104 – Bone graft at time of implant placement',
+      'D0220 – Intraoral periapical – first image',
+    ],
+  },
+  {
+    id: 'v4', name: 'Visit 4', total: '$1,340.00',
+    procedimientos: [
+      'D6056 – Prefabricated abutment',
+      'D0140 – Limited oral evaluation – problem focused',
+      'D0220 – Intraoral periapical – first image',
+    ],
+  },
+  {
+    id: 'v5', name: 'Visit 5', total: '$1,950.00',
+    procedimientos: [
+      'D6058 – Abutment supported porcelain/ceramic crown',
+      'D0220 – Intraoral periapical – first image',
+      'D6080 – Implant maintenance procedures',
+    ],
+  },
+]
+
+/* Los conteos de la card del plan salen de la lista de visitas: con números
+   escritos a mano, agregar una visita dejaba el plan diciendo "2 Visits". */
+const TOTAL_PROCEDIMIENTOS = VISITAS.reduce((a, v) => a + v.procedimientos.length, 0)
+
+const PLANES: Plan[] = [
+  { id: 'p1', estado: 'Accepted', date: '27, August 2025', doctor: 'Dr. Emily Chen', therapy: 'Comprehensive Implant Therapy', visitas: VISITAS.length, procedimientos: TOTAL_PROCEDIMIENTOS },
+  { id: 'p2', estado: 'Inprogress', date: '27, August 2025', doctor: 'Dr. Emily Chen', therapy: 'Comprehensive Implant Therapy', visitas: VISITAS.length, procedimientos: TOTAL_PROCEDIMIENTOS },
 ]
 
 const VACIO = {
