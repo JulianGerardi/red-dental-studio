@@ -255,6 +255,10 @@ plegadas.
 5. La segunda visita pasó a ser "Visit 2" con otro total. En el frame las dos
    dicen "Visit 1" y "Total 1,270.00", que en un selector real no distingue
    una opción de la otra.
+6. **Cinco visitas, no dos (pedido de Julián).** Se agregaron Visit 3, 4 y 5
+   -cirugía del implante, pilar y corona, siguiendo la Comprehensive Implant
+   Therapy-. Las cards del plan ya no dicen "2 Visits · 3 Procedures" del
+   frame: los conteos salen de la lista y hoy dan "5 Visits · 19 Procedures".
 
 
 ## Day / Week / Month funcionando (2026-08-29)
