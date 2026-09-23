@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import {
   Search, Plus, Bold, Italic, Underline, Heading1, Heading2,
-  Pilcrow, List, ListOrdered, X, MapPin, Eye,
+  Pilcrow, List, ListOrdered, X, MapPin, Eye, Send, Power, PowerOff,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Pill, type PillTone } from '@/components/ui/pill'
+import { Pill } from '@/components/ui/pill'
+import { Switch } from '@/components/ui/switch'
 import { SelectField } from '@/components/patients/form'
 import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
@@ -31,8 +32,18 @@ import { aviso } from '@/components/ui/toaster'
    Template" aunque haya un template cargado, tal cual las tres variantes del
    frame. */
 
-type EstadoTemplate = 'Active' | 'System'
-const ESTADO_TONO: Record<EstadoTemplate, PillTone> = { Active: 'success', System: 'info' }
+/* "Patient acknowledgment" es el mismo texto en todos los consentimientos:
+   no se edita por template, sólo se muestra en el preview. */
+const RECONOCIMIENTOS_PACIENTE = [
+  'I have read and understand the information provided.',
+  'I had the opportunity to ask questions.',
+  'I voluntarily consent to the proposed treatment.',
+]
+
+/* Fechas de ejemplo del preview -no vienen del template, son del envío y de
+   la cita del paciente-. */
+const CONSENT_ENVIADO = 'September 23, 2026 — 10:30 AM'
+const CITA = 'October 15, 2026 — 9:00 AM'
 
 type Procedimiento = { codigo: string; nombre: string }
 const PROCEDIMIENTOS_DISPONIBLES: Procedimiento[] = [
@@ -44,54 +55,46 @@ const PROCEDIMIENTOS_DISPONIBLES: Procedimiento[] = [
 ]
 const procedimiento = (codigo: string) => PROCEDIMIENTOS_DISPONIBLES.find((p) => p.codigo === codigo)
 
+/* `activo` y `sistema` son independientes: "System" dice de dónde viene el
+   template (viene con el producto), "activo" si hoy se ofrece o no. Un
+   template de sistema también se puede desactivar. */
 type ConsentTemplate = {
   id: string
   titulo: string
-  estado: EstadoTemplate
+  activo: boolean
+  sistema: boolean
   procedimientos: string[]
   naturaleza: string
   riesgos: string
-  reconocimientos: string[]
 }
 
 const TEMPLATES_INICIALES: ConsentTemplate[] = [
   {
     id: 't1',
     titulo: 'Extraction Informed Consent',
-    estado: 'Active',
+    activo: true,
+    sistema: false,
     procedimientos: ['D7240', 'D3948'],
     naturaleza: 'The proposed treatment has been explained to me in a way that I understood, including what will be done and why it is recommended.',
     riesgos: 'Pain, swelling, bleeding, or bruising.\nInfection or delayed healing.\nReaction to medications or anesthesia.\nNeed for additional treatment if complications occur.',
-    reconocimientos: [
-      'I have read and understand the information provided.',
-      'I had the opportunity to ask questions.',
-      'I voluntarily consent to the proposed treatment.',
-    ],
   },
   {
     id: 't2',
     titulo: 'Root Canal Consent',
-    estado: 'Active',
+    activo: true,
+    sistema: false,
     procedimientos: ['D3310'],
     naturaleza: 'The proposed treatment has been explained to me in a way that I understood, including what will be done and why it is recommended.',
     riesgos: 'Alternatives to the proposed treatment, including the option of no treatment, have been discussed with me.\nPossible instrument separation or need for retreatment.\nPersistent pain or swelling after treatment.',
-    reconocimientos: [
-      'I have read and understand the information provided.',
-      'I had the opportunity to ask questions.',
-      'I voluntarily consent to the proposed treatment.',
-    ],
   },
   {
     id: 't3',
     titulo: 'Root Canal Consent – Molar',
-    estado: 'System',
+    activo: true,
+    sistema: true,
     procedimientos: ['D3320'],
     naturaleza: 'The proposed treatment has been explained to me in a way that I understood, including what will be done and why it is recommended.',
     riesgos: 'Alternatives to the proposed treatment, including the option of no treatment, have been discussed with me.\nPossible instrument separation or need for retreatment.',
-    reconocimientos: [
-      'I have read and understand the information provided.',
-      'I voluntarily consent to the proposed treatment.',
-    ],
   },
 ]
 
@@ -100,21 +103,22 @@ const TITULOS_SUGERIDOS = [
   'Crown & Bridge Consent', 'Implant Consent', 'HIPAA Acknowledgment',
 ]
 
-const FILTROS = ['Active', 'System', 'All'] as const
+const FILTROS = ['Active', 'Inactive', 'System', 'All'] as const
 type Filtro = (typeof FILTROS)[number]
+
+const coincideFiltro = (t: ConsentTemplate, f: Filtro) =>
+  f === 'All' || (f === 'Active' && t.activo) || (f === 'Inactive' && !t.activo) || (f === 'System' && t.sistema)
 
 type Borrador = {
   titulo: string
   procedimientos: string[]
   naturaleza: string
   riesgos: string
-  reconocimientos: string[]
 }
 
-const BORRADOR_VACIO: Borrador = { titulo: '', procedimientos: [], naturaleza: '', riesgos: '', reconocimientos: [] }
+const BORRADOR_VACIO: Borrador = { titulo: '', procedimientos: [], naturaleza: '', riesgos: '' }
 const aBorrador = (t: ConsentTemplate): Borrador => ({
-  titulo: t.titulo, procedimientos: t.procedimientos, naturaleza: t.naturaleza,
-  riesgos: t.riesgos, reconocimientos: t.reconocimientos,
+  titulo: t.titulo, procedimientos: t.procedimientos, naturaleza: t.naturaleza, riesgos: t.riesgos,
 })
 
 /* Toolbar decorativo: mismo trato que el botón "Select File" de Documents en
@@ -150,8 +154,16 @@ export function SettingsConsents() {
   const [vistaPaciente, setVistaPaciente] = useState(false)
 
   const visibles = templates.filter(
-    (t) => (filtro === 'All' || t.estado === filtro) && t.titulo.toLowerCase().includes(q.trim().toLowerCase()),
+    (t) => coincideFiltro(t, filtro) && t.titulo.toLowerCase().includes(q.trim().toLowerCase()),
   )
+  const actual = templates.find((t) => t.id === actualId)
+
+  const alternarActivo = (id: string) => {
+    const t = templates.find((x) => x.id === id)
+    if (!t) return
+    setTemplates((ts) => ts.map((x) => (x.id === id ? { ...x, activo: !x.activo } : x)))
+    aviso.ok(`Consent template ${t.activo ? 'deactivated' : 'activated'}.`)
+  }
 
   const elegir = (t: ConsentTemplate) => {
     setActualId(t.id)
@@ -166,7 +178,6 @@ export function SettingsConsents() {
   }
 
   const cancelar = () => {
-    const actual = templates.find((t) => t.id === actualId)
     setBorrador(actual ? aBorrador(actual) : BORRADOR_VACIO)
     setIntentado(false)
     aviso.info('Changes discarded.')
@@ -181,7 +192,7 @@ export function SettingsConsents() {
       aviso.ok('Consent template updated.')
     } else {
       const id = `t${Date.now()}`
-      setTemplates((ts) => [...ts, { id, estado: 'Active', ...borrador }])
+      setTemplates((ts) => [...ts, { id, activo: true, sistema: false, ...borrador }])
       setActualId(id)
       aviso.ok('Consent template created.')
     }
@@ -244,23 +255,36 @@ export function SettingsConsents() {
               <EmptyState icon={Search} title="No templates" detail="Nothing matches this search or filter." className="py-6" />
             ) : (
               visibles.map((t) => (
-                <button
+                <div
                   key={t.id}
-                  type="button"
-                  onClick={() => elegir(t)}
                   className={cn(
-                    'flex flex-col items-start gap-1 rounded-lg border px-3 py-2.5 text-left transition-colors',
+                    'flex items-start gap-2 rounded-lg border px-3 py-2.5 transition-colors',
                     actualId === t.id ? 'border-dash-blue bg-[#f8faff]' : 'border-[#e4e4e7] bg-white hover:bg-[#fafafa]',
                   )}
                 >
-                  <span className="truncate text-[13px] font-bold text-[#09090b]">{t.titulo}</span>
-                  <span className="flex items-center gap-1.5">
-                    <Pill tone={ESTADO_TONO[t.estado]} size="sm">{t.estado}</Pill>
-                    <span className="text-[11px] text-[#71717a]">
-                      {t.procedimientos.length} procedure{t.procedimientos.length === 1 ? '' : 's'}
+                  <button
+                    type="button"
+                    onClick={() => elegir(t)}
+                    className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left"
+                  >
+                    <span className={cn('w-full truncate text-[13px] font-bold', t.activo ? 'text-[#09090b]' : 'text-[#a1a1aa]')}>
+                      {t.titulo}
                     </span>
-                  </span>
-                </button>
+                    <span className="flex flex-wrap items-center gap-1.5">
+                      <Pill tone={t.activo ? 'success' : 'neutral'} size="sm">{t.activo ? 'Active' : 'Inactive'}</Pill>
+                      {t.sistema && <Pill tone="info" size="sm">System</Pill>}
+                      <span className="text-[11px] text-[#71717a]">
+                        {t.procedimientos.length} procedure{t.procedimientos.length === 1 ? '' : 's'}
+                      </span>
+                    </span>
+                  </button>
+                  <Switch
+                    checked={t.activo}
+                    onCheckedChange={() => alternarActivo(t.id)}
+                    aria-label={`${t.activo ? 'Deactivate' : 'Activate'} ${t.titulo}`}
+                    className="mt-0.5"
+                  />
+                </div>
               ))
             )}
           </div>
@@ -268,9 +292,26 @@ export function SettingsConsents() {
 
         {/* ── Editor ────────────────────────────────────────────────── */}
         <section className="flex flex-col gap-4 rounded-xl border border-[#e4e4e7] bg-white p-4 sm:p-5">
-          <div>
-            <h2 className="text-lg font-bold text-[#09090b]">New Consent Template</h2>
-            <p className="mt-0.5 text-xs text-[#71717a]">Create a standard consent document and assign it to one or more procedures.</p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-[240px] flex-1">
+              <h2 className="text-lg font-bold text-[#09090b]">New Consent Template</h2>
+              <p className="mt-0.5 text-xs text-[#71717a]">Create a standard consent document and assign it to one or more procedures.</p>
+            </div>
+            {actual && (
+              <button
+                type="button"
+                onClick={() => alternarActivo(actual.id)}
+                className={cn(
+                  'flex h-9 shrink-0 items-center gap-1.5 rounded-md px-3 text-[13px] font-medium transition-colors',
+                  actual.activo
+                    ? 'border border-[#e4e4e7] bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]'
+                    : 'bg-dash-blue hover:bg-dash-blue-hover text-white',
+                )}
+              >
+                {actual.activo ? <PowerOff className="size-4" /> : <Power className="size-4" />}
+                {actual.activo ? 'Deactivate template' : 'Activate template'}
+              </button>
+            )}
           </div>
 
           {intentado && (!borrador.titulo || borrador.procedimientos.length === 0) && (
@@ -290,7 +331,7 @@ export function SettingsConsents() {
 
           <div className="flex flex-col gap-2">
             <span className="text-xs font-medium text-[#09090b]">
-              Search Procedure or category<span className="text-[#ff0608]">*</span>
+              Search Procedure<span className="text-[#ff0608]">*</span>
             </span>
             <div className="relative">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
@@ -373,38 +414,6 @@ export function SettingsConsents() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-medium text-[#09090b]">Patient acknowledgment</span>
-            <div className="flex flex-col gap-2">
-              {borrador.reconocimientos.map((r, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <input
-                    value={r}
-                    onChange={(e) => setBorrador((b) => ({
-                      ...b, reconocimientos: b.reconocimientos.map((x, j) => (j === i ? e.target.value : x)),
-                    }))}
-                    className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white px-3 text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    aria-label="Remove statement"
-                    onClick={() => setBorrador((b) => ({ ...b, reconocimientos: b.reconocimientos.filter((_, j) => j !== i) }))}
-                    className="shrink-0 rounded p-2 text-[#09090b] hover:bg-[#fff2f2] hover:text-[#dc2626]"
-                  >
-                    <X className="size-4" />
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => setBorrador((b) => ({ ...b, reconocimientos: [...b.reconocimientos, ''] }))}
-                className="text-dash-blue flex items-center gap-1.5 self-start text-[13px] font-semibold hover:underline"
-              >
-                <Plus className="size-4" /> Add statement
-              </button>
-            </div>
-          </div>
-
           <div className="mt-2 flex justify-end gap-3">
             <button type="button" onClick={cancelar} className="h-9 rounded-md border border-[#e4e4e7] bg-white px-6 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]">
               Cancel
@@ -432,8 +441,9 @@ export function SettingsConsents() {
             </button>
           </div>
 
-          <div className="mt-3 flex items-center gap-1.5 text-[11px] text-[#71717a]">
-            <MapPin className="size-3.5" /> Los Angeles, Dental Clinic
+          <div className="mt-3 flex flex-col gap-1 text-[11px] text-[#71717a]">
+            <div className="flex items-center gap-1.5"><MapPin className="size-3.5 shrink-0" /> Los Angeles, Dental Clinic</div>
+            <div className="flex items-center gap-1.5"><Send className="size-3.5 shrink-0" /> Consent sent: {CONSENT_ENVIADO}</div>
           </div>
 
           <p className="mt-3 text-[10px] font-semibold tracking-wide text-[#1d56bc] uppercase">Informed Consent</p>
@@ -450,8 +460,8 @@ export function SettingsConsents() {
               <p className="text-[#71717a]">Provider</p>
             </div>
             <div>
-              <p className="font-bold text-[#09090b]">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-              <p className="text-[#71717a]">Consent Date</p>
+              <p className="font-bold text-[#09090b]">{CITA}</p>
+              <p className="text-[#71717a]">Appointment</p>
             </div>
             <div>
               <p className="truncate font-bold text-[#09090b]">
@@ -490,13 +500,11 @@ export function SettingsConsents() {
             )}
           </div>
 
-          {borrador.reconocimientos.length > 0 && (
-            <div className="mt-3 rounded-lg bg-[#f0f5ff] p-3 text-[12px]">
-              <ul className="text-dash-blue-hover list-disc space-y-1 pl-4 font-medium">
-                {borrador.reconocimientos.filter(Boolean).map((r, i) => <li key={i}>{r}</li>)}
-              </ul>
-            </div>
-          )}
+          <div className="mt-3 rounded-lg bg-[#f0f5ff] p-3 text-[12px]">
+            <ul className="text-dash-blue-hover list-disc space-y-1 pl-4 font-medium">
+              {RECONOCIMIENTOS_PACIENTE.map((r) => <li key={r}>{r}</li>)}
+            </ul>
+          </div>
 
           <div className="mt-4 border-t border-dashed border-[#d4d4d8] pt-2 text-[11px] text-[#a1a1aa]">
             Patient / Legal Guardian
