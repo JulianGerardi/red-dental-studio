@@ -273,7 +273,7 @@ export default function Ledger() {
           {tab === 'transacciones' && (
             <>
               <div className="mt-4">
-                <StatStrip stats={stats} />
+                <StatStrip stats={stats} apilada />
               </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-3">
