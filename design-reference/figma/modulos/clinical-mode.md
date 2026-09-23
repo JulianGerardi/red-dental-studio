@@ -24,6 +24,13 @@ salida es "Exit Clinical Mode". Se entra desde el panel del paciente.
 ## Barra superior (4235:135661)
 
 Solo Exit y Overwiev llevan caja; lo demas va suelto sobre el fondo `#fafbfe`.
+**Desviacion a pedido de Julian:** esos dos botones van **solo con el icono**
+(36x36, sin caja); la caja aparece al pasar el mouse y el nombre sale en un
+tooltip oscuro debajo. El tamano no cambia en el hover a proposito: si el
+boton creciera empujaria al resto de la barra y el de al lado se correria
+justo cuando uno le apunta. Overwiev seleccionado conserva el azul solido
+-es el estado "aca estas", no decoracion-. Ambos llevan `aria-label`. En
+pantallas tactiles no hay hover, asi que el nombre no se ve.
 De izquierda a derecha: `< Exit clinical Mode`, `Overwiev`, las pills verdes
 solidas **CC** y **TR** (`#28c563`), los cuatro contadores redondos, las
 constantes como texto (34 yrs / Male / 1.68 m / 85 kg), el profesional con su

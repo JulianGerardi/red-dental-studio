@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { CONSTANTES, CONTADORES, PANELES, type Contador, type ClavePanel } from '@/data/clinical-mode'
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
 import { ClinicalItemModal } from '@/components/patients/ClinicalItemModal'
@@ -14,11 +15,15 @@ import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clini
 
 const ICONO_CONTADOR = { link: Link2, signos: Activity, personas: Users, info: Info }
 
-/* Barra de 4235:135661. Sólo Exit y Overwiev llevan caja; lo demás va suelto
-   sobre el fondo. Todo va en una fila pegada, con la misma separación entre
-   piezas: nada se estira. Antes el grupo del medio crecía y dejaba un hueco
-   enorme antes de Start Enconter. */
-const CAJA = 'flex h-9 shrink-0 items-center gap-2 rounded-lg border border-[#e4e4e7] bg-white px-2.5 text-[13px] font-medium text-[#09090b] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]'
+/* Barra de 4235:135661. Todo va en una fila pegada, con la misma separación
+   entre piezas: nada se estira. Antes el grupo del medio crecía y dejaba un
+   hueco enorme antes de Start Enconter.
+
+   Exit y Overwiev (la caja con texto del frame) van sólo con el ícono, a
+   pedido de Julián: la caja aparece al pasar el mouse y el nombre sale en un
+   tooltip. Tamaño fijo: si el botón creciera al hover empujaría a los demás y
+   el de al lado se movería justo cuando uno le apunta. */
+const BOTON_ICONO = 'flex size-9 shrink-0 items-center justify-center rounded-lg border border-transparent text-[#09090b] transition-colors hover:border-[#e4e4e7] hover:bg-white hover:shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]'
 
 /* Todo lo que cuelga de la barra —los contadores y las pills CC/TR— usa el
    mismo desplegable flotante. Va en portal y con posición fija: la barra
@@ -198,28 +203,40 @@ export function ClinicalTopBar({
           línea entera -Exit y Overwiev a la izquierda, CC y TR al final- y
           empuja los contadores y el paciente a la segunda. */}
       <span className="flex items-center gap-[9.82px] max-md:flex-wrap md:max-lg:w-full lg:shrink-0">
-      <Link to={volverA} className={cn(CAJA, 'hover:bg-[#fafafa]')}>
-        <ChevronLeft className="size-[15.71px]" /> Exit clinical Mode
-      </Link>
+      <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Link to={volverA} aria-label="Exit clinical Mode" className={cn(BOTON_ICONO, 'hover:bg-[#fafafa]')}>
+            <ChevronLeft className="size-[18px]" />
+          </Link>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" sideOffset={6} className="bg-[#09090b] text-white">Exit clinical Mode</TooltipContent>
+      </Tooltip>
 
       {/* Overwiev no es una pestaña: es el botón que vuelve al panel del
           paciente desde cualquier examen o registro. */}
-      <button
-        onClick={onOverview}
-        aria-current={enOverview ? 'page' : undefined}
-        /* Seleccionado usa el mismo azul que la pestaña activa de la
-           botonera, y el hover también tira a azul: es el estado de "acá
-           estás" del sistema, no un borde negro suelto. */
-        className={cn(
-          CAJA,
-          'font-semibold',
-          enOverview
-            ? 'bg-dash-blue hover:bg-dash-blue-hover border-transparent text-white'
-            : 'hover:border-dash-blue hover:bg-dash-count-bg hover:text-dash-blue-hover',
-        )}
-      >
-        <PanelsTopLeft className="size-[15.71px]" /> Overwiev
-      </button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={onOverview}
+            aria-label="Overwiev"
+            aria-current={enOverview ? 'page' : undefined}
+            /* Seleccionado sigue siendo el azul sólido de la pestaña activa
+               de la botonera aunque el resto esté escondido: es el estado de
+               "acá estás", no decoración. Inactivo, el hover tira a azul. */
+            className={cn(
+              BOTON_ICONO,
+              enOverview
+                ? 'bg-dash-blue hover:bg-dash-blue-hover border-transparent text-white hover:border-transparent'
+                : 'hover:border-dash-blue hover:bg-dash-count-bg hover:text-dash-blue-hover',
+            )}
+          >
+            <PanelsTopLeft className="size-[18px]" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" sideOffset={6} className="bg-[#09090b] text-white">Overwiev</TooltipContent>
+      </Tooltip>
+      </TooltipProvider>
 
       {/* CC y TR hasta lg: en tablet al final de la primera línea, en el
           teléfono envueltas con el resto. Desde lg se muestran junto a la
