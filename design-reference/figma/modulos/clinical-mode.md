@@ -152,6 +152,14 @@ errores de layout o de dato, no decisiones de diseno.
   `max-lg:` que envolvian el grupo del paciente pasaron a `max-md:`. (Con el
   boton de nota puesto, la segunda linea no entraba a 768: 721px contra 708
   utiles. Al sacarlo sobran ~27px y no hace falta recortar nada.)
+- **CC y TR, pedido de Julian:** mas grandes que el export (28px de alto, texto
+  13, tilde 12; el export trae 22.81 / 10.9 / 9.08, donde el tilde casi no se
+  distinguia). **Desde `lg` van pegadas a la edad del paciente**, a la izquierda
+  de "34 yrs"; en tablet y telefono siguen donde estaban (al final de la
+  primera linea / con Exit y Overwiev). Son dos copias de los mismos botones,
+  una oculta con `hidden` segun el ancho. Con las pills ahi la fila de desktop
+  entra sin scroll desde ~1190px; abajo de eso scrollea de costado, como ya
+  hacia.
 - Pestanas: scroll horizontal. Son cortas y una grilla las volveria un bloque
   de botones.
 - Panel TT/CC: columna de 300px en `lg`, hoja completa abajo.

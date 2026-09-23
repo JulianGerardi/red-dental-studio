@@ -158,13 +158,41 @@ export function ClinicalTopBar({
     })
   }
 
+  /* CC y TR cuelgan un desplegable igual que los contadores: el texto es
+     corto y abrir media pantalla para leer dos párrafos era demasiado. Se
+     dibujan en dos lugares -según el ancho, uno se oculta con `hidden`- y
+     comparten estos botones. */
+  const pastillas = (['CC', 'TR'] as const).map((k) => {
+    const on = flot?.tipo === 'pill' && flot.k === k
+    return (
+      <button
+        key={k}
+        onClick={(e) =>
+          setFlot(on ? null : { tipo: 'pill', k, rect: e.currentTarget.getBoundingClientRect() })
+        }
+        aria-expanded={on}
+        className={cn(
+          /* Más grande que el export (22.81 de alto, texto 10.9, tilde 9.08):
+             a ese tamaño el tilde casi no se distinguía. */
+          'flex h-7 shrink-0 items-center gap-1.5 rounded-full bg-[#28C563] px-2.5 text-[13px] font-medium text-white',
+          'transition-all outline-none [outline-style:solid] outline-[2px] outline-offset-[2px] outline-transparent',
+          'hover:bg-[#1fae54]',
+          on && 'outline-[#28C563]',
+        )}
+      >
+        <Check className="size-3" /> {k}
+      </button>
+    )
+  })
+
   return (
     /* Fila de 1124 con gap 21 entre los cinco grupos, tal cual el export.
        Ninguno crece: la suma de los grupos más los gaps da exactamente 1124,
        así que el sobrante de pantallas más anchas queda a la derecha. */
     <div className="relative flex flex-wrap items-center gap-[12px] lg:flex-nowrap lg:overflow-x-auto">
       {/* Grupo 0 del export: Exit + Overwiev + las dos pills, con gap 9.82 y
-          11.25 respectivamente. */}
+          11.25 respectivamente -las pills sólo hasta lg: en desktop se
+          mudaron junto a la edad-. */}
       {/* En el teléfono el grupo envuelve: sus 370px no entran en 358 y la
           barra terminaba scrolleando de costado. En tablet ocupa la primera
           línea entera -Exit y Overwiev a la izquierda, CC y TR al final- y
@@ -193,30 +221,11 @@ export function ClinicalTopBar({
         <PanelsTopLeft className="size-[15.71px]" /> Overwiev
       </button>
 
-      <span className="flex shrink-0 items-center gap-[11.25px] md:max-lg:ml-auto">
-
-      {/* CC y TR cuelgan un desplegable igual que los contadores: el texto es
-          corto y abrir media pantalla para leer dos párrafos era demasiado. */}
-      {(['CC', 'TR'] as const).map((k) => {
-        const on = flot?.tipo === 'pill' && flot.k === k
-        return (
-          <button
-            key={k}
-            onClick={(e) =>
-              setFlot(on ? null : { tipo: 'pill', k, rect: e.currentTarget.getBoundingClientRect() })
-            }
-            aria-expanded={on}
-            className={cn(
-              'flex h-[22.81px] shrink-0 items-center gap-[4.54px] rounded-full bg-[#28C563] px-[5.68px] text-[10.9px] text-white',
-              'transition-all outline-none [outline-style:solid] outline-[2px] outline-offset-[2px] outline-transparent',
-              'hover:bg-[#1fae54]',
-              on && 'outline-[#28C563]',
-            )}
-          >
-            <Check className="size-[9.08px]" /> {k}
-          </button>
-        )
-      })}
+      {/* CC y TR hasta lg: en tablet al final de la primera línea, en el
+          teléfono envueltas con el resto. Desde lg se muestran junto a la
+          edad del paciente, más abajo. */}
+      <span className="flex shrink-0 items-center gap-[11.25px] md:max-lg:ml-auto lg:hidden">
+        {pastillas}
       </span>
       </span>
 
@@ -241,6 +250,10 @@ export function ClinicalTopBar({
           del pill de abajo lo aplastaría contra lo que sobre en esa línea en
           vez de mandarlo a la suya-. */}
       <span className="flex items-center gap-[9px] max-md:flex-wrap">
+      {/* Desktop: CC y TR pegadas a la edad, a pedido de Julián. */}
+      <span className="hidden shrink-0 items-center gap-[11.25px] lg:flex">
+        {pastillas}
+      </span>
       {/* "detail-info-bar": cuatro celdas de 15.71 de alto separadas por una
           regla a la derecha —la última no lleva—, texto de 11.79. */}
       <span className="flex h-[15.71px] items-center gap-[3.93px] max-md:flex-wrap md:shrink-0">
