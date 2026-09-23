@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  ChevronLeft, Search, Receipt, CreditCard, Wallet, PiggyBank, HandCoins, Download, MoveHorizontal,
+  ChevronLeft, Search, Receipt, CreditCard, Wallet, PiggyBank, Download, MoveHorizontal,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -42,6 +42,23 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
     : { texto: 'Charge Adj', tono: 'danger' }
 }
 
+/* Anillo de 16px: el arco es la parte del pago que sigue sin aplicar. El
+   color viene de `currentColor` para que el botón que lo envuelve lo tiña. */
+function AnilloCredito({ restante, total, className }: { restante: number; total: number; className?: string }) {
+  const radio = 6
+  const circunferencia = 2 * Math.PI * radio
+  const fraccion = total > 0 ? Math.min(restante / total, 1) : 0
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" className={className}>
+      <circle cx="8" cy="8" r={radio} fill="none" stroke="currentColor" strokeOpacity={0.2} strokeWidth={2} />
+      <circle
+        cx="8" cy="8" r={radio} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"
+        strokeDasharray={`${circunferencia * fraccion} ${circunferencia}`} transform="rotate(-90 8 8)"
+      />
+    </svg>
+  )
+}
+
 /* No es un `tipo` real -es una condición sobre `creditoDisponible`-, así que
    se agrega como una opción más al lado de Charge/Payment/Adjustment/
    Insurance en el mismo filtro, no como un filtro aparte. */
@@ -49,13 +66,11 @@ const FILTRO_CREDITO = 'Unapplied Credits'
 const OPCIONES_FILTRO = [...TIPOS, FILTRO_CREDITO]
 
 /* Anchos del diseño de referencia (Confidentally 2.0): 112/112/96 · desc
-   elástica · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding.
-   `credito` es nuestra -no viene de esa referencia-, bloqueada como fecha y
-   saldo: es la única forma de llegar a "Apply credit". */
-type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'credito' | 'saldo'
+   elástica · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding. */
+type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'saldo'
 
 const ANCHO_BASE: Record<ColLedger, number> = {
-  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, credito: 112, saldo: 96,
+  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, saldo: 96,
 }
 
 /* Piso de cada columna: hasta acá pueden encoger para que la tabla entre
@@ -64,7 +79,7 @@ const ANCHO_BASE: Record<ColLedger, number> = {
    "March 17, 2025" 93px, la pastilla "Ins Payment" 86, "-$9,850.00" 71.
    Patient/Description/Provider truncan y ya tienen tooltip. */
 const ANCHO_MINIMO: Record<ColLedger, number> = {
-  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, credito: 96, saldo: 76,
+  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, saldo: 76,
 }
 
 /* Techo de Description: pasado eso, lo que sobra se reparte entre las
@@ -88,36 +103,37 @@ const COLUMNAS: ColumnaLedger[] = [
     id: 'tipo', label: 'Type',
     celda: (m) => { const t = detalleTipo(m); return <Pill tone={t.tono}>{t.texto}</Pill> },
   },
-  { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
+  {
+    /* Cuarta vuelta: el crédito sin aplicar vive en Description como un
+       anillo -sin columna ni texto extra-: lo que queda del pago contra lo
+       que entró. Al pasar el mouse por la fila el anillo se vuelve el chip
+       "$150.00 left · Apply". Es el mismo botón en los dos estados. */
+    id: 'desc', label: 'Description', elastica: true, claseCelda: 'flex items-center gap-2 text-[#09090b]',
+    titulo: (m) => m.descripcion,
+    celda: (m) => (
+      <>
+        <span className="min-w-0 flex-1 truncate">{m.descripcion}</span>
+        {tieneCredito(m) && (
+          <button
+            type="button"
+            data-apply-credit
+            aria-label={`Apply ${moneda(m.creditoDisponible ?? 0)} credit from ${m.descripcion}`}
+            className="text-dash-blue group/credito flex shrink-0 items-center rounded-md"
+          >
+            <AnilloCredito restante={m.creditoDisponible ?? 0} total={Math.abs(m.monto)} className="group-hover/fila:hidden" />
+            <span className="hidden rounded-md border border-[#c7d9fb] bg-[#f0f5ff] px-2 py-0.5 text-[12px] font-medium whitespace-nowrap tabular-nums group-hover/fila:inline group-hover/credito:bg-[#e3edff]">
+              {moneda(m.creditoDisponible ?? 0)} left · Apply
+            </span>
+          </button>
+        )}
+      </>
+    ),
+  },
   { id: 'provider', label: 'Provider', claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
   /* Los negativos bajan la cuenta: van en verde. */
   {
     id: 'monto', label: 'Amount', derecha: true, claseCelda: 'font-medium tabular-nums',
     celda: (m) => <span className={m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]'}>{moneda(m.monto)}</span>,
-  },
-  {
-    /* Tercera vuelta: al lado de Amount, no en Description ni al final de
-       la tabla -Julián la quería ahí específicamente-. Con pinta de botón
-       de verdad (fondo y borde, no sólo texto azul) para que se note que es
-       clickeable, e ícono de mano con monedas -el chanchito ya significa
-       "ahorro/disponible" en el stat card de arriba, acá hace falta uno que
-       diga "aplicar", no "guardar". */
-    id: 'credito', label: 'Credit', derecha: true,
-    celda: (m) => {
-      if (!tieneCredito(m)) return null
-      return (
-        <button
-          type="button"
-          data-apply-credit
-          title={`${m.descripcion} · ${moneda(m.creditoDisponible ?? 0)} available`}
-          aria-label={`Apply credit from ${m.descripcion}`}
-          className="border-dash-blue/25 text-dash-blue inline-flex items-center gap-1.5 rounded-md border bg-[#f0f5ff] px-2 py-1 text-[12px] font-semibold tabular-nums hover:bg-[#e3edff]"
-        >
-          {moneda(m.creditoDisponible ?? 0)}
-          <HandCoins className="size-3.5 shrink-0" />
-        </button>
-      )
-    },
   },
   { id: 'saldo', label: 'Balance', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', celda: (m) => moneda(m.saldo) },
 ]
@@ -367,7 +383,7 @@ export default function Ledger() {
                           onClick={(e) => {
                             if ((e.target as HTMLElement).closest('[role="separator"]')) return
                             /* El botón "Apply credit" vive adentro de la celda de
-                               credito -no tiene sentido un handler propio por
+                               Description -no tiene sentido un handler propio por
                                columna sólo para esto-, así que se intercepta acá
                                igual que el `separator` del resize de columnas. */
                             if ((e.target as HTMLElement).closest('[data-apply-credit]')) { setEnCredito(m); return }
