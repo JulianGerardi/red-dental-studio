@@ -21,8 +21,7 @@ const ICONO_CONTADOR = { link: Link2, signos: Activity, personas: Users, info: I
    Exit y Overwiev (la caja con texto del frame) van sólo con el ícono, a
    pedido de Julián: al pasar el mouse el botón muestra su caja y se abre con
    el texto adentro. 36px en reposo: 8 de padding + 1 de borde + el ícono de
-   18. Se abre por encima de lo de al lado, sin empujarlo -ver el grupo más
-   abajo-. */
+   18. Al abrirse empujan lo de al lado, no lo tapan. */
 const BOTON = 'group/btn flex h-9 shrink-0 items-center justify-center rounded-lg border border-transparent px-2 text-[13px] font-medium text-[#09090b] transition-colors hover:border-[#e4e4e7] hover:bg-white hover:shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus-visible:border-[#e4e4e7] focus-visible:bg-white'
 
 /* El texto está siempre en el DOM, sólo sin ancho: se abre con el hover o con
@@ -207,40 +206,35 @@ export function ClinicalTopBar({
           línea entera -Exit y Overwiev a la izquierda, CC y TR al final- y
           empuja los contadores y el paciente a la segunda. */}
       <span className="flex items-center gap-[9.82px] max-md:flex-wrap md:max-lg:w-full lg:shrink-0">
-      {/* Exit y Overwiev: en reposo son dos íconos en un hueco fijo de 82px; al
-          pasar el mouse el botón se abre hacia la derecha con su texto, por
-          ENCIMA de lo que tenga al lado -no lo empuja-, así los contadores no
-          se corren cada vez que el mouse pasa por la esquina. El fondo del
-          grupo tapa lo que quede debajo mientras está abierto. */}
-      <span className="relative z-30 h-9 w-[81.82px] shrink-0">
-        <span className="bg-page-background absolute inset-y-0 left-0 flex items-center gap-[9.82px]">
-          <Link to={volverA} aria-label="Exit clinical Mode" className={cn(BOTON, 'hover:bg-[#fafafa]')}>
-            <ChevronLeft className="size-[18px] shrink-0" />
-            <span className={ETIQUETA}>Exit clinical Mode</span>
-          </Link>
+      {/* Exit y Overwiev: en reposo son dos íconos; al pasar el mouse el botón
+          se abre hacia la derecha con su texto y empuja lo que tiene al lado.
+          Antes se abría por encima y tapaba los contadores (Medications y
+          compañía): Julián pidió que no se superpongan. */}
+      <Link to={volverA} aria-label="Exit clinical Mode" className={cn(BOTON, 'hover:bg-[#fafafa]')}>
+        <ChevronLeft className="size-[18px] shrink-0" />
+        <span className={ETIQUETA}>Exit clinical Mode</span>
+      </Link>
 
-          {/* Overwiev no es una pestaña: es el botón que vuelve al panel del
-              paciente desde cualquier examen o registro. */}
-          <button
-            onClick={onOverview}
-            aria-label="Overwiev"
-            aria-current={enOverview ? 'page' : undefined}
-            /* Seleccionado sigue siendo el azul sólido de la pestaña activa
-               de la botonera aunque el resto esté escondido: es el estado de
-               "acá estás", no decoración. Inactivo, el hover tira a azul. */
-            className={cn(
-              BOTON,
-              'font-semibold',
-              enOverview
-                ? 'bg-dash-blue hover:bg-dash-blue-hover border-transparent text-white hover:border-transparent'
-                : 'hover:border-dash-blue hover:bg-dash-count-bg hover:text-dash-blue-hover',
-            )}
-          >
-            <PanelsTopLeft className="size-[18px] shrink-0" />
-            <span className={ETIQUETA}>Overwiev</span>
-          </button>
-        </span>
-      </span>
+      {/* Overwiev no es una pestaña: es el botón que vuelve al panel del
+          paciente desde cualquier examen o registro. */}
+      <button
+        onClick={onOverview}
+        aria-label="Overwiev"
+        aria-current={enOverview ? 'page' : undefined}
+        /* Seleccionado sigue siendo el azul sólido de la pestaña activa de la
+           botonera aunque el resto esté escondido: es el estado de "acá
+           estás", no decoración. Inactivo, el hover tira a azul. */
+        className={cn(
+          BOTON,
+          'font-semibold',
+          enOverview
+            ? 'bg-dash-blue hover:bg-dash-blue-hover border-transparent text-white hover:border-transparent'
+            : 'hover:border-dash-blue hover:bg-dash-count-bg hover:text-dash-blue-hover',
+        )}
+      >
+        <PanelsTopLeft className="size-[18px] shrink-0" />
+        <span className={ETIQUETA}>Overwiev</span>
+      </button>
 
       {/* CC y TR hasta lg: en tablet al final de la primera línea, en el
           teléfono envueltas con el resto. Desde lg se muestran junto a la
