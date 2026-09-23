@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import {
   ChevronLeft, ChevronDown, PanelsTopLeft, Check, Link2, Activity, Users, Info,
-  FileText, Play, Pause,
+  Play, Pause,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
@@ -162,7 +162,7 @@ export function ClinicalTopBar({
     /* Fila de 1124 con gap 21 entre los cinco grupos, tal cual el export.
        Ninguno crece: la suma de los grupos más los gaps da exactamente 1124,
        así que el sobrante de pantallas más anchas queda a la derecha. */
-    <div className="relative flex flex-wrap items-center gap-[12px] md:max-lg:gap-x-2 lg:flex-nowrap lg:overflow-x-auto">
+    <div className="relative flex flex-wrap items-center gap-[12px] lg:flex-nowrap lg:overflow-x-auto">
       {/* Grupo 0 del export: Exit + Overwiev + las dos pills, con gap 9.82 y
           11.25 respectivamente. */}
       {/* En el teléfono el grupo envuelve: sus 370px no entran en 358 y la
@@ -227,7 +227,8 @@ export function ClinicalTopBar({
       </span>
 
       {/* Grupo 4: la info del paciente (edad/sexo/altura/peso + avatar y
-          nombre), el botón de nota y Start Enconter, gap 9. Julián pidió esto
+          nombre) y Start Enconter, gap 9 -el botón de nota se sacó a pedido de
+          Julián-. Julián pidió esto
           al revés de como había quedado: lo que se sacaba del racimo de
           contadores -por pesado, no por chico- era este bloque, no
           Medications. Es el único grupo que se corre: `ml-auto` manda el
@@ -235,10 +236,10 @@ export function ClinicalTopBar({
       <span className="flex shrink-0 items-center gap-[9px] max-md:w-full max-md:flex-wrap md:ml-auto">
 
       {/* Subgrupo de info del paciente: detail-info-bar + user-info-bar
-          envuelven juntos, como una sola unidad, separados del botón de nota
-          y Start Enconter -si compartieran una sola fila sin wrap propio, el
-          `max-lg:flex-1` del pill de abajo lo aplastaría contra lo que sobre
-          en esa línea en vez de mandarlo a la suya-. */}
+          envuelven juntos, como una sola unidad, separados de Start Enconter
+          -si compartieran una sola fila sin wrap propio, el `max-md:flex-1`
+          del pill de abajo lo aplastaría contra lo que sobre en esa línea en
+          vez de mandarlo a la suya-. */}
       <span className="flex items-center gap-[9px] max-md:flex-wrap">
       {/* "detail-info-bar": cuatro celdas de 15.71 de alto separadas por una
           regla a la derecha —la última no lleva—, texto de 11.79. */}
@@ -247,7 +248,7 @@ export function ClinicalTopBar({
           <span
             key={c.valor}
             className={cn(
-              'flex h-full items-center justify-center px-[6px] md:max-lg:px-1 text-[11.79px] leading-[16px] whitespace-nowrap text-black',
+              'flex h-full items-center justify-center px-[6px] text-[11.79px] leading-[16px] whitespace-nowrap text-black',
               i < CONSTANTES.length - 1 && 'border-r border-[#E4E4E7]',
             )}
           >
@@ -267,26 +268,16 @@ export function ClinicalTopBar({
       </span>
       </span>
 
-      {/* Subgrupo del botón de nota + Start Enconter: en su propia fila el
-          pill puede volver a ocupar todo el ancho que sobre (`max-lg:flex-1`
-          adentro), en vez de repartirse contra la info del paciente. */}
+      {/* Start Enconter: en su propia fila el pill puede volver a ocupar todo
+          el ancho que sobre (`max-md:flex-1` adentro), en vez de repartirse
+          contra la info del paciente. */}
       <span className="flex shrink-0 items-center gap-[9px] max-md:w-full">
-      <button
-        onClick={() => aviso.info('Clinical note is not available in this release.')}
-        aria-label="Clinical note"
-        /* Redondo, como en el frame: es un ícono suelto, no un control con
-           etiqueta como Exit u Overwiev. */
-        className="flex size-[31.43px] shrink-0 items-center justify-center rounded-full border border-[#E4E4E7] bg-white text-black transition-colors hover:bg-[#fafafa]"
-      >
-        <FileText className="size-[15.71px]" />
-      </button>
-
       {/* Un solo pill verde con el chevron adentro: 31.79 de alto, radio
           completo, label en 10.8/600. */}
       <div className="flex h-[31.79px] shrink-0 items-center overflow-hidden rounded-full bg-[#28C563] max-md:flex-1">
         <button
           onClick={onEncuentro}
-          className="flex h-full items-center justify-center gap-[7.86px] pr-[6px] pl-[12.77px] md:max-lg:pl-2.5 text-[10.8px] font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#1fae54] max-md:flex-1"
+          className="flex h-full items-center justify-center gap-[7.86px] pr-[6px] pl-[12.77px] text-[10.8px] font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#1fae54] max-md:flex-1"
         >
           {encuentro ? <Pause className="size-[13.75px]" /> : <Play className="size-[13.75px]" />}
           {encuentro ? 'Pause Enconter' : 'Start Enconter'}
@@ -295,7 +286,7 @@ export function ClinicalTopBar({
           onClick={() => setAbierto((v) => !v)}
           aria-label="Encounter options"
           aria-expanded={abierto}
-          className="flex h-full items-center pr-[12.77px] pl-[2px] md:max-lg:pr-[9px] text-white transition-colors hover:bg-[#1fae54]"
+          className="flex h-full items-center pr-[12.77px] pl-[2px] text-white transition-colors hover:bg-[#1fae54]"
         >
           <ChevronDown className={cn('size-[15.71px] transition-transform', abierto && 'rotate-180')} />
         </button>

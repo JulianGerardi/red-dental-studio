@@ -27,7 +27,8 @@ Solo Exit y Overwiev llevan caja; lo demas va suelto sobre el fondo `#fafbfe`.
 De izquierda a derecha: `< Exit clinical Mode`, `Overwiev`, las pills verdes
 solidas **CC** y **TR** (`#28c563`), los cuatro contadores redondos, las
 constantes como texto (34 yrs / Male / 1.68 m / 85 kg), el profesional con su
-avatar, el boton de nota clinica y `Start Enconter` con su chevron.
+avatar y `Start Enconter` con su chevron. El frame tambien dibuja un boton de
+nota clinica redondo entre los dos: **se saco a pedido de Julian**.
 
 - **Los cuatro contadores son desplegables**, no numeritos: cada uno abre una
   lista flotante con lo que cuenta -Referrals, Medications, Conditions,
@@ -146,12 +147,11 @@ errores de layout o de dato, no decisiones de diseno.
   entera**, que es donde tiene que estar la accion principal en un telefono.
 - **Tablet (768-1023px), pedido de Julian:** tres lineas. 1) Exit y Overwiev a
   la izquierda, CC y TR al final; 2) los cuatro contadores a la izquierda y, al
-  final, constantes + profesional + nota + Start Enconter; 3) la botonera. A
-  768 la segunda linea no entraba (721px contra 708 utiles), asi que en ese
-  rango -y solo en ese- se achican 4px de padding por constante, el padding del
-  pill de Start Enconter y el hueco entre grupos. Desktop y telefono quedan
-  como estaban: las clases del rango son `md:max-lg:`, y los `max-lg:` que
-  envolvian el grupo del paciente pasaron a `max-md:`.
+  final, constantes + profesional + Start Enconter; 3) la botonera. Desktop y
+  telefono quedan como estaban: las clases del rango son `md:max-lg:`, y los
+  `max-lg:` que envolvian el grupo del paciente pasaron a `max-md:`. (Con el
+  boton de nota puesto, la segunda linea no entraba a 768: 721px contra 708
+  utiles. Al sacarlo sobran ~27px y no hace falta recortar nada.)
 - Pestanas: scroll horizontal. Son cortas y una grilla las volveria un bloque
   de botones.
 - Panel TT/CC: columna de 300px en `lg`, hoja completa abajo.
@@ -211,8 +211,6 @@ un estado del sistema.
 - **Gap de 12px** entre todas las piezas, el mismo de la botonera.
 - Las cuatro constantes van separadas por **reglas finas**: son cuatro datos
   distintos, no una frase.
-- El boton de nota clinica es **redondo**: es un icono suelto, no un control
-  con etiqueta como Exit u Overwiev.
 
 ## Radiography (4106:197453)
 
