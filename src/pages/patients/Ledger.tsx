@@ -50,10 +50,10 @@ const OPCIONES_FILTRO = [...TIPOS, FILTRO_CREDITO]
 
 /* Anchos del diseño de referencia (Confidentally 2.0): 112/112/96 · desc
    elástica · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding. */
-type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'saldo'
+type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'credito' | 'saldo'
 
 const ANCHO_BASE: Record<ColLedger, number> = {
-  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, saldo: 96,
+  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, credito: 136, saldo: 96,
 }
 
 /* Piso de cada columna: hasta acá pueden encoger para que la tabla entre
@@ -62,7 +62,7 @@ const ANCHO_BASE: Record<ColLedger, number> = {
    "March 17, 2025" 93px, la pastilla "Ins Payment" 86, "-$9,850.00" 71.
    Patient/Description/Provider truncan y ya tienen tooltip. */
 const ANCHO_MINIMO: Record<ColLedger, number> = {
-  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, saldo: 76,
+  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, credito: 128, saldo: 76,
 }
 
 /* Techo de Description: pasado eso, lo que sobra se reparte entre las
@@ -86,35 +86,33 @@ const COLUMNAS: ColumnaLedger[] = [
     id: 'tipo', label: 'Type',
     celda: (m) => { const t = detalleTipo(m); return <Pill tone={t.tono}>{t.texto}</Pill> },
   },
-  {
-    /* Cuarta vuelta: el crédito sin aplicar vive en Description como un
-       botón de ícono -sin columna ni texto extra en reposo-. Al pasar el
-       mouse por la fila se le suma "$150.00 left · Apply": es el mismo
-       botón, con el mismo borde y fondo, en los dos estados. */
-    id: 'desc', label: 'Description', elastica: true, claseCelda: 'flex items-center gap-2 text-[#09090b]',
-    titulo: (m) => m.descripcion,
-    celda: (m) => (
-      <>
-        <span className="min-w-0 flex-1 truncate">{m.descripcion}</span>
-        {tieneCredito(m) && (
-          <button
-            type="button"
-            data-apply-credit
-            aria-label={`Apply ${moneda(m.creditoDisponible ?? 0)} credit from ${m.descripcion}`}
-            className="text-dash-blue flex shrink-0 items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-[#f0f5ff] px-1.5 py-1 text-[12px] font-medium whitespace-nowrap tabular-nums hover:bg-[#e3edff]"
-          >
-            <HandCoins className="size-3.5 shrink-0" />
-            <span className="hidden group-hover/fila:inline">{moneda(m.creditoDisponible ?? 0)} left · Apply</span>
-          </button>
-        )}
-      </>
-    ),
-  },
+  { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
   { id: 'provider', label: 'Provider', claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
   /* Los negativos bajan la cuenta: van en verde. */
   {
     id: 'monto', label: 'Amount', derecha: true, claseCelda: 'font-medium tabular-nums',
     celda: (m) => <span className={m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]'}>{moneda(m.monto)}</span>,
+  },
+  {
+    /* Quinta vuelta: columna propia "Credit available" al lado de Amount, con
+       el botón siempre a la vista -el mismo que antes aparecía recién al
+       hacer hover-. Bloqueada: es la única forma de llegar a "Apply credit"
+       desde la tabla. */
+    id: 'credito', label: 'Credit available', derecha: true, bloqueada: true,
+    celda: (m) => {
+      if (!tieneCredito(m)) return null
+      return (
+        <button
+          type="button"
+          data-apply-credit
+          aria-label={`Apply ${moneda(m.creditoDisponible ?? 0)} credit from ${m.descripcion}`}
+          className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-[#f0f5ff] px-1.5 py-1 text-[12px] font-medium whitespace-nowrap tabular-nums hover:bg-[#e3edff]"
+        >
+          <HandCoins className="size-3.5 shrink-0" />
+          {moneda(m.creditoDisponible ?? 0)} · Apply
+        </button>
+      )
+    },
   },
   { id: 'saldo', label: 'Balance', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', celda: (m) => moneda(m.saldo) },
 ]
@@ -354,7 +352,15 @@ export default function Ledger() {
                     filasPagina.map((m) => {
                       const abierta = expandidas.includes(m.id)
                       return (
-                      <div key={m.id} className="border-t border-[#e7e7e7]">
+                      <div
+                        key={m.id}
+                        className={cn(
+                          'border-t border-[#e7e7e7]',
+                          /* Barra azul de 4px al borde de las filas con crédito
+                             sin aplicar; cubre también el detalle si se expande. */
+                          tieneCredito(m) && 'relative before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-dash-blue',
+                        )}
+                      >
                         <FilaConTooltip m={m} abierta={abierta}>
                         <div
                           role="button"

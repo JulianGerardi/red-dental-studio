@@ -140,7 +140,7 @@ export function LedgerRowDetail({
             <button
               type="button"
               onClick={onAplicarCredito}
-              className="text-dash-blue inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline"
+              className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-[#f0f5ff] px-2.5 py-1 text-[12px] font-medium hover:bg-[#e3edff]"
             >
               <HandCoins className="size-3.5" /> Apply credit
             </button>
