@@ -162,12 +162,14 @@ export function ClinicalTopBar({
     /* Fila de 1124 con gap 21 entre los cinco grupos, tal cual el export.
        Ninguno crece: la suma de los grupos más los gaps da exactamente 1124,
        así que el sobrante de pantallas más anchas queda a la derecha. */
-    <div className="relative flex flex-wrap items-center gap-[12px] lg:flex-nowrap lg:overflow-x-auto">
+    <div className="relative flex flex-wrap items-center gap-[12px] md:max-lg:gap-x-2 lg:flex-nowrap lg:overflow-x-auto">
       {/* Grupo 0 del export: Exit + Overwiev + las dos pills, con gap 9.82 y
           11.25 respectivamente. */}
       {/* En el teléfono el grupo envuelve: sus 370px no entran en 358 y la
-          barra terminaba scrolleando de costado. */}
-      <span className="flex items-center gap-[9.82px] max-lg:flex-wrap lg:shrink-0">
+          barra terminaba scrolleando de costado. En tablet ocupa la primera
+          línea entera -Exit y Overwiev a la izquierda, CC y TR al final- y
+          empuja los contadores y el paciente a la segunda. */}
+      <span className="flex items-center gap-[9.82px] max-md:flex-wrap md:max-lg:w-full lg:shrink-0">
       <Link to={volverA} className={cn(CAJA, 'hover:bg-[#fafafa]')}>
         <ChevronLeft className="size-[15.71px]" /> Exit clinical Mode
       </Link>
@@ -191,7 +193,7 @@ export function ClinicalTopBar({
         <PanelsTopLeft className="size-[15.71px]" /> Overwiev
       </button>
 
-      <span className="flex shrink-0 items-center gap-[11.25px]">
+      <span className="flex shrink-0 items-center gap-[11.25px] md:max-lg:ml-auto">
 
       {/* CC y TR cuelgan un desplegable igual que los contadores: el texto es
           corto y abrir media pantalla para leer dos párrafos era demasiado. */}
@@ -220,7 +222,7 @@ export function ClinicalTopBar({
 
       {/* Grupo 1: los contadores, gap 6 -Medications incluido, en su lugar
           original-. */}
-      <span className="flex items-center gap-[6px] max-lg:flex-wrap lg:shrink-0">
+      <span className="flex items-center gap-[6px] max-md:flex-wrap md:shrink-0">
       {CONTADORES.map(contadorBoton)}
       </span>
 
@@ -230,22 +232,22 @@ export function ClinicalTopBar({
           contadores -por pesado, no por chico- era este bloque, no
           Medications. Es el único grupo que se corre: `ml-auto` manda el
           sobrante acá y deja los demás pegados con su hueco de 12. */}
-      <span className="flex shrink-0 items-center gap-[9px] max-lg:w-full max-lg:flex-wrap lg:ml-auto">
+      <span className="flex shrink-0 items-center gap-[9px] max-md:w-full max-md:flex-wrap md:ml-auto">
 
       {/* Subgrupo de info del paciente: detail-info-bar + user-info-bar
           envuelven juntos, como una sola unidad, separados del botón de nota
           y Start Enconter -si compartieran una sola fila sin wrap propio, el
           `max-lg:flex-1` del pill de abajo lo aplastaría contra lo que sobre
           en esa línea en vez de mandarlo a la suya-. */}
-      <span className="flex items-center gap-[9px] max-lg:flex-wrap">
+      <span className="flex items-center gap-[9px] max-md:flex-wrap">
       {/* "detail-info-bar": cuatro celdas de 15.71 de alto separadas por una
           regla a la derecha —la última no lleva—, texto de 11.79. */}
-      <span className="flex h-[15.71px] items-center gap-[3.93px] max-lg:flex-wrap lg:shrink-0">
+      <span className="flex h-[15.71px] items-center gap-[3.93px] max-md:flex-wrap md:shrink-0">
         {CONSTANTES.map((c, i) => (
           <span
             key={c.valor}
             className={cn(
-              'flex h-full items-center justify-center px-[6px] text-[11.79px] leading-[16px] whitespace-nowrap text-black',
+              'flex h-full items-center justify-center px-[6px] md:max-lg:px-1 text-[11.79px] leading-[16px] whitespace-nowrap text-black',
               i < CONSTANTES.length - 1 && 'border-r border-[#E4E4E7]',
             )}
           >
@@ -268,7 +270,7 @@ export function ClinicalTopBar({
       {/* Subgrupo del botón de nota + Start Enconter: en su propia fila el
           pill puede volver a ocupar todo el ancho que sobre (`max-lg:flex-1`
           adentro), en vez de repartirse contra la info del paciente. */}
-      <span className="flex shrink-0 items-center gap-[9px] max-lg:w-full">
+      <span className="flex shrink-0 items-center gap-[9px] max-md:w-full">
       <button
         onClick={() => aviso.info('Clinical note is not available in this release.')}
         aria-label="Clinical note"
@@ -281,10 +283,10 @@ export function ClinicalTopBar({
 
       {/* Un solo pill verde con el chevron adentro: 31.79 de alto, radio
           completo, label en 10.8/600. */}
-      <div className="flex h-[31.79px] shrink-0 items-center overflow-hidden rounded-full bg-[#28C563] max-lg:flex-1">
+      <div className="flex h-[31.79px] shrink-0 items-center overflow-hidden rounded-full bg-[#28C563] max-md:flex-1">
         <button
           onClick={onEncuentro}
-          className="flex h-full items-center justify-center gap-[7.86px] pr-[6px] pl-[12.77px] text-[10.8px] font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#1fae54] max-lg:flex-1"
+          className="flex h-full items-center justify-center gap-[7.86px] pr-[6px] pl-[12.77px] md:max-lg:pl-2.5 text-[10.8px] font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#1fae54] max-md:flex-1"
         >
           {encuentro ? <Pause className="size-[13.75px]" /> : <Play className="size-[13.75px]" />}
           {encuentro ? 'Pause Enconter' : 'Start Enconter'}
@@ -293,7 +295,7 @@ export function ClinicalTopBar({
           onClick={() => setAbierto((v) => !v)}
           aria-label="Encounter options"
           aria-expanded={abierto}
-          className="flex h-full items-center pr-[12.77px] pl-[2px] text-white transition-colors hover:bg-[#1fae54]"
+          className="flex h-full items-center pr-[12.77px] pl-[2px] md:max-lg:pr-[9px] text-white transition-colors hover:bg-[#1fae54]"
         >
           <ChevronDown className={cn('size-[15.71px] transition-transform', abierto && 'rotate-180')} />
         </button>

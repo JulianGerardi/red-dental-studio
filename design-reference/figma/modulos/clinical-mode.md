@@ -144,6 +144,14 @@ errores de layout o de dato, no decisiones de diseno.
 - Barra: una fila en `lg`, con la capsula de constantes absorbiendo el sobrante
   por scroll interno. Abajo de `lg` envuelve y **Start Encounter ocupa la fila
   entera**, que es donde tiene que estar la accion principal en un telefono.
+- **Tablet (768-1023px), pedido de Julian:** tres lineas. 1) Exit y Overwiev a
+  la izquierda, CC y TR al final; 2) los cuatro contadores a la izquierda y, al
+  final, constantes + profesional + nota + Start Enconter; 3) la botonera. A
+  768 la segunda linea no entraba (721px contra 708 utiles), asi que en ese
+  rango -y solo en ese- se achican 4px de padding por constante, el padding del
+  pill de Start Enconter y el hueco entre grupos. Desktop y telefono quedan
+  como estaban: las clases del rango son `md:max-lg:`, y los `max-lg:` que
+  envolvian el grupo del paciente pasaron a `max-md:`.
 - Pestanas: scroll horizontal. Son cortas y una grilla las volveria un bloque
   de botones.
 - Panel TT/CC: columna de 300px en `lg`, hoja completa abajo.
