@@ -116,7 +116,7 @@ export function Sidebar({
       <nav
         className={cn(
           'flex flex-col gap-1 pt-6',
-          expanded ? '' : 'md:items-center md:gap-[18px]',
+          expanded ? '' : 'md:items-center md:gap-[18px] md:[@media(max-height:700px)]:gap-2',
         )}
       >
         {NAV.map(({ to, label, icon: Icon, end }) => (
@@ -144,7 +144,19 @@ export function Sidebar({
         </ConTooltip>
       </nav>
 
-      <div className={cn('mt-auto flex flex-col pb-6', expanded ? '' : 'md:items-center')}>
+      {/* Expandido, Settings va al pie del panel. Colapsado va pegado al resto
+          de los íconos, con el mismo hueco de 18 -Julián: "no quedaron todos
+          los íconos juntos"-. En pantallas bajas el hueco baja a 8, para que
+          los once entren y Settings no quede fuera de la pantalla: el rail no
+          scrollea porque su menú flotante se recortaría. */}
+      <div
+        className={cn(
+          'flex flex-col',
+          expanded
+            ? 'mt-auto pb-6'
+            : 'md:mt-[18px] md:items-center md:[@media(max-height:700px)]:mt-2',
+        )}
+      >
           <SettingsItem clase={item} mostrarLabel={expanded} />
         </div>
       </aside>
@@ -191,7 +203,7 @@ function SettingsItem({
 
   return (
     <div
-      className="relative"
+      className="relative md:static"
       onMouseEnter={abrir}
       onMouseLeave={cerrarConDelay}
     >
@@ -215,12 +227,15 @@ function SettingsItem({
       </div>
 
       {abierto && (
-        /* Anclado abajo: el ítem vive al pie del rail y hacia arriba es el
-           único lado donde el panel entra completo. */
+        /* Anclado al pie de la pantalla, al costado del rail -no del ítem-: con
+           Settings pegado a los demás íconos, alinear el panel con él lo
+           dejaba cortado arriba. Crece hacia arriba y, si no entra, scrollea.
+           El ancestro posicionado es el propio rail (el wrapper es `static`
+           desde md). */
         <div
           /* En el panel mobile no hay lugar al costado: ahí se despliega en
              el mismo lugar, debajo del ítem. */
-          className="motion-safe:animate-[loc-in_120ms_ease-out] z-50 rounded-2xl border border-[#e4e4e7] bg-white p-2 max-md:mt-2 max-md:max-h-[45svh] max-md:overflow-y-auto md:absolute md:bottom-0 md:left-full md:ml-2 md:w-[236px] md:shadow-[0_12px_32px_rgb(0_0_0/0.18)]"
+          className="motion-safe:animate-[loc-in_120ms_ease-out] z-50 rounded-2xl border border-[#e4e4e7] bg-white p-2 max-md:mt-2 max-md:max-h-[45svh] max-md:overflow-y-auto md:absolute md:bottom-4 md:left-full md:ml-2 md:max-h-[calc(100svh-2rem)] md:w-[236px] md:overflow-y-auto md:shadow-[0_12px_32px_rgb(0_0_0/0.18)]"
           /* En mobile el ítem vive al pie del panel, así que los once destinos
              nacen abajo del pliegue. Se los trae a la vista al abrir; en
              desktop no hace falta porque el flotante sale al costado. */
