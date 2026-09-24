@@ -7,9 +7,31 @@ import {
 } from 'lucide-react'
 import { SETTINGS_NAV } from '@/data/settings-nav'
 import { useHelp } from '@/components/help/HelpProvider'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
 type NavItem = { to: string; label: string; icon: LucideIcon; end?: boolean }
+
+/* Con el rail colapsado los ítems son sólo un ícono: el nombre sale en un
+   tooltip al costado. Expandido no hace falta -el label ya se ve-. Reemplaza
+   al `title` nativo, que tardaba en aparecer y se veía distinto al resto de la
+   app. Settings queda afuera a propósito: al pasar el mouse ya abre su menú
+   flotante en ese mismo lugar. */
+function ConTooltip({
+  label, mostrar, children,
+}: {
+  label: string
+  mostrar: boolean
+  children: React.ReactElement
+}) {
+  if (!mostrar) return children
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent side="right" sideOffset={10} className="bg-[#09090b] text-white">{label}</TooltipContent>
+    </Tooltip>
+  )
+}
 
 /* Figma 3605:56447 "Sidebar Rail (Collapsed Icons)".
    Rail 58px sobre #fafafa, bloque de logo 64px en #1a4da9 (un azul más
@@ -47,7 +69,7 @@ export function Sidebar({
     )
 
   return (
-    <>
+    <TooltipProvider delayDuration={100}>
       {/* Fondo del panel en mobile. Arriba de md el rail es parte del layout. */}
       {expanded && (
         <div
@@ -98,31 +120,35 @@ export function Sidebar({
         )}
       >
         {NAV.map(({ to, label, icon: Icon, end }) => (
-          <NavLink key={to} to={to} end={end} title={label} className={({ isActive }) => item(isActive)}>
-            <Icon className="size-4 shrink-0" />
-            <span className={cn(expanded ? '' : 'md:hidden')}>{label}</span>
-          </NavLink>
+          <ConTooltip key={to} label={label} mostrar={!expanded}>
+            <NavLink to={to} end={end} aria-label={label} className={({ isActive }) => item(isActive)}>
+              <Icon className="size-4 shrink-0" />
+              <span className={cn(expanded ? '' : 'md:hidden')}>{label}</span>
+            </NavLink>
+          </ConTooltip>
         ))}
         {/* No es una ruta: abre la hoja de chat de Confibot, que antes vivía
             flotando solo sobre la pantalla y tapaba otros botones flotantes
             -el de Appointment requests en Scheduling, por ejemplo-. */}
-        <button
-          type="button"
-          title="Confibot"
-          aria-pressed={confibotAbierto}
-          onClick={toggleConfibot}
-          className={item(confibotAbierto)}
-        >
-          <Bot className="size-4 shrink-0" />
-          <span className={cn(expanded ? '' : 'md:hidden')}>Confibot</span>
-        </button>
+        <ConTooltip label="Confibot" mostrar={!expanded}>
+          <button
+            type="button"
+            aria-label="Confibot"
+            aria-pressed={confibotAbierto}
+            onClick={toggleConfibot}
+            className={item(confibotAbierto)}
+          >
+            <Bot className="size-4 shrink-0" />
+            <span className={cn(expanded ? '' : 'md:hidden')}>Confibot</span>
+          </button>
+        </ConTooltip>
       </nav>
 
       <div className={cn('mt-auto flex flex-col pb-6', expanded ? '' : 'md:items-center')}>
           <SettingsItem clase={item} mostrarLabel={expanded} />
         </div>
       </aside>
-    </>
+    </TooltipProvider>
   )
 }
 
