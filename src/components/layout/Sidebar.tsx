@@ -57,6 +57,14 @@ export function Sidebar({
   onClose?: () => void
 }) {
   const { confibotAbierto, toggleConfibot } = useHelp()
+  const { pathname } = useLocation()
+
+  /* Mismo criterio que el `isActive` de NavLink. Se calcula acá y no con la
+     función de `className` de NavLink porque el tooltip envuelve al link con
+     `asChild`, y Radix Slot no sabe combinar una `className` que es función:
+     la pasa como texto y el link perdía todos sus estilos. */
+  const activa = (to: string, end?: boolean) =>
+    pathname === to || (!end && pathname.startsWith(to) && pathname.charAt(to.length) === '/')
 
   /* En mobile el panel siempre está abierto de ancho completo, así que los
      ítems van con label; el modo icono es sólo para el rail de escritorio. */
@@ -121,7 +129,7 @@ export function Sidebar({
       >
         {NAV.map(({ to, label, icon: Icon, end }) => (
           <ConTooltip key={to} label={label} mostrar={!expanded}>
-            <NavLink to={to} end={end} aria-label={label} className={({ isActive }) => item(isActive)}>
+            <NavLink to={to} end={end} aria-label={label} className={item(activa(to, end))}>
               <Icon className="size-4 shrink-0" />
               <span className={cn(expanded ? '' : 'md:hidden')}>{label}</span>
             </NavLink>
@@ -211,7 +219,13 @@ function SettingsItem({
           cancelar la navegación dependía de que el preventDefault ganara la
           carrera contra el Link, y en touch terminaba navegando igual. */}
       <div className={cn(clase(activo), 'w-full')} data-tour="settings-menu">
-        <NavLink to="/settings" title="Settings" className="flex min-w-0 flex-1 items-center gap-3">
+        <NavLink
+          to="/settings"
+          title="Settings"
+          /* Colapsado el ícono va centrado en su caja de 32: sin esto quedaba
+             corrido 8px a la izquierda del resto de la columna. */
+          className={cn('flex min-w-0 flex-1 items-center gap-3', !mostrarLabel && 'md:justify-center')}
+        >
           <Settings className="size-4 shrink-0" />
           <span className={cn(mostrarLabel ? '' : 'md:hidden')}>Settings</span>
         </NavLink>
