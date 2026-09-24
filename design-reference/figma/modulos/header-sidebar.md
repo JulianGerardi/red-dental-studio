@@ -14,15 +14,17 @@ con dropdown abierto `3605:56446`.
 **pitch de 50px** · icono 16px · **9 ítems**, incluido `CircleHelp` que faltaba ·
 Settings al pie. Se hizo `sticky` porque con la página larga quedaba en y=1390.
 
-**Rail colapsado, pedido de Julián:** Settings va **pegado al resto de los
-íconos** (mismo hueco de 18), no solo al pie; expandido sigue al pie. En
-pantallas de menos de 700px de alto el hueco baja a 8 para que los once entren
-sin scroll (el rail no scrollea porque recortaría el menú flotante). Como el
-ítem ya no está abajo, el menú flotante de Settings se ancla al pie de la
-pantalla, al costado del rail, con alto máximo y scroll propio -alineado con el
-ítem quedaba cortado arriba a 800px-. Los ítems del rail colapsado llevan
-tooltip con el nombre; Settings no, porque su menú flotante ya abre al hover
-en ese lugar.
+**Settings no cambia de lugar al colapsar (pedido de Julián).** Va al pie del
+rail en los dos estados, con el ícono a la misma altura: el ítem colapsado mide
+32 y el expandido 36, así que colapsado lleva 2px más de padding abajo. (Se
+probó pegarlo a los demás íconos y se descartó: Julián lo quería donde está
+expandido.) Los ítems del rail colapsado llevan tooltip con el nombre; Settings
+no, porque su menú flotante ya abre al hover en ese lugar.
+
+Ojo con los tooltips: los `NavLink` van envueltos con `asChild`, y Radix Slot
+no combina una `className` que es función -la pasa como texto y el link pierde
+todos sus estilos-. Por eso el estado activo se calcula en el Sidebar y llega
+como string.
 
 ### Header — correcciones de esta pasada
 - **Toggle**: es un botón con borde `#e4e4e7` y esquinas redondeadas, no un icono
