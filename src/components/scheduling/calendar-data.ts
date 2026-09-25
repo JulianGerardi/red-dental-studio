@@ -4,25 +4,30 @@ export type ApptState =
   | 'Proposed' | 'Check-in' | 'Booked' | 'In progress'
   | 'Fulfilled' | 'No-show' | 'Cancelled'
 
+/* Los colores son tokens de src/index.css (--color-appt-*): se cambian ahí. */
+const c = (estado: string, parte: 'bg' | 'bar' | 'fg' | 'dot') => `var(--color-appt-${estado}-${parte})`
+
 export const LEGEND: { state: ApptState; dot: string | null }[] = [
-  { state: 'Proposed', dot: '#ffb82c' },
-  { state: 'Check-in', dot: '#1e9850' },
-  { state: 'Booked', dot: '#1d56bc' },
-  { state: 'In progress', dot: '#4f46e5' },
-  { state: 'Fulfilled', dot: '#17723c' },
+  { state: 'Proposed', dot: c('proposed', 'dot') },
+  { state: 'Check-in', dot: c('checkin', 'dot') },
+  { state: 'Booked', dot: c('booked', 'dot') },
+  { state: 'In progress', dot: c('inprogress', 'dot') },
+  { state: 'Fulfilled', dot: c('fulfilled', 'dot') },
   /* En el Figma "No-show" es el único sin punto. Se replica tal cual. */
   { state: 'No-show', dot: null },
-  { state: 'Cancelled', dot: '#71717a' },
+  { state: 'Cancelled', dot: c('cancelled', 'dot') },
 ]
 
+const bloque = (estado: string) => ({ bg: c(estado, 'bg'), bar: c(estado, 'bar'), fg: c(estado, 'fg') })
+
 export const BLOCK_STYLE: Record<string, { bg: string; bar: string; fg: string }> = {
-  'Check-in':    { bg: '#ddf0e5', bar: '#1e9850', fg: '#17723c' },
-  'Booked':      { bg: '#e8eef8', bar: '#1d56bc', fg: '#1d56bc' },
-  'In progress': { bg: '#f5f0ff', bar: '#6633a6', fg: '#6633a6' },
-  'Fulfilled':   { bg: '#e9f5ee', bar: '#1e9850', fg: '#17723c' },
-  'Proposed':    { bg: '#fffaf0', bar: '#ffb82c', fg: '#99660d' },
-  'No-show':     { bg: '#f4f4f5', bar: '#a1a1aa', fg: '#52525b' },
-  'Cancelled':   { bg: '#f4f4f5', bar: '#71717a', fg: '#52525b' },
+  'Check-in': bloque('checkin'),
+  'Booked': bloque('booked'),
+  'In progress': bloque('inprogress'),
+  'Fulfilled': bloque('fulfilled'),
+  'Proposed': bloque('proposed'),
+  'No-show': bloque('noshow'),
+  'Cancelled': bloque('cancelled'),
 }
 
 export type CalendarEvent = {

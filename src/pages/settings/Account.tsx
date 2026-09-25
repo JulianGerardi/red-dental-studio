@@ -236,7 +236,7 @@ export function SettingsAccount() {
                       <span className="bg-dash-count-bg text-dash-blue-hover flex size-11 shrink-0 items-center justify-center rounded-lg text-sm font-semibold">
                         {iniciales(cuenta.duenos)}
                       </span>
-                      <span className="inline-flex items-center gap-1 rounded-full border border-purple-fg bg-[#f5f0ff] px-2 py-[2px] text-[11px] font-semibold text-purple-fg">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-purple-fg bg-purple-bg px-2 py-[2px] text-[11px] font-semibold text-purple-fg">
                         <Crown className="size-3" /> Practice Owner
                       </span>
                     </div>

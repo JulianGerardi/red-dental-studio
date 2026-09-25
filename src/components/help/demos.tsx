@@ -186,7 +186,7 @@ export function CalendarOverviewDemo() {
           <div key={c} className="relative flex-1 border-l border-line">
             {[0, 1, 2, 3].map((i) => <div key={i} className="h-9 border-b border-line" />)}
             {c === 1 && (
-              <div className="absolute inset-x-1 top-[9px] rounded-r-[3px] border-l-[3px] border-l-dash-blue bg-[#e8eef8] px-1 py-0.5" style={{ animation: 'tour-card-in 4s .3s ease-out infinite' }}>
+              <div className="absolute inset-x-1 top-[9px] rounded-r-[3px] border-l-[3px] border-l-dash-blue bg-brand-tint px-1 py-0.5" style={{ animation: 'tour-card-in 4s .3s ease-out infinite' }}>
                 <span className="block text-[8px] font-medium text-dash-blue">09:00 AM</span>
               </div>
             )}
@@ -206,7 +206,7 @@ export function NewApptButtonDemo() {
       >
         <Plus className="size-3" /> New appointment
       </span>
-      <div className="mt-3 h-9 w-[130px] overflow-hidden rounded-r-[3px] border-l-[3px] border-l-dash-blue bg-[#e8eef8] px-1.5 py-1 origin-top" style={{ animation: 'tour-block-appear 4s ease-out infinite' }}>
+      <div className="mt-3 h-9 w-[130px] overflow-hidden rounded-r-[3px] border-l-[3px] border-l-dash-blue bg-brand-tint px-1.5 py-1 origin-top" style={{ animation: 'tour-block-appear 4s ease-out infinite' }}>
         <span className="block text-[9px] font-medium text-dash-blue">10:00 AM</span>
         <span className="block truncate text-[9px] text-ink">Sofia Marin</span>
       </div>

@@ -11,8 +11,8 @@ const oscuro: Mapa = {}
 const tema: Mapa = {}
 const temaInline: Mapa = {}
 
-for (const [, selector, cuerpo] of limpio.matchAll(/(:root|\.dark|@theme inline|@theme)\s*\{([^{}]*)\}/g)) {
-  const destino = selector === ':root' ? claro : selector === '.dark' ? oscuro : selector === '@theme' ? tema : temaInline
+for (const [, selector, cuerpo] of limpio.matchAll(/(:root|\.dark|@theme inline|@theme(?: static)?)\s*\{([^{}]*)\}/g)) {
+  const destino = selector === ':root' ? claro : selector === '.dark' ? oscuro : selector.startsWith('@theme') && !selector.includes('inline') ? tema : temaInline
   for (const [, nombre, valor] of cuerpo.matchAll(/--([\w-]+)\s*:\s*([^;]+);/g)) destino[nombre] = valor.trim()
 }
 

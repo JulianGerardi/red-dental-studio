@@ -125,7 +125,7 @@ export function PatientDetailsPopover({
             "Enconter" es del Figma, sin la u. */}
         <button
           type="button"
-          className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#1e9850] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#18763e]"
+          className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#18763e]"
         >
           <Play className="size-3.5 shrink-0" /> Start Enconter
           <ChevronDown className="size-3.5 shrink-0" />

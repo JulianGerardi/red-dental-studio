@@ -181,7 +181,7 @@ export function PatientSidePanel({
             <span
               tabIndex={0}
               aria-label={`${name}, Active, 50 years`}
-              className="absolute right-0 bottom-0 hidden size-3 rounded-full border-2 border-white bg-[#1e9850] lg:block"
+              className="absolute right-0 bottom-0 hidden size-3 rounded-full border-2 border-white bg-green lg:block"
             />
           ))}
         </div>
@@ -338,12 +338,12 @@ function useEstadoEncuentro() {
 const ENCUENTRO = {
   start: {
     label: 'Start Enconter',
-    clase: 'bg-[#1e9850] text-white hover:bg-[#18763e]',
+    clase: 'bg-green text-white hover:bg-[#18763e]',
     icono: <Play className="size-3.5 shrink-0" />,
   },
   pending: {
     label: 'Pending Encounter',
-    clase: 'bg-[#ffb82c] text-[#7a4a00] hover:bg-[#f0a913]',
+    clase: 'bg-amber text-[#7a4a00] hover:bg-[#f0a913]',
     icono: <Pause className="size-3.5 shrink-0" />,
   },
 } as const

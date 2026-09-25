@@ -120,7 +120,7 @@ export function AppointmentSlotPicker({
                       e.dataTransfer.effectAllowed = 'move'
                       e.dataTransfer.setData('text/plain', h)
                     }}
-                    className="border-l-dash-blue relative flex h-full cursor-grab items-center gap-1 rounded-r-[3px] border-l-[3px] bg-[#e8eef8] px-1.5 active:cursor-grabbing"
+                    className="border-l-dash-blue relative flex h-full cursor-grab items-center gap-1 rounded-r-[3px] border-l-[3px] bg-brand-tint px-1.5 active:cursor-grabbing"
                   >
                     <GripVertical className="text-dash-blue size-3 shrink-0" />
                     <span className="min-w-0 leading-tight">

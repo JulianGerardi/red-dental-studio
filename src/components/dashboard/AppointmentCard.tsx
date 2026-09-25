@@ -77,7 +77,7 @@ export function AppointmentCard({
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5">
-          <span className="flex h-8 items-center gap-1 rounded-lg bg-[#ddf0e5] px-2 text-[13px] text-ink">
+          <span className="flex h-8 items-center gap-1 rounded-lg bg-green-soft px-2 text-[13px] text-ink">
             TR <Check className="text-dash-ok-fg size-4" strokeWidth={2.5} />
           </span>
           <span className="flex h-8 items-center gap-1 rounded-lg bg-dash-bad-chip px-2 text-[13px] text-ink">

@@ -64,7 +64,7 @@ const rutasSinStory = [...rutas].filter((r) => !urls.some((u) => coincide(r, u))
 /* Colores escritos a mano en clases */
 const css = readFileSync(join(RAIZ, 'src/index.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
 const tokens = {}
-for (const [, cuerpo] of css.matchAll(/@theme\s*\{([^{}]*)\}/g))
+for (const [, cuerpo] of css.matchAll(/@theme(?:\s+static)?\s*\{([^{}]*)\}/g))
   for (const [, nombre, hex] of cuerpo.matchAll(/--color-([\w-]+)\s*:\s*(#[0-9a-fA-F]{6})\s*;/g)) tokens[hex.toLowerCase()] ??= nombre
 const UTIL = /(?<![\w-])(?:text|bg|border(?:-[trblxyse])?|ring|fill|stroke|divide|outline|decoration|placeholder|caret|accent|from|to|via)-\[(#[0-9a-fA-F]{6})\]/g
 let conToken = 0

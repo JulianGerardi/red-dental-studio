@@ -14,7 +14,7 @@ const TONO: Record<PillTone, string> = {
   warning: 'border-warn-fg bg-warn-bg text-warn-fg',
   danger: 'border-dash-bad-fg bg-dash-bad-bg text-dash-bad-fg',
   neutral: 'border-ink-faint bg-[#f5f5f5] text-[#595959]',
-  purple: 'border-purple-fg bg-[#f5f0ff] text-purple-fg',
+  purple: 'border-purple-fg bg-purple-bg text-purple-fg',
 }
 
 const TAMANO = {

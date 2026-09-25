@@ -50,7 +50,7 @@ export function StatusLegend() {
               <div key={state} className="flex items-center gap-2.5 rounded-md px-2 py-1.5">
                 <span
                   className="h-5 w-8 shrink-0 rounded-r-[3px] border-l-[3px]"
-                  style={{ backgroundColor: s?.bg ?? '#f4f4f5', borderLeftColor: s?.bar ?? '#a1a1aa' }}
+                  style={{ backgroundColor: s?.bg ?? 'var(--color-surface-muted)', borderLeftColor: s?.bar ?? 'var(--color-ink-faint)' }}
                 />
                 <span className="text-[13px] text-ink">{state}</span>
                 {/* En el Figma "No-show" es el único sin punto (anomalía 24). */}

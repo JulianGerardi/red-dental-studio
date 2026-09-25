@@ -148,7 +148,7 @@ export function PatientInSessionPopup() {
               <ChevronRight className="size-4" />
             </span>
           ) : hayEnCurso ? (
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[10px] font-bold text-[#17723c]">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-green-tint text-[10px] font-bold text-green-deep">
               {primero.initials}
             </span>
           ) : (
@@ -176,7 +176,7 @@ export function PatientInSessionPopup() {
           )}
         >
           <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-[#1e9850] uppercase">
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-green uppercase">
               <Radio className="size-3" /> Currently being seen
             </div>
             {hayEnCurso && <span className="text-[10px] font-semibold text-ink-faint">{visibles.length}</span>}
@@ -188,7 +188,7 @@ export function PatientInSessionPopup() {
                 const i = enCurso.indexOf(p)
                 return (
                   <div key={i} className="group flex items-center gap-2.5 py-2.5 first:pt-0.5 last:pb-0.5">
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e9f5ee] text-[10px] font-bold text-[#17723c]">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-green-tint text-[10px] font-bold text-green-deep">
                       {p.initials}
                     </span>
                     <Link to={`/patients/${slug(p.name)}`} className="min-w-0 flex-1">

@@ -19,6 +19,6 @@ function Demo(args: React.ComponentProps<typeof EditableAvatar>) {
 export const Circle: Story = { render: (args) => <Demo {...args} /> }
 
 export const Square: Story = {
-  args: { avatarClassName: 'size-14 rounded-lg bg-[#e8eef8] text-dash-blue text-lg' },
+  args: { avatarClassName: 'size-14 rounded-lg bg-brand-tint text-dash-blue text-lg' },
   render: (args) => <Demo {...args} />,
 }

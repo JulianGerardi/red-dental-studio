@@ -28,7 +28,7 @@ export function EmptyState({
         className,
       )}
     >
-      <span className="flex size-9 items-center justify-center rounded-lg bg-[#e8eef8]">
+      <span className="flex size-9 items-center justify-center rounded-lg bg-brand-tint">
         {Icon ? <Icon className="text-dash-blue size-4" /> : <span className="bg-dash-blue size-2.5 rounded-full" />}
       </span>
       <p className="text-sm font-bold text-ink">{title}</p>

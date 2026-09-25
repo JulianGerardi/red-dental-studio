@@ -309,7 +309,7 @@ function ExceptionsTab() {
         <div className="mt-4 flex flex-col gap-2">
           {excepciones.map((e) => (
             <div key={e.id} className="flex items-center gap-3 rounded-lg border border-line px-3 py-2.5">
-              <span className={cn('size-2 shrink-0 rounded-full', e.estado === 'Active' ? 'bg-[#1e9850]' : 'bg-ink-faint')} />
+              <span className={cn('size-2 shrink-0 rounded-full', e.estado === 'Active' ? 'bg-green' : 'bg-ink-faint')} />
               <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink">{e.nombre}</span>
               <span className="flex shrink-0 items-center gap-1.5 text-[12px] text-ink-muted">
                 <CalendarDays className="size-3.5" />

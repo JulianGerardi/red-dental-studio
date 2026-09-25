@@ -59,8 +59,18 @@ elementos) de 29 rutas antes y después: idénticos.
 | Estados | `dash-ok-*`, `dash-bad-*`, `dash-busy-*`, `field-error`, `required`, `warn-*`, `attn-fg`, `info-bg`, `purple-fg` | `text-dash-ok-fg` |
 | Marca | `dash-blue`, `dash-blue-hover`, `dash-ring` | `bg-dash-blue` |
 
-**Quedan 121 colores en clases sin token** (62 valores, casi todos de 1 a 5
-usos) y ~110 en estilos en línea, SVG y datos. Unificarlos cambia el aspecto
+Los **estados del calendario** (`--color-appt-<estado>-bg|bar|fg|dot`) también son
+tokens: `calendar-data.ts` los lee con `var(--color-appt-…)`, así que la
+paleta de turnos se cambia en `src/index.css` y se ve en la grilla, la
+leyenda y el detalle. Apuntan a tokens de apoyo (`brand-tint`, `green`,
+`green-deep`, `amber`…), no a hex.
+
+Los tokens propios van en `@theme static`: Tailwind sólo emite las variables
+que alguna clase usa, y estos también se leen desde JS y desde Storybook.
+
+**Quedan 103 colores en clases sin token** (55 valores, casi todos de 1 a 5
+usos) y ~110 en estilos en línea, SVG y datos (el odontograma, el mosaico
+de UnderConstruction, el visor de radiografías). Unificarlos cambia el aspecto
 (muchos son casi iguales entre sí), así que necesitan una decisión de diseño;
 están listados en **Foundations / Color audit**. `scripts/ds-baseline.json`
 guarda el tope: `ds:check` falla si crece.
