@@ -4,7 +4,7 @@ import { DentalAssessmentExam } from './DentalAssessmentExam'
 const meta = {
   title: 'Components/Clinical/DentalAssessmentExam',
   component: DentalAssessmentExam,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
 } satisfies Meta<typeof DentalAssessmentExam>
 
 export default meta

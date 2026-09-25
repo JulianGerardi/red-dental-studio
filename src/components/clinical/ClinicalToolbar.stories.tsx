@@ -6,7 +6,7 @@ import { ClinicalToolbar } from './ClinicalToolbar'
 const meta = {
   title: 'Components/Clinical/ClinicalToolbar',
   component: ClinicalToolbar,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
   args: { juego: 'Exams', onJuego: () => {}, pestana: 'Vitals' as Pestana, onPestana: () => {} },
 } satisfies Meta<typeof ClinicalToolbar>
 

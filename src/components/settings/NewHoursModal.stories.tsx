@@ -4,7 +4,7 @@ import { NewHoursModal } from './NewHoursModal'
 const meta = {
   title: 'Components/Settings/NewHoursModal',
   component: NewHoursModal,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { onClose: () => {} },
 } satisfies Meta<typeof NewHoursModal>
 

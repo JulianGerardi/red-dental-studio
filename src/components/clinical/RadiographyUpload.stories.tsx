@@ -4,7 +4,7 @@ import { RadiographyUpload } from './RadiographyUpload'
 const meta = {
   title: 'Components/Clinical/RadiographyUpload',
   component: RadiographyUpload,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
   args: { onCancel: () => {}, onSave: () => {} },
 } satisfies Meta<typeof RadiographyUpload>
 

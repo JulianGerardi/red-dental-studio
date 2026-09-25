@@ -40,6 +40,13 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
 
 Las 223 stories se abrieron una por una en el navegador: ninguna da error.
 
+**Cada página Docs muestra el código** (`src/design-system/DocsPage.tsx`): la nota
+de diseño del encabezado del archivo, el componente, sus controles, y al final
+*Source* (el `.tsx` del componente) y *Stories source* (el `.stories.tsx`),
+leídos con `?raw`. Los modales, drawers y paneles anchos se dibujan en un
+iframe dentro de Docs (`docs.story.inline: false`): son `position: fixed` y
+inline quedaban con alto cero, o sea que la página no mostraba nada.
+
 ## Tokens (2026-09-25)
 
 Había **1.885 colores hex escritos a mano** en 110 archivos

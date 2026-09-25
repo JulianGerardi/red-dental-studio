@@ -4,7 +4,7 @@ import { ClinicalPopover } from './ClinicalPopover'
 const meta = {
   title: 'Components/Patients/ClinicalPopover',
   component: ClinicalPopover,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: {
     title: 'Allergies',
     anchor: new DOMRect(40, 40, 120, 36),

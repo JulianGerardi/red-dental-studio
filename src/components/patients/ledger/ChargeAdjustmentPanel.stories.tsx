@@ -5,7 +5,7 @@ import { ChargeAdjustmentPanel } from './ChargeAdjustmentPanel'
 const meta = {
   title: 'Components/Ledger/ChargeAdjustmentPanel',
   component: ChargeAdjustmentPanel,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
   args: { cargosVisita: MOVIMIENTOS.filter((m) => m.tipo === 'Charge'), onCancelar: () => {}, onGuardar: () => {} },
 } satisfies Meta<typeof ChargeAdjustmentPanel>
 

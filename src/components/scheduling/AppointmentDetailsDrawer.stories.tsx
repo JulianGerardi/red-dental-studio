@@ -4,7 +4,7 @@ import { AppointmentDetailsDrawer } from './AppointmentDetailsDrawer'
 const meta = {
   title: 'Components/Scheduling/AppointmentDetailsDrawer',
   component: AppointmentDetailsDrawer,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: {
     patient: 'Maria Abril Viola',
     estado: 'Check-in',

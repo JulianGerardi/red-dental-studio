@@ -4,7 +4,7 @@ import { PostPaymentDialog } from './PostPaymentDialog'
 const meta = {
   title: 'Components/Billing/PostPaymentDialog',
   component: PostPaymentDialog,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { tipoInicial: 'Patient Payment', onClose: () => {}, onGuardar: () => {} },
   argTypes: { tipoInicial: { control: 'select', options: ['Patient Payment', 'Credit Adjustment', 'Charge Adjustment'] } },
 } satisfies Meta<typeof PostPaymentDialog>

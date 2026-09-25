@@ -5,7 +5,7 @@ import { PatientPaymentPanel } from './PatientPaymentPanel'
 const meta = {
   title: 'Components/Ledger/PatientPaymentPanel',
   component: PatientPaymentPanel,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
   args: { cargos: MOVIMIENTOS.filter((m) => m.tipo === 'Charge'), onCancelar: () => {}, onGuardar: () => {} },
 } satisfies Meta<typeof PatientPaymentPanel>
 

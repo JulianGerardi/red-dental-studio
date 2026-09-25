@@ -7,7 +7,7 @@ const CREDITO = MOVIMIENTOS.find((m) => (m.creditoDisponible ?? 0) > 0) ?? MOVIM
 const meta = {
   title: 'Components/Ledger/AplicarCreditoModal',
   component: AplicarCreditoModal,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { m: CREDITO, cargos: MOVIMIENTOS.filter((m) => m.tipo === 'Charge'), onClose: () => {}, onAplicar: () => {} },
 } satisfies Meta<typeof AplicarCreditoModal>
 

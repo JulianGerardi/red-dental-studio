@@ -3,7 +3,7 @@ import { ManageSubscriptionModal, NewDependerModal, NewSubscriptionModal } from 
 
 const meta = {
   title: 'Components/Patients/Insurance modals',
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
 } satisfies Meta
 
 export default meta

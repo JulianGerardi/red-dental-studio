@@ -5,7 +5,7 @@ import { Topbar } from './Topbar'
 const meta = {
   title: 'Components/Layout/Topbar',
   component: Topbar,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { expanded: true, onToggleSidebar: () => {}, notificaciones: NOTIFICACIONES },
 } satisfies Meta<typeof Topbar>
 

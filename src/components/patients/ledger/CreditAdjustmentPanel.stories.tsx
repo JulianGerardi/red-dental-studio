@@ -5,7 +5,7 @@ import { CreditAdjustmentPanel } from './CreditAdjustmentPanel'
 const meta = {
   title: 'Components/Ledger/CreditAdjustmentPanel',
   component: CreditAdjustmentPanel,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
   args: { cargos: MOVIMIENTOS.filter((m) => m.tipo === 'Charge'), onCancelar: () => {}, onGuardar: () => {} },
 } satisfies Meta<typeof CreditAdjustmentPanel>
 

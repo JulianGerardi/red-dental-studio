@@ -4,7 +4,7 @@ import { OdontogramEmbed } from './OdontogramEmbed'
 const meta = {
   title: 'Components/Clinical/OdontogramEmbed',
   component: OdontogramEmbed,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
   args: { controlesAbiertos: false, onCerrarControles: () => {} },
 } satisfies Meta<typeof OdontogramEmbed>
 

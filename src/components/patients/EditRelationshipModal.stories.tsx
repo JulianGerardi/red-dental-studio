@@ -4,7 +4,7 @@ import { EditRelationshipModal } from './EditRelationshipModal'
 const meta = {
   title: 'Components/Patients/EditRelationshipModal',
   component: EditRelationshipModal,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { persona: { name: 'Michael Miller', initials: 'MM', dob: 'May 14, 1982', email: 'mm.thompson@yahoo.com' }, onClose: () => {} },
 } satisfies Meta<typeof EditRelationshipModal>
 

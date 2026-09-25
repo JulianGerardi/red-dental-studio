@@ -4,7 +4,7 @@ import { LabOrderPanel } from './LabOrderPanel'
 const meta = {
   title: 'Components/Clinical/LabOrderPanel',
   component: LabOrderPanel,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
 } satisfies Meta<typeof LabOrderPanel>
 
 export default meta

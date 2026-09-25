@@ -44,7 +44,7 @@ function exportsDe(texto: string): string[] {
 
 /* El primer comentario de bloque del archivo: es donde cada componente
    explica por qué se ve como se ve. */
-function comentarioDe(texto: string): string {
+export function comentarioDe(texto: string): string {
   const sinImports = texto.replace(/^(?:import[^;]*?from\s+['"][^'"]+['"];?\s*|\s*\n)+/m, '')
   const m = sinImports.match(/\/\*+([\s\S]*?)\*\//)
   if (!m) return ''

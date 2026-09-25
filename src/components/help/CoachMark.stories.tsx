@@ -5,7 +5,7 @@ import { TOPICS } from './topics'
 const meta = {
   title: 'Components/Help/CoachMark',
   component: CoachMark,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: {
     coaching: { ...TOPICS[0], index: 0, total: 3 },
     onNext: () => {},

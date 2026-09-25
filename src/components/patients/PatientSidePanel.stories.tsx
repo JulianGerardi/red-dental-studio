@@ -5,7 +5,7 @@ import { PatientSidePanel } from './PatientSidePanel'
 const meta = {
   title: 'Components/Patients/PatientSidePanel',
   component: PatientSidePanel,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { name: 'Sarah Stone', initials: 'SS', section: 'Dashboard', basePath: '/patients/patient-0001' },
   decorators: [conPacientes, (Story) => <div className="flex h-[760px] bg-page-background"><Story /></div>],
 } satisfies Meta<typeof PatientSidePanel>

@@ -6,7 +6,7 @@ import { AppShell } from './AppShell'
 const meta = {
   title: 'Components/Layout/AppShell',
   component: AppShell,
-  parameters: { layout: 'fullscreen', router: false },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } }, router: false },
 } satisfies Meta<typeof AppShell>
 
 export default meta

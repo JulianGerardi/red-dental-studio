@@ -58,7 +58,7 @@ export const Section: Story = {
 export const Footer: Story = { render: () => <FormFooter onCancel={() => {}} onSave={() => {}} /> }
 
 export const Modal: Story = {
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   render: () => (
     <ModalShell title="New Allergy" onClose={() => {}} footer={<FormFooter onCancel={() => {}} onSave={() => {}} />}>
       <div className="flex flex-col gap-4">

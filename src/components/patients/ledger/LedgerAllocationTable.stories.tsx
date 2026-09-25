@@ -5,7 +5,7 @@ import { LedgerAllocationTable } from './LedgerAllocationTable'
 const meta = {
   title: 'Components/Ledger/LedgerAllocationTable',
   component: LedgerAllocationTable,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
   args: { cargos: MOVIMIENTOS.filter((m) => m.tipo === 'Charge') },
 } satisfies Meta<typeof LedgerAllocationTable>
 

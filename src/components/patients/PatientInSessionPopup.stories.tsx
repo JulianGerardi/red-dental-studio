@@ -4,7 +4,7 @@ import { PatientInSessionPopup } from './PatientInSessionPopup'
 const meta = {
   title: 'Components/Patients/PatientInSessionPopup',
   component: PatientInSessionPopup,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   decorators: [(Story) => <div className="relative h-[520px]"><Story /></div>],
 } satisfies Meta<typeof PatientInSessionPopup>
 

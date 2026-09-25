@@ -4,7 +4,7 @@ import { NewRoomModal } from './NewRoomModal'
 const meta = {
   title: 'Components/Settings/NewRoomModal',
   component: NewRoomModal,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { onClose: () => {}, onGuardar: () => {} },
 } satisfies Meta<typeof NewRoomModal>
 

@@ -2,12 +2,14 @@ import type { Preview } from '@storybook/react-vite'
 import { MemoryRouter } from 'react-router-dom'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/toaster'
+import { DocsPage } from '../src/design-system/DocsPage'
 import '../src/index.css'
 
 const preview: Preview = {
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
+    docs: { page: DocsPage },
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
     options: {
       storySort: {

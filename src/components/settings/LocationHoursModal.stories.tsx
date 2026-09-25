@@ -4,7 +4,7 @@ import { LocationHoursModal } from './LocationHoursModal'
 const meta = {
   title: 'Components/Settings/LocationHoursModal',
   component: LocationHoursModal,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { onClose: () => {} },
 } satisfies Meta<typeof LocationHoursModal>
 

@@ -4,7 +4,7 @@ import { Confibot } from './Confibot'
 const meta = {
   title: 'Components/Help/Confibot',
   component: Confibot,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { abierto: true, onClose: () => {}, onShowOnScreen: () => {} },
   decorators: [(Story) => <div className="relative h-[640px]"><Story /></div>],
 } satisfies Meta<typeof Confibot>

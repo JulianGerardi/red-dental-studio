@@ -4,7 +4,7 @@ import { ProblemList } from './ProblemList'
 const meta = {
   title: 'Components/Clinical/ProblemList',
   component: ProblemList,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
 } satisfies Meta<typeof ProblemList>
 
 export default meta

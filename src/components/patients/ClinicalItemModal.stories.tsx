@@ -4,7 +4,7 @@ import { ClinicalItemModal } from './ClinicalItemModal'
 const meta = {
   title: 'Components/Patients/ClinicalItemModal',
   component: ClinicalItemModal,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { categoria: 'Allergies', onGuardar: () => {}, onClose: () => {} },
   argTypes: { categoria: { control: 'select', options: ['Allergies', 'Medical Conditions', 'Medication', 'Past Surgery and Hospitalization'] } },
 } satisfies Meta<typeof ClinicalItemModal>

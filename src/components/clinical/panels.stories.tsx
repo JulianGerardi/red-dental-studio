@@ -3,7 +3,7 @@ import { PatientSummaryPanel, TreatmentPanel, TreatmentPlanPanel } from './panel
 
 const meta = {
   title: 'Components/Clinical/Panels',
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
 } satisfies Meta
 
 export default meta

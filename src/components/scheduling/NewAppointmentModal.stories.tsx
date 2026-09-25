@@ -4,7 +4,7 @@ import { NewAppointmentModal } from './NewAppointmentModal'
 const meta = {
   title: 'Components/Scheduling/NewAppointmentModal',
   component: NewAppointmentModal,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { onClose: () => {} },
 } satisfies Meta<typeof NewAppointmentModal>
 

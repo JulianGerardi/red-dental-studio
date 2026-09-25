@@ -4,7 +4,7 @@ import { NewExceptionModal } from './NewExceptionModal'
 const meta = {
   title: 'Components/Settings/NewExceptionModal',
   component: NewExceptionModal,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { onClose: () => {}, onGuardar: () => {} },
 } satisfies Meta<typeof NewExceptionModal>
 

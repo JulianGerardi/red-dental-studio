@@ -4,7 +4,7 @@ import { TreatmentPlanSection } from './TreatmentPlanSection'
 const meta = {
   title: 'Components/Clinical/TreatmentPlanSection',
   component: TreatmentPlanSection,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
 } satisfies Meta<typeof TreatmentPlanSection>
 
 export default meta

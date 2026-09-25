@@ -12,6 +12,6 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 export const AssignRole: Story = {
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   render: () => <AssignRoleModal onGuardar={() => {}} onClose={() => {}} />,
 }

@@ -6,7 +6,7 @@ import { NotificationBanner } from './NotificationBanner'
 const meta = {
   title: 'Components/Layout/NotificationBanner',
   component: NotificationBanner,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { items: NOTIFICACIONES, cursor: 0, onCursor: () => {}, onOcultar: () => {} },
 } satisfies Meta<typeof NotificationBanner>
 

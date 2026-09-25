@@ -4,7 +4,7 @@ import { RadiographyPanel } from './RadiographyPanel'
 const meta = {
   title: 'Components/Clinical/RadiographyPanel',
   component: RadiographyPanel,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
 } satisfies Meta<typeof RadiographyPanel>
 
 export default meta

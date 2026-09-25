@@ -6,7 +6,7 @@ import { Odontogram } from './Odontogram'
 const meta = {
   title: 'Components/Clinical/Odontogram',
   component: Odontogram,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
   args: { exam: makeMockExam(), selected: [], onToggle: () => {}, onSurface: () => {} },
 } satisfies Meta<typeof Odontogram>
 

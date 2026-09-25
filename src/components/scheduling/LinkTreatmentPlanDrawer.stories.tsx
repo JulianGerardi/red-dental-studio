@@ -4,7 +4,7 @@ import { LinkTreatmentPlanDrawer } from './LinkTreatmentPlanDrawer'
 const meta = {
   title: 'Components/Scheduling/LinkTreatmentPlanDrawer',
   component: LinkTreatmentPlanDrawer,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { onClose: () => {} },
 } satisfies Meta<typeof LinkTreatmentPlanDrawer>
 

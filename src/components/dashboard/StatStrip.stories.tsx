@@ -5,7 +5,7 @@ import { StatStrip } from './StatStrip'
 const meta = {
   title: 'Components/Dashboard/StatStrip',
   component: StatStrip,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
 } satisfies Meta<typeof StatStrip>
 
 export default meta

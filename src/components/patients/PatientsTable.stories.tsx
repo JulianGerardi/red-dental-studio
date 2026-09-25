@@ -10,7 +10,7 @@ const FILAS: PatientRow[] = [
 const meta = {
   title: 'Components/Patients/PatientsTable',
   component: PatientsTable,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
   args: { rows: FILAS },
 } satisfies Meta<typeof PatientsTable>
 

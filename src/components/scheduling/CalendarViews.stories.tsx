@@ -6,7 +6,7 @@ const props = { eventos: EVENTOS_INICIALES, fecha: FECHA_ANCLA, onMover: () => {
 
 const meta = {
   title: 'Components/Scheduling/CalendarViews',
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
 } satisfies Meta
 
 export default meta

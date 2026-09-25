@@ -4,7 +4,7 @@ import { PatientDetailsPopover } from './PatientDetailsPopover'
 const meta = {
   title: 'Components/Dashboard/PatientDetailsPopover',
   component: PatientDetailsPopover,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { name: 'Noah James', initials: 'NJ', anchor: new DOMRect(120, 120, 300, 90), onClose: () => {} },
 } satisfies Meta<typeof PatientDetailsPopover>
 

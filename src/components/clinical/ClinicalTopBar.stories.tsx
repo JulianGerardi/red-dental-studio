@@ -5,7 +5,7 @@ import { ClinicalTopBar } from './ClinicalTopBar'
 const meta = {
   title: 'Components/Clinical/ClinicalTopBar',
   component: ClinicalTopBar,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   decorators: [conPacientes],
   args: { volverA: '/patients/patient-0001', encuentro: false, onEncuentro: () => {}, onOverview: () => {}, enOverview: false },
 } satisfies Meta<typeof ClinicalTopBar>

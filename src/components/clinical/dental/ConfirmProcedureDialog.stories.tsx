@@ -9,7 +9,7 @@ const FINDING = {
 const meta = {
   title: 'Components/Clinical/Dental/ConfirmProcedureDialog',
   component: ConfirmProcedureDialog,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { action: 'treated', finding: FINDING, linkedConditions: [{ ...FINDING, id: 'F-2', area: 'Tooth 4' }], onCancel: () => {}, onConfirm: () => {} },
 } satisfies Meta<typeof ConfirmProcedureDialog>
 
