@@ -28,9 +28,9 @@ export function FindingCard({
         {action}
       </div>
       <div className="flex flex-col gap-0.5 pl-1">
-        <p className="text-xs font-extrabold text-[#09090b]">{finding.area}</p>
-        <p className="text-xs text-[#09090b]">Condition: <span className="text-[#71717a]">{finding.condition}</span></p>
-        <p className="text-xs text-[#09090b]">Descriptors: <span className="text-[#71717a]">{finding.descriptor}</span></p>
+        <p className="text-xs font-extrabold text-ink">{finding.area}</p>
+        <p className="text-xs text-ink">Condition: <span className="text-ink-muted">{finding.condition}</span></p>
+        <p className="text-xs text-ink">Descriptors: <span className="text-ink-muted">{finding.descriptor}</span></p>
       </div>
     </div>
   )

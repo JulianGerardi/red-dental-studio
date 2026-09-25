@@ -84,14 +84,14 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const totalAplicado = cargos.reduce((a, m) => a + (Number(aplicado[m.id]) || 0), 0)
 
   const columnas: Columna[] = [
-    { id: 'fecha', label: 'Date', px: 76, bloqueada: true, claseCelda: 'text-[#3f3f46]', celda: (m) => fechaCorta(m.fecha) },
-    { id: 'paciente', label: 'Patient', px: 76, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.paciente, celda: (m) => m.paciente },
+    { id: 'fecha', label: 'Date', px: 76, bloqueada: true, claseCelda: 'text-ink-soft', celda: (m) => fechaCorta(m.fecha) },
+    { id: 'paciente', label: 'Patient', px: 76, claseCelda: 'truncate text-ink', titulo: (m) => m.paciente, celda: (m) => m.paciente },
     { id: 'provider', label: 'Provider', px: 72, claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
     { id: 'diente', label: 'Tooth', px: 40, celda: (m) => m.diente ?? '—' },
     { id: 'superficie', label: 'Surface', px: 48, celda: (m) => m.superficie ?? '—' },
     { id: 'codigo', label: 'Code', px: 52, claseCelda: 'text-dash-blue font-medium', celda: (m) => m.codigo },
-    { id: 'desc', label: 'Description', px: 88, elastica: true, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
-    { id: 'charge', label: 'Charge', px: 64, derecha: true, claseCelda: 'font-medium tabular-nums text-[#09090b]', celda: (m) => moneda(m.monto) },
+    { id: 'desc', label: 'Description', px: 88, elastica: true, claseCelda: 'truncate text-ink', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
+    { id: 'charge', label: 'Charge', px: 64, derecha: true, claseCelda: 'font-medium tabular-nums text-ink', celda: (m) => moneda(m.monto) },
     { id: 'otroCredito', label: 'Other Credit', px: 68, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * coberturaSeguro(m.codigo)) },
     { id: 'guarEstimado', label: 'Guar Estimate', px: 76, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * (1 - coberturaSeguro(m.codigo))) },
     {
@@ -108,11 +108,11 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
           inputMode="decimal"
           placeholder="0.00"
           aria-label={`Applied to ${m.descripcion}`}
-          className="focus:border-dash-blue h-7 w-full rounded-md border border-[#e4e4e7] bg-white px-2 text-right text-[12px] tabular-nums placeholder:text-[#a1a1aa] focus:outline-none"
+          className="focus:border-dash-blue h-7 w-full rounded-md border border-line bg-white px-2 text-right text-[12px] tabular-nums placeholder:text-ink-faint focus:outline-none"
         />
       ),
     },
-    { id: 'balance', label: 'Balance', px: 64, derecha: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', bloqueada: true, celda: (m, ap) => moneda(Math.max(m.monto - ap, 0)) },
+    { id: 'balance', label: 'Balance', px: 64, derecha: true, claseCelda: 'font-semibold tabular-nums text-ink', bloqueada: true, celda: (m, ap) => moneda(Math.max(m.monto - ap, 0)) },
   ]
   const columnasVisibles = columnas.filter((c) => !ocultas.includes(c.id))
   const anchoMinimo = columnasVisibles.reduce(
@@ -140,9 +140,9 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   }
 
   return (
-    <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
+    <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="flex items-center gap-2 text-sm font-bold text-[#09090b]">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
           <CreditCard className="size-4" /> Ledger Transactions
         </h2>
         <div className="flex flex-wrap items-center gap-2">
@@ -155,7 +155,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
       </div>
 
       {cargos.length === 0 ? (
-        <p className="mt-3 text-[13px] text-[#71717a]">No open charges to apply this against.</p>
+        <p className="mt-3 text-[13px] text-ink-muted">No open charges to apply this against.</p>
       ) : (
         <>
           {/* `skipDelayDuration={0}`: sin esto Radix deja una ventana de gracia
@@ -163,9 +163,9 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                   instante -y alcanza a mostrar el contenido de la anterior-, que
                   es el parpadeo que hacía imposible leerlo. */}
               <TooltipProvider delayDuration={500} skipDelayDuration={0}>
-          <div ref={refVisible} data-tabla-scroll className="mt-3 w-full overflow-x-auto rounded-md border border-[#e7e7e7]">
+          <div ref={refVisible} data-tabla-scroll className="mt-3 w-full overflow-x-auto rounded-md border border-line-row">
             <div style={{ minWidth: anchoMinimo }}>
-              <div data-tabla-header className="group/fila flex items-center gap-1.5 bg-[#f9f9f9] px-3 py-2.5 text-[11px] font-semibold text-[#71717a]">
+              <div data-tabla-header className="group/fila flex items-center gap-1.5 bg-surface-alt px-3 py-2.5 text-[11px] font-semibold text-ink-muted">
                 {columnasVisibles.map((c, i) => (
                   <span
                     key={c.id}
@@ -182,7 +182,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                 const ap = Number(aplicado[m.id]) || 0
                 const abierta = expandidas.includes(m.id)
                 return (
-                  <div key={m.id} className="border-t border-[#e7e7e7]">
+                  <div key={m.id} className="border-t border-line-row">
                     {/* La fila entera abre el detalle, salvo cuando el click
                         cae en el input de "Applied" o en una manija. */}
                     <FilaConTooltip m={m} abierta={abierta}>
@@ -200,8 +200,8 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
                       }}
                       className={cn(
-                        'group/fila flex cursor-pointer items-center gap-1.5 px-3 py-2.5 text-[12px] text-[#3f3f46] hover:bg-[#fafafa]',
-                        abierta && 'bg-[#fafafa]',
+                        'group/fila flex cursor-pointer items-center gap-1.5 px-3 py-2.5 text-[12px] text-ink-soft hover:bg-surface-subtle',
+                        abierta && 'bg-surface-subtle',
                       )}
                     >
                       {columnasVisibles.map((c) => (
@@ -222,24 +222,24 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
 
               {/* El resumen cierra la tabla: adentro del mismo borde y
                   arriba del paginado, no suelto afuera de la card. */}
-              <div className="flex justify-end border-t border-[#e7e7e7] px-3 py-3">
-                <dl className="w-fit overflow-hidden rounded-md border border-[#e4e4e7] text-[13px]">
+              <div className="flex justify-end border-t border-line-row px-3 py-3">
+                <dl className="w-fit overflow-hidden rounded-md border border-line text-[13px]">
                   <div className="flex items-center">
-                    <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Amount not applied</dt>
-                    <dd className="w-24 px-3 py-2 text-right font-semibold tabular-nums text-[#09090b]">{moneda(Math.max(totalCargos - totalAplicado, 0))}</dd>
+                    <dt className="w-36 bg-surface-alt px-3 py-2 text-right font-medium text-ink-soft">Amount not applied</dt>
+                    <dd className="w-24 px-3 py-2 text-right font-semibold tabular-nums text-ink">{moneda(Math.max(totalCargos - totalAplicado, 0))}</dd>
                   </div>
-                  <div className="flex items-center border-t border-[#e4e4e7]">
-                    <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Amount applied</dt>
+                  <div className="flex items-center border-t border-line">
+                    <dt className="w-36 bg-surface-alt px-3 py-2 text-right font-medium text-ink-soft">Amount applied</dt>
                     <dd className="text-dash-blue w-24 px-3 py-2 text-right font-semibold tabular-nums">{moneda(totalAplicado)}</dd>
                   </div>
                 </dl>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
-                <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
+                <span className="flex items-center gap-3 text-xs font-semibold text-ink-muted">
                   Showing {cargosPagina.length} of {cargos.length} transactions
                   {anchos.avisando && (
-                    <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-[#a1a1aa] lg:flex">
+                    <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
                       <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
                     </span>
                   )}

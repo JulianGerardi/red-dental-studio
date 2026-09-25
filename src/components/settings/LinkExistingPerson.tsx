@@ -30,17 +30,17 @@ export function LinkExistingPerson({
           <FieldLabel required>Person</FieldLabel>
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
                 value={busqueda}
                 onChange={(e) => { setBusqueda(e.target.value); onSeleccionar(null) }}
                 placeholder="Search providers..."
-                className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-9 pl-9 text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
+                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-9 pl-9 text-[13px] placeholder:text-ink-faint focus:outline-none"
               />
               {busqueda && (
                 <button
                   type="button" aria-label="Clear search" onClick={limpiar}
-                  className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-0.5 text-[#a1a1aa] hover:text-[#71717a]"
+                  className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-0.5 text-ink-faint hover:text-ink-muted"
                 >
                   <X className="size-4" />
                 </button>
@@ -57,14 +57,14 @@ export function LinkExistingPerson({
           {resultados.map((p) => (
             <button
               key={p.id} type="button" onClick={() => { onSeleccionar(p); setBusqueda(p.nombre) }}
-              className="flex items-center gap-3 rounded-lg border border-[#e4e4e7] bg-white p-3 text-left hover:bg-[#fafafa]"
+              className="flex items-center gap-3 rounded-lg border border-line bg-white p-3 text-left hover:bg-surface-subtle"
             >
               <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">
                 {p.iniciales}
               </span>
               <span className="min-w-0 leading-tight">
-                <span className="block text-[13px] font-semibold text-[#09090b]">{p.nombre}</span>
-                <span className="block text-[11px] text-[#71717a]">DOB: {p.cumpleanos}</span>
+                <span className="block text-[13px] font-semibold text-ink">{p.nombre}</span>
+                <span className="block text-[11px] text-ink-muted">DOB: {p.cumpleanos}</span>
               </span>
             </button>
           ))}
@@ -75,10 +75,10 @@ export function LinkExistingPerson({
                 {vinculado.iniciales}
               </span>
               <span className="min-w-0 leading-tight">
-                <span className="block text-[13px] font-bold text-[#09090b] uppercase">{vinculado.nombre}</span>
-                <span className="block text-[11px] text-[#71717a]">
-                  <span className="text-[#a1a1aa]">DOB:</span> {vinculado.cumpleanos}
-                  <span className="text-[#a1a1aa]"> Email:</span> {vinculado.email}
+                <span className="block text-[13px] font-bold text-ink uppercase">{vinculado.nombre}</span>
+                <span className="block text-[11px] text-ink-muted">
+                  <span className="text-ink-faint">DOB:</span> {vinculado.cumpleanos}
+                  <span className="text-ink-faint"> Email:</span> {vinculado.email}
                 </span>
               </span>
             </div>

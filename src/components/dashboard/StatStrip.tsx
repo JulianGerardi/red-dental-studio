@@ -40,9 +40,9 @@ function StatStripApilada({ stats }: { stats: Stat[] }) {
             key={label}
             className={cn(
               'flex min-w-0 items-center gap-3 px-4 py-3.5',
-              i % 2 === 1 && 'border-l border-[#ededed]',
-              i >= 2 && 'border-t border-[#ededed]',
-              i > 0 && '@2xl:border-l @2xl:border-[#ededed]',
+              i % 2 === 1 && 'border-l border-line-hair',
+              i >= 2 && 'border-t border-line-hair',
+              i > 0 && '@2xl:border-l @2xl:border-line-hair',
               '@2xl:border-t-0',
             )}
           >
@@ -50,9 +50,9 @@ function StatStripApilada({ stats }: { stats: Stat[] }) {
               <Icon className="size-[18px]" />
             </span>
             <span className="min-w-0 leading-tight">
-              <span className="block truncate text-[10px] font-semibold tracking-wide text-[#4a5565] uppercase">{label}</span>
-              <span className="mt-1 block text-[17px] leading-none font-bold text-[#09090b] tabular-nums">{value}</span>
-              <span className="mt-1 block truncate text-[11px] text-[#71717a]">{nota}</span>
+              <span className="block truncate text-[10px] font-semibold tracking-wide text-dash-muted uppercase">{label}</span>
+              <span className="mt-1 block text-[17px] leading-none font-bold text-ink tabular-nums">{value}</span>
+              <span className="mt-1 block truncate text-[11px] text-ink-muted">{nota}</span>
             </span>
           </div>
         ))}
@@ -81,7 +81,7 @@ export function StatStrip({ stats = STATS, apilada = false }: { stats?: Stat[]; 
           className={cn(
             'flex min-w-0 flex-col items-start gap-1.5 px-3 py-3',
             'lg:shrink-0 lg:flex-row lg:items-center lg:gap-3 lg:px-4 lg:py-4',
-            i > 0 && 'border-l border-[#ededed]',
+            i > 0 && 'border-l border-line-hair',
           )}
         >
           <span className="text-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#eef2ff] lg:size-10">
@@ -93,14 +93,14 @@ export function StatStrip({ stats = STATS, apilada = false }: { stats?: Stat[]; 
               su nombre. */}
           <span className="min-w-0 leading-tight">
             <span className="flex items-baseline gap-1.5">
-              <span className="truncate text-[10px] font-semibold tracking-wide text-[#4a5565] uppercase lg:text-[11px]">
+              <span className="truncate text-[10px] font-semibold tracking-wide text-dash-muted uppercase lg:text-[11px]">
                 {label}
               </span>
-              <span className="text-[14px] leading-none font-bold text-[#09090b] lg:text-[15px]">
+              <span className="text-[14px] leading-none font-bold text-ink lg:text-[15px]">
                 {value}
               </span>
             </span>
-            <span className="mt-1 block text-[11px] text-[#71717a] lg:text-[12px] lg:whitespace-nowrap">
+            <span className="mt-1 block text-[11px] text-ink-muted lg:text-[12px] lg:whitespace-nowrap">
               {nota}
             </span>
           </span>

@@ -17,7 +17,7 @@ export function Pagination({
         aria-label="Previous page"
         disabled={pagina === 1}
         onClick={() => mover(-1)}
-        className="flex size-7 items-center justify-center rounded-md text-[#a1a1aa] transition-colors hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
+        className="flex size-7 items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface-muted disabled:pointer-events-none disabled:opacity-40"
       >
         <ChevronLeft className="size-4" />
       </button>
@@ -29,7 +29,7 @@ export function Pagination({
           onClick={() => onChange(p)}
           className={
             'flex size-7 items-center justify-center rounded-md text-xs font-semibold transition-colors '
-            + (p === pagina ? 'bg-dash-blue text-white' : 'text-[#71717a] hover:bg-[#f4f4f5]')
+            + (p === pagina ? 'bg-dash-blue text-white' : 'text-ink-muted hover:bg-surface-muted')
           }
         >
           {p}
@@ -40,7 +40,7 @@ export function Pagination({
         aria-label="Next page"
         disabled={pagina === paginas}
         onClick={() => mover(1)}
-        className="flex size-7 items-center justify-center rounded-md text-[#a1a1aa] transition-colors hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
+        className="flex size-7 items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-surface-muted disabled:pointer-events-none disabled:opacity-40"
       >
         <ChevronRight className="size-4" />
       </button>

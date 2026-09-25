@@ -115,18 +115,18 @@ const aBorrador = (t: ConsentTemplate): Borrador => ({
 function ToolbarFormato() {
   const iconos = [Bold, Italic, Underline, Heading1, Heading2, Pilcrow, List, ListOrdered]
   return (
-    <div className="flex items-center gap-0.5 rounded-t-md border border-b-0 border-[#e4e4e7] bg-[#fafafa] px-2 py-1.5">
+    <div className="flex items-center gap-0.5 rounded-t-md border border-b-0 border-line bg-surface-subtle px-2 py-1.5">
       {iconos.map((Icono, i) => (
         <button
           key={i}
           type="button"
           onClick={() => aviso.info('Rich text formatting is not available in this release.')}
-          className="rounded p-1.5 text-[#52525b] hover:bg-black/5"
+          className="rounded p-1.5 text-ink-medium hover:bg-black/5"
         >
           <Icono className="size-3.5" />
         </button>
       ))}
-      <span className="ml-auto pr-1 text-[11px] text-[#a1a1aa] max-sm:hidden">Basic formatting only</span>
+      <span className="ml-auto pr-1 text-[11px] text-ink-faint max-sm:hidden">Basic formatting only</span>
     </div>
   )
 }
@@ -200,14 +200,14 @@ export function SettingsConsents() {
 
   return (
     <div className="@container px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">Consent Templates</h1>
-      <p className="mt-1 text-sm text-[#71717a]">Create a standard consent document and assign it to one or more procedures.</p>
+      <h1 className="text-2xl font-bold text-ink">Consent Templates</h1>
+      <p className="mt-1 text-sm text-ink-muted">Create a standard consent document and assign it to one or more procedures.</p>
 
       <div className="mt-4 grid grid-cols-1 gap-4 @3xl:grid-cols-[240px_minmax(0,1fr)] @5xl:grid-cols-[260px_minmax(0,1fr)_minmax(0,1.15fr)]">
         {/* ── Lista ─────────────────────────────────────────────────── */}
-        <section className="flex flex-col gap-3 self-start rounded-xl border border-[#e4e4e7] bg-white p-4">
+        <section className="flex flex-col gap-3 self-start rounded-xl border border-line bg-white p-4">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-bold text-[#09090b]">Templates</h2>
+            <h2 className="text-sm font-bold text-ink">Templates</h2>
             <button
               type="button"
               onClick={nuevoTemplate}
@@ -219,16 +219,16 @@ export function SettingsConsents() {
           </div>
 
           <div className="relative">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
             <input
               value={q}
               onChange={(e) => { setQ(e.target.value); setFijados([]) }}
               placeholder="Search templates..."
-              className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+              className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
             />
           </div>
 
-          <div className="flex items-center gap-1 rounded-lg bg-[#f1f5f9] p-1">
+          <div className="flex items-center gap-1 rounded-lg bg-surface-slate p-1">
             {FILTROS.map((f) => (
               <button
                 key={f}
@@ -236,7 +236,7 @@ export function SettingsConsents() {
                 onClick={() => { setFiltro(f); setFijados([]) }}
                 className={cn(
                   'h-7 flex-1 rounded-md text-xs font-medium transition-colors',
-                  filtro === f ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
+                  filtro === f ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
                 )}
               >
                 {f}
@@ -253,7 +253,7 @@ export function SettingsConsents() {
                   key={t.id}
                   className={cn(
                     'flex items-start gap-2 rounded-lg border px-3 py-2.5 transition-colors',
-                    actualId === t.id ? 'border-dash-blue bg-[#f8faff]' : 'border-[#e4e4e7] bg-white hover:bg-[#fafafa]',
+                    actualId === t.id ? 'border-dash-blue bg-[#f8faff]' : 'border-line bg-white hover:bg-surface-subtle',
                   )}
                 >
                   <button
@@ -261,13 +261,13 @@ export function SettingsConsents() {
                     onClick={() => elegir(t)}
                     className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left"
                   >
-                    <span className={cn('line-clamp-2 w-full text-[13px] font-bold', t.activo ? 'text-[#09090b]' : 'text-[#a1a1aa]')}>
+                    <span className={cn('line-clamp-2 w-full text-[13px] font-bold', t.activo ? 'text-ink' : 'text-ink-faint')}>
                       {t.titulo}
                     </span>
                     <span className="flex flex-wrap items-center gap-1.5">
                       <Pill tone={t.activo ? 'success' : 'neutral'} size="sm">{t.activo ? 'Active' : 'Inactive'}</Pill>
                       {t.sistema && <Pill tone="info" size="sm">System</Pill>}
-                      <span className="text-[11px] text-[#71717a]">
+                      <span className="text-[11px] text-ink-muted">
                         {t.procedimientos.length} procedure{t.procedimientos.length === 1 ? '' : 's'}
                       </span>
                     </span>
@@ -285,15 +285,15 @@ export function SettingsConsents() {
         </section>
 
         {/* ── Editor ────────────────────────────────────────────────── */}
-        <section className="flex flex-col gap-4 self-start rounded-xl border border-[#e4e4e7] bg-white p-4 sm:p-5">
+        <section className="flex flex-col gap-4 self-start rounded-xl border border-line bg-white p-4 sm:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-[200px] flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-lg font-bold text-[#09090b]">{actual ? 'Edit Template' : 'New Consent Template'}</h2>
+                <h2 className="text-lg font-bold text-ink">{actual ? 'Edit Template' : 'New Consent Template'}</h2>
                 {actual && <Pill tone={actual.activo ? 'success' : 'neutral'} size="sm">{actual.activo ? 'Active' : 'Inactive'}</Pill>}
                 {actual?.sistema && <Pill tone="info" size="sm">System</Pill>}
               </div>
-              <p className="mt-0.5 text-xs text-[#71717a]">
+              <p className="mt-0.5 text-xs text-ink-muted">
                 {actual
                   ? 'Changes show in the preview as you type. Save to keep them.'
                   : 'Fill in the details and the text, then save to add it to the list.'}
@@ -306,7 +306,7 @@ export function SettingsConsents() {
                 className={cn(
                   'flex h-9 shrink-0 items-center gap-1.5 rounded-md px-3 text-[13px] font-medium transition-colors',
                   actual.activo
-                    ? 'border border-[#e4e4e7] bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]'
+                    ? 'border border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle'
                     : 'bg-dash-blue hover:bg-dash-blue-hover text-white',
                 )}
               >
@@ -317,7 +317,7 @@ export function SettingsConsents() {
           </div>
 
           {intentado && (!borrador.titulo || borrador.procedimientos.length === 0) && (
-            <div className="rounded-md border border-[#f3b6b6] bg-[#fff2f2] px-3 py-2.5 text-[12px] font-medium text-[#b22626]">
+            <div className="rounded-md border border-[#f3b6b6] bg-dash-bad-bg px-3 py-2.5 text-[12px] font-medium text-dash-bad-fg">
               All required fields marked with (*) must be completed before proceeding.
             </div>
           )}
@@ -332,23 +332,23 @@ export function SettingsConsents() {
           />
 
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-medium text-[#09090b]">
-              Search Procedure<span className="text-[#ff0608]">*</span>
+            <span className="text-xs font-medium text-ink">
+              Search Procedure<span className="text-required">*</span>
             </span>
             <div className="relative">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
                 value={buscarProcedimiento}
                 onChange={(e) => setBuscarProcedimiento(e.target.value)}
                 placeholder="Search..."
                 className={cn(
                   'h-9 w-full rounded-md border bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]',
-                  'placeholder:text-[#a1a1aa] focus:outline-none',
-                  intentado && borrador.procedimientos.length === 0 ? 'border-[#dc2626]' : 'focus:border-dash-blue border-[#e4e4e7]',
+                  'placeholder:text-ink-faint focus:outline-none',
+                  intentado && borrador.procedimientos.length === 0 ? 'border-field-error' : 'focus:border-dash-blue border-line',
                 )}
               />
               {buscarProcedimiento && opcionesProcedimiento.length > 0 && (
-                <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-[#e4e4e7] bg-white py-1 shadow-lg">
+                <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
                   {opcionesProcedimiento.map((p) => (
                     <button
                       key={p.codigo}
@@ -357,22 +357,22 @@ export function SettingsConsents() {
                         setBorrador((b) => ({ ...b, procedimientos: [...b.procedimientos, p.codigo] }))
                         setBuscarProcedimiento('')
                       }}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
                     >
                       <span className="text-dash-blue font-semibold">{p.codigo}</span>
-                      <span className="truncate text-[#3f3f46]">{p.nombre}</span>
+                      <span className="truncate text-ink-soft">{p.nombre}</span>
                     </button>
                   ))}
                 </div>
               )}
             </div>
             {intentado && borrador.procedimientos.length === 0 ? (
-              <span className="text-[11px] leading-[1.35] text-[#dc2626]">At least one procedure must be listed.</span>
+              <span className="text-[11px] leading-[1.35] text-field-error">At least one procedure must be listed.</span>
             ) : (
               borrador.procedimientos.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {borrador.procedimientos.map((codigo) => (
-                    <span key={codigo} className="text-dash-blue flex items-center gap-1.5 rounded-full bg-[#f0f5ff] py-1 pr-1.5 pl-2.5 text-[12px] font-medium">
+                    <span key={codigo} className="text-dash-blue flex items-center gap-1.5 rounded-full bg-info-bg py-1 pr-1.5 pl-2.5 text-[12px] font-medium">
                       {codigo} - {procedimiento(codigo)?.nombre}
                       <button
                         type="button"
@@ -390,34 +390,34 @@ export function SettingsConsents() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-medium text-[#09090b]">Consent text</span>
+            <span className="text-xs font-medium text-ink">Consent text</span>
             <ToolbarFormato />
-            <div className="-mt-2 flex flex-col gap-3 rounded-b-md border border-t-0 border-[#e4e4e7] p-3">
+            <div className="-mt-2 flex flex-col gap-3 rounded-b-md border border-t-0 border-line p-3">
               <label className="flex flex-col gap-1.5">
-                <span className="text-[11px] font-semibold tracking-wide text-[#71717a] uppercase">Nature of procedure</span>
+                <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Nature of procedure</span>
                 <textarea
                   rows={3}
                   value={borrador.naturaleza}
                   onChange={(e) => setBorrador((b) => ({ ...b, naturaleza: e.target.value }))}
                   placeholder="Describe the procedure in plain language..."
-                  className="focus:border-dash-blue w-full resize-none rounded-md border border-[#e4e4e7] bg-white px-3 py-2 text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
+                  className="focus:border-dash-blue w-full resize-none rounded-md border border-line bg-white px-3 py-2 text-[13px] placeholder:text-ink-faint focus:outline-none"
                 />
               </label>
               <label className="flex flex-col gap-1.5">
-                <span className="text-[11px] font-semibold tracking-wide text-[#71717a] uppercase">Risk and complications</span>
+                <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Risk and complications</span>
                 <textarea
                   rows={4}
                   value={borrador.riesgos}
                   onChange={(e) => setBorrador((b) => ({ ...b, riesgos: e.target.value }))}
                   placeholder={'One risk per line...'}
-                  className="focus:border-dash-blue w-full resize-none rounded-md border border-[#e4e4e7] bg-white px-3 py-2 text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
+                  className="focus:border-dash-blue w-full resize-none rounded-md border border-line bg-white px-3 py-2 text-[13px] placeholder:text-ink-faint focus:outline-none"
                 />
               </label>
             </div>
           </div>
 
-          <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex justify-end gap-3 rounded-b-xl border-t border-[#e4e4e7] bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
-            <button type="button" onClick={cancelar} className="h-9 rounded-md border border-[#e4e4e7] bg-white px-6 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]">
+          <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex justify-end gap-3 rounded-b-xl border-t border-line bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
+            <button type="button" onClick={cancelar} className="h-9 rounded-md border border-line bg-white px-6 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle">
               Cancel
             </button>
             <button type="button" onClick={guardar} className="bg-dash-blue hover:bg-dash-blue-hover h-9 rounded-md px-6 text-[13px] font-medium text-white transition-colors">
@@ -427,11 +427,11 @@ export function SettingsConsents() {
         </section>
 
         {/* ── Preview ───────────────────────────────────────────────── */}
-        <section className="self-start rounded-xl border border-[#e4e4e7] bg-[#f5f6f8] p-3 @3xl:col-start-2 @5xl:sticky @5xl:top-4 @5xl:col-start-3 @5xl:max-h-[calc(100vh-2rem)] @5xl:overflow-y-auto">
+        <section className="self-start rounded-xl border border-line bg-[#f5f6f8] p-3 @3xl:col-start-2 @5xl:sticky @5xl:top-4 @5xl:col-start-3 @5xl:max-h-[calc(100vh-2rem)] @5xl:overflow-y-auto">
           <div className="flex items-center justify-between gap-2 px-1">
             <div>
-              <h2 className="text-sm font-bold text-[#09090b]">Preview</h2>
-              <p className="text-[11px] text-[#71717a]">What the patient receives</p>
+              <h2 className="text-sm font-bold text-ink">Preview</h2>
+              <p className="text-[11px] text-ink-muted">What the patient receives</p>
             </div>
             <button
               type="button"
@@ -439,7 +439,7 @@ export function SettingsConsents() {
               aria-pressed={vistaPaciente}
               className={cn(
                 'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
-                vistaPaciente ? 'border-dash-blue bg-dash-blue text-white' : 'border-[#e4e4e7] bg-white text-[#64748b] hover:text-[#3f3f46]',
+                vistaPaciente ? 'border-dash-blue bg-dash-blue text-white' : 'border-line bg-white text-ink-slate hover:text-ink-soft',
               )}
             >
               <Eye className="size-3.5" /> Patient View

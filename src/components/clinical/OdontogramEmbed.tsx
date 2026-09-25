@@ -226,14 +226,14 @@ export function OdontogramEmbed({
      encima. En Odontogram no hay esos tabs -`tabsPerioNodo` da `null`-,
      así que va inline debajo del "Dental chart", como antes. */
   const panelInfo = infoAbierto && (infoNodo || perioNodo) && (
-    <div className="mb-3 w-full rounded-xl border border-[#e4e4e7] bg-white p-4">
+    <div className="mb-3 w-full rounded-xl border border-line bg-white p-4">
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-[13px] font-semibold text-[#09090b]">Tooth information</span>
+        <span className="text-[13px] font-semibold text-ink">Tooth information</span>
         <button
           type="button"
           aria-label="Close tooth information"
           onClick={() => setInfoAbierto(false)}
-          className="flex size-7 shrink-0 items-center justify-center rounded-md border border-[#e4e4e7] text-[#71717a] hover:bg-[#f4f4f5]"
+          className="flex size-7 shrink-0 items-center justify-center rounded-md border border-line text-ink-muted hover:bg-surface-muted"
         >
           <X className="size-3.5" />
         </button>
@@ -276,34 +276,34 @@ export function OdontogramEmbed({
           width="max-w-[440px]"
           footer={
             <>
-              <button type="button" onClick={() => setConfirmandoCierre(false)} className="h-9 rounded-md border border-[#e4e4e7] bg-white px-5 text-[13px] font-medium hover:bg-[#fafafa]">
+              <button type="button" onClick={() => setConfirmandoCierre(false)} className="h-9 rounded-md border border-line bg-white px-5 text-[13px] font-medium hover:bg-surface-subtle">
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={() => { setConfirmandoCierre(false); descartarYCerrar() }}
-                className="h-9 rounded-md bg-[#b22626] px-5 text-[13px] font-medium text-white hover:bg-[#961f1f]"
+                className="h-9 rounded-md bg-dash-bad-fg px-5 text-[13px] font-medium text-white hover:bg-[#961f1f]"
               >
                 Discard and close
               </button>
             </>
           }
         >
-          <p className="flex items-start gap-2 text-[13px] leading-relaxed text-[#3f3f46]">
-            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-[#b22626]" />
+          <p className="flex items-start gap-2 text-[13px] leading-relaxed text-ink-soft">
+            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-dash-bad-fg" />
             <span>
               This returns the whole chart to its default: every surface, condition
               and restoration you set is removed. It cannot be undone.
               <br />
               To put the controls away without losing anything, use the{' '}
-              <strong className="font-semibold text-[#09090b]">minimize</strong> arrow instead.
+              <strong className="font-semibold text-ink">minimize</strong> arrow instead.
             </span>
           </p>
         </ModalShell>
       )}
 
       {controlesAbiertos && !minimizado && actual && (
-        <div className="mt-3 w-full rounded-t-xl border border-b-0 border-[#e4e4e7] bg-white p-4">
+        <div className="mt-3 w-full rounded-t-xl border border-b-0 border-line bg-white p-4">
           <OdontogramPanel
             key={reinicio}
             card={actual.nodo}
@@ -314,7 +314,7 @@ export function OdontogramEmbed({
 
       {controlesAbiertos && pasos.length > 0 && (
         <div className={cn(
-          'flex h-10 w-full items-center gap-2 border border-[#e4e4e7] bg-white px-2',
+          'flex h-10 w-full items-center gap-2 border border-line bg-white px-2',
           minimizado ? 'mt-3 rounded-xl' : 'rounded-b-xl border-t-0',
         )}>
           {/* Los dos chevrones van juntos, como un paginador: separados a los
@@ -325,7 +325,7 @@ export function OdontogramEmbed({
               aria-label="Previous section"
               disabled={paso === 0}
               onClick={() => setPaso((p) => Math.max(0, p - 1))}
-              className="flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
+              className="flex size-7 shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted disabled:pointer-events-none disabled:opacity-40"
             >
               <ChevronLeft className="size-4" />
             </button>
@@ -334,19 +334,19 @@ export function OdontogramEmbed({
               aria-label="Next section"
               disabled={paso === pasos.length - 1}
               onClick={() => setPaso((p) => Math.min(pasos.length - 1, p + 1))}
-              className="flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5] disabled:pointer-events-none disabled:opacity-40"
+              className="flex size-7 shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted disabled:pointer-events-none disabled:opacity-40"
             >
               <ChevronRight className="size-4" />
             </button>
           </span>
 
           <span className="min-w-0 flex-1 text-center">
-            <span className="block truncate text-[12px] font-semibold text-[#09090b]" title={minimizado ? tocados.join(' · ') : undefined}>
+            <span className="block truncate text-[12px] font-semibold text-ink" title={minimizado ? tocados.join(' · ') : undefined}>
               {minimizado
                 ? (tocados.length > 0 ? `Set: ${tocados.slice(0, 3).join(' · ')}${tocados.length > 3 ? ` +${tocados.length - 3}` : ''}` : 'Nothing set yet')
                 : actual?.titulo}
             </span>
-            <span className="block truncate text-[10px] text-[#a1a1aa]" title={minimizado ? pendientes.join(' · ') : undefined}>
+            <span className="block truncate text-[10px] text-ink-faint" title={minimizado ? pendientes.join(' · ') : undefined}>
               {minimizado
                 ? (pendientes.length > 0 ? `${pendientes.length} left: ${pendientes.slice(0, 2).join(' · ')}${pendientes.length > 2 ? '…' : ''}` : 'All sections visited')
                 : `${paso + 1} of ${pasos.length}`}
@@ -358,7 +358,7 @@ export function OdontogramEmbed({
             aria-label={minimizado ? 'Expand controls' : 'Minimize controls'}
             aria-pressed={minimizado}
             onClick={() => setMinimizado((v) => !v)}
-            className="flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]"
+            className="flex size-7 shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"
           >
             {minimizado ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
           </button>
@@ -367,7 +367,7 @@ export function OdontogramEmbed({
             type="button"
             aria-label="Close controls"
             onClick={() => setConfirmandoCierre(true)}
-            className="flex size-7 shrink-0 items-center justify-center rounded-md border border-[#e4e4e7] text-[#71717a] hover:bg-[#f4f4f5]"
+            className="flex size-7 shrink-0 items-center justify-center rounded-md border border-line text-ink-muted hover:bg-surface-muted"
           >
             <X className="size-3.5" />
           </button>

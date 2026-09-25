@@ -51,8 +51,8 @@ export function CreditAdjustmentPanel({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
-        <h2 className="flex items-center gap-2 text-sm font-bold text-[#09090b]">
+      <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
           <CreditCard className="size-4" /> Credit Information
         </h2>
 
@@ -77,7 +77,7 @@ export function CreditAdjustmentPanel({
 
       <LedgerAllocationTable cargos={cargosAplicables} />
 
-      <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
+      <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
         <TextArea label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
       </div>
 

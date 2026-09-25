@@ -19,7 +19,7 @@ function Switch({ on, onChange, label }: { on: boolean; onChange: () => void; la
       onClick={onChange}
       className={cn(
         'relative h-5 w-9 shrink-0 rounded-full transition-colors',
-        on ? 'bg-dash-blue' : 'bg-[#d4d4d8]',
+        on ? 'bg-dash-blue' : 'bg-line-strong',
       )}
     >
       <span className={cn('absolute top-0.5 size-4 rounded-full bg-white transition-all', on ? 'left-[18px]' : 'left-0.5')} />
@@ -112,14 +112,14 @@ export function SettingsLedgerOptions() {
         bajada="Set your location name. Add the location you need."
       >
         <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
           <input
             value={q}
             onChange={(e) => { setQ(e.target.value); setPagina(1) }}
             /* El frame dice "Search patients" en las dos pestañas, donde no
                hay pacientes. Se replica. */
             placeholder="Search patients"
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
           />
         </div>
         <SearchButton onClick={() => setPagina(1)} className="h-9" />
@@ -127,13 +127,13 @@ export function SettingsLedgerOptions() {
           value={tab}
           onChange={(e) => cambiarTab(e.target.value as Tab)}
           aria-label="View"
-          className="focus:border-dash-blue h-9 shrink-0 rounded-md border border-[#e4e4e7] bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none"
+          className="focus:border-dash-blue h-9 shrink-0 rounded-md border border-line bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none"
         >
           {TABS.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
       </SettingsPageHeader>
 
-      <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-[#f1f5f9] p-1">
+      <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-surface-slate p-1">
         {filtros.map((f) => (
           <button
             key={f}
@@ -141,7 +141,7 @@ export function SettingsLedgerOptions() {
             onClick={() => { setFiltro(f); setPagina(1) }}
             className={cn(
               'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-              filtro === f ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
+              filtro === f ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
             )}
           >
             {f}
@@ -149,10 +149,10 @@ export function SettingsLedgerOptions() {
         ))}
       </div>
 
-      <div className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+      <div className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
         <div className={tab === 'Adjustments Types' ? 'min-w-[820px]' : 'min-w-[620px]'}>
           {tab === 'Adjustments Types' ? (
-            <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
+            <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
               <span className="w-[160px] shrink-0">Adjustment Type</span>
               <span className="min-w-[180px] flex-1">Description</span>
               <span className="w-[100px] shrink-0">Category</span>
@@ -161,7 +161,7 @@ export function SettingsLedgerOptions() {
               <span className="w-[70px] shrink-0 text-right">Actions</span>
             </div>
           ) : (
-            <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
+            <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
               <span className="min-w-[200px] flex-1">Name</span>
               <span className="w-[110px] shrink-0">Method Type</span>
               <span className="w-[90px] shrink-0">Status</span>
@@ -176,8 +176,8 @@ export function SettingsLedgerOptions() {
             <EmptyState icon={SlidersHorizontal} title="Nothing here" detail="Nothing matches the current search or filter." />
           ) : tab === 'Adjustments Types' ? (
             (visibles as Ajuste[]).map((a) => (
-              <div key={a.id} className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]">
-                <span className="w-[160px] shrink-0 truncate text-[#09090b]" title={a.tipo}>{a.tipo}</span>
+              <div key={a.id} className="flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft">
+                <span className="w-[160px] shrink-0 truncate text-ink" title={a.tipo}>{a.tipo}</span>
                 <span className="min-w-[180px] flex-1 truncate" title={a.descripcion}>{a.descripcion}</span>
                 <span className="w-[100px] shrink-0 truncate">{a.categoria}</span>
                 <span className="w-[90px] shrink-0 truncate">{a.direccion}</span>
@@ -189,8 +189,8 @@ export function SettingsLedgerOptions() {
             ))
           ) : (
             (visibles as Metodo[]).map((m) => (
-              <div key={m.id} className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]">
-                <span className="min-w-[200px] flex-1 truncate text-[#09090b]" title={m.nombre}>{m.nombre}</span>
+              <div key={m.id} className="flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft">
+                <span className="min-w-[200px] flex-1 truncate text-ink" title={m.nombre}>{m.nombre}</span>
                 <span className="w-[110px] shrink-0 truncate">{m.tipo}</span>
                 <span className="w-[90px] shrink-0 truncate">Active</span>
                 <span className="flex w-[70px] shrink-0 justify-end">
@@ -200,8 +200,8 @@ export function SettingsLedgerOptions() {
             ))
           )}
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
-            <span className="text-xs font-semibold text-[#71717a]">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
+            <span className="text-xs font-semibold text-ink-muted">
               Showing {visibles.length} of {filas.length} {tab === 'Adjustments Types' ? 'adjustment types' : 'payment methods'}
             </span>
             <Pagination pagina={actual} paginas={paginas} onChange={setPagina} />

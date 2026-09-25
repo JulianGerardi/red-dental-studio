@@ -29,7 +29,7 @@ export function FilterMenu({
           type="button"
           aria-label={label}
           data-tour="dash-filter"
-          className="relative rounded-md p-1.5 text-[#09090b] transition-colors hover:bg-[#f4f4f5]"
+          className="relative rounded-md p-1.5 text-ink transition-colors hover:bg-surface-muted"
         >
           <ListFilter className="size-4" />
           {value.length > 0 && (
@@ -56,7 +56,7 @@ export function FilterMenu({
             <button
               type="button"
               onClick={() => onChange([])}
-              className="text-dash-blue w-full rounded-md px-1.5 py-1 text-left text-sm font-semibold hover:bg-[#f4f4f5]"
+              className="text-dash-blue w-full rounded-md px-1.5 py-1 text-left text-sm font-semibold hover:bg-surface-muted"
             >
               Clear filter
             </button>

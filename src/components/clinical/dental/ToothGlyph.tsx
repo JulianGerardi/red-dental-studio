@@ -59,8 +59,8 @@ export function ToothGlyph({
   if (ausente) {
     return (
       <svg viewBox="0 0 44 64" className="h-[58px] w-11" aria-hidden>
-        <rect x="10" y="34" width="24" height="24" rx="8" className="fill-none stroke-[#d4d4d8]" strokeWidth="1.6" strokeDasharray="3 2.5" />
-        <path d="M16 40 L28 52 M28 40 L16 52" className="stroke-[#a1a1aa]" strokeWidth="1.6" strokeLinecap="round" />
+        <rect x="10" y="34" width="24" height="24" rx="8" className="fill-none stroke-line-strong" strokeWidth="1.6" strokeDasharray="3 2.5" />
+        <path d="M16 40 L28 52 M28 40 L16 52" className="stroke-ink-faint" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
     )
   }
@@ -114,7 +114,7 @@ export function OcclusalView({
       viewBox={`0 0 ${W} ${H}`}
       className={cn(
         'h-[34px] w-10 rounded-[5px] border bg-white transition-colors',
-        seleccionado ? 'border-primary ring-primary/40 ring-2' : 'border-[#d4d4d8]',
+        seleccionado ? 'border-primary ring-primary/40 ring-2' : 'border-line-strong',
         ausente && 'opacity-40',
       )}
     >

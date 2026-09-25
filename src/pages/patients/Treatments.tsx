@@ -24,8 +24,8 @@ type Plan = {
 }
 
 const BADGE: Record<Estado, string> = {
-  Completed: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Expired: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
+  Completed: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg',
+  Expired: 'border-dash-bad-fg bg-dash-bad-bg text-dash-bad-fg',
 }
 
 const base = {
@@ -48,44 +48,44 @@ const PLANS: Plan[] = [
 function TreatmentCard({ plan }: { plan: Plan }) {
   const rojo = plan.estado === 'Expired'
   return (
-    <article className="overflow-hidden rounded-lg border border-[#e4e4e7] bg-white">
+    <article className="overflow-hidden rounded-lg border border-line bg-white">
       <header className="flex items-center gap-3 px-4 py-3">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#eff4ff] text-xs font-semibold text-[#0056ef]">
           {plan.initials}
         </span>
         <span className="min-w-0 flex-1 leading-tight">
-          <span className="block truncate text-[13px] font-bold text-[#09090b]">{plan.patient}</span>
-          <span className="block text-[11px] text-[#71717a]">Patient</span>
+          <span className="block truncate text-[13px] font-bold text-ink">{plan.patient}</span>
+          <span className="block text-[11px] text-ink-muted">Patient</span>
         </span>
         <span className={cn('shrink-0 rounded-full border px-2.5 py-[2px] text-[11px] font-semibold', BADGE[plan.estado])}>
           {plan.estado}
         </span>
       </header>
 
-      <div className="bg-[#fafafa] px-4 py-3">
-        <p className="text-[11px] font-medium text-[#71717a]">{plan.code}</p>
+      <div className="bg-surface-subtle px-4 py-3">
+        <p className="text-[11px] font-medium text-ink-muted">{plan.code}</p>
         <button className="mt-1 text-[13px] font-bold text-[#0056ef] hover:underline">
           {plan.name}
         </button>
-        <div className="mt-2.5 h-[3px] w-full rounded-full bg-[#e4e4e7]">
+        <div className="mt-2.5 h-[3px] w-full rounded-full bg-line">
           <div
             className="h-full rounded-full"
             style={{ width: `${plan.progress}%`, backgroundColor: rojo ? '#ef4444' : '#28c563' }}
           />
         </div>
-        <p className="mt-1.5 text-[11px] text-[#a1a1aa]">{plan.note}</p>
+        <p className="mt-1.5 text-[11px] text-ink-faint">{plan.note}</p>
       </div>
 
       <footer className="flex items-center gap-8 px-4 py-3">
         <span className="leading-tight">
-          <span className="block text-[11px] text-[#71717a]">Created On</span>
-          <span className="mt-0.5 flex items-center gap-1.5 text-[13px] font-semibold text-[#09090b]">
+          <span className="block text-[11px] text-ink-muted">Created On</span>
+          <span className="mt-0.5 flex items-center gap-1.5 text-[13px] font-semibold text-ink">
             <Calendar className="size-3.5 text-[#0056ef]" /> {plan.createdOn}
           </span>
         </span>
         <span className="leading-tight">
-          <span className="block text-[11px] text-[#71717a]">Total Amount</span>
-          <span className="mt-0.5 flex items-center gap-1.5 text-[13px] font-semibold text-[#09090b]">
+          <span className="block text-[11px] text-ink-muted">Total Amount</span>
+          <span className="mt-0.5 flex items-center gap-1.5 text-[13px] font-semibold text-ink">
             <DollarSign className="size-3.5 text-[#0056ef]" /> {plan.total}
           </span>
         </span>
@@ -123,19 +123,19 @@ export default function Treatments() {
             <PageTitle>Treatments plan</PageTitle>
             <button
               onClick={() => setVacio((v) => !v)}
-              className="rounded-md border border-[#e4e4e7] bg-white px-3 py-1.5 text-[11px] font-medium text-[#71717a] hover:bg-[#fafafa]"
+              className="rounded-md border border-line bg-white px-3 py-1.5 text-[11px] font-medium text-ink-muted hover:bg-surface-subtle"
             >
               {vacio ? 'Ver poblado' : 'Ver estado vacío'}
             </button>
           </div>
 
           {vacio ? (
-            <div className="mt-4 flex min-h-[560px] flex-col items-center justify-center rounded-lg border border-[#e4e4e7] bg-white">
+            <div className="mt-4 flex min-h-[560px] flex-col items-center justify-center rounded-lg border border-line bg-white">
               <span className="flex size-11 items-center justify-center rounded-lg bg-[#eff4ff]">
-                <Circle className="size-4 fill-[#1d56bc] text-[#1d56bc]" />
+                <Circle className="size-4 fill-dash-blue text-dash-blue" />
               </span>
-              <p className="mt-3 text-[15px] font-bold text-[#09090b]">No accepted treatment plans</p>
-              <p className="mt-1 max-w-[280px] text-center text-xs text-[#a1a1aa]">
+              <p className="mt-3 text-[15px] font-bold text-ink">No accepted treatment plans</p>
+              <p className="mt-1 max-w-[280px] text-center text-xs text-ink-faint">
                 This patient doesn&apos;t have any accepted treatment plans yet.
               </p>
             </div>

@@ -28,18 +28,18 @@ export function NotificationBanner({
        pendiente de hacer. */
     <div className="border-b border-[#fde68a] bg-[#fffbeb]">
       <div className={cn(ANCHO_PAGINA, 'flex items-center gap-3 px-4 py-2.5 sm:px-6')}>
-      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-[#b45309]">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-attn-fg">
         <Icono className="size-3.5" />
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[13px] font-semibold text-[#b45309]">{actual.titulo}</span>
+        <span className="block truncate text-[13px] font-semibold text-attn-fg">{actual.titulo}</span>
         <span className="hidden truncate text-[12px] text-[#92400e] sm:block">{actual.detalle}</span>
       </span>
 
       <Link
         to={actual.to}
-        className="hidden shrink-0 text-[12px] font-semibold text-[#b45309] hover:underline sm:inline"
+        className="hidden shrink-0 text-[12px] font-semibold text-attn-fg hover:underline sm:inline"
       >
         {actual.accion}
       </Link>
@@ -51,7 +51,7 @@ export function NotificationBanner({
             type="button"
             onClick={() => mover(-1)}
             aria-label="Previous notification"
-            className="flex size-6 items-center justify-center rounded-md text-[#b45309] hover:bg-white"
+            className="flex size-6 items-center justify-center rounded-md text-attn-fg hover:bg-white"
           >
             <ChevronLeft className="size-4" />
           </button>
@@ -62,7 +62,7 @@ export function NotificationBanner({
             type="button"
             onClick={() => mover(1)}
             aria-label="Next notification"
-            className="flex size-6 items-center justify-center rounded-md text-[#b45309] hover:bg-white"
+            className="flex size-6 items-center justify-center rounded-md text-attn-fg hover:bg-white"
           >
             <ChevronRight className="size-4" />
           </button>
@@ -74,7 +74,7 @@ export function NotificationBanner({
         onClick={() => onOcultar(actual.id)}
         aria-label={`Hide from banner: ${actual.titulo}`}
         title="Hide from banner — stays in notifications"
-        className={cn('flex size-6 shrink-0 items-center justify-center rounded-md text-[#b45309]/70 hover:bg-white hover:text-[#b45309]')}
+        className={cn('flex size-6 shrink-0 items-center justify-center rounded-md text-attn-fg/70 hover:bg-white hover:text-attn-fg')}
       >
         <X className="size-4" />
       </button>

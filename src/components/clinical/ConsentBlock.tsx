@@ -20,9 +20,9 @@ import { ICONO_SUELTO } from '@/lib/estilos'
    toda la card: cuando las dos firmas están, el bloque pasa a verde solo. */
 
 const TONO = {
-  Pending: { bar: '#99660d', pill: 'border-[#99660d] bg-[#fffaf0] text-[#99660d]', tile: 'bg-[#fffaf0] text-[#99660d]' },
-  Signed: { bar: '#1a804d', pill: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]', tile: 'bg-[#f0fcf5] text-[#1a804d]' },
-  Expired: { bar: '#b22626', pill: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]', tile: 'bg-[#fff2f2] text-[#b22626]' },
+  Pending: { bar: '#99660d', pill: 'border-warn-fg bg-warn-bg text-warn-fg', tile: 'bg-warn-bg text-warn-fg' },
+  Signed: { bar: '#1a804d', pill: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg', tile: 'bg-dash-ok-bg text-dash-ok-fg' },
+  Expired: { bar: '#b22626', pill: 'border-dash-bad-fg bg-dash-bad-bg text-dash-bad-fg', tile: 'bg-dash-bad-bg text-dash-bad-fg' },
 }
 
 function FilaFirma({ f }: { f: Firma }) {
@@ -30,13 +30,13 @@ function FilaFirma({ f }: { f: Firma }) {
   return (
     <div className="flex min-w-0 items-center gap-2">
       {ok
-        ? <CircleCheck className="size-4 shrink-0 text-[#1a804d]" />
-        : <CircleAlert className="size-4 shrink-0 text-[#99660d]" />}
-      <span className="min-w-0 flex-1 truncate text-[13px] text-[#09090b]">
+        ? <CircleCheck className="size-4 shrink-0 text-dash-ok-fg" />
+        : <CircleAlert className="size-4 shrink-0 text-warn-fg" />}
+      <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
         <span className="font-semibold">{f.rol}</span>
-        <span className="text-[#71717a]"> · {f.nombre}</span>
+        <span className="text-ink-muted"> · {f.nombre}</span>
       </span>
-      <span className={cn('shrink-0 text-[12px] font-medium', ok ? 'text-[#1a804d]' : 'text-[#99660d]')}>
+      <span className={cn('shrink-0 text-[12px] font-medium', ok ? 'text-dash-ok-fg' : 'text-warn-fg')}>
         {ok ? `Signed ${f.fecha}` : 'Signature pending'}
       </span>
     </div>
@@ -54,10 +54,10 @@ function PanelHistorial({ onClose }: { onClose: () => void }) {
       >
         <div className="flex items-start justify-between gap-3 p-5">
           <span className="min-w-0">
-            <h2 className="text-[18px] font-bold text-[#09090b]">Consent history</h2>
-            <p className="mt-0.5 truncate text-[12px] text-[#71717a]">{CONSENTIMIENTO.titulo}</p>
+            <h2 className="text-[18px] font-bold text-ink">Consent history</h2>
+            <p className="mt-0.5 truncate text-[12px] text-ink-muted">{CONSENTIMIENTO.titulo}</p>
           </span>
-          <button onClick={onClose} aria-label="Close" className="shrink-0 text-[#09090b] hover:opacity-60">
+          <button onClick={onClose} aria-label="Close" className="shrink-0 text-ink hover:opacity-60">
             <X className="size-5" />
           </button>
         </div>
@@ -66,12 +66,12 @@ function PanelHistorial({ onClose }: { onClose: () => void }) {
             {CONSENTIMIENTO.historial.map((h, i, todos) => (
               <li key={h.id} className="flex gap-3">
                 <span className="flex flex-col items-center">
-                  <span className={cn('mt-1 size-2 shrink-0 rounded-full', i === 0 ? 'bg-dash-blue' : 'bg-[#d4d4d8]')} />
-                  {i < todos.length - 1 && <span className="w-px flex-1 bg-[#e4e4e7]" />}
+                  <span className={cn('mt-1 size-2 shrink-0 rounded-full', i === 0 ? 'bg-dash-blue' : 'bg-line-strong')} />
+                  {i < todos.length - 1 && <span className="w-px flex-1 bg-line" />}
                 </span>
                 <span className="min-w-0 flex-1 pb-5">
-                  <span className="block text-[13px] font-semibold text-[#09090b]">{h.evento}</span>
-                  <span className="block text-[12px] text-[#71717a]">
+                  <span className="block text-[13px] font-semibold text-ink">{h.evento}</span>
+                  <span className="block text-[12px] text-ink-muted">
                     {h.version} · {h.fecha} · {h.autor}
                   </span>
                 </span>
@@ -102,7 +102,7 @@ export function ConsentBlock() {
 
   return (
     <div
-      className="relative overflow-hidden rounded-xl border border-[#e4e4e7] bg-white"
+      className="relative overflow-hidden rounded-xl border border-line bg-white"
       style={{ borderLeftWidth: 3, borderLeftColor: t.bar }}
     >
       <div className="flex flex-wrap items-start gap-3 p-4">
@@ -111,8 +111,8 @@ export function ConsentBlock() {
         </span>
 
         <span className="min-w-[200px] flex-1">
-          <span className="block text-[15px] font-bold text-[#09090b]">{CONSENTIMIENTO.titulo}</span>
-          <span className="block text-[12px] text-[#71717a]">
+          <span className="block text-[15px] font-bold text-ink">{CONSENTIMIENTO.titulo}</span>
+          <span className="block text-[12px] text-ink-muted">
             {pendientes.length === 0
               ? 'All signatures collected'
               : `${pendientes.length} of ${firmas.length} signatures pending`}
@@ -143,14 +143,14 @@ export function ConsentBlock() {
             <MoreVertical className="size-4" />
           </button>
           {menu && (
-            <div className="absolute top-full right-0 z-30 mt-1 w-[200px] rounded-lg border border-[#e4e4e7] bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
+            <div className="absolute top-full right-0 z-30 mt-1 w-[200px] rounded-lg border border-line bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
               {/* Sin fila de botones al pie, las acciones —incluida la firma
                   pendiente— viven acá. */}
               {pendientes.map((f) => (
                 <button
                   key={f.rol}
                   onClick={() => { setMenu(false); firmar(f.rol) }}
-                  className="text-dash-blue block w-full rounded px-3 py-2 text-left text-[13px] font-semibold hover:bg-[#f4f4f5]"
+                  className="text-dash-blue block w-full rounded px-3 py-2 text-left text-[13px] font-semibold hover:bg-surface-muted"
                 >
                   Sign as {f.rol.toLowerCase()}
                 </button>
@@ -159,7 +159,7 @@ export function ConsentBlock() {
                 <button
                   key={o}
                   onClick={() => { setMenu(false); aviso.info(`${o} is not available in this release.`) }}
-                  className="block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]"
+                  className="block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
                 >
                   {o}
                 </button>
@@ -170,7 +170,7 @@ export function ConsentBlock() {
       </div>
 
       {/* Quién firmó y qué falta, sin abrir nada. */}
-      <div className="flex flex-col gap-2 border-t border-[#f1f1f4] px-4 py-3">
+      <div className="flex flex-col gap-2 border-t border-line-soft px-4 py-3">
         {firmas.map((f) => <FilaFirma key={f.rol} f={f} />)}
       </div>
 

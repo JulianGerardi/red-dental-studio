@@ -34,8 +34,8 @@ export function StatusLegend() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         className={cn(
-          'flex h-8 items-center gap-1.5 rounded-md border border-[#e4e4e7] bg-white px-3 text-xs font-medium text-[#3f3f46] transition-colors',
-          open ? 'border-dash-blue' : 'hover:bg-[#fafafa]',
+          'flex h-8 items-center gap-1.5 rounded-md border border-line bg-white px-3 text-xs font-medium text-ink-soft transition-colors',
+          open ? 'border-dash-blue' : 'hover:bg-surface-subtle',
         )}
       >
         <Palette className="size-3.5" /> Status legend
@@ -43,7 +43,7 @@ export function StatusLegend() {
       </button>
 
       {open && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+6px)] left-0 z-40 w-[228px] rounded-lg border border-[#e4e4e7] bg-white p-2 shadow-lg">
+        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+6px)] left-0 z-40 w-[228px] rounded-lg border border-line bg-white p-2 shadow-lg">
           {LEGEND.map(({ state, dot }) => {
             const s = BLOCK_STYLE[state]
             return (
@@ -52,10 +52,10 @@ export function StatusLegend() {
                   className="h-5 w-8 shrink-0 rounded-r-[3px] border-l-[3px]"
                   style={{ backgroundColor: s?.bg ?? '#f4f4f5', borderLeftColor: s?.bar ?? '#a1a1aa' }}
                 />
-                <span className="text-[13px] text-[#09090b]">{state}</span>
+                <span className="text-[13px] text-ink">{state}</span>
                 {/* En el Figma "No-show" es el único sin punto (anomalía 24). */}
                 {dot === null && (
-                  <span className="ml-auto text-[10px] text-[#a1a1aa]">sin punto</span>
+                  <span className="ml-auto text-[10px] text-ink-faint">sin punto</span>
                 )}
               </div>
             )

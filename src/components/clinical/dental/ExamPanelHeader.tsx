@@ -15,13 +15,13 @@ export function ExamPanelHeader({
 }) {
   return (
     <div className="flex w-full flex-wrap items-center justify-between gap-2">
-      <div className="flex items-center gap-1 rounded-lg bg-[#f1f5f9] p-1">
+      <div className="flex items-center gap-1 rounded-lg bg-surface-slate p-1">
         {EXAM_PANEL_TABS.map((t) => (
           <button
             key={t} type="button" onClick={() => onTabChange(t)}
             className={cn(
               'h-8 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-              tab === t ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
+              tab === t ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
             )}
           >
             {t}
@@ -29,7 +29,7 @@ export function ExamPanelHeader({
         ))}
       </div>
       {tab === 'Findings' ? (
-        <button type="button" disabled title="Available once the exam has been charted" className="flex h-7 items-center gap-1.5 rounded-md bg-[#f4f4f5] px-2.5 text-[11px] font-semibold text-[#a1a1aa]">
+        <button type="button" disabled title="Available once the exam has been charted" className="flex h-7 items-center gap-1.5 rounded-md bg-surface-muted px-2.5 text-[11px] font-semibold text-ink-faint">
           <Plus className="size-3" /> No Finding
         </button>
       ) : (

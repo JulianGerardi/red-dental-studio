@@ -20,7 +20,7 @@ export const Efectos: Story = {
         <div className="flex flex-wrap gap-4">
           {['sm', 'md', 'lg', 'xl', '2xl'].map((r) => (
             <div key={r} className="flex flex-col items-center gap-2">
-              <div className={`size-16 border border-[#e4e4e7] bg-[#fafafa] rounded-${r}`} />
+              <div className={`size-16 border border-line bg-surface-subtle rounded-${r}`} />
               <Codigo>rounded-{r}</Codigo>
             </div>
           ))}
@@ -33,7 +33,7 @@ export const Efectos: Story = {
             <div key={nombre} className="flex flex-col gap-2">
               <div className="h-16 w-40 rounded-lg bg-white" style={{ boxShadow: `var(--${nombre})` }} />
               <Codigo>{nombre.replace('shadow-', 'shadow-')}</Codigo>
-              <span className="max-w-40 text-[11px] text-[#71717a]">{valor}</span>
+              <span className="max-w-40 text-[11px] text-ink-muted">{valor}</span>
             </div>
           ))}
         </div>
@@ -42,9 +42,9 @@ export const Efectos: Story = {
       <Seccion titulo="Radios escritos a mano" nota="rounded-[…] con valor propio. Cada uno es una decisión que no pasa por un token.">
         <ul className="text-[13px]">
           {radios.map((r) => (
-            <li key={r.valor} className="flex gap-4 border-t border-[#f1f1f4] py-1.5 first:border-t-0">
+            <li key={r.valor} className="flex gap-4 border-t border-line-soft py-1.5 first:border-t-0">
               <Codigo>{r.valor}</Codigo>
-              <span className="text-[#71717a]">{r.usos} usos en {r.archivos} archivos</span>
+              <span className="text-ink-muted">{r.usos} usos en {r.archivos} archivos</span>
             </li>
           ))}
         </ul>
@@ -53,9 +53,9 @@ export const Efectos: Story = {
       <Seccion titulo="Sombras escritas a mano">
         <ul className="text-[13px]">
           {sombras.map((s) => (
-            <li key={s.valor} className="flex flex-wrap gap-x-4 border-t border-[#f1f1f4] py-1.5 first:border-t-0">
+            <li key={s.valor} className="flex flex-wrap gap-x-4 border-t border-line-soft py-1.5 first:border-t-0">
               <Codigo>{s.valor.length > 90 ? `${s.valor.slice(0, 90)}…` : s.valor}</Codigo>
-              <span className="text-[#71717a]">{s.usos} usos en {s.archivos} archivos</span>
+              <span className="text-ink-muted">{s.usos} usos en {s.archivos} archivos</span>
             </li>
           ))}
         </ul>

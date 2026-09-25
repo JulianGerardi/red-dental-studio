@@ -50,12 +50,12 @@ function Fila({
   return (
     <div
       style={{ animationDelay: `${delay}ms` }}
-      className="motion-safe:animate-[login-fila_5.2s_ease-out_infinite] flex items-center gap-3 rounded-xl border border-[#f1f1f4] px-3.5 py-3"
+      className="motion-safe:animate-[login-fila_5.2s_ease-out_infinite] flex items-center gap-3 rounded-xl border border-line-soft px-3.5 py-3"
     >
       {avatar}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[13px] font-bold text-[#09090b]">{titulo}</span>
-        <span className="block truncate text-[11px] text-[#a1a1aa]">{subtitulo}</span>
+        <span className="block truncate text-[13px] font-bold text-ink">{titulo}</span>
+        <span className="block truncate text-[11px] text-ink-faint">{subtitulo}</span>
       </span>
       {children}
     </div>
@@ -117,20 +117,20 @@ function PanelLedger() {
           key={m.id}
           delay={i * 320}
           avatar={
-            <span className="text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f0f5ff] text-[9px] font-bold">
+            <span className="text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg bg-info-bg text-[9px] font-bold">
               {m.codigo === '—' ? m.tipo.slice(0, 3).toUpperCase() : m.codigo}
             </span>
           }
           titulo={m.descripcion}
           subtitulo={m.provider}
         >
-          <span className={cn('shrink-0 text-[12px] font-semibold tabular-nums', m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]')}>
+          <span className={cn('shrink-0 text-[12px] font-semibold tabular-nums', m.monto < 0 ? 'text-dash-ok-fg' : 'text-ink')}>
             {moneda(m.monto)}
           </span>
         </Fila>
       ))}
       <div className="mt-1 flex items-center justify-between rounded-xl bg-[#f6f8fc] px-3.5 py-3">
-        <span className="text-[11px] text-[#71717a]">Balance due</span>
+        <span className="text-[11px] text-ink-muted">Balance due</span>
         <span className="text-dash-blue text-[16px] leading-none font-extrabold tabular-nums">{moneda(saldo)}</span>
       </div>
     </Panel>
@@ -152,7 +152,7 @@ function PanelOdontograma() {
             style={{ animationDelay: `${i * 90}ms` }}
             className={cn(
               'motion-safe:animate-[login-diente_5.2s_ease-out_infinite] flex h-9 flex-1 items-end justify-center rounded-[6px] pb-1 text-[8px] font-bold',
-              CARGADAS.has(n) ? 'bg-dash-blue text-white' : 'bg-[#f1f5f9] text-[#a1a1aa]',
+              CARGADAS.has(n) ? 'bg-dash-blue text-white' : 'bg-surface-slate text-ink-faint',
             )}
           >
             {n}
@@ -168,7 +168,7 @@ function PanelOdontograma() {
             key={f.code}
             delay={1400 + i * 320}
             avatar={
-              <span className="text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f0f5ff] text-[9px] font-bold">
+              <span className="text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-lg bg-info-bg text-[9px] font-bold">
                 {f.code}
               </span>
             }
@@ -269,20 +269,20 @@ export default function Login() {
             <GalleryVerticalEnd className="size-7" />
           </span>
 
-          <h1 className="mt-5 text-[26px] leading-tight font-bold text-[#09090b]">Welcome! Red Dental Studio</h1>
-          <p className="mt-1 text-[13px] text-[#71717a]">Enter your credentials to access your account</p>
+          <h1 className="mt-5 text-[26px] leading-tight font-bold text-ink">Welcome! Red Dental Studio</h1>
+          <p className="mt-1 text-[13px] text-ink-muted">Enter your credentials to access your account</p>
 
           <label className="mt-7 flex flex-col gap-2">
-            <span className="text-xs font-medium text-[#09090b]">Email<span className="text-[#ff0608]">*</span></span>
-            <span className="focus-within:border-dash-blue flex h-10 items-center gap-2.5 rounded-md border border-[#e4e4e7] bg-white px-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors">
-              <Mail className="size-4 shrink-0 text-[#a1a1aa]" />
+            <span className="text-xs font-medium text-ink">Email<span className="text-required">*</span></span>
+            <span className="focus-within:border-dash-blue flex h-10 items-center gap-2.5 rounded-md border border-line bg-white px-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors">
+              <Mail className="size-4 shrink-0 text-ink-faint" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
                 placeholder="example@example.com"
-                className="min-w-0 flex-1 bg-transparent text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
+                className="min-w-0 flex-1 bg-transparent text-[13px] placeholder:text-ink-faint focus:outline-none"
               />
             </span>
           </label>
@@ -292,26 +292,26 @@ export default function Login() {
                 vez como link debajo del campo. Va una sola vez: dos accesos
                 al mismo lugar, pegados, no son dos cosas distintas. */}
             <span className="flex items-center justify-between gap-3">
-              <span className="text-xs font-medium text-[#09090b]">Password<span className="text-[#ff0608]">*</span></span>
+              <span className="text-xs font-medium text-ink">Password<span className="text-required">*</span></span>
               <Link to="/forgot-password" className="text-dash-blue text-xs font-medium hover:underline">
                 Forgot your password?
               </Link>
             </span>
-            <span className="focus-within:border-dash-blue flex h-10 items-center gap-2.5 rounded-md border border-[#e4e4e7] bg-white px-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors">
-              <Lock className="size-4 shrink-0 text-[#a1a1aa]" />
+            <span className="focus-within:border-dash-blue flex h-10 items-center gap-2.5 rounded-md border border-line bg-white px-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors">
+              <Lock className="size-4 shrink-0 text-ink-faint" />
               <input
                 type={verClave ? 'text' : 'password'}
                 value={clave}
                 onChange={(e) => setClave(e.target.value)}
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className="min-w-0 flex-1 bg-transparent text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
+                className="min-w-0 flex-1 bg-transparent text-[13px] placeholder:text-ink-faint focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => setVerClave((v) => !v)}
                 aria-label={verClave ? 'Hide password' : 'Show password'}
-                className="shrink-0 text-[#a1a1aa] transition-colors hover:text-[#09090b]"
+                className="shrink-0 text-ink-faint transition-colors hover:text-ink"
               >
                 {verClave ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
@@ -325,12 +325,12 @@ export default function Login() {
             Login
           </button>
 
-          <p className="mt-6 text-center text-[13px] text-[#3f3f46]">
+          <p className="mt-6 text-center text-[13px] text-ink-soft">
             Don&apos;t have an account?{' '}
             <Link to="/forgot-password" className="text-dash-blue font-semibold hover:underline">Sign up</Link>
           </p>
 
-          <p className="mt-12 text-center text-[11px] tracking-wide text-[#a1a1aa] uppercase">
+          <p className="mt-12 text-center text-[11px] tracking-wide text-ink-faint uppercase">
             © 2025 All rights reserved | Confidentally
           </p>
         </form>

@@ -27,7 +27,7 @@ const HOY = 'May 14, 2026'
 
 /* Mismo estilo que los botones de ClinicalToolbar.tsx: la fila que sigue
    debajo es una continuación de esa botonera, no un elemento nuevo. */
-const BOTON_TOOLBAR = 'flex h-9 items-center gap-1.5 rounded-lg border border-[#e4e4e7] bg-white px-3.5 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]'
+const BOTON_TOOLBAR = 'flex h-9 items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle'
 
 const INITIAL_FINDINGS: Finding[] = [
   { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: HOY, status: 'Discarded', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [] },
@@ -153,7 +153,7 @@ export function DentalAssessmentExam() {
       </div>
 
       <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-start">
-      <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-xl border border-[#e4e4e7] bg-white p-3 lg:order-1 lg:w-[300px]">
+      <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-xl border border-line bg-white p-3 lg:order-1 lg:w-[300px]">
         <ExamPanelHeader tab={reviewState.tab} onTabChange={reviewState.setTab} onNewReview={reviewState.openDialog} />
         <div className="flex w-full flex-col gap-3 lg:max-h-[70vh] lg:overflow-y-auto">
           {reviewState.tab === 'Findings' ? (
@@ -169,11 +169,11 @@ export function DentalAssessmentExam() {
         </div>
       </div>
 
-      <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-[#e4e4e7] p-4 lg:order-2" data-examen style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fafbfe' }}>
+      <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-line p-4 lg:order-2" data-examen style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fafbfe' }}>
         {view === 'table' ? (
-          <div className="w-full overflow-x-auto rounded-lg border border-[#e4e4e7] bg-white">
+          <div className="w-full overflow-x-auto rounded-lg border border-line bg-white">
             <div className="min-w-[720px]">
-              <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
+              <div className="flex h-12 items-center gap-3 border-b border-line-row bg-surface-alt px-4 text-xs font-semibold text-ink-muted">
                 <span className="w-[90px] shrink-0">Date</span>
                 <span className="w-[110px] shrink-0">Area</span>
                 <span className="w-[90px] shrink-0">Surface</span>
@@ -184,7 +184,7 @@ export function DentalAssessmentExam() {
               {findings.map((f) => {
                 const style = STATUS_STYLE[f.status]
                 return (
-                  <div key={f.id} className="flex items-center gap-3 border-b border-[#e7e7e7] px-4 py-3 text-[13px] text-[#3f3f46] last:border-0">
+                  <div key={f.id} className="flex items-center gap-3 border-b border-line-row px-4 py-3 text-[13px] text-ink-soft last:border-0">
                     <span className="w-[90px] shrink-0">{f.date}</span>
                     <span className="w-[110px] shrink-0 truncate">{f.area}</span>
                     <span className="w-[90px] shrink-0">{f.surfaces.join(', ') || '—'}</span>

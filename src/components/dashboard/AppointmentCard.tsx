@@ -77,11 +77,11 @@ export function AppointmentCard({
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5">
-          <span className="flex h-8 items-center gap-1 rounded-lg bg-[#ddf0e5] px-2 text-[13px] text-[#09090b]">
+          <span className="flex h-8 items-center gap-1 rounded-lg bg-[#ddf0e5] px-2 text-[13px] text-ink">
             TR <Check className="text-dash-ok-fg size-4" strokeWidth={2.5} />
           </span>
-          <span className="flex h-8 items-center gap-1 rounded-lg bg-[#fbe5e5] px-2 text-[13px] text-[#09090b]">
-            CC <X className="size-4 text-[#dc2626]" strokeWidth={2.5} />
+          <span className="flex h-8 items-center gap-1 rounded-lg bg-dash-bad-chip px-2 text-[13px] text-ink">
+            CC <X className="size-4 text-field-error" strokeWidth={2.5} />
           </span>
           <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
         </div>
@@ -95,8 +95,8 @@ export function AppointmentCard({
           <Field icon={<DoorClosed className="size-4 shrink-0" />} text={appt.operatory} />
         </div>
         <div className="bg-dash-field flex w-[68px] shrink-0 flex-col items-center justify-center gap-1 rounded-lg">
-          <Clock className="size-4 text-[#52525b]" />
-          <span className="text-[13px] font-medium text-[#09090b]">{appt.time}</span>
+          <Clock className="size-4 text-ink-medium" />
+          <span className="text-[13px] font-medium text-ink">{appt.time}</span>
         </div>
       </div>
 
@@ -125,13 +125,13 @@ export function AppointmentCard({
    una fila chica se veía como una línea cortada en vez de una sombra. */
 function AppointmentCardCompacta({ appt }: { appt: Appointment }) {
   return (
-    <InnerCard className="flex items-center gap-2.5 border border-[#e4e4e7] p-2.5 shadow-[0_1px_3px_rgb(0_0_0/0.08)]">
+    <InnerCard className="flex items-center gap-2.5 border border-line p-2.5 shadow-[0_1px_3px_rgb(0_0_0/0.08)]">
       <span className="bg-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold text-white">
         {appt.initials}
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="truncate text-[13px] font-semibold text-[#09090b]">{appt.name}</span>
-        <span className="flex items-center gap-1 text-[11px] text-[#71717a]">
+        <span className="truncate text-[13px] font-semibold text-ink">{appt.name}</span>
+        <span className="flex items-center gap-1 text-[11px] text-ink-muted">
           <Clock className="size-3 shrink-0" />
           <span className="truncate">{appt.time} · {appt.provider}</span>
         </span>
@@ -145,7 +145,7 @@ function AppointmentCardCompacta({ appt }: { appt: Appointment }) {
 
 function Field({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <span className="bg-dash-field flex h-10 items-center gap-2 rounded-lg px-3 text-[13px] text-[#52525b]">
+    <span className="bg-dash-field flex h-10 items-center gap-2 rounded-lg px-3 text-[13px] text-ink-medium">
       {icon}
       <span className="truncate">{text}</span>
     </span>
@@ -181,18 +181,18 @@ function MenuCard({ nombre, onEdit }: { nombre: string; onEdit?: () => void }) {
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#e4e4e7] bg-white text-[#09090b] shadow-sm hover:bg-[#f4f4f5]',
-          open && 'bg-[#f4f4f5]',
+          'flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-ink shadow-sm hover:bg-surface-muted',
+          open && 'bg-surface-muted',
         )}
       >
         <EllipsisVertical className="size-4" />
       </button>
       {open && onEdit && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-full right-0 z-30 mt-1 w-44 overflow-hidden rounded-md border border-[#e4e4e7] bg-white py-1 shadow-lg">
+        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-full right-0 z-30 mt-1 w-44 overflow-hidden rounded-md border border-line bg-white py-1 shadow-lg">
           <button
             type="button"
             onClick={() => { setOpen(false); onEdit() }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]"
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
           >
             <Pencil className="size-3.5" /> Edit appointment
           </button>

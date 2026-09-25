@@ -28,7 +28,7 @@ function ConTooltip({
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="right" sideOffset={10} className="bg-[#09090b] text-white">{label}</TooltipContent>
+      <TooltipContent side="right" sideOffset={10} className="bg-ink text-white">{label}</TooltipContent>
     </Tooltip>
   )
 }
@@ -91,7 +91,7 @@ export function Sidebar({
         className={cn(
           /* El scroll va sólo en mobile: en desktop un overflow acá recorta el
              menú flotante de Settings, que se sale del ancho del rail. */
-          'flex h-svh flex-col bg-[#fafafa] transition-[width,transform] duration-200',
+          'flex h-svh flex-col bg-surface-subtle transition-[width,transform] duration-200',
           'max-md:overflow-y-auto md:overflow-visible',
           /* Mobile: panel fijo que entra desde la izquierda. */
           'fixed top-0 left-0 z-50 w-[234px]',
@@ -238,7 +238,7 @@ function SettingsItem({
         <div
           /* En el panel mobile no hay lugar al costado: ahí se despliega en
              el mismo lugar, debajo del ítem. */
-          className="motion-safe:animate-[loc-in_120ms_ease-out] z-50 rounded-2xl border border-[#e4e4e7] bg-white p-2 max-md:mt-2 max-md:max-h-[45svh] max-md:overflow-y-auto md:absolute md:bottom-0 md:left-full md:ml-2 md:w-[236px] md:shadow-[0_12px_32px_rgb(0_0_0/0.18)]"
+          className="motion-safe:animate-[loc-in_120ms_ease-out] z-50 rounded-2xl border border-line bg-white p-2 max-md:mt-2 max-md:max-h-[45svh] max-md:overflow-y-auto md:absolute md:bottom-0 md:left-full md:ml-2 md:w-[236px] md:shadow-[0_12px_32px_rgb(0_0_0/0.18)]"
           /* En mobile el ítem vive al pie del panel, así que los once destinos
              nacen abajo del pliegue. Se los trae a la vista al abrir; en
              desktop no hace falta porque el flotante sale al costado. */
@@ -255,7 +255,7 @@ function SettingsItem({
               <span
                 className={cn(
                   'flex items-center rounded-lg pr-1 transition-colors',
-                  pathname.startsWith(s.to) ? 'bg-dash-count-bg' : 'hover:bg-[#f4f4f5]',
+                  pathname.startsWith(s.to) ? 'bg-dash-count-bg' : 'hover:bg-surface-muted',
                 )}
               >
                 <NavLink
@@ -263,7 +263,7 @@ function SettingsItem({
                   className={({ isActive }) =>
                     cn(
                       'block flex-1 px-3 py-2 text-sm',
-                      isActive ? 'text-dash-blue-hover font-medium' : 'text-[#09090b]',
+                      isActive ? 'text-dash-blue-hover font-medium' : 'text-ink',
                     )
                   }
                 >
@@ -275,7 +275,7 @@ function SettingsItem({
                     aria-label={`${s.label} options`}
                     aria-expanded={grupo === s.to}
                     onClick={() => setGrupo((g) => (g === s.to ? null : s.to))}
-                    className="rounded p-1 text-[#71717a] hover:text-black"
+                    className="rounded p-1 text-ink-muted hover:text-black"
                   >
                     <ChevronDown className={cn('size-4 transition-transform', grupo === s.to && 'rotate-180')} />
                   </button>
@@ -288,7 +288,7 @@ function SettingsItem({
                   className={({ isActive }) =>
                     cn(
                       'block rounded-lg py-1.5 pr-3 pl-7 text-[13px] transition-colors',
-                      isActive ? 'text-dash-blue font-medium' : 'text-[#71717a] hover:bg-[#f4f4f5]',
+                      isActive ? 'text-dash-blue font-medium' : 'text-ink-muted hover:bg-surface-muted',
                     )
                   }
                 >

@@ -71,7 +71,7 @@ export function PostPaymentDialog({
     <ModalShell title="Post payment" onClose={onClose} width="max-w-[900px]" footer={<FormFooter onCancel={onClose} onSave={guardar} />}>
       <div className="flex flex-col gap-4">
         <div ref={refBusqueda} className="relative">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
           <input
             value={busqueda}
             onChange={(e) => { setBusqueda(e.target.value); setBuscando(true) }}
@@ -79,19 +79,19 @@ export function PostPaymentDialog({
             /* Typo tal cual el Figma: "guarantors,phone...." sin espacio.
                Ver billing.md, anomalía documentada. */
             placeholder="Search Patients, guarantors,phone...."
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
           />
           {buscando && resultados.length > 0 && (
-            <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-[#e4e4e7] bg-white py-1 shadow-lg">
+            <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
               {resultados.map((p) => (
                 <button
                   key={p.nombre}
                   type="button"
                   onClick={() => elegirPaciente(p.nombre)}
-                  className="flex w-full items-center justify-between px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]"
+                  className="flex w-full items-center justify-between px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
                 >
                   {p.nombre}
-                  <span className="text-[#a1a1aa]">{p.rol}</span>
+                  <span className="text-ink-faint">{p.rol}</span>
                 </button>
               ))}
             </div>

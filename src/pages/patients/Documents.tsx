@@ -64,12 +64,12 @@ export default function Documents() {
 
           <div className="mt-4 flex items-center gap-3">
             <div className="relative w-[265px]">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search documents"
-                className="focus:border-dash-blue h-8 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+                className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
               />
             </div>
             <button
@@ -79,15 +79,15 @@ export default function Documents() {
                   : aviso.warn('Select at least one document to download.')
               }
               aria-label="Download selected"
-              className="ml-auto flex size-8 items-center justify-center rounded-md border border-[#e4e4e7] bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]"
+              className="ml-auto flex size-8 items-center justify-center rounded-md border border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle"
             >
               <Download className="size-4" />
             </button>
           </div>
 
-          <div className="mt-3 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+          <div className="mt-3 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
             <div className="min-w-[620px]">
-            <div className="flex items-center bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
+            <div className="flex items-center bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
               <span className="w-10">
                 <input
                   type="checkbox"
@@ -102,7 +102,7 @@ export default function Documents() {
             </div>
 
             {filasPagina.map((d, i) => (
-              <div key={i} className="flex items-center border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]">
+              <div key={i} className="flex items-center border-t border-line-row px-3 py-3 text-[13px] text-ink-soft">
                 <span className="w-10">
                   <input
                     type="checkbox"
@@ -117,12 +117,12 @@ export default function Documents() {
                   <span className="bg-dash-blue flex size-7 shrink-0 items-center justify-center rounded text-white">
                     <FileText className="size-4" />
                   </span>
-                  <span className="truncate text-[#52525b]">{d.name}</span>
+                  <span className="truncate text-ink-medium">{d.name}</span>
                 </span>
                 <span className="w-[200px]">
                   <Pill tone={FIRMA_TONO[d.firma]}>{d.firma}</Pill>
                 </span>
-                <span className="w-[140px] text-right text-[#52525b]">{d.fecha}</span>
+                <span className="w-[140px] text-right text-ink-medium">{d.fecha}</span>
               </div>
             ))}
 
@@ -130,8 +130,8 @@ export default function Documents() {
                 documentos -reusa el componente de referrals-. El contador
                 ahora cuenta documentos de verdad y el paginado funciona: los
                 botones dibujados no tenían onClick. */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
-              <span className="text-xs font-semibold text-[#71717a]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
+              <span className="text-xs font-semibold text-ink-muted">
                 Showing {filasPagina.length} of {filas.length} documents
               </span>
               <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />

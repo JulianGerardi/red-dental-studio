@@ -73,7 +73,7 @@ export function LocationHoursModal({
                 type="button"
                 aria-label="Remove time range"
                 onClick={() => setRangos((p) => p.filter((_, j) => j !== i))}
-                className="mt-7 shrink-0 rounded p-1 text-[#71717a] hover:bg-[#f4f4f5] hover:text-[#b22626]"
+                className="mt-7 shrink-0 rounded p-1 text-ink-muted hover:bg-surface-muted hover:text-dash-bad-fg"
               >
                 <X className="size-4" />
               </button>
@@ -89,8 +89,8 @@ export function LocationHoursModal({
           <CirclePlus className="size-4" /> Add another time range
         </button>
 
-        <div className="border-t border-[#e4e4e7] pt-4">
-          <p className="text-sm font-bold text-[#09090b]">Repeat on days</p>
+        <div className="border-t border-line pt-4">
+          <p className="text-sm font-bold text-ink">Repeat on days</p>
           <div className="mt-3 flex gap-2">
             {DIAS.map((d, i) => {
               const on = dias.includes(i)
@@ -104,7 +104,7 @@ export function LocationHoursModal({
                     'flex size-8 items-center justify-center rounded-md border text-[13px] font-semibold transition-colors',
                     on
                       ? 'border-dash-blue text-dash-blue bg-white'
-                      : 'border-transparent text-[#c4c4c8] hover:bg-[#f4f4f5]',
+                      : 'border-transparent text-[#c4c4c8] hover:bg-surface-muted',
                   )}
                 >
                   {d}
@@ -114,9 +114,9 @@ export function LocationHoursModal({
           </div>
         </div>
 
-        <div className="border-t border-[#e4e4e7] pt-4">
-          <p className="text-sm font-bold text-[#09090b]">Apply change to</p>
-          <p className="mt-0.5 text-[11px] text-[#71717a]">
+        <div className="border-t border-line pt-4">
+          <p className="text-sm font-bold text-ink">Apply change to</p>
+          <p className="mt-0.5 text-[11px] text-ink-muted">
             Choose how you want these hours to be applied.
           </p>
           <div className="mt-3 flex flex-col gap-2">
@@ -129,10 +129,10 @@ export function LocationHoursModal({
                   onClick={() => setAlcance(a)}
                   className={cn(
                     'flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-[13px]',
-                    on ? 'border-dash-blue' : 'border-[#e4e4e7] hover:bg-[#fafafa]',
+                    on ? 'border-dash-blue' : 'border-line hover:bg-surface-subtle',
                   )}
                 >
-                  <span className={cn('flex size-4 shrink-0 items-center justify-center rounded-full border-2', on ? 'border-dash-blue' : 'border-[#a1a1aa]')}>
+                  <span className={cn('flex size-4 shrink-0 items-center justify-center rounded-full border-2', on ? 'border-dash-blue' : 'border-ink-faint')}>
                     {on && <span className="bg-dash-blue size-2 rounded-full" />}
                   </span>
                   {a}

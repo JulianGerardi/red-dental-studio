@@ -40,10 +40,10 @@ const TASKS: PendingTask[] = Array.from({ length: 6 }, () => ({
 
 type ApptStatus = 'Booked' | 'Cancelled' | 'Fulfilled' | 'No Show'
 const APPT_STATUS: Record<ApptStatus, string> = {
-  Booked: 'border-[#174596] text-[#174596] bg-[#f0f2ff]',
-  Cancelled: 'border-[#b22626] text-[#b22626] bg-[#fff2f2]',
-  Fulfilled: 'border-[#1a804d] text-[#1a804d] bg-[#f0fcf5]',
-  'No Show': 'border-[#99660d] text-[#99660d] bg-[#fffaf0]',
+  Booked: 'border-dash-busy-fg text-dash-busy-fg bg-dash-busy-bg',
+  Cancelled: 'border-dash-bad-fg text-dash-bad-fg bg-dash-bad-bg',
+  Fulfilled: 'border-dash-ok-fg text-dash-ok-fg bg-dash-ok-bg',
+  'No Show': 'border-warn-fg text-warn-fg bg-warn-bg',
 }
 const APPTS: { status: ApptStatus; cancel?: boolean }[] = [
   { status: 'Booked', cancel: true }, { status: 'Cancelled' }, { status: 'Fulfilled' },
@@ -51,7 +51,7 @@ const APPTS: { status: ApptStatus; cancel?: boolean }[] = [
 ]
 
 function Card({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <div className={cn('rounded-lg border border-[#e4e4e7] bg-white', className)}>{children}</div>
+  return <div className={cn('rounded-lg border border-line bg-white', className)}>{children}</div>
 }
 
 export default function PatientDetail() {
@@ -127,8 +127,8 @@ export default function PatientDetail() {
                     aria-expanded={activa}
                     className="flex w-full items-center gap-2.5 px-4 py-3"
                   >
-                    <Icon className={cn('size-4 shrink-0', activa ? 'text-white' : 'text-[#09090b]')} />
-                    <span className={cn('truncate text-[13px] font-semibold', activa ? 'text-white' : 'text-[#09090b]')}>
+                    <Icon className={cn('size-4 shrink-0', activa ? 'text-white' : 'text-ink')} />
+                    <span className={cn('truncate text-[13px] font-semibold', activa ? 'text-white' : 'text-ink')}>
                       {label}
                     </span>
                     <span
@@ -142,7 +142,7 @@ export default function PatientDetail() {
                     <ChevronDown
                       className={cn(
                         'ml-auto size-4 shrink-0 transition-transform',
-                        activa ? 'rotate-180 text-white' : 'text-[#71717a]',
+                        activa ? 'rotate-180 text-white' : 'text-ink-muted',
                       )}
                     />
                   </button>
@@ -152,11 +152,11 @@ export default function PatientDetail() {
           </div>
 
           <Card className="p-5">
-            <h2 className="text-[15px] font-bold text-[#09090b]">Insurance</h2>
-            <div className="mt-4 overflow-x-auto rounded-lg border border-[#e4e4e7]">
+            <h2 className="text-[15px] font-bold text-ink">Insurance</h2>
+            <div className="mt-4 overflow-x-auto rounded-lg border border-line">
               <table className="w-full min-w-[720px] text-xs">
                 <thead>
-                  <tr className="border-b border-[#e4e4e7] bg-[#f9f9f9] text-[11px] text-[#71717a]">
+                  <tr className="border-b border-line bg-surface-alt text-[11px] text-ink-muted">
                     {['Order', 'Carrier', 'Plan', 'Subscriber', 'Relation', 'Coverage Period', 'Actions'].map((h) => (
                       <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
                     ))}
@@ -164,13 +164,13 @@ export default function PatientDetail() {
                 </thead>
                 <tbody>
                   {INSURANCE.map((r) => (
-                    <tr key={r.order} className="border-b border-[#e4e4e7] text-[13px] last:border-0">
+                    <tr key={r.order} className="border-b border-line text-[13px] last:border-0">
                       <td className="px-4 py-4"><Pill tone="info">{r.order}</Pill></td>
-                      <td className="px-4 py-4 text-[#3f3f46]">{r.carrier}</td>
-                      <td className="px-4 py-4 text-[#3f3f46]">{r.plan}</td>
-                      <td className="px-4 py-4 text-[#3f3f46]">{r.subscriber}</td>
+                      <td className="px-4 py-4 text-ink-soft">{r.carrier}</td>
+                      <td className="px-4 py-4 text-ink-soft">{r.plan}</td>
+                      <td className="px-4 py-4 text-ink-soft">{r.subscriber}</td>
                       <td className="px-4 py-4"><Pill tone={RELACION_TONO[r.relation] ?? 'neutral'}>{r.relation}</Pill></td>
-                      <td className="px-4 py-4 text-[#3f3f46]">{r.period}</td>
+                      <td className="px-4 py-4 text-ink-soft">{r.period}</td>
                       <td className="px-4 py-4">
                         <RowActionsMenu label={`${r.order} insurance plan`}>
                           <DropdownMenuItem asChild>
@@ -183,11 +183,11 @@ export default function PatientDetail() {
                 </tbody>
               </table>
               <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-xs text-[#71717a]">Showing 2 of 5 insurances</span>
+                <span className="text-xs text-ink-muted">Showing 2 of 5 insurances</span>
                 <div className="flex items-center gap-1">
                   {['‹', '1', '2', '3', '›'].map((p) => (
                     <span key={p} className={cn('flex size-7 items-center justify-center rounded-md text-xs font-semibold',
-                      p === '1' ? 'bg-dash-blue text-white' : 'text-[#71717a]')}>{p}</span>
+                      p === '1' ? 'bg-dash-blue text-white' : 'text-ink-muted')}>{p}</span>
                   ))}
                 </div>
               </div>
@@ -197,12 +197,12 @@ export default function PatientDetail() {
           <div className="grid gap-5 lg:grid-cols-[1fr_280px]">
             <Card className="p-5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-[15px] font-bold text-[#09090b]">Pending Task</h2>
-                <div className="flex rounded-md bg-[#f1f5f9] p-1">
+                <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
+                <div className="flex rounded-md bg-surface-slate p-1">
                   {(['Pending Task', 'Activity'] as const).map((t) => (
                     <button key={t} onClick={() => setTaskTab(t)}
                       className={cn('rounded px-3 py-1 text-xs font-medium',
-                        taskTab === t ? 'bg-dash-blue text-white' : 'text-[#64748b]')}>
+                        taskTab === t ? 'bg-dash-blue text-white' : 'text-ink-slate')}>
                       {t}
                     </button>
                   ))}
@@ -214,12 +214,12 @@ export default function PatientDetail() {
             </Card>
 
             <Card className="p-4">
-              <h2 className="text-[15px] font-bold text-[#09090b]">Appointments</h2>
-              <div className="mt-3 flex rounded-md bg-[#f1f5f9] p-1">
+              <h2 className="text-[15px] font-bold text-ink">Appointments</h2>
+              <div className="mt-3 flex rounded-md bg-surface-slate p-1">
                 {(['Next', 'Next Appointments'] as const).map((t) => (
                   <button key={t} onClick={() => setApptTab(t)}
                     className={cn('flex-1 truncate rounded px-1 py-1 text-xs font-medium',
-                      apptTab === t ? 'bg-dash-blue text-white' : 'text-[#64748b]')}>
+                      apptTab === t ? 'bg-dash-blue text-white' : 'text-ink-slate')}>
                     {t}
                   </button>
                 ))}
@@ -229,18 +229,18 @@ export default function PatientDetail() {
                   <div key={i} className="border-dash-blue rounded-md border-l-[3px] bg-white p-2.5 shadow-[0_1px_2px_rgb(0_0_0/0.06)]">
                     <div className="flex items-start gap-2">
                       <span className="bg-dash-blue-hover flex size-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white">av</span>
-                      <span className="min-w-0 flex-1 truncate text-xs font-semibold text-[#09090b]">Maria Abril Viola</span>
+                      <span className="min-w-0 flex-1 truncate text-xs font-semibold text-ink">Maria Abril Viola</span>
                       <span className={cn('shrink-0 rounded-full border px-2 py-[2px] text-[11px] font-semibold', APPT_STATUS[a.status])}>{a.status}</span>
                     </div>
-                    <p className="mt-1 truncate text-[11px] text-[#71717a]">Routine cleaning appointment</p>
-                    <p className="mt-1 flex items-center gap-1.5 text-[11px] text-[#71717a]">
+                    <p className="mt-1 truncate text-[11px] text-ink-muted">Routine cleaning appointment</p>
+                    <p className="mt-1 flex items-center gap-1.5 text-[11px] text-ink-muted">
                       <Clock className="size-3 shrink-0" /> 12 Mar 2025 · 10:00 - 11:00 AM
                     </p>
-                    <p className="mt-0.5 flex items-center gap-1.5 truncate text-[11px] text-[#71717a]">
+                    <p className="mt-0.5 flex items-center gap-1.5 truncate text-[11px] text-ink-muted">
                       <MapPin className="size-3 shrink-0" /> Los Angeles - 789 N Sunrise Street
                     </p>
                     {a.cancel && (
-                      <button className="mt-2 ml-auto block rounded-md border border-[#e4e4e7] px-2.5 py-1 text-[11px] font-medium hover:bg-[#fafafa]">
+                      <button className="mt-2 ml-auto block rounded-md border border-line px-2.5 py-1 text-[11px] font-medium hover:bg-surface-subtle">
                         Cancel
                       </button>
                     )}

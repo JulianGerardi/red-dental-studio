@@ -7,10 +7,10 @@ export type FindingStatus =
   | 'Active' | 'Monitoring' | 'In Treatment' | 'Treated' | 'Externally Treated'
   | 'No Treatment Needed' | 'Patient Declined' | 'Clinic Declined' | 'Discarded'
 
-const GREEN = { badge: 'bg-[#f0fcf5] text-[#1a804d]', rail: 'border-l-[#1a804d]', dot: 'bg-[#1a804d]', good: true }
+const GREEN = { badge: 'bg-dash-ok-bg text-dash-ok-fg', rail: 'border-l-dash-ok-fg', dot: 'bg-dash-ok-fg', good: true }
 const BLUE = { badge: 'bg-dash-count-bg text-dash-blue', rail: 'border-l-dash-blue', dot: 'bg-dash-blue', good: true }
-const RED = { badge: 'bg-[#fef2f2] text-[#dc2626]', rail: 'border-l-[#dc2626]', dot: 'bg-[#dc2626]', good: false }
-const AMBER = { badge: 'bg-[#fffaf0] text-[#99660d]', rail: 'border-l-[#99660d]', dot: 'bg-[#99660d]', good: false }
+const RED = { badge: 'bg-[#fef2f2] text-field-error', rail: 'border-l-field-error', dot: 'bg-field-error', good: false }
+const AMBER = { badge: 'bg-warn-bg text-warn-fg', rail: 'border-l-warn-fg', dot: 'bg-warn-fg', good: false }
 
 export const STATUS_STYLE: Record<FindingStatus, { badge: string; rail: string; dot: string; good: boolean }> = {
   Active: GREEN, Monitoring: AMBER, 'In Treatment': BLUE, Treated: GREEN, 'Externally Treated': GREEN,

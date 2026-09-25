@@ -46,8 +46,8 @@ export function SettingsNewEmployee() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">New Employee</h1>
-      <p className="mt-1 text-sm text-[#71717a]">Everyone with access to the practice, across every location.</p>
+      <h1 className="text-2xl font-bold text-ink">New Employee</h1>
+      <p className="mt-1 text-sm text-ink-muted">Everyone with access to the practice, across every location.</p>
 
       <div className="mt-5 flex flex-col gap-6">
         <SectionCard title="General Information">

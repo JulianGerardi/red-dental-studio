@@ -61,8 +61,8 @@ export function PatientPaymentPanel({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
-        <h2 className="flex items-center gap-2 text-sm font-bold text-[#09090b]">
+      <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
           <CreditCard className="size-4" /> Payment Information
         </h2>
 
@@ -105,7 +105,7 @@ export function PatientPaymentPanel({
                   type="button"
                   aria-label="Add another payment method"
                   onClick={() => setMetodos((p) => [...p, filaVacia(Math.max(0, ...p.map((x) => x.id)) + 1)])}
-                  className="mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-[#e4e4e7] text-[#71717a] hover:bg-[#f4f4f5]"
+                  className="mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-line text-ink-muted hover:bg-surface-muted"
                 >
                   <Plus className="size-4" />
                 </button>
@@ -114,7 +114,7 @@ export function PatientPaymentPanel({
                   type="button"
                   aria-label="Remove this payment method"
                   onClick={() => setMetodos((p) => p.filter((x) => x.id !== f.id))}
-                  className="mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-[#e4e4e7] text-[#71717a] hover:bg-[#fff2f2] hover:text-[#b22626]"
+                  className="mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-line text-ink-muted hover:bg-dash-bad-bg hover:text-dash-bad-fg"
                 >
                   <X className="size-4" />
                 </button>
@@ -127,7 +127,7 @@ export function PatientPaymentPanel({
 
       <LedgerAllocationTable cargos={cargosAplicables} />
 
-      <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
+      <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
         <TextArea label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
       </div>
 

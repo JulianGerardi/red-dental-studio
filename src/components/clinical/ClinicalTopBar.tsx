@@ -22,7 +22,7 @@ const ICONO_CONTADOR = { link: Link2, signos: Activity, personas: Users, info: I
    pedido de Julián: al pasar el mouse el botón muestra su caja y se abre con
    el texto adentro. 36px en reposo: 8 de padding + 1 de borde + el ícono de
    18. Al abrirse empujan lo de al lado, no lo tapan. */
-const BOTON = 'group/btn flex h-9 shrink-0 items-center justify-center rounded-lg border border-transparent px-2 text-[13px] font-medium text-[#09090b] transition-colors hover:border-[#e4e4e7] hover:bg-white hover:shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus-visible:border-[#e4e4e7] focus-visible:bg-white'
+const BOTON = 'group/btn flex h-9 shrink-0 items-center justify-center rounded-lg border border-transparent px-2 text-[13px] font-medium text-ink transition-colors hover:border-line hover:bg-white hover:shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus-visible:border-line focus-visible:bg-white'
 
 /* El texto está siempre en el DOM, sólo sin ancho: se abre con el hover o con
    el foco del teclado. */
@@ -62,9 +62,9 @@ function Flotante({
       role="dialog"
       aria-label={titulo}
       style={{ left, top: ancla.bottom + 6, width: ancho }}
-      className="motion-safe:animate-[loc-in_120ms_ease-out] fixed z-50 rounded-lg border border-[#e4e4e7] bg-white p-3 shadow-[0_12px_32px_rgb(0_0_0/0.18)]"
+      className="motion-safe:animate-[loc-in_120ms_ease-out] fixed z-50 rounded-lg border border-line bg-white p-3 shadow-[0_12px_32px_rgb(0_0_0/0.18)]"
     >
-      <p className="text-[13px] font-bold text-[#09090b]">{titulo}</p>
+      <p className="text-[13px] font-bold text-ink">{titulo}</p>
       {children}
     </div>,
     document.body,
@@ -73,11 +73,11 @@ function Flotante({
 
 /* Referrals cuenta lo suyo; las clínicas cuentan lo que hay en la lista. */
 function ListaContador({ c }: { c: Contador }) {
-  if (c.items.length === 0) return <p className="mt-1.5 text-[12px] text-[#71717a]">{c.vacio}</p>
+  if (c.items.length === 0) return <p className="mt-1.5 text-[12px] text-ink-muted">{c.vacio}</p>
   return (
     <ul className="mt-2 flex flex-col gap-1.5">
       {c.items.map((i) => (
-        <li key={i} className="flex items-center gap-2 text-[12px] text-[#52525b]">
+        <li key={i} className="flex items-center gap-2 text-[12px] text-ink-medium">
           <span className="bg-dash-blue size-1 shrink-0 rounded-full" />
           <span className="min-w-0 truncate">{i}</span>
         </li>
@@ -210,7 +210,7 @@ export function ClinicalTopBar({
           se abre hacia la derecha con su texto y empuja lo que tiene al lado.
           Antes se abría por encima y tapaba los contadores (Medications y
           compañía): Julián pidió que no se superpongan. */}
-      <Link to={volverA} aria-label="Exit clinical Mode" className={cn(BOTON, 'hover:bg-[#fafafa]')}>
+      <Link to={volverA} aria-label="Exit clinical Mode" className={cn(BOTON, 'hover:bg-surface-subtle')}>
         <ChevronLeft className="size-[18px] shrink-0" />
         <span className={ETIQUETA}>Exit clinical Mode</span>
       </Link>
@@ -277,7 +277,7 @@ export function ClinicalTopBar({
             key={c.valor}
             className={cn(
               'flex h-full items-center justify-center px-[6px] text-[11.79px] leading-[16px] whitespace-nowrap text-black',
-              i < CONSTANTES.length - 1 && 'border-r border-[#E4E4E7]',
+              i < CONSTANTES.length - 1 && 'border-r border-line',
             )}
           >
             {c.valor}
@@ -323,12 +323,12 @@ export function ClinicalTopBar({
       </span>
 
       {abierto && (
-        <div className="absolute top-full right-0 z-40 mt-1 w-[220px] rounded-lg border border-[#e4e4e7] bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
+        <div className="absolute top-full right-0 z-40 mt-1 w-[220px] rounded-lg border border-line bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
           {['End encounter', 'Discard encounter', 'Encounter settings'].map((t) => (
             <button
               key={t}
               onClick={() => { setAbierto(false); aviso.info(`${t} is not available in this release.`) }}
-              className="block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]"
+              className="block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
             >
               {t}
             </button>
@@ -365,9 +365,9 @@ export function ClinicalTopBar({
       {flot?.tipo === 'pill' && (
         <Flotante titulo={PANELES[flot.k].titulo} ancla={flot.rect} ancho={300} onClose={() => setFlot(null)}>
           {PANELES[flot.k].parrafos.map((t) => (
-            <p key={t} className="mt-2 text-[12px] leading-[1.55] text-[#52525b]">{t}</p>
+            <p key={t} className="mt-2 text-[12px] leading-[1.55] text-ink-medium">{t}</p>
           ))}
-          <p className="mt-3 border-t border-[#f1f1f4] pt-2 text-[11px] text-[#71717a]">
+          <p className="mt-3 border-t border-line-soft pt-2 text-[11px] text-ink-muted">
             {PANELES[flot.k].fecha} · {PANELES[flot.k].hora}
           </p>
         </Flotante>

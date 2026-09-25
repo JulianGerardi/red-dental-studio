@@ -43,7 +43,7 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="flex flex-col gap-6">
           <SectionCard title="Subscriber">
-            <p className="-mt-2 text-[11px] text-[#71717a]">Choose how you want to add the subscriber</p>
+            <p className="-mt-2 text-[11px] text-ink-muted">Choose how you want to add the subscriber</p>
             {OPCIONES.map((o) => (
               <OptionCheckbox
                 key={o.id}
@@ -106,10 +106,10 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
 function FilaLectura({ icon: Icon, label, value }: { icon: typeof ShieldHalf; label: string; value: string }) {
   return (
     <div className="flex items-center gap-2.5">
-      <Icon className="size-4 shrink-0 text-[#71717a]" strokeWidth={1.8} />
+      <Icon className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />
       <span className="leading-tight">
-        <span className="block text-[11px] text-[#a1a1aa]">{label}</span>
-        <span className="block text-[13px] text-[#09090b]">{value}</span>
+        <span className="block text-[11px] text-ink-faint">{label}</span>
+        <span className="block text-[13px] text-ink">{value}</span>
       </span>
     </div>
   )
@@ -146,7 +146,7 @@ export function ManageSubscriptionModal({
                 type="button"
                 aria-label="Edit subscriber"
                 onClick={() => aviso.info('Subscriber editing is not available in this release.')}
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-[#71717a] hover:text-black"
+                className="absolute top-1/2 right-3 -translate-y-1/2 text-ink-muted hover:text-black"
               >
                 <Pencil className="size-4" />
               </button>

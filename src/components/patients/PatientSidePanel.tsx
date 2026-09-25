@@ -68,13 +68,13 @@ function InfoBlock({
 }) {
   return (
     <div className={cn('mt-5', className)}>
-      <div className="flex items-center justify-between border-b border-[#e4e4e7] pb-1.5">
-        <span className="text-[13px] font-semibold text-[#09090b]">{title}</span>
+      <div className="flex items-center justify-between border-b border-line pb-1.5">
+        <span className="text-[13px] font-semibold text-ink">{title}</span>
         <button
           type="button"
           onClick={onEdit}
           aria-label={`Edit ${title}`}
-          className="text-[#71717a] transition-colors hover:text-black"
+          className="text-ink-muted transition-colors hover:text-black"
         >
           <Pencil className="size-3.5" />
         </button>
@@ -82,10 +82,10 @@ function InfoBlock({
       <dl className="mt-3 flex flex-col gap-3">
         {items.map(({ icon: Icon, label, value }) => (
           <div key={label}>
-            <dt className="flex items-center gap-2 text-xs font-medium text-[#09090b]">
+            <dt className="flex items-center gap-2 text-xs font-medium text-ink">
               <Icon className="size-3.5 shrink-0" /> {label}
             </dt>
-            <dd className="mt-0.5 text-[11px] text-[#71717a]">{value}</dd>
+            <dd className="mt-0.5 text-[11px] text-ink-muted">{value}</dd>
           </div>
         ))}
       </dl>
@@ -139,7 +139,7 @@ export function PatientSidePanel({
     colapsado ? (
       <Tooltip>
         <TooltipTrigger asChild>{hijo}</TooltipTrigger>
-        <TooltipContent side="right" className="bg-[#09090b] text-white">
+        <TooltipContent side="right" className="bg-ink text-white">
           {texto}
         </TooltipContent>
       </Tooltip>
@@ -149,13 +149,13 @@ export function PatientSidePanel({
 
   return (
     <TooltipProvider delayDuration={150}>
-    <aside className={cn('w-full rounded-lg border border-[#e4e4e7] bg-white p-4 lg:shrink-0', colapsado ? 'lg:w-[60px] lg:p-2' : 'lg:w-[218px]')}>
+    <aside className={cn('w-full rounded-lg border border-line bg-white p-4 lg:shrink-0', colapsado ? 'lg:w-[60px] lg:p-2' : 'lg:w-[218px]')}>
       <button
         type="button"
         onClick={() => setColapsado((v) => !v)}
         aria-label={colapsado ? 'Expand patient menu' : 'Collapse patient menu'}
         className={cn(
-          'hidden rounded-md text-[#71717a] hover:bg-[#f4f4f5] hover:text-black lg:mb-2 lg:flex lg:size-9 lg:items-center lg:justify-center',
+          'hidden rounded-md text-ink-muted hover:bg-surface-muted hover:text-black lg:mb-2 lg:flex lg:size-9 lg:items-center lg:justify-center',
           colapsado ? 'lg:mx-auto' : 'lg:ml-auto',
         )}
       >
@@ -186,11 +186,11 @@ export function PatientSidePanel({
           ))}
         </div>
         <div className={cn('flex min-w-0 flex-col items-start gap-1.5 lg:items-center', colapsado && 'lg:hidden')}>
-          <p className="truncate text-lg font-bold text-[#09090b]">{name}</p>
-          <span className="rounded-full border border-[#1a804d] bg-[#f0fcf5] px-2 py-[2px] text-[10px] font-semibold text-[#1a804d]">
+          <p className="truncate text-lg font-bold text-ink">{name}</p>
+          <span className="rounded-full border border-dash-ok-fg bg-dash-ok-bg px-2 py-[2px] text-[10px] font-semibold text-dash-ok-fg">
             Active
           </span>
-          <p className="text-[11px] text-[#71717a]">50 years</p>
+          <p className="text-[11px] text-ink-muted">50 years</p>
         </div>
       </div>
 
@@ -231,7 +231,7 @@ export function PatientSidePanel({
               onMouseEnter={abrirInfo}
               onMouseLeave={cerrarInfo}
               onFocus={abrirInfo}
-              className="flex size-9 items-center justify-center rounded-md text-[#09090b] hover:bg-[#f4f4f5]"
+              className="flex size-9 items-center justify-center rounded-md text-ink hover:bg-surface-muted"
             >
               <IdCard className="size-4" />
             </PopoverTrigger>
@@ -266,7 +266,7 @@ export function PatientSidePanel({
             colapsado && 'lg:size-9 lg:justify-center lg:gap-0 lg:p-0',
             section === key
               ? 'bg-dash-blue border-dash-blue text-white'
-              : 'border-[#e4e4e7] bg-white text-[#09090b] hover:bg-[#f4f4f5] lg:bg-transparent',
+              : 'border-line bg-white text-ink hover:bg-surface-muted lg:bg-transparent',
           )
           const contenido = (
             <>
@@ -389,14 +389,14 @@ function EncounterButton() {
       </span>
 
       {abierto && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 w-full overflow-hidden rounded-lg border border-[#e4e4e7] bg-white py-1 shadow-lg">
+        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 w-full overflow-hidden rounded-lg border border-line bg-white py-1 shadow-lg">
           {(Object.keys(ENCUENTRO) as EstadoEncuentro[]).map((k) => (
             <button
               key={k}
               type="button"
               onClick={() => { setEstado(k); setAbierto(false); aviso.ok(`Encounter set to ${ENCUENTRO[k].label}.`) }}
               className={cn(
-                'flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]',
+                'flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-surface-muted',
                 estado === k && 'text-dash-blue font-medium',
               )}
             >

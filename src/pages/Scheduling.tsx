@@ -153,14 +153,14 @@ export default function Scheduling() {
       {/* Toolbar */}
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
-          <button onClick={() => paso(-1)} className="rounded-md border border-[#e4e4e7] bg-white p-1.5" aria-label="Previous">
+          <button onClick={() => paso(-1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Previous">
             <ChevronLeft className="size-4" />
           </button>
-          <span className="text-[13px] font-semibold whitespace-nowrap text-[#09090b]">{rotulo}</span>
-          <button onClick={() => setFecha(FECHA_ANCLA)} className="flex items-center gap-1 text-[13px] text-[#71717a]">
+          <span className="text-[13px] font-semibold whitespace-nowrap text-ink">{rotulo}</span>
+          <button onClick={() => setFecha(FECHA_ANCLA)} className="flex items-center gap-1 text-[13px] text-ink-muted">
             Today <ChevronDown className="size-3.5" />
           </button>
-          <button onClick={() => paso(1)} className="rounded-md border border-[#e4e4e7] bg-white p-1.5" aria-label="Next">
+          <button onClick={() => paso(1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Next">
             <ChevronRight className="size-4" />
           </button>
         </div>
@@ -174,7 +174,7 @@ export default function Scheduling() {
                 onClick={() => setView(v)}
                 className={cn(
                   'h-8 rounded-md px-4 text-xs font-medium transition-colors',
-                  view === v ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
+                  view === v ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
                 )}
               >
                 {v}
@@ -242,9 +242,9 @@ export default function Scheduling() {
 
       {/* Panel flotante de solicitudes + FAB */}
       {reqOpen && (
-        <div className="motion-safe:animate-[fab-panel-in_180ms_cubic-bezier(0.16,1,0.3,1)] fixed right-[100px] bottom-8 z-30 flex max-h-[70svh] w-[260px] origin-bottom-right flex-col rounded-lg border border-[#e4e4e7] bg-white p-4 shadow-[0_4px_14px_0_rgb(100_100_100/0.25)]">
-          <p className="text-[13px] font-bold text-[#09090b]">Appointment requests</p>
-          <div className="mt-3 flex shrink-0 rounded-md bg-[#f1f5f9] p-1">
+        <div className="motion-safe:animate-[fab-panel-in_180ms_cubic-bezier(0.16,1,0.3,1)] fixed right-[100px] bottom-8 z-30 flex max-h-[70svh] w-[260px] origin-bottom-right flex-col rounded-lg border border-line bg-white p-4 shadow-[0_4px_14px_0_rgb(100_100_100/0.25)]">
+          <p className="text-[13px] font-bold text-ink">Appointment requests</p>
+          <div className="mt-3 flex shrink-0 rounded-md bg-surface-slate p-1">
             {(['ASAP', 'Waiting List'] as const).map((t) => {
               const n = solicitudes.filter((s) => s.tipo === t).length
               return (
@@ -253,7 +253,7 @@ export default function Scheduling() {
                   onClick={() => setReqTab(t)}
                   className={cn(
                     'flex-1 rounded px-2 py-1 text-xs font-medium',
-                    reqTab === t ? 'bg-dash-blue text-white' : 'text-[#64748b]',
+                    reqTab === t ? 'bg-dash-blue text-white' : 'text-ink-slate',
                   )}
                 >
                   {t}{n > 0 && ` (${n})`}
@@ -356,7 +356,7 @@ function SolicitudCard({
       <div className="flex items-start justify-between gap-2">
         <span className="flex min-w-0 items-center gap-1.5">
           <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: acento }} />
-          <span className="truncate text-xs font-bold text-[#09090b]">{s.patient}</span>
+          <span className="truncate text-xs font-bold text-ink">{s.patient}</span>
         </span>
         {/* Misma pill que el resto del sistema: 11px y con aire vertical. El
             frame la dibujaba a 10px y sin padding, y quedaba aplastada al lado
@@ -368,18 +368,18 @@ function SolicitudCard({
           {urgente ? 'ASAP' : s.espera}
         </span>
       </div>
-      <p className="mt-1 text-[11px] text-[#71717a]">{s.reason}</p>
-      <p className="mt-1 flex items-center gap-1.5 text-[11px] text-[#71717a]">
+      <p className="mt-1 text-[11px] text-ink-muted">{s.reason}</p>
+      <p className="mt-1 flex items-center gap-1.5 text-[11px] text-ink-muted">
         <Clock className="size-3 shrink-0" /> {fechaLegible(s.date)} · {s.start} - {s.end}
       </p>
-      <p className="mt-0.5 flex items-center gap-1.5 truncate text-[11px] text-[#71717a]">
+      <p className="mt-0.5 flex items-center gap-1.5 truncate text-[11px] text-ink-muted">
         <MapPin className="size-3 shrink-0" /> {s.location}
       </p>
       {/* Cancel y la acción principal, uno al lado del otro. */}
       <div className="mt-2 flex items-center justify-end gap-2">
         <button
           onClick={onCancel}
-          className="rounded-md border border-[#e4e4e7] px-2.5 py-1 text-[11px] font-medium hover:bg-[#fafafa]"
+          className="rounded-md border border-line px-2.5 py-1 text-[11px] font-medium hover:bg-surface-subtle"
         >
           Cancel
         </button>

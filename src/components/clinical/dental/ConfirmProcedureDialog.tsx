@@ -32,18 +32,18 @@ export function ConfirmProcedureDialog({
     <Dialog open onOpenChange={(v) => !v && onCancel()}>
       <DialogContent showCloseButton={false} className={`gap-3 p-5 ${hasList ? 'sm:max-w-[400px]' : 'sm:max-w-[360px]'}`}>
         <div className="flex items-start justify-between gap-4">
-          <h2 className="text-base leading-none font-bold text-[#09090b]">{copy.title}</h2>
-          <button type="button" aria-label="Close" onClick={onCancel} className="flex size-7 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]">
+          <h2 className="text-base leading-none font-bold text-ink">{copy.title}</h2>
+          <button type="button" aria-label="Close" onClick={onCancel} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted">
             <X className="size-4" />
           </button>
         </div>
 
         {hasList ? (
-          <p className="text-xs leading-relaxed text-[#71717a]">
+          <p className="text-xs leading-relaxed text-ink-muted">
             You are about to {copy.verb}.<br />Select any linked conditions you want to mark as Treated.
           </p>
         ) : (
-          <p className="text-xs leading-relaxed text-[#71717a]">{copy.question}</p>
+          <p className="text-xs leading-relaxed text-ink-muted">{copy.question}</p>
         )}
 
         {hasList && (
@@ -54,12 +54,12 @@ export function ConfirmProcedureDialog({
                 <button
                   key={c.id} type="button" aria-pressed={on}
                   onClick={() => setTreated((t) => (on ? t.filter((x) => x !== c.id) : [...t, c.id]))}
-                  className={`rounded-md text-left transition-shadow outline-none ${on ? 'ring-dash-blue ring-2' : 'ring-1 ring-transparent hover:ring-[#e4e4e7]'}`}
+                  className={`rounded-md text-left transition-shadow outline-none ${on ? 'ring-dash-blue ring-2' : 'ring-1 ring-transparent hover:ring-line'}`}
                 >
                   <FindingCard
                     finding={c}
                     action={
-                      <span aria-hidden className={`flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors ${on ? 'bg-dash-blue border-dash-blue text-white' : 'border-[#d4d4d8] bg-white'}`}>
+                      <span aria-hidden className={`flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors ${on ? 'bg-dash-blue border-dash-blue text-white' : 'border-line-strong bg-white'}`}>
                         {on && <Check className="size-2.5" strokeWidth={3} />}
                       </span>
                     }
@@ -71,12 +71,12 @@ export function ConfirmProcedureDialog({
         )}
 
         <div className="flex items-center justify-end gap-2">
-          <button type="button" onClick={onCancel} className="flex items-center gap-1.5 rounded-md border border-[#e4e4e7] px-3 py-1.5 text-[13px] font-medium hover:bg-[#fafafa]">
+          <button type="button" onClick={onCancel} className="flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-[13px] font-medium hover:bg-surface-subtle">
             <X className="size-3" /> Cancel
           </button>
           <button
             type="button" onClick={() => onConfirm(treated)}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-semibold text-white ${copy.destructive ? 'bg-[#dc2626] hover:bg-[#b91c1c]' : 'bg-dash-blue hover:bg-dash-blue-hover'}`}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-semibold text-white ${copy.destructive ? 'bg-field-error hover:bg-[#b91c1c]' : 'bg-dash-blue hover:bg-dash-blue-hover'}`}
           >
             <Check className="size-3" /> Confirm
           </button>

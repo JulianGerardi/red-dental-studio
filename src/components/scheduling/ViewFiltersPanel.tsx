@@ -48,13 +48,13 @@ function Group({
             onClick={() => onChange(r.id)}
             className={cn(
               'flex items-center gap-3 rounded-md px-3 py-2 text-left transition-colors',
-              on ? 'bg-[#eef2ff]' : 'hover:bg-[#fafafa]',
+              on ? 'bg-[#eef2ff]' : 'hover:bg-surface-subtle',
             )}
           >
             <span
               className={cn(
                 'flex size-4 shrink-0 items-center justify-center rounded-full border-2',
-                on ? 'border-dash-blue' : 'border-[#a1a1aa]',
+                on ? 'border-dash-blue' : 'border-ink-faint',
               )}
             >
               {on && <span className="bg-dash-blue size-2 rounded-full" />}
@@ -66,8 +66,8 @@ function Group({
             )}
             {r.kind === 'room' && <span className="bg-dash-blue size-7 shrink-0 rounded-full" />}
             <span className="min-w-0">
-              <span className="block truncate text-[13px] font-semibold text-[#09090b]">{r.label}</span>
-              {r.sub && <span className="block truncate text-[11px] text-[#a1a1aa]">{r.sub}</span>}
+              <span className="block truncate text-[13px] font-semibold text-ink">{r.label}</span>
+              {r.sub && <span className="block truncate text-[11px] text-ink-faint">{r.sub}</span>}
             </span>
           </button>
         )
@@ -107,17 +107,17 @@ export function ViewFiltersPanel({ onClose }: { onClose: () => void }) {
         /* En angosto los 360 fijos se salían de pantalla: ahí el panel se
            ancla a los bordes del viewport en vez de al botón. */
         className={cn(
-          'motion-safe:animate-[loc-in_150ms_ease-out] z-50 overflow-y-auto rounded-xl border border-[#e4e4e7] bg-white p-5 shadow-[0_8px_28px_rgb(0_0_0/0.18)] sm:p-6',
+          'motion-safe:animate-[loc-in_150ms_ease-out] z-50 overflow-y-auto rounded-xl border border-line bg-white p-5 shadow-[0_8px_28px_rgb(0_0_0/0.18)] sm:p-6',
           'fixed inset-x-3 top-[76px] max-h-[calc(100svh-96px)]',
           'sm:absolute sm:inset-x-auto sm:top-[calc(100%+6px)] sm:right-0 sm:max-h-[70vh] sm:w-[360px]',
         )}
       >
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h2 className="text-[22px] leading-none font-bold text-[#09090b]">View</h2>
-            <p className="mt-1 text-[11px] text-[#a1a1aa]">Customize the schedule you want to see</p>
+            <h2 className="text-[22px] leading-none font-bold text-ink">View</h2>
+            <p className="mt-1 text-[11px] text-ink-faint">Customize the schedule you want to see</p>
           </div>
-          <button onClick={onClose} aria-label="Close" className="text-[#09090b] hover:opacity-60">
+          <button onClick={onClose} aria-label="Close" className="text-ink hover:opacity-60">
             <X className="size-5" />
           </button>
         </div>
@@ -131,7 +131,7 @@ export function ViewFiltersPanel({ onClose }: { onClose: () => void }) {
         <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="h-9 rounded-md border border-[#e4e4e7] bg-white px-6 text-[13px] font-medium hover:bg-[#fafafa]"
+            className="h-9 rounded-md border border-line bg-white px-6 text-[13px] font-medium hover:bg-surface-subtle"
           >
             Cancel
           </button>

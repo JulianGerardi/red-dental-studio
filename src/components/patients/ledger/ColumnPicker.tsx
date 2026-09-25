@@ -18,7 +18,7 @@ export function ColumnPicker<T extends string>({
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md border border-[#e4e4e7] px-2.5 py-1.5 text-[12px] font-medium text-[#71717a] hover:bg-[#f4f4f5]">
+      <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md border border-line px-2.5 py-1.5 text-[12px] font-medium text-ink-muted hover:bg-surface-muted">
         <Columns3 className="size-3.5" /> Columns
         {ocultas.length > 0 && (
           <span className="text-dash-blue rounded-full bg-[#eef5ff] px-1.5 text-[10px] font-bold">
@@ -27,7 +27,7 @@ export function ColumnPicker<T extends string>({
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
-        <DropdownMenuLabel className="text-[11px] tracking-wide text-[#71717a] uppercase">
+        <DropdownMenuLabel className="text-[11px] tracking-wide text-ink-muted uppercase">
           Show columns
         </DropdownMenuLabel>
         {columnas.map((c) => (
@@ -47,7 +47,7 @@ export function ColumnPicker<T extends string>({
             <button
               type="button"
               onClick={onReset}
-              className="text-dash-blue w-full rounded-md px-1.5 py-1 text-left text-sm font-semibold hover:bg-[#f4f4f5]"
+              className="text-dash-blue w-full rounded-md px-1.5 py-1 text-left text-sm font-semibold hover:bg-surface-muted"
             >
               Show all columns
             </button>

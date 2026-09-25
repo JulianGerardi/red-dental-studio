@@ -24,15 +24,15 @@ export function ReviewList({ reviews }: { reviews: ExamReview[] }) {
     <>
       <div className="flex w-full flex-col gap-3">
         {reviews.map((r) => (
-          <div key={r.id} className="flex w-full flex-col gap-2.5 rounded-xl border border-[#e4e4e7] bg-white p-3">
+          <div key={r.id} className="flex w-full flex-col gap-2.5 rounded-xl border border-line bg-white p-3">
             <div className="flex w-full items-start justify-between gap-2">
-              <span className="flex flex-col rounded-lg bg-[#fafafa] px-2.5 py-1.5">
-                <span className="text-[11px] text-[#71717a]">Last Reviewed</span>
-                <span className="text-sm font-bold text-[#09090b]">{r.date}</span>
+              <span className="flex flex-col rounded-lg bg-surface-subtle px-2.5 py-1.5">
+                <span className="text-[11px] text-ink-muted">Last Reviewed</span>
+                <span className="text-sm font-bold text-ink">{r.date}</span>
               </span>
               <button
                 type="button" aria-label={`Read the review from ${r.date}`} onClick={() => setLeyendo(r)}
-                className="flex size-8 items-center justify-center rounded-md border border-[#e4e4e7] text-[#71717a] hover:bg-[#fafafa]"
+                className="flex size-8 items-center justify-center rounded-md border border-line text-ink-muted hover:bg-surface-subtle"
               >
                 <NotebookText className="size-3.5" />
               </button>
@@ -42,8 +42,8 @@ export function ReviewList({ reviews }: { reviews: ExamReview[] }) {
                 <AvatarFallback className="bg-dash-count-bg text-dash-blue text-[11px] font-bold">{iniciales(r.provider)}</AvatarFallback>
               </Avatar>
               <span className="min-w-0">
-                <span className="block truncate text-sm font-bold text-[#09090b]">{r.provider}</span>
-                <span className="block text-xs text-[#a1a1aa]">Provider</span>
+                <span className="block truncate text-sm font-bold text-ink">{r.provider}</span>
+                <span className="block text-xs text-ink-faint">Provider</span>
               </span>
             </div>
           </div>
@@ -54,14 +54,14 @@ export function ReviewList({ reviews }: { reviews: ExamReview[] }) {
         <DialogContent showCloseButton={false} className="gap-3 p-5 sm:max-w-[420px]">
           <div className="flex items-start justify-between gap-4">
             <span className="flex flex-col">
-              <span className="text-base leading-none font-bold text-[#09090b]">Exam review</span>
-              <span className="mt-1 text-xs text-[#a1a1aa]">{leyendo?.provider} · {leyendo?.date}</span>
+              <span className="text-base leading-none font-bold text-ink">Exam review</span>
+              <span className="mt-1 text-xs text-ink-faint">{leyendo?.provider} · {leyendo?.date}</span>
             </span>
-            <button type="button" aria-label="Close" onClick={() => setLeyendo(null)} className="flex size-7 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]">
+            <button type="button" aria-label="Close" onClick={() => setLeyendo(null)} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted">
               <X className="size-4" />
             </button>
           </div>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap text-[#09090b]">{leyendo?.note}</p>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap text-ink">{leyendo?.note}</p>
         </DialogContent>
       </Dialog>
     </>

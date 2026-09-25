@@ -16,7 +16,7 @@ export const Default: Story = {
         <HoverCardTrigger asChild><a className="text-dash-blue cursor-pointer text-sm font-medium">Sarah Stone</a></HoverCardTrigger>
         <HoverCardContent>
           <p className="text-sm font-bold">Sarah Stone</p>
-          <p className="text-xs text-[#71717a]">DOB 04/02/1991 · Patient ID 12345432</p>
+          <p className="text-xs text-ink-muted">DOB 04/02/1991 · Patient ID 12345432</p>
         </HoverCardContent>
       </HoverCard>
     </div>

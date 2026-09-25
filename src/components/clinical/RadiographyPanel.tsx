@@ -17,7 +17,7 @@ import { BOTON_ICONO_REDONDO } from '@/lib/estilos'
 
 function Card({ r, onAbrir }: { r: Radiografia; onAbrir: () => void }) {
   return (
-    <div className="group rounded-xl border border-[#e4e4e7] bg-white p-2">
+    <div className="group rounded-xl border border-line bg-white p-2">
       <button
         onClick={onAbrir}
         aria-label={`Open ${r.tipo} from ${r.fecha}`}
@@ -35,8 +35,8 @@ function Card({ r, onAbrir }: { r: Radiografia; onAbrir: () => void }) {
         <span className="bg-dash-count-bg text-dash-blue-hover flex size-6 shrink-0 items-center justify-center rounded-full text-[9px] font-semibold">
           DT
         </span>
-        <span className="min-w-0 flex-1 truncate text-[12px] text-[#52525b]">{r.profesional}</span>
-        <span className="shrink-0 text-[11px] text-[#a1a1aa]">{r.tipo}</span>
+        <span className="min-w-0 flex-1 truncate text-[12px] text-ink-medium">{r.profesional}</span>
+        <span className="shrink-0 text-[11px] text-ink-faint">{r.tipo}</span>
       </div>
     </div>
   )
@@ -75,18 +75,18 @@ export function RadiographyPanel() {
     <div className="relative xl:pr-14">
       <div className="mb-4 flex justify-end">
         <div className="relative w-full sm:w-[260px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search..."
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
           />
         </div>
       </div>
 
       {filas.length === 0 ? (
-        <div className="rounded-xl border border-[#e4e4e7] bg-white">
+        <div className="rounded-xl border border-line bg-white">
           <EmptyState
             icon={Search}
             title="No images found"

@@ -116,17 +116,17 @@ export function ToothInfoPanel({ nodo, perioNodo }: { nodo: HTMLElement | null; 
   return (
     <div className="flex flex-col gap-4">
       {resumen?.titular && (
-        <p className="text-[13px] font-semibold text-[#09090b]">{resumen.titular}</p>
+        <p className="text-[13px] font-semibold text-ink">{resumen.titular}</p>
       )}
 
       {perio && perio.length > 0 && (
-        <div className="rounded-lg border border-[#e7e7e7] bg-[#f9f9f9] p-3">
-          <p className="mb-2 text-[11px] font-semibold text-[#71717a]">Periodontal summary</p>
+        <div className="rounded-lg border border-line-row bg-surface-alt p-3">
+          <p className="mb-2 text-[11px] font-semibold text-ink-muted">Periodontal summary</p>
           <dl className="grid grid-cols-2 gap-x-6 gap-y-2">
             {perio.map((l) => (
               <div key={l.rotulo} className="flex items-center justify-between gap-2">
-                <dt className="text-[12px] text-[#3f3f46]">{l.rotulo}</dt>
-                <dd className={cn('text-[12px] tabular-nums', l.vacio ? 'text-[#a1a1aa]' : 'font-semibold text-[#09090b]')}>
+                <dt className="text-[12px] text-ink-soft">{l.rotulo}</dt>
+                <dd className={cn('text-[12px] tabular-nums', l.vacio ? 'text-ink-faint' : 'font-semibold text-ink')}>
                   {l.valor}
                 </dd>
               </div>
@@ -136,14 +136,14 @@ export function ToothInfoPanel({ nodo, perioNodo }: { nodo: HTMLElement | null; 
       )}
 
       {resumen && resumen.arcadas.length > 0 && (
-        <div className="overflow-hidden rounded-lg border border-[#e7e7e7]">
-          <div className="bg-[#f9f9f9] px-3 py-2 text-[11px] font-semibold text-[#71717a]">
+        <div className="overflow-hidden rounded-lg border border-line-row">
+          <div className="bg-surface-alt px-3 py-2 text-[11px] font-semibold text-ink-muted">
             {resumen.columna}
           </div>
           {resumen.arcadas.map((a) => (
-            <div key={a.arcada} className="flex items-start gap-3 border-t border-[#e7e7e7] px-3 py-2">
-              <span className="w-[84px] shrink-0 text-[12px] font-medium text-[#09090b]">{a.arcada}</span>
-              <span className="min-w-0 flex-1 text-[12px] leading-relaxed text-[#3f3f46] tabular-nums">{a.piezas}</span>
+            <div key={a.arcada} className="flex items-start gap-3 border-t border-line-row px-3 py-2">
+              <span className="w-[84px] shrink-0 text-[12px] font-medium text-ink">{a.arcada}</span>
+              <span className="min-w-0 flex-1 text-[12px] leading-relaxed text-ink-soft tabular-nums">{a.piezas}</span>
             </div>
           ))}
         </div>
@@ -153,8 +153,8 @@ export function ToothInfoPanel({ nodo, perioNodo }: { nodo: HTMLElement | null; 
         <dl className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-x-6 gap-y-3">
           {resumen.lineas.map((l) => (
             <div key={l.rotulo} className="min-w-0">
-              <dt className="text-[11px] font-medium text-[#71717a]">{l.rotulo}</dt>
-              <dd className={cn('text-[12px] leading-snug', l.vacio ? 'text-[#a1a1aa]' : 'font-medium text-[#09090b]')}>
+              <dt className="text-[11px] font-medium text-ink-muted">{l.rotulo}</dt>
+              <dd className={cn('text-[12px] leading-snug', l.vacio ? 'text-ink-faint' : 'font-medium text-ink')}>
                 {l.valor || '—'}
               </dd>
             </div>

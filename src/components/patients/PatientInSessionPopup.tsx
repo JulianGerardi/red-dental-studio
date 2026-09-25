@@ -119,7 +119,7 @@ export function PatientInSessionPopup() {
           queda en 0 la caja se queda quieta, sin apagarse del todo. */}
       <div
         className={cn(
-          'flex items-start overflow-hidden rounded-l-xl border border-r-0 border-[#e4e4e7] bg-white shadow-[0_8px_24px_rgb(0_0_0/0.16)] transition-[width] duration-300 ease-out',
+          'flex items-start overflow-hidden rounded-l-xl border border-r-0 border-line bg-white shadow-[0_8px_24px_rgb(0_0_0/0.16)] transition-[width] duration-300 ease-out',
           abierto ? 'w-[336px]' : 'w-[54px]',
           hayEnCurso && 'motion-safe:animate-[session-live_2.6s_ease-in-out_infinite]',
         )}
@@ -141,10 +141,10 @@ export function PatientInSessionPopup() {
                   : `Currently being seen: ${primero.name}`
                 : 'Currently being seen: no patients'
           }
-          className="flex shrink-0 items-center py-3 pr-2.5 pl-3 hover:bg-[#fafafa]"
+          className="flex shrink-0 items-center py-3 pr-2.5 pl-3 hover:bg-surface-subtle"
         >
           {abierto ? (
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full text-[#71717a]">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-muted">
               <ChevronRight className="size-4" />
             </span>
           ) : hayEnCurso ? (
@@ -152,7 +152,7 @@ export function PatientInSessionPopup() {
               {primero.initials}
             </span>
           ) : (
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f4f4f5] text-[#a1a1aa]">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-muted text-ink-faint">
               <UserRound className="size-4" />
             </span>
           )}
@@ -179,11 +179,11 @@ export function PatientInSessionPopup() {
             <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-[#1e9850] uppercase">
               <Radio className="size-3" /> Currently being seen
             </div>
-            {hayEnCurso && <span className="text-[10px] font-semibold text-[#a1a1aa]">{visibles.length}</span>}
+            {hayEnCurso && <span className="text-[10px] font-semibold text-ink-faint">{visibles.length}</span>}
           </div>
 
           {hayEnCurso ? (
-            <div className="flex flex-col divide-y divide-[#f1f1f4] overflow-y-auto">
+            <div className="flex flex-col divide-y divide-line-soft overflow-y-auto">
               {visibles.map((p) => {
                 const i = enCurso.indexOf(p)
                 return (
@@ -192,21 +192,21 @@ export function PatientInSessionPopup() {
                       {p.initials}
                     </span>
                     <Link to={`/patients/${slug(p.name)}`} className="min-w-0 flex-1">
-                      <p className="truncate text-[12.5px] font-bold text-[#09090b] group-hover:underline">{p.name}</p>
+                      <p className="truncate text-[12.5px] font-bold text-ink group-hover:underline">{p.name}</p>
                       <div className="mt-1 flex min-w-0 items-center gap-1.5">
                         <span className="bg-dash-count-bg text-dash-blue-hover shrink-0 rounded-full px-1.5 py-[1px] text-[10px] font-semibold whitespace-nowrap">
                           {p.operatory}
                         </span>
-                        <span className="truncate text-[10.5px] text-[#71717a]">{p.provider}</span>
+                        <span className="truncate text-[10.5px] text-ink-muted">{p.provider}</span>
                       </div>
                     </Link>
                     <div className="flex shrink-0 flex-col items-end gap-1">
-                      <span className="text-[10px] whitespace-nowrap text-[#a1a1aa]">{p.time}</span>
+                      <span className="text-[10px] whitespace-nowrap text-ink-faint">{p.time}</span>
                       <button
                         type="button"
                         aria-label={`Check out ${p.name}`}
                         onClick={() => setOcultos((prev) => new Set(prev).add(i))}
-                        className="flex size-6 items-center justify-center rounded-md text-[#a1a1aa] hover:bg-[#eef1f5] hover:text-[#09090b]"
+                        className="flex size-6 items-center justify-center rounded-md text-ink-faint hover:bg-[#eef1f5] hover:text-ink"
                       >
                         <LogOut className="size-3.5" />
                       </button>
@@ -216,7 +216,7 @@ export function PatientInSessionPopup() {
               })}
             </div>
           ) : (
-            <p className="px-1 py-3 text-[11.5px] text-[#a1a1aa]">No patients currently being seen.</p>
+            <p className="px-1 py-3 text-[11.5px] text-ink-faint">No patients currently being seen.</p>
           )}
         </div>
       </div>

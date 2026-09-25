@@ -33,12 +33,12 @@ export function FindingActionsMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button type="button" aria-label={`Actions for ${finding.area}`} className="flex size-7 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]">
+        <button type="button" aria-label={`Actions for ${finding.area}`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted">
           <MoreVertical className="size-3.5" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[248px]">
-        <p className="px-2 py-1.5 text-sm font-bold text-[#09090b]">Actions</p>
+        <p className="px-2 py-1.5 text-sm font-bold text-ink">Actions</p>
         <DropdownMenuItem onSelect={onEdit}>
           <Pencil className="size-4" /> Edit
         </DropdownMenuItem>
@@ -49,7 +49,7 @@ export function FindingActionsMenu({
           return (
             <DropdownMenuItem
               key={action} disabled={disabled}
-              className={copy.destructive ? 'text-[#dc2626] focus:bg-[#fef2f2] focus:text-[#dc2626]' : undefined}
+              className={copy.destructive ? 'text-field-error focus:bg-[#fef2f2] focus:text-field-error' : undefined}
               onSelect={() => onAction(action)}
             >
               <Icon className="size-4" /> {copy.label}
@@ -57,7 +57,7 @@ export function FindingActionsMenu({
           )
         })}
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-[#dc2626] focus:bg-[#fef2f2] focus:text-[#dc2626]" onSelect={() => onAction('delete')}>
+        <DropdownMenuItem className="text-field-error focus:bg-[#fef2f2] focus:text-field-error" onSelect={() => onAction('delete')}>
           <Trash2 className="size-4" /> Delete
         </DropdownMenuItem>
       </DropdownMenuContent>

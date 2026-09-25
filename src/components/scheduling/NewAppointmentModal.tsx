@@ -190,7 +190,7 @@ export function NewAppointmentModal({
         ) : undefined
       }
     >
-      <p className="-mt-2 mb-4 text-[10px] font-semibold tracking-wide text-[#71717a] uppercase">
+      <p className="-mt-2 mb-4 text-[10px] font-semibold tracking-wide text-ink-muted uppercase">
         Step {paso} of 2 — {paso === 1 ? 'Patient & Scheduling' : 'Treatment Plan'}
       </p>
 
@@ -202,7 +202,7 @@ export function NewAppointmentModal({
         <div className="flex flex-col gap-6">
           <div className="grid gap-6 lg:grid-cols-2">
             <SectionCard title="Patient">
-              <p className="-mt-2 text-[11px] text-[#71717a]">
+              <p className="-mt-2 text-[11px] text-ink-muted">
                 Complete the details below to schedule the appointment.
               </p>
               <SearchField

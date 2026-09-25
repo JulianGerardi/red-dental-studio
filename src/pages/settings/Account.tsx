@@ -83,10 +83,10 @@ export function SettingsAccount() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">Edit Account</h1>
-      <p className="mt-1 text-sm text-[#71717a]">Manage your dental clinic general settings, upload custom graphics, and specify billing parameters.</p>
+      <h1 className="text-2xl font-bold text-ink">Edit Account</h1>
+      <p className="mt-1 text-sm text-ink-muted">Manage your dental clinic general settings, upload custom graphics, and specify billing parameters.</p>
 
-      <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-[#f1f5f9] p-1">
+      <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-surface-slate p-1">
         {TABS.map((t) => (
           <button
             key={t}
@@ -94,7 +94,7 @@ export function SettingsAccount() {
             onClick={() => setTab(t)}
             className={cn(
               'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-              tab === t ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
+              tab === t ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
             )}
           >
             {t}
@@ -149,55 +149,55 @@ export function SettingsAccount() {
         {tab === 'Subscription' && (
           <>
             <div>
-              <h2 className="text-base font-bold text-[#09090b]">Subscription Summary</h2>
+              <h2 className="text-base font-bold text-ink">Subscription Summary</h2>
               <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-lg border border-[#e4e4e7] bg-white p-4">
-                  <span className="flex items-center gap-1.5 text-[13px] text-[#71717a]">
+                <div className="rounded-lg border border-line bg-white p-4">
+                  <span className="flex items-center gap-1.5 text-[13px] text-ink-muted">
                     <CreditCard className="size-3.5" /> Current Plan
                   </span>
-                  <span className="mt-2 block text-[19px] font-bold text-[#09090b]">
+                  <span className="mt-2 block text-[19px] font-bold text-ink">
                     {cuenta ? (cuenta.plan === '—' ? '—' : cuenta.plan) : 'Prueba Red'}
                   </span>
-                  <span className="mt-1 block text-[12px] text-[#a1a1aa]">Plan currently assigned to the account</span>
+                  <span className="mt-1 block text-[12px] text-ink-faint">Plan currently assigned to the account</span>
                 </div>
-                <div className="rounded-lg border border-[#e4e4e7] bg-white p-4">
-                  <span className="text-[13px] text-[#71717a]">Licenses</span>
-                  <span className="mt-2 block text-[19px] font-bold text-[#09090b] tabular-nums">
+                <div className="rounded-lg border border-line bg-white p-4">
+                  <span className="text-[13px] text-ink-muted">Licenses</span>
+                  <span className="mt-2 block text-[19px] font-bold text-ink tabular-nums">
                     {cuenta ? (cuenta.licencias === '—' ? '—' : cuenta.licencias) : '3 Used / 170 Total'}
                   </span>
-                  <span className="mt-1 block text-[12px] text-[#a1a1aa]">167 available licenses based on active and suspended employees.</span>
+                  <span className="mt-1 block text-[12px] text-ink-faint">167 available licenses based on active and suspended employees.</span>
                 </div>
-                <div className="rounded-lg border border-[#e4e4e7] bg-white p-4">
-                  <span className="text-[13px] text-[#71717a]">Expired on</span>
-                  <span className="mt-2 block text-[19px] font-bold text-[#09090b] tabular-nums">
+                <div className="rounded-lg border border-line bg-white p-4">
+                  <span className="text-[13px] text-ink-muted">Expired on</span>
+                  <span className="mt-2 block text-[19px] font-bold text-ink tabular-nums">
                     {cuenta ? (cuenta.vence || '—') : '31/12/2026'}
                   </span>
-                  <span className="mt-1 block text-[12px] text-[#a1a1aa]">Subscription end date</span>
+                  <span className="mt-1 block text-[12px] text-ink-faint">Subscription end date</span>
                 </div>
-                <div className="rounded-lg border border-[#e4e4e7] bg-white p-4">
-                  <span className="text-[13px] text-[#71717a]">Status</span>
+                <div className="rounded-lg border border-line bg-white p-4">
+                  <span className="text-[13px] text-ink-muted">Status</span>
                   <span className="mt-2 block">
                     {cuenta ? (
                       cuenta.estado in ESTADO_TONO_CUENTA ? (
-                        <span className="text-[19px] font-bold text-[#09090b]">{cuenta.estado}</span>
-                      ) : <span className="text-[19px] font-bold text-[#a1a1aa]">—</span>
+                        <span className="text-[19px] font-bold text-ink">{cuenta.estado}</span>
+                      ) : <span className="text-[19px] font-bold text-ink-faint">—</span>
                     ) : (
-                      <span className="text-[19px] font-bold text-[#09090b]">Active</span>
+                      <span className="text-[19px] font-bold text-ink">Active</span>
                     )}
                   </span>
-                  <span className="mt-1 block text-[12px] text-[#a1a1aa]">Current subscription status</span>
+                  <span className="mt-1 block text-[12px] text-ink-faint">Current subscription status</span>
                 </div>
               </div>
             </div>
 
             <div>
-              <h2 className="text-base font-bold text-[#09090b]">Subscription History</h2>
-              <div className="mt-3 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+              <h2 className="text-base font-bold text-ink">Subscription History</h2>
+              <div className="mt-3 overflow-x-auto rounded-lg border border-line-row bg-white">
                 {cuenta ? (
                   <EmptyState icon={CreditCard} title="No billing history" detail="This account doesn't have a subscription history yet." className="border-0" />
                 ) : (
                   <div className="min-w-[620px]">
-                    <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-2.5 text-[11px] font-semibold text-[#71717a] uppercase">
+                    <div className="flex items-center gap-3 bg-surface-alt px-3 py-2.5 text-[11px] font-semibold text-ink-muted uppercase">
                       <span className="min-w-0 flex-1">Plan</span>
                       <span className="w-[90px] shrink-0">Status</span>
                       <span className="w-[100px] shrink-0">Expired on</span>
@@ -205,8 +205,8 @@ export function SettingsAccount() {
                       <span className="w-[100px] shrink-0">Created at</span>
                     </div>
                     {HISTORIAL_PROPIO.map((h, i) => (
-                      <div key={i} className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-2.5 text-[13px] text-[#3f3f46]">
-                        <span className="min-w-0 flex-1 truncate font-medium text-[#09090b]">{h.plan}</span>
+                      <div key={i} className="flex items-center gap-3 border-t border-line-row px-3 py-2.5 text-[13px] text-ink-soft">
+                        <span className="min-w-0 flex-1 truncate font-medium text-ink">{h.plan}</span>
                         <span className="w-[90px] shrink-0">
                           <Pill tone={ESTADO_TONO[h.estado]} size="sm">{h.estado}</Pill>
                         </span>
@@ -236,7 +236,7 @@ export function SettingsAccount() {
                       <span className="bg-dash-count-bg text-dash-blue-hover flex size-11 shrink-0 items-center justify-center rounded-lg text-sm font-semibold">
                         {iniciales(cuenta.duenos)}
                       </span>
-                      <span className="inline-flex items-center gap-1 rounded-full border border-[#6633a6] bg-[#f5f0ff] px-2 py-[2px] text-[11px] font-semibold text-[#6633a6]">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-purple-fg bg-[#f5f0ff] px-2 py-[2px] text-[11px] font-semibold text-purple-fg">
                         <Crown className="size-3" /> Practice Owner
                       </span>
                     </div>
@@ -251,12 +251,12 @@ export function SettingsAccount() {
                 </Card>
 
                 <Card title="Contact Information">
-                  <label className="mb-4 flex items-center gap-2 text-[13px] text-[#3f3f46]">
+                  <label className="mb-4 flex items-center gap-2 text-[13px] text-ink-soft">
                     <input
                       type="checkbox"
                       checked={copiarContacto}
                       onChange={(e) => setCopiarContacto(e.target.checked)}
-                      className="accent-dash-blue size-4 rounded border-[#e4e4e7]"
+                      className="accent-dash-blue size-4 rounded border-line"
                     />
                     Copy contact information from account
                   </label>
@@ -280,12 +280,12 @@ export function SettingsAccount() {
                 </Card>
 
                 <Card title="Address Information">
-                  <label className="mb-4 flex items-center gap-2 text-[13px] text-[#3f3f46]">
+                  <label className="mb-4 flex items-center gap-2 text-[13px] text-ink-soft">
                     <input
                       type="checkbox"
                       checked={copiarDomicilio}
                       onChange={(e) => setCopiarDomicilio(e.target.checked)}
-                      className="accent-dash-blue size-4 rounded border-[#e4e4e7]"
+                      className="accent-dash-blue size-4 rounded border-line"
                     />
                     Copy address information from account
                   </label>
@@ -324,7 +324,7 @@ export function SettingsAccount() {
                 </Card>
 
                 {cuenta && (
-                  <p className="flex items-center gap-1.5 text-[12px] text-[#71717a]">
+                  <p className="flex items-center gap-1.5 text-[12px] text-ink-muted">
                     <Building2 className="size-3.5" /> {cuenta.nombre}
                   </p>
                 )}

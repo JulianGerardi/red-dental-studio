@@ -39,16 +39,16 @@ export function EditProcedureModal({
       footer={<FormFooter onCancel={onClose} onSave={() => { onSave({ provider, surfaces, notes }); onClose() }} />}
     >
       <div className="flex flex-col gap-5">
-        <div className="rounded-md border border-[#e4e4e7] bg-[#fafafa] px-3 py-2.5">
-          <p className="text-xs font-extrabold text-[#09090b]">{finding.area}</p>
-          <p className="text-xs text-[#71717a]">{finding.condition}</p>
+        <div className="rounded-md border border-line bg-surface-subtle px-3 py-2.5">
+          <p className="text-xs font-extrabold text-ink">{finding.area}</p>
+          <p className="text-xs text-ink-muted">{finding.condition}</p>
         </div>
 
         <SelectField label="Provider" required options={PROVIDERS} value={provider} onChange={setProvider} />
 
         {finding.tooth !== null && (
           <div className="flex w-full flex-col items-center gap-2">
-            <span className="w-full text-xs font-semibold text-[#71717a]">Surface</span>
+            <span className="w-full text-xs font-semibold text-ink-muted">Surface</span>
             <SurfaceWheel value={surfaces} onChange={setSurfaces} size={180} />
           </div>
         )}

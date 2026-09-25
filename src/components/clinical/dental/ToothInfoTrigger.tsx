@@ -82,12 +82,12 @@ export function ToothInfoTrigger({
             className={cn(
               BOTON_ICONO_REDONDO,
               'relative ml-2',
-              abierto && 'border-[#1d56bc] bg-[#f0f5ff] text-[#1d56bc] hover:bg-[#f0f5ff]',
+              abierto && 'border-dash-blue bg-info-bg text-dash-blue hover:bg-info-bg',
             )}
           >
             <Info className="size-4" />
             {hayNotificacion && (
-              <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-[#dc2626] ring-2 ring-white" />
+              <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-field-error ring-2 ring-white" />
             )}
           </button>
         </HoverCardTrigger>

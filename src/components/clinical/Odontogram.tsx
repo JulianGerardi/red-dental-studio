@@ -50,7 +50,7 @@ function ToothCell({
         selected
           ? 'bg-primary text-primary-foreground font-medium'
           : problema
-            ? 'font-bold text-[#dc2626]'
+            ? 'font-bold text-field-error'
             : finding
               ? 'text-dash-blue font-bold'
               : 'text-muted-foreground hover:bg-muted font-medium',

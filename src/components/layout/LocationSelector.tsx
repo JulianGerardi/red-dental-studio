@@ -51,7 +51,7 @@ function Fila({
     <div
       className={cn(
         'flex items-start gap-2.5 rounded-[10px] border border-l-[3px] p-2.5 transition-colors',
-        actual ? 'border-dash-blue bg-[#f8faff]' : 'border-transparent hover:bg-[#fafafa]',
+        actual ? 'border-dash-blue bg-[#f8faff]' : 'border-transparent hover:bg-surface-subtle',
       )}
     >
       <button type="button" onClick={onElegir} className="flex min-w-0 flex-1 items-start gap-2.5 text-left">
@@ -60,16 +60,16 @@ function Fila({
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-1.5">
-            <span className="truncate text-[13px] leading-none font-semibold text-[#09090b]">
+            <span className="truncate text-[13px] leading-none font-semibold text-ink">
               {loc.name}
             </span>
-            <span className="truncate text-[13px] leading-none text-[#71717a]">· {loc.ciudad}</span>
+            <span className="truncate text-[13px] leading-none text-ink-muted">· {loc.ciudad}</span>
             {actual && <Check className="text-dash-blue size-3.5 shrink-0" />}
           </span>
           {/* Los roles y la zona horaria en un solo renglón de texto: tres
               pastillas por fila multiplicadas por 40 locaciones eran una
               alfombra de color que competía con el nombre. */}
-          <span className="mt-1 block truncate text-[11px] leading-relaxed text-[#a1a1aa]">
+          <span className="mt-1 block truncate text-[11px] leading-relaxed text-ink-faint">
             {loc.timezone} · {loc.roles.join(' · ')}
           </span>
         </span>
@@ -82,7 +82,7 @@ function Fila({
         aria-pressed={favorita}
         className="shrink-0 rounded p-1 transition-colors hover:bg-black/5"
       >
-        <Star className={cn('size-4', favorita ? 'fill-amber-400 text-amber-400' : 'text-[#a1a1aa]')} />
+        <Star className={cn('size-4', favorita ? 'fill-amber-400 text-amber-400' : 'text-ink-faint')} />
       </button>
     </div>
   )
@@ -146,8 +146,8 @@ export function LocationSelector() {
         aria-haspopup="dialog"
         className={cn(
           'flex h-8 items-center gap-3 rounded-md border bg-white py-1 pr-[11px] pl-[7px] transition-colors',
-          /* Abierto, el selector toma borde azul (Figma: border-[#1d56bc]). */
-          open ? 'border-dash-blue' : 'border-[#e4e4e7]',
+          /* Abierto, el selector toma borde azul (Figma: border-dash-blue). */
+          open ? 'border-dash-blue' : 'border-line',
         )}
       >
         <MapPin className="text-dash-blue size-4 shrink-0" />
@@ -168,39 +168,39 @@ export function LocationSelector() {
           role="dialog"
           aria-label="Select location"
           className={cn(
-            'absolute top-[calc(100%+5px)] left-0 z-50 w-[320px] max-w-[calc(100vw-24px)] rounded-xl border border-[#e4e4e7] bg-white p-4',
+            'absolute top-[calc(100%+5px)] left-0 z-50 w-[320px] max-w-[calc(100vw-24px)] rounded-xl border border-line bg-white p-4',
             'flex flex-col gap-3 shadow-[0_8px_28px_rgb(0_0_0/0.18)]',
             'motion-safe:animate-[loc-in_140ms_ease-out]',
           )}
         >
           <div className="flex items-center justify-between gap-2">
-            <p className="text-base leading-[1.3] font-semibold text-[#09090b]">Select location</p>
+            <p className="text-base leading-[1.3] font-semibold text-ink">Select location</p>
             {/* Contador en texto plano: es un dato de contexto, no un estado
                 que merezca una pastilla de color. Y sigue a la lista — el
                 frame decía 40 con dos. */}
-            <span className="shrink-0 text-[11px] text-[#a1a1aa]">
+            <span className="shrink-0 text-[11px] text-ink-faint">
               {total} {total === 1 ? 'location' : 'locations'}
             </span>
           </div>
 
           <div className="relative">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search..."
-              className="focus:border-dash-blue h-8 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+              className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
             />
           </div>
 
           <div className="flex max-h-[416px] flex-col gap-1 overflow-y-auto">
             {total === 0 && (
-              <p className="px-1 py-6 text-center text-xs text-[#a1a1aa]">No locations match “{q}”.</p>
+              <p className="px-1 py-6 text-center text-xs text-ink-faint">No locations match “{q}”.</p>
             )}
 
             {favs.length > 0 && (
               <>
-                <p className="px-1 pt-1 text-[10px] font-semibold tracking-wide text-[#a1a1aa] uppercase">
+                <p className="px-1 pt-1 text-[10px] font-semibold tracking-wide text-ink-faint uppercase">
                   Favorites
                 </p>
                 {favs.map((loc) => (
@@ -215,7 +215,7 @@ export function LocationSelector() {
             {resto.length > 0 && (
               <>
                 {favs.length > 0 && (
-                  <p className="px-1 pt-2 text-[10px] font-semibold tracking-wide text-[#a1a1aa] uppercase">
+                  <p className="px-1 pt-2 text-[10px] font-semibold tracking-wide text-ink-faint uppercase">
                     All locations
                   </p>
                 )}

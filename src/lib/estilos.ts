@@ -7,16 +7,16 @@
 
    `BOTON_ICONO` (cuadrado) queda para los flotantes que no son redondos. */
 export const BOTON_ICONO =
-  'flex size-9 shrink-0 items-center justify-center rounded-md border border-[#e4e4e7] bg-white text-[#09090b] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-[#fafafa]'
+  'flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle'
 
 export const BOTON_ICONO_REDONDO =
-  'flex size-10 shrink-0 items-center justify-center rounded-full border border-[#e4e4e7] bg-white text-[#09090b] shadow-[0_2px_8px_rgb(0_0_0/0.12)] transition-colors hover:bg-[#fafafa]'
+  'flex size-10 shrink-0 items-center justify-center rounded-full border border-line bg-white text-ink shadow-[0_2px_8px_rgb(0_0_0/0.12)] transition-colors hover:bg-surface-subtle'
 
 /** Ícono suelto dentro de una card o una tabla: sin caja, pero **en negro**.
     Un ícono que hace algo —el kebab, el history, el ojo— se dibuja con el
     mismo peso que el texto que acompaña; en gris parecía deshabilitado. */
 export const ICONO_SUELTO =
-  'flex size-7 shrink-0 items-center justify-center rounded-md text-[#09090b] transition-colors hover:bg-[#f4f4f5]'
+  'flex size-7 shrink-0 items-center justify-center rounded-md text-ink transition-colors hover:bg-surface-muted'
 
 /* Contenedor de página del módulo de Patients (Dashboard, Scheduling,
    Billing, Patients y todo /patients/:id/*): a 1400px fijo, una pantalla de

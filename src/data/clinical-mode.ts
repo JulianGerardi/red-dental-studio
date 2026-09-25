@@ -172,9 +172,9 @@ export const ORDENES: OrdenLab[] = [
 export type EstadoVital = 'Normal' | 'Elevated' | 'Dangerously low'
 
 export const VITAL_COLOR: Record<EstadoVital, { arco: string; pill: string }> = {
-  Normal:            { arco: '#1a804d', pill: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]' },
-  Elevated:          { arco: '#d4900c', pill: 'border-[#99660d] bg-[#fffaf0] text-[#99660d]' },
-  'Dangerously low': { arco: '#b22626', pill: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]' },
+  Normal:            { arco: '#1a804d', pill: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg' },
+  Elevated:          { arco: '#d4900c', pill: 'border-warn-fg bg-warn-bg text-warn-fg' },
+  'Dangerously low': { arco: '#b22626', pill: 'border-dash-bad-fg bg-dash-bad-bg text-dash-bad-fg' },
 }
 
 export type Vital = {

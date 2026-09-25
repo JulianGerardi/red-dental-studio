@@ -19,6 +19,6 @@ export const WithAdornment: Story = {
     label: 'Password',
     id: 'password',
     type: 'password',
-    adornment: <Eye className="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />,
+    adornment: <Eye className="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-ink-faint" />,
   },
 }

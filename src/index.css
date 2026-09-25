@@ -313,6 +313,42 @@
   --color-dash-bad-chip: #fbe5e5;
   --color-dash-count-bg: #e8ecf7;
 
+  /* ── Tokens semánticos (2026-09-25) ───────────────────────────────
+     Antes estos valores estaban escritos a mano (text-[#09090b]) en más de
+     cien archivos: cambiar uno obligaba a buscar y reemplazar. Cada token vale
+     exactamente el hex que reemplazó, así que la app se ve igual; ahora se
+     cambia acá y cambia en todos lados, y en el design system. */
+
+  /* Texto: de más fuerte a más tenue. */
+  --color-ink: #09090b;
+  --color-ink-soft: #3f3f46;
+  --color-ink-medium: #52525b;
+  --color-ink-muted: #71717a;
+  --color-ink-slate: #64748b;
+  --color-ink-faint: #a1a1aa;
+
+  /* Líneas: bordes y divisores. */
+  --color-line: #e4e4e7;
+  --color-line-strong: #d4d4d8;
+  --color-line-row: #e7e7e7;
+  --color-line-soft: #f1f1f4;
+  --color-line-hair: #ededed;
+
+  /* Fondos neutros. */
+  --color-surface-subtle: #fafafa;
+  --color-surface-muted: #f4f4f5;
+  --color-surface-alt: #f9f9f9;
+  --color-surface-slate: #f1f5f9;
+
+  /* Estados que no estaban en dash-*. */
+  --color-field-error: #dc2626;
+  --color-required: #ff0608;
+  --color-warn-fg: #99660d;
+  --color-warn-bg: #fffaf0;
+  --color-attn-fg: #b45309;
+  --color-info-bg: #f0f5ff;
+  --color-purple-fg: #6633a6;
+
   --shadow-stat: 0 4px 4px 0 rgb(0 0 0 / 0.05);
   --shadow-panel: 0 4px 14px 0 rgb(100 100 100 / 0.25);
   --shadow-inner-card: 0 4px 2px 0 rgb(0 0 0 / 0.05);

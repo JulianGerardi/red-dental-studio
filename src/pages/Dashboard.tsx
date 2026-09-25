@@ -185,12 +185,12 @@ export default function Dashboard() {
           <button
             onClick={() => setDate(new Date())}
             title="Go to today"
-            className="flex h-9 items-center gap-1.5 rounded-md border border-[#e4e4e7] bg-white px-3 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-[#fafafa]"
+            className="flex h-9 items-center gap-1.5 rounded-md border border-line bg-white px-3 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle"
           >
             <CalendarClock className="size-4" /> Today
           </button>
         )}
-        <span className="text-[12px] text-[#71717a]">
+        <span className="text-[12px] text-ink-muted">
           Appointments, waiting room and tasks follow this date.
         </span>
       </div>

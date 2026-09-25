@@ -82,40 +82,40 @@ export function Confibot({
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center sm:inset-x-auto sm:right-6 sm:bottom-6">
-      <div className="motion-safe:[animation:sheet-in_220ms_ease-out] flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-[#e4e4e7] bg-white shadow-[0_8px_28px_rgb(0_0_0/0.18)] sm:max-w-[400px] sm:rounded-2xl">
-        <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-[#e4e4e7] sm:hidden" />
+      <div className="motion-safe:[animation:sheet-in_220ms_ease-out] flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-white shadow-[0_8px_28px_rgb(0_0_0/0.18)] sm:max-w-[400px] sm:rounded-2xl">
+        <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-line sm:hidden" />
 
-        <div className="flex items-center gap-2 border-b border-[#e4e4e7] px-4 py-3">
+        <div className="flex items-center gap-2 border-b border-line px-4 py-3">
           <span className="bg-dash-count-bg text-dash-blue flex size-8 shrink-0 items-center justify-center rounded-full">
             <Bot className="size-4" />
           </span>
           <span className="min-w-0">
-            <span className="block text-sm font-bold text-[#09090b]">Confibot</span>
-            <span className="block text-[11px] text-[#a1a1aa]">Here to explain the app</span>
+            <span className="block text-sm font-bold text-ink">Confibot</span>
+            <span className="block text-[11px] text-ink-faint">Here to explain the app</span>
           </span>
           <button
             type="button" aria-label="Close Confibot" onClick={onClose}
-            className="ml-auto flex size-7 shrink-0 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]"
+            className="ml-auto flex size-7 shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"
           >
             <X className="size-4" />
           </button>
         </div>
 
         <div ref={listaRef} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4">
-          <div className="max-w-[90%] rounded-2xl rounded-tl-sm bg-[#f1f5f9] px-3 py-2 text-[13px] leading-relaxed text-[#09090b]">
+          <div className="max-w-[90%] rounded-2xl rounded-tl-sm bg-surface-slate px-3 py-2 text-[13px] leading-relaxed text-ink">
             {SALUDO}
           </div>
 
           {preguntas > 0 && (
-            <span className="flex items-center gap-2 pt-1 text-[10px] font-semibold tracking-wide text-[#d4d4d8] uppercase">
-              <span className="h-px flex-1 bg-[#e4e4e7]" /> Your questions <span className="h-px flex-1 bg-[#e4e4e7]" />
+            <span className="flex items-center gap-2 pt-1 text-[10px] font-semibold tracking-wide text-line-strong uppercase">
+              <span className="h-px flex-1 bg-line" /> Your questions <span className="h-px flex-1 bg-line" />
             </span>
           )}
 
           {historial.map((m, i) =>
             m.de === 'bot' ? (
               <div key={i} ref={i === historial.length - 1 ? ultimaRef : undefined} className="flex flex-col gap-2">
-                <div className="max-w-[90%] rounded-2xl rounded-tl-sm bg-[#f1f5f9] px-3 py-2 text-[13px] leading-relaxed text-[#09090b]">
+                <div className="max-w-[90%] rounded-2xl rounded-tl-sm bg-surface-slate px-3 py-2 text-[13px] leading-relaxed text-ink">
                   {m.texto}
                 </div>
                 {m.temas?.map((id) => {
@@ -126,13 +126,13 @@ export function Confibot({
                     <button
                       key={id} type="button"
                       onClick={() => { onShowOnScreen(t.id); onClose() }}
-                      className="group flex w-full items-center gap-2 rounded-lg border border-[#e4e4e7] bg-white px-3 py-2 text-left hover:border-[#1d56bc]"
+                      className="group flex w-full items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 text-left hover:border-dash-blue"
                     >
                       <span className="min-w-0 flex-1">
                         <span className="text-dash-blue block text-[10px] font-semibold tracking-wide uppercase">{mod?.label}</span>
-                        <span className="block truncate text-[13px] font-semibold text-[#09090b]">{t.title}</span>
+                        <span className="block truncate text-[13px] font-semibold text-ink">{t.title}</span>
                       </span>
-                      <ChevronRight className="group-hover:text-dash-blue size-3.5 shrink-0 text-[#a1a1aa]" />
+                      <ChevronRight className="group-hover:text-dash-blue size-3.5 shrink-0 text-ink-faint" />
                     </button>
                   )
                 })}
@@ -154,7 +154,7 @@ export function Confibot({
             {SUGERENCIAS.map((s) => (
               <button
                 key={s} type="button" onClick={() => preguntar(s)}
-                className="hover:border-dash-blue w-full rounded-lg border border-[#e4e4e7] bg-white px-3 py-2 text-left text-[13px] text-[#71717a] hover:text-[#09090b]"
+                className="hover:border-dash-blue w-full rounded-lg border border-line bg-white px-3 py-2 text-left text-[13px] text-ink-muted hover:text-ink"
               >
                 {s}
               </button>
@@ -164,12 +164,12 @@ export function Confibot({
 
         <form
           onSubmit={(e) => { e.preventDefault(); preguntar(borrador) }}
-          className="flex items-center gap-2 border-t border-[#e4e4e7] p-3"
+          className="flex items-center gap-2 border-t border-line p-3"
         >
           <input
             value={borrador} onChange={(e) => setBorrador(e.target.value)}
             placeholder="Ask me anything about the app" aria-label="Ask Confibot"
-            className="focus:border-dash-blue h-9 min-w-0 flex-1 rounded-lg border border-[#e4e4e7] bg-white px-3 text-[13px] text-[#09090b] placeholder:text-[#a1a1aa] focus:outline-none"
+            className="focus:border-dash-blue h-9 min-w-0 flex-1 rounded-lg border border-line bg-white px-3 text-[13px] text-ink placeholder:text-ink-faint focus:outline-none"
           />
           <button
             type="submit" aria-label="Send" disabled={!borrador.trim()}

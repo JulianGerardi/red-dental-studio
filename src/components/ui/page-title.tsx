@@ -17,7 +17,7 @@ export function PageTitle({
   return (
     <h1
       className={cn(
-        'leading-[1.3] text-[#09090b]',
+        'leading-[1.3] text-ink',
         size === 'lg' ? 'text-2xl font-bold' : 'text-xl font-semibold',
       )}
     >

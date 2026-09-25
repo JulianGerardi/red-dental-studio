@@ -32,8 +32,8 @@ export type Visita = {
 }
 
 const ESTADO = {
-  Accepted: { pill: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]', barra: '#1a804d' },
-  Inprogress: { pill: 'border-[#174596] bg-[#f0f2ff] text-[#174596]', barra: '#1d56bc' },
+  Accepted: { pill: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg', barra: '#1a804d' },
+  Inprogress: { pill: 'border-dash-busy-fg bg-dash-busy-bg text-dash-busy-fg', barra: '#1d56bc' },
 }
 
 function Radio({ on, className }: { on: boolean; className?: string }) {
@@ -81,7 +81,7 @@ function Seleccionable({
       className={cn(
         'flex w-full cursor-pointer gap-3 rounded-lg border text-left transition-colors',
         barra && 'border-l-[3px]',
-        on ? 'border-dash-blue bg-[#f8faff]' : 'border-[#e4e4e7] bg-white hover:bg-[#fafafa]',
+        on ? 'border-dash-blue bg-[#f8faff]' : 'border-line bg-white hover:bg-surface-subtle',
         className,
       )}
     >
@@ -99,21 +99,21 @@ export function PlanCard({ plan, on, onClick }: { plan: Plan; on: boolean; onCli
       <Radio on={on} className="mt-0.5" />
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <span className="truncate text-[13px] font-bold text-[#09090b]">{plan.doctor}</span>
+          <span className="truncate text-[13px] font-bold text-ink">{plan.doctor}</span>
           <span className={cn('shrink-0 rounded-full border px-2 py-[2px] text-[11px] font-semibold', e.pill)}>
             {plan.estado}
           </span>
         </div>
-        <p className="mt-0.5 truncate text-xs text-[#71717a]">{plan.therapy}</p>
+        <p className="mt-0.5 truncate text-xs text-ink-muted">{plan.therapy}</p>
         {/* Conteos en texto, no en pill. Una pill marca un estado —Accepted,
             Inprogress— y ésa ya está arriba a la derecha; pintar también los
             números ponía tres cápsulas de colores compitiendo en una card de
             cuatro líneas. */}
         <div className="mt-2 flex items-center gap-1.5">
-          <span className="text-[11px] text-[#71717a]">
+          <span className="text-[11px] text-ink-muted">
             {plan.visitas} Visits · {plan.procedimientos} Procedures
           </span>
-          <span className="ml-auto shrink-0 text-[11px] whitespace-nowrap text-[#a1a1aa]">
+          <span className="ml-auto shrink-0 text-[11px] whitespace-nowrap text-ink-faint">
             {plan.date}
           </span>
         </div>
@@ -129,12 +129,12 @@ export function VisitRow({ visita, on, onClick }: { visita: Visita; on: boolean;
     <Seleccionable on={on} onClick={onClick} className="flex-col gap-0 p-0">
       <div className="flex w-full items-center gap-3 px-3 py-2.5">
         <Radio on={on} />
-        <span className="text-[13px] font-bold text-[#09090b]">{visita.name}</span>
-        <span className="text-[11px] text-[#71717a]">
+        <span className="text-[13px] font-bold text-ink">{visita.name}</span>
+        <span className="text-[11px] text-ink-muted">
           {visita.procedimientos.length} Procedures
         </span>
         <span className="ml-auto shrink-0 text-right">
-          <span className="text-[10px] tracking-wide text-[#a1a1aa] uppercase">Total </span>
+          <span className="text-[10px] tracking-wide text-ink-faint uppercase">Total </span>
           <span className="text-dash-blue text-[15px] font-bold">{visita.total}</span>
         </span>
       </div>
@@ -143,8 +143,8 @@ export function VisitRow({ visita, on, onClick }: { visita: Visita; on: boolean;
           usan Insurance y Documents. */}
       {on && (
         <div className="w-full px-3 pb-3">
-          <div className="overflow-hidden rounded-lg border border-[#e7e7e7] bg-white">
-            <div className="flex h-8 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-3 text-[10px] font-semibold tracking-wide text-[#71717a] uppercase">
+          <div className="overflow-hidden rounded-lg border border-line-row bg-white">
+            <div className="flex h-8 items-center gap-3 border-b border-line-row bg-surface-alt px-3 text-[10px] font-semibold tracking-wide text-ink-muted uppercase">
               <span className="w-[52px] shrink-0">Code</span>
               <span className="min-w-0 flex-1">Procedure</span>
             </div>
@@ -154,10 +154,10 @@ export function VisitRow({ visita, on, onClick }: { visita: Visita; on: boolean;
                 return (
                   <div
                     key={p}
-                    className="flex h-8 items-center gap-3 border-b border-[#f1f1f4] px-3 text-[11px] last:border-0"
+                    className="flex h-8 items-center gap-3 border-b border-line-soft px-3 text-[11px] last:border-0"
                   >
                     <span className="text-dash-blue w-[52px] shrink-0 font-medium">{code}</span>
-                    <span className="min-w-0 flex-1 truncate text-[#52525b]">{resto.join(' – ')}</span>
+                    <span className="min-w-0 flex-1 truncate text-ink-medium">{resto.join(' – ')}</span>
                   </div>
                 )
               })}

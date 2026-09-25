@@ -108,12 +108,12 @@ export function SettingsAccounts() {
         )}
       >
         <div className="relative min-w-0 flex-1 sm:max-w-[300px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
           <input
             value={q}
             onChange={(e) => { setQ(e.target.value); setPagina(1) }}
             placeholder="Search..."
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
           />
         </div>
         <SearchButton onClick={() => setPagina(1)} className="h-9" />
@@ -121,15 +121,15 @@ export function SettingsAccounts() {
           value={filtro}
           onChange={(e) => { setFiltro(e.target.value as typeof filtro); setPagina(1) }}
           aria-label="Filter by status"
-          className="focus:border-dash-blue h-9 shrink-0 rounded-md border border-[#e4e4e7] bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none"
+          className="focus:border-dash-blue h-9 shrink-0 rounded-md border border-line bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none"
         >
           {FILTROS.map((f) => <option key={f} value={f}>{f}</option>)}
         </select>
       </SettingsPageHeader>
 
-      <div className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+      <div className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
         <div className="min-w-[1080px]">
-          <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
+          <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
             <span className={COLS.nombre}>Name</span>
             <span className={COLS.plan}>Plan</span>
             <span className={COLS.suscripcion}>Subscription</span>
@@ -147,11 +147,11 @@ export function SettingsAccounts() {
             <EmptyState icon={Building2} title="No accounts" detail="Nothing matches the current search or filter." />
           ) : (
             visibles.map((c) => (
-              <div key={c.id} className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]">
+              <div key={c.id} className="flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft">
                 <Link to={`/settings/accounts/${c.id}`} className={cn(COLS.nombre, 'text-dash-blue truncate font-medium hover:underline')} title={c.nombre}>
                   {c.nombre}
                 </Link>
-                <span className={cn(COLS.plan, 'truncate font-medium text-[#09090b]')} title={c.plan}>{c.plan}</span>
+                <span className={cn(COLS.plan, 'truncate font-medium text-ink')} title={c.plan}>{c.plan}</span>
                 <span className={COLS.suscripcion}>{c.suscripcion}</span>
                 <span className={COLS.vence}>{c.vence}</span>
                 <span className={COLS.estadoSub}>{c.estadoSuscripcion}</span>
@@ -173,8 +173,8 @@ export function SettingsAccounts() {
             ))
           )}
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
-            <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
+            <span className="flex items-center gap-3 text-xs font-semibold text-ink-muted">
               Showing {desde} to {desde === 0 ? 0 : desde + visibles.length - 1} of {filtradas.length} results
               {/* "Mostrar" en castellano en una pantalla en inglés: así viene
                   en el diseño y el contenido se replica tal cual. */}
@@ -184,7 +184,7 @@ export function SettingsAccounts() {
                   value={porPagina}
                   onChange={(e) => { setPorPagina(Number(e.target.value)); setPagina(1) }}
                   aria-label="Rows per page"
-                  className="focus:border-dash-blue h-7 rounded-md border border-[#e4e4e7] bg-white px-2 text-[12px] focus:outline-none"
+                  className="focus:border-dash-blue h-7 rounded-md border border-line bg-white px-2 text-[12px] focus:outline-none"
                 >
                   {[10, 25, 50].map((n) => <option key={n} value={n}>{n}</option>)}
                 </select>

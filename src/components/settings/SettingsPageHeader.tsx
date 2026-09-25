@@ -16,8 +16,8 @@ export function SettingsPageHeader({
     <>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-2xl font-bold text-[#09090b]">{titulo}</h1>
-          <p className="mt-1 text-sm text-[#71717a]">{bajada}</p>
+          <h1 className="text-2xl font-bold text-ink">{titulo}</h1>
+          <p className="mt-1 text-sm text-ink-muted">{bajada}</p>
         </div>
         {accion}
       </div>

@@ -9,9 +9,9 @@ import { DatePicker, formatDMY } from '@/components/ui/date-picker'
 
 export function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <span className="block text-xs font-medium text-[#09090b]">
+    <span className="block text-xs font-medium text-ink">
       {children}
-      {required && <span className="text-[#ff0608]">*</span>}
+      {required && <span className="text-required">*</span>}
     </span>
   )
 }
@@ -20,7 +20,7 @@ export function FieldLabel({ children, required }: { children: React.ReactNode; 
    reservados para el resultado de la acción (guardar, borrar, descargar). */
 export function FieldError({ children }: { children?: string }) {
   if (!children) return null
-  return <span className="-mt-1 block text-[11px] leading-[1.35] text-[#dc2626]">{children}</span>
+  return <span className="-mt-1 block text-[11px] leading-[1.35] text-field-error">{children}</span>
 }
 
 export function TextField({
@@ -44,8 +44,8 @@ export function TextField({
         {...(onChange ? { value: value ?? '', onChange: (e) => onChange(e.target.value) } : {})}
         className={cn(
           'h-9 w-full rounded-md border bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]',
-          'placeholder:text-[#a1a1aa] focus:outline-none',
-          error ? 'border-[#dc2626] focus:border-[#dc2626]' : 'focus:border-dash-blue border-[#e4e4e7]',
+          'placeholder:text-ink-faint focus:outline-none',
+          error ? 'border-field-error focus:border-field-error' : 'focus:border-dash-blue border-line',
         )}
       />
       <FieldError>{error}</FieldError>
@@ -124,22 +124,22 @@ export function SelectField({
           className={cn(
             'flex h-9 w-full items-center justify-between rounded-md border bg-white px-3 text-[13px]',
             'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors focus:outline-none',
-            error ? 'border-[#dc2626]' : open ? 'border-dash-blue' : 'border-[#e4e4e7]',
-            value ? 'text-[#09090b]' : 'text-[#a1a1aa]',
+            error ? 'border-field-error' : open ? 'border-dash-blue' : 'border-line',
+            value ? 'text-ink' : 'text-ink-faint',
           )}
         >
           {value ?? placeholder}
           <ChevronDown className={cn('size-4 shrink-0 text-black transition-transform', open && 'rotate-180')} />
         </button>
         {open && (
-          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-56 w-full overflow-y-auto rounded-md border border-[#e4e4e7] bg-white py-1 shadow-lg">
+          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-56 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
             {items.map((o) => (
               <button
                 key={o}
                 type="button"
                 onClick={() => { setValue(o); setOpen(false) }}
                 className={cn(
-                  'flex w-full items-center justify-between px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]',
+                  'flex w-full items-center justify-between px-3 py-2 text-left text-[13px] hover:bg-surface-muted',
                   value === o && 'text-dash-blue font-medium',
                 )}
               >
@@ -186,9 +186,9 @@ export function DateField({
             onClick={() => setValue(new Date(1990, 0, 1))}
             aria-invalid={!!error || undefined}
             className={cn(
-              'flex h-9 w-full items-center gap-2 rounded-md border bg-white px-3 text-[13px] text-[#a1a1aa]',
+              'flex h-9 w-full items-center gap-2 rounded-md border bg-white px-3 text-[13px] text-ink-faint',
               'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none',
-              error ? 'border-[#dc2626]' : 'focus:border-dash-blue border-[#e4e4e7]',
+              error ? 'border-field-error' : 'focus:border-dash-blue border-line',
             )}
           >
             <Calendar className="size-4 shrink-0" />
@@ -234,18 +234,18 @@ export function OptionCheckbox({
       }}
       className={cn(
         'flex w-full items-start gap-2.5 rounded-lg border bg-white p-3 text-left transition-colors',
-        on ? 'border-dash-blue' : 'border-[#e4e4e7] hover:bg-[#fafafa]',
+        on ? 'border-dash-blue' : 'border-line hover:bg-surface-subtle',
       )}
     >
       <span
         className={cn(
           'mt-px flex size-4 shrink-0 items-center justify-center rounded-[3px] border transition-colors',
-          on ? 'bg-dash-blue border-dash-blue' : 'border-[#a1a1aa] bg-white',
+          on ? 'bg-dash-blue border-dash-blue' : 'border-ink-faint bg-white',
         )}
       >
         {on && <Check className="size-3 text-white" strokeWidth={3} />}
       </span>
-      <span className="text-xs leading-[1.45] text-[#09090b]">{label}</span>
+      <span className="text-xs leading-[1.45] text-ink">{label}</span>
     </button>
   )
 }
@@ -296,7 +296,7 @@ export function SearchField({
     <div className={cn('flex flex-col gap-2', className)}>
       <FieldLabel required={required}>{label}</FieldLabel>
       <div ref={ref} className="relative">
-        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
         <input
           value={value}
           placeholder={placeholder}
@@ -305,18 +305,18 @@ export function SearchField({
           onFocus={() => setAbierto(true)}
           className={cn(
             'h-9 w-full rounded-md border bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]',
-            'placeholder:text-[#a1a1aa] focus:outline-none',
-            error ? 'border-[#dc2626] focus:border-[#dc2626]' : 'focus:border-dash-blue border-[#e4e4e7]',
+            'placeholder:text-ink-faint focus:outline-none',
+            error ? 'border-field-error focus:border-field-error' : 'focus:border-dash-blue border-line',
           )}
         />
         {abierto && sugerencias.length > 0 && (
-          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-[#e4e4e7] bg-white py-1 shadow-lg">
+          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
             {sugerencias.map((o) => (
               <button
                 key={o}
                 type="button"
                 onClick={() => { onChange?.(o); setAbierto(false) }}
-                className="block w-full px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]"
+                className="block w-full px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
               >
                 {o}
               </button>
@@ -356,8 +356,8 @@ export function DateTextField({
         onChange={(e) => onChange?.(formatear(e.target.value))}
         className={cn(
           'h-9 w-full rounded-md border bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]',
-          'placeholder:text-[#a1a1aa] focus:outline-none',
-          error ? 'border-[#dc2626] focus:border-[#dc2626]' : 'focus:border-dash-blue border-[#e4e4e7]',
+          'placeholder:text-ink-faint focus:outline-none',
+          error ? 'border-field-error focus:border-field-error' : 'focus:border-dash-blue border-line',
         )}
       />
       <FieldError>{error}</FieldError>
@@ -387,8 +387,8 @@ export function TextArea({
         onChange={(e) => onChange?.(e.target.value)}
         className={cn(
           'w-full resize-none rounded-md border bg-white px-3 py-2 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]',
-          'placeholder:text-[#a1a1aa] focus:outline-none',
-          error ? 'border-[#dc2626] focus:border-[#dc2626]' : 'focus:border-dash-blue border-[#e4e4e7]',
+          'placeholder:text-ink-faint focus:outline-none',
+          error ? 'border-field-error focus:border-field-error' : 'focus:border-dash-blue border-line',
         )}
       />
       <FieldError>{error}</FieldError>
@@ -400,8 +400,8 @@ export function SectionCard({
   title, className, children,
 }: { title: string; className?: string; children: React.ReactNode }) {
   return (
-    <section className={cn('rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5', className)}>
-      <h2 className="text-sm font-semibold text-[#09090b]">{title}</h2>
+    <section className={cn('rounded-lg border border-line bg-white p-4 sm:p-5', className)}>
+      <h2 className="text-sm font-semibold text-ink">{title}</h2>
       <div className="mt-4 flex flex-col gap-4">{children}</div>
     </section>
   )
@@ -436,8 +436,8 @@ export function ModalShell({
         )}
       >
         <div className="flex items-start justify-between gap-4">
-          <h2 className="text-lg leading-none font-bold text-[#09090b] sm:text-[22px]">{title}</h2>
-          <button type="button" onClick={onClose} aria-label="Close" className="text-[#09090b] hover:opacity-60">
+          <h2 className="text-lg leading-none font-bold text-ink sm:text-[22px]">{title}</h2>
+          <button type="button" onClick={onClose} aria-label="Close" className="text-ink hover:opacity-60">
             <X className="size-5" />
           </button>
         </div>
@@ -475,7 +475,7 @@ export function FormFooter({
       <button
         type="button"
         onClick={onCancel}
-        className="h-9 shrink-0 rounded-md border border-[#e4e4e7] bg-white px-6 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]"
+        className="h-9 shrink-0 rounded-md border border-line bg-white px-6 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle"
       >
         {cancelLabel}
       </button>

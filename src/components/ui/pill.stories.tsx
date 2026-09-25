@@ -23,7 +23,7 @@ export const Tones: Story = {
     <div className="flex flex-col gap-3">
       {(['md', 'sm'] as const).map((size) => (
         <div key={size} className="flex flex-wrap items-center gap-2">
-          <span className="w-8 text-[11px] text-[#71717a]">{size}</span>
+          <span className="w-8 text-[11px] text-ink-muted">{size}</span>
           {TONOS.map((t) => <Pill key={t} tone={t} size={size}>{t}</Pill>)}
         </div>
       ))}

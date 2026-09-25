@@ -148,14 +148,14 @@ function CruzSuperficies({ celdas, onCambio, bloqueo }: { celdas: Celda[]; onCam
               LUGAR[c.pos] ?? '',
               c.activo
                 ? 'border-dash-blue bg-dash-blue text-white'
-                : 'border-[#e4e4e7] bg-white text-[#71717a] hover:border-[#1d56bc] hover:text-[#1d56bc]',
+                : 'border-line bg-white text-ink-muted hover:border-dash-blue hover:text-dash-blue',
             )}
           >
             {c.letra}
           </button>
         ))}
       </div>
-      <ul className={cn('flex flex-col gap-1 text-[11px] text-[#71717a]', bloqueo && 'opacity-40')}>
+      <ul className={cn('flex flex-col gap-1 text-[11px] text-ink-muted', bloqueo && 'opacity-40')}>
         {celdas.map((c) => (
           <li key={c.pos} className={cn(c.activo && 'text-dash-blue font-medium')}>
             <span className="inline-block w-4 font-semibold">{c.letra}</span> {c.nombre}
@@ -205,7 +205,7 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
   const acciones = controles.filter((c): c is Extract<Control, { tipo: 'accion' }> => c.tipo === 'accion')
 
   if (controles.length === 0) {
-    return <div className="px-1 py-6 text-center text-[13px] text-[#a1a1aa]">{vacio ?? 'Nothing to set for this tooth.'}</div>
+    return <div className="px-1 py-6 text-center text-[13px] text-ink-faint">{vacio ?? 'Nothing to set for this tooth.'}</div>
   }
 
   /* Sin pieza elegida la librería deshabilita todo. Sin un aviso parecía que
@@ -227,7 +227,7 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
         <div className="grid min-w-0 flex-1 grid-cols-[repeat(auto-fill,minmax(200px,280px))] gap-x-6 gap-y-4">
           {selects.map((c) => (
             <label key={c.clave} className="flex min-w-0 flex-col gap-1.5">
-              <span className="truncate text-[11px] font-medium text-[#71717a]">{c.label}</span>
+              <span className="truncate text-[11px] font-medium text-ink-muted">{c.label}</span>
               <span className="relative block">
               <select
                 value={c.valor}
@@ -235,13 +235,13 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
                 onChange={(e) => { elegirEnSelect(c.el, e.target.value); releer(); onTocar?.() }}
                 className={cn(
                   'h-9 w-full min-w-0 appearance-none rounded-md border pr-8 pl-2.5 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors',
-                  'focus:border-dash-blue focus:ring-2 focus:ring-[#1d56bc]/20 focus:outline-none',
-                  c.off ? 'border-[#e4e4e7] bg-[#fafafa] text-[#a1a1aa]' : 'border-[#e4e4e7] bg-white text-[#09090b] hover:border-[#d4d4d8]',
+                  'focus:border-dash-blue focus:ring-2 focus:ring-dash-blue/20 focus:outline-none',
+                  c.off ? 'border-line bg-surface-subtle text-ink-faint' : 'border-line bg-white text-ink hover:border-line-strong',
                 )}
               >
                 {c.opciones.map((o) => <option key={o.v} value={o.v}>{o.t}</option>)}
               </select>
-              <ChevronDown className={cn('pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2', c.off ? 'text-[#d4d4d8]' : 'text-black')} />
+              <ChevronDown className={cn('pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2', c.off ? 'text-line-strong' : 'text-black')} />
               </span>
             </label>
           ))}
@@ -273,10 +273,10 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
               onClick={() => { tocarCheckbox(c.el); releer(); onTocar?.() }}
               className={cn(
                 'flex h-8 items-center gap-2 rounded-md border px-2.5 text-[12px] transition-colors disabled:opacity-50',
-                c.activo ? 'border-dash-blue bg-dash-count-bg text-dash-blue font-medium' : 'border-[#e4e4e7] bg-white text-[#3f3f46] hover:bg-[#fafafa]',
+                c.activo ? 'border-dash-blue bg-dash-count-bg text-dash-blue font-medium' : 'border-line bg-white text-ink-soft hover:bg-surface-subtle',
               )}
             >
-              <span className={cn('flex size-3.5 shrink-0 items-center justify-center rounded-[3px] border', c.activo ? 'bg-dash-blue border-dash-blue' : 'border-[#a1a1aa]')}>
+              <span className={cn('flex size-3.5 shrink-0 items-center justify-center rounded-[3px] border', c.activo ? 'bg-dash-blue border-dash-blue' : 'border-ink-faint')}>
                 {c.activo && <Check className="size-2.5 text-white" strokeWidth={3} />}
               </span>
               <span className="truncate">{c.label}</span>
@@ -292,7 +292,7 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
           width="max-w-[420px]"
           footer={
             <>
-              <button type="button" onClick={() => setConfirmando(null)} className="h-9 rounded-md border border-[#e4e4e7] bg-white px-5 text-[13px] font-medium hover:bg-[#fafafa]">
+              <button type="button" onClick={() => setConfirmando(null)} className="h-9 rounded-md border border-line bg-white px-5 text-[13px] font-medium hover:bg-surface-subtle">
                 Cancel
               </button>
               <button
@@ -302,22 +302,22 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
                   marcarAccion(/clear/i.test(confirmando.label) ? null : confirmando.clave)
                   setConfirmando(null)
                 }}
-                className="h-9 rounded-md bg-[#b22626] px-5 text-[13px] font-medium text-white hover:bg-[#961f1f]"
+                className="h-9 rounded-md bg-dash-bad-fg px-5 text-[13px] font-medium text-white hover:bg-[#961f1f]"
               >
                 {confirmando.label}
               </button>
             </>
           }
         >
-          <p className="flex items-start gap-2 text-[13px] leading-relaxed text-[#3f3f46]">
-            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-[#99660d]" />
+          <p className="flex items-start gap-2 text-[13px] leading-relaxed text-ink-soft">
+            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-warn-fg" />
             This clears everything charted for the current selection — surfaces, conditions and restorations. It cannot be undone.
           </p>
         </ModalShell>
       )}
 
       {acciones.length > 0 && (
-        <div className="flex flex-wrap gap-2 border-t border-[#f1f1f4] pt-3">
+        <div className="flex flex-wrap gap-2 border-t border-line-soft pt-3">
           {acciones.map((c) => (
             <button
               key={c.clave}
@@ -334,7 +334,7 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
                 'h-8 rounded-md border px-3 text-[12px] font-medium transition-colors disabled:opacity-50',
                 accionActiva === c.clave
                   ? 'border-dash-blue bg-dash-blue text-white'
-                  : 'border-[#e4e4e7] bg-white text-[#3f3f46] hover:bg-[#fafafa]',
+                  : 'border-line bg-white text-ink-soft hover:bg-surface-subtle',
               )}
             >
               {c.label}

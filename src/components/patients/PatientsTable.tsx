@@ -47,7 +47,7 @@ const COLS = {
 function HeadCell({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
     <div className={cn('flex h-full items-center', className)}>
-      <span className="text-[11px] font-semibold text-[#71717a]">{children}</span>
+      <span className="text-[11px] font-semibold text-ink-muted">{children}</span>
     </div>
   )
 }
@@ -55,7 +55,7 @@ function HeadCell({ className, children }: { className?: string; children: React
 function Cell({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
     <div className={cn('flex h-full items-center', className)}>
-      <span className="truncate text-[13px] text-[#3f3f46]">{children}</span>
+      <span className="truncate text-[13px] text-ink-soft">{children}</span>
     </div>
   )
 }
@@ -76,9 +76,9 @@ export function PatientsTable({
   return (
     /* Las columnas suman 872: en pantallas angostas la tabla scrollea sola en
        vez de recortarse contra el borde. */
-    <div className="overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+    <div className="overflow-x-auto rounded-lg border border-line-row bg-white">
     <div className="min-w-[880px]">
-      <div className="flex h-11 w-full items-center justify-between border-b border-[#e7e7e7] bg-[#f9f9f9] px-4">
+      <div className="flex h-11 w-full items-center justify-between border-b border-line-row bg-surface-alt px-4">
         <HeadCell className={COLS.name}>Full name</HeadCell>
         <HeadCell className={COLS.birthday}>Birthday</HeadCell>
         <HeadCell className={COLS.email}>Email</HeadCell>
@@ -91,11 +91,11 @@ export function PatientsTable({
           key={`${r.email}-${i}`}
           className={cn(
             'flex h-14 w-full items-center justify-between bg-white px-4',
-            i < rows.length - 1 && 'border-b border-[#e7e7e7]',
+            i < rows.length - 1 && 'border-b border-line-row',
           )}
         >
           <div className={cn('flex h-full items-center gap-2.5', COLS.name)}>
-            <span className="bg-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold text-[#fafafa]">
+            <span className="bg-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold text-surface-subtle">
               {r.initials}
             </span>
             {/* El nombre es el acceso al dashboard del paciente. */}
@@ -122,8 +122,8 @@ export function PatientsTable({
         </div>
       ))}
 
-      <div className="flex h-[52px] w-full items-center justify-between border-t border-[#e7e7e7] bg-white px-4">
-        <p className="text-xs font-semibold text-[#71717a]">
+      <div className="flex h-[52px] w-full items-center justify-between border-t border-line-row bg-white px-4">
+        <p className="text-xs font-semibold text-ink-muted">
           Showing {desde} to {desde === 0 ? 0 : desde + visibles.length - 1} of {rows.length} patients
         </p>
         <Pagination pagina={actual} paginas={paginas} onChange={setPagina} />

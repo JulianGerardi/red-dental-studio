@@ -9,12 +9,12 @@ import { cn } from '@/lib/utils'
 export type PillTone = 'success' | 'info' | 'warning' | 'danger' | 'neutral' | 'purple'
 
 const TONO: Record<PillTone, string> = {
-  success: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  info: 'border-[#174596] bg-[#f0f5ff] text-[#174596]',
-  warning: 'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
-  danger: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
-  neutral: 'border-[#a1a1aa] bg-[#f5f5f5] text-[#595959]',
-  purple: 'border-[#6633a6] bg-[#f5f0ff] text-[#6633a6]',
+  success: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg',
+  info: 'border-dash-busy-fg bg-info-bg text-dash-busy-fg',
+  warning: 'border-warn-fg bg-warn-bg text-warn-fg',
+  danger: 'border-dash-bad-fg bg-dash-bad-bg text-dash-bad-fg',
+  neutral: 'border-ink-faint bg-[#f5f5f5] text-[#595959]',
+  purple: 'border-purple-fg bg-[#f5f0ff] text-purple-fg',
 }
 
 const TAMANO = {

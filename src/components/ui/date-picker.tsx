@@ -85,10 +85,10 @@ export function DatePicker({
         className={cn(
           'flex h-8 items-center gap-2 rounded-md border bg-white px-3 text-[13px]',
           'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors',
-          value ? 'text-[#0f172a]' : 'text-[#a1a1aa]',
+          value ? 'text-[#0f172a]' : 'text-ink-faint',
           error
-            ? 'border-[#dc2626]'
-            : open ? 'border-dash-blue' : 'border-[#e4e4e7] hover:border-[#d4d4d8]',
+            ? 'border-field-error'
+            : open ? 'border-dash-blue' : 'border-line hover:border-line-strong',
           className,
         )}
       >

@@ -20,7 +20,7 @@ export function Checkbox({
       onClick={() => onChange(!on)}
       className={cn(
         'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
-        on ? 'border-dash-blue bg-dash-blue text-white' : 'border-[#d4d4d8] bg-white hover:border-[#a1a1aa]',
+        on ? 'border-dash-blue bg-dash-blue text-white' : 'border-line-strong bg-white hover:border-ink-faint',
         className,
       )}
     >

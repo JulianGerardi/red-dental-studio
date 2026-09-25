@@ -57,7 +57,7 @@ export function SurfaceWheel({
             key={z.id} role="checkbox" aria-checked={on} aria-label={SURFACE_NAMES[z.id]} tabIndex={0}
             onClick={() => toggle(z.id)}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(z.id) } }}
-            className="cursor-pointer outline-none [&:focus-visible>*:first-child]:stroke-[#1d56bc] [&:focus-visible>*:first-child]:stroke-[3]"
+            className="cursor-pointer outline-none [&:focus-visible>*:first-child]:stroke-dash-blue [&:focus-visible>*:first-child]:stroke-[3]"
           >
             {z.d ? (
               <path d={z.d} fill={on ? '#dbe7fa' : '#ffffff'} stroke="#000000" strokeWidth={1.5} />

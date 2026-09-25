@@ -73,40 +73,40 @@ export function CoachMark({
       {coaching.anchor && <Spotlight anchor={coaching.anchor} topicId={coaching.id} />}
 
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center p-3 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:justify-end sm:p-0">
-        <div className="pointer-events-auto motion-safe:animate-[loc-in_180ms_ease-out] flex w-full max-w-[380px] flex-col overflow-hidden rounded-2xl border border-[#e4e4e7] bg-white shadow-[0_8px_28px_rgb(0_0_0/0.18)]">
+        <div className="pointer-events-auto motion-safe:animate-[loc-in_180ms_ease-out] flex w-full max-w-[380px] flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-[0_8px_28px_rgb(0_0_0/0.18)]">
           <div className="flex items-center gap-2 px-4 pt-3.5">
             <span className="text-dash-blue text-[10px] font-semibold tracking-wide uppercase">{modulo}</span>
-            <span className="text-[10px] text-[#a1a1aa]">{coaching.index + 1}/{coaching.total}</span>
+            <span className="text-[10px] text-ink-faint">{coaching.index + 1}/{coaching.total}</span>
             <span className="ml-auto flex items-center gap-0.5">
               <button
                 type="button" aria-label={plegado ? 'Expand the explanation' : 'Collapse the explanation'}
                 aria-expanded={!plegado} onClick={() => setPlegado((v) => !v)}
-                className="flex size-6 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]"
+                className="flex size-6 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"
               >
                 <ChevronDown className={`size-3.5 transition-transform ${plegado ? '' : 'rotate-180'}`} />
               </button>
               <button
                 type="button" aria-label="Close the explanation" onClick={onClose}
-                className="flex size-6 items-center justify-center rounded-md text-[#71717a] hover:bg-[#f4f4f5]"
+                className="flex size-6 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"
               >
                 <X className="size-3.5" />
               </button>
             </span>
           </div>
 
-          <p className="px-4 pt-1 text-[13px] font-bold text-[#09090b]">{coaching.title}</p>
+          <p className="px-4 pt-1 text-[13px] font-bold text-ink">{coaching.title}</p>
 
           {!plegado && (
             <>
               <div className="px-4 pt-3"><Demo /></div>
-              <p className="px-4 pt-3 text-xs leading-relaxed text-[#71717a]">{coaching.body}</p>
+              <p className="px-4 pt-3 text-xs leading-relaxed text-ink-muted">{coaching.body}</p>
             </>
           )}
 
           <div className="flex flex-wrap items-center gap-2 px-4 py-3">
             <button
               type="button" onClick={onBackToHelp}
-              className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[12px] font-medium text-[#71717a] hover:bg-[#f4f4f5]"
+              className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[12px] font-medium text-ink-muted hover:bg-surface-muted"
             >
               <BookOpen className="size-3" /> Back to Help
             </button>
@@ -114,7 +114,7 @@ export function CoachMark({
               {onPrev && (
                 <button
                   type="button" onClick={onPrev}
-                  className="flex items-center gap-1.5 rounded-md border border-[#e4e4e7] px-2.5 py-1.5 text-[12px] font-medium text-[#09090b] hover:bg-[#fafafa]"
+                  className="flex items-center gap-1.5 rounded-md border border-line px-2.5 py-1.5 text-[12px] font-medium text-ink hover:bg-surface-subtle"
                 >
                   <ArrowLeft className="size-3" /> Back
                 </button>

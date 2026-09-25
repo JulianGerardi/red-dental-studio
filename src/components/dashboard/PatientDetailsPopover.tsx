@@ -51,11 +51,11 @@ function FilaDato({
 }: Fila & { className?: string; wrap?: boolean }) {
   return (
     <div className={cn('flex items-center gap-2 bg-white px-3 py-3', className)}>
-      <Icon className={cn('size-4 shrink-0 text-[#09090b]', wrap && 'mt-0.5')} strokeWidth={1.8} />
-      <span className="shrink-0 text-[13px] font-semibold text-[#09090b]">{label}</span>
+      <Icon className={cn('size-4 shrink-0 text-ink', wrap && 'mt-0.5')} strokeWidth={1.8} />
+      <span className="shrink-0 text-[13px] font-semibold text-ink">{label}</span>
       <span
         className={cn(
-          'ml-auto text-[13px] text-[#71717a]',
+          'ml-auto text-[13px] text-ink-muted',
           wrap ? 'min-w-0 text-right leading-[1.4]' : 'shrink-0 truncate',
         )}
       >
@@ -110,7 +110,7 @@ export function PatientDetailsPopover({
         type="button"
         onClick={onClose}
         aria-label="Close"
-        className="absolute top-3 right-3 rounded-full p-1.5 text-[#09090b] transition-colors hover:bg-black/5"
+        className="absolute top-3 right-3 rounded-full p-1.5 text-ink transition-colors hover:bg-black/5"
       >
         <X className="size-5" />
       </button>
@@ -133,8 +133,8 @@ export function PatientDetailsPopover({
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-3">
-        <p className="truncate text-xl font-bold text-[#09090b]">{name}</p>
-        <span className="shrink-0 rounded-full border border-[#1a804d] bg-[#f0fcf5] px-3 py-1 text-xs font-semibold text-[#1a804d]">
+        <p className="truncate text-xl font-bold text-ink">{name}</p>
+        <span className="shrink-0 rounded-full border border-dash-ok-fg bg-dash-ok-bg px-3 py-1 text-xs font-semibold text-dash-ok-fg">
           Planned
         </span>
       </div>
@@ -173,14 +173,14 @@ export function PatientDetailsPopover({
           Se mantiene "Reason for Visit" escrito completo y el icono de
           historia clínica, que Julián pidió al mejorar este bloque; el frame
           sigue diciendo "Rsn for Visit" con el icono de tamaño de texto. */}
-      <div className="border-l-dash-blue mt-3 overflow-hidden rounded-lg border border-[#e4e4e7] border-l-[3px] bg-white">
+      <div className="border-l-dash-blue mt-3 overflow-hidden rounded-lg border border-line border-l-[3px] bg-white">
         {/* El motivo envuelve en vez de cortarse: con "Reason" escrito completo
             no entra en una línea, y truncarlo era justo lo que había que
             arreglar acá. */}
         <div className="flex items-start gap-2 border-b border-[#f2f2f2] px-3 py-2.5">
-          <ClipboardList className="mt-px size-4 shrink-0 text-[#09090b]" strokeWidth={1.8} />
-          <span className="shrink-0 text-[13px] font-semibold text-[#09090b]">Reason for Visit</span>
-          <span className="ml-auto min-w-0 text-right text-[11px] leading-[1.4] text-[#a1a1aa]">
+          <ClipboardList className="mt-px size-4 shrink-0 text-ink" strokeWidth={1.8} />
+          <span className="shrink-0 text-[13px] font-semibold text-ink">Reason for Visit</span>
+          <span className="ml-auto min-w-0 text-right text-[11px] leading-[1.4] text-ink-faint">
             Routine dental check-up appointment
           </span>
         </div>
@@ -190,17 +190,17 @@ export function PatientDetailsPopover({
               número sólo cuenta filas de la tabla que está justo abajo. La
               negrita pasa al nombre de la visita, que es el dato. */}
           <div className="flex items-baseline justify-between gap-2">
-            <span className="text-[13px] font-bold text-[#09090b]">Visit 1</span>
-            <span className="shrink-0 text-[11px] text-[#71717a]">
+            <span className="text-[13px] font-bold text-ink">Visit 1</span>
+            <span className="shrink-0 text-[11px] text-ink-muted">
               {PROCEDIMIENTOS.length} Procedures
             </span>
           </div>
-          <p className="mt-0.5 text-[13px] text-[#09090b]">Comprehensive Implant Therapy</p>
+          <p className="mt-0.5 text-[13px] text-ink">Comprehensive Implant Therapy</p>
 
           {/* Misma tabla que Insurance y Documents: cabecera #f9f9f9 y filas
               finas. Con scroll, así no hay ningún "+N" que no lleve a nada. */}
-          <div className="mt-2 overflow-hidden rounded-lg border border-[#e7e7e7]">
-            <div className="flex h-7 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-2.5 text-[10px] font-semibold tracking-wide text-[#71717a] uppercase">
+          <div className="mt-2 overflow-hidden rounded-lg border border-line-row">
+            <div className="flex h-7 items-center gap-3 border-b border-line-row bg-surface-alt px-2.5 text-[10px] font-semibold tracking-wide text-ink-muted uppercase">
               <span className="w-[46px] shrink-0">Code</span>
               <span className="min-w-0 flex-1">Procedure</span>
             </div>
@@ -210,17 +210,17 @@ export function PatientDetailsPopover({
                 return (
                   <div
                     key={p}
-                    className="flex h-8 items-center gap-3 border-b border-[#f1f1f4] px-2.5 text-[11px] last:border-0"
+                    className="flex h-8 items-center gap-3 border-b border-line-soft px-2.5 text-[11px] last:border-0"
                   >
                     <span className="text-dash-blue w-[46px] shrink-0 font-medium">{code}</span>
-                    <span className="min-w-0 flex-1 truncate text-[#52525b]">{resto.join(' – ')}</span>
+                    <span className="min-w-0 flex-1 truncate text-ink-medium">{resto.join(' – ')}</span>
                   </div>
                 )
               })}
             </div>
           </div>
 
-          <p className="mt-2 text-right text-[13px] font-semibold text-[#09090b]">
+          <p className="mt-2 text-right text-[13px] font-semibold text-ink">
             Total: 1,270.00
           </p>
         </div>

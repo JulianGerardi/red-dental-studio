@@ -20,8 +20,8 @@ export function PatientCard({
   onEdit: (row: PatientRow) => void
 }) {
   return (
-    <article className="flex items-center gap-2.5 rounded-lg border border-[#e4e4e7] bg-white p-2.5 shadow-[0_1px_3px_rgb(0_0_0/0.08)]">
-      <span className="bg-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold text-[#fafafa]">
+    <article className="flex items-center gap-2.5 rounded-lg border border-line bg-white p-2.5 shadow-[0_1px_3px_rgb(0_0_0/0.08)]">
+      <span className="bg-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold text-surface-subtle">
         {row.initials}
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -34,7 +34,7 @@ export function PatientCard({
           </Link>
           <Pill tone={STATUS_TONO[row.status]} size="sm" className="shrink-0">{row.status}</Pill>
         </span>
-        <span className="flex items-center gap-1 text-[11px] text-[#71717a]">
+        <span className="flex items-center gap-1 text-[11px] text-ink-muted">
           <Mail className="size-3 shrink-0" />
           <span className="truncate">{row.email}</span>
         </span>

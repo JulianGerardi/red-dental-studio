@@ -51,23 +51,23 @@ function Dialogo({
       >
         <div className="flex items-start justify-between gap-4">
           <span className="min-w-0">
-            <h2 className="text-[18px] leading-tight font-bold text-[#09090b]">{titulo}</h2>
+            <h2 className="text-[18px] leading-tight font-bold text-ink">{titulo}</h2>
             {bajada?.map((t) => (
-              <p key={t} className="mt-1.5 text-[12px] leading-[1.5] text-[#71717a]">{t}</p>
+              <p key={t} className="mt-1.5 text-[12px] leading-[1.5] text-ink-muted">{t}</p>
             ))}
           </span>
-          <button onClick={onClose} aria-label="Close" className="shrink-0 text-[#09090b] hover:opacity-60">
+          <button onClick={onClose} aria-label="Close" className="shrink-0 text-ink hover:opacity-60">
             <X className="size-4" />
           </button>
         </div>
         {texto?.map((t) => (
-          <p key={t} className="mt-2 text-[13px] text-[#71717a]">{t}</p>
+          <p key={t} className="mt-2 text-[13px] text-ink-muted">{t}</p>
         ))}
         {children}
         <div className="mt-5 flex flex-nowrap items-center justify-end gap-3">
           <button
             onClick={onClose}
-            className="h-9 shrink-0 rounded-md border border-[#e4e4e7] px-4 text-[13px] font-medium whitespace-nowrap hover:bg-[#fafafa]"
+            className="h-9 shrink-0 rounded-md border border-line px-4 text-[13px] font-medium whitespace-nowrap hover:bg-surface-subtle"
           >
             Cancel
           </button>
@@ -92,20 +92,20 @@ function OpcionRadio({
       onClick={onClick}
       className={cn(
         'flex gap-3 rounded-lg border px-3.5 py-3 text-left transition-colors',
-        on ? 'border-dash-blue' : 'border-[#e4e4e7] hover:bg-[#fafafa]',
+        on ? 'border-dash-blue' : 'border-line hover:bg-surface-subtle',
       )}
     >
       <span
         className={cn(
           'mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-2',
-          on ? 'border-dash-blue' : 'border-[#a1a1aa]',
+          on ? 'border-dash-blue' : 'border-ink-faint',
         )}
       >
         {on && <span className="bg-dash-blue size-2 rounded-full" />}
       </span>
       <span className="min-w-0">
-        <span className="block text-[13px] font-semibold text-[#09090b]">{titulo}</span>
-        <span className="mt-1 block text-[12px] leading-[1.5] text-[#71717a]">{detalle}</span>
+        <span className="block text-[13px] font-semibold text-ink">{titulo}</span>
+        <span className="mt-1 block text-[12px] leading-[1.5] text-ink-muted">{detalle}</span>
       </span>
     </button>
   )
@@ -142,7 +142,7 @@ function DialogoMover({ onClose }: { onClose: () => void }) {
           error={intentado && !caso ? 'This field is required.' : undefined}
         />
       </div>
-      <p className="mt-5 text-xs font-medium text-[#09090b]">Select destination case</p>
+      <p className="mt-5 text-xs font-medium text-ink">Select destination case</p>
       <div className="mt-2.5 flex flex-col gap-2.5">
         {MOVER.opciones.map((o) => (
           <OpcionRadio key={o.id} on={op === o.id} titulo={o.titulo} detalle={o.detalle} onClick={() => setOp(o.id)} />
@@ -204,8 +204,8 @@ function DialogoCompletar({ onClose }: { onClose: () => void }) {
             <div
               key={c.id}
               className={cn(
-                'rounded-r-md border border-l-[3px] border-[#f1f1f4] border-l-[#1a804d] p-3 transition-colors',
-                on && 'border-dash-blue border-l-[#1a804d] bg-dash-count-bg',
+                'rounded-r-md border border-l-[3px] border-line-soft border-l-dash-ok-fg p-3 transition-colors',
+                on && 'border-dash-blue border-l-dash-ok-fg bg-dash-count-bg',
               )}
             >
               <div className="flex items-center gap-2">
@@ -214,7 +214,7 @@ function DialogoCompletar({ onClose }: { onClose: () => void }) {
                   label={`Mark ${c.zona} as treated`}
                   onChange={(v) => setMarcadas((m) => (v ? [...m, c.id] : m.filter((x) => x !== c.id)))}
                 />
-                <span className="rounded-full border border-[#1a804d] bg-[#f0fcf5] px-2 py-[2px] text-[11px] font-semibold text-[#1a804d]">
+                <span className="rounded-full border border-dash-ok-fg bg-dash-ok-bg px-2 py-[2px] text-[11px] font-semibold text-dash-ok-fg">
                   {c.estado}
                 </span>
                 <span className="text-dash-blue flex items-center gap-1 text-[12px] font-medium">
@@ -228,12 +228,12 @@ function DialogoCompletar({ onClose }: { onClose: () => void }) {
                   <MoreVertical className="size-4" />
                 </button>
               </div>
-              <p className="mt-2 text-[13px] font-bold text-[#09090b]">{c.zona}</p>
-              <p className="text-[12px] text-[#52525b]">
-                Condition: <span className="text-[#71717a]">{c.condicion}</span>
+              <p className="mt-2 text-[13px] font-bold text-ink">{c.zona}</p>
+              <p className="text-[12px] text-ink-medium">
+                Condition: <span className="text-ink-muted">{c.condicion}</span>
               </p>
-              <p className="text-[12px] text-[#52525b]">
-                Descriptors: <span className="text-[#71717a]">{c.descriptores}</span>
+              <p className="text-[12px] text-ink-medium">
+                Descriptors: <span className="text-ink-muted">{c.descriptores}</span>
               </p>
               <button
                 onClick={() => aviso.info('The procedure detail is not available in this release.')}
@@ -260,7 +260,7 @@ function DialogoBorrarCaso({ onConfirm, onClose }: { onConfirm: (op: string) => 
     >
       {/* "Select destination case" es el rótulo del frame, aunque lo que se
           elige acá sea el alcance del borrado. Se replica. */}
-      <p className="mt-4 text-[13px] font-semibold text-[#09090b]">Select destination case</p>
+      <p className="mt-4 text-[13px] font-semibold text-ink">Select destination case</p>
       <div className="mt-2 flex flex-col gap-2">
         {OPCIONES_BORRAR_CASO.map((o) => (
           <OpcionRadio key={o.id} on={op === o.id} titulo={o.titulo} detalle={o.detalle} onClick={() => setOp(o.id)} />
@@ -292,7 +292,7 @@ function Rail({
         onClick={onUnassigned}
         className={cn(
           'flex w-full items-center gap-2 rounded-md px-2 py-2 text-[13px] transition-colors',
-          vista === 'unassigned' ? 'bg-dash-blue font-medium text-white' : 'text-[#52525b] hover:bg-[#f4f4f5]',
+          vista === 'unassigned' ? 'bg-dash-blue font-medium text-white' : 'text-ink-medium hover:bg-surface-muted',
         )}
       >
         <SquareX className="size-4 shrink-0" /> Unassigned
@@ -301,7 +301,7 @@ function Rail({
       <button
         onClick={() => setAbierto((v) => !v)}
         aria-expanded={abierto}
-        className="mt-1 flex w-full items-center gap-2 rounded-md px-2 py-2 text-[13px] text-[#52525b] transition-colors hover:bg-[#f4f4f5]"
+        className="mt-1 flex w-full items-center gap-2 rounded-md px-2 py-2 text-[13px] text-ink-medium transition-colors hover:bg-surface-muted"
       >
         <LoaderCircle className="size-4 shrink-0" />
         <span className="min-w-0 flex-1 text-left">Pending Decision</span>
@@ -317,7 +317,7 @@ function Rail({
                 key={c.id}
                 className={cn(
                   'flex items-center gap-2 rounded-md pr-1 transition-colors',
-                  on ? 'bg-dash-blue text-white' : 'text-[#52525b] hover:bg-[#f4f4f5]',
+                  on ? 'bg-dash-blue text-white' : 'text-ink-medium hover:bg-surface-muted',
                 )}
               >
                 {/* El bookmark marca favorito; el resto de la fila navega. */}
@@ -353,7 +353,7 @@ function Rail({
         <button
           key={label}
           onClick={() => aviso.info(`${label} cases are not available in this release.`)}
-          className="mt-1 flex w-full items-center gap-2 rounded-md px-2 py-2 text-[13px] text-[#52525b] transition-colors hover:bg-[#f4f4f5]"
+          className="mt-1 flex w-full items-center gap-2 rounded-md px-2 py-2 text-[13px] text-ink-medium transition-colors hover:bg-surface-muted"
         >
           <Icono className="size-4 shrink-0" /> {label}
         </button>
@@ -375,7 +375,7 @@ function Casilla({ on, onChange, label }: { on: boolean; onChange: (v: boolean) 
       onClick={() => onChange(!on)}
       className={cn(
         'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
-        on ? 'border-dash-blue bg-dash-blue text-white' : 'border-[#d4d4d8] bg-white hover:border-[#a1a1aa]',
+        on ? 'border-dash-blue bg-dash-blue text-white' : 'border-line-strong bg-white hover:border-ink-faint',
       )}
     >
       {on && <Check className="size-3" strokeWidth={3} />}
@@ -401,7 +401,7 @@ function TablaProcedimientos({
     <div className="overflow-x-auto">
       <table className="w-full min-w-[860px] border-collapse">
         <thead>
-          <tr className="border-y border-[#f1f1f4] bg-[#f9f9f9]">
+          <tr className="border-y border-line-soft bg-surface-alt">
             {conCasillas && (
               <th className="w-10 px-3">
                 <Casilla
@@ -412,7 +412,7 @@ function TablaProcedimientos({
               </th>
             )}
             {COLUMNAS.map((c) => (
-              <th key={c} className="h-10 px-3 text-left text-[11px] font-semibold whitespace-nowrap text-[#71717a]">
+              <th key={c} className="h-10 px-3 text-left text-[11px] font-semibold whitespace-nowrap text-ink-muted">
                 {c}
               </th>
             ))}
@@ -423,7 +423,7 @@ function TablaProcedimientos({
             <tr
               key={p.id}
               className={cn(
-                'border-b border-[#f1f1f4] last:border-0',
+                'border-b border-line-soft last:border-0',
                 conCasillas && seleccion.includes(p.id) && 'bg-dash-count-bg',
               )}
             >
@@ -438,15 +438,15 @@ function TablaProcedimientos({
                   />
                 </td>
               )}
-              <td className="h-12 px-3 text-[13px] whitespace-nowrap text-[#09090b]">{p.fecha}</td>
-              <td className="px-3 text-[13px] text-[#09090b]">{p.superficie}</td>
-              <td className="px-3 text-[13px] text-[#09090b]">{p.pieza}</td>
-              <td className="px-3 text-[13px] text-[#09090b]">{p.ubicacion}</td>
-              <td className="px-3 text-[13px] whitespace-nowrap text-[#09090b]">
+              <td className="h-12 px-3 text-[13px] whitespace-nowrap text-ink">{p.fecha}</td>
+              <td className="px-3 text-[13px] text-ink">{p.superficie}</td>
+              <td className="px-3 text-[13px] text-ink">{p.pieza}</td>
+              <td className="px-3 text-[13px] text-ink">{p.ubicacion}</td>
+              <td className="px-3 text-[13px] whitespace-nowrap text-ink">
                 {p.codigo} {p.nombre}
               </td>
-              <td className="px-3 text-[13px] whitespace-nowrap text-[#3f3f46]">{p.proveedor}</td>
-              <td className="px-3 text-[13px] whitespace-nowrap text-[#3f3f46] tabular-nums">{p.fee}</td>
+              <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.proveedor}</td>
+              <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft tabular-nums">{p.fee}</td>
               <td className="px-3"><Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill></td>
               <td className="px-3">
                 <span className="flex items-center gap-1">
@@ -511,7 +511,7 @@ function VistaCaso({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-xl border border-[#e4e4e7] bg-white p-4 sm:p-5">
+      <div className="rounded-xl border border-line bg-white p-4 sm:p-5">
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={onFavorito}
@@ -519,16 +519,16 @@ function VistaCaso({
             aria-pressed={favorito}
             className={cn(
               'flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors',
-              favorito ? 'bg-dash-blue text-white' : 'border border-[#e4e4e7] bg-white text-[#09090b] hover:bg-[#fafafa]',
+              favorito ? 'bg-dash-blue text-white' : 'border border-line bg-white text-ink hover:bg-surface-subtle',
             )}
           >
             <Bookmark className="size-4" fill={favorito ? 'currentColor' : 'none'} />
           </button>
-          <span className="min-w-0 flex-1 text-[17px] font-bold text-[#09090b]">{caso.nombre}</span>
+          <span className="min-w-0 flex-1 text-[17px] font-bold text-ink">{caso.nombre}</span>
           <button
             onClick={() => aviso.info('Renaming a case is not available in this release.')}
             aria-label="Rename case"
-            className="shrink-0 text-[#52525b] hover:opacity-70"
+            className="shrink-0 text-ink-medium hover:opacity-70"
           >
             <Pencil className="size-4" />
           </button>
@@ -548,7 +548,7 @@ function VistaCaso({
               <MoreVertical className="size-4" />
             </button>
             {menu && (
-              <div className="absolute top-full right-0 z-30 mt-1 w-[190px] rounded-lg border border-[#e4e4e7] bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
+              <div className="absolute top-full right-0 z-30 mt-1 w-[190px] rounded-lg border border-line bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
                 {([
                   ['Present Case', 'present'],
                   ['Accept Case', 'accept'],
@@ -558,7 +558,7 @@ function VistaCaso({
                   <button
                     key={clave}
                     onClick={() => { setMenu(false); onDialogo(clave) }}
-                    className="block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]"
+                    className="block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
                   >
                     {label}
                   </button>
@@ -581,15 +581,15 @@ function VistaCaso({
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-x-8 gap-y-2">
-          <span className="text-[13px] text-[#09090b]">
+          <span className="text-[13px] text-ink">
             Create on: <span className="text-dash-blue font-medium">{caso.creado}</span>
           </span>
-          <span className="text-[13px] text-[#09090b]">
+          <span className="text-[13px] text-ink">
             Create by: <span className="text-dash-blue font-medium">{caso.creadoPor}</span>
           </span>
-          <span className="ml-auto flex items-center gap-2 text-[13px] text-[#09090b]">
+          <span className="ml-auto flex items-center gap-2 text-[13px] text-ink">
             Status:
-            <span className="rounded-full border border-[#99660d] bg-[#fffaf0] px-2 py-[2px] text-[11px] font-semibold text-[#99660d]">
+            <span className="rounded-full border border-warn-fg bg-warn-bg px-2 py-[2px] text-[11px] font-semibold text-warn-fg">
               {caso.estado}
             </span>
           </span>
@@ -597,13 +597,13 @@ function VistaCaso({
 
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <div>
-            <span className="block text-xs font-medium text-[#09090b]">
-              Treatment Case Category<span className="text-[#ff0608]">*</span>
+            <span className="block text-xs font-medium text-ink">
+              Treatment Case Category<span className="text-required">*</span>
             </span>
             <select
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
-              className="focus:border-dash-blue mt-1.5 h-10 w-full rounded-md border border-[#e4e4e7] bg-white px-3 text-[13px] focus:outline-none"
+              className="focus:border-dash-blue mt-1.5 h-10 w-full rounded-md border border-line bg-white px-3 text-[13px] focus:outline-none"
             >
               <option value="">Select</option>
               {CATEGORIAS.map((c) => <option key={c}>{c}</option>)}
@@ -616,8 +616,8 @@ function VistaCaso({
             </button>
           </div>
           <div>
-            <span className="block text-xs font-medium text-[#09090b]">
-              Additional Discussion Notes<span className="text-[#ff0608]">*</span>
+            <span className="block text-xs font-medium text-ink">
+              Additional Discussion Notes<span className="text-required">*</span>
             </span>
             <div className="relative mt-1.5">
               <textarea
@@ -625,12 +625,12 @@ function VistaCaso({
                 onChange={(e) => setNotas(e.target.value)}
                 rows={3}
                 placeholder="Include patient history, previous treatments, and specific questions for the specialist..."
-                className="focus:border-dash-blue w-full resize-none rounded-md border border-[#e4e4e7] p-3 pr-10 text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
+                className="focus:border-dash-blue w-full resize-none rounded-md border border-line p-3 pr-10 text-[13px] placeholder:text-ink-faint focus:outline-none"
               />
               <button
                 onClick={() => aviso.ok('Discussion notes saved.')}
                 aria-label="Save notes"
-                className="absolute right-2 bottom-2 text-[#52525b] hover:opacity-70"
+                className="absolute right-2 bottom-2 text-ink-medium hover:opacity-70"
               >
                 <Save className="size-4" />
               </button>
@@ -638,13 +638,13 @@ function VistaCaso({
           </div>
         </div>
 
-        <div className="bg-dash-count-bg mt-4 w-fit rounded-md px-3 py-2 text-[13px] font-semibold text-[#09090b]">
+        <div className="bg-dash-count-bg mt-4 w-fit rounded-md px-3 py-2 text-[13px] font-semibold text-ink">
           Total Amount: <span className="text-dash-blue">{caso.total}</span>
         </div>
       </div>
 
       {caso.visitas.map((v) => (
-        <div key={v.id} className="overflow-hidden rounded-xl border border-[#e4e4e7] bg-white">
+        <div key={v.id} className="overflow-hidden rounded-xl border border-line bg-white">
           <div className="bg-dash-blue px-4 py-2 text-[13px] font-semibold text-white">
             {v.nombre} - {v.total}
           </div>
@@ -692,9 +692,9 @@ export function TreatmentPlanSection() {
         {vista === 'caso' && <ConsentBlock />}
 
         {vista === 'unassigned' ? (
-          <div className="rounded-xl border border-[#e4e4e7] bg-white p-4 sm:p-5">
+          <div className="rounded-xl border border-line bg-white p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-3">
-              <p className="min-w-0 flex-1 text-[17px] font-bold text-[#09090b]">Unassigned</p>
+              <p className="min-w-0 flex-1 text-[17px] font-bold text-ink">Unassigned</p>
               {['New Case Group', 'New Alternative Case'].map((t) => (
                 <button
                   key={t}
@@ -726,13 +726,13 @@ export function TreatmentPlanSection() {
                 </button>
                 <button
                   onClick={() => setDialogo('removeProcedure')}
-                  className="text-[13px] font-semibold text-[#b22626] hover:underline"
+                  className="text-[13px] font-semibold text-dash-bad-fg hover:underline"
                 >
                   Remove
                 </button>
                 <button
                   onClick={() => setSeleccion([])}
-                  className="ml-auto text-[13px] font-medium text-[#71717a] hover:underline"
+                  className="ml-auto text-[13px] font-medium text-ink-muted hover:underline"
                 >
                   Clear
                 </button>
@@ -748,7 +748,7 @@ export function TreatmentPlanSection() {
             </div>
             {/* El pie del frame dice "insurances" en una tabla de
                 procedimientos. Se replica. */}
-            <p className="mt-3 text-[12px] text-[#71717a]">
+            <p className="mt-3 text-[12px] text-ink-muted">
               Showing {NO_ASIGNADOS.length} of {NO_ASIGNADOS.length} insurances
             </p>
           </div>

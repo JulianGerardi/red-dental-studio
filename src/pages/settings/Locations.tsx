@@ -58,21 +58,21 @@ export function SettingsLocations() {
         )}
       >
         <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
           <input
             ref={inputRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search locations"
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
           />
         </div>
         <SearchButton onClick={() => inputRef.current?.focus()} className="h-9" />
       </SettingsPageHeader>
 
-      <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+      <div className="mt-4 overflow-x-auto rounded-lg border border-line-row bg-white">
         <div className="min-w-[760px]">
-          <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
+          <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
             <span className="w-[180px]">Location name</span>
             <span className="w-[100px]">Employees</span>
             <span className="w-[80px]">Room</span>
@@ -95,7 +95,7 @@ export function SettingsLocations() {
             visibles.map((l) => (
               <div
                 key={l.id}
-                className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]"
+                className="flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft"
               >
                 {/* El nombre es el acceso, como en la tabla de pacientes. */}
                 <Link
@@ -122,8 +122,8 @@ export function SettingsLocations() {
           )}
 
           {visibles.length > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
-              <span className="text-xs font-semibold text-[#71717a]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
+              <span className="text-xs font-semibold text-ink-muted">
                 Showing {visibles.length} of {filas.length} locations
               </span>
             </div>

@@ -31,9 +31,9 @@ export function EmptyState({
       <span className="flex size-9 items-center justify-center rounded-lg bg-[#e8eef8]">
         {Icon ? <Icon className="text-dash-blue size-4" /> : <span className="bg-dash-blue size-2.5 rounded-full" />}
       </span>
-      <p className="text-sm font-bold text-[#09090b]">{title}</p>
+      <p className="text-sm font-bold text-ink">{title}</p>
       {detail && (
-        <p className="max-w-[260px] text-xs leading-[1.5] text-[#a1a1aa]">{detail}</p>
+        <p className="max-w-[260px] text-xs leading-[1.5] text-ink-faint">{detail}</p>
       )}
       {accion && (
         <button
@@ -45,7 +45,7 @@ export function EmptyState({
         </button>
       )}
       {pill && (
-        <span className="mt-1 rounded-md bg-[#f2f5f7] px-2 py-1 text-[10px] font-semibold tracking-wide text-[#b8b8b8] uppercase">
+        <span className="mt-1 rounded-md bg-[#f2f5f7] px-2 py-1 text-[10px] font-semibold tracking-wide text-dash-delta uppercase">
           {pill}
         </span>
       )}

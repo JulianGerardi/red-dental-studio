@@ -53,9 +53,9 @@ function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) =
       role="switch"
       aria-checked={on}
       onClick={() => onChange(!on)}
-      className="flex items-center gap-2 text-[13px] text-[#09090b]"
+      className="flex items-center gap-2 text-[13px] text-ink"
     >
-      <span className={cn('flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors', on ? 'bg-dash-blue' : 'bg-[#d4d4d8]')}>
+      <span className={cn('flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors', on ? 'bg-dash-blue' : 'bg-line-strong')}>
         <span className={cn('size-3 rounded-full bg-white transition-transform', on && 'translate-x-3')} />
       </span>
       {label}
@@ -67,10 +67,10 @@ function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) =
 function FilaDato({ icon: Icon, label, value }: { icon: typeof ShieldHalf; label: string; value: string }) {
   return (
     <div className="flex items-center gap-2.5">
-      <Icon className="size-4 shrink-0 text-[#71717a]" strokeWidth={1.8} />
+      <Icon className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />
       <span className="min-w-0 leading-tight">
-        <span className="block text-[11px] text-[#a1a1aa]">{label}</span>
-        <span className="block truncate text-[13px] text-[#09090b]">{value}</span>
+        <span className="block text-[11px] text-ink-faint">{label}</span>
+        <span className="block truncate text-[13px] text-ink">{value}</span>
       </span>
     </div>
   )
@@ -132,14 +132,14 @@ export default function Insurance() {
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-xl leading-[1.3] font-semibold text-[#09090b]">Patients Plans</h1>
+            <h1 className="text-xl leading-[1.3] font-semibold text-ink">Patients Plans</h1>
             <Switch on={historial} onChange={setHistorial} label="Show plan history" />
           </div>
 
           {/* Tabla de planes */}
-          <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+          <div className="mt-4 overflow-x-auto rounded-lg border border-line-row bg-white">
             <div className="min-w-[960px]">
-              <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
+              <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
                 <span className={COLS.handle} />
                 <span className={COLS.order}>Order</span>
                 <span className={COLS.carrier}>Carrier</span>
@@ -159,13 +159,13 @@ export default function Insurance() {
                     key={p.id}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={() => soltar(i)}
-                    className="flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]"
+                    className="flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft"
                   >
                     <span
                       draggable
                       onDragStart={() => { arrastrada.current = i }}
                       aria-label={`Reorder ${p.plan}`}
-                      className={cn(COLS.handle, 'cursor-grab text-[#a1a1aa] active:cursor-grabbing')}
+                      className={cn(COLS.handle, 'cursor-grab text-ink-faint active:cursor-grabbing')}
                     >
                       <GripVertical className="size-4" />
                     </span>
@@ -186,8 +186,8 @@ export default function Insurance() {
               {/* El Figma dice "8 of 8" con cuatro filas a la vista; el
                   contador ahora cuenta las que hay. La paginación dibujada
                   no tenía onClick: se usa el componente compartido. */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
-                <span className="text-xs font-semibold text-[#71717a]">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
+                <span className="text-xs font-semibold text-ink-muted">
                   Showing {visibles.length} of {visibles.length} insurances
                 </span>
                 <Pagination pagina={1} paginas={1} onChange={() => {}} />
@@ -197,23 +197,23 @@ export default function Insurance() {
 
           {/* Suscripción + datos del paciente */}
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <section className="flex flex-col rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
-              <h2 className="text-sm font-semibold text-[#09090b]">Subscription Information</h2>
-              <p className="mt-0.5 text-[11px] text-[#71717a]">
+            <section className="flex flex-col rounded-lg border border-line bg-white p-4 sm:p-5">
+              <h2 className="text-sm font-semibold text-ink">Subscription Information</h2>
+              <p className="mt-0.5 text-[11px] text-ink-muted">
                 Select an existing subscription or create new one.
               </p>
 
-              <span className="mt-4 block text-xs font-medium text-[#09090b]">
-                Search for an existing subscription<span className="text-[#ff0608]">*</span>
+              <span className="mt-4 block text-xs font-medium text-ink">
+                Search for an existing subscription<span className="text-required">*</span>
               </span>
               <div className="relative mt-2">
-                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
                 {/* Borde gris como todos los buscadores del sistema; el azul
                     queda para el foco. El frame lo dibuja siempre azul porque
                     lo capturó enfocado. */}
                 <input
                   placeholder="Search result"
-                  className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+                  className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
                 />
               </div>
               <button
@@ -224,7 +224,7 @@ export default function Insurance() {
                 <CirclePlus className="size-4" /> Add New Subscription
               </button>
 
-              <p className="mt-4 text-sm font-semibold text-[#09090b]">Select a subscription</p>
+              <p className="mt-4 text-sm font-semibold text-ink">Select a subscription</p>
               <div className="mt-3 flex flex-col gap-3">
                 <FilaDato icon={PersonStanding} label="Subscriber" value={SUSCRIPCION.subscriber} />
                 <FilaDato icon={PersonStanding} label="Subscriber ID" value={SUSCRIPCION.subscriberId} />
@@ -243,8 +243,8 @@ export default function Insurance() {
               </button>
             </section>
 
-            <section className="flex flex-col rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
-              <h2 className="text-sm font-semibold text-[#09090b]">Patient Information</h2>
+            <section className="flex flex-col rounded-lg border border-line bg-white p-4 sm:p-5">
+              <h2 className="text-sm font-semibold text-ink">Patient Information</h2>
 
               <SelectField
                 className="mt-4" label="Relationship to Subscriber" required options={RELACIONES}
@@ -254,10 +254,10 @@ export default function Insurance() {
               {/* Caja de sólo lectura con el mismo rótulo que el select de
                   abajo, y con "Cordination" mal escrito. Es del Figma. */}
               <div className="mt-4 flex items-center gap-2.5 rounded-md bg-[#eff4ff] px-3 py-2">
-                <CreditCard className="size-4 shrink-0 text-[#71717a]" strokeWidth={1.8} />
+                <CreditCard className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />
                 <span className="leading-tight">
-                  <span className="block text-[11px] text-[#a1a1aa]">Cordination Order</span>
-                  <span className="block text-[13px] text-[#09090b]">Primary</span>
+                  <span className="block text-[11px] text-ink-faint">Cordination Order</span>
+                  <span className="block text-[13px] text-ink">Primary</span>
                 </span>
               </div>
 

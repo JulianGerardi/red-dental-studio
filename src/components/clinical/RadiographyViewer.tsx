@@ -40,8 +40,8 @@ export function Placa({ id, chica }: { id: string; chica?: boolean }) {
    acento a la izquierda, la zona en versalitas y dos acciones —borrar y
    editar— en cajitas blancas. Los rojos y verdes salen muestreados del nodo. */
 const PILL: Record<Hallazgo['estado'], string> = {
-  Active: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Discarded: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
+  Active: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg',
+  Discarded: 'border-dash-bad-fg bg-dash-bad-bg text-dash-bad-fg',
 }
 const ACENTO: Record<Hallazgo['estado'], string> = {
   Active: '#1e9850',
@@ -53,37 +53,37 @@ function FichaHallazgo({ h, onBorrar }: { h: Hallazgo; onBorrar: () => void }) {
     <div
       /* shrink-0: la lista es flex con alto máximo, y sin esto las cards se
          achicaban hasta recortar Condition y Descriptors. */
-      className="shrink-0 overflow-hidden rounded-md border-l-[4px] bg-[#f9f9f9] p-3"
+      className="shrink-0 overflow-hidden rounded-md border-l-[4px] bg-surface-alt p-3"
       style={{ borderLeftColor: ACENTO[h.estado] }}
     >
       <div className="flex items-center gap-2">
         <span className={cn('shrink-0 rounded-full border px-2 py-[2px] text-[11px] font-semibold', PILL[h.estado])}>
           {h.estado}
         </span>
-        <span className="min-w-0 truncate text-[12px] text-[#71717a]">{h.fecha}</span>
+        <span className="min-w-0 truncate text-[12px] text-ink-muted">{h.fecha}</span>
         <span className="ml-auto flex shrink-0 items-center gap-1">
           <button
             onClick={onBorrar}
             aria-label={`Delete finding on ${h.zona}`}
-            className="flex size-7 items-center justify-center rounded-md bg-white text-[#09090b] transition-colors hover:bg-[#fff2f2] hover:text-[#b22626]"
+            className="flex size-7 items-center justify-center rounded-md bg-white text-ink transition-colors hover:bg-dash-bad-bg hover:text-dash-bad-fg"
           >
             <Trash2 className="size-3.5" />
           </button>
           <button
             onClick={() => aviso.info('Editing a finding is not available in this release.')}
             aria-label={`Edit finding on ${h.zona}`}
-            className="flex size-7 items-center justify-center rounded-md bg-white text-[#09090b] transition-colors hover:bg-[#f1f1f4]"
+            className="flex size-7 items-center justify-center rounded-md bg-white text-ink transition-colors hover:bg-line-soft"
           >
             <Pencil className="size-3.5" />
           </button>
         </span>
       </div>
-      <p className="mt-2 text-[13px] font-bold text-[#09090b] uppercase">{h.zona}</p>
-      <p className="mt-1 text-[13px] text-[#09090b]">
-        Condition: <span className="text-[#71717a]">{h.condicion}</span>
+      <p className="mt-2 text-[13px] font-bold text-ink uppercase">{h.zona}</p>
+      <p className="mt-1 text-[13px] text-ink">
+        Condition: <span className="text-ink-muted">{h.condicion}</span>
       </p>
-      <p className="text-[13px] text-[#09090b]">
-        Descriptors: <span className="text-[#71717a]">{h.descriptores}</span>
+      <p className="text-[13px] text-ink">
+        Descriptors: <span className="text-ink-muted">{h.descriptores}</span>
       </p>
     </div>
   )
@@ -106,8 +106,8 @@ function NewCondition({ onClose }: { onClose: () => void }) {
         className="motion-safe:animate-[panel-in_180ms_ease-out] flex h-full w-full max-w-[420px] flex-col bg-white"
       >
         <div className="flex items-start justify-between gap-3 px-5 pt-5">
-          <h2 className="text-[20px] font-bold text-[#09090b]">New Condition</h2>
-          <button onClick={onClose} aria-label="Close" className="shrink-0 text-[#09090b] hover:opacity-60">
+          <h2 className="text-[20px] font-bold text-ink">New Condition</h2>
+          <button onClick={onClose} aria-label="Close" className="shrink-0 text-ink hover:opacity-60">
             <X className="size-5" />
           </button>
         </div>
@@ -117,20 +117,20 @@ function NewCondition({ onClose }: { onClose: () => void }) {
           {[1, 2].map((n) => (
             <span key={n} className="flex flex-1 items-center gap-3 last:flex-none">
               <span className="flex flex-col items-center gap-1">
-                <span className={cn('text-[11px]', paso >= n ? 'text-dash-blue font-medium' : 'text-[#a1a1aa]')}>
+                <span className={cn('text-[11px]', paso >= n ? 'text-dash-blue font-medium' : 'text-ink-faint')}>
                   Step
                 </span>
                 <span
                   className={cn(
                     'flex size-5 items-center justify-center rounded-full text-[11px] font-semibold',
-                    paso >= n ? 'bg-dash-blue text-white' : 'bg-[#e4e4e7] text-[#71717a]',
+                    paso >= n ? 'bg-dash-blue text-white' : 'bg-line text-ink-muted',
                   )}
                 >
                   {n}
                 </span>
               </span>
               {n === 1 && (
-                <span className="mt-4 h-px flex-1 bg-[#e4e4e7]">
+                <span className="mt-4 h-px flex-1 bg-line">
                   <span className={cn('block h-px bg-dash-blue transition-all', paso > 1 ? 'w-full' : 'w-0')} />
                 </span>
               )}
@@ -139,7 +139,7 @@ function NewCondition({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
-          <p className="text-[13px] font-semibold text-[#09090b]">Selected area</p>
+          <p className="text-[13px] font-semibold text-ink">Selected area</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {zona ? (
               <span className="bg-dash-count-bg text-dash-blue-hover flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] font-semibold">
@@ -149,27 +149,27 @@ function NewCondition({ onClose }: { onClose: () => void }) {
                 {zona}
               </span>
             ) : (
-              <span className="text-[12px] text-[#71717a]">Pick an area on the image.</span>
+              <span className="text-[12px] text-ink-muted">Pick an area on the image.</span>
             )}
           </div>
 
-          <div className="my-4 h-px bg-[#f1f1f4]" />
+          <div className="my-4 h-px bg-line-soft" />
 
           {paso === 1 ? (
             <>
-              <span className="block text-xs font-medium text-[#09090b]">
-                Condition<span className="text-[#ff0608]">*</span>
+              <span className="block text-xs font-medium text-ink">
+                Condition<span className="text-required">*</span>
               </span>
               <div className="mt-1.5 flex gap-2">
                 <input
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Select"
-                  className="focus:border-dash-blue h-9 min-w-0 flex-1 rounded-md border border-[#e4e4e7] px-3 text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
+                  className="focus:border-dash-blue h-9 min-w-0 flex-1 rounded-md border border-line px-3 text-[13px] placeholder:text-ink-faint focus:outline-none"
                 />
                 <button
                   onClick={() => aviso.info('Filters are not available in this release.')}
-                  className="flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-[#e4e4e7] px-3 text-[13px] font-medium hover:bg-[#fafafa]"
+                  className="flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-line px-3 text-[13px] font-medium hover:bg-surface-subtle"
                 >
                   <ListFilter className="size-3.5" /> Filter
                 </button>
@@ -193,10 +193,10 @@ function NewCondition({ onClose }: { onClose: () => void }) {
                       className={cn(
                         'flex items-center gap-2 rounded-lg border p-3 text-left transition-colors',
                         p.deshabilitado
-                          ? 'cursor-not-allowed border-[#e4e4e7] bg-[#f4f4f5] text-[#a1a1aa]'
+                          ? 'cursor-not-allowed border-line bg-surface-muted text-ink-faint'
                           : elegido === i
                             ? 'border-dash-blue'
-                            : 'border-[#e4e4e7] hover:bg-[#fafafa]',
+                            : 'border-line hover:bg-surface-subtle',
                       )}
                     >
                       <span className="min-w-0 flex-1 text-[13px]">
@@ -211,32 +211,32 @@ function NewCondition({ onClose }: { onClose: () => void }) {
             </>
           ) : (
             <>
-              <span className="block text-xs font-medium text-[#09090b]">Descriptors</span>
+              <span className="block text-xs font-medium text-ink">Descriptors</span>
               <div className="mt-2 flex flex-wrap gap-2">
                 {['Red', 'White', 'Ulcerated', 'Swollen', 'Painful'].map((d) => (
                   <button
                     key={d}
                     onClick={() => aviso.info(`${d} added to the finding.`)}
-                    className="rounded-full border border-[#e4e4e7] px-3 py-1 text-[12px] font-medium hover:bg-[#fafafa]"
+                    className="rounded-full border border-line px-3 py-1 text-[12px] font-medium hover:bg-surface-subtle"
                   >
                     {d}
                   </button>
                 ))}
               </div>
-              <span className="mt-4 block text-xs font-medium text-[#09090b]">Note</span>
+              <span className="mt-4 block text-xs font-medium text-ink">Note</span>
               <textarea
                 rows={4}
                 placeholder="Add a note for this finding"
-                className="focus:border-dash-blue mt-1.5 w-full resize-none rounded-md border border-[#e4e4e7] p-3 text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
+                className="focus:border-dash-blue mt-1.5 w-full resize-none rounded-md border border-line p-3 text-[13px] placeholder:text-ink-faint focus:outline-none"
               />
             </>
           )}
         </div>
 
-        <div className="flex items-center gap-3 border-t border-[#f1f1f4] p-5">
+        <div className="flex items-center gap-3 border-t border-line-soft p-5">
           <button
             onClick={() => (paso === 1 ? onClose() : setPaso(1))}
-            className="h-10 flex-1 rounded-md border border-[#e4e4e7] text-[13px] font-medium hover:bg-[#fafafa]"
+            className="h-10 flex-1 rounded-md border border-line text-[13px] font-medium hover:bg-surface-subtle"
           >
             {paso === 1 ? 'Cancel' : 'Back'}
           </button>
@@ -271,9 +271,9 @@ export function RadiographyViewer({
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row">
-      <div className="flex flex-col rounded-xl border border-[#e4e4e7] bg-white lg:w-[330px] lg:shrink-0">
+      <div className="flex flex-col rounded-xl border border-line bg-white lg:w-[330px] lg:shrink-0">
         <div className="flex flex-wrap items-center gap-2 px-4 pt-4">
-          <p className="min-w-0 flex-1 text-[17px] font-bold text-[#09090b]">Findings</p>
+          <p className="min-w-0 flex-1 text-[17px] font-bold text-ink">Findings</p>
           {/* Los dos botones del componente: el azul apagado para revisar y el
               azul pleno para el alta. */}
           <button
@@ -377,7 +377,7 @@ export function RadiographyViewer({
               aria-current={r.id === actual.id ? 'true' : undefined}
               className={cn(
                 'h-[74px] w-[96px] shrink-0 overflow-hidden rounded-lg border-2 transition-colors',
-                r.id === actual.id ? 'border-dash-blue' : 'border-transparent hover:border-[#e4e4e7]',
+                r.id === actual.id ? 'border-dash-blue' : 'border-transparent hover:border-line',
               )}
             >
               <Placa id={r.id} chica />

@@ -121,7 +121,7 @@ export function SettingsPlaceholder() {
   const label = [...SETTINGS_NAV].reverse().find((n) => pathname.startsWith(n.to))?.label ?? 'Settings'
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">{label}</h1>
+      <h1 className="text-2xl font-bold text-ink">{label}</h1>
       <Card className="mt-6 flex">
         <EmptyState
           title="Coming soon"

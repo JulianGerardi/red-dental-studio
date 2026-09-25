@@ -4,8 +4,8 @@ import { Check } from 'lucide-react'
 /* Header de paso que comparten los drawers de varios pasos: una insignia
    numerada por paso, unidas por una regla que se completa al avanzar. */
 function Insignia({ estado, numero }: { estado: 'active' | 'complete' | 'pending'; numero: number }) {
-  const bg = estado === 'complete' ? 'bg-[#1a804d]' : estado === 'active' ? 'bg-dash-blue' : 'bg-[#d4d4d8]'
-  const label = estado === 'complete' ? 'text-[#1a804d]' : estado === 'active' ? 'text-dash-blue' : 'text-[#a1a1aa]'
+  const bg = estado === 'complete' ? 'bg-dash-ok-fg' : estado === 'active' ? 'bg-dash-blue' : 'bg-line-strong'
+  const label = estado === 'complete' ? 'text-dash-ok-fg' : estado === 'active' ? 'text-dash-blue' : 'text-ink-faint'
   return (
     <div className="flex flex-col items-center gap-1">
       <span className={`text-[10px] font-medium transition-colors duration-300 ${label}`}>Step</span>
@@ -21,7 +21,7 @@ function Conector({ lleno }: { lleno: boolean }) {
     <div className="-mx-2 flex flex-1 flex-col items-center gap-1">
       <span className="invisible text-[10px] font-medium">Step</span>
       <div className="flex h-6 w-full items-center">
-        <div className={`w-full border-t-2 transition-colors duration-300 ${lleno ? 'border-dash-blue' : 'border-[#d4d4d8]'}`} />
+        <div className={`w-full border-t-2 transition-colors duration-300 ${lleno ? 'border-dash-blue' : 'border-line-strong'}`} />
       </div>
     </div>
   )

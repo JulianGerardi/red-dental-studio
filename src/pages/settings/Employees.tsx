@@ -100,13 +100,13 @@ export function SettingsEmployees() {
         )}
       >
         <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
           <input
             ref={inputRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search employees"
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
           />
         </div>
         <SearchButton onClick={() => inputRef.current?.focus()} className="h-9" />
@@ -117,9 +117,9 @@ export function SettingsEmployees() {
         )}
       </SettingsPageHeader>
 
-      <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+      <div className="mt-4 overflow-x-auto rounded-lg border border-line-row bg-white">
         <div className="min-w-[840px]">
-          <div className="flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
+          <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
             <span className={COLS.check}>
               <Checkbox on={todasVisibles} onChange={alternarTodas} label="Select all employees" />
             </span>
@@ -148,7 +148,7 @@ export function SettingsEmployees() {
                 <div
                   key={e.id}
                   className={cn(
-                    'flex items-center gap-3 border-t border-[#e7e7e7] px-3 py-3 text-[13px] text-[#3f3f46]',
+                    'flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft',
                     marcada && 'bg-dash-count-bg',
                   )}
                 >
@@ -206,8 +206,8 @@ export function SettingsEmployees() {
           )}
 
           {visibles.length > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
-              <span className="text-xs font-semibold text-[#71717a]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
+              <span className="text-xs font-semibold text-ink-muted">
                 Showing {visibles.length} of {filas.length} employees
               </span>
             </div>
@@ -267,12 +267,12 @@ export function SettingsEmployeeDetail() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">
+      <h1 className="text-2xl font-bold text-ink">
         {tab === 'Employee' ? 'Employee Information' : tab}
       </h1>
-      <p className="mt-1 text-sm text-[#71717a]">Set your employee information. Update roles and hours.</p>
+      <p className="mt-1 text-sm text-ink-muted">Set your employee information. Update roles and hours.</p>
 
-      <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-[#f1f5f9] p-1">
+      <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-surface-slate p-1">
         {tabsVisibles.map((t) => (
           <button
             key={t}
@@ -285,7 +285,7 @@ export function SettingsEmployeeDetail() {
                  claro que "Is Provider" acaba de destrabar algo, no que la
                  pantalla se reordenó sola. */
               esTabProvider(t) && 'motion-safe:animate-[tab-in_180ms_cubic-bezier(0.16,1,0.3,1)]',
-              tab === t ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
+              tab === t ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
             )}
           >
             {t}
@@ -307,19 +307,19 @@ export function SettingsEmployeeDetail() {
                     avatarClassName="bg-dash-count-bg text-dash-blue-hover size-14 rounded-lg text-base"
                   />
                   <span>
-                    <span className="block text-xl font-bold text-[#09090b]">{empleado.nombre}</span>
-                    <span className="mt-1 inline-block rounded-full border border-[#1a804d] bg-[#f0fcf5] px-2 py-[2px] text-[11px] font-semibold text-[#1a804d]">
+                    <span className="block text-xl font-bold text-ink">{empleado.nombre}</span>
+                    <span className="mt-1 inline-block rounded-full border border-dash-ok-fg bg-dash-ok-bg px-2 py-[2px] text-[11px] font-semibold text-dash-ok-fg">
                       {empleado.estado}
                     </span>
                   </span>
                 </div>
                 <span className="flex items-center gap-2">
                   <Toggle on={esProvider} onChange={alternarProvider} />
-                  <span className="text-[13px] text-[#09090b]">Is Provider</span>
+                  <span className="text-[13px] text-ink">Is Provider</span>
                 </span>
               </div>
 
-              <h3 className="mt-5 text-sm font-bold text-[#09090b]">General Information</h3>
+              <h3 className="mt-5 text-sm font-bold text-ink">General Information</h3>
               <div className="mt-3 flex flex-col gap-3">
                 <LinkExistingPerson
                   vincular={vincular}
@@ -409,7 +409,7 @@ export function SettingsEmployeeDetail() {
                         type="button"
                         aria-label="Remove credential"
                         onClick={() => setCredenciales((p) => p.filter((x) => x !== c))}
-                        className="mb-1 rounded p-2 text-[#09090b] hover:bg-[#fff2f2] hover:text-[#dc2626]"
+                        className="mb-1 rounded p-2 text-ink hover:bg-dash-bad-bg hover:text-field-error"
                       >
                         <Trash2 className="size-4" />
                       </button>
@@ -434,8 +434,8 @@ export function SettingsEmployeeDetail() {
                 className="flex w-full flex-col items-center gap-2 rounded-lg border-2 border-dashed border-[#93c5fd] bg-[#fafcff] px-6 py-10 sm:w-[420px]"
               >
                 <FileText className="text-dash-blue size-8" strokeWidth={1.5} />
-                <span className="text-sm font-bold text-[#09090b]">Drag and drop your files</span>
-                <span className="text-[11px] text-[#a1a1aa]">JPEG, PND, PDF, and MP4 formats, up to 50MB</span>
+                <span className="text-sm font-bold text-ink">Drag and drop your files</span>
+                <span className="text-[11px] text-ink-faint">JPEG, PND, PDF, and MP4 formats, up to 50MB</span>
                 <span className="bg-dash-blue mt-2 rounded-md px-4 py-2 text-[13px] font-medium text-white">
                   Select File
                 </span>
@@ -447,7 +447,7 @@ export function SettingsEmployeeDetail() {
         {tab === 'Working Hours' && (
           <Card>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-sm font-bold text-[#09090b]">Coordinated Universal Time (UTC)</h2>
+              <h2 className="text-sm font-bold text-ink">Coordinated Universal Time (UTC)</h2>
               <button
                 type="button"
                 onClick={() => setNuevaHora(true)}
@@ -459,18 +459,18 @@ export function SettingsEmployeeDetail() {
 
             {/* Misma grilla que el calendario de Scheduling: cabecera con el
                 día, columnas separadas y bloques con barra de acento. */}
-            <div className="mt-4 overflow-x-auto rounded-lg border border-[#e4e4e7]">
+            <div className="mt-4 overflow-x-auto rounded-lg border border-line">
               <div className="min-w-[760px]">
-                <div className="flex border-b border-[#ededed]">
+                <div className="flex border-b border-line-hair">
                   {DIAS.map((d) => (
-                    <div key={d} className="flex-1 border-l border-[#ededed] px-3 py-3 first:border-l-0">
-                      <span className="text-[11px] font-semibold tracking-wide text-[#71717a]">{d}</span>
+                    <div key={d} className="flex-1 border-l border-line-hair px-3 py-3 first:border-l-0">
+                      <span className="text-[11px] font-semibold tracking-wide text-ink-muted">{d}</span>
                     </div>
                   ))}
                 </div>
                 <div className="flex min-h-[300px]">
                   {DIAS.map((_, i) => (
-                    <div key={i} className="flex flex-1 flex-col gap-2 border-l border-[#ededed] p-2 first:border-l-0">
+                    <div key={i} className="flex flex-1 flex-col gap-2 border-l border-line-hair p-2 first:border-l-0">
                       {BLOQUES.filter((b) => b.dia === i).map((b, j) => {
                         const t = TONO[b.tono]
                         return (
@@ -485,7 +485,7 @@ export function SettingsEmployeeDetail() {
                               {b.horas}
                             </span>
                             <span className="block text-[11px] text-[#18181b]">{b.sala}</span>
-                            <span className="block text-[10px] text-[#71717a]">{b.empresa}</span>
+                            <span className="block text-[10px] text-ink-muted">{b.empresa}</span>
                           </button>
                         )
                       })}

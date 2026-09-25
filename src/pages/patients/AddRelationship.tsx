@@ -39,12 +39,12 @@ export function PersonaSeleccionada({ p }: { p: PersonaDirectorio }) {
         {p.initials}
       </span>
       <span className="min-w-0 leading-tight">
-        <span className="block text-[13px] font-semibold text-[#09090b]">{p.name}</span>
-        <span className="block text-[11px] text-[#71717a]">
-          <span className="text-[#a1a1aa]">DOB:</span> {p.dob}
+        <span className="block text-[13px] font-semibold text-ink">{p.name}</span>
+        <span className="block text-[11px] text-ink-muted">
+          <span className="text-ink-faint">DOB:</span> {p.dob}
         </span>
-        <span className="block text-[11px] text-[#71717a]">
-          <span className="text-[#a1a1aa]">Email:</span> {p.email}
+        <span className="block text-[11px] text-ink-muted">
+          <span className="text-ink-faint">Email:</span> {p.email}
         </span>
       </span>
     </div>
@@ -118,14 +118,14 @@ export default function AddRelationship() {
         <div className="min-w-0 flex-1">
           <PageTitle>Add Relationship</PageTitle>
 
-          <div className="mt-4 rounded-lg border border-[#e4e4e7] bg-white p-6">
-            <h2 className="text-sm font-bold text-[#09090b]">Find or create person</h2>
+          <div className="mt-4 rounded-lg border border-line bg-white p-6">
+            <h2 className="text-sm font-bold text-ink">Find or create person</h2>
 
             <div className="mt-4 grid items-start gap-x-5 gap-y-4 lg:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <FieldLabel>Select Person</FieldLabel>
                 <div className="relative">
-                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
                   <input
                     value={q}
                     onChange={(e) => { setQ(e.target.value); setPersona(null) }}
@@ -133,8 +133,8 @@ export default function AddRelationship() {
                     aria-invalid={sinPersona || undefined}
                     className={cn(
                       'h-9 w-full rounded-md border bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]',
-                      'placeholder:text-[#a1a1aa] focus:outline-none',
-                      sinPersona ? 'border-[#dc2626]' : 'focus:border-dash-blue border-[#e4e4e7]',
+                      'placeholder:text-ink-faint focus:outline-none',
+                      sinPersona ? 'border-field-error' : 'focus:border-dash-blue border-line',
                     )}
                   />
                 </div>
@@ -147,14 +147,14 @@ export default function AddRelationship() {
                     key={p.name}
                     type="button"
                     onClick={() => { setPersona(p); setQ(p.name); setNueva(false) }}
-                    className="flex items-center gap-3 rounded-lg border border-[#e4e4e7] bg-white p-3 text-left hover:bg-[#fafafa]"
+                    className="flex items-center gap-3 rounded-lg border border-line bg-white p-3 text-left hover:bg-surface-subtle"
                   >
                     <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">
                       {p.initials}
                     </span>
                     <span className="min-w-0 leading-tight">
-                      <span className="block text-[13px] font-semibold text-[#09090b]">{p.name}</span>
-                      <span className="block text-[11px] text-[#71717a]">DOB: {p.dob}</span>
+                      <span className="block text-[13px] font-semibold text-ink">{p.name}</span>
+                      <span className="block text-[11px] text-ink-muted">DOB: {p.dob}</span>
                     </span>
                   </button>
                 ))}
@@ -174,7 +174,7 @@ export default function AddRelationship() {
 
             {formulario && (
               <>
-                <h3 className="mt-6 text-sm font-bold text-[#09090b]">General Information</h3>
+                <h3 className="mt-6 text-sm font-bold text-ink">General Information</h3>
                 <div className="mt-4 grid gap-x-5 gap-y-4 lg:grid-cols-2">
                   <SelectField label="Country" required value={d.country} onChange={set('country')} error={req(d.country)} />
                   <TextField label="Number" required placeholder="408-XXX-XXXX" value={d.number} onChange={set('number')} error={req(d.number)} />
@@ -186,7 +186,7 @@ export default function AddRelationship() {
 
                 {/* "Adress" sin doble D y las dos líneas como select: los dos
                     salen del Figma. Anomalías 37 y 38. */}
-                <h3 className="mt-6 text-sm font-bold text-[#09090b]">Adress Information</h3>
+                <h3 className="mt-6 text-sm font-bold text-ink">Adress Information</h3>
                 <div className="mt-4 grid gap-x-5 gap-y-4 lg:grid-cols-2">
                   <SelectField label="Adress line 1" required options={['123 Maple Street', '456 Oak Avenue', '789 Pine Road']} value={d.linea1} onChange={set('linea1')} error={req(d.linea1)} />
                   <SelectField label="Adress line 2" required options={['Apt 2B', 'Suite 300', 'Floor 4']} value={d.linea2} onChange={set('linea2')} error={req(d.linea2)} />
@@ -198,7 +198,7 @@ export default function AddRelationship() {
               </>
             )}
 
-            <h3 className="mt-6 text-sm font-bold text-[#09090b]">Assign relationship role</h3>
+            <h3 className="mt-6 text-sm font-bold text-ink">Assign relationship role</h3>
             <div className="mt-4 flex flex-col gap-2">
               <FieldLabel required>Role</FieldLabel>
               <div className="grid gap-x-5 gap-y-4 lg:grid-cols-2">
@@ -220,14 +220,14 @@ export default function AddRelationship() {
                       type="button"
                       onClick={() => setDireccion(i)}
                       className={cn(
-                        'flex h-11 items-center gap-3 rounded-lg border bg-white px-3 text-left text-[13px] text-[#09090b]',
-                        direccion === i ? 'border-dash-blue' : 'border-[#e4e4e7] hover:bg-[#fafafa]',
+                        'flex h-11 items-center gap-3 rounded-lg border bg-white px-3 text-left text-[13px] text-ink',
+                        direccion === i ? 'border-dash-blue' : 'border-line hover:bg-surface-subtle',
                       )}
                     >
                       <span
                         className={cn(
                           'flex size-4 shrink-0 items-center justify-center rounded-full border-2',
-                          direccion === i ? 'border-dash-blue' : 'border-[#a1a1aa]',
+                          direccion === i ? 'border-dash-blue' : 'border-ink-faint',
                         )}
                       >
                         {direccion === i && <span className="bg-dash-blue size-[7px] rounded-full" />}

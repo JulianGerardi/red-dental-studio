@@ -198,7 +198,7 @@ export function ManijaResize<T extends string>({
             ? 'bg-dash-blue h-[26px]'
             : cn(
               'group-hover/manija:bg-dash-blue h-[16px] group-hover/manija:h-[22px]',
-              tocada ? 'bg-dash-blue/50' : 'bg-[#d4d4d8]',
+              tocada ? 'bg-dash-blue/50' : 'bg-line-strong',
             ),
         )}
       />

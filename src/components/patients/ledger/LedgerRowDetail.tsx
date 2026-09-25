@@ -23,7 +23,7 @@ export function FilaConTooltip({
           tabla, así que un tooltip vertical le tapa sí o sí los datos de la
           fila vecina. `side="right"` no tiene lugar y Radix lo voltea al
           margen izquierdo, fuera de la tabla. */}
-      <TooltipContent side="right" align="center" sideOffset={8} collisionPadding={12} className="max-w-sm bg-[#09090b] text-white">
+      <TooltipContent side="right" align="center" sideOffset={8} collisionPadding={12} className="max-w-sm bg-ink text-white">
         <span className="flex flex-col gap-0.5">
           <span className="font-semibold">{m.descripcion}</span>
           <span className="text-white/70">
@@ -53,7 +53,7 @@ export function BotonExpandirTodo({
   onColapsarTodo: () => void
 }) {
   if (!hayAlgunaAbierta) return null
-  const clase = 'flex items-center gap-1.5 rounded-md border border-[#e4e4e7] px-2.5 py-1.5 text-[12px] font-medium text-[#71717a] hover:bg-[#f4f4f5]'
+  const clase = 'flex items-center gap-1.5 rounded-md border border-line px-2.5 py-1.5 text-[12px] font-medium text-ink-muted hover:bg-surface-muted'
   return (
     <span className="flex items-center gap-2">
       {/* Colapsar está desde la primera fila abierta: obligar a expandir
@@ -94,14 +94,14 @@ function Campos({ m }: { m: Movimiento & { saldo?: number } }) {
   return (
     <>
       <div>
-        <dt className="text-[11px] font-medium text-[#71717a]">Description</dt>
-        <dd className="mt-0.5 text-[13px] text-[#09090b]">{m.descripcion}</dd>
+        <dt className="text-[11px] font-medium text-ink-muted">Description</dt>
+        <dd className="mt-0.5 text-[13px] text-ink">{m.descripcion}</dd>
       </div>
       <dl className="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-3">
         {campos(m).map(({ label, valor }) => (
           <div key={label}>
-            <dt className="text-[11px] font-medium text-[#71717a]">{label}</dt>
-            <dd className="mt-0.5 text-[13px] break-words text-[#09090b]">{valor}</dd>
+            <dt className="text-[11px] font-medium text-ink-muted">{label}</dt>
+            <dd className="mt-0.5 text-[13px] break-words text-ink">{valor}</dd>
           </div>
         ))}
       </dl>
@@ -119,7 +119,7 @@ export function LedgerRowDetail({
   onAplicarCredito?: () => void
 }) {
   return (
-    <div className="border-t border-[#e7e7e7] bg-[#fafafa] px-3 py-3">
+    <div className="border-t border-line-row bg-surface-subtle px-3 py-3">
       {/* La fila vive dentro del ancho mínimo de la tabla, que en pantallas
           chicas es más ancho que la vista. Sin esto el detalle nacía de 864px
           y había que scrollear para leerlo -lo contrario de para qué está-.
@@ -140,7 +140,7 @@ export function LedgerRowDetail({
             <button
               type="button"
               onClick={onAplicarCredito}
-              className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-[#f0f5ff] px-2.5 py-1 text-[12px] font-medium hover:bg-[#e3edff]"
+              className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-info-bg px-2.5 py-1 text-[12px] font-medium hover:bg-[#e3edff]"
             >
               <HandCoins className="size-3.5" /> Apply credit
             </button>
@@ -168,7 +168,7 @@ export function LedgerRowModal({
         <button
           type="button"
           onClick={onClose}
-          className="h-9 shrink-0 rounded-md border border-[#e4e4e7] bg-white px-6 text-[13px] font-medium hover:bg-[#fafafa]"
+          className="h-9 shrink-0 rounded-md border border-line bg-white px-6 text-[13px] font-medium hover:bg-surface-subtle"
         >
           Close
         </button>

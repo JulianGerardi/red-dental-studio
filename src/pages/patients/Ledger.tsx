@@ -81,17 +81,17 @@ type Fila = Movimiento & { saldo: number }
 
 const COLUMNAS: ColumnaLedger[] = [
   { id: 'fecha', label: 'Date', bloqueada: true, celda: (m) => m.fecha },
-  { id: 'paciente', label: 'Patient', claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.paciente, celda: (m) => m.paciente },
+  { id: 'paciente', label: 'Patient', claseCelda: 'truncate text-ink', titulo: (m) => m.paciente, celda: (m) => m.paciente },
   {
     id: 'tipo', label: 'Type',
     celda: (m) => { const t = detalleTipo(m); return <Pill tone={t.tono}>{t.texto}</Pill> },
   },
-  { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-[#09090b]', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
+  { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-ink', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
   { id: 'provider', label: 'Provider', claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
   /* Los negativos bajan la cuenta: van en verde. */
   {
     id: 'monto', label: 'Amount', derecha: true, claseCelda: 'font-medium tabular-nums',
-    celda: (m) => <span className={m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]'}>{moneda(m.monto)}</span>,
+    celda: (m) => <span className={m.monto < 0 ? 'text-dash-ok-fg' : 'text-ink'}>{moneda(m.monto)}</span>,
   },
   {
     /* Quinta vuelta: columna propia "Credit available" al lado de Amount, con
@@ -106,7 +106,7 @@ const COLUMNAS: ColumnaLedger[] = [
           type="button"
           data-apply-credit
           aria-label={`Apply ${moneda(m.creditoDisponible ?? 0)} credit from ${m.descripcion}`}
-          className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-[#f0f5ff] px-1.5 py-1 text-[12px] font-medium whitespace-nowrap tabular-nums hover:bg-[#e3edff]"
+          className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-info-bg px-1.5 py-1 text-[12px] font-medium whitespace-nowrap tabular-nums hover:bg-[#e3edff]"
         >
           <HandCoins className="size-3.5 shrink-0" />
           {moneda(m.creditoDisponible ?? 0)} · Apply
@@ -114,7 +114,7 @@ const COLUMNAS: ColumnaLedger[] = [
       )
     },
   },
-  { id: 'saldo', label: 'Balance', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-[#09090b]', celda: (m) => moneda(m.saldo) },
+  { id: 'saldo', label: 'Balance', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-ink', celda: (m) => moneda(m.saldo) },
 ]
 
 const VISTAS = ['Patient View', 'Guarantor View'] as const
@@ -252,9 +252,9 @@ export default function Ledger() {
         />
 
         <div className="min-w-0 flex-1">
-          <h1 className="text-xl leading-[1.3] font-semibold text-[#09090b]">{tituloActivo}</h1>
+          <h1 className="text-xl leading-[1.3] font-semibold text-ink">{tituloActivo}</h1>
 
-          <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-[#f1f5f9] p-1">
+          <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-surface-slate p-1">
             {TABS.map((t) => (
               <button
                 key={t.id}
@@ -262,7 +262,7 @@ export default function Ledger() {
                 onClick={() => setTab(t.id)}
                 className={cn(
                   'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-                  tab === t.id ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
+                  tab === t.id ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
                 )}
               >
                 {t.label}
@@ -278,12 +278,12 @@ export default function Ledger() {
 
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
-                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
                   <input
                     value={q}
                     onChange={(e) => { setQ(e.target.value); setPagina(1) }}
                     placeholder="Search by code, description or provider"
-                    className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+                    className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
                   />
                 </div>
                 <SearchButton onClick={() => setPagina(1)} className="h-9" />
@@ -294,7 +294,7 @@ export default function Ledger() {
                 )}
 
                 <div className="ml-auto flex flex-wrap items-center gap-3">
-                  <div className="flex w-fit shrink-0 items-center gap-1 rounded-lg bg-[#f1f5f9] p-1">
+                  <div className="flex w-fit shrink-0 items-center gap-1 rounded-lg bg-surface-slate p-1">
                     {VISTAS.map((v) => (
                       <button
                         key={v}
@@ -302,7 +302,7 @@ export default function Ledger() {
                         onClick={() => { setVista(v); setPagina(1) }}
                         className={cn(
                           'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-                          vista === v ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
+                          vista === v ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
                         )}
                       >
                         {v}
@@ -318,7 +318,7 @@ export default function Ledger() {
                   <button
                     type="button"
                     onClick={() => aviso.ok('Statement exported.')}
-                    className="flex h-9 items-center gap-2 rounded-md border border-[#e4e4e7] bg-white px-4 text-[13px] font-medium hover:bg-[#fafafa]"
+                    className="flex h-9 items-center gap-2 rounded-md border border-line bg-white px-4 text-[13px] font-medium hover:bg-surface-subtle"
                   >
                     <Download className="size-4" /> Export statement
                   </button>
@@ -330,9 +330,9 @@ export default function Ledger() {
                   instante -y alcanza a mostrar el contenido de la anterior-, que
                   es el parpadeo que hacía imposible leerlo. */}
               <TooltipProvider delayDuration={500} skipDelayDuration={0}>
-              <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
+              <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
                 <div style={{ minWidth: anchoMinimo }}>
-                  <div data-tabla-header className="group/fila flex items-center gap-3 bg-[#f9f9f9] px-3 py-3 text-[11px] font-semibold text-[#71717a]">
+                  <div data-tabla-header className="group/fila flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
                     {columnasVisibles.map((c, i) => (
                       <span
                         key={c.id}
@@ -355,7 +355,7 @@ export default function Ledger() {
                       <div
                         key={m.id}
                         className={cn(
-                          'border-t border-[#e7e7e7]',
+                          'border-t border-line-row',
                           /* Barra azul de 4px al borde de las filas con crédito
                              sin aplicar; cubre también el detalle si se expande. */
                           tieneCredito(m) && 'relative before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-dash-blue',
@@ -381,8 +381,8 @@ export default function Ledger() {
                             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
                           }}
                           className={cn(
-                            'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-[#3f3f46] hover:bg-[#fafafa]',
-                            abierta && 'bg-[#fafafa]',
+                            'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-ink-soft hover:bg-surface-subtle',
+                            abierta && 'bg-surface-subtle',
                           )}
                         >
                           {columnasVisibles.map((c) => (
@@ -410,10 +410,10 @@ export default function Ledger() {
 
                   {/* El resumen cierra la tabla: adentro del mismo borde y
                       arriba del paginado, no suelto afuera de la card. */}
-                  <div className="flex justify-end border-t border-[#e7e7e7] px-3 py-3">
-                    <dl className="w-fit overflow-hidden rounded-md border border-[#e4e4e7] text-[13px]">
+                  <div className="flex justify-end border-t border-line-row px-3 py-3">
+                    <dl className="w-fit overflow-hidden rounded-md border border-line text-[13px]">
                       <div className="flex items-center">
-                        <dt className="w-36 bg-[#f9f9f9] px-3 py-2 text-right font-medium text-[#3f3f46]">Balance due</dt>
+                        <dt className="w-36 bg-surface-alt px-3 py-2 text-right font-medium text-ink-soft">Balance due</dt>
                         <dd className="text-dash-blue w-24 px-3 py-2 text-right font-semibold tabular-nums">
                           {moneda(delaVista.reduce((a, m) => a + m.monto, 0))}
                         </dd>
@@ -421,11 +421,11 @@ export default function Ledger() {
                     </dl>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e7e7e7] px-3 py-3">
-                    <span className="flex items-center gap-3 text-xs font-semibold text-[#71717a]">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
+                    <span className="flex items-center gap-3 text-xs font-semibold text-ink-muted">
                       Showing {filasPagina.length} of {filas.length} entries
                       {anchos.avisando && (
-                        <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-[#a1a1aa] lg:flex">
+                        <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
                           <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
                         </span>
                       )}

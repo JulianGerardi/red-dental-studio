@@ -88,14 +88,14 @@ function PersonaCard({
   onDelete?: () => void
 }) {
   return (
-    <article className="rounded-lg border border-[#e4e4e7] bg-white px-5 py-4">
+    <article className="rounded-lg border border-line bg-white px-5 py-4">
       <header className="flex flex-wrap items-center gap-3">
         <span className="bg-dash-blue flex size-10 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold text-white">
           {p.initials}
         </span>
         <span className="leading-tight">
-          <span className="block text-[15px] font-bold text-[#09090b]">{p.name}</span>
-          <span className="block text-xs text-[#71717a]">{p.rol}</span>
+          <span className="block text-[15px] font-bold text-ink">{p.name}</span>
+          <span className="block text-xs text-ink-muted">{p.rol}</span>
         </span>
         <span className="flex flex-wrap items-center gap-2">
           {p.badges.map((b) => <Pill key={b} tone={BADGE_TONO[b]}>{b}</Pill>)}
@@ -103,14 +103,14 @@ function PersonaCard({
         {onEdit && onDelete && <MenuAcciones nombre={p.name} onEdit={onEdit} onDelete={onDelete} />}
       </header>
 
-      <div className="mt-4 border-t border-[#e4e4e7] pt-3">
+      <div className="mt-4 border-t border-line pt-3">
         <dl className="flex flex-wrap gap-x-10 gap-y-3">
           {p.campos.map(({ icon: Icon, label, value }) => (
             <div key={label} className="min-w-0">
-              <dt className="flex items-center gap-1.5 text-[11px] text-[#71717a]">
+              <dt className="flex items-center gap-1.5 text-[11px] text-ink-muted">
                 <Icon className="size-3.5 shrink-0" /> {label}
               </dt>
-              <dd className="mt-0.5 text-[13px] text-[#09090b]">{value}</dd>
+              <dd className="mt-0.5 text-[13px] text-ink">{value}</dd>
             </div>
           ))}
         </dl>
@@ -160,7 +160,7 @@ export default function Relationships() {
             <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={() => setVacio((v) => !v)}
-                className="rounded-md border border-[#e4e4e7] bg-white px-3 py-1.5 text-[11px] font-medium text-[#71717a] hover:bg-[#fafafa]"
+                className="rounded-md border border-line bg-white px-3 py-1.5 text-[11px] font-medium text-ink-muted hover:bg-surface-subtle"
               >
                 {vacio ? 'Ver poblado' : 'Ver estado vacío'}
               </button>
@@ -177,7 +177,7 @@ export default function Relationships() {
           </div>
 
           {vacio ? (
-            <div className="mt-4 flex min-h-[460px] rounded-lg border border-[#e4e4e7] bg-white">
+            <div className="mt-4 flex min-h-[460px] rounded-lg border border-line bg-white">
               <EmptyState
                 icon={Users}
                 title="No relationships yet"
@@ -189,7 +189,7 @@ export default function Relationships() {
             <>
               <div className="mt-4 flex flex-col gap-4">
                 {relaciones.length === 0 ? (
-                  <div className="rounded-lg border border-[#e4e4e7] bg-white">
+                  <div className="rounded-lg border border-line bg-white">
                     <EmptyState icon={Users} title="No related contacts" detail="Every relationship was removed." />
                   </div>
                 ) : (
@@ -204,7 +204,7 @@ export default function Relationships() {
                 )}
               </div>
 
-              <h2 className="mt-8 text-xl leading-none font-bold text-[#09090b]">
+              <h2 className="mt-8 text-xl leading-none font-bold text-ink">
                 Household/Same Guarantor Patients
               </h2>
               <div className="mt-4 flex flex-col gap-4">

@@ -23,7 +23,7 @@ export const Escala: Story = {
     >
       <Seccion titulo="Familia">
         <p className="text-[32px] leading-tight font-semibold">Inter</p>
-        <p className="mt-1 text-[13px] text-[#71717a]">
+        <p className="mt-1 text-[13px] text-ink-muted">
           <Codigo>--font-sans: {tokensTema['font-sans']}</Codigo>
         </p>
         <div className="mt-4 flex flex-wrap gap-6 text-[20px]">
@@ -37,13 +37,13 @@ export const Escala: Story = {
         titulo="Tamaños en uso"
         nota="Todos son clases arbitrarias (text-[13px]). Los que casi no se usan son candidatos a unificarse."
       >
-        <div className="overflow-hidden rounded-lg border border-[#e4e4e7]">
+        <div className="overflow-hidden rounded-lg border border-line">
           {tamanosDeTexto.map((t) => {
             const px = parseFloat(t.valor.replace('text-[', ''))
             return (
-              <div key={t.valor} className="flex items-baseline gap-4 border-t border-[#f1f1f4] px-4 py-2.5 first:border-t-0">
+              <div key={t.valor} className="flex items-baseline gap-4 border-t border-line-soft px-4 py-2.5 first:border-t-0">
                 <span className="w-24 shrink-0"><Codigo>{t.valor}</Codigo></span>
-                <span className="w-24 shrink-0 text-[12px] text-[#71717a]">{t.usos} usos</span>
+                <span className="w-24 shrink-0 text-[12px] text-ink-muted">{t.usos} usos</span>
                 <span className="min-w-0 truncate" style={{ fontSize: px }}>{EJEMPLO}</span>
               </div>
             )

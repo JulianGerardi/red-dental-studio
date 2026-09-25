@@ -50,8 +50,8 @@ export function ChargeAdjustmentPanel({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
-        <h2 className="flex items-center gap-2 text-sm font-bold text-[#09090b]">
+      <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
           <CreditCard className="size-4" /> Adjustment Information
         </h2>
 

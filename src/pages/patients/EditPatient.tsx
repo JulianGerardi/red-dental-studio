@@ -9,8 +9,8 @@ import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-lg border border-[#e4e4e7] bg-white p-6">
-      <h2 className="text-sm font-semibold text-[#09090b]">{title}</h2>
+    <section className="rounded-lg border border-line bg-white p-6">
+      <h2 className="text-sm font-semibold text-ink">{title}</h2>
       <div className="mt-4 flex flex-col gap-4">{children}</div>
     </section>
   )

@@ -149,13 +149,13 @@ export default function Patients() {
         <div ref={contenidoRef} className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative w-full sm:w-[320px]" data-tour="pat-search">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search by Name or Last Name"
-                className="focus:border-dash-blue h-8 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+                className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
               />
             </div>
             <SearchButton onClick={() => inputRef.current?.focus()} className="h-8" />
@@ -186,12 +186,12 @@ export default function Patients() {
             }
           >
             <div className="relative shrink-0">
-              <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-[#a1a1aa]" />
+              <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
               <input
                 value={buscarTurno}
                 onChange={(e) => setBuscarTurno(e.target.value)}
                 placeholder="Search today's appointments"
-                className="focus:border-dash-blue h-8 w-full rounded-md border border-[#e4e4e7] bg-white pr-2 pl-8 text-[12px] placeholder:text-[#a1a1aa] focus:outline-none"
+                className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-2 pl-8 text-[12px] placeholder:text-ink-faint focus:outline-none"
               />
             </div>
             <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
