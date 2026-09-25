@@ -1,0 +1,3 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,r,t as i}from"./ToothIcon-C8dO6Z_W.js";var a,o,s,c,l;function u(){return(u=e((()=>{r(),a=t(),o={title:`Components/Clinical/Dental/ToothIcon`,component:n,args:{className:`size-8 text-dash-blue`}},s={},c={render:()=>(0,a.jsx)(i,{})},l=[`Icon`,`Chip`],s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{}`,...s.parameters?.docs?.source}}},c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{
+  render: () => <ToothChip />
+}`,...c.parameters?.docs?.source}}}})))()}u();export{c as Chip,s as Icon,l as __namedExportsOrder,o as default};

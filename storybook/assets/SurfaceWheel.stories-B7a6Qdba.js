@@ -1,0 +1,3 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./react-BZJXY1be.js";import{t as n}from"./jsx-runtime-DeHZSEgm.js";import{n as r,t as i}from"./SurfaceWheel-DYVepzD3.js";function a({size:e}){let[t,n]=(0,o.useState)([`O`,`DB`]);return(0,s.jsx)(i,{value:t,onChange:n,size:e})}var o,s,c,l,u;function d(){return(d=e((()=>{o=t(),r(),s=n(),c={title:`Components/Clinical/Dental/SurfaceWheel`,component:i,args:{value:[`O`],onChange:()=>{},size:220}},l={render:e=>(0,s.jsx)(a,{size:e.size})},u=[`Default`],l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
+  render: args => <Demo size={args.size} />
+}`,...l.parameters?.docs?.source}}}})))()}d();export{l as Default,u as __namedExportsOrder,c as default};

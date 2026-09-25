@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{n as t,t as n}from"./ClinicalTopBar-DcNONu9K.js";import{n as r,r as i}from"./decorators-DQawb0em.js";var a,o,s,c;function l(){return(l=e((()=>{i(),t(),a={title:`Components/Clinical/ClinicalTopBar`,component:n,parameters:{layout:`fullscreen`},decorators:[r],args:{volverA:`/patients/patient-0001`,encuentro:!1,onEncuentro:()=>{},onOverview:()=>{},enOverview:!1}},o={},s={args:{encuentro:!0}},c=[`Default`,`EncounterStarted`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{}`,...o.parameters?.docs?.source}}},s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
+  args: {
+    encuentro: true
+  }
+}`,...s.parameters?.docs?.source}}}})))()}l();export{o as Default,s as EncounterStarted,c as __namedExportsOrder,a as default};

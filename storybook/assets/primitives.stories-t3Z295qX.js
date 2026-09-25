@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./react-BZJXY1be.js";import{t as n}from"./jsx-runtime-DeHZSEgm.js";import{n as r,r as i,t as a}from"./primitives-ILPSMVv7.js";function o(){let[e,t]=(0,s.useState)(!0);return(0,c.jsx)(a,{title:`Preferences`,className:`w-[360px]`,children:(0,c.jsx)(r,{label:`Send appointment reminders`,on:e,onChange:t})})}var s,c,l,u,d,f;function p(){return(p=e((()=>{s=t(),i(),c=n(),l={title:`Components/Settings/Card and Toggle`,component:a,parameters:{layout:`padded`},args:{children:null}},u={render:()=>(0,c.jsx)(o,{})},d={render:()=>(0,c.jsx)(a,{className:`w-[360px]`,children:`Plain card body.`})},f=[`Default`,`WithoutTitle`],u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
+  render: () => <ConToggle />
+}`,...u.parameters?.docs?.source}}},d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`{
+  render: () => <Card className="w-[360px]">Plain card body.</Card>
+}`,...d.parameters?.docs?.source}}}})))()}p();export{u as Default,d as WithoutTitle,f as __namedExportsOrder,l as default};

@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./react-BZJXY1be.js";import{t as n}from"./jsx-runtime-DeHZSEgm.js";import{n as r,t as i}from"./notificaciones-Dmlaj1eV.js";import{n as a,t as o}from"./NotificationBanner-C5oU3hca.js";function s({items:e}){let[t,n]=(0,c.useState)(0);return(0,l.jsx)(o,{items:e,cursor:t,onCursor:n,onOcultar:()=>{}})}var c,l,u,d,f,p;function m(){return(m=e((()=>{c=t(),r(),a(),l=n(),u={title:`Components/Layout/NotificationBanner`,component:o,parameters:{layout:`fullscreen`},args:{items:i,cursor:0,onCursor:()=>{},onOcultar:()=>{}}},d={render:e=>(0,l.jsx)(s,{items:e.items})},f={render:()=>(0,l.jsx)(s,{items:i.slice(0,1)})},p=[`Several`,`Single`],d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`{
+  render: args => <Demo items={args.items} />
+}`,...d.parameters?.docs?.source}}},f.parameters={...f.parameters,docs:{...f.parameters?.docs,source:{originalSource:`{
+  render: () => <Demo items={NOTIFICACIONES.slice(0, 1)} />
+}`,...f.parameters?.docs?.source}}}})))()}m();export{d as Several,f as Single,p as __namedExportsOrder,u as default};

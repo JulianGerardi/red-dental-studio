@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./react-BZJXY1be.js";import{t as n}from"./jsx-runtime-DeHZSEgm.js";import{n as r,t as i}from"./Pagination-sAJrva2q.js";function a({paginas:e}){let[t,n]=(0,o.useState)(1);return(0,s.jsx)(i,{pagina:t,paginas:e,onChange:n})}var o,s,c,l,u,d;function f(){return(f=e((()=>{o=t(),r(),s=n(),c={title:`Components/Ledger/Pagination`,component:i,args:{pagina:1,paginas:6,onChange:()=>{}}},l={render:()=>(0,s.jsx)(a,{paginas:6})},u={render:()=>(0,s.jsx)(a,{paginas:24})},d=[`Default`,`ManyPages`],l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
+  render: () => <Demo paginas={6} />
+}`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
+  render: () => <Demo paginas={24} />
+}`,...u.parameters?.docs?.source}}}})))()}f();export{l as Default,u as ManyPages,d as __namedExportsOrder,c as default};
