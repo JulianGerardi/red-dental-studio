@@ -1,0 +1,10 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{i as n,n as r}from"./Page-D7sAlKBt.js";import{i,n as a,r as o,t as s}from"./Recipes-a_HoGmmB.js";var c,l,u,d,f;function p(){return(p=e((()=>{n(),o(),c=t(),l={title:`Patterns/Buttons`,tags:[`!autodocs`],parameters:{layout:`fullscreen`,options:{showPanel:!1}}},u=[`Primary (solid blue)`,`Outline`,`Text link`,`Icon-only`,`Floating round`,`Destructive`,`Disabled placeholder`,`List row / menu item`,`Other`],d={name:`Buttons`,render:()=>{let e=i.filter(e=>e.tipo===`button`),t=e.reduce((e,t)=>e+t.cantidad,0);return(0,c.jsx)(r,{titulo:`Buttons`,bajada:`Los ${t} botones de la app, leídos del código: ${e.length} recetas distintas. Casi todos son <button> con clases propias; el componente Button de ui/ casi no se usa. Cada tarjeta dibuja la receta con sus clases reales y sus estados; los cuadros de consistencia muestran cuántos valores distintos de altura, padding, peso y radio conviven dentro de una misma familia.`,children:(0,c.jsx)(s,{tipo:`button`,familiaDe:a,orden:u})})}},f=[`Botones`],d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`{
+  name: 'Buttons',
+  render: () => {
+    const botones = recetas.filter(r => r.tipo === 'button');
+    const total = botones.reduce((n, r) => n + r.cantidad, 0);
+    return <Page titulo="Buttons" bajada={\`Los \${total} botones de la app, leídos del código: \${botones.length} recetas distintas. Casi todos son <button> con clases propias; el componente Button de ui/ casi no se usa. Cada tarjeta dibuja la receta con sus clases reales y sus estados; los cuadros de consistencia muestran cuántos valores distintos de altura, padding, peso y radio conviven dentro de una misma familia.\`}>
+        <PaginaDeRecetas tipo="button" familiaDe={familiaBoton} orden={FAMILIAS} />
+      </Page>;
+  }
+}`,...d.parameters?.docs?.source}}}})))()}p();export{d as Botones,f as __namedExportsOrder,l as default};
