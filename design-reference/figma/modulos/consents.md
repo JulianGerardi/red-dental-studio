@@ -32,10 +32,11 @@ paciente**, no una tarjeta más de la interfaz.
   línea de fecha al lado, y pie "Page 1 of 1".
 
 **La hoja crece con el contenido.** Tiene proporción carta (8.5×11) como
-*mínimo*, pero con el texto real (dos textareas, cinco riesgos) en una
+*mínimo*, pero con el texto real (dos textareas, cuatro riesgos) en una
 columna de ~314px queda bastante más alta que una carta -más de 2:1-. Se prefirió eso
-a escalar la página entera con `transform`, que dejaba el texto en ~6px. Con
-el template vacío la hoja se queda en la proporción carta.
+a escalar la página entera con `transform`, que dejaba el texto en ~6px. Incluso
+con el template vacío las secciones fijas (datos, acknowledgment, firma) ya
+superan la proporción carta.
 
 **Excepción al piso de 11px:** rótulos, firma y pie de la hoja bajan a
 9–10.5px. Es un documento reducido, y esos textos son la parte "chica" de
