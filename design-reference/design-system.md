@@ -27,12 +27,18 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
 - **Welcome**: qué es y cómo se usa.
 - **Foundations**: Colors, Typography, Radius and shadows, Color audit. Todo
   calculado leyendo `src/index.css` y el código fuente.
-- **Components / UI**: los 24 primitivos de `src/components/ui`, con props
-  (autodocs), variantes y estados.
+- **Components**: 109 de los 115 archivos de `src/components` tienen su story
+  (223 stories en total), agrupados por módulo: UI (los 24 primitivos, con
+  props por autodocs), Dashboard, Layout, Scheduling, Patients, Ledger,
+  Settings, Billing, Clinical (con Dental) y Help. Los 6 restantes manipulan
+  el DOM de la librería del odontograma y se ven dentro de
+  *Clinical / DentalAssessmentExam* (`src/design-system/exentos.json`).
 - **Components / Catalog**: inventario de *todos* los archivos de
-  `src/components`: qué exportan, dónde se usan, si tienen story y la nota de
-  diseño que cada uno trae en el encabezado.
+  `src/components`, leído del código: qué exportan, dónde se usan, si tienen
+  story y la nota de diseño que cada uno trae en el encabezado.
 - **Pages**: las 30 pantallas de la app, montadas con las rutas reales.
+
+Las 223 stories se abrieron una por una en el navegador: ninguna da error.
 
 ## Tokens (2026-09-25)
 

@@ -1,0 +1,17 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { conPacientes } from '@/design-system/decorators'
+import { ClinicalTopBar } from './ClinicalTopBar'
+
+const meta = {
+  title: 'Components/Clinical/ClinicalTopBar',
+  component: ClinicalTopBar,
+  parameters: { layout: 'fullscreen' },
+  decorators: [conPacientes],
+  args: { volverA: '/patients/patient-0001', encuentro: false, onEncuentro: () => {}, onOverview: () => {}, enOverview: false },
+} satisfies Meta<typeof ClinicalTopBar>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Default: Story = {}
+export const EncounterStarted: Story = { args: { encuentro: true } }

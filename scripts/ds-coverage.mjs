@@ -25,7 +25,11 @@ const archivos = (dir) =>
 const componentes = archivos(join(RAIZ, 'src/components')).filter(
   (p) => extname(p) === '.tsx' && !p.endsWith('.stories.tsx'),
 )
-const sinStory = componentes.filter((p) => !existsSync(p.replace(/\.tsx$/, '.stories.tsx')))
+/* Componentes que sólo existen dentro de otro (manipulan el DOM de la librería
+   del odontograma): se documentan en el story del anfitrión. Ver exentos.json. */
+const exentos = JSON.parse(readFileSync(join(RAIZ, 'src/design-system/exentos.json'), 'utf8'))
+const esExento = (p) => `components/${p.split('/src/components/')[1]}` in exentos
+const sinStory = componentes.filter((p) => !existsSync(p.replace(/\.tsx$/, '.stories.tsx')) && !esExento(p))
 
 /* Rutas sin story */
 const rutasSrc = readFileSync(join(RAIZ, 'src/AppRoutes.tsx'), 'utf8')
@@ -74,7 +78,8 @@ for (const f of archivos(join(RAIZ, 'src')).filter((p) => ['.ts', '.tsx'].includ
 }
 const baseline = JSON.parse(readFileSync(join(RAIZ, 'scripts/ds-baseline.json'), 'utf8'))
 
-console.log(`Componentes con story:  ${componentes.length - sinStory.length} de ${componentes.length}`)
+const nExentos = componentes.filter(esExento).length
+console.log(`Componentes con story:  ${componentes.length - sinStory.length - nExentos} de ${componentes.length}` + (nExentos ? ` (+${nExentos} documentados en su anfitrión)` : ''))
 console.log(`Rutas con story:        ${rutas.size - rutasSinStory.length} de ${rutas.size}`)
 console.log(`Colores a mano en clases: ${sinToken} sin token (baseline ${baseline.colorSinToken}), ${conToken} que ya tienen token`)
 if (rutasSinStory.length) console.log(`\nRutas sin story en Pages:\n  ${rutasSinStory.join('\n  ')}`)

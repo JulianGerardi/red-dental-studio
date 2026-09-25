@@ -19,12 +19,12 @@ function Catalogo() {
     () =>
       componentes.filter(
         (c) =>
-          (!soloSinStory || !c.tieneStory) &&
+          (!soloSinStory || (!c.tieneStory && !c.exento)) &&
           `${c.archivo} ${c.exports.join(' ')} ${c.comentario}`.toLowerCase().includes(q.trim().toLowerCase()),
       ),
     [q, soloSinStory],
   )
-  const conStory = componentes.filter((c) => c.tieneStory).length
+  const conStory = componentes.filter((c) => c.tieneStory || c.exento).length
   const carpetas = [...new Set(visibles.map((c) => c.carpeta))]
 
   return (
@@ -56,12 +56,13 @@ function Catalogo() {
                   <span className="font-semibold">{c.nombre}</span>
                   <span className="min-w-0 flex-1 truncate text-ink-muted">{c.exports.join(', ') || '-'}</span>
                   <span className="text-[11.5px] text-ink-muted">used in {c.usadoEn}</span>
-                  <span className={c.tieneStory ? 'rounded-full bg-dash-ok-bg px-2 py-0.5 text-[11px] font-semibold text-dash-ok-fg' : 'rounded-full bg-warn-bg px-2 py-0.5 text-[11px] font-semibold text-warn-fg'}>
-                    {c.tieneStory ? 'story' : 'no story'}
+                  <span className={c.tieneStory || c.exento ? 'rounded-full bg-dash-ok-bg px-2 py-0.5 text-[11px] font-semibold text-dash-ok-fg' : 'rounded-full bg-warn-bg px-2 py-0.5 text-[11px] font-semibold text-warn-fg'}>
+                    {c.tieneStory ? 'story' : c.exento ? 'in host story' : 'no story'}
                   </span>
                 </summary>
                 <div className="border-t border-line-soft bg-surface-subtle px-4 py-3 text-[12.5px] text-ink-soft">
                   <p className="mb-2"><Codigo>src/{c.archivo}</Codigo></p>
+                  {c.exento && <p className="mb-2 text-ink-medium">{c.exento}</p>}
                   {c.comentario ? <p className="max-w-[80ch] whitespace-pre-wrap">{c.comentario}</p> : <p className="text-ink-faint">Sin nota de diseño en el encabezado del archivo.</p>}
                 </div>
               </details>

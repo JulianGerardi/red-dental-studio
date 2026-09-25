@@ -1,3 +1,5 @@
+import exentos from './exentos.json'
+
 /* Inventario de todos los componentes de src/components, armado leyendo el
    código: qué exporta cada archivo, el comentario de diseño con el que está
    documentado, dónde se usa y si ya tiene su story. Es el "scraping" que
@@ -24,6 +26,8 @@ export type Componente = {
   comentario: string
   usadoEn: number
   tieneStory: boolean
+  /** Documentado en el story de otro componente, con el motivo. */
+  exento?: string
 }
 
 function exportsDe(texto: string): string[] {
@@ -65,6 +69,7 @@ export const componentes: Componente[] = Object.entries(sinStories(fuentes))
       comentario: comentarioDe(texto),
       usadoEn,
       tieneStory: historias.has(archivo.replace(/\.tsx$/, '.stories.tsx')),
+      exento: (exentos as Record<string, string>)[ruta],
     }
   })
   .sort((a, b) => a.archivo.localeCompare(b.archivo))
