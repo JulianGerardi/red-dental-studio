@@ -1,7 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{i as n,n as r,r as i,t as a}from"./modals-BsfrQtTs.js";var o,s,c,l,u,d;function f(){return(f=e((()=>{n(),o=t(),s={title:`Components/Patients/Insurance modals`,parameters:{layout:`fullscreen`}},c={render:()=>(0,o.jsx)(i,{onClose:()=>{}})},l={render:()=>(0,o.jsx)(a,{onNuevoDependiente:()=>{},onClose:()=>{}})},u={render:()=>(0,o.jsx)(r,{onClose:()=>{}})},d=[`NewSubscription`,`ManageSubscription`,`NewDependent`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{
-  render: () => <NewSubscriptionModal onClose={() => {}} />
-}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
-  render: () => <ManageSubscriptionModal onNuevoDependiente={() => {}} onClose={() => {}} />
-}`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
-  render: () => <NewDependerModal onClose={() => {}} />
-}`,...u.parameters?.docs?.source}}}})))()}f();export{l as ManageSubscription,u as NewDependent,c as NewSubscription,d as __namedExportsOrder,s as default};

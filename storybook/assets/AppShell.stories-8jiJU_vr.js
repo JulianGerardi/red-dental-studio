@@ -1,0 +1,28 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";var t;function n(){return(n=e((()=>{t=`import type { Meta, StoryObj } from '@storybook/react-vite'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { HelpProvider } from '@/components/help/HelpProvider'
+import { AppShell } from './AppShell'
+
+const meta = {
+  title: 'Components/Layout/AppShell',
+  component: AppShell,
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } }, router: false },
+} satisfies Meta<typeof AppShell>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Default: Story = {
+  render: () => (
+    <MemoryRouter>
+      <HelpProvider>
+        <Routes>
+          <Route element={<AppShell />}>
+            <Route index element={<div className="p-8 text-sm text-ink-muted">Page content goes here.</div>} />
+          </Route>
+        </Routes>
+      </HelpProvider>
+    </MemoryRouter>
+  ),
+}
+`})))()}n();export{t as default};

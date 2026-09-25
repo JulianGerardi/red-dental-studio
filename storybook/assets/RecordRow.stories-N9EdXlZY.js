@@ -1,7 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{i as n,n as r,r as i,t as a}from"./RecordRow-CURyNJKI.js";var o,s,c,l,u;function d(){return(d=e((()=>{n(),o=t(),s={title:`Components/Clinical/RecordRow`,component:r,parameters:{layout:`padded`},args:{provider:`Tomy Gi`,providerRole:`Dentist`,status:`Pending`,created:`30/09/2026`,updated:`30/09/2026`,expires:`30/10/2026`},argTypes:{status:{control:`select`,options:[`Pending`,`Requested`,`Delivered`,`Active`,`Expired`,`Cancelled`,`Completed`]}}},c={},l={render:e=>(0,o.jsxs)(`div`,{className:`w-[820px]`,children:[(0,o.jsx)(i,{newLabel:`New lab order`}),(0,o.jsx)(r,{...e}),(0,o.jsx)(a,{total:12})]})},u=[`Default`,`WithToolbarAndPagination`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
-  render: args => <div className="w-[820px]">
-      <RecordToolbar newLabel="New lab order" />
-      <RecordRow {...args} />
-      <RecordPagination total={12} />
-    </div>
-}`,...l.parameters?.docs?.source}}}})))()}d();export{c as Default,l as WithToolbarAndPagination,u as __namedExportsOrder,s as default};
