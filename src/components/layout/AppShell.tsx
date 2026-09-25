@@ -62,7 +62,8 @@ export function AppShell() {
           onCursor={setCursor}
           onOcultar={ocultarDelBanner}
         />
-        <main className="bg-page-background flex-1 overflow-x-hidden">
+        {/* `clip`, no `hidden`: hidden vuelve a <main> contenedor de scroll y deja sin efecto todo sticky de adentro. */}
+        <main className="bg-page-background flex-1 overflow-x-clip">
           <Outlet />
         </main>
       </div>

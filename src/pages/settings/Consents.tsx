@@ -126,7 +126,7 @@ function ToolbarFormato() {
           <Icono className="size-3.5" />
         </button>
       ))}
-      <span className="ml-auto pr-1 text-[11px] text-[#a1a1aa]">Basic formatting only</span>
+      <span className="ml-auto pr-1 text-[11px] text-[#a1a1aa] max-sm:hidden">Basic formatting only</span>
     </div>
   )
 }
@@ -199,22 +199,22 @@ export function SettingsConsents() {
   )
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className="@container px-4 py-6 sm:px-8">
       <h1 className="text-2xl font-bold text-[#09090b]">Consent Templates</h1>
       <p className="mt-1 text-sm text-[#71717a]">Create a standard consent document and assign it to one or more procedures.</p>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[300px_1fr_340px]">
+      <div className="mt-4 grid grid-cols-1 gap-4 @3xl:grid-cols-[240px_minmax(0,1fr)] @5xl:grid-cols-[260px_minmax(0,1fr)_minmax(0,1.15fr)]">
         {/* ── Lista ─────────────────────────────────────────────────── */}
-        <section className="flex flex-col gap-3 rounded-xl border border-[#e4e4e7] bg-white p-4">
+        <section className="flex flex-col gap-3 self-start rounded-xl border border-[#e4e4e7] bg-white p-4">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-bold text-[#09090b]">Consent Templates</h2>
+            <h2 className="text-sm font-bold text-[#09090b]">Templates</h2>
             <button
               type="button"
               onClick={nuevoTemplate}
               aria-label="New Template"
-              className="text-dash-blue flex items-center gap-1 text-[12px] font-semibold hover:underline"
+              className="text-dash-blue flex h-8 items-center gap-1 rounded-md border border-[#c7d9fb] bg-[#f0f5ff] px-2.5 text-[12px] font-semibold hover:bg-[#e3edff]"
             >
-              <Plus className="size-3.5" /> New
+              <Plus className="size-3.5" /> New template
             </button>
           </div>
 
@@ -261,7 +261,7 @@ export function SettingsConsents() {
                     onClick={() => elegir(t)}
                     className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left"
                   >
-                    <span className={cn('w-full truncate text-[13px] font-bold', t.activo ? 'text-[#09090b]' : 'text-[#a1a1aa]')}>
+                    <span className={cn('line-clamp-2 w-full text-[13px] font-bold', t.activo ? 'text-[#09090b]' : 'text-[#a1a1aa]')}>
                       {t.titulo}
                     </span>
                     <span className="flex flex-wrap items-center gap-1.5">
@@ -285,11 +285,19 @@ export function SettingsConsents() {
         </section>
 
         {/* ── Editor ────────────────────────────────────────────────── */}
-        <section className="flex flex-col gap-4 rounded-xl border border-[#e4e4e7] bg-white p-4 sm:p-5">
+        <section className="flex flex-col gap-4 self-start rounded-xl border border-[#e4e4e7] bg-white p-4 sm:p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-[240px] flex-1">
-              <h2 className="text-lg font-bold text-[#09090b]">New Consent Template</h2>
-              <p className="mt-0.5 text-xs text-[#71717a]">Create a standard consent document and assign it to one or more procedures.</p>
+            <div className="min-w-[200px] flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-lg font-bold text-[#09090b]">{actual ? 'Edit Template' : 'New Consent Template'}</h2>
+                {actual && <Pill tone={actual.activo ? 'success' : 'neutral'} size="sm">{actual.activo ? 'Active' : 'Inactive'}</Pill>}
+                {actual?.sistema && <Pill tone="info" size="sm">System</Pill>}
+              </div>
+              <p className="mt-0.5 text-xs text-[#71717a]">
+                {actual
+                  ? 'Changes show in the preview as you type. Save to keep them.'
+                  : 'Fill in the details and the text, then save to add it to the list.'}
+              </p>
             </div>
             {actual && (
               <button
@@ -408,7 +416,7 @@ export function SettingsConsents() {
             </div>
           </div>
 
-          <div className="mt-2 flex justify-end gap-3">
+          <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex justify-end gap-3 rounded-b-xl border-t border-[#e4e4e7] bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
             <button type="button" onClick={cancelar} className="h-9 rounded-md border border-[#e4e4e7] bg-white px-6 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]">
               Cancel
             </button>
@@ -419,9 +427,12 @@ export function SettingsConsents() {
         </section>
 
         {/* ── Preview ───────────────────────────────────────────────── */}
-        <section className="h-fit rounded-xl border border-[#e4e4e7] bg-[#eef0f4] p-3">
+        <section className="self-start rounded-xl border border-[#e4e4e7] bg-[#eef0f4] p-3 @3xl:col-start-2 @5xl:sticky @5xl:top-4 @5xl:col-start-3 @5xl:max-h-[calc(100vh-2rem)] @5xl:overflow-y-auto">
           <div className="flex items-center justify-between gap-2 px-1">
-            <h2 className="text-sm font-bold text-[#09090b]">Preview</h2>
+            <div>
+              <h2 className="text-sm font-bold text-[#09090b]">Preview</h2>
+              <p className="text-[11px] text-[#71717a]">What the patient receives</p>
+            </div>
             <button
               type="button"
               onClick={() => setVistaPaciente((v) => !v)}
