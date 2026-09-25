@@ -30,7 +30,9 @@ jobs:
         env:
           VITE_HASH_ROUTER: 'true'
 
-      # El design system queda en /storybook, junto a la app.
+      # El design system queda en /storybook, junto a la app. Antes se lee el
+      # código para armar las recetas (Patterns / Buttons, Fields, Cards…).
+      - run: npm run ds:scan
       - run: npx storybook build -o dist/storybook
 
       - uses: peaceiris/actions-gh-pages@v4
