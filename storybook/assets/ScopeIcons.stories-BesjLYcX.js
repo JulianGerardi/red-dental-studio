@@ -1,5 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,t as r}from"./ScopeIcons-DfBl1DmN.js";import{c as i,o as a}from"./data-CyEcoex9.js";var o,s,c,l,u;function d(){return(d=e((()=>{n(),i(),o=t(),s={title:`Components/Clinical/Dental/ScopeIcon`,component:r,args:{scope:`Tooth`,className:`size-5`},argTypes:{scope:{control:`select`,options:a}}},c={},l={render:()=>(0,o.jsx)(`div`,{className:`flex items-center gap-4`,children:a.map(e=>(0,o.jsxs)(`span`,{className:`flex items-center gap-1.5 text-sm`,children:[(0,o.jsx)(r,{scope:e,className:`size-5`}),` `,e]},e))})},u=[`Default`,`AllScopes`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="flex items-center gap-4">
-      {SCOPES.map(s => <span key={s} className="flex items-center gap-1.5 text-sm"><ScopeIcon scope={s} className="size-5" /> {s}</span>)}
-    </div>
-}`,...l.parameters?.docs?.source}}}})))()}d();export{l as AllScopes,c as Default,u as __namedExportsOrder,s as default};

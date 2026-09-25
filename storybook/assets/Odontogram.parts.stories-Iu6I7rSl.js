@@ -1,0 +1,10 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{a as n,o as r}from"./odontogram-VqIbi4zX.js";import{i,r as a,t as o}from"./Odontogram-DuVyhaSr.js";var s,c,l,u,d,f;function p(){return(p=e((()=>{n(),i(),s=t(),c=r(),l={title:`Components/Clinical/Odontogram parts`,parameters:{layout:`padded`}},u={render:()=>(0,s.jsxs)(`div`,{className:`flex gap-3`,children:[(0,s.jsx)(a,{tooth:c.teeth[2],selected:!1,onToggle:()=>{},onSurface:()=>{},problema:!1,finding:!1,flip:!1}),(0,s.jsx)(a,{tooth:c.teeth[2],selected:!0,onToggle:()=>{},onSurface:()=>{},problema:!1,finding:!1,flip:!1}),(0,s.jsx)(a,{tooth:c.teeth[2],selected:!1,onToggle:()=>{},onSurface:()=>{},problema:!0,finding:!1,flip:!1}),(0,s.jsx)(a,{tooth:c.teeth[2],selected:!1,onToggle:()=>{},onSurface:()=>{},problema:!1,finding:!0,flip:!1})]})},d={render:()=>(0,s.jsx)(o,{exam:c,numbers:[1,2,3,4,5,6,7,8],flip:!1,selected:[3],onToggle:()=>{},onSurface:()=>{},findings:[],left:`UR`,center:``,right:``})},f=[`Tooth`,`HalfArch`],u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="flex gap-3">
+      <ToothCell tooth={exam.teeth[2]} selected={false} onToggle={() => {}} onSurface={() => {}} problema={false} finding={false} flip={false} />
+      <ToothCell tooth={exam.teeth[2]} selected onToggle={() => {}} onSurface={() => {}} problema={false} finding={false} flip={false} />
+      <ToothCell tooth={exam.teeth[2]} selected={false} onToggle={() => {}} onSurface={() => {}} problema finding={false} flip={false} />
+      <ToothCell tooth={exam.teeth[2]} selected={false} onToggle={() => {}} onSurface={() => {}} problema={false} finding flip={false} />
+    </div>
+}`,...u.parameters?.docs?.source}}},d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`{
+  render: () => <Arch exam={exam} numbers={[1, 2, 3, 4, 5, 6, 7, 8]} flip={false} selected={[3]} onToggle={() => {}} onSurface={() => {}} findings={[]} left="UR" center="" right="" />
+}`,...d.parameters?.docs?.source}}}})))()}p();export{d as HalfArch,u as Tooth,f as __namedExportsOrder,l as default};

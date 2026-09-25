@@ -1,0 +1,9 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{c as n,i as r,n as i,s as a,t as o}from"./Sidebar-TWA0log2.js";import{r as s,t as c}from"./decorators-D4bN_Xim.js";var l,u,d,f,p;function m(){return(m=e((()=>{n(),s(),r(),l=t(),u={title:`Components/Layout/Sidebar parts`,parameters:{layout:`padded`},decorators:[c]},d={render:()=>(0,l.jsx)(`div`,{className:`p-16`,children:(0,l.jsx)(o,{label:`Dashboard`,mostrar:!0,children:(0,l.jsx)(`button`,{className:`flex size-8 items-center justify-center rounded-md bg-dash-blue text-white`,children:(0,l.jsx)(a,{className:`size-4`})})})})},f={render:()=>(0,l.jsx)(`div`,{className:`h-72 w-[234px] p-4`,children:(0,l.jsx)(i,{clase:e=>`flex items-center rounded-md px-3 py-2 text-sm ${e?`bg-dash-blue text-white`:``}`,mostrarLabel:!0})})},p=[`ItemTooltip`,`SettingsEntry`],d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="p-16">
+      <ConTooltip label="Dashboard" mostrar>
+        <button className="flex size-8 items-center justify-center rounded-md bg-dash-blue text-white"><Home className="size-4" /></button>
+      </ConTooltip>
+    </div>
+}`,...d.parameters?.docs?.source}}},f.parameters={...f.parameters,docs:{...f.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="h-72 w-[234px] p-4"><SettingsItem clase={a => \`flex items-center rounded-md px-3 py-2 text-sm \${a ? 'bg-dash-blue text-white' : ''}\`} mostrarLabel /></div>
+}`,...f.parameters?.docs?.source}}}})))()}m();export{d as ItemTooltip,f as SettingsEntry,p as __namedExportsOrder,u as default};

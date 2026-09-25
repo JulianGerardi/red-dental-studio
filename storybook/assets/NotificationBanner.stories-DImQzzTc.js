@@ -1,0 +1,10 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./react-BZJXY1be.js";import{t as n}from"./jsx-runtime-DeHZSEgm.js";import{n as r,t as i}from"./notificaciones-Dmlaj1eV.js";import{n as a,t as o}from"./NotificationBanner-D3RtDVYf.js";function s({items:e}){let[t,n]=(0,c.useState)(0);return(0,l.jsx)(o,{items:e,cursor:t,onCursor:n,onOcultar:()=>{}})}var c,l,u,d,f,p,m;function h(){return(h=e((()=>{c=t(),r(),a(),l=n(),u={title:`Components/Layout/NotificationBanner`,component:o,parameters:{layout:`fullscreen`,docs:{story:{inline:!1,iframeHeight:620}}},args:{items:i,cursor:0,onCursor:()=>{},onOcultar:()=>{}}},d={render:e=>(0,l.jsx)(s,{items:e.items})},f={render:()=>(0,l.jsx)(s,{items:i.slice(0,1)})},p={render:()=>(0,l.jsxs)(`div`,{className:`border border-dashed border-line-strong p-4 text-[12px] text-ink-muted`,children:[(0,l.jsx)(o,{items:[],cursor:0,onCursor:()=>{},onOcultar:()=>{}}),`No banner is rendered when there are no pending tasks.`]})},m=[`Several`,`Single`,`Empty`],d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`{
+  render: args => <Demo items={args.items} />
+}`,...d.parameters?.docs?.source}}},f.parameters={...f.parameters,docs:{...f.parameters?.docs,source:{originalSource:`{
+  render: () => <Demo items={NOTIFICACIONES.slice(0, 1)} />
+}`,...f.parameters?.docs?.source}}},p.parameters={...p.parameters,docs:{...p.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="border border-dashed border-line-strong p-4 text-[12px] text-ink-muted">
+      <NotificationBanner items={[]} cursor={0} onCursor={() => {}} onOcultar={() => {}} />
+      No banner is rendered when there are no pending tasks.
+    </div>
+}`,...p.parameters?.docs?.source}}}})))()}h();export{p as Empty,d as Several,f as Single,m as __namedExportsOrder,u as default};
