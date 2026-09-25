@@ -1,0 +1,10 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{i as n,n as r}from"./Page-BT4O46MH.js";import{c as i,i as a,l as o,u as s}from"./Recipes-C7_5mTa5.js";var c,l,u,d,f;function p(){return(p=e((()=>{n(),i(),c=t(),l={title:`Patterns/Fields`,tags:[`!autodocs`],parameters:{layout:`fullscreen`,options:{showPanel:!1}}},u=e=>e.tag===`select`?`Select`:e.tag===`textarea`?`Textarea`:/field-error|dash-bad/.test(e.firma)?`Input with error`:`Text input`,d={name:`Fields`,render:()=>{let e=s.filter(e=>e.tipo===`field`),t=o.elementos.field??0;return(0,c.jsx)(r,{titulo:`Fields`,bajada:`Los ${t} <input>, <select> y <textarea> con estilo propio de la app: ${e.length} looks. Los campos de formulario reutilizables viven en Components / Patients / Form fields; acá está lo que el código escribe a mano, con el estado de foco (borde azul), error (borde rojo) y deshabilitado de cada uno.`,children:(0,c.jsx)(a,{tipo:`field`,familiaDe:u,orden:[`Text input`,`Input with error`,`Select`,`Textarea`],vista:`matriz`})})}},f=[`Campos`],d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`{
+  name: 'Fields',
+  render: () => {
+    const campos = recetas.filter(r => r.tipo === 'field');
+    const usos = datos.elementos.field ?? 0;
+    return <Page titulo="Fields" bajada={\`Los \${usos} <input>, <select> y <textarea> con estilo propio de la app: \${campos.length} looks. Los campos de formulario reutilizables viven en Components / Patients / Form fields; acá está lo que el código escribe a mano, con el estado de foco (borde azul), error (borde rojo) y deshabilitado de cada uno.\`}>
+        <PaginaDeRecetas tipo="field" familiaDe={familia} orden={['Text input', 'Input with error', 'Select', 'Textarea']} vista="matriz" />
+      </Page>;
+  }
+}`,...d.parameters?.docs?.source}}}})))()}p();export{d as Campos,f as __namedExportsOrder,l as default};

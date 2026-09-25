@@ -1,5 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,t as r}from"./ReviewList-UmL8tvq6.js";var i,a,o,s,c;function l(){return(l=e((()=>{n(),i=t(),a={title:`Components/Clinical/Dental/ReviewList`,component:r,args:{reviews:[{id:`R-1`,date:`May 14, 2026`,provider:`Elena Martinez`,note:`Reviewed with the patient. No new findings.`},{id:`R-2`,date:`Feb 02, 2026`,provider:`Emily Chen`,note:`Caries on 3 to monitor.`}]},decorators:[e=>(0,i.jsx)(`div`,{className:`w-[420px]`,children:(0,i.jsx)(e,{})})]},o={},s={args:{reviews:[]}},c=[`Default`,`Empty`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{}`,...o.parameters?.docs?.source}}},s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
-  args: {
-    reviews: []
-  }
-}`,...s.parameters?.docs?.source}}}})))()}l();export{o as Default,s as Empty,c as __namedExportsOrder,a as default};

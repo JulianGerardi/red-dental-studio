@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{a as n,i as r,n as i,r as a}from"./Scheduling-CxlquY5e.js";var o,s,c,l;function u(){return(u=e((()=>{n(),a(),o=t(),s={title:`Pages/Parts/Scheduling`,parameters:{layout:`padded`}},c={render:()=>(0,o.jsx)(`div`,{className:`flex w-[300px] flex-col gap-3`,children:r.slice(0,3).map(e=>(0,o.jsx)(i,{s:e,onCancel:()=>{},onSchedule:()=>{}},e.id))})},l=[`RequestCards`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="flex w-[300px] flex-col gap-3">
+      {SOLICITUDES.slice(0, 3).map(s => <SolicitudCard key={s.id} s={s} onCancel={() => {}} onSchedule={() => {}} />)}
+    </div>
+}`,...c.parameters?.docs?.source}}}})))()}u();export{c as RequestCards,l as __namedExportsOrder,s as default};

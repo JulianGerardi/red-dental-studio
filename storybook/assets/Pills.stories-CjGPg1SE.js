@@ -1,9 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{i as n,n as r}from"./Page-D7sAlKBt.js";import{i,r as a,t as o}from"./Recipes-a_HoGmmB.js";var s,c,l,u,d;function f(){return(f=e((()=>{n(),a(),s=t(),c={title:`Patterns/Pills and badges`,tags:[`!autodocs`],parameters:{layout:`fullscreen`,options:{showPanel:!1}}},l=e=>{let t=e.clases;return/dash-ok/.test(t)?`Success`:/dash-bad|field-error/.test(t)?`Danger`:/dash-busy|dash-blue|info-bg/.test(t)?`Info`:/warn|attn/.test(t)?`Warning`:/purple/.test(t)?`Purple`:`Neutral or state-driven`},u={name:`Pills and badges`,render:()=>{let e=i.filter(e=>e.tipo===`pill`);return(0,s.jsx)(r,{titulo:`Pills and badges`,bajada:`Las pastillas de estado que el código escribe a mano (${e.length} recetas). La pastilla del sistema es Components / UI / Pill, con seis tonos; acá aparecen las que no la usan y su color se decide por estado.`,children:(0,s.jsx)(o,{tipo:`pill`,familiaDe:l,orden:[`Success`,`Danger`,`Info`,`Warning`,`Purple`,`Neutral or state-driven`],estados:!1})})}},d=[`Pastillas`],u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
-  name: 'Pills and badges',
-  render: () => {
-    const pastillas = recetas.filter(r => r.tipo === 'pill');
-    return <Page titulo="Pills and badges" bajada={\`Las pastillas de estado que el código escribe a mano (\${pastillas.length} recetas). La pastilla del sistema es Components / UI / Pill, con seis tonos; acá aparecen las que no la usan y su color se decide por estado.\`}>
-        <PaginaDeRecetas tipo="pill" familiaDe={familia} orden={['Success', 'Danger', 'Info', 'Warning', 'Purple', 'Neutral or state-driven']} estados={false} />
-      </Page>;
-  }
-}`,...u.parameters?.docs?.source}}}})))()}f();export{u as Pastillas,d as __namedExportsOrder,c as default};

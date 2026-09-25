@@ -1,6 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{a as n,n as r,t as i}from"./PatientsTable-C2ZW_ARB.js";var a,o,s,c;function l(){return(l=e((()=>{n(),a=t(),o={title:`Components/Patients/PatientsTable parts`,parameters:{layout:`padded`}},s={render:()=>(0,a.jsxs)(`div`,{className:`flex h-10 w-[420px] items-center gap-4 border border-line`,children:[(0,a.jsx)(r,{className:`w-[120px]`,children:`Full name`}),(0,a.jsx)(i,{className:`w-[200px]`,children:`A very long text that should truncate at the column edge`})]})},c=[`HeaderAndDataCells`],s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="flex h-10 w-[420px] items-center gap-4 border border-line">
-      <HeadCell className="w-[120px]">Full name</HeadCell>
-      <Cell className="w-[200px]">A very long text that should truncate at the column edge</Cell>
-    </div>
-}`,...s.parameters?.docs?.source}}}})))()}l();export{s as HeaderAndDataCells,c as __namedExportsOrder,o as default};

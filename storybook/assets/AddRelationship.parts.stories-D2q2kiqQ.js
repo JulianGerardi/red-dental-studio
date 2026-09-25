@@ -1,0 +1,3 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{i as n,n as r,r as i}from"./AddRelationship-2h8xLXDI.js";var a,o,s,c;function l(){return(l=e((()=>{n(),a=t(),o={title:`Pages/Parts/Add relationship`,parameters:{layout:`padded`}},s={render:()=>(0,a.jsx)(`div`,{className:`w-[420px]`,children:(0,a.jsx)(i,{p:r[0]})})},c=[`SelectedPerson`],s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="w-[420px]"><PersonaSeleccionada p={DIRECTORIO[0]} /></div>
+}`,...s.parameters?.docs?.source}}}})))()}l();export{s as SelectedPerson,c as __namedExportsOrder,o as default};
