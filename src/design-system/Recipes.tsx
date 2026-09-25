@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import recetasJson from './generated/recipes.json'
 import metaJson from './generated/recipes-meta.json'
 import nombres from './recipe-names.json'
@@ -28,6 +28,7 @@ export type Receta = {
   id: string
   tipo: 'button' | 'field' | 'card' | 'table' | 'pill'
   tag: string
+  inputType?: string
   firma: string
   clases: string
   etiqueta: string
@@ -87,14 +88,37 @@ function Muestra({ r, estado }: { r: Receta; estado?: EstadoMuestra }) {
       </button>
     )
   }
-  if (r.tipo === 'field') {
-    if (r.tag === 'textarea') return <textarea className={clases} style={estilo} disabled={deshabilitado} placeholder={r.etiqueta || 'Placeholder'} rows={2} />
-    if (r.tag === 'select') return <select className={clases} style={estilo} disabled={deshabilitado}><option>Option</option></select>
-    return <input className={clases} style={estilo} disabled={deshabilitado} placeholder={r.etiqueta || 'Placeholder'} />
-  }
+  if (r.tipo === 'field') return <MuestraDeCampo r={r} clases={clases} estilo={estilo} deshabilitado={deshabilitado} />
   if (r.tipo === 'pill') return <span className={clases}>{r.etiqueta || 'Label'}</span>
   if (r.tipo === 'card') return <div className={`${clases} h-16 w-full p-3 text-[12px] text-ink-muted`}>{r.etiqueta || 'Card'}</div>
   return null
+}
+
+/* Los campos se dibujan todos en una celda del mismo ancho: el ancho real es
+   de la pantalla que los usa, no del look, y con anchos naturales la columna
+   queda dentada. Lo que sí es del look -altura, borde, radio, relleno- se
+   respeta. */
+export const esBuscador = (r: Receta) => /(^|\s)pl-(8|9|10)(\s|$)/.test(r.clases)
+export const esCasilla = (r: Receta) => r.inputType === 'checkbox' || r.inputType === 'radio'
+export const esOculto = (r: Receta) => r.inputType === 'file' || /(^|\s)sr-only(\s|$)/.test(r.clases)
+export const sinBorde = (r: Receta) => !/(^|\s)border(\s|$)/.test(r.clases)
+
+function MuestraDeCampo({ r, clases, estilo, deshabilitado }: { r: Receta; clases: string; estilo?: React.CSSProperties; deshabilitado: boolean }) {
+  if (esOculto(r)) return <span className="text-[11px] text-ink-faint">visually hidden file input</span>
+  if (esCasilla(r)) return <input type={r.inputType} className={clases} style={estilo} disabled={deshabilitado} aria-label="Sample" />
+  const pieza = cn(clases, 'w-full min-w-0')
+  const campo =
+    r.tag === 'textarea' ? <textarea className={pieza} style={estilo} disabled={deshabilitado} placeholder={r.etiqueta || 'Placeholder'} rows={2} />
+    : r.tag === 'select' ? <select className={pieza} style={estilo} disabled={deshabilitado}><option>Option</option></select>
+    : <input type={r.inputType ?? 'text'} className={pieza} style={estilo} disabled={deshabilitado} placeholder={r.etiqueta || 'Placeholder'} />
+  /* Sin borde propio, el campo vive dentro de otra caja: se le da una. */
+  const caja = sinBorde(r) && r.tag !== 'select' ? 'rounded-md border border-dashed border-line-strong bg-white px-2 py-1' : ''
+  return (
+    <span className={cn('relative block w-36', caja)}>
+      {esBuscador(r) && <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />}
+      {campo}
+    </span>
+  )
 }
 
 /* ── Estados ──────────────────────────────────────────────────────────────
@@ -158,14 +182,18 @@ const ESTADOS_BASE: EstadoMuestra[] = ['hover', 'focus', 'active', 'disabled']
 
 /* Matriz de estados: una fila por look, una columna por estado. */
 export function MatrizDeEstados({ de }: { de: Receta[] }) {
-  const columnas = ESTADOS_BASE.filter((e) => e !== 'active' || de.some((r) => r.estados.activo))
+  /* Un campo no se "aprieta": para él no hay columna Active. */
+  const esCampo = de[0]?.tipo === 'field'
+  const columnas = ESTADOS_BASE.filter((e) => e !== 'active' || (!esCampo && de.some((r) => r.estados.activo)))
+  /* Columnas de igual ancho para los campos, así las muestras quedan en línea. */
+  const celda = esCampo ? 'w-[168px] min-w-[168px] px-2' : 'px-3'
   return (
     <div className="overflow-x-auto rounded-lg border border-line bg-white">
-      <table className="w-full min-w-[820px] text-left text-[12px]">
+      <table className={cn('w-full text-left text-[12px]', esCampo ? 'min-w-[760px]' : 'min-w-[820px]')}>
         <thead className="bg-surface-subtle text-[10px] tracking-wide text-ink-muted uppercase">
           <tr>
-            <th className="px-3 py-2">Default</th>
-            {columnas.map((e) => <th key={e} className="px-3 py-2">{TITULO_ESTADO[e]}</th>)}
+            <th className={cn('py-2', celda)}>Default</th>
+            {columnas.map((e) => <th key={e} className={cn('py-2', celda)}>{TITULO_ESTADO[e]}</th>)}
             <th className="px-3 py-2">Uses</th>
             <th className="px-3 py-2">Look</th>
           </tr>
@@ -176,10 +204,10 @@ export function MatrizDeEstados({ de }: { de: Receta[] }) {
             const cuando = [...new Set(r.usos.map((u) => u.cuando).filter(Boolean))]
             return (
               <tr key={r.id} className="border-t border-line-soft align-top">
-                <td className="px-3 py-3"><Muestra r={r} /></td>
-                {columnas.map((e) => <td key={e} className="px-3 py-3"><CeldaDeEstado r={r} e={e} /></td>)}
+                <td className={cn('py-3', celda)}><Muestra r={r} /></td>
+                {columnas.map((e) => <td key={e} className={cn('py-3', celda)}><CeldaDeEstado r={r} e={e} /></td>)}
                 <td className="px-3 py-3 whitespace-nowrap text-ink-muted">{r.cantidad} · {r.archivos}f</td>
-                <td className="max-w-[340px] px-3 py-3">
+                <td className="min-w-[200px] max-w-[340px] px-3 py-3">
                   <p className="text-[12px] font-semibold text-ink">{nombre ?? <span className="font-normal text-ink-faint">{r.id}</span>}{nombre && <span className="ml-1.5 font-mono text-[10.5px] font-normal text-ink-faint">{r.id}</span>}</p>
                   {notaDe(r) && <p className="mt-0.5 text-ink-medium">{notaDe(r)}</p>}
                   {cuando.length > 0 && <p className="mt-0.5 text-ink-muted">only when <Codigo>{cuando[0] as string}</Codigo>{cuando.length > 1 && ` (+${cuando.length - 1} more)`}</p>}
@@ -396,7 +424,7 @@ export function IndiceDeFamilias({ tipo, familiaDe, orden, descripciones }: { ti
    internas. Los primeros `visibles` looks van a la vista; el resto, plegado. */
 export function SeccionDeFamilia({ familia, de, descripcion, visibles = 8 }: { familia: string; de: Receta[]; descripcion?: string; visibles?: number }) {
   const cambios = facetas(de).filter((f) => f.valores.length > 1)
-  const sinActivo = !de.some((r) => r.estados.activo)
+  const sinActivo = de[0]?.tipo !== 'field' && !de.some((r) => r.estados.activo)
   return (
     <section id={slug(familia)} className="scroll-mt-6">
       <h2 className="text-[16px] font-semibold">{familia} <span className="text-[13px] font-normal text-ink-muted">· {elementosDe(de)} elements, {de.length} {de.length === 1 ? 'look' : 'looks'}</span></h2>

@@ -217,7 +217,7 @@ const usaCn = (attr) => {
   return !!e && ts.isCallExpression(e) && ['cn', 'twMerge'].includes(e.expression.getText())
 }
 
-function registrar(tipo, tag, alts, archivo, linea, texto, cuentaElemento, fusionar) {
+function registrar(tipo, tag, alts, archivo, linea, texto, cuentaElemento, fusionar, inputType) {
   const vistos = new Set()
   for (const a0 of alts) {
     const a = fusionar ? { ...a0, clases: twMerge(a0.clases.join(' ')).split(/\s+/).filter(Boolean) } : a0
@@ -225,9 +225,9 @@ function registrar(tipo, tag, alts, archivo, linea, texto, cuentaElemento, fusio
       .filter((c) => !TAMANO_TEXTO.test(sinVariante(c)) && !LAYOUT.test(sinVariante(c)))
       .sort()
     const firma = visuales.join(' ')
-    const id = `${tipo}-${createHash('sha1').update(firma).digest('hex').slice(0, 8)}`
+    const id = `${tipo}-${createHash('sha1').update(firma + (inputType ? `|${inputType}` : '')).digest('hex').slice(0, 8)}`
     if (!cuentaElemento(a)) continue
-    const r = recetas.get(id) ?? { id, tipo, tag, firma, clases: [...new Set(a.clases)].join(' '), etiqueta: texto, estados: estadosDe(a.clases, a.conds), usos: [] }
+    const r = recetas.get(id) ?? { id, tipo, tag, ...(inputType ? { inputType } : {}), firma, clases: [...new Set(a.clases)].join(' '), etiqueta: texto, estados: estadosDe(a.clases, a.conds), usos: [] }
     if (!r.etiqueta && texto) r.etiqueta = texto
     /* Si el look sale de varios elementos, el estado "deshabilitado por
        condición" se acumula: alcanza con que uno lo tenga. */
@@ -275,7 +275,13 @@ for (const archivo of fuentes) {
         if (tipo) {
           /* Un elemento cuenta una sola vez aunque dé varios looks. */
           if (alts.some(filtro)) elementos[tipo] = (elementos[tipo] ?? 0) + 1
-          registrar(tipo, tag, alts, rel, linea, texto, filtro, usaCn(attr))
+          const tipoAttr = n.attributes.properties.find((a) => ts.isJsxAttribute(a) && a.name.getText(sf) === 'type')
+          let inputType
+          if (tag === 'input' && tipoAttr?.initializer) {
+            const v = ts.isJsxExpression(tipoAttr.initializer) ? tipoAttr.initializer.expression : tipoAttr.initializer
+            if (v && ts.isStringLiteral(v)) inputType = v.text
+          }
+          registrar(tipo, tag, alts, rel, linea, texto, filtro, usaCn(attr), inputType)
         }
       }
     }
