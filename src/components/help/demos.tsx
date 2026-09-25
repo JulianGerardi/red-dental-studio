@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
    un panel- para reconocer la interacción sin redibujar la pantalla entera.
    Todas en loop de 4s, ver design-reference/figma/modulos/help.md. */
 
-function Stage({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+export function Stage({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
     <div className={`relative h-[150px] w-full overflow-hidden rounded-xl border border-line bg-[#fafbfe] ${className}`}>
       {children}
@@ -14,7 +14,7 @@ function Stage({ children, className = '' }: { children: React.ReactNode; classN
   )
 }
 
-function Panel({ title, children, className = '' }: { title?: string; children?: React.ReactNode; className?: string }) {
+export function Panel({ title, children, className = '' }: { title?: string; children?: React.ReactNode; className?: string }) {
   return (
     <div className={`rounded-lg border border-line bg-white p-2.5 shadow-sm ${className}`}>
       {title && <p className="text-[10px] font-bold text-ink">{title}</p>}
@@ -23,7 +23,7 @@ function Panel({ title, children, className = '' }: { title?: string; children?:
   )
 }
 
-function Pointer({ style }: { style?: React.CSSProperties }) {
+export function Pointer({ style }: { style?: React.CSSProperties }) {
   return (
     <svg viewBox="0 0 12 16" className="absolute z-20 size-4 drop-shadow-sm" style={style}>
       <path d="M1 1l9.5 8.2-4.2.5 2.4 4.6-1.9 1-2.4-4.6-2.6 3z" fill="#18181b" stroke="#fff" strokeWidth="1" />

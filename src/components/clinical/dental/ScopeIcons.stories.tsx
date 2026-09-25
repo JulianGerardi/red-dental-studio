@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ScopeIcon } from './ScopeIcons'
+import { ArchIcon, ScopeIcon } from './ScopeIcons'
 import { SCOPES } from './data'
 
 const meta = {
@@ -20,3 +20,6 @@ export const AllScopes: Story = {
     </div>
   ),
 }
+
+/* El ícono de arcada, que no existe en lucide, con el mismo tamaño que los demás. */
+export const ArchGlyph: Story = { render: () => <ArchIcon className="size-6" /> }

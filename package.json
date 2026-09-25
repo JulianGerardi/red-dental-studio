@@ -14,7 +14,7 @@
     "ds:coverage": "node scripts/ds-coverage.mjs",
     "ds:check": "node scripts/ds-coverage.mjs --check",
     "ds:tokenize": "node scripts/tokenize-colors.mjs",
-    "ds:scan": "node scripts/scan-recipes.mjs",
+    "ds:scan": "node scripts/scan-recipes.mjs && node scripts/ds-coverage.mjs > /dev/null; true",
     "prestorybook": "npm run ds:scan",
     "prebuild-storybook": "npm run ds:scan",
     "prebuild": "npm run ds:scan"

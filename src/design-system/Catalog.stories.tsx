@@ -56,6 +56,7 @@ function Catalogo() {
                   <span className="font-semibold">{c.nombre}</span>
                   <span className="min-w-0 flex-1 truncate text-ink-muted">{c.exports.join(', ') || '-'}</span>
                   <span className="text-[11.5px] text-ink-muted">used in {c.usadoEn}</span>
+                  {c.usadoEn === 0 && <span className="rounded-full bg-warn-bg px-2 py-0.5 text-[11px] font-semibold text-warn-fg">unused</span>}
                   <span className={c.tieneStory || c.exento ? 'rounded-full bg-dash-ok-bg px-2 py-0.5 text-[11px] font-semibold text-dash-ok-fg' : 'rounded-full bg-warn-bg px-2 py-0.5 text-[11px] font-semibold text-warn-fg'}>
                     {c.tieneStory ? 'story' : c.exento ? 'in host story' : 'no story'}
                   </span>

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ConsentDocument } from './ConsentDocument'
+import { User } from 'lucide-react'
+import { Campo, ConsentDocument } from './ConsentDocument'
 
 const meta = {
   title: 'Components/Settings/ConsentDocument',
@@ -21,3 +22,8 @@ type Story = StoryObj<typeof meta>
 export const ClinicView: Story = {}
 export const PatientView: Story = { args: { vistaPaciente: true } }
 export const Empty: Story = { args: { titulo: '', procedimiento: undefined, naturaleza: '', riesgos: '' } }
+
+/* Casilla del recuadro de datos: rótulo con ícono arriba, valor abajo. */
+export const DataCell: Story = {
+  render: () => <div className="w-[220px] border border-line"><Campo icono={User} etiqueta="Patient"><p className="font-bold">Sarah Stone</p><p className="text-ink-muted">DOB: 04/02/1991</p></Campo></div>,
+}

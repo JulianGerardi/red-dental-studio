@@ -25,7 +25,7 @@ const TONO = {
   Expired: { bar: '#b22626', pill: 'border-dash-bad-fg bg-dash-bad-bg text-dash-bad-fg', tile: 'bg-dash-bad-bg text-dash-bad-fg' },
 }
 
-function FilaFirma({ f }: { f: Firma }) {
+export function FilaFirma({ f }: { f: Firma }) {
   const ok = f.estado === 'Signed'
   return (
     <div className="flex min-w-0 items-center gap-2">
@@ -43,7 +43,7 @@ function FilaFirma({ f }: { f: Firma }) {
   )
 }
 
-function PanelHistorial({ onClose }: { onClose: () => void }) {
+export function PanelHistorial({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/30" onClick={onClose}>
       <aside

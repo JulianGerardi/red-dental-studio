@@ -13,7 +13,7 @@ import type { Finding } from '@/components/clinical/dental/data'
 /* Un problema todavía sin resolver, no uno cerrado (Treated/Discarded/...). */
 const PROBLEMA_ABIERTO: Finding['status'][] = ['Active', 'Monitoring', 'In Treatment']
 
-function ToothCell({
+export function ToothCell({
   tooth, selected, onToggle, onSurface, problema, finding, flip,
 }: {
   tooth: Tooth
@@ -87,7 +87,7 @@ function ToothCell({
   )
 }
 
-function Arch({
+export function Arch({
   exam, numbers, flip, selected, onToggle, onSurface, findings, left, center, right,
 }: {
   exam: OralExam

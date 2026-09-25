@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ManageSubscriptionModal, NewDependerModal, NewSubscriptionModal } from './modals'
+import { ShieldHalf } from 'lucide-react'
+import { FilaLectura, ManageSubscriptionModal, NewDependerModal, NewSubscriptionModal } from './modals'
 import { esperar, pulsar, secuencia } from '@/design-system/play'
 
 const meta = {
@@ -26,3 +27,8 @@ export const ManageSubscriptionWithErrors: Story = {
   },
 }
 export const NewDependentWithErrors: Story = { ...NewDependent, play: secuencia(pulsar(/^save$/i), esperar(/required|at least|must|invalid/i)) }
+
+/* Fila de sólo lectura de la ficha de la suscripción. */
+export const ReadOnlyRow: Story = {
+  render: () => <div className="w-[300px]"><FilaLectura icon={ShieldHalf} label="Carrier" value="Delta Dental" /></div>,
+}

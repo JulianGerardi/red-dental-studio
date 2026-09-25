@@ -112,7 +112,7 @@ const aBorrador = (t: ConsentTemplate): Borrador => ({
 /* Toolbar decorativo: mismo trato que el botón "Select File" de Documents en
    Employees.tsx -avisa que no está disponible en vez de fingir que hace
    algo-. No hay editor de texto enriquecido real en este prototipo. */
-function ToolbarFormato() {
+export function ToolbarFormato() {
   const iconos = [Bold, Italic, Underline, Heading1, Heading2, Pilcrow, List, ListOrdered]
   return (
     <div className="flex items-center gap-0.5 rounded-t-md border border-b-0 border-line bg-surface-subtle px-2 py-1.5">

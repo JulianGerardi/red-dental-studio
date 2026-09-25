@@ -26,7 +26,7 @@ export function DocsPage() {
   const historia = contexto.componentStories()[0]
   const archivoStories = (historia?.parameters?.fileName as string | undefined)?.replace(/^\.\//, '')
   const rutaStories = archivoStories ? `/${archivoStories}` : null
-  const rutaComponente = rutaStories ? rutaStories.replace(/\.stories\.tsx$/, '.tsx') : null
+  const rutaComponente = rutaStories ? rutaStories.replace(/(\.[a-z]+)*\.stories\.tsx$/, '.tsx') : null
 
   const componente = useArchivo(rutaComponente)
   const stories = useArchivo(rutaStories)

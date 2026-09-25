@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { PlanCard, VisitRow, type Plan, type Visita } from './TreatmentPlanPicker'
+import { PlanCard, Seleccionable, VisitRow, type Plan, type Visita } from './TreatmentPlanPicker'
 
 const PLAN: Plan = { id: 'p1', estado: 'Accepted', date: '02/12/2026', doctor: 'Dr. Elena Martinez', therapy: 'Crown and root canal', visitas: 2, procedimientos: 4 }
 const VISITA: Visita = { id: 'v1', name: 'Visit 1', procedimientos: ['D3310', 'D2740'], total: '$1,240' }
@@ -27,6 +27,16 @@ export const Visits: Story = {
     <div className="flex flex-col gap-2">
       <VisitRow visita={VISITA} on onClick={() => {}} />
       <VisitRow visita={{ ...VISITA, id: 'v2', name: 'Visit 2', total: '$860' }} on={false} onClick={() => {}} />
+    </div>
+  ),
+}
+
+/* La tarjeta seleccionable base: elegida (borde azul) y sin elegir. */
+export const SelectableCard: Story = {
+  render: () => (
+    <div className="flex flex-col gap-2">
+      <Seleccionable on onClick={() => {}} barra="var(--color-dash-blue)" className="p-3"><span className="text-[13px] font-semibold">Selected</span></Seleccionable>
+      <Seleccionable on={false} onClick={() => {}} className="p-3"><span className="text-[13px] font-semibold">Not selected</span></Seleccionable>
     </div>
   ),
 }

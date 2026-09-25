@@ -28,7 +28,7 @@ export const STATS: Stat[] = [
    el panel del paciente abiertos y empujaba la cuarta métrica fuera de la
    pantalla. Acá el ancho lo decide el contenedor -no el viewport, que no
    sabe si los menús están abiertos-: de 2×2 a cuatro columnas desde 672px. */
-function StatStripApilada({ stats }: { stats: Stat[] }) {
+export function StatStripApilada({ stats }: { stats: Stat[] }) {
   return (
     <div className="@container w-full">
       <div className={cn(

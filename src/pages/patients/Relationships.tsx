@@ -28,7 +28,7 @@ const BADGE_TONO: Record<Badge, PillTone> = {
    acciones que el propio diseño da por existentes: editar (3716:81940) y
    borrar, que el texto de ese modal menciona sin llegar a dibujar.
    Ver modulos/relationships.md, anomalía 42. */
-function MenuAcciones({
+export function MenuAcciones({
   nombre, onEdit, onDelete,
 }: {
   nombre: string
@@ -71,16 +71,16 @@ const HOGAR: Campo[] = [
 
 /* Dos cards con la misma persona: es lo que muestra el frame. Se les agrega
    un id para poder borrarlas por separado. */
-const RELACIONES: Persona[] = [
+export const RELACIONES: Persona[] = [
   { id: 'r1', name: 'Jessica Miller', initials: 'JM', rol: 'Mother', badges: ['Legal contact', 'Financial contact'], campos: CONTACTO },
   { id: 'r2', name: 'Jessica Miller', initials: 'JM', rol: 'Mother', badges: ['Legal contact', 'Financial contact'], campos: CONTACTO },
 ]
-const HOUSEHOLD: Persona[] = [
+export const HOUSEHOLD: Persona[] = [
   { id: 'h1', name: 'Jessica Miller', initials: 'JM', rol: 'Child', badges: ['Household'], campos: HOGAR },
   { id: 'h2', name: 'Jessica Miller', initials: 'JM', rol: 'Child', badges: ['Household'], campos: HOGAR },
 ]
 
-function PersonaCard({
+export function PersonaCard({
   p, onEdit, onDelete,
 }: {
   p: Persona

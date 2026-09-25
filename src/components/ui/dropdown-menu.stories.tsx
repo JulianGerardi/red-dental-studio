@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import {
-  DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
-  DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel,
+  DropdownMenuPortal, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut,
+  DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger,
 } from './dropdown-menu'
 import { Button } from './button'
 
@@ -42,6 +43,33 @@ export const DisabledItem: Story = {
           <DropdownMenuItem>Edit</DropdownMenuItem>
           <DropdownMenuItem disabled>Cancel (disabled - started)</DropdownMenuItem>
           <DropdownMenuCheckboxItem disabled checked>Notifications (disabled)</DropdownMenuCheckboxItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  ),
+}
+
+/* Grupos, opciones de radio y submenú: el resto de la familia del menú. */
+export const GroupsRadioAndSubmenu: Story = {
+  render: () => (
+    <div className="h-72 w-72">
+      <DropdownMenu defaultOpen>
+        <DropdownMenuTrigger asChild><Button variant="outline">View</Button></DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56">
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+            <DropdownMenuRadioGroup value="date">
+              <DropdownMenuRadioItem value="date">Date</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="name">Name</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent><DropdownMenuItem>Export…</DropdownMenuItem></DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

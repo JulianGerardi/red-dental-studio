@@ -9,7 +9,7 @@ import { PLANES, type Plan } from '@/data/clinical-mode'
    profesional: se sacó a pedido de Julián. */
 /* La etiqueta va en una sola línea. Partida en dos —"Total / Procedures"—
    desalineaba las tres cajas entre sí y apretaba la card entera. */
-function Dato({ label, valor, azul }: { label: string; valor: string; azul?: boolean }) {
+export function Dato({ label, valor, azul }: { label: string; valor: string; azul?: boolean }) {
   return (
     <div className="min-w-0 rounded-md border border-line px-2 py-2">
       <span className="block truncate text-[9px] leading-none whitespace-nowrap text-ink-muted">
@@ -22,7 +22,7 @@ function Dato({ label, valor, azul }: { label: string; valor: string; azul?: boo
   )
 }
 
-function PlanCard({ p }: { p: Plan }) {
+export function PlanCard({ p }: { p: Plan }) {
   return (
     <div className="rounded-lg border border-line bg-white p-3.5">
       <div className="flex items-start gap-2">

@@ -38,7 +38,7 @@ const PITCH = [
 
 /* Fila compartida por Agenda y Ledger -mismo recorte: avatar/ícono + texto +
    etiqueta- para que las tres tarjetas se sientan una sola familia visual. */
-function Fila({
+export function Fila({
   avatar, titulo, subtitulo, delay, children,
 }: {
   avatar: React.ReactNode
@@ -75,7 +75,7 @@ const ESTADO_TONO: Record<ApptState, PillTone> = {
 /** Turnos del día, salidos del mismo `EVENTS` que dibuja el calendario. Mismo
     `Panel` que usa el resto del sistema -no una tarjeta propia-, así el
     encabezado, el radio y la sombra son un componente y no una imitación. */
-function PanelAgenda() {
+export function PanelAgenda() {
   const filas = EVENTS.slice(0, 3)
   return (
     <Panel
@@ -103,7 +103,7 @@ function PanelAgenda() {
 }
 
 /** Las últimas líneas del ledger, con el saldo que corre de verdad. */
-function PanelLedger() {
+export function PanelLedger() {
   const filas = conSaldo(MOVIMIENTOS).slice(-3)
   const saldo = MOVIMIENTOS.reduce((a, m) => a + m.monto, 0)
   return (
@@ -142,7 +142,7 @@ function PanelLedger() {
 const CARGADAS = new Set([19, 30, 32])
 
 /** La arcada inferior, llenándose diente por diente. */
-function PanelOdontograma() {
+export function PanelOdontograma() {
   return (
     <Panel title="Dental Assessment" controls={<span className="text-dash-blue shrink-0 text-[12px] font-semibold">Mandibular</span>} bodyClassName="gap-3">
       <div className="flex justify-between gap-1">

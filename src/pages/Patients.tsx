@@ -28,7 +28,7 @@ const CANTIDAD_PACIENTES = 4
 
 /* Globo con el total -no el filtrado ni el visible- al lado del título del
    panel, mismo color que el de notificaciones de la campana. */
-function Globo({ n }: { n: number }) {
+export function Globo({ n }: { n: number }) {
   return (
     <span className="bg-dash-blue flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold text-white">
       {n}
@@ -38,7 +38,7 @@ function Globo({ n }: { n: number }) {
 
 /* "View all" en el header del panel, mismo lugar y estilo que "All treatment"
    en TreatmentPlanList. Se esconde solo si no hay nada de más para mostrar. */
-function BotonVerTodos({
+export function BotonVerTodos({
   total, cantidad, mostrando, onToggle,
 }: {
   total: number

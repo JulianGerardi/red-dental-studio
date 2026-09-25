@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { AssignRoleModal, RolesLocation } from './RolesLocation'
+import { AssignRoleModal, FilaRol, RolesLocation } from './RolesLocation'
 import { esperar, pulsar, secuencia } from '@/design-system/play'
 import { userEvent, within } from 'storybook/test'
 
@@ -35,3 +35,13 @@ export const Empty: Story = {
 
 /* Rol abierto: muestra sus sedes con los interruptores encendidos. */
 export const RoleExpandedSelected: Story = { render: () => <RolesLocation /> }
+
+/* Una fila de rol: cerrada y abierta con sus sedes. */
+export const RoleRow: Story = {
+  render: () => (
+    <div className="flex w-[560px] flex-col gap-3">
+      <FilaRol rol={{ id: 'r1', nombre: 'Administrator', sedes: ['Buenos Aires Medical 1'] }} abierto={false} onAbrir={() => {}} onCambiar={() => {}} onBorrar={() => {}} />
+      <FilaRol rol={{ id: 'r2', nombre: 'Dentist', sedes: ['Sede Pruebas 1'] }} abierto onAbrir={() => {}} onCambiar={() => {}} onBorrar={() => {}} />
+    </div>
+  ),
+}

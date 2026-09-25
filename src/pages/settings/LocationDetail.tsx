@@ -35,7 +35,7 @@ const DIAS: [string, string][] = [
   ['Wednesday', 'Wednesday'], ['Thursday', 'Thursday'], ['Friday', 'Friday'], ['Saturday', 'Saturday'],
 ]
 
-function SwitchOpenClose({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+export function SwitchOpenClose({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
   return (
     <button
       type="button"
@@ -55,7 +55,7 @@ function SwitchOpenClose({ on, onChange }: { on: boolean; onChange: (v: boolean)
   )
 }
 
-function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
+export function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
   const [d, setD] = useState({
     nombre: nombreLocacion, abrev: '', fee: '',
     codigo: CODIGOS[0], numero: '', email: '',
@@ -101,7 +101,7 @@ function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
   )
 }
 
-function WorkingHoursTab() {
+export function WorkingHoursTab() {
   const [horario, setHorario] = useState(HORARIO_SEMANAL)
   const [expandido, setExpandido] = useState<string | null>(null)
   const [modal, setModal] = useState<string | null>(null)
@@ -209,7 +209,7 @@ function WorkingHoursTab() {
   )
 }
 
-function RoomsTab() {
+export function RoomsTab() {
   const [salas, setSalas] = useState<Sala[]>(SALAS_INICIALES)
   const [modal, setModal] = useState<'nueva' | Sala | false>(false)
 
@@ -287,7 +287,7 @@ function RoomsTab() {
   )
 }
 
-function ExceptionsTab() {
+export function ExceptionsTab() {
   const [excepciones, setExcepciones] = useState<Excepcion[]>(EXCEPCIONES_INICIALES)
   const [modal, setModal] = useState<'nueva' | Excepcion | null>(null)
 

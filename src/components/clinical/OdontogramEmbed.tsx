@@ -77,7 +77,7 @@ function tituloDe(nodo: HTMLElement, porDefecto: string) {
    `useLayoutEffect`, devolverlo antes de que React lo desmonte- porque
    `.perio-tabs-cabecera` es de `PeriodontalTabs.tsx`, que la rearma con
    cada cambio de vista. */
-function PanelArribaDeTabs({ ancla, children }: { ancla: HTMLElement; children: React.ReactNode }) {
+export function PanelArribaDeTabs({ ancla, children }: { ancla: HTMLElement; children: React.ReactNode }) {
   const envoltorio = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {

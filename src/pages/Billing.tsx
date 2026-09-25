@@ -29,7 +29,7 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
     : { texto: 'Charge Adj', tono: 'danger' }
 }
 
-function Stat({ label, value, caption }: { label: string; value: string; caption: string }) {
+export function Stat({ label, value, caption }: { label: string; value: string; caption: string }) {
   return (
     <div className="min-w-0 rounded-lg border border-line bg-white p-4">
       <p className="truncate text-xs text-ink-muted" title={label}>{label}</p>

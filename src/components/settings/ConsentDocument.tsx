@@ -22,7 +22,7 @@ const [FECHA_CITA, HORA_CITA] = 'October 15, 2026 — 9:00 AM'.split(' — ')
 
 const ETIQUETA = 'text-[10px] font-semibold tracking-wide uppercase'
 
-function Seccion({ titulo, children }: { titulo: string; children: React.ReactNode }) {
+export function Seccion({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
     <section className="mt-3.5">
       <h4 className={`${ETIQUETA} border-b border-line pb-1 text-ink-muted`}>{titulo}</h4>
@@ -32,7 +32,7 @@ function Seccion({ titulo, children }: { titulo: string; children: React.ReactNo
 }
 
 /* Casilla del recuadro de datos: rótulo con ícono arriba, valor abajo. */
-function Campo({ icono: Icono, etiqueta, children }: { icono: LucideIcon; etiqueta: string; children: React.ReactNode }) {
+export function Campo({ icono: Icono, etiqueta, children }: { icono: LucideIcon; etiqueta: string; children: React.ReactNode }) {
   return (
     <div className="bg-white p-2.5">
       <p className={`${ETIQUETA} flex items-center gap-1 text-ink-muted`}>

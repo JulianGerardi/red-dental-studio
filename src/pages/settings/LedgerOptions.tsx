@@ -9,7 +9,7 @@ import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 /* Settings → Ledger. Figma 4293:57917.
    Ver design-reference/figma/modulos/settings-ledger.md. */
 
-function Switch({ on, onChange, label }: { on: boolean; onChange: () => void; label: string }) {
+export function Switch({ on, onChange, label }: { on: boolean; onChange: () => void; label: string }) {
   return (
     <button
       type="button"

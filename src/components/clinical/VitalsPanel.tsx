@@ -34,7 +34,7 @@ const CY = R + PAD
 const ALTO = CY + PAD
 const LARGO = Math.PI * R
 
-function Medidor({
+export function Medidor({
   pct, color, etiqueta, min, max, valor, onValor, children,
 }: {
   pct: number
@@ -123,7 +123,7 @@ function Medidor({
   )
 }
 
-function CampoNumero({
+export function CampoNumero({
   label, valor, min, max, paso, onChange,
 }: {
   label?: string
@@ -176,7 +176,7 @@ function estadoDe(v: number, min: number, max: number): EstadoVital {
   return 'Normal'
 }
 
-function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean }) {
+export function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean }) {
   const [valores, setValores] = useState(v.campos.map((c) => c.valor))
   const [grupo, setGrupo] = useState(v.alternador?.grupo[0] ?? '')
   const [unidad, setUnidad] = useState(v.alternador?.unidades[0] ?? v.unidad)

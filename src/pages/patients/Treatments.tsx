@@ -33,7 +33,7 @@ const base = {
   code: 'TO01 - Acute / Emergency', name: 'Root Canal Treatment',
   createdOn: 'Jun 3, 2026', total: '$1,850.00',
 }
-const PLANS: Plan[] = [
+export const PLANS: Plan[] = [
   { ...base, progress: 100, note: 'Overall completion: 100%', estado: 'Completed' },
   { ...base, progress: 100, note: 'Overall completion: 100%', estado: 'Completed' },
   { ...base, progress: 100, note: 'Overall completion: 100%', estado: 'Completed' },
@@ -45,7 +45,7 @@ const PLANS: Plan[] = [
   { ...base, progress: 100, note: 'Overall completion: 100%', estado: 'Completed' },
 ]
 
-function TreatmentCard({ plan }: { plan: Plan }) {
+export function TreatmentCard({ plan }: { plan: Plan }) {
   const rojo = plan.estado === 'Expired'
   return (
     <article className="overflow-hidden rounded-lg border border-line bg-white">

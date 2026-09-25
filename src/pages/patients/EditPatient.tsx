@@ -7,7 +7,7 @@ import { CONTENEDOR_PAGINA } from '@/lib/estilos'
    Tres secciones a 1088 de ancho: General (2×2 + 1 full), Demography
    (7 full-width + un checkbox) y Address (3 filas de 2). */
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+export function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="rounded-lg border border-line bg-white p-6">
       <h2 className="text-sm font-semibold text-ink">{title}</h2>

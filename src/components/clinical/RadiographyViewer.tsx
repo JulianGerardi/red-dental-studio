@@ -48,7 +48,7 @@ const ACENTO: Record<Hallazgo['estado'], string> = {
   Discarded: '#d20319',
 }
 
-function FichaHallazgo({ h, onBorrar }: { h: Hallazgo; onBorrar: () => void }) {
+export function FichaHallazgo({ h, onBorrar }: { h: Hallazgo; onBorrar: () => void }) {
   return (
     <div
       /* shrink-0: la lista es flex con alto máximo, y sin esto las cards se
@@ -91,7 +91,7 @@ function FichaHallazgo({ h, onBorrar }: { h: Hallazgo; onBorrar: () => void }) {
 
 /* Panel New Condition: dos pasos, con el catálogo de procedimientos en el
    primero. En el frame entra por la derecha y tapa media pantalla. */
-function NewCondition({ onClose }: { onClose: () => void }) {
+export function NewCondition({ onClose }: { onClose: () => void }) {
   const [paso, setPaso] = useState(1)
   const [zona, setZona] = useState<string | null>(ZONAS[0])
   const [elegido, setElegido] = useState(0)

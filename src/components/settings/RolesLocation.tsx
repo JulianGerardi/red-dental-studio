@@ -23,7 +23,7 @@ export const ROLES_DISPONIBLES = [
 
 export type RolAsignado = { id: string; nombre: string; sedes: string[] }
 
-function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
+export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <button
       type="button"
@@ -41,7 +41,7 @@ function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) =
   )
 }
 
-function FilaRol({
+export function FilaRol({
   rol, abierto, onAbrir, onCambiar, onBorrar,
 }: {
   rol: RolAsignado

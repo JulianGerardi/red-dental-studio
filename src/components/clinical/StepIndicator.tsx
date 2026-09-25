@@ -3,7 +3,7 @@ import { Check } from 'lucide-react'
 
 /* Header de paso que comparten los drawers de varios pasos: una insignia
    numerada por paso, unidas por una regla que se completa al avanzar. */
-function Insignia({ estado, numero }: { estado: 'active' | 'complete' | 'pending'; numero: number }) {
+export function Insignia({ estado, numero }: { estado: 'active' | 'complete' | 'pending'; numero: number }) {
   const bg = estado === 'complete' ? 'bg-dash-ok-fg' : estado === 'active' ? 'bg-dash-blue' : 'bg-line-strong'
   const label = estado === 'complete' ? 'text-dash-ok-fg' : estado === 'active' ? 'text-dash-blue' : 'text-ink-faint'
   return (
@@ -16,7 +16,7 @@ function Insignia({ estado, numero }: { estado: 'active' | 'complete' | 'pending
   )
 }
 
-function Conector({ lleno }: { lleno: boolean }) {
+export function Conector({ lleno }: { lleno: boolean }) {
   return (
     <div className="-mx-2 flex flex-1 flex-col items-center gap-1">
       <span className="invisible text-[10px] font-medium">Step</span>

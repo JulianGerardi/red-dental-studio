@@ -3,7 +3,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react'
 import { MODULES, TOPICS, type ModuleId, type Topic } from '@/components/help/topics'
 import { useHelp } from '@/components/help/HelpProvider'
 
-function TopicCard({ topic, onOpen }: { topic: Topic; onOpen: () => void }) {
+export function TopicCard({ topic, onOpen }: { topic: Topic; onOpen: () => void }) {
   return (
     <button
       type="button" onClick={onOpen}

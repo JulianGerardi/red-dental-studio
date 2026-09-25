@@ -34,7 +34,7 @@ const W = 336
 
 /* El detalle es de lectura: el turno se cambia desde "Edit appointment", no
    con lápices sueltos por fila. */
-function Fila({ icono: Icono, children }: { icono: typeof User; children: string }) {
+export function Fila({ icono: Icono, children }: { icono: typeof User; children: string }) {
   return (
     <span className="flex items-center gap-2.5">
       <Icono className="size-4 shrink-0 text-ink-faint" />

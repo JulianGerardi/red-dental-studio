@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip'
 import { Button } from './button'
 
 const meta = {
@@ -18,5 +18,19 @@ export const Default: Story = {
         <TooltipContent side="right">Dashboard</TooltipContent>
       </Tooltip>
     </div>
+  ),
+}
+
+/* El proveedor fija la demora con que aparecen los tooltips del área. */
+export const WithProviderDelay: Story = {
+  render: () => (
+    <TooltipProvider delayDuration={400}>
+      <div className="p-16">
+        <Tooltip>
+          <TooltipTrigger asChild><Button variant="outline">Hover, waits 400 ms</Button></TooltipTrigger>
+          <TooltipContent>Delayed tooltip</TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
   ),
 }

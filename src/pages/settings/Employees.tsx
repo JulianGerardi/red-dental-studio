@@ -32,11 +32,11 @@ import { RowActionsMenu } from '@/components/ui/row-actions-menu'
    Working Hours— vivía antes colgada de Locations: un empleado no es una
    locación, así que se mudó para acá. */
 
-function EstadoPill({ estado }: { estado: Empleado['estado'] }) {
+export function EstadoPill({ estado }: { estado: Empleado['estado'] }) {
   return <Pill tone={estado === 'Active' ? 'success' : 'neutral'}>{estado}</Pill>
 }
 
-function ProviderPill({ si }: { si: boolean }) {
+export function ProviderPill({ si }: { si: boolean }) {
   return <Pill tone={si ? 'info' : 'neutral'}>{si ? 'Yes' : 'No'}</Pill>
 }
 

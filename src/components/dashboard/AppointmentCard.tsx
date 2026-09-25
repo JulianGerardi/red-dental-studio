@@ -123,7 +123,7 @@ export function AppointmentCard({
    sombra que esa card también: la `shadow-inner-card` de acá abajo es de
    `InnerCard`, pensada para las cards grandes del Dashboard, y sin borde en
    una fila chica se veía como una línea cortada en vez de una sombra. */
-function AppointmentCardCompacta({ appt }: { appt: Appointment }) {
+export function AppointmentCardCompacta({ appt }: { appt: Appointment }) {
   return (
     <InnerCard className="flex items-center gap-2.5 border border-line p-2.5 shadow-[0_1px_3px_rgb(0_0_0/0.08)]">
       <span className="bg-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold text-white">
@@ -143,7 +143,7 @@ function AppointmentCardCompacta({ appt }: { appt: Appointment }) {
   )
 }
 
-function Field({ icon, text }: { icon: React.ReactNode; text: string }) {
+export function Field({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
     <span className="bg-dash-field flex h-10 items-center gap-2 rounded-lg px-3 text-[13px] text-ink-medium">
       {icon}
@@ -155,7 +155,7 @@ function Field({ icon, text }: { icon: React.ReactNode; text: string }) {
 
 /* El kebab del frame está dibujado sin menú. Despliega "Edit appointment",
    que abre el mismo modal de alta con los datos de la card ya cargados. */
-function MenuCard({ nombre, onEdit }: { nombre: string; onEdit?: () => void }) {
+export function MenuCard({ nombre, onEdit }: { nombre: string; onEdit?: () => void }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 

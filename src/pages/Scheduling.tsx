@@ -339,7 +339,7 @@ export default function Scheduling() {
 
 /* Una solicitud tiene dos salidas y las dos están en la card. El acento rojo
    es sólo para ASAP: en la lista de espera nada es urgente por definición. */
-function SolicitudCard({
+export function SolicitudCard({
   s, onCancel, onSchedule,
 }: {
   s: Solicitud

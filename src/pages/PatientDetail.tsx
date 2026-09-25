@@ -50,7 +50,7 @@ const APPTS: { status: ApptStatus; cancel?: boolean }[] = [
   { status: 'No Show' }, { status: 'No Show' }, { status: 'No Show' }, { status: 'No Show' },
 ]
 
-function Card({ className, children }: { className?: string; children: React.ReactNode }) {
+export function Card({ className, children }: { className?: string; children: React.ReactNode }) {
   return <div className={cn('rounded-lg border border-line bg-white', className)}>{children}</div>
 }
 

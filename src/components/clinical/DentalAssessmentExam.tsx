@@ -45,7 +45,7 @@ const INITIAL_REVIEWS: ExamReview[] = [
 
 
 
-function NewDocumentDialog({ open, onClose, onSave }: { open: boolean; onClose: () => void; onSave: (type: string) => void }) {
+export function NewDocumentDialog({ open, onClose, onSave }: { open: boolean; onClose: () => void; onSave: (type: string) => void }) {
   const [type, setType] = useState(DOCUMENT_TYPES[0])
   const [note, setNote] = useState('')
   if (!open) return null

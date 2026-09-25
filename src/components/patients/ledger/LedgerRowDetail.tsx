@@ -90,7 +90,7 @@ function campos(m: Movimiento & { saldo?: number }) {
   ]
 }
 
-function Campos({ m }: { m: Movimiento & { saldo?: number } }) {
+export function Campos({ m }: { m: Movimiento & { saldo?: number } }) {
   return (
     <>
       <div>

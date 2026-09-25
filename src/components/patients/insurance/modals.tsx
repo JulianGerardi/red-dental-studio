@@ -103,7 +103,7 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
 
 /* ── Manage Suscription (3847:82831) ─────────────────────────────────── */
 
-function FilaLectura({ icon: Icon, label, value }: { icon: typeof ShieldHalf; label: string; value: string }) {
+export function FilaLectura({ icon: Icon, label, value }: { icon: typeof ShieldHalf; label: string; value: string }) {
   return (
     <div className="flex items-center gap-2.5">
       <Icon className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />

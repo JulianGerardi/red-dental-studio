@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { AppointmentDetailsDrawer } from './AppointmentDetailsDrawer'
+import { FileText, MapPin, User } from 'lucide-react'
+import { AppointmentDetailsDrawer, Fila } from './AppointmentDetailsDrawer'
 
 const meta = {
   title: 'Components/Scheduling/AppointmentDetailsDrawer',
@@ -27,3 +28,15 @@ export const CheckIn: Story = {}
 export const Booked: Story = { args: { estado: 'Booked' } }
 export const Proposed: Story = { args: { estado: 'Proposed' } }
 export const Cancelled: Story = { args: { estado: 'Cancelled' } }
+
+/* La fila de dato con ícono del detalle: profesional, consultorio y motivo. */
+export const DetailRows: Story = {
+  parameters: { layout: 'padded' },
+  render: () => (
+    <div className="flex w-[280px] flex-col gap-2.5">
+      <Fila icono={User}>Dr. Elena Martinez</Fila>
+      <Fila icono={MapPin}>Operatory 2</Fila>
+      <Fila icono={FileText}>Routine cleaning appointment with a long reason that truncates</Fila>
+    </div>
+  ),
+}

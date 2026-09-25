@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { DatePicker } from './date-picker'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { DatePicker, NavBtn } from './date-picker'
 
 const meta = {
   title: 'Components/UI/DatePicker',
@@ -36,3 +37,8 @@ function ConFecha() {
 
 /* Con una fecha elegida el campo la muestra en formato dd-mm-aaaa. */
 export const SelectedDate: Story = { render: () => <ConFecha /> }
+
+/* Los botones de navegación del mes (‹ ›) y de año (‹‹ ››). */
+export const NavigationButtons: Story = {
+  render: () => <div className="flex gap-2"><NavBtn onClick={() => {}} label="Previous month"><ChevronLeft className="size-4" /></NavBtn><NavBtn onClick={() => {}} label="Next month"><ChevronRight className="size-4" /></NavBtn></div>,
+}

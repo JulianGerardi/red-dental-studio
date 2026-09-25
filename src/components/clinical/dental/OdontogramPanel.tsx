@@ -126,7 +126,7 @@ const LUGAR: Record<string, string> = {
   lingual: 'col-start-2 row-start-3',
 }
 
-function CruzSuperficies({ celdas, onCambio, bloqueo }: { celdas: Celda[]; onCambio: () => void; bloqueo?: string }) {
+export function CruzSuperficies({ celdas, onCambio, bloqueo }: { celdas: Celda[]; onCambio: () => void; bloqueo?: string }) {
   return (
     <div className="flex flex-col gap-2">
       {bloqueo && (

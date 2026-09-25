@@ -39,7 +39,7 @@ import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 const DEFAULT_DATE = HOY_DEMO
 
-function BotonFiltro({
+export function BotonFiltro({
   label, options, value, onChange,
 }: {
   label: string

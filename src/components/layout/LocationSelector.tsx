@@ -27,7 +27,7 @@ type Location = {
   roles: string[]
 }
 
-const LOCATIONS: Location[] = [
+export const LOCATIONS: Location[] = [
   { name: 'Abril', ciudad: 'Los Angeles', timezone: 'Europe/Berlin', roles: ['Administrator', 'Dentist', '+1'] },
   { name: 'Alaska Medical', ciudad: 'Anchorage', timezone: 'Europe/Berlin', roles: ['Administrator'] },
   { name: 'Bayside Dental', ciudad: 'Miami', timezone: 'America/New_York', roles: ['Dentist'] },
@@ -38,7 +38,7 @@ const LOCATIONS: Location[] = [
 const iniciales = (n: string) =>
   n.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
 
-function Fila({
+export function Fila({
   loc, actual, favorita, onElegir, onFavorita,
 }: {
   loc: Location

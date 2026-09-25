@@ -28,7 +28,7 @@ const ROOMS: Row[] = [
   { id: 'op3', label: 'Operatory 3', sub: 'Oral Surgeon', kind: 'room' },
 ]
 
-function Group({
+export function Group({
   rows,
   value,
   onChange,

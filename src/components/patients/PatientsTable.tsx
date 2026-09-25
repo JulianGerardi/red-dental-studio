@@ -44,7 +44,7 @@ const COLS = {
   actions: 'w-[72px]',
 }
 
-function HeadCell({ className, children }: { className?: string; children: React.ReactNode }) {
+export function HeadCell({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
     <div className={cn('flex h-full items-center', className)}>
       <span className="text-[11px] font-semibold text-ink-muted">{children}</span>
@@ -52,7 +52,7 @@ function HeadCell({ className, children }: { className?: string; children: React
   )
 }
 
-function Cell({ className, children }: { className?: string; children: React.ReactNode }) {
+export function Cell({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
     <div className={cn('flex h-full items-center', className)}>
       <span className="truncate text-[13px] text-ink-soft">{children}</span>

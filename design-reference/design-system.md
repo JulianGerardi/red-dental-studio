@@ -4,8 +4,9 @@ Vive en el mismo repo que la app y **lee el mismo código**: no hay una copia qu
 mantener aparte. Publicado junto a la app, en `/storybook`.
 
 ```bash
-npm run storybook        # localhost:6006
+npm run storybook        # localhost:6006 (antes corre ds:scan)
 npm run build-storybook  # versión estática (storybook-static/)
+npm run ds:scan          # lee el código: recetas de UI y cobertura (generated/*.json)
 npm run ds:coverage      # qué falta documentar
 npm run ds:check         # igual, pero falla si se rompe una regla (CI)
 npm run ds:tokenize      # pasa colores escritos a mano a su token
@@ -36,9 +37,52 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
 - **Components / Catalog**: inventario de *todos* los archivos de
   `src/components`, leído del código: qué exportan, dónde se usan, si tienen
   story y la nota de diseño que cada uno trae en el encabezado.
-- **Pages**: las 30 pantallas de la app, montadas con las rutas reales.
+- **Patterns**: lo que el código arma a mano y no es un componente con nombre.
+  *Buttons, Fields, Cards, Pills and badges* y *Tables* se generan leyendo el
+  código con el compilador de TypeScript (`scripts/scan-recipes.mjs`): cada
+  receta se dibuja con sus clases reales, con su cantidad de usos, dónde está,
+  sus estados (hover, foco, deshabilitado) y un cuadro de consistencia por
+  familia (cuántas alturas, paddings y pesos distintos conviven).
+  *Duplicates and inconsistencies* pone lado a lado lo que la app resuelve más
+  de una vez (6 switches, 7 contenedores tipo card, 3 checkboxes…), medido en
+  pantalla.
+- **Foundations / Documentation coverage**: lo que falta documentar, calculado
+  del código (ver "Cómo se mide" abajo).
+- **Pages**: las 30 pantallas de la app, montadas con las rutas reales. Las
+  piezas internas de cada pantalla (tarjetas, filas, pestañas, diálogos) están
+  en **Pages / Parts**.
 
-Las 223 stories se abrieron una por una en el navegador: ninguna da error.
+Las 394 stories se abrieron una por una en el navegador: ninguna da error.
+
+## Cómo se mide que no falte nada
+
+`npm run ds:check` (y la página *Documentation coverage*) comprueban cuatro
+cosas contra el código:
+
+1. **Cada archivo de `src/components` tiene su `.stories.tsx`** (o está en
+   `exentos.json` con el motivo, si sólo vive dentro de otro).
+2. **Cada función de React tiene story**, exportada o no: 328 en total. Las
+   piezas chicas -`FilaRol`, `Dialogo`, `HeadCell`…- se exportaron para poder
+   mostrarlas, y viven en `X.parts.stories.tsx`. Se cuenta por importación
+   desde su propio archivo, no por nombre.
+3. **Cada estado que un componente soporta tiene un story que lo muestra**:
+   `disabled`, `error`, `loading`, `empty`, `selected`. El detector lee el
+   código (`scripts/states-lib.mjs`). Si el estado nace de una interacción
+   (un error de validación, una búsqueda sin resultados), el story la hace con
+   una función `play` y **comprueba que el estado esté en pantalla**
+   (`esperar(/required/i)`): si no aparece, el story falla. Lo que no se puede
+   mostrar va a `state-waivers.json` con motivo, y cada exención se valida
+   contra un story real.
+4. **Cada ruta tiene su story en Pages**, y **ningún color escrito a mano que
+   ya tenga token**.
+
+Además informa los **15 componentes exportados que ninguna pantalla usa**
+(los seis paneles de `clinical/panels.tsx`, `StatCard`, `ViewToggle`,
+`GuarantorBanner`, `LinkTreatmentPlanDrawer`, `Tabs` y cuatro piezas de
+`ui/card`): siguen documentados, pero son candidatos a borrarse o conectarse.
+
+`hover`, `focus` y `active` no llevan story propio: se ven con el addon de
+pseudo-estados (`storybook-addon-pseudo-states`) en cada tarjeta de Patterns.
 
 **Cada página Docs muestra el código** (`src/design-system/DocsPage.tsx`): la nota
 de diseño del encabezado del archivo, el componente, sus controles, y al final

@@ -15,7 +15,7 @@ import { BOTON_ICONO_REDONDO } from '@/lib/estilos'
    en negativo. No corresponde meter radiografías reales de nadie en una
    réplica, y una foto de stock haría creer que es un estudio del paciente. */
 
-function Card({ r, onAbrir }: { r: Radiografia; onAbrir: () => void }) {
+export function Card({ r, onAbrir }: { r: Radiografia; onAbrir: () => void }) {
   return (
     <div className="group rounded-xl border border-line bg-white p-2">
       <button

@@ -17,7 +17,7 @@ type NavItem = { to: string; label: string; icon: LucideIcon; end?: boolean }
    al `title` nativo, que tardaba en aparecer y se veía distinto al resto de la
    app. Settings queda afuera a propósito: al pasar el mouse ya abre su menú
    flotante en ese mismo lugar. */
-function ConTooltip({
+export function ConTooltip({
   label, mostrar, children,
 }: {
   label: string
@@ -169,7 +169,7 @@ export function Sidebar({
    cuelgan de un menú flotante que sale al costado del ítem, como en el
    ejemplo que pasó Julián. Se abre con hover en escritorio y con clic en el
    chevron, para que también funcione con dedo. */
-function SettingsItem({
+export function SettingsItem({
   clase,
   mostrarLabel,
 }: {

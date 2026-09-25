@@ -32,7 +32,7 @@ type Props = {
 
 /* ── Rejilla de horas, compartida por Day y Week ─────────────────────── */
 
-function ColumnaHoras() {
+export function ColumnaHoras() {
   return (
     <div className="w-[46px] shrink-0">
       {HORAS.map((h) => (
@@ -44,7 +44,7 @@ function ColumnaHoras() {
   )
 }
 
-function ColumnaDia({
+export function ColumnaDia({
   fecha, eventos, onMover, onAbrir, arrastrado, resaltada, onResaltar,
 }: {
   fecha: Date
@@ -125,7 +125,7 @@ function ColumnaDia({
   )
 }
 
-function Cabecera({ dias, hoy }: { dias: Date[]; hoy: Date }) {
+export function Cabecera({ dias, hoy }: { dias: Date[]; hoy: Date }) {
   return (
     <div className="flex border-b border-line-hair">
       <div className="w-[46px] shrink-0" />
@@ -150,7 +150,7 @@ function Cabecera({ dias, hoy }: { dias: Date[]; hoy: Date }) {
 
 /* ── Day y Week ──────────────────────────────────────────────────────── */
 
-function VistaHoras({ dias, ...props }: Props & { dias: Date[] }) {
+export function VistaHoras({ dias, ...props }: Props & { dias: Date[] }) {
   const arrastrado = useRef<number | null>(null)
   const [destino, setDestino] = useState<number | null>(null)
 

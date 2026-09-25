@@ -8,7 +8,7 @@ export type Coaching = Topic & { index: number; total: number }
 
 type Caja = { top: number; left: number; width: number; height: number }
 
-function Spotlight({ anchor, topicId }: { anchor: string; topicId: string }) {
+export function Spotlight({ anchor, topicId }: { anchor: string; topicId: string }) {
   const [caja, setCaja] = useState<Caja | null>(null)
 
   useLayoutEffect(() => {

@@ -31,7 +31,7 @@ const ETIQUETA = 'max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition
 /* Todo lo que cuelga de la barra —los contadores y las pills CC/TR— usa el
    mismo desplegable flotante. Va en portal y con posición fija: la barra
    scrollea de costado y un absoluto adentro quedaría recortado. */
-function Flotante({
+export function Flotante({
   titulo, ancla, ancho = 220, onClose, children,
 }: {
   titulo: string
@@ -72,7 +72,7 @@ function Flotante({
 }
 
 /* Referrals cuenta lo suyo; las clínicas cuentan lo que hay en la lista. */
-function ListaContador({ c }: { c: Contador }) {
+export function ListaContador({ c }: { c: Contador }) {
   if (c.items.length === 0) return <p className="mt-1.5 text-[12px] text-ink-muted">{c.vacio}</p>
   return (
     <ul className="mt-2 flex flex-col gap-1.5">

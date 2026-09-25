@@ -110,7 +110,7 @@ const CUENTA = [
   { label: 'Support', icon: CircleHelp, to: '/help' },
 ]
 
-function MenuCuenta() {
+export function MenuCuenta() {
   const navigate = useNavigate()
 
   return (
@@ -155,7 +155,7 @@ function MenuCuenta() {
 /* La campana es donde viven las tareas: acá están todas, incluidas las que
    se sacaron del banner. Nada se borra desde acá -siguen pendientes hasta
    que se completen-; lo que sí se puede es volver a ponerlas en el banner. */
-function Campana({
+export function Campana({
   items, ocultas, onVolverAlBanner,
 }: {
   items: Notificacion[]
@@ -212,7 +212,7 @@ function Campana({
   )
 }
 
-function GlobalSearch({ showCommandHint }: { showCommandHint: boolean }) {
+export function GlobalSearch({ showCommandHint }: { showCommandHint: boolean }) {
   const [q, setQ] = useState('')
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)

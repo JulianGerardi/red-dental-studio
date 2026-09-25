@@ -28,7 +28,7 @@ const ESTADO_TONO: Record<Procedimiento['estado'], PillTone> = {
 
 /* ── Diálogos ─────────────────────────────────────────────────────── */
 
-function Dialogo({
+export function Dialogo({
   titulo, bajada, texto, children, onConfirm, onClose, confirmar = 'Confirm',
 }: {
   titulo: string
@@ -84,7 +84,7 @@ function Dialogo({
 }
 
 /* Tarjeta con radio: la usan Delete Case y Move Procedure. */
-function OpcionRadio({
+export function OpcionRadio({
   on, titulo, detalle, onClick,
 }: { on: boolean; titulo: string; detalle: string; onClick: () => void }) {
   return (
@@ -112,7 +112,7 @@ function OpcionRadio({
 }
 
 /* Figma 4122:246942. El mismo modal sale de New Alternative Case y de Move to. */
-function DialogoMover({ onClose }: { onClose: () => void }) {
+export function DialogoMover({ onClose }: { onClose: () => void }) {
   const [caso, setCaso] = useState('')
   const [op, setOp] = useState(MOVER.opciones[0].id)
   const [intentado, setIntentado] = useState(false)
@@ -153,7 +153,7 @@ function DialogoMover({ onClose }: { onClose: () => void }) {
 }
 
 /* Figma 4122:246100. Un solo campo. */
-function DialogoNuevoGrupo({ onClose }: { onClose: () => void }) {
+export function DialogoNuevoGrupo({ onClose }: { onClose: () => void }) {
   const [nombre, setNombre] = useState('')
   const [intentado, setIntentado] = useState(false)
   return (
@@ -182,7 +182,7 @@ function DialogoNuevoGrupo({ onClose }: { onClose: () => void }) {
 
 /* Figma 4122:250957. Las tarjetas llevan casilla: el texto pide seleccionar
    las condiciones y en el frame no había con qué. */
-function DialogoCompletar({ onClose }: { onClose: () => void }) {
+export function DialogoCompletar({ onClose }: { onClose: () => void }) {
   const [marcadas, setMarcadas] = useState<string[]>([])
   return (
     <Dialogo
@@ -249,7 +249,7 @@ function DialogoCompletar({ onClose }: { onClose: () => void }) {
   )
 }
 
-function DialogoBorrarCaso({ onConfirm, onClose }: { onConfirm: (op: string) => void; onClose: () => void }) {
+export function DialogoBorrarCaso({ onConfirm, onClose }: { onConfirm: (op: string) => void; onClose: () => void }) {
   const [op, setOp] = useState(OPCIONES_BORRAR_CASO[0].id)
   return (
     <Dialogo
@@ -272,7 +272,7 @@ function DialogoBorrarCaso({ onConfirm, onClose }: { onConfirm: (op: string) => 
 
 /* ── Rail de estados ──────────────────────────────────────────────── */
 
-function Rail({
+export function Rail({
   vista, casoId, favoritos, onFavorito, onUnassigned, onCaso,
 }: {
   vista: 'unassigned' | 'caso'
@@ -365,7 +365,7 @@ function Rail({
 /* ── Tablas ───────────────────────────────────────────────────────── */
 
 /* Casilla del sistema: cuadrada, azul cuando está marcada. */
-function Casilla({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
+export function Casilla({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <button
       type="button"
@@ -383,7 +383,7 @@ function Casilla({ on, onChange, label }: { on: boolean; onChange: (v: boolean) 
   )
 }
 
-function TablaProcedimientos({
+export function TablaProcedimientos({
   filas, acciones, seleccion, onSeleccion, onAccion, onCompletar,
 }: {
   filas: Procedimiento[]
@@ -494,7 +494,7 @@ function TablaProcedimientos({
 
 /* ── Caso ─────────────────────────────────────────────────────────── */
 
-function VistaCaso({
+export function VistaCaso({
   caso, favorito, onFavorito, onDialogo, onMover, onGrupo, onCompletar,
 }: {
   caso: Caso

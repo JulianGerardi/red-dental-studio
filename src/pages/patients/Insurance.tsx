@@ -46,7 +46,7 @@ const COLS = {
   status: 'w-[92px]',
 }
 
-function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
+export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <button
       type="button"
@@ -64,7 +64,7 @@ function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) =
 }
 
 /* Fila de dato de la card de suscripción: icono, etiqueta chica y valor. */
-function FilaDato({ icon: Icon, label, value }: { icon: typeof ShieldHalf; label: string; value: string }) {
+export function FilaDato({ icon: Icon, label, value }: { icon: typeof ShieldHalf; label: string; value: string }) {
   return (
     <div className="flex items-center gap-2.5">
       <Icon className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />

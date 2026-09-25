@@ -170,7 +170,7 @@ export function DatePicker({
 
 /* Botón de navegación del Calendar de shadcn: fantasma con borde, medio
    apagado hasta el hover. */
-function NavBtn({
+export function NavBtn({
   onClick, label, children,
 }: {
   onClick: () => void

@@ -55,7 +55,7 @@ function useColapso() {
   return [colapsadoGlobal, set] as const
 }
 
-function InfoBlock({
+export function InfoBlock({
   title,
   items,
   onEdit,
@@ -348,7 +348,7 @@ const ENCUENTRO = {
   },
 } as const
 
-function EncounterButton() {
+export function EncounterButton() {
   const [estado, setEstado] = useEstadoEncuentro()
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)

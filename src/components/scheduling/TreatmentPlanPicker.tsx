@@ -36,7 +36,7 @@ const ESTADO = {
   Inprogress: { pill: 'border-dash-busy-fg bg-dash-busy-bg text-dash-busy-fg', barra: '#1d56bc' },
 }
 
-function Radio({ on, className }: { on: boolean; className?: string }) {
+export function Radio({ on, className }: { on: boolean; className?: string }) {
   return (
     <span
       className={cn(
@@ -52,7 +52,7 @@ function Radio({ on, className }: { on: boolean; className?: string }) {
 
 /* Contenedor seleccionable. Es un div con role=radio y no un <button> para
    poder anidar adentro el botón que despliega los procedimientos. */
-function Seleccionable({
+export function Seleccionable({
   on,
   onClick,
   barra,

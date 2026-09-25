@@ -46,7 +46,7 @@ const PROCEDIMIENTOS = [
   'D9310 – Consultation',
 ]
 
-function FilaDato({
+export function FilaDato({
   icon: Icon, label, value, className, wrap,
 }: Fila & { className?: string; wrap?: boolean }) {
   return (
