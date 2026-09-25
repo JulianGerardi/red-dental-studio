@@ -1,0 +1,556 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";var t;function n(){return(n=e((()=>{t=`@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─────────────────────────────────────────────────────────────
+   Design tokens extraídos de red.dev.confidentally.com
+   Convención shadcn/ui: tripletes HSL sin la función hsl()
+   Fuente de verdad: design-reference/tokens.json
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 3.9%;
+  --primary: 218 73% 43%;
+  --primary-foreground: 0 0% 100%;
+  --primary-hover: 223 100% 26%;
+  --primary-hover-foreground: 0 0% 100%;
+  --primary-active: 223 99% 47%;
+  --primary-active-foreground: 0 0% 100%;
+  --primary-disabled: 210 42% 95%;
+  --primary-disabled-foreground: 220 29% 79%;
+  --primary-border: 226 71% 40%;
+  --primary-variant: 226 71% 40%;
+  --primary-light: 218 55% 91%;
+  --primary-light-foreground: 218 73% 43%;
+  --primary-interactive: 217 85% 43%;
+  --primary-interactive-foreground: 0 0% 98%;
+  --primary-gradient-first-dark: 218 73% 43%;
+  --primary-gradient-first-ligth: 200 74% 55%;
+  --secondary: 0 0% 100%;
+  --secondary-foreground: 223 26% 36%;
+  --secondary-hover: 224 41% 75%;
+  --secondary-hover-foreground: 223 26% 36%;
+  --secondary-active: 0 0% 100%;
+  --secondary-active-foreground: 223 26% 36%;
+  --secondary-disabled: 210 42% 95%;
+  --secondary-disabled-foreground: 220 29% 79%;
+  --secondary-border: 224 41% 95%;
+  --destructive: 354 85% 49%;
+  --destructive-foreground: 0 0% 100%;
+  --destructive-hover: 354 97% 42%;
+  --destructive-hover-foreground: 0 0% 100%;
+  --destructive-active: 354 100% 31%;
+  --destructive-active-foreground: 0 0% 100%;
+  --destructive-disabled: 353 100% 95%;
+  --destructive-disabled-foreground: 354 100% 85%;
+  --destructive-border: 354 85% 49%;
+  --success: 144 82% 28%;
+  --success-foreground: 0 0% 98%;
+  --success-hover: 142 76% 36%;
+  --success-hover-foreground: 0 0% 98%;
+  --success-active: 142 76% 36%;
+  --success-active-foreground: 0 0% 98%;
+  --success-disabled: 142 76% 36%;
+  --success-disabled-foreground: 0 0% 98%;
+  --success-border: 142 76% 36%;
+  --warning: 36 100% 50%;
+  --warning-foreground: 0 0% 98%;
+  --warning-hover: 36 100% 50%;
+  --warning-hover-foreground: 0 0% 98%;
+  --warning-active: 36 100% 50%;
+  --warning-active-foreground: 0 0% 98%;
+  --warning-disabled: 36 100% 50%;
+  --warning-disabled-foreground: 0 0% 98%;
+  --warning-border: 36 100% 50%;
+  --muted: 0 0% 96.1%;
+  --muted-foreground: 0 0% 45.1%;
+  --accent: 218 57% 95%;
+  --accent-foreground: 0 0% 9%;
+  --border: 240 5% 91%;
+  --input: 0 0% 89.8%;
+  --ring: 0 0% 3.9%;
+  --page-background: 0 0% 96%;
+  --page-background-foreground: 0 0% 3.9%;
+  --gray-first: 220 14% 96%;
+  --gray-first-foreground: 222 8% 25%;
+  --gray-second: 240 4% 46%;
+  --gray-second-foreground: 222 8% 25%;
+  --surface-primary-lighter: 214 95% 93%;
+  --surface-primary-subtle: 218 57% 95%;
+  --clinical-mode-base-fg: 240 10% 4%;
+  --calendar: 0 0% 100%;
+  --calendar-foreground: 0 0% 59%;
+  --calendar-border: 0 0% 91%;
+  --calendar-disabled: 0 0% 98%;
+  --calendar-disabled-foreground: 0 0% 59%;
+  --calendaar-accent: 238 61% 89%;
+  --calendaar-accent-foreground: 238 61% 89%;
+  --sidebar-background: 0 0% 100%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+  --radius: .5rem;
+  --sidebar: 0 0% 100%;
+}
+
+.dark {
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 0 0% 9%;
+  --secondary: 0 0% 14.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 14.9%;
+  --muted-foreground: 0 0% 63.9%;
+  --accent: 0 0% 14.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 98%;
+  --warning: 36 100% 50%;
+  --warning-foreground: 0 0% 98%;
+  --border: 0 0% 14.9%;
+  --input: 0 0% 14.9%;
+  --ring: 0 0% 83.1%;
+  --sidebar-background: 240 5.9% 10%;
+  --sidebar-foreground: 240 4.8% 95.9%;
+  --sidebar-primary: 224.3 76.3% 48%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 240 3.7% 15.9%;
+  --sidebar-accent-foreground: 240 4.8% 95.9%;
+  --sidebar-border: 240 3.7% 15.9%;
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
+  --sidebar: 240 5.9% 10%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-hover: hsl(var(--primary-hover));
+  --color-primary-hover-foreground: hsl(var(--primary-hover-foreground));
+  --color-primary-active: hsl(var(--primary-active));
+  --color-primary-active-foreground: hsl(var(--primary-active-foreground));
+  --color-primary-disabled: hsl(var(--primary-disabled));
+  --color-primary-disabled-foreground: hsl(var(--primary-disabled-foreground));
+  --color-primary-border: hsl(var(--primary-border));
+  --color-primary-variant: hsl(var(--primary-variant));
+  --color-primary-light: hsl(var(--primary-light));
+  --color-primary-light-foreground: hsl(var(--primary-light-foreground));
+  --color-primary-interactive: hsl(var(--primary-interactive));
+  --color-primary-interactive-foreground: hsl(var(--primary-interactive-foreground));
+  --color-primary-gradient-first-dark: hsl(var(--primary-gradient-first-dark));
+  --color-primary-gradient-first-ligth: hsl(var(--primary-gradient-first-ligth));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-hover: hsl(var(--secondary-hover));
+  --color-secondary-hover-foreground: hsl(var(--secondary-hover-foreground));
+  --color-secondary-active: hsl(var(--secondary-active));
+  --color-secondary-active-foreground: hsl(var(--secondary-active-foreground));
+  --color-secondary-disabled: hsl(var(--secondary-disabled));
+  --color-secondary-disabled-foreground: hsl(var(--secondary-disabled-foreground));
+  --color-secondary-border: hsl(var(--secondary-border));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-hover: hsl(var(--destructive-hover));
+  --color-destructive-hover-foreground: hsl(var(--destructive-hover-foreground));
+  --color-destructive-active: hsl(var(--destructive-active));
+  --color-destructive-active-foreground: hsl(var(--destructive-active-foreground));
+  --color-destructive-disabled: hsl(var(--destructive-disabled));
+  --color-destructive-disabled-foreground: hsl(var(--destructive-disabled-foreground));
+  --color-destructive-border: hsl(var(--destructive-border));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-success-hover: hsl(var(--success-hover));
+  --color-success-hover-foreground: hsl(var(--success-hover-foreground));
+  --color-success-active: hsl(var(--success-active));
+  --color-success-active-foreground: hsl(var(--success-active-foreground));
+  --color-success-disabled: hsl(var(--success-disabled));
+  --color-success-disabled-foreground: hsl(var(--success-disabled-foreground));
+  --color-success-border: hsl(var(--success-border));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-warning-hover: hsl(var(--warning-hover));
+  --color-warning-hover-foreground: hsl(var(--warning-hover-foreground));
+  --color-warning-active: hsl(var(--warning-active));
+  --color-warning-active-foreground: hsl(var(--warning-active-foreground));
+  --color-warning-disabled: hsl(var(--warning-disabled));
+  --color-warning-disabled-foreground: hsl(var(--warning-disabled-foreground));
+  --color-warning-border: hsl(var(--warning-border));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-page-background: hsl(var(--page-background));
+  --color-page-background-foreground: hsl(var(--page-background-foreground));
+  --color-gray-first: hsl(var(--gray-first));
+  --color-gray-first-foreground: hsl(var(--gray-first-foreground));
+  --color-gray-second: hsl(var(--gray-second));
+  --color-gray-second-foreground: hsl(var(--gray-second-foreground));
+  --color-surface-primary-lighter: hsl(var(--surface-primary-lighter));
+  --color-surface-primary-subtle: hsl(var(--surface-primary-subtle));
+  --color-clinical-mode-base-fg: hsl(var(--clinical-mode-base-fg));
+  --color-calendar: hsl(var(--calendar));
+  --color-calendar-foreground: hsl(var(--calendar-foreground));
+  --color-calendar-border: hsl(var(--calendar-border));
+  --color-calendar-disabled: hsl(var(--calendar-disabled));
+  --color-calendar-disabled-foreground: hsl(var(--calendar-disabled-foreground));
+  --color-calendaar-accent: hsl(var(--calendaar-accent));
+  --color-calendaar-accent-foreground: hsl(var(--calendaar-accent-foreground));
+  --color-sidebar-background: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* utilidad tipográfica custom del original */
+  --text-small: 1rem;
+  --text-small--line-height: 1.5rem;
+  --font-heading: var(--font-sans);
+  --color-sidebar: var(--sidebar);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Mesh gradient del panel de auth, recreado en CSS.
+   El original usa un PNG (auth-fallback-bg.png). */
+.auth-mesh {
+  background-color: #2f6ad0;
+  background-image:
+    radial-gradient(80% 70% at 12% 8%,  #6f9ce8 0%, transparent 60%),
+    radial-gradient(70% 60% at 88% 22%, #5b8ce4 0%, transparent 55%),
+    radial-gradient(95% 85% at 30% 62%, #1c3f9e 0%, transparent 62%),
+    radial-gradient(60% 55% at 82% 88%, #4a7fdd 0%, transparent 58%),
+    radial-gradient(50% 45% at 8%  95%, #7aa6ec 0%, transparent 60%);
+}
+
+/* ── Tokens del Figma "Platform Design" (dashboard) ──────────────────
+   Conviven con los tokens extraídos del sistema original: el azul del
+   Figma (#1d56bc) es casi el mismo que --primary (#1e58be) pero no
+   idéntico, así que se mantiene aparte para no falsear la comparación. */
+/* \`static\`: Tailwind sólo emite las variables que alguna clase usa. Estos tokens
+   también se leen desde JS (var(--color-appt-*)) y desde el design system, así
+   que tienen que estar siempre. */
+@theme static {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-dash-blue: #1d56bc;
+  --color-dash-blue-hover: #1a4da9;
+  /* Anillo de foco/activo del sistema, medido en el FAB del calendario. */
+  --color-dash-ring: #0047c4;
+  --color-dash-blue-active: #174596;
+
+  --color-dash-name: #1a1a1a;
+  --color-dash-muted: #4a5565;
+  --color-dash-delta: #b8b8b8;
+  --color-dash-field: #f6f6f6;
+
+  --color-dash-ok-fg: #1a804d;
+  --color-dash-ok-bg: #f0fcf5;
+  --color-dash-busy-fg: #174596;
+  --color-dash-busy-bg: #f0f2ff;
+  --color-dash-bad-fg: #b22626;
+  --color-dash-bad-bg: #fff2f2;
+  --color-dash-bad-chip: #fbe5e5;
+  --color-dash-count-bg: #e8ecf7;
+
+  /* ── Tokens semánticos (2026-09-25) ───────────────────────────────
+     Antes estos valores estaban escritos a mano (text-[#09090b]) en más de
+     cien archivos: cambiar uno obligaba a buscar y reemplazar. Cada token vale
+     exactamente el hex que reemplazó, así que la app se ve igual; ahora se
+     cambia acá y cambia en todos lados, y en el design system. */
+
+  /* Texto: de más fuerte a más tenue. */
+  --color-ink: #09090b;
+  --color-ink-soft: #3f3f46;
+  --color-ink-medium: #52525b;
+  --color-ink-muted: #71717a;
+  --color-ink-slate: #64748b;
+  --color-ink-faint: #a1a1aa;
+
+  /* Líneas: bordes y divisores. */
+  --color-line: #e4e4e7;
+  --color-line-strong: #d4d4d8;
+  --color-line-row: #e7e7e7;
+  --color-line-soft: #f1f1f4;
+  --color-line-hair: #ededed;
+
+  /* Fondos neutros. */
+  --color-surface-subtle: #fafafa;
+  --color-surface-muted: #f4f4f5;
+  --color-surface-alt: #f9f9f9;
+  --color-surface-slate: #f1f5f9;
+
+  /* Estados que no estaban en dash-*. */
+  --color-field-error: #dc2626;
+  --color-required: #ff0608;
+  --color-warn-fg: #99660d;
+  --color-warn-bg: #fffaf0;
+  --color-attn-fg: #b45309;
+  --color-info-bg: #f0f5ff;
+  --color-purple-fg: #6633a6;
+
+  /* Colores de apoyo que se repiten en varias pantallas: los tintes celeste y
+     violeta, y la familia de verdes. Los estados del calendario de abajo
+     apuntan a estos. */
+  --color-brand-tint: #e8eef8;
+  --color-purple-bg: #f5f0ff;
+  --color-indigo: #4f46e5;
+  --color-amber: #ffb82c;
+  --color-green: #1e9850;
+  --color-green-deep: #17723c;
+  --color-green-tint: #e9f5ee;
+  --color-green-soft: #ddf0e5;
+
+  /* Estados de un turno del calendario: fondo del bloque (bg), barra de la
+     izquierda (bar), texto (fg) y punto de la leyenda (dot). Sale de la paleta
+     muestreada del Figma; ver design-reference/figma/modulos/scheduling.md. */
+  --color-appt-proposed-bg: var(--color-warn-bg);
+  --color-appt-proposed-bar: var(--color-amber);
+  --color-appt-proposed-fg: var(--color-warn-fg);
+  --color-appt-proposed-dot: var(--color-amber);
+  --color-appt-checkin-bg: var(--color-green-soft);
+  --color-appt-checkin-bar: var(--color-green);
+  --color-appt-checkin-fg: var(--color-green-deep);
+  --color-appt-checkin-dot: var(--color-green);
+  --color-appt-booked-bg: var(--color-brand-tint);
+  --color-appt-booked-bar: var(--color-dash-blue);
+  --color-appt-booked-fg: var(--color-dash-blue);
+  --color-appt-booked-dot: var(--color-dash-blue);
+  --color-appt-inprogress-bg: var(--color-purple-bg);
+  --color-appt-inprogress-bar: var(--color-purple-fg);
+  --color-appt-inprogress-fg: var(--color-purple-fg);
+  --color-appt-inprogress-dot: var(--color-indigo);
+  --color-appt-fulfilled-bg: var(--color-green-tint);
+  --color-appt-fulfilled-bar: var(--color-green);
+  --color-appt-fulfilled-fg: var(--color-green-deep);
+  --color-appt-fulfilled-dot: var(--color-green-deep);
+  --color-appt-noshow-bg: var(--color-surface-muted);
+  --color-appt-noshow-bar: var(--color-ink-faint);
+  --color-appt-noshow-fg: var(--color-ink-medium);
+  --color-appt-cancelled-bg: var(--color-surface-muted);
+  --color-appt-cancelled-bar: var(--color-ink-muted);
+  --color-appt-cancelled-fg: var(--color-ink-medium);
+  --color-appt-cancelled-dot: var(--color-ink-muted);
+
+  --shadow-stat: 0 4px 4px 0 rgb(0 0 0 / 0.05);
+  --shadow-panel: 0 4px 14px 0 rgb(100 100 100 / 0.25);
+  --shadow-inner-card: 0 4px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+body { font-family: var(--font-sans); }
+
+/* Override del rediseño: el Figma usa #fafbfe como fondo de página en ambas
+   vistas del dashboard, no el 0 0% 96% del sistema original.
+   tokens.json queda intacto a propósito: documenta el original, no el rediseño. */
+:root {
+  --page-background: 225 67% 98.8%;
+}
+
+@keyframes panel-in {
+  from { transform: translateX(12px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes sheet-in {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes loc-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* El panel de solicitudes nace desde la esquina donde está el FAB. */
+@keyframes fab-panel-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Las tabs que "Is Provider" destraba -Provider Info, Working Hours-. */
+@keyframes tab-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Help: apunta al control real de la pantalla. Corre una vez al llegar. */
+@keyframes coach-spotlight {
+  0%   { box-shadow: 0 0 0 0 rgba(29,86,188,.5), 0 0 0 9999px rgba(15,23,42,.28); outline: 2px solid rgba(29,86,188,.9); }
+  55%  { box-shadow: 0 0 0 10px rgba(29,86,188,0), 0 0 0 9999px rgba(15,23,42,.22); outline: 2px solid rgba(29,86,188,.9); }
+  100% { box-shadow: 0 0 0 10px rgba(29,86,188,0), 0 0 0 9999px rgba(15,23,42,0); outline: 2px solid rgba(29,86,188,0); }
+}
+
+/* Mini-demos de Help: todas en loop de 4s para que un paso se lea igual sin
+   importar cuánto te quedes mirándolo. */
+@keyframes tour-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(29,86,188,.35); }
+  50%      { box-shadow: 0 0 0 6px rgba(29,86,188,0); }
+}
+
+/* "Currently being seen" (PatientInSessionPopup): antes el aviso de "en
+   vivo" era un punto verde con \`animate-ping\` en cada avatar -repetido en
+   toda la lista, mareaba en vez de comunicar-. Julián lo pidió como un glow
+   en el borde de toda la pestaña, estilo indicador "vivo" de un panel de
+   IA: una respiración suave, no un tilde que aparece y desaparece de golpe.
+   Incluye la sombra de reposo en los dos extremos para no pisar el
+   \`shadow-[...]\` de Tailwind que la pestaña ya trae. */
+@keyframes session-live {
+  0%, 100% { box-shadow: 0 8px 24px rgba(0,0,0,.16), 0 0 0 0 rgba(30,152,80,.45); }
+  50%      { box-shadow: 0 8px 24px rgba(0,0,0,.16), 0 0 14px 3px rgba(30,152,80,.55); }
+}
+@keyframes tour-card-in {
+  0%, 8%   { opacity: 0; transform: translateY(10px); }
+  22%,100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes tour-tap-move {
+  0%, 10%  { transform: translate(4px, 34px); }
+  35%,100% { transform: translate(52px, 12px); }
+}
+@keyframes tour-tap-ring {
+  0%, 38%  { opacity: 0; transform: scale(.4); }
+  48%      { opacity: .9; transform: scale(1); }
+  62%,100% { opacity: 0; transform: scale(1.5); }
+}
+@keyframes tour-block-appear {
+  0%, 48%  { opacity: 0; transform: scaleY(.2); }
+  62%,100% { opacity: 1; transform: scaleY(1); }
+}
+@keyframes tour-drag-down {
+  0%, 12%  { transform: translate(46px, 8px); }
+  55%,100% { transform: translate(46px, 52px); }
+}
+@keyframes tour-range-grow {
+  0%, 12%  { height: 0; opacity: 0; }
+  20%      { opacity: 1; }
+  55%,100% { height: 48px; opacity: 1; }
+}
+@keyframes tour-expand {
+  0%, 20%  { max-height: 0; opacity: 0; }
+  45%, 80% { max-height: 80px; opacity: 1; }
+  100%     { max-height: 0; opacity: 0; }
+}
+@keyframes tour-slide-away {
+  0%, 20%  { transform: translateX(0); opacity: 1; }
+  45%,100% { transform: translateX(-16px); opacity: 0; }
+}
+@keyframes tour-rail-collapse {
+  0%, 20%  { width: 148px; }
+  50%,100% { width: 56px; }
+}
+@keyframes tour-menu-in {
+  0%, 15%  { opacity: 0; transform: translateY(-6px); }
+  30%,100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes tour-cursor-click {
+  0%, 30%  { transform: translate(0, 0) scale(1); }
+  40%      { transform: translate(0, 0) scale(.85); }
+  55%,100% { transform: translate(0, 0) scale(1); }
+}
+
+/* Las manijas de las columnas se muestran solas una vez, en cascada de
+   izquierda a derecha, para que se note que la tabla se puede ajustar.
+   Después vuelven a aparecer sólo con el mouse encima. */
+@keyframes col-hint {
+  0%   { opacity: 0; }
+  18%  { opacity: 1; }
+  55%  { opacity: 1; }
+  80%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* El agarre crece un toque al pasar por encima: avisa que es arrastrable
+   antes de que el usuario apriete. */
+@keyframes col-grip-in {
+  from { transform: scaleY(0.55); }
+  to   { transform: scaleY(1); }
+}
+
+/* Panel del login: cada fila de los widgets (turnos, ledger, hallazgos)
+   entra con un fundido + un deslizamiento chico, escalonada por fila, para
+   que el widget se sienta vivo y no una foto fija. Se repite en loop
+   mientras el slide está en pantalla. Ver design-reference/figma/modulos/login.md. */
+@keyframes login-fila {
+  0%   { opacity: 0; transform: translateY(6px); }
+  14%  { opacity: 1; transform: translateY(0); }
+  86%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Mismo espíritu que login-fila, pero para las piezas del mini-odontograma:
+   crecen desde abajo en vez de entrar desde un costado. */
+@keyframes login-diente {
+  0%   { opacity: 0.35; transform: scaleY(0.8); }
+  18%  { opacity: 1; transform: scaleY(1); }
+  100% { opacity: 1; transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="tour-"], [style*="tour-"], [style*="coach-spotlight"],
+  [style*="col-hint"], [class*="col-grip-in"], [class*="login-fila"], [class*="login-diente"] {
+    animation: none !important;
+  }
+}
+`})))()}function r(e){let t=e.match(/^([\d.]+)\s+([\d.]+)%\s+([\d.]+)%$/);if(!t)return null;let n=Number(t[1]),r=Number(t[2])/100,i=Number(t[3])/100,a=e=>(e+n/30)%12,o=r*Math.min(i,1-i),s=e=>i-o*Math.max(-1,Math.min(a(e)-3,Math.min(9-a(e),1))),c=e=>Math.round(e*255).toString(16).padStart(2,`0`);return`#${c(s(0))}${c(s(8))}${c(s(4))}`}function i(){let e=p.map(([e])=>({grupo:e,filas:[]}));for(let t of Object.keys(o)){if(t===`radius`)continue;let n=p.findIndex(([,e])=>e.test(t));n>=0&&e[n].filas.push({nombre:t,claro:o[t],oscuro:s[t]})}return e.filter(e=>e.filas.length>0)}var a,o,s,c,l,u,d,f,p,m,h,g;function _(){return(_=e((()=>{n(),a=t.replace(/\/\*[\s\S]*?\*\//g,``),o={},s={},c={},l={};for(let[,e,t]of a.matchAll(/(:root|\.dark|@theme inline|@theme(?: static)?)\s*\{([^{}]*)\}/g)){let n=e===`:root`?o:e===`.dark`?s:e.startsWith(`@theme`)&&!e.includes(`inline`)?c:l;for(let[,e,r]of t.matchAll(/--([\w-]+)\s*:\s*([^;]+);/g))n[e]=r.trim()}u=o,d=c,f=e=>`hsl(${e})`,p=[[`Primary`,/^primary/],[`Secondary`,/^secondary/],[`Destructive`,/^destructive/],[`Success`,/^success/],[`Warning`,/^warning/],[`Base`,/^(background|foreground|card|popover|muted|accent|border|input|ring)/],[`Page and surfaces`,/^(page-background|gray-|surface-|clinical-)/],[`Calendar`,/^calendaar?-|^calendar/],[`Sidebar`,/^sidebar/],[`Chart`,/^chart-/]],m=Object.entries(c).filter(([e])=>e.startsWith(`color-`)).map(([e,t])=>({nombre:e,valor:t})),h=Object.entries(c).filter(([e])=>e.startsWith(`shadow-`)).map(([e,t])=>({nombre:e,valor:t})),g={};for(let{nombre:e,valor:t}of m)/^#[0-9a-f]{6}$/i.test(t)&&(g[t.toLowerCase()]??=e.replace(`color-`,``));for(let[e,t]of Object.entries(o)){let n=r(t);n&&(g[n]??=e)}})))()}export{_ as a,u as c,r as i,d as l,m as n,h as o,i as r,g as s,f as t};

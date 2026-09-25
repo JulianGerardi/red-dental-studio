@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,t as r}from"./ClinicalPopover-CDm17iKW.js";var i,a,o,s,c;function l(){return(l=e((()=>{n(),i=t(),a={title:`Components/Patients/ClinicalPopover`,component:r,parameters:{layout:`fullscreen`},args:{title:`Allergies`,anchor:new DOMRect(40,40,120,36),items:[{id:`a1`,name:`Penicillin`,status:`Prescribed`,since:`2019`,detail:`Rash and swelling`,campos:{}},{id:`a2`,name:`Latex`,status:`Completed`,since:`2021`,detail:`Contact dermatitis`,campos:{}}],onAdd:()=>{},onEdit:()=>{},onDelete:()=>{},onClose:()=>{}},decorators:[e=>(0,i.jsx)(`div`,{className:`relative h-[420px]`,children:(0,i.jsx)(e,{})})]},o={},s={args:{items:[]}},c=[`Default`,`Empty`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{}`,...o.parameters?.docs?.source}}},s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
+  args: {
+    items: []
+  }
+}`,...s.parameters?.docs?.source}}}})))()}l();export{o as Default,s as Empty,c as __namedExportsOrder,a as default};

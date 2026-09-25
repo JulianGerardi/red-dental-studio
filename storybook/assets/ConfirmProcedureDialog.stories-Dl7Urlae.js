@@ -1,5 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{n as t,t as n}from"./ConfirmProcedureDialog-Cpr_eMpo.js";var r,i,a,o,s;function c(){return(c=e((()=>{t(),r={id:`F-1`,area:`Tooth 3`,condition:`chronic enamel dental caries`,descriptor:`Deep`,date:`May 14, 2026`,status:`Active`,tooth:3,provider:`Elena Martinez`,surfaces:[`O`],notes:``,linked:[`F-2`],diagnoses:[]},i={title:`Components/Clinical/Dental/ConfirmProcedureDialog`,component:n,parameters:{layout:`fullscreen`},args:{action:`treated`,finding:r,linkedConditions:[{...r,id:`F-2`,area:`Tooth 4`}],onCancel:()=>{},onConfirm:()=>{}}},a={},o={args:{action:`discard`}},s=[`MarkAsTreated`,`Discard`],a.parameters={...a.parameters,docs:{...a.parameters?.docs,source:{originalSource:`{}`,...a.parameters?.docs?.source}}},o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{
-  args: {
-    action: 'discard'
-  }
-}`,...o.parameters?.docs?.source}}}})))()}c();export{o as Discard,a as MarkAsTreated,s as __namedExportsOrder,i as default};

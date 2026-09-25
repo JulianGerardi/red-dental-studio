@@ -1,5 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,t as r}from"./PatientSidePanel-XnCMkIbb.js";import{n as i,r as a}from"./decorators-DQawb0em.js";var o,s,c,l,u;function d(){return(d=e((()=>{a(),n(),o=t(),s={title:`Components/Patients/PatientSidePanel`,component:r,parameters:{layout:`fullscreen`},args:{name:`Sarah Stone`,initials:`SS`,section:`Dashboard`,basePath:`/patients/patient-0001`},decorators:[i,e=>(0,o.jsx)(`div`,{className:`flex h-[760px] bg-page-background`,children:(0,o.jsx)(e,{})})]},c={},l={args:{section:`Ledger`}},u=[`Default`,`LedgerSelected`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
-  args: {
-    section: 'Ledger'
-  }
-}`,...l.parameters?.docs?.source}}}})))()}d();export{c as Default,l as LedgerSelected,u as __namedExportsOrder,s as default};

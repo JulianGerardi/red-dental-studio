@@ -1,0 +1,8 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,t as r}from"./pill-DGJoOAXK.js";var i,a,o,s,c,l;function u(){return(u=e((()=>{n(),i=t(),a=[`success`,`info`,`warning`,`danger`,`neutral`,`purple`],o={title:`Components/UI/Pill`,component:r,args:{tone:`success`,children:`Accepted`},argTypes:{tone:{control:`select`,options:a},size:{control:`select`,options:[`md`,`sm`]}}},s={},c={render:()=>(0,i.jsx)(`div`,{className:`flex flex-col gap-3`,children:[`md`,`sm`].map(e=>(0,i.jsxs)(`div`,{className:`flex flex-wrap items-center gap-2`,children:[(0,i.jsx)(`span`,{className:`w-8 text-[11px] text-ink-muted`,children:e}),a.map(t=>(0,i.jsx)(r,{tone:t,size:e,children:t},t))]},e))})},l=[`Default`,`Tones`],s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{}`,...s.parameters?.docs?.source}}},c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="flex flex-col gap-3">
+      {(['md', 'sm'] as const).map(size => <div key={size} className="flex flex-wrap items-center gap-2">
+          <span className="w-8 text-[11px] text-ink-muted">{size}</span>
+          {TONOS.map(t => <Pill key={t} tone={t} size={size}>{t}</Pill>)}
+        </div>)}
+    </div>
+}`,...c.parameters?.docs?.source}}}})))()}u();export{s as Default,c as Tones,l as __namedExportsOrder,o as default};
