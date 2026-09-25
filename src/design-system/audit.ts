@@ -36,3 +36,10 @@ export const hexEnCodigo = contar(/#[0-9a-fA-F]{6}\b/g, (s) => s.toLowerCase()).
 export const tamanosDeTexto = contar(/text-\[\d+(?:\.\d+)?px\]/g)
 export const radios = contar(/rounded(?:-[trbl]{1,2})?-\[[^\]]+\]/g)
 export const sombras = contar(/shadow-\[[^\]]+\]/g)
+
+/* Cómo se dibuja cada estado interactivo: todas las clases con ese prefijo
+   (hover:, focus:, disabled:…) que aparecen en el código, con cuántas veces. */
+export function clasesDeEstado(prefijo: string): Uso[] {
+  const re = new RegExp(`(?<![\\w-])${prefijo}:[^\\s"'\`\\\\)]+`, 'g')
+  return contar(re)
+}

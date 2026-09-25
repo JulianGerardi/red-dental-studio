@@ -46,6 +46,8 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   *Duplicates and inconsistencies* pone lado a lado lo que la app resuelve más
   de una vez (6 switches, 7 contenedores tipo card, 3 checkboxes…), medido en
   pantalla.
+- **Foundations / States**: cómo dibuja el código cada estado (hover, foco,
+  active, disabled, invalid): todas las clases con su cantidad de usos.
 - **Foundations / Documentation coverage**: lo que falta documentar, calculado
   del código (ver "Cómo se mide" abajo).
 - **Pages**: las 30 pantallas de la app, montadas con las rutas reales. Las
