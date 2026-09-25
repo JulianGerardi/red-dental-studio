@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ConsentBlock } from './ConsentBlock'
+import { esperar, pulsar, secuencia } from '@/design-system/play'
 
 const meta = {
   title: 'Components/Clinical/ConsentBlock',
@@ -11,3 +12,13 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+/* Con las dos firmas juntadas el consentimiento pasa a "Signed" y desaparece
+   la acción de firmar. */
+export const AllSigned: Story = {
+  play: secuencia(
+    pulsar(/consent actions/i), pulsar(/sign as patient/i),
+    pulsar(/consent actions/i), pulsar(/sign as provider/i),
+    esperar(/all signatures collected/i),
+  ),
+}

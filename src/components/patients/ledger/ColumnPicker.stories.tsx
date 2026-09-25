@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ColumnPicker } from './ColumnPicker'
+import { esperar, pulsar, secuencia } from '@/design-system/play'
 
 const COLUMNAS = [
   { id: 'fecha', label: 'Date', bloqueada: true },
@@ -36,3 +37,10 @@ function Demo() {
 }
 
 export const Default: Story = { render: () => <Demo /> }
+
+/* Menú abierto: las columnas bloqueadas (Date, Balance) aparecen
+   deshabilitadas, no se pueden ocultar. */
+export const LockedColumnsDisabled: Story = {
+  render: () => <Demo />,
+  play: secuencia(pulsar(/columns/i), esperar(/reset/i)),
+}

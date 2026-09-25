@@ -31,3 +31,19 @@ export const Default: Story = {
     </div>
   ),
 }
+
+/* Ítem deshabilitado: atenuado y sin respuesta al mouse ni al teclado. */
+export const DisabledItem: Story = {
+  render: () => (
+    <div className="h-64 w-64">
+      <DropdownMenu defaultOpen>
+        <DropdownMenuTrigger asChild><Button variant="outline">Actions</Button></DropdownMenuTrigger>
+        <DropdownMenuContent className="w-52">
+          <DropdownMenuItem>Edit</DropdownMenuItem>
+          <DropdownMenuItem disabled>Cancel (disabled - started)</DropdownMenuItem>
+          <DropdownMenuCheckboxItem disabled checked>Notifications (disabled)</DropdownMenuCheckboxItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  ),
+}

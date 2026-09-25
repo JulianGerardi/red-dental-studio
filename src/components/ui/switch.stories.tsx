@@ -23,3 +23,13 @@ export const States: Story = {
     </div>
   ),
 }
+
+/* Estado de error: borde y anillo rojos cuando el campo es inválido. */
+export const Invalid: Story = {
+  render: () => (
+    <div className="flex items-center gap-4">
+      <Switch aria-invalid aria-label="Invalid off" />
+      <Switch aria-invalid defaultChecked aria-label="Invalid on" />
+    </div>
+  ),
+}

@@ -11,6 +11,7 @@
    Ver design-reference/design-system.md. */
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
 import { join, extname, basename } from 'node:path'
+import { estadosSoportados, estadosFaltantes } from './states-lib.mjs'
 
 const RAIZ = new URL('..', import.meta.url).pathname
 const check = process.argv.includes('--check')
@@ -61,6 +62,33 @@ const base = (pila, p) => `/${[...pila, p].filter(Boolean).join('/')}`.replace(/
 const coincide = (patron, url) => new RegExp(`^${patron.replace(/:[^/]+/g, '[^/]+').replace(/\/$/, '') || '/'}/?$`).test(url)
 const rutasSinStory = [...rutas].filter((r) => !urls.some((u) => coincide(r, u)))
 
+/* Estados: cada componente con story tiene que mostrar los estados que su
+   código soporta (disabled, error, loading, empty, selected) o tener una
+   exención válida en state-waivers.json. */
+const exencionesEstado = JSON.parse(readFileSync(join(RAIZ, 'src/design-system/state-waivers.json'), 'utf8'))
+const estadosSinCubrir = []
+const exencionesInvalidas = []
+for (const [archivo, estados] of Object.entries(exencionesEstado)) {
+  for (const [estado, ex] of Object.entries(estados)) {
+    if (ex.na) { if (!ex.reason) exencionesInvalidas.push(`${archivo} · ${estado}: falta el motivo`); continue }
+    const [ruta, historia] = String(ex.story ?? '').split('#')
+    const f = join(RAIZ, 'src', ruta ?? '')
+    if (!ruta || !historia || !existsSync(f) || !new RegExp(`export const ${historia}\\b`).test(readFileSync(f, 'utf8')))
+      exencionesInvalidas.push(`${archivo} · ${estado}: el story "${ex.story}" no existe`)
+  }
+}
+let conEstados = 0
+for (const p of componentes) {
+  const st = p.replace(/\.tsx$/, '.stories.tsx')
+  if (!existsSync(st)) continue
+  const clave = `components/${p.split('/src/components/')[1]}`
+  const codigo = readFileSync(p, 'utf8')
+  const soportados = estadosSoportados(codigo)
+  if (soportados.length) conEstados++
+  const faltan = estadosFaltantes(clave, codigo, readFileSync(st, 'utf8'), Object.fromEntries(Object.entries(exencionesEstado).map(([k, v]) => [k, v])))
+  if (faltan.length) estadosSinCubrir.push(`${clave}: ${faltan.join(', ')}`)
+}
+
 /* Colores escritos a mano en clases */
 const css = readFileSync(join(RAIZ, 'src/index.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
 const tokens = {}
@@ -81,11 +109,17 @@ const baseline = JSON.parse(readFileSync(join(RAIZ, 'scripts/ds-baseline.json'),
 const nExentos = componentes.filter(esExento).length
 console.log(`Componentes con story:  ${componentes.length - sinStory.length - nExentos} de ${componentes.length}` + (nExentos ? ` (+${nExentos} documentados en su anfitrión)` : ''))
 console.log(`Rutas con story:        ${rutas.size - rutasSinStory.length} de ${rutas.size}`)
+console.log(`Estados:                ${conEstados - estadosSinCubrir.length} de ${conEstados} componentes con estados los muestran todos (${Object.values(exencionesEstado).reduce((n, e) => n + Object.keys(e).length, 0)} exenciones)`)
 console.log(`Colores a mano en clases: ${sinToken} sin token (baseline ${baseline.colorSinToken}), ${conToken} que ya tienen token`)
 if (rutasSinStory.length) console.log(`\nRutas sin story en Pages:\n  ${rutasSinStory.join('\n  ')}`)
 if (!check && sinStory.length) console.log(`\nComponentes sin story:\n  ${sinStory.map((p) => p.replace(`${RAIZ}src/`, '')).join('\n  ')}`)
 
+if (estadosSinCubrir.length) console.log(`\nEstados soportados sin story ni exención:\n  ${estadosSinCubrir.join('\n  ')}`)
+if (exencionesInvalidas.length) console.log(`\nExenciones de estado inválidas:\n  ${exencionesInvalidas.join('\n  ')}`)
+
 let falla = false
+if (estadosSinCubrir.length) { console.error(`\n✗ Hay estados sin documentar: agregá el story (Disabled, WithValidationErrors, Empty…) o una exención con motivo en src/design-system/state-waivers.json.`); falla = true }
+if (exencionesInvalidas.length) { console.error(`\n✗ Hay exenciones de estado que apuntan a stories que no existen.`); falla = true }
 if (conToken > 0) {
   console.error(`\n✗ Hay ${conToken} colores escritos a mano que ya tienen token: corré "npm run ds:tokenize".`)
   falla = true

@@ -17,3 +17,9 @@ function Demo({ size }: { size?: number }) {
 }
 
 export const Default: Story = { render: (args) => <Demo size={args.size} /> }
+
+/* Ninguna superficie elegida. */
+export const NoneSelected: Story = { render: () => <SurfaceWheel value={[]} onChange={() => {}} /> }
+
+/* Todas las superficies elegidas. */
+export const AllSelected: Story = { render: () => <SurfaceWheel value={['MB', 'B', 'DB', 'O', 'ML', 'L', 'DL']} onChange={() => {}} /> }

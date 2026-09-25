@@ -20,3 +20,19 @@ function Demo({ conMarcados }: { conMarcados?: boolean }) {
 
 export const Default: Story = { render: () => <Demo /> }
 export const WithMarkedDays: Story = { render: () => <Demo conMarcados /> }
+
+function ConError() {
+  const [d, setD] = useState<Date | null>(null)
+  return <div className="h-[100px] w-64"><DatePicker value={d} onChange={setD} error /></div>
+}
+
+/* Estado de error: borde rojo, para campos obligatorios sin fecha. */
+export const WithError: Story = { render: () => <ConError /> }
+
+function ConFecha() {
+  const [d, setD] = useState<Date | null>(new Date(2026, 8, 25))
+  return <div className="h-[380px] w-64"><DatePicker value={d} onChange={setD} /></div>
+}
+
+/* Con una fecha elegida el campo la muestra en formato dd-mm-aaaa. */
+export const SelectedDate: Story = { render: () => <ConFecha /> }

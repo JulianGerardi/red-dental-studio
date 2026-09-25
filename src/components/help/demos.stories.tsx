@@ -28,3 +28,8 @@ export const All: Story = {
     </div>
   ),
 }
+
+/* Pestaña elegida en la demo de pestañas del paciente. */
+export const PatientTabsSelected: Story = {
+  render: () => <div className="w-[300px] overflow-hidden rounded-xl border border-line"><demos.PatientTabsDemo activa="Ledger" /></div>,
+}

@@ -17,3 +17,7 @@ function Demo(args: React.ComponentProps<typeof AppointmentSlotPicker>) {
 }
 
 export const Default: Story = { render: (args) => <Demo {...args} /> }
+
+/* La franja de las 09 AM está ocupada: el botón queda deshabilitado y no
+   acepta turnos. */
+export const BusySlotDisabled: Story = { args: { seleccion: undefined } }

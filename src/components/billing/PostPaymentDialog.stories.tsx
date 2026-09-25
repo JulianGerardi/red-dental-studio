@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { PostPaymentDialog } from './PostPaymentDialog'
+import { esperar, pulsar, secuencia } from '@/design-system/play'
 
 const meta = {
   title: 'Components/Billing/PostPaymentDialog',
@@ -15,3 +16,8 @@ type Story = StoryObj<typeof meta>
 export const PatientPayment: Story = {}
 export const CreditAdjustment: Story = { args: { tipoInicial: 'Credit Adjustment' } }
 export const ChargeAdjustment: Story = { args: { tipoInicial: 'Charge Adjustment' } }
+
+/* Estado de error: Save con los campos obligatorios vacíos. */
+export const WithValidationErrors: Story = {
+  play: secuencia(pulsar(/^save$/i), esperar(/required|at least|must|invalid/i)),
+}

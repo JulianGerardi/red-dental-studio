@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { NewProcedureModal } from './NewProcedureModal'
+import { esperar, pulsar, secuencia } from '@/design-system/play'
 
 const meta = {
   title: 'Components/Clinical/Dental/NewProcedureModal',
@@ -12,3 +13,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+/* "Next Step" queda deshabilitado hasta elegir un procedimiento. */
+export const NextDisabledUntilProcedure: Story = {}
+
+/* Paso 2 (superficies): sin superficies marcadas "Apply to unset" está
+   deshabilitado y "Previous tooth" también en el primer diente. */
+export const SurfacesStepEmpty: Story = {
+  play: secuencia(pulsar(/^D0120/), pulsar(/chart on tooth/i), pulsar(/next step/i), esperar(/apply to unset/i)),
+}

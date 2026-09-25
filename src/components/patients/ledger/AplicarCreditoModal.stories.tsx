@@ -15,3 +15,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+/* "Apply credit" queda deshabilitado hasta que se aplica un monto a algún
+   cargo, y el campo de monto de cada fila también hasta que se la marca. */
+export const ApplyDisabledUntilAmount: Story = {}
+
+/* Sin cargos abiertos: el modal lo dice y no hay nada que aplicar. */
+export const NoOpenCharges: Story = { args: { cargos: [] } }

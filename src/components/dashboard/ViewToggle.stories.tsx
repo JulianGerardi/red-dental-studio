@@ -17,3 +17,6 @@ function Demo() {
 }
 
 export const Default: Story = { render: () => <Demo /> }
+
+/* Segmento elegido: el pill activo se pinta de azul. */
+export const ProviderSelected: Story = { args: { value: 'Provider' } }

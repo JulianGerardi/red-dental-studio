@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ViewFiltersPanel } from './ViewFiltersPanel'
+import { pulsar } from '@/design-system/play'
 
 const meta = {
   title: 'Components/Scheduling/ViewFiltersPanel',
@@ -12,3 +13,8 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+/* Otra opción elegida: la fila toma fondo lila y el radio se llena. */
+export const OtherOptionSelected: Story = {
+  play: pulsar(/check in/i),
+}

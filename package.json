@@ -13,7 +13,11 @@
     "build-storybook": "storybook build -o storybook-static",
     "ds:coverage": "node scripts/ds-coverage.mjs",
     "ds:check": "node scripts/ds-coverage.mjs --check",
-    "ds:tokenize": "node scripts/tokenize-colors.mjs"
+    "ds:tokenize": "node scripts/tokenize-colors.mjs",
+    "ds:scan": "node scripts/scan-recipes.mjs",
+    "prestorybook": "npm run ds:scan",
+    "prebuild-storybook": "npm run ds:scan",
+    "prebuild": "npm run ds:scan"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -43,6 +47,7 @@
     "gh-pages": "^6.3.0",
     "oxlint": "^1.79.0",
     "storybook": "^10.6.0",
+    "storybook-addon-pseudo-states": "^10.6.0",
     "typescript": "~6.0.2",
     "vite": "^8.2.2"
   }

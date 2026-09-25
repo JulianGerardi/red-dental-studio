@@ -18,3 +18,9 @@ function Demo({ paginas }: { paginas: number }) {
 
 export const Default: Story = { render: () => <Demo paginas={6} /> }
 export const ManyPages: Story = { render: () => <Demo paginas={24} /> }
+
+/* Primera página: "Previous" queda deshabilitado. */
+export const FirstPage: Story = { render: (args) => <Pagination {...args} pagina={1} paginas={6} /> }
+
+/* Última página: "Next" queda deshabilitado. */
+export const LastPage: Story = { render: (args) => <Pagination {...args} pagina={6} paginas={6} /> }

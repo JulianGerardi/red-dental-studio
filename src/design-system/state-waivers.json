@@ -1,0 +1,56 @@
+{
+  "components/clinical/ClinicalTopBar.tsx": {
+    "selected": {
+      "story": "components/clinical/ClinicalTopBar.stories.tsx#CounterOpen",
+      "reason": "El contador elegido es el que tiene el popover abierto."
+    }
+  },
+  "components/clinical/ConsentBlock.tsx": {
+    "empty": {
+      "story": "components/clinical/ConsentBlock.stories.tsx#AllSigned",
+      "reason": "El caso sin firmas pendientes es el estado 'Signed'."
+    }
+  },
+  "components/clinical/OdontogramEmbed.tsx": {
+    "empty": {
+      "na": true,
+      "reason": "`odonto-vacio` es una clase marcadora que se le pone a los nodos de la librería del odontograma; no es un estado vacío del componente."
+    }
+  },
+  "components/clinical/RadiographyViewer.tsx": {
+    "loading": {
+      "na": true,
+      "reason": "El detector confunde `loading=\"lazy\"` de las imágenes con un estado de carga; el visor no tiene uno."
+    }
+  },
+  "components/layout/LocationSelector.tsx": {
+    "selected": {
+      "story": "components/layout/LocationSelector.stories.tsx#Open",
+      "reason": "Abierto, la ubicación elegida queda marcada y la favorita con la estrella presionada."
+    }
+  },
+  "components/patients/ledger/useAnchoColumnas.tsx": {
+    "selected": {
+      "na": true,
+      "reason": "El estado 'arrastrando' sólo existe mientras el puntero está apretado; no se puede dejar quieto en un story."
+    }
+  },
+  "components/scheduling/NewAppointmentModal.tsx": {
+    "selected": {
+      "story": "components/scheduling/TreatmentPlanPicker.stories.tsx#Plans",
+      "reason": "La selección de plan y de visita usa PlanCard/VisitRow, que se documentan ahí con la tarjeta elegida."
+    }
+  },
+  "components/ui/tooltip.tsx": {
+    "selected": {
+      "na": true,
+      "reason": "El detector confunde los `data-[state=…]` de animación de Radix con un estado de selección; el tooltip no tiene uno."
+    }
+  },
+  "components/clinical/TreatmentPlanSection.tsx": {
+    "empty": {
+      "na": true,
+      "reason": "La coincidencia es `marcadas.length === 0` dentro del texto de un toast de confirmación, no un estado vacío del componente."
+    }
+  }
+}

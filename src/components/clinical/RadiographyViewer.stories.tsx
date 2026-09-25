@@ -13,3 +13,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+/* En la lista de procedimientos de una condición, los que no aplican aparecen
+   deshabilitados (fondo gris, cursor bloqueado), y el elegido lleva borde azul. */
+export const DisabledProcedureAndSelection: Story = {}

@@ -20,3 +20,13 @@ function Demo({ items }: { items: typeof NOTIFICACIONES }) {
 
 export const Several: Story = { render: (args) => <Demo items={args.items} /> }
 export const Single: Story = { render: () => <Demo items={NOTIFICACIONES.slice(0, 1)} /> }
+
+/* Sin tareas pendientes el banner no se dibuja: el componente devuelve null. */
+export const Empty: Story = {
+  render: () => (
+    <div className="border border-dashed border-line-strong p-4 text-[12px] text-ink-muted">
+      <NotificationBanner items={[]} cursor={0} onCursor={() => {}} onOcultar={() => {}} />
+      No banner is rendered when there are no pending tasks.
+    </div>
+  ),
+}

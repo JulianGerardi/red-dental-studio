@@ -5,7 +5,7 @@ import type { StorybookConfig } from '@storybook/react-vite'
    design-reference/design-system.md. */
 const config: StorybookConfig = {
   stories: ['../src/design-system/**/*.mdx', '../src/**/*.stories.@(ts|tsx)'],
-  addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
+  addons: ['@storybook/addon-docs', '@storybook/addon-a11y', 'storybook-addon-pseudo-states'],
   framework: '@storybook/react-vite',
   core: { disableTelemetry: true },
 }

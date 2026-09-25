@@ -68,3 +68,13 @@ export const Modal: Story = {
     </ModalShell>
   ),
 }
+
+/* Casilla del formulario: tildada (por defecto) y destildada. */
+export const CheckboxStates: Story = {
+  render: () => (
+    <div className="flex flex-col gap-3">
+      <OptionCheckbox label="Checked" defaultChecked />
+      <OptionCheckbox label="Unchecked" defaultChecked={false} />
+    </div>
+  ),
+}

@@ -13,3 +13,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+/* Sin cargos abiertos la tabla queda vacía. */
+export const Empty: Story = { args: { cargos: [] } }

@@ -18,3 +18,13 @@ type Story = StoryObj<typeof meta>
 
 export const Open: Story = {}
 export const Treated: Story = { args: { finding: { ...FINDING, status: 'Treated' } } }
+
+/* En un finding ya tratado, "Start Treatment" queda deshabilitado: el
+   tratamiento sólo puede arrancar sobre algo todavía abierto. */
+export const StartTreatmentDisabledWhenTreated: Story = {
+  args: { finding: { ...FINDING, status: 'Treated' } },
+  play: async (c) => {
+    const { userEvent, within } = await import('storybook/test')
+    await userEvent.click(await within(c.canvasElement).findByRole('button'))
+  },
+}

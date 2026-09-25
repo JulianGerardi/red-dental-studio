@@ -20,3 +20,9 @@ function Demo() {
 }
 
 export const Default: Story = { render: () => <Demo /> }
+
+/* Juego "Records": la pestaña elegida es la primera de esa lista. */
+export const RecordsSelected: Story = {
+  args: { juego: 'Records', pestana: 'Treatment Plan' as Pestana },
+  render: (args) => <ClinicalToolbar {...args} />,
+}
