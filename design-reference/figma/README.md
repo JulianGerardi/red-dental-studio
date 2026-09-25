@@ -12,6 +12,7 @@ Archivo: `9fYLxX9hlTj5unFthG4bBg`. Relevado durante el rediseño de `red-clone`.
 | Treatments | `3763:254355` | [modulos/treatments.md](modulos/treatments.md) |
 | Documents (manager) | `3753:80194` | [modulos/treatments.md](modulos/treatments.md) |
 | Relationships & Billing (6 pantallas) | `3751:76507` | [modulos/relationships.md](modulos/relationships.md) |
+| Consents (Settings) | `4106:170620` | [modulos/consents.md](modulos/consents.md) |
 
 ## Convenciones acordadas
 

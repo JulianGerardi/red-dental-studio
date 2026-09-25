@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import {
   Search, Plus, Bold, Italic, Underline, Heading1, Heading2,
-  Pilcrow, List, ListOrdered, X, MapPin, Eye, Send, Power, PowerOff,
-  User, Stethoscope, CalendarDays, ClipboardList, type LucideIcon,
+  Pilcrow, List, ListOrdered, X, Eye, Power, PowerOff,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Pill } from '@/components/ui/pill'
@@ -10,6 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { SelectField } from '@/components/patients/form'
 import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
+import { ConsentDocument } from '@/components/settings/ConsentDocument'
 
 /* Settings → Consents. Figma 4106:170620 ("New Consent Template"): lista de
    templates a la izquierda, editor del texto en el medio, preview en vivo a
@@ -32,19 +32,6 @@ import { aviso } from '@/components/ui/toaster'
    ToolbarFormato). El heading de la pantalla queda fijo en "New Consent
    Template" aunque haya un template cargado, tal cual las tres variantes del
    frame. */
-
-/* "Patient acknowledgment" es el mismo texto en todos los consentimientos:
-   no se edita por template, sólo se muestra en el preview. */
-const RECONOCIMIENTOS_PACIENTE = [
-  'I have read and understand the information provided.',
-  'I had the opportunity to ask questions.',
-  'I voluntarily consent to the proposed treatment.',
-]
-
-/* Fechas de ejemplo del preview -no vienen del template, son del envío y de
-   la cita del paciente-. */
-const CONSENT_ENVIADO = 'September 23, 2026 — 10:30 AM'
-const CITA = 'October 15, 2026 — 9:00 AM'
 
 type Procedimiento = { codigo: string; nombre: string }
 const PROCEDIMIENTOS_DISPONIBLES: Procedimiento[] = [
@@ -121,18 +108,6 @@ const BORRADOR_VACIO: Borrador = { titulo: '', procedimientos: [], naturaleza: '
 const aBorrador = (t: ConsentTemplate): Borrador => ({
   titulo: t.titulo, procedimientos: t.procedimientos, naturaleza: t.naturaleza, riesgos: t.riesgos,
 })
-
-/* Un dato del encabezado del preview con su ícono a la izquierda -paciente,
-   proveedor, cita y procedimiento-. El ícono es chico y sin caja para no
-   comerle ancho al texto: la columna del preview mide ~144px. */
-function DatoConIcono({ icono: Icono, children }: { icono: LucideIcon; children: React.ReactNode }) {
-  return (
-    <div className="flex items-start gap-1.5">
-      <Icono className="text-dash-blue mt-px size-3.5 shrink-0" />
-      <div className="min-w-0">{children}</div>
-    </div>
-  )
-}
 
 /* Toolbar decorativo: mismo trato que el botón "Select File" de Documents en
    Employees.tsx -avisa que no está disponible en vez de fingir que hace
@@ -444,8 +419,8 @@ export function SettingsConsents() {
         </section>
 
         {/* ── Preview ───────────────────────────────────────────────── */}
-        <section className="h-fit rounded-xl border border-[#e4e4e7] bg-white p-4 sm:p-5">
-          <div className="flex items-center justify-between gap-2">
+        <section className="h-fit rounded-xl border border-[#e4e4e7] bg-[#eef0f4] p-3">
+          <div className="flex items-center justify-between gap-2 px-1">
             <h2 className="text-sm font-bold text-[#09090b]">Preview</h2>
             <button
               type="button"
@@ -453,80 +428,21 @@ export function SettingsConsents() {
               aria-pressed={vistaPaciente}
               className={cn(
                 'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
-                vistaPaciente ? 'border-dash-blue bg-dash-blue text-white' : 'border-[#e4e4e7] text-[#64748b] hover:text-[#3f3f46]',
+                vistaPaciente ? 'border-dash-blue bg-dash-blue text-white' : 'border-[#e4e4e7] bg-white text-[#64748b] hover:text-[#3f3f46]',
               )}
             >
               <Eye className="size-3.5" /> Patient View
             </button>
           </div>
 
-          <div className="mt-3 flex flex-col gap-1 text-[11px] text-[#71717a]">
-            <div className="flex items-center gap-1.5"><MapPin className="size-3.5 shrink-0" /> Los Angeles, Dental Clinic</div>
-            <div className="flex items-center gap-1.5"><Send className="size-3.5 shrink-0" /> Consent sent: {CONSENT_ENVIADO}</div>
-          </div>
-
-          <p className="mt-3 text-[10px] font-semibold tracking-wide text-[#1d56bc] uppercase">Informed Consent</p>
-          <h3 className="text-[17px] leading-tight font-bold text-[#09090b]">{borrador.titulo || 'Untitled Consent'}</h3>
-
-          <div className="mt-3 grid grid-cols-2 gap-3 text-[12px]">
-            <DatoConIcono icono={User}>
-              <p className="font-bold text-[#09090b]">Sarah Stone</p>
-              <p className="text-[#71717a]">DOB: 04/02/1991</p>
-              <p className="text-[#71717a]">Patient ID: 12345432</p>
-            </DatoConIcono>
-            <DatoConIcono icono={Stethoscope}>
-              <p className="font-bold text-[#09090b]">John Lorem</p>
-              <p className="text-[#71717a]">Provider</p>
-            </DatoConIcono>
-            <DatoConIcono icono={CalendarDays}>
-              <p className="font-bold text-[#09090b]">{CITA}</p>
-              <p className="text-[#71717a]">Appointment</p>
-            </DatoConIcono>
-            <DatoConIcono icono={ClipboardList}>
-              <p className="font-bold text-[#09090b]">
-                {borrador.procedimientos.length > 0 ? procedimiento(borrador.procedimientos[0])?.nombre : '—'}
-              </p>
-              <p className="text-[#71717a]">Procedure</p>
-            </DatoConIcono>
-          </div>
-
-          {!vistaPaciente && (
-            <div className="mt-3 flex flex-col gap-2 border-t border-[#f1f1f4] pt-3 text-[12px]">
-              <div>
-                <p className="text-[10px] font-semibold tracking-wide text-[#71717a] uppercase">Diagnosis</p>
-                <p className="text-[#3f3f46]">Non-restorable tooth with recurrent infection.</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-semibold tracking-wide text-[#71717a] uppercase">Clinical Findings</p>
-                <p className="text-[#3f3f46]">Extensive decay affecting tooth structure and surrounding tissue.</p>
-              </div>
-            </div>
-          )}
-
-          <div className="mt-3 border-t border-[#f1f1f4] pt-3 text-[12px]">
-            <p className="text-[10px] font-semibold tracking-wide text-[#71717a] uppercase">Nature of procedure</p>
-            <p className="mt-1 text-[#3f3f46]">{borrador.naturaleza || 'No content yet.'}</p>
-          </div>
-
-          <div className="mt-3 text-[12px]">
-            <p className="text-[10px] font-semibold tracking-wide text-[#71717a] uppercase">Risk and complications</p>
-            {borrador.riesgos ? (
-              <ul className="mt-1 list-disc pl-4 text-[#3f3f46]">
-                {borrador.riesgos.split('\n').filter(Boolean).map((linea, i) => <li key={i}>{linea}</li>)}
-              </ul>
-            ) : (
-              <p className="mt-1 text-[#3f3f46]">No content yet.</p>
-            )}
-          </div>
-
-          <div className="mt-3 rounded-lg bg-[#f0f5ff] p-3 text-[12px]">
-            <ul className="text-dash-blue-hover list-disc space-y-1 pl-4 font-medium">
-              {RECONOCIMIENTOS_PACIENTE.map((r) => <li key={r}>{r}</li>)}
-            </ul>
-          </div>
-
-          <div className="mt-4 border-t border-dashed border-[#d4d4d8] pt-2 text-[11px] text-[#a1a1aa]">
-            Patient / Legal Guardian
+          <div className="mt-3">
+            <ConsentDocument
+              titulo={borrador.titulo}
+              procedimiento={borrador.procedimientos.length > 0 ? procedimiento(borrador.procedimientos[0])?.nombre : undefined}
+              naturaleza={borrador.naturaleza}
+              riesgos={borrador.riesgos}
+              vistaPaciente={vistaPaciente}
+            />
           </div>
         </section>
       </div>
