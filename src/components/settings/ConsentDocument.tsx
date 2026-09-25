@@ -10,10 +10,18 @@ import {
 /* "Patient acknowledgment" es el mismo texto en todos los consentimientos:
    no se edita por template, sólo se muestra acá. */
 const RECONOCIMIENTOS_PACIENTE = [
-  'I have read and understand the information provided.',
-  'I had the opportunity to ask questions.',
+  'I have read and understand the information provided regarding the proposed treatment.',
+  'I have had the opportunity to ask questions and have received satisfactory answers.',
+  'I understand the potential risks, benefits, and alternatives to the proposed treatment.',
+  'I understand that I may choose to decline the proposed treatment.',
   'I voluntarily consent to the proposed treatment.',
 ]
+const AVISO_RECONOCIMIENTOS = 'All acknowledgment checkboxes must be completed before the patient can sign the consent.'
+
+/* Texto guía de cada bloque editable: se muestra siempre, en cursiva, debajo
+   del contenido del template. */
+const GUIA_NATURALEZA = 'Describe the proposed treatment, what the procedure involves, expected outcomes, and other relevant information the patient should understand before treatment.'
+const GUIA_RIESGOS = 'Describe the material risks, potential complications, and other relevant considerations associated with the proposed treatment.'
 
 /* Fechas de ejemplo -no vienen del template, son del envío y de la cita del
    paciente-. */
@@ -30,6 +38,8 @@ export function Seccion({ titulo, children }: { titulo: string; children: React.
     </section>
   )
 }
+
+const Guia = ({ children }: { children: React.ReactNode }) => <p className="mt-1.5 text-[11px] leading-snug text-ink-faint italic">{children}</p>
 
 /* Casilla del recuadro de datos: rótulo con ícono arriba, valor abajo. */
 export function Campo({ icono: Icono, etiqueta, children }: { icono: LucideIcon; etiqueta: string; children: React.ReactNode }) {
@@ -98,7 +108,10 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, vi
         </>
       )}
 
-      <Seccion titulo="Nature of procedure">{naturaleza ? <p>{naturaleza}</p> : vacio}</Seccion>
+      <Seccion titulo="Nature of procedure">
+        {naturaleza ? <p>{naturaleza}</p> : vacio}
+        <Guia>{GUIA_NATURALEZA}</Guia>
+      </Seccion>
 
       <Seccion titulo="Risk and complications">
         {lineasRiesgo.length > 0 ? (
@@ -106,6 +119,7 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, vi
             {lineasRiesgo.map((linea, i) => <li key={i}>{linea}</li>)}
           </ul>
         ) : vacio}
+        <Guia>{GUIA_RIESGOS}</Guia>
       </Seccion>
 
       <Seccion titulo="Patient acknowledgment">
@@ -117,6 +131,7 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, vi
             </li>
           ))}
         </ul>
+        <p className="mt-2 text-[11px] leading-snug font-medium text-ink-muted">{AVISO_RECONOCIMIENTOS}</p>
       </Seccion>
 
       <div className="mt-auto grid grid-cols-[1fr_88px] gap-4 pt-7 text-[11px] text-ink-faint">

@@ -44,16 +44,20 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     `cond && 'x'`, `cn()`, `clsx({})`, plantillas): **cada rama es un look
     aparte**, nunca se mezclan las dos, y las clases que se pisan se resuelven
     con `twMerge` como en la app. Cada look guarda la condición que lo activa.
-  - **Buttons** y **Fields** muestran una *matriz de estados*: una fila por
-    look y una columna por estado (hover, foco, active, disabled). Si el look
-    define el estado, se dibuja de verdad; si no, la celda dice *not defined*
-    en vez de repetir el botón sin cambios. Un foco sin definir se dibuja con
-    el anillo por defecto del navegador; un foco que la app saca sin poner
-    otro (`outline-none` y nada más) o que declara pero no se ve
-    (`outline-none` con `focus-visible:outline-2`) se marca aparte.
-  - Arriba de cada familia hay un índice con cuántos looks definen cada
-    estado, y `ui/Button` (el componente oficial) dibujado con todas sus
-    variantes y estados como referencia.
+  - **Buttons** y **Fields** son páginas cortas con el mismo orden, para
+    leerlas de arriba a abajo: *Types and states* (el look más usado de cada
+    tipo en cada estado; “—” = el código no define ese estado), *Measures*
+    (alto, padding, texto, radio, relleno, color y borde, leídos de las muestras
+    ya dibujadas), *Sizes in use* (cuántos elementos usan cada valor; más de un
+    valor = inconsistencia), *Colors in use* (los tokens de relleno, texto y
+    borde, con su hex y cantidad) y *States in the app* (qué % define cada
+    estado, con qué clases y qué falta). Todas las variantes que el código
+    dibuja quedan en un bloque plegado al final, con búsqueda y filtro por
+    estado faltante. El código está en `src/design-system/spec.tsx`.
+  - Un foco sin definir se dibuja con el anillo por defecto del navegador; un
+    foco que la app saca sin poner otro (`outline-none` y nada más) o que
+    declara pero no se ve (`outline-none` con `focus-visible:outline-2`) se
+    cuenta aparte.
   - **Tables** mide cada tabla sobre la pantalla real: abre su story en un
     iframe oculto y lee el DOM y los estilos calculados (`tables-measure.ts`).
     Las columnas, la construcción (`<table>` o filas de `div`), el radio y el
@@ -74,6 +78,17 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   en **Pages / Parts**.
 
 Las 394 stories se abrieron una por una en el navegador: ninguna da error.
+
+## Interfaz de Storybook
+
+La interfaz usa la identidad de la app para que plataforma y design system se
+sientan una sola cosa: tema claro con el riel `#fafafa` y el azul `#1d56bc`
+para lo activo (como el ítem activo del sidebar), bordes `#e7e7e7`, Inter,
+logo azul `#1a4da9` con el ícono y el nombre del bloque superior del sidebar,
+y el fondo gris `page-background` con contenido en cajas blancas, igual que
+`<main>` en `AppShell`. Está en `.storybook/theme.ts` (valores), `manager.ts`
+y `manager-head.html` (fuente y retoques de CSS) y `Page.tsx`. Si cambia un
+token de `src/index.css`, cambiar el mismo valor en `theme.ts`.
 
 ## Cómo se mide que no falte nada
 

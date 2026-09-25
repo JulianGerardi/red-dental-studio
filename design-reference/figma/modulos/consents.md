@@ -28,7 +28,13 @@ paciente**, no una tarjeta más de la interfaz.
   Findings (sólo en la vista de clínica), Nature of procedure, Risk and
   complications y Patient acknowledgment.
 - **Acknowledgment con casillas vacías** -es un formulario que el paciente
-  todavía no firmó, no una lista informativa-.
+  todavía no firmó, no una lista informativa-. Son cinco afirmaciones (leyó y
+  entendió, tuvo oportunidad de preguntar, entiende riesgos/beneficios/
+  alternativas, sabe que puede rechazar, consiente voluntariamente) y un aviso
+  debajo: todas deben estar marcadas antes de que el paciente firme.
+- **Texto guía en cursiva** debajo de Nature of procedure y de Risk and
+  complications, siempre visible: le dice a quien redacta el template qué va
+  en cada bloque (2026-09-25).
 - **Cierre:** línea de firma "Patient / Legal Guardian" con una "X" al inicio,
   línea de fecha al lado, y pie "Page 1 of 1".
 

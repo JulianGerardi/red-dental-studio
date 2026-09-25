@@ -3,10 +3,14 @@ import type { ReactNode } from 'react'
 /* Marco común de las páginas de Foundations. */
 export function Page({ titulo, bajada, children }: { titulo: string; bajada?: string; children: ReactNode }) {
   return (
-    <div className="mx-auto w-full max-w-[1080px] px-8 py-10 text-ink">
-      <h1 className="text-[28px] font-bold tracking-tight">{titulo}</h1>
-      {bajada && <p className="mt-2 max-w-[70ch] text-[14px] text-ink-muted">{bajada}</p>}
-      <div className="mt-8 flex flex-col gap-10">{children}</div>
+    /* Fondo gris de la app (page-background) con contenido en cajas blancas:
+       el mismo layout que <main> en AppShell. */
+    <div className="bg-page-background min-h-svh text-ink">
+      <div className="mx-auto w-full max-w-[1080px] px-8 py-10">
+        <h1 className="text-[28px] font-bold tracking-tight">{titulo}</h1>
+        {bajada && <p className="mt-2 max-w-[70ch] text-[14px] text-ink-muted">{bajada}</p>}
+        <div className="mt-8 flex flex-col gap-10">{children}</div>
+      </div>
     </div>
   )
 }

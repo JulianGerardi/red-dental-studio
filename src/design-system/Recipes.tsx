@@ -73,7 +73,7 @@ const limpiar = (clases: string) => clases.split(/\s+/).filter((c) => c && !POSI
 
 export type EstadoMuestra = 'hover' | 'focus' | 'active' | 'disabled'
 
-function Muestra({ r, estado }: { r: Receta; estado?: EstadoMuestra }) {
+export function Muestra({ r, estado, texto }: { r: Receta; estado?: EstadoMuestra; texto?: string }) {
   const pseudo = estado === 'hover' ? 'pseudo-hover' : estado === 'focus' ? 'pseudo-focus-visible pseudo-focus' : estado === 'active' ? 'pseudo-active' : ''
   const clases = cn(limpiar(r.clases), pseudo)
   /* Sin foco propio, el navegador dibuja su anillo por defecto. Ese anillo no
@@ -84,11 +84,11 @@ function Muestra({ r, estado }: { r: Receta; estado?: EstadoMuestra }) {
   if (r.tipo === 'button') {
     return (
       <button type="button" className={clases} style={estilo} disabled={deshabilitado}>
-        {r.etiqueta || <Plus className="size-4" />}
+        {texto ?? (r.etiqueta || <Plus className="size-4" />)}
       </button>
     )
   }
-  if (r.tipo === 'field') return <MuestraDeCampo r={r} clases={clases} estilo={estilo} deshabilitado={deshabilitado} />
+  if (r.tipo === 'field') return <MuestraDeCampo r={r} clases={clases} estilo={estilo} deshabilitado={deshabilitado} texto={texto} />
   if (r.tipo === 'pill') return <span className={clases}>{r.etiqueta || 'Label'}</span>
   if (r.tipo === 'card') return <div className={`${clases} h-16 w-full p-3 text-[12px] text-ink-muted`}>{r.etiqueta || 'Card'}</div>
   return null
@@ -103,14 +103,14 @@ export const esCasilla = (r: Receta) => r.inputType === 'checkbox' || r.inputTyp
 export const esOculto = (r: Receta) => r.inputType === 'file' || /(^|\s)sr-only(\s|$)/.test(r.clases)
 export const sinBorde = (r: Receta) => !/(^|\s)border(\s|$)/.test(r.clases)
 
-function MuestraDeCampo({ r, clases, estilo, deshabilitado }: { r: Receta; clases: string; estilo?: React.CSSProperties; deshabilitado: boolean }) {
+function MuestraDeCampo({ r, clases, estilo, deshabilitado, texto }: { r: Receta; clases: string; estilo?: React.CSSProperties; deshabilitado: boolean; texto?: string }) {
   if (esOculto(r)) return <span className="text-[11px] text-ink-faint">visually hidden file input</span>
   if (esCasilla(r)) return <input type={r.inputType} className={clases} style={estilo} disabled={deshabilitado} aria-label="Sample" />
   const pieza = cn(clases, 'w-full min-w-0')
   const campo =
-    r.tag === 'textarea' ? <textarea className={pieza} style={estilo} disabled={deshabilitado} placeholder={r.etiqueta || 'Placeholder'} rows={2} />
+    r.tag === 'textarea' ? <textarea className={pieza} style={estilo} disabled={deshabilitado} placeholder={texto ?? (r.etiqueta || 'Placeholder')} rows={2} />
     : r.tag === 'select' ? <select className={pieza} style={estilo} disabled={deshabilitado}><option>Option</option></select>
-    : <input type={r.inputType ?? 'text'} className={pieza} style={estilo} disabled={deshabilitado} placeholder={r.etiqueta || 'Placeholder'} />
+    : <input type={r.inputType ?? 'text'} className={pieza} style={estilo} disabled={deshabilitado} placeholder={texto ?? (r.etiqueta || 'Placeholder')} />
   /* Sin borde propio, el campo vive dentro de otra caja: se le da una. */
   const caja = sinBorde(r) && r.tag !== 'select' ? 'rounded-md border border-dashed border-line-strong bg-white px-2 py-1' : ''
   return (
@@ -135,16 +135,16 @@ function ConNota({ nota, children }: { nota?: string; children: ReactNode }) {
   )
 }
 
-export function CeldaDeEstado({ r, e }: { r: Receta; e: EstadoMuestra }) {
+export function CeldaDeEstado({ r, e, texto }: { r: Receta; e: EstadoMuestra; texto?: string }) {
   const s = r.estados
-  if (e === 'hover') return s.hover ? <Muestra r={r} estado="hover" /> : s.hoverSinEfecto ? <span className="text-[11px] text-ink-faint">— repeats the default</span> : SIN_DEFINIR
-  if (e === 'active') return s.activo ? <Muestra r={r} estado="active" /> : SIN_DEFINIR
+  if (e === 'hover') return s.hover ? <Muestra r={r} estado="hover" texto={texto} /> : s.hoverSinEfecto ? <span className="text-[11px] text-ink-faint">— repeats the default</span> : SIN_DEFINIR
+  if (e === 'active') return s.activo ? <Muestra r={r} estado="active" texto={texto} /> : SIN_DEFINIR
   if (e === 'focus') {
     const nota = s.foco === 'navegador' ? 'browser default' : s.foco === 'quitado' ? 'ring removed' : s.foco === 'invisible' ? 'declared, but invisible' : undefined
-    return <ConNota nota={nota}><Muestra r={r} estado="focus" /></ConNota>
+    return <ConNota nota={nota}><Muestra r={r} estado="focus" texto={texto} /></ConNota>
   }
-  if (s.deshabilitadoPorAtributo) return <Muestra r={r} estado="disabled" />
-  if (s.deshabilitado) return <ConNota nota="drawn as disabled"><Muestra r={r} /></ConNota>
+  if (s.deshabilitadoPorAtributo) return <Muestra r={r} estado="disabled" texto={texto} />
+  if (s.deshabilitado) return <ConNota nota="drawn as disabled"><Muestra r={r} texto={texto} /></ConNota>
   return SIN_DEFINIR
 }
 
