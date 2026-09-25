@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./react-BZJXY1be.js";import{t as n}from"./jsx-runtime-DeHZSEgm.js";import{r,t as i}from"./date-picker-CiCLGfJ-.js";function a({conMarcados:e}){let t=new Date,[n,r]=(0,o.useState)(e?t:null),a=e?[1,5,9].map(e=>new Date(t.getFullYear(),t.getMonth(),e)):[];return(0,s.jsx)(`div`,{className:`h-[380px] w-64`,children:(0,s.jsx)(i,{value:n,onChange:r,marked:a})})}var o,s,c,l,u,d;function f(){return(f=e((()=>{o=t(),r(),s=n(),c={title:`Components/UI/DatePicker`,component:i,args:{value:null,onChange:()=>{}}},l={render:()=>(0,s.jsx)(a,{})},u={render:()=>(0,s.jsx)(a,{conMarcados:!0})},d=[`Default`,`WithMarkedDays`],l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
+  render: () => <Demo />
+}`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
+  render: () => <Demo conMarcados />
+}`,...u.parameters?.docs?.source}}}})))()}f();export{l as Default,u as WithMarkedDays,d as __namedExportsOrder,c as default};

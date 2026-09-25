@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,t as r}from"./badge-Dn96Faf5.js";var i,a,o,s,c;function l(){return(l=e((()=>{n(),i=t(),a={title:`Components/UI/Badge`,component:r,args:{children:`Active`,variant:`active`},argTypes:{variant:{control:`select`,options:[`active`,`inactive`,`neutral`,`self`,`warning`]}}},o={},s={render:()=>(0,i.jsx)(`div`,{className:`flex flex-wrap gap-2`,children:[`active`,`inactive`,`neutral`,`self`,`warning`].map(e=>(0,i.jsx)(r,{variant:e,children:e},e))})},c=[`Default`,`AllVariants`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{}`,...o.parameters?.docs?.source}}},s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="flex flex-wrap gap-2">
+      {(['active', 'inactive', 'neutral', 'self', 'warning'] as const).map(v => <Badge key={v} variant={v}>{v}</Badge>)}
+    </div>
+}`,...s.parameters?.docs?.source}}}})))()}l();export{s as AllVariants,o as Default,c as __namedExportsOrder,a as default};
