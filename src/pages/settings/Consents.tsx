@@ -212,7 +212,7 @@ export function SettingsConsents() {
               type="button"
               onClick={nuevoTemplate}
               aria-label="New Template"
-              className="text-dash-blue flex h-8 items-center gap-1 rounded-md border border-[#c7d9fb] bg-[#f0f5ff] px-2.5 text-[12px] font-semibold hover:bg-[#e3edff]"
+              className="bg-dash-blue hover:bg-dash-blue-hover flex h-7 items-center gap-1 rounded-md px-2.5 text-[12px] font-medium text-white transition-colors"
             >
               <Plus className="size-3.5" /> New template
             </button>
@@ -427,7 +427,7 @@ export function SettingsConsents() {
         </section>
 
         {/* ── Preview ───────────────────────────────────────────────── */}
-        <section className="self-start rounded-xl border border-[#e4e4e7] bg-[#eef0f4] p-3 @3xl:col-start-2 @5xl:sticky @5xl:top-4 @5xl:col-start-3 @5xl:max-h-[calc(100vh-2rem)] @5xl:overflow-y-auto">
+        <section className="self-start rounded-xl border border-[#e4e4e7] bg-[#f5f6f8] p-3 @3xl:col-start-2 @5xl:sticky @5xl:top-4 @5xl:col-start-3 @5xl:max-h-[calc(100vh-2rem)] @5xl:overflow-y-auto">
           <div className="flex items-center justify-between gap-2 px-1">
             <div>
               <h2 className="text-sm font-bold text-[#09090b]">Preview</h2>

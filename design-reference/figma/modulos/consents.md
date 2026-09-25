@@ -10,7 +10,7 @@ izquierda, editor en el medio, preview a la derecha. Código en
 Pedido de Julián: el preview tenía que parecer **el documento que ve el
 paciente**, no una tarjeta más de la interfaz.
 
-- **Escritorio gris, hoja blanca.** El panel del preview pasa a fondo `#eef0f4`
+- **Escritorio gris, hoja blanca.** El panel del preview pasa a fondo `#f5f6f8`
   y adentro va una hoja blanca con sombra de papel (borde de 1px + sombra
   suave + sombra larga abajo). El encabezado "Preview" / "Patient View" queda
   en el escritorio, fuera de la hoja: es de la app, no del documento.
@@ -62,7 +62,7 @@ entendía de un vistazo. Misma lógica, mejor flujo:
 - **Guardar y Cancelar quedan fijos al pie del editor** (`sticky`), sin tener
   que bajar hasta el final para guardar.
 - **Lista:** el panel se llama "Templates" (ya no repite el título de la
-  página), "New template" pasa de link a botón, y el título de cada template
+  página), "New template" pasa de link a botón azul relleno y chico (h-7, como Save), y el título de cada template
   hace hasta dos líneas en vez de cortarse.
 - Cada tarjeta ocupa su propio alto (`self-start`) en vez de estirarse al de
   la más alta.
