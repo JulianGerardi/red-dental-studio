@@ -3,11 +3,12 @@ import { tokenPorHex } from './tokens'
 /* Lee el código fuente de la app -todo lo que hay bajo src/ menos los propios
    stories- y cuenta qué valores visuales están escritos a mano. Es el
    "scraping" del design system: siempre sale del código actual. */
-const fuentes = import.meta.glob(['/src/**/*.{ts,tsx}', '!/src/**/*.stories.tsx', '!/src/design-system/**'], {
+const todas = import.meta.glob(['/src/**/*.{ts,tsx}', '!/src/**/*.stories.tsx', '!/src/design-system/**'], {
   query: '?raw',
   import: 'default',
   eager: true,
 }) as Record<string, string>
+const fuentes = Object.fromEntries(Object.entries(todas).filter(([f]) => !f.endsWith('.stories.tsx') && !f.startsWith('/src/design-system/')))
 
 export type Uso = { valor: string; usos: number; archivos: number }
 

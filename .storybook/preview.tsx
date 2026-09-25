@@ -16,14 +16,19 @@ const preview: Preview = {
     },
   },
   decorators: [
-    (Story) => (
-      <MemoryRouter>
-        <TooltipProvider>
-          <Story />
-          <Toaster />
-        </TooltipProvider>
-      </MemoryRouter>
-    ),
+    /* Las pantallas completas (Pages) traen su propio router y providers:
+       con `parameters.router: false` no se les anida otro. */
+    (Story, { parameters }) =>
+      parameters.router === false ? (
+        <Story />
+      ) : (
+        <MemoryRouter>
+          <TooltipProvider>
+            <Story />
+            <Toaster />
+          </TooltipProvider>
+        </MemoryRouter>
+      ),
   ],
 }
 

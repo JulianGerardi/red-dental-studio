@@ -13,6 +13,7 @@ Archivo: `9fYLxX9hlTj5unFthG4bBg`. Relevado durante el rediseño de `red-clone`.
 | Documents (manager) | `3753:80194` | [modulos/treatments.md](modulos/treatments.md) |
 | Relationships & Billing (6 pantallas) | `3751:76507` | [modulos/relationships.md](modulos/relationships.md) |
 | Consents (Settings) | `4106:170620` | [modulos/consents.md](modulos/consents.md) |
+| Design system (Storybook) | — | [../design-system.md](../design-system.md) |
 
 ## Convenciones acordadas
 

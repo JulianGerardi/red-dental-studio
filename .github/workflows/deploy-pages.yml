@@ -21,9 +21,17 @@ jobs:
 
       - run: npm ci
 
+      # Informe del design system: falla si aparece un color escrito a mano
+      # que ya tiene token. No frena el deploy mientras se termina la migración.
+      - run: npm run ds:check
+        continue-on-error: true
+
       - run: npx vite build --base=/red-dental-studio/
         env:
           VITE_HASH_ROUTER: 'true'
+
+      # El design system queda en /storybook, junto a la app.
+      - run: npx storybook build -o dist/storybook
 
       - uses: peaceiris/actions-gh-pages@v4
         with:

@@ -10,7 +10,10 @@
     "preview": "vite preview",
     "odontogram:css": "node scripts/scope-odontogram-css.mjs",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build -o storybook-static"
+    "build-storybook": "storybook build -o storybook-static",
+    "ds:coverage": "node scripts/ds-coverage.mjs",
+    "ds:check": "node scripts/ds-coverage.mjs --check",
+    "ds:tokenize": "node scripts/tokenize-colors.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
