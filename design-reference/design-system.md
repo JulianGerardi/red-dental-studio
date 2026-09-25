@@ -6,7 +6,7 @@ mantener aparte. Publicado junto a la app, en `/storybook`.
 ```bash
 npm run storybook        # localhost:6006 (antes corre ds:scan)
 npm run build-storybook  # versión estática (storybook-static/)
-npm run ds:scan          # lee el código: recetas de UI y cobertura (generated/*.json)
+npm run ds:scan          # lee el código: looks de UI y cobertura (generated/*.json)
 npm run ds:coverage      # qué falta documentar
 npm run ds:check         # igual, pero falla si se rompe una regla (CI)
 npm run ds:tokenize      # pasa colores escritos a mano a su token
@@ -39,10 +39,29 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   story y la nota de diseño que cada uno trae en el encabezado.
 - **Patterns**: lo que el código arma a mano y no es un componente con nombre.
   *Buttons, Fields, Cards, Pills and badges* y *Tables* se generan leyendo el
-  código con el compilador de TypeScript (`scripts/scan-recipes.mjs`): cada
-  receta se dibuja con sus clases reales, con su cantidad de usos, dónde está,
-  sus estados (hover, foco, deshabilitado) y un cuadro de consistencia por
-  familia (cuántas alturas, paddings y pesos distintos conviven).
+  código con el compilador de TypeScript (`scripts/scan-recipes.mjs`).
+  - Se lee cada `className`, incluidos los condicionales (`cond ? 'a' : 'b'`,
+    `cond && 'x'`, `cn()`, `clsx({})`, plantillas): **cada rama es un look
+    aparte**, nunca se mezclan las dos, y las clases que se pisan se resuelven
+    con `twMerge` como en la app. Cada look guarda la condición que lo activa.
+  - **Buttons** y **Fields** muestran una *matriz de estados*: una fila por
+    look y una columna por estado (hover, foco, active, disabled). Si el look
+    define el estado, se dibuja de verdad; si no, la celda dice *not defined*
+    en vez de repetir el botón sin cambios. Un foco sin definir se dibuja con
+    el anillo por defecto del navegador; un foco que la app saca sin poner
+    otro (`outline-none` y nada más) o que declara pero no se ve
+    (`outline-none` con `focus-visible:outline-2`) se marca aparte.
+  - Arriba de cada familia hay un índice con cuántos looks definen cada
+    estado, y `ui/Button` (el componente oficial) dibujado con todas sus
+    variantes y estados como referencia.
+  - **Tables** mide cada tabla sobre la pantalla real: abre su story en un
+    iframe oculto y lee el DOM y los estilos calculados (`tables-measure.ts`).
+    Las columnas, la construcción (`<table>` o filas de `div`), el radio y el
+    borde del contenedor, el encabezado, la fila, el divisor y las funciones
+    visibles (selección, menú de fila, pastillas, paginación, arrastre,
+    columnas redimensionables) salen de esa medición, y una tabla compara
+    todas contra el valor más común. Lo único escrito a mano es para qué
+    sirve cada tabla.
   *Duplicates and inconsistencies* pone lado a lado lo que la app resuelve más
   de una vez (6 switches, 7 contenedores tipo card, 3 checkboxes…), medido en
   pantalla.

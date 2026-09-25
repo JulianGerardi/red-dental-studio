@@ -11,9 +11,9 @@ export function Page({ titulo, bajada, children }: { titulo: string; bajada?: st
   )
 }
 
-export function Seccion({ titulo, nota, children }: { titulo: string; nota?: string; children: ReactNode }) {
+export function Seccion({ titulo, nota, id, children }: { titulo: string; nota?: string; id?: string; children: ReactNode }) {
   return (
-    <section>
+    <section id={id} className="scroll-mt-6">
       <h2 className="text-[16px] font-semibold">{titulo}</h2>
       {nota && <p className="mt-1 max-w-[70ch] text-[13px] text-ink-muted">{nota}</p>}
       <div className="mt-4">{children}</div>

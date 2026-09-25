@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Page } from './Page'
-import { PaginaDeRecetas, recetas, type Receta } from './Recipes'
+import { PaginaDeRecetas, meta as datos, recetas, type Receta } from './Recipes'
 
 const meta = {
   title: 'Patterns/Cards',
@@ -24,11 +24,11 @@ export const Tarjetas: Story = {
   name: 'Cards',
   render: () => {
     const tarjetas = recetas.filter((r) => r.tipo === 'card')
-    const usos = tarjetas.reduce((n, r) => n + r.cantidad, 0)
+    const usos = datos.elementos.card ?? 0
     return (
       <Page
         titulo="Cards and surfaces"
-        bajada={`Los ${usos} contenedores blancos con borde de la app (bg-white + border + radio): ${tarjetas.length} recetas. Los componentes con nombre -Card, SectionCard, StatCard, PatientCard, OperatoryCard, PendingTaskCard y otros- están en Components; acá está lo que el código arma a mano. Las tarjetas de una misma familia deberían verse igual: los cuadros de consistencia marcan lo que no.`}
+        bajada={`Los ${usos} contenedores blancos con borde de la app (bg-white + border + radio): ${tarjetas.length} looks. Los componentes con nombre -Card, SectionCard, StatCard, PatientCard, OperatoryCard, PendingTaskCard y otros- están en Components; acá está lo que el código arma a mano. Las tarjetas de una misma familia deberían verse igual: los cuadros de consistencia marcan lo que no.`}
       >
         <PaginaDeRecetas
           tipo="card"

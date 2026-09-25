@@ -28,7 +28,7 @@ export const Pastillas: Story = {
     return (
       <Page
         titulo="Pills and badges"
-        bajada={`Las pastillas de estado que el código escribe a mano (${pastillas.length} recetas). La pastilla del sistema es Components / UI / Pill, con seis tonos; acá aparecen las que no la usan y su color se decide por estado.`}
+        bajada={`Las pastillas de estado que el código escribe a mano (${pastillas.length} looks). La pastilla del sistema es Components / UI / Pill, con seis tonos; acá aparecen las que no la usan y su color se decide por estado.`}
       >
         <PaginaDeRecetas tipo="pill" familiaDe={familia} orden={['Success', 'Danger', 'Info', 'Warning', 'Purple', 'Neutral or state-driven']} estados={false} />
       </Page>

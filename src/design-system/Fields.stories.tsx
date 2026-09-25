@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Page } from './Page'
-import { PaginaDeRecetas, recetas, type Receta } from './Recipes'
+import { PaginaDeRecetas, meta as datos, recetas, type Receta } from './Recipes'
 
 const meta = {
   title: 'Patterns/Fields',
@@ -22,13 +22,13 @@ export const Campos: Story = {
   name: 'Fields',
   render: () => {
     const campos = recetas.filter((r) => r.tipo === 'field')
-    const usos = campos.reduce((n, r) => n + r.cantidad, 0)
+    const usos = datos.elementos.field ?? 0
     return (
       <Page
         titulo="Fields"
-        bajada={`Los ${usos} <input>, <select> y <textarea> con estilo propio de la app: ${campos.length} recetas. Los campos de formulario reutilizables viven en Components / Patients / Form fields; acá está lo que el código escribe a mano, con el estado de foco (borde azul), error (borde rojo) y deshabilitado de cada uno.`}
+        bajada={`Los ${usos} <input>, <select> y <textarea> con estilo propio de la app: ${campos.length} looks. Los campos de formulario reutilizables viven en Components / Patients / Form fields; acá está lo que el código escribe a mano, con el estado de foco (borde azul), error (borde rojo) y deshabilitado de cada uno.`}
       >
-        <PaginaDeRecetas tipo="field" familiaDe={familia} orden={['Text input', 'Input with error', 'Select', 'Textarea']} />
+        <PaginaDeRecetas tipo="field" familiaDe={familia} orden={['Text input', 'Input with error', 'Select', 'Textarea']} vista="matriz" />
       </Page>
     )
   },
