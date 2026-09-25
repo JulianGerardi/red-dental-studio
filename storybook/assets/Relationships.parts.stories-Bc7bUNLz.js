@@ -1,0 +1,7 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{i as n,n as r,o as i,r as a,t as o}from"./Relationships-CT1VCD7W.js";var s,c,l,u,d,f;function p(){return(p=e((()=>{i(),s=t(),c={title:`Pages/Parts/Relationships`,parameters:{layout:`padded`}},l={render:()=>(0,s.jsx)(`div`,{className:`w-[640px]`,children:(0,s.jsx)(a,{p:n[0],onEdit:()=>{},onDelete:()=>{}})})},u={render:()=>(0,s.jsx)(`div`,{className:`w-[640px]`,children:(0,s.jsx)(a,{p:o[0]})})},d={render:()=>(0,s.jsx)(`div`,{className:`h-40`,children:(0,s.jsx)(r,{nombre:`Jessica Miller`,onEdit:()=>{},onDelete:()=>{}})})},f=[`RelationCard`,`HouseholdCard`,`RowMenu`],l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="w-[640px]"><PersonaCard p={RELACIONES[0]} onEdit={() => {}} onDelete={() => {}} /></div>
+}`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="w-[640px]"><PersonaCard p={HOUSEHOLD[0]} /></div>
+}`,...u.parameters?.docs?.source}}},d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="h-40"><MenuAcciones nombre="Jessica Miller" onEdit={() => {}} onDelete={() => {}} /></div>
+}`,...d.parameters?.docs?.source}}}})))()}p();export{u as HouseholdCard,l as RelationCard,d as RowMenu,f as __namedExportsOrder,c as default};

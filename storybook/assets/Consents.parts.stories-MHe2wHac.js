@@ -1,3 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,r}from"./Consents-Bg6AJVkN.js";var i,a,o,s;function c(){return(c=e((()=>{r(),i=t(),a={title:`Pages/Parts/Consents`,parameters:{layout:`padded`}},o={render:()=>(0,i.jsx)(`div`,{className:`w-[480px]`,children:(0,i.jsx)(n,{})})},s=[`FormattingToolbar`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="w-[480px]"><ToolbarFormato /></div>
-}`,...o.parameters?.docs?.source}}}})))()}c();export{o as FormattingToolbar,s as __namedExportsOrder,a as default};
