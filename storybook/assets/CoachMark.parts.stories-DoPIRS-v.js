@@ -1,6 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,r}from"./CoachMark-G6qKawlX.js";var i,a,o,s;function c(){return(c=e((()=>{r(),i=t(),a={title:`Components/Help/CoachMark parts`,parameters:{layout:`fullscreen`}},o={render:()=>(0,i.jsxs)(`div`,{className:`relative h-[320px] p-16`,children:[(0,i.jsx)(`button`,{"data-tour":`demo-target`,className:`bg-dash-blue h-9 rounded-md px-4 text-[13px] font-medium text-white`,children:`Target control`}),(0,i.jsx)(n,{anchor:`demo-target`,topicId:`demo`})]})},s=[`SpotlightRing`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="relative h-[320px] p-16">
-      <button data-tour="demo-target" className="bg-dash-blue h-9 rounded-md px-4 text-[13px] font-medium text-white">Target control</button>
-      <Spotlight anchor="demo-target" topicId="demo" />
-    </div>
-}`,...o.parameters?.docs?.source}}}})))()}c();export{o as SpotlightRing,s as __namedExportsOrder,a as default};
