@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { aviso } from './toaster'
+import { Toaster, aviso } from './toaster'
 import { Button } from './button'
 
 const meta = {
   title: 'Components/UI/Toast',
+  component: Toaster,
   parameters: { docs: { description: { component: 'Se dispara con `aviso.ok / error / warn / info`. El `<Toaster />` ya está montado en el preview.' } } },
 } satisfies Meta
 
