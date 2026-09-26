@@ -74,11 +74,14 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     Collapse all). El Playground deja armar una tabla eligiendo columnas y
     funciones; *Reduce, resize and filter* las muestra todas prendidas y *How to
     build a table* explica los pasos con el código.
-    Ya la usan **Patients**, **Team**, **Accounts** y **Locations**
-    (2026-09-26), con `Button` / `buttonClasses()` para su acción principal. Para
-    esas pantallas se sumaron: selección controlada (`selected`,
-    `onSelectedChange`), filas por página (`pageSizeOptions`) y avatar `soft` en
-    `PersonCell`. Documents, Insurance, Billing y las de Clinical todavía no.
+    Ya la usan **Patients**, **Team**, **Accounts**, **Locations**,
+    **Documents**, **Insurance** y **Billing** (2026-09-26), con `Button` /
+    `buttonClasses()` para su acción principal. Para esas pantallas se sumaron:
+    selección controlada (`selected`, `onSelectedChange`), filas por página
+    (`pageSizeOptions`), avatar `soft` en `PersonCell`, `reorder` (manija para
+    reordenar arrastrando o con ↑ ↓; Insurance), filas clickeables con teclado
+    (Billing) y filas que crecen si una celda tiene dos líneas. Las tablas de
+    Clinical (`<table>` nativas) y las del Ledger todavía no.
 - **Components**: las piezas de cada módulo (Dashboard, Layout, Scheduling,
   Patients, Ledger, Settings, Billing, Clinical, Help, UI). *Components /
   Catalog* es el inventario de todos los archivos de `src/components`.

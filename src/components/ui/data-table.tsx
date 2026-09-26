@@ -1,6 +1,6 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, MoveHorizontal, Search, SearchX, type LucideIcon } from 'lucide-react'
+import { ChevronRight, GripVertical, MoveHorizontal, Search, SearchX, type LucideIcon } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { EmptyState } from '@/components/ui/empty-state'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
@@ -33,7 +33,8 @@ export type DataTableColumn<T> = {
   hidden?: boolean
 }
 
-const ALTO_FILA = { regular: 'h-14', compact: 'h-11' } as const
+/* Alto mínimo: una celda con dos líneas agranda la fila en vez de cortarse. */
+const ALTO_FILA = { regular: 'min-h-14 py-2', compact: 'min-h-11 py-1.5' } as const
 const ALINEAR = { left: 'justify-start text-left', center: 'justify-center text-center', right: 'justify-end text-right' } as const
 
 /* Ancho mínimo de la columna que se estira. */
@@ -42,7 +43,7 @@ const GAP = 12
 const PADDING = 32
 
 export function DataTable<T>({
-  columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail,
+  columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail, reorder,
   search, filter, columnPicker, resizable, actions,
   pageSize: pageSizeInicial = 10, pageSizeOptions, pageSizeLabel = 'Rows per page:',
   itemLabel = 'results', density = 'regular', selected, onSelectedChange,
@@ -64,6 +65,9 @@ export function DataTable<T>({
   onRowClick?: (row: T) => void
   /** Detalle que se despliega al hacer clic en la fila, como en el Ledger. */
   rowDetail?: (row: T) => ReactNode
+  /** Manija para reordenar filas arrastrando (o con ↑ ↓ desde el teclado).
+      `canMove` deja fijas las filas que no se pueden mover. */
+  reorder?: { onReorder: (from: T, to: T) => void; canMove?: (row: T) => boolean }
   /** Buscador arriba de la tabla. `match` decide si la fila coincide. */
   search?: { placeholder?: string; match: (row: T, query: string) => boolean }
   /** Filtro por categorías (el embudo). Sin nada tildado, se ve todo. */
@@ -87,8 +91,13 @@ export function DataTable<T>({
   const [pageSize, setPageSize] = useState(pageSizeInicial)
   const [elegidasPropias, setElegidasPropias] = useState<string[]>([])
   const elegidas = selected ?? elegidasPropias
+  /* La última selección, para que dos clics seguidos no se pisen antes de
+     que la tabla vuelva a dibujarse. */
+  const ultima = useRef(elegidas)
+  useLayoutEffect(() => { ultima.current = elegidas })
   const setElegidas = (f: (p: string[]) => string[]) => {
-    const n = f(elegidas)
+    const n = f(ultima.current)
+    ultima.current = n
     if (!selected) setElegidasPropias(n)
     onSelectedChange?.(n)
   }
@@ -96,6 +105,7 @@ export function DataTable<T>({
   const [filtro, setFiltro] = useState<string[]>([])
   const [ocultas, setOcultas] = useState<string[]>(() => columns.filter((c) => c.hidden && !c.locked).map((c) => c.key))
   const [abiertas, setAbiertas] = useState<string[]>([])
+  const arrastrada = useRef<T | null>(null)
   const anchos = useAnchoColumnas<string>(Object.fromEntries(columns.map((c) => [c.key, c.width ?? MIN_FLEX])))
 
   /* Si las filas cambian desde afuera (la pantalla busca o filtra), se vuelve
@@ -142,8 +152,8 @@ export function DataTable<T>({
 
   /* Ancho mínimo: si no entra, la tabla scrollea dentro de su caja en vez de
      aplastar las columnas. */
-  const extras = (selectable ? 16 : 0) + (rowActions ? 40 : 0) + (rowDetail ? 16 : 0)
-  const huecos = visiblesCols.length - 1 + (selectable ? 1 : 0) + (rowActions ? 1 : 0) + (rowDetail ? 1 : 0)
+  const extras = (selectable ? 16 : 0) + (rowActions ? 40 : 0) + (rowDetail ? 16 : 0) + (reorder ? 20 : 0)
+  const huecos = visiblesCols.length - 1 + (selectable ? 1 : 0) + (rowActions ? 1 : 0) + (rowDetail ? 1 : 0) + (reorder ? 1 : 0)
   const minimo = visiblesCols.reduce((a, c) => a + (manual(c) ?? c.width ?? MIN_FLEX), 0) + extras + huecos * GAP + PADDING
 
   const idsAbribles = rowDetail ? ids : []
@@ -193,6 +203,7 @@ export function DataTable<T>({
       <div data-tabla-scroll className="overflow-x-auto rounded-lg border border-line-row bg-white">
         <div style={{ minWidth: minimo }}>
           <div role="row" data-tabla-header className="group/fila flex h-11 items-center gap-3 bg-surface-alt px-4 text-[11px] font-semibold text-ink-muted">
+            {reorder && <span className="w-5 shrink-0" aria-hidden />}
             {rowDetail && <span className="w-4 shrink-0" aria-hidden />}
             {selectable && <Checkbox on={todas} onChange={alternarTodas} label="Select all rows" />}
             {visiblesCols.map((c, i) => (
@@ -218,21 +229,53 @@ export function DataTable<T>({
               const elegida = elegidas.includes(id)
               const abierta = abiertas.includes(id)
               const alHacerClic = rowDetail ? () => alternarAbierta(id) : onRowClick ? () => onRowClick(r) : undefined
+              const movible = reorder && (reorder.canMove?.(r) ?? true)
+              const indice = filtradas.indexOf(r)
+              const mover = (paso: number) => {
+                const destino = filtradas[indice + paso]
+                if (reorder && destino && (reorder.canMove?.(destino) ?? true)) reorder.onReorder(r, destino)
+              }
               return (
-                <div key={id} className="border-t border-line-row">
+                <div
+                  key={id}
+                  className="border-t border-line-row"
+                  onDragOver={reorder ? (e) => e.preventDefault() : undefined}
+                  onDrop={reorder ? () => {
+                    const origen = arrastrada.current
+                    arrastrada.current = null
+                    if (origen && origen !== r && (reorder.canMove?.(r) ?? true)) reorder.onReorder(origen, r)
+                  } : undefined}
+                >
                   <div
                     role="row"
                     aria-selected={selectable ? elegida : undefined}
                     aria-expanded={rowDetail ? abierta : undefined}
-                    tabIndex={rowDetail ? 0 : undefined}
+                    tabIndex={alHacerClic ? 0 : undefined}
                     onClick={alHacerClic ? (e) => { if (!(e.target as HTMLElement).closest('[role="separator"]')) alHacerClic() } : undefined}
-                    onKeyDown={rowDetail ? (e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); alternarAbierta(id) } } : undefined}
+                    onKeyDown={alHacerClic ? (e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); alHacerClic() } } : undefined}
                     className={cn(
                       'group/fila flex items-center gap-3 px-4 text-[13px] text-ink-soft transition-colors focus-visible:outline-none focus-visible:bg-surface-subtle',
                       ALTO_FILA[density],
                       elegida ? 'bg-dash-count-bg' : abierta ? 'bg-surface-subtle' : alHacerClic && 'cursor-pointer hover:bg-surface-subtle',
                     )}
                   >
+                    {reorder && (
+                      movible ? (
+                        <button
+                          type="button"
+                          draggable
+                          onDragStart={() => { arrastrada.current = r }}
+                          onClick={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => {
+                            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); e.stopPropagation(); mover(e.key === 'ArrowUp' ? -1 : 1) }
+                          }}
+                          aria-label={`Reorder ${nombre(r)}. Drag, or use the up and down arrows.`}
+                          className="flex w-5 shrink-0 cursor-grab justify-center rounded text-ink-faint hover:text-ink-muted focus-visible:outline-2 focus-visible:outline-dash-blue active:cursor-grabbing"
+                        >
+                          <GripVertical className="size-4" />
+                        </button>
+                      ) : <span className="w-5 shrink-0" aria-hidden />
+                    )}
                     {rowDetail && <ChevronRight aria-hidden className={cn('size-4 shrink-0 text-ink-faint transition-transform', abierta && 'rotate-90')} />}
                     {selectable && (
                       <span onClick={(e) => e.stopPropagation()} className="flex">

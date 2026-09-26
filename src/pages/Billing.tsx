@@ -13,6 +13,7 @@ import {
 } from '@/data/billing'
 import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
 import { Pill, type PillTone } from '@/components/ui/pill'
+import { AmountCell, DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 4481:9881 "Billing". Ver design-reference/figma/modulos/billing.md.
@@ -45,6 +46,23 @@ function coincideFiltro(m: Movimiento, f: FiltroActividad) {
   if (f === 'Charge Adj') return m.tipo === 'Adjustment' && m.monto > 0
   return m.tipo === 'Adjustment' && m.monto < 0
 }
+
+/* La tabla estándar (ui/data-table) con las columnas de actividad. Compacta:
+   vive adentro de una card. */
+const COLUMNAS: DataTableColumn<Movimiento & { saldo: number }>[] = [
+  { key: 'fecha', header: 'Date', width: 104, cell: (m) => m.fecha },
+  { key: 'paciente', header: 'Patient', width: 124, cell: (m) => <TextCell strong>{m.paciente}</TextCell> },
+  {
+    key: 'tipo', header: 'Type', width: 92, cell: (m) => {
+      const t = detalleTipo(m)
+      return m.tipo === 'Charge' ? t.texto : <Pill tone={t.tono}>{t.texto}</Pill>
+    },
+  },
+  { key: 'desc', header: 'Description', cell: (m) => <TextCell>{m.descripcion}</TextCell> },
+  { key: 'provider', header: 'Provider', width: 124, cell: (m) => <TextCell>{m.provider}</TextCell> },
+  { key: 'monto', header: 'Amount', width: 88, align: 'right', cell: (m) => <AmountCell value={m.monto} /> },
+  { key: 'saldo', header: 'Balance', width: 92, align: 'right', cell: (m) => <span className="font-semibold tabular-nums text-ink">{moneda(m.saldo)}</span> },
+]
 
 const initials = (nombre: string) => nombre.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
 
@@ -159,51 +177,21 @@ export default function Billing() {
             </div>
           )}
 
-          {actividad.length === 0 ? (
-            <EmptyState icon={CreditCard} title="No financial transaction has been posted yet." className="mt-3" />
-          ) : filas.length === 0 ? (
-            <EmptyState icon={CreditCard} title="No entries" detail="Nothing matches the current filter." className="mt-3" />
-          ) : (
-            <div className="mt-4 w-full overflow-x-auto rounded-md border border-line-row">
-              <div className="min-w-[760px]">
-                <div className="flex items-center gap-3 bg-surface-alt px-3 py-2.5 text-[11px] font-semibold text-ink-muted">
-                  <span className="w-[104px] shrink-0">Date</span>
-                  <span className="w-[124px] shrink-0">Patient</span>
-                  <span className="w-[92px] shrink-0">Type</span>
-                  <span className="min-w-[160px] flex-1">Description</span>
-                  <span className="w-[124px] shrink-0">Provider</span>
-                  <span className="w-[88px] shrink-0 text-right">Amount</span>
-                  <span className="w-[92px] shrink-0 text-right">Balance</span>
-                </div>
-                {filas.slice(0, 10).map((m) => {
-                  const t = detalleTipo(m)
-                  return (
-                    <div
-                      key={m.id}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`Select ${m.paciente}`}
-                      onClick={() => setSeleccionado(m.paciente)}
-                      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setSeleccionado(m.paciente)}
-                      className="flex cursor-pointer items-center gap-3 border-t border-line-row px-3 py-2.5 text-[13px] text-ink-soft hover:bg-surface-subtle"
-                    >
-                      <span className="w-[104px] shrink-0">{m.fecha}</span>
-                      <span className="w-[124px] shrink-0 truncate text-ink" title={m.paciente}>{m.paciente}</span>
-                      <span className="w-[92px] shrink-0">{m.tipo === 'Charge' ? t.texto : <Pill tone={t.tono}>{t.texto}</Pill>}</span>
-                      <span className="min-w-[160px] flex-1 truncate" title={m.descripcion}>{m.descripcion}</span>
-                      <span className="w-[124px] shrink-0 truncate" title={m.provider}>{m.provider}</span>
-                      <span className={cn('w-[88px] shrink-0 text-right font-medium tabular-nums', m.monto < 0 ? 'text-dash-ok-fg' : 'text-ink')}>{moneda(m.monto)}</span>
-                      <span className="w-[92px] shrink-0 text-right font-semibold tabular-nums text-ink">{moneda(m.saldo)}</span>
-                    </div>
-                  )
-                })}
-                <div className="flex items-center justify-between border-t border-line-row px-3 py-2.5 text-xs font-semibold text-ink-muted">
-                  <span>Showing {Math.min(10, filas.length)} of {filas.length}</span>
-                  {filas.length > 10 && <button type="button" className="text-dash-blue hover:underline">View More →</button>}
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Clic en una fila elige al paciente y muestra sus saldos arriba. */}
+          <div className="mt-4">
+            <DataTable
+              columns={COLUMNAS}
+              rows={filas}
+              rowKey={(m) => m.id}
+              rowLabel={(m) => m.paciente}
+              onRowClick={(m) => setSeleccionado(m.paciente)}
+              density="compact"
+              itemLabel="entries"
+              empty={actividad.length === 0
+                ? { icon: CreditCard, title: 'No financial transaction has been posted yet.' }
+                : { icon: CreditCard, title: 'No entries', detail: 'Nothing matches the current filter.' }}
+            />
+          </div>
         </div>
 
         <div className="flex flex-col gap-4">

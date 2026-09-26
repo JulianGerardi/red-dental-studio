@@ -1,9 +1,8 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ChevronLeft, GripVertical, CirclePlus, Search, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye } from 'lucide-react'
+import { ChevronLeft, CirclePlus, Search, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { EmptyState } from '@/components/ui/empty-state'
-import { Pagination } from '@/components/patients/ledger/Pagination'
+import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { SelectField, DateTextField, TextArea, OptionCheckbox, FormFooter } from '@/components/patients/form'
@@ -34,17 +33,18 @@ const ESTADO_TONO: Record<PlanPaciente['estado'], PillTone> = {
   Inactive: 'danger',
 }
 
-const COLS = {
-  handle: 'w-8',
-  order: 'w-[92px]',
-  carrier: 'w-[92px]',
-  plan: 'w-[124px]',
-  subscriber: 'w-[128px]',
-  relation: 'w-[92px]',
-  coverage: 'w-[148px]',
-  priority: 'w-[150px]',
-  status: 'w-[92px]',
-}
+/* La tabla estándar (ui/data-table) con las columnas de planes, con los
+   anchos de antes. Los períodos pueden ocupar dos líneas: la fila crece. */
+const COLUMNAS: DataTableColumn<PlanPaciente>[] = [
+  { key: 'order', header: 'Order', width: 92, cell: (p) => <Pill tone={ORDEN_TONO}>{p.orden}</Pill> },
+  { key: 'carrier', header: 'Carrier', width: 92, cell: (p) => <TextCell>{p.carrier}</TextCell> },
+  { key: 'plan', header: 'Plan', width: 124, cell: (p) => <TextCell>{p.plan}</TextCell> },
+  { key: 'subscriber', header: 'Subscriber', width: 128, cell: (p) => <TextCell>{p.subscriber}</TextCell> },
+  { key: 'relation', header: 'Relation', width: 92, cell: (p) => <Pill tone={RELACION_TONO[p.relacion]}>{p.relacion}</Pill> },
+  { key: 'coverage', header: 'Coverage Period', width: 148, cell: (p) => <span className="leading-tight">{p.cobertura}</span> },
+  { key: 'priority', header: 'Priority Period', width: 150, cell: (p) => <span className="flex flex-col gap-0.5 leading-tight">{p.prioridad.map((t) => <span key={t}>{t}</span>)}</span> },
+  { key: 'status', header: 'Status', width: 92, cell: (p) => <Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill> },
+]
 
 export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
@@ -86,16 +86,15 @@ export default function Insurance() {
   const set = (k: keyof typeof d) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? 'This field is required.' : undefined)
 
-  /* Las filas llevan grip: se reordenan arrastrando. */
-  const arrastrada = useRef<number | null>(null)
-  const soltar = (destino: number) => {
-    const origen = arrastrada.current
-    arrastrada.current = null
-    if (origen === null || origen === destino) return
+  /* Las filas llevan grip: se reordenan arrastrando (o con ↑ ↓). Sólo los
+     planes vigentes; los del historial quedan fijos al final. */
+  const reordenar = (origen: PlanPaciente, destino: PlanPaciente) => {
     setPlanes((prev) => {
-      const copia = [...prev]
-      const [fila] = copia.splice(origen, 1)
-      copia.splice(destino, 0, fila)
+      const copia = prev.filter((p) => p.id !== origen.id)
+      const i = copia.findIndex((p) => p.id === destino.id)
+      const deOrigen = prev.findIndex((p) => p.id === origen.id)
+      const deDestino = prev.findIndex((p) => p.id === destino.id)
+      copia.splice(deOrigen < deDestino ? i + 1 : i, 0, origen)
       return copia
     })
     aviso.ok('Plan order updated.')
@@ -137,62 +136,16 @@ export default function Insurance() {
           </div>
 
           {/* Tabla de planes */}
-          <div className="mt-4 overflow-x-auto rounded-lg border border-line-row bg-white">
-            <div className="min-w-[960px]">
-              <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
-                <span className={COLS.handle} />
-                <span className={COLS.order}>Order</span>
-                <span className={COLS.carrier}>Carrier</span>
-                <span className={COLS.plan}>Plan</span>
-                <span className={COLS.subscriber}>Subscriber</span>
-                <span className={COLS.relation}>Relation</span>
-                <span className={COLS.coverage}>Coverage Period</span>
-                <span className={COLS.priority}>Priority Period</span>
-                <span className={COLS.status}>Status</span>
-              </div>
-
-              {visibles.length === 0 ? (
-                <EmptyState icon={CreditCard} title="No plans yet" detail="Add a subscription to start tracking this patient's coverage." />
-              ) : (
-                visibles.map((p, i) => (
-                  <div
-                    key={p.id}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={() => soltar(i)}
-                    className="flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft"
-                  >
-                    <span
-                      draggable
-                      onDragStart={() => { arrastrada.current = i }}
-                      aria-label={`Reorder ${p.plan}`}
-                      className={cn(COLS.handle, 'cursor-grab text-ink-faint active:cursor-grabbing')}
-                    >
-                      <GripVertical className="size-4" />
-                    </span>
-                    <span className={COLS.order}><Pill tone={ORDEN_TONO}>{p.orden}</Pill></span>
-                    <span className={COLS.carrier}>{p.carrier}</span>
-                    <span className={COLS.plan}>{p.plan}</span>
-                    <span className={COLS.subscriber}>{p.subscriber}</span>
-                    <span className={COLS.relation}><Pill tone={RELACION_TONO[p.relacion]}>{p.relacion}</Pill></span>
-                    <span className={COLS.coverage}>{p.cobertura}</span>
-                    <span className={cn(COLS.priority, 'flex flex-col gap-0.5 leading-tight')}>
-                      {p.prioridad.map((t) => <span key={t}>{t}</span>)}
-                    </span>
-                    <span className={COLS.status}><Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill></span>
-                  </div>
-                ))
-              )}
-
-              {/* El Figma dice "8 of 8" con cuatro filas a la vista; el
-                  contador ahora cuenta las que hay. La paginación dibujada
-                  no tenía onClick: se usa el componente compartido. */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
-                <span className="text-xs font-semibold text-ink-muted">
-                  Showing {visibles.length} of {visibles.length} insurances
-                </span>
-                <Pagination pagina={1} paginas={1} onChange={() => {}} />
-              </div>
-            </div>
+          <div className="mt-4">
+            <DataTable
+              columns={COLUMNAS}
+              rows={visibles}
+              rowKey={(p) => p.id}
+              rowLabel={(p) => p.plan}
+              reorder={{ onReorder: reordenar, canMove: (p) => planes.some((x) => x.id === p.id) }}
+              itemLabel="insurances"
+              empty={{ icon: CreditCard, title: 'No plans yet', detail: "Add a subscription to start tracking this patient's coverage." }}
+            />
           </div>
 
           {/* Suscripción + datos del paciente */}

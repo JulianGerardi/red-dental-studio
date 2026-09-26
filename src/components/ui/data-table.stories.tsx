@@ -50,6 +50,7 @@ type Args = {
   columnPicker: boolean
   resizable: boolean
   expandable: boolean
+  reorderable: boolean
   selectable: boolean
   rowActions: boolean
   primaryAction: boolean
@@ -79,7 +80,7 @@ const meta = {
   },
   args: {
     columns: ['Name', 'Email', 'Status', 'Balance'], rows: 24,
-    search: true, filter: true, columnPicker: true, resizable: true, expandable: false,
+    search: true, filter: true, columnPicker: true, resizable: true, expandable: false, reorderable: false,
     selectable: true, rowActions: true, primaryAction: true, clickableRows: false,
     density: 'regular', pageSize: 10, itemLabel: 'patients',
   },
@@ -91,11 +92,12 @@ const meta = {
     columnPicker: { control: 'boolean', description: 'Botón Columns para ocultar columnas. Full name no se puede ocultar.', table: { category: 'Reduce, resize and filter' } },
     resizable: { control: 'boolean', description: 'Arrastrá el borde de una columna para achicarla o ensancharla. Doble clic la devuelve a su ancho.', table: { category: 'Reduce, resize and filter' } },
     expandable: { control: 'boolean', description: 'Clic en la fila despliega el detalle, con Expand / Collapse all.', table: { category: 'Reduce, resize and filter' } },
+    reorderable: { control: 'boolean', description: 'Manija para reordenar filas arrastrando (o con ↑ ↓), como los planes de Insurance.' },
     selectable: { control: 'boolean', description: 'Casilla por fila y "seleccionar todo".' },
     rowActions: { control: 'boolean', description: 'Menú ⋮ con Edit y Delete en cada fila.' },
     primaryAction: { control: 'boolean', description: 'Botón New patient a la derecha de la barra.' },
     clickableRows: { control: 'boolean', description: 'La fila entera abre el detalle (sin expandir).' },
-    density: { control: 'inline-radio', options: ['regular', 'compact'], description: 'regular 56px por fila · compact 44px.' },
+    density: { control: 'inline-radio', options: ['regular', 'compact'], description: 'regular 56px por fila · compact 44px. La fila crece si una celda tiene dos líneas.' },
     pageSize: { control: 'inline-radio', options: [5, 10, 20], description: 'Filas por página.' },
     itemLabel: { control: 'text', description: 'Qué se cuenta en el pie.' },
   },
@@ -117,8 +119,17 @@ function Detalle({ p }: { p: Paciente }) {
   )
 }
 
-function Armada({ columns, rows, search, filter, columnPicker, resizable, expandable, selectable, rowActions, primaryAction, clickableRows, density, pageSize, itemLabel }: Args) {
+function Armada({ columns, rows, search, filter, columnPicker, resizable, expandable, reorderable, selectable, rowActions, primaryAction, clickableRows, density, pageSize, itemLabel }: Args) {
   const [abierta, setAbierta] = useState<string | null>(null)
+  const [orden, setOrden] = useState(PACIENTES)
+  const reordenar = (origen: Paciente, destino: Paciente) =>
+    setOrden((prev) => {
+      const de = prev.indexOf(origen)
+      const a = prev.indexOf(destino)
+      const copia = prev.filter((p) => p !== origen)
+      copia.splice(copia.indexOf(destino) + (de < a ? 1 : 0), 0, origen)
+      return copia
+    })
   /* En el orden lógico, no en el orden en que se tildaron. */
   const cols = NOMBRES_COLUMNAS.filter((c) => columns.includes(c)).map((c) => COLUMNAS[c]!)
   return (
@@ -126,7 +137,7 @@ function Armada({ columns, rows, search, filter, columnPicker, resizable, expand
       <DataTable
         key={`${pageSize}-${rows}-${cols.map((c) => c.key).join()}`}
         columns={cols.length ? cols : [COLUMNAS.Name!]}
-        rows={PACIENTES.slice(0, rows)}
+        rows={orden.slice(0, rows)}
         rowKey={(p) => p.id}
         rowLabel={(p) => p.nombre}
         search={search ? BUSQUEDA : undefined}
@@ -134,6 +145,7 @@ function Armada({ columns, rows, search, filter, columnPicker, resizable, expand
         columnPicker={columnPicker}
         resizable={resizable}
         rowDetail={expandable ? (p) => <Detalle p={p} /> : undefined}
+        reorder={reorderable ? { onReorder: reordenar } : undefined}
         selectable={selectable}
         rowActions={rowActions ? () => (
           <>
@@ -155,7 +167,7 @@ function Armada({ columns, rows, search, filter, columnPicker, resizable, expand
 
 const BASE: Args = {
   columns: ['Name', 'Email', 'Status'], rows: 6,
-  search: false, filter: false, columnPicker: false, resizable: false, expandable: false,
+  search: false, filter: false, columnPicker: false, resizable: false, expandable: false, reorderable: false,
   selectable: false, rowActions: false, primaryAction: false, clickableRows: false,
   density: 'regular', pageSize: 10, itemLabel: 'patients',
 }
@@ -269,7 +281,7 @@ export const Specs: Story = {
         <Tabla encabezado={['Part', 'Height', 'Fill', 'Text', 'Divider']} minimo={760}>
           <tr><td className="font-semibold">Container</td><td>—</td><td><Token nombre="white" /></td><td>—</td><td><Token nombre="line-row" /> · radius 8px</td></tr>
           <tr><td className="font-semibold">Header row</td><td className="tabular-nums">44px</td><td><Token nombre="surface-alt" /></td><td><Token nombre="ink-muted" /> 11px Semibold</td><td>—</td></tr>
-          <tr><td className="font-semibold">Row</td><td className="tabular-nums">56px · 44px compact</td><td><Token nombre="white" /></td><td><Token nombre="ink-soft" /> 13px</td><td><Token nombre="line-row" /></td></tr>
+          <tr><td className="font-semibold">Row</td><td className="tabular-nums">56px · 44px compact (grows if a cell has two lines)</td><td><Token nombre="white" /></td><td><Token nombre="ink-soft" /> 13px</td><td><Token nombre="line-row" /></td></tr>
           <tr><td className="font-semibold">Selected row</td><td>—</td><td><Token nombre="dash-count-bg" /></td><td>—</td><td>—</td></tr>
           <tr><td className="font-semibold">Footer</td><td className="tabular-nums">52px</td><td><Token nombre="white" /></td><td><Token nombre="ink-muted" /> 12px Semibold</td><td><Token nombre="line-row" /></td></tr>
         </Tabla>
