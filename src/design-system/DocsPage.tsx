@@ -30,7 +30,10 @@ export function DocsPage() {
 
   const componente = useArchivo(rutaComponente)
   const stories = useArchivo(rutaStories)
-  const nota = componente ? comentarioDe(componente) : ''
+  /* Si la página ya trae su descripción (Elements), la nota del código la
+     repetiría. */
+  const tieneDescripcion = !!(historia?.parameters?.docs as { description?: { component?: string } } | undefined)?.description?.component
+  const nota = componente && !tieneDescripcion ? comentarioDe(componente) : ''
 
   return (
     <>

@@ -25,59 +25,51 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
 
 ## Estructura del sidebar
 
-- **Welcome**: qué es y cómo se usa.
-- **Foundations**: Colors, Typography, Radius and shadows, Color audit. Todo
-  calculado leyendo `src/index.css` y el código fuente.
-- **Components**: 109 de los 115 archivos de `src/components` tienen su story
-  (223 stories en total), agrupados por módulo: UI (los 24 primitivos, con
-  props por autodocs), Dashboard, Layout, Scheduling, Patients, Ledger,
-  Settings, Billing, Clinical (con Dental) y Help. Los 6 restantes manipulan
-  el DOM de la librería del odontograma y se ven dentro de
-  *Clinical / DentalAssessmentExam* (`src/design-system/exentos.json`).
-- **Components / Catalog**: inventario de *todos* los archivos de
-  `src/components`, leído del código: qué exportan, dónde se usan, si tienen
-  story y la nota de diseño que cada uno trae en el encabezado.
-- **Patterns**: lo que el código arma a mano y no es un componente con nombre.
-  *Buttons, Fields, Cards, Pills and badges* y *Tables* se generan leyendo el
-  código con el compilador de TypeScript (`scripts/scan-recipes.mjs`).
-  - Se lee cada `className`, incluidos los condicionales (`cond ? 'a' : 'b'`,
-    `cond && 'x'`, `cn()`, `clsx({})`, plantillas): **cada rama es un look
-    aparte**, nunca se mezclan las dos, y las clases que se pisan se resuelven
-    con `twMerge` como en la app. Cada look guarda la condición que lo activa.
-  - **Buttons** y **Fields** son páginas cortas con el mismo orden, para
-    leerlas de arriba a abajo: *Types and states* (el look más usado de cada
-    tipo en cada estado; “—” = el código no define ese estado), *Measures*
-    (alto, padding, texto, radio, relleno, color y borde, leídos de las muestras
-    ya dibujadas), *Sizes in use* (cuántos elementos usan cada valor; más de un
-    valor = inconsistencia), *Colors in use* (los tokens de relleno, texto y
-    borde, con su hex y cantidad) y *States in the app* (qué % define cada
-    estado, con qué clases y qué falta). Todas las variantes que el código
-    dibuja quedan en un bloque plegado al final, con búsqueda y filtro por
-    estado faltante. El código está en `src/design-system/spec.tsx`.
-  - Un foco sin definir se dibuja con el anillo por defecto del navegador; un
-    foco que la app saca sin poner otro (`outline-none` y nada más) o que
-    declara pero no se ve (`outline-none` con `focus-visible:outline-2`) se
-    cuenta aparte.
-  - **Tables** mide cada tabla sobre la pantalla real: abre su story en un
-    iframe oculto y lee el DOM y los estilos calculados (`tables-measure.ts`).
-    Las columnas, la construcción (`<table>` o filas de `div`), el radio y el
-    borde del contenedor, el encabezado, la fila, el divisor y las funciones
-    visibles (selección, menú de fila, pastillas, paginación, arrastre,
-    columnas redimensionables) salen de esa medición, y una tabla compara
-    todas contra el valor más común. Lo único escrito a mano es para qué
-    sirve cada tabla.
-  *Duplicates and inconsistencies* pone lado a lado lo que la app resuelve más
-  de una vez (6 switches, 7 contenedores tipo card, 3 checkboxes…), medido en
-  pantalla.
-- **Foundations / States**: cómo dibuja el código cada estado (hover, foco,
-  active, disabled, invalid): todas las clases con su cantidad de usos.
-- **Foundations / Documentation coverage**: lo que falta documentar, calculado
-  del código (ver "Cómo se mide" abajo).
-- **Pages**: las 30 pantallas de la app, montadas con las rutas reales. Las
-  piezas internas de cada pantalla (tarjetas, filas, pestañas, diálogos) están
+- **Welcome**: qué es, cómo está ordenado y cómo probar un elemento.
+- **Foundations**: Colors, Typography, Radius and shadows. Todo calculado
+  leyendo `src/index.css`.
+- **Elements**: las piezas estándar para armar pantallas. Cada una es un
+  componente real de la app y su página tiene el mismo orden: **Playground**
+  (se personaliza desde el panel *Controls*; *Show code* da el código),
+  variantes o tipos, estados, y **Specs** (medidas leídas del componente
+  dibujado y colores leídos de sus clases y de `src/index.css`).
+  - **Buttons** — `src/components/ui/button.tsx`. Variantes `primary`,
+    `secondary`, `ghost`, `link`, `destructive` (el look más usado en el código
+    para cada tipo) y tamaños `sm` 28 · `md` 32 · `lg` 36 (las tres alturas más
+    usadas). Resuelve una sola vez hover, presionado, foco con teclado (anillo
+    de 2px del color de la variante: rojo en destructive), deshabilitado y
+    cargando (`loading`).
+  - **Fields** — `src/components/patients/form.tsx` (TextField, SelectField,
+    SearchField, DateTextField, TextArea, OptionCheckbox). Todos comparten el
+    mismo aspecto (`control()`): foco azul, error rojo con mensaje, y ahora
+    `disabled` y `hint` (texto de ayuda).
+  - **Pills** — `src/components/ui/pill.tsx`, con *Statuses in the app*: qué
+    estado usa qué tono, leído del código, marcando los que usan dos tonos.
+  - **Cards** — `src/components/ui/card.tsx` (Card, CardHeader, CardTitle,
+    CardDescription, CardContent, CardFooter): qué es una card, Playground
+    para armarla, anatomía y las cards reales de la app.
+  - **Tables** — `src/components/ui/data-table.tsx`: la tabla estándar
+    (barra → encabezado → filas → pie) armada con columnas y filas; selección,
+    menú de fila, paginación, densidad y estado vacío se prenden con props. El
+    Playground deja armar una tabla eligiendo columnas y funciones, y *How to
+    build a table* explica los tres pasos con el código.
+- **Components**: las piezas de cada módulo (Dashboard, Layout, Scheduling,
+  Patients, Ledger, Settings, Billing, Clinical, Help, UI). *Components /
+  Catalog* es el inventario de todos los archivos de `src/components`.
+- **Pages**: las 30 pantallas, con las rutas reales. Sus piezas internas están
   en **Pages / Parts**.
+- **Audit**: para quien migra código, lo que la app hace hoy y se aparta del
+  estándar. *Colors in code* (colores sin token), *Buttons / Fields / Cards /
+  Pills in code* (tamaños, colores y estados en uso, con todas las variantes
+  que el código dibuja), *Tables in the app* (cada tabla medida en pantalla y
+  comparada), *States in code*, *Duplicates* y *Documentation coverage*. Estas
+  páginas se generan leyendo el código (`scripts/scan-recipes.mjs`, que lee
+  cada rama de un condicional como un look aparte).
 
-Las 394 stories se abrieron una por una en el navegador: ninguna da error.
+Los componentes estándar (Button, DataTable, las partes de Card) todavía no
+reemplazan a los `<button>` y tablas escritos a mano en las pantallas: la
+migración es un paso aparte. *Documentation coverage* lista qué exportados no
+usa todavía la app.
 
 ## Interfaz de Storybook
 
@@ -118,7 +110,7 @@ Además informa los **15 componentes exportados que ninguna pantalla usa**
 `ui/card`): siguen documentados, pero son candidatos a borrarse o conectarse.
 
 `hover`, `focus` y `active` no llevan story propio: se ven con el addon de
-pseudo-estados (`storybook-addon-pseudo-states`) en cada tarjeta de Patterns.
+pseudo-estados (`storybook-addon-pseudo-states`) en las páginas de Elements.
 
 **Cada página Docs muestra el código** (`src/design-system/DocsPage.tsx`): la nota
 de diseño del encabezado del archivo, el componente, sus controles, y al final

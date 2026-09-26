@@ -105,6 +105,11 @@ type Borrador = {
 }
 
 const BORRADOR_VACIO: Borrador = { titulo: '', procedimientos: [], naturaleza: '', riesgos: '' }
+
+/* Guía para quien redacta el template: va en el editor, no en la hoja que ve
+   el paciente. */
+const GUIA_NATURALEZA = 'Describe the proposed treatment, what the procedure involves, expected outcomes, and other relevant information the patient should understand before treatment.'
+const GUIA_RIESGOS = 'Describe the material risks, potential complications, and other relevant considerations associated with the proposed treatment.'
 const aBorrador = (t: ConsentTemplate): Borrador => ({
   titulo: t.titulo, procedimientos: t.procedimientos, naturaleza: t.naturaleza, riesgos: t.riesgos,
 })
@@ -402,6 +407,7 @@ export function SettingsConsents() {
                   placeholder="Describe the procedure in plain language..."
                   className="focus:border-dash-blue w-full resize-none rounded-md border border-line bg-white px-3 py-2 text-[13px] placeholder:text-ink-faint focus:outline-none"
                 />
+                <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_NATURALEZA}</span>
               </label>
               <label className="flex flex-col gap-1.5">
                 <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Risk and complications</span>
@@ -412,6 +418,7 @@ export function SettingsConsents() {
                   placeholder={'One risk per line...'}
                   className="focus:border-dash-blue w-full resize-none rounded-md border border-line bg-white px-3 py-2 text-[13px] placeholder:text-ink-faint focus:outline-none"
                 />
+                <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_RIESGOS}</span>
               </label>
             </div>
           </div>

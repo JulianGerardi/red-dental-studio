@@ -18,11 +18,6 @@ const RECONOCIMIENTOS_PACIENTE = [
 ]
 const AVISO_RECONOCIMIENTOS = 'All acknowledgment checkboxes must be completed before the patient can sign the consent.'
 
-/* Texto guía de cada bloque editable: se muestra siempre, en cursiva, debajo
-   del contenido del template. */
-const GUIA_NATURALEZA = 'Describe the proposed treatment, what the procedure involves, expected outcomes, and other relevant information the patient should understand before treatment.'
-const GUIA_RIESGOS = 'Describe the material risks, potential complications, and other relevant considerations associated with the proposed treatment.'
-
 /* Fechas de ejemplo -no vienen del template, son del envío y de la cita del
    paciente-. */
 const CONSENT_ENVIADO = 'September 23, 2026 — 10:30 AM'
@@ -38,8 +33,6 @@ export function Seccion({ titulo, children }: { titulo: string; children: React.
     </section>
   )
 }
-
-const Guia = ({ children }: { children: React.ReactNode }) => <p className="mt-1.5 text-[11px] leading-snug text-ink-faint italic">{children}</p>
 
 /* Casilla del recuadro de datos: rótulo con ícono arriba, valor abajo. */
 export function Campo({ icono: Icono, etiqueta, children }: { icono: LucideIcon; etiqueta: string; children: React.ReactNode }) {
@@ -110,7 +103,6 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, vi
 
       <Seccion titulo="Nature of procedure">
         {naturaleza ? <p>{naturaleza}</p> : vacio}
-        <Guia>{GUIA_NATURALEZA}</Guia>
       </Seccion>
 
       <Seccion titulo="Risk and complications">
@@ -119,7 +111,6 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, vi
             {lineasRiesgo.map((linea, i) => <li key={i}>{linea}</li>)}
           </ul>
         ) : vacio}
-        <Guia>{GUIA_RIESGOS}</Guia>
       </Seccion>
 
       <Seccion titulo="Patient acknowledgment">

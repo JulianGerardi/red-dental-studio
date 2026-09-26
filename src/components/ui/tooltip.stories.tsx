@@ -14,7 +14,7 @@ export const Default: Story = {
   render: () => (
     <div className="p-16">
       <Tooltip defaultOpen>
-        <TooltipTrigger asChild><Button variant="outline">Hover me</Button></TooltipTrigger>
+        <TooltipTrigger asChild><Button variant="secondary">Hover me</Button></TooltipTrigger>
         <TooltipContent side="right">Dashboard</TooltipContent>
       </Tooltip>
     </div>
@@ -27,7 +27,7 @@ export const WithProviderDelay: Story = {
     <TooltipProvider delayDuration={400}>
       <div className="p-16">
         <Tooltip>
-          <TooltipTrigger asChild><Button variant="outline">Hover, waits 400 ms</Button></TooltipTrigger>
+          <TooltipTrigger asChild><Button variant="secondary">Hover, waits 400 ms</Button></TooltipTrigger>
           <TooltipContent>Delayed tooltip</TooltipContent>
         </Tooltip>
       </div>

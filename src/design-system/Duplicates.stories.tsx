@@ -26,7 +26,7 @@ import { Codigo, Page, Seccion } from './Page'
    dibuja con su código real y se mide en pantalla (tamaño, radio, borde,
    fondo), así las diferencias salen del DOM y no de una descripción. */
 const meta = {
-  title: 'Patterns/Duplicates and inconsistencies',
+  title: 'Audit/Duplicates',
   tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta

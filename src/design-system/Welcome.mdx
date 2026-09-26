@@ -2,13 +2,26 @@ import { Meta } from '@storybook/addon-docs/blocks'
 
 <Meta title="Welcome" />
 
-# Red Dental Studio design system
+# Confidentally design system
 
-Este design system **no es una copia** de la app: lee el mismo código.
+Este design system **no es una copia** de la app: lee el mismo código. Si cambiás un color o un componente en la app, cambia acá.
 
-- **Los tokens** (colores, radios, sombras, tipografía) salen de `src/index.css`. Si cambiás un valor ahí, cambia la app y cambia esta documentación.
-- **Los componentes** de cada story se importan de `src/components`. Si cambiás un botón, cambia acá.
-- **Las auditorías** (colores escritos a mano, tamaños de texto, radios) se calculan leyendo el código fuente en cada build.
+## Cómo está ordenado
+
+| Sección | Qué hay | Para qué |
+|---|---|---|
+| **Foundations** | Colores, tipografía, radios y sombras. | Los valores base, leídos de `src/index.css`. |
+| **Elements** | Buttons, Fields, Pills, Cards y Tables. | Las piezas estándar para armar pantallas. Cada una tiene un **Playground** para personalizarla y probarla, sus estados, sus medidas y sus colores. |
+| **Components** | Las piezas de cada módulo (Dashboard, Patients, Scheduling, Clinical…). | Ver y probar cada componente de la app por separado. |
+| **Pages** | Las 30 pantallas de la app. | Ver cada pantalla completa, con sus rutas reales. |
+| **Audit** | Colores sin token, estados, duplicados, cobertura y lo que el código hace hoy. | Para quien migra código: qué se aparta del estándar. |
+
+## Cómo probar un elemento
+
+1. Abrí un elemento en **Elements**, por ejemplo *Buttons*.
+2. Entrá a **Playground**.
+3. En el panel **Controls** (abajo o a la derecha) cambiá variante, tamaño, texto, estado… El elemento cambia en vivo.
+4. **Show code** muestra el código de lo que armaste, listo para copiar.
 
 ## Qué se actualiza solo y qué no
 
@@ -16,13 +29,13 @@ Este design system **no es una copia** de la app: lee el mismo código.
 |---|---|
 | Cambiás un token en `src/index.css` | Se actualiza solo. |
 | Cambiás un componente existente | Se actualiza solo. |
-| Cambiás un color escrito a mano (`text-ink`) | Cambia solo ese lugar. Por eso conviene pasarlos a tokens: ver *Foundations / Color audit*. |
+| Cambiás un color escrito a mano (`text-[#09090b]`) | Cambia solo ese lugar. Por eso conviene pasarlos a tokens: ver *Audit / Colors in code*. |
 | Agregás un componente nuevo | Hay que crear su `.stories.tsx`. `npm run ds:coverage` lista los que faltan. |
 
-## Cómo se usa
+## Comandos
 
 ```bash
 npm run storybook        # abre el design system en localhost:6006
-npm run ds:coverage      # componentes de la app que todavía no tienen story
+npm run ds:coverage      # lo que todavía no tiene story
 npm run build-storybook  # versión estática
 ```

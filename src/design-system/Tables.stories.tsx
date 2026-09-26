@@ -37,7 +37,7 @@ const DEL_CODIGO: [string, RegExp][] = [
 ]
 
 const meta = {
-  title: 'Patterns/Tables',
+  title: 'Audit/Tables in the app',
   tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta
@@ -157,7 +157,7 @@ function Anatomia({ medidas }: { medidas: Record<string, Resultado> }) {
       <p><b className="text-ink">Rows.</b> {moda(filas.map((m) => m.fila!.texto))} text in <Codigo>{moda(filas.map((m) => m.fila!.color))}</Codigo>, divided by <Codigo>{moda(filas.map((m) => m.fila!.divisor))}</Codigo>. Row height is not fixed: it goes from {Math.min(...filas.map((m) => m.fila!.alto))}px to {Math.max(...filas.map((m) => m.fila!.alto))}px because each table sets its own vertical padding.</p>
       <p><b className="text-ink">Cells.</b> Plain text; avatar with initials next to a name; <Codigo>Pill</Codigo> for a status; a checkbox for selection; <Codigo>RowActionsMenu</Codigo> for row actions. Which of these a table has is measured per table below.</p>
       <p><b className="text-ink">Footer.</b> Most tables close with a “Showing X of N” counter, some with <Codigo>Pagination</Codigo>. With no rows they show <Codigo>EmptyState</Codigo>.</p>
-      <p><b className="text-ink">Toolbar.</b> Above the container, not inside it: search, a filter and the main action (see Patterns / Buttons, Primary). It belongs to the screen, so it only appears in the page stories.</p>
+      <p><b className="text-ink">Toolbar.</b> Above the container, not inside it: search, a filter and the main action (see Elements / Buttons, Primary). It belongs to the screen, so it only appears in the page stories.</p>
     </div>
   )
 }

@@ -3,7 +3,7 @@ import { Page } from './Page'
 import { PaginaDeRecetas, recetas, type Receta } from './Recipes'
 
 const meta = {
-  title: 'Patterns/Pills and badges',
+  title: 'Audit/Pills in code',
   tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta

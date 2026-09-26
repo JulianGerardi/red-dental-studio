@@ -313,6 +313,8 @@
   --color-dash-busy-bg: #f0f2ff;
   --color-dash-bad-fg: #b22626;
   --color-dash-bad-bg: #fff2f2;
+  /* Hover del botón destructivo (Delete, Discard). */
+  --color-dash-bad-hover: #961f1f;
   --color-dash-bad-chip: #fbe5e5;
   --color-dash-count-bg: #e8ecf7;
 

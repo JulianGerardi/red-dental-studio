@@ -6,7 +6,7 @@ import { Codigo, Page, Seccion } from './Page'
    scripts/ds-coverage.mjs. Es lo que hace que "todo documentado" se pueda
    medir: si algo falta, acá aparece en rojo. */
 const meta = {
-  title: 'Foundations/Documentation coverage',
+  title: 'Audit/Documentation coverage',
   tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta
@@ -52,7 +52,7 @@ export const Cobertura: Story = {
           </div>
         </Seccion>
 
-        <Seccion titulo="States matrix" nota="Cada componente con story y los estados que su código soporta. Hover y foco se ven con Patterns / Buttons y los stories con pseudo-estados; acá van los que cambian el contenido o la interacción.">
+        <Seccion titulo="States matrix" nota="Cada componente con story y los estados que su código soporta. Hover y foco se ven en Elements / Buttons y Elements / Fields; acá van los que cambian el contenido o la interacción.">
           <div className="overflow-x-auto rounded-lg border border-line">
             <table className="w-full text-left text-[12px]">
               <thead className="bg-surface-subtle text-[11px] tracking-wide text-ink-muted uppercase">

@@ -6,7 +6,7 @@ import { Codigo, Page, Seccion } from './Page'
    hover, foco, active y disabled con la cantidad de veces que se usan. Un
    mismo estado dibujado de cinco maneras distintas se ve acá, en la tabla. */
 const meta = {
-  title: 'Foundations/States',
+  title: 'Audit/States in code',
   tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false }, pseudo: {} },
 } satisfies Meta
@@ -57,7 +57,7 @@ export const Estados: Story = {
   render: () => (
     <Page
       titulo="States"
-      bajada="Los estados de un control y las clases con las que la app los dibuja hoy. Para ver un estado aplicado a un componente concreto, usá Patterns / Buttons (cada receta muestra hover, foco, active y disabled) y los stories Disabled, WithValidationErrors, Empty y Selected de cada componente."
+      bajada="Los estados de un control y las clases con las que la app los dibuja hoy. Para ver un estado aplicado a un componente concreto, usá Elements / Buttons y Elements / Fields y los stories Disabled, WithValidationErrors, Empty y Selected de cada componente."
     >
       {ESTADOS.map((e) => (
         <Seccion key={e.prefijo} titulo={e.titulo} nota={e.nota}>

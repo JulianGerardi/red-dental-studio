@@ -1,5 +1,5 @@
 /* Mide una tabla ya dibujada: abre su story en un iframe y lee el DOM y los
-   estilos calculados. Así lo que dice Patterns / Tables sale de lo que la app
+   estilos calculados. Así lo que dice Audit / Tables in the app sale de lo que la app
    dibuja hoy, no de una descripción escrita a mano que se desactualiza. */
 
 export type Medida = {

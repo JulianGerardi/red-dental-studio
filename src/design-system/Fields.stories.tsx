@@ -1,85 +1,201 @@
+import { useLayoutEffect, useRef, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Page, Seccion } from './Page'
-import { elementosDe, esBuscador, esCasilla, esOculto, meta as datos, recetas, sinBorde, type Receta } from './Recipes'
-import { ColoresEnUso, EstadosDeLaApp, MedidasDeTipos, ROLES_COLOR, TamanosEnUso, TiposConEstados, TodoLoEncontrado, type Tipo } from './spec'
+import { DateTextField, OptionCheckbox, SearchField, SelectField, TextArea, TextField } from '@/components/patients/form'
+import { Bloque, Lienzo, Swatch, Tabla, useMedidas } from './kit'
+import { cn } from '@/lib/utils'
+import { hex } from './medir'
+
+/* Los campos de formulario de la app (src/components/patients/form.tsx): los
+   que usan todas las pantallas con formulario. Esta página los muestra tal
+   cual y deja probarlos. */
+
+type Tipo = 'Text' | 'Select' | 'Search' | 'Date' | 'Textarea' | 'Checkbox'
+type Estado = 'default' | 'focus'
+type Args = {
+  type: Tipo
+  label: string
+  placeholder: string
+  value: string
+  hint: string
+  error: string
+  required: boolean
+  disabled: boolean
+  state: Estado
+}
+
+const OPCIONES = ['Female', 'Male', 'Other']
 
 const meta = {
-  title: 'Patterns/Fields',
-  tags: ['!autodocs'],
-  parameters: { layout: 'fullscreen', options: { showPanel: false } },
-} satisfies Meta
+  title: 'Elements/Fields',
+  component: TextField,
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        component: [
+          'Los campos de formulario de la app (`@/components/patients/form`). Todos comparten el mismo aspecto: rótulo arriba, control de 36px, texto de ayuda o error debajo.',
+          '',
+          '**Cuál usar:** *Text* para texto corto · *Select* para elegir de una lista · *Search* para buscar con sugerencias · *Date* para una fecha tipeada · *Textarea* para texto largo · *Checkbox* para aceptar o activar una opción.',
+          '',
+          '**Probalo:** en *Playground* cambiá tipo, rótulo, valor, ayuda, error y estado desde *Controls*.',
+        ].join('\n'),
+      },
+    },
+  },
+  args: { type: 'Text', label: 'First name', placeholder: 'Type here', value: '', hint: '', error: '', required: false, disabled: false, state: 'default' },
+  argTypes: {
+    type: { control: 'inline-radio', options: ['Text', 'Select', 'Search', 'Date', 'Textarea', 'Checkbox'], description: 'Tipo de campo.' },
+    label: { control: 'text', description: 'Rótulo arriba del campo.' },
+    placeholder: { control: 'text', description: 'Texto gris cuando está vacío.' },
+    value: { control: 'text', description: 'Valor cargado.' },
+    hint: { control: 'text', description: 'Texto de ayuda debajo del campo.' },
+    error: { control: 'text', description: 'Mensaje de error. Pinta el borde de rojo y reemplaza la ayuda.' },
+    required: { control: 'boolean', description: 'Agrega el asterisco rojo.' },
+    disabled: { control: 'boolean' },
+    state: { control: 'inline-radio', options: ['default', 'focus'], description: 'Fuerza el foco para verlo sin hacer clic.', table: { category: 'Preview' } },
+  },
+} satisfies Meta<Args>
+
+const angosto = [(Story: React.ComponentType) => <div className="w-[340px] max-w-full"><Story /></div>]
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<Args>
 
-const campos = recetas.filter((r) => r.tipo === 'field')
-const conError = (r: Receta) => /field-error|dash-bad/.test(r.firma)
-const familia = (r: Receta) => {
-  if (esOculto(r)) return 'Hidden file input'
-  if (esCasilla(r)) return 'Checkbox and radio'
-  if (r.tag === 'select') return 'Select'
-  if (r.tag === 'textarea') return 'Textarea'
-  if (conError(r)) return 'Input with error'
-  if (esBuscador(r)) return 'Search input'
-  if (sinBorde(r)) return 'Inline input'
-  return 'Text input'
+function Campo({ type, label, placeholder, value, hint, error, required, disabled }: Omit<Args, 'state'>) {
+  const [v, setV] = useState(value)
+  const comun = { label, required, disabled, hint: hint || undefined, error: error || undefined }
+  if (type === 'Select') return <SelectField {...comun} placeholder={placeholder || 'Select'} options={OPCIONES} value={v} onChange={setV} />
+  if (type === 'Search') return <SearchField {...comun} placeholder={placeholder || 'Search...'} options={['Amoxicillin', 'Ibuprofen', 'Lidocaine']} value={v} onChange={setV} />
+  if (type === 'Date') return <DateTextField {...comun} value={v} onChange={setV} />
+  if (type === 'Textarea') return <TextArea {...comun} placeholder={placeholder} value={v} onChange={setV} rows={3} />
+  if (type === 'Checkbox') return <OptionCheckbox label={label} disabled={disabled} />
+  return <TextField {...comun} placeholder={placeholder} value={v} onChange={setV} />
 }
-const masUsado = (f: string, extra: (r: Receta) => boolean = () => true) => campos.filter((r) => familia(r) === f && extra(r)).sort((a, b) => b.cantidad - a.cantidad)[0]
-const errorDe = (buscador: boolean) => campos.filter((r) => conError(r) && esBuscador(r) === buscador && r.tag === 'input').sort((a, b) => b.cantidad - a.cantidad)[0]
 
-const TIPOS: Tipo[] = [
-  { nombre: 'Text input', uso: 'A single-line field.', look: masUsado('Text input'), error: errorDe(false) },
-  { nombre: 'Search input', uso: 'A text field with a magnifier icon on the left.', look: masUsado('Search input'), error: errorDe(true) },
-  { nombre: 'Select', uso: 'The native select, styled like a text field.', look: masUsado('Select') },
-  { nombre: 'Textarea', uso: `A multi-line field.${sinBorde(masUsado('Textarea') ?? ({ clases: 'border' } as Receta)) ? ' Its only look has no border of its own: the box comes from the screen.' : ''}`, look: masUsado('Textarea') },
-  { nombre: 'Checkbox', uso: 'A native checkbox tinted with the brand accent.', look: masUsado('Checkbox and radio') },
-]
+/* Cambiá todo desde Controls. */
+export const Playground: Story = {
+  decorators: angosto,
+  render: ({ state, ...args }) => (
+    <div className={state === 'focus' ? 'pseudo-focus-all pseudo-focus-visible-all' : ''}>
+      {/* key: al cambiar el valor desde Controls, el campo arranca de nuevo con ese valor. */}
+      <Campo key={`${args.type}-${args.value}`} {...args} />
+    </div>
+  ),
+}
 
-export const Campos: Story = {
-  name: 'Fields',
-  render: () => {
-    const total = datos.elementos.field ?? 0
-    return (
-      <Page
-        titulo="Fields"
-        bajada={`Los ${total} <input>, <select> y <textarea> con estilo propio de la app, leídos del código. Cada tipo se muestra en sus estados, con sus medidas y colores. Los campos de formulario reutilizables (etiqueta + campo + error) están en Components / Patients / Form fields.`}
-      >
-        <Seccion titulo="Types and states" nota="El look más usado de cada tipo. Error es el aspecto que toma el campo cuando falla la validación; “—” quiere decir que el código no lo define.">
-          <TiposConEstados tipos={TIPOS} columnas={['default', 'focus', 'error', 'disabled']} />
-        </Seccion>
+export const Types: Story = {
+  parameters: { controls: { include: ['required', 'disabled'] } },
+  decorators: [(Story) => <div className="w-[720px] max-w-full"><Story /></div>],
+  render: ({ required, disabled }) => (
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <TextField label="Text" placeholder="Type here" required={required} disabled={disabled} />
+      <SelectField label="Select" options={OPCIONES} required={required} disabled={disabled} />
+      <SearchField label="Search" options={['Amoxicillin', 'Ibuprofen']} required={required} disabled={disabled} />
+      <DateTextField label="Date" required={required} disabled={disabled} />
+      <TextArea label="Textarea" placeholder="Add notes" rows={3} required={required} disabled={disabled} />
+      <div className="flex flex-col gap-2">
+        <span className="text-xs font-medium text-ink">Checkbox</span>
+        <OptionCheckbox label="Send a reminder to the patient" disabled={disabled} />
+      </div>
+    </div>
+  ),
+}
 
-        <Seccion titulo="Measures" nota="Leídas de los campos de arriba, ya dibujados.">
-          <MedidasDeTipos tipos={TIPOS} />
-        </Seccion>
+const COLUMNAS = ['Empty', 'Filled', 'Focus', 'Error', 'Disabled'] as const
 
-        <Seccion titulo="Sizes in use" nota="Cuántos campos usan cada valor, en toda la app. Si hay más de un valor, hay campos del mismo tipo que no miden lo mismo.">
-          <TamanosEnUso looks={campos.filter((r) => !esOculto(r) && !esCasilla(r))} total={total} />
-        </Seccion>
+function Celda({ tipo, col }: { tipo: 'Text' | 'Select' | 'Textarea'; col: (typeof COLUMNAS)[number] }) {
+  const lleno = col === 'Filled' || col === 'Disabled'
+  const error = col === 'Error' ? 'This field is required.' : undefined
+  const comun = { label: 'Label', disabled: col === 'Disabled', error }
+  const campo =
+    tipo === 'Select' ? <SelectField {...comun} options={OPCIONES} value={lleno ? 'Female' : ''} onChange={() => {}} />
+    : tipo === 'Textarea' ? <TextArea {...comun} placeholder="Placeholder" rows={2} value={lleno ? 'Sensitive to cold.' : ''} onChange={() => {}} />
+    : <TextField {...comun} placeholder="Placeholder" value={lleno ? 'Sarah Stone' : undefined} />
+  return <div className={col === 'Focus' ? 'pseudo-focus-all pseudo-focus-visible-all' : ''}>{campo}</div>
+}
 
-        <Seccion titulo="Colors in use" nota="Los colores que usan los campos, con la cantidad de campos que los usan.">
-          <ColoresEnUso looks={campos} roles={ROLES_COLOR.filter((r) => r.nombre !== 'Fill on hover')} />
-        </Seccion>
+export const States: Story = {
+  parameters: { controls: { disable: true } },
+  decorators: [(Story) => <div className="w-[980px] max-w-full"><Story /></div>],
+  render: () => (
+    <Tabla encabezado={['Type', ...COLUMNAS]} minimo={940} arriba>
+      {(['Text', 'Select', 'Textarea'] as const).map((t) => (
+        <tr key={t}>
+          <td className="w-[90px] pt-[38px] font-semibold">{t}</td>
+          {COLUMNAS.map((c) => <td key={c} className="w-[170px] align-top"><Celda tipo={t} col={c} /></td>)}
+        </tr>
+      ))}
+    </Tabla>
+  ),
+}
 
-        <Seccion titulo="States in the app" nota="Qué porcentaje de los campos define cada estado, qué clases usa y qué falta.">
-          <EstadosDeLaApp
-            looks={campos}
-            total={total}
-            filas={[
-              { estado: 'Hover', define: (r) => r.estados.hover, clases: /^hover:/, faltante: (n) => `${n} fields look the same under the mouse.` },
-              {
-                estado: 'Focus',
-                define: (r) => r.estados.foco === 'definido',
-                clases: /^(?:[^\s:]+:)*focus(?:-visible)?:(?!outline-none)/,
-                faltante: (n, sin) => `${n} fields use the browser’s default ring; ${elementosDe(sin.filter((r) => r.estados.foco === 'quitado' || r.estados.foco === 'invisible'))} show no ring at all.`,
-              },
-              { estado: 'Error', define: conError, clases: /field-error|dash-bad/, faltante: (n) => `${n} fields have no error look: a failed validation is not visible on them.` },
-              { estado: 'Disabled', define: (r) => r.estados.deshabilitado, clases: /(^|:)disabled:|cursor-not-allowed/, faltante: (n) => `${n} fields have no disabled look: disabled or not, they look the same.` },
-            ]}
-          />
-        </Seccion>
+export const WithHintAndError: Story = {
+  name: 'Hint and error',
+  parameters: { controls: { disable: true } },
+  decorators: angosto,
+  render: () => (
+    <div className="flex flex-col gap-5">
+      <TextField label="Email" placeholder="name@clinic.com" hint="We send the appointment reminders here." />
+      <TextField label="Email" required placeholder="name@clinic.com" error="Enter a valid email." value="sarah@" />
+    </div>
+  ),
+}
 
-        <TodoLoEncontrado tipo="field" familiaDe={familia} cantidad={campos.length} elementos={total} />
-      </Page>
-    )
-  },
+/* Medidas y colores, leídos del campo dibujado. */
+function FilaMedidas({ nombre, children, selector }: { nombre: string; children: React.ReactNode; selector: string }) {
+  const { ref, m } = useMedidas(selector)
+  return (
+    <tr>
+      <td className="font-semibold">{nombre}</td>
+      <td><div ref={ref} className="w-[180px]">{children}</div></td>
+      <td className="tabular-nums">{m?.alto}</td>
+      <td className="tabular-nums">{m?.padding}</td>
+      <td className="tabular-nums">{m?.texto}</td>
+      <td className="tabular-nums">{m?.radio}</td>
+    </tr>
+  )
+}
+
+function FilaColores({ nombre, clase, children }: { nombre: string; clase: string; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [c, setC] = useState<string[] | null>(null)
+  useLayoutEffect(() => {
+    const el = ref.current?.querySelector('input')
+    if (!el) return
+    const s = getComputedStyle(el)
+    setC([hex(s.borderTopColor), hex(s.backgroundColor), hex(s.color)])
+  }, [])
+  return (
+    <tr>
+      <td className="font-semibold">{nombre}</td>
+      <td><div ref={ref} className={cn('w-[170px]', clase)}>{children}</div></td>
+      {(c ?? ['', '', '']).map((v, i) => (
+        <td key={i}><span className="inline-flex items-center gap-2"><Swatch color={v} /><span className="text-[12px] tabular-nums">{v}</span></span></td>
+      ))}
+    </tr>
+  )
+}
+
+export const Specs: Story = {
+  parameters: { controls: { disable: true } },
+  decorators: [(Story) => <div className="w-[880px] max-w-full"><Story /></div>],
+  render: () => (
+    <Lienzo>
+      <Bloque titulo="Sizes" nota="Todos los campos miden 36px de alto; el rótulo va 8px arriba y la ayuda o el error 4px abajo.">
+        <Tabla encabezado={['Type', 'Sample', 'Height', 'Padding', 'Text', 'Radius']} minimo={680}>
+          <FilaMedidas nombre="Text" selector="input"><TextField label="Label" placeholder="Placeholder" /></FilaMedidas>
+          <FilaMedidas nombre="Search" selector="input"><SearchField label="Label" /></FilaMedidas>
+          <FilaMedidas nombre="Select" selector="button"><SelectField label="Label" options={OPCIONES} /></FilaMedidas>
+        </Tabla>
+      </Bloque>
+      <Bloque titulo="Colors" nota="Leídos del campo en cada estado. El error agrega el mensaje en el mismo rojo del borde.">
+        <Tabla encabezado={['State', 'Sample', 'Border', 'Fill', 'Text']} minimo={720}>
+          <FilaColores nombre="Default" clase=""><TextField label="Label" value="Sarah Stone" /></FilaColores>
+          <FilaColores nombre="Focus" clase="pseudo-focus-all"><TextField label="Label" value="Sarah Stone" /></FilaColores>
+          <FilaColores nombre="Error" clase=""><TextField label="Label" value="Sarah Stone" error="This field is required." /></FilaColores>
+          <FilaColores nombre="Disabled" clase=""><TextField label="Label" value="Sarah Stone" disabled /></FilaColores>
+        </Tabla>
+      </Bloque>
+    </Lienzo>
+  ),
 }

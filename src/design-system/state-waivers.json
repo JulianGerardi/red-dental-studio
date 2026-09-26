@@ -23,10 +23,26 @@
       "reason": "El detector confunde `loading=\"lazy\"` de las imágenes con un estado de carga; el visor no tiene uno."
     }
   },
+  "components/clinical/TreatmentPlanSection.tsx": {
+    "empty": {
+      "na": true,
+      "reason": "La coincidencia es `marcadas.length === 0` dentro del texto de un toast de confirmación, no un estado vacío del componente."
+    }
+  },
   "components/layout/LocationSelector.tsx": {
     "selected": {
       "story": "components/layout/LocationSelector.stories.tsx#Open",
       "reason": "Abierto, la ubicación elegida queda marcada y la favorita con la estrella presionada."
+    }
+  },
+  "components/patients/form.tsx": {
+    "disabled": {
+      "story": "design-system/Fields.stories.tsx#States",
+      "reason": "Los campos se documentan en Elements / Fields: la columna Disabled muestra cada tipo deshabilitado."
+    },
+    "selected": {
+      "story": "design-system/Fields.stories.tsx#Types",
+      "reason": "La casilla OptionCheckbox marcada y desmarcada está en Elements / Fields (Types y Playground)."
     }
   },
   "components/patients/ledger/useAnchoColumnas.tsx": {
@@ -45,12 +61,6 @@
     "selected": {
       "na": true,
       "reason": "El detector confunde los `data-[state=…]` de animación de Radix con un estado de selección; el tooltip no tiene uno."
-    }
-  },
-  "components/clinical/TreatmentPlanSection.tsx": {
-    "empty": {
-      "na": true,
-      "reason": "La coincidencia es `marcadas.length === 0` dentro del texto de un toast de confirmación, no un estado vacío del componente."
     }
   }
 }

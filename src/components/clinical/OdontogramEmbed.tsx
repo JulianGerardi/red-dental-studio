@@ -282,7 +282,7 @@ export function OdontogramEmbed({
               <button
                 type="button"
                 onClick={() => { setConfirmandoCierre(false); descartarYCerrar() }}
-                className="h-9 rounded-md bg-dash-bad-fg px-5 text-[13px] font-medium text-white hover:bg-[#961f1f]"
+                className="h-9 rounded-md bg-dash-bad-fg px-5 text-[13px] font-medium text-white hover:bg-dash-bad-hover"
               >
                 Discard and close
               </button>

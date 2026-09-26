@@ -13,8 +13,11 @@ const preview: Preview = {
     docs: { page: DocsPage, theme },
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
     options: {
+      /* El panel de Controls a la vista: es donde se personaliza cada
+         elemento. Las páginas de Audit, que no tienen controles, lo ocultan. */
+      showPanel: true,
       storySort: {
-        order: ['Welcome', 'Foundations', 'Components', 'Patterns', 'Pages'],
+        order: ['Welcome', 'Foundations', ['Colors', 'Typography', 'Radius and shadows'], 'Elements', ['Buttons', 'Fields', 'Pills', 'Cards', 'Tables'], 'Components', 'Pages', 'Audit'],
       },
     },
   },

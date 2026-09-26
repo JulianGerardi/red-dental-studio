@@ -18,7 +18,7 @@ export const Default: Story = {
   render: () => (
     <div className="h-64 w-64">
       <DropdownMenu defaultOpen>
-        <DropdownMenuTrigger asChild><Button variant="outline">My Account</Button></DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild><Button variant="secondary">My Account</Button></DropdownMenuTrigger>
         <DropdownMenuContent className="w-52">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -38,7 +38,7 @@ export const DisabledItem: Story = {
   render: () => (
     <div className="h-64 w-64">
       <DropdownMenu defaultOpen>
-        <DropdownMenuTrigger asChild><Button variant="outline">Actions</Button></DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild><Button variant="secondary">Actions</Button></DropdownMenuTrigger>
         <DropdownMenuContent className="w-52">
           <DropdownMenuItem>Edit</DropdownMenuItem>
           <DropdownMenuItem disabled>Cancel (disabled - started)</DropdownMenuItem>
@@ -54,7 +54,7 @@ export const GroupsRadioAndSubmenu: Story = {
   render: () => (
     <div className="h-72 w-72">
       <DropdownMenu defaultOpen>
-        <DropdownMenuTrigger asChild><Button variant="outline">View</Button></DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild><Button variant="secondary">View</Button></DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuGroup>
             <DropdownMenuLabel>Sort by</DropdownMenuLabel>

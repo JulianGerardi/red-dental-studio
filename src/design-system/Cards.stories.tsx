@@ -3,7 +3,7 @@ import { Page } from './Page'
 import { PaginaDeRecetas, meta as datos, recetas, type Receta } from './Recipes'
 
 const meta = {
-  title: 'Patterns/Cards',
+  title: 'Audit/Cards in code',
   tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta

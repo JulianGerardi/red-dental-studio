@@ -23,8 +23,26 @@ export function FieldError({ children }: { children?: string }) {
   return <span className="-mt-1 block text-[11px] leading-[1.35] text-field-error">{children}</span>
 }
 
+/* Texto de ayuda debajo del campo. Si hay error, se muestra el error en su
+   lugar. */
+export function FieldHint({ children }: { children?: React.ReactNode }) {
+  if (!children) return null
+  return <span className="-mt-1 block text-[11.5px] leading-[1.4] text-ink-muted">{children}</span>
+}
+
+/* Aspecto común de los controles: borde gris, foco azul, error rojo y
+   deshabilitado gris. Lo usan todos los campos de este archivo. */
+const control = (error?: string) =>
+  cn(
+    'w-full rounded-md border bg-white text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
+    'disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-ink-faint disabled:shadow-none',
+    error ? 'border-field-error focus:border-field-error' : 'focus:border-dash-blue border-line',
+  )
+
+const pie = (error?: string, hint?: React.ReactNode) => (error ? <FieldError>{error}</FieldError> : <FieldHint>{hint}</FieldHint>)
+
 export function TextField({
-  label, placeholder, required, className, value, onChange, error,
+  label, placeholder, required, className, value, onChange, error, hint, disabled,
 }: {
   label: string
   placeholder?: string
@@ -34,6 +52,9 @@ export function TextField({
   onChange?: (v: string) => void
   /** Mensaje de validación. Pinta el borde en rojo y se muestra debajo. */
   error?: string
+  /** Texto de ayuda debajo del campo. */
+  hint?: React.ReactNode
+  disabled?: boolean
 }) {
   return (
     <label className={cn('flex flex-col gap-2', className)}>
@@ -41,14 +62,11 @@ export function TextField({
       <input
         aria-invalid={!!error || undefined}
         placeholder={placeholder}
-        {...(onChange ? { value: value ?? '', onChange: (e) => onChange(e.target.value) } : {})}
-        className={cn(
-          'h-9 w-full rounded-md border bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]',
-          'placeholder:text-ink-faint focus:outline-none',
-          error ? 'border-field-error focus:border-field-error' : 'focus:border-dash-blue border-line',
-        )}
+        disabled={disabled}
+        {...(onChange ? { value: value ?? '', onChange: (e) => onChange(e.target.value) } : value !== undefined ? { defaultValue: value } : {})}
+        className={cn(control(error), 'h-9 px-3')}
       />
-      <FieldError>{error}</FieldError>
+      {pie(error, hint)}
     </label>
   )
 }
@@ -78,7 +96,7 @@ const OPCIONES_GENERICAS = ['Option A', 'Option B', 'Option C']
 
 export function SelectField({
   label, placeholder = 'Select', required, className, options,
-  value: valueProp, onChange, error,
+  value: valueProp, onChange, error, hint, disabled,
 }: {
   label: string
   placeholder?: string
@@ -88,6 +106,8 @@ export function SelectField({
   value?: string
   onChange?: (v: string) => void
   error?: string
+  hint?: React.ReactNode
+  disabled?: boolean
 }) {
   const items = options ?? OPCIONES[label] ?? OPCIONES_GENERICAS
   const [interno, setInterno] = useState<string | null>(null)
@@ -121,10 +141,11 @@ export function SelectField({
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-invalid={!!error || undefined}
+          disabled={disabled}
           className={cn(
-            'flex h-9 w-full items-center justify-between rounded-md border bg-white px-3 text-[13px]',
-            'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors focus:outline-none',
-            error ? 'border-field-error' : open ? 'border-dash-blue' : 'border-line',
+            control(error),
+            'flex h-9 items-center justify-between px-3 transition-colors',
+            open && !error && 'border-dash-blue',
             value ? 'text-ink' : 'text-ink-faint',
           )}
         >
@@ -150,7 +171,7 @@ export function SelectField({
           </div>
         )}
       </div>
-      <FieldError>{error}</FieldError>
+      {pie(error, hint)}
     </div>
   )
 }
@@ -209,12 +230,14 @@ export function OptionCheckbox({
   checked,
   defaultChecked = true,
   onChange,
+  disabled,
 }: {
   label: React.ReactNode
   /** Sólo para controlarlo desde afuera; sin esto se maneja solo. */
   checked?: boolean
   defaultChecked?: boolean
   onChange?: (v: boolean) => void
+  disabled?: boolean
 }) {
   /* Antes recibía `checked` con default true y sin `onChange` quedaba
      congelado: se veía tildado y no había forma de destildarlo. Ahora, si
@@ -228,12 +251,14 @@ export function OptionCheckbox({
       type="button"
       role="checkbox"
       aria-checked={on}
+      disabled={disabled}
       onClick={() => {
         if (!controlado) setInterno(!on)
         onChange?.(!on)
       }}
       className={cn(
         'flex w-full items-start gap-2.5 rounded-lg border bg-white p-3 text-left transition-colors',
+        'focus-visible:border-dash-blue focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
         on ? 'border-dash-blue' : 'border-line hover:bg-surface-subtle',
       )}
     >
@@ -266,7 +291,7 @@ export function LinkPersonCheckbox(props: Omit<React.ComponentProps<typeof Optio
    (3648:59976 y hermanos): el campo principal siempre es una búsqueda. */
 export function SearchField({
   label, required, className, options = [], value = '', onChange, error,
-  placeholder = 'Search...',
+  placeholder = 'Search...', hint, disabled,
 }: {
   label: string
   required?: boolean
@@ -276,6 +301,8 @@ export function SearchField({
   onChange?: (v: string) => void
   error?: string
   placeholder?: string
+  hint?: React.ReactNode
+  disabled?: boolean
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -301,13 +328,10 @@ export function SearchField({
           value={value}
           placeholder={placeholder}
           aria-invalid={!!error || undefined}
+          disabled={disabled}
           onChange={(e) => { onChange?.(e.target.value); setAbierto(true) }}
           onFocus={() => setAbierto(true)}
-          className={cn(
-            'h-9 w-full rounded-md border bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]',
-            'placeholder:text-ink-faint focus:outline-none',
-            error ? 'border-field-error focus:border-field-error' : 'focus:border-dash-blue border-line',
-          )}
+          className={cn(control(error), 'h-9 pr-3 pl-9')}
         />
         {abierto && sugerencias.length > 0 && (
           <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
@@ -324,7 +348,7 @@ export function SearchField({
           </div>
         )}
       </div>
-      <FieldError>{error}</FieldError>
+      {pie(error, hint)}
     </div>
   )
 }
@@ -332,7 +356,7 @@ export function SearchField({
 /* El Figma pide una fecha tipeada con placeholder "DD / MM / YY", no el
    calendario. Se formatea sola a medida que se escribe. */
 export function DateTextField({
-  label, required, className, value = '', onChange, error,
+  label, required, className, value = '', onChange, error, hint, disabled,
 }: {
   label: string
   required?: boolean
@@ -340,6 +364,8 @@ export function DateTextField({
   value?: string
   onChange?: (v: string) => void
   error?: string
+  hint?: React.ReactNode
+  disabled?: boolean
 }) {
   const formatear = (bruto: string) => {
     const d = bruto.replace(/\D/g, '').slice(0, 6)
@@ -353,20 +379,17 @@ export function DateTextField({
         value={value}
         placeholder="DD / MM / YY"
         aria-invalid={!!error || undefined}
+        disabled={disabled}
         onChange={(e) => onChange?.(formatear(e.target.value))}
-        className={cn(
-          'h-9 w-full rounded-md border bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]',
-          'placeholder:text-ink-faint focus:outline-none',
-          error ? 'border-field-error focus:border-field-error' : 'focus:border-dash-blue border-line',
-        )}
+        className={cn(control(error), 'h-9 px-3')}
       />
-      <FieldError>{error}</FieldError>
+      {pie(error, hint)}
     </div>
   )
 }
 
 export function TextArea({
-  label, required, className, placeholder, value = '', onChange, error,
+  label, required, className, placeholder, value = '', onChange, error, hint, disabled, rows = 4,
 }: {
   label: string
   required?: boolean
@@ -375,23 +398,23 @@ export function TextArea({
   value?: string
   onChange?: (v: string) => void
   error?: string
+  hint?: React.ReactNode
+  disabled?: boolean
+  rows?: number
 }) {
   return (
     <div className={cn('flex flex-col gap-2', className)}>
       <FieldLabel required={required}>{label}</FieldLabel>
       <textarea
-        rows={4}
+        rows={rows}
         value={value}
         placeholder={placeholder}
         aria-invalid={!!error || undefined}
+        disabled={disabled}
         onChange={(e) => onChange?.(e.target.value)}
-        className={cn(
-          'w-full resize-none rounded-md border bg-white px-3 py-2 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]',
-          'placeholder:text-ink-faint focus:outline-none',
-          error ? 'border-field-error focus:border-field-error' : 'focus:border-dash-blue border-line',
-        )}
+        className={cn(control(error), 'resize-none px-3 py-2')}
       />
-      <FieldError>{error}</FieldError>
+      {pie(error, hint)}
     </div>
   )
 }

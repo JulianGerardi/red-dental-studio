@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 
 export type PillTone = 'success' | 'info' | 'warning' | 'danger' | 'neutral' | 'purple'
 
-const TONO: Record<PillTone, string> = {
+export const PILL_TONES: Record<PillTone, string> = {
   success: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg',
   info: 'border-dash-busy-fg bg-info-bg text-dash-busy-fg',
   warning: 'border-warn-fg bg-warn-bg text-warn-fg',
@@ -17,16 +17,16 @@ const TONO: Record<PillTone, string> = {
   purple: 'border-purple-fg bg-purple-bg text-purple-fg',
 }
 
-const TAMANO = {
+export const PILL_SIZES = {
   md: 'px-2.5 py-[3px] text-[11px]',
   sm: 'px-2 py-[1px] text-[10px]',
 }
 
 export function Pill({
   tone, size = 'md', className, children,
-}: { tone: PillTone; size?: keyof typeof TAMANO; className?: string; children: ReactNode }) {
+}: { tone: PillTone; size?: keyof typeof PILL_SIZES; className?: string; children: ReactNode }) {
   return (
-    <span className={cn('inline-flex items-center rounded-full border font-semibold', TAMANO[size], TONO[tone], className)}>
+    <span className={cn('inline-flex items-center rounded-full border font-semibold', PILL_SIZES[size], PILL_TONES[tone], className)}>
       {children}
     </span>
   )

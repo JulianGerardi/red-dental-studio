@@ -3,7 +3,7 @@ import { archivosAnalizados, hexEnCodigo } from './audit'
 import { Codigo, Page, Seccion } from './Page'
 
 const meta = {
-  title: 'Foundations/Color audit',
+  title: 'Audit/Colors in code',
   tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta

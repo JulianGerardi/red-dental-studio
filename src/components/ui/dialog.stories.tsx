@@ -40,7 +40,7 @@ export const ManualComposition: Story = {
             <DialogTitle>Custom dialog</DialogTitle>
             <DialogDescription>Built from Portal, Overlay and Close.</DialogDescription>
           </DialogHeader>
-          <DialogClose asChild><Button variant="outline">Close</Button></DialogClose>
+          <DialogClose asChild><Button variant="secondary">Close</Button></DialogClose>
         </DialogContent>
       </DialogPortal>
     </Dialog>
