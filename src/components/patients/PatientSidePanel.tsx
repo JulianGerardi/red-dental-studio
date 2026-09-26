@@ -107,6 +107,9 @@ export function PatientSidePanel({
   onSection,
   onEditGeneral,
   onEditContact,
+  tooltipAbierto,
+  infoAbierta,
+  opcionesEncuentroAbiertas,
 }: {
   name: string
   initials: string
@@ -118,6 +121,12 @@ export function PatientSidePanel({
      Relationships, que pasaban funciones vacías. */
   onEditGeneral?: () => void
   onEditContact?: () => void
+  /** Deja abierto el tooltip con ese texto (rail colapsado). Sólo para documentarlo en Storybook. */
+  tooltipAbierto?: string
+  /** Deja abierta la tarjeta de datos del paciente (rail colapsado). Sólo para Storybook. */
+  infoAbierta?: boolean
+  /** Deja abiertas las opciones del botón de encuentro. Sólo para Storybook. */
+  opcionesEncuentroAbiertas?: boolean
 }) {
   const navigate = useNavigate()
   const [contacto, setContacto] = useState(false)
@@ -143,7 +152,7 @@ export function PatientSidePanel({
      ítem ya dice qué es y un tooltip encima sería ruido. */
   const conTooltip = (texto: string, hijo: React.ReactNode) =>
     colapsado ? (
-      <Tooltip>
+      <Tooltip open={tooltipAbierto === texto || undefined}>
         <TooltipTrigger asChild>{hijo}</TooltipTrigger>
         <TooltipContent side="right" className="bg-ink text-white">
           {texto}
@@ -201,7 +210,7 @@ export function PatientSidePanel({
       </div>
 
       <div className={cn('mt-3 flex flex-col gap-2 sm:flex-row lg:flex-col', colapsado && 'lg:hidden')}>
-        <EncounterButton />
+        <EncounterButton opcionesAbiertas={opcionesEncuentroAbiertas} />
         <Link
           to="/patients/john-smith/clinical-mode"
           data-tour="pat-clinical-mode"
@@ -229,7 +238,7 @@ export function PatientSidePanel({
               consulta, no una acción, y a esa altura del rail el usuario
               está apenas paseando. El cierre va con retardo para poder
               cruzar el hueco entre el botón y el panel sin que se escape. */}
-          <Popover open={info} onOpenChange={setInfo}>
+          <Popover open={info || !!infoAbierta} onOpenChange={setInfo}>
             {/* Sin tooltip: abriendo con el mouse encima, el panel ya dice
                 qué es y el tooltip se le encimaba. */}
             <PopoverTrigger
@@ -327,6 +336,12 @@ type EstadoEncuentro = 'start' | 'pending'
 let estadoGlobal: EstadoEncuentro = 'start'
 const oyentes = new Set<() => void>()
 
+/** Deja el botón de encuentro en un estado desde afuera (Storybook). */
+export function setEncounterState(v: EstadoEncuentro) {
+  estadoGlobal = v
+  oyentes.forEach((f) => f())
+}
+
 function useEstadoEncuentro() {
   const [, redibujar] = useState(0)
   useEffect(() => {
@@ -354,9 +369,10 @@ const ENCUENTRO = {
   },
 } as const
 
-export function EncounterButton() {
+export function EncounterButton({ opcionesAbiertas }: { opcionesAbiertas?: boolean } = {}) {
   const [estado, setEstado] = useEstadoEncuentro()
-  const [abierto, setAbierto] = useState(false)
+  const [abiertoPropio, setAbierto] = useState(false)
+  const abierto = abiertoPropio || !!opcionesAbiertas
   const ref = useRef<HTMLDivElement>(null)
   const actual = ENCUENTRO[estado]
 

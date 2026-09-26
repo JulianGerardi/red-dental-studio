@@ -26,3 +26,14 @@ export const States: Story = {
     </div>
   ),
 }
+
+/* Deshabilitada: gris y sin respuesta, marcada o no. La usan las filas
+   deshabilitadas de las tablas. */
+export const Disabled: Story = {
+  render: (args) => (
+    <div className="flex items-center gap-4">
+      <Checkbox {...args} on={false} disabled label="Disabled" />
+      <Checkbox {...args} on disabled label="Disabled, checked" />
+    </div>
+  ),
+}

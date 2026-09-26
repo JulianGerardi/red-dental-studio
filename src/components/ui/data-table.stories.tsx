@@ -58,6 +58,8 @@ type Args = {
   density: 'regular' | 'compact'
   pageSize: number
   itemLabel: string
+  state: 'ready' | 'loading' | 'error' | 'disabled'
+  disabledRows: boolean
 }
 
 const meta = {
@@ -82,7 +84,7 @@ const meta = {
     columns: ['Name', 'Email', 'Status', 'Balance'], rows: 24,
     search: true, filter: true, columnPicker: true, resizable: true, expandable: false, reorderable: false,
     selectable: true, rowActions: true, primaryAction: true, clickableRows: false,
-    density: 'regular', pageSize: 10, itemLabel: 'patients',
+    density: 'regular', pageSize: 10, itemLabel: 'patients', state: 'ready', disabledRows: false,
   },
   argTypes: {
     columns: { control: 'check', options: NOMBRES_COLUMNAS, description: 'Qué columnas mostrar, en ese orden.' },
@@ -100,6 +102,8 @@ const meta = {
     density: { control: 'inline-radio', options: ['regular', 'compact'], description: 'regular 56px por fila · compact 44px. La fila crece si una celda tiene dos líneas.' },
     pageSize: { control: 'inline-radio', options: [5, 10, 20], description: 'Filas por página.' },
     itemLabel: { control: 'text', description: 'Qué se cuenta en el pie.' },
+    state: { control: 'inline-radio', options: ['ready', 'loading', 'error', 'disabled'], description: 'loading: filas grises · error: no se pudo cargar, con Try again · disabled: toda la tabla de sólo lectura.', table: { category: 'States' } },
+    disabledRows: { control: 'boolean', description: 'Los pacientes Inactive no se pueden elegir ni accionar.', table: { category: 'States' } },
   },
 } satisfies Meta<Args>
 
@@ -119,7 +123,8 @@ function Detalle({ p }: { p: Paciente }) {
   )
 }
 
-function Armada({ columns, rows, search, filter, columnPicker, resizable, expandable, reorderable, selectable, rowActions, primaryAction, clickableRows, density, pageSize, itemLabel }: Args) {
+function Armada({ columns, rows, search, filter, columnPicker, resizable, expandable, reorderable, selectable, rowActions, primaryAction, clickableRows, density, pageSize, itemLabel, state = 'ready', disabledRows = false }: Args) {
+  const [reintentos, setReintentos] = useState(0)
   const [abierta, setAbierta] = useState<string | null>(null)
   const [orden, setOrden] = useState(PACIENTES)
   const reordenar = (origen: Paciente, destino: Paciente) =>
@@ -159,6 +164,10 @@ function Armada({ columns, rows, search, filter, columnPicker, resizable, expand
         itemLabel={itemLabel}
         empty={rows === 0 ? { icon: Users, title: 'No patients yet', detail: 'Add your first patient to see them here.' } : undefined}
         actions={primaryAction ? <Button size="md"><Plus />New patient</Button> : undefined}
+        loading={state === 'loading'}
+        disabled={state === 'disabled'}
+        error={state === 'error' ? { title: 'We couldn’t load the patients', detail: `The server did not answer. Check your connection and try again.${reintentos ? ` (${reintentos} retries)` : ''}`, onRetry: () => setReintentos((n) => n + 1) } : undefined}
+        isRowDisabled={disabledRows ? (p) => p.estado === 'Inactive' : undefined}
       />
       {abierta && <p className="text-[12px] text-ink-muted">Row clicked: <b className="text-ink">{abierta}</b> (in the app this opens the detail).</p>}
     </div>
@@ -169,7 +178,7 @@ const BASE: Args = {
   columns: ['Name', 'Email', 'Status'], rows: 6,
   search: false, filter: false, columnPicker: false, resizable: false, expandable: false, reorderable: false,
   selectable: false, rowActions: false, primaryAction: false, clickableRows: false,
-  density: 'regular', pageSize: 10, itemLabel: 'patients',
+  density: 'regular', pageSize: 10, itemLabel: 'patients', state: 'ready', disabledRows: false,
 }
 
 /* Armá la tabla desde Controls. */
@@ -260,8 +269,23 @@ export const States: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
     <Lienzo>
+      <Bloque titulo="Loading" nota="Mientras llegan los datos: filas grises con la forma de las columnas, sin pie. La barra y las casillas no se pueden tocar.">
+        <Armada {...BASE} selectable search state="loading" />
+      </Bloque>
+      <Bloque titulo="Error" nota="No se pudieron traer los datos: qué pasó, qué hacer y Try again. No se muestran filas viejas como si estuvieran al día.">
+        <Armada {...BASE} search state="error" />
+      </Bloque>
+      <Bloque titulo="Disabled" nota="Toda la tabla de sólo lectura, por ejemplo sin permiso de edición o mientras se guarda: se ve al 60% y nada responde.">
+        <Armada {...BASE} rows={4} selectable rowActions search state="disabled" />
+      </Bloque>
+      <Bloque titulo="Disabled rows" nota="Filas que no se pueden elegir ni accionar (acá, los pacientes Inactive): texto atenuado, casilla deshabilitada y sin menú. Seleccionar todo las saltea.">
+        <Armada {...BASE} rows={8} selectable rowActions disabledRows />
+      </Bloque>
       <Bloque titulo="Empty" nota="Sin filas: el estado vacío dice por qué y qué hacer. No hay pie.">
         <Armada {...BASE} rows={0} />
+      </Bloque>
+      <Bloque titulo="No results" nota="Hay datos pero la búsqueda o el filtro no encuentra nada: se dice eso, no “no hay datos”.">
+        <SinResultados />
       </Bloque>
       <Bloque titulo="Selected rows" nota="La fila elegida toma el fondo azul claro y el pie cuenta cuántas hay.">
         <Armada {...BASE} rows={4} selectable />
@@ -271,6 +295,19 @@ export const States: Story = {
       </Bloque>
     </Lienzo>
   ),
+}
+
+/* Búsqueda sin resultados: la tabla con el buscador ya cargado. */
+function SinResultados() {
+  return (
+    <DataTable
+      columns={[COLUMNAS.Name!, COLUMNAS.Email!, COLUMNAS.Status!]}
+      rows={PACIENTES.slice(0, 6).filter((p) => p.nombre.includes('zzz'))}
+      rowKey={(p) => p.id}
+      itemLabel="patients"
+      empty={{ title: 'No patients found', detail: 'Try a different name or email.' }}
+    />
+  )
 }
 
 export const Specs: Story = {

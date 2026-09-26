@@ -44,10 +44,18 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     PageTitle 20px Semibold, h1 sueltos de 20, 24 y 36px).
   - **Navigation** — el rail (`Sidebar` + `Topbar`): colapsado 58px con
     tooltip al pasar el mouse, expandido 234px, ítem activo según la ruta, menú
-    flotante de Settings; y el menú del paciente (`PatientSidePanel`): 218px →
-    60px con su botón, estado que se mantiene entre secciones. Las historias
-    usan los componentes reales; `tooltipAbierto` y `settingsAbierto` (Sidebar)
-    y `setPatientMenuCollapsed` sólo existen para dejar esos estados a la vista.
+    flotante de Settings.
+  - **Patient menu** — `PatientSidePanel`, con todas sus vistas: expandido,
+    colapsado, tooltip de cada ícono, estado del paciente (punto verde), tarjeta
+    de General/Contact, sección activa, encuentro Start/Pending y sus opciones,
+    y en el celular (tira horizontal). El Playground cambia colapsado, sección,
+    encuentro y paciente.
+  - Los estados que abren con el mouse (tooltips, menú de Settings, tarjeta del
+    paciente, opciones de encuentro) se dejan a la vista con props que sólo usa
+    Storybook: `tooltipAbierto`, `settingsAbierto` (Sidebar); `tooltipAbierto`,
+    `infoAbierta`, `opcionesEncuentroAbiertas` (PatientSidePanel);
+    `setPatientMenuCollapsed` y `setEncounterState`. Abrirlos con una función
+    `play` no alcanza: al terminar, la historia se vuelve a dibujar y se cierran.
   - **Buttons** — `src/components/ui/button.tsx`. Variantes `primary`,
     `secondary`, `ghost`, `link`, `destructive` (el look más usado en el código
     para cada tipo) y tamaños `sm` 28 · `md` 32 · `lg` 36 (las tres alturas más
@@ -80,7 +88,11 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     selección controlada (`selected`, `onSelectedChange`), filas por página
     (`pageSizeOptions`), avatar `soft` en `PersonCell`, `reorder` (manija para
     reordenar arrastrando o con ↑ ↓; Insurance), filas clickeables con teclado
-    (Billing) y filas que crecen si una celda tiene dos líneas. Las tablas de
+    (Billing) y filas que crecen si una celda tiene dos líneas.
+    **Estados:** `loading` (filas grises con la forma de las columnas),
+    `error` (motivo + *Try again*), `disabled` (toda la tabla de sólo lectura, al
+    60%) e `isRowDisabled` (filas atenuadas, sin casilla ni menú; *seleccionar
+    todo* las saltea), además de vacío, sin resultados, seleccionadas y compacta. Las tablas de
     Clinical (`<table>` nativas) y las del Ledger todavía no.
 - **Components**: las piezas de cada módulo (Dashboard, Layout, Scheduling,
   Patients, Ledger, Settings, Billing, Clinical, Help, UI). *Components /

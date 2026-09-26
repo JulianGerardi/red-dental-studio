@@ -3,10 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MemoryRouter } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
-import { PatientSidePanel, setPatientMenuCollapsed } from '@/components/patients/PatientSidePanel'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { NOTIFICACIONES } from '@/data/notificaciones'
-import { conPacientes } from './decorators'
 import { HelpProvider } from '@/components/help/HelpProvider'
 
 /* Cómo se navega la app: el menú lateral (rail) y el menú del paciente. Se
@@ -35,7 +33,7 @@ const meta = {
           '- **Settings:** queda abajo, en el mismo lugar colapsado y expandido. Al pasar el mouse abre un menú flotante con sus secciones.',
           '- **En el celular:** el menú es un panel que tapa el contenido y se cierra solo al elegir una pantalla.',
           '',
-          '**Menú del paciente.** En las pantallas de un paciente, el panel de la izquierda (218px) se colapsa a 60px con el botón de arriba del panel; colapsado muestra sólo íconos, con tooltip. Queda colapsado al pasar de una sección del paciente a otra. Sólo colapsa desde 1024px de ancho.',
+          '**Menú del paciente:** está en *Elements / Patient menu*, con todas sus vistas.',
           '',
           '**Probalo:** en *Sidebar* usá el botón de la barra de arriba o el control *expanded*; pasá el mouse por los íconos y por Settings.',
         ].join('\n'),
@@ -123,40 +121,4 @@ export const SettingsMenu: Story = {
 export const Expanded: Story = {
   args: { expanded: true, route: '/scheduling' },
   render: (args) => <Marco key={`${args.expanded}-${args.route}`} {...args} />,
-}
-
-/* ── Menú del paciente ──────────────────────────────────────────────────── */
-function Paciente() {
-  return (
-    <MemoryRouter initialEntries={['/patients/patient-0001']}>
-      <HelpProvider>
-      <TooltipProvider>
-        <div className="flex min-h-svh gap-5 bg-page-background p-6">
-          <PatientSidePanel name="Sarah Stone" initials="SS" section="Dashboard" basePath="/patients/patient-0001" />
-          <div className="flex-1 rounded-lg border border-line-row bg-white p-5 text-[13px] text-ink-medium">
-            The patient’s content uses the width the menu frees when it collapses.
-          </div>
-        </div>
-      </TooltipProvider>
-      </HelpProvider>
-    </MemoryRouter>
-  )
-}
-
-/* El estado del panel es de toda la sesión (así queda igual al pasar de una
-   sección del paciente a otra); cada historia lo deja como dice su nombre. */
-export const PatientMenu: Story = {
-  name: 'Patient menu: expanded',
-  parameters: { controls: { disable: true } },
-  decorators: [conPacientes],
-  loaders: [async () => { setPatientMenuCollapsed(false); return {} }],
-  render: () => <Paciente />,
-}
-
-export const PatientMenuCollapsed: Story = {
-  name: 'Patient menu: collapsed',
-  parameters: { controls: { disable: true } },
-  decorators: [conPacientes],
-  loaders: [async () => { setPatientMenuCollapsed(true); return {} }],
-  render: () => <Paciente />,
 }

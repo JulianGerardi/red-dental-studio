@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, GripVertical, MoveHorizontal, Search, SearchX, type LucideIcon } from 'lucide-react'
+import { ChevronRight, GripVertical, MoveHorizontal, RotateCw, Search, SearchX, TriangleAlert, type LucideIcon } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { EmptyState } from '@/components/ui/empty-state'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
@@ -47,6 +47,7 @@ export function DataTable<T>({
   search, filter, columnPicker, resizable, actions,
   pageSize: pageSizeInicial = 10, pageSizeOptions, pageSizeLabel = 'Rows per page:',
   itemLabel = 'results', density = 'regular', selected, onSelectedChange,
+  loading, error, disabled, isRowDisabled,
   empty = { title: 'No results', detail: 'Try a different search or filter.' },
 }: {
   columns: DataTableColumn<T>[]
@@ -86,6 +87,14 @@ export function DataTable<T>({
   itemLabel?: string
   density?: keyof typeof ALTO_FILA
   empty?: { icon?: LucideIcon; title: string; detail?: string }
+  /** Cargando: filas grises en lugar de datos, y nada se puede tocar. */
+  loading?: boolean
+  /** No se pudieron traer los datos: el motivo y, si se puede, reintentar. */
+  error?: { title: string; detail?: string; onRetry?: () => void }
+  /** Toda la tabla de sólo lectura (sin permiso, o guardando): se ve atenuada. */
+  disabled?: boolean
+  /** Filas que no se pueden elegir ni accionar: se ven atenuadas. */
+  isRowDisabled?: (row: T) => boolean
 }) {
   const [pagina, setPagina] = useState(1)
   const [pageSize, setPageSize] = useState(pageSizeInicial)
@@ -130,7 +139,9 @@ export function DataTable<T>({
   const desde = filtradas.length === 0 ? 0 : (actual - 1) * pageSize + 1
   const hasta = desde === 0 ? 0 : desde + visibles.length - 1
 
-  const ids = visibles.map(rowKey)
+  const bloqueada = (r: T) => !!isRowDisabled?.(r)
+  const ids = visibles.filter((r) => !bloqueada(r)).map(rowKey)
+  const inactiva = disabled || loading || !!error
   const todas = ids.length > 0 && ids.every((id) => elegidas.includes(id))
   const alternar = (id: string) => setElegidas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
   const alternarTodas = () => setElegidas((p) => (todas ? p.filter((x) => !ids.includes(x)) : [...new Set([...p, ...ids])]))
@@ -164,12 +175,13 @@ export function DataTable<T>({
   return (
     <div className="flex flex-col gap-3">
       {hayBarra && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={cn('flex flex-wrap items-center gap-2', inactiva && 'pointer-events-none opacity-50')} aria-disabled={inactiva || undefined}>
           {search && (
             <div className="relative w-[260px] max-w-full">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
                 value={q}
+                disabled={inactiva}
                 onChange={(e) => { setQ(e.target.value); reiniciar() }}
                 placeholder={search.placeholder ?? 'Search'}
                 aria-label={search.placeholder ?? 'Search'}
@@ -200,12 +212,17 @@ export function DataTable<T>({
         </div>
       )}
 
-      <div data-tabla-scroll className="overflow-x-auto rounded-lg border border-line-row bg-white">
+      <div
+        data-tabla-scroll
+        aria-busy={loading || undefined}
+        aria-disabled={disabled || undefined}
+        className={cn('overflow-x-auto rounded-lg border border-line-row bg-white', disabled && 'pointer-events-none select-none opacity-60')}
+      >
         <div style={{ minWidth: minimo }}>
           <div role="row" data-tabla-header className="group/fila flex h-11 items-center gap-3 bg-surface-alt px-4 text-[11px] font-semibold text-ink-muted">
             {reorder && <span className="w-5 shrink-0" aria-hidden />}
             {rowDetail && <span className="w-4 shrink-0" aria-hidden />}
-            {selectable && <Checkbox on={todas} onChange={alternarTodas} label="Select all rows" />}
+            {selectable && <Checkbox on={todas} onChange={alternarTodas} label="Select all rows" disabled={inactiva || ids.length === 0} />}
             {visiblesCols.map((c, i) => (
               <div key={c.key} role="columnheader" data-elastica={elastica(c) || undefined} className={celda(c)} style={ancho(c)}>
                 <span className="truncate">{c.header}</span>
@@ -216,7 +233,36 @@ export function DataTable<T>({
             {rowActions && <div role="columnheader" className="w-10 shrink-0 text-center">Actions</div>}
           </div>
 
-          {filtradas.length === 0 ? (
+          {loading ? (
+            /* Filas grises con la forma de la tabla: se sabe qué va a venir. */
+            Array.from({ length: Math.min(pageSize, 5) }, (_, i) => (
+              <div key={i} aria-hidden className={cn('flex items-center gap-3 border-t border-line-row px-4', ALTO_FILA[density])}>
+                {reorder && <span className="w-5 shrink-0" />}
+                {rowDetail && <span className="w-4 shrink-0" />}
+                {selectable && <span className="size-4 shrink-0 rounded bg-surface-muted" />}
+                {visiblesCols.map((c) => (
+                  <div key={c.key} className={celda(c)} style={ancho(c)}>
+                    <span className="h-3 w-3/4 animate-pulse rounded bg-surface-muted motion-reduce:animate-none" />
+                  </div>
+                ))}
+                {relleno}
+                {rowActions && <span className="w-10 shrink-0" />}
+              </div>
+            ))
+          ) : error ? (
+            <div role="alert" className="flex flex-col items-center gap-2 border-t border-line-row px-6 py-10 text-center">
+              <span className="flex size-9 items-center justify-center rounded-lg bg-dash-bad-bg">
+                <TriangleAlert className="size-4 text-dash-bad-fg" />
+              </span>
+              <p className="text-sm font-bold text-ink">{error.title}</p>
+              {error.detail && <p className="max-w-[320px] text-xs leading-[1.5] text-ink-muted">{error.detail}</p>}
+              {error.onRetry && (
+                <button type="button" onClick={error.onRetry} className="text-dash-blue mt-1 flex items-center gap-1.5 text-[13px] font-semibold hover:underline">
+                  <RotateCw className="size-3.5" /> Try again
+                </button>
+              )}
+            </div>
+          ) : filtradas.length === 0 ? (
             <EmptyState
               icon={rows.length === 0 ? (empty.icon ?? SearchX) : SearchX}
               title={rows.length === 0 ? empty.title : 'No results'}
@@ -226,10 +272,11 @@ export function DataTable<T>({
           ) : (
             visibles.map((r) => {
               const id = rowKey(r)
+              const off = bloqueada(r)
               const elegida = elegidas.includes(id)
               const abierta = abiertas.includes(id)
-              const alHacerClic = rowDetail ? () => alternarAbierta(id) : onRowClick ? () => onRowClick(r) : undefined
-              const movible = reorder && (reorder.canMove?.(r) ?? true)
+              const alHacerClic = off ? undefined : rowDetail ? () => alternarAbierta(id) : onRowClick ? () => onRowClick(r) : undefined
+              const movible = reorder && !off && (reorder.canMove?.(r) ?? true)
               const indice = filtradas.indexOf(r)
               const mover = (paso: number) => {
                 const destino = filtradas[indice + paso]
@@ -249,6 +296,7 @@ export function DataTable<T>({
                   <div
                     role="row"
                     aria-selected={selectable ? elegida : undefined}
+                    aria-disabled={off || undefined}
                     aria-expanded={rowDetail ? abierta : undefined}
                     tabIndex={alHacerClic ? 0 : undefined}
                     onClick={alHacerClic ? (e) => { if (!(e.target as HTMLElement).closest('[role="separator"]')) alHacerClic() } : undefined}
@@ -256,7 +304,7 @@ export function DataTable<T>({
                     className={cn(
                       'group/fila flex items-center gap-3 px-4 text-[13px] text-ink-soft transition-colors focus-visible:outline-none focus-visible:bg-surface-subtle',
                       ALTO_FILA[density],
-                      elegida ? 'bg-dash-count-bg' : abierta ? 'bg-surface-subtle' : alHacerClic && 'cursor-pointer hover:bg-surface-subtle',
+                      off ? 'text-ink-faint [&_*]:opacity-70' : elegida ? 'bg-dash-count-bg' : abierta ? 'bg-surface-subtle' : alHacerClic && 'cursor-pointer hover:bg-surface-subtle',
                     )}
                   >
                     {reorder && (
@@ -279,14 +327,14 @@ export function DataTable<T>({
                     {rowDetail && <ChevronRight aria-hidden className={cn('size-4 shrink-0 text-ink-faint transition-transform', abierta && 'rotate-90')} />}
                     {selectable && (
                       <span onClick={(e) => e.stopPropagation()} className="flex">
-                        <Checkbox on={elegida} onChange={() => alternar(id)} label={`Select ${nombre(r)}`} />
+                        <Checkbox on={elegida} onChange={() => alternar(id)} label={`Select ${nombre(r)}`} disabled={off} />
                       </span>
                     )}
-                    {visiblesCols.map((c) => <div key={c.key} role="cell" className={celda(c)} style={ancho(c)}>{c.cell(r)}</div>)}
+                    {visiblesCols.map((c) => <div key={c.key} role="cell" inert={off || undefined} className={celda(c)} style={ancho(c)}>{c.cell(r)}</div>)}
                     {relleno}
                     {rowActions && (
                       <div className="flex w-10 shrink-0 justify-center" onClick={(e) => e.stopPropagation()}>
-                        <RowActionsMenu label={nombre(r)}>{rowActions(r)}</RowActionsMenu>
+                        {off ? <span className="w-8" aria-hidden /> : <RowActionsMenu label={nombre(r)}>{rowActions(r)}</RowActionsMenu>}
                       </div>
                     )}
                   </div>
@@ -296,7 +344,7 @@ export function DataTable<T>({
             })
           )}
 
-          {filtradas.length > 0 && (
+          {filtradas.length > 0 && !loading && !error && (
             <div className="flex min-h-[52px] flex-wrap items-center justify-between gap-3 border-t border-line-row px-4 py-2">
               <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-ink-muted">
                 <span>
