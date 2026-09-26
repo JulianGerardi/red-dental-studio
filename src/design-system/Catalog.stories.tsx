@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { componentes } from './catalog'
 import { Codigo, Page } from './Page'
+import { IrA, paginaDeArchivo, useIndice } from './Mapa'
 
 const meta = {
   title: 'Components/Catalog',
@@ -13,6 +14,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 function Catalogo() {
+  const entradas = useIndice()
   const [q, setQ] = useState('')
   const [soloSinStory, setSoloSinStory] = useState(false)
   const visibles = useMemo(
@@ -30,7 +32,7 @@ function Catalogo() {
   return (
     <Page
       titulo="Component catalog"
-      bajada={`Todos los archivos de src/components, leídos del código: qué exportan, dónde se usan y la nota de diseño que cada uno trae en su encabezado. ${conStory} de ${componentes.length} tienen story.`}
+      bajada={`Todos los archivos de src/components, leídos del código: qué exportan, dónde se usan y la nota de diseño que cada uno trae en su encabezado. ${conStory} de ${componentes.length} tienen story; “Open →” lleva a su página.`}
     >
       <div className="flex flex-wrap items-center gap-3">
         <input
@@ -57,6 +59,14 @@ function Catalogo() {
                   <span className="min-w-0 flex-1 truncate text-ink-muted">{c.exports.join(', ') || '-'}</span>
                   <span className="text-[11.5px] text-ink-muted">used in {c.usadoEn}</span>
                   {c.usadoEn === 0 && <span className="rounded-full bg-warn-bg px-2 py-0.5 text-[11px] font-semibold text-warn-fg">unused</span>}
+                  {(() => {
+                    const destino = entradas && paginaDeArchivo(entradas, c.archivo)
+                    return destino ? (
+                      <span onClick={(e) => e.stopPropagation()}>
+                        <IrA entrada={destino} className="text-dash-blue text-[12px] font-semibold hover:underline">Open →</IrA>
+                      </span>
+                    ) : null
+                  })()}
                   <span className={c.tieneStory || c.exento ? 'rounded-full bg-dash-ok-bg px-2 py-0.5 text-[11px] font-semibold text-dash-ok-fg' : 'rounded-full bg-warn-bg px-2 py-0.5 text-[11px] font-semibold text-warn-fg'}>
                     {c.tieneStory ? 'story' : c.exento ? 'in host story' : 'no story'}
                   </span>

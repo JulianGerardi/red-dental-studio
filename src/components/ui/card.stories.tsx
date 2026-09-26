@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { composeStories } from '@storybook/react-vite'
-import { MoreVertical } from 'lucide-react'
+import { MoreVertical, UserCog } from 'lucide-react'
 import { Button } from './button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card'
 import { SectionCard, TextField } from '@/components/patients/form'
@@ -11,6 +11,7 @@ import * as AppointmentCardStories from '@/components/dashboard/AppointmentCard.
 import * as OperatoryCardStories from '@/components/dashboard/OperatoryCard.stories'
 import * as PendingTaskCardStories from '@/components/dashboard/PendingTaskCard.stories'
 import * as PatientCardStories from '@/components/patients/PatientCard.stories'
+import { SettingsSectionCard } from '@/components/settings/SettingsSectionCard'
 import { cn } from '@/lib/utils'
 
 type Args = {
@@ -135,6 +136,7 @@ const { Default: Pending } = composeStories(PendingTaskCardStories)
 const { Active: Patient } = composeStories(PatientCardStories)
 
 const EN_LA_APP: { nombre: string; uso: string; ancho: number; nodo: ReactNode }[] = [
+  { nombre: 'SettingsSectionCard', uso: 'One section of Settings on its home page. The whole card is the link.', ancho: 320, nodo: <SettingsSectionCard to="/settings/accounts" icon={UserCog} title="Accounts" description="Manage your account and their access." /> },
   { nombre: 'SectionCard', uso: 'A block of a form: groups related fields under a title.', ancho: 340, nodo: <SectionCard title="General"><TextField label="Name" placeholder="Name" /></SectionCard> },
   { nombre: 'StatCard', uso: 'One number of the day with its change.', ancho: 260, nodo: <Stat /> },
   { nombre: 'AppointmentCard', uso: 'One appointment in the dashboard list.', ancho: 360, nodo: <Appointment /> },

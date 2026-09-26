@@ -6,7 +6,6 @@ import {
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { SearchButton } from '@/components/ui/search-button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
@@ -21,7 +20,8 @@ import { LinkExistingPerson } from '@/components/settings/LinkExistingPerson'
 import { NewHoursModal } from '@/components/settings/NewHoursModal'
 import { Pill } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { RowActionsMenu } from '@/components/ui/row-actions-menu'
+import { buttonClasses } from '@/components/ui/button'
+import { DataTable, PersonCell, TextCell } from '@/components/ui/data-table'
 
 /* Settings → Employees. La lista es propia —el Figma de 3864:235190 sólo
    tiene la ficha de un empleado, no la tabla que lleva hasta ahí—, con las
@@ -40,16 +40,6 @@ export function ProviderPill({ si }: { si: boolean }) {
   return <Pill tone={si ? 'info' : 'neutral'}>{si ? 'Yes' : 'No'}</Pill>
 }
 
-const COLS = {
-  check: 'w-9',
-  nombre: 'w-[240px]',
-  cumple: 'w-[120px]',
-  email: 'w-[220px]',
-  provider: 'w-[100px]',
-  estado: 'w-[100px]',
-  acciones: 'w-9',
-}
-
 export function SettingsEmployees() {
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(EMPLEADOS)
@@ -60,12 +50,6 @@ export function SettingsEmployees() {
     () => filas.filter((e) => `${e.nombre} ${e.email} ${e.cargo}`.toLowerCase().includes(q.trim().toLowerCase())),
     [filas, q],
   )
-  const todasVisibles = visibles.length > 0 && visibles.every((e) => seleccion.includes(e.id))
-
-  const alternarTodas = (v: boolean) =>
-    setSeleccion(v ? [...new Set([...seleccion, ...visibles.map((e) => e.id)])] : seleccion.filter((id) => !visibles.some((e) => e.id === id)))
-  const alternarUna = (id: string, v: boolean) =>
-    setSeleccion((p) => (v ? [...p, id] : p.filter((x) => x !== id)))
 
   const borrar = (e: Empleado) => {
     const indice = filas.findIndex((x) => x.id === e.id)
@@ -90,12 +74,8 @@ export function SettingsEmployees() {
         titulo="Employees"
         bajada="Everyone with access to the practice, across every location."
         accion={(
-          <Link
-            to="/settings/team/new"
-            data-tour="set-team"
-            className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 shrink-0 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
-          >
-            <CirclePlus className="size-4" /> New Employee
+          <Link to="/settings/team/new" data-tour="set-team" className={buttonClasses()}>
+            <CirclePlus /> New Employee
           </Link>
         )}
       >
@@ -117,102 +97,56 @@ export function SettingsEmployees() {
         )}
       </SettingsPageHeader>
 
-      <div className="mt-4 overflow-x-auto rounded-lg border border-line-row bg-white">
-        <div className="min-w-[840px]">
-          <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
-            <span className={COLS.check}>
-              <Checkbox on={todasVisibles} onChange={alternarTodas} label="Select all employees" />
-            </span>
-            <span className={COLS.nombre}>Full Name</span>
-            <span className={COLS.cumple}>Birthdate</span>
-            <span className={cn(COLS.email, 'min-w-0 flex-1')}>Email</span>
-            <span className={COLS.provider}>Is Provider</span>
-            <span className={COLS.estado}>Status</span>
-            <span className={COLS.acciones} />
-          </div>
-
-          {visibles.length === 0 ? (
-            <EmptyState
-              title={filas.length === 0 ? 'No employees yet' : 'No employees found'}
-              detail={
-                filas.length === 0
-                  ? 'Add the people who work at your practice.'
-                  : 'Try a different name or email.'
-              }
-              className="border-0"
-            />
-          ) : (
-            visibles.map((e) => {
-              const marcada = seleccion.includes(e.id)
-              return (
-                <div
-                  key={e.id}
-                  className={cn(
-                    'flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft',
-                    marcada && 'bg-dash-count-bg',
-                  )}
+      <div className="mt-4">
+        <DataTable
+          columns={[
+            /* El nombre es el acceso a la ficha, como en la tabla de pacientes. */
+            { key: 'nombre', header: 'Full Name', width: 240, cell: (e) => <PersonCell tone="soft" name={e.nombre} initials={e.iniciales} to={`/settings/team/${e.id}`} /> },
+            { key: 'cumple', header: 'Birthdate', width: 120, cell: (e) => <TextCell>{e.cumpleanos}</TextCell> },
+            { key: 'email', header: 'Email', cell: (e) => <TextCell>{e.email}</TextCell> },
+            { key: 'provider', header: 'Is Provider', width: 100, cell: (e) => <ProviderPill si={e.esProvider} /> },
+            { key: 'estado', header: 'Status', width: 100, cell: (e) => <EstadoPill estado={e.estado} /> },
+          ]}
+          rows={visibles}
+          rowKey={(e) => e.id}
+          rowLabel={(e) => e.nombre}
+          selectable
+          selected={seleccion}
+          onSelectedChange={setSeleccion}
+          /* Todos en una página, como antes: el equipo de una práctica es corto. */
+          pageSize={Math.max(visibles.length, 1)}
+          itemLabel="employees"
+          empty={filas.length === 0
+            ? { title: 'No employees yet', detail: 'Add the people who work at your practice.' }
+            : { title: 'No employees found', detail: 'Try a different name or email.' }}
+          rowActions={(e) => (
+            <>
+              <DropdownMenuItem asChild>
+                <Link to={`/settings/team/${e.id}`}>
+                  <Pencil className="size-4 shrink-0" /> Edit Employee
+                </Link>
+              </DropdownMenuItem>
+              {/* "Delete Employee" borra la fila de verdad. Las otras tres son
+                  del mismo peso en el frame —mismo ícono de "prohibido"— pero
+                  necesitarían estados de cuenta que el sistema todavía no tiene. */}
+              <DropdownMenuItem variant="destructive" onSelect={() => borrar(e)}>
+                <Ban className="size-4 shrink-0" /> Delete Employee
+              </DropdownMenuItem>
+              {(['Suspend Employee', 'Terminate Employee', 'Disable'] as const).map((accion) => (
+                <DropdownMenuItem
+                  key={accion}
+                  variant="destructive"
+                  onSelect={() => aviso.info(`${accion} is not available in this release.`)}
                 >
-                  <span className={COLS.check}>
-                    <Checkbox on={marcada} onChange={(v) => alternarUna(e.id, v)} label={`Select ${e.nombre}`} />
-                  </span>
-                  <span className={cn('flex items-center gap-2.5', COLS.nombre)}>
-                    <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold">
-                      {e.iniciales}
-                    </span>
-                    {/* El nombre es el acceso a la ficha, como en la tabla de pacientes. */}
-                    <Link to={`/settings/team/${e.id}`} className="text-dash-blue truncate font-semibold hover:underline">
-                      {e.nombre}
-                    </Link>
-                  </span>
-                  <span className={cn('truncate', COLS.cumple)}>{e.cumpleanos}</span>
-                  <span className={cn('min-w-0 flex-1 truncate', COLS.email)}>{e.email}</span>
-                  <span className={COLS.provider}>
-                    <ProviderPill si={e.esProvider} />
-                  </span>
-                  <span className={COLS.estado}>
-                    <EstadoPill estado={e.estado} />
-                  </span>
-                  <span className={COLS.acciones}>
-                    <RowActionsMenu label={e.nombre}>
-                      <DropdownMenuItem asChild>
-                        <Link to={`/settings/team/${e.id}`}>
-                          <Pencil className="size-4 shrink-0" /> Edit Employee
-                        </Link>
-                      </DropdownMenuItem>
-                      {/* "Delete Employee" borra la fila de verdad. Las
-                          otras tres son del mismo peso en el frame —mismo
-                          ícono de "prohibido"— pero necesitarían estados de
-                          cuenta que el sistema todavía no tiene. */}
-                      <DropdownMenuItem variant="destructive" onSelect={() => borrar(e)}>
-                        <Ban className="size-4 shrink-0" /> Delete Employee
-                      </DropdownMenuItem>
-                      {(['Suspend Employee', 'Terminate Employee', 'Disable'] as const).map((accion) => (
-                        <DropdownMenuItem
-                          key={accion}
-                          variant="destructive"
-                          onSelect={() => aviso.info(`${accion} is not available in this release.`)}
-                        >
-                          <Ban className="size-4 shrink-0" /> {accion}
-                        </DropdownMenuItem>
-                      ))}
-                      <DropdownMenuItem variant="destructive" onSelect={() => quitarRolProvider(e)}>
-                        <Trash2 className="size-4 shrink-0" /> Remove Provider Role
-                      </DropdownMenuItem>
-                    </RowActionsMenu>
-                  </span>
-                </div>
-              )
-            })
+                  <Ban className="size-4 shrink-0" /> {accion}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuItem variant="destructive" onSelect={() => quitarRolProvider(e)}>
+                <Trash2 className="size-4 shrink-0" /> Remove Provider Role
+              </DropdownMenuItem>
+            </>
           )}
-
-          {visibles.length > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
-              <span className="text-xs font-semibold text-ink-muted">
-                Showing {visibles.length} of {filas.length} employees
-              </span>
-            </div>
-          )}
-        </div>
+        />
       </div>
     </div>
   )

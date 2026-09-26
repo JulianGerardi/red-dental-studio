@@ -1,4 +1,4 @@
-import { Outlet, useLocation, Link } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { ANCHO_PAGINA } from '@/lib/estilos'
 import {
@@ -10,11 +10,12 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { SETTINGS_SECTIONS } from '@/data/mock'
 import { SETTINGS_NAV } from '@/data/settings-nav'
 import { Breadcrumb, type Miga } from '@/components/ui/breadcrumb'
+import { SettingsSectionCard } from '@/components/settings/SettingsSectionCard'
 import { LOCACIONES } from '@/pages/settings/Locations'
 import { EMPLEADOS } from '@/data/employees'
 import { CUENTAS } from '@/pages/settings/Accounts'
 
-const ICONS: Record<string, LucideIcon> = {
+export const SETTINGS_ICONS: Record<string, LucideIcon> = {
   'user-cog': UserCog, building: Building2, users: Users, 'shield-check': ShieldCheck,
   sliders: SlidersHorizontal, 'credit-card': CreditCard, library: Library,
   'circle-user': CircleUser, lock: Lock, 'file-signature': FileSignature,
@@ -98,17 +99,9 @@ export function SettingsGeneral() {
 
       <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {SETTINGS_SECTIONS.map((s) => {
-          const Icon = ICONS[s.icon] ?? SlidersHorizontal
+          const Icon = SETTINGS_ICONS[s.icon] ?? SlidersHorizontal
           return (
-            <Link key={s.to} to={s.to}>
-              <Card className="hover:border-primary/40 h-full p-6 transition-colors">
-                <span className="bg-accent text-primary flex size-11 items-center justify-center rounded-lg">
-                  <Icon className="size-5" />
-                </span>
-                <h2 className="mt-4 text-lg font-bold">{s.title}</h2>
-                <p className="text-muted-foreground mt-1 text-sm">{s.desc}</p>
-              </Card>
-            </Link>
+            <SettingsSectionCard key={s.to} to={s.to} icon={Icon} title={s.title} description={s.desc} />
           )
         })}
       </div>

@@ -18,15 +18,17 @@ type NavItem = { to: string; label: string; icon: LucideIcon; end?: boolean }
    app. Settings queda afuera a propósito: al pasar el mouse ya abre su menú
    flotante en ese mismo lugar. */
 export function ConTooltip({
-  label, mostrar, children,
+  label, mostrar, abierto, children,
 }: {
   label: string
   mostrar: boolean
+  /** Deja el tooltip abierto sin pasar el mouse (para documentarlo). */
+  abierto?: boolean
   children: React.ReactElement
 }) {
   if (!mostrar) return children
   return (
-    <Tooltip>
+    <Tooltip open={abierto || undefined}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipContent side="right" sideOffset={10} className="bg-ink text-white">{label}</TooltipContent>
     </Tooltip>
@@ -52,9 +54,15 @@ const NAV: NavItem[] = [
 export function Sidebar({
   expanded,
   onClose,
+  tooltipAbierto,
+  settingsAbierto,
 }: {
   expanded: boolean
   onClose?: () => void
+  /** Nombre del ítem cuyo tooltip queda abierto. Sólo para documentar el rail colapsado en Storybook. */
+  tooltipAbierto?: string
+  /** Deja abierto el menú flotante de Settings. Sólo para documentarlo en Storybook. */
+  settingsAbierto?: boolean
 }) {
   const { confibotAbierto, toggleConfibot } = useHelp()
   const { pathname } = useLocation()
@@ -128,7 +136,7 @@ export function Sidebar({
         )}
       >
         {NAV.map(({ to, label, icon: Icon, end }) => (
-          <ConTooltip key={to} label={label} mostrar={!expanded}>
+          <ConTooltip key={to} label={label} mostrar={!expanded} abierto={tooltipAbierto === label}>
             <NavLink to={to} end={end} aria-label={label} className={item(activa(to, end))}>
               <Icon className="size-4 shrink-0" />
               <span className={cn(expanded ? '' : 'md:hidden')}>{label}</span>
@@ -157,7 +165,7 @@ export function Sidebar({
           ítem colapsado mide 32 y el expandido 36, así que se le suman 2px de
           padding abajo para que el ícono caiga exactamente en la misma altura. */}
       <div className={cn('mt-auto flex flex-col pb-6', expanded ? '' : 'md:items-center md:pb-[26px]')}>
-          <SettingsItem clase={item} mostrarLabel={expanded} />
+          <SettingsItem clase={item} mostrarLabel={expanded} forzarAbierto={settingsAbierto} />
         </div>
       </aside>
     </TooltipProvider>
@@ -172,11 +180,14 @@ export function Sidebar({
 export function SettingsItem({
   clase,
   mostrarLabel,
+  forzarAbierto,
 }: {
   clase: (active: boolean) => string
   mostrarLabel: boolean
+  forzarAbierto?: boolean
 }) {
-  const [abierto, setAbierto] = useState(false)
+  const [abiertoPropio, setAbierto] = useState(false)
+  const abierto = abiertoPropio || !!forzarAbierto
   /* Billing es el único con sub-items: se despliega con su chevron en vez de
      mostrarlos siempre. */
   const [grupo, setGrupo] = useState<string | null>(null)

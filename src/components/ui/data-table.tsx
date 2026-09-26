@@ -44,7 +44,8 @@ const PADDING = 32
 export function DataTable<T>({
   columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail,
   search, filter, columnPicker, resizable, actions,
-  pageSize = 10, itemLabel = 'results', density = 'regular',
+  pageSize: pageSizeInicial = 10, pageSizeOptions, pageSizeLabel = 'Rows per page:',
+  itemLabel = 'results', density = 'regular', selected, onSelectedChange,
   empty = { title: 'No results', detail: 'Try a different search or filter.' },
 }: {
   columns: DataTableColumn<T>[]
@@ -54,6 +55,9 @@ export function DataTable<T>({
   rowLabel?: (row: T) => string
   /** Casilla por fila y "seleccionar todo" en el encabezado. */
   selectable?: boolean
+  /** Selección controlada desde afuera (ids), para mostrarla fuera de la tabla. */
+  selected?: string[]
+  onSelectedChange?: (ids: string[]) => void
   /** Ítems del menú ⋮ de cada fila (DropdownMenuItem). */
   rowActions?: (row: T) => ReactNode
   /** La fila entera es clickeable. */
@@ -71,18 +75,37 @@ export function DataTable<T>({
   /** A la derecha de la barra: acción principal, exportar… */
   actions?: ReactNode
   pageSize?: number
+  /** Selector de filas por página en el pie, por ejemplo [10, 25, 50]. */
+  pageSizeOptions?: number[]
+  pageSizeLabel?: string
   /** Qué se cuenta en el pie: "Showing 1 to 10 of 24 patients". */
   itemLabel?: string
   density?: keyof typeof ALTO_FILA
   empty?: { icon?: LucideIcon; title: string; detail?: string }
 }) {
   const [pagina, setPagina] = useState(1)
-  const [elegidas, setElegidas] = useState<string[]>([])
+  const [pageSize, setPageSize] = useState(pageSizeInicial)
+  const [elegidasPropias, setElegidasPropias] = useState<string[]>([])
+  const elegidas = selected ?? elegidasPropias
+  const setElegidas = (f: (p: string[]) => string[]) => {
+    const n = f(elegidas)
+    if (!selected) setElegidasPropias(n)
+    onSelectedChange?.(n)
+  }
   const [q, setQ] = useState('')
   const [filtro, setFiltro] = useState<string[]>([])
   const [ocultas, setOcultas] = useState<string[]>(() => columns.filter((c) => c.hidden && !c.locked).map((c) => c.key))
   const [abiertas, setAbiertas] = useState<string[]>([])
   const anchos = useAnchoColumnas<string>(Object.fromEntries(columns.map((c) => [c.key, c.width ?? MIN_FLEX])))
+
+  /* Si las filas cambian desde afuera (la pantalla busca o filtra), se vuelve
+     a la primera página. */
+  const firma = `${rows.length}:${rows[0] ? rowKey(rows[0]) : ''}`
+  const [firmaPrevia, setFirmaPrevia] = useState(firma)
+  if (firma !== firmaPrevia) {
+    setFirmaPrevia(firma)
+    setPagina(1)
+  }
 
   /* Buscar y filtrar primero; paginar después. */
   const filtradas = useMemo(
@@ -238,6 +261,19 @@ export function DataTable<T>({
                   Showing {desde} to {hasta} of {filtradas.length} {itemLabel}
                   {filtradas.length !== rows.length && <span className="font-medium text-ink-faint"> (filtered from {rows.length})</span>}
                 </span>
+                {pageSizeOptions && (
+                  <span className="flex items-center gap-2 font-normal">
+                    {pageSizeLabel}
+                    <select
+                      value={pageSize}
+                      onChange={(e) => { setPageSize(Number(e.target.value)); setPagina(1) }}
+                      aria-label="Rows per page"
+                      className="h-7 rounded-md border border-line bg-white px-2 text-[12px] focus:border-dash-blue focus:outline-none"
+                    >
+                      {pageSizeOptions.map((n) => <option key={n} value={n}>{n}</option>)}
+                    </select>
+                  </span>
+                )}
                 {resizable && anchos.avisando && (
                   <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
                     <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
@@ -259,11 +295,21 @@ export function DataTable<T>({
 /* Celdas que se repiten en las tablas de la app. */
 
 /** Iniciales en un círculo azul y el nombre como link. */
-export function PersonCell({ name, initials, to, onClick }: { name: string; initials: string; to?: string; onClick?: () => void }) {
+export function PersonCell({ name, initials, to, onClick, tone = 'solid' }: {
+  name: string
+  initials: string
+  to?: string
+  onClick?: () => void
+  /** solid: pacientes. soft: equipo (círculo celeste, iniciales azules). */
+  tone?: 'solid' | 'soft'
+}) {
   const clase = 'text-dash-blue truncate text-[13px] font-semibold hover:underline'
   return (
     <span className="flex min-w-0 items-center gap-2.5">
-      <span className="bg-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold text-surface-subtle">{initials}</span>
+      <span className={cn(
+        'flex size-8 shrink-0 items-center justify-center rounded-full font-semibold',
+        tone === 'solid' ? 'bg-dash-blue-hover text-[13px] text-surface-subtle' : 'bg-dash-count-bg text-dash-blue-hover text-[11px]',
+      )}>{initials}</span>
       {to ? (
         <Link to={to} onClick={(e) => e.stopPropagation()} className={clase}>{name}</Link>
       ) : (

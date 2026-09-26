@@ -41,6 +41,12 @@ const CONTACT = [
 let colapsadoGlobal = false
 const oyentesColapso = new Set<() => void>()
 
+/** Deja el menú del paciente colapsado o expandido desde afuera (Storybook). */
+export function setPatientMenuCollapsed(v: boolean) {
+  colapsadoGlobal = v
+  oyentesColapso.forEach((f) => f())
+}
+
 function useColapso() {
   const [, redibujar] = useState(0)
   useEffect(() => {

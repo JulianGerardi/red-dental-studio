@@ -28,11 +28,26 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
 - **Welcome**: qué es, cómo está ordenado y cómo probar un elemento.
 - **Foundations**: Colors, Typography, Radius and shadows. Todo calculado
   leyendo `src/index.css`.
+- **Welcome** tiene un **mapa** (*Ir a…*): todas las páginas agrupadas como en
+  el menú, con buscador y un link a cada una. Se arma leyendo `index.json`, así
+  que una página nueva aparece sola (`src/design-system/Mapa.tsx`). En
+  *Components / Catalog*, cada archivo tiene su “Open →”.
 - **Elements**: las piezas estándar para armar pantallas. Cada una es un
   componente real de la app y su página tiene el mismo orden: **Playground**
   (se personaliza desde el panel *Controls*; *Show code* da el código),
   variantes o tipos, estados, y **Specs** (medidas leídas del componente
   dibujado y colores leídos de sus clases y de `src/index.css`).
+  - **Page header** — `Breadcrumb` + `SettingsPageHeader`: rastro, título
+    (24px Bold), bajada, acción principal y barra con buscador, botón Search y
+    filtro. *Headers in the app* detecta en el código qué encabezado usa cada
+    pantalla y marca los que se apartan (hoy conviven varios tamaños de título:
+    PageTitle 20px Semibold, h1 sueltos de 20, 24 y 36px).
+  - **Navigation** — el rail (`Sidebar` + `Topbar`): colapsado 58px con
+    tooltip al pasar el mouse, expandido 234px, ítem activo según la ruta, menú
+    flotante de Settings; y el menú del paciente (`PatientSidePanel`): 218px →
+    60px con su botón, estado que se mantiene entre secciones. Las historias
+    usan los componentes reales; `tooltipAbierto` y `settingsAbierto` (Sidebar)
+    y `setPatientMenuCollapsed` sólo existen para dejar esos estados a la vista.
   - **Buttons** — `src/components/ui/button.tsx`. Variantes `primary`,
     `secondary`, `ghost`, `link`, `destructive` (el look más usado en el código
     para cada tipo) y tamaños `sm` 28 · `md` 32 · `lg` 36 (las tres alturas más
@@ -47,7 +62,8 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     estado usa qué tono, leído del código, marcando los que usan dos tonos.
   - **Cards** — `src/components/ui/card.tsx` (Card, CardHeader, CardTitle,
     CardDescription, CardContent, CardFooter): qué es una card, Playground
-    para armarla, anatomía y las cards reales de la app.
+    para armarla, anatomía y las cards reales de la app, incluida la de la
+    portada de Settings (`SettingsSectionCard`).
   - **Tables** — `src/components/ui/data-table.tsx`: la tabla estándar
     (barra → encabezado → filas → pie) armada con columnas y filas; selección,
     menú de fila, paginación, densidad y estado vacío se prenden con props. Trae
@@ -58,8 +74,11 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     Collapse all). El Playground deja armar una tabla eligiendo columnas y
     funciones; *Reduce, resize and filter* las muestra todas prendidas y *How to
     build a table* explica los pasos con el código.
-    **Patients** ya la usa (`PatientsTable` es DataTable con las columnas de
-    pacientes, 2026-09-26); el resto de las tablas de la app todavía no.
+    Ya la usan **Patients**, **Team**, **Accounts** y **Locations**
+    (2026-09-26), con `Button` / `buttonClasses()` para su acción principal. Para
+    esas pantallas se sumaron: selección controlada (`selected`,
+    `onSelectedChange`), filas por página (`pageSizeOptions`) y avatar `soft` en
+    `PersonCell`. Documents, Insurance, Billing y las de Clinical todavía no.
 - **Components**: las piezas de cada módulo (Dashboard, Layout, Scheduling,
   Patients, Ledger, Settings, Billing, Clinical, Help, UI). *Components /
   Catalog* es el inventario de todos los archivos de `src/components`.

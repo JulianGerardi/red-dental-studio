@@ -1,12 +1,12 @@
 import { useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, Pencil, Trash2, Plus, MapPin } from 'lucide-react'
-import { EmptyState } from '@/components/ui/empty-state'
 import { SearchButton } from '@/components/ui/search-button'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { RowActionsMenu } from '@/components/ui/row-actions-menu'
+import { buttonClasses } from '@/components/ui/button'
+import { DataTable, TextCell } from '@/components/ui/data-table'
 
 /* Settings → Locations. La tabla de entrada: nombre, empleados, salas e
    información de contacto. El detalle de cada fila —Information / Working
@@ -48,12 +48,8 @@ export function SettingsLocations() {
         titulo="Locations"
         bajada="Set your location name. Add the location you need."
         accion={(
-          <Link
-            to="/settings/locations/new"
-            data-tour="set-locations"
-            className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 shrink-0 items-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
-          >
-            <Plus className="size-4" /> New location
+          <Link to="/settings/locations/new" data-tour="set-locations" className={buttonClasses()}>
+            <Plus /> New location
           </Link>
         )}
       >
@@ -70,65 +66,34 @@ export function SettingsLocations() {
         <SearchButton onClick={() => inputRef.current?.focus()} className="h-9" />
       </SettingsPageHeader>
 
-      <div className="mt-4 overflow-x-auto rounded-lg border border-line-row bg-white">
-        <div className="min-w-[760px]">
-          <div className="flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
-            <span className="w-[180px]">Location name</span>
-            <span className="w-[100px]">Employees</span>
-            <span className="w-[80px]">Room</span>
-            <span className="min-w-0 flex-1">Information</span>
-            <span className="w-[60px] text-right">Actions</span>
-          </div>
-
-          {visibles.length === 0 ? (
-            <EmptyState
-              icon={MapPin}
-              title={filas.length === 0 ? 'No locations yet' : 'No locations found'}
-              detail={
-                filas.length === 0
-                  ? 'Add your first location to start assigning employees and rooms.'
-                  : 'Try a different name or address.'
-              }
-              className="border-0"
-            />
-          ) : (
-            visibles.map((l) => (
-              <div
-                key={l.id}
-                className="flex items-center gap-3 border-t border-line-row px-3 py-3 text-[13px] text-ink-soft"
-              >
-                {/* El nombre es el acceso, como en la tabla de pacientes. */}
-                <Link
-                  to={`/settings/locations/${l.id}`}
-                  className="text-dash-blue w-[180px] truncate font-semibold hover:underline"
-                >
-                  {l.nombre}
-                </Link>
-                <span className="w-[100px]">{l.empleados}</span>
-                <span className="w-[80px]">{l.salas}</span>
-                <span className="min-w-0 flex-1 truncate">{l.info}</span>
-                <span className="flex w-[60px] justify-end">
-                  <RowActionsMenu label={l.nombre}>
-                    <DropdownMenuItem onSelect={() => navigate(`/settings/locations/${l.id}`)}>
-                      <Pencil className="size-4 shrink-0" /> Edit location
-                    </DropdownMenuItem>
-                    <DropdownMenuItem variant="destructive" onSelect={() => borrar(l)}>
-                      <Trash2 className="size-4 shrink-0" /> Delete location
-                    </DropdownMenuItem>
-                  </RowActionsMenu>
-                </span>
-              </div>
-            ))
+      <div className="mt-4">
+        <DataTable
+          columns={[
+            /* El nombre es el acceso, como en la tabla de pacientes. */
+            { key: 'nombre', header: 'Location name', width: 180, cell: (l) => <Link to={`/settings/locations/${l.id}`} className="text-dash-blue truncate font-semibold hover:underline">{l.nombre}</Link> },
+            { key: 'empleados', header: 'Employees', width: 100, cell: (l) => l.empleados },
+            { key: 'salas', header: 'Room', width: 80, cell: (l) => l.salas },
+            { key: 'info', header: 'Information', cell: (l) => <TextCell>{l.info}</TextCell> },
+          ]}
+          rows={visibles}
+          rowKey={(l) => l.id}
+          rowLabel={(l) => l.nombre}
+          pageSize={Math.max(visibles.length, 1)}
+          itemLabel="locations"
+          empty={filas.length === 0
+            ? { icon: MapPin, title: 'No locations yet', detail: 'Add your first location to start assigning employees and rooms.' }
+            : { icon: MapPin, title: 'No locations found', detail: 'Try a different name or address.' }}
+          rowActions={(l) => (
+            <>
+              <DropdownMenuItem onSelect={() => navigate(`/settings/locations/${l.id}`)}>
+                <Pencil className="size-4 shrink-0" /> Edit location
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive" onSelect={() => borrar(l)}>
+                <Trash2 className="size-4 shrink-0" /> Delete location
+              </DropdownMenuItem>
+            </>
           )}
-
-          {visibles.length > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
-              <span className="text-xs font-semibold text-ink-muted">
-                Showing {visibles.length} of {filas.length} locations
-              </span>
-            </div>
-          )}
-        </div>
+        />
       </div>
     </div>
   )

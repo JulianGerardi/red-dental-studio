@@ -42,6 +42,21 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   loading?: boolean
 }
 
+/** Las clases del botón, para dar el mismo aspecto a un link (`<Link>`). */
+export function buttonClasses({ variant = 'primary', size = 'lg', iconOnly, className }: Pick<ButtonProps, 'variant' | 'size' | 'iconOnly' | 'className'> = {}) {
+  return cn(
+    'inline-flex shrink-0 items-center justify-center rounded-md font-medium whitespace-nowrap transition-colors',
+    'focus-visible:outline-2 focus-visible:outline-offset-2',
+    'disabled:pointer-events-none disabled:opacity-40',
+    '[&_svg]:pointer-events-none [&_svg]:shrink-0',
+    BUTTON_VARIANTS[variant],
+    BUTTON_SIZES[size],
+    iconOnly && ICON_ONLY[size],
+    variant === 'link' && !iconOnly && 'h-auto px-0',
+    className,
+  )
+}
+
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'lg', iconOnly, loading, disabled, children, type = 'button', ...props }, ref) => (
     <button
@@ -49,17 +64,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       type={type}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
-      className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-md font-medium whitespace-nowrap transition-colors',
-        'focus-visible:outline-2 focus-visible:outline-offset-2',
-        'disabled:pointer-events-none disabled:opacity-40',
-        '[&_svg]:pointer-events-none [&_svg]:shrink-0',
-        BUTTON_VARIANTS[variant],
-        BUTTON_SIZES[size],
-        iconOnly && ICON_ONLY[size],
-        variant === 'link' && !iconOnly && 'h-auto px-0',
-        className,
-      )}
+      className={buttonClasses({ variant, size, iconOnly, className })}
       {...props}
     >
       {loading && <Loader2 className="animate-spin" aria-hidden />}
