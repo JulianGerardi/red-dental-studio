@@ -1,7 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{i as n,n as r,t as i}from"./LocationSelector-DNG9K_Hh.js";var a,o,s,c;function l(){return(l=e((()=>{n(),a=t(),o={title:`Components/Layout/LocationSelector parts`,parameters:{layout:`padded`}},s={render:()=>(0,a.jsxs)(`div`,{className:`flex w-[300px] flex-col gap-1`,children:[(0,a.jsx)(i,{loc:r[0],actual:!0,favorita:!0,onElegir:()=>{},onFavorita:()=>{}}),(0,a.jsx)(i,{loc:r[2],actual:!1,favorita:!1,onElegir:()=>{},onFavorita:()=>{}}),(0,a.jsx)(i,{loc:r[3],actual:!1,favorita:!0,onElegir:()=>{},onFavorita:()=>{}})]})},c=[`LocationRows`],s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="flex w-[300px] flex-col gap-1">
-      <Fila loc={LOCATIONS[0]} actual favorita onElegir={() => {}} onFavorita={() => {}} />
-      <Fila loc={LOCATIONS[2]} actual={false} favorita={false} onElegir={() => {}} onFavorita={() => {}} />
-      <Fila loc={LOCATIONS[3]} actual={false} favorita onElegir={() => {}} onFavorita={() => {}} />
-    </div>
-}`,...s.parameters?.docs?.source}}}})))()}l();export{s as LocationRows,c as __namedExportsOrder,o as default};

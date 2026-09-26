@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{f as t,u as n}from"./TreatmentPlanSection-AR0C4emf.js";import{a as r,i,n as a,r as o}from"./play-CDw6varG.js";var s,c,l,u,d;function f(){return(f=e((()=>{t(),o(),s={title:`Components/Clinical/TreatmentPlanSection`,component:n,parameters:{layout:`padded`,docs:{story:{inline:!1,iframeHeight:720}}}},c={},l={play:i(/select all procedures/i)},u={play:r(i(/new alternative case/i),i(/^save$/i),a(/required/i))},d=[`Default`,`RowsSelected`,`MoveDialogWithError`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
+  play: pulsar(/select all procedures/i)
+}`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
+  play: secuencia(pulsar(/new alternative case/i), pulsar(/^save$/i), esperar(/required/i))
+}`,...u.parameters?.docs?.source}}}})))()}f();export{c as Default,u as MoveDialogWithError,l as RowsSelected,d as __namedExportsOrder,s as default};
