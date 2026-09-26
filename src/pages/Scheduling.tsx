@@ -1,3 +1,4 @@
+import { Tabs } from '@/components/ui/tabs'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, ChevronLeft, ChevronRight, Plus, CalendarCheck, Inbox, MapPin, Clock } from 'lucide-react'
@@ -244,23 +245,15 @@ export default function Scheduling() {
       {reqOpen && (
         <div className="motion-safe:animate-[fab-panel-in_180ms_cubic-bezier(0.16,1,0.3,1)] fixed right-[100px] bottom-8 z-30 flex max-h-[70svh] w-[260px] origin-bottom-right flex-col rounded-lg border border-line bg-white p-4 shadow-[0_4px_14px_0_rgb(100_100_100/0.25)]">
           <p className="text-[13px] font-bold text-ink">Appointment requests</p>
-          <div className="mt-3 flex shrink-0 rounded-md bg-surface-slate p-1">
-            {(['ASAP', 'Waiting List'] as const).map((t) => {
-              const n = solicitudes.filter((s) => s.tipo === t).length
-              return (
-                <button
-                  key={t}
-                  onClick={() => setReqTab(t)}
-                  className={cn(
-                    'flex-1 rounded px-2 py-1 text-xs font-medium',
-                    reqTab === t ? 'bg-dash-blue text-white' : 'text-ink-slate',
-                  )}
-                >
-                  {t}{n > 0 && ` (${n})`}
-                </button>
-              )
-            })}
-          </div>
+          <Tabs
+            size="sm"
+            fullWidth
+            className="mt-3 shrink-0"
+            aria-label="Request type"
+            tabs={(['ASAP', 'Waiting List'] as const).map((t) => ({ value: t, count: solicitudes.filter((x) => x.tipo === t).length }))}
+            value={reqTab}
+            onChange={setReqTab}
+          />
 
           {/* La lista scrollea sola: el panel está anclado al FAB y no puede
               crecer hasta tapar el calendario. */}

@@ -5,6 +5,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { SearchButton } from '@/components/ui/search-button'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import { Tabs } from '@/components/ui/tabs'
 
 /* Settings → Ledger. Figma 4293:57917.
    Ver design-reference/figma/modulos/settings-ledger.md. */
@@ -133,21 +134,7 @@ export function SettingsLedgerOptions() {
         </select>
       </SettingsPageHeader>
 
-      <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-surface-slate p-1">
-        {filtros.map((f) => (
-          <button
-            key={f}
-            type="button"
-            onClick={() => { setFiltro(f); setPagina(1) }}
-            className={cn(
-              'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-              filtro === f ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
-            )}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
+      <Tabs className="mt-4" aria-label="Filter options" tabs={filtros} value={filtro} onChange={(f) => { setFiltro(f); setPagina(1) }} />
 
       <div className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
         <div className={tab === 'Adjustments Types' ? 'min-w-[820px]' : 'min-w-[620px]'}>

@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Tabs } from '@/components/ui/tabs'
 
 export const EXAM_PANEL_TABS = ['Findings', 'Review exam'] as const
 export type ExamPanelTab = (typeof EXAM_PANEL_TABS)[number]
@@ -15,19 +15,7 @@ export function ExamPanelHeader({
 }) {
   return (
     <div className="flex w-full flex-wrap items-center justify-between gap-2">
-      <div className="flex items-center gap-1 rounded-lg bg-surface-slate p-1">
-        {EXAM_PANEL_TABS.map((t) => (
-          <button
-            key={t} type="button" onClick={() => onTabChange(t)}
-            className={cn(
-              'h-8 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-              tab === t ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
-            )}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <Tabs aria-label="Exam panel" tabs={EXAM_PANEL_TABS} value={tab} onChange={onTabChange} />
       {tab === 'Findings' ? (
         <button type="button" disabled title="Available once the exam has been charted" className="flex h-7 items-center gap-1.5 rounded-md bg-surface-muted px-2.5 text-[11px] font-semibold text-ink-faint">
           <Plus className="size-3" /> No Finding

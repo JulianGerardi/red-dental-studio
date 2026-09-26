@@ -1,3 +1,4 @@
+import { Tabs } from '@/components/ui/tabs'
 import { useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, ChevronRight, ChevronsLeft, ChevronsRight, ListFilter, Search, X } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
@@ -256,16 +257,7 @@ export function NewProcedureModal({
         {step === 3 && (
           <div className="flex w-full flex-col items-start gap-4">
             {CONDICIONES && (
-              <div className="flex items-center gap-1 rounded-lg bg-surface-slate p-1">
-                {(['Findings', 'Diagnostics'] as const).map((t) => (
-                  <button
-                    key={t} type="button" onClick={() => setTab(t)}
-                    className={`h-8 rounded-md px-3 text-xs font-medium ${tab === t ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft'}`}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
+              <Tabs aria-label="Link to" tabs={['Findings', 'Diagnostics'] as const} value={tab} onChange={setTab} />
             )}
 
             <div className="flex w-full flex-col gap-1">

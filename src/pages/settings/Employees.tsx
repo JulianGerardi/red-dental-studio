@@ -3,7 +3,6 @@ import { Link, useParams } from 'react-router-dom'
 import {
   Search, CirclePlus, Trash2, FileText, Pencil, Ban,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { SearchButton } from '@/components/ui/search-button'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
@@ -22,6 +21,7 @@ import { Pill } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { buttonClasses } from '@/components/ui/button'
 import { DataTable, PersonCell, TextCell } from '@/components/ui/data-table'
+import { Tabs } from '@/components/ui/tabs'
 
 /* Settings → Employees. La lista es propia —el Figma de 3864:235190 sólo
    tiene la ficha de un empleado, no la tabla que lleva hasta ahí—, con las
@@ -206,26 +206,17 @@ export function SettingsEmployeeDetail() {
       </h1>
       <p className="mt-1 text-sm text-ink-muted">Set your employee information. Update roles and hours.</p>
 
-      <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-surface-slate p-1">
-        {tabsVisibles.map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            className={cn(
-              'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-              /* Nacen con el mismo pop que el resto de los popovers del
-                 sistema -misma curva que `fab-panel-in`-, para que quede
-                 claro que "Is Provider" acaba de destrabar algo, no que la
-                 pantalla se reordenó sola. */
-              esTabProvider(t) && 'motion-safe:animate-[tab-in_180ms_cubic-bezier(0.16,1,0.3,1)]',
-              tab === t ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
-            )}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        className="mt-4"
+        aria-label="Employee sections"
+        /* Las pestañas de provider nacen con el mismo pop que el resto de los
+           popovers del sistema -misma curva que `fab-panel-in`-, para que quede
+           claro que "Is Provider" acaba de destrabar algo, no que la pantalla
+           se reordenó sola. */
+        tabs={tabsVisibles.map((t) => ({ value: t, className: esTabProvider(t) ? 'motion-safe:animate-[tab-in_180ms_cubic-bezier(0.16,1,0.3,1)]' : undefined }))}
+        value={tab}
+        onChange={setTab}
+      />
 
       <div className="mt-4 flex flex-col gap-4">
         {tab === 'Employee' && (

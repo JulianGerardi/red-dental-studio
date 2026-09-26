@@ -1,3 +1,4 @@
+import { Tabs } from '@/components/ui/tabs'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
@@ -372,21 +373,7 @@ export function SettingsLocationDetail() {
       <h1 className="text-2xl font-bold text-ink">{tab === 'Information' ? loc.nombre : tab}</h1>
       <p className="mt-1 text-sm text-ink-muted">Set your location name. Add the location you need.</p>
 
-      <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-surface-slate p-1">
-        {TABS.map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            className={cn(
-              'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-              tab === t ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
-            )}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <Tabs className="mt-4" aria-label="Location sections" tabs={TABS} value={tab} onChange={setTab} />
 
       <div className="mt-4">
         {tab === 'Information' && <InformationTab nombreLocacion={loc.nombre} />}

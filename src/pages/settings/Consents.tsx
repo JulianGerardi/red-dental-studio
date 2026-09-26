@@ -10,6 +10,7 @@ import { SelectField } from '@/components/patients/form'
 import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
 import { ConsentDocument } from '@/components/settings/ConsentDocument'
+import { Tabs } from '@/components/ui/tabs'
 
 /* Settings → Consents. Figma 4106:170620 ("New Consent Template"): lista de
    templates a la izquierda, editor del texto en el medio, preview en vivo a
@@ -233,21 +234,7 @@ export function SettingsConsents() {
             />
           </div>
 
-          <div className="flex items-center gap-1 rounded-lg bg-surface-slate p-1">
-            {FILTROS.map((f) => (
-              <button
-                key={f}
-                type="button"
-                onClick={() => { setFiltro(f); setFijados([]) }}
-                className={cn(
-                  'h-7 flex-1 rounded-md text-xs font-medium transition-colors',
-                  filtro === f ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
-                )}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
+          <Tabs size="sm" fullWidth aria-label="Filter templates" tabs={FILTROS} value={filtro} onChange={(f) => { setFiltro(f); setFijados([]) }} />
 
           <div className="flex max-h-[520px] flex-col gap-2 overflow-y-auto">
             {visibles.length === 0 ? (

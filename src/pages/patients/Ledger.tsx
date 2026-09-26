@@ -25,6 +25,7 @@ import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjust
 import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
 import { AplicarCreditoModal } from '@/components/patients/ledger/AplicarCreditoModal'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { Tabs } from '@/components/ui/tabs'
 
 /* Figma 4582:28487 / 4588:84886. Ver design-reference/figma/modulos/ledger.md. */
 
@@ -254,21 +255,7 @@ export default function Ledger() {
         <div className="min-w-0 flex-1">
           <h1 className="text-xl leading-[1.3] font-semibold text-ink">{tituloActivo}</h1>
 
-          <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-surface-slate p-1">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTab(t.id)}
-                className={cn(
-                  'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-                  tab === t.id ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
-                )}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
+          <Tabs className="mt-4" aria-label="Ledger sections" tabs={TABS.map((t) => ({ value: t.id, label: t.label }))} value={tab} onChange={setTab} />
 
           {tab === 'transacciones' && (
             <>
@@ -294,21 +281,7 @@ export default function Ledger() {
                 )}
 
                 <div className="ml-auto flex flex-wrap items-center gap-3">
-                  <div className="flex w-fit shrink-0 items-center gap-1 rounded-lg bg-surface-slate p-1">
-                    {VISTAS.map((v) => (
-                      <button
-                        key={v}
-                        type="button"
-                        onClick={() => { setVista(v); setPagina(1) }}
-                        className={cn(
-                          'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-                          vista === v ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
-                        )}
-                      >
-                        {v}
-                      </button>
-                    ))}
-                  </div>
+                  <Tabs className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
                   <ColumnPicker
                     columnas={COLUMNAS}
                     ocultas={ocultas}

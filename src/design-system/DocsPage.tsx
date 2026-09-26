@@ -3,6 +3,8 @@ import {
   Controls, Description, DocsContext, Primary, Source, Stories, Subtitle, Title,
 } from '@storybook/addon-docs/blocks'
 import { comentarioDe } from './catalog'
+import { Decisiones } from './decisiones'
+import { Dispositivos } from './Dispositivos'
 
 /* Página de docs de cada componente: la de Storybook más lo que faltaba, que
    es ver el código. Lee el archivo del componente y el de sus stories con
@@ -49,6 +51,20 @@ export function DocsPage() {
       <Primary />
       <Controls />
       <Stories includePrimary={false} />
+      {historia && !historia.parameters?.docs?.devices?.disable && (
+        <>
+          <h2>On each device</h2>
+          <p>La historia principal en el ancho real de un celular, una tablet y una computadora. Se puede usar adentro.</p>
+          <Dispositivos storyId={historia.id} alto={historia.parameters?.docs?.devices?.height} />
+        </>
+      )}
+      {rutaComponente && componente && (
+        <>
+          <h2>Design decisions</h2>
+          <p>Por qué el componente es como es, leído de los comentarios de su código: cada decisión con la línea a la que se refiere.</p>
+          <Decisiones archivo={rutaComponente} />
+        </>
+      )}
       {componente && rutaComponente && (
         <>
           <h2>Source</h2>

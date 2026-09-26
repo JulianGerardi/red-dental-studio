@@ -14,6 +14,7 @@ import { Pill, type PillTone } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { Tabs } from '@/components/ui/tabs'
 
 /* Figma 3646:58836 "Patient Dashboard". */
 
@@ -198,15 +199,7 @@ export default function PatientDetail() {
             <Card className="p-5">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
-                <div className="flex rounded-md bg-surface-slate p-1">
-                  {(['Pending Task', 'Activity'] as const).map((t) => (
-                    <button key={t} onClick={() => setTaskTab(t)}
-                      className={cn('rounded px-3 py-1 text-xs font-medium',
-                        taskTab === t ? 'bg-dash-blue text-white' : 'text-ink-slate')}>
-                      {t}
-                    </button>
-                  ))}
-                </div>
+                <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
               </div>
               <div className="mt-4 grid gap-4 xl:grid-cols-2">
                 {TASKS.map((t, i) => <PendingTaskCard key={i} task={t} />)}
@@ -215,15 +208,7 @@ export default function PatientDetail() {
 
             <Card className="p-4">
               <h2 className="text-[15px] font-bold text-ink">Appointments</h2>
-              <div className="mt-3 flex rounded-md bg-surface-slate p-1">
-                {(['Next', 'Next Appointments'] as const).map((t) => (
-                  <button key={t} onClick={() => setApptTab(t)}
-                    className={cn('flex-1 truncate rounded px-1 py-1 text-xs font-medium',
-                      apptTab === t ? 'bg-dash-blue text-white' : 'text-ink-slate')}>
-                    {t}
-                  </button>
-                ))}
-              </div>
+              <Tabs size="sm" fullWidth className="mt-3" aria-label="Appointments" tabs={['Next', 'Next Appointments'] as const} value={apptTab} onChange={setApptTab} />
               <div className="mt-3 flex flex-col gap-2">
                 {APPTS.map((a, i) => (
                   <div key={i} className="border-dash-blue rounded-md border-l-[3px] bg-white p-2.5 shadow-[0_1px_2px_rgb(0_0_0/0.06)]">

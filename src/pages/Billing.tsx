@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import {
   CreditCard, Search, X, Download, Wallet, MinusCircle, PlusCircle,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { PageTitle } from '@/components/ui/page-title'
 import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
@@ -15,6 +14,7 @@ import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { AmountCell, DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { Tabs } from '@/components/ui/tabs'
 
 /* Figma 4481:9881 "Billing". Ver design-reference/figma/modulos/billing.md.
    Las 4 pantallas del frame son estados de una sola vista: vacía, poblada,
@@ -136,21 +136,7 @@ export default function Billing() {
             <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
               <CreditCard className="size-4" /> Recent Billing Activity
             </h2>
-            <div className="flex w-fit shrink-0 items-center gap-1 rounded-lg bg-surface-slate p-1">
-              {FILTROS_ACTIVIDAD.map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => setFiltro(f)}
-                  className={cn(
-                    'h-7 shrink-0 rounded-md px-2.5 text-xs font-medium whitespace-nowrap transition-colors',
-                    filtro === f ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
-                  )}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
+            <Tabs size="sm" className="shrink-0" aria-label="Filter activity" tabs={FILTROS_ACTIVIDAD} value={filtro} onChange={setFiltro} />
           </div>
 
           {pacienteSeleccionado && (
