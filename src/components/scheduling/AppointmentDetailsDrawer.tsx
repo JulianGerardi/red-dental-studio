@@ -34,11 +34,11 @@ const W = 336
 
 /* El detalle es de lectura: el turno se cambia desde "Edit appointment", no
    con lápices sueltos por fila. */
-function Fila({ icono: Icono, children }: { icono: typeof User; children: string }) {
+export function Fila({ icono: Icono, children }: { icono: typeof User; children: string }) {
   return (
     <span className="flex items-center gap-2.5">
-      <Icono className="size-4 shrink-0 text-[#a1a1aa]" />
-      <span className="min-w-0 flex-1 truncate text-[13px] text-[#09090b]">{children}</span>
+      <Icono className="size-4 shrink-0 text-ink-faint" />
+      <span className="min-w-0 flex-1 truncate text-[13px] text-ink">{children}</span>
     </span>
   )
 }
@@ -59,6 +59,9 @@ export function AppointmentDetailsDrawer({
   hora,
   duracion,
   fecha,
+  provider,
+  room,
+  reason,
   anchor,
   onClose,
 }: {
@@ -68,6 +71,9 @@ export function AppointmentDetailsDrawer({
   hora: string
   duracion: number
   fecha: Date
+  provider: string
+  room: string
+  reason: string
   anchor: DOMRect
   onClose: () => void
 }) {
@@ -120,7 +126,7 @@ export function AppointmentDetailsDrawer({
       }
     >
       {chico && (
-        <span className="mx-auto mt-2 block h-1 w-9 rounded-full bg-[#e4e4e7]" aria-hidden />
+        <span className="mx-auto mt-2 block h-1 w-9 rounded-full bg-line" aria-hidden />
       )}
 
       {/* Cabecera en blanco. El estado ya lo canta el acento de arriba; con el
@@ -131,10 +137,10 @@ export function AppointmentDetailsDrawer({
           {initials}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[15px] leading-tight font-bold text-[#09090b]">
+          <span className="block truncate text-[15px] leading-tight font-bold text-ink">
             {patient}
           </span>
-          <span className="block text-[11px] text-[#52525b]">33 yrs · ID 4471</span>
+          <span className="block text-[11px] text-ink-medium">33 yrs · ID 4471</span>
         </span>
         {/* Pill igual a las del resto del sistema —Insurance, Treatment
             plans—: borde y texto del mismo color, fondo tintado, 11px. Antes
@@ -145,7 +151,7 @@ export function AppointmentDetailsDrawer({
         >
           {estado}
         </span>
-        <button onClick={onClose} aria-label="Close" className="shrink-0 text-[#09090b] hover:opacity-60">
+        <button onClick={onClose} aria-label="Close" className="shrink-0 text-ink hover:opacity-60">
           <X className="size-4" />
         </button>
       </div>
@@ -154,26 +160,25 @@ export function AppointmentDetailsDrawer({
         {/* Un solo horario: el de inicio, que es el que ubica el turno. La
             duración va al lado y en chico. Va sobre una caja gris para que se
             despegue de las filas de abajo sin necesidad de una regla. */}
-        <div className="flex items-center gap-2.5 rounded-md bg-[#f4f4f5] px-3 py-2">
-          <Clock className="size-4 shrink-0 text-[#09090b]" />
-          <span className="text-[15px] leading-none font-bold text-[#09090b]">{hora}</span>
-          <span className="text-[11px] text-[#71717a]">
+        <div className="flex items-center gap-2.5 rounded-md bg-surface-muted px-3 py-2">
+          <Clock className="size-4 shrink-0 text-ink" />
+          <span className="text-[15px] leading-none font-bold text-ink">{hora}</span>
+          <span className="text-[11px] text-ink-muted">
             {duracionLegible(duracion)} ·{' '}
             {fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
           </span>
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <Fila icono={User}>Dr. Smith</Fila>
-          <Fila icono={DoorOpen}>Operatory 2</Fila>
-          {/* "Reaseon" es el typo del Figma; se replica tal cual. */}
-          <Fila icono={ClipboardList}>Consultation · reaseon for the visit</Fila>
+          <Fila icono={User}>{provider}</Fila>
+          <Fila icono={DoorOpen}>{room}</Fila>
+          <Fila icono={ClipboardList}>{reason}</Fila>
           <Fila icono={Activity}>Encounter open</Fila>
         </div>
 
-        <div className="flex items-center gap-2 rounded-r-md border-l-[3px] border-l-[#99660d] bg-[#fffaf0] px-2.5 py-1.5">
-          <TriangleAlert className="size-3.5 shrink-0 text-[#99660d]" />
-          <span className="text-[11px] font-semibold text-[#99660d]">Guarantor not assigned</span>
+        <div className="flex items-center gap-2 rounded-r-md border-l-[3px] border-l-warn-fg bg-warn-bg px-2.5 py-1.5">
+          <TriangleAlert className="size-3.5 shrink-0 text-warn-fg" />
+          <span className="text-[11px] font-semibold text-warn-fg">Guarantor not assigned</span>
         </div>
 
         <button

@@ -23,7 +23,7 @@ export const ROLES_DISPONIBLES = [
 
 export type RolAsignado = { id: string; nombre: string; sedes: string[] }
 
-function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
+export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <button
       type="button"
@@ -33,7 +33,7 @@ function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) =
       onClick={() => onChange(!on)}
       className={cn(
         'flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors',
-        on ? 'bg-dash-blue' : 'bg-[#d4d4d8]',
+        on ? 'bg-dash-blue' : 'bg-line-strong',
       )}
     >
       <span className={cn('size-4 rounded-full bg-white transition-transform', on && 'translate-x-4')} />
@@ -41,7 +41,7 @@ function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) =
   )
 }
 
-function FilaRol({
+export function FilaRol({
   rol, abierto, onAbrir, onCambiar, onBorrar,
 }: {
   rol: RolAsignado
@@ -56,13 +56,13 @@ function FilaRol({
     <div
       className={cn(
         'overflow-hidden rounded-xl border transition-colors',
-        abierto ? 'border-dash-blue' : 'border-[#e4e4e7]',
+        abierto ? 'border-dash-blue' : 'border-line',
       )}
     >
       <div className={cn('flex items-center gap-3 px-4 py-3.5', abierto ? 'bg-dash-count-bg' : 'bg-white')}>
         <span className="min-w-0 flex-1">
-          <span className="text-[15px] font-bold text-[#09090b]">{rol.nombre}</span>
-          <span className="ml-2 text-[13px] text-[#71717a]">
+          <span className="text-[15px] font-bold text-ink">{rol.nombre}</span>
+          <span className="ml-2 text-[13px] text-ink-muted">
             {rol.sedes.length === 0
               ? 'Global access'
               : `${rol.sedes.length} / ${SEDES.length} locations`}
@@ -72,18 +72,18 @@ function FilaRol({
         {/* "Global access" y no "All locations": es el nombre que usa el aviso
             del modal para la misma regla, y nombrar dos veces distinto la
             misma cosa es lo que hace dudar. */}
-        <span className="hidden text-[13px] text-[#71717a] sm:inline">Global access</span>
+        <span className="hidden text-[13px] text-ink-muted sm:inline">Global access</span>
         <Switch
           on={todas}
           label={`Global access for ${rol.nombre}`}
           onChange={(v) => onCambiar(v ? [] : [SEDES[0]])}
         />
-        <span className="h-5 w-px bg-[#e4e4e7]" />
+        <span className="h-5 w-px bg-line" />
         <button
           type="button"
           aria-label={`Remove ${rol.nombre}`}
           onClick={onBorrar}
-          className="rounded p-1 text-[#09090b] hover:bg-[#fff2f2] hover:text-[#b22626]"
+          className="rounded p-1 text-ink hover:bg-dash-bad-bg hover:text-dash-bad-fg"
         >
           <Trash2 className="size-4" />
         </button>
@@ -92,14 +92,14 @@ function FilaRol({
           aria-label={abierto ? `Collapse ${rol.nombre}` : `Expand ${rol.nombre}`}
           aria-expanded={abierto}
           onClick={onAbrir}
-          className="rounded p-1 text-[#09090b] hover:bg-black/5"
+          className="rounded p-1 text-ink hover:bg-black/5"
         >
           {abierto ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
         </button>
       </div>
 
       {abierto && (
-        <div className="grid gap-3 border-t border-[#e4e4e7] bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-3 border-t border-line bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
           {SEDES.map((s) => {
             const on = rol.sedes.includes(s)
             return (
@@ -107,10 +107,10 @@ function FilaRol({
                 key={s}
                 className={cn(
                   'flex items-center gap-2 rounded-lg border px-3 py-2.5 transition-colors',
-                  on ? 'border-dash-blue' : 'border-[#e4e4e7]',
+                  on ? 'border-dash-blue' : 'border-line',
                 )}
               >
-                <span className="min-w-0 flex-1 truncate text-[13px] text-[#09090b]">{s}</span>
+                <span className="min-w-0 flex-1 truncate text-[13px] text-ink">{s}</span>
                 <Switch
                   on={on}
                   label={s}

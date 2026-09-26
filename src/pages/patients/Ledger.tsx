@@ -1,61 +1,132 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  ChevronLeft, Search, Receipt, CreditCard, Wallet, Download,
+  ChevronLeft, Search, Receipt, CreditCard, Wallet, HandCoins, Download, MoveHorizontal,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
+import { SearchButton } from '@/components/ui/search-button'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { FilterMenu } from '@/components/dashboard/FilterMenu'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import {
-  MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda,
-  type EstadoMovimiento, type Movimiento, type TipoMovimiento,
+  MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda, tieneCredito,
+  type Movimiento,
 } from '@/data/ledger'
 import { aviso } from '@/components/ui/toaster'
-import { NewPatientPaymentModal } from '@/components/patients/ledger/NewPatientPaymentModal'
-import { NewCreditAdjustmentModal } from '@/components/patients/ledger/NewCreditAdjustmentModal'
-import { NewChargeAdjustmentModal } from '@/components/patients/ledger/NewChargeAdjustmentModal'
+import { Pill, type PillTone } from '@/components/ui/pill'
+import { Pagination } from '@/components/patients/ledger/Pagination'
+import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
+import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
+import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip } from '@/components/patients/ledger/LedgerRowDetail'
+import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
+import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
+import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
+import { AplicarCreditoModal } from '@/components/patients/ledger/AplicarCreditoModal'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
-/* Figma 4582:28487 "Ledger — Screens". El Figma no traía esta pantalla hasta
-   ahora; el layout base -tira de métricas, buscador, tabla con pills de
-   Type/Status- viene de antes y se mantiene, pero arriba se suman las tres
-   acciones del frame y el toggle Patient/Guarantor View. Ver modulos/ledger.md. */
+/* Figma 4582:28487 / 4588:84886. Ver design-reference/figma/modulos/ledger.md. */
 
-const ESTADO_PILL: Record<EstadoMovimiento, string> = {
-  Posted: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Pending: 'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
-  Denied: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
-}
-const TIPO_PILL: Record<TipoMovimiento, string> = {
-  Charge: 'border-[#174596] bg-[#f0f5ff] text-[#174596]',
-  Payment: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Adjustment: 'border-[#a1a1aa] bg-[#f5f5f5] text-[#595959]',
-  Insurance: 'border-[#6633a6] bg-[#f5f0ff] text-[#6633a6]',
-}
-
-const COLS = {
-  fecha: 'w-[120px]',
-  paciente: 'w-[120px]',
-  codigo: 'w-[74px]',
-  desc: 'min-w-[200px] flex-1',
-  provider: 'w-[148px]',
-  tipo: 'w-[104px]',
-  monto: 'w-[104px] text-right',
-  saldo: 'w-[104px] text-right',
-  estado: 'w-[92px]',
+/* El Figma agrupa Payment/Adjustment en un solo tipo cada uno, pero el
+   diseño de referencia de Confidentally 2.0 distingue paciente/seguro y
+   cargo/crédito en la propia celda -mismo dato (`tipo`+signo de `monto`),
+   sólo más específico al mostrarlo-. Charge muestra el código en vez de
+   una etiqueta genérica, igual que esa referencia. */
+function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
+  if (m.tipo === 'Charge') return { texto: m.codigo, tono: 'neutral' }
+  if (m.tipo === 'Insurance') return { texto: 'Ins Payment', tono: 'purple' }
+  if (m.tipo === 'Payment') return { texto: 'Pt Payment', tono: 'info' }
+  return m.monto < 0
+    ? { texto: 'Credit Adj', tono: 'neutral' }
+    : { texto: 'Charge Adj', tono: 'danger' }
 }
 
-function Pill({ tono, children }: { tono: string; children: React.ReactNode }) {
-  return (
-    <span className={cn('inline-flex rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', tono)}>
-      {children}
-    </span>
-  )
+/* No es un `tipo` real -es una condición sobre `creditoDisponible`-, así que
+   se agrega como una opción más al lado de Charge/Payment/Adjustment/
+   Insurance en el mismo filtro, no como un filtro aparte. */
+const FILTRO_CREDITO = 'Unapplied Credits'
+const OPCIONES_FILTRO = [...TIPOS, FILTRO_CREDITO]
+
+/* Anchos del diseño de referencia (Confidentally 2.0): 112/112/96 · desc
+   elástica · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding. */
+type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'credito' | 'saldo'
+
+const ANCHO_BASE: Record<ColLedger, number> = {
+  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, credito: 136, saldo: 96,
 }
+
+/* Piso de cada columna: hasta acá pueden encoger para que la tabla entre
+   entera cuando el menú lateral y el panel del paciente están abiertos, en
+   vez de desbordar y pedir scroll. Medidos contra el contenido real:
+   "March 17, 2025" 93px, la pastilla "Ins Payment" 86, "-$9,850.00" 71.
+   Patient/Description/Provider truncan y ya tienen tooltip. */
+const ANCHO_MINIMO: Record<ColLedger, number> = {
+  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, credito: 128, saldo: 76,
+}
+
+/* Techo de Description: pasado eso, lo que sobra se reparte entre las
+   demás. 280 deja intacto el ancho de escritorio -a 934px la columna llega
+   a 230- y sólo entra en juego cuando se ocultan columnas. */
+const MAX_ELASTICA = 280
+
+type ColumnaLedger = {
+  id: ColLedger; label: string
+  elastica?: boolean; derecha?: boolean; bloqueada?: boolean
+  claseCelda?: string
+  titulo?: (m: Fila) => string
+  celda: (m: Fila) => React.ReactNode
+}
+type Fila = Movimiento & { saldo: number }
+
+const COLUMNAS: ColumnaLedger[] = [
+  { id: 'fecha', label: 'Date', bloqueada: true, celda: (m) => m.fecha },
+  { id: 'paciente', label: 'Patient', claseCelda: 'truncate text-ink', titulo: (m) => m.paciente, celda: (m) => m.paciente },
+  {
+    id: 'tipo', label: 'Type',
+    celda: (m) => { const t = detalleTipo(m); return <Pill tone={t.tono}>{t.texto}</Pill> },
+  },
+  { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-ink', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
+  { id: 'provider', label: 'Provider', claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
+  /* Los negativos bajan la cuenta: van en verde. */
+  {
+    id: 'monto', label: 'Amount', derecha: true, claseCelda: 'font-medium tabular-nums',
+    celda: (m) => <span className={m.monto < 0 ? 'text-dash-ok-fg' : 'text-ink'}>{moneda(m.monto)}</span>,
+  },
+  {
+    /* Quinta vuelta: columna propia "Credit available" al lado de Amount, con
+       el botón siempre a la vista -el mismo que antes aparecía recién al
+       hacer hover-. Bloqueada: es la única forma de llegar a "Apply credit"
+       desde la tabla. */
+    id: 'credito', label: 'Credit available', derecha: true, bloqueada: true,
+    celda: (m) => {
+      if (!tieneCredito(m)) return null
+      return (
+        <button
+          type="button"
+          data-apply-credit
+          aria-label={`Apply ${moneda(m.creditoDisponible ?? 0)} credit from ${m.descripcion}`}
+          className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-info-bg px-1.5 py-1 text-[12px] font-medium whitespace-nowrap tabular-nums hover:bg-[#e3edff]"
+        >
+          <HandCoins className="size-3.5 shrink-0" />
+          {moneda(m.creditoDisponible ?? 0)} · Apply
+        </button>
+      )
+    },
+  },
+  { id: 'saldo', label: 'Balance', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-ink', celda: (m) => moneda(m.saldo) },
+]
 
 const VISTAS = ['Patient View', 'Guarantor View'] as const
 type Vista = (typeof VISTAS)[number]
+
+const TABS = [
+  { id: 'transacciones', label: 'Transactions', titulo: 'Ledger' },
+  { id: 'pago', label: 'Patient Payment (-)', titulo: 'New Patient Payment (-)' },
+  { id: 'credito', label: 'Credit Adjustment (-)', titulo: 'New Credit (-) Adjustment' },
+  { id: 'cargo', label: 'Charge Adjustment (+)', titulo: 'New Credit (+) Adjustment' },
+] as const
+type Tab = (typeof TABS)[number]['id']
 
 export default function Ledger() {
   const { id = 'john-smith' } = useParams()
@@ -63,12 +134,54 @@ export default function Ledger() {
   const [vista, setVista] = useState<Vista>('Patient View')
   const [q, setQ] = useState('')
   const [tipos, setTipos] = useState<string[]>([])
-  const [modal, setModal] = useState<'pago' | 'credito' | 'cargo' | null>(null)
+  const [tab, setTab] = useState<Tab>('transacciones')
+  const [pagina, setPagina] = useState(1)
+  const [expandidas, setExpandidas] = useState<string[]>([])
+  const [ocultas, setOcultas] = useState<ColLedger[]>([])
+  const alternarCol = (id: ColLedger) =>
+    setOcultas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+  const [enModal, setEnModal] = useState<Fila | null>(null)
+  const [enCredito, setEnCredito] = useState<Fila | null>(null)
+  const anchos = useAnchoColumnas<ColLedger>(ANCHO_BASE)
+  const refVisible = useAnchoVisible<HTMLDivElement>()
 
-  /* Guarantor View muestra la cuenta completa; Patient View la recorta al
-     paciente que se está mirando. El saldo sigue siendo el de la cuenta
-     entera en los dos casos -no se reinicia por paciente-, así que se corre
-     sobre `movs` antes de filtrar por vista. */
+  const alternarFila = (id: string) =>
+    setExpandidas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+
+  /* Aplicar crédito no genera un movimiento nuevo -esa plata ya está
+     contada en el saldo desde que el Payment/Adjustment se registró-, sólo
+     descuenta lo aplicado del remanente de la transacción de origen. */
+  const aplicarCredito = (id: string, monto: number) => {
+    setMovs((prev) => prev.map((mv) =>
+      mv.id === id ? { ...mv, creditoDisponible: Math.max((mv.creditoDisponible ?? 0) - monto, 0) } : mv,
+    ))
+    aviso.ok(`${moneda(monto)} of credit applied.`)
+    setEnCredito(null)
+  }
+
+  /* Una columna movida a mano se queda donde la dejaron: no encoge ni
+     crece. El resto cede hasta su piso para que la tabla entre entera, y al
+     sobrar lugar Description se lo queda primero (peso alto) hasta su
+     techo; recién ahí el excedente se reparte entre las demás. */
+  const estilo = (c: ColumnaLedger) => {
+    const fijada = anchos.manual(c.id) !== undefined
+    if (fijada) {
+      return { width: anchos.ancho(c.id), minWidth: anchos.ancho(c.id), flexGrow: 0, flexShrink: 0 }
+    }
+    return {
+      width: anchos.ancho(c.id),
+      minWidth: ANCHO_MINIMO[c.id],
+      maxWidth: c.elastica ? MAX_ELASTICA : undefined,
+      flexGrow: c.elastica ? 1000 : 1,
+      flexShrink: 1,
+    }
+  }
+  const columnasVisibles = COLUMNAS.filter((c) => !ocultas.includes(c.id))
+
+  const anchoMinimo = columnasVisibles.reduce(
+    (a, c) => a + (anchos.manual(c.id) ?? ANCHO_MINIMO[c.id]), 0,
+  ) + (columnasVisibles.length - 1) * 12 + 24
+
   const conSaldoTotal = useMemo(() => conSaldo(movs), [movs])
   const delaVista = useMemo(
     () => (vista === 'Guarantor View' ? conSaldoTotal : conSaldoTotal.filter((m) => m.paciente === GUARANTOR)),
@@ -78,24 +191,40 @@ export default function Ledger() {
   const filas = useMemo(
     () => delaVista.filter(
       (m) =>
-        (tipos.length === 0 || tipos.includes(m.tipo)) &&
+        (tipos.length === 0 || tipos.includes(m.tipo) || (tipos.includes(FILTRO_CREDITO) && tieneCredito(m))) &&
         `${m.codigo} ${m.descripcion} ${m.provider} ${m.paciente}`.toLowerCase().includes(q.trim().toLowerCase()),
     ),
     [delaVista, q, tipos],
   )
+  const TAM_PAGINA = 8
+  const paginas = Math.max(1, Math.ceil(filas.length / TAM_PAGINA))
+  const paginaActual = Math.min(pagina, paginas)
+  const filasPagina = filas.slice((paginaActual - 1) * TAM_PAGINA, paginaActual * TAM_PAGINA)
 
-  /* Los totales salen de los movimientos de la vista activa, no de un mock
-     aparte. */
+  /* "todas" es sobre lo que se ve en pantalla, no sobre la cuenta entera:
+     abrir 26 filas de golpe en una tabla paginada no le sirve a nadie. */
+  const todasAbiertas = filasPagina.length > 0 && filasPagina.every((m) => expandidas.includes(m.id))
+  const hayAlgunaAbierta = filasPagina.some((m) => expandidas.includes(m.id))
+  const expandirTodo = () =>
+    setExpandidas((p) => [...new Set([...p, ...filasPagina.map((m) => m.id)])])
+  const colapsarTodo = () =>
+    setExpandidas((p) => p.filter((id) => !filasPagina.some((m) => m.id === id)))
+
   const stats: Stat[] = useMemo(() => {
     const cargos = delaVista.filter((m) => m.tipo === 'Charge').reduce((a, m) => a + m.monto, 0)
     const seguro = delaVista.filter((m) => m.tipo === 'Insurance' && m.estado === 'Posted')
       .reduce((a, m) => a + m.monto, 0)
     const saldo = delaVista.reduce((a, m) => a + m.monto, 0)
     const denegados = delaVista.filter((m) => m.estado === 'Denied').length
+    const credito = delaVista.filter(tieneCredito).reduce((a, m) => a + (m.creditoDisponible ?? 0), 0)
     return [
       { label: 'Total charges', value: moneda(cargos), nota: `${delaVista.filter((m) => m.tipo === 'Charge').length} procedures`, icon: Receipt, bg: '#eef2ff', fg: '#1d56bc' },
       { label: 'Insurance paid', value: moneda(-seguro), nota: denegados ? `${denegados} denied` : 'all posted', icon: CreditCard, bg: '#f5f3ff', fg: '#8b5cf6' },
       { label: 'Patient balance', value: moneda(saldo), nota: 'due on next visit', icon: Wallet, bg: '#fff7ed', fg: '#f97316' },
+      /* bg/fg: StatStrip los ignora a propósito -las cuatro comparten el
+         mismo azul del ícono, ver su propio comentario-, quedan sólo por
+         las dudas de que algún día se lean. */
+      { label: 'Unapplied credits', value: moneda(credito), nota: 'Available to apply', icon: HandCoins, bg: '#eef2ff', fg: '#1d56bc' },
     ]
   }, [delaVista])
 
@@ -104,9 +233,11 @@ export default function Ledger() {
   }
 
   const cargosDeLaCuenta = movs.filter((m) => m.tipo === 'Charge')
+  const volver = () => setTab('transacciones')
+  const tituloActivo = TABS.find((t) => t.id === tab)?.titulo ?? 'Ledger'
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
       <Link
         to="/patients"
         className="text-dash-blue mb-3 inline-flex items-center gap-1 text-sm hover:underline"
@@ -121,151 +252,234 @@ export default function Ledger() {
         />
 
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-xl leading-[1.3] font-semibold text-[#09090b]">Ledger</h1>
+          <h1 className="text-xl leading-[1.3] font-semibold text-ink">{tituloActivo}</h1>
 
-            {/* Las tres acciones del frame y el toggle de vista, en la misma
-                fila -alineados entre sí, no apilados-. */}
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-surface-slate p-1">
+            {TABS.map((t) => (
               <button
+                key={t.id}
                 type="button"
-                onClick={() => setModal('pago')}
-                className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 shrink-0 items-center gap-1.5 rounded-md px-3 text-[13px] font-medium whitespace-nowrap text-white transition-colors"
+                onClick={() => setTab(t.id)}
+                className={cn(
+                  'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
+                  tab === t.id ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
+                )}
               >
-                Patient Payment (-)
+                {t.label}
               </button>
-              <button
-                type="button"
-                onClick={() => setModal('credito')}
-                className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 shrink-0 items-center gap-1.5 rounded-md px-3 text-[13px] font-medium whitespace-nowrap text-white transition-colors"
-              >
-                Credit Adjustment (-)
-              </button>
-              <button
-                type="button"
-                onClick={() => setModal('cargo')}
-                className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 shrink-0 items-center gap-1.5 rounded-md px-3 text-[13px] font-medium whitespace-nowrap text-white transition-colors"
-              >
-                Charge Adjustment (+)
-              </button>
+            ))}
+          </div>
 
-              <div className="flex w-fit shrink-0 items-center gap-1 rounded-lg bg-[#f1f5f9] p-1">
-                {VISTAS.map((v) => (
-                  <button
-                    key={v}
-                    type="button"
-                    onClick={() => setVista(v)}
-                    className={cn(
-                      'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-                      vista === v ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
-                    )}
-                  >
-                    {v}
-                  </button>
-                ))}
+          {tab === 'transacciones' && (
+            <>
+              <div className="mt-4">
+                <StatStrip stats={stats} apilada />
               </div>
-            </div>
-          </div>
 
-          <div className="mt-4">
-            <StatStrip stats={stats} />
-          </div>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
+                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+                  <input
+                    value={q}
+                    onChange={(e) => { setQ(e.target.value); setPagina(1) }}
+                    placeholder="Search by code, description or provider"
+                    className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+                  />
+                </div>
+                <SearchButton onClick={() => setPagina(1)} className="h-9" />
+                <FilterMenu label="Filter entries" options={OPCIONES_FILTRO} value={tipos} onChange={(v) => { setTipos(v); setPagina(1) }} />
+                {filasPagina.length > 0 && (
+                  <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
+                  onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
+                )}
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Search by code, description or provider"
-                className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+                <div className="ml-auto flex flex-wrap items-center gap-3">
+                  <div className="flex w-fit shrink-0 items-center gap-1 rounded-lg bg-surface-slate p-1">
+                    {VISTAS.map((v) => (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => { setVista(v); setPagina(1) }}
+                        className={cn(
+                          'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
+                          vista === v ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
+                        )}
+                      >
+                        {v}
+                      </button>
+                    ))}
+                  </div>
+                  <ColumnPicker
+                    columnas={COLUMNAS}
+                    ocultas={ocultas}
+                    onToggle={alternarCol}
+                    onReset={() => setOcultas([])}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => aviso.ok('Statement exported.')}
+                    className="flex h-9 items-center gap-2 rounded-md border border-line bg-white px-4 text-[13px] font-medium hover:bg-surface-subtle"
+                  >
+                    <Download className="size-4" /> Export statement
+                  </button>
+                </div>
+              </div>
+
+              {/* `skipDelayDuration={0}`: sin esto Radix deja una ventana de gracia
+                  y al barrer la tabla el tooltip de la fila siguiente abre al
+                  instante -y alcanza a mostrar el contenido de la anterior-, que
+                  es el parpadeo que hacía imposible leerlo. */}
+              <TooltipProvider delayDuration={500} skipDelayDuration={0}>
+              <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
+                <div style={{ minWidth: anchoMinimo }}>
+                  <div data-tabla-header className="group/fila flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
+                    {columnasVisibles.map((c, i) => (
+                      <span
+                        key={c.id}
+                        data-elastica={c.elastica || undefined}
+                        style={estilo(c)}
+                        className={cn('relative flex items-center', c.derecha && 'justify-end')}
+                      >
+                        <span className="truncate">{c.label}</span>
+                        <ManijaResize id={c.id} label={c.label} estado={anchos} indice={i} />
+                      </span>
+                    ))}
+                  </div>
+
+                  {filasPagina.length === 0 ? (
+                    <EmptyState icon={Receipt} title="No entries" detail="Nothing matches the current search or filters." />
+                  ) : (
+                    filasPagina.map((m) => {
+                      const abierta = expandidas.includes(m.id)
+                      return (
+                      <div
+                        key={m.id}
+                        className={cn(
+                          'border-t border-line-row',
+                          /* Barra azul de 4px al borde de las filas con crédito
+                             sin aplicar; cubre también el detalle si se expande. */
+                          tieneCredito(m) && 'relative before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-dash-blue',
+                        )}
+                      >
+                        <FilaConTooltip m={m} abierta={abierta}>
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          aria-expanded={abierta}
+                          aria-label={`Toggle details for ${m.descripcion}`}
+                          onClick={(e) => {
+                            if ((e.target as HTMLElement).closest('[role="separator"]')) return
+                            /* El botón "Apply credit" vive adentro de la celda de
+                               Description -no tiene sentido un handler propio por
+                               columna sólo para esto-, así que se intercepta acá
+                               igual que el `separator` del resize de columnas. */
+                            if ((e.target as HTMLElement).closest('[data-apply-credit]')) { setEnCredito(m); return }
+                            alternarFila(m.id)
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.target !== e.currentTarget) return
+                            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
+                          }}
+                          className={cn(
+                            'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-ink-soft hover:bg-surface-subtle',
+                            abierta && 'bg-surface-subtle',
+                          )}
+                        >
+                          {columnasVisibles.map((c) => (
+                            <span
+                              key={c.id}
+                              style={estilo(c)}
+                              className={cn('relative', c.derecha && 'text-right', c.claseCelda)}
+                            >
+                              {c.celda(m)}
+                            </span>
+                          ))}
+                        </div>
+                        </FilaConTooltip>
+                        {abierta && (
+                          <LedgerRowDetail
+                            m={m}
+                            onVerTodo={() => setEnModal(m)}
+                            onAplicarCredito={tieneCredito(m) ? () => setEnCredito(m) : undefined}
+                          />
+                        )}
+                      </div>
+                      )
+                    })
+                  )}
+
+                  {/* El resumen cierra la tabla: adentro del mismo borde y
+                      arriba del paginado, no suelto afuera de la card. */}
+                  <div className="flex justify-end border-t border-line-row px-3 py-3">
+                    <dl className="w-fit overflow-hidden rounded-md border border-line text-[13px]">
+                      <div className="flex items-center">
+                        <dt className="w-36 bg-surface-alt px-3 py-2 text-right font-medium text-ink-soft">Balance due</dt>
+                        <dd className="text-dash-blue w-24 px-3 py-2 text-right font-semibold tabular-nums">
+                          {moneda(delaVista.reduce((a, m) => a + m.monto, 0))}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
+                    <span className="flex items-center gap-3 text-xs font-semibold text-ink-muted">
+                      Showing {filasPagina.length} of {filas.length} entries
+                      {anchos.avisando && (
+                        <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
+                          <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
+                        </span>
+                      )}
+                      {anchos.hayCambios && (
+                        <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">
+                          Reset column widths
+                        </button>
+                      )}
+                    </span>
+                    <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
+                  </div>
+                </div>
+              </div>
+              </TooltipProvider>
+            </>
+          )}
+
+          {tab === 'pago' && (
+            <div className="mt-4">
+              <PatientPaymentPanel
+                cargos={cargosDeLaCuenta}
+                onCancelar={volver}
+                onGuardar={(m) => { agregar(m); aviso.ok(`Payment of ${moneda(Math.abs(m.monto))} recorded for ${m.paciente}.`); volver() }}
               />
             </div>
-            <FilterMenu label="Filter entries" options={TIPOS} value={tipos} onChange={setTipos} />
-            <button
-              type="button"
-              onClick={() => aviso.ok('Statement exported.')}
-              className="ml-auto flex h-9 items-center gap-2 rounded-md border border-[#e4e4e7] bg-white px-4 text-[13px] font-medium hover:bg-[#fafafa]"
-            >
-              <Download className="size-4" /> Export statement
-            </button>
-          </div>
-
-          <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
-            <div className="min-w-[1080px]">
-              <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
-                <span className={COLS.fecha}>Date</span>
-                <span className={COLS.paciente}>Patient</span>
-                <span className={COLS.codigo}>Code</span>
-                <span className={COLS.desc}>Description</span>
-                <span className={COLS.provider}>Provider</span>
-                <span className={COLS.tipo}>Type</span>
-                <span className={COLS.monto}>Amount</span>
-                <span className={COLS.saldo}>Balance</span>
-                <span className={COLS.estado}>Status</span>
-              </div>
-
-              {filas.length === 0 ? (
-                <EmptyState icon={Receipt} title="No entries" detail="Nothing matches the current search or filters." />
-              ) : (
-                filas.map((m) => (
-                  <div
-                    key={m.id}
-                    className="flex items-center gap-3 border-b border-[#e7e7e7] px-4 py-3 text-[13px] text-[#3f3f46] last:border-0"
-                  >
-                    <span className={COLS.fecha}>{m.fecha}</span>
-                    <span className={cn(COLS.paciente, 'truncate text-[#09090b]')}>{m.paciente}</span>
-                    <span className={cn(COLS.codigo, 'text-dash-blue font-medium')}>{m.codigo}</span>
-                    <span className={cn(COLS.desc, 'truncate text-[#09090b]')}>{m.descripcion}</span>
-                    <span className={cn(COLS.provider, 'truncate')}>{m.provider}</span>
-                    <span className={COLS.tipo}><Pill tono={TIPO_PILL[m.tipo]}>{m.tipo}</Pill></span>
-                    {/* Los negativos bajan la cuenta: van en verde. */}
-                    <span className={cn(COLS.monto, 'font-medium tabular-nums', m.monto < 0 ? 'text-[#1a804d]' : 'text-[#09090b]')}>
-                      {moneda(m.monto)}
-                    </span>
-                    <span className={cn(COLS.saldo, 'font-semibold tabular-nums text-[#09090b]')}>
-                      {moneda(m.saldo)}
-                    </span>
-                    <span className={COLS.estado}><Pill tono={ESTADO_PILL[m.estado]}>{m.estado}</Pill></span>
-                  </div>
-                ))
-              )}
-
-              <div className="flex h-[52px] items-center justify-between px-4">
-                <span className="text-xs font-semibold text-[#71717a]">
-                  Showing {filas.length} of {delaVista.length} entries
-                </span>
-                <span className="text-[13px] font-semibold text-[#09090b]">
-                  Balance due{' '}
-                  <span className="text-dash-blue">
-                    {moneda(delaVista.reduce((a, m) => a + m.monto, 0))}
-                  </span>
-                </span>
-              </div>
+          )}
+          {tab === 'credito' && (
+            <div className="mt-4">
+              <CreditAdjustmentPanel
+                cargos={cargosDeLaCuenta}
+                onCancelar={volver}
+                onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} applied to ${m.paciente}.`); volver() }}
+              />
             </div>
-          </div>
+          )}
+          {tab === 'cargo' && (
+            <div className="mt-4">
+              <ChargeAdjustmentPanel
+                cargosVisita={cargosDeLaCuenta}
+                onCancelar={volver}
+                onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} added for ${m.paciente}.`); volver() }}
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      {modal === 'pago' && (
-        <NewPatientPaymentModal
-          cargos={cargosDeLaCuenta}
-          onClose={() => setModal(null)}
-          onGuardar={(m) => { agregar(m); aviso.ok(`Payment of ${moneda(Math.abs(m.monto))} recorded for ${m.paciente}.`) }}
-        />
-      )}
-      {modal === 'credito' && (
-        <NewCreditAdjustmentModal
-          cargos={cargosDeLaCuenta}
-          onClose={() => setModal(null)}
-          onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} applied to ${m.paciente}.`) }}
-        />
-      )}
-      {modal === 'cargo' && (
-        <NewChargeAdjustmentModal
-          cargosVisita={cargosDeLaCuenta}
-          onClose={() => setModal(null)}
-          onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} added for ${m.paciente}.`) }}
+      {enModal && <LedgerRowModal m={enModal} onClose={() => setEnModal(null)} />}
+      {enCredito && (
+        <AplicarCreditoModal
+          m={enCredito}
+          cargos={cargosDeLaCuenta.filter((c) => c.paciente === enCredito.paciente)}
+          onClose={() => setEnCredito(null)}
+          onAplicar={(monto) => aplicarCredito(enCredito.id, monto)}
         />
       )}
     </div>

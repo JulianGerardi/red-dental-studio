@@ -4,25 +4,30 @@ export type ApptState =
   | 'Proposed' | 'Check-in' | 'Booked' | 'In progress'
   | 'Fulfilled' | 'No-show' | 'Cancelled'
 
+/* Los colores son tokens de src/index.css (--color-appt-*): se cambian ahí. */
+const c = (estado: string, parte: 'bg' | 'bar' | 'fg' | 'dot') => `var(--color-appt-${estado}-${parte})`
+
 export const LEGEND: { state: ApptState; dot: string | null }[] = [
-  { state: 'Proposed', dot: '#ffb82c' },
-  { state: 'Check-in', dot: '#1e9850' },
-  { state: 'Booked', dot: '#1d56bc' },
-  { state: 'In progress', dot: '#4f46e5' },
-  { state: 'Fulfilled', dot: '#17723c' },
+  { state: 'Proposed', dot: c('proposed', 'dot') },
+  { state: 'Check-in', dot: c('checkin', 'dot') },
+  { state: 'Booked', dot: c('booked', 'dot') },
+  { state: 'In progress', dot: c('inprogress', 'dot') },
+  { state: 'Fulfilled', dot: c('fulfilled', 'dot') },
   /* En el Figma "No-show" es el único sin punto. Se replica tal cual. */
   { state: 'No-show', dot: null },
-  { state: 'Cancelled', dot: '#71717a' },
+  { state: 'Cancelled', dot: c('cancelled', 'dot') },
 ]
 
+const bloque = (estado: string) => ({ bg: c(estado, 'bg'), bar: c(estado, 'bar'), fg: c(estado, 'fg') })
+
 export const BLOCK_STYLE: Record<string, { bg: string; bar: string; fg: string }> = {
-  'Check-in':    { bg: '#ddf0e5', bar: '#1e9850', fg: '#17723c' },
-  'Booked':      { bg: '#e8eef8', bar: '#1d56bc', fg: '#1d56bc' },
-  'In progress': { bg: '#f5f0ff', bar: '#6633a6', fg: '#6633a6' },
-  'Fulfilled':   { bg: '#e9f5ee', bar: '#1e9850', fg: '#17723c' },
-  'Proposed':    { bg: '#fffaf0', bar: '#ffb82c', fg: '#99660d' },
-  'No-show':     { bg: '#f4f4f5', bar: '#a1a1aa', fg: '#52525b' },
-  'Cancelled':   { bg: '#f4f4f5', bar: '#71717a', fg: '#52525b' },
+  'Check-in': bloque('checkin'),
+  'Booked': bloque('booked'),
+  'In progress': bloque('inprogress'),
+  'Fulfilled': bloque('fulfilled'),
+  'Proposed': bloque('proposed'),
+  'No-show': bloque('noshow'),
+  'Cancelled': bloque('cancelled'),
 }
 
 export type CalendarEvent = {
@@ -31,6 +36,9 @@ export type CalendarEvent = {
   duration: number  // en horas
   patient: string
   state: ApptState
+  provider: string
+  room: string
+  reason: string
 }
 
 /* El Figma rotula los cuatro eventos "10:00 AM" aunque estén en franjas
@@ -43,10 +51,10 @@ export type CalendarEvent = {
    venían de medir el alto del frame— para que la hora impresa sea una hora de
    agenda y no "08:12 AM". El bloque se mueve unos pocos píxeles. */
 export const EVENTS: CalendarEvent[] = [
-  { day: 1, start: 8.25,  duration: 2.5, patient: 'Juan Perez', state: 'Check-in' },
-  { day: 4, start: 8.25,  duration: 0.5, patient: 'Juan Perez', state: 'In progress' },
-  { day: 4, start: 9.5,   duration: 1,   patient: 'Juan Perez', state: 'Booked' },
-  { day: 0, start: 13.0,  duration: 1,   patient: 'Juan Perez', state: 'Fulfilled' },
+  { day: 1, start: 8.25,  duration: 2.5, patient: 'Maria Abril Viola', state: 'Check-in', provider: 'Dr. Elena Martinez', room: 'Operatory 2', reason: 'Routine cleaning appointment' },
+  { day: 4, start: 8.25,  duration: 0.5, patient: 'John Smith', state: 'In progress', provider: 'Dr. Salgado', room: 'Operatory 1', reason: 'Prophylaxis - adult' },
+  { day: 4, start: 9.5,   duration: 1,   patient: 'Noah James Smith', state: 'Booked', provider: 'Dr. Emily Chen', room: 'Operatory 3', reason: 'Implant consultation' },
+  { day: 0, start: 13.0,  duration: 1,   patient: 'Elias Aguirre', state: 'Fulfilled', provider: 'Sarah Stone', room: 'Operatory 1', reason: 'Broken crown, in pain' },
 ]
 
 /* Franjas no disponibles (gris) del extremo derecho del frame. */

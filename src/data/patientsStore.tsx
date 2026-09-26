@@ -15,17 +15,17 @@ export type NuevoPaciente = {
 }
 
 const SEMILLA: PatientRow[] = [
-  { id: 'abril-viola', name: 'Abril Viola', initials: 'av', birthday: 'April 2, 2025', email: 'Abril@gmail.com', status: 'Completed' },
-  { id: 'marco-rivera', name: 'Marco Rivera', initials: 'mr', birthday: 'Jan 15, 2025', email: 'marco.r@gmail.com', status: 'Proposed' },
-  { id: 'sofia-chen', name: 'Sofia Chen', initials: 'sc', birthday: 'Mar 8, 2025', email: 'sofia.chen@mail.com', status: 'Completed' },
-  { id: 'daniel-ortiz', name: 'Daniel Ortiz', initials: 'do', birthday: 'Feb 20, 2025', email: 'd.ortiz@outlook.com', status: 'In Progress' },
-  { id: 'thomas-davis', name: 'Thomas Davis', initials: 'td', birthday: 'May 30, 2025', email: 'thomas.davis@email.com', status: 'Proposed' },
-  { id: 'lena-park', name: 'Lena Park', initials: 'lp', birthday: 'May 11, 2025', email: 'lena.park@email.com', status: 'Completed' },
-  { id: 'mark-wilson', name: 'Mark Wilson', initials: 'mw', birthday: 'June 2, 2025', email: 'mark.wilson@email.com', status: 'Proposed' },
-  { id: 'sophia-johnson', name: 'Sophia Johnson', initials: 'sj', birthday: 'April 20, 2025', email: 'sophia.johnson@email.com', status: 'Completed' },
-  { id: 'robert-brown', name: 'Robert Brown', initials: 'rb', birthday: 'March 15, 2025', email: 'robert.brown@email.com', status: 'In Progress' },
-  { id: 'emily-clark', name: 'Emily Clark', initials: 'ec', birthday: 'July 8, 2025', email: 'emily.clark@email.com', status: 'Completed' },
-  { id: 'james-wilson', name: 'James Wilson', initials: 'jw', birthday: 'Jun 3, 2025', email: 'j.wilson@corp.com', status: 'Proposed' },
+  { id: 'abril-viola', name: 'Abril Viola', initials: 'av', birthday: 'April 2, 2025', email: 'Abril@gmail.com', status: 'Active' },
+  { id: 'marco-rivera', name: 'Marco Rivera', initials: 'mr', birthday: 'Jan 15, 2025', email: 'marco.r@gmail.com', status: 'Active' },
+  { id: 'sofia-chen', name: 'Sofia Chen', initials: 'sc', birthday: 'Mar 8, 2025', email: 'sofia.chen@mail.com', status: 'Inactive' },
+  { id: 'daniel-ortiz', name: 'Daniel Ortiz', initials: 'do', birthday: 'Feb 20, 2025', email: 'd.ortiz@outlook.com', status: 'Active' },
+  { id: 'thomas-davis', name: 'Thomas Davis', initials: 'td', birthday: 'May 30, 2025', email: 'thomas.davis@email.com', status: 'Active' },
+  { id: 'lena-park', name: 'Lena Park', initials: 'lp', birthday: 'May 11, 2025', email: 'lena.park@email.com', status: 'Inactive' },
+  { id: 'mark-wilson', name: 'Mark Wilson', initials: 'mw', birthday: 'June 2, 2025', email: 'mark.wilson@email.com', status: 'Active' },
+  { id: 'sophia-johnson', name: 'Sophia Johnson', initials: 'sj', birthday: 'April 20, 2025', email: 'sophia.johnson@email.com', status: 'Active' },
+  { id: 'robert-brown', name: 'Robert Brown', initials: 'rb', birthday: 'March 15, 2025', email: 'robert.brown@email.com', status: 'Inactive' },
+  { id: 'emily-clark', name: 'Emily Clark', initials: 'ec', birthday: 'July 8, 2025', email: 'emily.clark@email.com', status: 'Active' },
+  { id: 'james-wilson', name: 'James Wilson', initials: 'jw', birthday: 'Jun 3, 2025', email: 'j.wilson@corp.com', status: 'Active' },
 ]
 
 const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
@@ -41,7 +41,7 @@ function aFila(d: NuevoPaciente, id: string): PatientRow {
     initials: iniciales(d.first, d.last) || '??',
     birthday: d.birthday || '—',
     email: d.email || '—',
-    status: 'Proposed' as PatientStatus,
+    status: 'Active' as PatientStatus,
   }
 }
 

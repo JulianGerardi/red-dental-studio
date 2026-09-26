@@ -35,7 +35,7 @@ const DIAS: [string, string][] = [
   ['Wednesday', 'Wednesday'], ['Thursday', 'Thursday'], ['Friday', 'Friday'], ['Saturday', 'Saturday'],
 ]
 
-function SwitchOpenClose({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+export function SwitchOpenClose({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
   return (
     <button
       type="button"
@@ -44,18 +44,18 @@ function SwitchOpenClose({ on, onChange }: { on: boolean; onChange: (v: boolean)
       onClick={() => onChange(!on)}
       className="flex items-center gap-2 text-[13px]"
     >
-      <span className={cn('flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors', on ? 'bg-dash-blue' : 'bg-[#d4d4d8]')}>
+      <span className={cn('flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors', on ? 'bg-dash-blue' : 'bg-line-strong')}>
         <span className={cn('size-4 rounded-full bg-white transition-transform', on && 'translate-x-4')} />
       </span>
       {/* Azul, no verde: el switch ya es azul cuando está en Open, y el
           texto va del mismo color en vez de meter un segundo significado
           -verde- que el resto del sistema reserva para "Active"/"Completado". */}
-      <span className={cn('font-medium', on ? 'text-dash-blue' : 'text-[#71717a]')}>{on ? 'Open' : 'Close'}</span>
+      <span className={cn('font-medium', on ? 'text-dash-blue' : 'text-ink-muted')}>{on ? 'Open' : 'Close'}</span>
     </button>
   )
 }
 
-function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
+export function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
   const [d, setD] = useState({
     nombre: nombreLocacion, abrev: '', fee: '',
     codigo: CODIGOS[0], numero: '', email: '',
@@ -101,14 +101,14 @@ function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
   )
 }
 
-function WorkingHoursTab() {
+export function WorkingHoursTab() {
   const [horario, setHorario] = useState(HORARIO_SEMANAL)
   const [expandido, setExpandido] = useState<string | null>(null)
   const [modal, setModal] = useState<string | null>(null)
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#e4e4e7] bg-white">
-      <div className="grid grid-cols-[140px_140px_1fr] gap-3 border-b border-[#e4e4e7] bg-[#f9f9f9] px-4 py-3 text-xs font-semibold text-[#71717a]">
+    <div className="overflow-hidden rounded-xl border border-line bg-white">
+      <div className="grid grid-cols-[140px_140px_1fr] gap-3 border-b border-line bg-surface-alt px-4 py-3 text-xs font-semibold text-ink-muted">
         <span>Day</span>
         <span>Status</span>
         <span>Hours</span>
@@ -120,11 +120,11 @@ function WorkingHoursTab() {
           <div
             key={key}
             className={cn(
-              'grid grid-cols-[140px_140px_1fr] items-center gap-3 border-b border-[#f1f1f4] px-4 py-3 last:border-0',
-              !dia.abierto && 'bg-[#fafafa]',
+              'grid grid-cols-[140px_140px_1fr] items-center gap-3 border-b border-line-soft px-4 py-3 last:border-0',
+              !dia.abierto && 'bg-surface-subtle',
             )}
           >
-            <span className="text-[13px] font-semibold text-[#09090b]">{label}</span>
+            <span className="text-[13px] font-semibold text-ink">{label}</span>
             <SwitchOpenClose
               on={dia.abierto}
               onChange={(v) => {
@@ -187,7 +187,7 @@ function WorkingHoursTab() {
                 )}
               </div>
             ) : (
-              <span className="text-[12px] text-[#a1a1aa]">Closed all day.</span>
+              <span className="text-[12px] text-ink-faint">Closed all day.</span>
             )}
           </div>
         )
@@ -209,12 +209,12 @@ function WorkingHoursTab() {
   )
 }
 
-function RoomsTab() {
+export function RoomsTab() {
   const [salas, setSalas] = useState<Sala[]>(SALAS_INICIALES)
   const [modal, setModal] = useState<'nueva' | Sala | false>(false)
 
   return (
-    <div className="rounded-xl border border-[#e4e4e7] bg-white p-4 sm:p-5">
+    <div className="rounded-xl border border-line bg-white p-4 sm:p-5">
       <div className="flex items-center justify-end">
         <button
           type="button"
@@ -230,9 +230,9 @@ function RoomsTab() {
       ) : (
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {salas.map((s) => (
-            <div key={s.id} className="rounded-lg border-l-[3px] border-l-dash-blue bg-[#fafafa] p-3">
+            <div key={s.id} className="rounded-lg border-l-[3px] border-l-dash-blue bg-surface-subtle p-3">
               <div className="flex items-start justify-between gap-2">
-                <span className="flex min-w-0 items-center gap-2 text-[13px] font-bold text-[#09090b]">
+                <span className="flex min-w-0 items-center gap-2 text-[13px] font-bold text-ink">
                   <DoorOpen className="text-dash-blue size-4 shrink-0" /> <span className="truncate">{s.nombre}</span>
                 </span>
                 <span className="flex shrink-0 items-center gap-0.5">
@@ -261,8 +261,8 @@ function RoomsTab() {
                   </button>
                 </span>
               </div>
-              <p className="mt-1.5 text-[12px] text-[#71717a]">Type: {s.tipo || '-'}</p>
-              <p className="text-[12px] text-[#71717a]">Abbreviation: {s.abreviatura || '-'}</p>
+              <p className="mt-1.5 text-[12px] text-ink-muted">Type: {s.tipo || '-'}</p>
+              <p className="text-[12px] text-ink-muted">Abbreviation: {s.abreviatura || '-'}</p>
             </div>
           ))}
         </div>
@@ -287,12 +287,12 @@ function RoomsTab() {
   )
 }
 
-function ExceptionsTab() {
+export function ExceptionsTab() {
   const [excepciones, setExcepciones] = useState<Excepcion[]>(EXCEPCIONES_INICIALES)
   const [modal, setModal] = useState<'nueva' | Excepcion | null>(null)
 
   return (
-    <div className="rounded-xl border border-[#e4e4e7] bg-white p-4 sm:p-5">
+    <div className="rounded-xl border border-line bg-white p-4 sm:p-5">
       <div className="flex items-center justify-end">
         <button
           type="button"
@@ -308,10 +308,10 @@ function ExceptionsTab() {
       ) : (
         <div className="mt-4 flex flex-col gap-2">
           {excepciones.map((e) => (
-            <div key={e.id} className="flex items-center gap-3 rounded-lg border border-[#e4e4e7] px-3 py-2.5">
-              <span className={cn('size-2 shrink-0 rounded-full', e.estado === 'Active' ? 'bg-[#1e9850]' : 'bg-[#a1a1aa]')} />
-              <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-[#09090b]">{e.nombre}</span>
-              <span className="flex shrink-0 items-center gap-1.5 text-[12px] text-[#71717a]">
+            <div key={e.id} className="flex items-center gap-3 rounded-lg border border-line px-3 py-2.5">
+              <span className={cn('size-2 shrink-0 rounded-full', e.estado === 'Active' ? 'bg-green' : 'bg-ink-faint')} />
+              <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink">{e.nombre}</span>
+              <span className="flex shrink-0 items-center gap-1.5 text-[12px] text-ink-muted">
                 <CalendarDays className="size-3.5" />
                 {e.fecha.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
@@ -369,10 +369,10 @@ export function SettingsLocationDetail() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">{tab === 'Information' ? loc.nombre : tab}</h1>
-      <p className="mt-1 text-sm text-[#71717a]">Set your location name. Add the location you need.</p>
+      <h1 className="text-2xl font-bold text-ink">{tab === 'Information' ? loc.nombre : tab}</h1>
+      <p className="mt-1 text-sm text-ink-muted">Set your location name. Add the location you need.</p>
 
-      <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-[#f1f5f9] p-1">
+      <div className="mt-4 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-surface-slate p-1">
         {TABS.map((t) => (
           <button
             key={t}
@@ -380,7 +380,7 @@ export function SettingsLocationDetail() {
             onClick={() => setTab(t)}
             className={cn(
               'h-8 shrink-0 rounded-md px-3 text-xs font-medium whitespace-nowrap transition-colors',
-              tab === t ? 'bg-dash-blue text-white' : 'text-[#64748b] hover:text-[#3f3f46]',
+              tab === t ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
             )}
           >
             {t}

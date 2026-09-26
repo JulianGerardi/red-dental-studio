@@ -20,6 +20,7 @@ import {
 } from '@/components/scheduling/CalendarViews'
 import { StatusLegend } from '@/components/scheduling/StatusLegend'
 import { EmptyState } from '@/components/ui/empty-state'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 
 /* Interruptor de lo que está en el tablero pero todavía no se usa. En false
@@ -77,10 +78,11 @@ export default function Scheduling() {
     })
   }
 
-  /* Agendar una solicitud la saca de la lista y la pone en la grilla. El turno
-     puede caer en otro día que el que se está mirando: el sistema no cambia de
-     pantalla solo, lo ofrece en el toast. */
-  const agendarSolicitud = (s: Solicitud, d: { patient: string; date: string; start: string; end: string; status: string }) => {
+  /* Datos crudos del modal -> turno de la grilla. Compartido por "agendar una
+     solicitud" y por "New appointment" suelto: los dos arman el mismo tipo de
+     evento, sólo cambia qué pasa con la solicitud de origen (si hay una). */
+  type DatosGuardado = { patient: string; date: string; start: string; end: string; status: string; primary?: string; operatory?: string; reason?: string }
+  const construirEvento = (d: DatosGuardado): EventoConFecha => {
     const [dd, mm, yyyy] = d.date.split('-').map(Number)
     const dia = new Date(yyyy, mm - 1, dd)
     const desde = HORAS.indexOf(d.start)
@@ -88,17 +90,33 @@ export default function Scheduling() {
     const inicio = desde >= 0 ? Number(d.start.slice(0, 2)) : 9
     const duracion = desde >= 0 && hasta > desde ? hasta - desde : 1
     const estado = (d.status in BLOCK_STYLE ? d.status : 'Booked') as ApptState
-    setEventos((prev) => [
-      ...prev,
-      { start: inicio, duration: duracion, patient: d.patient, state: estado, fecha: dia },
-    ])
+    return {
+      start: inicio, duration: duracion, patient: d.patient, state: estado, fecha: dia,
+      provider: d.primary || 'Unassigned', room: d.operatory || 'Unassigned', reason: d.reason || 'Appointment',
+    }
+  }
+
+  /* Agendar una solicitud la saca de la lista y la pone en la grilla. El turno
+     puede caer en otro día que el que se está mirando: el sistema no cambia de
+     pantalla solo, lo ofrece en el toast. */
+  const agendarSolicitud = (s: Solicitud, d: DatosGuardado) => {
+    const nuevo = construirEvento(d)
+    setEventos((prev) => [...prev, nuevo])
     setSolicitudes((prev) => prev.filter((x) => x.id !== s.id))
-    const rotulo = dia.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    const rotulo = nuevo.fecha.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     aviso.ok(`${d.patient} scheduled for ${rotulo} at ${d.start}.`, {
       label: `Go to ${rotulo}`,
-      onClick: () => { setFecha(dia); setView('Day') },
+      onClick: () => { setFecha(nuevo.fecha); setView('Day') },
     })
     return true
+  }
+
+  /* "New appointment" suelto -sin solicitud de origen-: mismo armado de
+     evento, sin nada que sacar de la lista de espera. Antes no pasaba
+     `onGuardar` acá y el modal sólo mostraba un toast sin tocar la grilla. */
+  const crearTurno = (d: DatosGuardado) => {
+    setEventos((prev) => [...prev, construirEvento(d)])
+    return false
   }
 
   /* Las flechas y el rótulo siguen la vista, igual que en Google Calendar. */
@@ -124,7 +142,7 @@ export default function Scheduling() {
   })()
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
       <Link to="/scheduling" className="flex items-center gap-1 text-sm text-[#0056ef]">
         Scheduling <ChevronDown className="size-[15px]" />
       </Link>
@@ -135,14 +153,14 @@ export default function Scheduling() {
       {/* Toolbar */}
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
-          <button onClick={() => paso(-1)} className="rounded-md border border-[#e4e4e7] bg-white p-1.5" aria-label="Previous">
+          <button onClick={() => paso(-1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Previous">
             <ChevronLeft className="size-4" />
           </button>
-          <span className="text-[13px] font-semibold whitespace-nowrap text-[#09090b]">{rotulo}</span>
-          <button onClick={() => setFecha(FECHA_ANCLA)} className="flex items-center gap-1 text-[13px] text-[#71717a]">
+          <span className="text-[13px] font-semibold whitespace-nowrap text-ink">{rotulo}</span>
+          <button onClick={() => setFecha(FECHA_ANCLA)} className="flex items-center gap-1 text-[13px] text-ink-muted">
             Today <ChevronDown className="size-3.5" />
           </button>
-          <button onClick={() => paso(1)} className="rounded-md border border-[#e4e4e7] bg-white p-1.5" aria-label="Next">
+          <button onClick={() => paso(1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Next">
             <ChevronRight className="size-4" />
           </button>
         </div>
@@ -156,7 +174,7 @@ export default function Scheduling() {
                 onClick={() => setView(v)}
                 className={cn(
                   'h-8 rounded-md px-4 text-xs font-medium transition-colors',
-                  view === v ? 'bg-dash-blue text-white' : 'text-[#a3a9b8] hover:text-[#71717a]',
+                  view === v ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
                 )}
               >
                 {v}
@@ -198,6 +216,7 @@ export default function Scheduling() {
           )}
           <button
             onClick={() => setPanel('new')}
+            data-tour="sched-new"
             className="bg-dash-blue hover:bg-dash-blue-hover flex h-8 items-center gap-1.5 rounded-md px-4 text-xs font-medium text-white transition-colors"
           >
             <Plus className="size-3.5" /> New appointment
@@ -223,9 +242,9 @@ export default function Scheduling() {
 
       {/* Panel flotante de solicitudes + FAB */}
       {reqOpen && (
-        <div className="motion-safe:animate-[fab-panel-in_180ms_cubic-bezier(0.16,1,0.3,1)] fixed right-[100px] bottom-8 z-30 flex max-h-[70svh] w-[260px] origin-bottom-right flex-col rounded-lg border border-[#e4e4e7] bg-white p-4 shadow-[0_4px_14px_0_rgb(100_100_100/0.25)]">
-          <p className="text-[13px] font-bold text-[#09090b]">Appointment requests</p>
-          <div className="mt-3 flex shrink-0 rounded-md bg-[#f1f5f9] p-1">
+        <div className="motion-safe:animate-[fab-panel-in_180ms_cubic-bezier(0.16,1,0.3,1)] fixed right-[100px] bottom-8 z-30 flex max-h-[70svh] w-[260px] origin-bottom-right flex-col rounded-lg border border-line bg-white p-4 shadow-[0_4px_14px_0_rgb(100_100_100/0.25)]">
+          <p className="text-[13px] font-bold text-ink">Appointment requests</p>
+          <div className="mt-3 flex shrink-0 rounded-md bg-surface-slate p-1">
             {(['ASAP', 'Waiting List'] as const).map((t) => {
               const n = solicitudes.filter((s) => s.tipo === t).length
               return (
@@ -234,7 +253,7 @@ export default function Scheduling() {
                   onClick={() => setReqTab(t)}
                   className={cn(
                     'flex-1 rounded px-2 py-1 text-xs font-medium',
-                    reqTab === t ? 'bg-dash-blue text-white' : 'text-[#64748b]',
+                    reqTab === t ? 'bg-dash-blue text-white' : 'text-ink-slate',
                   )}
                 >
                   {t}{n > 0 && ` (${n})`}
@@ -297,11 +316,14 @@ export default function Scheduling() {
           hora={fmtExacta(detail.ev.start)}
           duracion={detail.ev.duration}
           fecha={detail.ev.fecha}
+          provider={detail.ev.provider}
+          room={detail.ev.room}
+          reason={detail.ev.reason}
           anchor={detail.rect}
           onClose={() => setDetail(null)}
         />
       )}
-      {panel === 'new' && <NewAppointmentModal onClose={() => setPanel(null)} />}
+      {panel === 'new' && <NewAppointmentModal onGuardar={crearTurno} onClose={() => setPanel(null)} />}
       {/* Agendar una solicitud es crear un turno, no editarlo: el modal es el
           mismo pero llega con lo que el paciente ya había pedido. */}
       {agendando && (
@@ -317,7 +339,7 @@ export default function Scheduling() {
 
 /* Una solicitud tiene dos salidas y las dos están en la card. El acento rojo
    es sólo para ASAP: en la lista de espera nada es urgente por definición. */
-function SolicitudCard({
+export function SolicitudCard({
   s, onCancel, onSchedule,
 }: {
   s: Solicitud
@@ -334,7 +356,7 @@ function SolicitudCard({
       <div className="flex items-start justify-between gap-2">
         <span className="flex min-w-0 items-center gap-1.5">
           <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: acento }} />
-          <span className="truncate text-xs font-bold text-[#09090b]">{s.patient}</span>
+          <span className="truncate text-xs font-bold text-ink">{s.patient}</span>
         </span>
         {/* Misma pill que el resto del sistema: 11px y con aire vertical. El
             frame la dibujaba a 10px y sin padding, y quedaba aplastada al lado
@@ -346,18 +368,18 @@ function SolicitudCard({
           {urgente ? 'ASAP' : s.espera}
         </span>
       </div>
-      <p className="mt-1 text-[11px] text-[#71717a]">{s.reason}</p>
-      <p className="mt-1 flex items-center gap-1.5 text-[11px] text-[#71717a]">
+      <p className="mt-1 text-[11px] text-ink-muted">{s.reason}</p>
+      <p className="mt-1 flex items-center gap-1.5 text-[11px] text-ink-muted">
         <Clock className="size-3 shrink-0" /> {fechaLegible(s.date)} · {s.start} - {s.end}
       </p>
-      <p className="mt-0.5 flex items-center gap-1.5 truncate text-[11px] text-[#71717a]">
+      <p className="mt-0.5 flex items-center gap-1.5 truncate text-[11px] text-ink-muted">
         <MapPin className="size-3 shrink-0" /> {s.location}
       </p>
       {/* Cancel y la acción principal, uno al lado del otro. */}
       <div className="mt-2 flex items-center justify-end gap-2">
         <button
           onClick={onCancel}
-          className="rounded-md border border-[#e4e4e7] px-2.5 py-1 text-[11px] font-medium hover:bg-[#fafafa]"
+          className="rounded-md border border-line px-2.5 py-1 text-[11px] font-medium hover:bg-surface-subtle"
         >
           Cancel
         </button>

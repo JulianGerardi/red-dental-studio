@@ -32,19 +32,19 @@ type Props = {
 
 /* ── Rejilla de horas, compartida por Day y Week ─────────────────────── */
 
-function ColumnaHoras() {
+export function ColumnaHoras() {
   return (
     <div className="w-[46px] shrink-0">
       {HORAS.map((h) => (
         <div key={h} style={{ height: HOUR_PX }} className="relative">
-          <span className="absolute -top-2 right-2 text-[11px] text-[#71717a]">{fmtHora(h)}</span>
+          <span className="absolute -top-2 right-2 text-[11px] text-ink-muted">{fmtHora(h)}</span>
         </div>
       ))}
     </div>
   )
 }
 
-function ColumnaDia({
+export function ColumnaDia({
   fecha, eventos, onMover, onAbrir, arrastrado, resaltada, onResaltar,
 }: {
   fecha: Date
@@ -75,12 +75,12 @@ function ColumnaDia({
         arrastrado.current = null
       }}
       className={cn(
-        'relative min-w-0 flex-1 border-l border-[#ededed] transition-colors',
+        'relative min-w-0 flex-1 border-l border-line-hair transition-colors',
         resaltada && 'bg-[#f5f8ff]',
       )}
     >
       {HORAS.map((h) => (
-        <div key={h} style={{ height: HOUR_PX }} className="border-b border-[#ededed]" />
+        <div key={h} style={{ height: HOUR_PX }} className="border-b border-line-hair" />
       ))}
 
       {BLOCKED.filter((b) => b.day === fecha.getDay()).map((b, i) => (
@@ -125,13 +125,13 @@ function ColumnaDia({
   )
 }
 
-function Cabecera({ dias, hoy }: { dias: Date[]; hoy: Date }) {
+export function Cabecera({ dias, hoy }: { dias: Date[]; hoy: Date }) {
   return (
-    <div className="flex border-b border-[#ededed]">
+    <div className="flex border-b border-line-hair">
       <div className="w-[46px] shrink-0" />
       {dias.map((d, i) => (
-        <div key={i} className="flex min-w-0 flex-1 flex-col gap-1 border-l border-[#ededed] px-3 py-3">
-          <span className="text-[11px] font-semibold tracking-wide text-[#71717a]">
+        <div key={i} className="flex min-w-0 flex-1 flex-col gap-1 border-l border-line-hair px-3 py-3">
+          <span className="text-[11px] font-semibold tracking-wide text-ink-muted">
             {DIAS_CORTOS[d.getDay()]}
           </span>
           <span
@@ -150,14 +150,14 @@ function Cabecera({ dias, hoy }: { dias: Date[]; hoy: Date }) {
 
 /* ── Day y Week ──────────────────────────────────────────────────────── */
 
-function VistaHoras({ dias, ...props }: Props & { dias: Date[] }) {
+export function VistaHoras({ dias, ...props }: Props & { dias: Date[] }) {
   const arrastrado = useRef<number | null>(null)
   const [destino, setDestino] = useState<number | null>(null)
 
   return (
     /* Una sola columna entra en cualquier pantalla; siete necesitan un ancho
        mínimo y scroll propio. */
-    <div className="mt-4 overflow-x-auto rounded-lg border border-[#e4e4e7] bg-white">
+    <div className="mt-4 overflow-x-auto rounded-lg border border-line bg-white">
       <div className={dias.length > 1 ? 'min-w-[760px]' : 'min-w-0'}>
         <Cabecera dias={dias} hoy={props.fecha} />
         <div className="relative flex">
@@ -206,13 +206,13 @@ export function VistaMes({ eventos, fecha, onMover, onAbrir }: Props) {
   const hoy = new Date()
 
   return (
-    <div className="mt-4 overflow-x-auto rounded-lg border border-[#e4e4e7] bg-white">
+    <div className="mt-4 overflow-x-auto rounded-lg border border-line bg-white">
       {/* En celular el mes entra completo: las celdas muestran un punto por
           turno en vez del chip con nombre, como hace Google Calendar. */}
       <div className="md:min-w-[700px]">
-        <div className="grid grid-cols-7 border-b border-[#ededed]">
+        <div className="grid grid-cols-7 border-b border-line-hair">
           {DIAS_CORTOS.map((d) => (
-            <span key={d} className="px-1.5 py-2 text-center text-[10px] font-semibold tracking-wide text-[#71717a] md:px-3 md:text-left md:text-[11px]">
+            <span key={d} className="px-1.5 py-2 text-center text-[10px] font-semibold tracking-wide text-ink-muted md:px-3 md:text-left md:text-[11px]">
               {d}
             </span>
           ))}
@@ -237,9 +237,9 @@ export function VistaMes({ eventos, fecha, onMover, onAbrir }: Props) {
                 }}
                 onClick={() => setDiaAbierto((x) => (x && mismoDia(x, d) ? null : d))}
                 className={cn(
-                  'flex min-h-[68px] flex-col gap-1 border-r border-b border-[#ededed] p-1 transition-colors md:min-h-[104px] md:p-1.5',
+                  'flex min-h-[68px] flex-col gap-1 border-r border-b border-line-hair p-1 transition-colors md:min-h-[104px] md:p-1.5',
                   i % 7 === 6 && 'border-r-0',
-                  fuera && 'bg-[#fafafa]',
+                  fuera && 'bg-surface-subtle',
                   destino === clave && 'bg-[#f5f8ff]',
                   diaAbierto && mismoDia(diaAbierto, d) && 'bg-[#eff6ff] md:bg-transparent',
                   propios.length > 0 && 'cursor-pointer md:cursor-default',
@@ -248,7 +248,7 @@ export function VistaMes({ eventos, fecha, onMover, onAbrir }: Props) {
                 <span
                   className={cn(
                     'flex size-6 shrink-0 items-center justify-center self-start rounded-full text-[11px] font-semibold md:text-[12px]',
-                    mismoDia(d, hoy) ? 'bg-dash-blue text-white' : fuera ? 'text-[#c4c4c8]' : 'text-[#09090b]',
+                    mismoDia(d, hoy) ? 'bg-dash-blue text-white' : fuera ? 'text-[#c4c4c8]' : 'text-ink',
                   )}
                 >
                   {d.getDate()}
@@ -300,12 +300,12 @@ export function VistaMes({ eventos, fecha, onMover, onAbrir }: Props) {
         {/* Lista del día elegido: sólo en celular, que es donde la celda
             muestra puntos en vez de los turnos. */}
         {diaAbierto && (
-          <div className="border-t border-[#ededed] p-3 md:hidden">
-            <p className="text-[13px] font-bold text-[#09090b]">
+          <div className="border-t border-line-hair p-3 md:hidden">
+            <p className="text-[13px] font-bold text-ink">
               {DIAS_CORTOS[diaAbierto.getDay()]} {diaAbierto.getDate()}
             </p>
             {delDia.length === 0 ? (
-              <p className="mt-2 text-xs text-[#a1a1aa]">No appointments on this day.</p>
+              <p className="mt-2 text-xs text-ink-faint">No appointments on this day.</p>
             ) : (
               <div className="mt-2 flex flex-col gap-2">
                 {delDia.map(({ e, j }) => {

@@ -1,19 +1,24 @@
-import { Outlet, useLocation, Link } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
+import { cn } from '@/lib/utils'
+import { ANCHO_PAGINA } from '@/lib/estilos'
 import {
-  UserCog, Building2, Users, ShieldCheck, SlidersHorizontal, CreditCard, Library, CircleUser, Lock, type LucideIcon,
+  UserCog, Building2, Users, ShieldCheck, SlidersHorizontal, CreditCard, Library, CircleUser, Lock,
+  FileSignature, type LucideIcon,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/empty-state'
 import { SETTINGS_SECTIONS } from '@/data/mock'
 import { SETTINGS_NAV } from '@/data/settings-nav'
 import { Breadcrumb, type Miga } from '@/components/ui/breadcrumb'
+import { SettingsSectionCard } from '@/components/settings/SettingsSectionCard'
 import { LOCACIONES } from '@/pages/settings/Locations'
 import { EMPLEADOS } from '@/data/employees'
+import { CUENTAS } from '@/pages/settings/Accounts'
 
-const ICONS: Record<string, LucideIcon> = {
+export const SETTINGS_ICONS: Record<string, LucideIcon> = {
   'user-cog': UserCog, building: Building2, users: Users, 'shield-check': ShieldCheck,
   sliders: SlidersHorizontal, 'credit-card': CreditCard, library: Library,
-  'circle-user': CircleUser, lock: Lock,
+  'circle-user': CircleUser, lock: Lock, 'file-signature': FileSignature,
 }
 
 
@@ -56,6 +61,11 @@ function migasDe(pathname: string): Miga[] {
       migas.push({ label: emp?.nombre ?? detalleEmpleado[1] })
     }
   }
+  const detalleCuenta = pathname.match(/^\/settings\/accounts\/([^/]+)$/)
+  if (detalleCuenta) {
+    const cuenta = CUENTAS.find((c) => c.id === detalleCuenta[1])
+    migas.push({ label: cuenta?.nombre ?? detalleCuenta[1] })
+  }
   return migas
 }
 
@@ -66,7 +76,11 @@ export function SettingsLayout() {
     /* El sidebar propio de Settings se fue —sus pantallas cuelgan del menú
        flotante del rail—. El breadcrumb vive acá y en ningún otro lado: cuando
        además lo dibujaba cada pantalla, quedaban dos. */
-    <div className="min-h-full">
+    /* Settings era la única sección sin tope de ancho: en un monitor grande
+       sus cards se estiraban hasta 800px mientras el resto de la app cortaba
+       a 1400/1800. Ahora comparte el ancho, y la barra de arriba se alinea
+       con todas las pantallas por igual. */
+    <div className={cn(ANCHO_PAGINA, 'min-h-full')}>
       {migas.length > 0 && (
         <div className="px-4 pt-5 sm:px-8">
           <Breadcrumb items={migas} />
@@ -85,17 +99,9 @@ export function SettingsGeneral() {
 
       <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {SETTINGS_SECTIONS.map((s) => {
-          const Icon = ICONS[s.icon] ?? SlidersHorizontal
+          const Icon = SETTINGS_ICONS[s.icon] ?? SlidersHorizontal
           return (
-            <Link key={s.to} to={s.to}>
-              <Card className="hover:border-primary/40 h-full p-6 transition-colors">
-                <span className="bg-accent text-primary flex size-11 items-center justify-center rounded-lg">
-                  <Icon className="size-5" />
-                </span>
-                <h2 className="mt-4 text-lg font-bold">{s.title}</h2>
-                <p className="text-muted-foreground mt-1 text-sm">{s.desc}</p>
-              </Card>
-            </Link>
+            <SettingsSectionCard key={s.to} to={s.to} icon={Icon} title={s.title} description={s.desc} />
           )
         })}
       </div>
@@ -108,7 +114,7 @@ export function SettingsPlaceholder() {
   const label = [...SETTINGS_NAV].reverse().find((n) => pathname.startsWith(n.to))?.label ?? 'Settings'
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">{label}</h1>
+      <h1 className="text-2xl font-bold text-ink">{label}</h1>
       <Card className="mt-6 flex">
         <EmptyState
           title="Coming soon"

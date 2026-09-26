@@ -1,48 +1,42 @@
-import { FileText, ChevronRight, CircleCheck } from 'lucide-react'
+import { ChevronRight, CircleCheck } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { PLANES, type Plan } from '@/data/clinical-mode'
 
-/* Card de 4235:135661: profesional arriba con su documento, una regla, el
-   nombre del plan con la pill, los tres datos y el porcentaje grande con la
-   barra. El orden de los datos es Created On / Total Procedures / Total Amount,
-   distinto al del tablero viejo. */
+/* Card de 4235:135661: profesional arriba, una regla, el nombre del plan con
+   la pill, los tres datos y el porcentaje grande con la barra. El orden de los
+   datos es Created On / Total Procedures / Total Amount, distinto al del
+   tablero viejo. El frame dibuja además un ícono de documento a la derecha del
+   profesional: se sacó a pedido de Julián. */
 /* La etiqueta va en una sola línea. Partida en dos —"Total / Procedures"—
    desalineaba las tres cajas entre sí y apretaba la card entera. */
-function Dato({ label, valor, azul }: { label: string; valor: string; azul?: boolean }) {
+export function Dato({ label, valor, azul }: { label: string; valor: string; azul?: boolean }) {
   return (
-    <div className="min-w-0 rounded-md border border-[#e4e4e7] px-2 py-2">
-      <span className="block truncate text-[9px] leading-none whitespace-nowrap text-[#71717a]">
+    <div className="min-w-0 rounded-md border border-line px-2 py-2">
+      <span className="block truncate text-[9px] leading-none whitespace-nowrap text-ink-muted">
         {label}
       </span>
-      <span className={`mt-1.5 block truncate text-[12px] font-semibold ${azul ? 'text-dash-blue' : 'text-[#09090b]'}`}>
+      <span className={`mt-1.5 block truncate text-[12px] font-semibold ${azul ? 'text-dash-blue' : 'text-ink'}`}>
         {valor}
       </span>
     </div>
   )
 }
 
-function PlanCard({ p }: { p: Plan }) {
+export function PlanCard({ p }: { p: Plan }) {
   return (
-    <div className="rounded-lg border border-[#e4e4e7] bg-white p-3.5">
+    <div className="rounded-lg border border-line bg-white p-3.5">
       <div className="flex items-start gap-2">
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[13px] font-bold text-[#09090b]">{p.doctor}</span>
-          <span className="block text-[12px] text-[#71717a]">{p.rol}</span>
+          <span className="block truncate text-[13px] font-bold text-ink">{p.doctor}</span>
+          <span className="block text-[12px] text-ink-muted">{p.rol}</span>
         </span>
-        <button
-          onClick={() => aviso.info('The plan document is not available in this release.')}
-          aria-label={`Open ${p.nombre} document`}
-          className="shrink-0 text-[#52525b] hover:opacity-70"
-        >
-          <FileText className="size-4" />
-        </button>
       </div>
 
-      <div className="my-3 h-px bg-[#f1f1f4]" />
+      <div className="my-3 h-px bg-line-soft" />
 
       <div className="flex items-center gap-2">
-        <span className="min-w-0 flex-1 truncate text-[13px] text-[#09090b]">{p.nombre}</span>
-        <span className="shrink-0 rounded-full border border-[#1a804d] bg-[#f0fcf5] px-2 py-[2px] text-[11px] font-semibold text-[#1a804d]">
+        <span className="min-w-0 flex-1 truncate text-[13px] text-ink">{p.nombre}</span>
+        <span className="shrink-0 rounded-full border border-dash-ok-fg bg-dash-ok-bg px-2 py-[2px] text-[11px] font-semibold text-dash-ok-fg">
           {p.estado}
         </span>
       </div>
@@ -68,9 +62,9 @@ function PlanCard({ p }: { p: Plan }) {
 
 export function TreatmentPlanList() {
   return (
-    <div className="rounded-xl border border-[#e4e4e7] bg-white p-4">
+    <div className="rounded-xl border border-line bg-white p-4">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[15px] font-bold text-[#09090b]">Treatment Plan</p>
+        <p className="text-[15px] font-bold text-ink">Treatment Plan</p>
         <button
           onClick={() => aviso.info('Full treatment plan list is not available in this release.')}
           className="text-dash-blue flex shrink-0 items-center gap-0.5 text-[12px] font-semibold hover:underline"

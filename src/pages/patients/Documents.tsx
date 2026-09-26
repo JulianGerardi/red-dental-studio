@@ -1,40 +1,57 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ChevronLeft, Search, Download, FileText } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { Pill, type PillTone } from '@/components/ui/pill'
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table'
+import { Button } from '@/components/ui/button'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3753:80195 "Patient Profile — Documents". */
 
-type Doc = { name: string; firma: 'Signed' | 'Pending Signature'; fecha: string }
+type Doc = { id: string; name: string; firma: 'Signed' | 'Pending Signature'; fecha: string }
 
+/* Los nombres se repiten -así viene en el Figma-: el id distingue cada fila. */
 const DOCS: Doc[] = [
   ...Array.from({ length: 9 }, () => ({ name: 'Isacc Cihtepin.doc', firma: 'Signed' as const, fecha: 'Aug 5, 2026' })),
-  { name: 'Isacc Cihtepin.doc', firma: 'Pending Signature', fecha: 'Jul 28, 2026' },
-  { name: 'Isacc Cihtepin.doc', firma: 'Pending Signature', fecha: 'Jul 28, 2026' },
-  { name: 'Isacc Cihtepin.doc', firma: 'Signed', fecha: 'Aug 1, 2026' },
-]
+  { name: 'Isacc Cihtepin.doc', firma: 'Pending Signature' as const, fecha: 'Jul 28, 2026' },
+  { name: 'Isacc Cihtepin.doc', firma: 'Pending Signature' as const, fecha: 'Jul 28, 2026' },
+  { name: 'Isacc Cihtepin.doc', firma: 'Signed' as const, fecha: 'Aug 1, 2026' },
+].map((d, i) => ({ ...d, id: `doc-${i + 1}` }))
 
-const FIRMA = {
-  Signed: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  'Pending Signature': 'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
+const FIRMA_TONO: Record<Doc['firma'], PillTone> = {
+  Signed: 'success',
+  'Pending Signature': 'warning',
 }
+
+/* La tabla estándar (ui/data-table) con las columnas de documentos. */
+const COLUMNAS: DataTableColumn<Doc>[] = [
+  {
+    key: 'name', header: 'Name', cell: (d) => (
+      <span className="flex min-w-0 items-center gap-3">
+        <span className="bg-dash-blue flex size-7 shrink-0 items-center justify-center rounded text-white"><FileText className="size-4" /></span>
+        <span className="truncate text-ink-medium">{d.name}</span>
+      </span>
+    ),
+  },
+  { key: 'firma', header: 'Signature', width: 200, cell: (d) => <Pill tone={FIRMA_TONO[d.firma]}>{d.firma}</Pill> },
+  { key: 'fecha', header: 'Last Update', width: 140, align: 'right', cell: (d) => <span className="text-ink-medium">{d.fecha}</span> },
+]
 
 export default function Documents() {
   const { id = 'john-smith' } = useParams()
   const [q, setQ] = useState('')
-  const [sel, setSel] = useState<number[]>([])
+  const [sel, setSel] = useState<string[]>([])
 
   const filas = useMemo(
     () => DOCS.filter((d) => d.name.toLowerCase().includes(q.toLowerCase())),
     [q],
   )
-  const todas = sel.length === filas.length && filas.length > 0
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
 
       {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
           El breadcrumb completo repetía lo que ya dice el panel lateral. */}
@@ -57,89 +74,43 @@ export default function Documents() {
 
           <div className="mt-4 flex items-center gap-3">
             <div className="relative w-[265px]">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search documents"
-                className="focus:border-dash-blue h-8 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+                className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
               />
             </div>
-            <button
+            <Button
+              variant="secondary"
+              size="md"
+              iconOnly
+              aria-label="Download selected"
+              className="ml-auto"
               onClick={() =>
                 sel.length
                   ? aviso.ok(`${sel.length} document${sel.length > 1 ? 's' : ''} downloaded.`)
                   : aviso.warn('Select at least one document to download.')
               }
-              aria-label="Download selected"
-              className="ml-auto flex size-8 items-center justify-center rounded-md border border-[#e4e4e7] bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]"
             >
-              <Download className="size-4" />
-            </button>
+              <Download />
+            </Button>
           </div>
 
-          <div className="mt-3 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
-            <div className="min-w-[620px]">
-            <div className="flex h-11 items-center border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
-              <span className="w-10">
-                <input
-                  type="checkbox"
-                  aria-label="Select all"
-                  checked={todas}
-                  onChange={() => setSel(todas ? [] : filas.map((_, i) => i))}
-                />
-              </span>
-              <span className="flex-1">Name</span>
-              <span className="w-[200px]">Signature</span>
-              <span className="w-[140px] text-right">Last Update</span>
-            </div>
-
-            {filas.map((d, i) => (
-              <div key={i} className="flex h-14 items-center border-b border-[#e7e7e7] px-4 text-[13px] last:border-0">
-                <span className="w-10">
-                  <input
-                    type="checkbox"
-                    aria-label={`Select ${d.name}`}
-                    checked={sel.includes(i)}
-                    onChange={() =>
-                      setSel((s) => (s.includes(i) ? s.filter((x) => x !== i) : [...s, i]))
-                    }
-                  />
-                </span>
-                <span className="flex flex-1 items-center gap-3">
-                  <span className="bg-dash-blue flex size-7 shrink-0 items-center justify-center rounded text-white">
-                    <FileText className="size-4" />
-                  </span>
-                  <span className="truncate text-[#52525b]">{d.name}</span>
-                </span>
-                <span className="w-[200px]">
-                  <span className={cn('rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', FIRMA[d.firma])}>
-                    {d.firma}
-                  </span>
-                </span>
-                <span className="w-[140px] text-right text-[#52525b]">{d.fecha}</span>
-              </div>
-            ))}
-
-            <div className="flex h-[52px] items-center justify-between border-t border-[#e7e7e7] px-4">
-              {/* Dice "referrals" en una tabla de documentos: el componente
-                  `table/referral-table` reusado otra vez. */}
-              <span className="text-xs font-semibold text-[#71717a]">Showing 3 of 15 referrals</span>
-              <div className="flex items-center gap-1">
-                {['‹', '1', '2', '3', '4', '5', '›'].map((p) => (
-                  <button
-                    key={p}
-                    className={cn(
-                      'flex size-8 items-center justify-center rounded-md text-xs font-semibold',
-                      p === '1' ? 'bg-dash-blue text-white' : 'text-[#71717a] hover:bg-[#f4f4f5]',
-                    )}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
-            </div>
-            </div>
+          <div className="mt-3">
+            <DataTable
+              columns={COLUMNAS}
+              rows={filas}
+              rowKey={(d) => d.id}
+              rowLabel={(d) => d.name}
+              selectable
+              selected={sel}
+              onSelectedChange={setSel}
+              pageSize={8}
+              itemLabel="documents"
+              empty={{ icon: FileText, title: 'No documents found', detail: 'Try a different file name.' }}
+            />
           </div>
         </div>
       </div>

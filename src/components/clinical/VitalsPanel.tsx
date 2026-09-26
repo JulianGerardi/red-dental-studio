@@ -34,7 +34,7 @@ const CY = R + PAD
 const ALTO = CY + PAD
 const LARGO = Math.PI * R
 
-function Medidor({
+export function Medidor({
   pct, color, etiqueta, min, max, valor, onValor, children,
 }: {
   pct: number
@@ -123,7 +123,7 @@ function Medidor({
   )
 }
 
-function CampoNumero({
+export function CampoNumero({
   label, valor, min, max, paso, onChange,
 }: {
   label?: string
@@ -136,7 +136,7 @@ function CampoNumero({
   const acotar = (v: number) => Math.min(max, Math.max(min, Number(v.toFixed(1))))
   return (
     <div className="min-w-0 flex-1">
-      {label && <span className="mb-1 block text-center text-[12px] text-[#52525b]">{label}</span>}
+      {label && <span className="mb-1 block text-center text-[12px] text-ink-medium">{label}</span>}
       <div className="flex items-center justify-center gap-1.5">
         <button
           onClick={() => onChange(acotar(valor - paso))}
@@ -153,7 +153,7 @@ function CampoNumero({
           }}
           inputMode="decimal"
           aria-label={label ?? 'Value'}
-          className="focus:border-dash-blue h-8 w-full min-w-0 rounded-md border border-[#e4e4e7] text-center text-[13px] font-medium tabular-nums focus:outline-none"
+          className="focus:border-dash-blue h-8 w-full min-w-0 rounded-md border border-line text-center text-[13px] font-medium tabular-nums focus:outline-none"
         />
         <button
           onClick={() => onChange(acotar(valor + paso))}
@@ -176,7 +176,7 @@ function estadoDe(v: number, min: number, max: number): EstadoVital {
   return 'Normal'
 }
 
-function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean }) {
+export function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean }) {
   const [valores, setValores] = useState(v.campos.map((c) => c.valor))
   const [grupo, setGrupo] = useState(v.alternador?.grupo[0] ?? '')
   const [unidad, setUnidad] = useState(v.alternador?.unidades[0] ?? v.unidad)
@@ -188,11 +188,11 @@ function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean }) {
   const texto = v.campos.length > 1 ? `${valores[0]}/${valores[1]}` : String(valores[0])
 
   return (
-    <div className="flex flex-col rounded-xl border border-[#e4e4e7] bg-white p-4">
+    <div className="flex flex-col rounded-xl border border-line bg-white p-4">
       <div className="flex items-start justify-between gap-2">
         <span className="min-w-0">
-          <span className="block text-[17px] font-bold text-[#09090b]">{v.titulo}</span>
-          <span className="block text-[12px] text-[#52525b]">{v.subtitulo}</span>
+          <span className="block text-[17px] font-bold text-ink">{v.titulo}</span>
+          <span className="block text-[12px] text-ink-medium">{v.subtitulo}</span>
         </span>
         <span className={cn('shrink-0 rounded-full border px-2 py-[2px] text-[11px] font-semibold', VITAL_COLOR[estado].pill)}>
           {estado}
@@ -209,14 +209,14 @@ function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean }) {
       )}
 
       {v.alternador && (
-        <div className="mt-3 flex w-fit gap-1 rounded-lg bg-[#f4f4f5] p-1">
+        <div className="mt-3 flex w-fit gap-1 rounded-lg bg-surface-muted p-1">
           {v.alternador.grupo.map((g) => (
             <button
               key={g}
               onClick={() => setGrupo(g)}
               className={cn(
                 'rounded-md px-3 py-1 text-[12px] font-medium transition-colors',
-                grupo === g ? 'bg-dash-blue text-white' : 'text-[#52525b] hover:bg-white',
+                grupo === g ? 'bg-dash-blue text-white' : 'text-ink-medium hover:bg-white',
               )}
             >
               {g}
@@ -238,7 +238,7 @@ function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean }) {
           valor={valores[0]}
           onValor={(n) => setValores((vs) => vs.map((x, j) => (j === 0 ? Number(n.toFixed(1)) : x)))}
         >
-          <span className="text-[27px] leading-none font-bold tracking-tight text-[#09090b] tabular-nums">
+          <span className="text-[27px] leading-none font-bold tracking-tight text-ink tabular-nums">
             {texto}
             <span className="ml-0.5 align-baseline text-[12px] font-bold">{v.unidad}</span>
           </span>
@@ -246,14 +246,14 @@ function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean }) {
       </div>
 
       {v.alternador && (
-        <div className="mx-auto mt-3 flex w-fit gap-1 rounded-lg bg-[#f4f4f5] p-1">
+        <div className="mx-auto mt-3 flex w-fit gap-1 rounded-lg bg-surface-muted p-1">
           {v.alternador.unidades.map((u) => (
             <button
               key={u}
               onClick={() => setUnidad(u)}
               className={cn(
                 'rounded-md px-3 py-1 text-[12px] font-medium transition-colors',
-                unidad === u ? 'bg-dash-blue text-white' : 'text-[#52525b] hover:bg-white',
+                unidad === u ? 'bg-dash-blue text-white' : 'text-ink-medium hover:bg-white',
               )}
             >
               {u}
@@ -276,7 +276,7 @@ function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean }) {
         ))}
       </div>
 
-      <p className="mt-3 text-[11px] text-[#71717a]">{v.rango}</p>
+      <p className="mt-3 text-[11px] text-ink-muted">{v.rango}</p>
     </div>
   )
 }
@@ -296,26 +296,26 @@ export function VitalsPanel() {
 
       {/* Composer de notas: el frame lo pone abajo, ocupando la columna izquierda. */}
       <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <div className="rounded-xl border border-[#e4e4e7] bg-white p-3">
+        <div className="rounded-xl border border-line bg-white p-3">
           <textarea
             value={nota}
             onChange={(e) => setNota(e.target.value)}
             placeholder="Add notes"
             rows={2}
-            className="w-full resize-none text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
+            className="w-full resize-none text-[13px] placeholder:text-ink-faint focus:outline-none"
           />
           <div className="mt-2 flex items-center gap-3">
             <button
               onClick={() => aviso.info('Attachments are not available in this release.')}
               aria-label="Attach file"
-              className="text-[#52525b] hover:opacity-70"
+              className="text-ink-medium hover:opacity-70"
             >
               <Paperclip className="size-4" />
             </button>
             <button
               onClick={() => aviso.info('Voice notes are not available in this release.')}
               aria-label="Record voice note"
-              className="text-[#52525b] hover:opacity-70"
+              className="text-ink-medium hover:opacity-70"
             >
               <Mic className="size-4" />
             </button>
@@ -323,7 +323,7 @@ export function VitalsPanel() {
             <button
               disabled={!nota.trim()}
               onClick={() => { aviso.ok('Note added to the encounter.'); setNota('') }}
-              className="bg-dash-blue hover:bg-dash-blue-hover ml-auto h-8 rounded-md px-4 text-[13px] font-semibold text-white transition-colors disabled:bg-[#f4f4f5] disabled:text-[#a1a1aa]"
+              className="bg-dash-blue hover:bg-dash-blue-hover ml-auto h-8 rounded-md px-4 text-[13px] font-semibold text-white transition-colors disabled:bg-surface-muted disabled:text-ink-faint"
             >
               Send
             </button>

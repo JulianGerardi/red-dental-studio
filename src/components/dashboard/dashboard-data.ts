@@ -108,6 +108,13 @@ export const DIA_VACIO: DiaDashboard = {
   encuentros: { abiertos: 0, promedio: 'no data' },
 }
 
+/* El chip del Figma dice 30-02-2026, una fecha que no existe. Al volverse
+   filtro real no puede ser el valor seleccionado, así que el default pasa a
+   28-02-2026. Ver README.md, anomalía 4. Se exporta para que cualquier
+   pantalla que necesite "el día de hoy" de la demo (Dashboard, y el panel de
+   Today Appointments de Patients) mire siempre el mismo día. */
+export const HOY_DEMO = new Date(2026, 1, 28)
+
 export const claveFecha = (d: Date) =>
   `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`
 

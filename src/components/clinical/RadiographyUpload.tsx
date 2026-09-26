@@ -36,18 +36,18 @@ export function RadiographyUpload({ onCancel, onSave }: { onCancel: () => void; 
           if (n) { sumar(n); aviso.ok(`${n} added to the queue.`) }
         }}
         className={`flex flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-12 text-center transition-colors ${
-          sobre ? 'border-dash-blue bg-dash-count-bg' : 'border-[#d4d4d8] bg-white'
+          sobre ? 'border-dash-blue bg-dash-count-bg' : 'border-line-strong bg-white'
         }`}
       >
-        <FileText className="size-10 text-[#09090b]" strokeWidth={1.5} />
+        <FileText className="size-10 text-ink" strokeWidth={1.5} />
         <span>
-          <span className="block text-[17px] font-bold text-[#09090b]">Drag and drop your files</span>
+          <span className="block text-[17px] font-bold text-ink">Drag and drop your files</span>
           {/* "PND" es el typo del frame. */}
-          <span className="block text-[13px] text-[#71717a]">
+          <span className="block text-[13px] text-ink-muted">
             JPEG, PND, PDF, and MP4 formats, up to 50MB
           </span>
         </span>
-        <label className="h-9 cursor-pointer rounded-md border border-[#e4e4e7] bg-white px-4 text-[13px] leading-9 font-medium hover:bg-[#fafafa]">
+        <label className="h-9 cursor-pointer rounded-md border border-line bg-white px-4 text-[13px] leading-9 font-medium hover:bg-surface-subtle">
           Select File
           <input
             type="file"
@@ -61,13 +61,13 @@ export function RadiographyUpload({ onCancel, onSave }: { onCancel: () => void; 
       </div>
 
       <div>
-        <span className="block text-xs font-medium text-[#09090b]">or upload from URL</span>
+        <span className="block text-xs font-medium text-ink">or upload from URL</span>
         <div className="mt-1.5 flex gap-2">
           <input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="Add file URL"
-            className="focus:border-dash-blue h-10 min-w-0 flex-1 rounded-md border border-[#e4e4e7] px-3 text-[13px] placeholder:text-[#a1a1aa] focus:outline-none"
+            className="focus:border-dash-blue h-10 min-w-0 flex-1 rounded-md border border-line px-3 text-[13px] placeholder:text-ink-faint focus:outline-none"
           />
           <button
             disabled={!url.trim()}
@@ -76,7 +76,7 @@ export function RadiographyUpload({ onCancel, onSave }: { onCancel: () => void; 
               setUrl('')
               aviso.ok('File added to the queue.')
             }}
-            className="h-10 shrink-0 rounded-md border border-[#e4e4e7] px-5 text-[13px] font-medium hover:bg-[#fafafa] disabled:opacity-50"
+            className="h-10 shrink-0 rounded-md border border-line px-5 text-[13px] font-medium hover:bg-surface-subtle disabled:opacity-50"
           >
             Upload
           </button>
@@ -85,18 +85,18 @@ export function RadiographyUpload({ onCancel, onSave }: { onCancel: () => void; 
 
       <div className="flex flex-col gap-2">
         {archivos.map((a) => (
-          <div key={a.id} className="flex items-center gap-3 rounded-lg border border-[#e4e4e7] bg-white p-3">
-            <FileText className="size-6 shrink-0 text-[#09090b]" strokeWidth={1.5} />
+          <div key={a.id} className="flex items-center gap-3 rounded-lg border border-line bg-white p-3">
+            <FileText className="size-6 shrink-0 text-ink" strokeWidth={1.5} />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px] font-bold text-[#09090b]">{a.nombre}</span>
-              <span className="flex flex-wrap items-center gap-x-2 text-[12px] text-[#71717a]">
-                {a.peso} <span className="text-[#d4d4d8]">|</span> {a.progreso}%
+              <span className="block truncate text-[13px] font-bold text-ink">{a.nombre}</span>
+              <span className="flex flex-wrap items-center gap-x-2 text-[12px] text-ink-muted">
+                {a.peso} <span className="text-line-strong">|</span> {a.progreso}%
                 <span className="bg-dash-blue size-1.5 rounded-full" />
                 <span className="text-dash-blue font-medium">37 sec left</span>
-                <LoaderCircle className="size-3.5 animate-spin text-[#1a804d]" />
+                <LoaderCircle className="size-3.5 animate-spin text-dash-ok-fg" />
                 Uploading
               </span>
-              <span className="mt-1.5 block h-1 overflow-hidden rounded-full bg-[#f1f1f4]">
+              <span className="mt-1.5 block h-1 overflow-hidden rounded-full bg-line-soft">
                 <span className="bg-dash-blue block h-full rounded-full transition-all" style={{ width: `${a.progreso}%` }} />
               </span>
             </span>
@@ -110,7 +110,7 @@ export function RadiographyUpload({ onCancel, onSave }: { onCancel: () => void; 
                 })
               }}
               aria-label={`Remove ${a.nombre}`}
-              className="shrink-0 rounded p-1 text-[#09090b] hover:bg-[#fff2f2] hover:text-[#b22626]"
+              className="shrink-0 rounded p-1 text-ink hover:bg-dash-bad-bg hover:text-dash-bad-fg"
             >
               <Trash2 className="size-4" />
             </button>
@@ -123,7 +123,7 @@ export function RadiographyUpload({ onCancel, onSave }: { onCancel: () => void; 
       <div className="flex flex-nowrap items-center justify-end gap-3">
         <button
           onClick={onCancel}
-          className="h-9 shrink-0 rounded-md border border-[#e4e4e7] px-4 text-[13px] font-medium whitespace-nowrap hover:bg-[#fafafa]"
+          className="h-9 shrink-0 rounded-md border border-line px-4 text-[13px] font-medium whitespace-nowrap hover:bg-surface-subtle"
         >
           Cancel
         </button>

@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  SectionCard, TextField, SelectField, DateField, LinkPersonCheckbox, FormFooter,
+  SectionCard, TextField, SelectField, DateField, FormFooter,
 } from '@/components/patients/form'
+import { LinkExistingPerson } from '@/components/settings/LinkExistingPerson'
 import { CODIGOS, PAISES, ESTADOS } from '@/data/location-options'
+import { type Empleado } from '@/data/employees'
 import { aviso } from '@/components/ui/toaster'
 
 /* Antes era un modal (`NewEmployeeModal.tsx`); misma lógica que "New
@@ -22,53 +24,67 @@ export function SettingsNewEmployee() {
   const navigate = useNavigate()
   const [d, setD] = useState(VACIO)
   const [intentado, setIntentado] = useState(false)
+  const [vincular, setVincular] = useState(false)
+  const [vinculado, setVinculado] = useState<Empleado | null>(null)
   const set = (k: keyof typeof VACIO) => (v: string) => setD((p) => ({ ...p, [k]: v }))
-  const req = (k: keyof typeof VACIO) => (intentado && !d[k].trim() ? 'This field is required.' : undefined)
+  const req = (k: keyof typeof VACIO) => (intentado && !vincular && !d[k].trim() ? 'This field is required.' : undefined)
 
-  const obligatorios: (keyof typeof VACIO)[] =
-    ['first', 'last', 'email', 'birthday', 'codigo', 'area', 'numero', 'linea1', 'pais', 'estado', 'ciudad', 'zip']
+  const obligatorios: (keyof typeof VACIO)[] = vincular
+    ? ['codigo', 'area', 'numero', 'linea1', 'pais', 'estado', 'ciudad', 'zip']
+    : ['first', 'last', 'email', 'birthday', 'codigo', 'area', 'numero', 'linea1', 'pais', 'estado', 'ciudad', 'zip']
 
   const volver = () => navigate('/settings/team')
 
   const guardar = () => {
     setIntentado(true)
+    if (vincular && !vinculado) return
     if (obligatorios.some((k) => !d[k].trim())) return
-    aviso.ok(`${d.first} ${d.last} was added to your employees.`)
+    const nombre = vincular && vinculado ? vinculado.nombre : `${d.first} ${d.last}`
+    aviso.ok(`${nombre} was added to your employees.`)
     volver()
   }
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">New Employee</h1>
-      <p className="mt-1 text-sm text-[#71717a]">Everyone with access to the practice, across every location.</p>
+      <h1 className="text-2xl font-bold text-ink">New Employee</h1>
+      <p className="mt-1 text-sm text-ink-muted">Everyone with access to the practice, across every location.</p>
 
       <div className="mt-5 flex flex-col gap-6">
         <SectionCard title="General Information">
-          <LinkPersonCheckbox />
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <TextField
-              label="First name" required placeholder="First name"
-              value={d.first} onChange={set('first')} error={req('first')}
-            />
-            <TextField
-              label="Middle name" placeholder="Middle name"
-              value={d.middle} onChange={set('middle')}
-            />
-            <TextField
-              label="Last name" required placeholder="Last name"
-              value={d.last} onChange={set('last')} error={req('last')}
-            />
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <TextField
-              label="Email" required placeholder="Email"
-              value={d.email} onChange={set('email')} error={req('email')}
-            />
-            <DateField
-              label="Birthdate" required placeholder="Birthdate"
-              onChange={set('birthday')} error={req('birthday')}
-            />
-          </div>
+          <LinkExistingPerson
+            vincular={vincular}
+            onVincular={setVincular}
+            vinculado={vinculado}
+            onSeleccionar={setVinculado}
+          />
+          {!vincular && (
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <TextField
+                  label="First name" required placeholder="First name"
+                  value={d.first} onChange={set('first')} error={req('first')}
+                />
+                <TextField
+                  label="Middle name" placeholder="Middle name"
+                  value={d.middle} onChange={set('middle')}
+                />
+                <TextField
+                  label="Last name" required placeholder="Last name"
+                  value={d.last} onChange={set('last')} error={req('last')}
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <TextField
+                  label="Email" required placeholder="Email"
+                  value={d.email} onChange={set('email')} error={req('email')}
+                />
+                <DateField
+                  label="Birthdate" required placeholder="Birthdate"
+                  onChange={set('birthday')} error={req('birthday')}
+                />
+              </div>
+            </>
+          )}
         </SectionCard>
 
         <SectionCard title="Contact Information">

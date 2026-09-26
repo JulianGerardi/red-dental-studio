@@ -4,7 +4,13 @@ import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ICONO_SUELTO } from '@/lib/estilos'
-import { ORDENES, ORDEN_PILL } from '@/data/clinical-mode'
+import { ORDENES, type EstadoOrden } from '@/data/clinical-mode'
+import { Pill, type PillTone } from '@/components/ui/pill'
+
+const ORDEN_TONO: Record<EstadoOrden, PillTone> = {
+  Pending: 'warning', Canceled: 'danger', Rejected: 'danger',
+  Delayed: 'warning', Requested: 'purple', Delivered: 'success',
+}
 
 /* Figma 4070:148911 "Lab Order — Section (List, Detail & New Laboratory
    Modal)". Acá está el listado, que es donde cae la pestaña. El detalle y el
@@ -30,20 +36,20 @@ export function LabOrderPanel() {
   }, [q])
 
   return (
-    <div className="rounded-xl border border-[#e4e4e7] bg-white">
+    <div className="rounded-xl border border-line bg-white">
       <div className="flex flex-wrap items-center justify-end gap-2 p-3">
         <div className="relative mr-auto w-full sm:w-[240px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search..."
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
           />
         </div>
         <button
           onClick={() => aviso.info('Filters are not available in this release.')}
-          className="flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-[#e4e4e7] px-3 text-[13px] font-medium hover:bg-[#fafafa]"
+          className="flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-line px-3 text-[13px] font-medium hover:bg-surface-subtle"
         >
           <Filter className="size-3.5" /> Filter
         </button>
@@ -66,9 +72,9 @@ export function LabOrderPanel() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[880px] border-collapse">
             <thead>
-              <tr className="border-y border-[#f1f1f4]">
+              <tr className="border-y border-line-soft bg-surface-alt">
                 {COLUMNAS.map((c) => (
-                  <th key={c} className="h-10 px-3 text-left text-[11px] font-semibold whitespace-nowrap text-[#71717a]">
+                  <th key={c} className="h-10 px-3 text-left text-[11px] font-semibold whitespace-nowrap text-ink-muted">
                     {c}
                   </th>
                 ))}
@@ -76,13 +82,13 @@ export function LabOrderPanel() {
             </thead>
             <tbody>
               {filas.map((o) => (
-                <tr key={o.id} className="border-b border-[#f1f1f4] last:border-0">
+                <tr key={o.id} className="border-b border-line-soft last:border-0">
                   <td className="h-14 px-3">
                     <span className="flex items-center gap-2 whitespace-nowrap">
                       <span className="bg-dash-count-bg text-dash-blue-hover flex size-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
                         {iniciales(o.proveedor)}
                       </span>
-                      <span className="text-[13px] text-[#09090b]">{o.proveedor}</span>
+                      <span className="text-[13px] text-ink">{o.proveedor}</span>
                     </span>
                   </td>
                   <td className="px-3">
@@ -90,18 +96,14 @@ export function LabOrderPanel() {
                       <span className="bg-dash-count-bg text-dash-blue-hover flex size-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
                         {iniciales(o.paciente)}
                       </span>
-                      <span className="text-[13px] text-[#09090b]">{o.paciente}</span>
+                      <span className="text-[13px] text-ink">{o.paciente}</span>
                     </span>
                   </td>
-                  <td className="px-3">
-                    <span className={cn('rounded-full border px-2 py-[2px] text-[11px] font-semibold', ORDEN_PILL[o.estado])}>
-                      {o.estado}
-                    </span>
-                  </td>
-                  <td className="px-3 text-[13px] whitespace-nowrap text-[#52525b]">{o.actualizado}</td>
-                  <td className="px-3 text-[13px] whitespace-nowrap text-[#52525b]">{o.creado}</td>
+                  <td className="px-3"><Pill tone={ORDEN_TONO[o.estado]}>{o.estado}</Pill></td>
+                  <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">{o.actualizado}</td>
+                  <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">{o.creado}</td>
                   {/* El frame pinta de rojo las que vencen pronto. */}
-                  <td className={cn('px-3 text-[13px] whitespace-nowrap', o.urgente ? 'font-semibold text-[#b22626]' : 'text-[#52525b]')}>
+                  <td className={cn('px-3 text-[13px] whitespace-nowrap', o.urgente ? 'font-semibold text-dash-bad-fg' : 'text-ink-soft')}>
                     {o.vence}
                   </td>
                   <td className="px-3">
@@ -129,8 +131,8 @@ export function LabOrderPanel() {
         </div>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#f1f1f4] p-3">
-        <span className="text-[12px] text-[#71717a]">Showing {filas.length} active prescriptions</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line-soft p-3">
+        <span className="text-[12px] text-ink-muted">Showing {filas.length} active prescriptions</span>
         <button
           onClick={() => aviso.info('History is not available in this release.')}
           className="text-dash-blue flex items-center gap-0.5 text-[12px] font-medium hover:underline"
