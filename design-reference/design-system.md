@@ -50,9 +50,16 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     para armarla, anatomía y las cards reales de la app.
   - **Tables** — `src/components/ui/data-table.tsx`: la tabla estándar
     (barra → encabezado → filas → pie) armada con columnas y filas; selección,
-    menú de fila, paginación, densidad y estado vacío se prenden con props. El
-    Playground deja armar una tabla eligiendo columnas y funciones, y *How to
-    build a table* explica los tres pasos con el código.
+    menú de fila, paginación, densidad y estado vacío se prenden con props. Trae
+    también las funciones del Ledger para **reducir, achicar y filtrar**, con
+    las mismas piezas: `search`, `filter` (FilterMenu), `columnPicker`
+    (ColumnPicker; `locked` y `hidden` por columna), `resizable` (ManijaResize +
+    useAnchoColumnas) y `rowDetail` (filas que se despliegan, con Expand /
+    Collapse all). El Playground deja armar una tabla eligiendo columnas y
+    funciones; *Reduce, resize and filter* las muestra todas prendidas y *How to
+    build a table* explica los pasos con el código.
+    **Patients** ya la usa (`PatientsTable` es DataTable con las columnas de
+    pacientes, 2026-09-26); el resto de las tablas de la app todavía no.
 - **Components**: las piezas de cada módulo (Dashboard, Layout, Scheduling,
   Patients, Ledger, Settings, Billing, Clinical, Help, UI). *Components /
   Catalog* es el inventario de todos los archivos de `src/components`.

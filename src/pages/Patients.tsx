@@ -6,6 +6,7 @@ import { PatientCard } from '@/components/patients/PatientCard'
 import { usePatients } from '@/data/patientsStore'
 import { PageTitle } from '@/components/ui/page-title'
 import { SearchButton } from '@/components/ui/search-button'
+import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
 import { Panel } from '@/components/dashboard/primitives'
@@ -135,14 +136,9 @@ export default function Patients() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setModal('new')}
-          data-tour="pat-new"
-          className="bg-dash-blue hover:bg-dash-blue-hover flex h-[33px] shrink-0 items-center justify-center gap-2 rounded-md px-5 text-[13px] font-medium text-white transition-colors"
-        >
-          <Plus className="size-3.5" /> New Patient
-        </button>
+        <Button size="md" onClick={() => setModal('new')} data-tour="pat-new">
+          <Plus /> New Patient
+        </Button>
       </div>
 
       <div className="mt-5 flex flex-col gap-5 lg:flex-row lg:items-start">
