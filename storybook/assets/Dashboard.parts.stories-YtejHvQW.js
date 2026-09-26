@@ -1,5 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./react-BZJXY1be.js";import{t as n}from"./jsx-runtime-DeHZSEgm.js";import{r,t as i}from"./Dashboard-D-AOWjXY.js";function a({inicial:e}){let[t,n]=(0,o.useState)(e);return(0,s.jsx)(`div`,{className:`h-64`,children:(0,s.jsx)(i,{label:`Provider`,options:[`Dr. Elena Martinez`,`Dr. Emily Chen`],value:t,onChange:n})})}var o,s,c,l,u,d;function f(){return(f=e((()=>{o=t(),r(),s=n(),c={title:`Pages/Parts/Dashboard`,parameters:{layout:`padded`}},l={render:()=>(0,s.jsx)(a,{inicial:[]})},u={render:()=>(0,s.jsx)(a,{inicial:[`Dr. Emily Chen`]})},d=[`PanelFilterButton`,`PanelFilterActive`],l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
-  render: () => <Demo inicial={[]} />
-}`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
-  render: () => <Demo inicial={['Dr. Emily Chen']} />
-}`,...u.parameters?.docs?.source}}}})))()}f();export{u as PanelFilterActive,l as PanelFilterButton,d as __namedExportsOrder,c as default};

@@ -1,5 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{a as t,i as n}from"./Topbar-PcJ6OZp3.js";import{n as r,t as i}from"./notificaciones-Dmlaj1eV.js";var a,o,s,c;function l(){return(l=e((()=>{r(),t(),a={title:`Components/Layout/Topbar`,component:n,parameters:{layout:`fullscreen`,docs:{story:{inline:!1,iframeHeight:620}}},args:{expanded:!0,onToggleSidebar:()=>{},notificaciones:i}},o={},s={args:{notificaciones:[]}},c=[`Default`,`WithoutNotifications`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{}`,...o.parameters?.docs?.source}}},s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
-  args: {
-    notificaciones: []
-  }
-}`,...s.parameters?.docs?.source}}}})))()}l();export{o as Default,s as WithoutNotifications,c as __namedExportsOrder,a as default};

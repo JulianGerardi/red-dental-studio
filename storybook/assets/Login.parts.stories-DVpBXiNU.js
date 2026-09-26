@@ -1,0 +1,7 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{a as n,i as r,o as i,r as a}from"./Login-YeKzEPwu.js";var o,s,c,l,u,d;function f(){return(f=e((()=>{i(),o=t(),s={title:`Pages/Parts/Login`,parameters:{layout:`padded`}},c={render:()=>(0,o.jsx)(`div`,{className:`w-[360px]`,children:(0,o.jsx)(a,{})})},l={render:()=>(0,o.jsx)(`div`,{className:`w-[360px]`,children:(0,o.jsx)(r,{})})},u={render:()=>(0,o.jsx)(`div`,{className:`w-[360px]`,children:(0,o.jsx)(n,{})})},d=[`AgendaWidget`,`LedgerWidget`,`OdontogramWidget`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="w-[360px]"><PanelAgenda /></div>
+}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="w-[360px]"><PanelLedger /></div>
+}`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="w-[360px]"><PanelOdontograma /></div>
+}`,...u.parameters?.docs?.source}}}})))()}f();export{c as AgendaWidget,l as LedgerWidget,u as OdontogramWidget,d as __namedExportsOrder,s as default};

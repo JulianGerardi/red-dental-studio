@@ -1,3 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{i as n,n as r,t as i}from"./Treatments-BxdueSBu.js";var a,o,s,c;function l(){return(l=e((()=>{n(),a=t(),o={title:`Pages/Parts/Treatments`,parameters:{layout:`padded`}},s={render:()=>(0,a.jsxs)(`div`,{className:`flex w-[340px] flex-col gap-3`,children:[(0,a.jsx)(r,{plan:i[0]}),(0,a.jsx)(r,{plan:i[4]})]})},c=[`PlanCards`],s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="flex w-[340px] flex-col gap-3"><TreatmentCard plan={PLANS[0]} /><TreatmentCard plan={PLANS[4]} /></div>
-}`,...s.parameters?.docs?.source}}}})))()}l();export{s as PlanCards,c as __namedExportsOrder,o as default};
