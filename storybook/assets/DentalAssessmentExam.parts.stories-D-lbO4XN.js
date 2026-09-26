@@ -1,3 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,r}from"./DentalAssessmentExam-DlXLQkRv.js";var i,a,o,s;function c(){return(c=e((()=>{r(),i=t(),a={title:`Components/Clinical/DentalAssessmentExam parts`,parameters:{layout:`fullscreen`,docs:{story:{inline:!1,iframeHeight:520}}}},o={render:()=>(0,i.jsx)(n,{open:!0,onClose:()=>{},onSave:()=>{}})},s=[`NewDocument`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{
-  render: () => <NewDocumentDialog open onClose={() => {}} onSave={() => {}} />
-}`,...o.parameters?.docs?.source}}}})))()}c();export{o as NewDocument,s as __namedExportsOrder,a as default};
