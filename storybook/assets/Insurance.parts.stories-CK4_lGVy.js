@@ -1,0 +1,3 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{m as n,p as r}from"./modals-BDg-vyZd.js";import{i,t as a}from"./Insurance-JpG3KAKT.js";var o,s,c,l;function u(){return(u=e((()=>{n(),i(),o=t(),s={title:`Pages/Parts/Insurance`,parameters:{layout:`padded`}},c={render:()=>(0,o.jsx)(`div`,{className:`w-[300px]`,children:(0,o.jsx)(a,{icon:r,label:`Carrier`,value:`Delta Dental`})})},l=[`DataRow`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="w-[300px]"><FilaDato icon={ShieldHalf} label="Carrier" value="Delta Dental" /></div>
+}`,...c.parameters?.docs?.source}}}})))()}u();export{c as DataRow,l as __namedExportsOrder,s as default};

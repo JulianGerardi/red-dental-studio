@@ -1,3 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{i as n,r}from"./topics-CfNbGGBN.js";import{n as i,r as a}from"./Help-Cjdt93BJ.js";var o,s,c,l;function u(){return(u=e((()=>{n(),a(),o=t(),s={title:`Pages/Parts/Help`,parameters:{layout:`padded`}},c={render:()=>(0,o.jsx)(`div`,{className:`w-[340px]`,children:(0,o.jsx)(i,{topic:r[0],onOpen:()=>{}})})},l=[`Topic`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="w-[340px]"><TopicCard topic={TOPICS[0]} onOpen={() => {}} /></div>
-}`,...c.parameters?.docs?.source}}}})))()}u();export{c as Topic,l as __namedExportsOrder,s as default};
