@@ -1,25 +1,29 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { MemoryRouter } from 'react-router-dom'
-import { PatientSidePanel, setEncounterState, setPatientMenuCollapsed } from '@/components/patients/PatientSidePanel'
-import { TooltipProvider } from '@/components/ui/tooltip'
-import { HelpProvider } from '@/components/help/HelpProvider'
-import { conPacientes } from './decorators'
+import { setEncounterState, setPatientMenuCollapsed } from '@/components/patients/PatientSidePanel'
+import { PatientMenuPreview, type PatientMenuPreviewState } from '@/components/patients/patient-menu-preview'
+import { PantallaReal } from './pantalla'
 
-/* El menú del paciente: el panel de la izquierda en todas las pantallas de un
-   paciente (Overview, Treatments, Insurance, Ledger, Documents,
-   Relationships). Es el componente real, PatientSidePanel. */
+/* El menú del paciente sobre las pantallas reales del paciente: cada sección
+   muestra su pantalla de verdad (Overview, Treatments, Insurance, Ledger,
+   Documents, Relationships & Billing), con el panel tal como lo arma la app. */
 
-const SECCIONES = ['Overview', 'Treatments', 'Insurance', 'Ledger', 'Documents', 'Relationships & Billing'] as const
+const PACIENTE = '/patients/abril-viola'
+const SECCIONES = {
+  Overview: '',
+  Treatments: '/treatments',
+  Insurance: '/insurance',
+  Ledger: '/ledger',
+  Documents: '/documents',
+  'Relationships & Billing': '/relationships',
+} as const
+type Seccion = keyof typeof SECCIONES
+
 type Args = {
+  section: Seccion
   collapsed: boolean
-  section: (typeof SECCIONES)[number]
   encounter: 'start' | 'pending'
-  name: string
-  initials: string
-  tooltip?: string
-  infoCard?: boolean
-  encounterOptions?: boolean
+  preview?: PatientMenuPreviewState
 }
 
 const meta = {
@@ -28,36 +32,31 @@ const meta = {
     layout: 'fullscreen',
     router: false,
     docs: {
-      story: { inline: false, iframeHeight: 780 },
+      /* La página de docs explica y muestra el Playground; cada vista está en su
+         historia, a tamaño completo. */
+      story: { inline: false, iframeHeight: 760 },
       description: {
         component: [
-          'El panel de la izquierda en todas las pantallas de un paciente (`@/components/patients/PatientSidePanel`).',
+          'El panel de la izquierda en las pantallas de un paciente (`@/components/patients/PatientSidePanel`), mostrado sobre las pantallas reales.',
           '',
-          '**Expandido (218px), de arriba hacia abajo:** botón para colapsar · foto (se cambia con clic), nombre, estado y edad · botón de encuentro (*Start Encounter* verde o *Pending Encounter* ámbar; el chevron cambia entre los dos) · *Clinical Mode* · las secciones del paciente, con la actual en azul · *General* y *Contact*, cada uno con su lápiz para editar.',
+          '**Expandido (218px):** colapsar · foto, nombre, estado y edad · botón de encuentro (*Start Encounter* / *Pending Encounter*, el chevron cambia entre los dos) · *Clinical Mode* · las secciones, con la actual en azul · *General* y *Contact* con su lápiz.',
           '',
-          '**Colapsado (60px):** sólo íconos, cada uno con su nombre en un tooltip. El estado del paciente pasa a un punto verde sobre la foto (tooltip: nombre, estado y edad). *Clinical Mode* queda como ícono. *General* y *Contact* se leen en una tarjeta que abre el ícono de ficha al pasar el mouse. El botón de encuentro no está: se usa expandido.',
+          '**Colapsado (60px):** sólo íconos con su tooltip; el estado pasa a un punto verde sobre la foto; General y Contact se leen en la tarjeta del ícono de ficha. La pantalla usa el ancho que libera (se nota en Ledger).',
           '',
-          '**Recuerda el estado:** colapsado o expandido, y el estado del encuentro, se mantienen al pasar de una sección del paciente a otra.',
-          '',
-          '**En pantallas angostas (menos de 1024px)** no se colapsa: las secciones pasan a una tira horizontal que se desliza, y General y Contact van en dos columnas.',
-          '',
-          '**Probalo:** en *Playground* cambiá colapsado, sección, encuentro y paciente desde *Controls*.',
+          '**Recuerda** colapsado/expandido y el encuentro al pasar de una sección a otra. **Menos de 1024px:** no colapsa; las secciones pasan a una tira horizontal.',
         ].join('\n'),
       },
     },
   },
-  args: { collapsed: false, section: 'Overview', encounter: 'start', name: 'Sarah Stone', initials: 'SS' },
+  args: { section: 'Overview', collapsed: false, encounter: 'start' },
   argTypes: {
-    collapsed: { control: 'boolean', description: 'Expandido (218px) o colapsado (60px). En la app se cambia con el botón de arriba del panel.' },
-    section: { control: 'select', options: SECCIONES, description: 'Sección actual: queda en azul.' },
+    section: { control: 'select', options: Object.keys(SECCIONES), description: 'Sección: se abre su pantalla y queda en azul en el menú.' },
+    collapsed: { control: 'boolean', description: 'Expandido (218px) o colapsado (60px). En la app, con el botón de arriba del panel.' },
     encounter: { control: 'inline-radio', options: ['start', 'pending'], description: 'Start Encounter (verde) o Pending Encounter (ámbar).' },
-    name: { control: 'text' },
-    initials: { control: 'text', description: 'Iniciales cuando no hay foto.' },
-    tooltip: { table: { disable: true } },
-    infoCard: { table: { disable: true } },
-    encounterOptions: { table: { disable: true } },
+    preview: { table: { disable: true } },
   },
-  decorators: [conPacientes],
+  /* El colapso y el encuentro viven fuera de React (se comparten entre las
+     pantallas del paciente): quedan bien antes de dibujar. */
   loaders: [async ({ args }) => {
     setPatientMenuCollapsed(!!args.collapsed)
     setEncounterState(args.encounter ?? 'start')
@@ -68,10 +67,7 @@ const meta = {
 export default meta
 type Story = StoryObj<Args>
 
-/* El colapso y el encuentro viven fuera de React (se comparten entre las
-   pantallas del paciente). Un loader los deja bien antes de dibujar, y este
-   componente -después del panel, para que el panel ya esté escuchando- los
-   sigue cuando cambian los controles. */
+/* Sigue los controles una vez que el panel ya está escuchando. */
 function Sincronizar({ collapsed, encounter }: Pick<Args, 'collapsed' | 'encounter'>) {
   useEffect(() => {
     setPatientMenuCollapsed(collapsed)
@@ -80,104 +76,47 @@ function Sincronizar({ collapsed, encounter }: Pick<Args, 'collapsed' | 'encount
   return null
 }
 
-function Marco({ children }: { children: ReactNode }) {
+function Pantalla({ section, collapsed, encounter, preview = {} }: Args) {
   return (
-    <MemoryRouter initialEntries={['/patients/patient-0001']}>
-      <HelpProvider>
-        <TooltipProvider>{children}</TooltipProvider>
-      </HelpProvider>
-    </MemoryRouter>
+    <PatientMenuPreview.Provider value={preview}>
+      <PantallaReal
+        key={section}
+        ruta={`${PACIENTE}${SECCIONES[section]}`}
+        despues={<Sincronizar collapsed={collapsed} encounter={encounter} />}
+      />
+    </PatientMenuPreview.Provider>
   )
 }
 
-function Pantalla({ collapsed, section, encounter, name, initials, tooltip, infoCard, encounterOptions }: Args) {
-  return (
-    <Marco>
-      <div className="flex min-h-svh flex-col gap-5 bg-page-background p-6 lg:flex-row lg:items-start">
-        <PatientSidePanel
-          name={name}
-          initials={initials}
-          section={section}
-          basePath="/patients/patient-0001"
-          tooltipAbierto={tooltip}
-          infoAbierta={infoCard}
-          opcionesEncuentroAbiertas={encounterOptions}
-        />
-        <div className="min-h-[240px] flex-1 rounded-lg border border-line-row bg-white p-5 text-[13px] text-ink-medium">
-          <p className="text-[14px] font-semibold text-ink">{section}</p>
-          <p className="mt-1">The patient’s screen. It uses the width the menu frees when it collapses.</p>
-        </div>
-      </div>
-      <Sincronizar collapsed={collapsed} encounter={encounter} />
-    </Marco>
-  )
-}
+const historia = (nombre: string, args: Partial<Args>, controles?: (keyof Args)[]): Story => ({
+  name: nombre,
+  args,
+  parameters: { docs: { disable: true }, controls: controles ? { include: controles } : { disable: true } },
+  render: (a) => <Pantalla {...a} />,
+})
 
-/* Cambiá todo desde Controls. */
+/* Cambiá sección, colapsado y encuentro desde Controls. */
 export const Playground: Story = { render: (args) => <Pantalla {...args} /> }
 
-export const Expanded: Story = {
-  parameters: { controls: { disable: true } },
-  render: (args) => <Pantalla {...args} />,
-}
+/* Cada sección abre su pantalla real. */
+export const Overview = historia('Section: Overview', { section: 'Overview' }, ['collapsed'])
+export const Treatments = historia('Section: Treatments', { section: 'Treatments' }, ['collapsed'])
+export const Insurance = historia('Section: Insurance', { section: 'Insurance' }, ['collapsed'])
+export const Ledger = historia('Section: Ledger', { section: 'Ledger' }, ['collapsed'])
+export const Documents = historia('Section: Documents', { section: 'Documents' }, ['collapsed'])
+export const Relationships = historia('Section: Relationships & Billing', { section: 'Relationships & Billing' }, ['collapsed'])
 
-export const Collapsed: Story = {
-  args: { collapsed: true },
-  parameters: { controls: { include: ['section'] } },
-  render: (args) => <Pantalla {...args} />,
-}
+/* Colapsado: la tabla del Ledger gana el ancho del panel. */
+export const Collapsed = historia('Collapsed', { section: 'Ledger', collapsed: true }, ['section'])
+export const CollapsedTooltip = historia('Collapsed: tooltip on hover', { section: 'Overview', collapsed: true, preview: { tooltip: 'Ledger' } })
+export const CollapsedStatus = historia('Collapsed: patient status', { section: 'Overview', collapsed: true, preview: { tooltip: 'John Smith · Active · 50 years' } })
+export const CollapsedInfoCard = historia('Collapsed: patient information', { section: 'Overview', collapsed: true, preview: { infoCard: true } })
 
-/* Colapsado: el nombre de cada ícono aparece al pasar el mouse. */
-export const CollapsedTooltip: Story = {
-  name: 'Collapsed: tooltip on hover',
-  args: { collapsed: true, section: 'Overview', tooltip: 'Ledger' },
-  parameters: { controls: { disable: true } },
-  render: (args) => <Pantalla {...args} />,
-}
+export const PendingEncounter = historia('Encounter: pending', { encounter: 'pending' })
+export const EncounterOptions = historia('Encounter: options', { preview: { encounterOptions: true } })
 
-/* Colapsado: el punto verde sobre la foto dice nombre, estado y edad. */
-export const CollapsedStatus: Story = {
-  name: 'Collapsed: patient status',
-  args: { collapsed: true, tooltip: 'Sarah Stone · Active · 50 years' },
-  parameters: { controls: { disable: true } },
-  render: (args) => <Pantalla {...args} />,
-}
-
-/* Colapsado: General y Contact en la tarjeta del ícono de ficha. */
-export const CollapsedInfoCard: Story = {
-  name: 'Collapsed: patient information',
-  args: { collapsed: true, infoCard: true },
-  parameters: { controls: { disable: true } },
-  render: (args) => <Pantalla {...args} />,
-}
-
-/* La sección actual queda en azul. */
-export const ActiveSection: Story = {
-  name: 'Active section',
-  args: { section: 'Ledger' },
-  parameters: { controls: { include: ['section', 'collapsed'] } },
-  render: (args) => <Pantalla {...args} />,
-}
-
-export const PendingEncounter: Story = {
-  name: 'Encounter: pending',
-  args: { encounter: 'pending' },
-  parameters: { controls: { disable: true } },
-  render: (args) => <Pantalla {...args} />,
-}
-
-/* El chevron del botón abre las dos opciones. */
-export const EncounterOptions: Story = {
-  name: 'Encounter: options',
-  args: { encounterOptions: true },
-  parameters: { controls: { disable: true } },
-  render: (args) => <Pantalla {...args} />,
-}
-
-/* En el celular: tira horizontal de secciones y datos en dos columnas. */
+/* En el celular: tira horizontal de secciones. */
 export const Phone: Story = {
-  name: 'On a phone',
+  ...historia('On a phone', { section: 'Overview' }, ['section']),
   globals: { viewport: { value: 'mobile2', isRotated: false } },
-  parameters: { controls: { include: ['section'] } },
-  render: (args) => <Pantalla {...args} />,
 }

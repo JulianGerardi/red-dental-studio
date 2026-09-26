@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Ban, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen, IdCard,
@@ -10,6 +10,7 @@ import { aviso } from '@/components/ui/toaster'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { usePhoto } from '@/lib/usePhoto'
+import { PatientMenuPreview } from './patient-menu-preview'
 
 /* Figma 3646:58836 — panel izquierdo del dashboard del paciente. */
 
@@ -107,9 +108,6 @@ export function PatientSidePanel({
   onSection,
   onEditGeneral,
   onEditContact,
-  tooltipAbierto,
-  infoAbierta,
-  opcionesEncuentroAbiertas,
 }: {
   name: string
   initials: string
@@ -121,14 +119,9 @@ export function PatientSidePanel({
      Relationships, que pasaban funciones vacías. */
   onEditGeneral?: () => void
   onEditContact?: () => void
-  /** Deja abierto el tooltip con ese texto (rail colapsado). Sólo para documentarlo en Storybook. */
-  tooltipAbierto?: string
-  /** Deja abierta la tarjeta de datos del paciente (rail colapsado). Sólo para Storybook. */
-  infoAbierta?: boolean
-  /** Deja abiertas las opciones del botón de encuentro. Sólo para Storybook. */
-  opcionesEncuentroAbiertas?: boolean
 }) {
   const navigate = useNavigate()
+  const vista = useContext(PatientMenuPreview)
   const [contacto, setContacto] = useState(false)
   const [foto, setFoto] = usePhoto(`patient-photo:${basePath}`)
   /* Sólo colapsa en desktop -en angosto el panel ya es compacto por su
@@ -152,7 +145,7 @@ export function PatientSidePanel({
      ítem ya dice qué es y un tooltip encima sería ruido. */
   const conTooltip = (texto: string, hijo: React.ReactNode) =>
     colapsado ? (
-      <Tooltip open={tooltipAbierto === texto || undefined}>
+      <Tooltip open={vista.tooltip === texto || undefined}>
         <TooltipTrigger asChild>{hijo}</TooltipTrigger>
         <TooltipContent side="right" className="bg-ink text-white">
           {texto}
@@ -210,7 +203,7 @@ export function PatientSidePanel({
       </div>
 
       <div className={cn('mt-3 flex flex-col gap-2 sm:flex-row lg:flex-col', colapsado && 'lg:hidden')}>
-        <EncounterButton opcionesAbiertas={opcionesEncuentroAbiertas} />
+        <EncounterButton />
         <Link
           to="/patients/john-smith/clinical-mode"
           data-tour="pat-clinical-mode"
@@ -238,7 +231,7 @@ export function PatientSidePanel({
               consulta, no una acción, y a esa altura del rail el usuario
               está apenas paseando. El cierre va con retardo para poder
               cruzar el hueco entre el botón y el panel sin que se escape. */}
-          <Popover open={info || !!infoAbierta} onOpenChange={setInfo}>
+          <Popover open={info || !!vista.infoCard} onOpenChange={setInfo}>
             {/* Sin tooltip: abriendo con el mouse encima, el panel ya dice
                 qué es y el tooltip se le encimaba. */}
             <PopoverTrigger
@@ -369,10 +362,11 @@ const ENCUENTRO = {
   },
 } as const
 
-export function EncounterButton({ opcionesAbiertas }: { opcionesAbiertas?: boolean } = {}) {
+export function EncounterButton() {
   const [estado, setEstado] = useEstadoEncuentro()
   const [abiertoPropio, setAbierto] = useState(false)
-  const abierto = abiertoPropio || !!opcionesAbiertas
+  const vista = useContext(PatientMenuPreview)
+  const abierto = abiertoPropio || !!vista.encounterOptions
   const ref = useRef<HTMLDivElement>(null)
   const actual = ENCUENTRO[estado]
 

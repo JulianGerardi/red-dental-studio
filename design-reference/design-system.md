@@ -42,20 +42,24 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     filtro. *Headers in the app* detecta en el código qué encabezado usa cada
     pantalla y marca los que se apartan (hoy conviven varios tamaños de título:
     PageTitle 20px Semibold, h1 sueltos de 20, 24 y 36px).
-  - **Navigation** — el rail (`Sidebar` + `Topbar`): colapsado 58px con
-    tooltip al pasar el mouse, expandido 234px, ítem activo según la ruta, menú
-    flotante de Settings.
-  - **Patient menu** — `PatientSidePanel`, con todas sus vistas: expandido,
-    colapsado, tooltip de cada ícono, estado del paciente (punto verde), tarjeta
-    de General/Contact, sección activa, encuentro Start/Pending y sus opciones,
-    y en el celular (tira horizontal). El Playground cambia colapsado, sección,
-    encuentro y paciente.
-  - Los estados que abren con el mouse (tooltips, menú de Settings, tarjeta del
-    paciente, opciones de encuentro) se dejan a la vista con props que sólo usa
-    Storybook: `tooltipAbierto`, `settingsAbierto` (Sidebar); `tooltipAbierto`,
-    `infoAbierta`, `opcionesEncuentroAbiertas` (PatientSidePanel);
+  - **Navigation** — el menú lateral (`Sidebar` en `AppShell`) sobre la app
+    real: colapsado 58px con tooltip, expandido 234px, ítem activo según la
+    pantalla, menú flotante de Settings, celular. El Playground elige la
+    pantalla y cómo arranca el menú.
+  - **Patient menu** — `PatientSidePanel` sobre las pantallas reales del
+    paciente: una historia por sección (Overview, Treatments, Insurance, Ledger,
+    Documents, Relationships & Billing, cada una con su pantalla), colapsado
+    (Ledger gana el ancho), tooltip, estado del paciente, tarjeta de datos,
+    encuentro Start/Pending y sus opciones, celular.
+  - Estas dos páginas montan la app con `PantallaReal`
+    (`src/design-system/pantalla.tsx`, lo mismo que usa *Pages*). Lo que en la
+    app se abre con el mouse se deja a la vista con dos contextos que la app no
+    usa: `NavigationPreview` (`components/layout/navigation-preview.ts`:
+    expanded, tooltip, settingsMenu) y `PatientMenuPreview`
+    (`components/patients/patient-menu-preview.ts`: tooltip, infoCard,
+    encounterOptions); el colapso y el encuentro del paciente se fijan con
     `setPatientMenuCollapsed` y `setEncounterState`. Abrirlos con una función
-    `play` no alcanza: al terminar, la historia se vuelve a dibujar y se cierran.
+    `play` no alcanza: al terminar, la historia se vuelve a dibujar.
   - **Buttons** — `src/components/ui/button.tsx`. Variantes `primary`,
     `secondary`, `ghost`, `link`, `destructive` (el look más usado en el código
     para cada tipo) y tamaños `sm` 28 · `md` 32 · `lg` 36 (las tres alturas más

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
@@ -8,9 +8,10 @@ import { useHelp } from '@/components/help/HelpProvider'
 import { NOTIFICACIONES } from '@/data/notificaciones'
 import { aviso } from '@/components/ui/toaster'
 import { PatientInSessionPopup } from '@/components/patients/PatientInSessionPopup'
+import { NavigationPreview } from './navigation-preview'
 
 export function AppShell() {
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(useContext(NavigationPreview).expanded ?? false)
   const { pathname } = useLocation()
   const { showOnScreen, confibotAbierto, closeConfibot } = useHelp()
 

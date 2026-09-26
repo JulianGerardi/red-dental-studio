@@ -1,25 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { MemoryRouter } from 'react-router-dom'
-import { AppRoutes } from '@/AppRoutes'
-import { PatientsProvider } from '@/data/patientsStore'
-import { HelpProvider } from '@/components/help/HelpProvider'
-import { Toaster } from '@/components/ui/toaster'
+import { PantallaReal } from './pantalla'
 
 /* Cada pantalla de la app, montada con las mismas rutas y providers que en
    producción (src/AppRoutes.tsx). `npm run ds:coverage` avisa si una ruta
    nueva no aparece acá. */
-function Pantalla({ ruta }: { ruta: string }) {
-  return (
-    <PatientsProvider>
-      <Toaster />
-      <MemoryRouter initialEntries={[ruta]}>
-        <HelpProvider>
-          <AppRoutes />
-        </HelpProvider>
-      </MemoryRouter>
-    </PatientsProvider>
-  )
-}
+const Pantalla = ({ ruta }: { ruta: string }) => <PantallaReal ruta={ruta} />
 
 const meta = {
   title: 'Pages',

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   GalleryVerticalEnd, House, Users, CalendarRange, CreditCard,
@@ -9,6 +9,7 @@ import { SETTINGS_NAV } from '@/data/settings-nav'
 import { useHelp } from '@/components/help/HelpProvider'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import { NavigationPreview } from './navigation-preview'
 
 type NavItem = { to: string; label: string; icon: LucideIcon; end?: boolean }
 
@@ -54,18 +55,13 @@ const NAV: NavItem[] = [
 export function Sidebar({
   expanded,
   onClose,
-  tooltipAbierto,
-  settingsAbierto,
 }: {
   expanded: boolean
   onClose?: () => void
-  /** Nombre del ítem cuyo tooltip queda abierto. Sólo para documentar el rail colapsado en Storybook. */
-  tooltipAbierto?: string
-  /** Deja abierto el menú flotante de Settings. Sólo para documentarlo en Storybook. */
-  settingsAbierto?: boolean
 }) {
   const { confibotAbierto, toggleConfibot } = useHelp()
   const { pathname } = useLocation()
+  const vista = useContext(NavigationPreview)
 
   /* Mismo criterio que el `isActive` de NavLink. Se calcula acá y no con la
      función de `className` de NavLink porque el tooltip envuelve al link con
@@ -136,7 +132,7 @@ export function Sidebar({
         )}
       >
         {NAV.map(({ to, label, icon: Icon, end }) => (
-          <ConTooltip key={to} label={label} mostrar={!expanded} abierto={tooltipAbierto === label}>
+          <ConTooltip key={to} label={label} mostrar={!expanded} abierto={vista.tooltip === label}>
             <NavLink to={to} end={end} aria-label={label} className={item(activa(to, end))}>
               <Icon className="size-4 shrink-0" />
               <span className={cn(expanded ? '' : 'md:hidden')}>{label}</span>
@@ -165,7 +161,7 @@ export function Sidebar({
           ítem colapsado mide 32 y el expandido 36, así que se le suman 2px de
           padding abajo para que el ícono caiga exactamente en la misma altura. */}
       <div className={cn('mt-auto flex flex-col pb-6', expanded ? '' : 'md:items-center md:pb-[26px]')}>
-          <SettingsItem clase={item} mostrarLabel={expanded} forzarAbierto={settingsAbierto} />
+          <SettingsItem clase={item} mostrarLabel={expanded} forzarAbierto={vista.settingsMenu} />
         </div>
       </aside>
     </TooltipProvider>
