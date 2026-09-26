@@ -1,9 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./react-BZJXY1be.js";import{t as n}from"./jsx-runtime-DeHZSEgm.js";import{a as r,n as i,r as a,t as o}from"./VitalsPanel-Ggq0wNus.js";import{_ as s,m as c}from"./clinical-mode-Bvx1pbAd.js";function l(){let[e,t]=(0,d.useState)(120);return(0,f.jsx)(o,{label:`Systolic`,valor:e,min:50,max:250,paso:1,onChange:t})}function u(){let[e,t]=(0,d.useState)(36.6);return(0,f.jsx)(`div`,{className:`w-[260px]`,children:(0,f.jsx)(i,{pct:.55,color:`#1a804d`,etiqueta:`Normal`,min:30,max:45,valor:e,onValor:t,children:(0,f.jsxs)(`span`,{className:`text-sm`,children:[e,` °C`]})})})}var d,f,p,m,h,g,_;function v(){return(v=e((()=>{d=t(),s(),r(),f=n(),p={title:`Components/Clinical/VitalsPanel parts`,parameters:{layout:`padded`}},m={render:()=>(0,f.jsx)(`div`,{className:`grid w-[820px] grid-cols-2 gap-4`,children:c.slice(0,4).map(e=>(0,f.jsx)(a,{v:e,aviso:e.id===`blood-pressure`},e.id))})},h={render:()=>(0,f.jsx)(l,{})},g={render:()=>(0,f.jsx)(u,{})},_=[`VitalCards`,`NumberField`,`Gauge`],m.parameters={...m.parameters,docs:{...m.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="grid w-[820px] grid-cols-2 gap-4">
-      {VITALES.slice(0, 4).map(v => <TarjetaVital key={v.id} v={v} aviso={v.id === 'blood-pressure'} />)}
-    </div>
-}`,...m.parameters?.docs?.source}}},h.parameters={...h.parameters,docs:{...h.parameters?.docs,source:{originalSource:`{
-  render: () => <NumberDemo />
-}`,...h.parameters?.docs?.source}}},g.parameters={...g.parameters,docs:{...g.parameters?.docs,source:{originalSource:`{
-  render: () => <GaugeDemo />
-}`,...g.parameters?.docs?.source}}}})))()}v();export{g as Gauge,h as NumberField,m as VitalCards,_ as __namedExportsOrder,p as default};
