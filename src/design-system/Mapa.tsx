@@ -61,7 +61,7 @@ const SECCIONES: { nombre: string; que: string }[] = [
   { nombre: 'Audit', que: 'Lo que el código hace hoy y se aparta del estándar.' },
 ]
 
-export function Mapa() {
+export function Mapa({ buscador = true }: { buscador?: boolean }) {
   const entradas = useIndice()
   const [q, setQ] = useState('')
   /* Las pantallas son stories de un mismo título (Pages): cada una va aparte. */
@@ -76,7 +76,7 @@ export function Mapa() {
   const coincide = (e: Entrada) => e.title.toLowerCase().includes(q.trim().toLowerCase())
   return (
     <div className="not-prose flex flex-col gap-5 font-sans text-ink">
-      <div className="relative w-[320px] max-w-full">
+      {buscador && <div className="relative w-[320px] max-w-full">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
         <input
           value={q}
@@ -85,7 +85,7 @@ export function Mapa() {
           aria-label="Find a page"
           className="h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:border-dash-blue focus:outline-none"
         />
-      </div>
+      </div>}
       {SECCIONES.map((s) => {
         const deSeccion = lista.filter((e) => e.title.split('/')[0] === s.nombre && coincide(e))
         if (!deSeccion.length) return null

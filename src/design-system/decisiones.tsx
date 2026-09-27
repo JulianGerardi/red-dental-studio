@@ -66,7 +66,7 @@ export function Decisiones({ archivo, max }: { archivo: string; max?: number }) 
   if (!d.length) return <p style={{ color: '#71717a', fontSize: 13 }}>Este archivo no tiene decisiones escritas en comentarios.</p>
   const lista = max ? d.slice(0, max) : d
   return (
-    <ol className="m-0 flex list-none flex-col gap-2 p-0 font-sans">
+    <ol className="sb-unstyled m-0 flex list-none flex-col gap-2 p-0 font-sans">
       {lista.map((x, i) => (
         <li key={`${x.linea}-${i}`} className="rounded-lg border border-line-row bg-white px-4 py-3">
           <p className="m-0 text-[13px] leading-relaxed text-ink">{x.texto}</p>

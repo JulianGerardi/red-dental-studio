@@ -48,7 +48,9 @@ function exportsDe(texto: string): string[] {
    explica por qué se ve como se ve. */
 export function comentarioDe(texto: string): string {
   const sinImports = texto.replace(/^(?:import[^;]*?from\s+['"][^'"]+['"];?\s*|\s*\n)+/m, '')
-  const m = sinImports.match(/\/\*+([\s\S]*?)\*\//)
+  /* Sólo comentarios de primer nivel: los de adentro de un tipo o una
+     función (sangrados) hablan de un detalle, no del componente. */
+  const m = sinImports.match(/^\/\*+([\s\S]*?)\*\//m)
   if (!m) return ''
   return m[1].split('\n').map((l) => l.replace(/^\s*\*?\s?/, '')).join('\n').trim()
 }

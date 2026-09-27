@@ -28,10 +28,24 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
 - **Welcome**: qué es, cómo está ordenado y cómo probar un elemento.
 - **Foundations**: Colors, Typography, Radius and shadows. Todo calculado
   leyendo `src/index.css`.
-- **Welcome** tiene un **mapa** (*Ir a…*): todas las páginas agrupadas como en
-  el menú, con buscador y un link a cada una. Se arma leyendo `index.json`, así
-  que una página nueva aparece sola (`src/design-system/Mapa.tsx`). En
-  *Components / Catalog*, cada archivo tiene su “Open →”.
+- **Welcome** es la portada (`src/design-system/Inicio.tsx`): un buscador
+  grande, estilo Google, que busca en todas las páginas por nombre, por su
+  descripción y por el nombre de sus ejemplos, y entiende castellano
+  ("botón", "turno", "pestañas", "deshabilitado" → Buttons, Appointment cards,
+  Tabs, los ejemplos Disabled). El índice y los sinónimos están en
+  `src/design-system/buscar.ts`. Debajo: *Explorá tocando* (piezas reales de la
+  app que abren su página), las secciones con su cantidad, cómo se lee una
+  página y el mapa completo (`Mapa.tsx`, armado con `index.json`).
+- **Página de cada componente** (`DocsPage.tsx`), armada como las de Primer:
+  rastro, nombre, una frase de qué es (el primer párrafo de la descripción o
+  del comentario del componente), chips (Playground, cantidad de ejemplos,
+  dónde se usa, decisiones, abrir a pantalla completa, código en GitHub) y
+  tres pestañas: **Overview** (Playground con Controls y los ejemplos),
+  **Guidelines** (por qué es así, en cada dispositivo, dónde se usa) y
+  **Code** (cómo importarlo, su código y el de sus stories). A la derecha, un
+  índice *On this page* de la pestaña abierta. Estilos de ancho en
+  `src/design-system/docs.css`; lo propio lleva `sb-unstyled` para que
+  Storybook no le ponga sus estilos de texto.
 - **Elements**: las piezas estándar para armar pantallas. Cada una es un
   componente real de la app y su página tiene el mismo orden: **Playground**
   (se personaliza desde el panel *Controls*; *Show code* da el código),
