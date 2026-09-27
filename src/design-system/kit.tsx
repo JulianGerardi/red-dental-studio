@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { PESOS, colorDeToken, hex, px } from './medir'
 import { cn } from '@/lib/utils'
 
@@ -72,28 +72,33 @@ export function ConRotulo({ rotulo, children }: { rotulo: ReactNode; children: R
    medir dentro de la muestra (el <input> dentro de un campo, por ejemplo). */
 export type Medidas = { alto: string; ancho: string; padding: string; texto: string; peso: string; radio: string; gap: string; borde: string; icono: string }
 
+export function medidasDe(el: HTMLElement): Medidas {
+  const s = getComputedStyle(el)
+  const svg = el.querySelector('svg')
+  const pl = px(s.paddingLeft)
+  const pr = px(s.paddingRight)
+  return {
+    alto: `${px(s.height)}px`,
+    ancho: `${px(s.width)}px`,
+    padding: pl === pr ? `${pl}px` : `${pl}px left · ${pr}px right`,
+    texto: `${px(s.fontSize)}px`,
+    peso: PESOS[s.fontWeight] ?? s.fontWeight,
+    radio: px(s.borderTopLeftRadius) >= 999 ? 'Full'
+      : px(s.borderTopLeftRadius) === px(s.borderTopRightRadius) ? `${px(s.borderTopLeftRadius)}px`
+      : `${px(s.borderTopLeftRadius)}px left · ${px(s.borderTopRightRadius)}px right`,
+    gap: s.columnGap && s.columnGap !== 'normal' ? `${px(s.columnGap)}px` : '—',
+    borde: px(s.borderTopWidth) > 0 ? `${px(s.borderTopWidth)}px ${hex(s.borderTopColor)}` : 'None',
+    icono: svg ? `${px(getComputedStyle(svg).width)}px` : '—',
+  }
+}
+
 export function useMedidas(selector?: string) {
   const ref = useRef<HTMLDivElement>(null)
   const [m, setM] = useState<Medidas | null>(null)
   useLayoutEffect(() => {
     const raiz = ref.current
     const el = (selector ? raiz?.querySelector(selector) : raiz?.firstElementChild) as HTMLElement | null
-    if (!el) return
-    const s = getComputedStyle(el)
-    const svg = el.querySelector('svg')
-    const pl = px(s.paddingLeft)
-    const pr = px(s.paddingRight)
-    setM({
-      alto: `${px(s.height)}px`,
-      ancho: `${px(s.width)}px`,
-      padding: pl === pr ? `${pl}px` : `${pl}px left · ${pr}px right`,
-      texto: `${px(s.fontSize)}px`,
-      peso: PESOS[s.fontWeight] ?? s.fontWeight,
-      radio: px(s.borderTopLeftRadius) >= 999 ? 'Full' : `${px(s.borderTopLeftRadius)}px`,
-      gap: s.columnGap && s.columnGap !== 'normal' ? `${px(s.columnGap)}px` : '—',
-      borde: px(s.borderTopWidth) > 0 ? `${px(s.borderTopWidth)}px ${hex(s.borderTopColor)}` : 'None',
-      icono: svg ? `${px(getComputedStyle(svg).width)}px` : '—',
-    })
+    if (el) setM(medidasDe(el))
   }, [selector])
   return { ref, m }
 }
@@ -112,3 +117,22 @@ export function Bloque({ titulo, nota, children }: { titulo?: string; nota?: Rea
 export const Lienzo = ({ children, className }: { children: ReactNode; className?: string }) => (
   <div className={cn('flex w-full max-w-[960px] flex-col gap-8 text-ink', className)}>{children}</div>
 )
+
+/* Deja fijo un estado de interacción en una parte de la muestra: le pone la
+   clase del addon de pseudo-estados (hover, focus-visible) al elemento que
+   indica `selector`, o lo clickea una vez para dejar abierto su menú. Un play
+   no sirve: la historia se vuelve a dibujar después y el estado se pierde. */
+export function Forzar({ selector, estado, children, className }: { selector: string; estado: 'hover' | 'focus-visible' | 'click'; children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const clickeado = useRef(false)
+  useEffect(() => {
+    const el = ref.current?.querySelector<HTMLElement>(selector)
+    if (!el) return
+    if (estado !== 'click') el.classList.add(`pseudo-${estado}`)
+    else if (!clickeado.current) {
+      clickeado.current = true
+      el.click()
+    }
+  })
+  return <div ref={ref} className={className}>{children}</div>
+}

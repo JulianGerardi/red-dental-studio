@@ -102,3 +102,10 @@ export const EVENTOS_INICIALES: EventoConFecha[] = EVENTS.map(({ day, ...e }) =>
   ...e,
   fecha: sumarDias(inicioDeSemana(FECHA_ANCLA), day),
 }))
+
+/* Hora decimal a rótulo de agenda: 8.25 -> "08:15 AM". */
+export const fmtExacta = (h: number) => {
+  const hh = Math.floor(h)
+  const mm = Math.round((h - hh) * 60)
+  return `${String(hh > 12 ? hh - 12 : hh).padStart(2, '0')}:${String(mm).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`
+}

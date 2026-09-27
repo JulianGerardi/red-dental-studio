@@ -46,20 +46,36 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     real: colapsado 58px con tooltip, expandido 234px, ítem activo según la
     pantalla, menú flotante de Settings, celular. El Playground elige la
     pantalla y cómo arranca el menú.
-  - **Patient menu** — `PatientSidePanel` sobre las pantallas reales del
-    paciente: una historia por sección (Overview, Treatments, Insurance, Ledger,
-    Documents, Relationships & Billing, cada una con su pantalla), colapsado
-    (Ledger gana el ancho), tooltip, estado del paciente, tarjeta de datos,
-    encuentro Start/Pending y sus opciones, celular.
-  - Estas dos páginas montan la app con `PantallaReal`
+  - **Patient menu** — `PatientSidePanel` solo, sin la pantalla (las
+    pantallas del paciente están en *Pages*). Tiene su propio router: tocar una
+    sección cambia el ítem activo, y un recuadro punteado marca dónde va la
+    pantalla y mide el ancho que le queda (colapsar le da 158px más). Historias:
+    Playground (sección, colapsado, encuentro, nombre y *open* para dejar
+    abierto un tooltip, la tarjeta de datos o las opciones del encuentro),
+    *Parts* (qué hace cada parte, expandido y colapsado), *States* (hover y
+    foco en una sección, encuentro pendiente y sus opciones, colapsado con
+    tooltip, estado y tarjeta) y *Specs*.
+  - **Appointment cards** — las cuatro cards de un turno, cada una con su
+    componente: `AppointmentCard` (Dashboard), `AppointmentCard compact`
+    (Patients), `PatientAppointmentCard` (Overview del paciente, antes escrita
+    a mano en `PatientDetail.tsx`) y `TurnoCalendario` (Scheduling: bloque,
+    chip de Month y fila del celular, antes repetido tres veces en
+    `CalendarViews.tsx`). *Which card goes where*, estados de cada una, los
+    siete estados del calendario en sus tres formas y *Specs*. Tocarlas abre lo
+    mismo que en la app (ficha rápida, detalle del turno, modal de edición).
+  - **Navigation** monta la app con `PantallaReal`
     (`src/design-system/pantalla.tsx`, lo mismo que usa *Pages*). Lo que en la
     app se abre con el mouse se deja a la vista con dos contextos que la app no
     usa: `NavigationPreview` (`components/layout/navigation-preview.ts`:
     expanded, tooltip, settingsMenu) y `PatientMenuPreview`
-    (`components/patients/patient-menu-preview.ts`: tooltip, infoCard,
-    encounterOptions); el colapso y el encuentro del paciente se fijan con
-    `setPatientMenuCollapsed` y `setEncounterState`. Abrirlos con una función
-    `play` no alcanza: al terminar, la historia se vuelve a dibujar.
+    (`components/patients/patient-menu-preview.ts`: collapsed y encounter por
+    instancia, tooltip, infoCard, encounterOptions). Abrirlos con una función
+    `play` no alcanza: al terminar, la historia se vuelve a dibujar. Para
+    hover, foco o un menú abierto en una parte de una muestra está `Forzar`
+    (`src/design-system/kit.tsx`).
+  - Una página de Elements puede documentar varios archivos:
+    `docs.decisionsFrom` acepta una lista, y *Design decisions* y *Where it is
+    used* los juntan.
   - **Buttons** — `src/components/ui/button.tsx`. Variantes `primary`,
     `secondary`, `ghost`, `link`, `destructive` (el look más usado en el código
     para cada tipo) y tamaños `sm` 28 · `md` 32 · `lg` 36 (las tres alturas más

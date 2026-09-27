@@ -198,7 +198,7 @@ const conStory = componentes.filter((p) => existsSync(p.replace(/\.tsx$/, '.stor
 const documentadosEnElements = new Set(
   archivos(join(RAIZ, 'src/design-system'))
     .filter((p) => p.endsWith('.stories.tsx'))
-    .flatMap((p) => [...readFileSync(p, 'utf8').matchAll(/decisionsFrom:\s*'([^']+)'/g)].map((m) => m[1])),
+    .flatMap((p) => [...readFileSync(p, 'utf8').matchAll(/decisionsFrom:\s*(\[[^\]]*\]|'[^']+')/g)].flatMap((m) => [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]))),
 )
 const tienePlayground = (p) => {
   if (documentadosEnElements.has(p.replace(`${RAIZ}src/`, ''))) return true

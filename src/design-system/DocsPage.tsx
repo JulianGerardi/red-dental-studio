@@ -33,9 +33,13 @@ export function DocsPage() {
   const componente = useArchivo(rutaComponente)
   /* Páginas que documentan un componente de otro archivo (Elements / Patient
      menu → PatientSidePanel.tsx) lo indican con `docs.decisionsFrom`. */
-  const decisionesDe = historia?.parameters?.docs?.decisionsFrom as string | undefined
-  const archivoDeUso = (decisionesDe ?? rutaComponente?.slice(1))?.replace(/^\//, '')
-  const usos = componentes.find((c) => c.archivo === archivoDeUso)?.usadoPor
+  /* Puede ser más de uno: Elements / Appointment cards documenta las cuatro
+     cards de turno, cada una en su archivo. */
+  const decisionesDe = historia?.parameters?.docs?.decisionsFrom as string | string[] | undefined
+  const archivosDeDecision = decisionesDe ? [decisionesDe].flat() : rutaComponente && componente ? [rutaComponente] : []
+  const archivosDeUso = (decisionesDe ? [decisionesDe].flat() : rutaComponente ? [rutaComponente.slice(1)] : []).map((a) => a.replace(/^\/?(src\/)?/, ''))
+  const encontrados = componentes.filter((c) => archivosDeUso.includes(c.archivo))
+  const usos = encontrados.length ? [...new Set(encontrados.flatMap((c) => c.usadoPor))].sort() : undefined
   const stories = useArchivo(rutaStories)
   /* Si la página ya trae su descripción (Elements), la nota del código la
      repetiría. */
@@ -76,11 +80,20 @@ export function DocsPage() {
           )}
         </>
       )}
-      {(decisionesDe || (rutaComponente && componente)) && (
+      {archivosDeDecision.length > 0 && (
         <>
           <h2>Design decisions</h2>
-          <p>Por qué el componente es como es, leído de los comentarios de su código{decisionesDe ? ` (${decisionesDe})` : ''}: cada decisión con la línea a la que se refiere.</p>
-          <Decisiones archivo={decisionesDe ?? rutaComponente!} />
+          <p>Por qué el componente es como es, leído de los comentarios de su código{decisionesDe && archivosDeDecision.length === 1 ? ` (${archivosDeDecision[0]})` : ''}: cada decisión con la línea a la que se refiere.</p>
+          {archivosDeDecision.length === 1 ? (
+            <Decisiones archivo={archivosDeDecision[0]!} />
+          ) : (
+            archivosDeDecision.map((a) => (
+              <div key={a}>
+                <h3><code>{a}</code></h3>
+                <Decisiones archivo={a} />
+              </div>
+            ))
+          )}
         </>
       )}
       {componente && rutaComponente && (

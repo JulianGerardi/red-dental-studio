@@ -2,8 +2,9 @@ import { useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import {
   BLOCK_STYLE, BLOCKED, DIAS_CORTOS, START_HOUR, END_HOUR, HOUR_PX,
-  inicioDeSemana, sumarDias, mismoDia, type EventoConFecha,
+  inicioDeSemana, sumarDias, mismoDia, fmtExacta, type EventoConFecha,
 } from './calendar-data'
+import { TurnoCalendario } from './TurnoCalendario'
 
 /* Las tres vistas de Scheduling sobre la misma agenda, como Google Calendar:
    Day es una columna, Week son siete y Month es la grilla del mes.
@@ -15,11 +16,6 @@ export type Vista = 'Day' | 'Week' | 'Month'
 const HORAS = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => START_HOUR + i)
 const fmtHora = (h: number) =>
   `${String(h > 12 ? h - 12 : h).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`
-export const fmtExacta = (h: number) => {
-  const hh = Math.floor(h)
-  const mm = Math.round((h - hh) * 60)
-  return `${String(hh > 12 ? hh - 12 : hh).padStart(2, '0')}:${String(mm).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`
-}
 /* Los turnos se sueltan en franjas de 15 minutos. */
 const PASO = 0.25
 
@@ -91,36 +87,27 @@ export function ColumnaDia({
         />
       ))}
 
-      {propios.map(({ e, i }) => {
-        const s = BLOCK_STYLE[e.state]
-        return (
-          <button
-            key={i}
-            draggable
-            onDragStart={(ev) => {
-              arrastrado.current = i
-              huboArrastre.current = true
-              ev.dataTransfer.effectAllowed = 'move'
-              ev.dataTransfer.setData('text/plain', e.patient)
-            }}
-            onDragEnd={() => { setTimeout(() => { huboArrastre.current = false }, 0) }}
-            onClick={(ev) => {
-              if (huboArrastre.current) return
-              onAbrir(e, ev.currentTarget)
-            }}
-            className="absolute right-1 left-1 cursor-grab overflow-hidden rounded-r-[3px] border-l-[3px] px-1.5 py-1 text-left transition-shadow hover:shadow-md active:cursor-grabbing"
-            style={{
-              top: (e.start - START_HOUR) * HOUR_PX,
-              height: e.duration * HOUR_PX,
-              backgroundColor: s.bg,
-              borderLeftColor: s.bar,
-            }}
-          >
-            <span className="block text-[10px] font-medium" style={{ color: s.fg }}>{fmtExacta(e.start)}</span>
-            <span className="block truncate text-[11px] text-[#18181b]">{e.patient}</span>
-          </button>
-        )
-      })}
+      {propios.map(({ e, i }) => (
+        <TurnoCalendario
+          key={i}
+          evento={e}
+          forma="bloque"
+          draggable
+          onDragStart={(ev) => {
+            arrastrado.current = i
+            huboArrastre.current = true
+            ev.dataTransfer.effectAllowed = 'move'
+            ev.dataTransfer.setData('text/plain', e.patient)
+          }}
+          onDragEnd={() => { setTimeout(() => { huboArrastre.current = false }, 0) }}
+          onClick={(ev) => {
+            if (huboArrastre.current) return
+            onAbrir(e, ev.currentTarget)
+          }}
+          className="absolute right-1 left-1"
+          style={{ top: (e.start - START_HOUR) * HOUR_PX, height: e.duration * HOUR_PX }}
+        />
+      ))}
     </div>
   )
 }
@@ -269,28 +256,20 @@ export function VistaMes({ eventos, fecha, onMover, onAbrir }: Props) {
                 )}
 
                 <span className="hidden flex-col gap-1 md:flex">
-                {propios.map(({ e, j }) => {
-                  const s = BLOCK_STYLE[e.state]
-                  return (
-                    <button
-                      key={j}
-                      draggable
-                      onDragStart={(ev) => {
-                        arrastrado.current = j
-                        ev.dataTransfer.effectAllowed = 'move'
-                        ev.dataTransfer.setData('text/plain', e.patient)
-                      }}
-                      onClick={(ev) => onAbrir(e, ev.currentTarget)}
-                      className="flex cursor-grab items-center gap-1.5 overflow-hidden rounded-r-[3px] border-l-[3px] px-1.5 py-1 text-left active:cursor-grabbing"
-                      style={{ backgroundColor: s.bg, borderLeftColor: s.bar }}
-                    >
-                      <span className="shrink-0 text-[10px] font-medium" style={{ color: s.fg }}>
-                        {fmtExacta(e.start).slice(0, 5)}
-                      </span>
-                      <span className="truncate text-[10px] text-[#18181b]">{e.patient}</span>
-                    </button>
-                  )
-                })}
+                {propios.map(({ e, j }) => (
+                  <TurnoCalendario
+                    key={j}
+                    evento={e}
+                    forma="chip"
+                    draggable
+                    onDragStart={(ev) => {
+                      arrastrado.current = j
+                      ev.dataTransfer.effectAllowed = 'move'
+                      ev.dataTransfer.setData('text/plain', e.patient)
+                    }}
+                    onClick={(ev) => onAbrir(e, ev.currentTarget)}
+                  />
+                ))}
                 </span>
               </div>
             )
@@ -308,25 +287,14 @@ export function VistaMes({ eventos, fecha, onMover, onAbrir }: Props) {
               <p className="mt-2 text-xs text-ink-faint">No appointments on this day.</p>
             ) : (
               <div className="mt-2 flex flex-col gap-2">
-                {delDia.map(({ e, j }) => {
-                  const s = BLOCK_STYLE[e.state]
-                  return (
-                    <button
-                      key={j}
-                      onClick={(ev) => { ev.stopPropagation(); onAbrir(e, ev.currentTarget) }}
-                      className="flex items-center gap-2 rounded-r-[3px] border-l-[3px] px-2.5 py-2 text-left"
-                      style={{ backgroundColor: s.bg, borderLeftColor: s.bar }}
-                    >
-                      <span className="shrink-0 text-[11px] font-semibold" style={{ color: s.fg }}>
-                        {fmtExacta(e.start)}
-                      </span>
-                      <span className="min-w-0 flex-1 truncate text-[13px] text-[#18181b]">
-                        {e.patient}
-                      </span>
-                      <span className="shrink-0 text-[11px]" style={{ color: s.fg }}>{e.state}</span>
-                    </button>
-                  )
-                })}
+                {delDia.map(({ e, j }) => (
+                  <TurnoCalendario
+                    key={j}
+                    evento={e}
+                    forma="fila"
+                    onClick={(ev) => { ev.stopPropagation(); onAbrir(e, ev.currentTarget) }}
+                  />
+                ))}
               </div>
             )}
           </div>

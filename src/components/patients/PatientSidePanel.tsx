@@ -37,6 +37,11 @@ const CONTACT = [
   { icon: MapPin, label: 'Address', value: '123 Biscayne Blvd' },
 ]
 
+/* Anillo azul al llegar con Tab, el mismo de los botones y las pestañas:
+   sin él las secciones mostraban el contorno del navegador, distinto en cada
+   uno. */
+const FOCO = 'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dash-blue'
+
 /* Mismo mecanismo que `useEstadoEncuentro` de más abajo y por el mismo
    motivo: el panel se remonta en cada pantalla del paciente. */
 let colapsadoGlobal = false
@@ -129,7 +134,8 @@ export function PatientSidePanel({
      tablas del Ledger). El estado vive fuera de React, igual que el del
      botón de encuentro: el panel se vuelve a montar en cada pantalla del
      paciente, así que con `useState` volvía a abrirse al cambiar de ítem. */
-  const [colapsado, setColapsado] = useColapso()
+  const [colapsadoCompartido, setColapsado] = useColapso()
+  const colapsado = vista.collapsed ?? colapsadoCompartido
   const [info, setInfo] = useState(false)
   const cierre = useRef<number | null>(null)
   const abrirInfo = () => {
@@ -164,6 +170,7 @@ export function PatientSidePanel({
         aria-label={colapsado ? 'Expand patient menu' : 'Collapse patient menu'}
         className={cn(
           'hidden rounded-md text-ink-muted hover:bg-surface-muted hover:text-black lg:mb-2 lg:flex lg:size-9 lg:items-center lg:justify-center',
+          FOCO,
           colapsado ? 'lg:mx-auto' : 'lg:ml-auto',
         )}
       >
@@ -270,6 +277,7 @@ export function PatientSidePanel({
         {NAV.map(({ key, icon: Icon, to }) => {
           const clase = cn(
             'flex h-10 shrink-0 items-center gap-2 rounded-lg border px-3 text-left text-[13px] font-medium whitespace-nowrap',
+            FOCO,
             'lg:h-auto lg:shrink lg:gap-2.5 lg:rounded-md lg:border-0 lg:px-2.5 lg:py-2 lg:text-xs',
             colapsado && 'lg:size-9 lg:justify-center lg:gap-0 lg:p-0',
             section === key
@@ -363,9 +371,10 @@ const ENCUENTRO = {
 } as const
 
 export function EncounterButton() {
-  const [estado, setEstado] = useEstadoEncuentro()
+  const [estadoCompartido, setEstado] = useEstadoEncuentro()
   const [abiertoPropio, setAbierto] = useState(false)
   const vista = useContext(PatientMenuPreview)
+  const estado = vista.encounter ?? estadoCompartido
   const abierto = abiertoPropio || !!vista.encounterOptions
   const ref = useRef<HTMLDivElement>(null)
   const actual = ENCUENTRO[estado]

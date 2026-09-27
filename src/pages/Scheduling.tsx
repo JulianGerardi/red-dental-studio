@@ -14,10 +14,11 @@ import { PageTitle } from '@/components/ui/page-title'
 import {
   EVENTOS_INICIALES, FECHA_ANCLA, MESES, BLOCK_STYLE,
   inicioDeSemana, sumarDias, type EventoConFecha, type ApptState,
+  fmtExacta,
 } from '@/components/scheduling/calendar-data'
 import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
 import {
-  VistaDia, VistaSemana, VistaMes, fmtExacta, type Vista,
+  VistaDia, VistaSemana, VistaMes, type Vista,
 } from '@/components/scheduling/CalendarViews'
 import { StatusLegend } from '@/components/scheduling/StatusLegend'
 import { EmptyState } from '@/components/ui/empty-state'

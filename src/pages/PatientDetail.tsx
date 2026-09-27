@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, ChevronDown, PersonStanding, Clipboard, Pill as PillIcon, ClipboardList, MapPin, Clock, type LucideIcon } from 'lucide-react'
+import { ChevronLeft, ChevronDown, PersonStanding, Clipboard, Pill as PillIcon, ClipboardList, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
@@ -15,6 +15,7 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
+import { PatientAppointmentCard, type PatientAppointmentStatus } from '@/components/patients/PatientAppointmentCard'
 
 /* Figma 3646:58836 "Patient Dashboard". */
 
@@ -39,14 +40,7 @@ const TASKS: PendingTask[] = Array.from({ length: 6 }, () => ({
   register: 'March 17, 2025', expiration: 'March 15, 2025',
 }))
 
-type ApptStatus = 'Booked' | 'Cancelled' | 'Fulfilled' | 'No Show'
-const APPT_STATUS: Record<ApptStatus, string> = {
-  Booked: 'border-dash-busy-fg text-dash-busy-fg bg-dash-busy-bg',
-  Cancelled: 'border-dash-bad-fg text-dash-bad-fg bg-dash-bad-bg',
-  Fulfilled: 'border-dash-ok-fg text-dash-ok-fg bg-dash-ok-bg',
-  'No Show': 'border-warn-fg text-warn-fg bg-warn-bg',
-}
-const APPTS: { status: ApptStatus; cancel?: boolean }[] = [
+const APPTS: { status: PatientAppointmentStatus; cancel?: boolean }[] = [
   { status: 'Booked', cancel: true }, { status: 'Cancelled' }, { status: 'Fulfilled' },
   { status: 'No Show' }, { status: 'No Show' }, { status: 'No Show' }, { status: 'No Show' },
 ]
@@ -211,25 +205,16 @@ export default function PatientDetail() {
               <Tabs size="sm" fullWidth className="mt-3" aria-label="Appointments" tabs={['Next', 'Next Appointments'] as const} value={apptTab} onChange={setApptTab} />
               <div className="mt-3 flex flex-col gap-2">
                 {APPTS.map((a, i) => (
-                  <div key={i} className="border-dash-blue rounded-md border-l-[3px] bg-white p-2.5 shadow-[0_1px_2px_rgb(0_0_0/0.06)]">
-                    <div className="flex items-start gap-2">
-                      <span className="bg-dash-blue-hover flex size-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white">av</span>
-                      <span className="min-w-0 flex-1 truncate text-xs font-semibold text-ink">Maria Abril Viola</span>
-                      <span className={cn('shrink-0 rounded-full border px-2 py-[2px] text-[11px] font-semibold', APPT_STATUS[a.status])}>{a.status}</span>
-                    </div>
-                    <p className="mt-1 truncate text-[11px] text-ink-muted">Routine cleaning appointment</p>
-                    <p className="mt-1 flex items-center gap-1.5 text-[11px] text-ink-muted">
-                      <Clock className="size-3 shrink-0" /> 12 Mar 2025 · 10:00 - 11:00 AM
-                    </p>
-                    <p className="mt-0.5 flex items-center gap-1.5 truncate text-[11px] text-ink-muted">
-                      <MapPin className="size-3 shrink-0" /> Los Angeles - 789 N Sunrise Street
-                    </p>
-                    {a.cancel && (
-                      <button className="mt-2 ml-auto block rounded-md border border-line px-2.5 py-1 text-[11px] font-medium hover:bg-surface-subtle">
-                        Cancel
-                      </button>
-                    )}
-                  </div>
+                  <PatientAppointmentCard
+                    key={i}
+                    name="Maria Abril Viola"
+                    initials="av"
+                    status={a.status}
+                    reason="Routine cleaning appointment"
+                    when="12 Mar 2025 · 10:00 - 11:00 AM"
+                    place="Los Angeles - 789 N Sunrise Street"
+                    onCancel={a.cancel ? () => aviso.warn('Appointment cancelled.') : undefined}
+                  />
                 ))}
               </div>
             </Card>

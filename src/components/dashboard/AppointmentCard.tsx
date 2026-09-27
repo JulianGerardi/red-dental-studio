@@ -21,7 +21,18 @@ export type Appointment = {
 /* Figma 4430:57451. El card se rediseñó: sin borde, con la foto y el badge
    "Check In" a la izquierda, los chips TR/CC y el kebab a la derecha, los dos
    campos grises con la caja de hora al costado, y el botón de acción a lo
-   ancho del pie. */
+   ancho del pie. Ver Elements / Appointment cards.
+
+   Por qué así:
+   - Es la card más grande de las cuatro de turnos porque es la de trabajo del
+     día: trae todo lo que hace falta para atender (quién, con quién, en qué
+     sala, a qué hora) sin abrir nada.
+   - La acción que sigue (Check Out, Cancel) va a lo ancho del pie: es lo que
+     más se toca en la lista, y así se toca sin apuntar.
+   - Click en la card abre la ficha rápida del paciente anclada a ella; el
+     anillo azul marca cuál la abrió mientras está abierta.
+   - La misma card sirve para Appointments y Waiting Room: un turno se ve igual
+     antes y después de llegar. */
 export function AppointmentCard({
   appt,
   id,
@@ -46,10 +57,11 @@ export function AppointmentCard({
   if (compact) return <AppointmentCardCompacta appt={appt} />
 
   const accion = appt.accion ?? 'Check Out'
+  const Paciente = onSelect ? 'button' : 'div'
 
   return (
     <InnerCard
-      aria-expanded={onSelect ? !!activa : undefined}
+      data-appt-card
       className={cn(
         'flex flex-col gap-2.5 p-3',
         onSelect && 'cursor-pointer transition-colors hover:bg-[#fafbfe]',
@@ -64,7 +76,20 @@ export function AppointmentCard({
       {/* Todo en un renglón, también en angosto: Julián prefiere que el nombre
           se recorte antes que mandar los chips a una segunda línea. */}
       <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+        {/* Con el teclado se llega por el nombre: la card entera no puede ser
+            un botón porque adentro tiene otros (kebab, Check Out). */}
+        <Paciente
+          type={onSelect ? 'button' : undefined}
+          aria-expanded={onSelect ? !!activa : undefined}
+          onClick={onSelect && ((e: React.MouseEvent<HTMLElement>) => {
+            e.stopPropagation()
+            onSelect(appt, e.currentTarget.closest<HTMLElement>('[data-appt-card]')!, id)
+          })}
+          className={cn(
+            'flex min-w-0 flex-1 items-center gap-2.5 rounded-xl text-left',
+            onSelect && 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
+          )}
+        >
           <span className="bg-dash-blue flex size-11 shrink-0 items-center justify-center rounded-xl text-sm font-semibold text-white">
             {appt.initials}
           </span>
@@ -74,7 +99,7 @@ export function AppointmentCard({
             </span>
             <StatusPill tone="ok" className="self-start">Check In</StatusPill>
           </span>
-        </div>
+        </Paciente>
 
         <div className="flex shrink-0 items-center gap-1.5">
           <span className="flex h-8 items-center gap-1 rounded-lg bg-green-soft px-2 text-[13px] text-ink">
