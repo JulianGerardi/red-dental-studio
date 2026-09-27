@@ -3,6 +3,19 @@ import { cn } from "@/lib/utils"
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
+/* DropdownMenu: la lista de acciones que abre un botón (el ⋮ de cada fila,
+   Columns, los filtros). Ver Components / UI / DropdownMenu.
+
+   Por qué así:
+   - Un solo menú para toda la app: antes cada tabla tenía el suyo, con su
+     propio clic afuera y su propio Escape.
+   - Las acciones que borran van en rojo (variant="destructive") y al final,
+     separadas: no se eligen por error.
+   - Flechas, Enter y Escape funcionan con el teclado; el menú se ubica solo
+     donde entra (arriba si abajo no hay lugar).
+   - Casillas y radios adentro para filtros y opciones que no cierran el menú
+     al elegir. */
+
 function DropdownMenu({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {

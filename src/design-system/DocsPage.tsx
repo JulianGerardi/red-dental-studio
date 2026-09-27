@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react'
 import {
   Controls, Description, DocsContext, Primary, Source, Stories, Subtitle, Title,
 } from '@storybook/addon-docs/blocks'
-import { comentarioDe } from './catalog'
+import { comentarioDe, componentes } from './catalog'
 import { Decisiones } from './decisiones'
 import { Dispositivos } from './Dispositivos'
 
@@ -31,6 +31,11 @@ export function DocsPage() {
   const rutaComponente = rutaStories ? rutaStories.replace(/(\.[a-z]+)*\.stories\.tsx$/, '.tsx') : null
 
   const componente = useArchivo(rutaComponente)
+  /* Páginas que documentan un componente de otro archivo (Elements / Patient
+     menu → PatientSidePanel.tsx) lo indican con `docs.decisionsFrom`. */
+  const decisionesDe = historia?.parameters?.docs?.decisionsFrom as string | undefined
+  const archivoDeUso = (decisionesDe ?? rutaComponente?.slice(1))?.replace(/^\//, '')
+  const usos = componentes.find((c) => c.archivo === archivoDeUso)?.usadoPor
   const stories = useArchivo(rutaStories)
   /* Si la página ya trae su descripción (Elements), la nota del código la
      repetiría. */
@@ -58,11 +63,24 @@ export function DocsPage() {
           <Dispositivos storyId={historia.id} alto={historia.parameters?.docs?.devices?.height} />
         </>
       )}
-      {rutaComponente && componente && (
+      {usos && (
+        <>
+          <h2>Where it is used</h2>
+          {usos.length ? (
+            <>
+              <p>{usos.length} {usos.length === 1 ? 'file of the app uses it' : 'files of the app use it'}, read from the code:</p>
+              <ul>{usos.map((u) => <li key={u}><code>{u}</code></li>)}</ul>
+            </>
+          ) : (
+            <p>No screen of the app uses it yet: it is only documented here.</p>
+          )}
+        </>
+      )}
+      {(decisionesDe || (rutaComponente && componente)) && (
         <>
           <h2>Design decisions</h2>
-          <p>Por qué el componente es como es, leído de los comentarios de su código: cada decisión con la línea a la que se refiere.</p>
-          <Decisiones archivo={rutaComponente} />
+          <p>Por qué el componente es como es, leído de los comentarios de su código{decisionesDe ? ` (${decisionesDe})` : ''}: cada decisión con la línea a la que se refiere.</p>
+          <Decisiones archivo={decisionesDe ?? rutaComponente!} />
         </>
       )}
       {componente && rutaComponente && (

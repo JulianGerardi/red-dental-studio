@@ -25,6 +25,8 @@ export type Componente = {
   exports: string[]
   comentario: string
   usadoEn: number
+  /** Archivos de la app que lo importan. */
+  usadoPor: string[]
   tieneStory: boolean
   /** Documentado en el story de otro componente, con el motivo. */
   exento?: string
@@ -59,7 +61,11 @@ export const componentes: Componente[] = Object.entries(sinStories(fuentes))
     const ruta = archivo.replace('/src/', '')
     const base = ruta.replace(/\.tsx$/, '').replace(/^components\//, '')
     const alias = `@/${ruta.replace(/\.tsx$/, '')}`
-    const usadoEn = Object.entries(todo).filter(([otro, t]) => otro !== archivo && (t.includes(`'${alias}'`) || t.includes(`"${alias}"`) || t.includes(`from './${base.split('/').pop()}'`) && otro.startsWith(archivo.slice(0, archivo.lastIndexOf('/'))))).length
+    const usadoPor = Object.entries(todo)
+      .filter(([otro, t]) => otro !== archivo && (t.includes(`'${alias}'`) || t.includes(`"${alias}"`) || t.includes(`from './${base.split('/').pop()}'`) && otro.startsWith(archivo.slice(0, archivo.lastIndexOf('/')))))
+      .map(([otro]) => otro.replace('/src/', ''))
+      .sort()
+    const usadoEn = usadoPor.length
     const carpeta = base.includes('/') ? base.split('/')[0] : 'root'
     return {
       archivo: ruta,
@@ -68,6 +74,7 @@ export const componentes: Componente[] = Object.entries(sinStories(fuentes))
       exports: exportsDe(texto),
       comentario: comentarioDe(texto),
       usadoEn,
+      usadoPor,
       tieneStory: historias.has(archivo.replace(/\.tsx$/, '.stories.tsx')),
       exento: (exentos as Record<string, string>)[ruta],
     }

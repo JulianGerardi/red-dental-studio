@@ -31,6 +31,7 @@ const meta = {
   parameters: {
     layout: 'padded',
     docs: {
+      decisionsFrom: 'components/patients/form.tsx',
       description: {
         component: [
           'Los campos de formulario de la app (`@/components/patients/form`). Todos comparten el mismo aspecto: rótulo arriba, control de 36px, texto de ayuda o error debajo.',

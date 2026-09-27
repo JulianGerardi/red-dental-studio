@@ -2,6 +2,16 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { HoverCard as HoverCardPrimitive } from "radix-ui"
 
+/* HoverCard: información de consulta que aparece al pasar el mouse sobre
+   algo (la ficha de un diente en el odontograma). Ver Components / UI / HoverCard.
+
+   Por qué así:
+   - Para leer, no para actuar: no tiene botones propios que haya que alcanzar
+     con el mouse. Si hay acciones, es un Popover.
+   - Espera un momento antes de abrir: pasar el mouse por encima de camino a
+     otro lado no la dispara.
+   - Alto máximo con scroll propio: una ficha larga no tapa toda la pantalla. */
+
 function HoverCard({
   ...props
 }: React.ComponentProps<typeof HoverCardPrimitive.Root>) {

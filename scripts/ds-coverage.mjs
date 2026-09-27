@@ -189,15 +189,40 @@ for (const f of archivos(join(RAIZ, 'src')).filter((p) => ['.ts', '.tsx'].includ
 }
 const baseline = JSON.parse(readFileSync(join(RAIZ, 'scripts/ds-baseline.json'), 'utf8'))
 
+/* La "biblia": cada componente con story tiene que poder probarse (un
+   Playground con controles) y explicar sus decisiones (comentarios en su
+   código). No frena el build: marca lo que falta. */
+const conStory = componentes.filter((p) => existsSync(p.replace(/\.tsx$/, '.stories.tsx')))
+/* Páginas de Elements que documentan un componente de otro archivo
+   (docs.decisionsFrom): su Playground cuenta para ese componente. */
+const documentadosEnElements = new Set(
+  archivos(join(RAIZ, 'src/design-system'))
+    .filter((p) => p.endsWith('.stories.tsx'))
+    .flatMap((p) => [...readFileSync(p, 'utf8').matchAll(/decisionsFrom:\s*'([^']+)'/g)].map((m) => m[1])),
+)
+const tienePlayground = (p) => {
+  if (documentadosEnElements.has(p.replace(`${RAIZ}src/`, ''))) return true
+  const st = readFileSync(p.replace(/\.tsx$/, '.stories.tsx'), 'utf8')
+  const metaTxt = st.split('export default')[0]
+  return /export const Playground\b/.test(st) || (/component:\s*\w+/.test(metaTxt) && /^\s*args:\s*\{/m.test(metaTxt))
+}
+const tieneDecisiones = (p) => (readFileSync(p, 'utf8').match(/\/\*[\s\S]{40,}?\*\//g) ?? []).length > 0
+const sinPlayground = conStory.filter((p) => !tienePlayground(p)).map((p) => p.replace(`${RAIZ}src/`, ''))
+const sinDecisiones = conStory.filter((p) => !tieneDecisiones(p)).map((p) => p.replace(`${RAIZ}src/`, ''))
+
 const nExentos = componentes.filter(esExento).length
 console.log(`Componentes con story:  ${componentes.length - sinStory.length - nExentos} de ${componentes.length}` + (nExentos ? ` (+${nExentos} documentados en su anfitrión)` : ''))
 console.log(`Rutas con story:        ${rutas.size - rutasSinStory.length} de ${rutas.size}`)
 console.log(`Componentes internos:   ${totalInternos - internosSinStory.length} de ${totalInternos} funciones de React tienen story`)
 console.log(`Estados:                ${conEstados - estadosSinCubrir.length} de ${conEstados} componentes con estados los muestran todos (${Object.values(exencionesEstado).reduce((n, e) => n + Object.keys(e).length, 0)} exenciones)`)
+console.log(`Playground con controles: ${conStory.length - sinPlayground.length} de ${conStory.length} componentes con story`)
+console.log(`Decisiones en el código:  ${conStory.length - sinDecisiones.length} de ${conStory.length}`)
 console.log(`Colores a mano en clases: ${sinToken} sin token (baseline ${baseline.colorSinToken}), ${conToken} que ya tienen token`)
 if (rutasSinStory.length) console.log(`\nRutas sin story en Pages:\n  ${rutasSinStory.join('\n  ')}`)
 if (!check && sinStory.length) console.log(`\nComponentes sin story:\n  ${sinStory.map((p) => p.replace(`${RAIZ}src/`, '')).join('\n  ')}`)
 
+if (!check && sinPlayground.length) console.log(`\nSin Playground ni controles (${sinPlayground.length}):\n  ${sinPlayground.join('\n  ')}`)
+if (!check && sinDecisiones.length) console.log(`\nSin decisiones escritas en el código (${sinDecisiones.length}):\n  ${sinDecisiones.join('\n  ')}`)
 if (sinUso.length) console.log(`\nExportados que la app no usa (${sinUso.length}, sólo los importan stories):\n  ${sinUso.join('\n  ')}`)
 if (internosSinStory.length) console.log(`\nFunciones de React sin story:\n  ${internosSinStory.join('\n  ')}`)
 if (estadosSinCubrir.length) console.log(`\nEstados soportados sin story ni exención:\n  ${estadosSinCubrir.join('\n  ')}`)
@@ -211,6 +236,7 @@ writeFileSync(join(RAIZ, 'src/design-system/generated/coverage.json'), JSON.stri
   estados: { matriz: matrizEstados, sinCubrir: estadosSinCubrir, exenciones: exencionesEstado },
   sinUso,
   colores: { sinToken, conToken, baseline: baseline.colorSinToken },
+  biblia: { total: conStory.length, sinPlayground, sinDecisiones },
 }, null, 1))
 
 let falla = false

@@ -32,6 +32,7 @@ const meta = {
     layout: 'fullscreen',
     router: false,
     docs: {
+      decisionsFrom: 'components/patients/PatientSidePanel.tsx',
       /* La página de docs explica y muestra el Playground; cada vista está en su
          historia, a tamaño completo. */
       story: { inline: false, iframeHeight: 760 },

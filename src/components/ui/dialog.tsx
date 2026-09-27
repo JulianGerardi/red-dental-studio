@@ -5,6 +5,20 @@ import { Dialog as DialogPrimitive } from "radix-ui"
 import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 
+/* Dialog: una ventana sobre la pantalla para confirmar o completar algo
+   antes de seguir (confirmar un procedimiento, revisar un examen). Ver
+   Components / UI / Dialog.
+
+   Por qué así:
+   - Bloquea lo de atrás a propósito: se usa cuando la decisión tiene que
+     tomarse ahora. Para consultar algo, Popover.
+   - Título que dice la pregunta ("Discard changes?") y botones que dicen la
+     acción ("Discard"), no "OK" / "Cancel" sueltos.
+   - El foco queda adentro mientras está abierto y Escape lo cierra (Radix);
+     la capa oscura dice que lo de atrás no se puede tocar.
+   - Los formularios largos de la app usan ModalShell (patients/form), que
+     tiene su propio encabezado y pie. */
+
 function Dialog({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {

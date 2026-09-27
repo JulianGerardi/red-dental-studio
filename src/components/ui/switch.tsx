@@ -2,6 +2,17 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Switch as SwitchPrimitive } from "radix-ui"
 
+/* Switch: prende o apaga algo que tiene efecto enseguida (un template de
+   consentimiento activo o no). Ver Components / UI / Switch.
+
+   Por qué así:
+   - Switch y no casilla cuando el cambio se aplica al instante; la casilla
+     es para elegir opciones que se guardan después con Save.
+   - Siempre con un nombre al lado o un aria-label: el switch solo no dice
+     qué prende.
+   - Deshabilitado al 50% y con cursor de "no permitido"; inválido con borde
+     y anillo rojos (aria-invalid). */
+
 function Switch({
   className,
   size = "default",

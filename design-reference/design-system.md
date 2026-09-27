@@ -116,6 +116,30 @@ reemplazan a los `<button>` y tablas escritos a mano en las pantallas: la
 migración es un paso aparte. *Documentation coverage* lista qué exportados no
 usa todavía la app.
 
+## La biblia: qué tiene cada página de componente
+
+Cada página de docs (`src/design-system/DocsPage.tsx`) muestra, sola:
+qué es y cuándo usarlo, **Playground** con controles, las historias (estados),
+**On each device** (la historia principal en un iframe de 390, 768 y 1280px,
+escalado para entrar; `Dispositivos.tsx`), **Where it is used** (archivos que
+lo importan, de `catalog.ts`), **Design decisions** (los comentarios del
+código del componente, cada uno con la línea que explica; `decisiones.tsx`) y
+el código. Las páginas de Elements que documentan un componente de otro
+archivo lo indican con `parameters.docs.decisionsFrom`.
+
+`npm run ds:coverage` mide *Playground con controles* y *Decisiones en el
+código* (no frenan el build) y los muestra en *Documentation coverage → UX
+bible*. Al 2026-09-27: 89 de 111 con Playground y 107 de 111 con decisiones.
+Todo `ui/` tiene Playground: Avatar, Tooltip, Popover, HoverCard, Dialog,
+DropdownMenu, Toast, Switch, además de Button, Pill, Card, Tabs y DataTable.
+
+**Tabs** (`ui/tabs.tsx`) es el control segmentado de la app (antes 13 copias a
+mano en Ledger, Billing, Account, LedgerOptions, LocationDetail, Employees,
+PatientDetail, Scheduling, Consents, ExamPanelHeader y NewProcedureModal):
+tamaños md/sm, `fullWidth`, cantidades, íconos, pestaña deshabilitada, flechas
+del teclado y deslizamiento cuando no entran. *Elements / Tabs* deja sumar
+pestañas, nombrarlas y achicar el ancho.
+
 ## Interfaz de Storybook
 
 La interfaz usa la identidad de la app para que plataforma y design system se

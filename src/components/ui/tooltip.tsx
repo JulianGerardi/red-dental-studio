@@ -2,6 +2,19 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Tooltip as TooltipPrimitive } from "radix-ui"
 
+/* Tooltip: el nombre de algo que se muestra sólo como ícono, al pasar el
+   mouse o al llegar con el teclado. Ver Components / UI / Tooltip.
+
+   Por qué así:
+   - Sólo para nombrar, no para explicar: si hace falta más de una línea, es
+     un HoverCard o texto en la pantalla.
+   - Fondo oscuro (ink) con texto blanco: se distingue del contenido y se lee
+     sobre cualquier fondo.
+   - Radix y no `title`: aparece al instante que elijamos (100-150ms en los
+     rieles, 500ms en las tablas del Ledger para no parpadear al barrer), se
+     ve igual en todos lados y también abre con el foco del teclado.
+   - Se dibuja en un portal: no lo recorta un contenedor con scroll. */
+
 function TooltipProvider({
   delayDuration = 0,
   ...props

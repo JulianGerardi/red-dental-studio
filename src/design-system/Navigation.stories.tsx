@@ -26,6 +26,7 @@ const meta = {
     layout: 'fullscreen',
     router: false,
     docs: {
+      decisionsFrom: 'components/layout/Sidebar.tsx',
       story: { inline: false, iframeHeight: 720 },
       description: {
         component: [

@@ -52,6 +52,23 @@ export const Cobertura: Story = {
           </div>
         </Seccion>
 
+        <Seccion titulo="UX bible" nota="Lo que tiene que tener cada página de componente: poder probarlo (Playground con controles) y explicar por qué es así (decisiones escritas en su código). Todas las páginas muestran además cómo se ve en celular, tablet y escritorio, y dónde se usa en la app.">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Cifra n={c.biblia.total - c.biblia.sinPlayground.length} de={c.biblia.total} titulo="With a Playground to try it" nota="Un Playground propio o controles en su página, o una página de Elements que lo documenta" ok={c.biblia.sinPlayground.length === 0} />
+            <Cifra n={c.biblia.total - c.biblia.sinDecisiones.length} de={c.biblia.total} titulo="With design decisions in code" nota="Comentarios que explican por qué" ok={c.biblia.sinDecisiones.length === 0} />
+          </div>
+          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <p className="text-[12px] font-semibold text-ink-muted">Still without a Playground</p>
+              <ul className="mt-1 flex flex-col gap-0.5 text-[12.5px]">{c.biblia.sinPlayground.map((a) => <li key={a}><Codigo>{a.replace('components/', '')}</Codigo></li>)}</ul>
+            </div>
+            <div>
+              <p className="text-[12px] font-semibold text-ink-muted">Still without written decisions</p>
+              <ul className="mt-1 flex flex-col gap-0.5 text-[12.5px]">{c.biblia.sinDecisiones.map((a) => <li key={a}><Codigo>{a.replace('components/', '')}</Codigo></li>)}</ul>
+            </div>
+          </div>
+        </Seccion>
+
         <Seccion titulo="States matrix" nota="Cada componente con story y los estados que su código soporta. Hover y foco se ven en Elements / Buttons y Elements / Fields; acá van los que cambian el contenido o la interacción.">
           <div className="overflow-x-auto rounded-lg border border-line">
             <table className="w-full text-left text-[12px]">

@@ -2,6 +2,17 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Popover as PopoverPrimitive } from "radix-ui"
 
+/* Popover: un panel chico que se abre al lado de un botón y se queda abierto
+   hasta que se cierra. Ver Components / UI / Popover.
+
+   Por qué así:
+   - Para consultar o elegir sin salir de la pantalla (la tarjeta de datos
+     del paciente con el menú colapsado). Si hay que completar un formulario,
+     es un Dialog.
+   - Se cierra con Escape y con un clic afuera, y devuelve el foco al botón
+     que lo abrió (Radix).
+   - Portal: flota por encima de todo sin que lo recorte el panel donde vive. */
+
 function Popover({
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Root>) {

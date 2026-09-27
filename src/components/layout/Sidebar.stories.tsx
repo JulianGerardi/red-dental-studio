@@ -5,6 +5,7 @@ import { Sidebar } from './Sidebar'
 const meta = {
   title: 'Components/Layout/Sidebar',
   component: Sidebar,
+  args: { expanded: false },
   parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   decorators: [conHelp, (Story) => <div className="flex h-[720px]"><Story /></div>],
 } satisfies Meta<typeof Sidebar>

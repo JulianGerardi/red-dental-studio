@@ -28,6 +28,7 @@ const meta = {
   parameters: {
     layout: 'fullscreen',
     docs: {
+      decisionsFrom: 'components/settings/SettingsPageHeader.tsx',
       description: {
         component: [
           'El encabezado de las pantallas de la app. De arriba hacia abajo: **rastro** (dónde estás, con links para volver) · **título** · **bajada** (qué se hace acá) · **acción principal** a la derecha del título · **barra** con buscador, botón Search y filtros.',
