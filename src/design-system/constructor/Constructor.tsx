@@ -21,6 +21,7 @@ import {
    se arma queda guardado en este navegador. */
 
 const GUARDADO = 'confidentally-ui-builder'
+const lista = (s: string) => s.split(',').map((x) => x.trim()).filter(Boolean)
 
 function cargar(): Diseno | null {
   try {
@@ -103,7 +104,7 @@ function Sumar({ onClick, children }: { onClick: () => void; children: ReactNode
 const OPC_ICONO = (Object.keys(ICONOS) as NombreIcono[]).map((k) => ({ value: k, label: k === 'none' ? 'No icon' : k }))
 const TONOS: PillTone[] = ['success', 'info', 'warning', 'danger', 'neutral', 'purple']
 const CLASES_CAMPO = [
-  { value: 'text', label: 'Text' }, { value: 'select', label: 'Select' }, { value: 'date', label: 'Date' },
+  { value: 'text', label: 'Text' }, { value: 'select', label: 'Select' }, { value: 'date', label: 'Date (typed)' }, { value: 'calendar', label: 'Calendar' },
   { value: 'textarea', label: 'Text area' }, { value: 'search', label: 'Search' },
 ] as const
 
@@ -117,15 +118,17 @@ function EditorCampo({ c, cambiar, quitar }: { c: Campo; cambiar: (x: Partial<Ca
         <div className="min-w-0 flex-1"><Texto label="Label" value={c.label} onChange={(v) => cambiar({ label: v })} /></div>
         <Quitar onClick={quitar} label={`Remove ${c.label}`} />
       </div>
-      {c.clase !== 'date' && <Texto label="Placeholder" value={c.placeholder} onChange={(v) => cambiar({ placeholder: v })} />}
+      {c.clase !== 'date' && c.clase !== 'calendar' && <Texto label="Placeholder" value={c.placeholder} onChange={(v) => cambiar({ placeholder: v })} />}
       {(c.clase === 'select' || c.clase === 'search') && <Texto label="Options (comma separated)" value={c.opciones} onChange={(v) => cambiar({ opciones: v })} />}
-      <div className="grid grid-cols-2 gap-2">
-        <Texto label="Hint" value={c.hint} onChange={(v) => cambiar({ hint: v })} />
-        <Texto label="Error" value={c.error} onChange={(v) => cambiar({ error: v })} placeholder="None" />
-      </div>
+      {c.clase !== 'calendar' && (
+        <div className="grid grid-cols-2 gap-2">
+          <Texto label="Hint" value={c.hint} onChange={(v) => cambiar({ hint: v })} />
+          <Texto label="Error" value={c.error} onChange={(v) => cambiar({ error: v })} placeholder="None" />
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-3">
         <Llave label="Required" value={c.required} onChange={(v) => cambiar({ required: v })} />
-        <Llave label="Disabled" value={c.disabled} onChange={(v) => cambiar({ disabled: v })} />
+        {c.clase !== 'calendar' && <Llave label="Disabled" value={c.disabled} onChange={(v) => cambiar({ disabled: v })} />}
       </div>
     </div>
   )
@@ -224,6 +227,42 @@ function Editor({ b, cambiar, ctx }: { b: Bloque; cambiar: (x: Partial<Bloque>) 
             )
           })}
           <Sumar onClick={() => c({ items: [...b.items, { icono: 'FileText', label: 'Label', valor: 'Value' }] })}>Add row</Sumar>
+        </>
+      )
+    case 'pago':
+      return (
+        <>
+          <Texto label="Title" value={b.titulo} onChange={(v) => c({ titulo: v })} />
+          <Texto label="Payment methods (comma separated)" value={b.metodos} onChange={(v) => c({ metodos: v })} />
+          <p className="m-0 -mt-1 text-[11.5px] leading-snug text-ink-muted">Check payment pide número y banco; Card payment, los últimos 4 números; Electronic payment, una referencia.</p>
+          <Texto label="Apply to (comma separated, empty hides it)" value={b.aplicarA} onChange={(v) => c({ aplicarA: v })} />
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+            <Llave label="Transaction date" value={b.fecha} onChange={(v) => c({ fecha: v })} />
+            <Llave label="Several methods" value={b.varios} onChange={(v) => c({ varios: v })} />
+            <Llave label="Notes" value={b.notas} onChange={(v) => c({ notas: v })} />
+            <Llave label="Total" value={b.total} onChange={(v) => c({ total: v })} />
+          </div>
+        </>
+      )
+    case 'calendario':
+      return (
+        <>
+          <Segmentos label="Starts on" value={b.vista} opciones={[{ value: 'Day', label: 'Day' }, { value: 'Week', label: 'Week' }, { value: 'Month', label: 'Month' }]} onChange={(v) => c({ vista: v })} />
+          <div className="grid grid-cols-2 gap-x-4">
+            <Llave label="Day / Week / Month" value={b.selector} onChange={(v) => c({ selector: v })} />
+            <Llave label="Status legend" value={b.leyenda} onChange={(v) => c({ leyenda: v })} />
+          </div>
+          <p className="m-0 text-[11.5px] leading-snug text-ink-muted">Usa los turnos de ejemplo de Scheduling. En el lienzo se pueden arrastrar.</p>
+        </>
+      )
+    case 'horarios':
+      return (
+        <>
+          <div className="grid grid-cols-2 gap-2">
+            <Texto label="Provider" value={b.provider} onChange={(v) => c({ provider: v })} />
+            <Texto label="Specialty" value={b.especialidad} onChange={(v) => c({ especialidad: v })} />
+          </div>
+          <Texto label="Date" value={b.fecha} onChange={(v) => c({ fecha: v })} />
         </>
       )
     case 'tareas':
@@ -399,6 +438,9 @@ function resumen(b: Bloque) {
     case 'pestanasContenido': return b.pestanas.map((p) => p.label).join(' · ')
     case 'stats': return b.items.map((x) => x.titulo).join(' · ')
     case 'detalles': return b.titulo
+    case 'pago': return lista(b.metodos).join(' · ')
+    case 'calendario': return `${b.vista} view${b.selector ? ' · Day / Week / Month' : ''}`
+    case 'horarios': return `${b.provider} · ${b.fecha}`
     case 'divisor': return ''
   }
 }
@@ -416,7 +458,7 @@ function Adentro({ titulo, nota, children }: { titulo: string; nota?: string; ch
   )
 }
 
-const GRUPOS: Grupo[] = ['Layout', 'Content', 'Data']
+const GRUPOS: Grupo[] = ['Layout', 'Forms', 'Content', 'Data']
 
 /* Una lista de bloques: la del diseño y la de adentro de cada contenedor
    (un modal, una sección, cada pestaña). Se suman, ordenan, duplican,

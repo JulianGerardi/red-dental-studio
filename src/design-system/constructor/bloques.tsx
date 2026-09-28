@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import {
-  AppWindow, BarChart3, CalendarClock, CalendarDays, Clock, CreditCard, Download, FileText, Heading, IdCard, Inbox, ListChecks,
+  AppWindow, BarChart3, CalendarClock, CalendarDays, CalendarRange, Clock, CreditCard, Wallet, X, Download, FileText, Heading, IdCard, Inbox, ListChecks,
   Mail, MapPin, Minus, MousePointerClick, PanelsTopLeft, Pencil, Phone, Plus, Save, Search, Send, Settings, Shield, SquareStack,
   Table, Tag, TextCursorInput, ToggleRight, Trash2, Type, Users, type LucideIcon,
 } from 'lucide-react'
@@ -11,7 +11,12 @@ import { StatCard } from '@/components/dashboard/StatCard'
 import { PendingTaskCard, type PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { Tabs } from '@/components/ui/tabs'
-import { DateTextField, FormFooter, ModalShell, SearchField, SectionCard, SelectField, TextArea, TextField } from '@/components/patients/form'
+import { DateTextField, FieldLabel, FormFooter, ModalShell, SearchField, SectionCard, SelectField, TextArea, TextField } from '@/components/patients/form'
+import { DatePicker } from '@/components/ui/date-picker'
+import { VistaDia, VistaMes, VistaSemana, type Vista } from '@/components/scheduling/CalendarViews'
+import { EVENTOS_INICIALES, FECHA_ANCLA } from '@/components/scheduling/calendar-data'
+import { StatusLegend } from '@/components/scheduling/StatusLegend'
+import { AppointmentSlotPicker } from '@/components/scheduling/AppointmentSlotPicker'
 import { InfoBlock } from '@/components/patients/PatientSidePanel'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { AmountCell, DataTable, PersonCell, TextCell, type DataTableColumn } from '@/components/ui/data-table'
@@ -42,7 +47,7 @@ export type NombreIcono = keyof typeof ICONOS
 export type IconoReal = Exclude<NombreIcono, 'none'>
 
 export type Boton = { label: string; variant: ButtonVariant; size: ButtonSize; icono: NombreIcono }
-export type ClaseCampo = 'text' | 'select' | 'date' | 'textarea' | 'search'
+export type ClaseCampo = 'text' | 'select' | 'date' | 'calendar' | 'textarea' | 'search'
 export type Campo = { id: string; clase: ClaseCampo; label: string; placeholder: string; opciones: string; hint: string; error: string; required: boolean; disabled: boolean }
 export type ColumnaTabla = 'patient' | 'status' | 'next' | 'provider' | 'balance'
 export type Pestana = { id: string; label: string; bloques: Bloque[] }
@@ -64,6 +69,9 @@ export type Bloque = { id: string } & (
   | { tipo: 'opciones'; control: 'switch' | 'checkbox'; items: { label: string; on: boolean }[] }
   | { tipo: 'turnos'; cantidad: number }
   | { tipo: 'tareas'; cantidad: number }
+  | { tipo: 'pago'; titulo: string; fecha: boolean; aplicarA: string; metodos: string; varios: boolean; notas: boolean; total: boolean }
+  | { tipo: 'calendario'; vista: Vista; selector: boolean; leyenda: boolean }
+  | { tipo: 'horarios'; provider: string; especialidad: string; fecha: string }
   | { tipo: 'divisor' }
 )
 export type TipoBloque = Bloque['tipo']
@@ -117,15 +125,17 @@ export function reIdentificar(b: Bloque): Bloque {
   return recorrer(JSON.parse(JSON.stringify(b)) as Bloque)
 }
 
-export type Grupo = 'Layout' | 'Content' | 'Data'
+export type Grupo = 'Layout' | 'Forms' | 'Content' | 'Data'
 
 /* Los tipos de bloque, con lo que trae cada uno al agregarlo. */
 export const TIPOS: { tipo: TipoBloque; nombre: string; que: string; icono: LucideIcon; grupo: Grupo; nuevo: () => Bloque }[] = [
   { tipo: 'encabezado', grupo: 'Content', nombre: 'Heading', que: 'Título, bajada y acción principal', icono: Heading, nuevo: () => ({ id: nuevoId(), tipo: 'encabezado', titulo: 'Title', bajada: 'A short line that says what this is for.', accion: '', icono: 'none' }) },
   { tipo: 'texto', grupo: 'Content', nombre: 'Text', que: 'Un párrafo', icono: Type, nuevo: () => ({ id: nuevoId(), tipo: 'texto', texto: 'Write something useful for the person using this screen.', tono: 'suave' }) },
   { tipo: 'botones', grupo: 'Content', nombre: 'Buttons', que: 'Acciones: primaria, secundaria…', icono: MousePointerClick, nuevo: () => ({ id: nuevoId(), tipo: 'botones', alinear: 'fin', botones: [{ label: 'Cancel', variant: 'secondary', size: 'lg', icono: 'none' }, { label: 'Save', variant: 'primary', size: 'lg', icono: 'none' }] }) },
-  { tipo: 'campos', grupo: 'Content', nombre: 'Fields', que: 'Un formulario', icono: TextCursorInput, nuevo: () => ({ id: nuevoId(), tipo: 'campos', columnas: 2, campos: [campo({ label: 'First name', placeholder: 'Maria' }), campo({ label: 'Last name', placeholder: 'Viola' })] }) },
-  { tipo: 'opciones', grupo: 'Content', nombre: 'Switches', que: 'Prender o apagar opciones', icono: ToggleRight, nuevo: () => ({ id: nuevoId(), tipo: 'opciones', control: 'switch', items: [{ label: 'Email reminders', on: true }, { label: 'SMS confirmations', on: false }] }) },
+  { tipo: 'campos', grupo: 'Forms', nombre: 'Fields', que: 'Un formulario', icono: TextCursorInput, nuevo: () => ({ id: nuevoId(), tipo: 'campos', columnas: 2, campos: [campo({ label: 'First name', placeholder: 'Maria' }), campo({ label: 'Last name', placeholder: 'Viola' })] }) },
+  { tipo: 'opciones', grupo: 'Forms', nombre: 'Switches', que: 'Prender o apagar opciones', icono: ToggleRight, nuevo: () => ({ id: nuevoId(), tipo: 'opciones', control: 'switch', items: [{ label: 'Email reminders', on: true }, { label: 'SMS confirmations', on: false }] }) },
+  { tipo: 'pago', grupo: 'Forms', nombre: 'Payment', que: 'Registrar un pago: monto, método, fecha', icono: Wallet, nuevo: () => ({ id: nuevoId(), tipo: 'pago', titulo: 'Payment information', fecha: true, aplicarA: 'Maria Abril Viola, Noah James Smith', metodos: 'Card payment, Cash payment, Check payment, Electronic payment', varios: true, notas: true, total: true }) },
+  { tipo: 'horarios', grupo: 'Forms', nombre: 'Time slots', que: 'Elegir la hora de un turno', icono: Clock, nuevo: () => ({ id: nuevoId(), tipo: 'horarios', provider: 'Sarah Stone', especialidad: 'General Dentistry', fecha: 'Saturday, February 19, 2022' }) },
   { tipo: 'pills', grupo: 'Content', nombre: 'Pills', que: 'Estados', icono: Tag, nuevo: () => ({ id: nuevoId(), tipo: 'pills', items: [{ label: 'Active', tone: 'success' }, { label: 'Pending', tone: 'warning' }] }) },
   { tipo: 'vacio', grupo: 'Content', nombre: 'Empty state', que: 'Cuando todavía no hay nada', icono: Inbox, nuevo: () => ({ id: nuevoId(), tipo: 'vacio', icono: 'CalendarDays', titulo: 'Nothing here yet', detalle: 'When there is something to show, it will appear here.', accion: '' }) },
   { tipo: 'divisor', grupo: 'Content', nombre: 'Divider', que: 'Una línea para separar', icono: Minus, nuevo: () => ({ id: nuevoId(), tipo: 'divisor' }) },
@@ -134,6 +144,7 @@ export const TIPOS: { tipo: TipoBloque; nombre: string; que: string; icono: Luci
   { tipo: 'seccion', grupo: 'Layout', nombre: 'Section', que: 'Un grupo con título, como en los formularios', icono: SquareStack, nuevo: () => ({ id: nuevoId(), tipo: 'seccion', titulo: 'Section', bloques: [{ id: nuevoId(), tipo: 'campos', columnas: 2, campos: [campo({ label: 'Field one' }), campo({ label: 'Field two' })] }] }) },
   { tipo: 'pestanas', grupo: 'Layout', nombre: 'Tabs', que: 'Sólo la fila de pestañas', icono: PanelsTopLeft, nuevo: () => ({ id: nuevoId(), tipo: 'pestanas', tabs: 'All, Active, Inactive', size: 'md', fullWidth: false }) },
   { tipo: 'tabla', grupo: 'Data', nombre: 'Table', que: 'Una lista de pacientes', icono: Table, nuevo: () => ({ id: nuevoId(), tipo: 'tabla', columnas: ['patient', 'status', 'next', 'balance'], filas: 6, buscador: true, seleccion: false, acciones: true, compacta: false, porPagina: 5 }) },
+  { tipo: 'calendario', grupo: 'Data', nombre: 'Calendar', que: 'La agenda de Scheduling: día, semana o mes', icono: CalendarRange, nuevo: () => ({ id: nuevoId(), tipo: 'calendario', vista: 'Week', selector: true, leyenda: true }) },
   { tipo: 'stats', grupo: 'Data', nombre: 'Stats', que: 'Números clave en tarjetas', icono: BarChart3, nuevo: () => ({ id: nuevoId(), tipo: 'stats', items: [{ titulo: 'Patients today', valor: '24', delta: '+12% from last week', icono: 'Users' }, { titulo: 'Revenue', valor: '$8,420', delta: '+4.2% from last week', icono: 'CreditCard' }, { titulo: 'No shows', valor: '2', delta: '−1 from yesterday', icono: 'CalendarDays' }] }) },
   { tipo: 'detalles', grupo: 'Data', nombre: 'Details', que: 'Datos con ícono y lápiz para editar', icono: IdCard, nuevo: () => ({ id: nuevoId(), tipo: 'detalles', titulo: 'Contact', items: [{ icono: 'Phone', label: 'Phone', valor: '(555) 234-5678' }, { icono: 'Mail', label: 'Email', valor: 'maria.viola@mail.com' }, { icono: 'MapPin', label: 'Address', valor: '123 Biscayne Blvd' }] }) },
   { tipo: 'turnos', grupo: 'Data', nombre: 'Appointments', que: 'Turnos del día', icono: CalendarClock, nuevo: () => ({ id: nuevoId(), tipo: 'turnos', cantidad: 3 }) },
@@ -258,6 +269,102 @@ function VerModal({ b }: { b: BloqueDe<'modal'> }) {
   )
 }
 
+const dinero = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+const montoDe = (s: string) => Number(s.replace(/[^0-9.]/g, '')) || 0
+type FilaPago = { id: number; monto: string; metodo: string; detalle: string; banco: string }
+
+/* El pago como en el Ledger (PatientPaymentPanel): fecha, a quién se aplica y
+   uno o varios métodos; el cheque pide número y banco, la tarjeta sus
+   últimos 4 números, el pago electrónico una referencia. */
+function PagoVivo({ b }: { b: BloqueDe<'pago'> }) {
+  const metodos = lista(b.metodos)
+  const aplicar = lista(b.aplicarA)
+  const [fecha, setFecha] = useState<Date | null>(null)
+  const [pagos, setPagos] = useState<FilaPago[]>([{ id: 0, monto: '', metodo: metodos[0] ?? '', detalle: '', banco: '' }])
+  const poner = (id: number, x: Partial<FilaPago>) => setPagos((ps) => ps.map((p) => (p.id === id ? { ...p, ...x } : p)))
+  const total = pagos.reduce((t, p) => t + montoDe(p.monto), 0)
+  return (
+    <div className="flex flex-col gap-4">
+      <h3 className="flex items-center gap-2 text-sm font-bold text-ink"><CreditCard className="size-4" /> {b.titulo}</h3>
+      {(b.fecha || aplicar.length > 0) && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {b.fecha && (
+            <div className="flex flex-col gap-2">
+              <FieldLabel required>Transaction date</FieldLabel>
+              <DatePicker value={fecha} onChange={setFecha} className="h-9 w-full" />
+            </div>
+          )}
+          {aplicar.length > 0 && <SelectField label="Apply to" required options={aplicar} />}
+        </div>
+      )}
+      {pagos.map((p, i) => (
+        <div key={p.id} className="flex items-start gap-2">
+          <div className="grid flex-1 gap-4 sm:grid-cols-2">
+            <TextField label="Amount" required placeholder="$ 0.00" value={p.monto} onChange={(v) => poner(p.id, { monto: v })} />
+            <SelectField label="Payment method" required options={metodos} value={p.metodo} onChange={(v) => poner(p.id, { metodo: v })} />
+            {p.metodo === 'Check payment' && (
+              <>
+                <TextField label="Check number" required placeholder="1234" value={p.detalle} onChange={(v) => poner(p.id, { detalle: v })} />
+                <TextField label="Bank/Branch" required placeholder="AE9323AMB" value={p.banco} onChange={(v) => poner(p.id, { banco: v })} />
+              </>
+            )}
+            {p.metodo === 'Card payment' && <TextField label="Card last 4 digits" placeholder="4242" value={p.detalle} onChange={(v) => poner(p.id, { detalle: v })} />}
+            {p.metodo === 'Electronic payment' && <TextField label="Reference" placeholder="TRX-20250312" value={p.detalle} onChange={(v) => poner(p.id, { detalle: v })} />}
+          </div>
+          {b.varios && (i === pagos.length - 1 ? (
+            <Button variant="secondary" iconOnly aria-label="Add another payment method" className="mt-7" onClick={() => setPagos((ps) => [...ps, { id: Math.max(...ps.map((x) => x.id)) + 1, monto: '', metodo: metodos[0] ?? '', detalle: '', banco: '' }])}><Plus /></Button>
+          ) : (
+            <Button variant="secondary" iconOnly aria-label="Remove this payment method" className="mt-7" onClick={() => setPagos((ps) => ps.filter((x) => x.id !== p.id))}><X /></Button>
+          ))}
+        </div>
+      ))}
+      {b.notas && <TextArea label="Notes" placeholder="Anything the front desk should know" />}
+      {b.total && (
+        <div className="flex items-center justify-between rounded-lg bg-surface-subtle px-4 py-3">
+          <span className="text-[13px] text-ink-muted">Total payment</span>
+          <span className="text-[15px] font-semibold text-ink tabular-nums">{dinero(total)}</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* La agenda de Scheduling con sus turnos de ejemplo: se pueden arrastrar. */
+function CalendarioVivo({ b }: { b: BloqueDe<'calendario'> }) {
+  const [vista, setVista] = useState<Vista>(b.vista)
+  const [eventos, setEventos] = useState(EVENTOS_INICIALES)
+  const mover = (i: number, fecha: Date, start?: number) => setEventos((es) => es.map((e, k) => (k === i ? { ...e, fecha, start: start ?? e.start } : e)))
+  const props = { eventos, fecha: FECHA_ANCLA, onMover: mover, onAbrir: () => {} }
+  return (
+    <div className="flex min-w-0 flex-col gap-3">
+      {(b.selector || b.leyenda) && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          {b.selector && <Tabs tabs={['Day', 'Week', 'Month'] as const} value={vista} onChange={setVista} />}
+          {b.leyenda && <StatusLegend />}
+        </div>
+      )}
+      {vista === 'Day' && <VistaDia {...props} />}
+      {vista === 'Week' && <VistaSemana {...props} />}
+      {vista === 'Month' && <VistaMes {...props} />}
+    </div>
+  )
+}
+
+function HorariosVivos({ b }: { b: BloqueDe<'horarios'> }) {
+  const [hora, setHora] = useState<string | undefined>()
+  return <AppointmentSlotPicker provider={b.provider} especialidad={b.especialidad} fecha={b.fecha} seleccion={hora} onPick={setHora} className="h-[440px]" />
+}
+
+function FechaViva({ c }: { c: Campo }) {
+  const [fecha, setFecha] = useState<Date | null>(null)
+  return (
+    <div className="flex flex-col gap-2">
+      <FieldLabel required={c.required}>{c.label}</FieldLabel>
+      <DatePicker value={fecha} onChange={setFecha} className="h-9 w-full" />
+    </div>
+  )
+}
+
 function CasillasVivas({ b }: { b: BloqueDe<'opciones'> }) {
   const [marcados, setMarcados] = useState(() => b.items.filter((i) => i.on).map((i) => i.label))
   return (
@@ -276,6 +383,7 @@ function VerCampo({ c, ancho }: { c: Campo; ancho?: string }) {
   const comun = { label: c.label, required: c.required, disabled: c.disabled, hint: c.hint || undefined, error: c.error || undefined, className: ancho }
   if (c.clase === 'select') return <SelectField {...comun} placeholder={c.placeholder || undefined} options={lista(c.opciones)} />
   if (c.clase === 'date') return <DateTextField {...comun} />
+  if (c.clase === 'calendar') return <FechaViva c={c} />
   if (c.clase === 'textarea') return <TextArea {...comun} placeholder={c.placeholder || undefined} />
   if (c.clase === 'search') return <SearchField {...comun} placeholder={c.placeholder || undefined} options={lista(c.opciones)} />
   return <TextField {...comun} placeholder={c.placeholder || undefined} />
@@ -371,6 +479,12 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
       )
     case 'turnos':
       return <div className="flex flex-col gap-2">{TURNOS.slice(0, b.cantidad).map((a) => <AppointmentCard key={a.name} appt={a} compact />)}</div>
+    case 'pago':
+      return <PagoVivo key={`${b.metodos}-${b.varios}`} b={b} />
+    case 'calendario':
+      return <CalendarioVivo key={b.vista} b={b} />
+    case 'horarios':
+      return <HorariosVivos b={b} />
     case 'tareas':
       return <div className="grid gap-3 sm:grid-cols-2">{TAREAS.slice(0, b.cantidad).map((t) => <PendingTaskCard key={t.kind} task={t} />)}</div>
     case 'divisor':
@@ -420,6 +534,12 @@ function estado(c: Codigo, base: string, inicial: string) {
 }
 
 function codigoCampo(c: Codigo, f: Campo, extra?: string): string {
+  if (f.clase === 'calendar') {
+    importar(c, '@/components/patients/form', 'FieldLabel')
+    importar(c, '@/components/ui/date-picker', 'DatePicker')
+    const [v, set] = estado(c, 'fecha', '<Date | null>(null)')
+    return `<div className="flex flex-col gap-2"><FieldLabel${f.required ? ' required' : ''}>${texto(f.label)}</FieldLabel><DatePicker value={${v}} onChange={${set}} className="h-9 w-full" /></div>`
+  }
   const comp = { text: 'TextField', select: 'SelectField', date: 'DateTextField', textarea: 'TextArea', search: 'SearchField' }[f.clase]
   importar(c, '@/components/patients/form', comp)
   let s = `<${comp} label=${valorAttr(f.label)}`
@@ -632,6 +752,112 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor): string[
         c.datos.push([`const turnos = [`, ...TURNOS.slice(0, b.cantidad).map((a) => `  { name: ${comillas(a.name)}, initials: ${comillas(a.initials)}, provider: ${comillas(a.provider)}, operatory: ${comillas(a.operatory)}, time: ${comillas(a.time)} },`), `]`].join('\n'))
       }
       return [`<div className="flex flex-col gap-2">`, `  {turnos.map((t) => <AppointmentCard key={t.name} appt={t} compact />)}`, `</div>`]
+    case 'pago': {
+      const metodos = lista(b.metodos)
+      const aplicar = lista(b.aplicarA)
+      importar(c, 'lucide-react', 'CreditCard')
+      importar(c, '@/components/patients/form', 'SelectField', 'TextField')
+      const [v, set] = estado(c, 'pagos', `([{ id: 0, monto: '', metodo: ${comillas(metodos[0] ?? '')}, detalle: '', banco: '' }])`)
+      const cambiar = `cambiar${v[0]!.toUpperCase()}${v.slice(1)}`
+      c.estado.push(`const ${cambiar} = (id: number, cambio: Partial<(typeof ${v})[number]>) => ${set}((ps) => ps.map((x) => (x.id === id ? { ...x, ...cambio } : x)))`)
+      if (b.total) c.estado.push(`const ${v}Total = ${v}.reduce((t, x) => t + (Number(x.monto.replace(/[^0-9.]/g, '')) || 0), 0)`)
+      const lineas = [`<div className="flex flex-col gap-4">`, `  <h3 className="flex items-center gap-2 text-sm font-bold text-ink"><CreditCard className="size-4" /> ${texto(b.titulo)}</h3>`]
+      if (b.fecha || aplicar.length) {
+        lineas.push(`  <div className="grid gap-4 sm:grid-cols-2">`)
+        if (b.fecha) {
+          importar(c, '@/components/patients/form', 'FieldLabel')
+          importar(c, '@/components/ui/date-picker', 'DatePicker')
+          const [f, setF] = estado(c, 'fecha', '<Date | null>(null)')
+          lineas.push(`    <div className="flex flex-col gap-2">`, `      <FieldLabel required>Transaction date</FieldLabel>`, `      <DatePicker value={${f}} onChange={${setF}} className="h-9 w-full" />`, `    </div>`)
+        }
+        if (aplicar.length) lineas.push(`    <SelectField label="Apply to" required options={${arreglo(aplicar)}} />`)
+        lineas.push(`  </div>`)
+      }
+      const campo = (label: string, clave: string, extra: string) => `<TextField label="${label}"${extra} value={p.${clave}} onChange={(v) => ${cambiar}(p.id, { ${clave}: v })} />`
+      lineas.push(
+        `  {${v}.map((p${b.varios ? ', i' : ''}) => (`,
+        `    <div key={p.id} className="flex items-start gap-2">`,
+        `      <div className="grid flex-1 gap-4 sm:grid-cols-2">`,
+        `        ${campo('Amount', 'monto', ' required placeholder="$ 0.00"')}`,
+        `        <SelectField label="Payment method" required options={${arreglo(metodos)}} value={p.metodo} onChange={(v) => ${cambiar}(p.id, { metodo: v })} />`,
+      )
+      if (metodos.includes('Check payment')) lineas.push(`        {p.metodo === 'Check payment' && (`, `          <>`, `            ${campo('Check number', 'detalle', ' required placeholder="1234"')}`, `            ${campo('Bank/Branch', 'banco', ' required placeholder="AE9323AMB"')}`, `          </>`, `        )}`)
+      if (metodos.includes('Card payment')) lineas.push(`        {p.metodo === 'Card payment' && ${campo('Card last 4 digits', 'detalle', ' placeholder="4242"')}}`)
+      if (metodos.includes('Electronic payment')) lineas.push(`        {p.metodo === 'Electronic payment' && ${campo('Reference', 'detalle', ' placeholder="TRX-20250312"')}}`)
+      lineas.push(`      </div>`)
+      if (b.varios) {
+        importar(c, '@/components/ui/button', 'Button')
+        importar(c, 'lucide-react', 'Plus', 'X')
+        lineas.push(
+          `      {i === ${v}.length - 1 ? (`,
+          `        <Button variant="secondary" iconOnly aria-label="Add another payment method" className="mt-7" onClick={() => ${set}((ps) => [...ps, { id: Math.max(...ps.map((x) => x.id)) + 1, monto: '', metodo: ${comillas(metodos[0] ?? '')}, detalle: '', banco: '' }])}>`,
+          `          <Plus />`,
+          `        </Button>`,
+          `      ) : (`,
+          `        <Button variant="secondary" iconOnly aria-label="Remove this payment method" className="mt-7" onClick={() => ${set}((ps) => ps.filter((x) => x.id !== p.id))}>`,
+          `          <X />`,
+          `        </Button>`,
+          `      )}`,
+        )
+      }
+      lineas.push(`    </div>`, `  ))}`)
+      if (b.notas) {
+        importar(c, '@/components/patients/form', 'TextArea')
+        lineas.push(`  <TextArea label="Notes" placeholder="Anything the front desk should know" />`)
+      }
+      if (b.total) lineas.push(
+        `  <div className="flex items-center justify-between rounded-lg bg-surface-subtle px-4 py-3">`,
+        `    <span className="text-[13px] text-ink-muted">Total payment</span>`,
+        `    <span className="text-[15px] font-semibold text-ink tabular-nums">{${v}Total.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>`,
+        `  </div>`,
+      )
+      lineas.push(`</div>`)
+      return lineas
+    }
+    case 'calendario': {
+      importar(c, '@/components/scheduling/calendar-data', 'EVENTOS_INICIALES', 'FECHA_ANCLA')
+      const vistas = b.selector ? (['Day', 'Week', 'Month'] as const) : [b.vista]
+      const COMP = { Day: 'VistaDia', Week: 'VistaSemana', Month: 'VistaMes' } as const
+      importar(c, '@/components/scheduling/CalendarViews', ...vistas.map((x) => COMP[x]), ...(b.selector ? ['type Vista'] : []))
+      const [ev, setEv] = estado(c, 'eventos', '(EVENTOS_INICIALES)')
+      const mover = `mover${ev[0]!.toUpperCase()}${ev.slice(1)}`
+      c.estado.push(`const ${mover} = (i: number, fecha: Date, start?: number) => ${setEv}((es) => es.map((e, k) => (k === i ? { ...e, fecha, start: start ?? e.start } : e)))`)
+      const props = `eventos={${ev}} fecha={FECHA_ANCLA} onMover={${mover}} onAbrir={() => {}}`
+      const lineas = [`<div className="flex min-w-0 flex-col gap-3">`]
+      let vista = ''
+      if (b.selector || b.leyenda) {
+        lineas.push(`  <div className="flex flex-wrap items-center justify-between gap-3">`)
+        if (b.selector) {
+          importar(c, '@/components/ui/tabs', 'Tabs')
+          const [v, set] = estado(c, 'vista', `<Vista>(${comillas(b.vista)})`)
+          vista = v
+          lineas.push(`    <Tabs tabs={['Day', 'Week', 'Month'] as const} value={${v}} onChange={${set}} />`)
+        }
+        if (b.leyenda) {
+          importar(c, '@/components/scheduling/StatusLegend', 'StatusLegend')
+          lineas.push(`    <StatusLegend />`)
+        }
+        lineas.push(`  </div>`)
+      }
+      if (vista) vistas.forEach((x) => lineas.push(`  {${vista} === '${x}' && <${COMP[x]} ${props} />}`))
+      else lineas.push(`  <${COMP[b.vista]} ${props} />`)
+      lineas.push(`</div>`)
+      return lineas
+    }
+    case 'horarios': {
+      importar(c, '@/components/scheduling/AppointmentSlotPicker', 'AppointmentSlotPicker')
+      const [v, set] = estado(c, 'hora', '<string | undefined>()')
+      return [
+        `<AppointmentSlotPicker`,
+        `  provider=${valorAttr(b.provider)}`,
+        `  especialidad=${valorAttr(b.especialidad)}`,
+        `  fecha=${valorAttr(b.fecha)}`,
+        `  seleccion={${v}}`,
+        `  onPick={${set}}`,
+        `  className="h-[440px]"`,
+        `/>`,
+      ]
+    }
     case 'tareas':
       importar(c, '@/components/dashboard/PendingTaskCard', 'PendingTaskCard')
       if (!c.datos.some((d) => d.startsWith('const tareas'))) {
@@ -669,7 +895,7 @@ export function generarCodigo(d: Diseno): string {
   }
   const imports = [...c.imports]
     .sort(([a], [b]) => ORDEN_IMPORTS(a) - ORDEN_IMPORTS(b) || a.localeCompare(b))
-    .map(([desde, nombres]) => `import { ${[...nombres].sort((a, b) => a.localeCompare(b)).join(', ')} } from '${desde}'`)
+    .map(([desde, nombres]) => `import { ${[...nombres].sort((a, b) => a.replace(/^type /, '').localeCompare(b.replace(/^type /, ''))).join(', ')} } from '${desde}'`)
   const jsx = cuerpo.length ? cuerpo : ['{/* Sumá bloques desde el constructor. */}']
   return [
     ...imports,
@@ -749,6 +975,45 @@ export const PLANTILLAS: { nombre: string; que: string; crear: () => Diseno }[] 
         encabezado('Danger zone', 'Deleting a patient removes their records from this location.'),
         { id: nuevoId(), tipo: 'modal', titulo: 'Delete Maria Abril Viola?', disparador: 'Delete patient', ancho: 'sm', confirmar: 'Delete patient', cancelar: 'Cancel', peligro: true, bloques: [
           { id: nuevoId(), tipo: 'texto', texto: 'Their appointments, ledger and documents will be removed. This cannot be undone.', tono: 'normal' },
+        ] },
+      ],
+    }),
+  },
+  {
+    nombre: 'Patient payment', que: 'Registrar un pago con uno o varios métodos',
+    crear: () => ({
+      nombre: 'New payment card', contenedor: 'card', tituloPanel: '', ancho: 'medio',
+      bloques: [
+        encabezado('New payment', 'Record what the patient paid today.'),
+        infoDe('pago').nuevo(),
+        { id: nuevoId(), tipo: 'botones', alinear: 'fin', botones: [{ label: 'Cancel', variant: 'secondary', size: 'lg', icono: 'none' }, { label: 'Save payment', variant: 'primary', size: 'lg', icono: 'none' }] },
+      ],
+    }),
+  },
+  {
+    nombre: 'Schedule', que: 'La agenda con día, semana y mes',
+    crear: () => ({
+      nombre: 'Schedule screen', contenedor: 'page', tituloPanel: '', ancho: 'completo',
+      bloques: [
+        encabezado('Scheduling', 'Drag an appointment to move it to another time or day.', 'New appointment', 'Plus'),
+        infoDe('calendario').nuevo(),
+      ],
+    }),
+  },
+  {
+    nombre: 'Book appointment', que: 'Un modal con los datos del turno y la hora',
+    crear: () => ({
+      nombre: 'Book appointment card', contenedor: 'card', tituloPanel: '', ancho: 'angosto',
+      bloques: [
+        encabezado('Appointments', 'Book a visit for this patient.'),
+        { id: nuevoId(), tipo: 'modal', titulo: 'New appointment', disparador: 'New appointment', ancho: 'lg', confirmar: 'Book appointment', cancelar: 'Cancel', peligro: false, bloques: [
+          { id: nuevoId(), tipo: 'campos', columnas: 2, campos: [
+            campo({ clase: 'search', label: 'Patient', placeholder: 'Search a patient', opciones: 'Maria Abril Viola, Noah James Smith, Elias Aguirre', required: true }),
+            campo({ clase: 'select', label: 'Provider', placeholder: 'Select provider', opciones: 'Sarah Stone, Dr. Elena Martinez, Dr. Emily Chen', required: true }),
+            campo({ clase: 'calendar', label: 'Visit date', required: true }),
+            campo({ clase: 'select', label: 'Operatory', placeholder: 'Select operatory', opciones: 'Operatory 1, Operatory 2, Operatory 3' }),
+          ] },
+          infoDe('horarios').nuevo(),
         ] },
       ],
     }),

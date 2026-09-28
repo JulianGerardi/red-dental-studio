@@ -58,10 +58,13 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   tiene *Build* (puntos de partida, contenedor Card / Panel / Page, ancho,
   bloques que se suman, ordenan, duplican y editan) y *Code* (el TSX con sus
   imports, para copiar). Bloques: Layout (Modal con `ModalShell` y
-  `FormFooter`, Tabs with content, Section con `SectionCard`, Tabs), Content
-  (Heading, Text, Buttons, Fields, Switches, Pills, Empty state, Divider) y
-  Data (Table, Stats con `StatCard`, Details con `InfoBlock`, Appointments,
-  Tasks con `PendingTaskCard`). Modal, Section y cada pestaña tienen bloques
+  `FormFooter`, Tabs with content, Section con `SectionCard`, Tabs), Forms
+  (Fields —con el tipo Calendar, que usa `DatePicker`—, Payment como el
+  `PatientPaymentPanel` del Ledger, Switches, Time slots con
+  `AppointmentSlotPicker`), Content (Heading, Text, Buttons, Pills, Empty
+  state, Divider) y Data (Table, Calendar con `VistaDia` / `VistaSemana` /
+  `VistaMes` y `StatusLegend`, Stats con `StatCard`, Details con `InfoBlock`,
+  Appointments, Tasks con `PendingTaskCard`). Modal, Section y cada pestaña tienen bloques
   adentro (el panel los muestra anidados); un modal no va adentro de otro
   bloque. En el lienzo el modal se abre sobre el lienzo (`transform-gpu`
   contiene su `position: fixed`) y queda abierto mientras se edita algo de
@@ -71,6 +74,11 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   página hay un botón flotante: en la de una pieza que el constructor conoce
   dice "Build with …" y la agrega. Si se suma un bloque nuevo, generar el
   código de todos los puntos de partida y compilarlo (se probó con `tsc`).
+- **Piezas de pantalla completa en un ejemplo** (barras, paneles, banners de
+  Components con `layout: 'fullscreen'`): dentro del recuadro de un ejemplo
+  o de una vista de dispositivo se muestran con 24px de aire y el fondo de la
+  app (decorador en `preview.tsx`), para que no queden pegadas al borde. Los
+  modales se ven igual.
 - **Una historia sola** (Full screen, una pantalla de Pages): barra fina para
   volver (`Foco.tsx`, decorador en `preview.tsx`) y el panel de Controls.
 - **Elements**: las piezas estándar para armar pantallas. Cada una es un
