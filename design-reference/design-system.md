@@ -64,7 +64,15 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   `AppointmentSlotPicker`), Content (Heading, Text, Buttons, Pills, Empty
   state, Divider) y Data (Table, Calendar con `VistaDia` / `VistaSemana` /
   `VistaMes` y `StatusLegend`, Stats con `StatCard`, Details con `InfoBlock`,
-  Appointments, Tasks con `PendingTaskCard`). Modal, Section y cada pestaña tienen bloques
+  Appointments, Tasks con `PendingTaskCard`) y Clinical (Odontogram con el
+  `Odontogram` de Clinical y `makeMockExam`, Prescription). Las tablas tienen
+  columnas libres sobre cuatro conjuntos de datos (`constructor/datos.tsx`:
+  pacientes, movimientos del Ledger, recetas y turnos). *PNG* baja la imagen
+  del componente (o del modal abierto) con `html-to-image`; *Share link* arma
+  un link con el diseño comprimido en `#diseno=` (`constructor/compartir.ts`):
+  no se sube a ningún servidor. `.storybook/manager.ts` guarda ese `#` al
+  abrir el sitio, antes de que Storybook reescriba la dirección, y el Builder
+  lo toma y lo borra. Modal, Section y cada pestaña tienen bloques
   adentro (el panel los muestra anidados); un modal no va adentro de otro
   bloque. En el lienzo el modal se abre sobre el lienzo (`transform-gpu`
   contiene su `position: fixed`) y queda abierto mientras se edita algo de
