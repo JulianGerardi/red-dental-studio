@@ -1,0 +1,7 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{Lc as n,Rc as r,bc as i,nl as a,tl as o,yc as s}from"./iframe-CMZfeCHG.js";import{r as c,t as l}from"./PatientDetailsPopover-BAggW_fS.js";var u,d,f,p;function m(){return(m=e((()=>{a(),r(),i(),c(),u=t(),d={title:`Components/Dashboard/PatientDetailsPopover parts`},f={render:()=>(0,u.jsxs)(`div`,{className:`flex w-[260px] flex-col gap-2`,children:[(0,u.jsx)(l,{icon:o,label:`Date of Birth`,value:`May 14, 1982`}),(0,u.jsx)(l,{icon:s,label:`Phone`,value:`(555) 123-4567`}),(0,u.jsx)(l,{icon:n,label:`Email`,value:`a-very-long-email-address@example-clinic.com`,wrap:!0})]})},p=[`DataRow`],f.parameters={...f.parameters,docs:{...f.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="flex w-[260px] flex-col gap-2">
+      <FilaDato icon={CalendarDays} label="Date of Birth" value="May 14, 1982" />
+      <FilaDato icon={Phone} label="Phone" value="(555) 123-4567" />
+      <FilaDato icon={Mail} label="Email" value="a-very-long-email-address@example-clinic.com" wrap />
+    </div>
+}`,...f.parameters?.docs?.source}}}})))()}m();export{f as DataRow,p as __namedExportsOrder,d as default};
