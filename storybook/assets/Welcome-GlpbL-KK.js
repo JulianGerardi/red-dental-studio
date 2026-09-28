@@ -1,0 +1,2 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{r as n,t as r}from"./Inicio-Bv4COCfW.js";import{c as i,p as a}from"./blocks-DDrcCMWJ.js";import{i as o,r as s}from"./react-Bl2r1tuC.js";function c(e){return(0,u.jsxs)(u.Fragment,{children:[(0,u.jsx)(i,{title:`Welcome`}),`
+`,(0,u.jsx)(r,{})]})}function l(e={}){let{wrapper:t}={...o(),...e.components};return t?(0,u.jsx)(t,{...e,children:(0,u.jsx)(c,{...e})}):c(e)}var u;function d(){return(d=e((()=>{u=t(),s(),a(),n()})))()}d();export{l as default};
