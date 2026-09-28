@@ -1,14 +1,18 @@
-import { useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import {
-  CalendarClock, CalendarDays, Download, FileText, Heading, Inbox, Minus, MousePointerClick, PanelsTopLeft, Pencil,
-  Plus, Save, Search, Send, Settings, Table, Tag, TextCursorInput, ToggleRight, Trash2, Type, Users, type LucideIcon,
+  AppWindow, BarChart3, CalendarClock, CalendarDays, Clock, CreditCard, Download, FileText, Heading, IdCard, Inbox, ListChecks,
+  Mail, MapPin, Minus, MousePointerClick, PanelsTopLeft, Pencil, Phone, Plus, Save, Search, Send, Settings, Shield, SquareStack,
+  Table, Tag, TextCursorInput, ToggleRight, Trash2, Type, Users, type LucideIcon,
 } from 'lucide-react'
 import { Button, type ButtonSize, type ButtonVariant } from '@/components/ui/button'
 import { Card, CardDescription, CardTitle } from '@/components/ui/card'
 import { Panel } from '@/components/dashboard/primitives'
+import { StatCard } from '@/components/dashboard/StatCard'
+import { PendingTaskCard, type PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { Tabs } from '@/components/ui/tabs'
-import { DateTextField, SearchField, SelectField, TextArea, TextField } from '@/components/patients/form'
+import { DateTextField, FormFooter, ModalShell, SearchField, SectionCard, SelectField, TextArea, TextField } from '@/components/patients/form'
+import { InfoBlock } from '@/components/patients/PatientSidePanel'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { AmountCell, DataTable, PersonCell, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
@@ -20,33 +24,46 @@ import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
 /* Los bloques del constructor. Cada uno sabe dibujarse con el componente
-   real de la app (`Ver`) y escribir su código (`codigo`), uno al lado del
-   otro: lo que se ve en el lienzo y lo que se copia son siempre lo mismo. */
+   real de la app (`VerBloque`) y escribir su código (`codigoBloque`), uno al
+   lado del otro: lo que se ve en el lienzo y lo que se copia son siempre lo
+   mismo. Algunos contienen otros bloques (Modal, Tabs with content,
+   Section): el modelo y los dos lados son recursivos. */
 
 /* ── Modelo ─────────────────────────────────────────────────────────── */
 
 /* Llave con la que una página le pasa al constructor qué bloque sumar. */
 export const AGREGAR = 'confidentally-ui-builder-add'
 
-export const ICONOS = { none: null, Plus, Save, Download, Pencil, Trash2, Search, Send, CalendarDays, Users, FileText, Settings } as const
+export const ICONOS = {
+  none: null, Plus, Save, Download, Pencil, Trash2, Search, Send, CalendarDays, Clock, Users, FileText, Settings,
+  Phone, Mail, MapPin, CreditCard, Shield,
+} as const
 export type NombreIcono = keyof typeof ICONOS
+export type IconoReal = Exclude<NombreIcono, 'none'>
 
 export type Boton = { label: string; variant: ButtonVariant; size: ButtonSize; icono: NombreIcono }
 export type ClaseCampo = 'text' | 'select' | 'date' | 'textarea' | 'search'
 export type Campo = { id: string; clase: ClaseCampo; label: string; placeholder: string; opciones: string; hint: string; error: string; required: boolean; disabled: boolean }
 export type ColumnaTabla = 'patient' | 'status' | 'next' | 'provider' | 'balance'
+export type Pestana = { id: string; label: string; bloques: Bloque[] }
 
 export type Bloque = { id: string } & (
   | { tipo: 'encabezado'; titulo: string; bajada: string; accion: string; icono: NombreIcono }
   | { tipo: 'texto'; texto: string; tono: 'normal' | 'suave' }
   | { tipo: 'botones'; alinear: 'inicio' | 'fin' | 'extremos'; botones: Boton[] }
   | { tipo: 'pestanas'; tabs: string; size: 'sm' | 'md'; fullWidth: boolean }
+  | { tipo: 'pestanasContenido'; size: 'sm' | 'md'; fullWidth: boolean; pestanas: Pestana[] }
+  | { tipo: 'modal'; titulo: string; disparador: string; ancho: 'sm' | 'md' | 'lg'; confirmar: string; cancelar: string; peligro: boolean; bloques: Bloque[] }
+  | { tipo: 'seccion'; titulo: string; bloques: Bloque[] }
   | { tipo: 'campos'; columnas: 1 | 2; campos: Campo[] }
   | { tipo: 'pills'; items: { label: string; tone: PillTone }[] }
+  | { tipo: 'stats'; items: { titulo: string; valor: string; delta: string; icono: IconoReal }[] }
+  | { tipo: 'detalles'; titulo: string; items: { icono: IconoReal; label: string; valor: string }[] }
   | { tipo: 'tabla'; columnas: ColumnaTabla[]; filas: number; buscador: boolean; seleccion: boolean; acciones: boolean; compacta: boolean; porPagina: number }
   | { tipo: 'vacio'; icono: NombreIcono; titulo: string; detalle: string; accion: string }
   | { tipo: 'opciones'; control: 'switch' | 'checkbox'; items: { label: string; on: boolean }[] }
   | { tipo: 'turnos'; cantidad: number }
+  | { tipo: 'tareas'; cantidad: number }
   | { tipo: 'divisor' }
 )
 export type TipoBloque = Bloque['tipo']
@@ -68,20 +85,59 @@ export const nuevoId = () => `b${Date.now().toString(36)}${(n++).toString(36)}`
 export const campo = (c: Partial<Campo> = {}): Campo => ({
   id: nuevoId(), clase: 'text', label: 'Label', placeholder: '', opciones: '', hint: '', error: '', required: false, disabled: false, ...c,
 })
+export const pestana = (label: string, bloques: Bloque[] = []): Pestana => ({ id: nuevoId(), label, bloques })
+
+/* Los bloques que tienen otros adentro, y cuáles. */
+export function hijosDe(b: Bloque): Bloque[][] {
+  if (b.tipo === 'modal' || b.tipo === 'seccion') return [b.bloques]
+  if (b.tipo === 'pestanasContenido') return b.pestanas.map((p) => p.bloques)
+  return []
+}
+export const contiene = (bloques: Bloque[], id: string): boolean =>
+  bloques.some((b) => b.id === id || hijosDe(b).some((h) => contiene(h, id)))
+
+/* Qué se puede poner adentro de qué: un modal no va adentro de otro bloque,
+   y unas pestañas con contenido no van adentro de otras. */
+export function permitidos(padre?: TipoBloque): TipoBloque[] {
+  const todos = TIPOS.map((t) => t.tipo)
+  if (!padre) return todos
+  if (padre === 'pestanasContenido') return todos.filter((t) => t !== 'modal' && t !== 'pestanasContenido')
+  return todos.filter((t) => t !== 'modal')
+}
+
+/* Una copia con ids nuevos, también adentro. */
+export function reIdentificar(b: Bloque): Bloque {
+  const recorrer = (x: Bloque): Bloque => {
+    x.id = nuevoId()
+    if (x.tipo === 'campos') x.campos = x.campos.map((f) => ({ ...f, id: nuevoId() }))
+    if (x.tipo === 'modal' || x.tipo === 'seccion') x.bloques = x.bloques.map(recorrer)
+    if (x.tipo === 'pestanasContenido') x.pestanas = x.pestanas.map((p) => ({ ...p, id: nuevoId(), bloques: p.bloques.map(recorrer) }))
+    return x
+  }
+  return recorrer(JSON.parse(JSON.stringify(b)) as Bloque)
+}
+
+export type Grupo = 'Layout' | 'Content' | 'Data'
 
 /* Los tipos de bloque, con lo que trae cada uno al agregarlo. */
-export const TIPOS: { tipo: TipoBloque; nombre: string; que: string; icono: LucideIcon; nuevo: () => Bloque }[] = [
-  { tipo: 'encabezado', nombre: 'Heading', que: 'Título, bajada y acción principal', icono: Heading, nuevo: () => ({ id: nuevoId(), tipo: 'encabezado', titulo: 'Title', bajada: 'A short line that says what this is for.', accion: '', icono: 'none' }) },
-  { tipo: 'texto', nombre: 'Text', que: 'Un párrafo', icono: Type, nuevo: () => ({ id: nuevoId(), tipo: 'texto', texto: 'Write something useful for the person using this screen.', tono: 'suave' }) },
-  { tipo: 'botones', nombre: 'Buttons', que: 'Acciones: primaria, secundaria…', icono: MousePointerClick, nuevo: () => ({ id: nuevoId(), tipo: 'botones', alinear: 'fin', botones: [{ label: 'Cancel', variant: 'secondary', size: 'lg', icono: 'none' }, { label: 'Save', variant: 'primary', size: 'lg', icono: 'none' }] }) },
-  { tipo: 'pestanas', nombre: 'Tabs', que: 'Cambiar de vista', icono: PanelsTopLeft, nuevo: () => ({ id: nuevoId(), tipo: 'pestanas', tabs: 'All, Active, Inactive', size: 'md', fullWidth: false }) },
-  { tipo: 'campos', nombre: 'Fields', que: 'Un formulario', icono: TextCursorInput, nuevo: () => ({ id: nuevoId(), tipo: 'campos', columnas: 2, campos: [campo({ label: 'First name', placeholder: 'Maria' }), campo({ label: 'Last name', placeholder: 'Viola' })] }) },
-  { tipo: 'pills', nombre: 'Pills', que: 'Estados', icono: Tag, nuevo: () => ({ id: nuevoId(), tipo: 'pills', items: [{ label: 'Active', tone: 'success' }, { label: 'Pending', tone: 'warning' }] }) },
-  { tipo: 'tabla', nombre: 'Table', que: 'Una lista de pacientes', icono: Table, nuevo: () => ({ id: nuevoId(), tipo: 'tabla', columnas: ['patient', 'status', 'next', 'balance'], filas: 6, buscador: true, seleccion: false, acciones: true, compacta: false, porPagina: 5 }) },
-  { tipo: 'vacio', nombre: 'Empty state', que: 'Cuando todavía no hay nada', icono: Inbox, nuevo: () => ({ id: nuevoId(), tipo: 'vacio', icono: 'CalendarDays', titulo: 'Nothing here yet', detalle: 'When there is something to show, it will appear here.', accion: '' }) },
-  { tipo: 'opciones', nombre: 'Switches', que: 'Prender o apagar opciones', icono: ToggleRight, nuevo: () => ({ id: nuevoId(), tipo: 'opciones', control: 'switch', items: [{ label: 'Email reminders', on: true }, { label: 'SMS confirmations', on: false }] }) },
-  { tipo: 'turnos', nombre: 'Appointments', que: 'Turnos del día', icono: CalendarClock, nuevo: () => ({ id: nuevoId(), tipo: 'turnos', cantidad: 3 }) },
-  { tipo: 'divisor', nombre: 'Divider', que: 'Una línea para separar', icono: Minus, nuevo: () => ({ id: nuevoId(), tipo: 'divisor' }) },
+export const TIPOS: { tipo: TipoBloque; nombre: string; que: string; icono: LucideIcon; grupo: Grupo; nuevo: () => Bloque }[] = [
+  { tipo: 'encabezado', grupo: 'Content', nombre: 'Heading', que: 'Título, bajada y acción principal', icono: Heading, nuevo: () => ({ id: nuevoId(), tipo: 'encabezado', titulo: 'Title', bajada: 'A short line that says what this is for.', accion: '', icono: 'none' }) },
+  { tipo: 'texto', grupo: 'Content', nombre: 'Text', que: 'Un párrafo', icono: Type, nuevo: () => ({ id: nuevoId(), tipo: 'texto', texto: 'Write something useful for the person using this screen.', tono: 'suave' }) },
+  { tipo: 'botones', grupo: 'Content', nombre: 'Buttons', que: 'Acciones: primaria, secundaria…', icono: MousePointerClick, nuevo: () => ({ id: nuevoId(), tipo: 'botones', alinear: 'fin', botones: [{ label: 'Cancel', variant: 'secondary', size: 'lg', icono: 'none' }, { label: 'Save', variant: 'primary', size: 'lg', icono: 'none' }] }) },
+  { tipo: 'campos', grupo: 'Content', nombre: 'Fields', que: 'Un formulario', icono: TextCursorInput, nuevo: () => ({ id: nuevoId(), tipo: 'campos', columnas: 2, campos: [campo({ label: 'First name', placeholder: 'Maria' }), campo({ label: 'Last name', placeholder: 'Viola' })] }) },
+  { tipo: 'opciones', grupo: 'Content', nombre: 'Switches', que: 'Prender o apagar opciones', icono: ToggleRight, nuevo: () => ({ id: nuevoId(), tipo: 'opciones', control: 'switch', items: [{ label: 'Email reminders', on: true }, { label: 'SMS confirmations', on: false }] }) },
+  { tipo: 'pills', grupo: 'Content', nombre: 'Pills', que: 'Estados', icono: Tag, nuevo: () => ({ id: nuevoId(), tipo: 'pills', items: [{ label: 'Active', tone: 'success' }, { label: 'Pending', tone: 'warning' }] }) },
+  { tipo: 'vacio', grupo: 'Content', nombre: 'Empty state', que: 'Cuando todavía no hay nada', icono: Inbox, nuevo: () => ({ id: nuevoId(), tipo: 'vacio', icono: 'CalendarDays', titulo: 'Nothing here yet', detalle: 'When there is something to show, it will appear here.', accion: '' }) },
+  { tipo: 'divisor', grupo: 'Content', nombre: 'Divider', que: 'Una línea para separar', icono: Minus, nuevo: () => ({ id: nuevoId(), tipo: 'divisor' }) },
+  { tipo: 'modal', grupo: 'Layout', nombre: 'Modal', que: 'Un botón que abre un modal con bloques adentro', icono: AppWindow, nuevo: () => ({ id: nuevoId(), tipo: 'modal', titulo: 'New item', disparador: 'Add item', ancho: 'md', confirmar: 'Save', cancelar: 'Cancel', peligro: false, bloques: [{ id: nuevoId(), tipo: 'campos', columnas: 1, campos: [campo({ label: 'Name', placeholder: 'Write a name' })] }] }) },
+  { tipo: 'pestanasContenido', grupo: 'Layout', nombre: 'Tabs with content', que: 'Pestañas, cada una con sus bloques', icono: PanelsTopLeft, nuevo: () => ({ id: nuevoId(), tipo: 'pestanasContenido', size: 'md', fullWidth: false, pestanas: [pestana('Details', [{ id: nuevoId(), tipo: 'texto', texto: 'What goes in the first tab.', tono: 'suave' }]), pestana('History', [{ id: nuevoId(), tipo: 'vacio', icono: 'Clock', titulo: 'No history yet', detalle: '', accion: '' }])] }) },
+  { tipo: 'seccion', grupo: 'Layout', nombre: 'Section', que: 'Un grupo con título, como en los formularios', icono: SquareStack, nuevo: () => ({ id: nuevoId(), tipo: 'seccion', titulo: 'Section', bloques: [{ id: nuevoId(), tipo: 'campos', columnas: 2, campos: [campo({ label: 'Field one' }), campo({ label: 'Field two' })] }] }) },
+  { tipo: 'pestanas', grupo: 'Layout', nombre: 'Tabs', que: 'Sólo la fila de pestañas', icono: PanelsTopLeft, nuevo: () => ({ id: nuevoId(), tipo: 'pestanas', tabs: 'All, Active, Inactive', size: 'md', fullWidth: false }) },
+  { tipo: 'tabla', grupo: 'Data', nombre: 'Table', que: 'Una lista de pacientes', icono: Table, nuevo: () => ({ id: nuevoId(), tipo: 'tabla', columnas: ['patient', 'status', 'next', 'balance'], filas: 6, buscador: true, seleccion: false, acciones: true, compacta: false, porPagina: 5 }) },
+  { tipo: 'stats', grupo: 'Data', nombre: 'Stats', que: 'Números clave en tarjetas', icono: BarChart3, nuevo: () => ({ id: nuevoId(), tipo: 'stats', items: [{ titulo: 'Patients today', valor: '24', delta: '+12% from last week', icono: 'Users' }, { titulo: 'Revenue', valor: '$8,420', delta: '+4.2% from last week', icono: 'CreditCard' }, { titulo: 'No shows', valor: '2', delta: '−1 from yesterday', icono: 'CalendarDays' }] }) },
+  { tipo: 'detalles', grupo: 'Data', nombre: 'Details', que: 'Datos con ícono y lápiz para editar', icono: IdCard, nuevo: () => ({ id: nuevoId(), tipo: 'detalles', titulo: 'Contact', items: [{ icono: 'Phone', label: 'Phone', valor: '(555) 234-5678' }, { icono: 'Mail', label: 'Email', valor: 'maria.viola@mail.com' }, { icono: 'MapPin', label: 'Address', valor: '123 Biscayne Blvd' }] }) },
+  { tipo: 'turnos', grupo: 'Data', nombre: 'Appointments', que: 'Turnos del día', icono: CalendarClock, nuevo: () => ({ id: nuevoId(), tipo: 'turnos', cantidad: 3 }) },
+  { tipo: 'tareas', grupo: 'Data', nombre: 'Tasks', que: 'Tareas pendientes', icono: ListChecks, nuevo: () => ({ id: nuevoId(), tipo: 'tareas', cantidad: 2 }) },
 ]
 export const infoDe = (t: TipoBloque) => TIPOS.find((x) => x.tipo === t)!
 
@@ -109,6 +165,13 @@ const TURNOS: Appointment[] = [
   { name: 'Sofía Romero', initials: 'SR', provider: 'Dr. Emily Chen', operatory: 'Operatory 1', time: '17:00' },
 ]
 
+const TAREAS: PendingTask[] = [
+  { kind: 'Referrals', state: 'Requested', person: 'Elena Marquez', initials: 'EM', register: 'March 17, 2025', expiration: 'March 31, 2025' },
+  { kind: 'Lab order', state: 'In progress', person: 'Noah James Smith', initials: 'NS', register: 'March 18, 2025', expiration: 'March 25, 2025' },
+  { kind: 'Insurance claim', state: 'Requested', person: 'Maria Abril Viola', initials: 'MV', register: 'March 19, 2025', expiration: 'April 2, 2025' },
+  { kind: 'Prescription', state: 'Requested', person: 'John Smith', initials: 'JS', register: 'March 20, 2025', expiration: 'March 27, 2025' },
+]
+
 const COLUMNAS: Record<ColumnaTabla, { header: string; col: DataTableColumn<Paciente>; codigo: string }> = {
   patient: { header: 'Patient', col: { key: 'patient', header: 'Patient', cell: (p) => <PersonCell name={p.name} initials={p.initials} /> }, codigo: `{ key: 'patient', header: 'Patient', cell: (p) => <PersonCell name={p.name} initials={p.initials} /> }` },
   status: { header: 'Status', col: { key: 'status', header: 'Status', width: 120, cell: (p) => <Pill tone={p.status === 'Active' ? 'success' : 'neutral'}>{p.status}</Pill> }, codigo: `{ key: 'status', header: 'Status', width: 120, cell: (p) => <Pill tone={p.status === 'Active' ? 'success' : 'neutral'}>{p.status}</Pill> }` },
@@ -120,8 +183,16 @@ export const NOMBRE_COLUMNA = Object.fromEntries(Object.entries(COLUMNAS).map(([
 
 /* ── Cómo se ve ─────────────────────────────────────────────────────── */
 
+/* Lo que el lienzo necesita saber del constructor: qué bloque se está
+   editando (para abrir su modal o su pestaña) y qué modal está abierto. */
+export const VistaPrevia = createContext<{ editando: string | null; abierto: string | null; setAbierto: (id: string | null) => void }>({
+  editando: null, abierto: null, setAbierto: () => {},
+})
+
 const ALINEAR = { inicio: 'justify-start', fin: 'justify-end', extremos: 'justify-between' } as const
+const ANCHO_MODAL = { sm: 'max-w-[480px]', md: 'max-w-[640px]', lg: undefined } as const
 const lista = (s: string) => s.split(',').map((x) => x.trim()).filter(Boolean)
+const SIN_CONTENIDO = 'Nothing here yet.'
 
 function ConIcono({ icono, children }: { icono: NombreIcono; children: ReactNode }) {
   const I = ICONOS[icono]
@@ -133,6 +204,58 @@ function PestanasVivas({ b }: { b: BloqueDe<'pestanas'> }) {
   const [valor, setValor] = useState(tabs[0] ?? '')
   const actual = tabs.includes(valor) ? valor : (tabs[0] ?? '')
   return tabs.length ? <Tabs tabs={tabs} value={actual} onChange={setValor} size={b.size} fullWidth={b.fullWidth} /> : null
+}
+
+function Hijos({ bloques, gap = 'gap-4' }: { bloques: Bloque[]; gap?: string }) {
+  if (!bloques.length) return <p className="text-[13px] text-ink-muted">{SIN_CONTENIDO}</p>
+  return <div className={cn('flex flex-col', gap)}>{bloques.map((x) => <VerBloque key={x.id} b={x} contenedor="card" />)}</div>
+}
+
+function PestanasConContenido({ b }: { b: BloqueDe<'pestanasContenido'> }) {
+  const { editando } = useContext(VistaPrevia)
+  const [valor, setValor] = useState(b.pestanas[0]?.label ?? '')
+  /* Mientras se edita un bloque de una pestaña, esa pestaña queda a la vista. */
+  const forzada = editando ? b.pestanas.find((p) => contiene(p.bloques, editando))?.label : undefined
+  const labels = b.pestanas.map((p) => p.label)
+  const actual = forzada ?? (labels.includes(valor) ? valor : (labels[0] ?? ''))
+  const abierta = b.pestanas.find((p) => p.label === actual)
+  if (!b.pestanas.length) return null
+  return (
+    <div className="flex flex-col gap-4">
+      <Tabs tabs={labels} value={actual} onChange={setValor} size={b.size} fullWidth={b.fullWidth} />
+      {abierta && <Hijos bloques={abierta.bloques} />}
+    </div>
+  )
+}
+
+function VerModal({ b }: { b: BloqueDe<'modal'> }) {
+  const { editando, abierto, setAbierto } = useContext(VistaPrevia)
+  /* Mientras se edita el modal o algo de adentro, queda abierto. */
+  const visible = abierto === b.id || (!!editando && (editando === b.id || contiene(b.bloques, editando)))
+  const cerrar = () => setAbierto(null)
+  useEffect(() => {
+    if (visible) document.querySelector(`[role="dialog"][aria-label="${CSS.escape(b.titulo)}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }, [visible, b.titulo])
+  const pie = b.peligro ? (
+    <>
+      <Button variant="secondary" onClick={cerrar}>{b.cancelar}</Button>
+      <Button variant="destructive" onClick={cerrar}>{b.confirmar}</Button>
+    </>
+  ) : (
+    <FormFooter onCancel={cerrar} onSave={cerrar} cancelLabel={b.cancelar} saveLabel={b.confirmar} />
+  )
+  return (
+    <>
+      <div>
+        <Button variant={b.peligro ? 'destructive' : 'primary'} onClick={() => setAbierto(b.id)}>{b.disparador}</Button>
+      </div>
+      {visible && (
+        <ModalShell title={b.titulo} width={ANCHO_MODAL[b.ancho]} onClose={cerrar} footer={pie}>
+          <Hijos bloques={b.bloques} gap="gap-5" />
+        </ModalShell>
+      )}
+    </>
+  )
 }
 
 function CasillasVivas({ b }: { b: BloqueDe<'opciones'> }) {
@@ -183,6 +306,16 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
       )
     case 'pestanas':
       return <PestanasVivas key={b.tabs} b={b} />
+    case 'pestanasContenido':
+      return <PestanasConContenido b={b} />
+    case 'modal':
+      return <VerModal b={b} />
+    case 'seccion':
+      return (
+        <SectionCard title={b.titulo}>
+          {b.bloques.length ? b.bloques.map((x) => <VerBloque key={x.id} b={x} contenedor="card" />) : <p className="text-[13px] text-ink-muted">{SIN_CONTENIDO}</p>}
+        </SectionCard>
+      )
     case 'campos':
       return (
         <div className={cn('grid gap-4', b.columnas === 2 && 'sm:grid-cols-2')}>
@@ -191,6 +324,14 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
       )
     case 'pills':
       return <div className="flex flex-wrap gap-1.5">{b.items.map((x, i) => <Pill key={i} tone={x.tone}>{x.label}</Pill>)}</div>
+    case 'stats':
+      return (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {b.items.map((x, i) => <StatCard key={i} title={x.titulo} value={x.valor} delta={x.delta} icon={ICONOS[x.icono]} />)}
+        </div>
+      )
+    case 'detalles':
+      return <InfoBlock className="mt-0" title={b.titulo} items={b.items.map((x) => ({ icon: ICONOS[x.icono], label: x.label, value: x.valor }))} onEdit={() => {}} />
     case 'tabla':
       return (
         <DataTable
@@ -213,7 +354,7 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
         />
       )
     case 'vacio': {
-      const I = ICONOS[b.icono] ?? undefined
+      const I = ICONOS[b.icono]
       return <EmptyState icon={I ?? undefined} title={b.titulo} detail={b.detalle || undefined} accion={b.accion ? { label: b.accion, onClick: () => {} } : undefined} />
     }
     case 'opciones':
@@ -230,6 +371,8 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
       )
     case 'turnos':
       return <div className="flex flex-col gap-2">{TURNOS.slice(0, b.cantidad).map((a) => <AppointmentCard key={a.name} appt={a} compact />)}</div>
+    case 'tareas':
+      return <div className="grid gap-3 sm:grid-cols-2">{TAREAS.slice(0, b.cantidad).map((t) => <PendingTaskCard key={t.kind} task={t} />)}</div>
     case 'divisor':
       return <hr className="border-line-row" />
   }
@@ -246,12 +389,12 @@ export function VerDiseno({ d }: { d: Diseno }) {
 
 /* ── Cómo se escribe ────────────────────────────────────────────────── */
 
-type Codigo = { imports: Map<string, Set<string>>; estado: string[]; datos: string[] }
+type Codigo = { imports: Map<string, Set<string>>; estado: string[]; datos: string[]; cuenta: Record<string, number> }
 
-const valorAttr = (s: string) => (/["{}<>\\]/.test(s) ? `{${comillas(s)}}` : `"${s}"`)
 /* Un texto como literal de JS con comillas simples, como el resto del código. */
 const comillas = (s: string) => `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
 const arreglo = (xs: string[]) => `[${xs.map(comillas).join(', ')}]`
+const valorAttr = (s: string) => (/["{}<>\\]/.test(s) ? `{${comillas(s)}}` : `"${s}"`)
 const texto = (s: string) => (/[{}<>]/.test(s) ? `{${comillas(s)}}` : s)
 const importar = (c: Codigo, desde: string, ...nombres: string[]) => {
   const s = c.imports.get(desde) ?? new Set<string>()
@@ -264,6 +407,17 @@ const conIcono = (c: Codigo, icono: NombreIcono, label: string) => {
   return `<${icono} /> ${texto(label)}`
 }
 const sangrar = (lineas: string[], n: number) => lineas.map((l) => (l ? ' '.repeat(n) + l : l))
+
+/* Un estado propio por bloque que lo necesita: pestana, pestana2… */
+function estado(c: Codigo, base: string, inicial: string) {
+  const k = c.cuenta[base] ?? 0
+  c.cuenta[base] = k + 1
+  const v = k ? `${base}${k + 1}` : base
+  const set = `set${v[0]!.toUpperCase()}${v.slice(1)}`
+  importar(c, 'react', 'useState')
+  c.estado.push(`const [${v}, ${set}] = useState${inicial}`)
+  return [v, set] as const
+}
 
 function codigoCampo(c: Codigo, f: Campo, extra?: string): string {
   const comp = { text: 'TextField', select: 'SelectField', date: 'DateTextField', textarea: 'TextArea', search: 'SearchField' }[f.clase]
@@ -279,20 +433,20 @@ function codigoCampo(c: Codigo, f: Campo, extra?: string): string {
   return `${s} />`
 }
 
-function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor, orden: number): string[] {
+/* Los bloques de adentro de un contenedor, en una columna. */
+function codigoHijos(c: Codigo, bloques: Bloque[], gap = 'gap-4'): string[] {
+  if (!bloques.length) return [`<p className="text-[13px] text-ink-muted">${SIN_CONTENIDO}</p>`]
+  return [`<div className="flex flex-col ${gap}">`, ...sangrar(bloques.flatMap((x) => codigoBloque(c, x, 'card')), 2), `</div>`]
+}
+
+function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor): string[] {
   switch (b.tipo) {
     case 'encabezado': {
       if (b.accion) importar(c, '@/components/ui/button', 'Button')
       const accion = b.accion ? `<Button size="md">${conIcono(c, b.icono, b.accion)}</Button>` : ''
       if (contenedor === 'page') {
         importar(c, '@/components/settings/SettingsPageHeader', 'SettingsPageHeader')
-        return [
-          `<SettingsPageHeader`,
-          `  titulo=${valorAttr(b.titulo)}`,
-          `  bajada=${valorAttr(b.bajada)}`,
-          ...(accion ? [`  accion={${accion}}`] : []),
-          `/>`,
-        ]
+        return [`<SettingsPageHeader`, `  titulo=${valorAttr(b.titulo)}`, `  bajada=${valorAttr(b.bajada)}`, ...(accion ? [`  accion={${accion}}`] : []), `/>`]
       }
       importar(c, '@/components/ui/card', 'CardTitle', ...(b.bajada ? ['CardDescription'] : []))
       return [
@@ -320,13 +474,58 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor, orden: n
     case 'pestanas': {
       const tabs = lista(b.tabs)
       importar(c, '@/components/ui/tabs', 'Tabs')
-      importar(c, 'react', 'useState')
-      const v = orden ? `pestana${orden + 1}` : 'pestana'
-      const set = `set${v[0]!.toUpperCase()}${v.slice(1)}`
-      c.estado.push(`const [${v}, ${set}] = useState(${comillas(tabs[0] ?? '')})`)
+      const [v, set] = estado(c, 'pestana', `(${comillas(tabs[0] ?? '')})`)
       const props = [b.size === 'sm' && 'size="sm"', b.fullWidth && 'fullWidth'].filter(Boolean).join(' ')
       return [`<Tabs tabs={${arreglo(tabs)}} value={${v}} onChange={${set}}${props ? ` ${props}` : ''} />`]
     }
+    case 'pestanasContenido': {
+      if (!b.pestanas.length) return []
+      importar(c, '@/components/ui/tabs', 'Tabs')
+      const labels = b.pestanas.map((p) => p.label)
+      const [v, set] = estado(c, 'pestana', `(${comillas(labels[0] ?? '')})`)
+      const props = [b.size === 'sm' && 'size="sm"', b.fullWidth && 'fullWidth'].filter(Boolean).join(' ')
+      return [
+        `<div className="flex flex-col gap-4">`,
+        `  <Tabs tabs={${arreglo(labels)}} value={${v}} onChange={${set}}${props ? ` ${props}` : ''} />`,
+        ...b.pestanas.flatMap((p) => [`  {${v} === ${comillas(p.label)} && (`, ...sangrar(codigoHijos(c, p.bloques), 4), `  )}`]),
+        `</div>`,
+      ]
+    }
+    case 'modal': {
+      importar(c, '@/components/ui/button', 'Button')
+      importar(c, '@/components/patients/form', 'ModalShell')
+      const [v, set] = estado(c, 'abierto', '(false)')
+      const cerrar = `() => ${set}(false)`
+      let pie: string
+      if (b.peligro) {
+        pie = `<><Button variant="secondary" onClick={${cerrar}}>${texto(b.cancelar)}</Button><Button variant="destructive" onClick={${cerrar}}>${texto(b.confirmar)}</Button></>`
+      } else {
+        importar(c, '@/components/patients/form', 'FormFooter')
+        pie = `<FormFooter onCancel={${cerrar}} onSave={${cerrar}}${b.cancelar !== 'Cancel' ? ` cancelLabel=${valorAttr(b.cancelar)}` : ''}${b.confirmar !== 'Save' ? ` saveLabel=${valorAttr(b.confirmar)}` : ''} />`
+      }
+      return [
+        `<div>`,
+        `  <Button${b.peligro ? ' variant="destructive"' : ''} onClick={() => ${set}(true)}>${texto(b.disparador)}</Button>`,
+        `</div>`,
+        `{${v} && (`,
+        `  <ModalShell`,
+        `    title=${valorAttr(b.titulo)}`,
+        ...(ANCHO_MODAL[b.ancho] ? [`    width="${ANCHO_MODAL[b.ancho]}"`] : []),
+        `    onClose={${cerrar}}`,
+        `    footer={${pie}}`,
+        `  >`,
+        ...sangrar(codigoHijos(c, b.bloques, 'gap-5'), 4),
+        `  </ModalShell>`,
+        `)}`,
+      ]
+    }
+    case 'seccion':
+      importar(c, '@/components/patients/form', 'SectionCard')
+      return [
+        `<SectionCard title=${valorAttr(b.titulo)}>`,
+        ...sangrar(b.bloques.length ? b.bloques.flatMap((x) => codigoBloque(c, x, 'card')) : [`<p className="text-[13px] text-ink-muted">${SIN_CONTENIDO}</p>`], 2),
+        `</SectionCard>`,
+      ]
     case 'campos':
       return [
         `<div className="grid gap-4${b.columnas === 2 ? ' sm:grid-cols-2' : ''}">`,
@@ -336,25 +535,38 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor, orden: n
     case 'pills':
       importar(c, '@/components/ui/pill', 'Pill')
       return [`<div className="flex flex-wrap gap-1.5">`, ...b.items.map((x) => `  <Pill tone="${x.tone}">${texto(x.label)}</Pill>`), `</div>`]
+    case 'stats':
+      importar(c, '@/components/dashboard/StatCard', 'StatCard')
+      b.items.forEach((x) => importar(c, 'lucide-react', x.icono))
+      return [
+        `<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">`,
+        ...b.items.map((x) => `  <StatCard title=${valorAttr(x.titulo)} value=${valorAttr(x.valor)} delta=${valorAttr(x.delta)} icon={${x.icono}} />`),
+        `</div>`,
+      ]
+    case 'detalles':
+      importar(c, '@/components/patients/PatientSidePanel', 'InfoBlock')
+      b.items.forEach((x) => importar(c, 'lucide-react', x.icono))
+      return [
+        `<InfoBlock`,
+        `  className="mt-0"`,
+        `  title=${valorAttr(b.titulo)}`,
+        `  items={[`,
+        ...b.items.map((x) => `    { icon: ${x.icono}, label: ${comillas(x.label)}, value: ${comillas(x.valor)} },`),
+        `  ]}`,
+        `  onEdit={() => {}}`,
+        `/>`,
+      ]
     case 'tabla': {
       importar(c, '@/components/ui/data-table', 'DataTable', ...(b.columnas.includes('patient') ? ['PersonCell'] : []), ...(b.columnas.some((x) => x === 'next' || x === 'provider') ? ['TextCell'] : []), ...(b.columnas.includes('balance') ? ['AmountCell'] : []))
       if (b.columnas.includes('status')) importar(c, '@/components/ui/pill', 'Pill')
       if (!c.datos.some((d) => d.startsWith('const pacientes'))) {
         c.datos.push([
           `const pacientes = [`,
-          ...PACIENTES.slice(0, b.filas).map((p) => `  ${JSON.stringify(p).replace(/"(\w+)":/g, '$1: ').replace(/,(?=\w+:)/g, ', ').replace(/^\{/, '{ ').replace(/\}$/, ' }').replace(/"/g, "'")},`),
+          ...PACIENTES.slice(0, b.filas).map((p) => `  { id: ${comillas(p.id)}, name: ${comillas(p.name)}, initials: ${comillas(p.initials)}, status: ${comillas(p.status)}, next: ${comillas(p.next)}, provider: ${comillas(p.provider)}, balance: ${p.balance} },`),
           `]`,
         ].join('\n'))
       }
-      const lineas = [
-        `<DataTable`,
-        `  rows={pacientes}`,
-        `  rowKey={(p) => p.id}`,
-        `  rowLabel={(p) => p.name}`,
-        `  columns={[`,
-        ...b.columnas.map((x) => `    ${COLUMNAS[x].codigo},`),
-        `  ]}`,
-      ]
+      const lineas = [`<DataTable`, `  rows={pacientes}`, `  rowKey={(p) => p.id}`, `  rowLabel={(p) => p.name}`, `  columns={[`, ...b.columnas.map((x) => `    ${COLUMNAS[x].codigo},`), `  ]}`]
       if (b.buscador) lineas.push(`  search={{ placeholder: 'Search patients', match: (p, q) => p.name.toLowerCase().includes(q.toLowerCase()) }}`)
       if (b.seleccion) lineas.push(`  selectable`)
       if (b.acciones) {
@@ -374,7 +586,7 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor, orden: n
       lineas.push(`  itemLabel="patients"`, `/>`)
       return lineas
     }
-    case 'vacio': {
+    case 'vacio':
       importar(c, '@/components/ui/empty-state', 'EmptyState')
       if (b.icono !== 'none') importar(c, 'lucide-react', b.icono)
       return [
@@ -385,19 +597,20 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor, orden: n
         ...(b.accion ? [`  accion={{ label: ${comillas(b.accion)}, onClick: () => {} }}`] : []),
         `/>`,
       ]
-    }
     case 'opciones':
       if (b.control === 'checkbox') {
         importar(c, '@/components/ui/checkbox', 'Checkbox')
-        importar(c, 'react', 'useState')
-        const v = orden ? `marcados${orden + 1}` : 'marcados'
-        const set = `set${v[0]!.toUpperCase()}${v.slice(1)}`
-        c.estado.push(`const [${v}, ${set}] = useState<string[]>(${arreglo(b.items.filter((i) => i.on).map((i) => i.label))})`)
+        const [v, set] = estado(c, 'marcados', `<string[]>(${arreglo(b.items.filter((i) => i.on).map((i) => i.label))})`)
         return [
           `<div className="flex flex-col gap-3">`,
-          ...b.items.map((i) => {
+          ...b.items.flatMap((i) => {
             const l = comillas(i.label)
-            return `  <label className="flex items-center gap-2.5 text-[13px] text-ink">\n    <Checkbox label=${valorAttr(i.label)} on={${v}.includes(${l})} onChange={(on) => ${set}((m) => (on ? [...m, ${l}] : m.filter((x) => x !== ${l})))} />\n    ${texto(i.label)}\n  </label>`
+            return [
+              `  <label className="flex items-center gap-2.5 text-[13px] text-ink">`,
+              `    <Checkbox label=${valorAttr(i.label)} on={${v}.includes(${l})} onChange={(on) => ${set}((m) => (on ? [...m, ${l}] : m.filter((x) => x !== ${l})))} />`,
+              `    ${texto(i.label)}`,
+              `  </label>`,
+            ]
           }),
           `</div>`,
         ]
@@ -405,15 +618,26 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor, orden: n
       importar(c, '@/components/ui/switch', 'Switch')
       return [
         `<div className="flex flex-col gap-3">`,
-        ...b.items.map((i) => `  <label className="flex items-center justify-between gap-4 text-[13px] text-ink">\n    ${texto(i.label)}\n    <Switch${i.on ? ' defaultChecked' : ''} aria-label=${valorAttr(i.label)} />\n  </label>`),
+        ...b.items.flatMap((i) => [
+          `  <label className="flex items-center justify-between gap-4 text-[13px] text-ink">`,
+          `    ${texto(i.label)}`,
+          `    <Switch${i.on ? ' defaultChecked' : ''} aria-label=${valorAttr(i.label)} />`,
+          `  </label>`,
+        ]),
         `</div>`,
       ]
     case 'turnos':
       importar(c, '@/components/dashboard/AppointmentCard', 'AppointmentCard')
       if (!c.datos.some((d) => d.startsWith('const turnos'))) {
-        c.datos.push([`const turnos = [`, ...TURNOS.slice(0, b.cantidad).map((a) => `  { name: '${a.name}', initials: '${a.initials}', provider: '${a.provider}', operatory: '${a.operatory}', time: '${a.time}' },`), `]`].join('\n'))
+        c.datos.push([`const turnos = [`, ...TURNOS.slice(0, b.cantidad).map((a) => `  { name: ${comillas(a.name)}, initials: ${comillas(a.initials)}, provider: ${comillas(a.provider)}, operatory: ${comillas(a.operatory)}, time: ${comillas(a.time)} },`), `]`].join('\n'))
       }
       return [`<div className="flex flex-col gap-2">`, `  {turnos.map((t) => <AppointmentCard key={t.name} appt={t} compact />)}`, `</div>`]
+    case 'tareas':
+      importar(c, '@/components/dashboard/PendingTaskCard', 'PendingTaskCard')
+      if (!c.datos.some((d) => d.startsWith('const tareas'))) {
+        c.datos.push([`const tareas = [`, ...TAREAS.slice(0, b.cantidad).map((t) => `  { kind: ${comillas(t.kind)}, state: ${comillas(t.state)}, person: ${comillas(t.person)}, initials: ${comillas(t.initials)}, register: ${comillas(t.register)}, expiration: ${comillas(t.expiration)} },`), `]`].join('\n'))
+      }
+      return [`<div className="grid gap-3 sm:grid-cols-2">`, `  {tareas.map((t) => <PendingTaskCard key={t.kind} task={t} />)}`, `</div>`]
     case 'divisor':
       return [`<hr className="border-line-row" />`]
   }
@@ -425,16 +649,8 @@ export const nombreComponente = (s: string) =>
 const ORDEN_IMPORTS = (a: string) => (a === 'react' ? 0 : a === 'lucide-react' ? 1 : 2)
 
 export function generarCodigo(d: Diseno): string {
-  const c: Codigo = { imports: new Map(), estado: [], datos: [] }
-  /* Cada bloque con estado propio (pestañas, casillas) lleva su número:
-     pestana, pestana2… */
-  const porTipo: Record<string, number> = {}
-  const cuerpo = d.bloques.flatMap((b) => {
-    const clave = b.tipo === 'opciones' ? `${b.tipo}-${b.control}` : b.tipo
-    const orden = porTipo[clave] ?? 0
-    porTipo[clave] = orden + 1
-    return codigoBloque(c, b, d.contenedor, orden)
-  })
+  const c: Codigo = { imports: new Map(), estado: [], datos: [], cuenta: {} }
+  const cuerpo = d.bloques.flatMap((b) => codigoBloque(c, b, d.contenedor))
   let abre: string
   let cierra: string
   if (d.contenedor === 'panel') {
@@ -454,11 +670,11 @@ export function generarCodigo(d: Diseno): string {
   const imports = [...c.imports]
     .sort(([a], [b]) => ORDEN_IMPORTS(a) - ORDEN_IMPORTS(b) || a.localeCompare(b))
     .map(([desde, nombres]) => `import { ${[...nombres].sort((a, b) => a.localeCompare(b)).join(', ')} } from '${desde}'`)
-  const jsx = cuerpo.length ? cuerpo.join('\n').split('\n') : ['{/* Sumá bloques desde el constructor. */}']
+  const jsx = cuerpo.length ? cuerpo : ['{/* Sumá bloques desde el constructor. */}']
   return [
     ...imports,
     '',
-    ...(c.datos.length ? [...c.datos.flatMap((x) => [x, ''])] : []),
+    ...c.datos.flatMap((x) => [x, '']),
     `export function ${nombreComponente(d.nombre)}() {`,
     ...c.estado.map((l) => `  ${l}`),
     ...(c.estado.length ? [''] : []),
@@ -474,13 +690,15 @@ export function generarCodigo(d: Diseno): string {
 
 /* ── Puntos de partida ──────────────────────────────────────────────── */
 
+const encabezado = (titulo: string, bajada: string, accion = '', icono: NombreIcono = 'none'): Bloque => ({ id: nuevoId(), tipo: 'encabezado', titulo, bajada, accion, icono })
+
 export const PLANTILLAS: { nombre: string; que: string; crear: () => Diseno }[] = [
   {
     nombre: 'Settings form', que: 'Una card con un formulario y sus botones',
     crear: () => ({
       nombre: 'Clinic details card', contenedor: 'card', tituloPanel: '', ancho: 'medio',
       bloques: [
-        { id: nuevoId(), tipo: 'encabezado', titulo: 'Clinic details', bajada: 'Name and contact shown to patients.', accion: '', icono: 'none' },
+        encabezado('Clinic details', 'Name and contact shown to patients.'),
         { id: nuevoId(), tipo: 'campos', columnas: 2, campos: [
           campo({ label: 'Clinic name', placeholder: 'Red Dental Studio', required: true }),
           campo({ label: 'Phone', placeholder: '(555) 234-5678' }),
@@ -493,13 +711,67 @@ export const PLANTILLAS: { nombre: string; que: string; crear: () => Diseno }[] 
     }),
   },
   {
+    nombre: 'Modal form', que: 'Un botón que abre un modal con un formulario',
+    crear: () => ({
+      nombre: 'Rooms card', contenedor: 'card', tituloPanel: '', ancho: 'medio',
+      bloques: [
+        encabezado('Rooms', 'Where appointments happen in this location.'),
+        { id: nuevoId(), tipo: 'pills', items: [{ label: '3 available', tone: 'success' }, { label: '1 in maintenance', tone: 'warning' }] },
+        { id: nuevoId(), tipo: 'modal', titulo: 'New room', disparador: 'Add room', ancho: 'md', confirmar: 'Save room', cancelar: 'Cancel', peligro: false, bloques: [
+          { id: nuevoId(), tipo: 'campos', columnas: 2, campos: [
+            campo({ label: 'Room name', placeholder: 'Operatory 4', required: true }),
+            campo({ clase: 'select', label: 'Type', placeholder: 'Select type', opciones: 'Operatory, Consultation, X-ray' }),
+          ] },
+          { id: nuevoId(), tipo: 'opciones', control: 'switch', items: [{ label: 'Available for online booking', on: true }] },
+        ] },
+      ],
+    }),
+  },
+  {
+    nombre: 'Patient tabs', que: 'Pestañas, cada una con su contenido',
+    crear: () => ({
+      nombre: 'Patient overview card', contenedor: 'card', tituloPanel: '', ancho: 'medio',
+      bloques: [
+        encabezado('Maria Abril Viola', 'Patient since March 2021.', 'Edit', 'Pencil'),
+        { id: nuevoId(), tipo: 'pestanasContenido', size: 'md', fullWidth: false, pestanas: [
+          pestana('Details', [{ id: nuevoId(), tipo: 'detalles', titulo: 'Contact', items: [{ icono: 'Phone', label: 'Phone', valor: '(555) 234-5678' }, { icono: 'Mail', label: 'Email', valor: 'maria.viola@mail.com' }, { icono: 'MapPin', label: 'Address', valor: '123 Biscayne Blvd' }] }]),
+          pestana('Appointments', [{ id: nuevoId(), tipo: 'turnos', cantidad: 3 }]),
+          pestana('Tasks', [{ id: nuevoId(), tipo: 'tareas', cantidad: 2 }]),
+        ] },
+      ],
+    }),
+  },
+  {
+    nombre: 'Delete confirm', que: 'Un modal que confirma algo que no se puede deshacer',
+    crear: () => ({
+      nombre: 'Delete patient', contenedor: 'card', tituloPanel: '', ancho: 'angosto',
+      bloques: [
+        encabezado('Danger zone', 'Deleting a patient removes their records from this location.'),
+        { id: nuevoId(), tipo: 'modal', titulo: 'Delete Maria Abril Viola?', disparador: 'Delete patient', ancho: 'sm', confirmar: 'Delete patient', cancelar: 'Cancel', peligro: true, bloques: [
+          { id: nuevoId(), tipo: 'texto', texto: 'Their appointments, ledger and documents will be removed. This cannot be undone.', tono: 'normal' },
+        ] },
+      ],
+    }),
+  },
+  {
     nombre: 'Patient list', que: 'Una pantalla con encabezado, pestañas y tabla',
     crear: () => ({
       nombre: 'Patients screen', contenedor: 'page', tituloPanel: '', ancho: 'completo',
       bloques: [
-        { id: nuevoId(), tipo: 'encabezado', titulo: 'Patients', bajada: 'Everyone registered in this location.', accion: 'New patient', icono: 'Plus' },
+        encabezado('Patients', 'Everyone registered in this location.', 'New patient', 'Plus'),
         { id: nuevoId(), tipo: 'pestanas', tabs: 'All, Active, Inactive', size: 'md', fullWidth: false },
         { id: nuevoId(), tipo: 'tabla', columnas: ['patient', 'status', 'next', 'provider', 'balance'], filas: 8, buscador: true, seleccion: true, acciones: true, compacta: false, porPagina: 5 },
+      ],
+    }),
+  },
+  {
+    nombre: 'Dashboard', que: 'Números clave y las tareas del día',
+    crear: () => ({
+      nombre: 'Clinic overview', contenedor: 'page', tituloPanel: '', ancho: 'completo',
+      bloques: [
+        encabezado('Good morning, Julian', 'Here is what is happening today.'),
+        infoDe('stats').nuevo(),
+        { id: nuevoId(), tipo: 'seccion', titulo: 'Pending tasks', bloques: [{ id: nuevoId(), tipo: 'tareas', cantidad: 4 }] },
       ],
     }),
   },
@@ -515,21 +787,10 @@ export const PLANTILLAS: { nombre: string; que: string; crear: () => Diseno }[] 
     crear: () => ({
       nombre: 'Notification settings', contenedor: 'card', tituloPanel: '', ancho: 'angosto',
       bloques: [
-        { id: nuevoId(), tipo: 'encabezado', titulo: 'Notifications', bajada: 'What patients receive before a visit.', accion: '', icono: 'none' },
+        encabezado('Notifications', 'What patients receive before a visit.'),
         { id: nuevoId(), tipo: 'opciones', control: 'switch', items: [{ label: 'Email reminders', on: true }, { label: 'SMS confirmations', on: true }, { label: 'Online booking', on: false }] },
         { id: nuevoId(), tipo: 'divisor' },
         { id: nuevoId(), tipo: 'botones', alinear: 'fin', botones: [{ label: 'Save', variant: 'primary', size: 'md', icono: 'none' }] },
-      ],
-    }),
-  },
-  {
-    nombre: 'Today', que: 'Los turnos del día en un panel',
-    crear: () => ({
-      nombre: 'Today appointments', contenedor: 'panel', tituloPanel: 'Today Appointments', ancho: 'angosto',
-      bloques: [
-        { id: nuevoId(), tipo: 'pills', items: [{ label: '3 checked in', tone: 'success' }, { label: '1 no show', tone: 'warning' }] },
-        { id: nuevoId(), tipo: 'turnos', cantidad: 4 },
-        { id: nuevoId(), tipo: 'botones', alinear: 'inicio', botones: [{ label: 'View schedule', variant: 'link', size: 'md', icono: 'none' }] },
       ],
     }),
   },

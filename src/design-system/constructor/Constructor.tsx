@@ -10,8 +10,9 @@ import { cn } from '@/lib/utils'
 import { Enlace } from '../navegar'
 import { Sitio } from '../Sitio'
 import {
-  AGREGAR, ANCHOS, ICONOS, NOMBRE_COLUMNA, PLANTILLAS, TIPOS, VerDiseno, campo, generarCodigo, infoDe, nombreComponente, nuevoId,
-  type Bloque, type BloqueDe, type Campo, type ColumnaTabla, type Diseno, type NombreIcono, type TipoBloque,
+  AGREGAR, ANCHOS, ICONOS, NOMBRE_COLUMNA, PLANTILLAS, TIPOS, VerDiseno, VistaPrevia, campo, contiene, generarCodigo, infoDe,
+  nombreComponente, pestana as nuevaPestana, permitidos, reIdentificar,
+  type Bloque, type BloqueDe, type Campo, type ColumnaTabla, type Diseno, type Grupo, type IconoReal, type NombreIcono, type TipoBloque,
 } from './bloques'
 
 /* El constructor: cualquiera arma un componente con las piezas reales de la
@@ -130,9 +131,108 @@ function EditorCampo({ c, cambiar, quitar }: { c: Campo; cambiar: (x: Partial<Ca
   )
 }
 
-function Editor({ b, cambiar }: { b: Bloque; cambiar: (x: Partial<Bloque>) => void }) {
+type Ctx = { editando: string | null; setEditando: (id: string | null) => void }
+
+const OPC_ICONO_REAL = OPC_ICONO.filter((o) => o.value !== 'none') as { value: IconoReal; label: string }[]
+
+function Editor({ b, cambiar, ctx }: { b: Bloque; cambiar: (x: Partial<Bloque>) => void; ctx: Ctx }) {
   const c = cambiar as (x: object) => void
   switch (b.tipo) {
+    case 'modal':
+      return (
+        <>
+          <Texto label="Modal title" value={b.titulo} onChange={(v) => c({ titulo: v })} />
+          <div className="grid grid-cols-2 gap-2">
+            <Texto label="Button that opens it" value={b.disparador} onChange={(v) => c({ disparador: v })} />
+            <Elegir label="Width" value={b.ancho} opciones={[{ value: 'sm', label: 'Small · 480' }, { value: 'md', label: 'Medium · 640' }, { value: 'lg', label: 'Large · 860' }]} onChange={(v) => c({ ancho: v })} />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Texto label="Cancel" value={b.cancelar} onChange={(v) => c({ cancelar: v })} />
+            <Texto label="Confirm" value={b.confirmar} onChange={(v) => c({ confirmar: v })} />
+          </div>
+          <Llave label="Destructive (red confirm)" value={b.peligro} onChange={(v) => c({ peligro: v })} />
+          <Adentro titulo="Inside the modal" nota="Mientras lo editás, el modal queda abierto en el lienzo.">
+            <ListaBloques bloques={b.bloques} onChange={(x) => c({ bloques: x })} ctx={ctx} padre="modal" />
+          </Adentro>
+        </>
+      )
+    case 'seccion':
+      return (
+        <>
+          <Texto label="Section title" value={b.titulo} onChange={(v) => c({ titulo: v })} />
+          <Adentro titulo="Inside the section">
+            <ListaBloques bloques={b.bloques} onChange={(x) => c({ bloques: x })} ctx={ctx} padre="seccion" />
+          </Adentro>
+        </>
+      )
+    case 'pestanasContenido': {
+      const poner = (id: string, x: object) => c({ pestanas: b.pestanas.map((p) => (p.id === id ? { ...p, ...x } : p)) })
+      return (
+        <>
+          <div className="grid grid-cols-2 gap-2">
+            <Segmentos label="Size" value={b.size} opciones={[{ value: 'md', label: 'md' }, { value: 'sm', label: 'sm' }]} onChange={(v) => c({ size: v })} />
+            <div className="flex items-end pb-1.5"><Llave label="Full width" value={b.fullWidth} onChange={(v) => c({ fullWidth: v })} /></div>
+          </div>
+          {b.pestanas.map((p, i) => (
+            <div key={p.id} className="flex flex-col gap-2.5 rounded-lg border border-line-row bg-surface-subtle p-2.5">
+              <div className="flex items-end gap-2">
+                <div className="min-w-0 flex-1"><Texto label={`Tab ${i + 1}`} value={p.label} onChange={(v) => poner(p.id, { label: v })} /></div>
+                <Quitar onClick={() => c({ pestanas: b.pestanas.filter((x) => x.id !== p.id) })} label={`Remove ${p.label}`} />
+              </div>
+              <ListaBloques bloques={p.bloques} onChange={(x) => poner(p.id, { bloques: x })} ctx={ctx} padre="pestanasContenido" />
+            </div>
+          ))}
+          {b.pestanas.length < 6 && <Sumar onClick={() => c({ pestanas: [...b.pestanas, nuevaPestana(`Tab ${b.pestanas.length + 1}`)] })}>Add tab</Sumar>}
+        </>
+      )
+    }
+    case 'stats':
+      return (
+        <>
+          {b.items.map((x, i) => {
+            const poner = (y: object) => c({ items: b.items.map((z, k) => (k === i ? { ...z, ...y } : z)) })
+            return (
+              <div key={i} className="flex flex-col gap-2 rounded-lg border border-line-row bg-surface-subtle p-2.5">
+                <div className="flex items-end gap-2">
+                  <div className="min-w-0 flex-1"><Texto label={`Card ${i + 1}`} value={x.titulo} onChange={(v) => poner({ titulo: v })} /></div>
+                  <Quitar onClick={() => c({ items: b.items.filter((_, k) => k !== i) })} label={`Remove ${x.titulo}`} />
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <Texto label="Value" value={x.valor} onChange={(v) => poner({ valor: v })} />
+                  <Texto label="Change" value={x.delta} onChange={(v) => poner({ delta: v })} />
+                  <Elegir label="Icon" value={x.icono} opciones={OPC_ICONO_REAL} onChange={(v) => poner({ icono: v })} />
+                </div>
+              </div>
+            )
+          })}
+          {b.items.length < 4 && <Sumar onClick={() => c({ items: [...b.items, { titulo: 'New metric', valor: '0', delta: 'No change', icono: 'FileText' }] })}>Add card</Sumar>}
+        </>
+      )
+    case 'detalles':
+      return (
+        <>
+          <Texto label="Title" value={b.titulo} onChange={(v) => c({ titulo: v })} />
+          {b.items.map((x, i) => {
+            const poner = (y: object) => c({ items: b.items.map((z, k) => (k === i ? { ...z, ...y } : z)) })
+            return (
+              <div key={i} className="flex items-end gap-2">
+                <div className="w-[96px] shrink-0"><Elegir label="Icon" value={x.icono} opciones={OPC_ICONO_REAL} onChange={(v) => poner({ icono: v })} /></div>
+                <div className="min-w-0 flex-1"><Texto label="Label" value={x.label} onChange={(v) => poner({ label: v })} /></div>
+                <div className="min-w-0 flex-1"><Texto label="Value" value={x.valor} onChange={(v) => poner({ valor: v })} /></div>
+                <Quitar onClick={() => c({ items: b.items.filter((_, k) => k !== i) })} label={`Remove ${x.label}`} />
+              </div>
+            )
+          })}
+          <Sumar onClick={() => c({ items: [...b.items, { icono: 'FileText', label: 'Label', valor: 'Value' }] })}>Add row</Sumar>
+        </>
+      )
+    case 'tareas':
+      return (
+        <label className="flex flex-col gap-1">
+          <span className={ETIQUETA}>Tasks · {b.cantidad}</span>
+          <input type="range" min={1} max={4} value={b.cantidad} onChange={(e) => c({ cantidad: Number(e.target.value) })} className="accent-dash-blue" />
+        </label>
+      )
     case 'encabezado':
       return (
         <>
@@ -293,16 +393,132 @@ function resumen(b: Bloque) {
     case 'vacio': return b.titulo
     case 'opciones': return b.items.map((x) => x.label).join(' · ')
     case 'turnos': return `${b.cantidad} appointments`
+    case 'tareas': return `${b.cantidad} tasks`
+    case 'modal': return `${b.disparador} → ${b.titulo} · ${b.bloques.length} inside`
+    case 'seccion': return `${b.titulo} · ${b.bloques.length} inside`
+    case 'pestanasContenido': return b.pestanas.map((p) => p.label).join(' · ')
+    case 'stats': return b.items.map((x) => x.titulo).join(' · ')
+    case 'detalles': return b.titulo
     case 'divisor': return ''
   }
 }
 
-const copiarNuevo = (b: Bloque): Bloque => {
-  const c = JSON.parse(JSON.stringify(b)) as Bloque
-  c.id = nuevoId()
-  if (c.tipo === 'campos') c.campos = c.campos.map((f) => ({ ...f, id: nuevoId() }))
-  return c
+/* El recuadro de lo que va adentro de un bloque contenedor. */
+function Adentro({ titulo, nota, children }: { titulo: string; nota?: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2 border-l-2 border-dash-blue/25 pl-3">
+      <span className="flex flex-col">
+        <span className={ETIQUETA}>{titulo}</span>
+        {nota && <span className="text-[11.5px] text-ink-muted">{nota}</span>}
+      </span>
+      {children}
+    </div>
+  )
 }
+
+const GRUPOS: Grupo[] = ['Layout', 'Content', 'Data']
+
+/* Una lista de bloques: la del diseño y la de adentro de cada contenedor
+   (un modal, una sección, cada pestaña). Se suman, ordenan, duplican,
+   borran y editan igual en todos los niveles. */
+function ListaBloques({ bloques, onChange, ctx, padre, agregando: agregandoProp, setAgregando: setAgregandoProp }: {
+  bloques: Bloque[]
+  onChange: (b: Bloque[]) => void
+  ctx: Ctx
+  padre?: TipoBloque
+  agregando?: boolean
+  setAgregando?: (v: boolean) => void
+}) {
+  const [agregandoPropio, setAgregandoPropio] = useState(false)
+  const agregando = agregandoProp ?? agregandoPropio
+  const setAgregando = setAgregandoProp ?? setAgregandoPropio
+  const tipos = permitidos(padre)
+  const poner = (id: string, cambio: Partial<Bloque>) => onChange(bloques.map((b) => (b.id === id ? ({ ...b, ...cambio } as Bloque) : b)))
+  const mover = (i: number, paso: -1 | 1) => {
+    const j = i + paso
+    if (j < 0 || j >= bloques.length) return
+    const n = [...bloques]
+    ;[n[i], n[j]] = [n[j]!, n[i]!]
+    onChange(n)
+  }
+  const agregar = (t: TipoBloque) => {
+    const b = infoDe(t).nuevo()
+    onChange([...bloques, b])
+    ctx.setEditando(b.id)
+    setAgregando(false)
+  }
+  const chico = !!padre
+
+  return (
+    <div className="flex flex-col gap-2">
+      {bloques.length === 0 && <p className="m-0 text-[12.5px] text-ink-muted">{padre ? 'Vacío: sumá un bloque adentro.' : 'Todavía no hay bloques. Sumá el primero.'}</p>}
+      <ol className="m-0 flex list-none flex-col gap-2 p-0">
+        {bloques.map((b, i) => {
+          const info = infoDe(b.tipo)
+          const este = ctx.editando === b.id
+          const abiertoB = !!ctx.editando && contiene([b], ctx.editando)
+          return (
+            <li key={b.id} className={cn('rounded-xl border bg-white', este ? 'border-dash-blue/50 shadow-[0_0_0_3px_rgb(29_86_188/0.08)]' : 'border-line')}>
+              <div className="flex items-center gap-1 py-1.5 pr-1.5 pl-2.5">
+                <button type="button" onClick={() => ctx.setEditando(este ? null : b.id)} aria-expanded={abiertoB} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
+                  <span className={cn('flex shrink-0 items-center justify-center rounded-md', chico ? 'size-6' : 'size-7', abiertoB ? 'bg-dash-blue text-white' : 'bg-surface-slate text-ink-slate')}>
+                    <info.icono className="size-3.5" />
+                  </span>
+                  <span className="flex min-w-0 flex-col">
+                    <span className="text-[13px] font-semibold text-ink">{info.nombre}</span>
+                    {resumen(b) && <span className="truncate text-[12px] text-ink-muted">{resumen(b)}</span>}
+                  </span>
+                </button>
+                <button type="button" onClick={() => mover(i, -1)} disabled={i === 0} aria-label={`Move ${info.nombre} up`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted disabled:opacity-30"><ArrowUp className="size-3.5" /></button>
+                <button type="button" onClick={() => mover(i, 1)} disabled={i === bloques.length - 1} aria-label={`Move ${info.nombre} down`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted disabled:opacity-30"><ArrowDown className="size-3.5" /></button>
+                <button type="button" onClick={() => onChange([...bloques.slice(0, i + 1), reIdentificar(b), ...bloques.slice(i + 1)])} aria-label={`Duplicate ${info.nombre}`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"><CopyPlus className="size-3.5" /></button>
+                <button type="button" onClick={() => onChange(bloques.filter((y) => y.id !== b.id))} aria-label={`Delete ${info.nombre}`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-dash-bad-bg hover:text-dash-bad-fg"><Trash2 className="size-3.5" /></button>
+              </div>
+              {abiertoB && (
+                <div className="flex flex-col gap-3 border-t border-line-row px-3 pt-3 pb-3.5">
+                  <Editor b={b} cambiar={(x) => poner(b.id, x)} ctx={ctx} />
+                </div>
+              )}
+            </li>
+          )
+        })}
+      </ol>
+      {agregando ? (
+        <div className="flex flex-col gap-3 rounded-xl border border-dashed border-dash-blue/40 bg-info-bg/50 p-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[12.5px] font-semibold text-ink">{padre ? 'Add a block inside' : 'Add a block'}</span>
+            <button type="button" onClick={() => setAgregando(false)} aria-label="Close" className="flex size-6 items-center justify-center rounded-md text-ink-muted hover:bg-white"><X className="size-3.5" /></button>
+          </div>
+          {GRUPOS.map((g) => {
+            const deGrupo = TIPOS.filter((t) => t.grupo === g && tipos.includes(t.tipo))
+            if (!deGrupo.length) return null
+            return (
+              <div key={g} className="flex flex-col gap-1.5">
+                <span className="text-[11px] font-semibold tracking-[0.06em] text-ink-muted uppercase">{g}</span>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {deGrupo.map((t) => (
+                    <button key={t.tipo} type="button" onClick={() => agregar(t.tipo)} className="flex items-start gap-2 rounded-lg border border-line bg-white p-2 text-left hover:border-dash-blue">
+                      <t.icono className="mt-0.5 size-4 shrink-0 text-dash-blue" />
+                      <span className="flex min-w-0 flex-col">
+                        <span className="text-[12.5px] font-semibold text-ink">{t.nombre}</span>
+                        <span className="text-[11.5px] leading-snug text-ink-muted">{t.que}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      ) : (
+        <button type="button" onClick={() => setAgregando(true)} className={cn('flex items-center justify-center gap-1.5 rounded-xl border border-dashed border-line text-[13px] font-medium text-dash-blue hover:border-dash-blue hover:bg-info-bg/50', chico ? 'h-8' : 'h-10')}>
+          <Plus className="size-4" /> {padre ? 'Add block inside' : 'Add block'}
+        </button>
+      )}
+    </div>
+  )
+}
+
 
 /* ── La página ──────────────────────────────────────────────────────── */
 
@@ -313,6 +529,9 @@ export function Constructor() {
   const [editando, setEditando] = useState<string | null>(null)
   const [agregando, setAgregando] = useState(false)
   const [copiado, setCopiado] = useState(false)
+  /* El modal que se abrió tocando su botón en el lienzo. */
+  const [modalAbierto, setModalAbierto] = useState<string | null>(null)
+  const ctx: Ctx = { editando, setEditando }
   const codigo = useMemo(() => generarCodigo(d), [d])
 
   useEffect(() => {
@@ -340,22 +559,6 @@ export function Constructor() {
     setEditando(b.id)
   }, [])
 
-  const cambiar = (id: string, cambio: Partial<Bloque>) => setD((x) => ({ ...x, bloques: x.bloques.map((b) => (b.id === id ? ({ ...b, ...cambio } as Bloque) : b)) }))
-  const mover = (i: number, paso: -1 | 1) =>
-    setD((x) => {
-      const bloques = [...x.bloques]
-      const j = i + paso
-      if (j < 0 || j >= bloques.length) return x
-      ;[bloques[i], bloques[j]] = [bloques[j]!, bloques[i]!]
-      return { ...x, bloques }
-    })
-  const agregar = (t: TipoBloque) => {
-    const b = infoDe(t).nuevo()
-    setD((x) => ({ ...x, bloques: [...x.bloques, b] }))
-    setEditando(b.id)
-    setAgregando(false)
-  }
-
   const copiar = async () => {
     try {
       await navigator.clipboard.writeText(codigo)
@@ -377,7 +580,11 @@ export function Constructor() {
   return (
     <Sitio actual="builder--docs" lateral={false}>
       <div className="relative min-h-[calc(100vh-4rem)] bg-page-background [background-image:radial-gradient(color-mix(in_srgb,var(--color-ink)_10%,transparent)_1px,transparent_1px)] [background-size:18px_18px]">
-        <div className={cn('flex flex-col gap-8 px-5 pt-8 pb-[60vh] sm:px-8 lg:pb-24', abierto && (pestana === 'Code' ? 'lg:pr-[600px]' : 'lg:pr-[440px]'))}>
+        <div className={cn('px-5 pt-8 pb-[60vh] sm:px-8 lg:pb-24', abierto && (pestana === 'Code' ? 'lg:pr-[600px]' : 'lg:pr-[440px]'))}>
+        {/* El transform hace que los modales del lienzo (ModalShell es
+            position: fixed) se abran sobre el lienzo, centrados en el lugar
+            libre, y no sobre el panel. */}
+        <div className="flex min-h-[calc(100vh-7rem)] transform-gpu flex-col gap-8">
           <header className="flex flex-col gap-3">
             <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[14px]">
               <Enlace id="welcome--docs" className="text-dash-blue no-underline hover:underline">Home</Enlace>
@@ -398,7 +605,9 @@ export function Constructor() {
             <div className={cn(d.contenedor === 'page' && 'overflow-hidden rounded-xl border border-line bg-page-background')}>
               {d.bloques.length ? (
                 <MemoryRouter>
-                  <VerDiseno d={d} />
+                  <VistaPrevia.Provider value={{ editando, abierto: modalAbierto, setAbierto: setModalAbierto }}>
+                    <VerDiseno d={d} />
+                  </VistaPrevia.Provider>
                 </MemoryRouter>
               ) : (
                 <button
@@ -411,6 +620,7 @@ export function Constructor() {
               )}
             </div>
           </div>
+        </div>
         </div>
 
         {!abierto && (
@@ -471,7 +681,7 @@ export function Constructor() {
                           key={p.nombre}
                           type="button"
                           title={p.que}
-                          onClick={() => { setD(p.crear()); setEditando(null); setAgregando(false) }}
+                          onClick={() => { setD(p.crear()); setEditando(null); setAgregando(false); setModalAbierto(null) }}
                           className="inline-flex h-7 items-center rounded-full border border-line px-2.5 text-[12.5px] font-medium text-ink hover:border-dash-blue hover:text-dash-blue"
                         >
                           {p.nombre}
@@ -488,60 +698,7 @@ export function Constructor() {
 
                   <section className="flex flex-col gap-2">
                     <span className={ETIQUETA}>Blocks</span>
-                    {d.bloques.length === 0 && <p className="m-0 text-[13px] text-ink-muted">Todavía no hay bloques. Sumá el primero.</p>}
-                    <ol className="m-0 flex list-none flex-col gap-2 p-0">
-                      {d.bloques.map((b, i) => {
-                        const info = infoDe(b.tipo)
-                        const abiertoB = editando === b.id
-                        return (
-                          <li key={b.id} className={cn('rounded-xl border bg-white', abiertoB ? 'border-dash-blue/50 shadow-[0_0_0_3px_rgb(29_86_188/0.08)]' : 'border-line')}>
-                            <div className="flex items-center gap-1 py-1.5 pr-1.5 pl-2.5">
-                              <button type="button" onClick={() => setEditando(abiertoB ? null : b.id)} aria-expanded={abiertoB} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
-                                <span className={cn('flex size-7 shrink-0 items-center justify-center rounded-md', abiertoB ? 'bg-dash-blue text-white' : 'bg-surface-slate text-ink-slate')}>
-                                  <info.icono className="size-3.5" />
-                                </span>
-                                <span className="flex min-w-0 flex-col">
-                                  <span className="text-[13px] font-semibold text-ink">{info.nombre}</span>
-                                  {resumen(b) && <span className="truncate text-[12px] text-ink-muted">{resumen(b)}</span>}
-                                </span>
-                              </button>
-                              <button type="button" onClick={() => mover(i, -1)} disabled={i === 0} aria-label={`Move ${info.nombre} up`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted disabled:opacity-30"><ArrowUp className="size-3.5" /></button>
-                              <button type="button" onClick={() => mover(i, 1)} disabled={i === d.bloques.length - 1} aria-label={`Move ${info.nombre} down`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted disabled:opacity-30"><ArrowDown className="size-3.5" /></button>
-                              <button type="button" onClick={() => setD((x) => ({ ...x, bloques: [...x.bloques.slice(0, i + 1), copiarNuevo(b), ...x.bloques.slice(i + 1)] }))} aria-label={`Duplicate ${info.nombre}`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"><CopyPlus className="size-3.5" /></button>
-                              <button type="button" onClick={() => setD((x) => ({ ...x, bloques: x.bloques.filter((y) => y.id !== b.id) }))} aria-label={`Delete ${info.nombre}`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-dash-bad-bg hover:text-dash-bad-fg"><Trash2 className="size-3.5" /></button>
-                            </div>
-                            {abiertoB && (
-                              <div className="flex flex-col gap-3 border-t border-line-row px-3 pt-3 pb-3.5">
-                                <Editor b={b} cambiar={(x) => cambiar(b.id, x)} />
-                              </div>
-                            )}
-                          </li>
-                        )
-                      })}
-                    </ol>
-                    {agregando ? (
-                      <div className="flex flex-col gap-2 rounded-xl border border-dashed border-dash-blue/40 bg-info-bg/50 p-2.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[12.5px] font-semibold text-ink">Add a block</span>
-                          <button type="button" onClick={() => setAgregando(false)} aria-label="Close" className="flex size-6 items-center justify-center rounded-md text-ink-muted hover:bg-white"><X className="size-3.5" /></button>
-                        </div>
-                        <div className="grid grid-cols-2 gap-1.5">
-                          {TIPOS.map((t) => (
-                            <button key={t.tipo} type="button" onClick={() => agregar(t.tipo)} className="flex items-start gap-2 rounded-lg border border-line bg-white p-2 text-left hover:border-dash-blue">
-                              <t.icono className="mt-0.5 size-4 shrink-0 text-dash-blue" />
-                              <span className="flex min-w-0 flex-col">
-                                <span className="text-[12.5px] font-semibold text-ink">{t.nombre}</span>
-                                <span className="text-[11.5px] leading-snug text-ink-muted">{t.que}</span>
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <button type="button" onClick={() => setAgregando(true)} className="flex h-10 items-center justify-center gap-1.5 rounded-xl border border-dashed border-line text-[13px] font-medium text-dash-blue hover:border-dash-blue hover:bg-info-bg/50">
-                        <Plus className="size-4" /> Add block
-                      </button>
-                    )}
+                    <ListaBloques bloques={d.bloques} onChange={(bloques) => setD((x) => ({ ...x, bloques }))} ctx={ctx} agregando={agregando} setAgregando={setAgregando} />
                   </section>
                 </div>
               ) : (

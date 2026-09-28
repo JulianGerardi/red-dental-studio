@@ -18,8 +18,9 @@ export const SECCIONES: Seccion[] = ['Foundations', 'Elements', 'Components', 'P
 /* Las páginas de piezas que el constructor sabe armar: su botón flotante
    abre el constructor con ese bloque ya agregado. */
 const BLOQUE_DE_PAGINA: Record<string, TipoBloque> = {
-  Buttons: 'botones', Tabs: 'pestanas', Fields: 'campos', Pills: 'pills', Tables: 'tabla', 'Page header': 'encabezado',
+  Buttons: 'botones', Tabs: 'pestanasContenido', Fields: 'campos', Pills: 'pills', Tables: 'tabla', 'Page header': 'encabezado',
   'Appointment cards': 'turnos', EmptyState: 'vacio', Switch: 'opciones', Checkbox: 'opciones', DataTable: 'tabla',
+  Dialog: 'modal', Cards: 'seccion', StatCard: 'stats', PendingTaskCard: 'tareas', AppointmentCard: 'turnos',
 }
 export const idPortada = (s: Seccion) => `${s.toLowerCase()}-overview--docs`
 const APP = 'https://juliangerardi.github.io/red-dental-studio/'

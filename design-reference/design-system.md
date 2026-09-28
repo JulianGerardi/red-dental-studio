@@ -57,7 +57,15 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   muestra el resultado; un panel flotante al costado (abajo en el celular)
   tiene *Build* (puntos de partida, contenedor Card / Panel / Page, ancho,
   bloques que se suman, ordenan, duplican y editan) y *Code* (el TSX con sus
-  imports, para copiar). Cada bloque se dibuja y se escribe en el mismo lugar
+  imports, para copiar). Bloques: Layout (Modal con `ModalShell` y
+  `FormFooter`, Tabs with content, Section con `SectionCard`, Tabs), Content
+  (Heading, Text, Buttons, Fields, Switches, Pills, Empty state, Divider) y
+  Data (Table, Stats con `StatCard`, Details con `InfoBlock`, Appointments,
+  Tasks con `PendingTaskCard`). Modal, Section y cada pestaña tienen bloques
+  adentro (el panel los muestra anidados); un modal no va adentro de otro
+  bloque. En el lienzo el modal se abre sobre el lienzo (`transform-gpu`
+  contiene su `position: fixed`) y queda abierto mientras se edita algo de
+  adentro; la pestaña que se edita queda a la vista. Cada bloque se dibuja y se escribe en el mismo lugar
   (`constructor/bloques.tsx`: `VerBloque` y `codigoBloque`), así lo que se ve
   y lo que se copia no se separan. Lo armado queda en `localStorage`. En cada
   página hay un botón flotante: en la de una pieza que el constructor conoce
