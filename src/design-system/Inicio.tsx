@@ -46,9 +46,9 @@ export function Inicio() {
           </div>
           <div className="relative flex flex-col items-center gap-6 text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-dash-blue/20 bg-white/80 px-3 py-1 text-[12px] font-medium text-dash-blue">
-              <span className="size-1.5 rounded-full bg-green" /> El design system de Confidentally
+              <span className="size-1.5 rounded-full bg-green" /> Design system
             </span>
-            <h1 className="m-0 text-[56px] leading-none font-bold tracking-[-0.04em] text-ink sm:text-[76px]">Enamel</h1>
+            <h1 className="m-0 text-[44px] leading-[1.05] font-bold tracking-[-0.035em] text-balance text-ink sm:text-[64px]">Confidentally UI</h1>
             <p className="m-0 max-w-[56ch] text-[17px] leading-relaxed text-ink-medium">
               Cada botón, tabla y pantalla de la app, funcionando y explicado. Buscá lo que necesitás, tocá una pieza para abrirla o armá la tuya.
             </p>

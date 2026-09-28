@@ -27,7 +27,7 @@ export function Foco({ id, titulo, nombre, layout, children }: { id: string; tit
         <span className="truncate text-[14px] text-ink-muted">{nombre}</span>
         <Enlace id="welcome--docs" className="ml-auto flex items-center gap-2 text-[14px] font-semibold text-ink no-underline">
           <span className="flex size-6 items-center justify-center rounded-md bg-dash-blue text-white"><GalleryVerticalEnd className="size-3.5" /></span>
-          <span className="hidden sm:inline">Enamel</span>
+          <span className="hidden sm:inline">Confidentally UI</span>
         </Enlace>
       </header>
       <div className={cn('flex-1', layout === 'centered' && 'flex items-center justify-center p-6', layout === 'padded' && 'p-6', !layout && 'flex items-center justify-center p-6')}>

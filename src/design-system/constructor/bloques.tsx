@@ -26,7 +26,7 @@ import { cn } from '@/lib/utils'
 /* ── Modelo ─────────────────────────────────────────────────────────── */
 
 /* Llave con la que una página le pasa al constructor qué bloque sumar. */
-export const AGREGAR = 'enamel-builder-add'
+export const AGREGAR = 'confidentally-ui-builder-add'
 
 export const ICONOS = { none: null, Plus, Save, Download, Pencil, Trash2, Search, Send, CalendarDays, Users, FileText, Settings } as const
 export type NombreIcono = keyof typeof ICONOS

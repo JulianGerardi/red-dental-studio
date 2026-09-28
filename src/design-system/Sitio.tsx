@@ -129,8 +129,8 @@ export function Sitio({ actual, seccion, lateral = true, children }: { actual?: 
         </button>
         <Enlace id="welcome--docs" className="flex items-center gap-2.5 text-ink no-underline">
           <span className="flex size-8 items-center justify-center rounded-lg bg-dash-blue text-white"><GalleryVerticalEnd className="size-4" /></span>
-          <span className="text-[16px] font-bold tracking-[-0.01em]">Enamel</span>
-          <span className="hidden text-[14px] text-ink-muted sm:inline">Confidentally design system</span>
+          <span className="text-[16px] font-bold tracking-[-0.01em]">Confidentally UI</span>
+          <span className="hidden text-[14px] text-ink-muted sm:inline">Design system</span>
         </Enlace>
         <nav aria-label="Sections" className="ml-auto hidden items-center gap-1 lg:flex">
           {SECCIONES.map((s) => (

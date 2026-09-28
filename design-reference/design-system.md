@@ -37,7 +37,7 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   a la izquierda (con filtro, grupos plegables y el ítem actual marcado) y en
   celular un menú desplegable. Los links cambian de página sin recargar: le
   piden al Storybook que abra otra página (`navegar.tsx`). El design system
-  se llama **Enamel** (el esmalte: la capa visible del diente). Letra Inter,
+  se llama **Confidentally UI**. Letra Inter,
   la de la app.
 - **Welcome** (`Inicio.tsx`): título, el buscador grande (`Buscador.tsx` +
   `buscar.ts`: nombre, descripción, ejemplos y sinónimos en castellano),

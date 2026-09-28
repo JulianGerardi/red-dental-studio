@@ -19,7 +19,7 @@ import {
    flotante del costado tiene los bloques (Build) y el código (Code). Lo que
    se arma queda guardado en este navegador. */
 
-const GUARDADO = 'enamel-builder'
+const GUARDADO = 'confidentally-ui-builder'
 
 function cargar(): Diseno | null {
   try {

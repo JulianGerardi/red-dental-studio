@@ -11,7 +11,7 @@ const LOGO = `<svg xmlns="http://www.w3.org/2000/svg" width="208" height="40" vi
 
 export default create({
   base: 'light',
-  brandTitle: 'Enamel · Confidentally design system',
+  brandTitle: 'Confidentally UI',
   brandImage: `data:image/svg+xml;utf8,${encodeURIComponent(LOGO)}`,
   brandTarget: '_self',
 
