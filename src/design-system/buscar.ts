@@ -8,7 +8,17 @@ import { paginas, type Entrada } from './Mapa'
 
 const historias = import.meta.glob('/src/**/*.stories.tsx', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
 
-export type Seccion = 'Foundations' | 'Elements' | 'Components' | 'Pages' | 'Audit'
+export type Seccion = 'Foundations' | 'Elements' | 'Components' | 'Pages' | 'Audit' | 'Builder'
+
+/* Qué hay en cada sección, para las portadas y el buscador. */
+export const QUE_SECCION: Record<Seccion, string> = {
+  Foundations: 'Colores, tipografía, radios y sombras: los valores de los que sale todo lo demás.',
+  Elements: 'Las piezas estándar para armar pantallas, cada una con su Playground para probarla.',
+  Components: 'Cada pieza de cada módulo de la app (Dashboard, Patients, Scheduling, Clinical…), por separado.',
+  Pages: 'Las pantallas completas de la app, con sus rutas reales, y las partes de cada una.',
+  Audit: 'Lo que el código hace hoy y se aparta del estándar: colores sin token, estados, duplicados.',
+  Builder: 'Armá un componente con las piezas reales de la app y llevate su código.',
+}
 
 export type Pagina = {
   id: string
@@ -49,6 +59,7 @@ const SINONIMOS: Record<string, string[]> = {
   equipo: ['team', 'employees'], empleados: ['employees'], sede: ['locations'], sedes: ['locations'], consultorio: ['locations', 'operatory'],
   consentimiento: ['consent'], consentimientos: ['consent'], odontograma: ['dental', 'tooth'], diente: ['tooth'], dientes: ['tooth', 'dental'],
   receta: ['prescription'], recetas: ['prescription'], ayuda: ['help'], inicio: ['dashboard'], tablero: ['dashboard'],
+  armar: ['builder'], construir: ['builder'], constructor: ['builder'], crear: ['builder'], codigo: ['builder', 'code'], generar: ['builder'],
   foto: ['avatar'], avatar: ['avatar'], icono: ['icon'], iconos: ['icon'], medidas: ['specs'], tamanos: ['sizes'],
 }
 
@@ -87,7 +98,7 @@ export function armarIndice(entradas: Entrada[]): Pagina[] {
       titulo: partes[partes.length - 1] === 'Overview' ? partes[0]! : partes[partes.length - 1]!,
       seccion: partes[0] as Seccion,
       grupo: partes.length > 2 ? partes[1]! : '',
-      descripcion: descripcionDe(e.importPath),
+      descripcion: e.importPath.endsWith('.mdx') ? QUE_SECCION[partes[0] as Seccion] ?? '' : descripcionDe(e.importPath),
       ejemplos: ejemplosPorArchivo.get(e.importPath) ?? [],
     }
   })
@@ -114,7 +125,7 @@ function alternativas(palabra: string): string[] {
   return [...alts]
 }
 
-const PESO_SECCION: Record<Seccion, number> = { Elements: 8, Foundations: 6, Pages: 3, Components: 0, Audit: -4 }
+const PESO_SECCION: Record<Seccion, number> = { Builder: 10, Elements: 8, Foundations: 6, Pages: 3, Components: 0, Audit: -4 }
 
 export function buscar(indice: Pagina[], consulta: string, max = Infinity): Resultado[] {
   const palabras = normalizar(consulta).split(/[\s/,]+/).filter(Boolean)

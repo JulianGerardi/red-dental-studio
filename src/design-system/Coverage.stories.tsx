@@ -51,7 +51,7 @@ export const Cobertura: Story = {
           </div>
         </Seccion>
 
-        <Seccion titulo="UX bible" nota="Lo que tiene que tener cada página de componente: poder probarlo (Playground con controles) y explicar por qué es así (decisiones escritas en su código). Todas las páginas muestran además cómo se ve en celular, tablet y escritorio, y dónde se usa en la app.">
+        <Seccion titulo="Enamel checklist" nota="Lo que tiene que tener cada página de componente: poder probarlo (Playground con controles) y explicar por qué es así (decisiones escritas en su código). Todas las páginas muestran además cómo se ve en celular, tablet y escritorio, y dónde se usa en la app.">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Cifra n={c.biblia.total - c.biblia.sinPlayground.length} de={c.biblia.total} titulo="With a Playground to try it" nota="Un Playground propio o controles en su página, o una página de Elements que lo documenta" ok={c.biblia.sinPlayground.length === 0} />
             <Cifra n={c.biblia.total - c.biblia.sinDecisiones.length} de={c.biblia.total} titulo="With design decisions in code" nota="Comentarios que explican por qué" ok={c.biblia.sinDecisiones.length === 0} />

@@ -1,6 +1,5 @@
 import { ChevronRight } from 'lucide-react'
-import type { Pagina, Seccion } from './buscar'
-import { QUE_SECCION } from './Inicio'
+import { QUE_SECCION, type Pagina, type Seccion } from './buscar'
 import { Enlace } from './navegar'
 import { PIEZAS, TarjetaPieza } from './piezas'
 import { Sitio, idPortada, useIndiceSitio } from './Sitio'

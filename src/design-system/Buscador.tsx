@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { ClipboardCheck, CornerDownLeft, LayoutTemplate, MonitorSmartphone, Palette, Puzzle, Search, X, type LucideIcon } from 'lucide-react'
+import { Blocks, ClipboardCheck, CornerDownLeft, LayoutTemplate, MonitorSmartphone, Palette, Puzzle, Search, X, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { buscar, normalizar, type Pagina, type Resultado, type Seccion } from './buscar'
 import { Enlace, ir } from './navegar'
@@ -14,6 +14,7 @@ export const ICONO_SECCION: Record<Seccion, LucideIcon> = {
   Components: Puzzle,
   Pages: MonitorSmartphone,
   Audit: ClipboardCheck,
+  Builder: Blocks,
 }
 
 /* Marca en el texto lo que coincide con la búsqueda. */
@@ -77,10 +78,10 @@ export function Buscador({ indice, grande, autoFocus, className }: { indice: Pag
       <div
         className={cn(
           'flex items-center border border-line bg-white transition-[border-radius]',
-          'focus-within:border-dash-blue focus-within:ring-dash-blue/15',
+          'focus-within:border-dash-blue',
           grande
-            ? cn('h-14 gap-3 px-5 shadow-[0_1px_6px_rgb(9_9_11/0.08)] focus-within:ring-4', abierto ? 'rounded-t-[28px] rounded-b-none' : 'rounded-full')
-            : 'h-8 gap-2 rounded-md px-2.5 focus-within:ring-2',
+            ? cn('h-14 gap-3 px-5 shadow-[0_10px_30px_-12px_rgb(29_86_188/0.35)] focus-within:ring-4 focus-within:ring-dash-blue/10', abierto ? 'rounded-t-[28px] rounded-b-none' : 'rounded-full')
+            : 'h-8 gap-2 rounded-md px-2.5 focus-within:ring-2 focus-within:ring-dash-blue/15',
         )}
       >
         <Search className={cn('shrink-0', grande ? 'size-5 text-dash-blue' : 'size-4 text-ink-muted')} aria-hidden />
@@ -116,7 +117,7 @@ export function Buscador({ indice, grande, autoFocus, className }: { indice: Pag
           className={cn(
             'absolute z-40 overflow-hidden bg-white text-left',
             grande
-              ? 'inset-x-0 top-full rounded-b-[28px] border border-t-0 border-dash-blue pb-2 shadow-[0_24px_48px_-16px_rgb(9_9_11/0.25)] ring-4 ring-dash-blue/15'
+              ? 'inset-x-0 top-full rounded-b-[28px] border border-t-0 border-dash-blue pb-2 shadow-[0_24px_48px_-16px_rgb(9_9_11/0.25)] ring-4 ring-dash-blue/10'
               : 'top-[calc(100%+6px)] right-0 w-[min(440px,calc(100vw-32px))] rounded-xl border border-line py-1.5 shadow-[0_16px_40px_-12px_rgb(9_9_11/0.3)]',
           )}
         >

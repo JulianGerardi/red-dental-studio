@@ -35,9 +35,10 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   abajo se oculta en `manager-head.html`). El sitio pone su barra de arriba
   (logo, las cinco secciones, buscador, "Open the app"), el menú de la sección
   a la izquierda (con filtro, grupos plegables y el ítem actual marcado) y en
-  celular un menú desplegable. Letra Mona Sans (`preview-head.html`); las
-  muestras siguen en Inter. Los links cambian de página sin recargar: le
-  piden al Storybook que abra otra página (`navegar.tsx`).
+  celular un menú desplegable. Los links cambian de página sin recargar: le
+  piden al Storybook que abra otra página (`navegar.tsx`). El design system
+  se llama **Enamel** (el esmalte: la capa visible del diente). Letra Inter,
+  la de la app.
 - **Welcome** (`Inicio.tsx`): título, el buscador grande (`Buscador.tsx` +
   `buscar.ts`: nombre, descripción, ejemplos y sinónimos en castellano),
   *Explorá tocando* (`piezas.tsx`: 18 piezas reales, 7 a la vista y *View
@@ -51,6 +52,17 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   índice *On this page*. Foundations y Audit ahora también tienen página: su
   historia se muestra sin marco (`.ds-informe`) y `Page.tsx` deja el título
   al sitio.
+- **Builder** (`constructor/Constructor.tsx`, `portadas/Builder.mdx`): arma
+  un componente con las piezas reales de la app y da su código. El lienzo
+  muestra el resultado; un panel flotante al costado (abajo en el celular)
+  tiene *Build* (puntos de partida, contenedor Card / Panel / Page, ancho,
+  bloques que se suman, ordenan, duplican y editan) y *Code* (el TSX con sus
+  imports, para copiar). Cada bloque se dibuja y se escribe en el mismo lugar
+  (`constructor/bloques.tsx`: `VerBloque` y `codigoBloque`), así lo que se ve
+  y lo que se copia no se separan. Lo armado queda en `localStorage`. En cada
+  página hay un botón flotante: en la de una pieza que el constructor conoce
+  dice "Build with …" y la agrega. Si se suma un bloque nuevo, generar el
+  código de todos los puntos de partida y compilarlo (se probó con `tsc`).
 - **Una historia sola** (Full screen, una pantalla de Pages): barra fina para
   volver (`Foco.tsx`, decorador en `preview.tsx`) y el panel de Controls.
 - **Elements**: las piezas estándar para armar pantallas. Cada una es un

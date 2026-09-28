@@ -72,7 +72,7 @@ export const PIEZAS: Pieza[] = [
   },
   {
     titulo: 'Tabs', seccion: 'Elements', que: 'Cambiar de vista dentro de un mismo bloque.',
-    muestra: <Tabs tabs={['Findings', 'Diagnostics', 'Notes']} value="Findings" onChange={() => {}} aria-label="Example" />,
+    muestra: <Tabs tabs={['Findings', 'Diagnostics']} value="Findings" onChange={() => {}} aria-label="Example" />,
   },
   {
     titulo: 'Pills', seccion: 'Elements', que: 'El estado de algo, con seis tonos para toda la app.',

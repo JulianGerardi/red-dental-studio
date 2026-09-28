@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react'
-import { ChevronRight, Layers, Lightbulb, SlidersHorizontal, type LucideIcon } from 'lucide-react'
+import { Blocks, ChevronRight, Layers, Lightbulb, SlidersHorizontal, type LucideIcon } from 'lucide-react'
 import { ICONO_SECCION, Buscador } from './Buscador'
-import type { Seccion } from './buscar'
+import { QUE_SECCION, type Seccion } from './buscar'
 import { useIndice } from './Mapa'
 import { Enlace } from './navegar'
 import { Vitrina } from './piezas'
@@ -11,13 +11,6 @@ import { SECCIONES, Sitio, idPortada, useIndiceSitio } from './Sitio'
    blanco, un título grande, el buscador (lo primero que se usa), la vitrina
    de piezas reales y las secciones en tarjetas con "Learn more". */
 
-export const QUE_SECCION: Record<Seccion, string> = {
-  Foundations: 'Colores, tipografía, radios y sombras: los valores de los que sale todo lo demás.',
-  Elements: 'Las piezas estándar para armar pantallas, cada una con su Playground para probarla.',
-  Components: 'Cada pieza de cada módulo de la app (Dashboard, Patients, Scheduling, Clinical…), por separado.',
-  Pages: 'Las pantallas completas de la app, con sus rutas reales, y las partes de cada una.',
-  Audit: 'Lo que el código hace hoy y se aparta del estándar: colores sin token, estados, duplicados.',
-}
 
 const PARA_EMPEZAR = ['Buttons', 'Tables', 'Fields', 'Patient menu', 'Appointment cards', 'Colors']
 
@@ -44,35 +37,79 @@ export function Inicio() {
 
   return (
     <Sitio actual="welcome--docs" lateral={false}>
-      <div className="mx-auto flex max-w-[1180px] flex-col gap-20 px-5 pt-16 pb-24 sm:px-8">
+      <div className="mx-auto flex max-w-[1180px] flex-col gap-16 px-5 pt-10 pb-24 sm:px-8">
         {/* Portada: el buscador es lo primero y lo más grande. */}
-        <section className="flex flex-col items-center gap-6 text-center">
-          <h1 className="m-0 max-w-[18ch] text-[40px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance text-ink sm:text-[56px]">
-            La biblia del UX de Confidentally
-          </h1>
-          <p className="m-0 max-w-[58ch] text-[18px] leading-relaxed text-ink-muted">
-            Cada botón, tabla y pantalla de la app, funcionando y explicado. Buscá lo que necesitás o tocá una pieza para abrirla.
-          </p>
-          <Buscador indice={indice} grande autoFocus className="mt-2" />
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <span className="text-[13px] text-ink-muted">Para empezar:</span>
-            {PARA_EMPEZAR.map((t) => {
-              const p = indice?.find((x) => x.titulo === t)
-              return p ? (
-                <Enlace key={t} id={p.id} className="inline-flex h-8 items-center rounded-full border border-line bg-white px-3 text-[13px] font-medium text-ink no-underline transition-colors hover:border-dash-blue hover:text-dash-blue">
-                  {t}
-                </Enlace>
-              ) : null
-            })}
+        <section className="relative -mx-2 rounded-3xl border border-line-row px-6 pt-14 pb-12 sm:px-10">
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_70%_at_50%_0%,var(--color-brand-tint)_0%,var(--color-info-bg)_45%,white_80%)]" />
+            <div className="absolute inset-0 [background-image:linear-gradient(color-mix(in_srgb,var(--color-dash-blue)_6%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_srgb,var(--color-dash-blue)_6%,transparent)_1px,transparent_1px)] [background-size:28px_28px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_20%,#000_20%,transparent_75%)]" />
           </div>
-          <p className="m-0 min-h-5 text-[13px] text-ink-muted tabular-nums">
-            {indice && (
-              <>
-                <b className="font-semibold text-ink">{cuenta('Components') + cuenta('Elements')}</b> piezas · <b className="font-semibold text-ink">{indice.filter((p) => p.grupo === 'Screens').length}</b> pantallas · <b className="font-semibold text-ink">{ejemplos}</b> ejemplos en vivo, leídos del mismo código que la app.
-              </>
-            )}
-          </p>
+          <div className="relative flex flex-col items-center gap-6 text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-dash-blue/20 bg-white/80 px-3 py-1 text-[12px] font-medium text-dash-blue">
+              <span className="size-1.5 rounded-full bg-green" /> El design system de Confidentally
+            </span>
+            <h1 className="m-0 text-[56px] leading-none font-bold tracking-[-0.04em] text-ink sm:text-[76px]">Enamel</h1>
+            <p className="m-0 max-w-[56ch] text-[17px] leading-relaxed text-ink-medium">
+              Cada botón, tabla y pantalla de la app, funcionando y explicado. Buscá lo que necesitás, tocá una pieza para abrirla o armá la tuya.
+            </p>
+            <Buscador indice={indice} grande autoFocus />
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <span className="text-[12.5px] text-ink-muted">Para empezar:</span>
+              {PARA_EMPEZAR.map((t) => {
+                const p = indice?.find((x) => x.titulo === t)
+                return p ? (
+                  <Enlace key={t} id={p.id} className="inline-flex h-8 items-center rounded-full border border-line bg-white px-3 text-[13px] font-medium text-ink no-underline transition-colors hover:border-dash-blue hover:text-dash-blue">
+                    {t}
+                  </Enlace>
+                ) : null
+              })}
+            </div>
+            <p className="m-0 min-h-5 text-[12.5px] text-ink-muted tabular-nums">
+              {indice && (
+                <>
+                  <b className="font-semibold text-ink">{cuenta('Components') + cuenta('Elements')}</b> piezas · <b className="font-semibold text-ink">{indice.filter((p) => p.grupo === 'Screens').length}</b> pantallas · <b className="font-semibold text-ink">{ejemplos}</b> ejemplos en vivo, leídos del mismo código que la app.
+                </>
+              )}
+            </p>
+          </div>
         </section>
+
+        {/* El constructor, la invitación más grande después del buscador. */}
+        <Enlace id="builder--docs" className="group relative flex flex-col gap-6 overflow-hidden rounded-3xl bg-ink p-8 text-white no-underline sm:p-10 lg:flex-row lg:items-center">
+          <div className="flex flex-1 flex-col gap-3">
+            <span className="inline-flex items-center gap-2 self-start rounded-full bg-white/10 px-3 py-1 text-[12px] font-medium text-white/90">
+              <Blocks className="size-3.5" /> Builder
+            </span>
+            <span className="text-[30px] leading-tight font-bold tracking-[-0.02em] sm:text-[36px]">Armá tu propio componente</span>
+            <span className="max-w-[52ch] text-[15px] leading-relaxed text-white/70">
+              Sumá bloques (encabezado, campos, tabla, botones…), cambiá cada uno y mirá cómo queda. El código sale solo, listo para copiar, con los componentes reales de la app.
+            </span>
+            <span className="mt-2 inline-flex items-center gap-1.5 self-start rounded-md bg-white px-4 py-2 text-[14px] font-semibold text-ink transition-transform group-hover:translate-x-0.5">
+              Open builder <ChevronRight className="size-4" />
+            </span>
+          </div>
+          <div aria-hidden className="relative hidden w-[420px] shrink-0 lg:block">
+            <div className="rounded-xl bg-white p-4 text-ink shadow-2xl">
+              <p className="m-0 text-[13px] font-semibold">Clinic details</p>
+              <p className="m-0 mt-0.5 text-[12px] text-ink-muted">Name and contact shown to patients.</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {['Clinic name', 'Phone'].map((x) => (
+                  <span key={x} className="flex flex-col gap-1 text-[11px] font-medium">{x}<span className="h-7 rounded-md border border-line" /></span>
+                ))}
+              </div>
+              <div className="mt-3 flex justify-end gap-1.5">
+                <span className="rounded-md border border-line px-2.5 py-1 text-[11px]">Cancel</span>
+                <span className="rounded-md bg-dash-blue px-2.5 py-1 text-[11px] text-white">Save changes</span>
+              </div>
+            </div>
+            <div className="absolute -right-3 -bottom-6 w-[230px] rounded-xl border border-white/10 bg-[color-mix(in_srgb,var(--color-ink)_92%,white)] p-3 font-mono text-[10.5px] leading-relaxed text-white/80 shadow-2xl">
+              <span className="text-[color-mix(in_srgb,var(--color-dash-blue)_45%,white)]">{'<Card>'}</span><br />
+              {'  '}<span className="text-[color-mix(in_srgb,var(--color-dash-blue)_45%,white)]">{'<CardTitle>'}</span>Clinic details…<br />
+              {'  '}<span className="text-[color-mix(in_srgb,var(--color-dash-blue)_45%,white)]">{'<TextField'}</span> label=&quot;Phone&quot; /&gt;<br />
+              <span className="text-[color-mix(in_srgb,var(--color-dash-blue)_45%,white)]">{'</Card>'}</span>
+            </div>
+          </div>
+        </Enlace>
 
         <section className="flex flex-col gap-8">
           <Titulo nota="Piezas reales de la app. Tocá cualquiera para abrir su página.">Explorá tocando</Titulo>
