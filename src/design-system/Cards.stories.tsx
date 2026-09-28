@@ -4,7 +4,6 @@ import { PaginaDeRecetas, meta as datos, recetas, type Receta } from './Recipes'
 
 const meta = {
   title: 'Audit/Cards in code',
-  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta
 

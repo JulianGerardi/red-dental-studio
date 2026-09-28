@@ -4,7 +4,6 @@ import { Codigo, Page, Seccion } from './Page'
 
 const meta = {
   title: 'Audit/Colors in code',
-  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta
 

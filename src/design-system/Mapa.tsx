@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
+import { Enlace } from './navegar'
 
 /* Mapa del design system: todo lo que hay, agrupado como en el menú de la
    izquierda, con un link a cada página. Se arma leyendo index.json -el índice
@@ -33,7 +34,7 @@ export function useIndice() {
 export const hrefDe = (e: Pick<Entrada, 'id' | 'type'>) => `./?path=/${e.type === 'docs' ? 'docs' : 'story'}/${e.id}`
 
 export function IrA({ entrada, children, className }: { entrada: Pick<Entrada, 'id' | 'type'>; children: React.ReactNode; className?: string }) {
-  return <a href={hrefDe(entrada)} target="_top" className={className ?? 'text-dash-blue hover:underline'}>{children}</a>
+  return <Enlace id={entrada.id} className={className ?? 'text-dash-blue hover:underline'}>{children}</Enlace>
 }
 
 /* Una página por título: la de docs si existe, si no la primera story. */

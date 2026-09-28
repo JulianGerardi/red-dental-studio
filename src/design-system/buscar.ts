@@ -1,5 +1,5 @@
 import { componentes, comentarioDe } from './catalog'
-import { hrefDe, paginas, type Entrada } from './Mapa'
+import { paginas, type Entrada } from './Mapa'
 
 /* El buscador de la portada. Busca en todas las páginas del design system
    por nombre, por lo que dicen (su descripción) y por el nombre de sus
@@ -12,17 +12,16 @@ export type Seccion = 'Foundations' | 'Elements' | 'Components' | 'Pages' | 'Aud
 
 export type Pagina = {
   id: string
-  href: string
   titulo: string
   seccion: Seccion
   /** Módulo o grupo: Dashboard, Scheduling, Screens… */
   grupo: string
   descripcion: string
-  /** Nombres de sus ejemplos, con el link a cada uno. */
-  ejemplos: { nombre: string; href: string }[]
+  /** Sus ejemplos (stories), con el id de cada uno. */
+  ejemplos: { nombre: string; id: string }[]
 }
 
-export type Resultado = Pagina & { puntos: number; ejemplo?: { nombre: string; href: string } }
+export type Resultado = Pagina & { puntos: number; ejemplo?: { nombre: string; id: string } }
 
 /* Castellano → cómo se llama en el design system. */
 const SINONIMOS: Record<string, string[]> = {
@@ -75,17 +74,17 @@ function descripcionDe(importPath: string): string {
 }
 
 export function armarIndice(entradas: Entrada[]): Pagina[] {
-  const ejemplosPorArchivo = new Map<string, { nombre: string; href: string }[]>()
+  const ejemplosPorArchivo = new Map<string, { nombre: string; id: string }[]>()
   for (const e of entradas) {
     if (e.type !== 'story') continue
-    ejemplosPorArchivo.set(e.importPath, [...(ejemplosPorArchivo.get(e.importPath) ?? []), { nombre: e.name, href: hrefDe(e) }])
+    ejemplosPorArchivo.set(e.importPath, [...(ejemplosPorArchivo.get(e.importPath) ?? []), { nombre: e.name, id: e.id }])
   }
   const normales = paginas(entradas.filter((e) => e.title !== 'Pages' && e.title !== 'Welcome')).map((e): Pagina => {
     const partes = e.title.split('/')
     return {
       id: e.id,
-      href: hrefDe(e),
-      titulo: partes[partes.length - 1]!,
+      /* La portada de una sección se busca por el nombre de la sección. */
+      titulo: partes[partes.length - 1] === 'Overview' ? partes[0]! : partes[partes.length - 1]!,
       seccion: partes[0] as Seccion,
       grupo: partes.length > 2 ? partes[1]! : '',
       descripcion: descripcionDe(e.importPath),
@@ -97,7 +96,6 @@ export function armarIndice(entradas: Entrada[]): Pagina[] {
     .filter((e) => e.title === 'Pages' && e.type === 'story')
     .map((e): Pagina => ({
       id: e.id,
-      href: hrefDe(e),
       titulo: e.name,
       seccion: 'Pages',
       grupo: 'Screens',

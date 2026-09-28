@@ -5,7 +5,6 @@ import { ColoresEnUso, EstadosDeLaApp, TamanosEnUso, TodoLoEncontrado } from './
 
 const meta_ = {
   title: 'Audit/Buttons in code',
-  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta
 

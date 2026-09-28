@@ -7,7 +7,6 @@ import { Codigo, Page, Seccion } from './Page'
    mismo estado dibujado de cinco maneras distintas se ve acá, en la tabla. */
 const meta = {
   title: 'Audit/States in code',
-  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false }, pseudo: {} },
 } satisfies Meta
 

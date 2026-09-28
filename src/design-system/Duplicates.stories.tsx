@@ -27,7 +27,6 @@ import { Codigo, Page, Seccion } from './Page'
    fondo), así las diferencias salen del DOM y no de una descripción. */
 const meta = {
   title: 'Audit/Duplicates',
-  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta
 

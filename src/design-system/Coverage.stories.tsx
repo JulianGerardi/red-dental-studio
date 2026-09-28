@@ -7,7 +7,6 @@ import { Codigo, Page, Seccion } from './Page'
    medir: si algo falta, acá aparece en rojo. */
 const meta = {
   title: 'Audit/Documentation coverage',
-  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta
 

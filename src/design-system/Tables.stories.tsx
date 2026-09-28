@@ -38,7 +38,6 @@ const DEL_CODIGO: [string, RegExp][] = [
 
 const meta = {
   title: 'Audit/Tables in the app',
-  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta
 

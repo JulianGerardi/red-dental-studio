@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/toaster'
 import { DocsPage } from '../src/design-system/DocsPage'
+import { Foco } from '../src/design-system/Foco'
 import theme from './theme'
 import '../src/index.css'
 import '../src/design-system/docs.css'
@@ -11,14 +12,16 @@ const preview: Preview = {
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
-    docs: { page: DocsPage, theme },
+    /* Los ejemplos sin la barra de zoom del Storybook: el sitio tiene su
+       propia estética (ver src/design-system/Sitio.tsx). */
+    docs: { page: DocsPage, theme, canvas: { withToolbar: false } },
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
     options: {
       /* El panel de Controls a la vista: es donde se personaliza cada
          elemento. Las páginas de Audit, que no tienen controles, lo ocultan. */
       showPanel: true,
       storySort: {
-        order: ['Welcome', 'Foundations', ['Colors', 'Typography', 'Radius and shadows'], 'Elements', ['Page header', 'Buttons', 'Fields', 'Tabs', 'Pills', 'Cards', 'Appointment cards', 'Tables', 'Navigation', 'Patient menu'], 'Components', 'Pages', 'Audit'],
+        order: ['Welcome', 'Foundations', ['Overview', 'Colors', 'Typography', 'Radius and shadows'], 'Elements', ['Overview', 'Page header', 'Buttons', 'Fields', 'Tabs', 'Pills', 'Cards', 'Appointment cards', 'Tables', 'Navigation', 'Patient menu'], 'Components', ['Overview'], 'Pages', ['Overview'], 'Audit', ['Overview']],
       },
     },
   },
@@ -35,6 +38,17 @@ const preview: Preview = {
             <Toaster />
           </TooltipProvider>
         </MemoryRouter>
+      ),
+    /* Una historia abierta sola (Full screen, una pantalla de Pages): con la
+       barra del sitio para volver. No en los docs ni en las vistas de
+       dispositivo, que son iframes adentro de otro. */
+    (Story, ctx) =>
+      ctx.viewMode === 'story' && window.parent !== window && window.parent === window.top ? (
+        <Foco id={ctx.id} titulo={ctx.title} nombre={ctx.name} layout={ctx.parameters.layout}>
+          <Story />
+        </Foco>
+      ) : (
+        <Story />
       ),
   ],
 }

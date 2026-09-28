@@ -5,7 +5,6 @@ import { ColoresEnUso, EstadosDeLaApp, ROLES_COLOR, TamanosEnUso, TodoLoEncontra
 
 const meta = {
   title: 'Audit/Fields in code',
-  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta
 

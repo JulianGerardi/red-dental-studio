@@ -28,24 +28,31 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
 - **Welcome**: qué es, cómo está ordenado y cómo probar un elemento.
 - **Foundations**: Colors, Typography, Radius and shadows. Todo calculado
   leyendo `src/index.css`.
-- **Welcome** es la portada (`src/design-system/Inicio.tsx`): un buscador
-  grande, estilo Google, que busca en todas las páginas por nombre, por su
-  descripción y por el nombre de sus ejemplos, y entiende castellano
-  ("botón", "turno", "pestañas", "deshabilitado" → Buttons, Appointment cards,
-  Tabs, los ejemplos Disabled). El índice y los sinónimos están en
-  `src/design-system/buscar.ts`. Debajo: *Explorá tocando* (piezas reales de la
-  app que abren su página), las secciones con su cantidad, cómo se lee una
-  página y el mapa completo (`Mapa.tsx`, armado con `index.json`).
-- **Página de cada componente** (`DocsPage.tsx`), armada como las de Primer:
-  rastro, nombre, una frase de qué es (el primer párrafo de la descripción o
-  del comentario del componente), chips (Playground, cantidad de ejemplos,
-  dónde se usa, decisiones, abrir a pantalla completa, código en GitHub) y
-  tres pestañas: **Overview** (Playground con Controls y los ejemplos),
-  **Guidelines** (por qué es así, en cada dispositivo, dónde se usa) y
-  **Code** (cómo importarlo, su código y el de sus stories). A la derecha, un
-  índice *On this page* de la pestaña abierta. Estilos de ancho en
-  `src/design-system/docs.css`; lo propio lleva `sb-unstyled` para que
-  Storybook no le ponga sus estilos de texto.
+- **El sitio** (`src/design-system/Sitio.tsx`): el design system se ve como
+  un sitio de documentación con la estética de primer.style, no como
+  Storybook. `.storybook/manager.ts` oculta el menú, la barra de herramientas
+  y el panel de Storybook (`layoutCustomisations`; en celular, la barra de
+  abajo se oculta en `manager-head.html`). El sitio pone su barra de arriba
+  (logo, las cinco secciones, buscador, "Open the app"), el menú de la sección
+  a la izquierda (con filtro, grupos plegables y el ítem actual marcado) y en
+  celular un menú desplegable. Letra Mona Sans (`preview-head.html`); las
+  muestras siguen en Inter. Los links cambian de página sin recargar: le
+  piden al Storybook que abra otra página (`navegar.tsx`).
+- **Welcome** (`Inicio.tsx`): título, el buscador grande (`Buscador.tsx` +
+  `buscar.ts`: nombre, descripción, ejemplos y sinónimos en castellano),
+  *Explorá tocando* (`piezas.tsx`: 18 piezas reales, 7 a la vista y *View
+  more*), las secciones en tarjetas con *Learn more* y cómo se lee una página.
+- **Portada de cada sección** (`PortadaSeccion.tsx`, `portadas/*.mdx`,
+  título `<Sección>/Overview`): una tarjeta por página, con su muestra si la
+  tiene; Components y Pages agrupados por módulo.
+- **Página de cada componente** (`DocsPage.tsx`): rastro, nombre, una frase,
+  pestañas subrayadas **Overview / Guidelines / Code**, tres tarjetas de
+  estado (Component: Ready si tiene Playground y decisiones; Usage; Design) e
+  índice *On this page*. Foundations y Audit ahora también tienen página: su
+  historia se muestra sin marco (`.ds-informe`) y `Page.tsx` deja el título
+  al sitio.
+- **Una historia sola** (Full screen, una pantalla de Pages): barra fina para
+  volver (`Foco.tsx`, decorador en `preview.tsx`) y el panel de Controls.
 - **Elements**: las piezas estándar para armar pantallas. Cada una es un
   componente real de la app y su página tiene el mismo orden: **Playground**
   (se personaliza desde el panel *Controls*; *Show code* da el código),

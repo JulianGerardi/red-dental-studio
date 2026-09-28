@@ -12,4 +12,7 @@
   #storybook-sidebar-region a img { height: 40px; width: auto; max-width: 100%; }
   /* La lista de "primeros pasos" de Storybook no aporta acá. */
   #storybook-checklist-widget { display: none; }
+  /* En el celular Storybook agrega una barra abajo para abrir su menú: el
+     sitio tiene el suyo (Sitio.tsx), así que no se muestra. */
+  #root > div > section:has(.sb-bar) { display: none !important; }
 </style>

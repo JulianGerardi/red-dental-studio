@@ -6,7 +6,6 @@ import { IrA, paginaDeArchivo, useIndice } from './Mapa'
 
 const meta = {
   title: 'Components/Catalog',
-  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta
 

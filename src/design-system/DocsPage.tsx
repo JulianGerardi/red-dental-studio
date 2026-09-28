@@ -1,21 +1,21 @@
 import { useContext, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
-import { Controls, DocsContext, Markdown, Primary, Source, Stories } from '@storybook/addon-docs/blocks'
-import {
-  BookOpen, ClipboardCheck, Code2, ExternalLink, LayoutTemplate, Lightbulb, MonitorSmartphone, Palette, Puzzle,
-  SlidersHorizontal, type LucideIcon,
-} from 'lucide-react'
-import { Tabs } from '@/components/ui/tabs'
+import { Controls, DocsContext, Markdown, Primary, Source, Stories, Story } from '@storybook/addon-docs/blocks'
+import { Lightbulb, Puzzle, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { Seccion as NombreSeccion } from './buscar'
 import { comentarioDe, componentes } from './catalog'
 import { Decisiones, useDecisiones } from './decisiones'
 import { Dispositivos } from './Dispositivos'
-import { hrefDe, paginaDeArchivo, useIndice } from './Mapa'
+import { paginaDeArchivo, useIndice } from './Mapa'
+import { Enlace } from './navegar'
+import { Sitio, idPortada } from './Sitio'
 
-/* Página de docs de cada componente, armada como las de Primer: arriba qué
-   es, en una frase; tres pestañas -Overview para probarlo y ver sus
-   ejemplos, Guidelines para entender por qué es así y dónde se usa, Code
-   para importarlo y leer su código-, y a la derecha un índice de la pestaña.
-   Lee los archivos con `?raw`, así que siempre muestra lo que hay en el repo. */
+/* La página de cada componente, con la estética de primer.style: rastro,
+   nombre, una frase de qué es, pestañas subrayadas (Overview para probarlo y
+   ver sus ejemplos, Guidelines para entender por qué es así, Code para
+   importarlo y leer su código), tarjetas de estado y el índice "On this
+   page" a la derecha. Lee los archivos con `?raw`, así que siempre muestra lo
+   que hay en el repo. */
 
 const archivos = import.meta.glob('/src/**/*.{ts,tsx}', { query: '?raw', import: 'default' }) as Record<
   string,
@@ -37,14 +37,6 @@ function useArchivo(ruta: string | null) {
   return codigo
 }
 
-const ICONO_SECCION: Record<string, LucideIcon> = {
-  Foundations: Palette,
-  Elements: LayoutTemplate,
-  Components: Puzzle,
-  Pages: MonitorSmartphone,
-  Audit: ClipboardCheck,
-}
-
 /* Un comentario de código a Markdown: une las líneas cortadas de cada
    párrafo y deja las listas como listas. */
 function comentarioAMarkdown(texto: string) {
@@ -55,12 +47,12 @@ function comentarioAMarkdown(texto: string) {
 }
 
 /* Título de sección: entra en el índice de la derecha. */
-function Seccion({ titulo, nota, children, id }: { titulo: string; nota?: ReactNode; children: ReactNode; id?: string }) {
+function Seccion({ titulo, nota, children, id }: { titulo?: string; nota?: ReactNode; children: ReactNode; id?: string }) {
   return (
-    <section className="ds-seccion mt-12 first:mt-8" id={id}>
-      <h2 data-toc className="sb-unstyled m-0 scroll-mt-6 text-[22px] leading-tight font-bold tracking-[-0.015em] text-ink">{titulo}</h2>
-      {nota && <p className="sb-unstyled m-0 mt-1.5 max-w-[70ch] text-[14px] leading-relaxed text-ink-muted">{nota}</p>}
-      <div className="mt-4">{children}</div>
+    <section className="mt-12 first:mt-10" id={id}>
+      {titulo && <h2 data-toc className="m-0 scroll-mt-24 border-b border-line pb-2 text-[24px] leading-tight font-semibold tracking-[-0.01em] text-ink">{titulo}</h2>}
+      {nota && <p className="m-0 mt-3 max-w-[70ch] text-[15px] leading-relaxed text-ink-muted">{nota}</p>}
+      <div className={titulo || nota ? 'mt-5' : ''}>{children}</div>
     </section>
   )
 }
@@ -77,8 +69,8 @@ function EnEstaPagina({ raiz, clave }: { raiz: RefObject<HTMLDivElement | null>;
     let firma = ''
     let t = 0
     const leer = () => {
-      const hs = [...el.querySelectorAll<HTMLElement>('h2[data-toc], .ds-ejemplos .sb-anchor > h3')]
-      const nuevos = hs.map((h): Item => ({ el: h, texto: h.textContent?.trim() ?? '', nivel: h.matches('[data-toc]') ? 2 : 3 })).filter((i) => i.texto)
+      const hs = [...el.querySelectorAll<HTMLElement>('h2[data-toc], .ds-ejemplos .sb-anchor > h3, .ds-informe .ds-page-h2')]
+      const nuevos = hs.map((h): Item => ({ el: h, texto: h.textContent?.trim() ?? '', nivel: h.matches('.ds-ejemplos h3') ? 3 : 2 })).filter((i) => i.texto)
       const f = nuevos.map((i) => i.texto).join('|')
       if (f !== firma) {
         firma = f
@@ -100,7 +92,7 @@ function EnEstaPagina({ raiz, clave }: { raiz: RefObject<HTMLDivElement | null>;
     const alMover = () => {
       let i = 0
       items.forEach((it, k) => {
-        if (it.el.getBoundingClientRect().top < 160) i = k
+        if (it.el.getBoundingClientRect().top < 180) i = k
       })
       setActivo(i)
     }
@@ -110,18 +102,18 @@ function EnEstaPagina({ raiz, clave }: { raiz: RefObject<HTMLDivElement | null>;
   }, [items])
   if (items.length < 2) return null
   return (
-    <nav aria-label="On this page" className="sb-unstyled sticky top-6 hidden max-h-[calc(100vh-48px)] self-start overflow-y-auto lg:block">
-      <p className="m-0 mb-2 text-[12px] font-semibold text-ink">On this page</p>
-      <ul className="m-0 flex list-none flex-col border-l border-line p-0">
+    <nav aria-label="On this page" className="sticky top-24 hidden max-h-[calc(100vh-120px)] self-start overflow-y-auto xl:block">
+      <p className="m-0 mb-3 text-[12px] font-semibold tracking-[0.06em] text-ink-muted uppercase">On this page</p>
+      <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
         {items.map((it, i) => (
           <li key={`${it.texto}-${i}`}>
             <button
               type="button"
               onClick={() => it.el.scrollIntoView({ behavior: 'smooth', block: 'start' })}
               className={cn(
-                '-ml-px block w-full border-l-2 py-1 text-left text-[12.5px] leading-snug transition-colors',
-                it.nivel === 3 ? 'pl-6' : 'pl-3',
-                i === activo ? 'border-dash-blue font-medium text-dash-blue' : 'border-transparent text-ink-muted hover:text-ink',
+                'block w-full rounded-md py-1 pr-2 text-left text-[14px] leading-snug transition-colors hover:bg-surface-muted',
+                it.nivel === 3 ? 'pl-5' : 'pl-2',
+                i === activo ? 'font-semibold text-ink' : 'text-dash-blue',
               )}
             >
               {it.texto}
@@ -133,19 +125,31 @@ function EnEstaPagina({ raiz, clave }: { raiz: RefObject<HTMLDivElement | null>;
   )
 }
 
-function Chip({ icono: Icono, children, tono = 'gris', onClick, href }: { icono?: LucideIcon; children: ReactNode; tono?: 'gris' | 'azul' | 'verde'; onClick?: () => void; href?: string }) {
-  const clase = cn(
-    'inline-flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-[12px] font-medium no-underline whitespace-nowrap',
-    tono === 'azul' && 'border-dash-blue/25 bg-info-bg text-dash-blue',
-    tono === 'verde' && 'border-dash-ok-fg/30 bg-dash-ok-bg text-dash-ok-fg',
-    tono === 'gris' && 'border-line bg-white text-ink-medium',
-    (onClick || href) && 'transition-colors hover:border-dash-blue hover:text-dash-blue',
+/* Como las tarjetas React / Rails / Figma de Primer: qué es, en qué estado
+   está y adónde ir. */
+function Tarjeta({ icono: Icono, titulo, etiqueta, tono = 'gris', children }: { icono: typeof Puzzle; titulo: string; etiqueta: string; tono?: 'verde' | 'ambar' | 'gris'; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border border-line p-4">
+      <span className="flex items-center justify-between">
+        <span className="text-[15px] font-semibold text-ink">{titulo}</span>
+        <Icono className="size-5 text-ink-muted" aria-hidden />
+      </span>
+      <span
+        className={cn(
+          'self-start rounded-full border px-2 py-0.5 text-[12px] font-medium',
+          tono === 'verde' && 'border-dash-ok-fg/30 bg-dash-ok-bg text-dash-ok-fg',
+          tono === 'ambar' && 'border-warn-fg/30 bg-warn-bg text-warn-fg',
+          tono === 'gris' && 'border-line bg-surface-subtle text-ink-medium',
+        )}
+      >
+        {etiqueta}
+      </span>
+      <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] [&>*+*]:before:mr-2 [&>*+*]:before:text-ink-faint [&>*+*]:before:content-['|']">{children}</span>
+    </div>
   )
-  const contenido = <>{Icono && <Icono className="size-3.5" aria-hidden />}{children}</>
-  if (href) return <a href={href} target="_top" className={clase}>{contenido}</a>
-  if (onClick) return <button type="button" onClick={onClick} className={clase}>{contenido}</button>
-  return <span className={clase}>{contenido}</span>
 }
+
+const LINK = 'cursor-pointer text-dash-blue underline decoration-dash-blue/40 underline-offset-2 hover:decoration-dash-blue'
 
 type Pestana = 'Overview' | 'Guidelines' | 'Code'
 
@@ -168,7 +172,7 @@ export function DocsPage() {
   const archivosDeUso = (decisionesDe ? [decisionesDe].flat() : rutaComponente ? [rutaComponente.slice(1)] : []).map((a) => a.replace(/^\/?(src\/)?/, ''))
   const encontrados = componentes.filter((c) => archivosDeUso.includes(c.archivo))
   const usos = encontrados.length ? [...new Set(encontrados.flatMap((c) => c.usadoPor))].sort() : undefined
-  const decisionesPrimero = useDecisiones(archivosDeDecision[0] ?? null)
+  const decisiones = useDecisiones(archivosDeDecision[0] ?? null)
 
   /* El código que se muestra: el del componente, o el primero que documenta
      una página de Elements. */
@@ -181,9 +185,12 @@ export function DocsPage() {
   const titulo = historia?.title ?? ''
   const partes = titulo.split('/')
   const nombre = partes[partes.length - 1] ?? ''
-  const seccion = partes[0] ?? ''
+  const seccion = (partes[0] ?? '') as NombreSeccion
   const grupo = partes.length > 2 ? partes.slice(1, -1).join(' / ') : ''
-  const IconoSeccion = ICONO_SECCION[seccion] ?? BookOpen
+  const idPagina = historia ? `${historia.id.split('--')[0]}--docs` : undefined
+  /* Foundations y Audit son páginas de una sola historia que ya se explica
+     sola: se muestra tal cual, sin marco de ejemplo. */
+  const informe = todas.length === 1 && historia?.name !== 'Playground' && (seccion === 'Foundations' || seccion === 'Audit' || !componente)
 
   const descripcionDocs = (historia?.parameters?.docs as { description?: { component?: string } } | undefined)?.description?.component
   const descripcion = descripcionDocs ?? (componente ? comentarioAMarkdown(comentarioDe(componente)).replace(/^Figma[^—\-.:]*?\d+:\d+\s*[—\-.:]?\s*/i, '').replace(/^\p{Ll}/u, (c) => c.toUpperCase()) : '')
@@ -191,7 +198,7 @@ export function DocsPage() {
   const [lead, resto] = !parrafos[0] || /^\s*[-*\d]/.test(parrafos[0]) ? ['', descripcion] : [parrafos[0], parrafos.slice(1).join('\n\n')]
 
   const tieneControles = !!historia && Object.keys(historia.argTypes ?? {}).length > 0 && !historia.parameters?.controls?.disable
-  const conDispositivos = !!historia && !historia.parameters?.docs?.devices?.disable
+  const conDispositivos = !!historia && !informe && !historia.parameters?.docs?.devices?.disable
   const pestanas: Pestana[] = ['Overview']
   if (archivosDeDecision.length || conDispositivos || usos) pestanas.push('Guidelines')
   if (fuente || stories) pestanas.push('Code')
@@ -200,72 +207,93 @@ export function DocsPage() {
 
   const irA = (p: Pestana, id: string) => {
     setPestana(p)
-    window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
+    window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80)
   }
-
-  const paginaDe = (archivo: string) => {
-    if (!indice) return undefined
-    const e = paginaDeArchivo(indice, archivo)
-    return e ? hrefDe(e) : undefined
-  }
+  const idDeArchivo = (archivo: string) => (indice ? paginaDeArchivo(indice, archivo)?.id : undefined)
+  const listo = historia?.name === 'Playground' && !!decisiones?.length
 
   return (
-    <div className="ds-doc font-sans text-ink">
-      <header className="sb-unstyled flex flex-col gap-4 border-b border-line-row pb-6">
-        <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[12.5px] text-ink-muted">
-          <IconoSeccion className="size-3.5" aria-hidden />
-          <span>{seccion}</span>
-          {grupo && <><span className="text-ink-faint">/</span><span>{grupo}</span></>}
-        </nav>
-        <h1 className="sb-unstyled m-0 text-[36px] leading-[1.1] font-bold tracking-[-0.02em] text-ink sm:text-[40px]">{nombre}</h1>
-        {lead && (
-          <div className="ds-lead max-w-[68ch] text-[16px] leading-relaxed text-ink-medium">
-            <Markdown>{lead}</Markdown>
-          </div>
-        )}
-        <div className="flex flex-wrap items-center gap-2">
-          {historia?.name === 'Playground' && <Chip icono={SlidersHorizontal} tono="verde">Playground</Chip>}
-          {todas.length > 1 && <Chip onClick={() => irA('Overview', 'ds-ejemplos')}>{todas.length - 1} {todas.length === 2 ? 'example' : 'examples'}</Chip>}
-          {usos && <Chip onClick={() => irA('Guidelines', 'ds-usos')}>Used in {usos.length} {usos.length === 1 ? 'file' : 'files'}</Chip>}
-          {decisionesPrimero && decisionesPrimero.length > 0 && <Chip icono={Lightbulb} onClick={() => irA('Guidelines', 'ds-decisiones')}>Design decisions</Chip>}
-          <span className="mx-1 h-4 w-px bg-line" aria-hidden />
-          {historia && <Chip icono={ExternalLink} tono="azul" href={`./?path=/story/${historia.id}`}>Open full screen</Chip>}
-          {archivoFuente && <Chip icono={Code2} href={`${REPO}${archivoFuente}`}>Source</Chip>}
-        </div>
-      </header>
-
-      {pestanas.length > 1 && (
-        <div className="sticky top-0 z-10 -mx-1 bg-white/95 px-1 py-3 backdrop-blur">
-          <Tabs
-            aria-label="Page sections"
-            tabs={pestanas.map((p) => ({ value: p, icon: p === 'Overview' ? BookOpen : p === 'Guidelines' ? Lightbulb : Code2 }))}
-            value={pestana}
-            onChange={setPestana}
-          />
-        </div>
-      )}
-
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_190px]">
+    <Sitio actual={idPagina} seccion={seccion}>
+      <div className="ds-doc mx-auto grid max-w-[1240px] gap-12 px-5 pt-10 pb-24 sm:px-10 xl:grid-cols-[minmax(0,1fr)_220px]">
         <div ref={cuerpo} className="min-w-0">
+          <header className="flex flex-col gap-4">
+            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-[14px]">
+              <Enlace id="welcome--docs" className="text-dash-blue no-underline hover:underline">Home</Enlace>
+              <span className="text-ink-muted">/</span>
+              <Enlace id={idPortada(seccion)} className="text-dash-blue no-underline hover:underline">{seccion}</Enlace>
+              {grupo && <><span className="text-ink-muted">/</span><span className="text-ink-muted">{grupo}</span></>}
+              <span className="text-ink-muted">/</span>
+              <span className="text-ink">{nombre}</span>
+            </nav>
+            <h1 className="m-0 text-[40px] leading-[1.15] font-semibold tracking-[-0.02em] text-ink">{nombre}</h1>
+            {lead && (
+              <div className="ds-prosa ds-lead max-w-[70ch]">
+                <Markdown>{lead}</Markdown>
+              </div>
+            )}
+          </header>
+
+          {pestanas.length > 1 && (
+            <nav aria-label="Page sections" className="mt-8 flex gap-6 border-b border-line">
+              {pestanas.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  aria-current={p === pestana ? 'page' : undefined}
+                  onClick={() => setPestana(p)}
+                  className={cn(
+                    '-mb-px border-b-2 px-1 pb-2.5 text-[15px] transition-colors',
+                    p === pestana ? 'border-dash-blue font-semibold text-ink' : 'border-transparent text-ink-muted hover:border-line-strong hover:text-ink',
+                  )}
+                >
+                  {p}
+                </button>
+              ))}
+            </nav>
+          )}
+
           {pestana === 'Overview' && (
             <>
+              {!informe && historia && (
+                <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                  <Tarjeta icono={Puzzle} titulo="Component" etiqueta={listo ? 'Ready' : historia.name === 'Playground' ? 'In progress' : 'Documented'} tono={listo ? 'verde' : historia.name === 'Playground' ? 'ambar' : 'gris'}>
+                    <Enlace id={historia.id} className={LINK}>Full screen</Enlace>
+                    {archivoFuente && <a href={`${REPO}${archivoFuente}`} target="_blank" rel="noreferrer" className={LINK}>Source</a>}
+                    {pestanas.includes('Code') && <button type="button" onClick={() => irA('Code', 'ds-codigo')} className={LINK}>Code</button>}
+                  </Tarjeta>
+                  <Tarjeta icono={Users} titulo="Usage" etiqueta={usos ? `Used in ${usos.length} ${usos.length === 1 ? 'file' : 'files'}` : 'Not in the app'}>
+                    {usos && <button type="button" onClick={() => irA('Guidelines', 'ds-usos')} className={LINK}>Where</button>}
+                    {conDispositivos && <button type="button" onClick={() => irA('Guidelines', 'ds-dispositivos')} className={LINK}>Devices</button>}
+                    {todas.length > 1 && <button type="button" onClick={() => document.getElementById('ds-ejemplos')?.scrollIntoView({ behavior: 'smooth' })} className={LINK}>Examples</button>}
+                  </Tarjeta>
+                  <Tarjeta icono={Lightbulb} titulo="Design" etiqueta={decisiones?.length ? `${decisiones.length} ${decisiones.length === 1 ? 'decision' : 'decisions'}` : 'No decisions yet'} tono={decisiones?.length ? 'gris' : 'ambar'}>
+                    {!!decisiones?.length && <button type="button" onClick={() => irA('Guidelines', 'ds-decisiones')} className={LINK}>Why it looks like this</button>}
+                  </Tarjeta>
+                </div>
+              )}
               {resto && (
-                <div className="ds-acerca mt-6 max-w-[72ch]">
+                <div className="ds-prosa mt-8 max-w-[72ch]">
                   <Markdown>{resto}</Markdown>
                 </div>
               )}
-              {historia && (
-                <Seccion
-                  titulo={historia.name === 'Playground' ? 'Playground' : historia.name}
-                  nota={tieneControles ? 'Cambiá sus propiedades en la tabla de abajo: el componente cambia en vivo. Show code da el código de lo que armaste.' : undefined}
-                >
-                  <Primary />
-                  {tieneControles && <Controls />}
+              {informe ? (
+                <Seccion>
+                  <div className="ds-informe"><Story /></div>
                 </Seccion>
+              ) : (
+                historia && (
+                  <Seccion
+                    titulo={historia.name === 'Playground' ? 'Playground' : historia.name}
+                    nota={tieneControles ? 'Cambiá sus propiedades en la tabla de abajo: el componente cambia en vivo. Show code da el código de lo que armaste.' : undefined}
+                  >
+                    <Primary />
+                    {tieneControles && <div className="mt-4"><Controls /></div>}
+                  </Seccion>
+                )
               )}
               {todas.length > 1 && (
                 <Seccion id="ds-ejemplos" titulo="Examples" nota="Cada variante y estado, funcionando. Show code muestra cómo se arma.">
-                  <div className="ds-ejemplos">
+                  <div className="ds-ejemplos ds-prosa">
                     <Stories includePrimary={false} title={<></>} />
                   </div>
                 </Seccion>
@@ -283,7 +311,7 @@ export function DocsPage() {
                     <div className="flex flex-col gap-6">
                       {archivosDeDecision.map((a) => (
                         <div key={a} className="flex flex-col gap-2">
-                          <p className="sb-unstyled m-0 font-mono text-[12px] text-ink-muted">{a}</p>
+                          <p className="m-0 font-mono text-[12.5px] text-ink-muted">{a}</p>
                           <Decisiones archivo={a} />
                         </div>
                       ))}
@@ -292,20 +320,20 @@ export function DocsPage() {
                 </Seccion>
               )}
               {conDispositivos && historia && (
-                <Seccion titulo="On each device" nota="La historia principal en el ancho real de un celular, una tablet y una computadora. Se puede usar adentro.">
+                <Seccion id="ds-dispositivos" titulo="On each device" nota="La historia principal en el ancho real de un celular, una tablet y una computadora. Se puede usar adentro.">
                   <Dispositivos storyId={historia.id} alto={historia.parameters?.docs?.devices?.height} />
                 </Seccion>
               )}
               {usos && (
                 <Seccion id="ds-usos" titulo="Where it is used" nota={usos.length ? `${usos.length} ${usos.length === 1 ? 'archivo de la app lo usa' : 'archivos de la app lo usan'}, leído del código.` : 'Ninguna pantalla lo usa todavía: sólo está documentado acá.'}>
                   {usos.length > 0 && (
-                    <ul className="sb-unstyled m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
+                    <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
                       {usos.map((u) => {
-                        const href = u.startsWith('components/') ? paginaDe(u) : undefined
+                        const id = u.startsWith('components/') ? idDeArchivo(u) : undefined
                         return (
-                          <li key={u} className="flex items-center justify-between gap-3 rounded-lg border border-line-row bg-white px-3 py-2">
-                            <code className="truncate text-[12px] text-ink">{u}</code>
-                            {href && <a href={href} target="_top" className="shrink-0 text-[12px] text-dash-blue no-underline hover:underline">Open</a>}
+                          <li key={u} className="flex items-center justify-between gap-3 rounded-lg border border-line px-3 py-2">
+                            <code className="truncate text-[12.5px] text-ink">{u}</code>
+                            {id && <Enlace id={id} className="shrink-0 text-[13px] text-dash-blue no-underline hover:underline">Open</Enlace>}
                           </li>
                         )
                       })}
@@ -317,7 +345,7 @@ export function DocsPage() {
           )}
 
           {pestana === 'Code' && (
-            <>
+            <div id="ds-codigo">
               {exportados.length > 0 && (
                 <Seccion titulo="Import">
                   <Source
@@ -329,20 +357,20 @@ export function DocsPage() {
                 </Seccion>
               )}
               {fuente && archivoFuente && (
-                <Seccion titulo="Source" nota={<code>{archivoFuente}</code>}>
+                <Seccion titulo="Source" nota={<a href={`${REPO}${archivoFuente}`} target="_blank" rel="noreferrer" className={LINK}>{archivoFuente}</a>}>
                   <Source code={fuente} language="tsx" />
                 </Seccion>
               )}
               {stories && archivoStories && (
-                <Seccion titulo="Stories source" nota={<code>{archivoStories}</code>}>
+                <Seccion titulo="Stories source" nota={<code className="text-[13px]">{archivoStories}</code>}>
                   <Source code={stories} language="tsx" />
                 </Seccion>
               )}
-            </>
+            </div>
           )}
         </div>
         <EnEstaPagina raiz={cuerpo} clave={pestana} />
       </div>
-    </div>
+    </Sitio>
   )
 }

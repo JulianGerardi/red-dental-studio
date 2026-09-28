@@ -5,7 +5,6 @@ import { Codigo, Page, Seccion } from './Page'
 
 const meta = {
   title: 'Foundations/Radius and shadows',
-  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen', options: { showPanel: false } },
 } satisfies Meta
 
