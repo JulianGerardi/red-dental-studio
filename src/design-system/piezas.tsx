@@ -227,19 +227,33 @@ export function TarjetaPieza({ pieza, id }: { pieza: Pieza; id?: string }) {
       >
         {pieza.muestra}
       </div>
-      <span className="mt-4 text-[20px] leading-tight font-semibold text-ink">{pieza.titulo}</span>
+      {/* El nombre es el link y cubre toda la tarjeta (after:inset-0): la
+          muestra tiene links propios adentro y un link no puede ir dentro de
+          otro. */}
+      {id ? (
+        <Enlace id={id} className="mt-4 text-[20px] leading-tight font-semibold text-ink no-underline after:absolute after:inset-0 after:rounded-xl after:content-[''] focus-visible:outline-none">
+          {pieza.titulo}
+        </Enlace>
+      ) : (
+        <span className="mt-4 text-[20px] leading-tight font-semibold text-ink">{pieza.titulo}</span>
+      )}
       <span className="mt-2 flex-1 text-[14px] leading-relaxed text-ink-muted">{pieza.que}</span>
       <span className="mt-4 inline-flex items-center gap-0.5 text-[14px] font-medium text-dash-blue">
         Learn more <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
       </span>
     </>
   )
-  const clase = cn(
-    'group flex min-w-0 flex-col rounded-xl border border-line bg-white p-4 no-underline transition-colors hover:border-ink-faint',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
-    pieza.ancho === 2 && 'sm:col-span-2',
+  return (
+    <div
+      className={cn(
+        'group relative flex min-w-0 flex-col rounded-xl border border-line bg-white p-4 transition-colors hover:border-ink-faint',
+        'has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-dash-blue',
+        pieza.ancho === 2 && 'sm:col-span-2',
+      )}
+    >
+      {contenido}
+    </div>
   )
-  return id ? <Enlace id={id} className={clase}>{contenido}</Enlace> : <div className={clase}>{contenido}</div>
 }
 
 /* La grilla con "View more": primero `inicial` piezas, después todas. */

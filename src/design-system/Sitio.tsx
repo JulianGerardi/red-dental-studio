@@ -22,6 +22,7 @@ const BLOQUE_DE_PAGINA: Record<string, TipoBloque> = {
   'Appointment cards': 'turnos', EmptyState: 'vacio', Switch: 'opciones', Checkbox: 'opciones', DataTable: 'tabla',
   Dialog: 'modal', Cards: 'seccion', StatCard: 'stats', PendingTaskCard: 'tareas', AppointmentCard: 'turnos',
   CalendarViews: 'calendario', AppointmentSlotPicker: 'horarios', PatientPaymentPanel: 'pago', PostPaymentDialog: 'pago',
+  Odontogram: 'odontograma', OdontogramEmbed: 'odontograma', DentalAssessmentExam: 'odontograma', ClinicalItemModal: 'receta',
 }
 export const idPortada = (s: Seccion) => `${s.toLowerCase()}-overview--docs`
 const APP = 'https://juliangerardi.github.io/red-dental-studio/'

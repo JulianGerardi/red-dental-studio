@@ -6,6 +6,16 @@ import theme from './theme'
    muestran; el sitio tiene su propia barra y su propio menú
    (src/design-system/Sitio.tsx). En una historia abierta sola queda el panel
    de Controls, que es donde se la personaliza. */
+/* Un link compartido del Builder trae el diseño en el # de la dirección
+   (#diseno=…). Se guarda antes de que Storybook reescriba la dirección; el
+   Builder lo toma al abrirse (src/design-system/constructor/compartir.ts). */
+try {
+  const compartido = window.location.hash.match(/diseno=([\w-]+)/)
+  if (compartido) window.sessionStorage.setItem('confidentally-ui-shared', compartido[1]!)
+} catch {
+  /* Sin almacenamiento: el Builder intenta leer la dirección. */
+}
+
 addons.setConfig({
   theme,
   layoutCustomisations: {

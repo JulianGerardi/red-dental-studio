@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import {
-  ArrowDown, ArrowUp, Blocks, Check, ChevronDown, Code2, Copy, CopyPlus, PanelRightClose, Plus, Trash2, X,
+  ArrowDown, ArrowUp, Blocks, Check, ChevronDown, Code2, Copy, CopyPlus, Download, Link2, PanelRightClose, Plus, Trash2, X,
 } from 'lucide-react'
 import { Tabs } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
@@ -10,10 +10,12 @@ import { cn } from '@/lib/utils'
 import { Enlace } from '../navegar'
 import { Sitio } from '../Sitio'
 import {
-  AGREGAR, ANCHOS, ICONOS, NOMBRE_COLUMNA, PLANTILLAS, TIPOS, VerDiseno, VistaPrevia, campo, contiene, generarCodigo, infoDe,
+  AGREGAR, ANCHOS, ICONOS, MARCAS, PLANTILLAS, columna, migrarDiseno, TIPOS, VerDiseno, VistaPrevia, campo, contiene, generarCodigo, infoDe,
   nombreComponente, pestana as nuevaPestana, permitidos, reIdentificar,
-  type Bloque, type BloqueDe, type Campo, type ColumnaTabla, type Diseno, type Grupo, type IconoReal, type NombreIcono, type TipoBloque,
+  type Bloque, type BloqueDe, type Campo, type Diseno, type Marca, type Grupo, type IconoReal, type NombreIcono, type TipoBloque,
 } from './bloques'
+import { DATOS, conjunto, type CampoDato, type IdConjunto } from './datos'
+import { codificar, decodificar, descargarPng, linkDe, tomarCompartido } from './compartir'
 
 /* El constructor: cualquiera arma un componente con las piezas reales de la
    app y se lleva su código. El lienzo muestra lo que se arma; el panel
@@ -26,7 +28,7 @@ const lista = (s: string) => s.split(',').map((x) => x.trim()).filter(Boolean)
 function cargar(): Diseno | null {
   try {
     const t = window.localStorage.getItem(GUARDADO)
-    return t ? (JSON.parse(t) as Diseno) : null
+    return t ? migrarDiseno(JSON.parse(t) as Diseno) : null
   } catch {
     return null
   }
@@ -348,27 +350,37 @@ function Editor({ b, cambiar, ctx }: { b: Bloque; cambiar: (x: Partial<Bloque>) 
           <Sumar onClick={() => c({ items: [...b.items, { label: 'Status', tone: 'info' }] })}>Add pill</Sumar>
         </>
       )
-    case 'tabla':
+    case 'tabla': {
+      const cj = conjunto(b.datos)
+      const campos = cj.campos as Record<string, CampoDato>
+      const opcionesCampo = Object.entries(campos).map(([k, f]) => ({ value: k, label: f.header }))
+      const poner = (id: string, x: object) => c({ columnas: b.columnas.map((col) => (col.id === id ? { ...col, ...x } : col)) })
+      const mover = (i: number, paso: -1 | 1) => {
+        const j = i + paso
+        if (j < 0 || j >= b.columnas.length) return
+        const n = [...b.columnas]
+        ;[n[i], n[j]] = [n[j]!, n[i]!]
+        c({ columnas: n })
+      }
+      const libre = Object.keys(campos).find((k) => !b.columnas.some((col) => col.campo === k)) ?? Object.keys(campos)[0]!
       return (
         <>
-          <div className="flex flex-col gap-1">
-            <span className={ETIQUETA}>Columns</span>
-            <div className="flex flex-wrap gap-1.5">
-              {(Object.keys(NOMBRE_COLUMNA) as ColumnaTabla[]).map((k) => {
-                const on = b.columnas.includes(k)
-                return (
-                  <button
-                    key={k}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() => c({ columnas: on ? b.columnas.filter((x) => x !== k) : (Object.keys(NOMBRE_COLUMNA) as ColumnaTabla[]).filter((x) => x === k || b.columnas.includes(x)) })}
-                    className={cn('inline-flex h-7 items-center gap-1 rounded-full border px-2.5 text-[12px] font-medium', on ? 'border-dash-blue bg-info-bg text-dash-blue' : 'border-line text-ink-medium hover:bg-surface-muted')}
-                  >
-                    {on && <Check className="size-3" />} {NOMBRE_COLUMNA[k]}
-                  </button>
-                )
-              })}
-            </div>
+          <Elegir label="Data" value={b.datos} opciones={(Object.keys(DATOS) as IdConjunto[]).map((k) => ({ value: k, label: DATOS[k].nombre }))} onChange={(v) => c({ datos: v, columnas: conjunto(v).inicial.map((x) => columna(v, x)) })} />
+          <div className="flex flex-col gap-1.5">
+            <span className={ETIQUETA}>Columns · {b.columnas.length}</span>
+            {b.columnas.map((col, i) => (
+              <div key={col.id} className="flex items-end gap-1.5 rounded-lg border border-line-row bg-surface-subtle p-2">
+                <div className="w-[112px] shrink-0"><Elegir label="Field" value={col.campo} opciones={opcionesCampo} onChange={(v) => poner(col.id, { campo: v, header: campos[v]?.header ?? v, ancho: campos[v]?.ancho ?? null })} /></div>
+                <div className="min-w-0 flex-1"><Texto label="Header" value={col.header} onChange={(v) => poner(col.id, { header: v })} /></div>
+                <div className="w-[70px] shrink-0"><Elegir label="Width" value={String(col.ancho ?? 'auto')} opciones={['auto', '80', '100', '120', '150', '180', '220', '260']} onChange={(v) => poner(col.id, { ancho: v === 'auto' ? null : Number(v) })} /></div>
+                <span className="flex h-8 items-center">
+                  <button type="button" onClick={() => mover(i, -1)} disabled={i === 0} aria-label={`Move ${col.header} left`} className="flex size-6 items-center justify-center rounded text-ink-muted hover:bg-white disabled:opacity-30"><ArrowUp className="size-3" /></button>
+                  <button type="button" onClick={() => mover(i, 1)} disabled={i === b.columnas.length - 1} aria-label={`Move ${col.header} right`} className="flex size-6 items-center justify-center rounded text-ink-muted hover:bg-white disabled:opacity-30"><ArrowDown className="size-3" /></button>
+                </span>
+                <Quitar onClick={() => c({ columnas: b.columnas.filter((x) => x.id !== col.id) })} label={`Remove ${col.header}`} />
+              </div>
+            ))}
+            <Sumar onClick={() => c({ columnas: [...b.columnas, columna(b.datos, libre)] })}>Add column</Sumar>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <label className="flex flex-col gap-1">
@@ -382,6 +394,27 @@ function Editor({ b, cambiar, ctx }: { b: Bloque; cambiar: (x: Partial<Bloque>) 
             <Llave label="Selectable" value={b.seleccion} onChange={(v) => c({ seleccion: v })} />
             <Llave label="Row actions" value={b.acciones} onChange={(v) => c({ acciones: v })} />
             <Llave label="Compact" value={b.compacta} onChange={(v) => c({ compacta: v })} />
+          </div>
+        </>
+      )
+    }
+    case 'odontograma':
+      return (
+        <>
+          <Llave label="Start with sample findings" value={b.ejemplo} onChange={(v) => c({ ejemplo: v })} />
+          <Segmentos label="A surface click marks" value={b.marca} opciones={(Object.keys(MARCAS) as Marca[]).map((m) => ({ value: m, label: m }))} onChange={(v) => c({ marca: v })} />
+          <p className="m-0 text-[11.5px] leading-snug text-ink-muted">En el lienzo: el número de la pieza la selecciona; una superficie se marca o se desmarca.</p>
+        </>
+      )
+    case 'receta':
+      return (
+        <>
+          <Texto label="Title" value={b.titulo} onChange={(v) => c({ titulo: v })} />
+          <Texto label="Medications (comma separated)" value={b.medicamentos} onChange={(v) => c({ medicamentos: v })} />
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+            <Llave label="Refills" value={b.repeticiones} onChange={(v) => c({ repeticiones: v })} />
+            <Llave label="Generic substitution" value={b.sustitucion} onChange={(v) => c({ sustitucion: v })} />
+            <Llave label="Instructions" value={b.indicaciones} onChange={(v) => c({ indicaciones: v })} />
           </div>
         </>
       )
@@ -428,7 +461,9 @@ function resumen(b: Bloque) {
     case 'pestanas': return b.tabs
     case 'campos': return b.campos.map((x) => x.label).join(' · ')
     case 'pills': return b.items.map((x) => x.label).join(' · ')
-    case 'tabla': return b.columnas.map((x) => NOMBRE_COLUMNA[x]).join(' · ')
+    case 'tabla': return `${DATOS[b.datos].nombre} · ${b.columnas.length} columns`
+    case 'odontograma': return `32 teeth · marks ${b.marca.toLowerCase()}`
+    case 'receta': return b.titulo
     case 'vacio': return b.titulo
     case 'opciones': return b.items.map((x) => x.label).join(' · ')
     case 'turnos': return `${b.cantidad} appointments`
@@ -458,7 +493,7 @@ function Adentro({ titulo, nota, children }: { titulo: string; nota?: string; ch
   )
 }
 
-const GRUPOS: Grupo[] = ['Layout', 'Forms', 'Content', 'Data']
+const GRUPOS: Grupo[] = ['Layout', 'Forms', 'Content', 'Data', 'Clinical']
 
 /* Una lista de bloques: la del diseño y la de adentro de cada contenedor
    (un modal, una sección, cada pestaña). Se suman, ordenan, duplican,
@@ -573,6 +608,10 @@ export function Constructor() {
   const [copiado, setCopiado] = useState(false)
   /* El modal que se abrió tocando su botón en el lienzo. */
   const [modalAbierto, setModalAbierto] = useState<string | null>(null)
+  const [link, setLink] = useState<{ url: string; copiado: boolean } | null>(null)
+  const [bajando, setBajando] = useState(false)
+  const [compartido, setCompartido] = useState(false)
+  const previa = useRef<HTMLDivElement>(null)
   const ctx: Ctx = { editando, setEditando }
   const codigo = useMemo(() => generarCodigo(d), [d])
 
@@ -583,6 +622,15 @@ export function Constructor() {
       /* Sin almacenamiento (ventana privada): se arma igual, sólo no se guarda. */
     }
   }, [d])
+
+  /* Abierto desde un link compartido: se muestra ese diseño. */
+  useEffect(() => {
+    const codigo = tomarCompartido()
+    if (!codigo) return
+    decodificar(codigo)
+      .then((x) => { setD(migrarDiseno(x)); setEditando(null); setCompartido(true) })
+      .catch(() => {})
+  }, [])
 
   /* Viniendo de la página de un componente ("Build with Buttons"), se suma
      ese bloque y se abre para editarlo. */
@@ -600,6 +648,29 @@ export function Constructor() {
     setD((x) => ({ ...x, bloques: [...x.bloques, b] }))
     setEditando(b.id)
   }, [])
+
+  const compartir = async () => {
+    const url = linkDe(await codificar(d))
+    let copiado = true
+    try {
+      await navigator.clipboard.writeText(url)
+    } catch {
+      copiado = false
+    }
+    setLink({ url, copiado })
+  }
+
+  /* La imagen: el modal si hay uno abierto en el lienzo, si no el componente. */
+  const bajarPng = async () => {
+    const nodo = document.querySelector<HTMLElement>('[data-lienzo] [role="dialog"]') ?? previa.current
+    if (!nodo) return
+    setBajando(true)
+    try {
+      await descargarPng(nodo, nombreComponente(d.nombre))
+    } finally {
+      setBajando(false)
+    }
+  }
 
   const copiar = async () => {
     try {
@@ -626,7 +697,7 @@ export function Constructor() {
         {/* El transform hace que los modales del lienzo (ModalShell es
             position: fixed) se abran sobre el lienzo, centrados en el lugar
             libre, y no sobre el panel. */}
-        <div className="flex min-h-[calc(100vh-7rem)] transform-gpu flex-col gap-8">
+        <div data-lienzo className="flex min-h-[calc(100vh-7rem)] transform-gpu flex-col gap-8">
           <header className="flex flex-col gap-3">
             <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[14px]">
               <Enlace id="welcome--docs" className="text-dash-blue no-underline hover:underline">Home</Enlace>
@@ -644,7 +715,7 @@ export function Constructor() {
               <span>Preview · {d.contenedor === 'card' ? 'Card' : d.contenedor === 'panel' ? 'Panel' : 'Page'}</span>
               <span className="tabular-nums">{ancho ? `${ancho}px` : 'Full width'}</span>
             </p>
-            <div className={cn(d.contenedor === 'page' && 'overflow-hidden rounded-xl border border-line bg-page-background')}>
+            <div ref={previa} className={cn(d.contenedor === 'page' && 'overflow-hidden rounded-xl border border-line bg-page-background')}>
               {d.bloques.length ? (
                 <MemoryRouter>
                   <VistaPrevia.Provider value={{ editando, abierto: modalAbierto, setAbierto: setModalAbierto }}>
@@ -690,12 +761,43 @@ export function Constructor() {
                 <span className="text-[14px] font-semibold text-ink">Builder</span>
                 <span className="truncate text-[12px] text-ink-muted">{nombreComponente(d.nombre)} · {d.bloques.length} {d.bloques.length === 1 ? 'block' : 'blocks'}</span>
               </span>
-              <button type="button" onClick={copiar} className="inline-flex h-8 items-center gap-1.5 rounded-md bg-dash-blue px-3 text-[13px] font-medium text-white hover:bg-dash-blue-hover">
-                {copiado ? <Check className="size-4" /> : <Copy className="size-4" />} {copiado ? 'Copied' : 'Copy code'}
-              </button>
               <button type="button" onClick={() => setAbierto(false)} aria-label="Hide builder" className="flex size-8 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted hover:text-ink">
                 <PanelRightClose className="size-4" />
               </button>
+            </div>
+
+            {/* Lo que se hace con lo armado: llevarse el código, compartirlo o
+                bajarlo como imagen. */}
+            <div className="flex flex-col gap-2 border-b border-line-row px-4 py-3">
+              <div className="grid grid-cols-3 gap-2">
+                <button type="button" onClick={copiar} className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-dash-blue px-2 text-[13px] font-medium text-white hover:bg-dash-blue-hover">
+                  {copiado ? <Check className="size-4" /> : <Copy className="size-4" />} {copiado ? 'Copied' : 'Copy code'}
+                </button>
+                <button type="button" onClick={compartir} className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-line bg-white px-2 text-[13px] font-medium text-ink hover:bg-surface-subtle">
+                  <Link2 className="size-4" /> Share link
+                </button>
+                <button type="button" onClick={bajarPng} disabled={bajando || !d.bloques.length} className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-line bg-white px-2 text-[13px] font-medium text-ink hover:bg-surface-subtle disabled:opacity-50">
+                  <Download className="size-4" /> {bajando ? 'Saving…' : 'PNG'}
+                </button>
+              </div>
+              {link && (
+                <div className="flex flex-col gap-1.5 rounded-lg bg-info-bg p-2.5">
+                  <span className="text-[12px] font-medium text-ink">
+                    {link.copiado ? 'Link copiado. Quien lo abra ve este mismo componente, con su código.' : 'Copiá este link: quien lo abra ve este mismo componente, con su código.'}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <input readOnly value={link.url} onFocus={(e) => e.currentTarget.select()} aria-label="Share link" className={cn(INPUT, 'h-7 flex-1 text-[11.5px] text-ink-muted')} />
+                    <a href={link.url} target="_blank" rel="noreferrer" className="shrink-0 text-[12px] font-medium text-dash-blue">Open</a>
+                    <button type="button" onClick={() => setLink(null)} aria-label="Close" className="flex size-6 shrink-0 items-center justify-center rounded text-ink-muted hover:bg-white"><X className="size-3.5" /></button>
+                  </span>
+                </div>
+              )}
+              {compartido && (
+                <div className="flex items-start justify-between gap-2 rounded-lg border border-dash-blue/20 bg-info-bg px-2.5 py-2 text-[12px] text-ink">
+                  <span>Abriste un diseño compartido. Lo que cambies queda en tu navegador; el link no cambia.</span>
+                  <button type="button" onClick={() => setCompartido(false)} aria-label="Dismiss" className="flex size-5 shrink-0 items-center justify-center rounded text-ink-muted hover:bg-white"><X className="size-3" /></button>
+                </div>
+              )}
             </div>
 
             <nav aria-label="Builder sections" className="flex gap-5 border-b border-line px-4">

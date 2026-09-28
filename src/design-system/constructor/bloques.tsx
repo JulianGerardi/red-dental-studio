@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import {
   AppWindow, BarChart3, CalendarClock, CalendarDays, CalendarRange, Clock, CreditCard, Wallet, X, Download, FileText, Heading, IdCard, Inbox, ListChecks,
   Mail, MapPin, Minus, MousePointerClick, PanelsTopLeft, Pencil, Phone, Plus, Save, Search, Send, Settings, Shield, SquareStack,
-  Table, Tag, TextCursorInput, ToggleRight, Trash2, Type, Users, type LucideIcon,
+  Pill as PillIcon, Smile, Table, Tag, TextCursorInput, ToggleRight, Trash2, Type, Users, type LucideIcon,
 } from 'lucide-react'
 import { Button, type ButtonSize, type ButtonVariant } from '@/components/ui/button'
 import { Card, CardDescription, CardTitle } from '@/components/ui/card'
@@ -19,7 +19,10 @@ import { StatusLegend } from '@/components/scheduling/StatusLegend'
 import { AppointmentSlotPicker } from '@/components/scheduling/AppointmentSlotPicker'
 import { InfoBlock } from '@/components/patients/PatientSidePanel'
 import { Pill, type PillTone } from '@/components/ui/pill'
-import { AmountCell, DataTable, PersonCell, TextCell, type DataTableColumn } from '@/components/ui/data-table'
+import { DataTable } from '@/components/ui/data-table'
+import { Odontogram } from '@/components/clinical/Odontogram'
+import { makeMockExam, type OralExam } from '@/data/odontogram'
+import { COMPONENTE_CELDA, TONO_ESTADO, celda, codigoCelda, conjunto, type CampoDato, type IdConjunto } from './datos'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Switch } from '@/components/ui/switch'
@@ -49,7 +52,11 @@ export type IconoReal = Exclude<NombreIcono, 'none'>
 export type Boton = { label: string; variant: ButtonVariant; size: ButtonSize; icono: NombreIcono }
 export type ClaseCampo = 'text' | 'select' | 'date' | 'calendar' | 'textarea' | 'search'
 export type Campo = { id: string; clase: ClaseCampo; label: string; placeholder: string; opciones: string; hint: string; error: string; required: boolean; disabled: boolean }
-export type ColumnaTabla = 'patient' | 'status' | 'next' | 'provider' | 'balance'
+/** Una columna de tabla: un campo del conjunto de datos, con su título y ancho. */
+export type ColumnaTabla = { id: string; campo: string; header: string; ancho: number | null }
+/* Los colores con que se marca una superficie en el odontograma. */
+export const MARCAS = { Caries: '#fe0000', Restoration: '#2563eb', Planned: '#f59e0b' } as const
+export type Marca = keyof typeof MARCAS
 export type Pestana = { id: string; label: string; bloques: Bloque[] }
 
 export type Bloque = { id: string } & (
@@ -64,7 +71,9 @@ export type Bloque = { id: string } & (
   | { tipo: 'pills'; items: { label: string; tone: PillTone }[] }
   | { tipo: 'stats'; items: { titulo: string; valor: string; delta: string; icono: IconoReal }[] }
   | { tipo: 'detalles'; titulo: string; items: { icono: IconoReal; label: string; valor: string }[] }
-  | { tipo: 'tabla'; columnas: ColumnaTabla[]; filas: number; buscador: boolean; seleccion: boolean; acciones: boolean; compacta: boolean; porPagina: number }
+  | { tipo: 'tabla'; datos: IdConjunto; columnas: ColumnaTabla[]; filas: number; buscador: boolean; seleccion: boolean; acciones: boolean; compacta: boolean; porPagina: number }
+  | { tipo: 'odontograma'; ejemplo: boolean; marca: Marca }
+  | { tipo: 'receta'; titulo: string; medicamentos: string; repeticiones: boolean; sustitucion: boolean; indicaciones: boolean }
   | { tipo: 'vacio'; icono: NombreIcono; titulo: string; detalle: string; accion: string }
   | { tipo: 'opciones'; control: 'switch' | 'checkbox'; items: { label: string; on: boolean }[] }
   | { tipo: 'turnos'; cantidad: number }
@@ -125,7 +134,7 @@ export function reIdentificar(b: Bloque): Bloque {
   return recorrer(JSON.parse(JSON.stringify(b)) as Bloque)
 }
 
-export type Grupo = 'Layout' | 'Forms' | 'Content' | 'Data'
+export type Grupo = 'Layout' | 'Forms' | 'Content' | 'Data' | 'Clinical'
 
 /* Los tipos de bloque, con lo que trae cada uno al agregarlo. */
 export const TIPOS: { tipo: TipoBloque; nombre: string; que: string; icono: LucideIcon; grupo: Grupo; nuevo: () => Bloque }[] = [
@@ -143,30 +152,50 @@ export const TIPOS: { tipo: TipoBloque; nombre: string; que: string; icono: Luci
   { tipo: 'pestanasContenido', grupo: 'Layout', nombre: 'Tabs with content', que: 'Pestañas, cada una con sus bloques', icono: PanelsTopLeft, nuevo: () => ({ id: nuevoId(), tipo: 'pestanasContenido', size: 'md', fullWidth: false, pestanas: [pestana('Details', [{ id: nuevoId(), tipo: 'texto', texto: 'What goes in the first tab.', tono: 'suave' }]), pestana('History', [{ id: nuevoId(), tipo: 'vacio', icono: 'Clock', titulo: 'No history yet', detalle: '', accion: '' }])] }) },
   { tipo: 'seccion', grupo: 'Layout', nombre: 'Section', que: 'Un grupo con título, como en los formularios', icono: SquareStack, nuevo: () => ({ id: nuevoId(), tipo: 'seccion', titulo: 'Section', bloques: [{ id: nuevoId(), tipo: 'campos', columnas: 2, campos: [campo({ label: 'Field one' }), campo({ label: 'Field two' })] }] }) },
   { tipo: 'pestanas', grupo: 'Layout', nombre: 'Tabs', que: 'Sólo la fila de pestañas', icono: PanelsTopLeft, nuevo: () => ({ id: nuevoId(), tipo: 'pestanas', tabs: 'All, Active, Inactive', size: 'md', fullWidth: false }) },
-  { tipo: 'tabla', grupo: 'Data', nombre: 'Table', que: 'Una lista de pacientes', icono: Table, nuevo: () => ({ id: nuevoId(), tipo: 'tabla', columnas: ['patient', 'status', 'next', 'balance'], filas: 6, buscador: true, seleccion: false, acciones: true, compacta: false, porPagina: 5 }) },
+  { tipo: 'tabla', grupo: 'Data', nombre: 'Table', que: 'Pacientes, movimientos, recetas o turnos, con las columnas que quieras', icono: Table, nuevo: () => tablaDe('pacientes') },
   { tipo: 'calendario', grupo: 'Data', nombre: 'Calendar', que: 'La agenda de Scheduling: día, semana o mes', icono: CalendarRange, nuevo: () => ({ id: nuevoId(), tipo: 'calendario', vista: 'Week', selector: true, leyenda: true }) },
   { tipo: 'stats', grupo: 'Data', nombre: 'Stats', que: 'Números clave en tarjetas', icono: BarChart3, nuevo: () => ({ id: nuevoId(), tipo: 'stats', items: [{ titulo: 'Patients today', valor: '24', delta: '+12% from last week', icono: 'Users' }, { titulo: 'Revenue', valor: '$8,420', delta: '+4.2% from last week', icono: 'CreditCard' }, { titulo: 'No shows', valor: '2', delta: '−1 from yesterday', icono: 'CalendarDays' }] }) },
   { tipo: 'detalles', grupo: 'Data', nombre: 'Details', que: 'Datos con ícono y lápiz para editar', icono: IdCard, nuevo: () => ({ id: nuevoId(), tipo: 'detalles', titulo: 'Contact', items: [{ icono: 'Phone', label: 'Phone', valor: '(555) 234-5678' }, { icono: 'Mail', label: 'Email', valor: 'maria.viola@mail.com' }, { icono: 'MapPin', label: 'Address', valor: '123 Biscayne Blvd' }] }) },
   { tipo: 'turnos', grupo: 'Data', nombre: 'Appointments', que: 'Turnos del día', icono: CalendarClock, nuevo: () => ({ id: nuevoId(), tipo: 'turnos', cantidad: 3 }) },
   { tipo: 'tareas', grupo: 'Data', nombre: 'Tasks', que: 'Tareas pendientes', icono: ListChecks, nuevo: () => ({ id: nuevoId(), tipo: 'tareas', cantidad: 2 }) },
+  { tipo: 'odontograma', grupo: 'Clinical', nombre: 'Odontogram', que: 'Las 32 piezas: se seleccionan y se marcan superficies', icono: Smile, nuevo: () => ({ id: nuevoId(), tipo: 'odontograma', ejemplo: true, marca: 'Caries' }) },
+  { tipo: 'receta', grupo: 'Clinical', nombre: 'Prescription', que: 'Una receta: medicamento, dosis e indicaciones', icono: PillIcon, nuevo: () => ({ id: nuevoId(), tipo: 'receta', titulo: 'New prescription', medicamentos: 'Amoxicillin, Ibuprofen, Paracetamol, Clindamycin, Chlorhexidine 0.12%', repeticiones: true, sustitucion: true, indicaciones: true }) },
 ]
 export const infoDe = (t: TipoBloque) => TIPOS.find((x) => x.tipo === t)!
 
 /* ── Datos de ejemplo ───────────────────────────────────────────────── */
 
-export const PACIENTES = [
-  { id: '1', name: 'Maria Abril Viola', initials: 'MV', status: 'Active', next: '12 Mar 2025 · 10:00', provider: 'Dr. Elena Martinez', balance: 120 },
-  { id: '2', name: 'Noah James Smith', initials: 'NS', status: 'Active', next: '14 Mar 2025 · 09:30', provider: 'Dr. Emily Chen', balance: 0 },
-  { id: '3', name: 'Elias Aguirre', initials: 'EA', status: 'Inactive', next: '—', provider: 'Sarah Stone', balance: 48.5 },
-  { id: '4', name: 'John Smith', initials: 'JS', status: 'Active', next: '18 Mar 2025 · 11:00', provider: 'Dr. Salgado', balance: 250 },
-  { id: '5', name: 'Elena Marquez', initials: 'EM', status: 'Active', next: '19 Mar 2025 · 15:30', provider: 'Dr. Elena Martinez', balance: 0 },
-  { id: '6', name: 'Sarah Stone', initials: 'SS', status: 'Inactive', next: '—', provider: 'Dr. Emily Chen', balance: 32 },
-  { id: '7', name: 'Lucas Fernández', initials: 'LF', status: 'Active', next: '21 Mar 2025 · 08:45', provider: 'Dr. Salgado', balance: 90 },
-  { id: '8', name: 'Sofía Romero', initials: 'SR', status: 'Active', next: '24 Mar 2025 · 12:00', provider: 'Sarah Stone', balance: 0 },
-  { id: '9', name: 'Martín Díaz', initials: 'MD', status: 'Active', next: '25 Mar 2025 · 16:15', provider: 'Dr. Emily Chen', balance: 15 },
-  { id: '10', name: 'Valentina Ruiz', initials: 'VR', status: 'Inactive', next: '—', provider: 'Dr. Elena Martinez', balance: 60 },
-]
-type Paciente = (typeof PACIENTES)[number]
+/* Una columna nueva, con el título y el ancho del campo. */
+export function columna(datos: IdConjunto, campo: string): ColumnaTabla {
+  const f = (conjunto(datos).campos as Record<string, CampoDato>)[campo]
+  return { id: nuevoId(), campo, header: f?.header ?? campo, ancho: f?.ancho ?? null }
+}
+
+type OpcionesTabla = Partial<Omit<BloqueDe<'tabla'>, 'id' | 'tipo' | 'datos' | 'columnas'>> & { campos?: string[] }
+export function tablaDe(datos: IdConjunto, { campos, ...resto }: OpcionesTabla = {}): Bloque {
+  return {
+    id: nuevoId(), tipo: 'tabla', datos, columnas: (campos ?? conjunto(datos).inicial).map((x) => columna(datos, x)),
+    filas: 6, buscador: true, seleccion: false, acciones: true, compacta: false, porPagina: 5, ...resto,
+  }
+}
+
+/* Los diseños guardados antes de que las tablas tuvieran columnas libres
+   (una lista de claves de pacientes) se pasan al modelo nuevo. */
+const CLAVES_VIEJAS: Record<string, string> = { patient: 'name', status: 'status', next: 'next', provider: 'provider', balance: 'balance' }
+export function migrarDiseno(d: Diseno): Diseno {
+  const migrar = (b: Bloque): Bloque => {
+    if (b.tipo === 'tabla') {
+      const viejo = b as unknown as { datos?: IdConjunto; columnas: (string | ColumnaTabla)[] }
+      if (!viejo.datos || typeof viejo.columnas[0] === 'string') {
+        return { ...b, datos: 'pacientes', columnas: viejo.columnas.map((k) => (typeof k === 'string' ? columna('pacientes', CLAVES_VIEJAS[k] ?? 'name') : k)) }
+      }
+    }
+    if (b.tipo === 'modal' || b.tipo === 'seccion') return { ...b, bloques: b.bloques.map(migrar) }
+    if (b.tipo === 'pestanasContenido') return { ...b, pestanas: b.pestanas.map((p) => ({ ...p, bloques: p.bloques.map(migrar) })) }
+    return b
+  }
+  return { ...d, bloques: d.bloques.map(migrar) }
+}
 
 const TURNOS: Appointment[] = [
   { name: 'Noah James', initials: 'NJ', provider: 'Dr. Elena Martinez', operatory: 'Operatory 2', time: '10:00' },
@@ -183,14 +212,6 @@ const TAREAS: PendingTask[] = [
   { kind: 'Prescription', state: 'Requested', person: 'John Smith', initials: 'JS', register: 'March 20, 2025', expiration: 'March 27, 2025' },
 ]
 
-const COLUMNAS: Record<ColumnaTabla, { header: string; col: DataTableColumn<Paciente>; codigo: string }> = {
-  patient: { header: 'Patient', col: { key: 'patient', header: 'Patient', cell: (p) => <PersonCell name={p.name} initials={p.initials} /> }, codigo: `{ key: 'patient', header: 'Patient', cell: (p) => <PersonCell name={p.name} initials={p.initials} /> }` },
-  status: { header: 'Status', col: { key: 'status', header: 'Status', width: 120, cell: (p) => <Pill tone={p.status === 'Active' ? 'success' : 'neutral'}>{p.status}</Pill> }, codigo: `{ key: 'status', header: 'Status', width: 120, cell: (p) => <Pill tone={p.status === 'Active' ? 'success' : 'neutral'}>{p.status}</Pill> }` },
-  next: { header: 'Next appointment', col: { key: 'next', header: 'Next appointment', width: 180, cell: (p) => <TextCell>{p.next}</TextCell> }, codigo: `{ key: 'next', header: 'Next appointment', width: 180, cell: (p) => <TextCell>{p.next}</TextCell> }` },
-  provider: { header: 'Provider', col: { key: 'provider', header: 'Provider', width: 170, cell: (p) => <TextCell>{p.provider}</TextCell> }, codigo: `{ key: 'provider', header: 'Provider', width: 170, cell: (p) => <TextCell>{p.provider}</TextCell> }` },
-  balance: { header: 'Balance', col: { key: 'balance', header: 'Balance', width: 110, align: 'right', cell: (p) => <AmountCell value={p.balance} /> }, codigo: `{ key: 'balance', header: 'Balance', width: 110, align: 'right', cell: (p) => <AmountCell value={p.balance} /> }` },
-}
-export const NOMBRE_COLUMNA = Object.fromEntries(Object.entries(COLUMNAS).map(([k, v]) => [k, v.header])) as Record<ColumnaTabla, string>
 
 /* ── Cómo se ve ─────────────────────────────────────────────────────── */
 
@@ -365,6 +386,97 @@ function FechaViva({ c }: { c: Campo }) {
   )
 }
 
+function VerTabla({ b }: { b: BloqueDe<'tabla'> }) {
+  const cj = conjunto(b.datos)
+  const campos = cj.campos as Record<string, CampoDato>
+  return (
+    <DataTable
+      key={`${b.datos}-${b.porPagina}-${b.filas}`}
+      rows={cj.filas.slice(0, b.filas)}
+      rowKey={(r) => String(r.id)}
+      rowLabel={(r) => String(r[cj.etiqueta])}
+      columns={b.columnas.filter((col) => campos[col.campo]).map((col) => {
+        const f = campos[col.campo]!
+        return { key: col.id, header: col.header, width: col.ancho ?? undefined, align: f.tipo === 'monto' ? ('right' as const) : undefined, cell: (r: (typeof cj.filas)[number]) => celda(f.tipo, r, col.campo) }
+      })}
+      search={b.buscador ? { placeholder: `Search ${cj.plural}`, match: (r, q) => String(r[cj.etiqueta]).toLowerCase().includes(q.toLowerCase()) } : undefined}
+      selectable={b.seleccion}
+      rowActions={b.acciones ? () => (
+        <>
+          <DropdownMenuItem><Pencil className="size-4 shrink-0" /> Edit {cj.singular}</DropdownMenuItem>
+          <DropdownMenuItem variant="destructive"><Trash2 className="size-4 shrink-0" /> Delete {cj.singular}</DropdownMenuItem>
+        </>
+      ) : undefined}
+      density={b.compacta ? 'compact' : 'regular'}
+      pageSize={b.porPagina}
+      itemLabel={cj.plural}
+    />
+  )
+}
+
+/* Un examen sin nada marcado: las 32 piezas permanentes, limpias. */
+const examenLimpio = (): OralExam => {
+  const e = makeMockExam()
+  return { ...e, teeth: e.teeth.map((t) => ({ ...t, element: 'permanent' as const, surfaces: t.surfaces.map(() => null), icons: [], root: null, color: null, findings: [] })) }
+}
+
+/* El odontograma de Clinical: el número selecciona la pieza, una superficie
+   se marca (o se desmarca) con el color elegido. */
+function OdontogramaVivo({ b }: { b: BloqueDe<'odontograma'> }) {
+  const [examen, setExamen] = useState<OralExam>(() => (b.ejemplo ? makeMockExam() : examenLimpio()))
+  const [dientes, setDientes] = useState<number[]>([])
+  const color = MARCAS[b.marca]
+  return (
+    <div className="overflow-x-auto">
+      <Odontogram
+        exam={examen}
+        selected={dientes}
+        onToggle={(n) => setDientes((s) => (s.includes(n) ? s.filter((x) => x !== n) : [...s, n]))}
+        onSurface={(n, i) => setExamen((e) => ({ ...e, teeth: e.teeth.map((t) => (t.number === n ? { ...t, surfaces: t.surfaces.map((s, k) => (k === i ? (s ? null : color) : s)) } : t)) }))}
+      />
+    </div>
+  )
+}
+
+const FORMAS_DOSIS = ['Tablet', 'Capsule', 'Syrup', 'Mouthwash', 'Injection']
+const FRECUENCIAS = ['Once daily', 'Every 12 hours', 'Every 8 hours', 'Every 6 hours', 'As needed']
+
+/* La receta: qué, cuánto y cómo tomarlo, como el formulario de Medication de
+   la ficha clínica. */
+function VerReceta({ b }: { b: BloqueDe<'receta'> }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-2.5">
+        <span className="flex size-8 items-center justify-center rounded-lg bg-info-bg text-[13px] font-bold text-dash-blue">Rx</span>
+        <h3 className="text-sm font-bold text-ink">{b.titulo}</h3>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <SearchField label="Medication" required placeholder="Search a medication" options={lista(b.medicamentos)} className="sm:col-span-2" />
+        <TextField label="Strength" required placeholder="500 mg" />
+        <SelectField label="Dosage form" required placeholder="Select form" options={FORMAS_DOSIS} />
+      </div>
+      <p className="text-[13px] font-semibold text-ink">Directions for use</p>
+      <div className="grid gap-4 sm:grid-cols-3">
+        <TextField label="Dose" required placeholder="1 tablet" />
+        <SelectField label="Frequency" required placeholder="Select frequency" options={FRECUENCIAS} />
+        <TextField label="Duration" placeholder="7 days" />
+      </div>
+      {(b.repeticiones || b.sustitucion) && (
+        <div className="grid items-end gap-4 sm:grid-cols-2">
+          {b.repeticiones && <SelectField label="Refills" placeholder="0" options={['0', '1', '2', '3']} />}
+          {b.sustitucion && (
+            <label className="flex h-9 items-center justify-between gap-4 text-[13px] text-ink">
+              Allow generic substitution
+              <Switch defaultChecked aria-label="Allow generic substitution" />
+            </label>
+          )}
+        </div>
+      )}
+      {b.indicaciones && <TextArea label="Instructions for the patient" placeholder="Take after meals. Do not drive if you feel drowsy." />}
+    </div>
+  )
+}
+
 function CasillasVivas({ b }: { b: BloqueDe<'opciones'> }) {
   const [marcados, setMarcados] = useState(() => b.items.filter((i) => i.on).map((i) => i.label))
   return (
@@ -441,26 +553,11 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
     case 'detalles':
       return <InfoBlock className="mt-0" title={b.titulo} items={b.items.map((x) => ({ icon: ICONOS[x.icono], label: x.label, value: x.valor }))} onEdit={() => {}} />
     case 'tabla':
-      return (
-        <DataTable
-          key={`${b.porPagina}-${b.filas}`}
-          rows={PACIENTES.slice(0, b.filas)}
-          rowKey={(p) => p.id}
-          rowLabel={(p) => p.name}
-          columns={b.columnas.map((c) => COLUMNAS[c].col)}
-          search={b.buscador ? { placeholder: 'Search patients', match: (p, q) => p.name.toLowerCase().includes(q.toLowerCase()) } : undefined}
-          selectable={b.seleccion}
-          rowActions={b.acciones ? () => (
-            <>
-              <DropdownMenuItem><Pencil className="size-4 shrink-0" /> Edit patient</DropdownMenuItem>
-              <DropdownMenuItem variant="destructive"><Trash2 className="size-4 shrink-0" /> Delete patient</DropdownMenuItem>
-            </>
-          ) : undefined}
-          density={b.compacta ? 'compact' : 'regular'}
-          pageSize={b.porPagina}
-          itemLabel="patients"
-        />
-      )
+      return <VerTabla b={b} />
+    case 'odontograma':
+      return <OdontogramaVivo key={String(b.ejemplo)} b={b} />
+    case 'receta':
+      return <VerReceta b={b} />
     case 'vacio': {
       const I = ICONOS[b.icono]
       return <EmptyState icon={I ?? undefined} title={b.titulo} detail={b.detalle || undefined} accion={b.accion ? { label: b.accion, onClick: () => {} } : undefined} />
@@ -677,17 +774,37 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor): string[
         `/>`,
       ]
     case 'tabla': {
-      importar(c, '@/components/ui/data-table', 'DataTable', ...(b.columnas.includes('patient') ? ['PersonCell'] : []), ...(b.columnas.some((x) => x === 'next' || x === 'provider') ? ['TextCell'] : []), ...(b.columnas.includes('balance') ? ['AmountCell'] : []))
-      if (b.columnas.includes('status')) importar(c, '@/components/ui/pill', 'Pill')
-      if (!c.datos.some((d) => d.startsWith('const pacientes'))) {
-        c.datos.push([
-          `const pacientes = [`,
-          ...PACIENTES.slice(0, b.filas).map((p) => `  { id: ${comillas(p.id)}, name: ${comillas(p.name)}, initials: ${comillas(p.initials)}, status: ${comillas(p.status)}, next: ${comillas(p.next)}, provider: ${comillas(p.provider)}, balance: ${p.balance} },`),
-          `]`,
-        ].join('\n'))
+      const cj = conjunto(b.datos)
+      const campos = cj.campos as Record<string, CampoDato>
+      const cols = b.columnas.filter((col) => campos[col.campo])
+      importar(c, '@/components/ui/data-table', 'DataTable', ...cols.map((col) => COMPONENTE_CELDA[campos[col.campo]!.tipo]).filter((x) => x !== 'Pill'))
+      if (cols.some((col) => campos[col.campo]!.tipo === 'estado')) {
+        importar(c, '@/components/ui/pill', 'Pill', 'type PillTone')
+        if (!c.datos.some((d) => d.startsWith('const TONO_ESTADO'))) {
+          const clave = (k: string) => (/^[A-Za-z]\w*$/.test(k) ? k : comillas(k))
+          c.datos.push([`const TONO_ESTADO: Record<string, PillTone> = {`, ...Object.entries(TONO_ESTADO).map(([k, v]) => `  ${clave(k)}: '${v}',`), `}`].join('\n'))
+        }
       }
-      const lineas = [`<DataTable`, `  rows={pacientes}`, `  rowKey={(p) => p.id}`, `  rowLabel={(p) => p.name}`, `  columns={[`, ...b.columnas.map((x) => `    ${COLUMNAS[x].codigo},`), `  ]}`]
-      if (b.buscador) lineas.push(`  search={{ placeholder: 'Search patients', match: (p, q) => p.name.toLowerCase().includes(q.toLowerCase()) }}`)
+      if (!c.datos.some((d) => d.startsWith(`const ${cj.variable} =`))) {
+        const valor = (v: string | number) => (typeof v === 'number' ? String(v) : comillas(v))
+        c.datos.push([`const ${cj.variable} = [`, ...cj.filas.map((f) => `  { ${Object.entries(f).map(([k, v]) => `${k}: ${valor(v)}`).join(', ')} },`), `]`].join('\n'))
+      }
+      const claves: Record<string, number> = {}
+      const lineas = [
+        `<DataTable`,
+        `  rows={${cj.variable}${b.filas < cj.filas.length ? `.slice(0, ${b.filas})` : ''}}`,
+        `  rowKey={(r) => r.id}`,
+        `  rowLabel={(r) => r.${cj.etiqueta}}`,
+        `  columns={[`,
+        ...cols.map((col) => {
+          const f = campos[col.campo]!
+          const n = (claves[col.campo] = (claves[col.campo] ?? 0) + 1)
+          const key = n > 1 ? `${col.campo}${n}` : col.campo
+          return `    { key: '${key}', header: ${comillas(col.header)}${col.ancho ? `, width: ${col.ancho}` : ''}${f.tipo === 'monto' ? `, align: 'right'` : ''}, cell: (r) => ${codigoCelda(f.tipo, col.campo)} },`
+        }),
+        `  ]}`,
+      ]
+      if (b.buscador) lineas.push(`  search={{ placeholder: 'Search ${cj.plural}', match: (r, q) => r.${cj.etiqueta}.toLowerCase().includes(q.toLowerCase()) }}`)
       if (b.seleccion) lineas.push(`  selectable`)
       if (b.acciones) {
         importar(c, '@/components/ui/dropdown-menu', 'DropdownMenuItem')
@@ -695,15 +812,70 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor): string[
         lineas.push(
           `  rowActions={() => (`,
           `    <>`,
-          `      <DropdownMenuItem><Pencil className="size-4 shrink-0" /> Edit patient</DropdownMenuItem>`,
-          `      <DropdownMenuItem variant="destructive"><Trash2 className="size-4 shrink-0" /> Delete patient</DropdownMenuItem>`,
+          `      <DropdownMenuItem><Pencil className="size-4 shrink-0" /> Edit ${cj.singular}</DropdownMenuItem>`,
+          `      <DropdownMenuItem variant="destructive"><Trash2 className="size-4 shrink-0" /> Delete ${cj.singular}</DropdownMenuItem>`,
           `    </>`,
           `  )}`,
         )
       }
       if (b.compacta) lineas.push(`  density="compact"`)
       if (b.porPagina !== 10) lineas.push(`  pageSize={${b.porPagina}}`)
-      lineas.push(`  itemLabel="patients"`, `/>`)
+      lineas.push(`  itemLabel="${cj.plural}"`, `/>`)
+      return lineas
+    }
+    case 'odontograma': {
+      importar(c, '@/components/clinical/Odontogram', 'Odontogram')
+      importar(c, '@/data/odontogram', 'makeMockExam', 'type OralExam')
+      const inicial = b.ejemplo
+        ? '<OralExam>(makeMockExam)'
+        : `<OralExam>(() => { const e = makeMockExam(); return { ...e, teeth: e.teeth.map((t) => ({ ...t, element: 'permanent' as const, surfaces: t.surfaces.map(() => null), icons: [], root: null, color: null, findings: [] })) } })`
+      const [v, set] = estado(c, 'examen', inicial)
+      const [d, setD] = estado(c, 'dientes', '<number[]>([])')
+      return [
+        `<div className="overflow-x-auto">`,
+        `  <Odontogram`,
+        `    exam={${v}}`,
+        `    selected={${d}}`,
+        `    onToggle={(n) => ${setD}((s) => (s.includes(n) ? s.filter((x) => x !== n) : [...s, n]))}`,
+        `    onSurface={(n, i) => ${set}((e) => ({ ...e, teeth: e.teeth.map((t) => (t.number === n ? { ...t, surfaces: t.surfaces.map((s, k) => (k === i ? (s ? null : '${MARCAS[b.marca]}') : s)) } : t)) }))}`,
+        `  />`,
+        `</div>`,
+      ]
+    }
+    case 'receta': {
+      importar(c, '@/components/patients/form', 'SearchField', 'SelectField', 'TextField')
+      const lineas = [
+        `<div className="flex flex-col gap-4">`,
+        `  <div className="flex items-center gap-2.5">`,
+        `    <span className="flex size-8 items-center justify-center rounded-lg bg-info-bg text-[13px] font-bold text-dash-blue">Rx</span>`,
+        `    <h3 className="text-sm font-bold text-ink">${texto(b.titulo)}</h3>`,
+        `  </div>`,
+        `  <div className="grid gap-4 sm:grid-cols-2">`,
+        `    <SearchField label="Medication" required placeholder="Search a medication" options={${arreglo(lista(b.medicamentos))}} className="sm:col-span-2" />`,
+        `    <TextField label="Strength" required placeholder="500 mg" />`,
+        `    <SelectField label="Dosage form" required placeholder="Select form" options={${arreglo(FORMAS_DOSIS)}} />`,
+        `  </div>`,
+        `  <p className="text-[13px] font-semibold text-ink">Directions for use</p>`,
+        `  <div className="grid gap-4 sm:grid-cols-3">`,
+        `    <TextField label="Dose" required placeholder="1 tablet" />`,
+        `    <SelectField label="Frequency" required placeholder="Select frequency" options={${arreglo(FRECUENCIAS)}} />`,
+        `    <TextField label="Duration" placeholder="7 days" />`,
+        `  </div>`,
+      ]
+      if (b.repeticiones || b.sustitucion) {
+        lineas.push(`  <div className="grid items-end gap-4 sm:grid-cols-2">`)
+        if (b.repeticiones) lineas.push(`    <SelectField label="Refills" placeholder="0" options={['0', '1', '2', '3']} />`)
+        if (b.sustitucion) {
+          importar(c, '@/components/ui/switch', 'Switch')
+          lineas.push(`    <label className="flex h-9 items-center justify-between gap-4 text-[13px] text-ink">`, `      Allow generic substitution`, `      <Switch defaultChecked aria-label="Allow generic substitution" />`, `    </label>`)
+        }
+        lineas.push(`  </div>`)
+      }
+      if (b.indicaciones) {
+        importar(c, '@/components/patients/form', 'TextArea')
+        lineas.push(`  <TextArea label="Instructions for the patient" placeholder="Take after meals. Do not drive if you feel drowsy." />`)
+      }
+      lineas.push(`</div>`)
       return lineas
     }
     case 'vacio':
@@ -1025,7 +1197,40 @@ export const PLANTILLAS: { nombre: string; que: string; crear: () => Diseno }[] 
       bloques: [
         encabezado('Patients', 'Everyone registered in this location.', 'New patient', 'Plus'),
         { id: nuevoId(), tipo: 'pestanas', tabs: 'All, Active, Inactive', size: 'md', fullWidth: false },
-        { id: nuevoId(), tipo: 'tabla', columnas: ['patient', 'status', 'next', 'provider', 'balance'], filas: 8, buscador: true, seleccion: true, acciones: true, compacta: false, porPagina: 5 },
+        tablaDe('pacientes', { campos: ['name', 'status', 'next', 'provider', 'insurance', 'lastVisit', 'balance'], filas: 8, seleccion: true }),
+      ],
+    }),
+  },
+  {
+    nombre: 'Ledger', que: 'Todos los movimientos, con muchas columnas',
+    crear: () => ({
+      nombre: 'Ledger screen', contenedor: 'page', tituloPanel: '', ancho: 'completo',
+      bloques: [
+        encabezado('Ledger', 'Charges, payments and adjustments for this location.', 'Post payment', 'Plus'),
+        { id: nuevoId(), tipo: 'pestanas', tabs: 'All, Charges, Payments, Adjustments', size: 'md', fullWidth: false },
+        tablaDe('movimientos', { campos: ['date', 'patient', 'code', 'description', 'provider', 'type', 'amount', 'status'], filas: 8, compacta: true, porPagina: 10, seleccion: true }),
+      ],
+    }),
+  },
+  {
+    nombre: 'Prescriptions', que: 'Las recetas del paciente y un modal para hacer una nueva',
+    crear: () => ({
+      nombre: 'Prescriptions card', contenedor: 'card', tituloPanel: '', ancho: 'completo',
+      bloques: [
+        encabezado('Prescriptions', 'Medication prescribed at this clinic.'),
+        { id: nuevoId(), tipo: 'modal', titulo: 'New prescription', disparador: 'New prescription', ancho: 'md', confirmar: 'Sign and send', cancelar: 'Cancel', peligro: false, bloques: [infoDe('receta').nuevo()] },
+        tablaDe('recetas', { filas: 6, buscador: false, compacta: true }),
+      ],
+    }),
+  },
+  {
+    nombre: 'Dental chart', que: 'El odontograma con su leyenda',
+    crear: () => ({
+      nombre: 'Dental chart card', contenedor: 'card', tituloPanel: '', ancho: 'completo',
+      bloques: [
+        encabezado('Dental chart', 'Click a tooth number to select it and a surface to mark it.'),
+        { id: nuevoId(), tipo: 'pills', items: [{ label: 'Caries', tone: 'danger' }, { label: 'Restoration', tone: 'info' }, { label: 'Planned', tone: 'warning' }] },
+        infoDe('odontograma').nuevo(),
       ],
     }),
   },
