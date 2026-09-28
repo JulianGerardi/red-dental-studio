@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import {
-  ArrowDown, ArrowUp, Blocks, Check, ChevronDown, Code2, Copy, CopyPlus, Download, Link2, PanelRightClose, Plus, Trash2, X,
+  ArrowDown, ArrowUp, Blocks, Check, ChevronDown, Code2, Copy, CopyPlus, Download, Link2, PanelRightClose, Pencil, Plus, Trash2, X,
 } from 'lucide-react'
 import { Tabs } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
@@ -15,7 +15,7 @@ import {
   type Bloque, type BloqueDe, type Campo, type Diseno, type Marca, type Grupo, type IconoReal, type NombreIcono, type TipoBloque,
 } from './bloques'
 import { DATOS, conjunto, type CampoDato, type IdConjunto } from './datos'
-import { codificar, decodificar, descargarPng, linkDe, tomarCompartido } from './compartir'
+import { codificar, decodificar, descargarPng, linkDe, soltarCompartido, tomarCompartido } from './compartir'
 
 /* El constructor: cualquiera arma un componente con las piezas reales de la
    app y se lleva su código. El lienzo muestra lo que se arma; el panel
@@ -610,10 +610,17 @@ export function Constructor() {
   const [modalAbierto, setModalAbierto] = useState<string | null>(null)
   const [link, setLink] = useState<{ url: string; copiado: boolean } | null>(null)
   const [bajando, setBajando] = useState(false)
-  const [compartido, setCompartido] = useState(false)
+  /* Abierto desde un link compartido: se muestra ese diseño solo, sin tocar
+     el que esta persona tenga armado, hasta que elija editar una copia. */
+  const [delLink] = useState(tomarCompartido)
+  const [abriendo, setAbriendo] = useState(!!delLink)
+  const [visto, setVisto] = useState<Diseno | null>(null)
+  const [aviso, setAviso] = useState<'copia' | 'roto' | null>(null)
+  const [anterior, setAnterior] = useState<Diseno | null>(null)
   const previa = useRef<HTMLDivElement>(null)
   const ctx: Ctx = { editando, setEditando }
-  const codigo = useMemo(() => generarCodigo(d), [d])
+  const actual = visto ?? d
+  const codigo = useMemo(() => generarCodigo(actual), [actual])
 
   useEffect(() => {
     try {
@@ -623,14 +630,24 @@ export function Constructor() {
     }
   }, [d])
 
-  /* Abierto desde un link compartido: se muestra ese diseño. */
   useEffect(() => {
-    const codigo = tomarCompartido()
-    if (!codigo) return
-    decodificar(codigo)
-      .then((x) => { setD(migrarDiseno(x)); setEditando(null); setCompartido(true) })
-      .catch(() => {})
-  }, [])
+    if (!delLink) return
+    decodificar(delLink)
+      .then((x) => setVisto(migrarDiseno(x)))
+      .catch(() => { soltarCompartido(); setAviso('roto') })
+      .finally(() => setAbriendo(false))
+  }, [delLink])
+
+  const editarCopia = () => {
+    if (!visto) return
+    setAnterior(JSON.stringify(d) === JSON.stringify(visto) ? null : d)
+    setD(visto)
+    setVisto(null)
+    setEditando(null)
+    setModalAbierto(null)
+    setAviso('copia')
+    soltarCompartido()
+  }
 
   /* Viniendo de la página de un componente ("Build with Buttons"), se suma
      ese bloque y se abre para editarlo. */
@@ -666,7 +683,7 @@ export function Constructor() {
     if (!nodo) return
     setBajando(true)
     try {
-      await descargarPng(nodo, nombreComponente(d.nombre))
+      await descargarPng(nodo, nombreComponente(actual.nombre))
     } finally {
       setBajando(false)
     }
@@ -687,12 +704,67 @@ export function Constructor() {
     window.setTimeout(() => setCopiado(false), 1600)
   }
 
-  const ancho = ANCHOS[d.ancho]
   const anchoPanel = pestana === 'Code' ? 'lg:w-[560px]' : 'lg:w-[400px]'
+
+  if (abriendo) {
+    return (
+      <Sitio actual="builder--docs" lateral={false}>
+        <div className={cn(LIENZO, 'flex items-center justify-center text-[14px] text-ink-muted')}>Abriendo el diseño…</div>
+      </Sitio>
+    )
+  }
+
+  if (visto) {
+    const nombre = nombreComponente(visto.nombre)
+    return (
+      <Sitio actual="builder--docs" lateral={false}>
+        <div className={LIENZO}>
+          <div className="mx-auto flex max-w-[1180px] flex-col gap-10 px-5 pt-8 pb-24 sm:px-8">
+            <div data-lienzo className="flex min-h-[calc(100vh-10rem)] transform-gpu flex-col gap-8">
+              <header className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+                <div className="flex min-w-0 flex-col gap-3">
+                  <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[14px]">
+                    <Enlace id="welcome--docs" className="text-dash-blue no-underline hover:underline">Home</Enlace>
+                    <span className="text-ink-muted">/</span>
+                    <span className="text-ink">Shared design</span>
+                  </nav>
+                  <h1 className="m-0 truncate text-[36px] leading-tight font-bold tracking-[-0.02em] text-ink">{nombre}</h1>
+                  <p className="m-0 max-w-[62ch] text-[16px] leading-relaxed text-ink-muted">
+                    Un componente armado en el Builder con las piezas reales de la app. Probalo acá mismo; para cambiarlo, editá una copia.
+                  </p>
+                </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  <button type="button" onClick={editarCopia} className="inline-flex h-9 items-center gap-1.5 rounded-md bg-dash-blue px-3.5 text-[14px] font-medium text-white hover:bg-dash-blue-hover">
+                    <Pencil className="size-4" /> Edit a copy
+                  </button>
+                  <button type="button" onClick={bajarPng} disabled={bajando || !visto.bloques.length} className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line bg-white px-3.5 text-[14px] font-medium text-ink hover:bg-surface-subtle disabled:opacity-50">
+                    <Download className="size-4" /> {bajando ? 'Saving…' : 'PNG'}
+                  </button>
+                </div>
+              </header>
+              <Muestra d={visto} previa={previa} editando={null} modal={modalAbierto} setModal={setModalAbierto} />
+            </div>
+
+            <section aria-label="Code" className="overflow-hidden rounded-xl border border-line bg-white">
+              <div className="flex items-center justify-between gap-3 border-b border-line-row px-4 py-2.5">
+                <span className="flex min-w-0 items-center gap-2 text-[13px] font-medium text-ink">
+                  <Code2 className="size-4 shrink-0 text-ink-muted" /> <span className="truncate">{nombre}.tsx</span>
+                </span>
+                <button type="button" onClick={copiar} className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-line bg-white px-2.5 text-[13px] font-medium text-ink hover:bg-surface-subtle">
+                  {copiado ? <Check className="size-4" /> : <Copy className="size-4" />} {copiado ? 'Copied' : 'Copy code'}
+                </button>
+              </div>
+              <pre className="m-0 max-h-[520px] overflow-auto bg-surface-subtle p-4 font-mono text-[12.5px] leading-[1.6] text-ink"><Resaltar codigo={codigo} /></pre>
+            </section>
+          </div>
+        </div>
+      </Sitio>
+    )
+  }
 
   return (
     <Sitio actual="builder--docs" lateral={false}>
-      <div className="relative min-h-[calc(100vh-4rem)] bg-page-background [background-image:radial-gradient(color-mix(in_srgb,var(--color-ink)_10%,transparent)_1px,transparent_1px)] [background-size:18px_18px]">
+      <div className={cn(LIENZO, 'relative')}>
         <div className={cn('px-5 pt-8 pb-[60vh] sm:px-8 lg:pb-24', abierto && (pestana === 'Code' ? 'lg:pr-[600px]' : 'lg:pr-[440px]'))}>
         {/* El transform hace que los modales del lienzo (ModalShell es
             position: fixed) se abran sobre el lienzo, centrados en el lugar
@@ -710,29 +782,15 @@ export function Constructor() {
             </p>
           </header>
 
-          <div className="mx-auto w-full" style={{ maxWidth: ancho ?? undefined }}>
-            <p className="m-0 mb-2 flex items-center justify-between text-[12px] text-ink-muted">
-              <span>Preview · {d.contenedor === 'card' ? 'Card' : d.contenedor === 'panel' ? 'Panel' : 'Page'}</span>
-              <span className="tabular-nums">{ancho ? `${ancho}px` : 'Full width'}</span>
-            </p>
-            <div ref={previa} className={cn(d.contenedor === 'page' && 'overflow-hidden rounded-xl border border-line bg-page-background')}>
-              {d.bloques.length ? (
-                <MemoryRouter>
-                  <VistaPrevia.Provider value={{ editando, abierto: modalAbierto, setAbierto: setModalAbierto }}>
-                    <VerDiseno d={d} />
-                  </VistaPrevia.Provider>
-                </MemoryRouter>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => { setAbierto(true); setPestana('Build'); setAgregando(true) }}
-                  className="flex h-56 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line bg-white/70 text-[14px] text-ink-muted hover:border-dash-blue hover:text-dash-blue"
-                >
-                  <Plus className="size-5" /> Agregá el primer bloque
-                </button>
-              )}
-            </div>
-          </div>
+          <Muestra d={d} previa={previa} editando={editando} modal={modalAbierto} setModal={setModalAbierto}>
+            <button
+              type="button"
+              onClick={() => { setAbierto(true); setPestana('Build'); setAgregando(true) }}
+              className="flex h-56 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line bg-white/70 text-[14px] text-ink-muted hover:border-dash-blue hover:text-dash-blue"
+            >
+              <Plus className="size-5" /> Agregá el primer bloque
+            </button>
+          </Muestra>
         </div>
         </div>
 
@@ -783,7 +841,7 @@ export function Constructor() {
               {link && (
                 <div className="flex flex-col gap-1.5 rounded-lg bg-info-bg p-2.5">
                   <span className="text-[12px] font-medium text-ink">
-                    {link.copiado ? 'Link copiado. Quien lo abra ve este mismo componente, con su código.' : 'Copiá este link: quien lo abra ve este mismo componente, con su código.'}
+                    {link.copiado ? 'Link copiado.' : 'Copiá este link.'} Quien lo abra ve este componente con su código, y puede editar una copia.
                   </span>
                   <span className="flex items-center gap-1.5">
                     <input readOnly value={link.url} onFocus={(e) => e.currentTarget.select()} aria-label="Share link" className={cn(INPUT, 'h-7 flex-1 text-[11.5px] text-ink-muted')} />
@@ -792,10 +850,22 @@ export function Constructor() {
                   </span>
                 </div>
               )}
-              {compartido && (
+              {aviso && (
                 <div className="flex items-start justify-between gap-2 rounded-lg border border-dash-blue/20 bg-info-bg px-2.5 py-2 text-[12px] text-ink">
-                  <span>Abriste un diseño compartido. Lo que cambies queda en tu navegador; el link no cambia.</span>
-                  <button type="button" onClick={() => setCompartido(false)} aria-label="Dismiss" className="flex size-5 shrink-0 items-center justify-center rounded text-ink-muted hover:bg-white"><X className="size-3" /></button>
+                  {aviso === 'roto' ? (
+                    <span>No se pudo abrir el diseño del link: puede que esté cortado. Pedí que te lo copien de nuevo.</span>
+                  ) : (
+                    <span>
+                      Estás editando una copia del diseño compartido. Lo que cambies queda en tu navegador; el link no cambia.
+                      {anterior && (
+                        <>
+                          {' '}
+                          <button type="button" onClick={() => { setD(anterior); setAnterior(null); setAviso(null) }} className="font-medium text-dash-blue hover:underline">Volver a mi diseño</button>
+                        </>
+                      )}
+                    </span>
+                  )}
+                  <button type="button" onClick={() => setAviso(null)} aria-label="Dismiss" className="flex size-5 shrink-0 items-center justify-center rounded text-ink-muted hover:bg-white"><X className="size-3" /></button>
                 </div>
               )}
             </div>
@@ -859,6 +929,37 @@ export function Constructor() {
         )}
       </div>
     </Sitio>
+  )
+}
+
+const LIENZO = 'min-h-[calc(100vh-4rem)] bg-page-background [background-image:radial-gradient(color-mix(in_srgb,var(--color-ink)_10%,transparent)_1px,transparent_1px)] [background-size:18px_18px]'
+
+/* El componente armado, al ancho elegido. Sin bloques muestra `children`. */
+function Muestra({ d, previa, editando, modal, setModal, children }: {
+  d: Diseno
+  previa: RefObject<HTMLDivElement | null>
+  editando: string | null
+  modal: string | null
+  setModal: (id: string | null) => void
+  children?: ReactNode
+}) {
+  const ancho = ANCHOS[d.ancho]
+  return (
+    <div className="mx-auto w-full" style={{ maxWidth: ancho ?? undefined }}>
+      <p className="m-0 mb-2 flex items-center justify-between text-[12px] text-ink-muted">
+        <span>Preview · {d.contenedor === 'card' ? 'Card' : d.contenedor === 'panel' ? 'Panel' : 'Page'}</span>
+        <span className="tabular-nums">{ancho ? `${ancho}px` : 'Full width'}</span>
+      </p>
+      <div ref={previa} className={cn(d.contenedor === 'page' && 'overflow-hidden rounded-xl border border-line bg-page-background')}>
+        {d.bloques.length ? (
+          <MemoryRouter>
+            <VistaPrevia.Provider value={{ editando, abierto: modal, setAbierto: setModal }}>
+              <VerDiseno d={d} />
+            </VistaPrevia.Provider>
+          </MemoryRouter>
+        ) : children}
+      </div>
+    </div>
   )
 }
 

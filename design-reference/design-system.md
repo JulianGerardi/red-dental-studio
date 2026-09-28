@@ -72,7 +72,11 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   un link con el diseño comprimido en `#diseno=` (`constructor/compartir.ts`):
   no se sube a ningún servidor. `.storybook/manager.ts` guarda ese `#` al
   abrir el sitio, antes de que Storybook reescriba la dirección, y el Builder
-  lo toma y lo borra. Modal, Section y cada pestaña tienen bloques
+  lo vuelve a poner para que recargar o copiar la dirección siga mostrándolo.
+  El link abre una vista con solo el componente (se puede usar), su código y
+  *PNG*; no toca el diseño que la persona tenga guardado hasta que toca *Edit
+  a copy*, que lo pasa al Builder, borra el `#` y ofrece *Volver a mi diseño*.
+  Un link cortado abre el Builder con un aviso. Modal, Section y cada pestaña tienen bloques
   adentro (el panel los muestra anidados); un modal no va adentro de otro
   bloque. En el lienzo el modal se abre sobre el lienzo (`transform-gpu`
   contiene su `position: fixed`) y queda abierto mientras se edita algo de

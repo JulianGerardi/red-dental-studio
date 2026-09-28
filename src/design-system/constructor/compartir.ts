@@ -6,7 +6,7 @@ import type { Diseno } from './bloques'
    El link lleva el diseño adentro (comprimido, en el # de la dirección): no
    se sube a ningún servidor, así que no hay nada que borrar ni que pueda
    quedar público por error. Quien lo abre ve el mismo componente con su
-   código, y lo que cambie queda en su navegador, no en el link. */
+   código, y puede abrir una copia en el Builder para cambiarla. */
 
 const CLAVE = 'confidentally-ui-shared'
 
@@ -45,34 +45,41 @@ export function linkDe(codigo: string) {
   return url.toString()
 }
 
-/* El diseño de un link, una sola vez. Lo guarda .storybook/manager.ts al
-   abrir el sitio, antes de que Storybook reescriba la dirección. */
+/* El diseño de un link. Lo guarda .storybook/manager.ts al abrir el sitio,
+   antes de que Storybook reescriba la dirección; se vuelve a poner en la
+   dirección para que recargar o copiarla siga mostrando el diseño. */
 export function tomarCompartido(): string | null {
+  let codigo: string | null = null
   try {
-    const guardado = window.sessionStorage.getItem(CLAVE)
-    if (guardado) {
-      window.sessionStorage.removeItem(CLAVE)
-      const top = window.top
-      if (top?.location.hash.includes('diseno=')) top.history.replaceState(null, '', top.location.pathname + top.location.search)
-      return guardado
-    }
+    codigo = window.sessionStorage.getItem(CLAVE)
+    window.sessionStorage.removeItem(CLAVE)
   } catch {
     /* Sin almacenamiento: se intenta con la dirección. */
   }
-  for (const w of [window.top, window]) {
-    try {
-      const m = w?.location.hash.match(/diseno=([\w-]+)/)
-      if (m) {
-        /* Se saca de la dirección: recargar no tiene que pisar lo que se
-           cambie después. */
-        w!.history.replaceState(null, '', w!.location.pathname + w!.location.search)
-        return m[1]!
-      }
-    } catch {
-      /* Otro origen. */
-    }
+  codigo ??= dondeEsta().location.hash.match(/diseno=([\w-]+)/)?.[1] ?? null
+  if (codigo) ponerEnLaDireccion(`#diseno=${codigo}`)
+  return codigo
+}
+
+/* Al pasar a editar una copia: recargar ya no vuelve al diseño del link. */
+export function soltarCompartido() {
+  ponerEnLaDireccion('')
+}
+
+/* La ventana del sitio, o esta página si el sitio es de otro origen. */
+function dondeEsta(): Window {
+  try {
+    if (window.top?.location.href) return window.top
+  } catch {
+    /* Otro origen. */
   }
-  return null
+  return window
+}
+
+function ponerEnLaDireccion(hash: string) {
+  const w = dondeEsta()
+  if (w.location.hash === hash) return
+  w.history.replaceState(w.history.state, '', w.location.pathname + w.location.search + hash)
 }
 
 /* El color de fondo de las pantallas de la app, para el margen de la imagen. */
