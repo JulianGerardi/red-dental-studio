@@ -1,1 +1,0 @@
-import{t as e}from"./iframe-okb2-boh.js";e();
