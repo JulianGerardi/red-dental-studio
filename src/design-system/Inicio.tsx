@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Blocks, ChevronRight, Layers, Lightbulb, SlidersHorizontal, type LucideIcon } from 'lucide-react'
+import { Blocks, ChevronRight, Layers, Lightbulb, MousePointer2, SlidersHorizontal, type LucideIcon } from 'lucide-react'
 import { ICONO_SECCION, Buscador } from './Buscador'
 import { QUE_SECCION, type Seccion } from './buscar'
 import { useIndice } from './Mapa'
@@ -74,41 +74,23 @@ export function Inicio() {
           </div>
         </section>
 
-        {/* El constructor, la invitación más grande después del buscador. */}
-        <Enlace id="builder--docs" className="group relative flex flex-col gap-6 overflow-hidden rounded-3xl bg-ink p-8 text-white no-underline sm:p-10 lg:flex-row lg:items-center">
-          <div className="flex flex-1 flex-col gap-3">
-            <span className="inline-flex items-center gap-2 self-start rounded-full bg-white/10 px-3 py-1 text-[12px] font-medium text-white/90">
+        {/* El constructor, la invitación más grande después del buscador: azul, con la grilla del lienzo, y a la derecha
+            una pantalla vacía que se arma sola arrastrando componentes (`Arrastre`, animación en docs.css). */}
+        <Enlace id="builder--docs" className="group relative flex flex-col gap-6 overflow-hidden rounded-3xl bg-[linear-gradient(135deg,var(--color-dash-blue)_0%,color-mix(in_srgb,var(--color-dash-blue)_68%,black)_100%)] p-8 text-white no-underline sm:p-10 lg:flex-row lg:items-center">
+          <div aria-hidden className="pointer-events-none absolute inset-0 [background-image:radial-gradient(rgb(255_255_255/0.16)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(90deg,transparent,#000_45%)]" />
+          <div className="relative flex flex-1 flex-col gap-3">
+            <span className="inline-flex items-center gap-2 self-start rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white">
               <Blocks className="size-3.5" /> Builder
             </span>
             <span className="text-[30px] leading-tight font-bold tracking-[-0.02em] sm:text-[36px]">Armá tu propio componente</span>
-            <span className="max-w-[52ch] text-[15px] leading-relaxed text-white/70">
-              Sumá bloques (encabezado, campos, tabla, botones…), cambiá cada uno y mirá cómo queda. El código sale solo, listo para copiar, con los componentes reales de la app.
+            <span className="max-w-[52ch] text-[15px] leading-relaxed text-white/80">
+              Empezá con una pantalla en blanco y arrastrá los componentes reales de la app, cada uno suelto: métricas, tablas, tarjetas, modales… El código sale solo, listo para copiar.
             </span>
-            <span className="mt-2 inline-flex items-center gap-1.5 self-start rounded-md bg-white px-4 py-2 text-[14px] font-semibold text-ink transition-transform group-hover:translate-x-0.5">
+            <span className="mt-2 inline-flex items-center gap-1.5 self-start rounded-md bg-white px-4 py-2 text-[14px] font-semibold text-dash-blue transition-transform group-hover:translate-x-0.5">
               Open builder <ChevronRight className="size-4" />
             </span>
           </div>
-          <div aria-hidden className="relative hidden w-[420px] shrink-0 lg:block">
-            <div className="rounded-xl bg-white p-4 text-ink shadow-2xl">
-              <p className="m-0 text-[13px] font-semibold">Clinic details</p>
-              <p className="m-0 mt-0.5 text-[12px] text-ink-muted">Name and contact shown to patients.</p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {['Clinic name', 'Phone'].map((x) => (
-                  <span key={x} className="flex flex-col gap-1 text-[11px] font-medium">{x}<span className="h-7 rounded-md border border-line" /></span>
-                ))}
-              </div>
-              <div className="mt-3 flex justify-end gap-1.5">
-                <span className="rounded-md border border-line px-2.5 py-1 text-[11px]">Cancel</span>
-                <span className="rounded-md bg-dash-blue px-2.5 py-1 text-[11px] text-white">Save changes</span>
-              </div>
-            </div>
-            <div className="absolute -right-3 -bottom-6 w-[230px] rounded-xl border border-white/10 bg-[color-mix(in_srgb,var(--color-ink)_92%,white)] p-3 font-mono text-[10.5px] leading-relaxed text-white/80 shadow-2xl">
-              <span className="text-[color-mix(in_srgb,var(--color-dash-blue)_45%,white)]">{'<Card>'}</span><br />
-              {'  '}<span className="text-[color-mix(in_srgb,var(--color-dash-blue)_45%,white)]">{'<CardTitle>'}</span>Clinic details…<br />
-              {'  '}<span className="text-[color-mix(in_srgb,var(--color-dash-blue)_45%,white)]">{'<TextField'}</span> label=&quot;Phone&quot; /&gt;<br />
-              <span className="text-[color-mix(in_srgb,var(--color-dash-blue)_45%,white)]">{'</Card>'}</span>
-            </div>
-          </div>
+          <Arrastre />
         </Enlace>
 
         <section className="flex flex-col gap-8">
@@ -166,5 +148,88 @@ export function Inicio() {
         </section>
       </div>
     </Sitio>
+  )
+}
+
+/* La pantalla vacía que se arma sola: tres componentes salen de la paleta y caen en su lugar, uno por vez. Las medidas son
+   del recuadro de 440 × 290; `--dx` / `--dy` llevan cada fantasma de su lugar en la paleta al centro de su hueco. */
+const PIEZAS_DEMO = [
+  { nombre: 'StatCard', top: 60, dx: 239, dy: 5 },
+  { nombre: 'PatientsTable', top: 88, dx: 192, dy: 90 },
+  { nombre: 'AppointmentCard', top: 116, dx: 328, dy: 32 },
+]
+
+function Ficha({ nombre, className, style }: { nombre: string; className?: string; style?: React.CSSProperties }) {
+  return (
+    <span className={`absolute left-2 flex h-[22px] w-[102px] items-center gap-1.5 rounded-md border bg-white px-1.5 text-[10px] font-medium text-ink ${className ?? ''}`} style={style}>
+      <span className="size-2.5 shrink-0 rounded-[3px] bg-purple-bg ring-1 ring-purple-fg/40" />
+      <span className="truncate">{nombre}</span>
+    </span>
+  )
+}
+
+function Arrastre() {
+  return (
+    <div aria-hidden className="bl-demo relative hidden h-[290px] w-[440px] shrink-0 lg:block">
+      {/* La pantalla: menú lateral, barra y el contenido con sus huecos. */}
+      <div className="absolute top-0 left-[130px] flex h-[290px] w-[310px] overflow-hidden rounded-xl bg-white shadow-2xl">
+        <div className="flex w-[26px] flex-col items-center gap-2 border-r border-line-row bg-surface-subtle pt-1.5">
+          <span className="size-3.5 rounded bg-dash-blue" />
+          {[0, 1, 2, 3, 4].map((i) => <span key={i} className="size-2 rounded-full bg-line" />)}
+        </div>
+        <div className="flex flex-1 flex-col">
+          <div className="flex h-[24px] items-center justify-between border-b border-line-row px-2.5">
+            <span className="h-1.5 w-16 rounded-full bg-line" />
+            <span className="size-3 rounded-full bg-surface-slate" />
+          </div>
+          <div className="flex-1 bg-page-background px-2.5 pt-2.5">
+            <span className="block h-2 w-20 rounded-full bg-ink/70" />
+            <span className="mt-1 block h-1.5 w-32 rounded-full bg-line" />
+          </div>
+        </div>
+      </div>
+      {/* Los huecos: una línea punteada hasta que cae la pieza. */}
+      <div className="absolute top-[56px] left-[166px] h-[40px] w-[264px] rounded-md border border-dashed border-dash-blue/30">
+        <div className="bl-lleno-1 grid h-full grid-cols-3 gap-1.5">
+          {['24', '$8.4k', '2'].map((v) => (
+            <span key={v} className="flex flex-col justify-center gap-1 rounded-md bg-white px-2 shadow-sm">
+              <span className="h-1 w-8 rounded-full bg-line" />
+              <span className="text-[11px] leading-none font-bold text-ink">{v}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="absolute top-[104px] left-[166px] h-[170px] w-[170px] rounded-md border border-dashed border-dash-blue/30">
+        <div className="bl-lleno-2 flex h-full flex-col rounded-md bg-white p-2 shadow-sm">
+          <span className="h-1.5 w-12 rounded-full bg-ink/60" />
+          {[0, 1, 2, 3, 4].map((i) => (
+            <span key={i} className="mt-2 flex items-center gap-1.5 border-t border-line-row pt-2">
+              <span className="size-3 rounded-full bg-dash-blue/80" />
+              <span className="h-1 w-14 rounded-full bg-line" />
+              <span className="ml-auto h-1 w-6 rounded-full bg-line" />
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="absolute top-[104px] left-[344px] h-[110px] w-[86px] rounded-md border border-dashed border-dash-blue/30">
+        <div className="bl-lleno-3 flex h-full flex-col gap-1.5 rounded-md bg-white p-2 shadow-sm">
+          <span className="flex items-center gap-1"><span className="size-3 rounded-full bg-dash-blue" /><span className="h-1.5 w-9 rounded-full bg-ink/60" /></span>
+          <span className="h-1 w-12 rounded-full bg-line" />
+          <span className="h-1 w-10 rounded-full bg-line" />
+          <span className="mt-auto h-4 rounded bg-dash-blue" />
+        </div>
+      </div>
+      {/* La paleta y los fantasmas que se arrastran. */}
+      <div className="absolute top-[36px] left-0 h-[112px] w-[118px] rounded-lg bg-white shadow-xl">
+        <span className="absolute top-2 left-2.5 text-[8.5px] font-semibold tracking-[0.08em] text-ink-muted uppercase">Components</span>
+      </div>
+      {PIEZAS_DEMO.map((p) => <Ficha key={p.nombre} nombre={p.nombre} className="border-line" style={{ top: p.top }} />)}
+      {PIEZAS_DEMO.map((p, i) => (
+        <span key={p.nombre} className={`bl-mover-${i + 1} absolute top-0 left-0 opacity-0`} style={{ '--dx': `${p.dx}px`, '--dy': `${p.dy}px` } as React.CSSProperties}>
+          <Ficha nombre={p.nombre} className="border-dash-blue shadow-lg" style={{ top: p.top }} />
+          <MousePointer2 className="absolute left-[98px] size-4 fill-ink text-white" style={{ top: p.top + 14 }} />
+        </span>
+      ))}
+    </div>
   )
 }

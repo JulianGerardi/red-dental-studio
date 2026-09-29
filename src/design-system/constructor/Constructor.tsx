@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import {
-  ArrowDown, ArrowUp, Blocks, Check, ChevronDown, Code2, Copy, CopyPlus, Download, Link2, PanelRightClose, Pencil, Plus, Trash2, X,
+  ArrowDown, ArrowUp, Blocks, Check, ChevronDown, Code2, Component, Copy, CopyPlus, Download, Layers, Link2, PanelRightClose, Pencil, Plus, Search, Trash2, X,
 } from 'lucide-react'
 import { Tabs } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
@@ -9,20 +9,25 @@ import type { PillTone } from '@/components/ui/pill'
 import { cn } from '@/lib/utils'
 import { Enlace } from '../navegar'
 import { Sitio } from '../Sitio'
+import { cargarIndice, type Entrada } from '../Mapa'
+import { armarIndice, type Pagina } from '../buscar'
 import {
-  AGREGAR, ANCHOS, ICONOS, MARCAS, PLANTILLAS, columna, migrarDiseno, TIPOS, VerDiseno, VistaPrevia, campo, contiene, generarCodigo, infoDe,
-  nombreComponente, pestana as nuevaPestana, permitidos, reIdentificar,
-  type Bloque, type BloqueDe, type Campo, type Diseno, type Marca, type Grupo, type IconoReal, type NombreIcono, type TipoBloque,
+  AGREGAR, ANCHOS, ICONOS, MARCAS, PLANTILLAS, PROPORCIONES, columna, columnasDe, nuevoId, migrarDiseno, TIPOS, VerDiseno, VistaPrevia, campo, contiene, generarCodigo, iconoDe,
+  nombreComponente, nombreDe, pestana as nuevaPestana, reIdentificar,
+  type Bloque, type BloqueDe, type Campo, type Diseno, type Marca, type IconoReal, type NombreIcono, type Proporcion,
 } from './bloques'
+import { Lienzo, buscarBloque, entra, insertar, ubicar, useLienzo } from './lienzo'
+import { armarPaleta, filtrar, type Item, type Seccion } from './paleta'
 import { DATOS, conjunto, type CampoDato, type IdConjunto } from './datos'
 import { codificar, decodificar, descargarPng, linkDe, soltarCompartido, tomarCompartido } from './compartir'
 
-/* El constructor: cualquiera arma un componente con las piezas reales de la
-   app y se lleva su código. El lienzo muestra lo que se arma; el panel
-   flotante del costado tiene los bloques (Build) y el código (Code). Lo que
-   se arma queda guardado en este navegador. */
+/* El constructor: cualquiera arma un componente con las piezas reales de la app y se lleva su código. Se arma arrastrando:
+   de la paleta (Components) al lienzo, y dentro del lienzo para reordenar. Layers edita lo elegido; Code da el código.
+   Lo que se arma queda guardado en este navegador. Ver design-reference/design-system.md › Builder. */
 
 const GUARDADO = 'confidentally-ui-builder'
+/* Una pantalla de la app vacía (menú lateral y barra reales), para armarla desde cero. */
+const pantallaVacia = (): Diseno => ({ nombre: 'New screen', contenedor: 'app', tituloPanel: '', ancho: 'completo', bloques: [] })
 const lista = (s: string) => s.split(',').map((x) => x.trim()).filter(Boolean)
 
 function cargar(): Diseno | null {
@@ -136,7 +141,8 @@ function EditorCampo({ c, cambiar, quitar }: { c: Campo; cambiar: (x: Partial<Ca
   )
 }
 
-type Ctx = { editando: string | null; setEditando: (id: string | null) => void }
+type Sistema = { entradas: Entrada[]; indice: Pagina[] }
+type Ctx = { editando: string | null; setEditando: (id: string | null) => void; sistema: Sistema | null; agregarEn: (lista: string, nombre: string) => void }
 
 const OPC_ICONO_REAL = OPC_ICONO.filter((o) => o.value !== 'none') as { value: IconoReal; label: string }[]
 
@@ -157,7 +163,7 @@ function Editor({ b, cambiar, ctx }: { b: Bloque; cambiar: (x: Partial<Bloque>) 
           </div>
           <Llave label="Destructive (red confirm)" value={b.peligro} onChange={(v) => c({ peligro: v })} />
           <Adentro titulo="Inside the modal" nota="Mientras lo editás, el modal queda abierto en el lienzo.">
-            <ListaBloques bloques={b.bloques} onChange={(x) => c({ bloques: x })} ctx={ctx} padre="modal" />
+            <ListaBloques lista={b.id} bloques={b.bloques} onChange={(x) => c({ bloques: x })} ctx={ctx} padre={b.titulo} />
           </Adentro>
         </>
       )
@@ -166,7 +172,7 @@ function Editor({ b, cambiar, ctx }: { b: Bloque; cambiar: (x: Partial<Bloque>) 
         <>
           <Texto label="Section title" value={b.titulo} onChange={(v) => c({ titulo: v })} />
           <Adentro titulo="Inside the section">
-            <ListaBloques bloques={b.bloques} onChange={(x) => c({ bloques: x })} ctx={ctx} padre="seccion" />
+            <ListaBloques lista={b.id} bloques={b.bloques} onChange={(x) => c({ bloques: x })} ctx={ctx} padre={b.titulo} />
           </Adentro>
         </>
       )
@@ -184,7 +190,7 @@ function Editor({ b, cambiar, ctx }: { b: Bloque; cambiar: (x: Partial<Bloque>) 
                 <div className="min-w-0 flex-1"><Texto label={`Tab ${i + 1}`} value={p.label} onChange={(v) => poner(p.id, { label: v })} /></div>
                 <Quitar onClick={() => c({ pestanas: b.pestanas.filter((x) => x.id !== p.id) })} label={`Remove ${p.label}`} />
               </div>
-              <ListaBloques bloques={p.bloques} onChange={(x) => poner(p.id, { bloques: x })} ctx={ctx} padre="pestanasContenido" />
+              <ListaBloques lista={`${b.id}:${p.id}`} bloques={p.bloques} onChange={(x) => poner(p.id, { bloques: x })} ctx={ctx} padre={p.label} />
             </div>
           ))}
           {b.pestanas.length < 6 && <Sumar onClick={() => c({ pestanas: [...b.pestanas, nuevaPestana(`Tab ${b.pestanas.length + 1}`)] })}>Add tab</Sumar>}
@@ -450,6 +456,43 @@ function Editor({ b, cambiar, ctx }: { b: Bloque; cambiar: (x: Partial<Bloque>) 
       )
     case 'divisor':
       return <p className="m-0 text-[12.5px] text-ink-muted">Una línea fina para separar bloques. No tiene opciones.</p>
+    case 'columnas': {
+      const cambiarProporcion = (v: Proporcion) => {
+        const n = columnasDe(v)
+        const cols = b.columnas.slice(0, n)
+        /* Si se achica, lo de las columnas que sobran pasa a la última que queda. */
+        if (b.columnas.length > n) cols[n - 1] = { ...cols[n - 1]!, bloques: [...cols[n - 1]!.bloques, ...b.columnas.slice(n).flatMap((x) => x.bloques)] }
+        while (cols.length < n) cols.push({ id: nuevoId(), bloques: [] })
+        c({ proporcion: v, columnas: cols })
+      }
+      return (
+        <>
+          <Elegir label="Columns" value={b.proporcion} opciones={(Object.keys(PROPORCIONES) as Proporcion[]).map((k) => ({ value: k, label: k.split('-').join(' : ') }))} onChange={cambiarProporcion} />
+          {b.columnas.map((col, i) => (
+            <Adentro key={col.id} titulo={`Column ${i + 1}`}>
+              <ListaBloques lista={`${b.id}:${col.id}`} bloques={col.bloques} onChange={(x) => c({ columnas: b.columnas.map((y) => (y.id === col.id ? { ...y, bloques: x } : y)) })} ctx={ctx} padre={`Column ${i + 1}`} />
+            </Adentro>
+          ))}
+        </>
+      )
+    }
+    case 'pieza': {
+      const pagina = ctx.sistema?.indice.find((p) => p.titulo === b.componente && (p.id === b.storyId || p.ejemplos.some((e) => e.id === b.storyId)))
+      const ejemplos = pagina?.ejemplos.filter((e) => !/^(playground|specs|anatomy)$/i.test(e.nombre)) ?? []
+      return (
+        <>
+          {!b.pantalla && ejemplos.length > 1 && (
+            <Elegir label="Example" value={b.storyId} opciones={ejemplos.map((e) => ({ value: e.id, label: e.nombre }))} onChange={(v) => c({ storyId: v, ejemplo: ejemplos.find((e) => e.id === v)?.nombre ?? '' })} />
+          )}
+          <p className="m-0 text-[12px] leading-snug text-ink-muted">
+            {b.pantalla
+              ? 'La pantalla real de la app, escalada al ancho. En el código va como la ruta que ya existe.'
+              : 'El componente real de la app, tal como está en Confidentally UI. En el código va su import; los props salen del ejemplo.'}
+          </p>
+          <Enlace id={pagina?.id ?? b.storyId} className="self-start text-[12.5px] font-medium text-dash-blue hover:underline">Open in Confidentally UI · {b.lugar}</Enlace>
+        </>
+      )
+    }
   }
 }
 
@@ -477,6 +520,8 @@ function resumen(b: Bloque) {
     case 'calendario': return `${b.vista} view${b.selector ? ' · Day / Week / Month' : ''}`
     case 'horarios': return `${b.provider} · ${b.fecha}`
     case 'divisor': return ''
+    case 'pieza': return b.ejemplo || b.lugar
+    case 'columnas': return `${b.columnas.length} columns · ${b.columnas.map((c) => c.bloques.length).join(' + ')} inside`
   }
 }
 
@@ -493,23 +538,16 @@ function Adentro({ titulo, nota, children }: { titulo: string; nota?: string; ch
   )
 }
 
-const GRUPOS: Grupo[] = ['Layout', 'Forms', 'Content', 'Data', 'Clinical']
-
-/* Una lista de bloques: la del diseño y la de adentro de cada contenedor
-   (un modal, una sección, cada pestaña). Se suman, ordenan, duplican,
-   borran y editan igual en todos los niveles. */
-function ListaBloques({ bloques, onChange, ctx, padre, agregando: agregandoProp, setAgregando: setAgregandoProp }: {
+/* Una lista de bloques: la del diseño y la de adentro de cada contenedor (un modal, una sección, cada pestaña).
+   Se ordenan, duplican, borran y editan igual en todos los niveles; lo nuevo se suma desde Components. */
+function ListaBloques({ lista, bloques, onChange, ctx, padre }: {
+  lista: string
   bloques: Bloque[]
   onChange: (b: Bloque[]) => void
   ctx: Ctx
-  padre?: TipoBloque
-  agregando?: boolean
-  setAgregando?: (v: boolean) => void
+  /** Nombre del contenedor, si es una lista de adentro. */
+  padre?: string
 }) {
-  const [agregandoPropio, setAgregandoPropio] = useState(false)
-  const agregando = agregandoProp ?? agregandoPropio
-  const setAgregando = setAgregandoProp ?? setAgregandoPropio
-  const tipos = permitidos(padre)
   const poner = (id: string, cambio: Partial<Bloque>) => onChange(bloques.map((b) => (b.id === id ? ({ ...b, ...cambio } as Bloque) : b)))
   const mover = (i: number, paso: -1 | 1) => {
     const j = i + paso
@@ -518,38 +556,33 @@ function ListaBloques({ bloques, onChange, ctx, padre, agregando: agregandoProp,
     ;[n[i], n[j]] = [n[j]!, n[i]!]
     onChange(n)
   }
-  const agregar = (t: TipoBloque) => {
-    const b = infoDe(t).nuevo()
-    onChange([...bloques, b])
-    ctx.setEditando(b.id)
-    setAgregando(false)
-  }
   const chico = !!padre
 
   return (
     <div className="flex flex-col gap-2">
-      {bloques.length === 0 && <p className="m-0 text-[12.5px] text-ink-muted">{padre ? 'Vacío: sumá un bloque adentro.' : 'Todavía no hay bloques. Sumá el primero.'}</p>}
+      {bloques.length === 0 && <p className="m-0 text-[12.5px] text-ink-muted">{padre ? 'Vacío: arrastrá un bloque adentro en el lienzo, o sumalo desde acá.' : 'Todavía no hay bloques. Arrastrá el primero desde Components.'}</p>}
       <ol className="m-0 flex list-none flex-col gap-2 p-0">
         {bloques.map((b, i) => {
-          const info = infoDe(b.tipo)
+          const Icono = iconoDe(b)
+          const nombre = nombreDe(b)
           const este = ctx.editando === b.id
           const abiertoB = !!ctx.editando && contiene([b], ctx.editando)
           return (
-            <li key={b.id} className={cn('rounded-xl border bg-white', este ? 'border-dash-blue/50 shadow-[0_0_0_3px_rgb(29_86_188/0.08)]' : 'border-line')}>
+            <li key={b.id} ref={este ? (el) => el?.scrollIntoView({ block: 'nearest' }) : undefined} className={cn('scroll-mt-3 rounded-xl border bg-white', este ? 'border-dash-blue/50 shadow-[0_0_0_3px_rgb(29_86_188/0.08)]' : 'border-line')}>
               <div className="flex items-center gap-1 py-1.5 pr-1.5 pl-2.5">
                 <button type="button" onClick={() => ctx.setEditando(este ? null : b.id)} aria-expanded={abiertoB} className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
-                  <span className={cn('flex shrink-0 items-center justify-center rounded-md', chico ? 'size-6' : 'size-7', abiertoB ? 'bg-dash-blue text-white' : 'bg-surface-slate text-ink-slate')}>
-                    <info.icono className="size-3.5" />
+                  <span className={cn('flex shrink-0 items-center justify-center rounded-md', chico ? 'size-6' : 'size-7', abiertoB ? 'bg-dash-blue text-white' : b.tipo === 'pieza' ? 'bg-purple-bg text-purple-fg' : 'bg-surface-slate text-ink-slate')}>
+                    <Icono className="size-3.5" />
                   </span>
                   <span className="flex min-w-0 flex-col">
-                    <span className="text-[13px] font-semibold text-ink">{info.nombre}</span>
+                    <span className="truncate text-[13px] font-semibold text-ink">{nombre}</span>
                     {resumen(b) && <span className="truncate text-[12px] text-ink-muted">{resumen(b)}</span>}
                   </span>
                 </button>
-                <button type="button" onClick={() => mover(i, -1)} disabled={i === 0} aria-label={`Move ${info.nombre} up`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted disabled:opacity-30"><ArrowUp className="size-3.5" /></button>
-                <button type="button" onClick={() => mover(i, 1)} disabled={i === bloques.length - 1} aria-label={`Move ${info.nombre} down`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted disabled:opacity-30"><ArrowDown className="size-3.5" /></button>
-                <button type="button" onClick={() => onChange([...bloques.slice(0, i + 1), reIdentificar(b), ...bloques.slice(i + 1)])} aria-label={`Duplicate ${info.nombre}`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"><CopyPlus className="size-3.5" /></button>
-                <button type="button" onClick={() => onChange(bloques.filter((y) => y.id !== b.id))} aria-label={`Delete ${info.nombre}`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-dash-bad-bg hover:text-dash-bad-fg"><Trash2 className="size-3.5" /></button>
+                <button type="button" onClick={() => mover(i, -1)} disabled={i === 0} aria-label={`Move ${nombre} up`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted disabled:opacity-30"><ArrowUp className="size-3.5" /></button>
+                <button type="button" onClick={() => mover(i, 1)} disabled={i === bloques.length - 1} aria-label={`Move ${nombre} down`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted disabled:opacity-30"><ArrowDown className="size-3.5" /></button>
+                <button type="button" onClick={() => onChange([...bloques.slice(0, i + 1), reIdentificar(b), ...bloques.slice(i + 1)])} aria-label={`Duplicate ${nombre}`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"><CopyPlus className="size-3.5" /></button>
+                <button type="button" onClick={() => onChange(bloques.filter((y) => y.id !== b.id))} aria-label={`Delete ${nombre}`} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-dash-bad-bg hover:text-dash-bad-fg"><Trash2 className="size-3.5" /></button>
               </div>
               {abiertoB && (
                 <div className="flex flex-col gap-3 border-t border-line-row px-3 pt-3 pb-3.5">
@@ -560,51 +593,142 @@ function ListaBloques({ bloques, onChange, ctx, padre, agregando: agregandoProp,
           )
         })}
       </ol>
-      {agregando ? (
-        <div className="flex flex-col gap-3 rounded-xl border border-dashed border-dash-blue/40 bg-info-bg/50 p-2.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[12.5px] font-semibold text-ink">{padre ? 'Add a block inside' : 'Add a block'}</span>
-            <button type="button" onClick={() => setAgregando(false)} aria-label="Close" className="flex size-6 items-center justify-center rounded-md text-ink-muted hover:bg-white"><X className="size-3.5" /></button>
-          </div>
-          {GRUPOS.map((g) => {
-            const deGrupo = TIPOS.filter((t) => t.grupo === g && tipos.includes(t.tipo))
-            if (!deGrupo.length) return null
-            return (
-              <div key={g} className="flex flex-col gap-1.5">
-                <span className="text-[11px] font-semibold tracking-[0.06em] text-ink-muted uppercase">{g}</span>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {deGrupo.map((t) => (
-                    <button key={t.tipo} type="button" onClick={() => agregar(t.tipo)} className="flex items-start gap-2 rounded-lg border border-line bg-white p-2 text-left hover:border-dash-blue">
-                      <t.icono className="mt-0.5 size-4 shrink-0 text-dash-blue" />
-                      <span className="flex min-w-0 flex-col">
-                        <span className="text-[12.5px] font-semibold text-ink">{t.nombre}</span>
-                        <span className="text-[11.5px] leading-snug text-ink-muted">{t.que}</span>
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      ) : (
-        <button type="button" onClick={() => setAgregando(true)} className={cn('flex items-center justify-center gap-1.5 rounded-xl border border-dashed border-line text-[13px] font-medium text-dash-blue hover:border-dash-blue hover:bg-info-bg/50', chico ? 'h-8' : 'h-10')}>
-          <Plus className="size-4" /> {padre ? 'Add block inside' : 'Add block'}
-        </button>
-      )}
+      <button type="button" onClick={() => ctx.agregarEn(lista, padre ?? '')} className={cn('flex items-center justify-center gap-1.5 rounded-xl border border-dashed border-line text-[13px] font-medium text-dash-blue hover:border-dash-blue hover:bg-info-bg/50', chico ? 'h-8' : 'h-10')}>
+        <Plus className="size-4" /> {padre ? 'Add block inside' : 'Add block'}
+      </button>
     </div>
   )
 }
 
+/* La paleta: todo lo que se puede soltar en el lienzo. Se arrastra, o con un clic se suma. */
+function Paleta({ paleta, sistema, alArrastrar, alTerminar, sumar, dentro, salir, elegido, nuevaPantalla }: {
+  paleta: Seccion[]
+  sistema: Sistema | null
+  alArrastrar: (it: Item) => void
+  alTerminar: () => void
+  sumar: (it: Item) => void
+  dentro: string | null
+  salir: () => void
+  /** Lo elegido en el lienzo: el clic suma adentro (una sección, un modal) o debajo. */
+  elegido: { nombre: string; adentro: boolean; editar: () => void; soltar: () => void } | null
+  /** Empezar una pantalla en blanco, si lo armado no es una pantalla. */
+  nuevaPantalla: (() => void) | null
+}) {
+  const [q, setQ] = useState('')
+  const hallados = useMemo(() => (q.trim() ? filtrar(paleta, q) : null), [paleta, q])
+  const arrastrable = (it: Item) => ({
+    draggable: true,
+    onDragStart: (ev: React.DragEvent) => {
+      ev.dataTransfer.effectAllowed = 'copy'
+      ev.dataTransfer.setData('text/plain', it.nombre)
+      alArrastrar(it)
+    },
+    onDragEnd: alTerminar,
+    onClick: () => sumar(it),
+    title: `${it.nombre} · arrastralo al lienzo o hacé clic para sumarlo`,
+  })
+  const fila = (it: Item, conLugar = false) => {
+    const Icono = it.icono ?? Component
+    return (
+      <li key={it.clave}>
+        <button type="button" {...arrastrable(it)} className="flex w-full cursor-grab items-center gap-2.5 rounded-lg px-2 py-1.5 text-left hover:bg-info-bg/60 active:cursor-grabbing">
+          <span className={cn('flex size-7 shrink-0 items-center justify-center rounded-md', it.tipo === 'pieza' ? 'bg-purple-bg text-purple-fg' : 'bg-surface-slate text-ink-slate')}><Icono className="size-3.5" /></span>
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className="truncate text-[13px] font-medium text-ink">{it.nombre}</span>
+            <span className="truncate text-[11.5px] text-ink-muted">{conLugar ? `${it.lugar} · ${it.detalle}` : it.detalle}</span>
+          </span>
+        </button>
+      </li>
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-4 p-4">
+      <label className="relative block">
+        <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-ink-muted" />
+        <input id="builder-buscar" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar: tabla, paciente, odontograma…" aria-label="Search components" className={cn(INPUT, 'h-9 pl-8')} />
+      </label>
+      {nuevaPantalla && (
+        <div className="flex items-center justify-between gap-2 rounded-lg border border-dashed border-dash-blue/40 px-2.5 py-2 text-[12px] text-ink">
+          <span>¿Armás una pantalla? Empezá una en blanco, con el menú y la barra de la app.</span>
+          <button type="button" onClick={nuevaPantalla} className="inline-flex h-7 shrink-0 items-center rounded-md bg-dash-blue px-2.5 font-medium text-white hover:bg-dash-blue-hover">Blank screen</button>
+        </div>
+      )}
+      {dentro !== null && (
+        <div className="flex items-center justify-between gap-2 rounded-lg bg-info-bg px-2.5 py-1.5 text-[12px] text-ink">
+          <span>Con un clic se suma adentro de <b>{dentro || 'la pestaña'}</b>.</span>
+          <button type="button" onClick={salir} aria-label="Stop adding inside" className="flex size-5 items-center justify-center rounded text-ink-muted hover:bg-white"><X className="size-3" /></button>
+        </div>
+      )}
+      {elegido && (
+        <div className="flex items-center justify-between gap-2 rounded-lg border border-line-row bg-surface-subtle px-2.5 py-1.5 text-[12px] text-ink">
+          <span className="min-w-0">Elegido: <b>{elegido.nombre}</b>. Con un clic se suma {elegido.adentro ? 'adentro' : 'debajo'}.</span>
+          <span className="flex shrink-0 items-center gap-1">
+            <button type="button" onClick={elegido.editar} className="inline-flex h-6 items-center gap-1 rounded px-1.5 font-medium text-dash-blue hover:bg-white"><Pencil className="size-3" /> Edit</button>
+            <button type="button" onClick={elegido.soltar} aria-label="Deselect" className="flex size-6 items-center justify-center rounded text-ink-muted hover:bg-white"><X className="size-3" /></button>
+          </span>
+        </div>
+      )}
+      <p className="m-0 -mt-1 text-[12px] leading-snug text-ink-muted">Arrastrá al lienzo: entre bloques, o adentro de una sección, una pestaña o un modal abierto. Un clic en el lienzo elige; doble clic, o el lápiz, lo edita.</p>
+
+      {hallados ? (
+        hallados.length ? <ul className="m-0 flex list-none flex-col p-0">{hallados.map((it) => fila(it, true))}</ul> : <p className="m-0 text-[13px] text-ink-muted">Nada con “{q}”. Probá con otra palabra: turno, pago, tabla, modal…</p>
+      ) : (
+        paleta.map((sec, k) => (
+          <section key={sec.titulo} className="flex flex-col gap-2">
+            <div className="flex flex-col">
+              <span className="text-[13px] font-semibold text-ink">{sec.titulo}</span>
+              <span className="text-[11.5px] leading-snug text-ink-muted">{sec.que}</span>
+            </div>
+            {k === 0 ? (
+              sec.grupos.map((g) => (
+                <div key={g.nombre} className="flex flex-col gap-1.5">
+                  <span className="text-[11px] font-semibold tracking-[0.06em] text-ink-muted uppercase">{g.nombre}</span>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {g.items.map((it) => {
+                      const Icono = it.icono ?? Blocks
+                      return (
+                        <button key={it.clave} type="button" {...arrastrable(it)} className="flex cursor-grab items-start gap-2 rounded-lg border border-line bg-white p-2 text-left hover:border-dash-blue active:cursor-grabbing">
+                          <Icono className="mt-0.5 size-4 shrink-0 text-dash-blue" />
+                          <span className="flex min-w-0 flex-col">
+                            <span className="text-[12.5px] font-semibold text-ink">{it.nombre}</span>
+                            <span className="text-[11.5px] leading-snug text-ink-muted">{it.detalle}</span>
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))
+            ) : (
+              sec.grupos.map((g) => (
+                <details key={g.nombre} className="group rounded-lg border border-line-row">
+                  <summary className="flex cursor-pointer list-none items-center justify-between px-2.5 py-2 text-[12.5px] font-medium text-ink [&::-webkit-details-marker]:hidden">
+                    {g.nombre}
+                    <span className="flex items-center gap-1.5 text-[11.5px] text-ink-muted tabular-nums">{g.items.length}<ChevronDown className="size-3.5 transition-transform group-open:rotate-180" /></span>
+                  </summary>
+                  <ul className="m-0 flex list-none flex-col border-t border-line-row p-1">{g.items.map((it) => fila(it))}</ul>
+                </details>
+              ))
+            )}
+          </section>
+        ))
+      )}
+      {!sistema && <p className="m-0 text-[12px] text-ink-muted">Cargando los componentes de la app…</p>}
+    </div>
+  )
+}
 
 /* ── La página ──────────────────────────────────────────────────────── */
 
 export function Constructor() {
-  const [d, setD] = useState<Diseno>(() => cargar() ?? PLANTILLAS[0]!.crear())
+  const [d, setD] = useState<Diseno>(() => cargar() ?? pantallaVacia())
   const [abierto, setAbierto] = useState(true)
-  const [pestana, setPestana] = useState<'Build' | 'Code'>('Build')
+  const [pestana, setPestana] = useState<'Components' | 'Layers' | 'Code'>('Components')
   const [editando, setEditando] = useState<string | null>(null)
-  const [agregando, setAgregando] = useState(false)
+  /* La lista donde el clic en la paleta suma, cuando se pidió "Add block inside" en Layers. */
+  const [dentro, setDentro] = useState<{ lista: string; nombre: string } | null>(null)
+  const [sistema, setSistema] = useState<Sistema | null>(null)
   const [copiado, setCopiado] = useState(false)
   /* El modal que se abrió tocando su botón en el lienzo. */
   const [modalAbierto, setModalAbierto] = useState<string | null>(null)
@@ -618,9 +742,23 @@ export function Constructor() {
   const [aviso, setAviso] = useState<'copia' | 'roto' | null>(null)
   const [anterior, setAnterior] = useState<Diseno | null>(null)
   const previa = useRef<HTMLDivElement>(null)
-  const ctx: Ctx = { editando, setEditando }
   const actual = visto ?? d
   const codigo = useMemo(() => generarCodigo(actual), [actual])
+  const paleta = useMemo(() => (sistema ? armarPaleta(sistema.entradas, sistema.indice) : armarPaleta([], [])), [sistema])
+
+  const editar = (id: string) => {
+    setEditando(id)
+    setPestana('Layers')
+  }
+  const edicion = useLienzo({ bloques: d.bloques, setBloques: (f) => setD((x) => ({ ...x, bloques: f(x.bloques) })), elegido: editando, elegir: setEditando, editar })
+  const elegidoB = editando ? buscarBloque(d.bloques, editando) : null
+  const ctx: Ctx = {
+    editando, setEditando, sistema,
+    agregarEn: (lista, nombre) => {
+      setDentro(lista === 'raiz' ? null : { lista, nombre })
+      setPestana('Components')
+    },
+  }
 
   useEffect(() => {
     try {
@@ -631,12 +769,33 @@ export function Constructor() {
   }, [d])
 
   useEffect(() => {
+    let vivo = true
+    cargarIndice().then((e) => { if (vivo) setSistema({ entradas: e, indice: armarIndice(e) }) })
+    return () => { vivo = false }
+  }, [])
+
+  useEffect(() => {
     if (!delLink) return
     decodificar(delLink)
       .then((x) => setVisto(migrarDiseno(x)))
       .catch(() => { soltarCompartido(); setAviso('roto') })
       .finally(() => setAbriendo(false))
   }, [delLink])
+
+  /* Con algo elegido: Supr lo borra y Esc lo suelta, si no se está escribiendo. */
+  useEffect(() => {
+    const tecla = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement
+      if (visto || !editando || t.closest('input, textarea, select, [contenteditable="true"]')) return
+      if (e.key === 'Escape') setEditando(null)
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault()
+        edicion.borrar(editando)
+      }
+    }
+    window.addEventListener('keydown', tecla)
+    return () => window.removeEventListener('keydown', tecla)
+  })
 
   const editarCopia = () => {
     if (!visto) return
@@ -664,7 +823,23 @@ export function Constructor() {
     const b = info.nuevo()
     setD((x) => ({ ...x, bloques: [...x.bloques, b] }))
     setEditando(b.id)
+    setPestana('Layers')
   }, [])
+
+  /* El clic en la paleta suma adentro de lo pedido o de la sección o el modal elegidos, si no debajo de lo elegido, si no al final. */
+  const sumar = (it: Item) => {
+    const b = it.crear()
+    setD((x) => {
+      const u = editando ? ubicar(x.bloques, editando) : null
+      const [lista, indice] =
+        dentro && entra(x.bloques, dentro.lista, b.tipo) ? [dentro.lista, Infinity]
+        : editando && entra(x.bloques, editando, b.tipo) ? [editando, Infinity]
+        : u && entra(x.bloques, u.lista, b.tipo) ? [u.lista, u.indice + 1]
+        : ['raiz', Infinity]
+      return { ...x, bloques: insertar(x.bloques, lista, indice, b) }
+    })
+    setEditando(b.id)
+  }
 
   const compartir = async () => {
     const url = linkDe(await codificar(d))
@@ -778,19 +953,13 @@ export function Constructor() {
             </nav>
             <h1 className="m-0 text-[36px] leading-tight font-bold tracking-[-0.02em] text-ink">Builder</h1>
             <p className="m-0 max-w-[62ch] text-[16px] leading-relaxed text-ink-muted">
-              Armá un componente con las piezas reales de la app y llevate su código. Elegí un punto de partida, sumá bloques y cambiá lo que quieras desde el panel.
+              Armá pantallas de la app desde cero con sus componentes reales, cada uno suelto, y llevate su código. Arrastrá desde el panel al lienzo; ahí se elige, se mueve y se edita.
             </p>
           </header>
 
-          <Muestra d={d} previa={previa} editando={editando} modal={modalAbierto} setModal={setModalAbierto}>
-            <button
-              type="button"
-              onClick={() => { setAbierto(true); setPestana('Build'); setAgregando(true) }}
-              className="flex h-56 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line bg-white/70 text-[14px] text-ink-muted hover:border-dash-blue hover:text-dash-blue"
-            >
-              <Plus className="size-5" /> Agregá el primer bloque
-            </button>
-          </Muestra>
+          <Lienzo edicion={edicion}>
+            <Muestra d={d} previa={previa} editando={editando} elegir={setEditando} modal={modalAbierto} setModal={setModalAbierto} />
+          </Lienzo>
         </div>
         </div>
 
@@ -871,21 +1040,36 @@ export function Constructor() {
             </div>
 
             <nav aria-label="Builder sections" className="flex gap-5 border-b border-line px-4">
-              {(['Build', 'Code'] as const).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  aria-current={p === pestana ? 'page' : undefined}
-                  onClick={() => setPestana(p)}
-                  className={cn('-mb-px inline-flex items-center gap-1.5 border-b-2 py-2.5 text-[14px]', p === pestana ? 'border-dash-blue font-semibold text-ink' : 'border-transparent text-ink-muted hover:text-ink')}
-                >
-                  {p === 'Build' ? <Blocks className="size-3.5" /> : <Code2 className="size-3.5" />} {p}
-                </button>
-              ))}
+              {(['Components', 'Layers', 'Code'] as const).map((p) => {
+                const Icono = { Components: Component, Layers, Code: Code2 }[p]
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    aria-current={p === pestana ? 'page' : undefined}
+                    onClick={() => setPestana(p)}
+                    className={cn('-mb-px inline-flex items-center gap-1.5 border-b-2 py-2.5 text-[14px]', p === pestana ? 'border-dash-blue font-semibold text-ink' : 'border-transparent text-ink-muted hover:text-ink')}
+                  >
+                    <Icono className="size-3.5" /> {p}
+                  </button>
+                )
+              })}
             </nav>
 
             <div className="min-h-0 flex-1 overflow-y-auto">
-              {pestana === 'Build' ? (
+              {pestana === 'Components' ? (
+                <Paleta
+                  paleta={paleta}
+                  sistema={sistema}
+                  alArrastrar={(it) => edicion.empezar({ tipo: it.tipo, nuevo: it.crear })}
+                  alTerminar={edicion.terminar}
+                  sumar={sumar}
+                  dentro={dentro?.nombre ?? null}
+                  salir={() => setDentro(null)}
+                  nuevaPantalla={d.contenedor === 'app' ? null : () => { setD(pantallaVacia()); setEditando(null); setModalAbierto(null) }}
+                  elegido={elegidoB && !dentro ? { nombre: nombreDe(elegidoB), adentro: elegidoB.tipo === 'modal' || elegidoB.tipo === 'seccion', editar: () => editar(elegidoB.id), soltar: () => setEditando(null) } : null}
+                />
+              ) : pestana === 'Layers' ? (
                 <div className="flex flex-col gap-6 p-4">
                   <section className="flex flex-col gap-2">
                     <span className={ETIQUETA}>Start from</span>
@@ -895,24 +1079,32 @@ export function Constructor() {
                           key={p.nombre}
                           type="button"
                           title={p.que}
-                          onClick={() => { setD(p.crear()); setEditando(null); setAgregando(false); setModalAbierto(null) }}
+                          onClick={() => { setD(p.crear()); setEditando(null); setModalAbierto(null) }}
                           className="inline-flex h-7 items-center rounded-full border border-line px-2.5 text-[12.5px] font-medium text-ink hover:border-dash-blue hover:text-dash-blue"
                         >
                           {p.nombre}
                         </button>
                       ))}
+                      <button
+                        type="button"
+                        title="Una pantalla de la app vacía, para armarla desde cero"
+                        onClick={() => { setD(pantallaVacia()); setEditando(null); setModalAbierto(null) }}
+                        className="inline-flex h-7 items-center rounded-full border border-dashed border-line px-2.5 text-[12.5px] font-medium text-ink-muted hover:border-dash-blue hover:text-dash-blue"
+                      >
+                        Blank screen
+                      </button>
                     </div>
                   </section>
 
                   <section className="flex flex-col gap-3">
-                    <Segmentos label="Container" value={d.contenedor} opciones={[{ value: 'card', label: 'Card' }, { value: 'panel', label: 'Panel' }, { value: 'page', label: 'Page' }]} onChange={(v) => setD((x) => ({ ...x, contenedor: v, tituloPanel: v === 'panel' && !x.tituloPanel ? 'Panel title' : x.tituloPanel }))} />
+                    <Segmentos label="Container" value={d.contenedor} opciones={[{ value: 'app', label: 'App' }, { value: 'page', label: 'Page' }, { value: 'card', label: 'Card' }, { value: 'panel', label: 'Panel' }, { value: 'libre', label: 'None' }]} onChange={(v) => setD((x) => ({ ...x, contenedor: v, ancho: v === 'app' || v === 'page' ? 'completo' : x.ancho, tituloPanel: v === 'panel' && !x.tituloPanel ? 'Panel title' : x.tituloPanel }))} />
                     {d.contenedor === 'panel' && <Texto label="Panel title" value={d.tituloPanel} onChange={(v) => setD((x) => ({ ...x, tituloPanel: v }))} />}
                     <Segmentos label="Width" value={d.ancho} opciones={[{ value: 'angosto', label: 'Narrow' }, { value: 'medio', label: 'Medium' }, { value: 'completo', label: 'Full' }]} onChange={(v) => setD((x) => ({ ...x, ancho: v }))} />
                   </section>
 
                   <section className="flex flex-col gap-2">
                     <span className={ETIQUETA}>Blocks</span>
-                    <ListaBloques bloques={d.bloques} onChange={(bloques) => setD((x) => ({ ...x, bloques }))} ctx={ctx} agregando={agregando} setAgregando={setAgregando} />
+                    <ListaBloques lista="raiz" bloques={d.bloques} onChange={(bloques) => setD((x) => ({ ...x, bloques }))} ctx={ctx} />
                   </section>
                 </div>
               ) : (
@@ -933,31 +1125,33 @@ export function Constructor() {
 }
 
 const LIENZO = 'min-h-[calc(100vh-4rem)] bg-page-background [background-image:radial-gradient(color-mix(in_srgb,var(--color-ink)_10%,transparent)_1px,transparent_1px)] [background-size:18px_18px]'
+const NOMBRE_CONTENEDOR = { card: 'Card', panel: 'Panel', page: 'Page', libre: 'No container', app: 'App screen' } as const
 
-/* El componente armado, al ancho elegido. Sin bloques muestra `children`. */
-function Muestra({ d, previa, editando, modal, setModal, children }: {
+/* El componente armado, al ancho elegido. Con `elegir` se arma: cada bloque se elige y se arrastra. */
+function Muestra({ d, previa, editando, elegir, modal, setModal }: {
   d: Diseno
   previa: RefObject<HTMLDivElement | null>
   editando: string | null
+  elegir?: (id: string | null) => void
   modal: string | null
   setModal: (id: string | null) => void
-  children?: ReactNode
 }) {
   const ancho = ANCHOS[d.ancho]
   return (
     <div className="mx-auto w-full" style={{ maxWidth: ancho ?? undefined }}>
       <p className="m-0 mb-2 flex items-center justify-between text-[12px] text-ink-muted">
-        <span>Preview · {d.contenedor === 'card' ? 'Card' : d.contenedor === 'panel' ? 'Panel' : 'Page'}</span>
+        <span>Preview · {NOMBRE_CONTENEDOR[d.contenedor]}</span>
         <span className="tabular-nums">{ancho ? `${ancho}px` : 'Full width'}</span>
       </p>
-      <div ref={previa} className={cn(d.contenedor === 'page' && 'overflow-hidden rounded-xl border border-line bg-page-background')}>
-        {d.bloques.length ? (
+      {/* pt: lugar para la etiqueta del bloque elegido. */}
+      <div ref={previa} className={cn(elegir && 'pt-2', d.contenedor === 'page' && 'overflow-hidden rounded-xl border border-line bg-page-background')}>
+        {(d.bloques.length > 0 || elegir) && (
           <MemoryRouter>
-            <VistaPrevia.Provider value={{ editando, abierto: modal, setAbierto: setModal }}>
+            <VistaPrevia.Provider value={{ editando, abierto: modal, setAbierto: setModal, elegir }}>
               <VerDiseno d={d} />
             </VistaPrevia.Provider>
           </MemoryRouter>
-        ) : children}
+        )}
       </div>
     </div>
   )

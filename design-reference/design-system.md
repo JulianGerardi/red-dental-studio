@@ -53,11 +53,41 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   historia se muestra sin marco (`.ds-informe`) y `Page.tsx` deja el título
   al sitio.
 - **Builder** (`constructor/Constructor.tsx`, `portadas/Builder.mdx`): arma
-  un componente con las piezas reales de la app y da su código. El lienzo
-  muestra el resultado; un panel flotante al costado (abajo en el celular)
-  tiene *Build* (puntos de partida, contenedor Card / Panel / Page, ancho,
-  bloques que se suman, ordenan, duplican y editan) y *Code* (el TSX con sus
-  imports, para copiar). Bloques: Layout (Modal con `ModalShell` y
+  un componente con las piezas reales de la app, arrastrándolas, y da su
+  código. El panel flotante (abajo en el celular) tiene *Components*, la
+  paleta: los bloques editables y **todas** las piezas de Confidentally UI
+  (Elements, Components por módulo, Screens y Screen parts), leídas de
+  `index.json` en `constructor/paleta.ts`, así que una pieza nueva aparece
+  sola. Cada pieza va por separado: un ítem por ejemplo, y en las páginas que
+  juntan varias ("ClinicalTopBar parts", "Insurance modals", las partes de
+  Pages) cada ejemplo se llama como la pieza. El componente real y su import
+  se leen del archivo de historias (la primera etiqueta de la app en su
+  render, si no el `component` de la página). Se busca en castellano con el
+  buscador del sitio (`buscar.ts`).
+  Cada ítem se arrastra al lienzo (entre bloques, o adentro de una sección,
+  una pestaña o un modal abierto) o se suma con un clic: adentro de lo que se
+  pidió con *Add block inside*, adentro de la sección o el modal elegidos, si
+  no debajo de lo elegido. El lienzo (`constructor/lienzo.tsx`) envuelve cada
+  bloque en un marco: un clic lo elige (Supr lo borra, Esc lo suelta), su
+  etiqueta lo arrastra y tiene editar, duplicar y borrar; doble clic lo
+  edita. Cada lista del lienzo recibe lo que se suelta según la altura del
+  puntero; lo que no entra ahí (un modal adentro de una sección) sigue a la
+  lista de afuera. `bloques.tsx` sólo expone el contexto `Armado`, así el
+  mismo `VerDiseno` sirve para armar y para el link compartido. Una pieza
+  real (bloque `pieza`) se dibuja sola en el lienzo, sin iframe: su historia
+  con `composeStory` (sus args y decoradores; las que traen su router,
+  `parameters.router: false`, no van adentro del del lienzo) y `.pieza-aislada`
+  (docs.css) deja en su lugar lo que en la app es fijo, como el fondo de un
+  modal. Si al montarse dibuja algo afuera (un diálogo de Radix que bloquea la
+  página, un popover en `<body>`) —lo avisa un `focusin` que viaja por el
+  árbol de React— va en un iframe transparente; también las historias que
+  abren un menú o diálogo al cargar. Se probaron las 358 piezas. Las pantallas
+  completas no están en la paleta: una pantalla se arma desde cero con el
+  contenedor **App** (menú lateral y barra reales; en el código, el contenido
+  de la ruta para AppShell) y el bloque **Columns** (2 a 4 columnas, cada una
+  con bloques). *Layers* tiene los puntos de partida (*Blank screen*),
+  contenedor App / Page / Card / Panel / None, ancho y la lista de bloques;
+  *Code* el TSX con sus imports, para copiar. Bloques editables: Layout (Modal con `ModalShell` y
   `FormFooter`, Tabs with content, Section con `SectionCard`, Tabs), Forms
   (Fields —con el tipo Calendar, que usa `DatePicker`—, Payment como el
   `PatientPaymentPanel` del Ledger, Switches, Time slots con

@@ -1,6 +1,8 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { Component as ComponenteReact, createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type ReactNode } from 'react'
+import { composeStory } from '@storybook/react-vite'
+import { UNSAFE_LocationContext } from 'react-router-dom'
 import {
-  AppWindow, BarChart3, CalendarClock, CalendarDays, CalendarRange, Clock, CreditCard, Wallet, X, Download, FileText, Heading, IdCard, Inbox, ListChecks,
+  AppWindow, BarChart3, Columns3, Component, CalendarClock, CalendarDays, CalendarRange, Clock, CreditCard, Wallet, X, Download, FileText, Heading, IdCard, Inbox, ListChecks,
   Mail, MapPin, Minus, MousePointerClick, PanelsTopLeft, Pencil, Phone, Plus, Save, Search, Send, Settings, Shield, SquareStack,
   Pill as PillIcon, Smile, Table, Tag, TextCursorInput, ToggleRight, Trash2, Type, Users, type LucideIcon,
 } from 'lucide-react'
@@ -29,6 +31,10 @@ import { Switch } from '@/components/ui/switch'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { Sidebar } from '@/components/layout/Sidebar'
+import { Topbar } from '@/components/layout/Topbar'
+import { HelpProvider } from '@/components/help/HelpProvider'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
 /* Los bloques del constructor. Cada uno sabe dibujarse con el componente
@@ -58,6 +64,11 @@ export type ColumnaTabla = { id: string; campo: string; header: string; ancho: n
 export const MARCAS = { Caries: '#fe0000', Restoration: '#2563eb', Planned: '#f59e0b' } as const
 export type Marca = keyof typeof MARCAS
 export type Pestana = { id: string; label: string; bloques: Bloque[] }
+export type Columna = { id: string; bloques: Bloque[] }
+/* Cuánto ocupa cada columna, de izquierda a derecha. */
+export const PROPORCIONES = { '1-1': '1fr 1fr', '1-2': '1fr 2fr', '2-1': '2fr 1fr', '1-3': '1fr 3fr', '3-1': '3fr 1fr', '1-1-1': '1fr 1fr 1fr', '1-1-1-1': '1fr 1fr 1fr 1fr' } as const
+export type Proporcion = keyof typeof PROPORCIONES
+export const columnasDe = (p: Proporcion) => p.split('-').length
 
 export type Bloque = { id: string } & (
   | { tipo: 'encabezado'; titulo: string; bajada: string; accion: string; icono: NombreIcono }
@@ -82,11 +93,16 @@ export type Bloque = { id: string } & (
   | { tipo: 'calendario'; vista: Vista; selector: boolean; leyenda: boolean }
   | { tipo: 'horarios'; provider: string; especialidad: string; fecha: string }
   | { tipo: 'divisor' }
+  | { tipo: 'columnas'; proporcion: Proporcion; columnas: Columna[] }
+  /** Una pieza que ya existe en Confidentally UI (pantalla o componente), dibujada con su historia real. */
+  | { tipo: 'pieza'; storyId: string; componente: string; ejemplo: string; lugar: string; archivo: string; pantalla: boolean; jsx?: string
+      /** El archivo de historias: con él la pieza se dibuja sola en el lienzo. `marco`: va en un iframe (abre un diálogo o menú de Radix). */
+      historia?: string; marco?: boolean }
 )
 export type TipoBloque = Bloque['tipo']
 export type BloqueDe<T extends TipoBloque> = Extract<Bloque, { tipo: T }>
 
-export type TipoContenedor = 'card' | 'panel' | 'page'
+export type TipoContenedor = 'card' | 'panel' | 'page' | 'libre' | 'app'
 export type Diseno = {
   nombre: string
   contenedor: TipoContenedor
@@ -108,6 +124,7 @@ export const pestana = (label: string, bloques: Bloque[] = []): Pestana => ({ id
 export function hijosDe(b: Bloque): Bloque[][] {
   if (b.tipo === 'modal' || b.tipo === 'seccion') return [b.bloques]
   if (b.tipo === 'pestanasContenido') return b.pestanas.map((p) => p.bloques)
+  if (b.tipo === 'columnas') return b.columnas.map((c) => c.bloques)
   return []
 }
 export const contiene = (bloques: Bloque[], id: string): boolean =>
@@ -116,7 +133,7 @@ export const contiene = (bloques: Bloque[], id: string): boolean =>
 /* Qué se puede poner adentro de qué: un modal no va adentro de otro bloque,
    y unas pestañas con contenido no van adentro de otras. */
 export function permitidos(padre?: TipoBloque): TipoBloque[] {
-  const todos = TIPOS.map((t) => t.tipo)
+  const todos: TipoBloque[] = [...TIPOS.map((t) => t.tipo), 'pieza']
   if (!padre) return todos
   if (padre === 'pestanasContenido') return todos.filter((t) => t !== 'modal' && t !== 'pestanasContenido')
   return todos.filter((t) => t !== 'modal')
@@ -129,6 +146,7 @@ export function reIdentificar(b: Bloque): Bloque {
     if (x.tipo === 'campos') x.campos = x.campos.map((f) => ({ ...f, id: nuevoId() }))
     if (x.tipo === 'modal' || x.tipo === 'seccion') x.bloques = x.bloques.map(recorrer)
     if (x.tipo === 'pestanasContenido') x.pestanas = x.pestanas.map((p) => ({ ...p, id: nuevoId(), bloques: p.bloques.map(recorrer) }))
+    if (x.tipo === 'columnas') x.columnas = x.columnas.map((c) => ({ id: nuevoId(), bloques: c.bloques.map(recorrer) }))
     return x
   }
   return recorrer(JSON.parse(JSON.stringify(b)) as Bloque)
@@ -150,6 +168,7 @@ export const TIPOS: { tipo: TipoBloque; nombre: string; que: string; icono: Luci
   { tipo: 'divisor', grupo: 'Content', nombre: 'Divider', que: 'Una línea para separar', icono: Minus, nuevo: () => ({ id: nuevoId(), tipo: 'divisor' }) },
   { tipo: 'modal', grupo: 'Layout', nombre: 'Modal', que: 'Un botón que abre un modal con bloques adentro', icono: AppWindow, nuevo: () => ({ id: nuevoId(), tipo: 'modal', titulo: 'New item', disparador: 'Add item', ancho: 'md', confirmar: 'Save', cancelar: 'Cancel', peligro: false, bloques: [{ id: nuevoId(), tipo: 'campos', columnas: 1, campos: [campo({ label: 'Name', placeholder: 'Write a name' })] }] }) },
   { tipo: 'pestanasContenido', grupo: 'Layout', nombre: 'Tabs with content', que: 'Pestañas, cada una con sus bloques', icono: PanelsTopLeft, nuevo: () => ({ id: nuevoId(), tipo: 'pestanasContenido', size: 'md', fullWidth: false, pestanas: [pestana('Details', [{ id: nuevoId(), tipo: 'texto', texto: 'What goes in the first tab.', tono: 'suave' }]), pestana('History', [{ id: nuevoId(), tipo: 'vacio', icono: 'Clock', titulo: 'No history yet', detalle: '', accion: '' }])] }) },
+  { tipo: 'columnas', grupo: 'Layout', nombre: 'Columns', que: 'Piezas una al lado de la otra, en 2 a 4 columnas', icono: Columns3, nuevo: () => ({ id: nuevoId(), tipo: 'columnas', proporcion: '1-1', columnas: [{ id: nuevoId(), bloques: [] }, { id: nuevoId(), bloques: [] }] }) },
   { tipo: 'seccion', grupo: 'Layout', nombre: 'Section', que: 'Un grupo con título, como en los formularios', icono: SquareStack, nuevo: () => ({ id: nuevoId(), tipo: 'seccion', titulo: 'Section', bloques: [{ id: nuevoId(), tipo: 'campos', columnas: 2, campos: [campo({ label: 'Field one' }), campo({ label: 'Field two' })] }] }) },
   { tipo: 'pestanas', grupo: 'Layout', nombre: 'Tabs', que: 'Sólo la fila de pestañas', icono: PanelsTopLeft, nuevo: () => ({ id: nuevoId(), tipo: 'pestanas', tabs: 'All, Active, Inactive', size: 'md', fullWidth: false }) },
   { tipo: 'tabla', grupo: 'Data', nombre: 'Table', que: 'Pacientes, movimientos, recetas o turnos, con las columnas que quieras', icono: Table, nuevo: () => tablaDe('pacientes') },
@@ -162,6 +181,9 @@ export const TIPOS: { tipo: TipoBloque; nombre: string; que: string; icono: Luci
   { tipo: 'receta', grupo: 'Clinical', nombre: 'Prescription', que: 'Una receta: medicamento, dosis e indicaciones', icono: PillIcon, nuevo: () => ({ id: nuevoId(), tipo: 'receta', titulo: 'New prescription', medicamentos: 'Amoxicillin, Ibuprofen, Paracetamol, Clindamycin, Chlorhexidine 0.12%', repeticiones: true, sustitucion: true, indicaciones: true }) },
 ]
 export const infoDe = (t: TipoBloque) => TIPOS.find((x) => x.tipo === t)!
+/* Nombre e ícono de un bloque; una pieza real se llama como su componente. */
+export const nombreDe = (b: Bloque) => (b.tipo === 'pieza' ? b.componente : infoDe(b.tipo).nombre)
+export const iconoDe = (b: Bloque): LucideIcon => (b.tipo === 'pieza' ? Component : infoDe(b.tipo).icono)
 
 /* ── Datos de ejemplo ───────────────────────────────────────────────── */
 
@@ -192,6 +214,7 @@ export function migrarDiseno(d: Diseno): Diseno {
     }
     if (b.tipo === 'modal' || b.tipo === 'seccion') return { ...b, bloques: b.bloques.map(migrar) }
     if (b.tipo === 'pestanasContenido') return { ...b, pestanas: b.pestanas.map((p) => ({ ...p, bloques: p.bloques.map(migrar) })) }
+    if (b.tipo === 'columnas') return { ...b, columnas: b.columnas.map((c) => ({ ...c, bloques: c.bloques.map(migrar) })) }
     return b
   }
   return { ...d, bloques: d.bloques.map(migrar) }
@@ -217,9 +240,14 @@ const TAREAS: PendingTask[] = [
 
 /* Lo que el lienzo necesita saber del constructor: qué bloque se está
    editando (para abrir su modal o su pestaña) y qué modal está abierto. */
-export const VistaPrevia = createContext<{ editando: string | null; abierto: string | null; setAbierto: (id: string | null) => void }>({
+export const VistaPrevia = createContext<{ editando: string | null; abierto: string | null; setAbierto: (id: string | null) => void; elegir?: (id: string | null) => void }>({
   editando: null, abierto: null, setAbierto: () => {},
 })
+
+/* En el Builder cada lista de bloques del lienzo acepta lo que se arrastra y cada bloque se elige y se mueve (ver lienzo.tsx).
+   `lista` es 'raiz', el id de un modal o sección, o `id:pestaña`. */
+export type ListaProps = { lista: string; bloques: Bloque[]; contenedor: TipoContenedor; className?: string }
+export const Armado = createContext<{ Lista: ComponentType<ListaProps> } | null>(null)
 
 const ALINEAR = { inicio: 'justify-start', fin: 'justify-end', extremos: 'justify-between' } as const
 const ANCHO_MODAL = { sm: 'max-w-[480px]', md: 'max-w-[640px]', lg: undefined } as const
@@ -238,7 +266,9 @@ function PestanasVivas({ b }: { b: BloqueDe<'pestanas'> }) {
   return tabs.length ? <Tabs tabs={tabs} value={actual} onChange={setValor} size={b.size} fullWidth={b.fullWidth} /> : null
 }
 
-function Hijos({ bloques, gap = 'gap-4' }: { bloques: Bloque[]; gap?: string }) {
+function Hijos({ lista, bloques, gap = 'gap-4' }: { lista: string; bloques: Bloque[]; gap?: string }) {
+  const armado = useContext(Armado)
+  if (armado) return <armado.Lista lista={lista} bloques={bloques} contenedor="card" className={cn('flex flex-col', gap)} />
   if (!bloques.length) return <p className="text-[13px] text-ink-muted">{SIN_CONTENIDO}</p>
   return <div className={cn('flex flex-col', gap)}>{bloques.map((x) => <VerBloque key={x.id} b={x} contenedor="card" />)}</div>
 }
@@ -255,16 +285,19 @@ function PestanasConContenido({ b }: { b: BloqueDe<'pestanasContenido'> }) {
   return (
     <div className="flex flex-col gap-4">
       <Tabs tabs={labels} value={actual} onChange={setValor} size={b.size} fullWidth={b.fullWidth} />
-      {abierta && <Hijos bloques={abierta.bloques} />}
+      {abierta && <Hijos lista={`${b.id}:${abierta.id}`} bloques={abierta.bloques} />}
     </div>
   )
 }
 
 function VerModal({ b }: { b: BloqueDe<'modal'> }) {
-  const { editando, abierto, setAbierto } = useContext(VistaPrevia)
+  const { editando, abierto, setAbierto, elegir } = useContext(VistaPrevia)
   /* Mientras se edita el modal o algo de adentro, queda abierto. */
   const visible = abierto === b.id || (!!editando && (editando === b.id || contiene(b.bloques, editando)))
-  const cerrar = () => setAbierto(null)
+  const cerrar = () => {
+    setAbierto(null)
+    if (visible && editando) elegir?.(null)
+  }
   useEffect(() => {
     if (visible) document.querySelector(`[role="dialog"][aria-label="${CSS.escape(b.titulo)}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
   }, [visible, b.titulo])
@@ -283,7 +316,7 @@ function VerModal({ b }: { b: BloqueDe<'modal'> }) {
       </div>
       {visible && (
         <ModalShell title={b.titulo} width={ANCHO_MODAL[b.ancho]} onClose={cerrar} footer={pie}>
-          <Hijos bloques={b.bloques} gap="gap-5" />
+          <Hijos lista={b.id} bloques={b.bloques} gap="gap-5" />
         </ModalShell>
       )}
     </>
@@ -505,7 +538,7 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
   switch (b.tipo) {
     case 'encabezado': {
       const accion = b.accion ? <Button size="md"><ConIcono icono={b.icono}>{b.accion}</ConIcono></Button> : undefined
-      if (contenedor === 'page') return <div><SettingsPageHeader titulo={b.titulo} bajada={b.bajada} accion={accion} /></div>
+      if (contenedor === 'page' || contenedor === 'app') return <div><SettingsPageHeader titulo={b.titulo} bajada={b.bajada} accion={accion} /></div>
       return (
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -533,7 +566,7 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
     case 'seccion':
       return (
         <SectionCard title={b.titulo}>
-          {b.bloques.length ? b.bloques.map((x) => <VerBloque key={x.id} b={x} contenedor="card" />) : <p className="text-[13px] text-ink-muted">{SIN_CONTENIDO}</p>}
+          <Hijos lista={b.id} bloques={b.bloques} />
         </SectionCard>
       )
     case 'campos':
@@ -586,15 +619,168 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
       return <div className="grid gap-3 sm:grid-cols-2">{TAREAS.slice(0, b.cantidad).map((t) => <PendingTaskCard key={t.kind} task={t} />)}</div>
     case 'divisor':
       return <hr className="border-line-row" />
+    case 'pieza':
+      return <PiezaViva b={b} />
+    case 'columnas':
+      return (
+        <div className="grid items-start gap-5" style={{ gridTemplateColumns: PROPORCIONES[b.proporcion] }}>
+          {b.columnas.map((c) => <div key={c.id} className="min-w-0"><Hijos lista={`${b.id}:${c.id}`} bloques={c.bloques} /></div>)}
+        </div>
+      )
   }
+}
+
+/* Las historias de todo el sitio, para dibujar una pieza sola (sin su página ni su iframe). */
+const HISTORIAS = import.meta.glob('/src/**/*.stories.tsx') as Record<string, () => Promise<Record<string, unknown>>>
+
+class Aguanta extends ComponenteReact<{ children: ReactNode; caida: ReactNode }, { roto: boolean }> {
+  state = { roto: false }
+  static getDerivedStateFromError() {
+    return { roto: true }
+  }
+  render() {
+    return this.state.roto ? this.props.caida : this.props.children
+  }
+}
+
+/* La pieza real, dibujada con su historia (sus args y decoradores) en el lienzo mismo: lo que en la app es fijo (el fondo de un
+   modal, un panel lateral) queda en el lugar de la pieza (`.pieza-aislada` en docs.css). */
+function PiezaAislada({ b, historia }: { b: BloqueDe<'pieza'>; historia: string }) {
+  const [Pieza, setPieza] = useState<(ComponentType & { parameters?: { router?: boolean } }) | null>(null)
+  const [roto, setRoto] = useState(false)
+  /* Si al abrir dibuja algo fuera de su lugar (un diálogo de Radix que bloquea la página, un popover en <body>), va en un iframe. */
+  const [afuera, setAfuera] = useState(false)
+  const caja = useRef<HTMLDivElement>(null)
+  const recien = useRef(true)
+  useEffect(() => {
+    let vivo = true
+    const clave = b.storyId.split('--')[1]!.replace(/-/g, '')
+    const cargar = HISTORIAS[historia.replace(/^\./, '')]
+    ;(cargar ? cargar() : Promise.reject(new Error(historia)))
+      .then((m) => {
+        const exp = Object.keys(m).find((k) => k !== 'default' && k.toLowerCase() === clave)
+        if (!exp) throw new Error(b.storyId)
+        const C = composeStory(m[exp] as Parameters<typeof composeStory>[0], m.default as Parameters<typeof composeStory>[1])
+        if (vivo) setPieza(() => C as ComponentType & { parameters?: { router?: boolean } })
+      })
+      .catch(() => vivo && setRoto(true))
+    return () => {
+      vivo = false
+    }
+  }, [b.storyId, historia])
+  /* Lo que se dibuja en un portal avisa por el árbol de React: un focus de afuera de la caja es suyo. Recién montada se le
+     pregunta a cada cosa suelta en <body>; después, un menú que se abre con un clic ya es uso normal. */
+  useEffect(() => {
+    if (!Pieza) return
+    const t1 = window.setTimeout(() => {
+      for (const el of document.body.children) if (el instanceof HTMLElement && !el.contains(caja.current) && el.tagName !== 'SCRIPT') el.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    }, 300)
+    const t2 = window.setTimeout(() => { recien.current = false }, 1200)
+    return () => {
+      window.clearTimeout(t1)
+      window.clearTimeout(t2)
+    }
+  }, [Pieza])
+  if (afuera) return <PiezaEnMarco b={b} />
+  const caida = <p className="rounded-lg border border-dashed border-line p-4 text-[13px] text-ink-muted">No se pudo dibujar {b.componente}{b.ejemplo ? ` · ${b.ejemplo}` : ''}.</p>
+  if (roto) return caida
+  if (!Pieza) return <div className="h-16 animate-pulse rounded-lg bg-surface-muted" />
+  /* Las que traen su propio router (`parameters.router: false`, como en preview.tsx) no van adentro del del lienzo. */
+  const pieza = (
+    <div ref={caja} className="pieza-aislada" onFocus={(e) => { if (recien.current && !caja.current?.contains(e.target as Node)) setAfuera(true) }}>
+      <Pieza />
+    </div>
+  )
+  return (
+    <Aguanta caida={caida}>
+      <TooltipProvider>
+        {Pieza.parameters?.router === false ? <UNSAFE_LocationContext.Provider value={null as never}>{pieza}</UNSAFE_LocationContext.Provider> : pieza}
+      </TooltipProvider>
+    </Aguanta>
+  )
+}
+
+function PiezaViva({ b }: { b: BloqueDe<'pieza'> }) {
+  return b.historia && !b.marco && !b.pantalla ? <PiezaAislada b={b} historia={b.historia} /> : <PiezaEnMarco b={b} />
+}
+
+/* La historia en un iframe: una pantalla a 1440 px escalada al ancho libre; un componente a lo ancho, con el alto de lo que dibuja. */
+function PiezaEnMarco({ b }: { b: BloqueDe<'pieza'> }) {
+  const caja = useRef<HTMLDivElement>(null)
+  const [ancho, setAncho] = useState(0)
+  const [alto, setAlto] = useState(b.pantalla ? 900 : 260)
+  useLayoutEffect(() => {
+    const el = caja.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setAncho(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const medir = (e: React.SyntheticEvent<HTMLIFrameElement>) => {
+    const doc = e.currentTarget.contentDocument
+    /* La barra "‹ Componente / Ejemplo" del sitio no es parte de la pieza; sin el alto de pantalla mide lo que dibuja, y sin fondos
+       (el oscuro de un diálogo, el blanco de la página) se ve sola sobre el lienzo. */
+    const sola = '.ds-foco, body, #storybook-root { background: transparent !important } .ds-foco > div { padding: 0 !important; justify-content: flex-start !important; align-items: flex-start !important }'
+      + ' [data-slot$="overlay"], .fixed.inset-0 { background: transparent !important }'
+    if (doc) doc.head.appendChild(Object.assign(doc.createElement('style'), { textContent: `.ds-foco > header { display: none !important } .ds-foco { min-height: 0 !important } ${b.pantalla ? '' : sola}` }))
+    if (b.pantalla) return
+    const raiz = doc?.querySelector<HTMLElement>('#storybook-root')
+    if (!doc || !raiz) return
+    const tomar = () => {
+      const fondos = [...doc.querySelectorAll<HTMLElement>('[role=dialog], [role=alertdialog], body > :not(script):not(#storybook-root)')].map((x) => x.getBoundingClientRect().bottom + 16)
+      setAlto(Math.min(900, Math.max(48, raiz.getBoundingClientRect().height + 16, ...fondos)))
+    }
+    tomar()
+    const ro = new ResizeObserver(tomar)
+    ro.observe(raiz)
+    window.setTimeout(tomar, 600)
+  }
+  const escala = b.pantalla && ancho ? Math.min(1, ancho / 1440) : 1
+  return (
+    <div ref={caja} className={cn('w-full overflow-hidden', b.pantalla && 'rounded-xl border border-line bg-page-background')} style={{ height: alto * escala }}>
+      <iframe
+        key={b.storyId}
+        data-pieza
+        title={b.ejemplo ? `${b.componente} · ${b.ejemplo}` : b.componente}
+        src={`iframe.html?id=${b.storyId}&viewMode=story`}
+        onLoad={medir}
+        style={{ width: b.pantalla ? 1440 : '100%', height: alto, border: 0, transform: b.pantalla ? `scale(${escala})` : undefined, transformOrigin: 'top left' }}
+      />
+    </div>
+  )
 }
 
 export const ANCHOS = { angosto: 420, medio: 680, completo: null } as const
 
+const GAP = { card: 'gap-5', panel: 'gap-3', page: 'gap-6', libre: 'gap-6', app: 'gap-6' } as const
+
+/* La pantalla de la app vacía, con el menú lateral y la barra de arriba reales: lo de adentro es el contenido de la ruta. */
+function MarcoApp({ children }: { children: ReactNode }) {
+  const [abierto, setAbierto] = useState(false)
+  return (
+    <HelpProvider>
+      <TooltipProvider>
+        <div className="flex min-h-[720px] overflow-hidden rounded-xl border border-line bg-white">
+          <Sidebar expanded={abierto} onClose={() => setAbierto(false)} />
+          <div className="flex min-w-0 flex-1 flex-col">
+            <Topbar expanded={abierto} onToggleSidebar={() => setAbierto((v) => !v)} />
+            <main className="flex-1 bg-page-background"><div className={CONTENEDOR_PAGINA}>{children}</div></main>
+          </div>
+        </div>
+      </TooltipProvider>
+    </HelpProvider>
+  )
+}
+
 export function VerDiseno({ d }: { d: Diseno }) {
-  const hijos = d.bloques.map((b) => <VerBloque key={b.id} b={b} contenedor={d.contenedor} />)
+  const armado = useContext(Armado)
+  const hijos = armado
+    ? <armado.Lista lista="raiz" bloques={d.bloques} contenedor={d.contenedor} className={cn('flex flex-col', GAP[d.contenedor])} />
+    : d.bloques.map((b) => <VerBloque key={b.id} b={b} contenedor={d.contenedor} />)
   if (d.contenedor === 'panel') return <Panel title={d.tituloPanel || 'Panel'}>{hijos}</Panel>
   if (d.contenedor === 'page') return <div className={cn(CONTENEDOR_PAGINA, 'flex flex-col gap-6')}>{hijos}</div>
+  if (d.contenedor === 'libre') return <div className="flex flex-col gap-6">{hijos}</div>
+  if (d.contenedor === 'app') return <MarcoApp>{armado ? hijos : <div className="flex flex-col gap-6">{hijos}</div>}</MarcoApp>
   return <Card className="flex flex-col gap-5 p-5">{hijos}</Card>
 }
 
@@ -658,10 +844,25 @@ function codigoHijos(c: Codigo, bloques: Bloque[], gap = 'gap-4'): string[] {
 
 function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor): string[] {
   switch (b.tipo) {
+    case 'columnas':
+      return [
+        `<div className="grid grid-cols-[${PROPORCIONES[b.proporcion].replace(/ /g, '_')}] items-start gap-5">`,
+        ...sangrar(b.columnas.flatMap((col) => codigoHijos(c, col.bloques)), 2),
+        `</div>`,
+      ]
+    case 'pieza': {
+      if (b.pantalla) return [`{/* ${b.componente}: la pantalla ya existe en la app (src/AppRoutes.tsx). Ver ${b.lugar} › ${b.componente} en Confidentally UI. */}`]
+      const jsx = b.jsx ?? b.componente
+      if (b.archivo && /^[A-Z][A-Za-z0-9]*$/.test(jsx)) {
+        importar(c, b.archivo, jsx)
+        return [`<${jsx} /* props: ver el ejemplo “${b.ejemplo || b.componente}” en Confidentally UI */ />`]
+      }
+      return [`{/* ${b.componente}${b.ejemplo ? ` · ${b.ejemplo}` : ''}: ver ${b.lugar} en Confidentally UI. */}`]
+    }
     case 'encabezado': {
       if (b.accion) importar(c, '@/components/ui/button', 'Button')
       const accion = b.accion ? `<Button size="md">${conIcono(c, b.icono, b.accion)}</Button>` : ''
-      if (contenedor === 'page') {
+      if (contenedor === 'page' || contenedor === 'app') {
         importar(c, '@/components/settings/SettingsPageHeader', 'SettingsPageHeader')
         return [`<SettingsPageHeader`, `  titulo=${valorAttr(b.titulo)}`, `  bajada=${valorAttr(b.bajada)}`, ...(accion ? [`  accion={${accion}}`] : []), `/>`]
       }
@@ -1055,7 +1256,10 @@ export function generarCodigo(d: Diseno): string {
     importar(c, '@/components/dashboard/primitives', 'Panel')
     abre = `<Panel title=${valorAttr(d.tituloPanel || 'Panel')}>`
     cierra = `</Panel>`
-  } else if (d.contenedor === 'page') {
+  } else if (d.contenedor === 'libre') {
+    abre = `<>`
+    cierra = `</>`
+  } else if (d.contenedor === 'page' || d.contenedor === 'app') {
     importar(c, '@/lib/estilos', 'CONTENEDOR_PAGINA')
     importar(c, '@/lib/utils', 'cn')
     abre = `<div className={cn(CONTENEDOR_PAGINA, 'flex flex-col gap-6')}>`
@@ -1069,6 +1273,8 @@ export function generarCodigo(d: Diseno): string {
     .sort(([a], [b]) => ORDEN_IMPORTS(a) - ORDEN_IMPORTS(b) || a.localeCompare(b))
     .map(([desde, nombres]) => `import { ${[...nombres].sort((a, b) => a.replace(/^type /, '').localeCompare(b.replace(/^type /, ''))).join(', ')} } from '${desde}'`)
   const jsx = cuerpo.length ? cuerpo : ['{/* Sumá bloques desde el constructor. */}']
+  /* Una pantalla de la app se dibuja adentro de AppShell, que pone el menú lateral y la barra: acá va sólo su contenido. */
+  if (d.contenedor === 'app') jsx.unshift('{/* Pantalla: sumala como ruta adentro de AppShell en src/AppRoutes.tsx. */}')
   return [
     ...imports,
     '',

@@ -6,7 +6,7 @@ import { paginas, type Entrada } from './Mapa'
    ejemplos (States, Disabled, Loading…), y entiende castellano: "botón",
    "turno" o "pestañas" encuentran Buttons, Appointment cards y Tabs. */
 
-const historias = import.meta.glob('/src/**/*.stories.tsx', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
+export const historias = import.meta.glob('/src/**/*.stories.tsx', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
 
 export type Seccion = 'Foundations' | 'Elements' | 'Components' | 'Pages' | 'Audit' | 'Builder'
 
@@ -41,7 +41,7 @@ const SINONIMOS: Record<string, string[]> = {
   pestana: ['tabs'], pestanas: ['tabs'], solapa: ['tabs'], solapas: ['tabs'],
   tarjeta: ['card'], tarjetas: ['card'],
   turno: ['appointment'], turnos: ['appointment'], cita: ['appointment'], citas: ['appointment'], agenda: ['scheduling', 'calendar'], calendario: ['calendar', 'scheduling'],
-  paciente: ['patient'], pacientes: ['patient'],
+  paciente: ['patient'], pacientes: ['patient', 'patients'],
   menu: ['menu', 'navigation'], lateral: ['navigation', 'sidebar'], barra: ['navigation', 'sidebar'],
   encabezado: ['header'], titulo: ['header', 'title', 'typography'],
   etiqueta: ['pill', 'badge'], etiquetas: ['pill', 'badge'], estado: ['pill', 'states', 'status'], estados: ['states', 'pill'],
@@ -57,10 +57,17 @@ const SINONIMOS: Record<string, string[]> = {
   factura: ['billing'], facturacion: ['billing'], cuenta: ['accounts', 'ledger'], cuentas: ['accounts'],
   seguro: ['insurance'], seguros: ['insurance'], documento: ['documents'], documentos: ['documents'],
   equipo: ['team', 'employees'], empleados: ['employees'], sede: ['locations'], sedes: ['locations'], consultorio: ['locations', 'operatory'],
-  consentimiento: ['consent'], consentimientos: ['consent'], odontograma: ['dental', 'tooth'], diente: ['tooth'], dientes: ['tooth', 'dental'],
+  consentimiento: ['consent'], consentimientos: ['consent'], odontograma: ['odontogram', 'dental', 'tooth'], diente: ['tooth'], dientes: ['tooth', 'dental'],
   receta: ['prescription'], recetas: ['prescription'], ayuda: ['help'], inicio: ['dashboard'], tablero: ['dashboard'],
   armar: ['builder'], construir: ['builder'], constructor: ['builder'], crear: ['builder'], codigo: ['builder', 'code'], generar: ['builder'],
   foto: ['avatar'], avatar: ['avatar'], icono: ['icon'], iconos: ['icon'], medidas: ['specs'], tamanos: ['sizes'],
+  pago: ['payment'], pagos: ['payment'], cobro: ['payment'], cobros: ['payment'], movimiento: ['ledger'], movimientos: ['ledger'],
+  nuevo: ['new'], nueva: ['new'], editar: ['edit'], radiografia: ['radiography'], radiografias: ['radiography'], signos: ['vitals'], vitales: ['vitals'],
+  laboratorio: ['lab'], tratamiento: ['treatment'], tratamientos: ['treatment'], sala: ['room'], salas: ['room'], horario: ['hours'], horarios: ['hours'],
+  alergia: ['clinical'], alergias: ['clinical'], relacion: ['relationship'], relaciones: ['relationship'], firma: ['consent'],
+  suscripcion: ['subscription'], suscripciones: ['subscription'], dependiente: ['dependent'], dependientes: ['dependent'], campana: ['bell'],
+  contacto: ['contact'], familia: ['household', 'relationship'], familiar: ['household', 'relationship'], superior: ['topbar'],
+  detalle: ['detail'], detalles: ['detail'], fila: ['row'], filas: ['row'], ubicacion: ['location'], ubicaciones: ['location'], empleado: ['employee'],
 }
 
 export const normalizar = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()

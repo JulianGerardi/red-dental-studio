@@ -129,3 +129,64 @@ body:has(.ds-foco) #storybook-root {
   letter-spacing: -0.01em;
   scroll-margin-top: 96px;
 }
+
+/* Builder: una pieza se ve sola, en el lugar que ocupa en el lienzo. Lo que en la app es fijo (el fondo oscuro de un
+   modal, un panel que entra de costado) queda en su lugar, y los envoltorios de alto de pantalla miden lo que dibujan. */
+.pieza-aislada .fixed {
+  position: relative !important;
+  inset: auto !important;
+  z-index: auto !important;
+}
+.pieza-aislada .fixed.inset-0 {
+  background: transparent !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+.pieza-aislada .min-h-screen,
+.pieza-aislada .min-h-svh {
+  min-height: 0 !important;
+}
+
+/* Portada, banner del Builder: tres piezas se arrastran de la paleta a una pantalla vacía y caen en su lugar (Inicio.tsx,
+   `Arrastre`). Quieto (sin movimiento), la pantalla se ve armada. Un ciclo de 9 s: cada pieza tiene su tramo. */
+@media (prefers-reduced-motion: no-preference) {
+  .bl-demo .bl-mover-1 { animation: bl-mover-1 9s ease-in-out infinite; }
+  .bl-demo .bl-mover-2 { animation: bl-mover-2 9s ease-in-out infinite; }
+  .bl-demo .bl-mover-3 { animation: bl-mover-3 9s ease-in-out infinite; }
+  .bl-demo .bl-lleno-1 { animation: bl-lleno-1 9s ease-out infinite; }
+  .bl-demo .bl-lleno-2 { animation: bl-lleno-2 9s ease-out infinite; }
+  .bl-demo .bl-lleno-3 { animation: bl-lleno-3 9s ease-out infinite; }
+}
+@keyframes bl-mover-1 {
+  0% { opacity: 0; transform: translate(0, 0); }
+  4% { opacity: 1; transform: translate(0, -2px) rotate(-2deg); }
+  20% { opacity: 1; transform: translate(var(--dx), var(--dy)) rotate(-2deg); }
+  24%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.94); }
+}
+@keyframes bl-mover-2 {
+  0%, 27% { opacity: 0; transform: translate(0, 0); }
+  31% { opacity: 1; transform: translate(0, -2px) rotate(-2deg); }
+  47% { opacity: 1; transform: translate(var(--dx), var(--dy)) rotate(-2deg); }
+  51%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.94); }
+}
+@keyframes bl-mover-3 {
+  0%, 54% { opacity: 0; transform: translate(0, 0); }
+  58% { opacity: 1; transform: translate(0, -2px) rotate(-2deg); }
+  74% { opacity: 1; transform: translate(var(--dx), var(--dy)) rotate(-2deg); }
+  78%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.94); }
+}
+@keyframes bl-lleno-1 {
+  0%, 20% { opacity: 0; transform: scale(0.96); }
+  25%, 90% { opacity: 1; transform: none; }
+  97%, 100% { opacity: 0; }
+}
+@keyframes bl-lleno-2 {
+  0%, 47% { opacity: 0; transform: scale(0.96); }
+  52%, 90% { opacity: 1; transform: none; }
+  97%, 100% { opacity: 0; }
+}
+@keyframes bl-lleno-3 {
+  0%, 74% { opacity: 0; transform: scale(0.96); }
+  79%, 90% { opacity: 1; transform: none; }
+  97%, 100% { opacity: 0; }
+}
