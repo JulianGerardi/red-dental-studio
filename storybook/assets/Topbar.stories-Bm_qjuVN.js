@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{R as t,z as n}from"./iframe-BK-jJKMa.js";import{n as r,t as i}from"./notificaciones-ybHJKpR-.js";var a,o,s,c;function l(){return(l=e((()=>{r(),n(),a={title:`Components/Layout/Topbar`,component:t,parameters:{layout:`fullscreen`,docs:{story:{inline:!1,iframeHeight:620}}},args:{expanded:!0,onToggleSidebar:()=>{},notificaciones:i}},o={},s={args:{notificaciones:[]}},c=[`Default`,`WithoutNotifications`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{}`,...o.parameters?.docs?.source}}},s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
+  args: {
+    notificaciones: []
+  }
+}`,...s.parameters?.docs?.source}}}})))()}l();export{o as Default,s as WithoutNotifications,c as __namedExportsOrder,a as default};
