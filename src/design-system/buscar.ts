@@ -67,6 +67,7 @@ const SINONIMOS: Record<string, string[]> = {
   alergia: ['clinical'], alergias: ['clinical'], relacion: ['relationship'], relaciones: ['relationship'], firma: ['consent'],
   suscripcion: ['subscription'], suscripciones: ['subscription'], dependiente: ['dependent'], dependientes: ['dependent'], campana: ['bell'],
   contacto: ['contact'], familia: ['household', 'relationship'], familiar: ['household', 'relationship'], superior: ['topbar'],
+  metricas: ['statcard', 'statstrip'], estadisticas: ['statcard', 'statstrip'], indicadores: ['statcard', 'statstrip'], popup: ['dialog', 'modal'],
   detalle: ['detail'], detalles: ['detail'], fila: ['row'], filas: ['row'], ubicacion: ['location'], ubicaciones: ['location'], empleado: ['employee'],
 }
 

@@ -55,10 +55,11 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
 - **Builder** (`constructor/Constructor.tsx`, `portadas/Builder.mdx`): arma
   un componente con las piezas reales de la app, arrastrándolas, y da su
   código. El panel flotante (abajo en el celular) tiene *Components*, la
-  paleta: los bloques editables y **todas** las piezas de Confidentally UI
-  (Elements, Components por módulo, Screens y Screen parts), leídas de
-  `index.json` en `constructor/paleta.ts`, así que una pieza nueva aparece
-  sola. Cada pieza va por separado: un ítem por ejemplo, y en las páginas que
+  paleta: los bloques editables y las partes de pantallas (Screen parts).
+  `constructor/paleta.ts` arma además, desde `index.json`, todas las piezas
+  de Confidentally UI (Elements y Components por módulo), así que una pieza
+  nueva aparece sola; esas no se muestran en la paleta (se sacaron a pedido)
+  pero Describe las usa. Cada pieza va por separado: un ítem por ejemplo, y en las páginas que
   juntan varias ("ClinicalTopBar parts", "Insurance modals", las partes de
   Pages) cada ejemplo se llama como la pieza. El componente real y su import
   se leen del archivo de historias (la primera etiqueta de la app en su
@@ -87,14 +88,37 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   de la ruta para AppShell) y el bloque **Columns** (2 a 4 columnas, cada una
   con bloques). *Layers* tiene los puntos de partida (*Blank screen*),
   contenedor App / Page / Card / Panel / None, ancho y la lista de bloques;
-  *Code* el TSX con sus imports, para copiar. Bloques editables: Layout (Modal con `ModalShell` y
-  `FormFooter`, Tabs with content, Section con `SectionCard`, Tabs), Forms
-  (Fields —con el tipo Calendar, que usa `DatePicker`—, Payment como el
-  `PatientPaymentPanel` del Ledger, Switches, Time slots con
-  `AppointmentSlotPicker`), Content (Heading, Text, Buttons, Pills, Empty
-  state, Divider) y Data (Table, Calendar con `VistaDia` / `VistaSemana` /
-  `VistaMes` y `StatusLegend`, Stats con `StatCard`, Details con `InfoBlock`,
-  Appointments, Tasks con `PendingTaskCard`) y Clinical (Odontogram con el
+  *Code* el TSX con sus imports, para copiar. *Describe* (primera pestaña,
+  `constructor/PanelDescribir.tsx`) piensa con animación: un orbe, los pasos
+  y, con Gemini, sus pensamientos a medida que llegan; después arma el lienzo
+  bloque por bloque (docs.css, `bl-*`). Con una clave de Gemini (plan gratis,
+  la pega cada persona y queda en su navegador) piensa `constructor/ia.ts`:
+  `streamGenerateContent` con `thinkingConfig.includeThoughts` y un
+  `responseSchema` que sólo admite piezas del catálogo (ids cortos p1…),
+  bloques, tablas y campos; `desdePlan` lo arma. Si el modelo no existe
+  prueba el siguiente; si falla (clave, límite, red) lo dice y arma sin IA.
+  Sin clave arma con `constructor/describir.ts`, sin IA: parte
+  el texto (comas, "y", "a la derecha", "abajo"), reconoce campos (≈45 clases
+  de dato, con su control y opciones sacadas de `src/data`: profesionales,
+  pacientes, seguros, zonas…), bloques por palabras de UI (tabla de
+  pacientes / movimientos / recetas / turnos, pestañas, métricas, agenda…) y
+  si no, la pieza real más parecida (`buscarPiezas`, con los sinónimos del
+  buscador). Popup con lista → Modal con sus campos; sin lista → el modal
+  real; "eliminar" → modal de confirmación; formulario → card con botones;
+  pantalla → contenedor App con encabezado y "a la derecha" en Columns. Cada
+  parte queda con sus otras opciones para cambiarla, y *Deshacer* vuelve al
+  diseño anterior. Si no reconoce nada lo dice. Bloques editables: Layout (Modal con `ModalShell` y
+  `FormFooter`, Tabs with content, Columns, Section con `SectionCard`, Tabs,
+  Breadcrumb, Steps con `StepIndicator`), Forms (Fields —con el tipo
+  Calendar, que usa `DatePicker`—, Payment como el `PatientPaymentPanel` del
+  Ledger, Switches, Time slots con `AppointmentSlotPicker`, Search bar como
+  la de Patients con `SearchButton` y `FilterMenu`, Upload), Content
+  (Heading, Text, Buttons, Pills, Empty state, Divider, Alert en los tonos de
+  `Pill`, Person con `Avatar`), Data (Table, Calendar con `VistaDia` /
+  `VistaSemana` / `VistaMes` y `StatusLegend`, Stats con `StatCard`, Stat
+  strip con `StatStrip`, Details con `InfoBlock`, Appointments, Tasks con
+  `PendingTaskCard`, Patient cards con `PatientCard`, Operatories con
+  `OperatoryCard`, Pagination) y Clinical (Odontogram con el
   `Odontogram` de Clinical y `makeMockExam`, Prescription). Las tablas tienen
   columnas libres sobre cuatro conjuntos de datos (`constructor/datos.tsx`:
   pacientes, movimientos del Ledger, recetas y turnos). *PNG* baja la imagen

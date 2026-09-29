@@ -33,7 +33,10 @@ jobs:
       # El design system queda en /storybook, junto a la app. Antes se lee el
       # código para armar las recetas (Patterns / Buttons, Fields, Cards…).
       - run: npm run ds:scan
+      # La clave de Gemini del Builder (Describe) sale del secreto del repo; sin secreto, el Builder arma sin IA.
       - run: npx storybook build -o dist/storybook
+        env:
+          VITE_GEMINI_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - uses: peaceiris/actions-gh-pages@v4
         with:

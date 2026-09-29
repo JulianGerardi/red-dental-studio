@@ -18,6 +18,10 @@ const PALABRAS: Partial<Record<TipoBloque, string>> = {
   pestanasContenido: 'pestanas solapas tabs', seccion: 'seccion grupo section', pestanas: 'pestanas solapas tabs', tabla: 'tabla lista grilla table',
   calendario: 'calendario agenda', stats: 'numeros metricas estadisticas', detalles: 'detalles datos contacto', turnos: 'turnos citas agenda appointments',
   tareas: 'tareas pendientes tasks', odontograma: 'odontograma dientes', receta: 'receta medicamento prescription',
+  migas: 'migas ruta breadcrumb navegacion', pasos: 'pasos etapas stepper wizard progreso', paginacion: 'paginacion paginas siguiente anterior',
+  busqueda: 'buscador busqueda filtro barra toolbar search', aviso: 'aviso alerta mensaje banner error exito atencion',
+  persona: 'persona avatar paciente perfil usuario', metricas: 'metricas numeros franja resumen dashboard stats',
+  operatorios: 'operatorios salas consultorios', pacientes: 'pacientes tarjetas cards lista', subir: 'subir archivos adjuntar upload documentos',
 }
 
 const GRUPOS_BLOQUES: Grupo[] = ['Layout', 'Forms', 'Content', 'Data', 'Clinical']
@@ -160,9 +164,15 @@ export function filtrar(paleta: Seccion[], consulta: string): Item[] {
     const donde = normalizar(`${it.nombre} ${it.detalle} ${PALABRAS[it.tipo] ?? ''}`)
     return palabras.every((w) => donde.includes(w))
   })
+  return [...bloques, ...buscarPiezas(paleta, q)]
+}
+
+/* Las piezas de la app que coinciden, de más a menos: por nombre, ejemplo, módulo y lo que dice su página. */
+export function buscarPiezas(paleta: Seccion[], consulta: string): Item[] {
   const piezas = new Map(paleta.slice(1).flatMap((s) => s.grupos.flatMap((g) => g.items as ItemPieza[])).map((it) => [it.clave, it]))
   const indice: Pagina[] = [...piezas.values()].map((it) => ({
     ...it.pagina, id: it.clave, titulo: `${it.nombre} ${it.detalle}`, descripcion: `${it.pagina.titulo} ${it.pagina.descripcion}`, ejemplos: [],
   }))
-  return [...bloques, ...buscar(indice, q).map((r) => piezas.get(r.id)!)]
+  /* A igual puntaje, la de nombre más corto: "tarjeta de paciente" es PatientCard antes que PatientAppointmentCard. */
+  return buscar(indice, consulta).sort((a, b) => b.puntos - a.puntos || a.titulo.length - b.titulo.length).map((r) => piezas.get(r.id)!)
 }

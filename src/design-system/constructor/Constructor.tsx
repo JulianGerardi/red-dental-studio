@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import {
-  ArrowDown, ArrowUp, Blocks, Check, ChevronDown, Code2, Component, Copy, CopyPlus, Download, Layers, Link2, PanelRightClose, Pencil, Plus, Search, Trash2, X,
+  ArrowDown, ArrowUp, Blocks, Check, ChevronDown, Code2, Component, Copy, CopyPlus, Download, Layers, Link2, PanelRightClose, Pencil, Plus, Search, Sparkles, Trash2, X,
 } from 'lucide-react'
 import { Tabs } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
@@ -17,6 +17,7 @@ import {
   type Bloque, type BloqueDe, type Campo, type Diseno, type Marca, type IconoReal, type NombreIcono, type Proporcion,
 } from './bloques'
 import { Lienzo, buscarBloque, entra, insertar, ubicar, useLienzo } from './lienzo'
+import { Describir, useDescribir } from './PanelDescribir'
 import { armarPaleta, filtrar, type Item, type Seccion } from './paleta'
 import { DATOS, conjunto, type CampoDato, type IdConjunto } from './datos'
 import { codificar, decodificar, descargarPng, linkDe, soltarCompartido, tomarCompartido } from './compartir'
@@ -456,6 +457,95 @@ function Editor({ b, cambiar, ctx }: { b: Bloque; cambiar: (x: Partial<Bloque>) 
       )
     case 'divisor':
       return <p className="m-0 text-[12.5px] text-ink-muted">Una línea fina para separar bloques. No tiene opciones.</p>
+    case 'migas':
+      return <Texto label="Items (comma separated, the last one is this screen)" value={b.items} onChange={(v) => c({ items: v })} />
+    case 'pasos':
+      return (
+        <>
+          <div className="grid grid-cols-2 gap-2">
+            <Elegir label="Steps" value={String(b.total)} opciones={['2', '3', '4', '5', '6']} onChange={(v) => c({ total: Number(v), actual: Math.min(b.actual, Number(v)) })} />
+            <Elegir label="Current" value={String(b.actual)} opciones={Array.from({ length: b.total }, (_, i) => String(i + 1))} onChange={(v) => c({ actual: Number(v) })} />
+          </div>
+          <Texto label="Step names (comma separated)" value={b.etiquetas} onChange={(v) => c({ etiquetas: v })} />
+        </>
+      )
+    case 'paginacion':
+      return <Elegir label="Pages" value={String(b.paginas)} opciones={['2', '3', '5', '10', '20']} onChange={(v) => c({ paginas: Number(v) })} />
+    case 'busqueda':
+      return (
+        <>
+          <Texto label="Placeholder" value={b.placeholder} onChange={(v) => c({ placeholder: v })} />
+          <div className="grid grid-cols-2 gap-2">
+            <Texto label="Filter" value={b.filtro} onChange={(v) => c({ filtro: v })} placeholder="None" />
+            <Texto label="Main action" value={b.accion} onChange={(v) => c({ accion: v })} placeholder="None" />
+          </div>
+          {b.filtro && <Texto label="Filter options (comma separated)" value={b.opcionesFiltro} onChange={(v) => c({ opcionesFiltro: v })} />}
+        </>
+      )
+    case 'aviso':
+      return (
+        <>
+          <Segmentos label="Tone" value={b.tono} opciones={[{ value: 'info', label: 'Info' }, { value: 'success', label: 'Success' }, { value: 'warning', label: 'Warning' }, { value: 'danger', label: 'Error' }]} onChange={(v) => c({ tono: v })} />
+          <Texto label="Title" value={b.titulo} onChange={(v) => c({ titulo: v })} />
+          <Texto label="Text" value={b.texto} onChange={(v) => c({ texto: v })} largo />
+        </>
+      )
+    case 'persona':
+      return (
+        <>
+          <Texto label="Name" value={b.nombre} onChange={(v) => c({ nombre: v })} />
+          <Texto label="Detail" value={b.detalle} onChange={(v) => c({ detalle: v })} placeholder="None" />
+          <div className="grid grid-cols-2 gap-2">
+            <Elegir label="Status" value={b.estado || 'none'} opciones={[{ value: 'none', label: 'None' }, { value: 'Active', label: 'Active' }, { value: 'Inactive', label: 'Inactive' }]} onChange={(v) => c({ estado: v === 'none' ? '' : v })} />
+            <div className="flex items-end pb-1.5"><Llave label="Large" value={b.grande} onChange={(v) => c({ grande: v })} /></div>
+          </div>
+        </>
+      )
+    case 'metricas':
+      return (
+        <>
+          <Llave label="Stacked (2 × 2, like the Ledger)" value={b.apilada} onChange={(v) => c({ apilada: v })} />
+          {b.items.map((x, i) => {
+            const poner = (y: object) => c({ items: b.items.map((z, k) => (k === i ? { ...z, ...y } : z)) })
+            return (
+              <div key={i} className="flex flex-col gap-2 rounded-lg border border-line-row bg-surface-subtle p-2.5">
+                <div className="flex items-end gap-2">
+                  <div className="min-w-0 flex-1"><Texto label={`Stat ${i + 1}`} value={x.titulo} onChange={(v) => poner({ titulo: v })} /></div>
+                  <Quitar onClick={() => c({ items: b.items.filter((_, k) => k !== i) })} label={`Remove ${x.titulo}`} />
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <Texto label="Value" value={x.valor} onChange={(v) => poner({ valor: v })} />
+                  <Texto label="Note" value={x.nota} onChange={(v) => poner({ nota: v })} />
+                  <Elegir label="Icon" value={x.icono} opciones={OPC_ICONO_REAL} onChange={(v) => poner({ icono: v })} />
+                </div>
+              </div>
+            )
+          })}
+          {b.items.length < 4 && <Sumar onClick={() => c({ items: [...b.items, { titulo: 'New stat', valor: '0', nota: 'No change', icono: 'FileText' }] })}>Add stat</Sumar>}
+        </>
+      )
+    case 'operatorios':
+      return (
+        <label className="flex flex-col gap-1">
+          <span className={ETIQUETA}>Operatories · {b.cantidad}</span>
+          <input type="range" min={1} max={4} value={b.cantidad} onChange={(e) => c({ cantidad: Number(e.target.value) })} className="accent-dash-blue" />
+        </label>
+      )
+    case 'pacientes':
+      return (
+        <label className="flex flex-col gap-1">
+          <span className={ETIQUETA}>Patients · {b.cantidad}</span>
+          <input type="range" min={1} max={5} value={b.cantidad} onChange={(e) => c({ cantidad: Number(e.target.value) })} className="accent-dash-blue" />
+        </label>
+      )
+    case 'subir':
+      return (
+        <>
+          <Texto label="Title" value={b.titulo} onChange={(v) => c({ titulo: v })} />
+          <Texto label="Detail" value={b.detalle} onChange={(v) => c({ detalle: v })} placeholder="None" />
+          <Texto label="Button" value={b.accion} onChange={(v) => c({ accion: v })} placeholder="None" />
+        </>
+      )
     case 'columnas': {
       const cambiarProporcion = (v: Proporcion) => {
         const n = columnasDe(v)
@@ -522,6 +612,16 @@ function resumen(b: Bloque) {
     case 'divisor': return ''
     case 'pieza': return b.ejemplo || b.lugar
     case 'columnas': return `${b.columnas.length} columns · ${b.columnas.map((c) => c.bloques.length).join(' + ')} inside`
+    case 'migas': return lista(b.items).join(' › ')
+    case 'pasos': return `Step ${b.actual} of ${b.total}`
+    case 'paginacion': return `${b.paginas} pages`
+    case 'busqueda': return [b.placeholder, b.filtro, b.accion].filter(Boolean).join(' · ')
+    case 'aviso': return b.titulo
+    case 'persona': return b.nombre
+    case 'metricas': return b.items.map((x) => x.titulo).join(' · ')
+    case 'operatorios': return `${b.cantidad} operatories`
+    case 'pacientes': return `${b.cantidad} patients`
+    case 'subir': return b.titulo
   }
 }
 
@@ -724,7 +824,7 @@ function Paleta({ paleta, sistema, alArrastrar, alTerminar, sumar, dentro, salir
 export function Constructor() {
   const [d, setD] = useState<Diseno>(() => cargar() ?? pantallaVacia())
   const [abierto, setAbierto] = useState(true)
-  const [pestana, setPestana] = useState<'Components' | 'Layers' | 'Code'>('Components')
+  const [pestana, setPestana] = useState<'Describe' | 'Components' | 'Layers' | 'Code'>('Describe')
   const [editando, setEditando] = useState<string | null>(null)
   /* La lista donde el clic en la paleta suma, cuando se pidió "Add block inside" en Layers. */
   const [dentro, setDentro] = useState<{ lista: string; nombre: string } | null>(null)
@@ -752,6 +852,10 @@ export function Constructor() {
   }
   const edicion = useLienzo({ bloques: d.bloques, setBloques: (f) => setD((x) => ({ ...x, bloques: f(x.bloques) })), elegido: editando, elegir: setEditando, editar })
   const elegidoB = editando ? buscarBloque(d.bloques, editando) : null
+  const desc = useDescribir({
+    paleta, d, setD, setEditando, setModalAbierto,
+    cuantas: { piezas: paleta.slice(1).reduce((n, s) => n + s.grupos.reduce((m, g) => m + g.items.length, 0), 0), bloques: TIPOS.length },
+  })
   const ctx: Ctx = {
     editando, setEditando, sistema,
     agregarEn: (lista, nombre) => {
@@ -957,9 +1061,17 @@ export function Constructor() {
             </p>
           </header>
 
-          <Lienzo edicion={edicion}>
-            <Muestra d={d} previa={previa} editando={editando} elegir={setEditando} modal={modalAbierto} setModal={setModalAbierto} />
-          </Lienzo>
+          {/* Mientras piensa, lo de antes queda atenuado; mientras arma, cada bloque entra de a uno (docs.css). */}
+          <div className={cn('relative flex flex-1 flex-col transition-opacity', desc.estado === 'pensando' && 'opacity-45', desc.estado === 'armando' && 'bl-armando')}>
+            {desc.estado !== 'quieto' && (
+              <span className="pointer-events-none absolute top-6 left-1/2 z-40 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-ink px-3.5 py-1.5 text-[12.5px] font-medium text-white shadow-lg">
+                <Sparkles className="bl-orbe size-3.5" /> {desc.estado === 'pensando' ? 'Pensando…' : 'Armando…'}
+              </span>
+            )}
+            <Lienzo edicion={edicion}>
+              <Muestra d={d} previa={previa} editando={editando} elegir={setEditando} modal={modalAbierto} setModal={setModalAbierto} />
+            </Lienzo>
+          </div>
         </div>
         </div>
 
@@ -1040,8 +1152,8 @@ export function Constructor() {
             </div>
 
             <nav aria-label="Builder sections" className="flex gap-5 border-b border-line px-4">
-              {(['Components', 'Layers', 'Code'] as const).map((p) => {
-                const Icono = { Components: Component, Layers, Code: Code2 }[p]
+              {(['Describe', 'Components', 'Layers', 'Code'] as const).map((p) => {
+                const Icono = { Describe: Sparkles, Components: Component, Layers, Code: Code2 }[p]
                 return (
                   <button
                     key={p}
@@ -1057,9 +1169,11 @@ export function Constructor() {
             </nav>
 
             <div className="min-h-0 flex-1 overflow-y-auto">
-              {pestana === 'Components' ? (
+              {pestana === 'Describe' ? (
+                <Describir desc={desc} listo={!!sistema} />
+              ) : pestana === 'Components' ? (
                 <Paleta
-                  paleta={paleta}
+                  paleta={paleta.filter((sec) => sec.titulo !== 'App components')}
                   sistema={sistema}
                   alArrastrar={(it) => edicion.empezar({ tipo: it.tipo, nuevo: it.crear })}
                   alTerminar={edicion.terminar}

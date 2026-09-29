@@ -2,7 +2,7 @@ import { Component as ComponenteReact, createContext, useContext, useEffect, use
 import { composeStory } from '@storybook/react-vite'
 import { UNSAFE_LocationContext } from 'react-router-dom'
 import {
-  AppWindow, BarChart3, Columns3, Component, CalendarClock, CalendarDays, CalendarRange, Clock, CreditCard, Wallet, X, Download, FileText, Heading, IdCard, Inbox, ListChecks,
+  Activity, AppWindow, BarChart3, ChevronsRight, CircleAlert, CircleCheck, CircleUser, Columns3, Component, Contact, DoorOpen, Ellipsis, Info, ListOrdered, TriangleAlert, Upload, CalendarClock, CalendarDays, CalendarRange, Clock, CreditCard, Wallet, X, Download, FileText, Heading, IdCard, Inbox, ListChecks,
   Mail, MapPin, Minus, MousePointerClick, PanelsTopLeft, Pencil, Phone, Plus, Save, Search, Send, Settings, Shield, SquareStack,
   Pill as PillIcon, Smile, Table, Tag, TextCursorInput, ToggleRight, Trash2, Type, Users, type LucideIcon,
 } from 'lucide-react'
@@ -32,6 +32,16 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
+import { StepIndicator } from '@/components/clinical/StepIndicator'
+import { Pagination } from '@/components/patients/ledger/Pagination'
+import { SearchButton } from '@/components/ui/search-button'
+import { FilterMenu } from '@/components/dashboard/FilterMenu'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { StatStrip } from '@/components/dashboard/StatStrip'
+import { OperatoryCard, type Operatory } from '@/components/dashboard/OperatoryCard'
+import { PatientCard } from '@/components/patients/PatientCard'
+import type { PatientRow } from '@/components/patients/PatientsTable'
 import { Topbar } from '@/components/layout/Topbar'
 import { HelpProvider } from '@/components/help/HelpProvider'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -65,6 +75,7 @@ export const MARCAS = { Caries: '#fe0000', Restoration: '#2563eb', Planned: '#f5
 export type Marca = keyof typeof MARCAS
 export type Pestana = { id: string; label: string; bloques: Bloque[] }
 export type Columna = { id: string; bloques: Bloque[] }
+export type Tono = 'info' | 'success' | 'warning' | 'danger'
 /* Cuánto ocupa cada columna, de izquierda a derecha. */
 export const PROPORCIONES = { '1-1': '1fr 1fr', '1-2': '1fr 2fr', '2-1': '2fr 1fr', '1-3': '1fr 3fr', '3-1': '3fr 1fr', '1-1-1': '1fr 1fr 1fr', '1-1-1-1': '1fr 1fr 1fr 1fr' } as const
 export type Proporcion = keyof typeof PROPORCIONES
@@ -94,6 +105,16 @@ export type Bloque = { id: string } & (
   | { tipo: 'horarios'; provider: string; especialidad: string; fecha: string }
   | { tipo: 'divisor' }
   | { tipo: 'columnas'; proporcion: Proporcion; columnas: Columna[] }
+  | { tipo: 'migas'; items: string }
+  | { tipo: 'pasos'; total: number; actual: number; etiquetas: string }
+  | { tipo: 'paginacion'; paginas: number }
+  | { tipo: 'busqueda'; placeholder: string; filtro: string; opcionesFiltro: string; accion: string }
+  | { tipo: 'aviso'; tono: Tono; titulo: string; texto: string }
+  | { tipo: 'persona'; nombre: string; detalle: string; estado: '' | 'Active' | 'Inactive'; grande: boolean }
+  | { tipo: 'metricas'; apilada: boolean; items: { titulo: string; valor: string; nota: string; icono: IconoReal }[] }
+  | { tipo: 'operatorios'; cantidad: number }
+  | { tipo: 'pacientes'; cantidad: number }
+  | { tipo: 'subir'; titulo: string; detalle: string; accion: string }
   /** Una pieza que ya existe en Confidentally UI (pantalla o componente), dibujada con su historia real. */
   | { tipo: 'pieza'; storyId: string; componente: string; ejemplo: string; lugar: string; archivo: string; pantalla: boolean; jsx?: string
       /** El archivo de historias: con él la pieza se dibuja sola en el lienzo. `marco`: va en un iframe (abre un diálogo o menú de Radix). */
@@ -177,6 +198,16 @@ export const TIPOS: { tipo: TipoBloque; nombre: string; que: string; icono: Luci
   { tipo: 'detalles', grupo: 'Data', nombre: 'Details', que: 'Datos con ícono y lápiz para editar', icono: IdCard, nuevo: () => ({ id: nuevoId(), tipo: 'detalles', titulo: 'Contact', items: [{ icono: 'Phone', label: 'Phone', valor: '(555) 234-5678' }, { icono: 'Mail', label: 'Email', valor: 'maria.viola@mail.com' }, { icono: 'MapPin', label: 'Address', valor: '123 Biscayne Blvd' }] }) },
   { tipo: 'turnos', grupo: 'Data', nombre: 'Appointments', que: 'Turnos del día', icono: CalendarClock, nuevo: () => ({ id: nuevoId(), tipo: 'turnos', cantidad: 3 }) },
   { tipo: 'tareas', grupo: 'Data', nombre: 'Tasks', que: 'Tareas pendientes', icono: ListChecks, nuevo: () => ({ id: nuevoId(), tipo: 'tareas', cantidad: 2 }) },
+  { tipo: 'migas', grupo: 'Layout', nombre: 'Breadcrumb', que: 'Dónde está la pantalla: Patients › Maria', icono: ChevronsRight, nuevo: () => ({ id: nuevoId(), tipo: 'migas', items: 'Patients, Maria Abril Viola' }) },
+  { tipo: 'pasos', grupo: 'Layout', nombre: 'Steps', que: 'Los pasos de un proceso y en cuál va', icono: ListOrdered, nuevo: () => ({ id: nuevoId(), tipo: 'pasos', total: 3, actual: 2, etiquetas: 'Patient, Scheduling, Confirm' }) },
+  { tipo: 'busqueda', grupo: 'Forms', nombre: 'Search bar', que: 'Buscador, filtro y acción principal', icono: Search, nuevo: () => ({ id: nuevoId(), tipo: 'busqueda', placeholder: 'Search by Name or Last Name', filtro: 'Status', opcionesFiltro: 'Active, Inactive', accion: 'New Patient' }) },
+  { tipo: 'subir', grupo: 'Forms', nombre: 'Upload', que: 'Soltar o elegir archivos', icono: Upload, nuevo: () => ({ id: nuevoId(), tipo: 'subir', titulo: 'Drop files here', detalle: 'PDF, JPG or PNG, up to 10 MB', accion: 'Choose file' }) },
+  { tipo: 'aviso', grupo: 'Content', nombre: 'Alert', que: 'Un aviso: info, éxito, atención o error', icono: Info, nuevo: () => ({ id: nuevoId(), tipo: 'aviso', tono: 'info', titulo: 'Insurance verification pending', texto: 'We will let you know when the carrier confirms the coverage.' }) },
+  { tipo: 'persona', grupo: 'Content', nombre: 'Person', que: 'Avatar, nombre, detalle y estado', icono: CircleUser, nuevo: () => ({ id: nuevoId(), tipo: 'persona', nombre: 'Maria Abril Viola', detalle: '33 yrs · ID 4471', estado: 'Active', grande: false }) },
+  { tipo: 'metricas', grupo: 'Data', nombre: 'Stat strip', que: 'Números del día en una franja, como en el Dashboard', icono: Activity, nuevo: () => ({ id: nuevoId(), tipo: 'metricas', apilada: false, items: [{ titulo: 'Appointments', valor: '6', nota: '2 completed', icono: 'CalendarDays' }, { titulo: 'Waiting', valor: '3', nota: '1 new', icono: 'Clock' }, { titulo: 'Patients', valor: '24', nota: '+12% this week', icono: 'Users' }] }) },
+  { tipo: 'pacientes', grupo: 'Data', nombre: 'Patient cards', que: 'Pacientes en tarjetas de una fila', icono: Contact, nuevo: () => ({ id: nuevoId(), tipo: 'pacientes', cantidad: 3 }) },
+  { tipo: 'operatorios', grupo: 'Data', nombre: 'Operatories', que: 'Salas con su estado y quién atiende', icono: DoorOpen, nuevo: () => ({ id: nuevoId(), tipo: 'operatorios', cantidad: 4 }) },
+  { tipo: 'paginacion', grupo: 'Data', nombre: 'Pagination', que: 'Anterior y siguiente página', icono: Ellipsis, nuevo: () => ({ id: nuevoId(), tipo: 'paginacion', paginas: 5 }) },
   { tipo: 'odontograma', grupo: 'Clinical', nombre: 'Odontogram', que: 'Las 32 piezas: se seleccionan y se marcan superficies', icono: Smile, nuevo: () => ({ id: nuevoId(), tipo: 'odontograma', ejemplo: true, marca: 'Caries' }) },
   { tipo: 'receta', grupo: 'Clinical', nombre: 'Prescription', que: 'Una receta: medicamento, dosis e indicaciones', icono: PillIcon, nuevo: () => ({ id: nuevoId(), tipo: 'receta', titulo: 'New prescription', medicamentos: 'Amoxicillin, Ibuprofen, Paracetamol, Clindamycin, Chlorhexidine 0.12%', repeticiones: true, sustitucion: true, indicaciones: true }) },
 ]
@@ -227,6 +258,31 @@ const TURNOS: Appointment[] = [
   { name: 'John Smith', initials: 'JS', provider: 'Dr. Salgado', operatory: 'Operatory 2', time: '15:30' },
   { name: 'Sofía Romero', initials: 'SR', provider: 'Dr. Emily Chen', operatory: 'Operatory 1', time: '17:00' },
 ]
+
+const SALAS: Operatory[] = [
+  { name: 'Operatory 1', status: 'Busy', patientsToday: 6, provider: 'Dr. Emily Chen' },
+  { name: 'Operatory 2', status: 'Available', patientsToday: 4, provider: 'Dr. Elena Martinez' },
+  { name: 'Operatory 3', status: 'Available', patientsToday: 3, provider: 'Sarah Stone' },
+  { name: 'Operatory 4', status: 'Unavailable', patientsToday: 0, provider: '-' },
+]
+
+const FILAS: PatientRow[] = [
+  { id: 'p1', name: 'Maria Abril Viola', initials: 'MV', birthday: '23/11/1978', email: 'maria.viola@mail.com', status: 'Active' },
+  { id: 'p2', name: 'Noah James Smith', initials: 'NS', birthday: '04/02/1991', email: 'noah.smith@mail.com', status: 'Active' },
+  { id: 'p3', name: 'Elias Aguirre', initials: 'EA', birthday: '12/09/1985', email: 'elias.aguirre@mail.com', status: 'Inactive' },
+  { id: 'p4', name: 'Sofía Romero', initials: 'SR', birthday: '30/03/1979', email: 'sofia.romero@mail.com', status: 'Active' },
+  { id: 'p5', name: 'John Smith', initials: 'JS', birthday: '21/01/1983', email: 'john.smith@mail.com', status: 'Inactive' },
+]
+
+/* El aviso en los colores de los estados de la app (los mismos que Pill). */
+export const ALERTAS: Record<Tono, { caja: string; color: string; icono: LucideIcon; nombre: string }> = {
+  info: { caja: 'border-dash-busy-fg/25 bg-info-bg', color: 'text-dash-busy-fg', icono: Info, nombre: 'Info' },
+  success: { caja: 'border-dash-ok-fg/25 bg-dash-ok-bg', color: 'text-dash-ok-fg', icono: CircleCheck, nombre: 'CircleCheck' },
+  warning: { caja: 'border-warn-fg/25 bg-warn-bg', color: 'text-warn-fg', icono: TriangleAlert, nombre: 'TriangleAlert' },
+  danger: { caja: 'border-dash-bad-fg/25 bg-dash-bad-bg', color: 'text-dash-bad-fg', icono: CircleAlert, nombre: 'CircleAlert' },
+}
+const iniciales = (nombre: string) => nombre.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join('')
+const CLASE_BUSCADOR = 'focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none'
 
 const TAREAS: PendingTask[] = [
   { kind: 'Referrals', state: 'Requested', person: 'Elena Marquez', initials: 'EM', register: 'March 17, 2025', expiration: 'March 31, 2025' },
@@ -524,6 +580,28 @@ function CasillasVivas({ b }: { b: BloqueDe<'opciones'> }) {
   )
 }
 
+function PaginacionViva({ b }: { b: BloqueDe<'paginacion'> }) {
+  const [pagina, setPagina] = useState(1)
+  return <Pagination pagina={Math.min(pagina, b.paginas)} paginas={b.paginas} onChange={setPagina} />
+}
+
+/* El buscador de las pantallas con tabla (como en Patients): campo, botón Search, filtro y la acción principal. */
+function BusquedaViva({ b }: { b: BloqueDe<'busqueda'> }) {
+  const [q, setQ] = useState('')
+  const [filtro, setFiltro] = useState<string[]>([])
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <div className="relative w-full sm:w-[320px]">
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={b.placeholder} aria-label={b.placeholder || 'Search'} className={CLASE_BUSCADOR} />
+      </div>
+      <SearchButton className="h-8" />
+      {b.filtro && <FilterMenu label={b.filtro} options={lista(b.opcionesFiltro)} value={filtro} onChange={setFiltro} />}
+      {b.accion && <Button size="md" className="ml-auto"><Plus /> {b.accion}</Button>}
+    </div>
+  )
+}
+
 function VerCampo({ c, ancho }: { c: Campo; ancho?: string }) {
   const comun = { label: c.label, required: c.required, disabled: c.disabled, hint: c.hint || undefined, error: c.error || undefined, className: ancho }
   if (c.clase === 'select') return <SelectField {...comun} placeholder={c.placeholder || undefined} options={lista(c.opciones)} />
@@ -621,6 +699,65 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
       return <hr className="border-line-row" />
     case 'pieza':
       return <PiezaViva b={b} />
+    case 'migas': {
+      const items = lista(b.items)
+      return <Breadcrumb items={items.map((label, i) => ({ label, to: i < items.length - 1 ? '/' : undefined }))} />
+    }
+    case 'pasos': {
+      const etiquetas = lista(b.etiquetas)
+      return (
+        <div className="flex flex-col gap-2">
+          <StepIndicator total={b.total} current={b.actual} />
+          {etiquetas[b.actual - 1] && <p className="text-[12px] font-semibold tracking-[0.04em] text-ink-muted uppercase">Step {b.actual} of {b.total} — {etiquetas[b.actual - 1]}</p>}
+        </div>
+      )
+    }
+    case 'paginacion':
+      return <div className="flex justify-end"><PaginacionViva key={b.paginas} b={b} /></div>
+    case 'busqueda':
+      return <BusquedaViva b={b} />
+    case 'aviso': {
+      const a = ALERTAS[b.tono]
+      return (
+        <div role="status" className={cn('flex items-start gap-3 rounded-lg border px-4 py-3', a.caja)}>
+          <a.icono className={cn('mt-0.5 size-4 shrink-0', a.color)} />
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <p className={cn('text-[13px] font-semibold', a.color)}>{b.titulo}</p>
+            {b.texto && <p className="text-[13px] leading-relaxed text-ink">{b.texto}</p>}
+          </div>
+        </div>
+      )
+    }
+    case 'persona':
+      return (
+        <div className="flex items-center gap-3">
+          <Avatar className={b.grande ? 'size-[62px]' : 'size-10'}>
+            <AvatarFallback className={cn('bg-dash-blue-hover text-surface-subtle', b.grande ? 'text-xl' : 'text-[13px]')}>{iniciales(b.nombre)}</AvatarFallback>
+          </Avatar>
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="flex items-center gap-2">
+              <span className={cn('truncate font-semibold text-ink', b.grande ? 'text-lg' : 'text-[15px]')}>{b.nombre}</span>
+              {b.estado && <Pill tone={b.estado === 'Active' ? 'success' : 'neutral'} size="sm">{b.estado}</Pill>}
+            </span>
+            {b.detalle && <span className="text-[13px] text-ink-muted">{b.detalle}</span>}
+          </div>
+        </div>
+      )
+    case 'metricas':
+      return <StatStrip apilada={b.apilada} stats={b.items.map((x) => ({ label: x.titulo, value: x.valor, nota: x.nota, icon: ICONOS[x.icono] }))} />
+    case 'operatorios':
+      return <div className="grid gap-3 sm:grid-cols-2">{SALAS.slice(0, b.cantidad).map((r) => <OperatoryCard key={r.name} room={r} />)}</div>
+    case 'pacientes':
+      return <div className="flex flex-col gap-2">{FILAS.slice(0, b.cantidad).map((r) => <PatientCard key={r.id} row={r} onEdit={() => {}} />)}</div>
+    case 'subir':
+      return (
+        <div className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-line bg-surface-subtle px-6 py-8 text-center">
+          <span className="flex size-10 items-center justify-center rounded-full bg-info-bg text-dash-blue"><Upload className="size-5" /></span>
+          <p className="text-sm font-semibold text-ink">{b.titulo}</p>
+          {b.detalle && <p className="text-[13px] text-ink-muted">{b.detalle}</p>}
+          {b.accion && <Button variant="secondary" size="md">{b.accion}</Button>}
+        </div>
+      )
     case 'columnas':
       return (
         <div className="grid items-start gap-5" style={{ gridTemplateColumns: PROPORCIONES[b.proporcion] }}>
@@ -1239,6 +1376,113 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor): string[
       return [`<div className="grid gap-3 sm:grid-cols-2">`, `  {tareas.map((t) => <PendingTaskCard key={t.kind} task={t} />)}`, `</div>`]
     case 'divisor':
       return [`<hr className="border-line-row" />`]
+    case 'migas': {
+      importar(c, '@/components/ui/breadcrumb', 'Breadcrumb')
+      const items = lista(b.items)
+      return [`<Breadcrumb items={[${items.map((l, i) => `{ label: ${comillas(l)}${i < items.length - 1 ? ", to: '/'" : ''} }`).join(', ')}]} />`]
+    }
+    case 'pasos': {
+      importar(c, '@/components/clinical/StepIndicator', 'StepIndicator')
+      const etiqueta = lista(b.etiquetas)[b.actual - 1]
+      return [
+        `<div className="flex flex-col gap-2">`,
+        `  <StepIndicator total={${b.total}} current={${b.actual}} />`,
+        ...(etiqueta ? [`  <p className="text-[12px] font-semibold tracking-[0.04em] text-ink-muted uppercase">Step ${b.actual} of ${b.total} — ${texto(etiqueta)}</p>`] : []),
+        `</div>`,
+      ]
+    }
+    case 'paginacion': {
+      importar(c, '@/components/patients/ledger/Pagination', 'Pagination')
+      const [v, set] = estado(c, 'pagina', '(1)')
+      return [`<div className="flex justify-end">`, `  <Pagination pagina={${v}} paginas={${b.paginas}} onChange={${set}} />`, `</div>`]
+    }
+    case 'busqueda': {
+      importar(c, 'lucide-react', 'Search')
+      importar(c, '@/components/ui/search-button', 'SearchButton')
+      const [v, set] = estado(c, 'busqueda', "('')")
+      const lineas = [
+        `<div className="flex flex-wrap items-center gap-3">`,
+        `  <div className="relative w-full sm:w-[320px]">`,
+        `    <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />`,
+        `    <input value={${v}} onChange={(e) => ${set}(e.target.value)} placeholder=${valorAttr(b.placeholder)} className="${CLASE_BUSCADOR}" />`,
+        `  </div>`,
+        `  <SearchButton className="h-8" />`,
+      ]
+      if (b.filtro) {
+        importar(c, '@/components/dashboard/FilterMenu', 'FilterMenu')
+        const [f, setF] = estado(c, 'filtro', '<string[]>([])')
+        lineas.push(`  <FilterMenu label=${valorAttr(b.filtro)} options={${arreglo(lista(b.opcionesFiltro))}} value={${f}} onChange={${setF}} />`)
+      }
+      if (b.accion) {
+        importar(c, '@/components/ui/button', 'Button')
+        importar(c, 'lucide-react', 'Plus')
+        lineas.push(`  <Button size="md" className="ml-auto"><Plus /> ${texto(b.accion)}</Button>`)
+      }
+      return [...lineas, `</div>`]
+    }
+    case 'aviso': {
+      const a = ALERTAS[b.tono]
+      importar(c, 'lucide-react', a.nombre)
+      return [
+        `<div role="status" className="flex items-start gap-3 rounded-lg border px-4 py-3 ${a.caja}">`,
+        `  <${a.nombre} className="mt-0.5 size-4 shrink-0 ${a.color}" />`,
+        `  <div className="flex min-w-0 flex-col gap-0.5">`,
+        `    <p className="text-[13px] font-semibold ${a.color}">${texto(b.titulo)}</p>`,
+        ...(b.texto ? [`    <p className="text-[13px] leading-relaxed text-ink">${texto(b.texto)}</p>`] : []),
+        `  </div>`,
+        `</div>`,
+      ]
+    }
+    case 'persona': {
+      importar(c, '@/components/ui/avatar', 'Avatar', 'AvatarFallback')
+      if (b.estado) importar(c, '@/components/ui/pill', 'Pill')
+      return [
+        `<div className="flex items-center gap-3">`,
+        `  <Avatar className="${b.grande ? 'size-[62px]' : 'size-10'}">`,
+        `    <AvatarFallback className="bg-dash-blue-hover text-surface-subtle ${b.grande ? 'text-xl' : 'text-[13px]'}">${iniciales(b.nombre)}</AvatarFallback>`,
+        `  </Avatar>`,
+        `  <div className="flex min-w-0 flex-col gap-0.5">`,
+        `    <span className="flex items-center gap-2">`,
+        `      <span className="truncate font-semibold text-ink ${b.grande ? 'text-lg' : 'text-[15px]'}">${texto(b.nombre)}</span>`,
+        ...(b.estado ? [`      <Pill tone="${b.estado === 'Active' ? 'success' : 'neutral'}" size="sm">${b.estado}</Pill>`] : []),
+        `    </span>`,
+        ...(b.detalle ? [`    <span className="text-[13px] text-ink-muted">${texto(b.detalle)}</span>`] : []),
+        `  </div>`,
+        `</div>`,
+      ]
+    }
+    case 'metricas':
+      importar(c, '@/components/dashboard/StatStrip', 'StatStrip')
+      b.items.forEach((x) => importar(c, 'lucide-react', x.icono))
+      return [
+        `<StatStrip${b.apilada ? ' apilada' : ''} stats={[`,
+        ...b.items.map((x) => `  { label: ${comillas(x.titulo)}, value: ${comillas(x.valor)}, nota: ${comillas(x.nota)}, icon: ${x.icono} },`),
+        `]} />`,
+      ]
+    case 'operatorios':
+      importar(c, '@/components/dashboard/OperatoryCard', 'OperatoryCard', 'type Operatory')
+      if (!c.datos.some((d) => d.startsWith('const salas'))) {
+        c.datos.push([`const salas: Operatory[] = [`, ...SALAS.slice(0, b.cantidad).map((r) => `  { name: ${comillas(r.name)}, status: ${comillas(r.status)}, patientsToday: ${r.patientsToday}, provider: ${comillas(r.provider)} },`), `]`].join('\n'))
+      }
+      return [`<div className="grid gap-3 sm:grid-cols-2">`, `  {salas.map((r) => <OperatoryCard key={r.name} room={r} />)}`, `</div>`]
+    case 'pacientes':
+      importar(c, '@/components/patients/PatientCard', 'PatientCard')
+      importar(c, '@/components/patients/PatientsTable', 'type PatientRow')
+      if (!c.datos.some((d) => d.startsWith('const filas'))) {
+        c.datos.push([`const filas: PatientRow[] = [`, ...FILAS.slice(0, b.cantidad).map((r) => `  { id: ${comillas(r.id)}, name: ${comillas(r.name)}, initials: ${comillas(r.initials)}, birthday: ${comillas(r.birthday)}, email: ${comillas(r.email)}, status: ${comillas(r.status)} },`), `]`].join('\n'))
+      }
+      return [`<div className="flex flex-col gap-2">`, `  {filas.map((r) => <PatientCard key={r.id} row={r} onEdit={() => {}} />)}`, `</div>`]
+    case 'subir':
+      importar(c, 'lucide-react', 'Upload')
+      if (b.accion) importar(c, '@/components/ui/button', 'Button')
+      return [
+        `<div className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-line bg-surface-subtle px-6 py-8 text-center">`,
+        `  <span className="flex size-10 items-center justify-center rounded-full bg-info-bg text-dash-blue"><Upload className="size-5" /></span>`,
+        `  <p className="text-sm font-semibold text-ink">${texto(b.titulo)}</p>`,
+        ...(b.detalle ? [`  <p className="text-[13px] text-ink-muted">${texto(b.detalle)}</p>`] : []),
+        ...(b.accion ? [`  <Button variant="secondary" size="md">${texto(b.accion)}</Button>`] : []),
+        `</div>`,
+      ]
   }
 }
 

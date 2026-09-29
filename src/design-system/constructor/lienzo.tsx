@@ -44,6 +44,8 @@ export const insertar = (bloques: Bloque[], lista: string, indice: number, b: Bl
 
 export const sacar = (bloques: Bloque[], id: string) => recorrer(bloques, (xs) => xs.filter((b) => b.id !== id))
 
+export const reemplazar = (bloques: Bloque[], id: string, nuevo: Bloque) => recorrer(bloques, (xs) => xs.map((b) => (b.id === id ? nuevo : b)))
+
 /* Mover a una lista: si es la misma y va más abajo, el lugar se corre uno al sacarlo. */
 export function mover(bloques: Bloque[], id: string, lista: string, indice: number): Bloque[] {
   const b = buscarBloque(bloques, id)
@@ -227,7 +229,7 @@ function Lista({ lista, bloques, contenedor, className }: ListaProps) {
           {lista === 'raiz' ? (
             <>
               <span className="font-medium text-ink">Arrastrá componentes acá</span>
-              <span>Desde el panel Components: bloques editables o cualquier pieza de la app.</span>
+              <span>Desde el panel Components, o describilo en Describe.</span>
             </>
           ) : 'Soltá bloques acá'}
         </div>

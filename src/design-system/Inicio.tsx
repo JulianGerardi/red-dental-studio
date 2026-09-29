@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Blocks, ChevronRight, Layers, Lightbulb, MousePointer2, SlidersHorizontal, type LucideIcon } from 'lucide-react'
+import { Blocks, ChevronRight, Layers, Lightbulb, MousePointer2, SlidersHorizontal, Sparkles, type LucideIcon } from 'lucide-react'
 import { ICONO_SECCION, Buscador } from './Buscador'
 import { QUE_SECCION, type Seccion } from './buscar'
 import { useIndice } from './Mapa'
@@ -79,12 +79,17 @@ export function Inicio() {
         <Enlace id="builder--docs" className="group relative flex flex-col gap-6 overflow-hidden rounded-3xl bg-[linear-gradient(135deg,var(--color-dash-blue)_0%,color-mix(in_srgb,var(--color-dash-blue)_68%,black)_100%)] p-8 text-white no-underline sm:p-10 lg:flex-row lg:items-center">
           <div aria-hidden className="pointer-events-none absolute inset-0 [background-image:radial-gradient(rgb(255_255_255/0.16)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(90deg,transparent,#000_45%)]" />
           <div className="relative flex flex-1 flex-col gap-3">
-            <span className="inline-flex items-center gap-2 self-start rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white">
-              <Blocks className="size-3.5" /> Builder
+            <span className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white">
+                <Blocks className="size-3.5" /> Builder
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-[12px] font-semibold text-dash-blue">
+                <Sparkles className="size-3.5" /> Ahora con IA
+              </span>
             </span>
             <span className="text-[30px] leading-tight font-bold tracking-[-0.02em] sm:text-[36px]">Armá tu propio componente</span>
             <span className="max-w-[52ch] text-[15px] leading-relaxed text-white/80">
-              Empezá con una pantalla en blanco y arrastrá los componentes reales de la app, cada uno suelto: métricas, tablas, tarjetas, modales… El código sale solo, listo para copiar.
+              Describí lo que necesitás y la IA lo piensa y lo arma con los componentes reales de la app. O arrastralos vos, cada uno suelto, a una pantalla en blanco. El código sale solo, listo para copiar.
             </span>
             <span className="mt-2 inline-flex items-center gap-1.5 self-start rounded-md bg-white px-4 py-2 text-[14px] font-semibold text-dash-blue transition-transform group-hover:translate-x-0.5">
               Open builder <ChevronRight className="size-4" />
@@ -224,6 +229,14 @@ function Arrastre() {
         <span className="absolute top-2 left-2.5 text-[8.5px] font-semibold tracking-[0.08em] text-ink-muted uppercase">Components</span>
       </div>
       {PIEZAS_DEMO.map((p) => <Ficha key={p.nombre} nombre={p.nombre} className="border-line" style={{ top: p.top }} />)}
+      {/* El pedido a la IA: el mismo armado, descripto en palabras. */}
+      <div className="absolute top-[162px] left-0 flex w-[118px] flex-col gap-1.5 rounded-lg bg-white p-2 shadow-xl">
+        <span className="flex items-center gap-1 text-[8.5px] font-semibold tracking-[0.08em] text-dash-blue uppercase">
+          <Sparkles className="bl-orbe size-2.5" /> Con IA
+        </span>
+        <span className="text-[9.5px] leading-snug text-ink">“Pantalla de pacientes con métricas, la tabla y los turnos”<span className="bl-cursor ml-px inline-block h-2.5 w-px translate-y-0.5 bg-ink" /></span>
+        <span className="flex h-4 items-center justify-center gap-1 rounded bg-dash-blue text-[8.5px] font-medium text-white"><Sparkles className="size-2" /> Armar</span>
+      </div>
       {PIEZAS_DEMO.map((p, i) => (
         <span key={p.nombre} className={`bl-mover-${i + 1} absolute top-0 left-0 opacity-0`} style={{ '--dx': `${p.dx}px`, '--dy': `${p.dy}px` } as React.CSSProperties}>
           <Ficha nombre={p.nombre} className="border-dash-blue shadow-lg" style={{ top: p.top }} />

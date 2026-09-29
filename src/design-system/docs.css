@@ -190,3 +190,43 @@ body:has(.ds-foco) #storybook-root {
   79%, 90% { opacity: 1; transform: none; }
   97%, 100% { opacity: 0; }
 }
+
+/* Builder › Describe (PanelDescribir.tsx): el orbe late y el "Pensando…" brilla mientras piensa; cada paso entra al
+   aparecer; mientras arma, cada bloque entra al lienzo de a uno. Quieto (sin movimiento), todo aparece directo. */
+@media (prefers-reduced-motion: no-preference) {
+  .bl-orbe { animation: bl-orbe 1.6s ease-in-out infinite; }
+  .bl-brillo {
+    background: linear-gradient(90deg, var(--color-ink) 0%, var(--color-ink) 35%, var(--color-dash-blue) 50%, var(--color-purple-fg) 58%, var(--color-ink) 72%, var(--color-ink) 100%);
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: bl-brillo 2s linear infinite;
+  }
+  .bl-paso { animation: bl-paso 320ms ease-out both; }
+  .bl-armando [data-bloque] { animation: bl-entra 480ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+}
+@keyframes bl-orbe {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.12) rotate(180deg); }
+}
+@keyframes bl-brillo {
+  from { background-position: 100% 0; }
+  to { background-position: -150% 0; }
+}
+@keyframes bl-paso {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes bl-entra {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+/* Portada: el cursor del pedido a la IA en el banner del Builder. */
+@media (prefers-reduced-motion: no-preference) {
+  .bl-demo .bl-cursor { animation: bl-cursor 1s steps(1) infinite; }
+}
+@keyframes bl-cursor {
+  50% { opacity: 0; }
+}
