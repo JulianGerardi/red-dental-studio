@@ -1,3 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{J as n,X as r,Z as i}from"./iframe-BK-jJKMa.js";var a,o,s,c;function l(){return(l=e((()=>{i(),a=t(),o={title:`Components/Dashboard/StatStrip parts`,parameters:{layout:`padded`}},s={render:()=>(0,a.jsx)(r,{stats:n})},c=[`StackedVariant`],s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
-  render: () => <StatStripApilada stats={STATS} />
-}`,...s.parameters?.docs?.source}}}})))()}l();export{s as StackedVariant,c as __namedExportsOrder,o as default};
