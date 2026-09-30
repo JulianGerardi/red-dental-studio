@@ -322,14 +322,15 @@ la botonera de registros.
 - **Caso**: cabecera con el nombre y su lapiz, Move to y el kebab con Present /
   Accept / Discard / Delete; fecha y autor; categoria y notas; total; y una
   tabla por visita con la barra azul del encabezado.
-- **Estado del caso**: Pending -> Presented -> Accepted (o Discarded). Present,
-  Accept y Discard del kebab cambian el estado; cada accion sólo se ofrece desde
-  los estados donde tiene sentido.
-  - Mientras se arma (Pending o Presented): lapiz para renombrar, Move to y la
-    categoria como combo. El ojo de vista previa se ve, pero sólo responde en
-    Presented; antes queda deshabilitado con su tooltip.
-  - Aceptado o descartado: lapiz, ojo y Move to desaparecen y la categoria pasa
-    a texto fijo.
+- **Estado del caso**: Planning -> Pending -> Presented -> Accepted (o
+  Discarded). El kebab los mueve: Finish Planning (no esta en el frame), Present,
+  Accept y Discard; cada accion sólo se ofrece desde el estado donde tiene
+  sentido.
+  - Planning: lapiz para renombrar, Move to y la categoria como combo.
+  - Presented: sólo el ojo de vista previa.
+  - Fuera de su estado, lapiz, ojo y Move to no se esconden: quedan
+    deshabilitados y el tooltip dice cuando se pueden usar. La categoria, fuera
+    de Planning, es texto fijo.
 - **Dialogos** con la copia del frame: Present Case, Accept Case, Discard Case,
   Remove Procedure y Delete Case -este ultimo con las dos opciones de alcance-.
 

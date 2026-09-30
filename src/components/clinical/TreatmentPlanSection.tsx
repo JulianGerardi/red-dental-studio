@@ -31,22 +31,56 @@ const ESTADO_TONO: Record<Procedimiento['estado'], PillTone> = {
 }
 
 const TONO_CASO: Record<EstadoCaso, PillTone> = {
-  Pending: 'warning', Presented: 'info', Accepted: 'success', Discarded: 'neutral',
+  Planning: 'purple', Pending: 'warning', Presented: 'info', Accepted: 'success', Discarded: 'neutral',
 }
 
 /* Lo que cada diálogo del menú hace con el estado del caso. */
 const ESTADO_TRAS: Partial<Record<ClaveDialogo, EstadoCaso>> = {
-  present: 'Presented', accept: 'Accepted', discard: 'Discarded',
+  finish: 'Pending', present: 'Presented', accept: 'Accepted', discard: 'Discarded',
 }
 
-/* Desde qué estados se ofrece cada acción del menú: un caso aceptado o
-   descartado no vuelve a presentarse, aceptarse ni descartarse. */
+/* Desde qué estados se ofrece cada acción del menú. */
 const ACCIONES_CASO: { label: string; clave: ClaveDialogo | 'delete'; desde?: EstadoCaso[] }[] = [
+  { label: 'Finish Planning', clave: 'finish', desde: ['Planning'] },
   { label: 'Present Case', clave: 'present', desde: ['Pending'] },
-  { label: 'Accept Case', clave: 'accept', desde: ['Pending', 'Presented'] },
-  { label: 'Discard Case', clave: 'discard', desde: ['Pending', 'Presented'] },
+  { label: 'Accept Case', clave: 'accept', desde: ['Presented'] },
+  { label: 'Discard Case', clave: 'discard', desde: ['Planning', 'Pending', 'Presented'] },
   { label: 'Delete Case', clave: 'delete' },
 ]
+
+/* Ícono de acción del encabezado del caso. Fuera de su estado no se esconde:
+   queda deshabilitado y el tooltip dice cuándo se puede usar. El botón
+   deshabilitado no recibe el hover, así que el tooltip cuelga del span. */
+function AccionCaso({
+  habilitado, tooltip, tooltipDeshabilitado, className, claseBoton, children, ...boton
+}: {
+  habilitado: boolean
+  tooltip: string
+  tooltipDeshabilitado: string
+  claseBoton?: string
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className={cn('shrink-0', className)}>
+          <button
+            {...boton}
+            disabled={!habilitado}
+            className={cn(
+              'flex items-center enabled:hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40',
+              claseBoton,
+            )}
+          >
+            {children}
+          </button>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">
+        {habilitado ? tooltip : tooltipDeshabilitado}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
 
 /* ── Diálogos ─────────────────────────────────────────────────────── */
 
@@ -553,9 +587,7 @@ export function VistaCaso({
   const [notas, setNotas] = useState('')
   const [menu, setMenu] = useState(false)
   const [colapsado, setColapsado] = useState(false)
-  /* Mientras se arma (Pending o Presented) el caso se edita; aceptado o
-     descartado queda fijo. La vista previa sólo existe una vez presentado. */
-  const planificando = caso.estado === 'Pending' || caso.estado === 'Presented'
+  const planificando = caso.estado === 'Planning'
   const presentado = caso.estado === 'Presented'
 
   return (
@@ -583,48 +615,40 @@ export function VistaCaso({
               </span>
             </span>
           )}
-          {planificando && (
-            <button
+          {/* Lápiz y Move to sólo mientras se planea; el ojo sólo con el caso presentado. */}
+          <TooltipProvider delayDuration={150}>
+            <AccionCaso
+              habilitado={planificando}
+              tooltip="Rename case"
+              tooltipDeshabilitado="The case can only be renamed while it is being planned"
               onClick={() => aviso.info('Renaming a case is not available in this release.')}
               aria-label="Rename case"
-              className="shrink-0 text-ink-medium hover:opacity-70"
+              claseBoton="text-ink-medium"
             >
               <Pencil className="size-4" />
-            </button>
-          )}
-          {/* Preview sube al encabezado, con los demás íconos: sólo ícono, con su tooltip.
-              Se ve mientras se arma el caso, pero sólo responde una vez presentado. El
-              botón deshabilitado no recibe el hover, así que el tooltip cuelga del span. */}
-          {planificando && (
-            <TooltipProvider delayDuration={150}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="shrink-0">
-                    <button
-                      onClick={() => aviso.info('The case preview is not available in this release.')}
-                      disabled={!presentado}
-                      aria-label="Preview case"
-                      className="block text-ink-medium hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:opacity-40"
-                    >
-                      <Eye className="size-4" />
-                    </button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">
-                  {presentado ? 'Preview case' : 'Present the case to preview it'}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          {planificando && (
-            <button
+            </AccionCaso>
+            <AccionCaso
+              habilitado={presentado}
+              tooltip="Preview case"
+              tooltipDeshabilitado="The preview is only available while the case is presented"
+              onClick={() => aviso.info('The case preview is not available in this release.')}
+              aria-label="Preview case"
+              claseBoton="text-ink-medium"
+            >
+              <Eye className="size-4" />
+            </AccionCaso>
+            <AccionCaso
+              habilitado={planificando}
+              tooltip="Move procedures to another case"
+              tooltipDeshabilitado="Procedures can only be moved while the case is being planned"
               onClick={onMover}
-              className="text-dash-blue ml-auto flex shrink-0 items-center gap-1 text-[13px] font-semibold hover:underline"
+              className="ml-auto"
+              claseBoton="text-dash-blue gap-1 text-[13px] font-semibold enabled:hover:underline enabled:hover:opacity-100"
             >
               Move to <CornerUpLeft className="size-3.5" />
-            </button>
-          )}
-          <div className={cn('relative shrink-0', !planificando && 'ml-auto')}>
+            </AccionCaso>
+          </TooltipProvider>
+          <div className="relative shrink-0">
             <button
               onClick={() => setMenu((v) => !v)}
               aria-label="Case actions"
@@ -672,7 +696,7 @@ export function VistaCaso({
         </div>
 
         {/* Una sola línea: categoría, notas y total. La categoría no necesita el ancho de media card.
-            Es un combo mientras se arma el plan; aceptado, pasa a texto. */}
+            Es un combo sólo mientras se planea; después queda como texto. */}
         <div className="mt-4 flex flex-wrap items-start gap-4">
           {planificando ? (
             <SelectField

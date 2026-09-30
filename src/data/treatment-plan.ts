@@ -5,9 +5,9 @@
    "Periodontists Recommended" / "Periodontist Alternative", y el pie de la
    tabla que dice "insurances" en una tabla de procedimientos. */
 
-/* Pending y Presented son las dos etapas en las que el plan todavía se está
-   armando; Accepted y Discarded lo congelan. */
-export type EstadoCaso = 'Pending' | 'Presented' | 'Accepted' | 'Discarded'
+/* Planning -> Pending -> Presented -> Accepted / Discarded. Sólo en Planning el
+   caso se edita; Pending es el plan terminado que espera ser presentado. */
+export type EstadoCaso = 'Planning' | 'Pending' | 'Presented' | 'Accepted' | 'Discarded'
 
 export type Procedimiento = {
   id: string
@@ -61,7 +61,7 @@ export type Caso = {
 
 export const CASOS: Caso[] = [
   {
-    id: 'c1', nombre: 'Periodontists Recommended', grupo: 'Pending Decision', estado: 'Pending',
+    id: 'c1', nombre: 'Periodontists Recommended', grupo: 'Pending Decision', estado: 'Planning',
     creado: '01/07/2024', creadoPor: 'Provider 1', total: '231.12',
     visitas: [
       { id: 'v1', nombre: 'Visit 1', total: '$100.000', procedimientos: visita('c1v1', ['Signed', 'Signed', 'Pending', 'Pending']) },
@@ -76,7 +76,7 @@ export const CASOS: Caso[] = [
     ],
   },
   {
-    id: 'c3', nombre: 'Periodontist Alternative', grupo: 'Pending Decision', estado: 'Pending',
+    id: 'c3', nombre: 'Periodontist Alternative', grupo: 'Pending Decision', estado: 'Presented',
     creado: '01/07/2024', creadoPor: 'Provider 1', total: '96.00',
     visitas: [
       { id: 'v1', nombre: 'Visit 1', total: '$96.000', procedimientos: visita('c3v1', ['Not sent', 'Not sent']) },
@@ -131,6 +131,11 @@ export const CONSENTIMIENTO: Consentimiento = {
 
 /* Copias exactas de los diálogos del frame. */
 export const DIALOGOS = {
+  /* No está en el frame: es el paso que cierra la planificación. */
+  finish: {
+    titulo: 'Finish Planning',
+    texto: ['Are you sure you want to finish planning this case? It will no longer be editable and will be ready to present to the patient.'],
+  },
   present: {
     titulo: 'Present Case',
     texto: ['Are you sure you want to present this case to the patient?'],
