@@ -48,12 +48,17 @@ export const CaseView: Story = {
   render: () => <VistaCaso caso={CASOS[0]} favorito={false} onFavorito={() => {}} onDialogo={() => {}} onMover={() => {}} onCompletar={() => {}} />,
 }
 
-/* Presentado: el ojo de vista previa se habilita; lápiz, Move to y el combo de categoría siguen disponibles. */
+/* Planeado, esperando ser presentado: lápiz, ojo y Move to deshabilitados con su tooltip; la categoría queda como texto. */
+export const CaseViewPending: Story = {
+  render: () => <VistaCaso caso={{ ...CASOS[0], estado: 'Pending' }} favorito={false} onFavorito={() => {}} onDialogo={() => {}} onMover={() => {}} onCompletar={() => {}} />,
+}
+
+/* Presentado: sólo el ojo de vista previa se habilita. */
 export const CaseViewPresented: Story = {
   render: () => <VistaCaso caso={{ ...CASOS[0], estado: 'Presented' }} favorito={false} onFavorito={() => {}} onDialogo={() => {}} onMover={() => {}} onCompletar={() => {}} />,
 }
 
-/* Aceptado: desaparecen lápiz, ojo y Move to, y la categoría queda como texto. */
+/* Aceptado: lápiz, ojo y Move to deshabilitados con su tooltip, y la categoría como texto. */
 export const CaseViewAccepted: Story = {
   render: () => <VistaCaso caso={{ ...CASOS[0], estado: 'Accepted' }} favorito={false} onFavorito={() => {}} onDialogo={() => {}} onMover={() => {}} onCompletar={() => {}} />,
 }
