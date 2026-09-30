@@ -1,5 +1,42 @@
 (function () {
   var root = document.documentElement;
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Headline words blur in one after another */
+  document.querySelectorAll('.split').forEach(function (el) {
+    var i = 0;
+    var walk = function (node) {
+      Array.prototype.slice.call(node.childNodes).forEach(function (child) {
+        if (child.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          child.textContent.split(/(\s+)/).forEach(function (part) {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+            var span = document.createElement('span');
+            span.className = 'w';
+            span.style.setProperty('--i', i++);
+            span.textContent = part;
+            frag.appendChild(span);
+          });
+          child.parentNode.replaceChild(frag, child);
+        } else if (child.nodeType === 1) {
+          walk(child);
+        }
+      });
+    };
+    walk(el);
+  });
+
+  /* Soft spotlight that follows the pointer inside a cell */
+  if (!reduced) {
+    document.querySelectorAll('.spot').forEach(function (el) {
+      el.addEventListener('pointermove', function (e) {
+        var r = el.getBoundingClientRect();
+        el.style.setProperty('--x', (e.clientX - r.left) + 'px');
+        el.style.setProperty('--y', (e.clientY - r.top) + 'px');
+      });
+    });
+  }
 
   /* Theme: follows the system until the visitor picks one */
   try {
@@ -48,7 +85,7 @@
         setTimeout(function () { btn.textContent = label; }, 1600);
       };
       var fallback = function () {
-        var target = btn.parentElement.querySelector('[data-copy-text]');
+        var target = btn.parentElement.querySelector('[data-copy-text]') || btn.parentElement.querySelector('span');
         if (!target) return;
         var range = document.createRange();
         range.selectNodeContents(target);

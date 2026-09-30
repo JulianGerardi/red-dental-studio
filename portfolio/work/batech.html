@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Batech AI Platform Case Study</title>
+<meta name="description" content="Design of Batech's AI video analytics platform for retail. Case study by Julián Gerardi.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23171717'/%3E%3Ctext x='16' y='20.5' font-family='Arial' font-weight='700' font-size='11' text-anchor='middle' fill='%23fff'%3EJG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&amp;family=Geist+Mono:wght@400..600&amp;display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<script>try{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-component" viewBox="0 0 16 16"><path d="M8 1.2 10.2 3.4 8 5.6 5.8 3.4ZM3.4 5.8 5.6 8 3.4 10.2 1.2 8ZM12.6 5.8 14.8 8 12.6 10.2 10.4 8ZM8 10.4 10.2 12.6 8 14.8 5.8 12.6Z" fill="currentColor"/></symbol>
+  <symbol id="i-cursor" viewBox="0 0 20 20"><path d="M3 2.2 17.2 8.6l-6.1 1.9-2.3 6.3Z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+</svg>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <div class="nav__inner">
+    <a class="brand" href="../index.html" aria-label="Julián Gerardi, home"><span class="brand__mark" aria-hidden="true">JG</span>Julián Gerardi</a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="../index.html#work" aria-current="page">Work</a>
+      <a href="../index.html#process">Process</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#about">About</a>
+    </nav>
+    <div class="nav__right">
+      <button class="icon-btn theme-toggle" type="button" aria-label="Switch theme">
+        <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+        <svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+      </button>
+      <button class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+      <a class="btn btn--sm" href="../index.html#contact">Get in touch</a>
+    </div>
+  </div>
+</header>
+
+<main class="shell" id="main">
+  <section class="row case-head">
+    <div class="cell" style="padding-block:clamp(56px,9vw,112px) clamp(40px,6vw,72px)">
+      <nav class="crumbs rise" style="--d:0s" aria-label="Breadcrumb"><a href="../index.html#work">Work</a><span>/</span><span>Batech AI Platform</span></nav>
+      <h1 class="case-title split">Batech AI Platform</h1>
+      <p class="case-lede rise">A computer-vision platform that turns store cameras into events, alerts and reports. I led its design end to end, from the first flow to a high-fidelity prototype.</p>
+      <div class="btns rise" style="--d:.55s"><a class="btn" href="https://www.figma.com/design/ljgOjnuyx1hS052ehRnyRb/Portfolio?node-id=133-4775" target="_blank" rel="noopener">View in Figma <svg aria-hidden="true"><use href="#i-arrow"/></svg></a><a class="btn btn--ghost" href="#flow">Jump to the flow</a></div>
+      
+    </div>
+  </section>
+  <section class="row"><dl class="cells meta" style="margin:0"><div class="cell"><dt>Role</dt><dd>Lead UX/UI Designer</dd></div><div class="cell"><dt>Company</dt><dd>Batech · Querétaro, MX</dd></div><div class="cell"><dt>Timeline</dt><dd>2022 — 2026</dd></div><div class="cell"><dt>Platform</dt><dd>Web app, dark UI</dd></div><div class="cell"><dt>Team</dt><dd>Design team lead</dd></div><div class="cell"><dt>Scope</dt><dd>Research, flows, UI, design system</dd></div></dl></section>
+  <section class="row"><div class="cell cell--flush"><div class="cover cover--batech cover--hero" aria-hidden="true"><div class="cover__stage"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Resultado de análisis</span></div><img src="../assets/img/b-resultado.webp" width="1200" height="1021" alt="" decoding="async"></div></div></div></div></section>
+  <section class="row chapter" id="overview">
+    <div class="chapter__label"><span>Overview</span></div>
+    <div class="chapter__body">
+      <h2>AI that watches the store, and a place to read what it saw.</h2>
+      <div class="prose">
+        <p>Batech builds artificial intelligence for physical retail. Its models watch the cameras of every branch and detect events, such as a cash drawer opening at the till. The platform is where operations teams follow those detections, configure new analyses and download the results.</p>
+        <p>I led the design of the platform from the first idea to launch: research and testing, flows and navigation, the interface and the component library in Figma. I also led the design team, which delivered <strong>10% faster</strong> over the project.</p>
+      </div>
+    </div>
+  </section>
+  <section class="row chapter" id="challenge">
+    <div class="chapter__label"><span>The challenge</span></div>
+    <div class="chapter__body">
+      <h2>A technical setup that has to feel like a form.</h2>
+      <div class="prose">
+        <p>Video analytics is full of concepts that are hard to explain: models, camera sources, RTSP links, geofences, execution schedules. And the people configuring an analysis shouldn’t need to be engineers.</p>
+        <p>At the same time the platform produces a lot of data. Hundreds of pages of detections, each one tied to a camera, a branch and a video that may or may not be processed yet.</p>
+      </div>
+      <p class="pull">Make the setup read like a form, and make hundreds of detections easy to scan.</p>
+    </div>
+  </section>
+  <section class="row chapter" id="structure">
+    <div class="chapter__label"><span>Structure</span></div>
+    <div class="chapter__body">
+      <h2>Seven sections, each answering one question.</h2>
+      <div class="grid-cards">
+        <div><b>Dashboard</b><span>What is happening now: active cameras, total detections and rate.</span></div>
+        <div><b>Eventos</b><span>What was detected, with the camera frame and its video.</span></div>
+        <div><b>Alertas</b><span>What needs attention right away.</span></div>
+        <div><b>Análisis</b><span>What is being analyzed, and in which state.</span></div>
+        <div><b>Bitácora</b><span>What happened, and when.</span></div>
+        <div><b>Operativo</b><span>How long operations take against what was expected.</span></div>
+        <div><b>Reportes</b><span>What to share with the rest of the company.</span></div>
+      </div>
+      <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Dashboard</span></div><img class="zoomable" src="../assets/img/b-dashboard.webp" width="1200" height="857" alt="Dashboard with active cameras, total detections and rate" loading="lazy" decoding="async"></div></div><figcaption><b>Dashboard.</b> Three numbers up top and the live analytics panel below; the sidebar keeps the seven sections one click away.</figcaption></figure>
+    </div>
+  </section>
+  <section class="row chapter" id="flow">
+    <div class="chapter__label"><span>Configuring an analysis</span></div>
+    <div class="chapter__body">
+      <h2>From camera to report in six steps.</h2>
+      <div class="prose"><p>I prototyped the to-be flow in high fidelity: three ways to connect a source, and one shared path from there to the report.</p></div>
+      <div class="flow" tabindex="0" aria-label="High-fidelity to-be flow, scroll sideways"><img class="zoomable" src="../assets/img/b-flow.webp" width="3200" height="718" alt="To-be flow for configuring an analysis, from source to report" loading="lazy" decoding="async"></div>
+      <ol class="steps">
+        <li><span class="steps__n">01</span><div><h3>Choose the source</h3><p>A video service, an RTSP link or an uploaded video file. Three branches that converge in the same form.</p></div></li>
+        <li><span class="steps__n">02</span><div><h3>Name it and pick a model</h3><p>General aspects first: the detection model and a name the team will recognise later.</p></div></li>
+        <li><span class="steps__n">03</span><div><h3>Schedule it</h3><p>Execution days as chips from Monday to Sunday, plus a start and end time.</p></div></li>
+        <li><span class="steps__n">04</span><div><h3>Draw the geofence</h3><p>On a frame of the camera, the user outlines the area to analyze with the cursor and names it.</p></div></li>
+        <li><span class="steps__n">05</span><div><h3>Confirm</h3><p>A dialog warns that the analysis can take hours, and says where to follow its progress and download the report.</p></div></li>
+        <li><span class="steps__n">06</span><div><h3>Read the result</h3><p>The geofence over the frame, the detections in a table and one button to download.</p></div></li>
+      </ol>
+      <div class="pair">
+        <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Nuevo análisis · Geocerca</span></div><img class="zoomable" src="../assets/img/b-geocerca.webp" width="1200" height="1233" alt="Geofence creation dialog over a parking lot camera frame" loading="lazy" decoding="async"></div></div><figcaption><b>Step 04.</b> The geofence is drawn on the real camera frame, not described in coordinates.</figcaption></figure>
+        <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Nuevo análisis · Confirmación</span></div><img class="zoomable" src="../assets/img/b-confirm.webp" width="1200" height="1396" alt="Confirmation dialog before starting the analysis" loading="lazy" decoding="async"></div></div><figcaption><b>Step 05.</b> The dialog sets expectations: it may take hours, and here is where to check.</figcaption></figure>
+      </div>
+      <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Resultado de análisis</span></div><img class="zoomable" src="../assets/img/b-resultado.webp" width="1200" height="1021" alt="Analysis result with the geofence highlighted and a table of detections" loading="lazy" decoding="async"></div></div><figcaption><b>Step 06.</b> The highlighted area shows exactly what the model watched.</figcaption></figure>
+    </div>
+  </section>
+  <section class="row chapter" id="events">
+    <div class="chapter__label"><span>Events and operations</span></div>
+    <div class="chapter__body">
+      <h2>Hundreds of pages, scannable at a glance.</h2>
+      <div class="decision">
+        <div class="decision__head">
+          <h3>Events as cards with the frame</h3>
+          <ul class="bullets">
+            <li><b>The camera frame leads</b>, so people recognise the scene before they read the ID.</li>
+            <li><b>Four filters</b> above the grid: event ID, date range, detection type and branch.</li>
+            <li><b>Video state in colour</b>: a red bar when the video is not processed yet, a blue button when it can be watched.</li>
+            <li><b>Pagination with jump-to-page</b>, because there can be 300 pages.</li>
+          </ul>
+        </div>
+        <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Eventos detectados</span></div><img class="zoomable" src="../assets/img/b-eventos.webp" width="1200" height="932" alt="Grid of detected events with camera frames, filters and pagination" loading="lazy" decoding="async"></div></div></figure>
+      </div>
+      <div class="decision">
+        <div class="decision__head">
+          <h3>Analyses and operational times</h3>
+          <div class="prose"><p>The analysis table puts status last and in colour (retry, error, active, configured) so problems stand out in a long list. The operational view compares <strong>real time against expected time</strong> for each analysis and turns it into a percentage.</p></div>
+        </div>
+        <div class="pair">
+          <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Análisis</span></div><img class="zoomable" src="../assets/img/b-analisis.webp" width="1200" height="857" alt="Analysis table with coloured statuses" loading="lazy" decoding="async"></div></div></figure>
+          <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Operativos</span></div><img class="zoomable" src="../assets/img/b-operativos.webp" width="1200" height="857" alt="Operational cards comparing real and expected time" loading="lazy" decoding="async"></div></div></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="row chapter" id="ai">
+    <div class="chapter__label"><span>Batech AI</span></div>
+    <div class="chapter__body">
+      <h2>Ask the platform instead of building a report.</h2>
+      <div class="prose"><p>An assistant opens in a side panel over any screen. It opens with suggested questions, such as the most visited branch, the most recurrent event or the conversion rate, and accepts text, attachments and voice.</p></div>
+      <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech AI · New chat</span></div><img class="zoomable" src="../assets/img/b-ai.webp" width="1200" height="857" alt="AI assistant panel with suggested questions" loading="lazy" decoding="async"></div></div></figure>
+    </div>
+  </section>
+  <section class="row chapter" id="system">
+    <div class="chapter__label"><span>Access and system</span></div>
+    <div class="chapter__body">
+      <h2>One dark system, from the login in.</h2>
+      <div class="prose"><p>Sign-in works with a phone or an email, switched with a segmented control. Every screen is built from the same Figma library (sidebar, filters, cards, tables, dialogs and pagination) on a dark theme with the brand’s cyan as the accent.</p></div>
+      <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Iniciar sesión</span></div><img class="zoomable" src="../assets/img/b-login.webp" width="1200" height="857" alt="Login with phone or email tabs" loading="lazy" decoding="async"></div></div></figure>
+    </div>
+  </section>
+  <section class="row chapter" id="outcome">
+    <div class="chapter__label"><span>Outcome</span></div>
+    <div class="chapter__body">
+      <h2>One place to set up, follow and share every analysis.</h2>
+      <div class="numbers">
+        <div><b>7</b><span>sections in the navigation</span></div>
+        <div><b>3</b><span>video sources, one setup flow</span></div>
+        <div><b>6</b><span>steps from camera to report</span></div>
+        <div><b>10%</b><span>faster delivery from the design team</span></div>
+      </div>
+      <div class="prose"><p>Alongside the platform I revamped Batech’s web and mobile interfaces with analytics and A/B testing to simplify key flows and reduce abandonment, and kept the design system in Figma consistent across both.</p></div>
+      <div class="btns"><a class="btn" href="https://www.figma.com/design/ljgOjnuyx1hS052ehRnyRb/Portfolio?node-id=133-4775" target="_blank" rel="noopener">View in Figma <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+    </div>
+  </section>
+  <section class="row"><a class="next" href="confidentally.html"><div><div class="label">Next project</div><h2>Confidentally</h2></div><svg aria-hidden="true"><use href="#i-arrow"/></svg></a></section>
+  <footer class="row">
+    <div class="footer">
+      <span>© <span data-year>2026</span> Julián Gerardi · Mercedes, Buenos Aires · <span data-clock>--:--</span> local time</span>
+      <div class="footer__links">
+        <a href="../index.html#work">Work</a>
+        <a href="https://www.linkedin.com/in/julian-gerardi" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.behance.net/Jotainc" target="_blank" rel="noopener">Behance</a>
+      </div>
+    </div>
+  </footer>
+  <div class="row shell-end" aria-hidden="true"></div>
+</main>
+<dialog class="lightbox" aria-label="Screen preview">
+  <button class="icon-btn lightbox__close" type="button" aria-label="Close preview"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+  <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
+</dialog>
+<script src="../assets/site.js"></script>
+</body>
+</html>

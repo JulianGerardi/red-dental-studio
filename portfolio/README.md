@@ -1,6 +1,6 @@
 # Portfolio · Julián Gerardi
 
-Sitio personal estático (HTML + CSS + JS, sin build). Se abre directo en el navegador o se sirve con cualquier hosting estático.
+Sitio personal estático (HTML + CSS + JS, sin dependencias). Estética tipo Vercel/Geist: grilla con líneas de 1px y cruces, tipografía Geist, blanco y negro, y el color solo en las portadas de cada proyecto.
 
 ```bash
 npx http-server portfolio -p 8090   # http://localhost:8090
@@ -10,31 +10,45 @@ npx http-server portfolio -p 8090   # http://localhost:8090
 
 ```
 portfolio/
-  index.html                  home: hero, trabajos, proceso, experiencia, about, contacto
-  work/confidentally.html     caso de estudio con NDA (bloqueado con contraseña)
-  work/confidentally-ui.html  caso del design system y el Builder con IA
-  work/grill.html             caso de GRILL Empresas (app de empleados + panel de cocina)
-  assets/site.css             tokens de color y tipografía arriba de todo (claro y oscuro)
-  assets/site.js              tema, menú mobile, copiar mail, lightbox, índice y NDA
-  assets/img/                 capturas reales en WebP (d- dental, ds- design system, g- GRILL, mp- Mercado Play)
+  index.html                  home: hero, métricas, marcas, trabajos, proceso, experiencia, about, contacto
+  work/batech.html            Batech AI Platform (Figma: Portfolio › Batech)
+  work/confidentally.html     caso con NDA (bloqueado con contraseña)
+  work/confidentally-ui.html  design system y Builder con IA
+  work/grill.html             GRILL Empresas (app de empleados + panel de cocina)
+  assets/site.css             tokens arriba de todo (claro y oscuro), grilla, portadas, animaciones
+  assets/site.js              tema, menú mobile, palabras del título, spotlight, copiar mail, lightbox, NDA
+  assets/img/                 capturas en WebP (b- Batech, d- dental, ds- design system, g- GRILL)
+  _build/                     scripts que generan los HTML
 ```
 
-Mercado Play no tiene página propia: la tarjeta de la home recrea la portada en código y abre el archivo de Figma. Cuando haya contenido del challenge se puede sumar `work/mercado-play.html` copiando la estructura de `work/grill.html`.
+## Editar
 
-## Cambiar colores
+Los HTML se generan con Python para que el menú, el pie y las portadas sean iguales en todas las páginas. Cambiá el texto en `_build/` y regenerá:
 
-Todo sale de los tokens al principio de `assets/site.css`. `--select` es el violeta de selección (acento), `--cursor-1` y `--cursor-2` los cursores, y cada proyecto tiene su gradiente (`--dental-*`, `--ds-*`, `--grill-*`, `--mp-*`). El tema oscuro redefine los mismos tokens en los dos bloques de abajo.
+```bash
+python3 portfolio/_build/build.py
+```
+
+- `_build/common.py`: head, menú, pie, mockups y portadas (`cover_batech`, `cover_dental`, `cover_ds`, `cover_grill`, `cover_mp`).
+- `_build/index_page.py`: la home.
+- `_build/batech_page.py`: el caso de Batech.
+- `_build/cases_page.py`: Confidentally, Confidentally UI y GRILL.
+
+Los colores de marca de cada portada están en `assets/site.css` (`--batech-*`, `--dental-*`, `--ds-*`, `--grill-*`, `--mp-*`).
 
 ## Contraseña del caso con NDA
 
-La contraseña actual es `dental2026`. Se guarda como hash SHA-256 en el atributo `data-hash` de `work/confidentally.html`. Para cambiarla:
+La contraseña actual es `dental2026`. Se guarda como hash SHA-256 en `data-hash` (en `_build/cases_page.py`). Para cambiarla:
 
 ```bash
 printf 'nueva-clave' | sha256sum
 ```
 
-y pegá el resultado en `data-hash`. Es un candado suave: el contenido está en el HTML, así que sirve para pedir permiso a quien lo lee, no para proteger información sensible.
+Es un candado suave: el contenido está en el HTML, así que sirve para pedir permiso a quien lo lee, no para proteger información sensible.
 
-## Capturas
+## Animaciones
 
-Las capturas se sacaron corriendo la app dental (`npm run dev`), el Storybook compilado y los artifacts de GRILL con Playwright, a 2x, y se pasaron a WebP. Si una pantalla cambia, se reemplaza el archivo con el mismo nombre.
+- Título de la home y de cada caso: las palabras entran con desenfoque, una tras otra.
+- Portadas y paneles: el mockup sube al entrar en pantalla (animación ligada al scroll) y se eleva al pasar el mouse.
+- Brillo de colores del hero girando lento, marquesina de marcas y spotlight que sigue al puntero en las tarjetas.
+- Con "reducir movimiento" activado en el sistema, todo queda quieto.
