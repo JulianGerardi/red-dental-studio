@@ -5,7 +5,9 @@
    "Periodontists Recommended" / "Periodontist Alternative", y el pie de la
    tabla que dice "insurances" en una tabla de procedimientos. */
 
-export type EstadoCaso = 'Pending' | 'Accepted' | 'Discarded'
+/* Pending y Presented son las dos etapas en las que el plan todavía se está
+   armando; Accepted y Discarded lo congelan. */
+export type EstadoCaso = 'Pending' | 'Presented' | 'Accepted' | 'Discarded'
 
 export type Procedimiento = {
   id: string
