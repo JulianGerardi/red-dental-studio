@@ -1,6 +1,14 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
+/* Badge: la etiqueta de estado del sistema original (shadcn), con colores
+   fijos de Tailwind. Ver Components / UI / Badge.
+
+   Por qué así:
+   - Ninguna pantalla la usa: para estados, la app usa Pill
+     (Elements / Pills), que toma sus colores de los tokens. Queda documentada
+     para que se vea la diferencia y no se vuelva a usar por error. */
+
 const variants = {
   active: 'bg-green-50 text-green-700 border-green-200',
   inactive: 'bg-red-50 text-red-600 border-red-200',

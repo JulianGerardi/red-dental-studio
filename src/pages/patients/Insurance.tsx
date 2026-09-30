@@ -1,15 +1,17 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ChevronLeft, GripVertical, CirclePlus, Search, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye } from 'lucide-react'
+import { ChevronLeft, CirclePlus, Search, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { EmptyState } from '@/components/ui/empty-state'
+import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { Pill, type PillTone } from '@/components/ui/pill'
 import { SelectField, DateTextField, TextArea, OptionCheckbox, FormFooter } from '@/components/patients/form'
 import {
   NewSubscriptionModal, ManageSubscriptionModal, NewDependerModal,
 } from '@/components/patients/insurance/modals'
 import { PLANES, PLANES_HISTORICOS, SUSCRIPCION, RELACIONES, ORDENES, ELEGIBILIDAD, type PlanPaciente } from '@/data/insurance'
 import { aviso } from '@/components/ui/toaster'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 3817:865128 "Insurance", frames 3817:865704 y 3831:897436.
 
@@ -18,50 +20,42 @@ import { aviso } from '@/components/ui/toaster'
    ver modulos/insurance.md, anomalías 60 a 66. */
 
 /* Pills con fondo tintado, como el resto del sistema. Muestreados del frame:
-   Primary y Self usan el azul #f0f5ff/#174596, Child el verde #f0fcf5/#1a804d,
-   Spouse el neutro #f5f5f5/#595959, Active el verde y Inactive el rojo
-   #fff2f2/#b22626. */
-const ORDEN_PILL = 'border-[#174596] bg-[#f0f5ff] text-[#174596]'
-const RELACION_PILL: Record<PlanPaciente['relacion'], string> = {
-  Child: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Self: 'border-[#174596] bg-[#f0f5ff] text-[#174596]',
-  Spouse: 'border-[#a1a1aa] bg-[#f5f5f5] text-[#595959]',
+   Primary y Self usan el azul, Child el verde, Spouse el neutro, Active el
+   verde e Inactive el rojo — los mismos seis tonos de `Pill`. */
+const ORDEN_TONO: PillTone = 'info'
+const RELACION_TONO: Record<PlanPaciente['relacion'], PillTone> = {
+  Child: 'success',
+  Self: 'info',
+  Spouse: 'neutral',
 }
-const ESTADO_PILL: Record<PlanPaciente['estado'], string> = {
-  Active: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Inactive: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
-}
-
-const COLS = {
-  handle: 'w-8',
-  order: 'w-[92px]',
-  carrier: 'w-[92px]',
-  plan: 'w-[124px]',
-  subscriber: 'w-[128px]',
-  relation: 'w-[92px]',
-  coverage: 'w-[148px]',
-  priority: 'w-[150px]',
-  status: 'w-[92px]',
+const ESTADO_TONO: Record<PlanPaciente['estado'], PillTone> = {
+  Active: 'success',
+  Inactive: 'danger',
 }
 
-function Pill({ tono, children }: { tono: string; children: React.ReactNode }) {
-  return (
-    <span className={cn('inline-flex rounded-full border px-2.5 py-[3px] text-[11px] font-semibold', tono)}>
-      {children}
-    </span>
-  )
-}
+/* La tabla estándar (ui/data-table) con las columnas de planes, con los
+   anchos de antes. Los períodos pueden ocupar dos líneas: la fila crece. */
+const COLUMNAS: DataTableColumn<PlanPaciente>[] = [
+  { key: 'order', header: 'Order', width: 92, cell: (p) => <Pill tone={ORDEN_TONO}>{p.orden}</Pill> },
+  { key: 'carrier', header: 'Carrier', width: 92, cell: (p) => <TextCell>{p.carrier}</TextCell> },
+  { key: 'plan', header: 'Plan', width: 124, cell: (p) => <TextCell>{p.plan}</TextCell> },
+  { key: 'subscriber', header: 'Subscriber', width: 128, cell: (p) => <TextCell>{p.subscriber}</TextCell> },
+  { key: 'relation', header: 'Relation', width: 92, cell: (p) => <Pill tone={RELACION_TONO[p.relacion]}>{p.relacion}</Pill> },
+  { key: 'coverage', header: 'Coverage Period', width: 148, cell: (p) => <span className="leading-tight">{p.cobertura}</span> },
+  { key: 'priority', header: 'Priority Period', width: 150, cell: (p) => <span className="flex flex-col gap-0.5 leading-tight">{p.prioridad.map((t) => <span key={t}>{t}</span>)}</span> },
+  { key: 'status', header: 'Status', width: 92, cell: (p) => <Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill> },
+]
 
-function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
+export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={on}
       onClick={() => onChange(!on)}
-      className="flex items-center gap-2 text-[13px] text-[#09090b]"
+      className="flex items-center gap-2 text-[13px] text-ink"
     >
-      <span className={cn('flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors', on ? 'bg-dash-blue' : 'bg-[#d4d4d8]')}>
+      <span className={cn('flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors', on ? 'bg-dash-blue' : 'bg-line-strong')}>
         <span className={cn('size-3 rounded-full bg-white transition-transform', on && 'translate-x-3')} />
       </span>
       {label}
@@ -70,13 +64,13 @@ function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) =
 }
 
 /* Fila de dato de la card de suscripción: icono, etiqueta chica y valor. */
-function FilaDato({ icon: Icon, label, value }: { icon: typeof ShieldHalf; label: string; value: string }) {
+export function FilaDato({ icon: Icon, label, value }: { icon: typeof ShieldHalf; label: string; value: string }) {
   return (
     <div className="flex items-center gap-2.5">
-      <Icon className="size-4 shrink-0 text-[#71717a]" strokeWidth={1.8} />
+      <Icon className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />
       <span className="min-w-0 leading-tight">
-        <span className="block text-[11px] text-[#a1a1aa]">{label}</span>
-        <span className="block truncate text-[13px] text-[#09090b]">{value}</span>
+        <span className="block text-[11px] text-ink-faint">{label}</span>
+        <span className="block truncate text-[13px] text-ink">{value}</span>
       </span>
     </div>
   )
@@ -92,16 +86,15 @@ export default function Insurance() {
   const set = (k: keyof typeof d) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? 'This field is required.' : undefined)
 
-  /* Las filas llevan grip: se reordenan arrastrando. */
-  const arrastrada = useRef<number | null>(null)
-  const soltar = (destino: number) => {
-    const origen = arrastrada.current
-    arrastrada.current = null
-    if (origen === null || origen === destino) return
+  /* Las filas llevan grip: se reordenan arrastrando (o con ↑ ↓). Sólo los
+     planes vigentes; los del historial quedan fijos al final. */
+  const reordenar = (origen: PlanPaciente, destino: PlanPaciente) => {
     setPlanes((prev) => {
-      const copia = [...prev]
-      const [fila] = copia.splice(origen, 1)
-      copia.splice(destino, 0, fila)
+      const copia = prev.filter((p) => p.id !== origen.id)
+      const i = copia.findIndex((p) => p.id === destino.id)
+      const deOrigen = prev.findIndex((p) => p.id === origen.id)
+      const deDestino = prev.findIndex((p) => p.id === destino.id)
+      copia.splice(deOrigen < deDestino ? i + 1 : i, 0, origen)
       return copia
     })
     aviso.ok('Plan order updated.')
@@ -118,7 +111,7 @@ export default function Insurance() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
       {/* El último tramo del breadcrumb dice "Documents" en una pantalla de
           Insurance. Es del Figma. */}
 
@@ -138,96 +131,42 @@ export default function Insurance() {
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-xl leading-[1.3] font-semibold text-[#09090b]">Patients Plans</h1>
+            <h1 className="text-xl leading-[1.3] font-semibold text-ink">Patients Plans</h1>
             <Switch on={historial} onChange={setHistorial} label="Show plan history" />
           </div>
 
           {/* Tabla de planes */}
-          <div className="mt-4 overflow-x-auto rounded-lg border border-[#e7e7e7] bg-white">
-            <div className="min-w-[960px]">
-              <div className="flex h-12 items-center gap-3 border-b border-[#e7e7e7] bg-[#f9f9f9] px-4 text-xs font-semibold text-[#71717a]">
-                <span className={COLS.handle} />
-                <span className={COLS.order}>Order</span>
-                <span className={COLS.carrier}>Carrier</span>
-                <span className={COLS.plan}>Plan</span>
-                <span className={COLS.subscriber}>Subscriber</span>
-                <span className={COLS.relation}>Relation</span>
-                <span className={COLS.coverage}>Coverage Period</span>
-                <span className={COLS.priority}>Priority Period</span>
-                <span className={COLS.status}>Status</span>
-              </div>
-
-              {visibles.length === 0 ? (
-                <EmptyState icon={CreditCard} title="No plans yet" detail="Add a subscription to start tracking this patient's coverage." />
-              ) : (
-                visibles.map((p, i) => (
-                  <div
-                    key={p.id}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={() => soltar(i)}
-                    className="flex items-center gap-3 border-b border-[#e7e7e7] px-4 py-3 text-[13px] text-[#3f3f46] last:border-0"
-                  >
-                    <span
-                      draggable
-                      onDragStart={() => { arrastrada.current = i }}
-                      aria-label={`Reorder ${p.plan}`}
-                      className={cn(COLS.handle, 'cursor-grab text-[#a1a1aa] active:cursor-grabbing')}
-                    >
-                      <GripVertical className="size-4" />
-                    </span>
-                    <span className={COLS.order}><Pill tono={ORDEN_PILL}>{p.orden}</Pill></span>
-                    <span className={COLS.carrier}>{p.carrier}</span>
-                    <span className={COLS.plan}>{p.plan}</span>
-                    <span className={COLS.subscriber}>{p.subscriber}</span>
-                    <span className={COLS.relation}><Pill tono={RELACION_PILL[p.relacion]}>{p.relacion}</Pill></span>
-                    <span className={COLS.coverage}>{p.cobertura}</span>
-                    <span className={cn(COLS.priority, 'flex flex-col gap-0.5 leading-tight')}>
-                      {p.prioridad.map((t) => <span key={t}>{t}</span>)}
-                    </span>
-                    <span className={COLS.status}><Pill tono={ESTADO_PILL[p.estado]}>{p.estado}</Pill></span>
-                  </div>
-                ))
-              )}
-
-              {/* Dice 8 con cuatro filas a la vista: es del Figma. */}
-              <div className="flex h-[52px] items-center justify-between px-4">
-                <span className="text-xs font-semibold text-[#71717a]">Showing 8 of 8 insurances</span>
-                <div className="flex items-center gap-1">
-                  {['‹', '1', '2', '3', '›'].map((n) => (
-                    <button
-                      key={n}
-                      className={cn(
-                        'flex size-8 items-center justify-center rounded-md text-xs font-semibold',
-                        n === '1' ? 'bg-dash-blue text-white' : 'text-[#71717a] hover:bg-[#f4f4f5]',
-                      )}
-                    >
-                      {n}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <div className="mt-4">
+            <DataTable
+              columns={COLUMNAS}
+              rows={visibles}
+              rowKey={(p) => p.id}
+              rowLabel={(p) => p.plan}
+              reorder={{ onReorder: reordenar, canMove: (p) => planes.some((x) => x.id === p.id) }}
+              itemLabel="insurances"
+              empty={{ icon: CreditCard, title: 'No plans yet', detail: "Add a subscription to start tracking this patient's coverage." }}
+            />
           </div>
 
           {/* Suscripción + datos del paciente */}
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <section className="flex flex-col rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
-              <h2 className="text-sm font-semibold text-[#09090b]">Subscription Information</h2>
-              <p className="mt-0.5 text-[11px] text-[#71717a]">
+            <section className="flex flex-col rounded-lg border border-line bg-white p-4 sm:p-5">
+              <h2 className="text-sm font-semibold text-ink">Subscription Information</h2>
+              <p className="mt-0.5 text-[11px] text-ink-muted">
                 Select an existing subscription or create new one.
               </p>
 
-              <span className="mt-4 block text-xs font-medium text-[#09090b]">
-                Search for an existing subscription<span className="text-[#ff0608]">*</span>
+              <span className="mt-4 block text-xs font-medium text-ink">
+                Search for an existing subscription<span className="text-required">*</span>
               </span>
               <div className="relative mt-2">
-                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#a1a1aa]" />
+                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
                 {/* Borde gris como todos los buscadores del sistema; el azul
                     queda para el foco. El frame lo dibuja siempre azul porque
                     lo capturó enfocado. */}
                 <input
                   placeholder="Search result"
-                  className="focus:border-dash-blue h-9 w-full rounded-md border border-[#e4e4e7] bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-[#a1a1aa] focus:outline-none"
+                  className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
                 />
               </div>
               <button
@@ -238,7 +177,7 @@ export default function Insurance() {
                 <CirclePlus className="size-4" /> Add New Subscription
               </button>
 
-              <p className="mt-4 text-sm font-semibold text-[#09090b]">Select a subscription</p>
+              <p className="mt-4 text-sm font-semibold text-ink">Select a subscription</p>
               <div className="mt-3 flex flex-col gap-3">
                 <FilaDato icon={PersonStanding} label="Subscriber" value={SUSCRIPCION.subscriber} />
                 <FilaDato icon={PersonStanding} label="Subscriber ID" value={SUSCRIPCION.subscriberId} />
@@ -257,8 +196,8 @@ export default function Insurance() {
               </button>
             </section>
 
-            <section className="flex flex-col rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
-              <h2 className="text-sm font-semibold text-[#09090b]">Patient Information</h2>
+            <section className="flex flex-col rounded-lg border border-line bg-white p-4 sm:p-5">
+              <h2 className="text-sm font-semibold text-ink">Patient Information</h2>
 
               <SelectField
                 className="mt-4" label="Relationship to Subscriber" required options={RELACIONES}
@@ -268,10 +207,10 @@ export default function Insurance() {
               {/* Caja de sólo lectura con el mismo rótulo que el select de
                   abajo, y con "Cordination" mal escrito. Es del Figma. */}
               <div className="mt-4 flex items-center gap-2.5 rounded-md bg-[#eff4ff] px-3 py-2">
-                <CreditCard className="size-4 shrink-0 text-[#71717a]" strokeWidth={1.8} />
+                <CreditCard className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />
                 <span className="leading-tight">
-                  <span className="block text-[11px] text-[#a1a1aa]">Cordination Order</span>
-                  <span className="block text-[13px] text-[#09090b]">Primary</span>
+                  <span className="block text-[11px] text-ink-faint">Cordination Order</span>
+                  <span className="block text-[13px] text-ink">Primary</span>
                 </span>
               </div>
 

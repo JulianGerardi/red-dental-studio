@@ -1,0 +1,232 @@
+/* El sitio del design system (Sitio.tsx) ocupa toda la página de docs: sin
+   el margen ni el ancho máximo que pone Storybook. */
+.sbdocs-wrapper:has(.ds-sitio) {
+  padding: 0 !important;
+  background: #fff;
+}
+.sbdocs-content:has(.ds-sitio) {
+  max-width: none !important;
+}
+
+/* La letra del sitio es la de la app, Inter. */
+.ds-sitio,
+.ds-foco > header {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+.ds-sitio .ds-muestra,
+.ds-sitio .docs-story,
+.ds-sitio .ds-informe,
+.ds-sitio .docblock-argstable {
+  font-family: var(--font-sans);
+}
+
+/* Una historia abierta sola (Foco.tsx): sin el centrado ni el margen del
+   Storybook; lo resuelve la barra. */
+body:has(.ds-foco) {
+  display: block !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: 0 !important;
+}
+body:has(.ds-foco) #storybook-root {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-height: none !important;
+}
+
+/* Texto corrido (Markdown): el sitio no usa los estilos de texto de
+   Storybook (lleva sb-unstyled), así que los define acá. Nunca adentro de
+   una muestra (.docs-story): ahí manda el componente. */
+.ds-prosa :is(p, li):not(.docs-story *) {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--color-ink-medium);
+}
+.ds-prosa :is(p + p, p + ul, ul + p):not(.docs-story *) { margin-top: 12px; }
+.ds-prosa :is(ul, ol):not(.docs-story *) {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ds-prosa ul:not(.docs-story *) { list-style: disc; }
+.ds-prosa ol:not(.docs-story *) { list-style: decimal; }
+.ds-prosa strong:not(.docs-story *) { font-weight: 600; color: var(--color-ink); }
+.ds-prosa em:not(.docs-story *) { font-style: italic; }
+.ds-prosa code:not(.docs-story *, .docblock-source *) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--color-surface-muted);
+  color: var(--color-ink);
+}
+.ds-prosa a:not(.docs-story *) { color: var(--color-dash-blue); text-decoration: underline; text-underline-offset: 2px; }
+.ds-prosa.ds-lead p:not(.docs-story *) {
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--color-ink-muted);
+}
+
+/* Cada ejemplo: su título, su explicación y la muestra en un marco como los
+   de Primer (borde fino, esquinas redondeadas, sin sombra). */
+.ds-ejemplos .sb-anchor > h3 {
+  margin: 48px 0 8px !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.005em;
+  color: var(--color-ink);
+  scroll-margin-top: 96px;
+}
+.ds-ejemplos .sb-anchor:first-of-type > h3 { margin-top: 8px !important; }
+
+.ds-sitio .docs-story {
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  border: 1px solid var(--color-line) !important;
+  overflow: hidden;
+}
+.ds-sitio .docs-story + div,
+.ds-sitio .docblock-source {
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+.ds-sitio .docblock-source {
+  border: 1px solid var(--color-line) !important;
+  background: var(--color-surface-subtle) !important;
+}
+.ds-sitio .docblock-argstable {
+  box-shadow: none !important;
+}
+
+/* Las páginas de Foundations y Audit (Page.tsx) adentro del sitio: sin su
+   fondo gris ni su título, que ya pone el sitio; sus secciones con el mismo
+   título que las del resto de las páginas. */
+.ds-informe .ds-page {
+  background: transparent;
+  min-height: 0;
+}
+.ds-informe .ds-page > div {
+  max-width: none;
+  padding: 0;
+}
+.ds-informe .ds-page-titulo { display: none; }
+.ds-informe .ds-page-bajada {
+  margin-top: 0;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--color-ink-muted);
+}
+.ds-informe .ds-page-h2 {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-line);
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 96px;
+}
+
+/* Builder: una pieza se ve sola, en el lugar que ocupa en el lienzo. Lo que en la app es fijo (el fondo oscuro de un
+   modal, un panel que entra de costado) queda en su lugar, y los envoltorios de alto de pantalla miden lo que dibujan. */
+.pieza-aislada .fixed {
+  position: relative !important;
+  inset: auto !important;
+  z-index: auto !important;
+}
+.pieza-aislada .fixed.inset-0 {
+  background: transparent !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+.pieza-aislada .min-h-screen,
+.pieza-aislada .min-h-svh {
+  min-height: 0 !important;
+}
+
+/* Portada, banner del Builder: tres piezas se arrastran de la paleta a una pantalla vacía y caen en su lugar (Inicio.tsx,
+   `Arrastre`). Quieto (sin movimiento), la pantalla se ve armada. Un ciclo de 9 s: cada pieza tiene su tramo. */
+@media (prefers-reduced-motion: no-preference) {
+  .bl-demo .bl-mover-1 { animation: bl-mover-1 9s ease-in-out infinite; }
+  .bl-demo .bl-mover-2 { animation: bl-mover-2 9s ease-in-out infinite; }
+  .bl-demo .bl-mover-3 { animation: bl-mover-3 9s ease-in-out infinite; }
+  .bl-demo .bl-lleno-1 { animation: bl-lleno-1 9s ease-out infinite; }
+  .bl-demo .bl-lleno-2 { animation: bl-lleno-2 9s ease-out infinite; }
+  .bl-demo .bl-lleno-3 { animation: bl-lleno-3 9s ease-out infinite; }
+}
+@keyframes bl-mover-1 {
+  0% { opacity: 0; transform: translate(0, 0); }
+  4% { opacity: 1; transform: translate(0, -2px) rotate(-2deg); }
+  20% { opacity: 1; transform: translate(var(--dx), var(--dy)) rotate(-2deg); }
+  24%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.94); }
+}
+@keyframes bl-mover-2 {
+  0%, 27% { opacity: 0; transform: translate(0, 0); }
+  31% { opacity: 1; transform: translate(0, -2px) rotate(-2deg); }
+  47% { opacity: 1; transform: translate(var(--dx), var(--dy)) rotate(-2deg); }
+  51%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.94); }
+}
+@keyframes bl-mover-3 {
+  0%, 54% { opacity: 0; transform: translate(0, 0); }
+  58% { opacity: 1; transform: translate(0, -2px) rotate(-2deg); }
+  74% { opacity: 1; transform: translate(var(--dx), var(--dy)) rotate(-2deg); }
+  78%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.94); }
+}
+@keyframes bl-lleno-1 {
+  0%, 20% { opacity: 0; transform: scale(0.96); }
+  25%, 90% { opacity: 1; transform: none; }
+  97%, 100% { opacity: 0; }
+}
+@keyframes bl-lleno-2 {
+  0%, 47% { opacity: 0; transform: scale(0.96); }
+  52%, 90% { opacity: 1; transform: none; }
+  97%, 100% { opacity: 0; }
+}
+@keyframes bl-lleno-3 {
+  0%, 74% { opacity: 0; transform: scale(0.96); }
+  79%, 90% { opacity: 1; transform: none; }
+  97%, 100% { opacity: 0; }
+}
+
+/* Builder › Describe (PanelDescribir.tsx): el orbe late y el "Pensando…" brilla mientras piensa; cada paso entra al
+   aparecer; mientras arma, cada bloque entra al lienzo de a uno. Quieto (sin movimiento), todo aparece directo. */
+@media (prefers-reduced-motion: no-preference) {
+  .bl-orbe { animation: bl-orbe 1.6s ease-in-out infinite; }
+  .bl-brillo {
+    background: linear-gradient(90deg, var(--color-ink) 0%, var(--color-ink) 35%, var(--color-dash-blue) 50%, var(--color-purple-fg) 58%, var(--color-ink) 72%, var(--color-ink) 100%);
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: bl-brillo 2s linear infinite;
+  }
+  .bl-paso { animation: bl-paso 320ms ease-out both; }
+  .bl-armando [data-bloque] { animation: bl-entra 480ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+}
+@keyframes bl-orbe {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.12) rotate(180deg); }
+}
+@keyframes bl-brillo {
+  from { background-position: 100% 0; }
+  to { background-position: -150% 0; }
+}
+@keyframes bl-paso {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes bl-entra {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+/* Portada: el cursor del pedido a la IA en el banner del Builder. */
+@media (prefers-reduced-motion: no-preference) {
+  .bl-demo .bl-cursor { animation: bl-cursor 1s steps(1) infinite; }
+}
+@keyframes bl-cursor {
+  50% { opacity: 0; }
+}

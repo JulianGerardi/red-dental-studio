@@ -30,13 +30,13 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
         className="flex h-full w-[480px] max-w-full flex-col overflow-y-auto bg-white p-6 shadow-2xl"
       >
         <div className="flex items-start justify-between gap-2">
-          <h2 className="text-xl font-bold text-[#09090b]">Link to treatment plan visit</h2>
-          <button onClick={onClose} aria-label="Close" className="text-[#09090b] hover:opacity-60">
+          <h2 className="text-xl font-bold text-ink">Link to treatment plan visit</h2>
+          <button onClick={onClose} aria-label="Close" className="text-ink hover:opacity-60">
             <X className="size-5" />
           </button>
         </div>
 
-        <p className="mt-5 text-[13px] font-semibold text-[#09090b]">Treatment plan</p>
+        <p className="mt-5 text-[13px] font-semibold text-ink">Treatment plan</p>
         <div className="mt-2 flex flex-col gap-3">
           {PLANS.map((p) => {
             const on = plan === p.id
@@ -46,23 +46,23 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
                 onClick={() => setPlan(p.id)}
                 className={cn(
                   'rounded-lg border p-3 text-left transition-colors',
-                  on ? 'border-dash-blue' : 'border-transparent hover:bg-[#fafafa]',
+                  on ? 'border-dash-blue' : 'border-transparent hover:bg-surface-subtle',
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="rounded-full border border-[#1a804d] bg-white px-2 py-[2px] text-[10px] font-semibold text-[#1a804d]">
+                  <span className="rounded-full border border-dash-ok-fg bg-white px-2 py-[2px] text-[10px] font-semibold text-dash-ok-fg">
                     Check In
                   </span>
-                  <span className="text-[13px] font-bold text-[#09090b]">{p.date}</span>
+                  <span className="text-[13px] font-bold text-ink">{p.date}</span>
                 </div>
                 <div className="mt-2 flex items-center gap-2">
                   <span className={cn('flex size-4 shrink-0 items-center justify-center rounded-full border-2',
-                    on ? 'border-dash-blue' : 'border-[#a1a1aa]')}>
+                    on ? 'border-dash-blue' : 'border-ink-faint')}>
                     {on && <span className="bg-dash-blue size-2 rounded-full" />}
                   </span>
-                  <span className="text-[13px] font-bold text-[#09090b]">{p.doctor}</span>
-                  <span className="text-[#e4e4e7]">|</span>
-                  <span className="text-[12px] text-[#71717a]">{p.therapy}</span>
+                  <span className="text-[13px] font-bold text-ink">{p.doctor}</span>
+                  <span className="text-line">|</span>
+                  <span className="text-[12px] text-ink-muted">{p.therapy}</span>
                 </div>
                 <p className="text-dash-blue mt-1.5 text-[12px] font-medium">2 Visits • 3 Procedures</p>
               </button>
@@ -70,7 +70,7 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
           })}
         </div>
 
-        <p className="mt-6 text-[13px] font-semibold text-[#09090b]">Visit</p>
+        <p className="mt-6 text-[13px] font-semibold text-ink">Visit</p>
         <div className="mt-2 flex flex-col gap-3">
           {VISITS.map((v) => {
             const on = visit === v.id
@@ -80,13 +80,13 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
                 onClick={() => setVisit(v.id)}
                 className={cn(
                   'rounded-lg border p-3 text-left transition-colors',
-                  on ? 'border-dash-blue' : 'border-transparent hover:bg-[#fafafa]',
+                  on ? 'border-dash-blue' : 'border-transparent hover:bg-surface-subtle',
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[13px] font-bold text-[#09090b]">{v.name}</span>
-                  <span className="text-[12px] font-semibold text-[#71717a]">
-                    Total : <span className={on ? 'text-dash-blue' : 'text-[#a1a1aa]'}>{v.total}</span>
+                  <span className="text-[13px] font-bold text-ink">{v.name}</span>
+                  <span className="text-[12px] font-semibold text-ink-muted">
+                    Total : <span className={on ? 'text-dash-blue' : 'text-ink-faint'}>{v.total}</span>
                   </span>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -95,7 +95,7 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
                       key={i}
                       className={cn(
                         'rounded-full border px-2 py-[3px] text-[10px]',
-                        on ? 'border-dash-blue text-dash-blue' : 'border-[#e4e4e7] text-[#a1a1aa]',
+                        on ? 'border-dash-blue text-dash-blue' : 'border-line text-ink-faint',
                       )}
                     >
                       {p}
@@ -107,7 +107,7 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
           })}
         </div>
 
-        <p className="mt-6 text-[13px] font-semibold text-[#71717a]">Additional</p>
+        <p className="mt-6 text-[13px] font-semibold text-ink-muted">Additional</p>
         <div className="mt-2 flex flex-col gap-3">
           <OptionCheckbox label="ASAP" />
           <OptionCheckbox label="Follow-up" />
@@ -117,7 +117,7 @@ export function LinkTreatmentPlanDrawer({ onClose }: { onClose: () => void }) {
         <div className="mt-6 flex justify-end gap-3 pb-2">
           <button
             onClick={onClose}
-            className="h-9 rounded-md border border-[#e4e4e7] bg-white px-6 text-[13px] font-medium hover:bg-[#fafafa]"
+            className="h-9 rounded-md border border-line bg-white px-6 text-[13px] font-medium hover:bg-surface-subtle"
           >
             Cancel
           </button>

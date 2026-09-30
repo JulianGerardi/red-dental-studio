@@ -41,9 +41,9 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
       footer={<FormFooter onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-4">
-        <div className="rounded-r-md border-l-[3px] border-l-[#b45309] bg-[#fffbeb] px-3 py-2.5">
-          <p className="text-[11px] font-bold text-[#b45309]">Attention needed</p>
-          <p className="mt-1 text-[11px] leading-[1.5] font-medium text-[#b45309]">
+        <div className="rounded-r-md border-l-[3px] border-l-attn-fg bg-[#fffbeb] px-3 py-2.5">
+          <p className="text-[11px] font-bold text-attn-fg">Attention needed</p>
+          <p className="mt-1 text-[11px] leading-[1.5] font-medium text-attn-fg">
             Select the location assigned to the provider, then set the start and end times in the
             location&apos;s local time zone. The system will automatically convert and store the
             shift in Coordinated Universal Time (UTC) for consistency across all locations.
@@ -58,7 +58,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
             onChange={setLocacion}
             error={intentado && !locacion.trim() ? 'This field is required.' : undefined}
           />
-          <p className="mt-1.5 text-[11px] text-[#71717a]">{ZONA}</p>
+          <p className="mt-1.5 text-[11px] text-ink-muted">{ZONA}</p>
         </div>
 
         {rangos.map((r, i) => (
@@ -75,7 +75,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
                 error={intentado && !r.fin.trim() ? 'Required.' : undefined}
               />
             </div>
-            <p className="mt-1.5 text-[11px] text-[#71717a]">{ZONA}</p>
+            <p className="mt-1.5 text-[11px] text-ink-muted">{ZONA}</p>
           </div>
         ))}
 
@@ -87,9 +87,9 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
           <CirclePlus className="size-4" /> Add another time range
         </button>
 
-        <div className="border-t border-[#e4e4e7] pt-4">
-          <p className="text-sm font-bold text-[#09090b]">Repeat on days</p>
-          <p className="mt-0.5 text-[11px] text-[#71717a]">Set your regular hours for each day.</p>
+        <div className="border-t border-line pt-4">
+          <p className="text-sm font-bold text-ink">Repeat on days</p>
+          <p className="mt-0.5 text-[11px] text-ink-muted">Set your regular hours for each day.</p>
           <div className="mt-3 flex gap-2">
             {DIAS.map((d, i) => {
               const on = dias.includes(i)
@@ -103,7 +103,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
                     'flex size-8 items-center justify-center rounded-md border text-[13px] font-semibold transition-colors',
                     on
                       ? 'border-dash-blue text-dash-blue bg-white'
-                      : 'border-transparent text-[#c4c4c8] hover:bg-[#f4f4f5]',
+                      : 'border-transparent text-[#c4c4c8] hover:bg-surface-muted',
                   )}
                 >
                   {d}
@@ -113,9 +113,9 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        <div className="border-t border-[#e4e4e7] pt-4">
-          <p className="text-sm font-bold text-[#09090b]">Apply change to</p>
-          <p className="mt-0.5 text-[11px] text-[#71717a]">
+        <div className="border-t border-line pt-4">
+          <p className="text-sm font-bold text-ink">Apply change to</p>
+          <p className="mt-0.5 text-[11px] text-ink-muted">
             Choose how you want these hours to be applied.
           </p>
           <div className="mt-3 flex flex-col gap-2">
@@ -128,10 +128,10 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
                   onClick={() => setAlcance(a)}
                   className={cn(
                     'flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-[13px]',
-                    on ? 'border-dash-blue' : 'border-[#e4e4e7] hover:bg-[#fafafa]',
+                    on ? 'border-dash-blue' : 'border-line hover:bg-surface-subtle',
                   )}
                 >
-                  <span className={cn('flex size-4 shrink-0 items-center justify-center rounded-full border-2', on ? 'border-dash-blue' : 'border-[#a1a1aa]')}>
+                  <span className={cn('flex size-4 shrink-0 items-center justify-center rounded-full border-2', on ? 'border-dash-blue' : 'border-ink-faint')}>
                     {on && <span className="bg-dash-blue size-2 rounded-full" />}
                   </span>
                   {a}
@@ -141,7 +141,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        <div className="rounded-r-md border-l-[3px] border-l-[#1d56bc] bg-[#eff4ff] px-3 py-2.5">
+        <div className="rounded-r-md border-l-[3px] border-l-dash-blue bg-[#eff4ff] px-3 py-2.5">
           <p className="text-dash-blue text-[11px] leading-[1.5] font-semibold">
             This will update the hours for all selected days with the time ranges you&apos;ve set above.
           </p>

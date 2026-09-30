@@ -73,7 +73,7 @@ export function NewExceptionModal({
         />
         <SelectField label="Reason" options={RAZONES} value={razon} onChange={setRazon} />
 
-        <div className="rounded-lg border border-[#e4e4e7] p-3">
+        <div className="rounded-lg border border-line p-3">
           <div className="flex flex-col gap-4">
             <SelectField
               label="Start Time" required placeholder="00:00 hs" options={HORAS}
@@ -101,7 +101,7 @@ export function NewExceptionModal({
               type="button"
               aria-label="Clear range"
               onClick={() => { setInicio(''); setFin(''); aviso.info('Time range cleared.') }}
-              className="rounded-md p-1.5 text-[#71717a] transition-colors hover:bg-[#fff2f2] hover:text-[#b22626]"
+              className="rounded-md p-1.5 text-ink-muted transition-colors hover:bg-dash-bad-bg hover:text-dash-bad-fg"
             >
               <Trash2 className="size-4" />
             </button>
@@ -109,7 +109,7 @@ export function NewExceptionModal({
               type="button"
               aria-label="Save range"
               onClick={guardar}
-              className="rounded-md p-1.5 text-[#71717a] transition-colors hover:bg-[#f4f4f5] hover:text-[#09090b]"
+              className="rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink"
             >
               <Save className="size-4" />
             </button>

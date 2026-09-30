@@ -11,13 +11,13 @@ export function Breadcrumb({ items }: { items: Miga[] }) {
     <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[13px]">
       {items.map((m, i) => (
         <Fragment key={`${m.label}-${i}`}>
-          {i > 0 && <ChevronRight className="size-3.5 shrink-0 text-[#a1a1aa]" />}
+          {i > 0 && <ChevronRight className="size-3.5 shrink-0 text-ink-faint" />}
           {m.to ? (
             <Link to={m.to} className="text-dash-blue hover:underline">
               {m.label}
             </Link>
           ) : (
-            <span className="text-[#71717a]">{m.label}</span>
+            <span className="text-ink-muted">{m.label}</span>
           )}
         </Fragment>
       ))}

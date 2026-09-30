@@ -109,12 +109,6 @@ export const PROBLEMAS: Problema[] = [
   { id: 'p7', fecha: '2024/11/05', pieza: 19, superficie: 'DL', condicion: 'Carries',     examen: 'Intra Oral',        proveedor: 'Perez Martinez',  nota: 'Recurrent caries under old amalgam.', estado: 'Active' },
 ]
 
-export const ESTADO_PILL: Record<Problema['estado'], string> = {
-  Active: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-  Resolved: 'border-[#595959] bg-[#f5f5f5] text-[#595959]',
-  Monitoring: 'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
-}
-
 /* Los dos textos del panel lateral que abren las pills verdes de la barra. */
 export const PANELES = {
   TR: {
@@ -149,15 +143,6 @@ export const ULTIMA_CONDICION = {
 export type EstadoOrden =
   | 'Pending' | 'Canceled' | 'Rejected' | 'Delayed' | 'Requested' | 'Delivered'
 
-export const ORDEN_PILL: Record<EstadoOrden, string> = {
-  Pending:   'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
-  Canceled:  'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
-  Rejected:  'border-[#b22626] bg-[#fff2f2] text-[#b22626]',
-  Delayed:   'border-[#99660d] bg-[#fffaf0] text-[#99660d]',
-  Requested: 'border-[#6633a6] bg-[#f5f0ff] text-[#6633a6]',
-  Delivered: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
-}
-
 export type OrdenLab = {
   id: string
   proveedor: string
@@ -187,9 +172,9 @@ export const ORDENES: OrdenLab[] = [
 export type EstadoVital = 'Normal' | 'Elevated' | 'Dangerously low'
 
 export const VITAL_COLOR: Record<EstadoVital, { arco: string; pill: string }> = {
-  Normal:            { arco: '#1a804d', pill: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]' },
-  Elevated:          { arco: '#d4900c', pill: 'border-[#99660d] bg-[#fffaf0] text-[#99660d]' },
-  'Dangerously low': { arco: '#b22626', pill: 'border-[#b22626] bg-[#fff2f2] text-[#b22626]' },
+  Normal:            { arco: '#1a804d', pill: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg' },
+  Elevated:          { arco: '#d4900c', pill: 'border-warn-fg bg-warn-bg text-warn-fg' },
+  'Dangerously low': { arco: '#b22626', pill: 'border-dash-bad-fg bg-dash-bad-bg text-dash-bad-fg' },
 }
 
 export type Vital = {

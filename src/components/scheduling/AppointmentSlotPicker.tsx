@@ -47,22 +47,22 @@ export function AppointmentSlotPicker({
        pegado y a toda la altura; adentro, a lo ancho y con scroll. */
     <aside
       className={cn(
-        'motion-safe:animate-[loc-in_180ms_ease-out] flex flex-col overflow-hidden rounded-xl border border-[#e4e4e7] bg-white',
+        'motion-safe:animate-[loc-in_180ms_ease-out] flex flex-col overflow-hidden rounded-xl border border-line bg-white',
         className,
       )}
     >
-      <header className="shrink-0 border-b border-[#e4e4e7] px-3 py-3">
+      <header className="shrink-0 border-b border-line px-3 py-3">
         <div className="flex items-center gap-2">
           <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
             {provider.split(' ').map((w) => w[0]).slice(0, 2).join('')}
           </span>
           <span className="min-w-0 leading-tight">
-            <span className="block truncate text-[13px] font-bold text-[#09090b]">{provider}</span>
-            <span className="block truncate text-[13px] font-bold text-[#09090b]">{especialidad}</span>
+            <span className="block truncate text-[13px] font-bold text-ink">{provider}</span>
+            <span className="block truncate text-[13px] font-bold text-ink">{especialidad}</span>
           </span>
         </div>
-        <p className="mt-2 text-[10px] text-[#71717a]">{fecha}</p>
-        <p className="text-[10px] text-[#a1a1aa]">
+        <p className="mt-2 text-[10px] text-ink-muted">{fecha}</p>
+        <p className="text-[10px] text-ink-faint">
           {seleccion ? 'Drag the card to move it' : 'Click on available time to schedule'}
         </p>
       </header>
@@ -74,8 +74,8 @@ export function AppointmentSlotPicker({
           const ocupada = h === OCUPADA
           const elegida = seleccion === h
           return (
-            <div key={h} className="flex min-h-[54px] flex-1 border-b border-[#f1f1f4] last:border-0">
-              <span className="flex w-[50px] shrink-0 items-center pl-2 text-[11px] text-[#71717a]">
+            <div key={h} className="flex min-h-[54px] flex-1 border-b border-line-soft last:border-0">
+              <span className="flex w-[50px] shrink-0 items-center pl-2 text-[11px] text-ink-muted">
                 {h}
               </span>
               <button
@@ -91,7 +91,7 @@ export function AppointmentSlotPicker({
                   if (!ocupada) onPick(h)
                 }}
                 className={cn(
-                  'relative flex-1 border-l border-[#f1f1f4] p-1 text-left transition-colors',
+                  'relative flex-1 border-l border-line-soft p-1 text-left transition-colors',
                   ocupada
                     ? 'cursor-not-allowed bg-[#fdf3f3]'
                     : sobre === h
@@ -102,11 +102,11 @@ export function AppointmentSlotPicker({
                 )}
               >
                 {/* Media hora, para que la fila no quede como un bloque plano. */}
-                <span className="pointer-events-none absolute inset-x-0 top-1/2 border-t border-[#f1f1f4]" />
+                <span className="pointer-events-none absolute inset-x-0 top-1/2 border-t border-line-soft" />
 
                 {ocupada && (
-                  <span className="absolute inset-y-1 left-1 flex items-center rounded-r-md border-l-[3px] border-l-[#dc2626] bg-[#fde8e8] pr-2 pl-1.5">
-                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#dc2626] text-white">
+                  <span className="absolute inset-y-1 left-1 flex items-center rounded-r-md border-l-[3px] border-l-field-error bg-[#fde8e8] pr-2 pl-1.5">
+                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-field-error text-white">
                       <AlarmClock className="size-3" />
                     </span>
                   </span>
@@ -120,7 +120,7 @@ export function AppointmentSlotPicker({
                       e.dataTransfer.effectAllowed = 'move'
                       e.dataTransfer.setData('text/plain', h)
                     }}
-                    className="border-l-dash-blue relative flex h-full cursor-grab items-center gap-1 rounded-r-[3px] border-l-[3px] bg-[#e8eef8] px-1.5 active:cursor-grabbing"
+                    className="border-l-dash-blue relative flex h-full cursor-grab items-center gap-1 rounded-r-[3px] border-l-[3px] bg-brand-tint px-1.5 active:cursor-grabbing"
                   >
                     <GripVertical className="text-dash-blue size-3 shrink-0" />
                     <span className="min-w-0 leading-tight">

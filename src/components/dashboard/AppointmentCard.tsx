@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   Check, X, EllipsisVertical, Pencil, User, DoorClosed, Clock, ArrowRight,
 } from 'lucide-react'
 import { InnerCard, StatusPill } from './primitives'
 import { cn } from '@/lib/utils'
+import { ICONO_SUELTO } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 
 export type Appointment = {
@@ -19,13 +21,25 @@ export type Appointment = {
 /* Figma 4430:57451. El card se rediseñó: sin borde, con la foto y el badge
    "Check In" a la izquierda, los chips TR/CC y el kebab a la derecha, los dos
    campos grises con la caja de hora al costado, y el botón de acción a lo
-   ancho del pie. */
+   ancho del pie. Ver Elements / Appointment cards.
+
+   Por qué así:
+   - Es la card más grande de las cuatro de turnos porque es la de trabajo del
+     día: trae todo lo que hace falta para atender (quién, con quién, en qué
+     sala, a qué hora) sin abrir nada.
+   - La acción que sigue (Check Out, Cancel) va a lo ancho del pie: es lo que
+     más se toca en la lista, y así se toca sin apuntar.
+   - Click en la card abre la ficha rápida del paciente anclada a ella; el
+     anillo azul marca cuál la abrió mientras está abierta.
+   - La misma card sirve para Appointments y Waiting Room: un turno se ve igual
+     antes y después de llegar. */
 export function AppointmentCard({
   appt,
   id,
   activa,
   onSelect,
   onEdit,
+  compact,
 }: {
   appt: Appointment
   /** Identifica la card entre los dos paneles. */
@@ -34,12 +48,20 @@ export function AppointmentCard({
   activa?: boolean
   onSelect?: (appt: Appointment, el: HTMLElement, id?: string) => void
   onEdit?: (appt: Appointment) => void
+  /** Versión chica para una lista angosta -el costado de Patients-: una fila
+      con nombre + hora/provider, sin los chips TR/CC, sin el "Check In" y
+      sin el botón de Check Out. Es otro layout, no el mismo con partes
+      escondidas -por eso vive en su propio componente más abajo. */
+  compact?: boolean
 }) {
+  if (compact) return <AppointmentCardCompacta appt={appt} />
+
   const accion = appt.accion ?? 'Check Out'
+  const Paciente = onSelect ? 'button' : 'div'
 
   return (
     <InnerCard
-      aria-expanded={onSelect ? !!activa : undefined}
+      data-appt-card
       className={cn(
         'flex flex-col gap-2.5 p-3',
         onSelect && 'cursor-pointer transition-colors hover:bg-[#fafbfe]',
@@ -54,7 +76,20 @@ export function AppointmentCard({
       {/* Todo en un renglón, también en angosto: Julián prefiere que el nombre
           se recorte antes que mandar los chips a una segunda línea. */}
       <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+        {/* Con el teclado se llega por el nombre: la card entera no puede ser
+            un botón porque adentro tiene otros (kebab, Check Out). */}
+        <Paciente
+          type={onSelect ? 'button' : undefined}
+          aria-expanded={onSelect ? !!activa : undefined}
+          onClick={onSelect && ((e: React.MouseEvent<HTMLElement>) => {
+            e.stopPropagation()
+            onSelect(appt, e.currentTarget.closest<HTMLElement>('[data-appt-card]')!, id)
+          })}
+          className={cn(
+            'flex min-w-0 flex-1 items-center gap-2.5 rounded-xl text-left',
+            onSelect && 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
+          )}
+        >
           <span className="bg-dash-blue flex size-11 shrink-0 items-center justify-center rounded-xl text-sm font-semibold text-white">
             {appt.initials}
           </span>
@@ -64,14 +99,14 @@ export function AppointmentCard({
             </span>
             <StatusPill tone="ok" className="self-start">Check In</StatusPill>
           </span>
-        </div>
+        </Paciente>
 
         <div className="flex shrink-0 items-center gap-1.5">
-          <span className="flex h-8 items-center gap-1 rounded-lg bg-[#ddf0e5] px-2 text-[13px] text-[#09090b]">
+          <span className="flex h-8 items-center gap-1 rounded-lg bg-green-soft px-2 text-[13px] text-ink">
             TR <Check className="text-dash-ok-fg size-4" strokeWidth={2.5} />
           </span>
-          <span className="flex h-8 items-center gap-1 rounded-lg bg-[#fbe5e5] px-2 text-[13px] text-[#09090b]">
-            CC <X className="size-4 text-[#dc2626]" strokeWidth={2.5} />
+          <span className="flex h-8 items-center gap-1 rounded-lg bg-dash-bad-chip px-2 text-[13px] text-ink">
+            CC <X className="size-4 text-field-error" strokeWidth={2.5} />
           </span>
           <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
         </div>
@@ -85,8 +120,8 @@ export function AppointmentCard({
           <Field icon={<DoorClosed className="size-4 shrink-0" />} text={appt.operatory} />
         </div>
         <div className="bg-dash-field flex w-[68px] shrink-0 flex-col items-center justify-center gap-1 rounded-lg">
-          <Clock className="size-4 text-[#52525b]" />
-          <span className="text-[13px] font-medium text-[#09090b]">{appt.time}</span>
+          <Clock className="size-4 text-ink-medium" />
+          <span className="text-[13px] font-medium text-ink">{appt.time}</span>
         </div>
       </div>
 
@@ -106,9 +141,36 @@ export function AppointmentCard({
   )
 }
 
-function Field({ icon, text }: { icon: React.ReactNode; text: string }) {
+/* Una fila, no una card de dos pisos: avatar, nombre y hora/provider abajo
+   en gris, y una flecha a Scheduling en vez del menú -acá no hay nada para
+   editar in situ. Mismo tamaño de trigger que el kebab de las tablas
+   (`ICONO_SUELTO`), para que quede a la par de PatientCard al lado -misma
+   sombra que esa card también: la `shadow-inner-card` de acá abajo es de
+   `InnerCard`, pensada para las cards grandes del Dashboard, y sin borde en
+   una fila chica se veía como una línea cortada en vez de una sombra. */
+export function AppointmentCardCompacta({ appt }: { appt: Appointment }) {
   return (
-    <span className="bg-dash-field flex h-10 items-center gap-2 rounded-lg px-3 text-[13px] text-[#52525b]">
+    <InnerCard className="flex items-center gap-2.5 border border-line p-2.5 shadow-[0_1px_3px_rgb(0_0_0/0.08)]">
+      <span className="bg-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold text-white">
+        {appt.initials}
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="truncate text-[13px] font-semibold text-ink">{appt.name}</span>
+        <span className="flex items-center gap-1 text-[11px] text-ink-muted">
+          <Clock className="size-3 shrink-0" />
+          <span className="truncate">{appt.time} · {appt.provider}</span>
+        </span>
+      </span>
+      <Link to="/scheduling" aria-label={`View ${appt.name}'s appointment`} className={ICONO_SUELTO}>
+        <ArrowRight className="size-4" />
+      </Link>
+    </InnerCard>
+  )
+}
+
+export function Field({ icon, text }: { icon: React.ReactNode; text: string }) {
+  return (
+    <span className="bg-dash-field flex h-10 items-center gap-2 rounded-lg px-3 text-[13px] text-ink-medium">
       {icon}
       <span className="truncate">{text}</span>
     </span>
@@ -118,7 +180,7 @@ function Field({ icon, text }: { icon: React.ReactNode; text: string }) {
 
 /* El kebab del frame está dibujado sin menú. Despliega "Edit appointment",
    que abre el mismo modal de alta con los datos de la card ya cargados. */
-function MenuCard({ nombre, onEdit }: { nombre: string; onEdit?: () => void }) {
+export function MenuCard({ nombre, onEdit }: { nombre: string; onEdit?: () => void }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -144,18 +206,18 @@ function MenuCard({ nombre, onEdit }: { nombre: string; onEdit?: () => void }) {
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#e4e4e7] bg-white text-[#09090b] shadow-sm hover:bg-[#f4f4f5]',
-          open && 'bg-[#f4f4f5]',
+          'flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-ink shadow-sm hover:bg-surface-muted',
+          open && 'bg-surface-muted',
         )}
       >
         <EllipsisVertical className="size-4" />
       </button>
       {open && onEdit && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-full right-0 z-30 mt-1 w-44 overflow-hidden rounded-md border border-[#e4e4e7] bg-white py-1 shadow-lg">
+        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-full right-0 z-30 mt-1 w-44 overflow-hidden rounded-md border border-line bg-white py-1 shadow-lg">
           <button
             type="button"
             onClick={() => { setOpen(false); onEdit() }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]"
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
           >
             <Pencil className="size-3.5" /> Edit appointment
           </button>

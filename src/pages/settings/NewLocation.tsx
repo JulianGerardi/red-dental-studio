@@ -37,8 +37,8 @@ export function SettingsNewLocation() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-[#09090b]">New Location</h1>
-      <p className="mt-1 text-sm text-[#71717a]">Set your location name. Add the location you need.</p>
+      <h1 className="text-2xl font-bold text-ink">New Location</h1>
+      <p className="mt-1 text-sm text-ink-muted">Set your location name. Add the location you need.</p>
 
       <div className="mt-5 flex flex-col gap-6">
         <SectionCard title="General Information">

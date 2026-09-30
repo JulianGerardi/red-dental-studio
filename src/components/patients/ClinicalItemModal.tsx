@@ -54,7 +54,7 @@ export function ClinicalItemModal({
     switch (c.tipo) {
       case 'titulo':
         return (
-          <h3 key={i} className="mt-2 text-sm font-bold text-[#09090b] sm:col-span-2">
+          <h3 key={i} className="mt-2 text-sm font-bold text-ink sm:col-span-2">
             {c.label}
           </h3>
         )

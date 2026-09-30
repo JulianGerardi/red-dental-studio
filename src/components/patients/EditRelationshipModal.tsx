@@ -32,16 +32,16 @@ export function EditRelationshipModal({
       width="max-w-[780px]"
       footer={<FormFooter onCancel={onClose} onSave={guardar} />}
     >
-      <section className="rounded-lg border border-[#e4e4e7] bg-white p-5">
-        <h3 className="text-sm font-semibold text-[#09090b]">Person</h3>
+      <section className="rounded-lg border border-line bg-white p-5">
+        <h3 className="text-sm font-semibold text-ink">Person</h3>
         <div className="mt-3">
           <PersonaSeleccionada p={persona} />
         </div>
       </section>
 
-      <section className="mt-5 rounded-lg border border-[#e4e4e7] bg-white p-5">
-        <h3 className="text-sm font-semibold text-[#09090b]">Relationship</h3>
-        <p className="mt-1.5 max-w-[520px] text-xs leading-[1.5] text-[#71717a]">
+      <section className="mt-5 rounded-lg border border-line bg-white p-5">
+        <h3 className="text-sm font-semibold text-ink">Relationship</h3>
+        <p className="mt-1.5 max-w-[520px] text-xs leading-[1.5] text-ink-muted">
           The direction of this relationship cannot be changed. To update this, delete the
           relationship and create a new one.
         </p>

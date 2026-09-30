@@ -10,7 +10,7 @@ import type { ClinicalItem } from '@/data/clinicalItems'
 
 const BADGE = {
   Prescribed: 'border-dash-blue bg-[#eff6ff] text-dash-blue',
-  Completed: 'border-[#1a804d] bg-[#f0fcf5] text-[#1a804d]',
+  Completed: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg',
 }
 
 export function ClinicalPopover({
@@ -73,7 +73,7 @@ export function ClinicalPopover({
       role="dialog"
       aria-label={title}
       style={{ left, top, width: ancho }}
-      className="motion-safe:animate-[fab-panel-in_160ms_cubic-bezier(0.16,1,0.3,1)] absolute z-40 origin-top rounded-lg border border-[#e4e4e7] bg-[#fafcff] p-2 shadow-[0_8px_24px_rgb(0_0_0/0.12)]"
+      className="motion-safe:animate-[fab-panel-in_160ms_cubic-bezier(0.16,1,0.3,1)] absolute z-40 origin-top rounded-lg border border-line bg-[#fafcff] p-2 shadow-[0_8px_24px_rgb(0_0_0/0.12)]"
     >
       <div className="flex flex-col gap-1.5">
         {items.length === 0 && (
@@ -92,7 +92,7 @@ export function ClinicalPopover({
                 hasta desaparecer: colgado del contador de la barra clínica no
                 se leía qué medicación era. */}
             <div className="flex items-start gap-2">
-              <span className="group-hover:text-dash-blue min-w-0 flex-1 text-[13px] font-semibold break-words text-[#09090b] transition-colors">
+              <span className="group-hover:text-dash-blue min-w-0 flex-1 text-[13px] font-semibold break-words text-ink transition-colors">
                 {it.name}
               </span>
               <span className={cn('shrink-0 rounded-full border px-2 py-[1px] text-[10px] font-semibold', BADGE[it.status])}>
@@ -100,15 +100,15 @@ export function ClinicalPopover({
               </span>
             </div>
             <div className="mt-1 flex items-center gap-2">
-              <span className="min-w-0 flex-1 truncate text-[10px] tracking-wide text-[#a1a1aa]">
+              <span className="min-w-0 flex-1 truncate text-[10px] tracking-wide text-ink-faint">
                 {it.detail}
               </span>
-              <span className="shrink-0 text-[11px] text-[#71717a]">Since: {it.since}</span>
+              <span className="shrink-0 text-[11px] text-ink-muted">Since: {it.since}</span>
               <button
                 type="button"
                 aria-label={`Edit ${it.name}`}
                 onClick={() => onEdit(it)}
-                className="shrink-0 text-[#09090b] hover:opacity-60"
+                className="shrink-0 text-ink hover:opacity-60"
               >
                 <Pencil className="size-3.5" />
               </button>
@@ -116,7 +116,7 @@ export function ClinicalPopover({
                 type="button"
                 aria-label={`Delete ${it.name}`}
                 onClick={() => onDelete(it)}
-                className="shrink-0 text-[#09090b] hover:text-[#dc2626]"
+                className="shrink-0 text-ink hover:text-field-error"
               >
                 <Trash2 className="size-3.5" />
               </button>

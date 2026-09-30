@@ -1,0 +1,12 @@
+{
+  "components/clinical/dental/CarasLinguales.tsx": "Se monta dentro del odontograma: manipula el DOM de la librería. Se ve en Components / Clinical / DentalAssessmentExam.",
+  "components/clinical/dental/OdontogramPanel.tsx": "Necesita el nodo que crea la librería del odontograma. Se ve en Components / Clinical / DentalAssessmentExam.",
+  "components/clinical/dental/PerioPdArrastre.tsx": "Manipula el DOM de la librería del odontograma. Se ve en Components / Clinical / DentalAssessmentExam.",
+  "components/clinical/dental/PeriodontalTabs.tsx": "Reordena el DOM de la librería del odontograma. Se ve en Components / Clinical / DentalAssessmentExam.",
+  "components/clinical/dental/ToothInfoPanel.tsx": "Lee el resumen que genera la librería del odontograma. Se ve en Components / Clinical / DentalAssessmentExam.",
+  "components/clinical/dental/ToothInfoTrigger.tsx": "Necesita el nodo de la librería del odontograma. Se ve en Components / Clinical / DentalAssessmentExam.",
+  "components/clinical/OdontogramEmbed.tsx#PanelArribaDeTabs": "Necesita los nodos que crea la librería del odontograma. Se ve dentro de Components / Clinical / DentalAssessmentExam.",
+  "components/scheduling/CalendarViews.tsx#ColumnaDia": "Recibe refs de arrastre internas. Se ve dentro de las vistas Day y Week (Components / Scheduling / CalendarViews).",
+  "components/scheduling/CalendarViews.tsx#VistaHoras": "Es lo que dibujan VistaDia y VistaSemana: se ve en sus stories Day y Week.",
+  "components/patients/PatientSidePanel.tsx#FileText": "Re-exporta un ícono de lucide; no es un componente propio."
+}

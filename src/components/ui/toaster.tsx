@@ -17,9 +17,9 @@ export function Toaster() {
 }
 
 const ICONO = {
-  ok: <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#1a804d]"><Check className="size-3 text-white" strokeWidth={3} /></span>,
-  error: <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#b22626]"><X className="size-3 text-white" strokeWidth={3} /></span>,
-  warn: <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#99660d]"><TriangleAlert className="size-3 text-white" strokeWidth={3} /></span>,
+  ok: <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-dash-ok-fg"><Check className="size-3 text-white" strokeWidth={3} /></span>,
+  error: <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-dash-bad-fg"><X className="size-3 text-white" strokeWidth={3} /></span>,
+  warn: <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-warn-fg"><TriangleAlert className="size-3 text-white" strokeWidth={3} /></span>,
   info: <span className="bg-dash-blue flex size-5 shrink-0 items-center justify-center rounded-full"><Info className="size-3 text-white" strokeWidth={3} /></span>,
 }
 
@@ -30,9 +30,9 @@ export type AccionToast = { label: string; onClick: () => void }
 function mostrar(tipo: keyof typeof ICONO, mensaje: string, accion?: AccionToast) {
   toast.custom(
     (t) => (
-      <div className="flex w-[360px] items-center gap-3 rounded-xl border border-[#e4e4e7] bg-white px-4 py-3 shadow-[0_8px_24px_rgb(0_0_0/0.12)]">
+      <div className="flex w-[360px] items-center gap-3 rounded-xl border border-line bg-white px-4 py-3 shadow-[0_8px_24px_rgb(0_0_0/0.12)]">
         {ICONO[tipo]}
-        <span className="min-w-0 flex-1 text-[13px] text-[#09090b]">{mensaje}</span>
+        <span className="min-w-0 flex-1 text-[13px] text-ink">{mensaje}</span>
         {accion && (
           <button
             onClick={() => { accion.onClick(); toast.dismiss(t) }}
@@ -44,7 +44,7 @@ function mostrar(tipo: keyof typeof ICONO, mensaje: string, accion?: AccionToast
         <button
           onClick={() => toast.dismiss(t)}
           aria-label="Close"
-          className="shrink-0 text-[#71717a] hover:text-black"
+          className="shrink-0 text-ink-muted hover:text-black"
         >
           <X className="size-4" />
         </button>

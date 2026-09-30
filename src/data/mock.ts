@@ -58,12 +58,13 @@ export const ROOMS = [
 ]
 
 export const SETTINGS_SECTIONS = [
-  { to: '/settings/account', title: 'Accounts', desc: 'Manage your account and their access.', icon: 'user-cog' },
+  { to: '/settings/accounts', title: 'Accounts', desc: 'Manage your account and their access.', icon: 'user-cog' },
   { to: '/settings/locations', title: 'Locations', desc: 'Configure and manage your practice locations.', icon: 'building' },
   { to: '/settings/team', title: 'Employees', desc: 'Manage your team members and their access.', icon: 'users' },
   { to: '/settings/roles', title: 'Roles', desc: 'Define and assign permissions and roles.', icon: 'shield-check' },
   { to: '/settings/parameters', title: 'Parameters', desc: 'Configure system parameters and settings.', icon: 'sliders' },
   { to: '/settings/finance', title: 'Billing', desc: 'Manage fee schedules, carriers, and coverage tables.', icon: 'credit-card' },
+  { to: '/settings/ledger', title: 'Ledger', desc: 'Set adjustment types and payment methods.', icon: 'credit-card' },
   { to: '/settings/libraries', title: 'Libraries', desc: 'Manage clinical and administrative libraries.', icon: 'library' },
   { to: '/settings/patient-portal', title: 'Patient Portal', desc: 'Configure settings for the patient portal.', icon: 'circle-user' },
   { to: '/settings/security', title: 'Security', desc: 'Manage security settings and access controls.', icon: 'lock' },

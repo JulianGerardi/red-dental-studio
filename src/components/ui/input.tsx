@@ -1,6 +1,14 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
+/* Input: el campo de texto base (shadcn). Ver Components / UI / Input.
+
+   Por qué así:
+   - Es la base de ui/Field, que usan las pantallas de acceso (Login, Forgot
+     password). Los formularios de la app usan los campos de
+     patients/form.tsx (Elements / Fields), con rótulo, ayuda y error
+     incluidos. */
+
 export const Input = React.forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement>

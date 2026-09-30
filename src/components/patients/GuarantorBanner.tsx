@@ -3,9 +3,9 @@
    asignado). Queda acá para engancharlo cuando ese flujo se implemente. */
 export function GuarantorBanner() {
   return (
-    <div className="rounded-r-md border-l-[3px] border-[#b45309] bg-[#fffbeb] px-4 py-2.5">
-      <p className="text-[13px] font-bold text-[#b45309]">Guarantor not assigned</p>
-      <p className="text-xs text-[#b45309]">
+    <div className="rounded-r-md border-l-[3px] border-attn-fg bg-[#fffbeb] px-4 py-2.5">
+      <p className="text-[13px] font-bold text-attn-fg">Guarantor not assigned</p>
+      <p className="text-xs text-attn-fg">
         This patient is a minor and does not have a guarantor assigned yet.
       </p>
     </div>

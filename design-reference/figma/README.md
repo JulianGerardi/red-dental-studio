@@ -12,6 +12,8 @@ Archivo: `9fYLxX9hlTj5unFthG4bBg`. Relevado durante el rediseño de `red-clone`.
 | Treatments | `3763:254355` | [modulos/treatments.md](modulos/treatments.md) |
 | Documents (manager) | `3753:80194` | [modulos/treatments.md](modulos/treatments.md) |
 | Relationships & Billing (6 pantallas) | `3751:76507` | [modulos/relationships.md](modulos/relationships.md) |
+| Consents (Settings) | `4106:170620` | [modulos/consents.md](modulos/consents.md) |
+| Design system (Storybook) | — | [../design-system.md](../design-system.md) |
 
 ## Convenciones acordadas
 
@@ -274,6 +276,15 @@ del rail principal, siguiendo el ejemplo que pasó Julián.
 Ver `modulos/clinical-mode.md`. Takeover con barra de catorce controles, diez
 pestanas y el Overview maquetado; los nueve examenes cuelgan de sus propios
 tableros. Anomalias 67 a 74.
+
+## Billing (2026-09-12)
+
+Nodo `4481:9881`, módulo nuevo de nivel superior (`/billing`), no el
+"Relationships & Billing" del tab de un paciente. Cuatro pantallas que son
+en realidad estados de una sola vista -vacía, poblada, con el modal "Post
+payment" y con un paciente seleccionado. Ver `modulos/billing.md`, con el
+detalle de por qué los datos de fila no replican el relleno duplicado del
+Figma. Anomalías 75 a 90.
 
 ## Responsive
 

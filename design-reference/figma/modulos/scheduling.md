@@ -255,6 +255,10 @@ plegadas.
 5. La segunda visita pasó a ser "Visit 2" con otro total. En el frame las dos
    dicen "Visit 1" y "Total 1,270.00", que en un selector real no distingue
    una opción de la otra.
+6. **Cinco visitas, no dos (pedido de Julián).** Se agregaron Visit 3, 4 y 5
+   -cirugía del implante, pilar y corona, siguiendo la Comprehensive Implant
+   Therapy-. Las cards del plan ya no dicen "2 Visits · 3 Procedures" del
+   frame: los conteos salen de la lista y hoy dan "5 Visits · 19 Procedures".
 
 
 ## Day / Week / Month funcionando (2026-08-29)
@@ -430,3 +434,52 @@ de Insurance o Treatment plans.
 La pill del sistema es una sola: `rounded-full border px-2 py-[2px]
 text-[11px] font-semibold`, con borde y texto del mismo color y fondo tintado.
 Las dos pasaron a esa.
+
+## "New appointment" no creaba nada (2026-09-07)
+
+Comparando contra un proyecto hermano de la misma spec (ver
+[[red-clone-dashboard-figma-sibling]] en memoria) aparecieron dos gaps reales,
+los dos en el mismo lugar de siempre -no en la lógica compartida, en lo que
+quedó sin conectar-.
+
+`CalendarEvent` no tenía `provider`/`room`/`reason`: el Appointment Details
+Drawer mostraba **"Dr. Smith" / "Operatory 2" / "Consultation · reaseon for
+the visit" fijos**, para cualquier turno que se clickeara. El formulario de
+"New Appointment" sí pide Primary Provider, Operatory y Reason -los datos
+existían-, sólo no llegaban al evento guardado. Se agregan los tres campos a
+`CalendarEvent`, a los 4 eventos semilla (que además repetían todos "Juan
+Perez" como paciente, mismo tipo de anomalía que ya se documentó con
+Radiography/Rooms) y al drawer, que ahora lee del turno real.
+
+Más grave: el botón suelto "New appointment" (a diferencia de "agendar una
+solicitud") **no pasaba `onGuardar`** — el modal mostraba su toast de éxito
+pero nunca tocaba `eventos`. Se factoriza `construirEvento` (antes vivía
+inline en `agendarSolicitud`) y se usa en los dos casos: agendar una
+solicitud saca a alguien de la cola de espera, crear uno suelto no, pero los
+dos arman el mismo tipo de evento.
+
+
+## Comparación con el Scheduling real (2026-09-25)
+
+Pedido de Julián: entender por qué el prototipo no se parece al Scheduling de
+red.dev.confidentally.com y qué hace falta para que un dev lo implemente tal
+cual. Resultado completo, con la tabla de 14 diferencias y los seis pasos
+recomendados: https://claude.ai/artifact/Mu28yUXmDEW7isJko5CgqV
+
+Lo que hay que saber al retomar:
+
+- **La app real tiene lo que el Figma nunca dibujó:** Day con una columna por
+  sala (Room 2/3/7), 24 h con horas no laborables en gris, View con toggles,
+  Zoom y Enabled hours, Check In / No Show / Cancel en el detalle, "+N" en Month
+  y la leyenda en una fila. El prototipo no tiene nada de eso.
+- **El prototipo agrega lo que el real no tiene:** plan y visita en New
+  Appointment, la card de detalle propia, Schedule que precarga el modal.
+- **Vocabulario de estados inconsistente en el real:** la leyenda dice
+  Completed, el filtro Fulfilled; "Check in" y "Checked in" conviven en el
+  filtro; el alta arranca en "Waitlist", que no está en ninguna de las dos.
+- **Escala distinta:** real = fuente del sistema, controles de 36 px con 14 px,
+  75 px por hora, azul `#1e58be`; prototipo = Inter, 32 px con 12 px, 63 px
+  por hora, azul `#1d56bc`. Los colores de estado sí coinciden con el Figma,
+  salvo el verde oscuro (`#115c30` real, `#17723c` prototipo).
+- **Sin verificar:** arrastrar turnos, el menú de Today, el ícono ↗ por sala,
+  qué hacen "+N" y Schedule, la app real en celular y otros roles.

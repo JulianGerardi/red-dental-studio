@@ -15,7 +15,9 @@ export function Panel({
   bodyClassName,
   children,
 }: {
-  title: string
+  /** String en casi todos los paneles; algunos -Today Appointments,
+      Recent Patients en Patients.tsx- le agregan un globo con el total. */
+  title: React.ReactNode
   controls?: React.ReactNode
   className?: string
   bodyClassName?: string
@@ -25,9 +27,9 @@ export function Panel({
     <section
       className={cn('shadow-panel flex flex-col overflow-hidden rounded-lg bg-white', className)}
     >
-      <header className="flex h-[52px] shrink-0 items-center justify-between px-5 py-3">
+      <header className="flex h-[52px] shrink-0 items-center justify-between gap-2 px-5 py-3">
         {/* Figma: 13.5px. Subido a 15 para igualar el título del stat card. */}
-        <h2 className="text-[15px] leading-none font-bold text-black">{title}</h2>
+        <h2 className="flex min-w-0 items-center gap-2 text-[15px] leading-none font-bold text-black">{title}</h2>
         {controls}
       </header>
       <div className={cn('flex min-h-px flex-1 flex-col gap-3 p-4', bodyClassName)}>

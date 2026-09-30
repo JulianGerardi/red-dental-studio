@@ -1,5 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 /* ─────────────────────────────────────────────────────────────
    Design tokens extraídos de red.dev.confidentally.com
@@ -103,6 +107,7 @@
   --chart-4: 43 74% 66%;
   --chart-5: 27 87% 67%;
   --radius: .5rem;
+  --sidebar: 0 0% 100%;
 }
 
 .dark {
@@ -141,6 +146,8 @@
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
+  --sidebar: 240 5.9% 10%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 @theme inline {
@@ -246,16 +253,24 @@
   /* utilidad tipográfica custom del original */
   --text-small: 1rem;
   --text-small--line-height: 1.5rem;
+  --font-heading: var(--font-sans);
+  --color-sidebar: var(--sidebar);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    @apply border-border outline-ring/50;
   }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;
+  }
+  html {
+    @apply font-sans;
   }
 }
 
@@ -275,7 +290,10 @@
    Conviven con los tokens extraídos del sistema original: el azul del
    Figma (#1d56bc) es casi el mismo que --primary (#1e58be) pero no
    idéntico, así que se mantiene aparte para no falsear la comparación. */
-@theme {
+/* `static`: Tailwind sólo emite las variables que alguna clase usa. Estos tokens
+   también se leen desde JS (var(--color-appt-*)) y desde el design system, así
+   que tienen que estar siempre. */
+@theme static {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
   --color-dash-blue: #1d56bc;
@@ -295,8 +313,89 @@
   --color-dash-busy-bg: #f0f2ff;
   --color-dash-bad-fg: #b22626;
   --color-dash-bad-bg: #fff2f2;
+  /* Hover del botón destructivo (Delete, Discard). */
+  --color-dash-bad-hover: #961f1f;
   --color-dash-bad-chip: #fbe5e5;
   --color-dash-count-bg: #e8ecf7;
+
+  /* ── Tokens semánticos (2026-09-25) ───────────────────────────────
+     Antes estos valores estaban escritos a mano (text-[#09090b]) en más de
+     cien archivos: cambiar uno obligaba a buscar y reemplazar. Cada token vale
+     exactamente el hex que reemplazó, así que la app se ve igual; ahora se
+     cambia acá y cambia en todos lados, y en el design system. */
+
+  /* Texto: de más fuerte a más tenue. */
+  --color-ink: #09090b;
+  --color-ink-soft: #3f3f46;
+  --color-ink-medium: #52525b;
+  --color-ink-muted: #71717a;
+  --color-ink-slate: #64748b;
+  --color-ink-faint: #a1a1aa;
+
+  /* Líneas: bordes y divisores. */
+  --color-line: #e4e4e7;
+  --color-line-strong: #d4d4d8;
+  --color-line-row: #e7e7e7;
+  --color-line-soft: #f1f1f4;
+  --color-line-hair: #ededed;
+
+  /* Fondos neutros. */
+  --color-surface-subtle: #fafafa;
+  --color-surface-muted: #f4f4f5;
+  --color-surface-alt: #f9f9f9;
+  --color-surface-slate: #f1f5f9;
+
+  /* Estados que no estaban en dash-*. */
+  --color-field-error: #dc2626;
+  --color-required: #ff0608;
+  --color-warn-fg: #99660d;
+  --color-warn-bg: #fffaf0;
+  --color-attn-fg: #b45309;
+  --color-info-bg: #f0f5ff;
+  --color-purple-fg: #6633a6;
+
+  /* Colores de apoyo que se repiten en varias pantallas: los tintes celeste y
+     violeta, y la familia de verdes. Los estados del calendario de abajo
+     apuntan a estos. */
+  --color-brand-tint: #e8eef8;
+  --color-purple-bg: #f5f0ff;
+  --color-indigo: #4f46e5;
+  --color-amber: #ffb82c;
+  --color-green: #1e9850;
+  --color-green-deep: #17723c;
+  --color-green-tint: #e9f5ee;
+  --color-green-soft: #ddf0e5;
+
+  /* Estados de un turno del calendario: fondo del bloque (bg), barra de la
+     izquierda (bar), texto (fg) y punto de la leyenda (dot). Sale de la paleta
+     muestreada del Figma; ver design-reference/figma/modulos/scheduling.md. */
+  --color-appt-proposed-bg: var(--color-warn-bg);
+  --color-appt-proposed-bar: var(--color-amber);
+  --color-appt-proposed-fg: var(--color-warn-fg);
+  --color-appt-proposed-dot: var(--color-amber);
+  --color-appt-checkin-bg: var(--color-green-soft);
+  --color-appt-checkin-bar: var(--color-green);
+  --color-appt-checkin-fg: var(--color-green-deep);
+  --color-appt-checkin-dot: var(--color-green);
+  --color-appt-booked-bg: var(--color-brand-tint);
+  --color-appt-booked-bar: var(--color-dash-blue);
+  --color-appt-booked-fg: var(--color-dash-blue);
+  --color-appt-booked-dot: var(--color-dash-blue);
+  --color-appt-inprogress-bg: var(--color-purple-bg);
+  --color-appt-inprogress-bar: var(--color-purple-fg);
+  --color-appt-inprogress-fg: var(--color-purple-fg);
+  --color-appt-inprogress-dot: var(--color-indigo);
+  --color-appt-fulfilled-bg: var(--color-green-tint);
+  --color-appt-fulfilled-bar: var(--color-green);
+  --color-appt-fulfilled-fg: var(--color-green-deep);
+  --color-appt-fulfilled-dot: var(--color-green-deep);
+  --color-appt-noshow-bg: var(--color-surface-muted);
+  --color-appt-noshow-bar: var(--color-ink-faint);
+  --color-appt-noshow-fg: var(--color-ink-medium);
+  --color-appt-cancelled-bg: var(--color-surface-muted);
+  --color-appt-cancelled-bar: var(--color-ink-muted);
+  --color-appt-cancelled-fg: var(--color-ink-medium);
+  --color-appt-cancelled-dot: var(--color-ink-muted);
 
   --shadow-stat: 0 4px 4px 0 rgb(0 0 0 / 0.05);
   --shadow-panel: 0 4px 14px 0 rgb(100 100 100 / 0.25);
@@ -337,4 +436,122 @@ body { font-family: var(--font-sans); }
 @keyframes tab-in {
   from { opacity: 0; transform: scale(0.85); }
   to   { opacity: 1; transform: scale(1); }
+}
+
+/* Help: apunta al control real de la pantalla. Corre una vez al llegar. */
+@keyframes coach-spotlight {
+  0%   { box-shadow: 0 0 0 0 rgba(29,86,188,.5), 0 0 0 9999px rgba(15,23,42,.28); outline: 2px solid rgba(29,86,188,.9); }
+  55%  { box-shadow: 0 0 0 10px rgba(29,86,188,0), 0 0 0 9999px rgba(15,23,42,.22); outline: 2px solid rgba(29,86,188,.9); }
+  100% { box-shadow: 0 0 0 10px rgba(29,86,188,0), 0 0 0 9999px rgba(15,23,42,0); outline: 2px solid rgba(29,86,188,0); }
+}
+
+/* Mini-demos de Help: todas en loop de 4s para que un paso se lea igual sin
+   importar cuánto te quedes mirándolo. */
+@keyframes tour-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(29,86,188,.35); }
+  50%      { box-shadow: 0 0 0 6px rgba(29,86,188,0); }
+}
+
+/* "Currently being seen" (PatientInSessionPopup): antes el aviso de "en
+   vivo" era un punto verde con `animate-ping` en cada avatar -repetido en
+   toda la lista, mareaba en vez de comunicar-. Julián lo pidió como un glow
+   en el borde de toda la pestaña, estilo indicador "vivo" de un panel de
+   IA: una respiración suave, no un tilde que aparece y desaparece de golpe.
+   Incluye la sombra de reposo en los dos extremos para no pisar el
+   `shadow-[...]` de Tailwind que la pestaña ya trae. */
+@keyframes session-live {
+  0%, 100% { box-shadow: 0 8px 24px rgba(0,0,0,.16), 0 0 0 0 rgba(30,152,80,.45); }
+  50%      { box-shadow: 0 8px 24px rgba(0,0,0,.16), 0 0 14px 3px rgba(30,152,80,.55); }
+}
+@keyframes tour-card-in {
+  0%, 8%   { opacity: 0; transform: translateY(10px); }
+  22%,100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes tour-tap-move {
+  0%, 10%  { transform: translate(4px, 34px); }
+  35%,100% { transform: translate(52px, 12px); }
+}
+@keyframes tour-tap-ring {
+  0%, 38%  { opacity: 0; transform: scale(.4); }
+  48%      { opacity: .9; transform: scale(1); }
+  62%,100% { opacity: 0; transform: scale(1.5); }
+}
+@keyframes tour-block-appear {
+  0%, 48%  { opacity: 0; transform: scaleY(.2); }
+  62%,100% { opacity: 1; transform: scaleY(1); }
+}
+@keyframes tour-drag-down {
+  0%, 12%  { transform: translate(46px, 8px); }
+  55%,100% { transform: translate(46px, 52px); }
+}
+@keyframes tour-range-grow {
+  0%, 12%  { height: 0; opacity: 0; }
+  20%      { opacity: 1; }
+  55%,100% { height: 48px; opacity: 1; }
+}
+@keyframes tour-expand {
+  0%, 20%  { max-height: 0; opacity: 0; }
+  45%, 80% { max-height: 80px; opacity: 1; }
+  100%     { max-height: 0; opacity: 0; }
+}
+@keyframes tour-slide-away {
+  0%, 20%  { transform: translateX(0); opacity: 1; }
+  45%,100% { transform: translateX(-16px); opacity: 0; }
+}
+@keyframes tour-rail-collapse {
+  0%, 20%  { width: 148px; }
+  50%,100% { width: 56px; }
+}
+@keyframes tour-menu-in {
+  0%, 15%  { opacity: 0; transform: translateY(-6px); }
+  30%,100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes tour-cursor-click {
+  0%, 30%  { transform: translate(0, 0) scale(1); }
+  40%      { transform: translate(0, 0) scale(.85); }
+  55%,100% { transform: translate(0, 0) scale(1); }
+}
+
+/* Las manijas de las columnas se muestran solas una vez, en cascada de
+   izquierda a derecha, para que se note que la tabla se puede ajustar.
+   Después vuelven a aparecer sólo con el mouse encima. */
+@keyframes col-hint {
+  0%   { opacity: 0; }
+  18%  { opacity: 1; }
+  55%  { opacity: 1; }
+  80%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* El agarre crece un toque al pasar por encima: avisa que es arrastrable
+   antes de que el usuario apriete. */
+@keyframes col-grip-in {
+  from { transform: scaleY(0.55); }
+  to   { transform: scaleY(1); }
+}
+
+/* Panel del login: cada fila de los widgets (turnos, ledger, hallazgos)
+   entra con un fundido + un deslizamiento chico, escalonada por fila, para
+   que el widget se sienta vivo y no una foto fija. Se repite en loop
+   mientras el slide está en pantalla. Ver design-reference/figma/modulos/login.md. */
+@keyframes login-fila {
+  0%   { opacity: 0; transform: translateY(6px); }
+  14%  { opacity: 1; transform: translateY(0); }
+  86%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Mismo espíritu que login-fila, pero para las piezas del mini-odontograma:
+   crecen desde abajo en vez de entrar desde un costado. */
+@keyframes login-diente {
+  0%   { opacity: 0.35; transform: scaleY(0.8); }
+  18%  { opacity: 1; transform: scaleY(1); }
+  100% { opacity: 1; transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="tour-"], [style*="tour-"], [style*="coach-spotlight"],
+  [style*="col-hint"], [class*="col-grip-in"], [class*="login-fila"], [class*="login-diente"] {
+    animation: none !important;
+  }
 }

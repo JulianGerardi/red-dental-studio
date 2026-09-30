@@ -1,89 +1,263 @@
 import { useState } from 'react'
-import { CreditCard } from 'lucide-react'
-import { moneda, type Movimiento } from '@/data/ledger'
+import { CreditCard, MoveHorizontal } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { ColumnPicker } from './ColumnPicker'
+import { moneda, fechaCorta, type Movimiento } from '@/data/ledger'
+import { Pagination } from '@/components/patients/ledger/Pagination'
+import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
+import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip } from '@/components/patients/ledger/LedgerRowDetail'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
-/* Card "Ledger Transactions" de los modales de Payment y Credit (-)
-   Adjustment (Figma 4582:29545, 4582:29862, 4582:30209): la tabla de cargos
-   contra los que se puede aplicar el pago o el crédito, con un input de
-   "Applied" por fila y el resumen "Amount not applied" / "Amount applied"
-   abajo a la derecha.
+/* Figma 4582:29618 / 4582:30251. Ver design-reference/figma/modulos/ledger.md. */
+function coberturaSeguro(codigo: string) {
+  const categoria = codigo.charAt(1)
+  return categoria === '0' || categoria === '1' ? 1 : 0.5
+}
 
-   El Figma trae columnas que no existen en el resto de la app -Tooth,
-   Surface, Guar Estimate-; se usan las que ya tiene `Movimiento` (fecha,
-   paciente, provider, código, descripción, monto) en vez de inventar campos
-   nuevos sólo para este cuadro. Los números del frame tampoco cuadran entre
-   sí -"Applied" en 0.00 pero "Amount applied" en $430.00-, así que acá los
-   dos totales salen de lo que se tipea, no de un mock fijo. */
+type ColId =
+  | 'fecha' | 'paciente' | 'provider' | 'diente' | 'superficie' | 'codigo'
+  | 'desc' | 'charge' | 'otroCredito' | 'guarEstimado' | 'applied' | 'balance'
+
+
+type Columna = {
+  id: ColId; label: string; px: number
+  /** Crece con la tabla mientras no se la arrastre a mano. */
+  elastica?: boolean
+  derecha?: boolean
+  claseCelda?: string; bloqueada?: boolean
+  titulo?: (m: Movimiento) => string
+  celda: (m: Movimiento, ap: number) => React.ReactNode
+}
+
+const TAM_PAGINA = 5
+/* gap-1.5 entre columnas y px-3 a los costados, como el diseño de
+   referencia: con esos números las 12 columnas entran sin scroll. */
+const GAP = 6
+const PADDING_FILA = 24
+
+const ANCHO_BASE: Record<ColId, number> = {
+  fecha: 76, paciente: 76, provider: 72, diente: 40, superficie: 48, codigo: 52,
+  desc: 88, charge: 64, otroCredito: 68, guarEstimado: 76, applied: 72, balance: 64,
+}
+
+/* Piso de cada columna, para que las 12 entren aun con el menú lateral y el
+   panel del paciente abiertos. Medidos contra el contenido real a 12px:
+   "03/17/2025" 66, "MODBL" 44, "$9,850.00" 60. */
+const ANCHO_MINIMO: Record<ColId, number> = {
+  fecha: 66, paciente: 56, provider: 52, diente: 32, superficie: 45, codigo: 40,
+  desc: 72, charge: 61, otroCredito: 61, guarEstimado: 61, applied: 58, balance: 61,
+}
+
+/** Techo de Description: pasado eso, el lugar que sobra va a las demás. */
+const MAX_ELASTICA = 240
+
 export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const [aplicado, setAplicado] = useState<Record<string, string>>({})
+  /* Arrancan todas visibles: con los anchos del diseño de referencia las 12
+     entran en la card sin pedir scroll. "Columns" queda para achicar, no
+     para arreglar un default que no entraba. */
+  const [ocultas, setOcultas] = useState<ColId[]>([])
+  const alternarCol = (id: ColId) => setOcultas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+  const [pagina, setPagina] = useState(1)
+  const [expandidas, setExpandidas] = useState<string[]>([])
+  const [enModal, setEnModal] = useState<Movimiento | null>(null)
+  const anchos = useAnchoColumnas<ColId>(ANCHO_BASE)
+  const refVisible = useAnchoVisible<HTMLDivElement>()
+
+  const alternarFila = (id: string) =>
+    setExpandidas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+
+  const paginas = Math.max(1, Math.ceil(cargos.length / TAM_PAGINA))
+  const paginaActual = Math.min(pagina, paginas)
+  const cargosPagina = cargos.slice((paginaActual - 1) * TAM_PAGINA, paginaActual * TAM_PAGINA)
+
+  /* "todas" es sobre lo que se ve en pantalla, no sobre la cuenta entera:
+     abrir 26 filas de golpe en una tabla paginada no le sirve a nadie. */
+  const todasAbiertas = cargosPagina.length > 0 && cargosPagina.every((m) => expandidas.includes(m.id))
+  const hayAlgunaAbierta = cargosPagina.some((m) => expandidas.includes(m.id))
+  const expandirTodo = () =>
+    setExpandidas((p) => [...new Set([...p, ...cargosPagina.map((m) => m.id)])])
+  const colapsarTodo = () =>
+    setExpandidas((p) => p.filter((id) => !cargosPagina.some((m) => m.id === id)))
 
   const totalCargos = cargos.reduce((a, m) => a + m.monto, 0)
   const totalAplicado = cargos.reduce((a, m) => a + (Number(aplicado[m.id]) || 0), 0)
 
+  const columnas: Columna[] = [
+    { id: 'fecha', label: 'Date', px: 76, bloqueada: true, claseCelda: 'text-ink-soft', celda: (m) => fechaCorta(m.fecha) },
+    { id: 'paciente', label: 'Patient', px: 76, claseCelda: 'truncate text-ink', titulo: (m) => m.paciente, celda: (m) => m.paciente },
+    { id: 'provider', label: 'Provider', px: 72, claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
+    { id: 'diente', label: 'Tooth', px: 40, celda: (m) => m.diente ?? '—' },
+    { id: 'superficie', label: 'Surface', px: 48, celda: (m) => m.superficie ?? '—' },
+    { id: 'codigo', label: 'Code', px: 52, claseCelda: 'text-dash-blue font-medium', celda: (m) => m.codigo },
+    { id: 'desc', label: 'Description', px: 88, elastica: true, claseCelda: 'truncate text-ink', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
+    { id: 'charge', label: 'Charge', px: 64, derecha: true, claseCelda: 'font-medium tabular-nums text-ink', celda: (m) => moneda(m.monto) },
+    { id: 'otroCredito', label: 'Other Credit', px: 68, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * coberturaSeguro(m.codigo)) },
+    { id: 'guarEstimado', label: 'Guar Estimate', px: 76, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * (1 - coberturaSeguro(m.codigo))) },
+    {
+      id: 'applied', label: 'Applied', px: 72, bloqueada: true,
+      celda: (m) => (
+        <input
+          value={aplicado[m.id] ?? ''}
+          onChange={(e) => {
+            const limpio = e.target.value.replace(/[^0-9.]/g, '')
+            const numero = Number(limpio)
+            const final = Number.isFinite(numero) && numero > m.monto ? String(m.monto) : limpio
+            setAplicado((p) => ({ ...p, [m.id]: final }))
+          }}
+          inputMode="decimal"
+          placeholder="0.00"
+          aria-label={`Applied to ${m.descripcion}`}
+          className="focus:border-dash-blue h-7 w-full rounded-md border border-line bg-white px-2 text-right text-[12px] tabular-nums placeholder:text-ink-faint focus:outline-none"
+        />
+      ),
+    },
+    { id: 'balance', label: 'Balance', px: 64, derecha: true, claseCelda: 'font-semibold tabular-nums text-ink', bloqueada: true, celda: (m, ap) => moneda(Math.max(m.monto - ap, 0)) },
+  ]
+  const columnasVisibles = columnas.filter((c) => !ocultas.includes(c.id))
+  const anchoMinimo = columnasVisibles.reduce(
+    (a, c) => a + (anchos.manual(c.id) ?? ANCHO_MINIMO[c.id]), 0,
+  ) + (columnasVisibles.length - 1) * GAP + PADDING_FILA
+
+  /* Una columna movida a mano se queda donde la dejaron: no encoge ni
+     crece. El resto cede hasta su piso para que las 12 entren enteras.
+     Al sobrar lugar -sobre todo cuando se ocultan columnas- Description se
+     lo queda primero (peso alto) hasta su techo, y recién ahí el excedente
+     se reparte entre las demás: sin el techo, esconder cuatro columnas la
+     estiraba a 350px y dejaba al resto igual de apretado. */
+  const estilo = (c: Columna) => {
+    const fijada = anchos.manual(c.id) !== undefined
+    if (fijada) {
+      return { width: anchos.ancho(c.id), minWidth: anchos.ancho(c.id), flexGrow: 0, flexShrink: 0 }
+    }
+    return {
+      width: anchos.ancho(c.id),
+      minWidth: ANCHO_MINIMO[c.id],
+      maxWidth: c.elastica ? MAX_ELASTICA : undefined,
+      flexGrow: c.elastica ? 1000 : 1,
+      flexShrink: 1,
+    }
+  }
+
   return (
-    <div className="rounded-lg border border-[#e4e4e7] bg-white p-4 sm:p-5">
-      <h2 className="flex items-center gap-2 text-sm font-bold text-[#09090b]">
-        <CreditCard className="size-4" /> Ledger Transactions
-      </h2>
+    <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
+          <CreditCard className="size-4" /> Ledger Transactions
+        </h2>
+        <div className="flex flex-wrap items-center gap-2">
+          {cargos.length > 0 && (
+            <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
+                  onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
+          )}
+          <ColumnPicker columnas={columnas} ocultas={ocultas} onToggle={alternarCol} onReset={() => setOcultas([])} />
+        </div>
+      </div>
 
       {cargos.length === 0 ? (
-        <p className="mt-3 text-[13px] text-[#71717a]">No open charges to apply this against.</p>
+        <p className="mt-3 text-[13px] text-ink-muted">No open charges to apply this against.</p>
       ) : (
         <>
-          <div className="mt-3 overflow-x-auto">
-            <div className="min-w-[960px]">
-              <div className="flex h-9 items-center gap-3 border-b border-[#e4e4e7] text-[11px] font-semibold text-[#71717a]">
-                <span className="w-[100px] shrink-0">Date</span>
-                <span className="w-[110px] shrink-0">Patient</span>
-                <span className="w-[140px] shrink-0">Provider</span>
-                <span className="w-[70px] shrink-0">Code</span>
-                <span className="min-w-[160px] flex-1">Description</span>
-                <span className="w-[90px] shrink-0 text-right">Charge</span>
-                <span className="w-[100px] shrink-0 text-right">Applied</span>
-                <span className="w-[90px] shrink-0 text-right">Balance</span>
+          {/* `skipDelayDuration={0}`: sin esto Radix deja una ventana de gracia
+                  y al barrer la tabla el tooltip de la fila siguiente abre al
+                  instante -y alcanza a mostrar el contenido de la anterior-, que
+                  es el parpadeo que hacía imposible leerlo. */}
+              <TooltipProvider delayDuration={500} skipDelayDuration={0}>
+          <div ref={refVisible} data-tabla-scroll className="mt-3 w-full overflow-x-auto rounded-md border border-line-row">
+            <div style={{ minWidth: anchoMinimo }}>
+              <div data-tabla-header className="group/fila flex items-center gap-1.5 bg-surface-alt px-3 py-2.5 text-[11px] font-semibold text-ink-muted">
+                {columnasVisibles.map((c, i) => (
+                  <span
+                    key={c.id}
+                    data-elastica={c.elastica || undefined}
+                    style={estilo(c)}
+                    className={cn('relative flex items-center', c.derecha && 'justify-end')}
+                  >
+                    <span className="truncate">{c.label}</span>
+                    <ManijaResize id={c.id} label={c.label} estado={anchos} indice={i} />
+                  </span>
+                ))}
               </div>
-              {cargos.map((m) => {
+              {cargosPagina.map((m) => {
                 const ap = Number(aplicado[m.id]) || 0
+                const abierta = expandidas.includes(m.id)
                 return (
-                  <div key={m.id} className="flex items-center gap-3 border-b border-[#f1f1f4] py-2 text-[13px] text-[#3f3f46] last:border-0">
-                    <span className="w-[100px] shrink-0">{m.fecha}</span>
-                    <span className="w-[110px] shrink-0 truncate">{m.paciente}</span>
-                    <span className="w-[140px] shrink-0 truncate">{m.provider}</span>
-                    <span className="text-dash-blue w-[70px] shrink-0 font-medium">{m.codigo}</span>
-                    <span className="min-w-[160px] flex-1 truncate text-[#09090b]">{m.descripcion}</span>
-                    <span className="w-[90px] shrink-0 text-right font-medium tabular-nums text-[#09090b]">{moneda(m.monto)}</span>
-                    <span className="w-[100px] shrink-0 text-right">
-                      <input
-                        value={aplicado[m.id] ?? ''}
-                        onChange={(e) => setAplicado((p) => ({ ...p, [m.id]: e.target.value.replace(/[^0-9.]/g, '') }))}
-                        placeholder="0.00"
-                        aria-label={`Applied to ${m.descripcion}`}
-                        className="focus:border-dash-blue h-8 w-full rounded-md border border-[#e4e4e7] bg-white px-2 text-right text-[13px] tabular-nums placeholder:text-[#a1a1aa] focus:outline-none"
-                      />
-                    </span>
-                    <span className="w-[90px] shrink-0 text-right font-semibold tabular-nums text-[#09090b]">
-                      {moneda(Math.max(m.monto - ap, 0))}
-                    </span>
+                  <div key={m.id} className="border-t border-line-row">
+                    {/* La fila entera abre el detalle, salvo cuando el click
+                        cae en el input de "Applied" o en una manija. */}
+                    <FilaConTooltip m={m} abierta={abierta}>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={abierta}
+                      aria-label={`Toggle details for ${m.descripcion}`}
+                      onClick={(e) => {
+                        if ((e.target as HTMLElement).closest('input, [role="separator"]')) return
+                        alternarFila(m.id)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.target !== e.currentTarget) return
+                        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
+                      }}
+                      className={cn(
+                        'group/fila flex cursor-pointer items-center gap-1.5 px-3 py-2.5 text-[12px] text-ink-soft hover:bg-surface-subtle',
+                        abierta && 'bg-surface-subtle',
+                      )}
+                    >
+                      {columnasVisibles.map((c) => (
+                        <span
+                          key={c.id}
+                          style={estilo(c)}
+                          className={cn('relative', c.derecha && 'text-right', c.claseCelda)}
+                        >
+                          {c.celda(m, ap)}
+                        </span>
+                      ))}
+                    </div>
+                    </FilaConTooltip>
+                    {abierta && <LedgerRowDetail m={m} onVerTodo={() => setEnModal(m)} />}
                   </div>
                 )
               })}
-            </div>
-          </div>
 
-          <div className="mt-3 flex justify-end">
-            <div className="bg-dash-count-bg flex flex-col gap-1.5 rounded-md px-4 py-3 text-[13px]">
-              <span className="flex items-center justify-between gap-6">
-                <span className="text-[#71717a]">Amount not applied</span>
-                <span className="font-semibold tabular-nums text-[#09090b]">{moneda(Math.max(totalCargos - totalAplicado, 0))}</span>
-              </span>
-              <span className="flex items-center justify-between gap-6">
-                <span className="text-[#71717a]">Amount applied</span>
-                <span className="text-dash-blue font-semibold tabular-nums">{moneda(totalAplicado)}</span>
-              </span>
+              {/* El resumen cierra la tabla: adentro del mismo borde y
+                  arriba del paginado, no suelto afuera de la card. */}
+              <div className="flex justify-end border-t border-line-row px-3 py-3">
+                <dl className="w-fit overflow-hidden rounded-md border border-line text-[13px]">
+                  <div className="flex items-center">
+                    <dt className="w-36 bg-surface-alt px-3 py-2 text-right font-medium text-ink-soft">Amount not applied</dt>
+                    <dd className="w-24 px-3 py-2 text-right font-semibold tabular-nums text-ink">{moneda(Math.max(totalCargos - totalAplicado, 0))}</dd>
+                  </div>
+                  <div className="flex items-center border-t border-line">
+                    <dt className="w-36 bg-surface-alt px-3 py-2 text-right font-medium text-ink-soft">Amount applied</dt>
+                    <dd className="text-dash-blue w-24 px-3 py-2 text-right font-semibold tabular-nums">{moneda(totalAplicado)}</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
+                <span className="flex items-center gap-3 text-xs font-semibold text-ink-muted">
+                  Showing {cargosPagina.length} of {cargos.length} transactions
+                  {anchos.avisando && (
+                    <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
+                      <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
+                    </span>
+                  )}
+                  {anchos.hayCambios && (
+                    <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">
+                      Reset column widths
+                    </button>
+                  )}
+                </span>
+                <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
+              </div>
             </div>
           </div>
+          </TooltipProvider>
         </>
       )}
+
+      {enModal && <LedgerRowModal m={enModal} onClose={() => setEnModal(null)} />}
     </div>
   )
 }

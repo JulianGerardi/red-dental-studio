@@ -11,7 +11,7 @@ import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import { OperatoryCard } from '@/components/dashboard/OperatoryCard'
 import { PendingTaskCard } from '@/components/dashboard/PendingTaskCard'
 import {
-  DIAS, DIA_VACIO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
+  DIAS, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
   type DiaDashboard, type Origen,
 } from '@/components/dashboard/dashboard-data'
 import {
@@ -20,6 +20,7 @@ import {
 import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
 import { formatDMY } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
+import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 
 /* Figma 4430:57451 — rediseño del dashboard.
    Cambios respecto de la versión anterior (3605:56445 / 3636:57488):
@@ -36,12 +37,9 @@ import { aviso } from '@/components/ui/toaster'
    encabezado, tira de stats, sala de espera, salas y tareas. Los datos por
    día están en dashboard-data.ts. */
 
-/* El chip del Figma dice 30-02-2026, una fecha que no existe. Al volverse
-   filtro real no puede ser el valor seleccionado, así que el default pasa a
-   28-02-2026. Ver README.md, anomalía 4. */
-const DEFAULT_DATE = new Date(2026, 1, 28)
+const DEFAULT_DATE = HOY_DEMO
 
-function BotonFiltro({
+export function BotonFiltro({
   label, options, value, onChange,
 }: {
   label: string
@@ -163,7 +161,7 @@ export default function Dashboard() {
   const diaSemana = date.toLocaleDateString('en-US', { weekday: 'long' })
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className={CONTENEDOR_PAGINA}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <p className="text-dash-blue text-sm">
@@ -171,13 +169,15 @@ export default function Dashboard() {
           </p>
           <PageTitle size="lg">Dashboard</PageTitle>
         </div>
-        <StatStrip stats={stats} />
+        <div data-tour="dash-stats">
+          <StatStrip stats={stats} />
+        </div>
       </div>
 
       {/* La fecha manda sobre las tres columnas, así que vive acá arriba y no
           adentro de Appointments: metida en una de las tres, parecía filtrar
           sólo esa. */}
-      <div className="mt-4 flex flex-wrap items-center gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-2" data-tour="dash-date">
         <DatePicker value={date} onChange={setDate} marked={diasConDatos} />
         {/* Volver a hoy sin tener que abrir el calendario y buscar el día.
             Desaparece cuando ya estás en hoy: no tendría nada que hacer. */}
@@ -185,12 +185,12 @@ export default function Dashboard() {
           <button
             onClick={() => setDate(new Date())}
             title="Go to today"
-            className="flex h-9 items-center gap-1.5 rounded-md border border-[#e4e4e7] bg-white px-3 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-[#fafafa]"
+            className="flex h-9 items-center gap-1.5 rounded-md border border-line bg-white px-3 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle"
           >
             <CalendarClock className="size-4" /> Today
           </button>
         )}
-        <span className="text-[12px] text-[#71717a]">
+        <span className="text-[12px] text-ink-muted">
           Appointments, waiting room and tasks follow this date.
         </span>
       </div>

@@ -38,7 +38,7 @@ export function ClinicalToolbar({
         <button
           onClick={() => setAbierto((v) => !v)}
           aria-expanded={abierto}
-          className="flex h-9 items-center gap-1.5 rounded-lg border border-[#e4e4e7] bg-white px-3.5 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]"
+          className="flex h-9 items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle"
         >
           {/* El rótulo es siempre "Exams", como en los dos frames: es el nombre
               del menú, no el del juego activo. Cuál está puesto se ve marcado
@@ -48,7 +48,7 @@ export function ClinicalToolbar({
         </button>
 
         {abierto && (
-          <div className="absolute top-full left-0 z-50 mt-1 w-[180px] rounded-lg border border-[#e4e4e7] bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
+          <div className="absolute top-full left-0 z-50 mt-1 w-[180px] rounded-lg border border-line bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
             {(['Exams', 'Records'] as const).map((j) => (
               <button
                 key={j}
@@ -58,7 +58,7 @@ export function ClinicalToolbar({
                   setAbierto(false)
                 }}
                 className={cn(
-                  'block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-[#f4f4f5]',
+                  'block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-surface-muted',
                   juego === j && 'bg-dash-count-bg text-dash-blue-hover font-medium',
                 )}
               >
@@ -96,7 +96,7 @@ export function ClinicalToolbar({
                   'lg:grow',
                   on
                     ? 'bg-dash-blue font-semibold text-white'
-                    : 'border border-[#e4e4e7] bg-white font-medium text-[#09090b] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-[#fafafa]',
+                    : 'border border-line bg-white font-medium text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle',
                 )}
               >
                 {p}
