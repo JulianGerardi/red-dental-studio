@@ -18,11 +18,11 @@ portfolio/
   work/mercado-play.html      challenge de Mercado Play (portada y su sistema de piezas)
   assets/site.css             tokens (claro y oscuro), layout, trabajos, casos, intro, agente, cursor
   assets/site.js              idioma, intro, scroll suave, reveals, marquesina, trabajos, cursor, tema, lightbox, NDA, CV
-  assets/banner.js            banner interactivo con partículas (solo en la home)
-  assets/agent.js             agente de IA
+  assets/hero.js              movimiento del degradé del inicio (solo en la home)
+  assets/agent.js             asistente que responde con el contenido del sitio
   assets/Julian_Gerardi_CV.pdf  CV para descargar
   assets/img/                 capturas en WebP (b- Batech, d- dental, ds- design system, g- GRILL, mp- Mercado Play)
-  _build/                     scripts que generan los HTML
+  _build/                     scripts que generan los HTML (demos.py: microanimaciones de cada pantalla)
 ```
 
 ## Idioma
@@ -36,12 +36,13 @@ Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span 
 - **Marquesina** de marcas: avanza sola y acelera y cambia de sentido según el scroll.
 - **Portadas de los casos**: parallax suave del mockup.
 - **Transición entre páginas**: una cortina cubre la pantalla al salir y se levanta al entrar.
-- **Banner**: "Julián Gerardi" dibujado con partículas en un degradé que se mueve. El puntero las empuja y un clic las dispersa; siempre vuelven a su lugar.
+- **Inicio**: una tarjeta con un degradé verde y violeta que se mueve solo y se inclina hacia el puntero, con la frase principal al centro, el rol abajo a la izquierda y la disponibilidad abajo a la derecha.
+- **Microanimaciones**: cada pantalla muestra cómo funciona algo (un clic, un campo que se escribe solo, una geocerca que se dibuja, filas que se recorren) con una etiqueta que lo explica. Los datos están en `_build/demos.py`: el área de cada interacción va en % de la captura. Solo se animan mientras están en pantalla.
 - Con "reducir movimiento" activado en el sistema, todo queda quieto.
 
 ## Selected work
 
-Cada fila tiene número, título y etiquetas; al pasar el mouse se invierte y se despliega una tira de 5 pantallas a todo el ancho con la descripción debajo. Cada pantalla flota, y al pasar el mouse se inclina hacia el puntero y se eleva. Las tiras se arman en `_build/common.py` (`tiles_batech`, `tiles_dental`, `tiles_ds`, `tiles_grill`, `tiles_mp`) con `tile_screen` (navegador), `tile_phone` (celular) y `tile_card` (una pieza). El ancho de cada objeto se calcula en el build para que la pantalla entre **entera**, sin recortes.
+Va sobre una banda oscura, con líneas finas entre filas y el número en verde. Cada fila tiene número, título y etiquetas; al pasar el mouse se invierte y se despliega una tira de 5 pantallas a todo el ancho con la descripción debajo. Cada pantalla flota, y al pasar el mouse se inclina hacia el puntero y se eleva. Las tiras se arman en `_build/common.py` (`tiles_batech`, `tiles_dental`, `tiles_ds`, `tiles_grill`, `tiles_mp`) con `tile_screen` (navegador), `tile_phone` (celular) y `tile_card` (una pieza). El ancho de cada objeto se calcula en el build para que la pantalla entre **entera**, sin recortes.
 
 El cursor es un cuadrado blanco con `mix-blend-mode: difference`: invierte lo que tiene debajo, crece sobre links y, sobre el título de un proyecto, se agranda y muestra el año (`data-cursor`).
 
@@ -49,10 +50,10 @@ El cursor es un cuadrado blanco con `mix-blend-mode: difference`: invierte lo qu
 
 Cada caso tiene una barra con breadcrumbs (Inicio / Trabajos / Proyecto), el número de proyecto, flechas a anterior y siguiente, y una línea de progreso de lectura. La portada usa una pantalla que no se repite en el resto del caso.
 
-## CV y agente de IA
+## CV y asistente
 
-- El CV se descarga desde el menú, el hero, About, Contacto y el pie. Dentro del visor de Artifacts de Claude pasa por la ventana de descarga del visor.
-- El agente ("Ask my AI") responde sobre proyectos, proceso, experiencia, herramientas y disponibilidad. Dentro del visor de Artifacts de Claude usa Claude con la cuenta de quien lo abre (pide permiso la primera vez); en cualquier otro hosting responde con la base de conocimiento de `assets/agent.js` (`FACTS` e `INTENTS`). Si cambia algo del CV, actualizalo ahí.
+- El CV se descarga desde el menú, About, Contacto y el pie. Dentro del visor de Artifacts de Claude pasa por la ventana de descarga del visor.
+- El asistente ("Preguntame") no usa ninguna IA externa: responde con el contenido de este sitio. Las preguntas generales (quién es, disponibilidad, contacto, CV, idiomas, formación) tienen respuestas escritas en `assets/agent.js` (`INTENTS`); el resto lo busca en el texto de las páginas y responde con el párrafo que corresponde, con un link a esa sección. El contenido del caso con NDA no se usa.
 
 ## Editar
 
@@ -67,6 +68,10 @@ python3 portfolio/_build/build.py
 - `_build/mercado_page.py`: Mercado Play.
 
 Los colores de marca de cada portada están en `assets/site.css` (`--batech-*`, `--dental-*`, `--ds-*`, `--grill-*`, `--mp-*`).
+
+## Pie
+
+Como el de vercel.com: columnas de links (trabajos, sitio, proyectos en vivo, contacto), el estado de disponibilidad y un selector de tema (sistema, claro, oscuro).
 
 ## Contraseña del caso con NDA
 

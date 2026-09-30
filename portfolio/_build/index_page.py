@@ -78,13 +78,13 @@ work = "".join([
               "Pedidos de almuerzo para empresas de una cocina en Mercedes: los empleados eligen la vianda desde el celular y la cocina maneja comandas, etiquetas y reparto."),
             T("Product design — flows, UI, working prototype", "Diseño de producto — flujos, UI, prototipo funcional")),
     wl_item(p, 5, "work/mercado-play.html", "Mercado Play", T("Streaming · UX/UI challenge", "Streaming · Challenge UX/UI"), "2026", tiles_mp(p),
-            T("A UX/UI challenge for Mercado Libre’s free streaming service, presented as a Figma file with its own cover system.",
-              "Un challenge UX/UI para el servicio de streaming gratuito de Mercado Libre, presentado en Figma con su propio sistema de portada."),
-            T("UX/UI challenge — version 2.0 · Figma", "Challenge UX/UI — versión 2.0 · Figma")),
+            T("A UX/UI challenge for Mercado Libre’s free streaming service, presented with its own cover system.",
+              "Un challenge UX/UI para el servicio de streaming gratuito de Mercado Libre, presentado con su propio sistema de portada."),
+            T("UX/UI challenge — version 2.0", "Challenge UX/UI — versión 2.0")),
 ])
 
 INTRO = """<script>(function(){var d=document.documentElement;try{if(sessionStorage.getItem('jg-intro'))return;}catch(e){}if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('is-loading','intro');setTimeout(function(){d.classList.remove('is-loading');},7000);})();</script>
-<script src="assets/banner.js" defer></script>
+<script src="assets/hero.js" defer></script>
 """
 LOADER = f"""<div class="loader" aria-hidden="true">
   <div class="loader__top"><span>Julián Gerardi</span><span>{T("Senior Product Designer", "Senior Product Designer")}</span><span>{T("Portfolio", "Portfolio")} ’26</span></div>
@@ -102,29 +102,15 @@ page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Se
             p, extra_scripts=INTRO) + SPRITE + LOADER + nav(p) + f"""
 <main id="main">
   <section class="hero">
-    <div class="wrap hero__top">
-      <div class="who rise" style="--d:.1s">
-        <span class="who__avatar" aria-hidden="true">JG</span>
-        <span class="who__text"><b>Senior Product Designer</b><span>{T("Lead UX/UI · AI-assisted product design", "Lead UX/UI · Diseño de producto asistido por IA")}</span></span>
+    <div class="hero-card" data-hero>
+      <div class="hero-card__mesh" aria-hidden="true"><i class="m1"></i><i class="m2"></i><i class="m3"></i><i class="m4"></i><i class="m5"></i><i class="m-spot"></i></div>
+      <div class="hero-card__body">
+        <p class="hero-card__hi rise" style="--d:.15s">{T("Hey, I’m Julián", "Hey, soy Julián")}</p>
+        <h1 class="hero-card__title split">{T("Fewer standalone screens. More end-to-end products, living design systems and AI prototypes people actually use.", "Menos pantallas sueltas. Más productos de punta a punta, design systems vivos y prototipos con IA que la gente usa.")}</h1>
       </div>
-      <span class="status rise" style="--d:.2s"><i aria-hidden="true"></i>{T("Open to remote roles", "Disponible para trabajo remoto")}</span>
-    </div>
-    <div class="banner" data-banner>
-      <h1 class="sr-only">Julián Gerardi</h1>
-      <div class="banner__text" aria-hidden="true">Julián Gerardi</div>
-      <canvas class="banner__canvas" aria-hidden="true"></canvas>
-      <p class="banner__hint mono">{T("Move the cursor over my name", "Pasá el cursor sobre mi nombre")}</p>
-    </div>
-    <div class="wrap hero__bottom">
-      <h2 class="hero__title split">{T('Designing SaaS products <span class="dim">from the first interview to a prototype you can click.</span>', 'Diseño productos SaaS <span class="dim">desde la primera entrevista hasta un prototipo que se puede clickear.</span>')}</h2>
-      <div class="hero__side rise" style="--d:.6s">
-        <p>{T("Lead UX/UI designer for B2B and B2C teams in the United States, Mexico, Ireland and Latin America. Research, flows, design systems and high-fidelity UI, with an AI-assisted workflow that turns ideas into working web apps.",
-              "Lead UX/UI para equipos B2B y B2C de Estados Unidos, México, Irlanda y Latinoamérica. Research, flujos, design systems y UI de alta fidelidad, con un flujo de trabajo asistido por IA que convierte ideas en web apps funcionales.")}</p>
-        <div class="btns">
-          <a class="btn" href="#work">{T("View work", "Ver trabajos")} {arrow("i-down")}</a>
-          <a class="btn btn--ghost" {cv_attrs}>{T("Download CV", "Descargar CV")}</a>
-          <button class="btn btn--ghost" type="button" data-open-agent><svg aria-hidden="true"><use href="#i-spark"/></svg>{T("Ask my AI", "Preguntale a mi IA")}</button>
-        </div>
+      <div class="hero-card__foot">
+        <p class="rise" style="--d:.9s"><b>Senior Product Designer</b><span>{T("Lead UX/UI · AI-assisted product design", "Lead UX/UI · Diseño de producto asistido por IA")}</span></p>
+        <p class="hero-card__right rise" style="--d:1s"><b>{T("Open to new projects", "Abierto a nuevos proyectos")}</b><span>{T("Designing from Mercedes, Buenos Aires", "Diseñando desde Mercedes, Buenos Aires")}</span></p>
       </div>
     </div>
   </section>

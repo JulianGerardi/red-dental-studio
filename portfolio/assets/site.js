@@ -278,7 +278,7 @@
       }
       cursor.classList.toggle('is-link', !item && !!(t && t.closest('a, button, [role="button"], .zoomable, summary')));
       cursor.classList.toggle('is-text', !!(t && t.closest('input, textarea')));
-      cursor.classList.toggle('is-hidden', !!(t && t.closest('.banner, .agent__panel')));
+      cursor.classList.toggle('is-hidden', !!(t && t.closest('.agent__panel')));
       if (!running) { running = true; requestAnimationFrame(loop); }
     }, { passive: true });
     document.documentElement.addEventListener('mouseleave', function () { cursor.classList.remove('is-visible'); });
@@ -291,14 +291,38 @@
     if (set) return set;
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
-  document.querySelectorAll('.theme-toggle').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var next = currentTheme() === 'dark' ? 'light' : 'dark';
-      root.setAttribute('data-theme', next);
-      try { localStorage.setItem('jg-theme', next); } catch (e) {}
-      document.dispatchEvent(new CustomEvent('jg:theme', { detail: next }));
+  function setTheme(mode) {
+    if (mode === 'system') {
+      root.removeAttribute('data-theme');
+      try { localStorage.removeItem('jg-theme'); } catch (e) {}
+    } else {
+      root.setAttribute('data-theme', mode);
+      try { localStorage.setItem('jg-theme', mode); } catch (e) {}
+    }
+    syncThemeSwitch();
+    document.dispatchEvent(new CustomEvent('jg:theme', { detail: currentTheme() }));
+  }
+  function syncThemeSwitch() {
+    var mode = root.getAttribute('data-theme') || 'system';
+    document.querySelectorAll('[data-set-theme]').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-set-theme') === mode ? 'true' : 'false');
     });
+  }
+  syncThemeSwitch();
+  document.querySelectorAll('.theme-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () { setTheme(currentTheme() === 'dark' ? 'light' : 'dark'); });
   });
+  document.querySelectorAll('[data-set-theme]').forEach(function (btn) {
+    btn.addEventListener('click', function () { setTheme(btn.getAttribute('data-set-theme')); });
+  });
+
+  /* ---------- Micro-animations: each screen plays its demo while it is on screen ---------- */
+  if (!reduced && 'IntersectionObserver' in window) {
+    var screens = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) { entry.target.classList.toggle('is-playing', entry.isIntersecting); });
+    }, { threshold: 0.35 });
+    document.querySelectorAll('.scr').forEach(function (el) { if (el.querySelector('.demo')) screens.observe(el); });
+  }
 
   /* ---------- Mobile menu ---------- */
   var menuBtn = document.querySelector('.menu-btn');

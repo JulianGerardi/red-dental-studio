@@ -3,6 +3,8 @@
 Text is bilingual: T(en, es) writes both versions and the page shows the one
 that matches <html data-lang>. The toggle in the nav switches it.
 """
+from demos import demo_html
+
 FONTS = "https://fonts.googleapis.com/css2?family=Geist:wght@300..800&amp;family=Geist+Mono:wght@400..600&amp;display=swap"
 LENIS = "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"
 ICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23171717'/%3E"
@@ -60,6 +62,7 @@ SPRITE = """<svg width="0" height="0" style="position:absolute" aria-hidden="tru
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-send" viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 20h7M12 16.5V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
   <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3c.6 4.2 2.8 6.4 7 7-4.2.6-6.4 2.8-7 7-.6-4.2-2.8-6.4-7-7 4.2-.6 6.4-2.8 7-7Z" fill="currentColor"/><path d="M19 15.5c.25 1.6 1 2.35 2.5 2.5-1.5.15-2.25.9-2.5 2.5-.25-1.6-1-2.35-2.5-2.5 1.5-.15 2.25-.9 2.5-2.5Z" fill="currentColor"/></symbol>
 </svg>
 """
@@ -121,13 +124,13 @@ def crumbs_bar(p, current_file, title):
 def agent(p=""):
     return f"""<div class="agent" data-agent>
   <button class="agent__launch" type="button" aria-expanded="false" aria-controls="agent-panel">
-    <span class="agent__orb" aria-hidden="true"></span>
-    <span class="agent__launch-text">{T("Ask my AI", "Preguntale a mi IA")}</span>
+    <span class="agent__pill">{T("Ask me", "Preguntame")}</span>
+    <span class="agent__ring" aria-hidden="true"><span class="agent__orb"></span></span>
   </button>
-  <section class="agent__panel" id="agent-panel" hidden aria-label="AI assistant">
+  <section class="agent__panel" id="agent-panel" hidden aria-label="Assistant">
     <header class="agent__head">
-      <span class="agent__orb agent__orb--lg" aria-hidden="true"></span>
-      <div><b>{T("Julián’s AI assistant", "Asistente IA de Julián")}</b><span data-agent-mode>{T("Answers about my work, experience and availability", "Responde sobre mi trabajo, experiencia y disponibilidad")}</span></div>
+      <span class="agent__ring agent__ring--sm" aria-hidden="true"><span class="agent__orb"></span></span>
+      <div><b>{T("Julián’s assistant", "Asistente de Julián")}</b><span>{T("Answers with what’s on this website", "Responde con lo que hay en esta web")}</span></div>
       <button class="icon-btn agent__close" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
     </header>
     <div class="agent__log" data-agent-log aria-live="polite"></div>
@@ -143,15 +146,41 @@ def agent(p=""):
 
 
 def footer(p=""):
-    return f"""<footer class="footer wrap">
-  <div class="footer__big" aria-hidden="true">Julián Gerardi</div>
-  <div class="footer__row">
-    <span>© <span data-year>2026</span> Julián Gerardi · Mercedes, Buenos Aires · <span data-clock>--:--</span> {T("local time", "hora local")}</span>
-    <div class="footer__links">
-      <a href="{p}index.html#work">{T("Work", "Trabajos")}</a>
-      <a href="{p}{CV}" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv>{T("Download CV", "Descargar CV")}</a>
-      <a href="{LINKEDIN}" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="{BEHANCE}" target="_blank" rel="noopener">Behance</a>
+    w = f"{p}work/"
+    cols = [
+        (T("Work", "Trabajos"), [(f"{w}batech.html", "Batech AI Platform"), (f"{w}confidentally.html", "Confidentally"),
+                                 (f"{w}confidentally-ui.html", "Confidentally UI"), (f"{w}grill.html", "GRILL Empresas"), (f"{w}mercado-play.html", "Mercado Play")]),
+        (T("Site", "Sitio"), [(f"{p}index.html#work", T("Selected work", "Trabajos")), (f"{p}index.html#process", T("Process", "Proceso")),
+                              (f"{p}index.html#experience", T("Experience", "Experiencia")), (f"{p}index.html#about", T("About", "Sobre mí")), (f"{p}index.html#contact", T("Contact", "Contacto"))]),
+        (T("Live projects", "Proyectos en vivo"), [("https://juliangerardi.github.io/red-dental-studio/#/patients/patient-0001", T("Confidentally prototype", "Prototipo de Confidentally")),
+                                                  ("https://juliangerardi.github.io/red-dental-studio/storybook/?path=/docs/welcome--docs", "Confidentally UI"),
+                                                  ("https://claude.ai/code/artifact/b8691278-bb38-469f-89b1-a323dd661d5d", T("GRILL employee app", "GRILL, app de empleados")),
+                                                  ("https://claude.ai/code/artifact/44a2be1f-d2b3-462a-acbd-382cd5c76347", T("GRILL kitchen panel", "GRILL, panel de cocina"))]),
+        (T("Connect", "Contacto"), [(f"mailto:{EMAIL}", "Email"), (LINKEDIN, "LinkedIn"), (BEHANCE, "Behance"), (f"{p}{CV}", T("Download CV", "Descargar CV"))]),
+    ]
+
+    def link(href, label):
+        if href.endswith(".pdf"):
+            return f'<li><a href="{href}" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv>{label}</a></li>'
+        ext = ' target="_blank" rel="noopener"' if href.startswith("http") else ""
+        return f'<li><a href="{href}"{ext}>{label}</a></li>'
+
+    grid = "".join(f'<div class="footer__col"><h2>{t}</h2><ul>{"".join(link(h, l) for h, l in items)}</ul></div>' for t, items in cols)
+    return f"""<footer class="footer">
+  <div class="wrap footer__grid">
+    <div class="footer__brand">
+      <a class="brand" href="{p}index.html" aria-label="Julián Gerardi"><span class="brand__mark" aria-hidden="true">JG</span></a>
+      <p>Senior Product Designer<br><span>Mercedes, Buenos Aires · <span data-clock>--:--</span></span></p>
+    </div>
+    {grid}
+  </div>
+  <div class="wrap footer__bottom">
+    <span class="footer__status"><i aria-hidden="true"></i>{T("Open to remote roles and freelance", "Disponible para roles remotos y freelance")}</span>
+    <span class="footer__copy">© <span data-year>2026</span> Julián Gerardi</span>
+    <div class="footer__switch" role="group" aria-label="Theme">
+      <button type="button" data-set-theme="system" aria-label="System"><svg aria-hidden="true"><use href="#i-monitor"/></svg></button>
+      <button type="button" data-set-theme="light" aria-label="Light"><svg aria-hidden="true"><use href="#i-sun"/></svg></button>
+      <button type="button" data-set-theme="dark" aria-label="Dark"><svg aria-hidden="true"><use href="#i-moon"/></svg></button>
     </div>
   </div>
 </footer>
@@ -184,16 +213,21 @@ def img(p, name, w, h, alt_en="", alt_es="", lazy=True, zoom=False, style=""):
     return f'<img{cls} src="{p}assets/img/{name}.webp" width="{w}" height="{h}" alt="{alt_en}"{es}{ld}{st} decoding="async">'
 
 
+def screen(p, name, w, h, alt_en="", alt_es="", lazy=True, zoom=False):
+    """A screenshot plus its micro-animation (see demos.py)."""
+    return f'<span class="scr">{img(p, name, w, h, alt_en, alt_es, lazy, zoom)}{demo_html(name, w, h, T)}</span>'
+
+
 def mock(p, name, w, h, title, dark=False, alt_en="", alt_es="", lazy=True, zoom=False, style=""):
     d = " mock--dark" if dark else ""
     st = f' style="{style}"' if style else ""
     return (f'<div class="mock{d}"{st}><div class="mock__bar"><i></i><i></i><i></i><span>{title}</span></div>'
-            f'{img(p, name, w, h, alt_en, alt_es, lazy, zoom)}</div>')
+            f'{screen(p, name, w, h, alt_en, alt_es, lazy, zoom)}</div>')
 
 
 def phone(p, name, alt_en="", alt_es="", lazy=True, style=""):
     st = f' style="{style}"' if style else ""
-    return f'<div class="phone"{st}>{img(p, name, 780, 1688, alt_en, alt_es, lazy)}</div>'
+    return f'<div class="phone"{st}>{screen(p, name, 780, 1688, alt_en, alt_es, lazy)}</div>'
 
 
 # ---------- Covers: brand colour, whole mockups, nothing cut ----------
@@ -242,17 +276,17 @@ def tile_screen(p, cls, name, w, h, k, dark=False):
     wf = round(min(1, TILE_INNER / (h / w + TILE_BAR)) * 100, 1)
     d = " mock--dark" if dark else ""
     return (f'<span class="tile tile--{cls}" style="--k:{k}"><span class="tile__obj mock{d}" style="width:{wf}%">'
-            f'<span class="mock__bar"><i></i><i></i><i></i></span>{img(p, name, w, h)}</span></span>')
+            f'<span class="mock__bar"><i></i><i></i><i></i></span>{screen(p, name, w, h)}</span></span>')
 
 
 def tile_phone(p, cls, name, k):
     wf = round(TILE_INNER / PHONE_RATIO * 100, 1)
-    return f'<span class="tile tile--{cls}" style="--k:{k}"><span class="tile__obj phone" style="width:{wf}%">{img(p, name, 780, 1688)}</span></span>'
+    return f'<span class="tile tile--{cls}" style="--k:{k}"><span class="tile__obj phone" style="width:{wf}%">{screen(p, name, 780, 1688)}</span></span>'
 
 
 def tile_card(p, cls, name, w, h, k):
     wf = round(min(1, TILE_INNER / (h / w)) * 100, 1)
-    return f'<span class="tile tile--{cls}" style="--k:{k}"><span class="tile__obj tile__card" style="width:{wf}%">{img(p, name, w, h)}</span></span>'
+    return f'<span class="tile tile--{cls}" style="--k:{k}"><span class="tile__obj tile__card" style="width:{wf}%">{screen(p, name, w, h)}</span></span>'
 
 
 def tiles_batech(p):

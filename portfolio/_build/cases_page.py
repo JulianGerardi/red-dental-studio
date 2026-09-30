@@ -23,7 +23,7 @@ def f(name, title, ae, as_, ce="", cs="", kind="soft", w=1600, h=1000):
 def fig_card(name, w, h, ae, as_, kind, ce="", cs=""):
     c = f"<figcaption>{T(ce, cs)}</figcaption>" if ce else ""
     return (f'<figure class="shot" data-reveal><div class="panel panel--{kind} panel--center">'
-            f'<div class="card-shot">{img(p, name, w, h, ae, as_, zoom=True)}</div></div>{c}</figure>')
+            f'<div class="card-shot">{screen(p, name, w, h, ae, as_, zoom=True)}</div></div>{c}</figure>')
 
 
 def numbers(items):
