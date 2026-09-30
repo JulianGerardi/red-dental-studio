@@ -4,116 +4,101 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
 p = "../"
 FIGMA = "https://www.figma.com/design/ljgOjnuyx1hS052ehRnyRb/Portfolio?node-id=133-4775"
+FN = "batech.html"
 
 
-def panel(inner, kind="batech"):
-    return f'<figure class="shot"><div class="panel panel--{kind}">{inner}</div>'
-
-
-def fig(name, w, h, title, alt, cap="", kind="batech", dark=True):
-    c = f"<figcaption>{cap}</figcaption>" if cap else ""
-    return f'{panel(mock(p, name, w, h, title, dark=dark, alt=alt, zoom=True), kind)}{c}</figure>'
+def bf(name, w, h, title, ae, as_, ce="", cs=""):
+    return fig(p, name, w, h, title, ae, as_, ce, cs, kind="batech", dark=True)
 
 
 body = case_head(
-    "Batech AI Platform", "Batech AI Platform",
-    "A computer-vision platform that turns store cameras into events, alerts and reports. I led its design end to end, from the first flow to a high-fidelity prototype.",
-    [("Role", "Lead UX/UI Designer"), ("Company", "Batech · Querétaro, MX"), ("Timeline", "2022 — 2026"),
-     ("Platform", "Web app, dark UI"), ("Team", "Design team lead"), ("Scope", "Research, flows, UI, design system")],
-    links=f'<a class="btn" href="{FIGMA}" target="_blank" rel="noopener">View in Figma {arrow()}</a><a class="btn btn--ghost" href="#flow">Jump to the flow</a>',
+    "Batech AI Platform",
+    T("A computer-vision platform that turns store cameras into events, alerts and reports. I led its design end to end, from the first flow to a high-fidelity prototype.",
+      "Una plataforma de visión artificial que convierte las cámaras de cada tienda en eventos, alertas y reportes. Lideré su diseño de punta a punta, del primer flujo al prototipo de alta fidelidad."),
+    [(T("Role", "Rol"), "Lead UX/UI Designer"), (T("Company", "Empresa"), "Batech · Querétaro, MX"), (T("Timeline", "Período"), "2022 — 2026"),
+     (T("Platform", "Plataforma"), T("Web app, dark UI", "Web app, UI oscura")), (T("Team", "Equipo"), T("Design team lead", "Líder del equipo de diseño")),
+     (T("Scope", "Alcance"), T("Research, flows, UI, design system", "Research, flujos, UI, design system"))],
+    links=f'<a class="btn" href="{FIGMA}" target="_blank" rel="noopener">{T("View in Figma", "Ver en Figma")} {arrow()}</a><a class="btn btn--ghost" href="#flow">{T("Jump to the flow", "Ir al flujo")}</a>',
 )
+body += f'  <section class="wrap case-cover" data-parallax>{cover_mock(p, "batech", "b-dashboard", 1200, 857, "Batech · Dashboard", dark=True)}</section>\n'
 
-body += f"""  <section class="row"><div class="cell cell--flush">{cover_batech(p, "cover--hero", lazy=False, shot="b-resultado", h=1021, title="Batech · Resultado de análisis")}</div></section>
-"""
+body += chapter(T("Overview", "Resumen"), h2("AI that watches the store, and a place to read what it saw.", "Una IA que mira la tienda, y un lugar para leer lo que vio.") + prose(
+    ("Batech builds artificial intelligence for physical retail. Its models watch the cameras of every branch and detect events, such as a cash drawer opening at the till. The platform is where operations teams follow those detections, configure new analyses and download the results.",
+     "Batech desarrolla inteligencia artificial para el retail físico. Sus modelos miran las cámaras de cada sucursal y detectan eventos, como la apertura de una caja. La plataforma es donde los equipos de operaciones siguen esas detecciones, configuran nuevos análisis y descargan los resultados."),
+    ("I led the design of the platform from the first idea to launch: research and testing, flows and navigation, the interface and the component library in Figma. I also led the design team, which delivered <strong>10% faster</strong> over the project.",
+     "Lideré el diseño de la plataforma desde la primera idea hasta el lanzamiento: research y testing, flujos y navegación, la interfaz y la librería de componentes en Figma. También lideré al equipo de diseño, que entregó <strong>un 10% más rápido</strong> a lo largo del proyecto.")), "overview")
 
-body += chapter("Overview", f"""      <h2>AI that watches the store, and a place to read what it saw.</h2>
-      <div class="prose">
-        <p>Batech builds artificial intelligence for physical retail. Its models watch the cameras of every branch and detect events, such as a cash drawer opening at the till. The platform is where operations teams follow those detections, configure new analyses and download the results.</p>
-        <p>I led the design of the platform from the first idea to launch: research and testing, flows and navigation, the interface and the component library in Figma. I also led the design team, which delivered <strong>10% faster</strong> over the project.</p>
-      </div>""", "overview")
+body += chapter(T("The challenge", "El desafío"), h2("A technical setup that has to feel like a form.", "Una configuración técnica que tiene que sentirse como un formulario.") + prose(
+    ("Video analytics is full of concepts that are hard to explain: models, camera sources, RTSP links, geofences, execution schedules. And the people configuring an analysis shouldn’t need to be engineers.",
+     "El análisis de video está lleno de conceptos difíciles de explicar: modelos, fuentes de cámara, links RTSP, geocercas, horarios de ejecución. Y quien configura un análisis no debería necesitar ser ingeniero."),
+    ("At the same time the platform produces a lot of data: hundreds of pages of detections, each tied to a camera, a branch and a video that may or may not be processed yet.",
+     "Al mismo tiempo, la plataforma genera muchísimos datos: cientos de páginas de detecciones, cada una atada a una cámara, una sucursal y un video que puede estar procesado o no.")) +
+    f'      <p class="pull" data-reveal>{T("Make the setup read like a form, and make hundreds of detections easy to scan.", "Que la configuración se lea como un formulario, y que cientos de detecciones se puedan escanear de un vistazo.")}</p>\n', "challenge")
 
-body += chapter("The challenge", """      <h2>A technical setup that has to feel like a form.</h2>
-      <div class="prose">
-        <p>Video analytics is full of concepts that are hard to explain: models, camera sources, RTSP links, geofences, execution schedules. And the people configuring an analysis shouldn’t need to be engineers.</p>
-        <p>At the same time the platform produces a lot of data. Hundreds of pages of detections, each one tied to a camera, a branch and a video that may or may not be processed yet.</p>
+cards = [("Dashboard", "What is happening now: active cameras, total detections and rate.", "Qué pasa ahora: cámaras activas, detecciones totales y tasa."),
+         ("Eventos", "What was detected, with the camera frame and its video.", "Qué se detectó, con el cuadro de la cámara y su video."),
+         ("Alertas", "What needs attention right away.", "Qué necesita atención ya."),
+         ("Análisis", "What is being analyzed, and in which state.", "Qué se está analizando y en qué estado."),
+         ("Bitácora", "What happened, and when.", "Qué pasó y cuándo."),
+         ("Operativo", "How long operations take against what was expected.", "Cuánto tardan las operaciones contra lo esperado."),
+         ("Reportes", "What to share with the rest of the company.", "Qué compartir con el resto de la empresa.")]
+grid = '      <div class="grid-cards" data-reveal>' + "".join(f"<div><b>{n}</b><span>{T(e, s)}</span></div>" for n, e, s in cards) + "</div>\n"
+body += chapter(T("Structure", "Estructura"), h2("Seven sections, each answering one question.", "Siete secciones, cada una responde una pregunta.") + grid +
+                prose(("The dashboard above opens the platform: three numbers up top and the live analytics panel below, with the seven sections always one click away in the sidebar.",
+                       "El dashboard de arriba abre la plataforma: tres números arriba y el panel de analítica en vivo debajo, con las siete secciones siempre a un clic en la barra lateral.")), "structure")
+
+steps = [("Choose the source", "Elegir la fuente", "A video service, an RTSP link or an uploaded video file. Three branches that converge in the same form.", "Un servicio de video, un link RTSP o un archivo subido. Tres caminos que llegan al mismo formulario."),
+         ("Name it and pick a model", "Nombrarlo y elegir el modelo", "General aspects first: the detection model and a name the team will recognise later.", "Primero lo general: el modelo de detección y un nombre que el equipo reconozca después."),
+         ("Schedule it", "Programarlo", "Execution days as chips from Monday to Sunday, plus a start and end time.", "Los días de ejecución como chips de lunes a domingo, más una hora de inicio y de fin."),
+         ("Draw the geofence", "Dibujar la geocerca", "On a frame of the camera, the user outlines the area to analyze with the cursor and names it.", "Sobre un cuadro de la cámara, se marca con el cursor el área a analizar y se le pone nombre."),
+         ("Confirm", "Confirmar", "A dialog warns that the analysis can take hours, and says where to follow its progress and download the report.", "Un diálogo avisa que el análisis puede tardar horas y dice dónde seguir su progreso y descargar el reporte."),
+         ("Read the result", "Ver el resultado", "The geofence over the frame, the detections in a table and one button to download.", "La geocerca sobre el cuadro, las detecciones en una tabla y un botón para descargar.")]
+ol = '      <ol class="steps">' + "".join(f'<li data-reveal><span class="steps__n">{i + 1:02d}</span><div><h3>{T(a, b)}</h3><p>{T(c, d)}</p></div></li>' for i, (a, b, c, d) in enumerate(steps)) + "</ol>\n"
+flow = (f'      <figure class="shot" data-reveal><div class="flow" tabindex="0">{img(p, "b-flow", 3200, 718, "To-be flow for configuring an analysis, from source to report", "Flujo to-be para configurar un análisis, de la fuente al reporte", zoom=True)}</div>'
+        f'<figcaption>{T("<b>The to-be flow</b>, prototyped in high fidelity in Figma. Click it to open it full size.", "<b>El flujo to-be</b>, prototipado en alta fidelidad en Figma. Hacé clic para verlo en grande.")}</figcaption></figure>\n')
+body += chapter(T("Configuring an analysis", "Configurar un análisis"), h2("From camera to report in six steps.", "De la cámara al reporte en seis pasos.") + flow + ol +
+                "      " + pair(bf("b-geocerca", 1200, 1233, "Nuevo análisis · Geocerca", "Geofence creation over a parking lot camera frame", "Creación de geocerca sobre el cuadro de una cámara de estacionamiento",
+                                  "<b>Step 04.</b> The geofence is drawn on the real camera frame, not described in coordinates.", "<b>Paso 04.</b> La geocerca se dibuja sobre el cuadro real de la cámara, no se describe con coordenadas."),
+                              bf("b-confirm", 1200, 1396, "Nuevo análisis · Confirmación", "Confirmation dialog before starting the analysis", "Diálogo de confirmación antes de iniciar el análisis",
+                                 "<b>Step 05.</b> The dialog sets expectations: it may take hours, and here is where to check.", "<b>Paso 05.</b> El diálogo marca expectativas: puede tardar horas, y acá es donde se sigue.")) + "\n"
+                + "      " + bf("b-resultado", 1200, 1021, "Resultado de análisis", "Analysis result with the geofence highlighted and a table of detections", "Resultado del análisis con la geocerca resaltada y la tabla de detecciones",
+                               "<b>Step 06.</b> The highlighted area shows exactly what the model watched.", "<b>Paso 06.</b> El área resaltada muestra exactamente qué miró el modelo.") + "\n", "flow")
+
+ev = decision("Events as cards with the frame", "Eventos como tarjetas con el cuadro",
+              bullets(("The camera frame leads,", "El cuadro de la cámara va primero,", "so people recognise the scene before they read the ID.", "así se reconoce la escena antes de leer el ID."),
+                      ("Four filters", "Cuatro filtros", "above the grid: event ID, date range, detection type and branch.", "sobre la grilla: ID del evento, rango de fechas, tipo de detección y sucursal."),
+                      ("Video state in colour:", "El estado del video en color:", "a red bar when the video is not processed yet, a blue button when it can be watched.", "una barra roja cuando el video todavía no se procesó, un botón azul cuando ya se puede ver."),
+                      ("Pagination with jump-to-page,", "Paginación con salto a página,", "because there can be 300 pages.", "porque puede haber 300 páginas.")),
+              bf("b-eventos", 1200, 932, "Batech · Eventos detectados", "Grid of detected events with camera frames, filters and pagination", "Grilla de eventos detectados con cuadros de cámara, filtros y paginación"))
+ev += decision("Analyses and operational times", "Análisis y tiempos operativos",
+               f"<p>{T('The analysis table puts status last and in colour (retry, error, active, configured) so problems stand out in a long list. The operational view compares <strong>real time against expected time</strong> for each analysis and turns it into a percentage.', 'La tabla de análisis pone el estado al final y en color (reintento, error, activo, configurado) para que los problemas resalten en una lista larga. La vista operativa compara <strong>el tiempo real contra el esperado</strong> de cada análisis y lo convierte en un porcentaje.')}</p>",
+               pair(bf("b-analisis", 1200, 857, "Batech · Análisis", "Analysis table with coloured statuses", "Tabla de análisis con estados en color"),
+                    bf("b-operativos", 1200, 857, "Batech · Operativos", "Operational cards comparing real and expected time", "Tarjetas operativas que comparan el tiempo real y el esperado")))
+body += chapter(T("Events and operations", "Eventos y operación"), h2("Hundreds of pages, scannable at a glance.", "Cientos de páginas, legibles de un vistazo.") + ev, "events")
+
+body += chapter("Batech AI", h2("Ask the platform instead of building a report.", "Preguntarle a la plataforma en vez de armar un reporte.") + prose(
+    ("An assistant opens in a side panel over any screen. It opens with suggested questions, such as the most visited branch, the most recurrent event or the conversion rate, and accepts text, attachments and voice.",
+     "Un asistente se abre en un panel lateral sobre cualquier pantalla. Arranca con preguntas sugeridas, como la sucursal más visitada, el evento más recurrente o la tasa de conversión, y acepta texto, adjuntos y voz.")) +
+    "      " + bf("b-ai", 1200, 857, "Batech AI · New chat", "AI assistant panel with suggested questions", "Panel del asistente de IA con preguntas sugeridas") + "\n", "ai")
+
+body += chapter(T("Access and system", "Acceso y sistema"), h2("One dark system, from the login in.", "Un sistema oscuro, desde el login.") + prose(
+    ("Sign-in works with a phone or an email, switched with a segmented control. Every screen is built from the same Figma library (sidebar, filters, cards, tables, dialogs and pagination) on a dark theme with the brand’s cyan as the accent.",
+     "El ingreso funciona con teléfono o con email, que se cambian con un control segmentado. Cada pantalla sale de la misma librería de Figma (barra lateral, filtros, tarjetas, tablas, diálogos y paginación) sobre un tema oscuro con el cian de la marca como acento.")) +
+    "      " + bf("b-login", 1200, 857, "Batech · Iniciar sesión", "Login with phone or email tabs", "Login con pestañas de teléfono o email") + "\n", "system")
+
+body += chapter(T("Outcome", "Resultado"), h2("One place to set up, follow and share every analysis.", "Un solo lugar para configurar, seguir y compartir cada análisis.") +
+                f"""      <div class="numbers" data-reveal>
+        <div><b data-count="7">7</b><span>{T("sections in the navigation", "secciones en la navegación")}</span></div>
+        <div><b data-count="3">3</b><span>{T("video sources, one setup flow", "fuentes de video, un solo flujo")}</span></div>
+        <div><b data-count="6">6</b><span>{T("steps from camera to report", "pasos de la cámara al reporte")}</span></div>
+        <div><b data-count="10" data-suffix="%">10%</b><span>{T("faster delivery from the design team", "entregas más rápidas del equipo de diseño")}</span></div>
       </div>
-      <p class="pull">Make the setup read like a form, and make hundreds of detections easy to scan.</p>""", "challenge")
+""" + prose(("Alongside the platform I revamped Batech’s web and mobile interfaces with analytics and A/B testing to simplify key flows and reduce abandonment, and kept the design system in Figma consistent across both.",
+             "Además de la plataforma, rediseñé las interfaces web y mobile de Batech con analytics y A/B testing para simplificar flujos clave y bajar el abandono, y mantuve el design system en Figma consistente entre ambas.")) +
+                f'      <div class="btns" data-reveal><a class="btn" href="{FIGMA}" target="_blank" rel="noopener">{T("View in Figma", "Ver en Figma")} {arrow()}</a></div>\n', "outcome")
 
-body += chapter("Structure", f"""      <h2>Seven sections, each answering one question.</h2>
-      <div class="grid-cards">
-        <div><b>Dashboard</b><span>What is happening now: active cameras, total detections and rate.</span></div>
-        <div><b>Eventos</b><span>What was detected, with the camera frame and its video.</span></div>
-        <div><b>Alertas</b><span>What needs attention right away.</span></div>
-        <div><b>Análisis</b><span>What is being analyzed, and in which state.</span></div>
-        <div><b>Bitácora</b><span>What happened, and when.</span></div>
-        <div><b>Operativo</b><span>How long operations take against what was expected.</span></div>
-        <div><b>Reportes</b><span>What to share with the rest of the company.</span></div>
-      </div>
-      {fig("b-dashboard", 1200, 857, "Batech · Dashboard", "Dashboard with active cameras, total detections and rate", "<b>Dashboard.</b> Three numbers up top and the live analytics panel below; the sidebar keeps the seven sections one click away.")}""", "structure")
-
-body += chapter("Configuring an analysis", f"""      <h2>From camera to report in six steps.</h2>
-      <div class="prose"><p>I prototyped the to-be flow in high fidelity: three ways to connect a source, and one shared path from there to the report.</p></div>
-      <div class="flow" tabindex="0" aria-label="High-fidelity to-be flow, scroll sideways">{img(p, "b-flow", 3200, 718, "To-be flow for configuring an analysis, from source to report", zoom=True)}</div>
-      <ol class="steps">
-        <li><span class="steps__n">01</span><div><h3>Choose the source</h3><p>A video service, an RTSP link or an uploaded video file. Three branches that converge in the same form.</p></div></li>
-        <li><span class="steps__n">02</span><div><h3>Name it and pick a model</h3><p>General aspects first: the detection model and a name the team will recognise later.</p></div></li>
-        <li><span class="steps__n">03</span><div><h3>Schedule it</h3><p>Execution days as chips from Monday to Sunday, plus a start and end time.</p></div></li>
-        <li><span class="steps__n">04</span><div><h3>Draw the geofence</h3><p>On a frame of the camera, the user outlines the area to analyze with the cursor and names it.</p></div></li>
-        <li><span class="steps__n">05</span><div><h3>Confirm</h3><p>A dialog warns that the analysis can take hours, and says where to follow its progress and download the report.</p></div></li>
-        <li><span class="steps__n">06</span><div><h3>Read the result</h3><p>The geofence over the frame, the detections in a table and one button to download.</p></div></li>
-      </ol>
-      <div class="pair">
-        {fig("b-geocerca", 1200, 1233, "Nuevo análisis · Geocerca", "Geofence creation dialog over a parking lot camera frame", "<b>Step 04.</b> The geofence is drawn on the real camera frame, not described in coordinates.")}
-        {fig("b-confirm", 1200, 1396, "Nuevo análisis · Confirmación", "Confirmation dialog before starting the analysis", "<b>Step 05.</b> The dialog sets expectations: it may take hours, and here is where to check.")}
-      </div>
-      {fig("b-resultado", 1200, 1021, "Resultado de análisis", "Analysis result with the geofence highlighted and a table of detections", "<b>Step 06.</b> The highlighted area shows exactly what the model watched.")}""", "flow")
-
-body += chapter("Events and operations", f"""      <h2>Hundreds of pages, scannable at a glance.</h2>
-      <div class="decision">
-        <div class="decision__head">
-          <h3>Events as cards with the frame</h3>
-          <ul class="bullets">
-            <li><b>The camera frame leads</b>, so people recognise the scene before they read the ID.</li>
-            <li><b>Four filters</b> above the grid: event ID, date range, detection type and branch.</li>
-            <li><b>Video state in colour</b>: a red bar when the video is not processed yet, a blue button when it can be watched.</li>
-            <li><b>Pagination with jump-to-page</b>, because there can be 300 pages.</li>
-          </ul>
-        </div>
-        {fig("b-eventos", 1200, 932, "Batech · Eventos detectados", "Grid of detected events with camera frames, filters and pagination")}
-      </div>
-      <div class="decision">
-        <div class="decision__head">
-          <h3>Analyses and operational times</h3>
-          <div class="prose"><p>The analysis table puts status last and in colour (retry, error, active, configured) so problems stand out in a long list. The operational view compares <strong>real time against expected time</strong> for each analysis and turns it into a percentage.</p></div>
-        </div>
-        <div class="pair">
-          {fig("b-analisis", 1200, 857, "Batech · Análisis", "Analysis table with coloured statuses")}
-          {fig("b-operativos", 1200, 857, "Batech · Operativos", "Operational cards comparing real and expected time")}
-        </div>
-      </div>""", "events")
-
-body += chapter("Batech AI", f"""      <h2>Ask the platform instead of building a report.</h2>
-      <div class="prose"><p>An assistant opens in a side panel over any screen. It opens with suggested questions, such as the most visited branch, the most recurrent event or the conversion rate, and accepts text, attachments and voice.</p></div>
-      {fig("b-ai", 1200, 857, "Batech AI · New chat", "AI assistant panel with suggested questions")}""", "ai")
-
-body += chapter("Access and system", f"""      <h2>One dark system, from the login in.</h2>
-      <div class="prose"><p>Sign-in works with a phone or an email, switched with a segmented control. Every screen is built from the same Figma library (sidebar, filters, cards, tables, dialogs and pagination) on a dark theme with the brand’s cyan as the accent.</p></div>
-      {fig("b-login", 1200, 857, "Batech · Iniciar sesión", "Login with phone or email tabs")}""", "system")
-
-body += chapter("Outcome", f"""      <h2>One place to set up, follow and share every analysis.</h2>
-      <div class="numbers">
-        <div><b>7</b><span>sections in the navigation</span></div>
-        <div><b>3</b><span>video sources, one setup flow</span></div>
-        <div><b>6</b><span>steps from camera to report</span></div>
-        <div><b>10%</b><span>faster delivery from the design team</span></div>
-      </div>
-      <div class="prose"><p>Alongside the platform I revamped Batech’s web and mobile interfaces with analytics and A/B testing to simplify key flows and reduce abandonment, and kept the design system in Figma consistent across both.</p></div>
-      <div class="btns"><a class="btn" href="{FIGMA}" target="_blank" rel="noopener">View in Figma {arrow()}</a></div>""", "outcome")
-
-body += next_row("confidentally.html", "Confidentally")
-
-page = (head("Batech AI Platform Case Study", "Design of Batech's AI video analytics platform for retail. Case study by Julián Gerardi.", p)
-        + SPRITE + nav(p, on_home=False) + '\n<main class="shell" id="main">\n' + body + footer(p)
-        + '  <div class="row shell-end" aria-hidden="true"></div>\n</main>\n' + tail(p, lightbox=True))
-open(os.path.join(ROOT, "work", "batech.html"), "w").write(page)
+page = case_page(p, FN, "Batech AI Platform", "Batech AI Platform",
+                 "Design of Batech's AI video analytics platform for retail. Case study by Julián Gerardi.",
+                 "Diseño de la plataforma de análisis de video con IA de Batech para retail. Caso de Julián Gerardi.", body)
+open(os.path.join(ROOT, "work", FN), "w").write(page)
 print("batech ok", len(page))

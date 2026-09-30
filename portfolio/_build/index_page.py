@@ -5,187 +5,218 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 p = ""
 BRANDS = ["Batech", "Icarus Digital Marketing", "Bahco", "Datachain Summit", "Blue CP Construction",
           "Azure Printed Homes", "Gloob Marketing", "Cuponstar", "Vieja Cubana", "GRILL"]
-
-
-def project(href, cover, title, year, desc, badges, external=False, extra=""):
-    tgt = ' target="_blank" rel="noopener"' if external else ""
-    b = "".join(badges)
-    return f"""        <a class="cell spot project{extra}" href="{href}"{tgt}>
-          {cover}
-          <div class="project__meta">
-            <div class="project__top"><h3>{title} {arrow()}</h3><span class="mono muted">{year}</span></div>
-            <p>{desc}</p>
-            <div class="badges">{b}</div>
-          </div>
-        </a>
-"""
-
-
-def badge(t):
-    return f'<span class="badge">{t}</span>'
-
-
-NDA = '<span class="badge badge--nda"><svg aria-hidden="true"><use href="#i-lock"/></svg>NDA · password</span>'
-
 marquee = "".join(f"<li>{b}</li>" for b in BRANDS)
 
 XP = [
-    ("May 2025 — Now", "Lead UX/UI Designer", "Confidential company · AI product, pre-launch · Miami, US",
-     "<p>End-to-end design of an AI-assisted product, from information architecture and journeys to a functional web-app prototype built with Figma and Claude.</p><p>Running research and usability testing, and leading the pre-launch validation stage with the development team.</p>"),
-    ("Nov 2023 — Nov 2025", "Senior UX/UI Designer", "Icarus Digital Marketing · Ireland · Remote",
-     "<p>Led a digital platform from idea to launch: research, usability testing, flows and a UI redesign focused on reducing abandonment.</p><p>Managed the creative team. The refreshed identity drove a <b>20% rise in brand recognition</b>.</p>"),
-    ("Feb 2022 — May 2026", "Lead UX/UI Designer", "Batech · Querétaro, MX · Remote",
-     "<p>Designed Batech’s AI video analytics platform end to end and revamped web and mobile flows with analytics and A/B testing to cut abandonment.</p><p>Built the Figma design system and led the design team to <b>10% faster delivery</b>; content drove <b>+25% social engagement</b>.</p>"),
-    ("Aug 2019 — Oct 2023", "Digital Designer", "Freelance &amp; contract · US, Mexico, Argentina",
-     "<p><b>Datachain Summit</b>: identity redesign (+25% recognition) and a delivery process 40% faster. <b>Blue CP Construction</b>: +40% engagement in 3 months.</p><p>Also Azure Printed Homes, Gloob Marketing and Cuponstar.</p>"),
-    ("Jan 2019 — Mar 2022", "Co-founder &amp; CEO", "Vieja Cubana · Mercedes, AR",
-     "<p>Digital strategy behind online revenue; creative team delivering <b>15% faster</b> with <b>+25% client referrals</b>.</p>"),
-    ("Jul 2018 — Jul 2025", "Senior Digital Designer", "Bahco Argentina · Buenos Aires · Remote",
-     "<p>Graphic communication for <b>5 Latin American markets</b> and the brand refresh behind a <b>20% rise in recognition</b>.</p>"),
-    ("May 2016 — Oct 2016", "Trainee Graphic Designer", "Orsonia Interactive Ideas · Buenos Aires",
-     "<p>Campaigns and content for Amdia, Adblick and Bisblick.</p>"),
+    ("May 2025 — Now", "May 2025 — Hoy", "Lead UX/UI Designer", "Lead UX/UI Designer",
+     "Confidential company · AI product, pre-launch · Miami, US", "Empresa confidencial · producto de IA, pre-lanzamiento · Miami, EE. UU.",
+     "End-to-end design of an AI-assisted product, from information architecture and journeys to a functional web-app prototype built with Figma and Claude. I run research and usability testing and lead the pre-launch validation with the development team.",
+     "Diseño de punta a punta de un producto asistido por IA, desde la arquitectura de información y los journeys hasta un prototipo web funcional hecho con Figma y Claude. Hago research y tests de usabilidad y lidero la validación previa al lanzamiento con el equipo de desarrollo."),
+    ("Nov 2023 — Nov 2025", "Nov 2023 — Nov 2025", "Senior UX/UI Designer", "Senior UX/UI Designer",
+     "Icarus Digital Marketing · Ireland · Remote", "Icarus Digital Marketing · Irlanda · Remoto",
+     "Led a digital platform from idea to launch: research, usability testing, flows and a UI redesign focused on reducing abandonment. Managed the creative team; the refreshed identity drove a <b>20% rise in brand recognition</b>.",
+     "Lideré una plataforma digital de la idea al lanzamiento: research, tests de usabilidad, flujos y un rediseño de UI enfocado en bajar el abandono. Dirigí al equipo creativo; la nueva identidad logró <b>un 20% más de reconocimiento de marca</b>."),
+    ("Feb 2022 — May 2026", "Feb 2022 — May 2026", "Lead UX/UI Designer", "Lead UX/UI Designer",
+     "Batech · Querétaro, MX · Remote", "Batech · Querétaro, MX · Remoto",
+     "Designed Batech’s AI video analytics platform end to end and revamped web and mobile flows with analytics and A/B testing to cut abandonment. Built the Figma design system and led the design team to <b>10% faster delivery</b>.",
+     "Diseñé de punta a punta la plataforma de análisis de video con IA de Batech y rediseñé los flujos web y mobile con analytics y A/B testing para bajar el abandono. Armé el design system en Figma y lideré al equipo de diseño a <b>entregas un 10% más rápidas</b>."),
+    ("Aug 2019 — Oct 2023", "Ago 2019 — Oct 2023", "Digital Designer", "Diseñador digital",
+     "Freelance &amp; contract · US, Mexico, Argentina", "Freelance y contrato · EE. UU., México, Argentina",
+     "<b>Datachain Summit</b>: identity redesign (+25% recognition) and a delivery process 40% faster. <b>Blue CP Construction</b>: +40% engagement in 3 months. Also Azure Printed Homes, Gloob Marketing and Cuponstar.",
+     "<b>Datachain Summit</b>: rediseño de identidad (+25% de reconocimiento) y un proceso de entrega 40% más rápido. <b>Blue CP Construction</b>: +40% de engagement en 3 meses. También Azure Printed Homes, Gloob Marketing y Cuponstar."),
+    ("Jan 2019 — Mar 2022", "Ene 2019 — Mar 2022", "Co-founder &amp; CEO", "Cofundador y CEO",
+     "Vieja Cubana · Mercedes, AR", "Vieja Cubana · Mercedes, AR",
+     "Digital strategy behind online revenue; a creative team delivering <b>15% faster</b> with <b>+25% client referrals</b>.",
+     "Estrategia digital detrás de las ventas online; un equipo creativo que entregó <b>un 15% más rápido</b> con <b>+25% de recomendaciones</b>."),
+    ("Jul 2018 — Jul 2025", "Jul 2018 — Jul 2025", "Senior Digital Designer", "Senior Digital Designer",
+     "Bahco Argentina · Buenos Aires · Remote", "Bahco Argentina · Buenos Aires · Remoto",
+     "Graphic communication for <b>5 Latin American markets</b> and the brand refresh behind a <b>20% rise in recognition</b>.",
+     "Comunicación gráfica para <b>5 mercados de Latinoamérica</b> y el refresh de marca que sumó <b>un 20% de reconocimiento</b>."),
+    ("May 2016 — Oct 2016", "May 2016 — Oct 2016", "Trainee Graphic Designer", "Diseñador gráfico trainee",
+     "Orsonia Interactive Ideas · Buenos Aires", "Orsonia Interactive Ideas · Buenos Aires",
+     "Campaigns and content for Amdia, Adblick and Bisblick.", "Campañas y contenido para Amdia, Adblick y Bisblick."),
 ]
-xp = "".join(f"""      <li class="xp__item">
-        <span class="xp__when">{w}</span>
-        <div><div class="xp__role">{r}</div><div class="xp__org">{o}</div></div>
-        <div class="xp__notes">{n}</div>
+xp = "".join(f"""      <li class="xp__item" data-reveal>
+        <span class="xp__when">{T(we, ws)}</span>
+        <div><div class="xp__role">{T(re, rs)}</div><div class="xp__org">{T(oe, os_)}</div></div>
+        <p class="xp__notes">{T(ne, ns)}</p>
       </li>
-""" for w, r, o, n in XP)
+""" for we, ws, re, rs, oe, os_, ne, ns in XP)
 
-page = head("Julián Gerardi",
-            "Julián Gerardi, Senior Product Designer. SaaS products designed end to end, from research to design systems and working prototypes built with AI.") + SPRITE + nav(p) + f"""
-<div class="shell" id="main">
-  <section class="row row--plain hero">
-    <div class="hero__lines" aria-hidden="true"></div>
-    <div class="hero__glow" aria-hidden="true"></div>
-    <div class="hero__inner">
-      <div class="who rise" style="--d:0s">
+STEPS = [
+    ("Research", "Research", "Interviews, usability tests and analytics, plus an audit of screens, components and the rules nobody wrote down.",
+     "Entrevistas, tests de usabilidad y analytics, más una auditoría de pantallas, componentes y las reglas que nadie escribió."),
+    ("Structure", "Estructura", "Information architecture, user flows and journeys. Navigation is agreed before any pixel.",
+     "Arquitectura de información, flujos y journeys. La navegación se acuerda antes que cualquier pixel."),
+    ("Design", "Diseño", "High-fidelity UI in Figma on a design system and component library shared by web and mobile.",
+     "UI de alta fidelidad en Figma sobre un design system y una librería de componentes compartida por web y mobile."),
+    ("Prototype", "Prototipo", "Functional web-app prototypes built with Claude and Cursor, so stakeholders test the real flow.",
+     "Prototipos web funcionales hechos con Claude y Cursor, para que se pruebe el flujo real."),
+    ("Validate &amp; ship", "Validar y lanzar", "Usability testing, A/B tests and KPIs, then handoff with developers on technical feasibility.",
+     "Tests de usabilidad, A/B testing y KPIs, y después el handoff con desarrollo sobre la factibilidad técnica."),
+]
+steps = "".join(f"""      <li class="step" data-reveal style="--k:{i}"><span class="step__n">{i + 1:02d}</span><h3>{T(a, b)}</h3><p>{T(c, d)}</p></li>
+""" for i, (a, b, c, d) in enumerate(STEPS))
+
+tools = "".join(f'<span class="badge">{t}</span>' for t in ["Figma", "Claude", "Cursor", "Gemini", "Midjourney", "Freepik Spaces", "Storybook", "Photoshop", "Illustrator", "InDesign"])
+
+work = "".join([
+    wl_item(p, 1, "work/batech.html", "Batech AI Platform", T("AI · Computer vision · Dashboard", "IA · Visión artificial · Dashboard"), "2022–26", tiles_batech(p),
+            T("Computer-vision analytics for retail branches: camera events, geofences drawn on live video, operational times and an AI assistant for every store.",
+              "Analítica con visión artificial para sucursales: eventos de cámaras, geocercas dibujadas sobre el video, tiempos operativos y un asistente de IA para cada tienda."),
+            T("Lead UX/UI — research, flows, UI, design system", "Lead UX/UI — research, flujos, UI, design system"), is_open=True),
+    wl_item(p, 2, "work/confidentally.html", "Confidentally", T("SaaS · Healthcare · Prototype", "SaaS · Salud · Prototipo"), "2026", tiles_dental(p),
+            T("Redesign of a dental practice platform, from the front desk to the dental chair, rebuilt as a working prototype on mock data.",
+              "Rediseño de una plataforma para clínicas dentales, de la recepción al sillón, reconstruida como prototipo funcional con datos de prueba."),
+            T("Lead product designer — audit, UX, UI, coded prototype", "Lead product designer — auditoría, UX, UI, prototipo en código"), nda=True),
+    wl_item(p, 3, "work/confidentally-ui.html", "Confidentally UI", T("Design system · AI builder", "Design system · Builder con IA"), "2026", tiles_ds(p),
+            T("A living design system that reads the app’s own code, with a search that understands Spanish and a Builder that assembles screens with AI.",
+              "Un design system vivo que lee el código de la app, con un buscador que entiende español y un Builder que arma pantallas con IA."),
+            T("Design system lead — tokens, docs site, audit scripts, builder", "Design system lead — tokens, sitio de documentación, auditoría, builder")),
+    wl_item(p, 4, "work/grill.html", "GRILL Empresas", T("Food service · Mobile · Two apps", "Gastronomía · Mobile · Dos apps"), "2026", tiles_grill(p),
+            T("Corporate lunch ordering for a kitchen in Mercedes: employees pick the day’s meal on their phone, the kitchen runs tickets, labels and delivery.",
+              "Pedidos de almuerzo para empresas de una cocina en Mercedes: los empleados eligen la vianda desde el celular y la cocina maneja comandas, etiquetas y reparto."),
+            T("Product design — flows, UI, working prototype", "Diseño de producto — flujos, UI, prototipo funcional")),
+    wl_item(p, 5, "work/mercado-play.html", "Mercado Play", T("Streaming · UX/UI challenge", "Streaming · Challenge UX/UI"), "2026", tiles_mp(p),
+            T("A UX/UI challenge for Mercado Libre’s free streaming service, presented as a Figma file with its own cover system.",
+              "Un challenge UX/UI para el servicio de streaming gratuito de Mercado Libre, presentado en Figma con su propio sistema de portada."),
+            T("UX/UI challenge — version 2.0 · Figma", "Challenge UX/UI — versión 2.0 · Figma")),
+])
+
+INTRO = """<script>(function(){var d=document.documentElement;try{if(sessionStorage.getItem('jg-intro'))return;}catch(e){}if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('is-loading','intro');setTimeout(function(){d.classList.remove('is-loading');},7000);})();</script>
+<script src="assets/banner.js" defer></script>
+"""
+LOADER = f"""<div class="loader" aria-hidden="true">
+  <div class="loader__top"><span>Julián Gerardi</span><span>{T("Senior Product Designer", "Senior Product Designer")}</span><span>{T("Portfolio", "Portfolio")} ’26</span></div>
+  <div class="loader__words"><span>{T("Research", "Research")}</span><span>{T("Systems", "Sistemas")}</span><span>{T("Interfaces", "Interfaces")}</span><span>{T("Prototypes", "Prototipos")}</span></div>
+  <div class="loader__bottom"><span class="loader__count" data-loader-count>0</span><span class="loader__label">{T("Loading selected work", "Cargando trabajos")}</span></div>
+  <div class="loader__bar"><i data-loader-bar></i></div>
+</div>
+"""
+
+cv_attrs = f'href="{CV}" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv'
+
+page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Senior Product Designer",
+            "Julián Gerardi, Senior Product Designer. SaaS products designed end to end, from research to design systems and working prototypes built with AI.",
+            "Julián Gerardi, Senior Product Designer. Productos SaaS diseñados de punta a punta, del research al design system y prototipos funcionales hechos con IA.",
+            p, extra_scripts=INTRO) + SPRITE + LOADER + nav(p) + f"""
+<main id="main">
+  <section class="hero">
+    <div class="wrap hero__top">
+      <div class="who rise" style="--d:.1s">
         <span class="who__avatar" aria-hidden="true">JG</span>
-        <span class="who__text"><b>Julián Gerardi</b><span>Senior Product Designer</span></span>
-        <span class="status"><i aria-hidden="true"></i>Open to remote roles</span>
+        <span class="who__text"><b>Senior Product Designer</b><span>{T("Lead UX/UI · AI-assisted product design", "Lead UX/UI · Diseño de producto asistido por IA")}</span></span>
       </div>
-      <h1 class="hero__title split">Designing SaaS products <span class="dim">from the first interview to a prototype you can click.</span></h1>
-      <p class="hero__sub rise" style="--d:.55s">Lead UX/UI designer for B2B and B2C teams in the United States, Mexico, Ireland and Latin America. Research, flows, design systems and high-fidelity UI, with an AI-assisted workflow that turns ideas into working web apps.</p>
-      <div class="btns hero__ctas rise" style="--d:.7s">
-        <a class="btn" href="#work">View work {arrow()}</a>
-        <a class="btn btn--ghost" href="#contact">Get in touch</a>
+      <span class="status rise" style="--d:.2s"><i aria-hidden="true"></i>{T("Open to remote roles", "Disponible para trabajo remoto")}</span>
+    </div>
+    <div class="banner" data-banner>
+      <h1 class="sr-only">Julián Gerardi</h1>
+      <div class="banner__text" aria-hidden="true">Julián Gerardi</div>
+      <canvas class="banner__canvas" aria-hidden="true"></canvas>
+      <p class="banner__hint mono">{T("Move the cursor over my name", "Pasá el cursor sobre mi nombre")}</p>
+    </div>
+    <div class="wrap hero__bottom">
+      <h2 class="hero__title split">{T('Designing SaaS products <span class="dim">from the first interview to a prototype you can click.</span>', 'Diseño productos SaaS <span class="dim">desde la primera entrevista hasta un prototipo que se puede clickear.</span>')}</h2>
+      <div class="hero__side rise" style="--d:.6s">
+        <p>{T("Lead UX/UI designer for B2B and B2C teams in the United States, Mexico, Ireland and Latin America. Research, flows, design systems and high-fidelity UI, with an AI-assisted workflow that turns ideas into working web apps.",
+              "Lead UX/UI para equipos B2B y B2C de Estados Unidos, México, Irlanda y Latinoamérica. Research, flujos, design systems y UI de alta fidelidad, con un flujo de trabajo asistido por IA que convierte ideas en web apps funcionales.")}</p>
+        <div class="btns">
+          <a class="btn" href="#work">{T("View work", "Ver trabajos")} {arrow("i-down")}</a>
+          <a class="btn btn--ghost" {cv_attrs}>{T("Download CV", "Descargar CV")}</a>
+          <button class="btn btn--ghost" type="button" data-open-agent><svg aria-hidden="true"><use href="#i-spark"/></svg>{T("Ask my AI", "Preguntale a mi IA")}</button>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="row">
-    <div class="cells stats">
-      <div class="cell stat"><b>8+</b><span>years designing products and brands</span></div>
-      <div class="cell stat"><b>4</b><span>countries: US, Mexico, Ireland, Argentina</span></div>
-      <div class="cell stat"><b>5</b><span>Latin American markets for Bahco</span></div>
-      <div class="cell stat"><b>10%</b><span>faster delivery leading Batech’s design team</span></div>
-    </div>
+  <section class="wrap stats" aria-label="Highlights">
+    <div class="stat" data-reveal style="--k:0"><b data-count="8" data-suffix="+">8+</b><span>{T("years designing products and brands", "años diseñando productos y marcas")}</span></div>
+    <div class="stat" data-reveal style="--k:1"><b data-count="4">4</b><span>{T("countries: US, Mexico, Ireland, Argentina", "países: EE. UU., México, Irlanda, Argentina")}</span></div>
+    <div class="stat" data-reveal style="--k:2"><b data-count="5">5</b><span>{T("Latin American markets for Bahco", "mercados de Latinoamérica para Bahco")}</span></div>
+    <div class="stat" data-reveal style="--k:3"><b data-count="10" data-suffix="%">10%</b><span>{T("faster delivery leading Batech’s design team", "entregas más rápidas liderando el equipo de Batech")}</span></div>
   </section>
 
-  <section class="row" aria-label="Teams and brands I have worked with">
-    <div class="marquee"><div class="marquee__row">
+  <section class="marquee" aria-label="Brands">
+    <div class="marquee__row" data-marquee>
       <ul class="marquee__list">{marquee}</ul>
       <ul class="marquee__list" aria-hidden="true">{marquee}</ul>
-    </div></div>
-  </section>
-
-  <section class="row" id="work">
-    <div class="wl">
-      <div class="wl-top"><b>Selected work</b><span>Five projects · 2022–2026</span></div>
-      <ol class="wl-list">
-{wl_item(p, 1, "work/batech.html", "Batech AI Platform", "AI · Computer vision · Dashboard", "2022–26", tiles_batech(p),
-         "Computer-vision analytics for retail branches: camera events, geofences drawn on live video, operational times and an AI assistant for every store.",
-         "Lead UX/UI — research, flows, UI, design system", is_open=True)}{wl_item(p, 2, "work/confidentally.html", "Confidentally", "SaaS · Healthcare · Prototype", "2026", tiles_dental(p),
-         "Redesign of a dental practice platform, from the front desk to the dental chair, rebuilt as a working prototype on mock data.",
-         "Lead product designer — audit, UX, UI, coded prototype", nda=True)}{wl_item(p, 3, "work/confidentally-ui.html", "Confidentally UI", "Design system · AI builder", "2026", tiles_ds(p),
-         "A living design system that reads the app’s own code, with a search that understands Spanish and a Builder that assembles screens with AI.",
-         "Design system lead — tokens, docs site, audit scripts, builder")}{wl_item(p, 4, "work/grill.html", "GRILL Empresas", "Food service · Mobile · Two apps", "2026", tiles_grill(p),
-         "Corporate lunch ordering for a kitchen in Mercedes: employees pick the day’s meal on their phone, the kitchen runs tickets, labels and delivery.",
-         "Product design — flows, UI, working prototype")}{wl_item(p, 5, "work/mercado-play.html", "Mercado Play", "Streaming · UX/UI challenge", "2026", tiles_mp(p),
-         "A UX/UI challenge for Mercado Libre’s free streaming service, presented as a Figma file with its own cover system.",
-         "UX/UI challenge — version 2.0 · Figma")}      </ol>
     </div>
   </section>
 
-  <section class="row" id="process">
-    <div class="cell section-head reveal">
-      <div><div class="label">Process</div><h2>How a project moves from question to shipped product.</h2></div>
-      <p>The stages stay the same from project to project. What changes is how long each one takes.</p>
-    </div>
-  </section>
-  <section class="row">
-    <ol class="cells process">
-      <li class="cell spot"><span class="process__n">01</span><h3>Research</h3><p>Interviews, usability tests and analytics, plus an audit of screens, components and the rules nobody wrote down.</p></li>
-      <li class="cell spot"><span class="process__n">02</span><h3>Structure</h3><p>Information architecture, user flows and journeys. Navigation is agreed before any pixel.</p></li>
-      <li class="cell spot"><span class="process__n">03</span><h3>Design</h3><p>High-fidelity UI in Figma on a design system and component library shared by web and mobile.</p></li>
-      <li class="cell spot"><span class="process__n">04</span><h3>Prototype</h3><p>Functional web-app prototypes built with Claude and Cursor, so stakeholders test the real flow.</p></li>
-      <li class="cell spot"><span class="process__n">05</span><h3>Validate &amp; ship</h3><p>Usability testing, A/B tests and KPIs, then handoff with developers on technical feasibility.</p></li>
-    </ol>
-  </section>
-  <section class="row">
-    <div class="cell tools" style="padding-block:20px">
-      <span class="mono muted" style="margin-right:6px">TOOLKIT</span>
-      {''.join(badge(t) for t in ["Figma", "Claude", "Cursor", "Gemini", "Midjourney", "Freepik Spaces", "Storybook", "Photoshop", "Illustrator", "InDesign"])}
-    </div>
+  <section class="work" id="work">
+    <div class="wrap wl-top" data-reveal><b>{T("Selected work", "Trabajos seleccionados")}</b><span>{T("Five projects · 2022–2026", "Cinco proyectos · 2022–2026")}</span></div>
+    <ol class="wl-list">
+{work}    </ol>
   </section>
 
-  <section class="row" id="experience">
-    <div class="cell section-head reveal">
-      <div><div class="label">Experience</div><h2>Ten years between product, brand and teams.</h2></div>
-      <p>2016 to today, remote for teams in four countries.</p>
+  <section class="wrap section" id="process">
+    <div class="section-head">
+      <div class="label" data-reveal>{T("Process", "Proceso")}</div>
+      <h2 class="lines">{T("How a project moves from question to shipped product.", "Cómo un proyecto pasa de una pregunta a un producto lanzado.")}</h2>
+      <p data-reveal>{T("The stages stay the same from project to project. What changes is how long each one takes.", "Las etapas son las mismas en cada proyecto. Lo que cambia es cuánto dura cada una.")}</p>
     </div>
+    <ol class="steps-grid">
+{steps}    </ol>
+    <div class="tools" data-reveal><span class="mono muted">{T("TOOLKIT", "HERRAMIENTAS")}</span>{tools}</div>
   </section>
-  <section class="row">
-    <ol class="xp" style="margin-top:-1px">
+
+  <section class="wrap section" id="experience">
+    <div class="section-head">
+      <div class="label" data-reveal>{T("Experience", "Experiencia")}</div>
+      <h2 class="lines">{T("Ten years between product, brand and teams.", "Diez años entre producto, marca y equipos.")}</h2>
+      <p data-reveal>{T("2016 to today, remote for teams in four countries.", "De 2016 a hoy, en remoto para equipos de cuatro países.")}</p>
+    </div>
+    <ol class="xp">
 {xp}    </ol>
   </section>
 
-  <section class="row" id="about">
-    <div class="cells about">
-      <div class="cell about__bio reveal">
-        <div class="label">About</div>
-        <p>I trained as an art director, so I care how a product looks. Years of SaaS work taught me to care more about how it behaves on a busy Tuesday.</p>
-        <p>I lead product design from research and information architecture to design systems, high-fidelity UI and interactive prototypes, and I measure the result with analytics and A/B testing.</p>
-        <p>My workflow runs through AI: Claude and Cursor to build functional prototypes, Midjourney and Freepik Spaces to explore visual directions. A small team can test more ideas with real users before committing to one.</p>
-      </div>
-      <div class="cell reveal">
-        <div class="list"><h3>Education</h3><ul>
-          <li>Bachelor’s in Advertising Art Direction, Universidad de Palermo <span>2011–16</span></li>
-          <li>Advertising Creative Technician, Universidad de Palermo <span>2011–14</span></li>
-          <li>UX/UI Design Program, Coderhouse <span>2019</span></li>
-        </ul></div>
-        <div class="list"><h3>Awards &amp; talks</h3><ul>
-          <li>Speaker, XII Latin American Design Meeting <span>Talk</span></li>
-          <li>Creativity Award, Imágenes Creativas <span>Award</span></li>
-          <li>Award, Universidad de Palermo <span>Award</span></li>
-          <li>“Mundos digitales”, Jueves de Networking DC <span>Interview</span></li>
-        </ul></div>
-        <div class="list"><h3>Languages</h3><ul>
-          <li>Spanish <span>Native</span></li>
-          <li>English <span>Full professional</span></li>
-          <li>Italian <span>Professional working</span></li>
-        </ul></div>
-      </div>
+  <section class="wrap section about" id="about">
+    <div class="about__bio">
+      <div class="label" data-reveal>{T("About", "Sobre mí")}</div>
+      <p class="about__lead lines">{T("I trained as an art director, so I care how a product looks. Years of SaaS work taught me to care more about how it behaves on a busy Tuesday.",
+                                   "Me formé como director de arte, así que me importa cómo se ve un producto. Años de SaaS me enseñaron que importa más cómo se comporta un martes cualquiera.")}</p>
+      <p data-reveal>{T("I lead product design from research and information architecture to design systems, high-fidelity UI and interactive prototypes, and I measure the result with analytics and A/B testing.",
+                       "Lidero el diseño de producto desde el research y la arquitectura de información hasta el design system, la UI de alta fidelidad y los prototipos interactivos, y mido el resultado con analytics y A/B testing.")}</p>
+      <p data-reveal>{T("My workflow runs through AI: Claude and Cursor to build functional prototypes, Midjourney and Freepik Spaces to explore visual directions. A small team can test more ideas with real users before committing to one.",
+                       "Mi flujo de trabajo pasa por la IA: Claude y Cursor para prototipos funcionales, Midjourney y Freepik Spaces para explorar direcciones visuales. Un equipo chico puede probar más ideas con usuarios reales antes de elegir una.")}</p>
+      <div class="btns" data-reveal><a class="btn" {cv_attrs}>{arrow("i-down")}{T("Download CV", "Descargar CV")}</a></div>
+    </div>
+    <div class="about__lists">
+      <div class="list" data-reveal><h3>{T("Education", "Formación")}</h3><ul>
+        <li><span>{T("Bachelor’s in Advertising Art Direction", "Licenciatura en Dirección de Arte Publicitario")}, Universidad de Palermo</span><em>2011–16</em></li>
+        <li><span>{T("Advertising Creative Technician", "Técnico en Creatividad Publicitaria")}, Universidad de Palermo</span><em>2011–14</em></li>
+        <li><span>{T("UX/UI Design Program", "Carrera de Diseño UX/UI")}, Coderhouse</span><em>2019</em></li>
+      </ul></div>
+      <div class="list" data-reveal><h3>{T("Awards &amp; talks", "Premios y charlas")}</h3><ul>
+        <li><span>{T("Speaker, XII Latin American Design Meeting", "Orador, XII Encuentro Latinoamericano de Diseño")}</span><em>{T("Talk", "Charla")}</em></li>
+        <li><span>{T("Creativity Award, Imágenes Creativas", "Premio a la Creatividad, Imágenes Creativas")}</span><em>{T("Award", "Premio")}</em></li>
+        <li><span>{T("Award, Universidad de Palermo", "Premio, Universidad de Palermo")}</span><em>{T("Award", "Premio")}</em></li>
+        <li><span>“Mundos digitales”, Jueves de Networking DC</span><em>{T("Interview", "Entrevista")}</em></li>
+      </ul></div>
+      <div class="list" data-reveal><h3>{T("Languages", "Idiomas")}</h3><ul>
+        <li><span>{T("Spanish", "Español")}</span><em>{T("Native", "Nativo")}</em></li>
+        <li><span>{T("English", "Inglés")}</span><em>{T("Full professional", "Profesional completo")}</em></li>
+        <li><span>{T("Italian", "Italiano")}</span><em>{T("Professional working", "Profesional")}</em></li>
+      </ul></div>
     </div>
   </section>
 
-  <section class="row contact" id="contact">
-    <div class="hero__glow" aria-hidden="true"></div>
-    <div class="contact__inner reveal">
-      <div class="label">Contact</div>
-      <h2>Let’s build something people want to use.</h2>
-      <p>Open to senior and lead product design roles, remote, and to freelance projects.</p>
-      <span class="copy"><span data-copy-text>{EMAIL}</span><button type="button" data-copy="{EMAIL}">Copy</button></span>
-      <div class="btns" style="justify-content:center">
+  <section class="contact" id="contact">
+    <div class="contact__glow" aria-hidden="true"></div>
+    <div class="wrap contact__inner">
+      <div class="label" data-reveal>{T("Contact", "Contacto")}</div>
+      <h2 class="lines">{T("Let’s build something people want to use.", "Construyamos algo que la gente quiera usar.")}</h2>
+      <p data-reveal>{T("Open to senior and lead product design roles, remote, and to freelance projects.", "Disponible para roles senior y lead de diseño de producto, en remoto, y para proyectos freelance.")}</p>
+      <span class="copy" data-reveal><span data-copy-text>{EMAIL}</span><button type="button" data-copy="{EMAIL}">{T("Copy", "Copiar")}</button></span>
+      <div class="btns" data-reveal>
         <a class="btn" href="{LINKEDIN}" target="_blank" rel="noopener">LinkedIn {arrow()}</a>
         <a class="btn btn--ghost" href="{BEHANCE}" target="_blank" rel="noopener">Behance {arrow()}</a>
+        <a class="btn btn--ghost" {cv_attrs}>{T("Download CV", "Descargar CV")}</a>
       </div>
     </div>
   </section>
-
-{footer(p)}  <div class="row shell-end" aria-hidden="true"></div>
-</div>
-""" + tail(p)
+</main>
+""" + footer(p) + tail(p)
 
 open(os.path.join(ROOT, "index.html"), "w").write(page)
 print("index ok", len(page))

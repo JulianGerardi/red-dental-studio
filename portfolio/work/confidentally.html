@@ -1,21 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-lang="en" data-title-en="Confidentally · Julián Gerardi" data-title-es="Confidentally · Julián Gerardi">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Confidentally Case Study</title>
-<meta name="description" content="Redesign of a dental practice platform. Case study by Julián Gerardi.">
+<title>Confidentally · Julián Gerardi</title>
+<meta name="description" content="Redesign of a dental practice platform. Case study by Julián Gerardi." data-es="Rediseño de una plataforma para clínicas dentales. Caso de Julián Gerardi.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23171717'/%3E%3Ctext x='16' y='20.5' font-family='Arial' font-weight='700' font-size='11' text-anchor='middle' fill='%23fff'%3EJG%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&amp;family=Geist+Mono:wght@400..600&amp;display=swap">
 <link rel="stylesheet" href="../assets/site.css">
-<script>try{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script>(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);var l=localStorage.getItem('jg-lang');if(!l)l=(navigator.language||'').toLowerCase().indexOf('es')===0?'es':'en';d.setAttribute('data-lang',l);d.lang=l;}catch(e){}})();</script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js" defer></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12M6 11l6 6 6-6M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
@@ -24,178 +28,202 @@
   <symbol id="i-cursor" viewBox="0 0 20 20"><path d="M3 2.2 17.2 8.6l-6.1 1.9-2.3 6.3Z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3c.6 4.2 2.8 6.4 7 7-4.2.6-6.4 2.8-7 7-.6-4.2-2.8-6.4-7-7 4.2-.6 6.4-2.8 7-7Z" fill="currentColor"/><path d="M19 15.5c.25 1.6 1 2.35 2.5 2.5-1.5.15-2.25.9-2.5 2.5-.25-1.6-1-2.35-2.5-2.5 1.5-.15 2.25-.9 2.5-2.5Z" fill="currentColor"/></symbol>
 </svg>
-<a class="skip" href="#main">Skip to content</a>
+<a class="skip" href="#main"><span lang="en">Skip to content</span><span lang="es">Ir al contenido</span></a>
 <header class="nav">
   <div class="nav__inner">
-    <a class="brand" href="../index.html" aria-label="Julián Gerardi, home"><span class="brand__mark" aria-hidden="true">JG</span>Julián Gerardi</a>
+    <a class="brand" href="../index.html" aria-label="Julián Gerardi"><span class="brand__mark" aria-hidden="true">JG</span><span class="brand__name">Julián Gerardi</span></a>
     <nav class="nav__links" aria-label="Main">
-      <a href="../index.html#work" aria-current="page">Work</a>
-      <a href="../index.html#process">Process</a>
-      <a href="../index.html#experience">Experience</a>
-      <a href="../index.html#about">About</a>
+      <a href="../index.html#work" aria-current="page"><span lang="en">Work</span><span lang="es">Trabajos</span></a>
+      <a href="../index.html#process"><span lang="en">Process</span><span lang="es">Proceso</span></a>
+      <a href="../index.html#experience"><span lang="en">Experience</span><span lang="es">Experiencia</span></a>
+      <a href="../index.html#about"><span lang="en">About</span><span lang="es">Sobre mí</span></a>
+      <a href="../index.html#contact"><span lang="en">Contact</span><span lang="es">Contacto</span></a>
+      <a class="nav__cv-mobile" href="../assets/Julian_Gerardi_CV.pdf" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv><span lang="en">Download CV</span><span lang="es">Descargar CV</span></a>
     </nav>
     <div class="nav__right">
-      <button class="icon-btn theme-toggle" type="button" aria-label="Switch theme">
+      <div class="lang" role="group" aria-label="Language / Idioma">
+        <button type="button" data-set-lang="en">EN</button><button type="button" data-set-lang="es">ES</button>
+      </div>
+      <button class="icon-btn theme-toggle" type="button" aria-label="Theme">
         <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
         <svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
       </button>
-      <button class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
-      <a class="btn btn--sm" href="../index.html#contact">Get in touch</a>
+      <a class="btn btn--sm nav__cv" href="../assets/Julian_Gerardi_CV.pdf" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv><svg aria-hidden="true"><use href="#i-down"/></svg><span lang="en">CV</span><span lang="es">CV</span></a>
+      <button class="icon-btn menu-btn" type="button" aria-label="Menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
     </div>
   </div>
 </header>
-
-<main class="shell" id="main">
-  <section class="row case-head">
-    <div class="cell" style="padding-block:clamp(56px,9vw,112px) clamp(40px,6vw,72px)">
-      <nav class="crumbs rise" style="--d:0s" aria-label="Breadcrumb"><a href="../index.html#work">Work</a><span>/</span><span>Confidentally</span></nav>
-      <h1 class="case-title split">Confidentally</h1>
-      <p class="case-lede rise">A dental practice platform, redesigned from the front desk to the dental chair and rebuilt as a prototype the whole team can click through.</p>
-      
-      
+<div class="crumbs-bar">
+  <div class="crumbs-bar__inner">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span aria-hidden="true">/</span>
+      <a href="../index.html#work"><span lang="en">Work</span><span lang="es">Trabajos</span></a><span aria-hidden="true">/</span>
+      <span aria-current="page">Confidentally</span>
+    </nav>
+    <div class="crumbs-bar__nav">
+      <span class="mono">02 / 05</span>
+      <a class="icon-btn" href="batech.html" aria-label="Batech AI Platform" title="Batech AI Platform"><svg aria-hidden="true"><use href="#i-left"/></svg></a>
+      <a class="icon-btn" href="confidentally-ui.html" aria-label="Confidentally UI" title="Confidentally UI"><svg aria-hidden="true"><use href="#i-right"/></svg></a>
     </div>
-  </section>
-  <section class="row"><dl class="cells meta" style="margin:0"><div class="cell"><dt>Role</dt><dd>Lead Product Designer</dd></div><div class="cell"><dt>Client</dt><dd>Confidential · US</dd></div><div class="cell"><dt>Year</dt><dd>2026</dd></div><div class="cell"><dt>Platform</dt><dd>Responsive web app</dd></div><div class="cell"><dt>Scope</dt><dd>Audit, UX, UI, prototype</dd></div><div class="cell"><dt>Tools</dt><dd>Figma, Claude, React, Storybook</dd></div></dl></section>
-  <section class="row"><div class="cell cell--flush"><div class="cover cover--dental cover--hero" aria-hidden="true"><div class="cover__stage"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Red Dental Studio · Clinical Mode</span></div><img src="../assets/img/d-clinical.webp" width="1600" height="1000" alt="" decoding="async"></div></div></div></div></section>
-  <section class="row" data-gate="nda-content" data-hash="dd113f6caa9a677a96e4c3a57f6dd18ea4a3e421f85fe9e4a70a3c2f9bd278fb">
-    <div class="cell" style="padding-block:clamp(56px,8vw,96px)">
-      <div class="gate">
-        <span class="gate__icon"><svg aria-hidden="true"><use href="#i-lock"/></svg></span>
-        <h2>This case study is under NDA</h2>
-        <p>The client and product details are confidential. Enter the password to read the process, the decisions and every screen.</p>
-        <form>
-          <label class="sr-only" for="nda-password">Password</label>
-          <input id="nda-password" name="password" type="password" autocomplete="current-password" placeholder="Password">
-          <button class="btn" type="submit">Unlock case study</button>
-        </form>
-        <p class="gate__error" role="alert" aria-live="polite"></p>
-        <p class="gate__ask">No password? Write to <span>juliangerardi266@gmail.com</span> and I’ll send it to you.</p>
-      </div>
+  </div>
+  <div class="crumbs-bar__progress" aria-hidden="true"><i></i></div>
+</div>
+
+<main id="main" class="case">
+  <header class="case-head wrap">
+    <h1 class="case-title split">Confidentally</h1>
+    <p class="case-lede" data-reveal><span lang="en">A dental practice platform, redesigned from the front desk to the dental chair and rebuilt as a prototype the whole team can click through.</span><span lang="es">Una plataforma para clínicas dentales, rediseñada de la recepción al sillón y reconstruida como un prototipo que todo el equipo puede recorrer.</span></p>
+    
+    
+    <dl class="case-meta" data-reveal><div><dt><span lang="en">Role</span><span lang="es">Rol</span></dt><dd>Lead Product Designer</dd></div><div><dt><span lang="en">Client</span><span lang="es">Cliente</span></dt><dd><span lang="en">Confidential · US</span><span lang="es">Confidencial · EE. UU.</span></dd></div><div><dt><span lang="en">Year</span><span lang="es">Año</span></dt><dd>2026</dd></div><div><dt><span lang="en">Platform</span><span lang="es">Plataforma</span></dt><dd><span lang="en">Responsive web app</span><span lang="es">Web app responsive</span></dd></div><div><dt><span lang="en">Scope</span><span lang="es">Alcance</span></dt><dd><span lang="en">Audit, UX, UI, prototype</span><span lang="es">Auditoría, UX, UI, prototipo</span></dd></div><div><dt><span lang="en">Tools</span><span lang="es">Herramientas</span></dt><dd>Figma, Claude, React, Storybook</dd></div></dl>
+  </header>
+  <section class="wrap case-cover" data-parallax><div class="cover cover--dental " aria-hidden="true"><div class="cover__stage"><div class="mock" style="width:68.18%"><div class="mock__bar"><i></i><i></i><i></i><span>Red Dental Studio · Login</span></div><img src="../assets/img/d-login.webp" width="1600" height="1000" alt="" decoding="async"></div></div></div></section>
+  <section class="wrap gate-wrap" data-gate="nda-content" data-hash="dd113f6caa9a677a96e4c3a57f6dd18ea4a3e421f85fe9e4a70a3c2f9bd278fb">
+    <div class="gate">
+      <span class="gate__icon"><svg aria-hidden="true"><use href="#i-lock"/></svg></span>
+      <h2><span lang="en">This case study is under NDA</span><span lang="es">Este caso está bajo NDA</span></h2>
+      <p><span lang="en">The client and product details are confidential. Enter the password to read the process, the decisions and every screen.</span><span lang="es">El cliente y los detalles del producto son confidenciales. Ingresá la contraseña para ver el proceso, las decisiones y todas las pantallas.</span></p>
+      <form>
+        <label class="sr-only" for="nda-password">Password</label>
+        <input id="nda-password" name="password" type="password" autocomplete="current-password" data-ph-en="Password" data-ph-es="Contraseña" placeholder="Password">
+        <button class="btn" type="submit"><span lang="en">Unlock case study</span><span lang="es">Desbloquear caso</span></button>
+      </form>
+      <p class="gate__error" role="alert" aria-live="polite" data-err-empty-en="Type the password to open the case study." data-err-empty-es="Escribí la contraseña para abrir el caso." data-err-wrong-en="That password is not right. Check it and try again." data-err-wrong-es="La contraseña no es correcta. Revisala y probá de nuevo."></p>
+      <p class="gate__ask"><span lang="en">No password? Write to</span><span lang="es">¿No tenés la contraseña? Escribime a</span> <span>juliangerardi266@gmail.com</span> <span lang="en">and I’ll send it to you.</span><span lang="es">y te la paso.</span></p>
     </div>
   </section>
   <div id="nda-content" hidden>
-  <section class="row chapter" id="overview">
-    <div class="chapter__label"><span>Overview</span></div>
+  <section class="chapter wrap" id="overview">
+    <div class="chapter__label"><span><span lang="en">Overview</span><span lang="es">Resumen</span></span></div>
     <div class="chapter__body">
-      <h2>One product for everyone who works in a dental clinic.</h2>
-      <div class="prose">
-        <p>Confidentally is a practice-management platform for dental clinics. The front desk checks patients in and manages the waiting room, dentists chart teeth and plan treatments, and the billing team closes the day with insurance claims and patient balances.</p>
-        <p>I led the redesign of the interface. Instead of stopping at Figma, I rebuilt the product as a <strong>working prototype with mock data</strong>, so every flow could be tried in a browser, and documented every piece in <strong>Confidentally UI</strong>, a design system that reads the same code.</p>
-      </div>
-      <div class="note"><svg aria-hidden="true"><use href="#i-info"/></svg><p>Everything shown here is my redesign running on invented data. No real patient, clinic or client information appears in this case study.</p></div>
+      <h2 class="lines"><span lang="en">One product for everyone who works in a dental clinic.</span><span lang="es">Un producto para todos los que trabajan en una clínica dental.</span></h2>
+      <div class="prose" data-reveal><p><span lang="en">Confidentally is a practice-management platform for dental clinics. The front desk checks patients in and manages the waiting room, dentists chart teeth and plan treatments, and the billing team closes the day with insurance claims and patient balances.</span><span lang="es">Confidentally es una plataforma de gestión para clínicas dentales. La recepción registra la llegada de pacientes y maneja la sala de espera, los odontólogos cargan el odontograma y planifican tratamientos, y facturación cierra el día con obras sociales y saldos de pacientes.</span></p><p><span lang="en">I led the redesign of the interface. Instead of stopping at Figma, I rebuilt the product as a <strong>working prototype with mock data</strong>, so every flow could be tried in a browser, and documented every piece in <strong>Confidentally UI</strong>, a design system that reads the same code.</span><span lang="es">Lideré el rediseño de la interfaz. En vez de quedarme en Figma, reconstruí el producto como un <strong>prototipo funcional con datos de prueba</strong>, para que cada flujo se pueda probar en el navegador, y documenté cada pieza en <strong>Confidentally UI</strong>, un design system que lee el mismo código.</span></p></div>
+      <div class="note" data-reveal><svg aria-hidden="true"><use href="#i-info"/></svg><p><span lang="en">Everything shown here is my redesign running on invented data. No real patient, clinic or client information appears in this case study.</span><span lang="es">Todo lo que se ve acá es mi rediseño funcionando con datos inventados. No aparece información real de pacientes, clínicas ni del cliente.</span></p></div>
+
     </div>
   </section>
-  <section class="row chapter" id="challenge">
-    <div class="chapter__label"><span>The challenge</span></div>
+  <section class="chapter wrap" id="challenge">
+    <div class="chapter__label"><span><span lang="en">The challenge</span><span lang="es">El desafío</span></span></div>
     <div class="chapter__body">
-      <h2>A product that grew module by module.</h2>
-      <div class="prose"><p>Each area had been designed on its own. Screens didn’t share a grid, appointment cards were rewritten by hand in several places, and Spanish strings slipped into English modals. For people who keep the app open all day, those small breaks add up to slower work and more errors.</p></div>
-      <p class="pull">One coherent system from the front desk to the dental chair, without slowing down anyone who already knows the product.</p>
+      <h2 class="lines"><span lang="en">A product that grew module by module.</span><span lang="es">Un producto que creció módulo por módulo.</span></h2>
+      <div class="prose" data-reveal><p><span lang="en">Each area had been designed on its own. Screens didn’t share a grid, appointment cards were rewritten by hand in several places, and Spanish strings slipped into English modals. For people who keep the app open all day, those small breaks add up to slower work and more errors.</span><span lang="es">Cada área se había diseñado por separado. Las pantallas no compartían grilla, las tarjetas de turnos estaban reescritas a mano en varios lugares y se colaban textos en español en modales en inglés. Para quien tiene la app abierta todo el día, esos cortes chicos suman trabajo más lento y más errores.</span></p></div>
+      <p class="pull" data-reveal><span lang="en">One coherent system from the front desk to the dental chair, without slowing down anyone who already knows the product.</span><span lang="es">Un sistema coherente de la recepción al sillón, sin frenar a nadie que ya conoce el producto.</span></p>
+
     </div>
   </section>
-  <section class="row chapter" id="approach">
-    <div class="chapter__label"><span>Approach</span></div>
+  <section class="chapter wrap" id="approach">
+    <div class="chapter__label"><span><span lang="en">Approach</span><span lang="es">Enfoque</span></span></div>
     <div class="chapter__body">
-      <h2>Audit first, then design, then build.</h2>
-      <ol class="steps">
-        <li><span class="steps__n">01</span><div><h3>Inventory the live product</h3><p>Every route of the production app mapped at 1440×900 and rated by complexity, from the login to the seven Clinical Mode modules.</p></div></li>
-        <li><span class="steps__n">02</span><div><h3>Audit the Figma file, module by module</h3><p>Dashboard, Patients, Scheduling, Treatments, Documents and Relationships: <strong>44 anomalies</strong> logged and numbered so the team could cite them without ambiguity.</p></div></li>
-        <li><span class="steps__n">03</span><div><h3>Agree on conventions</h3><p>Keep the Figma proportions with an 11px floor for text in cards, open two- and three-column grids at 1024px, fix what is visual and document the rest.</p></div></li>
-        <li><span class="steps__n">04</span><div><h3>Rebuild it as a working prototype</h3><p>React, TypeScript and Tailwind on mock data, built with Claude as a pair. Real flows, such as booking an appointment with a treatment plan, can be tried in a browser.</p></div></li>
-        <li><span class="steps__n">05</span><div><h3>Turn the result into a system</h3><p>Every button, card and screen went into Confidentally UI, with the reasons behind each decision and scripts that flag when the code drifts.</p></div></li>
-      </ol>
-      <h3 style="font-size:1rem;letter-spacing:-0.01em">A few of the 44 anomalies</h3>
-      <div class="grid-cards">
-        <div><b>#02 · Dashboard</b><span>The date picker shows 30-02-2026, a date that doesn’t exist.</span></div>
-        <div><b>#08 · Dashboard</b><span>Type inside cards drops as low as 5.87px.</span></div>
-        <div><b>#14 · Patients</b><span>Two different primary blues, #0056ef and #1d56bc.</span></div>
-        <div><b>#21 · Scheduling</b><span>All seven calendar columns are labelled “THUR”.</span></div>
-        <div><b>#34 · Documents</b><span>A banner says the patient is a minor; the profile says 50 years old.</span></div>
-        <div><b>#42 · Relationships</b><span>No button on any screen leads to “Add Relationship”.</span></div>
-      </div>
+      <h2 class="lines"><span lang="en">Audit first, then design, then build.</span><span lang="es">Primero auditar, después diseñar, después construir.</span></h2>
+      <ol class="steps"><li data-reveal><span class="steps__n">01</span><div><h3><span lang="en">Inventory the live product</span><span lang="es">Relevar el producto en producción</span></h3><p><span lang="en">Every route of the production app mapped at 1440×900 and rated by complexity, from the login to the seven Clinical Mode modules.</span><span lang="es">Cada ruta de la app en producción relevada a 1440×900 y clasificada por complejidad, del login a los siete módulos de Clinical Mode.</span></p></div></li><li data-reveal><span class="steps__n">02</span><div><h3><span lang="en">Audit the Figma file, module by module</span><span lang="es">Auditar el Figma, módulo por módulo</span></h3><p><span lang="en">Dashboard, Patients, Scheduling, Treatments, Documents and Relationships: <strong>44 anomalies</strong> logged and numbered so the team could cite them without ambiguity.</span><span lang="es">Dashboard, Patients, Scheduling, Treatments, Documents y Relationships: <strong>44 anomalías</strong> registradas y numeradas para que el equipo las pueda citar sin ambigüedad.</span></p></div></li><li data-reveal><span class="steps__n">03</span><div><h3><span lang="en">Agree on conventions</span><span lang="es">Acordar convenciones</span></h3><p><span lang="en">Keep the Figma proportions with an 11px floor for text in cards, open two- and three-column grids at 1024px, fix what is visual and document the rest.</span><span lang="es">Mantener las proporciones del Figma con un mínimo de 11px para el texto en tarjetas, abrir las grillas de dos y tres columnas a 1024px, corregir lo visual y documentar el resto.</span></p></div></li><li data-reveal><span class="steps__n">04</span><div><h3><span lang="en">Rebuild it as a working prototype</span><span lang="es">Reconstruirlo como prototipo funcional</span></h3><p><span lang="en">React, TypeScript and Tailwind on mock data, built with Claude as a pair. Real flows, such as booking an appointment with a treatment plan, can be tried in a browser.</span><span lang="es">React, TypeScript y Tailwind con datos de prueba, hecho con Claude como compañero. Los flujos reales, como dar un turno con plan de tratamiento, se pueden probar en el navegador.</span></p></div></li><li data-reveal><span class="steps__n">05</span><div><h3><span lang="en">Turn the result into a system</span><span lang="es">Convertir el resultado en un sistema</span></h3><p><span lang="en">Every button, card and screen went into Confidentally UI, with the reasons behind each decision and scripts that flag when the code drifts.</span><span lang="es">Cada botón, tarjeta y pantalla pasó a Confidentally UI, con el porqué de cada decisión y scripts que avisan cuando el código se desvía.</span></p></div></li></ol>
+      <h3 class="sub" data-reveal><span lang="en">A few of the 44 anomalies</span><span lang="es">Algunas de las 44 anomalías</span></h3>
+      <div class="grid-cards" data-reveal><div><b>#02 · Dashboard</b><span><span lang="en">The date picker shows 30-02-2026, a date that doesn’t exist.</span><span lang="es">El selector de fecha muestra 30-02-2026, una fecha que no existe.</span></span></div><div><b>#08 · Dashboard</b><span><span lang="en">Type inside cards drops as low as 5.87px.</span><span lang="es">El texto dentro de las tarjetas baja hasta 5,87px.</span></span></div><div><b>#14 · Patients</b><span><span lang="en">Two different primary blues, #0056ef and #1d56bc.</span><span lang="es">Dos azules primarios distintos, #0056ef y #1d56bc.</span></span></div><div><b>#21 · Scheduling</b><span><span lang="en">All seven calendar columns are labelled “THUR”.</span><span lang="es">Las siete columnas del calendario dicen “THUR”.</span></span></div><div><b>#34 · Documents</b><span><span lang="en">A banner says the patient is a minor; the profile says 50 years old.</span><span lang="es">Un banner dice que el paciente es menor; el perfil dice 50 años.</span></span></div><div><b>#42 · Relationships</b><span><span lang="en">No button on any screen leads to “Add Relationship”.</span><span lang="es">Ningún botón de ninguna pantalla lleva a “Add Relationship”.</span></span></div></div>
+
     </div>
   </section>
-  <section class="row chapter" id="screens">
-    <div class="chapter__label"><span>Key screens</span></div>
+  <section class="chapter wrap" id="screens">
+    <div class="chapter__label"><span><span lang="en">Key screens</span><span lang="es">Pantallas clave</span></span></div>
     <div class="chapter__body">
-      <h2>Designed around the moment each person is in.</h2>
+      <h2 class="lines"><span lang="en">Designed around the moment each person is in.</span><span lang="es">Diseñado alrededor del momento de cada persona.</span></h2>
       <div class="decision">
-        <div class="decision__head"><h3>Dashboard: the day at a glance</h3><div class="prose"><p>The front desk lives here. Appointments, the waiting room and the operatories sit side by side, and one date control drives appointments, the waiting room and tasks.</p><ul class="bullets"><li><b>Stat strip</b> with appointments, people waiting and open encounters.</li><li><b>Signature banner</b> with a 1-of-4 pager instead of a stack of alerts.</li></ul></div></div>
-        <figure class="shot"><div class="panel panel--dental"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Dashboard</span></div><img class="zoomable" src="../assets/img/d-dashboard.webp" width="1600" height="1000" alt="Dashboard with appointments, waiting room and operatories" loading="lazy" decoding="async"></div></div></figure>
+        <div class="decision__head" data-reveal><h3><span lang="en">Dashboard: the day at a glance</span><span lang="es">Dashboard: el día de un vistazo</span></h3><div class="prose"><p><span lang="en">The front desk lives here. Appointments, the waiting room and the operatories sit side by side, and one date control drives appointments, the waiting room and tasks.</span><span lang="es">La recepción vive acá. Turnos, sala de espera y consultorios van uno al lado del otro, y un solo control de fecha maneja turnos, sala de espera y tareas.</span></p><ul class="bullets"><li><b><span lang="en">Stat strip</span><span lang="es">Franja de métricas</span></b> <span lang="en">with appointments, people waiting and open encounters.</span><span lang="es">con turnos, gente esperando y consultas abiertas.</span></li><li><b><span lang="en">Signature banner</span><span lang="es">Banner de firmas</span></b> <span lang="en">with a 1-of-4 pager instead of a stack of alerts.</span><span lang="es">con un paginador de 1 de 4 en vez de una pila de alertas.</span></li></ul></div></div>
+        <figure class="shot" data-reveal><div class="panel panel--dental"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Dashboard</span></div><img class="zoomable" src="../assets/img/d-dashboard.webp" width="1600" height="1000" alt="Dashboard with appointments, waiting room and operatories" data-alt-es="Dashboard con turnos, sala de espera y consultorios" loading="lazy" decoding="async"></div></div></figure>
       </div>
       <div class="decision">
-        <div class="decision__head"><h3>Patient record</h3><div class="prose"><p>The left panel keeps identity and the two actions that matter most, <strong>Start Encounter</strong> and <strong>Clinical Mode</strong>, in reach while tabs change on the right.</p><ul class="bullets"><li><b>Clinical accordions</b> with counters, so allergies and medication show before they’re opened.</li><li><b>Pending tasks</b> such as referrals flag expired dates in context.</li></ul></div></div>
-        <figure class="shot"><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Patients · John Smith</span></div><img class="zoomable" src="../assets/img/d-patient.webp" width="1600" height="1000" alt="Patient record with side panel, clinical accordions, insurance and tasks" loading="lazy" decoding="async"></div></div></figure>
+        <div class="decision__head" data-reveal><h3><span lang="en">Patient record</span><span lang="es">Ficha del paciente</span></h3><div class="prose"><p><span lang="en">The left panel keeps identity and the two actions that matter most, <strong>Start Encounter</strong> and <strong>Clinical Mode</strong>, in reach while tabs change on the right.</span><span lang="es">El panel izquierdo mantiene la identidad y las dos acciones más importantes, <strong>Start Encounter</strong> y <strong>Clinical Mode</strong>, siempre a mano mientras cambian las pestañas de la derecha.</span></p><ul class="bullets"><li><b><span lang="en">Clinical accordions</span><span lang="es">Acordeones clínicos</span></b> <span lang="en">with counters, so allergies and medication show before they’re opened.</span><span lang="es">con contadores, para ver alergias y medicación antes de abrirlos.</span></li><li><b><span lang="en">Pending tasks</span><span lang="es">Tareas pendientes</span></b> <span lang="en">such as referrals flag expired dates in context.</span><span lang="es">como derivaciones marcan las fechas vencidas en contexto.</span></li></ul></div></div>
+        <figure class="shot" data-reveal><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Patients · John Smith</span></div><img class="zoomable" src="../assets/img/d-patient.webp" width="1600" height="1000" alt="Patient record with side panel, clinical accordions, insurance and tasks" data-alt-es="Ficha del paciente con panel lateral, acordeones clínicos, seguros y tareas" loading="lazy" decoding="async"></div></div></figure>
       </div>
       <div class="decision">
-        <div class="decision__head"><h3>Clinical Mode</h3><div class="prose"><p>A takeover without the app shell, because the dentist needs the whole screen. The odontogram sits at the center, with ten exams one tap away and the treatment plan to the left.</p><ul class="bullets"><li><b>Last condition</b> callout on the chart, so the latest finding is never buried.</li></ul></div></div>
-        <figure class="shot"><div class="panel panel--dental"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Clinical Mode</span></div><img class="zoomable" src="../assets/img/d-clinical.webp" width="1600" height="1000" alt="Clinical Mode with odontogram, treatment plan and problem list" loading="lazy" decoding="async"></div></div></figure>
+        <div class="decision__head" data-reveal><h3><span lang="en">Clinical Mode</span><span lang="es">Clinical Mode</span></h3><div class="prose"><p><span lang="en">A takeover without the app shell, because the dentist needs the whole screen. The odontogram sits at the center, with ten exams one tap away and the treatment plan to the left.</span><span lang="es">Una vista a pantalla completa sin el marco de la app, porque el odontólogo necesita toda la pantalla. El odontograma va al centro, con diez exámenes a un toque y el plan de tratamiento a la izquierda.</span></p><ul class="bullets"><li><b><span lang="en">Last condition</span><span lang="es">Última condición</span></b> <span lang="en">callout on the chart, so the latest finding is never buried.</span><span lang="es">destacada sobre el odontograma, para que el último hallazgo nunca quede escondido.</span></li></ul></div></div>
+        <figure class="shot" data-reveal><div class="panel panel--dental"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Clinical Mode</span></div><img class="zoomable" src="../assets/img/d-clinical.webp" width="1600" height="1000" alt="Clinical Mode with odontogram, treatment plan and problem list" data-alt-es="Clinical Mode con odontograma, plan de tratamiento y lista de problemas" loading="lazy" decoding="async"></div></div></figure>
       </div>
       <div class="decision">
-        <div class="decision__head"><h3>Scheduling</h3><div class="prose"><p>Day, week and month share one legend with seven appointment states. A new appointment is a two-step wizard, patient and time first and treatment plan second, with free slots in a side panel.</p><ul class="bullets"><li><b>Patient in session</b>: a tab on the right edge of every screen lists today’s patients who haven’t finished.</li></ul></div></div>
-        <div class="pair"><figure class="shot"><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Scheduling · Week</span></div><img class="zoomable" src="../assets/img/d-scheduling.webp" width="1600" height="1000" alt="Weekly calendar with appointments by status" loading="lazy" decoding="async"></div></div></figure><figure class="shot"><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Patients</span></div><img class="zoomable" src="../assets/img/d-patients.webp" width="1600" height="1000" alt="Patients list with search and status" loading="lazy" decoding="async"></div></div></figure></div>
+        <div class="decision__head" data-reveal><h3><span lang="en">Scheduling</span><span lang="es">Agenda</span></h3><div class="prose"><p><span lang="en">Day, week and month share one legend with seven appointment states. A new appointment is a two-step wizard, patient and time first and treatment plan second, with free slots in a side panel.</span><span lang="es">Día, semana y mes comparten una leyenda con siete estados de turno. Un turno nuevo es un asistente de dos pasos, primero paciente y horario y después plan de tratamiento, con los horarios libres en un panel lateral.</span></p><ul class="bullets"><li><b><span lang="en">Patient in session:</span><span lang="es">Paciente en consulta:</span></b> <span lang="en">a tab on the right edge of every screen lists today’s patients who haven’t finished.</span><span lang="es">una pestaña en el borde derecho de cada pantalla lista los pacientes de hoy que todavía no terminaron.</span></li></ul></div></div>
+        <div class="pair"><figure class="shot" data-reveal><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Scheduling · Week</span></div><img class="zoomable" src="../assets/img/d-scheduling.webp" width="1600" height="1000" alt="Weekly calendar with appointments by status" data-alt-es="Calendario semanal con turnos por estado" loading="lazy" decoding="async"></div></div></figure><figure class="shot" data-reveal><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Patients</span></div><img class="zoomable" src="../assets/img/d-patients.webp" width="1600" height="1000" alt="Patients list with search and status" data-alt-es="Lista de pacientes con búsqueda y estado" loading="lazy" decoding="async"></div></div></figure></div>
       </div>
       <div class="decision">
-        <div class="decision__head"><h3>Billing and ledger</h3><div class="prose"><p>Receivables split between what patients owe and what insurance carriers owe, with overdue balances apart. Payments and adjustments open as panels over the ledger.</p></div></div>
-        <div class="pair"><figure class="shot"><div class="panel panel--dental"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Billing</span></div><img class="zoomable" src="../assets/img/d-billing.webp" width="1600" height="1000" alt="Billing overview with receivables" loading="lazy" decoding="async"></div></div></figure><figure class="shot"><div class="panel panel--dental"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Ledger</span></div><img class="zoomable" src="../assets/img/d-ledger.webp" width="1600" height="1000" alt="Patient ledger with transactions" loading="lazy" decoding="async"></div></div></figure></div>
+        <div class="decision__head" data-reveal><h3><span lang="en">Billing and ledger</span><span lang="es">Facturación y cuenta corriente</span></h3><div class="prose"><p><span lang="en">Receivables split between what patients owe and what insurance carriers owe, with overdue balances apart. Payments and adjustments open as panels over the ledger.</span><span lang="es">Las cuentas por cobrar se separan entre lo que deben los pacientes y lo que deben las aseguradoras, con los saldos vencidos aparte. Pagos y ajustes se abren como paneles sobre la cuenta corriente.</span></p></div></div>
+        <div class="pair"><figure class="shot" data-reveal><div class="panel panel--dental"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Billing</span></div><img class="zoomable" src="../assets/img/d-billing.webp" width="1600" height="1000" alt="Billing overview with receivables" data-alt-es="Resumen de facturación con cuentas por cobrar" loading="lazy" decoding="async"></div></div></figure><figure class="shot" data-reveal><div class="panel panel--dental"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Ledger</span></div><img class="zoomable" src="../assets/img/d-ledger.webp" width="1600" height="1000" alt="Patient ledger with transactions" data-alt-es="Cuenta corriente del paciente con movimientos" loading="lazy" decoding="async"></div></div></figure></div>
       </div>
       <div class="decision">
-        <div class="decision__head"><h3>Notifications with a “pending” state</h3><div class="prose"><p>The inbox follows Notion’s logic: inbox, unread and archived, grouped by date, with bulk actions. I added <strong>pending</strong> because here notifications are tasks: sign a consent, confirm an appointment, verify an insurance plan.</p></div></div>
-        <figure class="shot"><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Notifications</span></div><img class="zoomable" src="../assets/img/d-notifications.webp" width="1600" height="1000" alt="Notifications inbox with pending state" loading="lazy" decoding="async"></div></div></figure>
+        <div class="decision__head" data-reveal><h3><span lang="en">Notifications with a “pending” state</span><span lang="es">Notificaciones con estado “pendiente”</span></h3><div class="prose"><p><span lang="en">The inbox follows Notion’s logic: inbox, unread and archived, grouped by date, with bulk actions. I added <strong>pending</strong> because here notifications are tasks: sign a consent, confirm an appointment, verify an insurance plan.</span><span lang="es">La bandeja sigue la lógica de Notion: entrada, no leídas y archivadas, agrupadas por fecha, con acciones en lote. Sumé <strong>pendiente</strong> porque acá las notificaciones son tareas: firmar un consentimiento, confirmar un turno, verificar una cobertura.</span></p></div></div>
+        <figure class="shot" data-reveal><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Notifications</span></div><img class="zoomable" src="../assets/img/d-notifications.webp" width="1600" height="1000" alt="Notifications inbox with pending state" data-alt-es="Bandeja de notificaciones con estado pendiente" loading="lazy" decoding="async"></div></div></figure>
       </div>
 
     </div>
   </section>
-  <section class="row chapter" id="mobile">
+  <section class="chapter wrap" id="mobile">
     <div class="chapter__label"><span>Mobile</span></div>
     <div class="chapter__body">
-      <h2>The same product in a dentist’s pocket.</h2>
-      <div class="prose"><p>Every screen is responsive. On a phone the patient menu turns into horizontal tabs and panels stack in the order a clinician reads them.</p></div>
-      <figure class="shot"><div class="panel panel--dental"><div class="phones"><div class="phone"><img src="../assets/img/d-m-dashboard.webp" width="780" height="1688" alt="Dashboard on a phone" loading="lazy" decoding="async"></div><div class="phone"><img src="../assets/img/d-m-patient.webp" width="780" height="1688" alt="Patient record on a phone" loading="lazy" decoding="async"></div><div class="phone"><img src="../assets/img/d-m-scheduling.webp" width="780" height="1688" alt="Scheduling on a phone" loading="lazy" decoding="async"></div></div></div></figure>
+      <h2 class="lines"><span lang="en">The same product in a dentist’s pocket.</span><span lang="es">El mismo producto en el bolsillo del odontólogo.</span></h2>
+      <div class="prose" data-reveal><p><span lang="en">Every screen is responsive. On a phone the patient menu turns into horizontal tabs and panels stack in the order a clinician reads them.</span><span lang="es">Todas las pantallas son responsive. En el celular el menú del paciente pasa a pestañas horizontales y los paneles se apilan en el orden en que los lee un profesional.</span></p></div>
+      <figure class="shot" data-reveal><div class="panel panel--dental"><div class="phones"><div class="phone"><img src="../assets/img/d-m-dashboard.webp" width="780" height="1688" alt="Dashboard on a phone" data-alt-es="Dashboard en el celular" loading="lazy" decoding="async"></div><div class="phone"><img src="../assets/img/d-m-patient.webp" width="780" height="1688" alt="Patient record on a phone" data-alt-es="Ficha del paciente en el celular" loading="lazy" decoding="async"></div><div class="phone"><img src="../assets/img/d-m-scheduling.webp" width="780" height="1688" alt="Scheduling on a phone" data-alt-es="Agenda en el celular" loading="lazy" decoding="async"></div></div></div></figure>
+
     </div>
   </section>
-  <section class="row chapter" id="system">
+  <section class="chapter wrap" id="system">
     <div class="chapter__label"><span>Design system</span></div>
     <div class="chapter__body">
-      <h2>Confidentally UI keeps the redesign from drifting.</h2>
-      <div class="prose"><p>The design system reads the app’s own components: change a token in code and the docs change with it. It has its own case study.</p></div>
-      <figure class="shot"><div class="panel panel--ds"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Confidentally UI</span></div><img class="zoomable" src="../assets/img/ds-welcome.webp" width="1600" height="1000" alt="Design system home with search" loading="lazy" decoding="async"></div></div></figure>
-      <div class="btns"><a class="btn btn--ghost" href="confidentally-ui.html">Read the design system case study <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+      <h2 class="lines"><span lang="en">Confidentally UI keeps the redesign from drifting.</span><span lang="es">Confidentally UI evita que el rediseño se desvíe.</span></h2>
+      <div class="prose" data-reveal><p><span lang="en">The design system reads the app’s own components: change a token in code and the docs change with it. It has its own case study.</span><span lang="es">El design system lee los componentes de la propia app: si cambia un token en el código, la documentación cambia con él. Tiene su propio caso.</span></p></div>
+      <div class="btns" data-reveal><a class="btn btn--ghost" href="confidentally-ui.html"><span lang="en">Read the design system case study</span><span lang="es">Ver el caso del design system</span> <svg aria-hidden="true"><use href="#i-right"/></svg></a></div>
+
     </div>
   </section>
-  <section class="row chapter" id="outcome">
-    <div class="chapter__label"><span>Outcome</span></div>
+  <section class="chapter wrap" id="outcome">
+    <div class="chapter__label"><span><span lang="en">Outcome</span><span lang="es">Resultado</span></span></div>
     <div class="chapter__body">
-      <h2>A product the team can open, click and build from.</h2>
-      <div class="numbers">
-        <div><b>32</b><span>screens working in the browser</span></div>
-        <div><b>139</b><span>documented pieces</span></div>
-        <div><b>481</b><span>live examples</span></div>
-        <div><b>44</b><span>anomalies found and cited</span></div>
-      </div>
-      <div class="prose"><p>Developers get components that already exist in code, product gets a prototype to test with clinics, and design gets one place where every decision is written down.</p></div>
-      <div class="btns"><a class="btn" href="https://juliangerardi.github.io/red-dental-studio/#/patients/patient-0001" target="_blank" rel="noopener">Open the prototype <svg aria-hidden="true"><use href="#i-arrow"/></svg></a><a class="btn btn--ghost" href="https://juliangerardi.github.io/red-dental-studio/storybook/?path=/docs/welcome--docs" target="_blank" rel="noopener">Open the design system <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+      <h2 class="lines"><span lang="en">A product the team can open, click and build from.</span><span lang="es">Un producto que el equipo puede abrir, recorrer y usar de base.</span></h2>
+      <div class="numbers" data-reveal><div><b data-count="32">32</b><span><span lang="en">screens working in the browser</span><span lang="es">pantallas funcionando en el navegador</span></span></div><div><b data-count="139">139</b><span><span lang="en">documented pieces</span><span lang="es">piezas documentadas</span></span></div><div><b data-count="481">481</b><span><span lang="en">live examples</span><span lang="es">ejemplos en vivo</span></span></div><div><b data-count="44">44</b><span><span lang="en">anomalies found and cited</span><span lang="es">anomalías encontradas y citadas</span></span></div></div>
+      <div class="prose" data-reveal><p><span lang="en">Developers get components that already exist in code, product gets a prototype to test with clinics, and design gets one place where every decision is written down.</span><span lang="es">Desarrollo recibe componentes que ya existen en código, producto recibe un prototipo para probar con clínicas y diseño tiene un solo lugar donde cada decisión queda escrita.</span></p></div>
+      <div class="btns" data-reveal><a class="btn" href="https://juliangerardi.github.io/red-dental-studio/#/patients/patient-0001" target="_blank" rel="noopener"><span lang="en">Open the prototype</span><span lang="es">Abrir el prototipo</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a><a class="btn btn--ghost" href="https://juliangerardi.github.io/red-dental-studio/storybook/?path=/docs/welcome--docs" target="_blank" rel="noopener"><span lang="en">Open the design system</span><span lang="es">Abrir el design system</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+
     </div>
   </section>
   </div>
-  <section class="row"><a class="next" href="confidentally-ui.html"><div><div class="label">Next project</div><h2>Confidentally UI</h2></div><svg aria-hidden="true"><use href="#i-arrow"/></svg></a></section>
-  <footer class="row">
-    <div class="footer">
-      <span>© <span data-year>2026</span> Julián Gerardi · Mercedes, Buenos Aires · <span data-clock>--:--</span> local time</span>
-      <div class="footer__links">
-        <a href="../index.html#work">Work</a>
-        <a href="https://www.linkedin.com/in/julian-gerardi" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://www.behance.net/Jotainc" target="_blank" rel="noopener">Behance</a>
-      </div>
-    </div>
-  </footer>
-  <div class="row shell-end" aria-hidden="true"></div>
+  <section class="wrap"><a class="next" href="confidentally-ui.html" data-cursor="→"><div><div class="label"><span lang="en">Next project</span><span lang="es">Próximo proyecto</span></div><h2>Confidentally UI</h2></div><svg aria-hidden="true"><use href="#i-right"/></svg></a></section>
 </main>
+<footer class="footer wrap">
+  <div class="footer__big" aria-hidden="true">Julián Gerardi</div>
+  <div class="footer__row">
+    <span>© <span data-year>2026</span> Julián Gerardi · Mercedes, Buenos Aires · <span data-clock>--:--</span> <span lang="en">local time</span><span lang="es">hora local</span></span>
+    <div class="footer__links">
+      <a href="../index.html#work"><span lang="en">Work</span><span lang="es">Trabajos</span></a>
+      <a href="../assets/Julian_Gerardi_CV.pdf" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv><span lang="en">Download CV</span><span lang="es">Descargar CV</span></a>
+      <a href="https://www.linkedin.com/in/julian-gerardi" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.behance.net/Jotainc" target="_blank" rel="noopener">Behance</a>
+    </div>
+  </div>
+</footer>
+<div class="curtain" aria-hidden="true"></div>
+<div class="agent" data-agent>
+  <button class="agent__launch" type="button" aria-expanded="false" aria-controls="agent-panel">
+    <span class="agent__orb" aria-hidden="true"></span>
+    <span class="agent__launch-text"><span lang="en">Ask my AI</span><span lang="es">Preguntale a mi IA</span></span>
+  </button>
+  <section class="agent__panel" id="agent-panel" hidden aria-label="AI assistant">
+    <header class="agent__head">
+      <span class="agent__orb agent__orb--lg" aria-hidden="true"></span>
+      <div><b><span lang="en">Julián’s AI assistant</span><span lang="es">Asistente IA de Julián</span></b><span data-agent-mode><span lang="en">Answers about my work, experience and availability</span><span lang="es">Responde sobre mi trabajo, experiencia y disponibilidad</span></span></div>
+      <button class="icon-btn agent__close" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+    </header>
+    <div class="agent__log" data-agent-log aria-live="polite"></div>
+    <div class="agent__chips" data-agent-chips></div>
+    <form class="agent__form" data-agent-form>
+      <label class="sr-only" for="agent-input">Message</label>
+      <input id="agent-input" name="q" autocomplete="off" data-ph-en="Ask about projects, process, availability…" data-ph-es="Preguntá por proyectos, proceso, disponibilidad…" placeholder="Ask about projects, process, availability…">
+      <button class="agent__send" type="submit" aria-label="Send"><svg aria-hidden="true"><use href="#i-send"/></svg></button>
+    </form>
+  </section>
+</div>
 <dialog class="lightbox" aria-label="Screen preview">
-  <button class="icon-btn lightbox__close" type="button" aria-label="Close preview"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+  <button class="icon-btn lightbox__close" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
   <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
 </dialog>
 <script src="../assets/site.js"></script>
+<script src="../assets/agent.js"></script>
 </body>
 </html>

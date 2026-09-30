@@ -1,20 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-lang="en" data-title-en="GRILL Empresas · Julián Gerardi" data-title-es="GRILL Empresas · Julián Gerardi">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>GRILL Empresas Case Study</title>
-<meta name="description" content="Corporate lunch ordering for a kitchen in Mercedes, Buenos Aires. Case study by Julián Gerardi.">
+<title>GRILL Empresas · Julián Gerardi</title>
+<meta name="description" content="Corporate lunch ordering for a kitchen in Mercedes, Buenos Aires. Case study by Julián Gerardi." data-es="Pedidos de almuerzo para empresas de una cocina en Mercedes, Buenos Aires. Caso de Julián Gerardi.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23171717'/%3E%3Ctext x='16' y='20.5' font-family='Arial' font-weight='700' font-size='11' text-anchor='middle' fill='%23fff'%3EJG%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&amp;family=Geist+Mono:wght@400..600&amp;display=swap">
 <link rel="stylesheet" href="../assets/site.css">
-<script>try{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script>(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);var l=localStorage.getItem('jg-lang');if(!l)l=(navigator.language||'').toLowerCase().indexOf('es')===0?'es':'en';d.setAttribute('data-lang',l);d.lang=l;}catch(e){}})();</script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js" defer></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12M6 11l6 6 6-6M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
@@ -23,148 +27,184 @@
   <symbol id="i-cursor" viewBox="0 0 20 20"><path d="M3 2.2 17.2 8.6l-6.1 1.9-2.3 6.3Z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3c.6 4.2 2.8 6.4 7 7-4.2.6-6.4 2.8-7 7-.6-4.2-2.8-6.4-7-7 4.2-.6 6.4-2.8 7-7Z" fill="currentColor"/><path d="M19 15.5c.25 1.6 1 2.35 2.5 2.5-1.5.15-2.25.9-2.5 2.5-.25-1.6-1-2.35-2.5-2.5 1.5-.15 2.25-.9 2.5-2.5Z" fill="currentColor"/></symbol>
 </svg>
-<a class="skip" href="#main">Skip to content</a>
+<a class="skip" href="#main"><span lang="en">Skip to content</span><span lang="es">Ir al contenido</span></a>
 <header class="nav">
   <div class="nav__inner">
-    <a class="brand" href="../index.html" aria-label="Julián Gerardi, home"><span class="brand__mark" aria-hidden="true">JG</span>Julián Gerardi</a>
+    <a class="brand" href="../index.html" aria-label="Julián Gerardi"><span class="brand__mark" aria-hidden="true">JG</span><span class="brand__name">Julián Gerardi</span></a>
     <nav class="nav__links" aria-label="Main">
-      <a href="../index.html#work" aria-current="page">Work</a>
-      <a href="../index.html#process">Process</a>
-      <a href="../index.html#experience">Experience</a>
-      <a href="../index.html#about">About</a>
+      <a href="../index.html#work" aria-current="page"><span lang="en">Work</span><span lang="es">Trabajos</span></a>
+      <a href="../index.html#process"><span lang="en">Process</span><span lang="es">Proceso</span></a>
+      <a href="../index.html#experience"><span lang="en">Experience</span><span lang="es">Experiencia</span></a>
+      <a href="../index.html#about"><span lang="en">About</span><span lang="es">Sobre mí</span></a>
+      <a href="../index.html#contact"><span lang="en">Contact</span><span lang="es">Contacto</span></a>
+      <a class="nav__cv-mobile" href="../assets/Julian_Gerardi_CV.pdf" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv><span lang="en">Download CV</span><span lang="es">Descargar CV</span></a>
     </nav>
     <div class="nav__right">
-      <button class="icon-btn theme-toggle" type="button" aria-label="Switch theme">
+      <div class="lang" role="group" aria-label="Language / Idioma">
+        <button type="button" data-set-lang="en">EN</button><button type="button" data-set-lang="es">ES</button>
+      </div>
+      <button class="icon-btn theme-toggle" type="button" aria-label="Theme">
         <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
         <svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
       </button>
-      <button class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
-      <a class="btn btn--sm" href="../index.html#contact">Get in touch</a>
+      <a class="btn btn--sm nav__cv" href="../assets/Julian_Gerardi_CV.pdf" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv><svg aria-hidden="true"><use href="#i-down"/></svg><span lang="en">CV</span><span lang="es">CV</span></a>
+      <button class="icon-btn menu-btn" type="button" aria-label="Menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
     </div>
   </div>
 </header>
+<div class="crumbs-bar">
+  <div class="crumbs-bar__inner">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span aria-hidden="true">/</span>
+      <a href="../index.html#work"><span lang="en">Work</span><span lang="es">Trabajos</span></a><span aria-hidden="true">/</span>
+      <span aria-current="page">GRILL Empresas</span>
+    </nav>
+    <div class="crumbs-bar__nav">
+      <span class="mono">04 / 05</span>
+      <a class="icon-btn" href="confidentally-ui.html" aria-label="Confidentally UI" title="Confidentally UI"><svg aria-hidden="true"><use href="#i-left"/></svg></a>
+      <a class="icon-btn" href="mercado-play.html" aria-label="Mercado Play" title="Mercado Play"><svg aria-hidden="true"><use href="#i-right"/></svg></a>
+    </div>
+  </div>
+  <div class="crumbs-bar__progress" aria-hidden="true"><i></i></div>
+</div>
 
-<main class="shell" id="main">
-  <section class="row case-head">
-    <div class="cell" style="padding-block:clamp(56px,9vw,112px) clamp(40px,6vw,72px)">
-      <nav class="crumbs rise" style="--d:0s" aria-label="Breadcrumb"><a href="../index.html#work">Work</a><span>/</span><span>GRILL Empresas</span></nav>
-      <h1 class="case-title split">GRILL Empresas</h1>
-      <p class="case-lede rise">Lunch for companies, ordered from the phone. Two connected web apps for a kitchen in Mercedes: one for the people who eat, one for the team that cooks.</p>
-      <div class="btns rise" style="--d:.55s"><a class="btn" href="https://claude.ai/code/artifact/b8691278-bb38-469f-89b1-a323dd661d5d" target="_blank" rel="noopener">Try the employee app <svg aria-hidden="true"><use href="#i-arrow"/></svg></a><a class="btn btn--ghost" href="https://claude.ai/code/artifact/44a2be1f-d2b3-462a-acbd-382cd5c76347" target="_blank" rel="noopener">Try the kitchen panel <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
-      <p class="case-note">Demo: sign in with any email and password.</p>
-    </div>
-  </section>
-  <section class="row"><dl class="cells meta" style="margin:0"><div class="cell"><dt>Role</dt><dd>Product designer, UX/UI</dd></div><div class="cell"><dt>Client</dt><dd>GRILL · Mercedes, AR</dd></div><div class="cell"><dt>Year</dt><dd>2026</dd></div><div class="cell"><dt>Platform</dt><dd>Mobile web + desktop panel</dd></div><div class="cell"><dt>Language</dt><dd>Rioplatense Spanish</dd></div><div class="cell"><dt>Tools</dt><dd>Figma, Claude, React</dd></div></dl></section>
-  <section class="row"><div class="cell cell--flush"><div class="cover cover--grill cover--hero" aria-hidden="true"><div class="cover__stage"><div class="phone"><img src="../assets/img/g-emp-m-app.webp" width="780" height="1688" alt="" decoding="async"></div><div class="phone"><img src="../assets/img/g-emp-m-modal.webp" width="780" height="1688" alt="" decoding="async"></div><div class="phone"><img src="../assets/img/g-emp-m-dark-app.webp" width="780" height="1688" alt="" decoding="async"></div></div></div></div></section>
-  <section class="row chapter" id="overview">
-    <div class="chapter__label"><span>Overview</span></div>
+<main id="main" class="case">
+  <header class="case-head wrap">
+    <h1 class="case-title split">GRILL Empresas</h1>
+    <p class="case-lede" data-reveal><span lang="en">Lunch for companies, ordered from the phone. Two connected web apps for a kitchen in Mercedes: one for the people who eat, one for the team that cooks.</span><span lang="es">Almuerzos para empresas, pedidos desde el celular. Dos web apps conectadas para una cocina de Mercedes: una para quienes comen y otra para el equipo que cocina.</span></p>
+    <div class="btns" data-reveal><a class="btn" href="https://claude.ai/code/artifact/b8691278-bb38-469f-89b1-a323dd661d5d" target="_blank" rel="noopener"><span lang="en">Try the employee app</span><span lang="es">Probar la app de empleados</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a><a class="btn btn--ghost" href="https://claude.ai/code/artifact/44a2be1f-d2b3-462a-acbd-382cd5c76347" target="_blank" rel="noopener"><span lang="en">Try the kitchen panel</span><span lang="es">Probar el panel de cocina</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+    <p class="case-note" data-reveal><span lang="en">Demo: sign in with any email and password.</span><span lang="es">Demo: ingresá con cualquier email y contraseña.</span></p>
+    <dl class="case-meta" data-reveal><div><dt><span lang="en">Role</span><span lang="es">Rol</span></dt><dd><span lang="en">Product designer, UX/UI</span><span lang="es">Diseñador de producto, UX/UI</span></dd></div><div><dt><span lang="en">Client</span><span lang="es">Cliente</span></dt><dd>GRILL · Mercedes, AR</dd></div><div><dt><span lang="en">Year</span><span lang="es">Año</span></dt><dd>2026</dd></div><div><dt><span lang="en">Platform</span><span lang="es">Plataforma</span></dt><dd><span lang="en">Mobile web + desktop panel</span><span lang="es">Web mobile + panel de escritorio</span></dd></div><div><dt><span lang="en">Language</span><span lang="es">Idioma</span></dt><dd><span lang="en">Rioplatense Spanish</span><span lang="es">Español rioplatense</span></dd></div><div><dt><span lang="en">Tools</span><span lang="es">Herramientas</span></dt><dd>Figma, Claude, React</dd></div></dl>
+  </header>
+  <section class="wrap case-cover" data-parallax><div class="cover cover--grill " aria-hidden="true"><div class="cover__stage"><div class="phone" style="width:21.6%"><img src="../assets/img/g-emp-m-app.webp" width="780" height="1688" alt="" decoding="async"></div><div class="phone" style="width:21.6%"><img src="../assets/img/g-emp-m-carta.webp" width="780" height="1688" alt="" decoding="async"></div><div class="phone" style="width:21.6%"><img src="../assets/img/g-emp-m-dark-app.webp" width="780" height="1688" alt="" decoding="async"></div></div></div></section>
+  <section class="chapter wrap" id="overview">
+    <div class="chapter__label"><span><span lang="en">Overview</span><span lang="es">Resumen</span></span></div>
     <div class="chapter__body">
-      <h2>A kitchen that feeds whole offices, one tray at a time.</h2>
-      <div class="prose">
-        <p>GRILL is a kitchen in Mercedes, Buenos Aires that delivers lunch to companies. Each company covers a daily amount per employee and pays at the end of the month; each employee chooses what they eat.</p>
-        <p>I designed both sides of the service and built them as working web apps with an AI-assisted workflow: <strong>GRILL Empresas</strong> for employees and <strong>GRILL Team</strong>, the panel the kitchen runs the day from.</p>
-      </div>
-    </div>
-  </section>
-  <section class="row chapter" id="problem">
-    <div class="chapter__label"><span>The problem</span></div>
-    <div class="chapter__body">
-      <h2>Everything lived on paper and in WhatsApp.</h2>
-      <div class="prose"><p>Kitchen tickets, orders per company, new employee accounts and the monthly account closing. Every day the team gathers choices, counts dishes, labels trays, plans the delivery run and keeps each company’s account, all before 11:30.</p></div>
-      <p class="pull">Make ordering take less than a minute, and turn the kitchen’s morning into a checklist.</p>
-    </div>
-  </section>
-  <section class="row chapter" id="users">
-    <div class="chapter__label"><span>Two users</span></div>
-    <div class="chapter__body">
-      <h2>Same orders, two very different mornings.</h2>
-      <div class="grid-cards">
-        <div><b>EMPLOYEE · PHONE</b><span><strong>A minute between meetings, before the cutoff.</strong> When is the next delivery, what does the kitchen suggest, how much does the company cover, which side dish.</span></div>
-        <div><b>KITCHEN TEAM · DESKTOP</b><span><strong>The whole morning, hands busy.</strong> How many of each dish, a label for every tray, the delivery run by company, and what to bill each one.</span></div>
-      </div>
-    </div>
-  </section>
-  <section class="row chapter" id="employees">
-    <div class="chapter__label"><span>Employee app</span></div>
-    <div class="chapter__body">
-      <h2>Order lunch in a few taps.</h2>
-      <div class="decision">
-        <div class="decision__head"><h3>The cutoff comes first</h3><div class="prose"><p>The screen opens on the next delivery date and a countdown to the 10:30 cutoff. When today’s cutoff has passed, a banner says the order goes to the next delivery and can be changed until 10:30 that day.</p><ul class="bullets"><li><b>A short selection first</b>, and the full menu one link away.</li><li><b>The allowance always visible</b>: the company covers up to $11,000 a day.</li></ul></div></div>
-        <figure class="shot"><div class="panel panel--grill"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>GRILL Empresas · Pedido del día</span></div><img class="zoomable" src="../assets/img/g-emp-app.webp" width="1600" height="1000" alt="Order of the day with next delivery, cutoff countdown and the kitchen selection" loading="lazy" decoding="async"></div></div></figure>
-      </div>
-      <div class="decision">
-        <div class="decision__head"><h3>Choosing is one step</h3><div class="prose"><p>Tapping a dish opens a sheet to pick the side and leave a note for the kitchen, up to 140 characters. The button carries the price, so there’s no surprise at checkout. The full menu has <strong>59 dishes in 9 categories</strong>, filtered by gluten-free and vegetarian.</p></div></div>
-        <figure class="shot"><div class="panel panel--grill"><div class="phones"><div class="phone"><img src="../assets/img/g-emp-m-app.webp" width="780" height="1688" alt="Order of the day on a phone" loading="lazy" decoding="async"></div><div class="phone"><img src="../assets/img/g-emp-m-modal.webp" width="780" height="1688" alt="Side dish sheet on a phone" loading="lazy" decoding="async"></div><div class="phone"><img src="../assets/img/g-emp-m-carta.webp" width="780" height="1688" alt="Full menu on a phone" loading="lazy" decoding="async"></div></div></div></figure>
-      </div>
-      <div class="decision">
-        <div class="decision__head"><h3>History and dark mode</h3><div class="prose"><p><strong>My orders</strong> shows the week or month day by day, with a summary to download. The app has a dark theme, and the copy talks the way people in Mercedes do: “Elegí”, “Tocá”, “¿La olvidaste?”.</p></div></div>
-        <div class="pair"><figure class="shot"><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Mis pedidos</span></div><img class="zoomable" src="../assets/img/g-emp-historial.webp" width="1600" height="1000" alt="Order history by week" loading="lazy" decoding="async"></div></div></figure><figure class="shot"><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Pedido del día · dark</span></div><img class="zoomable" src="../assets/img/g-emp-dark-app.webp" width="1600" height="1000" alt="Order of the day in dark mode" loading="lazy" decoding="async"></div></div></figure></div>
-      </div>
+      <h2 class="lines"><span lang="en">A kitchen that feeds whole offices, one tray at a time.</span><span lang="es">Una cocina que alimenta oficinas enteras, bandeja por bandeja.</span></h2>
+      <div class="prose" data-reveal><p><span lang="en">GRILL is a kitchen in Mercedes, Buenos Aires that delivers lunch to companies. Each company covers a daily amount per employee and pays at the end of the month; each employee chooses what they eat.</span><span lang="es">GRILL es una cocina de Mercedes, Buenos Aires, que lleva el almuerzo a empresas. Cada empresa cubre un monto diario por empleado y paga a fin de mes; cada empleado elige qué come.</span></p><p><span lang="en">I designed both sides of the service and built them as working web apps with an AI-assisted workflow: <strong>GRILL Empresas</strong> for employees and <strong>GRILL Team</strong>, the panel the kitchen runs the day from.</span><span lang="es">Diseñé los dos lados del servicio y los construí como web apps funcionales con un flujo asistido por IA: <strong>GRILL Empresas</strong> para los empleados y <strong>GRILL Team</strong>, el panel desde el que la cocina maneja el día.</span></p></div>
 
     </div>
   </section>
-  <section class="row chapter" id="kitchen">
-    <div class="chapter__label"><span>Kitchen panel</span></div>
+  <section class="chapter wrap" id="problem">
+    <div class="chapter__label"><span><span lang="en">The problem</span><span lang="es">El problema</span></span></div>
     <div class="chapter__body">
-      <h2>The kitchen’s morning, as a checklist.</h2>
+      <h2 class="lines"><span lang="en">Everything lived on paper and in WhatsApp.</span><span lang="es">Todo vivía en papel y en WhatsApp.</span></h2>
+      <div class="prose" data-reveal><p><span lang="en">Kitchen tickets, orders per company, new employee accounts and the monthly account closing. Every day the team gathers choices, counts dishes, labels trays, plans the delivery run and keeps each company’s account, all before 11:30.</span><span lang="es">Comandas de cocina, pedidos por empresa, altas de empleados y el cierre de cuenta corriente. Cada día el equipo junta los pedidos, cuenta platos, etiqueta bandejas, arma el reparto y lleva la cuenta de cada empresa, todo antes de las 11:30.</span></p></div>
+      <p class="pull" data-reveal><span lang="en">Make ordering take less than a minute, and turn the kitchen’s morning into a checklist.</span><span lang="es">Que pedir lleve menos de un minuto, y que la mañana de la cocina sea una lista de tareas.</span></p>
+
+    </div>
+  </section>
+  <section class="chapter wrap" id="users">
+    <div class="chapter__label"><span><span lang="en">Two users</span><span lang="es">Dos usuarios</span></span></div>
+    <div class="chapter__body">
+      <h2 class="lines"><span lang="en">Same orders, two very different mornings.</span><span lang="es">Los mismos pedidos, dos mañanas muy distintas.</span></h2>
+      <div class="grid-cards" data-reveal><div><b><span lang="en">EMPLOYEE · PHONE</span><span lang="es">EMPLEADO · CELULAR</span></b><span><span lang="en"><strong>A minute between meetings, before the cutoff.</strong> When is the next delivery, what does the kitchen suggest, how much does the company cover, which side dish.</span><span lang="es"><strong>Un minuto entre reuniones, antes del cierre.</strong> Cuándo es la próxima entrega, qué sugiere la cocina, cuánto cubre la empresa, qué guarnición.</span></span></div><div><b><span lang="en">KITCHEN TEAM · DESKTOP</span><span lang="es">EQUIPO DE COCINA · ESCRITORIO</span></b><span><span lang="en"><strong>The whole morning, hands busy.</strong> How many of each dish, a label for every tray, the delivery run by company, and what to bill each one.</span><span lang="es"><strong>Toda la mañana, con las manos ocupadas.</strong> Cuántos de cada plato, una etiqueta por bandeja, el reparto por empresa y qué facturarle a cada una.</span></span></div></div>
+
+    </div>
+  </section>
+  <section class="chapter wrap" id="employees">
+    <div class="chapter__label"><span><span lang="en">Employee app</span><span lang="es">App de empleados</span></span></div>
+    <div class="chapter__body">
+      <h2 class="lines"><span lang="en">Order lunch in a few taps.</span><span lang="es">Pedir el almuerzo en pocos toques.</span></h2>
       <div class="decision">
-        <div class="decision__head"><h3>Summary of the day</h3><div class="prose"><p>Units, orders and companies at the top with the departure time; below, one card per job of the morning and the alerts still to resolve.</p></div></div>
-        <figure class="shot"><div class="panel panel--grill"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>GRILL Team · Resumen</span></div><img class="zoomable" src="../assets/img/g-corp-hoy.webp" width="1600" height="1000" alt="Summary of the day with units, orders and companies" loading="lazy" decoding="async"></div></div></figure>
+        <div class="decision__head" data-reveal><h3><span lang="en">The cutoff comes first</span><span lang="es">Primero, el horario de cierre</span></h3><div class="prose"><p><span lang="en">The screen opens on the next delivery date and a countdown to the 10:30 cutoff. When today’s cutoff has passed, a banner says the order goes to the next delivery and can be changed until 10:30 that day.</span><span lang="es">La pantalla abre con la fecha de la próxima entrega y una cuenta regresiva al cierre de las 10:30. Si el cierre de hoy ya pasó, un aviso explica que el pedido entra en la próxima entrega y se puede modificar hasta las 10:30 de ese día.</span></p><ul class="bullets"><li><b><span lang="en">A short selection first,</span><span lang="es">Primero una selección corta,</span></b> <span lang="en">and the full menu one link away.</span><span lang="es">y la carta completa a un link.</span></li><li><b><span lang="en">The allowance always visible:</span><span lang="es">El tope siempre visible:</span></b> <span lang="en">the company covers up to $11,000 a day.</span><span lang="es">la empresa cubre hasta $11.000 por día.</span></li></ul></div></div>
+        <figure class="shot" data-reveal><div class="panel panel--grill"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>GRILL Empresas · Pedido del día</span></div><img class="zoomable" src="../assets/img/g-emp-app.webp" width="1600" height="1000" alt="Order of the day on desktop with the cutoff countdown and the kitchen selection" data-alt-es="Pedido del día en escritorio con la cuenta regresiva y la selección de la cocina" loading="lazy" decoding="async"></div></div></figure>
       </div>
       <div class="decision">
-        <div class="decision__head"><h3>Kitchen ticket</h3><div class="prose"><p>Every order added up by dish and side, grouped by category, with a checkbox to tick as each one is cooked. It prints as the day’s ticket.</p></div></div>
-        <figure class="shot"><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Cocina · Comanda del día</span></div><img class="zoomable" src="../assets/img/g-corp-dark-cocina.webp" width="1600" height="1000" alt="Kitchen ticket with aggregated quantities in dark mode" loading="lazy" decoding="async"></div></div></figure>
+        <div class="decision__head" data-reveal><h3><span lang="en">Choosing is one step</span><span lang="es">Elegir es un solo paso</span></h3><div class="prose"><p><span lang="en">Picking a dish opens a sheet to choose the side and leave a note for the kitchen, up to 140 characters. The button carries the price, so there’s no surprise at checkout. The full menu has <strong>59 dishes in 9 categories</strong>, filtered by gluten-free and vegetarian.</span><span lang="es">Elegir un plato abre una hoja para la guarnición y una nota para la cocina, de hasta 140 caracteres. El botón lleva el precio, así no hay sorpresas. La carta completa tiene <strong>59 platos en 9 categorías</strong>, con filtros sin TACC y vegetariano.</span></p></div></div>
+        <figure class="shot" data-reveal><div class="panel panel--cream panel--center"><div class="card-shot"><img class="zoomable" src="../assets/img/g-crop-modal.webp" width="896" height="1268" alt="Side dish sheet with a note for the kitchen" data-alt-es="Hoja de guarnición con nota para la cocina" loading="lazy" decoding="async"></div></div></figure>
       </div>
       <div class="decision">
-        <div class="decision__head"><h3>Labels that fit the real sheet</h3><div class="prose"><p>Each tray gets a label on a sheet of <strong>70 × 25.4 mm</strong> labels. “Start from” reuses a half-used sheet by tapping the first free cell, and a note reminds the team to print at real size so labels don’t shift off the die cut.</p></div></div>
-        <figure class="shot"><div class="panel panel--grill"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Etiquetas · Pliego del día</span></div><img class="zoomable" src="../assets/img/g-corp-etiquetas.webp" width="1600" height="1000" alt="Label sheet with start-from selector" loading="lazy" decoding="async"></div></div></figure>
-      </div>
-      <div class="decision">
-        <div class="decision__head"><h3>Delivery, orders and accounts</h3><div class="prose"><ul class="bullets"><li><b>Delivery</b>: stops by company, trays per person and a checklist per stop.</li><li><b>Orders</b>: totals to invoice for any period and status.</li><li><b>Companies and employees</b>: a registration code per company; block accounts or make someone admin.</li></ul></div></div>
-        <div class="pair"><figure class="shot"><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Reparto</span></div><img class="zoomable" src="../assets/img/g-corp-reparto.webp" width="1600" height="1000" alt="Delivery run grouped by company" loading="lazy" decoding="async"></div></div></figure><figure class="shot"><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Pedidos</span></div><img class="zoomable" src="../assets/img/g-corp-pedidos.webp" width="1600" height="1000" alt="Orders for the period with amount to invoice" loading="lazy" decoding="async"></div></div></figure></div>
+        <div class="decision__head" data-reveal><h3><span lang="en">Order history</span><span lang="es">Historial de pedidos</span></h3><div class="prose"><p><span lang="en"><strong>My orders</strong> shows the week or the month day by day, with a summary to download. The copy talks the way people in Mercedes do: “Elegí”, “Tocá”, “¿La olvidaste?”.</span><span lang="es"><strong>Mis pedidos</strong> muestra la semana o el mes día por día, con un resumen para descargar. Los textos hablan como se habla en Mercedes: “Elegí”, “Tocá”, “¿La olvidaste?”.</span></p></div></div>
+        <figure class="shot" data-reveal><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Mis pedidos</span></div><img class="zoomable" src="../assets/img/g-emp-historial.webp" width="1600" height="1000" alt="Order history by week" data-alt-es="Historial de pedidos por semana" loading="lazy" decoding="async"></div></div></figure>
       </div>
 
     </div>
   </section>
-  <section class="row chapter" id="access">
-    <div class="chapter__label"><span>Access</span></div>
+  <section class="chapter wrap" id="kitchen">
+    <div class="chapter__label"><span><span lang="en">Kitchen panel</span><span lang="es">Panel de cocina</span></span></div>
     <div class="chapter__body">
-      <h2>Two doors, each one explained.</h2>
-      <div class="prose"><p>Employees don’t sign up on their own: their company creates the account. The login says so, tells them who to ask and offers companies a proposal. The kitchen has its own internal entrance, with a link back for employees who land there by mistake.</p></div>
-      <div class="pair"><figure class="shot"><div class="panel panel--grill"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>GRILL Empresas · Ingresar</span></div><img class="zoomable" src="../assets/img/g-emp-login.webp" width="1600" height="1000" alt="Employee login" loading="lazy" decoding="async"></div></div></figure><figure class="shot"><div class="panel panel--grill"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>GRILL Team · Acceso interno</span></div><img class="zoomable" src="../assets/img/g-corp-login.webp" width="1600" height="1000" alt="Internal login for the kitchen panel" loading="lazy" decoding="async"></div></div></figure></div>
+      <h2 class="lines"><span lang="en">The kitchen’s morning, as a checklist.</span><span lang="es">La mañana de la cocina, como lista de tareas.</span></h2>
+      <div class="decision">
+        <div class="decision__head" data-reveal><h3><span lang="en">Summary of the day</span><span lang="es">Resumen del día</span></h3><div class="prose"><p><span lang="en">Units, orders and companies at the top with the departure time; below, one card per job of the morning and the alerts still to resolve.</span><span lang="es">Unidades, pedidos y empresas arriba con el horario de salida; debajo, una tarjeta por cada tarea de la mañana y las alertas que faltan resolver.</span></p></div></div>
+        <figure class="shot" data-reveal><div class="panel panel--grill"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>GRILL Team · Resumen</span></div><img class="zoomable" src="../assets/img/g-corp-hoy.webp" width="1600" height="1000" alt="Summary of the day with units, orders and companies" data-alt-es="Resumen del día con unidades, pedidos y empresas" loading="lazy" decoding="async"></div></div></figure>
+      </div>
+      <div class="decision">
+        <div class="decision__head" data-reveal><h3><span lang="en">Kitchen ticket</span><span lang="es">Comanda de cocina</span></h3><div class="prose"><p><span lang="en">Every order added up by dish and side, grouped by category, with a checkbox to tick as each one is cooked. It prints as the day’s ticket, and works in dark mode for the kitchen.</span><span lang="es">Todos los pedidos sumados por plato y guarnición, agrupados por categoría, con una casilla para tildar a medida que se cocina. Se imprime como la comanda del día y funciona en modo oscuro para la cocina.</span></p></div></div>
+        <figure class="shot" data-reveal><div class="panel"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Cocina · Comanda del día</span></div><img class="zoomable" src="../assets/img/g-corp-dark-cocina.webp" width="1600" height="1000" alt="Kitchen ticket with aggregated quantities in dark mode" data-alt-es="Comanda con cantidades sumadas en modo oscuro" loading="lazy" decoding="async"></div></div></figure>
+      </div>
+      <div class="decision">
+        <div class="decision__head" data-reveal><h3><span lang="en">Labels that fit the real sheet</span><span lang="es">Etiquetas que calzan en la hoja real</span></h3><div class="prose"><p><span lang="en">Each tray gets a label on a sheet of <strong>70 × 25.4 mm</strong> labels. “Start from” reuses a half-used sheet by tapping the first free cell, and a note reminds the team to print at real size so labels don’t shift off the die cut.</span><span lang="es">Cada bandeja tiene su etiqueta en una hoja de <strong>70 × 25,4 mm</strong>. “Empezar desde” reutiliza una hoja a medio usar tocando la primera casilla libre, y un aviso recuerda imprimir en tamaño real para que no se corran del troquel.</span></p></div></div>
+        <figure class="shot" data-reveal><div class="panel panel--grill"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Etiquetas · Pliego del día</span></div><img class="zoomable" src="../assets/img/g-corp-etiquetas.webp" width="1600" height="1000" alt="Label sheet with start-from selector" data-alt-es="Pliego de etiquetas con selector de inicio" loading="lazy" decoding="async"></div></div></figure>
+      </div>
+      <div class="decision">
+        <div class="decision__head" data-reveal><h3><span lang="en">Delivery, orders and accounts</span><span lang="es">Reparto, pedidos y cuentas</span></h3><div class="prose"><ul class="bullets"><li><b><span lang="en">Delivery:</span><span lang="es">Reparto:</span></b> <span lang="en">stops by company, trays per person and a checklist per stop.</span><span lang="es">paradas por empresa, bandejas por persona y una lista por parada.</span></li><li><b><span lang="en">Orders:</span><span lang="es">Pedidos:</span></b> <span lang="en">totals to invoice for any period and status.</span><span lang="es">totales a facturar por período y estado.</span></li><li><b><span lang="en">Companies and employees:</span><span lang="es">Empresas y empleados:</span></b> <span lang="en">a registration code per company; block accounts or make someone admin.</span><span lang="es">un código de registro por empresa; bloquear cuentas o hacer admin a alguien.</span></li></ul></div></div>
+        <div class="pair"><figure class="shot" data-reveal><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Reparto</span></div><img class="zoomable" src="../assets/img/g-corp-reparto.webp" width="1600" height="1000" alt="Delivery run grouped by company" data-alt-es="Reparto agrupado por empresa" loading="lazy" decoding="async"></div></div></figure><figure class="shot" data-reveal><div class="panel"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>Pedidos</span></div><img class="zoomable" src="../assets/img/g-corp-pedidos.webp" width="1600" height="1000" alt="Orders for the period with amount to invoice" data-alt-es="Pedidos del período con el monto a facturar" loading="lazy" decoding="async"></div></div></figure></div>
+      </div>
+
     </div>
   </section>
-  <section class="row chapter" id="outcome">
-    <div class="chapter__label"><span>Outcome</span></div>
+  <section class="chapter wrap" id="access">
+    <div class="chapter__label"><span><span lang="en">Access</span><span lang="es">Acceso</span></span></div>
     <div class="chapter__body">
-      <h2>Two apps, one language.</h2>
-      <div class="numbers">
-        <div><b>2</b><span>connected apps</span></div>
-        <div><b>12</b><span>screens</span></div>
-        <div><b>59</b><span>dishes in the menu</span></div>
-        <div><b>2</b><span>themes, light and dark</span></div>
-      </div>
-      <div class="prose"><p>Both apps share the GRILL wordmark, the lime accent and the same components, so the kitchen and its clients read the same order the same way.</p></div>
+      <h2 class="lines"><span lang="en">Two doors, each one explained.</span><span lang="es">Dos puertas, cada una explicada.</span></h2>
+      <div class="prose" data-reveal><p><span lang="en">Employees don’t sign up on their own: their company creates the account. The login says so, tells them who to ask and offers companies a proposal. The kitchen has its own internal entrance, with a link back for employees who land there by mistake.</span><span lang="es">Los empleados no se registran solos: la cuenta la crea su empresa. El login lo explica, dice a quién pedirla y ofrece una propuesta a las empresas. La cocina tiene su propia entrada interna, con un link de vuelta para el empleado que llega ahí por error.</span></p></div>
+      <div class="pair"><figure class="shot" data-reveal><div class="panel panel--grill"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>GRILL Empresas · Ingresar</span></div><img class="zoomable" src="../assets/img/g-emp-login.webp" width="1600" height="1000" alt="Employee login" data-alt-es="Login de empleados" loading="lazy" decoding="async"></div></div></figure><figure class="shot" data-reveal><div class="panel panel--grill"><div class="mock"><div class="mock__bar"><i></i><i></i><i></i><span>GRILL Team · Acceso interno</span></div><img class="zoomable" src="../assets/img/g-corp-login.webp" width="1600" height="1000" alt="Internal login for the kitchen panel" data-alt-es="Login interno del panel de cocina" loading="lazy" decoding="async"></div></div></figure></div>
+
     </div>
   </section>
-  <section class="row"><a class="next" href="mercado-play.html"><div><div class="label">Next project</div><h2>Mercado Play</h2></div><svg aria-hidden="true"><use href="#i-arrow"/></svg></a></section>
-  <footer class="row">
-    <div class="footer">
-      <span>© <span data-year>2026</span> Julián Gerardi · Mercedes, Buenos Aires · <span data-clock>--:--</span> local time</span>
-      <div class="footer__links">
-        <a href="../index.html#work">Work</a>
-        <a href="https://www.linkedin.com/in/julian-gerardi" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://www.behance.net/Jotainc" target="_blank" rel="noopener">Behance</a>
-      </div>
+  <section class="chapter wrap" id="outcome">
+    <div class="chapter__label"><span><span lang="en">Outcome</span><span lang="es">Resultado</span></span></div>
+    <div class="chapter__body">
+      <h2 class="lines"><span lang="en">Two apps, one language.</span><span lang="es">Dos apps, un mismo lenguaje.</span></h2>
+      <div class="numbers" data-reveal><div><b data-count="2">2</b><span><span lang="en">connected apps</span><span lang="es">apps conectadas</span></span></div><div><b data-count="12">12</b><span><span lang="en">screens</span><span lang="es">pantallas</span></span></div><div><b data-count="59">59</b><span><span lang="en">dishes in the menu</span><span lang="es">platos en la carta</span></span></div><div><b data-count="2">2</b><span><span lang="en">themes, light and dark</span><span lang="es">temas, claro y oscuro</span></span></div></div>
+      <div class="prose" data-reveal><p><span lang="en">Both apps share the GRILL wordmark, the lime accent and the same components, so the kitchen and its clients read the same order the same way.</span><span lang="es">Las dos apps comparten el logo de GRILL, el verde lima y los mismos componentes, así la cocina y sus clientes leen el mismo pedido de la misma forma.</span></p></div>
+
     </div>
-  </footer>
-  <div class="row shell-end" aria-hidden="true"></div>
+  </section>
+  <section class="wrap"><a class="next" href="mercado-play.html" data-cursor="→"><div><div class="label"><span lang="en">Next project</span><span lang="es">Próximo proyecto</span></div><h2>Mercado Play</h2></div><svg aria-hidden="true"><use href="#i-right"/></svg></a></section>
 </main>
+<footer class="footer wrap">
+  <div class="footer__big" aria-hidden="true">Julián Gerardi</div>
+  <div class="footer__row">
+    <span>© <span data-year>2026</span> Julián Gerardi · Mercedes, Buenos Aires · <span data-clock>--:--</span> <span lang="en">local time</span><span lang="es">hora local</span></span>
+    <div class="footer__links">
+      <a href="../index.html#work"><span lang="en">Work</span><span lang="es">Trabajos</span></a>
+      <a href="../assets/Julian_Gerardi_CV.pdf" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv><span lang="en">Download CV</span><span lang="es">Descargar CV</span></a>
+      <a href="https://www.linkedin.com/in/julian-gerardi" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.behance.net/Jotainc" target="_blank" rel="noopener">Behance</a>
+    </div>
+  </div>
+</footer>
+<div class="curtain" aria-hidden="true"></div>
+<div class="agent" data-agent>
+  <button class="agent__launch" type="button" aria-expanded="false" aria-controls="agent-panel">
+    <span class="agent__orb" aria-hidden="true"></span>
+    <span class="agent__launch-text"><span lang="en">Ask my AI</span><span lang="es">Preguntale a mi IA</span></span>
+  </button>
+  <section class="agent__panel" id="agent-panel" hidden aria-label="AI assistant">
+    <header class="agent__head">
+      <span class="agent__orb agent__orb--lg" aria-hidden="true"></span>
+      <div><b><span lang="en">Julián’s AI assistant</span><span lang="es">Asistente IA de Julián</span></b><span data-agent-mode><span lang="en">Answers about my work, experience and availability</span><span lang="es">Responde sobre mi trabajo, experiencia y disponibilidad</span></span></div>
+      <button class="icon-btn agent__close" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+    </header>
+    <div class="agent__log" data-agent-log aria-live="polite"></div>
+    <div class="agent__chips" data-agent-chips></div>
+    <form class="agent__form" data-agent-form>
+      <label class="sr-only" for="agent-input">Message</label>
+      <input id="agent-input" name="q" autocomplete="off" data-ph-en="Ask about projects, process, availability…" data-ph-es="Preguntá por proyectos, proceso, disponibilidad…" placeholder="Ask about projects, process, availability…">
+      <button class="agent__send" type="submit" aria-label="Send"><svg aria-hidden="true"><use href="#i-send"/></svg></button>
+    </form>
+  </section>
+</div>
 <dialog class="lightbox" aria-label="Screen preview">
-  <button class="icon-btn lightbox__close" type="button" aria-label="Close preview"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+  <button class="icon-btn lightbox__close" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
   <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
 </dialog>
 <script src="../assets/site.js"></script>
+<script src="../assets/agent.js"></script>
 </body>
 </html>

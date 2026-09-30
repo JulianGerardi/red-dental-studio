@@ -1,20 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-lang="en" data-title-en="Batech AI Platform · Julián Gerardi" data-title-es="Batech AI Platform · Julián Gerardi">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Batech AI Platform Case Study</title>
-<meta name="description" content="Design of Batech's AI video analytics platform for retail. Case study by Julián Gerardi.">
+<title>Batech AI Platform · Julián Gerardi</title>
+<meta name="description" content="Design of Batech's AI video analytics platform for retail. Case study by Julián Gerardi." data-es="Diseño de la plataforma de análisis de video con IA de Batech para retail. Caso de Julián Gerardi.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23171717'/%3E%3Ctext x='16' y='20.5' font-family='Arial' font-weight='700' font-size='11' text-anchor='middle' fill='%23fff'%3EJG%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&amp;family=Geist+Mono:wght@400..600&amp;display=swap">
 <link rel="stylesheet" href="../assets/site.css">
-<script>try{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script>(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);var l=localStorage.getItem('jg-lang');if(!l)l=(navigator.language||'').toLowerCase().indexOf('es')===0?'es':'en';d.setAttribute('data-lang',l);d.lang=l;}catch(e){}})();</script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js" defer></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12M6 11l6 6 6-6M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
@@ -23,173 +27,184 @@
   <symbol id="i-cursor" viewBox="0 0 20 20"><path d="M3 2.2 17.2 8.6l-6.1 1.9-2.3 6.3Z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3c.6 4.2 2.8 6.4 7 7-4.2.6-6.4 2.8-7 7-.6-4.2-2.8-6.4-7-7 4.2-.6 6.4-2.8 7-7Z" fill="currentColor"/><path d="M19 15.5c.25 1.6 1 2.35 2.5 2.5-1.5.15-2.25.9-2.5 2.5-.25-1.6-1-2.35-2.5-2.5 1.5-.15 2.25-.9 2.5-2.5Z" fill="currentColor"/></symbol>
 </svg>
-<a class="skip" href="#main">Skip to content</a>
+<a class="skip" href="#main"><span lang="en">Skip to content</span><span lang="es">Ir al contenido</span></a>
 <header class="nav">
   <div class="nav__inner">
-    <a class="brand" href="../index.html" aria-label="Julián Gerardi, home"><span class="brand__mark" aria-hidden="true">JG</span>Julián Gerardi</a>
+    <a class="brand" href="../index.html" aria-label="Julián Gerardi"><span class="brand__mark" aria-hidden="true">JG</span><span class="brand__name">Julián Gerardi</span></a>
     <nav class="nav__links" aria-label="Main">
-      <a href="../index.html#work" aria-current="page">Work</a>
-      <a href="../index.html#process">Process</a>
-      <a href="../index.html#experience">Experience</a>
-      <a href="../index.html#about">About</a>
+      <a href="../index.html#work" aria-current="page"><span lang="en">Work</span><span lang="es">Trabajos</span></a>
+      <a href="../index.html#process"><span lang="en">Process</span><span lang="es">Proceso</span></a>
+      <a href="../index.html#experience"><span lang="en">Experience</span><span lang="es">Experiencia</span></a>
+      <a href="../index.html#about"><span lang="en">About</span><span lang="es">Sobre mí</span></a>
+      <a href="../index.html#contact"><span lang="en">Contact</span><span lang="es">Contacto</span></a>
+      <a class="nav__cv-mobile" href="../assets/Julian_Gerardi_CV.pdf" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv><span lang="en">Download CV</span><span lang="es">Descargar CV</span></a>
     </nav>
     <div class="nav__right">
-      <button class="icon-btn theme-toggle" type="button" aria-label="Switch theme">
+      <div class="lang" role="group" aria-label="Language / Idioma">
+        <button type="button" data-set-lang="en">EN</button><button type="button" data-set-lang="es">ES</button>
+      </div>
+      <button class="icon-btn theme-toggle" type="button" aria-label="Theme">
         <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
         <svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
       </button>
-      <button class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
-      <a class="btn btn--sm" href="../index.html#contact">Get in touch</a>
+      <a class="btn btn--sm nav__cv" href="../assets/Julian_Gerardi_CV.pdf" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv><svg aria-hidden="true"><use href="#i-down"/></svg><span lang="en">CV</span><span lang="es">CV</span></a>
+      <button class="icon-btn menu-btn" type="button" aria-label="Menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
     </div>
   </div>
 </header>
+<div class="crumbs-bar">
+  <div class="crumbs-bar__inner">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span aria-hidden="true">/</span>
+      <a href="../index.html#work"><span lang="en">Work</span><span lang="es">Trabajos</span></a><span aria-hidden="true">/</span>
+      <span aria-current="page">Batech AI Platform</span>
+    </nav>
+    <div class="crumbs-bar__nav">
+      <span class="mono">01 / 05</span>
+      <a class="icon-btn" href="mercado-play.html" aria-label="Mercado Play" title="Mercado Play"><svg aria-hidden="true"><use href="#i-left"/></svg></a>
+      <a class="icon-btn" href="confidentally.html" aria-label="Confidentally" title="Confidentally"><svg aria-hidden="true"><use href="#i-right"/></svg></a>
+    </div>
+  </div>
+  <div class="crumbs-bar__progress" aria-hidden="true"><i></i></div>
+</div>
 
-<main class="shell" id="main">
-  <section class="row case-head">
-    <div class="cell" style="padding-block:clamp(56px,9vw,112px) clamp(40px,6vw,72px)">
-      <nav class="crumbs rise" style="--d:0s" aria-label="Breadcrumb"><a href="../index.html#work">Work</a><span>/</span><span>Batech AI Platform</span></nav>
-      <h1 class="case-title split">Batech AI Platform</h1>
-      <p class="case-lede rise">A computer-vision platform that turns store cameras into events, alerts and reports. I led its design end to end, from the first flow to a high-fidelity prototype.</p>
-      <div class="btns rise" style="--d:.55s"><a class="btn" href="https://www.figma.com/design/ljgOjnuyx1hS052ehRnyRb/Portfolio?node-id=133-4775" target="_blank" rel="noopener">View in Figma <svg aria-hidden="true"><use href="#i-arrow"/></svg></a><a class="btn btn--ghost" href="#flow">Jump to the flow</a></div>
-      
+<main id="main" class="case">
+  <header class="case-head wrap">
+    <h1 class="case-title split">Batech AI Platform</h1>
+    <p class="case-lede" data-reveal><span lang="en">A computer-vision platform that turns store cameras into events, alerts and reports. I led its design end to end, from the first flow to a high-fidelity prototype.</span><span lang="es">Una plataforma de visión artificial que convierte las cámaras de cada tienda en eventos, alertas y reportes. Lideré su diseño de punta a punta, del primer flujo al prototipo de alta fidelidad.</span></p>
+    <div class="btns" data-reveal><a class="btn" href="https://www.figma.com/design/ljgOjnuyx1hS052ehRnyRb/Portfolio?node-id=133-4775" target="_blank" rel="noopener"><span lang="en">View in Figma</span><span lang="es">Ver en Figma</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a><a class="btn btn--ghost" href="#flow"><span lang="en">Jump to the flow</span><span lang="es">Ir al flujo</span></a></div>
+    
+    <dl class="case-meta" data-reveal><div><dt><span lang="en">Role</span><span lang="es">Rol</span></dt><dd>Lead UX/UI Designer</dd></div><div><dt><span lang="en">Company</span><span lang="es">Empresa</span></dt><dd>Batech · Querétaro, MX</dd></div><div><dt><span lang="en">Timeline</span><span lang="es">Período</span></dt><dd>2022 — 2026</dd></div><div><dt><span lang="en">Platform</span><span lang="es">Plataforma</span></dt><dd><span lang="en">Web app, dark UI</span><span lang="es">Web app, UI oscura</span></dd></div><div><dt><span lang="en">Team</span><span lang="es">Equipo</span></dt><dd><span lang="en">Design team lead</span><span lang="es">Líder del equipo de diseño</span></dd></div><div><dt><span lang="en">Scope</span><span lang="es">Alcance</span></dt><dd><span lang="en">Research, flows, UI, design system</span><span lang="es">Research, flujos, UI, design system</span></dd></div></dl>
+  </header>
+  <section class="wrap case-cover" data-parallax><div class="cover cover--batech " aria-hidden="true"><div class="cover__stage"><div class="mock mock--dark" style="width:60.07%"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Dashboard</span></div><img src="../assets/img/b-dashboard.webp" width="1200" height="857" alt="" decoding="async"></div></div></div></section>
+  <section class="chapter wrap" id="overview">
+    <div class="chapter__label"><span><span lang="en">Overview</span><span lang="es">Resumen</span></span></div>
+    <div class="chapter__body">
+      <h2 class="lines"><span lang="en">AI that watches the store, and a place to read what it saw.</span><span lang="es">Una IA que mira la tienda, y un lugar para leer lo que vio.</span></h2>
+      <div class="prose" data-reveal><p><span lang="en">Batech builds artificial intelligence for physical retail. Its models watch the cameras of every branch and detect events, such as a cash drawer opening at the till. The platform is where operations teams follow those detections, configure new analyses and download the results.</span><span lang="es">Batech desarrolla inteligencia artificial para el retail físico. Sus modelos miran las cámaras de cada sucursal y detectan eventos, como la apertura de una caja. La plataforma es donde los equipos de operaciones siguen esas detecciones, configuran nuevos análisis y descargan los resultados.</span></p><p><span lang="en">I led the design of the platform from the first idea to launch: research and testing, flows and navigation, the interface and the component library in Figma. I also led the design team, which delivered <strong>10% faster</strong> over the project.</span><span lang="es">Lideré el diseño de la plataforma desde la primera idea hasta el lanzamiento: research y testing, flujos y navegación, la interfaz y la librería de componentes en Figma. También lideré al equipo de diseño, que entregó <strong>un 10% más rápido</strong> a lo largo del proyecto.</span></p></div>
+
     </div>
   </section>
-  <section class="row"><dl class="cells meta" style="margin:0"><div class="cell"><dt>Role</dt><dd>Lead UX/UI Designer</dd></div><div class="cell"><dt>Company</dt><dd>Batech · Querétaro, MX</dd></div><div class="cell"><dt>Timeline</dt><dd>2022 — 2026</dd></div><div class="cell"><dt>Platform</dt><dd>Web app, dark UI</dd></div><div class="cell"><dt>Team</dt><dd>Design team lead</dd></div><div class="cell"><dt>Scope</dt><dd>Research, flows, UI, design system</dd></div></dl></section>
-  <section class="row"><div class="cell cell--flush"><div class="cover cover--batech cover--hero" aria-hidden="true"><div class="cover__stage"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Resultado de análisis</span></div><img src="../assets/img/b-resultado.webp" width="1200" height="1021" alt="" decoding="async"></div></div></div></div></section>
-  <section class="row chapter" id="overview">
-    <div class="chapter__label"><span>Overview</span></div>
+  <section class="chapter wrap" id="challenge">
+    <div class="chapter__label"><span><span lang="en">The challenge</span><span lang="es">El desafío</span></span></div>
     <div class="chapter__body">
-      <h2>AI that watches the store, and a place to read what it saw.</h2>
-      <div class="prose">
-        <p>Batech builds artificial intelligence for physical retail. Its models watch the cameras of every branch and detect events, such as a cash drawer opening at the till. The platform is where operations teams follow those detections, configure new analyses and download the results.</p>
-        <p>I led the design of the platform from the first idea to launch: research and testing, flows and navigation, the interface and the component library in Figma. I also led the design team, which delivered <strong>10% faster</strong> over the project.</p>
-      </div>
+      <h2 class="lines"><span lang="en">A technical setup that has to feel like a form.</span><span lang="es">Una configuración técnica que tiene que sentirse como un formulario.</span></h2>
+      <div class="prose" data-reveal><p><span lang="en">Video analytics is full of concepts that are hard to explain: models, camera sources, RTSP links, geofences, execution schedules. And the people configuring an analysis shouldn’t need to be engineers.</span><span lang="es">El análisis de video está lleno de conceptos difíciles de explicar: modelos, fuentes de cámara, links RTSP, geocercas, horarios de ejecución. Y quien configura un análisis no debería necesitar ser ingeniero.</span></p><p><span lang="en">At the same time the platform produces a lot of data: hundreds of pages of detections, each tied to a camera, a branch and a video that may or may not be processed yet.</span><span lang="es">Al mismo tiempo, la plataforma genera muchísimos datos: cientos de páginas de detecciones, cada una atada a una cámara, una sucursal y un video que puede estar procesado o no.</span></p></div>
+      <p class="pull" data-reveal><span lang="en">Make the setup read like a form, and make hundreds of detections easy to scan.</span><span lang="es">Que la configuración se lea como un formulario, y que cientos de detecciones se puedan escanear de un vistazo.</span></p>
+
     </div>
   </section>
-  <section class="row chapter" id="challenge">
-    <div class="chapter__label"><span>The challenge</span></div>
+  <section class="chapter wrap" id="structure">
+    <div class="chapter__label"><span><span lang="en">Structure</span><span lang="es">Estructura</span></span></div>
     <div class="chapter__body">
-      <h2>A technical setup that has to feel like a form.</h2>
-      <div class="prose">
-        <p>Video analytics is full of concepts that are hard to explain: models, camera sources, RTSP links, geofences, execution schedules. And the people configuring an analysis shouldn’t need to be engineers.</p>
-        <p>At the same time the platform produces a lot of data. Hundreds of pages of detections, each one tied to a camera, a branch and a video that may or may not be processed yet.</p>
-      </div>
-      <p class="pull">Make the setup read like a form, and make hundreds of detections easy to scan.</p>
+      <h2 class="lines"><span lang="en">Seven sections, each answering one question.</span><span lang="es">Siete secciones, cada una responde una pregunta.</span></h2>
+      <div class="grid-cards" data-reveal><div><b>Dashboard</b><span><span lang="en">What is happening now: active cameras, total detections and rate.</span><span lang="es">Qué pasa ahora: cámaras activas, detecciones totales y tasa.</span></span></div><div><b>Eventos</b><span><span lang="en">What was detected, with the camera frame and its video.</span><span lang="es">Qué se detectó, con el cuadro de la cámara y su video.</span></span></div><div><b>Alertas</b><span><span lang="en">What needs attention right away.</span><span lang="es">Qué necesita atención ya.</span></span></div><div><b>Análisis</b><span><span lang="en">What is being analyzed, and in which state.</span><span lang="es">Qué se está analizando y en qué estado.</span></span></div><div><b>Bitácora</b><span><span lang="en">What happened, and when.</span><span lang="es">Qué pasó y cuándo.</span></span></div><div><b>Operativo</b><span><span lang="en">How long operations take against what was expected.</span><span lang="es">Cuánto tardan las operaciones contra lo esperado.</span></span></div><div><b>Reportes</b><span><span lang="en">What to share with the rest of the company.</span><span lang="es">Qué compartir con el resto de la empresa.</span></span></div></div>
+      <div class="prose" data-reveal><p><span lang="en">The dashboard above opens the platform: three numbers up top and the live analytics panel below, with the seven sections always one click away in the sidebar.</span><span lang="es">El dashboard de arriba abre la plataforma: tres números arriba y el panel de analítica en vivo debajo, con las siete secciones siempre a un clic en la barra lateral.</span></p></div>
+
     </div>
   </section>
-  <section class="row chapter" id="structure">
-    <div class="chapter__label"><span>Structure</span></div>
+  <section class="chapter wrap" id="flow">
+    <div class="chapter__label"><span><span lang="en">Configuring an analysis</span><span lang="es">Configurar un análisis</span></span></div>
     <div class="chapter__body">
-      <h2>Seven sections, each answering one question.</h2>
-      <div class="grid-cards">
-        <div><b>Dashboard</b><span>What is happening now: active cameras, total detections and rate.</span></div>
-        <div><b>Eventos</b><span>What was detected, with the camera frame and its video.</span></div>
-        <div><b>Alertas</b><span>What needs attention right away.</span></div>
-        <div><b>Análisis</b><span>What is being analyzed, and in which state.</span></div>
-        <div><b>Bitácora</b><span>What happened, and when.</span></div>
-        <div><b>Operativo</b><span>How long operations take against what was expected.</span></div>
-        <div><b>Reportes</b><span>What to share with the rest of the company.</span></div>
-      </div>
-      <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Dashboard</span></div><img class="zoomable" src="../assets/img/b-dashboard.webp" width="1200" height="857" alt="Dashboard with active cameras, total detections and rate" loading="lazy" decoding="async"></div></div><figcaption><b>Dashboard.</b> Three numbers up top and the live analytics panel below; the sidebar keeps the seven sections one click away.</figcaption></figure>
+      <h2 class="lines"><span lang="en">From camera to report in six steps.</span><span lang="es">De la cámara al reporte en seis pasos.</span></h2>
+      <figure class="shot" data-reveal><div class="flow" tabindex="0"><img class="zoomable" src="../assets/img/b-flow.webp" width="3200" height="718" alt="To-be flow for configuring an analysis, from source to report" data-alt-es="Flujo to-be para configurar un análisis, de la fuente al reporte" loading="lazy" decoding="async"></div><figcaption><span lang="en"><b>The to-be flow</b>, prototyped in high fidelity in Figma. Click it to open it full size.</span><span lang="es"><b>El flujo to-be</b>, prototipado en alta fidelidad en Figma. Hacé clic para verlo en grande.</span></figcaption></figure>
+      <ol class="steps"><li data-reveal><span class="steps__n">01</span><div><h3><span lang="en">Choose the source</span><span lang="es">Elegir la fuente</span></h3><p><span lang="en">A video service, an RTSP link or an uploaded video file. Three branches that converge in the same form.</span><span lang="es">Un servicio de video, un link RTSP o un archivo subido. Tres caminos que llegan al mismo formulario.</span></p></div></li><li data-reveal><span class="steps__n">02</span><div><h3><span lang="en">Name it and pick a model</span><span lang="es">Nombrarlo y elegir el modelo</span></h3><p><span lang="en">General aspects first: the detection model and a name the team will recognise later.</span><span lang="es">Primero lo general: el modelo de detección y un nombre que el equipo reconozca después.</span></p></div></li><li data-reveal><span class="steps__n">03</span><div><h3><span lang="en">Schedule it</span><span lang="es">Programarlo</span></h3><p><span lang="en">Execution days as chips from Monday to Sunday, plus a start and end time.</span><span lang="es">Los días de ejecución como chips de lunes a domingo, más una hora de inicio y de fin.</span></p></div></li><li data-reveal><span class="steps__n">04</span><div><h3><span lang="en">Draw the geofence</span><span lang="es">Dibujar la geocerca</span></h3><p><span lang="en">On a frame of the camera, the user outlines the area to analyze with the cursor and names it.</span><span lang="es">Sobre un cuadro de la cámara, se marca con el cursor el área a analizar y se le pone nombre.</span></p></div></li><li data-reveal><span class="steps__n">05</span><div><h3><span lang="en">Confirm</span><span lang="es">Confirmar</span></h3><p><span lang="en">A dialog warns that the analysis can take hours, and says where to follow its progress and download the report.</span><span lang="es">Un diálogo avisa que el análisis puede tardar horas y dice dónde seguir su progreso y descargar el reporte.</span></p></div></li><li data-reveal><span class="steps__n">06</span><div><h3><span lang="en">Read the result</span><span lang="es">Ver el resultado</span></h3><p><span lang="en">The geofence over the frame, the detections in a table and one button to download.</span><span lang="es">La geocerca sobre el cuadro, las detecciones en una tabla y un botón para descargar.</span></p></div></li></ol>
+      <div class="pair"><figure class="shot" data-reveal><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Nuevo análisis · Geocerca</span></div><img class="zoomable" src="../assets/img/b-geocerca.webp" width="1200" height="1233" alt="Geofence creation over a parking lot camera frame" data-alt-es="Creación de geocerca sobre el cuadro de una cámara de estacionamiento" loading="lazy" decoding="async"></div></div><figcaption><span lang="en"><b>Step 04.</b> The geofence is drawn on the real camera frame, not described in coordinates.</span><span lang="es"><b>Paso 04.</b> La geocerca se dibuja sobre el cuadro real de la cámara, no se describe con coordenadas.</span></figcaption></figure><figure class="shot" data-reveal><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Nuevo análisis · Confirmación</span></div><img class="zoomable" src="../assets/img/b-confirm.webp" width="1200" height="1396" alt="Confirmation dialog before starting the analysis" data-alt-es="Diálogo de confirmación antes de iniciar el análisis" loading="lazy" decoding="async"></div></div><figcaption><span lang="en"><b>Step 05.</b> The dialog sets expectations: it may take hours, and here is where to check.</span><span lang="es"><b>Paso 05.</b> El diálogo marca expectativas: puede tardar horas, y acá es donde se sigue.</span></figcaption></figure></div>
+      <figure class="shot" data-reveal><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Resultado de análisis</span></div><img class="zoomable" src="../assets/img/b-resultado.webp" width="1200" height="1021" alt="Analysis result with the geofence highlighted and a table of detections" data-alt-es="Resultado del análisis con la geocerca resaltada y la tabla de detecciones" loading="lazy" decoding="async"></div></div><figcaption><span lang="en"><b>Step 06.</b> The highlighted area shows exactly what the model watched.</span><span lang="es"><b>Paso 06.</b> El área resaltada muestra exactamente qué miró el modelo.</span></figcaption></figure>
+
     </div>
   </section>
-  <section class="row chapter" id="flow">
-    <div class="chapter__label"><span>Configuring an analysis</span></div>
+  <section class="chapter wrap" id="events">
+    <div class="chapter__label"><span><span lang="en">Events and operations</span><span lang="es">Eventos y operación</span></span></div>
     <div class="chapter__body">
-      <h2>From camera to report in six steps.</h2>
-      <div class="prose"><p>I prototyped the to-be flow in high fidelity: three ways to connect a source, and one shared path from there to the report.</p></div>
-      <div class="flow" tabindex="0" aria-label="High-fidelity to-be flow, scroll sideways"><img class="zoomable" src="../assets/img/b-flow.webp" width="3200" height="718" alt="To-be flow for configuring an analysis, from source to report" loading="lazy" decoding="async"></div>
-      <ol class="steps">
-        <li><span class="steps__n">01</span><div><h3>Choose the source</h3><p>A video service, an RTSP link or an uploaded video file. Three branches that converge in the same form.</p></div></li>
-        <li><span class="steps__n">02</span><div><h3>Name it and pick a model</h3><p>General aspects first: the detection model and a name the team will recognise later.</p></div></li>
-        <li><span class="steps__n">03</span><div><h3>Schedule it</h3><p>Execution days as chips from Monday to Sunday, plus a start and end time.</p></div></li>
-        <li><span class="steps__n">04</span><div><h3>Draw the geofence</h3><p>On a frame of the camera, the user outlines the area to analyze with the cursor and names it.</p></div></li>
-        <li><span class="steps__n">05</span><div><h3>Confirm</h3><p>A dialog warns that the analysis can take hours, and says where to follow its progress and download the report.</p></div></li>
-        <li><span class="steps__n">06</span><div><h3>Read the result</h3><p>The geofence over the frame, the detections in a table and one button to download.</p></div></li>
-      </ol>
-      <div class="pair">
-        <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Nuevo análisis · Geocerca</span></div><img class="zoomable" src="../assets/img/b-geocerca.webp" width="1200" height="1233" alt="Geofence creation dialog over a parking lot camera frame" loading="lazy" decoding="async"></div></div><figcaption><b>Step 04.</b> The geofence is drawn on the real camera frame, not described in coordinates.</figcaption></figure>
-        <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Nuevo análisis · Confirmación</span></div><img class="zoomable" src="../assets/img/b-confirm.webp" width="1200" height="1396" alt="Confirmation dialog before starting the analysis" loading="lazy" decoding="async"></div></div><figcaption><b>Step 05.</b> The dialog sets expectations: it may take hours, and here is where to check.</figcaption></figure>
-      </div>
-      <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Resultado de análisis</span></div><img class="zoomable" src="../assets/img/b-resultado.webp" width="1200" height="1021" alt="Analysis result with the geofence highlighted and a table of detections" loading="lazy" decoding="async"></div></div><figcaption><b>Step 06.</b> The highlighted area shows exactly what the model watched.</figcaption></figure>
-    </div>
-  </section>
-  <section class="row chapter" id="events">
-    <div class="chapter__label"><span>Events and operations</span></div>
-    <div class="chapter__body">
-      <h2>Hundreds of pages, scannable at a glance.</h2>
+      <h2 class="lines"><span lang="en">Hundreds of pages, scannable at a glance.</span><span lang="es">Cientos de páginas, legibles de un vistazo.</span></h2>
       <div class="decision">
-        <div class="decision__head">
-          <h3>Events as cards with the frame</h3>
-          <ul class="bullets">
-            <li><b>The camera frame leads</b>, so people recognise the scene before they read the ID.</li>
-            <li><b>Four filters</b> above the grid: event ID, date range, detection type and branch.</li>
-            <li><b>Video state in colour</b>: a red bar when the video is not processed yet, a blue button when it can be watched.</li>
-            <li><b>Pagination with jump-to-page</b>, because there can be 300 pages.</li>
-          </ul>
-        </div>
-        <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Eventos detectados</span></div><img class="zoomable" src="../assets/img/b-eventos.webp" width="1200" height="932" alt="Grid of detected events with camera frames, filters and pagination" loading="lazy" decoding="async"></div></div></figure>
+        <div class="decision__head" data-reveal><h3><span lang="en">Events as cards with the frame</span><span lang="es">Eventos como tarjetas con el cuadro</span></h3><div class="prose"><ul class="bullets"><li><b><span lang="en">The camera frame leads,</span><span lang="es">El cuadro de la cámara va primero,</span></b> <span lang="en">so people recognise the scene before they read the ID.</span><span lang="es">así se reconoce la escena antes de leer el ID.</span></li><li><b><span lang="en">Four filters</span><span lang="es">Cuatro filtros</span></b> <span lang="en">above the grid: event ID, date range, detection type and branch.</span><span lang="es">sobre la grilla: ID del evento, rango de fechas, tipo de detección y sucursal.</span></li><li><b><span lang="en">Video state in colour:</span><span lang="es">El estado del video en color:</span></b> <span lang="en">a red bar when the video is not processed yet, a blue button when it can be watched.</span><span lang="es">una barra roja cuando el video todavía no se procesó, un botón azul cuando ya se puede ver.</span></li><li><b><span lang="en">Pagination with jump-to-page,</span><span lang="es">Paginación con salto a página,</span></b> <span lang="en">because there can be 300 pages.</span><span lang="es">porque puede haber 300 páginas.</span></li></ul></div></div>
+        <figure class="shot" data-reveal><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Eventos detectados</span></div><img class="zoomable" src="../assets/img/b-eventos.webp" width="1200" height="932" alt="Grid of detected events with camera frames, filters and pagination" data-alt-es="Grilla de eventos detectados con cuadros de cámara, filtros y paginación" loading="lazy" decoding="async"></div></div></figure>
       </div>
       <div class="decision">
-        <div class="decision__head">
-          <h3>Analyses and operational times</h3>
-          <div class="prose"><p>The analysis table puts status last and in colour (retry, error, active, configured) so problems stand out in a long list. The operational view compares <strong>real time against expected time</strong> for each analysis and turns it into a percentage.</p></div>
-        </div>
-        <div class="pair">
-          <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Análisis</span></div><img class="zoomable" src="../assets/img/b-analisis.webp" width="1200" height="857" alt="Analysis table with coloured statuses" loading="lazy" decoding="async"></div></div></figure>
-          <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Operativos</span></div><img class="zoomable" src="../assets/img/b-operativos.webp" width="1200" height="857" alt="Operational cards comparing real and expected time" loading="lazy" decoding="async"></div></div></figure>
-        </div>
+        <div class="decision__head" data-reveal><h3><span lang="en">Analyses and operational times</span><span lang="es">Análisis y tiempos operativos</span></h3><div class="prose"><p><span lang="en">The analysis table puts status last and in colour (retry, error, active, configured) so problems stand out in a long list. The operational view compares <strong>real time against expected time</strong> for each analysis and turns it into a percentage.</span><span lang="es">La tabla de análisis pone el estado al final y en color (reintento, error, activo, configurado) para que los problemas resalten en una lista larga. La vista operativa compara <strong>el tiempo real contra el esperado</strong> de cada análisis y lo convierte en un porcentaje.</span></p></div></div>
+        <div class="pair"><figure class="shot" data-reveal><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Análisis</span></div><img class="zoomable" src="../assets/img/b-analisis.webp" width="1200" height="857" alt="Analysis table with coloured statuses" data-alt-es="Tabla de análisis con estados en color" loading="lazy" decoding="async"></div></div></figure><figure class="shot" data-reveal><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Operativos</span></div><img class="zoomable" src="../assets/img/b-operativos.webp" width="1200" height="857" alt="Operational cards comparing real and expected time" data-alt-es="Tarjetas operativas que comparan el tiempo real y el esperado" loading="lazy" decoding="async"></div></div></figure></div>
       </div>
+
     </div>
   </section>
-  <section class="row chapter" id="ai">
+  <section class="chapter wrap" id="ai">
     <div class="chapter__label"><span>Batech AI</span></div>
     <div class="chapter__body">
-      <h2>Ask the platform instead of building a report.</h2>
-      <div class="prose"><p>An assistant opens in a side panel over any screen. It opens with suggested questions, such as the most visited branch, the most recurrent event or the conversion rate, and accepts text, attachments and voice.</p></div>
-      <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech AI · New chat</span></div><img class="zoomable" src="../assets/img/b-ai.webp" width="1200" height="857" alt="AI assistant panel with suggested questions" loading="lazy" decoding="async"></div></div></figure>
+      <h2 class="lines"><span lang="en">Ask the platform instead of building a report.</span><span lang="es">Preguntarle a la plataforma en vez de armar un reporte.</span></h2>
+      <div class="prose" data-reveal><p><span lang="en">An assistant opens in a side panel over any screen. It opens with suggested questions, such as the most visited branch, the most recurrent event or the conversion rate, and accepts text, attachments and voice.</span><span lang="es">Un asistente se abre en un panel lateral sobre cualquier pantalla. Arranca con preguntas sugeridas, como la sucursal más visitada, el evento más recurrente o la tasa de conversión, y acepta texto, adjuntos y voz.</span></p></div>
+      <figure class="shot" data-reveal><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech AI · New chat</span></div><img class="zoomable" src="../assets/img/b-ai.webp" width="1200" height="857" alt="AI assistant panel with suggested questions" data-alt-es="Panel del asistente de IA con preguntas sugeridas" loading="lazy" decoding="async"></div></div></figure>
+
     </div>
   </section>
-  <section class="row chapter" id="system">
-    <div class="chapter__label"><span>Access and system</span></div>
+  <section class="chapter wrap" id="system">
+    <div class="chapter__label"><span><span lang="en">Access and system</span><span lang="es">Acceso y sistema</span></span></div>
     <div class="chapter__body">
-      <h2>One dark system, from the login in.</h2>
-      <div class="prose"><p>Sign-in works with a phone or an email, switched with a segmented control. Every screen is built from the same Figma library (sidebar, filters, cards, tables, dialogs and pagination) on a dark theme with the brand’s cyan as the accent.</p></div>
-      <figure class="shot"><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Iniciar sesión</span></div><img class="zoomable" src="../assets/img/b-login.webp" width="1200" height="857" alt="Login with phone or email tabs" loading="lazy" decoding="async"></div></div></figure>
+      <h2 class="lines"><span lang="en">One dark system, from the login in.</span><span lang="es">Un sistema oscuro, desde el login.</span></h2>
+      <div class="prose" data-reveal><p><span lang="en">Sign-in works with a phone or an email, switched with a segmented control. Every screen is built from the same Figma library (sidebar, filters, cards, tables, dialogs and pagination) on a dark theme with the brand’s cyan as the accent.</span><span lang="es">El ingreso funciona con teléfono o con email, que se cambian con un control segmentado. Cada pantalla sale de la misma librería de Figma (barra lateral, filtros, tarjetas, tablas, diálogos y paginación) sobre un tema oscuro con el cian de la marca como acento.</span></p></div>
+      <figure class="shot" data-reveal><div class="panel panel--batech"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i><span>Batech · Iniciar sesión</span></div><img class="zoomable" src="../assets/img/b-login.webp" width="1200" height="857" alt="Login with phone or email tabs" data-alt-es="Login con pestañas de teléfono o email" loading="lazy" decoding="async"></div></div></figure>
+
     </div>
   </section>
-  <section class="row chapter" id="outcome">
-    <div class="chapter__label"><span>Outcome</span></div>
+  <section class="chapter wrap" id="outcome">
+    <div class="chapter__label"><span><span lang="en">Outcome</span><span lang="es">Resultado</span></span></div>
     <div class="chapter__body">
-      <h2>One place to set up, follow and share every analysis.</h2>
-      <div class="numbers">
-        <div><b>7</b><span>sections in the navigation</span></div>
-        <div><b>3</b><span>video sources, one setup flow</span></div>
-        <div><b>6</b><span>steps from camera to report</span></div>
-        <div><b>10%</b><span>faster delivery from the design team</span></div>
+      <h2 class="lines"><span lang="en">One place to set up, follow and share every analysis.</span><span lang="es">Un solo lugar para configurar, seguir y compartir cada análisis.</span></h2>
+      <div class="numbers" data-reveal>
+        <div><b data-count="7">7</b><span><span lang="en">sections in the navigation</span><span lang="es">secciones en la navegación</span></span></div>
+        <div><b data-count="3">3</b><span><span lang="en">video sources, one setup flow</span><span lang="es">fuentes de video, un solo flujo</span></span></div>
+        <div><b data-count="6">6</b><span><span lang="en">steps from camera to report</span><span lang="es">pasos de la cámara al reporte</span></span></div>
+        <div><b data-count="10" data-suffix="%">10%</b><span><span lang="en">faster delivery from the design team</span><span lang="es">entregas más rápidas del equipo de diseño</span></span></div>
       </div>
-      <div class="prose"><p>Alongside the platform I revamped Batech’s web and mobile interfaces with analytics and A/B testing to simplify key flows and reduce abandonment, and kept the design system in Figma consistent across both.</p></div>
-      <div class="btns"><a class="btn" href="https://www.figma.com/design/ljgOjnuyx1hS052ehRnyRb/Portfolio?node-id=133-4775" target="_blank" rel="noopener">View in Figma <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+      <div class="prose" data-reveal><p><span lang="en">Alongside the platform I revamped Batech’s web and mobile interfaces with analytics and A/B testing to simplify key flows and reduce abandonment, and kept the design system in Figma consistent across both.</span><span lang="es">Además de la plataforma, rediseñé las interfaces web y mobile de Batech con analytics y A/B testing para simplificar flujos clave y bajar el abandono, y mantuve el design system en Figma consistente entre ambas.</span></p></div>
+      <div class="btns" data-reveal><a class="btn" href="https://www.figma.com/design/ljgOjnuyx1hS052ehRnyRb/Portfolio?node-id=133-4775" target="_blank" rel="noopener"><span lang="en">View in Figma</span><span lang="es">Ver en Figma</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+
     </div>
   </section>
-  <section class="row"><a class="next" href="confidentally.html"><div><div class="label">Next project</div><h2>Confidentally</h2></div><svg aria-hidden="true"><use href="#i-arrow"/></svg></a></section>
-  <footer class="row">
-    <div class="footer">
-      <span>© <span data-year>2026</span> Julián Gerardi · Mercedes, Buenos Aires · <span data-clock>--:--</span> local time</span>
-      <div class="footer__links">
-        <a href="../index.html#work">Work</a>
-        <a href="https://www.linkedin.com/in/julian-gerardi" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://www.behance.net/Jotainc" target="_blank" rel="noopener">Behance</a>
-      </div>
-    </div>
-  </footer>
-  <div class="row shell-end" aria-hidden="true"></div>
+  <section class="wrap"><a class="next" href="confidentally.html" data-cursor="→"><div><div class="label"><span lang="en">Next project</span><span lang="es">Próximo proyecto</span></div><h2>Confidentally</h2></div><svg aria-hidden="true"><use href="#i-right"/></svg></a></section>
 </main>
+<footer class="footer wrap">
+  <div class="footer__big" aria-hidden="true">Julián Gerardi</div>
+  <div class="footer__row">
+    <span>© <span data-year>2026</span> Julián Gerardi · Mercedes, Buenos Aires · <span data-clock>--:--</span> <span lang="en">local time</span><span lang="es">hora local</span></span>
+    <div class="footer__links">
+      <a href="../index.html#work"><span lang="en">Work</span><span lang="es">Trabajos</span></a>
+      <a href="../assets/Julian_Gerardi_CV.pdf" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv><span lang="en">Download CV</span><span lang="es">Descargar CV</span></a>
+      <a href="https://www.linkedin.com/in/julian-gerardi" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.behance.net/Jotainc" target="_blank" rel="noopener">Behance</a>
+    </div>
+  </div>
+</footer>
+<div class="curtain" aria-hidden="true"></div>
+<div class="agent" data-agent>
+  <button class="agent__launch" type="button" aria-expanded="false" aria-controls="agent-panel">
+    <span class="agent__orb" aria-hidden="true"></span>
+    <span class="agent__launch-text"><span lang="en">Ask my AI</span><span lang="es">Preguntale a mi IA</span></span>
+  </button>
+  <section class="agent__panel" id="agent-panel" hidden aria-label="AI assistant">
+    <header class="agent__head">
+      <span class="agent__orb agent__orb--lg" aria-hidden="true"></span>
+      <div><b><span lang="en">Julián’s AI assistant</span><span lang="es">Asistente IA de Julián</span></b><span data-agent-mode><span lang="en">Answers about my work, experience and availability</span><span lang="es">Responde sobre mi trabajo, experiencia y disponibilidad</span></span></div>
+      <button class="icon-btn agent__close" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+    </header>
+    <div class="agent__log" data-agent-log aria-live="polite"></div>
+    <div class="agent__chips" data-agent-chips></div>
+    <form class="agent__form" data-agent-form>
+      <label class="sr-only" for="agent-input">Message</label>
+      <input id="agent-input" name="q" autocomplete="off" data-ph-en="Ask about projects, process, availability…" data-ph-es="Preguntá por proyectos, proceso, disponibilidad…" placeholder="Ask about projects, process, availability…">
+      <button class="agent__send" type="submit" aria-label="Send"><svg aria-hidden="true"><use href="#i-send"/></svg></button>
+    </form>
+  </section>
+</div>
 <dialog class="lightbox" aria-label="Screen preview">
-  <button class="icon-btn lightbox__close" type="button" aria-label="Close preview"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+  <button class="icon-btn lightbox__close" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
   <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
 </dialog>
 <script src="../assets/site.js"></script>
+<script src="../assets/agent.js"></script>
 </body>
 </html>
