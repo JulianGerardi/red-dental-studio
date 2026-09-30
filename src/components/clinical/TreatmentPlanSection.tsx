@@ -10,7 +10,7 @@ import { ConsentBlock } from '@/components/clinical/ConsentBlock'
 import {
   CASOS, NO_ASIGNADOS, CATEGORIAS, DIALOGOS, OPCIONES_BORRAR_CASO, MOVER,
   NUEVO_GRUPO, COMPLETAR,
-  type Caso, type Procedimiento, type ClaveDialogo, type ConsentProcedimiento,
+  type Caso, type EstadoCaso, type Procedimiento, type ClaveDialogo, type ConsentProcedimiento,
 } from '@/data/treatment-plan'
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { SelectField } from '@/components/patients/form'
@@ -29,6 +29,24 @@ const CAJA_TOTAL = 'bg-dash-count-bg flex h-9 shrink-0 items-center rounded-md p
 const ESTADO_TONO: Record<Procedimiento['estado'], PillTone> = {
   Planned: 'success', Completed: 'info', Removed: 'neutral',
 }
+
+const TONO_CASO: Record<EstadoCaso, PillTone> = {
+  Pending: 'warning', Presented: 'info', Accepted: 'success', Discarded: 'neutral',
+}
+
+/* Lo que cada diálogo del menú hace con el estado del caso. */
+const ESTADO_TRAS: Partial<Record<ClaveDialogo, EstadoCaso>> = {
+  present: 'Presented', accept: 'Accepted', discard: 'Discarded',
+}
+
+/* Desde qué estados se ofrece cada acción del menú: un caso aceptado o
+   descartado no vuelve a presentarse, aceptarse ni descartarse. */
+const ACCIONES_CASO: { label: string; clave: ClaveDialogo | 'delete'; desde?: EstadoCaso[] }[] = [
+  { label: 'Present Case', clave: 'present', desde: ['Pending'] },
+  { label: 'Accept Case', clave: 'accept', desde: ['Pending', 'Presented'] },
+  { label: 'Discard Case', clave: 'discard', desde: ['Pending', 'Presented'] },
+  { label: 'Delete Case', clave: 'delete' },
+]
 
 /* ── Diálogos ─────────────────────────────────────────────────────── */
 
@@ -535,6 +553,10 @@ export function VistaCaso({
   const [notas, setNotas] = useState('')
   const [menu, setMenu] = useState(false)
   const [colapsado, setColapsado] = useState(false)
+  /* Mientras se arma (Pending o Presented) el caso se edita; aceptado o
+     descartado queda fijo. La vista previa sólo existe una vez presentado. */
+  const planificando = caso.estado === 'Pending' || caso.estado === 'Presented'
+  const presentado = caso.estado === 'Presented'
 
   return (
     <div className="flex flex-col gap-4">
@@ -555,43 +577,54 @@ export function VistaCaso({
           {/* Plegado, el encabezado conserva lo que se consulta sin abrir: estado y total. */}
           {colapsado && (
             <span className="flex shrink-0 items-center gap-3">
-              <span className="rounded-full border border-warn-fg bg-warn-bg px-2 py-[2px] text-[11px] font-semibold text-warn-fg">
-                {caso.estado}
-              </span>
+              <Pill tone={TONO_CASO[caso.estado]} className="px-2 py-[2px]">{caso.estado}</Pill>
               <span className={CAJA_TOTAL}>
                 Total Amount: <span className="text-dash-blue ml-1">{caso.total}</span>
               </span>
             </span>
           )}
-          <button
-            onClick={() => aviso.info('Renaming a case is not available in this release.')}
-            aria-label="Rename case"
-            className="shrink-0 text-ink-medium hover:opacity-70"
-          >
-            <Pencil className="size-4" />
-          </button>
-          {/* Preview sube al encabezado, con los demás íconos: sólo ícono, con su tooltip. */}
-          <TooltipProvider delayDuration={150}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => aviso.info('The case preview is not available in this release.')}
-                  aria-label="Preview case"
-                  className="shrink-0 text-ink-medium hover:opacity-70"
-                >
-                  <Eye className="size-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">Preview case</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <button
-            onClick={onMover}
-            className="text-dash-blue ml-auto flex shrink-0 items-center gap-1 text-[13px] font-semibold hover:underline"
-          >
-            Move to <CornerUpLeft className="size-3.5" />
-          </button>
-          <div className="relative shrink-0">
+          {planificando && (
+            <button
+              onClick={() => aviso.info('Renaming a case is not available in this release.')}
+              aria-label="Rename case"
+              className="shrink-0 text-ink-medium hover:opacity-70"
+            >
+              <Pencil className="size-4" />
+            </button>
+          )}
+          {/* Preview sube al encabezado, con los demás íconos: sólo ícono, con su tooltip.
+              Se ve mientras se arma el caso, pero sólo responde una vez presentado. El
+              botón deshabilitado no recibe el hover, así que el tooltip cuelga del span. */}
+          {planificando && (
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="shrink-0">
+                    <button
+                      onClick={() => aviso.info('The case preview is not available in this release.')}
+                      disabled={!presentado}
+                      aria-label="Preview case"
+                      className="block text-ink-medium hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:opacity-40"
+                    >
+                      <Eye className="size-4" />
+                    </button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">
+                  {presentado ? 'Preview case' : 'Present the case to preview it'}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          {planificando && (
+            <button
+              onClick={onMover}
+              className="text-dash-blue ml-auto flex shrink-0 items-center gap-1 text-[13px] font-semibold hover:underline"
+            >
+              Move to <CornerUpLeft className="size-3.5" />
+            </button>
+          )}
+          <div className={cn('relative shrink-0', !planificando && 'ml-auto')}>
             <button
               onClick={() => setMenu((v) => !v)}
               aria-label="Case actions"
@@ -602,12 +635,7 @@ export function VistaCaso({
             </button>
             {menu && (
               <div className="absolute top-full right-0 z-30 mt-1 w-[190px] rounded-lg border border-line bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
-                {([
-                  ['Present Case', 'present'],
-                  ['Accept Case', 'accept'],
-                  ['Discard Case', 'discard'],
-                  ['Delete Case', 'delete'],
-                ] as const).map(([label, clave]) => (
+                {ACCIONES_CASO.filter((a) => !a.desde || a.desde.includes(caso.estado)).map(({ label, clave }) => (
                   <button
                     key={clave}
                     onClick={() => { setMenu(false); onDialogo(clave) }}
@@ -639,22 +667,28 @@ export function VistaCaso({
           </span>
           <span className="ml-auto flex items-center gap-2 text-[13px] text-ink">
             Status:
-            <span className="rounded-full border border-warn-fg bg-warn-bg px-2 py-[2px] text-[11px] font-semibold text-warn-fg">
-              {caso.estado}
-            </span>
+            <Pill tone={TONO_CASO[caso.estado]} className="px-2 py-[2px]">{caso.estado}</Pill>
           </span>
         </div>
 
-        {/* Una sola línea: categoría, notas y total. La categoría no necesita el ancho de media card. */}
+        {/* Una sola línea: categoría, notas y total. La categoría no necesita el ancho de media card.
+            Es un combo mientras se arma el plan; aceptado, pasa a texto. */}
         <div className="mt-4 flex flex-wrap items-start gap-4">
-          <SelectField
-            label="Treatment Case Category"
-            required
-            value={categoria}
-            onChange={setCategoria}
-            options={CATEGORIAS}
-            className="w-[240px] max-w-full"
-          />
+          {planificando ? (
+            <SelectField
+              label="Treatment Case Category"
+              required
+              value={categoria}
+              onChange={setCategoria}
+              options={CATEGORIAS}
+              className="w-[240px] max-w-full"
+            />
+          ) : (
+            <div className="w-[240px] max-w-full">
+              <span className="block text-xs font-medium text-ink">Treatment Case Category</span>
+              <p className="mt-2 flex h-9 items-center text-[13px] font-medium text-ink">{categoria || '—'}</p>
+            </div>
+          )}
           <div className="min-w-[260px] flex-1">
             <span className="block text-xs font-medium text-ink">
               Additional Discussion Notes<span className="text-required">*</span>
@@ -714,7 +748,11 @@ export function TreatmentPlanSection() {
   const [completar, setCompletar] = useState(false)
   const [favoritos, setFavoritos] = useState<string[]>([])
   const [seleccion, setSeleccion] = useState<string[]>([])
-  const caso = CASOS.find((c) => c.id === casoId) ?? CASOS[0]
+  const [estados, setEstados] = useState<Record<string, EstadoCaso>>(
+    () => Object.fromEntries(CASOS.map((c) => [c.id, c.estado])),
+  )
+  const base = CASOS.find((c) => c.id === casoId) ?? CASOS[0]
+  const caso: Caso = { ...base, estado: estados[base.id] ?? base.estado }
 
   const alternarFavorito = (id: string) =>
     setFavoritos((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]))
@@ -822,7 +860,11 @@ export function TreatmentPlanSection() {
           titulo={DIALOGOS[dialogo].titulo}
           texto={DIALOGOS[dialogo].texto}
           onClose={() => setDialogo(null)}
-          onConfirm={() => aviso.ok(`${DIALOGOS[dialogo].titulo} confirmed.`)}
+          onConfirm={() => {
+            const nuevo = ESTADO_TRAS[dialogo]
+            if (nuevo) setEstados((e) => ({ ...e, [caso.id]: nuevo }))
+            aviso.ok(`${DIALOGOS[dialogo].titulo} confirmed.`)
+          }}
         />
       )}
     </div>
