@@ -27,6 +27,62 @@
     walk(el);
   });
 
+  /* Selected work: the row under the pointer (or keyboard focus) opens */
+  var rows = document.querySelectorAll('.wl-item');
+  if (rows.length) {
+    var timer = null;
+    var open = function (row) {
+      if (row.classList.contains('is-open')) return;
+      rows.forEach(function (r) { r.classList.toggle('is-open', r === row); });
+    };
+    rows.forEach(function (row) {
+      var head = row.querySelector('.wl-head');
+      head.addEventListener('mouseenter', function () {
+        clearTimeout(timer);
+        timer = setTimeout(function () { open(row); }, 90);
+      });
+      head.addEventListener('mouseleave', function () { clearTimeout(timer); });
+      head.addEventListener('focus', function () { open(row); });
+    });
+  }
+
+  /* Cursor: a square that inverts what is under it and shows the year over a project */
+  var finePointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (finePointer && !reduced) {
+    var cursor = document.createElement('div');
+    cursor.className = 'cursor';
+    cursor.setAttribute('aria-hidden', 'true');
+    cursor.innerHTML = '<span class="cursor__label"></span>';
+    document.body.appendChild(cursor);
+    var label = cursor.firstChild;
+    root.classList.add('has-cursor');
+    var cx = -100, cy = -100, tx = -100, ty = -100, running = false;
+    var loop = function () {
+      cx += (tx - cx) * 0.2;
+      cy += (ty - cy) * 0.2;
+      cursor.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0)';
+      if (Math.abs(tx - cx) > 0.1 || Math.abs(ty - cy) > 0.1) { requestAnimationFrame(loop); } else { running = false; }
+    };
+    window.addEventListener('pointermove', function (e) {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      tx = e.clientX; ty = e.clientY;
+      if (!cursor.classList.contains('is-visible')) { cx = tx; cy = ty; cursor.classList.add('is-visible'); }
+      var t = e.target && e.target.closest ? e.target : null;
+      var item = t && t.closest('[data-cursor]');
+      if (item) {
+        if (label.textContent !== item.getAttribute('data-cursor')) label.textContent = item.getAttribute('data-cursor');
+        cursor.classList.add('is-big');
+      } else {
+        cursor.classList.remove('is-big');
+      }
+      cursor.classList.toggle('is-link', !item && !!(t && t.closest('a, button, [role="button"], .zoomable, summary')));
+      cursor.classList.toggle('is-text', !!(t && t.closest('input, textarea')));
+      if (!running) { running = true; requestAnimationFrame(loop); }
+    }, { passive: true });
+    document.documentElement.addEventListener('mouseleave', function () { cursor.classList.remove('is-visible'); });
+    window.addEventListener('blur', function () { cursor.classList.remove('is-visible'); });
+  }
+
   /* Soft spotlight that follows the pointer inside a cell */
   if (!reduced) {
     document.querySelectorAll('.spot').forEach(function (el) {

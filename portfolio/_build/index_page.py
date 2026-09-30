@@ -90,28 +90,20 @@ page = head("Julián Gerardi",
   </section>
 
   <section class="row" id="work">
-    <div class="cell section-head reveal">
-      <div><div class="label">Selected work</div><h2>Products designed end to end, most of them shipped as working prototypes.</h2></div>
-      <p>Five projects from 2022 to 2026: an AI video platform, a dental SaaS and its design system, a food-service app and a UX challenge.</p>
-    </div>
-  </section>
-  <section class="row">
-    <div class="cells projects">
-{project("work/batech.html", cover_batech(p, "cover--wide", lazy=False), "Batech AI Platform", "2022 — 2026",
-         "Computer-vision analytics for retail branches: camera events, geofences drawn on live video, operational times and an AI assistant that answers questions about every store.",
-         [badge("AI"), badge("Computer vision"), badge("Dashboard"), badge("Lead UX/UI")], extra=" cell--span")}
-{project("work/confidentally.html", cover_dental(p), "Confidentally", "2026",
-         "Redesign of a dental practice platform, from the front desk to the dental chair, rebuilt as a working prototype.",
-         [NDA, badge("SaaS"), badge("Healthcare")])}
-{project("work/confidentally-ui.html", cover_ds(p), "Confidentally UI", "2026",
-         "A living design system that reads the app’s own code, with search and a Builder that assembles screens with AI.",
-         [badge("Design system"), badge("Storybook"), badge("AI builder")])}
-{project("work/grill.html", cover_grill(p), "GRILL Empresas", "2026",
-         "Corporate lunch ordering: employees pick the day’s meal on their phone, and the kitchen runs tickets, labels and delivery from one panel.",
-         [badge("Food service"), badge("Mobile first"), badge("Two apps")])}
-{project("https://www.figma.com/design/MTQT0AwdScSnoRK3m3SHeB/Challenge%E2%80%94UX-UI?node-id=11-544", cover_mp(), "Mercado Play", "2026",
-         "UX/UI challenge for Mercado Libre’s free streaming service. The cover is rebuilt in code; the full exercise opens in Figma.",
-         [badge("Streaming"), badge("Challenge"), badge("Figma")], external=True)}
+    <div class="wl">
+      <div class="wl-top"><b>Selected work</b><span>Five projects · 2022–2026</span></div>
+      <ol class="wl-list">
+{wl_item(p, 1, "work/batech.html", "Batech AI Platform", "AI · Computer vision · Dashboard", "2022–26", tiles_batech(p),
+         "Computer-vision analytics for retail branches: camera events, geofences drawn on live video, operational times and an AI assistant for every store.",
+         "Lead UX/UI — research, flows, UI, design system", is_open=True)}{wl_item(p, 2, "work/confidentally.html", "Confidentally", "SaaS · Healthcare · Prototype", "2026", tiles_dental(p),
+         "Redesign of a dental practice platform, from the front desk to the dental chair, rebuilt as a working prototype on mock data.",
+         "Lead product designer — audit, UX, UI, coded prototype", nda=True)}{wl_item(p, 3, "work/confidentally-ui.html", "Confidentally UI", "Design system · AI builder", "2026", tiles_ds(p),
+         "A living design system that reads the app’s own code, with a search that understands Spanish and a Builder that assembles screens with AI.",
+         "Design system lead — tokens, docs site, audit scripts, builder")}{wl_item(p, 4, "work/grill.html", "GRILL Empresas", "Food service · Mobile · Two apps", "2026", tiles_grill(p),
+         "Corporate lunch ordering for a kitchen in Mercedes: employees pick the day’s meal on their phone, the kitchen runs tickets, labels and delivery.",
+         "Product design — flows, UI, working prototype")}{wl_item(p, 5, "work/mercado-play.html", "Mercado Play", "Streaming · UX/UI challenge", "2026", tiles_mp(p),
+         "A UX/UI challenge for Mercado Libre’s free streaming service, presented as a Figma file with its own cover system.",
+         "UX/UI challenge — version 2.0 · Figma")}      </ol>
     </div>
   </section>
 

@@ -175,3 +175,94 @@ def chapter(label, body, cid=""):
 def next_row(href, name):
     return f"""  <section class="row"><a class="next" href="{href}"><div><div class="label">Next project</div><h2>{name}</h2></div>{arrow()}</a></section>
 """
+
+
+# ---------- Presentation tiles for the Selected work index ----------
+def tile_full(p, cls, name, w, h, pos="50% 50%", z=1.0, k=0):
+    return (f'<span class="tile tile--full tile--{cls}" style="--k:{k};--pos:{pos};--z:{z}">'
+            f'{img(p, name, w, h)}</span>')
+
+
+def tile_window(p, cls, name, w, h, k=0):
+    return f'<span class="tile tile--window tile--{cls}" style="--k:{k}">{img(p, name, w, h)}</span>'
+
+
+def tile_card(p, cls, name, w, h, width="84%", k=0):
+    return f'<span class="tile tile--card tile--{cls}" style="--k:{k};--w:{width}">{img(p, name, w, h)}</span>'
+
+
+def tile_phone(p, cls, name, k=0):
+    return f'<span class="tile tile--{cls}" style="--k:{k}">{phone(p, name)}</span>'
+
+
+def tiles_batech(p):
+    return "".join([
+        tile_window(p, "batech", "b-dashboard", 1200, 857, 0),
+        tile_full(p, "batech", "b-geocerca", 1200, 1233, "40% 38%", 2.1, 1),
+        tile_full(p, "batech", "b-eventos", 1200, 932, "45% 30%", 1.9, 2),
+        tile_full(p, "batech", "b-resultado", 1200, 1021, "62% 38%", 2.2, 3),
+        tile_full(p, "batech", "b-ai", 1200, 857, "84% 34%", 1.8, 4),
+    ])
+
+
+def tiles_dental(p):
+    return "".join([
+        tile_window(p, "dental", "d-dashboard", 1600, 1000, 0),
+        tile_phone(p, "dental", "d-m-patient", 1),
+        tile_card(p, "ds", "d-crop-apptcard", 800, 429, "86%", 2),
+        tile_full(p, "dental", "d-clinical", 1600, 1000, "66% 40%", 2.0, 3),
+        tile_phone(p, "dental", "d-m-dashboard", 4),
+    ])
+
+
+def tiles_ds(p):
+    return "".join([
+        tile_full(p, "ds", "ds-welcome", 1600, 1000, "50% 30%", 1.55, 0),
+        tile_card(p, "ds", "ds-crop-describe", 731, 393, "88%", 1),
+        tile_card(p, "dental", "ds-crop-search", 1100, 891, "90%", 2),
+        tile_window(p, "ds", "ds-buttons", 1600, 1000, 3),
+        tile_full(p, "ds", "ds-builder-built", 1600, 1000, "30% 70%", 1.9, 4),
+    ])
+
+
+def tiles_grill(p):
+    return "".join([
+        tile_phone(p, "grill", "g-emp-m-app", 0),
+        tile_phone(p, "grill-deep", "g-emp-m-dark-app", 1),
+        tile_card(p, "cream", "g-crop-label", 532, 195, "86%", 2),
+        tile_phone(p, "grill", "g-emp-m-modal", 3),
+        tile_full(p, "cream", "g-corp-cocina", 1600, 1000, "38% 20%", 1.5, 4),
+    ])
+
+
+def tiles_mp(p):
+    return "".join([
+        '<span class="tile tile--mp" style="--k:0"><span class="mp-word">Mer<br>cado<br>Play</span></span>',
+        '<span class="tile tile--mp-dark" style="--k:1"><span class="mp-sel"><span class="mp__dialog-label"><svg><use href="#i-component"/></svg>Alert Dialog</span>'
+        '<span class="mp__dialog-box" style="display:block"><i></i><i></i><i></i><i></i>Challenge UX-UI</span></span></span>',
+        '<span class="tile tile--mp-dark" style="--k:2"><span class="mp-stars"><i></i><i></i><i></i></span><span class="mp-year">20<br>26</span></span>',
+        '<span class="tile tile--mp" style="--k:3"><span class="mp-cursor mp-cursor--a"><svg><use href="#i-cursor"/></svg><span>Julián Gerardi</span></span>'
+        '<span class="mp-cursor mp-cursor--b"><svg><use href="#i-cursor"/></svg><span>Devs</span></span></span>',
+        tile_full(p, "mp-dark", "mp-cover", 2000, 1126, "28% 58%", 1.7, 4),
+    ])
+
+
+def wl_item(p, n, href, title, tags, year, tiles, desc, credit, is_open=False, nda=False):
+    o = " is-open" if is_open else ""
+    lock = ' <svg aria-hidden="true" style="width:12px;height:12px;vertical-align:-1px"><use href="#i-lock"/></svg> NDA ·' if nda else ""
+    return f"""      <li class="wl-item{o}" data-cursor="{year}">
+        <a class="wl-head" href="{href}">
+          <span class="wl-n">{n:02d}</span>
+          <span class="wl-title">{title}</span>
+          <span class="wl-tags">{lock} {tags}</span>
+        </a>
+        <div class="wl-body"><div class="wl-clip"><div class="wl-inner">
+          <a class="wl-strip" href="{href}" tabindex="-1" aria-hidden="true">{tiles}</a>
+          <div class="wl-desc">
+            <p>{desc}</p>
+            <p class="wl-credit">{credit}</p>
+            <a class="wl-more" href="{href}">View case study {arrow()}</a>
+          </div>
+        </div></div></div>
+      </li>
+"""

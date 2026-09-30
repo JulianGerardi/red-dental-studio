@@ -258,5 +258,5 @@ b += chapter("Outcome", """      <h2>Two apps, one language.</h2>
         <div><b>2</b><span>themes, light and dark</span></div>
       </div>
       <div class="prose"><p>Both apps share the GRILL wordmark, the lime accent and the same components, so the kitchen and its clients read the same order the same way.</p></div>""", "outcome")
-b += next_row("batech.html", "Batech AI Platform")
+b += next_row("mercado-play.html", "Mercado Play")
 page("grill.html", "GRILL Empresas Case Study", "Corporate lunch ordering for a kitchen in Mercedes, Buenos Aires. Case study by Julián Gerardi.", b)

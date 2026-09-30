@@ -15,11 +15,19 @@ portfolio/
   work/confidentally.html     caso con NDA (bloqueado con contraseña)
   work/confidentally-ui.html  design system y Builder con IA
   work/grill.html             GRILL Empresas (app de empleados + panel de cocina)
+  work/mercado-play.html      challenge de Mercado Play (portada y su sistema de piezas)
   assets/site.css             tokens arriba de todo (claro y oscuro), grilla, portadas, animaciones
   assets/site.js              tema, menú mobile, palabras del título, spotlight, copiar mail, lightbox, NDA
   assets/img/                 capturas en WebP (b- Batech, d- dental, ds- design system, g- GRILL)
   _build/                     scripts que generan los HTML
 ```
+
+## Selected work
+
+La lista de trabajos funciona como la de rsoph: cada fila tiene número, título y etiquetas; al pasar el mouse la fila se invierte (fondo del color del texto) y se despliega una tira de 5 imágenes con la descripción. Las imágenes se arman en `_build/common.py` (`tiles_batech`, `tiles_dental`, `tiles_ds`, `tiles_grill`, `tiles_mp`) con cuatro tipos: `tile_full` (recorte con zoom de una pantalla), `tile_window` (pantalla que asoma desde una esquina), `tile_card` (una pieza centrada) y `tile_phone` (celular).
+
+El cursor es un cuadrado blanco con `mix-blend-mode: difference`: invierte lo que tiene debajo, crece sobre links y, sobre un proyecto, se agranda y muestra el año (`data-cursor`). Solo aparece con mouse y sin "reducir movimiento".
+
 
 ## Editar
 
@@ -33,6 +41,7 @@ python3 portfolio/_build/build.py
 - `_build/index_page.py`: la home.
 - `_build/batech_page.py`: el caso de Batech.
 - `_build/cases_page.py`: Confidentally, Confidentally UI y GRILL.
+- `_build/mercado_page.py`: Mercado Play.
 
 Los colores de marca de cada portada están en `assets/site.css` (`--batech-*`, `--dental-*`, `--ds-*`, `--grill-*`, `--mp-*`).
 
