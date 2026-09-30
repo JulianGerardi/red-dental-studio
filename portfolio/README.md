@@ -25,6 +25,15 @@ portfolio/
   _build/                     scripts que generan los HTML (demos.py: microanimaciones de cada pantalla)
 ```
 
+## Marca y tamaño
+
+- La marca es un triángulo invertido (se dibuja al cargar y gira al pasar el mouse) con "Julián Gerardi" en Geist Mono. El favicon es el mismo triángulo en blanco.
+- Todo el diseño está a la escala de ver la página al 90%: el `html` tiene `font-size: 90%` y las medidas en px del CSS están multiplicadas por 0,9.
+
+## Flujo con zoom (Batech)
+
+El flujo to-be está exportado de Figma a 10000 px (`b-flow.webp`) dentro de un visor: se arrastra para moverse y se hace zoom con los botones, pellizcando, con ⌘/Ctrl + rueda, doble clic o las teclas +/−. Tiene pantalla completa.
+
 ## Idioma
 
 Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span lang="en">…</span><span lang="es">…</span>`. El CSS muestra solo el idioma de `<html data-lang>`. El switch EN/ES del menú lo cambia y lo recuerda (`localStorage`, clave `jg-lang`); la primera vez sigue el idioma del navegador. También traduce el título de la pestaña, la descripción, los placeholders y los textos alternativos de las imágenes (`data-alt-es`).
@@ -36,8 +45,8 @@ Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span 
 - **Marquesina** de marcas: avanza sola y acelera y cambia de sentido según el scroll.
 - **Portadas de los casos**: parallax suave del mockup.
 - **Transición entre páginas**: una cortina cubre la pantalla al salir y se levanta al entrar.
-- **Inicio**: una tarjeta con un degradé verde y violeta que se mueve solo y se inclina hacia el puntero, con la frase principal al centro, el rol abajo a la izquierda y la disponibilidad abajo a la derecha.
-- **Microanimaciones**: cada pantalla muestra cómo funciona algo (un clic, un campo que se escribe solo, una geocerca que se dibuja, filas que se recorren) con una etiqueta que lo explica. Los datos están en `_build/demos.py`: el área de cada interacción va en % de la captura. Solo se animan mientras están en pantalla.
+- **Inicio**: una tarjeta con un degradé verde y violeta que se mueve solo y se inclina hacia el puntero; al pasar el mouse deja una estela de previews de los trabajos (miniaturas `assets/img/t-*.webp`), con la frase principal al centro, el rol abajo a la izquierda y la disponibilidad abajo a la derecha.
+- **Microanimaciones**: cada pantalla muestra cómo funciona algo en estilo UI mínimo (un puntero, un anillo de foco, un cursor de texto que escribe, una fila seleccionada) con una etiqueta en mono que lo explica. Los datos están en `_build/demos.py`: el área de cada interacción va en % de la captura. Solo se animan mientras están en pantalla.
 - Con "reducir movimiento" activado en el sistema, todo queda quieto.
 
 ## Selected work

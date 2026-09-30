@@ -94,6 +94,8 @@ LOADER = f"""<div class="loader" aria-hidden="true">
 </div>
 """
 
+TRAIL = '[{&quot;src&quot;: &quot;assets/img/t-b-dashboard.webp&quot;, &quot;name&quot;: &quot;Batech AI Platform&quot;, &quot;href&quot;: &quot;work/batech.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-d-dashboard.webp&quot;, &quot;name&quot;: &quot;Confidentally&quot;, &quot;href&quot;: &quot;work/confidentally.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-ds-welcome.webp&quot;, &quot;name&quot;: &quot;Confidentally UI&quot;, &quot;href&quot;: &quot;work/confidentally-ui.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-g-emp-app.webp&quot;, &quot;name&quot;: &quot;GRILL Empresas&quot;, &quot;href&quot;: &quot;work/grill.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-mp-cover.webp&quot;, &quot;name&quot;: &quot;Mercado Play&quot;, &quot;href&quot;: &quot;work/mercado-play.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-b-ai.webp&quot;, &quot;name&quot;: &quot;Batech AI Platform&quot;, &quot;href&quot;: &quot;work/batech.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-d-clinical.webp&quot;, &quot;name&quot;: &quot;Confidentally&quot;, &quot;href&quot;: &quot;work/confidentally.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-ds-builder-built.webp&quot;, &quot;name&quot;: &quot;Confidentally UI&quot;, &quot;href&quot;: &quot;work/confidentally-ui.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-g-corp-hoy.webp&quot;, &quot;name&quot;: &quot;GRILL Empresas&quot;, &quot;href&quot;: &quot;work/grill.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-b-geocerca.webp&quot;, &quot;name&quot;: &quot;Batech AI Platform&quot;, &quot;href&quot;: &quot;work/batech.html&quot;}]'
+
 cv_attrs = f'href="{CV}" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv'
 
 page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Senior Product Designer",
@@ -104,6 +106,7 @@ page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Se
   <section class="hero">
     <div class="hero-card" data-hero>
       <div class="hero-card__mesh" aria-hidden="true"><i class="m1"></i><i class="m2"></i><i class="m3"></i><i class="m4"></i><i class="m5"></i><i class="m-spot"></i></div>
+      <div class="hero-card__trail" aria-hidden="true" data-trail="{TRAIL}"></div>
       <div class="hero-card__body">
         <p class="hero-card__hi rise" style="--d:.15s">{T("Hey, I’m Julián", "Hey, soy Julián")}</p>
         <h1 class="hero-card__title split">{T("Fewer standalone screens. More end-to-end products, living design systems and AI prototypes people actually use.", "Menos pantallas sueltas. Más productos de punta a punta, design systems vivos y prototipos con IA que la gente usa.")}</h1>

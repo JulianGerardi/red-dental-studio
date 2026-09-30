@@ -24,7 +24,6 @@ DEMOS = {
     "b-operativos": dict(k="click", r=(38.4, 16.8, 14.0, 3.5), en="Filter by % against the expected time", es="Filtrar por % contra el tiempo esperado"),
     "b-login": dict(k="type", r=(34.3, 56.6, 28.0, 2.9), bg="#303030", fg="#e5e5e5",
                     text=("kim@batech.mx", "kim@batech.mx"), en="Sign in with email", es="Ingreso con email"),
-    "b-flow": dict(k="sweep", r=(0, 0, 100, 100), en="From the source to the report", es="De la fuente al reporte"),
 
     # ---------- Confidentally ----------
     "d-login": dict(k="type", r=(61.8, 44.4, 24.0, 3.3), bg="#ffffff", fg="#171717",
@@ -80,6 +79,9 @@ DEMOS = {
 }
 
 
+DARK = {"g-corp-dark-cocina", "g-emp-m-dark-app", "mp-cover"}
+
+
 def _pct(v):
     return f"{round(v, 2)}%"
 
@@ -116,7 +118,9 @@ def demo_html(name, w, h, T):
     if k == "type":
         fs = round(rh * (h / w) * 0.52, 3)
         te, ts = d["text"]
-        inner += (f'<i class="demo__type" style="--bg:{d["bg"]};--fg:{d["fg"]};--fs:{fs}cqw">'
+        n = max(len(te), len(ts))
+        inner += (f'<i class="demo__type" style="--bg:{d["bg"]};--fg:{d["fg"]};--fs:{fs}cqw;--n:{n}">'
                   f'<i class="demo__txt">{T(te, ts)}</i></i>')
     tag = f'<b class="demo__tag demo__tag--{"b" if below else "t"}">{T(d["en"], d["es"])}</b>'
-    return f'<span class="demo demo--{k}" style="{";".join(style)}" aria-hidden="true">{inner}{tag}</span>'
+    dk = " demo--dk" if name.startswith("b-") or name in DARK else ""
+    return f'<span class="demo demo--{k}{dk}" style="{";".join(style)}" aria-hidden="true">{inner}{tag}</span>'

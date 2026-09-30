@@ -7,8 +7,9 @@ from demos import demo_html
 
 FONTS = "https://fonts.googleapis.com/css2?family=Geist:wght@300..800&amp;family=Geist+Mono:wght@400..600&amp;display=swap"
 LENIS = "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"
-ICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23171717'/%3E"
-        "%3Ctext x='16' y='20.5' font-family='Arial' font-weight='700' font-size='11' text-anchor='middle' fill='%23fff'%3EJG%3C/text%3E%3C/svg%3E")
+ICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0a0a'/%3E"
+        "%3Cpath d='M7 9.5h18L16 25z' fill='%23fff'/%3E%3C/svg%3E")
+MARK = '<svg class="brand__tri" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 4.5h19L12 21z"/></svg>'
 EMAIL = "juliangerardi266@gmail.com"
 LINKEDIN = "https://www.linkedin.com/in/julian-gerardi"
 BEHANCE = "https://www.behance.net/Jotainc"
@@ -63,6 +64,9 @@ SPRITE = """<svg width="0" height="0" style="position:absolute" aria-hidden="tru
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-send" viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 20h7M12 16.5V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3c.6 4.2 2.8 6.4 7 7-4.2.6-6.4 2.8-7 7-.6-4.2-2.8-6.4-7-7 4.2-.6 6.4-2.8 7-7Z" fill="currentColor"/><path d="M19 15.5c.25 1.6 1 2.35 2.5 2.5-1.5.15-2.25.9-2.5 2.5-.25-1.6-1-2.35-2.5-2.5 1.5-.15 2.25-.9 2.5-2.5Z" fill="currentColor"/></symbol>
 </svg>
 """
@@ -74,7 +78,7 @@ def nav(p="", on_home=True):
     return f"""<a class="skip" href="#main">{T("Skip to content", "Ir al contenido")}</a>
 <header class="nav">
   <div class="nav__inner">
-    <a class="brand" href="{p}index.html" aria-label="Julián Gerardi"><span class="brand__mark" aria-hidden="true">JG</span><span class="brand__name">Julián Gerardi</span></a>
+    <a class="brand" href="{p}index.html" aria-label="Julián Gerardi"><span class="brand__mark" aria-hidden="true">{MARK}</span><span class="brand__name">Julián Gerardi</span></a>
     <nav class="nav__links" aria-label="Main">
       <a href="{h}#work"{cur}>{T("Work", "Trabajos")}</a>
       <a href="{h}#process">{T("Process", "Proceso")}</a>
@@ -169,7 +173,7 @@ def footer(p=""):
     return f"""<footer class="footer">
   <div class="wrap footer__grid">
     <div class="footer__brand">
-      <a class="brand" href="{p}index.html" aria-label="Julián Gerardi"><span class="brand__mark" aria-hidden="true">JG</span></a>
+      <a class="brand" href="{p}index.html" aria-label="Julián Gerardi"><span class="brand__mark" aria-hidden="true">{MARK}</span><span class="brand__name">Julián Gerardi</span></a>
       <p>Senior Product Designer<br><span>Mercedes, Buenos Aires · <span data-clock>--:--</span></span></p>
     </div>
     {grid}

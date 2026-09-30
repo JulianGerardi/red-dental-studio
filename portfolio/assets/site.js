@@ -235,8 +235,8 @@
         var r = tile.getBoundingClientRect();
         var px = (e.clientX - r.left) / r.width;
         var py = (e.clientY - r.top) / r.height;
-        tile.style.setProperty('--rx', ((px - 0.5) * 14).toFixed(2) + 'deg');
-        tile.style.setProperty('--ry', ((0.5 - py) * 10).toFixed(2) + 'deg');
+        tile.style.setProperty('--rx', ((px - 0.5) * 6).toFixed(2) + 'deg');
+        tile.style.setProperty('--ry', ((0.5 - py) * 4).toFixed(2) + 'deg');
         tile.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
         tile.style.setProperty('--my', (py * 100).toFixed(1) + '%');
       });
@@ -375,6 +375,105 @@
   }
   var year = document.querySelector('[data-year]');
   if (year) year.textContent = String(new Date().getFullYear());
+
+  /* ---------- Zoomable flows: drag to move, pinch / Ctrl + wheel / buttons to zoom ---------- */
+  document.querySelectorAll('[data-zoomer]').forEach(function (z) {
+    var stage = z.querySelector('.zoomer__stage');
+    var pct = z.querySelector('[data-zoom-pct]');
+    var img = stage.querySelector('img');
+    var W = parseFloat(stage.style.width) || img.naturalWidth || 1600;
+    var H = W * (parseFloat(img.getAttribute('height')) / parseFloat(img.getAttribute('width')));
+    var MAX = 1.6;
+    var s = 0.5, tx = 0, ty = 0;
+    var fit = function () { return Math.min(z.clientWidth / W, z.clientHeight / H); };
+    var used = function () { z.classList.add('is-used'); };
+    function apply(animate) {
+      var cw = z.clientWidth, ch = z.clientHeight, w = W * s, h = H * s;
+      tx = w <= cw ? (cw - w) / 2 : Math.min(0, Math.max(cw - w, tx));
+      ty = h <= ch ? (ch - h) / 2 : Math.min(0, Math.max(ch - h, ty));
+      z.classList.toggle('is-animating', !!animate);
+      stage.style.transform = 'translate(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px) scale(' + s.toFixed(4) + ')';
+      pct.textContent = Math.round(s * 100) + '%';
+    }
+    function zoomAt(ns, cx, cy, animate) {
+      ns = Math.max(fit(), Math.min(MAX, ns));
+      var k = ns / s;
+      tx = cx - (cx - tx) * k;
+      ty = cy - (cy - ty) * k;
+      s = ns;
+      apply(animate);
+    }
+    function initial() { s = fit(); tx = 0; ty = 0; apply(false); }
+    initial();
+
+    var drag = null;
+    z.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0 || e.target.closest('.zoomer__ui')) return;
+      drag = { x: e.clientX, y: e.clientY, tx: tx, ty: ty };
+      try { z.setPointerCapture(e.pointerId); } catch (err) {}
+      z.classList.add('is-dragging');
+      used();
+    });
+    z.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      tx = drag.tx + e.clientX - drag.x;
+      ty = drag.ty + e.clientY - drag.y;
+      apply(false);
+    });
+    var end = function () { drag = null; z.classList.remove('is-dragging'); };
+    z.addEventListener('pointerup', end);
+    z.addEventListener('pointercancel', end);
+    z.addEventListener('wheel', function (e) {
+      var r = z.getBoundingClientRect();
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault(); e.stopPropagation();
+        zoomAt(s * Math.exp(-e.deltaY * 0.01), e.clientX - r.left, e.clientY - r.top, false);
+        used();
+      } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault(); e.stopPropagation();
+        tx -= e.deltaX;
+        apply(false);
+        used();
+      }
+    }, { passive: false });
+    z.addEventListener('dblclick', function (e) {
+      var r = z.getBoundingClientRect();
+      zoomAt(s < 0.6 ? 1 : fit(), e.clientX - r.left, e.clientY - r.top, true);
+      used();
+    });
+    z.addEventListener('keydown', function (e) {
+      var cx = z.clientWidth / 2, cy = z.clientHeight / 2;
+      if (e.key === '+' || e.key === '=') zoomAt(s * 1.4, cx, cy, true);
+      else if (e.key === '-' || e.key === '_') zoomAt(s / 1.4, cx, cy, true);
+      else if (e.key === 'ArrowLeft') { tx += 80; apply(true); }
+      else if (e.key === 'ArrowRight') { tx -= 80; apply(true); }
+      else if (e.key === 'ArrowUp') { ty += 80; apply(true); }
+      else if (e.key === 'ArrowDown') { ty -= 80; apply(true); }
+      else return;
+      e.preventDefault();
+      used();
+    });
+    z.querySelectorAll('[data-zoom]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var m = b.getAttribute('data-zoom');
+        var cx = z.clientWidth / 2, cy = z.clientHeight / 2;
+        if (m === 'in') zoomAt(s * 1.4, cx, cy, true);
+        else if (m === 'out') zoomAt(s / 1.4, cx, cy, true);
+        else if (m === 'fit') zoomAt(fit(), cx, cy, true);
+        else if (m === 'full') {
+          if (document.fullscreenElement) document.exitFullscreen();
+          else if (z.requestFullscreen) z.requestFullscreen();
+        }
+        used();
+      });
+    });
+    document.addEventListener('fullscreenchange', function () {
+      setTimeout(function () {
+        if (document.fullscreenElement === z) { s = fit(); apply(false); } else initial();
+      }, 80);
+    });
+    window.addEventListener('resize', function () { apply(false); });
+  });
 
   /* ---------- Lightbox for case study screens ---------- */
   var box = document.querySelector('.lightbox');
