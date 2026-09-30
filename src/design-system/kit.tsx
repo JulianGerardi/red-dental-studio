@@ -119,10 +119,10 @@ export const Lienzo = ({ children, className }: { children: ReactNode; className
 )
 
 /* Deja fijo un estado de interacción en una parte de la muestra: le pone la
-   clase del addon de pseudo-estados (hover, focus-visible) al elemento que
+   clase del addon de pseudo-estados (hover, focus-visible, focus-within) al elemento que
    indica `selector`, o lo clickea una vez para dejar abierto su menú. Un play
    no sirve: la historia se vuelve a dibujar después y el estado se pierde. */
-export function Forzar({ selector, estado, children, className }: { selector: string; estado: 'hover' | 'focus-visible' | 'click'; children: ReactNode; className?: string }) {
+export function Forzar({ selector, estado, children, className }: { selector: string; estado: 'hover' | 'focus-visible' | 'focus-within' | 'click'; children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const clickeado = useRef(false)
   useEffect(() => {

@@ -5,7 +5,7 @@ import { Topbar } from './Topbar'
 import { NotificationBanner } from './NotificationBanner'
 import { Confibot } from '@/components/help/Confibot'
 import { useHelp } from '@/components/help/HelpProvider'
-import { NOTIFICACIONES } from '@/data/notificaciones'
+import { delBanner, useNotificaciones } from '@/data/notificacionesStore'
 import { aviso } from '@/components/ui/toaster'
 import { PatientInSessionPopup } from '@/components/patients/PatientInSessionPopup'
 import { NavigationPreview } from './navigation-preview'
@@ -15,28 +15,28 @@ export function AppShell() {
   const { pathname } = useLocation()
   const { showOnScreen, confibotAbierto, closeConfibot } = useHelp()
 
-  /* Las notificaciones viven acá y no en cada pantalla: son tareas del
-     usuario, tienen que sobrevivir a la navegación y las comparten el
-     banner y la campana.
+  /* Las notificaciones viven en su store (data/notificacionesStore): tienen
+     que sobrevivir a la navegación y las comparten el banner, la campana y
+     la pantalla Notifications.
 
      La X del banner **no borra**: sólo la saca del banner. La tarea sigue
      pendiente y sigue en la campana, que es donde vive; desde ahí se la
      puede volver a poner en el banner. Borrarla de verdad implicaría dar
      por hecha una tarea que nadie completó. */
-  const [ocultasDelBanner, setOcultas] = useState<string[]>([])
+  const notis = useNotificaciones()
   const [cursor, setCursor] = useState(0)
 
-  const enBanner = NOTIFICACIONES.filter((n) => !ocultasDelBanner.includes(n.id))
+  const enBanner = delBanner(notis.items, notis.ocultas)
 
   const ocultarDelBanner = (id: string) => {
-    setOcultas((p) => [...p, id])
+    notis.ocultarDelBanner(id)
     /* Recorta el cursor para que nunca apunte a una que ya no se muestra. */
     setCursor((c) => Math.min(c, Math.max(0, enBanner.length - 2)))
     aviso.info('Moved to notifications.')
   }
 
   const volverAlBanner = (id: string) => {
-    setOcultas((p) => p.filter((x) => x !== id))
+    notis.volverAlBanner(id)
     setCursor(0)
   }
 
@@ -53,9 +53,11 @@ export function AppShell() {
         <Topbar
           expanded={expanded}
           onToggleSidebar={() => setExpanded((v) => !v)}
-          notificaciones={NOTIFICACIONES}
-          ocultasDelBanner={ocultasDelBanner}
+          notificaciones={notis.items.filter((n) => !n.archivada)}
+          ocultasDelBanner={notis.ocultas}
           onVolverAlBanner={volverAlBanner}
+          onAbrirNotificacion={notis.abrir}
+          onMarcarTodasLeidas={() => notis.marcar(notis.items.filter((n) => n.estado === 'unread').map((n) => n.id), 'read')}
         />
         <NotificationBanner
           items={enBanner}

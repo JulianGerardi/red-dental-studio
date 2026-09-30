@@ -1,5 +1,6 @@
 import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { PatientsProvider } from '@/data/patientsStore'
+import { NotificacionesProvider } from '@/data/notificacionesStore'
 import { Toaster } from '@/components/ui/toaster'
 import { HelpProvider } from '@/components/help/HelpProvider'
 import { AppRoutes } from '@/AppRoutes'
@@ -14,7 +15,9 @@ export default function App() {
       <Toaster />
       <Router>
         <HelpProvider>
-          <AppRoutes />
+          <NotificacionesProvider>
+            <AppRoutes />
+          </NotificacionesProvider>
         </HelpProvider>
       </Router>
     </PatientsProvider>

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { AppRoutes } from '@/AppRoutes'
 import { PatientsProvider } from '@/data/patientsStore'
+import { NotificacionesProvider } from '@/data/notificacionesStore'
 import { HelpProvider } from '@/components/help/HelpProvider'
 import { Toaster } from '@/components/ui/toaster'
 
@@ -15,8 +16,10 @@ export function PantallaReal({ ruta, despues }: { ruta: string; despues?: ReactN
       <Toaster />
       <MemoryRouter initialEntries={[ruta]}>
         <HelpProvider>
-          <AppRoutes />
-          {despues}
+          <NotificacionesProvider>
+            <AppRoutes />
+            {despues}
+          </NotificacionesProvider>
         </HelpProvider>
       </MemoryRouter>
     </PatientsProvider>

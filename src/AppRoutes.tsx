@@ -28,6 +28,7 @@ import { SettingsAccount } from '@/pages/settings/Account'
 import { SettingsConsents } from '@/pages/settings/Consents'
 import { SettingsLedgerOptions } from '@/pages/settings/LedgerOptions'
 import Help from '@/pages/Help'
+import Notifications from '@/pages/Notifications'
 
 const SETTINGS_PLACEHOLDERS = [
   'roles', 'parameters',
@@ -69,6 +70,7 @@ export function AppRoutes() {
           <Route key={p} path={p} element={<UnderConstruction />} />
         ))}
         <Route path="help" element={<Help />} />
+        <Route path="notifications" element={<Notifications />} />
 
         <Route path="settings" element={<SettingsLayout />}>
           <Route index element={<Navigate to="/settings/general" replace />} />

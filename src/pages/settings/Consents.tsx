@@ -3,6 +3,8 @@ import {
   Search, Plus, Bold, Italic, Underline, Heading1, Heading2,
   Pilcrow, List, ListOrdered, X, Eye, Power, PowerOff,
 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { cn } from '@/lib/utils'
 import { Pill } from '@/components/ui/pill'
 import { Switch } from '@/components/ui/switch'
@@ -30,12 +32,12 @@ import { Tabs } from '@/components/ui/tabs'
    un editor de texto enriquecido real en este prototipo, se separaron en dos
    campos estructurados con su propio label -mismo contenido, modelo de datos
    más simple-, bajo un solo toolbar decorativo (ver comentario en
-   ToolbarFormato). El heading de la pantalla queda fijo en "New Consent
-   Template" aunque haya un template cargado, tal cual las tres variantes del
-   frame. */
+   ToolbarFormato). Las partes (lista, tarjeta, editor, procedimientos, texto,
+   preview) se exportan para documentarlas en el design system; ver
+   design-reference/figma/modulos/consents.md. */
 
-type Procedimiento = { codigo: string; nombre: string }
-const PROCEDIMIENTOS_DISPONIBLES: Procedimiento[] = [
+export type Procedimiento = { codigo: string; nombre: string }
+export const PROCEDIMIENTOS_DISPONIBLES: Procedimiento[] = [
   { codigo: 'D7240', nombre: 'Removal of impacted tooth' },
   { codigo: 'D3948', nombre: 'Extraction, angled tooth' },
   { codigo: 'D3310', nombre: 'Root canal therapy, anterior' },
@@ -47,7 +49,7 @@ const procedimiento = (codigo: string) => PROCEDIMIENTOS_DISPONIBLES.find((p) =>
 /* `activo` y `sistema` son independientes: "System" dice de dónde viene el
    template (viene con el producto), "activo" si hoy se ofrece o no. Un
    template de sistema también se puede desactivar. */
-type ConsentTemplate = {
+export type ConsentTemplate = {
   id: string
   titulo: string
   activo: boolean
@@ -57,7 +59,7 @@ type ConsentTemplate = {
   riesgos: string
 }
 
-const TEMPLATES_INICIALES: ConsentTemplate[] = [
+export const TEMPLATES_INICIALES: ConsentTemplate[] = [
   {
     id: 't1',
     titulo: 'Extraction Informed Consent',
@@ -93,25 +95,25 @@ const TITULOS_SUGERIDOS = [
 ]
 
 const FILTROS = ['Active', 'Inactive', 'System', 'All'] as const
-type Filtro = (typeof FILTROS)[number]
+export type Filtro = (typeof FILTROS)[number]
 
 const coincideFiltro = (t: ConsentTemplate, f: Filtro) =>
   f === 'All' || (f === 'Active' && t.activo) || (f === 'Inactive' && !t.activo) || (f === 'System' && t.sistema)
 
-type Borrador = {
+export type Borrador = {
   titulo: string
   procedimientos: string[]
   naturaleza: string
   riesgos: string
 }
 
-const BORRADOR_VACIO: Borrador = { titulo: '', procedimientos: [], naturaleza: '', riesgos: '' }
+export const BORRADOR_VACIO: Borrador = { titulo: '', procedimientos: [], naturaleza: '', riesgos: '' }
 
 /* Guía para quien redacta el template: va en el editor, no en la hoja que ve
    el paciente. */
 const GUIA_NATURALEZA = 'Describe the proposed treatment, what the procedure involves, expected outcomes, and other relevant information the patient should understand before treatment.'
 const GUIA_RIESGOS = 'Describe the material risks, potential complications, and other relevant considerations associated with the proposed treatment.'
-const aBorrador = (t: ConsentTemplate): Borrador => ({
+export const aBorrador = (t: ConsentTemplate): Borrador => ({
   titulo: t.titulo, procedimientos: t.procedimientos, naturaleza: t.naturaleza, riesgos: t.riesgos,
 })
 
@@ -137,6 +139,265 @@ export function ToolbarFormato() {
   )
 }
 
+/* Una tarjeta de la lista: título (hasta dos líneas), estado, System si viene con el producto y cuántos procedimientos
+   usa. El interruptor la activa o desactiva sin abrirla; la elegida lleva el borde azul, como `Seleccionable`. */
+export function TarjetaTemplate({ t, elegida, onElegir, onAlternar }: {
+  t: ConsentTemplate
+  elegida: boolean
+  onElegir: () => void
+  onAlternar: () => void
+}) {
+  return (
+    <div className={cn('flex items-start gap-2 self-stretch rounded-lg border px-3 py-2.5 transition-colors', elegida ? 'border-dash-blue bg-info-bg' : 'border-line bg-white hover:bg-surface-subtle')}>
+      <button type="button" onClick={onElegir} aria-current={elegida || undefined} className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left">
+        <span className={cn('line-clamp-2 w-full text-[13px] font-bold', t.activo ? 'text-ink' : 'text-ink-faint')}>{t.titulo}</span>
+        <span className="flex flex-wrap items-center gap-1.5">
+          <Pill tone={t.activo ? 'success' : 'neutral'} size="sm">{t.activo ? 'Active' : 'Inactive'}</Pill>
+          {t.sistema && <Pill tone="info" size="sm">System</Pill>}
+          <span className="text-[11px] text-ink-muted">{t.procedimientos.length} procedure{t.procedimientos.length === 1 ? '' : 's'}</span>
+        </span>
+      </button>
+      <Switch checked={t.activo} onCheckedChange={onAlternar} aria-label={`${t.activo ? 'Deactivate' : 'Activate'} ${t.titulo}`} className="mt-0.5" />
+    </div>
+  )
+}
+
+/* El panel de la izquierda: New template, buscador, filtros (Active, Inactive, System, All) y la lista. */
+export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro, onElegir, onAlternar, onNuevo }: {
+  templates: ConsentTemplate[]
+  elegidoId: string | null
+  q: string
+  onQ: (q: string) => void
+  filtro: Filtro
+  onFiltro: (f: Filtro) => void
+  onElegir: (t: ConsentTemplate) => void
+  onAlternar: (id: string) => void
+  onNuevo: () => void
+}) {
+  return (
+    <section aria-label="Templates" className="flex flex-col gap-3 self-start rounded-xl border border-line bg-white p-4">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-sm font-bold text-ink">Templates</h2>
+        <Button size="sm" onClick={onNuevo}><Plus /> New template</Button>
+      </div>
+      <div className="relative">
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+        <input
+          value={q}
+          onChange={(e) => onQ(e.target.value)}
+          placeholder="Search templates..."
+          aria-label="Search templates"
+          className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+        />
+      </div>
+      <Tabs size="sm" fullWidth aria-label="Filter templates" tabs={FILTROS} value={filtro} onChange={onFiltro} />
+      <div className="flex max-h-[520px] flex-col gap-2 overflow-y-auto">
+        {templates.length === 0 ? (
+          <EmptyState icon={Search} title="No templates" detail="Nothing matches this search or filter." className="py-6" />
+        ) : (
+          templates.map((t) => <TarjetaTemplate key={t.id} t={t} elegida={elegidoId === t.id} onElegir={() => onElegir(t)} onAlternar={() => onAlternar(t.id)} />)
+        )}
+      </div>
+    </section>
+  )
+}
+
+/* Buscar y sumar procedimientos: el buscador muestra los que coinciden y no están elegidos; los elegidos quedan como
+   chips que se sacan con la X. Obligatorio: con el error, el borde en rojo y el mensaje en lugar de los chips. */
+export function SelectorProcedimientos({ elegidos, onCambiar, error }: {
+  elegidos: string[]
+  onCambiar: (codigos: string[]) => void
+  error?: boolean
+}) {
+  const [q, setQ] = useState('')
+  const opciones = PROCEDIMIENTOS_DISPONIBLES.filter(
+    (p) => !elegidos.includes(p.codigo) && `${p.codigo} ${p.nombre}`.toLowerCase().includes(q.trim().toLowerCase()),
+  )
+  return (
+    <div className="flex flex-col gap-2">
+      <label htmlFor="consent-procedimiento" className="text-xs font-medium text-ink">
+        Search Procedure<span className="text-required">*</span>
+      </label>
+      <div className="relative">
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+        <input
+          id="consent-procedimiento"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search..."
+          aria-invalid={error || undefined}
+          className={cn(
+            'h-9 w-full rounded-md border bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
+            error ? 'border-field-error' : 'focus:border-dash-blue border-line',
+          )}
+        />
+        {q && opciones.length > 0 && (
+          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
+            {opciones.map((p) => (
+              <button
+                key={p.codigo}
+                type="button"
+                onClick={() => { onCambiar([...elegidos, p.codigo]); setQ('') }}
+                className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
+              >
+                <span className="text-dash-blue font-semibold">{p.codigo}</span>
+                <span className="truncate text-ink-soft">{p.nombre}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      {error ? (
+        <span className="text-[11px] leading-[1.35] text-field-error">At least one procedure must be listed.</span>
+      ) : (
+        elegidos.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {elegidos.map((codigo) => (
+              <span key={codigo} className="text-dash-blue flex items-center gap-1.5 rounded-full bg-info-bg py-1 pr-1.5 pl-2.5 text-[12px] font-medium">
+                {codigo} - {procedimiento(codigo)?.nombre}
+                <button type="button" aria-label={`Remove ${codigo}`} onClick={() => onCambiar(elegidos.filter((c) => c !== codigo))} className="rounded-full p-0.5 hover:bg-dash-blue/10">
+                  <X className="size-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )
+      )}
+    </div>
+  )
+}
+
+/* El texto del consentimiento: dos secciones con su rótulo y, debajo de cada caja, la guía en cursiva para quien
+   redacta (no va en la hoja del paciente). Un solo toolbar arriba, decorativo. */
+export function TextoConsentimiento({ naturaleza, riesgos, onNaturaleza, onRiesgos }: {
+  naturaleza: string
+  riesgos: string
+  onNaturaleza: (v: string) => void
+  onRiesgos: (v: string) => void
+}) {
+  const caja = 'focus:border-dash-blue w-full resize-none rounded-md border border-line bg-white px-3 py-2 text-[13px] placeholder:text-ink-faint focus:outline-none'
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-xs font-medium text-ink">Consent text</span>
+      <ToolbarFormato />
+      <div className="-mt-2 flex flex-col gap-3 rounded-b-md border border-t-0 border-line p-3">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Nature of procedure</span>
+          <textarea rows={3} value={naturaleza} onChange={(e) => onNaturaleza(e.target.value)} placeholder="Describe the procedure in plain language..." className={caja} />
+          <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_NATURALEZA}</span>
+        </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Risk and complications</span>
+          <textarea rows={4} value={riesgos} onChange={(e) => onRiesgos(e.target.value)} placeholder="One risk per line..." className={caja} />
+          <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_RIESGOS}</span>
+        </label>
+      </div>
+    </div>
+  )
+}
+
+/* El editor del medio. El título dice qué se hace (Edit Template con su estado, o New Consent Template); Activate o
+   Deactivate a la derecha; el aviso rojo arriba si se intentó guardar con faltantes; Cancel y Save fijos al pie. */
+export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlternar, onCancelar, onGuardar }: {
+  actual?: ConsentTemplate
+  borrador: Borrador
+  onBorrador: (b: Borrador) => void
+  intentado: boolean
+  onAlternar: () => void
+  onCancelar: () => void
+  onGuardar: () => void
+}) {
+  const faltaTitulo = intentado && !borrador.titulo
+  const faltaProcedimiento = intentado && borrador.procedimientos.length === 0
+  return (
+    <section aria-label="Template editor" className="flex flex-col gap-4 self-start rounded-xl border border-line bg-white p-4 sm:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-[200px] flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-bold text-ink">{actual ? 'Edit Template' : 'New Consent Template'}</h2>
+            {actual && <Pill tone={actual.activo ? 'success' : 'neutral'} size="sm">{actual.activo ? 'Active' : 'Inactive'}</Pill>}
+            {actual?.sistema && <Pill tone="info" size="sm">System</Pill>}
+          </div>
+          <p className="mt-0.5 text-xs text-ink-muted">
+            {actual ? 'Changes show in the preview as you type. Save to keep them.' : 'Fill in the details and the text, then save to add it to the list.'}
+          </p>
+        </div>
+        {actual && (
+          <Button variant={actual.activo ? 'secondary' : 'primary'} onClick={onAlternar}>
+            {actual.activo ? <PowerOff /> : <Power />} {actual.activo ? 'Deactivate template' : 'Activate template'}
+          </Button>
+        )}
+      </div>
+
+      {(faltaTitulo || faltaProcedimiento) && (
+        <div role="alert" className="rounded-md border border-dash-bad-fg/30 bg-dash-bad-bg px-3 py-2.5 text-[12px] font-medium text-dash-bad-fg">
+          All required fields marked with (*) must be completed before proceeding.
+        </div>
+      )}
+
+      <SelectField
+        label="Current Title"
+        required
+        options={TITULOS_SUGERIDOS}
+        value={borrador.titulo}
+        onChange={(v) => onBorrador({ ...borrador, titulo: v })}
+        error={faltaTitulo ? 'This field is required.' : undefined}
+      />
+      <SelectorProcedimientos elegidos={borrador.procedimientos} onCambiar={(procedimientos) => onBorrador({ ...borrador, procedimientos })} error={faltaProcedimiento} />
+      <TextoConsentimiento
+        naturaleza={borrador.naturaleza}
+        riesgos={borrador.riesgos}
+        onNaturaleza={(naturaleza) => onBorrador({ ...borrador, naturaleza })}
+        onRiesgos={(riesgos) => onBorrador({ ...borrador, riesgos })}
+      />
+
+      <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex justify-end gap-3 rounded-b-xl border-t border-line bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
+        <Button variant="secondary" className="px-6" onClick={onCancelar}>Cancel</Button>
+        <Button className="px-6" onClick={onGuardar}>Save</Button>
+      </div>
+    </section>
+  )
+}
+
+/* La columna del preview: el "escritorio" gris con la hoja que recibe el paciente (ConsentDocument). Patient View
+   saca lo que es sólo de la clínica (diagnóstico y hallazgos). */
+export function PanelPreview({ borrador, vistaPaciente, onVistaPaciente }: {
+  borrador: Borrador
+  vistaPaciente: boolean
+  onVistaPaciente: (v: boolean) => void
+}) {
+  return (
+    <section aria-label="Preview" className="self-start rounded-xl border border-line bg-surface-muted p-3 @3xl:col-start-2 @5xl:sticky @5xl:top-4 @5xl:col-start-3 @5xl:max-h-[calc(100vh-2rem)] @5xl:overflow-y-auto">
+      <div className="flex items-center justify-between gap-2 px-1">
+        <div>
+          <h2 className="text-sm font-bold text-ink">Preview</h2>
+          <p className="text-[11px] text-ink-muted">What the patient receives</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => onVistaPaciente(!vistaPaciente)}
+          aria-pressed={vistaPaciente}
+          className={cn(
+            'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
+            vistaPaciente ? 'border-dash-blue bg-dash-blue text-white' : 'border-line bg-white text-ink-slate hover:text-ink-soft',
+          )}
+        >
+          <Eye className="size-3.5" /> Patient View
+        </button>
+      </div>
+      <div className="mt-3">
+        <ConsentDocument
+          titulo={borrador.titulo}
+          procedimiento={borrador.procedimientos.length > 0 ? procedimiento(borrador.procedimientos[0])?.nombre : undefined}
+          naturaleza={borrador.naturaleza}
+          riesgos={borrador.riesgos}
+          vistaPaciente={vistaPaciente}
+        />
+      </div>
+    </section>
+  )
+}
+
 export function SettingsConsents() {
   const [templates, setTemplates] = useState(TEMPLATES_INICIALES)
   const [q, setQ] = useState('')
@@ -149,7 +410,6 @@ export function SettingsConsents() {
   const [actualId, setActualId] = useState<string | null>('t1')
   const [borrador, setBorrador] = useState<Borrador>(aBorrador(TEMPLATES_INICIALES[0]))
   const [intentado, setIntentado] = useState(false)
-  const [buscarProcedimiento, setBuscarProcedimiento] = useState('')
   const [vistaPaciente, setVistaPaciente] = useState(false)
 
   const visibles = templates.filter(
@@ -199,257 +459,33 @@ export function SettingsConsents() {
     setIntentado(false)
   }
 
-  const opcionesProcedimiento = PROCEDIMIENTOS_DISPONIBLES.filter(
-    (p) => !borrador.procedimientos.includes(p.codigo)
-      && `${p.codigo} ${p.nombre}`.toLowerCase().includes(buscarProcedimiento.trim().toLowerCase()),
-  )
-
   return (
     <div className="@container px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-ink">Consent Templates</h1>
-      <p className="mt-1 text-sm text-ink-muted">Create a standard consent document and assign it to one or more procedures.</p>
+      <SettingsPageHeader titulo="Consent Templates" bajada="Create a standard consent document and assign it to one or more procedures." />
 
-      <div className="mt-4 grid grid-cols-1 gap-4 @3xl:grid-cols-[240px_minmax(0,1fr)] @5xl:grid-cols-[260px_minmax(0,1fr)_minmax(0,1.15fr)]">
-        {/* ── Lista ─────────────────────────────────────────────────── */}
-        <section className="flex flex-col gap-3 self-start rounded-xl border border-line bg-white p-4">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-bold text-ink">Templates</h2>
-            <button
-              type="button"
-              onClick={nuevoTemplate}
-              aria-label="New Template"
-              className="bg-dash-blue hover:bg-dash-blue-hover flex h-7 items-center gap-1 rounded-md px-2.5 text-[12px] font-medium text-white transition-colors"
-            >
-              <Plus className="size-3.5" /> New template
-            </button>
-          </div>
-
-          <div className="relative">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-            <input
-              value={q}
-              onChange={(e) => { setQ(e.target.value); setFijados([]) }}
-              placeholder="Search templates..."
-              className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-            />
-          </div>
-
-          <Tabs size="sm" fullWidth aria-label="Filter templates" tabs={FILTROS} value={filtro} onChange={(f) => { setFiltro(f); setFijados([]) }} />
-
-          <div className="flex max-h-[520px] flex-col gap-2 overflow-y-auto">
-            {visibles.length === 0 ? (
-              <EmptyState icon={Search} title="No templates" detail="Nothing matches this search or filter." className="py-6" />
-            ) : (
-              visibles.map((t) => (
-                <div
-                  key={t.id}
-                  className={cn(
-                    'flex items-start gap-2 rounded-lg border px-3 py-2.5 transition-colors',
-                    actualId === t.id ? 'border-dash-blue bg-[#f8faff]' : 'border-line bg-white hover:bg-surface-subtle',
-                  )}
-                >
-                  <button
-                    type="button"
-                    onClick={() => elegir(t)}
-                    className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left"
-                  >
-                    <span className={cn('line-clamp-2 w-full text-[13px] font-bold', t.activo ? 'text-ink' : 'text-ink-faint')}>
-                      {t.titulo}
-                    </span>
-                    <span className="flex flex-wrap items-center gap-1.5">
-                      <Pill tone={t.activo ? 'success' : 'neutral'} size="sm">{t.activo ? 'Active' : 'Inactive'}</Pill>
-                      {t.sistema && <Pill tone="info" size="sm">System</Pill>}
-                      <span className="text-[11px] text-ink-muted">
-                        {t.procedimientos.length} procedure{t.procedimientos.length === 1 ? '' : 's'}
-                      </span>
-                    </span>
-                  </button>
-                  <Switch
-                    checked={t.activo}
-                    onCheckedChange={() => alternarActivo(t.id)}
-                    aria-label={`${t.activo ? 'Deactivate' : 'Activate'} ${t.titulo}`}
-                    className="mt-0.5"
-                  />
-                </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* ── Editor ────────────────────────────────────────────────── */}
-        <section className="flex flex-col gap-4 self-start rounded-xl border border-line bg-white p-4 sm:p-5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-[200px] flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-lg font-bold text-ink">{actual ? 'Edit Template' : 'New Consent Template'}</h2>
-                {actual && <Pill tone={actual.activo ? 'success' : 'neutral'} size="sm">{actual.activo ? 'Active' : 'Inactive'}</Pill>}
-                {actual?.sistema && <Pill tone="info" size="sm">System</Pill>}
-              </div>
-              <p className="mt-0.5 text-xs text-ink-muted">
-                {actual
-                  ? 'Changes show in the preview as you type. Save to keep them.'
-                  : 'Fill in the details and the text, then save to add it to the list.'}
-              </p>
-            </div>
-            {actual && (
-              <button
-                type="button"
-                onClick={() => alternarActivo(actual.id)}
-                className={cn(
-                  'flex h-9 shrink-0 items-center gap-1.5 rounded-md px-3 text-[13px] font-medium transition-colors',
-                  actual.activo
-                    ? 'border border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle'
-                    : 'bg-dash-blue hover:bg-dash-blue-hover text-white',
-                )}
-              >
-                {actual.activo ? <PowerOff className="size-4" /> : <Power className="size-4" />}
-                {actual.activo ? 'Deactivate template' : 'Activate template'}
-              </button>
-            )}
-          </div>
-
-          {intentado && (!borrador.titulo || borrador.procedimientos.length === 0) && (
-            <div className="rounded-md border border-[#f3b6b6] bg-dash-bad-bg px-3 py-2.5 text-[12px] font-medium text-dash-bad-fg">
-              All required fields marked with (*) must be completed before proceeding.
-            </div>
-          )}
-
-          <SelectField
-            label="Current Title"
-            required
-            options={TITULOS_SUGERIDOS}
-            value={borrador.titulo}
-            onChange={(v) => setBorrador((b) => ({ ...b, titulo: v }))}
-            error={intentado && !borrador.titulo ? 'This field is required.' : undefined}
-          />
-
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-medium text-ink">
-              Search Procedure<span className="text-required">*</span>
-            </span>
-            <div className="relative">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-              <input
-                value={buscarProcedimiento}
-                onChange={(e) => setBuscarProcedimiento(e.target.value)}
-                placeholder="Search..."
-                className={cn(
-                  'h-9 w-full rounded-md border bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]',
-                  'placeholder:text-ink-faint focus:outline-none',
-                  intentado && borrador.procedimientos.length === 0 ? 'border-field-error' : 'focus:border-dash-blue border-line',
-                )}
-              />
-              {buscarProcedimiento && opcionesProcedimiento.length > 0 && (
-                <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
-                  {opcionesProcedimiento.map((p) => (
-                    <button
-                      key={p.codigo}
-                      type="button"
-                      onClick={() => {
-                        setBorrador((b) => ({ ...b, procedimientos: [...b.procedimientos, p.codigo] }))
-                        setBuscarProcedimiento('')
-                      }}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
-                    >
-                      <span className="text-dash-blue font-semibold">{p.codigo}</span>
-                      <span className="truncate text-ink-soft">{p.nombre}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            {intentado && borrador.procedimientos.length === 0 ? (
-              <span className="text-[11px] leading-[1.35] text-field-error">At least one procedure must be listed.</span>
-            ) : (
-              borrador.procedimientos.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {borrador.procedimientos.map((codigo) => (
-                    <span key={codigo} className="text-dash-blue flex items-center gap-1.5 rounded-full bg-info-bg py-1 pr-1.5 pl-2.5 text-[12px] font-medium">
-                      {codigo} - {procedimiento(codigo)?.nombre}
-                      <button
-                        type="button"
-                        aria-label={`Remove ${codigo}`}
-                        onClick={() => setBorrador((b) => ({ ...b, procedimientos: b.procedimientos.filter((c) => c !== codigo) }))}
-                        className="rounded-full p-0.5 hover:bg-[#dbe6ff]"
-                      >
-                        <X className="size-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-medium text-ink">Consent text</span>
-            <ToolbarFormato />
-            <div className="-mt-2 flex flex-col gap-3 rounded-b-md border border-t-0 border-line p-3">
-              <label className="flex flex-col gap-1.5">
-                <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Nature of procedure</span>
-                <textarea
-                  rows={3}
-                  value={borrador.naturaleza}
-                  onChange={(e) => setBorrador((b) => ({ ...b, naturaleza: e.target.value }))}
-                  placeholder="Describe the procedure in plain language..."
-                  className="focus:border-dash-blue w-full resize-none rounded-md border border-line bg-white px-3 py-2 text-[13px] placeholder:text-ink-faint focus:outline-none"
-                />
-                <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_NATURALEZA}</span>
-              </label>
-              <label className="flex flex-col gap-1.5">
-                <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Risk and complications</span>
-                <textarea
-                  rows={4}
-                  value={borrador.riesgos}
-                  onChange={(e) => setBorrador((b) => ({ ...b, riesgos: e.target.value }))}
-                  placeholder={'One risk per line...'}
-                  className="focus:border-dash-blue w-full resize-none rounded-md border border-line bg-white px-3 py-2 text-[13px] placeholder:text-ink-faint focus:outline-none"
-                />
-                <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_RIESGOS}</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex justify-end gap-3 rounded-b-xl border-t border-line bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
-            <button type="button" onClick={cancelar} className="h-9 rounded-md border border-line bg-white px-6 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle">
-              Cancel
-            </button>
-            <button type="button" onClick={guardar} className="bg-dash-blue hover:bg-dash-blue-hover h-9 rounded-md px-6 text-[13px] font-medium text-white transition-colors">
-              Save
-            </button>
-          </div>
-        </section>
-
-        {/* ── Preview ───────────────────────────────────────────────── */}
-        <section className="self-start rounded-xl border border-line bg-[#f5f6f8] p-3 @3xl:col-start-2 @5xl:sticky @5xl:top-4 @5xl:col-start-3 @5xl:max-h-[calc(100vh-2rem)] @5xl:overflow-y-auto">
-          <div className="flex items-center justify-between gap-2 px-1">
-            <div>
-              <h2 className="text-sm font-bold text-ink">Preview</h2>
-              <p className="text-[11px] text-ink-muted">What the patient receives</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setVistaPaciente((v) => !v)}
-              aria-pressed={vistaPaciente}
-              className={cn(
-                'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
-                vistaPaciente ? 'border-dash-blue bg-dash-blue text-white' : 'border-line bg-white text-ink-slate hover:text-ink-soft',
-              )}
-            >
-              <Eye className="size-3.5" /> Patient View
-            </button>
-          </div>
-
-          <div className="mt-3">
-            <ConsentDocument
-              titulo={borrador.titulo}
-              procedimiento={borrador.procedimientos.length > 0 ? procedimiento(borrador.procedimientos[0])?.nombre : undefined}
-              naturaleza={borrador.naturaleza}
-              riesgos={borrador.riesgos}
-              vistaPaciente={vistaPaciente}
-            />
-          </div>
-        </section>
+      {/* La lista es de 280-288px: con 240/260 la cuarta pestaña ("All") no entraba y quedaba cortada. */}
+      <div className="mt-4 grid grid-cols-1 gap-4 @3xl:grid-cols-[280px_minmax(0,1fr)] @5xl:grid-cols-[288px_minmax(0,1fr)_minmax(0,1.15fr)]">
+        <ListaTemplates
+          templates={visibles}
+          elegidoId={actualId}
+          q={q}
+          onQ={(v) => { setQ(v); setFijados([]) }}
+          filtro={filtro}
+          onFiltro={(f) => { setFiltro(f); setFijados([]) }}
+          onElegir={elegir}
+          onAlternar={alternarActivo}
+          onNuevo={nuevoTemplate}
+        />
+        <EditorTemplate
+          actual={actual}
+          borrador={borrador}
+          onBorrador={setBorrador}
+          intentado={intentado}
+          onAlternar={() => actual && alternarActivo(actual.id)}
+          onCancelar={cancelar}
+          onGuardar={guardar}
+        />
+        <PanelPreview borrador={borrador} vistaPaciente={vistaPaciente} onVistaPaciente={setVistaPaciente} />
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { HelpProvider } from '@/components/help/HelpProvider'
+import { NotificacionesProvider } from '@/data/notificacionesStore'
 import { AppShell } from './AppShell'
 
 const meta = {
@@ -16,11 +17,13 @@ export const Default: Story = {
   render: () => (
     <MemoryRouter>
       <HelpProvider>
-        <Routes>
-          <Route element={<AppShell />}>
-            <Route index element={<div className="p-8 text-sm text-ink-muted">Page content goes here.</div>} />
-          </Route>
-        </Routes>
+        <NotificacionesProvider>
+          <Routes>
+            <Route element={<AppShell />}>
+              <Route index element={<div className="p-8 text-sm text-ink-muted">Page content goes here.</div>} />
+            </Route>
+          </Routes>
+        </NotificacionesProvider>
       </HelpProvider>
     </MemoryRouter>
   ),

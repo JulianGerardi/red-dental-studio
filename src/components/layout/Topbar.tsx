@@ -2,10 +2,11 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   PanelLeftOpen, PanelLeftClose, Search, BellDot, ChevronDown,
-  CircleUserRound, CreditCard, CircleHelp, Info, LogOut, EyeOff,
+  CircleUserRound, CreditCard, CircleHelp, Info, LogOut, EyeOff, ArrowRight, CheckCheck,
 } from 'lucide-react'
 import { LocationSelector } from './LocationSelector'
-import type { Notificacion } from '@/data/notificaciones'
+import { haceCuanto, type Notificacion } from '@/data/notificaciones'
+import { Pill } from '@/components/ui/pill'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -35,6 +36,8 @@ export function Topbar({
   notificaciones = [],
   ocultasDelBanner = [],
   onVolverAlBanner,
+  onAbrirNotificacion,
+  onMarcarTodasLeidas,
 }: {
   expanded: boolean
   onToggleSidebar: () => void
@@ -42,6 +45,8 @@ export function Topbar({
   notificaciones?: Notificacion[]
   ocultasDelBanner?: string[]
   onVolverAlBanner?: (id: string) => void
+  onAbrirNotificacion?: (id: string) => void
+  onMarcarTodasLeidas?: () => void
 }) {
   const ToggleIcon = expanded ? PanelLeftClose : PanelLeftOpen
 
@@ -85,7 +90,7 @@ export function Topbar({
         <GlobalSearch showCommandHint={showCommandHint} />
 
 
-        <Campana items={notificaciones} ocultas={ocultasDelBanner} onVolverAlBanner={onVolverAlBanner} />
+        <Campana items={notificaciones} ocultas={ocultasDelBanner} onVolverAlBanner={onVolverAlBanner} onAbrir={onAbrirNotificacion} onMarcarTodasLeidas={onMarcarTodasLeidas} />
       </div>
 
       </div>
@@ -152,61 +157,90 @@ export function MenuCuenta() {
   )
 }
 
-/* La campana es donde viven las tareas: acá están todas, incluidas las que
-   se sacaron del banner. Nada se borra desde acá -siguen pendientes hasta
-   que se completen-; lo que sí se puede es volver a ponerlas en el banner. */
+/* La campana: las últimas notificaciones, con la lógica del Inbox de Notion. El número son las que no se leyeron;
+   abrir una la marca leída y lleva a donde pasó. Todas están en Notifications ("View all notifications"), donde se
+   marcan como leídas, pendientes o sin leer y se archivan. Nada se borra desde acá. Ver
+   design-reference/figma/modulos/notifications.md. */
+const EN_CAMPANA = 5
+
 export function Campana({
-  items, ocultas, onVolverAlBanner,
+  items, ocultas, onVolverAlBanner, onAbrir, onMarcarTodasLeidas,
 }: {
   items: Notificacion[]
   ocultas: string[]
   onVolverAlBanner?: (id: string) => void
+  onAbrir?: (id: string) => void
+  onMarcarTodasLeidas?: () => void
 }) {
   const navigate = useNavigate()
+  const sinLeer = items.filter((n) => n.estado === 'unread').length
+  const ultimas = [...items].sort((a, b) => a.hace - b.hace).slice(0, EN_CAMPANA)
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label={items.length ? `Notifications (${items.length})` : 'Notifications'}
+        aria-label={sinLeer ? `Notifications (${sinLeer} unread)` : 'Notifications'}
         className="relative shrink-0 rounded-md p-1 text-ink-soft transition-colors hover:bg-surface-muted hover:text-black"
       >
         <BellDot className="size-5" />
-        {items.length > 0 && (
+        {sinLeer > 0 && (
           <span className="bg-dash-blue absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full text-[9px] font-semibold text-white">
-            {items.length}
+            {sinLeer}
           </span>
         )}
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-[320px]">
-        <DropdownMenuLabel className="text-[13px] font-bold text-ink">
-          Notifications {items.length > 0 && <span className="font-normal text-ink-muted">({items.length})</span>}
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {items.length === 0 ? (
-          <p className="px-2 py-6 text-center text-[13px] text-ink-faint">You&apos;re all caught up.</p>
-        ) : (
-          items.map((n) => (
-            /* Abrirla desde acá la devuelve al banner además de llevarte a
-               la tarea: vuelve al estado de siempre, sin nada escondido. */
-            <DropdownMenuItem
-              key={n.id}
-              onSelect={() => { onVolverAlBanner?.(n.id); navigate(n.to) }}
-              className="items-start gap-2.5 py-2.5"
-            >
-              <n.icon className="mt-0.5 size-4 shrink-0 text-attn-fg" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-[13px] font-semibold text-ink">{n.titulo}</span>
-                <span className="block text-[12px] leading-snug text-ink-muted">{n.detalle}</span>
-                {ocultas.includes(n.id) && (
-                  <span className="mt-1 flex items-center gap-1 text-[11px] font-medium text-ink-faint">
-                    <EyeOff className="size-3" /> Hidden from banner
+      <DropdownMenuContent align="end" className="w-[360px] p-0">
+        <div className="flex items-center justify-between gap-2 px-3 pt-2.5 pb-2">
+          <DropdownMenuLabel className="p-0 text-[13px] font-bold text-ink">
+            Notifications {sinLeer > 0 && <span className="font-normal text-ink-muted">({sinLeer} unread)</span>}
+          </DropdownMenuLabel>
+          {sinLeer > 0 && onMarcarTodasLeidas && (
+            <button type="button" onClick={onMarcarTodasLeidas} className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[12px] font-medium text-dash-blue hover:bg-info-bg">
+              <CheckCheck className="size-3.5" /> Mark all as read
+            </button>
+          )}
+        </div>
+        <DropdownMenuSeparator className="m-0" />
+        <div className="max-h-[380px] overflow-y-auto p-1">
+          {ultimas.length === 0 ? (
+            <p className="px-2 py-6 text-center text-[13px] text-ink-faint">You&apos;re all caught up.</p>
+          ) : (
+            ultimas.map((n) => (
+              /* Abrirla desde acá la marca leída, la devuelve al banner si
+                 estaba oculta y lleva a la tarea. */
+              <DropdownMenuItem
+                key={n.id}
+                onSelect={() => { onAbrir?.(n.id); onVolverAlBanner?.(n.id); navigate(n.to) }}
+                className="items-start gap-2.5 py-2.5 pl-1.5"
+              >
+                <span aria-hidden className={cn('mt-[7px] size-1.5 shrink-0 rounded-full', n.estado === 'unread' ? 'bg-dash-blue' : 'bg-transparent')} />
+                <n.icon className={cn('mt-0.5 size-4 shrink-0', n.tarea ? 'text-attn-fg' : 'text-ink-muted')} />
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-baseline justify-between gap-2">
+                    <span className={cn('truncate text-[13px] text-ink', n.estado === 'unread' ? 'font-semibold' : 'font-medium')}>{n.titulo}</span>
+                    <span className="shrink-0 text-[11px] text-ink-faint">{haceCuanto(n.hace)}</span>
                   </span>
-                )}
-              </span>
-            </DropdownMenuItem>
-          ))
-        )}
+                  <span className="block text-[12px] leading-snug text-ink-muted">{n.detalle}</span>
+                  {(n.estado === 'pending' || ocultas.includes(n.id)) && (
+                    <span className="mt-1 flex items-center gap-2">
+                      {n.estado === 'pending' && <Pill tone="warning" size="sm">Pending</Pill>}
+                      {ocultas.includes(n.id) && (
+                        <span className="flex items-center gap-1 text-[11px] font-medium text-ink-faint">
+                          <EyeOff className="size-3" /> Hidden from banner
+                        </span>
+                      )}
+                    </span>
+                  )}
+                </span>
+              </DropdownMenuItem>
+            ))
+          )}
+        </div>
+        <DropdownMenuSeparator className="m-0" />
+        <DropdownMenuItem onSelect={() => navigate('/notifications')} className="m-1 justify-center gap-1.5 py-2 text-[13px] font-semibold text-dash-blue">
+          View all notifications <ArrowRight className="size-3.5" />
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

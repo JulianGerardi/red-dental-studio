@@ -128,6 +128,11 @@ completarla, que es justo lo que Julián pidió.
 pendientes como badge, las lista con su detalle, cada una se puede descartar
 desde ahí, y sin pendientes dice "You're all caught up".
 
+> Actualizado el 2026-09-29: la campana ahora sigue la lógica de la pantalla
+> Notifications (ver `notifications.md`): el número es cuántas hay **sin
+> leer**, muestra las 5 más nuevas con *Mark all as read* y lleva a todas
+> con **View all notifications**. El banner sigue mostrando sólo tareas.
+
 El estado vive en `AppShell`, no en cada pantalla: tiene que sobrevivir a la
 navegación y lo comparten banner y campana.
 

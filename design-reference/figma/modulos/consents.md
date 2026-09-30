@@ -78,3 +78,37 @@ entendía de un vistazo. Misma lógica, mejor flujo:
 contenedor de scroll aunque no scrollee -el `sticky` de adentro se calculaba
 contra él y nunca se pegaba-. Pasó a `overflow-x-clip`, que recorta igual sin
 crear contenedor de scroll.
+
+## Pantalla terminada y documentada en el design system (2026-09-29)
+
+Pedido de Julián: "armá bien la pantalla de consent que le falta documentar en
+el design system". En el design system sólo estaba el toolbar de formato; el
+resto vivía adentro de un solo componente de 456 líneas.
+
+1. **La pestaña "All" quedaba cortada** ("Al") en la columna de la lista: las
+   cuatro pestañas (Active, Inactive, System, All) no entraban en 260px. La
+   lista pasa a 288px con las tres columnas y a 280px con dos. Verificado que
+   la fila de pestañas ya no desborda (ancho de contenido = ancho visible).
+2. **Encabezado estándar:** usa `SettingsPageHeader`, como Accounts y Ledger
+   Options, en vez de un `h1` propio con las mismas clases.
+3. **Botones del sistema:** New template (`Button` sm), Activate / Deactivate
+   template (primary / secondary) y Cancel / Save pasan a `Button`. Antes eran
+   botones hechos a mano con las clases copiadas.
+4. **Colores con token:** los cuatro valores escritos a mano pasan a tokens
+   -la tarjeta elegida a `info-bg`, el borde del aviso a `dash-bad-fg/30`, el
+   escritorio del preview a `surface-muted` y el hover de la X del chip a
+   `dash-blue/10`-. El conteo de colores sin token del design system bajó de
+   101 a 97.
+5. **Partes separadas y exportadas**, misma lógica: `TarjetaTemplate`,
+   `ListaTemplates`, `SelectorProcedimientos` (maneja su propia búsqueda),
+   `TextoConsentimiento`, `EditorTemplate` y `PanelPreview`. La pantalla sólo
+   guarda el estado y las une.
+6. **Design system → Pages › Parts › Consents**, con la misma estructura que
+   Elements (Buttons, Patient menu), a pedido de Julián: descripción corta,
+   **Playground** con lista, editor y preview juntos y sus *Controls*
+   (template, activo, filtro, errores de validación, Patient View), **Parts**
+   (qué hace cada parte), **States** (tarjeta: elegida, default, hover,
+   inactiva, System; lista y sin resultados; procedimientos con chips, vacío
+   y con error; texto lleno y vacío; editor editando, nuevo y con errores;
+   preview de clínica y de paciente; toolbar) y **Specs** (medidas leídas de
+   la pantalla dibujada, tokens y reglas). Todo se puede usar.
