@@ -129,11 +129,11 @@ def agent(p=""):
     return f"""<div class="agent" data-agent>
   <button class="agent__launch" type="button" aria-expanded="false" aria-controls="agent-panel">
     <span class="agent__pill">{T("Ask me", "Preguntame")}</span>
-    <span class="agent__ring" aria-hidden="true"><span class="agent__orb"></span></span>
+    <span class="agent__ring" aria-hidden="true"><span class="agent__orb">{MARK}</span></span>
   </button>
   <section class="agent__panel" id="agent-panel" hidden aria-label="Assistant">
     <header class="agent__head">
-      <span class="agent__ring agent__ring--sm" aria-hidden="true"><span class="agent__orb"></span></span>
+      <span class="agent__ring agent__ring--sm" aria-hidden="true"><span class="agent__orb">{MARK}</span></span>
       <div><b>{T("Julián’s assistant", "Asistente de Julián")}</b><span>{T("Answers with what’s on this website", "Responde con lo que hay en esta web")}</span></div>
       <button class="icon-btn agent__close" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
     </header>
@@ -333,21 +333,14 @@ def tiles_grill(p):
     ])
 
 
-MP_TILES = [
-    '<span class="tile tile--mp" style="--k:{k}"><span class="tile__obj mp-word">Mer<br>cado<br>Play</span></span>',
-    '<span class="tile tile--mp-dark" style="--k:{k}"><span class="tile__obj mp-sel"><span class="mp__dialog-label"><svg><use href="#i-component"/></svg>Alert Dialog</span>'
-    '<span class="mp__dialog-box" style="display:block"><i></i><i></i><i></i><i></i>Challenge<br>UX-UI</span></span></span>',
-    '<span class="tile tile--mp-dark" style="--k:{k}"><span class="mp-stars"><i></i><i></i><i></i></span><span class="tile__obj mp-year">20<br>26</span></span>',
-    '<span class="tile tile--mp" style="--k:{k}"><span class="tile__obj mp-cursors"><span class="mp-cursor mp-cursor--a"><svg><use href="#i-cursor"/></svg><span>Julián Gerardi</span></span>'
-    '<span class="mp-cursor mp-cursor--b"><svg><use href="#i-cursor"/></svg><span>Devs</span></span></span></span>',
-]
-
-
-def tiles_mp(p, with_cover=True):
-    out = [t.format(k=i) for i, t in enumerate(MP_TILES)]
-    if with_cover:
-        out.append(tile_screen(p, "mp", "mp-cover", 2000, 1126, 4, True))
-    return "".join(out)
+def tiles_mp(p, with_cover=False):
+    return "".join([
+        tile_screen(p, "mp", "mp-home", 1200, 3570, 0, True),
+        tile_card(p, "mp-dark", "mp-kit-modal", 350, 378, 1),
+        tile_screen(p, "mp", "mp-recos", 1200, 1538, 2, True),
+        tile_card(p, "mp-dark", "mp-kit-comments", 244, 450, 3),
+        tile_screen(p, "mp", "mp-points", 1200, 3597, 4, True),
+    ])
 
 
 def wl_item(p, n, href, title, tags, year, tiles, desc, credit, is_open=False, nda=False):

@@ -4,34 +4,163 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
 p = "../"
 FN = "mercado-play.html"
+FIGMA = "https://www.figma.com/design/MTQT0AwdScSnoRK3m3SHeB/Challenge---UX-UI?node-id=11-544"
+
+
+def scroll_mock(name, w, h, title, ae, as_, kind="mp", ce="", cs=""):
+    """A long page inside a browser window that scrolls itself, top to bottom."""
+    c = f"<figcaption>{T(ce, cs)}</figcaption>" if ce else ""
+    return (f'<figure class="shot" data-reveal><div class="panel panel--{kind}"><div class="mock mock--dark mock--scroll">'
+            f'<div class="mock__bar"><i></i><i></i><i></i><span>{title}</span></div>'
+            f'<div class="mock__view">{screen(p, name, w, h, ae, as_, zoom=True)}</div></div></div>{c}</figure>')
+
+
+def pages(items, kind="mp-dark", ce="", cs=""):
+    """Whole long pages side by side, nothing cut."""
+    c = f"<figcaption>{T(ce, cs)}</figcaption>" if ce else ""
+    cols = "".join(f'<div class="pages__col"><div class="mock mock--dark"><div class="mock__bar"><i></i><i></i><i></i></div>{screen(p, n, w, h, ae, as_, zoom=True)}</div><p>{T(le, ls)}</p></div>'
+                   for n, w, h, ae, as_, le, ls in items)
+    return f'<figure class="shot" data-reveal><div class="panel panel--{kind}"><div class="pages">{cols}</div></div>{c}</figure>'
+
+
+def kit(items, ce="", cs=""):
+    c = f"<figcaption>{T(ce, cs)}</figcaption>" if ce else ""
+    cells = "".join(f'<div class="kit__item"><div class="kit__piece" style="--w:{pw}px">{screen(p, n, w, h, ae, as_, zoom=True)}</div><span>{T(le, ls)}</span></div>'
+                    for n, w, h, pw, ae, as_, le, ls in items)
+    return f'<figure class="shot" data-reveal><div class="panel panel--mp-dark"><div class="kit">{cells}</div></div>{c}</figure>'
+
+
+QUOTES = [
+    ("Tengo una conversación de WhatsApp conmigo misma para anotar todas las películas que me recomiendan mis compañeros de trabajo, así después puedo verlas en Meli Play.",
+     "I keep a WhatsApp chat with myself to note down every film my co-workers recommend, so I can watch them on Meli Play later.", "Carla Gallardo", 21, "a"),
+    ("Nunca me guío por las recomendaciones de los críticos de cine o por las opiniones de quienes no conozco.",
+     "I never go by film critics’ recommendations or the opinions of people I don’t know.", "Virginia Lopez", 40, "a"),
+    ("A veces la crítica puede ser útil, pero siempre prefiero formarme mi propia opinión sobre una película.",
+     "Reviews can help sometimes, but I always prefer to make up my own mind about a film.", "Javier Torres", 32, "o"),
+    ("Mi papá siempre se olvida el nombre de las series que me quiere recomendar, y termino teniendo que buscar los títulos o los actores en Google.",
+     "My dad always forgets the names of the shows he wants to recommend, and I end up searching the titles or the actors on Google.", "Roberto Castro", 60, "o"),
+    ("La tecnología no es mi fuerte. Cuando abro Meli Play, me gustaría tener un lugar con los contenidos destacados por mi familia.",
+     "Technology isn’t my thing. When I open Meli Play, I’d like a place with the titles my family highlighted.", "Andres Zunino", 30, "o"),
+    ("Creo que lo mejor es ver el tráiler y decidir si la película me atrae personalmente.",
+     "I think the best thing is to watch the trailer and decide whether the film appeals to me.", "Laura Gómez", 64, "a"),
+]
+quotes = '      <div class="quotes">' + "".join(
+    f'<blockquote class="quote" data-reveal style="--k:{i % 3}"><span class="quote__at">@MercadoPlay</span>'
+    f'<p>{T(en, es)}</p><footer><b>{name}</b> · {T(f"{age}", f"{age} años")}{T(" · Mercado Play user", f" · Usuari{g} de Mercado Play")}</footer></blockquote>'
+    for i, (es, en, name, age, g) in enumerate(QUOTES)) + "</div>\n"
+
+BENCH_COLS = [("Service", "Tipo de servicio"), ("Business model", "Modelo de negocio"), ("Catalogue", "Catálogo"), ("Audience", "Público objetivo"),
+              ("Differentiator", "Diferenciador"), ("Onboarding", "Onboarding"), ("UX strengths", "Fortalezas UX"), ("UX weaknesses", "Debilidades UX")]
+BENCH = [
+    ("Mercado Play", [("Integrated streaming", "Streaming integrado"), ("Free with ads", "Gratis con publicidad"), ("Medium", "Medio"), ("Mercado Libre users", "Usuarios de Mercado Libre"),
+                      ("E-commerce integration", "Integración con ecommerce"), ("Very low friction (existing Mercado Libre account)", "Muy baja fricción (cuenta existente de Mercado Libre)"),
+                      ("Instant access, part of the ecosystem", "Acceso inmediato, integrado al ecosistema"), ("Smaller catalogue, limited recommendations", "Catálogo menor, recomendaciones limitadas")]),
+    ("Netflix", [("Premium streaming", "Streaming premium"), ("Subscription", "Suscripción"), ("Very high", "Muy alto"), ("General audience", "Público general"),
+                 ("Recommendation algorithm", "Algoritmo de recomendación"), ("Medium (sign-up + payment)", "Media (registro + pago)"), ("Best-in-class recommendations", "UX líder en recomendación"), ("High price", "Precio alto")]),
+    ("Prime Video", [("Streaming + marketplace", "Streaming + marketplace"), ("Subscription", "Suscripción"), ("High", "Alto"), ("Amazon users", "Usuarios Amazon"),
+                     ("Amazon ecosystem", "Ecosistema Amazon"), ("Medium", "Media"), ("Integration with Amazon services", "Integración con servicios Amazon"), ("Confusing navigation", "Navegación confusa")]),
+    ("Disney+", [("Franchise streaming", "Streaming de franquicias"), ("Subscription", "Suscripción"), ("Medium / High", "Medio / Alto"), ("Families", "Familias"),
+                 ("Exclusive content", "Contenido exclusivo"), ("Medium", "Media"), ("Exclusive content", "Contenido exclusivo"), ("Less personalisation", "Menos personalización")]),
+    ("Pluto TV", [("Free streaming", "Streaming gratuito"), ("Free with ads", "Gratis con publicidad"), ("High", "Alto"), ("People looking for free TV", "Usuarios que buscan TV gratis"),
+                  ("TV-like experience", "Experiencia tipo TV"), ("Low friction", "Baja fricción"), ("TV-like experience", "Experiencia tipo TV"), ("Less user control", "Menor control del usuario")]),
+]
+US = ' class="is-us"'
+bench = ('      <div class="bench" data-reveal data-lenis-prevent><table><thead><tr><th>' + T("Platform", "Plataforma") + "</th>"
+         + "".join(f"<th>{T(e, s)}</th>" for e, s in BENCH_COLS) + "</tr></thead><tbody>"
+         + "".join(f'<tr{US if name == "Mercado Play" else ""}><th>{name}</th>' + "".join(f"<td>{T(e, s)}</td>" for e, s in cells) + "</tr>" for name, cells in BENCH)
+         + "</tbody></table></div>\n")
+
+
+def persona(name, role_en, role_es, quote_en, quote_es, data, beh, mot, fru, k):
+    rows = "".join(f"<div><dt>{T(a, b)}</dt><dd>{T(c, d)}</dd></div>" for a, b, c, d in data)
+    lst = lambda items: "<ul>" + "".join(f"<li>{T(e, s)}</li>" for e, s in items) + "</ul>"
+    return (f'<article class="persona" data-reveal style="--k:{k}"><header><span class="persona__av" aria-hidden="true">{name[0]}</span><div><h3>{name}</h3><span>{T(role_en, role_es)}</span></div></header>'
+            f'<p class="persona__q">{T(quote_en, quote_es)}</p><dl>{rows}</dl>'
+            f'<div class="persona__cols"><div><h4>{T("Behaviour", "Comportamiento")}</h4>{lst(beh)}</div><div><h4>{T("Motivations", "Motivaciones")}</h4>{lst(mot)}</div><div><h4>{T("Frustrations", "Frustraciones")}</h4>{lst(fru)}</div></div></article>')
+
+
+personas = '      <div class="personas">' + persona(
+    "Sofía", "Casual user", "Usuaria casual",
+    "Streaming works as complementary content inside the Mercado Libre ecosystem.", "El streaming funciona como contenido complementario dentro del ecosistema Mercado Libre.",
+    [("Age", "Edad", "29", "29 años"), ("Job", "Ocupación", "Administrative", "Administrativa"), ("Main device", "Dispositivo principal", "Phone", "Celular"),
+     ("Mercado Libre use", "Uso de Mercado Libre", "Frequent purchases", "Compras frecuentes"), ("Streaming", "Consumo de streaming", "Casual", "Casual")],
+    [("Opens Mercado Libre every day", "Entra a Mercado Libre todos los días"), ("Finds Mercado Play inside the app", "Descubre Mercado Play dentro de la app"), ("Watches short content before bed", "Mira contenido corto antes de dormir")],
+    [("Watch something quickly", "Ver algo rápido"), ("Not paying for another subscription", "No pagar otra suscripción"), ("Use apps she already knows", "Usar apps que ya conoce")],
+    [("Too much time looking for something to watch", "Mucho tiempo buscando contenido"), ("Too many paid platforms", "Tener muchas plataformas pagas")], 0) + persona(
+    "Ricardo", "Recurring user", "Usuario recurrente",
+    "He values the free, ad-supported model as long as content is easy to find.", "Valora el modelo gratuito con publicidad, siempre que el contenido sea fácil de encontrar.",
+    [("Age", "Edad", "50", "50 años"), ("Job", "Ocupación", "Shop owner / self-employed", "Comerciante / independiente"), ("Main device", "Dispositivo principal", "Desktop", "Desktop"),
+     ("Mercado Libre use", "Uso de Mercado Libre", "Very frequent", "Muy frecuente"), ("Streaming", "Consumo de streaming", "High", "Alto")],
+    [("Browses Mercado Libre several times a week", "Navega Mercado Libre varias veces por semana"), ("Finds Mercado Play while using the app", "Descubre Mercado Play mientras usa la app"),
+     ("Watches at night on the TV", "Consume contenido por la noche en la televisión"), ("Prefers well-known, easy-to-pick films", "Prefiere películas conocidas o fáciles de elegir")],
+    [("Watch without paying another subscription", "Ver contenido sin pagar otra suscripción"), ("Find something to watch fast", "Encontrar algo para ver rápidamente"), ("Simple platforms", "Usar plataformas simples")],
+    [("Complicated interfaces", "Interfaces complicadas"), ("Too many options", "Demasiadas opciones para elegir"), ("Creating new accounts", "Tener que crear cuentas nuevas")], 1) + "</div>\n"
+
+flow = [("Recommend", "Recomendar", "Share a film or a show from its card, by email or with a link.", "Compartir una peli o serie desde su card, por mail o con un enlace."),
+        ("A friend watches it", "Un amigo la ve", "The recommendation lands with someone who trusts you.", "La recomendación le llega a alguien que confía en vos."),
+        ("They finish it", "La termina", "Points only count when the whole film is watched.", "Los puntos cuentan solo si la ve completa."),
+        ("You earn points", "Sumás puntos", "Points go to benefits across Mercado Libre, like Mercado Envíos.", "Los puntos van a beneficios de Mercado Libre, como Mercado Envíos.")]
+steps = '      <ol class="steps">' + "".join(f'<li data-reveal><span class="steps__n">{i + 1:02d}</span><div><h3>{T(a, b)}</h3><p>{T(c, d)}</p></div></li>' for i, (a, b, c, d) in enumerate(flow)) + "</ol>\n"
 
 b = case_head(
     "Mercado Play",
-    T("A UX/UI challenge for Mercado Libre’s free streaming service, with its own visual system for the presentation.",
-      "Un challenge de UX/UI para el servicio de streaming gratuito de Mercado Libre, con su propio sistema visual para la presentación."),
+    T("A UX/UI challenge for Mercado Libre’s free streaming service: people recommend films to the people who trust them, and earn points when a friend watches the whole thing.",
+      "Un challenge de UX/UI para el streaming gratuito de Mercado Libre: la gente recomienda pelis a quien confía en ella y suma puntos cuando un amigo la ve completa."),
     [(T("Role", "Rol"), "UX/UI Designer"), (T("Company", "Empresa"), "Mercado Libre · Challenge"), (T("Year", "Año"), "2026"),
-     (T("Product", "Producto"), "Mercado Play"), (T("Version", "Versión"), "2.0"), (T("Tools", "Herramientas"), "Figma")],
+     (T("Platform", "Plataforma"), "Web · desktop"), (T("Scope", "Alcance"), T("Research, benchmarking, UX, UI, prototype", "Research, benchmarking, UX, UI, prototipo")), (T("Tools", "Herramientas"), "Figma")],
 )
 b += f'  <section class="wrap case-cover" data-parallax>{cover_mp()}</section>\n'
-b += chapter(T("Overview", "Resumen"), h2("Streaming inside the largest marketplace in Latin America.", "Streaming dentro del marketplace más grande de Latinoamérica.") + prose(
-    ("Mercado Play is Mercado Libre’s free streaming service: films, series and live channels at no cost, supported by ads and available inside the Mercado Libre ecosystem.",
-     "Mercado Play es el servicio de streaming gratuito de Mercado Libre: películas, series y canales en vivo sin costo, sostenidos con publicidad y disponibles dentro del ecosistema de Mercado Libre."),
-    ("This project is a UX/UI challenge built around the product. It is on its <strong>second version</strong>, and its presentation was designed as carefully as the screens.",
-     "Este proyecto es un challenge de UX/UI pensado alrededor del producto. Va por su <strong>segunda versión</strong> y la presentación se diseñó con el mismo cuidado que las pantallas.")), "overview")
-b += chapter(T("The cover as a system", "La portada como sistema"), h2("A presentation that opens like a Figma canvas.", "Una presentación que se abre como un lienzo de Figma.") + prose(
-    ("The challenge title sits inside a selected component called <strong>Alert Dialog</strong>, the product name is set in Mercado Libre’s yellow, and two multiplayer cursors, mine and the developers’, share the frame.",
-     "El título del challenge vive dentro de un componente seleccionado llamado <strong>Alert Dialog</strong>, el nombre del producto va en el amarillo de Mercado Libre y dos cursores multiplayer, el mío y el de desarrollo, comparten el frame."),
-    ("The same pieces break down into a small set of assets that carry the rest of the file: the wordmark, the selected dialog, the year and the cursors.",
-     "Esas mismas piezas se separan en un set chico de recursos que acompañan el resto del archivo: el logotipo, el diálogo seleccionado, el año y los cursores.")) +
-    f'      <div class="mp-set" data-reveal>{tiles_mp(p, with_cover=False)}</div>\n', "cover")
-b += chapter(T("How I approach a challenge", "Cómo encaro un challenge"), h2("Same process as a real project, in less time.", "El mismo proceso que un proyecto real, en menos tiempo.") +
-             '      <ol class="steps">' + "".join(f'<li data-reveal><span class="steps__n">{i + 1:02d}</span><div><h3>{T(a, c)}</h3><p>{T(d, e)}</p></div></li>' for i, (a, c, d, e) in enumerate([
-                 ("Read the brief twice", "Leer el brief dos veces", "Separate what is asked from what is assumed, and write the questions I would ask the team.", "Separar lo que se pide de lo que se supone, y anotar las preguntas que le haría al equipo."),
-                 ("Understand the product", "Entender el producto", "Map how Mercado Play lives inside Mercado Libre and who arrives there, and from where.", "Mapear cómo vive Mercado Play dentro de Mercado Libre y quién llega ahí, y desde dónde."),
-                 ("Design the flow before the screens", "Diseñar el flujo antes que las pantallas", "Agree on the path first so every screen has a reason to exist.", "Acordar el recorrido primero para que cada pantalla tenga una razón de ser."),
-                 ("Present it as a product", "Presentarlo como un producto", "A cover and a system of pieces that anyone on the team can follow on their own.", "Una portada y un sistema de piezas que cualquiera del equipo pueda seguir solo.")])) + "</ol>\n", "approach")
+b += chapter(T("The problem", "El problema"), h2("Usage dropped 4% in a month.", "El uso cayó un 4% en un mes.") + prose(
+    ("In the last month, how often people used the platform fell 4% compared with the month before. To understand why, the User Research team surveyed users and found clear patterns in their answers.",
+     "En el último mes, la frecuencia de uso de la plataforma cayó un 4% respecto del mes anterior. Para entender por qué, el equipo de User Research encuestó a las personas usuarias y encontró patrones claros en sus respuestas.")) +
+    f'      <h3 class="sub" data-reveal>{T("What people say about Mercado Play", "Lo que dicen de Mercado Play")}</h3>\n' + quotes, "problem")
+b += chapter("Benchmarking", h2("Five platforms, eight dimensions.", "Cinco plataformas, ocho dimensiones.") + prose(
+    ("To understand where Mercado Play stands in streaming, I compared it with Netflix, Prime Video, Disney+ and Pluto TV across business model, onboarding, navigation, content discovery and ecosystem, looking for similarities, differences and room to improve its value proposition.",
+     "Para entender dónde se ubica Mercado Play en el streaming, lo comparé con Netflix, Prime Video, Disney+ y Pluto TV en modelo de negocio, onboarding, navegación, descubrimiento de contenido y ecosistema, buscando similitudes, diferencias y oportunidades para mejorar su propuesta de valor.")) +
+    bench + f'      <p class="pull" data-reveal>{T("Mercado Play wins on access, a Mercado Libre account is all it takes, and loses on discovery.", "Mercado Play gana en acceso, alcanza con la cuenta de Mercado Libre, y pierde en descubrimiento.")}</p>\n', "benchmarking")
+b += chapter(T("User archetypes", "Arquetipos de usuario"), h2("People don’t come looking for content. They find it.", "La gente no llega buscando contenido. Lo encuentra.") + prose(
+    ("Mercado Play users don’t necessarily arrive looking for something to watch: they discover it while using the rest of Mercado Libre. That turns the platform into an opportunity for engagement and retention inside the main product.",
+     "Las personas usuarias de Mercado Play no necesariamente llegan buscando contenido: lo descubren mientras usan el resto de Mercado Libre. Eso convierte a la plataforma en una oportunidad de engagement y retención dentro del producto principal.")) + personas, "archetypes")
+b += chapter(T("The solution", "La solución"), h2("Recommendations between people, rewarded.", "Recomendaciones entre personas, con recompensa.") +
+    f'      <p class="pull" data-reveal>{T("Recommendations between people are one of the most trusted ways to discover content, especially when the film is one click away.", "Las recomendaciones entre personas son una de las formas más confiables de descubrir contenido, sobre todo si la peli está a un clic.")}</p>\n' + prose(
+    ("The proposal adds social recommendations to Mercado Play. People recommend the films and shows they liked and share them with anyone through a link. If someone watches the whole title from that recommendation, the person who shared it earns points to use on benefits across Mercado Libre.",
+     "La propuesta suma recomendaciones sociales a Mercado Play. La gente recomienda las pelis y series que le gustaron y las comparte con quien quiera mediante un enlace. Si alguien ve el contenido completo a partir de esa recomendación, quien la compartió suma puntos para usar en beneficios dentro de Mercado Libre."),
+    ("Discovery comes from real people, and taking part is rewarded.", "El descubrimiento viene de personas reales, y participar tiene recompensa.")) + steps, "solution")
+b += chapter(T("Low fidelity", "Baja fidelidad"), h2("Structure first, then colour.", "Primero la estructura, después el color.") + prose(
+    ("The wireframes settle the hierarchy of the home and where the new actions live: favourite and share on every card, comments in place and a notifications panel for points. The same screen in high fidelity keeps every block where it was.",
+     "Los wireframes definen la jerarquía de la home y dónde viven las acciones nuevas: favorito y compartir en cada card, comentarios en el lugar y un panel de notificaciones para los puntos. La misma pantalla en alta fidelidad mantiene cada bloque donde estaba.")) +
+    "      " + pages([("mp-lofi", 900, 2698, "Low-fidelity wireframe of the home with notifications", "Wireframe de baja fidelidad de la home con notificaciones", "Low fidelity", "Baja fidelidad"),
+                      ("mp-points", 1200, 3597, "High-fidelity home with the notifications panel showing points", "Home en alta fidelidad con el panel de notificaciones y los puntos", "High fidelity", "Alta fidelidad")], kind="mp-dark") + "\n", "lofi")
+b += chapter(T("High fidelity", "Alta fidelidad"), h2("Every card can be saved, shared and talked about.", "Cada card se puede guardar, compartir y comentar.") +
+    decision("A home built around what people recommend", "Una home armada alrededor de lo que recomienda la gente",
+             f"<p>{T('“Top 10 films recommended by people” sits next to the usual rows. Each card carries two actions, save and share, and opens its comments in place.', '“Top 10 pelis recomendadas por la gente” convive con las filas de siempre. Cada card lleva dos acciones, guardar y compartir, y abre sus comentarios en el lugar.')}</p>",
+             scroll_mock("mp-home", 1200, 3570, "Mercado Play · Inicio", "Mercado Play home with recommendation rows", "Home de Mercado Play con filas de recomendaciones")) +
+    decision("Share, and see it pay off", "Compartir, y ver que suma",
+             f"<p>{T('Sharing opens a short modal: an email or a link, and a clear promise, 100 points if the person watches it all. Saving confirms with a toast, and the bell tells you when a friend finished what you shared.', 'Compartir abre un modal corto: un mail o un enlace, y una promesa clara, 100 puntos si la persona la ve completa. Guardar confirma con un toast, y la campana avisa cuando un amigo terminó lo que compartiste.')}</p>",
+             pages([("mp-fav", 1200, 3544, "Home with the saved-to-favourites toast", "Home con el toast de agregado a favoritos", "Saved to favourites", "Agregada a favoritos"),
+                    ("mp-share", 1200, 3597, "Share modal over the home", "Modal para compartir sobre la home", "Share modal", "Modal para compartir")], kind="mp")) +
+    decision("My favourites and my recommendations", "Mis favoritos y mis recomendados",
+             f"<p>{T('A page of its own keeps what you saved and what you shared, so recommending becomes a habit instead of a WhatsApp chat with yourself.', 'Una página propia guarda lo que guardaste y lo que compartiste, así recomendar se vuelve un hábito y no un chat de WhatsApp con uno mismo.')}</p>",
+             fig(p, "mp-recos", 1200, 1538, "Mercado Play · Mis favoritos", "My favourites and my recommendations page", "Página de mis favoritos y mis recomendados", kind="mp", dark=True)), "hifi")
+b += chapter("UI kit", h2("Small pieces, every state.", "Piezas chicas, todos los estados.") + prose(
+    ("Cards, the share modal and comments were designed as components with their states: default, saved, active and sent.",
+     "Las cards, el modal para compartir y los comentarios se diseñaron como componentes con sus estados: default, guardado, activo y enviado.")) +
+    "      " + kit([("mp-kit-card", 244, 438, 180, "Card default", "Card default", "Card · default", "Card · default"),
+                    ("mp-kit-card-saved", 244, 438, 180, "Card saved", "Card guardada", "Card · saved", "Card · guardada"),
+                    ("mp-kit-comments", 244, 450, 180, "Card with comments", "Card con comentarios", "Comments", "Comentarios"),
+                    ("mp-kit-modal", 350, 378, 250, "Share modal", "Modal para compartir", "Share · default", "Compartir · default"),
+                    ("mp-kit-modal-on", 350, 378, 250, "Share modal, email typed", "Modal para compartir, con mail", "Share · active", "Compartir · activo"),
+                    ("mp-kit-sent", 350, 204, 250, "Message sent", "Mensaje enviado", "Sent", "Enviado")]) + "\n", "kit")
+b += chapter(T("Outcome", "Resultado"), h2("Discovery that comes from people.", "Descubrimiento que viene de las personas.") +
+    '      <div class="numbers" data-reveal>' + "".join(f'<div><b data-count="{n}"{f" data-suffix={chr(34)}{sfx}{chr(34)}" if sfx else ""}>{n}{sfx}</b><span>{T(e, s)}</span></div>'
+                                                      for n, sfx, e, s in [(6, "", "users quoted", "personas citadas"), (5, "", "platforms benchmarked", "plataformas comparadas"),
+                                                                           (2, "", "user archetypes", "arquetipos de usuario"), (100, "", "points per watched recommendation", "puntos por recomendación vista")]) + "</div>\n" +
+    prose(("The challenge goes from a 4% drop in usage to a feature that gives people a reason to come back: the recommendations of someone they trust, and points for sharing them.",
+           "El challenge va de una caída del 4% en el uso a una funcionalidad que le da a la gente un motivo para volver: las recomendaciones de alguien de confianza, y puntos por compartirlas.")) +
+    f'      <div class="btns" data-reveal><a class="btn btn--ghost" href="{FIGMA}" target="_blank" rel="noopener">{T("See the file in Figma", "Ver el archivo en Figma")} {arrow()}</a></div>\n', "outcome")
+
 page = case_page(p, FN, "Mercado Play", "Mercado Play",
-                 "UX/UI challenge for Mercado Play, Mercado Libre's free streaming service. By Julián Gerardi.",
-                 "Challenge de UX/UI para Mercado Play, el streaming gratuito de Mercado Libre. Por Julián Gerardi.", b)
+                 "UX/UI challenge for Mercado Play, Mercado Libre's free streaming service: social recommendations with rewards. By Julián Gerardi.",
+                 "Challenge de UX/UI para Mercado Play, el streaming gratuito de Mercado Libre: recomendaciones sociales con recompensa. Por Julián Gerardi.", b)
 open(os.path.join(ROOT, "work", FN), "w").write(page)
 print(FN, len(page))

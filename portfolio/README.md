@@ -15,7 +15,7 @@ portfolio/
   work/confidentally.html     caso con NDA (bloqueado con contraseña)
   work/confidentally-ui.html  design system y Builder con IA
   work/grill.html             GRILL Empresas (app de empleados + panel de cocina)
-  work/mercado-play.html      challenge de Mercado Play (portada y su sistema de piezas)
+  work/mercado-play.html      challenge de Mercado Play: problema, benchmarking, arquetipos, solución, baja y alta fidelidad, UI kit
   assets/site.css             tokens (claro y oscuro), layout, trabajos, casos, intro, agente, cursor
   assets/site.js              idioma, intro, scroll suave, reveals, marquesina, trabajos, cursor, tema, lightbox, NDA, CV
   assets/hero.js              movimiento del degradé del inicio (solo en la home)
@@ -27,12 +27,12 @@ portfolio/
 
 ## Marca y tamaño
 
-- La marca es un triángulo invertido (se dibuja al cargar y gira al pasar el mouse) con "Julián Gerardi" en Geist Mono. El favicon es el mismo triángulo en blanco.
+- La marca es un triángulo invertido (aparece suave al cargar y baja apenas al pasar el mouse) con "Julián Gerardi" en Geist Mono. El favicon es el mismo triángulo en blanco.
 - Todo el diseño está a la escala de ver la página al 90%: el `html` tiene `font-size: 90%` y las medidas en px del CSS están multiplicadas por 0,9.
 
 ## Flujo con zoom (Batech)
 
-El flujo to-be está exportado de Figma a 10000 px (`b-flow.webp`) dentro de un visor: se arrastra para moverse y se hace zoom con los botones, pellizcando, con ⌘/Ctrl + rueda, doble clic o las teclas +/−. Tiene pantalla completa.
+El flujo to-be se exportó de Figma a 20000 px y se cortó en 30 mosaicos (`assets/img/flow/t-x-y.webp`) más una vista general de 5000 px (`overview.webp`). Con la rueda del mouse se hace zoom sobre el punto del cursor, arrastrando se mueve, y un clic acerca. Los mosaicos nítidos se cargan solo al acercarse, así no se pixela. Si la página se está scrolleando, la rueda sigue scrolleando la página. Tiene pantalla completa y un botón que abre el flujo en Figma.
 
 ## Idioma
 
@@ -40,13 +40,12 @@ Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span 
 
 ## Movimiento
 
-- **Intro**: la primera vez que se abre la home en la sesión, una pantalla negra cuenta de 0 a 100 con palabras que pasan (Research, Systems, Interfaces, Prototypes) y se levanta. Después el título entra palabra por palabra.
+- **Intro**: cada vez que se entra a la home desde afuera del sitio, una pantalla negra cuenta de 0 a 100 con palabras que pasan (Research, Systems, Interfaces, Prototypes) y se levanta. Navegando entre páginas del sitio no se repite.
 - **Scroll suave** con [Lenis](https://github.com/darkroomengineering/lenis) (CDN). Los bloques con `data-reveal` suben al entrar, los títulos `.lines` aparecen palabra por palabra detrás de una máscara, y los números con `data-count` cuentan.
-- **Marquesina** de marcas: avanza sola y acelera y cambia de sentido según el scroll.
 - **Portadas de los casos**: parallax suave del mockup.
 - **Transición entre páginas**: una cortina cubre la pantalla al salir y se levanta al entrar.
-- **Inicio**: una tarjeta con un degradé verde y violeta que se mueve solo y se inclina hacia el puntero; al pasar el mouse deja una estela de previews de los trabajos (miniaturas `assets/img/t-*.webp`), con la frase principal al centro, el rol abajo a la izquierda y la disponibilidad abajo a la derecha.
-- **Microanimaciones**: cada pantalla muestra cómo funciona algo en estilo UI mínimo (un puntero, un anillo de foco, un cursor de texto que escribe, una fila seleccionada) con una etiqueta en mono que lo explica. Los datos están en `_build/demos.py`: el área de cada interacción va en % de la captura. Solo se animan mientras están en pantalla.
+- **Inicio**: una tarjeta clara con el mismo brillo verde y violeta del final de la página, que se mueve solo y sigue el puntero. Las palabras subrayadas de la frase muestran el proyecto al que apuntan (design systems → Confidentally UI, IA → Batech, prototipos → Confidentally, productos de punta a punta → GRILL, que la gente usa → Mercado Play) y llevan a su caso. Se configuran en `HOT` de `_build/index_page.py`.
+- **Microanimaciones**: cada pantalla responde como el producto: un pulso en el control usado, un toast que sube y se asienta, un campo que se escribe solo o una fila que se selecciona, con los colores de cada marca (`.demo--batech`, `--dental`, `--ds`, `--grill`, `--mp`). Sin cursores falsos. Los datos están en `_build/demos.py`. Solo se animan mientras están en pantalla.
 - Con "reducir movimiento" activado en el sistema, todo queda quieto.
 
 ## Selected work
@@ -62,7 +61,7 @@ Cada caso tiene una barra con breadcrumbs (Inicio / Trabajos / Proyecto), el nú
 ## CV y asistente
 
 - El CV se descarga desde el menú, About, Contacto y el pie. Dentro del visor de Artifacts de Claude pasa por la ventana de descarga del visor.
-- El asistente ("Preguntame") no usa ninguna IA externa: responde con el contenido de este sitio. Las preguntas generales (quién es, disponibilidad, contacto, CV, idiomas, formación) tienen respuestas escritas en `assets/agent.js` (`INTENTS`); el resto lo busca en el texto de las páginas y responde con el párrafo que corresponde, con un link a esa sección. El contenido del caso con NDA no se usa.
+- El asistente ("Preguntame", el globo negro con el triángulo) no usa ninguna IA externa: responde con el contenido de este sitio. Las preguntas generales (quién es, disponibilidad, contacto, CV, idiomas, formación) tienen respuestas escritas en `assets/agent.js` (`INTENTS`); el resto lo busca en el texto de las páginas y responde con el párrafo que corresponde, con un link a esa sección. El contenido del caso con NDA no se usa.
 
 ## Editar
 

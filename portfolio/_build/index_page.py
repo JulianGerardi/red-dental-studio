@@ -3,9 +3,6 @@ import os
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
 p = ""
-BRANDS = ["Batech", "Icarus Digital Marketing", "Bahco", "Datachain Summit", "Blue CP Construction",
-          "Azure Printed Homes", "Gloob Marketing", "Cuponstar", "Vieja Cubana", "GRILL"]
-marquee = "".join(f"<li>{b}</li>" for b in BRANDS)
 
 XP = [
     ("May 2025 — Now", "May 2025 — Hoy", "Lead UX/UI Designer", "Lead UX/UI Designer",
@@ -64,7 +61,7 @@ work = "".join([
     wl_item(p, 1, "work/batech.html", "Batech AI Platform", T("AI · Computer vision · Dashboard", "IA · Visión artificial · Dashboard"), "2022–26", tiles_batech(p),
             T("Computer-vision analytics for retail branches: camera events, geofences drawn on live video, operational times and an AI assistant for every store.",
               "Analítica con visión artificial para sucursales: eventos de cámaras, geocercas dibujadas sobre el video, tiempos operativos y un asistente de IA para cada tienda."),
-            T("Lead UX/UI — research, flows, UI, design system", "Lead UX/UI — research, flujos, UI, design system"), is_open=True),
+            T("Lead UX/UI — research, flows, UI, design system", "Lead UX/UI — research, flujos, UI, design system")),
     wl_item(p, 2, "work/confidentally.html", "Confidentally", T("SaaS · Healthcare · Prototype", "SaaS · Salud · Prototipo"), "2026", tiles_dental(p),
             T("Redesign of a dental practice platform, from the front desk to the dental chair, rebuilt as a working prototype on mock data.",
               "Rediseño de una plataforma para clínicas dentales, de la recepción al sillón, reconstruida como prototipo funcional con datos de prueba."),
@@ -78,12 +75,12 @@ work = "".join([
               "Pedidos de almuerzo para empresas de una cocina en Mercedes: los empleados eligen la vianda desde el celular y la cocina maneja comandas, etiquetas y reparto."),
             T("Product design — flows, UI, working prototype", "Diseño de producto — flujos, UI, prototipo funcional")),
     wl_item(p, 5, "work/mercado-play.html", "Mercado Play", T("Streaming · UX/UI challenge", "Streaming · Challenge UX/UI"), "2026", tiles_mp(p),
-            T("A UX/UI challenge for Mercado Libre’s free streaming service, presented with its own cover system.",
-              "Un challenge UX/UI para el servicio de streaming gratuito de Mercado Libre, presentado con su propio sistema de portada."),
-            T("UX/UI challenge — version 2.0", "Challenge UX/UI — versión 2.0")),
+            T("A UX/UI challenge for Mercado Libre’s free streaming service: social recommendations that reward people with points when a friend watches what they shared.",
+              "Un challenge UX/UI para el streaming gratuito de Mercado Libre: recomendaciones sociales que suman puntos cuando un amigo ve lo que compartiste."),
+            T("Research, benchmarking, UX, UI, prototype", "Research, benchmarking, UX, UI, prototipo")),
 ])
 
-INTRO = """<script>(function(){var d=document.documentElement;try{if(sessionStorage.getItem('jg-intro'))return;}catch(e){}if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('is-loading','intro');setTimeout(function(){d.classList.remove('is-loading');},7000);})();</script>
+INTRO = """<script>(function(){var d=document.documentElement;try{var r=document.referrer;if(r&&new URL(r).origin===location.origin&&r!==location.href)return;}catch(e){}if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('is-loading','intro');setTimeout(function(){d.classList.remove('is-loading');},7000);})();</script>
 <script src="assets/hero.js" defer></script>
 """
 LOADER = f"""<div class="loader" aria-hidden="true">
@@ -94,7 +91,20 @@ LOADER = f"""<div class="loader" aria-hidden="true">
 </div>
 """
 
-TRAIL = '[{&quot;src&quot;: &quot;assets/img/t-b-dashboard.webp&quot;, &quot;name&quot;: &quot;Batech AI Platform&quot;, &quot;href&quot;: &quot;work/batech.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-d-dashboard.webp&quot;, &quot;name&quot;: &quot;Confidentally&quot;, &quot;href&quot;: &quot;work/confidentally.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-ds-welcome.webp&quot;, &quot;name&quot;: &quot;Confidentally UI&quot;, &quot;href&quot;: &quot;work/confidentally-ui.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-g-emp-app.webp&quot;, &quot;name&quot;: &quot;GRILL Empresas&quot;, &quot;href&quot;: &quot;work/grill.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-mp-cover.webp&quot;, &quot;name&quot;: &quot;Mercado Play&quot;, &quot;href&quot;: &quot;work/mercado-play.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-b-ai.webp&quot;, &quot;name&quot;: &quot;Batech AI Platform&quot;, &quot;href&quot;: &quot;work/batech.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-d-clinical.webp&quot;, &quot;name&quot;: &quot;Confidentally&quot;, &quot;href&quot;: &quot;work/confidentally.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-ds-builder-built.webp&quot;, &quot;name&quot;: &quot;Confidentally UI&quot;, &quot;href&quot;: &quot;work/confidentally-ui.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-g-corp-hoy.webp&quot;, &quot;name&quot;: &quot;GRILL Empresas&quot;, &quot;href&quot;: &quot;work/grill.html&quot;}, {&quot;src&quot;: &quot;assets/img/t-b-geocerca.webp&quot;, &quot;name&quot;: &quot;Batech AI Platform&quot;, &quot;href&quot;: &quot;work/batech.html&quot;}]'
+HOT = {
+    "batech": ("work/batech.html", "t-b-ai", "Batech AI Platform", ("AI video analytics for retail", "Analítica de video con IA para retail"), "2022–26", "batech"),
+    "dental": ("work/confidentally.html", "t-d-dashboard", "Confidentally", ("Dental platform, rebuilt as a working prototype", "Plataforma dental, reconstruida como prototipo funcional"), "2026 · NDA", "dental"),
+    "ds": ("work/confidentally-ui.html", "t-ds-welcome", "Confidentally UI", ("A living design system with an AI Builder", "Un design system vivo con un Builder con IA"), "2026", "ds"),
+    "grill": ("work/grill.html", "t-g-emp-app", "GRILL Empresas", ("Two connected apps, from order to delivery", "Dos apps conectadas, del pedido al reparto"), "2026", "grill"),
+    "mp": ("work/mercado-play.html", "t-mp-home", "Mercado Play", ("Social recommendations for streaming", "Recomendaciones sociales para streaming"), "2026", "mp"),
+}
+
+
+def hot(key, text):
+    return f'<a class="hot" href="{HOT[key][0]}" data-hot="{key}">{text}</a>'
+
+
+HOT_CARDS = "".join(f"""<div class="hot-card hot-card--{b}" data-card="{k}"><span class="hot-card__shot"><i></i><i></i><i></i><img src="assets/img/{im}.webp" alt="" width="560" height="350" loading="lazy" decoding="async"></span><span class="hot-card__meta"><b>{name}</b><span>{T(*sub)}</span><em>{yr}</em></span></div>""" for k, (href, im, name, sub, yr, b) in HOT.items())
 
 cv_attrs = f'href="{CV}" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv'
 
@@ -106,11 +116,12 @@ page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Se
   <section class="hero">
     <div class="hero-card" data-hero>
       <div class="hero-card__mesh" aria-hidden="true"><i class="m1"></i><i class="m2"></i><i class="m3"></i><i class="m4"></i><i class="m5"></i><i class="m-spot"></i></div>
-      <div class="hero-card__trail" aria-hidden="true" data-trail="{TRAIL}"></div>
       <div class="hero-card__body">
         <p class="hero-card__hi rise" style="--d:.15s">{T("Hey, I’m Julián", "Hey, soy Julián")}</p>
-        <h1 class="hero-card__title split">{T("Fewer standalone screens. More end-to-end products, living design systems and AI prototypes people actually use.", "Menos pantallas sueltas. Más productos de punta a punta, design systems vivos y prototipos con IA que la gente usa.")}</h1>
+        <h1 class="hero-card__title split">{T(f"Fewer standalone screens. More {hot('grill', 'end-to-end products')}, living {hot('ds', 'design systems')} and {hot('batech', 'AI')} {hot('dental', 'prototypes')} {hot('mp', 'people actually use')}.",
+                                              f"Menos pantallas sueltas. Más {hot('grill', 'productos de punta a punta')}, {hot('ds', 'design systems')} vivos y {hot('dental', 'prototipos')} con {hot('batech', 'IA')} {hot('mp', 'que la gente usa')}.")}</h1>
       </div>
+      <div class="hot-cards" aria-hidden="true">{HOT_CARDS}</div>
       <div class="hero-card__foot">
         <p class="rise" style="--d:.9s"><b>Senior Product Designer</b><span>{T("Lead UX/UI · AI-assisted product design", "Lead UX/UI · Diseño de producto asistido por IA")}</span></p>
         <p class="hero-card__right rise" style="--d:1s"><b>{T("Open to new projects", "Abierto a nuevos proyectos")}</b><span>{T("Designing from Mercedes, Buenos Aires", "Diseñando desde Mercedes, Buenos Aires")}</span></p>
@@ -123,13 +134,6 @@ page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Se
     <div class="stat" data-reveal style="--k:1"><b data-count="4">4</b><span>{T("countries: US, Mexico, Ireland, Argentina", "países: EE. UU., México, Irlanda, Argentina")}</span></div>
     <div class="stat" data-reveal style="--k:2"><b data-count="5">5</b><span>{T("Latin American markets for Bahco", "mercados de Latinoamérica para Bahco")}</span></div>
     <div class="stat" data-reveal style="--k:3"><b data-count="10" data-suffix="%">10%</b><span>{T("faster delivery leading Batech’s design team", "entregas más rápidas liderando el equipo de Batech")}</span></div>
-  </section>
-
-  <section class="marquee" aria-label="Brands">
-    <div class="marquee__row" data-marquee>
-      <ul class="marquee__list">{marquee}</ul>
-      <ul class="marquee__list" aria-hidden="true">{marquee}</ul>
-    </div>
   </section>
 
   <section class="work" id="work">

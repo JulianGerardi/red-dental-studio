@@ -30,6 +30,20 @@
 
   /* ---------- Word splitting: blur-in titles and masked lines ---------- */
   function splitWords(el, masked) {
+    /* punctuation right after a link stays with its last word, so it never wraps alone */
+    var tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    var texts = [];
+    while (tw.nextNode()) texts.push(tw.currentNode);
+    texts.forEach(function (t) {
+      var m = /^[,.;:!?)]+/.exec(t.data);
+      var prev = t.previousSibling;
+      if (!m || !prev || prev.nodeType !== 1) return;
+      var last = prev.lastChild;
+      while (last && last.nodeType === 1) last = last.lastChild;
+      if (!last || last.nodeType !== 3) return;
+      last.data += m[0];
+      t.data = t.data.slice(m[0].length);
+    });
     var i = 0;
     var walk = function (node) {
       Array.prototype.slice.call(node.childNodes).forEach(function (child) {
@@ -226,6 +240,17 @@
       head.addEventListener('mouseleave', function () { clearTimeout(timer); });
       head.addEventListener('focus', function () { openRow(row); });
     });
+    var list = document.querySelector('.wl-list');
+    if (list) {
+      list.addEventListener('mouseleave', function () {
+        clearTimeout(timer);
+        timer = setTimeout(function () { rows.forEach(function (r) { r.classList.remove('is-open'); }); }, 120);
+      });
+      list.addEventListener('mouseenter', function () { clearTimeout(timer); });
+      list.addEventListener('focusout', function (e) {
+        if (!list.contains(e.relatedTarget)) rows.forEach(function (r) { r.classList.remove('is-open'); });
+      });
+    }
   }
 
   /* Each screen tilts toward the pointer and lifts */
@@ -376,24 +401,60 @@
   var year = document.querySelector('[data-year]');
   if (year) year.textContent = String(new Date().getFullYear());
 
-  /* ---------- Zoomable flows: drag to move, pinch / Ctrl + wheel / buttons to zoom ---------- */
+  /* ---------- Zoomable flow: wheel to zoom, drag to move, sharp tiles when zoomed in ---------- */
+  var lastPageScroll = 0;
+  window.addEventListener('scroll', function () { lastPageScroll = Date.now(); }, { passive: true });
   document.querySelectorAll('[data-zoomer]').forEach(function (z) {
     var stage = z.querySelector('.zoomer__stage');
     var pct = z.querySelector('[data-zoom-pct]');
-    var img = stage.querySelector('img');
-    var W = parseFloat(stage.style.width) || img.naturalWidth || 1600;
-    var H = W * (parseFloat(img.getAttribute('height')) / parseFloat(img.getAttribute('width')));
-    var MAX = 1.6;
-    var s = 0.5, tx = 0, ty = 0;
+    var SRC_W = +z.getAttribute('data-w'), SRC_H = +z.getAttribute('data-h');
+    var T = +z.getAttribute('data-tile'), COLS = +z.getAttribute('data-cols'), ROWS = +z.getAttribute('data-rows');
+    var BASE = z.getAttribute('data-base');
+    var W = SRC_W / 2, H = SRC_H / 2;              /* stage size in CSS px: 2 source px per CSS px */
+    var dpr = Math.min(3, window.devicePixelRatio || 1);
+    var MAX = Math.max(1, 2 / dpr);                /* never past 1 source px per device px */
+    stage.style.width = W + 'px';
+    stage.style.height = H + 'px';
+    var s = 0.1, tx = 0, ty = 0;
+    var tiles = {};
+    var order = [];
     var fit = function () { return Math.min(z.clientWidth / W, z.clientHeight / H); };
     var used = function () { z.classList.add('is-used'); };
+
+    function updateTiles() {
+      var need = s * dpr * 2 > 1.15;              /* the 5000px overview is enough until here */
+      var x0 = -tx / s, y0 = -ty / s, x1 = (z.clientWidth - tx) / s, y1 = (z.clientHeight - ty) / s;
+      var th = T / 2;
+      for (var r = 0; r < ROWS; r++) for (var c = 0; c < COLS; c++) {
+        var key = c + '-' + r;
+        var left = c * th, top = r * th;
+        var w = Math.min(th, W - left), h = Math.min(th, H - top);
+        var visible = need && left < x1 + th / 2 && left + w > x0 - th / 2 && top < y1 + th / 2 && top + h > y0 - th / 2;
+        if (visible && !tiles[key]) {
+          var im = new Image();
+          im.className = 'zoomer__tile';
+          im.decoding = 'async';
+          im.alt = '';
+          im.style.cssText = 'left:' + left + 'px;top:' + top + 'px;width:' + w + 'px;height:' + h + 'px';
+          im.onload = function () { this.classList.add('is-ready'); };
+          im.src = BASE + 't-' + key + '.webp';
+          stage.appendChild(im);
+          tiles[key] = im;
+          order.push(key);
+        }
+        if (visible) { var at = order.indexOf(key); if (at !== -1) { order.splice(at, 1); order.push(key); } }
+      }
+      while (order.length > 14) { var old = order.shift(); if (tiles[old]) { tiles[old].remove(); delete tiles[old]; } }
+    }
     function apply(animate) {
       var cw = z.clientWidth, ch = z.clientHeight, w = W * s, h = H * s;
       tx = w <= cw ? (cw - w) / 2 : Math.min(0, Math.max(cw - w, tx));
       ty = h <= ch ? (ch - h) / 2 : Math.min(0, Math.max(ch - h, ty));
       z.classList.toggle('is-animating', !!animate);
-      stage.style.transform = 'translate(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px) scale(' + s.toFixed(4) + ')';
-      pct.textContent = Math.round(s * 100) + '%';
+      z.classList.toggle('is-zoomed', s > fit() * 1.02);
+      stage.style.transform = 'translate(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px) scale(' + s.toFixed(5) + ')';
+      pct.textContent = Math.round(s / MAX * 100) + '%';
+      updateTiles();
     }
     function zoomAt(ns, cx, cy, animate) {
       ns = Math.max(fit(), Math.min(MAX, ns));
@@ -403,62 +464,74 @@
       s = ns;
       apply(animate);
     }
-    function initial() { s = fit(); tx = 0; ty = 0; apply(false); }
-    initial();
+    function reset() { s = fit(); tx = 0; ty = 0; apply(false); }
+    reset();
 
-    var drag = null;
+    var drag = null, moved = false;
     z.addEventListener('pointerdown', function (e) {
       if (e.button !== 0 || e.target.closest('.zoomer__ui')) return;
       drag = { x: e.clientX, y: e.clientY, tx: tx, ty: ty };
+      moved = false;
       try { z.setPointerCapture(e.pointerId); } catch (err) {}
-      z.classList.add('is-dragging');
-      used();
     });
     z.addEventListener('pointermove', function (e) {
       if (!drag) return;
+      if (!moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 4) return;
+      moved = true;
+      z.classList.add('is-dragging');
       tx = drag.tx + e.clientX - drag.x;
       ty = drag.ty + e.clientY - drag.y;
       apply(false);
+      used();
     });
-    var end = function () { drag = null; z.classList.remove('is-dragging'); };
+    var end = function (e) {
+      if (drag && !moved && e && e.type === 'pointerup' && !e.target.closest('.zoomer__ui')) {
+        var r = z.getBoundingClientRect();
+        if (s < MAX * 0.98) zoomAt(Math.min(MAX, s * 2.5), e.clientX - r.left, e.clientY - r.top, true);
+        else zoomAt(fit(), e.clientX - r.left, e.clientY - r.top, true);
+        used();
+      }
+      drag = null;
+      z.classList.remove('is-dragging');
+    };
     z.addEventListener('pointerup', end);
     z.addEventListener('pointercancel', end);
     z.addEventListener('wheel', function (e) {
+      var pinch = e.ctrlKey || e.metaKey;
+      var scrolling = Date.now() - lastPageScroll < 280;
+      if (!pinch && scrolling) return;               /* the page is scrolling past: let it */
       var r = z.getBoundingClientRect();
-      if (e.ctrlKey || e.metaKey) {
+      var dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      if (!pinch && Math.abs(e.deltaX) > Math.abs(dy) && s > fit() * 1.02) {
         e.preventDefault(); e.stopPropagation();
-        zoomAt(s * Math.exp(-e.deltaY * 0.01), e.clientX - r.left, e.clientY - r.top, false);
-        used();
-      } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        e.preventDefault(); e.stopPropagation();
-        tx -= e.deltaX;
-        apply(false);
-        used();
+        tx -= e.deltaX; apply(false); used();
+        return;
       }
-    }, { passive: false });
-    z.addEventListener('dblclick', function (e) {
-      var r = z.getBoundingClientRect();
-      zoomAt(s < 0.6 ? 1 : fit(), e.clientX - r.left, e.clientY - r.top, true);
+      if (!pinch && dy > 0 && s <= fit() * 1.001) return;   /* fully zoomed out: keep scrolling the page */
+      e.preventDefault(); e.stopPropagation();
+      zoomAt(s * Math.exp(-dy * (pinch ? 0.012 : 0.0022)), e.clientX - r.left, e.clientY - r.top, false);
       used();
-    });
+    }, { passive: false });
     z.addEventListener('keydown', function (e) {
       var cx = z.clientWidth / 2, cy = z.clientHeight / 2;
-      if (e.key === '+' || e.key === '=') zoomAt(s * 1.4, cx, cy, true);
-      else if (e.key === '-' || e.key === '_') zoomAt(s / 1.4, cx, cy, true);
+      if (e.key === '+' || e.key === '=') zoomAt(s * 1.5, cx, cy, true);
+      else if (e.key === '-' || e.key === '_') zoomAt(s / 1.5, cx, cy, true);
       else if (e.key === 'ArrowLeft') { tx += 80; apply(true); }
       else if (e.key === 'ArrowRight') { tx -= 80; apply(true); }
       else if (e.key === 'ArrowUp') { ty += 80; apply(true); }
       else if (e.key === 'ArrowDown') { ty -= 80; apply(true); }
+      else if (e.key === '0') zoomAt(fit(), cx, cy, true);
       else return;
       e.preventDefault();
       used();
     });
     z.querySelectorAll('[data-zoom]').forEach(function (b) {
-      b.addEventListener('click', function () {
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
         var m = b.getAttribute('data-zoom');
         var cx = z.clientWidth / 2, cy = z.clientHeight / 2;
-        if (m === 'in') zoomAt(s * 1.4, cx, cy, true);
-        else if (m === 'out') zoomAt(s / 1.4, cx, cy, true);
+        if (m === 'in') zoomAt(s * 1.6, cx, cy, true);
+        else if (m === 'out') zoomAt(s / 1.6, cx, cy, true);
         else if (m === 'fit') zoomAt(fit(), cx, cy, true);
         else if (m === 'full') {
           if (document.fullscreenElement) document.exitFullscreen();
@@ -467,12 +540,8 @@
         used();
       });
     });
-    document.addEventListener('fullscreenchange', function () {
-      setTimeout(function () {
-        if (document.fullscreenElement === z) { s = fit(); apply(false); } else initial();
-      }, 80);
-    });
-    window.addEventListener('resize', function () { apply(false); });
+    document.addEventListener('fullscreenchange', function () { setTimeout(reset, 80); });
+    window.addEventListener('resize', function () { var f = fit(); if (s < f) s = f; apply(false); });
   });
 
   /* ---------- Lightbox for case study screens ---------- */

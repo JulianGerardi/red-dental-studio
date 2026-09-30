@@ -54,15 +54,17 @@ steps = [("Choose the source", "Elegir la fuente", "A video service, an RTSP lin
          ("Confirm", "Confirmar", "A dialog warns that the analysis can take hours, and says where to follow its progress and download the report.", "Un diálogo avisa que el análisis puede tardar horas y dice dónde seguir su progreso y descargar el reporte."),
          ("Read the result", "Ver el resultado", "The geofence over the frame, the detections in a table and one button to download.", "La geocerca sobre el cuadro, las detecciones en una tabla y un botón para descargar.")]
 ol = '      <ol class="steps">' + "".join(f'<li data-reveal><span class="steps__n">{i + 1:02d}</span><div><h3>{T(a, b)}</h3><p>{T(c, d)}</p></div></li>' for i, (a, b, c, d) in enumerate(steps)) + "</ol>\n"
-flow = (f'      <figure class="shot" data-reveal><div class="zoomer" data-zoomer tabindex="0" role="region" aria-label="To-be flow">'
-        f'<div class="zoomer__stage" style="width:8000px">{screen(p, "b-flow", 10000, 2243, "To-be flow for configuring an analysis, from source to report", "Flujo to-be para configurar un análisis, de la fuente al reporte")}</div>'
+FLOW_FIGMA = "https://www.figma.com/design/ljgOjnuyx1hS052ehRnyRb/Portfolio?node-id=89-5120"
+flow = (f'      <figure class="shot" data-reveal><div class="zoomer" data-zoomer data-w="20000" data-h="4486" data-tile="2048" data-cols="10" data-rows="3" data-base="{p}assets/img/flow/" tabindex="0" role="region" aria-label="To-be flow">'
+        f'<div class="zoomer__stage"><img class="zoomer__low" src="{p}assets/img/flow/overview.webp" width="5000" height="1122" alt="To-be flow for configuring an analysis, from source to report" data-alt-es="Flujo to-be para configurar un análisis, de la fuente al reporte" decoding="async" loading="lazy"></div>'
         f'<div class="zoomer__ui"><button type="button" data-zoom="out" aria-label="Zoom out"><svg aria-hidden="true"><use href="#i-minus"/></svg></button>'
-        f'<span class="zoomer__pct" data-zoom-pct>10%</span>'
+        f'<span class="zoomer__pct" data-zoom-pct>–</span>'
         f'<button type="button" data-zoom="in" aria-label="Zoom in"><svg aria-hidden="true"><use href="#i-plus"/></svg></button>'
         f'<button type="button" data-zoom="fit" class="zoomer__txt">{T("Fit", "Ajustar")}</button>'
-        f'<button type="button" data-zoom="full" aria-label="Full screen"><svg aria-hidden="true"><use href="#i-expand"/></svg></button></div>'
-        f'<p class="zoomer__hint">{T("Drag to move · pinch, ⌘/Ctrl + scroll or +/− to zoom", "Arrastrá para moverte · pellizcá, ⌘/Ctrl + rueda o +/− para hacer zoom")}</p></div>'
-        f'<figcaption>{T("<b>The to-be flow</b>, prototyped in high fidelity in Figma. Zoom in to read every screen.", "<b>El flujo to-be</b>, prototipado en alta fidelidad en Figma. Hacé zoom para leer cada pantalla.")}</figcaption></figure>\n')
+        f'<button type="button" data-zoom="full" aria-label="Full screen"><svg aria-hidden="true"><use href="#i-expand"/></svg></button>'
+        f'<a class="zoomer__txt zoomer__figma" href="{FLOW_FIGMA}" target="_blank" rel="noopener">Figma <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>'
+        f'<p class="zoomer__hint">{T("Scroll to zoom · drag to move", "Rueda para hacer zoom · arrastrá para moverte")}</p></div>'
+        f'<figcaption>{T("<b>The to-be flow</b>, prototyped in high fidelity in Figma. Zoom in with the mouse wheel to read every screen, or open it in Figma.", "<b>El flujo to-be</b>, prototipado en alta fidelidad en Figma. Hacé zoom con la rueda del mouse para leer cada pantalla, o abrilo en Figma.")}</figcaption></figure>\n')
 body += chapter(T("Configuring an analysis", "Configurar un análisis"), h2("From camera to report in six steps.", "De la cámara al reporte en seis pasos.") + flow + ol +
                 "      " + pair(bf("b-geocerca", 1200, 1233, "Nuevo análisis · Geocerca", "Geofence creation over a parking lot camera frame", "Creación de geocerca sobre el cuadro de una cámara de estacionamiento",
                                   "<b>Step 04.</b> The geofence is drawn on the real camera frame, not described in coordinates.", "<b>Paso 04.</b> La geocerca se dibuja sobre el cuadro real de la cámara, no se describe con coordenadas."),
