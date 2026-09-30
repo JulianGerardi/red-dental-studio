@@ -6,8 +6,8 @@ import {
   TextoConsentimiento, ToolbarFormato, aBorrador, type Borrador, type ConsentTemplate, type Filtro,
 } from './Consents'
 
-/* Settings › Consents, documentado como Elements (Playground, Parts, States, Specs). La pantalla completa está en
-   Pages › Settings Consents. */
+/* Settings › Consents: un ejemplo por parte y estado, con la estética de Elements (fondo de la app, título y nota en
+   cada ejemplo), Playground primero y Specs al final. La pantalla completa está en Pages › Settings Consents. */
 
 type Args = {
   template: 'Extraction Informed Consent' | 'Root Canal Consent' | 'Root Canal Consent – Molar' | 'New template'
@@ -29,7 +29,7 @@ const meta = {
           '',
           '**Cómo se usa:** se elige un template (o *New template*), se le pone título, uno o más procedimientos y el texto; el preview cambia mientras se escribe y *Save* lo guarda. El interruptor de cada tarjeta lo activa o desactiva sin abrirlo. *System* dice que viene con el producto; es independiente de activo.',
           '',
-          '**Probalo:** en *Playground* elegí template, filtro, errores de validación y *Patient View* desde *Controls*; todo se puede usar.',
+          '**Probalo:** en *Playground* elegí template, filtro, errores de validación y *Patient View* desde *Controls*; abajo está cada parte en cada estado, y todo se puede usar.',
         ].join('\n'),
       },
     },
@@ -50,8 +50,24 @@ type Story = StoryObj<Args>
 const nada = () => {}
 const [extraccion, conducto, molar] = TEMPLATES_INICIALES
 const coincide = (t: ConsentTemplate, f: Filtro) => f === 'All' || (f === 'Active' && t.activo) || (f === 'Inactive' && !t.activo) || (f === 'System' && t.sistema)
+const sinControles = { controls: { disable: true } }
 
 const Fondo = ({ children }: { children: ReactNode }) => <div className="bg-page-background p-4 sm:p-6">{children}</div>
+
+/* Un ejemplo: título y nota arriba, la parte abajo, al ancho que tiene en la pantalla. */
+function Ejemplo({ titulo, nota, ancho, children }: { titulo: string; nota: string; ancho: number; children: ReactNode }) {
+  return (
+    <Fondo>
+      <figure className="m-0 flex max-w-full flex-col gap-2" style={{ width: ancho }}>
+        <figcaption className="flex flex-col gap-0.5">
+          <span className="text-[12.5px] font-semibold text-ink">{titulo}</span>
+          <span className="text-[11.5px] leading-snug text-ink-muted">{nota}</span>
+        </figcaption>
+        {children}
+      </figure>
+    </Fondo>
+  )
+}
 
 /* La pantalla sin su encabezado: lista, editor y preview, con el estado propio de cada uno. */
 function Consentimientos({ args }: { args: Args }) {
@@ -87,59 +103,95 @@ export const Playground: Story = {
   render: (a) => <Fondo><Consentimientos key={JSON.stringify(a)} args={a} /></Fondo>,
 }
 
-const PARTES: [string, string][] = [
-  ['Templates list', 'New template, el buscador, los filtros (Active, Inactive, System, All) y las tarjetas. 288px: las cuatro pestañas entran enteras.'],
-  ['Template card', 'Título (hasta dos líneas), estado, System y cuántos procedimientos usa. Tocarla la abre en el editor; el interruptor la activa o desactiva sin abrirla. La elegida lleva el borde azul.'],
-  ['Editor', 'Edit Template con su estado (o New Consent Template), Activate / Deactivate, el aviso rojo si faltan datos y Cancel / Save fijos al pie.'],
-  ['Procedure picker', 'Busca por código o nombre; los elegidos quedan como chips con X. Obligatorio: al menos uno.'],
-  ['Consent text', 'Nature of procedure y Risk and complications, con la guía en cursiva para quien redacta. El toolbar de formato es decorativo.'],
-  ['Preview', 'La hoja que recibe el paciente sobre el escritorio gris. Patient View saca diagnóstico y hallazgos.'],
-]
+/* ── Template card ─────────────────────────────────────────────────── */
 
-export const Parts: Story = {
-  parameters: { controls: { disable: true } },
-  render: () => (
-    <Fondo>
-      <div className="flex flex-col gap-8">
-        <Consentimientos args={meta.args} />
-        <Lienzo>
-          <Tabla encabezado={['Part', 'What it does']} minimo={560} arriba>
-            {PARTES.map(([parte, que]) => (
-              <tr key={parte}>
-                <td className="font-semibold whitespace-nowrap">{parte}</td>
-                <td className="text-ink-medium">{que}</td>
-              </tr>
-            ))}
-          </Tabla>
-        </Lienzo>
-      </div>
-    </Fondo>
-  ),
-}
-
-function Estado({ titulo, nota, ancho, children }: { titulo: string; nota: string; ancho?: number; children: ReactNode }) {
-  return (
-    <figure className="m-0 flex flex-col gap-2" style={{ width: ancho }}>
-      <figcaption className="flex flex-col gap-0.5">
-        <span className="text-[12.5px] font-semibold text-ink">{titulo}</span>
-        <span className="text-[11.5px] leading-snug text-ink-muted">{nota}</span>
-      </figcaption>
-      {children}
-    </figure>
-  )
-}
-
-/* Una tarjeta que se puede usar: el interruptor cambia su estado. */
-function Tarjeta({ inicial, elegida, forzar }: { inicial: ConsentTemplate; elegida?: boolean; forzar?: 'hover' | 'focus-visible' }) {
+function Tarjeta({ inicial, elegida, forzar }: { inicial: ConsentTemplate; elegida?: boolean; forzar?: 'hover' }) {
   const [t, setT] = useState(inicial)
   const tarjeta = <TarjetaTemplate t={t} elegida={!!elegida} onElegir={nada} onAlternar={() => setT((x) => ({ ...x, activo: !x.activo }))} />
   return forzar ? <Forzar selector="button" estado={forzar} className="block">{tarjeta}</Forzar> : tarjeta
 }
 
+export const TemplateCardSelected: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Selected" nota="Abierta en el editor: borde azul y fondo apenas azul. El interruptor la activa o desactiva sin abrirla." ancho={256}><Tarjeta inicial={extraccion} elegida /></Ejemplo>,
+}
+export const TemplateCardDefault: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Default" nota="Activa, sin elegir. El título hace hasta dos líneas." ancho={256}><Tarjeta inicial={conducto} /></Ejemplo>,
+}
+export const TemplateCardHover: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Hover" nota="Fondo gris: se puede elegir." ancho={256}><Tarjeta inicial={conducto} forzar="hover" /></Ejemplo>,
+}
+export const TemplateCardInactive: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Inactive" nota="Título apagado y pill gris. Se ve con el filtro Inactive." ancho={256}><Tarjeta inicial={{ ...conducto, activo: false }} /></Ejemplo>,
+}
+export const TemplateCardSystem: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="System" nota="Viene con el producto. Es independiente de activo: también se desactiva." ancho={256}><Tarjeta inicial={molar} /></Ejemplo>,
+}
+
+/* ── Templates list ────────────────────────────────────────────────── */
+
+function Lista({ q }: { q: string }) {
+  const [filtro, setFiltro] = useState<Filtro>('Active')
+  const [texto, setTexto] = useState(q)
+  const [elegido, setElegido] = useState<string | null>('t1')
+  return (
+    <ListaTemplates
+      templates={TEMPLATES_INICIALES.filter((t) => coincide(t, filtro) && t.titulo.toLowerCase().includes(texto.toLowerCase()))}
+      elegidoId={elegido} q={texto} onQ={setTexto} filtro={filtro} onFiltro={setFiltro} onElegir={(t) => setElegido(t.id)} onAlternar={nada} onNuevo={() => setElegido(null)}
+    />
+  )
+}
+
+export const TemplatesList: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Default" nota="New template, el buscador, los filtros (las cuatro pestañas entran en 288px) y las tarjetas. Se puede buscar, filtrar y elegir." ancho={288}><Lista q="" /></Ejemplo>,
+}
+export const TemplatesListEmpty: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="No results" nota="Nada coincide con la búsqueda o el filtro." ancho={288}><Lista q="implant" /></Ejemplo>,
+}
+
+/* ── Procedure picker ──────────────────────────────────────────────── */
+
 function Procedimientos({ inicial, error }: { inicial: string[]; error?: boolean }) {
   const [elegidos, setElegidos] = useState(inicial)
   return <SelectorProcedimientos elegidos={elegidos} onCambiar={setElegidos} error={error && elegidos.length === 0} />
 }
+
+export const ProcedurePicker: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="With procedures" nota="Busca por código o nombre; los elegidos quedan como chips con X." ancho={480}><Procedimientos inicial={['D7240', 'D3948']} /></Ejemplo>,
+}
+export const ProcedurePickerEmpty: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Empty" nota="Todavía sin procedimientos. Escribí “root” o “D3” para ver las sugerencias." ancho={480}><Procedimientos inicial={[]} /></Ejemplo>,
+}
+export const ProcedurePickerError: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Error" nota="Save sin ninguno: borde rojo y el mensaje en lugar de los chips." ancho={480}><Procedimientos inicial={[]} error /></Ejemplo>,
+}
+
+/* ── Consent text ──────────────────────────────────────────────────── */
+
+function Texto({ inicial }: { inicial: Borrador }) {
+  const [b, setB] = useState(inicial)
+  return <TextoConsentimiento naturaleza={b.naturaleza} riesgos={b.riesgos} onNaturaleza={(naturaleza) => setB({ ...b, naturaleza })} onRiesgos={(riesgos) => setB({ ...b, riesgos })} />
+}
+
+export const ConsentText: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Filled" nota="Las dos secciones con su guía en cursiva, para quien redacta (no va en la hoja del paciente)." ancho={520}><Texto inicial={aBorrador(extraccion)} /></Ejemplo>,
+}
+export const ConsentTextEmpty: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Empty" nota="Un template nuevo: los placeholders y la guía." ancho={520}><Texto inicial={BORRADOR_VACIO} /></Ejemplo>,
+}
+
+/* ── Editor ────────────────────────────────────────────────────────── */
 
 function Editor({ actual, intentado }: { actual?: ConsentTemplate; intentado?: boolean }) {
   const [b, setB] = useState(actual ? aBorrador(actual) : BORRADOR_VACIO)
@@ -147,80 +199,43 @@ function Editor({ actual, intentado }: { actual?: ConsentTemplate; intentado?: b
   return <EditorTemplate actual={actual} borrador={b} onBorrador={setB} intentado={probado} onAlternar={nada} onCancelar={() => setProbado(false)} onGuardar={() => setProbado(true)} />
 }
 
-function Texto({ inicial }: { inicial: Borrador }) {
-  const [b, setB] = useState(inicial)
-  return <TextoConsentimiento naturaleza={b.naturaleza} riesgos={b.riesgos} onNaturaleza={(naturaleza) => setB({ ...b, naturaleza })} onRiesgos={(riesgos) => setB({ ...b, riesgos })} />
+export const EditorEditing: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Editing" nota="Edit Template con su estado y Deactivate template. Cancel y Save fijos al pie." ancho={560}><Editor actual={extraccion} /></Ejemplo>,
 }
+export const EditorNew: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="New" nota="New Consent Template, sin botón de activar. Tocá Save para ver los errores." ancho={560}><Editor /></Ejemplo>,
+}
+export const EditorValidationErrors: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Validation errors" nota="Save con faltantes: el aviso rojo arriba y cada campo obligatorio con su error." ancho={560}><Editor intentado /></Ejemplo>,
+}
+
+/* ── Preview ───────────────────────────────────────────────────────── */
 
 function Preview({ paciente }: { paciente?: boolean }) {
   const [v, setV] = useState(!!paciente)
   return <PanelPreview borrador={aBorrador(extraccion)} vistaPaciente={v} onVistaPaciente={setV} />
 }
 
-function Lista({ q }: { q: string }) {
-  const [filtro, setFiltro] = useState<Filtro>('Active')
-  const [texto, setTexto] = useState(q)
-  return (
-    <ListaTemplates
-      templates={TEMPLATES_INICIALES.filter((t) => coincide(t, filtro) && t.titulo.toLowerCase().includes(texto.toLowerCase()))}
-      elegidoId="t1" q={texto} onQ={setTexto} filtro={filtro} onFiltro={setFiltro} onElegir={nada} onAlternar={nada} onNuevo={nada}
-    />
-  )
+export const PreviewClinicView: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Clinic view" nota="La hoja sobre el escritorio gris, con diagnóstico y hallazgos clínicos." ancho={560}><Preview /></Ejemplo>,
+}
+export const PreviewPatientView: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Patient view" nota="Lo que ve el paciente: sin lo que es sólo de la clínica." ancho={560}><Preview paciente /></Ejemplo>,
 }
 
-export const States: Story = {
-  parameters: { controls: { disable: true } },
-  render: () => (
-    <Fondo>
-      <div className="flex flex-col gap-10">
-        <Bloque titulo="Template card · 256px">
-          <div className="flex flex-wrap items-start gap-x-6 gap-y-8">
-            <Estado titulo="Selected" nota="Abierta en el editor: borde azul y fondo apenas azul." ancho={256}><Tarjeta inicial={extraccion} elegida /></Estado>
-            <Estado titulo="Default" nota="Activa, sin elegir." ancho={256}><Tarjeta inicial={conducto} /></Estado>
-            <Estado titulo="Hover" nota="Fondo gris: se puede elegir." ancho={256}><Tarjeta inicial={conducto} forzar="hover" /></Estado>
-            <Estado titulo="Inactive" nota="Título apagado y pill gris. Sigue en la lista con el filtro Inactive." ancho={256}><Tarjeta inicial={{ ...conducto, activo: false }} /></Estado>
-            <Estado titulo="System" nota="Viene con el producto. También se desactiva." ancho={256}><Tarjeta inicial={molar} /></Estado>
-          </div>
-        </Bloque>
-        <Bloque titulo="Templates list · 288px">
-          <div className="flex flex-wrap items-start gap-x-6 gap-y-8">
-            <Estado titulo="Default" nota="Filtro Active, con la elegida marcada." ancho={288}><Lista q="" /></Estado>
-            <Estado titulo="No results" nota="Nada coincide con la búsqueda o el filtro." ancho={288}><Lista q="implant" /></Estado>
-          </div>
-        </Bloque>
-        <Bloque titulo="Procedure picker">
-          <div className="flex flex-wrap items-start gap-x-6 gap-y-8">
-            <Estado titulo="With procedures" nota="Los elegidos, como chips con X." ancho={420}><Procedimientos inicial={['D7240', 'D3948']} /></Estado>
-            <Estado titulo="Empty" nota="Todavía sin procedimientos." ancho={420}><Procedimientos inicial={[]} /></Estado>
-            <Estado titulo="Error" nota="Save sin ninguno: borde rojo y el mensaje en lugar de los chips." ancho={420}><Procedimientos inicial={[]} error /></Estado>
-          </div>
-        </Bloque>
-        <Bloque titulo="Consent text">
-          <div className="flex flex-wrap items-start gap-x-6 gap-y-8">
-            <Estado titulo="Filled" nota="El texto de un template existente." ancho={480}><Texto inicial={aBorrador(extraccion)} /></Estado>
-            <Estado titulo="Empty" nota="Un template nuevo: los placeholders y la guía." ancho={480}><Texto inicial={BORRADOR_VACIO} /></Estado>
-          </div>
-        </Bloque>
-        <Bloque titulo="Editor">
-          <div className="flex flex-wrap items-start gap-x-6 gap-y-8">
-            <Estado titulo="Editing" nota="Edit Template con su estado y Deactivate template." ancho={520}><Editor actual={extraccion} /></Estado>
-            <Estado titulo="New" nota="New Consent Template, sin botón de activar." ancho={520}><Editor /></Estado>
-            <Estado titulo="Validation errors" nota="Save con faltantes: el aviso rojo arriba y cada campo obligatorio con su error." ancho={520}><Editor intentado /></Estado>
-          </div>
-        </Bloque>
-        <Bloque titulo="Preview">
-          <div className="flex flex-wrap items-start gap-x-6 gap-y-8">
-            <Estado titulo="Clinic view" nota="Con diagnóstico y hallazgos clínicos." ancho={520}><Preview /></Estado>
-            <Estado titulo="Patient view" nota="Lo que ve el paciente: sin lo que es sólo de la clínica." ancho={520}><Preview paciente /></Estado>
-          </div>
-        </Bloque>
-        <Bloque titulo="Formatting toolbar" nota="Decorativo: avisa que el formato enriquecido no está disponible.">
-          <div className="w-[480px]"><ToolbarFormato /></div>
-        </Bloque>
-      </div>
-    </Fondo>
-  ),
+/* ── Formatting toolbar ────────────────────────────────────────────── */
+
+export const FormattingToolbar: Story = {
+  parameters: sinControles,
+  render: () => <Ejemplo titulo="Formatting toolbar" nota="Decorativo: avisa que el formato enriquecido no está disponible." ancho={480}><ToolbarFormato /></Ejemplo>,
 }
+
+/* ── Specs ─────────────────────────────────────────────────────────── */
 
 const MEDIDAS: [string, string][] = [
   ['Templates list', 'section[aria-label="Templates"]'],
@@ -289,6 +304,6 @@ function Medir() {
 
 /* Medidas y colores, leídos de la pantalla dibujada y de src/index.css. */
 export const Specs: Story = {
-  parameters: { controls: { disable: true } },
+  parameters: sinControles,
   render: () => <Fondo><Medir /></Fondo>,
 }

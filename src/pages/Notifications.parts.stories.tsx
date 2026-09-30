@@ -30,7 +30,7 @@ const meta = {
         component: [
           'Una notificación de la pantalla *Notifications* (`@/pages/Notifications`), con la lógica del Inbox de Notion. La pantalla completa, con sus pestañas y acciones en lote, está en *Pages*.',
           '',
-          '**Estados:** *Unread* (punto azul, fondo apenas azul, título en negrita) · *Read* (texto más apagado) · *Pending* (etiqueta ámbar: quedó para hacer). Abrirla la marca leída; una pendiente sigue pendiente. Archivada sale del Inbox y vuelve con *Move to inbox*.',
+          '**Estados:** *Unread* (punto azul, fondo apenas azul, título en negrita) · *Read* (texto más apagado) · *Pending* (lo mismo que sin leer pero en amarillo: punto `amber` y fondo amarillo tenue; quedó para hacer). Abrirla la marca leída; una pendiente sigue pendiente. Archivada sale del Inbox y vuelve con *Move to inbox*.',
           '',
           '**Tipos:** *Task* (ícono ámbar: firmar, confirmar, verificar; va al banner mientras no esté leída) · *Notice* (ícono gris: un pago, una mención).',
           '',
@@ -104,10 +104,10 @@ export const Playground: Story = {
 }
 
 const PARTES: [string, string][] = [
-  ['Unread dot', 'Azul si no se leyó. Leída o pendiente, no hay punto.'],
+  ['Dot', 'Azul si no se leyó, amarillo si está pendiente. Leída, no hay punto. Va centrado con el ícono.'],
   ['Icon', 'Qué tipo de aviso es. Ámbar si es una tarea (firmar, confirmar, verificar), gris si es un aviso.'],
-  ['Title', 'Qué pasó, en una línea. En negrita mientras esté sin leer.'],
-  ['Pending', 'Etiqueta ámbar (Pill warning): la notificación quedó para hacer.'],
+  ['Title', 'Qué pasó, en una línea. En negrita mientras esté sin leer o pendiente; centrado con el ícono y el punto.'],
+  ['Background', 'Apenas azul si está sin leer, amarillo tenue si está pendiente, blanco si está leída.'],
   ['Detail', 'A quién y cuándo. Más apagado cuando está leída.'],
   ['Time · author · action', 'Hace cuánto llegó, quién la generó y a dónde lleva (el mismo texto que el banner). Tocar la fila la abre y la marca leída.'],
   ['Row actions', 'Leída/no leída, pendiente y archivar, con tooltip. Aparecen al pasar el mouse o al llegar con Tab; en pantallas chicas quedan a la vista.'],
@@ -155,7 +155,7 @@ export const States: Story = {
         <Estado titulo="Read" nota="Sin punto y con el detalle más apagado. Abrir una sin leer la deja así.">
           <FilaViva inicial={base('n9')} />
         </Estado>
-        <Estado titulo="Pending" nota="Quedó para hacer: etiqueta ámbar y el reloj activo. Abrirla no le saca el pendiente.">
+        <Estado titulo="Pending" nota="Quedó para hacer: como sin leer, pero en amarillo (punto y fondo), y el reloj activo. Abrirla no le saca el pendiente.">
           <FilaViva inicial={base('n4')} />
         </Estado>
         <Estado titulo="Archived" nota="Fuera del Inbox, en la pestaña Archived. La acción pasa a Move to inbox.">
@@ -217,7 +217,7 @@ export const RowActions: Story = {
 
 const MEDIDAS: [string, string][] = [
   ['Row', 'li'],
-  ['Unread dot', 'li > span:first-child'],
+  ['Dot', 'li > span:first-child'],
   ['Icon', 'li > span:nth-child(2)'],
   ['Title', 'li > button > span:first-child > span:first-child'],
   ['Detail', 'li > button > span:nth-child(2)'],
@@ -258,9 +258,9 @@ function Medir() {
         <Tabla encabezado={['Part', 'Token']} minimo={480}>
           <tr><td className="font-semibold">Unread row</td><td><Token nombre="info-bg" /> at 50% · dot <Token nombre="dash-blue" /></td></tr>
           <tr><td className="font-semibold">Hover</td><td><Token nombre="surface-subtle" /></td></tr>
-          <tr><td className="font-semibold">Task icon</td><td><Token nombre="warn-bg" /> · icon <Token nombre="attn-fg" /></td></tr>
+          <tr><td className="font-semibold">Task icon</td><td><Token nombre="amber" /> at 15% · icon <Token nombre="attn-fg" /></td></tr>
           <tr><td className="font-semibold">Notice icon</td><td><Token nombre="surface-slate" /> · icon <Token nombre="ink-slate" /></td></tr>
-          <tr><td className="font-semibold">Pending</td><td><Token nombre="warn-bg" /> · <Token nombre="warn-fg" /></td></tr>
+          <tr><td className="font-semibold">Pending row</td><td><Token nombre="warn-bg" /> · dot <Token nombre="amber" /> · clock <Token nombre="warn-fg" /></td></tr>
           <tr><td className="font-semibold">Action link</td><td><Token nombre="dash-blue" /></td></tr>
           <tr><td className="font-semibold">Divider</td><td><Token nombre="line-row" /></td></tr>
           <tr><td className="font-semibold">Tooltip</td><td><Token nombre="ink" /> · text <Token nombre="white" /></td></tr>

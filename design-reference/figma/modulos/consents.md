@@ -103,12 +103,13 @@ resto vivía adentro de un solo componente de 456 líneas.
    `ListaTemplates`, `SelectorProcedimientos` (maneja su propia búsqueda),
    `TextoConsentimiento`, `EditorTemplate` y `PanelPreview`. La pantalla sólo
    guarda el estado y las une.
-6. **Design system → Pages › Parts › Consents**, con la misma estructura que
-   Elements (Buttons, Patient menu), a pedido de Julián: descripción corta,
-   **Playground** con lista, editor y preview juntos y sus *Controls*
-   (template, activo, filtro, errores de validación, Patient View), **Parts**
-   (qué hace cada parte), **States** (tarjeta: elegida, default, hover,
-   inactiva, System; lista y sin resultados; procedimientos con chips, vacío
-   y con error; texto lleno y vacío; editor editando, nuevo y con errores;
-   preview de clínica y de paciente; toolbar) y **Specs** (medidas leídas de
-   la pantalla dibujada, tokens y reglas). Todo se puede usar.
+6. **Design system → Pages › Parts › Consents.** Un ejemplo por parte y
+   estado, como estaba al principio (Julián prefirió verlos separados), pero
+   con la estética de Elements: descripción corta, **Playground** primero con
+   lista, editor y preview juntos y sus *Controls* (template, activo, filtro,
+   errores de validación, Patient View); cada ejemplo sobre el fondo de la app
+   con su título y nota -tarjeta elegida, default, hover, inactiva y System;
+   lista y sin resultados; procedimientos con chips, vacío y con error; texto
+   lleno y vacío; editor editando, nuevo y con errores; preview de clínica y
+   de paciente; toolbar- y **Specs** al final (medidas leídas de la pantalla
+   dibujada, tokens y reglas). Todo se puede usar.

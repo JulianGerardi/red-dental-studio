@@ -30,8 +30,10 @@ verificar un seguro). Es un tercer estado, no una marca aparte:
 
 - **Unread** → no se vio. Punto azul, fondo apenas azul, título en negrita.
 - **Read** → vista y resuelta. Texto más apagado.
-- **Pending** → vista, pero queda para hacer. Etiqueta ámbar *Pending* (el
-  `Pill` warning, el mismo par de "atención" que el banner).
+- **Pending** → vista, pero queda para hacer. Se marca como las sin leer
+  pero en amarillo: punto `amber` y fondo amarillo tenue (`warn-bg`), título
+  en negrita. Al principio llevaba una etiqueta *Pending* (Pill); Julián pidió
+  sacarla (2026-09-29): el color alcanza y la etiqueta desalineaba la fila.
 
 Abrir una pendiente **no** le saca el pendiente: sólo el que la marcó sabe
 cuándo está resuelta. *Remove from pending* la pasa a leída. Tiene su propia
@@ -39,6 +41,9 @@ pestaña, *Pending*.
 
 ## 3. La fila
 
+- **Todo en una línea:** el punto, el centro del ícono (36px), el título y
+  los íconos de acción comparten la misma altura de centro (18px desde
+  arriba). Verificado midiendo la fila dibujada.
 - Punto azul si está sin leer; ícono en círculo, **ámbar si es una tarea** y
   gris si es un aviso (un pago recibido, una mención).
 - Título, detalle y abajo "hace cuánto · quién · acción" (*Review*, *Open
@@ -74,7 +79,7 @@ notifications*.
 - El número es **cuántas hay sin leer** (antes, cuántas tareas había). Es lo
   que muestra Notion y baja a medida que se leen.
 - Muestra las **5 más nuevas** no archivadas, con el punto azul, la hora y la
-  etiqueta *Pending*; *Mark all as read* arriba y **View all notifications**
+  punto amarillo de las pendientes; *Mark all as read* arriba y **View all notifications**
   abajo, que lleva a la pantalla.
 - Abrir una desde la campana la marca leída, como en la pantalla.
 

@@ -6,7 +6,6 @@ import {
 } from 'lucide-react'
 import { LocationSelector } from './LocationSelector'
 import { haceCuanto, type Notificacion } from '@/data/notificaciones'
-import { Pill } from '@/components/ui/pill'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -212,24 +211,20 @@ export function Campana({
               <DropdownMenuItem
                 key={n.id}
                 onSelect={() => { onAbrir?.(n.id); onVolverAlBanner?.(n.id); navigate(n.to) }}
-                className="items-start gap-2.5 py-2.5 pl-1.5"
+                className={cn('items-start gap-2.5 py-2.5 pl-1.5', n.estado === 'pending' && 'bg-warn-bg')}
               >
-                <span aria-hidden className={cn('mt-[7px] size-1.5 shrink-0 rounded-full', n.estado === 'unread' ? 'bg-dash-blue' : 'bg-transparent')} />
+                <span aria-hidden className={cn('mt-[7px] size-1.5 shrink-0 rounded-full', n.estado === 'unread' ? 'bg-dash-blue' : n.estado === 'pending' ? 'bg-amber' : 'bg-transparent')} />
                 <n.icon className={cn('mt-0.5 size-4 shrink-0', n.tarea ? 'text-attn-fg' : 'text-ink-muted')} />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-baseline justify-between gap-2">
-                    <span className={cn('truncate text-[13px] text-ink', n.estado === 'unread' ? 'font-semibold' : 'font-medium')}>{n.titulo}</span>
+                    <span className={cn('truncate text-[13px] text-ink', n.estado === 'read' ? 'font-medium' : 'font-semibold')}>{n.titulo}</span>
                     <span className="shrink-0 text-[11px] text-ink-faint">{haceCuanto(n.hace)}</span>
                   </span>
                   <span className="block text-[12px] leading-snug text-ink-muted">{n.detalle}</span>
-                  {(n.estado === 'pending' || ocultas.includes(n.id)) && (
-                    <span className="mt-1 flex items-center gap-2">
-                      {n.estado === 'pending' && <Pill tone="warning" size="sm">Pending</Pill>}
-                      {ocultas.includes(n.id) && (
-                        <span className="flex items-center gap-1 text-[11px] font-medium text-ink-faint">
-                          <EyeOff className="size-3" /> Hidden from banner
-                        </span>
-                      )}
+                  {n.estado === 'pending' && <span className="sr-only">(pending)</span>}
+                  {ocultas.includes(n.id) && (
+                    <span className="mt-1 flex items-center gap-1 text-[11px] font-medium text-ink-faint">
+                      <EyeOff className="size-3" /> Hidden from banner
                     </span>
                   )}
                 </span>

@@ -4,7 +4,6 @@ import { Archive, ArchiveRestore, CheckCheck, Clock, Inbox, Mail, MailOpen, type
 import { PageTitle } from '@/components/ui/page-title'
 import { Tabs } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Pill } from '@/components/ui/pill'
 import { EmptyState } from '@/components/ui/empty-state'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
@@ -55,7 +54,8 @@ export function Accion({ label, icon: Icon, activo, onClick }: { label: string; 
   )
 }
 
-/* Una notificación. Sin leer: punto azul, fondo apenas azul y título en negrita. Pendiente: la etiqueta ámbar.
+/* Una notificación. Sin leer: punto azul, fondo apenas azul y título en negrita. Pendiente: lo mismo en amarillo (punto
+   `amber`, fondo `warn-bg`), sin etiqueta. Punto, ícono, título y acciones van centrados en la misma línea.
    Las tres acciones (leída/no leída, pendiente, archivar) aparecen al pasar el mouse o al llegar con el teclado, como en
    Notion, cada una con su tooltip; en pantallas chicas quedan a la vista. Sin menú ⋮: repetía lo mismo. */
 export function FilaNotificacion({ n, onAbrir, onMarcar, onArchivar }: {
@@ -67,16 +67,17 @@ export function FilaNotificacion({ n, onAbrir, onMarcar, onArchivar }: {
   const sinLeer = n.estado === 'unread'
   const pendiente = n.estado === 'pending'
   return (
-    <li className={cn('group flex items-start gap-3 border-b border-line-row px-4 py-3 transition-colors last:border-b-0 hover:bg-surface-subtle', sinLeer && 'bg-info-bg/50')}>
-      <span aria-hidden className={cn('mt-[15px] size-2 shrink-0 rounded-full', sinLeer ? 'bg-dash-blue' : 'bg-transparent')} />
-      <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-full', n.tarea ? 'bg-warn-bg text-attn-fg' : 'bg-surface-slate text-ink-slate')}>
+    <li className={cn('group flex items-start gap-3 border-b border-line-row px-4 py-3 transition-colors last:border-b-0 hover:bg-surface-subtle', sinLeer && 'bg-info-bg/50', pendiente && 'bg-warn-bg')}>
+      {/* El centro de todo es el del ícono (36px): el punto (8px) baja 14px, el título (20px de alto) 8px y las acciones (28px) 4px. */}
+      <span aria-hidden className={cn('mt-3.5 size-2 shrink-0 rounded-full', sinLeer ? 'bg-dash-blue' : pendiente ? 'bg-amber' : 'bg-transparent')} />
+      <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-full', n.tarea ? 'bg-amber/15 text-attn-fg' : 'bg-surface-slate text-ink-slate')}>
         <n.icon className="size-4" />
       </span>
-      <button type="button" onClick={() => onAbrir(n)} className="min-w-0 flex-1 rounded-sm text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-dash-blue">
-        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className={cn('text-[13.5px] text-ink', sinLeer ? 'font-semibold' : 'font-medium')}>{n.titulo}</span>
-          {pendiente && <Pill tone="warning" size="sm">Pending</Pill>}
-          {sinLeer && <span className="sr-only">(unread)</span>}
+      <button type="button" onClick={() => onAbrir(n)} className="min-w-0 flex-1 rounded-sm pt-2 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-dash-blue">
+        <span className={cn('block text-[13.5px] leading-5 text-ink', n.estado === 'read' ? 'font-medium' : 'font-semibold')}>
+          {n.titulo}
+          {sinLeer && <span className="sr-only"> (unread)</span>}
+          {pendiente && <span className="sr-only"> (pending)</span>}
         </span>
         <span className={cn('mt-0.5 block text-[13px] leading-snug', n.estado === 'read' ? 'text-ink-muted' : 'text-ink-medium')}>{n.detalle}</span>
         <span className="mt-1 flex flex-wrap items-center gap-x-1.5 text-[12px] text-ink-faint">
@@ -86,7 +87,7 @@ export function FilaNotificacion({ n, onAbrir, onMarcar, onArchivar }: {
           <span className="font-medium text-dash-blue group-hover:underline">{n.accion}</span>
         </span>
       </button>
-      <span className="flex shrink-0 items-center gap-0.5 sm:opacity-0 sm:transition-opacity sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+      <span className="mt-1 flex shrink-0 items-center gap-0.5 sm:opacity-0 sm:transition-opacity sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
         <Accion label={sinLeer ? 'Mark as read' : 'Mark as unread'} icon={sinLeer ? MailOpen : Mail} onClick={() => onMarcar(n, sinLeer ? 'read' : 'unread')} />
         <Accion label={pendiente ? 'Remove from pending' : 'Mark as pending'} icon={Clock} activo={pendiente} onClick={() => onMarcar(n, pendiente ? 'read' : 'pending')} />
         <Accion label={n.archivada ? 'Move to inbox' : 'Archive'} icon={n.archivada ? ArchiveRestore : Archive} onClick={() => onArchivar(n, !n.archivada)} />
