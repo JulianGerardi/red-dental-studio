@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GRILL Empresas Case Study</title>
+<meta name="description" content="Corporate lunch ordering for a kitchen in Mercedes, Buenos Aires: an employee app and a kitchen panel. Case study by Julián Gerardi.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' fill='%23fff' stroke='%237445ff' stroke-width='2'/%3E%3Ctext x='16' y='21' font-family='Arial' font-weight='700' font-size='12' text-anchor='middle' fill='%2316141d'%3EJG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@300..700&amp;family=Geist+Mono:wght@400..600&amp;display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<script>try{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-frame" viewBox="0 0 16 16"><path d="M5 1.5v13M11 1.5v13M1.5 5h13M1.5 11h13" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-component" viewBox="0 0 16 16"><path d="M8 1.2 10.2 3.4 8 5.6 5.8 3.4ZM3.4 5.8 5.6 8 3.4 10.2 1.2 8ZM12.6 5.8 14.8 8 12.6 10.2 10.4 8ZM8 10.4 10.2 12.6 8 14.8 5.8 12.6Z" fill="currentColor"/></symbol>
+  <symbol id="i-cursor" viewBox="0 0 20 20"><path d="M3 2.2 17.2 8.6l-6.1 1.9-2.3 6.3Z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+</svg>
+
+<header class="nav">
+  <div class="wrap nav__inner">
+    <a class="logo" href="../index.html" aria-label="Julián Gerardi, home">
+      <span class="logo__mark" aria-hidden="true">JG</span>
+      <span class="logo__name">Julián Gerardi</span>
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="../index.html#work" aria-current="page">Work</a>
+      <a href="../index.html#process">Process</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+    <div class="nav__actions">
+      <button class="icon-btn theme-toggle" type="button" aria-label="Switch theme">
+        <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+        <svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+      </button>
+      <button class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false">
+        <svg aria-hidden="true"><use href="#i-menu"/></svg>
+      </button>
+      <a class="btn" href="../index.html#contact">Let’s talk</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <header class="case-hero">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html#work">Work</a><span>/</span><span>GRILL Empresas</span></nav>
+      <h1>GRILL Empresas</h1>
+      <p class="case-hero__lede">Lunch for companies, ordered from the phone. Two connected web apps for a kitchen in Mercedes: one for the people who eat, one for the team that cooks.</p>
+      <dl class="case-meta">
+        <div><dt>Role</dt><dd>Product designer, UX/UI and prototype</dd></div>
+        <div><dt>Client</dt><dd>GRILL · Mercedes, Buenos Aires</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+        <div><dt>Platform</dt><dd>Mobile-first web app and desktop panel</dd></div>
+        <div><dt>Language</dt><dd>Rioplatense Spanish</dd></div>
+        <div><dt>Tools</dt><dd>Figma, Claude, React</dd></div>
+      </dl>
+      <div class="case-links">
+        <a class="btn" href="https://claude.ai/code/artifact/b8691278-bb38-469f-89b1-a323dd661d5d" target="_blank" rel="noopener">Try the employee app <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn--ghost" href="https://claude.ai/code/artifact/44a2be1f-d2b3-462a-acbd-382cd5c76347" target="_blank" rel="noopener">Try the kitchen panel <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+      <p style="margin-top:12px;color:var(--muted);font-size:.9rem">Demo: sign in with any email and password.</p>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="stage stage--grill comp-grill case-stage" aria-hidden="true">
+      <div class="layer l-phone-a phone"><img src="../assets/img/g-emp-m-dark-app.webp" width="780" height="1688" alt="" decoding="async"></div>
+      <div class="layer l-phone-b phone"><img src="../assets/img/g-emp-m-modal.webp" width="780" height="1688" alt="" decoding="async"></div>
+      <div class="layer l-label chip-shot"><img src="../assets/img/g-crop-label.webp" width="532" height="195" alt="" decoding="async"></div>
+      <div class="cursor cursor--1"><svg><use href="#i-cursor"/></svg><span class="cursor__tag">Julián</span></div>
+    </div>
+  </div>
+
+  <div class="wrap case-body">
+    <nav class="toc" aria-label="On this page">
+      <a href="#overview">Overview</a>
+      <a href="#problem">The problem</a>
+      <a href="#users">Two users</a>
+      <a href="#employees">Employee app</a>
+      <a href="#kitchen">Kitchen panel</a>
+      <a href="#access">Access</a>
+      <a href="#outcome">Outcome</a>
+    </nav>
+
+    <div>
+      <section class="chapter" id="overview">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Overview</div>
+        <h2>A kitchen that feeds whole offices, one tray at a time.</h2>
+        <div class="prose">
+          <p>GRILL is a kitchen in Mercedes, Buenos Aires that delivers lunch to companies. Each company covers a daily amount per employee and pays at the end of the month; each employee chooses what they eat.</p>
+          <p>I designed both sides of the service and built them as working web apps with an AI-assisted workflow: <strong>GRILL Empresas</strong> for employees and <strong>GRILL Team</strong>, the panel the kitchen runs the day from.</p>
+        </div>
+      </section>
+
+      <section class="chapter" id="problem">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>The problem</div>
+        <h2>Everything lived on paper and in WhatsApp.</h2>
+        <div class="prose">
+          <p>Kitchen tickets, orders per company, new employee accounts and the monthly account closing. Every day the team gathers choices, counts dishes for the kitchen, labels trays, plans the delivery run and keeps each company’s account, all before 11:30.</p>
+        </div>
+        <p class="pull">Make ordering take less than a minute, and turn the kitchen’s morning into a checklist.</p>
+      </section>
+
+      <section class="chapter" id="users">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Two users<span class="frame-label__meta">2 apps</span></div>
+        <h2>Same orders, two very different mornings.</h2>
+        <div class="pair">
+          <div class="shot-pad shot-pad--soft prose">
+            <span class="eyebrow">Employee · phone</span>
+            <p><strong>A minute between meetings, before the cutoff.</strong> Needs to know when the next delivery is, what the kitchen suggests today, how much the company covers, and how to pick a side dish.</p>
+          </div>
+          <div class="shot-pad shot-pad--soft prose">
+            <span class="eyebrow">Kitchen team · desktop</span>
+            <p><strong>The whole morning, hands busy.</strong> Needs how many of each dish to cook, a label for every tray, the delivery run by company, and what to bill each one.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="employees">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Employee app</div>
+        <h2>Order lunch in a few taps.</h2>
+        <div class="decisions">
+          <article class="decision">
+            <div class="decision__head">
+              <h3>The cutoff comes first</h3>
+              <div class="prose">
+                <p>The screen opens on the next delivery date and a countdown to the 10:30 cutoff. When today’s cutoff has passed, a banner says the order goes to the next delivery and can be changed until 10:30 that day. No dead end.</p>
+                <ul class="bullets">
+                  <li><b>A short selection first</b>: the kitchen picks a few dishes each day, and the full menu is one link away.</li>
+                  <li><b>The allowance is always visible</b>: “Your company covers up to $11,000 a day”.</li>
+                </ul>
+              </div>
+            </div>
+            <figure class="shot shot-pad shot-pad--grill">
+              <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>GRILL Empresas · Pedido del día</span></div><img class="zoomable" src="../assets/img/g-emp-app.webp" width="1600" height="1000" alt="Order of the day with next delivery, cutoff countdown and the kitchen selection" loading="lazy" decoding="async"></div>
+            </figure>
+          </article>
+
+          <article class="decision">
+            <div class="decision__head">
+              <h3>Choosing is one step</h3>
+              <div class="prose">
+                <p>Tapping a dish opens a sheet to pick the side dish and leave a note for the kitchen, up to 140 characters. The button carries the price, “Agregar · $10.800”, so there is no surprise at checkout.</p>
+                <p>The full menu has <strong>59 dishes in 9 categories</strong>, filtered by gluten-free (Sin TACC) and vegetarian.</p>
+              </div>
+            </div>
+            <div class="shot-pad shot-pad--grill">
+              <div class="phones">
+                <div class="phone"><img src="../assets/img/g-emp-m-app.webp" width="780" height="1688" alt="Order of the day on a phone" loading="lazy" decoding="async"></div>
+                <div class="phone"><img src="../assets/img/g-emp-m-modal.webp" width="780" height="1688" alt="Side dish selection sheet on a phone" loading="lazy" decoding="async"></div>
+                <div class="phone"><img src="../assets/img/g-emp-m-carta.webp" width="780" height="1688" alt="Full menu with filters on a phone" loading="lazy" decoding="async"></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="decision">
+            <div class="decision__head">
+              <h3>History and dark mode</h3>
+              <div class="prose">
+                <p><strong>My orders</strong> shows the week or the month day by day, with a summary to download. The whole app has a dark theme, and the copy talks like people in Mercedes do: “Elegí”, “Tocá”, “¿La olvidaste?”.</p>
+              </div>
+            </div>
+            <div class="pair">
+              <figure class="shot shot-pad shot-pad--soft">
+                <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Mis pedidos</span></div><img class="zoomable" src="../assets/img/g-emp-historial.webp" width="1600" height="1000" alt="Order history by week" loading="lazy" decoding="async"></div>
+              </figure>
+              <figure class="shot shot-pad shot-pad--soft">
+                <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Pedido del día · dark</span></div><img class="zoomable" src="../assets/img/g-emp-dark-app.webp" width="1600" height="1000" alt="Order of the day in dark mode" loading="lazy" decoding="async"></div>
+              </figure>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="chapter" id="kitchen">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Kitchen panel</div>
+        <h2>The kitchen’s morning, as a checklist.</h2>
+        <div class="decisions">
+          <article class="decision">
+            <div class="decision__head">
+              <h3>Summary of the day</h3>
+              <div class="prose">
+                <p>Units, orders and companies at the top, with the departure time. Below, one card per job of the morning (kitchen, labels, delivery) and the alerts still to resolve, which are marked from the bell.</p>
+              </div>
+            </div>
+            <figure class="shot shot-pad shot-pad--grill">
+              <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>GRILL Team · Resumen</span></div><img class="zoomable" src="../assets/img/g-corp-hoy.webp" width="1600" height="1000" alt="Summary of the day with units, orders and companies" loading="lazy" decoding="async"></div>
+            </figure>
+          </article>
+
+          <article class="decision">
+            <div class="decision__head">
+              <h3>Kitchen ticket</h3>
+              <div class="prose">
+                <p>Every order is added up by dish and side, grouped by category, with a checkbox to tick as each one is cooked. It prints as the day’s ticket.</p>
+              </div>
+            </div>
+            <figure class="shot shot-pad shot-pad--soft">
+              <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Cocina · Comanda del día</span></div><img class="zoomable" src="../assets/img/g-corp-dark-cocina.webp" width="1600" height="1000" alt="Kitchen ticket with aggregated quantities in dark mode" loading="lazy" decoding="async"></div>
+            </figure>
+          </article>
+
+          <article class="decision">
+            <div class="decision__head">
+              <h3>Labels that fit the real sheet</h3>
+              <div class="prose">
+                <p>Each tray gets a label on a sheet of <strong>70 × 25.4 mm</strong> labels. “Start from” lets the team reuse a half-used sheet by tapping the first free cell, and a note reminds them to print at real size so labels don’t shift off the die cut.</p>
+              </div>
+            </div>
+            <figure class="shot shot-pad shot-pad--grill">
+              <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Etiquetas · Pliego del día</span></div><img class="zoomable" src="../assets/img/g-corp-etiquetas.webp" width="1600" height="1000" alt="Label sheet with start-from selector and real-size preview" loading="lazy" decoding="async"></div>
+            </figure>
+          </article>
+
+          <article class="decision">
+            <div class="decision__head">
+              <h3>Delivery, orders and accounts</h3>
+              <div class="prose">
+                <ul class="bullets">
+                  <li><b>Delivery</b>: stops by company, trays per person and a checklist per stop.</li>
+                  <li><b>Orders</b>: totals to invoice for any period, units dispatched and status (new, in preparation, delivered).</li>
+                  <li><b>Companies and employees</b>: each company gets a registration code; the team can block accounts or make someone an admin.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="pair">
+              <figure class="shot shot-pad shot-pad--soft">
+                <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Reparto</span></div><img class="zoomable" src="../assets/img/g-corp-reparto.webp" width="1600" height="1000" alt="Delivery run grouped by company" loading="lazy" decoding="async"></div>
+              </figure>
+              <figure class="shot shot-pad shot-pad--soft">
+                <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Pedidos</span></div><img class="zoomable" src="../assets/img/g-corp-pedidos.webp" width="1600" height="1000" alt="Orders for the period with amount to invoice" loading="lazy" decoding="async"></div>
+              </figure>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="chapter" id="access">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Access</div>
+        <h2>Two doors, each one explained.</h2>
+        <p>Employees don’t sign up on their own: their company creates the account. The login says so, tells them who to ask, and offers companies a way to request a proposal. The kitchen has its own internal entrance, with a link back for employees who land there by mistake.</p>
+        <div class="pair">
+          <figure class="shot shot-pad shot-pad--grill">
+            <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>GRILL Empresas · Ingresar</span></div><img class="zoomable" src="../assets/img/g-emp-login.webp" width="1600" height="1000" alt="Employee login with how to get access" loading="lazy" decoding="async"></div>
+          </figure>
+          <figure class="shot shot-pad shot-pad--grill">
+            <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>GRILL Team · Acceso interno</span></div><img class="zoomable" src="../assets/img/g-corp-login.webp" width="1600" height="1000" alt="Internal login for the kitchen panel" loading="lazy" decoding="async"></div>
+          </figure>
+        </div>
+      </section>
+
+      <section class="chapter" id="outcome">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Outcome</div>
+        <h2>Two apps, one language.</h2>
+        <div class="stats">
+          <div class="stat"><b>2</b><span>connected apps</span></div>
+          <div class="stat"><b>12</b><span>screens</span></div>
+          <div class="stat"><b>59</b><span>dishes in the menu</span></div>
+          <div class="stat"><b>2</b><span>themes, light and dark</span></div>
+        </div>
+        <p>Both apps share the GRILL wordmark, the lime accent and the same components, so the kitchen and its clients read the same order the same way.</p>
+      </section>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-bottom:clamp(56px,8vw,104px)">
+    <a class="next" href="confidentally.html">
+      <div><span class="eyebrow">Next project</span><h2>Confidentally</h2></div>
+      <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+    </a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <span>© <span data-year>2026</span> Julián Gerardi</span>
+    <div class="footer__links">
+      <a href="../index.html#work">All work</a>
+      <a href="https://www.linkedin.com/in/julian-gerardi" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.behance.net/Jotainc" target="_blank" rel="noopener">Behance</a>
+    </div>
+  </div>
+</footer>
+
+<dialog class="lightbox" aria-label="Screen preview">
+  <button class="icon-btn lightbox__close" type="button" aria-label="Close preview"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+  <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
+</dialog>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>

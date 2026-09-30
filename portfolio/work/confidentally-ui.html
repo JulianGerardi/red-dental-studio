@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Confidentally UI Case Study</title>
+<meta name="description" content="A living design system with search and an AI Builder that assembles screens from real components. Case study by Julián Gerardi.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' fill='%23fff' stroke='%237445ff' stroke-width='2'/%3E%3Ctext x='16' y='21' font-family='Arial' font-weight='700' font-size='12' text-anchor='middle' fill='%2316141d'%3EJG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@300..700&amp;family=Geist+Mono:wght@400..600&amp;display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<script>try{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-frame" viewBox="0 0 16 16"><path d="M5 1.5v13M11 1.5v13M1.5 5h13M1.5 11h13" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-component" viewBox="0 0 16 16"><path d="M8 1.2 10.2 3.4 8 5.6 5.8 3.4ZM3.4 5.8 5.6 8 3.4 10.2 1.2 8ZM12.6 5.8 14.8 8 12.6 10.2 10.4 8ZM8 10.4 10.2 12.6 8 14.8 5.8 12.6Z" fill="currentColor"/></symbol>
+  <symbol id="i-cursor" viewBox="0 0 20 20"><path d="M3 2.2 17.2 8.6l-6.1 1.9-2.3 6.3Z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+</svg>
+
+<header class="nav">
+  <div class="wrap nav__inner">
+    <a class="logo" href="../index.html" aria-label="Julián Gerardi, home">
+      <span class="logo__mark" aria-hidden="true">JG</span>
+      <span class="logo__name">Julián Gerardi</span>
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="../index.html#work" aria-current="page">Work</a>
+      <a href="../index.html#process">Process</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+    <div class="nav__actions">
+      <button class="icon-btn theme-toggle" type="button" aria-label="Switch theme">
+        <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+        <svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+      </button>
+      <button class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false">
+        <svg aria-hidden="true"><use href="#i-menu"/></svg>
+      </button>
+      <a class="btn" href="../index.html#contact">Let’s talk</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <header class="case-hero">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html#work">Work</a><span>/</span><span>Confidentally UI</span></nav>
+      <h1>Confidentally UI</h1>
+      <p class="case-hero__lede">A living design system: every button, table and screen of the app, working and explained, plus a Builder that assembles new screens from the real components.</p>
+      <dl class="case-meta">
+        <div><dt>Role</dt><dd>Design system lead</dd></div>
+        <div><dt>Product</dt><dd>Confidentally, dental practice platform</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+        <div><dt>Built with</dt><dd>Storybook, React, Tailwind</dd></div>
+        <div><dt>AI</dt><dd>Gemini API, optional</dd></div>
+        <div><dt>Scope</dt><dd>Tokens, docs site, audit scripts, builder</dd></div>
+      </dl>
+      <div class="case-links">
+        <a class="btn" href="https://juliangerardi.github.io/red-dental-studio/storybook/?path=/docs/welcome--docs" target="_blank" rel="noopener">Open the design system <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn--ghost" href="https://juliangerardi.github.io/red-dental-studio/storybook/?path=/docs/builder--docs" target="_blank" rel="noopener">Try the Builder <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="stage stage--ds comp-ds case-stage" aria-hidden="true">
+      <div class="layer l-browser browser">
+        <div class="browser__bar"><i></i><i></i><i></i><span>Confidentally UI · Builder</span></div>
+        <img src="../assets/img/ds-builder-built.webp" width="1600" height="1000" alt="" decoding="async">
+      </div>
+      <div class="layer l-describe chip-shot"><img src="../assets/img/ds-crop-describe.webp" width="731" height="393" alt="" decoding="async"></div>
+      <div class="cursor cursor--2"><svg><use href="#i-cursor"/></svg><span class="cursor__tag">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="wrap case-body">
+    <nav class="toc" aria-label="On this page">
+      <a href="#overview">Overview</a>
+      <a href="#problem">The problem</a>
+      <a href="#structure">Structure</a>
+      <a href="#anatomy">A component page</a>
+      <a href="#from-code">Designed from the code</a>
+      <a href="#search">Search</a>
+      <a href="#builder">Builder</a>
+      <a href="#governance">Governance</a>
+      <a href="#outcome">Outcome</a>
+    </nav>
+
+    <div>
+      <section class="chapter" id="overview">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Overview</div>
+        <h2>Documentation that can’t fall out of date.</h2>
+        <div class="prose">
+          <p>Most design systems are a copy of the product that someone has to keep in sync. Confidentally UI isn’t. Storybook imports the same components the app uses, the colors page parses the app’s stylesheet, and the Pages section mounts the real routes. <strong>When the code changes, the documentation changes with it.</strong></p>
+          <p>I hid Storybook’s own chrome and designed a documentation site on top: a top bar with the six sections, a search, a menu per section and a consistent page for every component.</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>139</b><span>pieces</span></div>
+          <div class="stat"><b>32</b><span>screens</span></div>
+          <div class="stat"><b>481</b><span>live examples</span></div>
+          <div class="stat"><b>174</b><span>documentation pages</span></div>
+        </div>
+      </section>
+
+      <section class="chapter" id="problem">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>The problem</div>
+        <h2>The same thing, built several ways.</h2>
+        <div class="prose">
+          <p>Screen titles came in at 20, 24 and 36px. The appointment card of the patient overview was written by hand, and the calendar one was repeated three times in the same file. Colors were typed as hex values instead of tokens. Designers and developers needed one answer to the same question: <strong>which one do I use?</strong></p>
+        </div>
+      </section>
+
+      <section class="chapter" id="structure">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Structure<span class="frame-label__meta">6 sections</span></div>
+        <h2>Ordered from the smallest decision to the whole screen.</h2>
+        <ol class="steps">
+          <li><span class="steps__n">01</span><div><h3>Foundations</h3><p>Colors, typography, radius and shadows, calculated by reading the app’s CSS. Each token shows its light and dark value and the class to use.</p></div></li>
+          <li><span class="steps__n">02</span><div><h3>Elements</h3><p>Ten standard pieces to build any screen: page header, buttons, fields, tabs, pills, cards, appointment cards, tables, navigation and the patient menu.</p></div></li>
+          <li><span class="steps__n">03</span><div><h3>Components</h3><p>128 pieces grouped by module: Clinical 39, UI 20, Dashboard 12, Patients 12, Ledger 11, Settings 11, Scheduling 9, Layout 8, Help 5 and Billing 1.</p></div></li>
+          <li><span class="steps__n">04</span><div><h3>Pages</h3><p>Every route of the app, mounted from the same router, so a screen in the docs is the screen in production.</p></div></li>
+          <li><span class="steps__n">05</span><div><h3>Audit</h3><p>What the code does today that departs from the standard, measured by scripts.</p></div></li>
+          <li><span class="steps__n">06</span><div><h3>Builder</h3><p>Where the pieces come together into new screens, by hand or described in words.</p></div></li>
+        </ol>
+        <figure class="shot shot-pad shot-pad--ds">
+          <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Components</span></div><img class="zoomable" src="../assets/img/ds-components.webp" width="1600" height="1000" alt="Components overview grouped by module" loading="lazy" decoding="async"></div>
+        </figure>
+      </section>
+
+      <section class="chapter" id="anatomy">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>A component page</div>
+        <h2>Three questions answered before anyone scrolls.</h2>
+        <div class="prose">
+          <p>Every page follows the same order: breadcrumb, name, one sentence, and Overview, Guidelines and Code tabs. Three status cards answer what a team asks first:</p>
+          <ul class="bullets">
+            <li><b>Component · Ready</b> when it has a playground and documented decisions.</li>
+            <li><b>Usage</b> counted in the code, such as “Used in 10 files”, with the list of where.</li>
+            <li><b>Design</b> with the decisions behind it, under “Why it looks like this”.</li>
+          </ul>
+          <p>Specs are measured from the rendered component and its classes, not typed by hand.</p>
+        </div>
+        <figure class="shot shot-pad shot-pad--soft">
+          <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Elements · Buttons</span></div><img class="zoomable" src="../assets/img/ds-buttons.webp" width="1600" height="1000" alt="Buttons documentation page with status cards" loading="lazy" decoding="async"></div>
+        </figure>
+      </section>
+
+      <section class="chapter" id="from-code">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Designed from the code</div>
+        <h2>I measured the button before I designed it.</h2>
+        <div class="pair pair--text">
+          <div class="prose">
+            <p>Each variant, <strong>primary, secondary, ghost, link and destructive</strong>, is the look the code already used most for that kind of action. The three sizes, <strong>28, 32 and 36px</strong>, are the three heights the app used most.</p>
+            <p>Hover, pressed, keyboard focus (a 2px ring in the variant’s color, red for destructive), disabled and loading are solved once, in one component, instead of in every screen.</p>
+          </div>
+          <div class="prose">
+            <p>The same logic shaped the <strong>appointment cards</strong>. One appointment appears in four places, and each place gets the card that serves it: the Dashboard card carries everything needed to attend, the Patients card is compact, the patient overview has its own, and the calendar block adapts to day, week, month and phone. Same patient, same time, same status.</p>
+          </div>
+        </div>
+        <figure class="shot shot-pad shot-pad--ds">
+          <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Elements · Appointment cards</span></div><img class="zoomable" src="../assets/img/ds-appt-cards.webp" width="1600" height="1000" alt="Appointment cards documentation page" loading="lazy" decoding="async"></div>
+        </figure>
+      </section>
+
+      <section class="chapter" id="search">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Search</div>
+        <h2>Search in the words people actually use.</h2>
+        <div class="pair pair--text">
+          <div class="prose">
+            <p>The search reads names, descriptions, examples and Spanish synonyms. Typing <strong>“turno”</strong> finds every appointment component, even though none of them is called that in the code.</p>
+            <p>Starting points sit under the search box (Buttons, Tables, Fields, Patient menu, Appointment cards, Colors), and a strip of 18 real pieces invites people to explore by clicking.</p>
+          </div>
+          <figure class="shot">
+            <img class="zoomable chip-shot" style="border-radius:14px" src="../assets/img/ds-crop-search.webp" width="1100" height="891" alt="Search results for the word turno" loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </section>
+
+      <section class="chapter" id="builder">
+        <div class="frame-label frame-label--component"><svg aria-hidden="true"><use href="#i-component"/></svg>Builder · with AI</div>
+        <h2>Describe a screen, get it built with the real components.</h2>
+        <div class="prose">
+          <p>The Builder assembles screens from the app’s own components. Drag pieces onto a canvas that starts with the real sidebar and top bar, then nest them in columns, sections, tabs or modals. <strong>Layers</strong> shows the tree, <strong>Code</strong> gives the TSX with its imports, <strong>PNG</strong> exports the design and <strong>Share link</strong> compresses the whole design into the URL, with nothing uploaded to a server.</p>
+          <p><strong>Describe</strong> goes further. Write “a patients screen with metrics, the table and today’s appointments on the right”, and it searches 379 pieces and 33 blocks and builds the screen block by block.</p>
+          <ul class="bullets">
+            <li><b>With a free Gemini key</b>, the model streams its reasoning and can only answer with pieces from the catalog, because the response schema is limited to catalog IDs.</li>
+            <li><b>Without a key</b>, a parser splits the sentence (commas, “and”, “to the right”, “below”), recognizes about 45 kinds of data for fields and maps words to blocks.</li>
+            <li><b>Every result can be undone</b>, and each block keeps its alternatives so it can be swapped.</li>
+            <li><b>A privacy note</b> in the panel asks people not to type real patient data, since prompts reach Google on the free plan.</li>
+          </ul>
+        </div>
+        <figure class="shot shot-pad shot-pad--ds">
+          <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Builder · Describe</span></div><img class="zoomable" src="../assets/img/ds-builder-built.webp" width="1600" height="1000" alt="Builder after describing a patients screen, with the steps the describe panel followed" loading="lazy" decoding="async"></div>
+          <figcaption><b>Describe, without AI.</b> The sentence became a Patients screen with stats, the patients table and today’s appointments, and the panel lists how each phrase was read.</figcaption>
+        </figure>
+      </section>
+
+      <section class="chapter" id="governance">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Governance</div>
+        <h2>The system tells you when the code drifts.</h2>
+        <div class="prose">
+          <p>The Audit section shows what the code does today that departs from the standard: colors without a token, buttons, cards, fields and pills written outside the components, duplicates, missing states and documentation coverage.</p>
+          <ul class="bullets">
+            <li><b>In CI</b>, a check reports hard-coded colors that already have a token.</li>
+            <li><b>Headers in the app</b> detects which header each screen uses and flags the ones that differ.</li>
+            <li><b>Coverage</b> makes “everything is documented” measurable: if a piece is missing, it shows up there.</li>
+          </ul>
+        </div>
+        <div class="pair">
+          <figure class="shot shot-pad shot-pad--soft">
+            <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Audit</span></div><img class="zoomable" src="../assets/img/ds-audit.webp" width="1600" height="1000" alt="Audit overview" loading="lazy" decoding="async"></div>
+          </figure>
+          <figure class="shot shot-pad shot-pad--soft">
+            <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Foundations · Colors</span></div><img class="zoomable" src="../assets/img/ds-colors.webp" width="1600" height="1000" alt="Color tokens with light and dark values" loading="lazy" decoding="async"></div>
+          </figure>
+        </div>
+      </section>
+
+      <section class="chapter" id="outcome">
+        <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Outcome</div>
+        <h2>One answer to “which one do I use?”</h2>
+        <p>The design system is published next to the app, updates itself from the code and gives designers, developers and product the same reference. The Builder turns it into a tool: a new screen starts from real components instead of a blank Figma frame.</p>
+        <div class="case-links">
+          <a class="btn" href="https://juliangerardi.github.io/red-dental-studio/storybook/?path=/docs/welcome--docs" target="_blank" rel="noopener">Open the design system <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn--ghost" href="confidentally.html">Read the product case study</a>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-bottom:clamp(56px,8vw,104px)">
+    <a class="next" href="grill.html">
+      <div><span class="eyebrow">Next project</span><h2>GRILL Empresas</h2></div>
+      <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+    </a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <span>© <span data-year>2026</span> Julián Gerardi</span>
+    <div class="footer__links">
+      <a href="../index.html#work">All work</a>
+      <a href="https://www.linkedin.com/in/julian-gerardi" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.behance.net/Jotainc" target="_blank" rel="noopener">Behance</a>
+    </div>
+  </div>
+</footer>
+
+<dialog class="lightbox" aria-label="Screen preview">
+  <button class="icon-btn lightbox__close" type="button" aria-label="Close preview"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+  <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
+</dialog>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>

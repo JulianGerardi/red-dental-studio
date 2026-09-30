@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Confidentally Case Study</title>
+<meta name="description" content="Redesign of a dental practice platform, from the front desk to the dental chair. Case study by Julián Gerardi.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' fill='%23fff' stroke='%237445ff' stroke-width='2'/%3E%3Ctext x='16' y='21' font-family='Arial' font-weight='700' font-size='12' text-anchor='middle' fill='%2316141d'%3EJG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@300..700&amp;family=Geist+Mono:wght@400..600&amp;display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<script>try{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-frame" viewBox="0 0 16 16"><path d="M5 1.5v13M11 1.5v13M1.5 5h13M1.5 11h13" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-component" viewBox="0 0 16 16"><path d="M8 1.2 10.2 3.4 8 5.6 5.8 3.4ZM3.4 5.8 5.6 8 3.4 10.2 1.2 8ZM12.6 5.8 14.8 8 12.6 10.2 10.4 8ZM8 10.4 10.2 12.6 8 14.8 5.8 12.6Z" fill="currentColor"/></symbol>
+  <symbol id="i-cursor" viewBox="0 0 20 20"><path d="M3 2.2 17.2 8.6l-6.1 1.9-2.3 6.3Z" fill="currentColor" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+</svg>
+
+<header class="nav">
+  <div class="wrap nav__inner">
+    <a class="logo" href="../index.html" aria-label="Julián Gerardi, home">
+      <span class="logo__mark" aria-hidden="true">JG</span>
+      <span class="logo__name">Julián Gerardi</span>
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="../index.html#work" aria-current="page">Work</a>
+      <a href="../index.html#process">Process</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+    <div class="nav__actions">
+      <button class="icon-btn theme-toggle" type="button" aria-label="Switch theme">
+        <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+        <svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+      </button>
+      <button class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false">
+        <svg aria-hidden="true"><use href="#i-menu"/></svg>
+      </button>
+      <a class="btn" href="../index.html#contact">Let’s talk</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <header class="case-hero">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html#work">Work</a><span>/</span><span>Confidentally</span></nav>
+      <h1>Confidentally</h1>
+      <p class="case-hero__lede">A dental practice platform, redesigned from the front desk to the dental chair and rebuilt as a prototype the whole team can click through.</p>
+      <dl class="case-meta">
+        <div><dt>Role</dt><dd>Lead Product Designer, UX/UI</dd></div>
+        <div><dt>Client</dt><dd>Confidential · United States</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+        <div><dt>Platform</dt><dd>Responsive web app</dd></div>
+        <div><dt>Scope</dt><dd>Audit, UX, UI, design system, coded prototype</dd></div>
+        <div><dt>Tools</dt><dd>Figma, Claude, React, Storybook</dd></div>
+      </dl>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="stage stage--dental comp-dental case-stage" aria-hidden="true">
+      <div class="layer l-browser browser">
+        <div class="browser__bar"><i></i><i></i><i></i><span>Red Dental Studio · Clinical Mode</span></div>
+        <img src="../assets/img/d-clinical.webp" width="1600" height="1000" alt="" decoding="async">
+      </div>
+      <div class="layer l-phone phone"><img src="../assets/img/d-m-dashboard.webp" width="780" height="1688" alt="" decoding="async"></div>
+      <div class="layer l-card chip-shot"><img src="../assets/img/d-crop-apptcard.webp" width="800" height="429" alt="" decoding="async"></div>
+      <div class="layer l-stats chip-shot"><img src="../assets/img/d-crop-stats.webp" width="1100" height="136" alt="" decoding="async"></div>
+      <div class="cursor cursor--1"><svg><use href="#i-cursor"/></svg><span class="cursor__tag">Julián</span></div>
+    </div>
+  </div>
+
+  <section class="section" data-gate="nda-content" data-hash="dd113f6caa9a677a96e4c3a57f6dd18ea4a3e421f85fe9e4a70a3c2f9bd278fb">
+    <div class="wrap">
+      <div class="gate">
+        <span class="gate__icon"><svg aria-hidden="true"><use href="#i-lock"/></svg></span>
+        <h2>This case study is under NDA</h2>
+        <p>The client and their product details are confidential. Enter the password to read the process, the decisions and every screen.</p>
+        <form>
+          <label class="sr-only" for="nda-password">Password</label>
+          <input id="nda-password" name="password" type="password" autocomplete="current-password" placeholder="Password">
+          <button class="btn btn--select" type="submit">Unlock case study</button>
+        </form>
+        <p class="gate__error" role="alert" aria-live="polite"></p>
+        <p class="gate__ask">No password? Write to <span>juliangerardi266@gmail.com</span> and I’ll send it to you.</p>
+      </div>
+    </div>
+  </section>
+
+  <div id="nda-content" hidden>
+    <div class="wrap case-body">
+      <nav class="toc" aria-label="On this page">
+        <a href="#overview">Overview</a>
+        <a href="#challenge">The challenge</a>
+        <a href="#approach">Approach</a>
+        <a href="#screens">Key screens</a>
+        <a href="#mobile">Mobile</a>
+        <a href="#system">Design system</a>
+        <a href="#outcome">Outcome</a>
+      </nav>
+
+      <div>
+        <section class="chapter" id="overview">
+          <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Overview</div>
+          <h2>One product for everyone who works in a dental clinic.</h2>
+          <div class="prose">
+            <p>Confidentally is a practice-management platform for dental clinics. The front desk uses it to check patients in and manage the waiting room, dentists chart teeth and plan treatments, and the billing team closes the day with insurance claims and patient balances.</p>
+            <p>I led the redesign of the interface. Instead of stopping at Figma, I rebuilt the product as a <strong>working prototype with mock data</strong>, so every flow could be tested in a browser, and I documented every piece in <strong>Confidentally UI</strong>, a design system that reads the same code.</p>
+          </div>
+          <div class="note"><svg aria-hidden="true"><use href="#i-info"/></svg><p>Everything shown here is my redesign running on invented data. No real patient, clinic or client information appears in this case study.</p></div>
+        </section>
+
+        <section class="chapter" id="challenge">
+          <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>The challenge</div>
+          <h2>A product that grew module by module.</h2>
+          <div class="prose">
+            <p>Each area of the product had been designed on its own. Screens didn’t share a grid, appointment cards were rewritten by hand in several places, and Spanish strings slipped into English modals. For people who keep the app open all day, those small breaks add up to slower work and more errors.</p>
+          </div>
+          <p class="pull">The goal: one coherent system from the front desk to the dental chair, without slowing down anyone who already knows the product.</p>
+        </section>
+
+        <section class="chapter" id="approach">
+          <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Approach<span class="frame-label__meta">5 steps</span></div>
+          <h2>Audit first, then design, then build.</h2>
+          <ol class="steps">
+            <li><span class="steps__n">01</span><div><h3>Inventory the live product</h3><p>I mapped every route of the production app at 1440×900 and rated each one by complexity, from the login to the seven Clinical Mode modules. That list became the plan of work.</p></div></li>
+            <li><span class="steps__n">02</span><div><h3>Audit the Figma file, module by module</h3><p>Dashboard, Patients, Scheduling, Treatments, Documents and Relationships. I logged <strong>44 anomalies</strong> and numbered them across modules so the team could cite them without ambiguity.</p></div></li>
+            <li><span class="steps__n">03</span><div><h3>Agree on conventions</h3><p>Keep the Figma proportions but set an 11px floor for text inside cards. Open two- and three-column grids at 1024px. Fix what is visual, keep the content as it is and document the difference.</p></div></li>
+            <li><span class="steps__n">04</span><div><h3>Rebuild it as a working prototype</h3><p>React, TypeScript and Tailwind on mock data, built with Claude as a pair. Real flows, such as booking an appointment with a treatment plan, can be tried in a browser instead of reviewed as static frames.</p></div></li>
+            <li><span class="steps__n">05</span><div><h3>Turn the result into a system</h3><p>Every button, card and screen went into Confidentally UI, with the reasons behind each decision and scripts that flag when the code drifts away from it.</p></div></li>
+          </ol>
+          <h3 style="font-size:var(--step-1);margin-top:12px">A few of the 44 anomalies</h3>
+          <div class="anomalies">
+            <div class="anomaly"><b>#02 · Dashboard</b><span>The date picker shows 30-02-2026, a date that doesn’t exist.</span></div>
+            <div class="anomaly"><b>#08 · Dashboard</b><span>Type inside cards drops as low as 5.87px.</span></div>
+            <div class="anomaly"><b>#14 · Patients</b><span>Two different primary blues, #0056ef and #1d56bc.</span></div>
+            <div class="anomaly"><b>#21 · Scheduling</b><span>All seven calendar columns are labelled “THUR”.</span></div>
+            <div class="anomaly"><b>#34 · Documents</b><span>A banner says the patient is a minor; the profile says 50 years old.</span></div>
+            <div class="anomaly"><b>#42 · Relationships</b><span>No button on any screen leads to “Add Relationship”.</span></div>
+          </div>
+        </section>
+
+        <section class="chapter" id="screens">
+          <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Key screens<span class="frame-label__meta">6 of 32</span></div>
+          <h2>Designed around the moment each person is in.</h2>
+
+          <div class="decisions">
+            <article class="decision">
+              <div class="decision__head">
+                <h3>Dashboard: the day at a glance</h3>
+                <div class="prose">
+                  <p>The front desk lives here. Appointments, the waiting room and the operatories sit side by side, and a single date control drives appointments, the waiting room and tasks.</p>
+                  <ul class="bullets">
+                    <li><b>Stat strip</b> with appointments, people waiting and open encounters, each with its secondary number.</li>
+                    <li><b>Signature banner</b> for documents that need attention, with a 1-of-4 pager instead of a stack of alerts.</li>
+                  </ul>
+                </div>
+              </div>
+              <figure class="shot shot-pad shot-pad--dental">
+                <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Dashboard</span></div><img class="zoomable" src="../assets/img/d-dashboard.webp" width="1600" height="1000" alt="Dashboard with appointments, waiting room and operatories side by side" loading="lazy" decoding="async"></div>
+              </figure>
+            </article>
+
+            <article class="decision">
+              <div class="decision__head">
+                <h3>Patient record</h3>
+                <div class="prose">
+                  <p>The left panel keeps identity and the two actions that matter most, <strong>Start Encounter</strong> and <strong>Clinical Mode</strong>, always in reach while tabs change on the right.</p>
+                  <ul class="bullets">
+                    <li><b>Clinical accordions</b> with counters, so allergies and medication are visible before they are opened.</li>
+                    <li><b>Pending tasks</b> such as referrals flag expired dates in context.</li>
+                  </ul>
+                </div>
+              </div>
+              <figure class="shot shot-pad shot-pad--soft">
+                <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Patients · John Smith</span></div><img class="zoomable" src="../assets/img/d-patient.webp" width="1600" height="1000" alt="Patient record with side panel, clinical accordions, insurance and pending tasks" loading="lazy" decoding="async"></div>
+              </figure>
+            </article>
+
+            <article class="decision">
+              <div class="decision__head">
+                <h3>Clinical Mode</h3>
+                <div class="prose">
+                  <p>A takeover without the app shell, because the dentist needs the whole screen. The odontogram sits at the center, with the exams toolbar above and the treatment plan to the left.</p>
+                  <ul class="bullets">
+                    <li><b>Ten exams</b> one tap away: ROS, BMI, vitals, physical, ATM/O-F, intra oral, extra oral, dental assessment, periodontal and radiography.</li>
+                    <li><b>Last condition</b> callout on the chart, so the latest finding is never buried in a list.</li>
+                  </ul>
+                </div>
+              </div>
+              <figure class="shot shot-pad shot-pad--dental">
+                <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Clinical Mode</span></div><img class="zoomable" src="../assets/img/d-clinical.webp" width="1600" height="1000" alt="Clinical Mode with odontogram, treatment plan and problem list" loading="lazy" decoding="async"></div>
+              </figure>
+            </article>
+
+            <article class="decision">
+              <div class="decision__head">
+                <h3>Scheduling</h3>
+                <div class="prose">
+                  <p>Day, week and month views share one status legend with seven appointment states. A new appointment is a two-step wizard: patient and time first, treatment plan second.</p>
+                  <ul class="bullets">
+                    <li><b>Slot picker</b> opens as a side panel with free times, so the calendar stays visible.</li>
+                    <li><b>Patient in session</b>: a tab on the right edge of every screen lists today’s patients who haven’t finished.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="pair">
+                <figure class="shot shot-pad shot-pad--soft">
+                  <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Scheduling · Week</span></div><img class="zoomable" src="../assets/img/d-scheduling.webp" width="1600" height="1000" alt="Weekly calendar with appointments by status" loading="lazy" decoding="async"></div>
+                </figure>
+                <figure class="shot shot-pad shot-pad--soft">
+                  <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Patients</span></div><img class="zoomable" src="../assets/img/d-patients.webp" width="1600" height="1000" alt="Patients list with search, status and actions" loading="lazy" decoding="async"></div>
+                </figure>
+              </div>
+            </article>
+
+            <article class="decision">
+              <div class="decision__head">
+                <h3>Billing and ledger</h3>
+                <div class="prose">
+                  <p>Accounts receivable split between what patients owe and what insurance carriers owe, with overdue balances surfaced separately. Payments and adjustments open as panels on top of the ledger instead of new pages.</p>
+                </div>
+              </div>
+              <div class="pair">
+                <figure class="shot shot-pad shot-pad--dental">
+                  <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Billing</span></div><img class="zoomable" src="../assets/img/d-billing.webp" width="1600" height="1000" alt="Billing overview with total, patient and insurance receivables" loading="lazy" decoding="async"></div>
+                </figure>
+                <figure class="shot shot-pad shot-pad--dental">
+                  <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Ledger</span></div><img class="zoomable" src="../assets/img/d-ledger.webp" width="1600" height="1000" alt="Patient ledger with transactions" loading="lazy" decoding="async"></div>
+                </figure>
+              </div>
+            </article>
+
+            <article class="decision">
+              <div class="decision__head">
+                <h3>Notifications with a “pending” state</h3>
+                <div class="prose">
+                  <p>The inbox follows Notion’s logic: tabs for inbox, unread and archived, grouped by date, with bulk actions. I added a third state, <strong>pending</strong>, because here notifications are tasks: sign a consent, confirm an appointment, verify an insurance plan.</p>
+                </div>
+              </div>
+              <figure class="shot shot-pad shot-pad--soft">
+                <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Notifications</span></div><img class="zoomable" src="../assets/img/d-notifications.webp" width="1600" height="1000" alt="Notifications inbox with unread, pending and archived tabs" loading="lazy" decoding="async"></div>
+              </figure>
+            </article>
+          </div>
+        </section>
+
+        <section class="chapter" id="mobile">
+          <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Mobile</div>
+          <h2>The same product in a dentist’s pocket.</h2>
+          <p>Every screen is responsive. On a phone, the patient menu turns into horizontal tabs and panels stack in the order a clinician reads them.</p>
+          <div class="shot-pad shot-pad--dental">
+            <div class="phones">
+              <div class="phone"><img src="../assets/img/d-m-dashboard.webp" width="780" height="1688" alt="Dashboard on a phone" loading="lazy" decoding="async"></div>
+              <div class="phone"><img src="../assets/img/d-m-patient.webp" width="780" height="1688" alt="Patient record on a phone" loading="lazy" decoding="async"></div>
+              <div class="phone"><img src="../assets/img/d-m-scheduling.webp" width="780" height="1688" alt="Scheduling on a phone" loading="lazy" decoding="async"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="chapter" id="system">
+          <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Design system</div>
+          <h2>Confidentally UI keeps the redesign from drifting.</h2>
+          <p>Documentation that lives apart from the product goes stale in weeks. So the design system reads the app’s own components: change a token in code and the docs change with it. It has its own case study.</p>
+          <figure class="shot shot-pad shot-pad--ds">
+            <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span>Confidentally UI</span></div><img class="zoomable" src="../assets/img/ds-welcome.webp" width="1600" height="1000" alt="Confidentally UI design system home with search" loading="lazy" decoding="async"></div>
+          </figure>
+          <a class="btn btn--ghost" href="confidentally-ui.html" style="justify-self:start">Read the design system case study <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </section>
+
+        <section class="chapter" id="outcome">
+          <div class="frame-label"><svg aria-hidden="true"><use href="#i-frame"/></svg>Outcome</div>
+          <h2>A product the team can open, click and build from.</h2>
+          <div class="stats">
+            <div class="stat"><b>32</b><span>screens working in the browser</span></div>
+            <div class="stat"><b>139</b><span>documented pieces</span></div>
+            <div class="stat"><b>481</b><span>live examples</span></div>
+            <div class="stat"><b>44</b><span>anomalies found and cited</span></div>
+          </div>
+          <p>Developers get components that already exist in code, product gets a prototype to test with clinics before committing, and design gets one place where every decision is written down.</p>
+          <div class="case-links">
+            <a class="btn" href="https://juliangerardi.github.io/red-dental-studio/#/patients/patient-0001" target="_blank" rel="noopener">Open the prototype <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn--ghost" href="https://juliangerardi.github.io/red-dental-studio/storybook/?path=/docs/welcome--docs" target="_blank" rel="noopener">Open the design system <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-bottom:clamp(56px,8vw,104px)">
+    <a class="next" href="confidentally-ui.html">
+      <div><span class="eyebrow">Next project</span><h2>Confidentally UI</h2></div>
+      <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+    </a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <span>© <span data-year>2026</span> Julián Gerardi</span>
+    <div class="footer__links">
+      <a href="../index.html#work">All work</a>
+      <a href="https://www.linkedin.com/in/julian-gerardi" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.behance.net/Jotainc" target="_blank" rel="noopener">Behance</a>
+    </div>
+  </div>
+</footer>
+
+<dialog class="lightbox" aria-label="Screen preview">
+  <button class="icon-btn lightbox__close" type="button" aria-label="Close preview"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+  <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
+</dialog>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>
