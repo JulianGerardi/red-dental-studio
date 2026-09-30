@@ -15,12 +15,16 @@ import {
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { SelectField } from '@/components/patients/form'
 import { Pill, type PillTone } from '@/components/ui/pill'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 /* Figma 4118:220403 "Treatment Plan — Section (Cases, Workflow & Dialogs)":
    el rail de estados, la tabla de no asignados, el caso con sus visitas y los
    diálogos. */
 
 const COLUMNAS = ['Date', 'Surface', 'Tooth', 'Location', 'Procedure', 'Provider', 'Fee', 'Status']
+
+/* La caja del total, igual abierta (en la fila de campos) y plegada (en el encabezado). */
+const CAJA_TOTAL = 'bg-dash-count-bg flex h-9 shrink-0 items-center rounded-md px-3 text-[13px] font-semibold whitespace-nowrap text-ink'
 
 const ESTADO_TONO: Record<Procedimiento['estado'], PillTone> = {
   Planned: 'success', Completed: 'info', Removed: 'neutral',
@@ -530,6 +534,7 @@ export function VistaCaso({
   const [categoria, setCategoria] = useState('')
   const [notas, setNotas] = useState('')
   const [menu, setMenu] = useState(false)
+  const [colapsado, setColapsado] = useState(false)
 
   return (
     <div className="flex flex-col gap-4">
@@ -547,6 +552,17 @@ export function VistaCaso({
             <Bookmark className="size-4" fill={favorito ? 'currentColor' : 'none'} />
           </button>
           <span className="min-w-0 flex-1 text-[17px] font-bold text-ink">{caso.nombre}</span>
+          {/* Plegado, el encabezado conserva lo que se consulta sin abrir: estado y total. */}
+          {colapsado && (
+            <span className="flex shrink-0 items-center gap-3">
+              <span className="rounded-full border border-warn-fg bg-warn-bg px-2 py-[2px] text-[11px] font-semibold text-warn-fg">
+                {caso.estado}
+              </span>
+              <span className={CAJA_TOTAL}>
+                Total Amount: <span className="text-dash-blue ml-1">{caso.total}</span>
+              </span>
+            </span>
+          )}
           <button
             onClick={() => aviso.info('Renaming a case is not available in this release.')}
             aria-label="Rename case"
@@ -554,6 +570,21 @@ export function VistaCaso({
           >
             <Pencil className="size-4" />
           </button>
+          {/* Preview sube al encabezado, con los demás íconos: sólo ícono, con su tooltip. */}
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => aviso.info('The case preview is not available in this release.')}
+                  aria-label="Preview case"
+                  className="shrink-0 text-ink-medium hover:opacity-70"
+                >
+                  <Eye className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">Preview case</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <button
             onClick={onMover}
             className="text-dash-blue ml-auto flex shrink-0 items-center gap-1 text-[13px] font-semibold hover:underline"
@@ -588,8 +619,17 @@ export function VistaCaso({
               </div>
             )}
           </div>
+          <button
+            onClick={() => setColapsado((v) => !v)}
+            aria-expanded={!colapsado}
+            aria-label={colapsado ? 'Expand case' : 'Collapse case'}
+            className={`${ICONO_SUELTO} size-9`}
+          >
+            <ChevronDown className={cn('size-4 transition-transform', colapsado && '-rotate-90')} />
+          </button>
         </div>
 
+        {!colapsado && (<>
         <div className="mt-4 flex flex-wrap items-center gap-x-8 gap-y-2">
           <span className="text-[13px] text-ink">
             Create on: <span className="text-dash-blue font-medium">{caso.creado}</span>
@@ -605,35 +645,25 @@ export function VistaCaso({
           </span>
         </div>
 
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          <div>
-            <span className="block text-xs font-medium text-ink">
-              Treatment Case Category<span className="text-required">*</span>
-            </span>
-            <select
-              value={categoria}
-              onChange={(e) => setCategoria(e.target.value)}
-              className="focus:border-dash-blue mt-1.5 h-10 w-full rounded-md border border-line bg-white px-3 text-[13px] focus:outline-none"
-            >
-              <option value="">Select</option>
-              {CATEGORIAS.map((c) => <option key={c}>{c}</option>)}
-            </select>
-            <button
-              onClick={() => aviso.info('The case preview is not available in this release.')}
-              className="text-dash-blue mt-2 flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
-            >
-              Preview <Eye className="size-3.5" />
-            </button>
-          </div>
-          <div>
+        {/* Una sola línea: categoría, notas y total. La categoría no necesita el ancho de media card. */}
+        <div className="mt-4 flex flex-wrap items-start gap-4">
+          <SelectField
+            label="Treatment Case Category"
+            required
+            value={categoria}
+            onChange={setCategoria}
+            options={CATEGORIAS}
+            className="w-[240px] max-w-full"
+          />
+          <div className="min-w-[260px] flex-1">
             <span className="block text-xs font-medium text-ink">
               Additional Discussion Notes<span className="text-required">*</span>
             </span>
-            <div className="relative mt-1.5">
+            <div className="relative mt-2">
               <textarea
                 value={notas}
                 onChange={(e) => setNotas(e.target.value)}
-                rows={3}
+                rows={2}
                 placeholder="Include patient history, previous treatments, and specific questions for the specialist..."
                 className="focus:border-dash-blue w-full resize-none rounded-md border border-line p-3 pr-10 text-[13px] placeholder:text-ink-faint focus:outline-none"
               />
@@ -646,11 +676,12 @@ export function VistaCaso({
               </button>
             </div>
           </div>
+          {/* Sin rótulo propio: baja lo que miden el rótulo y el gap de los campos (16 + 8) para alinear con los controles. */}
+          <div className={cn(CAJA_TOTAL, 'mt-6')}>
+            Total Amount: <span className="text-dash-blue ml-1">{caso.total}</span>
+          </div>
         </div>
-
-        <div className="bg-dash-count-bg mt-4 w-fit rounded-md px-3 py-2 text-[13px] font-semibold text-ink">
-          Total Amount: <span className="text-dash-blue">{caso.total}</span>
-        </div>
+        </>)}
       </div>
 
       {caso.visitas.map((v) => (

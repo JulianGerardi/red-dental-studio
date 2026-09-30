@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { CASOS, NO_ASIGNADOS } from '@/data/treatment-plan'
+import { esperar, pulsar, secuencia } from '@/design-system/play'
 import {
   Dialogo, DialogoBorrarCaso, DialogoCompletar, DialogoMover, DialogoNuevoGrupo, OpcionRadio, Rail, TablaProcedimientos, VistaCaso, EstadoConsentimiento,
 } from './TreatmentPlanSection'
@@ -54,4 +55,10 @@ export const ConsentStatus: Story = {
       {(['Signed', 'Pending', 'Not sent', 'Expired'] as const).map((e) => <EstadoConsentimiento key={e} estado={e} />)}
     </div>
   ),
+}
+
+/* El caso plegado: el encabezado conserva el estado y el total, y la categoría, las notas y las fechas se esconden. */
+export const CaseViewCollapsed: Story = {
+  render: () => <VistaCaso caso={CASOS[0]} favorito={false} onFavorito={() => {}} onDialogo={() => {}} onMover={() => {}} onCompletar={() => {}} />,
+  play: secuencia(pulsar(/collapse case/i), esperar(/^total:/i)),
 }

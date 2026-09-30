@@ -1604,3 +1604,21 @@ A pedido de Julian, dentro de un caso (Periodontists Recommended y los demas):
    en el color del estado -Signed verde, Pending ambar, Not sent gris, Expired
    rojo-. Palabra y no solo icono, para que se lea sin pasar el mouse. No va en
    Unassigned: un procedimiento suelto no tiene consentimiento.
+
+
+### Segunda vuelta: el caso se puede plegar (2026-09-30)
+
+- **El caso se pliega** con un chevron al final del encabezado -el mismo gesto que
+  Pending Decision en el rail-. Plegado queda una franja de 77px con el nombre,
+  el estado y el total; las visitas siguen a la vista. Abierto mide 243px, contra
+  348 antes de estos ajustes.
+- **Una sola linea de campos: Treatment Case Category (240px) - Additional
+  Discussion Notes - Total Amount**, en ese orden. El total va al final y con la
+  misma altura que el select (36px); las notas pasan de 3 a 2 filas para que la
+  linea no sea mas alta de lo necesario.
+- **La categoria usa el `SelectField` de la app**, el mismo de los modales. Era un
+  `<select>` nativo con la flecha pegada al borde.
+- **Plegado, el total conserva su caja** (fondo `dash-count-bg`, "Total Amount:
+  231.12") en el encabezado, junto al estado: es la misma caja abierta y plegada.
+- **Preview sube al encabezado** como icono, junto al lapiz, con tooltip. Antes
+  era un link de texto debajo del select.
