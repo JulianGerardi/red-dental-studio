@@ -13,7 +13,7 @@ type Story = StoryObj<typeof meta>
 /* Una fila de firma: con su estado (pendiente o firmada) y la fecha. */
 export const SignatureRows: Story = {
   render: () => (
-    <div className="flex w-[360px] flex-col gap-2">
+    <div className="@container flex w-[1100px] flex-col gap-2">
       {CONSENTIMIENTO.firmas.map((f) => <FilaFirma key={f.rol} f={f} />)}
       <FilaFirma f={{ ...CONSENTIMIENTO.firmas[0], estado: 'Signed', fecha: '05/14/2026' }} />
     </div>

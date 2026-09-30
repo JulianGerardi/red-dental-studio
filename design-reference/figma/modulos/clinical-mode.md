@@ -1582,3 +1582,25 @@ abajo (nada se superpone, todo se ve completo). Cambiar de tab
 (Odontogram ↔ Periodontal Status) varias veces seguidas con el panel
 abierto y cerrado en distintos momentos: cero errores de consola, el
 panel reaparece en el lugar correcto cada vez.
+
+
+## Treatment Plan: caso más liviano (2026-09-30)
+
+A pedido de Julian, dentro de un caso (Periodontists Recommended y los demas):
+
+1. **Sin New Case Group ni New Alternative Case en el caso.** Siguen en
+   Unassigned, que es donde se arman los casos.
+2. **El consentimiento es una sola fila**: icono del documento en el color del
+   estado, titulo, pill, y las dos firmas -Patient y Provider- en la misma linea,
+   con History y el kebab al final. Medido: 50px de alto contra ~145 antes. La
+   linea "1 of 2 signatures pending" pasa a texto para lector de pantalla: las
+   firmas ya lo dicen.
+3. **Con la card angosta se esconden los nombres de los firmantes** (container
+   query a 1024px): quedan rol y estado. Medido: la fila pide 1068px con
+   nombres; a 1440 la card mide 1088 y entra, a 1280 mide 928 y se partia.
+4. **La card del consentimiento ya no recorta**: sin `overflow-hidden`, el menu
+   del kebab se sale del bloque en vez de quedar cortado.
+5. **Columna Consent en las tablas del caso**, antes de Actions: icono y palabra
+   en el color del estado -Signed verde, Pending ambar, Not sent gris, Expired
+   rojo-. Palabra y no solo icono, para que se lea sin pasar el mouse. No va en
+   Unassigned: un procedimiento suelto no tiene consentimiento.

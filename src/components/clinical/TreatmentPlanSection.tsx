@@ -2,7 +2,7 @@ import { useState } from 'react'
 import {
   Bookmark, Pencil, Plus, MoreVertical, CornerUpLeft, ChevronDown, SquareX,
   LoaderCircle, Check, FileText, Eye, Save, Link2, ClipboardList, Scan, X,
-  CalendarDays,
+  CalendarDays, FileCheck2, FileClock, FileMinus2, FileX2, type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
@@ -10,7 +10,7 @@ import { ConsentBlock } from '@/components/clinical/ConsentBlock'
 import {
   CASOS, NO_ASIGNADOS, CATEGORIAS, DIALOGOS, OPCIONES_BORRAR_CASO, MOVER,
   NUEVO_GRUPO, COMPLETAR,
-  type Caso, type Procedimiento, type ClaveDialogo,
+  type Caso, type Procedimiento, type ClaveDialogo, type ConsentProcedimiento,
 } from '@/data/treatment-plan'
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { SelectField } from '@/components/patients/form'
@@ -20,7 +20,7 @@ import { Pill, type PillTone } from '@/components/ui/pill'
    el rail de estados, la tabla de no asignados, el caso con sus visitas y los
    diálogos. */
 
-const COLUMNAS = ['Date', 'Surface', 'Tooth', 'Location', 'Procedure', 'Provider', 'Fee', 'Status', 'Actions']
+const COLUMNAS = ['Date', 'Surface', 'Tooth', 'Location', 'Procedure', 'Provider', 'Fee', 'Status']
 
 const ESTADO_TONO: Record<Procedimiento['estado'], PillTone> = {
   Planned: 'success', Completed: 'info', Removed: 'neutral',
@@ -364,6 +364,23 @@ export function Rail({
 
 /* ── Tablas ───────────────────────────────────────────────────────── */
 
+/* Estado del consentimiento de un procedimiento: ícono y palabra, en el color del estado. Ver clinical-mode.md. */
+const CONSENT: Record<ConsentProcedimiento, { icono: LucideIcon; clase: string }> = {
+  Signed: { icono: FileCheck2, clase: 'text-dash-ok-fg' },
+  Pending: { icono: FileClock, clase: 'text-warn-fg' },
+  'Not sent': { icono: FileMinus2, clase: 'text-ink-muted' },
+  Expired: { icono: FileX2, clase: 'text-dash-bad-fg' },
+}
+
+export function EstadoConsentimiento({ estado }: { estado: ConsentProcedimiento }) {
+  const { icono: Icono, clase } = CONSENT[estado]
+  return (
+    <span className={cn('flex items-center gap-1.5 text-[12px] font-medium whitespace-nowrap', clase)}>
+      <Icono className="size-4 shrink-0" aria-hidden /> {estado}
+    </span>
+  )
+}
+
 /* Casilla del sistema: cuadrada, azul cuando está marcada. */
 export function Casilla({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
@@ -384,10 +401,12 @@ export function Casilla({ on, onChange, label }: { on: boolean; onChange: (v: bo
 }
 
 export function TablaProcedimientos({
-  filas, acciones, seleccion, onSeleccion, onAccion, onCompletar,
+  filas, acciones, consentimiento, seleccion, onSeleccion, onAccion, onCompletar,
 }: {
   filas: Procedimiento[]
   acciones?: boolean
+  /** Suma la columna Consent: sólo en los casos, los sueltos no tienen consentimiento. */
+  consentimiento?: boolean
   /** Con selección, la tabla suma la columna de casillas. */
   seleccion?: string[]
   onSeleccion?: (ids: string[]) => void
@@ -396,6 +415,7 @@ export function TablaProcedimientos({
 }) {
   const conCasillas = !!seleccion && !!onSeleccion
   const todas = conCasillas && filas.length > 0 && filas.every((f) => seleccion.includes(f.id))
+  const columnas = [...COLUMNAS, ...(consentimiento ? ['Consent'] : []), 'Actions']
 
   return (
     <div className="overflow-x-auto">
@@ -411,7 +431,7 @@ export function TablaProcedimientos({
                 />
               </th>
             )}
-            {COLUMNAS.map((c) => (
+            {columnas.map((c) => (
               <th key={c} className="h-10 px-3 text-left text-[11px] font-semibold whitespace-nowrap text-ink-muted">
                 {c}
               </th>
@@ -448,6 +468,9 @@ export function TablaProcedimientos({
               <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.proveedor}</td>
               <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft tabular-nums">{p.fee}</td>
               <td className="px-3"><Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill></td>
+              {consentimiento && (
+                <td className="px-3">{p.consentimiento && <EstadoConsentimiento estado={p.consentimiento} />}</td>
+              )}
               <td className="px-3">
                 <span className="flex items-center gap-1">
                   <button
@@ -495,14 +518,13 @@ export function TablaProcedimientos({
 /* ── Caso ─────────────────────────────────────────────────────────── */
 
 export function VistaCaso({
-  caso, favorito, onFavorito, onDialogo, onMover, onGrupo, onCompletar,
+  caso, favorito, onFavorito, onDialogo, onMover, onCompletar,
 }: {
   caso: Caso
   favorito: boolean
   onFavorito: () => void
   onDialogo: (d: ClaveDialogo | 'delete') => void
   onMover: () => void
-  onGrupo: () => void
   onCompletar: () => void
 }) {
   const [categoria, setCategoria] = useState('')
@@ -566,18 +588,6 @@ export function VistaCaso({
               </div>
             )}
           </div>
-        </div>
-
-        <div className="mt-4 flex flex-wrap justify-end gap-2">
-          {['New Case Group', 'New Alternative Case'].map((t) => (
-            <button
-              key={t}
-              onClick={t === 'New Alternative Case' ? onMover : onGrupo}
-              className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-4 text-[13px] font-semibold text-white transition-colors"
-            >
-              <Plus className="size-3.5" /> {t}
-            </button>
-          ))}
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-x-8 gap-y-2">
@@ -651,6 +661,7 @@ export function VistaCaso({
           <TablaProcedimientos
             filas={v.procedimientos}
             acciones
+            consentimiento
             onAccion={() => onDialogo('removeProcedure')}
             onCompletar={onCompletar}
           />
@@ -759,7 +770,6 @@ export function TreatmentPlanSection() {
             onFavorito={() => alternarFavorito(caso.id)}
             onDialogo={setDialogo}
             onMover={() => setMover(true)}
-            onGrupo={() => setGrupo(true)}
             onCompletar={() => setCompletar(true)}
           />
         )}

@@ -17,7 +17,6 @@ export const Default: Story = {}
    la acción de firmar. */
 export const AllSigned: Story = {
   play: secuencia(
-    pulsar(/consent actions/i), pulsar(/sign as patient/i),
     pulsar(/consent actions/i), pulsar(/sign as provider/i),
     esperar(/all signatures collected/i),
   ),

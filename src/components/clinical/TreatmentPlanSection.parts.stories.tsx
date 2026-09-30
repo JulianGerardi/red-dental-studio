@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { CASOS, NO_ASIGNADOS } from '@/data/treatment-plan'
 import {
-  Dialogo, DialogoBorrarCaso, DialogoCompletar, DialogoMover, DialogoNuevoGrupo, OpcionRadio, Rail, TablaProcedimientos, VistaCaso,
+  Dialogo, DialogoBorrarCaso, DialogoCompletar, DialogoMover, DialogoNuevoGrupo, OpcionRadio, Rail, TablaProcedimientos, VistaCaso, EstadoConsentimiento,
 } from './TreatmentPlanSection'
 
 const meta = {
@@ -44,5 +44,14 @@ export const ProceduresTable: Story = { render: () => <ConSeleccion /> }
 export const ProceduresTableReadOnly: Story = { render: () => <TablaProcedimientos filas={NO_ASIGNADOS.slice(0, 5)} onAccion={() => {}} /> }
 
 export const CaseView: Story = {
-  render: () => <VistaCaso caso={CASOS[0]} favorito={false} onFavorito={() => {}} onDialogo={() => {}} onMover={() => {}} onGrupo={() => {}} onCompletar={() => {}} />,
+  render: () => <VistaCaso caso={CASOS[0]} favorito={false} onFavorito={() => {}} onDialogo={() => {}} onMover={() => {}} onCompletar={() => {}} />,
+}
+
+/* Estado del consentimiento de cada procedimiento del caso (columna Consent). */
+export const ConsentStatus: Story = {
+  render: () => (
+    <div className="flex flex-col gap-3">
+      {(['Signed', 'Pending', 'Not sent', 'Expired'] as const).map((e) => <EstadoConsentimiento key={e} estado={e} />)}
+    </div>
+  ),
 }

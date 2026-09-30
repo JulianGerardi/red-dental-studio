@@ -1,45 +1,32 @@
 import { useState } from 'react'
-import { Bookmark, CircleCheck, CircleAlert, History, MoreVertical, X } from 'lucide-react'
+import { CircleCheck, CircleAlert, FileSignature, History, MoreVertical, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { CONSENTIMIENTO, type Firma } from '@/data/treatment-plan'
 import { ICONO_SUELTO } from '@/lib/estilos'
 
-/* Figma 4122:250449, rediseñado.
-
-   El frame lo pone al pie del caso: una fila ámbar con el título, la misma
-   advertencia repetida dos veces —"Provider signature pending"— y dos botones
-   de ícono sin rótulo. Para saber quién firmó había que abrir Consent history y
-   recién ahí elegir el documento.
-
-   Acá el documento es lo primero de la pantalla y el bloque responde las tres
-   preguntas que importan sin abrir nada: **qué documento es, quién firmó y qué
-   falta hacer**. El historial queda de vista secundaria, detrás de un botón.
-
-   El ámbar se mantiene, pero como acento del estado pendiente, no como marco de
-   toda la card: cuando las dos firmas están, el bloque pasa a verde solo. */
+/* Figma 4122:250449, rediseñado: una sola fila con el documento, su estado y las dos firmas. Ver clinical-mode.md. */
 
 const TONO = {
-  Pending: { bar: '#99660d', pill: 'border-warn-fg bg-warn-bg text-warn-fg', tile: 'bg-warn-bg text-warn-fg' },
-  Signed: { bar: '#1a804d', pill: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg', tile: 'bg-dash-ok-bg text-dash-ok-fg' },
-  Expired: { bar: '#b22626', pill: 'border-dash-bad-fg bg-dash-bad-bg text-dash-bad-fg', tile: 'bg-dash-bad-bg text-dash-bad-fg' },
+  Pending: { bar: '#99660d', pill: 'border-warn-fg bg-warn-bg text-warn-fg', icono: 'text-warn-fg' },
+  Signed: { bar: '#1a804d', pill: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg', icono: 'text-dash-ok-fg' },
+  Expired: { bar: '#b22626', pill: 'border-dash-bad-fg bg-dash-bad-bg text-dash-bad-fg', icono: 'text-dash-bad-fg' },
 }
 
 export function FilaFirma({ f }: { f: Firma }) {
   const ok = f.estado === 'Signed'
   return (
-    <div className="flex min-w-0 items-center gap-2">
+    <span className="flex min-w-0 items-center gap-1.5 text-[12.5px] whitespace-nowrap">
       {ok
-        ? <CircleCheck className="size-4 shrink-0 text-dash-ok-fg" />
-        : <CircleAlert className="size-4 shrink-0 text-warn-fg" />}
-      <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
-        <span className="font-semibold">{f.rol}</span>
-        <span className="text-ink-muted"> · {f.nombre}</span>
+        ? <CircleCheck className="size-4 shrink-0 text-dash-ok-fg" aria-hidden />
+        : <CircleAlert className="size-4 shrink-0 text-warn-fg" aria-hidden />}
+      <span className="font-semibold text-ink">{f.rol}</span>
+      {/* Con la card angosta el nombre se esconde para que la fila no se parta; el rol y el estado quedan. */}
+      <span className="sr-only text-ink-muted @5xl:not-sr-only">{f.nombre}</span>
+      <span className={cn('font-medium', ok ? 'text-dash-ok-fg' : 'text-warn-fg')}>
+        · {ok ? `Signed ${f.fecha}` : 'Pending'}
       </span>
-      <span className={cn('shrink-0 text-[12px] font-medium', ok ? 'text-dash-ok-fg' : 'text-warn-fg')}>
-        {ok ? `Signed ${f.fecha}` : 'Signature pending'}
-      </span>
-    </div>
+    </span>
   )
 }
 
@@ -102,33 +89,34 @@ export function ConsentBlock() {
 
   return (
     <div
-      className="relative overflow-hidden rounded-xl border border-line bg-white"
+      className="@container relative flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-line bg-white py-2 pr-2 pl-4"
       style={{ borderLeftWidth: 3, borderLeftColor: t.bar }}
     >
-      <div className="flex flex-wrap items-start gap-3 p-4">
-        <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-lg', t.tile)}>
-          <Bookmark className="size-4" />
-        </span>
-
-        <span className="min-w-[200px] flex-1">
-          <span className="block text-[15px] font-bold text-ink">{CONSENTIMIENTO.titulo}</span>
-          <span className="block text-[12px] text-ink-muted">
-            {pendientes.length === 0
-              ? 'All signatures collected'
-              : `${pendientes.length} of ${firmas.length} signatures pending`}
-          </span>
-        </span>
-
-        <span className={cn('shrink-0 rounded-full border px-2 py-[2px] text-[11px] font-semibold', t.pill)}>
+      <span className="flex min-w-0 items-center gap-2">
+        <FileSignature className={cn('size-4 shrink-0', t.icono)} aria-hidden />
+        <span className="text-[14px] font-bold text-ink">{CONSENTIMIENTO.titulo}</span>
+        <span className={cn('shrink-0 rounded-full border px-2 py-[1px] text-[11px] font-semibold', t.pill)}>
           {estado}
         </span>
+        <span className="sr-only">
+          {pendientes.length === 0
+            ? 'All signatures collected'
+            : `${pendientes.length} of ${firmas.length} signatures pending`}
+        </span>
+      </span>
 
+      {/* Quién firmó y qué falta, en la misma línea. */}
+      <span className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1">
+        {firmas.map((f) => <FilaFirma key={f.rol} f={f} />)}
+      </span>
+
+      <span className="flex shrink-0 items-center">
         {/* El historial es secundario: sólo el ícono, con su título. */}
         <button
           onClick={() => setHistorial(true)}
           title="Consent history"
           aria-label="Consent history"
-          className={`${ICONO_SUELTO} size-9`}
+          className={`${ICONO_SUELTO} size-8`}
         >
           <History className="size-4" />
         </button>
@@ -138,7 +126,7 @@ export function ConsentBlock() {
             onClick={() => setMenu((v) => !v)}
             aria-label="Consent actions"
             aria-expanded={menu}
-            className={`${ICONO_SUELTO} size-9`}
+            className={`${ICONO_SUELTO} size-8`}
           >
             <MoreVertical className="size-4" />
           </button>
@@ -167,12 +155,7 @@ export function ConsentBlock() {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Quién firmó y qué falta, sin abrir nada. */}
-      <div className="flex flex-col gap-2 border-t border-line-soft px-4 py-3">
-        {firmas.map((f) => <FilaFirma key={f.rol} f={f} />)}
-      </div>
+      </span>
 
       {historial && <PanelHistorial onClose={() => setHistorial(false)} />}
     </div>
