@@ -1,4 +1,4 @@
-/* Assistant: answers questions about Julián using this website.
+/* Assistant: answers questions about Julián from his CV and this website.
    Common questions have written answers (INTENTS); anything else is looked up in
    the text of the pages themselves, and the answer links to the section it came from.
    Nothing is sent to an external AI. */
@@ -41,9 +41,9 @@
     { id: 'batech', re: /(batech|video|c[aá]mara|camera|retail|geocerca|geofence|visi[oó]n artificial|computer vision)/i,
       en: 'At Batech (2022–2026) Julián led the design of an AI video analytics platform for retail: cameras become events, alerts and reports, geofences are drawn on live video, a six-step flow sets up an analysis, and every store has an AI assistant. He also built the Figma design system and led the design team to 10% faster delivery.',
       es: 'En Batech (2022–2026) Julián lideró el diseño de una plataforma de análisis de video con IA para retail: las cámaras se convierten en eventos, alertas y reportes, las geocercas se dibujan sobre el video, un flujo de seis pasos configura cada análisis y cada tienda tiene un asistente de IA. También armó el design system en Figma y llevó al equipo a entregas un 10% más rápidas.', links: ['batech'] },
-    { id: 'ds', re: /(design system|storybook|builder|componente|component|token|confidentally ui|sistema de dise)/i,
-      en: 'Confidentally UI is a living design system that reads the app’s own code: 139 documented pieces and 481 live examples, a search that understands Spanish, audit scripts that flag drift, and a Builder that assembles screens from real components, even from a written description with Gemini.',
-      es: 'Confidentally UI es un design system vivo que lee el código de la propia app: 139 piezas documentadas y 481 ejemplos en vivo, un buscador que entiende español, scripts de auditoría que avisan desvíos y un Builder que arma pantallas con los componentes reales, incluso a partir de una descripción con Gemini.', links: ['confidentally-ui'] },
+    { id: 'ds', re: /(design system|storybook|builder|componente|component|token|confidentally ui|sistema de dise|handoff|hand-off)/i,
+      en: 'Confidentally UI is the design system Julián took from Figma to code: the tokens and components designed in Figma went through Claude Code into React and Storybook, so developers take each piece straight from there. It documents 139 pieces with 481 live examples, flags when the code drifts, and has a Builder: you describe a screen in words and the AI assembles it with the system’s real components.',
+      es: 'Confidentally UI es el design system que Julián llevó de Figma al código: los tokens y componentes diseñados en Figma pasaron con Claude Code a React y a Storybook, y los devs toman cada pieza directamente de ahí. Documenta 139 piezas con 481 ejemplos en vivo, avisa cuando el código se desvía y tiene un Builder: describís una pantalla con palabras y la IA la arma con los componentes reales del sistema.', links: ['confidentally-ui'] },
     { id: 'dental', re: /(dental|confidentally|cl[ií]nica|clinic|odont|\bnda\b|health|salud|m[eé]dic|anomal)/i,
       en: 'Confidentally is a dental practice platform Julián redesigned in 2026, under NDA. He audited the product (44 anomalies logged), redesigned it from the front desk to the dental chair, and rebuilt it as a working prototype on mock data: 32 screens you can click in the browser. The case study asks for a password; he shares it on request.',
       es: 'Confidentally es una plataforma para clínicas dentales que Julián rediseñó en 2026, bajo NDA. Auditó el producto (44 anomalías registradas), lo rediseñó de la recepción al sillón y lo reconstruyó como prototipo funcional con datos de prueba: 32 pantallas que se pueden recorrer en el navegador. El caso pide contraseña; la comparte si se la pedís.', links: ['confidentally', 'contact'] },
@@ -53,15 +53,21 @@
     { id: 'mp', re: /(mercado|meli|\bplay\b|streaming|challenge)/i,
       en: 'Mercado Play is a UX/UI challenge for Mercado Libre’s free streaming service. Julián delivered it as a Figma file, now on version 2.0, with its own cover system built from a selected Alert Dialog, the product name in Mercado Libre yellow and multiplayer cursors.',
       es: 'Mercado Play es un challenge de UX/UI para el streaming gratuito de Mercado Libre. Julián lo entregó como un archivo de Figma, ya en su versión 2.0, con un sistema de portada armado con un Alert Dialog seleccionado, el nombre en el amarillo de Mercado Libre y cursores multiplayer.', links: ['mercado-play'] },
-    { id: 'ai', re: /(\bai\b|\bia\b|claude|cursor|gemini|midjourney|artificial|prompt|llm|gpt)/i,
-      en: 'AI is part of how Julián works: he uses Claude and Cursor to build functional web-app prototypes, and Midjourney and Freepik Spaces to explore visual directions. That way a small team can test more ideas with real users before committing to one. Confidentally and GRILL were both built this way.',
-      es: 'La IA es parte de cómo trabaja Julián: usa Claude y Cursor para hacer prototipos web funcionales, y Midjourney y Freepik Spaces para explorar direcciones visuales. Así un equipo chico puede probar más ideas con usuarios reales antes de elegir una. Confidentally y GRILL se hicieron así.', links: ['confidentally', 'grill'] },
+    { id: 'team', re: /(\bdevs?\b|developer|desarrollador|programador|engineer|ingenier|stakeholder|\bceo\b|founder|fundador|direct(or|ivo)|management|gerencia|equipo|team|colabor|cross.?functional|lider|lead(er|s)?\b|present)/i,
+      en: 'Julián works side by side with developers: he checks technical feasibility early, and hands off components that already exist in code, in Storybook. He presents the work to stakeholders and CEOs and turns their feedback into decisions, and he has led design and creative teams at Batech, Icarus and Vieja Cubana, where he was co-founder and CEO himself.',
+      es: 'Julián trabaja codo a codo con los devs: revisa la factibilidad técnica desde el principio y entrega componentes que ya existen en código, en Storybook. Presenta el trabajo a stakeholders y CEOs y convierte su feedback en decisiones, y lideró equipos de diseño y creativos en Batech, Icarus y Vieja Cubana, donde él mismo fue cofundador y CEO.', links: ['experience', 'confidentally-ui'] },
+    { id: 'research', re: /(research|investigaci|entrevista|interview|usabilidad|usability|user test|testeo|\btests?\b|a\/b|analytics|m[eé]tricas|kpi|validat|valid[aá])/i,
+      en: 'Every project starts with people: Julián plans and runs user interviews and usability tests, and reads analytics and A/B tests to see what actually changed. At Batech that cut abandonment in key web and mobile flows; on the AI product he leads now, usability testing drives the pre-launch validation with the dev team.',
+      es: 'Cada proyecto arranca con personas: Julián planifica y hace entrevistas con usuarios y tests de usabilidad, y lee analytics y A/B tests para ver qué cambió de verdad. En Batech eso bajó el abandono en flujos clave de web y mobile; en el producto de IA que lidera hoy, los tests de usabilidad guían la validación previa al lanzamiento con el equipo de desarrollo.', links: ['process'] },
+    { id: 'ai', re: /(\bai\b|\bia\b|claude|cursor|gemini|midjourney|artificial|prompt|llm|gpt|vibe)/i,
+      en: 'AI is part of how Julián works. He uses Claude and Claude Code to turn designs into working web-app prototypes and to take a Figma design system into code, with Storybook for the developers; Gemini, Midjourney and Freepik Spaces help him explore. Confidentally, its design system and GRILL were all built this way.',
+      es: 'La IA es parte de cómo trabaja Julián. Usa Claude y Claude Code para convertir diseños en prototipos web funcionales y para llevar un design system de Figma al código, con Storybook para los devs; Gemini, Midjourney y Freepik Spaces lo ayudan a explorar. Confidentally, su design system y GRILL se hicieron así.', links: ['confidentally-ui', 'grill'] },
     { id: 'process', re: /(process|proceso|method|m[eé]todo|how does he work|c[oó]mo trabaja|research|metodolog|workflow|flujo de trabajo)/i,
-      en: 'His process has five stages: research (interviews, tests, analytics and an audit), structure (information architecture, flows and journeys), design (high-fidelity UI on a design system), prototype (working prototypes built with AI) and validate & ship (usability and A/B tests, KPIs and handoff).',
-      es: 'Su proceso tiene cinco etapas: research (entrevistas, tests, analytics y auditoría), estructura (arquitectura de información, flujos y journeys), diseño (UI de alta fidelidad sobre un design system), prototipo (prototipos funcionales hechos con IA) y validar y lanzar (tests de usabilidad y A/B, KPIs y handoff).', links: ['process'] },
+      en: 'His process has five stages: research (user interviews, usability tests, analytics and an audit), structure (information architecture, flows and journeys), design (high-fidelity UI on a design system in Figma), prototype (working prototypes built with Claude Code) and validate & ship (usability and A/B tests, KPIs, and a handoff to developers through Storybook).',
+      es: 'Su proceso tiene cinco etapas: research (entrevistas con usuarios, tests de usabilidad, analytics y auditoría), estructura (arquitectura de información, flujos y journeys), diseño (UI de alta fidelidad sobre un design system en Figma), prototipo (prototipos funcionales hechos con Claude Code) y validar y lanzar (tests de usabilidad y A/B, KPIs y handoff a desarrollo a través de Storybook).', links: ['process'] },
     { id: 'tools', re: /(tools|herramient|figma|software|stack|programs|programas)/i,
-      en: 'His toolkit: Figma, Storybook, Claude, Cursor, Gemini, Midjourney, Freepik Spaces, Photoshop, Illustrator and InDesign.',
-      es: 'Sus herramientas: Figma, Storybook, Claude, Cursor, Gemini, Midjourney, Freepik Spaces, Photoshop, Illustrator e InDesign.', links: ['process'] },
+      en: 'His toolkit: Figma, Claude, Claude Code, Storybook, Gemini, Midjourney, Freepik Spaces, Photoshop, Illustrator and InDesign.',
+      es: 'Sus herramientas: Figma, Claude, Claude Code, Storybook, Gemini, Midjourney, Freepik Spaces, Photoshop, Illustrator e InDesign.', links: ['process'] },
     { id: 'hire', re: /(availab|disponib|hire|contrat|freelance|remote|remoto|\bjobs?\b|\brol(es)?\b|\broles?\b|open to|busca|looking|salary|sueldo|\brates?\b|tarifa)/i,
       en: 'Yes: Julián is open to senior and lead product design roles, remote, and to freelance projects. The fastest way to reach him is email.',
       es: 'Sí: Julián está disponible para roles senior y lead de diseño de producto, en remoto, y para proyectos freelance. La forma más rápida de contactarlo es por mail.', links: ['contact', 'cv'] },
@@ -89,8 +95,8 @@
       en: 'There are five case studies: Batech AI Platform, Confidentally (under NDA), Confidentally UI, GRILL Empresas and Mercado Play. Which one should I tell you about?',
       es: 'Hay cinco casos: Batech AI Platform, Confidentally (bajo NDA), Confidentally UI, GRILL Empresas y Mercado Play. ¿De cuál te cuento?', links: ['work'] },
     { id: 'about', re: /(who|quién|quien|about him|sobre él|sobre el|perfil|profile|summary|resum|what does he do|qué hace|que hace|present)/i,
-      en: 'Julián Gerardi is a Senior Product Designer and Lead UX/UI designer from Mercedes, Buenos Aires. For 8+ years he has designed SaaS products end to end for teams in the US, Mexico, Ireland and Argentina: research, flows, design systems and high-fidelity UI, with an AI-assisted workflow that turns ideas into working prototypes.',
-      es: 'Julián Gerardi es Senior Product Designer y Lead UX/UI de Mercedes, Buenos Aires. Hace más de 8 años diseña productos SaaS de punta a punta para equipos de EE. UU., México, Irlanda y Argentina: research, flujos, design systems y UI de alta fidelidad, con un flujo asistido por IA que convierte ideas en prototipos funcionales.', links: ['work', 'cv'] },
+      en: 'Julián Gerardi is a Senior Product Designer and Lead UX/UI designer from Mercedes, Buenos Aires. For 8+ years he has designed SaaS products, brands and visual systems for teams in the US, Mexico, Ireland and Argentina: user research, flows, design systems and high-fidelity UI, working with developers, stakeholders and CEOs, and using Claude Code to turn ideas into working prototypes.',
+      es: 'Julián Gerardi es Senior Product Designer y Lead UX/UI de Mercedes, Buenos Aires. Hace más de 8 años diseña productos SaaS, marcas y sistemas visuales para equipos de EE. UU., México, Irlanda y Argentina: research con usuarios, flujos, design systems y UI de alta fidelidad, trabajando con devs, stakeholders y CEOs, y con Claude Code para convertir ideas en prototipos funcionales.', links: ['work', 'cv'] },
     { id: 'greet', re: /\b(hola|hi|hello|hey|buenas|buen día|good (morning|afternoon))\b/i,
       en: 'Hi! I can tell you about Julián’s projects, how he works, his experience or his availability. What would you like to know?',
       es: '¡Hola! Te puedo contar sobre los proyectos de Julián, cómo trabaja, su experiencia o su disponibilidad. ¿Qué te gustaría saber?', links: ['work'] }
@@ -152,12 +158,6 @@
     if (wrap.childNodes.length) b.appendChild(wrap);
     scrollLog();
   }
-  function note(b, text) {
-    var n = document.createElement('span');
-    n.className = 'msg__note';
-    n.textContent = text;
-    b.appendChild(n);
-  }
 
   /* ---------- The website as the knowledge base ---------- */
   var PAGES = [
@@ -169,7 +169,7 @@
     { file: 'work/mercado-play.html', en: 'Mercado Play', es: 'Mercado Play' }
   ];
   var HOME = [['#process', 'Process', 'Proceso'], ['#experience', 'Experience', 'Experiencia'], ['#about', 'About', 'Sobre mí'], ['#contact', 'Contact', 'Contacto']];
-  var UNIT = 'p, li, figcaption, .grid-cards > div, .numbers > div, .xp__item, .stat';
+  var UNIT = 'p, li, figcaption, .grid-cards > div, .numbers > div, .xp__item, .fact';
   var units = null;
   var loading = null;
 
@@ -202,7 +202,7 @@
         var sec = doc.querySelector(h[0]);
         if (sec) collect(sec, list, { href: href + h[0], page: pg, part: { en: h[1], es: h[2] }, h2: sec.querySelector('h2') });
       });
-      var stats = doc.querySelector('.stats');
+      var stats = doc.querySelector('.statement');
       if (stats) collect(stats, list, { href: href, page: pg, part: { en: 'Highlights', es: 'Datos' }, h2: null });
     } else {
       var headEl = doc.querySelector('.case-head');
@@ -289,9 +289,9 @@
     if (!best || bestScore < 2.6) return null;
     var v = view(best, l);
     var text = v.body;
-    if (v.heading && text.indexOf(v.heading) === -1 && !best.node.matches('.xp__item, .grid-cards > div, .numbers > div, .stat')) text = v.heading + ' ' + text;
+    if (v.heading && text.indexOf(v.heading) === -1 && !best.node.matches('.xp__item, .grid-cards > div, .numbers > div, .fact')) text = v.heading + ' ' + text;
     if (text.length > 420) text = text.slice(0, 417).replace(/\s+\S*$/, '') + '…';
-    return { text: text, page: best.page[l], part: v.part, link: { en: 'See it on the site', es: 'Verlo en la web', href: best.href } };
+    return { text: text, link: { en: best.page.en + ' · ' + (v.part || 'More'), es: best.page.es + ' · ' + (v.part || 'Más'), href: best.href } };
   }
 
   /* ---------- Conversation ---------- */
@@ -301,7 +301,7 @@
     sendBtn.disabled = false;
     scrollLog();
   }
-  var FIXED = ['about', 'hire', 'contact', 'cv', 'langs', 'edu', 'awards', 'where', 'tools', 'ai', 'process', 'xp', 'greet'];
+  var FIXED = ['about', 'hire', 'contact', 'cv', 'langs', 'edu', 'awards', 'where', 'tools', 'ai', 'team', 'research', 'process', 'xp', 'greet'];
   function answer(q, b) {
     typing(b);
     var started = Date.now();
@@ -313,7 +313,6 @@
         if (found) {
           b.textContent = found.text;
           addLinks(b, [found.link].concat(intent ? intent.links.slice(0, 1) : []));
-          note(b, say('From this site: ', 'De esta web: ') + found.page + ' › ' + found.part);
         } else if (intent) {
           b.textContent = intent[lang()];
           addLinks(b, intent.links);
@@ -337,8 +336,8 @@
 
   /* ---------- Chips and welcome ---------- */
   var CHIPS = {
-    en: ['Who is Julián?', 'Tell me about Batech', 'How does he use AI?', 'Is he available?', 'Download CV'],
-    es: ['¿Quién es Julián?', 'Contame de Batech', '¿Cómo usa la IA?', '¿Está disponible?', 'Descargar CV']
+    en: ['Who is Julián?', 'How does he work with devs?', 'How does he use AI?', 'Tell me about Batech', 'Is he available?', 'Download CV'],
+    es: ['¿Quién es Julián?', '¿Cómo trabaja con los devs?', '¿Cómo usa la IA?', 'Contame de Batech', '¿Está disponible?', 'Descargar CV']
   };
   function renderChips() {
     chipsEl.textContent = '';
@@ -353,8 +352,8 @@
   var welcome = null;
   function renderWelcome() {
     if (!welcome) welcome = bubble('bot');
-    welcome.textContent = say('Hi! I answer with what’s on this website: projects, process, experience and availability. What would you like to know?',
-      '¡Hola! Respondo con lo que hay en esta web: proyectos, proceso, experiencia y disponibilidad. ¿Qué te gustaría saber?');
+    welcome.textContent = say('Hi! I’m Julián’s assistant. Ask me about his projects, how he works with developers and stakeholders, his tools or his availability.',
+      '¡Hola! Soy el asistente de Julián. Preguntame por sus proyectos, cómo trabaja con devs y stakeholders, sus herramientas o su disponibilidad.');
   }
 
   /* ---------- Open / close ---------- */

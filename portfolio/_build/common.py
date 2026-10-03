@@ -3,12 +3,10 @@
 Text is bilingual: T(en, es) writes both versions and the page shows the one
 that matches <html data-lang>. The toggle in the nav switches it.
 """
-from demos import demo_html
+from mockups import browser, iphone, notif, brand_scene, far_browser, FAR_PHONE, ICO
 
 FONTS = "https://fonts.googleapis.com/css2?family=Geist:wght@300..800&amp;family=Geist+Mono:wght@400..600&amp;display=swap"
 LENIS = "https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"
-ICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0a0a'/%3E"
-        "%3Cpath d='M7 9.5h18L16 25z' fill='%23fff'/%3E%3C/svg%3E")
 MARK = '<svg class="brand__tri" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 4.5h19L12 21z"/></svg>'
 EMAIL = "juliangerardi266@gmail.com"
 LINKEDIN = "https://www.linkedin.com/in/julian-gerardi"
@@ -37,12 +35,15 @@ def head(title_en, title_es, desc_en, desc_es, p="", noindex=False, extra_script
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title_en}</title>
 <meta name="description" content="{desc_en}" data-es="{desc_es}">{robots}
-<link rel="icon" href="{ICON}">
+<link rel="icon" href="{p}assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="{p}assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="{p}assets/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{FONTS}">
 <link rel="stylesheet" href="{p}assets/site.css">
-<script>(function(){{var d=document.documentElement;d.classList.add('js');try{{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);var l=localStorage.getItem('jg-lang');if(!l)l=(navigator.language||'').toLowerCase().indexOf('es')===0?'es':'en';d.setAttribute('data-lang',l);d.lang=l;}}catch(e){{}}}})();</script>
+<script>(function(){{var d=document.documentElement;d.classList.add('js');d.classList.add(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches?'no-motion':'motion');try{{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);var l=localStorage.getItem('jg-lang');if(!l)l=(navigator.language||'').toLowerCase().indexOf('es')===0?'es':'en';d.setAttribute('data-lang',l);d.lang=l;}}catch(e){{}}}})();</script>
 <script src="{LENIS}" defer></script>
 {extra_scripts}</head>
 <body>
@@ -134,7 +135,7 @@ def agent(p=""):
   <section class="agent__panel" id="agent-panel" hidden aria-label="Assistant">
     <header class="agent__head">
       <span class="agent__ring agent__ring--sm" aria-hidden="true"><span class="agent__orb">{MARK}</span></span>
-      <div><b>{T("Julián’s assistant", "Asistente de Julián")}</b><span>{T("Answers with what’s on this website", "Responde con lo que hay en esta web")}</span></div>
+      <div><b>{T("Julián’s assistant", "Asistente de Julián")}</b></div>
       <button class="icon-btn agent__close" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
     </header>
     <div class="agent__log" data-agent-log aria-live="polite"></div>
@@ -179,7 +180,6 @@ def footer(p=""):
     {grid}
   </div>
   <div class="wrap footer__bottom">
-    <span class="footer__status"><i aria-hidden="true"></i>{T("Open to remote roles and freelance", "Disponible para roles remotos y freelance")}</span>
     <span class="footer__copy">© <span data-year>2026</span> Julián Gerardi</span>
     <div class="footer__switch" role="group" aria-label="Theme">
       <button type="button" data-set-theme="system" aria-label="System"><svg aria-hidden="true"><use href="#i-monitor"/></svg></button>
@@ -218,8 +218,8 @@ def img(p, name, w, h, alt_en="", alt_es="", lazy=True, zoom=False, style=""):
 
 
 def screen(p, name, w, h, alt_en="", alt_es="", lazy=True, zoom=False):
-    """A screenshot plus its micro-animation (see demos.py)."""
-    return f'<span class="scr">{img(p, name, w, h, alt_en, alt_es, lazy, zoom)}{demo_html(name, w, h, T)}</span>'
+    """A screenshot, whole."""
+    return f'<span class="scr">{img(p, name, w, h, alt_en, alt_es, lazy, zoom)}</span>'
 
 
 def mock(p, name, w, h, title, dark=False, alt_en="", alt_es="", lazy=True, zoom=False, style=""):
@@ -259,8 +259,8 @@ def cover_phones(p, kind, names, lazy=False):
     return cover(kind, "".join(phone(p, n, lazy=lazy, style=f"width:{pw}%") for n in names))
 
 
-def cover_mp(mod=""):
-    return cover("mp", """<div class="mp-slide">
+def mp_slide():
+    return """<div class="mp-slide">
   <div class="mp__stars"><i></i><i></i><i></i></div>
   <div class="mp__year">2026</div>
   <div class="mp__dialog"><div class="mp__dialog-label"><svg><use href="#i-component"/></svg>Alert Dialog</div><div class="mp__dialog-box"><i></i><i></i><i></i><i></i>Challenge UX-UI</div></div>
@@ -268,7 +268,11 @@ def cover_mp(mod=""):
   <div class="mp-cursor mp-cursor--a"><svg><use href="#i-cursor"/></svg><span>Julián Gerardi</span></div>
   <div class="mp-cursor mp-cursor--b"><svg><use href="#i-cursor"/></svg><span>Devs</span></div>
   <div class="mp__foot"><span>Julián Gerardi</span><span>Version 2.0</span></div>
-</div>""", mod)
+</div>"""
+
+
+def cover_mp(mod=""):
+    return cover("mp", mp_slide(), mod)
 
 
 # ---------- Presentation tiles: one whole screen, device or piece each ----------
@@ -439,3 +443,16 @@ def prose(*pairs):
 
 def bullets(*items):
     return '<ul class="bullets">' + "".join(f"<li><b>{T(be, bs)}</b> {T(te, ts)}</li>" for be, bs, te, ts in items) + "</ul>"
+
+
+# ---------- Scroll storytelling (see scenes.py) ----------
+def scene_head(label, h_en, h_es, p_en="", p_es="", sid=""):
+    i = f' id="{sid}"' if sid else ""
+    pp = f'<p data-reveal>{T(p_en, p_es)}</p>' if p_en else ""
+    return (f'  <header class="wrap section-head scene-head"{i}><div class="label" data-reveal>{label}</div>'
+            f'<h2 class="lines">{T(h_en, h_es)}</h2>{pp}</header>\n')
+
+
+def big_words(en, es, sub_en="", sub_es=""):
+    sub = f'<p data-reveal>{T(sub_en, sub_es)}</p>' if sub_en else ""
+    return f'  <section class="wrap big-words"><p class="words" data-words>{T(en, es)}</p>{sub}</section>\n'

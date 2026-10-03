@@ -10,24 +10,25 @@ python3 -m http.server 8090 -d portfolio   # http://localhost:8090
 
 ```
 portfolio/
-  index.html                  home: intro, banner, métricas, marcas, trabajos, proceso, experiencia, about, contacto
+  index.html                  home: intro, banner, marca y sistemas visuales, trabajos, proceso, experiencia, about, contacto
   work/batech.html            Batech AI Platform (Figma: Portfolio › Batech)
   work/confidentally.html     caso con NDA (bloqueado con contraseña)
   work/confidentally-ui.html  design system y Builder con IA
   work/grill.html             GRILL Empresas (app de empleados + panel de cocina)
   work/mercado-play.html      challenge de Mercado Play: problema, benchmarking, arquetipos, solución, baja y alta fidelidad, UI kit
   assets/site.css             tokens (claro y oscuro), layout, trabajos, casos, intro, agente, cursor
-  assets/site.js              idioma, intro, scroll suave, reveals, marquesina, trabajos, cursor, tema, lightbox, NDA, CV
+  assets/site.js              idioma, intro, scroll suave, reveals, escenas de scroll, trabajos, cursor, tema, lightbox, NDA, CV
   assets/hero.js              movimiento del degradé del inicio (solo en la home)
-  assets/agent.js             asistente que responde con el contenido del sitio
+  assets/agent.js             asistente que responde con lo del CV y el contenido del sitio
+  assets/favicon.svg          el ícono: el globo negro con el triángulo blanco (más favicon-32.png y apple-touch-icon.png)
   assets/Julian_Gerardi_CV.pdf  CV para descargar
   assets/img/                 capturas en WebP (b- Batech, d- dental, ds- design system, g- GRILL, mp- Mercado Play)
-  _build/                     scripts que generan los HTML (demos.py: microanimaciones de cada pantalla)
+  _build/                     scripts que generan los HTML (mockups.py: Safari, iPhone y notificaciones; scenes.py: escenas de scroll; builder_ui.py: pipeline y Builder de Confidentally UI)
 ```
 
 ## Marca y tamaño
 
-- La marca es un triángulo invertido (aparece suave al cargar y baja apenas al pasar el mouse) con "Julián Gerardi" en Geist Mono. El favicon es el mismo triángulo en blanco.
+- La marca es un triángulo invertido (aparece suave al cargar y baja apenas al pasar el mouse; en el pie salta y gira) con "Julián Gerardi" en Geist Mono. El favicon es el globo del asistente: negro, con el triángulo en blanco.
 - Todo el diseño está a la escala de ver la página al 90%: el `html` tiene `font-size: 90%` y las medidas en px del CSS están multiplicadas por 0,9.
 
 ## Flujo con zoom (Batech)
@@ -44,8 +45,17 @@ Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span 
 - **Scroll suave** con [Lenis](https://github.com/darkroomengineering/lenis) (CDN). Los bloques con `data-reveal` suben al entrar, los títulos `.lines` aparecen palabra por palabra detrás de una máscara, y los números con `data-count` cuentan.
 - **Portadas de los casos**: parallax suave del mockup.
 - **Transición entre páginas**: una cortina cubre la pantalla al salir y se levanta al entrar.
-- **Inicio**: una tarjeta clara con el mismo brillo verde y violeta del final de la página, que se mueve solo y sigue el puntero. Las palabras subrayadas de la frase muestran el proyecto al que apuntan (design systems → Confidentally UI, IA → Batech, prototipos → Confidentally, productos de punta a punta → GRILL, que la gente usa → Mercado Play) y llevan a su caso. Se configuran en `HOT` de `_build/index_page.py`.
-- **Microanimaciones**: cada pantalla responde como el producto: un pulso en el control usado, un toast que sube y se asienta, un campo que se escribe solo o una fila que se selecciona, con los colores de cada marca (`.demo--batech`, `--dental`, `--ds`, `--grill`, `--mp`). Sin cursores falsos. Los datos están en `_build/demos.py`. Solo se animan mientras están en pantalla.
+- **Inicio**: una tarjeta clara con el mismo brillo verde y violeta del final de la página, que se mueve solo y sigue el puntero. Las palabras clave de la frase (sin subrayado hasta pasar el mouse) muestran el proyecto al que apuntan en su escena de marca: ventana de Safari sobre un degradé, el monitor con el diagrama Figma → Claude Code → Storybook, o iPhones inclinados con notificaciones flotando (design systems → Confidentally UI, IA → Batech, prototipos → Confidentally, productos de punta a punta → GRILL, que la gente usa → Mercado Play). Se configuran en `HOT` de `_build/index_page.py` y `brand_scene()` de `_build/mockups.py`.
+- **Marca y sistemas visuales**: debajo del banner, un párrafo cuyas palabras se encienden a medida que se scrollea, con los años, los cuatro países con sus banderas y las áreas de práctica.
+- **Escenas de scroll (los casos)**, al estilo de las páginas de producto de Apple. El JS le da a cada escena su avance (`--p`, de 0 a 1) y cada una lo usa a su manera:
+  - `rise`: la portada crece hasta ocupar la pantalla.
+  - `story`: un dispositivo queda fijo y cambia de pantalla a medida que pasan los pasos (Batech: el formulario de nuevo análisis se completa solo, reconstruido en HTML desde el Figma).
+  - `rail`: una fila de pantallas que se mueve de costado con el scroll.
+  - `fan`: los celulares se abren en abanico.
+  - `wipe`: la baja fidelidad pasa a alta fidelidad bajo una línea (Mercado Play).
+  - `scrub`: una página larga se desplaza dentro de su ventana.
+  - `pipe` y `builder` (Confidentally UI): el diagrama Figma → Claude Code → Storybook → devs se enciende paso a paso, y el Builder escribe el pedido, la IA elige piezas del catálogo y la pantalla se arma, hasta mostrar el código.
+  En el celular las escenas anchas se desplazan para seguir cada paso; con "reducir movimiento" todas muestran su estado final.
 - Con "reducir movimiento" activado en el sistema, todo queda quieto.
 
 ## Selected work
@@ -61,7 +71,7 @@ Cada caso tiene una barra con breadcrumbs (Inicio / Trabajos / Proyecto), el nú
 ## CV y asistente
 
 - El CV se descarga desde el menú, About, Contacto y el pie. Dentro del visor de Artifacts de Claude pasa por la ventana de descarga del visor.
-- El asistente ("Preguntame", el globo negro con el triángulo) no usa ninguna IA externa: responde con el contenido de este sitio. Las preguntas generales (quién es, disponibilidad, contacto, CV, idiomas, formación) tienen respuestas escritas en `assets/agent.js` (`INTENTS`); el resto lo busca en el texto de las páginas y responde con el párrafo que corresponde, con un link a esa sección. El contenido del caso con NDA no se usa.
+- El asistente ("Preguntame", el globo negro con el triángulo, con sombra) no usa ninguna IA externa. Las preguntas generales (quién es, cómo trabaja con devs, stakeholders y CEOs, research y tests de usabilidad, Claude Code y el design system llevado de Figma a Storybook, disponibilidad, contacto, CV, idiomas, formación) tienen respuestas escritas en `assets/agent.js` (`INTENTS`), basadas en el CV; el resto lo busca en el texto de las páginas y responde con el párrafo que corresponde, con un link a esa sección. El contenido del caso con NDA no se usa. Dentro del panel vuelve el cursor del sistema.
 
 ## Editar
 
@@ -79,7 +89,7 @@ Los colores de marca de cada portada están en `assets/site.css` (`--batech-*`, 
 
 ## Pie
 
-Como el de vercel.com: columnas de links (trabajos, sitio, proyectos en vivo, contacto), el estado de disponibilidad y un selector de tema (sistema, claro, oscuro).
+Como el de vercel.com: columnas de links (trabajos, sitio, proyectos en vivo, contacto) y un selector de tema (sistema, claro, oscuro).
 
 ## Contraseña del caso con NDA
 

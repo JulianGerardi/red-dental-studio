@@ -1,4 +1,6 @@
 from common import *
+from scenes import rise, story, wipe, scrub, dev_piece
+from mockups import ICO
 import os
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
@@ -109,7 +111,7 @@ b = case_head(
     [(T("Role", "Rol"), "UX/UI Designer"), (T("Company", "Empresa"), "Mercado Libre · Challenge"), (T("Year", "Año"), "2026"),
      (T("Platform", "Plataforma"), "Web · desktop"), (T("Scope", "Alcance"), T("Research, benchmarking, UX, UI, prototype", "Research, benchmarking, UX, UI, prototipo")), (T("Tools", "Herramientas"), "Figma")],
 )
-b += f'  <section class="wrap case-cover" data-parallax>{cover_mp()}</section>\n'
+b += rise(mp_slide(), "mp")
 b += chapter(T("The problem", "El problema"), h2("Usage dropped 4% in a month.", "El uso cayó un 4% en un mes.") + prose(
     ("In the last month, how often people used the platform fell 4% compared with the month before. To understand why, the User Research team surveyed users and found clear patterns in their answers.",
      "En el último mes, la frecuencia de uso de la plataforma cayó un 4% respecto del mes anterior. Para entender por qué, el equipo de User Research encuestó a las personas usuarias y encontró patrones claros en sus respuestas.")) +
@@ -117,31 +119,57 @@ b += chapter(T("The problem", "El problema"), h2("Usage dropped 4% in a month.",
 b += chapter("Benchmarking", h2("Five platforms, eight dimensions.", "Cinco plataformas, ocho dimensiones.") + prose(
     ("To understand where Mercado Play stands in streaming, I compared it with Netflix, Prime Video, Disney+ and Pluto TV across business model, onboarding, navigation, content discovery and ecosystem, looking for similarities, differences and room to improve its value proposition.",
      "Para entender dónde se ubica Mercado Play en el streaming, lo comparé con Netflix, Prime Video, Disney+ y Pluto TV en modelo de negocio, onboarding, navegación, descubrimiento de contenido y ecosistema, buscando similitudes, diferencias y oportunidades para mejorar su propuesta de valor.")) +
-    bench + f'      <p class="pull" data-reveal>{T("Mercado Play wins on access, a Mercado Libre account is all it takes, and loses on discovery.", "Mercado Play gana en acceso, alcanza con la cuenta de Mercado Libre, y pierde en descubrimiento.")}</p>\n', "benchmarking")
+    bench, "benchmarking")
+b += big_words("Mercado Play wins on access, a Mercado Libre account is all it takes, and loses on discovery.",
+               "Mercado Play gana en acceso, alcanza con la cuenta de Mercado Libre, y pierde en descubrimiento.")
 b += chapter(T("User archetypes", "Arquetipos de usuario"), h2("People don’t come looking for content. They find it.", "La gente no llega buscando contenido. Lo encuentra.") + prose(
     ("Mercado Play users don’t necessarily arrive looking for something to watch: they discover it while using the rest of Mercado Libre. That turns the platform into an opportunity for engagement and retention inside the main product.",
      "Las personas usuarias de Mercado Play no necesariamente llegan buscando contenido: lo descubren mientras usan el resto de Mercado Libre. Eso convierte a la plataforma en una oportunidad de engagement y retención dentro del producto principal.")) + personas, "archetypes")
-b += chapter(T("The solution", "La solución"), h2("Recommendations between people, rewarded.", "Recomendaciones entre personas, con recompensa.") +
-    f'      <p class="pull" data-reveal>{T("Recommendations between people are one of the most trusted ways to discover content, especially when the film is one click away.", "Las recomendaciones entre personas son una de las formas más confiables de descubrir contenido, sobre todo si la peli está a un clic.")}</p>\n' + prose(
+b += chapter(T("The solution", "La solución"), h2("Recommendations between people, rewarded.", "Recomendaciones entre personas, con recompensa.") + prose(
     ("The proposal adds social recommendations to Mercado Play. People recommend the films and shows they liked and share them with anyone through a link. If someone watches the whole title from that recommendation, the person who shared it earns points to use on benefits across Mercado Libre.",
-     "La propuesta suma recomendaciones sociales a Mercado Play. La gente recomienda las pelis y series que le gustaron y las comparte con quien quiera mediante un enlace. Si alguien ve el contenido completo a partir de esa recomendación, quien la compartió suma puntos para usar en beneficios dentro de Mercado Libre."),
-    ("Discovery comes from real people, and taking part is rewarded.", "El descubrimiento viene de personas reales, y participar tiene recompensa.")) + steps, "solution")
+     "La propuesta suma recomendaciones sociales a Mercado Play. La gente recomienda las pelis y series que le gustaron y las comparte con quien quiera mediante un enlace. Si alguien ve el contenido completo a partir de esa recomendación, quien la compartió suma puntos para usar en beneficios dentro de Mercado Libre.")), "solution")
+b += big_words("Recommendations between people are one of the most trusted ways to discover content, especially when the film is one click away.",
+               "Las recomendaciones entre personas son una de las formas más confiables de descubrir contenido, sobre todo si la peli está a un clic.")
+GIFT = ICO["gift"]
+notif = ('<div class="mpn"><div class="mpn__head"><b>Notificaciones</b><span>×</span></div>'
+         + "".join(f'<div class="mpn__item">{GIFT}<div><b>¡Felicitaciones!</b><span>Guido vio la peli que le recomendaste</span><em><u>Sumaste 213 puntos</u> para Mercado Envíos</em></div></div>' for _ in range(3))
+         + '</div>')
+flow_steps = [("Save or share from any card", "Guardar o compartir desde cualquier card",
+               "Every film and show carries two actions, save and share, right on the card, so recommending takes one click.",
+               "Cada peli y serie lleva dos acciones, guardar y compartir, en la misma card, así recomendar lleva un clic."),
+              ("Send it to someone who trusts you", "Mandarla a alguien que confía en vos",
+               "A short modal: an email or a link, and a clear promise, points if the person watches it all.",
+               "Un modal corto: un mail o un enlace, y una promesa clara, puntos si la persona la ve completa."),
+              ("Sent", "Enviado",
+               "The recommendation lands with a friend, one click away from the film.",
+               "La recomendación le llega a un amigo, a un clic de la peli."),
+              ("Points when they watch it all", "Puntos cuando la ve completa",
+               "The bell tells you when a friend finished what you shared, and the points go to benefits such as Mercado Envíos.",
+               "La campana avisa cuando un amigo terminó lo que compartiste, y los puntos van a beneficios como Mercado Envíos.")]
+b += story(flow_steps, [([0], dev_piece(p, "mp-kit-card-saved", 244, 438, "Card saved to favourites", "Card guardada en favoritos", 1.25)),
+                        ([1], dev_piece(p, "mp-kit-modal-on", 350, 378, "Share modal with an email typed", "Modal para compartir con un mail", 1.25)),
+                        ([2], dev_piece(p, "mp-kit-sent", 350, 204, "Message sent", "Mensaje enviado", 1.3)),
+                        ([3], notif)], "mp", "Recommend and earn points")
 b += chapter(T("Low fidelity", "Baja fidelidad"), h2("Structure first, then colour.", "Primero la estructura, después el color.") + prose(
     ("The wireframes settle the hierarchy of the home and where the new actions live: favourite and share on every card, comments in place and a notifications panel for points. The same screen in high fidelity keeps every block where it was.",
      "Los wireframes definen la jerarquía de la home y dónde viven las acciones nuevas: favorito y compartir en cada card, comentarios en el lugar y un panel de notificaciones para los puntos. La misma pantalla en alta fidelidad mantiene cada bloque donde estaba.")) +
-    "      " + pages([("mp-lofi", 900, 2698, "Low-fidelity wireframe of the home with notifications", "Wireframe de baja fidelidad de la home con notificaciones", "Low fidelity", "Baja fidelidad"),
-                      ("mp-points", 1200, 3597, "High-fidelity home with the notifications panel showing points", "Home en alta fidelidad con el panel de notificaciones y los puntos", "High fidelity", "Alta fidelidad")], kind="mp-dark") + "\n", "lofi")
+    "", "lofi")
+b += wipe(p, ("mp-lofi", 900, 2698), ("mp-points", 1200, 3597), "play.mercadolibre.com", T("Low fidelity", "Baja fidelidad"), T("High fidelity", "Alta fidelidad"),
+          "Same blocks, same places.", "Mismos bloques, mismos lugares.")
 b += chapter(T("High fidelity", "Alta fidelidad"), h2("Every card can be saved, shared and talked about.", "Cada card se puede guardar, compartir y comentar.") +
     decision("A home built around what people recommend", "Una home armada alrededor de lo que recomienda la gente",
              f"<p>{T('“Top 10 films recommended by people” sits next to the usual rows. Each card carries two actions, save and share, and opens its comments in place.', '“Top 10 pelis recomendadas por la gente” convive con las filas de siempre. Cada card lleva dos acciones, guardar y compartir, y abre sus comentarios en el lugar.')}</p>",
-             scroll_mock("mp-home", 1200, 3570, "Mercado Play · Inicio", "Mercado Play home with recommendation rows", "Home de Mercado Play con filas de recomendaciones")) +
-    decision("Share, and see it pay off", "Compartir, y ver que suma",
+             "") +
+    "", "hifi")
+b += scrub(p, "mp-home", 1200, 3570, "play.mercadolibre.com", alt_en="Mercado Play home with recommendation rows", alt_es="Home de Mercado Play con filas de recomendaciones")
+b += chapter(T("Every state", "Cada estado"), h2("Share, and see it pay off.", "Compartir, y ver que suma.") +
+    decision("Saved and shared, in place", "Guardado y compartido, en el lugar",
              f"<p>{T('Sharing opens a short modal: an email or a link, and a clear promise, 100 points if the person watches it all. Saving confirms with a toast, and the bell tells you when a friend finished what you shared.', 'Compartir abre un modal corto: un mail o un enlace, y una promesa clara, 100 puntos si la persona la ve completa. Guardar confirma con un toast, y la campana avisa cuando un amigo terminó lo que compartiste.')}</p>",
              pages([("mp-fav", 1200, 3544, "Home with the saved-to-favourites toast", "Home con el toast de agregado a favoritos", "Saved to favourites", "Agregada a favoritos"),
                     ("mp-share", 1200, 3597, "Share modal over the home", "Modal para compartir sobre la home", "Share modal", "Modal para compartir")], kind="mp")) +
     decision("My favourites and my recommendations", "Mis favoritos y mis recomendados",
              f"<p>{T('A page of its own keeps what you saved and what you shared, so recommending becomes a habit instead of a WhatsApp chat with yourself.', 'Una página propia guarda lo que guardaste y lo que compartiste, así recomendar se vuelve un hábito y no un chat de WhatsApp con uno mismo.')}</p>",
-             fig(p, "mp-recos", 1200, 1538, "Mercado Play · Mis favoritos", "My favourites and my recommendations page", "Página de mis favoritos y mis recomendados", kind="mp", dark=True)), "hifi")
+             fig(p, "mp-recos", 1200, 1538, "Mercado Play · Mis favoritos", "My favourites and my recommendations page", "Página de mis favoritos y mis recomendados", kind="mp", dark=True)), "states")
 b += chapter("UI kit", h2("Small pieces, every state.", "Piezas chicas, todos los estados.") + prose(
     ("Cards, the share modal and comments were designed as components with their states: default, saved, active and sent.",
      "Las cards, el modal para compartir y los comentarios se diseñaron como componentes con sus estados: default, guardado, activo y enviado.")) +

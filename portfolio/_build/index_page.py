@@ -1,4 +1,5 @@
 from common import *
+from scenes import words
 import os
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
@@ -7,8 +8,8 @@ p = ""
 XP = [
     ("May 2025 — Now", "May 2025 — Hoy", "Lead UX/UI Designer", "Lead UX/UI Designer",
      "Confidential company · AI product, pre-launch · Miami, US", "Empresa confidencial · producto de IA, pre-lanzamiento · Miami, EE. UU.",
-     "End-to-end design of an AI-assisted product, from information architecture and journeys to a functional web-app prototype built with Figma and Claude. I run research and usability testing and lead the pre-launch validation with the development team.",
-     "Diseño de punta a punta de un producto asistido por IA, desde la arquitectura de información y los journeys hasta un prototipo web funcional hecho con Figma y Claude. Hago research y tests de usabilidad y lidero la validación previa al lanzamiento con el equipo de desarrollo."),
+     "End-to-end design of an AI-assisted product, from information architecture and journeys to a functional web-app prototype built with Figma and Claude Code. I run user interviews and usability tests, and lead the pre-launch validation with the development team.",
+     "Diseño de punta a punta de un producto asistido por IA, desde la arquitectura de información y los journeys hasta un prototipo web funcional hecho con Figma y Claude Code. Hago entrevistas con usuarios y tests de usabilidad, y lidero la validación previa al lanzamiento con el equipo de desarrollo."),
     ("Nov 2023 — Nov 2025", "Nov 2023 — Nov 2025", "Senior UX/UI Designer", "Senior UX/UI Designer",
      "Icarus Digital Marketing · Ireland · Remote", "Icarus Digital Marketing · Irlanda · Remoto",
      "Led a digital platform from idea to launch: research, usability testing, flows and a UI redesign focused on reducing abandonment. Managed the creative team; the refreshed identity drove a <b>20% rise in brand recognition</b>.",
@@ -41,21 +42,21 @@ xp = "".join(f"""      <li class="xp__item" data-reveal>
 """ for we, ws, re, rs, oe, os_, ne, ns in XP)
 
 STEPS = [
-    ("Research", "Research", "Interviews, usability tests and analytics, plus an audit of screens, components and the rules nobody wrote down.",
-     "Entrevistas, tests de usabilidad y analytics, más una auditoría de pantallas, componentes y las reglas que nadie escribió."),
+    ("Research", "Research", "User interviews, usability tests and analytics, plus an audit of screens, components and the rules nobody wrote down.",
+     "Entrevistas con usuarios, tests de usabilidad y analytics, más una auditoría de pantallas, componentes y las reglas que nadie escribió."),
     ("Structure", "Estructura", "Information architecture, user flows and journeys. Navigation is agreed before any pixel.",
      "Arquitectura de información, flujos y journeys. La navegación se acuerda antes que cualquier pixel."),
-    ("Design", "Diseño", "High-fidelity UI in Figma on a design system and component library shared by web and mobile.",
-     "UI de alta fidelidad en Figma sobre un design system y una librería de componentes compartida por web y mobile."),
-    ("Prototype", "Prototipo", "Functional web-app prototypes built with Claude and Cursor, so stakeholders test the real flow.",
-     "Prototipos web funcionales hechos con Claude y Cursor, para que se pruebe el flujo real."),
-    ("Validate &amp; ship", "Validar y lanzar", "Usability testing, A/B tests and KPIs, then handoff with developers on technical feasibility.",
-     "Tests de usabilidad, A/B testing y KPIs, y después el handoff con desarrollo sobre la factibilidad técnica."),
+    ("Design", "Diseño", "High-fidelity UI in Figma on a design system shared by web and mobile, reviewed with stakeholders as it grows.",
+     "UI de alta fidelidad en Figma sobre un design system compartido por web y mobile, revisado con stakeholders a medida que crece."),
+    ("Prototype", "Prototipo", "Working prototypes built with Claude Code, so stakeholders, the CEO and real users try the actual flow.",
+     "Prototipos funcionales hechos con Claude Code, para que stakeholders, el CEO y usuarios reales prueben el flujo de verdad."),
+    ("Validate &amp; ship", "Validar y lanzar", "Usability tests, A/B tests and KPIs, then a handoff with components that already live in code and in Storybook.",
+     "Tests de usabilidad, A/B testing y KPIs, y un handoff con componentes que ya viven en código y en Storybook."),
 ]
 steps = "".join(f"""      <li class="step" data-reveal style="--k:{i}"><span class="step__n">{i + 1:02d}</span><h3>{T(a, b)}</h3><p>{T(c, d)}</p></li>
 """ for i, (a, b, c, d) in enumerate(STEPS))
 
-tools = "".join(f'<span class="badge">{t}</span>' for t in ["Figma", "Claude", "Cursor", "Gemini", "Midjourney", "Freepik Spaces", "Storybook", "Photoshop", "Illustrator", "InDesign"])
+tools = "".join(f'<span class="badge">{t}</span>' for t in ["Figma", "Claude", "Claude Code", "Storybook", "Gemini", "Midjourney", "Freepik Spaces", "Photoshop", "Illustrator", "InDesign"])
 
 work = "".join([
     wl_item(p, 1, "work/batech.html", "Batech AI Platform", T("AI · Computer vision · Dashboard", "IA · Visión artificial · Dashboard"), "2022–26", tiles_batech(p),
@@ -104,7 +105,16 @@ def hot(key, text):
     return f'<a class="hot" href="{HOT[key][0]}" data-hot="{key}">{text}</a>'
 
 
-HOT_CARDS = "".join(f"""<div class="hot-card hot-card--{b}" data-card="{k}"><span class="hot-card__shot"><i></i><i></i><i></i><img src="assets/img/{im}.webp" alt="" width="560" height="350" loading="lazy" decoding="async"></span><span class="hot-card__meta"><b>{name}</b><span>{T(*sub)}</span><em>{yr}</em></span></div>""" for k, (href, im, name, sub, yr, b) in HOT.items())
+HOT_CARDS = "".join(f"""<div class="hot-card hot-card--{b}" data-card="{k}">{brand_scene(p, k, T)}<span class="hot-card__meta"><b>{name}</b><span>{T(*sub)}</span><em>{yr}</em></span></div>""" for k, (href, im, name, sub, yr, b) in HOT.items())
+
+FLAGS = {
+    "us": '<svg viewBox="0 0 21 14" aria-hidden="true"><rect width="21" height="14" fill="#fff"/>' + "".join(f'<rect y="{i * 14 / 13:.2f}" width="21" height="{14 / 13:.2f}" fill="#b22234"/>' for i in range(0, 13, 2)) + '<rect width="9.4" height="7.54" fill="#3c3b6e"/></svg>',
+    "mx": '<svg viewBox="0 0 21 14" aria-hidden="true"><rect width="7" height="14" fill="#006847"/><rect x="7" width="7" height="14" fill="#fff"/><rect x="14" width="7" height="14" fill="#ce1126"/><circle cx="10.5" cy="7" r="1.9" fill="#8c6a2f"/></svg>',
+    "ie": '<svg viewBox="0 0 21 14" aria-hidden="true"><rect width="7" height="14" fill="#169b62"/><rect x="7" width="7" height="14" fill="#fff"/><rect x="14" width="7" height="14" fill="#ff883e"/></svg>',
+    "ar": '<svg viewBox="0 0 21 14" aria-hidden="true"><rect width="21" height="14" fill="#74acdf"/><rect y="4.67" width="21" height="4.67" fill="#fff"/><circle cx="10.5" cy="7" r="1.6" fill="#f6b40e"/></svg>',
+}
+flags = "".join(f'<span class="flag">{FLAGS[k]}{T(en, es)}</span>' for k, en, es in [("us", "United States", "Estados Unidos"), ("mx", "Mexico", "México"), ("ie", "Ireland", "Irlanda"), ("ar", "Argentina", "Argentina")])
+practice = "".join(f'<span class="badge">{T(en, es)}</span>' for en, es in [("Brand identity", "Identidad de marca"), ("Visual systems", "Sistemas visuales"), ("Art direction", "Dirección de arte"), ("Product design", "Diseño de producto")])
 
 cv_attrs = f'href="{CV}" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv'
 
@@ -129,11 +139,15 @@ page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Se
     </div>
   </section>
 
-  <section class="wrap stats" aria-label="Highlights">
-    <div class="stat" data-reveal style="--k:0"><b data-count="8" data-suffix="+">8+</b><span>{T("years designing products and brands", "años diseñando productos y marcas")}</span></div>
-    <div class="stat" data-reveal style="--k:1"><b data-count="4">4</b><span>{T("countries: US, Mexico, Ireland, Argentina", "países: EE. UU., México, Irlanda, Argentina")}</span></div>
-    <div class="stat" data-reveal style="--k:2"><b data-count="5">5</b><span>{T("Latin American markets for Bahco", "mercados de Latinoamérica para Bahco")}</span></div>
-    <div class="stat" data-reveal style="--k:3"><b data-count="10" data-suffix="%">10%</b><span>{T("faster delivery leading Batech’s design team", "entregas más rápidas liderando el equipo de Batech")}</span></div>
+  <section class="wrap statement" aria-label="Brand and visual systems">
+    <div class="label" data-reveal>{T("Brand &amp; visual systems", "Marca y sistemas visuales")}</div>
+    {words("I design brand and visual systems that hold up in every format they have to live in. I learned it in advertising agencies in Argentina, building identities from scratch, and today I bring it to digital products.",
+           "Diseño sistemas de marca y visuales que se sostienen en cada formato en el que tienen que vivir. Lo aprendí en agencias de publicidad de Argentina, armando identidades desde cero, y hoy lo llevo a productos digitales.", "statement__text")}
+    <div class="statement__facts">
+      <div class="fact" data-reveal style="--k:0"><b data-count="8" data-suffix="+">8+</b><span>{T("years designing brands, visual systems and products", "años diseñando marcas, sistemas visuales y productos")}</span></div>
+      <div class="fact" data-reveal style="--k:1"><b data-count="4">4</b><span>{T("countries I’ve worked for, remote", "países para los que trabajé, en remoto")}</span><div class="flags">{flags}</div></div>
+      <div class="fact" data-reveal style="--k:2"><span class="mono muted">{T("PRACTICE", "PRÁCTICA")}</span><div class="fact__tags">{practice}</div></div>
+    </div>
   </section>
 
   <section class="work" id="work">
@@ -170,8 +184,10 @@ page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Se
                                    "Me formé como director de arte, así que me importa cómo se ve un producto. Años de SaaS me enseñaron que importa más cómo se comporta un martes cualquiera.")}</p>
       <p data-reveal>{T("I lead product design from research and information architecture to design systems, high-fidelity UI and interactive prototypes, and I measure the result with analytics and A/B testing.",
                        "Lidero el diseño de producto desde el research y la arquitectura de información hasta el design system, la UI de alta fidelidad y los prototipos interactivos, y mido el resultado con analytics y A/B testing.")}</p>
-      <p data-reveal>{T("My workflow runs through AI: Claude and Cursor to build functional prototypes, Midjourney and Freepik Spaces to explore visual directions. A small team can test more ideas with real users before committing to one.",
-                       "Mi flujo de trabajo pasa por la IA: Claude y Cursor para prototipos funcionales, Midjourney y Freepik Spaces para explorar direcciones visuales. Un equipo chico puede probar más ideas con usuarios reales antes de elegir una.")}</p>
+      <p data-reveal>{T("I work side by side with developers from the first sketch, present the work to stakeholders and CEOs, and run user interviews and usability tests so decisions rest on what people actually do.",
+                       "Trabajo codo a codo con los devs desde el primer boceto, presento el trabajo a stakeholders y CEOs, y hago entrevistas y tests de usabilidad para que las decisiones se apoyen en lo que la gente hace de verdad.")}</p>
+      <p data-reveal>{T("My workflow runs through AI: Claude Code turns designs into working prototypes and takes a Figma design system into code, documented in Storybook for the developers. Midjourney and Freepik Spaces help me explore visual directions.",
+                       "Mi flujo de trabajo pasa por la IA: con Claude Code convierto diseños en prototipos funcionales y llevo un design system de Figma al código, documentado en Storybook para los devs. Midjourney y Freepik Spaces me ayudan a explorar direcciones visuales.")}</p>
       <div class="btns" data-reveal><a class="btn" {cv_attrs}>{arrow("i-down")}{T("Download CV", "Descargar CV")}</a></div>
     </div>
     <div class="about__lists">
