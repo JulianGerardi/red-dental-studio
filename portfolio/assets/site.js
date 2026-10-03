@@ -29,6 +29,21 @@
     b.addEventListener('click', function () { applyLang(b.getAttribute('data-set-lang'), true); });
   });
 
+  /* ---------- Brand name: one span per letter, for the roll on hover ---------- */
+  if (!reduced) document.querySelectorAll('.brand__name').forEach(function (el) {
+    var text = el.textContent;
+    el.setAttribute('aria-label', text);
+    el.textContent = '';
+    Array.prototype.forEach.call(text, function (c, i) {
+      var s = document.createElement('span');
+      s.className = 'ch';
+      s.setAttribute('aria-hidden', 'true');
+      s.style.setProperty('--d', i);
+      s.textContent = c;
+      el.appendChild(s);
+    });
+  });
+
   /* ---------- Word splitting: blur-in titles and masked lines ---------- */
   function splitWords(el, masked) {
     /* punctuation right after a link stays with its last word, so it never wraps alone */

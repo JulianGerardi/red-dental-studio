@@ -32,6 +32,7 @@ ICO = {
     "gift": '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="9" width="16" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M12 9v11M12 9c-1.5-3.5-5.5-4.5-6-2s4 2 6 2Zm0 0c1.5-3.5 5.5-4.5 6-2s-4 2-6 2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
     "check": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 12.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     "clock": '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    "cam": '<svg viewBox="0 0 24 24" aria-hidden="true" class="ic-cam"><rect x="2.5" y="6.5" width="13" height="11" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="m15.5 10.6 5-2.9a.6.6 0 0 1 .9.5v7.6a.6.6 0 0 1-.9.5l-5-2.9Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><circle cx="6.4" cy="10.2" r="1.2" fill="currentColor"/></svg>',
     "bell": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20.5a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
 }
 
@@ -110,7 +111,7 @@ def brand_scene(p, kind, T, big=False):
     if kind == "batech":
         return (f'<div class="bs bs--batech">'
                 f'<div class="bs__dev bs__dev--win">{browser(p, "b-eventos", 1200, 932, "app.batech.ai", dark=True, lazy=lazy, view="fit")}</div>'
-                f'{notif(BATECH_MARK, "Batech AI", T("Cash drawer opened · Branch 12", "Apertura de caja · Sucursal 12"), T("now", "ahora"), "bs__nt bs__nt--a nt--dark")}'
+                f'{notif(ICO["cam"], "Batech AI", T("Cash drawer opened · Branch 12", "Apertura de caja · Sucursal 12"), T("now", "ahora"), "bs__nt bs__nt--a nt--dark")}'
                 f'</div>')
     if kind == "dental":
         return (f'<div class="bs bs--dental">'
