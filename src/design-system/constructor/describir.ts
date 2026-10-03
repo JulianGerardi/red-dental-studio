@@ -390,7 +390,8 @@ export function editarSinIA(texto: string, d: Diseno, paleta: Seccion[]): Result
   const n = normalizar(texto).trim()
   const original = texto.trim()
 
-  const titulo = original.match(/(?:t[ií]tulo|encabezado|nombre)\s+(?:a|por|que diga|:)\s*["“]?(.+?)["”]?$/i)
+  /* El título nuevo termina en la primera coma o "y": "cambiá el título a Clinic patients, sacá…" → "Clinic patients". */
+  const titulo = original.match(/(?:t[ií]tulo|encabezado|nombre)\s+(?:a|por|que diga|:)\s*["“]?(.+?)["”]?(?=\s*(?:,|;|\s+y\s+|\s+and\s+|$))/i)
   if (/\b(cambia|cambiar|renombra|renombrar|pone|poner)\b/.test(n) && titulo) {
     const nuevo = titulo[1]!.trim()
     let hecho = false
