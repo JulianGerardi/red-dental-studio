@@ -70,16 +70,16 @@ def pipeline(title_en, title_es):
         _node("figma", 346, 316, 130, 108, 0.5, "<i></i>", "Figma", T("design source", "fuente de diseño")),
         _node("claude", 548, 262, 216, 216, 1, "", "Claude Code", T("reads the design<br>and the codebase", "lee el diseño<br>y el código")),
         f'<span class="pd__pill pd__pill--hl" data-on="1" style="left:594px;top:206px">human-in-the-loop</span>',
-        _node("code", 848, 306, 176, 128, 2, "&lt;/&gt;", "React + Tailwind", T("139 components,<br>same names as Figma", "139 componentes,<br>mismos nombres que Figma")),
-        _node("sb", 1066, 306, 176, 128, 3, "S", "Storybook", T("Confidentally UI ·<br>481 live examples", "Confidentally UI ·<br>481 ejemplos en vivo")),
-        _node("dev", 1276, 182, 140, 96, 4, I["users"], T("Developers", "Devs"), T("take each piece", "toman cada pieza")),
-        _node("app", 1276, 322, 140, 96, 4, I["box"], "App", T("32 screens", "32 pantallas")),
-        _node("ai", 1276, 462, 140, 96, 4.2, I["spark"], T("AI Builder", "Builder IA"), T("new screens", "pantallas nuevas")),
+        _node("code", 838, 296, 196, 148, 2, "&lt;/&gt;", "React + Tailwind", T("139 components,<br>same names as Figma", "139 componentes,<br>mismos nombres que Figma")),
+        _node("sb", 1052, 296, 190, 148, 3, "S", "Storybook", T("Confidentally UI ·<br>481 live examples", "Confidentally UI ·<br>481 ejemplos en vivo")),
+        _node("dev", 1276, 172, 150, 116, 4, I["users"], T("Developers", "Devs"), T("take each piece", "toman cada pieza")),
+        _node("app", 1276, 312, 150, 116, 4, I["box"], "App", T("32 screens", "32 pantallas")),
+        _node("ai", 1276, 452, 150, 116, 4.2, I["spark"], T("AI Builder", "Builder IA"), T("new screens", "pantallas nuevas")),
         f'<span class="pd__pill" data-on="4.4" style="left:1062px;top:622px">{T("Audit in CI flags drift", "La auditoría en CI avisa desvíos")}</span>',
     ])
-    paths = [("M302 370H346", 0.2, ""), ("M476 370H548", 0.75, ""), ("M764 370H848", 1.55, ""), ("M1024 370H1066", 2.55, ""),
+    paths = [("M302 370H346", 0.2, ""), ("M476 370H548", 0.75, ""), ("M764 370H838", 1.55, ""), ("M1034 370H1052", 2.55, ""),
              ("M1242 370H1258V230H1276", 3.45, ""), ("M1242 370H1276", 3.45, ""), ("M1242 370H1258V510H1276", 3.65, ""),
-             ("M1346 558V638H1154V434", 4.3, " loop")]
+             ("M1351 568V638H1147V444", 4.3, " loop")]
     wires = "".join(f'<path class="b" d="{d}"/>' for d, _, _ in paths) + "".join(
         f'<path class="f{c}" d="{d}" pathLength="1" data-wire="{w}" style="stroke-dashoffset:0"/>' for d, w, c in paths)
     caps = [("It starts in Figma.", "Arranca en Figma.",
