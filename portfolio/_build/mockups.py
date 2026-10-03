@@ -129,7 +129,7 @@ def brand_scene(p, kind, T, big=False):
                 f'</div>')
     if kind == "mp":
         return (f'<div class="bs bs--mp">'
-                f'<div class="bs__dev bs__dev--win">{browser(p, "mp-hero", 1210, 756, "play.mercadolibre.com", dark=True, lazy=lazy, view="fit")}</div>'
+                f'<div class="bs__dev bs__dev--win">{browser(p, "mp-hero", 1440, 900, "play.mercadolibre.com", dark=True, lazy=lazy, view="fit")}</div>'
                 f'{notif(MP_MARK, T("Congratulations!", "¡Felicitaciones!"), T("Guido watched the film you recommended · <u>+213 points</u> for Mercado Envíos", "Guido vio la peli que le recomendaste · <u>Sumaste 213 puntos</u> para Mercado Envíos"), "", "bs__nt bs__nt--a nt--mp")}'
                 f'</div>')
     raise ValueError(kind)

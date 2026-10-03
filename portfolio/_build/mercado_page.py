@@ -9,6 +9,14 @@ FN = "mercado-play.html"
 FIGMA = "https://www.figma.com/design/MTQT0AwdScSnoRK3m3SHeB/Challenge---UX-UI?node-id=11-544"
 
 
+def win(name, w, h, cap_en="", cap_es="", ae="", as_="", view="", maxw=""):
+    """A Mercado Play screen in a Safari window on the soft yellow of the brand."""
+    c = f"<figcaption>{T(cap_en, cap_es)}</figcaption>" if cap_en else ""
+    st = f' style="max-width:{maxw}"' if maxw else ""
+    return (f'<figure class="shot" data-reveal><div class="panel bg--mp mpwin"><div class="mpwin__in"{st}>'
+            f'{browser(p, name, w, h, "play.mercadolibre.com", dark=True, alt_en=ae, alt_es=as_, view=view)}</div></div>{c}</figure>')
+
+
 def scroll_mock(name, w, h, title, ae, as_, kind="mp", ce="", cs=""):
     """A long page inside a browser window that scrolls itself, top to bottom."""
     c = f"<figcaption>{T(ce, cs)}</figcaption>" if ce else ""
@@ -146,39 +154,61 @@ flow_steps = [("Save or share from any card", "Guardar o compartir desde cualqui
               ("Points when they watch it all", "Puntos cuando la ve completa",
                "The bell tells you when a friend finished what you shared, and the points go to benefits such as Mercado Envíos.",
                "La campana avisa cuando un amigo terminó lo que compartiste, y los puntos van a beneficios como Mercado Envíos.")]
-b += story(flow_steps, [([0], dev_piece(p, "mp-kit-card-saved", 244, 438, "Card saved to favourites", "Card guardada en favoritos", 1.25)),
-                        ([1], dev_piece(p, "mp-kit-modal-on", 350, 378, "Share modal with an email typed", "Modal para compartir con un mail", 1.25)),
-                        ([2], dev_piece(p, "mp-kit-sent", 350, 204, "Message sent", "Mensaje enviado", 1.3)),
+b += story(flow_steps, [([0], dev_piece(p, "mp-kit-peli-bookmark", 325, 585, "Card saved to favourites", "Card guardada en favoritos", 1.1)),
+                        ([1], dev_piece(p, "mp-kit-modal-mail", 349, 372, "Share modal with an email typed", "Modal para compartir con un mail", 1.2)),
+                        ([2], dev_piece(p, "mp-kit-modal-sent", 349, 202, "Message sent", "Mensaje enviado", 1.2)),
                         ([3], notif)], "mp", "Recommend and earn points")
 b += chapter(T("Low fidelity", "Baja fidelidad"), h2("Structure first, then colour.", "Primero la estructura, después el color.") + prose(
     ("The wireframes settle the hierarchy of the home and where the new actions live: favourite and share on every card, comments in place and a notifications panel for points. The same screen in high fidelity keeps every block where it was.",
      "Los wireframes definen la jerarquía de la home y dónde viven las acciones nuevas: favorito y compartir en cada card, comentarios en el lugar y un panel de notificaciones para los puntos. La misma pantalla en alta fidelidad mantiene cada bloque donde estaba.")) +
     "", "lofi")
-b += wipe(p, ("mp-lofi", 934, 2800), ("mp-points", 1201, 3600), "play.mercadolibre.com", T("Low fidelity", "Baja fidelidad"), T("High fidelity", "Alta fidelidad"),
+b += wipe(p, ("mp-lofi", 1440, 4319), ("mp-points", 1440, 4320), "play.mercadolibre.com", T("Low fidelity", "Baja fidelidad"), T("High fidelity", "Alta fidelidad"),
           "Same blocks, same places.", "Mismos bloques, mismos lugares.")
 b += chapter(T("High fidelity", "Alta fidelidad"), h2("Every card can be saved, shared and talked about.", "Cada card se puede guardar, compartir y comentar.") +
     decision("A home built around what people recommend", "Una home armada alrededor de lo que recomienda la gente",
              f"<p>{T('“Top 10 films recommended by people” sits next to the usual rows. Each card carries two actions, save and share, and opens its comments in place.', '“Top 10 pelis recomendadas por la gente” convive con las filas de siempre. Cada card lleva dos acciones, guardar y compartir, y abre sus comentarios en el lugar.')}</p>",
              "") +
     "", "hifi")
-b += scrub(p, "mp-home", 1210, 3600, "play.mercadolibre.com", alt_en="Mercado Play home with recommendation rows", alt_es="Home de Mercado Play con filas de recomendaciones")
+b += scrub(p, "mp-home", 1440, 4287, "play.mercadolibre.com", alt_en="Mercado Play home with recommendation rows", alt_es="Home de Mercado Play con filas de recomendaciones")
 b += chapter(T("Every state", "Cada estado"), h2("Share, and see it pay off.", "Compartir, y ver que suma.") +
     decision("Saved and shared, in place", "Guardado y compartido, en el lugar",
              f"<p>{T('Sharing opens a short modal: an email or a link, and a clear promise, 100 points if the person watches it all. Saving confirms with a toast, and the bell tells you when a friend finished what you shared.', 'Compartir abre un modal corto: un mail o un enlace, y una promesa clara, 100 puntos si la persona la ve completa. Guardar confirma con un toast, y la campana avisa cuando un amigo terminó lo que compartiste.')}</p>",
-             pages([("mp-fav", 1219, 3600, "Home with the saved-to-favourites toast", "Home con el toast de agregado a favoritos", "Saved to favourites", "Agregada a favoritos"),
-                    ("mp-share", 1201, 3600, "Share modal over the home", "Modal para compartir sobre la home", "Share modal", "Modal para compartir")], kind="mp")) +
+             pair(win("mp-fav-top", 1440, 900, "<b>Saved.</b> A toast confirms it at the top: “Agregaste a tu lista de favoritos”.", "<b>Guardado.</b> Un toast lo confirma arriba: “Agregaste a tu lista de favoritos”.", "Home with the saved-to-favourites toast", "Home con el toast de agregado a favoritos"),
+                  win("mp-share-top", 1440, 900, "<b>Share.</b> The modal over the film: an email or a link, and 100 points if it’s watched to the end.", "<b>Compartir.</b> El modal sobre la peli: un mail o un enlace, y 100 puntos si la ven completa.", "Share modal over the home", "Modal para compartir sobre la home")) +
+             win("mp-points-top", 1440, 900, "<b>Points.</b> The bell lists every friend who finished what you shared, with the points earned for Mercado Envíos.", "<b>Puntos.</b> La campana lista a cada amigo que terminó lo que compartiste, con los puntos sumados para Mercado Envíos.", "Notifications panel with the points earned", "Panel de notificaciones con los puntos sumados")) +
     decision("My favourites and my recommendations", "Mis favoritos y mis recomendados",
              f"<p>{T('A page of its own keeps what you saved and what you shared, so recommending becomes a habit instead of a WhatsApp chat with yourself.', 'Una página propia guarda lo que guardaste y lo que compartiste, así recomendar se vuelve un hábito y no un chat de WhatsApp con uno mismo.')}</p>",
-             fig(p, "mp-recos", 1440, 1845, "Mercado Play · Mis favoritos", "My favourites and my recommendations page", "Página de mis favoritos y mis recomendados", kind="mp", dark=True)), "states")
-b += chapter("UI kit", h2("Small pieces, every state.", "Piezas chicas, todos los estados.") + prose(
-    ("Cards, the share modal and comments were designed as components with their states: default, saved, active and sent.",
-     "Las cards, el modal para compartir y los comentarios se diseñaron como componentes con sus estados: default, guardado, activo y enviado.")) +
-    "      " + kit([("mp-kit-card", 244, 438, 180, "Card default", "Card default", "Card · default", "Card · default"),
-                    ("mp-kit-card-saved", 244, 438, 180, "Card saved", "Card guardada", "Card · saved", "Card · guardada"),
-                    ("mp-kit-comments", 244, 450, 180, "Card with comments", "Card con comentarios", "Comments", "Comentarios"),
-                    ("mp-kit-modal", 350, 378, 250, "Share modal", "Modal para compartir", "Share · default", "Compartir · default"),
-                    ("mp-kit-modal-on", 350, 378, 250, "Share modal, email typed", "Modal para compartir, con mail", "Share · active", "Compartir · activo"),
-                    ("mp-kit-sent", 350, 204, 250, "Message sent", "Mensaje enviado", "Sent", "Enviado")]) + "\n", "kit")
+             win("mp-recos", 1440, 1845, ae="My favourites and my recommendations page", as_="Página de mis favoritos y mis recomendados", view="fit", maxw="760px")), "states")
+def state(name, w, h, label, disp=None):
+    dw = disp or w
+    return (f'<figure class="kd__st" data-reveal><div class="kd__img" style="--w:{dw}px"><img src="{p}assets/img/mp-kit-{name}.webp" width="{w}" height="{h}" alt="{label}" loading="lazy" decoding="async"></div>'
+            f'<figcaption>{label}</figcaption></figure>')
+
+
+def comp(title_en, title_es, text_en, text_es, states, cls=""):
+    return (f'<article class="kd__comp {cls}"><header data-reveal><h3>{T(title_en, title_es)}</h3><p>{T(text_en, text_es)}</p></header>'
+            f'<div class="kd__states">{"".join(states)}</div></article>')
+
+
+kit_doc = (f'  <section class="kd" id="kit">\n    <div class="wrap">'
+           f'<header class="kd__head"><div class="label" data-reveal>UI Kit</div><h2 class="lines">{T("Every component, every state.", "Cada componente, cada estado.")}</h2>'
+           f'<p data-reveal>{T("The new pieces were documented in Figma with all their states, so development builds each one once. This is the UI Kit page, piece by piece.", "Las piezas nuevas se documentaron en Figma con todos sus estados, para que desarrollo construya cada una una sola vez. Esta es la página del UI Kit, pieza por pieza.")}</p>'
+           f'<a class="btn btn--ghost kd__btn" href="https://www.figma.com/design/MTQT0AwdScSnoRK3m3SHeB/Challenge---UX-UI?node-id=11-291" target="_blank" rel="noopener" data-reveal>{T("Open the UI Kit in Figma", "Abrir el UI Kit en Figma")} {arrow()}</a></header>'
+           + '<div class="kd__grid">'
+           + comp("Save button", "Botón guardar", "Adds the title to My favourites. The tooltip explains it on hover.", "Agrega el título a Mis favoritos. El tooltip lo explica al pasar el mouse.",
+                  [state("bm-tooltip", 159, 116, "Tooltip"), state("bm-default", 159, 64, "Default"), state("bm-active", 159, 64, "Activo"), state("bm-disabled", 159, 64, "Desabilitado")], "kd__comp--btn")
+           + comp("Share button", "Botón compartir", "Opens the share modal. Same four states as the save button.", "Abre el modal para compartir. Los mismos cuatro estados que guardar.",
+                  [state("sh-tooltip", 86, 116, "Tooltip"), state("sh-default", 64, 64, "Default"), state("sh-active", 66, 64, "Activo"), state("sh-disabled", 64, 64, "Desabilitado")], "kd__comp--btn")
+           + comp("Share modal", "Modal para compartir", "An email or a link, and the promise in yellow: 100 points if the friend watches it all.", "Un mail o un enlace, y la promesa en amarillo: 100 puntos si el amigo la ve completa.",
+                  [state("modal-default", 349, 372, "Default"), state("modal-mail", 349, 372, "Activo"), state("modal-sent", 349, 202, "Mensaje enviado")], "kd__comp--wide")
+           + comp("Film card", "Card de peli", "Save and share on every card, and the comments of the people who recommended it, in place.", "Guardar y compartir en cada card, y los comentarios de quienes la recomendaron, en el lugar.",
+                  [state("peli-default", 325, 585, "Default", 230), state("peli-bookmark", 325, 585, "Bookmark", 230), state("peli-active", 325, 618, "Activo · comentarios", 230), state("peli-norecos", 325, 585, "Sin recomendaciones", 230)], "kd__comp--wide")
+           + comp("Top 10 card", "Card Top 10", "The ranking number grows into the card when it becomes active, with the trailer and “Ver ahora”.", "El número del ranking crece con la card al activarse, con el tráiler y “Ver ahora”.",
+                  [state("serie-default", 426, 405, "Default", 300), state("serie-active", 782, 405, "Card activa", 552), state("serie-v1", 782, 405, "Card activa 1", 552), state("serie-v2", 782, 405, "Card activa 2", 552), state("serie-v3", 486, 405, "Card activa 3", 343)], "kd__comp--wide")
+           + comp("Links and wide card", "Links y card ancha", "“Discover more” turns yellow on hover; the wide card keeps the same two actions.", "“Descubrí más” se vuelve amarilla al pasar el mouse; la card ancha mantiene las mismas dos acciones.",
+                  [state("more-default", 260, 47, "Default"), state("more-hover", 260, 47, "Hover"), state("wide", 437, 240, "Card ancha")], "kd__comp--wide")
+           + '</div></div>\n  </section>\n')
+b += kit_doc
 b += chapter(T("Outcome", "Resultado"), h2("Discovery that comes from people.", "Descubrimiento que viene de las personas.") +
     '      <div class="numbers" data-reveal>' + "".join(f'<div><b data-count="{n}"{f" data-suffix={chr(34)}{sfx}{chr(34)}" if sfx else ""}>{n}{sfx}</b><span>{T(e, s)}</span></div>'
                                                       for n, sfx, e, s in [(6, "", "users quoted", "personas citadas"), (5, "", "platforms benchmarked", "plataformas comparadas"),

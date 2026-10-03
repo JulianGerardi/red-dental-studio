@@ -1438,3 +1438,35 @@ html.has-cursor .agent__panel input { cursor: text; }
   .bld__box { width: 210vw; margin-left: var(--gutter); translate: calc(var(--pan, 0) * (100vw - 100% - var(--gutter) * 2)) 0; transition: translate 0.9s var(--ease); }
   .pipe__caps { min-height: 7.5em; }
 }
+
+/* ================= Mercado Play UI Kit: the documentation, piece by piece ================= */
+.kd { margin-top: clamp(96px, 12vw, 180px); padding-block: clamp(64px, 8vw, 120px); background: radial-gradient(60% 40% at 50% 0%, rgba(255, 230, 0, 0.09), transparent 70%), #111111; color: #f4f4f4; color-scheme: dark; }
+.kd__head { display: grid; gap: 14px; max-width: 760px; margin-bottom: clamp(40px, 5vw, 72px); }
+.kd__head .label { color: #a1a1a1; margin: 0; }
+.kd__head .label::before { background: #ffe600; }
+.kd__head h2 { font-size: var(--text-3xl); letter-spacing: -0.055em; line-height: 1; }
+.kd__head p { color: #a1a1a1; font-size: var(--text-lg); max-width: 56ch; }
+.kd__btn { justify-self: start; margin-top: 6px; color: #f4f4f4; border-color: #3a3a3a; }
+.kd__btn:hover { background: #1c1c1c; border-color: #f4f4f4; }
+.kd__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.kd__comp { display: grid; gap: 22px; align-content: start; padding: clamp(20px, 2.4vw, 32px); border-radius: 20px; background: #181818; box-shadow: inset 0 0 0 1px #262626; }
+.kd__comp--wide { grid-column: 1 / -1; }
+.kd__comp header { display: grid; gap: 6px; max-width: 62ch; }
+.kd__comp h3 { font-size: var(--text-xl); letter-spacing: -0.03em; }
+.kd__comp header p { color: #a1a1a1; font-size: var(--text-sm); }
+.kd__states { display: flex; flex-wrap: wrap; align-items: flex-end; gap: clamp(14px, 2vw, 28px); }
+.kd__comp--wide .kd__states { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+.kd__st { display: grid; gap: 10px; justify-items: start; margin: 0; flex: none; }
+.kd__img { width: min(var(--w), 72vw); border-radius: 10px; overflow: hidden; box-shadow: 0 18px 36px -20px rgba(0, 0, 0, 0.9); }
+.kd__comp--btn .kd__img { border-radius: 8px; }
+.kd__img img { width: 100%; }
+.kd__st figcaption { display: inline-flex; align-items: center; gap: 7px; font: 500 11px/1 var(--font-mono); color: #b9a8ff; }
+.kd__st figcaption::before { content: ""; width: 6px; height: 6px; border-radius: 2px; background: #8a5cf6; }
+.kd__st[data-reveal] { transition-delay: calc(var(--k, 0) * 70ms); }
+.kd__states > .kd__st:nth-child(2) { --k: 1; }
+.kd__states > .kd__st:nth-child(3) { --k: 2; }
+.kd__states > .kd__st:nth-child(4) { --k: 3; }
+.kd__states > .kd__st:nth-child(5) { --k: 4; }
+@media (max-width: 860px) { .kd__grid { grid-template-columns: minmax(0, 1fr); } }
+.mpwin { display: grid; place-items: center; padding: clamp(14px, 2.6vw, 40px); }
+.mpwin__in { width: 100%; }

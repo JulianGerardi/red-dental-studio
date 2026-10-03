@@ -350,11 +350,11 @@ def tiles_grill(p):
 
 def tiles_mp(p, with_cover=False):
     return "".join([
-        tile_screen(p, "mp", "mp-home", 1210, 3600, 0, True),
-        tile_card(p, "mp-dark", "mp-kit-modal", 350, 378, 1),
+        tile_screen(p, "mp", "mp-home", 1440, 4287, 0, True),
+        tile_card(p, "mp-dark", "mp-kit-modal-default", 349, 372, 1),
         tile_screen(p, "mp", "mp-recos", 1440, 1845, 2, True),
-        tile_card(p, "mp-dark", "mp-kit-comments", 244, 450, 3),
-        tile_screen(p, "mp", "mp-points", 1201, 3600, 4, True),
+        tile_card(p, "mp-dark", "mp-kit-peli-active", 325, 618, 3),
+        tile_screen(p, "mp", "mp-points", 1440, 4320, 4, True),
     ])
 
 

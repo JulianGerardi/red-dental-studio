@@ -15,7 +15,7 @@ portfolio/
   work/confidentally.html     caso con NDA (bloqueado con contraseña)
   work/confidentally-ui.html  design system y Builder con IA
   work/grill.html             GRILL Empresas (app de empleados + panel de cocina)
-  work/mercado-play.html      challenge de Mercado Play: problema, benchmarking, arquetipos, solución, baja y alta fidelidad, UI kit
+  work/mercado-play.html      challenge de Mercado Play: problema, benchmarking, arquetipos, solución, baja y alta fidelidad, y la página del UI Kit de Figma pieza por pieza con cada estado (`mp-kit-*`, recortadas de la página UI Kit a su tamaño real)
   assets/site.css             tokens (claro y oscuro), layout, trabajos, casos, intro, agente, cursor
   assets/site.js              idioma, intro, scroll suave, reveals, escenas de scroll, trabajos, cursor, tema, lightbox, NDA, CV
   assets/hero.js              movimiento del degradé del inicio (solo en la home)
