@@ -2,12 +2,9 @@ import { normalizar } from '../buscar'
 import { EMPLEADOS } from '@/data/employees'
 import { INSURANCE, PATIENTS, fullName } from '@/data/mock'
 import { PAISES, ESTADOS, ZONAS } from '@/data/location-options'
-import { PLANTILLAS, TIPOS, campo, infoDe, nuevoId, pestana, tablaDe, type Bloque, type Campo, type Diseno, type TipoBloque } from './bloques'
-import { DATOS, type IdConjunto } from './datos'
-import type { ParteIA, PlanIA } from './ia'
+import { PLANTILLAS, campo, hijosDe, infoDe, nombreDe, nuevoId, pestana, tablaDe, type Bloque, type Campo, type Diseno, type TipoBloque } from './bloques'
+import type { IdConjunto } from './datos'
 import { buscarPiezas, type Item, type Seccion } from './paleta'
-
-const TIPOS_BLOQUE = TIPOS.map((t) => t.tipo)
 
 /* "Describí lo que querés armar": se arma con palabras clave, sin IA, con lo que el Builder sabe de la app — sus piezas
    reales (la paleta), los bloques editables, las tablas con sus datos y los datos de ejemplo para las opciones de los campos.
@@ -365,89 +362,77 @@ export function describir(texto: string, paleta: Seccion[]): Resultado | null {
   }
 }
 
-/* ── Con IA ─────────────────────────────────────────────────────────── */
+/* ── Editar sin IA ──────────────────────────────────────────────────── */
 
-/* Un bloque del plan de la IA, con sus datos (tabla), pestañas o texto. */
-function bloqueIA(p: ParteIA): Opcion | null {
-  const t = TIPOS_BLOQUE.find((x) => x === p.bloque)
-  if (!t) return null
-  if (t === 'tabla') {
-    const datos = (p.datos && p.datos in DATOS ? p.datos : 'pacientes') as IdConjunto
-    return { etiqueta: `Table · ${datos}`, lugar: 'Bloque editable', crear: () => tablaDe(datos) }
-  }
-  return deBloque(t, () => {
-    const b = infoDe(t).nuevo()
-    if (b.tipo === 'pestanasContenido' && p.pestanas && p.pestanas.length > 1) return { ...b, pestanas: p.pestanas.map((l) => pestana(l)) }
-    if (b.tipo === 'encabezado' && p.texto) return { ...b, titulo: p.texto }
-    if (b.tipo === 'texto' && p.texto) return { ...b, texto: p.texto }
-    if (b.tipo === 'vacio' && p.texto) return { ...b, titulo: p.texto }
+/* Cada palabra con los tipos de bloque que nombra, para "sacá la tabla" o "borrá las métricas". */
+const NOMBRA: [RegExp, TipoBloque[]][] = [
+  [/\b(tabla|tablas|listado|grilla)\b/, ['tabla']], [/\b(pestanas|solapas|tabs)\b/, ['pestanas', 'pestanasContenido']],
+  [/\b(botones|boton|acciones)\b/, ['botones']], [/\b(titulo|encabezado|header)\b/, ['encabezado']],
+  [/\b(metricas|estadisticas|numeros|indicadores)\b/, ['stats', 'metricas']], [/\b(campos|formulario)\b/, ['campos']],
+  [/\b(buscador|busqueda)\b/, ['busqueda']], [/\b(aviso|alerta)\b/, ['aviso']], [/\b(turnos|citas)\b/, ['turnos']],
+  [/\b(tareas)\b/, ['tareas']], [/\b(calendario|agenda)\b/, ['calendario']], [/\b(odontograma)\b/, ['odontograma']],
+  [/\b(migas|breadcrumb)\b/, ['migas']], [/\b(pasos)\b/, ['pasos']], [/\b(paginacion)\b/, ['paginacion']],
+  [/\b(divisor|linea)\b/, ['divisor']], [/\b(texto|parrafo)\b/, ['texto']], [/\b(modal|popup)\b/, ['modal']],
+]
+
+const sacar = (bs: Bloque[], quita: (b: Bloque) => boolean): Bloque[] =>
+  bs.filter((b) => !quita(b)).map((b) => {
+    if (b.tipo === 'modal' || b.tipo === 'seccion') return { ...b, bloques: sacar(b.bloques, quita) }
+    if (b.tipo === 'pestanasContenido') return { ...b, pestanas: b.pestanas.map((p) => ({ ...p, bloques: sacar(p.bloques, quita) })) }
+    if (b.tipo === 'columnas') return { ...b, columnas: b.columnas.map((c) => ({ ...c, bloques: sacar(c.bloques, quita) })) }
     return b
   })
-}
 
-/* Las opciones de una parte del plan: lo que eligió la IA, sus alternativas y, por las dudas, lo que da el motor sin IA. */
-function opcionesIA(p: ParteIA, porId: Map<string, Item>, paleta: Seccion[]): Opcion[] {
-  const out: Opcion[] = []
-  if (p.que === 'campos' && p.campos?.length) {
-    const campos = p.campos
-    out.push({
-      etiqueta: `Fields · ${campos.map((c) => c.label).join(', ')}`, lugar: 'Bloque editable',
-      crear: () => ({
-        id: nuevoId(), tipo: 'campos', columnas: campos.length > 3 ? 2 : 1,
-        campos: campos.map((c) => campo({ label: c.label, clase: c.control, opciones: c.opciones.join(', '), required: c.obligatorio, placeholder: c.placeholder })),
-      }),
+/* Lo que se puede cambiar sin IA sobre lo que hay: agregar una parte, sacar una y cambiar el título. Si no es nada de eso,
+   devuelve null y se arma de cero. */
+export function editarSinIA(texto: string, d: Diseno, paleta: Seccion[]): Resultado | null {
+  if (!d.bloques.length) return null
+  const n = normalizar(texto).trim()
+  const original = texto.trim()
+
+  const titulo = original.match(/(?:t[ií]tulo|encabezado|nombre)\s+(?:a|por|que diga|:)\s*["“]?(.+?)["”]?$/i)
+  if (/\b(cambia|cambiar|renombra|renombrar|pone|poner)\b/.test(n) && titulo) {
+    const nuevo = titulo[1]!.trim()
+    let hecho = false
+    const cambiar = (bs: Bloque[]): Bloque[] => bs.map((b) => {
+      if (!hecho && (b.tipo === 'encabezado' || b.tipo === 'modal')) { hecho = true; return { ...b, titulo: nuevo } }
+      if (b.tipo === 'seccion') return { ...b, bloques: cambiar(b.bloques) }
+      if (b.tipo === 'columnas') return { ...b, columnas: b.columnas.map((c) => ({ ...c, bloques: cambiar(c.bloques) })) }
+      return b
     })
+    const bloques = cambiar(d.bloques)
+    if (hecho) return { diseno: { ...d, bloques }, partes: [], plantillas: [], abrir: null, entendido: `Cambié el título a “${nuevo}”.` }
   }
-  const bloque = p.que === 'bloque' ? bloqueIA(p) : null
-  if (bloque) out.push(bloque)
-  const pieza = p.pieza ? porId.get(p.pieza) : undefined
-  if (pieza) out.push(dePieza(pieza))
-  for (const id of p.alternativas) {
-    const it = porId.get(id)
-    if (it) out.push(dePieza(it))
-  }
-  out.push(...opcionesDe(paleta, p.pedido))
-  const vistas = new Set<string>()
-  return out.filter((o) => !vistas.has(o.etiqueta) && vistas.add(o.etiqueta))
-}
 
-/* Arma el plan que devolvió la IA con las mismas reglas que el motor sin IA: pantalla con App y columnas, modal, formulario. */
-export function desdePlan(plan: PlanIA, porId: Map<string, Item>, paleta: Seccion[]): Resultado {
-  const partes: Parte[] = []
-  const hechos = plan.partes.map((p) => {
-    const opciones = opcionesIA(p, porId, paleta)
+  if (/^(saca|sacar|quita|quitar|elimina|eliminar|borra|borrar)\b/.test(n)) {
+    const tipos = NOMBRA.filter(([re]) => re.test(n)).flatMap(([, t]) => t)
+    const palabrasPedido = palabras(n).filter((w) => w.length > 3 && !RELLENO.has(w))
+    const quita = (b: Bloque) => tipos.includes(b.tipo) || (b.tipo === 'pieza' && palabrasPedido.some((w) => normalizar(nombreDe(b)).includes(w)))
+    const bloques = sacar(d.bloques, quita)
+    const cuenta = (bs: Bloque[]): number => bs.reduce((k, b) => k + 1 + hijosDe(b).reduce((j, h) => j + cuenta(h), 0), 0)
+    if (cuenta(bloques) < cuenta(d.bloques)) return { diseno: { ...d, bloques }, partes: [], plantillas: [], abrir: null, entendido: 'Saqué lo que pediste; lo demás quedó igual.' }
+    return null
+  }
+
+  if (/^(agrega|agregar|suma|sumar|anade|anadir|pone|poner|mete|meter)\b/.test(n)) {
+    const pedido = original.replace(/^\S+\s+/, '')
+    const opciones = opcionesDe(paleta, pedido)
+    if (!opciones.length) return null
     const b = opciones[0]!.crear()
-    partes.push({ texto: p.pedido, opciones, elegida: 0, bloqueId: b.id })
-    return { b, lado: p.lado }
-  })
-  const titulo = plan.titulo || 'Untitled'
-  const base = { partes, plantillas: [], entendido: plan.resumen }
-  const botones = (): Bloque => ({ id: nuevoId(), tipo: 'botones', alinear: 'fin', botones: [{ label: 'Cancel', variant: 'secondary', size: 'lg', icono: 'none' }, { label: plan.accion || 'Save', variant: plan.peligro ? 'destructive' : 'primary', size: 'lg', icono: 'none' }] })
-
-  if (plan.tipo === 'modal') {
-    if (hechos.length === 1 && hechos[0]!.b.tipo === 'pieza') return { ...base, diseno: { nombre: titulo, contenedor: 'libre', tituloPanel: '', ancho: 'completo', bloques: [hechos[0]!.b] }, abrir: null }
-    const modal: Bloque = {
-      id: nuevoId(), tipo: 'modal', titulo, disparador: plan.accion || `Add ${titulo.replace(/^New /, '').toLowerCase()}`, ancho: hechos.length > 1 ? 'lg' : 'md',
-      confirmar: plan.peligro ? 'Delete' : 'Save', cancelar: 'Cancel', peligro: plan.peligro, bloques: hechos.map((h) => h.b),
-    }
-    return { ...base, diseno: { nombre: titulo, contenedor: 'libre', tituloPanel: '', ancho: 'completo', bloques: [modal] }, abrir: modal.id }
-  }
-  if (plan.tipo === 'formulario') {
-    const bloques: Bloque[] = [{ id: nuevoId(), tipo: 'encabezado', titulo, bajada: '', accion: '', icono: 'none' }, ...hechos.map((h) => h.b), botones()]
-    return { ...base, diseno: { nombre: titulo, contenedor: 'card', tituloPanel: titulo, ancho: 'medio', bloques }, abrir: null }
-  }
-  if (plan.tipo === 'suelta') {
-    const suelta = hechos.every((h) => h.b.tipo === 'pieza')
-    return { ...base, diseno: { nombre: titulo, contenedor: suelta ? 'libre' : 'card', tituloPanel: '', ancho: suelta ? 'completo' : 'medio', bloques: hechos.map((h) => h.b) }, abrir: null }
-  }
-  const bloques: Bloque[] = [{ id: nuevoId(), tipo: 'encabezado', titulo, bajada: '', accion: plan.accion, icono: plan.accion ? 'Plus' : 'none' }]
-  for (const { b, lado } of hechos) {
-    const anterior = bloques[bloques.length - 1]
-    if (lado && anterior && anterior.tipo !== 'encabezado') {
+    const lado = /\b(a la derecha|al lado)\b/.test(n) ? 'derecha' : /\ba la izquierda\b/.test(n) ? 'izquierda' : null
+    const bloques = [...d.bloques]
+    const ultimo = bloques[bloques.length - 1]
+    if (lado && ultimo && ultimo.tipo !== 'encabezado') {
       bloques.pop()
-      const [izq, der] = lado === 'derecha' ? [anterior, b] : [b, anterior]
+      const [izq, der] = lado === 'derecha' ? [ultimo, b] : [b, ultimo]
       bloques.push({ id: nuevoId(), tipo: 'columnas', proporcion: lado === 'derecha' ? '2-1' : '1-2', columnas: [{ id: nuevoId(), bloques: [izq] }, { id: nuevoId(), bloques: [der] }] })
+    } else if (bloques.length === 1 && bloques[0]!.tipo === 'modal') {
+      bloques[0] = { ...bloques[0]!, bloques: [...bloques[0]!.bloques, b] }
     } else bloques.push(b)
+    return {
+      diseno: { ...d, bloques }, partes: [{ texto: pedido, opciones, elegida: 0, bloqueId: b.id }], plantillas: [], abrir: null,
+      entendido: `Agregué ${opciones[0]!.etiqueta}${lado ? ` a la ${lado}` : ''}.`,
+    }
   }
-  return { ...base, diseno: { nombre: `${titulo} screen`, contenedor: 'app', tituloPanel: '', ancho: 'completo', bloques }, abrir: null }
+  return null
 }

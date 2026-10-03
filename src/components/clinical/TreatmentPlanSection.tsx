@@ -51,7 +51,7 @@ const ACCIONES_CASO: { label: string; clave: ClaveDialogo | 'delete'; desde?: Es
 /* Ícono de acción del encabezado del caso. Fuera de su estado no se esconde:
    queda deshabilitado y el tooltip dice cuándo se puede usar. El botón
    deshabilitado no recibe el hover, así que el tooltip cuelga del span. */
-function AccionCaso({
+export function AccionCaso({
   habilitado, tooltip, tooltipDeshabilitado, className, claseBoton, children, ...boton
 }: {
   habilitado: boolean

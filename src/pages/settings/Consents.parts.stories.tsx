@@ -188,7 +188,7 @@ export const ConsentText: Story = {
 }
 export const ConsentTextEmpty: Story = {
   parameters: sinControles,
-  render: () => <Ejemplo titulo="Empty" nota="Un template nuevo: los placeholders y la guía." ancho={520}><Texto inicial={BORRADOR_VACIO} /></Ejemplo>,
+  render: () => <Ejemplo titulo="Empty" nota="Un template nuevo: las dos cajas vacías, sin nada escrito adentro; quedan los rótulos y la guía." ancho={520}><Texto inicial={BORRADOR_VACIO} /></Ejemplo>,
 }
 
 /* ── Editor ────────────────────────────────────────────────────────── */
@@ -232,7 +232,7 @@ export const PreviewPatientView: Story = {
 
 export const FormattingToolbar: Story = {
   parameters: sinControles,
-  render: () => <Ejemplo titulo="Formatting toolbar" nota="Decorativo: avisa que el formato enriquecido no está disponible." ancho={480}><ToolbarFormato /></Ejemplo>,
+  render: () => <Ejemplo titulo="Formatting toolbar" nota="Decorativa con los dos campos: avisa que el formato enriquecido no está disponible. Cada ícono con su tooltip." ancho={480}><ToolbarFormato /></Ejemplo>,
 }
 
 /* ── Specs ─────────────────────────────────────────────────────────── */

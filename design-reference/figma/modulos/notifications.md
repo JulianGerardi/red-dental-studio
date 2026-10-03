@@ -120,3 +120,30 @@ La pantalla completa está en Pages › Notifications.
 Para el estado *Keyboard focus* se sumó `focus-within` a `Forzar` (kit del
 design system) y un anillo azul de foco a los íconos de la fila, que no
 tenían estilo propio de foco.
+
+
+## Íconos de un solo color y variantes (2026-10-03)
+
+1. **El ícono es gris en todas las notificaciones** (`surface-slate` /
+   `ink-slate`) y sólo se pone ámbar cuando está **pendiente**, junto con el
+   punto y el fondo. Antes las tareas eran ámbar siempre: mezclaba dos
+   significados en el mismo color. Igual en la campana.
+2. **Design system**, variantes y estados que faltaban:
+   - *Variants*: cada estado con cada tipo (unread, read y pending × task y
+     notice) y las archivadas (read, unread, pending).
+   - *States*: hover en leída, sin leer y pendiente; foco de teclado en una
+     acción y en la fila.
+   - *Content*: texto largo, con y sin autor, y cómo se escribe el tiempo
+     (Just now, 25m ago, 3h ago, Yesterday, 4d ago, fecha).
+   - *Empty states*: el vacío de cada pestaña.
+   - En el celular las acciones quedan a la vista: lo muestra *Guidelines ›
+     On each device*.
+
+3. **Todo eso también en la app.** Los datos de ejemplo suman lo que faltaba
+   para ver cada caso en la pantalla real: una de "Just now", una tarea leída,
+   un aviso pendiente, un texto largo con autor y tres archivadas (leída, sin
+   leer y pendiente).
+4. **Move all to inbox**, en el menú de la pantalla, con Undo: devuelve todas
+   las archivadas. Con eso cada pestaña se puede vaciar en un paso y ver su
+   vacío: *Mark all as read* (Unread), *Archive all* (Inbox y Pending) y *Move
+   all to inbox* (Archived).

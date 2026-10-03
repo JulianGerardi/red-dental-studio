@@ -4,7 +4,8 @@ import { Archive, ArchiveRestore, Clock, Mail, MailOpen } from 'lucide-react'
 import { NOTIFICACIONES, type EstadoNotificacion } from '@/data/notificaciones'
 import type { NotificacionViva } from '@/data/notificacionesStore'
 import { Bloque, ConRotulo, Forzar, Lienzo, Muestras, Tabla, Token, medidasDe, type Medidas } from '@/design-system/kit'
-import { Accion, FilaNotificacion } from './Notifications'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Accion, FilaNotificacion, VACIO, type Vista } from './Notifications'
 
 /* La fila de Notifications, documentada como Elements (Playground, Parts, States, Types, Row actions, Specs). La
    pantalla completa está en Pages › Notifications. */
@@ -30,9 +31,13 @@ const meta = {
         component: [
           'Una notificación de la pantalla *Notifications* (`@/pages/Notifications`), con la lógica del Inbox de Notion. La pantalla completa, con sus pestañas y acciones en lote, está en *Pages*.',
           '',
-          '**Estados:** *Unread* (punto azul, fondo apenas azul, título en negrita) · *Read* (texto más apagado) · *Pending* (lo mismo que sin leer pero en amarillo: punto `amber` y fondo amarillo tenue; quedó para hacer). Abrirla la marca leída; una pendiente sigue pendiente. Archivada sale del Inbox y vuelve con *Move to inbox*.',
+          '**Estados:** *Unread* (punto azul, fondo apenas azul, título en negrita) · *Read* (texto más apagado) · *Pending* (lo mismo que sin leer pero en amarillo: punto `amber`, fondo amarillo tenue e ícono ámbar; quedó para hacer). Abrirla la marca leída; una pendiente sigue pendiente. Archivada sale del Inbox y vuelve con *Move to inbox*.',
           '',
-          '**Tipos:** *Task* (ícono ámbar: firmar, confirmar, verificar; va al banner mientras no esté leída) · *Notice* (ícono gris: un pago, una mención).',
+          '**Ícono:** gris en todas; el color sólo cambia cuando está pendiente.',
+          '',
+          '**Tipos:** *Task* (firmar, confirmar, verificar; va al banner mientras no esté leída) · *Notice* (un pago, una mención). Se ven igual: lo que cambia es si va al banner.',
+          '',
+          '**En el celular** no hay hover: las acciones quedan siempre a la vista (ver *Guidelines › On each device*).',
           '',
           '**Probalo:** en *Playground* cambiá estado, tipo, texto y hace cuánto llegó desde *Controls*; pasá el mouse por la fila para ver las acciones, cada una con su tooltip.',
         ].join('\n'),
@@ -53,7 +58,7 @@ const meta = {
     title: { control: 'text', description: 'Qué pasó, en una línea.' },
     detail: { control: 'text', description: 'El detalle: a quién y cuándo.' },
     state: { control: 'inline-radio', options: ['unread', 'read', 'pending'], description: 'Sin leer, leída o pendiente.' },
-    type: { control: 'inline-radio', options: ['task', 'notice'], description: 'Task: ícono ámbar y va al banner. Notice: ícono gris.' },
+    type: { control: 'inline-radio', options: ['task', 'notice'], description: 'Task: va al banner mientras no esté leída. Notice: no. El ícono es gris en los dos.' },
     archived: { control: 'boolean', description: 'Archivada: la acción pasa a Move to inbox.' },
     minutesAgo: { control: { type: 'number', min: 0 }, description: 'Minutos desde que llegó: 25m ago, 3h ago, Yesterday, 4d ago…' },
     author: { control: 'text', description: 'Quién la generó, si fue una persona.' },
@@ -105,7 +110,7 @@ export const Playground: Story = {
 
 const PARTES: [string, string][] = [
   ['Dot', 'Azul si no se leyó, amarillo si está pendiente. Leída, no hay punto. Va centrado con el ícono.'],
-  ['Icon', 'Qué tipo de aviso es. Ámbar si es una tarea (firmar, confirmar, verificar), gris si es un aviso.'],
+  ['Icon', 'Qué tipo de aviso es. Gris en todas; ámbar sólo cuando está pendiente.'],
   ['Title', 'Qué pasó, en una línea. En negrita mientras esté sin leer o pendiente; centrado con el ícono y el punto.'],
   ['Background', 'Apenas azul si está sin leer, amarillo tenue si está pendiente, blanco si está leída.'],
   ['Detail', 'A quién y cuándo. Más apagado cuando está leída.'],
@@ -155,17 +160,26 @@ export const States: Story = {
         <Estado titulo="Read" nota="Sin punto y con el detalle más apagado. Abrir una sin leer la deja así.">
           <FilaViva inicial={base('n9')} />
         </Estado>
-        <Estado titulo="Pending" nota="Quedó para hacer: como sin leer, pero en amarillo (punto y fondo), y el reloj activo. Abrirla no le saca el pendiente.">
+        <Estado titulo="Pending" nota="Quedó para hacer: como sin leer, pero en amarillo (punto, fondo e ícono), y el reloj activo. Abrirla no le saca el pendiente.">
           <FilaViva inicial={base('n4')} />
         </Estado>
         <Estado titulo="Archived" nota="Fuera del Inbox, en la pestaña Archived. La acción pasa a Move to inbox.">
           <FilaViva inicial={base('n10', { archivada: true })} />
         </Estado>
-        <Estado titulo="Hover" nota="Fondo gris, la acción subrayada y los tres íconos a la vista.">
+        <Estado titulo="Hover · read" nota="Fondo gris, la acción subrayada y los tres íconos a la vista.">
           <FilaViva inicial={base('n6')} forzar="hover" />
         </Estado>
-        <Estado titulo="Keyboard focus" nota="Al llegar con Tab a un ícono aparecen las acciones y el ícono lleva el anillo azul.">
+        <Estado titulo="Hover · unread" nota="El fondo pasa a gris como en las leídas; el punto azul y la negrita quedan.">
+          <FilaViva inicial={base('n3')} forzar="hover" />
+        </Estado>
+        <Estado titulo="Hover · pending" nota="Igual: fondo gris; el punto, el ícono ámbar y el reloj activo quedan.">
+          <FilaViva inicial={base('n4')} forzar="hover" />
+        </Estado>
+        <Estado titulo="Keyboard focus · action" nota="Al llegar con Tab a un ícono aparecen las acciones y el ícono lleva el anillo azul.">
           <FilaViva inicial={base('n6')} forzar="focus-visible" />
+        </Estado>
+        <Estado titulo="Keyboard focus · row" nota="Con Tab sobre el contenido: anillo azul alrededor del texto; Enter la abre y la marca leída.">
+          <Forzar selector="li" estado="focus-within"><Forzar selector="li > button" estado="focus-visible"><FilaViva inicial={base('n3')} /></Forzar></Forzar>
         </Estado>
       </Lienzo>
     </Fondo>
@@ -177,15 +191,87 @@ export const Types: Story = {
   render: () => (
     <Fondo>
       <Lienzo>
-        <Estado titulo="Task" nota="Algo para hacer: firmar, confirmar un turno, verificar un seguro. Ícono ámbar; va al banner de arriba mientras no esté leída ni archivada.">
+        <Estado titulo="Task" nota="Algo para hacer: firmar, confirmar un turno, verificar un seguro. Va al banner de arriba mientras no esté leída ni archivada. Ícono gris, como todas.">
           <FilaViva inicial={base('n2')} />
         </Estado>
-        <Estado titulo="Notice" nota="Algo que pasó: un pago, un resultado, un plan aceptado. Ícono gris; no va al banner.">
+        <Estado titulo="Notice" nota="Algo que pasó: un pago, un resultado, un plan aceptado. No va al banner.">
           <FilaViva inicial={base('n7', { estado: 'unread' })} />
         </Estado>
         <Estado titulo="Mention" nota="Un aviso con autor: “hace cuánto · quién · acción”.">
           <FilaViva inicial={base('n5')} />
         </Estado>
+      </Lienzo>
+    </Fondo>
+  ),
+}
+
+/* Cada estado con cada tipo, y archivadas: todas las combinaciones que puede tener una fila. */
+const VARIANTES: [string, string, NotificacionViva][] = [
+  ['Unread · task', 'Punto y fondo azul, ícono gris.', base('n1')],
+  ['Unread · notice', 'Igual que la tarea: el tipo no cambia cómo se ve.', base('n3')],
+  ['Read · task', 'Sin punto ni fondo, texto apagado. Ya no va al banner.', base('n2', { estado: 'read' })],
+  ['Read · notice', 'Sin punto ni fondo, texto apagado.', base('n7')],
+  ['Pending · task', 'Punto, fondo e ícono en amarillo; reloj activo. Sigue en el banner.', base('n4')],
+  ['Pending · notice', 'Lo mismo: pendiente se ve igual en los dos tipos.', base('n3', { estado: 'pending' })],
+  ['Archived · read', 'En Archived, con Move to inbox.', base('n10', { archivada: true })],
+  ['Archived · unread', 'Archivada sin leer: conserva el punto azul.', base('n5', { archivada: true })],
+  ['Archived · pending', 'Archivada pendiente: conserva el amarillo; sale del banner.', base('n8', { archivada: true })],
+]
+
+export const Variants: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Fondo>
+      <Lienzo>
+        {VARIANTES.map(([titulo, nota, n]) => (
+          <Estado key={titulo} titulo={titulo} nota={nota}><FilaViva inicial={n} /></Estado>
+        ))}
+      </Lienzo>
+    </Fondo>
+  ),
+}
+
+/* Lo que cambia con el contenido: textos largos, con y sin autor, y cómo se escribe hace cuánto llegó. */
+export const Content: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Fondo>
+      <Lienzo>
+        <Estado titulo="Long text" nota="Título y detalle largos bajan de línea; el punto, el ícono y las acciones quedan arriba, centrados con la primera línea.">
+          <FilaViva inicial={base('n2', {
+            titulo: 'Referral to Dr. Alvarez for periodontal evaluation expires today and still needs your approval',
+            detalle: 'Mara Otero · Periodontics referral sent on September 12 — the patient is waiting for a call from the specialist’s office to schedule the first visit.',
+          })} />
+        </Estado>
+        <Estado titulo="With author" nota="Cuando la generó una persona: “hace cuánto · quién · acción”.">
+          <FilaViva inicial={base('n5')} />
+        </Estado>
+        <Estado titulo="Without author" nota="Cuando la genera el sistema: “hace cuánto · acción”.">
+          <FilaViva inicial={base('n3')} />
+        </Estado>
+        <Bloque titulo="Time" nota="Cómo se escribe hace cuánto llegó, según los minutos.">
+          <Lista>
+            {([['Just now', 0], ['Minutes', 25], ['Hours', 3 * 60], ['Yesterday', 26 * 60], ['Days', 4 * 24 * 60], ['Older than a week', 12 * 24 * 60]] as const).map(([titulo, hace]) => (
+              <FilaNotificacion key={titulo} n={base('n7', { titulo, hace })} onAbrir={nada} onMarcar={nada} onArchivar={nada} />
+            ))}
+          </Lista>
+        </Bloque>
+      </Lienzo>
+    </Fondo>
+  ),
+}
+
+/* Cada pestaña sin nada que mostrar: qué pasó y qué hacer. */
+export const EmptyStates: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Fondo>
+      <Lienzo>
+        {(Object.keys(VACIO) as Vista[]).map((v) => (
+          <Estado key={v} titulo={v} nota={VACIO[v].detail}>
+            <div className="max-w-[820px] rounded-lg border border-line bg-white"><EmptyState className="py-10" {...VACIO[v]} /></div>
+          </Estado>
+        ))}
       </Lienzo>
     </Fondo>
   ),
@@ -258,8 +344,8 @@ function Medir() {
         <Tabla encabezado={['Part', 'Token']} minimo={480}>
           <tr><td className="font-semibold">Unread row</td><td><Token nombre="info-bg" /> at 50% · dot <Token nombre="dash-blue" /></td></tr>
           <tr><td className="font-semibold">Hover</td><td><Token nombre="surface-subtle" /></td></tr>
-          <tr><td className="font-semibold">Task icon</td><td><Token nombre="amber" /> at 15% · icon <Token nombre="attn-fg" /></td></tr>
-          <tr><td className="font-semibold">Notice icon</td><td><Token nombre="surface-slate" /> · icon <Token nombre="ink-slate" /></td></tr>
+          <tr><td className="font-semibold">Icon</td><td><Token nombre="surface-slate" /> · icon <Token nombre="ink-slate" /></td></tr>
+          <tr><td className="font-semibold">Pending icon</td><td><Token nombre="amber" /> at 15% · icon <Token nombre="attn-fg" /></td></tr>
           <tr><td className="font-semibold">Pending row</td><td><Token nombre="warn-bg" /> · dot <Token nombre="amber" /> · clock <Token nombre="warn-fg" /></td></tr>
           <tr><td className="font-semibold">Action link</td><td><Token nombre="dash-blue" /></td></tr>
           <tr><td className="font-semibold">Divider</td><td><Token nombre="line-row" /></td></tr>
@@ -272,6 +358,7 @@ function Medir() {
           <li>Archiving, Archive read, Archive all and Mark all as read always come with Undo.</li>
           <li>Row actions show on hover or keyboard focus, each with its tooltip; on small screens they are always visible.</li>
           <li>Tasks go to the banner while they are unread or pending and not archived.</li>
+          <li>The icon is gray for every notification; it only turns amber when the notification is pending.</li>
         </ul>
       </Bloque>
     </Lienzo>

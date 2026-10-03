@@ -28,7 +28,7 @@ const EN_VISTA: Record<Vista, (n: NotificacionViva) => boolean> = {
   Archived: (n) => n.archivada,
 }
 
-const VACIO: Record<Vista, { icon: LucideIcon; title: string; detail: string }> = {
+export const VACIO: Record<Vista, { icon: LucideIcon; title: string; detail: string }> = {
   Inbox: { icon: Inbox, title: 'You’re all caught up', detail: 'New notifications will show up here.' },
   Unread: { icon: CheckCheck, title: 'No unread notifications', detail: 'You’ve read everything. What you left for later is in Pending.' },
   Pending: { icon: Clock, title: 'Nothing pending', detail: 'Mark a notification as pending to come back to it later.' },
@@ -55,7 +55,7 @@ export function Accion({ label, icon: Icon, activo, onClick }: { label: string; 
 }
 
 /* Una notificación. Sin leer: punto azul, fondo apenas azul y título en negrita. Pendiente: lo mismo en amarillo (punto
-   `amber`, fondo `warn-bg`), sin etiqueta. Punto, ícono, título y acciones van centrados en la misma línea.
+   `amber`, fondo `warn-bg`, ícono ámbar), sin etiqueta. El ícono es gris en todas: sólo cambia de color en pendiente. Punto, ícono, título y acciones van centrados en la misma línea.
    Las tres acciones (leída/no leída, pendiente, archivar) aparecen al pasar el mouse o al llegar con el teclado, como en
    Notion, cada una con su tooltip; en pantallas chicas quedan a la vista. Sin menú ⋮: repetía lo mismo. */
 export function FilaNotificacion({ n, onAbrir, onMarcar, onArchivar }: {
@@ -70,7 +70,7 @@ export function FilaNotificacion({ n, onAbrir, onMarcar, onArchivar }: {
     <li className={cn('group flex items-start gap-3 border-b border-line-row px-4 py-3 transition-colors last:border-b-0 hover:bg-surface-subtle', sinLeer && 'bg-info-bg/50', pendiente && 'bg-warn-bg')}>
       {/* El centro de todo es el del ícono (36px): el punto (8px) baja 14px, el título (20px de alto) 8px y las acciones (28px) 4px. */}
       <span aria-hidden className={cn('mt-3.5 size-2 shrink-0 rounded-full', sinLeer ? 'bg-dash-blue' : pendiente ? 'bg-amber' : 'bg-transparent')} />
-      <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-full', n.tarea ? 'bg-amber/15 text-attn-fg' : 'bg-surface-slate text-ink-slate')}>
+      <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-full', pendiente ? 'bg-amber/15 text-attn-fg' : 'bg-surface-slate text-ink-slate')}>
         <n.icon className="size-4" />
       </span>
       <button type="button" onClick={() => onAbrir(n)} className="min-w-0 flex-1 rounded-sm pt-2 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-dash-blue">
@@ -107,6 +107,7 @@ export default function Notifications() {
   const sinLeer = notis.items.filter((n) => !n.archivada && n.estado === 'unread')
   const leidas = notis.items.filter((n) => !n.archivada && n.estado === 'read')
   const enInbox = notis.items.filter((n) => !n.archivada)
+  const archivadas = notis.items.filter((n) => n.archivada)
 
   /* Todo cambio masivo avisa con Undo, que devuelve cada una a como estaba. */
   const conUndo = (mensaje: string, antes: NotificacionViva[], hacer: () => void) => {
@@ -148,6 +149,9 @@ export default function Notifications() {
             </DropdownMenuItem>
             <DropdownMenuItem disabled={!enInbox.length} onSelect={() => conUndo(`${plural(enInbox.length)} archived.`, enInbox, () => notis.archivar(enInbox.map((n) => n.id), true))}>
               <Archive /> Archive all
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled={!archivadas.length} onSelect={() => conUndo(`${plural(archivadas.length)} moved back to the inbox.`, archivadas, () => notis.archivar(archivadas.map((n) => n.id), false))}>
+              <ArchiveRestore /> Move all to inbox
             </DropdownMenuItem>
           </RowActionsMenu>
         </div>

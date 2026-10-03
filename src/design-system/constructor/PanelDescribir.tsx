@@ -2,13 +2,14 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Check, ChevronDown, ExternalLink, KeyRound, Loader2, Sparkles, Square, Undo2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Diseno } from './bloques'
-import { describir, desdePlan, type Resultado } from './describir'
-import { CLAVE_DEL_EQUIPO, ErrorIA, guardarClave, leerClave, pensar } from './ia'
+import { describir, editarSinIA, type Resultado } from './describir'
+import { CLAVE_DEL_EQUIPO, ErrorIA, guardarClave, leerClave, pensarDiseno, type Turno } from './ia'
 import { reemplazar } from './lienzo'
 import type { Seccion } from './paleta'
 
-/* La pestaña Describe: se escribe lo que se quiere armar y el Builder piensa (con Gemini si hay clave, si no con el motor de
-   palabras clave), muestra lo que va pensando y lo arma en el lienzo pieza por pieza. Ver design-reference/design-system.md. */
+/* La pestaña Describe: se escribe lo que se quiere armar o cambiar y el Builder piensa (con Gemini si hay clave, si no con el
+   motor de palabras clave), muestra lo que va pensando y lo arma en el lienzo. Gemini ve lo que ya hay: un pedido de cambio
+   edita eso y deja lo demás. Ver design-reference/design-system.md. */
 
 type Paso = { texto: string; hecho: boolean }
 const espera = (ms: number, senal: AbortSignal) =>
@@ -17,6 +18,8 @@ const espera = (ms: number, senal: AbortSignal) =>
     senal.addEventListener('abort', () => { window.clearTimeout(t); cortar(senal.reason) }, { once: true })
   })
 const recortar = (s: string, n = 42) => (s.length > n ? `${s.slice(0, n - 1)}…` : s)
+/* Un modal solo en el lienzo: se deja abierto para verlo. */
+const modalDe = (d: Diseno) => (d.bloques.length === 1 && d.bloques[0]!.tipo === 'modal' ? d.bloques[0]!.id : null)
 
 export function useDescribir({ paleta, cuantas, d, setD, setEditando, setModalAbierto }: {
   paleta: Seccion[]
@@ -37,6 +40,10 @@ export function useDescribir({ paleta, cuantas, d, setD, setEditando, setModalAb
   const [nada, setNada] = useState<string | null>(null)
   const [clave, setClave] = useState(leerClave)
   const [modelo, setModelo] = useState<string | null>(null)
+  const [cambios, setCambios] = useState<string[]>([])
+  const [claveRechazada, setClaveRechazada] = useState(false)
+  /* Lo que se pidió en esta sesión: la IA lo usa para entender "eso", "la tabla", "más grande". */
+  const historial = useRef<Turno[]>([])
   const corrida = useRef<AbortController | null>(null)
   const actual = useRef(d)
   useEffect(() => {
@@ -57,27 +64,46 @@ export function useDescribir({ paleta, cuantas, d, setD, setEditando, setModalAb
     setAviso(null)
     setNada(null)
     setResultado(null)
+    setCambios([])
     setInicio(Date.now())
     try {
       paso('Leyendo lo que pediste')
-      await espera(350, s)
+      await espera(300, s)
+      const hay = actual.current.bloques.length > 0
       let r: Resultado | null = null
+      let edito = false
       if (clave) {
-        paso('Pensando con Gemini, con todas las piezas de la app a mano')
+        paso(hay ? 'Mirando lo que hay en el lienzo y pensando con Gemini' : 'Pensando con Gemini, con todas las piezas de la app a mano')
         try {
-          const ia = await pensar({ clave, pedido: texto, paleta, alPensar: (t) => setPensamiento((p) => p + t), senal: s })
-          r = desdePlan(ia.plan, ia.porId, paleta)
+          const ia = await pensarDiseno({ clave, pedido: texto, historial: historial.current, diseno: actual.current, paleta, alPensar: (t) => setPensamiento((p) => p + t), senal: s })
+          r = { diseno: ia.diseno, partes: [], plantillas: [], entendido: ia.resumen || 'Listo.', abrir: modalDe(ia.diseno) }
+          edito = ia.edito
           setModelo(ia.modelo)
+          setClaveRechazada(false)
+          setCambios(ia.cambios)
+          for (const c of ia.cambios) {
+            paso(c)
+            await espera(200, s)
+          }
         } catch (e) {
           if (s.aborted) throw e
-          setAviso(`${e instanceof ErrorIA ? e.message : 'Gemini no respondió.'} Lo armé sin IA.`)
+          if (e instanceof ErrorIA && e.motivo === 'clave') setClaveRechazada(true)
+          setAviso(`${e instanceof ErrorIA ? e.message : 'Gemini no respondió.'} Lo hice sin IA.`)
         }
       }
       if (!r) {
         setModelo(null)
-        paso(`Buscando entre ${cuantas.piezas} piezas y ${cuantas.bloques} bloques de la app`)
-        await espera(550, s)
-        r = describir(texto, paleta)
+        /* Sin IA también se puede cambiar lo que hay: agregar una parte, sacar una, cambiar el título. */
+        const cambio = hay ? editarSinIA(texto, actual.current, paleta) : null
+        if (cambio) {
+          r = cambio
+          edito = true
+          paso('Cambiando lo que hay en el lienzo')
+        } else {
+          paso(`Buscando entre ${cuantas.piezas} piezas y ${cuantas.bloques} bloques de la app`)
+          await espera(550, s)
+          r = describir(texto, paleta)
+        }
       }
       if (!r) {
         setNada(texto)
@@ -85,26 +111,35 @@ export function useDescribir({ paleta, cuantas, d, setD, setEditando, setModalAb
         setEstado('quieto')
         return
       }
-      for (const p of r.partes) {
-        paso(`“${recortar(p.texto)}” → ${p.opciones[0]!.etiqueta}`)
-        await espera(240, s)
+      if (!edito) {
+        for (const p of r.partes) {
+          paso(`“${recortar(p.texto)}” → ${p.opciones[0]!.etiqueta}`)
+          await espera(240, s)
+        }
       }
-      paso(r.diseno.contenedor === 'app' ? 'Armando la pantalla' : 'Armándolo en el lienzo')
+      paso(edito ? 'Aplicando los cambios' : r.diseno.contenedor === 'app' ? 'Armando la pantalla' : 'Armándolo en el lienzo')
       anterior = actual.current
       setEstado('armando')
       setEditando(null)
       setModalAbierto(null)
       const final = r.diseno
-      setD({ ...final, bloques: [] })
-      for (let i = 1; i <= final.bloques.length; i++) {
-        await espera(i === 1 ? 220 : 340, s)
-        setD({ ...final, bloques: final.bloques.slice(0, i) })
+      if (edito) {
+        /* Un cambio se aplica de una: rearmar pieza por pieza haría parecer que se perdió lo que había. */
+        await espera(260, s)
+        setD(final)
+      } else {
+        setD({ ...final, bloques: [] })
+        for (let i = 1; i <= final.bloques.length; i++) {
+          await espera(i === 1 ? 220 : 340, s)
+          setD({ ...final, bloques: final.bloques.slice(0, i) })
+        }
       }
       await espera(260, s)
       setPasos((ps) => ps.map((p) => ({ ...p, hecho: true })))
       setPrevio(anterior)
       setResultado(r)
       setEditando(r.abrir)
+      historial.current = [...historial.current, { pedido: texto, resumen: r.entendido }].slice(-8)
       setEstado('quieto')
     } catch {
       /* Detenido: si ya estaba armando, vuelve lo que había. */
@@ -115,11 +150,13 @@ export function useDescribir({ paleta, cuantas, d, setD, setEditando, setModalAb
   }
 
   return {
-    estado, pasos, pensamiento, inicio, resultado, previo, aviso, nada, clave, modelo, armar,
+    estado, pasos, pensamiento, inicio, resultado, previo, aviso, nada, clave, modelo, cambios, claveRechazada, armar,
+    hayAlgo: d.bloques.length > 0,
     detener: () => corrida.current?.abort(),
     conectar: (k: string | null) => {
       guardarClave(k)
       setClave(leerClave())
+      setClaveRechazada(false)
     },
     cambiar: (i: number, k: number) => {
       if (!resultado) return
@@ -136,6 +173,7 @@ export function useDescribir({ paleta, cuantas, d, setD, setEditando, setModalAb
       setResultado(null)
       setPasos([])
       setEditando(null)
+      historial.current = historial.current.slice(0, -1)
     },
     plantilla: (crear: () => Diseno) => {
       setPrevio(actual.current)
@@ -191,21 +229,28 @@ function Segundos({ desde }: { desde: number }) {
 
 function Conexion({ desc }: { desc: Descripcion }) {
   const [abierto, setAbierto] = useState(!desc.clave)
+  const mala = desc.claveRechazada
+  useEffect(() => {
+    if (mala) setAbierto(true)
+  }, [mala])
   const [valor, setValor] = useState('')
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-line-row bg-surface-subtle">
       <button type="button" onClick={() => setAbierto((v) => !v)} aria-expanded={abierto} className="flex items-center justify-between gap-2 px-3 py-2 text-left">
         <span className="flex items-center gap-2 text-[12.5px] text-ink">
-          <span className={cn('size-2 rounded-full', desc.clave ? 'bg-green' : 'bg-line')} />
-          {desc.clave ? <>Piensa con <b className="font-semibold">Gemini</b>{desc.clave === CLAVE_DEL_EQUIPO && ' · clave del equipo'}</> : <>Sin IA · <span className="font-medium text-dash-blue">Conectar Gemini (gratis)</span></>}
+          <span className={cn('size-2 rounded-full', mala ? 'bg-dash-bad-fg' : desc.clave ? 'bg-green' : 'bg-line')} />
+          {mala ? <>Gemini rechazó la clave · <span className="font-medium text-dash-blue">Conectar otra</span></> : desc.clave ? <>Piensa con <b className="font-semibold">Gemini</b>{desc.clave === CLAVE_DEL_EQUIPO && ' · clave del equipo'}</> : <>Sin IA · <span className="font-medium text-dash-blue">Conectar Gemini (gratis)</span></>}
         </span>
         <ChevronDown className={cn('size-3.5 text-ink-muted transition-transform', abierto && 'rotate-180')} />
       </button>
       {abierto && (
         <div className="flex flex-col gap-2 border-t border-line-row px-3 pt-2.5 pb-3 text-[12px] leading-snug text-ink">
-          {desc.clave && desc.clave === CLAVE_DEL_EQUIPO ? (
+          {mala ? (
+            <span className="text-dash-bad-fg">{desc.clave === CLAVE_DEL_EQUIPO ? 'La clave del equipo dejó de funcionar: hay que renovarla en Google AI Studio y volver a cargarla en el deploy.' : 'Tu clave dejó de funcionar.'} Mientras tanto podés pegar una tuya abajo.</span>
+          ) : null}
+          {!mala && desc.clave && desc.clave === CLAVE_DEL_EQUIPO ? (
             <span>Usa la clave de Gemini del equipo. Cada descripción la piensa Gemini con el catálogo de la app.</span>
-          ) : desc.clave ? (
+          ) : !mala && desc.clave ? (
             <>
               <span>Tu clave de Gemini está guardada en este navegador. Cada descripción la piensa Gemini con el catálogo de la app.</span>
               <button type="button" onClick={() => desc.conectar(null)} className="self-start font-medium text-dash-bad-fg hover:underline">Quitar la clave</button>
@@ -250,7 +295,7 @@ export function Describir({ desc, listo }: { desc: Descripcion; listo: boolean }
           onChange={(e) => setTexto(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar() } }}
           rows={3}
-          placeholder="¿Qué querés armar? Ej: una pantalla de pacientes con métricas, la tabla y a la derecha los turnos del día"
+          placeholder={desc.hayAlgo ? 'Pedí un cambio: “sacá la tabla”, “cambiá el título a Patients”, “agregá un buscador”… o algo nuevo' : '¿Qué querés armar? Ej: una pantalla de pacientes con métricas, la tabla y a la derecha los turnos del día'}
           aria-label="Describe what you want to build"
           className="w-full resize-none border-0 bg-transparent px-1.5 py-1 text-[13.5px] leading-relaxed text-ink outline-none placeholder:text-ink-faint"
         />
@@ -311,6 +356,11 @@ export function Describir({ desc, listo }: { desc: Descripcion; listo: boolean }
             )}
           </div>
           <span className="self-start rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-ink-muted">{desc.modelo ? `Pensado con ${desc.modelo}` : 'Armado sin IA'}</span>
+          {desc.cambios.length > 0 && (
+            <ul className="m-0 flex list-disc flex-col gap-1 pl-5 text-[12.5px] leading-snug text-ink-medium">
+              {desc.cambios.map((c, i) => <li key={`${i}-${c}`}>{c}</li>)}
+            </ul>
+          )}
           {r.partes.length > 0 && (
             <ol className="m-0 flex list-none flex-col gap-2.5 p-0">
               {r.partes.map((p, i) => (
@@ -338,7 +388,7 @@ export function Describir({ desc, listo }: { desc: Descripcion; listo: boolean }
               ))}
             </div>
           )}
-          <p className="m-0 text-[11.5px] leading-snug text-ink-muted">Cada parte se cambia por otra opción acá arriba. Para lo demás, arrastrá desde Components o ajustá en Layers.</p>
+          <p className="m-0 text-[11.5px] leading-snug text-ink-muted">Seguí pidiendo cambios acá arriba: “sacá la tabla”, “cambiá el título a…”, “poné los turnos a la derecha”.{r.partes.length > 0 && ' Cada parte también se cambia por otra opción.'} Para lo demás, arrastrá desde Components o ajustá en Layers.</p>
         </section>
       ) : !ocupado && !desc.pasos.length && (
         <div className="flex flex-col gap-1.5">

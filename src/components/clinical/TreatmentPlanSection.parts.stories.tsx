@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Pencil } from 'lucide-react'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { CASOS, NO_ASIGNADOS } from '@/data/treatment-plan'
 import { esperar, pulsar, secuencia } from '@/design-system/play'
 import {
-  Dialogo, DialogoBorrarCaso, DialogoCompletar, DialogoMover, DialogoNuevoGrupo, OpcionRadio, Rail, TablaProcedimientos, VistaCaso, EstadoConsentimiento,
+  Dialogo, DialogoBorrarCaso, DialogoCompletar, DialogoMover, DialogoNuevoGrupo, OpcionRadio, Rail, TablaProcedimientos, VistaCaso, EstadoConsentimiento, AccionCaso,
 } from './TreatmentPlanSection'
 
 const meta = {
@@ -76,4 +78,16 @@ export const ConsentStatus: Story = {
 export const CaseViewCollapsed: Story = {
   render: () => <VistaCaso caso={CASOS[0]} favorito={false} onFavorito={() => {}} onDialogo={() => {}} onMover={() => {}} onCompletar={() => {}} />,
   play: secuencia(pulsar(/collapse case/i), esperar(/^total:/i)),
+}
+
+/* Ícono de acción del encabezado del caso: habilitado en su estado; fuera de él, deshabilitado con el tooltip que dice cuándo se usa. */
+export const CaseAction: Story = {
+  render: () => (
+    <TooltipProvider delayDuration={150}>
+      <div className="flex items-center gap-6 text-ink-medium">
+        <AccionCaso habilitado tooltip="Rename case" tooltipDeshabilitado="Only while planning" aria-label="Rename case"><Pencil className="size-4" /></AccionCaso>
+        <AccionCaso habilitado={false} tooltip="Rename case" tooltipDeshabilitado="Only while planning" aria-label="Rename case (disabled)"><Pencil className="size-4" /></AccionCaso>
+      </div>
+    </TooltipProvider>
+  ),
 }

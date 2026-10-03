@@ -27,6 +27,10 @@
     "empty": {
       "na": true,
       "reason": "La coincidencia es `marcadas.length === 0` dentro del texto de un toast de confirmación, no un estado vacío del componente."
+    },
+    "disabled": {
+      "story": "components/clinical/TreatmentPlanSection.parts.stories.tsx#CaseAction",
+      "reason": "El estado deshabilitado es el de los íconos del encabezado del caso (lápiz, ojo, Move to) fuera de su estado: se muestra en CaseAction y en CaseViewPending/CaseViewAccepted."
     }
   },
   "components/layout/LocationSelector.tsx": {

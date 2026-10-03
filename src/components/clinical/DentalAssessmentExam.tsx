@@ -1,20 +1,22 @@
 import { useState } from 'react'
-import { Plus, FilePlus, Table2 } from 'lucide-react'
+import { Plus, Stethoscope, Table2, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { aviso } from '@/components/ui/toaster'
-import { ModalShell, SelectField, TextArea, FormFooter } from '@/components/patients/form'
 import { OdontogramEmbed } from '@/components/clinical/OdontogramEmbed'
+import { ProblemList } from '@/components/clinical/ProblemList'
 import { ExamPanelHeader } from './dental/ExamPanelHeader'
 import { ReviewList, type ExamReview } from './dental/ReviewList'
 import { ReviewExamDialog } from './dental/ReviewExamDialog'
 import { FindingCard } from './dental/FindingCard'
 import { FindingActionsMenu } from './dental/FindingActionsMenu'
-import { NewProcedureModal, type ProcedureDraft } from './dental/NewProcedureModal'
+import { NewProcedureDrawer, type ProcedureDraft } from './dental/NewProcedureDrawer'
 import { EditProcedureModal } from './dental/EditProcedureModal'
 import { ConfirmProcedureDialog } from './dental/ConfirmProcedureDialog'
 import { useExamReviews } from './dental/useExamReviews'
 import { ACTIONS, type FindingAction } from './dental/actions'
-import { STATUS_STYLE, neighbours, quadrantTeeth, type Finding } from './dental/data'
+import { neighbours, quadrantTeeth, type Finding } from './dental/data'
 
 /* DentAssmt — Figma (proyecto hermano, misma spec). Reusa nuestro
    `Odontogram` real en vez del PNG con hotspots del original: ya existe,
@@ -25,9 +27,14 @@ import { STATUS_STYLE, neighbours, quadrantTeeth, type Finding } from './dental/
 
 const HOY = 'May 14, 2026'
 
-/* Mismo estilo que los botones de ClinicalToolbar.tsx: la fila que sigue
-   debajo es una continuación de esa botonera, no un elemento nuevo. */
-const BOTON_TOOLBAR = 'flex h-9 items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle'
+/* Las acciones del examen, flotando arriba a la izquierda del chart: blancas con sombra para despegarse del fondo punteado.
+   Con poco ancho queda sólo el ícono, con su tooltip. */
+const BOTON_FLOTANTE = 'flex h-9 items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 text-[13px] font-medium whitespace-nowrap shadow-[0_4px_12px_rgb(0_0_0/0.10)] hover:bg-surface-subtle xl:px-3.5'
+const ACCIONES_EXAMEN: { label: string; icono: LucideIcon; modo?: 'procedure' | 'condition' }[] = [
+  { label: 'Add Procedure', icono: Plus, modo: 'procedure' },
+  { label: 'Add Condition', icono: Stethoscope, modo: 'condition' },
+  { label: 'View Problem List', icono: Table2 },
+]
 
 const INITIAL_FINDINGS: Finding[] = [
   { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: HOY, status: 'Discarded', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [] },
@@ -37,37 +44,21 @@ const INITIAL_FINDINGS: Finding[] = [
   { id: 'F-5', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [] },
 ]
 
-const DOCUMENT_TYPES = ['Clinical note', 'Consent form', 'Lab prescription', 'Referral letter']
-
 const INITIAL_REVIEWS: ExamReview[] = [
   { id: 'R-1', date: 'January 12, 2026', provider: 'Daniel Anderson', note: 'Charting checked against the radiographs. Caries on tooth 3 confirmed, the rest of the arch is unremarkable. Cleared for treatment planning.' },
 ]
 
 
 
-export function NewDocumentDialog({ open, onClose, onSave }: { open: boolean; onClose: () => void; onSave: (type: string) => void }) {
-  const [type, setType] = useState(DOCUMENT_TYPES[0])
-  const [note, setNote] = useState('')
-  if (!open) return null
-  return (
-    <ModalShell title="New document" onClose={onClose} width="max-w-[380px]" footer={<FormFooter onCancel={onClose} onSave={() => { onSave(type); onClose() }} />}>
-      <div className="flex flex-col gap-4">
-        <SelectField label="Type" required value={type} onChange={setType} options={DOCUMENT_TYPES} />
-        <TextArea label="Notes" value={note} onChange={setNote} placeholder="What should this document say?" />
-      </div>
-    </ModalShell>
-  )
-}
-
 export function DentalAssessmentExam() {
   const [findings, setFindings] = useState<Finding[]>(INITIAL_FINDINGS)
   /* El chart sólo aparece una vez elegida la dentición. */
   const [procedureFor, setProcedureFor] = useState<number | null>(null)
-  const [procedureOpen, setProcedureOpen] = useState(false)
+  /* Add Procedure y Add Condition abren el mismo drawer; cambia con qué pestaña arranca. */
+  const [procedureOpen, setProcedureOpen] = useState<'procedure' | 'condition' | null>(null)
   const [editing, setEditing] = useState<Finding | null>(null)
   const [confirming, setConfirming] = useState<{ action: Exclude<FindingAction, 'edit'>; finding: Finding } | null>(null)
-  const [documentOpen, setDocumentOpen] = useState(false)
-  const [view, setView] = useState<'chart' | 'table'>('chart')
+  const [problemas, setProblemas] = useState(false)
   /* Los controles del odontograma salen en un flotante, no en columna. */
   const [controlesAbiertos, setControlesAbiertos] = useState(false)
   const reviewState = useExamReviews(INITIAL_REVIEWS, HOY)
@@ -76,9 +67,9 @@ export function DentalAssessmentExam() {
      listos: al cerrar el modal (Cancel o Save) el panel ya está ahí,
      sin un botón aparte para "Tooth controls" -se sacó, quedaba
      redundante con esto-. */
-  function openProcedure(tooth: number | null) {
+  function openProcedure(tooth: number | null, mode: 'procedure' | 'condition' = 'procedure') {
     setProcedureFor(tooth)
-    setProcedureOpen(true)
+    setProcedureOpen(mode)
     setControlesAbiertos(true)
   }
 
@@ -90,12 +81,12 @@ export function DentalAssessmentExam() {
         area: tooth !== null ? `Tooth ${tooth}` : draft.area,
         condition: `${draft.procedure.code} - ${draft.procedure.label}`,
         descriptor: draft.surfaces.join(', ') || draft.scope,
-        date: HOY, status: 'Active', tooth, provider: 'Elena Martinez',
+        date: HOY, status: draft.status === 'Existing' ? 'Externally Treated' : 'Active', tooth, provider: 'Elena Martinez',
         surfaces: draft.surfaces, notes: '', linked: draft.linked, diagnoses: draft.diagnoses,
       },
       ...f,
     ])
-    aviso.ok(`${draft.procedure.code} charted on ${tooth !== null ? `tooth ${tooth}` : draft.area.toLowerCase()}.`)
+    aviso.ok(`${draft.procedure.code} charted as ${draft.status.toLowerCase()} on ${tooth !== null ? `tooth ${tooth}` : draft.area.toLowerCase()}.`)
   }
 
   function applyConfirm(treatedIds: string[]) {
@@ -130,28 +121,6 @@ export function DentalAssessmentExam() {
 
   return (
     <div className="flex w-full flex-col gap-4">
-      {/* Antes eran 3 botones circulares flotando sobre el gráfico -tapaban
-          el chart al abrirse el panel de controles-. Julián pidió sacarlos
-          de ahí y ponerlos con nombre completo debajo de la botonera larga
-          (ClinicalToolbar, en ClinicalMode.tsx): misma función, nueva
-          posición. */}
-      <div className="flex flex-wrap items-center gap-2">
-        <button type="button" onClick={() => openProcedure(null)} className={BOTON_TOOLBAR}>
-          <Plus className="size-4" /> Add Procedure
-        </button>
-        <button type="button" onClick={() => setDocumentOpen(true)} className={BOTON_TOOLBAR}>
-          <FilePlus className="size-4" /> Add Document
-        </button>
-        <button
-          type="button"
-          aria-pressed={view === 'table'}
-          onClick={() => setView((v) => (v === 'table' ? 'chart' : 'table'))}
-          className={cn(BOTON_TOOLBAR, view === 'table' && 'border-dash-blue bg-dash-count-bg text-dash-blue-hover')}
-        >
-          <Table2 className="size-4" /> {view === 'table' ? 'View Chart' : 'View Problem List'}
-        </button>
-      </div>
-
       <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-start">
       <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-xl border border-line bg-white p-3 lg:order-1 lg:w-[300px]">
         <ExamPanelHeader tab={reviewState.tab} onTabChange={reviewState.setTab} onNewReview={reviewState.openDialog} />
@@ -170,45 +139,53 @@ export function DentalAssessmentExam() {
       </div>
 
       <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-line p-4 lg:order-2" data-examen style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fafbfe' }}>
-        {view === 'table' ? (
-          <div className="w-full overflow-x-auto rounded-lg border border-line bg-white">
-            <div className="min-w-[720px]">
-              <div className="flex h-12 items-center gap-3 border-b border-line-row bg-surface-alt px-4 text-xs font-semibold text-ink-muted">
-                <span className="w-[90px] shrink-0">Date</span>
-                <span className="w-[110px] shrink-0">Area</span>
-                <span className="w-[90px] shrink-0">Surface</span>
-                <span className="min-w-[180px] flex-1">Condition</span>
-                <span className="w-[110px] shrink-0">Provider</span>
-                <span className="w-[110px] shrink-0 text-center">Status</span>
-              </div>
-              {findings.map((f) => {
-                const style = STATUS_STYLE[f.status]
-                return (
-                  <div key={f.id} className="flex items-center gap-3 border-b border-line-row px-4 py-3 text-[13px] text-ink-soft last:border-0">
-                    <span className="w-[90px] shrink-0">{f.date}</span>
-                    <span className="w-[110px] shrink-0 truncate">{f.area}</span>
-                    <span className="w-[90px] shrink-0">{f.surfaces.join(', ') || '—'}</span>
-                    <span className="text-dash-blue min-w-[180px] flex-1 truncate font-semibold">{f.condition}</span>
-                    <span className="w-[110px] shrink-0 truncate">{f.provider}</span>
-                    <span className="w-[110px] shrink-0 text-center">
-                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${style.badge}`}>{f.status}</span>
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
+        {/* Arriba a la izquierda, en la fila de Odontogram / Periodontal Status, que ahí está libre: se ven apenas se
+            abre el examen (abajo quedaban fuera de la pantalla). En el celular van en su propia fila. La Problem list
+            se abre flotando sobre el chart, sin cambiar de vista. */}
+        <TooltipProvider delayDuration={150}>
+          <div className="z-10 flex items-center gap-2 self-start sm:absolute sm:top-[31px] sm:left-4">
+            {ACCIONES_EXAMEN.map(({ label, icono: Icono, modo }) => {
+              const boton = (
+                <button
+                  type="button"
+                  aria-label={label}
+                  onClick={modo ? () => openProcedure(null, modo) : undefined}
+                  className={cn(BOTON_FLOTANTE, !modo && problemas && 'border-dash-blue bg-dash-count-bg text-dash-blue-hover')}
+                >
+                  <Icono className="size-4" /> <span className="hidden xl:inline">{label}</span>
+                </button>
+              )
+              return (
+                <Tooltip key={label}>
+                  {modo ? (
+                    <TooltipTrigger asChild>{boton}</TooltipTrigger>
+                  ) : (
+                    <Popover open={problemas} onOpenChange={setProblemas}>
+                      <TooltipTrigger asChild>
+                        <PopoverTrigger asChild>{boton}</PopoverTrigger>
+                      </TooltipTrigger>
+                      <PopoverContent align="start" sideOffset={8} aria-label="Problem list" className="w-[min(820px,calc(100vw-2rem))] gap-0 bg-transparent p-0 shadow-none ring-0">
+                        <div className="rounded-xl shadow-[0_16px_40px_rgb(0_0_0/0.18)]"><ProblemList /></div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                  <TooltipContent side="bottom" sideOffset={4} className="bg-ink text-white xl:hidden">{label}</TooltipContent>
+                </Tooltip>
+              )
+            })}
           </div>
-        ) : (
-          <OdontogramEmbed controlesAbiertos={controlesAbiertos} onCerrarControles={() => setControlesAbiertos(false)} />
-        )}
+        </TooltipProvider>
+        <OdontogramEmbed controlesAbiertos={controlesAbiertos} onCerrarControles={() => setControlesAbiertos(false)} />
       </div>
       </div>
 
-      <NewProcedureModal
-        open={procedureOpen}
+      <NewProcedureDrawer
+        open={procedureOpen !== null}
+        mode={procedureOpen ?? 'procedure'}
         area={procedureFor !== null ? `Tooth ${procedureFor}` : 'Upper left'}
         teeth={procedureFor !== null ? neighbours(procedureFor) : quadrantTeeth(9)}
-        onClose={() => setProcedureOpen(false)}
+        findings={findings}
+        onClose={() => setProcedureOpen(null)}
         onSave={saveProcedure}
       />
 
@@ -225,8 +202,6 @@ export function DentalAssessmentExam() {
         onCancel={() => setConfirming(null)}
         onConfirm={applyConfirm}
       />
-
-      <NewDocumentDialog open={documentOpen} onClose={() => setDocumentOpen(false)} onSave={(type) => aviso.ok(`${type} added to the patient's documents.`)} />
 
       <ReviewExamDialog open={reviewState.dialogOpen} onCancel={reviewState.closeDialog} onConfirm={reviewState.confirm} />
     </div>

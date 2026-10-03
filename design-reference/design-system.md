@@ -92,12 +92,21 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
   `constructor/PanelDescribir.tsx`) piensa con animación: un orbe, los pasos
   y, con Gemini, sus pensamientos a medida que llegan; después arma el lienzo
   bloque por bloque (docs.css, `bl-*`). Con una clave de Gemini (plan gratis,
-  la pega cada persona y queda en su navegador) piensa `constructor/ia.ts`:
-  `streamGenerateContent` con `thinkingConfig.includeThoughts` y un
-  `responseSchema` que sólo admite piezas del catálogo (ids cortos p1…),
-  bloques, tablas y campos; `desdePlan` lo arma. Si el modelo no existe
-  prueba el siguiente; si falla (clave, límite, red) lo dice y arma sin IA.
-  Sin clave arma con `constructor/describir.ts`, sin IA: parte
+  la pega cada persona y queda en su navegador) piensa `constructor/ia.ts`
+  (`pensarDiseno`): `streamGenerateContent` con
+  `thinkingConfig.includeThoughts`; Gemini recibe el catálogo (piezas con ids
+  cortos p1…, los campos de cada bloque y de cada tabla), el **lienzo actual**
+  en JSON con sus ids y los pedidos anteriores de la sesión, y devuelve el
+  diseño entero. Así edita: "cambiá el título", "sacá la tabla", "poné los
+  turnos a la derecha" tocan sólo eso y lo demás vuelve con el mismo id;
+  algo nuevo lo arma de cero. `desdeFormatoIA` valida todo campo contra el
+  bloque real (tipos, valores permitidos, columnas que existen) y descarta
+  lo que no existe. Un cambio se aplica de una; algo nuevo se arma bloque
+  por bloque. Si el modelo no existe prueba el siguiente; si falla (clave,
+  límite, red) lo dice —una clave rechazada se marca en rojo y ofrece pegar
+  otra— y sigue sin IA. Sin IA también se edita lo que hay
+  (`editarSinIA`): agregar una parte, sacar una por su nombre y cambiar el
+  título. Sin clave arma con `constructor/describir.ts`, sin IA: parte
   el texto (comas, "y", "a la derecha", "abajo"), reconoce campos (≈45 clases
   de dato, con su control y opciones sacadas de `src/data`: profesionales,
   pacientes, seguros, zonas…), bloques por palabras de UI (tabla de

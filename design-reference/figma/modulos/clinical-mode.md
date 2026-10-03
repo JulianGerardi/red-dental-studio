@@ -1631,3 +1631,64 @@ A pedido de Julian, dentro de un caso (Periodontists Recommended y los demas):
   231.12") en el encabezado, junto al estado: es la misma caja abierta y plegada.
 - **Preview sube al encabezado** como icono, junto al lapiz, con tooltip. Antes
   era un link de texto debajo del select.
+
+
+## DentAssmt: Add Procedure / Add Condition en un drawer (2026-10-03)
+
+A pedido de Julian, siguiendo la organizacion del Figma UX-UI 2.0 (1669:87207
+el drawer, 1669:87208 los tres pasos) con el design system de la app:
+
+1. **Drawer a la derecha** (`components/ui/drawer.tsx`) en vez de modal: el
+   chart queda a la vista mientras se carga. Es la excepcion pedida a la regla
+   de no usar drawers en red-clone.
+2. **"Add Document" pasa a "Add Condition".** Los dos botones abren el mismo
+   drawer: Add Procedure arranca en *Planned* y se titula New Procedure; Add
+   Condition arranca en *Existing* (algo que el paciente ya tiene hecho) y se
+   titula New Condition.
+3. **Los pasos tienen nombre**: el indicador dice Procedure, Surfaces y Link to
+   finding en vez de "Step" (`StepIndicator` con `labels`).
+4. **Procedure**: la busqueda tiene pestañas *Existing* / *Planned* con su
+   cantidad. Existing muestra solo lo que queda en la boca (restauraciones y
+   endodoncias); el estado se guarda con el procedimiento (Existing queda como
+   Externally Treated, Planned como Active).
+5. **Surfaces** es opcional: no todo procedimiento va en una superficie.
+6. **Link to finding** lista los hallazgos del examen (no los descartados):
+   cada card dice el nombre del hallazgo y, si tiene, sus superficies
+   ("Localized periodontal pocketing - B, MB") y debajo la zona.
+7. **Botones arriba a la izquierda del chart**, en la fila de Odontogram /
+   Periodontal Status, que ahi esta libre: Add Procedure, Add Condition y View
+   Problem List. Abajo quedaban fuera de la pantalla (Julian: "ahi abajo no se
+   ven"). Medido: centrados con esa fila a 1440, 1280 y 1024. Con menos de
+   1280 queda solo el icono, con su tooltip; en el celular van en su fila.
+8. **View Problem List abre la tabla del overview flotando** (`ProblemList` en
+   un Popover) sobre el chart, sin cambiar de vista. Se cierra con Escape o
+   tocando afuera.
+
+### La busqueda de procedure, como en la app real (red.dev, 2026-10-03)
+
+Mirado en red.dev sin guardar nada (New Procedure y New Condition, abiertos y
+cancelados). Lo que se trajo al paso Procedure del drawer:
+
+- Placeholder **"Search by code or description"**.
+- **Las 14 categorias del catalogo** (Adjunctive service, Cosmetic & aesthetic
+  services, Diagnostic services, Endodontic services, Implant services,
+  Maxillofacial prosthetics, Oral and maxillofacial surgery, Orthodontic
+  services, Periodontal services, Preventive services, Prosthodontics fixed y
+  removable, Restorative services). En la app real son una columna a la
+  izquierda de un modal ancho; en un drawer de 440px van en un select
+  "Category". La app real escribe "Adjuntive service"; aca va bien escrito.
+- **El embudo filtra por area de tratamiento** con switches: Show all
+  treatment, Arch, Mouth, Quadrant, Surface, Tooth. Con filtros activos el
+  embudo se pone azul y muestra cuantos hay.
+- **Cada procedimiento muestra su area** en un chip debajo de la descripcion,
+  como los resultados de la busqueda real.
+- **Codigos y descripciones reales** (D0120 Periodic oral evaluation -
+  established patient, D2740 Crown - porcelain/ceramic, D4341 scaling and root
+  planing...). D3310 decia "Treatment of Root Canal Obstruction", que es otro
+  codigo: ahora dice Endodontic therapy, anterior tooth.
+
+Lo que la app real hace distinto y no se trajo: New Procedure es un modal
+centrado (se pidio drawer) y al pasar de paso avisa con un "Validation warning"
+si el area elegida no coincide con la que pide el procedimiento. New Condition
+es un flujo aparte, una busqueda de condiciones filtrada por el area elegida;
+aca Add Condition abre el mismo drawer en Existing, como se pidio.

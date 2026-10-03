@@ -113,3 +113,35 @@ resto vivía adentro de un solo componente de 456 líneas.
    lleno y vacío; editor editando, nuevo y con errores; preview de clínica y
    de paciente; toolbar- y **Specs** al final (medidas leídas de la pantalla
    dibujada, tokens y reglas). Todo se puede usar.
+
+
+## Consent text: un solo editor, vacío de verdad (2026-10-03)
+
+1. **Un solo editor de texto enriquecido**, como en el Figma. "Nature of
+   procedure" y "Risk and complications" dejan de ser campos fijos: son
+   encabezados del contenido de cada template. Un template nuevo arranca
+   **vacío**, sin secciones ni guías, sólo el placeholder.
+2. **La barra de formato funciona** (negrita, cursiva, subrayado, H1, H2,
+   párrafo, listas) sobre lo seleccionado, cada ícono con su tooltip. Pegar
+   pega texto plano. Las listas que Chrome mete dentro de un `<p>` se sacan.
+3. **El preview pinta el mismo contenido**: los H2 se ven como el rótulo de
+   una sección de la hoja; vacío, "No content yet". Se limpia el HTML antes
+   de pintarlo (sólo las etiquetas de la barra, sin atributos).
+4. **La pantalla arranca en un template nuevo y vacío**, como el estado Empty
+   del design system; los templates se abren desde la lista.
+5. Design system: *Consent text · Empty* sin secciones; *Filled* con los
+   encabezados como contenido; *Formatting toolbar* ya no es decorativa.
+
+### Vuelta atrás: los dos campos, sin nada escrito (2026-10-03)
+
+Julián prefirió los **dos campos separados** con su guía ("Nature of procedure",
+"Risk and complications"). Lo único que cambia respecto de antes: **las cajas
+no traen nada escrito** (sin placeholder) en un template nuevo ni en el estado
+Empty. La pantalla vuelve a abrir con el primer template de la lista y la barra
+de formato vuelve a avisar que no está disponible.
+
+El editor único de arriba queda **oculto** en `Consents.tsx`
+(`EDITOR_UNICO = false`): poniéndolo en `true` vuelve esa versión entera
+(editor, barra que aplica formato, preview con el HTML y la pantalla que abre
+vacía). Su componente está exento en `exentos.json` para que no aparezca en el
+design system.

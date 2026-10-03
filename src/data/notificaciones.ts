@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { AtSign, BadgeDollarSign, CalendarPlus, ClipboardCheck, FileCheck2, FileSignature, FlaskConical, ListTodo, Send, ShieldAlert, TrendingUp, Wrench } from 'lucide-react'
+import { AtSign, BadgeDollarSign, CalendarPlus, ClipboardCheck, FileCheck2, FileSignature, FlaskConical, ListTodo, LogIn, Package, Receipt, Send, ShieldAlert, TrendingUp, Truck, Wrench } from 'lucide-react'
 
 /* Las notificaciones del usuario, con la lógica del Inbox de Notion: cada una está sin leer, leída o pendiente
    (lo que quedó para hacer), y se archiva cuando ya no hace falta verla. Las que son tareas van además al banner
@@ -22,6 +22,8 @@ export type Notificacion = {
   estado: EstadoNotificacion
   /** Quién la generó, si fue una persona. */
   autor?: string
+  /** Arranca archivada. */
+  archivada?: boolean
 }
 
 const HORA = 60
@@ -164,6 +166,89 @@ export const NOTIFICACIONES: Notificacion[] = [
     tarea: false,
     hace: 11 * DIA,
     estado: 'read',
+  },
+  /* Las que completan cada combinación en la app (estado × tipo, archivadas, texto largo, "Just now"). */
+  {
+    id: 'n13',
+    titulo: 'Maria Abril Viola checked in',
+    detalle: 'Waiting room · 10:00 AM appointment with Dr. Elena Martinez.',
+    accion: 'Open scheduling',
+    to: '/scheduling',
+    icon: LogIn,
+    tarea: false,
+    hace: 0,
+    estado: 'unread',
+  },
+  {
+    id: 'n14',
+    titulo: 'Approve next week’s hygienist schedule',
+    detalle: 'Sarah Stone sent the schedule for Abril - Los Angeles.',
+    accion: 'Open scheduling',
+    to: '/scheduling',
+    icon: ClipboardCheck,
+    tarea: true,
+    hace: 8 * HORA,
+    estado: 'read',
+    autor: 'Sarah Stone',
+  },
+  {
+    id: 'n15',
+    titulo: 'New fee schedule from Delta Dental',
+    detalle: 'Updated allowed amounts take effect on November 1.',
+    accion: 'Open billing',
+    to: '/billing',
+    icon: Receipt,
+    tarea: false,
+    hace: 2 * DIA + 3 * HORA,
+    estado: 'pending',
+  },
+  {
+    id: 'n16',
+    titulo: 'Referral to Dr. Alvarez for periodontal evaluation needs a signed consent before the specialist’s office can schedule the first visit',
+    detalle: 'Mara Otero · Periodontics referral sent on September 12. The patient asked to be called in the afternoon, after 3 PM, and prefers the Uptown office if there is availability this month.',
+    accion: 'Open referral',
+    to: '/patients/patient-0001/treatments',
+    icon: Send,
+    tarea: false,
+    hace: 6 * HORA,
+    estado: 'unread',
+    autor: 'Dr. Alvarez’s office',
+  },
+  {
+    id: 'n17',
+    titulo: 'Lab case shipped',
+    detalle: 'Lakeside Lab shipped the crown for Noah James. Arrives Thursday.',
+    accion: 'View documents',
+    to: '/patients/patient-0001/documents',
+    icon: Truck,
+    tarea: false,
+    hace: 5 * DIA,
+    estado: 'read',
+    archivada: true,
+  },
+  {
+    id: 'n18',
+    titulo: 'Supply order delivered',
+    detalle: 'Gloves, masks and impression material arrived at Abril - Los Angeles.',
+    accion: 'Open locations',
+    to: '/settings/locations',
+    icon: Package,
+    tarea: false,
+    hace: 8 * DIA,
+    estado: 'unread',
+    archivada: true,
+  },
+  {
+    id: 'n19',
+    titulo: 'Follow up on an overdue balance',
+    detalle: 'Elias Aguirre has $48.50 overdue for 45 days.',
+    accion: 'Open ledger',
+    to: '/patients/patient-0001/ledger',
+    icon: BadgeDollarSign,
+    tarea: true,
+    hace: 10 * DIA,
+    estado: 'pending',
+    archivada: true,
   },
 ]
 

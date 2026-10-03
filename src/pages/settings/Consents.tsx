@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import {
   Search, Plus, Bold, Italic, Underline, Heading1, Heading2,
   Pilcrow, List, ListOrdered, X, Eye, Power, PowerOff,
@@ -11,7 +11,8 @@ import { Switch } from '@/components/ui/switch'
 import { SelectField } from '@/components/patients/form'
 import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
-import { ConsentDocument } from '@/components/settings/ConsentDocument'
+import { ConsentDocument, textoPlano } from '@/components/settings/ConsentDocument'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Tabs } from '@/components/ui/tabs'
 
 /* Settings → Consents. Figma 4106:170620 ("New Consent Template"): lista de
@@ -27,12 +28,9 @@ import { Tabs } from '@/components/ui/tabs'
    quirk que "First Name" en Employees.tsx: acá los campos son choices, no
    texto libre-.
 
-   El Figma muestra "Consent text" como un solo bloque de texto enriquecido
-   con encabezados inline (Nature of procedure, Risk and complications). Sin
-   un editor de texto enriquecido real en este prototipo, se separaron en dos
-   campos estructurados con su propio label -mismo contenido, modelo de datos
-   más simple-, bajo un solo toolbar decorativo (ver comentario en
-   ToolbarFormato). Las partes (lista, tarjeta, editor, procedimientos, texto,
+   "Consent text" son dos campos con su rótulo y su guía (Nature of procedure,
+   Risk and complications), vacíos en un template nuevo. La versión de un solo
+   editor enriquecido queda oculta detrás de EDITOR_UNICO. Las partes (lista, tarjeta, editor, procedimientos, texto,
    preview) se exportan para documentarlas en el design system; ver
    design-reference/figma/modulos/consents.md. */
 
@@ -56,8 +54,23 @@ export type ConsentTemplate = {
   sistema: boolean
   procedimientos: string[]
   naturaleza: string
+  /** Un riesgo por línea. */
   riesgos: string
 }
+
+/* Oculto a pedido de Julián (2026-10-03): "Consent text" como un solo editor enriquecido, con los dos encabezados como
+   contenido. Queda armado por si se vuelve a esta versión: poner esto en `true`. Ver consents.md. */
+const EDITOR_UNICO = false
+
+/* El texto del editor único, hecho con los dos campos: la naturaleza del procedimiento y la lista de riesgos. */
+const textoDe = (naturaleza: string, riesgos: string) => {
+  const lineas = riesgos.split('\n').filter(Boolean)
+  return naturaleza || lineas.length
+    ? `<h2>Nature of procedure</h2><p>${naturaleza}</p><h2>Risk and complications</h2><ul>${lineas.map((r) => `<li>${r}</li>`).join('')}</ul>`
+    : ''
+}
+const EXPLICADO = 'The proposed treatment has been explained to me in a way that I understood, including what will be done and why it is recommended.'
+const ALTERNATIVAS = 'Alternatives to the proposed treatment, including the option of no treatment, have been discussed with me.'
 
 export const TEMPLATES_INICIALES: ConsentTemplate[] = [
   {
@@ -66,7 +79,7 @@ export const TEMPLATES_INICIALES: ConsentTemplate[] = [
     activo: true,
     sistema: false,
     procedimientos: ['D7240', 'D3948'],
-    naturaleza: 'The proposed treatment has been explained to me in a way that I understood, including what will be done and why it is recommended.',
+    naturaleza: EXPLICADO,
     riesgos: 'Pain, swelling, bleeding, or bruising.\nInfection or delayed healing.\nReaction to medications or anesthesia.\nNeed for additional treatment if complications occur.',
   },
   {
@@ -75,8 +88,8 @@ export const TEMPLATES_INICIALES: ConsentTemplate[] = [
     activo: true,
     sistema: false,
     procedimientos: ['D3310'],
-    naturaleza: 'The proposed treatment has been explained to me in a way that I understood, including what will be done and why it is recommended.',
-    riesgos: 'Alternatives to the proposed treatment, including the option of no treatment, have been discussed with me.\nPossible instrument separation or need for retreatment.\nPersistent pain or swelling after treatment.',
+    naturaleza: EXPLICADO,
+    riesgos: `${ALTERNATIVAS}\nPossible instrument separation or need for retreatment.\nPersistent pain or swelling after treatment.`,
   },
   {
     id: 't3',
@@ -84,8 +97,8 @@ export const TEMPLATES_INICIALES: ConsentTemplate[] = [
     activo: true,
     sistema: true,
     procedimientos: ['D3320'],
-    naturaleza: 'The proposed treatment has been explained to me in a way that I understood, including what will be done and why it is recommended.',
-    riesgos: 'Alternatives to the proposed treatment, including the option of no treatment, have been discussed with me.\nPossible instrument separation or need for retreatment.',
+    naturaleza: EXPLICADO,
+    riesgos: `${ALTERNATIVAS}\nPossible instrument separation or need for retreatment.`,
   },
 ]
 
@@ -105,35 +118,66 @@ export type Borrador = {
   procedimientos: string[]
   naturaleza: string
   riesgos: string
+  /** Sólo con EDITOR_UNICO: el HTML del editor enriquecido. */
+  texto: string
 }
 
-export const BORRADOR_VACIO: Borrador = { titulo: '', procedimientos: [], naturaleza: '', riesgos: '' }
+export const BORRADOR_VACIO: Borrador = { titulo: '', procedimientos: [], naturaleza: '', riesgos: '', texto: '' }
 
-/* Guía para quien redacta el template: va en el editor, no en la hoja que ve
-   el paciente. */
+/* Guía para quien redacta el template: va en el editor, no en la hoja que ve el paciente. */
 const GUIA_NATURALEZA = 'Describe the proposed treatment, what the procedure involves, expected outcomes, and other relevant information the patient should understand before treatment.'
 const GUIA_RIESGOS = 'Describe the material risks, potential complications, and other relevant considerations associated with the proposed treatment.'
 export const aBorrador = (t: ConsentTemplate): Borrador => ({
-  titulo: t.titulo, procedimientos: t.procedimientos, naturaleza: t.naturaleza, riesgos: t.riesgos,
+  titulo: t.titulo, procedimientos: t.procedimientos, naturaleza: t.naturaleza, riesgos: t.riesgos, texto: textoDe(t.naturaleza, t.riesgos),
 })
 
-/* Toolbar decorativo: mismo trato que el botón "Select File" de Documents en
-   Employees.tsx -avisa que no está disponible en vez de fingir que hace
-   algo-. No hay editor de texto enriquecido real en este prototipo. */
-export function ToolbarFormato() {
-  const iconos = [Bold, Italic, Underline, Heading1, Heading2, Pilcrow, List, ListOrdered]
+/* Con el editor único cada botón aplica su formato a lo seleccionado (`mousedown` sin foco para no perder la selección);
+   con los dos campos de texto no hay formato y avisa, como el botón "Select File" de Employees. */
+const FORMATOS = [
+  { icono: Bold, label: 'Bold', comando: 'bold' },
+  { icono: Italic, label: 'Italic', comando: 'italic' },
+  { icono: Underline, label: 'Underline', comando: 'underline' },
+  { icono: Heading1, label: 'Heading 1', comando: 'formatBlock', valor: 'h1' },
+  { icono: Heading2, label: 'Heading 2', comando: 'formatBlock', valor: 'h2' },
+  { icono: Pilcrow, label: 'Paragraph', comando: 'formatBlock', valor: 'p' },
+  { icono: List, label: 'Bulleted list', comando: 'insertUnorderedList' },
+  { icono: ListOrdered, label: 'Numbered list', comando: 'insertOrderedList' },
+] as const
+
+/* Chrome mete la lista dentro del <p> en que estaba el cursor: se saca el <p> y se avisa al editor del cambio. */
+function aplicarFormato(comando: string, valor?: string) {
+  document.execCommand(comando, false, valor)
+  if (!comando.startsWith('insert')) return
+  const nodo = getSelection()?.anchorNode
+  const lista = (nodo instanceof Element ? nodo : nodo?.parentElement)?.closest('ul,ol')
+  const padre = lista?.parentElement
+  if (!lista || padre?.tagName !== 'P') return
+  const editor = padre.closest('[contenteditable]')
+  padre.replaceWith(...padre.childNodes)
+  editor?.dispatchEvent(new Event('input', { bubbles: true }))
+}
+
+export function ToolbarFormato({ aplica = false }: { aplica?: boolean }) {
   return (
     <div className="flex items-center gap-0.5 rounded-t-md border border-b-0 border-line bg-surface-subtle px-2 py-1.5">
-      {iconos.map((Icono, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={() => aviso.info('Rich text formatting is not available in this release.')}
-          className="rounded p-1.5 text-ink-medium hover:bg-black/5"
-        >
-          <Icono className="size-3.5" />
-        </button>
-      ))}
+      <TooltipProvider delayDuration={150}>
+        {FORMATOS.map((f) => (
+          <Tooltip key={f.label}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label={f.label}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => (aplica ? aplicarFormato(f.comando, 'valor' in f ? f.valor : undefined) : aviso.info('Rich text formatting is not available in this release.'))}
+                className="rounded p-1.5 text-ink-medium hover:bg-black/5"
+              >
+                <f.icono className="size-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" sideOffset={4} className="bg-ink text-white">{f.label}</TooltipContent>
+          </Tooltip>
+        ))}
+      </TooltipProvider>
       <span className="ml-auto pr-1 text-[11px] text-ink-faint max-sm:hidden">Basic formatting only</span>
     </div>
   )
@@ -267,15 +311,15 @@ export function SelectorProcedimientos({ elegidos, onCambiar, error }: {
   )
 }
 
-/* El texto del consentimiento: dos secciones con su rótulo y, debajo de cada caja, la guía en cursiva para quien
-   redacta (no va en la hoja del paciente). Un solo toolbar arriba, decorativo. */
+/* El texto del consentimiento: dos secciones con su rótulo y, debajo de cada caja, la guía en cursiva para quien redacta
+   (no va en la hoja del paciente). Las cajas no traen nada escrito: vacías en un template nuevo. */
 export function TextoConsentimiento({ naturaleza, riesgos, onNaturaleza, onRiesgos }: {
   naturaleza: string
   riesgos: string
   onNaturaleza: (v: string) => void
   onRiesgos: (v: string) => void
 }) {
-  const caja = 'focus:border-dash-blue w-full resize-none rounded-md border border-line bg-white px-3 py-2 text-[13px] placeholder:text-ink-faint focus:outline-none'
+  const caja = 'focus:border-dash-blue w-full resize-none rounded-md border border-line bg-white px-3 py-2 text-[13px] focus:outline-none'
   return (
     <div className="flex flex-col gap-2">
       <span className="text-xs font-medium text-ink">Consent text</span>
@@ -283,14 +327,55 @@ export function TextoConsentimiento({ naturaleza, riesgos, onNaturaleza, onRiesg
       <div className="-mt-2 flex flex-col gap-3 rounded-b-md border border-t-0 border-line p-3">
         <label className="flex flex-col gap-1.5">
           <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Nature of procedure</span>
-          <textarea rows={3} value={naturaleza} onChange={(e) => onNaturaleza(e.target.value)} placeholder="Describe the procedure in plain language..." className={caja} />
+          <textarea rows={3} value={naturaleza} onChange={(e) => onNaturaleza(e.target.value)} className={caja} />
           <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_NATURALEZA}</span>
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Risk and complications</span>
-          <textarea rows={4} value={riesgos} onChange={(e) => onRiesgos(e.target.value)} placeholder="One risk per line..." className={caja} />
+          <textarea rows={4} value={riesgos} onChange={(e) => onRiesgos(e.target.value)} className={caja} />
           <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_RIESGOS}</span>
         </label>
+      </div>
+    </div>
+  )
+}
+
+/* Oculto (EDITOR_UNICO): el texto como un solo editor con la barra de formato arriba. Vacío, sólo el placeholder. */
+const PROSA_EDITOR =
+  '[&_h1]:mt-3 [&_h1]:mb-1 [&_h1]:text-[15px] [&_h1]:font-bold [&_h2]:mt-3 [&_h2]:mb-1 [&_h2]:text-[11px] [&_h2]:font-semibold [&_h2]:tracking-wide [&_h2]:text-ink-muted [&_h2]:uppercase [&_p]:my-1 [&_ul]:my-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-1 [&_ol]:list-decimal [&_ol]:pl-5 [&>:first-child]:mt-0'
+
+function TextoConsentimientoUnico({ texto, onTexto }: { texto: string; onTexto: (v: string) => void }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const escrito = useRef<string | null>(null)
+  const id = useId()
+  /* El editor no es controlado: sólo se reescribe cuando el texto cambia desde afuera (otro template), no al tipear. */
+  useEffect(() => {
+    if (ref.current && texto !== escrito.current) ref.current.innerHTML = texto
+    escrito.current = texto
+  }, [texto])
+  return (
+    <div className="flex flex-col gap-2">
+      <span id={id} className="text-xs font-medium text-ink">Consent text</span>
+      <div>
+        <ToolbarFormato aplica />
+        <div className="relative">
+          {!textoPlano(texto) && (
+            <span aria-hidden className="pointer-events-none absolute top-3 left-3 text-[13px] text-ink-faint">
+              Write the consent text the patient will read and sign...
+            </span>
+          )}
+          <div
+            ref={ref}
+            role="textbox"
+            aria-multiline="true"
+            aria-labelledby={id}
+            contentEditable
+            onFocus={() => document.execCommand('defaultParagraphSeparator', false, 'p')}
+            onInput={(e) => { escrito.current = e.currentTarget.innerHTML; onTexto(escrito.current) }}
+            onPaste={(e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData.getData('text/plain')) }}
+            className={cn('focus:border-dash-blue min-h-[220px] rounded-b-md border border-line bg-white p-3 text-[13px] leading-relaxed text-ink focus:outline-none', PROSA_EDITOR)}
+          />
+        </div>
       </div>
     </div>
   )
@@ -344,12 +429,16 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
         error={faltaTitulo ? 'This field is required.' : undefined}
       />
       <SelectorProcedimientos elegidos={borrador.procedimientos} onCambiar={(procedimientos) => onBorrador({ ...borrador, procedimientos })} error={faltaProcedimiento} />
-      <TextoConsentimiento
-        naturaleza={borrador.naturaleza}
-        riesgos={borrador.riesgos}
-        onNaturaleza={(naturaleza) => onBorrador({ ...borrador, naturaleza })}
-        onRiesgos={(riesgos) => onBorrador({ ...borrador, riesgos })}
-      />
+      {EDITOR_UNICO ? (
+        <TextoConsentimientoUnico texto={borrador.texto} onTexto={(texto) => onBorrador({ ...borrador, texto })} />
+      ) : (
+        <TextoConsentimiento
+          naturaleza={borrador.naturaleza}
+          riesgos={borrador.riesgos}
+          onNaturaleza={(naturaleza) => onBorrador({ ...borrador, naturaleza })}
+          onRiesgos={(riesgos) => onBorrador({ ...borrador, riesgos })}
+        />
+      )}
 
       <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex justify-end gap-3 rounded-b-xl border-t border-line bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
         <Button variant="secondary" className="px-6" onClick={onCancelar}>Cancel</Button>
@@ -391,6 +480,7 @@ export function PanelPreview({ borrador, vistaPaciente, onVistaPaciente }: {
           procedimiento={borrador.procedimientos.length > 0 ? procedimiento(borrador.procedimientos[0])?.nombre : undefined}
           naturaleza={borrador.naturaleza}
           riesgos={borrador.riesgos}
+          texto={EDITOR_UNICO ? borrador.texto : undefined}
           vistaPaciente={vistaPaciente}
         />
       </div>
@@ -407,8 +497,9 @@ export function SettingsConsents() {
      que la tarjeta desaparezca de golpe. Se limpia al cambiar de filtro o
      de búsqueda. */
   const [fijados, setFijados] = useState<string[]>([])
-  const [actualId, setActualId] = useState<string | null>('t1')
-  const [borrador, setBorrador] = useState<Borrador>(aBorrador(TEMPLATES_INICIALES[0]))
+  /* Con el editor único arranca en un template nuevo y vacío; con los dos campos, en el primero de la lista. */
+  const [actualId, setActualId] = useState<string | null>(EDITOR_UNICO ? null : 't1')
+  const [borrador, setBorrador] = useState<Borrador>(EDITOR_UNICO ? BORRADOR_VACIO : aBorrador(TEMPLATES_INICIALES[0]))
   const [intentado, setIntentado] = useState(false)
   const [vistaPaciente, setVistaPaciente] = useState(false)
 

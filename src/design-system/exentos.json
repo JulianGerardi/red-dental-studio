@@ -8,5 +8,6 @@
   "components/clinical/OdontogramEmbed.tsx#PanelArribaDeTabs": "Necesita los nodos que crea la librería del odontograma. Se ve dentro de Components / Clinical / DentalAssessmentExam.",
   "components/scheduling/CalendarViews.tsx#ColumnaDia": "Recibe refs de arrastre internas. Se ve dentro de las vistas Day y Week (Components / Scheduling / CalendarViews).",
   "components/scheduling/CalendarViews.tsx#VistaHoras": "Es lo que dibujan VistaDia y VistaSemana: se ve en sus stories Day y Week.",
-  "components/patients/PatientSidePanel.tsx#FileText": "Re-exporta un ícono de lucide; no es un componente propio."
+  "components/patients/PatientSidePanel.tsx#FileText": "Re-exporta un ícono de lucide; no es un componente propio.",
+  "pages/settings/Consents.tsx#TextoConsentimientoUnico": "Versión oculta del texto del consentimiento (un solo editor enriquecido, EDITOR_UNICO = false en Consents.tsx). Se guarda por si se vuelve a ella; ver consents.md."
 }

@@ -22,7 +22,7 @@ type Ctx = {
 const Contexto = createContext<Ctx | null>(null)
 
 export function NotificacionesProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<NotificacionViva[]>(() => NOTIFICACIONES.map((n) => ({ ...n, archivada: false })))
+  const [items, setItems] = useState<NotificacionViva[]>(() => NOTIFICACIONES.map((n) => ({ ...n, archivada: n.archivada ?? false })))
   const [ocultas, setOcultas] = useState<string[]>([])
 
   const cambiar = useCallback((ids: string[], f: (n: NotificacionViva) => NotificacionViva) =>

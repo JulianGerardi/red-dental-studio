@@ -17,24 +17,48 @@ export const STATUS_STYLE: Record<FindingStatus, { badge: string; rail: string; 
   'No Treatment Needed': RED, 'Patient Declined': RED, 'Clinic Declined': RED, Discarded: RED,
 }
 
-export type ProcedureGroup = 'Diagnostic' | 'Preventive' | 'Restorative' | 'Endodontic'
+/* Las categorías y el catálogo como en la app real (red.dev, New Procedure): cada procedimiento con su área de tratamiento,
+   que es lo que filtra el embudo y lo que muestra el chip debajo de la descripción. */
+export const PROCEDURE_GROUPS = [
+  'All', 'Adjunctive service', 'Cosmetic & aesthetic services', 'Diagnostic services', 'Endodontic services', 'Implant services',
+  'Maxillofacial prosthetics', 'Oral and maxillofacial surgery', 'Orthodontic services', 'Periodontal services', 'Preventive services',
+  'Prosthodontics, fixed', 'Prosthodontics, removable', 'Restorative services',
+] as const
+export type ProcedureFilter = (typeof PROCEDURE_GROUPS)[number]
+export type ProcedureGroup = Exclude<ProcedureFilter, 'All'>
 export type ProcedureScope = 'Tooth' | 'Surface' | 'Quadrant' | 'Arch'
 export const SCOPES: ProcedureScope[] = ['Tooth', 'Surface', 'Quadrant', 'Arch']
-export type ProcedureOption = { code: string; label: string; group: ProcedureGroup }
-
-export const PROCEDURE_GROUPS = ['All', 'Diagnostic', 'Preventive', 'Restorative', 'Endodontic'] as const
-export type ProcedureFilter = (typeof PROCEDURE_GROUPS)[number]
+export const TREATMENT_AREAS = ['Arch', 'Mouth', 'Quadrant', 'Surface', 'Tooth'] as const
+export type TreatmentArea = (typeof TREATMENT_AREAS)[number]
+export type ProcedureOption = { code: string; label: string; group: ProcedureGroup; area: TreatmentArea }
 
 export const PROCEDURES: ProcedureOption[] = [
-  { code: 'D0120', label: 'Periodic Oral Evaluation', group: 'Diagnostic' },
-  { code: 'D0140', label: 'Limited Oral Evaluation - Problem Focused', group: 'Diagnostic' },
-  { code: 'D0220', label: 'Intraoral - Periapical First Radiographic Image', group: 'Diagnostic' },
-  { code: 'D1110', label: 'Prophylaxis - Adult', group: 'Preventive' },
-  { code: 'D1206', label: 'Topical Application of Fluoride Varnish', group: 'Preventive' },
-  { code: 'D2140', label: 'Amalgam - One Surface, Primary or Permanent', group: 'Restorative' },
-  { code: 'D2740', label: 'Crown - Porcelain / Ceramic', group: 'Restorative' },
-  { code: 'D3310', label: 'Treatment of Root Canal Obstruction; Non-Surgical Access', group: 'Endodontic' },
-  { code: 'D3330', label: 'Endodontic Therapy, Molar - Excluding Final Restoration', group: 'Endodontic' },
+  { code: 'D0120', label: 'Periodic oral evaluation – established patient', group: 'Diagnostic services', area: 'Mouth' },
+  { code: 'D0140', label: 'Limited oral evaluation – problem focused', group: 'Diagnostic services', area: 'Mouth' },
+  { code: 'D0150', label: 'Comprehensive oral evaluation – new or established patient', group: 'Diagnostic services', area: 'Mouth' },
+  { code: 'D0180', label: 'Comprehensive periodontal evaluation – new or established patient', group: 'Diagnostic services', area: 'Mouth' },
+  { code: 'D0220', label: 'Intraoral – periapical first radiographic image', group: 'Diagnostic services', area: 'Tooth' },
+  { code: 'D1110', label: 'Prophylaxis – adult', group: 'Preventive services', area: 'Mouth' },
+  { code: 'D1206', label: 'Topical application of fluoride varnish', group: 'Preventive services', area: 'Mouth' },
+  { code: 'D1351', label: 'Sealant – per tooth', group: 'Preventive services', area: 'Tooth' },
+  { code: 'D2140', label: 'Amalgam – one surface, primary or permanent', group: 'Restorative services', area: 'Surface' },
+  { code: 'D2330', label: 'Resin-based composite – one surface, anterior', group: 'Restorative services', area: 'Surface' },
+  { code: 'D2390', label: 'Resin-based composite crown, anterior', group: 'Restorative services', area: 'Tooth' },
+  { code: 'D2720', label: 'Crown – resin with high noble metal', group: 'Restorative services', area: 'Tooth' },
+  { code: 'D2740', label: 'Crown – porcelain/ceramic', group: 'Restorative services', area: 'Tooth' },
+  { code: 'D3310', label: 'Endodontic therapy, anterior tooth', group: 'Endodontic services', area: 'Tooth' },
+  { code: 'D3330', label: 'Endodontic therapy, molar tooth', group: 'Endodontic services', area: 'Tooth' },
+  { code: 'D4341', label: 'Periodontal scaling and root planing – four or more teeth per quadrant', group: 'Periodontal services', area: 'Quadrant' },
+  { code: 'D4910', label: 'Periodontal maintenance', group: 'Periodontal services', area: 'Mouth' },
+  { code: 'D5110', label: 'Complete denture – maxillary', group: 'Prosthodontics, removable', area: 'Arch' },
+  { code: 'D5986', label: 'Fluoride gel carrier', group: 'Maxillofacial prosthetics', area: 'Arch' },
+  { code: 'D6010', label: 'Surgical placement of implant body: endosteal implant', group: 'Implant services', area: 'Tooth' },
+  { code: 'D6750', label: 'Retainer crown – porcelain fused to high noble metal', group: 'Prosthodontics, fixed', area: 'Tooth' },
+  { code: 'D7140', label: 'Extraction, erupted tooth or exposed root', group: 'Oral and maxillofacial surgery', area: 'Tooth' },
+  { code: 'D7240', label: 'Removal of impacted tooth – completely bony', group: 'Oral and maxillofacial surgery', area: 'Tooth' },
+  { code: 'D8080', label: 'Comprehensive orthodontic treatment of the adolescent dentition', group: 'Orthodontic services', area: 'Mouth' },
+  { code: 'D9110', label: 'Palliative treatment of dental pain – per visit', group: 'Adjunctive service', area: 'Mouth' },
+  { code: 'D9972', label: 'External bleaching – per arch', group: 'Cosmetic & aesthetic services', area: 'Arch' },
 ]
 
 export const DIAGNOSES = [
@@ -61,15 +85,11 @@ export type Finding = {
   diagnoses: string[]
 }
 
-export type LinkedFinding = { id: string; tooth: number; date: string; status: FindingStatus }
-
-export const LINKED_FINDINGS: LinkedFinding[] = [
-  { id: '#10987231', tooth: 20, date: 'May 18, 2026', status: 'Active' },
-  { id: '#10987232', tooth: 20, date: 'May 18, 2026', status: 'Active' },
-  { id: '#10987233', tooth: 21, date: 'May 18, 2026', status: 'Active' },
-  { id: '#10987234', tooth: 21, date: 'May 18, 2026', status: 'Active' },
-  { id: '#10987235', tooth: 22, date: 'May 18, 2026', status: 'Active' },
-]
+/* Existing: algo que el paciente ya tiene hecho (una condition ya hecha); Planned: lo que se va a hacer. En Existing sólo
+   aparecen los procedimientos que quedan en la boca (restauraciones, endodoncias, implantes y prótesis). */
+export type ProcedureStatus = 'Existing' | 'Planned'
+export const PROCEDURE_STATUSES: ProcedureStatus[] = ['Existing', 'Planned']
+export const EXISTING_GROUPS: ProcedureGroup[] = ['Restorative services', 'Endodontic services', 'Implant services', 'Prosthodontics, fixed', 'Prosthodontics, removable']
 
 /* Numeración universal 1-32, ya la tiene odontogram.ts -mismo esquema
    (1-16 maxilar, 32-17 mandibular)-, se reusa en vez de duplicarla. */

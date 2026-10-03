@@ -214,7 +214,7 @@ export function Campana({
                 className={cn('items-start gap-2.5 py-2.5 pl-1.5', n.estado === 'pending' && 'bg-warn-bg')}
               >
                 <span aria-hidden className={cn('mt-[7px] size-1.5 shrink-0 rounded-full', n.estado === 'unread' ? 'bg-dash-blue' : n.estado === 'pending' ? 'bg-amber' : 'bg-transparent')} />
-                <n.icon className={cn('mt-0.5 size-4 shrink-0', n.tarea ? 'text-attn-fg' : 'text-ink-muted')} />
+                <n.icon className={cn('mt-0.5 size-4 shrink-0', n.estado === 'pending' ? 'text-attn-fg' : 'text-ink-muted')} />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-baseline justify-between gap-2">
                     <span className={cn('truncate text-[13px] text-ink', n.estado === 'read' ? 'font-medium' : 'font-semibold')}>{n.titulo}</span>

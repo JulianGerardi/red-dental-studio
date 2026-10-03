@@ -25,6 +25,31 @@ const [FECHA_CITA, HORA_CITA] = 'October 15, 2026 — 9:00 AM'.split(' — ')
 
 const ETIQUETA = 'text-[10px] font-semibold tracking-wide uppercase'
 
+/* El texto del template es HTML del editor: los H2 se ven como el rótulo de una sección de la hoja. */
+const PROSA_HOJA =
+  '[&_h1]:mt-3.5 [&_h1]:text-[13px] [&_h1]:font-bold [&_h1]:text-ink [&_h2]:mt-3.5 [&_h2]:mb-2 [&_h2]:border-b [&_h2]:border-line [&_h2]:pb-1 [&_h2]:text-[10px] [&_h2]:font-semibold [&_h2]:tracking-wide [&_h2]:text-ink-muted [&_h2]:uppercase [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:marker:text-ink-faint [&_ol]:list-decimal [&_ol]:pl-4'
+
+/* Texto sin etiquetas: para saber si el consentimiento está vacío. */
+export const textoPlano = (html: string) => html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
+
+/* Deja sólo las etiquetas que produce la barra de formato y les saca los atributos: el preview pinta lo que se escribió. */
+const PERMITIDAS = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'H1', 'H2', 'H3', 'P', 'BR', 'UL', 'OL', 'LI', 'DIV'])
+export function limpiarHtml(html: string) {
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  const limpiar = (padre: Node) => {
+    for (const n of [...padre.childNodes]) {
+      if (n.nodeType === Node.TEXT_NODE) continue
+      if (n.nodeType !== Node.ELEMENT_NODE || ['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED'].includes((n as Element).tagName)) { n.remove(); continue }
+      const el = n as Element
+      limpiar(el)
+      if (!PERMITIDAS.has(el.tagName)) { el.replaceWith(...el.childNodes); continue }
+      for (const a of [...el.attributes]) el.removeAttribute(a.name)
+    }
+  }
+  limpiar(doc.body)
+  return doc.body.innerHTML
+}
+
 export function Seccion({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
     <section className="mt-3.5">
@@ -51,10 +76,12 @@ type Props = {
   procedimiento?: string
   naturaleza: string
   riesgos: string
+  /** Sólo con el editor único (oculto en Consents): el HTML del template, en lugar de las dos secciones. */
+  texto?: string
   vistaPaciente: boolean
 }
 
-export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, vistaPaciente }: Props) {
+export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, texto, vistaPaciente }: Props) {
   const lineasRiesgo = riesgos.split('\n').filter(Boolean)
   const vacio = <p className="text-ink-faint">No content yet.</p>
 
@@ -101,17 +128,24 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, vi
         </>
       )}
 
-      <Seccion titulo="Nature of procedure">
-        {naturaleza ? <p>{naturaleza}</p> : vacio}
-      </Seccion>
-
-      <Seccion titulo="Risk and complications">
-        {lineasRiesgo.length > 0 ? (
-          <ul className="list-disc pl-4 marker:text-ink-faint">
-            {lineasRiesgo.map((linea, i) => <li key={i}>{linea}</li>)}
-          </ul>
-        ) : vacio}
-      </Seccion>
+      {texto !== undefined ? (
+        textoPlano(texto)
+          ? <div className={`${PROSA_HOJA} text-ink-soft`} dangerouslySetInnerHTML={{ __html: limpiarHtml(texto) }} />
+          : <Seccion titulo="Consent text">{vacio}</Seccion>
+      ) : (
+        <>
+          <Seccion titulo="Nature of procedure">
+            {naturaleza ? <p>{naturaleza}</p> : vacio}
+          </Seccion>
+          <Seccion titulo="Risk and complications">
+            {lineasRiesgo.length > 0 ? (
+              <ul className="list-disc pl-4 marker:text-ink-faint">
+                {lineasRiesgo.map((linea, i) => <li key={i}>{linea}</li>)}
+              </ul>
+            ) : vacio}
+          </Seccion>
+        </>
+      )}
 
       <Seccion titulo="Patient acknowledgment">
         <ul className="flex flex-col gap-1.5">

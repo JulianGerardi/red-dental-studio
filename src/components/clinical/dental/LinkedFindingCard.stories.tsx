@@ -5,7 +5,7 @@ import { LinkedFindingCard } from './LinkedFindingCard'
 const meta = {
   title: 'Components/Clinical/Dental/LinkedFindingCard',
   component: LinkedFindingCard,
-  args: { finding: { id: 'L-1', tooth: 14, date: 'May 12, 2026', status: 'Active' }, linked: false, onToggle: () => {} },
+  args: { finding: { id: 'F-1', condition: 'chronic enamel dental caries', area: 'Tooth 3', surfaces: ['O', 'DB'], date: 'May 12, 2026', status: 'Active' }, linked: false, onToggle: () => {} },
   decorators: [(Story) => <div className="w-[360px]"><Story /></div>],
 } satisfies Meta<typeof LinkedFindingCard>
 
@@ -18,3 +18,6 @@ function Demo(args: React.ComponentProps<typeof LinkedFindingCard>) {
 }
 
 export const Default: Story = { render: (args) => <Demo {...args} /> }
+
+/* Sin superficies: sólo el nombre del hallazgo y su zona. */
+export const WithoutSurfaces: Story = { args: { finding: { id: 'F-2', condition: 'oral candidiasis', area: 'Soft Palate', surfaces: [], date: 'May 12, 2026', status: 'Active' } }, render: (args) => <Demo {...args} /> }

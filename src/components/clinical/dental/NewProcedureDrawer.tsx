@@ -1,20 +1,24 @@
 import { Tabs } from '@/components/ui/tabs'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ArrowRight, Check, ChevronRight, ChevronsLeft, ChevronsRight, ListFilter, Search, X } from 'lucide-react'
-import { ModalShell } from '@/components/patients/form'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { ArrowLeft, ArrowRight, Check, ChevronsLeft, ChevronsRight, ListFilter, Search, X } from 'lucide-react'
+import { Drawer } from '@/components/ui/drawer'
+import { Button } from '@/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Switch } from '@/components/ui/switch'
+import { SelectField } from '@/components/patients/form'
 import { StepIndicator } from '@/components/clinical/StepIndicator'
 import { SurfaceWheel, type Surface } from './SurfaceWheel'
 import { LinkedFindingCard } from './LinkedFindingCard'
 import { ScopeIcon } from './ScopeIcons'
 import { ToothChip } from './ToothIcon'
 import {
-  DIAGNOSES, LINKED_FINDINGS, PROCEDURES, PROCEDURE_GROUPS, SCOPES,
-  type ProcedureFilter, type ProcedureOption, type ProcedureScope,
+  DIAGNOSES, EXISTING_GROUPS, PROCEDURES, PROCEDURE_GROUPS, PROCEDURE_STATUSES, SCOPES, TREATMENT_AREAS,
+  type Finding, type ProcedureFilter, type ProcedureOption, type ProcedureScope, type ProcedureStatus, type TreatmentArea,
 } from './data'
 
 export type ProcedureDraft = {
   procedure: ProcedureOption
+  status: ProcedureStatus
   scope: ProcedureScope
   area: string
   tooth: number | null
@@ -31,25 +35,33 @@ export type ProcedureDraft = {
    esto en `true`. */
 const CONDICIONES = false
 
-/* Modal, no drawer: en red-clone un formulario complejo se resuelve con
-   `ModalShell` (ver NewAppointmentModal de Scheduling), nunca con un panel
-   deslizante -eso no es un patrón que use este proyecto. Ver
+const PASOS = ['Procedure', 'Surfaces', 'Link to finding'] as const
+
+/* Drawer a la derecha, a pedido de Julián (Figma UX-UI 2.0, 1669:87207 y 1669:87208): el chart queda a la vista mientras
+   se carga. Add Procedure abre en Planned; Add Condition, en Existing (algo que el paciente ya tiene hecho). Ver
    design-reference/figma/modulos/clinical-mode.md. */
-export function NewProcedureModal({
-  open, area, teeth, onClose, onSave,
+export function NewProcedureDrawer({
+  open, mode = 'procedure', area, teeth, findings, onClose, onSave,
 }: {
   open: boolean
+  /** De qué botón se abrió: cambia el título y la pestaña con que arranca la búsqueda. */
+  mode?: 'procedure' | 'condition'
   /** Rótulo del área donde se clickeó, ej "Tooth 21" o "Upper left". */
   area: string
   /** Dientes contra los que se puede cargar el procedimiento; el del medio arranca elegido. */
   teeth: number[]
+  /** Los hallazgos del examen, para vincularlos en el último paso. */
+  findings: Finding[]
   onClose: () => void
   onSave: (draft: ProcedureDraft) => void
 }) {
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [keepArea, setKeepArea] = useState(true)
   const [query, setQuery] = useState('')
+  const [status, setStatus] = useState<ProcedureStatus>('Planned')
   const [group, setGroup] = useState<ProcedureFilter>('All')
+  /* Áreas de tratamiento del embudo; vacío = todas ("Show all treatment"). */
+  const [areas, setAreas] = useState<TreatmentArea[]>([])
   const [code, setCode] = useState<string | null>(null)
   const [scope, setScope] = useState<ProcedureScope>('Tooth')
   const [tooth, setTooth] = useState<number | null>(null)
@@ -61,24 +73,25 @@ export function NewProcedureModal({
 
   useEffect(() => {
     if (!open) return
-    setStep(1); setKeepArea(true); setQuery(''); setGroup('All'); setCode(null); setScope('Tooth')
+    setStep(1); setKeepArea(true); setQuery(''); setStatus(mode === 'condition' ? 'Existing' : 'Planned'); setGroup('All'); setAreas([]); setCode(null); setScope('Tooth')
     setTooth(teeth[Math.floor(teeth.length / 2)] ?? null); setSurfaces({}); setTab('Findings')
     setFindingQuery(''); setLinked([]); setDiagnoses([])
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
-  if (!open) return null
-
   const procedure = PROCEDURES.find((p) => p.code === code) ?? null
   const q = query.trim().toLowerCase()
-  const list = PROCEDURES.filter((p) =>
+  const coincide = (p: ProcedureOption, s: ProcedureStatus) =>
+    (s === 'Planned' || EXISTING_GROUPS.includes(p.group)) &&
     (group === 'All' || p.group === group) &&
-    (!q || p.code.toLowerCase().includes(q) || p.label.toLowerCase().includes(q)))
+    (!areas.length || areas.includes(p.area)) &&
+    (!q || p.code.toLowerCase().includes(q) || p.label.toLowerCase().includes(q))
+  const list = PROCEDURES.filter((p) => coincide(p, status))
 
   const current = tooth ?? teeth[0] ?? null
   const currentSurfaces = current !== null ? (surfaces[current] ?? []) : []
   const fq = findingQuery.trim().toLowerCase()
-  const findings = LINKED_FINDINGS.filter((f) => !fq || f.id.includes(fq) || String(f.tooth).includes(fq))
+  const vinculables = findings.filter((f) => f.status !== 'Discarded' && (!fq || `${f.condition} ${f.area} ${f.surfaces.join(' ')}`.toLowerCase().includes(fq)))
   const diagnosisList = DIAGNOSES.filter((d) => !fq || d.toLowerCase().includes(fq))
 
   function step2Move(delta: number) {
@@ -99,39 +112,31 @@ export function NewProcedureModal({
 
   function save() {
     if (!procedure) return
-    onSave({ procedure, scope, area: keepArea ? area : 'Full mouth', tooth: current, surfaces: currentSurfaces, linked, diagnoses })
+    onSave({ procedure, status, scope, area: keepArea ? area : 'Full mouth', tooth: current, surfaces: currentSurfaces, linked, diagnoses })
     onClose()
   }
 
-  const footer = step === 1 ? (
+  /* Como en el Figma: la acción principal a lo ancho y debajo la secundaria. */
+  const footer = (
     <>
-      <button type="button" onClick={onClose} className="flex h-9 items-center gap-1.5 rounded-md border border-line bg-white px-6 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle">
-        <X className="size-3" /> Cancel
-      </button>
-      <button type="button" disabled={!procedure} onClick={() => setStep(2)} className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-6 text-[13px] font-medium whitespace-nowrap text-white disabled:opacity-40">
-        Next Step <ArrowRight className="size-3" />
-      </button>
-    </>
-  ) : (
-    <>
-      <button type="button" onClick={() => setStep(step === 3 ? 2 : 1)} className="flex h-9 items-center gap-1.5 rounded-md border border-line bg-white px-6 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle">
-        <ArrowLeft className="size-3" /> Return
-      </button>
-      {step === 2 ? (
-        <button type="button" onClick={() => setStep(3)} className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-6 text-[13px] font-medium whitespace-nowrap text-white">
-          Next Step <ArrowRight className="size-3" />
-        </button>
+      {step < 3 ? (
+        <Button className="w-full" disabled={step === 1 && !procedure} onClick={() => setStep(step === 1 ? 2 : 3)}>
+          Next Step <ArrowRight />
+        </Button>
       ) : (
-        <button type="button" onClick={save} className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-6 text-[13px] font-medium whitespace-nowrap text-white">
-          <Check className="size-3" /> Save
-        </button>
+        <Button className="w-full" onClick={save}><Check /> Save</Button>
+      )}
+      {step === 1 ? (
+        <Button variant="secondary" className="w-full" onClick={onClose}><X /> Cancel</Button>
+      ) : (
+        <Button variant="secondary" className="w-full" onClick={() => setStep(step === 3 ? 2 : 1)}><ArrowLeft /> Return</Button>
       )}
     </>
   )
 
   return (
-    <ModalShell title="New Procedure" onClose={onClose} width="max-w-[560px]" footer={footer}>
-      <StepIndicator total={3} current={step} />
+    <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New Condition' : 'New Procedure'} footer={footer}>
+      <StepIndicator total={3} current={step} labels={PASOS} />
 
       <div className="mt-5">
         {step === 1 && (
@@ -147,27 +152,33 @@ export function NewProcedureModal({
               )}
             </div>
 
+            {/* Como en la app real: búsqueda por código o descripción, el embudo con las áreas de tratamiento y las
+                categorías del catálogo. */}
             <div className="flex w-full flex-col items-start gap-1.5">
               <span className="text-xs font-semibold text-ink-muted">Procedure<span className="text-field-error">*</span></span>
               <div className="flex w-full items-center gap-2">
                 <div className="relative flex-1">
                   <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
                   <input
-                    value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search..."
+                    value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by code or description"
                     className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] placeholder:text-ink-faint focus:outline-none"
                   />
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button type="button" className="flex h-9 items-center gap-1.5 rounded-md border border-line px-3 text-[13px] font-medium hover:bg-surface-subtle">
-                      <ListFilter className="size-3.5" /> Filter
+                    <button type="button" aria-label="Filter by treatment area" className={`relative flex size-9 items-center justify-center rounded-md border hover:bg-surface-subtle ${areas.length ? 'border-dash-blue text-dash-blue' : 'border-line'}`}>
+                      <ListFilter className="size-4" />
+                      {areas.length > 0 && <span className="bg-dash-blue absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full text-[9px] font-bold text-white">{areas.length}</span>}
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="min-w-[180px]">
-                    {PROCEDURE_GROUPS.map((g) => (
-                      <DropdownMenuItem key={g} onSelect={() => setGroup(g)}>
-                        {g === group && <Check className="text-dash-blue size-3.5" />}
-                        <span className={g === group ? 'font-semibold' : 'ml-5'}>{g}</span>
+                  <DropdownMenuContent align="end" className="min-w-[200px]">
+                    <DropdownMenuLabel>Treatment Area</DropdownMenuLabel>
+                    <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setAreas([]) }} className="justify-between">
+                      Show all treatment <Switch checked={!areas.length} aria-hidden tabIndex={-1} />
+                    </DropdownMenuItem>
+                    {TREATMENT_AREAS.map((a) => (
+                      <DropdownMenuItem key={a} onSelect={(e) => { e.preventDefault(); setAreas((xs) => (xs.includes(a) ? xs.filter((x) => x !== a) : [...xs, a])) }} className="justify-between">
+                        {a} <Switch checked={areas.includes(a)} aria-hidden tabIndex={-1} />
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
@@ -175,9 +186,15 @@ export function NewProcedureModal({
               </div>
             </div>
 
-            <button type="button" onClick={() => setGroup('All')} className="text-dash-blue flex items-center gap-0.5 text-xs font-bold hover:underline">
-              {group} <ChevronRight className="size-3.5" />
-            </button>
+            <SelectField label="Category" value={group === 'All' ? 'All' : group} onChange={(v) => setGroup(v as ProcedureFilter)} options={[...PROCEDURE_GROUPS]} className="w-full" />
+
+            {/* Existing: algo que ya tiene hecho; Planned: lo que se va a hacer. Filtran la búsqueda y se guardan con el procedimiento. */}
+            <Tabs
+              aria-label="Procedure status"
+              tabs={PROCEDURE_STATUSES.map((s) => ({ value: s, count: PROCEDURES.filter((p) => coincide(p, s)).length }))}
+              value={status}
+              onChange={(s) => { setStatus(s); if (procedure && !coincide(procedure, s)) setCode(null) }}
+            />
 
             <div className="flex max-h-[320px] w-full flex-col items-start gap-2 overflow-y-auto">
               {list.map((p) => {
@@ -187,6 +204,7 @@ export function NewProcedureModal({
                     <button type="button" onClick={() => setCode(p.code)} className="min-w-0 flex-1 text-left text-xs outline-none">
                       <span className="text-dash-blue font-bold">{p.code}</span>
                       <span className="font-medium text-ink"> - {p.label}</span>
+                      <span className="mt-1 block"><span className="rounded bg-dash-count-bg px-1.5 py-0.5 text-[10px] font-semibold text-dash-blue">{p.area}</span></span>
                     </button>
                     <span className="flex shrink-0 items-center gap-1">
                       {SCOPES.map((s) => (
@@ -202,7 +220,7 @@ export function NewProcedureModal({
                   </div>
                 )
               })}
-              {!list.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No procedure matches that search.</p>}
+              {!list.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No procedure matches that search, category or treatment area.</p>}
             </div>
           </div>
         )}
@@ -213,12 +231,18 @@ export function NewProcedureModal({
               <span className="text-xs font-semibold text-ink-muted">Procedure<span className="text-field-error">*</span></span>
               <div className="border-dash-blue flex w-full items-center justify-between gap-2 rounded-md border px-3 py-2">
                 <span className="min-w-0 text-xs font-semibold text-ink">{procedure?.code} - {procedure?.label}</span>
-                <ToothChip />
+                <span className="flex shrink-0 items-center gap-1.5">
+                  <span className="bg-dash-count-bg text-dash-blue rounded-full px-2 py-0.5 text-[10px] font-semibold">{status}</span>
+                  <ToothChip />
+                </span>
               </div>
             </div>
 
             <div className="flex w-full flex-col items-center gap-3">
-              <span className="w-full text-xs font-semibold text-ink-muted">Surface</span>
+              <span className="flex w-full flex-col gap-0.5">
+                <span className="text-xs font-semibold text-ink-muted">Surfaces <span className="font-normal text-ink-faint">(optional)</span></span>
+                <span className="text-[11px] text-ink-faint">Not every procedure goes on a surface. If this one doesn’t, go to the next step.</span>
+              </span>
               <div className="flex flex-wrap items-center justify-center gap-2">
                 {teeth.map((t) => (
                   <button
@@ -261,7 +285,7 @@ export function NewProcedureModal({
             )}
 
             <div className="flex w-full flex-col gap-1">
-              <p className="text-sm font-bold text-ink">{tab === 'Findings' ? 'Link Findings' : 'Add Diagnostic'}</p>
+              <p className="text-sm font-bold text-ink">{tab === 'Findings' ? 'Link to finding' : 'Add Diagnostic'}</p>
               <p className="text-[11px] leading-relaxed text-ink-faint">
                 You can link clinical findings that may be resolved by this procedure.
               </p>
@@ -278,13 +302,13 @@ export function NewProcedureModal({
             <div className="max-h-[280px] w-full overflow-y-auto">
               {tab === 'Findings' ? (
                 <div className="flex w-full flex-col gap-2.5">
-                  {findings.map((f) => (
+                  {vinculables.map((f) => (
                     <LinkedFindingCard
                       key={f.id} finding={f} linked={linked.includes(f.id)}
                       onToggle={(on) => setLinked((prev) => (on ? [...new Set([...prev, f.id])] : prev.filter((x) => x !== f.id)))}
                     />
                   ))}
-                  {!findings.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No finding matches that search.</p>}
+                  {!vinculables.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No finding matches that search.</p>}
                 </div>
               ) : (
                 <div className="flex w-full flex-col gap-2">
@@ -308,6 +332,6 @@ export function NewProcedureModal({
           </div>
         )}
       </div>
-    </ModalShell>
+    </Drawer>
   )
 }
