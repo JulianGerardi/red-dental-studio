@@ -228,6 +228,8 @@ function errorDe(estado: number, cuerpo: { error?: { message?: string; status?: 
 
 /* Llama a Gemini en streaming: los pensamientos van a `alPensar` a medida que llegan; devuelve el texto de la respuesta. */
 async function llamar(clave: string, cuerpo: string, alPensar: (t: string) => void, senal: AbortSignal): Promise<{ texto: string; modelo: string }> {
+  /* Una clave con espacios o acentos no es una clave (se pegó otro texto): el navegador ni manda el pedido. */
+  if (!/^[\x21-\x7e]+$/.test(clave)) throw new ErrorIA('La clave guardada no es una clave de Gemini (tiene espacios o caracteres que no van): hay que volver a cargarla.', 'clave')
   for (const modelo of MODELOS) {
     let r: Response
     try {
