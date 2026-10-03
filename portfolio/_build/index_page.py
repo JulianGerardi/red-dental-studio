@@ -114,7 +114,7 @@ FLAGS = {
     "ar": '<svg viewBox="0 0 21 14" aria-hidden="true"><rect width="21" height="14" fill="#74acdf"/><rect y="4.67" width="21" height="4.67" fill="#fff"/><circle cx="10.5" cy="7" r="1.6" fill="#f6b40e"/></svg>',
 }
 flags = "".join(f'<span class="flag">{FLAGS[k]}{T(en, es)}</span>' for k, en, es in [("us", "United States", "Estados Unidos"), ("mx", "Mexico", "México"), ("ie", "Ireland", "Irlanda"), ("ar", "Argentina", "Argentina")])
-practice = "".join(f'<span class="badge">{T(en, es)}</span>' for en, es in [("Brand identity", "Identidad de marca"), ("Visual systems", "Sistemas visuales"), ("Art direction", "Dirección de arte"), ("Product design", "Diseño de producto")])
+practice = "".join(f'<span class="badge">{T(en, es)}</span>' for en, es in [("User research", "Research con usuarios"), ("UX &amp; flows", "UX y flujos"), ("UI design", "Diseño de UI"), ("Design systems", "Design systems"), ("Prototyping", "Prototipado")])
 
 cv_attrs = f'href="{CV}" download="Julian_Gerardi_CV.pdf" target="_blank" rel="noopener" data-cv'
 
@@ -139,12 +139,12 @@ page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Se
     </div>
   </section>
 
-  <section class="wrap statement" aria-label="Brand and visual systems">
-    <div class="label" data-reveal>{T("Brand &amp; visual systems", "Marca y sistemas visuales")}</div>
-    {words("I design brand and visual systems that hold up in every format they have to live in. I learned it in advertising agencies in Argentina, building identities from scratch, and today I bring it to digital products.",
-           "Diseño sistemas de marca y visuales que se sostienen en cada formato en el que tienen que vivir. Lo aprendí en agencias de publicidad de Argentina, armando identidades desde cero, y hoy lo llevo a productos digitales.", "statement__text")}
+  <section class="wrap statement" aria-label="UX/UI">
+    <div class="label" data-reveal>UX/UI</div>
+    {words("I design clear digital products, from user research to interface and design system, with an art director’s eye.",
+           "Diseño productos digitales claros, del research con usuarios a la interfaz y el design system, con ojo de director de arte.", "statement__text")}
     <div class="statement__facts">
-      <div class="fact" data-reveal style="--k:0"><b data-count="8" data-suffix="+">8+</b><span>{T("years designing brands, visual systems and products", "años diseñando marcas, sistemas visuales y productos")}</span></div>
+      <div class="fact" data-reveal style="--k:0"><b data-count="8" data-suffix="+">8+</b><span>{T("years designing digital products", "años diseñando productos digitales")}</span></div>
       <div class="fact" data-reveal style="--k:1"><b data-count="4">4</b><span>{T("countries I’ve worked for, remote", "países para los que trabajé, en remoto")}</span><div class="flags">{flags}</div></div>
       <div class="fact" data-reveal style="--k:2"><span class="mono muted">{T("PRACTICE", "PRÁCTICA")}</span><div class="fact__tags">{practice}</div></div>
     </div>

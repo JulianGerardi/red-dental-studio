@@ -84,7 +84,9 @@ def emoji(ch, cls):
 
 GRILL_MARK = '<span class="logo-grill">G</span>'
 MP_MARK = '<span class="logo-mp">' + ICO["gift"] + '</span>'
-BATECH_MARK = '<svg class="logo-batech" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.4 2.6c-3 2.4-4.1 6.1-2.6 9.6.9 2.1.4 4.4-1.3 5.9a6.2 6.2 0 1 0 3.9-15.5Z" fill="#29a9e1"/></svg>'
+BATECH_MARK = ('<svg class="logo-batech" viewBox="2 2 22 28" aria-hidden="true">'
+               '<path d="M12 4.4c5.6 2.6 9.2 7.6 9.2 13 0 6-4.6 10.6-11.2 11.2 2.9-2.7 4.3-6.5 4.1-10.7-.2-4.6-.9-9.1-2.1-13.5Z" fill="#2ba9e1"/>'
+               '<circle cx="7.3" cy="24.3" r="2.8" fill="#fff"/></svg>')
 
 
 def pipeline_mini(T):
@@ -122,11 +124,8 @@ def brand_scene(p, kind, T, big=False):
                 f'</div>')
     if kind == "grill":
         return (f'<div class="bs bs--grill">'
-                f'<div class="bs__dev bs__dev--ph1">{iphone(p, "g-emp-m-app", lazy=lazy)}</div>'
-                f'<div class="bs__dev bs__dev--ph2">{iphone(p, "g-emp-m-historial", lazy=lazy)}</div>'
-                f'{notif(GRILL_MARK, T("Order confirmed", "Pedido confirmado"), T("Milanesa de ternera · Puré de papa", "Milanesa de ternera · Puré de papa"), "$10.800", "bs__nt bs__nt--a")}'
-                f'{notif(ICO["clock"], T("Closes in 17 h 59 min", "Cierra en 17 h 59 min"), T("Until 10:30 · Thursday’s delivery", "Hasta las 10:30 · Entrega del jueves"), "", "bs__nt bs__nt--b nt--soft")}'
-                f'{emoji("🥗", "bs__emoji--a")}{emoji("🔥", "bs__emoji--b")}{emoji("⭐", "bs__emoji--c")}'
+                f'<div class="bs__dev bs__dev--win">{browser(p, "g-emp-app", 1600, 1000, "empresas.grill.com.ar", lazy=lazy, view="fit")}</div>'
+                f'{notif(GRILL_MARK, T("Order confirmed", "Pedido confirmado"), "Milanesa de ternera · Puré de papa", "$10.800", "bs__nt bs__nt--a")}'
                 f'</div>')
     if kind == "mp":
         return (f'<div class="bs bs--mp">'

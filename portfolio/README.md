@@ -10,7 +10,7 @@ python3 -m http.server 8090 -d portfolio   # http://localhost:8090
 
 ```
 portfolio/
-  index.html                  home: intro, banner, marca y sistemas visuales, trabajos, proceso, experiencia, about, contacto
+  index.html                  home: intro, banner, frase UX/UI, trabajos, proceso, experiencia, about, contacto
   work/batech.html            Batech AI Platform (Figma: Portfolio › Batech)
   work/confidentally.html     caso con NDA (bloqueado con contraseña)
   work/confidentally-ui.html  design system y Builder con IA
@@ -55,8 +55,8 @@ Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span 
 - **Scroll suave** con [Lenis](https://github.com/darkroomengineering/lenis) (CDN). Los bloques con `data-reveal` suben al entrar, los títulos `.lines` aparecen palabra por palabra detrás de una máscara, y los números con `data-count` cuentan.
 - **Portadas de los casos**: parallax suave del mockup.
 - **Transición entre páginas**: una cortina cubre la pantalla al salir y se levanta al entrar.
-- **Inicio**: una tarjeta clara con el mismo brillo verde y violeta del final de la página, que se mueve solo y sigue el puntero. Las palabras clave de la frase (sin subrayado hasta pasar el mouse) muestran el proyecto al que apuntan en su escena de marca: ventana de Safari sobre un degradé, el monitor con el diagrama Figma → Claude Code → Storybook, o iPhones inclinados con notificaciones flotando (design systems → Confidentally UI, IA → Batech, prototipos → Confidentally, productos de punta a punta → GRILL, que la gente usa → Mercado Play). Se configuran en `HOT` de `_build/index_page.py` y `brand_scene()` de `_build/mockups.py`.
-- **Marca y sistemas visuales**: debajo del banner, un párrafo cuyas palabras se encienden a medida que se scrollea, con los años, los cuatro países con sus banderas y las áreas de práctica.
+- **Inicio**: una tarjeta clara con el mismo brillo verde y violeta del final de la página, que se mueve solo y sigue el puntero. Las palabras clave de la frase (sin subrayado hasta pasar el mouse) muestran el proyecto al que apuntan en su escena de marca: una ventana de Safari sobre un degradé suave con una notificación (Batech, Confidentally, GRILL), el monitor con el diagrama Figma → Claude Code → Storybook (Confidentally UI) o la ventana inclinada sobre el amarillo de Mercado Play (design systems → Confidentally UI, IA → Batech, prototipos → Confidentally, productos de punta a punta → GRILL, que la gente usa → Mercado Play). Se configuran en `HOT` de `_build/index_page.py` y `brand_scene()` de `_build/mockups.py`.
+- **UX/UI**: debajo del banner, una frase corta cuyas palabras se encienden a medida que se scrollea, con los años, los cuatro países con sus banderas y las áreas de práctica.
 - **Escenas de scroll (los casos)**, al estilo de las páginas de producto de Apple. El JS le da a cada escena su avance (`--p`, de 0 a 1) y cada una lo usa a su manera:
   - `rise`: la portada crece hasta ocupar la pantalla.
   - `story`: un dispositivo queda fijo y cambia de pantalla a medida que pasan los pasos (Batech: el formulario de nuevo análisis se completa solo, reconstruido en HTML desde el Figma).
