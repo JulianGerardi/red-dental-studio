@@ -94,8 +94,25 @@ export function PanelArribaDeTabs({ ancla, children }: { ancla: HTMLElement; chi
   return <div ref={envoltorio}>{children}</div>
 }
 
+/* Lo que el examen quiere en la barra de la librería (la de Odontogram / Periodontal Status), a la izquierda. Mismo
+   truco que ToothInfoTrigger: React lo dibuja en su árbol y un efecto de layout lo mueve a la barra y lo devuelve al
+   desmontar (ver ese archivo para el porqué). */
+function EnBarra({ contenedor, children }: { contenedor: HTMLElement; children: React.ReactNode }) {
+  const envoltorio = useRef<HTMLSpanElement>(null)
+  useLayoutEffect(() => {
+    const el = envoltorio.current
+    if (!el) return
+    const origen = el.parentElement
+    contenedor.prepend(el)
+    return () => {
+      if (origen && el.parentElement !== origen) origen.appendChild(el)
+    }
+  }, [contenedor])
+  return <span ref={envoltorio} className="mr-auto flex items-center gap-1">{children}</span>
+}
+
 export function OdontogramEmbed({
-  controlesAbiertos, onCerrarControles,
+  controlesAbiertos, onCerrarControles, accionesBarra,
 }: {
   /** Controls, Statuses, Tooth details, Orthodontics, Caries y Diagnoses
       viven en un panel flotante que abre el FAB del examen, y se recorren
@@ -103,6 +120,8 @@ export function OdontogramEmbed({
       nada. "Tooth information" va aparte, en `ToothInfoTrigger`. */
   controlesAbiertos: boolean
   onCerrarControles: () => void
+  /** Botones del examen para la izquierda de la barra de Odontogram / Periodontal Status. */
+  accionesBarra?: React.ReactNode
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const [pasos, setPasos] = useState<Paso[]>([])
@@ -255,6 +274,7 @@ export function OdontogramEmbed({
       <CarasLinguales raiz={ref.current} />
       <PeriodontalTabs raiz={ref.current} />
       <PerioPdArrastre raiz={ref.current} />
+      {barraNodo && accionesBarra && <EnBarra contenedor={barraNodo}>{accionesBarra}</EnBarra>}
       {barraNodo && (infoNodo || perioNodo) && (
         <ToothInfoTrigger
           nodo={infoNodo}

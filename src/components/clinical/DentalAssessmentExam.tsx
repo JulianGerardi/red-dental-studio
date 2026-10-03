@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Plus, Stethoscope, Table2, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
+import { BotoneraDientes } from './dental/BotoneraDientes'
 import { aviso } from '@/components/ui/toaster'
 import { OdontogramEmbed } from '@/components/clinical/OdontogramEmbed'
 import { ProblemList } from '@/components/clinical/ProblemList'
@@ -27,9 +28,7 @@ import { neighbours, quadrantTeeth, type Finding } from './dental/data'
 
 const HOY = 'May 14, 2026'
 
-/* Las acciones del examen, flotando arriba a la izquierda del chart: blancas con sombra para despegarse del fondo punteado.
-   Con poco ancho queda sólo el ícono, con su tooltip. */
-const BOTON_FLOTANTE = 'flex h-9 items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 text-[13px] font-medium whitespace-nowrap shadow-[0_4px_12px_rgb(0_0_0/0.10)] hover:bg-surface-subtle xl:px-3.5'
+/* Las acciones del examen, como Exit clinical Mode: sólo el ícono, y al pasar el mouse se abren con su texto. */
 const ACCIONES_EXAMEN: { label: string; icono: LucideIcon; modo?: 'procedure' | 'condition' }[] = [
   { label: 'Add Procedure', icono: Plus, modo: 'procedure' },
   { label: 'Add Condition', icono: Stethoscope, modo: 'condition' },
@@ -54,23 +53,19 @@ export function DentalAssessmentExam() {
   const [findings, setFindings] = useState<Finding[]>(INITIAL_FINDINGS)
   /* El chart sólo aparece una vez elegida la dentición. */
   const [procedureFor, setProcedureFor] = useState<number | null>(null)
+  /* El lienzo del chart: la botonera de selección busca ahí las piezas de la librería. */
+  const [lienzo, setLienzo] = useState<HTMLDivElement | null>(null)
   /* Add Procedure y Add Condition abren el mismo drawer; cambia con qué pestaña arranca. */
   const [procedureOpen, setProcedureOpen] = useState<'procedure' | 'condition' | null>(null)
   const [editing, setEditing] = useState<Finding | null>(null)
   const [confirming, setConfirming] = useState<{ action: Exclude<FindingAction, 'edit'>; finding: Finding } | null>(null)
   const [problemas, setProblemas] = useState(false)
-  /* Los controles del odontograma salen en un flotante, no en columna. */
-  const [controlesAbiertos, setControlesAbiertos] = useState(false)
   const reviewState = useExamReviews(INITIAL_REVIEWS, HOY)
 
-  /* El "+" abre New Procedure y de una vez deja los controles del diente
-     listos: al cerrar el modal (Cancel o Save) el panel ya está ahí,
-     sin un botón aparte para "Tooth controls" -se sacó, quedaba
-     redundante con esto-. */
+  /* La tabla de controles del diente ya no se abre: la selección va por la botonera de arriba (Julián, 2026-10-03). */
   function openProcedure(tooth: number | null, mode: 'procedure' | 'condition' = 'procedure') {
     setProcedureFor(tooth)
     setProcedureOpen(mode)
-    setControlesAbiertos(true)
   }
 
   function saveProcedure(draft: ProcedureDraft) {
@@ -138,44 +133,40 @@ export function DentalAssessmentExam() {
         </div>
       </div>
 
-      <div className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-line p-4 lg:order-2" data-examen style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fafbfe' }}>
-        {/* Arriba a la izquierda, en la fila de Odontogram / Periodontal Status, que ahí está libre: se ven apenas se
-            abre el examen (abajo quedaban fuera de la pantalla). En el celular van en su propia fila. La Problem list
-            se abre flotando sobre el chart, sin cambiar de vista. */}
-        <TooltipProvider delayDuration={150}>
-          <div className="z-10 flex items-center gap-2 self-start sm:absolute sm:top-[31px] sm:left-4">
+      <div ref={setLienzo} className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-line p-4 lg:order-2" data-examen style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fafbfe' }}>
+        {/* Arriba del chart, la botonera de selección de la app real. Las acciones del examen van a la izquierda de la barra
+            de Odontogram / Periodontal Status, que ahí está libre. La Problem list se abre flotando sobre el chart. */}
+        <div className="w-full"><BotoneraDientes raiz={lienzo} /></div>
+        <OdontogramEmbed
+          controlesAbiertos={false}
+          onCerrarControles={() => {}}
+          accionesBarra={
+            <>
             {ACCIONES_EXAMEN.map(({ label, icono: Icono, modo }) => {
               const boton = (
                 <button
+                  key={label}
                   type="button"
                   aria-label={label}
                   onClick={modo ? () => openProcedure(null, modo) : undefined}
-                  className={cn(BOTON_FLOTANTE, !modo && problemas && 'border-dash-blue bg-dash-count-bg text-dash-blue-hover')}
+                  className={cn(BOTON_EXPANDIBLE, !modo && problemas && 'border-dash-blue bg-dash-count-bg text-dash-blue-hover hover:bg-dash-count-bg')}
                 >
-                  <Icono className="size-4" /> <span className="hidden xl:inline">{label}</span>
+                  <Icono className="size-[18px] shrink-0" />
+                  <span className={ETIQUETA_EXPANDIBLE}>{label}</span>
                 </button>
               )
-              return (
-                <Tooltip key={label}>
-                  {modo ? (
-                    <TooltipTrigger asChild>{boton}</TooltipTrigger>
-                  ) : (
-                    <Popover open={problemas} onOpenChange={setProblemas}>
-                      <TooltipTrigger asChild>
-                        <PopoverTrigger asChild>{boton}</PopoverTrigger>
-                      </TooltipTrigger>
-                      <PopoverContent align="start" sideOffset={8} aria-label="Problem list" className="w-[min(820px,calc(100vw-2rem))] gap-0 bg-transparent p-0 shadow-none ring-0">
-                        <div className="rounded-xl shadow-[0_16px_40px_rgb(0_0_0/0.18)]"><ProblemList /></div>
-                      </PopoverContent>
-                    </Popover>
-                  )}
-                  <TooltipContent side="bottom" sideOffset={4} className="bg-ink text-white xl:hidden">{label}</TooltipContent>
-                </Tooltip>
+              return modo ? boton : (
+                <Popover key={label} open={problemas} onOpenChange={setProblemas}>
+                  <PopoverTrigger asChild>{boton}</PopoverTrigger>
+                  <PopoverContent align="start" sideOffset={8} aria-label="Problem list" className="w-[min(820px,calc(100vw-2rem))] gap-0 bg-transparent p-0 shadow-none ring-0">
+                    <div className="rounded-xl shadow-[0_16px_40px_rgb(0_0_0/0.18)]"><ProblemList /></div>
+                  </PopoverContent>
+                </Popover>
               )
             })}
-          </div>
-        </TooltipProvider>
-        <OdontogramEmbed controlesAbiertos={controlesAbiertos} onCerrarControles={() => setControlesAbiertos(false)} />
+            </>
+          }
+        />
       </div>
       </div>
 

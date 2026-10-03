@@ -30,3 +30,11 @@ export const ICONO_SUELTO =
 export const ANCHO_PAGINA = 'mx-auto w-full max-w-[1400px] 2xl:max-w-[1800px]'
 
 export const CONTENEDOR_PAGINA = `${ANCHO_PAGINA} px-4 py-6 sm:px-6`
+
+/* Botón de ícono que al pasar el mouse (o con el foco) muestra su caja y se abre con el texto adentro: Exit clinical Mode,
+   Overwiev y las acciones del examen en Clinical Mode. El texto va en un span con ETIQUETA_EXPANDIBLE. */
+export const BOTON_EXPANDIBLE =
+  'group/btn flex h-9 shrink-0 items-center justify-center rounded-lg border border-transparent px-2 text-[13px] font-medium text-ink transition-colors hover:border-line hover:bg-white hover:shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus-visible:border-line focus-visible:bg-white'
+/* El texto está siempre en el DOM, sólo sin ancho: se abre con el hover o con el foco del teclado. */
+export const ETIQUETA_EXPANDIBLE =
+  'max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,opacity,margin] duration-200 group-hover/btn:ml-2 group-hover/btn:max-w-[160px] group-hover/btn:opacity-100 group-focus-visible/btn:ml-2 group-focus-visible/btn:max-w-[160px] group-focus-visible/btn:opacity-100'

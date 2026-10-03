@@ -6,6 +6,7 @@ import {
   Play, Pause,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 import { CONSTANTES, CONTADORES, PANELES, type Contador, type ClavePanel } from '@/data/clinical-mode'
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
@@ -22,11 +23,8 @@ const ICONO_CONTADOR = { link: Link2, signos: Activity, personas: Users, info: I
    pedido de Julián: al pasar el mouse el botón muestra su caja y se abre con
    el texto adentro. 36px en reposo: 8 de padding + 1 de borde + el ícono de
    18. Al abrirse empujan lo de al lado, no lo tapan. */
-const BOTON = 'group/btn flex h-9 shrink-0 items-center justify-center rounded-lg border border-transparent px-2 text-[13px] font-medium text-ink transition-colors hover:border-line hover:bg-white hover:shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus-visible:border-line focus-visible:bg-white'
-
-/* El texto está siempre en el DOM, sólo sin ancho: se abre con el hover o con
-   el foco del teclado. */
-const ETIQUETA = 'max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,opacity,margin] duration-200 group-hover/btn:ml-2 group-hover/btn:max-w-[160px] group-hover/btn:opacity-100 group-focus-visible/btn:ml-2 group-focus-visible/btn:max-w-[160px] group-focus-visible/btn:opacity-100'
+const BOTON = BOTON_EXPANDIBLE
+const ETIQUETA = ETIQUETA_EXPANDIBLE
 
 /* Todo lo que cuelga de la barra —los contadores y las pills CC/TR— usa el
    mismo desplegable flotante. Va en portal y con posición fija: la barra

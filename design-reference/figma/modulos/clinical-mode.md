@@ -1692,3 +1692,30 @@ centrado (se pidio drawer) y al pasar de paso avisa con un "Validation warning"
 si el area elegida no coincide con la que pide el procedimiento. New Condition
 es un flujo aparte, una busqueda de condiciones filtrada por el area elegida;
 aca Add Condition abre el mismo drawer en Existing, como se pidio.
+
+
+### DentAssmt: botonera de la app real y sin tabla de controles (2026-10-03)
+
+A pedido de Julian:
+
+1. **Sin la tabla de controles.** Add Procedure ya no abre el panel "Controls"
+   (1 of 8) debajo del chart; la seleccion de piezas pasa a la botonera.
+2. **La botonera de la app real arriba del chart** (`dental/BotoneraDientes.tsx`):
+   Permanent / Primary, Upper arch, Lower arch, Q1-Q4, All, Clear y las flechas
+   para ir a la pieza anterior o siguiente. Maneja la seleccion de la libreria:
+   sus botones por id (`#btnSelectAll`, `#btnSelectUpper`, `#btnSelectLower`) y,
+   para los cuadrantes y las flechas, clic con CMD/CTRL sobre cada pieza
+   (`.tooth-tile[data-tooth]`, que viene en FDI; la pantalla numera en
+   Universal). Verificado: Q1 elige 1-8, Q2 9-16, Q3 17-24, Q4 25-32; las
+   arcadas 1-16 y 17-32; All las 32; las flechas avanzan de a una.
+   - **Primary** usa `applyPrimaryDentition()` de la libreria (piezas A-J).
+     La libreria no tiene "volver a permanente": **Permanent** vuelve con
+     `resetMouth()`, que tambien borra lo marcado, asi que pide confirmacion.
+   - Con poco ancho la botonera baja a dos lineas, como en la app real.
+3. **Las acciones del examen como Exit clinical Mode**: solo el icono y, al
+   pasar el mouse o con el foco, se abren con su texto (mismas clases,
+   `BOTON_EXPANDIBLE` y `ETIQUETA_EXPANDIBLE` en `lib/estilos.ts`, que ahora
+   comparten con la barra de Clinical Mode). Van a la izquierda de la barra de
+   Odontogram / Periodontal Status, metidas en la barra de la libreria con el
+   mismo truco que el boton de Tooth information (`EnBarra` en
+   OdontogramEmbed): siguen ahi al cambiar de pestaña.
