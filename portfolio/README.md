@@ -35,6 +35,16 @@ portfolio/
 
 El flujo to-be se exportó de Figma a 20000 px y se cortó en 30 mosaicos (`assets/img/flow/t-x-y.webp`) más una vista general de 5000 px (`overview.webp`). Con la rueda del mouse se hace zoom sobre el punto del cursor, arrastrando se mueve, y un clic acerca. Los mosaicos nítidos se cargan solo al acercarse, así no se pixela. Si la página se está scrolleando, la rueda sigue scrolleando la página. Tiene pantalla completa y un botón que abre el flujo en Figma.
 
+## Publicación (GitHub Pages)
+
+La carpeta `portfolio/` es el sitio completo, sin build de servidor: se sube tal cual a la raíz del repositorio `JulianGerardi/portfolio` y GitHub Pages lo sirve en **https://juliangerardi.github.io/portfolio/**.
+
+1. Crear el repositorio público `portfolio` (vacío) en GitHub y darle acceso a la app de Claude.
+2. Subir el contenido de `portfolio/` a la rama `main` (el `.nojekyll` evita que Jekyll ignore `_build/`).
+3. En el repositorio: *Settings → Pages → Build and deployment → Deploy from a branch → `main` / `(root)`*.
+
+Todos los links son relativos, así que funciona igual en `/portfolio/`, en local y en cualquier otra ruta.
+
 ## Idioma
 
 Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span lang="en">…</span><span lang="es">…</span>`. El CSS muestra solo el idioma de `<html data-lang>`. El switch EN/ES del menú lo cambia y lo recuerda (`localStorage`, clave `jg-lang`); la primera vez sigue el idioma del navegador. También traduce el título de la pestaña, la descripción, los placeholders y los textos alternativos de las imágenes (`data-alt-es`).
