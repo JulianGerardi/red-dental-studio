@@ -13,6 +13,17 @@ LINKEDIN = "https://www.linkedin.com/in/julian-gerardi"
 BEHANCE = "https://www.behance.net/Jotainc"
 CV = "assets/Julian_Gerardi_CV.pdf"
 
+# Cache busting: each build stamps the assets with a hash of their content, so a
+# new version never pairs fresh HTML with a stylesheet the browser kept from before.
+import hashlib as _hashlib, os as _os
+_ASSETS = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "assets")
+
+
+def V(name):
+    with open(_os.path.join(_ASSETS, name), "rb") as f:
+        return name + "?v=" + _hashlib.md5(f.read()).hexdigest()[:8]
+
+
 PROJECTS = [  # order of the work index and of prev/next
     ("batech.html", "Batech AI Platform"),
     ("confidentally.html", "Confidentally"),
@@ -42,7 +53,7 @@ def head(title_en, title_es, desc_en, desc_es, p="", noindex=False, extra_script
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{FONTS}">
-<link rel="stylesheet" href="{p}assets/site.css">
+<link rel="stylesheet" href="{p}assets/{V("site.css")}">
 <script>(function(){{var d=document.documentElement;d.classList.add('js');d.classList.add(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches?'no-motion':'motion');try{{var t=localStorage.getItem('jg-theme');if(t==='dark'||t==='light')d.setAttribute('data-theme',t);var l=localStorage.getItem('jg-lang');if(!l)l=(navigator.language||'').toLowerCase().indexOf('es')===0?'es':'en';d.setAttribute('data-lang',l);d.lang=l;}}catch(e){{}}}})();</script>
 <script src="{LENIS}" defer></script>
 {extra_scripts}</head>
@@ -198,8 +209,8 @@ def tail(p="", lightbox=False, extra=""):
 </dialog>
 """ if lightbox else ""
     return f"""<div class="curtain" aria-hidden="true"></div>
-{agent(p)}{lb}<script src="{p}assets/site.js"></script>
-<script src="{p}assets/agent.js"></script>
+{agent(p)}{lb}<script src="{p}assets/{V("site.js")}"></script>
+<script src="{p}assets/{V("agent.js")}"></script>
 {extra}</body>
 </html>
 """
@@ -339,11 +350,11 @@ def tiles_grill(p):
 
 def tiles_mp(p, with_cover=False):
     return "".join([
-        tile_screen(p, "mp", "mp-home", 1200, 3570, 0, True),
+        tile_screen(p, "mp", "mp-home", 1210, 3600, 0, True),
         tile_card(p, "mp-dark", "mp-kit-modal", 350, 378, 1),
-        tile_screen(p, "mp", "mp-recos", 1200, 1538, 2, True),
+        tile_screen(p, "mp", "mp-recos", 1440, 1845, 2, True),
         tile_card(p, "mp-dark", "mp-kit-comments", 244, 450, 3),
-        tile_screen(p, "mp", "mp-points", 1200, 3597, 4, True),
+        tile_screen(p, "mp", "mp-points", 1201, 3600, 4, True),
     ])
 
 

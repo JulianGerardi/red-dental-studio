@@ -111,7 +111,7 @@ b = case_head(
     [(T("Role", "Rol"), "UX/UI Designer"), (T("Company", "Empresa"), "Mercado Libre · Challenge"), (T("Year", "Año"), "2026"),
      (T("Platform", "Plataforma"), "Web · desktop"), (T("Scope", "Alcance"), T("Research, benchmarking, UX, UI, prototype", "Research, benchmarking, UX, UI, prototipo")), (T("Tools", "Herramientas"), "Figma")],
 )
-b += rise(mp_slide(), "mp")
+b += rise(brand_scene(p, "mp", T, big=True), "mp")
 b += chapter(T("The problem", "El problema"), h2("Usage dropped 4% in a month.", "El uso cayó un 4% en un mes.") + prose(
     ("In the last month, how often people used the platform fell 4% compared with the month before. To understand why, the User Research team surveyed users and found clear patterns in their answers.",
      "En el último mes, la frecuencia de uso de la plataforma cayó un 4% respecto del mes anterior. Para entender por qué, el equipo de User Research encuestó a las personas usuarias y encontró patrones claros en sus respuestas.")) +
@@ -154,22 +154,22 @@ b += chapter(T("Low fidelity", "Baja fidelidad"), h2("Structure first, then colo
     ("The wireframes settle the hierarchy of the home and where the new actions live: favourite and share on every card, comments in place and a notifications panel for points. The same screen in high fidelity keeps every block where it was.",
      "Los wireframes definen la jerarquía de la home y dónde viven las acciones nuevas: favorito y compartir en cada card, comentarios en el lugar y un panel de notificaciones para los puntos. La misma pantalla en alta fidelidad mantiene cada bloque donde estaba.")) +
     "", "lofi")
-b += wipe(p, ("mp-lofi", 900, 2698), ("mp-points", 1200, 3597), "play.mercadolibre.com", T("Low fidelity", "Baja fidelidad"), T("High fidelity", "Alta fidelidad"),
+b += wipe(p, ("mp-lofi", 934, 2800), ("mp-points", 1201, 3600), "play.mercadolibre.com", T("Low fidelity", "Baja fidelidad"), T("High fidelity", "Alta fidelidad"),
           "Same blocks, same places.", "Mismos bloques, mismos lugares.")
 b += chapter(T("High fidelity", "Alta fidelidad"), h2("Every card can be saved, shared and talked about.", "Cada card se puede guardar, compartir y comentar.") +
     decision("A home built around what people recommend", "Una home armada alrededor de lo que recomienda la gente",
              f"<p>{T('“Top 10 films recommended by people” sits next to the usual rows. Each card carries two actions, save and share, and opens its comments in place.', '“Top 10 pelis recomendadas por la gente” convive con las filas de siempre. Cada card lleva dos acciones, guardar y compartir, y abre sus comentarios en el lugar.')}</p>",
              "") +
     "", "hifi")
-b += scrub(p, "mp-home", 1200, 3570, "play.mercadolibre.com", alt_en="Mercado Play home with recommendation rows", alt_es="Home de Mercado Play con filas de recomendaciones")
+b += scrub(p, "mp-home", 1210, 3600, "play.mercadolibre.com", alt_en="Mercado Play home with recommendation rows", alt_es="Home de Mercado Play con filas de recomendaciones")
 b += chapter(T("Every state", "Cada estado"), h2("Share, and see it pay off.", "Compartir, y ver que suma.") +
     decision("Saved and shared, in place", "Guardado y compartido, en el lugar",
              f"<p>{T('Sharing opens a short modal: an email or a link, and a clear promise, 100 points if the person watches it all. Saving confirms with a toast, and the bell tells you when a friend finished what you shared.', 'Compartir abre un modal corto: un mail o un enlace, y una promesa clara, 100 puntos si la persona la ve completa. Guardar confirma con un toast, y la campana avisa cuando un amigo terminó lo que compartiste.')}</p>",
-             pages([("mp-fav", 1200, 3544, "Home with the saved-to-favourites toast", "Home con el toast de agregado a favoritos", "Saved to favourites", "Agregada a favoritos"),
-                    ("mp-share", 1200, 3597, "Share modal over the home", "Modal para compartir sobre la home", "Share modal", "Modal para compartir")], kind="mp")) +
+             pages([("mp-fav", 1219, 3600, "Home with the saved-to-favourites toast", "Home con el toast de agregado a favoritos", "Saved to favourites", "Agregada a favoritos"),
+                    ("mp-share", 1201, 3600, "Share modal over the home", "Modal para compartir sobre la home", "Share modal", "Modal para compartir")], kind="mp")) +
     decision("My favourites and my recommendations", "Mis favoritos y mis recomendados",
              f"<p>{T('A page of its own keeps what you saved and what you shared, so recommending becomes a habit instead of a WhatsApp chat with yourself.', 'Una página propia guarda lo que guardaste y lo que compartiste, así recomendar se vuelve un hábito y no un chat de WhatsApp con uno mismo.')}</p>",
-             fig(p, "mp-recos", 1200, 1538, "Mercado Play · Mis favoritos", "My favourites and my recommendations page", "Página de mis favoritos y mis recomendados", kind="mp", dark=True)), "states")
+             fig(p, "mp-recos", 1440, 1845, "Mercado Play · Mis favoritos", "My favourites and my recommendations page", "Página de mis favoritos y mis recomendados", kind="mp", dark=True)), "states")
 b += chapter("UI kit", h2("Small pieces, every state.", "Piezas chicas, todos los estados.") + prose(
     ("Cards, the share modal and comments were designed as components with their states: default, saved, active and sent.",
      "Las cards, el modal para compartir y los comentarios se diseñaron como componentes con sus estados: default, guardado, activo y enviado.")) +

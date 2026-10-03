@@ -1035,12 +1035,9 @@ html.has-cursor .agent__panel input { cursor: text; }
 .bs--grill, .bg--grill { background: radial-gradient(70% 60% at 14% 6%, #f8fbef 0%, transparent 62%), radial-gradient(60% 70% at 92% 100%, #b7d46a 0%, transparent 70%), linear-gradient(165deg, #eaf3d2, #cfe39a); }
 .bs--grill .bs__dev--win { left: 14%; top: 8%; width: 72%; }
 .bs--grill .bs__nt--a { left: 5%; bottom: 7%; width: 38cqw; }
-.bs--mp, .bg--mp { background: radial-gradient(60% 60% at 74% 16%, #fff7a0 0%, transparent 70%), radial-gradient(60% 60% at 6% 100%, #f2c900 0%, transparent 70%), #ffe600; }
-.bs--mp .bs__dev--win { left: 27%; top: 9%; width: 68%; transform: perspective(1800px) rotateY(-14deg) rotateX(5deg); transform-origin: 0 50%; }
-.bs--mp .bs__nt--a { left: 4%; top: 58%; width: 44cqw; }
-.bs--mp .bs__emoji--a { left: 8%; top: 13%; }
-.bs--mp .bs__emoji--b { left: 18%; top: 31%; font-size: 3.8cqw; }
-.bs--mp .bs__emoji--c { left: 6%; top: 39%; font-size: 4.2cqw; }
+.bs--mp, .bg--mp { background: radial-gradient(70% 60% at 14% 6%, #fffbe0 0%, transparent 62%), radial-gradient(60% 70% at 92% 100%, #ffd900 0%, transparent 70%), linear-gradient(165deg, #fff4a8, #ffe94d); }
+.bs--mp .bs__dev--win { left: 14%; top: 8%; width: 72%; }
+.bs--mp .bs__nt--a { left: 5%; bottom: 7%; width: 42cqw; }
 @media (prefers-reduced-motion: no-preference) {
   .bs .nt, .bs .bs__emoji { animation: bob 6s ease-in-out infinite; }
   .bs .bs__nt--b { animation-delay: -2s; }

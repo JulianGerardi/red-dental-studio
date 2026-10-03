@@ -82,8 +82,7 @@ work = "".join([
 ])
 
 INTRO = """<script>(function(){var d=document.documentElement;try{var r=document.referrer;if(r&&new URL(r).origin===location.origin&&r!==location.href)return;}catch(e){}if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('is-loading','intro');setTimeout(function(){d.classList.remove('is-loading');},7000);})();</script>
-<script src="assets/hero.js" defer></script>
-"""
+""" + f'<script src="assets/{V("hero.js")}" defer></script>\n'
 LOADER = f"""<div class="loader" aria-hidden="true">
   <div class="loader__top"><span>Julián Gerardi</span><span>{T("Senior Product Designer", "Senior Product Designer")}</span><span>{T("Portfolio", "Portfolio")} ’26</span></div>
   <div class="loader__words"><span>{T("Research", "Research")}</span><span>{T("Systems", "Sistemas")}</span><span>{T("Interfaces", "Interfaces")}</span><span>{T("Prototypes", "Prototipos")}</span></div>
