@@ -1,0 +1,7 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,r,t as i}from"./ScopeIcons-DisUdwfV.js";import{s as a,u as o}from"./data-BrHMiAjf.js";var s,c,l,u,d,f;function p(){return(p=e((()=>{r(),o(),s=t(),c={title:`Components/Clinical/Dental/ScopeIcon`,component:n,args:{scope:`Tooth`,className:`size-5`},argTypes:{scope:{control:`select`,options:a}}},l={},u={render:()=>(0,s.jsx)(`div`,{className:`flex items-center gap-4`,children:a.map(e=>(0,s.jsxs)(`span`,{className:`flex items-center gap-1.5 text-sm`,children:[(0,s.jsx)(n,{scope:e,className:`size-5`}),` `,e]},e))})},d={render:()=>(0,s.jsx)(i,{className:`size-6`})},f=[`Default`,`AllScopes`,`ArchGlyph`],l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{}`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="flex items-center gap-4">
+      {SCOPES.map(s => <span key={s} className="flex items-center gap-1.5 text-sm"><ScopeIcon scope={s} className="size-5" /> {s}</span>)}
+    </div>
+}`,...u.parameters?.docs?.source}}},d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`{
+  render: () => <ArchIcon className="size-6" />
+}`,...d.parameters?.docs?.source}}}})))()}p();export{u as AllScopes,d as ArchGlyph,l as Default,f as __namedExportsOrder,c as default};
