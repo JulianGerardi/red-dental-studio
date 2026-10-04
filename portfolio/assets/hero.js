@@ -31,8 +31,9 @@
     });
   }
 
-  /* Words -> project previews, one card per project */
-  if (!fine) return;
+  /* Words -> project previews, one card per project.
+     Mouse: the card follows the hover. Touch: the first tap shows the card,
+     a tap on the card (or on the same word again) opens the case. */
   var cards = {};
   card.querySelectorAll('[data-card]').forEach(function (c) { cards[c.getAttribute('data-card')] = c; });
   var current = null, hideTimer = null;
@@ -71,10 +72,31 @@
       current = null;
     }, 90);
   }
+  if (fine) {
+    card.querySelectorAll('.hot').forEach(function (w) {
+      w.addEventListener('mouseenter', function () { show(w); });
+      w.addEventListener('mouseleave', hide);
+      w.addEventListener('focus', function () { show(w); });
+      w.addEventListener('blur', hide);
+    });
+    return;
+  }
+  var tapped = null;
   card.querySelectorAll('.hot').forEach(function (w) {
-    w.addEventListener('mouseenter', function () { show(w); });
-    w.addEventListener('mouseleave', hide);
-    w.addEventListener('focus', function () { show(w); });
-    w.addEventListener('blur', hide);
+    w.addEventListener('click', function (e) {
+      if (tapped === w) return;                 /* second tap on the same word: go */
+      e.preventDefault();
+      tapped = w;
+      show(w);
+    });
   });
+  Object.keys(cards).forEach(function (k) {
+    cards[k].addEventListener('click', function () { if (tapped) tapped.click(); });
+  });
+  document.addEventListener('click', function (e) {
+    if (!tapped || e.target.closest('.hot, .hot-card')) return;
+    tapped = null;
+    hide();
+  });
+  window.addEventListener('scroll', function () { if (tapped) { tapped = null; hide(); } }, { passive: true });
 })();

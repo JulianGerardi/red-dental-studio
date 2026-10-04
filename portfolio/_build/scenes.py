@@ -8,6 +8,7 @@ wipe()   low fidelity turns into high fidelity under a moving line
 scrub()  a long page that scrolls inside its window as you scroll
 words()  a paragraph whose words light up as it passes
 """
+import re
 from mockups import browser, iphone, far_browser, FAR_PHONE
 
 
@@ -38,9 +39,20 @@ def dev_piece(p, name, w, h, alt_en="", alt_es="", scale=1.3):
             f'<img src="{p}assets/img/{name}.webp" width="{w}" height="{h}" alt="{alt_en}" data-alt-es="{alt_es}" loading="lazy" decoding="async"></div>')
 
 
+def _static(html, i):
+    """A layer frozen at step i: fields filled up to that step (for the phone slides)."""
+    html = re.sub(r'class="([^"]*)" data-at="(\d+)"', lambda m: f'class="{m.group(1)}{" is-set" if int(m.group(2)) <= i else ""}"', html)
+    return re.sub(r'<span data-at="(\d+)"', lambda m: '<span class="is-set"' if int(m.group(1)) <= i else '<span', html)
+
+
 def story(steps, layers, stage, label=""):
-    """steps: [(title_en, title_es, text_en, text_es)], layers: [(indices, html)]."""
-    lis = "".join(f'<li class="story__step" data-i="{i}"><span class="story__n">{i + 1:02d} / {len(steps):02d}</span>'
+    """steps: [(title_en, title_es, text_en, text_es)], layers: [(indices, html)].
+    Desktop: a sticky stage beside the steps. Phone: each step is its own slide,
+    with its screen above the text, and the scroll stops on every step."""
+    def media(i):
+        html = next((h for idx, h in layers if i in idx), "")
+        return f'<div class="story__mob stage--{stage}" data-step="{i}" aria-hidden="true">{_static(html, i)}</div>'
+    lis = "".join(f'<li class="story__step" data-i="{i}">{media(i)}<span class="story__n">{i + 1:02d} / {len(steps):02d}</span>'
                   f'<h3>{T(a, b)}</h3><p>{T(c, d)}</p></li>' for i, (a, b, c, d) in enumerate(steps))
     lay = "".join(f'<div class="story__layer" data-i="{" ".join(str(i) for i in idx)}">{html}</div>' for idx, html in layers)
     dots = "".join("<i></i>" for _ in steps)

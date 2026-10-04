@@ -251,11 +251,11 @@
       setVar(el, '--p', clamp01((vh * 0.86 - r.top) / (vh * 0.42 + r.height)));
     });
     stories.forEach(function (st) {
+      if (narrow()) { if (st._active !== -1) { st._active = -1; st.removeAttribute('data-step'); } return; }
       var r = st.getBoundingClientRect();
       if (r.bottom < 0 || r.top > vh) return;
       var steps = st._steps || (st._steps = Array.prototype.slice.call(st.querySelectorAll('.story__step')));
       var anchor = vh * 0.55;
-      if (narrow()) { var m = st.querySelector('.story__media').getBoundingClientRect(); anchor = m.bottom + (vh - m.bottom) * 0.4; }
       var active = 0;
       steps.forEach(function (s, i) { if (s.getBoundingClientRect().top < anchor) active = i; });
       if (st._active === active) return;
@@ -353,6 +353,30 @@
     };
     sc._run(reduced ? 0.74 : 0);
   });
+
+  /* Phone: when a swipe ends inside a story, settle on the nearest step */
+  var coarse = window.matchMedia && window.matchMedia('(hover: none)').matches;
+  if (coarse && stories.length) {
+    var settleTimer = null, touching = false;
+    var settle = function () {
+      if (touching || !narrow()) return;
+      var vh = window.innerHeight;
+      var top = parseFloat(getComputedStyle(root).scrollPaddingTop) || 0;
+      stories.forEach(function (st) {
+        var r = st.getBoundingClientRect();
+        if (r.top > top + vh * 0.4 || r.bottom < top + vh * 0.6) return;
+        var best = null, bd = Infinity;
+        st.querySelectorAll('.story__step').forEach(function (s) {
+          var d = s.getBoundingClientRect().top - top;
+          if (Math.abs(d) < Math.abs(bd)) { bd = d; best = s; }
+        });
+        if (best && Math.abs(bd) > 2 && Math.abs(bd) < vh * 0.5) window.scrollTo({ top: window.scrollY + bd, behavior: reduced ? 'auto' : 'smooth' });
+      });
+    };
+    window.addEventListener('touchstart', function () { touching = true; clearTimeout(settleTimer); }, { passive: true });
+    window.addEventListener('touchend', function () { touching = false; clearTimeout(settleTimer); settleTimer = setTimeout(settle, 220); }, { passive: true });
+    window.addEventListener('scroll', function () { clearTimeout(settleTimer); settleTimer = setTimeout(settle, 160); }, { passive: true });
+  }
 
   /* Fitted canvases: built at a fixed size (data-fit="WxH") and scaled to their box */
   var fits = Array.prototype.slice.call(document.querySelectorAll('[data-fit]'));
