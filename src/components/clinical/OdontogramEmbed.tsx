@@ -108,7 +108,7 @@ function EnBarra({ contenedor, children }: { contenedor: HTMLElement; children: 
       if (origen && el.parentElement !== origen) origen.appendChild(el)
     }
   }, [contenedor])
-  return <span ref={envoltorio} className="mr-auto flex items-center gap-1">{children}</span>
+  return <span ref={envoltorio} className="mr-auto flex min-w-0 items-center gap-1">{children}</span>
 }
 
 export function OdontogramEmbed({
@@ -120,7 +120,7 @@ export function OdontogramEmbed({
       nada. "Tooth information" va aparte, en `ToothInfoTrigger`. */
   controlesAbiertos: boolean
   onCerrarControles: () => void
-  /** Botones del examen para la izquierda de la barra de Odontogram / Periodontal Status. */
+  /** Lo que va a la izquierda de la barra de Odontogram / Periodontal Status (la botonera de selección de DentAssmt). */
   accionesBarra?: React.ReactNode
 }) {
   const ref = useRef<HTMLDivElement>(null)

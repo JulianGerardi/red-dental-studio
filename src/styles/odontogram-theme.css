@@ -211,6 +211,13 @@
 
 /* Julián pidió sacar el botón "Diagnoses" de la barra de tabs: el ícono de
    "Tooth information" (`ToothInfoTrigger`) ocupa su lugar. */
+/* La barra de Odontogram / Periodontal Status lleva a la izquierda la botonera de selección de DentAssmt: si no entra en
+   una línea, baja; las pestañas quedan a la derecha. */
+.odonto-embed .perio-launch-bar {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
 .odonto-embed .perio-launch-bar #openCaseDiagnosesBtn {
   display: none;
 }

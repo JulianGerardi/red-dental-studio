@@ -1719,3 +1719,31 @@ A pedido de Julian:
    Odontogram / Periodontal Status, metidas en la barra de la libreria con el
    mismo truco que el boton de Tooth information (`EnBarra` en
    OdontogramEmbed): siguen ahi al cambiar de pestaña.
+
+4. **Cambiadas de lugar** (Julian): las tres acciones del examen van arriba, en
+   la fila propia del lienzo, y la botonera de seleccion va a la izquierda de
+   la barra de Odontogram / Periodontal Status (`accionesBarra` de
+   OdontogramEmbed). Ahi va en version compacta -Upper / Lower, cuadrantes sin
+   icono, Clear solo con el icono- para compartir la fila con las pestañas:
+   medido, a 1440 entra todo en una fila; con menos ancho la barra baja a dos
+   lineas (`flex-wrap` en `.perio-launch-bar`) y las pestañas quedan a la
+   derecha.
+
+5. **La botonera como controles segmentados** (Julian pidio algo mas lindo de
+   usar): cada grupo es una sola pieza con los botones unidos -[Permanent |
+   Primary], [All | Upper | Lower], [Q1 | Q2 | Q3 | Q4], [← | →] y Clear-, asi
+   se lee de un vistazo que va con que y ocupa menos. All paso al grupo de las
+   arcadas: boca entera, arriba, abajo.
+   - **Lo elegido queda en azul** (arcada, cuadrante o todas) hasta que la
+     seleccion cambia: Clear, las flechas o un clic sobre una pieza del chart.
+   - **Siempre en una fila**: debajo de 1400px Permanent / Primary quedan solo
+     con el icono (con su tooltip) y Upper / Lower sin icono. Medido a 1440 y
+     1280: la barra mide 40px, una sola linea con las pestañas. Se usa
+     `max-[1400px]:hidden` y no `hidden …:inline` porque la libreria del
+     odontograma pisa la clase `.hidden`.
+
+6. **Editar un finding tambien va en el drawer** (`dental/EditFindingDrawer.tsx`,
+   antes `EditProcedureModal`): el finding entero arriba (estado, fecha, zona,
+   condicion y descriptores, con la misma card del panel), debajo lo que se
+   edita -Provider, Surfaces si es una pieza, Notes- y los procedimientos
+   vinculados. Save y Cancel fijos al pie, como New Procedure.

@@ -13,7 +13,7 @@ import { ReviewExamDialog } from './dental/ReviewExamDialog'
 import { FindingCard } from './dental/FindingCard'
 import { FindingActionsMenu } from './dental/FindingActionsMenu'
 import { NewProcedureDrawer, type ProcedureDraft } from './dental/NewProcedureDrawer'
-import { EditProcedureModal } from './dental/EditProcedureModal'
+import { EditFindingDrawer } from './dental/EditFindingDrawer'
 import { ConfirmProcedureDialog } from './dental/ConfirmProcedureDialog'
 import { useExamReviews } from './dental/useExamReviews'
 import { ACTIONS, type FindingAction } from './dental/actions'
@@ -134,14 +134,9 @@ export function DentalAssessmentExam() {
       </div>
 
       <div ref={setLienzo} className="relative order-1 flex min-w-0 flex-1 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-line p-4 lg:order-2" data-examen style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fafbfe' }}>
-        {/* Arriba del chart, la botonera de selección de la app real. Las acciones del examen van a la izquierda de la barra
-            de Odontogram / Periodontal Status, que ahí está libre. La Problem list se abre flotando sobre el chart. */}
-        <div className="w-full"><BotoneraDientes raiz={lienzo} /></div>
-        <OdontogramEmbed
-          controlesAbiertos={false}
-          onCerrarControles={() => {}}
-          accionesBarra={
-            <>
+        {/* Arriba del chart, las acciones del examen; la botonera de selección de la app real va a la izquierda de la barra
+            de Odontogram / Periodontal Status (Julián las cambió de lugar). La Problem list se abre flotando sobre el chart. */}
+        <div className="flex w-full items-center gap-1">
             {ACCIONES_EXAMEN.map(({ label, icono: Icono, modo }) => {
               const boton = (
                 <button
@@ -164,8 +159,11 @@ export function DentalAssessmentExam() {
                 </Popover>
               )
             })}
-            </>
-          }
+        </div>
+        <OdontogramEmbed
+          controlesAbiertos={false}
+          onCerrarControles={() => {}}
+          accionesBarra={<BotoneraDientes raiz={lienzo} />}
         />
       </div>
       </div>
@@ -180,7 +178,7 @@ export function DentalAssessmentExam() {
         onSave={saveProcedure}
       />
 
-      <EditProcedureModal
+      <EditFindingDrawer
         finding={editing}
         onClose={() => setEditing(null)}
         onSave={(patch) => setFindings((all) => all.map((f) => (f.id === editing?.id ? { ...f, ...patch } : f)))}
