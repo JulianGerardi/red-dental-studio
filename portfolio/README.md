@@ -1,5 +1,7 @@
 # Portfolio · Julián Gerardi
 
+En vivo: **https://juliangerardi.github.io/Portfolio/**
+
 Sitio personal estático (HTML + CSS + JS). Estética tipo Vercel/Geist sin líneas de grilla: layout ancho (hasta 1680px), tipografía Geist, blanco y negro, y el color solo en las portadas de cada proyecto. Bilingüe (inglés y español).
 
 ```bash
