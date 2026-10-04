@@ -409,7 +409,7 @@ def chapter(label, body, cid=""):
 def next_row(p, current_file):
     idx = [f for f, _ in PROJECTS].index(current_file)
     nf, nt = PROJECTS[(idx + 1) % len(PROJECTS)]
-    return f"""  <section class="wrap"><a class="next" href="{nf}" data-cursor="→"><div><div class="label">{T("Next project", "Próximo proyecto")}</div><h2>{nt}</h2></div>{arrow("i-right")}</a></section>
+    return f"""  <section class="wrap"><a class="next" href="{nf}"><div><div class="label">{T("Next project", "Próximo proyecto")}</div><h2>{nt}</h2></div><span class="next__go" aria-hidden="true">{arrow("i-right")}</span></a></section>
 """
 
 

@@ -15,7 +15,7 @@ portfolio/
   work/confidentally.html     caso con NDA (bloqueado con contraseña)
   work/confidentally-ui.html  design system y Builder con IA
   work/grill.html             GRILL Empresas (app de empleados + panel de cocina)
-  work/mercado-play.html      challenge de Mercado Play: problema, benchmarking, arquetipos, solución, baja y alta fidelidad, y la página del UI Kit de Figma pieza por pieza con cada estado (`mp-kit-*`, recortadas de la página UI Kit a su tamaño real)
+  work/mercado-play.html      challenge de Mercado Play: problema, benchmarking, arquetipos (como en la página del Figma, con las fotos de Sofía y Ricardo), solución, baja y alta fidelidad, y la página del UI Kit de Figma pieza por pieza con cada estado (`mp-kit-*`, recortadas de la página UI Kit a su tamaño real)
   assets/site.css             tokens (claro y oscuro), layout, trabajos, casos, intro, agente, cursor
   assets/site.js              idioma, intro, scroll suave, reveals, escenas de scroll, trabajos, cursor, tema, lightbox, NDA, CV
   assets/hero.js              movimiento del degradé del inicio (solo en la home)
@@ -52,7 +52,7 @@ Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span 
 ## Movimiento
 
 - **Intro**: cada vez que se entra a la home desde afuera del sitio, una pantalla negra cuenta de 0 a 100 con palabras que pasan (Research, Systems, Interfaces, Prototypes) y se levanta. Navegando entre páginas del sitio no se repite.
-- **Scroll suave** con [Lenis](https://github.com/darkroomengineering/lenis) (CDN). Los bloques con `data-reveal` suben al entrar, los títulos `.lines` aparecen palabra por palabra detrás de una máscara, y los números con `data-count` cuentan.
+- **Scroll suave** con [Lenis](https://github.com/darkroomengineering/lenis) (CDN). Cada paso de la rueda tiene un tope y el destino del scroll nunca se adelanta más de una pantalla, así un scroll rápido no salta hasta el final. Los bloques con `data-reveal` suben al entrar, los títulos `.lines` aparecen palabra por palabra detrás de una máscara, y los números con `data-count` cuentan.
 - **Portadas de los casos**: parallax suave del mockup.
 - **Transición entre páginas**: una cortina cubre la pantalla al salir y se levanta al entrar.
 - **Inicio**: una tarjeta clara con el mismo brillo verde y violeta del final de la página, que se mueve solo y sigue el puntero. Las palabras clave de la frase (sin subrayado hasta pasar el mouse) muestran el proyecto al que apuntan en su escena de marca: una ventana de Safari sobre un degradé suave con una notificación (Batech, Confidentally, GRILL), el monitor con el diagrama Figma → Claude Code → Storybook (Confidentally UI) o la ventana inclinada sobre el amarillo de Mercado Play (design systems → Confidentally UI, IA → Batech, prototipos → Confidentally, productos de punta a punta → GRILL, que la gente usa → Mercado Play). Se configuran en `HOT` de `_build/index_page.py` y `brand_scene()` de `_build/mockups.py`.

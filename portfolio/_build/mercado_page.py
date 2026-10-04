@@ -81,30 +81,36 @@ bench = ('      <div class="bench" data-reveal data-lenis-prevent><table><thead>
          + "</tbody></table></div>\n")
 
 
-def persona(name, role_en, role_es, quote_en, quote_es, data, beh, mot, fru, k):
+def persona(name, photo, role_en, role_es, quote_en, quote_es, data, beh, mot, fru, k):
+    """A user archetype, laid out as in the Figma page “Arquetipos de usuario”."""
     rows = "".join(f"<div><dt>{T(a, b)}</dt><dd>{T(c, d)}</dd></div>" for a, b, c, d in data)
     lst = lambda items: "<ul>" + "".join(f"<li>{T(e, s)}</li>" for e, s in items) + "</ul>"
-    return (f'<article class="persona" data-reveal style="--k:{k}"><header><span class="persona__av" aria-hidden="true">{name[0]}</span><div><h3>{name}</h3><span>{T(role_en, role_es)}</span></div></header>'
-            f'<p class="persona__q">{T(quote_en, quote_es)}</p><dl>{rows}</dl>'
-            f'<div class="persona__cols"><div><h4>{T("Behaviour", "Comportamiento")}</h4>{lst(beh)}</div><div><h4>{T("Motivations", "Motivaciones")}</h4>{lst(mot)}</div><div><h4>{T("Frustrations", "Frustraciones")}</h4>{lst(fru)}</div></div></article>')
+    block = lambda en, es, body: f'<section class="persona__block"><h4>{T(en, es)}</h4>{body}</section>'
+    return (f'<article class="persona" data-reveal style="--k:{k}">'
+            f'<div class="persona__photo"><img src="{p}assets/img/mp-persona-{photo}.webp" width="1000" height="960" alt="{name}" loading="lazy" decoding="async"></div>'
+            f'<header class="persona__head"><h3><i aria-hidden="true"></i>{name}</h3><span>{T(role_en, role_es)}</span><p>{T(quote_en, quote_es)}</p></header>'
+            + block("Personal details", "Datos personales", f"<dl>{rows}</dl>")
+            + block("Behaviour", "Comportamiento", lst(beh)) + block("Motivations", "Motivaciones", lst(mot)) + block("Frustrations", "Frustraciones", lst(fru))
+            + '</article>')
 
 
-personas = '      <div class="personas">' + persona(
-    "Sofía", "Casual user", "Usuaria casual",
+personas = ('      <p class="personas__lead" data-reveal>' + T('Mercado Play users:', 'Usuarios de <b>Mercado Play</b>:') + '</p>\n'
+             '      <div class="personas">' + persona(
+    "Sofía", "sofia", "Casual user", "Usuaria casual",
     "Streaming works as complementary content inside the Mercado Libre ecosystem.", "El streaming funciona como contenido complementario dentro del ecosistema Mercado Libre.",
     [("Age", "Edad", "29", "29 años"), ("Job", "Ocupación", "Administrative", "Administrativa"), ("Main device", "Dispositivo principal", "Phone", "Celular"),
      ("Mercado Libre use", "Uso de Mercado Libre", "Frequent purchases", "Compras frecuentes"), ("Streaming", "Consumo de streaming", "Casual", "Casual")],
     [("Opens Mercado Libre every day", "Entra a Mercado Libre todos los días"), ("Finds Mercado Play inside the app", "Descubre Mercado Play dentro de la app"), ("Watches short content before bed", "Mira contenido corto antes de dormir")],
     [("Watch something quickly", "Ver algo rápido"), ("Not paying for another subscription", "No pagar otra suscripción"), ("Use apps she already knows", "Usar apps que ya conoce")],
     [("Too much time looking for something to watch", "Mucho tiempo buscando contenido"), ("Too many paid platforms", "Tener muchas plataformas pagas")], 0) + persona(
-    "Ricardo", "Recurring user", "Usuario recurrente",
-    "He values the free, ad-supported model as long as content is easy to find.", "Valora el modelo gratuito con publicidad, siempre que el contenido sea fácil de encontrar.",
+    "Ricardo", "ricardo", "Recurring user", "Usuario recurrente",
+    "He values the free, ad-supported model, as long as content is easy to find.", "Este usuario valora el modelo gratuito con publicidad, siempre que el contenido sea fácil de encontrar.",
     [("Age", "Edad", "50", "50 años"), ("Job", "Ocupación", "Shop owner / self-employed", "Comerciante / independiente"), ("Main device", "Dispositivo principal", "Desktop", "Desktop"),
-     ("Mercado Libre use", "Uso de Mercado Libre", "Very frequent", "Muy frecuente"), ("Streaming", "Consumo de streaming", "High", "Alto")],
+     ("Mercado Libre use", "Uso de Mercado Libre", "Very frequent", "Muy frecuentes"), ("Streaming", "Consumo de streaming", "High", "Alta")],
     [("Browses Mercado Libre several times a week", "Navega Mercado Libre varias veces por semana"), ("Finds Mercado Play while using the app", "Descubre Mercado Play mientras usa la app"),
      ("Watches at night on the TV", "Consume contenido por la noche en la televisión"), ("Prefers well-known, easy-to-pick films", "Prefiere películas conocidas o fáciles de elegir")],
     [("Watch without paying another subscription", "Ver contenido sin pagar otra suscripción"), ("Find something to watch fast", "Encontrar algo para ver rápidamente"), ("Simple platforms", "Usar plataformas simples")],
-    [("Complicated interfaces", "Interfaces complicadas"), ("Too many options", "Demasiadas opciones para elegir"), ("Creating new accounts", "Tener que crear cuentas nuevas")], 1) + "</div>\n"
+    [("Complicated interfaces", "Interfaces complicadas"), ("Too many options", "Demasiadas opciones para elegir"), ("Creating new accounts", "Tener que crear cuentas nuevas")], 1) + "</div>\n")
 
 flow = [("Recommend", "Recomendar", "Share a film or a show from its card, by email or with a link.", "Compartir una peli o serie desde su card, por mail o con un enlace."),
         ("A friend watches it", "Un amigo la ve", "The recommendation lands with someone who trusts you.", "La recomendación le llega a alguien que confía en vos."),
@@ -131,8 +137,8 @@ b += chapter("Benchmarking", h2("Five platforms, eight dimensions.", "Cinco plat
 b += big_words("Mercado Play wins on access, a Mercado Libre account is all it takes, and loses on discovery.",
                "Mercado Play gana en acceso, alcanza con la cuenta de Mercado Libre, y pierde en descubrimiento.")
 b += chapter(T("User archetypes", "Arquetipos de usuario"), h2("People don’t come looking for content. They find it.", "La gente no llega buscando contenido. Lo encuentra.") + prose(
-    ("Mercado Play users don’t necessarily arrive looking for something to watch: they discover it while using the rest of Mercado Libre. That turns the platform into an opportunity for engagement and retention inside the main product.",
-     "Las personas usuarias de Mercado Play no necesariamente llegan buscando contenido: lo descubren mientras usan el resto de Mercado Libre. Eso convierte a la plataforma en una oportunidad de engagement y retención dentro del producto principal.")) + personas, "archetypes")
+    ("Mercado Play users don’t necessarily arrive looking for something to watch: they discover it while using the rest of Mercado Libre. That turns the platform into <strong>an opportunity for engagement and retention inside the main product</strong>.",
+     "Las personas usuarias de Mercado Play no necesariamente llegan buscando contenido: lo descubren mientras usan el resto de Mercado Libre. Eso convierte a la plataforma en <strong>una oportunidad de engagement y retención dentro del producto principal</strong>.")) + personas, "archetypes")
 b += chapter(T("The solution", "La solución"), h2("Recommendations between people, rewarded.", "Recomendaciones entre personas, con recompensa.") + prose(
     ("The proposal adds social recommendations to Mercado Play. People recommend the films and shows they liked and share them with anyone through a link. If someone watches the whole title from that recommendation, the person who shared it earns points to use on benefits across Mercado Libre.",
      "La propuesta suma recomendaciones sociales a Mercado Play. La gente recomienda las pelis y series que le gustaron y las comparte con quien quiera mediante un enlace. Si alguien ve el contenido completo a partir de esa recomendación, quien la compartió suma puntos para usar en beneficios dentro de Mercado Libre.")), "solution")

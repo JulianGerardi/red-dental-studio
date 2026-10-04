@@ -229,7 +229,7 @@
       if (off) { sc.style.height = ''; track.style.transform = ''; sc._track = null; return; }
       sc._track = track;
       sc._dist = Math.max(0, track.scrollWidth - pin.clientWidth);
-      sc.style.height = Math.round(pin.clientHeight + sc._dist * 1.1 + window.innerHeight * 0.35) + 'px';
+      sc.style.height = Math.round(pin.clientHeight + sc._dist * 0.85 + window.innerHeight * 0.2) + 'px';
     });
   }
   function scenesTick(vh) {
@@ -376,9 +376,21 @@
     try {
       lenis = new window.Lenis({
         autoRaf: true,
-        lerp: 0.095,
+        lerp: 0.1,
+        wheelMultiplier: 0.85,
         anchors: { offset: -120 },
-        prevent: function (node) { return !!(node && node.closest && node.closest('.agent__panel, .lightbox, .wl-strip')); }
+        prevent: function (node) { return !!(node && node.closest && node.closest('.agent__panel, .lightbox, .wl-strip')); },
+        /* A fast flick can't run away to the end of the page: each wheel step is capped,
+           and the scroll target never gets more than ~one screen ahead of where the page is. */
+        virtualScroll: function (data) {
+          if (!lenis || !data.event || data.event.type.indexOf('wheel') === -1) return true;
+          var d = Math.max(-140, Math.min(140, data.deltaY));
+          var lead = lenis.targetScroll - lenis.animatedScroll;
+          var max = window.innerHeight * 0.9;
+          if (d && lead && (d > 0) === (lead > 0) && Math.abs(lead) > max) d = d > 0 ? 0.01 : -0.01;
+          data.deltaY = d;
+          return true;
+        }
       });
     } catch (e) { lenis = null; return; }
     window.__jgLenis = lenis;

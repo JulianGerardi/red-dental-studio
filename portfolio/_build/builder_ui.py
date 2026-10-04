@@ -62,24 +62,25 @@ def _node(cls, x, y, w, h, on, icon, title, sub, small=False):
 
 
 def pipeline(title_en, title_es):
+    # One baseline (y = 310) and a fixed rhythm: every wire is horizontal or a right angle.
     nodes = "".join([
-        f'<div class="pd__group" style="left:40px;top:196px;width:262px;height:348px"><em>{T("Figma file", "Archivo de Figma")}</em></div>',
-        _node("tok", 56, 248, 230, 76, 0, I["sliders"], "Variables", T("Colour, type, radius", "Color, tipografía, radios"), True),
-        _node("cmp", 56, 336, 230, 76, 0, I["comp"], "Components", T("Buttons, fields, cards", "Botones, campos, tarjetas"), True),
-        _node("sty", 56, 424, 230, 76, 0, I["type"], "Styles", T("Text and effects", "Textos y efectos"), True),
-        _node("figma", 346, 316, 130, 108, 0.5, "<i></i>", "Figma", T("design source", "fuente de diseño")),
-        _node("claude", 548, 262, 216, 216, 1, "", "Claude Code", T("reads the design<br>and the codebase", "lee el diseño<br>y el código")),
-        f'<span class="pd__pill pd__pill--hl" data-on="1" style="left:594px;top:206px">human-in-the-loop</span>',
-        _node("code", 838, 296, 196, 148, 2, "&lt;/&gt;", "React + Tailwind", T("139 components,<br>same names as Figma", "139 componentes,<br>mismos nombres que Figma")),
-        _node("sb", 1052, 296, 190, 148, 3, "S", "Storybook", T("Confidentally UI ·<br>481 live examples", "Confidentally UI ·<br>481 ejemplos en vivo")),
-        _node("dev", 1276, 172, 150, 116, 4, I["users"], T("Developers", "Devs"), T("take each piece", "toman cada pieza")),
-        _node("app", 1276, 312, 150, 116, 4, I["box"], "App", T("32 screens", "32 pantallas")),
-        _node("ai", 1276, 452, 150, 116, 4.2, I["spark"], T("AI Builder", "Builder IA"), T("new screens", "pantallas nuevas")),
-        f'<span class="pd__pill" data-on="4.4" style="left:1062px;top:622px">{T("Audit in CI flags drift", "La auditoría en CI avisa desvíos")}</span>',
+        f'<div class="pd__group" style="left:40px;top:146px;width:266px;height:300px"><em>{T("Figma file", "Archivo de Figma")}</em></div>',
+        _node("tok", 56, 190, 234, 72, 0, I["sliders"], "Variables", T("Colour, type, radius", "Color, tipografía, radios"), True),
+        _node("cmp", 56, 274, 234, 72, 0, I["comp"], "Components", T("Buttons, fields, cards", "Botones, campos, tarjetas"), True),
+        _node("sty", 56, 358, 234, 72, 0, I["type"], "Styles", T("Text and effects", "Textos y efectos"), True),
+        _node("figma", 340, 240, 130, 140, 0.5, "<i></i>", "Figma", T("design source", "fuente de diseño")),
+        _node("claude", 525, 210, 200, 200, 1, "", "Claude Code", T("reads the design<br>and the code", "lee el diseño<br>y el código")),
+        f'<span class="pd__pill pd__pill--hl pd__pill--c" data-on="1" style="left:625px;top:166px">human-in-the-loop</span>',
+        _node("code", 770, 240, 180, 140, 2, "&lt;/&gt;", "React + Tailwind", T("139 components,<br>named as in Figma", "139 componentes,<br>con los nombres de Figma")),
+        _node("sb", 990, 240, 180, 140, 3, "S", "Storybook", T("Confidentally UI ·<br>481 live examples", "Confidentally UI ·<br>481 ejemplos en vivo")),
+        _node("dev", 1220, 162, 180, 84, 4, I["users"], T("Developers", "Devs"), T("take each piece", "toman cada pieza"), True),
+        _node("app", 1220, 268, 180, 84, 4, I["box"], "App", T("32 screens", "32 pantallas"), True),
+        _node("ai", 1220, 374, 180, 84, 4.2, I["spark"], T("AI Builder", "Builder IA"), T("new screens", "pantallas nuevas"), True),
+        f'<span class="pd__pill pd__pill--c" data-on="4.4" style="left:1080px;top:516px">{T("Audit in CI flags drift", "La auditoría en CI avisa desvíos")}</span>',
     ])
-    paths = [("M302 370H346", 0.2, ""), ("M476 370H548", 0.75, ""), ("M764 370H838", 1.55, ""), ("M1034 370H1052", 2.55, ""),
-             ("M1242 370H1258V230H1276", 3.45, ""), ("M1242 370H1276", 3.45, ""), ("M1242 370H1258V510H1276", 3.65, ""),
-             ("M1351 568V638H1147V444", 4.3, " loop")]
+    paths = [("M306 310H340", 0.2, ""), ("M470 310H525", 0.75, ""), ("M725 310H770", 1.55, ""), ("M950 310H990", 2.55, ""),
+             ("M1170 310H1195V204H1220", 3.45, ""), ("M1170 310H1220", 3.45, ""), ("M1170 310H1195V416H1220", 3.65, ""),
+             ("M1080 380V516", 4.3, " loop")]
     wires = "".join(f'<path class="b" d="{d}"/>' for d, _, _ in paths) + "".join(
         f'<path class="f{c}" d="{d}" pathLength="1" data-wire="{w}" style="stroke-dashoffset:0"/>' for d, w, c in paths)
     caps = [("It starts in Figma.", "Arranca en Figma.",
@@ -98,10 +99,10 @@ def pipeline(title_en, title_es):
              "The app imports the same components, and the AI Builder assembles new screens from the catalog.",
              "La app importa los mismos componentes, y el Builder con IA arma pantallas nuevas desde el catálogo.")]
     cap = "".join(f'<div class="pipe__cap{" is-on" if i == 0 else ""}"><b>{T(a, b)}</b><span>{T(c, d)}</span></div>' for i, (a, b, c, d) in enumerate(caps))
-    return (f'  <section class="scene scene--pin pipe" data-scene="pipe" style="--len:430vh">\n    <div class="scene__pin">'
+    return (f'  <section class="scene scene--pin pipe" data-scene="pipe" style="--len:300vh">\n    <div class="scene__pin">'
             f'<div class="scene__copy"><h2 class="scene__h">{T(title_en, title_es)}</h2></div>'
-            f'<div class="pipe__screen"><div class="mon"><div class="mon__screen fitbox" data-fit="1440x760" data-fit-keep><div class="fit"><div class="pd">'
-            f'<svg class="pd__wires" viewBox="0 0 1440 760" aria-hidden="true">{wires}</svg>{nodes}</div></div></div></div></div>'
+            f'<div class="pipe__screen"><div class="mon"><div class="mon__screen fitbox" data-fit="1440x620" data-fit-keep><div class="fit"><div class="pd">'
+            f'<svg class="pd__wires" viewBox="0 0 1440 620" aria-hidden="true">{wires}</svg>{nodes}</div></div></div></div></div>'
             f'<div class="pipe__caps" aria-live="polite">{cap}</div></div>\n  </section>\n')
 
 
@@ -162,7 +163,7 @@ def builder():
             f'<span class="bu__menu"><span>Foundations</span><span>Elements</span><span>Components</span><span>Pages</span><span>Audit</span><span class="on">Builder</span></span></div>')
     chips = "".join(f"<span>{T(a, b)}</span>" for a, b in [("1 · Describe it", "1 · Describilo"), ("2 · The AI picks real pieces", "2 · La IA elige piezas reales"),
                                                            ("3 · The screen assembles", "3 · Se arma la pantalla"), ("4 · Take the code", "4 · Llevate el código")])
-    return (f'  <section class="scene scene--pin bld" data-scene="builder" style="--len:480vh" aria-label="Builder">\n    <div class="scene__pin">'
+    return (f'  <section class="scene scene--pin bld" data-scene="builder" style="--len:320vh" aria-label="Builder">\n    <div class="scene__pin">'
             f'<div class="scene__copy"><div class="bld__steps">{chips}</div></div>'
             f'<div class="bld__box fitbox" data-fit="1440x900"><div class="fit"><div class="bu">{site}<div class="bu__main">{canvas}{panel}</div></div></div></div>'
             f'</div>\n  </section>\n')

@@ -19,7 +19,7 @@ def words(en, es, cls="", tag="p"):
     return f'<{tag} class="words {cls}" data-words>{T(en, es)}</{tag}>'
 
 
-def rise(inner, bg, length=175):
+def rise(inner, bg, length=130):
     return (f'  <section class="scene scene--pin rise" data-scene="rise" style="--len:{length}vh" aria-hidden="true">'
             f'<div class="scene__pin"><div class="rise__frame bg--{bg}"><div class="rise__obj">{inner}</div></div></div></section>\n')
 
@@ -65,7 +65,7 @@ def rail_phone(p, name, cap):
     return (iphone(p, name), FAR_PHONE, cap)
 
 
-def fan(p, names, title_en, title_es, text_en, text_es, length=230):
+def fan(p, names, title_en, title_es, text_en, text_es, length=165):
     pos = [("-112%", "7%", "-9deg"), ("0%", "0%", "0deg"), ("112%", "7%", "9deg")]
     phones = "".join(f'<div class="fan__ph" style="--x:{x};--y:{y};--r:{r}">{iphone(p, n)}</div>' for n, (x, y, r) in zip(names, pos))
     return (f'  <section class="scene scene--pin fan" data-scene="fan" style="--len:{length}vh">'
@@ -73,7 +73,7 @@ def fan(p, names, title_en, title_es, text_en, text_es, length=230):
             f'<div class="fan__stage">{phones}</div></div></section>\n')
 
 
-def wipe(p, lo, hi, url, tag_lo, tag_hi, title_en, title_es, length=220):
+def wipe(p, lo, hi, url, tag_lo, tag_hi, title_en, title_es, length=160):
     lo_n, lo_w, lo_h = lo
     hi_n, hi_w, hi_h = hi
     body = (f'<div class="wipe__view sf__view"><img src="{p}assets/img/{lo_n}.webp" width="{lo_w}" height="{lo_h}" alt="" loading="lazy" decoding="async">'
@@ -84,7 +84,7 @@ def wipe(p, lo, hi, url, tag_lo, tag_hi, title_en, title_es, length=220):
             f'<div class="scene__pin"><div class="scene__copy"><h2 class="scene__h">{T(title_en, title_es)}</h2></div><div class="wipe__win">{win}</div></div></section>\n')
 
 
-def scrub(p, name, w, h, url, dark=True, length=260, alt_en="", alt_es=""):
+def scrub(p, name, w, h, url, dark=True, length=190, alt_en="", alt_es=""):
     shift = round((1 - 0.625 * w / h) * 100, 2)
     win = browser(p, name, w, h, url, dark, alt_en, alt_es)
     return (f'  <section class="scene scene--pin scrubp" data-scene="scrub" style="--len:{length}vh;--shift:{shift}%">'
