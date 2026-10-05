@@ -351,10 +351,10 @@ def tiles_grill(p):
 def tiles_mp(p, with_cover=False):
     return "".join([
         tile_screen(p, "mp", "mp-hero", 1440, 900, 0, True),
-        tile_screen(p, "mp", "mp-fav-top", 1440, 900, 1, True),
-        tile_screen(p, "mp", "mp-share-top", 1440, 900, 2, True),
-        tile_screen(p, "mp", "mp-points-top", 1440, 900, 3, True),
-        tile_screen(p, "mp", "mp-recos-top", 1440, 900, 4, True),
+        tile_screen(p, "mp", "mp-s-rows", 1440, 900, 1, True),
+        tile_screen(p, "mp", "mp-s-comments", 1440, 900, 2, True),
+        tile_screen(p, "mp", "mp-s-share", 1440, 900, 3, True),
+        tile_screen(p, "mp", "mp-s-points", 1440, 900, 4, True),
     ])
 
 
