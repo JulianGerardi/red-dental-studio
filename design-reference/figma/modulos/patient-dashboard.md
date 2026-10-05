@@ -173,3 +173,20 @@ mismo mecanismo que en la ficha de un empleado -ver README.md, "Foto de
 perfil editable"-: `EditableAvatar` + `usePhoto`, persistida en `localStorage`
 para que sobreviva a que el panel se vuelva a montar en cada tab del
 paciente.
+
+## Patient Dashboard: documentos pendientes en lugar de Insurance (2026-10-05)
+
+Julian pidio reemplazar la tabla de Insurance del dashboard por los
+documentos pendientes a resolver (Insurance sigue en su seccion). De dos
+propuestas eligio **By urgency** (la otra era un checklist para la proxima
+visita, con el progreso). `PendingDocuments`, datos en
+`src/data/pendingDocuments.ts`:
+
+- Agrupados en Overdue, Due this week y Later.
+- Cada fila: icono del documento en el color de lo que le falta, nombre,
+  motivo (Pending signature, Expired, Missing, Needs review), detalle,
+  vencimiento (en rojo si paso), quien tiene que actuar (Patient, Provider,
+  Front desk) y un boton con la accion (Send reminder, Request update,
+  Upload, Sign, Review); los vencidos con el boton azul.
+- Filtro All / Patient / Office. Resolver un documento lo saca de
+  pendientes y avisa con un toast; sin pendientes, estado vacio.

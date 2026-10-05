@@ -10,12 +10,10 @@ import { aviso } from '@/components/ui/toaster'
 import { PendingTaskCard, type PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
-import { Pill, type PillTone } from '@/components/ui/pill'
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
 import { PatientAppointmentCard, type PatientAppointmentStatus } from '@/components/patients/PatientAppointmentCard'
+import { PendingDocuments } from '@/components/patients/PendingDocuments'
 
 /* Figma 3646:58836 "Patient Dashboard". */
 
@@ -25,15 +23,6 @@ const CLINICAL: { label: Categoria; icon: LucideIcon }[] = [
   { label: 'Medication', icon: PillIcon },
   { label: 'Past Surgery and Hospitalization', icon: ClipboardList },
 ]
-
-const INSURANCE = [
-  { order: 'Primary', carrier: 'AETNA', plan: 'Dental PPO', subscriber: 'Janet Johnson', relation: 'Child', period: 'Annual' },
-  { order: 'Secondary', carrier: 'AETNA', plan: 'Dental PPO', subscriber: 'Janet Johnson', relation: 'Child', period: 'Annual' },
-]
-
-/* Mismos tonos que la tabla completa de Insurance (src/pages/patients/Insurance.tsx):
-   el orden siempre en azul, la relación varía. */
-const RELACION_TONO: Record<string, PillTone> = { Child: 'success', Self: 'info', Spouse: 'neutral' }
 
 const TASKS: PendingTask[] = Array.from({ length: 6 }, () => ({
   kind: 'Referrals', state: 'Requested', person: 'Elena Marquez', initials: 'EM',
@@ -146,47 +135,9 @@ export default function PatientDetail() {
             })}
           </div>
 
+          {/* En lugar de la tabla de Insurance (que sigue en su sección): los documentos pendientes a resolver. */}
           <Card className="p-5">
-            <h2 className="text-[15px] font-bold text-ink">Insurance</h2>
-            <div className="mt-4 overflow-x-auto rounded-lg border border-line">
-              <table className="w-full min-w-[720px] text-xs">
-                <thead>
-                  <tr className="border-b border-line bg-surface-alt text-[11px] text-ink-muted">
-                    {['Order', 'Carrier', 'Plan', 'Subscriber', 'Relation', 'Coverage Period', 'Actions'].map((h) => (
-                      <th key={h} className="px-4 py-3 text-left font-semibold">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {INSURANCE.map((r) => (
-                    <tr key={r.order} className="border-b border-line text-[13px] last:border-0">
-                      <td className="px-4 py-4"><Pill tone="info">{r.order}</Pill></td>
-                      <td className="px-4 py-4 text-ink-soft">{r.carrier}</td>
-                      <td className="px-4 py-4 text-ink-soft">{r.plan}</td>
-                      <td className="px-4 py-4 text-ink-soft">{r.subscriber}</td>
-                      <td className="px-4 py-4"><Pill tone={RELACION_TONO[r.relation] ?? 'neutral'}>{r.relation}</Pill></td>
-                      <td className="px-4 py-4 text-ink-soft">{r.period}</td>
-                      <td className="px-4 py-4">
-                        <RowActionsMenu label={`${r.order} insurance plan`}>
-                          <DropdownMenuItem asChild>
-                            <Link to={`/patients/${id}/insurance`}>View plan</Link>
-                          </DropdownMenuItem>
-                        </RowActionsMenu>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-xs text-ink-muted">Showing 2 of 5 insurances</span>
-                <div className="flex items-center gap-1">
-                  {['‹', '1', '2', '3', '›'].map((p) => (
-                    <span key={p} className={cn('flex size-7 items-center justify-center rounded-md text-xs font-semibold',
-                      p === '1' ? 'bg-dash-blue text-white' : 'text-ink-muted')}>{p}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <PendingDocuments />
           </Card>
 
           <div className="grid gap-5 lg:grid-cols-[1fr_280px]">
