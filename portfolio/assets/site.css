@@ -457,6 +457,22 @@ html[data-lang="en"] [lang="es"], html[data-lang="es"] [lang="en"] { display: no
   .wl-item.is-open .tile__obj { animation: float 6.5s ease-in-out infinite; animation-delay: calc(var(--k, 0) * -1.3s); }
 }
 @keyframes float { 0%, 100% { translate: 0 0.6%; } 50% { translate: 0 -0.6%; } }
+/* Opening a project deals its screens out of one stack in the middle,
+   then each screen stands up from a 3D tilt. The middle card leads. */
+.tile { --dk: max(var(--k, 0) - 2, 2 - var(--k, 0)); z-index: calc(4 - var(--dk)); }
+@media (prefers-reduced-motion: no-preference) and (min-width: 811px) and (hover: hover) {
+  .wl-item.is-open .tile { animation: tile-deal 1.2s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(0.06s + var(--dk) * 70ms); }
+  .wl-item.is-open .tile__obj { animation: tile-up 1.35s cubic-bezier(0.16, 1, 0.3, 1) backwards, float 6.5s ease-in-out infinite; animation-delay: calc(0.24s + var(--dk) * 80ms), calc(var(--k, 0) * -1.3s); }
+}
+@keyframes tile-deal {
+  from { opacity: 0; transform: translate(calc((2 - var(--k, 0)) * 106%), 14%) rotate(calc((var(--k, 0) - 2) * 5deg)) scale(0.8); }
+  35% { opacity: 1; }
+  to { opacity: 1; transform: none; }
+}
+@keyframes tile-up {
+  from { opacity: 0; transform: perspective(810px) rotateX(46deg) translateY(30%) scale(0.78); }
+  to { opacity: 1; transform: perspective(810px) rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg)); }
+}
 .tile .mock { width: 100%; border: 0; border-radius: 2.4cqw; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 16.2px 27px -14px rgba(0, 0, 0, 0.45); }
 .tile .mock--dark { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 16.2px 27px -14px rgba(0, 0, 0, 0.7); }
 .tile .mock__bar { height: auto; min-height: 0; aspect-ratio: 100 / 8; gap: 1.6cqw; padding-inline: 3cqw; }
@@ -520,6 +536,12 @@ html[data-lang="en"] [lang="es"], html[data-lang="es"] [lang="en"] { display: no
   .wl-more { background: var(--fg); color: var(--bg); }
 }
 @media (max-width: 504px) { .wl-strip { grid-auto-columns: 64%; } }
+@media (prefers-reduced-motion: no-preference) and (max-width: 810px), (prefers-reduced-motion: no-preference) and (hover: none) {
+  .js .wl-item:not(.is-seen) .tile { opacity: 0; }
+  .wl-item.is-seen .tile { animation: tile-slide 1.1s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(var(--k, 0) * 90ms); }
+  .wl-item.is-seen .tile__obj { animation: tile-up 1.3s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(0.18s + var(--k, 0) * 90ms); }
+}
+@keyframes tile-slide { from { opacity: 0; transform: translateX(38%) rotate(4deg) scale(0.9); } to { opacity: 1; transform: none; } }
 
 /* ---------- Process ---------- */
 .steps-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10.8px; }
@@ -701,6 +723,10 @@ html[data-lang="en"] [lang="es"], html[data-lang="es"] [lang="en"] { display: no
 .panel--mp > .mock:not(.mock--scroll) { max-width: 720px; margin-inline: auto; }
 .panel--mp-dark { background: radial-gradient(70% 60% at 50% 0%, #2a2a1a, transparent 70%), #121212; }
 .panel--center { display: grid; place-items: center; }
+/* Screens in a case: as a panel scrolls in it opens out from its middle and the
+   screen inside stands up from a 3D tilt. --t (0 → 1) comes from site.js. */
+.motion .shot > .panel { perspective: 1600px; clip-path: inset(calc((1 - var(--t, 1)) * 7%) calc((1 - var(--t, 1)) * 5%) round clamp(12.6px, 1.4vw, 21.6px)); }
+.motion .shot > .panel > * { transform-origin: 50% 100%; translate: 0 calc((1 - var(--t, 1)) * 14%); scale: calc(0.86 + 0.14 * var(--t, 1)); rotate: x calc((1 - var(--t, 1)) * 30deg); }
 .panel .mock { width: 100%; transition: transform 0.8s var(--ease); }
 .panel:hover .mock { transform: translateY(-4px); }
 .panel .mock__bar { height: 27px; gap: 5.4px; padding-inline: 10.8px; }
@@ -1148,7 +1174,8 @@ html.has-cursor .agent__panel input { cursor: text; }
 .rise .bs { background: none; }
 .motion .rise .scene__pin { display: grid; place-items: center; }
 .motion .rise__frame { aspect-ratio: auto; width: calc(100% - var(--gutter) * 2 * (1 - var(--e))); height: calc(100% - 5vh * (1 - var(--e))); border-radius: calc(clamp(12.6px, 1.6vw, 25.2px) * (1 - var(--e) * 0.6)); }
-.motion .rise__obj { width: min(100%, calc((100svh - var(--pin-top)) * 1.6)); translate: 0 calc((1 - var(--e)) * 9%); scale: calc(0.84 + 0.16 * var(--e)); }
+.motion .rise__frame { perspective: 1800px; }
+.motion .rise__obj { width: min(100%, calc((100svh - var(--pin-top)) * 1.6)); transform-origin: 50% 100%; translate: 0 calc((1 - var(--e)) * 12%); scale: calc(0.8 + 0.2 * var(--e)); rotate: x calc((1 - var(--e)) * 28deg); }
 .motion .rise .nt, .motion .rise .bs__emoji { opacity: clamp(0, calc((var(--e) - 0.55) * 4), 1); }
 .rise .mp-slide { width: 82%; margin-inline: auto; }
 
@@ -1490,7 +1517,7 @@ html.has-cursor .agent__panel input { cursor: text; }
   .motion .rise > .scene__pin { position: relative; top: 0; height: auto; }
   .rise { --e: 1 !important; }
   .motion .rise__frame { width: calc(100% - var(--gutter) * 2); height: auto; aspect-ratio: 16 / 10; }
-  .motion .rise__obj { width: 100%; translate: none; scale: none; }
+  .motion .rise__obj { width: 100%; translate: none; scale: none; rotate: none; }
 }
 
 /* Phones: the diagram and the Builder stay readable, wider than the screen,

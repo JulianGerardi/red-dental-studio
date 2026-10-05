@@ -203,6 +203,7 @@
   var scenes = Array.prototype.slice.call(document.querySelectorAll('[data-scene]'));
   var stories = Array.prototype.slice.call(document.querySelectorAll('[data-story]'));
   var wordEls = Array.prototype.slice.call(document.querySelectorAll('[data-words]'));
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.shot > .panel'));
   var narrow = function () { return window.innerWidth < 900; };
   function setVar(el, k, v) { var t = v.toFixed(4); if (el['_' + k] !== t) { el['_' + k] = t; el.style.setProperty(k, t); } }
   var SCENE = {
@@ -244,6 +245,11 @@
       setVar(sc, '--p', p);
       var h = SCENE[sc.getAttribute('data-scene')];
       if (h) h(sc, p);
+    });
+    panels.forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.bottom < -50) return;
+      setVar(el, '--t', r.top > vh ? 0 : easeOut(clamp01((vh - r.top) / (vh * 0.62))));
     });
     wordEls.forEach(function (el) {
       var r = el.getBoundingClientRect();
@@ -483,6 +489,20 @@
         if (!list.contains(e.relatedTarget)) rows.forEach(function (r) { r.classList.remove('is-open'); });
       });
     }
+  }
+
+  /* On phones the work list is always open: its screens come in as each project scrolls into view */
+  if (rows.length && 'IntersectionObserver' in window) {
+    var seen = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.closest('.wl-item').classList.add('is-seen');
+        seen.unobserve(en.target);
+      });
+    }, { rootMargin: '0px 0px -12% 0px' });
+    rows.forEach(function (row) { var st = row.querySelector('.wl-strip'); if (st) seen.observe(st); });
+  } else {
+    rows.forEach(function (row) { row.classList.add('is-seen'); });
   }
 
   /* Each screen tilts toward the pointer and lifts */
