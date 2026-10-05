@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
-import { Plus, Table2, Search, Maximize2 } from 'lucide-react'
+import { Plus, Search, Maximize2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
 import { RADIOGRAFIAS, type Radiografia } from '@/data/clinical-mode'
 import { RadiographyViewer, Placa } from '@/components/clinical/RadiographyViewer'
 import { RadiographyUpload } from '@/components/clinical/RadiographyUpload'
-import { BOTON_ICONO_REDONDO } from '@/lib/estilos'
+import { Button } from '@/components/ui/button'
+import { ExamLayout } from '@/components/clinical/ExamLayout'
 
 /* Figma 4106:197453 "Radiography - Initial": grilla de cinco columnas de
    placas, cada una con su fecha sobre la imagen y el profesional abajo.
@@ -57,34 +57,41 @@ export function RadiographyPanel() {
 
   if (vista === 'visor' && abierta) {
     return (
-      <RadiographyViewer
-        estudios={RADIOGRAFIAS}
-        actual={abierta}
-        onCambiar={setAbierta}
-        onVolver={() => setVista('grilla')}
-        onSubir={() => setVista('subir')}
-      />
+      <ExamLayout findings={false}>
+        <RadiographyViewer
+          estudios={RADIOGRAFIAS}
+          actual={abierta}
+          onCambiar={setAbierta}
+          onVolver={() => setVista('grilla')}
+          onSubir={() => setVista('subir')}
+        />
+      </ExamLayout>
     )
   }
 
   if (vista === 'subir') {
-    return <RadiographyUpload onCancel={() => setVista('grilla')} onSave={() => setVista('grilla')} />
+    return <ExamLayout findings={false}><RadiographyUpload onCancel={() => setVista('grilla')} onSave={() => setVista('grilla')} /></ExamLayout>
   }
 
-  return (
-    <div className="relative xl:pr-14">
-      <div className="mb-4 flex justify-end">
-        <div className="relative w-full sm:w-[260px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search..."
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-          />
-        </div>
+  /* El buscador y Add image van en la fila de las acciones del examen (ExamLayout); sin los flotantes de abajo. */
+  const buscador = (
+    <>
+      <div className="relative w-full sm:w-[260px]">
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search..."
+          aria-label="Search images"
+          className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+        />
       </div>
+      <Button variant="secondary" size="lg" onClick={() => setVista('subir')}><Plus /> Add image</Button>
+    </>
+  )
 
+  return (
+    <ExamLayout findings={false} extra={buscador}>
       {filas.length === 0 ? (
         <div className="rounded-xl border border-line bg-white">
           <EmptyState
@@ -101,29 +108,6 @@ export function RadiographyPanel() {
           ))}
         </div>
       )}
-
-      {/* Las dos acciones flotantes del frame, en azul sólido. */}
-      <div className="pointer-events-none fixed right-3 bottom-6 z-30 hidden xl:block">
-        <div className="pointer-events-auto flex flex-col gap-3">
-          {[
-            { icono: Plus, label: 'Add image', accion: () => setVista('subir') },
-            { icono: Table2, label: 'Table view', accion: () => aviso.info('The table view is not available in this release.') },
-          ].map(({ icono: Icono, label, accion }) => (
-            <button
-              key={label}
-              onClick={accion}
-              aria-label={label}
-              title={label}
-              /* Redondos, con el ícono en negro y borde gris: el estado por
-                 defecto de un botón del sistema, no un azul permanente. */
-              className={BOTON_ICONO_REDONDO}
-            >
-              <Icono className="size-4" />
-            </button>
-          ))}
-        </div>
-      </div>
-
-    </div>
+    </ExamLayout>
   )
 }

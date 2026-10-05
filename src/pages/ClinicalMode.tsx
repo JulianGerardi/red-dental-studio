@@ -15,7 +15,8 @@ import { VitalsPanel } from '@/components/clinical/VitalsPanel'
 import { LabOrderPanel } from '@/components/clinical/LabOrderPanel'
 import { RadiographyPanel } from '@/components/clinical/RadiographyPanel'
 import { TreatmentPlanSection } from '@/components/clinical/TreatmentPlanSection'
-import { ULTIMA_CONDICION, type Pestana, type Juego } from '@/data/clinical-mode'
+import { ExamFindingsProvider, ExamLayout } from '@/components/clinical/ExamLayout'
+import { EXAMENES, ULTIMA_CONDICION, type Pestana, type Juego } from '@/data/clinical-mode'
 import { PATIENTS } from '@/data/mock'
 
 /* Clinical Mode — Figma 4235:135661 (barra, botonera y overview),
@@ -119,10 +120,24 @@ export default function ClinicalMode() {
     </div>
   )
 
+  /* Todos los exámenes llevan las acciones y el panel de Findings (ExamLayout); Vitals sólo las acciones, y Radiography
+     también, porque sus findings ya viven en el visor de cada placa. Los registros (Treatment Plan…) no. */
+  const esExamen = (EXAMENES as readonly string[]).includes(pestana)
+  const enConstruccion = (
+    <div className="rounded-xl border border-line bg-white">
+      <EmptyState
+        icon={Stethoscope}
+        title={pestana}
+        detail={`This ${juego === 'Exams' ? 'exam' : 'section'} is part of Clinical Mode and is being built from its own Figma board.`}
+        pill="Planned"
+        className="py-16"
+      />
+    </div>
+  )
   const contenido = enOverview
     ? overview
     : pestana === 'Vitals'
-      ? <VitalsPanel />
+      ? <ExamLayout findings={false}><VitalsPanel /></ExamLayout>
       : pestana === 'Lab Order'
         ? <LabOrderPanel />
         : pestana === 'Radiography'
@@ -131,17 +146,9 @@ export default function ClinicalMode() {
             ? <TreatmentPlanSection />
             : pestana === 'DentAssmt'
               ? <DentalAssessmentExam />
-              : (
-          <div className="rounded-xl border border-line bg-white">
-            <EmptyState
-              icon={Stethoscope}
-              title={pestana}
-              detail={`This ${juego === 'Exams' ? 'exam' : 'section'} is part of Clinical Mode and is being built from its own Figma board.`}
-              pill="Planned"
-              className="py-16"
-            />
-          </div>
-        )
+              : esExamen
+                ? <ExamLayout>{enConstruccion}</ExamLayout>
+                : enConstruccion
 
   return (
         /* Sin tope de ancho: en pantallas grandes el contenido —las tablas, el
@@ -179,9 +186,12 @@ export default function ClinicalMode() {
         />
       </div>
 
-      <div className="mt-4 flex gap-4">
-        <div className="min-w-0 flex-1">{contenido}</div>
-      </div>
+      {/* Los findings son del paciente: el provider queda montado al cambiar de examen y los conserva. */}
+      <ExamFindingsProvider>
+        <div className="mt-4 flex gap-4">
+          <div className="min-w-0 flex-1">{contenido}</div>
+        </div>
+      </ExamFindingsProvider>
       </div>
     </div>
   )

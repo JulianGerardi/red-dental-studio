@@ -1,8 +1,7 @@
 import { useRef, useState } from 'react'
-import { Minus, Plus, Paperclip, Mic, FilePlus2, Table2 } from 'lucide-react'
+import { Minus, Plus, Paperclip, Mic } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
-import { BOTON_ICONO_REDONDO } from '@/lib/estilos'
 import {
   VITALES, VITAL_COLOR, AVISO_PRESION, type Vital, type EstadoVital,
 } from '@/data/clinical-mode'
@@ -285,9 +284,7 @@ export function VitalsPanel() {
   const [nota, setNota] = useState('')
 
   return (
-    /* En xl el contenido deja lugar a la derecha para las tres acciones
-       flotantes; sin ese margen les pasaba por debajo. */
-    <div className="relative xl:pr-14">
+    <div className="relative">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {VITALES.map((v) => (
           <TarjetaVital key={v.id} v={v} aviso={v.id === 'blood-pressure'} />
@@ -331,28 +328,6 @@ export function VitalsPanel() {
         </div>
       </div>
 
-      {/* Las tres acciones flotantes del borde derecho. Van fijas a la ventana
-          —como el FAB de Scheduling— y no colgadas del contenedor: colgadas
-          quedaban fuera del documento y lo hacían scrollear de costado. */}
-      <div className="pointer-events-none fixed top-1/2 right-3 z-30 hidden -translate-y-1/2 xl:block">
-        <div className="pointer-events-auto flex flex-col gap-3">
-          {[
-            { icono: Plus, label: 'Add vital', msg: 'Adding a vital is not available in this release.' },
-            { icono: FilePlus2, label: 'New document', msg: 'Documents are not available in this release.' },
-            { icono: Table2, label: 'Table view', msg: 'The table view is not available in this release.' },
-          ].map(({ icono: Icono, label, msg }) => (
-            <button
-              key={label}
-              onClick={() => aviso.info(msg)}
-              aria-label={label}
-              title={label}
-              className={BOTON_ICONO_REDONDO}
-            >
-              <Icono className="size-4" />
-            </button>
-          ))}
-        </div>
-      </div>
     </div>
   )
 }

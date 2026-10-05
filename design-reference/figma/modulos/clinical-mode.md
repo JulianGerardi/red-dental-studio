@@ -1747,3 +1747,35 @@ A pedido de Julian:
    condicion y descriptores, con la misma card del panel), debajo lo que se
    edita -Provider, Surfaces si es una pieza, Notes- y los procedimientos
    vinculados. Save y Cancel fijos al pie, como New Procedure.
+
+
+## Todos los examenes con Findings y las acciones (2026-10-03)
+
+A pedido de Julian:
+
+1. **Las acciones vuelven a ser blancas** (borde y sombra, como antes) y
+   mantienen la animacion de Exit clinical Mode: al pasar el mouse se abren
+   con su texto.
+2. **Se repiten en todos los examenes** (Ros, BMI, Vitals, Physical, ATM/O-F,
+   Intra Oral, Extra Oral, DentAssmt, Periodontal, Radiography) con
+   `ExamLayout`: arriba del contenido Add Procedure, Add Condition y View
+   Problem List, y a la izquierda el panel de **Findings** con Review exam.
+   - **Vitals** lleva las acciones y no Findings, como se pidio.
+   - **Radiography** lleva las acciones; sus findings ya viven en el visor de
+     cada placa, asi que no se duplica el panel.
+   - Los registros (Treatment Plan, Lab Order...) no cambian.
+3. **Los findings son del paciente**: `ExamFindingsProvider` (en ClinicalMode)
+   los guarda mientras se cambia de examen. Verificado: una nota editada en
+   Physical aparece en Ros.
+4. DentAssmt queda solo con su chart; el panel, las acciones y los drawers
+   (New Procedure, Edit Finding, confirmaciones, Review exam) son los de
+   `ExamLayout`.
+5. **Radiography**: sin los botones flotantes de abajo (Add image y Table
+   view). El buscador va en la misma fila que las acciones del examen, a la
+   derecha (`extra` de `ExamLayout`), y al lado **Add image**, que es el unico
+   camino a la carga de placas. La grilla usa todo el ancho (sin el margen que
+   les dejaba a los flotantes). El visor y la carga tambien llevan las
+   acciones arriba.
+6. **Vitals**: sin los tres botones del costado (Add vital, New document,
+   Table view); quedan las acciones comunes arriba y el contenido usa todo el
+   ancho.
