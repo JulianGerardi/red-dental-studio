@@ -470,9 +470,8 @@ html[data-lang="en"] [lang="es"], html[data-lang="es"] [lang="en"] { display: no
 .tile--grill { background: radial-gradient(80% 60% at 50% 0%, var(--grill-hi), transparent 70%), var(--grill-bg); }
 .tile--grill-deep { background: radial-gradient(80% 60% at 50% 0%, #5a7a22, transparent 70%), var(--grill-deep); }
 .tile--cream { background: var(--grill-cream); }
-.tile--mp { background: var(--mp-bg); color: var(--mp-ink); }
+.tile--mp { background: radial-gradient(80% 60% at 50% 0%, #fff7a0, transparent 70%), var(--mp-bg); color: var(--mp-ink); }
 .tile--mp-dark { background: var(--mp-ink); color: #ffffff; }
-.tile--mp .tile__obj, .tile--mp-dark .tile__obj { position: absolute; }
 
 .mp-word { left: 7%; bottom: 5%; font: 800 33cqw/0.82 var(--font-sans); letter-spacing: -0.07em; }
 .mp-sel { left: 9%; top: 40%; right: 9%; }
