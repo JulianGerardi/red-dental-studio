@@ -438,6 +438,26 @@ body { font-family: var(--font-sans); }
   to   { opacity: 1; transform: scale(1); }
 }
 
+/* Al abrir un Dialog o Drawer, Radix bloquea el scroll y define esta variable en :root. Heredable, obligaba a recalcular
+   cada elemento de la página: con el odontograma (27.000 nodos) abrir Add Procedure tardaba ~105 ms. Sin herencia, ~40.
+   Nada nuestro la usa. Ver modulos/clinical-mode.md. */
+@property --removed-body-scroll-bar-size {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+/* StepIndicator: el tilde del paso completado entra con un rebote corto y un anillo verde se abre y se apaga. */
+@keyframes paso-check {
+  0%   { opacity: 0; transform: scale(.4); }
+  60%  { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes paso-anillo {
+  from { box-shadow: 0 0 0 0 rgba(26,128,77,.45); }
+  to   { box-shadow: 0 0 0 7px rgba(26,128,77,0); }
+}
+
 /* Help: apunta al control real de la pantalla. Corre una vez al llegar. */
 @keyframes coach-spotlight {
   0%   { box-shadow: 0 0 0 0 rgba(29,86,188,.5), 0 0 0 9999px rgba(15,23,42,.28); outline: 2px solid rgba(29,86,188,.9); }

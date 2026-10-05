@@ -7,12 +7,12 @@ export type FindingStatus =
   | 'Active' | 'Monitoring' | 'In Treatment' | 'Treated' | 'Externally Treated'
   | 'No Treatment Needed' | 'Patient Declined' | 'Clinic Declined' | 'Discarded'
 
-const GREEN = { badge: 'bg-dash-ok-bg text-dash-ok-fg', rail: 'border-l-dash-ok-fg', dot: 'bg-dash-ok-fg', good: true }
-const BLUE = { badge: 'bg-dash-count-bg text-dash-blue', rail: 'border-l-dash-blue', dot: 'bg-dash-blue', good: true }
-const RED = { badge: 'bg-[#fef2f2] text-field-error', rail: 'border-l-field-error', dot: 'bg-field-error', good: false }
-const AMBER = { badge: 'bg-warn-bg text-warn-fg', rail: 'border-l-warn-fg', dot: 'bg-warn-fg', good: false }
+const GREEN = { badge: 'bg-dash-ok-bg text-dash-ok-fg', rail: 'border-l-dash-ok-fg', dot: 'bg-dash-ok-fg', text: 'text-dash-ok-fg', good: true }
+const BLUE = { badge: 'bg-dash-count-bg text-dash-blue', rail: 'border-l-dash-blue', dot: 'bg-dash-blue', text: 'text-dash-blue', good: true }
+const RED = { badge: 'bg-[#fef2f2] text-field-error', rail: 'border-l-field-error', dot: 'bg-field-error', text: 'text-field-error', good: false }
+const AMBER = { badge: 'bg-warn-bg text-warn-fg', rail: 'border-l-warn-fg', dot: 'bg-warn-fg', text: 'text-warn-fg', good: false }
 
-export const STATUS_STYLE: Record<FindingStatus, { badge: string; rail: string; dot: string; good: boolean }> = {
+export const STATUS_STYLE: Record<FindingStatus, { badge: string; rail: string; dot: string; text: string; good: boolean }> = {
   Active: GREEN, Monitoring: AMBER, 'In Treatment': BLUE, Treated: GREEN, 'Externally Treated': GREEN,
   'No Treatment Needed': RED, 'Patient Declined': RED, 'Clinic Declined': RED, Discarded: RED,
 }

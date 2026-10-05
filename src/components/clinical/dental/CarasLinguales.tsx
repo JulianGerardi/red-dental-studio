@@ -62,20 +62,24 @@ export function CarasLinguales({ raiz }: { raiz: HTMLElement | null }) {
 
   useEffect(() => {
     if (!raiz) return
-    sincronizar()
+    /* La selección no pasa por `onStateChange`: es una clase en la celda, así que se mira `class`. Lo que cambia
+       `sincronizar` en las copias también es una mutación: se descarta (`takeRecords`) y se ignoran las de las celdas
+       copiadas. Si no, cada copia disparaba otra y el chart se recopiaba en cada frame, sin parar. */
+    let pedido = 0
+    const observer = new MutationObserver((registros) => {
+      if (registros.every((r) => (r.target as Element).closest?.(`[${MARCA}]`))) return
+      cancelAnimationFrame(pedido)
+      pedido = requestAnimationFrame(copiar)
+    })
+    const copiar = () => {
+      sincronizar()
+      observer.takeRecords()
+    }
+    copiar()
+    observer.observe(raiz, { subtree: true, attributes: true, attributeFilter: ['class'] })
 
     /* Redibujar con los avisos de la propia librería. */
-    const baja = onStateChange(() => sincronizar())
-
-    /* La selección no pasa por `onStateChange`: es una clase en la celda.
-       Se mira sólo `class` y se difiere con un frame, porque el observer
-       también ve los cambios que hacemos nosotros. */
-    let pedido = 0
-    const observer = new MutationObserver(() => {
-      cancelAnimationFrame(pedido)
-      pedido = requestAnimationFrame(() => sincronizar())
-    })
-    observer.observe(raiz, { subtree: true, attributes: true, attributeFilter: ['class'] })
+    const baja = onStateChange(copiar)
 
     return () => {
       baja?.()

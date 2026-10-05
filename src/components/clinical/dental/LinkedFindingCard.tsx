@@ -16,7 +16,7 @@ export function LinkedFindingCard({
     <div className={`flex items-center gap-2 rounded-md border border-l-[3px] border-line bg-white px-3 py-2.5 ${style.rail} ${linked ? 'border-dash-blue' : ''}`}>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-          <span className={`flex items-center gap-1 text-[11px] font-semibold ${style.good ? 'text-dash-ok-fg' : 'text-field-error'}`}>
+          <span className={`flex items-center gap-1 text-[11px] font-semibold ${style.text}`}>
             <span className={`size-1.5 rounded-full ${style.dot}`} />
             {finding.status}
           </span>

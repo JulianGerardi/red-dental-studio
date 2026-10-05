@@ -1646,7 +1646,12 @@ el drawer, 1669:87208 los tres pasos) con el design system de la app:
    Condition arranca en *Existing* (algo que el paciente ya tiene hecho) y se
    titula New Condition.
 3. **Los pasos tienen nombre**: el indicador dice Procedure, Surfaces y Link to
-   finding en vez de "Step" (`StepIndicator` con `labels`).
+   finding en vez de "Step" (`StepIndicator` con `labels`). Al completar un
+   paso la insignia y la regla hacia el siguiente quedan en **verde** (antes la
+   regla quedaba azul). La animacion: el tilde entra con un rebote corto y un
+   anillo que se abre (`paso-check`, `paso-anillo`), y despues la regla se
+   llena hacia el paso siguiente. Con *reduce motion* no se anima (Julian,
+   2026-10-05).
 4. **Procedure**: la busqueda tiene pestañas *Existing* / *Planned* con su
    cantidad. Existing muestra solo lo que queda en la boca (restauraciones y
    endodoncias); el estado se guarda con el procedimiento (Existing queda como
@@ -1654,7 +1659,10 @@ el drawer, 1669:87208 los tres pasos) con el design system de la app:
 5. **Surfaces** es opcional: no todo procedimiento va en una superficie.
 6. **Link to finding** lista los hallazgos del examen (no los descartados):
    cada card dice el nombre del hallazgo y, si tiene, sus superficies
-   ("Localized periodontal pocketing - B, MB") y debajo la zona.
+   ("Localized periodontal pocketing - B, MB") y debajo la zona. El estado va
+   en el color del estado, igual que en la card de Findings: *In Treatment* en
+   azul, *Monitoring* en ambar. Antes era verde o rojo y nada mas (Julian,
+   2026-10-05).
 7. **Botones arriba a la izquierda del chart**, en la fila de Odontogram /
    Periodontal Status, que ahi esta libre: Add Procedure, Add Condition y View
    Problem List. Abajo quedaban fuera de la pantalla (Julian: "ahi abajo no se
@@ -1779,3 +1787,34 @@ A pedido de Julian:
 6. **Vitals**: sin los tres botones del costado (Add vital, New document,
    Table view); quedan las acciones comunes arriba y el contenido usa todo el
    ancho.
+7. **Tooltips en las acciones** (2026-10-05). No repiten el nombre, que ya se
+   lee al abrirse el boton: dicen que hace cada una ("Chart a planned
+   procedure", "Chart a condition or work the patient already has", "Open the
+   patient's problem list"). Abajo del boton, con 400 ms de espera para no
+   saltar mientras se abre la etiqueta.
+
+## DentAssmt estaba lento (2026-10-05)
+
+Julian: "esta como medio lento los botones de add procedure". Medido con la
+build de produccion, no a ojo:
+
+1. **Un bucle que no paraba.** `CarasLinguales` mira los cambios de `class`
+   en el chart para copiar la seleccion a las caras linguales, pero veia
+   tambien los que hacia ella misma (`classList.add` de una clase que ya esta
+   igual cuenta como mutacion). Cada copia disparaba otra: en reposo, ~2000
+   mutaciones cada 2 s, las 12 piezas recopiadas en cada frame, y los demas
+   observers del chart (`OdontogramEmbed`, `PeriodontalTabs`,
+   `PerioPdArrastre`) corriendo detras. La pantalla iba a **28 fps**. Ahora
+   descarta sus propias mutaciones (`takeRecords`) e ignora las de las celdas
+   copiadas: **0 mutaciones en reposo, 61 fps**. La seleccion se sigue
+   copiando (Q1 marca sus caras; Clear las limpia).
+2. **Abrir el drawer recalculaba toda la pagina.** Radix bloquea el scroll y
+   define `--removed-body-scroll-bar-size` en `:root`; una variable heredable
+   ahi obliga a recalcular los estilos de cada elemento, y el odontograma
+   tiene ~27.000. Registrada sin herencia (`@property` en `index.css`; nada
+   nuestro la usa): la tarea al abrir pasa de **~90 ms a ~43 ms**. En los
+   examenes sin chart ya abria en ~20 ms.
+3. **La etiqueta de los botones** se abre y se cierra en 150 ms (antes 200)
+   y su tope pasa de 160 a 128 px: con tanto aire sobre la etiqueta mas larga
+   (111 px), al cerrarse tardaba en arrancar. Vale tambien para Exit clinical
+   Mode y Overwiev, que comparten la constante.

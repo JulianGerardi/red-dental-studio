@@ -1,8 +1,9 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, Fragment, useContext, useState, type ReactNode } from 'react'
 import { Plus, Stethoscope, Table2, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
 import { ProblemList } from '@/components/clinical/ProblemList'
 import { ExamPanelHeader } from './dental/ExamPanelHeader'
@@ -36,11 +37,12 @@ const INITIAL_REVIEWS: ExamReview[] = [
   { id: 'R-1', date: 'January 12, 2026', provider: 'Daniel Anderson', note: 'Charting checked against the radiographs. Caries on tooth 3 confirmed, the rest of the arch is unremarkable. Cleared for treatment planning.' },
 ]
 
-/* Las acciones de todos los exámenes: blancas, y al pasar el mouse se abren con su texto como Exit clinical Mode. */
-const ACCIONES_EXAMEN: { label: string; icono: LucideIcon; modo?: 'procedure' | 'condition' }[] = [
-  { label: 'Add Procedure', icono: Plus, modo: 'procedure' },
-  { label: 'Add Condition', icono: Stethoscope, modo: 'condition' },
-  { label: 'View Problem List', icono: Table2 },
+/* Las acciones de todos los exámenes: blancas, y al pasar el mouse se abren con su texto como Exit clinical Mode. El
+   tooltip no repite el nombre, que ya se lee en el botón: dice qué hace. */
+const ACCIONES_EXAMEN: { label: string; ayuda: string; icono: LucideIcon; modo?: 'procedure' | 'condition' }[] = [
+  { label: 'Add Procedure', ayuda: 'Chart a planned procedure', icono: Plus, modo: 'procedure' },
+  { label: 'Add Condition', ayuda: 'Chart a condition or work the patient already has', icono: Stethoscope, modo: 'condition' },
+  { label: 'View Problem List', ayuda: "Open the patient's problem list", icono: Table2 },
 ]
 const BOTON_ACCION = cn(BOTON_EXPANDIBLE, 'border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle')
 
@@ -141,11 +143,11 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
 
       <div className="order-1 flex min-w-0 flex-1 flex-col gap-3 lg:order-2">
         {/* Las acciones arriba del contenido del examen. La Problem list se abre flotando, sin cambiar de vista. */}
+        <TooltipProvider delayDuration={400}>
         <div className="flex flex-wrap items-center gap-2">
-          {ACCIONES_EXAMEN.map(({ label, icono: Icono, modo }) => {
+          {ACCIONES_EXAMEN.map(({ label, ayuda, icono: Icono, modo }) => {
             const boton = (
               <button
-                key={label}
                 type="button"
                 aria-label={label}
                 onClick={modo ? () => setProcedureOpen(modo) : undefined}
@@ -155,9 +157,15 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
                 <span className={ETIQUETA_EXPANDIBLE}>{label}</span>
               </button>
             )
-            return modo ? boton : (
+            const conAyuda = (trigger: ReactNode) => (
+              <Tooltip>
+                <TooltipTrigger asChild>{trigger}</TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={6} className="bg-ink text-white">{ayuda}</TooltipContent>
+              </Tooltip>
+            )
+            return modo ? <Fragment key={label}>{conAyuda(boton)}</Fragment> : (
               <Popover key={label} open={problemas} onOpenChange={setProblemas}>
-                <PopoverTrigger asChild>{boton}</PopoverTrigger>
+                {conAyuda(<PopoverTrigger asChild>{boton}</PopoverTrigger>)}
                 <PopoverContent align="start" sideOffset={8} aria-label="Problem list" className="w-[min(820px,calc(100vw-2rem))] gap-0 bg-transparent p-0 shadow-none ring-0">
                   <div className="rounded-xl shadow-[0_16px_40px_rgb(0_0_0/0.18)]"><ProblemList /></div>
                 </PopoverContent>
@@ -166,6 +174,7 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
           })}
           {extra && <div className="ml-auto flex items-center gap-2">{extra}</div>}
         </div>
+        </TooltipProvider>
         {children}
       </div>
 
