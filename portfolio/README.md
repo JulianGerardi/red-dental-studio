@@ -92,7 +92,8 @@ python3 portfolio/_build/build.py
 ```
 
 - `_build/common.py`: head, menú, breadcrumbs, agente, pie, mockups, portadas y tiras de trabajos.
-- `_build/index_page.py`: la home (intro, banner, experiencia).
+- `_build/index_page.py`: la home (intro, banner, about).
+- `_build/experience.py`: la experiencia tal cual el CV; cada rol se despliega con sus logros, el lugar y la modalidad.
 - `_build/batech_page.py`: el caso de Batech.
 - `_build/cases_page.py`: Confidentally, Confidentally UI y GRILL.
 - `_build/mercado_page.py`: Mercado Play.

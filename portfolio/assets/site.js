@@ -573,6 +573,17 @@
     btn.addEventListener('click', function () { setTheme(btn.getAttribute('data-set-theme')); });
   });
 
+  /* ---------- Experience: each role opens to show what was done there ---------- */
+  document.querySelectorAll('.xp__item').forEach(function (item) {
+    var head = item.querySelector('.xp__head');
+    if (!head) return;
+    head.addEventListener('click', function () {
+      var open = item.classList.toggle('is-open');
+      head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (lenis) setTimeout(function () { lenis.resize(); }, 650);
+    });
+  });
+
   /* ---------- Mobile menu ---------- */
   var menuBtn = document.querySelector('.menu-btn');
   if (nav && menuBtn) {

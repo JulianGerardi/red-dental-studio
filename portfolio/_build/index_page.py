@@ -1,45 +1,12 @@
 from common import *
 from scenes import words
+from experience import experience_list
 import os
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
 p = ""
 
-XP = [
-    ("May 2025 — Now", "May 2025 — Hoy", "Lead UX/UI Designer", "Lead UX/UI Designer",
-     "Confidential company · AI product, pre-launch · Miami, US", "Empresa confidencial · producto de IA, pre-lanzamiento · Miami, EE. UU.",
-     "End-to-end design of an AI-assisted product, from information architecture and journeys to a functional web-app prototype built with Figma and Claude Code. I run user interviews and usability tests, and lead the pre-launch validation with the development team.",
-     "Diseño de punta a punta de un producto asistido por IA, desde la arquitectura de información y los journeys hasta un prototipo web funcional hecho con Figma y Claude Code. Hago entrevistas con usuarios y tests de usabilidad, y lidero la validación previa al lanzamiento con el equipo de desarrollo."),
-    ("Nov 2023 — Nov 2025", "Nov 2023 — Nov 2025", "Senior UX/UI Designer", "Senior UX/UI Designer",
-     "Icarus Digital Marketing · Ireland · Remote", "Icarus Digital Marketing · Irlanda · Remoto",
-     "Led a digital platform from idea to launch: research, usability testing, flows and a UI redesign focused on reducing abandonment. Managed the creative team; the refreshed identity drove a <b>20% rise in brand recognition</b>.",
-     "Lideré una plataforma digital de la idea al lanzamiento: research, tests de usabilidad, flujos y un rediseño de UI enfocado en bajar el abandono. Dirigí al equipo creativo; la nueva identidad logró <b>un 20% más de reconocimiento de marca</b>."),
-    ("Feb 2022 — May 2026", "Feb 2022 — May 2026", "Lead UX/UI Designer", "Lead UX/UI Designer",
-     "Batech · Querétaro, MX · Remote", "Batech · Querétaro, MX · Remoto",
-     "Designed Batech’s AI video analytics platform end to end and revamped web and mobile flows with analytics and A/B testing to cut abandonment. Built the Figma design system and led the design team to <b>10% faster delivery</b>.",
-     "Diseñé de punta a punta la plataforma de análisis de video con IA de Batech y rediseñé los flujos web y mobile con analytics y A/B testing para bajar el abandono. Armé el design system en Figma y lideré al equipo de diseño a <b>entregas un 10% más rápidas</b>."),
-    ("Aug 2019 — Oct 2023", "Ago 2019 — Oct 2023", "Digital Designer", "Diseñador digital",
-     "Freelance &amp; contract · US, Mexico, Argentina", "Freelance y contrato · EE. UU., México, Argentina",
-     "<b>Datachain Summit</b>: identity redesign (+25% recognition) and a delivery process 40% faster. <b>Blue CP Construction</b>: +40% engagement in 3 months. Also Azure Printed Homes, Gloob Marketing and Cuponstar.",
-     "<b>Datachain Summit</b>: rediseño de identidad (+25% de reconocimiento) y un proceso de entrega 40% más rápido. <b>Blue CP Construction</b>: +40% de engagement en 3 meses. También Azure Printed Homes, Gloob Marketing y Cuponstar."),
-    ("Jan 2019 — Mar 2022", "Ene 2019 — Mar 2022", "Co-founder &amp; CEO", "Cofundador y CEO",
-     "Vieja Cubana · Mercedes, AR", "Vieja Cubana · Mercedes, AR",
-     "Digital strategy behind online revenue; a creative team delivering <b>15% faster</b> with <b>+25% client referrals</b>.",
-     "Estrategia digital detrás de las ventas online; un equipo creativo que entregó <b>un 15% más rápido</b> con <b>+25% de recomendaciones</b>."),
-    ("Jul 2018 — Jul 2025", "Jul 2018 — Jul 2025", "Senior Digital Designer", "Senior Digital Designer",
-     "Bahco Argentina · Buenos Aires · Remote", "Bahco Argentina · Buenos Aires · Remoto",
-     "Graphic communication for <b>5 Latin American markets</b> and the brand refresh behind a <b>20% rise in recognition</b>.",
-     "Comunicación gráfica para <b>5 mercados de Latinoamérica</b> y el refresh de marca que sumó <b>un 20% de reconocimiento</b>."),
-    ("May 2016 — Oct 2016", "May 2016 — Oct 2016", "Trainee Graphic Designer", "Diseñador gráfico trainee",
-     "Orsonia Interactive Ideas · Buenos Aires", "Orsonia Interactive Ideas · Buenos Aires",
-     "Campaigns and content for Amdia, Adblick and Bisblick.", "Campañas y contenido para Amdia, Adblick y Bisblick."),
-]
-xp = "".join(f"""      <li class="xp__item" data-reveal>
-        <span class="xp__when">{T(we, ws)}</span>
-        <div><div class="xp__role">{T(re, rs)}</div><div class="xp__org">{T(oe, os_)}</div></div>
-        <p class="xp__notes">{T(ne, ns)}</p>
-      </li>
-""" for we, ws, re, rs, oe, os_, ne, ns in XP)
+xp = experience_list()
 
 STEPS = [
     ("Research", "Research", "User interviews, usability tests and analytics, plus an audit of screens, components and the rules nobody wrote down.",
@@ -170,7 +137,7 @@ page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Se
     <div class="section-head">
       <div class="label" data-reveal>{T("Experience", "Experiencia")}</div>
       <h2 class="lines">{T("Ten years between product, brand and teams.", "Diez años entre producto, marca y equipos.")}</h2>
-      <p data-reveal>{T("2016 to today, remote for teams in four countries.", "De 2016 a hoy, en remoto para equipos de cuatro países.")}</p>
+      <p data-reveal>{T("2016 to today, remote for teams in four countries. Open each role to see what I did there.", "De 2016 a hoy, en remoto para equipos de cuatro países. Abrí cada rol para ver qué hice ahí.")}</p>
     </div>
     <ol class="xp">
 {xp}    </ol>
@@ -179,10 +146,10 @@ page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Se
   <section class="wrap section about" id="about">
     <div class="about__bio">
       <div class="label" data-reveal>{T("About", "Sobre mí")}</div>
-      <p class="about__lead lines">{T("I trained as an art director, so I care how a product looks. Years of SaaS work taught me to care more about how it behaves on a busy Tuesday.",
-                                   "Me formé como director de arte, así que me importa cómo se ve un producto. Años de SaaS me enseñaron que importa más cómo se comporta un martes cualquiera.")}</p>
-      <p data-reveal>{T("I lead product design from research and information architecture to design systems, high-fidelity UI and interactive prototypes, and I measure the result with analytics and A/B testing.",
-                       "Lidero el diseño de producto desde el research y la arquitectura de información hasta el design system, la UI de alta fidelidad y los prototipos interactivos, y mido el resultado con analytics y A/B testing.")}</p>
+      <p class="about__lead lines">{T("I design digital products end to end: I talk to users, shape the flows, design the interface and turn it into a prototype people can use.",
+                                   "Diseño productos digitales de punta a punta: hablo con usuarios, ordeno los flujos, diseño la interfaz y la convierto en un prototipo que se puede usar.")}</p>
+      <p data-reveal>{T("I trained in advertising art direction, and for 8+ years I’ve designed SaaS, web and mobile products for teams in the US, Mexico, Ireland and Argentina: from research and information architecture to design systems and high-fidelity UI, measured with analytics and A/B testing.",
+                       "Me formé en dirección de arte publicitaria y hace más de 8 años diseño productos SaaS, web y mobile para equipos de EE. UU., México, Irlanda y Argentina: del research y la arquitectura de información al design system y la UI de alta fidelidad, medidos con analytics y A/B testing.")}</p>
       <p data-reveal>{T("I work side by side with developers from the first sketch, present the work to stakeholders and CEOs, and run user interviews and usability tests so decisions rest on what people actually do.",
                        "Trabajo codo a codo con los devs desde el primer boceto, presento el trabajo a stakeholders y CEOs, y hago entrevistas y tests de usabilidad para que las decisiones se apoyen en lo que la gente hace de verdad.")}</p>
       <p data-reveal>{T("My workflow runs through AI: Claude Code turns designs into working prototypes and takes a Figma design system into code, documented in Storybook for the developers. Midjourney and Freepik Spaces help me explore visual directions.",
