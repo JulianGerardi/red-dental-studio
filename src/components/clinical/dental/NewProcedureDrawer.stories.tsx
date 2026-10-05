@@ -26,12 +26,14 @@ export const Default: Story = {}
 /* Desde Add Condition: arranca en Existing, lo que el paciente ya tiene hecho. */
 export const FromAddCondition: Story = { args: { mode: 'condition' } }
 
-/* Paso 2, Surfaces: opcional. Sin superficies marcadas "Apply to unset" queda deshabilitado. */
+/* Paso 2, Surfaces: sólo con un procedimiento de diente + superficie cargado en superficie. Sin superficies marcadas
+   "Next Step" y "Apply to unset" quedan deshabilitados. */
 export const SurfacesStep: Story = {
-  play: secuencia(pulsar(/^D0120\s*-/), pulsar(/^D0120 on tooth$/i), pulsar(/next step/i), esperar(/apply to unset/i)),
+  play: secuencia(pulsar(/^D2140 on surface$/i), pulsar(/next step/i), esperar(/apply to unset/i)),
 }
 
-/* Paso 3, Link to finding: cada hallazgo con su nombre y, si tiene, sus superficies. */
+/* Link to finding: cada hallazgo con su nombre y, si tiene, sus superficies. Un procedimiento sin superficie llega
+   directo desde Procedure: el drawer tiene dos pasos. */
 export const LinkToFindingStep: Story = {
-  play: secuencia(pulsar(/^D0120\s*-/), pulsar(/^D0120 on tooth$/i), pulsar(/next step/i), pulsar(/next step/i), esperar(/chronic enamel dental caries/i)),
+  play: secuencia(pulsar(/^D0120\s*-/), pulsar(/^D0120 on tooth$/i), pulsar(/next step/i), esperar(/localized periodontal pocketing/i)),
 }

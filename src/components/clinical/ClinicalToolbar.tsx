@@ -1,73 +1,57 @@
-import { useEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
+import { useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { EXAMENES, REGISTROS, type Juego, type Pestana } from '@/data/clinical-mode'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { EXAMENES, REGISTROS, type Pestana } from '@/data/clinical-mode'
 
-/* Botonera de 4235:135661 y 4265:56662. El primer botón no es una pestaña más:
-   es el que **cambia la botonera entera**. Con "Exams" salen los diez
-   exámenes; con "Records", los siete registros —Treatment Plan, Lab Order,
-   Prescription…—. El frame lo dibuja con chevron derecho cerrado y chevron
-   abajo abierto, y eso es exactamente lo que hace acá. */
+/* Botonera de Clinical Mode, como en la app real (red.dev, 2026-10-05). En los exámenes, "Exams ›" queda marcado y
+   despliega los registros (Treatment Plan, Treatment, Patient Summary, Lab Order, Prescription, Referral). Con un
+   registro abierto, las pestañas pasan a ser los registros y "Exams" es un botón común que vuelve al último examen.
+   Ver design-reference/figma/modulos/clinical-mode.md. */
 export function ClinicalToolbar({
-  juego, onJuego, pestana, onPestana,
+  pestana, onPestana,
 }: {
-  juego: Juego
-  onJuego: (j: Juego) => void
   pestana: Pestana
   onPestana: (p: Pestana) => void
 }) {
   const [abierto, setAbierto] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const fuera = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setAbierto(false)
-    }
-    document.addEventListener('mousedown', fuera)
-    return () => document.removeEventListener('mousedown', fuera)
-  }, [])
-
-  const items: readonly string[] = juego === 'Exams' ? EXAMENES : REGISTROS
+  const enRegistro = (REGISTROS as readonly string[]).includes(pestana)
+  const ultimoExamen = useRef<Pestana>('Vitals')
+  if ((EXAMENES as readonly string[]).includes(pestana)) ultimoExamen.current = pestana
+  const items: readonly Pestana[] = enRegistro ? REGISTROS : EXAMENES
 
   return (
-    /* El botón del desplegable vive FUERA del contenedor que scrollea: adentro,
-       el `overflow-x-auto` recortaba el menú y quedaba escondido detrás de la
-       pantalla. Sólo scrollean las pestañas. */
+    /* El botón del desplegable vive FUERA del contenedor que scrollea: sólo scrollean las pestañas. */
     <div className="flex items-center gap-[10.64px]">
-      <div ref={ref} className="relative z-20 shrink-0">
+      {enRegistro ? (
         <button
-          onClick={() => setAbierto((v) => !v)}
-          aria-expanded={abierto}
-          className="flex h-9 items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle"
+          type="button"
+          onClick={() => onPestana(ultimoExamen.current)}
+          className="flex h-9 shrink-0 items-center rounded-lg border border-line bg-white px-3.5 text-[13px] font-medium whitespace-nowrap text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle"
         >
-          {/* El rótulo es siempre "Exams", como en los dos frames: es el nombre
-              del menú, no el del juego activo. Cuál está puesto se ve marcado
-              adentro del desplegable. */}
           Exams
-          {abierto ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
         </button>
-
-        {abierto && (
-          <div className="absolute top-full left-0 z-50 mt-1 w-[180px] rounded-lg border border-line bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
-            {(['Exams', 'Records'] as const).map((j) => (
-              <button
-                key={j}
-                onClick={() => {
-                  onJuego(j)
-                  onPestana((j === 'Exams' ? EXAMENES[2] : REGISTROS[3]) as Pestana)
-                  setAbierto(false)
-                }}
-                className={cn(
-                  'block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-surface-muted',
-                  juego === j && 'bg-dash-count-bg text-dash-blue-hover font-medium',
-                )}
-              >
-                {j}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      ) : (
+      <DropdownMenu open={abierto} onOpenChange={setAbierto}>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            aria-label="Exams. Open records menu"
+            className="bg-dash-count-bg text-dash-blue hover:bg-dash-count-bg/80 flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-3.5 text-[13px] font-medium whitespace-nowrap transition-colors"
+          >
+            Exams
+            {abierto ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" sideOffset={6} className="w-auto min-w-[168px] rounded-lg p-1.5 shadow-[0_12px_32px_rgb(0_0_0/0.14)]">
+          {REGISTROS.map((r) => (
+            <DropdownMenuItem key={r} onSelect={() => onPestana(r)} className="rounded-md px-3 py-2 text-[13px] text-ink">
+              {r}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      )}
 
       {/* Fill container: en desktop las pestañas se reparten el ancho en
           partes iguales, como en el frame. En angosto vuelven a su tamaño y
@@ -85,7 +69,7 @@ export function ClinicalToolbar({
             return (
               <button
                 key={p}
-                onClick={() => onPestana(p as Pestana)}
+                onClick={() => onPestana(p)}
                 aria-current={on ? 'page' : undefined}
                 className={cn(
                   /* Del export de la Tab Bar: alto 33.96, padding 21.27, radio

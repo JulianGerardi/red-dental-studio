@@ -9,8 +9,9 @@ import { SelectField } from '@/components/patients/form'
 import { StepIndicator } from '@/components/clinical/StepIndicator'
 import { SurfaceWheel, type Surface } from './SurfaceWheel'
 import { LinkedFindingCard } from './LinkedFindingCard'
-import { ScopeIcon } from './ScopeIcons'
-import { ToothChip } from './ToothIcon'
+import { NOMBRE_ALCANCE, ScopeIcon } from './ScopeIcons'
+import { CajaIcono, ConAyuda, ConditionRow, ProcedureRow } from './ProcedureRow'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import {
   DIAGNOSES, EXISTING_GROUPS, PROCEDURES, PROCEDURE_GROUPS, PROCEDURE_STATUSES, SCOPES, TREATMENT_AREAS,
   type Finding, type ProcedureFilter, type ProcedureOption, type ProcedureScope, type ProcedureStatus, type TreatmentArea,
@@ -35,7 +36,9 @@ export type ProcedureDraft = {
    esto en `true`. */
 const CONDICIONES = false
 
-const PASOS = ['Procedure', 'Surfaces', 'Link to finding'] as const
+/* Los pasos dependen de lo elegido (Julián, 2026-10-05): Surfaces sólo si el procedimiento lleva superficie, y Link to
+   finding sólo para lo planeado: algo que el paciente ya tiene hecho (Existing) no resuelve un hallazgo. */
+type Paso = 'Procedure' | 'Surfaces' | 'Link to finding'
 
 /* Drawer a la derecha, a pedido de Julián (Figma UX-UI 2.0, 1669:87207 y 1669:87208): el chart queda a la vista mientras
    se carga. Add Procedure abre en Planned; Add Condition, en Existing (algo que el paciente ya tiene hecho). Ver
@@ -55,7 +58,7 @@ export function NewProcedureDrawer({
   onClose: () => void
   onSave: (draft: ProcedureDraft) => void
 }) {
-  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [paso, setPaso] = useState(0)
   const [keepArea, setKeepArea] = useState(true)
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<ProcedureStatus>('Planned')
@@ -73,13 +76,18 @@ export function NewProcedureDrawer({
 
   useEffect(() => {
     if (!open) return
-    setStep(1); setKeepArea(true); setQuery(''); setStatus(mode === 'condition' ? 'Existing' : 'Planned'); setGroup('All'); setAreas([]); setCode(null); setScope('Tooth')
+    setPaso(0); setKeepArea(true); setQuery(''); setStatus(mode === 'condition' ? 'Existing' : 'Planned'); setGroup('All'); setAreas([]); setCode(null); setScope('Tooth')
     setTooth(teeth[Math.floor(teeth.length / 2)] ?? null); setSurfaces({}); setTab('Findings')
     setFindingQuery(''); setLinked([]); setDiagnoses([])
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const procedure = PROCEDURES.find((p) => p.code === code) ?? null
+  const conSuperficies = procedure?.area === 'Surface'
+  const pasos: Paso[] = ['Procedure', ...(conSuperficies ? ['Surfaces' as const] : []), ...(status === 'Planned' ? ['Link to finding' as const] : [])]
+  const actual = pasos[Math.min(paso, pasos.length - 1)]!
+  const ultimo = paso >= pasos.length - 1
+  const hayAlguna = Object.values(surfaces).some((x) => x.length > 0)
   const q = query.trim().toLowerCase()
   const coincide = (p: ProcedureOption, s: ProcedureStatus) =>
     (s === 'Planned' || EXISTING_GROUPS.includes(p.group)) &&
@@ -112,34 +120,36 @@ export function NewProcedureDrawer({
 
   function save() {
     if (!procedure) return
-    onSave({ procedure, status, scope, area: keepArea ? area : 'Full mouth', tooth: current, surfaces: currentSurfaces, linked, diagnoses })
+    const vincula = status === 'Planned'
+    onSave({ procedure, status, scope, area: keepArea ? area : 'Full mouth', tooth: current, surfaces: conSuperficies ? currentSurfaces : [], linked: vincula ? linked : [], diagnoses: vincula ? diagnoses : [] })
     onClose()
   }
 
   /* Como en el Figma: la acción principal a lo ancho y debajo la secundaria. */
   const footer = (
     <>
-      {step < 3 ? (
-        <Button className="w-full" disabled={step === 1 && !procedure} onClick={() => setStep(step === 1 ? 2 : 3)}>
+      {!ultimo ? (
+        <Button className="w-full" disabled={(actual === 'Procedure' && !procedure) || (actual === 'Surfaces' && !hayAlguna)} onClick={() => setPaso(paso + 1)}>
           Next Step <ArrowRight />
         </Button>
       ) : (
-        <Button className="w-full" onClick={save}><Check /> Save</Button>
+        <Button className="w-full" disabled={(actual === 'Procedure' && !procedure) || (actual === 'Surfaces' && !hayAlguna)} onClick={save}><Check /> Save</Button>
       )}
-      {step === 1 ? (
+      {paso === 0 ? (
         <Button variant="secondary" className="w-full" onClick={onClose}><X /> Cancel</Button>
       ) : (
-        <Button variant="secondary" className="w-full" onClick={() => setStep(step === 3 ? 2 : 1)}><ArrowLeft /> Return</Button>
+        <Button variant="secondary" className="w-full" onClick={() => setPaso(paso - 1)}><ArrowLeft /> Return</Button>
       )}
     </>
   )
 
   return (
     <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New Condition' : 'New Procedure'} footer={footer}>
-      <StepIndicator total={3} current={step} labels={PASOS} />
+      {/* Con un solo paso (algo ya hecho, sin superficie) no hay pasos que mostrar. */}
+      {pasos.length > 1 && <StepIndicator total={pasos.length} current={paso + 1} labels={pasos} />}
 
       <div className="mt-5">
-        {step === 1 && (
+        {actual === 'Procedure' && (
           <div className="flex w-full flex-col items-start gap-4">
             <div className="flex w-full flex-col items-start gap-2 border-b border-line pb-4">
               <span className="text-xs font-semibold text-ink-muted">Selected area</span>
@@ -200,24 +210,13 @@ export function NewProcedureDrawer({
               {list.map((p) => {
                 const on = p.code === code
                 return (
-                  <div key={p.code} className={`flex w-full items-center gap-2 rounded-md border px-3 py-2 transition-colors ${on ? 'border-dash-blue' : 'border-line hover:border-line-strong'}`}>
-                    <button type="button" onClick={() => setCode(p.code)} className="min-w-0 flex-1 text-left text-xs outline-none">
-                      <span className="text-dash-blue font-bold">{p.code}</span>
-                      <span className="font-medium text-ink"> - {p.label}</span>
-                      <span className="mt-1 block"><span className="rounded bg-dash-count-bg px-1.5 py-0.5 text-[10px] font-semibold text-dash-blue">{p.area}</span></span>
-                    </button>
-                    <span className="flex shrink-0 items-center gap-1">
-                      {SCOPES.map((s) => (
-                        <button
-                          key={s} type="button" title={`Chart on ${s.toLowerCase()}`} aria-label={`${p.code} on ${s.toLowerCase()}`}
-                          aria-pressed={on && scope === s} onClick={() => { setCode(p.code); setScope(s) }}
-                          className={`bg-dash-blue hover:bg-dash-blue-hover flex size-6 items-center justify-center rounded-md text-white transition-all ${on && scope === s ? 'ring-dash-blue ring-2 ring-offset-1' : ''}`}
-                        >
-                          <ScopeIcon scope={s} className="size-3.5" />
-                        </button>
-                      ))}
-                    </span>
-                  </div>
+                  <ProcedureRow
+                    key={p.code} procedure={p} estado={on ? 'selected' : 'default'}
+                    scopes={SCOPES.filter((s) => s !== 'Surface' || p.area === 'Surface')}
+                    scope={on ? scope : null}
+                    onSelect={() => { setCode(p.code); if (p.area === 'Surface') setScope('Surface') }}
+                    onScope={(s) => { setCode(p.code); setScope(s) }}
+                  />
                 )
               })}
               {!list.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No procedure matches that search, category or treatment area.</p>}
@@ -225,7 +224,7 @@ export function NewProcedureDrawer({
           </div>
         )}
 
-        {step === 2 && (
+        {actual === 'Surfaces' && (
           <div className="flex w-full flex-col items-start gap-5">
             <div className="flex w-full flex-col items-start gap-1.5">
               <span className="text-xs font-semibold text-ink-muted">Procedure<span className="text-field-error">*</span></span>
@@ -233,15 +232,17 @@ export function NewProcedureDrawer({
                 <span className="min-w-0 text-xs font-semibold text-ink">{procedure?.code} - {procedure?.label}</span>
                 <span className="flex shrink-0 items-center gap-1.5">
                   <span className="bg-dash-count-bg text-dash-blue rounded-full px-2 py-0.5 text-[10px] font-semibold">{status}</span>
-                  <ToothChip />
+                  <TooltipProvider delayDuration={200}>
+                    <ConAyuda texto={NOMBRE_ALCANCE[scope]}><span><CajaIcono estado="selected"><ScopeIcon scope={scope} /></CajaIcono></span></ConAyuda>
+                  </TooltipProvider>
                 </span>
               </div>
             </div>
 
             <div className="flex w-full flex-col items-center gap-3">
               <span className="flex w-full flex-col gap-0.5">
-                <span className="text-xs font-semibold text-ink-muted">Surfaces <span className="font-normal text-ink-faint">(optional)</span></span>
-                <span className="text-[11px] text-ink-faint">Not every procedure goes on a surface. If this one doesn’t, go to the next step.</span>
+                <span className="text-xs font-semibold text-ink-muted">Surfaces<span className="text-field-error">*</span></span>
+                <span className="text-[11px] text-ink-faint">Mark the surfaces this procedure goes on, tooth by tooth.</span>
               </span>
               <div className="flex flex-wrap items-center justify-center gap-2">
                 {teeth.map((t) => (
@@ -278,7 +279,7 @@ export function NewProcedureDrawer({
           </div>
         )}
 
-        {step === 3 && (
+        {actual === 'Link to finding' && (
           <div className="flex w-full flex-col items-start gap-4">
             {CONDICIONES && (
               <Tabs aria-label="Link to" tabs={['Findings', 'Diagnostics'] as const} value={tab} onChange={setTab} />
@@ -315,14 +316,10 @@ export function NewProcedureDrawer({
                   {diagnosisList.map((d) => {
                     const on = diagnoses.includes(d)
                     return (
-                      <button
-                        key={d} type="button" aria-pressed={on}
+                      <ConditionRow
+                        key={d} label={d} estado={on ? 'selected' : 'default'}
                         onClick={() => setDiagnoses((prev) => (on ? prev.filter((x) => x !== d) : [...prev, d]))}
-                        className={`flex w-full items-center justify-between gap-2 rounded-md border px-3 py-2 text-left transition-colors ${on ? 'border-dash-blue' : 'border-line hover:border-line-strong'}`}
-                      >
-                        <span className="min-w-0 text-xs font-medium text-ink">{d}</span>
-                        <ToothChip />
-                      </button>
+                      />
                     )
                   })}
                   {!diagnosisList.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No diagnosis matches that search.</p>}

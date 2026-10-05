@@ -48,18 +48,16 @@ export const CONTADORES: Contador[] = [
   },
 ]
 
-/* La botonera tiene dos juegos y el botón "Exams" alterna entre ellos
-   (4265:56662). Overview dejó de ser pestaña: vive en la barra de arriba. */
+/* Las pestañas son los exámenes; el botón "Exams" despliega los registros, en el orden de la app real (2026-10-05).
+   Overview dejó de ser pestaña: vive en la barra de arriba. */
 export const EXAMENES = [
   'Ros', 'BMI', 'Vitals', 'Physical', 'ATM/O-F',
   'Intra Oral', 'Extra Oral', 'DentAssmt', 'Periodontal', 'Radiography',
 ] as const
 export const REGISTROS = [
-  'Treatment Plan', 'Treatment', 'Treatment History',
-  'Lab Order', 'Prescription', 'Referral', 'Clinical Note',
+  'Treatment Plan', 'Treatment', 'Patient Summary', 'Lab Order', 'Prescription', 'Referral',
 ] as const
 export type Pestana = (typeof EXAMENES)[number] | (typeof REGISTROS)[number]
-export type Juego = 'Exams' | 'Records'
 
 export type Plan = {
   id: string
@@ -131,6 +129,12 @@ export const PANELES = {
   },
 } as const
 export type ClavePanel = keyof typeof PANELES
+
+/* Cómo está cada badge del header (Figma 254:2930): con tilde (`ok`) o cruz (`no`), y active / inactive / disabled. */
+export const ESTADO_CLINICO: Record<ClavePanel, { resultado: 'ok' | 'no'; estado: 'active' | 'inactive' | 'disabled' }> = {
+  CC: { resultado: 'ok', estado: 'active' },
+  TR: { resultado: 'ok', estado: 'active' },
+}
 
 export const ULTIMA_CONDICION = {
   condicion: 'Caries',

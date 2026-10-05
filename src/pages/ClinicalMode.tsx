@@ -16,7 +16,7 @@ import { LabOrderPanel } from '@/components/clinical/LabOrderPanel'
 import { RadiographyPanel } from '@/components/clinical/RadiographyPanel'
 import { TreatmentPlanSection } from '@/components/clinical/TreatmentPlanSection'
 import { ExamFindingsProvider, ExamLayout } from '@/components/clinical/ExamLayout'
-import { EXAMENES, ULTIMA_CONDICION, type Pestana, type Juego } from '@/data/clinical-mode'
+import { EXAMENES, ULTIMA_CONDICION, type Pestana } from '@/data/clinical-mode'
 import { PATIENTS } from '@/data/mock'
 
 /* Clinical Mode — Figma 4235:135661 (barra, botonera y overview),
@@ -38,7 +38,6 @@ export default function ClinicalMode() {
   /* Overwiev no es una pestaña más: es el estado inicial y el botón de la
      barra vuelve acá desde cualquier examen o registro. */
   const [enOverview, setEnOverview] = useState(true)
-  const [juego, setJuego] = useState<Juego>('Exams')
   const [pestana, setPestana] = useState<Pestana>('Vitals')
   const [encuentro, setEncuentro] = useState(false)
   const [ampliado, setAmpliado] = useState(false)
@@ -128,7 +127,7 @@ export default function ClinicalMode() {
       <EmptyState
         icon={Stethoscope}
         title={pestana}
-        detail={`This ${juego === 'Exams' ? 'exam' : 'section'} is part of Clinical Mode and is being built from its own Figma board.`}
+        detail={`This ${esExamen ? 'exam' : 'section'} is part of Clinical Mode and is being built from its own Figma board.`}
         pill="Planned"
         className="py-16"
       />
@@ -179,8 +178,6 @@ export default function ClinicalMode() {
 
       <div className="mt-4">
         <ClinicalToolbar
-          juego={juego}
-          onJuego={setJuego}
           pestana={enOverview ? ('' as Pestana) : pestana}
           onPestana={irA}
         />

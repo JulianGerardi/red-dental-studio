@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import {
-  ChevronLeft, ChevronDown, PanelsTopLeft, Check, Link2, Activity, Users, Info,
+  ChevronLeft, ChevronDown, PanelsTopLeft, Link2, Activity, Users, Info,
   Play, Pause,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
-import { CONSTANTES, CONTADORES, PANELES, type Contador, type ClavePanel } from '@/data/clinical-mode'
+import { CONSTANTES, CONTADORES, ESTADO_CLINICO, PANELES, type Contador, type ClavePanel } from '@/data/clinical-mode'
+import { ClinicalBadge } from '@/components/clinical/ClinicalBadge'
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
 import { ClinicalItemModal } from '@/components/patients/ClinicalItemModal'
 import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clinicalItems'
@@ -177,16 +178,14 @@ export function ClinicalTopBar({
           setFlot(on ? null : { tipo: 'pill', k, rect: e.currentTarget.getBoundingClientRect() })
         }
         aria-expanded={on}
+        disabled={ESTADO_CLINICO[k].estado === 'disabled'}
         className={cn(
-          /* Más grande que el export (22.81 de alto, texto 10.9, tilde 9.08):
-             a ese tamaño el tilde casi no se distinguía. */
-          'flex h-7 shrink-0 items-center gap-1.5 rounded-full bg-[#28C563] px-2.5 text-[13px] font-medium text-white',
-          'transition-all outline-none [outline-style:solid] outline-[2px] outline-offset-[2px] outline-transparent',
-          'hover:bg-[#1fae54]',
-          on && 'outline-[#28C563]',
+          'shrink-0 rounded-full transition-all outline-none [outline-style:solid] outline-[2px] outline-offset-[2px] outline-transparent enabled:hover:opacity-90',
+          on && (ESTADO_CLINICO[k].resultado === 'ok' ? 'outline-status-ok' : 'outline-required'),
         )}
       >
-        <Check className="size-3" /> {k}
+        {/* El badge del design system 2.0 en tamaño md: al del export (22 de alto) el tilde casi no se distinguía. */}
+        <ClinicalBadge tipo={k} {...ESTADO_CLINICO[k]} size="md" />
       </button>
     )
   })
@@ -300,7 +299,7 @@ export function ClinicalTopBar({
       <span className="flex shrink-0 items-center gap-[9px] max-md:w-full">
       {/* Un solo pill verde con el chevron adentro: 31.79 de alto, radio
           completo, label en 10.8/600. */}
-      <div className="flex h-[31.79px] shrink-0 items-center overflow-hidden rounded-full bg-[#28C563] max-md:flex-1">
+      <div className="flex h-[31.79px] shrink-0 items-center overflow-hidden rounded-full bg-status-ok max-md:flex-1">
         <button
           onClick={onEncuentro}
           className="flex h-full items-center justify-center gap-[7.86px] pr-[6px] pl-[12.77px] text-[10.8px] font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#1fae54] max-md:flex-1"

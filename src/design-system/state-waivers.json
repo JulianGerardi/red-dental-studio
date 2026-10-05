@@ -3,6 +3,10 @@
     "selected": {
       "story": "components/clinical/ClinicalTopBar.stories.tsx#CounterOpen",
       "reason": "El contador elegido es el que tiene el popover abierto."
+    },
+    "disabled": {
+      "story": "components/clinical/ClinicalBadge.stories.tsx#States",
+      "reason": "El badge CC / TR del header se deshabilita cuando no hay dato (ESTADO_CLINICO en disabled); su aspecto es el de ClinicalBadge, que muestra los tres estados."
     }
   },
   "components/clinical/ConsentBlock.tsx": {
@@ -30,7 +34,7 @@
     },
     "disabled": {
       "story": "components/clinical/TreatmentPlanSection.parts.stories.tsx#CaseAction",
-      "reason": "El estado deshabilitado es el de los íconos del encabezado del caso (lápiz, ojo, Move to) fuera de su estado: se muestra en CaseAction y en CaseViewPending/CaseViewAccepted."
+      "reason": "El estado deshabilitado es el de AccionCaso, que el caso ya no usa deshabilitado (lo que no corresponde se oculta): queda documentado en CaseAction."
     }
   },
   "components/layout/LocationSelector.tsx": {

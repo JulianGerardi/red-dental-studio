@@ -76,7 +76,7 @@ export function ConfirmProcedureDialog({
           </button>
           <button
             type="button" onClick={() => onConfirm(treated)}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-semibold text-white ${copy.destructive ? 'bg-field-error hover:bg-[#b91c1c]' : 'bg-dash-blue hover:bg-dash-blue-hover'}`}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-semibold text-white ${copy.destructive ? 'bg-field-error hover:bg-status-bad-strong' : 'bg-dash-blue hover:bg-dash-blue-hover'}`}
           >
             <Check className="size-3" /> Confirm
           </button>

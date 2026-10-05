@@ -5,7 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { CASOS, NO_ASIGNADOS } from '@/data/treatment-plan'
 import { esperar, pulsar, secuencia } from '@/design-system/play'
 import {
-  Dialogo, DialogoBorrarCaso, DialogoCompletar, DialogoMover, DialogoNuevoGrupo, OpcionRadio, Rail, TablaProcedimientos, VistaCaso, EstadoConsentimiento, AccionCaso,
+  Dialogo, DialogoBorrarCaso, DialogoCompletar, DialogoMover, DialogoNuevoGrupo, OpcionRadio, Rail, TablaProcedimientos, VistaCaso, EstadoConsentimiento, AccionCaso, CitaVisita,
 } from './TreatmentPlanSection'
 
 const meta = {
@@ -36,7 +36,7 @@ export const RadioOption: Story = {
 }
 
 export const CaseRail: Story = {
-  render: () => <div className="w-[300px]"><Rail vista="caso" casoId={CASOS[0].id} favoritos={[CASOS[0].id]} onFavorito={() => {}} onUnassigned={() => {}} onCaso={() => {}} /></div>,
+  render: () => <div className="w-[300px]"><Rail casos={CASOS} vista="caso" casoId={CASOS[0].id} onUnassigned={() => {}} onCaso={() => {}} /></div>,
 }
 
 function ConSeleccion() {
@@ -90,4 +90,19 @@ export const CaseAction: Story = {
       </div>
     </TooltipProvider>
   ),
+}
+
+/* El turno de la visita: sin turno avisa que el encuentro no tiene uno; con turno muestra la fecha y abre el detalle. */
+export const VisitAppointment: Story = {
+  render: () => (
+    <div className="flex w-[420px] flex-col gap-3">
+      <div className="flex items-center justify-between text-[14px] font-semibold text-ink">Visit 1 - $30 <CitaVisita /></div>
+      <div className="flex items-center justify-between text-[14px] font-semibold text-ink">Visit 2 - $30 <CitaVisita cita={{ fecha: 'Sep 2, 2026', hora: '10:00 AM', proveedor: 'Perez Martinez' }} /></div>
+    </div>
+  ),
+}
+
+/* Un caso de una ubicación sin permiso: el aviso de acceso limitado y nada para editar. */
+export const CaseViewLimitedAccess: Story = {
+  render: () => <VistaCaso caso={{ ...CASOS[0], sinPermiso: true }} favorito={false} onFavorito={() => {}} onDialogo={() => {}} onMover={() => {}} onCompletar={() => {}} />,
 }

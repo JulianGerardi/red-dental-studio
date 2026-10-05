@@ -5,9 +5,10 @@
    "Periodontists Recommended" / "Periodontist Alternative", y el pie de la
    tabla que dice "insurances" en una tabla de procedimientos. */
 
-/* Planning -> Pending -> Presented -> Accepted / Discarded. Sólo en Planning el
-   caso se edita; Pending es el plan terminado que espera ser presentado. */
-export type EstadoCaso = 'Planning' | 'Pending' | 'Presented' | 'Accepted' | 'Discarded'
+/* Planning -> Pending -> Presented -> Waiting for consent -> Accepted, o Discarded. Sólo en Planning el caso se edita;
+   Pending es el plan terminado que espera ser presentado. Al aceptarlo salen los consentimientos y espera la firma
+   (Waiting for consent, como en la app real). */
+export type EstadoCaso = 'Planning' | 'Pending' | 'Presented' | 'Waiting for consent' | 'Accepted' | 'Discarded'
 
 export type Procedimiento = {
   id: string
@@ -26,7 +27,9 @@ export type Procedimiento = {
 
 export type ConsentProcedimiento = 'Signed' | 'Pending' | 'Not sent' | 'Expired'
 
-export type Visita = { id: string; nombre: string; total: string; procedimientos: Procedimiento[] }
+/* El turno vinculado a la visita, si hay. Sin turno, la visita dice "No appointment". */
+export type Cita = { fecha: string; hora: string; proveedor: string }
+export type Visita = { id: string; nombre: string; total: string; procedimientos: Procedimiento[]; cita?: Cita }
 
 const proc = (id: string, estado: Procedimiento['estado'] = 'Planned', consentimiento?: ConsentProcedimiento): Procedimiento => ({
   id,
@@ -57,32 +60,78 @@ export type Caso = {
   creadoPor: string
   total: string
   visitas: Visita[]
+  /** El caso es de una ubicación donde el usuario no puede editar planes: se avisa y no se edita. */
+  sinPermiso?: boolean
 }
 
+/* Los planes del paciente. La pantalla los agrupa por fecha de creación (DD/MM/YYYY, como la app real), la más nueva
+   arriba; los de una fecha son las alternativas de un grupo: al aceptar una, las otras se descartan. */
 export const CASOS: Caso[] = [
   {
-    id: 'c1', nombre: 'Periodontists Recommended', grupo: 'Pending Decision', estado: 'Planning',
-    creado: '01/07/2024', creadoPor: 'Provider 1', total: '231.12',
+    id: 'c1', nombre: 'Periodontists Recommended', grupo: 'Periodontal', estado: 'Planning',
+    creado: '27/08/2026', creadoPor: 'Provider 1', total: '231.12',
     visitas: [
-      { id: 'v1', nombre: 'Visit 1', total: '$100.000', procedimientos: visita('c1v1', ['Signed', 'Signed', 'Pending', 'Pending']) },
+      { id: 'v1', nombre: 'Visit 1', total: '$100.000', procedimientos: visita('c1v1', ['Signed', 'Signed', 'Pending', 'Pending']), cita: { fecha: 'Sep 2, 2026', hora: '10:00 AM', proveedor: 'Perez Martinez' } },
       { id: 'v2', nombre: 'Visit 2', total: '$100.000', procedimientos: visita('c1v2', ['Pending', 'Not sent', 'Not sent', 'Expired']) },
     ],
   },
   {
-    id: 'c2', nombre: 'Periodontist Alternative', grupo: 'Pending Decision', estado: 'Pending',
-    creado: '01/07/2024', creadoPor: 'Provider 1', total: '184.60',
+    id: 'c2', nombre: 'Periodontist Alternative', grupo: 'Periodontal', estado: 'Planning',
+    creado: '27/08/2026', creadoPor: 'Provider 1', total: '184.60',
     visitas: [
       { id: 'v1', nombre: 'Visit 1', total: '$84.600', procedimientos: visita('c2v1', ['Signed', 'Pending', 'Not sent']) },
     ],
   },
   {
-    id: 'c3', nombre: 'Periodontist Alternative', grupo: 'Pending Decision', estado: 'Presented',
-    creado: '01/07/2024', creadoPor: 'Provider 1', total: '96.00',
+    id: 'c3', nombre: 'Restorative Plan', grupo: 'Restorative', estado: 'Waiting for consent',
+    creado: '26/08/2026', creadoPor: 'Provider 1', total: '96.00',
     visitas: [
-      { id: 'v1', nombre: 'Visit 1', total: '$96.000', procedimientos: visita('c3v1', ['Not sent', 'Not sent']) },
+      { id: 'v1', nombre: 'Visit 1', total: '$96.000', procedimientos: visita('c3v1', ['Pending', 'Not sent']) },
+    ],
+  },
+  {
+    id: 'c8', nombre: 'Orthodontic Plan', grupo: 'Orthodontics', estado: 'Pending',
+    creado: '25/08/2026', creadoPor: 'Provider 1', total: '2,400.00',
+    visitas: [
+      { id: 'v1', nombre: 'Visit 1', total: '$2,400.000', procedimientos: visita('c8v1', ['Not sent', 'Not sent']) },
+    ],
+  },
+  {
+    id: 'c4', nombre: 'Crown Option', grupo: 'Prosthodontics', estado: 'Presented',
+    creado: '24/08/2026', creadoPor: 'Provider 1', total: '412.00',
+    visitas: [
+      { id: 'v1', nombre: 'Visit 1', total: '$412.000', procedimientos: visita('c4v1', ['Not sent', 'Not sent']) },
+    ],
+  },
+  {
+    id: 'c5', nombre: 'Endodontic Treatment', grupo: 'Endodontics', estado: 'Accepted',
+    creado: '27/04/2026', creadoPor: 'Provider 1', total: '640.00',
+    visitas: [
+      { id: 'v1', nombre: 'Visit 1', total: '$320.000', procedimientos: visita('c5v1', ['Signed', 'Signed']), cita: { fecha: 'May 4, 2026', hora: '9:30 AM', proveedor: 'Perez Martinez' } },
+      { id: 'v2', nombre: 'Visit 2', total: '$320.000', procedimientos: visita('c5v2', ['Signed']) },
+    ],
+  },
+  {
+    id: 'c6', nombre: 'Implant Option', grupo: 'Implant', estado: 'Discarded',
+    creado: '17/04/2026', creadoPor: 'Provider 1', total: '1,250.00', sinPermiso: true,
+    visitas: [
+      { id: 'v1', nombre: 'Visit 1', total: '$1,250.000', procedimientos: visita('c6v1', ['Not sent']) },
+    ],
+  },
+  {
+    id: 'c7', nombre: 'Bridge Option', grupo: 'Implant', estado: 'Accepted',
+    creado: '17/04/2026', creadoPor: 'Provider 1', total: '980.00', sinPermiso: true,
+    visitas: [
+      { id: 'v1', nombre: 'Visit 1', total: '$980.000', procedimientos: visita('c7v1', ['Signed', 'Signed']) },
     ],
   },
 ]
+
+/* DD/MM/YYYY a un número que ordena: el más nuevo, mayor. */
+export const ordenFecha = (fecha: string) => {
+  const [d, m, a] = fecha.split('/').map(Number)
+  return (a ?? 0) * 10000 + (m ?? 0) * 100 + (d ?? 0)
+}
 
 export const CATEGORIAS = [
   'Preventive', 'Restorative', 'Periodontics', 'Endodontics', 'Prosthodontics', 'Surgery',
@@ -150,6 +199,15 @@ export const DIALOGOS = {
   discard: {
     titulo: 'Discard Case',
     texto: ['Are you sure you want to discard this case?'],
+  },
+  /* Del menú del caso en la app real (Actions Treatment): cierran el plan. */
+  expire: {
+    titulo: 'Expire Treatment Plan',
+    texto: ['Are you sure you want to expire this treatment plan? It will no longer be available to accept.'],
+  },
+  cancel: {
+    titulo: 'Cancel Treatment Plan',
+    texto: ['Are you sure you want to cancel this treatment plan?'],
   },
   removeProcedure: {
     titulo: 'Remove Procedure',

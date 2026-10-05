@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { CircleCheck, CircleAlert, FileSignature, History, MoreVertical, X } from 'lucide-react'
+import { CircleCheck, CircleAlert, Download, FileSignature, FileText, History, MoreVertical, PenLine, RefreshCw, Send, X, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { CONSENTIMIENTO, type Firma } from '@/data/treatment-plan'
 import { ICONO_SUELTO } from '@/lib/estilos'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 /* Figma 4122:250449, rediseñado: una sola fila con el documento, su estado y las dos firmas. Ver clinical-mode.md. */
 
@@ -71,10 +72,17 @@ export function PanelHistorial({ onClose }: { onClose: () => void }) {
   )
 }
 
+/* Las acciones del documento; el menú tiene el mismo diseño que el del caso (secciones con título, ícono en cada ítem). */
+const ACCIONES_DOCUMENTO: { label: string; icono: LucideIcon }[] = [
+  { label: 'Open document', icono: FileText },
+  { label: 'Send to patient again', icono: Send },
+  { label: 'Replace document', icono: RefreshCw },
+  { label: 'Download PDF', icono: Download },
+]
+
 export function ConsentBlock() {
   const [firmas, setFirmas] = useState(CONSENTIMIENTO.firmas)
   const [historial, setHistorial] = useState(false)
-  const [menu, setMenu] = useState(false)
 
   const pendientes = firmas.filter((f) => f.estado === 'Pending')
   const estado = pendientes.length === 0 ? 'Signed' : CONSENTIMIENTO.estado
@@ -121,40 +129,29 @@ export function ConsentBlock() {
           <History className="size-4" />
         </button>
 
-        <div className="relative shrink-0">
-          <button
-            onClick={() => setMenu((v) => !v)}
-            aria-label="Consent actions"
-            aria-expanded={menu}
-            className={`${ICONO_SUELTO} size-8`}
-          >
-            <MoreVertical className="size-4" />
-          </button>
-          {menu && (
-            <div className="absolute top-full right-0 z-30 mt-1 w-[200px] rounded-lg border border-line bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
-              {/* Sin fila de botones al pie, las acciones —incluida la firma
-                  pendiente— viven acá. */}
-              {pendientes.map((f) => (
-                <button
-                  key={f.rol}
-                  onClick={() => { setMenu(false); firmar(f.rol) }}
-                  className="text-dash-blue block w-full rounded px-3 py-2 text-left text-[13px] font-semibold hover:bg-surface-muted"
-                >
-                  Sign as {f.rol.toLowerCase()}
-                </button>
-              ))}
-              {['Open document', 'Send to patient again', 'Replace document', 'Download PDF'].map((o) => (
-                <button
-                  key={o}
-                  onClick={() => { setMenu(false); aviso.info(`${o} is not available in this release.`) }}
-                  className="block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
-                >
-                  {o}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button aria-label="Consent actions" className={`${ICONO_SUELTO} size-8 shrink-0`}>
+              <MoreVertical className="size-4" />
+            </button>
+          </DropdownMenuTrigger>
+          {/* Sin fila de botones al pie, las acciones —incluida la firma pendiente— viven acá. */}
+          <DropdownMenuContent align="end" className="w-[210px]">
+            <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Signatures</DropdownMenuLabel>
+            {pendientes.length ? pendientes.map((f) => (
+              <DropdownMenuItem key={f.rol} onSelect={() => firmar(f.rol)} className="gap-2 text-[13px]">
+                <PenLine className="size-4 text-ink-muted" /> Sign as {f.rol.toLowerCase()}
+              </DropdownMenuItem>
+            )) : <p className="px-2 pb-1.5 text-[12px] text-ink-muted italic">All signatures collected</p>}
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Document</DropdownMenuLabel>
+            {ACCIONES_DOCUMENTO.map(({ label, icono: Icono }) => (
+              <DropdownMenuItem key={label} onSelect={() => aviso.info(`${label} is not available in this release.`)} className="gap-2 text-[13px]">
+                <Icono className="size-4 text-ink-muted" /> {label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </span>
 
       {historial && <PanelHistorial onClose={() => setHistorial(false)} />}

@@ -1818,3 +1818,123 @@ build de produccion, no a ojo:
    y su tope pasa de 160 a 128 px: con tanto aire sobre la etiqueta mas larga
    (111 px), al cerrarse tardaba en arrancar. Vale tambien para Exit clinical
    Mode y Overwiev, que comparten la constante.
+
+## Treatment Plan por fecha, menu Exams y Surfaces condicional (2026-10-05)
+
+Pedido de Julian con captura de la app real (red.dev, Clinical Mode >
+Treatment Plan).
+
+1. **Los planes se agrupan por fecha**, no por Pending Decision / Acepted /
+   Discarted (revisado en red.dev). A la izquierda, **Unassigned Items** y
+   debajo una fila por fecha de creacion (DD/MM/YYYY, la mas nueva arriba)
+   con el estado del grupo en una pastilla (PLANNING, PENDING, PRESENTED,
+   WAITING FOR CONSENT, ACCEPTED, DISCARDED) y un chevron. La fecha se
+   despliega con sus casos (las alternativas), unidos por la linea del arbol:
+   marcador naranja, nombre, "Update: fecha" y un punto con el color del
+   estado del caso; el elegido queda en azul. Cada fecha se abre y se cierra
+   sola, tambien la del caso abierto (antes quedaba forzada abierta y, al
+   elegir un caso de otra fecha, la anterior se cerraba sola). El estado del grupo es el de
+   sus casos vivos, o Discarded si se descartaron todos. Se suma **Waiting
+   for consent** (como en la app real): Accept Case lo deja ahi, esperando
+   las firmas.
+2. **Que se ve segun el estado**: lo que no corresponde **se oculta**, ya no
+   queda deshabilitado con tooltip.
+   - *Planning*: lapiz (renombrar), ojo, **New Alternative Case** (boton azul
+     chico, `Button size="sm"`), Move to,
+     categoria como combo, y las visitas se editan: cada procedimiento se
+     arrastra a otra visita o a **"Drag procedure here to create new visit"**,
+     que arma una visita nueva (las vacias se van y se renumeran). New
+     Alternative Case crea una copia en Planning con la misma fecha y la abre.
+   - *Pending*: solo el ojo, para ver el plan antes de presentarlo (Finish
+     Planning ya dice que deja de ser editable).
+   - *Presented y siguientes*: sin Move to, ojo ni lapiz; la categoria queda
+     como texto y las filas sin menu de quitar.
+3. **La barra, como en red.dev**: en los examenes, el boton **Exams ›**
+   queda marcado (fondo azul claro) y despliega los registros: Treatment
+   Plan, Treatment, Patient Summary, Lab Order, Prescription y Referral. Al
+   elegir uno, las pestanas pasan a ser los registros y **Exams** queda como
+   boton comun que vuelve al ultimo examen abierto.
+4. **Surfaces solo cuando hace falta**: el paso aparece cuando el
+   procedimiento es de diente + superficie (D2140, D2330) y se eligio
+   cargarlo en superficie. El boton Surface de la fila solo esta en esos
+   procedimientos. Sin superficie el drawer tiene dos pasos, Procedure y Link
+   to finding. Con el paso, Next Step pide al menos una superficie.
+
+## Iconos y estados del design system 2.0 (2026-10-05)
+
+Figma *Design system · 2.0* (QZThiRTqdCgD1H6fv3k5zf):
+
+1. **Iconos de procedimiento** (535:2307, 535:2822): diente, boca y arcada
+   en blanco sobre un cuadrado de 23 px con el color del estado
+   (`src/assets/procedure-icons/`, `ScopeIcon`, `CajaIcono`). Figma repite
+   la boca en dos lugares: aca va en Quadrant. No hay icono de superficie:
+   Surface sigue con la grilla.
+2. **Filas con estados** (`ProcedureRow`, `ConditionRow`): default,
+   selected (borde azul), inactive (gris azulado, `input-inactive`), error
+   (borde y codigo rojos, fondo `dash-bad-bg`) y disabled (apagada, no se
+   elige). El drawer de New Procedure usa default y selected; la lista de
+   diagnosticos (oculta por ahora) usa `ConditionRow`.
+3. **Badges CC / TR del header** (254:2930, `ClinicalBadge`): CC es Chief
+   Complaint y TR **Triage** (asi en Figma y en el panel). Tilde (`ok`) o
+   cruz (`no`), en active (lleno), inactive (suave) y disabled (gris, sin
+   dato). El header los lee de `ESTADO_CLINICO`; hoy los dos en active con
+   tilde. Tamano `md` en el header (el de Figma, 22 px, hace ilegible el
+   tilde).
+4. Tokens nuevos en `index.css`: `input-inactive`, `input-inactive-bg`,
+   `status-ok`, `status-ok-muted`, `status-ok-strong`, `status-bad-muted`,
+   `status-bad-strong`.
+
+## Treatment Plan: menu, turnos, seleccion y acceso limitado (2026-10-05)
+
+Revisado en red.dev (casos en Planning, Waiting for consent, Accepted y
+Discarded):
+
+1. **Encabezado del caso**, en el orden de la app real: New Alternative Case
+   (azul chico), lapiz, ojo, Move to; despues el menu y el pliegue.
+2. **El menu (los tres puntos) tiene dos secciones**, "Actions Case" y
+   "Actions Treatment", como en red.dev; lo que borra o cierra va en rojo y,
+   sin acciones de caso, dice *No case actions available*:
+   - Planning: Delete | Finish Planning, Expire, Cancel (red.dev dice
+     Present: aca primero se termina de planear).
+   - Pending: — | Present, Expire, Cancel.
+   - Presented: — | Accept, Discard, Expire, Cancel (no existe en red.dev).
+   - Waiting for consent: — | Expire, Cancel.
+   - Accepted: — | Generate Consent, Expire, Cancel.
+   - Discarded: — | Generate Consent.
+   Expire y Cancel confirman y dejan el caso en Discarded.
+3. **Turno de la visita**: afuera de la tabla de cada visita, arriba a la
+   derecha (la visita conserva su barra azul; Julian: "era solo poner el
+   boton por fuera de esa tabla"). Sin turno dice
+   **No appointment** y, al tocarlo, avisa "No active appointment. There is no
+   active appointment in the current encounter." (el toast de red.dev). Con
+   turno muestra fecha y hora y abre el detalle (fecha, hora, provider).
+4. **Las filas de las visitas se marcan** en todos los estados, con la
+   casilla de cada fila y la de toda la visita (marca solo las suyas). La
+   barra dice cuantas y que hacer: Move to y Remove en Planning, Complete en
+   Accepted y Waiting for consent.
+5. **Acceso limitado**: un caso de otra ubicacion (`sinPermiso`) lleva el
+   aviso "Limited access to this treatment case" con el estilo de avisos del
+   design system (`ui/alert`, tono warning) y no se edita. `Alert` es el
+   bloque Alert del constructor hecho componente; el constructor lee sus
+   tonos de ahi.
+
+## Tooltips, pasos del drawer y puntos del arbol (2026-10-05)
+
+1. **Cada icono tiene tooltip** que dice que es: los alcances del buscador
+   (Tooth, Surface, Quadrant, Arch), el diente de la condicion, el alcance
+   elegido en Surfaces y las acciones de cada procedimiento en las visitas
+   (More actions, Complete procedure, Imaging, Link to finding). red.dev se
+   colgo al abrir los examenes, asi que los nombres son los de los alcances
+   del buscador.
+2. **Los pasos del drawer dependen de lo elegido**: Surfaces solo si el
+   procedimiento lleva superficie (area Surface; al elegirlo queda en
+   superficie), y Link to finding solo con Planned: lo ya hecho (Existing)
+   no resuelve un hallazgo. Existing sin superficie es un solo paso: no se
+   muestran pasos y el boton es Save.
+3. **El punto de estado de cada caso** va al inicio, sobre la linea del
+   arbol, con su tooltip.
+4. **El menu de Informed Consent** usa el mismo diseno que el del caso
+   (`DropdownMenu` con secciones con titulo e icono en cada item):
+   *Signatures* (Sign as patient / provider, o "All signatures collected") y
+   *Document* (Open document, Send to patient again, Replace document,
+   Download PDF).

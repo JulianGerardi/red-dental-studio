@@ -347,6 +347,15 @@
 
   /* Estados que no estaban en dash-*. */
   --color-field-error: #dc2626;
+  /* Design system 2.0: estado inactivo de un campo o una fila (Figma 535:2822) y los estados ok / bad de los badges CC / TR
+     (Figma 254:2930). */
+  --color-input-inactive: #9ea8b8;
+  --color-input-inactive-bg: #edf0f2;
+  --color-status-ok: #28c563;
+  --color-status-ok-muted: #dcfce7;
+  --color-status-ok-strong: #15803d;
+  --color-status-bad-muted: #ffe4e6;
+  --color-status-bad-strong: #b91c1c;
   --color-required: #ff0608;
   --color-warn-fg: #99660d;
   --color-warn-bg: #fffaf0;

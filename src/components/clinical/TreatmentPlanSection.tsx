@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
-  Bookmark, Pencil, Plus, MoreVertical, CornerUpLeft, ChevronDown, SquareX,
-  LoaderCircle, Check, FileText, Eye, Save, Link2, ClipboardList, Scan, X,
+  Bookmark, Pencil, Plus, MoreVertical, CornerUpLeft, ChevronDown, ChevronRight, Captions,
+  Check, Eye, Save, Link2, ClipboardList, Scan, X, GripVertical, Trash2, TimerOff, Ban, FilePen, CheckCheck,
+  Presentation, CircleCheck, CircleX, CalendarCheck2, CalendarX2,
   CalendarDays, FileCheck2, FileClock, FileMinus2, FileX2, type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -9,13 +10,18 @@ import { aviso } from '@/components/ui/toaster'
 import { ConsentBlock } from '@/components/clinical/ConsentBlock'
 import {
   CASOS, NO_ASIGNADOS, CATEGORIAS, DIALOGOS, OPCIONES_BORRAR_CASO, MOVER,
-  NUEVO_GRUPO, COMPLETAR,
-  type Caso, type EstadoCaso, type Procedimiento, type ClaveDialogo, type ConsentProcedimiento,
+  NUEVO_GRUPO, COMPLETAR, ordenFecha,
+  type Caso, type Cita, type EstadoCaso, type Procedimiento, type ClaveDialogo, type ConsentProcedimiento, type Visita,
 } from '@/data/treatment-plan'
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { SelectField } from '@/components/patients/form'
 import { Pill, type PillTone } from '@/components/ui/pill'
+import { Button } from '@/components/ui/button'
+import { Alert } from '@/components/ui/alert'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
 
 /* Figma 4118:220403 "Treatment Plan — Section (Cases, Workflow & Dialogs)":
    el rail de estados, la tabla de no asignados, el caso con sus visitas y los
@@ -31,22 +37,31 @@ const ESTADO_TONO: Record<Procedimiento['estado'], PillTone> = {
 }
 
 const TONO_CASO: Record<EstadoCaso, PillTone> = {
-  Planning: 'purple', Pending: 'warning', Presented: 'info', Accepted: 'success', Discarded: 'neutral',
+  Planning: 'warning', Pending: 'purple', Presented: 'info', 'Waiting for consent': 'neutral', Accepted: 'success', Discarded: 'danger',
 }
 
 /* Lo que cada diálogo del menú hace con el estado del caso. */
 const ESTADO_TRAS: Partial<Record<ClaveDialogo, EstadoCaso>> = {
-  finish: 'Pending', present: 'Presented', accept: 'Accepted', discard: 'Discarded',
+  finish: 'Pending', present: 'Presented', accept: 'Waiting for consent', discard: 'Discarded', expire: 'Discarded', cancel: 'Discarded',
 }
 
-/* Desde qué estados se ofrece cada acción del menú. */
-const ACCIONES_CASO: { label: string; clave: ClaveDialogo | 'delete'; desde?: EstadoCaso[] }[] = [
-  { label: 'Finish Planning', clave: 'finish', desde: ['Planning'] },
-  { label: 'Present Case', clave: 'present', desde: ['Pending'] },
-  { label: 'Accept Case', clave: 'accept', desde: ['Presented'] },
-  { label: 'Discard Case', clave: 'discard', desde: ['Planning', 'Pending', 'Presented'] },
-  { label: 'Delete Case', clave: 'delete' },
-]
+/* El menú del caso, como en la app real: "Actions Case" y "Actions Treatment", según el estado. Lo que cierra o borra
+   va en rojo. Ver clinical-mode.md. */
+type AccionMenu = { label: string; clave: ClaveDialogo | 'delete' | 'consent'; icono: LucideIcon; peligro?: boolean }
+const EXPIRAR: AccionMenu = { label: 'Expire', clave: 'expire', icono: TimerOff, peligro: true }
+const CANCELAR: AccionMenu = { label: 'Cancel', clave: 'cancel', icono: Ban, peligro: true }
+const CONSENTIMIENTO: AccionMenu = { label: 'Generate Consent', clave: 'consent', icono: FilePen }
+const ACCIONES_CASO: Partial<Record<EstadoCaso, AccionMenu[]>> = {
+  Planning: [{ label: 'Delete', clave: 'delete', icono: Trash2, peligro: true }],
+}
+const ACCIONES_TRATAMIENTO: Record<EstadoCaso, AccionMenu[]> = {
+  Planning: [{ label: 'Finish Planning', clave: 'finish', icono: CheckCheck }, EXPIRAR, CANCELAR],
+  Pending: [{ label: 'Present', clave: 'present', icono: Presentation }, EXPIRAR, CANCELAR],
+  Presented: [{ label: 'Accept', clave: 'accept', icono: CircleCheck }, { label: 'Discard', clave: 'discard', icono: CircleX }, EXPIRAR, CANCELAR],
+  'Waiting for consent': [EXPIRAR, CANCELAR],
+  Accepted: [CONSENTIMIENTO, EXPIRAR, CANCELAR],
+  Discarded: [CONSENTIMIENTO],
+}
 
 /* Ícono de acción del encabezado del caso. Fuera de su estado no se esconde:
    queda deshabilitado y el tooltip dice cuándo se puede usar. El botón
@@ -328,92 +343,106 @@ export function DialogoBorrarCaso({ onConfirm, onClose }: { onConfirm: (op: stri
 
 /* ── Rail de estados ──────────────────────────────────────────────── */
 
+/* El estado de un grupo (una fecha): el de sus casos vivos; si todos se descartaron, Discarded. */
+const estadoGrupo = (casos: Caso[]): EstadoCaso => casos.find((c) => c.estado !== 'Discarded')?.estado ?? 'Discarded'
+
+/* El punto de cada caso en la lista: el color de su estado. */
+const PUNTO_CASO: Record<EstadoCaso, string> = {
+  Planning: 'bg-ink-faint', Pending: 'bg-purple-fg', Presented: 'bg-dash-busy-fg', 'Waiting for consent': 'bg-warn-fg', Accepted: 'bg-dash-ok-fg', Discarded: 'bg-dash-bad-fg',
+}
+
+/* Como en la app real (red.dev): arriba Unassigned Items y debajo los planes agrupados por fecha de creación, la más
+   nueva primero. Cada fecha lleva el estado del grupo y se despliega con sus casos (las alternativas). Ver
+   clinical-mode.md. */
 export function Rail({
-  vista, casoId, favoritos, onFavorito, onUnassigned, onCaso,
+  casos, vista, casoId, onUnassigned, onCaso,
 }: {
+  casos: Caso[]
   vista: 'unassigned' | 'caso'
   casoId: string
-  favoritos: string[]
-  onFavorito: (id: string) => void
   onUnassigned: () => void
   onCaso: (id: string) => void
 }) {
-  const [abierto, setAbierto] = useState(true)
+  const fechas = [...new Set(casos.map((c) => c.creado))].sort((x, y) => ordenFecha(y) - ordenFecha(x))
+  const fechaElegida = casos.find((c) => c.id === casoId)?.creado
+  const [abiertas, setAbiertas] = useState<string[]>(() => [vista === 'caso' && fechaElegida ? fechaElegida : fechas[0]!])
+  const alternar = (f: string) => setAbiertas((xs) => (xs.includes(f) ? xs.filter((x) => x !== f) : [...xs, f]))
+  /* Al cambiar de caso su fecha se abre, pero después se puede cerrar como cualquier otra. */
+  useEffect(() => {
+    if (vista === 'caso' && fechaElegida) setAbiertas((xs) => (xs.includes(fechaElegida) ? xs : [...xs, fechaElegida]))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [casoId, vista])
 
-  /* Medido: "Periodontists Recommended" pide 179px de texto; con el ícono y el
-     padding la columna necesita 240. Con 190 se cortaba. */
   return (
-    <nav className="shrink-0 lg:w-[240px]">
+    <nav aria-label="Treatment plans" className="flex shrink-0 flex-col self-start rounded-xl border border-line bg-white p-2 lg:max-h-[720px] lg:w-[300px]">
       <button
         onClick={onUnassigned}
+        aria-current={vista === 'unassigned' ? 'page' : undefined}
         className={cn(
-          'flex w-full items-center gap-2 rounded-md px-2 py-2 text-[13px] transition-colors',
-          vista === 'unassigned' ? 'bg-dash-blue font-medium text-white' : 'text-ink-medium hover:bg-surface-muted',
+          'flex w-full items-center gap-2.5 rounded-md px-3 py-2.5 text-[13px] font-medium transition-colors',
+          vista === 'unassigned' ? 'bg-dash-blue text-white' : 'text-ink hover:bg-surface-muted',
         )}
       >
-        <SquareX className="size-4 shrink-0" /> Unassigned
+        <Captions className="size-4 shrink-0" /> Unassigned Items
       </button>
-
-      <button
-        onClick={() => setAbierto((v) => !v)}
-        aria-expanded={abierto}
-        className="mt-1 flex w-full items-center gap-2 rounded-md px-2 py-2 text-[13px] text-ink-medium transition-colors hover:bg-surface-muted"
-      >
-        <LoaderCircle className="size-4 shrink-0" />
-        <span className="min-w-0 flex-1 text-left">Pending Decision</span>
-        <ChevronDown className={cn('size-4 shrink-0 transition-transform', !abierto && '-rotate-90')} />
-      </button>
-
-      {abierto && (
-        <div className="mt-1 flex flex-col gap-1 pl-3">
-          {CASOS.map((c) => {
-            const on = vista === 'caso' && c.id === casoId
-            return (
-              <span
-                key={c.id}
-                className={cn(
-                  'flex items-center gap-2 rounded-md pr-1 transition-colors',
-                  on ? 'bg-dash-blue text-white' : 'text-ink-medium hover:bg-surface-muted',
-                )}
+      <TooltipProvider delayDuration={200}>
+      <ul className="mt-1 flex min-h-0 flex-col overflow-y-auto">
+        {fechas.map((f) => {
+          const delDia = casos.filter((c) => c.creado === f)
+          const abierta = abiertas.includes(f)
+          const estado = estadoGrupo(delDia)
+          return (
+            <li key={f}>
+              <button
+                onClick={() => alternar(f)}
+                aria-expanded={abierta}
+                aria-label={`${f}, ${estado}, ${delDia.length} ${delDia.length === 1 ? 'case' : 'cases'}`}
+                className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors hover:bg-surface-muted"
               >
-                {/* El bookmark marca favorito; el resto de la fila navega. */}
-                <button
-                  onClick={() => onFavorito(c.id)}
-                  aria-label={`${favoritos.includes(c.id) ? 'Unmark' : 'Mark'} ${c.nombre} as favourite`}
-                  aria-pressed={favoritos.includes(c.id)}
-                  className="shrink-0 py-2 pl-2 hover:opacity-70"
-                >
-                  <Bookmark
-                    className="size-4"
-                    fill={favoritos.includes(c.id) ? 'currentColor' : 'none'}
-                  />
-                </button>
-                <button
-                  onClick={() => onCaso(c.id)}
-                  aria-current={on ? 'page' : undefined}
-                  className={cn('min-w-0 flex-1 truncate py-2 text-left text-[13px]', on && 'font-medium')}
-                >
-                  {c.nombre}
-                </button>
-              </span>
-            )
-          })}
-        </div>
-      )}
-
-      {/* "Acepted" y "Discarted" son los typos del frame. */}
-      {[
-        { label: 'Acepted', icono: Check },
-        { label: 'Discarted', icono: FileText },
-      ].map(({ label, icono: Icono }) => (
-        <button
-          key={label}
-          onClick={() => aviso.info(`${label} cases are not available in this release.`)}
-          className="mt-1 flex w-full items-center gap-2 rounded-md px-2 py-2 text-[13px] text-ink-medium transition-colors hover:bg-surface-muted"
-        >
-          <Icono className="size-4 shrink-0" /> {label}
-        </button>
-      ))}
+                <span className="text-[13px] text-ink tabular-nums">{f}</span>
+                <Pill tone={TONO_CASO[estado]} size="sm" className="ml-auto tracking-wide whitespace-nowrap uppercase">{estado}</Pill>
+                <ChevronRight className={cn('size-4 shrink-0 text-ink-faint transition-transform', abierta && 'rotate-90')} />
+              </button>
+              {abierta && (
+                /* La línea del árbol une los casos con su fecha. */
+                <ul className="relative mb-1 ml-5 flex flex-col gap-1 border-l border-line pl-3">
+                  {delDia.map((c) => {
+                    const on = vista === 'caso' && c.id === casoId
+                    return (
+                      <li key={c.id} className="relative before:absolute before:top-1/2 before:-left-3 before:w-2.5 before:border-t before:border-line">
+                        {/* El punto del estado va sobre la línea del árbol, al inicio de cada caso. */}
+                        <ConAyuda texto={c.estado}>
+                          <span aria-label={c.estado} className={cn('absolute top-1/2 -left-[16.5px] z-10 size-2 -translate-y-1/2 rounded-full ring-2 ring-white', PUNTO_CASO[c.estado])} />
+                        </ConAyuda>
+                        <button
+                          onClick={() => onCaso(c.id)}
+                          aria-current={on ? 'page' : undefined}
+                          aria-label={`${c.nombre}, ${c.estado}`}
+                          className={cn(
+                            'flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left transition-colors',
+                            on ? 'bg-dash-blue text-white' : 'hover:bg-surface-muted',
+                          )}
+                        >
+                          <span className="bg-warning flex size-5 shrink-0 items-center justify-center rounded text-white">
+                            <Bookmark className="size-3" fill="currentColor" />
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className={cn('block truncate text-[13px] font-medium', on ? 'text-white' : 'text-ink')}>{c.nombre}</span>
+                            <span className={cn('flex items-center gap-1 text-[10px]', on ? 'text-white/80' : 'text-ink-muted')}>
+                              <CalendarDays className="size-2.5" /> Update: {c.creado}
+                            </span>
+                          </span>
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </li>
+          )
+        })}
+      </ul>
+      </TooltipProvider>
     </nav>
   )
 }
@@ -457,10 +486,14 @@ export function Casilla({ on, onChange, label }: { on: boolean; onChange: (v: bo
 }
 
 export function TablaProcedimientos({
-  filas, acciones, consentimiento, seleccion, onSeleccion, onAccion, onCompletar,
+  filas, acciones, consentimiento, seleccion, onSeleccion, onAccion, onCompletar, arrastrable, sinMenu,
 }: {
   filas: Procedimiento[]
   acciones?: boolean
+  /** Mientras se planea: cada fila se arrastra a otra visita o a una nueva. */
+  arrastrable?: boolean
+  /** Sin el menú de la fila (quitar el procedimiento): un caso ya presentado no se edita. */
+  sinMenu?: boolean
   /** Suma la columna Consent: sólo en los casos, los sueltos no tienen consentimiento. */
   consentimiento?: boolean
   /** Con selección, la tabla suma la columna de casillas. */
@@ -474,10 +507,12 @@ export function TablaProcedimientos({
   const columnas = [...COLUMNAS, ...(consentimiento ? ['Consent'] : []), 'Actions']
 
   return (
+    <TooltipProvider delayDuration={200}>
     <div className="overflow-x-auto">
       <table className="w-full min-w-[860px] border-collapse">
         <thead>
           <tr className="border-y border-line-soft bg-surface-alt">
+            {arrastrable && <th className="w-8" aria-label="Drag" />}
             {conCasillas && (
               <th className="w-10 px-3">
                 <Casilla
@@ -498,11 +533,17 @@ export function TablaProcedimientos({
           {filas.map((p) => (
             <tr
               key={p.id}
+              draggable={arrastrable}
+              onDragStart={arrastrable ? (e) => { e.dataTransfer.setData('text/plain', p.id); e.dataTransfer.effectAllowed = 'move' } : undefined}
               className={cn(
                 'border-b border-line-soft last:border-0',
                 conCasillas && seleccion.includes(p.id) && 'bg-dash-count-bg',
+                arrastrable && 'cursor-grab active:cursor-grabbing',
               )}
             >
+              {arrastrable && (
+                <td className="pl-3 text-ink-faint" aria-label={`Drag ${p.codigo} to another visit`}><GripVertical className="size-4" /></td>
+              )}
               {conCasillas && (
                 <td className="px-3">
                   <Casilla
@@ -529,36 +570,30 @@ export function TablaProcedimientos({
               )}
               <td className="px-3">
                 <span className="flex items-center gap-1">
-                  <button
-                    onClick={() => onAccion(p)}
-                    aria-label={`Actions for ${p.codigo}`}
-                    className={ICONO_SUELTO}
-                  >
-                    <MoreVertical className="size-4" />
-                  </button>
+                  {!sinMenu && (
+                    <ConAyuda texto="More actions">
+                      <button onClick={() => onAccion(p)} aria-label={`Actions for ${p.codigo}`} className={ICONO_SUELTO}>
+                        <MoreVertical className="size-4" />
+                      </button>
+                    </ConAyuda>
+                  )}
                   {acciones && (
                     <>
-                      <button
-                        onClick={() => onCompletar?.()}
-                        aria-label={`Complete ${p.codigo}`}
-                        className={ICONO_SUELTO}
-                      >
-                        <ClipboardList className="size-4" />
-                      </button>
-                      <button
-                        onClick={() => aviso.info('Imaging is not available in this release.')}
-                        aria-label={`Imaging for ${p.codigo}`}
-                        className={ICONO_SUELTO}
-                      >
-                        <Scan className="size-4" />
-                      </button>
-                      <button
-                        onClick={() => aviso.info('Linking is not available in this release.')}
-                        aria-label={`Link ${p.codigo}`}
-                        className={ICONO_SUELTO}
-                      >
-                        <Link2 className="size-4" />
-                      </button>
+                      <ConAyuda texto="Complete procedure">
+                        <button onClick={() => onCompletar?.()} aria-label={`Complete ${p.codigo}`} className={ICONO_SUELTO}>
+                          <ClipboardList className="size-4" />
+                        </button>
+                      </ConAyuda>
+                      <ConAyuda texto="Imaging">
+                        <button onClick={() => aviso.info('Imaging is not available in this release.')} aria-label={`Imaging for ${p.codigo}`} className={ICONO_SUELTO}>
+                          <Scan className="size-4" />
+                        </button>
+                      </ConAyuda>
+                      <ConAyuda texto="Link to finding">
+                        <button onClick={() => aviso.info('Linking is not available in this release.')} aria-label={`Link ${p.codigo}`} className={ICONO_SUELTO}>
+                          <Link2 className="size-4" />
+                        </button>
+                      </ConAyuda>
                     </>
                   )}
                 </span>
@@ -568,13 +603,70 @@ export function TablaProcedimientos({
         </tbody>
       </table>
     </div>
+    </TooltipProvider>
   )
 }
 
 /* ── Caso ─────────────────────────────────────────────────────────── */
 
+/* Mueve un procedimiento a otra visita, o a una nueva con `destino` null. Las visitas vacías se van y se renumeran. */
+function moverEnVisitas(visitas: Visita[], id: string, destino: string | null): Visita[] {
+  const proc = visitas.flatMap((v) => v.procedimientos).find((p) => p.id === id)
+  const origen = visitas.find((v) => v.procedimientos.some((p) => p.id === id))
+  if (!proc || !origen || origen.id === destino) return visitas
+  let siguientes = visitas.map((v) => ({ ...v, procedimientos: v.procedimientos.filter((p) => p.id !== id) }))
+  siguientes = destino
+    ? siguientes.map((v) => (v.id === destino ? { ...v, procedimientos: [...v.procedimientos, proc] } : v))
+    : [...siguientes, { id: `v${Date.now()}`, nombre: '', total: '', procedimientos: [proc] }]
+  return siguientes
+    .filter((v) => v.procedimientos.length > 0)
+    .map((v, i) => ({
+      ...v,
+      nombre: `Visit ${i + 1}`,
+      total: `$${v.procedimientos.reduce((t, p) => t + Number(p.fee.replace(/[^0-9.]/g, '')), 0)}`,
+    }))
+}
+
+/* El turno de la visita (como "No appointment" en la app real): sin turno, avisa que el encuentro no tiene uno activo;
+   con turno, muestra la fecha y abre el detalle. */
+export function CitaVisita({ cita }: { cita?: Cita }) {
+  const boton = 'flex h-7 shrink-0 items-center gap-1.5 rounded-md border border-line bg-white px-2.5 text-[12px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle'
+  if (!cita) {
+    return (
+      <button type="button" onClick={() => aviso.error('No active appointment. There is no active appointment in the current encounter.')} className={cn(boton, 'text-ink-medium')}>
+        <CalendarX2 className="size-3.5" /> No appointment
+      </button>
+    )
+  }
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button type="button" aria-label={`Appointment on ${cita.fecha} at ${cita.hora}`} className={cn(boton, 'text-dash-blue')}>
+          <CalendarCheck2 className="size-3.5" /> {cita.fecha} · {cita.hora}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-[240px] gap-2 p-3">
+        <span className="flex items-center justify-between gap-2">
+          <span className="text-[13px] font-semibold text-ink">Appointment</span>
+          <Pill tone="info" size="sm">Booked</Pill>
+        </span>
+        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[12px]">
+          <dt className="text-ink-muted">Date</dt><dd className="text-ink">{cita.fecha}</dd>
+          <dt className="text-ink-muted">Time</dt><dd className="text-ink">{cita.hora}</dd>
+          <dt className="text-ink-muted">Provider</dt><dd className="text-ink">{cita.proveedor}</dd>
+        </dl>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+/* Qué se ve según el estado (Julián, 2026-10-05). Planning: todo se edita (nombre, alternativa, Move to, categoría,
+   visitas). Pending: sólo el ojo, para ver el plan antes de presentarlo. Desde Presented, nada de eso: la categoría
+   queda como texto. Lo que no corresponde no se muestra, en vez de quedar deshabilitado. Un caso de una ubicación sin
+   permiso (`sinPermiso`) lleva el aviso de acceso limitado y tampoco se edita. Las filas de las visitas se marcan
+   siempre; lo que se hace con ellas depende del estado. */
 export function VistaCaso({
-  caso, favorito, onFavorito, onDialogo, onMover, onCompletar,
+  caso, favorito, onFavorito, onDialogo, onMover, onCompletar, onNuevaAlternativa, onVisitas,
 }: {
   caso: Caso
   favorito: boolean
@@ -582,17 +674,45 @@ export function VistaCaso({
   onDialogo: (d: ClaveDialogo | 'delete') => void
   onMover: () => void
   onCompletar: () => void
+  onNuevaAlternativa?: () => void
+  onVisitas?: (visitas: Visita[]) => void
 }) {
   const [categoria, setCategoria] = useState('')
   const [notas, setNotas] = useState('')
-  const [menu, setMenu] = useState(false)
   const [colapsado, setColapsado] = useState(false)
-  const planificando = caso.estado === 'Planning'
-  const presentado = caso.estado === 'Presented'
+  const [soltando, setSoltando] = useState<string | null>(null)
+  const [seleccion, setSeleccion] = useState<string[]>([])
+  const planificando = caso.estado === 'Planning' && !caso.sinPermiso
+  const antesDePresentar = caso.estado === 'Planning' || caso.estado === 'Pending'
+  /* Cada tabla marca y desmarca sólo sus filas: las de las otras visitas quedan como estaban. */
+  const marcarEn = (ids: string[]) => (nuevos: string[]) => setSeleccion((sel) => [...new Set([...sel.filter((x) => !ids.includes(x)), ...nuevos])])
+  const elegir = (a: AccionMenu) => {
+    if (a.clave === 'consent') aviso.ok('Consent generated and sent to the patient for signature.')
+    else onDialogo(a.clave)
+  }
+  const itemMenu = (a: AccionMenu) => (
+    <DropdownMenuItem key={a.clave} onSelect={() => elegir(a)} className={cn('gap-2 text-[13px]', a.peligro && 'text-dash-bad-fg focus:text-dash-bad-fg')}>
+      <a.icono className={cn('size-4', a.peligro ? 'text-dash-bad-fg' : 'text-ink-muted')} /> {a.label}
+    </DropdownMenuItem>
+  )
+  const accionesCaso = ACCIONES_CASO[caso.estado] ?? []
+
+  const soltar = (destino: string | null) => (e: React.DragEvent) => {
+    e.preventDefault()
+    setSoltando(null)
+    const id = e.dataTransfer.getData('text/plain')
+    if (id) onVisitas?.(moverEnVisitas(caso.visitas, id, destino))
+  }
+  const sobre = (destino: string) => (e: React.DragEvent) => { e.preventDefault(); setSoltando(destino) }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-xl border border-line bg-white p-4 sm:p-5">
+        {caso.sinPermiso && (
+          <Alert tone="warning" title="Limited access to this treatment case" className="mb-4">
+            You do not have permission to update treatment plans for this location.
+          </Alert>
+        )}
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={onFavorito}
@@ -615,62 +735,45 @@ export function VistaCaso({
               </span>
             </span>
           )}
-          {/* Lápiz y Move to sólo mientras se planea; el ojo sólo con el caso presentado. */}
+          {/* En el orden de la app real: New Alternative Case, lápiz, ojo y Move to. */}
           <TooltipProvider delayDuration={150}>
-            <AccionCaso
-              habilitado={planificando}
-              tooltip="Rename case"
-              tooltipDeshabilitado="The case can only be renamed while it is being planned"
-              onClick={() => aviso.info('Renaming a case is not available in this release.')}
-              aria-label="Rename case"
-              claseBoton="text-ink-medium"
-            >
-              <Pencil className="size-4" />
-            </AccionCaso>
-            <AccionCaso
-              habilitado={presentado}
-              tooltip="Preview case"
-              tooltipDeshabilitado="The preview is only available while the case is presented"
-              onClick={() => aviso.info('The case preview is not available in this release.')}
-              aria-label="Preview case"
-              claseBoton="text-ink-medium"
-            >
-              <Eye className="size-4" />
-            </AccionCaso>
-            <AccionCaso
-              habilitado={planificando}
-              tooltip="Move procedures to another case"
-              tooltipDeshabilitado="Procedures can only be moved while the case is being planned"
-              onClick={onMover}
-              className="ml-auto"
-              claseBoton="text-dash-blue gap-1 text-[13px] font-semibold enabled:hover:underline enabled:hover:opacity-100"
-            >
-              Move to <CornerUpLeft className="size-3.5" />
-            </AccionCaso>
+            <span className="ml-auto flex shrink-0 items-center gap-3">
+              {planificando && (
+                <Button size="sm" onClick={onNuevaAlternativa}>
+                  <Plus /> New Alternative Case
+                </Button>
+              )}
+              {planificando && (
+                <AccionCaso habilitado tooltip="Rename case" tooltipDeshabilitado="" onClick={() => aviso.info('Renaming a case is not available in this release.')} aria-label="Rename case" claseBoton="text-ink-medium">
+                  <Pencil className="size-4" />
+                </AccionCaso>
+              )}
+              {antesDePresentar && (
+                <AccionCaso habilitado tooltip="Preview case" tooltipDeshabilitado="" onClick={() => aviso.info('The case preview is not available in this release.')} aria-label="Preview case" claseBoton="text-ink-medium">
+                  <Eye className="size-4" />
+                </AccionCaso>
+              )}
+              {planificando && (
+                <button onClick={onMover} className="text-dash-blue flex items-center gap-1 text-[13px] font-semibold hover:underline">
+                  Move to <CornerUpLeft className="size-3.5" />
+                </button>
+              )}
+            </span>
           </TooltipProvider>
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setMenu((v) => !v)}
-              aria-label="Case actions"
-              aria-expanded={menu}
-              className={`${ICONO_SUELTO} size-9`}
-            >
-              <MoreVertical className="size-4" />
-            </button>
-            {menu && (
-              <div className="absolute top-full right-0 z-30 mt-1 w-[190px] rounded-lg border border-line bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
-                {ACCIONES_CASO.filter((a) => !a.desde || a.desde.includes(caso.estado)).map(({ label, clave }) => (
-                  <button
-                    key={clave}
-                    onClick={() => { setMenu(false); onDialogo(clave) }}
-                    className="block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button aria-label="Case actions" className={`${ICONO_SUELTO} size-9 shrink-0`}>
+                <MoreVertical className="size-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[210px]">
+              <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Actions Case</DropdownMenuLabel>
+              {accionesCaso.length ? accionesCaso.map(itemMenu) : <p className="px-2 pb-1.5 text-[12px] text-ink-muted italic">No case actions available</p>}
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Actions Treatment</DropdownMenuLabel>
+              {ACCIONES_TRATAMIENTO[caso.estado].map(itemMenu)}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <button
             onClick={() => setColapsado((v) => !v)}
             aria-expanded={!colapsado}
@@ -742,20 +845,65 @@ export function VistaCaso({
         </>)}
       </div>
 
-      {caso.visitas.map((v) => (
-        <div key={v.id} className="overflow-hidden rounded-xl border border-line bg-white">
-          <div className="bg-dash-blue px-4 py-2 text-[13px] font-semibold text-white">
-            {v.nombre} - {v.total}
-          </div>
-          <TablaProcedimientos
-            filas={v.procedimientos}
-            acciones
-            consentimiento
-            onAccion={() => onDialogo('removeProcedure')}
-            onCompletar={onCompletar}
-          />
+      {/* Con filas marcadas, la barra dice cuántas y qué se puede hacer con ellas en este estado. */}
+      {seleccion.length > 0 && (
+        <div className="bg-dash-count-bg flex flex-wrap items-center gap-3 rounded-md px-3 py-2">
+          <span className="text-dash-blue-hover text-[13px] font-semibold">{seleccion.length} selected</span>
+          {planificando && (
+            <>
+              <button onClick={onMover} className="text-dash-blue text-[13px] font-semibold hover:underline">Move to</button>
+              <button onClick={() => onDialogo('removeProcedure')} className="text-[13px] font-semibold text-dash-bad-fg hover:underline">Remove</button>
+            </>
+          )}
+          {(caso.estado === 'Accepted' || caso.estado === 'Waiting for consent') && (
+            <button onClick={onCompletar} className="text-dash-blue text-[13px] font-semibold hover:underline">Complete</button>
+          )}
+          <button onClick={() => setSeleccion([])} className="ml-auto text-[13px] font-medium text-ink-muted hover:underline">Clear</button>
         </div>
+      )}
+
+      {/* El turno de la visita va afuera de su tabla, arriba a la derecha; la visita queda como estaba. */}
+      {caso.visitas.map((v) => (
+        <section key={v.id} aria-label={v.nombre} className="flex flex-col gap-2">
+          <div className="flex justify-end"><CitaVisita cita={v.cita} /></div>
+          <div
+            onDragOver={planificando ? sobre(v.id) : undefined}
+            onDragLeave={planificando ? () => setSoltando(null) : undefined}
+            onDrop={planificando ? soltar(v.id) : undefined}
+            className={cn('overflow-hidden rounded-xl border bg-white transition-colors', soltando === v.id ? 'border-dash-blue ring-dash-blue/30 ring-2' : 'border-line')}
+          >
+            <div className="bg-dash-blue px-4 py-2 text-[13px] font-semibold text-white">
+              {v.nombre} - {v.total}
+            </div>
+            <TablaProcedimientos
+              filas={v.procedimientos}
+              acciones
+              consentimiento
+              arrastrable={planificando}
+              sinMenu={!planificando}
+              seleccion={seleccion}
+              onSeleccion={marcarEn(v.procedimientos.map((p) => p.id))}
+              onAccion={() => onDialogo('removeProcedure')}
+              onCompletar={onCompletar}
+            />
+          </div>
+        </section>
       ))}
+
+      {/* Mientras se planea, soltar un procedimiento acá arma una visita nueva con él. */}
+      {planificando && (
+        <div
+          onDragOver={sobre('nueva')}
+          onDragLeave={() => setSoltando(null)}
+          onDrop={soltar(null)}
+          className={cn(
+            'flex h-16 items-center justify-center rounded-xl border-2 border-dashed text-[13px] font-medium transition-colors',
+            soltando === 'nueva' ? 'border-dash-blue bg-dash-count-bg text-dash-blue' : 'border-line bg-surface-subtle text-ink-muted',
+          )}
+        >
+          Drag procedure here to create new visit
+        </div>
+      )}
     </div>
   )
 }
@@ -772,11 +920,18 @@ export function TreatmentPlanSection() {
   const [completar, setCompletar] = useState(false)
   const [favoritos, setFavoritos] = useState<string[]>([])
   const [seleccion, setSeleccion] = useState<string[]>([])
-  const [estados, setEstados] = useState<Record<string, EstadoCaso>>(
-    () => Object.fromEntries(CASOS.map((c) => [c.id, c.estado])),
-  )
-  const base = CASOS.find((c) => c.id === casoId) ?? CASOS[0]
-  const caso: Caso = { ...base, estado: estados[base.id] ?? base.estado }
+  const [casos, setCasos] = useState<Caso[]>(CASOS)
+  const caso = casos.find((c) => c.id === casoId) ?? casos[0]!
+  const cambiarCaso = (cambio: Partial<Caso>) => setCasos((cs) => cs.map((c) => (c.id === caso.id ? { ...c, ...cambio } : c)))
+
+  /* La alternativa nace como copia del caso, en Planning y con la misma fecha: queda al lado en la lista. */
+  const nuevaAlternativa = () => {
+    const id = `${caso.id}-alt-${Date.now()}`
+    const n = casos.filter((c) => c.grupo === caso.grupo).length
+    setCasos((cs) => [...cs, { ...caso, id, nombre: `${caso.nombre.replace(/ Alternative( \d+)?$/, '')} Alternative ${n}`, estado: 'Planning' }])
+    setCasoId(id)
+    aviso.ok('Alternative case created.')
+  }
 
   const alternarFavorito = (id: string) =>
     setFavoritos((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]))
@@ -784,10 +939,9 @@ export function TreatmentPlanSection() {
   return (
     <div className="flex flex-col gap-4 lg:flex-row">
       <Rail
+        casos={casos}
         vista={vista}
-        casoId={casoId}
-        favoritos={favoritos}
-        onFavorito={alternarFavorito}
+        casoId={caso.id}
         onUnassigned={() => setVista('unassigned')}
         onCaso={(id) => { setCasoId(id); setVista('caso') }}
       />
@@ -858,12 +1012,15 @@ export function TreatmentPlanSection() {
           </div>
         ) : (
           <VistaCaso
+            key={caso.id}
             caso={caso}
             favorito={favoritos.includes(caso.id)}
             onFavorito={() => alternarFavorito(caso.id)}
             onDialogo={setDialogo}
             onMover={() => setMover(true)}
             onCompletar={() => setCompletar(true)}
+            onNuevaAlternativa={nuevaAlternativa}
+            onVisitas={(visitas) => cambiarCaso({ visitas })}
           />
         )}
       </div>
@@ -886,7 +1043,7 @@ export function TreatmentPlanSection() {
           onClose={() => setDialogo(null)}
           onConfirm={() => {
             const nuevo = ESTADO_TRAS[dialogo]
-            if (nuevo) setEstados((e) => ({ ...e, [caso.id]: nuevo }))
+            if (nuevo) cambiarCaso({ estado: nuevo })
             aviso.ok(`${DIALOGOS[dialogo].titulo} confirmed.`)
           }}
         />

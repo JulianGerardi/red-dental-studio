@@ -2,7 +2,7 @@ import { Component as ComponenteReact, createContext, useContext, useEffect, use
 import { composeStory } from '@storybook/react-vite'
 import { UNSAFE_LocationContext } from 'react-router-dom'
 import {
-  Activity, AppWindow, BarChart3, ChevronsRight, CircleAlert, CircleCheck, CircleUser, Columns3, Component, Contact, DoorOpen, Ellipsis, Info, ListOrdered, TriangleAlert, Upload, CalendarClock, CalendarDays, CalendarRange, Clock, CreditCard, Wallet, X, Download, FileText, Heading, IdCard, Inbox, ListChecks,
+  Activity, AppWindow, BarChart3, ChevronsRight, CircleUser, Columns3, Component, Contact, DoorOpen, Ellipsis, Info, ListOrdered, Upload, CalendarClock, CalendarDays, CalendarRange, Clock, CreditCard, Wallet, X, Download, FileText, Heading, IdCard, Inbox, ListChecks,
   Mail, MapPin, Minus, MousePointerClick, PanelsTopLeft, Pencil, Phone, Plus, Save, Search, Send, Settings, Shield, SquareStack,
   Pill as PillIcon, Smile, Table, Tag, TextCursorInput, ToggleRight, Trash2, Type, Users, type LucideIcon,
 } from 'lucide-react'
@@ -46,6 +46,7 @@ import { Topbar } from '@/components/layout/Topbar'
 import { HelpProvider } from '@/components/help/HelpProvider'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import { ALERT_TONES } from '@/components/ui/alert'
 
 /* Los bloques del constructor. Cada uno sabe dibujarse con el componente
    real de la app (`VerBloque`) y escribir su código (`codigoBloque`), uno al
@@ -274,13 +275,8 @@ const FILAS: PatientRow[] = [
   { id: 'p5', name: 'John Smith', initials: 'JS', birthday: '21/01/1983', email: 'john.smith@mail.com', status: 'Inactive' },
 ]
 
-/* El aviso en los colores de los estados de la app (los mismos que Pill). */
-export const ALERTAS: Record<Tono, { caja: string; color: string; icono: LucideIcon; nombre: string }> = {
-  info: { caja: 'border-dash-busy-fg/25 bg-info-bg', color: 'text-dash-busy-fg', icono: Info, nombre: 'Info' },
-  success: { caja: 'border-dash-ok-fg/25 bg-dash-ok-bg', color: 'text-dash-ok-fg', icono: CircleCheck, nombre: 'CircleCheck' },
-  warning: { caja: 'border-warn-fg/25 bg-warn-bg', color: 'text-warn-fg', icono: TriangleAlert, nombre: 'TriangleAlert' },
-  danger: { caja: 'border-dash-bad-fg/25 bg-dash-bad-bg', color: 'text-dash-bad-fg', icono: CircleAlert, nombre: 'CircleAlert' },
-}
+/* El aviso en los colores de los estados de la app: los tonos de `ui/alert`. */
+export const ALERTAS = ALERT_TONES
 const iniciales = (nombre: string) => nombre.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join('')
 const CLASE_BUSCADOR = 'focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none'
 
