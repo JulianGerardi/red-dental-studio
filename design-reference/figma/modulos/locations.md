@@ -375,3 +375,10 @@ sin tope de ancho. El contenido no cambió: las mismas tres cards, los mismos
 catálogos de `location-options.ts`. `Employees.tsx` cambió el botón "+ New
 Employee" de `onClick` con estado local a `Link`, igual que "+ New location"
 en su momento.
+
+## "New Location" pasa a drawer (2026-10-06)
+
+Misma regla que New Employee: `components/settings/NewLocationDrawer.tsx`, lg, pasos **General**, **Contact** y
+**Address**, mismos campos y catálogos que la pantalla anterior. `/settings/locations/new` abre la lista con el drawer
+abierto. La locación nueva entra primera en la tabla. Next Step valida sólo el paso a la vista (`lib/useFormPasos`).
+Design system: *Components / Settings / NewLocationDrawer*.

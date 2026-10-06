@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Bloque, Lienzo, Tabla } from '@/design-system/kit'
 import { Bold, List } from 'lucide-react'
 import { PROGRESO_INICIAL, WORKFLOWS, type Narrativa, type ProgresoWorkflow } from '@/data/workflows'
 import { BotonFormato, NarrativeEditor } from './NarrativeEditor'
@@ -16,13 +17,30 @@ function Editor({ wf, inicial }: { wf: typeof CC; inicial?: ProgresoWorkflow }) 
 const meta = {
   title: 'Components/Clinical/NarrativeEditor',
   component: NarrativeEditor,
-  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 760 } } },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      story: { inline: false, iframeHeight: 760 },
+      description: {
+        component: [
+          "El **AI Narrative Editor** de Treatment (Clinical Mode): arma la narrativa clínica con lo contestado y guardado en un workflow, como red.dev. Se abre con *Generate Narrative* (o *Edit Narrative* si ya hay una) y es un drawer xl.",
+          "",
+          "**Flujo:** al abrir genera el borrador (skeleton mientras tanto) y lo guarda solo como *Original Clinical Draft*. Se edita con la barra de formato; *Apply Changes* se habilita recién al editar. Descartar o regenerar encima de cambios pide confirmación.",
+          "",
+          "**Probalo:** en *Playground* editá el texto y aplicá los cambios.",
+        ].join('\n'),
+      },
+    },
+  },
 } satisfies Meta<typeof NarrativeEditor>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 const args = { wf: CC, open: true, onClose: () => {}, onGuardar: () => {} }
+
+/* El editor vivo con Chief Complaint contestado. */
+export const Playground: Story = { args, render: () => <Editor wf={CC} inicial={PROGRESO_INICIAL['chief-complaint']} /> }
 
 /* Se abre generando (skeleton de loading) y deja el "Original Clinical Draft" con lo contestado en Chief Complaint.
    Apply Changes queda disabled hasta editar. */
@@ -48,5 +66,59 @@ export const FormatButtons: Story = {
       <BotonFormato etiqueta="Title" onClick={() => {}} />
       <BotonFormato etiqueta="List" icono={List} onClick={() => {}} disabled />
     </div>
+  ),
+}
+
+/* Las partes del editor. */
+export const Parts: Story = {
+  args,
+  parameters: { layout: 'padded', controls: { disable: true }, docs: { story: { inline: true } } },
+  render: () => (
+    <Lienzo>
+      <Bloque titulo="Parts">
+        <Tabla encabezado={["Part", "What it does"]} minimo={560}>
+          <tr><td className="font-semibold">Status</td><td>Original Clinical Draft (generado y guardado solo) o Edited narrative (aplicada), con la fecha.</td></tr>
+          <tr><td className="font-semibold">Format bar</td><td>Bold, Title, Subtitle, Text y List. Deshabilitada mientras genera.</td></tr>
+          <tr><td className="font-semibold">Editor</td><td>El texto con títulos por paso guardado y la lista de preguntas y respuestas.</td></tr>
+          <tr><td className="font-semibold">Footer</td><td>Discard o Regenerate a la izquierda; Apply Changes a la derecha.</td></tr>
+        </Tabla>
+      </Bloque>
+    </Lienzo>
+  ),
+}
+
+/* Los estados del editor; cada uno tiene su story. */
+export const States: Story = {
+  args,
+  parameters: { layout: 'padded', controls: { disable: true }, docs: { story: { inline: true } } },
+  render: () => (
+    <Lienzo>
+      <Bloque titulo="States">
+        <Tabla encabezado={["State", "When", "Story"]} minimo={560}>
+          <tr><td className="font-semibold">Loading</td><td>Generando el borrador: skeleton y barra deshabilitada.</td><td>Draft (al abrir)</td></tr>
+          <tr><td className="font-semibold">Draft</td><td>Borrador generado; Apply Changes disabled hasta editar.</td><td>Draft</td></tr>
+          <tr><td className="font-semibold">Edited</td><td>Hay cambios sin aplicar: Apply Changes habilitado; descartar o regenerar pide confirmación.</td><td>—</td></tr>
+          <tr><td className="font-semibold">Applied</td><td>La narrativa editada quedó guardada en el workflow.</td><td>Edited</td></tr>
+          <tr><td className="font-semibold">Empty</td><td>No hay pasos guardados: aviso de error y nada que resumir.</td><td>No Answers</td></tr>
+        </Tabla>
+      </Bloque>
+    </Lienzo>
+  ),
+}
+
+/* Medidas y reglas. */
+export const Specs: Story = {
+  args,
+  parameters: { layout: 'padded', controls: { disable: true }, docs: { story: { inline: true } } },
+  render: () => (
+    <Lienzo>
+      <Bloque titulo="Specs" nota="Lo común a todos los drawers está en Components / UI / Drawer.">
+        <Tabla encabezado={["Item", "Value"]} minimo={560}>
+          <tr><td className="font-semibold">Size</td><td>xl · 760px</td></tr>
+          <tr><td className="font-semibold">Generation</td><td>900ms de skeleton; el borrador se arma con borradorNarrativa de data/workflows.ts.</td></tr>
+          <tr><td className="font-semibold">Saved</td><td>En el workflow: la tarjeta de resumen de Treatment muestra el texto y Edit Narrative lo reabre.</td></tr>
+        </Tabla>
+      </Bloque>
+    </Lienzo>
   ),
 }

@@ -61,3 +61,8 @@ resto es la misma receta: nuevo `Topic` en `topics.ts`, nueva mini-demo en
 `settings-menu` (Sidebar). Los temas sin ancla -por ejemplo los que explican
 un concepto en vez de un control puntual- no dibujan spotlight, sólo abren la
 tarjeta con la demo.
+
+## Títulos alineados (2026-10-06)
+
+Help usa `PageTitle` (20px Semibold) con la bajada de 12px, como las demás pantallas (antes 24px Bold). Confibot titula
+como los drawers: 18px Bold y bajada de 12px; los rótulos en mayúsculas pasan a 11px.

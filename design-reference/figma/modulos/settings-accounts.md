@@ -103,3 +103,13 @@ Locations, Employee, Ledger**. Vuelve como `SearchButton`
 Accounts y en el buscador de Transactions del Ledger de paciente repite el
 `onClick={() => setPagina(1)}` original; en Locations, Employees y Patients
 -que no paginan- hace foco en el campo en vez de no hacer nada.
+
+## New Account y Manage licenses, como drawers (2026-10-06)
+
+- **New Account** (antes un toast "coming soon"): `NewAccountDrawer`, lg, con los pasos de las pestañas de Edit
+  Account: **Information** (General y Contact), **Address** y **Owner** (con "Copy contact / address from account",
+  tildadas por defecto). La cuenta nueva entra primera, en **Draft**, sin plan ni licencias.
+- **Manage licenses** (antes un toast): `ManageLicensesDrawer`, md, un paso: plan, suscripción, vencimiento y en uso;
+  el total no puede bajar de las licencias en uso; sin plan avisa y Save queda deshabilitado.
+- **Edit account** lleva a la cuenta (`/settings/accounts/:id`), como en Confidentally 2.0.
+- Títulos: Settings usa `PageTitle` (20px Semibold) y la bajada de 12px, como el resto de las pantallas.

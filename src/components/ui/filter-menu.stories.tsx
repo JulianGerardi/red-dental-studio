@@ -2,6 +2,8 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { CircleAlert, ClipboardList, Siren, Stethoscope } from 'lucide-react'
 import { FilterMenu, FilterOptionLabel, FilterTrigger } from './filter-menu'
+import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
+import { SearchButton } from '@/components/ui/search-button'
 import { Bloque, ConRotulo, Lienzo, Muestras, Tabla, useMedidas } from '@/design-system/kit'
 import { esperar } from '@/design-system/play'
 import { userEvent, within } from 'storybook/test'
@@ -20,6 +22,8 @@ const meta = {
           '**El botón** es siempre el mismo: ícono, "Filter" y, con filtros aplicados, azul con la cantidad. **El menú** tiene grupos de varias opciones (casillas) o de una (radio), cada opción con su cantidad y, si es un estado, el punto de su color; búsqueda opcional y Clear all. Se aplica al tocar.',
           '',
           '**Tamaños:** md (36px) junto a buscadores; sm (28px) en encabezados de cards y paneles.',
+          '',
+          '**En una barra de herramientas** Columns usa el mismo botón (`filterTriggerClasses`): en el Ledger y en las tablas, Filter y Columns tienen el mismo alto, letra y borde, y los dos se pintan de azul cuando algo está aplicado.',
           '',
           '**Probalo:** en *Playground* cambiá el tipo de filtro, el tamaño y las cantidades desde *Controls*.',
         ].join('\n'),
@@ -145,6 +149,15 @@ export const Specs: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
     <Lienzo>
+      <Bloque titulo="In a toolbar" nota="El buscador primero, después Filter y las demás herramientas con el mismo botón (Columns). Así se ve la barra del Ledger.">
+        <div className="flex h-48 flex-wrap items-start gap-3">
+          <input aria-label="Search" placeholder="Search by code, description or provider" className="h-9 w-[260px] rounded-md border border-line bg-white px-3 text-[13px] placeholder:text-ink-faint" />
+          <SearchButton onClick={() => {}} className="h-9" />
+          <FilterTrigger />
+          <ColumnPicker columnas={[{ id: 'fecha', label: 'Date', bloqueada: true }, { id: 'monto', label: 'Amount' }]} ocultas={[]} onToggle={() => {}} onReset={() => {}} />
+          <ColumnPicker columnas={[{ id: 'fecha', label: 'Date', bloqueada: true }, { id: 'monto', label: 'Amount' }]} ocultas={['monto']} onToggle={() => {}} onReset={() => {}} />
+        </div>
+      </Bloque>
       <Bloque titulo="Trigger" nota="Medidas leídas del botón dibujado. El menú mide 248px de ancho.">
         <Tabla encabezado={['Size', 'Sample', 'Height', 'Padding', 'Text', 'Icon', 'Radius']} minimo={720}>
           <Medida size="md" count={0} />

@@ -369,3 +369,8 @@ Las tres metricas comparten el celeste y el azul de Appointments. El frame le
 daba un color distinto a cada una -naranja y violeta-, y eso leia como si el
 color dijera algo: son el mismo tipo de dato del mismo dia, asi que el color no
 las distingue, solo las agrupa. Queda como **desviacion deliberada**.
+
+## Pending Task sin hueco al final (2026-10-06)
+
+Las 8 tareas del día en tres columnas dejaban la última fila con dos y un hueco blanco a la derecha. Desde 1360px van
+cuatro columnas (4 × 2); más angosto siguen tres, porque con cuatro se cortaba el nombre del paciente.

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PageTitle } from '@/components/ui/page-title'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { MODULES, TOPICS, type ModuleId, type Topic } from '@/components/help/topics'
 import { useHelp } from '@/components/help/HelpProvider'
@@ -22,8 +23,8 @@ export default function Help() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-ink">What can we help you with?</h1>
-      <p className="mt-1 text-sm text-ink-muted">Pick a topic and we'll take you to the screen it lives on, and explain it there.</p>
+      <PageTitle>What can we help you with?</PageTitle>
+      <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">Pick a topic and we'll take you to the screen it lives on, and explain it there.</p>
 
       <div className="mt-5 flex flex-col gap-3">
         {MODULES.map((m) => {

@@ -36,11 +36,12 @@ const meta = {
           '- **Expandido:** no hay tooltips, el nombre ya se ve.',
           '- **Ítem activo:** azul con texto blanco, según la pantalla en la que estás.',
           '- **Settings:** queda abajo, en el mismo lugar colapsado y expandido. Al pasar el mouse abre un menú flotante con sus secciones.',
+          '- **Billing:** al pasar el mouse (o con su flecha) abre al costado un menú con Billing, Fee Schedules, Carriers y Coverage Table. Queda activo en Billing y en esas tres tablas.',
           '- **En el celular:** el menú es un panel que tapa el contenido y se cierra solo al elegir una pantalla.',
           '',
           'El menú del paciente está en *Elements / Patient menu*.',
           '',
-          '**Probalo:** en *Playground* elegí la pantalla y usá el botón de la barra de arriba; pasá el mouse por los íconos y por Settings.',
+          '**Probalo:** en *Playground* elegí la pantalla y usá el botón de la barra de arriba; pasá el mouse por los íconos, por Billing y por Settings.',
         ].join('\n'),
       },
     },
@@ -78,6 +79,7 @@ export const Collapsed = historia('Collapsed', { expanded: false }, ['screen'])
 export const Expanded = historia('Expanded', { expanded: true }, ['screen'])
 export const CollapsedTooltip = historia('Collapsed: tooltip on hover', { preview: { tooltip: 'Scheduling' } })
 export const SettingsMenu = historia('Settings menu', { screen: 'Settings / Accounts', preview: { settingsMenu: true } })
+export const BillingMenu = historia('Billing menu', { screen: 'Billing', preview: { billingMenu: true } })
 export const ActiveItem = historia('Active item', { screen: 'Scheduling', expanded: true }, ['screen', 'expanded'])
 
 /* En el celular el menú es un panel: se abre con el botón de arriba. */

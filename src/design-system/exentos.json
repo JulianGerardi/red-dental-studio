@@ -13,5 +13,6 @@
   "components/clinical/dental/BotoneraDientes.tsx": "Maneja la selección de la librería del odontograma (sus botones y sus piezas en el DOM). Se ve en Components / Clinical / DentalAssessmentExam.",
   "components/clinical/OdontogramEmbed.tsx#EnBarra": "Mueve nodos adentro de la barra que crea la librería del odontograma. Se ve dentro de Components / Clinical / DentalAssessmentExam.",
   "components/patients/PendingDocuments.tsx#IconoDoc": "Pieza interna de cada fila (el ícono del documento en el color de lo que le falta). Se ve en Components / Patients / PendingDocuments.",
-  "components/clinical/WorkflowsContext.tsx": "Estado compartido de los workflows (provider y hook), sin interfaz propia. Se ve en Components / Clinical / TreatmentPanel y en los badges CC / TR del header."
+  "components/clinical/WorkflowsContext.tsx": "Estado compartido de los workflows (provider y hook), sin interfaz propia. Se ve en Components / Clinical / TreatmentPanel y en los badges CC / TR del header.",
+  "components/clinical/TreatmentPanel.tsx#MenuProcedimiento": "El menú de una fila de procedimiento (Open in Treatment Plan). Se ve en Components / Clinical / Treatment plans card."
 }

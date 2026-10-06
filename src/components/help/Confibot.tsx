@@ -85,13 +85,13 @@ export function Confibot({
       <div className="motion-safe:[animation:sheet-in_220ms_ease-out] flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-white shadow-[0_8px_28px_rgb(0_0_0/0.18)] sm:max-w-[400px] sm:rounded-2xl">
         <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-line sm:hidden" />
 
-        <div className="flex items-center gap-2 border-b border-line px-4 py-3">
-          <span className="bg-dash-count-bg text-dash-blue flex size-8 shrink-0 items-center justify-center rounded-full">
+        <div className="flex items-center gap-3 border-b border-line px-4 py-3.5">
+          <span className="bg-dash-count-bg text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-full">
             <Bot className="size-4" />
           </span>
           <span className="min-w-0">
-            <span className="block text-sm font-bold text-ink">Confibot</span>
-            <span className="block text-[11px] text-ink-faint">Here to explain the app</span>
+            <span className="block text-[18px] leading-tight font-bold text-ink">Confibot</span>
+            <span className="mt-0.5 block text-[12px] text-ink-muted">Here to explain the app</span>
           </span>
           <button
             type="button" aria-label="Close Confibot" onClick={onClose}
@@ -107,7 +107,7 @@ export function Confibot({
           </div>
 
           {preguntas > 0 && (
-            <span className="flex items-center gap-2 pt-1 text-[10px] font-semibold tracking-wide text-line-strong uppercase">
+            <span className="flex items-center gap-2 pt-1 text-[11px] font-semibold tracking-wide text-ink-faint uppercase">
               <span className="h-px flex-1 bg-line" /> Your questions <span className="h-px flex-1 bg-line" />
             </span>
           )}
@@ -129,7 +129,7 @@ export function Confibot({
                       className="group flex w-full items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 text-left hover:border-dash-blue"
                     >
                       <span className="min-w-0 flex-1">
-                        <span className="text-dash-blue block text-[10px] font-semibold tracking-wide uppercase">{mod?.label}</span>
+                        <span className="text-dash-blue block text-[11px] font-semibold tracking-wide uppercase">{mod?.label}</span>
                         <span className="block truncate text-[13px] font-semibold text-ink">{t.title}</span>
                       </span>
                       <ChevronRight className="group-hover:text-dash-blue size-3.5 shrink-0 text-ink-faint" />
@@ -148,7 +148,7 @@ export function Confibot({
           )}
 
           <div className="flex flex-col gap-1.5 pt-1">
-            <span className="text-dash-blue flex items-center gap-1.5 text-[11px] font-semibold">
+            <span className="text-dash-blue flex items-center gap-1.5 text-[12px] font-semibold">
               <Sparkles className="size-3" /> {preguntas === 0 ? 'Try one of these' : 'Or pick another'}
             </span>
             {SUGERENCIAS.map((s) => (

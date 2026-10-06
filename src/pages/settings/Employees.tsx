@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { PageTitle } from '@/components/ui/page-title'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   Search, CirclePlus, Trash2, FileText, Pencil, Ban,
 } from 'lucide-react'
@@ -19,7 +20,8 @@ import { LinkExistingPerson } from '@/components/settings/LinkExistingPerson'
 import { NewHoursModal } from '@/components/settings/NewHoursModal'
 import { Pill } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { buttonClasses } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
+import { NewEmployeeDrawer } from '@/components/settings/NewEmployeeDrawer'
 import { DataTable, PersonCell, TextCell } from '@/components/ui/data-table'
 import { Tabs } from '@/components/ui/tabs'
 
@@ -40,7 +42,11 @@ export function ProviderPill({ si }: { si: boolean }) {
   return <Pill tone={si ? 'info' : 'neutral'}>{si ? 'Yes' : 'No'}</Pill>
 }
 
-export function SettingsEmployees() {
+/* `nuevo`: la ruta /settings/team/new abre la lista con el drawer de New Employee ya abierto. */
+export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
+  const navigate = useNavigate()
+  const [creando, setCreando] = useState(nuevo)
+  const cerrar = () => { setCreando(false); if (nuevo) navigate('/settings/team', { replace: true }) }
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(EMPLEADOS)
   const [seleccion, setSeleccion] = useState<string[]>([])
@@ -74,9 +80,9 @@ export function SettingsEmployees() {
         titulo="Employees"
         bajada="Everyone with access to the practice, across every location."
         accion={(
-          <Link to="/settings/team/new" data-tour="set-team" className={buttonClasses()}>
+          <Button data-tour="set-team" onClick={() => setCreando(true)}>
             <CirclePlus /> New Employee
-          </Link>
+          </Button>
         )}
       >
         <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
@@ -148,6 +154,16 @@ export function SettingsEmployees() {
           )}
         />
       </div>
+
+      {creando && (
+        <NewEmployeeDrawer
+          onClose={cerrar}
+          onGuardar={(e) => {
+            setFilas((p) => (p.some((x) => x.id === e.id) ? p : [e, ...p]))
+            aviso.ok(`${e.nombre} was added to your employees.`)
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -201,9 +217,7 @@ export function SettingsEmployeeDetail() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-ink">
-        {tab === 'Employee' ? 'Employee Information' : tab}
-      </h1>
+      <PageTitle>{tab === 'Employee' ? 'Employee Information' : tab}</PageTitle>
       <p className="mt-1 text-sm text-ink-muted">Set your employee information. Update roles and hours.</p>
 
       <Tabs

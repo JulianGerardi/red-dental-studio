@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Bloque, Lienzo, Tabla } from '@/design-system/kit'
 import { ConfirmDialog } from './confirm-dialog'
 import { Button } from './button'
 
@@ -44,3 +45,44 @@ function Demo({ title, text, confirmLabel, tone }: Args) {
 
 export const Playground: Story = { render: (args) => <Demo {...args} /> }
 export const Primary: Story = { args: { title: 'Back to permanent dentition?', text: 'What was marked on the primary teeth is cleared.', confirmLabel: 'Switch to permanent', tone: 'primary' }, render: (args) => <Demo {...args} /> }
+
+/* Las partes de la confirmación. */
+export const Parts: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Lienzo>
+      <Bloque titulo="Parts">
+        <Tabla encabezado={["Part", "What it does"]} minimo={560}>
+          <tr><td className="font-semibold">Question</td><td>El título es la pregunta: Discard and close?</td></tr>
+          <tr><td className="font-semibold">Text</td><td>Qué pasa si se confirma.</td></tr>
+          <tr><td className="font-semibold">Buttons</td><td>Cancel y la acción con su verbo; danger en rojo.</td></tr>
+        </Tabla>
+      </Bloque>
+    </Lienzo>
+  ),
+}
+
+/* Medidas y dónde se usa. */
+export const Specs: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Lienzo>
+      <Bloque titulo="Specs">
+        <Tabla encabezado={["Item", "Value"]} minimo={560}>
+          <tr><td className="font-semibold">Width</td><td>420px, centrada.</td></tr>
+          <tr><td className="font-semibold">Title</td><td>16px Bold</td></tr>
+          <tr><td className="font-semibold">Text</td><td>13px</td></tr>
+        </Tabla>
+      </Bloque>
+      <Bloque titulo="Where" nota="Todo lo demás es un drawer.">
+        <Tabla encabezado={["Question", "Tone"]} minimo={560}>
+          <tr><td className="font-semibold">Discard and close? (odontograma)</td><td>danger</td></tr>
+          <tr><td className="font-semibold">Back to permanent dentition?</td><td>primary</td></tr>
+          <tr><td className="font-semibold">Clear the tooth selection</td><td>danger</td></tr>
+          <tr><td className="font-semibold">Discard, Expire, Cancel, Present, Accept del caso</td><td>danger o primary según la acción</td></tr>
+          <tr><td className="font-semibold">Confirm procedure</td><td>primary</td></tr>
+        </Tabla>
+      </Bloque>
+    </Lienzo>
+  ),
+}

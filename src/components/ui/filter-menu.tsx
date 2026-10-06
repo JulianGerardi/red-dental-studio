@@ -37,6 +37,14 @@ const TAMANO = {
   md: 'h-9 gap-2 px-3 text-[13px] [&_svg]:size-4',
 } as const
 
+/* El aspecto del botón del filtro. Lo comparten los otros botones de herramientas de una tabla (Columns), para que la
+   fila se vea pareja. */
+export const filterTriggerClasses = (size: keyof typeof TAMANO = 'md', aplicado = false) => cn(
+  'focus-visible:outline-dash-blue inline-flex shrink-0 items-center rounded-md border font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors disabled:pointer-events-none disabled:opacity-50',
+  TAMANO[size],
+  aplicado ? 'border-dash-blue bg-info-bg text-dash-blue' : 'data-[state=open]:border-dash-blue border-line bg-white text-ink hover:bg-surface-subtle',
+)
+
 /* El botón del filtro. Solo, sin menú, sirve para los filtros que todavía no filtran. */
 export const FilterTrigger = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement> & {
   /** Cuántos filtros hay aplicados; con 1 o más el botón se pinta de azul. */
@@ -49,12 +57,7 @@ export const FilterTrigger = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<
     ref={ref}
     type="button"
     aria-label={count ? `${label} (${count} applied)` : label}
-    className={cn(
-      'focus-visible:outline-dash-blue inline-flex shrink-0 items-center rounded-md border font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors disabled:pointer-events-none disabled:opacity-50',
-      TAMANO[size],
-      count ? 'border-dash-blue bg-info-bg text-dash-blue' : 'data-[state=open]:border-dash-blue border-line bg-white text-ink hover:bg-surface-subtle',
-      className,
-    )}
+    className={cn(filterTriggerClasses(size, count > 0), className)}
     {...props}
   >
     <ListFilter aria-hidden />

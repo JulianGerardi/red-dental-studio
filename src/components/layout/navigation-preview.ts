@@ -10,6 +10,8 @@ export type NavigationPreviewState = {
   tooltip?: string
   /** Menú flotante de Settings abierto. */
   settingsMenu?: boolean
+  /** Menú flotante de Billing abierto. */
+  billingMenu?: boolean
 }
 
 export const NavigationPreview = createContext<NavigationPreviewState>({})

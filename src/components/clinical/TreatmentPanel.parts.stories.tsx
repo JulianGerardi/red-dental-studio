@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { WORKFLOWS, PROGRESO_INICIAL, type CategoriaWorkflow, type Valor } from '@/data/workflows'
-import { FiltrosAplicados, NarrativeSummary, QuestionBlock, TreatmentPlansCard, WorkflowCard, WorkflowProgress, type Filtros as TipoFiltros } from './TreatmentPanel'
+import { FiltrosAplicados, NarrativeSummary, QuestionBlock, WorkflowCard, WorkflowProgress, type Filtros as TipoFiltros } from './TreatmentPanel'
 
 const meta = {
   title: 'Components/Clinical/TreatmentPanel parts',
@@ -68,4 +68,4 @@ export const Narrative: Story = {
   ),
 }
 
-export const TreatmentPlans: Story = { render: () => <div className="w-[311px]"><TreatmentPlansCard /></div> }
+/* La card Treatment plans del workflow tiene su propia página: Components / Clinical / Treatment plans card. */

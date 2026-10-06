@@ -715,7 +715,7 @@ export function VistaCaso({
           <TooltipProvider delayDuration={150}>
             <span className="ml-auto flex shrink-0 items-center gap-3">
               {planificando && (
-                <Button size="sm" onClick={onNuevaAlternativa}>
+                <Button onClick={onNuevaAlternativa}>
                   <Plus /> New Alternative Case
                 </Button>
               )}

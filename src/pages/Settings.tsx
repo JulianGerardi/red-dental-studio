@@ -1,4 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom'
+import { PageTitle } from '@/components/ui/page-title'
 import { cn } from '@/lib/utils'
 import { ANCHO_PAGINA } from '@/lib/estilos'
 import {
@@ -33,33 +34,25 @@ function migasDe(pathname: string): Miga[] {
     (n) => pathname === n.to || pathname.startsWith(`${n.to}/`),
   )
   if (item) {
-    const hoja = pathname === item.to
+    /* .../new es la lista con el drawer de alta abierto. */
+    const hoja = pathname === item.to || pathname === `${item.to}/new`
     migas.push({ label: item.label, to: hoja ? undefined : item.to })
     const hijo = item.children?.find((c) => pathname.startsWith(c.to))
     if (hijo) migas.push({ label: hijo.label })
   }
 
   /* El detalle de una locación o de un empleado no está en el menú: su
-     nombre es el último tramo y sale del id de la ruta. "new" no es un id de
-     locación real -por eso va antes, si no el fallback de abajo mostraría
-     "new" como si fuera el nombre de una locación inexistente-. */
-  if (pathname === '/settings/locations/new') {
-    migas.push({ label: 'New Location' })
-  } else {
-    const detalleLoc = pathname.match(/^\/settings\/locations\/([^/]+)$/)
-    if (detalleLoc) {
-      const loc = LOCACIONES.find((l) => l.id === detalleLoc[1])
-      migas.push({ label: loc?.nombre ?? detalleLoc[1] })
-    }
+     nombre es el último tramo y sale del id de la ruta. "new" no es un id:
+     es la lista con el drawer de alta abierto. */
+  const detalleLoc = pathname.match(/^\/settings\/locations\/([^/]+)$/)
+  if (detalleLoc && detalleLoc[1] !== 'new') {
+    const loc = LOCACIONES.find((l) => l.id === detalleLoc[1])
+    migas.push({ label: loc?.nombre ?? detalleLoc[1] })
   }
-  if (pathname === '/settings/team/new') {
-    migas.push({ label: 'New Employee' })
-  } else {
-    const detalleEmpleado = pathname.match(/^\/settings\/team\/([^/]+)$/)
-    if (detalleEmpleado) {
-      const emp = EMPLEADOS.find((e) => e.id === detalleEmpleado[1])
-      migas.push({ label: emp?.nombre ?? detalleEmpleado[1] })
-    }
+  const detalleEmpleado = pathname.match(/^\/settings\/team\/([^/]+)$/)
+  if (detalleEmpleado && detalleEmpleado[1] !== 'new') {
+    const emp = EMPLEADOS.find((e) => e.id === detalleEmpleado[1])
+    migas.push({ label: emp?.nombre ?? detalleEmpleado[1] })
   }
   const detalleCuenta = pathname.match(/^\/settings\/accounts\/([^/]+)$/)
   if (detalleCuenta) {
@@ -94,8 +87,8 @@ export function SettingsLayout() {
 export function SettingsGeneral() {
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-4xl font-bold">Settings</h1>
-      <p className="text-muted-foreground mt-2">Configure and manage your workspace preferences.</p>
+      <PageTitle>Settings</PageTitle>
+      <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">Configure and manage your workspace preferences.</p>
 
       <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {SETTINGS_SECTIONS.map((s) => {
@@ -114,7 +107,7 @@ export function SettingsPlaceholder() {
   const label = [...SETTINGS_NAV].reverse().find((n) => pathname.startsWith(n.to))?.label ?? 'Settings'
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-ink">{label}</h1>
+      <PageTitle>{label}</PageTitle>
       <Card className="mt-6 flex">
         <EmptyState
           title="Coming soon"

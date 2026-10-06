@@ -19,8 +19,8 @@ export function SettingsSectionCard({
         <span className="bg-accent text-primary flex size-11 items-center justify-center rounded-lg">
           <Icon className="size-5" />
         </span>
-        <h2 className="mt-4 text-lg font-bold">{title}</h2>
-        <p className="text-muted-foreground mt-1 text-sm">{description}</p>
+        <h2 className="mt-4 text-[15px] font-bold text-ink">{title}</h2>
+        <p className="mt-1 text-[13px] text-ink-muted">{description}</p>
       </Card>
     </Link>
   )

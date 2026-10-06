@@ -1,4 +1,5 @@
 import { Tabs } from '@/components/ui/tabs'
+import { PageTitle } from '@/components/ui/page-title'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
@@ -370,8 +371,8 @@ export function SettingsLocationDetail() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-ink">{tab === 'Information' ? loc.nombre : tab}</h1>
-      <p className="mt-1 text-sm text-ink-muted">Set your location name. Add the location you need.</p>
+      <PageTitle>{tab === 'Information' ? loc.nombre : tab}</PageTitle>
+      <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">Set your location name. Add the location you need.</p>
 
       <Tabs className="mt-4" aria-label="Location sections" tabs={TABS} value={tab} onChange={setTab} />
 

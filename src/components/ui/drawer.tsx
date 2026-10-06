@@ -24,8 +24,11 @@ export type DrawerSize = keyof typeof ANCHO
 const EnDrawer = React.createContext(false)
 export const useEnDrawer = () => React.useContext(EnDrawer)
 
+/* Hacia dónde se movió el paso: el contenido nuevo entra desde ese lado. */
+const Sentido = React.createContext<1 | -1>(1)
+
 export function Drawer({
-  open, onClose, title, description, steps, step = 0, size = 'md', footer, footerClassName, aside, children, className,
+  open, onClose, title, description, steps, step = 0, stepLabels, size = 'md', footer, footerClassName, aside, children, className,
 }: {
   open: boolean
   onClose: () => void
@@ -36,6 +39,8 @@ export function Drawer({
   steps?: readonly string[]
   /** Paso actual, desde 0. */
   step?: number
+  /** Cada paso dice su nombre en vez de "Step" (New Procedure). */
+  stepLabels?: boolean
   /** md 480 · lg 560 · xl 760, como los anchos de 2.0. */
   size?: DrawerSize
   /** Las acciones del pie, lado a lado y del mismo ancho. */
@@ -47,6 +52,9 @@ export function Drawer({
   className?: string
 }) {
   const conPasos = !!steps && steps.length > 1
+  const anterior = React.useRef(step)
+  const sentido: 1 | -1 = step < anterior.current ? -1 : 1
+  React.useEffect(() => { anterior.current = step }, [step])
   return (
     <DialogPrimitive.Root open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogPrimitive.Portal>
@@ -70,13 +78,15 @@ export function Drawer({
               </DialogPrimitive.Close>
             </div>
             {/* Como en 2.0, cada paso dice "Step" y su número; el nombre lo da el título de la sección. */}
-            {conPasos && <StepIndicator total={steps.length} current={step + 1} className="px-6 pt-6" />}
+            {conPasos && <StepIndicator total={steps.length} current={step + 1} labels={stepLabels ? steps : undefined} className="px-6 pt-6" />}
+            <Sentido.Provider value={sentido}>
             <EnDrawer.Provider value>
               <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
                 {children}
                 {aside && <div className="mt-6 lg:hidden">{aside}</div>}
               </div>
             </EnDrawer.Provider>
+            </Sentido.Provider>
             {footer && (
               <div className={cn('flex items-center gap-3 border-t border-line-soft px-6 py-4 [&>button]:flex-1 [&>div]:flex-1', footerClassName)}>
                 {footer}
@@ -103,9 +113,22 @@ export function DrawerSection({ title, description, children, className }: { tit
 }
 
 /* Una parte de un drawer con pasos. La que no es la actual queda escondida y no se desmonta: lo escrito se conserva al
-   ir y volver. */
+   ir y volver. Al mostrarse entra deslizándose desde el lado hacia el que se avanzó (Next desde la derecha, Return desde
+   la izquierda), junto con el tilde y la línea verde del indicador. */
 export function DrawerStep({ index, step, children, className }: { index: number; step: number; children: React.ReactNode; className?: string }) {
-  return <div hidden={index !== step} className={cn('flex flex-col gap-6', className)}>{children}</div>
+  const sentido = React.useContext(Sentido)
+  return (
+    <div
+      hidden={index !== step}
+      className={cn(
+        'flex flex-col gap-6',
+        sentido === 1 ? 'motion-safe:animate-[paso-entra_260ms_ease-out]' : 'motion-safe:animate-[paso-vuelve_260ms_ease-out]',
+        className,
+      )}
+    >
+      {children}
+    </div>
+  )
 }
 
 /* El pie de un drawer, como en 2.0: a la izquierda Cancel (primer paso) o Return; a la derecha Next Step o, en el

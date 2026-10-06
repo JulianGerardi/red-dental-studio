@@ -20,9 +20,7 @@ import UnderConstruction from '@/pages/UnderConstruction'
 import { SettingsLayout, SettingsGeneral, SettingsPlaceholder } from '@/pages/Settings'
 import { SettingsLocations } from '@/pages/settings/Locations'
 import { SettingsLocationDetail } from '@/pages/settings/LocationDetail'
-import { SettingsNewLocation } from '@/pages/settings/NewLocation'
 import { SettingsEmployees, SettingsEmployeeDetail } from '@/pages/settings/Employees'
-import { SettingsNewEmployee } from '@/pages/settings/NewEmployee'
 import { SettingsAccounts } from '@/pages/settings/Accounts'
 import { SettingsAccount } from '@/pages/settings/Account'
 import { SettingsConsents } from '@/pages/settings/Consents'
@@ -76,10 +74,10 @@ export function AppRoutes() {
           <Route index element={<Navigate to="/settings/general" replace />} />
           <Route path="general" element={<SettingsGeneral />} />
           <Route path="locations" element={<SettingsLocations />} />
-          <Route path="locations/new" element={<SettingsNewLocation />} />
+          <Route path="locations/new" element={<SettingsLocations nuevo />} />
           <Route path="locations/:locId" element={<SettingsLocationDetail />} />
           <Route path="team" element={<SettingsEmployees />} />
-          <Route path="team/new" element={<SettingsNewEmployee />} />
+          <Route path="team/new" element={<SettingsEmployees nuevo />} />
           <Route path="team/:employeeId" element={<SettingsEmployeeDetail />} />
           <Route path="accounts" element={<SettingsAccounts />} />
           <Route path="accounts/:accountId" element={<SettingsAccount />} />

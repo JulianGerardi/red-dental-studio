@@ -150,7 +150,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
             <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
                   onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
           )}
-          <ColumnPicker columnas={columnas} ocultas={ocultas} onToggle={alternarCol} onReset={() => setOcultas([])} />
+          <ColumnPicker size="sm" columnas={columnas} ocultas={ocultas} onToggle={alternarCol} onReset={() => setOcultas([])} />
         </div>
       </div>
 

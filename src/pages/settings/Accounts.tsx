@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Search, Plus, Building2 } from 'lucide-react'
 import { SearchButton } from '@/components/ui/search-button'
 import { FilterMenu } from '@/components/ui/filter-menu'
@@ -9,6 +9,8 @@ import { Pill, type PillTone } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
+import { NewAccountDrawer } from '@/components/settings/NewAccountDrawer'
+import { ManageLicensesDrawer } from '@/components/settings/ManageLicensesDrawer'
 
 /* Settings → Accounts. Ver design-reference/figma/modulos/settings-accounts.md.
 
@@ -74,16 +76,20 @@ const COLUMNAS: DataTableColumn<Cuenta>[] = [
 ]
 
 export function SettingsAccounts() {
+  const navigate = useNavigate()
   const [q, setQ] = useState('')
   const [filtro, setFiltro] = useState<(typeof FILTROS)[number]>('All')
+  const [filas, setFilas] = useState(CUENTAS)
+  const [nueva, setNueva] = useState(false)
+  const [licencias, setLicencias] = useState<Cuenta | null>(null)
 
   const filtradas = useMemo(
-    () => CUENTAS.filter(
+    () => filas.filter(
       (c) =>
         (filtro === 'All' || c.estado === filtro) &&
         `${c.nombre} ${c.plan} ${c.duenos}`.toLowerCase().includes(q.trim().toLowerCase()),
     ),
-    [q, filtro],
+    [filas, q, filtro],
   )
 
   return (
@@ -91,7 +97,7 @@ export function SettingsAccounts() {
       <SettingsPageHeader
         titulo="Accounts overview"
         bajada="View and manage all accounts across the platform."
-        accion={<Button onClick={() => aviso.info('New account — coming soon.')}><Plus /> New Account</Button>}
+        accion={<Button onClick={() => setNueva(true)}><Plus /> New Account</Button>}
       >
         <div className="relative min-w-0 flex-1 sm:max-w-[300px]">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
@@ -107,7 +113,7 @@ export function SettingsAccounts() {
           label="Filter by status"
           groups={[{
             type: 'single', title: 'Status', defaultValue: 'All', value: filtro, onChange: (v) => setFiltro(v as typeof filtro),
-            options: FILTROS.map((f) => ({ value: f, count: f === 'All' ? CUENTAS.length : CUENTAS.filter((c) => c.estado === f).length, tone: f === 'All' ? undefined : ESTADO_TONO[f] })),
+            options: FILTROS.map((f) => ({ value: f, count: f === 'All' ? filas.length : filas.filter((c) => c.estado === f).length, tone: f === 'All' ? undefined : ESTADO_TONO[f] })),
           }]}
         />
       </SettingsPageHeader>
@@ -125,13 +131,30 @@ export function SettingsAccounts() {
           empty={{ icon: Building2, title: 'No accounts', detail: 'Nothing matches the current search or filter.' }}
           rowActions={(c) => (
             <>
-              <DropdownMenuItem onSelect={() => aviso.info(`Editing ${c.nombre}.`)}>Edit account</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => aviso.info(`Licenses for ${c.nombre}.`)}>Manage licenses</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => navigate(`/settings/accounts/${c.id}`)}>Edit account</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setLicencias(c)}>Manage licenses</DropdownMenuItem>
               <DropdownMenuItem variant="destructive" onSelect={() => aviso.warn(`${c.nombre} suspended.`)}>Suspend</DropdownMenuItem>
             </>
           )}
         />
       </div>
+
+      {nueva && (
+        <NewAccountDrawer
+          onClose={() => setNueva(false)}
+          onGuardar={(c) => { setFilas((p) => [c, ...p]); aviso.ok(`${c.nombre} was added as a draft account.`) }}
+        />
+      )}
+      {licencias && (
+        <ManageLicensesDrawer
+          cuenta={licencias}
+          onClose={() => setLicencias(null)}
+          onGuardar={(total) => {
+            setFilas((p) => p.map((x) => (x.id === licencias.id ? { ...x, licencias: total } : x)))
+            aviso.ok(`${licencias.nombre} now has ${total} licenses.`)
+          }}
+        />
+      )}
     </div>
   )
 }

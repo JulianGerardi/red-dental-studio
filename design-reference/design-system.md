@@ -412,6 +412,17 @@ esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Proc
    Discard / Expire / Cancel / Present / Accept del caso, Confirm procedure- y el aviso de Clinical Note.
 7. **No cambian** los desplegables anclados (popovers, calendario, filtros) ni el visor de radiografías.
    `AppointmentDetailsDrawer` es una card anclada al turno y `LinkTreatmentPlanDrawer` no se usa en la app.
+8. **Settings** (2026-10-06, segunda vuelta): New Location y New Employee dejan de ser pantallas aparte (General,
+   Contact, Address; `/settings/locations/new` y `/settings/team/new` abren la lista con el drawer abierto); New Account
+   (Information, Address, Owner, como las pestañas de Edit Account; queda en Draft) y Manage Licenses (un paso; no baja
+   de las licencias en uso, sin plan avisa y no guarda). Next valida sólo el paso a la vista (`lib/useFormPasos`).
+9. **Animación de los pasos**: al completar un paso el tilde rebota, el anillo verde se abre y la línea se llena (la de
+   New Procedure); además el contenido del paso nuevo entra deslizándose desde la derecha con Next y desde la izquierda
+   con Return (`paso-entra` / `paso-vuelve`). **New Procedure conserva los nombres de sus pasos** (Procedure, Surfaces,
+   Link to finding) con `stepLabels`; el resto dice "Step", como en 2.0.
+10. **La línea entre círculos es la misma en todos los drawers**: el rótulo del paso ("Step" o un nombre) va encima
+    del círculo sin ocupar ancho (el primero alineado a la izquierda, el último a la derecha). Antes, los nombres largos
+    de New Procedure acortaban la línea y la despegaban de los círculos.
 
 ## Banner, filtros y Treatment plans (2026-10-06)
 
@@ -420,6 +431,27 @@ esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Proc
   punta a punta con hueco en el medio.
 - **Filtro único** (`ui/filter-menu`, *Elements / Filter*) en toda la app; **el buscador va siempre primero**, en las
   barras (buscador, después Filter) y dentro del menú (la búsqueda arriba de las opciones).
+- **Columns** (`ColumnPicker`) usa el mismo botón que el filtro (`filterTriggerClasses`): en la barra del Ledger y en las
+  tablas, Filter y Columns tienen el mismo alto, letra y borde.
+- **Títulos**: Settings, Help y las fichas de Settings usan `PageTitle` (20px semibold) y la bajada de 12px, como el
+  resto de las pantallas (antes 24px bold y 36px en la home de Settings); Confibot titula como los drawers (18px y 12px).
+- **Menú**: Billing, como Settings, abre al costado un menú con Billing, Fee Schedules, Carriers y Coverage Table.
+- **Pending Task**: cuatro columnas desde 1360px, para que las tareas del día llenen las filas sin hueco.
 - **Cards de Treatment Plan**: en el Overview y en la card *Treatment plans* del workflow quedan las publicadas. Se
   probaron una compacta con anillo de avance y una por visita (un procedimiento por línea); Julián se quedó con las
   actuales porque muestran el detalle de cada procedimiento.
+
+## Cómo se documenta lo nuevo (2026-10-06)
+
+Todo lo que se sumó en esta tanda tiene su página con la estructura de *Elements / Buttons* (Playground primero con
+controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx`; para drawers de formulario,
+`src/design-system/kit-drawer.tsx` con las tablas de pasos, estados y specs):
+
+- *Elements / StepIndicator* (rótulos, animación, la línea de círculo a círculo) y *Components / UI / Drawer*
+  (`stepLabels`, reglas de Next Step, dónde hay pasos).
+- *Components / Settings*: NewLocationDrawer, NewEmployeeDrawer, NewAccountDrawer, ManageLicensesDrawer.
+- *Components / Clinical*: Treatment plans card (opciones A, B y C), TreatmentPanel, NarrativeEditor, ProblemList,
+  TreatmentPlanList y Dental / NewProcedureDrawer.
+- *Elements / Filter* (Columns con el mismo botón) y *Components / Ledger / ColumnPicker*; *Elements / Navigation*
+  (Billing menu); *Components / UI / PageTitle* (la escala de títulos); *Components / Help / Confibot*;
+  *Components / Layout / NotificationBanner*; *Elements / ConfirmDialog*.

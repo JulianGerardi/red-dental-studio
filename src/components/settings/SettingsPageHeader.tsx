@@ -1,3 +1,5 @@
+import { PageTitle } from '@/components/ui/page-title'
+
 /* Encabezado común de las pantallas de Settings. Antes cada una lo armaba
    por su cuenta y el botón principal caía en la fila del buscador, corrido
    del título; acá va alineado con el título y el buscador queda en su
@@ -16,8 +18,8 @@ export function SettingsPageHeader({
     <>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-2xl font-bold text-ink">{titulo}</h1>
-          <p className="mt-1 text-sm text-ink-muted">{bajada}</p>
+          <PageTitle>{titulo}</PageTitle>
+          <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">{bajada}</p>
         </div>
         {accion}
       </div>

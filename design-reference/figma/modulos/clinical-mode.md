@@ -2039,3 +2039,15 @@ Como en red.dev:
    Toda la card abre ese caso en Treatment Plan; *All treatment* abre la
    lista. El icono de documento sigue afuera, como pidio Julian. Endodontic
    Treatment trae la primera visita completa, para que se vea avance.
+
+## Card Treatment plans: dos propuestas más, y los pasos de New Procedure (2026-10-06)
+
+- Julián pidió algo distinto para la card *Treatment plans* del workflow sin perder el detalle de la A. Quedan tres
+  opciones en `TreatmentPlansCard` (`variante`): **A · tarjetas** (la publicada, la que se ve en la app), **B ·
+  progreso** (cada plan en su caja con estado, barra de avance y monto; la pieza encabeza cada procedimiento) y **C ·
+  recorrido** (un plan a la vez con flechas, avance en tramos y los procedimientos en línea de tiempo por visita). Las
+  tres muestran estado, código, nombre, pieza, superficie, proveedor y el menú. Pendiente: que Julián elija. Design
+  system: *Components / Clinical / Treatment plans card*.
+- **New Procedure** conserva los nombres de sus pasos (Procedure, Surfaces, Link to finding) con `stepLabels`; los
+  demás drawers dicen "Step". El rótulo ya no ocupa ancho, así la línea entre círculos es igual en todos.
+- **New Alternative Case** pasa al tamaño normal del botón (36px), como New Case Group y los íconos de al lado.

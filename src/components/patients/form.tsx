@@ -145,12 +145,12 @@ export function SelectField({
           disabled={disabled}
           className={cn(
             control(error),
-            'flex h-9 items-center justify-between px-3 transition-colors',
+            'flex h-9 items-center justify-between gap-2 px-3 transition-colors',
             open && !error && 'border-dash-blue',
             value ? 'text-ink' : 'text-ink-faint',
           )}
         >
-          {value ?? placeholder}
+          <span className="min-w-0 truncate text-left">{value ?? placeholder}</span>
           <ChevronDown className={cn('size-4 shrink-0 text-black transition-transform', open && 'rotate-180')} />
         </button>
         {open && (

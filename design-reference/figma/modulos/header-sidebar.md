@@ -150,3 +150,10 @@ cada pantalla del paciente** -cada página renderiza su propia instancia-.
 Se pasa al mismo mecanismo fuera de React que ya usaba el botón de encuentro
 en ese archivo, y por la misma razón. Verificado: colapsar en Ledger, ir a
 Treatments, sigue en 60px.
+
+## Billing abre su menú flotante (2026-10-06)
+
+Como Settings: al pasar el mouse por Billing (o con su flecha, expandido o en el celular) se abre al costado un menú
+con **Billing**, **Fee Schedules**, **Carriers** y **Coverage Table** (las tablas de Settings → Billing). Billing queda
+activo en `/billing` y en esas tres; Settings deja de marcarse ahí. `BillingItem` en `Sidebar.tsx`, con la lógica de
+abrir y cerrar compartida (`useFlotante`). Design system: *Elements / Navigation → Billing menu*.

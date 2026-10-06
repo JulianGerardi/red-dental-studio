@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Bloque, Lienzo, Tabla } from '@/design-system/kit'
 import { userEvent, within } from 'storybook/test'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { NoteCell, ProblemList, ToothCell } from './ProblemList'
@@ -7,14 +8,28 @@ import { escribir, esperar, secuencia } from '@/design-system/play'
 const meta = {
   title: 'Components/Clinical/ProblemList',
   component: ProblemList,
-  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 560 } } },
+  parameters: {
+    layout: 'padded',
+    docs: {
+      story: { inline: false, iframeHeight: 560 },
+      description: {
+        component: [
+          "La tabla del Overview de Clinical Mode, con las pestañas **Problem List** y **Procedures** como en red.dev, sobre la tabla estándar (Elements / Tables).",
+          "",
+          "**Barra:** el buscador primero y después el filtro de estado (Elements / Filter): Active por defecto en Problem List, All en Procedures. Cambiar un estado desde el menú de la fila se puede deshacer.",
+          "",
+          "**Probalo:** en *Playground* cambiá de pestaña, buscá y filtrá.",
+        ].join('\n'),
+      },
+    },
+  },
 } satisfies Meta<typeof ProblemList>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 /* Problem List con el filtro en Active, como abre en red.dev. */
-export const Default: Story = {}
+export const Playground: Story = {}
 
 /* La otra pestaña: los procedimientos del paciente, con el filtro en All. */
 export const Procedures: Story = {
@@ -56,4 +71,37 @@ export const StatusFilterOpen: Story = {
     await userEvent.click(await within(c.canvasElement).findByRole('button', { name: /filter problems by status/i }))
     await esperar(/clinic declined/i)(c)
   },
+}
+
+/* Estados de la tabla. */
+export const States: Story = {
+  parameters: { layout: 'padded', controls: { disable: true }, docs: { story: { inline: true } } },
+  render: () => (
+    <Lienzo>
+      <Bloque titulo="States">
+        <Tabla encabezado={["State", "When", "Story"]} minimo={560}>
+          <tr><td className="font-semibold">Default</td><td>Problem List con el filtro en Active.</td><td>Playground</td></tr>
+          <tr><td className="font-semibold">Procedures</td><td>La otra pestaña, con el filtro en All.</td><td>Procedures</td></tr>
+          <tr><td className="font-semibold">Empty</td><td>Búsqueda o filtro sin resultados: No problems found.</td><td>No Results</td></tr>
+          <tr><td className="font-semibold">Row menu</td><td>Edit, los cambios de estado (los que cierran, en rojo) y Delete.</td><td>Row Menu</td></tr>
+        </Tabla>
+      </Bloque>
+    </Lienzo>
+  ),
+}
+
+/* Medidas. */
+export const Specs: Story = {
+  parameters: { layout: 'padded', controls: { disable: true }, docs: { story: { inline: true } } },
+  render: () => (
+    <Lienzo>
+      <Bloque titulo="Specs">
+        <Tabla encabezado={["Item", "Value"]} minimo={560}>
+          <tr><td className="font-semibold">Rows per page</td><td>5, con Show para cambiarlo.</td></tr>
+          <tr><td className="font-semibold">Text</td><td>12px, para que entre a 1440 sin scroll.</td></tr>
+          <tr><td className="font-semibold">Note and tooth</td><td>NoteCell muestra la nota en un tooltip; ToothCell la pieza o un guion.</td></tr>
+        </Tabla>
+      </Bloque>
+    </Lienzo>
+  ),
 }

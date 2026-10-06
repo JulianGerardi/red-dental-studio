@@ -5,7 +5,8 @@ import { SearchButton } from '@/components/ui/search-button'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { buttonClasses } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
+import { NewLocationDrawer } from '@/components/settings/NewLocationDrawer'
 import { DataTable, TextCell } from '@/components/ui/data-table'
 
 /* Settings → Locations. La tabla de entrada: nombre, empleados, salas e
@@ -22,8 +23,11 @@ export const LOCACIONES: Locacion[] = [
   { id: 'riverside', nombre: 'Riverside Care', empleados: 4, salas: 2, info: '310 Congress Ave, Austin' },
 ]
 
-export function SettingsLocations() {
+/* `nuevo`: la ruta /settings/locations/new abre la lista con el drawer de New Location ya abierto. */
+export function SettingsLocations({ nuevo = false }: { nuevo?: boolean }) {
   const navigate = useNavigate()
+  const [creando, setCreando] = useState(nuevo)
+  const cerrar = () => { setCreando(false); if (nuevo) navigate('/settings/locations', { replace: true }) }
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(LOCACIONES)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -48,9 +52,9 @@ export function SettingsLocations() {
         titulo="Locations"
         bajada="Set your location name. Add the location you need."
         accion={(
-          <Link to="/settings/locations/new" data-tour="set-locations" className={buttonClasses()}>
+          <Button data-tour="set-locations" onClick={() => setCreando(true)}>
             <Plus /> New location
-          </Link>
+          </Button>
         )}
       >
         <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
@@ -95,6 +99,16 @@ export function SettingsLocations() {
           )}
         />
       </div>
+
+      {creando && (
+        <NewLocationDrawer
+          onClose={cerrar}
+          onGuardar={(l) => {
+            setFilas((p) => [{ id: l.nombre.toLowerCase().replace(/\s+/g, '-'), nombre: l.nombre, empleados: 0, salas: 0, info: l.info }, ...p])
+            aviso.ok(`${l.nombre} was added to your locations.`)
+          }}
+        />
+      )}
     </div>
   )
 }

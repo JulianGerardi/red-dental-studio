@@ -1,7 +1,7 @@
 import { Tabs } from '@/components/ui/tabs'
 import { useEffect, useState } from 'react'
 import { ChevronsLeft, ChevronsRight, Search, X } from 'lucide-react'
-import { Drawer, DrawerActions } from '@/components/ui/drawer'
+import { Drawer, DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { SelectField } from '@/components/patients/form'
 import { SurfaceWheel, type Surface } from './SurfaceWheel'
@@ -131,8 +131,9 @@ export function NewProcedureDrawer({
   )
 
   return (
-    <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New Condition' : 'New Procedure'} steps={pasos} step={paso} footer={footer}>
-      <div>
+    <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New Condition' : 'New Procedure'} steps={pasos} step={paso} stepLabels footer={footer}>
+      {/* Cada paso dice qué se hace (Procedure, Surfaces, Link to finding), como antes. */}
+      <DrawerStep key={actual} index={paso} step={paso}>
         {actual === 'Procedure' && (
           <div className="flex w-full flex-col items-start gap-4">
             <div className="flex w-full flex-col items-start gap-2 border-b border-line pb-4">
@@ -295,7 +296,7 @@ export function NewProcedureDrawer({
             </div>
           </div>
         )}
-      </div>
+      </DrawerStep>
     </Drawer>
   )
 }

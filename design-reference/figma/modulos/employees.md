@@ -27,3 +27,12 @@ a pedir los cuatro campos manuales.
 50 estados y se empareja País/Código (se suma Canadá y México a los dos).
 Mismo catálogo, usado por "New Location", "New Employee" y la pestaña
 Information de una locación.
+
+## "New Employee" vuelve a abrirse encima de la lista, como drawer (2026-10-06)
+
+Julián pidió que todo pop up sea un drawer con los pasos de Confidentally 2.0. New Employee deja de ser una pantalla:
+`components/settings/NewEmployeeDrawer.tsx`, lg, con los pasos **General** (casilla para vincular a alguien que ya
+existe o nombre, nacimiento y email), **Contact** y **Address**. Con la casilla tildada, Next Step queda deshabilitado
+hasta elegir a la persona. `/settings/team/new` sigue existiendo y abre la lista con el drawer abierto; el breadcrumb
+queda en "Employees". El empleado nuevo entra primero en la tabla (al final caía en la página 2). Design system:
+*Components / Settings / NewEmployeeDrawer*.

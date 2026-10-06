@@ -757,3 +757,9 @@ Ahora **Collapse all está desde la primera fila abierta**, y "Expand all" lo
 acompaña sólo mientras queden filas por abrir. `alternarTodas` se parte en
 `expandirTodo` y `colapsarTodo`: un botón que alterna no sirve cuando las
 dos acciones tienen que estar disponibles a la vez.
+
+## Filter y Columns, el mismo botón (2026-10-06)
+
+En la barra, Columns era más bajo (32px), con letra de 12px y gris, al lado de un Filter de 36px: no se veían parejos.
+`ColumnPicker` usa ahora el botón del filtro (`filterTriggerClasses` de `ui/filter-menu`): mismo alto, letra y borde, y
+azul con "visibles/total" cuando hay columnas ocultas. En el encabezado de la tabla de asignación va en tamaño sm.

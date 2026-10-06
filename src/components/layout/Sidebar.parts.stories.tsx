@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Home } from 'lucide-react'
 import { conHelp } from '@/design-system/decorators'
-import { ConTooltip, SettingsItem } from './Sidebar'
+import { BillingItem, ConTooltip, SettingsItem } from './Sidebar'
 
 const meta = { title: 'Components/Layout/Sidebar parts', parameters: { layout: 'padded' }, decorators: [conHelp] } satisfies Meta
 
@@ -22,4 +22,9 @@ export const ItemTooltip: Story = {
 /* El ítem de Settings, con su menú flotante. */
 export const SettingsEntry: Story = {
   render: () => <div className="h-72 w-[234px] p-4"><SettingsItem clase={(a) => `flex items-center rounded-md px-3 py-2 text-sm ${a ? 'bg-dash-blue text-white' : ''}`} mostrarLabel /></div>,
+}
+
+/* El ítem de Billing, con su menú flotante: la pantalla de Billing, Fee Schedules, Carriers y Coverage Table. */
+export const BillingEntry: Story = {
+  render: () => <div className="h-56 w-[234px] p-4"><BillingItem clase={(a) => `flex items-center rounded-md px-3 py-2 text-sm ${a ? 'bg-dash-blue text-white' : ''}`} mostrarLabel forzarAbierto /></div>,
 }

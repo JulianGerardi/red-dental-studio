@@ -131,7 +131,9 @@ export function Sidebar({
           expanded ? '' : 'md:items-center md:gap-[18px]',
         )}
       >
-        {NAV.map(({ to, label, icon: Icon, end }) => (
+        {NAV.map(({ to, label, icon: Icon, end }) => to === '/billing' ? (
+          <BillingItem key={to} clase={item} mostrarLabel={expanded} forzarAbierto={vista.billingMenu} />
+        ) : (
           <ConTooltip key={to} label={label} mostrar={!expanded} abierto={vista.tooltip === label}>
             <NavLink to={to} end={end} aria-label={label} className={item(activa(to, end))}>
               <Icon className="size-4 shrink-0" />
@@ -169,6 +171,87 @@ export function Sidebar({
 }
 
 
+/* Abrir con hover y cerrar con un respiro: si no, el menú desaparece al cruzar el hueco entre el ítem y el panel.
+   Se cierra solo al navegar. */
+function useFlotante(forzarAbierto?: boolean) {
+  const [abiertoPropio, setAbierto] = useState(false)
+  const cierre = useRef<number | null>(null)
+  const { pathname } = useLocation()
+  const abrir = () => {
+    if (cierre.current) window.clearTimeout(cierre.current)
+    setAbierto(true)
+  }
+  const cerrarConDelay = () => {
+    cierre.current = window.setTimeout(() => setAbierto(false), 140)
+  }
+  useEffect(() => setAbierto(false), [pathname])
+  useEffect(() => () => { if (cierre.current) window.clearTimeout(cierre.current) }, [])
+  return { abierto: abiertoPropio || !!forzarAbierto, setAbierto, abrir, cerrarConDelay, pathname }
+}
+
+const PANEL_FLOTANTE = 'motion-safe:animate-[loc-in_120ms_ease-out] z-50 rounded-2xl border border-line bg-white p-2 max-md:mt-2 max-md:max-h-[45svh] max-md:overflow-y-auto md:absolute md:left-full md:ml-2 md:w-[236px] md:shadow-[0_12px_32px_rgb(0_0_0/0.18)]'
+
+/* Billing, como Settings: el ícono abre al costado un menú con la pantalla de Billing y las tablas que la alimentan
+   (Fee Schedules, Carriers, Coverage Table, las mismas de Settings → Billing). */
+const BILLING_MENU = [
+  { to: '/billing', label: 'Billing' },
+  ...(SETTINGS_NAV.find((s) => s.to === '/settings/finance')?.children ?? []),
+]
+
+export function BillingItem({
+  clase,
+  mostrarLabel,
+  forzarAbierto,
+}: {
+  clase: (active: boolean) => string
+  mostrarLabel: boolean
+  forzarAbierto?: boolean
+}) {
+  const { abierto, setAbierto, abrir, cerrarConDelay, pathname } = useFlotante(forzarAbierto)
+  const activo = pathname.startsWith('/billing') || pathname.startsWith('/settings/finance')
+
+  return (
+    <div className={cn('relative', mostrarLabel && 'w-full')} onMouseEnter={abrir} onMouseLeave={cerrarConDelay}>
+      <div className={cn(clase(activo), mostrarLabel && 'md:mx-3')} data-tour="billing-menu">
+        <NavLink to="/billing" aria-label="Billing" className={cn('flex min-w-0 flex-1 items-center gap-3', !mostrarLabel && 'md:justify-center')}>
+          <CreditCard className="size-4 shrink-0" />
+          <span className={cn(mostrarLabel ? '' : 'md:hidden')}>Billing</span>
+        </NavLink>
+        <button
+          type="button"
+          aria-label="Billing menu"
+          aria-expanded={abierto}
+          onClick={() => setAbierto((v) => !v)}
+          className={cn('shrink-0 opacity-60 hover:opacity-100', mostrarLabel ? '' : 'md:hidden')}
+        >
+          <ChevronRight className="size-4" />
+        </button>
+      </div>
+
+      {abierto && (
+        /* Anclado arriba: el ítem está en la parte alta del rail. */
+        <div className={cn(PANEL_FLOTANTE, 'md:top-0')} onMouseEnter={abrir} onMouseLeave={cerrarConDelay}>
+          {BILLING_MENU.map((m) => (
+            <NavLink
+              key={m.to}
+              to={m.to}
+              end
+              className={({ isActive }) =>
+                cn(
+                  'block rounded-lg px-3 py-2 text-sm transition-colors',
+                  isActive ? 'bg-dash-count-bg text-dash-blue-hover font-medium' : 'text-ink hover:bg-surface-muted',
+                )
+              }
+            >
+              {m.label}
+            </NavLink>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* Settings ya no abre un sidebar propio adentro de la sección: sus pantallas
    cuelgan de un menú flotante que sale al costado del ítem, como en el
    ejemplo que pasó Julián. Se abre con hover en escritorio y con clic en el
@@ -182,31 +265,17 @@ export function SettingsItem({
   mostrarLabel: boolean
   forzarAbierto?: boolean
 }) {
-  const [abiertoPropio, setAbierto] = useState(false)
-  const abierto = abiertoPropio || !!forzarAbierto
+  const { abierto, setAbierto, abrir, cerrarConDelay, pathname } = useFlotante(forzarAbierto)
   /* Billing es el único con sub-items: se despliega con su chevron en vez de
      mostrarlos siempre. */
   const [grupo, setGrupo] = useState<string | null>(null)
-  const cierre = useRef<number | null>(null)
-  const { pathname } = useLocation()
-  const activo = pathname.startsWith('/settings')
+  /* Las tablas de Billing se marcan en el ítem de Billing del rail, no acá. */
+  const activo = pathname.startsWith('/settings') && !pathname.startsWith('/settings/finance')
 
-  /* Un respiro antes de cerrar: si no, el menú desaparece al cruzar el hueco
-     entre el ítem y el panel. */
-  const abrir = () => {
-    if (cierre.current) window.clearTimeout(cierre.current)
-    setAbierto(true)
-  }
-  const cerrarConDelay = () => {
-    cierre.current = window.setTimeout(() => setAbierto(false), 140)
-  }
-
-  useEffect(() => setAbierto(false), [pathname])
   useEffect(() => {
     const dentro = SETTINGS_NAV.find((s) => s.children && pathname.startsWith(s.to))
     if (dentro) setGrupo(dentro.to)
   }, [pathname])
-  useEffect(() => () => { if (cierre.current) window.clearTimeout(cierre.current) }, [])
 
   return (
     <div
@@ -245,7 +314,7 @@ export function SettingsItem({
         <div
           /* En el panel mobile no hay lugar al costado: ahí se despliega en
              el mismo lugar, debajo del ítem. */
-          className="motion-safe:animate-[loc-in_120ms_ease-out] z-50 rounded-2xl border border-line bg-white p-2 max-md:mt-2 max-md:max-h-[45svh] max-md:overflow-y-auto md:absolute md:bottom-0 md:left-full md:ml-2 md:w-[236px] md:shadow-[0_12px_32px_rgb(0_0_0/0.18)]"
+          className={cn(PANEL_FLOTANTE, 'md:bottom-0')}
           /* En mobile el ítem vive al pie del panel, así que los once destinos
              nacen abajo del pliegue. Se los trae a la vista al abrir; en
              desktop no hace falta porque el flotante sale al costado. */

@@ -30,7 +30,7 @@ import { CONTENEDOR_PAGINA } from '@/lib/estilos'
    - Las columnas son Appointments · Waiting Room · Rooms, fijas: el toggle
      Provider / Recepcionista ya no está en el diseño.
    - Pending Task bajó a una franja a lo ancho, con las tareas en tres
-     columnas. Los tabs se sacaron: hacían lo mismo que el embudo.
+     columnas (cuatro desde 1360px: con tres, las 8 del día dejaban un hueco; más angosto el nombre se cortaba). Los tabs se sacaron: hacían lo mismo que el embudo.
    - Desapareció el cuarto panel "Rooms" vacío del pie.
 
    **Toda la pantalla cuelga del filtro de fecha** del panel de Appointments:
@@ -273,7 +273,7 @@ export default function Dashboard() {
               }
             />
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 min-[1360px]:grid-cols-4">
               {tareas.map((t, i) => <PendingTaskCard key={i} task={t} />)}
             </div>
           )}

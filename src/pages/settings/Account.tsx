@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PageTitle } from '@/components/ui/page-title'
 import { useParams } from 'react-router-dom'
 import { CreditCard, Crown, Building2 } from 'lucide-react'
 import { Card } from '@/components/settings/primitives'
@@ -83,8 +84,8 @@ export function SettingsAccount() {
 
   return (
     <div className="px-4 py-6 sm:px-8">
-      <h1 className="text-2xl font-bold text-ink">Edit Account</h1>
-      <p className="mt-1 text-sm text-ink-muted">Manage your dental clinic general settings, upload custom graphics, and specify billing parameters.</p>
+      <PageTitle>Edit Account</PageTitle>
+      <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">Manage your dental clinic general settings, upload custom graphics, and specify billing parameters.</p>
 
       <Tabs className="mt-4" aria-label="Account sections" tabs={TABS} value={tab} onChange={setTab} />
 
