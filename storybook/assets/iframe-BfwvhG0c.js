@@ -1,1 +1,0 @@
-import{t as e}from"./iframe-DIYF8Gpw.js";e();
