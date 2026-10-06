@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react'
+import { TARJETA_PANEL } from '@/lib/estilos'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Ban, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen, IdCard,
@@ -163,7 +164,7 @@ export function PatientSidePanel({
 
   return (
     <TooltipProvider delayDuration={150}>
-    <aside className={cn('w-full rounded-lg border border-line bg-white p-4 lg:shrink-0', colapsado ? 'lg:w-[60px] lg:p-2' : 'lg:w-[218px]')}>
+    <aside className={cn(TARJETA_PANEL, 'w-full p-4 lg:shrink-0', colapsado ? 'lg:w-[60px] lg:p-2' : 'lg:w-[218px]')}>
       <button
         type="button"
         onClick={() => setColapsado((v) => !v)}

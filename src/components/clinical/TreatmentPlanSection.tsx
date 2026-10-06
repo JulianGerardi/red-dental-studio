@@ -350,7 +350,7 @@ export function Rail({
   }, [casoId, vista])
 
   return (
-    <nav aria-label="Treatment plans" className="flex shrink-0 flex-col self-start rounded-xl border border-line bg-white p-2 lg:max-h-[720px] lg:w-[300px]">
+    <nav aria-label="Treatment plans" className="flex shrink-0 flex-col self-start rounded-lg bg-white shadow-panel p-2 lg:max-h-[720px] lg:w-[300px]">
       <button
         onClick={onUnassigned}
         aria-current={vista === 'unassigned' ? 'page' : undefined}
@@ -683,7 +683,7 @@ export function VistaCaso({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-xl border border-line bg-white p-4 sm:p-5">
+      <div className="rounded-lg bg-white shadow-panel p-4 sm:p-5">
         {caso.sinPermiso && (
           <Alert tone="warning" title="Limited access to this treatment case" className="mb-4">
             You do not have permission to update treatment plans for this location.
@@ -926,7 +926,7 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
         {vista === 'caso' && <ConsentBlock />}
 
         {vista === 'unassigned' ? (
-          <div className="rounded-xl border border-line bg-white p-4 sm:p-5">
+          <div className="rounded-lg bg-white shadow-panel p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-3">
               <p className="min-w-0 flex-1 text-[17px] font-bold text-ink">Unassigned</p>
               {['New Case Group', 'New Alternative Case'].map((t) => (

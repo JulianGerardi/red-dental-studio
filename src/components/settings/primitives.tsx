@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
    título opcional, y el mismo switch Yes/No. */
 export function Card({ title, children, className }: { title?: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={cn('rounded-xl border border-line bg-white p-4 sm:p-5', className)}>
+    <section className={cn('rounded-lg bg-white shadow-panel p-4 sm:p-5', className)}>
       {title && <h2 className="text-sm font-bold text-ink">{title}</h2>}
       <div className={title ? 'mt-4' : ''}>{children}</div>
     </section>

@@ -33,7 +33,7 @@ export default function Help() {
           const Icon = m.icon
           const abierto = abiertos.includes(m.id)
           return (
-            <div key={m.id} className="overflow-hidden rounded-xl border border-line bg-white">
+            <div key={m.id} className="overflow-hidden rounded-lg bg-white shadow-panel">
               <button
                 type="button" onClick={() => alternar(m.id)} aria-expanded={abierto}
                 className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-surface-subtle"

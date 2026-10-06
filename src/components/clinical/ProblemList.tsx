@@ -142,7 +142,7 @@ export function ProblemList() {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4">
+      <div className="flex flex-col gap-3 rounded-lg bg-white shadow-panel p-4">
         <div className="flex flex-wrap items-center gap-2">
           <Tabs tabs={['Problem List', 'Procedures'] as const} value={pestana} onChange={setPestana} aria-label="Clinical records" />
           <div className="ml-auto flex flex-wrap items-center gap-2">

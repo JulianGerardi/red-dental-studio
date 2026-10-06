@@ -80,7 +80,7 @@ export function ConsentBlock() {
 
   return (
     <div
-      className="@container relative flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-line bg-white py-2 pr-2 pl-4"
+      className="@container relative flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg bg-white shadow-panel py-2 pr-2 pl-4"
       style={{ borderLeftWidth: 3, borderLeftColor: t.bar }}
     >
       <span className="flex min-w-0 items-center gap-2">

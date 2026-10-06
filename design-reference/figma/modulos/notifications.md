@@ -147,3 +147,8 @@ tenían estilo propio de foco.
    las archivadas. Con eso cada pestaña se puede vaciar en un paso y ver su
    vacío: *Mark all as read* (Unread), *Archive all* (Inbox y Pending) y *Move
    all to inbox* (Archived).
+
+## Cards con sombra, sin borde (2026-10-06)
+
+Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
+En Notifications: la lista. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.

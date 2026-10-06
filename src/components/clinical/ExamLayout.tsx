@@ -124,7 +124,7 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
   return (
     <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-start">
       {conFindings && (
-        <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-xl border border-line bg-white p-3 lg:order-1 lg:w-[300px]">
+        <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-lg bg-white shadow-panel p-3 lg:order-1 lg:w-[300px]">
           <ExamPanelHeader tab={reviewState.tab} onTabChange={reviewState.setTab} onNewReview={reviewState.openDialog} />
           <div className="flex w-full flex-col gap-3 lg:max-h-[70vh] lg:overflow-y-auto">
             {reviewState.tab === 'Findings' ? (

@@ -15,7 +15,7 @@ export function SettingsSectionCard({
 }) {
   return (
     <Link to={to} className="focus-visible:outline-dash-blue block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2">
-      <Card className="hover:border-primary/40 h-full p-6 transition-colors">
+      <Card className="hover:ring-primary/40 h-full p-6 transition-shadow hover:ring-1">
         <span className="bg-accent text-primary flex size-11 items-center justify-center rounded-lg">
           <Icon className="size-5" />
         </span>

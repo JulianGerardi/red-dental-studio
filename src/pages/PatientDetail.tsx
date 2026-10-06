@@ -10,7 +10,7 @@ import { aviso } from '@/components/ui/toaster'
 import { PendingTaskCard, type PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
-import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
 import { PatientAppointmentCard, type PatientAppointmentStatus } from '@/components/patients/PatientAppointmentCard'
 import { PendingDocuments } from '@/components/patients/PendingDocuments'
@@ -35,7 +35,7 @@ const APPTS: { status: PatientAppointmentStatus; cancel?: boolean }[] = [
 ]
 
 export function Card({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <div className={cn('rounded-lg border border-line bg-white', className)}>{children}</div>
+  return <div className={cn(TARJETA_PANEL, className)}>{children}</div>
 }
 
 export default function PatientDetail() {

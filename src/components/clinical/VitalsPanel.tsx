@@ -187,7 +187,7 @@ export function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean
   const texto = v.campos.length > 1 ? `${valores[0]}/${valores[1]}` : String(valores[0])
 
   return (
-    <div className="flex flex-col rounded-xl border border-line bg-white p-4">
+    <div className="flex flex-col rounded-lg bg-white shadow-panel p-4">
       <div className="flex items-start justify-between gap-2">
         <span className="min-w-0">
           <span className="block text-[17px] font-bold text-ink">{v.titulo}</span>
@@ -293,7 +293,7 @@ export function VitalsPanel() {
 
       {/* Composer de notas: el frame lo pone abajo, ocupando la columna izquierda. */}
       <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <div className="rounded-xl border border-line bg-white p-3">
+        <div className="rounded-lg bg-white shadow-panel p-3">
           <textarea
             value={nota}
             onChange={(e) => setNota(e.target.value)}

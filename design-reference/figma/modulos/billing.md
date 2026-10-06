@@ -127,3 +127,8 @@ para tener más de tres cuentas distintas en "Find Patient".
     de la pantalla vacía pero no se ve en ningún screenshot renderizado de
     ninguna de las 4 pantallas. Se interpreta como un nodo oculto/sin uso
     del archivo y no se implementa.
+
+## Cards con sombra, sin borde (2026-10-06)
+
+Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
+En Billing: las cinco tarjetas de números, Recent Billing Activity, Find Patient y Today. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.

@@ -4,9 +4,11 @@ import { cn } from '@/lib/utils'
 /* Tarjeta: la caja blanca que agrupa un solo tema sobre el fondo gris de la
    pantalla. Card es el contenedor; las partes (encabezado, título, bajada,
    contenido y pie) llevan la escala de la app: título 14 semibold, bajada 13,
-   20px de margen interno. Ver Elements / Cards en Storybook. */
+   20px de margen interno. Sin borde y con la sombra de los paneles del Dashboard
+   (Julián, 2026-10-06: las cards generales llevan sombra, no stroke); las cards
+   que van adentro de otra usan InnerCard. Ver Elements / Cards en Storybook. */
 export const Card = ({ className, ...p }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('bg-card rounded-xl border shadow-sm', className)} {...p} />
+  <div className={cn('rounded-lg bg-card shadow-panel', className)} {...p} />
 )
 export const CardHeader = ({ className, ...p }: React.HTMLAttributes<HTMLDivElement>) => (
   <div className={cn('flex items-start justify-between gap-3 px-5 pt-5', className)} {...p} />

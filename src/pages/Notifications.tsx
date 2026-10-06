@@ -165,7 +165,7 @@ export default function Notifications() {
         onChange={setVista}
       />
 
-      <section aria-label={`${vista} notifications`} className="mt-4 overflow-hidden rounded-lg border border-line bg-white">
+      <section aria-label={`${vista} notifications`} className="mt-4 overflow-hidden rounded-lg bg-white shadow-panel">
         {visibles.length ? (
           GRUPOS.map((g) => {
             const del = visibles.filter((n) => grupoDe(n.hace) === g)

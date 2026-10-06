@@ -66,3 +66,8 @@ tarjeta con la demo.
 
 Help usa `PageTitle` (20px Semibold) con la bajada de 12px, como las demás pantallas (antes 24px Bold). Confibot titula
 como los drawers: 18px Bold y bajada de 12px; los rótulos en mayúsculas pasan a 11px.
+
+## Cards con sombra, sin borde (2026-10-06)
+
+Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
+En Help: cada módulo plegable. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.

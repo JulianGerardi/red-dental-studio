@@ -439,6 +439,10 @@ esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Proc
   resto de las pantallas (antes 24px bold y 36px en la home de Settings); Confibot titula como los drawers (18px y 12px).
 - **Menú**: Billing, como Settings, abre al costado un menú con Billing, Fee Schedules, Carriers y Coverage Table.
 - **Pending Task**: cuatro columnas desde 1360px, para que las tareas del día llenen las filas sin hueco.
+- **Cards de la página, en toda la app** (`Card`, `TARJETA_PANEL` en `lib/estilos`, la Card de Settings y `SectionCard`):
+  blancas, con la sombra de los paneles del Dashboard y **sin borde**: Dashboard, pantallas del paciente, Clinical Mode,
+  Billing, Help, Notifications y Settings. Las tablas y la grilla del calendario mantienen su borde. *Elements / Cards →
+  Card on the page*.
 - **Cards adentro de un panel** (`InnerCard`): todas con fondo blanco, borde `line` y `shadow-inner-card`
   (0 1px 3px, 8%): Appointments, Waiting Room, Rooms y Pending Task del Dashboard, los turnos y tareas del Patient
   Dashboard y las cards chicas de Patients y Scheduling. *Elements / Cards → Card inside a panel*.

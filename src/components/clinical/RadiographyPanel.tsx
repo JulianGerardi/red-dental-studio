@@ -17,7 +17,7 @@ import { ExamLayout } from '@/components/clinical/ExamLayout'
 
 export function Card({ r, onAbrir }: { r: Radiografia; onAbrir: () => void }) {
   return (
-    <div className="group rounded-xl border border-line bg-white p-2">
+    <div className="group rounded-lg bg-white shadow-panel p-2">
       <button
         onClick={onAbrir}
         aria-label={`Open ${r.tipo} from ${r.fecha}`}
@@ -93,7 +93,7 @@ export function RadiographyPanel() {
   return (
     <ExamLayout findings={false} extra={buscador}>
       {filas.length === 0 ? (
-        <div className="rounded-xl border border-line bg-white">
+        <div className="rounded-lg bg-white shadow-panel">
           <EmptyState
             icon={Search}
             title="No images found"

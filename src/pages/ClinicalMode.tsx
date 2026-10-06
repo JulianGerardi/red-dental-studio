@@ -65,7 +65,7 @@ export default function ClinicalMode() {
   const irA = (p: Pestana) => { setPestana(p); setEnOverview(false) }
 
   const modelo = (
-    <div className="relative overflow-hidden rounded-xl border border-line bg-white">
+    <div className="relative overflow-hidden rounded-lg bg-white shadow-panel">
       {/* Fondo punteado: es el del frame y da la sensación de mesa de trabajo. */}
       <div
         className="overflow-x-auto p-4 pb-16"
@@ -127,7 +127,7 @@ export default function ClinicalMode() {
      también, porque sus findings ya viven en el visor de cada placa. Los registros (Treatment Plan…) no. */
   const esExamen = (EXAMENES as readonly string[]).includes(pestana)
   const enConstruccion = (
-    <div className="rounded-xl border border-line bg-white">
+    <div className="rounded-lg bg-white shadow-panel">
       <EmptyState
         icon={Stethoscope}
         title={pestana}

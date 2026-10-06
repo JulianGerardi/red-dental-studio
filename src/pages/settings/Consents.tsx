@@ -219,7 +219,7 @@ export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro,
   onNuevo: () => void
 }) {
   return (
-    <section aria-label="Templates" className="flex flex-col gap-3 self-start rounded-xl border border-line bg-white p-4">
+    <section aria-label="Templates" className="flex flex-col gap-3 self-start rounded-lg bg-white shadow-panel p-4">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-bold text-ink">Templates</h2>
         <Button size="sm" onClick={onNuevo}><Plus /> New template</Button>
@@ -395,7 +395,7 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
   const faltaTitulo = intentado && !borrador.titulo
   const faltaProcedimiento = intentado && borrador.procedimientos.length === 0
   return (
-    <section aria-label="Template editor" className="flex flex-col gap-4 self-start rounded-xl border border-line bg-white p-4 sm:p-5">
+    <section aria-label="Template editor" className="flex flex-col gap-4 self-start rounded-lg bg-white shadow-panel p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-[200px] flex-1">
           <div className="flex flex-wrap items-center gap-2">

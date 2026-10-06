@@ -3,7 +3,8 @@ import { TextField, SelectField, OptionCheckbox, FormFooter, ModalShell } from '
 import { DrawerActions, DrawerSection, useEnDrawer } from '@/components/ui/drawer'
 import { useState } from 'react'
 import { aviso } from '@/components/ui/toaster'
-import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
+import { cn } from '@/lib/utils'
 
 /* Figma 3640:72713 "Patients — Edit Patient (Full Page)".
    Tres secciones a 1088 de ancho: General (2×2 + 1 full), Demography
@@ -13,7 +14,7 @@ export function Section({ title, children }: { title: string; children: React.Re
   /* En el drawer va sin caja, como en Confidentally 2.0. */
   if (useEnDrawer()) return <DrawerSection title={title}>{children}</DrawerSection>
   return (
-    <section className="rounded-lg border border-line bg-white p-6">
+    <section className={cn(TARJETA_PANEL, 'p-6')}>
       <h2 className="text-sm font-semibold text-ink">{title}</h2>
       <div className="mt-4 flex flex-col gap-4">{children}</div>
     </section>

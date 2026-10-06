@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { SectionCard, TextField } from '@/components/patients/form'
 import { Bloque, Lienzo, Tabla, Token, useMedidas } from '@/design-system/kit'
 import { InnerCard } from '@/components/dashboard/primitives'
+import { TARJETA_PANEL } from '@/lib/estilos'
 import * as StatCardStories from '@/components/dashboard/StatCard.stories'
 import * as AppointmentCardStories from '@/components/dashboard/AppointmentCard.stories'
 import * as OperatoryCardStories from '@/components/dashboard/OperatoryCard.stories'
@@ -37,6 +38,8 @@ const meta = {
           'Una **card** es la caja blanca que agrupa **un solo tema** sobre el fondo gris de la pantalla: los datos de contacto de un paciente, un número del día, una cita. Sirve para separar bloques y que la pantalla se lea por partes.',
           '',
           '**Partes** (`@/components/ui/card`): `Card` (la caja) · `CardHeader` con `CardTitle` y `CardDescription` · `CardContent` · `CardFooter` para las acciones.',
+          '',
+          '**Dos superficies, en toda la app:** la card que va sobre el fondo gris lleva **sombra y no borde** (`Card`, `TARJETA_PANEL`, como los paneles del Dashboard); la card que va **adentro** de otra lleva borde fino y sombra suave (`InnerCard`). Las tablas y la grilla del calendario mantienen su borde.',
           '',
           '**Probalo:** en *Playground* armá tu card desde *Controls*: título, bajada, acción, contenido, pie y estado.',
         ].join('\n'),
@@ -73,8 +76,8 @@ function Armada({ title, description, action, content, footer, state, width }: A
     <Card
       style={{ width }}
       className={cn(
-        state === 'hover' && 'hover:border-dash-blue/40 pseudo-hover cursor-pointer transition-colors',
-        state === 'selected' && 'border-dash-blue ring-dash-blue/15 ring-2',
+        state === 'hover' && 'hover:ring-dash-blue/40 pseudo-hover cursor-pointer transition-shadow hover:ring-1',
+        state === 'selected' && 'ring-dash-blue ring-2',
       )}
     >
       <CardHeader>
@@ -192,6 +195,22 @@ export const Specs: Story = {
           <Medida nombre="CardFooter" selector=":scope > div > div"><Card className="w-40"><CardFooter><Button size="sm">Save</Button></CardFooter></Card></Medida>
         </Tabla>
       </Bloque>
+      <Bloque titulo="Card on the page" nota="La card que va sobre el fondo gris, en toda la app (Card, TARJETA_PANEL en lib/estilos, la Card de Settings y SectionCard): los paneles del Dashboard, el Patient Dashboard y las pantallas del paciente, Clinical Mode, Billing, Help, Notifications y Settings. Blanca, con sombra y sin borde. Con el mouse encima o elegida, un anillo azul en vez de un borde.">
+        <div className="flex flex-wrap gap-4 rounded-lg bg-page-background p-6">
+          <div className={`${TARJETA_PANEL} flex h-24 w-56 items-center justify-center text-[12px] text-ink-muted`}>Card on the page</div>
+          <div className={`${TARJETA_PANEL} flex w-72 flex-col gap-3 p-4`}>
+            <span className="text-[12px] font-semibold text-ink">With cards inside</span>
+            <InnerCard className="h-10" />
+            <InnerCard className="h-10" />
+          </div>
+        </div>
+        <Tabla encabezado={['Part', 'Value']} minimo={560}>
+          <tr><td className="font-semibold">Background</td><td><Token nombre="white" /></td></tr>
+          <tr><td className="font-semibold">Border</td><td>None</td></tr>
+          <tr><td className="font-semibold">Shadow</td><td className="tabular-nums">shadow-panel · 0 4px 14px rgb(100 100 100 / 25%)</td></tr>
+          <tr><td className="font-semibold">Radius</td><td className="tabular-nums">8px</td></tr>
+        </Tabla>
+      </Bloque>
       <Bloque titulo="Card inside a panel" nota="La misma superficie para todas las cards que van adentro de un panel (InnerCard): Appointments, Waiting Room, Rooms y Pending Task del Dashboard, los turnos y las tareas del Patient Dashboard y las cards chicas de Patients. Antes cada una tenía su sombra y la del Dashboard (0 4px 2px) se veía dura.">
         <div className="flex flex-wrap gap-4 rounded-lg bg-surface-subtle p-5">
           <InnerCard className="flex h-20 w-48 items-center justify-center text-[12px] text-ink-muted">InnerCard</InnerCard>
@@ -208,7 +227,9 @@ export const Specs: Story = {
         <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
           <li>One topic per card. If it needs two titles, it is two cards.</li>
           <li>The action that edits the card goes top right; the ones that save or cancel go in the footer.</li>
-          <li>Cards sit on the grey page background, 16–24px apart.</li>
+          <li>Cards sit on the grey page background, 16–24px apart, with a shadow and no border.</li>
+          <li>A card inside another card has a thin border and a soft shadow (InnerCard).</li>
+          <li>Tables and the calendar grid keep their border: they are not cards.</li>
         </ul>
       </Bloque>
     </Lienzo>

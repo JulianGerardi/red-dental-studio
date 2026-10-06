@@ -4,7 +4,7 @@ import { ChevronLeft, Calendar, DollarSign, Circle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
-import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 
 /* Figma 3768:803852 (poblado) y 3769:808875 (vacío).
    Sección "Patient Profile — Treatment Plan & Documents". */
@@ -48,7 +48,7 @@ export const PLANS: Plan[] = [
 export function TreatmentCard({ plan }: { plan: Plan }) {
   const rojo = plan.estado === 'Expired'
   return (
-    <article className="overflow-hidden rounded-lg border border-line bg-white">
+    <article className={cn(TARJETA_PANEL, 'overflow-hidden')}>
       <header className="flex items-center gap-3 px-4 py-3">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#eff4ff] text-xs font-semibold text-[#0056ef]">
           {plan.initials}
@@ -130,7 +130,7 @@ export default function Treatments() {
           </div>
 
           {vacio ? (
-            <div className="mt-4 flex min-h-[560px] flex-col items-center justify-center rounded-lg border border-line bg-white">
+            <div className={cn(TARJETA_PANEL, 'mt-4 flex min-h-[560px] flex-col items-center justify-center')}>
               <span className="flex size-11 items-center justify-center rounded-lg bg-[#eff4ff]">
                 <Circle className="size-4 fill-dash-blue text-dash-blue" />
               </span>

@@ -2051,3 +2051,8 @@ Como en red.dev:
 - **New Procedure** conserva los nombres de sus pasos (Procedure, Surfaces, Link to finding) con `stepLabels`; los
   demás drawers dicen "Step". El rótulo ya no ocupa ancho, así la línea entre círculos es igual en todos.
 - **New Alternative Case** pasa al tamaño normal del botón (36px), como New Case Group y los íconos de al lado.
+
+## Cards con sombra, sin borde (2026-10-06)
+
+Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
+En Clinical Mode: el Overview (Treatment Plan, odontograma, Problem List), Treatment (el workflow, Workflows, Progress y Treatment plans), Treatment Plan (la lista de planes y el caso), la columna de los exámenes, Vitals, Radiography y el bloque de consentimiento. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.

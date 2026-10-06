@@ -31,6 +31,11 @@ export const ANCHO_PAGINA = 'mx-auto w-full max-w-[1400px] 2xl:max-w-[1800px]'
 
 export const CONTENEDOR_PAGINA = `${ANCHO_PAGINA} px-4 py-6 sm:px-6`
 
+/* La card que va sobre el fondo gris de la página (los paneles del Dashboard, las cards del Patient Dashboard y de las
+   pantallas del paciente): blanca, con sombra y **sin borde** (Julián, 2026-10-06). Las cards que van adentro de una de
+   estas usan InnerCard (dashboard/primitives): borde fino y sombra suave. */
+export const TARJETA_PANEL = 'rounded-lg bg-white shadow-panel'
+
 /* Botón de ícono que al pasar el mouse (o con el foco) muestra su caja y se abre con el texto adentro: Exit clinical Mode,
    Overwiev y las acciones del examen en Clinical Mode. El texto va en un span con ETIQUETA_EXPANDIBLE. */
 export const BOTON_EXPANDIBLE =

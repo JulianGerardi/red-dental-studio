@@ -146,7 +146,7 @@ export function WorkflowProgress({
   const hechos = wf.pasos.filter((p) => guardados.includes(p.id)).length
   const listo = hechos === wf.pasos.length
   return (
-    <div className="rounded-xl border border-line bg-white p-4">
+    <div className="rounded-lg bg-white shadow-panel p-4">
       <div className="flex items-center gap-3">
         <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-full text-white', listo ? 'bg-status-ok' : 'bg-dash-blue')}>
           {listo ? <Check className="size-4" strokeWidth={3} aria-hidden /> : <Play className="size-4" aria-hidden />}
@@ -377,7 +377,7 @@ export function TreatmentPlansCard({ onTreatmentPlan, variante = 'tarjetas' }: {
   const casos = CASOS.filter((c) => c.estado !== 'Discarded').slice(0, 3)
   const [abiertos, setAbiertos] = useState<string[]>(casos.slice(0, 1).map((c) => c.id))
   return (
-    <div className="rounded-xl border border-line bg-white p-4">
+    <div className="rounded-lg bg-white shadow-panel p-4">
       <p className="text-[15px] font-bold text-ink">Treatment plans</p>
       {variante === 'progreso' ? <PlanProgressList casos={casos} onTreatmentPlan={onTreatmentPlan} />
         : variante === 'recorrido' ? <PlanTimeline casos={casos} onTreatmentPlan={onTreatmentPlan} />
@@ -455,7 +455,7 @@ export function TreatmentPanel({ onTreatmentPlan }: { onTreatmentPlan?: () => vo
   return (
     <TooltipProvider delayDuration={200}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
-        <section aria-label={`${wf.nombre} workflow`} className="flex min-w-0 flex-1 flex-col rounded-xl border border-line bg-white">
+        <section aria-label={`${wf.nombre} workflow`} className="flex min-w-0 flex-1 flex-col rounded-lg bg-white shadow-panel">
           <header className="flex flex-wrap items-center gap-2 border-b border-line-soft px-4 py-3">
             <p className="text-dash-blue text-[12px] font-bold tracking-wide uppercase">{wf.nombre}</p>
             <span className="text-[11px] text-ink-muted">· Published v{wf.version}</span>
@@ -529,7 +529,7 @@ export function TreatmentPanel({ onTreatmentPlan }: { onTreatmentPlan?: () => vo
         </section>
 
         <aside className="flex w-full shrink-0 flex-col gap-4 lg:w-[311px]">
-          <div className="rounded-xl border border-line bg-white p-3">
+          <div className="rounded-lg bg-white shadow-panel p-3">
             <div className="flex items-center justify-between gap-2 px-1">
               <p className="text-[15px] font-bold text-ink">Workflows</p>
               <FilterMenu

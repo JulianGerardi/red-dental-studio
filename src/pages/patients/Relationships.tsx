@@ -10,7 +10,8 @@ import { aviso } from '@/components/ui/toaster'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
-import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
 /* Figma 3712:60564 (poblado) y 3712:59142 (vacío). */
@@ -89,7 +90,7 @@ export function PersonaCard({
   onDelete?: () => void
 }) {
   return (
-    <article className="rounded-lg border border-line bg-white px-5 py-4">
+    <article className={cn(TARJETA_PANEL, 'px-5 py-4')}>
       <header className="flex flex-wrap items-center gap-3">
         <span className="bg-dash-blue flex size-10 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold text-white">
           {p.initials}
@@ -191,7 +192,7 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
           </div>
 
           {vacio ? (
-            <div className="mt-4 flex min-h-[460px] rounded-lg border border-line bg-white">
+            <div className={cn(TARJETA_PANEL, 'mt-4 flex min-h-[460px]')}>
               <EmptyState
                 icon={Users}
                 title="No relationships yet"
@@ -203,7 +204,7 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
             <>
               <div className="mt-4 flex flex-col gap-4">
                 {relaciones.length === 0 ? (
-                  <div className="rounded-lg border border-line bg-white">
+                  <div className={TARJETA_PANEL}>
                     <EmptyState icon={Users} title="No related contacts" detail="Every relationship was removed." />
                   </div>
                 ) : (

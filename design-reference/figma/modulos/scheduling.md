@@ -483,3 +483,8 @@ Lo que hay que saber al retomar:
   salvo el verde oscuro (`#115c30` real, `#17723c` prototipo).
 - **Sin verificar:** arrastrar turnos, el menú de Today, el ícono ↗ por sala,
   qué hacen "+N" y Schedule, la app real en celular y otros roles.
+
+## La grilla del calendario mantiene su borde (2026-10-06)
+
+Con la regla nueva (cards con sombra y sin borde), las vistas de semana y mes del calendario siguen con borde: son una
+grilla, como las tablas.

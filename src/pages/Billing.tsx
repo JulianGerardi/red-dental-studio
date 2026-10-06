@@ -32,7 +32,7 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
 
 export function Stat({ label, value, caption }: { label: string; value: string; caption: string }) {
   return (
-    <div className="min-w-0 rounded-lg border border-line bg-white p-4">
+    <div className="min-w-0 rounded-lg bg-white shadow-panel p-4">
       <p className="truncate text-xs text-ink-muted" title={label}>{label}</p>
       <p className="text-dash-blue mt-1 text-xl font-bold">{value}</p>
       <p className="mt-0.5 truncate text-[11px] text-ink-faint">{caption}</p>
@@ -131,7 +131,7 @@ export default function Billing() {
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_280px]">
-        <div className="min-w-0 rounded-lg border border-line bg-white p-4 sm:p-5">
+        <div className="min-w-0 rounded-lg bg-white shadow-panel p-4 sm:p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
               <CreditCard className="size-4" /> Recent Billing Activity
@@ -181,7 +181,7 @@ export default function Billing() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border border-line bg-white p-4">
+          <div className="rounded-lg bg-white shadow-panel p-4">
             <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
               <Search className="size-4" /> Find Patient
             </h2>
@@ -235,7 +235,7 @@ export default function Billing() {
             )}
           </div>
 
-          <div className="rounded-lg border border-line bg-white p-4">
+          <div className="rounded-lg bg-white shadow-panel p-4">
             <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
               <CreditCard className="size-4" /> Today
             </h2>

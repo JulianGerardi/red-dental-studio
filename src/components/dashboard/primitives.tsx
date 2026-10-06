@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { TARJETA_PANEL } from '@/lib/estilos'
 
 /* ── Escala tipográfica ──────────────────────────────────────────────
    El Figma usa 15/26/13px en el chrome exterior, pero adentro de los
@@ -25,7 +26,7 @@ export function Panel({
 }) {
   return (
     <section
-      className={cn('shadow-panel flex flex-col overflow-hidden rounded-lg bg-white', className)}
+      className={cn(TARJETA_PANEL, 'flex flex-col overflow-hidden', className)}
     >
       <header className="flex h-[52px] shrink-0 items-center justify-between gap-2 px-5 py-3">
         {/* Figma: 13.5px. Subido a 15 para igualar el título del stat card. */}

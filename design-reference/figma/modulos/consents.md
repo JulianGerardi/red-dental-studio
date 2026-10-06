@@ -145,3 +145,8 @@ El editor único de arriba queda **oculto** en `Consents.tsx`
 (editor, barra que aplica formato, preview con el HTML y la pantalla que abre
 vacía). Su componente está exento en `exentos.json` para que no aparezca en el
 design system.
+
+## Cards con sombra, sin borde (2026-10-06)
+
+Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
+En Consents: Templates y el editor. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.

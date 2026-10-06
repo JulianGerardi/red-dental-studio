@@ -11,7 +11,7 @@ import {
 } from '@/components/patients/insurance/modals'
 import { PLANES, PLANES_HISTORICOS, SUSCRIPCION, RELACIONES, ORDENES, ELEGIBILIDAD, type PlanPaciente } from '@/data/insurance'
 import { aviso } from '@/components/ui/toaster'
-import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 
 /* Figma 3817:865128 "Insurance", frames 3817:865704 y 3831:897436.
 
@@ -150,7 +150,7 @@ export default function Insurance() {
 
           {/* Suscripción + datos del paciente */}
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <section className="flex flex-col rounded-lg border border-line bg-white p-4 sm:p-5">
+            <section className={cn(TARJETA_PANEL, 'flex flex-col p-4 sm:p-5')}>
               <h2 className="text-sm font-semibold text-ink">Subscription Information</h2>
               <p className="mt-0.5 text-[11px] text-ink-muted">
                 Select an existing subscription or create new one.
@@ -196,7 +196,7 @@ export default function Insurance() {
               </button>
             </section>
 
-            <section className="flex flex-col rounded-lg border border-line bg-white p-4 sm:p-5">
+            <section className={cn(TARJETA_PANEL, 'flex flex-col p-4 sm:p-5')}>
               <h2 className="text-sm font-semibold text-ink">Patient Information</h2>
 
               <SelectField

@@ -71,7 +71,7 @@ export function PlanCard({ p, onAbrir }: { p: Plan; onAbrir?: () => void }) {
 
 export function TreatmentPlanList({ onAbrir }: { onAbrir?: (casoId?: string) => void }) {
   return (
-    <div className="rounded-xl border border-line bg-white p-4">
+    <div className="rounded-lg bg-white shadow-panel p-4">
       <div className="flex items-center justify-between gap-2">
         <p className="text-[15px] font-bold text-ink">Treatment Plan</p>
         <button onClick={() => onAbrir?.()} className="text-dash-blue flex shrink-0 items-center gap-0.5 text-[12px] font-semibold hover:underline">

@@ -426,7 +426,7 @@ export function SectionCard({
   /* Dentro de un drawer va sin caja, con el título suelto, como en Confidentally 2.0. */
   if (useEnDrawer()) return <DrawerSection title={title} className={className}>{children}</DrawerSection>
   return (
-    <section className={cn('rounded-lg border border-line bg-white p-4 sm:p-5', className)}>
+    <section className={cn('rounded-lg bg-white p-4 shadow-panel sm:p-5', className)}>
       <h2 className="text-sm font-semibold text-ink">{title}</h2>
       <div className="mt-4 flex flex-col gap-4">{children}</div>
     </section>

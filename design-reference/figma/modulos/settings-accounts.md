@@ -113,3 +113,8 @@ Accounts y en el buscador de Transactions del Ledger de paciente repite el
   el total no puede bajar de las licencias en uso; sin plan avisa y Save queda deshabilitado.
 - **Edit account** lleva a la cuenta (`/settings/accounts/:id`), como en Confidentally 2.0.
 - Títulos: Settings usa `PageTitle` (20px Semibold) y la bajada de 12px, como el resto de las pantallas.
+
+## Cards con sombra, sin borde (2026-10-06)
+
+Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
+En Settings: las cards de la home (con el mouse encima, un anillo azul en vez del borde), las secciones de las fichas (Account, Location, Employee) con la Card de Settings y las páginas en construcción. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.

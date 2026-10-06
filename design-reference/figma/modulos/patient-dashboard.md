@@ -198,3 +198,11 @@ visita, con el progreso). `PendingDocuments`, datos en
 - Los turnos (`PatientAppointmentCard`) usan la misma card que el Dashboard (`InnerCard`): fondo blanco, borde fino y
   sombra suave. Se fue el borde azul a la izquierda.
 - **Pending documents** sigue en el Overview, entre los cuatro bloques clínicos y Pending Task.
+
+## Las cards de la página, con sombra y sin borde (2026-10-06)
+
+Julián: las cards generales -las que contienen otras cards- no llevan stroke, llevan la sombra de los paneles del
+Dashboard. `TARJETA_PANEL` (lib/estilos: blanca, `shadow-panel`, sin borde) en el menú del paciente, los cuatro bloques
+clínicos, Pending documents, Pending Task y Appointments, y en Treatments, Insurance, Relationships y Edit Patient. Las
+cards de adentro siguen con `InnerCard` (borde fino y sombra suave). Las tablas (Insurance, Ledger, Documents) son la
+tabla del design system y mantienen su borde.
