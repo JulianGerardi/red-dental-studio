@@ -380,3 +380,10 @@ cuatro columnas (4 × 2); más angosto siguen tres, porque con cuatro se cortaba
 Appointments, Waiting Room, Rooms y Pending Task usan `InnerCard` con la sombra nueva `shadow-inner-card`
 (0 1px 3px, 8%) y un borde fino `line`: la de antes (0 4px 2px) se veía dura. Es la misma de los turnos del Patient
 Dashboard y de las cards chicas de Patients y Scheduling. Ver *Elements / Cards → Card inside a panel*.
+
+## Stroke más tenue y más fino en las cards de adentro (2026-10-06)
+
+Julián: "el stroke de las cards lo haría un gris más tenue y la línea más finita". `shadow-inner-card` lleva ahora la
+línea: 0 0 0 0.5px negro al 10% (en retina medio pixel; en una pantalla común 1px en #f0f0f0, antes #e4e4e7), más la
+sombra suave. Un `border-[0.5px]` no sirve: Chrome lo redondea a 1px. Igual en el Patient Dashboard (turnos, tareas y
+las listas de Pending documents, con `shadow-hairline`).

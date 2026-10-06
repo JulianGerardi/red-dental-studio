@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { cn } from '@/lib/utils'
+import { TARJETA_INTERNA } from '@/lib/estilos'
 import { Mail, Pencil } from 'lucide-react'
 import { Pill } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
@@ -19,7 +21,7 @@ export function PatientCard({
   onEdit: (row: PatientRow) => void
 }) {
   return (
-    <article className="flex items-center gap-2.5 rounded-lg border border-line bg-white p-2.5 shadow-inner-card">
+    <article className={cn(TARJETA_INTERNA, 'flex items-center gap-2.5 p-2.5')}>
       <span className="bg-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold text-surface-subtle">
         {row.initials}
       </span>

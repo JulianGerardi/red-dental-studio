@@ -445,8 +445,9 @@ esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Proc
   blancas, con la sombra de los paneles del Dashboard y **sin borde**: Dashboard, pantallas del paciente, Clinical Mode,
   Billing, Help, Notifications y Settings. Las tablas y la grilla del calendario mantienen su borde. *Elements / Cards →
   Card on the page*.
-- **Cards adentro de un panel** (`InnerCard`): todas con fondo blanco, borde `line` y `shadow-inner-card`
-  (0 1px 3px, 8%): Appointments, Waiting Room, Rooms y Pending Task del Dashboard, los turnos y tareas del Patient
+- **Cards adentro de un panel** (`InnerCard`, `TARJETA_INTERNA`): todas con fondo blanco y `shadow-inner-card`: un
+  stroke de medio pixel en gris tenue (negro al 10%, hecho con sombra porque un border de 0.5px se redondea a 1px) y una
+  sombra suave (0 1px 3px, 6%): Appointments, Waiting Room, Rooms y Pending Task del Dashboard, los turnos y tareas del Patient
   Dashboard y las cards chicas de Patients y Scheduling. *Elements / Cards → Card inside a panel*.
 - **Cards de Treatment Plan**: en el Overview y en la card *Treatment plans* del workflow quedan las publicadas. Se
   probaron una compacta con anillo de avance y una por visita (un procedimiento por línea); Julián se quedó con las

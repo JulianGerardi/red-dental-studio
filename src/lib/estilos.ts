@@ -36,6 +36,10 @@ export const CONTENEDOR_PAGINA = `${ANCHO_PAGINA} px-4 py-6 sm:px-6`
    estas usan InnerCard (dashboard/primitives): borde fino y sombra suave. */
 export const TARJETA_PANEL = 'rounded-lg bg-white shadow-panel'
 
+/* La card que va adentro de otra (InnerCard): stroke de medio pixel en un gris tenue y sombra suave, los dos en
+   shadow-inner-card (Julián, 2026-10-06: "el stroke de las cards, un gris más tenue y la línea más finita"). */
+export const TARJETA_INTERNA = 'rounded-lg bg-white shadow-inner-card'
+
 /* Botón de ícono que al pasar el mouse (o con el foco) muestra su caja y se abre con el texto adentro: Exit clinical Mode,
    Overwiev y las acciones del examen en Clinical Mode. El texto va en un span con ETIQUETA_EXPANDIBLE. */
 export const BOTON_EXPANDIBLE =

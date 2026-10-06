@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import { TARJETA_PANEL } from '@/lib/estilos'
+import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 
 /* ── Escala tipográfica ──────────────────────────────────────────────
    El Figma usa 15/26/13px en el chrome exterior, pero adentro de los
@@ -41,15 +41,15 @@ export function Panel({
 }
 
 /* La card de adentro de un panel: Appointments, Waiting Room, Rooms y Pending Task del Dashboard, y los turnos del
-   Patient Dashboard. Todas con el mismo fondo blanco, borde fino y sombra suave (Julián, 2026-10-06: la de antes,
-   0 4px 2px, se veía dura y cada card tenía la suya). */
+   Patient Dashboard. Todas con el mismo fondo blanco, borde de medio pixel en gris tenue y sombra suave (Julián,
+   2026-10-06: la sombra de antes, 0 4px 2px, se veía dura y cada card tenía la suya). Ver TARJETA_INTERNA. */
 export function InnerCard({
   className,
   children,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('shadow-inner-card rounded-lg border border-line bg-white', className)} {...props}>
+    <div className={cn(TARJETA_INTERNA, className)} {...props}>
       {children}
     </div>
   )

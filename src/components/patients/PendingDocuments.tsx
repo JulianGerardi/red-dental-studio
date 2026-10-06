@@ -79,7 +79,7 @@ export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES }: { docs?:
             return (
               <section key={g.titulo} aria-label={g.titulo} className="flex flex-col gap-1.5">
                 <p className={cn('text-[11px] font-semibold tracking-wide uppercase', g.color)}>{g.titulo} · {del.length}</p>
-                <ul className="flex flex-col divide-y divide-line-soft rounded-lg border border-line">
+                <ul className="shadow-hairline flex flex-col divide-y divide-line-soft rounded-lg">
                   {del.map((d) => (
                     <li key={d.id} className="flex flex-wrap items-center gap-3 px-3 py-2.5">
                       <IconoDoc d={d} />

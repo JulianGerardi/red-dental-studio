@@ -39,7 +39,7 @@ const meta = {
           '',
           '**Partes** (`@/components/ui/card`): `Card` (la caja) · `CardHeader` con `CardTitle` y `CardDescription` · `CardContent` · `CardFooter` para las acciones.',
           '',
-          '**Dos superficies, en toda la app:** la card que va sobre el fondo gris lleva **sombra y no borde** (`Card`, `TARJETA_PANEL`, como los paneles del Dashboard); la card que va **adentro** de otra lleva borde fino y sombra suave (`InnerCard`). Las tablas y la grilla del calendario mantienen su borde.',
+          '**Dos superficies, en toda la app:** la card que va sobre el fondo gris lleva **sombra y no borde** (`Card`, `TARJETA_PANEL`, como los paneles del Dashboard); la card que va **adentro** de otra lleva un stroke de medio pixel en gris tenue y sombra suave (`InnerCard`, `TARJETA_INTERNA`). Las tablas y la grilla del calendario mantienen su borde.',
           '',
           '**Probalo:** en *Playground* armá tu card desde *Controls*: título, bajada, acción, contenido, pie y estado.',
         ].join('\n'),
@@ -218,8 +218,8 @@ export const Specs: Story = {
         </div>
         <Tabla encabezado={['Part', 'Value']} minimo={560}>
           <tr><td className="font-semibold">Background</td><td><Token nombre="white" /></td></tr>
-          <tr><td className="font-semibold">Border</td><td><Token nombre="line" /> · 1px</td></tr>
-          <tr><td className="font-semibold">Shadow</td><td className="tabular-nums">shadow-inner-card · 0 1px 3px rgb(0 0 0 / 8%)</td></tr>
+          <tr><td className="font-semibold">Stroke</td><td className="tabular-nums">0.5px, negro al 10% (una línea de sombra: un border de 0.5px se redondea a 1px). En retina, medio pixel; en una pantalla común, 1px en #f0f0f0</td></tr>
+          <tr><td className="font-semibold">Shadow</td><td className="tabular-nums">shadow-inner-card · 0 0 0 0.5px rgb(0 0 0 / 10%), 0 1px 3px rgb(0 0 0 / 6%)</td></tr>
           <tr><td className="font-semibold">Radius</td><td className="tabular-nums">8px</td></tr>
         </Tabla>
       </Bloque>
@@ -228,7 +228,7 @@ export const Specs: Story = {
           <li>One topic per card. If it needs two titles, it is two cards.</li>
           <li>The action that edits the card goes top right; the ones that save or cancel go in the footer.</li>
           <li>Cards sit on the grey page background, 16–24px apart, with a shadow and no border.</li>
-          <li>A card inside another card has a thin border and a soft shadow (InnerCard).</li>
+          <li>A card inside another card has a half-pixel stroke in a faint grey and a soft shadow (InnerCard).</li>
           <li>Tables and the calendar grid keep their border: they are not cards.</li>
         </ul>
       </Bloque>
