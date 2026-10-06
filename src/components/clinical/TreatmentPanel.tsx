@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import {
-  Bot, CalendarDays, Check, ChevronDown, ChevronLeft, ChevronRight, CircleAlert, CircleCheck, ClipboardList, Eye, EyeOff, MoreVertical, Play, Search, Siren, Sparkles,
+  Bot, CalendarDays, Check, ChevronDown, ChevronRight, CircleAlert, CircleCheck, ClipboardList, Eye, EyeOff, MoreVertical, Play, Search, Siren, Sparkles,
   Stethoscope, Workflow as IconoWorkflow, X, type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -20,7 +20,6 @@ import {
   type CategoriaWorkflow, type Narrativa, type Pregunta, type Valor, type Workflow,
 } from '@/data/workflows'
 import { CASOS, type Caso, type Procedimiento } from '@/data/treatment-plan'
-import { TONO_CASO } from '@/components/clinical/TreatmentPlanSection'
 
 /* Treatment — Figma 9fYLxX9h 4540:26288 "Workflow Detail & Clinical Note Confirmation", con la lógica de red.dev: a la
    izquierda el workflow elegido con sus pasos y preguntas; a la derecha Workflows, Progress y Treatment plans. Completar
@@ -226,9 +225,6 @@ export function NarrativeSummary({ narrativa, onAbrir }: { narrativa: Narrativa;
   )
 }
 
-/* Punto del color del estado de cada procedimiento (el de su pill). */
-const PUNTO_PROCEDIMIENTO: Record<Procedimiento['estado'], string> = { Planned: 'bg-status-ok', Completed: 'bg-dash-busy-fg', Removed: 'bg-ink-faint' }
-
 const procedimientosDe = (c: Caso) => c.visitas.flatMap((v) => v.procedimientos)
 
 function MenuProcedimiento({ p, onTreatmentPlan }: { p: Procedimiento; onTreatmentPlan?: () => void }) {
@@ -239,149 +235,14 @@ function MenuProcedimiento({ p, onTreatmentPlan }: { p: Procedimiento; onTreatme
   )
 }
 
-/* B · Cada plan en su caja, con estado, avance y total a la vista; abierto, los procedimientos encabezados por la pieza. */
-export function PlanProgressList({ casos, onTreatmentPlan }: { casos: Caso[]; onTreatmentPlan?: () => void }) {
-  const [abiertos, setAbiertos] = useState<string[]>(casos.slice(0, 1).map((c) => c.id))
-  return (
-    <div className="mt-3 flex flex-col gap-2">
-      {casos.map((c) => {
-        const procs = procedimientosDe(c)
-        const hechos = procs.filter((p) => p.estado === 'Completed').length
-        const abierto = abiertos.includes(c.id)
-        return (
-          <div key={c.id} className={cn('rounded-lg border', abierto ? 'border-line' : 'border-line-soft')}>
-            <button
-              type="button" aria-expanded={abierto}
-              onClick={() => setAbiertos((a) => (abierto ? a.filter((x) => x !== c.id) : [...a, c.id]))}
-              className="flex w-full flex-col gap-2 p-3 text-left"
-            >
-              <span className="flex items-center gap-2">
-                <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-ink">{c.nombre}</span>
-                <Pill tone={TONO_CASO[c.estado]} size="sm" className="whitespace-nowrap">{c.estado}</Pill>
-                <ChevronDown className={cn('size-4 shrink-0 text-ink-muted transition-transform', abierto && 'rotate-180')} aria-hidden />
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-line" role="progressbar" aria-label={`${c.nombre} progress`} aria-valuenow={hechos} aria-valuemin={0} aria-valuemax={procs.length}>
-                  <span className="block h-full rounded-full bg-dash-busy-fg" style={{ width: `${(hechos / procs.length) * 100}%` }} />
-                </span>
-                <span className="text-[11px] whitespace-nowrap text-ink-muted tabular-nums">{hechos}/{procs.length} done · ${c.total}</span>
-              </span>
-            </button>
-            {abierto && (
-              <ul className="border-t border-line-soft">
-                {procs.slice(0, 3).map((p) => (
-                  <li key={p.id} className="flex items-center gap-2.5 border-b border-line-soft px-3 py-2 last:border-b-0">
-                    <span className="flex size-9 shrink-0 flex-col items-center justify-center rounded-md bg-surface-alt leading-none">
-                      <span className="text-[8px] font-semibold tracking-wide text-ink-muted uppercase">Tooth</span>
-                      <span className="mt-0.5 text-[13px] font-bold text-ink tabular-nums">{p.pieza}</span>
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[12px] text-ink"><span className="font-semibold">{p.codigo}:</span> {p.nombre}</p>
-                      <p className="mt-0.5 flex items-center gap-1.5 text-[10px] text-ink-muted">
-                        <span aria-hidden className={cn('size-1.5 shrink-0 rounded-full', PUNTO_PROCEDIMIENTO[p.estado])} />
-                        <span className="font-semibold text-ink">{p.estado}</span>· Surface {p.superficie}
-                      </p>
-                      <p className="truncate text-[10px] text-ink-muted"><span className="font-semibold text-ink">Provider:</span> {p.proveedor}</p>
-                    </div>
-                    <MenuProcedimiento p={p} onTreatmentPlan={onTreatmentPlan} />
-                  </li>
-                ))}
-                {procs.length > 3 && (
-                  <li>
-                    <button type="button" onClick={() => onTreatmentPlan?.()} className="text-dash-blue w-full px-3 py-2 text-left text-[11px] font-medium hover:underline">
-                      See all {procs.length} procedures
-                    </button>
-                  </li>
-                )}
-              </ul>
-            )}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-/* C · Un plan a la vez, con flechas para pasar al siguiente: avance en tramos (uno por procedimiento, lleno el que está
-   completo) y los procedimientos en línea de tiempo por visita, con pieza, superficie y proveedor. */
-export function PlanTimeline({ casos, onTreatmentPlan, tope = 4 }: { casos: Caso[]; onTreatmentPlan?: () => void; tope?: number }) {
-  const [i, setI] = useState(0)
-  const c = casos[i]
-  if (!c) return null
-  const procs = procedimientosDe(c)
-  const hechos = procs.filter((p) => p.estado === 'Completed').length
-  let quedan = tope
-  const visitas = c.visitas
-    .map((v) => { const lista = v.procedimientos.slice(0, Math.max(quedan, 0)); quedan -= lista.length; return { ...v, lista } })
-    .filter((v) => v.lista.length)
-  const flecha = 'flex size-7 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-white hover:text-ink disabled:pointer-events-none disabled:opacity-40'
-  return (
-    <div className="mt-3">
-      <div className="flex items-center gap-1 rounded-lg bg-surface-alt p-1">
-        <button type="button" aria-label="Previous plan" disabled={i === 0} onClick={() => setI(i - 1)} className={flecha}><ChevronLeft className="size-4" /></button>
-        <div className="min-w-0 flex-1 text-center" aria-live="polite">
-          <p className="truncate text-[12px] font-semibold text-ink">{c.nombre}</p>
-          <p className="text-[10px] text-ink-muted tabular-nums">Plan {i + 1} of {casos.length}</p>
-        </div>
-        <button type="button" aria-label="Next plan" disabled={i === casos.length - 1} onClick={() => setI(i + 1)} className={flecha}><ChevronRight className="size-4" /></button>
-      </div>
-      <div className="mt-3 flex items-center gap-2">
-        <Pill tone={TONO_CASO[c.estado]} size="sm" className="whitespace-nowrap">{c.estado}</Pill>
-        <span className="ml-auto text-[11px] text-ink-muted tabular-nums">{hechos} of {procs.length} completed · ${c.total}</span>
-      </div>
-      <div className="mt-2 flex gap-0.5" role="img" aria-label={`${hechos} of ${procs.length} procedures completed`}>
-        {procs.map((p) => <span key={p.id} className={cn('h-1.5 flex-1 rounded-full', p.estado === 'Completed' ? 'bg-dash-busy-fg' : p.estado === 'Removed' ? 'bg-line-soft' : 'bg-line')} />)}
-      </div>
-      <ol className="mt-3 flex flex-col gap-3">
-        {visitas.map((v) => (
-          <li key={v.id}>
-            <p className="text-[10px] font-semibold tracking-wide text-ink-muted uppercase">
-              {v.nombre} <span className="font-normal tracking-normal normal-case">· {v.cita ? `${v.cita.fecha}, ${v.cita.hora}` : 'No appointment'}</span>
-            </p>
-            <ul className="mt-1 ml-[3px] flex flex-col border-l border-line">
-              {v.lista.map((p) => (
-                <li key={p.id} className="relative flex items-start gap-1 py-1.5 pl-4">
-                  <span aria-hidden className={cn('absolute top-[11px] -left-[4px] size-[7px] rounded-full ring-2 ring-white', PUNTO_PROCEDIMIENTO[p.estado])} />
-                  <div className="min-w-0 flex-1">
-                    <p className="flex items-center gap-2 text-[12px] text-ink">
-                      <span className="min-w-0 flex-1 truncate"><span className="font-semibold">{p.codigo}:</span> {p.nombre}</span>
-                      <Pill tone={TONO_PROCEDIMIENTO[p.estado]} size="sm">{p.estado}</Pill>
-                    </p>
-                    <p className="mt-1 flex flex-wrap gap-x-3 text-[10px] text-ink-muted">
-                      <span><span className="font-semibold text-ink">Tooth:</span> {p.pieza}</span>
-                      <span><span className="font-semibold text-ink">Surface:</span> {p.superficie}</span>
-                      <span><span className="font-semibold text-ink">Provider:</span> {p.proveedor}</span>
-                    </p>
-                  </div>
-                  <MenuProcedimiento p={p} onTreatmentPlan={onTreatmentPlan} />
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ol>
-      {procs.length > tope && (
-        <button type="button" onClick={() => onTreatmentPlan?.()} className="text-dash-blue mt-2 text-[11px] font-medium hover:underline">
-          See all {procs.length} procedures
-        </button>
-      )}
-    </div>
-  )
-}
-
-export type VarianteTreatmentPlans = 'tarjetas' | 'progreso' | 'recorrido'
-
-/* Los planes del paciente. A (tarjetas, la publicada): plegables, con sus procedimientos en tarjetas chicas. B y C son
-   las propuestas nuevas, con el mismo detalle por procedimiento; Julián elige. */
-export function TreatmentPlansCard({ onTreatmentPlan, variante = 'tarjetas' }: { onTreatmentPlan?: () => void; variante?: VarianteTreatmentPlans }) {
+/* Los planes del paciente, plegables, con sus procedimientos en tarjetas chicas. Julián eligió esta opción (A) entre
+   tres: muestra el detalle de cada procedimiento. Ver modulos/clinical-mode.md. */
+export function TreatmentPlansCard({ onTreatmentPlan }: { onTreatmentPlan?: () => void }) {
   const casos = CASOS.filter((c) => c.estado !== 'Discarded').slice(0, 3)
   const [abiertos, setAbiertos] = useState<string[]>(casos.slice(0, 1).map((c) => c.id))
   return (
-    <div className="rounded-lg bg-white shadow-panel p-4">
+    <div className="rounded-lg bg-white p-4 shadow-panel">
       <p className="text-[15px] font-bold text-ink">Treatment plans</p>
-      {variante === 'progreso' ? <PlanProgressList casos={casos} onTreatmentPlan={onTreatmentPlan} />
-        : variante === 'recorrido' ? <PlanTimeline casos={casos} onTreatmentPlan={onTreatmentPlan} />
-        : (
       <div className="mt-2 flex flex-col">
         {casos.map((c) => {
           const abierto = abiertos.includes(c.id)
@@ -419,7 +280,6 @@ export function TreatmentPlansCard({ onTreatmentPlan, variante = 'tarjetas' }: {
           )
         })}
       </div>
-      )}
     </div>
   )
 }

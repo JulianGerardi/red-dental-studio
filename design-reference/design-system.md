@@ -448,7 +448,9 @@ esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Proc
   Dashboard y las cards chicas de Patients y Scheduling. *Elements / Cards → Card inside a panel*.
 - **Cards de Treatment Plan**: en el Overview y en la card *Treatment plans* del workflow quedan las publicadas. Se
   probaron una compacta con anillo de avance y una por visita (un procedimiento por línea); Julián se quedó con las
-  actuales porque muestran el detalle de cada procedimiento.
+  actuales porque muestran el detalle de cada procedimiento. Segunda vuelta (2026-10-06): para la del workflow se
+  propusieron B (progreso por plan) y C (recorrido por visita) con el mismo detalle; Julián volvió a elegir **A** y las
+  otras dos se sacaron del código.
 
 ## Cómo se documenta lo nuevo (2026-10-06)
 
@@ -460,7 +462,7 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
   (`stepLabels`, reglas de Next Step, dónde hay pasos).
 - *Components / Settings*: NewLocationDrawer, NewEmployeeDrawer, NewAccountDrawer, ManageLicensesDrawer;
   *Components / Patients*: AddRelationshipDrawer; *Elements / Cards* (la card adentro de un panel).
-- *Components / Clinical*: Treatment plans card (opciones A, B y C), TreatmentPanel, NarrativeEditor, ProblemList,
+- *Components / Clinical*: Treatment plans card (la A, la elegida), TreatmentPanel, NarrativeEditor, ProblemList,
   TreatmentPlanList y Dental / NewProcedureDrawer.
 - *Elements / Filter* (Columns con el mismo botón) y *Components / Ledger / ColumnPicker*; *Elements / Navigation*
   (Billing menu); *Components / UI / PageTitle* (la escala de títulos); *Components / Help / Confibot*;

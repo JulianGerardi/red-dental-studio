@@ -2056,3 +2056,8 @@ Como en red.dev:
 
 Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
 En Clinical Mode: el Overview (Treatment Plan, odontograma, Problem List), Treatment (el workflow, Workflows, Progress y Treatment plans), Treatment Plan (la lista de planes y el caso), la columna de los exámenes, Vitals, Radiography y el bloque de consentimiento. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.
+
+## Card Treatment plans: queda la A (2026-10-06)
+
+Julián eligió la **A** (las tarjetas, la que ya estaba publicada). B y C se sacaron del código junto con la prop
+`variante`; la página *Components / Clinical / Treatment plans card* documenta sólo la A, con la decisión.
