@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, Baby, Eraser, PanelBottom, PanelTop, UserRound, type LucideIcon } from 'lucide-react'
 import { applyPrimaryDentition, clearSelection, resetMouth } from 'react-advanced-odontogram'
-import { ModalShell } from '@/components/patients/form'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
@@ -109,19 +109,14 @@ export function BotoneraDientes({ raiz }: { raiz: HTMLElement | null }) {
 
         {/* La librería no tiene "volver a permanente": vuelve con su reinicio, que también borra lo marcado. Se avisa. */}
         {confirmando && (
-          <ModalShell
+          <ConfirmDialog
             title="Back to permanent dentition?"
-            onClose={() => setConfirmando(false)}
-            width="max-w-[420px]"
-            footer={
-              <>
-                <button type="button" onClick={() => setConfirmando(false)} className="h-9 rounded-md border border-line bg-white px-5 text-[13px] font-medium hover:bg-surface-subtle">Cancel</button>
-                <button type="button" onClick={() => { resetMouth(); setDenticion('permanent'); setGrupo(null); setConfirmando(false) }} className="bg-dash-blue hover:bg-dash-blue-hover h-9 rounded-md px-5 text-[13px] font-medium text-white">Switch to permanent</button>
-              </>
-            }
+            confirmLabel="Switch to permanent"
+            onCancel={() => setConfirmando(false)}
+            onConfirm={() => { resetMouth(); setDenticion('permanent'); setGrupo(null); setConfirmando(false) }}
           >
-            <p className="text-[13px] leading-relaxed text-ink-soft">The chart goes back to the permanent teeth. What was marked on the primary teeth is cleared.</p>
-          </ModalShell>
+            <p>The chart goes back to the permanent teeth. What was marked on the primary teeth is cleared.</p>
+          </ConfirmDialog>
         )}
       </div>
     </TooltipProvider>

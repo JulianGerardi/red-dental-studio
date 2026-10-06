@@ -1,5 +1,6 @@
+import { Drawer } from '@/components/ui/drawer'
 import { useState } from 'react'
-import { CircleCheck, CircleAlert, Download, FileSignature, FileText, History, MoreVertical, PenLine, RefreshCw, Send, X, type LucideIcon } from 'lucide-react'
+import { CircleCheck, CircleAlert, Download, FileSignature, FileText, History, MoreVertical, PenLine, RefreshCw, Send, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { CONSENTIMIENTO, type Firma } from '@/data/treatment-plan'
@@ -33,42 +34,24 @@ export function FilaFirma({ f }: { f: Firma }) {
 
 export function PanelHistorial({ onClose }: { onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/30" onClick={onClose}>
-      <aside
-        role="dialog"
-        aria-label="Consent history"
-        onClick={(e) => e.stopPropagation()}
-        className="motion-safe:animate-[panel-in_180ms_ease-out] flex h-full w-full max-w-[380px] flex-col bg-white"
-      >
-        <div className="flex items-start justify-between gap-3 p-5">
-          <span className="min-w-0">
-            <h2 className="text-[18px] font-bold text-ink">Consent history</h2>
-            <p className="mt-0.5 truncate text-[12px] text-ink-muted">{CONSENTIMIENTO.titulo}</p>
-          </span>
-          <button onClick={onClose} aria-label="Close" className="shrink-0 text-ink hover:opacity-60">
-            <X className="size-5" />
-          </button>
-        </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5">
-          <ol className="flex flex-col">
-            {CONSENTIMIENTO.historial.map((h, i, todos) => (
-              <li key={h.id} className="flex gap-3">
-                <span className="flex flex-col items-center">
-                  <span className={cn('mt-1 size-2 shrink-0 rounded-full', i === 0 ? 'bg-dash-blue' : 'bg-line-strong')} />
-                  {i < todos.length - 1 && <span className="w-px flex-1 bg-line" />}
-                </span>
-                <span className="min-w-0 flex-1 pb-5">
-                  <span className="block text-[13px] font-semibold text-ink">{h.evento}</span>
-                  <span className="block text-[12px] text-ink-muted">
-                    {h.version} · {h.fecha} · {h.autor}
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </aside>
-    </div>
+    <Drawer open onClose={onClose} title="Consent history" description={CONSENTIMIENTO.titulo}>
+      <ol className="flex flex-col pt-2">
+        {CONSENTIMIENTO.historial.map((h, i, todos) => (
+          <li key={h.id} className="flex gap-3">
+            <span className="flex flex-col items-center">
+              <span className={cn('mt-1 size-2 shrink-0 rounded-full', i === 0 ? 'bg-dash-blue' : 'bg-line-strong')} />
+              {i < todos.length - 1 && <span className="w-px flex-1 bg-line" />}
+            </span>
+            <span className="min-w-0 flex-1 pb-5">
+              <span className="block text-[13px] font-semibold text-ink">{h.evento}</span>
+              <span className="block text-[12px] text-ink-muted">
+                {h.version} · {h.fecha} · {h.autor}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </Drawer>
   )
 }
 

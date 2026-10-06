@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { NotebookText, X } from 'lucide-react'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { NotebookText } from 'lucide-react'
+import { Drawer } from '@/components/ui/drawer'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 export type ExamReview = { id: string; date: string; provider: string; note: string }
@@ -50,20 +50,9 @@ export function ReviewList({ reviews }: { reviews: ExamReview[] }) {
         ))}
       </div>
 
-      <Dialog open={leyendo !== null} onOpenChange={(v) => !v && setLeyendo(null)}>
-        <DialogContent showCloseButton={false} className="gap-3 p-5 sm:max-w-[420px]">
-          <div className="flex items-start justify-between gap-4">
-            <span className="flex flex-col">
-              <span className="text-base leading-none font-bold text-ink">Exam review</span>
-              <span className="mt-1 text-xs text-ink-faint">{leyendo?.provider} · {leyendo?.date}</span>
-            </span>
-            <button type="button" aria-label="Close" onClick={() => setLeyendo(null)} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted">
-              <X className="size-4" />
-            </button>
-          </div>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap text-ink">{leyendo?.note}</p>
-        </DialogContent>
-      </Dialog>
+      <Drawer open={leyendo !== null} onClose={() => setLeyendo(null)} title="Exam review" description={leyendo ? `${leyendo.provider} · ${leyendo.date}` : undefined}>
+        <p className="pt-2 text-sm leading-relaxed whitespace-pre-wrap text-ink">{leyendo?.note}</p>
+      </Drawer>
     </>
   )
 }

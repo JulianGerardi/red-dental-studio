@@ -1,7 +1,8 @@
+import { DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
 import { Trash2, Save } from 'lucide-react'
 import {
-  ModalShell, TextField, SelectField, FormFooter, FieldLabel, OptionCheckbox,
+  ModalShell, TextField, SelectField, FieldLabel, OptionCheckbox,
 } from '@/components/patients/form'
 import { DatePicker } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
@@ -60,7 +61,7 @@ export function NewExceptionModal({
       title="New Exception"
       onClose={onClose}
       width="max-w-[420px]"
-      footer={<FormFooter onCancel={onClose} onSave={guardar} />}
+      actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-4">
         <TextField

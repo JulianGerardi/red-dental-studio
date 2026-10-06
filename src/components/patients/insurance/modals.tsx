@@ -1,8 +1,9 @@
+import { DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { useState } from 'react'
 import { CirclePlus, Pencil, ShieldHalf, Hospital, AArrowUp } from 'lucide-react'
 import {
   ModalShell, SectionCard, SearchField, SelectField, TextField,
-  DateTextField, TextArea, OptionCheckbox, FormFooter,
+  DateTextField, TextArea, OptionCheckbox,
 } from '@/components/patients/form'
 import { PersonaSeleccionada, DIRECTORIO } from '@/pages/patients/AddRelationship'
 import { CARRIERS, PLANES_NOMBRE, ORDENES, SUSCRIPCION } from '@/data/insurance'
@@ -30,18 +31,29 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
   const set = (k: keyof typeof d) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? 'This field is required.' : undefined)
 
+  /* Dos pasos, como los drawers de Confidentally 2.0: primero quién es el suscriptor, después la cobertura. */
+  const [paso, setPaso] = useState(0)
+  const faltaSuscriptor = modo === 'nuevo' && (!d.nombre.trim() || !d.apellido.trim() || !d.cumple.trim())
+  const siguiente = () => {
+    if (faltaSuscriptor) { setIntentado(true); return }
+    setIntentado(false)
+    setPaso(1)
+  }
   const guardar = () => {
     setIntentado(true)
+    if (faltaSuscriptor) { setPaso(0); return }
     if (!d.carrier.trim() || !d.inicio.trim()) return
-    if (modo === 'nuevo' && (!d.nombre.trim() || !d.apellido.trim() || !d.cumple.trim())) return
     aviso.ok(`Subscription with ${d.carrier} created.`)
     onClose()
   }
 
   return (
-    <ModalShell title="New Subscription" onClose={onClose} footer={<FormFooter onCancel={onClose} onSave={guardar} />}>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="flex flex-col gap-6">
+    <ModalShell
+      title="New Subscription" description="Subscriber and coverage" onClose={onClose} width="max-w-[560px]" steps={['Subscriber', 'Subscription']} step={paso}
+      actions={<DrawerActions step={paso} total={2} onNext={siguiente} onBack={() => setPaso(0)} onCancel={onClose} onSave={guardar} />}
+    >
+      <div className="flex flex-col gap-6">
+        <DrawerStep index={0} step={paso} className="flex flex-col gap-6">
           <SectionCard title="Subscriber">
             <p className="-mt-2 text-[11px] text-ink-muted">Choose how you want to add the subscriber</p>
             {OPCIONES.map((o) => (
@@ -82,8 +94,9 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
               </div>
             </SectionCard>
           )}
-        </div>
+        </DrawerStep>
 
+        <DrawerStep index={1} step={paso}>
         <SectionCard title="Subscription Information">
           <div className="grid gap-4 sm:grid-cols-2">
             <SearchField label="Subcriber ID" options={[SUSCRIPCION.subscriberId]} value={d.subId} onChange={set('subId')} />
@@ -96,6 +109,7 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
           </div>
           <TextArea label="Notes" placeholder="Add notes" value={d.notas} onChange={set('notas')} />
         </SectionCard>
+        </DrawerStep>
       </div>
     </ModalShell>
   )
@@ -126,6 +140,7 @@ export function ManageSubscriptionModal({
   const [fin, setFin] = useState('03/01/2025')
   const [notas, setNotas] = useState('')
   const [intentado, setIntentado] = useState(false)
+  const [paso, setPaso] = useState(0)
 
   const guardar = () => {
     setIntentado(true)
@@ -135,10 +150,13 @@ export function ManageSubscriptionModal({
   }
 
   return (
-    /* "Suscription" sin la b es del Figma. */
-    <ModalShell title="Manage Suscription" onClose={onClose} footer={<FormFooter onCancel={onClose} onSave={guardar} />}>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="flex flex-col gap-6">
+    /* "Suscription" sin la b es del Figma. Dos pasos: quiénes (suscriptor y dependientes) y la cobertura. */
+    <ModalShell
+      title="Manage Suscription" description="Subscriber, dependers and coverage" onClose={onClose} width="max-w-[560px]" steps={['Subscriber', 'Subscription']} step={paso}
+      actions={<DrawerActions step={paso} total={2} onNext={() => setPaso(1)} onBack={() => setPaso(0)} onCancel={onClose} onSave={guardar} />}
+    >
+      <div className="flex flex-col gap-6">
+        <DrawerStep index={0} step={paso} className="flex flex-col gap-6">
           <SectionCard title="Subscriber">
             <div className="relative">
               <PersonaSeleccionada p={DIRECTORIO[0]} />
@@ -164,8 +182,9 @@ export function ManageSubscriptionModal({
               <CirclePlus className="size-4" /> Add New
             </button>
           </SectionCard>
-        </div>
+        </DrawerStep>
 
+        <DrawerStep index={1} step={paso}>
         <SectionCard title="Subscription Information">
           <FilaLectura icon={ShieldHalf} label="Carrier" value={SUSCRIPCION.carrier} />
           <FilaLectura icon={Hospital} label="Plan" value={SUSCRIPCION.plan} />
@@ -179,6 +198,7 @@ export function ManageSubscriptionModal({
           </div>
           <TextArea label="Notes" placeholder="Add notes" value={notas} onChange={setNotas} />
         </SectionCard>
+        </DrawerStep>
       </div>
     </ModalShell>
   )
@@ -202,7 +222,7 @@ export function NewDependerModal({ onClose }: { onClose: () => void }) {
   return (
     /* "Depender" es del Figma; también es el único lugar donde "Coordination"
        está bien escrito. */
-    <ModalShell title="New Depender" onClose={onClose} width="max-w-[420px]" footer={<FormFooter onCancel={onClose} onSave={guardar} />}>
+    <ModalShell title="New Depender" onClose={onClose} width="max-w-[420px]" actions={<DrawerActions onCancel={onClose} onSave={guardar} />}>
       <div className="flex flex-col gap-4">
         <SearchField
           label="Dependent Patient" options={DIRECTORIO.map((p) => p.name)}

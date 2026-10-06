@@ -1,12 +1,9 @@
 import { Tabs } from '@/components/ui/tabs'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ArrowRight, Check, ChevronsLeft, ChevronsRight, ListFilter, Search, X } from 'lucide-react'
-import { Drawer } from '@/components/ui/drawer'
-import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Switch } from '@/components/ui/switch'
+import { ChevronsLeft, ChevronsRight, Search, X } from 'lucide-react'
+import { Drawer, DrawerActions } from '@/components/ui/drawer'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { SelectField } from '@/components/patients/form'
-import { StepIndicator } from '@/components/clinical/StepIndicator'
 import { SurfaceWheel, type Surface } from './SurfaceWheel'
 import { LinkedFindingCard } from './LinkedFindingCard'
 import { NOMBRE_ALCANCE, ScopeIcon } from './ScopeIcons'
@@ -86,7 +83,6 @@ export function NewProcedureDrawer({
   const conSuperficies = procedure?.area === 'Surface'
   const pasos: Paso[] = ['Procedure', ...(conSuperficies ? ['Surfaces' as const] : []), ...(status === 'Planned' ? ['Link to finding' as const] : [])]
   const actual = pasos[Math.min(paso, pasos.length - 1)]!
-  const ultimo = paso >= pasos.length - 1
   const hayAlguna = Object.values(surfaces).some((x) => x.length > 0)
   const q = query.trim().toLowerCase()
   const coincide = (p: ProcedureOption, s: ProcedureStatus) =>
@@ -125,30 +121,18 @@ export function NewProcedureDrawer({
     onClose()
   }
 
-  /* Como en el Figma: la acción principal a lo ancho y debajo la secundaria. */
+  /* El pie de todos los drawers (como en Confidentally 2.0): Cancel o Return a la izquierda, Next Step o Save a la derecha. */
+  const bloqueado = (actual === 'Procedure' && !procedure) || (actual === 'Surfaces' && !hayAlguna)
   const footer = (
-    <>
-      {!ultimo ? (
-        <Button className="w-full" disabled={(actual === 'Procedure' && !procedure) || (actual === 'Surfaces' && !hayAlguna)} onClick={() => setPaso(paso + 1)}>
-          Next Step <ArrowRight />
-        </Button>
-      ) : (
-        <Button className="w-full" disabled={(actual === 'Procedure' && !procedure) || (actual === 'Surfaces' && !hayAlguna)} onClick={save}><Check /> Save</Button>
-      )}
-      {paso === 0 ? (
-        <Button variant="secondary" className="w-full" onClick={onClose}><X /> Cancel</Button>
-      ) : (
-        <Button variant="secondary" className="w-full" onClick={() => setPaso(paso - 1)}><ArrowLeft /> Return</Button>
-      )}
-    </>
+    <DrawerActions
+      step={paso} total={pasos.length} onNext={() => setPaso(paso + 1)} onBack={() => setPaso(paso - 1)} onCancel={onClose} onSave={save}
+      nextDisabled={bloqueado} saveDisabled={bloqueado}
+    />
   )
 
   return (
-    <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New Condition' : 'New Procedure'} footer={footer}>
-      {/* Con un solo paso (algo ya hecho, sin superficie) no hay pasos que mostrar. */}
-      {pasos.length > 1 && <StepIndicator total={pasos.length} current={paso + 1} labels={pasos} />}
-
-      <div className="mt-5">
+    <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New Condition' : 'New Procedure'} steps={pasos} step={paso} footer={footer}>
+      <div>
         {actual === 'Procedure' && (
           <div className="flex w-full flex-col items-start gap-4">
             <div className="flex w-full flex-col items-start gap-2 border-b border-line pb-4">
@@ -174,25 +158,8 @@ export function NewProcedureDrawer({
                     className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] placeholder:text-ink-faint focus:outline-none"
                   />
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button type="button" aria-label="Filter by treatment area" className={`relative flex size-9 items-center justify-center rounded-md border hover:bg-surface-subtle ${areas.length ? 'border-dash-blue text-dash-blue' : 'border-line'}`}>
-                      <ListFilter className="size-4" />
-                      {areas.length > 0 && <span className="bg-dash-blue absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full text-[9px] font-bold text-white">{areas.length}</span>}
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="min-w-[200px]">
-                    <DropdownMenuLabel>Treatment Area</DropdownMenuLabel>
-                    <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setAreas([]) }} className="justify-between">
-                      Show all treatment <Switch checked={!areas.length} aria-hidden tabIndex={-1} />
-                    </DropdownMenuItem>
-                    {TREATMENT_AREAS.map((a) => (
-                      <DropdownMenuItem key={a} onSelect={(e) => { e.preventDefault(); setAreas((xs) => (xs.includes(a) ? xs.filter((x) => x !== a) : [...xs, a])) }} className="justify-between">
-                        {a} <Switch checked={areas.includes(a)} aria-hidden tabIndex={-1} />
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                {/* Sin áreas tildadas se ve todo ("Show all treatment"): Clear all vuelve a eso. */}
+                <FilterMenu label="Filter by treatment area" groups={[{ title: 'Treatment Area', options: [...TREATMENT_AREAS], value: areas, onChange: (v) => setAreas(v as TreatmentArea[]) }]} />
               </div>
             </div>
 

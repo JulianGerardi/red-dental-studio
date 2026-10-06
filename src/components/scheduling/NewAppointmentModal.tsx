@@ -1,7 +1,8 @@
+import { DrawerActions, DrawerSection } from '@/components/ui/drawer'
 import { useMemo, useState } from 'react'
 import {
-  ModalShell, SectionCard, SelectField, SearchField, TextArea,
-  OptionCheckbox, FormFooter, FieldLabel, FieldError,
+  ModalShell, SelectField, SearchField, TextArea,
+  OptionCheckbox, FieldLabel, FieldError,
 } from '@/components/patients/form'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
 import { AppointmentSlotPicker, HORAS } from '@/components/scheduling/AppointmentSlotPicker'
@@ -16,18 +17,10 @@ import { aviso } from '@/components/ui/toaster'
    "Providers" se fundieron en Patient + Scheduling, y Additional Provider
    perdió el asterisco.
 
-   Julián pidió después separar el modal en dos pasos (no viene del Figma):
-   paso 1 es Patient + Scheduling + Additional, paso 2 es el link al treatment
-   plan -antes vivían los dos en la misma pantalla, apretados uno al lado del
-   otro-. `paso` maneja cuál se ve; "Continue" valida los obligatorios del
-   paso 1 antes de dejar pasar al 2.
-
-   La columna de horarios sigue a la derecha del formulario, hermana suya
-   dentro de un mismo frame (757 + 190 = 947), pegada y sin montarse. Sólo
-   aparece en el paso 1, que es el único con campos de horario.
-
-   La dispara **ASAP**: es el único checkbox tildado en el frame donde la
-   columna aparece. Es una inferencia — ver README.md, Desviaciones. */
+   Desde 2026-10-06 es un drawer con la organización de New Appointment de Confidentally 2.0: paso 1 "Patient and
+   Scheduling" en una columna, paso 2 "Link to treatment plan visit" con Additional y las notas. El calendario del día
+   (AppointmentSlotPicker) se despliega al costado del drawer cuando se toca la fecha o la hora. Ver
+   design-reference/design-system.md, "Pop ups". */
 
 const PACIENTES = ['John Smith', 'Noah James Smith', 'Maria Abril Viola', 'Elias Aguirre']
 const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado', 'Sarah Stone']
@@ -121,18 +114,10 @@ export function NewAppointmentModal({
   const [plan, setPlan] = useState('p1')
   const [visita, setVisita] = useState('v1')
   const [intentado, setIntentado] = useState(false)
-  /* Antes el panel de franjas horarias sólo salía con ASAP tildado -un
-     disparador raro para algo que sólo tiene que ver con "mostrame dónde cae
-     el turno"-. Ahora sale al tocar cualquier campo de Scheduling (el
-     `onFocus` de React burbujea, así que uno solo alcanza para todo el
-     grupo), y ASAP lo sigue mostrando también, no lo reemplaza. Sólo aplica
-     en el paso 1 -en el 2 no hay campos de horario que lo disparen-. */
+  /* El calendario del día se despliega al costado cuando se toca la fecha o la hora (sólo en el paso 1). */
   const [tocoHorario, setTocoHorario] = useState(false)
-  /* Julián pidió separar el modal en dos pasos: primero paciente/proveedor/
-     horario, recién después el link al treatment plan -antes iba todo junto
-     en una sola pantalla larga-. */
   const [paso, setPaso] = useState<1 | 2>(1)
-  const mostrarPanel = paso === 1 && (asap || tocoHorario)
+  const mostrarPanel = paso === 1 && tocoHorario
   const set = (k: keyof typeof VACIO) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   const req = (k: keyof typeof VACIO) =>
     intentado && !d[k].trim() ? 'This field is required.' : undefined
@@ -171,139 +156,78 @@ export function NewAppointmentModal({
   return (
     <ModalShell
       title={titulo}
+      description="Customize the schedule you want to see"
       onClose={onClose}
-      footer={
-        paso === 1 ? (
-          <FormFooter onCancel={onClose} onSave={continuar} saveLabel="Continue" />
-        ) : (
-          <FormFooter onCancel={() => setPaso(1)} onSave={guardar} cancelLabel="Back" />
-        )
-      }
-      aside={
-        mostrarPanel ? (
-          <AppointmentSlotPicker
-            seleccion={d.start}
-            paciente={d.patient}
-            onPick={elegirFranja}
-            className="h-full w-[190px] rounded-l-none border-l-0 shadow-[0_4px_14px_0_rgb(100_100_100/0.25)] lg:h-full max-lg:max-h-[340px] max-lg:w-full max-lg:rounded-xl max-lg:border-l"
-          />
-        ) : undefined
-      }
+      width="max-w-[560px]"
+      steps={['Patient and Scheduling', 'Link to treatment plan visit']}
+      step={paso - 1}
+      actions={<DrawerActions step={paso - 1} total={2} onNext={continuar} onBack={() => setPaso(1)} onCancel={onClose} onSave={guardar} />}
+      aside={mostrarPanel ? <AppointmentSlotPicker seleccion={d.start} paciente={d.patient} onPick={elegirFranja} className="h-full rounded-none border-0" /> : undefined}
     >
-      <p className="-mt-2 mb-4 text-[10px] font-semibold tracking-wide text-ink-muted uppercase">
-        Step {paso} of 2 — {paso === 1 ? 'Patient & Scheduling' : 'Treatment Plan'}
-      </p>
-
       {paso === 1 ? (
-        /* Julián pidió Patient y Scheduling lado a lado -eran la columna
-           izquierda entera, apiladas- y Additional abajo de las dos, ocupando
-           todo el ancho: así entra toda la info del paso de un vistazo, sin
-           tener que bajar por una columna angosta. */
-        <div className="flex flex-col gap-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <SectionCard title="Patient">
-              <p className="-mt-2 text-[11px] text-ink-muted">
-                Complete the details below to schedule the appointment.
-              </p>
-              <SearchField
-                label="Patient" required placeholder="Search by Name" options={PACIENTES}
-                value={d.patient} onChange={set('patient')} error={req('patient')}
+        /* Como New Appointment de Confidentally 2.0: una columna, Requestor y Reason, Start y End, Operatory y Status de a
+           dos. Al tocar la fecha o la hora se despliega al costado el calendario del día para elegir la franja. */
+        <DrawerSection title="Patient and Scheduling" description="Complete the details below to schedule the appointment.">
+          <SearchField
+            label="Patient" required placeholder="Search by Name" options={PACIENTES}
+            value={d.patient} onChange={set('patient')} error={req('patient')}
+          />
+          <SearchField
+            label="Primary Provider" required placeholder="Search by Name" options={PROVIDERS}
+            value={d.primary} onChange={set('primary')} error={req('primary')}
+          />
+          <SearchField
+            label="Additional Provider" placeholder="Search by Name" options={PROVIDERS}
+            value={d.additional} onChange={set('additional')}
+          />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <SelectField label="Requestor" placeholder="Who is requesting?" value={d.requestor} onChange={set('requestor')} />
+            <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />
+          </div>
+          {/* onFocus burbujea: uno solo alcanza para la fecha y las horas. Una vez abierto, el calendario se queda. */}
+          <div onFocus={() => setTocoHorario(true)} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <FieldLabel required>Date</FieldLabel>
+              <DatePicker
+                value={fecha}
+                onChange={(nueva) => { set('date')(formatDMY(nueva)); setTocoHorario(true) }}
+                placeholder="12-03-2025"
+                error={!!req('date')}
+                className="h-9 w-full"
               />
-              <SearchField
-                label="Primary Provider" required placeholder="Search by Name" options={PROVIDERS}
-                value={d.primary} onChange={set('primary')} error={req('primary')}
-              />
-              <SearchField
-                label="Additional Provider" placeholder="Search by Name" options={PROVIDERS}
-                value={d.additional} onChange={set('additional')}
-              />
-              <SelectField
-                label="Requestor" placeholder="Who is requesting?"
-                value={d.requestor} onChange={set('requestor')}
-              />
-              <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />
-            </SectionCard>
-
-            {/* onFocus -no onClick- porque el primer campo suele ser el
-                DatePicker, que abre un popover en vez de "clickearse" él
-                mismo; onFocus de React burbujea, así que uno solo alcanza para
-                todo el grupo. Una vez que aparece, se queda -no tiene sentido
-                que el panel entre y salga cada vez que el foco se mueve dentro
-                del mismo grupo de campos-. */}
-            <div onFocus={() => setTocoHorario(true)}>
-            <SectionCard title="Scheduling">
-              {/* El Figma dibuja Date como un select con la fecha 12-03-2025 de
-                  placeholder; acá es el calendario, que es lo que hace falta para
-                  reprogramar. Los dos campos de hora sí conservan ese placeholder
-                  raro del frame. */}
-              <div className="flex flex-col gap-2">
-                <FieldLabel required>Date</FieldLabel>
-                <DatePicker
-                  value={fecha}
-                  onChange={(nueva) => set('date')(formatDMY(nueva))}
-                  placeholder="12-03-2025"
-                  error={!!req('date')}
-                  className="h-9 w-full"
-                />
-                <FieldError>{req('date')}</FieldError>
-              </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <SelectField
-                  label="Start Time" required placeholder="12-03-2025" options={HORAS.slice(0, -1)}
-                  value={d.start} onChange={set('start')} error={req('start')}
-                />
-                <SelectField
-                  label="End Time" required placeholder="12-03-2025" options={HORAS.slice(1)}
-                  value={d.end} onChange={set('end')} error={req('end')}
-                />
-              </div>
-              <SelectField
-                label="Operatory" required value={d.operatory}
-                onChange={set('operatory')} error={req('operatory')}
-              />
-              <SelectField
-                label="Status" required value={d.status}
-                onChange={set('status')} error={req('status')}
-              />
-            </SectionCard>
+              <FieldError>{req('date')}</FieldError>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <SelectField label="Start Time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} />
+              <SelectField label="End Time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
             </div>
           </div>
-
-          <SectionCard title="Additional">
-            {/* Los tres iban uno debajo del otro -SectionCard los apila por
-                default- y hacían bastante scroll para algo que es sólo tres
-                casilleros cortos. Van en fila; cada uno en flex-1 para que
-                `OptionCheckbox` (que ya es w-full) reparta el ancho parejo. */}
-            <div className="flex flex-wrap gap-3">
-              <div className="min-w-[160px] flex-1"><OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} /></div>
-              <div className="min-w-[160px] flex-1"><OptionCheckbox label="Follow-up" defaultChecked={false} /></div>
-              <div className="min-w-[160px] flex-1"><OptionCheckbox label="Premedicate" defaultChecked={false} /></div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <SelectField label="Operatory" required value={d.operatory} onChange={set('operatory')} error={req('operatory')} />
+            <SelectField label="Status" required value={d.status} onChange={set('status')} error={req('status')} />
+          </div>
+        </DrawerSection>
+      ) : (
+        /* Paso 2 de 2.0: el link a una visita del plan (opcional), Additional y las notas. */
+        <div className="flex flex-col gap-6">
+          <DrawerSection title="Link to treatment plan visit" description="Optional. Show this only when the appointment should be tied to a planned treatment visit.">
+            <div className="flex flex-col gap-2">
+              <p className="text-[12px] font-semibold text-ink">Treatment plan</p>
+              {PLANES.map((p) => <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />)}
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="text-[12px] font-semibold text-ink">Visit</p>
+              {VISITAS.map((v) => <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />)}
+            </div>
+          </DrawerSection>
+          <DrawerSection title="Additional">
+            <div className="flex flex-col gap-2">
+              <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
+              <OptionCheckbox label="Follow-up" defaultChecked={false} />
+              <OptionCheckbox label="Premedicate" defaultChecked={false} />
             </div>
             <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
-          </SectionCard>
-        </div>
-      ) : (
-        /* El link a un plan de tratamiento pasó a ser su propio paso -antes
-           vivía apretado al lado de Patient/Scheduling-. Llegar acá ya
-           implica que el paciente está elegido (es obligatorio en el paso 1),
-           así que no hace falta re-chequear d.patient.
-
-           Treatment plans y Visit iban los dos adentro de una sola card, uno
-           debajo del otro. Primero se separaron en dos filas, pero Julián
-           las quería lado a lado -Treatment a la izquierda, Visit a la
-           derecha-, igual que Patient/Scheduling en el paso 1. */
-        <div className="grid gap-6 lg:grid-cols-2">
-          <SectionCard title="Treatment plans">
-            {PLANES.map((p) => (
-              <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />
-            ))}
-          </SectionCard>
-
-          <SectionCard title="Visit">
-            {VISITAS.map((v) => (
-              <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />
-            ))}
-          </SectionCard>
+          </DrawerSection>
         </div>
       )}
     </ModalShell>

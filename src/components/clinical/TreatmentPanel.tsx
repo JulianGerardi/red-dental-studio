@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import {
-  Bot, CalendarDays, Check, ChevronDown, ChevronRight, CircleAlert, CircleCheck, ClipboardList, Eye, EyeOff, Filter, MoreVertical, Play, Search, Siren, Sparkles,
+  Bot, CalendarDays, Check, ChevronDown, ChevronRight, CircleAlert, CircleCheck, ClipboardList, Eye, EyeOff, MoreVertical, Play, Search, Siren, Sparkles,
   Stethoscope, Workflow as IconoWorkflow, X, type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { EmptyState } from '@/components/ui/empty-state'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
@@ -181,84 +181,6 @@ export const filtrar = (lista: Workflow[], f: Filtros) => {
   return lista.filter((w) => (!f.categorias.length || f.categorias.includes(w.categoria)) && (!t || `${w.codigo} ${w.nombre}`.toLowerCase().includes(t)))
 }
 
-/* El embudo de Workflows: por tipo (con cuántos hay de cada uno) y por código o descripción. Muestra cuántos quedarían
-   antes de aplicar; Clear all vacía el borrador. */
-export function WorkflowFilters({ value, onChange }: { value: Filtros; onChange: (f: Filtros) => void }) {
-  const [abierto, setAbierto] = useState(false)
-  const [borrador, setBorrador] = useState(value)
-  const activos = value.categorias.length + (value.q.trim() ? 1 : 0)
-  const hayBorrador = borrador.categorias.length > 0 || !!borrador.q.trim()
-  const quedan = filtrar(WORKFLOWS, borrador).length
-  const alternar = (c: CategoriaWorkflow) =>
-    setBorrador((b) => ({ ...b, categorias: b.categorias.includes(c) ? b.categorias.filter((x) => x !== c) : [...b.categorias, c] }))
-  return (
-    <Popover open={abierto} onOpenChange={(o) => { setAbierto(o); if (o) setBorrador(value) }}>
-      <ConAyuda texto="Filter workflows">
-        <PopoverTrigger
-          aria-label={activos ? `Filter workflows (${activos} applied)` : 'Filter workflows'}
-          className={cn(ICONO_SUELTO, 'relative size-8 rounded-md border', activos ? 'border-dash-blue bg-dash-count-bg text-dash-blue' : 'border-line')}
-        >
-          <Filter className="size-4" />
-          {activos > 0 && <span className="bg-dash-blue absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full text-[9px] text-white">{activos}</span>}
-        </PopoverTrigger>
-      </ConAyuda>
-      <PopoverContent align="end" className="w-[320px] gap-0 overflow-hidden p-0">
-        <div className="flex items-center justify-between gap-2 border-b border-line-soft px-4 py-3">
-          <p className="text-[14px] font-bold text-ink">Filters</p>
-          <button type="button" disabled={!hayBorrador} onClick={() => setBorrador({ categorias: [], q: '' })} className="text-dash-blue text-[12px] font-medium hover:underline disabled:text-ink-faint disabled:no-underline">
-            Clear all
-          </button>
-        </div>
-        <div className="flex flex-col gap-4 px-4 py-3">
-          <fieldset>
-            <legend className="text-[11px] font-semibold text-ink">Workflow type</legend>
-            <div className="mt-2 grid grid-cols-2 gap-1.5">
-              {CATEGORIAS_WORKFLOW.map((c) => {
-                const on = borrador.categorias.includes(c)
-                const Icono = on ? Check : ICONO_CATEGORIA[c]
-                const n = WORKFLOWS.filter((w) => w.categoria === c).length
-                return (
-                  <button
-                    key={c} type="button" aria-pressed={on} disabled={n === 0 && !on} onClick={() => alternar(c)}
-                    className={cn(
-                      'flex h-9 items-center gap-2 rounded-md border px-2.5 text-left text-[12px] transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-                      on ? 'border-dash-blue bg-info-bg text-dash-blue font-semibold' : 'enabled:hover:border-dash-blue border-line bg-white text-ink',
-                    )}
-                  >
-                    <Icono className="size-3.5 shrink-0" aria-hidden />
-                    <span className="min-w-0 flex-1 truncate">{c}</span>
-                    <span className={cn('text-[10px] tabular-nums', on ? 'text-dash-blue' : 'text-ink-faint')}>{n}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </fieldset>
-          <label className="flex flex-col gap-2">
-            <span className="text-[11px] font-semibold text-ink">Code or description</span>
-            <span className="relative">
-              <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
-              <input
-                value={borrador.q} onChange={(e) => setBorrador((b) => ({ ...b, q: e.target.value }))} placeholder="e.g. TRIAGE or Social"
-                onKeyDown={(e) => { if (e.key === 'Enter') { onChange(borrador); setAbierto(false) } }}
-                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-8 pl-8 text-[12px] placeholder:text-ink-faint focus:outline-none"
-              />
-              {borrador.q && (
-                <button type="button" aria-label="Clear search" onClick={() => setBorrador((b) => ({ ...b, q: '' }))} className="absolute top-1/2 right-2 -translate-y-1/2 text-ink-muted hover:text-ink">
-                  <X className="size-3.5" />
-                </button>
-              )}
-            </span>
-          </label>
-        </div>
-        <div className="flex items-center justify-between gap-2 border-t border-line-soft bg-surface-alt px-4 py-3">
-          <span className="text-[11px] text-ink-muted tabular-nums">{quedan} of {WORKFLOWS.length} workflows</span>
-          <Button size="sm" disabled={quedan === 0} onClick={() => { onChange(borrador); setAbierto(false) }}>Apply Filters</Button>
-        </div>
-      </PopoverContent>
-    </Popover>
-  )
-}
-
 /* Lo aplicado, debajo del título de Workflows: un chip por filtro para sacarlo, y Clear. */
 export function FiltrosAplicados({ value, onChange }: { value: Filtros; onChange: (f: Filtros) => void }) {
   if (!value.categorias.length && !value.q.trim()) return null
@@ -303,7 +225,8 @@ export function NarrativeSummary({ narrativa, onAbrir }: { narrativa: Narrativa;
   )
 }
 
-/* Los planes del paciente, plegables, con sus procedimientos en tarjetas chicas. */
+/* Los planes del paciente, plegables, con sus procedimientos en tarjetas chicas (Julián eligió esta opción: muestra el
+   detalle de cada procedimiento). */
 export function TreatmentPlansCard({ onTreatmentPlan }: { onTreatmentPlan?: () => void }) {
   const casos = CASOS.filter((c) => c.estado !== 'Discarded').slice(0, 3)
   const [abiertos, setAbiertos] = useState<string[]>(casos.slice(0, 1).map((c) => c.id))
@@ -461,7 +384,18 @@ export function TreatmentPanel({ onTreatmentPlan }: { onTreatmentPlan?: () => vo
           <div className="rounded-xl border border-line bg-white p-3">
             <div className="flex items-center justify-between gap-2 px-1">
               <p className="text-[15px] font-bold text-ink">Workflows</p>
-              <WorkflowFilters value={filtros} onChange={setFiltros} />
+              <FilterMenu
+                label="Filter workflows" size="sm"
+                groups={[{
+                  title: 'Workflow type', value: filtros.categorias, onChange: (v) => setFiltros((f) => ({ ...f, categorias: v as CategoriaWorkflow[] })),
+                  options: CATEGORIAS_WORKFLOW.map((c) => {
+                    const n = WORKFLOWS.filter((w) => w.categoria === c).length
+                    return { value: c, icon: ICONO_CATEGORIA[c], count: n, disabled: n === 0 }
+                  }),
+                }]}
+                search={{ label: 'Code or description', placeholder: 'e.g. TRIAGE or Social', value: filtros.q, onChange: (q) => setFiltros((f) => ({ ...f, q })) }}
+                result={`${lista.length} of ${WORKFLOWS.length} workflows`}
+              />
             </div>
             <FiltrosAplicados value={filtros} onChange={setFiltros} />
             {lista.length === 0 ? (

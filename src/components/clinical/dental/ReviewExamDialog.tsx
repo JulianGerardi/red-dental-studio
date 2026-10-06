@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Check, CircleAlert, X } from 'lucide-react'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { CircleAlert } from 'lucide-react'
+import { Drawer, DrawerActions } from '@/components/ui/drawer'
 import { TextArea } from '@/components/patients/form'
 
-/* Firmar el exam: hace falta una nota antes de poder confirmar. */
+/* Firmar el exam: hace falta una nota antes de poder confirmar. Drawer, como todo lo que se carga encima de una pantalla. */
 export function ReviewExamDialog({
   open, onCancel, onConfirm,
 }: {
@@ -16,36 +16,17 @@ export function ReviewExamDialog({
   useEffect(() => { if (open) setNota('') }, [open])
 
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onCancel()}>
-      <DialogContent showCloseButton={false} className="gap-3 p-5 sm:max-w-[400px]">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line text-ink">
-              <CircleAlert className="size-4" />
-            </span>
-            <h2 className="text-base leading-none font-bold text-ink">Review Exam</h2>
-          </div>
-          <button type="button" aria-label="Close" onClick={onCancel} className="flex size-7 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted">
-            <X className="size-4" />
-          </button>
-        </div>
-
-        <p className="text-xs leading-relaxed text-ink-muted">Are you sure you want to review this exam?</p>
-
+    <Drawer
+      open={open} onClose={onCancel} title="Review Exam" description="Are you sure you want to review this exam?"
+      footer={<DrawerActions onCancel={onCancel} onSave={() => onConfirm(nota.trim())} saveLabel="Confirm" saveDisabled={!nota.trim()} />}
+    >
+      <div className="flex flex-col gap-3 pt-2">
+        <p className="flex items-start gap-2 text-xs leading-relaxed text-ink-muted">
+          <CircleAlert className="mt-px size-4 shrink-0 text-ink" aria-hidden />
+          The review is signed with your name and stays in the exam history.
+        </p>
         <TextArea label="Review" required placeholder="Add review" value={nota} onChange={setNota} />
-
-        <div className="flex items-center justify-end gap-2">
-          <button type="button" onClick={onCancel} className="flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-[13px] font-medium hover:bg-surface-subtle">
-            <X className="size-3" /> Cancel
-          </button>
-          <button
-            type="button" disabled={!nota.trim()} onClick={() => onConfirm(nota.trim())}
-            className="bg-dash-blue hover:bg-dash-blue-hover flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-semibold text-white disabled:opacity-40"
-          >
-            <Check className="size-3" /> Confirm
-          </button>
-        </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </Drawer>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown, Calendar, Check, Search, X } from 'lucide-react'
+import { Drawer, DrawerSection, useEnDrawer, type DrawerSize } from '@/components/ui/drawer'
+import { ChevronDown, Calendar, Check, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
 
@@ -422,6 +423,8 @@ export function TextArea({
 export function SectionCard({
   title, className, children,
 }: { title: string; className?: string; children: React.ReactNode }) {
+  /* Dentro de un drawer va sin caja, con el título suelto, como en Confidentally 2.0. */
+  if (useEnDrawer()) return <DrawerSection title={title} className={className}>{children}</DrawerSection>
   return (
     <section className={cn('rounded-lg border border-line bg-white p-4 sm:p-5', className)}>
       <h2 className="text-sm font-semibold text-ink">{title}</h2>
@@ -430,55 +433,46 @@ export function SectionCard({
   )
 }
 
+/* Los formularios que se abren encima de una pantalla. Desde 2026-10-06 se abren como drawer (ui/drawer), no como modal
+   centrado: Julián pidió que todo pop up sea un drawer, con los pasos de Confidentally 2.0 cuando el formulario tiene
+   varias partes. El ancho pedido elige el tamaño del drawer. Ver Components / UI / Drawer. */
+const tamanoDe = (width: string): DrawerSize => {
+  const px = Number(width.match(/\d+/)?.[0] ?? 860)
+  return px <= 480 ? 'md' : px <= 640 ? 'lg' : 'xl'
+}
+
 export function ModalShell({
-  title, onClose, children, footer, aside, width = 'max-w-[860px]',
+  title, description, onClose, children, footer, actions, aside, width = 'max-w-[860px]', steps, step,
 }: {
   title: string
+  description?: string
   onClose: () => void
   children: React.ReactNode
+  /** Pie suelto (FormFooter o botones): en el drawer van lado a lado y del mismo ancho. */
   footer?: React.ReactNode
-  /** Panel que acompaña al modal por fuera de la card, a su derecha. */
+  /** Pie ya armado para el drawer (DrawerActions), con pasos o sin ellos. */
+  actions?: React.ReactNode
+  /** Panel de apoyo: se despliega al costado del drawer. */
   aside?: React.ReactNode
   width?: string
+  steps?: readonly string[]
+  step?: number
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:p-6" onClick={onClose}>
-      {/* items-stretch: el panel lateral toma la altura del modal, como en el
-          Figma, donde los dos frames miden 813 y arrancan en la misma y. */}
-      <div className={cn('my-auto flex w-full items-stretch justify-center', aside && 'lg:w-auto')}>
-      <div
-        role="dialog"
-        aria-label={title}
-        onClick={(e) => e.stopPropagation()}
-        className={cn(
-          'motion-safe:animate-[loc-in_160ms_ease-out] w-full rounded-xl bg-white p-5 shadow-2xl sm:p-9',
-          /* Con panel al lado, los dos bordes que se tocan van rectos para que
-             modal y columna lean como una sola pieza. */
-          aside && 'lg:rounded-r-none',
-          width,
-        )}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <h2 className="text-lg leading-none font-bold text-ink sm:text-[22px]">{title}</h2>
-          <button type="button" onClick={onClose} aria-label="Close" className="text-ink hover:opacity-60">
-            <X className="size-5" />
-          </button>
-        </div>
-        <div className="mt-6">{children}</div>
-        {/* En angosto el panel lateral no entra al costado: entra al pie del
-            propio modal, para no perder la función. */}
-        {aside && <div className="mt-6 lg:hidden">{aside}</div>}
-        {footer && <div className="mt-8 flex justify-end gap-3">{footer}</div>}
-      </div>
-      {aside && (
-        /* Pegado al modal, sin separación ni solape: en 4430:61940 el
-           formulario (757) y el panel (190) son hermanos de un frame de 947. */
-        <div className="hidden shrink-0 lg:block" onClick={(e) => e.stopPropagation()}>
-          {aside}
-        </div>
-      )}
-      </div>
-    </div>
+    <Drawer
+      open
+      onClose={onClose}
+      title={title}
+      description={description}
+      steps={steps}
+      step={step}
+      size={tamanoDe(width)}
+      footer={actions ?? footer}
+      footerClassName={actions ? undefined : '[&_[data-form-footer]]:w-full [&_[data-form-footer]_button]:flex-1'}
+      aside={aside}
+    >
+      {children}
+    </Drawer>
   )
 }
 
@@ -494,7 +488,7 @@ export function FormFooter({
   saveLabel?: string
 }) {
   return (
-    <div className="flex shrink-0 flex-nowrap items-center justify-end gap-3">
+    <div data-form-footer className="flex shrink-0 flex-nowrap items-center justify-end gap-3">
       <button
         type="button"
         onClick={onCancel}

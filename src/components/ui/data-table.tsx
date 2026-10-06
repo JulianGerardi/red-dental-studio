@@ -4,7 +4,7 @@ import { ChevronRight, GripVertical, MoveHorizontal, RotateCw, Search, SearchX, 
 import { Checkbox } from '@/components/ui/checkbox'
 import { EmptyState } from '@/components/ui/empty-state'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
-import { FilterMenu } from '@/components/dashboard/FilterMenu'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'

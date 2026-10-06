@@ -1,7 +1,8 @@
+import { DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
 import { CirclePlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ModalShell, SelectField, FormFooter } from '@/components/patients/form'
+import { ModalShell, SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
 
 /* Figma 3864:267207 "New Hours". Aviso ámbar con barra de acento, locación,
@@ -38,7 +39,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
       title="New Hours"
       onClose={onClose}
       width="max-w-[420px]"
-      footer={<FormFooter onCancel={onClose} onSave={guardar} />}
+      actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-4">
         <div className="rounded-r-md border-l-[3px] border-l-attn-fg bg-[#fffbeb] px-3 py-2.5">

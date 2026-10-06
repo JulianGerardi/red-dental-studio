@@ -1,5 +1,6 @@
+import { DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
-import { ModalShell, TextField, SelectField, FormFooter } from '@/components/patients/form'
+import { ModalShell, TextField, SelectField } from '@/components/patients/form'
 import type { Sala } from '@/data/location-detail'
 
 /* Figma 3864:306314 "Settings — Location (Rooms — New Room Modal)". Tres
@@ -34,7 +35,7 @@ export function NewRoomModal({
       title={inicial ? 'Edit Room' : 'New Room'}
       onClose={onClose}
       width="max-w-[420px]"
-      footer={<FormFooter onCancel={onClose} onSave={guardar} />}
+      actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-4">
         <TextField

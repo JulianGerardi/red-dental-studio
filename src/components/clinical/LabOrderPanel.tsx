@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Filter, CirclePlus, FileText, MoreVertical, Search } from 'lucide-react'
+import { CirclePlus, FileText, MoreVertical, Search } from 'lucide-react'
+import { FilterTrigger } from '@/components/ui/filter-menu'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -47,12 +48,7 @@ export function LabOrderPanel() {
             className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
           />
         </div>
-        <button
-          onClick={() => aviso.info('Filters are not available in this release.')}
-          className="flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-line px-3 text-[13px] font-medium hover:bg-surface-subtle"
-        >
-          <Filter className="size-3.5" /> Filter
-        </button>
+        <FilterTrigger onClick={() => aviso.info('Filters are not available in this release.')} />
         <button
           onClick={() => aviso.info('New Prescription is not available in this release.')}
           className="text-dash-blue flex h-9 shrink-0 items-center gap-1.5 px-2 text-[13px] font-semibold hover:underline"

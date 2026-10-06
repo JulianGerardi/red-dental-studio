@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { CalendarDays, Clock, Activity, CalendarClock } from 'lucide-react'
 import { Panel } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
-import { FilterMenu } from '@/components/dashboard/FilterMenu'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { PageTitle } from '@/components/ui/page-title'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
@@ -47,7 +47,7 @@ export function BotonFiltro({
   value: string[]
   onChange: (v: string[]) => void
 }) {
-  return <FilterMenu label={label} options={options} value={value} onChange={onChange} />
+  return <FilterMenu label={label} options={options} value={value} onChange={onChange} size="sm" tour="dash-filter" />
 }
 
 export default function Dashboard() {

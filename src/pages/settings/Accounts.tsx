@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Plus, Building2 } from 'lucide-react'
 import { SearchButton } from '@/components/ui/search-button'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { Pill, type PillTone } from '@/components/ui/pill'
@@ -102,14 +103,13 @@ export function SettingsAccounts() {
           />
         </div>
         <SearchButton onClick={() => setQ((v) => v.trim())} className="h-9" />
-        <select
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value as typeof filtro)}
-          aria-label="Filter by status"
-          className="focus:border-dash-blue h-9 shrink-0 rounded-md border border-line bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none"
-        >
-          {FILTROS.map((f) => <option key={f} value={f}>{f}</option>)}
-        </select>
+        <FilterMenu
+          label="Filter by status"
+          groups={[{
+            type: 'single', title: 'Status', defaultValue: 'All', value: filtro, onChange: (v) => setFiltro(v as typeof filtro),
+            options: FILTROS.map((f) => ({ value: f, count: f === 'All' ? CUENTAS.length : CUENTAS.filter((c) => c.estado === f).length, tone: f === 'All' ? undefined : ESTADO_TONO[f] })),
+          }]}
+        />
       </SettingsPageHeader>
 
       <div className="mt-4">

@@ -1,7 +1,8 @@
+import { DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
 import { CirclePlus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ModalShell, SelectField, FormFooter } from '@/components/patients/form'
+import { ModalShell, SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
 
 /* Misma grilla de media hora que "New Exception": desplegable, no texto
@@ -51,7 +52,7 @@ export function LocationHoursModal({
       title="New Availability"
       onClose={onClose}
       width="max-w-[420px]"
-      footer={<FormFooter onCancel={onClose} onSave={guardar} />}
+      actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-4">
         {rangos.map((r, i) => (

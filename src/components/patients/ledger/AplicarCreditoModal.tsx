@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { ModalShell } from '@/components/patients/form'
+import { DrawerActions } from '@/components/ui/drawer'
 import { moneda, type Movimiento } from '@/data/ledger'
 
 /* Modal de "Apply credit" (referencia de Julián, no viene del Figma).
@@ -77,21 +78,7 @@ export function AplicarCreditoModal({
       title="Apply unapplied credit"
       onClose={onClose}
       width="max-w-[820px]"
-      footer={(
-        <div className="flex justify-end gap-3">
-          <button type="button" onClick={onClose} className="h-9 shrink-0 rounded-md border border-line bg-white px-6 text-[13px] font-medium hover:bg-surface-subtle">
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={aplicar}
-            disabled={totalAplicado <= 0}
-            className="bg-dash-blue hover:bg-dash-blue-hover h-9 shrink-0 rounded-md px-6 text-[13px] font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Apply credit
-          </button>
-        </div>
-      )}
+      actions={<DrawerActions onCancel={onClose} onSave={aplicar} saveLabel="Apply credit" saveDisabled={totalAplicado <= 0} />}
     >
       <div className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-4 rounded-lg border border-[#c7d9fb] bg-info-bg px-4 py-3">

@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  Bookmark, Pencil, Plus, MoreVertical, CornerUpLeft, ChevronDown, ChevronRight, Captions,
-  Check, Eye, Save, Link2, ClipboardList, Scan, X, GripVertical, Trash2, TimerOff, Ban, FilePen, CheckCheck,
-  Presentation, CircleCheck, CircleX, CalendarCheck2, CalendarX2,
-  CalendarDays, FileCheck2, FileClock, FileMinus2, FileX2, type LucideIcon,
+  Bookmark, Pencil, Plus, MoreVertical, CornerUpLeft, ChevronDown, ChevronRight, Captions, Check, Eye, Save, Link2, ClipboardList, Scan, GripVertical, Trash2, TimerOff, Ban, FilePen, CheckCheck, Presentation, CircleCheck, CircleX, CalendarCheck2, CalendarX2, CalendarDays, FileCheck2, FileClock, FileMinus2, FileX2, type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
@@ -18,6 +15,8 @@ import { SelectField } from '@/components/patients/form'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { Button } from '@/components/ui/button'
 import { Alert } from '@/components/ui/alert'
+import { Drawer, DrawerActions } from '@/components/ui/drawer'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -99,12 +98,13 @@ export function AccionCaso({
 
 /* ── Diálogos ─────────────────────────────────────────────────────── */
 
+/* Con contenido para elegir (Move to, New group, Complete, Delete case) se abre como drawer; si es sólo una pregunta
+   (Discard, Expire, Present…) es una confirmación chica. Ver Components / UI / Drawer. */
 export function Dialogo({
   titulo, bajada, texto, children, onConfirm, onClose, confirmar = 'Confirm',
 }: {
   titulo: string
-  /** Bajada del título. Va en su columna, no a lo ancho: suelta se metía
-      debajo de la X. */
+  /** Bajada del título. */
   bajada?: readonly string[]
   texto?: readonly string[]
   children?: React.ReactNode
@@ -112,45 +112,21 @@ export function Dialogo({
   onClose: () => void
   confirmar?: string
 }) {
+  const confirmarYCerrar = () => { onConfirm(); onClose() }
+  if (!children) {
+    return (
+      <ConfirmDialog title={titulo} confirmLabel={confirmar} onCancel={onClose} onConfirm={confirmarYCerrar}>
+        {[...(bajada ?? []), ...(texto ?? [])].map((t) => <p key={t} className="mt-1 first:mt-0">{t}</p>)}
+      </ConfirmDialog>
+    )
+  }
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div
-        role="dialog"
-        aria-label={titulo}
-        onClick={(e) => e.stopPropagation()}
-        className="motion-safe:animate-[loc-in_160ms_ease-out] w-full max-w-[440px] rounded-xl bg-white p-5 shadow-2xl"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <span className="min-w-0">
-            <h2 className="text-[18px] leading-tight font-bold text-ink">{titulo}</h2>
-            {bajada?.map((t) => (
-              <p key={t} className="mt-1.5 text-[12px] leading-[1.5] text-ink-muted">{t}</p>
-            ))}
-          </span>
-          <button onClick={onClose} aria-label="Close" className="shrink-0 text-ink hover:opacity-60">
-            <X className="size-4" />
-          </button>
-        </div>
-        {texto?.map((t) => (
-          <p key={t} className="mt-2 text-[13px] text-ink-muted">{t}</p>
-        ))}
-        {children}
-        <div className="mt-5 flex flex-nowrap items-center justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="h-9 shrink-0 rounded-md border border-line px-4 text-[13px] font-medium whitespace-nowrap hover:bg-surface-subtle"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => { onConfirm(); onClose() }}
-            className="bg-dash-blue hover:bg-dash-blue-hover h-9 shrink-0 rounded-md px-4 text-[13px] font-semibold whitespace-nowrap text-white transition-colors"
-          >
-            {confirmar}
-          </button>
-        </div>
-      </div>
-    </div>
+    <Drawer open onClose={onClose} title={titulo} description={bajada?.join(' ')} footer={<DrawerActions onCancel={onClose} onSave={confirmarYCerrar} saveLabel={confirmar} />}>
+      {texto?.map((t) => (
+        <p key={t} className="mb-3 text-[13px] text-ink-muted">{t}</p>
+      ))}
+      {children}
+    </Drawer>
   )
 }
 

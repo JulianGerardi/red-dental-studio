@@ -1,7 +1,8 @@
+import { DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { useEffect, useRef, useState } from 'react'
 import { Search } from 'lucide-react'
 import {
-  ModalShell, TextField, SelectField, TextArea, FieldLabel, FormFooter,
+  ModalShell, TextField, SelectField, TextArea, FieldLabel,
 } from '@/components/patients/form'
 import { DatePicker } from '@/components/ui/date-picker'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
@@ -51,9 +52,19 @@ export function PostPaymentDialog({
   const cargos = cargosAbiertos(aplicaA)
   const resultados = buscarPacientes(busqueda)
 
+  /* Dos pasos, como los drawers de Confidentally 2.0: el pago y después a qué cargos se aplica. */
+  const [paso, setPaso] = useState(0)
+  const faltaPago = !fecha || !monto.trim() || !aplicaA.trim()
+  const siguiente = () => {
+    setIntentado(true)
+    if (faltaPago) return
+    setIntentado(false)
+    setPaso(1)
+  }
+
   const guardar = () => {
     setIntentado(true)
-    if (!fecha || !monto.trim() || !aplicaA.trim()) return
+    if (faltaPago) { setPaso(0); return }
     const valor = Number(monto) || 0
     onGuardar({
       fecha: fecha.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
@@ -68,8 +79,12 @@ export function PostPaymentDialog({
   }
 
   return (
-    <ModalShell title="Post payment" onClose={onClose} width="max-w-[900px]" footer={<FormFooter onCancel={onClose} onSave={guardar} />}>
-      <div className="flex flex-col gap-4">
+    <ModalShell
+      title="Post payment" description="Payment details, then how it applies to open charges" onClose={onClose} width="max-w-[900px]"
+      steps={['Payment', 'Allocation']} step={paso}
+      actions={<DrawerActions step={paso} total={2} onNext={siguiente} onBack={() => setPaso(0)} onCancel={onClose} onSave={guardar} />}
+    >
+      <DrawerStep index={0} step={paso} className="flex flex-col gap-4">
         <div ref={refBusqueda} className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
           <input
@@ -118,9 +133,11 @@ export function PostPaymentDialog({
         </div>
 
         <TextArea label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
+      </DrawerStep>
 
+      <DrawerStep index={1} step={paso}>
         <LedgerAllocationTable cargos={cargos} />
-      </div>
+      </DrawerStep>
     </ModalShell>
   )
 }

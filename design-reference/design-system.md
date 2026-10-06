@@ -380,3 +380,46 @@ guarda el tope: `ds:check` falla si crece.
 - `src/design-system/audit.ts` y `catalog.ts`: leen el código con
   `import.meta.glob(..., { query: '?raw' })`.
 - `.github/workflows/deploy-pages.yml`: construye Storybook en `dist/storybook`.
+
+## Pop ups: drawer para todo, confirmación chica para preguntas (2026-10-06)
+
+Julián pidió que todo lo que se abre encima de una pantalla sea un **drawer**, con la lógica, los pasos y la
+organización de Confidentally 2.0 (`~/Desktop/Work/dashboard-figma`) y los colores, la tipografía y los componentes de
+esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Procedure).
+
+1. **`ui/drawer`** (*Components / UI / Drawer*), como los Sheet de 2.0: márgenes de 24px; título y bajada; si hay varias
+   partes, el `StepIndicator` (en `ui/step-indicator`, *Elements / StepIndicator*) debajo del título, sin línea, con
+   "Step" y el número como en 2.0. Contenido en **una columna**, con secciones de título suelto **sin caja ni borde**
+   (`DrawerSection`; `SectionCard` se dibuja así dentro de un drawer) y campos de a dos por fila. Cada parte de un
+   formulario con pasos es un `DrawerStep` (la que no se ve no se desmonta). **Pie** (`DrawerActions`): dos botones del
+   mismo ancho, Cancel o Return a la izquierda y Next Step o Save a la derecha. Anchos de 2.0: md 480, lg 560, xl 760.
+   **`aside`**: un panel de apoyo que se despliega a la izquierda del drawer (en angosto, al pie del contenido).
+2. **`ModalShell`** (los formularios de Patients, Settings, Scheduling, Billing, Ledger, Insurance) abre un drawer: el
+   ancho que pedía elige el tamaño (hasta 480 md, hasta 640 lg, más xl); `actions` recibe un `DrawerActions`.
+3. **Copiados de 2.0**: New Patient (General con las tres casillas -vincular una persona existente, Interpreter
+   Required, crear usuario-; vincular cambia los datos por un buscador con el aviso de guardián y suma el paso Guardian,
+   que también aparece si es menor; Demography de a dos), New Appointment (paso 1 "Patient and Scheduling" en una
+   columna; paso 2 "Link to treatment plan visit" con Additional y Notes; el calendario del día se despliega **al
+   costado del drawer** al tocar la fecha o la hora), Edit Contact Details y Edit Relationship (un paso, sin cajas),
+   New Procedure / Condition (pie de 2.0).
+4. **Con pasos, sin equivalente en 2.0**: Edit Patient (General, Demography, Address), New Subscription y Manage
+   Subscription (Subscriber, Subscription), Post payment (Payment, Allocation), New Condition de Radiography.
+5. **Drawer de un paso**: medicamentos, condiciones y alergias, Apply unapplied credit, detalle de un movimiento del
+   Ledger, New Room / Hours / Availability / Exception, Assign Role, New Depender, Move Procedure / New Group /
+   Complete / Delete Case del Treatment Plan, Consent history, Review Exam, Exam review y el AI Narrative Editor (xl).
+6. **Siguen como confirmación chica** (`ui/confirm-dialog`, *Elements / ConfirmDialog*), igual que en 2.0: las
+   preguntas de sí o no -Discard and close?, Back to permanent dentition?, limpiar la selección del odontograma,
+   Discard / Expire / Cancel / Present / Accept del caso, Confirm procedure- y el aviso de Clinical Note.
+7. **No cambian** los desplegables anclados (popovers, calendario, filtros) ni el visor de radiografías.
+   `AppointmentDetailsDrawer` es una card anclada al turno y `LinkTreatmentPlanDrawer` no se usa en la app.
+
+## Banner, filtros y Treatment plans (2026-10-06)
+
+- **Banner de notificaciones**: Julián eligió la tarjeta -el aviso ámbar del design system (tono warning de Alert), del
+  ancho de su contenido y alineado con la página-, con la tarea, Review, el paginador y la X juntos. Ya no hay barra de
+  punta a punta con hueco en el medio.
+- **Filtro único** (`ui/filter-menu`, *Elements / Filter*) en toda la app; **el buscador va siempre primero**, en las
+  barras (buscador, después Filter) y dentro del menú (la búsqueda arriba de las opciones).
+- **Cards de Treatment Plan**: en el Overview y en la card *Treatment plans* del workflow quedan las publicadas. Se
+  probaron una compacta con anillo de avance y una por visita (un procedimiento por línea); Julián se quedó con las
+  actuales porque muestran el detalle de cada procedimiento.

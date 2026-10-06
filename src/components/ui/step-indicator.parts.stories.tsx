@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Conector, Insignia } from './StepIndicator'
+import { Conector, Insignia } from './step-indicator'
 
-const meta = { title: 'Components/Clinical/StepIndicator parts' } satisfies Meta
+const meta = { title: 'Elements/StepIndicator parts' } satisfies Meta
 
 export default meta
 type Story = StoryObj<typeof meta>

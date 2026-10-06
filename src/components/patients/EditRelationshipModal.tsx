@@ -1,6 +1,7 @@
+import { DrawerActions, DrawerSection } from '@/components/ui/drawer'
 import { useState } from 'react'
 import {
-  ModalShell, SelectField, FieldLabel, OptionCheckbox, FormFooter,
+  ModalShell, SelectField, FieldLabel, OptionCheckbox,
 } from '@/components/patients/form'
 import { PersonaSeleccionada, type PersonaDirectorio } from '@/pages/patients/AddRelationship'
 import { aviso } from '@/components/ui/toaster'
@@ -26,44 +27,38 @@ export function EditRelationshipModal({
   }
 
   return (
+    /* Como Edit Relationship de Confidentally 2.0: un paso, Person y Relationship sin caja. */
     <ModalShell
       title="Edit Relationship"
+      description="Find or create person"
       onClose={onClose}
-      width="max-w-[780px]"
-      footer={<FormFooter onCancel={onClose} onSave={guardar} />}
+      width="max-w-[480px]"
+      actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
-      <section className="rounded-lg border border-line bg-white p-5">
-        <h3 className="text-sm font-semibold text-ink">Person</h3>
-        <div className="mt-3">
+      <div className="flex flex-col gap-6">
+        <DrawerSection title="Person">
           <PersonaSeleccionada p={persona} />
-        </div>
-      </section>
+        </DrawerSection>
 
-      <section className="mt-5 rounded-lg border border-line bg-white p-5">
-        <h3 className="text-sm font-semibold text-ink">Relationship</h3>
-        <p className="mt-1.5 max-w-[520px] text-xs leading-[1.5] text-ink-muted">
-          The direction of this relationship cannot be changed. To update this, delete the
-          relationship and create a new one.
-        </p>
-
-        <div className="mt-4 flex flex-col gap-2">
-          <FieldLabel required>Role</FieldLabel>
-          <div className="grid gap-x-5 gap-y-4 lg:grid-cols-2">
+        <DrawerSection
+          title="Relationship"
+          description="The direction of this relationship cannot be changed. To update this, delete the relationship and create a new one."
+        >
+          <div className="flex flex-col gap-2">
+            <FieldLabel required>Role</FieldLabel>
             <OptionCheckbox label="Guardian" />
             <OptionCheckbox label="Guarantor" />
           </div>
-        </div>
-
-        <SelectField
-          className="mt-4"
-          label="Relationship to Patient"
-          required
-          options={['Parent', 'Guardian', 'Sibling', 'Spouse', 'Child', 'Other']}
-          value={rel}
-          onChange={setRel}
-          error={intentado && !rel.trim() ? 'This field is required.' : undefined}
-        />
-      </section>
+          <SelectField
+            label="Relationship to Patient"
+            required
+            options={['Parent', 'Guardian', 'Sibling', 'Spouse', 'Child', 'Other']}
+            value={rel}
+            onChange={setRel}
+            error={intentado && !rel.trim() ? 'This field is required.' : undefined}
+          />
+        </DrawerSection>
+      </div>
     </ModalShell>
   )
 }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, TriangleAlert, X } from 'lucide-react'
-import { ModalShell } from '@/components/patients/form'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { OdontogramShell, clearSelection, type OdontogramThemeConfig } from 'react-advanced-odontogram'
 import { cn } from '@/lib/utils'
 import { OdontogramPanel } from '@/components/clinical/dental/OdontogramPanel'
@@ -290,24 +290,12 @@ export function OdontogramEmbed({
       )}
 
       {confirmandoCierre && (
-        <ModalShell
+        <ConfirmDialog
           title="Discard and close?"
-          onClose={() => setConfirmandoCierre(false)}
-          width="max-w-[440px]"
-          footer={
-            <>
-              <button type="button" onClick={() => setConfirmandoCierre(false)} className="h-9 rounded-md border border-line bg-white px-5 text-[13px] font-medium hover:bg-surface-subtle">
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => { setConfirmandoCierre(false); descartarYCerrar() }}
-                className="h-9 rounded-md bg-dash-bad-fg px-5 text-[13px] font-medium text-white hover:bg-dash-bad-hover"
-              >
-                Discard and close
-              </button>
-            </>
-          }
+          tone="danger"
+          confirmLabel="Discard and close"
+          onCancel={() => setConfirmandoCierre(false)}
+          onConfirm={() => { setConfirmandoCierre(false); descartarYCerrar() }}
         >
           <p className="flex items-start gap-2 text-[13px] leading-relaxed text-ink-soft">
             <TriangleAlert className="mt-0.5 size-4 shrink-0 text-dash-bad-fg" />
@@ -319,7 +307,7 @@ export function OdontogramEmbed({
               <strong className="font-semibold text-ink">minimize</strong> arrow instead.
             </span>
           </p>
-        </ModalShell>
+        </ConfirmDialog>
       )}
 
       {controlesAbiertos && !minimizado && actual && (

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { SearchButton } from '@/components/ui/search-button'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
-import { FilterMenu } from '@/components/dashboard/FilterMenu'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import {

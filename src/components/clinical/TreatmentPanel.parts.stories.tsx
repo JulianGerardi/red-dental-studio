@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { WORKFLOWS, PROGRESO_INICIAL, type CategoriaWorkflow, type Valor } from '@/data/workflows'
-import { FiltrosAplicados, NarrativeSummary, QuestionBlock, TreatmentPlansCard, WorkflowCard, WorkflowFilters, WorkflowProgress, type Filtros as TipoFiltros } from './TreatmentPanel'
+import { FiltrosAplicados, NarrativeSummary, QuestionBlock, TreatmentPlansCard, WorkflowCard, WorkflowProgress, type Filtros as TipoFiltros } from './TreatmentPanel'
 
 const meta = {
   title: 'Components/Clinical/TreatmentPanel parts',
@@ -52,13 +52,11 @@ function Filtros({ inicial }: { inicial: TipoFiltros }) {
   const [f, setF] = useState<{ categorias: CategoriaWorkflow[]; q: string }>(inicial)
   return (
     <div className="w-[290px]">
-      <div className="flex justify-end"><WorkflowFilters value={f} onChange={setF} /></div>
       <FiltrosAplicados value={f} onChange={setF} />
     </div>
   )
 }
-/* El embudo de Workflows (tipo con cuántos hay, código o descripción, cuántos quedan) y, aplicados, los chips para sacarlos. */
-export const Filters: Story = { render: () => <Filtros inicial={{ categorias: [], q: '' }} /> }
+/* Los filtros aplicados en Workflows: un chip por filtro para sacarlo, y Clear. El menú es Elements / Filter. */
 export const FiltersApplied: Story = { render: () => <Filtros inicial={{ categorias: ['Questionnaire', 'Emergency'], q: 'history' }} /> }
 
 /* La narrativa guardada, resumida arriba de los pasos. */

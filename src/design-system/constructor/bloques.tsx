@@ -33,10 +33,10 @@ import { AppointmentCard, type Appointment } from '@/components/dashboard/Appoin
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Breadcrumb } from '@/components/ui/breadcrumb'
-import { StepIndicator } from '@/components/clinical/StepIndicator'
+import { StepIndicator } from '@/components/ui/step-indicator'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { SearchButton } from '@/components/ui/search-button'
-import { FilterMenu } from '@/components/dashboard/FilterMenu'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { StatStrip } from '@/components/dashboard/StatStrip'
 import { OperatoryCard, type Operatory } from '@/components/dashboard/OperatoryCard'
@@ -1378,7 +1378,7 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor): string[
       return [`<Breadcrumb items={[${items.map((l, i) => `{ label: ${comillas(l)}${i < items.length - 1 ? ", to: '/'" : ''} }`).join(', ')}]} />`]
     }
     case 'pasos': {
-      importar(c, '@/components/clinical/StepIndicator', 'StepIndicator')
+      importar(c, '@/components/ui/step-indicator', 'StepIndicator')
       const etiqueta = lista(b.etiquetas)[b.actual - 1]
       return [
         `<div className="flex flex-col gap-2">`,
@@ -1405,7 +1405,7 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor): string[
         `  <SearchButton className="h-8" />`,
       ]
       if (b.filtro) {
-        importar(c, '@/components/dashboard/FilterMenu', 'FilterMenu')
+        importar(c, '@/components/ui/filter-menu', 'FilterMenu')
         const [f, setF] = estado(c, 'filtro', '<string[]>([])')
         lineas.push(`  <FilterMenu label=${valorAttr(b.filtro)} options={${arreglo(lista(b.opcionesFiltro))}} value={${f}} onChange={${setF}} />`)
       }

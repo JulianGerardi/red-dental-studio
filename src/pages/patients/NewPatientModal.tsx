@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import {
-  ModalShell, SectionCard, TextField, SelectField, DateField, SearchField,
-  LinkPersonCheckbox, OptionCheckbox, FormFooter,
+  ModalShell, TextField, SelectField, DateField, SearchField,
+  LinkPersonCheckbox, OptionCheckbox,
 } from '@/components/patients/form'
+import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer'
+import { Alert } from '@/components/ui/alert'
 import { usePatients, type NuevoPaciente } from '@/data/patientsStore'
 import { aviso } from '@/components/ui/toaster'
 
@@ -27,6 +29,7 @@ function esMenor(texto: string) {
   return edad < MAYORIA
 }
 const VACIO: NuevoPaciente = { first: '', middle: '', last: '', email: '', birthday: '', gender: '' }
+const PERSONAS = ['Jessica Miller', 'Michael Miller', 'Robert Miller', 'Sarah Stone', 'Daniel Anderson']
 
 export function NewPatientModal({
   title = 'New Patient',
@@ -44,24 +47,37 @@ export function NewPatientModal({
 }) {
   const { addPatient, updatePatient } = usePatients()
   const [d, setD] = useState<NuevoPaciente>({ ...VACIO, ...inicial })
-  const withGuardian = forceGuardian || esMenor(d.birthday)
+  /* Como New Patient de Confidentally 2.0: "link a person that already exists" cambia los datos por un buscador y suma
+     el paso de guardián. El guardián también aparece si la fecha de nacimiento da menor de edad (regla de acá). */
+  const [vincular, setVincular] = useState(false)
+  const [persona, setPersona] = useState('')
+  const withGuardian = forceGuardian || vincular || esMenor(d.birthday)
   const [intentado, setIntentado] = useState(false)
   const set = (k: keyof NuevoPaciente) => (v: string) => setD((p) => ({ ...p, [k]: v }))
-  /* Los campos obligatorios se marcan en rojo recién después del primer
-     intento de guardar, para no señalar errores antes de tiempo. El aviso
-     va debajo del campo; el toast se reserva para el final de la acción. */
+  /* Los obligatorios se marcan en rojo recién después del primer intento de seguir o guardar. */
   const falta = (v: string) => (intentado && !v.trim() ? 'This field is required.' : undefined)
+  const pasos = withGuardian ? ['General', 'Guardian', 'Demography'] : ['General', 'Demography']
+  const [paso, setPaso] = useState(0)
+  const actual = pasos[Math.min(paso, pasos.length - 1)]!
+  const faltaGeneral = vincular ? !persona.trim() : !d.first.trim() || !d.last.trim() || !d.birthday.trim()
+  const siguiente = () => {
+    if (actual === 'General' && faltaGeneral) { setIntentado(true); return }
+    setIntentado(false)
+    setPaso((n) => Math.min(n + 1, pasos.length - 1))
+  }
 
   const guardar = () => {
-    /* Los campos marcados con * son los que el Figma exige. */
     setIntentado(true)
-    if (!d.first.trim() || !d.last.trim() || !d.birthday.trim() || !d.gender.trim()) return
-    const nombre = [d.first, d.last].filter(Boolean).join(' ')
+    if (faltaGeneral) { setPaso(0); return }
+    if (!d.gender.trim()) return
+    const [first = '', ...resto] = vincular ? persona.split(' ') : [d.first]
+    const datos = vincular ? { ...d, first, last: resto.join(' ') } : d
+    const nombre = [datos.first, datos.last].filter(Boolean).join(' ')
     if (editId) {
-      updatePatient(editId, d)
+      updatePatient(editId, datos)
       aviso.ok(`${nombre} has been updated.`)
     } else {
-      addPatient(d)
+      addPatient(datos)
       aviso.ok(`${nombre} has been added to the patient list.`)
     }
     onClose()
@@ -70,50 +86,66 @@ export function NewPatientModal({
   return (
     <ModalShell
       title={title}
+      description={editId ? 'Update the patient details' : 'Create the patient record'}
       onClose={onClose}
-      footer={<FormFooter onCancel={onClose} onSave={guardar} />}
+      width="max-w-[560px]"
+      steps={pasos}
+      step={paso}
+      actions={<DrawerActions step={paso} total={pasos.length} onNext={siguiente} onBack={() => setPaso((n) => n - 1)} onCancel={onClose} onSave={guardar} />}
     >
-      <div className="grid gap-7 lg:grid-cols-2">
-        <div className="flex flex-col gap-7">
-          <SectionCard title="General Information">
-            <LinkPersonCheckbox />
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <TextField label="First Name" required placeholder="John" value={d.first} onChange={set('first')} error={falta(d.first)} />
-              <TextField label="Middle Name" placeholder="Lorem" value={d.middle} onChange={set('middle')} />
-              <TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={set('last')} error={falta(d.last)} />
-            </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <TextField label="Email" placeholder="john.smith@hotmail.c..." value={d.email} onChange={set('email')} />
-              <DateField label="Birthdate" required onChange={set('birthday')} error={falta(d.birthday)} />
-            </div>
-            <OptionCheckbox label="Create a new user account with this email address" />
-          </SectionCard>
-
-          {withGuardian && (
-            <SectionCard title="Guardian Information">
-              <SearchField label="Select Person" options={['Jessica Miller', 'Michael Miller', 'Robert Miller']} />
-              <OptionCheckbox label="Add new person" defaultChecked={false} />
-              <OptionCheckbox label="This person is also the guarantor" defaultChecked={false} />
-              <SelectField
-                label="Relationship to Patient"
-                required
-                options={['Parent', 'Guardian', 'Sibling', 'Spouse', 'Other']}
+      <DrawerStep index={pasos.indexOf('General')} step={paso}>
+        <DrawerSection title="General Information">
+          <LinkPersonCheckbox checked={vincular} onChange={(v) => { setVincular(v); setIntentado(false) }} />
+          <OptionCheckbox label="Interpreter Required" defaultChecked={false} />
+          <OptionCheckbox label="Create a new user account with this email address" />
+          {vincular ? (
+            <>
+              <SearchField
+                label="Select Person" required placeholder="Search by Name or Last Name" options={PERSONAS}
+                value={persona} onChange={setPersona} error={falta(persona)}
               />
-            </SectionCard>
+              {persona && <Alert tone="warning" title="If underage, you must enable a guarantor in the next step" />}
+            </>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <TextField label="First Name" required placeholder="John" value={d.first} onChange={set('first')} error={falta(d.first)} />
+                <TextField label="Middle Name" placeholder="Lorem" value={d.middle} onChange={set('middle')} />
+                <TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={set('last')} error={falta(d.last)} />
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <TextField label="Email" placeholder="john.smith@hotmail.com" value={d.email} onChange={set('email')} />
+                <DateField label="Birthdate" required onChange={set('birthday')} error={falta(d.birthday)} />
+              </div>
+            </>
           )}
-        </div>
+        </DrawerSection>
+      </DrawerStep>
 
-        <SectionCard title="Demographic Information">
-          <SelectField label="Gender" required value={d.gender} onChange={set('gender')} error={falta(d.gender)} />
-          <SelectField label="Race" />
-          <SelectField label="Ethnicity" />
-          <SelectField label="Profession" />
-          <SelectField label="Nationality" />
-          <SelectField label="Language" />
-          <OptionCheckbox label="Interpreter Required" />
-          <SelectField label="Religion" />
-        </SectionCard>
-      </div>
+      {withGuardian && (
+        <DrawerStep index={pasos.indexOf('Guardian')} step={paso}>
+          <DrawerSection title="Guardian Information">
+            <OptionCheckbox label="Add new person" defaultChecked={false} />
+            <OptionCheckbox label="This person is also the guarantor" defaultChecked={false} />
+            <SearchField label="Select Person" placeholder="Search by Name or Last Name" options={PERSONAS} />
+            <SelectField label="Relationship to Patient" required options={['Parent', 'Guardian', 'Sibling', 'Spouse', 'Other']} />
+          </DrawerSection>
+        </DrawerStep>
+      )}
+
+      <DrawerStep index={pasos.indexOf('Demography')} step={paso}>
+        <DrawerSection title="Demography Information">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <SelectField label="Gender" required value={d.gender} onChange={set('gender')} error={falta(d.gender)} />
+            <SelectField label="Race" />
+            <SelectField label="Ethnicity" />
+            <SelectField label="Profession" />
+            <SelectField label="Nationality" />
+            <SelectField label="Language" />
+            <SelectField label="Religion" />
+          </div>
+        </DrawerSection>
+      </DrawerStep>
     </ModalShell>
   )
 }

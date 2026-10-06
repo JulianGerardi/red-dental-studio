@@ -1,4 +1,6 @@
-import { FileText, Trash2, MoreVertical, ListFilter, Plus } from 'lucide-react'
+import { FileText, Trash2, MoreVertical, Plus } from 'lucide-react'
+import { FilterTrigger } from '@/components/ui/filter-menu'
+import { aviso } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
 import type { RecordStatus } from '@/data/mock'
 
@@ -64,9 +66,7 @@ export function RecordRow({
 export function RecordToolbar({ newLabel }: { newLabel: string }) {
   return (
     <div className="mb-4 flex justify-end gap-3">
-      <button className="flex h-9 items-center gap-2 rounded-md border bg-background px-4 text-sm font-medium shadow-sm">
-        <ListFilter className="size-4" /> Filters
-      </button>
+      <FilterTrigger onClick={() => aviso.info('Filters are not available in this release.')} />
       {/* En el original este botón viene deshabilitado */}
       <button
         disabled

@@ -1,9 +1,10 @@
+import { DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
 import { Trash2, CirclePlus, ChevronDown, ChevronUp, Info } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
-import { ModalShell, SectionCard, SelectField, FormFooter, FieldLabel } from '@/components/patients/form'
+import { ModalShell, SectionCard, SelectField, FieldLabel } from '@/components/patients/form'
 
 /* Figma 3864:270946 "Settings — Employee (Roles & Location)" y el modal
    "Assign Role".
@@ -150,7 +151,7 @@ export function AssignRoleModal({
       title="Assign Role"
       width="max-w-[780px]"
       onClose={onClose}
-      footer={<FormFooter onCancel={onClose} onSave={guardar} />}
+      actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-5">
         <SelectField

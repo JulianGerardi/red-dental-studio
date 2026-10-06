@@ -1,6 +1,7 @@
+import { DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
 import {
-  ModalShell, FormFooter, SearchField, SelectField, TextField, DateTextField, TextArea,
+  ModalShell, SearchField, SelectField, TextField, DateTextField, TextArea,
 } from '@/components/patients/form'
 import {
   CONFIG, aItem,
@@ -111,8 +112,8 @@ export function ClinicalItemModal({
     <ModalShell
       title={item ? `Edit ${cfg.singular}` : cfg.titulo}
       onClose={onClose}
-      width="max-w-[555px]"
-      footer={<FormFooter onCancel={onClose} onSave={guardar} />}
+      width="max-w-[480px]"
+      actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
       <div className="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
         {cfg.campos.map(render)}

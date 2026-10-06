@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bold, Bot, List, Loader2, Pilcrow, RefreshCw, Send, X } from 'lucide-react'
+import { Bold, List, Loader2, Pilcrow, RefreshCw, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { Drawer } from '@/components/ui/drawer'
 import { borradorNarrativa, type Narrativa, type ProgresoWorkflow, type Workflow } from '@/data/workflows'
 
 /* AI Narrative Editor, el flujo de red.dev: al abrirse arma el borrador con lo contestado en los pasos guardados ("Original
@@ -96,19 +96,32 @@ export function NarrativeEditor({
   const generando = estado === 'generando'
 
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && cerrar()}>
-      <DialogContent showCloseButton={false} className="flex h-[min(80vh,720px)] flex-col gap-0 overflow-hidden p-0 sm:max-w-[760px]">
-        <div className="flex items-start gap-3 border-b border-line-soft px-5 py-4">
-          <span className="bg-purple-fg flex size-9 shrink-0 items-center justify-center rounded-lg text-white"><Bot className="size-5" aria-hidden /></span>
-          <div className="min-w-0 flex-1">
-            <DialogTitle className="text-[17px] font-semibold text-ink">AI Narrative Editor</DialogTitle>
-            <p className="text-[10px] font-medium tracking-wide text-ink-muted uppercase">{wf.codigo} - Published v{wf.version}</p>
-            <DialogDescription className="sr-only">Edit clinical narrative with direct visual formatting.</DialogDescription>
-          </div>
-          <button type="button" aria-label="Close narrative editor" onClick={cerrar} className="flex size-8 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"><X className="size-4" /></button>
+    <Drawer
+      open={open} onClose={cerrar} size="xl" title="AI Narrative Editor" description={`${wf.codigo} - Published v${wf.version}`}
+      footer={confirmar ? (
+        <div className="flex flex-col gap-2">
+          <p className="text-[12px] text-ink">
+            {confirmar === 'cerrar' ? 'Discard the unsaved changes to the narrative?' : 'Replace the edited narrative with a new draft from the answers?'}
+          </p>
+          <Button variant="destructive" className="w-full" onClick={() => { const c = confirmar; setConfirmar(null); if (c === 'cerrar') onClose(); else generar() }}>
+            {confirmar === 'cerrar' ? 'Discard' : 'Replace'}
+          </Button>
+          <Button variant="secondary" className="w-full" onClick={() => setConfirmar(null)}>Keep editing</Button>
         </div>
-
-        <div role="toolbar" aria-label="Formatting" className="flex flex-wrap items-center gap-1 border-b border-line-soft bg-surface-alt px-4 py-1.5">
+      ) : (
+        <div className="flex flex-col gap-2">
+          <span className="flex items-center gap-2 text-[11px] text-ink-muted italic">
+            {generando ? <Loader2 className="text-dash-blue size-3 animate-spin" aria-hidden /> : <span aria-hidden className={cn('size-1.5 rounded-full', ESTADO[estado].punto)} />}
+            {ESTADO[estado].texto}
+            {guardada && !generando && estado !== 'editado' && <span className="not-italic">· {guardada.fecha}</span>}
+          </span>
+          <Button className="w-full" disabled={estado !== 'editado'} onClick={aplicar}><Send /> Apply Changes</Button>
+          <Button variant="secondary" className="w-full" disabled={generando} onClick={regenerar}><RefreshCw /> Regenerate</Button>
+        </div>
+      )}
+    >
+      <div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-lg border border-line">
+        <div role="toolbar" aria-label="Formatting" className="flex flex-wrap items-center gap-1 border-b border-line-soft bg-surface-alt px-3 py-1.5">
           <BotonFormato etiqueta="Bold" icono={Bold} disabled={generando} onClick={() => formato('bold')} />
           <span aria-hidden className="mx-1 h-4 w-px bg-line" />
           <BotonFormato etiqueta="Title" disabled={generando} onClick={() => formato('formatBlock', 'h2')} />
@@ -117,10 +130,9 @@ export function NarrativeEditor({
           <BotonFormato etiqueta="Text" icono={Pilcrow} disabled={generando} onClick={() => formato('formatBlock', 'p')} />
           <BotonFormato etiqueta="List" icono={List} disabled={generando} onClick={() => formato('insertUnorderedList')} />
         </div>
-
         <div className="relative min-h-0 flex-1 overflow-y-auto">
           {generando && (
-            <div aria-live="polite" className="absolute inset-0 flex flex-col gap-2.5 px-6 py-5">
+            <div aria-live="polite" className="absolute inset-0 flex flex-col gap-2.5 px-5 py-4">
               <span className="sr-only">Generating narrative</span>
               {['w-1/3', 'w-1/4', 'w-5/6', 'w-2/3', 'w-1/4', 'w-3/4'].map((w, i) => <span key={i} className={cn('h-3 animate-pulse rounded bg-surface-muted', w)} />)}
             </div>
@@ -132,38 +144,14 @@ export function NarrativeEditor({
             data-placeholder={estado === 'vacio' ? 'No answered questions to summarize yet. Answer and save a step, then regenerate — or start typing your clinical notes...' : 'Start typing your clinical notes...'}
             onInput={() => setEstado('editado')}
             className={cn(
-              'min-h-full px-6 py-5 text-[13px] leading-relaxed text-ink outline-none',
+              'min-h-full px-5 py-4 text-[13px] leading-relaxed text-ink outline-none',
               'empty:before:text-ink-faint empty:before:content-[attr(data-placeholder)]',
               '[&_b]:font-semibold [&_h2]:mb-2 [&_h2]:text-[18px] [&_h2]:font-bold [&_h3]:mt-4 [&_h3]:mb-1 [&_h3]:text-[14px] [&_h3]:font-semibold [&_li]:my-1 [&_p]:my-1.5 [&_ul]:list-disc [&_ul]:pl-5',
               generando && 'invisible',
             )}
           />
         </div>
-
-        <div className="flex flex-wrap items-center gap-3 border-t border-line-soft bg-surface-alt px-5 py-3">
-          {confirmar ? (
-            <>
-              <span className="flex-1 text-[12px] text-ink">
-                {confirmar === 'cerrar' ? 'Discard the unsaved changes to the narrative?' : 'Replace the edited narrative with a new draft from the answers?'}
-              </span>
-              <Button variant="secondary" size="md" onClick={() => setConfirmar(null)}>Keep editing</Button>
-              <Button variant="destructive" size="md" onClick={() => { const c = confirmar; setConfirmar(null); if (c === 'cerrar') onClose(); else generar() }}>
-                {confirmar === 'cerrar' ? 'Discard' : 'Replace'}
-              </Button>
-            </>
-          ) : (
-            <>
-              <span className="flex flex-1 items-center gap-2 text-[11px] text-ink-muted italic">
-                {generando ? <Loader2 className="text-dash-blue size-3 animate-spin" aria-hidden /> : <span aria-hidden className={cn('size-1.5 rounded-full', ESTADO[estado].punto)} />}
-                {ESTADO[estado].texto}
-                {guardada && !generando && estado !== 'editado' && <span className="not-italic">· {guardada.fecha}</span>}
-              </span>
-              <Button variant="secondary" size="md" disabled={generando} onClick={regenerar}><RefreshCw /> Regenerate</Button>
-              <Button size="md" disabled={estado !== 'editado'} onClick={aplicar}><Send /> Apply Changes</Button>
-            </>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </Drawer>
   )
 }

@@ -1,8 +1,10 @@
+import { Drawer, DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
 import {
-  Plus, ZoomIn, ZoomOut, ListFilter, Trash2, Pencil, ChevronDown,
+  Plus, ZoomIn, ZoomOut, Trash2, Pencil, ChevronDown,
   CirclePlus, X, ChevronLeft,
 } from 'lucide-react'
+import { FilterTrigger } from '@/components/ui/filter-menu'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { PANORAMICA_GRANDE, PANORAMICA_CHICA } from '@/assets/panoramic'
@@ -89,8 +91,7 @@ export function FichaHallazgo({ h, onBorrar }: { h: Hallazgo; onBorrar: () => vo
   )
 }
 
-/* Panel New Condition: dos pasos, con el catálogo de procedimientos en el
-   primero. En el frame entra por la derecha y tapa media pantalla. */
+/* New Condition: drawer de dos pasos (ui/drawer), con el catálogo de procedimientos en el primero. */
 export function NewCondition({ onClose }: { onClose: () => void }) {
   const [paso, setPaso] = useState(1)
   const [zona, setZona] = useState<string | null>(ZONAS[0])
@@ -98,47 +99,16 @@ export function NewCondition({ onClose }: { onClose: () => void }) {
   const [q, setQ] = useState('')
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/30" onClick={onClose}>
-      <aside
-        role="dialog"
-        aria-label="New Condition"
-        onClick={(e) => e.stopPropagation()}
-        className="motion-safe:animate-[panel-in_180ms_ease-out] flex h-full w-full max-w-[420px] flex-col bg-white"
-      >
-        <div className="flex items-start justify-between gap-3 px-5 pt-5">
-          <h2 className="text-[20px] font-bold text-ink">New Condition</h2>
-          <button onClick={onClose} aria-label="Close" className="shrink-0 text-ink hover:opacity-60">
-            <X className="size-5" />
-          </button>
-        </div>
-
-        {/* Dos pasos, con la línea de progreso entre los dos números. */}
-        <div className="flex items-center gap-3 px-5 pt-5">
-          {[1, 2].map((n) => (
-            <span key={n} className="flex flex-1 items-center gap-3 last:flex-none">
-              <span className="flex flex-col items-center gap-1">
-                <span className={cn('text-[11px]', paso >= n ? 'text-dash-blue font-medium' : 'text-ink-faint')}>
-                  Step
-                </span>
-                <span
-                  className={cn(
-                    'flex size-5 items-center justify-center rounded-full text-[11px] font-semibold',
-                    paso >= n ? 'bg-dash-blue text-white' : 'bg-line text-ink-muted',
-                  )}
-                >
-                  {n}
-                </span>
-              </span>
-              {n === 1 && (
-                <span className="mt-4 h-px flex-1 bg-line">
-                  <span className={cn('block h-px bg-dash-blue transition-all', paso > 1 ? 'w-full' : 'w-0')} />
-                </span>
-              )}
-            </span>
-          ))}
-        </div>
-
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+    <Drawer
+      open onClose={onClose} title="New Condition" steps={['Condition', 'Details']} step={paso - 1}
+      footer={(
+        <DrawerActions
+          step={paso - 1} total={2} onNext={() => setPaso(2)} onBack={() => setPaso(1)} onCancel={onClose}
+          onSave={() => { aviso.ok('Finding added to the exam.'); onClose() }}
+        />
+      )}
+    >
+        <div>
           <p className="text-[13px] font-semibold text-ink">Selected area</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {zona ? (
@@ -167,12 +137,7 @@ export function NewCondition({ onClose }: { onClose: () => void }) {
                   placeholder="Select"
                   className="focus:border-dash-blue h-9 min-w-0 flex-1 rounded-md border border-line px-3 text-[13px] placeholder:text-ink-faint focus:outline-none"
                 />
-                <button
-                  onClick={() => aviso.info('Filters are not available in this release.')}
-                  className="flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-line px-3 text-[13px] font-medium hover:bg-surface-subtle"
-                >
-                  <ListFilter className="size-3.5" /> Filter
-                </button>
+                <FilterTrigger onClick={() => aviso.info('Filters are not available in this release.')} />
               </div>
 
               <button
@@ -233,26 +198,7 @@ export function NewCondition({ onClose }: { onClose: () => void }) {
           )}
         </div>
 
-        <div className="flex items-center gap-3 border-t border-line-soft p-5">
-          <button
-            onClick={() => (paso === 1 ? onClose() : setPaso(1))}
-            className="h-10 flex-1 rounded-md border border-line text-[13px] font-medium hover:bg-surface-subtle"
-          >
-            {paso === 1 ? 'Cancel' : 'Back'}
-          </button>
-          <button
-            onClick={() => {
-              if (paso === 1) return setPaso(2)
-              aviso.ok('Finding added to the exam.')
-              onClose()
-            }}
-            className="bg-dash-blue hover:bg-dash-blue-hover h-10 flex-1 rounded-md text-[13px] font-semibold text-white transition-colors"
-          >
-            {paso === 1 ? 'Next Step' : 'Save'}
-          </button>
-        </div>
-      </aside>
-    </div>
+    </Drawer>
   )
 }
 

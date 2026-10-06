@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { StepIndicator } from './StepIndicator'
+import { StepIndicator } from './step-indicator'
 import { Button } from '@/components/ui/button'
 
 const meta = {
-  title: 'Components/Clinical/StepIndicator',
+  title: 'Elements/StepIndicator',
   component: StepIndicator,
   args: { total: 3, current: 2 },
 } satisfies Meta<typeof StepIndicator>

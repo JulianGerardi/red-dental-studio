@@ -1,16 +1,15 @@
 import { useState } from 'react'
 import {
-  Ban, Check, CheckCheck, ChevronDown, CircleSlash, Eye, Info, Pencil, Play, RotateCcw, Search, Send, Trash2, UserX, XCircle, type LucideIcon,
+  Ban, Check, CheckCheck, CircleSlash, Eye, Info, Pencil, Play, RotateCcw, Search, Send, Trash2, UserX, XCircle, type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Tabs } from '@/components/ui/tabs'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
 import {
   ESTADOS_PROBLEMA, ESTADOS_PROCEDIMIENTO, PROBLEMAS, PROCEDIMIENTOS,
@@ -61,49 +60,6 @@ export function accionesProcedimiento(e: EstadoProcedimiento): Accion<EstadoProc
   return [[EDITAR], [{ ...ROLLBACK, a: e === 'Completed' ? 'In progress' : 'Planned' }], [BORRAR]]
 }
 
-const PUNTO: Record<PillTone, string> = {
-  success: 'bg-dash-ok-fg', info: 'bg-dash-busy-fg', warning: 'bg-warn-fg', danger: 'bg-dash-bad-fg', neutral: 'bg-ink-faint', purple: 'bg-purple-fg',
-}
-
-/* El filtro de estado: un desplegable de una sola opción, como el select de red.dev, con el punto del color de cada estado
-   y cuántas filas tiene. */
-export function StatusFilter<E extends string>({
-  value, options, onChange, conteo, tono,
-}: {
-  value: E
-  options: readonly E[]
-  onChange: (v: E) => void
-  conteo?: Partial<Record<E, number>>
-  tono?: Partial<Record<E, PillTone>>
-}) {
-  const punto = (o: E) => (tono?.[o] ? <span aria-hidden className={cn('size-2 shrink-0 rounded-full', PUNTO[tono[o]!])} /> : <span aria-hidden className="size-2 shrink-0 rounded-full border border-ink-faint" />)
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        aria-label={`Status: ${value}`}
-        className="focus-visible:outline-dash-blue data-[state=open]:border-dash-blue flex h-9 w-[180px] items-center gap-2 rounded-md border border-line bg-white px-3 text-[13px] text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle"
-      >
-        {punto(value)}
-        <span className="min-w-0 flex-1 truncate text-left">{value}</span>
-        {conteo?.[value] !== undefined && <span className="text-[11px] text-ink-muted tabular-nums">{conteo[value]}</span>}
-        <ChevronDown className="size-4 shrink-0 text-ink-muted" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[220px]">
-        <DropdownMenuLabel className="text-[11px] font-semibold text-ink-muted">Filter by status</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={value} onValueChange={(v) => onChange(v as E)}>
-          {options.map((o) => (
-            <DropdownMenuRadioItem key={o} value={o} className="gap-2 text-[13px]">
-              {punto(o)}
-              <span className="min-w-0 flex-1 truncate">{o}</span>
-              {conteo && <span className={cn('text-[11px] tabular-nums', conteo[o] ? 'text-ink-muted' : 'text-ink-faint')}>{conteo[o] ?? 0}</span>}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
-
 /* La nota de la fila: el ícono violeta con el texto en tooltip, o un guion si no hay. */
 export function NoteCell({ nota }: { nota?: string }) {
   if (!nota) return <span aria-label="No note" className="text-[13px] text-ink-faint">—</span>
@@ -121,8 +77,7 @@ export function ToothCell({ pieza }: { pieza?: number }) {
   return <span className="flex h-6 w-9 items-center justify-center rounded bg-surface-muted text-[12px] text-ink tabular-nums">{pieza ?? ''}</span>
 }
 
-const cuenta = <E extends string>(filas: { estado: E }[], estados: readonly E[]) =>
-  Object.fromEntries(estados.map((e) => [e, filas.filter((f) => f.estado === e).length])) as Record<E, number>
+const cuenta = <E extends string>(filas: { estado: E }[], e: E) => filas.filter((f) => f.estado === e).length
 const texto = (t: string) => <span className="text-[12px] text-ink">{t || '-'}</span>
 const estadoPill = (tono: PillTone, e: string) => <Pill tone={tono} size="sm" className="tracking-wide uppercase">{e}</Pill>
 
@@ -191,9 +146,7 @@ export function ProblemList() {
         <div className="flex flex-wrap items-center gap-2">
           <Tabs tabs={['Problem List', 'Procedures'] as const} value={pestana} onChange={setPestana} aria-label="Clinical records" />
           <div className="ml-auto flex flex-wrap items-center gap-2">
-            {pestana === 'Problem List'
-              ? <StatusFilter value={filtroProblema} options={ESTADOS_PROBLEMA} onChange={setFiltroProblema} conteo={cuenta(problemas, ESTADOS_PROBLEMA)} tono={TONO_PROBLEMA} />
-              : <StatusFilter value={filtroProcedimiento} options={['All', ...ESTADOS_PROCEDIMIENTO] as const} onChange={setFiltroProcedimiento} conteo={{ All: procedimientos.length, ...cuenta(procedimientos, ESTADOS_PROCEDIMIENTO) }} tono={TONO_PROCEDIMIENTO} />}
+            {/* El buscador va siempre primero y después el filtro (Julián, 2026-10-06). */}
             <div className="relative w-[200px] max-w-full">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
@@ -201,6 +154,23 @@ export function ProblemList() {
                 className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
               />
             </div>
+            {pestana === 'Problem List' ? (
+              <FilterMenu
+                label="Filter problems by status"
+                groups={[{
+                  type: 'single', title: 'Status', defaultValue: 'Active', value: filtroProblema, onChange: (v) => setFiltroProblema(v as EstadoProblema),
+                  options: ESTADOS_PROBLEMA.map((e) => ({ value: e, count: cuenta(problemas, e), tone: TONO_PROBLEMA[e] })),
+                }]}
+              />
+            ) : (
+              <FilterMenu
+                label="Filter procedures by status"
+                groups={[{
+                  type: 'single', title: 'Status', defaultValue: 'All', value: filtroProcedimiento, onChange: (v) => setFiltroProcedimiento(v as EstadoProcedimiento | 'All'),
+                  options: [{ value: 'All', count: procedimientos.length }, ...ESTADOS_PROCEDIMIENTO.map((e) => ({ value: e, count: cuenta(procedimientos, e), tone: TONO_PROCEDIMIENTO[e] }))],
+                }]}
+              />
+            )}
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Check, ChevronDown, TriangleAlert } from 'lucide-react'
-import { ModalShell } from '@/components/patients/form'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { cn } from '@/lib/utils'
 
 /* Panel de controles del odontograma, dibujado con los componentes de esta
@@ -286,34 +286,22 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
       )}
 
       {confirmando && (
-        <ModalShell
+        <ConfirmDialog
           title={confirmando.label}
-          onClose={() => setConfirmando(null)}
-          width="max-w-[420px]"
-          footer={
-            <>
-              <button type="button" onClick={() => setConfirmando(null)} className="h-9 rounded-md border border-line bg-white px-5 text-[13px] font-medium hover:bg-surface-subtle">
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  confirmando.el.click()
-                  marcarAccion(/clear/i.test(confirmando.label) ? null : confirmando.clave)
-                  setConfirmando(null)
-                }}
-                className="h-9 rounded-md bg-dash-bad-fg px-5 text-[13px] font-medium text-white hover:bg-dash-bad-hover"
-              >
-                {confirmando.label}
-              </button>
-            </>
-          }
+          tone="danger"
+          confirmLabel={confirmando.label}
+          onCancel={() => setConfirmando(null)}
+          onConfirm={() => {
+            confirmando.el.click()
+            marcarAccion(/clear/i.test(confirmando.label) ? null : confirmando.clave)
+            setConfirmando(null)
+          }}
         >
           <p className="flex items-start gap-2 text-[13px] leading-relaxed text-ink-soft">
             <TriangleAlert className="mt-0.5 size-4 shrink-0 text-warn-fg" />
             This clears everything charted for the current selection — surfaces, conditions and restorations. It cannot be undone.
           </p>
-        </ModalShell>
+        </ConfirmDialog>
       )}
 
       {acciones.length > 0 && (

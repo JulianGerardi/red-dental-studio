@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { userEvent, within } from 'storybook/test'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { ESTADOS_PROBLEMA, PROBLEMAS } from '@/data/clinical-mode'
-import { NoteCell, ProblemList, StatusFilter, ToothCell } from './ProblemList'
+import { NoteCell, ProblemList, ToothCell } from './ProblemList'
 import { escribir, esperar, secuencia } from '@/design-system/play'
 
 const meta = {
@@ -37,7 +36,7 @@ export const RowMenu: Story = {
   },
 }
 
-/* Las piezas de cada fila: la nota (con y sin texto), la pieza y el filtro de estado. */
+/* Las piezas de cada fila: la nota (con y sin texto) y la pieza. */
 export const Parts: Story = {
   render: () => (
     <TooltipProvider>
@@ -46,12 +45,15 @@ export const Parts: Story = {
         <NoteCell />
         <ToothCell pieza={14} />
         <ToothCell />
-        <StatusFilter
-          value="Active" options={ESTADOS_PROBLEMA} onChange={() => {}}
-          conteo={Object.fromEntries(ESTADOS_PROBLEMA.map((e) => [e, PROBLEMAS.filter((p) => p.estado === e).length]))}
-          tono={{ Active: 'success', Monitoring: 'warning', 'In treatment': 'info' }}
-        />
       </div>
     </TooltipProvider>
   ),
+}
+
+/* El filtro de estado (Elements / Filter) abierto: Active por defecto, con la cantidad y el color de cada estado. */
+export const StatusFilterOpen: Story = {
+  play: async (c) => {
+    await userEvent.click(await within(c.canvasElement).findByRole('button', { name: /filter problems by status/i }))
+    await esperar(/clinic declined/i)(c)
+  },
 }

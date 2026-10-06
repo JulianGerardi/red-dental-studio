@@ -30,3 +30,18 @@ export const Empty: Story = {
     </div>
   ),
 }
+
+/* En la página: el aviso del ancho de su contenido, alineado con el título. */
+function Pagina() {
+  const [cursor, setCursor] = useState(0)
+  return (
+    <div className="bg-page-background pb-6">
+      <NotificationBanner items={NOTIFICACIONES} cursor={cursor} onCursor={setCursor} onOcultar={() => {}} />
+      <div className="mx-auto w-full max-w-[1400px] px-6 pt-5">
+        <p className="text-[20px] font-bold text-ink">Notifications</p>
+        <p className="text-[13px] text-ink-muted">Mark each one as read, pending or unread, and archive what’s done.</p>
+      </div>
+    </div>
+  )
+}
+export const OnPage: Story = { render: () => <Pagina /> }
