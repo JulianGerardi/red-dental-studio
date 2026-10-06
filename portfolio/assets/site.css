@@ -540,14 +540,13 @@ html[data-lang="en"] [lang="es"], html[data-lang="es"] [lang="en"] { display: no
 /* ---------- Process ---------- */
 .steps-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10.8px; }
 .step { position: relative; display: grid; gap: 10.8px; align-content: start; min-height: 234px; padding: clamp(18px, 2vw, 25.2px); border-radius: 16.2px; background: var(--bg-2); overflow: hidden; isolation: isolate; transition: color 0.5s var(--ease), transform 0.6s var(--ease), box-shadow 0.6s var(--ease); }
-/* On hover a card turns into the assistant orb: a dark sphere-like surface with the
-   green and violet light of the brand turning slowly around it. */
-.step::before, .step::after { content: ""; position: absolute; z-index: -1; opacity: 0; pointer-events: none; transition: opacity 0.6s var(--ease); }
-.step::before { inset: 0; background: radial-gradient(120% 90% at 30% 0%, #2e2e2e, #0a0a0a 62%); }
-.step::after { inset: -40%; background: conic-gradient(from var(--a, 0deg), transparent 0 36%, rgba(61, 154, 127, 0.85) 55%, rgba(91, 69, 224, 0.8) 73%, transparent 90%); filter: blur(36px); }
-.step:hover { color: #ffffff; transform: translateY(-4px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.07), 0 22px 40px -22px rgba(0, 0, 0, 0.55); }
-.step:hover::before, .step:hover::after { opacity: 1; }
-.step:hover p, .step:hover .step__n { color: rgba(255, 255, 255, 0.72); }
+/* On hover the card's stroke lights up with the assistant orb's green and violet,
+   turning slowly around the edge. */
+.step::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; padding: 1.5px; pointer-events: none; opacity: 0; transition: opacity 0.6s var(--ease);
+  background: conic-gradient(from var(--a, 0deg), #2a9d7c, #5b45e0, #9fd3c0, #2a9d7c);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.step:hover { transform: translateY(-4px); box-shadow: 0 22px 40px -24px rgba(91, 69, 224, 0.45); }
+.step:hover::after { opacity: 1; }
 @media (prefers-reduced-motion: no-preference) { .step::after { animation: orb 7s linear infinite; animation-play-state: paused; } .step:hover::after { animation-play-state: running; } }
 .step__n { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--faint); margin-bottom: auto; }
 .step h3 { font-size: var(--text-xl); letter-spacing: -0.03em; margin-top: 50.4px; }
