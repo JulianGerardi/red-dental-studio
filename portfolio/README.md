@@ -59,8 +59,9 @@ Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span 
 - **Transición entre páginas**: una cortina cubre la pantalla al salir y se levanta al entrar.
 - **Inicio**: una tarjeta clara con el mismo brillo verde y violeta del final de la página, que se mueve solo y sigue el puntero. Las palabras clave de la frase (sin subrayado hasta pasar el mouse) muestran el proyecto al que apuntan en su escena de marca: una ventana de Safari sobre un degradé suave con una notificación (Batech, Confidentally, GRILL), el monitor con el diagrama Figma → Claude Code → Storybook (Confidentally UI) o la ventana inclinada sobre el amarillo de Mercado Play (design systems → Confidentally UI, IA → Batech, prototipos → Confidentally, productos de punta a punta → GRILL, que la gente usa → Mercado Play). En el celular el primer toque muestra la tarjeta y tocarla (o tocar la palabra otra vez) abre el caso. Se configuran en `HOT` de `_build/index_page.py` y `brand_scene()` de `_build/mockups.py`.
 - **UX/UI**: debajo del banner, una frase corta cuyas palabras se encienden a medida que se scrollea, con los años, los cuatro países con sus banderas y las áreas de práctica.
+- **Proceso**: las cinco etapas son cards; al pasar el mouse toman el aspecto del orbe del asistente (botón "Preguntame"): fondo oscuro con la luz verde y violeta girando alrededor.
 - **Escenas de scroll (los casos)**, al estilo de las páginas de producto de Apple. El JS le da a cada escena su avance (`--p`, de 0 a 1) y cada una lo usa a su manera:
-  - `rise`: la portada arranca recostada en 3D, se endereza y crece hasta ocupar la pantalla.
+  - `rise`: la portada arranca apenas recostada, se endereza y crece hasta ocupar la pantalla.
   - `story`: un dispositivo queda fijo y cambia de pantalla a medida que pasan los pasos (Batech: el formulario de nuevo análisis se completa solo, reconstruido en HTML desde el Figma). En el celular cada paso es su propia pantalla, con su captura arriba del texto, y el scroll se detiene en cada paso.
   - `rail`: una fila de pantallas que se mueve de costado con el scroll.
   - `fan`: los celulares se abren en abanico.
@@ -68,12 +69,12 @@ Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span 
   - `scrub`: una página larga se desplaza dentro de su ventana.
   - `pipe` y `builder` (Confidentally UI): el diagrama Figma → Claude Code → Storybook → devs se enciende paso a paso, y el Builder escribe el pedido, la IA elige piezas del catálogo y la pantalla se arma, hasta mostrar el código.
   En el celular las escenas anchas se desplazan para seguir cada paso; con "reducir movimiento" todas muestran su estado final.
-- **Pantallas de los casos** (`.shot`): al entrar con el scroll, el panel de color se abre desde el centro y la pantalla se levanta desde una inclinación 3D hasta quedar plana. El avance (`--t`, de 0 a 1) lo calcula `site.js`.
+- **Pantallas de los casos** (`.shot`): al entrar con el scroll, el panel de color se abre apenas y la pantalla sube y se asienta con una leve inclinación, al estilo Apple. El avance (`--t`, de 0 a 1) lo calcula `site.js`.
 - Con "reducir movimiento" activado en el sistema, todo queda quieto.
 
 ## Selected work
 
-Sigue el tema: blanca en modo claro y negra en modo oscuro, con líneas finas entre filas y el número en verde. Cada fila tiene número, título y etiquetas; al pasar el mouse se invierte y se despliega una tira de 5 pantallas a todo el ancho con la descripción debajo. Al abrirse una fila, las cinco pantallas salen apiladas del centro, se reparten en abanico hasta su lugar y cada una se endereza desde una inclinación 3D (en el celular entran deslizándose cuando el proyecto aparece en pantalla). Después cada pantalla flota, y al pasar el mouse se inclina hacia el puntero y se eleva. Las tiras se arman en `_build/common.py` (`tiles_batech`, `tiles_dental`, `tiles_ds`, `tiles_grill`, `tiles_mp`) con `tile_screen` (navegador), `tile_phone` (celular) y `tile_card` (una pieza). El ancho de cada objeto se calcula en el build para que la pantalla entre **entera**, sin recortes.
+Sigue el tema: blanca en modo claro y negra en modo oscuro, con líneas finas entre filas y el número en verde. Cada fila tiene número, título y etiquetas; al pasar el mouse se invierte y se despliega una tira de 5 pantallas a todo el ancho con la descripción debajo. Al abrirse una fila, cada panel sube suave, uno tras otro, y la pantalla de adentro sube un poco más detrás, así las dos capas se leen como profundidad (en el celular pasa lo mismo cuando el proyecto aparece en pantalla). Después cada pantalla flota, y al pasar el mouse se inclina hacia el puntero y se eleva. Las tiras se arman en `_build/common.py` (`tiles_batech`, `tiles_dental`, `tiles_ds`, `tiles_grill`, `tiles_mp`) con `tile_screen` (navegador), `tile_phone` (celular) y `tile_card` (una pieza). El ancho de cada objeto se calcula en el build para que la pantalla entre **entera**, sin recortes.
 
 El cursor es un cuadrado blanco con `mix-blend-mode: difference`: invierte lo que tiene debajo, crece sobre links y, sobre el título de un proyecto, se agranda y muestra el año (`data-cursor`).
 

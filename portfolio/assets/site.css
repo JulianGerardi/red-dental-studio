@@ -457,20 +457,15 @@ html[data-lang="en"] [lang="es"], html[data-lang="es"] [lang="en"] { display: no
   .wl-item.is-open .tile__obj { animation: float 6.5s ease-in-out infinite; animation-delay: calc(var(--k, 0) * -1.3s); }
 }
 @keyframes float { 0%, 100% { translate: 0 0.6%; } 50% { translate: 0 -0.6%; } }
-/* Opening a project deals its screens out of one stack in the middle,
-   then each screen stands up from a 3D tilt. The middle card leads. */
-.tile { --dk: max(var(--k, 0) - 2, 2 - var(--k, 0)); z-index: calc(4 - var(--dk)); }
+/* Opening a project: each panel rises softly, one after another, and the screen
+   inside rises a little further behind it, so the two layers read as depth. */
 @media (prefers-reduced-motion: no-preference) and (min-width: 811px) and (hover: hover) {
-  .wl-item.is-open .tile { animation: tile-deal 1.2s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(0.06s + var(--dk) * 70ms); }
-  .wl-item.is-open .tile__obj { animation: tile-up 1.35s cubic-bezier(0.16, 1, 0.3, 1) backwards, float 6.5s ease-in-out infinite; animation-delay: calc(0.24s + var(--dk) * 80ms), calc(var(--k, 0) * -1.3s); }
+  .wl-item.is-open .tile { animation: tile-rise 1s cubic-bezier(0.22, 1, 0.36, 1) backwards; animation-delay: calc(0.08s + var(--k, 0) * 60ms); }
+  .wl-item.is-open .tile__obj { animation: tile-up 1.3s cubic-bezier(0.22, 1, 0.36, 1) backwards, float 6.5s ease-in-out infinite; animation-delay: calc(0.14s + var(--k, 0) * 60ms), calc(var(--k, 0) * -1.3s); }
 }
-@keyframes tile-deal {
-  from { opacity: 0; transform: translate(calc((2 - var(--k, 0)) * 106%), 14%) rotate(calc((var(--k, 0) - 2) * 5deg)) scale(0.8); }
-  35% { opacity: 1; }
-  to { opacity: 1; transform: none; }
-}
+@keyframes tile-rise { from { opacity: 0; transform: translateY(28px) scale(0.97); } to { opacity: 1; transform: none; } }
 @keyframes tile-up {
-  from { opacity: 0; transform: perspective(810px) rotateX(46deg) translateY(30%) scale(0.78); }
+  from { opacity: 0; transform: perspective(810px) translateY(9%) scale(0.95); }
   to { opacity: 1; transform: perspective(810px) rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg)); }
 }
 .tile .mock { width: 100%; border: 0; border-radius: 2.4cqw; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 16.2px 27px -14px rgba(0, 0, 0, 0.45); }
@@ -538,16 +533,22 @@ html[data-lang="en"] [lang="es"], html[data-lang="es"] [lang="en"] { display: no
 @media (max-width: 504px) { .wl-strip { grid-auto-columns: 64%; } }
 @media (prefers-reduced-motion: no-preference) and (max-width: 810px), (prefers-reduced-motion: no-preference) and (hover: none) {
   .js .wl-item:not(.is-seen) .tile { opacity: 0; }
-  .wl-item.is-seen .tile { animation: tile-slide 1.1s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(var(--k, 0) * 90ms); }
-  .wl-item.is-seen .tile__obj { animation: tile-up 1.3s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(0.18s + var(--k, 0) * 90ms); }
+  .wl-item.is-seen .tile { animation: tile-rise 1s cubic-bezier(0.22, 1, 0.36, 1) backwards; animation-delay: calc(var(--k, 0) * 80ms); }
+  .wl-item.is-seen .tile__obj { animation: tile-up 1.3s cubic-bezier(0.22, 1, 0.36, 1) backwards; animation-delay: calc(0.08s + var(--k, 0) * 80ms); }
 }
-@keyframes tile-slide { from { opacity: 0; transform: translateX(38%) rotate(4deg) scale(0.9); } to { opacity: 1; transform: none; } }
 
 /* ---------- Process ---------- */
 .steps-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10.8px; }
-.step { position: relative; display: grid; gap: 10.8px; align-content: start; min-height: 234px; padding: clamp(18px, 2vw, 25.2px); border-radius: 16.2px; background: var(--bg-2); overflow: hidden; transition: background-color 0.5s var(--ease), color 0.5s var(--ease), transform 0.6s var(--ease); }
-.step:hover { background: var(--fg); color: var(--bg); transform: translateY(-6px); }
-.step:hover p, .step:hover .step__n { color: var(--inv-muted); }
+.step { position: relative; display: grid; gap: 10.8px; align-content: start; min-height: 234px; padding: clamp(18px, 2vw, 25.2px); border-radius: 16.2px; background: var(--bg-2); overflow: hidden; isolation: isolate; transition: color 0.5s var(--ease), transform 0.6s var(--ease), box-shadow 0.6s var(--ease); }
+/* On hover a card turns into the assistant orb: a dark sphere-like surface with the
+   green and violet light of the brand turning slowly around it. */
+.step::before, .step::after { content: ""; position: absolute; z-index: -1; opacity: 0; pointer-events: none; transition: opacity 0.6s var(--ease); }
+.step::before { inset: 0; background: radial-gradient(120% 90% at 30% 0%, #2e2e2e, #0a0a0a 62%); }
+.step::after { inset: -40%; background: conic-gradient(from var(--a, 0deg), transparent 0 36%, rgba(61, 154, 127, 0.85) 55%, rgba(91, 69, 224, 0.8) 73%, transparent 90%); filter: blur(36px); }
+.step:hover { color: #ffffff; transform: translateY(-4px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.07), 0 22px 40px -22px rgba(0, 0, 0, 0.55); }
+.step:hover::before, .step:hover::after { opacity: 1; }
+.step:hover p, .step:hover .step__n { color: rgba(255, 255, 255, 0.72); }
+@media (prefers-reduced-motion: no-preference) { .step::after { animation: orb 7s linear infinite; animation-play-state: paused; } .step:hover::after { animation-play-state: running; } }
 .step__n { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--faint); margin-bottom: auto; }
 .step h3 { font-size: var(--text-xl); letter-spacing: -0.03em; margin-top: 50.4px; }
 .step p { color: var(--muted); font-size: var(--text-sm); transition: color 0.5s; }
@@ -723,10 +724,10 @@ html[data-lang="en"] [lang="es"], html[data-lang="es"] [lang="en"] { display: no
 .panel--mp > .mock:not(.mock--scroll) { max-width: 720px; margin-inline: auto; }
 .panel--mp-dark { background: radial-gradient(70% 60% at 50% 0%, #2a2a1a, transparent 70%), #121212; }
 .panel--center { display: grid; place-items: center; }
-/* Screens in a case: as a panel scrolls in it opens out from its middle and the
-   screen inside stands up from a 3D tilt. --t (0 → 1) comes from site.js. */
-.motion .shot > .panel { perspective: 1600px; clip-path: inset(calc((1 - var(--t, 1)) * 7%) calc((1 - var(--t, 1)) * 5%) round clamp(12.6px, 1.4vw, 21.6px)); }
-.motion .shot > .panel > * { transform-origin: 50% 100%; translate: 0 calc((1 - var(--t, 1)) * 14%); scale: calc(0.86 + 0.14 * var(--t, 1)); rotate: x calc((1 - var(--t, 1)) * 30deg); }
+/* Screens in a case: as a panel scrolls in it opens out a touch and the screen
+   inside rises and settles with a slight lean. --t (0 → 1) comes from site.js. */
+.motion .shot > .panel { perspective: 1800px; clip-path: inset(calc((1 - var(--t, 1)) * 2.5%) calc((1 - var(--t, 1)) * 2%) round clamp(12.6px, 1.4vw, 21.6px)); }
+.motion .shot > .panel > * { transform-origin: 50% 100%; translate: 0 calc((1 - var(--t, 1)) * 7%); scale: calc(0.95 + 0.05 * var(--t, 1)); rotate: x calc((1 - var(--t, 1)) * 6deg); }
 .panel .mock { width: 100%; transition: transform 0.8s var(--ease); }
 .panel:hover .mock { transform: translateY(-4px); }
 .panel .mock__bar { height: 27px; gap: 5.4px; padding-inline: 10.8px; }
@@ -1175,7 +1176,7 @@ html.has-cursor .agent__panel input { cursor: text; }
 .motion .rise .scene__pin { display: grid; place-items: center; }
 .motion .rise__frame { aspect-ratio: auto; width: calc(100% - var(--gutter) * 2 * (1 - var(--e))); height: calc(100% - 5vh * (1 - var(--e))); border-radius: calc(clamp(12.6px, 1.6vw, 25.2px) * (1 - var(--e) * 0.6)); }
 .motion .rise__frame { perspective: 1800px; }
-.motion .rise__obj { width: min(100%, calc((100svh - var(--pin-top)) * 1.6)); transform-origin: 50% 100%; translate: 0 calc((1 - var(--e)) * 12%); scale: calc(0.8 + 0.2 * var(--e)); rotate: x calc((1 - var(--e)) * 28deg); }
+.motion .rise__obj { width: min(100%, calc((100svh - var(--pin-top)) * 1.6)); transform-origin: 50% 100%; translate: 0 calc((1 - var(--e)) * 8%); scale: calc(0.86 + 0.14 * var(--e)); rotate: x calc((1 - var(--e)) * 7deg); }
 .motion .rise .nt, .motion .rise .bs__emoji { opacity: clamp(0, calc((var(--e) - 0.55) * 4), 1); }
 .rise .mp-slide { width: 82%; margin-inline: auto; }
 
