@@ -409,9 +409,11 @@
   --shadow-stat: 0 4px 4px 0 rgb(0 0 0 / 0.05);
   --shadow-panel: 0 4px 14px 0 rgb(100 100 100 / 0.25);
   /* La card de adentro: el stroke es una línea de medio pixel en gris tenue hecha con sombra (un border de 0.5px Chrome
-     lo redondea a 1px) más una sombra suave. shadow-hairline es sólo la línea. */
-  --shadow-inner-card: 0 0 0 0.5px rgb(0 0 0 / 0.1), 0 1px 3px 0 rgb(0 0 0 / 0.06);
-  --shadow-hairline: 0 0 0 0.5px rgb(0 0 0 / 0.1);
+     lo redondea a 1px), por DENTRO de la card (inset): por fuera, una lista con scroll la recortaba arriba y a los
+     costados y sólo quedaba la sombra de abajo. La sombra de afuera es casi nada, para que el borde se vea parejo.
+     shadow-hairline es sólo la línea. */
+  --shadow-inner-card: inset 0 0 0 0.5px rgb(0 0 0 / 0.12), 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-hairline: inset 0 0 0 0.5px rgb(0 0 0 / 0.12);
 }
 
 body { font-family: var(--font-sans); }

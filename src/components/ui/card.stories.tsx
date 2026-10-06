@@ -218,8 +218,8 @@ export const Specs: Story = {
         </div>
         <Tabla encabezado={['Part', 'Value']} minimo={560}>
           <tr><td className="font-semibold">Background</td><td><Token nombre="white" /></td></tr>
-          <tr><td className="font-semibold">Stroke</td><td className="tabular-nums">0.5px, negro al 10% (una línea de sombra: un border de 0.5px se redondea a 1px). En retina, medio pixel; en una pantalla común, 1px en #f0f0f0</td></tr>
-          <tr><td className="font-semibold">Shadow</td><td className="tabular-nums">shadow-inner-card · 0 0 0 0.5px rgb(0 0 0 / 10%), 0 1px 3px rgb(0 0 0 / 6%)</td></tr>
+          <tr><td className="font-semibold">Stroke</td><td className="tabular-nums">0.5px, negro al 12%, por dentro de la card (sombra inset: un border de 0.5px se redondea a 1px y una línea por fuera la recorta una lista con scroll). En retina, medio pixel; en una pantalla común, 1px en #eeeeee; igual en los cuatro lados</td></tr>
+          <tr><td className="font-semibold">Shadow</td><td className="tabular-nums">shadow-inner-card · inset 0 0 0 0.5px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 4%)</td></tr>
           <tr><td className="font-semibold">Radius</td><td className="tabular-nums">8px</td></tr>
         </Tabla>
       </Bloque>

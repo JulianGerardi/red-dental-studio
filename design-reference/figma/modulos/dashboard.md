@@ -387,3 +387,10 @@ Julián: "el stroke de las cards lo haría un gris más tenue y la línea más f
 línea: 0 0 0 0.5px negro al 10% (en retina medio pixel; en una pantalla común 1px en #f0f0f0, antes #e4e4e7), más la
 sombra suave. Un `border-[0.5px]` no sirve: Chrome lo redondea a 1px. Igual en el Patient Dashboard (turnos, tareas y
 las listas de Pending documents, con `shadow-hairline`).
+
+## El stroke va por dentro de la card (2026-10-06)
+
+En Today Appointments (Patients) el stroke se veía raro: la lista tiene scroll y recortaba la línea, que iba por fuera
+de la card, arriba y a los costados; sólo quedaba la sombra de abajo. Ahora la línea es `inset` (por dentro, negro al
+12%) y la sombra de afuera casi no se nota (0 1px 2px, 4%): el borde es igual en los cuatro lados en todas las cards de
+adentro.
