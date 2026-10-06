@@ -1,4 +1,5 @@
 import { Clock, MapPin } from 'lucide-react'
+import { InnerCard } from '@/components/dashboard/primitives'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { Button } from '@/components/ui/button'
 
@@ -44,7 +45,7 @@ export function PatientAppointmentCard({
   onCancel?: () => void
 }) {
   return (
-    <div className="border-dash-blue rounded-md border-l-[3px] bg-white p-2.5 shadow-[0_1px_2px_rgb(0_0_0/0.06)]">
+    <InnerCard className="p-2.5">
       <div className="flex items-start gap-2">
         <span className="bg-dash-blue-hover flex size-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white">{initials}</span>
         <span className="min-w-0 flex-1 truncate text-xs font-semibold text-ink">{name}</span>
@@ -62,6 +63,6 @@ export function PatientAppointmentCard({
           Cancel
         </Button>
       )}
-    </div>
+    </InnerCard>
   )
 }

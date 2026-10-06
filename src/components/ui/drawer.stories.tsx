@@ -152,6 +152,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">New Appointment</td><td>Patient and Scheduling · Link to treatment plan visit</td><td>lg + calendario al costado</td></tr>
           <tr><td className="font-semibold">New Location · New Employee</td><td>General · Contact · Address</td><td>lg</td></tr>
           <tr><td className="font-semibold">New Account</td><td>Information · Address · Owner</td><td>lg</td></tr>
+          <tr><td className="font-semibold">Add Relationship</td><td>Person · Contact · Relationship</td><td>lg</td></tr>
           <tr><td className="font-semibold">New Procedure</td><td>Procedure · Surfaces · Link to finding (con nombres)</td><td>md</td></tr>
           <tr><td className="font-semibold">Edit Patient, subscriptions, Post payment</td><td>Ver cada componente</td><td>lg / xl</td></tr>
         </Tabla>

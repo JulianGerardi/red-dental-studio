@@ -5,7 +5,7 @@ import {
   ModalShell, SectionCard, SearchField, SelectField, TextField,
   DateTextField, TextArea, OptionCheckbox,
 } from '@/components/patients/form'
-import { PersonaSeleccionada, DIRECTORIO } from '@/pages/patients/AddRelationship'
+import { PersonaSeleccionada, DIRECTORIO } from '@/components/patients/AddRelationshipDrawer'
 import { CARRIERS, PLANES_NOMBRE, ORDENES, SUSCRIPCION } from '@/data/insurance'
 import { aviso } from '@/components/ui/toaster'
 

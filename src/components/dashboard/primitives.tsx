@@ -39,15 +39,16 @@ export function Panel({
   )
 }
 
-/* Card interior compartido por Appointment y Operatory: mismo radio,
-   misma sombra y mismo fondo en el Figma. */
+/* La card de adentro de un panel: Appointments, Waiting Room, Rooms y Pending Task del Dashboard, y los turnos del
+   Patient Dashboard. Todas con el mismo fondo blanco, borde fino y sombra suave (Julián, 2026-10-06: la de antes,
+   0 4px 2px, se veía dura y cada card tenía la suya). */
 export function InnerCard({
   className,
   children,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('shadow-inner-card rounded-lg bg-white', className)} {...props}>
+    <div className={cn('shadow-inner-card rounded-lg border border-line bg-white', className)} {...props}>
       {children}
     </div>
   )

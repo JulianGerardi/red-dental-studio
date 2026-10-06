@@ -190,3 +190,11 @@ visita, con el progreso). `PendingDocuments`, datos en
   Upload, Sign, Review); los vencidos con el boton azul.
 - Filtro All / Patient / Office. Resolver un documento lo saca de
   pendientes y avisa con un toast; sin pendientes, estado vacio.
+
+## Pending Task sin blanco y las cards con la misma superficie (2026-10-06)
+
+- Pending Task y Appointments comparten fila; Appointments (7 turnos) es más alta y estiraba la card de Pending Task,
+  que quedaba con un bloque blanco abajo. Ahora cada card mide lo que su contenido (`lg:items-start`).
+- Los turnos (`PatientAppointmentCard`) usan la misma card que el Dashboard (`InnerCard`): fondo blanco, borde fino y
+  sombra suave. Se fue el borde azul a la izquierda.
+- **Pending documents** sigue en el Overview, entre los cuatro bloques clínicos y Pending Task.

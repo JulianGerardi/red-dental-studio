@@ -408,7 +408,7 @@
 
   --shadow-stat: 0 4px 4px 0 rgb(0 0 0 / 0.05);
   --shadow-panel: 0 4px 14px 0 rgb(100 100 100 / 0.25);
-  --shadow-inner-card: 0 4px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-inner-card: 0 1px 3px 0 rgb(0 0 0 / 0.08);
 }
 
 body { font-family: var(--font-sans); }

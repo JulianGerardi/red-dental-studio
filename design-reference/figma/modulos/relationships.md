@@ -82,3 +82,13 @@ aclaración.
 El texto da por sentado que **borrar una relación es posible**, pero el borrado
 no está diseñado en ningún frame. Por eso el kebab despliega sólo "Edit
 relationship".
+
+## Add Relationship pasa a drawer (2026-10-06)
+
+Como en Confidentally 2.0 (`AddRelationshipDrawer`): drawer lg con tres pasos. **Person** (buscar por nombre o Add New
+Person con First, Last Name y Email; con la casilla tildada el buscador se deshabilita), **Contact** (General Information
+y Adress Information, con los textos del Figma) y **Relationship** (Guardian y/o Guarantor, Direction con las dos frases
+armadas con la persona, los roles y el paciente, y Relationship to Patient). Se abre desde el botón y el estado vacío de
+Relationships & Billing; `/patients/:id/relationships/new` abre la lista con el drawer abierto. La relación nueva entra
+primera, con Legal contact (Guardian) y/o Financial contact (Guarantor). `DIRECTORIO` y `PersonaSeleccionada` se mudaron
+al archivo del drawer. Design system: *Components / Patients / AddRelationshipDrawer*.

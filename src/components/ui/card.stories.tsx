@@ -5,12 +5,14 @@ import { MoreVertical, UserCog } from 'lucide-react'
 import { Button } from './button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card'
 import { SectionCard, TextField } from '@/components/patients/form'
-import { Bloque, Lienzo, Tabla, useMedidas } from '@/design-system/kit'
+import { Bloque, Lienzo, Tabla, Token, useMedidas } from '@/design-system/kit'
+import { InnerCard } from '@/components/dashboard/primitives'
 import * as StatCardStories from '@/components/dashboard/StatCard.stories'
 import * as AppointmentCardStories from '@/components/dashboard/AppointmentCard.stories'
 import * as OperatoryCardStories from '@/components/dashboard/OperatoryCard.stories'
 import * as PendingTaskCardStories from '@/components/dashboard/PendingTaskCard.stories'
 import * as PatientCardStories from '@/components/patients/PatientCard.stories'
+import * as PatientAppointmentCardStories from '@/components/patients/PatientAppointmentCard.stories'
 import { SettingsSectionCard } from '@/components/settings/SettingsSectionCard'
 import { cn } from '@/lib/utils'
 
@@ -134,6 +136,7 @@ const { Default: Appointment } = composeStories(AppointmentCardStories)
 const { Available: Operatory } = composeStories(OperatoryCardStories)
 const { Default: Pending } = composeStories(PendingTaskCardStories)
 const { Active: Patient } = composeStories(PatientCardStories)
+const { Booked: PatientAppointment } = composeStories(PatientAppointmentCardStories)
 
 const EN_LA_APP: { nombre: string; uso: string; ancho: number; nodo: ReactNode }[] = [
   { nombre: 'SettingsSectionCard', uso: 'One section of Settings on its home page. The whole card is the link.', ancho: 320, nodo: <SettingsSectionCard to="/settings/accounts" icon={UserCog} title="Accounts" description="Manage your account and their access." /> },
@@ -143,6 +146,7 @@ const EN_LA_APP: { nombre: string; uso: string; ancho: number; nodo: ReactNode }
   { nombre: 'OperatoryCard', uso: 'One room and who is in it.', ancho: 300, nodo: <Operatory /> },
   { nombre: 'PendingTaskCard', uso: 'A task that is waiting for someone.', ancho: 320, nodo: <Pending /> },
   { nombre: 'PatientCard', uso: 'A patient in the mobile list.', ancho: 340, nodo: <Patient /> },
+  { nombre: 'PatientAppointmentCard', uso: 'One appointment in the Patient Dashboard. Same surface as the dashboard cards.', ancho: 280, nodo: <PatientAppointment /> },
 ]
 
 export const InTheApp: Story = {
@@ -186,6 +190,18 @@ export const Specs: Story = {
           <Medida nombre="CardHeader" selector=":scope > div > div"><Card className="w-40"><CardHeader><CardTitle>Title</CardTitle></CardHeader></Card></Medida>
           <Medida nombre="CardContent" selector=":scope > div > div"><Card className="w-40"><CardContent>Content</CardContent></Card></Medida>
           <Medida nombre="CardFooter" selector=":scope > div > div"><Card className="w-40"><CardFooter><Button size="sm">Save</Button></CardFooter></Card></Medida>
+        </Tabla>
+      </Bloque>
+      <Bloque titulo="Card inside a panel" nota="La misma superficie para todas las cards que van adentro de un panel (InnerCard): Appointments, Waiting Room, Rooms y Pending Task del Dashboard, los turnos y las tareas del Patient Dashboard y las cards chicas de Patients. Antes cada una tenía su sombra y la del Dashboard (0 4px 2px) se veía dura.">
+        <div className="flex flex-wrap gap-4 rounded-lg bg-surface-subtle p-5">
+          <InnerCard className="flex h-20 w-48 items-center justify-center text-[12px] text-ink-muted">InnerCard</InnerCard>
+          <InnerCard className="flex h-20 w-48 items-center justify-center text-[12px] text-ink-muted">InnerCard</InnerCard>
+        </div>
+        <Tabla encabezado={['Part', 'Value']} minimo={560}>
+          <tr><td className="font-semibold">Background</td><td><Token nombre="white" /></td></tr>
+          <tr><td className="font-semibold">Border</td><td><Token nombre="line" /> · 1px</td></tr>
+          <tr><td className="font-semibold">Shadow</td><td className="tabular-nums">shadow-inner-card · 0 1px 3px rgb(0 0 0 / 8%)</td></tr>
+          <tr><td className="font-semibold">Radius</td><td className="tabular-nums">8px</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Rules">

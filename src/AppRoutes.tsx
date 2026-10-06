@@ -10,7 +10,6 @@ import PatientDocuments from '@/pages/patients/Documents'
 import Relationships from '@/pages/patients/Relationships'
 import Insurance from '@/pages/patients/Insurance'
 import Ledger from '@/pages/patients/Ledger'
-import AddRelationship from '@/pages/patients/AddRelationship'
 import PatientDetail from '@/pages/PatientDetail'
 import ClinicalMode from '@/pages/ClinicalMode'
 import NotFound from '@/pages/NotFound'
@@ -57,7 +56,7 @@ export function AppRoutes() {
         <Route path="patients/:id/insurance" element={<Insurance />} />
         <Route path="patients/:id/ledger" element={<Ledger />} />
         <Route path="patients/:id/relationships" element={<Relationships />} />
-        <Route path="patients/:id/relationships/new" element={<AddRelationship />} />
+        <Route path="patients/:id/relationships/new" element={<Relationships nuevo />} />
         <Route path="scheduling" element={<Scheduling />} />
         <Route path="billing" element={<Billing />} />
 

@@ -412,15 +412,17 @@ esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Proc
    Discard / Expire / Cancel / Present / Accept del caso, Confirm procedure- y el aviso de Clinical Note.
 7. **No cambian** los desplegables anclados (popovers, calendario, filtros) ni el visor de radiografías.
    `AppointmentDetailsDrawer` es una card anclada al turno y `LinkTreatmentPlanDrawer` no se usa en la app.
-8. **Settings** (2026-10-06, segunda vuelta): New Location y New Employee dejan de ser pantallas aparte (General,
+8. **Add Relationship** (2026-10-06): drawer de 2.0 con Person, Contact y Relationship (*Components / Patients /
+   AddRelationshipDrawer*).
+9. **Settings** (2026-10-06, segunda vuelta): New Location y New Employee dejan de ser pantallas aparte (General,
    Contact, Address; `/settings/locations/new` y `/settings/team/new` abren la lista con el drawer abierto); New Account
    (Information, Address, Owner, como las pestañas de Edit Account; queda en Draft) y Manage Licenses (un paso; no baja
    de las licencias en uso, sin plan avisa y no guarda). Next valida sólo el paso a la vista (`lib/useFormPasos`).
-9. **Animación de los pasos**: al completar un paso el tilde rebota, el anillo verde se abre y la línea se llena (la de
+10. **Animación de los pasos**: al completar un paso el tilde rebota, el anillo verde se abre y la línea se llena (la de
    New Procedure); además el contenido del paso nuevo entra deslizándose desde la derecha con Next y desde la izquierda
    con Return (`paso-entra` / `paso-vuelve`). **New Procedure conserva los nombres de sus pasos** (Procedure, Surfaces,
    Link to finding) con `stepLabels`; el resto dice "Step", como en 2.0.
-10. **La línea entre círculos es la misma en todos los drawers**: el rótulo del paso ("Step" o un nombre) va encima
+11. **La línea entre círculos es la misma en todos los drawers**: el rótulo del paso ("Step" o un nombre) va encima
     del círculo sin ocupar ancho (el primero alineado a la izquierda, el último a la derecha). Antes, los nombres largos
     de New Procedure acortaban la línea y la despegaban de los círculos.
 
@@ -437,6 +439,9 @@ esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Proc
   resto de las pantallas (antes 24px bold y 36px en la home de Settings); Confibot titula como los drawers (18px y 12px).
 - **Menú**: Billing, como Settings, abre al costado un menú con Billing, Fee Schedules, Carriers y Coverage Table.
 - **Pending Task**: cuatro columnas desde 1360px, para que las tareas del día llenen las filas sin hueco.
+- **Cards adentro de un panel** (`InnerCard`): todas con fondo blanco, borde `line` y `shadow-inner-card`
+  (0 1px 3px, 8%): Appointments, Waiting Room, Rooms y Pending Task del Dashboard, los turnos y tareas del Patient
+  Dashboard y las cards chicas de Patients y Scheduling. *Elements / Cards → Card inside a panel*.
 - **Cards de Treatment Plan**: en el Overview y en la card *Treatment plans* del workflow quedan las publicadas. Se
   probaron una compacta con anillo de avance y una por visita (un procedimiento por línea); Julián se quedó con las
   actuales porque muestran el detalle de cada procedimiento.
@@ -449,7 +454,8 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 
 - *Elements / StepIndicator* (rótulos, animación, la línea de círculo a círculo) y *Components / UI / Drawer*
   (`stepLabels`, reglas de Next Step, dónde hay pasos).
-- *Components / Settings*: NewLocationDrawer, NewEmployeeDrawer, NewAccountDrawer, ManageLicensesDrawer.
+- *Components / Settings*: NewLocationDrawer, NewEmployeeDrawer, NewAccountDrawer, ManageLicensesDrawer;
+  *Components / Patients*: AddRelationshipDrawer; *Elements / Cards* (la card adentro de un panel).
 - *Components / Clinical*: Treatment plans card (opciones A, B y C), TreatmentPanel, NarrativeEditor, ProblemList,
   TreatmentPlanList y Dental / NewProcedureDrawer.
 - *Elements / Filter* (Columns con el mismo botón) y *Components / Ledger / ColumnPicker*; *Elements / Navigation*

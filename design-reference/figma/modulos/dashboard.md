@@ -374,3 +374,9 @@ las distingue, solo las agrupa. Queda como **desviacion deliberada**.
 
 Las 8 tareas del día en tres columnas dejaban la última fila con dos y un hueco blanco a la derecha. Desde 1360px van
 cuatro columnas (4 × 2); más angosto siguen tres, porque con cuatro se cortaba el nombre del paciente.
+
+## Una sola superficie para las cards (2026-10-06)
+
+Appointments, Waiting Room, Rooms y Pending Task usan `InnerCard` con la sombra nueva `shadow-inner-card`
+(0 1px 3px, 8%) y un borde fino `line`: la de antes (0 4px 2px) se veía dura. Es la misma de los turnos del Patient
+Dashboard y de las cards chicas de Patients y Scheduling. Ver *Elements / Cards → Card inside a panel*.

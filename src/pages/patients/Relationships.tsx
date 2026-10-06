@@ -5,12 +5,13 @@ import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { EmptyState } from '@/components/ui/empty-state'
 import { EditRelationshipModal } from '@/components/patients/EditRelationshipModal'
-import { DIRECTORIO } from '@/pages/patients/AddRelationship'
+import { AddRelationshipDrawer, DIRECTORIO, type NuevaRelacion } from '@/components/patients/AddRelationshipDrawer'
 import { aviso } from '@/components/ui/toaster'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { Button } from '@/components/ui/button'
 
 /* Figma 3712:60564 (poblado) y 3712:59142 (vacío). */
 
@@ -119,10 +120,27 @@ export function PersonaCard({
   )
 }
 
-export default function Relationships() {
+/* `nuevo`: la ruta .../relationships/new abre la lista con el drawer de Add Relationship ya abierto. */
+export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
   const { id = 'john-smith' } = useParams()
   const navigate = useNavigate()
   const [vacio, setVacio] = useState(false)
+  const [agregando, setAgregando] = useState(nuevo)
+  const cerrarAlta = () => { setAgregando(false); if (nuevo) navigate(`/patients/${id}/relationships`, { replace: true }) }
+  const agregar = (r: NuevaRelacion) => {
+    const badges: Badge[] = [...(r.guardian ? ['Legal contact' as const] : []), ...(r.guarantor ? ['Financial contact' as const] : [])]
+    setRelaciones((prev) => [{
+      id: `r${Date.now()}`, name: r.name, initials: r.initials, rol: r.rol, badges,
+      campos: [
+        { icon: Calendar, label: 'Date of Birth', value: r.dob },
+        { icon: Phone, label: 'Phone', value: r.phone },
+        { icon: Mail, label: 'Email', value: r.email },
+        { icon: MapPin, label: 'Contact Address', value: r.address },
+      ],
+    }, ...prev])
+    setVacio(false)
+    aviso.ok(`${r.name} was added as ${r.rol}.`)
+  }
   const [editando, setEditando] = useState<string | null>(null)
   const [relaciones, setRelaciones] = useState(RELACIONES)
 
@@ -166,13 +184,9 @@ export default function Relationships() {
               </button>
               {/* El Figma diseña "Add Relationship" pero no dibuja de dónde se
                   entra. Este botón es una decisión propia — anomalía 42. */}
-              <Link
-                to={`/patients/${id}/relationships/new`}
-                data-tour="pat-add-relationship"
-                className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-4 text-[13px] font-medium text-white transition-colors"
-              >
-                <Plus className="size-4" /> Add Relationship
-              </Link>
+              <Button data-tour="pat-add-relationship" onClick={() => setAgregando(true)}>
+                <Plus /> Add Relationship
+              </Button>
             </div>
           </div>
 
@@ -182,7 +196,7 @@ export default function Relationships() {
                 icon={Users}
                 title="No relationships yet"
                 detail="This patient doesn't have any related contacts or household members yet."
-                accion={{ label: 'Add Relationship', onClick: () => navigate(`/patients/${id}/relationships/new`) }}
+                accion={{ label: 'Add Relationship', onClick: () => setAgregando(true) }}
               />
             </div>
           ) : (
@@ -215,6 +229,7 @@ export default function Relationships() {
         </div>
       </div>
 
+      {agregando && <AddRelationshipDrawer paciente="John Smith" onClose={cerrarAlta} onGuardar={agregar} />}
       {editando && (
         <EditRelationshipModal
           persona={DIRECTORIO.find((x) => x.name === editando) ?? DIRECTORIO[1]}

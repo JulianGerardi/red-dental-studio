@@ -140,7 +140,9 @@ export default function PatientDetail() {
             <PendingDocuments />
           </Card>
 
-          <div className="grid gap-5 lg:grid-cols-[1fr_280px]">
+          {/* Cada card del alto de su contenido: estiradas a la par de Appointments, a Pending Task le quedaba un
+              bloque blanco abajo. */}
+          <div className="grid gap-5 lg:grid-cols-[1fr_280px] lg:items-start">
             <Card className="p-5">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>

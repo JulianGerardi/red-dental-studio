@@ -344,7 +344,7 @@ export function SolicitudCard({
   const acento = urgente ? '#dc2626' : '#1d56bc'
   return (
     <div
-      className="rounded-md border-l-[3px] bg-white p-2.5 shadow-[0_1px_3px_rgb(0_0_0/0.08)]"
+      className="shadow-inner-card rounded-md border-l-[3px] bg-white p-2.5"
       style={{ borderLeftColor: acento }}
     >
       <div className="flex items-start justify-between gap-2">

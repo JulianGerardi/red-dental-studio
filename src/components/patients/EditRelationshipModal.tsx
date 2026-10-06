@@ -3,7 +3,7 @@ import { useState } from 'react'
 import {
   ModalShell, SelectField, FieldLabel, OptionCheckbox,
 } from '@/components/patients/form'
-import { PersonaSeleccionada, type PersonaDirectorio } from '@/pages/patients/AddRelationship'
+import { PersonaSeleccionada, type PersonaDirectorio } from '@/components/patients/AddRelationshipDrawer'
 import { aviso } from '@/components/ui/toaster'
 
 /* Figma 3716:81940. A diferencia de "Add Relationship", esta sí es modal y
