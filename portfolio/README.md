@@ -62,13 +62,13 @@ Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span 
 - **Proceso**: las cinco etapas son cards; al pasar el mouse se eleva un poco y se enciende al estilo IA: el degradé verde y violeta del orbe del asistente (botón "Preguntame") corre por el borde con un haz de luz que lo recorre, y detrás respira un halo suave de los mismos colores.
 - **Escenas de scroll (los casos)**, al estilo de las páginas de producto de Apple. El JS le da a cada escena su avance (`--p`, de 0 a 1) y cada una lo usa a su manera:
   - `rise`: la portada arranca apenas recostada, se endereza y crece hasta ocupar la pantalla.
-  - `story`: un dispositivo queda fijo y cambia de pantalla a medida que pasan los pasos (Batech: el formulario de nuevo análisis se completa solo, reconstruido en HTML desde el Figma). En el celular cada paso es su propia pantalla, con su captura arriba del texto, y el scroll se detiene en cada paso.
+  - `story`: un dispositivo queda fijo y cambia de pantalla a medida que pasan los pasos (Batech: el formulario de nuevo análisis se completa solo, reconstruido en HTML desde el Figma). En el celular los pasos son un carrusel: una card por paso con su captura arriba del texto, la siguiente asomando al costado, y cada deslizamiento avanza exactamente un paso, con puntos que marcan dónde estás.
   - `rail`: una fila de pantallas que se mueve de costado con el scroll.
   - `fan`: los celulares se abren en abanico.
   - `wipe`: la baja fidelidad pasa a alta fidelidad bajo una línea (Mercado Play).
   - `scrub`: una página larga se desplaza dentro de su ventana.
   - `pipe` y `builder` (Confidentally UI): el diagrama Figma → Claude Code → Storybook → devs se enciende paso a paso, y el Builder escribe el pedido, la IA elige piezas del catálogo y la pantalla se arma, hasta mostrar el código.
-  En el celular las escenas anchas se desplazan para seguir cada paso; con "reducir movimiento" todas muestran su estado final.
+  En el celular `wipe`, `scrub` y `fan` no quedan fijas: cada una se reproduce mientras cruza la pantalla, así nunca hay una pantalla vacía para scrollear. El diagrama y el Builder quedan dentro de su marco, con el contenido a un tamaño legible, y se desplazan adentro para seguir cada paso (`data-fit-pan`). Con "reducir movimiento" todas muestran su estado final.
 - **Pantallas de los casos** (`.shot`): al entrar con el scroll, el panel de color se abre apenas y la pantalla sube y se asienta con una leve inclinación, al estilo Apple. El avance (`--t`, de 0 a 1) lo calcula `site.js`.
 - Con "reducir movimiento" activado en el sistema, todo queda quieto.
 

@@ -241,7 +241,7 @@
       var pin = sc._pin || (sc._pin = sc.querySelector('.scene__pin'));
       var span = r.height - (pin ? pin.offsetHeight : vh);
       if (sc._top == null) sc._top = pin ? parseFloat(getComputedStyle(pin).top) || 0 : 0;
-      var p = span > 1 ? clamp01((sc._top - r.top) / span) : 0;
+      var p = span > 1 ? clamp01((sc._top - r.top) / span) : clamp01((vh * 0.92 - r.top) / (vh * 0.62));
       setVar(sc, '--p', p);
       var h = SCENE[sc.getAttribute('data-scene')];
       if (h) h(sc, p);
@@ -360,39 +360,44 @@
     sc._run(reduced ? 0.74 : 0);
   });
 
-  /* Phone: when a swipe ends inside a story, settle on the nearest step */
-  var coarse = window.matchMedia && window.matchMedia('(hover: none)').matches;
-  if (coarse && stories.length) {
-    var settleTimer = null, touching = false;
-    var settle = function () {
-      if (touching || !narrow()) return;
-      var vh = window.innerHeight;
-      var top = parseFloat(getComputedStyle(root).scrollPaddingTop) || 0;
-      stories.forEach(function (st) {
-        var r = st.getBoundingClientRect();
-        if (r.top > top + vh * 0.4 || r.bottom < top + vh * 0.6) return;
-        var best = null, bd = Infinity;
-        st.querySelectorAll('.story__step').forEach(function (s) {
-          var d = s.getBoundingClientRect().top - top;
-          if (Math.abs(d) < Math.abs(bd)) { bd = d; best = s; }
-        });
-        if (best && Math.abs(bd) > 2 && Math.abs(bd) < vh * 0.5) window.scrollTo({ top: window.scrollY + bd, behavior: reduced ? 'auto' : 'smooth' });
-      });
+  /* Phone: each story is a swipe carousel; its dots follow the card in view */
+  stories.forEach(function (st) {
+    var track = st.querySelector('.story__steps');
+    var dots = st.querySelectorAll('.story__mdots i');
+    if (!track || !dots.length) return;
+    var cards = track.children, raf = 0;
+    var mark = function () {
+      raf = 0;
+      var left = track.getBoundingClientRect().left + (parseFloat(getComputedStyle(track).scrollPaddingLeft) || 0);
+      var best = 0, bd = Infinity;
+      for (var i = 0; i < cards.length; i++) {
+        var d = Math.abs(cards[i].getBoundingClientRect().left - left);
+        if (d < bd) { bd = d; best = i; }
+      }
+      dots.forEach(function (d, i) { d.classList.toggle('is-on', i === best); });
     };
-    window.addEventListener('touchstart', function () { touching = true; clearTimeout(settleTimer); }, { passive: true });
-    window.addEventListener('touchend', function () { touching = false; clearTimeout(settleTimer); settleTimer = setTimeout(settle, 220); }, { passive: true });
-    window.addEventListener('scroll', function () { clearTimeout(settleTimer); settleTimer = setTimeout(settle, 160); }, { passive: true });
-  }
+    track.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(mark); }, { passive: true });
+    mark();
+  });
 
   /* Fitted canvases: built at a fixed size (data-fit="WxH") and scaled to their box */
   var fits = Array.prototype.slice.call(document.querySelectorAll('[data-fit]'));
+  /* On phones a [data-fit-pan] canvas fills its box's height instead, so it stays
+     readable; it is wider than the box and the scene pans it with --pan. */
+  var panFit = function () { return window.innerWidth <= 760; };
   function fitAll() {
     fits.forEach(function (box) {
       var wh = box.getAttribute('data-fit').split('x');
-      var k = box.clientWidth / +wh[0];
+      var pan = box.hasAttribute('data-fit-pan') && panFit();
+      if (pan) box.style.height = '';
+      var k = pan ? box.clientHeight / +wh[1] : box.clientWidth / +wh[0];
       if (!k) return;
       box.firstElementChild.style.transform = 'scale(' + k.toFixed(5) + ')';
-      if (!box.hasAttribute('data-fit-keep')) box.style.height = (+wh[1] * k).toFixed(1) + 'px';
+      if (box.hasAttribute('data-fit-pan')) {
+        box.style.setProperty('--boxw', box.clientWidth + 'px');
+        box.style.setProperty('--fitw', (pan ? +wh[0] * k : box.clientWidth).toFixed(1) + 'px');
+      }
+      if (!pan && !box.hasAttribute('data-fit-keep')) box.style.height = (+wh[1] * k).toFixed(1) + 'px';
     });
   }
   fitAll();

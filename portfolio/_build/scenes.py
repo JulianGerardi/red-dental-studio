@@ -47,8 +47,8 @@ def _static(html, i):
 
 def story(steps, layers, stage, label=""):
     """steps: [(title_en, title_es, text_en, text_es)], layers: [(indices, html)].
-    Desktop: a sticky stage beside the steps. Phone: each step is its own slide,
-    with its screen above the text, and the scroll stops on every step."""
+    Desktop: a sticky stage beside the steps. Phone: the steps become a carousel,
+    one card per step with its screen above the text, and each swipe moves one step."""
     def media(i):
         html = next((h for idx, h in layers if i in idx), "")
         return f'<div class="story__mob stage--{stage}" data-step="{i}" aria-hidden="true">{_static(html, i)}</div>'
@@ -58,6 +58,7 @@ def story(steps, layers, stage, label=""):
     dots = "".join("<i></i>" for _ in steps)
     lb = f' aria-label="{label}"' if label else ""
     return (f'  <section class="story" data-story{lb}>\n    <ol class="story__steps">{lis}</ol>\n'
+            f'    <div class="story__mdots" aria-hidden="true">{dots}</div>\n'
             f'    <div class="story__media"><div class="story__sticky"><div class="story__stage stage--{stage}">{lay}<div class="story__dots" aria-hidden="true">{dots}</div></div></div></div>\n  </section>\n')
 
 

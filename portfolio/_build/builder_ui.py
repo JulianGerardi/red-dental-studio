@@ -101,7 +101,7 @@ def pipeline(title_en, title_es):
     cap = "".join(f'<div class="pipe__cap{" is-on" if i == 0 else ""}"><b>{T(a, b)}</b><span>{T(c, d)}</span></div>' for i, (a, b, c, d) in enumerate(caps))
     return (f'  <section class="scene scene--pin pipe" data-scene="pipe" style="--len:300vh">\n    <div class="scene__pin">'
             f'<div class="scene__copy"><h2 class="scene__h">{T(title_en, title_es)}</h2></div>'
-            f'<div class="pipe__screen"><div class="mon"><div class="mon__screen fitbox" data-fit="1440x620" data-fit-keep><div class="fit"><div class="pd">'
+            f'<div class="pipe__screen"><div class="mon"><div class="mon__screen fitbox" data-fit="1440x620" data-fit-keep data-fit-pan><div class="fit"><div class="pd">'
             f'<svg class="pd__wires" viewBox="0 0 1440 620" aria-hidden="true">{wires}</svg>{nodes}</div></div></div></div></div>'
             f'<div class="pipe__caps" aria-live="polite">{cap}</div></div>\n  </section>\n')
 
@@ -165,5 +165,5 @@ def builder():
                                                            ("3 · The screen assembles", "3 · Se arma la pantalla"), ("4 · Take the code", "4 · Llevate el código")])
     return (f'  <section class="scene scene--pin bld" data-scene="builder" style="--len:320vh" aria-label="Builder">\n    <div class="scene__pin">'
             f'<div class="scene__copy"><div class="bld__steps">{chips}</div></div>'
-            f'<div class="bld__box fitbox" data-fit="1440x900"><div class="fit"><div class="bu">{site}<div class="bu__main">{canvas}{panel}</div></div></div></div>'
+            f'<div class="bld__box fitbox" data-fit="1440x900" data-fit-pan><div class="fit"><div class="bu">{site}<div class="bu__main">{canvas}{panel}</div></div></div></div>'
             f'</div>\n  </section>\n')
