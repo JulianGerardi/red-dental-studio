@@ -20,7 +20,7 @@ STEPS = [
     ("Validate &amp; ship", "Validar y lanzar", "Usability tests, A/B tests and KPIs, then a handoff with components that already live in code and in Storybook.",
      "Tests de usabilidad, A/B testing y KPIs, y un handoff con componentes que ya viven en código y en Storybook."),
 ]
-steps = "".join(f"""      <li class="step" data-reveal style="--k:{i}"><span class="step__n">{i + 1:02d}</span><h3>{T(a, b)}</h3><p>{T(c, d)}</p></li>
+steps = "".join(f"""      <li class="step" data-reveal style="--k:{i}"><span class="step__glow" aria-hidden="true"></span><span class="step__n">{i + 1:02d}</span><h3>{T(a, b)}</h3><p>{T(c, d)}</p></li>
 """ for i, (a, b, c, d) in enumerate(STEPS))
 
 tools = "".join(f'<span class="badge">{t}</span>' for t in ["Figma", "Claude", "Claude Code", "Storybook", "Gemini", "Midjourney", "Freepik Spaces", "Photoshop", "Illustrator", "InDesign"])
