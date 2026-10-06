@@ -3,10 +3,6 @@
     "selected": {
       "story": "components/clinical/ClinicalTopBar.stories.tsx#CounterOpen",
       "reason": "El contador elegido es el que tiene el popover abierto."
-    },
-    "disabled": {
-      "story": "components/clinical/ClinicalBadge.stories.tsx#States",
-      "reason": "El badge CC / TR del header se deshabilita cuando no hay dato (ESTADO_CLINICO en disabled); su aspecto es el de ClinicalBadge, que muestra los tres estados."
     }
   },
   "components/clinical/ConsentBlock.tsx": {

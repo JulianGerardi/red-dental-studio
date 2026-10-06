@@ -21,7 +21,7 @@ export function RowActionsMenu({
       <DropdownMenuTrigger aria-label={`Actions for ${label}`} className={cn(ICONO_SUELTO, className)}>
         <MoreVertical className="size-4" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[190px]">
+      <DropdownMenuContent align="end" className="w-max max-w-[280px] min-w-[190px]">
         {children}
       </DropdownMenuContent>
     </DropdownMenu>

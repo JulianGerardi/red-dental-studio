@@ -1,3 +1,4 @@
+import { CASOS, type EstadoCaso } from '@/data/treatment-plan'
 /* Clinical Mode — la barra, las pestañas y el overview salen de **4235:135661**,
    que es la versión buena; 4235:136450 era un tablero anterior.
 
@@ -59,82 +60,96 @@ export const REGISTROS = [
 ] as const
 export type Pestana = (typeof EXAMENES)[number] | (typeof REGISTROS)[number]
 
+/* Las cards de Treatment Plan del Overview salen de los casos del paciente (los descartados no se muestran), como en
+   red.dev: profesional, nombre y estado del caso, grupo, total, fecha de creación y avance. */
 export type Plan = {
   id: string
   doctor: string
   rol: string
   nombre: string
-  tipo: string
-  estado: 'Available' | 'Accepted' | 'Inprogress'
+  grupo: string
+  estado: EstadoCaso
   total: string
   creado: string
   procedimientos: number
-  progreso: number
-  completados: string
-  estimado: string
+  completados: number
 }
 
-export const PLANES: Plan[] = Array.from({ length: 4 }, (_, i) => ({
-  id: `tp${i + 1}`, doctor: 'Daniel Anderson', rol: 'Dentist',
-  nombre: 'periodontists Alternative', tipo: 'Comprehensive Care', estado: 'Available',
-  total: '$231.12', creado: '23/04/2025', procedimientos: 5,
-  progreso: 75, completados: '3 of 5 completed', estimado: 'Expected completion: May 2025',
-}))
+const DOCTORES = ['Daniel Anderson', 'Perez Martinez', 'Michael Johnson']
+export const PLANES: Plan[] = CASOS.filter((c) => c.estado !== 'Discarded').map((c, i) => {
+  const procs = c.visitas.flatMap((v) => v.procedimientos).filter((p) => p.estado !== 'Removed')
+  return {
+    id: c.id, doctor: DOCTORES[i % DOCTORES.length], rol: 'Dentist', nombre: c.nombre, grupo: c.grupo, estado: c.estado,
+    total: `$${c.total}`, creado: c.creado, procedimientos: procs.length, completados: procs.filter((p) => p.estado === 'Completed').length,
+  }
+})
+
+/* La tabla del Overview, como en red.dev: dos pestañas (Problem List y Procedures), cada una con sus estados, su filtro y
+   las acciones del menú de cada fila. Ver design-reference/figma/modulos/clinical-mode.md. */
+export const ESTADOS_PROBLEMA = [
+  'Active', 'Clinic declined', 'Discarded', 'Externally treated', 'In treatment', 'Monitoring', 'No treatment needed', 'Patient declined', 'Referred', 'Treated',
+] as const
+export type EstadoProblema = (typeof ESTADOS_PROBLEMA)[number]
 
 export type Problema = {
   id: string
   fecha: string
-  pieza: number
-  /** El frame la rotula "Surface" y muestra "1"; no hay columna de pieza. */
+  ubicacion: string
+  pieza?: number
   superficie: string
   condicion: string
   examen: string
   proveedor: string
-  nota: string
-  estado: 'Active' | 'Resolved' | 'Monitoring'
+  nota?: string
+  estado: EstadoProblema
 }
 
-/* El frame repite tres filas idénticas de "Perez Marti..." truncado. Acá la
-   columna se llama Date y lleva fechas: un nombre de persona en una columna
-   de fechas es del frame, no del dominio. Ver anomalías. */
 export const PROBLEMAS: Problema[] = [
-  { id: 'p1', fecha: '2025/01/24', pieza: 1,  superficie: '1',  condicion: 'Carries',     examen: 'Dental Assessment', proveedor: 'Perez Martinez',  nota: 'Deep lesion, monitor after restoration.', estado: 'Active' },
-  { id: 'p2', fecha: '2025/01/24', pieza: 14, superficie: '1',  condicion: 'Carries',     examen: 'Dental Assessment', proveedor: 'Perez Martinez',  nota: 'Occlusal decay detected on routine exam.', estado: 'Active' },
-  { id: 'p3', fecha: '2025/01/24', pieza: 3,  superficie: '1',  condicion: 'Carries',     examen: 'Dental Assessment', proveedor: 'Perez Martinez',  nota: 'Enamel fracture, no pulp involvement.', estado: 'Active' },
-  { id: 'p4', fecha: '2024/12/02', pieza: 22, superficie: 'L',  condicion: 'Calculus',    examen: 'Periodontal',       proveedor: 'Michael Johnson', nota: 'Subgingival calculus, scaling scheduled.', estado: 'Active' },
-  { id: 'p5', fecha: '2024/11/28', pieza: 30, superficie: 'ML', condicion: 'Restoration', examen: 'Dental Assessment', proveedor: 'Perez Martinez',  nota: 'Composite replaced, margins sealed.', estado: 'Resolved' },
-  { id: 'p6', fecha: '2024/11/19', pieza: 8,  superficie: 'B',  condicion: 'Abrasion',    examen: 'Extra Oral',        proveedor: 'Michael Johnson', nota: 'Cervical abrasion from brushing technique.', estado: 'Monitoring' },
-  { id: 'p7', fecha: '2024/11/05', pieza: 19, superficie: 'DL', condicion: 'Carries',     examen: 'Intra Oral',        proveedor: 'Perez Martinez',  nota: 'Recurrent caries under old amalgam.', estado: 'Active' },
+  { id: 'p1', fecha: '20/08/2026', ubicacion: 'Soft Palate', superficie: '-', condicion: 'Abscess (morphologic abnormality)', examen: 'Intraoral', proveedor: 'Perez Martinez', estado: 'Active' },
+  { id: 'p2', fecha: '20/08/2026', ubicacion: 'Right Temple Area', superficie: '-', condicion: 'Abscess (morphologic abnormality)', examen: 'Extraoral', proveedor: 'Perez Martinez', estado: 'Active' },
+  { id: 'p3', fecha: '20/08/2026', ubicacion: '-', superficie: '-', condicion: 'Generally unwell', examen: 'Physical', proveedor: 'Perez Martinez', nota: 'Reports fatigue for the last week; no fever.', estado: 'Active' },
+  { id: 'p4', fecha: '20/08/2026', ubicacion: '-', superficie: '-', condicion: 'Abnormal weight gain', examen: 'ROS', proveedor: 'Perez Martinez', nota: 'Gained 6 kg in three months; refer to physician.', estado: 'Active' },
+  { id: 'p5', fecha: '14/08/2026', ubicacion: '-', pieza: 3, superficie: 'O', condicion: 'Chronic enamel dental caries', examen: 'Dental Assessment', proveedor: 'Perez Martinez', nota: 'Deep lesion, monitor after restoration.', estado: 'In treatment' },
+  { id: 'p6', fecha: '14/08/2026', ubicacion: '-', pieza: 14, superficie: 'O, D', condicion: 'Chronic enamel dental caries', examen: 'Dental Assessment', proveedor: 'Perez Martinez', nota: 'Occlusal decay detected on routine exam.', estado: 'Active' },
+  { id: 'p7', fecha: '02/08/2026', ubicacion: '-', pieza: 22, superficie: 'L', condicion: 'Dental calculus', examen: 'Periodontal', proveedor: 'Michael Johnson', nota: 'Subgingival calculus, scaling scheduled.', estado: 'Active' },
+  { id: 'p8', fecha: '28/07/2026', ubicacion: '-', pieza: 8, superficie: 'B', condicion: 'Abrasion of teeth', examen: 'Extraoral', proveedor: 'Michael Johnson', nota: 'Cervical abrasion from brushing technique.', estado: 'Monitoring' },
+  { id: 'p9', fecha: '19/07/2026', ubicacion: '-', pieza: 19, superficie: 'D, L', condicion: 'Recurrent caries', examen: 'Intraoral', proveedor: 'Perez Martinez', estado: 'Treated' },
+  { id: 'p10', fecha: '05/07/2026', ubicacion: '-', pieza: 30, superficie: 'M, L', condicion: 'Fractured restoration', examen: 'Dental Assessment', proveedor: 'Perez Martinez', estado: 'Externally treated' },
+  { id: 'p11', fecha: '21/06/2026', ubicacion: 'Lower Lip', superficie: '-', condicion: 'Mucocele', examen: 'Intraoral', proveedor: 'Michael Johnson', estado: 'Referred' },
+  { id: 'p12', fecha: '10/06/2026', ubicacion: '-', pieza: 1, superficie: '-', condicion: 'Impacted third molar', examen: 'Radiography', proveedor: 'Perez Martinez', nota: 'Patient prefers to wait until symptoms appear.', estado: 'Patient declined' },
+  { id: 'p13', fecha: '02/06/2026', ubicacion: '-', pieza: 9, superficie: 'I', condicion: 'Enamel hypoplasia', examen: 'Dental Assessment', proveedor: 'Michael Johnson', estado: 'No treatment needed' },
+  { id: 'p14', fecha: '15/05/2026', ubicacion: '-', pieza: 12, superficie: '-', condicion: 'Gingival recession', examen: 'Periodontal', proveedor: 'Perez Martinez', estado: 'Discarded' },
 ]
 
-/* Los dos textos del panel lateral que abren las pills verdes de la barra. */
-export const PANELES = {
-  TR: {
-    titulo: 'Triage',
-    parrafos: [
-      'The user has successfully completed the dental triage questionnaire, addressing key questions such as their dental history, current symptoms, and any previous treatments.',
-      'This comprehensive assessment includes inquiries about pain levels, sensitivity to hot or cold, and any noticeable changes in their oral health.',
-    ],
-    fecha: '12 March 2025',
-    hora: '10:00 - 11:00 AM',
-  },
-  CC: {
-    titulo: 'Chief Compliace',
-    parrafos: [
-      'Patient reports a persistent ache on the lower right side when chewing, first noticed about two weeks ago.',
-      'Pain increases with cold drinks and subsides within a minute. No swelling or fever reported.',
-    ],
-    fecha: '12 March 2025',
-    hora: '10:00 - 11:00 AM',
-  },
-} as const
-export type ClavePanel = keyof typeof PANELES
+export const ESTADOS_PROCEDIMIENTO = ['Completed', 'Discarded', 'Discontinued', 'In progress', 'Planned', 'Referred'] as const
+export type EstadoProcedimiento = (typeof ESTADOS_PROCEDIMIENTO)[number]
 
-/* Cómo está cada badge del header (Figma 254:2930): con tilde (`ok`) o cruz (`no`), y active / inactive / disabled. */
-export const ESTADO_CLINICO: Record<ClavePanel, { resultado: 'ok' | 'no'; estado: 'active' | 'inactive' | 'disabled' }> = {
-  CC: { resultado: 'ok', estado: 'active' },
-  TR: { resultado: 'ok', estado: 'active' },
+export type ProcedimientoPaciente = {
+  id: string
+  fecha: string
+  ubicacion: string
+  pieza?: number
+  superficie: string
+  codigo: string
+  nombre: string
+  proveedor: string
+  nota?: string
+  estado: EstadoProcedimiento
 }
+
+export const PROCEDIMIENTOS: ProcedimientoPaciente[] = [
+  { id: 'pr1', fecha: '14/09/2026', ubicacion: '', pieza: 7, superficie: '-', codigo: 'D0220', nombre: 'Intraoral – periapical first radiographic image', proveedor: 'Perez Martinez', estado: 'In progress' },
+  { id: 'pr2', fecha: '25/08/2026', ubicacion: '', pieza: 30, superficie: 'B, M', codigo: 'D2140', nombre: 'Amalgam – one surface, primary or permanent', proveedor: 'Michael Johnson', nota: 'Patient asked to postpone; replaced by a composite plan.', estado: 'Discarded' },
+  { id: 'pr3', fecha: '25/08/2026', ubicacion: '', pieza: 31, superficie: 'B, D, M', codigo: 'D2140', nombre: 'Amalgam – one surface, primary or permanent', proveedor: 'Michael Johnson', estado: 'In progress' },
+  { id: 'pr4', fecha: '14/06/2026', ubicacion: '', pieza: 16, superficie: '-', codigo: 'D7140', nombre: 'Extraction – erupted tooth or exposed root (elevation and/or forceps removal)', proveedor: 'Perez Martinez', estado: 'In progress' },
+  { id: 'pr5', fecha: '15/05/2026', ubicacion: 'Soft Palate', superficie: '-', codigo: 'D7286', nombre: 'Incisional biopsy of oral tissue – soft', proveedor: 'Perez Martinez', estado: 'Discarded' },
+  { id: 'pr6', fecha: '02/05/2026', ubicacion: '', pieza: 3, superficie: 'O', codigo: 'D2391', nombre: 'Resin-based composite – one surface, posterior', proveedor: 'Perez Martinez', estado: 'Planned' },
+  { id: 'pr7', fecha: '02/05/2026', ubicacion: '', pieza: 14, superficie: 'O, D', codigo: 'D2392', nombre: 'Resin-based composite – two surfaces, posterior', proveedor: 'Perez Martinez', estado: 'Planned' },
+  { id: 'pr8', fecha: '18/04/2026', ubicacion: '', superficie: '-', codigo: 'D1110', nombre: 'Prophylaxis – adult', proveedor: 'Michael Johnson', nota: 'Light calculus on lower anteriors.', estado: 'Completed' },
+  { id: 'pr9', fecha: '18/04/2026', ubicacion: '', superficie: '-', codigo: 'D0120', nombre: 'Periodic oral evaluation – established patient', proveedor: 'Michael Johnson', estado: 'Completed' },
+  { id: 'pr10', fecha: '03/03/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D3330', nombre: 'Endodontic therapy, molar tooth', proveedor: 'Perez Martinez', estado: 'Referred' },
+  { id: 'pr11', fecha: '12/02/2026', ubicacion: 'Upper Arch', superficie: '-', codigo: 'D4341', nombre: 'Periodontal scaling and root planing – four or more teeth per quadrant', proveedor: 'Michael Johnson', estado: 'Discontinued' },
+]
 
 export const ULTIMA_CONDICION = {
   condicion: 'Caries',

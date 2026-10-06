@@ -1,157 +1,227 @@
-import { useMemo, useState } from 'react'
-import { Search, Info, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState } from 'react'
+import {
+  Ban, Check, CheckCheck, ChevronDown, CircleSlash, Eye, Info, Pencil, Play, RotateCcw, Search, Send, Trash2, UserX, XCircle, type LucideIcon,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
-import { EmptyState } from '@/components/ui/empty-state'
-import { ICONO_SUELTO } from '@/lib/estilos'
-import { PROBLEMAS, type Problema } from '@/data/clinical-mode'
+import { Tabs } from '@/components/ui/tabs'
 import { Pill, type PillTone } from '@/components/ui/pill'
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
+import {
+  ESTADOS_PROBLEMA, ESTADOS_PROCEDIMIENTO, PROBLEMAS, PROCEDIMIENTOS,
+  type EstadoProblema, type EstadoProcedimiento, type Problema, type ProcedimientoPaciente,
+} from '@/data/clinical-mode'
 
-const POR_PAGINA = 3
+/* La tabla del Overview, como en red.dev: Problem List y Procedures en dos pestañas, cada una con su filtro de estado
+   (Active y All por defecto), buscador, nota en tooltip y el menú de acciones según el estado. Ver
+   design-reference/figma/modulos/clinical-mode.md. */
 
-const ESTADO_TONO: Record<Problema['estado'], PillTone> = {
-  Active: 'success', Resolved: 'neutral', Monitoring: 'warning',
+type Pestana = 'Problem List' | 'Procedures'
+
+const TONO_PROBLEMA: Record<EstadoProblema, PillTone> = {
+  Active: 'success', 'In treatment': 'info', Monitoring: 'warning', Treated: 'neutral', 'Externally treated': 'neutral', Referred: 'purple',
+  'No treatment needed': 'neutral', 'Patient declined': 'danger', 'Clinic declined': 'danger', Discarded: 'danger',
+}
+const TONO_PROCEDIMIENTO: Record<EstadoProcedimiento, PillTone> = {
+  'In progress': 'info', Planned: 'success', Completed: 'neutral', Discontinued: 'warning', Discarded: 'danger', Referred: 'purple',
 }
 
-/* En el frame los encabezados se parten en dos líneas —"Dat e", "Toot h",
-   "Surf ace"— porque las columnas quedaron más angostas que las palabras. Es
-   un error de layout, no contenido: acá no se parten. */
-const COLUMNAS = ['Date', 'Surface', 'Condition', 'Exam', 'Provider', 'Note', 'Status', 'Actions']
+type Accion<E extends string> = { label: string; icono: LucideIcon; a?: E; peligro?: boolean; borrar?: boolean }
+
+const EDITAR = { label: 'Edit', icono: Pencil } as const
+const ROLLBACK = { label: 'Rollback', icono: RotateCcw } as const
+const BORRAR = { label: 'Delete', icono: Trash2, peligro: true, borrar: true } as const
+
+/* Las de Active son las de red.dev; las demás, inferidas: lo abierto ofrece los pasos que faltan y lo cerrado, Rollback. */
+const ABIERTO_PROBLEMA: Accion<EstadoProblema>[] = [
+  { label: 'Start Monitoring', icono: Eye, a: 'Monitoring' },
+  { label: 'Start Treatment', icono: Play, a: 'In treatment' },
+  { label: 'Mark As Treated', icono: Check, a: 'Treated' },
+  { label: 'Mark As Externally Treated', icono: CheckCheck, a: 'Externally treated' },
+  { label: 'Mark As No Treat. Needed', icono: CircleSlash, a: 'No treatment needed', peligro: true },
+  { label: 'Mark As Patient Declined', icono: UserX, a: 'Patient declined', peligro: true },
+  { label: 'Mark As Clinic Declined', icono: Ban, a: 'Clinic declined', peligro: true },
+  { label: 'Discard', icono: XCircle, a: 'Discarded', peligro: true },
+]
+export function accionesProblema(e: EstadoProblema): Accion<EstadoProblema>[][] {
+  if (e === 'Active' || e === 'Monitoring' || e === 'In treatment') {
+    const ya = e === 'Monitoring' ? ['Monitoring'] : e === 'In treatment' ? ['Monitoring', 'In treatment'] : []
+    return [[EDITAR], ABIERTO_PROBLEMA.filter((x) => !ya.includes(x.a!)), [BORRAR]]
+  }
+  return [[EDITAR], [{ ...ROLLBACK, a: 'Active' }], [BORRAR]]
+}
+export function accionesProcedimiento(e: EstadoProcedimiento): Accion<EstadoProcedimiento>[][] {
+  if (e === 'In progress') return [[EDITAR], [{ label: 'Discontinue', icono: CircleSlash, a: 'Discontinued' }, { ...ROLLBACK, a: 'Planned' }], [BORRAR]]
+  if (e === 'Planned') return [[EDITAR], [{ label: 'Start', icono: Play, a: 'In progress' }, { label: 'Refer', icono: Send, a: 'Referred' }, { label: 'Discard', icono: XCircle, a: 'Discarded', peligro: true }], [BORRAR]]
+  return [[EDITAR], [{ ...ROLLBACK, a: e === 'Completed' ? 'In progress' : 'Planned' }], [BORRAR]]
+}
+
+const PUNTO: Record<PillTone, string> = {
+  success: 'bg-dash-ok-fg', info: 'bg-dash-busy-fg', warning: 'bg-warn-fg', danger: 'bg-dash-bad-fg', neutral: 'bg-ink-faint', purple: 'bg-purple-fg',
+}
+
+/* El filtro de estado: un desplegable de una sola opción, como el select de red.dev, con el punto del color de cada estado
+   y cuántas filas tiene. */
+export function StatusFilter<E extends string>({
+  value, options, onChange, conteo, tono,
+}: {
+  value: E
+  options: readonly E[]
+  onChange: (v: E) => void
+  conteo?: Partial<Record<E, number>>
+  tono?: Partial<Record<E, PillTone>>
+}) {
+  const punto = (o: E) => (tono?.[o] ? <span aria-hidden className={cn('size-2 shrink-0 rounded-full', PUNTO[tono[o]!])} /> : <span aria-hidden className="size-2 shrink-0 rounded-full border border-ink-faint" />)
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label={`Status: ${value}`}
+        className="focus-visible:outline-dash-blue data-[state=open]:border-dash-blue flex h-9 w-[180px] items-center gap-2 rounded-md border border-line bg-white px-3 text-[13px] text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle"
+      >
+        {punto(value)}
+        <span className="min-w-0 flex-1 truncate text-left">{value}</span>
+        {conteo?.[value] !== undefined && <span className="text-[11px] text-ink-muted tabular-nums">{conteo[value]}</span>}
+        <ChevronDown className="size-4 shrink-0 text-ink-muted" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[220px]">
+        <DropdownMenuLabel className="text-[11px] font-semibold text-ink-muted">Filter by status</DropdownMenuLabel>
+        <DropdownMenuRadioGroup value={value} onValueChange={(v) => onChange(v as E)}>
+          {options.map((o) => (
+            <DropdownMenuRadioItem key={o} value={o} className="gap-2 text-[13px]">
+              {punto(o)}
+              <span className="min-w-0 flex-1 truncate">{o}</span>
+              {conteo && <span className={cn('text-[11px] tabular-nums', conteo[o] ? 'text-ink-muted' : 'text-ink-faint')}>{conteo[o] ?? 0}</span>}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+/* La nota de la fila: el ícono violeta con el texto en tooltip, o un guion si no hay. */
+export function NoteCell({ nota }: { nota?: string }) {
+  if (!nota) return <span aria-label="No note" className="text-[13px] text-ink-faint">—</span>
+  return (
+    <ConAyuda texto={nota}>
+      <button type="button" aria-label={`Note: ${nota}`} className="bg-purple-bg text-purple-fg flex size-6 items-center justify-center rounded-full">
+        <Info className="size-3.5" />
+      </button>
+    </ConAyuda>
+  )
+}
+
+/* La pieza en su cajita gris; vacía si el registro no es de un diente. */
+export function ToothCell({ pieza }: { pieza?: number }) {
+  return <span className="flex h-6 w-9 items-center justify-center rounded bg-surface-muted text-[12px] text-ink tabular-nums">{pieza ?? ''}</span>
+}
+
+const cuenta = <E extends string>(filas: { estado: E }[], estados: readonly E[]) =>
+  Object.fromEntries(estados.map((e) => [e, filas.filter((f) => f.estado === e).length])) as Record<E, number>
+const texto = (t: string) => <span className="text-[12px] text-ink">{t || '-'}</span>
+const estadoPill = (tono: PillTone, e: string) => <Pill tone={tono} size="sm" className="tracking-wide uppercase">{e}</Pill>
 
 export function ProblemList() {
+  const [pestana, setPestana] = useState<Pestana>('Problem List')
+  const [problemas, setProblemas] = useState(PROBLEMAS)
+  const [procedimientos, setProcedimientos] = useState(PROCEDIMIENTOS)
+  const [filtroProblema, setFiltroProblema] = useState<EstadoProblema>('Active')
+  const [filtroProcedimiento, setFiltroProcedimiento] = useState<EstadoProcedimiento | 'All'>('All')
   const [q, setQ] = useState('')
-  const [pagina, setPagina] = useState(1)
-  const [nota, setNota] = useState<Problema | null>(null)
 
-  const filtrados = useMemo(() => {
-    const t = q.trim().toLowerCase()
-    if (!t) return PROBLEMAS
-    return PROBLEMAS.filter((p) =>
-      `${p.fecha} ${p.pieza} ${p.superficie} ${p.condicion} ${p.examen} ${p.proveedor}`.toLowerCase().includes(t),
+  const t = q.trim().toLowerCase()
+  const filasProblema = problemas.filter((p) => p.estado === filtroProblema && (!t || `${p.fecha} ${p.ubicacion} ${p.pieza ?? ''} ${p.condicion} ${p.examen} ${p.proveedor}`.toLowerCase().includes(t)))
+  const filasProcedimiento = procedimientos.filter((p) => (filtroProcedimiento === 'All' || p.estado === filtroProcedimiento) && (!t || `${p.fecha} ${p.ubicacion} ${p.pieza ?? ''} ${p.codigo} ${p.nombre} ${p.proveedor}`.toLowerCase().includes(t)))
+
+  /* Cambiar el estado desde el menú: con aviso y Deshacer. Borrar saca la fila. */
+  function aplicar<T extends { id: string; estado: string }>(set: (xs: T[]) => void, antes: T[], fila: T, nombre: string, ac: Accion<string>) {
+    if (!ac.a && !ac.borrar) return aviso.info('Editing is not available in this release.')
+    set(ac.borrar ? antes.filter((x) => x.id !== fila.id) : antes.map((x) => (x.id === fila.id ? { ...x, estado: ac.a! } : x)))
+    aviso.ok(ac.borrar ? `${nombre} deleted.` : `${nombre} moved to ${ac.a}.`, { label: 'Undo', onClick: () => set(antes) })
+  }
+
+  function menu<E extends string>(grupos: Accion<E>[][], elegir: (a: Accion<E>) => void) {
+    return (
+      <>
+        <DropdownMenuLabel className="text-[12px] font-semibold text-ink">Actions</DropdownMenuLabel>
+        {grupos.map((g, i) => (
+          <div key={i}>
+            {i > 0 && <DropdownMenuSeparator />}
+            {g.map((a) => (
+              <DropdownMenuItem key={a.label} onSelect={() => elegir(a)} className={cn('gap-2 text-[13px]', a.peligro && 'text-dash-bad-fg focus:text-dash-bad-fg')}>
+                <a.icono className={cn('size-4', a.peligro ? 'text-dash-bad-fg' : 'text-ink-muted')} /> {a.label}
+              </DropdownMenuItem>
+            ))}
+          </div>
+        ))}
+      </>
     )
-  }, [q])
+  }
 
-  const paginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA))
-  const actual = Math.min(pagina, paginas)
-  const visibles = filtrados.slice((actual - 1) * POR_PAGINA, actual * POR_PAGINA)
+  const comunes = <T extends { fecha: string; ubicacion: string; pieza?: number; superficie: string }>(): DataTableColumn<T>[] => [
+    { key: 'fecha', header: 'Date', width: 72, cell: (r) => texto(r.fecha) },
+    { key: 'ubicacion', header: 'Location', width: 96, cell: (r) => texto(r.ubicacion) },
+    { key: 'pieza', header: 'Tooth', width: 44, cell: (r) => <ToothCell pieza={r.pieza} /> },
+    { key: 'superficie', header: 'Surface', width: 56, cell: (r) => texto(r.superficie) },
+  ]
+  const colsProblema: DataTableColumn<Problema>[] = [
+    ...comunes<Problema>(),
+    { key: 'condicion', header: 'Condition', cell: (r) => texto(r.condicion) },
+    { key: 'examen', header: 'Exam', width: 88, cell: (r) => texto(r.examen) },
+    { key: 'proveedor', header: 'Provider', width: 96, cell: (r) => texto(r.proveedor) },
+    { key: 'nota', header: 'Note', width: 36, align: 'center', cell: (r) => <NoteCell nota={r.nota} /> },
+    { key: 'estado', header: 'Status', width: 104, cell: (r) => estadoPill(TONO_PROBLEMA[r.estado], r.estado) },
+  ]
+  const colsProcedimiento: DataTableColumn<ProcedimientoPaciente>[] = [
+    ...comunes<ProcedimientoPaciente>(),
+    { key: 'procedimiento', header: 'Procedure', cell: (r) => texto(`${r.codigo} - ${r.nombre}`) },
+    { key: 'proveedor', header: 'Provider', width: 96, cell: (r) => texto(r.proveedor) },
+    { key: 'nota', header: 'Note', width: 36, align: 'center', cell: (r) => <NoteCell nota={r.nota} /> },
+    { key: 'estado', header: 'Status', width: 104, cell: (r) => estadoPill(TONO_PROCEDIMIENTO[r.estado], r.estado) },
+  ]
 
   return (
-    <div className="rounded-xl border border-line bg-white p-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[15px] font-bold text-ink">Problem list</p>
-        <div className="relative w-full sm:w-[220px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-          <input
-            value={q}
-            onChange={(e) => { setQ(e.target.value); setPagina(1) }}
-            placeholder="Search..."
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-          />
-        </div>
-      </div>
-
-      {filtrados.length === 0 ? (
-        <EmptyState
-          icon={Search}
-          title="No problems found"
-          detail={`Nothing matches "${q}". Try another tooth, condition or provider.`}
-          className="py-8"
-        />
-      ) : (
-        <>
-          <div className="mt-3 -mx-4 overflow-x-auto px-4">
-            <table className="w-full min-w-[720px] border-collapse">
-              <thead>
-                <tr className="border-y border-line-soft bg-surface-alt">
-                  {COLUMNAS.map((c) => (
-                    <th
-                      key={c}
-                      className="h-10 px-3 text-left text-[11px] font-semibold whitespace-nowrap text-ink-muted"
-                    >
-                      {c}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {visibles.map((p) => (
-                  <tr key={p.id} className="border-b border-line-soft last:border-0">
-                    <td className="h-12 px-3 text-[13px] whitespace-nowrap text-ink">{p.fecha}</td>
-                    <td className="px-3 text-[13px] text-ink">{p.superficie}</td>
-                    <td className="px-3 text-[13px] whitespace-nowrap text-ink">{p.condicion}</td>
-                    <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.examen}</td>
-                    <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.proveedor}</td>
-                    <td className="px-3">
-                      <button
-                        onClick={() => setNota(nota?.id === p.id ? null : p)}
-                        aria-label={`Note for tooth ${p.pieza}`}
-                        className={cn(
-                          'flex size-7 items-center justify-center rounded-full bg-[#f3effe] text-purple-fg transition-colors hover:bg-[#e7ddfd]',
-                          nota?.id === p.id && 'ring-2 ring-purple-fg ring-offset-1',
-                        )}
-                      >
-                        <Info className="size-3.5" />
-                      </button>
-                    </td>
-                    <td className="px-3"><Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill></td>
-                    <td className="px-3">
-                      <button
-                        onClick={() => aviso.info('Editing a problem is not available in this release.')}
-                        aria-label={`Actions for tooth ${p.pieza}`}
-                        className={ICONO_SUELTO}
-                      >
-                        <MoreVertical className="size-3.5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* La nota se lee acá abajo y no en un toast: es texto clínico, no
-              un aviso de que algo pasó. */}
-          {nota && (
-            <div className="mt-3 flex items-start gap-2 rounded-md border-l-[3px] border-l-purple-fg bg-[#faf8ff] px-3 py-2">
-              <Info className="mt-px size-3.5 shrink-0 text-purple-fg" />
-              <span className="text-[12px] text-ink-medium">
-                <span className="font-semibold text-ink">Tooth {nota.pieza} · {nota.condicion} — </span>
-                {nota.nota}
-              </span>
+    <TooltipProvider delayDuration={200}>
+      <div className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Tabs tabs={['Problem List', 'Procedures'] as const} value={pestana} onChange={setPestana} aria-label="Clinical records" />
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            {pestana === 'Problem List'
+              ? <StatusFilter value={filtroProblema} options={ESTADOS_PROBLEMA} onChange={setFiltroProblema} conteo={cuenta(problemas, ESTADOS_PROBLEMA)} tono={TONO_PROBLEMA} />
+              : <StatusFilter value={filtroProcedimiento} options={['All', ...ESTADOS_PROCEDIMIENTO] as const} onChange={setFiltroProcedimiento} conteo={{ All: procedimientos.length, ...cuenta(procedimientos, ESTADOS_PROCEDIMIENTO) }} tono={TONO_PROCEDIMIENTO} />}
+            <div className="relative w-[200px] max-w-full">
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+              <input
+                value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search..." aria-label="Search"
+                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+              />
             </div>
-          )}
-
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-1">
-            <button
-              onClick={() => setPagina((n) => Math.max(1, n - 1))}
-              disabled={actual === 1}
-              className="flex h-8 items-center gap-1 rounded-md px-2 text-[13px] font-medium disabled:opacity-40"
-            >
-              <ChevronLeft className="size-4" /> Previous
-            </button>
-            {Array.from({ length: paginas }, (_, i) => i + 1).map((n) => (
-              <button
-                key={n}
-                onClick={() => setPagina(n)}
-                aria-current={n === actual ? 'page' : undefined}
-                className={cn(
-                  'flex size-8 items-center justify-center rounded-md text-[13px] tabular-nums',
-                  n === actual ? 'border border-line font-semibold' : 'text-ink-medium hover:bg-surface-muted',
-                )}
-              >
-                {n}
-              </button>
-            ))}
-            <button
-              onClick={() => setPagina((n) => Math.min(paginas, n + 1))}
-              disabled={actual === paginas}
-              className="flex h-8 items-center gap-1 rounded-md px-2 text-[13px] font-medium disabled:opacity-40"
-            >
-              Next <ChevronRight className="size-4" />
-            </button>
           </div>
-        </>
-      )}
-    </div>
+        </div>
+
+        {pestana === 'Problem List' ? (
+          <DataTable
+            key="problemas"
+            columns={colsProblema} rows={filasProblema} rowKey={(r) => r.id} rowLabel={(r) => r.condicion}
+            rowActions={(r) => menu(accionesProblema(r.estado), (a) => aplicar(setProblemas, problemas, r, r.condicion, a))}
+            pageSize={5} pageSizeOptions={[5, 10, 20]} pageSizeLabel="Show:" density="compact"
+            empty={{ icon: Search, title: 'No problems found', detail: t ? `Nothing matches "${q}".` : `There are no ${filtroProblema.toLowerCase()} problems.` }}
+          />
+        ) : (
+          <DataTable
+            key="procedimientos"
+            columns={colsProcedimiento} rows={filasProcedimiento} rowKey={(r) => r.id} rowLabel={(r) => `${r.codigo} ${r.nombre}`}
+            rowActions={(r) => menu(accionesProcedimiento(r.estado), (a) => aplicar(setProcedimientos, procedimientos, r, r.codigo, a))}
+            pageSize={5} pageSizeOptions={[5, 10, 20]} pageSizeLabel="Show:" density="compact"
+            empty={{ icon: Search, title: 'No procedures found', detail: t ? `Nothing matches "${q}".` : `There are no ${filtroProcedimiento.toLowerCase()} procedures.` }}
+          />
+        )}
+      </div>
+    </TooltipProvider>
   )
 }

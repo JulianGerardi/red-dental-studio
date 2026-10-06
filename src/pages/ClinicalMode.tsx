@@ -15,6 +15,8 @@ import { VitalsPanel } from '@/components/clinical/VitalsPanel'
 import { LabOrderPanel } from '@/components/clinical/LabOrderPanel'
 import { RadiographyPanel } from '@/components/clinical/RadiographyPanel'
 import { TreatmentPlanSection } from '@/components/clinical/TreatmentPlanSection'
+import { TreatmentPanel } from '@/components/clinical/TreatmentPanel'
+import { WorkflowsProvider } from '@/components/clinical/WorkflowsContext'
 import { ExamFindingsProvider, ExamLayout } from '@/components/clinical/ExamLayout'
 import { EXAMENES, ULTIMA_CONDICION, type Pestana } from '@/data/clinical-mode'
 import { PATIENTS } from '@/data/mock'
@@ -41,6 +43,8 @@ export default function ClinicalMode() {
   const [pestana, setPestana] = useState<Pestana>('Vitals')
   const [encuentro, setEncuentro] = useState(false)
   const [ampliado, setAmpliado] = useState(false)
+  /* El caso que se abrió desde una card del Overview; sin caso, Treatment Plan entra por Unassigned. */
+  const [casoAbierto, setCasoAbierto] = useState<string | undefined>()
 
   const [exam, setExam] = useState(makeMockExam)
   const [seleccion, setSeleccion] = useState<number[]>([ULTIMA_CONDICION.pieza])
@@ -109,7 +113,7 @@ export default function ClinicalMode() {
           más larga pide 72px y con 360 la caja da 80. */}
       {!ampliado && (
         <div className="shrink-0 lg:w-[360px]">
-          <TreatmentPlanList />
+          <TreatmentPlanList onAbrir={(id) => { setCasoAbierto(id); irA('Treatment Plan') }} />
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-4">
@@ -142,7 +146,9 @@ export default function ClinicalMode() {
         : pestana === 'Radiography'
           ? <RadiographyPanel />
           : pestana === 'Treatment Plan'
-            ? <TreatmentPlanSection />
+            ? <TreatmentPlanSection key={casoAbierto ?? 'todos'} casoInicial={casoAbierto} />
+            : pestana === 'Treatment'
+            ? <TreatmentPanel onTreatmentPlan={() => irA('Treatment Plan')} />
             : pestana === 'DentAssmt'
               ? <DentalAssessmentExam />
               : esExamen
@@ -163,6 +169,7 @@ export default function ClinicalMode() {
        ahora pidió volver al #fafbfe del resto de las pantallas -mismo token
        `bg-page-background` que usa AppShell, definido en :root así que
        funciona igual en este take-over sin shell-. */
+    <WorkflowsProvider onAbrir={() => irA('Treatment')}>
     <div className="bg-page-background min-h-svh p-4 sm:p-[30px] lg:px-12">
       <div className="mx-auto w-full max-w-[1440px]">
       <ClinicalTopBar
@@ -191,5 +198,6 @@ export default function ClinicalMode() {
       </ExamFindingsProvider>
       </div>
     </div>
+    </WorkflowsProvider>
   )
 }

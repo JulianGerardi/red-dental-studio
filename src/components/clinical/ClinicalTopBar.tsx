@@ -3,13 +3,17 @@ import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import {
   ChevronLeft, ChevronDown, PanelsTopLeft, Link2, Activity, Users, Info,
-  Play, Pause,
+  Play, Pause, FileText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
-import { CONSTANTES, CONTADORES, ESTADO_CLINICO, PANELES, type Contador, type ClavePanel } from '@/data/clinical-mode'
-import { ClinicalBadge } from '@/components/clinical/ClinicalBadge'
+import { CONSTANTES, CONTADORES, type Contador } from '@/data/clinical-mode'
+import { ClinicalBadge, type TipoBadge } from '@/components/clinical/ClinicalBadge'
+import { useWorkflows } from '@/components/clinical/WorkflowsContext'
+import { WORKFLOWS, WORKFLOW_DEL_BADGE, contestada, preguntasVisibles, textoRespuesta, type ProgresoWorkflow } from '@/data/workflows'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
 import { ClinicalItemModal } from '@/components/patients/ClinicalItemModal'
 import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clinicalItems'
@@ -85,9 +89,67 @@ export function ListaContador({ c }: { c: Contador }) {
   )
 }
 
+/* Lo que se ve al abrir CC o TR: las respuestas del workflow, o el aviso de que el paciente todavía no lo contestó (como
+   en red.dev) con el atajo a Treatment. */
+export function ResumenWorkflow({ k, progreso, onAbrir }: { k: TipoBadge; progreso?: ProgresoWorkflow; onAbrir: () => void }) {
+  const wf = WORKFLOWS.find((w) => w.id === WORKFLOW_DEL_BADGE[k])!
+  if (!progreso?.completado) {
+    return (
+      <div className="mt-3 flex flex-col items-center gap-2 rounded-lg border border-line-soft px-3 py-4 text-center">
+        <span className="bg-info-bg text-dash-blue flex size-8 items-center justify-center rounded-lg"><FileText className="size-4" aria-hidden /></span>
+        <p className="text-[12px] text-ink-muted">The patient has not answered the {wf.nombre.toLowerCase()} questions yet.</p>
+        <Button size="sm" onClick={onAbrir}>Answer in Treatment</Button>
+      </div>
+    )
+  }
+  const r = progreso.respuestas
+  return (
+    <>
+      <div className="mt-2 flex max-h-[320px] flex-col gap-3 overflow-y-auto">
+        {wf.pasos.map((paso) => (
+          <div key={paso.id}>
+            <p className="text-[10px] font-semibold tracking-wide text-ink-muted uppercase">{paso.nombre}</p>
+            <dl className="mt-1 flex flex-col gap-1.5">
+              {preguntasVisibles(paso.preguntas, r).filter((p) => contestada(r[p.id])).map((p) => (
+                <div key={p.id}>
+                  <dt className="text-[11px] text-ink-muted">{p.texto}</dt>
+                  <dd className="text-[12px] text-ink">{textoRespuesta(r[p.id])}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 flex items-center justify-between gap-2 border-t border-line-soft pt-2">
+        <span className="text-[11px] text-ink-muted">Completed {progreso.completado}</span>
+        <Button variant="link" size="sm" onClick={onAbrir}>Open in Treatment</Button>
+      </div>
+    </>
+  )
+}
+
+/* Figma 4540:27072: al cerrar el encuentro se ofrece firmar la Clinical Note ahora o más tarde. */
+export function ClinicalNoteDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent showCloseButton={false} className="gap-0 p-6 sm:max-w-[440px]">
+        <DialogTitle className="text-[18px] font-semibold text-ink">Clinical Note</DialogTitle>
+        <DialogDescription className="mt-3 text-[13px] leading-relaxed text-ink-muted">
+          The clinical encounter has been completed.<br />
+          You can sign the Clinical Note now or defer the signature and complete it later.
+        </DialogDescription>
+        <div className="mt-6 flex flex-wrap justify-end gap-2">
+          <Button variant="secondary" onClick={() => { onClose(); aviso.info('We will remind you to sign the Clinical Note.') }}>Remind me later</Button>
+          <Button onClick={() => { onClose(); aviso.ok('Clinical Note signed.') }}>Review and sign</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 type Flot =
   | { tipo: 'contador'; c: Contador; rect: DOMRect }
-  | { tipo: 'pill'; k: ClavePanel; rect: DOMRect }
+  | { tipo: 'pill'; k: TipoBadge; rect: DOMRect }
 
 /* Tres de los cuatro contadores son categorías clínicas y ya tienen su
    componente en el dashboard del paciente: el popover con la lista y el modal
@@ -112,6 +174,7 @@ export function ClinicalTopBar({
   const [flot, setFlot] = useState<Flot | null>(null)
   const [items, setItems] = useState(ITEMS_INICIALES)
   const [clinico, setClinico] = useState<{ cat: Categoria; item?: ClinicalItem } | null>(null)
+  const [nota, setNota] = useState(false)
 
   const cuenta = (c: Contador) =>
     CATEGORIA_DE[c.id] ? items[CATEGORIA_DE[c.id]].length : c.items.length
@@ -165,12 +228,14 @@ export function ClinicalTopBar({
     })
   }
 
-  /* CC y TR cuelgan un desplegable igual que los contadores: el texto es
-     corto y abrir media pantalla para leer dos párrafos era demasiado. Se
-     dibujan en dos lugares -según el ancho, uno se oculta con `hidden`- y
-     comparten estos botones. */
+  /* CC y TR cuelgan un desplegable igual que los contadores. Cada uno dice si su workflow (Chief Complaint, Triage) está
+     completo en Treatment: verde con tilde, o rojo suave con cruz como en red.dev. Se dibujan en dos lugares -según el
+     ancho, uno se oculta con `hidden`- y comparten estos botones. */
+  const { progreso, abrir } = useWorkflows()
+  const listo = (k: TipoBadge) => !!progreso[WORKFLOW_DEL_BADGE[k]]?.completado
   const pastillas = (['CC', 'TR'] as const).map((k) => {
     const on = flot?.tipo === 'pill' && flot.k === k
+    const nombre = WORKFLOWS.find((w) => w.id === WORKFLOW_DEL_BADGE[k])!.nombre
     return (
       <button
         key={k}
@@ -178,14 +243,15 @@ export function ClinicalTopBar({
           setFlot(on ? null : { tipo: 'pill', k, rect: e.currentTarget.getBoundingClientRect() })
         }
         aria-expanded={on}
-        disabled={ESTADO_CLINICO[k].estado === 'disabled'}
+        aria-label={`${nombre}: ${listo(k) ? 'completed' : 'not completed'}`}
+        title={`${nombre} · ${listo(k) ? 'Completed' : 'Not completed'}`}
         className={cn(
           'shrink-0 rounded-full transition-all outline-none [outline-style:solid] outline-[2px] outline-offset-[2px] outline-transparent enabled:hover:opacity-90',
-          on && (ESTADO_CLINICO[k].resultado === 'ok' ? 'outline-status-ok' : 'outline-required'),
+          on && (listo(k) ? 'outline-status-ok' : 'outline-required'),
         )}
       >
         {/* El badge del design system 2.0 en tamaño md: al del export (22 de alto) el tilde casi no se distinguía. */}
-        <ClinicalBadge tipo={k} {...ESTADO_CLINICO[k]} size="md" />
+        <ClinicalBadge tipo={k} resultado={listo(k) ? 'ok' : 'no'} estado={listo(k) ? 'active' : 'inactive'} size="md" />
       </button>
     )
   })
@@ -324,7 +390,11 @@ export function ClinicalTopBar({
           {['End encounter', 'Discard encounter', 'Encounter settings'].map((t) => (
             <button
               key={t}
-              onClick={() => { setAbierto(false); aviso.info(`${t} is not available in this release.`) }}
+              onClick={() => {
+                setAbierto(false)
+                if (t === 'End encounter') setNota(true)
+                else aviso.info(`${t} is not available in this release.`)
+              }}
               className="block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
             >
               {t}
@@ -360,15 +430,15 @@ export function ClinicalTopBar({
         />
       )}
       {flot?.tipo === 'pill' && (
-        <Flotante titulo={PANELES[flot.k].titulo} ancla={flot.rect} ancho={300} onClose={() => setFlot(null)}>
-          {PANELES[flot.k].parrafos.map((t) => (
-            <p key={t} className="mt-2 text-[12px] leading-[1.55] text-ink-medium">{t}</p>
-          ))}
-          <p className="mt-3 border-t border-line-soft pt-2 text-[11px] text-ink-muted">
-            {PANELES[flot.k].fecha} · {PANELES[flot.k].hora}
-          </p>
+        <Flotante titulo={WORKFLOWS.find((w) => w.id === WORKFLOW_DEL_BADGE[flot.k])!.nombre} ancla={flot.rect} ancho={300} onClose={() => setFlot(null)}>
+          <ResumenWorkflow
+            k={flot.k}
+            progreso={progreso[WORKFLOW_DEL_BADGE[flot.k]]}
+            onAbrir={() => { setFlot(null); abrir(WORKFLOW_DEL_BADGE[flot.k]) }}
+          />
         </Flotante>
       )}
+      <ClinicalNoteDialog open={nota} onClose={() => setNota(false)} />
     </div>
   )
 }

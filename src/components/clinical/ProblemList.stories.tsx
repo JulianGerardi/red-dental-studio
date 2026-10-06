@@ -1,21 +1,57 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ProblemList } from './ProblemList'
+import { userEvent, within } from 'storybook/test'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { ESTADOS_PROBLEMA, PROBLEMAS } from '@/data/clinical-mode'
+import { NoteCell, ProblemList, StatusFilter, ToothCell } from './ProblemList'
 import { escribir, esperar, secuencia } from '@/design-system/play'
 
 const meta = {
   title: 'Components/Clinical/ProblemList',
   component: ProblemList,
-  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
+  parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 560 } } },
 } satisfies Meta<typeof ProblemList>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
+/* Problem List con el filtro en Active, como abre en red.dev. */
 export const Default: Story = {}
 
-/* Búsqueda sin resultados: estado vacío "No problems found". */
-export const NoResults: Story = { play: secuencia(escribir(/search/i, 'zzzz'), esperar(/no .* found|nothing matches/i)) }
+/* La otra pestaña: los procedimientos del paciente, con el filtro en All. */
+export const Procedures: Story = {
+  play: async (c) => {
+    await userEvent.click(await within(c.canvasElement).findByRole('tab', { name: 'Procedures' }))
+    await esperar(/D0220/)(c)
+  },
+}
 
-/* En la primera página "Previous" queda deshabilitado; al llegar a la última,
-   lo mismo le pasa a "Next". */
-export const PreviousDisabledOnFirstPage: Story = {}
+/* Búsqueda sin resultados: estado vacío "No problems found". */
+export const NoResults: Story = { play: secuencia(escribir(/search/i, 'zzzz'), esperar(/no problems found/i)) }
+
+/* El menú de una fila activa: Edit, los cambios de estado (los que cierran en rojo) y Delete. */
+export const RowMenu: Story = {
+  play: async (c) => {
+    const [primera] = await within(c.canvasElement).findAllByRole('button', { name: /actions for abscess/i })
+    await userEvent.click(primera)
+    await esperar(/start monitoring/i)(c)
+  },
+}
+
+/* Las piezas de cada fila: la nota (con y sin texto), la pieza y el filtro de estado. */
+export const Parts: Story = {
+  render: () => (
+    <TooltipProvider>
+      <div className="flex flex-wrap items-center gap-6">
+        <NoteCell nota="Reports fatigue for the last week; no fever." />
+        <NoteCell />
+        <ToothCell pieza={14} />
+        <ToothCell />
+        <StatusFilter
+          value="Active" options={ESTADOS_PROBLEMA} onChange={() => {}}
+          conteo={Object.fromEntries(ESTADOS_PROBLEMA.map((e) => [e, PROBLEMAS.filter((p) => p.estado === e).length]))}
+          tono={{ Active: 'success', Monitoring: 'warning', 'In treatment': 'info' }}
+        />
+      </div>
+    </TooltipProvider>
+  ),
+}

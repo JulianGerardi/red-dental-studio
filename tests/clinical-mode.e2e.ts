@@ -51,3 +51,35 @@ test('Existing no tiene Link to finding: sin superficie se guarda en un paso', a
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/D2740 charted as existing/)).toBeVisible()
 })
+
+test('CC y TR siguen a los workflows de Treatment: completar Triage pone TR en verde', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await expect(screen.getByRole('button', 'Chief Complaint: completed').first()).toBeVisible()
+  await screen.getByRole('button', 'Triage: not completed').first().tap()
+  await screen.getByRole('button', 'Answer in Treatment').tap()
+
+  await expect(screen.getByRole('button', 'Save Step')).toBeDisabled()
+  for (const pregunta of [/traveled/, /first visit/, /unsafe/, /in any danger/, /alcohol/, /dental emergency/]) {
+    await screen.getByRole('group', pregunta).getByRole('button', 'No').tap()
+  }
+  await screen.getByRole('button', 'Save Step').tap()
+  await expect(screen.getByText('Triage completed.')).toBeVisible()
+  await expect(screen.getByRole('button', 'Triage: completed').first()).toBeVisible()
+})
+
+test('la tabla del Overview tiene Problem List y Procedures', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await expect(screen.getByText('Generally unwell')).toBeVisible()
+  await screen.getByRole('tab', 'Procedures').tap()
+  await expect(screen.getByText(/D0220 - Intraoral/)).toBeVisible()
+})
+
+test('Generate Narrative arma el borrador con lo guardado de Chief Complaint', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'Chief Complaint: completed').first().tap()
+  await screen.getByRole('button', 'Open in Treatment').tap()
+  await screen.getByRole('button', 'Generate Narrative').tap()
+  const editor = screen.getByRole('dialog', 'AI Narrative Editor')
+  await expect(editor.getByText(/Original Clinical Draft/)).toBeVisible()
+  await expect(editor.getByRole('button', /Apply Changes/)).toBeDisabled()
+})

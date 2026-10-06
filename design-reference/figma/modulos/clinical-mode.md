@@ -1938,3 +1938,104 @@ Discarded):
    *Signatures* (Sign as patient / provider, o "All signatures collected") y
    *Document* (Open document, Send to patient again, Replace document,
    Download PDF).
+
+## Treatment: workflows, y CC / TR segun el workflow (2026-10-05)
+
+Figma 9fYLxX9h 4540:26288 "Treatment — Section (Workflow Detail & Clinical
+Note Confirmation)" para el diseno; red.dev (paciente Aaa Test Aaa, pestana
+Treatment) para la logica.
+
+1. **Regla de CC y TR** (la confirmo Julian): cada badge dice si el paciente
+   completo su workflow en Treatment. CC = Chief Complaint, TR = Triage.
+   Completo: verde con tilde (`ok` / `active`). Sin completar: rojo suave con
+   cruz (`no` / `inactive`), como en red.dev, donde se ven en blanco con texto
+   rojo y el icono de clipboard tachado. En red.dev, mientras carga, los dos
+   van en gris con spinner; aca no hay carga.
+2. **Al abrir CC o TR**: si esta completo, las respuestas por paso y la hora
+   en que se completo; si no, "The patient has not answered the chief
+   complaint / triage questions yet." (texto de red.dev, que lo muestra en un
+   panel lateral; aca va en el desplegable de la barra) con el atajo **Answer
+   in Treatment**, que abre Treatment con ese workflow.
+3. **Treatment** (`TreatmentPanel`): a la izquierda el workflow elegido
+   (codigo en azul y "Published vN", como red.dev), buscador de secciones y
+   los pasos plegables con ojo para ocultar y "Show hidden". Se abre un paso
+   a la vez. Las preguntas son chips (una o varias opciones, Yes / No) o
+   texto. Una opcion puede colgar preguntas hijas, con el conector del arbol
+   del Figma. Pie: **Generate Narrative** (abre el editor de narrativa, ver
+   abajo) y **Save Step**, que guarda el paso abierto y se habilita cuando lo
+   obligatorio esta contestado. A la derecha: Workflows (tarjetas con
+   categoria y fecha; la elegida en azul; filtro por categoria y por codigo),
+   Progress del workflow elegido (pasos guardados en verde con tilde) y
+   Treatment plans.
+4. **Workflows del mock**: Chief Complaint (Reason for Visit, Current Dental
+   Problems (HPI)), Triage, Social History, Family History, Dental and Oral
+   Health History y Prophylaxis (los seis pasos del Figma). Las preguntas de
+   Triage y de Reason for Visit son las de red.dev; las demas son mock. Arranca
+   con Chief Complaint completo y Triage sin contestar, para que se vean los
+   dos estados. El progreso vive en `WorkflowsProvider` (pantalla de Clinical
+   Mode) y lo leen Treatment y el header.
+5. **Clinical Note** (4540:27072): al elegir *End encounter* en el menu del
+   encuentro, el aviso "The clinical encounter has been completed" con
+   *Remind me later* y *Review and sign*.
+
+## Tabla del Overview: Problem List y Procedures (2026-10-05)
+
+Como en red.dev:
+
+1. **Dos pestanas** (`Tabs`): *Problem List* y *Procedures*. A la derecha,
+   el filtro de estado (desplegable de una opcion) y el buscador.
+2. **Problem List**: Date, Location, Tooth, Surface, Condition, Exam,
+   Provider, Note, Status. Filtro por defecto **Active**; opciones: Active,
+   Clinic declined, Discarded, Externally treated, In treatment, Monitoring,
+   No treatment needed, Patient declined, Referred, Treated (sin "All", igual
+   que red.dev).
+3. **Procedures**: Date, Location, Tooth, Surface, Procedure (codigo y
+   descripcion), Provider, Note, Status. Filtro por defecto **All**; opciones:
+   Completed, Discarded, Discontinued, In progress, Planned, Referred.
+4. **Celdas**: la pieza en una cajita gris (vacia si no es de un diente); la
+   nota es el icono violeta con el texto en tooltip, o un guion; el estado en
+   mayusculas.
+5. **Menu de cada fila** ("Actions"): un problema activo tiene Edit, Start
+   Monitoring, Start Treatment, Mark As Treated, Mark As Externally Treated,
+   y en rojo Mark As No Treat. Needed, Mark As Patient Declined, Mark As
+   Clinic Declined, Discard; despues Delete. Un procedimiento In progress:
+   Edit, Discontinue, Rollback, Delete; uno Discarded: Edit, Rollback,
+   Delete. Esos tres menus se vieron en red.dev; los de los demas estados son
+   inferidos (lo abierto ofrece lo que falta, lo cerrado Rollback). Cada
+   cambio avisa con Undo.
+6. Usa la tabla estandar (`DataTable`): 5 filas por pagina con selector
+   (Show: 5 / 10 / 20) y "Showing X to Y of N results". El menu de fila
+   (`RowActionsMenu`) ahora crece hasta 280 px para que "Mark As Externally
+   Treated" no se parta; las demas tablas siguen en 190.
+
+## Narrativa, filtros y cards de Treatment Plan (2026-10-05)
+
+1. **Narrativa con el flujo de red.dev** (`NarrativeEditor`): Generate
+   Narrative abre el **AI Narrative Editor** (icono violeta, "CODIGO -
+   PUBLISHED Vn"). Al abrirse genera el borrador con lo contestado en los
+   pasos **guardados** (skeleton mientras genera) y lo deja guardado como
+   *Original Clinical Draft*. Sin pasos guardados, el editor queda vacio y
+   avisa "no answered questions to summarize" (en red.dev: "Failed to
+   regenerate narrative · No answered questions to summarize"). Barra de
+   formato: Bold, Title, Subtitle, Text, List. Editar pasa a *Unsaved
+   changes* y habilita **Apply Changes** (deshabilitado con el borrador
+   original, como red.dev). Cerrar con cambios sin aplicar pide confirmacion;
+   **Regenerate** tambien, si pisa una version editada. La narrativa guardada
+   se ve resumida arriba de los pasos (Open vuelve al editor) y el boton pasa a
+   *Edit Narrative*. El borrador se arma con plantilla, sin IA real.
+2. **Filtro de Workflows**: encabezado con *Clear all*, tipos con icono y
+   cuantos workflows hay de cada uno (el que no tiene ninguno queda
+   deshabilitado), busqueda por codigo o descripcion (Enter aplica), y al pie
+   cuantos quedarian antes de aplicar. Lo aplicado se ve en chips debajo del
+   titulo, cada uno con su X, y *Clear*; sin resultados, *Clear filters*.
+3. **Filtro de estado de la tabla**: el punto del color de cada estado (el
+   mismo de su pill) y cuantas filas tiene cada uno, en el boton y en el menu.
+4. **Cards de Treatment Plan del Overview**, con la estructura de red.dev:
+   iniciales y profesional, nombre del caso con su estado (los colores del
+   rail de Treatment Plan), grupo y cantidad de procedimientos, Total amount y
+   Created on en cajas grises con icono, y Treatment progress con el
+   porcentaje, "x of y completed" y la barra. Salen de los casos del paciente
+   (los descartados no), no de cuatro copias de "periodontists Alternative".
+   Toda la card abre ese caso en Treatment Plan; *All treatment* abre la
+   lista. El icono de documento sigue afuera, como pidio Julian. Endodontic
+   Treatment trae la primera visita completa, para que se vea avance.

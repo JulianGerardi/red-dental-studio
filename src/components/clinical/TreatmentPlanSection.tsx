@@ -36,7 +36,7 @@ const ESTADO_TONO: Record<Procedimiento['estado'], PillTone> = {
   Planned: 'success', Completed: 'info', Removed: 'neutral',
 }
 
-const TONO_CASO: Record<EstadoCaso, PillTone> = {
+export const TONO_CASO: Record<EstadoCaso, PillTone> = {
   Planning: 'warning', Pending: 'purple', Presented: 'info', 'Waiting for consent': 'neutral', Accepted: 'success', Discarded: 'danger',
 }
 
@@ -910,10 +910,10 @@ export function VistaCaso({
 
 /* ── Sección ──────────────────────────────────────────────────────── */
 
-export function TreatmentPlanSection() {
-  /* Se entra por Unassigned, como el frame por defecto (4118:220406). */
-  const [vista, setVista] = useState<'unassigned' | 'caso'>('unassigned')
-  const [casoId, setCasoId] = useState(CASOS[0].id)
+export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) {
+  /* Se entra por Unassigned, como el frame por defecto (4118:220406), salvo que se llegue desde una card del Overview. */
+  const [vista, setVista] = useState<'unassigned' | 'caso'>(casoInicial ? 'caso' : 'unassigned')
+  const [casoId, setCasoId] = useState(casoInicial ?? CASOS[0].id)
   const [dialogo, setDialogo] = useState<ClaveDialogo | 'delete' | null>(null)
   const [mover, setMover] = useState(false)
   const [grupo, setGrupo] = useState(false)

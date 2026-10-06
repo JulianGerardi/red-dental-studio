@@ -107,7 +107,7 @@ export const CASOS: Caso[] = [
     id: 'c5', nombre: 'Endodontic Treatment', grupo: 'Endodontics', estado: 'Accepted',
     creado: '27/04/2026', creadoPor: 'Provider 1', total: '640.00',
     visitas: [
-      { id: 'v1', nombre: 'Visit 1', total: '$320.000', procedimientos: visita('c5v1', ['Signed', 'Signed']), cita: { fecha: 'May 4, 2026', hora: '9:30 AM', proveedor: 'Perez Martinez' } },
+      { id: 'v1', nombre: 'Visit 1', total: '$320.000', procedimientos: visita('c5v1', ['Signed', 'Signed']).map((p) => ({ ...p, estado: 'Completed' as const })), cita: { fecha: 'May 4, 2026', hora: '9:30 AM', proveedor: 'Perez Martinez' } },
       { id: 'v2', nombre: 'Visit 2', total: '$320.000', procedimientos: visita('c5v2', ['Signed']) },
     ],
   },

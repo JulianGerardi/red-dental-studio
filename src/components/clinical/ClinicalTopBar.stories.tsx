@@ -22,3 +22,9 @@ export const CounterOpen: Story = { play: secuencia(pulsar(/^medications/i), esp
 
 /* Contador sin elementos: el popover dice que no hay nada cargado. */
 export const EmptyCounterOpen: Story = { play: secuencia(pulsar(/^referrals/i), esperar(/no referrals/i)) }
+
+/* TR sin completar: el desplegable dice que el paciente no contestó Triage y lleva a Treatment. */
+export const TriagePending: Story = { play: secuencia(pulsar(/^triage: not completed/i), esperar(/has not answered the triage/i)) }
+
+/* CC completo: las respuestas de Chief Complaint. */
+export const ChiefComplaintCompleted: Story = { play: secuencia(pulsar(/^chief complaint: completed/i), esperar(/reason for visit/i)) }
