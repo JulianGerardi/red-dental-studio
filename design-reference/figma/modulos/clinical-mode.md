@@ -2061,3 +2061,15 @@ En Clinical Mode: el Overview (Treatment Plan, odontograma, Problem List), Treat
 
 Julián eligió la **A** (las tarjetas, la que ya estaba publicada). B y C se sacaron del código junto con la prop
 `variante`; la página *Components / Clinical / Treatment plans card* documenta sólo la A, con la decisión.
+
+## Treatment Plan antes de aceptar, Link to diagnosis y los nombres de los pasos (2026-10-06)
+
+- **Sin consentimiento ni turno antes de aceptar:** en Planning, Pending y Presented no se muestran el bloque de
+  consentimiento, la columna Consent de los procedimientos ni el turno de cada visita (`SIN_CONSENTIMIENTO_NI_TURNO` en
+  TreatmentPlanSection). Julián nombró Planning y Presented; Pending queda entre los dos, así que va igual.
+- **New Procedure, Link to diagnosis:** para Planned, después de Link to finding, un paso más con los diagnósticos de
+  los hallazgos del examen **por código ICD-10 y superficie** (`LinkedDiagnosisCard`), sin estado ni fecha; se guardan
+  como "K05.31 · B, MB". Los códigos salen de `CODIGO_DIAGNOSTICO` (data.ts). Se fue la pestaña oculta "Diagnostics".
+- **Surfaces** depende del procedimiento elegido (lleva superficie o no), tanto en Planned como en Existing.
+- **Los pasos dicen su nombre** en todos los drawers (Procedure, Surfaces, Link to finding, Link to diagnosis…), no
+  "Step": así se sabe qué se está haciendo.

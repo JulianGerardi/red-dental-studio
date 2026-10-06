@@ -47,3 +47,38 @@ export function LinkedFindingCard({
     </div>
   )
 }
+
+/* Un diagnóstico para vincular en el paso Link to diagnosis: igual que el hallazgo pero sólo con el código y las
+   superficies, sin estado ni fecha (Julián, 2026-10-06). */
+export function LinkedDiagnosisCard({
+  code, surfaces, linked, onToggle,
+}: {
+  code: string
+  surfaces: string[]
+  linked: boolean
+  onToggle: (linked: boolean) => void
+}) {
+  const nombre = surfaces.length ? `${code} - ${surfaces.join(', ')}` : code
+  return (
+    <div className={`flex items-center gap-2 rounded-md border bg-white px-3 py-2.5 ${linked ? 'border-dash-blue' : 'border-line'}`}>
+      <p className="min-w-0 flex-1 text-[13px] leading-tight font-bold text-ink tabular-nums">
+        {code}
+        {surfaces.length > 0 && <span className="font-semibold text-ink-medium"> - {surfaces.join(', ')}</span>}
+      </p>
+      <div className="flex shrink-0 items-center">
+        <button
+          type="button" aria-label={`Link ${nombre}`} aria-pressed={linked} onClick={() => onToggle(true)}
+          className={`flex size-7 items-center justify-center rounded-md hover:bg-surface-muted ${linked ? 'text-dash-blue' : 'text-ink-faint'}`}
+        >
+          <Link2 className="size-4" />
+        </button>
+        <button
+          type="button" aria-label={`Unlink ${nombre}`} aria-pressed={!linked} onClick={() => onToggle(false)}
+          className={`flex size-7 items-center justify-center rounded-md hover:bg-surface-muted ${linked ? 'text-ink-faint' : 'text-dash-blue'}`}
+        >
+          <Link2Off className="size-4" />
+        </button>
+      </div>
+    </div>
+  )
+}

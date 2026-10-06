@@ -67,6 +67,21 @@ export const DIAGNOSES = [
   'Severe root surface decay', 'Frequent enamel erosion',
 ]
 
+/* Código ICD-10-CM de cada hallazgo del chart, para el paso Link to diagnosis de New Procedure: ahí se muestran los
+   diagnósticos por código y superficie, no por nombre (Julián, 2026-10-06). */
+export const CODIGO_DIAGNOSTICO: Record<string, string> = {
+  'chronic enamel dental caries': 'K02.51',
+  'acute gingival inflammation': 'K05.00',
+  'chronic gingival inflammation': 'K05.10',
+  'periodic tooth sensitivity': 'K03.89',
+  'moderate plaque accumulation': 'K03.6',
+  'localized periodontal pocketing': 'K05.31',
+  'severe root surface decay': 'K02.7',
+  'frequent enamel erosion': 'K03.2',
+  'oral candidiasis': 'B37.0',
+}
+export const codigoDiagnostico = (condicion: string) => CODIGO_DIAGNOSTICO[condicion.toLowerCase()] ?? 'K08.9'
+
 export const PROVIDERS = ['Elena Martinez', 'Emily Chen', 'Daniel Anderson', 'Sarah Stone']
 
 export type Finding = {

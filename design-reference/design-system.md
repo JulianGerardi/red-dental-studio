@@ -388,8 +388,8 @@ organización de Confidentally 2.0 (`~/Desktop/Work/dashboard-figma`) y los colo
 esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Procedure).
 
 1. **`ui/drawer`** (*Components / UI / Drawer*), como los Sheet de 2.0: márgenes de 24px; título y bajada; si hay varias
-   partes, el `StepIndicator` (en `ui/step-indicator`, *Elements / StepIndicator*) debajo del título, sin línea, con
-   "Step" y el número como en 2.0. Contenido en **una columna**, con secciones de título suelto **sin caja ni borde**
+   partes, el `StepIndicator` (en `ui/step-indicator`, *Elements / StepIndicator*) debajo del título, sin línea, con el
+   **nombre de cada paso** (desde 2026-10-06; antes "Step" y el número como en 2.0). Contenido en **una columna**, con secciones de título suelto **sin caja ni borde**
    (`DrawerSection`; `SectionCard` se dibuja así dentro de un drawer) y campos de a dos por fila. Cada parte de un
    formulario con pasos es un `DrawerStep` (la que no se ve no se desmonta). **Pie** (`DrawerActions`): dos botones del
    mismo ancho, Cancel o Return a la izquierda y Next Step o Save a la derecha. Anchos de 2.0: md 480, lg 560, xl 760.
@@ -420,9 +420,11 @@ esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Proc
    de las licencias en uso, sin plan avisa y no guarda). Next valida sólo el paso a la vista (`lib/useFormPasos`).
 10. **Animación de los pasos**: al completar un paso el tilde rebota, el anillo verde se abre y la línea se llena (la de
    New Procedure); además el contenido del paso nuevo entra deslizándose desde la derecha con Next y desde la izquierda
-   con Return (`paso-entra` / `paso-vuelve`). **New Procedure conserva los nombres de sus pasos** (Procedure, Surfaces,
-   Link to finding) con `stepLabels`; el resto dice "Step", como en 2.0.
-11. **La línea entre círculos es la misma en todos los drawers**: el rótulo del paso ("Step" o un nombre) va encima
+   con Return (`paso-entra` / `paso-vuelve`).
+11. **Cada paso dice su nombre, en todos los drawers** (Julián, 2026-10-06: "en vez de steps debe coincidir con el paso
+    que estoy haciendo, así el usuario tiene noción de lo que está haciendo"): General · Contact · Address, Person ·
+    Contact · Relationship, Procedure · Surfaces · Link to finding · Link to diagnosis… Reemplaza el "Step" de 2.0.
+12. **La línea entre círculos es la misma en todos los drawers**: el rótulo del paso ("Step" o un nombre) va encima
     del círculo sin ocupar ancho (el primero alineado a la izquierda, el último a la derecha). Antes, los nombres largos
     de New Procedure acortaban la línea y la despegaban de los círculos.
 
@@ -459,7 +461,7 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 `src/design-system/kit-drawer.tsx` con las tablas de pasos, estados y specs):
 
 - *Elements / StepIndicator* (rótulos, animación, la línea de círculo a círculo) y *Components / UI / Drawer*
-  (`stepLabels`, reglas de Next Step, dónde hay pasos).
+  (los nombres de los pasos, reglas de Next Step, dónde hay pasos).
 - *Components / Settings*: NewLocationDrawer, NewEmployeeDrawer, NewAccountDrawer, ManageLicensesDrawer;
   *Components / Patients*: AddRelationshipDrawer; *Elements / Cards* (la card adentro de un panel).
 - *Components / Clinical*: Treatment plans card (la A, la elegida), TreatmentPanel, NarrativeEditor, ProblemList,

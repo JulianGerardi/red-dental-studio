@@ -16,9 +16,12 @@ test('Add Procedure carga un D0120 desde DentAssmt', async ({ app, screen }) => 
   const drawer = screen.getByRole('dialog', 'New Procedure')
   await expect(drawer).toBeVisible()
   await drawer.getByRole('button', /^D0120\s*-/).first().tap()
-  // Sin superficie: de Procedure pasa directo a Link to finding.
+  // Sin superficie: de Procedure pasa directo a Link to finding y después a Link to diagnosis, con los códigos.
   await drawer.getByRole('button', /Next Step/).tap()
-  await expect(drawer.getByText('Link to finding').first()).toBeVisible()
+  await expect(drawer.getByText('You can link clinical findings that may be resolved by this procedure.')).toBeVisible()
+  await drawer.getByRole('button', /Next Step/).tap()
+  await expect(drawer.getByText(/K05\.31/).first()).toBeVisible()
+  await drawer.getByRole('button', /^Link K05\.31/).tap()
   await drawer.getByRole('button', /^Save/).tap()
 
   await expect(screen.getByText(/D0120 charted as planned/)).toBeVisible()
@@ -35,6 +38,7 @@ test('Surfaces aparece sólo con un procedimiento de diente + superficie', async
   await expect(drawer.getByText('Apply to unset')).toBeVisible()
   await expect(drawer.getByRole('button', /Next Step/)).toBeDisabled()
   await drawer.getByRole('checkbox', 'Occlusal').tap()
+  await drawer.getByRole('button', /Next Step/).tap()
   await drawer.getByRole('button', /Next Step/).tap()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/D2140 charted as planned/)).toBeVisible()

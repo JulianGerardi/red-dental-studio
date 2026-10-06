@@ -11,7 +11,8 @@ import { StepIndicator } from '@/components/ui/step-indicator'
    plataforma. Las confirmaciones de una sola pregunta siguen siendo ConfirmDialog. Ver Components / UI / Drawer.
 
    Como en 2.0:
-   - Título y bajada arriba; si hay varias partes, los pasos (Step 1, 2, 3) debajo, sin línea que los separe.
+   - Título y bajada arriba; si hay varias partes, los pasos debajo, sin línea que los separe. Cada paso dice su nombre
+     (General, Contact, Address…) en vez de "Step": así se sabe qué se está haciendo (Julián, 2026-10-06).
    - Contenido en una sola columna, con secciones de título suelto -sin caja ni borde- y campos de a dos por fila.
    - Pie con dos botones del mismo ancho: a la izquierda Cancel o Return, a la derecha Next Step o Save.
    - Un panel de apoyo (`aside`, el calendario de horarios de New Appointment) se despliega al costado del drawer.
@@ -28,7 +29,7 @@ export const useEnDrawer = () => React.useContext(EnDrawer)
 const Sentido = React.createContext<1 | -1>(1)
 
 export function Drawer({
-  open, onClose, title, description, steps, step = 0, stepLabels, size = 'md', footer, footerClassName, aside, children, className,
+  open, onClose, title, description, steps, step = 0, size = 'md', footer, footerClassName, aside, children, className,
 }: {
   open: boolean
   onClose: () => void
@@ -39,8 +40,6 @@ export function Drawer({
   steps?: readonly string[]
   /** Paso actual, desde 0. */
   step?: number
-  /** Cada paso dice su nombre en vez de "Step" (New Procedure). */
-  stepLabels?: boolean
   /** md 480 · lg 560 · xl 760, como los anchos de 2.0. */
   size?: DrawerSize
   /** Las acciones del pie, lado a lado y del mismo ancho. */
@@ -77,8 +76,8 @@ export function Drawer({
                 <XIcon className="size-5" />
               </DialogPrimitive.Close>
             </div>
-            {/* Como en 2.0, cada paso dice "Step" y su número; el nombre lo da el título de la sección. */}
-            {conPasos && <StepIndicator total={steps.length} current={step + 1} labels={stepLabels ? steps : undefined} className="px-6 pt-6" />}
+            {/* Cada paso con su nombre: el usuario ve qué está haciendo y qué le falta. */}
+            {conPasos && <StepIndicator total={steps.length} current={step + 1} labels={steps} className="px-6 pt-6" />}
             <Sentido.Provider value={sentido}>
             <EnDrawer.Provider value>
               <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">

@@ -50,6 +50,10 @@ type AccionMenu = { label: string; clave: ClaveDialogo | 'delete' | 'consent'; i
 const EXPIRAR: AccionMenu = { label: 'Expire', clave: 'expire', icono: TimerOff, peligro: true }
 const CANCELAR: AccionMenu = { label: 'Cancel', clave: 'cancel', icono: Ban, peligro: true }
 const CONSENTIMIENTO: AccionMenu = { label: 'Generate Consent', clave: 'consent', icono: FilePen }
+/* Antes de aceptar el plan no hay consentimiento ni turno (Julián, 2026-10-06): en Planning, Pending y Presented no se
+   muestran el bloque de consentimiento, la columna Consent ni el turno de cada visita. */
+const SIN_CONSENTIMIENTO_NI_TURNO: EstadoCaso[] = ['Planning', 'Pending', 'Presented']
+
 const ACCIONES_CASO: Partial<Record<EstadoCaso, AccionMenu[]>> = {
   Planning: [{ label: 'Delete', clave: 'delete', icono: Trash2, peligro: true }],
 }
@@ -841,7 +845,7 @@ export function VistaCaso({
       {/* El turno de la visita va afuera de su tabla, arriba a la derecha; la visita queda como estaba. */}
       {caso.visitas.map((v) => (
         <section key={v.id} aria-label={v.nombre} className="flex flex-col gap-2">
-          <div className="flex justify-end"><CitaVisita cita={v.cita} /></div>
+          {!SIN_CONSENTIMIENTO_NI_TURNO.includes(caso.estado) && <div className="flex justify-end"><CitaVisita cita={v.cita} /></div>}
           <div
             onDragOver={planificando ? sobre(v.id) : undefined}
             onDragLeave={planificando ? () => setSoltando(null) : undefined}
@@ -854,7 +858,7 @@ export function VistaCaso({
             <TablaProcedimientos
               filas={v.procedimientos}
               acciones
-              consentimiento
+              consentimiento={!SIN_CONSENTIMIENTO_NI_TURNO.includes(caso.estado)}
               arrastrable={planificando}
               sinMenu={!planificando}
               seleccion={seleccion}
@@ -923,7 +927,7 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
       />
 
       <div className="flex min-w-0 flex-1 flex-col gap-4">
-        {vista === 'caso' && <ConsentBlock />}
+        {vista === 'caso' && !SIN_CONSENTIMIENTO_NI_TURNO.includes(caso.estado) && <ConsentBlock />}
 
         {vista === 'unassigned' ? (
           <div className="rounded-lg bg-white shadow-panel p-4 sm:p-5">

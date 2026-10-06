@@ -5,12 +5,12 @@ import { Drawer, DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { SelectField } from '@/components/patients/form'
 import { SurfaceWheel, type Surface } from './SurfaceWheel'
-import { LinkedFindingCard } from './LinkedFindingCard'
+import { LinkedDiagnosisCard, LinkedFindingCard } from './LinkedFindingCard'
 import { NOMBRE_ALCANCE, ScopeIcon } from './ScopeIcons'
-import { CajaIcono, ConAyuda, ConditionRow, ProcedureRow } from './ProcedureRow'
+import { CajaIcono, ConAyuda, ProcedureRow } from './ProcedureRow'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import {
-  DIAGNOSES, EXISTING_GROUPS, PROCEDURES, PROCEDURE_GROUPS, PROCEDURE_STATUSES, SCOPES, TREATMENT_AREAS,
+  EXISTING_GROUPS, PROCEDURES, codigoDiagnostico, PROCEDURE_GROUPS, PROCEDURE_STATUSES, SCOPES, TREATMENT_AREAS,
   type Finding, type ProcedureFilter, type ProcedureOption, type ProcedureScope, type ProcedureStatus, type TreatmentArea,
 } from './data'
 
@@ -25,17 +25,11 @@ export type ProcedureDraft = {
   diagnoses: string[]
 }
 
-/* Julián pidió sacar el tab "Diagnostics" (la lista de condiciones/
-   diagnósticos, ej. "Chronic enamel dental caries") del paso 3 por ahora.
-   El markup y el estado (`diagnoses`, `DIAGNOSES`) se dejan tal cual, sólo se
-   deja de dibujar el botón que lleva ahí -con eso alcanza, `tab` nunca pasa
-   a 'Diagnostics' si no hay cómo clickearlo-. Volver a mostrarlo es poner
-   esto en `true`. */
-const CONDICIONES = false
-
-/* Los pasos dependen de lo elegido (Julián, 2026-10-05): Surfaces sólo si el procedimiento lleva superficie, y Link to
-   finding sólo para lo planeado: algo que el paciente ya tiene hecho (Existing) no resuelve un hallazgo. */
-type Paso = 'Procedure' | 'Surfaces' | 'Link to finding'
+/* Los pasos dependen de lo elegido (Julián, 2026-10-05 y 2026-10-06): Surfaces sólo si el procedimiento elegido lleva
+   superficie, sea Planned o Existing; Link to finding y Link to diagnosis sólo para lo planeado: algo que el paciente ya
+   tiene hecho (Existing) no resuelve un hallazgo. Link to diagnosis muestra los diagnósticos de los hallazgos por código
+   y superficie. */
+type Paso = 'Procedure' | 'Surfaces' | 'Link to finding' | 'Link to diagnosis'
 
 /* Drawer a la derecha, a pedido de Julián (Figma UX-UI 2.0, 1669:87207 y 1669:87208): el chart queda a la vista mientras
    se carga. Add Procedure abre en Planned; Add Condition, en Existing (algo que el paciente ya tiene hecho). Ver
@@ -66,22 +60,22 @@ export function NewProcedureDrawer({
   const [scope, setScope] = useState<ProcedureScope>('Tooth')
   const [tooth, setTooth] = useState<number | null>(null)
   const [surfaces, setSurfaces] = useState<Record<number, Surface[]>>({})
-  const [tab, setTab] = useState<'Findings' | 'Diagnostics'>('Findings')
   const [findingQuery, setFindingQuery] = useState('')
+  const [diagnosisQuery, setDiagnosisQuery] = useState('')
   const [linked, setLinked] = useState<string[]>([])
   const [diagnoses, setDiagnoses] = useState<string[]>([])
 
   useEffect(() => {
     if (!open) return
     setPaso(0); setKeepArea(true); setQuery(''); setStatus(mode === 'condition' ? 'Existing' : 'Planned'); setGroup('All'); setAreas([]); setCode(null); setScope('Tooth')
-    setTooth(teeth[Math.floor(teeth.length / 2)] ?? null); setSurfaces({}); setTab('Findings')
-    setFindingQuery(''); setLinked([]); setDiagnoses([])
+    setTooth(teeth[Math.floor(teeth.length / 2)] ?? null); setSurfaces({})
+    setFindingQuery(''); setDiagnosisQuery(''); setLinked([]); setDiagnoses([])
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const procedure = PROCEDURES.find((p) => p.code === code) ?? null
   const conSuperficies = procedure?.area === 'Surface'
-  const pasos: Paso[] = ['Procedure', ...(conSuperficies ? ['Surfaces' as const] : []), ...(status === 'Planned' ? ['Link to finding' as const] : [])]
+  const pasos: Paso[] = ['Procedure', ...(conSuperficies ? ['Surfaces' as const] : []), ...(status === 'Planned' ? ['Link to finding' as const, 'Link to diagnosis' as const] : [])]
   const actual = pasos[Math.min(paso, pasos.length - 1)]!
   const hayAlguna = Object.values(surfaces).some((x) => x.length > 0)
   const q = query.trim().toLowerCase()
@@ -96,7 +90,13 @@ export function NewProcedureDrawer({
   const currentSurfaces = current !== null ? (surfaces[current] ?? []) : []
   const fq = findingQuery.trim().toLowerCase()
   const vinculables = findings.filter((f) => f.status !== 'Discarded' && (!fq || `${f.condition} ${f.area} ${f.surfaces.join(' ')}`.toLowerCase().includes(fq)))
-  const diagnosisList = DIAGNOSES.filter((d) => !fq || d.toLowerCase().includes(fq))
+  const dq = diagnosisQuery.trim().toLowerCase()
+  /* Un diagnóstico por hallazgo del examen, con su código y sus superficies. Se guarda como "K05.31 · B, MB". */
+  const diagnosticos = findings
+    .filter((f) => f.status !== 'Discarded')
+    .map((f) => ({ id: f.id, code: codigoDiagnostico(f.condition), surfaces: f.surfaces }))
+    .map((d) => ({ ...d, valor: d.surfaces.length ? `${d.code} · ${d.surfaces.join(', ')}` : d.code }))
+    .filter((d) => !dq || d.valor.toLowerCase().includes(dq))
 
   function step2Move(delta: number) {
     if (current === null) return
@@ -131,8 +131,7 @@ export function NewProcedureDrawer({
   )
 
   return (
-    <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New Condition' : 'New Procedure'} steps={pasos} step={paso} stepLabels footer={footer}>
-      {/* Cada paso dice qué se hace (Procedure, Surfaces, Link to finding), como antes. */}
+    <Drawer open={open} onClose={onClose} title={mode === 'condition' ? 'New Condition' : 'New Procedure'} steps={pasos} step={paso} footer={footer}>
       <DrawerStep key={actual} index={paso} step={paso}>
         {actual === 'Procedure' && (
           <div className="flex w-full flex-col items-start gap-4">
@@ -249,12 +248,8 @@ export function NewProcedureDrawer({
 
         {actual === 'Link to finding' && (
           <div className="flex w-full flex-col items-start gap-4">
-            {CONDICIONES && (
-              <Tabs aria-label="Link to" tabs={['Findings', 'Diagnostics'] as const} value={tab} onChange={setTab} />
-            )}
-
             <div className="flex w-full flex-col gap-1">
-              <p className="text-sm font-bold text-ink">{tab === 'Findings' ? 'Link to finding' : 'Add Diagnostic'}</p>
+              <p className="text-sm font-bold text-ink">Link to finding</p>
               <p className="text-[11px] leading-relaxed text-ink-faint">
                 You can link clinical findings that may be resolved by this procedure.
               </p>
@@ -263,36 +258,48 @@ export function NewProcedureDrawer({
             <div className="relative w-full">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
-                value={findingQuery} onChange={(e) => setFindingQuery(e.target.value)} placeholder="Search"
+                value={findingQuery} onChange={(e) => setFindingQuery(e.target.value)} placeholder="Search" aria-label="Search findings"
                 className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] placeholder:text-ink-faint focus:outline-none"
               />
             </div>
 
-            <div className="max-h-[280px] w-full overflow-y-auto">
-              {tab === 'Findings' ? (
-                <div className="flex w-full flex-col gap-2.5">
-                  {vinculables.map((f) => (
-                    <LinkedFindingCard
-                      key={f.id} finding={f} linked={linked.includes(f.id)}
-                      onToggle={(on) => setLinked((prev) => (on ? [...new Set([...prev, f.id])] : prev.filter((x) => x !== f.id)))}
-                    />
-                  ))}
-                  {!vinculables.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No finding matches that search.</p>}
-                </div>
-              ) : (
-                <div className="flex w-full flex-col gap-2">
-                  {diagnosisList.map((d) => {
-                    const on = diagnoses.includes(d)
-                    return (
-                      <ConditionRow
-                        key={d} label={d} estado={on ? 'selected' : 'default'}
-                        onClick={() => setDiagnoses((prev) => (on ? prev.filter((x) => x !== d) : [...prev, d]))}
-                      />
-                    )
-                  })}
-                  {!diagnosisList.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No diagnosis matches that search.</p>}
-                </div>
-              )}
+            <div className="flex max-h-[280px] w-full flex-col gap-2.5 overflow-y-auto">
+              {vinculables.map((f) => (
+                <LinkedFindingCard
+                  key={f.id} finding={f} linked={linked.includes(f.id)}
+                  onToggle={(on) => setLinked((prev) => (on ? [...new Set([...prev, f.id])] : prev.filter((x) => x !== f.id)))}
+                />
+              ))}
+              {!vinculables.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No finding matches that search.</p>}
+            </div>
+          </div>
+        )}
+
+        {actual === 'Link to diagnosis' && (
+          <div className="flex w-full flex-col items-start gap-4">
+            <div className="flex w-full flex-col gap-1">
+              <p className="text-sm font-bold text-ink">Link to diagnosis</p>
+              <p className="text-[11px] leading-relaxed text-ink-faint">
+                You can link the diagnoses this procedure treats, by code and surface.
+              </p>
+            </div>
+
+            <div className="relative w-full">
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+              <input
+                value={diagnosisQuery} onChange={(e) => setDiagnosisQuery(e.target.value)} placeholder="Search by code or surface" aria-label="Search diagnoses"
+                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] placeholder:text-ink-faint focus:outline-none"
+              />
+            </div>
+
+            <div className="flex max-h-[280px] w-full flex-col gap-2.5 overflow-y-auto">
+              {diagnosticos.map((d) => (
+                <LinkedDiagnosisCard
+                  key={d.id} code={d.code} surfaces={d.surfaces} linked={diagnoses.includes(d.valor)}
+                  onToggle={(on) => setDiagnoses((prev) => (on ? [...new Set([...prev, d.valor])] : prev.filter((x) => x !== d.valor)))}
+                />
+              ))}
+              {!diagnosticos.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No diagnosis matches that search.</p>}
             </div>
           </div>
         )}

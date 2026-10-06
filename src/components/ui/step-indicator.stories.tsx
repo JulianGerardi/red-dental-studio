@@ -17,7 +17,7 @@ const meta = {
         component: [
           'Los pasos de un drawer con varias partes (`@/components/ui/step-indicator`). El drawer lo dibuja solo cuando recibe `steps`: New Patient, New Appointment, Edit Patient, New Location, New Employee, New Account, New Procedure, Post payment, las suscripciones.',
           '',
-          '**Rótulos:** "Step" en todos los drawers, como en Confidentally 2.0; New Procedure muestra el nombre de cada paso (Procedure, Surfaces, Link to finding). El rótulo no ocupa ancho: la línea corre siempre de círculo a círculo, con "Step" o con nombres largos.',
+          '**Rótulos:** cada paso dice su nombre (General, Contact, Address; Procedure, Surfaces, Link to finding…) para que el usuario sepa qué está haciendo (Julián, 2026-10-06). Sin nombres dice "Step". El rótulo no ocupa ancho: la línea corre siempre de círculo a círculo, con nombres largos o cortos.',
           '',
           '**Al avanzar:** el tilde entra con un rebote, un anillo verde se abre y la línea se llena en verde hacia el paso siguiente.',
           '',
@@ -26,11 +26,11 @@ const meta = {
       },
     },
   },
-  args: { total: 3, current: 2, names: false },
+  args: { total: 3, current: 2, names: true },
   argTypes: {
     total: { control: { type: 'range', min: 2, max: 4, step: 1 }, description: 'Cantidad de pasos.' },
     current: { control: { type: 'range', min: 1, max: 4, step: 1 }, description: 'Paso actual, desde 1.' },
-    names: { control: 'boolean', description: 'Cada paso con su nombre en vez de "Step" (lo que usa New Procedure).' },
+    names: { control: 'boolean', description: 'Cada paso con su nombre (lo que usan los drawers). Apagado dice "Step".' },
   },
 } satisfies Meta<Args>
 

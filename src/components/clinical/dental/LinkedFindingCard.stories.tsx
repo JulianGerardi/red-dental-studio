@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { LinkedFindingCard } from './LinkedFindingCard'
+import { LinkedDiagnosisCard, LinkedFindingCard } from './LinkedFindingCard'
 
 const meta = {
   title: 'Components/Clinical/Dental/LinkedFindingCard',
@@ -21,3 +21,13 @@ export const Default: Story = { render: (args) => <Demo {...args} /> }
 
 /* Sin superficies: sólo el nombre del hallazgo y su zona. */
 export const WithoutSurfaces: Story = { args: { finding: { id: 'F-2', condition: 'oral candidiasis', area: 'Soft Palate', surfaces: [], date: 'May 12, 2026', status: 'Active' } }, render: (args) => <Demo {...args} /> }
+
+/* El diagnóstico de Link to diagnosis: sólo código y superficies, sin estado ni fecha. Linked y sin vincular. */
+export const Diagnosis: Story = {
+  render: () => (
+    <div className="flex flex-col gap-2.5">
+      <LinkedDiagnosisCard code="K05.31" surfaces={['B', 'MB']} linked onToggle={() => {}} />
+      <LinkedDiagnosisCard code="B37.0" surfaces={[]} linked={false} onToggle={() => {}} />
+    </div>
+  ),
+}
