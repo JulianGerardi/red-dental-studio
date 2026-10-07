@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
-  Check, X, EllipsisVertical, Pencil, User, DoorClosed, Clock, ArrowRight,
+  Check, X, EllipsisVertical, Pencil, User, DoorClosed, Clock, ArrowRight, CalendarDays,
 } from 'lucide-react'
 import { InnerCard, StatusPill } from './primitives'
 import { cn } from '@/lib/utils'
-import { ICONO_SUELTO } from '@/lib/estilos'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { aviso } from '@/components/ui/toaster'
 
 export type Appointment = {
@@ -54,7 +55,7 @@ export function AppointmentCard({
       escondidas -por eso vive en su propio componente más abajo. */
   compact?: boolean
 }) {
-  if (compact) return <AppointmentCardCompacta appt={appt} />
+  if (compact) return <AppointmentCardCompacta appt={appt} onEdit={onEdit} />
 
   const accion = appt.accion ?? 'Check Out'
   const Paciente = onSelect ? 'button' : 'div'
@@ -142,11 +143,10 @@ export function AppointmentCard({
 }
 
 /* Una fila, no una card de dos pisos: avatar, nombre y hora/provider abajo
-   en gris, y una flecha a Scheduling en vez del menú -acá no hay nada para
-   editar in situ. Mismo tamaño de trigger que el kebab de las tablas
-   (`ICONO_SUELTO`), para que quede a la par de PatientCard al lado, con la
-   misma superficie de InnerCard. */
-export function AppointmentCardCompacta({ appt }: { appt: Appointment }) {
+   en gris, y el kebab de las tablas (RowActionsMenu) con Edit y Go to
+   appointment -antes era una flecha suelta a Scheduling-. */
+export function AppointmentCardCompacta({ appt, onEdit }: { appt: Appointment; onEdit?: (appt: Appointment) => void }) {
+  const navigate = useNavigate()
   return (
     <InnerCard className="flex items-center gap-2.5 p-2.5">
       <span className="bg-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold text-white">
@@ -159,9 +159,14 @@ export function AppointmentCardCompacta({ appt }: { appt: Appointment }) {
           <span className="truncate">{appt.time} · {appt.provider}</span>
         </span>
       </span>
-      <Link to="/scheduling" aria-label={`View ${appt.name}'s appointment`} className={ICONO_SUELTO}>
-        <ArrowRight className="size-4" />
-      </Link>
+      <RowActionsMenu label={appt.name} className="shrink-0">
+        <DropdownMenuItem onSelect={() => onEdit?.(appt)}>
+          <Pencil className="size-4 shrink-0" /> Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => navigate('/scheduling')}>
+          <CalendarDays className="size-4 shrink-0" /> Go to appointment
+        </DropdownMenuItem>
+      </RowActionsMenu>
     </InnerCard>
   )
 }

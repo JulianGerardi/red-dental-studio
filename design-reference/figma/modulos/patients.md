@@ -124,3 +124,21 @@ indica qué las alterna. La réplica lo dispara con el **segundo checkbox de
 General Information**, que revela la sección Guardian Information. Es una
 elección propia y está marcada como tal en el código — si hay un control real
 que la activa, hay que reemplazarla.
+
+---
+
+## Patients — Today Appointments y sin Recent Patients (2026-10-07)
+
+Pedido de Julián sobre el costado de la lista (`src/pages/Patients.tsx`):
+
+- **Se saca el panel Recent Patients** (con el mail y el link al perfil de cada card): la tabla de al lado ya es la
+  lista de los últimos pacientes. `PatientCard` queda en el código con su story, sin usarse en la pantalla.
+- **Today Appointments**: en lugar de la flecha suelta a Scheduling, cada fila (`AppointmentCardCompacta`) lleva el
+  kebab de las tablas (`RowActionsMenu`) con **Edit** (abre el mismo modal "Edit Appointment" del Dashboard con los
+  datos de la card; guardar avisa y cierra, los turnos del día no se modifican acá) y **Go to appointment** (va a
+  `/scheduling`).
+- **Son 10 turnos**, los últimos del día: `TURNOS_PATIENTS` en `dashboard-data.ts` suma 4 a los 6 del día. Es una
+  lista aparte porque la tira del Dashboard calcula sus números de los turnos del día (6 / 3 / 2 del Figma). Con 10
+  caben todos (`CANTIDAD_TURNOS = 10`), con scroll adentro del panel, y "View all" no aparece.
+- Decisión propia, no está en el Figma: la pantalla no dibuja ni el kebab ni el menú de la card.
+

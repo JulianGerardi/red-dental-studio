@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, ChevronRight, Search, Plus, CalendarDays, Users } from 'lucide-react'
+import { ChevronDown, ChevronRight, Search, Plus, CalendarDays } from 'lucide-react'
 import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTable'
-import { PatientCard } from '@/components/patients/PatientCard'
 import { usePatients } from '@/data/patientsStore'
 import { PageTitle } from '@/components/ui/page-title'
 import { SearchButton } from '@/components/ui/search-button'
@@ -10,8 +9,12 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
 import { Panel } from '@/components/dashboard/primitives'
-import { AppointmentCard } from '@/components/dashboard/AppointmentCard'
-import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
+import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
+import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
+import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
+import { formatDMY } from '@/components/ui/date-picker'
+import { aviso } from '@/components/ui/toaster'
+import { TURNOS_PATIENTS } from '@/components/dashboard/dashboard-data'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
@@ -24,8 +27,7 @@ import { cn } from '@/lib/utils'
    ResizeObserver -mismo patrón que `useAnchoVisible` en ledger- y se publica
    como variable CSS; cada panel es `flex-1` con scroll propio adentro de esa
    altura, así ninguno de los tres bloques queda más alto que los otros. */
-const CANTIDAD_TURNOS = 4
-const CANTIDAD_PACIENTES = 4
+const CANTIDAD_TURNOS = 10
 
 /* Globo con el total -no el filtrado ni el visible- al lado del título del
    panel, mismo color que el de notificaciones de la campana. */
@@ -71,7 +73,7 @@ export default function Patients() {
   const [editando, setEditando] = useState<PatientRow | null>(null)
   const [buscarTurno, setBuscarTurno] = useState('')
   const [verTodosTurnos, setVerTodosTurnos] = useState(false)
-  const [verTodosPacientes, setVerTodosPacientes] = useState(false)
+  const [turnoEditando, setTurnoEditando] = useState<DatosTurno | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const contenidoRef = useRef<HTMLDivElement>(null)
 
@@ -102,11 +104,16 @@ export default function Patients() {
      Billing. "View all" saca el tope de a uno; buscar en Today Appointments
      también lo saca -no tendría sentido recortar un resultado que se buscó
      a propósito-. */
-  const recientesVisibles = useMemo(
-    () => (verTodosPacientes ? patients : patients.slice(0, CANTIDAD_PACIENTES)),
-    [patients, verTodosPacientes],
-  )
-  const turnosHoyTodos = useMemo(() => datosDelDia(HOY_DEMO).appointments, [])
+  /* Edit abre el mismo modal que el Dashboard con lo que la card ya sabe. */
+  const editarTurno = (a: Appointment) => {
+    const h = Number(a.time.slice(0, 2))
+    const inicio = HORAS.find((x) => Number(x.slice(0, 2)) === h) ?? ''
+    setTurnoEditando({
+      patient: a.name, primary: a.provider, operatory: a.operatory, date: formatDMY(new Date()),
+      start: inicio, end: HORAS[HORAS.indexOf(inicio) + 1] ?? '', status: 'Check-in',
+    })
+  }
+  const turnosHoyTodos = TURNOS_PATIENTS
   const turnosFiltrados = useMemo(
     () => turnosHoyTodos.filter((a) => a.name.toLowerCase().includes(buscarTurno.toLowerCase())),
     [turnosHoyTodos, buscarTurno],
@@ -199,36 +206,22 @@ export default function Patients() {
                   className="py-6"
                 />
               ) : (
-                turnosVisibles.map((a, i) => <AppointmentCard key={i} appt={a} compact />)
+                turnosVisibles.map((a, i) => <AppointmentCard key={i} appt={a} onEdit={editarTurno} compact />)
               )}
             </div>
           </Panel>
 
-          <Panel
-            title={<>Recent Patients <Globo n={patients.length} /></>}
-            className="flex-1"
-            bodyClassName="min-h-0 gap-3 overflow-y-auto"
-            controls={
-              <BotonVerTodos
-                total={patients.length} cantidad={CANTIDAD_PACIENTES}
-                mostrando={verTodosPacientes} onToggle={() => setVerTodosPacientes((v) => !v)}
-              />
-            }
-          >
-            {recientesVisibles.length === 0 ? (
-              <EmptyState
-                icon={Users}
-                title="No patients yet"
-                detail="New patients will show up here."
-                className="py-6"
-              />
-            ) : (
-              recientesVisibles.map((r) => <PatientCard key={r.id} row={r} onEdit={setEditando} />)
-            )}
-          </Panel>
         </div>
       </div>
 
+      {turnoEditando && (
+        <NewAppointmentModal
+          titulo="Edit Appointment"
+          inicial={turnoEditando}
+          onGuardar={() => { setTurnoEditando(null); aviso.ok('Appointment updated.') }}
+          onClose={() => setTurnoEditando(null)}
+        />
+      )}
       {modal === 'new' && <NewPatientModal onClose={() => setModal(null)} />}
       {/* Mismo formulario que New Patient (variante con guardián), otro título.
           Se le pasa la fila para que guarde sobre ese paciente. */}
