@@ -174,3 +174,24 @@ siempre está a mano:
 6. `PanelPreview` pasa a ser `DrawerPreview`. Design system (*Pages › Parts › Consents*): Playground en su propio iframe
    y con el control *previewOpen*; *Preview · Clinic view* y *Patient view* con el drawer abierto; el botón Preview en
    Specs.
+
+### Segunda vuelta: pie en angosto y Storybook con Parts y States (2026-10-07)
+
+Releyendo el CLAUDE.md nuevo se auditó la tanda contra cada regla de los `.md`. Quedaron dos arreglos y un cambio de
+documentación:
+
+1. **El pie del editor se cortaba en angosto.** Con Preview, Cancel y Save en una fila sin wrap (unos 302px), a 320px
+   Preview quedaba fuera de la pantalla y a 360 se metía en el padding: rompía "de 320 a 1440+ nada se recorta"
+   (`figma/README.md`, *Responsive*). Ahora el pie hace wrap: por debajo de ~370px **Cancel y Save bajan juntos** a una
+   segunda línea, a la derecha (van en su propio grupo), y **Preview queda solo arriba**, a la izquierda. El pie pasa de
+   61 a 109px de alto en ese rango. Medido en 320, 360, 390 y 1440: ningún botón sale del contenido de la card.
+2. **Specs → Colors decía "Panels: border line"**, de antes de las cards sin borde (2026-10-06). Ahora dice
+   `white · shadow-panel, no border`.
+3. **La página de Storybook pasa a Playground, Parts, States y Specs**, como *Elements / Navigation* (#9): el CLAUDE.md
+   dice "nada de listas sueltas" y que `ds:check` no alcanza. Reemplaza la lista de historias sueltas del 2026-09-29 (punto
+   6), pero **cada estado sigue siendo su propia muestra**, con título y nota, dentro de *States* (agrupadas por parte:
+   Template card, Templates list, Procedure picker, Consent text, Formatting toolbar, Editor y Preview drawer). *Parts*
+   es la pantalla con una tabla de qué hace cada parte. Los dos estados del drawer siguen en historias aparte, en
+   iframe, porque el drawer es `position: fixed`. *Narrow footer* es un iframe de 320px con la historia `NarrowFooter`
+   (fuera de la página de docs): inline, las clases `sm:` responden a la ventana de escritorio y el editor salía de
+   340px, así que no mostraba lo mismo que un celular.

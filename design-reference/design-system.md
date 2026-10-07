@@ -514,3 +514,13 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 - *Components / Layout / Sidebar parts*: las muestras de Settings y Billing van en 176. Decisiones en
   `figma/modulos/header-sidebar.md` (2026-10-07).
 
+
+## Consents: Parts y States, y el pie en angosto (2026-10-07)
+
+- *Pages › Parts › Consents* pasa a la estructura de *Elements / Buttons*: **Playground**, **Parts** (la pantalla y una
+  tabla con qué hace cada parte y su componente), **States** (cada parte en cada estado, una muestra por estado con su
+  nota, incluido *Narrow footer*), **Preview · Clinic view / Patient view** (el drawer abierto, en iframe) y **Specs**
+  (Colors corrige *Panels*: sombra, sin borde). Ya no hay historias sueltas.
+- Editor de Consents: el pie fijo hace wrap; en angosto Cancel y Save bajan juntos a otra línea y Preview queda arriba
+  (*Narrow footer*, en un iframe de 320px). Decisiones
+  en `figma/modulos/consents.md` (segunda vuelta del 2026-10-07).
