@@ -38,8 +38,12 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
    en `design-system.md`.
 3. Checks: `tsc -b`, `ds:check`, `vite build`, e2e. Si un cambio rompe un e2e, se arregla el test o el código, no se
    saltea.
-4. Mostrarle a Julián y **no hacer push sin su ok** ("subilo"). Subir a `main` publica app y Storybook juntos.
-5. Después del push: `gh run list` hasta que termine el deploy y confirmar en el bundle publicado. Pages cachea hasta
+4. Pasarle a Julián **los links de localhost** para que vea los cambios antes de publicar, con el dev server (y
+   Storybook, si cambió el design system) andando: la pantalla exacta que cambió, por ejemplo
+   `http://localhost:5182/patients/1/relationships`, y la página del DS, por ejemplo
+   `http://localhost:6006/?path=/docs/elements-cards--docs`. Localmente las rutas van sin `#`.
+5. **No hacer push sin su ok** ("subilo"). Subir a `main` publica app y Storybook juntos.
+6. Después del push: `gh run list` hasta que termine el deploy y confirmar en el bundle publicado. Pages cachea hasta
    ~10 min; para probar, agregá `?cb=<n>`.
 
 ## Reglas de UI
