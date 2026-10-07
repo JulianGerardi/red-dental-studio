@@ -485,6 +485,10 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 - `AppointmentCardCompacta` cambió la flecha por el kebab (`RowActionsMenu`) con *Edit* y *Go to appointment*; sigue en
   *Elements / Appointment cards* (Patients list: descripción y tabla *Which card goes where*) y en *Components /
   Dashboard / AppointmentCard parts → CompactRow*.
+- *Elements / Appointment cards → Patients list card: states*: Default, Kebab hover, Menu open (Edit / Go to
+  appointment), Long name y la lista de los 10 turnos. El Playground de *Patients list* abre el modal de Edit. Para
+  dejar el menú a la vista, `RowActionsMenu` suma `abierto` (sólo stories; ver *Components / UI / RowActionsMenu →
+  Open*) y `AppointmentCardCompacta` suma `menuAbierto`.
 - La pantalla Patients ya no tiene Recent Patients; `PatientCard` sigue en *Elements / Cards* y sus stories. Decisiones
   y motivos en `figma/modulos/patients.md` (2026-10-07).
 

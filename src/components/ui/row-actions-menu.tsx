@@ -10,14 +10,16 @@ import { cn } from '@/lib/utils'
    click-outside y su propio Escape. */
 
 export function RowActionsMenu({
-  label, className, children,
+  label, className, abierto, children,
 }: {
   label: string
   className?: string
+  /** Sólo para las stories: deja el menú abierto y sin bloquear la página. */
+  abierto?: boolean
   children: ReactNode
 }) {
   return (
-    <DropdownMenu>
+    <DropdownMenu {...(abierto ? { open: true, modal: false } : {})}>
       <DropdownMenuTrigger aria-label={`Actions for ${label}`} className={cn(ICONO_SUELTO, className)}>
         <MoreVertical className="size-4" />
       </DropdownMenuTrigger>

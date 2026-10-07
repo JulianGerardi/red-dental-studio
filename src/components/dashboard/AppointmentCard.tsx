@@ -145,7 +145,14 @@ export function AppointmentCard({
 /* Una fila, no una card de dos pisos: avatar, nombre y hora/provider abajo
    en gris, y el kebab de las tablas (RowActionsMenu) con Edit y Go to
    appointment -antes era una flecha suelta a Scheduling-. */
-export function AppointmentCardCompacta({ appt, onEdit }: { appt: Appointment; onEdit?: (appt: Appointment) => void }) {
+export function AppointmentCardCompacta({
+  appt, onEdit, menuAbierto,
+}: {
+  appt: Appointment
+  onEdit?: (appt: Appointment) => void
+  /** Sólo para las stories: deja el menú del kebab abierto. */
+  menuAbierto?: boolean
+}) {
   const navigate = useNavigate()
   return (
     <InnerCard className="flex items-center gap-2.5 p-2.5">
@@ -159,7 +166,7 @@ export function AppointmentCardCompacta({ appt, onEdit }: { appt: Appointment; o
           <span className="truncate">{appt.time} · {appt.provider}</span>
         </span>
       </span>
-      <RowActionsMenu label={appt.name} className="shrink-0">
+      <RowActionsMenu label={appt.name} className="shrink-0" abierto={menuAbierto}>
         <DropdownMenuItem onSelect={() => onEdit?.(appt)}>
           <Pencil className="size-4 shrink-0" /> Edit
         </DropdownMenuItem>
