@@ -167,7 +167,7 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     pantalla y marca los que se apartan (hoy conviven varios tamaños de título:
     PageTitle 20px Semibold, h1 sueltos de 20, 24 y 36px).
   - **Navigation** — el menú lateral (`Sidebar` en `AppShell`) sobre la app
-    real: colapsado 58px con tooltip, expandido 234px, ítem activo según la
+    real: colapsado 58px con tooltip, expandido 176px (234 en el celular), ítem activo según la
     pantalla, menú flotante de Settings, celular. El Playground elige la
     pantalla y cómo arranca el menú.
   - **Patient menu** — `PatientSidePanel` solo, sin la pantalla (las

@@ -30,7 +30,7 @@ const meta = {
       story: { inline: false, iframeHeight: 720 },
       description: {
         component: [
-          '**Menú lateral (rail)** (`Sidebar`, dentro de `AppShell`). Colapsado mide 58px y muestra sólo íconos; expandido mide 234px con los nombres. Se abre y se cierra con el botón de la barra de arriba, a la izquierda del saludo.',
+          '**Menú lateral (rail)** (`Sidebar`, dentro de `AppShell`). Colapsado mide 58px y muestra sólo íconos; expandido mide 176px con los nombres. Se abre y se cierra con el botón de la barra de arriba, a la izquierda del saludo.',
           '',
           '- **Colapsado:** al pasar el mouse por un ícono aparece su nombre en un tooltip a la derecha.',
           '- **Expandido:** no hay tooltips, el nombre ya se ve.',

@@ -109,7 +109,8 @@ export function Sidebar({
              los modales y popovers del contenido usan z-50 y lo siguen
              tapando. */
           'md:sticky md:z-40 md:shrink-0 md:translate-x-0',
-          expanded ? 'md:w-[234px]' : 'md:w-[58px]',
+          /* 176 expandido, a pedido de Julián: con 234 le quitaba demasiado a la pantalla (header-sidebar.md). */
+          expanded ? 'md:w-[176px]' : 'md:w-[58px]',
         )}
       >
       {/* Bloque del logo: ocupa exactamente el alto del header */}
@@ -286,7 +287,8 @@ export function SettingsItem({
       {/* El chevron es un botón aparte y no un icono adentro del link: dentro,
           cancelar la navegación dependía de que el preventDefault ganara la
           carrera contra el Link, y en touch terminaba navegando igual. */}
-      <div className={cn(clase(activo), 'w-full')} data-tour="settings-menu">
+      {/* Sin w-full: sumado al mx-3 del ítem lo sacaba 12px por fuera del rail. */}
+      <div className={clase(activo)} data-tour="settings-menu">
         <NavLink
           to="/settings"
           title="Settings"
