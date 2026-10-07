@@ -46,10 +46,21 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
    `http://localhost:6006/?path=/docs/elements-cards--docs`. Localmente las rutas van sin `#`.
 5. **No hacer push sin su ok.** Su "subilo" es la única validación y significa **publicar en todos lados**: la app en
    vivo y el design system. Con esa palabra se hace todo de corrido, sin volver a preguntar en ningún paso (nada de
-   "¿commiteo?", "¿abro el PR?", "¿mergeo?"): commit, push y, si hay rama de sesión, PR y merge a `main`. El merge a
-   `main` dispara el deploy de la app y del Storybook juntos.
+   "¿commiteo?", "¿abro el PR?", "¿mergeo?"): commit con la entrada de `CAMBIOS.md`, push, PR con los reviewers de
+   *Avisar al dev* y merge a `main`. El merge a `main` dispara el deploy de la app y del Storybook juntos.
 6. Después del merge: `gh run list` hasta que termine el deploy, confirmar el cambio en la app publicada y en el
    Storybook publicado, y pasarle los dos links. Pages cachea hasta ~10 min; para probar, agregá `?cb=<n>`.
+
+## Avisar al dev
+
+El código lo toman **jonatan784** y **betsyMb**, y se enteran de cada cambio por GitHub:
+
+- **Todo cambio va por PR**, también los del CLAUDE.md o la documentación: nunca push directo a `main`. Si estás en
+  `main`, creá una rama antes.
+- Cada PR suma **su entrada arriba de todo en `CAMBIOS.md`**, con fecha y número de PR: qué cambió y qué tiene que
+  saber el dev (componentes nuevos, reglas, rutas, qué dejar de usar), en pocas líneas y en castellano.
+- La descripción del PR lleva *Qué cambia*, *Para el dev* y *Verificación*.
+- Se crea con `gh pr create --reviewer jonatan784,betsyMb`: GitHub les manda un mail aunque el PR se mergee enseguida.
 
 ## Reglas de UI
 
