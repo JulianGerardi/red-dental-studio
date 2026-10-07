@@ -215,3 +215,6 @@ del Dashboard, los contadores de la barra de Clinical Mode). Ahora es `h-5 min-w
 dígito, píldora si el conteo pasa a dos. Mismos colores (`bg-dash-count-bg`, `text-dash-blue-hover`); activa, el fondo
 pasó del hex suelto `#eff6ff` al token `bg-info-bg` (`#f0f5ff`, imperceptible). Verificado: 4 globos de 20×20 con el
 centro vertical igual al del título.
+
+El globo es ahora la pieza `Count` (`src/components/ui/count.tsx`, página *Elements / Counts* del Storybook), no un
+`<span>` suelto en `PatientDetail`: el design system es la fuente y la pantalla sólo la usa.

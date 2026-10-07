@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ChevronLeft, ChevronDown, PersonStanding, Clipboard, Pill as PillIcon, ClipboardList, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Count } from '@/components/ui/count'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
 import { ClinicalItemModal } from '@/components/patients/ClinicalItemModal'
@@ -115,15 +116,7 @@ export default function PatientDetail() {
                     <span className={cn('truncate text-[13px] font-semibold', activa ? 'text-white' : 'text-ink')}>
                       {label}
                     </span>
-                    {/* Globo redondo como los demás conteos de la app (ver patient-dashboard.md, 2026-10-07). */}
-                    <span
-                      className={cn(
-                        'flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] leading-none font-medium',
-                        activa ? 'bg-info-bg text-dash-blue' : 'bg-dash-count-bg text-dash-blue-hover',
-                      )}
-                    >
-                      {items[label].length}
-                    </span>
+                    <Count active={activa}>{items[label].length}</Count>
                     <ChevronDown
                       className={cn(
                         'ml-auto size-4 shrink-0 transition-transform',
