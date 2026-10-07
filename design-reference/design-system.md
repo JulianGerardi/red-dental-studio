@@ -212,6 +212,10 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     `disabled` y `hint` (texto de ayuda).
   - **Pills** — `src/components/ui/pill.tsx`, con *Statuses in the app*: qué
     estado usa qué tono, leído del código, marcando los que usan dos tonos.
+  - **Counts** — `src/components/ui/count.tsx` (2026-10-07): el globo con una cuenta (alergias, medicación…), círculo
+    con un dígito y píldora con dos, 20 px de alto. No marca un estado —eso es `Pill`—. Prop `active` para el globo
+    sobre la card azul abierta. Lo usa el dashboard del paciente; los otros conteos redondos de la app
+    (`OperatoryCard`, la barra de Clinical Mode) siguen con su propia clase y se pueden migrar.
   - **Cards** — `src/components/ui/card.tsx` (Card, CardHeader, CardTitle,
     CardDescription, CardContent, CardFooter): qué es una card, Playground
     para armarla, anatomía y las cards reales de la app, incluida la de la

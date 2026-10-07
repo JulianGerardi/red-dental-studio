@@ -21,7 +21,7 @@ const preview: Preview = {
          elemento. Las páginas de Audit, que no tienen controles, lo ocultan. */
       showPanel: true,
       storySort: {
-        order: ['Welcome', 'Foundations', ['Overview', 'Colors', 'Typography', 'Radius and shadows'], 'Elements', ['Overview', 'Page header', 'Buttons', 'Fields', 'Tabs', 'Pills', 'Cards', 'Appointment cards', 'Tables', 'Navigation', 'Patient menu'], 'Components', ['Overview'], 'Pages', ['Overview'], 'Audit', ['Overview']],
+        order: ['Welcome', 'Foundations', ['Overview', 'Colors', 'Typography', 'Radius and shadows'], 'Elements', ['Overview', 'Page header', 'Buttons', 'Fields', 'Tabs', 'Pills', 'Counts', 'Cards', 'Appointment cards', 'Tables', 'Navigation', 'Patient menu'], 'Components', ['Overview'], 'Pages', ['Overview'], 'Audit', ['Overview']],
       },
     },
   },
