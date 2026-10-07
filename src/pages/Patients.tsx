@@ -14,7 +14,7 @@ import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/Ne
 import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
 import { formatDMY } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
-import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
+import { TURNOS_PATIENTS } from '@/components/dashboard/dashboard-data'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils'
    ResizeObserver -mismo patrón que `useAnchoVisible` en ledger- y se publica
    como variable CSS; cada panel es `flex-1` con scroll propio adentro de esa
    altura, así ninguno de los tres bloques queda más alto que los otros. */
-const CANTIDAD_TURNOS = 4
+const CANTIDAD_TURNOS = 10
 
 /* Globo con el total -no el filtrado ni el visible- al lado del título del
    panel, mismo color que el de notificaciones de la campana. */
@@ -113,7 +113,7 @@ export default function Patients() {
       start: inicio, end: HORAS[HORAS.indexOf(inicio) + 1] ?? '', status: 'Check-in',
     })
   }
-  const turnosHoyTodos = useMemo(() => datosDelDia(HOY_DEMO).appointments, [])
+  const turnosHoyTodos = TURNOS_PATIENTS
   const turnosFiltrados = useMemo(
     () => turnosHoyTodos.filter((a) => a.name.toLowerCase().includes(buscarTurno.toLowerCase())),
     [turnosHoyTodos, buscarTurno],

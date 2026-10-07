@@ -120,6 +120,16 @@ export const claveFecha = (d: Date) =>
 
 export const datosDelDia = (d: Date) => DIAS[claveFecha(d)] ?? DIA_VACIO
 
+/* Los 10 turnos del panel de Patients: los 6 del día + 4 más. Aparte de DIAS
+   porque la tira del Dashboard cuenta los del día (6 / 3 / 2 del Figma). */
+export const TURNOS_PATIENTS: Turno[] = [
+  ...DIAS['28-02-2026'].appointments,
+  turno('Sofia Chen', 'SC', 'Dr. Emily Chen', 'Operatory 2', '12:00'),
+  turno('Daniel Ortiz', 'DO', 'Dr. Salgado', 'Operatory 3', '13:30'),
+  turno('Lena Park', 'LP', 'Dr. Elena Martinez', 'Operatory 1', '14:30'),
+  turno('Thomas Davis', 'TD', 'Dr. Emily Chen', 'Operatory 2', '15:00'),
+]
+
 /* Días con datos, para los puntitos del calendario. */
 export const DIAS_CON_DATOS = Object.keys(DIAS).map((k) => {
   const [dd, mm, yyyy] = k.split('-').map(Number)
