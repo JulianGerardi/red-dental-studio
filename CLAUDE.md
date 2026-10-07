@@ -1,9 +1,9 @@
 # red-clone · Red Dental Studio
 
 Rediseño de la UI de Confidentally (clínicas dentales), guiado por Figma. React 19 + Vite + TypeScript + Tailwind v4 +
-shadcn/ui (Radix), con datos mock en `src/data/` (no hay backend). Lo pide y aprueba Julián, que escribe en castellano:
-respondé igual.
+shadcn/ui (Radix), con datos mock en `src/data/` (no hay backend). Lo pide y aprueba Julián.
 
+- **Respondé siempre en castellano**: mensajes, preguntas y resúmenes. Los textos de la app siguen en inglés.
 - **Carpeta del proyecto: siempre `~/Desktop/Claude/red-clone`.** No trabajar en otras copias
   (`~/Desktop/Claude/red-dental-studio`, ni el viejo `~/red-clone`).
 - App publicada: https://juliangerardi.github.io/red-dental-studio/
