@@ -4,6 +4,8 @@ Rediseño de la UI de Confidentally (clínicas dentales), guiado por Figma. Reac
 shadcn/ui (Radix), con datos mock en `src/data/` (no hay backend). Lo pide y aprueba Julián, que escribe en castellano:
 respondé igual.
 
+- **Carpeta del proyecto: siempre `~/Desktop/Claude/red-clone`.** No trabajar en otras copias
+  (`~/Desktop/Claude/red-dental-studio`, ni el viejo `~/red-clone`).
 - App publicada: https://juliangerardi.github.io/red-dental-studio/
 - Design system (Storybook, "Confidentally UI"): https://juliangerardi.github.io/red-dental-studio/storybook/
 - Repo: `JulianGerardi/red-dental-studio` (privado), rama `main`.
