@@ -1,9 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import {
   Search, Plus, Bold, Italic, Underline, Heading1, Heading2,
-  Pilcrow, List, ListOrdered, X, Eye, Power, PowerOff,
+  Pilcrow, List, ListOrdered, X, Eye, Power, PowerOff, ArrowLeft, Check,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Drawer } from '@/components/ui/drawer'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { cn } from '@/lib/utils'
 import { Pill } from '@/components/ui/pill'
@@ -16,10 +17,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Tabs } from '@/components/ui/tabs'
 
 /* Settings → Consents. Figma 4106:170620 ("New Consent Template"): lista de
-   templates a la izquierda, editor del texto en el medio, preview en vivo a
-   la derecha -las tres variantes del frame son el mismo estado con y sin el
-   error de validación, no pantallas distintas; layout replicado, contenido
-   simplificado donde hacía falta-.
+   templates a la izquierda y editor del texto -las tres variantes del frame son
+   el mismo estado con y sin el error de validación, no pantallas distintas-.
+   El preview, que en el Figma es una tercera columna, se abre en un drawer desde
+   el pie del editor (2026-10-07, ver consents.md).
 
    Opción 1 de las tres que planteó Julián para el flujo de consentimientos
    -la única con diseño de Figma-. Reusa piezas del sistema: Pill para los
@@ -381,9 +382,9 @@ function TextoConsentimientoUnico({ texto, onTexto }: { texto: string; onTexto: 
   )
 }
 
-/* El editor del medio. El título dice qué se hace (Edit Template con su estado, o New Consent Template); Activate o
-   Deactivate a la derecha; el aviso rojo arriba si se intentó guardar con faltantes; Cancel y Save fijos al pie. */
-export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlternar, onCancelar, onGuardar }: {
+/* El editor. El título dice qué se hace (Edit Template con su estado, o New Consent Template); Activate o Deactivate a
+   la derecha; el aviso rojo arriba si se intentó guardar con faltantes; Preview, Cancel y Save fijos al pie. */
+export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlternar, onCancelar, onGuardar, onPreview }: {
   actual?: ConsentTemplate
   borrador: Borrador
   onBorrador: (b: Borrador) => void
@@ -391,6 +392,7 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
   onAlternar: () => void
   onCancelar: () => void
   onGuardar: () => void
+  onPreview: () => void
 }) {
   const faltaTitulo = intentado && !borrador.titulo
   const faltaProcedimiento = intentado && borrador.procedimientos.length === 0
@@ -404,7 +406,7 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
             {actual?.sistema && <Pill tone="info" size="sm">System</Pill>}
           </div>
           <p className="mt-0.5 text-xs text-ink-muted">
-            {actual ? 'Changes show in the preview as you type. Save to keep them.' : 'Fill in the details and the text, then save to add it to the list.'}
+            {actual ? 'Preview shows the sheet with your changes. Save to keep them.' : 'Fill in the details and the text, then save to add it to the list.'}
           </p>
         </div>
         {actual && (
@@ -441,6 +443,7 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
       )}
 
       <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex justify-end gap-3 rounded-b-xl border-t border-line bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
+        <Button variant="secondary" className="mr-auto" onClick={onPreview}><Eye /> Preview</Button>
         <Button variant="secondary" className="px-6" onClick={onCancelar}>Cancel</Button>
         <Button className="px-6" onClick={onGuardar}>Save</Button>
       </div>
@@ -448,26 +451,39 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
   )
 }
 
-/* La columna del preview: el "escritorio" gris con la hoja que recibe el paciente (ConsentDocument). Patient View
-   saca lo que es sólo de la clínica (diagnóstico y hallazgos). */
-export function PanelPreview({ borrador, vistaPaciente, onVistaPaciente }: {
+/* El preview en un drawer, abierto desde el pie del editor: el "escritorio" gris con la hoja que recibe el paciente
+   (ConsentDocument). Patient View saca lo que es sólo de la clínica (diagnóstico y hallazgos). */
+export function DrawerPreview({ abierto, onCerrar, borrador, vistaPaciente, onVistaPaciente, onGuardar }: {
+  abierto: boolean
+  onCerrar: () => void
   borrador: Borrador
   vistaPaciente: boolean
   onVistaPaciente: (v: boolean) => void
+  onGuardar: () => void
 }) {
   return (
-    <section aria-label="Preview" className="self-start rounded-xl border border-line bg-surface-muted p-3 @3xl:col-start-2 @5xl:sticky @5xl:top-4 @5xl:col-start-3 @5xl:max-h-[calc(100vh-2rem)] @5xl:overflow-y-auto">
-      <div className="flex items-center justify-between gap-2 px-1">
-        <div>
-          <h2 className="text-sm font-bold text-ink">Preview</h2>
-          <p className="text-[11px] text-ink-muted">What the patient receives</p>
-        </div>
+    <Drawer
+      open={abierto}
+      onClose={onCerrar}
+      title="Preview"
+      description="What the patient receives"
+      size="lg"
+      className="bg-surface-muted"
+      footer={(
+        <>
+          <Button variant="secondary" onClick={onCerrar}><ArrowLeft /> Back to editor</Button>
+          <Button onClick={onGuardar}><Check /> Save</Button>
+        </>
+      )}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[11px] text-ink-muted">{vistaPaciente ? 'Without the clinic-only sections.' : 'With diagnosis and clinical findings.'}</p>
         <button
           type="button"
           onClick={() => onVistaPaciente(!vistaPaciente)}
           aria-pressed={vistaPaciente}
           className={cn(
-            'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
+            'flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
             vistaPaciente ? 'border-dash-blue bg-dash-blue text-white' : 'border-line bg-white text-ink-slate hover:text-ink-soft',
           )}
         >
@@ -484,7 +500,7 @@ export function PanelPreview({ borrador, vistaPaciente, onVistaPaciente }: {
           vistaPaciente={vistaPaciente}
         />
       </div>
-    </section>
+    </Drawer>
   )
 }
 
@@ -502,6 +518,7 @@ export function SettingsConsents() {
   const [borrador, setBorrador] = useState<Borrador>(EDITOR_UNICO ? BORRADOR_VACIO : aBorrador(TEMPLATES_INICIALES[0]))
   const [intentado, setIntentado] = useState(false)
   const [vistaPaciente, setVistaPaciente] = useState(false)
+  const [preview, setPreview] = useState(false)
 
   const visibles = templates.filter(
     (t) => (coincideFiltro(t, filtro) || fijados.includes(t.id)) && t.titulo.toLowerCase().includes(q.trim().toLowerCase()),
@@ -554,8 +571,8 @@ export function SettingsConsents() {
     <div className="@container px-4 py-6 sm:px-8">
       <SettingsPageHeader titulo="Consent Templates" bajada="Create a standard consent document and assign it to one or more procedures." />
 
-      {/* La lista es de 280-288px: con 240/260 la cuarta pestaña ("All") no entraba y quedaba cortada. */}
-      <div className="mt-4 grid grid-cols-1 gap-4 @3xl:grid-cols-[280px_minmax(0,1fr)] @5xl:grid-cols-[288px_minmax(0,1fr)_minmax(0,1.15fr)]">
+      {/* La lista es de 288px: con 240/260 la cuarta pestaña ("All") no entraba y quedaba cortada. */}
+      <div className="mt-4 grid grid-cols-1 gap-4 @3xl:grid-cols-[288px_minmax(0,1fr)]">
         <ListaTemplates
           templates={visibles}
           elegidoId={actualId}
@@ -575,9 +592,18 @@ export function SettingsConsents() {
           onAlternar={() => actual && alternarActivo(actual.id)}
           onCancelar={cancelar}
           onGuardar={guardar}
+          onPreview={() => setPreview(true)}
         />
-        <PanelPreview borrador={borrador} vistaPaciente={vistaPaciente} onVistaPaciente={setVistaPaciente} />
       </div>
+      {/* Guardar desde el preview lo cierra: si falta algo, los errores quedan a la vista en el editor. */}
+      <DrawerPreview
+        abierto={preview}
+        onCerrar={() => setPreview(false)}
+        borrador={borrador}
+        vistaPaciente={vistaPaciente}
+        onVistaPaciente={setVistaPaciente}
+        onGuardar={() => { setPreview(false); guardar() }}
+      />
     </div>
   )
 }

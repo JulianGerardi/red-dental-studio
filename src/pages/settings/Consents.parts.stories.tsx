@@ -1,8 +1,10 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Eye } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Bloque, Forzar, Lienzo, Tabla, Token, medidasDe, type Medidas } from '@/design-system/kit'
 import {
-  BORRADOR_VACIO, EditorTemplate, ListaTemplates, PanelPreview, SelectorProcedimientos, TEMPLATES_INICIALES, TarjetaTemplate,
+  BORRADOR_VACIO, DrawerPreview, EditorTemplate, ListaTemplates, SelectorProcedimientos, TEMPLATES_INICIALES, TarjetaTemplate,
   TextoConsentimiento, ToolbarFormato, aBorrador, type Borrador, type ConsentTemplate, type Filtro,
 } from './Consents'
 
@@ -14,6 +16,7 @@ type Args = {
   active: boolean
   filter: Filtro
   validationErrors: boolean
+  previewOpen: boolean
   patientView: boolean
 }
 
@@ -25,21 +28,22 @@ const meta = {
       decisionsFrom: 'pages/settings/Consents.tsx',
       description: {
         component: [
-          'Los consentimientos que firma el paciente (`@/pages/settings/Consents`): a la izquierda los templates, en el medio el editor y a la derecha la hoja tal como la recibe el paciente. La pantalla completa está en *Pages*.',
+          'Los consentimientos que firma el paciente (`@/pages/settings/Consents`): a la izquierda los templates y al lado el editor. La hoja tal como la recibe el paciente se abre en un drawer desde *Preview*, en el pie del editor. La pantalla completa está en *Pages*.',
           '',
-          '**Cómo se usa:** se elige un template (o *New template*), se le pone título, uno o más procedimientos y el texto; el preview cambia mientras se escribe y *Save* lo guarda. El interruptor de cada tarjeta lo activa o desactiva sin abrirlo. *System* dice que viene con el producto; es independiente de activo.',
+          '**Cómo se usa:** se elige un template (o *New template*), se le pone título, uno o más procedimientos y el texto; *Preview* muestra la hoja con lo escrito hasta ahí y *Save* lo guarda, desde el editor o desde el preview. El interruptor de cada tarjeta lo activa o desactiva sin abrirlo. *System* dice que viene con el producto; es independiente de activo.',
           '',
-          '**Probalo:** en *Playground* elegí template, filtro, errores de validación y *Patient View* desde *Controls*; abajo está cada parte en cada estado, y todo se puede usar.',
+          '**Probalo:** en *Playground* elegí template, filtro, errores de validación, el preview abierto y *Patient View* desde *Controls*; abajo está cada parte en cada estado, y todo se puede usar.',
         ].join('\n'),
       },
     },
   },
-  args: { template: 'Extraction Informed Consent', active: true, filter: 'Active', validationErrors: false, patientView: false },
+  args: { template: 'Extraction Informed Consent', active: true, filter: 'Active', validationErrors: false, previewOpen: false, patientView: false },
   argTypes: {
     template: { control: 'select', options: ['Extraction Informed Consent', 'Root Canal Consent', 'Root Canal Consent – Molar', 'New template'], description: 'El template abierto en el editor, o uno nuevo.' },
     active: { control: 'boolean', description: 'Activo o inactivo: el interruptor de la tarjeta y el botón Activate / Deactivate del editor.' },
     filter: { control: 'inline-radio', options: ['Active', 'Inactive', 'System', 'All'], description: 'Las pestañas de la lista.' },
     validationErrors: { control: 'boolean', description: 'Como después de tocar Save con faltantes. Se ve con un template nuevo.' },
+    previewOpen: { control: 'boolean', description: 'El drawer del preview abierto, como después de tocar Preview.', table: { category: 'Preview' } },
     patientView: { control: 'boolean', description: 'La hoja sin lo que es sólo de la clínica (diagnóstico y hallazgos).', table: { category: 'Preview' } },
   },
 } satisfies Meta<Args>
@@ -69,7 +73,7 @@ function Ejemplo({ titulo, nota, ancho, children }: { titulo: string; nota: stri
   )
 }
 
-/* La pantalla sin su encabezado: lista, editor y preview, con el estado propio de cada uno. */
+/* La pantalla sin su encabezado: lista y editor, con el drawer del preview, y el estado propio de cada uno. */
 function Consentimientos({ args }: { args: Args }) {
   const inicial = TEMPLATES_INICIALES.map((t) => (t.titulo === args.template ? { ...t, activo: args.active } : t))
   const [templates, setTemplates] = useState(inicial)
@@ -80,10 +84,11 @@ function Consentimientos({ args }: { args: Args }) {
   const [borrador, setBorrador] = useState<Borrador>(actual ? aBorrador(actual) : BORRADOR_VACIO)
   const [intentado, setIntentado] = useState(args.validationErrors)
   const [vista, setVista] = useState(args.patientView)
+  const [preview, setPreview] = useState(args.previewOpen)
   const alternar = (id: string) => setTemplates((ts) => ts.map((t) => (t.id === id ? { ...t, activo: !t.activo } : t)))
   return (
     <div className="overflow-x-auto">
-      <div className="grid min-w-[1080px] grid-cols-[288px_minmax(0,1fr)_minmax(0,1.15fr)] gap-4">
+      <div className="grid min-w-[880px] grid-cols-[288px_minmax(0,1fr)] gap-4">
         <ListaTemplates
           templates={templates.filter((t) => coincide(t, filtro) && t.titulo.toLowerCase().includes(q.toLowerCase()))}
           elegidoId={elegido} q={q} onQ={setQ} filtro={filtro} onFiltro={setFiltro}
@@ -91,15 +96,16 @@ function Consentimientos({ args }: { args: Args }) {
           onAlternar={alternar}
           onNuevo={() => { setElegido(null); setBorrador(BORRADOR_VACIO); setIntentado(false) }}
         />
-        <EditorTemplate actual={actual} borrador={borrador} onBorrador={setBorrador} intentado={intentado} onAlternar={() => actual && alternar(actual.id)} onCancelar={() => setIntentado(false)} onGuardar={() => setIntentado(true)} />
-        <PanelPreview borrador={borrador} vistaPaciente={vista} onVistaPaciente={setVista} />
+        <EditorTemplate actual={actual} borrador={borrador} onBorrador={setBorrador} intentado={intentado} onAlternar={() => actual && alternar(actual.id)} onCancelar={() => setIntentado(false)} onGuardar={() => setIntentado(true)} onPreview={() => setPreview(true)} />
       </div>
+      <DrawerPreview abierto={preview} onCerrar={() => setPreview(false)} borrador={borrador} vistaPaciente={vista} onVistaPaciente={setVista} onGuardar={() => { setPreview(false); setIntentado(true) }} />
     </div>
   )
 }
 
-/* Cambiá todo desde Controls. */
+/* Cambiá todo desde Controls. En su propio iframe, para que el drawer del preview se abra adentro. */
 export const Playground: Story = {
+  parameters: { docs: { story: { inline: false, iframeHeight: 820 } } },
   render: (a) => <Fondo><Consentimientos key={JSON.stringify(a)} args={a} /></Fondo>,
 }
 
@@ -196,12 +202,19 @@ export const ConsentTextEmpty: Story = {
 function Editor({ actual, intentado }: { actual?: ConsentTemplate; intentado?: boolean }) {
   const [b, setB] = useState(actual ? aBorrador(actual) : BORRADOR_VACIO)
   const [probado, setProbado] = useState(!!intentado)
-  return <EditorTemplate actual={actual} borrador={b} onBorrador={setB} intentado={probado} onAlternar={nada} onCancelar={() => setProbado(false)} onGuardar={() => setProbado(true)} />
+  const [preview, setPreview] = useState(false)
+  const [vista, setVista] = useState(false)
+  return (
+    <>
+      <EditorTemplate actual={actual} borrador={b} onBorrador={setB} intentado={probado} onAlternar={nada} onCancelar={() => setProbado(false)} onGuardar={() => setProbado(true)} onPreview={() => setPreview(true)} />
+      <DrawerPreview abierto={preview} onCerrar={() => setPreview(false)} borrador={b} vistaPaciente={vista} onVistaPaciente={setVista} onGuardar={() => { setPreview(false); setProbado(true) }} />
+    </>
+  )
 }
 
 export const EditorEditing: Story = {
   parameters: sinControles,
-  render: () => <Ejemplo titulo="Editing" nota="Edit Template con su estado y Deactivate template. Cancel y Save fijos al pie." ancho={560}><Editor actual={extraccion} /></Ejemplo>,
+  render: () => <Ejemplo titulo="Editing" nota="Edit Template con su estado y Deactivate template. Preview, Cancel y Save fijos al pie." ancho={560}><Editor actual={extraccion} /></Ejemplo>,
 }
 export const EditorNew: Story = {
   parameters: sinControles,
@@ -214,18 +227,27 @@ export const EditorValidationErrors: Story = {
 
 /* ── Preview ───────────────────────────────────────────────────────── */
 
+/* El drawer abierto sobre la página; Preview lo vuelve a abrir. */
 function Preview({ paciente }: { paciente?: boolean }) {
+  const [abierto, setAbierto] = useState(true)
   const [v, setV] = useState(!!paciente)
-  return <PanelPreview borrador={aBorrador(extraccion)} vistaPaciente={v} onVistaPaciente={setV} />
+  return (
+    <>
+      <Button variant="secondary" className="self-start" onClick={() => setAbierto(true)}><Eye /> Preview</Button>
+      <DrawerPreview abierto={abierto} onCerrar={() => setAbierto(false)} borrador={aBorrador(extraccion)} vistaPaciente={v} onVistaPaciente={setV} onGuardar={() => setAbierto(false)} />
+    </>
+  )
 }
 
+const enIframe = { layout: 'fullscreen', controls: { disable: true }, docs: { story: { inline: false, iframeHeight: 760 } } }
+
 export const PreviewClinicView: Story = {
-  parameters: sinControles,
-  render: () => <Ejemplo titulo="Clinic view" nota="La hoja sobre el escritorio gris, con diagnóstico y hallazgos clínicos." ancho={560}><Preview /></Ejemplo>,
+  parameters: enIframe,
+  render: () => <Ejemplo titulo="Clinic view" nota="Se abre desde Preview, en el pie del editor: drawer lg sobre el escritorio gris, con diagnóstico y hallazgos clínicos. Back to editor lo cierra; Save guarda y lo cierra." ancho={320}><Preview /></Ejemplo>,
 }
 export const PreviewPatientView: Story = {
-  parameters: sinControles,
-  render: () => <Ejemplo titulo="Patient view" nota="Lo que ve el paciente: sin lo que es sólo de la clínica." ancho={560}><Preview paciente /></Ejemplo>,
+  parameters: enIframe,
+  render: () => <Ejemplo titulo="Patient view" nota="Lo que ve el paciente: sin lo que es sólo de la clínica." ancho={320}><Preview paciente /></Ejemplo>,
 }
 
 /* ── Formatting toolbar ────────────────────────────────────────────── */
@@ -244,8 +266,8 @@ const MEDIDAS: [string, string][] = [
   ['Filter tabs', '[aria-label="Filter templates"]'],
   ['Editor', 'section[aria-label="Template editor"]'],
   ['Procedure chip', 'section[aria-label="Template editor"] .rounded-full.bg-info-bg'],
+  ['Preview button', 'section[aria-label="Template editor"] .sticky button:first-child'],
   ['Save', 'section[aria-label="Template editor"] .sticky button:last-child'],
-  ['Preview', 'section[aria-label="Preview"]'],
 ]
 
 function Medir() {
@@ -286,14 +308,15 @@ function Medir() {
             <tr><td className="font-semibold">Procedure chip</td><td><Token nombre="info-bg" /> · text <Token nombre="dash-blue" /></td></tr>
             <tr><td className="font-semibold">Validation notice</td><td><Token nombre="dash-bad-bg" /> · text <Token nombre="dash-bad-fg" /></td></tr>
             <tr><td className="font-semibold">Field error</td><td><Token nombre="field-error" /></td></tr>
-            <tr><td className="font-semibold">Preview desk</td><td><Token nombre="surface-muted" /></td></tr>
+            <tr><td className="font-semibold">Preview drawer</td><td><Token nombre="surface-muted" /> · sheet <Token nombre="white" /></td></tr>
           </Tabla>
         </Bloque>
         <Bloque titulo="Shared rules">
           <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
-            <li>Columns: list 288px · editor 1fr · preview 1.15fr, by the width of the content (@container), not the window.</li>
+            <li>Columns: list 288px · editor 1fr, by the width of the content (@container), not the window.</li>
             <li>Title and at least one procedure are required; Save shows the notice and each field’s error.</li>
-            <li>Cancel and Save stay fixed at the bottom of the editor; the preview stays visible while you scroll.</li>
+            <li>Preview, Cancel and Save stay fixed at the bottom of the editor. Preview opens the sheet in a drawer (lg · 560px) with what is written so far.</li>
+            <li>Save in the preview closes it and saves; if something is missing, the errors show in the editor.</li>
             <li>Activating or deactivating a template keeps its card in the list until the filter or search changes.</li>
           </ul>
         </Bloque>
