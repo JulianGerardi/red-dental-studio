@@ -1,7 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,t as r}from"./calendar-days-aAv0FTpR.js";import{a as i,i as a,n as o,o as s,t as c}from"./TreatmentPlanList-DucbLyQ_.js";import{l,y as u}from"./clinical-mode-B54OdYK5.js";var d,f,p,m,h;function g(){return(g=e((()=>{n(),s(),u(),a(),d=t(),f={title:`Components/Clinical/TreatmentPlanList parts`,parameters:{layout:`padded`}},p={render:()=>(0,d.jsxs)(`div`,{className:`grid w-[300px] grid-cols-2 gap-1.5`,children:[(0,d.jsx)(c,{label:`Total amount`,valor:`$231.12`,icono:i}),(0,d.jsx)(c,{label:`Created on`,valor:`27/08/2026`,icono:r})]})},m={render:()=>(0,d.jsx)(`div`,{className:`grid max-w-[960px] gap-3 md:grid-cols-2 lg:grid-cols-3`,children:l.slice(0,6).map(e=>(0,d.jsx)(o,{p:e},e.id))})},h=[`DataBox`,`PlanCardVariants`],p.parameters={...p.parameters,docs:{...p.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="grid w-[300px] grid-cols-2 gap-1.5"><Dato label="Total amount" valor="$231.12" icono={CircleDollarSign} /><Dato label="Created on" valor="27/08/2026" icono={CalendarDays} /></div>
-}`,...p.parameters?.docs?.source}}},m.parameters={...m.parameters,docs:{...m.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="grid max-w-[960px] gap-3 md:grid-cols-2 lg:grid-cols-3">
-      {PLANES.slice(0, 6).map(p => <PlanCard key={p.id} p={p} />)}
-    </div>
-}`,...m.parameters?.docs?.source}}}})))()}g();export{p as DataBox,m as PlanCardVariants,h as __namedExportsOrder,f as default};
