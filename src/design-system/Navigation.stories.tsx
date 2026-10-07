@@ -7,9 +7,7 @@ import { HelpProvider } from '@/components/help/HelpProvider'
 import { Bloque, Forzar, Tabla, Token, medidasDe, type Medidas as MedidasDe } from './kit'
 import { PantallaReal } from './pantalla'
 
-/* El menú lateral (rail): el Playground lo monta sobre la app entera, con la
-   barra de arriba y la pantalla de la ruta elegida; Parts, States y Specs lo
-   muestran solo, con su propio router. */
+/* Playground sobre la app entera; Parts, States y Specs con el rail solo (design-system.md). */
 
 const RUTAS = {
   Dashboard: '/',
@@ -91,9 +89,7 @@ export const Playground: Story = {
   },
 }
 
-/* El rail solo, con su router y estados fijos sólo para esta instancia. El alto
-   va fijo (en la app es el de la ventana) y sin z-40, que en la app lo sube
-   sobre el contenido y acá lo pondría encima de la barra del sitio. */
+/* Rail solo: alto fijo y sin el z-40 de la app, que lo pondría sobre la barra del sitio (design-system.md). */
 function Rail({ ruta = '/', expanded = true, preview = {}, alto = 640 }: { ruta?: string; expanded?: boolean; preview?: NavigationPreviewState; alto?: number }) {
   return (
     <MemoryRouter initialEntries={[ruta]}>
