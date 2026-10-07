@@ -44,10 +44,12 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
    Storybook, si cambió el design system) andando: la pantalla exacta que cambió, por ejemplo
    `http://localhost:5182/patients/1/relationships`, y la página del DS, por ejemplo
    `http://localhost:6006/?path=/docs/elements-cards--docs`. Localmente las rutas van sin `#`.
-5. **No hacer push sin su ok** ("subilo"). Su "subilo" ya incluye el merge a `main` (si hay rama de sesión: push, PR y
-   merge, sin volver a preguntar). Subir a `main` publica app y Storybook juntos.
-6. Después del push: `gh run list` hasta que termine el deploy y confirmar en el bundle publicado. Pages cachea hasta
-   ~10 min; para probar, agregá `?cb=<n>`.
+5. **No hacer push sin su ok.** Su "subilo" es la única validación y significa **publicar en todos lados**: la app en
+   vivo y el design system. Con esa palabra se hace todo de corrido, sin volver a preguntar en ningún paso (nada de
+   "¿commiteo?", "¿abro el PR?", "¿mergeo?"): commit, push y, si hay rama de sesión, PR y merge a `main`. El merge a
+   `main` dispara el deploy de la app y del Storybook juntos.
+6. Después del merge: `gh run list` hasta que termine el deploy, confirmar el cambio en la app publicada y en el
+   Storybook publicado, y pasarle los dos links. Pages cachea hasta ~10 min; para probar, agregá `?cb=<n>`.
 
 ## Reglas de UI
 
