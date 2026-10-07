@@ -42,7 +42,8 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
    Storybook, si cambió el design system) andando: la pantalla exacta que cambió, por ejemplo
    `http://localhost:5182/patients/1/relationships`, y la página del DS, por ejemplo
    `http://localhost:6006/?path=/docs/elements-cards--docs`. Localmente las rutas van sin `#`.
-5. **No hacer push sin su ok** ("subilo"). Subir a `main` publica app y Storybook juntos.
+5. **No hacer push sin su ok** ("subilo"). Su "subilo" ya incluye el merge a `main` (si hay rama de sesión: push, PR y
+   merge, sin volver a preguntar). Subir a `main` publica app y Storybook juntos.
 6. Después del push: `gh run list` hasta que termine el deploy y confirmar en el bundle publicado. Pages cachea hasta
    ~10 min; para probar, agregá `?cb=<n>`.
 
