@@ -97,7 +97,7 @@ export function Sidebar({
              menú flotante de Settings, que se sale del ancho del rail. */
           'flex h-svh flex-col bg-surface-subtle transition-[width,transform] duration-200',
           'max-md:overflow-y-auto md:overflow-visible',
-          /* Mobile: panel fijo que entra desde la izquierda. */
+          /* Mobile: panel fijo que entra desde la izquierda. Sigue en 234: tapa el contenido en vez de correrlo. */
           'fixed top-0 left-0 z-50 w-[234px]',
           expanded ? 'translate-x-0' : '-translate-x-full',
           /* Desde md vuelve a ser una columna del layout. El z-index explicito
