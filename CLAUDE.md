@@ -34,8 +34,8 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
 ## Cómo se trabaja una tanda
 
 1. Implementar y mirarlo en el dev server (Browser pane o Playwright en el scratchpad si el pane está oculto).
-2. Documentar **en la misma tanda**, sin que lo pida: story del componente y sección con fecha en el `.md` del módulo y
-   en `design-system.md`.
+2. Documentar **todo en Storybook en la misma tanda**, sin que lo pida, con la regla de la sección *Design system*;
+   además, sección con fecha en el `.md` del módulo y en `design-system.md`.
 3. Checks: `tsc -b`, `ds:check`, `vite build`, e2e. Si un cambio rompe un e2e, se arregla el test o el código, no se
    saltea.
 4. Pasarle a Julián **los links de localhost** para que vea los cambios antes de publicar, con el dev server (y
@@ -65,6 +65,9 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
 
 ## Design system
 
+- **Todo se documenta en Storybook antes de subir.** Cada componente, pantalla, estado, variante o regla nueva o
+  cambiada en la tanda tiene su página con la estructura de abajo; sin eso no se pide aprobación ni se sube. `ds:check`
+  en verde no alcanza: no exige Parts, States ni Specs.
 - Todo componente lleva su `.stories.tsx` al lado; toda ruta nueva va en `src/design-system/Pages.stories.tsx`.
 - `ds:check` falla si una función de React con mayúscula no está importada por ninguna story (o en
   `src/design-system/exentos.json`), si falta un estado soportado o si aparece un hex con token.
