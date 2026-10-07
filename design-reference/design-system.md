@@ -166,10 +166,12 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     filtro. *Headers in the app* detecta en el código qué encabezado usa cada
     pantalla y marca los que se apartan (hoy conviven varios tamaños de título:
     PageTitle 20px Semibold, h1 sueltos de 20, 24 y 36px).
-  - **Navigation** — el menú lateral (`Sidebar` en `AppShell`) sobre la app
-    real: colapsado 58px con tooltip, expandido 176px (234 en el celular), ítem activo según la
-    pantalla, menú flotante de Settings, celular. El Playground elige la
-    pantalla y cómo arranca el menú.
+  - **Navigation** — el menú lateral (`Sidebar` en `AppShell`): colapsado
+    58px con tooltip, expandido 176px (234 en el celular). Playground sobre la
+    app real (pantalla, cómo arranca y *open* para dejar abierto el tooltip o un
+    menú flotante); *Parts*, *States* (expandido y colapsado, hover, menús de
+    Billing y Settings, tooltip) y *Specs* (medidas leídas de los dos rails y
+    colores) con el rail solo.
   - **Patient menu** — `PatientSidePanel` solo, sin la pantalla (las
     pantallas del paciente están en *Pages*). Tiene su propio router: tocar una
     sección cambia el ítem activo, y un recuadro punteado marca dónde va la
@@ -187,11 +189,13 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     `CalendarViews.tsx`). *Which card goes where*, estados de cada una, los
     siete estados del calendario en sus tres formas y *Specs*. Tocarlas abre lo
     mismo que en la app (ficha rápida, detalle del turno, modal de edición).
-  - **Navigation** monta la app con `PantallaReal`
-    (`src/design-system/pantalla.tsx`, lo mismo que usa *Pages*). Lo que en la
+  - El Playground de **Navigation** monta la app con `PantallaReal`
+    (`src/design-system/pantalla.tsx`, lo mismo que usa *Pages*); *Parts*,
+    *States* y *Specs* montan sólo el `Sidebar` con su router (`Rail`, alto fijo
+    y sin el z-40, que lo ponía encima de la barra del sitio). Lo que en la
     app se abre con el mouse se deja a la vista con dos contextos que la app no
     usa: `NavigationPreview` (`components/layout/navigation-preview.ts`:
-    expanded, tooltip, settingsMenu) y `PatientMenuPreview`
+    expanded, tooltip, settingsMenu, billingMenu) y `PatientMenuPreview`
     (`components/patients/patient-menu-preview.ts`: collapsed y encounter por
     instancia, tooltip, infoCard, encounterOptions). Abrirlos con una función
     `play` no alcanza: al terminar, la historia se vuelve a dibujar. Para
@@ -497,7 +501,12 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 
 - El rail expandido pasa de 234 a **176px** en escritorio (colapsado sigue en 58; en el celular el panel sigue en 234,
   porque tapa el contenido y no le quita lugar). El ítem de Settings ya no se sale 12px del rail.
-- *Elements / Navigation*: descripción con las medidas nuevas; *Expanded*, *Active item*, *Settings menu* y *Billing
-  menu* ya se dibujan a 176 porque montan el `Sidebar` real. *Components / Layout / Sidebar parts*: las muestras de
-  Settings y Billing van en 176. Decisiones en `figma/modulos/header-sidebar.md` (2026-10-07).
+- *Elements / Navigation* pasa a la estructura de *Elements / Buttons* (antes era una lista suelta de historias):
+  **Playground** sobre la app real con *screen*, *expanded* y *open* (tooltip, menú de Billing o de Settings);
+  **Parts** (logo, ítems, Billing, Confibot, Settings, toggle, y qué hace cada uno colapsado); **States** (expandido:
+  default, hover, menú de Billing, menú de Settings; colapsado: default, tooltip, menú de Settings) y **Specs** (rail
+  176/58 × su alto, logo 64, ítem 152×36 y 32×32, Settings, separaciones y colores con token). El celular queda en
+  *Guidelines › On each device*. No hay muestra de foco: los ítems usan el anillo del navegador y no se puede forzar.
+- *Components / Layout / Sidebar parts*: las muestras de Settings y Billing van en 176. Decisiones en
+  `figma/modulos/header-sidebar.md` (2026-10-07).
 

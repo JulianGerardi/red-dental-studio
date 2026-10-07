@@ -156,7 +156,7 @@ Treatments, sigue en 60px.
 Como Settings: al pasar el mouse por Billing (o con su flecha, expandido o en el celular) se abre al costado un menú
 con **Billing**, **Fee Schedules**, **Carriers** y **Coverage Table** (las tablas de Settings → Billing). Billing queda
 activo en `/billing` y en esas tres; Settings deja de marcarse ahí. `BillingItem` en `Sidebar.tsx`, con la lógica de
-abrir y cerrar compartida (`useFlotante`). Design system: *Elements / Navigation → Billing menu*.
+abrir y cerrar compartida (`useFlotante`). Design system: *Elements / Navigation → States → Billing menu*.
 
 ## Menú expandido más angosto: 234 → 176px (2026-10-07)
 
@@ -174,3 +174,10 @@ rail más el margen y se pasaba por la derecha (se ve en la captura de Julián, 
 
 Verificado con Playwright en `/settings/consents` a 1500px: rail de 176, ningún ítem desborda, desborde horizontal 0,
 y los flotantes de Billing y Settings siguen saliendo al costado.
+
+**Navigation en Storybook, completa** (misma fecha). Con la regla nueva de documentar todo antes de subir, la página
+*Elements / Navigation* deja de ser una lista de historias y pasa a Playground (con *open* para tooltip y menús),
+Parts, States y Specs. Specs lee del rail dibujado: 176 y 58 de ancho, logo de 64, ítem expandido 152×36 con 12px de
+padding, colapsado 32×32. No lleva estado de foco: los ítems no tienen anillo propio (usan el del navegador) y el addon
+de pseudo-estados sólo fuerza reglas de CSS, así que la muestra salía igual al default.
+
