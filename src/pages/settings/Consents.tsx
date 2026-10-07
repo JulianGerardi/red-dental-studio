@@ -442,10 +442,13 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
         />
       )}
 
-      <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex justify-end gap-3 rounded-b-xl border-t border-line bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
+      {/* En angosto Cancel y Save bajan juntos a otra línea y Preview queda arriba. Ver consents.md (2026-10-07). */}
+      <div className="sticky bottom-0 z-10 -mx-4 -mb-4 flex flex-wrap items-center justify-end gap-3 rounded-b-xl border-t border-line bg-white px-4 py-3 sm:-mx-5 sm:-mb-5 sm:px-5">
         <Button variant="secondary" className="mr-auto" onClick={onPreview}><Eye /> Preview</Button>
-        <Button variant="secondary" className="px-6" onClick={onCancelar}>Cancel</Button>
-        <Button className="px-6" onClick={onGuardar}>Save</Button>
+        <div className="flex gap-3">
+          <Button variant="secondary" className="px-6" onClick={onCancelar}>Cancel</Button>
+          <Button className="px-6" onClick={onGuardar}>Save</Button>
+        </div>
       </div>
     </section>
   )
