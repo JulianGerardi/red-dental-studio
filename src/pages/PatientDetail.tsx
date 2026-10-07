@@ -115,10 +115,11 @@ export default function PatientDetail() {
                     <span className={cn('truncate text-[13px] font-semibold', activa ? 'text-white' : 'text-ink')}>
                       {label}
                     </span>
+                    {/* Globo redondo como los demás conteos de la app (ver patient-dashboard.md, 2026-10-07). */}
                     <span
                       className={cn(
-                        'flex size-5 shrink-0 items-center justify-center rounded text-[11px] font-medium',
-                        activa ? 'text-dash-blue bg-[#eff6ff]' : 'bg-dash-count-bg text-dash-blue-hover',
+                        'flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] leading-none font-medium',
+                        activa ? 'bg-info-bg text-dash-blue' : 'bg-dash-count-bg text-dash-blue-hover',
                       )}
                     >
                       {items[label].length}
