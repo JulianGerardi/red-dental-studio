@@ -206,3 +206,12 @@ Dashboard. `TARJETA_PANEL` (lib/estilos: blanca, `shadow-panel`, sin borde) en e
 clínicos, Pending documents, Pending Task y Appointments, y en Treatments, Insurance, Relationships y Edit Patient. Las
 cards de adentro siguen con `InnerCard` (borde fino y sombra suave). Las tablas (Insurance, Ledger, Documents) son la
 tabla del design system y mantienen su borde.
+
+## Contadores de las cards clínicas: globo redondo (2026-10-07)
+
+Julián: el número de Allergies, Medical Conditions, Medication y Past Surgery estaba desalineado del resto de la app.
+Era un cuadrado de 20 px con `rounded` (4 px) y en el resto los conteos son redondos (`rounded-full`: "Patients today"
+del Dashboard, los contadores de la barra de Clinical Mode). Ahora es `h-5 min-w-5 rounded-full px-1.5`: círculo con un
+dígito, píldora si el conteo pasa a dos. Mismos colores (`bg-dash-count-bg`, `text-dash-blue-hover`); activa, el fondo
+pasó del hex suelto `#eff6ff` al token `bg-info-bg` (`#f0f5ff`, imperceptible). Verificado: 4 globos de 20×20 con el
+centro vertical igual al del título.
