@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
+import { AppointmentCard, AppointmentCardCompacta, type Appointment } from '@/components/dashboard/AppointmentCard'
+import { TURNOS_PATIENTS } from '@/components/dashboard/dashboard-data'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
 import { NewAppointmentModal } from '@/components/scheduling/NewAppointmentModal'
 import { PatientAppointmentCard, type PatientAppointmentStatus } from '@/components/patients/PatientAppointmentCard'
@@ -133,7 +134,18 @@ function Demo(a: Args) {
       </div>
     )
   if (a.card === 'Patients list')
-    return <div style={{ width: ancho, maxWidth: '100%' }}><AppointmentCard appt={appt} compact /></div>
+    return (
+      <div style={{ width: ancho, maxWidth: '100%' }}>
+        <AppointmentCard appt={appt} compact onEdit={() => setEditando(true)} />
+        {editando && (
+          <NewAppointmentModal
+            titulo="Edit Appointment"
+            inicial={{ patient: a.name, primary: a.provider, operatory: a.operatory, reason: a.reason, status: 'Check-in', date: formatDMY(new Date()), ...franjaDe(a.time) }}
+            onClose={() => setEditando(false)}
+          />
+        )}
+      </div>
+    )
   if (a.card === 'Patient overview')
     return (
       <div style={{ width: ancho, maxWidth: '100%' }}>
@@ -256,6 +268,34 @@ export const DashboardStates: Story = {
       </Fila>
       <Fila estado="Long name" nota="El nombre se recorta: los chips no bajan de renglón.">
         <div className="w-[340px]"><AppointmentCard appt={{ ...NOAH, name: 'Maria Abril Viola Fernández de la Torre', initials: 'MA' }} onSelect={nada} onEdit={nada} /></div>
+      </Fila>
+    </Tabla>
+  ),
+}
+
+const KEBAB = 'button[aria-label^="Actions for"]'
+
+export const PatientsListStates: Story = {
+  name: 'Patients list card: states',
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <Tabla encabezado={['State', 'Sample', 'What it means']} minimo={760}>
+      <Fila estado="Default" nota="Un turno del día: quién, a qué hora y con quién. La card no se toca; se actúa desde el kebab.">
+        <div className="w-[300px]"><AppointmentCardCompacta appt={NOAH} onEdit={nada} /></div>
+      </Fila>
+      <Fila estado="Kebab hover" nota="El kebab de las tablas (RowActionsMenu): fondo gris al pasar el mouse.">
+        <Forzar selector={KEBAB} estado="hover" className="w-[300px]"><AppointmentCardCompacta appt={NOAH} onEdit={nada} /></Forzar>
+      </Fila>
+      <Fila estado="Menu open" nota="Con Tab se llega al kebab y Enter lo abre. Edit abre el modal Edit Appointment con los datos de la card (guardar avisa y cierra: los turnos del día no cambian acá). Go to appointment lleva a Scheduling.">
+        <div className="h-28 w-[300px]"><AppointmentCardCompacta appt={NOAH} onEdit={nada} menuAbierto /></div>
+      </Fila>
+      <Fila estado="Long name" nota="El nombre se recorta: el kebab no baja de renglón.">
+        <div className="w-[300px]"><AppointmentCardCompacta appt={{ ...NOAH, name: 'Maria Abril Viola Fernández de la Torre', initials: 'MA' }} onEdit={nada} /></div>
+      </Fila>
+      <Fila estado="Ten appointments" nota="Today Appointments muestra los 10 del día, con scroll adentro del panel; sin “View all”.">
+        <div className="flex h-72 w-[300px] flex-col gap-3 overflow-y-auto p-1">
+          {TURNOS_PATIENTS.map((t, i) => <AppointmentCardCompacta key={i} appt={t} onEdit={nada} />)}
+        </div>
       </Fila>
     </Tabla>
   ),

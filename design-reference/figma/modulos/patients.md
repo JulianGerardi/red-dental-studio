@@ -141,4 +141,7 @@ Pedido de Julián sobre el costado de la lista (`src/pages/Patients.tsx`):
   lista aparte porque la tira del Dashboard calcula sus números de los turnos del día (6 / 3 / 2 del Figma). Con 10
   caben todos (`CANTIDAD_TURNOS = 10`), con scroll adentro del panel, y "View all" no aparece.
 - Decisión propia, no está en el Figma: la pantalla no dibuja ni el kebab ni el menú de la card.
+- En Storybook: *Elements / Appointment cards → Patients list card: states* (kebab hover, menú abierto, nombre largo
+  y los 10 turnos) y *Components / UI / RowActionsMenu → Open*. El kebab no tiene anillo de foco propio (usa el del
+  navegador, como el de las tablas), por eso no hay un estado de foco dibujado.
 
