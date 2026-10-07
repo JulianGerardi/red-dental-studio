@@ -5,6 +5,10 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-07
 
+### Navigation: comentarios de una línea ([#11](https://github.com/JulianGerardi/red-dental-studio/pull/11))
+- `src/design-system/Navigation.stories.tsx`: dos comentarios largos pasan a una línea y apuntan a `design-system.md`.
+  Sin cambios en la app ni en Storybook.
+
 ### Avisos al dev ([#10](https://github.com/JulianGerardi/red-dental-studio/pull/10))
 - Nace este archivo. Desde ahora todo cambio entra por PR (incluidos el CLAUDE.md y la documentación), suma su entrada
   acá y pide revisión a jonatan784 y betsyMb.
