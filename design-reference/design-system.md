@@ -167,7 +167,7 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     pantalla y marca los que se apartan (hoy conviven varios tamaños de título:
     PageTitle 20px Semibold, h1 sueltos de 20, 24 y 36px).
   - **Navigation** — el menú lateral (`Sidebar` en `AppShell`) sobre la app
-    real: colapsado 58px con tooltip, expandido 234px, ítem activo según la
+    real: colapsado 58px con tooltip, expandido 176px (234 en el celular), ítem activo según la
     pantalla, menú flotante de Settings, celular. El Playground elige la
     pantalla y cómo arranca el menú.
   - **Patient menu** — `PatientSidePanel` solo, sin la pantalla (las
@@ -488,3 +488,12 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
   *Back to editor* y *Save*. Se suma al punto 5 de *Pop ups* (drawer de un paso).
 - *Pages › Parts › Consents*: Playground en iframe con el control *previewOpen*; *Preview · Clinic view / Patient view*
   con el drawer abierto; Specs con el botón Preview y la regla nueva. Decisiones en `figma/modulos/consents.md`.
+
+## Sidebar: menú expandido de 176px (2026-10-07)
+
+- El rail expandido pasa de 234 a **176px** en escritorio (colapsado sigue en 58; en el celular el panel sigue en 234,
+  porque tapa el contenido y no le quita lugar). El ítem de Settings ya no se sale 12px del rail.
+- *Elements / Navigation*: descripción con las medidas nuevas; *Expanded*, *Active item*, *Settings menu* y *Billing
+  menu* ya se dibujan a 176 porque montan el `Sidebar` real. *Components / Layout / Sidebar parts*: las muestras de
+  Settings y Billing van en 176. Decisiones en `figma/modulos/header-sidebar.md` (2026-10-07).
+

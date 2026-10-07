@@ -21,10 +21,10 @@ export const ItemTooltip: Story = {
 
 /* El ítem de Settings, con su menú flotante. */
 export const SettingsEntry: Story = {
-  render: () => <div className="h-72 w-[234px] p-4"><SettingsItem clase={(a) => `flex items-center rounded-md px-3 py-2 text-sm ${a ? 'bg-dash-blue text-white' : ''}`} mostrarLabel /></div>,
+  render: () => <div className="h-72 w-[176px] p-4"><SettingsItem clase={(a) => `flex items-center rounded-md px-3 py-2 text-sm ${a ? 'bg-dash-blue text-white' : ''}`} mostrarLabel /></div>,
 }
 
 /* El ítem de Billing, con su menú flotante: la pantalla de Billing, Fee Schedules, Carriers y Coverage Table. */
 export const BillingEntry: Story = {
-  render: () => <div className="h-56 w-[234px] p-4"><BillingItem clase={(a) => `flex items-center rounded-md px-3 py-2 text-sm ${a ? 'bg-dash-blue text-white' : ''}`} mostrarLabel forzarAbierto /></div>,
+  render: () => <div className="h-56 w-[176px] p-4"><BillingItem clase={(a) => `flex items-center rounded-md px-3 py-2 text-sm ${a ? 'bg-dash-blue text-white' : ''}`} mostrarLabel forzarAbierto /></div>,
 }

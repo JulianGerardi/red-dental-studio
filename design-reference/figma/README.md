@@ -298,7 +298,7 @@ Cómo se comporta cada pieza:
 
 | Pieza | < 768 | ≥ 768 | ≥ 1024 |
 |---|---|---|---|
-| Sidebar | panel sobre el contenido, con fondo oscuro y cierre al navegar | rail de 58 con iconos | igual, expandible a 234 |
+| Sidebar | panel sobre el contenido, con fondo oscuro y cierre al navegar | rail de 58 con iconos | igual, expandible a 176 |
 | Topbar | sólo buscador, campana y avatar | + locación | + saludo y nombre del perfil |
 | Dashboard | una columna | dos | tres |
 | Panel del paciente | arriba del contenido, avatar al lado del nombre y nav en tira horizontal | igual | columna de 218 a la izquierda |

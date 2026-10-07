@@ -157,3 +157,20 @@ Como Settings: al pasar el mouse por Billing (o con su flecha, expandido o en el
 con **Billing**, **Fee Schedules**, **Carriers** y **Coverage Table** (las tablas de Settings → Billing). Billing queda
 activo en `/billing` y en esas tres; Settings deja de marcarse ahí. `BillingItem` en `Sidebar.tsx`, con la lógica de
 abrir y cerrar compartida (`useFlotante`). Design system: *Elements / Navigation → Billing menu*.
+
+## Menú expandido más angosto: 234 → 176px (2026-10-07)
+
+Pedido de Julián, con una captura y una línea negra marcando hasta dónde: con 234px el menú abierto le quitaba
+demasiado a la pantalla. La línea caía a ~178px reales (la captura venía escalada ×1,33: el bloque del logo, de 64px,
+medía 85); se tomó **176**. Entra todo sin cortar: "Confidentally", "Scheduling" y "Documents" son lo más largo, y los
+ítems quedan a 12px de cada borde (`mx-3`, de 12 a 164). Colapsado sigue en 58.
+
+**Sólo escritorio.** En el celular el menú es un panel encima del contenido y no le roba lugar a nadie, así que sigue
+en 234: ahí además el menú de Settings se despliega adentro, con sus sub-items.
+
+**Settings se salía del rail 12px.** Su ítem llevaba `w-full` además del `mx-3` de todos: medía el ancho entero del
+rail más el margen y se pasaba por la derecha (se ve en la captura de Julián, la barra azul cruza el borde). Se quitó el
+`w-full`; ahora va de 12 a 164 como el resto, en escritorio y en el celular.
+
+Verificado con Playwright en `/settings/consents` a 1500px: rail de 176, ningún ítem desborda, desborde horizontal 0,
+y los flotantes de Billing y Settings siguen saliendo al costado.

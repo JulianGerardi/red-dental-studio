@@ -30,14 +30,14 @@ const meta = {
       story: { inline: false, iframeHeight: 720 },
       description: {
         component: [
-          '**Menú lateral (rail)** (`Sidebar`, dentro de `AppShell`). Colapsado mide 58px y muestra sólo íconos; expandido mide 234px con los nombres. Se abre y se cierra con el botón de la barra de arriba, a la izquierda del saludo.',
+          '**Menú lateral (rail)** (`Sidebar`, dentro de `AppShell`). Colapsado mide 58px y muestra sólo íconos; expandido mide 176px con los nombres. Se abre y se cierra con el botón de la barra de arriba, a la izquierda del saludo.',
           '',
           '- **Colapsado:** al pasar el mouse por un ícono aparece su nombre en un tooltip a la derecha.',
           '- **Expandido:** no hay tooltips, el nombre ya se ve.',
           '- **Ítem activo:** azul con texto blanco, según la pantalla en la que estás.',
           '- **Settings:** queda abajo, en el mismo lugar colapsado y expandido. Al pasar el mouse abre un menú flotante con sus secciones.',
           '- **Billing:** al pasar el mouse (o con su flecha) abre al costado un menú con Billing, Fee Schedules, Carriers y Coverage Table. Queda activo en Billing y en esas tres tablas.',
-          '- **En el celular:** el menú es un panel que tapa el contenido y se cierra solo al elegir una pantalla.',
+          '- **En el celular:** el menú es un panel de 234px que tapa el contenido y se cierra solo al elegir una pantalla.',
           '',
           'El menú del paciente está en *Elements / Patient menu*.',
           '',
