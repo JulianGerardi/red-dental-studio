@@ -181,7 +181,7 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     tooltip, estado y tarjeta) y *Specs*.
   - **Appointment cards** — las cuatro cards de un turno, cada una con su
     componente: `AppointmentCard` (Dashboard), `AppointmentCard compact`
-    (Patients), `PatientAppointmentCard` (Overview del paciente, antes escrita
+    (Patients, con kebab: Edit y Go to appointment), `PatientAppointmentCard` (Overview del paciente, antes escrita
     a mano en `PatientDetail.tsx`) y `TurnoCalendario` (Scheduling: bloque,
     chip de Month y fila del celular, antes repetido tres veces en
     `CalendarViews.tsx`). *Which card goes where*, estados de cada una, los
@@ -470,3 +470,12 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 - *Elements / Filter* (Columns con el mismo botón) y *Components / Ledger / ColumnPicker*; *Elements / Navigation*
   (Billing menu); *Components / UI / PageTitle* (la escala de títulos); *Components / Help / Confibot*;
   *Components / Layout / NotificationBanner*; *Elements / ConfirmDialog*.
+
+## Patients: Today Appointments (2026-10-07)
+
+- `AppointmentCardCompacta` cambió la flecha por el kebab (`RowActionsMenu`) con *Edit* y *Go to appointment*; sigue en
+  *Elements / Appointment cards* (Patients list: descripción y tabla *Which card goes where*) y en *Components /
+  Dashboard / AppointmentCard parts → CompactRow*.
+- La pantalla Patients ya no tiene Recent Patients; `PatientCard` sigue en *Elements / Cards* y sus stories. Decisiones
+  y motivos en `figma/modulos/patients.md` (2026-10-07).
+
