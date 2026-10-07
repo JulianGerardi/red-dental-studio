@@ -406,7 +406,8 @@ esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Proc
    Subscription (Subscriber, Subscription), Post payment (Payment, Allocation), New Condition de Radiography.
 5. **Drawer de un paso**: medicamentos, condiciones y alergias, Apply unapplied credit, detalle de un movimiento del
    Ledger, New Room / Hours / Availability / Exception, Assign Role, New Depender, Move Procedure / New Group /
-   Complete / Delete Case del Treatment Plan, Consent history, Review Exam, Exam review y el AI Narrative Editor (xl).
+   Complete / Delete Case del Treatment Plan, Consent history, el preview de Consents (lg, 2026-10-07), Review Exam, Exam
+   review y el AI Narrative Editor (xl).
 6. **Siguen como confirmación chica** (`ui/confirm-dialog`, *Elements / ConfirmDialog*), igual que en 2.0: las
    preguntas de sí o no -Discard and close?, Back to permanent dentition?, limpiar la selección del odontograma,
    Discard / Expire / Cancel / Present / Accept del caso, Confirm procedure- y el aviso de Clinical Note.
@@ -479,3 +480,11 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 - La pantalla Patients ya no tiene Recent Patients; `PatientCard` sigue en *Elements / Cards* y sus stories. Decisiones
   y motivos en `figma/modulos/patients.md` (2026-10-07).
 
+
+## Consents: el preview en un drawer (2026-10-07)
+
+- El preview de Settings → Consents deja de ser la tercera columna y se abre en un **drawer lg** desde *Preview*, en el
+  pie fijo del editor (al lado de Cancel y Save). El panel entero es el escritorio gris con la hoja blanca; pie con
+  *Back to editor* y *Save*. Se suma al punto 5 de *Pop ups* (drawer de un paso).
+- *Pages › Parts › Consents*: Playground en iframe con el control *previewOpen*; *Preview · Clinic view / Patient view*
+  con el drawer abierto; Specs con el botón Preview y la regla nueva. Decisiones en `figma/modulos/consents.md`.

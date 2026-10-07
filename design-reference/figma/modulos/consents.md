@@ -1,7 +1,8 @@
 # Consents (Settings → Consent Templates)
 
 Nodo Figma: `4106:170620` ("New Consent Template"). Lista de templates a la
-izquierda, editor en el medio, preview a la derecha. Código en
+izquierda, editor en el medio, preview a la derecha (desde 2026-10-07 el preview
+se abre en un drawer, ver al final). Código en
 `src/pages/settings/Consents.tsx` (pantalla) y
 `src/components/settings/ConsentDocument.tsx` (la hoja del preview).
 
@@ -150,3 +151,26 @@ design system.
 
 Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
 En Consents: Templates y el editor. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.
+
+## El preview pasa a un drawer (2026-10-07)
+
+Pedido de Julián: el preview ocupaba mucho lugar como tercera columna; que sea flotante, para abrirlo cuando se quiera,
+o un drawer como los formularios. Se eligió el **drawer** (es la regla de pop ups de la app) abierto desde un botón que
+siempre está a mano:
+
+1. **Dos columnas**: Templates (288px) y el editor, que se queda con todo el resto. Sin preview al costado, el editor
+   deja de verse apretado; la lista vale 288px también con dos columnas (antes 280).
+2. **Preview en el pie fijo del editor**, a la izquierda de Cancel y Save (botón secondary con el ojo). Como el pie es
+   `sticky`, se abre desde cualquier punto del scroll: eso cubre lo "flotante" sin sumar un botón suelto encima de la
+   pantalla.
+3. **Drawer lg (560px)** con título "Preview" y bajada "What the patient receives". Todo el panel es el **escritorio
+   gris** (`surface-muted`) con la hoja blanca encima, como estaba la columna: la hoja entra justa (512px de los 520 de
+   tope). Arriba de la hoja, *Patient View* y una línea que dice qué se está viendo (con o sin diagnóstico y hallazgos).
+4. **Pie de dos botones del mismo ancho**: *Back to editor* y *Save*. Save cierra el drawer y guarda; si falta algo, los
+   errores quedan a la vista en el editor (el aviso rojo y cada campo).
+5. La hoja muestra lo escrito hasta ese momento (el borrador, sin guardar). Se pierde el preview en vivo mientras se
+   tipea: es el costo de sacarlo de la pantalla. La bajada del editor ya no dice "Changes show in the preview as you
+   type" sino "Preview shows the sheet with your changes".
+6. `PanelPreview` pasa a ser `DrawerPreview`. Design system (*Pages › Parts › Consents*): Playground en su propio iframe
+   y con el control *previewOpen*; *Preview · Clinic view* y *Patient view* con el drawer abierto; el botón Preview en
+   Specs.
