@@ -11,24 +11,17 @@ import { DataTable, type DataTableColumn } from '@/components/ui/data-table'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
+import { DetalleRegistro, TONO_PROBLEMA, TONO_PROCEDIMIENTO, type ContextoDetalle } from '@/components/clinical/RecordDetail'
 import {
   ESTADOS_PROBLEMA, ESTADOS_PROCEDIMIENTO, PROBLEMAS, PROCEDIMIENTOS,
   type EstadoProblema, type EstadoProcedimiento, type Problema, type ProcedimientoPaciente,
 } from '@/data/clinical-mode'
 
 /* La tabla del Overview, como en red.dev: Problem List y Procedures en dos pestañas, cada una con su filtro de estado
-   (Active y All por defecto), buscador, nota en tooltip y el menú de acciones según el estado. Ver
-   design-reference/figma/modulos/clinical-mode.md. */
+   (Active y All por defecto), buscador, nota en tooltip y el menú de acciones según el estado. Cada fila se despliega
+   como en el Ledger con lo que cuelga del registro (RecordDetail). Ver design-reference/figma/modulos/clinical-mode.md. */
 
 type Pestana = 'Problem List' | 'Procedures'
-
-const TONO_PROBLEMA: Record<EstadoProblema, PillTone> = {
-  Active: 'success', 'In treatment': 'info', Monitoring: 'warning', Treated: 'neutral', 'Externally treated': 'neutral', Referred: 'purple',
-  'No treatment needed': 'neutral', 'Patient declined': 'danger', 'Clinic declined': 'danger', Discarded: 'danger',
-}
-const TONO_PROCEDIMIENTO: Record<EstadoProcedimiento, PillTone> = {
-  'In progress': 'info', Planned: 'success', Completed: 'neutral', Discontinued: 'warning', Discarded: 'danger', Referred: 'purple',
-}
 
 type Accion<E extends string> = { label: string; icono: LucideIcon; a?: E; peligro?: boolean; borrar?: boolean }
 
@@ -88,6 +81,8 @@ export function ProblemList() {
   const [filtroProblema, setFiltroProblema] = useState<EstadoProblema>('Active')
   const [filtroProcedimiento, setFiltroProcedimiento] = useState<EstadoProcedimiento | 'All'>('All')
   const [q, setQ] = useState('')
+  /* La fila que se abre al llegar desde el detalle de la otra pestaña. */
+  const [enfoque, setEnfoque] = useState<string>()
 
   const t = q.trim().toLowerCase()
   const filasProblema = problemas.filter((p) => p.estado === filtroProblema && (!t || `${p.fecha} ${p.ubicacion} ${p.pieza ?? ''} ${p.condicion} ${p.examen} ${p.proveedor}`.toLowerCase().includes(t)))
@@ -118,24 +113,31 @@ export function ProblemList() {
     )
   }
 
+  /* Un link del detalle a un registro de la otra pestaña: cambia de pestaña, deja el filtro donde se ve y lo abre. */
+  const contexto: ContextoDetalle = {
+    problemas, procedimientos,
+    onAbrirProblema: (p) => { setQ(''); setFiltroProblema(p.estado); setEnfoque(p.id); setPestana('Problem List') },
+    onAbrirProcedimiento: (p) => { setQ(''); setFiltroProcedimiento('All'); setEnfoque(p.id); setPestana('Procedures') },
+  }
+
   const comunes = <T extends { fecha: string; ubicacion: string; pieza?: number; superficie: string }>(): DataTableColumn<T>[] => [
     { key: 'fecha', header: 'Date', width: 72, cell: (r) => texto(r.fecha) },
-    { key: 'ubicacion', header: 'Location', width: 96, cell: (r) => texto(r.ubicacion) },
+    { key: 'ubicacion', header: 'Location', width: 80, cell: (r) => texto(r.ubicacion) },
     { key: 'pieza', header: 'Tooth', width: 44, cell: (r) => <ToothCell pieza={r.pieza} /> },
     { key: 'superficie', header: 'Surface', width: 56, cell: (r) => texto(r.superficie) },
   ]
   const colsProblema: DataTableColumn<Problema>[] = [
     ...comunes<Problema>(),
     { key: 'condicion', header: 'Condition', cell: (r) => texto(r.condicion) },
-    { key: 'examen', header: 'Exam', width: 88, cell: (r) => texto(r.examen) },
-    { key: 'proveedor', header: 'Provider', width: 96, cell: (r) => texto(r.proveedor) },
+    { key: 'examen', header: 'Exam', width: 84, cell: (r) => texto(r.examen) },
+    { key: 'proveedor', header: 'Provider', width: 88, cell: (r) => texto(r.proveedor) },
     { key: 'nota', header: 'Note', width: 36, align: 'center', cell: (r) => <NoteCell nota={r.nota} /> },
     { key: 'estado', header: 'Status', width: 104, cell: (r) => estadoPill(TONO_PROBLEMA[r.estado], r.estado) },
   ]
   const colsProcedimiento: DataTableColumn<ProcedimientoPaciente>[] = [
     ...comunes<ProcedimientoPaciente>(),
     { key: 'procedimiento', header: 'Procedure', cell: (r) => texto(`${r.codigo} - ${r.nombre}`) },
-    { key: 'proveedor', header: 'Provider', width: 96, cell: (r) => texto(r.proveedor) },
+    { key: 'proveedor', header: 'Provider', width: 88, cell: (r) => texto(r.proveedor) },
     { key: 'nota', header: 'Note', width: 36, align: 'center', cell: (r) => <NoteCell nota={r.nota} /> },
     { key: 'estado', header: 'Status', width: 104, cell: (r) => estadoPill(TONO_PROCEDIMIENTO[r.estado], r.estado) },
   ]
@@ -144,7 +146,7 @@ export function ProblemList() {
     <TooltipProvider delayDuration={200}>
       <div className="flex flex-col gap-3 rounded-lg bg-white shadow-panel p-4">
         <div className="flex flex-wrap items-center gap-2">
-          <Tabs tabs={['Problem List', 'Procedures'] as const} value={pestana} onChange={setPestana} aria-label="Clinical records" />
+          <Tabs tabs={['Problem List', 'Procedures'] as const} value={pestana} onChange={(v) => { setEnfoque(undefined); setPestana(v) }} aria-label="Clinical records" />
           <div className="ml-auto flex flex-wrap items-center gap-2">
             {/* El buscador va siempre primero y después el filtro (Julián, 2026-10-06). */}
             <div className="relative w-[200px] max-w-full">
@@ -179,6 +181,8 @@ export function ProblemList() {
             key="problemas"
             columns={colsProblema} rows={filasProblema} rowKey={(r) => r.id} rowLabel={(r) => r.condicion}
             rowActions={(r) => menu(accionesProblema(r.estado), (a) => aplicar(setProblemas, problemas, r, r.condicion, a))}
+            rowDetail={(r) => <DetalleRegistro registro={{ tipo: 'problema', r }} contexto={contexto} />}
+            defaultExpanded={enfoque ? [enfoque] : undefined}
             pageSize={5} pageSizeOptions={[5, 10, 20]} pageSizeLabel="Show:" density="compact"
             empty={{ icon: Search, title: 'No problems found', detail: t ? `Nothing matches "${q}".` : `There are no ${filtroProblema.toLowerCase()} problems.` }}
           />
@@ -187,6 +191,8 @@ export function ProblemList() {
             key="procedimientos"
             columns={colsProcedimiento} rows={filasProcedimiento} rowKey={(r) => r.id} rowLabel={(r) => `${r.codigo} ${r.nombre}`}
             rowActions={(r) => menu(accionesProcedimiento(r.estado), (a) => aplicar(setProcedimientos, procedimientos, r, r.codigo, a))}
+            rowDetail={(r) => <DetalleRegistro registro={{ tipo: 'procedimiento', r }} contexto={contexto} />}
+            defaultExpanded={enfoque ? [enfoque] : undefined}
             pageSize={5} pageSizeOptions={[5, 10, 20]} pageSizeLabel="Show:" density="compact"
             empty={{ icon: Search, title: 'No procedures found', detail: t ? `Nothing matches "${q}".` : `There are no ${filtroProcedimiento.toLowerCase()} procedures.` }}
           />

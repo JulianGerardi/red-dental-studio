@@ -293,8 +293,26 @@ export const States: Story = {
       <Bloque titulo="Compact" nota="44px por fila, para listas largas dentro de un panel.">
         <Armada {...BASE} rows={4} density="compact" />
       </Bloque>
+      <Bloque titulo="Expanded row" nota="defaultExpanded: la fila arranca desplegada y la tabla abre en su página (Clinical Mode lo usa al saltar de una pestaña a la otra). Con una fila abierta aparecen Collapse all y Expand all.">
+        <ConDetalleAbierto />
+      </Bloque>
     </Lienzo>
   ),
+}
+
+/* Una fila desplegada desde el principio, en la segunda página. */
+function ConDetalleAbierto() {
+  return (
+    <DataTable
+      columns={[COLUMNAS.Name!, COLUMNAS.Email!, COLUMNAS.Status!]}
+      rows={PACIENTES.slice(0, 8)}
+      rowKey={(p) => p.id}
+      rowDetail={(p) => <Detalle p={p} />}
+      defaultExpanded={['p-7']}
+      pageSize={5}
+      itemLabel="patients"
+    />
+  )
 }
 
 /* Búsqueda sin resultados: la tabla con el buscador ya cargado. */
@@ -327,7 +345,7 @@ export const Specs: Story = {
         <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
           <li>One column stretches (the one without a width); the rest have a fixed width so header and rows line up.</li>
           <li>Amounts align right with tabular numbers; text that does not fit ends in “…” and shows in full on hover.</li>
-          <li>If the columns do not fit, the table scrolls inside its box: the page never scrolls sideways.</li>
+          <li>If the columns do not fit, the table scrolls inside its box: the page never scrolls sideways. An open row detail stays in the visible part while the table scrolls.</li>
           <li>Above the table, never inside it: search and filter on the left; Columns and the main action on the right.</li>
           <li>Turn on Columns and resizable columns when the table has more columns than fit; search and filter when it has more rows than one page.</li>
         </ul>

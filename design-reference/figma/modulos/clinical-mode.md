@@ -2073,3 +2073,52 @@ Julián eligió la **A** (las tarjetas, la que ya estaba publicada). B y C se sa
 - **Surfaces** depende del procedimiento elegido (lleva superficie o no), tanto en Planned como en Existing.
 - **Los pasos dicen su nombre** en todos los drawers (Procedure, Surfaces, Link to finding, Link to diagnosis…), no
   "Step": así se sabe qué se está haciendo.
+
+## Detalle desplegable en Problem List y Procedures (2026-10-08)
+
+Pedido de Julián con un prototipo HTML (*Compact clinical details*): que cada fila de la tabla del Overview muestre lo
+que cuelga del registro, reusando el desplegable del Ledger.
+
+1. **El desplegable es el del Ledger** (`rowDetail` de `DataTable`): chevron al inicio, clic en la fila, *Collapse all /
+   Expand all* desde que hay una abierta, y el detalle con fondo gris claro debajo. Vale en el Overview y en el flotante
+   de *View Problem List* de los exámenes.
+2. **Bloques** (`RecordDetail.tsx`, cards adentro de un panel), en 3 columnas, 2 o 1 según el ancho **de la tabla**
+   (container query, no media query: el flotante del examen es más angosto que la pantalla). Arriba, el nombre completo
+   y la pieza / superficie: la celda de la fila corta los nombres largos.
+   - *Procedimiento:* **Treatment** (estado del grupo, el caso con su estado, la visita del procedimiento con su turno,
+     las otras visitas y los casos históricos plegados), **Lab order** + **Referral** en un mismo bloque, **Findings /
+     diagnoses** (el hallazgo y su diagnóstico ICD-10 + superficie, como Link to diagnosis) y **Procedure consent** a lo
+     ancho.
+   - *Problema:* **Procedures** que lo resuelven, **Treatment** (sólo el caso, sin visitas), **Lab order** + **Referral**
+     con el procedimiento relacionado y **Source exam** a lo ancho.
+   - Lo que no entra en el resumen va detrás de "N more…"; un bloque vacío queda y dice qué no hay ("No lab orders
+     linked."), así el detalle tiene siempre la misma forma.
+3. **Se reusa lo que ya había**: el turno de la visita es `CitaVisita` de Treatment Plan ("No appointment" avisa igual),
+   el consentimiento es `EstadoConsentimiento` de sus tablas, y las pills son las de cada pantalla (casos como el rail,
+   órdenes como Lab Order, la tabla como la tabla). **Antes de aceptar el caso** (Planning, Pending, Presented) no hay
+   turno ni consentimiento, la misma regla que Treatment Plan.
+4. **Los links llevan a donde se trabaja**, en vez del diálogo de "preview" del prototipo: el caso y el consentimiento a
+   Treatment Plan con ese caso abierto, la orden a Lab Order, la derivación a Referral, el examen de origen a su pestaña.
+   Un hallazgo o un procedimiento cambia a la otra pestaña, ajusta el filtro para que se vea y abre esa fila
+   (`defaultExpanded` de DataTable, que abre en la página de la fila). Desde el flotante de un examen, el flotante se
+   cierra al navegar. La navegación la provee ClinicalMode (`NavegacionClinica`); sin provider, el link avisa adónde iría.
+5. **View full record** abre un drawer de sólo lectura (Pop ups = drawer): los datos de la fila de a dos y una sección
+   por bloque, sin nada plegado. Pie: Close y Edit, que avisa como Edit del menú de la fila.
+6. **Datos** (`VINCULOS_PROCEDIMIENTO` y `DERIVACIONES_PROBLEMA` en `data/clinical-mode.ts`): cada procedimiento apunta
+   a un caso de `CASOS` y al procedimiento del caso (de ahí salen visita, turno y consentimiento), a sus hallazgos, órdenes
+   y derivaciones. Los problemas toman lo de sus procedimientos. Quedan registros sin nada para que se vea el vacío
+   (D0220).
+7. **Columnas**: el chevron suma 28px y la Problem List pasaba de 934 a 960 a 1440 (scroll lateral). Location 96 → 80,
+   Exam 88 → 84 y Provider 96 → 88: las dos pestañas entran otra vez a 1440 sin scroll.
+8. **En el teléfono** la tabla scrollea de costado; el detalle queda fijo en la parte visible (`sticky` + el ancho
+   visible de la tabla, como el Ledger), ahora para toda tabla con detalle.
+
+Del prototipo no se toma: el "Phase" de cada visita (el modelo no tiene fases) y el "Dental chart context".
+
+### Anomalía
+
+| # | Qué | Dónde |
+|---|---|---|
+| 97 | El contador de Referrals de la barra dice **0** aunque hay procedimientos y problemas en estado Referred (y ahora derivaciones vinculadas) | barra / detalle |
+
+No se tocó la barra en esta tanda: queda para decidir si el contador sale de las derivaciones.

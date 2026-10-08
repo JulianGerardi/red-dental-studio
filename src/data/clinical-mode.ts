@@ -151,6 +151,46 @@ export const PROCEDIMIENTOS: ProcedimientoPaciente[] = [
   { id: 'pr11', fecha: '12/02/2026', ubicacion: 'Upper Arch', superficie: '-', codigo: 'D4341', nombre: 'Periodontal scaling and root planing – four or more teeth per quadrant', proveedor: 'Michael Johnson', estado: 'Discontinued' },
 ]
 
+/* Lo que cuelga de cada registro, para el detalle desplegable de la tabla (2026-10-08): el caso de Treatment Plan y el
+   procedimiento del caso que le corresponde (de ahí salen la visita, el turno y el consentimiento), los hallazgos que
+   resuelve, las órdenes de laboratorio y las derivaciones. Los problemas toman lo de sus procedimientos; sólo las
+   derivaciones pueden ser del problema mismo. Ver clinical-mode.md. */
+export type EstadoDerivacion = 'Requested' | 'Accepted' | 'Scheduled' | 'Completed' | 'Declined'
+export type OrdenVinculada = { id: string; laboratorio: string; trabajo: string; pedida: string; estado: EstadoOrden }
+export type Derivacion = { id: string; a: string; especialidad: string; pedida: string; estado: EstadoDerivacion }
+export type VinculoProcedimiento = {
+  caso?: { id: string; procedimiento: string }
+  problemas?: string[]
+  ordenes?: OrdenVinculada[]
+  derivaciones?: Derivacion[]
+}
+
+export const VINCULOS_PROCEDIMIENTO: Record<string, VinculoProcedimiento> = {
+  pr2: { problemas: ['p10'] },
+  pr4: {
+    caso: { id: 'c7', procedimiento: 'c7v1p1' },
+    ordenes: [{ id: 'lo-b1', laboratorio: 'Dental laboratory', trabajo: 'Bridge framework', pedida: 'Apr 20, 2026', estado: 'Requested' }],
+  },
+  pr5: {
+    problemas: ['p1'],
+    ordenes: [{ id: 'lo-p1', laboratorio: 'Oral pathology lab', trabajo: 'Biopsy analysis', pedida: 'May 15, 2026', estado: 'Canceled' }],
+    derivaciones: [{ id: 'rf-2', a: 'Dr. Omar Haddad', especialidad: 'Oral Surgery', pedida: 'May 15, 2026', estado: 'Declined' }],
+  },
+  pr6: { caso: { id: 'c3', procedimiento: 'c3v1p1' }, problemas: ['p5'] },
+  pr7: { caso: { id: 'c3', procedimiento: 'c3v1p2' }, problemas: ['p6'] },
+  pr10: {
+    caso: { id: 'c5', procedimiento: 'c5v2p1' },
+    problemas: ['p9'],
+    derivaciones: [{ id: 'rf-1', a: 'Dr. Laura Chen', especialidad: 'Endodontics', pedida: 'Mar 03, 2026', estado: 'Accepted' }],
+  },
+  /* Se discontinuó y vuelve a planearse en el plan periodontal, que todavía está en Planning: sin turno ni consentimiento. */
+  pr11: { caso: { id: 'c1', procedimiento: 'c1v2p1' } },
+}
+
+export const DERIVACIONES_PROBLEMA: Record<string, Derivacion[]> = {
+  p11: [{ id: 'rf-3', a: 'Dr. Omar Haddad', especialidad: 'Oral Surgery', pedida: 'Jun 21, 2026', estado: 'Scheduled' }],
+}
+
 export const ULTIMA_CONDICION = {
   condicion: 'Caries',
   actualizado: '20/06/2025',

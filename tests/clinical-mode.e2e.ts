@@ -87,3 +87,20 @@ test('Generate Narrative arma el borrador con lo guardado de Chief Complaint', a
   await expect(editor.getByText(/Original Clinical Draft/)).toBeVisible()
   await expect(editor.getByRole('button', /Apply Changes/)).toBeDisabled()
 })
+
+test('el detalle de un procedimiento lleva a su caso y a su hallazgo', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('tab', 'Procedures').tap()
+  await screen.getByText(/D7286 - Incisional biopsy/).tap()
+  await expect(screen.getByRole('button', /View full record/)).toBeVisible()
+  await expect(screen.getByRole('button', 'Collapse all')).toBeVisible()
+  // El hallazgo vinculado abre Problem List con esa fila desplegada.
+  await screen.getByRole('button', /^Abscess \(morphologic abnormality\) · Soft Palate/).tap()
+  await expect(screen.getByRole('tab', 'Problem List')).toHaveAttribute('aria-selected', 'true')
+  await expect(screen.getByText('Source exam')).toBeVisible()
+
+  await screen.getByRole('tab', 'Procedures').tap()
+  await screen.getByText(/D7140 - Extraction/).tap()
+  await screen.getByRole('button', /^Bridge Option/).tap()
+  await expect(screen.getByRole('button', /Bridge Option, Accepted/)).toBeVisible()
+})

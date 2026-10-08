@@ -8,7 +8,7 @@ import { FilterMenu } from '@/components/ui/filter-menu'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
-import { ManijaResize, useAnchoColumnas } from '@/components/patients/ledger/useAnchoColumnas'
+import { ManijaResize, useAnchoColumnas, useAnchoVisible } from '@/components/patients/ledger/useAnchoColumnas'
 import { cn } from '@/lib/utils'
 
 /* Tabla estándar de la app: la misma anatomía que Patients, Team, Accounts y
@@ -43,7 +43,7 @@ const GAP = 12
 const PADDING = 32
 
 export function DataTable<T>({
-  columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail, reorder,
+  columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail, defaultExpanded, reorder,
   search, filter, columnPicker, resizable, actions,
   pageSize: pageSizeInicial = 10, pageSizeOptions, pageSizeLabel = 'Rows per page:',
   itemLabel = 'results', density = 'regular', selected, onSelectedChange,
@@ -66,6 +66,8 @@ export function DataTable<T>({
   onRowClick?: (row: T) => void
   /** Detalle que se despliega al hacer clic en la fila, como en el Ledger. */
   rowDetail?: (row: T) => ReactNode
+  /** Filas que arrancan desplegadas (ids); la tabla abre en la página de la primera. */
+  defaultExpanded?: string[]
   /** Manija para reordenar filas arrastrando (o con ↑ ↓ desde el teclado).
       `canMove` deja fijas las filas que no se pueden mover. */
   reorder?: { onReorder: (from: T, to: T) => void; canMove?: (row: T) => boolean }
@@ -96,8 +98,11 @@ export function DataTable<T>({
   /** Filas que no se pueden elegir ni accionar: se ven atenuadas. */
   isRowDisabled?: (row: T) => boolean
 }) {
-  const [pagina, setPagina] = useState(1)
   const [pageSize, setPageSize] = useState(pageSizeInicial)
+  const [pagina, setPagina] = useState(() => {
+    const i = defaultExpanded?.length ? rows.findIndex((r) => rowKey(r) === defaultExpanded[0]) : -1
+    return i < 0 ? 1 : Math.floor(i / pageSizeInicial) + 1
+  })
   const [elegidasPropias, setElegidasPropias] = useState<string[]>([])
   const elegidas = selected ?? elegidasPropias
   /* La última selección, para que dos clics seguidos no se pisen antes de
@@ -113,7 +118,8 @@ export function DataTable<T>({
   const [q, setQ] = useState('')
   const [filtro, setFiltro] = useState<string[]>([])
   const [ocultas, setOcultas] = useState<string[]>(() => columns.filter((c) => c.hidden && !c.locked).map((c) => c.key))
-  const [abiertas, setAbiertas] = useState<string[]>([])
+  const [abiertas, setAbiertas] = useState<string[]>(defaultExpanded ?? [])
+  const refVisible = useAnchoVisible<HTMLDivElement>()
   const arrastrada = useRef<T | null>(null)
   const anchos = useAnchoColumnas<string>(Object.fromEntries(columns.map((c) => [c.key, c.width ?? MIN_FLEX])))
 
@@ -213,6 +219,7 @@ export function DataTable<T>({
       )}
 
       <div
+        ref={refVisible}
         data-tabla-scroll
         aria-busy={loading || undefined}
         aria-disabled={disabled || undefined}
@@ -338,7 +345,10 @@ export function DataTable<T>({
                       </div>
                     )}
                   </div>
-                  {rowDetail && abierta && <div className="border-t border-line-soft bg-surface-subtle px-4 py-3 pl-11 text-[13px] text-ink-soft">{rowDetail(r)}</div>}
+                  {/* Con la tabla más ancha que la vista, el detalle queda fijo en la parte que se ve (como en el Ledger). */}
+                  {rowDetail && abierta && (
+                    <div className="sticky left-0 w-[var(--tabla-visible,100%)] border-t border-line-soft bg-surface-subtle px-4 py-3 pl-11 text-[13px] text-ink-soft">{rowDetail(r)}</div>
+                  )}
                 </div>
               )
             })

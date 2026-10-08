@@ -52,7 +52,7 @@ const CANCELAR: AccionMenu = { label: 'Cancel', clave: 'cancel', icono: Ban, pel
 const CONSENTIMIENTO: AccionMenu = { label: 'Generate Consent', clave: 'consent', icono: FilePen }
 /* Antes de aceptar el plan no hay consentimiento ni turno (Julián, 2026-10-06): en Planning, Pending y Presented no se
    muestran el bloque de consentimiento, la columna Consent ni el turno de cada visita. */
-const SIN_CONSENTIMIENTO_NI_TURNO: EstadoCaso[] = ['Planning', 'Pending', 'Presented']
+export const SIN_CONSENTIMIENTO_NI_TURNO: EstadoCaso[] = ['Planning', 'Pending', 'Presented']
 
 const ACCIONES_CASO: Partial<Record<EstadoCaso, AccionMenu[]>> = {
   Planning: [{ label: 'Delete', clave: 'delete', icono: Trash2, peligro: true }],
@@ -324,7 +324,7 @@ export function DialogoBorrarCaso({ onConfirm, onClose }: { onConfirm: (op: stri
 /* ── Rail de estados ──────────────────────────────────────────────── */
 
 /* El estado de un grupo (una fecha): el de sus casos vivos; si todos se descartaron, Discarded. */
-const estadoGrupo = (casos: Caso[]): EstadoCaso => casos.find((c) => c.estado !== 'Discarded')?.estado ?? 'Discarded'
+export const estadoGrupo = (casos: Caso[]): EstadoCaso => casos.find((c) => c.estado !== 'Discarded')?.estado ?? 'Discarded'
 
 /* El punto de cada caso en la lista: el color de su estado. */
 const PUNTO_CASO: Record<EstadoCaso, string> = {

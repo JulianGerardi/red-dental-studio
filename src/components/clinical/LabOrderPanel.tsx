@@ -8,7 +8,7 @@ import { ICONO_SUELTO } from '@/lib/estilos'
 import { ORDENES, type EstadoOrden } from '@/data/clinical-mode'
 import { Pill, type PillTone } from '@/components/ui/pill'
 
-const ORDEN_TONO: Record<EstadoOrden, PillTone> = {
+export const ORDEN_TONO: Record<EstadoOrden, PillTone> = {
   Pending: 'warning', Canceled: 'danger', Rejected: 'danger',
   Delayed: 'warning', Requested: 'purple', Delivered: 'success',
 }
