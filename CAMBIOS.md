@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-08
 
+### Link de prueba general y rol de product designer ([#16](https://github.com/JulianGerardi/red-dental-studio/pull/16))
+- Cada push a una rama que no sea `main` se publica en https://juliangerardi.github.io/red-dental-studio/prueba/ (app)
+  y `/prueba/storybook/`, para ver los cambios antes de "subilo". Muestra sólo la última rama subida;
+  `/prueba/version.txt` dice cuál. Publicar `main` ya no borra `/prueba` y escribe `/version.txt` con su commit.
+- `CLAUDE.md`: las sesiones actúan como product designer senior, UX/UI y UX researcher.
+- **Para el dev:** workflow nuevo `.github/workflows/deploy-preview.yml`; los dos deploys comparten `gh-pages` y el de
+  prueba sólo toca `prueba/`.
+
 ### Clinical Mode: el detalle de la fila pasa de cards a lista ([#15](https://github.com/JulianGerardi/red-dental-studio/pull/15))
 - El detalle desplegable de Problem List / Procedures deja las cards: es una lista de filas (título a la izquierda, datos
   a la derecha, una línea fina entre filas) en el orden Treatment, Lab order, Referral, Findings / diagnoses y Procedure
