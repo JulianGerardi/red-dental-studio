@@ -1,0 +1,11 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{Xl as n,Zl as r,at as i,lt as a,ot as o,st as s}from"./iframe-FBasW3Lw.js";import{r as c,t as l}from"./decorators-BL12_U98.js";var u,d,f,p,m,h;function g(){return(g=e((()=>{r(),c(),a(),u=t(),d={title:`Components/Layout/Sidebar parts`,parameters:{layout:`padded`},decorators:[l]},f={render:()=>(0,u.jsx)(`div`,{className:`p-16`,children:(0,u.jsx)(o,{label:`Dashboard`,mostrar:!0,children:(0,u.jsx)(`button`,{className:`flex size-8 items-center justify-center rounded-md bg-dash-blue text-white`,children:(0,u.jsx)(n,{className:`size-4`})})})})},p={render:()=>(0,u.jsx)(`div`,{className:`h-72 w-[176px] p-4`,children:(0,u.jsx)(s,{clase:e=>`flex items-center rounded-md px-3 py-2 text-sm ${e?`bg-dash-blue text-white`:``}`,mostrarLabel:!0})})},m={render:()=>(0,u.jsx)(`div`,{className:`h-56 w-[176px] p-4`,children:(0,u.jsx)(i,{clase:e=>`flex items-center rounded-md px-3 py-2 text-sm ${e?`bg-dash-blue text-white`:``}`,mostrarLabel:!0,forzarAbierto:!0})})},h=[`ItemTooltip`,`SettingsEntry`,`BillingEntry`],f.parameters={...f.parameters,docs:{...f.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="p-16">
+      <ConTooltip label="Dashboard" mostrar>
+        <button className="flex size-8 items-center justify-center rounded-md bg-dash-blue text-white"><Home className="size-4" /></button>
+      </ConTooltip>
+    </div>
+}`,...f.parameters?.docs?.source}}},p.parameters={...p.parameters,docs:{...p.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="h-72 w-[176px] p-4"><SettingsItem clase={a => \`flex items-center rounded-md px-3 py-2 text-sm \${a ? 'bg-dash-blue text-white' : ''}\`} mostrarLabel /></div>
+}`,...p.parameters?.docs?.source}}},m.parameters={...m.parameters,docs:{...m.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="h-56 w-[176px] p-4"><BillingItem clase={a => \`flex items-center rounded-md px-3 py-2 text-sm \${a ? 'bg-dash-blue text-white' : ''}\`} mostrarLabel forzarAbierto /></div>
+}`,...m.parameters?.docs?.source}}}})))()}g();export{m as BillingEntry,f as ItemTooltip,p as SettingsEntry,h as __namedExportsOrder,d as default};
