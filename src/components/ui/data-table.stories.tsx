@@ -110,7 +110,12 @@ const meta = {
 export default meta
 type Story = StoryObj<Args>
 
-const FILTRO_ESTADO = { label: 'Filter by status', options: ['Active', 'Inactive', 'Pending'], match: (p: Paciente, sel: string[]) => sel.includes(p.estado) }
+/* Cada opción con su cantidad y el punto del color de su pill, como el filtro de Lab Order. */
+const filtroEstado = (filas: Paciente[]) => ({
+  label: 'Filter by status',
+  options: (['Active', 'Inactive', 'Pending'] as const).map((e) => ({ value: e, count: filas.filter((p) => p.estado === e).length, tone: TONO[e] })),
+  match: (p: Paciente, sel: string[]) => sel.includes(p.estado),
+})
 const BUSQUEDA = { placeholder: 'Search patients', match: (p: Paciente, q: string) => `${p.nombre} ${p.email}`.toLowerCase().includes(q.toLowerCase()) }
 
 function Detalle({ p }: { p: Paciente }) {
@@ -146,7 +151,7 @@ function Armada({ columns, rows, search, filter, columnPicker, resizable, expand
         rowKey={(p) => p.id}
         rowLabel={(p) => p.nombre}
         search={search ? BUSQUEDA : undefined}
-        filter={filter ? FILTRO_ESTADO : undefined}
+        filter={filter ? filtroEstado(orden.slice(0, rows)) : undefined}
         columnPicker={columnPicker}
         resizable={resizable}
         rowDetail={expandable ? (p) => <Detalle p={p} /> : undefined}
@@ -234,7 +239,7 @@ const PASOS: { titulo: string; texto: string; codigo: string }[] = [
     codigo: `<DataTable
   columns={columns} rows={patients} rowKey={(p) => p.id}
   search={{ placeholder: 'Search patients', match: (p, q) => p.name.toLowerCase().includes(q.toLowerCase()) }}
-  filter={{ label: 'Filter by status', options: ['Active', 'Inactive'], match: (p, sel) => sel.includes(p.status) }}
+  filter={{ label: 'Filter by status', options: [{ value: 'Active', count: 12, tone: 'success' }, 'Inactive'], match: (p, sel) => sel.includes(p.status) }}
   columnPicker
   resizable
   rowDetail={(p) => <PatientSummary patient={p} />}
@@ -347,6 +352,7 @@ export const Specs: Story = {
           <li>Amounts align right with tabular numbers; text that does not fit ends in “…” and shows in full on hover.</li>
           <li>If the columns do not fit, the table scrolls inside its box: the page never scrolls sideways. An open row detail stays in the visible part while the table scrolls.</li>
           <li>Above the table, never inside it: search and filter on the left; Columns and the main action on the right.</li>
+          <li>Filter options can carry the count and the color dot of their pill (<code>FilterOption</code>), as in Lab Order.</li>
           <li>Turn on Columns and resizable columns when the table has more columns than fit; search and filter when it has more rows than one page.</li>
         </ul>
       </Bloque>
