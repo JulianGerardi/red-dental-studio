@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
 import { ProblemList } from '@/components/clinical/ProblemList'
+import { NavegacionClinica } from '@/components/clinical/RecordDetail'
 import { ExamPanelHeader } from './dental/ExamPanelHeader'
 import { ReviewList, type ExamReview } from './dental/ReviewList'
 import { ReviewExamDialog } from './dental/ReviewExamDialog'
@@ -75,6 +76,7 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
   const [editing, setEditing] = useState<Finding | null>(null)
   const [confirming, setConfirming] = useState<{ action: Exclude<FindingAction, 'edit'>; finding: Finding } | null>(null)
   const [problemas, setProblemas] = useState(false)
+  const ir = useContext(NavegacionClinica)
 
   function saveProcedure(draft: ProcedureDraft) {
     const tooth = draft.tooth
@@ -167,7 +169,10 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
               <Popover key={label} open={problemas} onOpenChange={setProblemas}>
                 {conAyuda(<PopoverTrigger asChild>{boton}</PopoverTrigger>)}
                 <PopoverContent align="start" sideOffset={8} aria-label="Problem list" className="w-[min(820px,calc(100vw-2rem))] gap-0 bg-transparent p-0 shadow-none ring-0">
-                  <div className="rounded-xl shadow-[0_16px_40px_rgb(0_0_0/0.18)]"><ProblemList /></div>
+                  <div className="rounded-xl shadow-[0_16px_40px_rgb(0_0_0/0.18)]">
+                    {/* Un link del detalle lleva a otra pantalla: el flotante se cierra. */}
+                    <NavegacionClinica.Provider value={ir && ((d) => { setProblemas(false); ir(d) })}><ProblemList /></NavegacionClinica.Provider>
+                  </div>
                 </PopoverContent>
               </Popover>
             )

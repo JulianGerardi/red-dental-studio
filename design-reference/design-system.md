@@ -524,3 +524,16 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 - Editor de Consents: el pie fijo hace wrap; en angosto Cancel y Save bajan juntos a otra línea y Preview queda arriba
   (*Narrow footer*, en un iframe de 320px). Decisiones
   en `figma/modulos/consents.md` (segunda vuelta del 2026-10-07).
+
+## Clinical Mode: detalle de fila en la Problem List (2026-10-08)
+
+- *Components / Clinical / RecordDetail* (nuevo): Playground (registro y ancho: tabla del Overview, flotante del examen,
+  teléfono), **Parts** (el detalle, los bloques de procedimiento y de problema, cada pieza y la tabla de qué hace cada
+  una), **States** (todo vinculado, caso histórico, antes de aceptar, vacío, problema con procedimientos, problema con
+  derivación propia, flotante y angosto), *More open*, *Full record* y *Full record · problem* (el drawer, en iframe),
+  *Contents* y **Specs** (columnas por container query, bloques, tipografía y reglas).
+- *Components / Clinical / ProblemList*: *Expanded row* y *Jump to finding*; States y Specs suman la fila desplegada,
+  el salto entre pestañas y los anchos de columna nuevos.
+- *Elements / Tables*: `defaultExpanded` (la fila arranca abierta y la tabla abre en su página), *States → Expanded
+  row*, y la regla de que el detalle queda en la parte visible cuando la tabla scrollea de costado.
+- Decisiones en `figma/modulos/clinical-mode.md` (2026-10-08).

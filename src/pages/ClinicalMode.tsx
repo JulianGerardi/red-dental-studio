@@ -11,6 +11,7 @@ import { ClinicalToolbar } from '@/components/clinical/ClinicalToolbar'
 import { DentalAssessmentExam } from '@/components/clinical/DentalAssessmentExam'
 import { TreatmentPlanList } from '@/components/clinical/TreatmentPlanList'
 import { ProblemList } from '@/components/clinical/ProblemList'
+import { NavegacionClinica, type DestinoClinico } from '@/components/clinical/RecordDetail'
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
 import { LabOrderPanel } from '@/components/clinical/LabOrderPanel'
 import { RadiographyPanel } from '@/components/clinical/RadiographyPanel'
@@ -63,6 +64,8 @@ export default function ClinicalMode() {
     }))
 
   const irA = (p: Pestana) => { setPestana(p); setEnOverview(false) }
+  /* Los links del detalle de la Problem List: la pestaña y, para Treatment Plan, el caso. */
+  const ir = ({ pestana: p, caso }: DestinoClinico) => { if (caso) setCasoAbierto(caso); irA(p) }
 
   const modelo = (
     <div className="relative overflow-hidden rounded-lg bg-white shadow-panel">
@@ -170,6 +173,7 @@ export default function ClinicalMode() {
        `bg-page-background` que usa AppShell, definido en :root así que
        funciona igual en este take-over sin shell-. */
     <WorkflowsProvider onAbrir={() => irA('Treatment')}>
+    <NavegacionClinica.Provider value={ir}>
     <div className="bg-page-background min-h-svh p-4 sm:p-[30px] lg:px-12">
       <div className="mx-auto w-full max-w-[1440px]">
       <ClinicalTopBar
@@ -198,6 +202,7 @@ export default function ClinicalMode() {
       </ExamFindingsProvider>
       </div>
     </div>
+    </NavegacionClinica.Provider>
     </WorkflowsProvider>
   )
 }
