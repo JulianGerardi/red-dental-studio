@@ -5,6 +5,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-08
 
+### Settings → Billing: Fee Schedules, Carriers y Coverage Tables ([#18](https://github.com/JulianGerardi/red-dental-studio/pull/18))
+- Las tres pantallas de Billing dejan de ser placeholder: portada (`/settings/finance`) con Setup checks, Fee Schedules
+  (precios por código CDT editables en la celda, Adjust fees), Carriers con sus planes y Coverage Tables (% por categoría,
+  deducibles y máximos). Cada plan apunta a un fee schedule y a una coverage table. Armado con criterio propio: falta
+  compararlo con la app real.
+- **Para el dev:** store `data/finanzasStore.tsx` (`FinanzasProvider` envuelve la ruta de Settings) y datos en
+  `data/finanzas.ts`; componentes en `components/finance/` (`CoverageBar`, `CoverageSummary`, `EditableAmount`,
+  `PlansTable` y seis drawers) y `settings/SettingsSearch`. `SettingsPageHeader` suma `etiquetas` y `SettingsSectionCard`
+  suma `detail`. `location-options → FEES` sale de los fee schedules activos. El menú dice "Coverage Tables".
+
 ### Clinical Mode: el detalle de la fila pasa de cards a lista ([#15](https://github.com/JulianGerardi/red-dental-studio/pull/15))
 - El detalle desplegable de Problem List / Procedures deja las cards: es una lista de filas (título a la izquierda, datos
   a la derecha, una línea fina entre filas) en el orden Treatment, Lab order, Referral, Findings / diagnoses y Procedure
