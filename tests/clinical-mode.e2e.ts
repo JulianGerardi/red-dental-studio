@@ -104,3 +104,23 @@ test('el detalle de un procedimiento lleva a su caso y a su hallazgo', async ({ 
   await screen.getByRole('button', /^Bridge Option/).tap()
   await expect(screen.getByRole('button', /Bridge Option, Accepted/)).toBeVisible()
 })
+
+/* Lab Order sobre la tabla estándar: Filter filtra por estado y Cancel order se deshace con Undo. */
+test('Lab Order filtra por estado y cancela una orden con Undo', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', /^Exams/).tap()
+  await screen.getByRole('menuitem', 'Lab Order').tap()
+  await expect(screen.getByText(/Showing 1 to 9 of 9 active prescriptions/)).toBeVisible()
+
+  await screen.getByRole('button', /Filter lab orders by status/).tap()
+  await screen.getByRole('menuitemcheckbox', /Requested/).tap()
+  await screen.getByRole('menuitemcheckbox', /Requested/).press('Escape')
+  await expect(screen.getByText(/Showing 1 to 2 of 2 active prescriptions/)).toBeVisible()
+
+  await screen.getByRole('button', 'Actions for Diego Garcia').tap()
+  await screen.getByRole('menuitem', /Cancel order/).tap()
+  await expect(screen.getByText('Lab order for Diego Garcia canceled.')).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 1 of 1 active prescriptions/)).toBeVisible()
+  await screen.getByRole('button', 'Undo').tap()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 active prescriptions/)).toBeVisible()
+})

@@ -108,7 +108,9 @@ semicircular con el valor adentro, los campos con -/+ y el rango abajo.
 Tabla de Provider / Patient / Status / Updated / Created / Expiration Date /
 Actions, con Filter, New Prescription y el pie "Showing 9 active
 prescriptions". Las que vencen pronto van en rojo. El detalle y el modal
-"New Laboratory" quedan pendientes.
+"New Laboratory" quedan pendientes. Desde el 2026-10-08 va con la estética de
+la app (tabla estándar, filtro y botones): ver *Lab Order con la estética de la
+app* más abajo.
 
 ## Desviaciones deliberadas
 
@@ -2138,3 +2140,31 @@ derecha; en angosto el título va arriba.
 3. Con más ancho por fila, el hallazgo **y** su diagnóstico se ven sin abrir nada (antes el diagnóstico iba plegado);
    se pliega desde el tercero. Las otras visitas y los casos históricos siguen detrás de "N more…".
 4. `BloqueDetalle` y `SubtituloBloque` se van; quedan `FilaDetalle`, `FilasProcedimiento` y `FilasProblema`.
+
+## Lab Order con la estética de la app (2026-10-08)
+
+Pedido de Julián: unificar Lab Order con el resto de la app -tabla, buscador, botones y filtros-. Tenía una `<table>`
+propia con borde, un link azul suelto para New Prescription, un `FilterTrigger` que no filtraba y un pie armado a mano.
+
+1. **Card de la página** (`TARJETA_PANEL`, sombra y sin borde, 16px de aire) con la **tabla estándar** (`DataTable`)
+   adentro, como la Problem List del Overview.
+2. **Barra**: el buscador primero (provider, paciente o estado) y después **Filter**, que ahora filtra: los seis estados
+   de a varios, con su cantidad y el punto del color de su pill (`ORDEN_TONO`, en el orden del pedido: Requested,
+   Pending, Delayed, Delivered, Canceled, Rejected). Para eso el `filter` de `DataTable` acepta opciones con `count` y
+   `tone` (`FilterOption`), no sólo texto.
+3. **Botones** con `ui/button` (36px, el alto del buscador y de Filter): *New Prescription* es la acción principal
+   (azul sólido, antes un link) y *View History* pasa del pie a la barra como secundario: el pie es el de la tabla.
+4. **Filas**: las iniciales en el círculo celeste del equipo (32px, como `PersonCell tone="soft"`) sin link -la orden no
+   lleva a la ficha-; los nombres en `ink` medium. La pill y el rojo de lo que vence pronto quedan.
+5. **Acciones**: el ícono de documento y el kebab se juntan en el kebab estándar (`RowActionsMenu`): *View order*,
+   *Edit order* y, mientras la orden sigue abierta (Requested, Pending, Delayed), *Cancel order* en rojo, que la pasa
+   a Canceled con Undo. View y Edit avisan que no están en esta versión, como antes el ícono.
+6. **Pie** de la tabla estándar: "Showing 1 to 9 of 9 active prescriptions" (anomalía 85, se mantiene), *Show* 5 / 10 / 20
+   y la paginación. 10 por página: entran las 9 del frame.
+7. **Vacíos**: la búsqueda sin resultados usa el de la tabla ("No results"); sin órdenes, "No lab orders yet".
+8. El panel recibe `ordenes` opcional (por defecto las del frame), para mostrar el vacío y la paginación en Storybook.
+
+Desviación del frame: View History deja el pie y el ícono de documento de cada fila pasa al menú. Storybook:
+*Components / Clinical / LabOrderPanel* (Playground, Parts, States y Specs) y *Elements / Tables* (filtro con cantidad y
+color).
+

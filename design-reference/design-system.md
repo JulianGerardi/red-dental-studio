@@ -540,3 +540,14 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 - Segunda vuelta (2026-10-08): el detalle pasa de cards a **lista** (filas una debajo de la otra, título a la izquierda).
   *RecordDetail* actualiza Parts (Rows of a procedure / problem, Row, Entry), States, *More open* y Specs (lista, título
   de 150px, línea de 24px).
+
+## Clinical Mode: Lab Order con la tabla estándar (2026-10-08)
+
+- *Components / Clinical / LabOrderPanel* pasa a la estructura de *Elements / Buttons*: **Playground** con *orders*
+  (0 a 9: el vacío y la paginación) y *width* (desktop, tablet, phone); **Parts** (Filter, View History, New
+  Prescription, las pills de estado y la tabla de qué hace cada parte); **States** (Filter open, Filtered, Row menu,
+  Canceled, No results, Empty, Phone, cada uno con su story) y **Specs**. Ya no hay historias sueltas.
+- *Elements / Tables*: el `filter` de `DataTable` acepta opciones con cantidad y color (`FilterOption`); el Playground
+  lo muestra y Specs → Rules lo suma. *Audit / Tables in the app* mide Lab Order desde su Playground.
+- Decisiones en `figma/modulos/clinical-mode.md` (2026-10-08).
+
