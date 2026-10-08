@@ -2122,3 +2122,19 @@ Del prototipo no se toma: el "Phase" de cada visita (el modelo no tiene fases) y
 | 97 | El contador de Referrals de la barra dice **0** aunque hay procedimientos y problemas en estado Referred (y ahora derivaciones vinculadas) | barra / detalle |
 
 No se tocó la barra en esta tanda: queda para decidir si el contador sale de las derivaciones.
+
+### Segunda vuelta: lista en vez de cards (2026-10-08)
+
+Julián: las cards ocupaban lugar. El detalle pasa a ser **una lista**: una fila debajo de la otra, separadas por una
+línea fina, sin card ni sombra, con el título (y la cuenta) en una columna de 150px a la izquierda y los datos a la
+derecha; en angosto el título va arriba.
+
+1. **Orden, el que pidió:** Treatment, Lab order, Findings, Procedure consent. Referral sale del bloque de Lab order y
+   pasa a su propia fila, justo después. El problema sigue el mismo orden con su contraparte: Treatment, Lab order,
+   Referral, **Procedures** (donde va Findings) y **Source exam** (donde va el consentimiento). El drawer de *View full
+   record* usa el mismo orden.
+2. **Cada dato en una línea**: link, estado y contexto seguidos. El estado del grupo se suma a la línea del caso
+   ("Group status") en vez de ocupar una línea propia, y la visita va sin la caja gris.
+3. Con más ancho por fila, el hallazgo **y** su diagnóstico se ven sin abrir nada (antes el diagnóstico iba plegado);
+   se pliega desde el tercero. Las otras visitas y los casos históricos siguen detrás de "N more…".
+4. `BloqueDetalle` y `SubtituloBloque` se van; quedan `FilaDetalle`, `FilasProcedimiento` y `FilasProblema`.
