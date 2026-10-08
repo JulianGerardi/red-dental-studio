@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-08
 
+### Clinical Mode: Lab Order con la tabla, el buscador, el filtro y los botones de la app ([#17](https://github.com/JulianGerardi/red-dental-studio/pull/17))
+- Lab Order deja su tabla propia y usa la de la app (`DataTable`) en la card de la página: buscador, Filter que filtra
+  por estado (con cantidad y color), *View History* y *New Prescription* con `ui/button`, el kebab estándar (*View
+  order*, *Edit order*, *Cancel order* con Undo) y el pie con *Show* y paginación.
+- **Para el dev:** `LabOrderPanel` recibe `ordenes` opcional. En `DataTable`, `filter.options` acepta `FilterOption`
+  (cantidad y tono); los strings siguen andando. Ya no hay `FilterTrigger` suelto en Lab Order.
+
 ### Clinical Mode: el detalle de la fila pasa de cards a lista ([#15](https://github.com/JulianGerardi/red-dental-studio/pull/15))
 - El detalle desplegable de Problem List / Procedures deja las cards: es una lista de filas (título a la izquierda, datos
   a la derecha, una línea fina entre filas) en el orden Treatment, Lab order, Referral, Findings / diagnoses y Procedure
