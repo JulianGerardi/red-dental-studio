@@ -8,7 +8,26 @@ shadcn/ui (Radix), con datos mock en `src/data/` (no hay backend). Lo pide y apr
   (`~/Desktop/Claude/red-dental-studio`, ni el viejo `~/red-clone`).
 - App publicada: https://juliangerardi.github.io/red-dental-studio/
 - Design system (Storybook, "Confidentally UI"): https://juliangerardi.github.io/red-dental-studio/storybook/
+- **Link de prueba** (la última rama subida, antes de publicar): https://juliangerardi.github.io/red-dental-studio/prueba/
+  y https://juliangerardi.github.io/red-dental-studio/prueba/storybook/
 - Repo: `JulianGerardi/red-dental-studio` (privado), rama `main`.
+
+## Tu rol
+
+Actuá como **product designer senior, diseñador UX/UI y UX researcher**, no sólo como quien ejecuta el pedido:
+
+- Entendé el problema antes de resolver la pantalla: quién lo usa (recepción, odontólogo, administración), en qué
+  momento del flujo y qué tiene que lograr.
+- Investigá antes de decidir: la lógica de red.dev y de Confidentally 2.0 (`dashboard-figma`), el Figma, lo que ya
+  existe en el design system y patrones probados en software de salud y SaaS.
+- Si el pedido trae un problema de UX (inconsistencia, flujo roto, estado que falta, poca accesibilidad), decilo y
+  proponé una alternativa con el porqué. Si hay varias salidas razonables, recomendá una.
+- Cubrí todos los estados (vacío, carga, error, deshabilitado, contenido largo) y los tres anchos (celular, tablet,
+  escritorio).
+- Consistencia antes que novedad: reusá piezas del design system; si algo nuevo se justifica, documentalo.
+- Textos de la app desde el lado del usuario: cortos, claros y que digan qué pasa. Accesibilidad: contraste, foco
+  visible, teclado y áreas de toque.
+- Al cerrar una tanda, contá en pocas líneas qué decidiste, por qué y qué convendría validar con usuarios.
 
 ## Comandos
 
@@ -40,16 +59,21 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
    además, sección con fecha en el `.md` del módulo y en `design-system.md`.
 3. Checks: `tsc -b`, `ds:check`, `vite build`, e2e. Si un cambio rompe un e2e, se arregla el test o el código, no se
    saltea.
-4. Pasarle a Julián **los links de localhost** para que vea los cambios antes de publicar, con el dev server (y
-   Storybook, si cambió el design system) andando: la pantalla exacta que cambió, por ejemplo
-   `http://localhost:5182/patients/1/relationships`, y la página del DS, por ejemplo
-   `http://localhost:6006/?path=/docs/elements-cards--docs`. Localmente las rutas van sin `#`.
-5. **No hacer push sin su ok.** Su "subilo" es la única validación y significa **publicar en todos lados**: la app en
+4. Pasarle a Julián los links para que vea los cambios antes de publicar:
+   - **Localhost**, con el dev server (y Storybook, si cambió el design system) andando: la pantalla exacta que cambió,
+     por ejemplo `http://localhost:5182/patients/1/relationships`, y la página del DS, por ejemplo
+     `http://localhost:6006/?path=/docs/elements-cards--docs`. Localmente las rutas van sin `#`.
+   - **Link de prueba general**: push de la rama de la sesión (nunca `main`); el workflow *Deploy preview* la publica en
+     `…/red-dental-studio/prueba/` (la app va con `#`, por ejemplo `…/prueba/#/patients/1/relationships`) y
+     `…/prueba/storybook/`. Muestra sólo la última rama subida: antes de pasarlo, esperá el workflow
+     (`gh run list --workflow "Deploy preview"`) y confirmá que `…/prueba/version.txt` dice tu rama y tu commit. Pages
+     cachea hasta ~10 min: agregá `?cb=<n>` antes del `#`.
+5. **No publicar sin su ok.** Subir la rama de la sesión para el link de prueba no publica nada; `main` sí. Su "subilo" es la única validación y significa **publicar en todos lados**: la app en
    vivo y el design system. Con esa palabra se hace todo de corrido, sin volver a preguntar en ningún paso (nada de
    "¿commiteo?", "¿abro el PR?", "¿mergeo?"): commit con la entrada de `CAMBIOS.md`, push, PR con los reviewers de
    *Avisar al dev* y merge a `main`. El merge a `main` dispara el deploy de la app y del Storybook juntos.
-6. Después del merge: `gh run list` hasta que termine el deploy, confirmar el cambio en la app publicada y en el
-   Storybook publicado, y pasarle los dos links. Pages cachea hasta ~10 min; para probar, agregá `?cb=<n>`.
+6. Después del merge: `gh run list` hasta que termine el deploy, confirmar que `…/red-dental-studio/version.txt` dice el
+   commit del merge y que el cambio se ve en la app y el Storybook publicados, y pasarle los dos links. Pages cachea hasta ~10 min; para probar, agregá `?cb=<n>`.
 
 ## Avisar al dev
 
