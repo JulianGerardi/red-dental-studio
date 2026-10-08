@@ -24,13 +24,16 @@ import { SettingsAccounts } from '@/pages/settings/Accounts'
 import { SettingsAccount } from '@/pages/settings/Account'
 import { SettingsConsents } from '@/pages/settings/Consents'
 import { SettingsLedgerOptions } from '@/pages/settings/LedgerOptions'
+import { SettingsBilling } from '@/pages/settings/finance/Billing'
+import { SettingsFeeSchedules, SettingsFeeScheduleDetail } from '@/pages/settings/finance/FeeSchedules'
+import { SettingsCarriers, SettingsCarrierDetail } from '@/pages/settings/finance/Carriers'
+import { SettingsCoverageTables, SettingsCoverageTableDetail } from '@/pages/settings/finance/CoverageTables'
+import { FinanzasProvider } from '@/data/finanzasStore'
 import Help from '@/pages/Help'
 import Notifications from '@/pages/Notifications'
 
 const SETTINGS_PLACEHOLDERS = [
-  'roles', 'parameters',
-  'finance', 'finance/fee-schedule', 'finance/carriers', 'finance/coverage-table',
-  'libraries', 'patient-portal', 'security', 'preferences',
+  'roles', 'parameters', 'libraries', 'patient-portal', 'security', 'preferences',
 ]
 
 /* Las rutas de la app, separadas del router y los providers para que el design
@@ -69,7 +72,8 @@ export function AppRoutes() {
         <Route path="help" element={<Help />} />
         <Route path="notifications" element={<Notifications />} />
 
-        <Route path="settings" element={<SettingsLayout />}>
+        {/* El store de Billing envuelve todo Settings: el breadcrumb lee de ahí el nombre de un carrier o un fee schedule. */}
+        <Route path="settings" element={<FinanzasProvider><SettingsLayout /></FinanzasProvider>}>
           <Route index element={<Navigate to="/settings/general" replace />} />
           <Route path="general" element={<SettingsGeneral />} />
           <Route path="locations" element={<SettingsLocations />} />
@@ -83,6 +87,16 @@ export function AppRoutes() {
           <Route path="account" element={<SettingsAccount />} />
           <Route path="consents" element={<SettingsConsents />} />
           <Route path="ledger" element={<SettingsLedgerOptions />} />
+          <Route path="finance" element={<SettingsBilling />} />
+          <Route path="finance/fee-schedule" element={<SettingsFeeSchedules />} />
+          <Route path="finance/fee-schedule/new" element={<SettingsFeeSchedules nuevo />} />
+          <Route path="finance/fee-schedule/:feeId" element={<SettingsFeeScheduleDetail />} />
+          <Route path="finance/carriers" element={<SettingsCarriers />} />
+          <Route path="finance/carriers/new" element={<SettingsCarriers nuevo />} />
+          <Route path="finance/carriers/:carrierId" element={<SettingsCarrierDetail />} />
+          <Route path="finance/coverage-table" element={<SettingsCoverageTables />} />
+          <Route path="finance/coverage-table/new" element={<SettingsCoverageTables nuevo />} />
+          <Route path="finance/coverage-table/:tableId" element={<SettingsCoverageTableDetail />} />
           {SETTINGS_PLACEHOLDERS.map((p) => (
             <Route key={p} path={p} element={<SettingsPlaceholder />} />
           ))}

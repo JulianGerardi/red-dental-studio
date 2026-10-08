@@ -30,8 +30,8 @@ export const secuencia = (...pasos: ((c: Contexto) => Promise<void>)[]) => async
   for (const paso of pasos) await paso(c)
 }
 
-/* Comprueba que el texto esté en pantalla: si no aparece el story falla, así
-   cada estado documentado queda verificado y no sólo dibujado. */
+/* Comprueba que el texto esté en pantalla (una vez o más: dos campos vacíos dicen los dos "required"): si no aparece el
+   story falla, así cada estado documentado queda verificado y no sólo dibujado. */
 export const esperar = (texto: RegExp) => async (c: Contexto) => {
-  await en(c).findByText(texto, { exact: false })
+  await en(c).findAllByText(texto, { exact: false })
 }

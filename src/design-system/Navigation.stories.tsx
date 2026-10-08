@@ -41,7 +41,7 @@ const meta = {
           '- **Expandido:** no hay tooltips, el nombre ya se ve.',
           '- **Ítem activo:** azul con texto blanco, según la pantalla en la que estás.',
           '- **Settings:** queda abajo, en el mismo lugar colapsado y expandido. Al pasar el mouse abre un menú flotante con sus secciones.',
-          '- **Billing:** al pasar el mouse (o con su flecha) abre al costado un menú con Billing, Fee Schedules, Carriers y Coverage Table. Queda activo en Billing y en esas tres tablas.',
+          '- **Billing:** al pasar el mouse (o con su flecha) abre al costado un menú con Billing, Fee Schedules, Carriers y Coverage Tables. Queda activo en Billing y en esas tres tablas.',
           '- **En el celular:** el menú es un panel de 234px que tapa el contenido y se cierra solo al elegir una pantalla (ver *On each device*).',
           '',
           'El menú del paciente está en *Elements / Patient menu*.',
@@ -112,7 +112,7 @@ const Fondo = ({ children }: { children: ReactNode }) => (
 const PARTES: [string, string, string][] = [
   ['Logo', 'Bloque azul oscuro con el nombre. Mide lo mismo que la barra de arriba (64px) para que las dos queden alineadas.', 'Sólo el ícono.'],
   ['Items', 'Dashboard, Patients, Scheduling, Message, Contacts, Documents, Reports y Help: cada uno abre su pantalla. El de la pantalla actual va en azul.', 'Sólo íconos de 32×32, con el nombre en un tooltip.'],
-  ['Billing', 'Abre Billing. Al pasar el mouse (o con su flecha) muestra al costado Billing, Fee Schedules, Carriers y Coverage Table.', 'El ícono; el menú sale igual al pasar el mouse.'],
+  ['Billing', 'Abre Billing. Al pasar el mouse (o con su flecha) muestra al costado Billing, Fee Schedules, Carriers y Coverage Tables.', 'El ícono; el menú sale igual al pasar el mouse.'],
   ['Confibot', 'No es una pantalla: abre y cierra la hoja de chat de ayuda. Queda en azul mientras está abierta.', 'Ícono con tooltip.'],
   ['Settings', 'Al pie, en el mismo lugar abierto o cerrado. Al pasar el mouse muestra sus secciones; Billing despliega sus tablas con su flecha.', 'El ícono, sin tooltip: el menú ya sale ahí mismo.'],
   ['Toggle', 'Está en la barra de arriba, a la izquierda del saludo: expande a 176px o colapsa a 58px.', 'Cambia el ícono.'],

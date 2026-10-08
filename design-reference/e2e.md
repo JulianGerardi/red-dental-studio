@@ -19,6 +19,9 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   pasos del drawer hasta el aviso de guardado.
 - `tests/consents.e2e.ts` (2026-10-07): en Settings → Consents, Preview abre la hoja en un drawer (Patient View saca
   Diagnosis) y Save desde el preview lo cierra y deja los faltantes a la vista en el editor.
+- `tests/billing-settings.e2e.ts` (2026-10-08): Settings → Billing. Un fee schedule nuevo copia el UCR con el ajuste y
+  un precio se edita en la celda; un plan nuevo de un carrier aparece en su coverage table; tocar una categoría cambia lo
+  que paga; un fee schedule en uso no se borra.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 
@@ -29,6 +32,10 @@ Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ni
 `agents.default` de `e2e.config.ts`. La clave va en una variable de entorno, nunca en el repo.
 
 ## Notas
+
+- Sin acceso a `cdn.playwright.dev` (sesiones en la nube), el runner no puede bajar su Chromium. Se corre con el que
+  ya está instalado apuntando `PLAYWRIGHT_BROWSERS_PATH` a una carpeta con enlaces `chromium-<versión>` y
+  `chromium_headless_shell-<versión>` hacia el binario de `/opt/pw-browsers`.
 
 - El CLI manda telemetría anónima de uso (comandos y errores, sin contenido de los tests). Se apaga con
   `npx e2e telemetry disable` o `E2E_TELEMETRY_DISABLED=1`.

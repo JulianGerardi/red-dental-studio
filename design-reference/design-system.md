@@ -540,3 +540,22 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 - Segunda vuelta (2026-10-08): el detalle pasa de cards a **lista** (filas una debajo de la otra, título a la izquierda).
   *RecordDetail* actualiza Parts (Rows of a procedure / problem, Row, Entry), States, *More open* y Specs (lista, título
   de 150px, línea de 24px).
+
+## Settings → Billing: Fee Schedules, Carriers y Coverage Tables (2026-10-08)
+
+- Pantallas nuevas en *Pages* (Billing, las tres listas, sus `/new` y sus detalles) y sus piezas internas en *Pages ›
+  Parts › Billing settings* (Setup checks, FeesTable, CarrierInformation, CoverageRulesTable y los kebabs), con
+  Playground, Parts, States (incluido *Carrier Information Errors*) y Specs (reglas de borrar y desactivar).
+- *Components / Finance* (nuevo módulo, `src/components/finance/`): **CoverageBar** (barra + %; verde 100, azul parcial,
+  "Not covered" en 0), **CoverageSummary** (el % por clase en una línea, con límites opcionales), **EditableAmount** (monto
+  que se edita en su celda; *Invalid Amount* comprueba `aria-invalid`), **PlansTable** (la tabla de planes que une las tres
+  secciones, con columnas que se ocultan según el detalle) y seis drawers documentados con `kit-drawer`
+  (FeeScheduleDrawer, AdjustFeesDrawer, CarrierDrawer, PlanDrawer, CoverageTableDrawer, CoverageRuleDrawer), cada uno
+  con *With Validation Errors*.
+- *Components / Settings*: **SettingsSearch** (nuevo), **SettingsPageHeader** suma `etiquetas` (pills al lado del
+  título) y **SettingsSectionCard** suma `detail` (dato al pie en azul); las dos páginas pasan a Playground, Parts,
+  States y Specs. *Elements / Page header* suma el control *tags* y la historia *Detail header*.
+- Kit: `Muestra` (título + nota + la pieza) y `TablaPartes` (Part · What it does · Component) en
+  `src/design-system/kit.tsx`. `esperar()` de `play.ts` acepta varias coincidencias: un formulario con dos campos vacíos
+  dice dos veces "required" y antes la story fallaba.
+- Decisiones en `figma/modulos/settings-billing.md`.

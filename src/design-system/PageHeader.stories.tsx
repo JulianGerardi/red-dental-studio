@@ -1,10 +1,15 @@
 import type { ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Plus, Search } from 'lucide-react'
+import { Pencil, Plus, Search } from 'lucide-react'
 import { Breadcrumb, type Miga } from '@/components/ui/breadcrumb'
 import { Button } from '@/components/ui/button'
 import { SearchButton } from '@/components/ui/search-button'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
+import { Pill } from '@/components/ui/pill'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { BOTON_ICONO } from '@/lib/estilos'
 import { Bloque, Lienzo, Tabla, useMedidas } from './kit'
 import { cn } from '@/lib/utils'
 
@@ -15,6 +20,7 @@ import { cn } from '@/lib/utils'
 type Args = {
   breadcrumb: string
   title: string
+  tags: boolean
   description: string
   action: boolean
   actionLabel: string
@@ -33,7 +39,7 @@ const meta = {
         component: [
           'El encabezado de las pantallas de la app. De arriba hacia abajo: **rastro** (dónde estás, con links para volver) · **título** · **bajada** (qué se hace acá) · **acción principal** a la derecha del título · **barra** con buscador, botón Search y filtros.',
           '',
-          'Se arma con `Breadcrumb` (`@/components/ui/breadcrumb`) y `SettingsPageHeader` (`@/components/settings/SettingsPageHeader`), que ya usan Accounts, Employees, Locations y Ledger options.',
+          'Se arma con `Breadcrumb` (`@/components/ui/breadcrumb`) y `SettingsPageHeader` (`@/components/settings/SettingsPageHeader`), que ya usan Accounts, Employees, Locations, Ledger options y las pantallas de Billing. En el **detalle de un ítem** (un carrier, un fee schedule) el título lleva sus pills al lado (`etiquetas`) y la acción puede ser un grupo: secundaria, principal y un kebab (*Detail header*). El buscador de Billing es `SettingsSearch`.',
           '',
           '**Probalo:** en *Playground* cambiá cada parte desde *Controls*.',
         ].join('\n'),
@@ -43,6 +49,7 @@ const meta = {
   args: {
     breadcrumb: 'Settings > Accounts',
     title: 'Accounts overview',
+    tags: false,
     description: 'View and manage all accounts across the platform.',
     action: true,
     actionLabel: 'New Account',
@@ -53,6 +60,7 @@ const meta = {
   argTypes: {
     breadcrumb: { control: 'text', description: 'Tramos separados por ">". El último es la pantalla actual. Vacío = sin rastro.' },
     title: { control: 'text' },
+    tags: { control: 'boolean', description: 'Pills al lado del título (etiquetas), como en el detalle de un ítem.' },
     description: { control: 'text', description: 'Una línea: qué se hace en esta pantalla.' },
     action: { control: 'boolean', description: 'Acción principal a la derecha del título.' },
     actionLabel: { control: 'text' },
@@ -90,7 +98,7 @@ const Filtro = () => (
 
 /* Mismo margen que las pantallas: el rastro lo pone el layout de Settings
    arriba y el encabezado va debajo. */
-function Encabezado({ breadcrumb, title, description, action, actionLabel, search, searchButton, filter }: Args) {
+function Encabezado({ breadcrumb, title, tags, description, action, actionLabel, search, searchButton, filter }: Args) {
   const barra = search || searchButton || filter
   return (
     <div>
@@ -98,6 +106,7 @@ function Encabezado({ breadcrumb, title, description, action, actionLabel, searc
       <div className="px-4 py-6 sm:px-8">
         <SettingsPageHeader
           titulo={title}
+          etiquetas={tags ? <><Pill tone="info">Default</Pill><Pill tone="success">Active</Pill></> : undefined}
           bajada={description}
           accion={action ? <Button><Plus /> {actionLabel}</Button> : undefined}
         >
@@ -129,7 +138,7 @@ function Marca({ n, children, className }: { n: number; children: ReactNode; cla
 
 const PARTES = [
   ['Breadcrumb', 'Dónde estás. Cada tramo menos el último lleva de vuelta. En Settings lo pone el layout: la pantalla no lo dibuja.'],
-  ['Title', 'El nombre de la pantalla. 24px Bold.'],
+  ['Title', 'El nombre de la pantalla. En el detalle de un ítem, con sus pills al lado (etiquetas).'],
   ['Description', 'Una línea que dice qué se hace acá. 14px, ink-muted.'],
   ['Primary action', 'Una sola, la más importante, alineada con el título. Button primary lg.'],
   ['Toolbar', 'Buscador (hasta 300px), botón Search y filtros, 20px debajo de la bajada. La tabla o el contenido van 16px más abajo.'],
@@ -160,6 +169,37 @@ export const Anatomy: Story = {
           </li>
         ))}
       </ol>
+    </div>
+  ),
+}
+
+/* El encabezado del detalle de un ítem (Billing): pills al lado del título y un grupo de acciones. */
+export const DetailHeader: Story = {
+  name: 'Detail header',
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <div>
+      <div className="px-4 pt-5 sm:px-8"><Breadcrumb items={migas('Settings > Billing > Fee Schedules > PPO Premium Plan')} /></div>
+      <div className="px-4 py-6 sm:px-8">
+        <SettingsPageHeader
+          titulo="PPO Premium Plan"
+          etiquetas={<Pill tone="success">Active</Pill>}
+          bajada="PPO · Effective Mar 1, 2026 · Contracted fees for premium PPO plans."
+          accion={(
+            <div className="flex items-center gap-2">
+              <Button variant="secondary"><Pencil /> Edit details</Button>
+              <Button>Adjust fees</Button>
+              <RowActionsMenu label="PPO Premium Plan" className={BOTON_ICONO}><DropdownMenuItem>Duplicate</DropdownMenuItem></RowActionsMenu>
+            </div>
+          )}
+        />
+      </div>
+      <div className="px-4 pb-6 sm:px-8">
+        <p className="mb-3 text-[12.5px] text-ink-muted">List of Billing: SettingsSearch in the toolbar.</p>
+        <SettingsPageHeader titulo="Carriers" bajada="The insurance companies you bill." accion={<Button><Plus /> New carrier</Button>}>
+          <SettingsSearch value="" onChange={() => {}} placeholder="Search carriers or payer ID" />
+        </SettingsPageHeader>
+      </div>
     </div>
   ),
 }

@@ -15,6 +15,7 @@ import { SettingsSectionCard } from '@/components/settings/SettingsSectionCard'
 import { LOCACIONES } from '@/pages/settings/Locations'
 import { EMPLEADOS } from '@/data/employees'
 import { CUENTAS } from '@/pages/settings/Accounts'
+import { useFinanzas } from '@/data/finanzasStore'
 
 export const SETTINGS_ICONS: Record<string, LucideIcon> = {
   'user-cog': UserCog, building: Building2, users: Users, 'shield-check': ShieldCheck,
@@ -26,7 +27,7 @@ export const SETTINGS_ICONS: Record<string, LucideIcon> = {
 /* El rastro se arma de la ruta, no lo escribe cada pantalla: así hay uno solo
    —el problema anterior eran dos— y siempre incluye la vuelta a General, que
    de otro modo obliga a abrir el menú flotante del rail. */
-function migasDe(pathname: string): Miga[] {
+function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string) => string | undefined): Miga[] {
   if (pathname === '/settings/general') return []
   const migas: Miga[] = [{ label: 'Settings', to: '/settings/general' }]
 
@@ -37,8 +38,9 @@ function migasDe(pathname: string): Miga[] {
     /* .../new es la lista con el drawer de alta abierto. */
     const hoja = pathname === item.to || pathname === `${item.to}/new`
     migas.push({ label: item.label, to: hoja ? undefined : item.to })
-    const hijo = item.children?.find((c) => pathname.startsWith(c.to))
-    if (hijo) migas.push({ label: hijo.label })
+    /* En el detalle de un carrier o un fee schedule, la lista de arriba también es un link. */
+    const hijo = item.children?.find((c) => pathname === c.to || pathname.startsWith(`${c.to}/`))
+    if (hijo) migas.push({ label: hijo.label, to: pathname === hijo.to || pathname === `${hijo.to}/new` ? undefined : hijo.to })
   }
 
   /* El detalle de una locación o de un empleado no está en el menú: su
@@ -59,12 +61,18 @@ function migasDe(pathname: string): Miga[] {
     const cuenta = CUENTAS.find((c) => c.id === detalleCuenta[1])
     migas.push({ label: cuenta?.nombre ?? detalleCuenta[1] })
   }
+  const detalleFinanzas = pathname.match(/^\/settings\/finance\/([^/]+)\/([^/]+)$/)
+  if (detalleFinanzas && detalleFinanzas[2] !== 'new') {
+    migas.push({ label: nombreFinanzas(detalleFinanzas[1], detalleFinanzas[2]) ?? detalleFinanzas[2] })
+  }
   return migas
 }
 
 export function SettingsLayout() {
   const { pathname } = useLocation()
-  const migas = migasDe(pathname)
+  const { aranceles, aseguradoras, coberturas } = useFinanzas()
+  const listas: Record<string, { id: string; nombre: string }[]> = { 'fee-schedule': aranceles, carriers: aseguradoras, 'coverage-table': coberturas }
+  const migas = migasDe(pathname, (seccion, id) => listas[seccion]?.find((x) => x.id === id)?.nombre)
   return (
     /* El sidebar propio de Settings se fue —sus pantallas cuelgan del menú
        flotante del rail—. El breadcrumb vive acá y en ningún otro lado: cuando
