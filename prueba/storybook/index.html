@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>storybook - Storybook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    
+    <style>
+      @font-face {
+        font-family: 'Nunito Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url('./sb-common-assets/nunito-sans-regular.woff2') format('woff2');
+      }
+
+      @font-face {
+        font-family: 'Nunito Sans';
+        font-style: italic;
+        font-weight: 400;
+        font-display: swap;
+        src: url('./sb-common-assets/nunito-sans-italic.woff2') format('woff2');
+      }
+
+      @font-face {
+        font-family: 'Nunito Sans';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url('./sb-common-assets/nunito-sans-bold.woff2') format('woff2');
+      }
+
+      @font-face {
+        font-family: 'Nunito Sans';
+        font-style: italic;
+        font-weight: 700;
+        font-display: swap;
+        src: url('./sb-common-assets/nunito-sans-bold-italic.woff2') format('woff2');
+      }
+    </style>
+
+    <link href="./sb-manager/runtime.js" rel="modulepreload" />
+
+    
+    <link href="./sb-addons/storybook-core-server-presets-0/common-manager-bundle.js" rel="modulepreload" />
+    
+    <link href="./sb-addons/docs-1/manager-bundle.js" rel="modulepreload" />
+    
+    <link href="./sb-addons/a11y-2/manager-bundle.js" rel="modulepreload" />
+    
+    <link href="./sb-addons/pseudo-states-3/manager-bundle.js" rel="modulepreload" />
+    
+    <link href="./sb-addons/storybook-4/manager-bundle.js" rel="modulepreload" />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* Lo que el tema no alcanza a cubrir: el mismo lenguaje del sidebar de la
+     app (riel gris claro, ítem activo azul con texto blanco, radio 6px). */
+  :root { color-scheme: light; }
+  body { font-family: "Inter", ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  #storybook-sidebar-region { background: #fafafa; border-right: 1px solid #e7e7e7; }
+  #storybook-sidebar-region .sidebar-item { border-radius: 6px; }
+  #storybook-sidebar-region .sidebar-subheading { letter-spacing: .06em; color: #71717a; }
+  #storybook-sidebar-region a img { height: 40px; width: auto; max-width: 100%; }
+  /* La lista de "primeros pasos" de Storybook no aporta acá. */
+  #storybook-checklist-widget { display: none; }
+  /* En el celular Storybook agrega una barra abajo para abrir su menú: el
+     sitio tiene el suyo (Sitio.tsx), así que no se muestra. */
+  #root > div > section:has(.sb-bar) { display: none !important; }
+</style>
+ 
+
+    <style>
+      #storybook-root[hidden] {
+        display: none !important;
+      }
+    </style>
+
+    
+  </head>
+  <body>
+    <div id="root"></div>
+
+    
+    <script>
+      
+        
+          window['FEATURES'] = {
+  "actions": true,
+  "argTypeTargetsV7": true,
+  "babelRemoveBugfixes": false,
+  "backgrounds": true,
+  "changeDetection": true,
+  "componentsManifest": false,
+  "controls": true,
+  "disallowImplicitActionsInRenderV8": true,
+  "highlight": true,
+  "interactions": true,
+  "legacyDecoratorFileOrder": false,
+  "measure": true,
+  "outline": true,
+  "menuOnboardingChecklist": true,
+  "sidebarOnboardingChecklist": true,
+  "viewport": true
+};
+        
+      
+        
+          window['REFS'] = {};
+        
+      
+        
+          window['LOGLEVEL'] = "info";
+        
+      
+        
+          window['DOCS_OPTIONS'] = {
+  "defaultName": "Docs"
+};
+        
+      
+        
+          window['CONFIG_TYPE'] = "PRODUCTION";
+        
+      
+        
+          window['DOCGEN_STORY_PREPARED'] = false;
+        
+      
+        
+      
+        
+      
+        
+          window['TAGS_OPTIONS'] = {};
+        
+      
+        
+          window['STORYBOOK_BUILDER'] = "vite";
+        
+      
+        
+          window['STORYBOOK_FRAMEWORK'] = "react-vite";
+        
+      
+        
+          window['STORYBOOK_RENDERER'] = "react";
+        
+      
+        
+      
+    </script>
+    
+
+    <script type="module">
+      import './sb-manager/globals-runtime.js';
+
+      
+        import './sb-addons/storybook-core-server-presets-0/common-manager-bundle.js';
+      
+        import './sb-addons/docs-1/manager-bundle.js';
+      
+        import './sb-addons/a11y-2/manager-bundle.js';
+      
+        import './sb-addons/pseudo-states-3/manager-bundle.js';
+      
+        import './sb-addons/storybook-4/manager-bundle.js';
+      
+
+      import './sb-manager/runtime.js';
+    </script>
+  </body>
+</html>

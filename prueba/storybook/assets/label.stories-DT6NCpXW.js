@@ -1,0 +1,6 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,t as r}from"./label-CLChzG_h.js";var i,a,o,s,c;function l(){return(l=e((()=>{n(),i=t(),a={title:`Components/UI/Label`,component:r,args:{children:`First name`}},o={},s={render:()=>(0,i.jsxs)(`div`,{className:`flex flex-col gap-2`,children:[(0,i.jsx)(`input`,{id:`lbl-off`,disabled:!0,defaultValue:`Read only`,className:`peer h-9 w-56 rounded-md border border-input px-3 text-sm disabled:opacity-50`}),(0,i.jsx)(r,{htmlFor:`lbl-off`,children:`First name`})]})},c=[`Default`,`WithDisabledField`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{}`,...o.parameters?.docs?.source}}},s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="flex flex-col gap-2">
+      <input id="lbl-off" disabled defaultValue="Read only" className="peer h-9 w-56 rounded-md border border-input px-3 text-sm disabled:opacity-50" />
+      <Label htmlFor="lbl-off">First name</Label>
+    </div>
+}`,...s.parameters?.docs?.source}}}})))()}l();export{o as Default,s as WithDisabledField,c as __namedExportsOrder,a as default};
