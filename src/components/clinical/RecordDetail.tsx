@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Count } from '@/components/ui/count'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { Drawer, DrawerSection } from '@/components/ui/drawer'
-import { TARJETA_INTERNA } from '@/lib/estilos'
 import { ORDEN_TONO } from '@/components/clinical/LabOrderPanel'
 import { CitaVisita, EstadoConsentimiento, SIN_CONSENTIMIENTO_NI_TURNO, TONO_CASO, estadoGrupo } from '@/components/clinical/TreatmentPlanSection'
 import { codigoDiagnostico } from '@/components/clinical/dental/data'
@@ -19,8 +18,9 @@ import {
 
 /* El detalle que se despliega en cada fila de la tabla del Overview (Problem List y Procedures), con el mismo desplegable
    del Ledger (`rowDetail` de DataTable): lo que cuelga del registro -caso, visitas y turno, órdenes de laboratorio,
-   derivaciones, hallazgos y diagnósticos, consentimiento, examen de origen- en bloques chicos, cada uno con su link a la
-   pantalla donde se trabaja. Sólo lectura. Ver design-reference/figma/modulos/clinical-mode.md (2026-10-08). */
+   derivaciones, hallazgos y diagnósticos, consentimiento, examen de origen- en una lista de filas, una debajo de la otra
+   y sin cards, cada dato con su link a la pantalla donde se trabaja. Sólo lectura. Ver
+   design-reference/figma/modulos/clinical-mode.md (2026-10-08). */
 
 export const TONO_PROBLEMA: Record<EstadoProblema, PillTone> = {
   Active: 'success', 'In treatment': 'info', Monitoring: 'warning', Treated: 'neutral', 'Externally treated': 'neutral', Referred: 'purple',
@@ -100,45 +100,31 @@ export function MasItems({ label, children, abierto: inicial = false }: { label:
   )
 }
 
-/** Un dato del bloque: el link (o el texto) con su estado a la derecha y una línea de contexto abajo. */
+/** Un dato de la fila, en una sola línea: rótulo opcional, el link (o el texto), su estado y el contexto. */
 export function Entrada({ children, estado, sub, rotulo }: { children: ReactNode; estado?: ReactNode; sub?: ReactNode; rotulo?: string }) {
   return (
-    <div className="border-t border-line-soft py-2 first:border-t-0 first:pt-0 last:pb-0">
-      {rotulo && <p className="mb-0.5 text-[10px] font-medium text-ink-muted">{rotulo}</p>}
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">{children}</div>
-        {estado && <span className="shrink-0">{estado}</span>}
-      </div>
-      {sub && <p className="mt-0.5 text-[11px] leading-[1.45] text-ink-muted">{sub}</p>}
+    <div className="flex min-h-6 flex-wrap items-center gap-x-2 gap-y-0.5 py-0.5">
+      {rotulo && <span className="text-[11px] text-ink-muted">{rotulo}:</span>}
+      {children}
+      {estado}
+      {sub && <span className="text-[11px] leading-[1.45] text-ink-muted">{sub}</span>}
     </div>
   )
 }
 
-export const Vacio = ({ children }: { children: ReactNode }) => <p className="text-[12px] text-ink-faint">{children}</p>
+export const Vacio = ({ children }: { children: ReactNode }) => <p className="flex min-h-6 items-center text-[12px] text-ink-faint">{children}</p>
 
-/** Un bloque del detalle: card adentro de la tabla (InnerCard), con el título y la cuenta. `ancho` lo estira a toda la
-    fila con el título al costado: para los bloques de un solo dato (consentimiento, examen de origen). */
-export function BloqueDetalle({ titulo, cuenta, ancho, children }: { titulo: string; cuenta?: number; ancho?: boolean; children: ReactNode }) {
-  const encabezado = (
-    <header className={cn('flex shrink-0 items-center gap-2', !ancho && 'mb-2 justify-between')}>
-      <h4 className="text-[11px] font-semibold text-ink-muted">{titulo}</h4>
-      {cuenta !== undefined && <Count>{cuenta}</Count>}
-    </header>
-  )
+/** Una fila de la lista: el título (y la cuenta) a la izquierda y lo vinculado a la derecha, sin card (Julián,
+    2026-10-08: las cards ocupaban lugar). En angosto el título va arriba. */
+export function FilaDetalle({ titulo, cuenta, children }: { titulo: string; cuenta?: number; children: ReactNode }) {
   return (
-    <section className={cn(TARJETA_INTERNA, 'min-w-0 p-3', ancho && 'flex flex-wrap items-center gap-x-4 gap-y-2 @md:col-span-2 @2xl:col-span-3')}>
-      {ancho ? <><div className="w-[120px] shrink-0">{encabezado}</div><div className="min-w-0 flex-1 basis-[220px]">{children}</div></> : <>{encabezado}{children}</>}
+    <section className="grid gap-x-4 gap-y-1 border-t border-line-soft py-2 first:border-t-0 first:pt-0 last:pb-0 @md:grid-cols-[150px_minmax(0,1fr)]">
+      <header className="flex min-h-6 items-center gap-2 self-start">
+        <h4 className="text-[11px] font-semibold text-ink-muted">{titulo}</h4>
+        {cuenta !== undefined && <Count>{cuenta}</Count>}
+      </header>
+      <div className="min-w-0">{children}</div>
     </section>
-  )
-}
-
-/** Subtítulo dentro de un bloque: la segunda lista del bloque Lab order (Referral). */
-export function SubtituloBloque({ titulo, cuenta }: { titulo: string; cuenta?: number }) {
-  return (
-    <header className="mt-3 mb-2 flex items-center justify-between gap-2 border-t border-line-soft pt-3">
-      <h4 className="text-[11px] font-semibold text-ink-muted">{titulo}</h4>
-      {cuenta !== undefined && <Count>{cuenta}</Count>}
-    </header>
   )
 }
 
@@ -146,7 +132,7 @@ const pill = (tono: PillTone, texto: string, mayusculas?: boolean) => (
   <Pill tone={tono} size="sm" className={cn('whitespace-nowrap', mayusculas && 'tracking-wide uppercase')}>{texto}</Pill>
 )
 
-/* ── Contenido de cada bloque (inline y en el drawer) ─────────────── */
+/* ── Contenido de cada fila (en la lista y en el drawer) ──────────── */
 
 /** El caso de Treatment Plan: estado del grupo, el caso con su estado, las visitas con su turno y los casos históricos
     (las alternativas descartadas del grupo). Sin `visitas`, sólo el caso: es lo que muestra el detalle de un problema. */
@@ -159,12 +145,9 @@ export function ContenidoTratamiento({ t, visitas, completo }: { t?: Tratamiento
   /* Antes de aceptar no hay turno (la misma regla que la visita en Treatment Plan). */
   const conTurno = !SIN_CONSENTIMIENTO_NI_TURNO.includes(caso.estado)
   const filaVisita = (v: Visita, esta?: boolean) => (
-    <div key={v.id} className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 py-1">
-      <span className="text-[12px] text-ink">
-        {v.nombre} · {v.total}{esta && <span className="text-ink-muted"> · this procedure</span>}
-      </span>
-      {conTurno && <CitaVisita cita={v.cita} />}
-    </div>
+    <Entrada key={v.id} estado={conTurno && <CitaVisita cita={v.cita} />}>
+      <span className="text-[12px] text-ink">{v.nombre} · {v.total}{esta && <span className="text-ink-muted"> · this procedure</span>}</span>
+    </Entrada>
   )
   const otras = caso.visitas.filter((v) => v.id !== visita?.id)
   const listaHistoricos = historicos.map((c) => (
@@ -174,23 +157,18 @@ export function ContenidoTratamiento({ t, visitas, completo }: { t?: Tratamiento
   ))
   return (
     <div>
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="text-[11px] text-ink-muted">Group status</span>
-        {pill(TONO_CASO[estadoGrupo(grupo)], estadoGrupo(grupo), true)}
-      </div>
-      <Entrada estado={pill(TONO_CASO[caso.estado], caso.estado)} sub={`${caso.grupo} · Created ${caso.creado}`}>
+      <Entrada
+        estado={pill(TONO_CASO[caso.estado], caso.estado)}
+        sub={<>{caso.grupo} · Created {caso.creado} · Group status {pill(TONO_CASO[estadoGrupo(grupo)], estadoGrupo(grupo), true)}</>}
+      >
         <EnlaceRegistro onClick={() => abrir(caso.id)}>{caso.nombre}</EnlaceRegistro>
       </Entrada>
-      {visitas && visita && (
-        <div className="mt-2 rounded-md bg-surface-subtle px-2.5 py-1.5">
-          {filaVisita(visita, true)}
-          {otras.length > 0 && (completo
-            ? otras.map((v) => filaVisita(v))
-            : <MasItems label={`${otras.length} more visit${otras.length > 1 ? 's' : ''}`}>{otras.map((v) => filaVisita(v))}</MasItems>)}
-        </div>
-      )}
+      {visitas && visita && filaVisita(visita, true)}
+      {visitas && otras.length > 0 && (completo
+        ? otras.map((v) => filaVisita(v))
+        : <MasItems label={`${otras.length} more visit${otras.length > 1 ? 's' : ''}`}>{otras.map((v) => filaVisita(v))}</MasItems>)}
       {historicos.length > 0 && (completo
-        ? <div className="mt-2">{listaHistoricos}</div>
+        ? listaHistoricos
         : <MasItems label={`Historical case${historicos.length > 1 ? 's' : ''} · ${historicos.length}`}>{listaHistoricos}</MasItems>)}
     </div>
   )
@@ -221,7 +199,7 @@ export function ContenidoDerivaciones({ derivaciones }: { derivaciones: Derivaci
 }
 
 /** Los hallazgos que resuelve el procedimiento y su diagnóstico (ICD-10 y superficie, como Link to diagnosis). En el
-    resumen va el primero y el resto se pliega. */
+    resumen van los dos primeros y el resto se pliega. */
 export function ContenidoHallazgos({ hallazgos, onAbrir, completo }: { hallazgos: Problema[]; onAbrir: (p: Problema) => void; completo?: boolean }) {
   if (hallazgos.length === 0) return <Vacio>No findings or diagnoses linked.</Vacio>
   const items = [
@@ -236,9 +214,9 @@ export function ContenidoHallazgos({ hallazgos, onAbrir, completo }: { hallazgos
       </Entrada>
     )),
   ]
-  if (completo || items.length === 1) return items
-  const resto = items.length - 1
-  return <>{items[0]}<MasItems label={`${resto} more finding${resto > 1 ? 's' : ''} / diagnos${resto > 1 ? 'es' : 'is'}`}>{items.slice(1)}</MasItems></>
+  if (completo || items.length <= 2) return items
+  const resto = items.length - 2
+  return <>{items.slice(0, 2)}<MasItems label={`${resto} more finding${resto > 1 ? 's' : ''} / diagnos${resto > 1 ? 'es' : 'is'}`}>{items.slice(2)}</MasItems></>
 }
 
 /** El consentimiento del procedimiento: el documento del caso y el estado de este procedimiento. */
@@ -249,13 +227,9 @@ export function ContenidoConsentimiento({ t }: { t?: Tratamiento }) {
   const estado = t.procCaso.consentimiento
   const enviado = CONSENTIMIENTO.historial.find((h) => h.evento === 'Sent to patient')?.fecha
   return (
-    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-      <span className="min-w-0">
-        <EnlaceRegistro onClick={() => ir({ pestana: 'Treatment Plan', caso: t.caso.id })}>{CONSENTIMIENTO.titulo}</EnlaceRegistro>
-        {estado !== 'Not sent' && enviado && <span className="text-[11px] text-ink-muted"> · Sent {enviado}</span>}
-      </span>
-      <EstadoConsentimiento estado={estado} />
-    </div>
+    <Entrada estado={<EstadoConsentimiento estado={estado} />} sub={estado !== 'Not sent' && enviado && `Sent ${enviado}`}>
+      <EnlaceRegistro onClick={() => ir({ pestana: 'Treatment Plan', caso: t.caso.id })}>{CONSENTIMIENTO.titulo}</EnlaceRegistro>
+    </Entrada>
   )
 }
 
@@ -272,12 +246,11 @@ export function ContenidoExamen({ problema }: { problema: Problema }) {
   const ir = useIr()
   const pestana = PESTANA_EXAMEN[problema.examen]
   return (
-    <span className="flex flex-wrap items-baseline gap-x-2">
+    <Entrada sub={`Charted ${problema.fecha} · ${problema.proveedor}`}>
       {pestana
         ? <EnlaceRegistro onClick={() => ir({ pestana })}>{problema.examen}</EnlaceRegistro>
         : <span className="text-[12px] text-ink">{problema.examen}</span>}
-      <span className="text-[11px] text-ink-muted">Charted {problema.fecha} · {problema.proveedor}</span>
-    </span>
+    </Entrada>
   )
 }
 
@@ -322,7 +295,7 @@ function datosProblema(r: Problema, c: ContextoDetalle) {
 const guion = (t: string) => (!t || t === '-' ? '—' : t)
 const nombreDe = (x: Registro) => (x.tipo === 'procedimiento' ? `${x.r.codigo} · ${x.r.nombre}` : x.r.condicion)
 
-/** El detalle desplegado de una fila: título completo, los bloques y el pie con View full record. */
+/** El detalle desplegado de una fila: título completo, la lista y el pie con View full record. */
 export function DetalleRegistro({ registro, contexto }: { registro: Registro; contexto: ContextoDetalle }) {
   const [completo, setCompleto] = useState(false)
   const lugar = pieza(registro.r)
@@ -332,8 +305,8 @@ export function DetalleRegistro({ registro, contexto }: { registro: Registro; co
         <h3 className="text-[13px] font-semibold text-ink">{nombreDe(registro)}</h3>
         {lugar && <span className="text-[11px] text-ink-muted">{lugar}</span>}
       </div>
-      <div className="grid gap-2.5 @md:grid-cols-2 @2xl:grid-cols-3">
-        {registro.tipo === 'procedimiento' ? <BloquesProcedimiento r={registro.r} c={contexto} /> : <BloquesProblema r={registro.r} c={contexto} />}
+      <div className="flex flex-col">
+        {registro.tipo === 'procedimiento' ? <FilasProcedimiento r={registro.r} c={contexto} /> : <FilasProblema r={registro.r} c={contexto} />}
       </div>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <button type="button" onClick={() => setCompleto(true)} className="text-dash-blue inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline">
@@ -346,46 +319,42 @@ export function DetalleRegistro({ registro, contexto }: { registro: Registro; co
   )
 }
 
-export function BloquesProcedimiento({ r, c }: { r: ProcedimientoPaciente; c: ContextoDetalle }) {
+/* El orden lo pidió Julián: Treatment, Lab order, Findings, Procedure consent. El problema sigue el mismo orden con su
+   contraparte: Procedures donde va Findings y Source exam donde va el consentimiento. */
+export function FilasProcedimiento({ r, c }: { r: ProcedimientoPaciente; c: ContextoDetalle }) {
   const d = datosProcedimiento(r, c)
   return (
     <>
-      <BloqueDetalle titulo="Treatment"><ContenidoTratamiento t={d.t} visitas /></BloqueDetalle>
-      <BloqueDetalle titulo="Lab order" cuenta={d.ordenes.length}>
-        <ContenidoOrdenes ordenes={d.ordenes} />
-        <SubtituloBloque titulo="Referral" cuenta={d.derivaciones.length} />
-        <ContenidoDerivaciones derivaciones={d.derivaciones} />
-      </BloqueDetalle>
-      <BloqueDetalle titulo="Findings / diagnoses" cuenta={d.hallazgos.length * 2}>
+      <FilaDetalle titulo="Treatment"><ContenidoTratamiento t={d.t} visitas /></FilaDetalle>
+      <FilaDetalle titulo="Lab order" cuenta={d.ordenes.length}><ContenidoOrdenes ordenes={d.ordenes} /></FilaDetalle>
+      <FilaDetalle titulo="Referral" cuenta={d.derivaciones.length}><ContenidoDerivaciones derivaciones={d.derivaciones} /></FilaDetalle>
+      <FilaDetalle titulo="Findings / diagnoses" cuenta={d.hallazgos.length * 2}>
         <ContenidoHallazgos hallazgos={d.hallazgos} onAbrir={c.onAbrirProblema} />
-      </BloqueDetalle>
-      <BloqueDetalle titulo="Procedure consent" ancho><ContenidoConsentimiento t={d.t} /></BloqueDetalle>
+      </FilaDetalle>
+      <FilaDetalle titulo="Procedure consent"><ContenidoConsentimiento t={d.t} /></FilaDetalle>
     </>
   )
 }
 
-export function BloquesProblema({ r, c }: { r: Problema; c: ContextoDetalle }) {
+export function FilasProblema({ r, c }: { r: Problema; c: ContextoDetalle }) {
   const d = datosProblema(r, c)
   return (
     <>
-      <BloqueDetalle titulo="Procedures" cuenta={d.procs.length}>
+      <FilaDetalle titulo="Treatment"><ContenidoTratamiento t={d.t} /></FilaDetalle>
+      <FilaDetalle titulo="Lab order" cuenta={d.ordenes.length}><ContenidoOrdenes ordenes={d.ordenes} /></FilaDetalle>
+      <FilaDetalle titulo="Referral" cuenta={d.derivaciones.length}><ContenidoDerivaciones derivaciones={d.derivaciones} /></FilaDetalle>
+      <FilaDetalle titulo="Procedures" cuenta={d.procs.length}>
         <ContenidoProcedimientos procedimientos={d.procs} onAbrir={c.onAbrirProcedimiento} />
-      </BloqueDetalle>
-      <BloqueDetalle titulo="Treatment"><ContenidoTratamiento t={d.t} /></BloqueDetalle>
-      <BloqueDetalle titulo="Lab order" cuenta={d.ordenes.length}>
-        <ContenidoOrdenes ordenes={d.ordenes} />
-        <SubtituloBloque titulo="Referral" cuenta={d.derivaciones.length} />
-        <ContenidoDerivaciones derivaciones={d.derivaciones} />
-      </BloqueDetalle>
-      <BloqueDetalle titulo="Source exam" ancho><ContenidoExamen problema={r} /></BloqueDetalle>
+      </FilaDetalle>
+      <FilaDetalle titulo="Source exam"><ContenidoExamen problema={r} /></FilaDetalle>
     </>
   )
 }
 
 /* ── View full record ─────────────────────────────────────────────── */
 
-/** El registro entero en un drawer de sólo lectura: los datos de la fila de a dos y cada bloque como sección, sin
-    nada plegado. Pie: Close y Edit (Edit avisa que no está en esta versión, como el menú de la fila). */
+/** El registro entero en un drawer de sólo lectura: los datos de la fila de a dos y cada fila de la lista como sección,
+    sin nada plegado. Pie: Close y Edit (Edit avisa que no está en esta versión, como el menú de la fila). */
 export function RegistroCompletoDrawer({ registro, contexto, onClose }: { registro: Registro | null; contexto: ContextoDetalle; onClose: () => void }) {
   const ir = useContext(NavegacionClinica)
   if (!registro) return null
@@ -447,11 +416,11 @@ export function SeccionesProblema({ r, c }: { r: Problema; c: ContextoDetalle })
   const d = datosProblema(r, c)
   return (
     <>
-      <DrawerSection title="Source exam"><ContenidoExamen problema={r} /></DrawerSection>
-      <DrawerSection title="Procedures"><div><ContenidoProcedimientos procedimientos={d.procs} onAbrir={c.onAbrirProcedimiento} /></div></DrawerSection>
       <DrawerSection title="Treatment"><ContenidoTratamiento t={d.t} completo /></DrawerSection>
       <DrawerSection title="Lab orders"><div><ContenidoOrdenes ordenes={d.ordenes} /></div></DrawerSection>
       <DrawerSection title="Referrals"><div><ContenidoDerivaciones derivaciones={d.derivaciones} /></div></DrawerSection>
+      <DrawerSection title="Procedures"><div><ContenidoProcedimientos procedimientos={d.procs} onAbrir={c.onAbrirProcedimiento} /></div></DrawerSection>
+      <DrawerSection title="Source exam"><ContenidoExamen problema={r} /></DrawerSection>
     </>
   )
 }

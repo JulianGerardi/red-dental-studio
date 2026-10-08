@@ -6,9 +6,9 @@ import { Bloque, Lienzo, Tabla, Token } from '@/design-system/kit'
 import { esperar } from '@/design-system/play'
 import { PROBLEMAS, PROCEDIMIENTOS } from '@/data/clinical-mode'
 import {
-  BloqueDetalle, BloquesProblema, BloquesProcedimiento, ContenidoConsentimiento, ContenidoDerivaciones, ContenidoExamen,
+  ContenidoConsentimiento, ContenidoDerivaciones, ContenidoExamen, FilaDetalle, FilasProblema, FilasProcedimiento,
   ContenidoHallazgos, ContenidoOrdenes, ContenidoProcedimientos, ContenidoTratamiento, DetalleRegistro, EnlaceRegistro,
-  Entrada, MasItems, RegistroCompletoDrawer, SeccionesProblema, SeccionesProcedimiento, SubtituloBloque, Vacio,
+  Entrada, MasItems, RegistroCompletoDrawer, SeccionesProblema, SeccionesProcedimiento, Vacio,
   type ContextoDetalle,
 } from './RecordDetail'
 
@@ -49,7 +49,7 @@ const meta = {
         component: [
           'El detalle que se despliega en cada fila de la tabla del Overview de Clinical Mode (**Problem List** y **Procedures**), con el mismo desplegable del Ledger: el chevron, clic en la fila, y *Expand all / Collapse all* desde que hay una abierta (`rowDetail` de Elements / Tables).',
           '',
-          '**Qué muestra:** lo que cuelga del registro, en bloques chicos (card adentro de un panel). Un procedimiento: *Treatment* (estado del grupo, el caso, la visita con su turno, las otras visitas y los casos históricos), *Lab order* y *Referral*, *Findings / diagnoses* y *Procedure consent*. Un problema: *Procedures*, *Treatment*, *Lab order* y *Referral* (con el procedimiento relacionado) y *Source exam*. Lo que no entra en el resumen se pliega detrás de "N more…".',
+          '**Qué muestra:** lo que cuelga del registro, en una **lista sin cards**: una fila debajo de la otra, el título a la izquierda y los datos a la derecha, cada dato en una línea. Un procedimiento: *Treatment* (el caso, su grupo, la visita con su turno, las otras visitas y los casos históricos), *Lab order*, *Referral*, *Findings / diagnoses* y *Procedure consent*. Un problema, en el mismo orden: *Treatment*, *Lab order*, *Referral* (con el procedimiento relacionado), *Procedures* y *Source exam*. Lo que no entra en el resumen se pliega detrás de "N more…".',
           '',
           '**Reusa** lo que ya hay: el turno de la visita de Treatment Plan (`CitaVisita`), el estado de consentimiento de sus tablas, las pills de caso, de Lab Order y de la tabla, y el drawer para *View full record*. Cada link lleva a la pantalla donde se trabaja (Treatment Plan con el caso abierto, Lab Order, Referral, el examen) o abre el registro en la otra pestaña. Sólo lectura.',
           '',
@@ -63,7 +63,7 @@ const meta = {
     tipo: { name: 'record', control: 'inline-radio', options: ['procedure', 'problem'], description: 'Qué pestaña de la tabla.' },
     procedure: { control: 'select', options: Object.values(PROC), labels: Object.fromEntries(Object.entries(PROC).map(([k, v]) => [v, k])), description: 'El procedimiento de la fila.', if: { arg: 'tipo', eq: 'procedure' } },
     problem: { control: 'select', options: Object.values(PROB), labels: Object.fromEntries(Object.entries(PROB).map(([k, v]) => [v, k])), description: 'El problema de la fila.', if: { arg: 'tipo', eq: 'problem' } },
-    ancho: { name: 'width', control: 'inline-radio', options: Object.keys(ANCHOS), description: 'wide 880 (Overview, 3 columnas) · overlay 790 (View Problem List de un examen, 3) · narrow 320 (teléfono, 1).' },
+    ancho: { name: 'width', control: 'inline-radio', options: Object.keys(ANCHOS), description: 'wide 880 (Overview) · overlay 790 (View Problem List de un examen) · narrow 320 (teléfono: el título de cada fila va arriba).' },
   },
 } satisfies Meta<Args>
 
@@ -83,45 +83,39 @@ export const Parts: Story = {
   render: () => (
     <TooltipProvider>
       <Lienzo>
-        <Bloque titulo="The detail, procedure" nota="Título completo y pieza arriba; los bloques; al pie View full record y Read-only summary.">
+        <Bloque titulo="The detail, procedure" nota="Título completo y pieza arriba; la lista; al pie View full record y Read-only summary.">
           <EnFila tipo="procedure" procedure="pr10" problem="p9" ancho="wide" />
         </Bloque>
-        <Bloque titulo="Blocks of a procedure" nota="BloquesProcedimiento: Treatment, Lab order + Referral, Findings / diagnoses y el consentimiento a lo ancho.">
-          <div className="@container w-[880px] max-w-full"><div className="grid gap-2.5 @md:grid-cols-2 @2xl:grid-cols-3"><BloquesProcedimiento r={r10} c={CONTEXTO} /></div></div>
+        <Bloque titulo="Rows of a procedure" nota="FilasProcedimiento, en el orden que pidió Julián: Treatment, Lab order, Referral, Findings / diagnoses y Procedure consent.">
+          <div className="@container flex w-[880px] max-w-full flex-col"><FilasProcedimiento r={r10} c={CONTEXTO} /></div>
         </Bloque>
-        <Bloque titulo="Blocks of a problem" nota="BloquesProblema: Procedures, Treatment (sin visitas), Lab order + Referral con el procedimiento relacionado y Source exam a lo ancho.">
-          <div className="@container w-[880px] max-w-full"><div className="grid gap-2.5 @md:grid-cols-2 @2xl:grid-cols-3"><BloquesProblema r={p9} c={CONTEXTO} /></div></div>
+        <Bloque titulo="Rows of a problem" nota="FilasProblema, en el mismo orden: Treatment (sin visitas), Lab order y Referral con el procedimiento relacionado, Procedures y Source exam.">
+          <div className="@container flex w-[880px] max-w-full flex-col"><FilasProblema r={p9} c={CONTEXTO} /></div>
         </Bloque>
         <Bloque titulo="Pieces">
-          <div className="grid w-[880px] max-w-full gap-3 md:grid-cols-3">
-            <BloqueDetalle titulo="Block" cuenta={2}>
-              <Entrada estado={<span className="text-[11px] text-ink-muted">status</span>} sub="Context line">
+          <div className="@container flex w-[880px] max-w-full flex-col">
+            <FilaDetalle titulo="Row" cuenta={2}>
+              <Entrada estado={<span className="text-[11px] text-ink-muted">status</span>} sub="Context">
                 <EnlaceRegistro onClick={() => aviso.info('Opens the record.')}>Link to the record</EnlaceRegistro>
               </Entrada>
               <Entrada rotulo="Label"><span className="text-[12px] text-ink">Plain value</span></Entrada>
-              <SubtituloBloque titulo="Second list" cuenta={0} />
-              <Vacio>Nothing linked.</Vacio>
-            </BloqueDetalle>
-            <BloqueDetalle titulo="Folded">
-              <span className="text-[12px] text-ink">First item</span>
-              <MasItems label="2 more items"><p className="text-[12px] text-ink">Second item</p><p className="text-[12px] text-ink">Third item</p></MasItems>
-            </BloqueDetalle>
-            <div className="@container md:col-span-3"><div className="grid @md:grid-cols-2 @2xl:grid-cols-3">
-              <BloqueDetalle titulo="Wide block" ancho><span className="text-[12px] text-ink">One value across the row</span></BloqueDetalle>
-            </div></div>
+            </FilaDetalle>
+            <FilaDetalle titulo="Folded">
+              <Entrada><span className="text-[12px] text-ink">First item</span></Entrada>
+              <MasItems label="2 more items"><Entrada><span className="text-[12px] text-ink">Second item</span></Entrada><Entrada><span className="text-[12px] text-ink">Third item</span></Entrada></MasItems>
+            </FilaDetalle>
+            <FilaDetalle titulo="Nothing linked" cuenta={0}><Vacio>Nothing linked.</Vacio></FilaDetalle>
           </div>
         </Bloque>
         <Bloque titulo="What each part is">
           <Tabla encabezado={['Part', 'What it does', 'Component']} minimo={720} arriba>
-            <tr><td className="font-semibold">Block</td><td>Card adentro del detalle (InnerCard): título de 11px y la cuenta de lo que lista.</td><td>BloqueDetalle</td></tr>
-            <tr><td className="font-semibold">Wide block</td><td>Un solo dato: ocupa la fila con el título al costado (consentimiento, examen de origen).</td><td>BloqueDetalle ancho</td></tr>
-            <tr><td className="font-semibold">Entry</td><td>Link o texto, el estado a la derecha y una línea de contexto. Rótulo opcional (Finding, Diagnosis).</td><td>Entrada</td></tr>
+            <tr><td className="font-semibold">Row</td><td>Una fila de la lista, sin card: título de 11px y la cuenta a la izquierda (arriba en angosto), los datos a la derecha. Una línea fina separa las filas.</td><td>FilaDetalle</td></tr>
+            <tr><td className="font-semibold">Entry</td><td>Un dato en una línea: rótulo opcional (Finding, Diagnosis), link o texto, su estado y el contexto.</td><td>Entrada</td></tr>
             <tr><td className="font-semibold">Link</td><td>Lleva a donde vive el registro; la flecha dice que sale de la tabla.</td><td>EnlaceRegistro</td></tr>
             <tr><td className="font-semibold">N more…</td><td>Lo que no entra en el resumen, plegado: visitas, casos históricos, hallazgos y diagnósticos.</td><td>MasItems</td></tr>
-            <tr><td className="font-semibold">Second list</td><td>Referral dentro del bloque de Lab order.</td><td>SubtituloBloque</td></tr>
-            <tr><td className="font-semibold">Nothing linked</td><td>El bloque queda y dice qué falta: así se sabe que no hay, no que no cargó.</td><td>Vacio</td></tr>
-            <tr><td className="font-semibold">Contents</td><td>Lo mismo en el bloque y en el drawer: el drawer lo muestra todo, sin plegar.</td><td>ContenidoTratamiento, ContenidoOrdenes, ContenidoDerivaciones, ContenidoHallazgos, ContenidoConsentimiento, ContenidoProcedimientos, ContenidoExamen</td></tr>
-            <tr><td className="font-semibold">Full record</td><td>Drawer de sólo lectura: los datos de la fila de a dos y una sección por bloque. Close y Edit.</td><td>RegistroCompletoDrawer, SeccionesProcedimiento, SeccionesProblema</td></tr>
+            <tr><td className="font-semibold">Nothing linked</td><td>La fila queda y dice qué falta: así se sabe que no hay, no que no cargó.</td><td>Vacio</td></tr>
+            <tr><td className="font-semibold">Contents</td><td>Lo mismo en la fila y en el drawer: el drawer lo muestra todo, sin plegar.</td><td>ContenidoTratamiento, ContenidoOrdenes, ContenidoDerivaciones, ContenidoHallazgos, ContenidoConsentimiento, ContenidoProcedimientos, ContenidoExamen</td></tr>
+            <tr><td className="font-semibold">Full record</td><td>Drawer de sólo lectura: los datos de la fila de a dos y una sección por fila de la lista. Close y Edit.</td><td>RegistroCompletoDrawer, SeccionesProcedimiento, SeccionesProblema</td></tr>
           </Tabla>
         </Bloque>
       </Lienzo>
@@ -148,7 +142,7 @@ export const States: Story = {
         <Bloque titulo="Before the case is accepted" nota="Planning, Pending o Presented: la visita sin turno y el consentimiento todavía no existe (la misma regla que Treatment Plan).">
           <EnFila tipo="procedure" procedure="pr11" problem="p9" ancho="wide" />
         </Bloque>
-        <Bloque titulo="Empty" nota="Nada vinculado: cada bloque queda y dice qué no hay (No treatment linked, No lab orders linked…).">
+        <Bloque titulo="Empty" nota="Nada vinculado: cada fila queda y dice qué no hay (No treatment linked, No lab orders linked…).">
           <EnFila tipo="procedure" procedure="pr1" problem="p9" ancho="wide" />
         </Bloque>
         <Bloque titulo="Problem with procedures" nota="El procedimiento que lo resuelve, su caso, y la derivación con el procedimiento relacionado.">
@@ -157,10 +151,10 @@ export const States: Story = {
         <Bloque titulo="Problem with its own referral" nota="Un problema derivado sin procedimiento: la derivación es del problema.">
           <EnFila tipo="problem" procedure="pr10" problem="p11" ancho="wide" />
         </Bloque>
-        <Bloque titulo="Overlay width" nota="790px, el flotante de View Problem List: siguen las tres columnas.">
+        <Bloque titulo="Overlay width" nota="790px, el flotante de View Problem List: la misma lista, con el título a la izquierda.">
           <EnFila tipo="procedure" procedure="pr6" problem="p9" ancho="overlay" />
         </Bloque>
-        <Bloque titulo="Narrow" nota="Teléfono: una columna. En la tabla, el detalle queda en la parte visible aunque la tabla scrollee de costado.">
+        <Bloque titulo="Narrow" nota="Teléfono: el título de cada fila va arriba de sus datos. En la tabla, el detalle queda en la parte visible aunque la tabla scrollee de costado.">
           <EnFila tipo="procedure" procedure="pr10" problem="p9" ancho="narrow" />
         </Bloque>
       </Lienzo>
@@ -168,7 +162,7 @@ export const States: Story = {
   ),
 }
 
-/* Los "more" abiertos: la otra visita con su turno y el diagnóstico (ICD-10 y superficie). */
+/* El "more" abierto: la otra visita con su turno. El diagnóstico ya se ve sin abrir nada. */
 export const MoreOpen: Story = {
   name: 'More open',
   args: { tipo: 'procedure', procedure: 'pr10', ancho: 'wide' },
@@ -176,7 +170,6 @@ export const MoreOpen: Story = {
   play: async (c) => {
     const canvas = within(c.canvasElement)
     await userEvent.click(await canvas.findByRole('button', { name: /1 more visit/ }))
-    await userEvent.click(await canvas.findByRole('button', { name: /more finding/ }))
     await esperar(/May 4, 2026/)(c)
     await esperar(/K08\.9/)(c)
   },
@@ -239,29 +232,30 @@ export const Specs: Story = {
     <Lienzo>
       <Bloque titulo="Layout">
         <Tabla encabezado={['Item', 'Value']} minimo={560}>
-          <tr><td className="font-semibold">Columns</td><td>3 desde 672px de detalle · 2 desde 448 · 1 abajo (container query: depende del ancho de la tabla, no de la pantalla).</td></tr>
-          <tr><td className="font-semibold">Gap</td><td>10px entre bloques · 12px entre el título, los bloques y el pie.</td></tr>
-          <tr><td className="font-semibold">Block</td><td>Padding 12px, radio 8px, sombra <code>shadow-inner-card</code> (card adentro de un panel, sin borde real).</td></tr>
-          <tr><td className="font-semibold">Wide block</td><td>Toda la fila; título de 120px al costado y el contenido baja abajo si no le quedan 220px.</td></tr>
+          <tr><td className="font-semibold">List</td><td>Sin cards: una fila debajo de la otra, separadas por una línea de 1px. Padding vertical de 8px por fila.</td></tr>
+          <tr><td className="font-semibold">Row title</td><td>Columna de 150px a la izquierda desde 448px de detalle; abajo de eso, arriba de los datos (container query: depende del ancho de la tabla, no de la pantalla).</td></tr>
+          <tr><td className="font-semibold">Entry</td><td>Una línea de 24px como mínimo (el alto del botón de turno); si no entra, sigue en la siguiente.</td></tr>
+          <tr><td className="font-semibold">Gap</td><td>12px entre el título del registro, la lista y el pie.</td></tr>
           <tr><td className="font-semibold">In the table</td><td>Debajo de la fila, con la sangría del chevron (44px) y fondo <code>surface-subtle</code>. Si la tabla scrollea de costado, el detalle queda fijo en la parte visible.</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Type and color">
         <Tabla encabezado={['Item', 'Size', 'Color']} minimo={560}>
           <tr><td className="font-semibold">Record title</td><td>13px Semibold</td><td><Token nombre="ink" /></td></tr>
-          <tr><td className="font-semibold">Block title</td><td>11px Semibold</td><td><Token nombre="ink-muted" /></td></tr>
+          <tr><td className="font-semibold">Row title</td><td>11px Semibold</td><td><Token nombre="ink-muted" /></td></tr>
           <tr><td className="font-semibold">Link</td><td>12px Medium, flecha 12px</td><td><Token nombre="dash-blue" /></td></tr>
           <tr><td className="font-semibold">Context line</td><td>11px</td><td><Token nombre="ink-muted" /></td></tr>
           <tr><td className="font-semibold">Nothing linked</td><td>12px</td><td><Token nombre="ink-faint" /></td></tr>
-          <tr><td className="font-semibold">Divider between entries</td><td>1px</td><td><Token nombre="line-soft" /></td></tr>
+          <tr><td className="font-semibold">Divider between rows</td><td>1px</td><td><Token nombre="line-soft" /></td></tr>
           <tr><td className="font-semibold">Count</td><td>Count (Elements)</td><td><Token nombre="dash-count-bg" /></td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Rules">
         <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
           <li>Read-only: changing a status stays in the row menu. Edit in the full record says it is not in this release.</li>
-          <li>Every block stays even when it is empty, so the detail always has the same shape.</li>
-          <li>Show one item per list in the summary; the rest goes behind “N more…”. The full record shows everything.</li>
+          <li>A list, not cards: the detail should not take more room than the data it shows.</li>
+          <li>Every row stays even when it is empty, so the detail always has the same shape and order.</li>
+          <li>Show the first items in the summary (the visit of the procedure, the finding and its diagnosis); the rest goes behind “N more…”. The full record shows everything.</li>
           <li>Statuses use the pills of their own screen: cases as in Treatment Plan, lab orders as in Lab Order, consent as in the visit table.</li>
           <li>No appointment and no consent before the case is accepted (Planning, Pending, Presented), as in Treatment Plan.</li>
         </ul>

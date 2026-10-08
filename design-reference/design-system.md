@@ -537,3 +537,6 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 - *Elements / Tables*: `defaultExpanded` (la fila arranca abierta y la tabla abre en su página), *States → Expanded
   row*, y la regla de que el detalle queda en la parte visible cuando la tabla scrollea de costado.
 - Decisiones en `figma/modulos/clinical-mode.md` (2026-10-08).
+- Segunda vuelta (2026-10-08): el detalle pasa de cards a **lista** (filas una debajo de la otra, título a la izquierda).
+  *RecordDetail* actualiza Parts (Rows of a procedure / problem, Row, Entry), States, *More open* y Specs (lista, título
+  de 150px, línea de 24px).
