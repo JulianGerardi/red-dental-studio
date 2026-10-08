@@ -4,7 +4,7 @@ import { ChevronRight, GripVertical, MoveHorizontal, RotateCw, Search, SearchX, 
 import { Checkbox } from '@/components/ui/checkbox'
 import { EmptyState } from '@/components/ui/empty-state'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
-import { FilterMenu } from '@/components/ui/filter-menu'
+import { FilterMenu, type FilterOption } from '@/components/ui/filter-menu'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
@@ -73,8 +73,8 @@ export function DataTable<T>({
   reorder?: { onReorder: (from: T, to: T) => void; canMove?: (row: T) => boolean }
   /** Buscador arriba de la tabla. `match` decide si la fila coincide. */
   search?: { placeholder?: string; match: (row: T, query: string) => boolean }
-  /** Filtro por categorías (el embudo). Sin nada tildado, se ve todo. */
-  filter?: { label: string; options: string[]; match: (row: T, selected: string[]) => boolean }
+  /** Filtro por categorías (el embudo). Sin nada tildado, se ve todo. Cada opción puede llevar cantidad y color. */
+  filter?: { label: string; options: FilterOption[]; match: (row: T, selected: string[]) => boolean }
   /** Botón Columns para elegir qué columnas se ven. */
   columnPicker?: boolean
   /** Bordes de columna que se arrastran para achicar o ensanchar. */

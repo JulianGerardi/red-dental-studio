@@ -25,7 +25,7 @@ const TABLAS: Tabla[] = [
   { nombre: 'Documents (Patient)', archivo: 'pages/patients/Documents.tsx', historia: 'pages--patient-documents', uso: 'The patient’s documents and their signature status.' },
   { nombre: 'Recent activity (Billing)', archivo: 'pages/Billing.tsx', historia: 'pages--billing', uso: 'The latest financial movements. Clicking a row selects that patient.' },
   { nombre: 'Problem list (Clinical)', archivo: 'components/clinical/ProblemList.tsx', historia: 'components-clinical-problemlist--playground', uso: 'The patient’s problems in Clinical Mode.' },
-  { nombre: 'Lab orders (Clinical)', archivo: 'components/clinical/LabOrderPanel.tsx', historia: 'components-clinical-laborderpanel--default', uso: 'The active lab prescriptions in Clinical Mode.' },
+  { nombre: 'Lab orders (Clinical)', archivo: 'components/clinical/LabOrderPanel.tsx', historia: 'components-clinical-laborderpanel--playground', uso: 'The lab orders in Clinical Mode, on the standard table with search, status filter and row menu.' },
   { nombre: 'Procedures (Treatment plan)', archivo: 'components/clinical/TreatmentPlanSection.tsx', historia: 'components-clinical-treatmentplansection--playground', uso: 'The procedures of a treatment case, with checkbox selection.' },
   { nombre: 'Insurance summary (Patient overview)', archivo: 'pages/PatientDetail.tsx', historia: 'pages--patient-overview', uso: 'The insurance table inside the patient overview: a compact <table>.', archivoCompartido: true },
 ]

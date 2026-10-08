@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-08
 
+### Clinical Mode: Lab Order con la tabla, el buscador, el filtro y los botones de la app ([#17](https://github.com/JulianGerardi/red-dental-studio/pull/17))
+- Lab Order deja su tabla propia y usa la de la app (`DataTable`) en la card de la página: buscador, Filter que filtra
+  por estado (con cantidad y color), *View History* y *New Prescription* con `ui/button`, el kebab estándar (*View
+  order*, *Edit order*, *Cancel order* con Undo) y el pie con *Show* y paginación.
+- **Para el dev:** `LabOrderPanel` recibe `ordenes` opcional. En `DataTable`, `filter.options` acepta `FilterOption`
+  (cantidad y tono); los strings siguen andando. Ya no hay `FilterTrigger` suelto en Lab Order.
+
 ### Link de prueba general y rol de product designer ([#16](https://github.com/JulianGerardi/red-dental-studio/pull/16))
 - Cada push a una rama que no sea `main` se publica en https://juliangerardi.github.io/red-dental-studio/prueba/ (app)
   y `/prueba/storybook/`, para ver los cambios antes de "subilo". Muestra sólo la última rama subida;
