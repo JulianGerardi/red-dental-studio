@@ -74,6 +74,8 @@ para tener más de tres cuentas distintas en "Find Patient".
 1. **(75)** La pantalla vacía no tiene título "Billing" ni los tres botones
    de acción que sí tienen las otras tres. **Corregido**: quedan siempre
    visibles -sin ellos no habría forma de postear el primer pago.
+   *2026-10-09:* Julián pidió que los botones aparezcan sólo con un paciente
+   elegido; el primer pago se postea eligiendo al paciente en Find Patient.
 2. **(76)** "Overdue Balance" repite el valor exacto de "Insurance A/R"
    ($9,896.66 los dos). **Corregido** a un valor propio ($1,845.20).
 3. **(77)** Las 10 filas de "Recent Billing Activity" muestran el mismo
@@ -132,3 +134,86 @@ para tener más de tres cuentas distintas en "Find Patient".
 
 Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
 En Billing: las cinco tarjetas de números, Recent Billing Activity, Find Patient y Today. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.
+
+## Cards como en Patients y el paciente elegido marcado (2026-10-09)
+
+Pedido de Julián: que el paciente elegido para ver Recent Billing quede marcado con el celeste del rango nuevo de
+Coverage Table; sacar los íconos de los títulos de Recent Billing Activity, Find Patient y Today; que Find Patient siga
+la lógica de cards de Patients; y chequear que la tabla esté alineada con las otras.
+
+1. **Paneles.** Los tres bloques pasan a `Panel` (`dashboard/primitives`), el mismo de Today Appointments en Patients y
+   del Dashboard: título de 15px Bold **sin ícono** y encabezado de 52px. De paso, Recent Billing Activity y Find
+   Patient tienen el título a la misma altura (antes las Tabs agrandaban el encabezado de la izquierda).
+2. **Find Patient.** Cada resultado es una `InnerCard` como las de Today Appointments: iniciales en un cuadrado azul
+   de 32px, nombre 13px Semibold, último pago 11px y el saldo a la derecha. El buscador es el del panel de Patients
+   (32px, texto de 12px). Antes eran filas sueltas con hover, sin card.
+3. **Números adentro de un panel.** Today y los dos saldos de Selected patient eran cards de página (sombra de panel)
+   adentro de otro panel. Pasan a `InnerCard` (`Stat interna`); los cinco de arriba siguen como card de página.
+4. **El elegido, marcado.** Un paciente a la vez, desde una fila o desde Find Patient. Su card (`aria-current`) queda
+   en `dash-count-bg` hasta que se elige otro o se toca la X. *(Primero también se marcaban en celeste todas sus filas;
+   la segunda vuelta filtra la tabla al paciente y eso se sacó.)*
+5. **Celular.** Find Patient queda debajo de la tabla: elegir ahí sube hasta los saldos (scroll *nearest*, sin
+   animación con movimiento reducido). En escritorio, con todo a la vista, no se mueve nada.
+6. **Encabezado de Panel.** Pasa de `h-[52px] py-3` a `min-h-[52px] py-2 flex-wrap`: unas Tabs sm (36px) entran sin
+   agrandarlo y en el celular bajan abajo del título en vez de pisarlo. En Dashboard y Patients no cambia ningún pixel
+   (comparado con capturas antes y después).
+7. **La tabla.** Es la misma `DataTable` que Patients, Team, Accounts y Lab Order (encabezado de 44px en banda gris con
+   11px, filas de 13px, pie con paginación), compacta (44px) por ir adentro de un panel y alineada con el cuerpo del
+   panel (16px). Lo único distinto es el peso: Patient en negrita negra y Amount y Balance en semibold. Eso ya lo
+   corrige el PR #18 (patrón único de tablas); acá no se duplicó para no pisarlo.
+
+**Para validar con usuarios:** si recepción lee el celeste como "elegido" (el Dashboard marca la card elegida con un
+anillo azul); si marcar todas las filas del paciente ayuda o conviene, en cambio, filtrar la tabla por ese paciente; y
+si el salto hacia arriba en el celular se entiende o desorienta.
+
+## Segunda vuelta (2026-10-09): la vista de un paciente
+
+Julián, con capturas de red.dev (`red.dev.confidentally.com/billing`, que desde la sesión en la nube no se pudo abrir):
+la pantalla sin paciente queda como está; al elegir uno, Billing pasa a ser la vista de ese paciente.
+
+1. **Dos modos, una pantalla.** *Resumen* (sin paciente): igual que antes. *Paciente*: se entra tocando una fila del
+   resumen o un resultado de Find Patient, y se sale con la X de su card, que vuelve al resumen tal como estaba (con el
+   filtro de tipo que tenía).
+2. **Sólo lo suyo.** La tabla muestra únicamente los movimientos del paciente. Las filas ya no eligen (están todas
+   las de él); en el resumen sí.
+3. **Patient View / Guarantor View.** Con paciente, las Tabs del encabezado cambian de tipo (All, Pt Payment…) a
+   *Patient View* (sus movimientos) y *Guarantor View* (todo lo que paga su garante, con la columna Patient para
+   distinguir a cada uno), como red.dev. Cada paciente nuevo arranca en Patient View. Para eso los datos suman
+   `garante` a cada paciente: Maria Abril Viola → John Hayes, Diego Molina → Sophie Tran; John, Brent y Sophie son
+   garantes. Unapplied Credits y Open Balance pasan a sumar todo el grupo del garante (lo dicen sus títulos:
+   *Guarantor …*).
+4. **El paciente, arriba de Find Patient.** Una franja de borde a borde arriba del título (`Panel` suma `top`), en
+   `dash-count-bg`, con sus iniciales, el nombre en azul, el rol (y su garante si es Patient) y la X. Antes el
+   paciente se nombraba en una línea de texto arriba de la tabla; ahora lo dice el título del panel
+   (*Maria Abril Viola — Recent Billing Activity*) y la franja, y esa línea se sacó.
+5. **Microanimación.** La franja baja 6px y aparece en 220ms (`paciente-entra`) y las iniciales hacen un pop
+   (`tab-in`); los saldos del garante y los botones entran igual. Cambiar de paciente la repite. Con movimiento
+   reducido aparece sin animar. La franja está en una región `aria-live`: el lector de pantalla dice el nombre.
+6. **Botones sólo con paciente.** Patient Payment, Credit Adjustment, Charge Adjustment y Export statement aparecen
+   recién con un paciente: siempre postean para él. El encabezado reserva el alto (36px) para que la página no salte.
+7. **Mensajes de cada card.** red.dev tiene un ícono de info con un mensaje en cada número. Se sumó en la tercera
+   vuelta (abajo).
+
+**Para validar con usuarios:** si recepción encuentra cómo postear un pago sin los botones a la vista en el resumen
+(hay que elegir un paciente primero); si Guarantor View se entiende sin explicación; y si la X de la franja se
+encuentra para volver al resumen o hace falta un "Back to all activity" con texto.
+
+## Tercera vuelta (2026-10-09): círculos de info y animación más sutil
+
+1. **Círculo de info en cada número** (`ui/info-tip`, nuevo en el design system). Arriba a la derecha de los cinco
+   números y de los tres de Today; al pasar el mouse, tocar o llegar con Tab abre una card blanca con el título y qué
+   cuenta. Es un `HoverCard` y no un `Tooltip`: la regla del design system dice que el Tooltip oscuro sólo nombra y lo
+   que explica en una o dos líneas va en HoverCard, que es además lo que muestra red.dev. Gris como la etiqueta y azul
+   al abrirse. El HoverCard solo no abre con el dedo: `InfoTip` lo abre y cierra tocando.
+2. **Textos.** Los cinco de arriba y *Payments Posted Today* son los de red.dev (capturas de Julián). *Adjustments
+   created* y *Unapplied credits* no tenían captura: los textos son una **propuesta a validar** ("Credit and charge
+   adjustments created today (practice timezone)." y "Payments and credits received that are not applied to a charge
+   yet."). Los saldos del garante (con paciente) no llevan círculo: red.dev no les da texto.
+3. **Etiquetas como red.dev.** *Patient A/R* pasa a **Guarantor A/R** y *Patients with Open Balance* a **Guarantors
+   with Open Charges**, para que el título del mensaje sea el mismo que el de la card (y porque el saldo es del
+   garante, como en Guarantor View). Las bajadas acompañan: "Outstanding guarantor responsibility" y "Guarantors with a
+   remaining balance". Se apartan del Figma, que decía Patient.
+4. **Las iniciales de la card del paciente, sin borde.** Se sacó el anillo blanco (`ring-2`).
+5. **Animación más sutil, estilo Apple.** Antes bajaba 6px en 220ms y las iniciales hacían un pop. Ahora la card del
+   paciente, los saldos del garante y los botones aparecen con 2px, un desenfoque de 2px que se aclara y opacidad, en
+   360ms con `cubic-bezier(0.32, 0.72, 0, 1)` (arranca rápido y frena largo). Sin pop.

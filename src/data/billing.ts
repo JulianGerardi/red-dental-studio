@@ -5,6 +5,8 @@ import { conSaldo, type Movimiento } from '@/data/ledger'
 export type PacienteBilling = {
   nombre: string
   rol: 'Guarantor' | 'Patient'
+  /** Quién paga: el propio nombre si es Guarantor. Arma la Guarantor View de Billing (billing.md, 2026-10-09). */
+  garante: string
   ultimoPago: string
   creditosNoAplicados: number
 }
@@ -14,12 +16,18 @@ export type PacienteBilling = {
    documentada. "John Hayes" y "Brent Crosby" se mantienen porque son los
    nombres que ya aparecen en el resto del frame (tabla y modal). */
 export const PACIENTES_BILLING: PacienteBilling[] = [
-  { nombre: 'John Hayes', rol: 'Guarantor', ultimoPago: '2h ago', creditosNoAplicados: 180 },
-  { nombre: 'Maria Abril Viola', rol: 'Patient', ultimoPago: '3h ago', creditosNoAplicados: 30 },
-  { nombre: 'Brent Crosby', rol: 'Guarantor', ultimoPago: '1d ago', creditosNoAplicados: 0 },
-  { nombre: 'Diego Molina', rol: 'Patient', ultimoPago: '4d ago', creditosNoAplicados: 120 },
-  { nombre: 'Sophie Tran', rol: 'Guarantor', ultimoPago: '6d ago', creditosNoAplicados: 260 },
+  { nombre: 'John Hayes', rol: 'Guarantor', garante: 'John Hayes', ultimoPago: '2h ago', creditosNoAplicados: 180 },
+  { nombre: 'Maria Abril Viola', rol: 'Patient', garante: 'John Hayes', ultimoPago: '3h ago', creditosNoAplicados: 30 },
+  { nombre: 'Brent Crosby', rol: 'Guarantor', garante: 'Brent Crosby', ultimoPago: '1d ago', creditosNoAplicados: 0 },
+  { nombre: 'Diego Molina', rol: 'Patient', garante: 'Sophie Tran', ultimoPago: '4d ago', creditosNoAplicados: 120 },
+  { nombre: 'Sophie Tran', rol: 'Guarantor', garante: 'Sophie Tran', ultimoPago: '6d ago', creditosNoAplicados: 260 },
 ]
+
+/* Todos los que paga el mismo garante (el garante y los pacientes a su cargo): la Guarantor View de Billing. */
+export function grupoDeGarante(nombre: string): PacienteBilling[] {
+  const garante = PACIENTES_BILLING.find((p) => p.nombre === nombre)?.garante ?? nombre
+  return PACIENTES_BILLING.filter((p) => p.garante === garante)
+}
 
 export function buscarPacientes(q: string): PacienteBilling[] {
   const texto = q.trim().toLowerCase()
@@ -79,22 +87,28 @@ export type TipoAjusteBilling = (typeof TIPOS_AJUSTE_BILLING)[number]
 export const FILTROS_ACTIVIDAD = ['All', 'Pt Payment', 'Charge Adj', 'Credit Adj'] as const
 export type FiltroActividad = (typeof FILTROS_ACTIVIDAD)[number]
 
-export type StatBilling = { label: string; value: string; caption: string }
+/* Con un paciente elegido, las Tabs de Recent Billing Activity pasan a elegir de quién se ven los movimientos (red.dev). */
+export const VISTAS_PACIENTE = ['Patient View', 'Guarantor View'] as const
+export type VistaPaciente = (typeof VISTAS_PACIENTE)[number]
+
+/** `info`: el texto del círculo de info (InfoTip). Los de arriba son los de red.dev (billing.md, 2026-10-09). */
+export type StatBilling = { label: string; value: string; caption: string; info?: string }
 
 /* "Overdue Balance" repetía el valor exacto de "Insurance A/R" en el Figma
    -ver billing.md, anomalía documentada y corregida acá. */
 export const STATS_BILLING: StatBilling[] = [
-  { label: 'Total A/R', value: '$2,131.86', caption: 'Across patient and insurance balances' },
-  { label: 'Patient A/R', value: '$7,411.30', caption: 'Outstanding patient responsibility' },
-  { label: 'Insurance A/R', value: '$9,896.66', caption: 'Carrier receivables not yet resolved' },
-  { label: 'Overdue Balance', value: '$1,845.20', caption: 'Accounts past due needing follow-up' },
-  { label: 'Patients with Open Balance', value: '128', caption: 'Patients with a remaining balance' },
+  { label: 'Total A/R', value: '$2,131.86', caption: 'Across patient and insurance balances', info: "Sum of the remaining total balance of the location's open charges." },
+  { label: 'Guarantor A/R', value: '$7,411.30', caption: 'Outstanding guarantor responsibility', info: "Sum of the remaining guarantor balance of the location's open charges." },
+  { label: 'Insurance A/R', value: '$9,896.66', caption: 'Carrier receivables not yet resolved', info: "Sum of the remaining insurance balance of the location's open charges." },
+  { label: 'Overdue Balance', value: '$1,845.20', caption: 'Accounts past due needing follow-up', info: 'Open charge balances older than 30 days.' },
+  { label: 'Guarantors with Open Charges', value: '128', caption: 'Guarantors with a remaining balance', info: 'Ledgers whose charges at this location still carry a positive guarantor balance.' },
 ]
 
 /* "Unapplied credits" repetía el valor exacto de "Payments Posted Today" en
    el Figma -misma anomalía que Overdue Balance, mismo criterio de arreglo. */
+/* Payments Posted Today usa el texto de red.dev; los otros dos son una propuesta a validar (billing.md, 2026-10-09). */
 export const STATS_HOY: StatBilling[] = [
-  { label: 'Payments Posted Today', value: '$9,420', caption: 'Patient and insurance posting activity' },
-  { label: 'Adjustments created', value: '6', caption: 'Adjustments created today' },
-  { label: 'Unapplied credits', value: '$610', caption: 'Credits not yet applied to charges' },
+  { label: 'Payments Posted Today', value: '$9,420', caption: 'Patient and insurance posting activity', info: 'Sum of payment transactions posted today (practice timezone).' },
+  { label: 'Adjustments created', value: '6', caption: 'Adjustments created today', info: 'Credit and charge adjustments created today (practice timezone).' },
+  { label: 'Unapplied credits', value: '$610', caption: 'Credits not yet applied to charges', info: 'Payments and credits received that are not applied to a charge yet.' },
 ]
