@@ -5,6 +5,8 @@ import { conSaldo, type Movimiento } from '@/data/ledger'
 export type PacienteBilling = {
   nombre: string
   rol: 'Guarantor' | 'Patient'
+  /** Quién paga: el propio nombre si es Guarantor. Arma la Guarantor View de Billing (billing.md, 2026-10-09). */
+  garante: string
   ultimoPago: string
   creditosNoAplicados: number
 }
@@ -14,12 +16,18 @@ export type PacienteBilling = {
    documentada. "John Hayes" y "Brent Crosby" se mantienen porque son los
    nombres que ya aparecen en el resto del frame (tabla y modal). */
 export const PACIENTES_BILLING: PacienteBilling[] = [
-  { nombre: 'John Hayes', rol: 'Guarantor', ultimoPago: '2h ago', creditosNoAplicados: 180 },
-  { nombre: 'Maria Abril Viola', rol: 'Patient', ultimoPago: '3h ago', creditosNoAplicados: 30 },
-  { nombre: 'Brent Crosby', rol: 'Guarantor', ultimoPago: '1d ago', creditosNoAplicados: 0 },
-  { nombre: 'Diego Molina', rol: 'Patient', ultimoPago: '4d ago', creditosNoAplicados: 120 },
-  { nombre: 'Sophie Tran', rol: 'Guarantor', ultimoPago: '6d ago', creditosNoAplicados: 260 },
+  { nombre: 'John Hayes', rol: 'Guarantor', garante: 'John Hayes', ultimoPago: '2h ago', creditosNoAplicados: 180 },
+  { nombre: 'Maria Abril Viola', rol: 'Patient', garante: 'John Hayes', ultimoPago: '3h ago', creditosNoAplicados: 30 },
+  { nombre: 'Brent Crosby', rol: 'Guarantor', garante: 'Brent Crosby', ultimoPago: '1d ago', creditosNoAplicados: 0 },
+  { nombre: 'Diego Molina', rol: 'Patient', garante: 'Sophie Tran', ultimoPago: '4d ago', creditosNoAplicados: 120 },
+  { nombre: 'Sophie Tran', rol: 'Guarantor', garante: 'Sophie Tran', ultimoPago: '6d ago', creditosNoAplicados: 260 },
 ]
+
+/* Todos los que paga el mismo garante (el garante y los pacientes a su cargo): la Guarantor View de Billing. */
+export function grupoDeGarante(nombre: string): PacienteBilling[] {
+  const garante = PACIENTES_BILLING.find((p) => p.nombre === nombre)?.garante ?? nombre
+  return PACIENTES_BILLING.filter((p) => p.garante === garante)
+}
 
 export function buscarPacientes(q: string): PacienteBilling[] {
   const texto = q.trim().toLowerCase()
@@ -78,6 +86,10 @@ export type TipoAjusteBilling = (typeof TIPOS_AJUSTE_BILLING)[number]
 
 export const FILTROS_ACTIVIDAD = ['All', 'Pt Payment', 'Charge Adj', 'Credit Adj'] as const
 export type FiltroActividad = (typeof FILTROS_ACTIVIDAD)[number]
+
+/* Con un paciente elegido, las Tabs de Recent Billing Activity pasan a elegir de quién se ven los movimientos (red.dev). */
+export const VISTAS_PACIENTE = ['Patient View', 'Guarantor View'] as const
+export type VistaPaciente = (typeof VISTAS_PACIENTE)[number]
 
 export type StatBilling = { label: string; value: string; caption: string }
 

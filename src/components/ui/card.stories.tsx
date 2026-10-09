@@ -232,7 +232,7 @@ export const Specs: Story = {
           <li>One topic per card. If it needs two titles, it is two cards.</li>
           <li>The action that edits the card goes top right; the ones that save or cancel go in the footer.</li>
           <li>Cards sit on the grey page background, 16–24px apart, with a shadow and no border.</li>
-          <li>A card inside another card has a half-pixel stroke in a faint grey and a soft shadow (InnerCard). That includes the numbers inside a panel (Today and Selected patient in Billing).</li>
+          <li>A card inside another card has a half-pixel stroke in a faint grey and a soft shadow (InnerCard). That includes the numbers inside a panel (Today and the guarantor numbers in Billing).</li>
           <li>A panel title has no icon: Panel, 15px Bold. The icon only goes inside the card, next to what it explains.</li>
           <li>A clickable inner card goes grey on hover; the chosen one stays light blue (dash-count-bg) while it is selected.</li>
           <li>Tables and the calendar grid keep their border: they are not cards.</li>

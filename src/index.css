@@ -452,6 +452,12 @@ body { font-family: var(--font-sans); }
   to   { opacity: 1; transform: scale(1); }
 }
 
+/* Billing: la card del paciente elegido baja arriba de Find Patient y aparecen los botones de pago (billing.md). */
+@keyframes paciente-entra {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
 /* Al abrir un Dialog o Drawer, Radix bloquea el scroll y define esta variable en :root. Heredable, obligaba a recalcular
    cada elemento de la página: con el odontograma (27.000 nodos) abrir Add Procedure tardaba ~105 ms. Sin herencia, ~40.
    Nada nuestro la usa. Ver modulos/clinical-mode.md. */

@@ -57,8 +57,7 @@ export function DataTable<T>({
   rowLabel?: (row: T) => string
   /** Casilla por fila y "seleccionar todo" en el encabezado. */
   selectable?: boolean
-  /** Selección controlada desde afuera (ids), para mostrarla fuera de la tabla. Sin `selectable` marca esas filas en
-      celeste, sin casillas: lo elegido con `onRowClick` (Billing). */
+  /** Selección controlada desde afuera (ids), para mostrarla fuera de la tabla. */
   selected?: string[]
   onSelectedChange?: (ids: string[]) => void
   /** Ítems del menú ⋮ de cada fila (DropdownMenuItem). */
@@ -303,7 +302,7 @@ export function DataTable<T>({
                 >
                   <div
                     role="row"
-                    aria-selected={selectable || selected ? elegida : undefined}
+                    aria-selected={selectable ? elegida : undefined}
                     aria-disabled={off || undefined}
                     aria-expanded={rowDetail ? abierta : undefined}
                     tabIndex={alHacerClic ? 0 : undefined}

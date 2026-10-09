@@ -74,6 +74,8 @@ para tener más de tres cuentas distintas en "Find Patient".
 1. **(75)** La pantalla vacía no tiene título "Billing" ni los tres botones
    de acción que sí tienen las otras tres. **Corregido**: quedan siempre
    visibles -sin ellos no habría forma de postear el primer pago.
+   *2026-10-09:* Julián pidió que los botones aparezcan sólo con un paciente
+   elegido; el primer pago se postea eligiendo al paciente en Find Patient.
 2. **(76)** "Overdue Balance" repite el valor exacto de "Insurance A/R"
    ($9,896.66 los dos). **Corregido** a un valor propio ($1,845.20).
 3. **(77)** Las 10 filas de "Recent Billing Activity" muestran el mismo
@@ -147,10 +149,9 @@ la lógica de cards de Patients; y chequear que la tabla esté alineada con las 
    (32px, texto de 12px). Antes eran filas sueltas con hover, sin card.
 3. **Números adentro de un panel.** Today y los dos saldos de Selected patient eran cards de página (sombra de panel)
    adentro de otro panel. Pasan a `InnerCard` (`Stat interna`); los cinco de arriba siguen como card de página.
-4. **El elegido, marcado.** Un paciente a la vez, desde una fila o desde Find Patient. Su card (`aria-current`) y
-   **todas sus filas** de la página (`aria-selected`) quedan en `dash-count-bg` hasta que se elige otro o se toca la X.
-   Todas las filas y no sólo la clickeada porque lo elegido es el paciente: así, elegido desde Find Patient, la tabla
-   también muestra qué movimientos son suyos. En la tabla es `selected` sin `selectable` (sin casillas).
+4. **El elegido, marcado.** Un paciente a la vez, desde una fila o desde Find Patient. Su card (`aria-current`) queda
+   en `dash-count-bg` hasta que se elige otro o se toca la X. *(Primero también se marcaban en celeste todas sus filas;
+   la segunda vuelta filtra la tabla al paciente y eso se sacó.)*
 5. **Celular.** Find Patient queda debajo de la tabla: elegir ahí sube hasta los saldos (scroll *nearest*, sin
    animación con movimiento reducido). En escritorio, con todo a la vista, no se mueve nada.
 6. **Encabezado de Panel.** Pasa de `h-[52px] py-3` a `min-h-[52px] py-2 flex-wrap`: unas Tabs sm (36px) entran sin
@@ -164,3 +165,36 @@ la lógica de cards de Patients; y chequear que la tabla esté alineada con las 
 **Para validar con usuarios:** si recepción lee el celeste como "elegido" (el Dashboard marca la card elegida con un
 anillo azul); si marcar todas las filas del paciente ayuda o conviene, en cambio, filtrar la tabla por ese paciente; y
 si el salto hacia arriba en el celular se entiende o desorienta.
+
+## Segunda vuelta (2026-10-09): la vista de un paciente
+
+Julián, con capturas de red.dev (`red.dev.confidentally.com/billing`, que desde la sesión en la nube no se pudo abrir):
+la pantalla sin paciente queda como está; al elegir uno, Billing pasa a ser la vista de ese paciente.
+
+1. **Dos modos, una pantalla.** *Resumen* (sin paciente): igual que antes. *Paciente*: se entra tocando una fila del
+   resumen o un resultado de Find Patient, y se sale con la X de su card, que vuelve al resumen tal como estaba (con el
+   filtro de tipo que tenía).
+2. **Sólo lo suyo.** La tabla muestra únicamente los movimientos del paciente. Las filas ya no eligen (están todas
+   las de él); en el resumen sí.
+3. **Patient View / Guarantor View.** Con paciente, las Tabs del encabezado cambian de tipo (All, Pt Payment…) a
+   *Patient View* (sus movimientos) y *Guarantor View* (todo lo que paga su garante, con la columna Patient para
+   distinguir a cada uno), como red.dev. Cada paciente nuevo arranca en Patient View. Para eso los datos suman
+   `garante` a cada paciente: Maria Abril Viola → John Hayes, Diego Molina → Sophie Tran; John, Brent y Sophie son
+   garantes. Unapplied Credits y Open Balance pasan a sumar todo el grupo del garante (lo dicen sus títulos:
+   *Guarantor …*).
+4. **El paciente, arriba de Find Patient.** Una franja de borde a borde arriba del título (`Panel` suma `top`), en
+   `dash-count-bg`, con sus iniciales, el nombre en azul, el rol (y su garante si es Patient) y la X. Antes el
+   paciente se nombraba en una línea de texto arriba de la tabla; ahora lo dice el título del panel
+   (*Maria Abril Viola — Recent Billing Activity*) y la franja, y esa línea se sacó.
+5. **Microanimación.** La franja baja 6px y aparece en 220ms (`paciente-entra`) y las iniciales hacen un pop
+   (`tab-in`); los saldos del garante y los botones entran igual. Cambiar de paciente la repite. Con movimiento
+   reducido aparece sin animar. La franja está en una región `aria-live`: el lector de pantalla dice el nombre.
+6. **Botones sólo con paciente.** Patient Payment, Credit Adjustment, Charge Adjustment y Export statement aparecen
+   recién con un paciente: siempre postean para él. El encabezado reserva el alto (36px) para que la página no salte.
+7. **Mensajes de cada card.** red.dev tiene un ícono de info con un mensaje en cada número (por ejemplo *Payments
+   Posted Today: Sum of payment transactions posted today (practice timezone)*). Queda para la próxima tanda, con las
+   capturas que va a pasar Julián.
+
+**Para validar con usuarios:** si recepción encuentra cómo postear un pago sin los botones a la vista en el resumen
+(hay que elegir un paciente primero); si Guarantor View se entiende sin explicación; y si la X de la franja se
+encuentra para volver al resumen o hace falta un "Back to all activity" con texto.

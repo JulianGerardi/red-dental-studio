@@ -7,13 +7,13 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
 import { moneda, type Movimiento } from '@/data/ledger'
 import {
-  PACIENTES_BILLING, buscarPacientes, ACTIVIDAD_RECIENTE,
-  STATS_BILLING, STATS_HOY, FILTROS_ACTIVIDAD, type FiltroActividad, type PacienteBilling, type TipoAjusteBilling,
+  PACIENTES_BILLING, buscarPacientes, grupoDeGarante, ACTIVIDAD_RECIENTE, STATS_BILLING, STATS_HOY, FILTROS_ACTIVIDAD,
+  VISTAS_PACIENTE, type FiltroActividad, type PacienteBilling, type TipoAjusteBilling, type VistaPaciente,
 } from '@/data/billing'
 import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { AmountCell, DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
-import { CONTENEDOR_PAGINA, TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
+import { CONTENEDOR_PAGINA, ICONO_SUELTO, TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
 import { Panel } from '@/components/dashboard/primitives'
 import { cn } from '@/lib/utils'
@@ -21,7 +21,9 @@ import { cn } from '@/lib/utils'
 /* Figma 4481:9881 "Billing". Ver design-reference/figma/modulos/billing.md.
    Las 4 pantallas del frame son estados de una sola vista: vacía, poblada,
    con el modal "Post payment" encima y con un paciente elegido -acá son
-   `filas.length === 0`, el modal y `seleccionado`, no rutas separadas. */
+   `filas.length === 0`, el modal y `seleccionado`, no rutas separadas.
+   Sin paciente es el resumen de la clínica; con uno, la vista de ese paciente (como red.dev): sus movimientos, Patient /
+   Guarantor View y los botones de pago (billing.md, segunda vuelta del 2026-10-09). */
 
 function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
   if (m.tipo === 'Charge') return { texto: m.codigo, tono: 'neutral' }
@@ -70,7 +72,7 @@ const COLUMNAS: DataTableColumn<Movimiento & { saldo: number }>[] = [
 const initials = (nombre: string) => nombre.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
 
 /* Un resultado de Find Patient: la InnerCard de la lista lateral de Patients. El elegido queda en el celeste del rango
-   nuevo de Coverage Table, igual que sus filas en la tabla (billing.md, 2026-10-09). */
+   nuevo de Coverage Table (billing.md, 2026-10-09). */
 export function ResultadoPaciente({ paciente, saldo, elegido, onElegir }: {
   paciente: PacienteBilling
   saldo: number
@@ -104,81 +106,97 @@ export function ResultadoPaciente({ paciente, saldo, elegido, onElegir }: {
   )
 }
 
-/* Recent Billing Activity: las Tabs de tipo, los saldos del paciente elegido y la tabla con sus filas en celeste. */
+/* El paciente que se está viendo, de borde a borde arriba de Find Patient. Entra con una animación corta; la X vuelve al
+   resumen de la clínica (billing.md, segunda vuelta del 2026-10-09). */
+export function PacienteElegido({ paciente, onCerrar }: { paciente: PacienteBilling; onCerrar: () => void }) {
+  return (
+    <div className="flex items-center gap-3 border-b border-line-row bg-dash-count-bg px-5 py-3 motion-safe:animate-[paciente-entra_220ms_ease-out]">
+      <span className="bg-dash-blue flex size-10 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold text-white ring-2 ring-white motion-safe:animate-[tab-in_260ms_ease-out]">
+        {initials(paciente.nombre)}
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="text-dash-blue truncate text-[14px] font-semibold" title={paciente.nombre}>{paciente.nombre}</span>
+        <span className="text-[11px] leading-snug text-ink-muted">
+          {paciente.rol === 'Guarantor' ? 'Guarantor' : `Patient · Guarantor: ${paciente.garante}`}
+        </span>
+      </span>
+      <button type="button" aria-label="Clear selected patient" title="Back to all activity" onClick={onCerrar} className={ICONO_SUELTO}>
+        <X className="size-4" />
+      </button>
+    </div>
+  )
+}
+
+/* Recent Billing Activity. Sin paciente: toda la clínica, con las Tabs de tipo y filas que eligen al paciente. Con uno:
+   su nombre en el título, Patient / Guarantor View, los saldos del garante y sólo sus movimientos. */
 export function ActividadReciente({
-  filas, sinActividad, filtro, onFiltro, paciente, saldo, onElegir, onLimpiar, refElegido,
+  filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, creditos, saldo, onElegir, refElegido,
 }: {
+  /** Las filas ya filtradas: por tipo en el resumen, por paciente o garante con uno elegido. */
   filas: (Movimiento & { saldo: number })[]
   /** Todavía no se posteó nada (no es un filtro sin resultados). */
   sinActividad?: boolean
   filtro: FiltroActividad
   onFiltro: (f: FiltroActividad) => void
   paciente?: PacienteBilling
-  /** Open Balance del paciente elegido, con lo posteado en la sesión. */
+  vista: VistaPaciente
+  onVista: (v: VistaPaciente) => void
+  /** Unapplied Credits y Open Balance del garante, con lo posteado en la sesión. */
+  creditos: number
   saldo: number
   onElegir: (nombre: string) => void
-  onLimpiar: () => void
   refElegido?: Ref<HTMLDivElement>
 }) {
   return (
     <Panel
-      title="Recent Billing Activity"
+      title={paciente ? `${paciente.nombre} — Recent Billing Activity` : 'Recent Billing Activity'}
       className="min-w-0"
-      controls={<Tabs size="sm" aria-label="Filter activity" tabs={FILTROS_ACTIVIDAD} value={filtro} onChange={onFiltro} />}
+      controls={paciente
+        ? <Tabs size="sm" aria-label="Whose activity" tabs={VISTAS_PACIENTE} value={vista} onChange={onVista} />
+        : <Tabs size="sm" aria-label="Filter activity" tabs={FILTROS_ACTIVIDAD} value={filtro} onChange={onFiltro} />}
     >
       {paciente && (
-        <div ref={refElegido} className="flex scroll-mt-4 flex-col gap-3">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-[13px] text-ink">
-              Selected patient: <span className="font-semibold">{paciente.nombre}</span>
-              {' · '}
-              <span className="text-dash-blue font-medium">{paciente.rol}</span>
-            </p>
-            <button
-              type="button"
-              aria-label="Clear selected patient"
-              onClick={onLimpiar}
-              className="flex size-6 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"
-            >
-              <X className="size-3.5" />
-            </button>
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Stat interna label="Guarantor Unapplied Credits" value={moneda(paciente.creditosNoAplicados)} caption="Available to apply" />
-            <Stat interna label="Guarantor Open Balance" value={moneda(saldo)} caption="Total outstanding" />
-          </div>
+        <div ref={refElegido} key={paciente.nombre} className="grid scroll-mt-20 grid-cols-1 gap-3 sm:grid-cols-2 motion-safe:animate-[paciente-entra_220ms_ease-out]">
+          <Stat interna label="Guarantor Unapplied Credits" value={moneda(creditos)} caption="Available to apply" />
+          <Stat interna label="Guarantor Open Balance" value={moneda(saldo)} caption="Total outstanding" />
         </div>
       )}
 
-      {/* Clic en una fila elige al paciente: sus saldos arriba y sus filas en celeste. */}
+      {/* En el resumen, clic en una fila abre la vista de ese paciente. */}
       <DataTable
         columns={COLUMNAS}
         rows={filas}
         rowKey={(m) => m.id}
         rowLabel={(m) => m.paciente}
-        onRowClick={(m) => onElegir(m.paciente)}
-        selected={filas.filter((m) => m.paciente === paciente?.nombre).map((m) => m.id)}
+        onRowClick={paciente ? undefined : (m) => onElegir(m.paciente)}
         density="compact"
         itemLabel="entries"
-        empty={sinActividad
-          ? { icon: CreditCard, title: 'No financial transaction has been posted yet.' }
-          : { icon: CreditCard, title: 'No entries', detail: 'Nothing matches the current filter.' }}
+        empty={paciente
+          ? { icon: CreditCard, title: 'No billing activity yet.', detail: 'Payments and adjustments posted for this patient show up here.' }
+          : sinActividad
+            ? { icon: CreditCard, title: 'No financial transaction has been posted yet.' }
+            : { icon: CreditCard, title: 'No entries', detail: 'Nothing matches the current filter.' }}
       />
     </Panel>
   )
 }
 
-/* Find Patient: el buscador y los resultados como InnerCard, como la lista lateral de Patients. */
-export function BuscarPaciente({ busqueda, onBusqueda, seleccionado, saldoDe, onElegir }: {
+/* Find Patient: arriba el paciente que se está viendo; abajo el buscador y los resultados como InnerCard, como la lista
+   lateral de Patients. */
+export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onElegir, onCerrar }: {
   busqueda: string
   onBusqueda: (q: string) => void
-  seleccionado?: string | null
+  paciente?: PacienteBilling
   saldoDe: (nombre: string) => number
   onElegir: (nombre: string) => void
+  onCerrar: () => void
 }) {
   const resultados = buscarPacientes(busqueda)
   return (
-    <Panel title="Find Patient">
+    <Panel
+      title="Find Patient"
+      top={<div aria-live="polite">{paciente && <PacienteElegido key={paciente.nombre} paciente={paciente} onCerrar={onCerrar} />}</div>}
+    >
       <div className="relative shrink-0">
         <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
         <input
@@ -208,7 +226,7 @@ export function BuscarPaciente({ busqueda, onBusqueda, seleccionado, saldoDe, on
             key={p.nombre}
             paciente={p}
             saldo={saldoDe(p.nombre)}
-            elegido={p.nombre === seleccionado}
+            elegido={p.nombre === paciente?.nombre}
             onElegir={() => onElegir(p.nombre)}
           />
         ))
@@ -217,25 +235,73 @@ export function BuscarPaciente({ busqueda, onBusqueda, seleccionado, saldoDe, on
   )
 }
 
-/* `inicial` sólo lo usan las stories (Pages › Parts › Billing): la ruta abre sin nada elegido. */
+const BOTON_ACCION = 'bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-3.5 text-[13px] font-medium text-white transition-colors'
+
+/* Título y acciones. Los pagos y ajustes son de un paciente: los botones aparecen recién con uno elegido (billing.md). */
+export function EncabezadoBilling({ conPaciente, onAccion, onExportar }: {
+  conPaciente: boolean
+  onAccion: (tipo: TipoAjusteBilling) => void
+  onExportar: () => void
+}) {
+  return (
+    <div className="flex min-h-9 flex-wrap items-center justify-between gap-3">
+      <PageTitle>Billing</PageTitle>
+      {conPaciente && (
+        <div className="flex flex-wrap items-center gap-2 motion-safe:animate-[paciente-entra_220ms_ease-out]">
+          <button type="button" onClick={() => onAccion('Patient Payment')} className={BOTON_ACCION}>
+            <Wallet className="size-3.5" /> Patient Payment (-)
+          </button>
+          <button type="button" onClick={() => onAccion('Credit Adjustment')} className={BOTON_ACCION}>
+            <MinusCircle className="size-3.5" /> Credit Adjustment (-)
+          </button>
+          <button type="button" onClick={() => onAccion('Charge Adjustment')} className={BOTON_ACCION}>
+            <PlusCircle className="size-3.5" /> Charge Adjustment (+)
+          </button>
+          <button
+            type="button"
+            aria-label="Export statement"
+            onClick={onExportar}
+            className="flex size-9 items-center justify-center rounded-md border border-line bg-white text-ink-muted hover:bg-surface-subtle"
+          >
+            <Download className="size-4" />
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* `inicial` sólo lo usan las stories (Pages › Parts › Billing): la ruta abre en el resumen, sin paciente. */
 export default function Billing({ inicial }: {
-  inicial?: { seleccionado?: string; filtro?: FiltroActividad; busqueda?: string; vacia?: boolean }
+  inicial?: { seleccionado?: string; vista?: VistaPaciente; filtro?: FiltroActividad; busqueda?: string; vacia?: boolean }
 } = {}) {
   const [actividad, setActividad] = useState(inicial?.vacia ? [] : ACTIVIDAD_RECIENTE)
   const [filtro, setFiltro] = useState<FiltroActividad>(inicial?.filtro ?? 'All')
   const [busqueda, setBusqueda] = useState(inicial?.busqueda ?? '')
   const [seleccionado, setSeleccionado] = useState<string | null>(inicial?.seleccionado ?? null)
+  const [vista, setVista] = useState<VistaPaciente>(inicial?.vista ?? 'Patient View')
   const [modal, setModal] = useState<TipoAjusteBilling | null>(null)
   const refElegido = useRef<HTMLDivElement>(null)
   const subir = useRef(false)
 
-  const filas = useMemo(() => actividad.filter((m) => coincideFiltro(m, filtro)), [actividad, filtro])
   const pacienteSeleccionado = seleccionado ? PACIENTES_BILLING.find((p) => p.nombre === seleccionado) : undefined
+  const grupo = useMemo(() => (seleccionado ? grupoDeGarante(seleccionado) : []), [seleccionado])
+  /* Resumen: por tipo. Paciente: lo suyo (Patient View) o todo lo de su garante (Guarantor View). */
+  const filas = useMemo(() => {
+    if (!seleccionado) return actividad.filter((m) => coincideFiltro(m, filtro))
+    const quienes = vista === 'Guarantor View' ? grupo.map((p) => p.nombre) : [seleccionado]
+    return actividad.filter((m) => quienes.includes(m.paciente))
+  }, [actividad, filtro, seleccionado, vista, grupo])
 
-  /* En el celular Find Patient queda debajo de la tabla: al elegir ahí se sube hasta los saldos (billing.md, 2026-10-09). */
+  /* Cada paciente nuevo arranca en Patient View. */
+  const elegir = (nombre: string) => {
+    setSeleccionado(nombre)
+    setVista('Patient View')
+  }
+  /* En el celular Find Patient queda debajo de la tabla: al elegir ahí se sube hasta lo del paciente (billing.md). */
   const elegirDeLaLista = (nombre: string) => {
     subir.current = nombre !== seleccionado
-    setSeleccionado(nombre)
+    elegir(nombre)
   }
   useEffect(() => {
     if (!subir.current) return
@@ -258,40 +324,7 @@ export default function Billing({ inicial }: {
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <PageTitle>Billing</PageTitle>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setModal('Patient Payment')}
-            className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-3.5 text-[13px] font-medium text-white transition-colors"
-          >
-            <Wallet className="size-3.5" /> Patient Payment (-)
-          </button>
-          <button
-            type="button"
-            onClick={() => setModal('Credit Adjustment')}
-            className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-3.5 text-[13px] font-medium text-white transition-colors"
-          >
-            <MinusCircle className="size-3.5" /> Credit Adjustment (-)
-          </button>
-          <button
-            type="button"
-            onClick={() => setModal('Charge Adjustment')}
-            className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 items-center gap-1.5 rounded-md px-3.5 text-[13px] font-medium text-white transition-colors"
-          >
-            <PlusCircle className="size-3.5" /> Charge Adjustment (+)
-          </button>
-          <button
-            type="button"
-            aria-label="Export statement"
-            onClick={() => aviso.ok('Statement exported.')}
-            className="flex size-9 items-center justify-center rounded-md border border-line bg-white text-ink-muted hover:bg-surface-subtle"
-          >
-            <Download className="size-4" />
-          </button>
-        </div>
-      </div>
+      <EncabezadoBilling conPaciente={!!pacienteSeleccionado} onAccion={setModal} onExportar={() => aviso.ok('Statement exported.')} />
 
       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {STATS_BILLING.map((s) => <Stat key={s.label} {...s} />)}
@@ -304,14 +337,23 @@ export default function Billing({ inicial }: {
           filtro={filtro}
           onFiltro={setFiltro}
           paciente={pacienteSeleccionado}
-          saldo={seleccionado ? saldoActual(seleccionado) : 0}
-          onElegir={setSeleccionado}
-          onLimpiar={() => setSeleccionado(null)}
+          vista={vista}
+          onVista={setVista}
+          creditos={grupo.reduce((n, p) => n + p.creditosNoAplicados, 0)}
+          saldo={grupo.reduce((n, p) => n + saldoActual(p.nombre), 0)}
+          onElegir={elegir}
           refElegido={refElegido}
         />
 
         <div className="flex flex-col gap-4">
-          <BuscarPaciente busqueda={busqueda} onBusqueda={setBusqueda} seleccionado={seleccionado} saldoDe={saldoActual} onElegir={elegirDeLaLista} />
+          <BuscarPaciente
+            busqueda={busqueda}
+            onBusqueda={setBusqueda}
+            paciente={pacienteSeleccionado}
+            saldoDe={saldoActual}
+            onElegir={elegirDeLaLista}
+            onCerrar={() => setSeleccionado(null)}
+          />
           <Panel title="Today">
             {STATS_HOY.map((s) => <Stat key={s.label} interna {...s} />)}
           </Panel>
