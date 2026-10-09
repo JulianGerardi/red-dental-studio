@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-09
 
-### Selects que se abren dentro de una tabla y Chip del design system
+### Selects que se abren dentro de una tabla y Chip del design system ([#22](https://github.com/JulianGerardi/red-dental-studio/pull/22))
 - Arreglo: en Fee Schedule By Location, Coordination Of Benefits y Deductible Type de las coverage tables la lista del
   select quedaba escondida (el marco de la tabla recortaba lo que sobresalía). Ahora se abre por encima.
 - Chip nuevo para lo elegido que se puede sacar (celeste, texto azul, ✕ a la derecha): lo usan los procedimientos de
