@@ -535,11 +535,11 @@ export function TablaProcedimientos({
                   />
                 </td>
               )}
-              <td className="h-12 px-3 text-[13px] whitespace-nowrap text-ink">{p.fecha}</td>
-              <td className="px-3 text-[13px] text-ink">{p.superficie}</td>
-              <td className="px-3 text-[13px] text-ink">{p.pieza}</td>
-              <td className="px-3 text-[13px] text-ink">{p.ubicacion}</td>
-              <td className="px-3 text-[13px] whitespace-nowrap text-ink">
+              <td className="h-12 px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.fecha}</td>
+              <td className="px-3 text-[13px] text-ink-soft">{p.superficie}</td>
+              <td className="px-3 text-[13px] text-ink-soft">{p.pieza}</td>
+              <td className="px-3 text-[13px] text-ink-soft">{p.ubicacion}</td>
+              <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">
                 {p.codigo} {p.nombre}
               </td>
               <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.proveedor}</td>

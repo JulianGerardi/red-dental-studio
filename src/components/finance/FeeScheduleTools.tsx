@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { FormFooter, ModalShell, OptionCheckbox, SelectField, TextField } from '@/components/patients/form'
-import { DrawerSection } from '@/components/ui/drawer'
 
 /* Las dos herramientas del editor de un fee schedule (red.dev): Copy form trae los precios de otro fee schedule y Bulk
    Edit ("Increase All") los sube en monto o en porcentaje. Las dos llenan la columna New Fee; nada se guarda hasta Save.
@@ -22,13 +21,11 @@ export function CopyFormDrawer({ opciones, onClose, onCopiar }: {
       width="max-w-[480px]"
       footer={<FormFooter onCancel={onClose} saveLabel="Confirm" onSave={() => { if (!elegido) { setIntentado(true); return } onCopiar(elegido); onClose() }} />}
     >
-      <DrawerSection title="Fee schedule">
-        <SelectField
-          label="Fee schedule" required placeholder="Select an option" options={opciones} value={elegido} onChange={setElegido}
-          error={intentado && !elegido ? 'Select the fee schedule to copy.' : undefined}
-          hint="Its fees replace every New Fee. Save to keep them."
-        />
-      </DrawerSection>
+      <SelectField
+        label="Fee schedule" required placeholder="Select an option" options={opciones} value={elegido} onChange={setElegido}
+        error={intentado && !elegido ? 'Select the fee schedule to copy.' : undefined}
+        hint="Its fees replace every New Fee. Save to keep them."
+      />
     </ModalShell>
   )
 }
@@ -64,7 +61,7 @@ export function IncreaseAllDrawer({ onClose, onAplicar, seleccionados = 0 }: {
       width="max-w-[480px]"
       footer={<FormFooter onCancel={onClose} saveLabel="Confirm" onSave={() => { if (!valido) { setIntentado(true); return } onAplicar({ monto: Number(monto), por, excluirCeros, redondear }); onClose() }} />}
     >
-      <DrawerSection title="Increase">
+      <div className="flex flex-col gap-4">
         <div className="grid grid-cols-[1fr_96px] gap-4">
           <TextField
             label={seleccionados ? 'Increase Selected Fees By' : 'Increase All Fees By'} required placeholder={por === '$' ? '$0.00' : '0'} value={monto}
@@ -78,7 +75,7 @@ export function IncreaseAllDrawer({ onClose, onAplicar, seleccionados = 0 }: {
           <OptionCheckbox label="Exclude $0.0 fees from the increase" checked={excluirCeros} onChange={setExcluirCeros} />
           <OptionCheckbox label="Round up the value to the nearest dollar" checked={redondear} onChange={setRedondear} />
         </div>
-      </DrawerSection>
+      </div>
     </ModalShell>
   )
 }

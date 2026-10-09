@@ -20,7 +20,7 @@ import {
   PlanAddressFields, PlanConfigurationFields, PlanContactFields, PlanGeneralFields, formDePlan, obligatoriosPlan, planDeForm,
 } from '@/components/finance/PlanFields'
 import { useFormPasos } from '@/lib/useFormPasos'
-import { ICONO_SUELTO, TARJETA_INTERNA } from '@/lib/estilos'
+import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO, TARJETA_INTERNA } from '@/lib/estilos'
 import { LOCACIONES } from '@/pages/settings/Locations'
 import { rutaPlanes } from '@/pages/settings/finance/Carriers'
 import { useFinanzas } from '@/data/finanzasStore'
@@ -100,6 +100,13 @@ export function PlanCoverage({ plan, onGuardar, onSucio }: PropsSeccion) {
   const { d, setD, cambiado, guardado } = useBorrador(plan.cobertura, onSucio)
   const [intentado, setIntentado] = useState(false)
   const [copiando, setCopiando] = useState(false)
+  const [nuevo, setNuevo] = useState<string>()
+  const agregarRango = () => {
+    const r = rangoVacio()
+    setD({ ...d, rangos: [...d.rangos, r] })
+    setNuevo(r.id)
+    aviso.info('A new range was added at the end. Complete it and Save.')
+  }
 
   const guardar = () => {
     if (!d.rangos.every(rangoCompleto)) { setIntentado(true); return }
@@ -116,10 +123,10 @@ export function PlanCoverage({ plan, onGuardar, onSucio }: PropsSeccion) {
             <SelectField label="Type" options={[...TIPOS_COBERTURA]} value={d.tipo} onChange={(v) => setD({ ...d, tipo: v as TipoCobertura })} className="w-full sm:w-[220px]" />
             <div className="flex gap-2">
               <Button variant="secondary" onClick={() => setCopiando(true)}><Copy /> Copy from</Button>
-              <Button onClick={() => setD({ ...d, rangos: [...d.rangos, rangoVacio()] })}><Plus /> Add Range</Button>
+              <Button onClick={agregarRango}><Plus /> Add Range</Button>
             </div>
           </div>
-          <RangesTable tipo={d.tipo} rangos={d.rangos} onChange={(rangos) => setD({ ...d, rangos })} intentado={intentado} />
+          <RangesTable tipo={d.tipo} rangos={d.rangos} onChange={(rangos) => setD({ ...d, rangos })} intentado={intentado} nuevo={nuevo} />
         </div>
       </Card>
       {pie(cambiado, () => navigate(rutaPlanes(plan.aseguradoraId)), guardar)}
@@ -156,20 +163,20 @@ export function PlanPredeterminations({ plan, onGuardar, onSucio }: PropsSeccion
         <div className="flex flex-col gap-4">
           <p className="text-[13px] text-ink-muted">By selecting procedures from this list, you will be warned to generate a predetermination claim and submit it to the payer while planning the patient's treatment in the Treatment Planner.</p>
           {buscador(q, setQ, 'Search for CDT Code o Description..')}
-          <div role="table" aria-label="Predeterminations" className="max-h-[480px] overflow-y-auto text-[13px]">
-            <div role="row" className="sticky top-0 grid grid-cols-[90px_80px_1fr] gap-3 border-b border-line bg-white pb-2 text-xs font-medium text-ink-muted">
+          <div role="table" aria-label="Predeterminations" className={cn(TABLA_MARCO, 'max-h-[480px] overflow-y-auto')}>
+            <div role="row" className={cn('sticky top-0 z-10 grid grid-cols-[90px_80px_1fr] gap-3', TABLA_ENCABEZADO)}>
               <span role="columnheader">Requierd</span><span role="columnheader">Code</span><span role="columnheader">Description</span>
             </div>
             {filas.map((p) => (
-              <div key={p.code} role="row" className="grid grid-cols-[90px_80px_1fr] items-center gap-3 border-b border-line py-2 last:border-b-0">
+              <div key={p.code} role="row" className={cn('grid grid-cols-[90px_80px_1fr] gap-3', TABLA_FILA)}>
                 <span role="cell">
                   <Switch
                     aria-label={`${p.code} requires predetermination`} checked={d.includes(p.code)}
                     onCheckedChange={(on) => setD(on ? [...d, p.code] : d.filter((c) => c !== p.code))}
                   />
                 </span>
-                <span role="cell" className="font-medium tabular-nums">{p.code}</span>
-                <span role="cell" className="text-ink-muted">{p.label}</span>
+                <span role="cell" className="tabular-nums">{p.code}</span>
+                <span role="cell">{p.label}</span>
               </div>
             ))}
             {filas.length === 0 && <p className="py-6 text-center text-ink-muted">No procedures match “{q}”.</p>}
@@ -205,16 +212,16 @@ export function PlanPaymentTable({ plan, onGuardar, onSucio }: PropsSeccion) {
               {buscador(q, setQ, 'Filter for CDT Code o Description', Filter)}
             </label>
           </div>
-          <div role="table" aria-label="Payment table" className="text-[13px]">
-            <div role="row" className="grid grid-cols-[80px_1fr_130px_32px] gap-3 border-b border-line pb-2 text-xs font-medium text-ink-muted">
-              <span role="columnheader">Code</span><span role="columnheader">Description</span><span role="columnheader" className="text-right">Value</span><span role="columnheader" className="sr-only">Actions</span>
+          <div role="table" aria-label="Payment table" className={TABLA_MARCO}>
+            <div role="row" className={cn('grid grid-cols-[80px_1fr_130px_32px] gap-3', TABLA_ENCABEZADO)}>
+              <span role="columnheader">Code</span><span role="columnheader">Description</span><span role="columnheader" className="text-right">Value</span><span role="columnheader"><span className="sr-only">Actions</span></span>
             </div>
             {filas.length === 0 ? (
               <EmptyState icon={FileSearch} title="No procedures found" detail={d.length ? `No procedures match “${q}”.` : 'Add a new procedure to the payment table'} className="py-10" />
             ) : filas.map((f) => (
-              <div key={f.codigo} role="row" className="grid grid-cols-[80px_1fr_130px_32px] items-center gap-3 border-b border-line py-2 last:border-b-0">
-                <span role="cell" className="font-medium tabular-nums">{f.codigo}</span>
-                <span role="cell" className="text-ink-muted">{descripcionDe(f.codigo)}</span>
+              <div key={f.codigo} role="row" className={cn('grid grid-cols-[80px_1fr_130px_32px] gap-3', TABLA_FILA)}>
+                <span role="cell" className="tabular-nums">{f.codigo}</span>
+                <span role="cell">{descripcionDe(f.codigo)}</span>
                 <span role="cell"><MoneyInput label={`${f.codigo} value`} value={f.valor} onChange={(v) => setD(d.map((x) => (x.codigo === f.codigo ? { ...x, valor: v ?? 0 } : x)))} /></span>
                 <span role="cell" className="flex justify-end">
                   <button type="button" aria-label={`Remove ${f.codigo}`} onClick={() => setD(d.filter((x) => x.codigo !== f.codigo))} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}><Trash2 className="size-4" /></button>
@@ -232,8 +239,8 @@ export function PlanPaymentTable({ plan, onGuardar, onSucio }: PropsSeccion) {
 /* Una fila de montos: Annual Individual, Annual Family y Lifetime. */
 function filaMontos(nombre: string, montos: Montos, columnas: readonly string[], onChange: (m: Montos) => void) {
   return (
-    <div key={nombre} role="row" className="grid grid-cols-[90px_repeat(3,minmax(0,1fr))] items-center gap-3">
-      <span role="rowheader" className="text-[13px] text-ink">{nombre}</span>
+    <div key={nombre} role="row" className={cn('grid grid-cols-[90px_repeat(3,minmax(0,1fr))] gap-3', TABLA_FILA)}>
+      <span role="rowheader">{nombre}</span>
       {montos.map((m, i) => (
         <span key={columnas[i]} role="cell">
           <MoneyInput label={`${nombre} ${columnas[i]}`} placeholder="0.00" value={m || null} onChange={(v) => onChange(montos.map((x, j) => (j === i ? v ?? 0 : x)) as Montos)} className="h-9 text-left" />
@@ -249,8 +256,8 @@ export function PlanDeductibles({ plan, onGuardar, onSucio }: PropsSeccion) {
   const DEDUCIBLES = ['Annual Individual', 'Annual Family', 'Lifetime Individual'] as const
   const BENEFICIOS = ['Annual Individual', 'Annual Family', 'Lifetime Ortho'] as const
   const encabezado = (cols: readonly string[]) => (
-    <div role="row" className="grid grid-cols-[90px_repeat(3,minmax(0,1fr))] gap-3 text-xs font-medium text-ink-muted">
-      <span role="columnheader" className="sr-only">Type</span>
+    <div role="row" className={cn('grid grid-cols-[90px_repeat(3,minmax(0,1fr))] gap-3', TABLA_ENCABEZADO)}>
+      <span role="columnheader"><span className="sr-only">Type</span></span>
       {cols.map((c) => <span key={c} role="columnheader">{c}</span>)}
     </div>
   )
@@ -260,14 +267,14 @@ export function PlanDeductibles({ plan, onGuardar, onSucio }: PropsSeccion) {
         <div className="flex flex-col gap-4 overflow-x-auto">
           <section className={cn(TARJETA_INTERNA, 'flex min-w-[520px] flex-col gap-3 p-4')}>
             <h3 className="text-[13px] font-semibold text-ink">Deductibles</h3>
-            <div role="table" aria-label="Deductibles" className="flex flex-col gap-2">
+            <div role="table" aria-label="Deductibles" className={TABLA_MARCO}>
               {encabezado(DEDUCIBLES)}
               {CLASES_DEDUCIBLE.map((k) => filaMontos(k, d.deducibles[k], DEDUCIBLES, (m) => setD({ ...d, deducibles: { ...d.deducibles, [k]: m } })))}
             </div>
           </section>
           <section className={cn(TARJETA_INTERNA, 'flex min-w-[520px] flex-col gap-3 p-4')}>
             <h3 className="text-[13px] font-semibold text-ink">Benefits</h3>
-            <div role="table" aria-label="Benefits" className="flex flex-col gap-2">
+            <div role="table" aria-label="Benefits" className={TABLA_MARCO}>
               {encabezado(BENEFICIOS)}
               {filaMontos('Maximum', d.beneficios, BENEFICIOS, (m) => setD({ ...d, beneficios: m }))}
             </div>
@@ -287,13 +294,13 @@ export function PlanCoordination({ plan, onGuardar, onSucio }: PropsSeccion) {
       <Card title="Coordination of Benefits">
         <div className="flex flex-col gap-4">
           <p className="text-[13px] text-ink-muted">Choose the method for coordinating benefits between the primary and secondary insurance when this plan is used as the patient's secondary coverage.</p>
-          <div role="table" aria-label="Coordination of benefits" className="text-[13px]">
-            <div role="row" className="grid grid-cols-[1fr_minmax(0,240px)] gap-4 border-b border-line pb-2 text-xs font-medium text-ink-muted">
+          <div role="table" aria-label="Coordination of benefits" className={TABLA_MARCO}>
+            <div role="row" className={cn('grid grid-cols-[1fr_minmax(0,240px)] gap-4', TABLA_ENCABEZADO)}>
               <span role="columnheader">Source of Payment for Primary Insurance Plan</span><span role="columnheader">Method for Coordination of Benefits</span>
             </div>
             {FUENTES_PAGO.map((f) => (
-              <div key={f} role="row" className="grid grid-cols-[1fr_minmax(0,240px)] items-center gap-4 border-b border-line py-2 last:border-b-0">
-                <span role="cell" className="text-ink">{f}</span>
+              <div key={f} role="row" className={cn('grid grid-cols-[1fr_minmax(0,240px)] gap-4', TABLA_FILA)}>
+                <span role="cell">{f}</span>
                 <span role="cell"><SelectField hideLabel label={`${f} method`} options={METODOS_COB} value={d[f] ?? 'Traditional'} onChange={(v) => setD({ ...d, [f]: v })} /></span>
               </div>
             ))}
@@ -323,13 +330,13 @@ export function PlanFeeByLocation({ plan, onGuardar, onSucio }: PropsSeccion) {
       <Card title="Max Allowable Amount Fee Schedule By Location">
         <div className="flex flex-col gap-4">
           <p className="text-[13px] text-ink-muted">Select a fee schedule for a specific location. If none is selected, the default from 'Max Allowable Amount Fee Schedule' will be used.</p>
-          <div role="table" aria-label="Fee schedule by location" className="text-[13px]">
-            <div role="row" className="grid grid-cols-[1fr_minmax(0,280px)] gap-4 border-b border-line pb-2 text-xs font-medium text-ink-muted">
+          <div role="table" aria-label="Fee schedule by location" className={TABLA_MARCO}>
+            <div role="row" className={cn('grid grid-cols-[1fr_minmax(0,280px)] gap-4', TABLA_ENCABEZADO)}>
               <span role="columnheader">Location Name</span><span role="columnheader">Max Allowable Amount Fee Schedule by Location</span>
             </div>
             {LOCACIONES.map((l) => (
-              <div key={l.id} role="row" className="grid grid-cols-[1fr_minmax(0,280px)] items-center gap-4 border-b border-line py-2 last:border-b-0">
-                <span role="cell" className="text-ink">{l.nombre}</span>
+              <div key={l.id} role="row" className={cn('grid grid-cols-[1fr_minmax(0,280px)] gap-4', TABLA_FILA)}>
+                <span role="cell">{l.nombre}</span>
                 <span role="cell">
                   <SelectField
                     hideLabel label={`${l.nombre} fee schedule`} placeholder="Select max allowable amount fee schedule"

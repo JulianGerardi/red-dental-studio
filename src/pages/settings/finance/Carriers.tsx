@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { Hash, Landmark, Pencil, Plus, Power, ShieldCheck, Trash2 } from 'lucide-react'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
@@ -18,6 +18,7 @@ import { LocationNumberDrawer } from '@/components/finance/LocationNumberDrawer'
 import { PhoneFields, UnitField } from '@/components/finance/fields'
 import { useFinanzas } from '@/data/finanzasStore'
 import { FORMATOS_RECLAMO, TONO_ESTADO, cantidad, esNorteamerica, type Aseguradora, type PlanSeguro } from '@/data/finanzas'
+import { TABLA_LINK } from '@/lib/estilos'
 
 /* Settings → Billing → Carriers como en red.dev: la lista, Edit Carrier con las pestañas Carrier e Insurance Plans /
    Employers, y los drawers New Carrier, New Insurance Plan y Location Number. Ver figma/modulos/settings-billing.md. */
@@ -59,7 +60,7 @@ export function SettingsCarriers({ nuevo = false }: { nuevo?: boolean }) {
   const planesDe = (c: Aseguradora) => planes.filter((p) => p.aseguradoraId === c.id).length
 
   const columnas: DataTableColumn<Aseguradora>[] = [
-    { key: 'nombre', header: 'Carrier Name', locked: true, cell: (c) => <span className="font-semibold text-ink">{c.nombre}</span> },
+    { key: 'nombre', header: 'Carrier Name', locked: true, cell: (c) => <Link to={rutaCarrier(c.id)} className={TABLA_LINK}>{c.nombre}</Link> },
     { key: 'payer', header: 'Payer ID', width: 140, cell: (c) => <span className="tabular-nums">{c.payerId}</span> },
     { key: 'planes', header: 'Group Plans #', width: 140, cell: (c) => <span className="tabular-nums">{planesDe(c)}</span> },
   ]
@@ -185,7 +186,7 @@ export function CarrierPlans({ carrier }: { carrier: Aseguradora }) {
   const filas = planes.filter((p) => p.aseguradoraId === carrier.id && `${p.nombre} ${p.grupo}`.toLowerCase().includes(q.trim().toLowerCase()))
 
   const columnas: DataTableColumn<PlanSeguro>[] = [
-    { key: 'nombre', header: 'Plan/Employer Name', locked: true, cell: (p) => <span className="font-medium text-ink">{p.nombre}</span> },
+    { key: 'nombre', header: 'Plan/Employer Name', locked: true, cell: (p) => <Link to={rutaPlan(carrier.id, p.id)} className={TABLA_LINK}>{p.nombre}</Link> },
     { key: 'grupo', header: 'Group #', width: 160, cell: (p) => <span className="tabular-nums">{p.grupo}</span> },
     { key: 'estado', header: 'Status', width: 110, cell: (p) => <Pill tone={TONO_ESTADO[p.estado]}>{p.estado}</Pill> },
   ]

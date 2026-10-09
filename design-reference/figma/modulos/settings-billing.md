@@ -1,5 +1,24 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
+## 2026-10-09 · Segunda vuelta de correcciones de Julián
+
+16. **Breadcrumbs como el resto de Settings**: `Settings › Billing › Fee Schedules | Carriers | Coverage Table › ítem`
+    (› plan, colgado de su carrier). Se va el tramo *Edit* y *Finance* de red.dev: el nombre del ítem linkeaba a la misma
+    pantalla y quedaba con el foco marcado al tocarlo. El último tramo nunca es link (`ui/breadcrumb`).
+17. **Manage Exceptions**: título *Manage Exceptions* (como el botón) y una bajada que nombra la plantilla; red.dev
+    repetía *Manage exceptions for standard with exceptions* en los dos. Buscador + Search a la izquierda, *Add new
+    exception* a la derecha y la tabla con columnas fijas (*Code, Exception* · *Description* · *Reason* · *Actions*); antes
+    el tacho caía en la primera columna y el texto se corría una.
+18. **Add Range avisa**: toast *A new range was added at the end. Complete it and Save.*, la tabla baja hasta la fila
+    nueva, la resalta un momento y pone el foco en *R. Min*.
+19. **Drawers sin títulos repetidos**: un título de sección no repite el rótulo del campo ni el título del drawer (Copy
+    form decía "Fee schedule" dos veces). Corregido en Copy form, Increase All, Location Number (el texto de red.dev pasa
+    a la bajada), Copy from y el asistente de excepciones; fuera de Billing, la bajada de Add Relationship y Edit
+    Relationship.
+20. **Patrón de tablas** (todas las de la app; guía: Locations, Employees, Patients): encabezado en banda gris, celdas en
+    13px Regular ink-soft, azul y Semibold sólo en lo que navega. Los nombres de Carriers y de Insurance Plans pasan a ser
+    links a su edición. Clases en `lib/estilos.ts` (`TABLA_*`); ver design-system.md.
+
 ## 2026-10-09 · Rehecho desde red.dev, con las correcciones de Julián
 
 La primera versión (2026-10-08, en este mismo PR #18) estaba armada "con criterio propio" porque desde la nube
@@ -27,8 +46,8 @@ fees* en vez de *vs UCR*, *Non-zero fees*, selección para Bulk Edit e *Informat
 | `/settings/finance/coverage-table/new` | **Coverage Table** (alta), página sin la lista |
 | `/settings/finance/coverage-table/:id/edit` | La lista y la plantilla (`/:id` redirige acá) |
 
-Menú: **Billing** › *Fee Schedules*, *Carriers*, *Coverage Table* (singular, tal cual). Breadcrumb: Settings › Finance ›
-sección › ítem › Edit (› Insurance plans › plan › Edit), como red.dev.
+Menú: **Billing** › *Fee Schedules*, *Carriers*, *Coverage Table* (singular, tal cual). Breadcrumb: Settings › Billing ›
+sección › ítem (› plan), como el resto de Settings (decisión 16).
 
 ### Decisiones
 
@@ -82,12 +101,13 @@ sección › ítem › Edit (› Insurance plans › plan › Edit), como red.de
 
 ### Anomalías de red.dev
 
-- **Copiadas tal cual:** columna *Requierd* (Predeterminations); *Search for CDT Code o Description*; *Manage exceptions
-  for standard with exceptions* (título y bajada); el título *Search Coverage Table* también al editar; *Create New
-  button* en el vacío de Coverage Table; breadcrumb *Finance* y menú *Billing*; *Fee Schedule's* / *Fee Schedule’s*; menú
-  *Coverage Table* en singular; el switch *Save in draft state* con el rótulo *Inactive*.
+- **Copiadas tal cual:** columna *Requierd* (Predeterminations); *Search for CDT Code o Description*; el título *Search
+  Coverage Table* también al editar; *Create New button* en el vacío de Coverage Table; *Fee Schedule's* / *Fee
+  Schedule’s*; menú *Coverage Table* en singular; el switch *Save in draft state* con el rótulo *Inactive*.
 - **Corregidas:** Plan/Employer name y Group # tenían de placeholder *Street name and number* y *Additional info*; el rango
-  decía *R. Min – R. Min* (acá *R. Max*); el buscador de Coverage Table decía *Search a Fee Schedule Here...*.
+  decía *R. Min – R. Min* (acá *R. Max*); el buscador de Coverage Table decía *Search a Fee Schedule Here...*; *Manage
+  exceptions for standard with exceptions* en título y bajada (decisión 17); el breadcrumb *Finance › … › Edit* (decisión
+  16).
 - **No copiadas:** *Mostrar:* (queda el pie de nuestra tabla); montos como `$30,00` (acá `$30.00`); la hora de la versión
   (`09:00 PM`); el título *Search Fee Schedule* de la lista (ahora es una tabla: *Fee Schedules*).
 - **Inferidas** (no se vieron en red.dev): las columnas de una plantilla *Copayment*, el estado *Scheduled* de una

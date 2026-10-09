@@ -1,8 +1,9 @@
+import { useEffect, useRef } from 'react'
 import { FileSearch, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SelectField, TextField } from '@/components/patients/form'
 import { EmptyState } from '@/components/ui/empty-state'
-import { ICONO_SUELTO } from '@/lib/estilos'
+import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO } from '@/lib/estilos'
 import { TIPOS_DEDUCIBLE, excepcionesEnRango, type Excepcion, type Rango, type TipoCobertura, type TipoDeducible } from '@/data/finanzas'
 
 /* La tabla de rangos de una coverage table, la de la plantilla y la de cada plan (red.dev, Coverage Table): un rango de
@@ -16,8 +17,10 @@ export const rangoVacio = (): Rango => ({ id: `r-${Math.random().toString(36).sl
 export const rangoCompleto = (r: Rango) => !!(r.desde.trim() && r.hasta.trim() && r.categoria.trim())
 
 export function RangesTable({
-  tipo, rangos, onChange, excepciones = [], intentado,
+  tipo, rangos, onChange, excepciones = [], intentado, nuevo,
 }: {
+  /** El rango recién agregado con Add Range: baja hasta él, lo resalta y pone el foco en su primer campo. */
+  nuevo?: string
   tipo: TipoCobertura
   rangos: Rango[]
   onChange: (rangos: Rango[]) => void
@@ -30,23 +33,34 @@ export function RangesTable({
   const codigo = (v: string) => v.toUpperCase().replace(/[^D0-9]/g, '').slice(0, 5)
   const falta = (v: string) => (intentado && !v.trim() ? 'Required' : undefined)
   const porcentaje = tipo === 'Percentage'
+  const tabla = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!nuevo) return
+    const fila = tabla.current?.querySelector<HTMLElement>(`[data-rango="${nuevo}"]`)
+    fila?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    fila?.querySelector('input')?.focus({ preventScroll: true })
+  }, [nuevo])
 
   return (
-    <div role="table" aria-label="Coverage ranges" className="text-[13px]">
-      <div role="row" className={cn('hidden gap-3 border-b border-line pb-2 text-xs font-medium text-ink-muted sm:grid', COLUMNAS)}>
+    <div ref={tabla} role="table" aria-label="Coverage ranges" className={TABLA_MARCO}>
+      <div role="row" className={cn('hidden gap-3 sm:grid', TABLA_ENCABEZADO, COLUMNAS)}>
         <span role="columnheader">Code Ranges<span className="text-required">*</span></span>
         <span role="columnheader">Category<span className="text-required">*</span></span>
         <span role="columnheader">Deductible Type<span className="text-required">*</span></span>
         <span role="columnheader">{porcentaje ? 'Coverage %' : 'Copayment'}<span className="text-required">*</span></span>
         <span role="columnheader" title="Exceptions">Exc</span>
-        <span role="columnheader" className="sr-only">Actions</span>
+        <span role="columnheader"><span className="sr-only">Actions</span></span>
       </div>
 
       {rangos.length === 0 ? (
-        <EmptyState icon={FileSearch} title="No procedure ranges found" detail="Make sure there are available ranges or try adding a new one." className="py-10" />
+        <EmptyState icon={FileSearch} title="No procedure ranges found" detail="Make sure there are available ranges or try adding a new one." className="border-t border-line-row py-10" />
       ) : (
         rangos.map((r, i) => (
-          <div key={r.id} role="row" className={cn('grid grid-cols-2 items-start gap-3 border-b border-line py-3 last:border-b-0', COLUMNAS)}>
+          <div
+            key={r.id} role="row" data-rango={r.id}
+            className={cn('grid grid-cols-2 gap-3', TABLA_FILA, 'items-start', COLUMNAS, r.id === nuevo && 'motion-safe:animate-[rango-nuevo_1.6s_ease-out]')}
+          >
             <div role="cell" className="col-span-2 flex items-start gap-2 sm:col-span-1">
               <TextField hideLabel label={`Range ${i + 1} from`} placeholder="R. Min" value={r.desde} onChange={(v) => cambiar(r.id, { desde: codigo(v) })} error={falta(r.desde)} className="min-w-0 flex-1" />
               <span className="pt-2 text-ink-faint">-</span>
@@ -64,7 +78,7 @@ export function RangesTable({
                 value={String(r.valor)} onChange={(v) => cambiar(r.id, { valor: Math.min(porcentaje ? 100 : 99999, Number(v.replace(/[^\d.]/g, '')) || 0) })}
               />
             </div>
-            <span role="cell" className="flex h-9 items-center text-ink-muted tabular-nums" aria-label={`${excepcionesEnRango(r, excepciones)} exceptions`}>
+            <span role="cell" className="flex h-9 items-center tabular-nums" aria-label={`${excepcionesEnRango(r, excepciones)} exceptions`}>
               <span className="mr-1 text-xs sm:hidden">Exc</span>{excepcionesEnRango(r, excepciones)}
             </span>
             <span role="cell" className="flex h-9 items-center justify-end">

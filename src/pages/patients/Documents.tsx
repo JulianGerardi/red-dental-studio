@@ -32,12 +32,12 @@ const COLUMNAS: DataTableColumn<Doc>[] = [
     key: 'name', header: 'Name', cell: (d) => (
       <span className="flex min-w-0 items-center gap-3">
         <span className="bg-dash-blue flex size-7 shrink-0 items-center justify-center rounded text-white"><FileText className="size-4" /></span>
-        <span className="truncate text-ink-medium">{d.name}</span>
+        <span className="truncate">{d.name}</span>
       </span>
     ),
   },
   { key: 'firma', header: 'Signature', width: 200, cell: (d) => <Pill tone={FIRMA_TONO[d.firma]}>{d.firma}</Pill> },
-  { key: 'fecha', header: 'Last Update', width: 140, align: 'right', cell: (d) => <span className="text-ink-medium">{d.fecha}</span> },
+  { key: 'fecha', header: 'Last Update', width: 140, align: 'right', cell: (d) => d.fecha },
 ]
 
 export default function Documents() {

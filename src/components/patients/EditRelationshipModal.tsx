@@ -30,7 +30,7 @@ export function EditRelationshipModal({
     /* Como Edit Relationship de Confidentally 2.0: un paso, Person y Relationship sin caja. */
     <ModalShell
       title="Edit Relationship"
-      description="Find or create person"
+      description="Update how this person is related to the patient."
       onClose={onClose}
       width="max-w-[480px]"
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}

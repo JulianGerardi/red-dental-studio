@@ -15,17 +15,17 @@ const meta = {
       story: { inline: false, iframeHeight: 720 },
       description: {
         component: [
-          '**Manage Exceptions** de una plantilla de *Coverage Table*. Título y bajada tal cual red.dev, con su error: *Manage exceptions for standard with exceptions*.',
+          '**Manage Exceptions** de una plantilla de *Coverage Table*. red.dev repite *Manage exceptions for standard with exceptions* en el título y la bajada; acá el título es *Manage Exceptions* (como el botón) y la bajada nombra la plantilla y dice para qué sirven.',
           '',
-          'Primero la lista (buscador, *Add new exception*, columnas *Code, Exception* · *Description* · *Reason* y el tacho). *Add new exception* abre en el mismo drawer el asistente de cuatro pasos de red.dev; Cancel vuelve a la lista. Cada excepción se guarda al terminar, sin esperar al Save de la tabla.',
+          'Primero la lista: buscador con Search a la izquierda, *Add new exception* a la derecha y la tabla (*Code, Exception* · *Description* · *Reason* · *Actions*) con el patrón de tablas. *Add new exception* abre en el mismo drawer el asistente de cuatro pasos de red.dev; Cancel vuelve a la lista. Cada excepción se guarda al terminar, sin esperar al Save de la tabla.',
           '',
           '**Probalo:** en *Playground* tocá *Add new exception* y armá una de tipo Frequency.',
         ].join('\n'),
       },
     },
   },
-  args: { excepciones: COBERTURAS[0].excepciones, onClose: () => {}, onGuardar: () => {} },
-  argTypes: { excepciones: { control: false }, agregando: { control: 'boolean', description: 'Abre directamente el asistente.' } },
+  args: { excepciones: COBERTURAS[0].excepciones, tabla: COBERTURAS[0].nombre, onClose: () => {}, onGuardar: () => {} },
+  argTypes: { excepciones: { control: false }, tabla: { control: 'text', description: 'El nombre de la plantilla, para la bajada.' }, agregando: { control: 'boolean', description: 'Abre directamente el asistente.' } },
 } satisfies Meta<typeof ExceptionsDrawer>
 
 export default meta
@@ -39,10 +39,10 @@ export const Parts: Story = {
     <PasosDelDrawer
       nota="La lista es la vista inicial; el asistente reemplaza su contenido y su pie (Cancel · Back · Next Step · Save)."
       pasos={[
-        { nombre: 'Exceptions Type', secciones: 'Exception Type: Age limitation · Downgrade · Frequency · Not covered', obligatorios: 'Exception Type' },
+        { nombre: 'Exceptions Type', secciones: 'Age limitation · Downgrade · Frequency · Not covered (sin título de sección: lo dice el paso)', obligatorios: 'Exception Type' },
         { nombre: 'Select Procedure', secciones: 'Add Procedures (n): buscador “Search for CDT Code o Description” y los elegidos como chips', obligatorios: 'Al menos uno (“Please add a procedure to the exception”)' },
         { nombre: 'Specify Options', secciones: 'Age limitation: Minimum/Maximum age y Coverage % o Downgrade to + Deductible Type · Downgrade: Downgrade to · Frequency: How many times, Over the course of · Not covered: sin opciones', obligatorios: 'Los del tipo' },
-        { nombre: 'Reason For Exception', secciones: '“Select the reason for the exception.” y el texto', obligatorios: 'Reason' },
+        { nombre: 'Reason For Exception', secciones: 'Reason for exception, con la ayuda “Select the reason for the exception.”', obligatorios: 'Reason' },
       ]}
     />
   ),

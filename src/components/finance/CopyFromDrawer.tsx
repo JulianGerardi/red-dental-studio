@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { FieldLabel, FormFooter, ModalShell, control } from '@/components/patients/form'
-import { DrawerSection } from '@/components/ui/drawer'
+import { FormFooter, ModalShell, control } from '@/components/patients/form'
 import { Tabs } from '@/components/ui/tabs'
 import { OpcionDireccion } from '@/components/patients/AddRelationshipDrawer'
 import { useFinanzas } from '@/data/finanzasStore'
@@ -49,23 +48,20 @@ export function CopyFromDrawer({ planId, onClose, onCopiar }: {
       width="max-w-[560px]"
       footer={<FormFooter onCancel={onClose} onSave={confirmar} saveLabel="Confirm" />}
     >
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         <Tabs aria-label="Copy from" tabs={[...ORIGENES]} value={origen} onChange={(v) => { setOrigen(v); setElegida(null) }} fullWidth />
-        <DrawerSection title={origen === 'Copy from template' ? 'Coverage tables' : 'Insurance plans'}>
-          <label className="flex flex-col gap-2">
-            <FieldLabel>Search</FieldLabel>
-            <span className="relative">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search for name" className={cn(control(), 'h-9 pr-3 pl-9')} />
-            </span>
-          </label>
+        <div className="flex flex-col gap-3">
+          <span className="relative">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+            <input aria-label="Search for name" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search for name" className={cn(control(), 'h-9 pr-3 pl-9')} />
+          </span>
           <div role="radiogroup" aria-label={origen === 'Copy from template' ? 'Coverage tables' : 'Insurance plans'} className="flex flex-col gap-2">
             {opciones.map((o) => (
               <OpcionDireccion key={o.id} texto={`${o.nombre} — ${o.detalle}`} elegida={elegida === o.id} onElegir={() => setElegida(o.id)} />
             ))}
             {opciones.length === 0 && <p className="py-6 text-center text-[13px] text-ink-muted">No results for “{q}”.</p>}
           </div>
-        </DrawerSection>
+        </div>
       </div>
     </ModalShell>
   )

@@ -576,3 +576,23 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `play.ts` suma `pulsarRol(rol, nombre)` para tocar una pestaña, un radio, una casilla o una opción de menú desde un
   `play`.
 - Decisiones y anomalías en `figma/modulos/settings-billing.md`; relevamiento en `red-dev/settings-billing/`.
+
+## Patrón de tablas y drawers sin títulos repetidos (2026-10-09)
+
+- **Todas las tablas iguales** (Julián: "solo está en azul cuando tiene un hipervínculo"; guía: Locations, Employees y
+  Patients). Encabezado en banda `surface-alt` con 11px Semibold `ink-muted`; celdas en 13px Regular `ink-soft`, también
+  códigos, montos y descripciones; azul `dash-blue` Semibold sólo en lo que navega. Quedan el color semántico de un dato
+  (crédito verde, vencido rojo) y las pills.
+- Clases en `src/lib/estilos.ts`: `TABLA_MARCO`, `TABLA_ENCABEZADO`, `TABLA_FILA`, `TABLA_TEXTO` y `TABLA_LINK`.
+  `DataTable` las usa y las tablas propias (`role="table"`) también. *Elements / Tables › Specs* suma el bloque
+  *Pattern for every table*.
+- Ajustes: Carriers e Insurance Plans (nombre como link), Accounts (link en Semibold, Plan sin negrita), Billing (Patient y
+  Balance sin negrita), Lab Order (personas sin negrita), Documents (sin `ink-medium`), Problem List (de 12px negro a 13px
+  `ink-soft`, columnas reacomodadas para que entre a 1440px), Treatment Plan (todas las celdas en `ink-soft`) y las tablas
+  propias de Billing (fees, rangos, Compare fees, Location Number, Exceptions y las pestañas del plan). `AmountCell` deja
+  el Medium. `TextCell strong` queda sólo para el Builder.
+- **Drawers**: un título de sección no repite el rótulo del campo ni el título del drawer; un drawer de un solo campo va
+  sin sección. Arreglados Copy form, Increase All, Location Number, Copy from, Manage Exceptions, Add Relationship y Edit
+  Relationship.
+- Decisiones de Billing en `figma/modulos/settings-billing.md` (16 a 20).
+

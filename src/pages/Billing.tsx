@@ -51,7 +51,7 @@ function coincideFiltro(m: Movimiento, f: FiltroActividad) {
    vive adentro de una card. */
 const COLUMNAS: DataTableColumn<Movimiento & { saldo: number }>[] = [
   { key: 'fecha', header: 'Date', width: 104, cell: (m) => m.fecha },
-  { key: 'paciente', header: 'Patient', width: 124, cell: (m) => <TextCell strong>{m.paciente}</TextCell> },
+  { key: 'paciente', header: 'Patient', width: 124, cell: (m) => <TextCell>{m.paciente}</TextCell> },
   {
     key: 'tipo', header: 'Type', width: 92, cell: (m) => {
       const t = detalleTipo(m)
@@ -61,7 +61,7 @@ const COLUMNAS: DataTableColumn<Movimiento & { saldo: number }>[] = [
   { key: 'desc', header: 'Description', cell: (m) => <TextCell>{m.descripcion}</TextCell> },
   { key: 'provider', header: 'Provider', width: 124, cell: (m) => <TextCell>{m.provider}</TextCell> },
   { key: 'monto', header: 'Amount', width: 88, align: 'right', cell: (m) => <AmountCell value={m.monto} /> },
-  { key: 'saldo', header: 'Balance', width: 92, align: 'right', cell: (m) => <span className="font-semibold tabular-nums text-ink">{moneda(m.saldo)}</span> },
+  { key: 'saldo', header: 'Balance', width: 92, align: 'right', cell: (m) => <span className="tabular-nums">{moneda(m.saldo)}</span> },
 ]
 
 const initials = (nombre: string) => nombre.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()

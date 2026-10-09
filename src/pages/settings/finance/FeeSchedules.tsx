@@ -20,7 +20,7 @@ import { AssignmentsCount, AssignmentsDrawer, asignacionesDe } from '@/component
 import { CompareFeesDrawer } from '@/components/finance/CompareFeesDrawer'
 import { MoneyInput } from '@/components/finance/fields'
 import { CopyFormDrawer, IncreaseAllDrawer, aumentar } from '@/components/finance/FeeScheduleTools'
-import { ICONO_SUELTO, TARJETA_PANEL } from '@/lib/estilos'
+import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_LINK, TABLA_MARCO, TARJETA_PANEL } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
 import {
   ESTADOS_ARANCEL, PROCEDIMIENTOS, SIN_ASIGNAR, TIPOS_ARANCEL, TONO_ARANCEL, conImporte, dinero, etiquetaVersion, fechaDMA,
@@ -190,8 +190,8 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         </div>
       )}
 
-      <div role="table" aria-label="Fees" className="text-[13px]">
-        <div role="row" className={cn(columnas, 'border-b border-line pb-2 text-xs font-medium text-ink-muted')}>
+      <div role="table" aria-label="Fees" className={TABLA_MARCO}>
+        <div role="row" className={cn(columnas, TABLA_ENCABEZADO)}>
           <span role="columnheader">
             <Checkbox
               on={todas} label="Select all procedures" disabled={filas.length === 0}
@@ -207,16 +207,16 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
           const actual = version?.precios[p.code]
           const cambio = !!arancel && (nuevos[p.code] ?? null) !== (actual ?? null)
           return (
-            <div key={p.code} role="row" aria-selected={elegido} className={cn(columnas, 'border-b border-line px-0 py-1.5 last:border-b-0', elegido && 'bg-info-bg/60')}>
+            <div key={p.code} role="row" aria-selected={elegido} className={cn(columnas, TABLA_FILA, elegido && 'bg-dash-count-bg')}>
               <span role="cell"><Checkbox on={elegido} label={`Select ${p.code}`} onChange={(v) => setElegidos((e) => (v ? [...e, p.code] : e.filter((c) => c !== p.code)))} /></span>
-              <span role="cell" className="font-medium tabular-nums">{p.code}</span>
-              <span role="cell" className="min-w-0 text-ink-muted">{p.label}</span>
-              {arancel && <span role="cell" className="text-right text-ink-muted tabular-nums">{actual !== undefined ? dinero(actual) : '—'}</span>}
+              <span role="cell" className="tabular-nums">{p.code}</span>
+              <span role="cell" className="min-w-0">{p.label}</span>
+              {arancel && <span role="cell" className="text-right tabular-nums">{actual !== undefined ? dinero(actual) : '—'}</span>}
               <span role="cell"><MoneyInput label={`${p.code} new fee`} value={nuevos[p.code] ?? null} onChange={(v) => setNuevos((n) => ({ ...n, [p.code]: v }))} className={cn(cambio && 'font-semibold text-dash-blue')} /></span>
             </div>
           )
         })}
-        {filas.length === 0 && <p className="py-6 text-center text-ink-muted">No procedures match “{q}”.</p>}
+        {filas.length === 0 && <p className={cn(TABLA_FILA, 'py-6 text-center text-ink-muted')}>No procedures match “{q}”.</p>}
       </div>
 
       <div className="flex justify-between gap-3">
@@ -269,7 +269,7 @@ export function SettingsFeeSchedules() {
       key: 'nombre', header: 'Name', locked: true,
       cell: (a) => (
         <span className="flex min-w-0 items-center gap-2">
-          <Link to={rutaArancel(a.id)} className="truncate font-semibold text-dash-blue hover:underline">{a.nombre}</Link>
+          <Link to={rutaArancel(a.id)} className={TABLA_LINK}>{a.nombre}</Link>
           {a.porDefecto && <Pill tone="info" size="sm">Default</Pill>}
         </span>
       ),

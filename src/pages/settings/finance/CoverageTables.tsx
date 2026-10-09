@@ -31,6 +31,13 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
   const [rangos, setRangos] = useState(tabla?.rangos ?? [])
   const [intentado, setIntentado] = useState(false)
   const [excepciones, setExcepciones] = useState(abrirExcepciones)
+  const [nuevo, setNuevo] = useState<string>()
+  const agregarRango = () => {
+    const r = rangoVacio()
+    setRangos([...rangos, r])
+    setNuevo(r.id)
+    aviso.info('A new range was added at the end. Complete it and Save.')
+  }
   const cambiado = !tabla || nombre.trim() !== tabla.nombre || JSON.stringify(rangos) !== JSON.stringify(tabla.rangos)
   const repetido = !!nombre.trim() && coberturas.some((c) => c.id !== tabla?.id && c.nombre.toLowerCase() === nombre.trim().toLowerCase())
 
@@ -56,7 +63,7 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
             <ShieldAlert /> Manage Exceptions{tabla.excepciones.length ? ` (${tabla.excepciones.length})` : ''}
           </Button>
         )}
-        <Button onClick={() => setRangos([...rangos, rangoVacio()])}><Plus /> Add Range</Button>
+        <Button onClick={agregarRango}><Plus /> Add Range</Button>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:max-w-[560px]">
         <TextField
@@ -68,7 +75,7 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
           hint={tabla ? 'Set when the table is created.' : undefined}
         />
       </div>
-      <RangesTable tipo={tipo} rangos={rangos} onChange={setRangos} excepciones={tabla?.excepciones} intentado={intentado} />
+      <RangesTable tipo={tipo} rangos={rangos} onChange={setRangos} excepciones={tabla?.excepciones} intentado={intentado} nuevo={nuevo} />
       <div className="flex justify-between gap-3">
         <Button variant="secondary" onClick={() => navigate(LISTA_COBERTURAS)}>Cancel</Button>
         <Button disabled={!cambiado} onClick={guardarTabla}>Save</Button>
@@ -76,7 +83,7 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
 
       {excepciones && tabla && (
         <ExceptionsDrawer
-          excepciones={tabla.excepciones}
+          excepciones={tabla.excepciones} tabla={tabla.nombre}
           onClose={() => setExcepciones(false)}
           onGuardar={(lista, cambio) => {
             guardar('coberturas', { ...tabla, excepciones: lista })

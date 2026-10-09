@@ -356,6 +356,15 @@ export const Specs: Story = {
           <li>Turn on Columns and resizable columns when the table has more columns than fit; search and filter when it has more rows than one page.</li>
         </ul>
       </Bloque>
+      <Bloque titulo="Pattern for every table" nota="Julián, 2026-10-09. La guía son Locations, Employees y Patients. Las tablas propias (role=table: el editor de un fee schedule, los rangos de una coverage table, las de los drawers) usan las mismas clases de lib/estilos.ts.">
+        <Tabla encabezado={['Piece', 'Rule', 'Class']} minimo={760}>
+          <tr><td className="font-semibold">Header</td><td>Banda <Token nombre="surface-alt" />, 11px Semibold <Token nombre="ink-muted" /></td><td className="font-mono text-xs">TABLA_ENCABEZADO</td></tr>
+          <tr><td className="font-semibold">Cell</td><td>13px Regular <Token nombre="ink-soft" />, también códigos, montos y descripciones: nada en negrita, negro ni gris claro</td><td className="font-mono text-xs">TABLA_TEXTO · TABLA_FILA</td></tr>
+          <tr><td className="font-semibold">Link</td><td>Sólo lo que navega: <Token nombre="dash-blue" /> Semibold, subrayado al pasar el mouse (el nombre que abre la ficha)</td><td className="font-mono text-xs">TABLA_LINK · PersonCell</td></tr>
+          <tr><td className="font-semibold">Box</td><td>Borde <Token nombre="line-row" />, radius 8px, línea entre filas</td><td className="font-mono text-xs">TABLA_MARCO</td></tr>
+          <tr><td className="font-semibold">Exceptions</td><td>El color semántico de un dato (crédito en verde, vencido en rojo) y las pills de estado</td><td>—</td></tr>
+        </Tabla>
+      </Bloque>
     </Lienzo>
   ),
 }

@@ -29,27 +29,27 @@ export const SETTINGS_ICONS: Record<string, LucideIcon> = {
    de otro modo obliga a abrir el menú flotante del rail. */
 /* Settings → Billing lleva el breadcrumb de red.dev: Settings › Finance › Carriers › Aetna Dental Plans › Edit ›
    Insurance plans › Acme Corp › Edit. Un /new que abre un drawer sobre la lista termina en la lista. */
-const TITULOS_FINANZAS: Record<string, string> = { 'fee-schedule': 'Fee schedule', carriers: 'Carriers', 'coverage-table': 'Coverage table' }
+const TITULOS_FINANZAS: Record<string, string> = { 'fee-schedule': 'Fee Schedules', carriers: 'Carriers', 'coverage-table': 'Coverage Table' }
+const NUEVO_FINANZAS: Record<string, string> = { 'fee-schedule': 'New Fee Schedule', 'coverage-table': 'New Coverage Table' }
 
+/* Billing sigue la regla del resto de Settings (Julián, 2026-10-09): Settings › Billing › sección › ítem, con el nombre del
+   menú y sin un tramo "Edit"; el último no es link. El plan cuelga de su carrier. Ver settings-billing.md. */
 function migasFinanzas(pathname: string, nombre: (seccion: string, id: string) => string | undefined): Miga[] | null {
   const m = pathname.match(/^\/settings\/finance\/(fee-schedule|carriers|coverage-table)(?:\/(.*))?$/)
   if (!m) return null
   const [, seccion, resto = ''] = m
   const partes = resto.split('/').filter(Boolean)
-  let ruta = `/settings/finance/${seccion}`
-  const migas: Miga[] = [{ label: 'Settings', to: '/settings/general' }, { label: 'Finance' }, { label: TITULOS_FINANZAS[seccion], to: ruta }]
-  if (partes[0] === 'new' && seccion !== 'carriers') migas.push({ label: 'New' })
-  else if (partes[0] && partes[0] !== 'new') {
-    ruta += `/${partes[0]}/edit`
-    migas.push({ label: nombre(seccion, partes[0]) ?? partes[0], to: ruta }, { label: 'Edit', to: ruta })
-    if (partes[2] === 'insurance-plans') {
-      ruta += '/insurance-plans'
-      migas.push({ label: 'Insurance plans', to: ruta })
-      if (partes[3] && partes[3] !== 'new') {
-        const plan = `${ruta}/${partes[3]}/edit`
-        migas.push({ label: nombre('planes', partes[3]) ?? partes[3], to: plan }, { label: 'Edit', to: plan })
-      }
-    }
+  const lista = `/settings/finance/${seccion}`
+  const migas: Miga[] = [
+    { label: 'Settings', to: '/settings/general' },
+    { label: 'Billing', to: '/settings/finance' },
+    { label: TITULOS_FINANZAS[seccion], to: lista },
+  ]
+  if (partes[0] === 'new') {
+    if (NUEVO_FINANZAS[seccion]) migas.push({ label: NUEVO_FINANZAS[seccion] })
+  } else if (partes[0]) {
+    migas.push({ label: nombre(seccion, partes[0]) ?? partes[0], to: `${lista}/${partes[0]}/edit/insurance-plans` })
+    if (partes[2] === 'insurance-plans' && partes[3] && partes[3] !== 'new') migas.push({ label: nombre('planes', partes[3]) ?? partes[3] })
   }
   migas[migas.length - 1] = { label: migas[migas.length - 1].label }
   return migas

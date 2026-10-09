@@ -33,7 +33,7 @@ const persona = (nombre: string) => (
     <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold">
       {iniciales(nombre)}
     </span>
-    <TextCell strong>{nombre}</TextCell>
+    <TextCell>{nombre}</TextCell>
   </span>
 )
 

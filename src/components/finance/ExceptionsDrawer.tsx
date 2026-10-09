@@ -8,7 +8,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { OpcionDireccion } from '@/components/patients/AddRelationshipDrawer'
 import { UnitField } from '@/components/finance/fields'
-import { ICONO_SUELTO } from '@/lib/estilos'
+import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 import {
   OPCIONES_PROCEDIMIENTO, TIPOS_DEDUCIBLE, TIPOS_EXCEPCION, codigoDeOpcion, descripcionDe, opcionProcedimiento,
@@ -16,10 +16,11 @@ import {
 } from '@/data/finanzas'
 
 /* Manage Exceptions (red.dev, Coverage Table): la lista de excepciones de la plantilla y, con Add new exception, un
-   asistente de cuatro pasos en el mismo drawer. Cancel del asistente vuelve a la lista, como en red.dev. Cada excepción se
+   asistente de cuatro pasos en el mismo drawer. Título y bajada ya no repiten el texto de red.dev (pedido de Julián). Cancel del asistente vuelve a la lista, como en red.dev. Cada excepción se
    guarda al terminar el asistente, sin esperar al Save de la tabla. Ver settings-billing.md. */
 
 const PASOS = ['Exceptions Type', 'Select Procedure', 'Specify Options', 'Reason For Exception'] as const
+const COLUMNAS_LISTA = 'grid-cols-[150px_minmax(0,1fr)_minmax(0,1fr)_56px]'
 
 /* La columna Description: lo que hace la excepción, en una línea. */
 export function resumenExcepcion(e: Excepcion) {
@@ -37,8 +38,10 @@ export function resumenExcepcion(e: Excepcion) {
 type Borrador = Omit<Excepcion, 'id'>
 const BORRADOR: Borrador = { tipo: 'Not covered', procedimientos: [], opcionEdad: 'Coverage', cobertura: 0, deducible: 'None', motivo: '' }
 
-export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = false }: {
+export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = false, tabla }: {
   excepciones: Excepcion[]
+  /** El nombre de la plantilla, para la bajada. */
+  tabla?: string
   onClose: () => void
   /** Se llama con la lista nueva al agregar o quitar una excepción. */
   onGuardar: (excepciones: Excepcion[], cambio: 'added' | 'removed') => void
@@ -46,6 +49,7 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
   agregando?: boolean
 }) {
   const [modo, setModo] = useState<'lista' | 'asistente'>(agregando ? 'asistente' : 'lista')
+  const bajada = `${tabla ? `Exceptions of ${tabla}` : 'Exceptions'} change what is paid for specific procedures: age limits, downgrades, frequency or not covered.`
   const [q, setQ] = useState('')
   const [paso, setPaso] = useState(0)
   const [b, setB] = useState<Borrador>(BORRADOR)
@@ -95,40 +99,46 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
   if (modo === 'lista') {
     return (
       <ModalShell
-        title="Manage exceptions for standard with exceptions"
-        description="Manage exceptions for standard with exceptions"
+        title="Manage Exceptions"
+        description={bajada}
         onClose={onClose}
         width="max-w-[720px]"
         footer={<Button variant="secondary" className="w-full" onClick={onClose}><X /> Cancel</Button>}
       >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <SettingsSearch value={q} onChange={setQ} placeholder="Search..." className="min-w-0 flex-1 sm:max-w-[260px]" />
-          <Button variant="secondary" onClick={() => setModo('asistente')}><Plus /> Add new exception</Button>
-        </div>
-        <div role="table" aria-label="Exceptions" className="text-[13px]">
-          <div role="row" className="hidden grid-cols-[150px_1fr_1fr_32px] gap-3 border-b border-line pb-2 text-xs font-medium text-ink-muted sm:grid">
-            <span role="columnheader">Code, Exception</span>
-            <span role="columnheader">Description</span>
-            <span role="columnheader">Reason</span>
-            <span role="columnheader" className="sr-only">Actions</span>
-          </div>
-          {filas.length === 0 ? (
-            <EmptyState icon={SearchX} title={excepciones.length ? `No exceptions match “${q}”.` : 'No exceptions found in the system.'} className="py-10" />
-          ) : filas.map((e) => (
-            <div key={e.id} role="row" className="grid grid-cols-[1fr_32px] gap-x-3 gap-y-1 border-b border-line py-3 last:border-b-0 sm:grid-cols-[150px_1fr_1fr_32px]">
-              <span role="cell" className="flex flex-col gap-1">
-                <span className="font-medium text-ink tabular-nums">{e.procedimientos.join(', ')}</span>
-                <Pill tone="info" className="self-start">{e.tipo}</Pill>
-              </span>
-              <span role="cell" className="col-start-1 text-ink-muted sm:col-start-auto">{resumenExcepcion(e)}</span>
-              <span role="cell" className="col-start-1 text-ink-muted sm:col-start-auto">{e.motivo}</span>
-              <span role="cell" className="col-start-2 row-start-1 flex justify-end sm:col-start-auto">
-                <button type="button" aria-label={`Remove exception ${e.procedimientos.join(', ')}`} onClick={() => onGuardar(excepciones.filter((x) => x.id !== e.id), 'removed')} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}>
-                  <Trash2 className="size-4" />
-                </button>
-              </span>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex min-w-0 flex-1 gap-2 sm:max-w-[400px]">
+              <SettingsSearch value={q} onChange={setQ} placeholder="Search..." className="min-w-0 flex-1 sm:max-w-none" />
             </div>
-          ))}
+            <Button variant="secondary" className="ml-auto" onClick={() => setModo('asistente')}><Plus /> Add new exception</Button>
+          </div>
+          <div className="overflow-x-auto">
+            <div role="table" aria-label="Exceptions" className={cn(TABLA_MARCO, 'min-w-[560px]')}>
+              <div role="row" className={cn('grid gap-3', COLUMNAS_LISTA, TABLA_ENCABEZADO)}>
+                <span role="columnheader">Code, Exception</span>
+                <span role="columnheader">Description</span>
+                <span role="columnheader">Reason</span>
+                <span role="columnheader" className="text-center">Actions</span>
+              </div>
+              {filas.length === 0 ? (
+                <EmptyState icon={SearchX} title={excepciones.length ? `No exceptions match “${q}”.` : 'No exceptions found in the system.'} className="border-t border-line-row py-10" />
+              ) : filas.map((e) => (
+                <div key={e.id} role="row" className={cn('grid gap-3', COLUMNAS_LISTA, TABLA_FILA, 'items-start py-3')}>
+                  <span role="cell" className="flex min-w-0 flex-col items-start gap-1.5">
+                    <span className="tabular-nums">{e.procedimientos.join(', ')}</span>
+                    <Pill tone="info" size="sm">{e.tipo}</Pill>
+                  </span>
+                  <span role="cell" className="min-w-0">{resumenExcepcion(e)}</span>
+                  <span role="cell" className="min-w-0 break-words">{e.motivo}</span>
+                  <span role="cell" className="flex justify-center">
+                    <button type="button" aria-label={`Remove exception ${e.procedimientos.join(', ')}`} onClick={() => onGuardar(excepciones.filter((x) => x.id !== e.id), 'removed')} className={cn(ICONO_SUELTO, 'text-dash-bad-fg')}>
+                      <Trash2 className="size-4" />
+                    </button>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </ModalShell>
     )
@@ -136,8 +146,8 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
 
   return (
     <ModalShell
-      title="Manage exceptions for standard with exceptions"
-      description="Manage exceptions for standard with exceptions"
+      title="Manage Exceptions"
+      description={tabla ? `New exception for ${tabla}.` : 'New exception.'}
       onClose={onClose}
       width="max-w-[720px]"
       steps={PASOS}
@@ -145,11 +155,12 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
       actions={<DrawerActions step={paso} total={PASOS.length} onNext={siguiente} onBack={() => { setIntentado(false); setPaso((n) => n - 1) }} onCancel={volverALista} onSave={guardar} />}
     >
       <DrawerStep index={0} step={paso}>
-        <DrawerSection title="Exception Type" description="Select the type of exception you want to create.">
+        <div className="flex flex-col gap-3">
+          <p className="text-[12px] text-ink-muted">Select the type of exception you want to create.</p>
           <div role="radiogroup" aria-label="Exception Type" className="flex flex-col gap-2">
             {TIPOS_EXCEPCION.map((t) => <OpcionDireccion key={t} texto={t} elegida={b.tipo === t} onElegir={() => set('tipo', t as TipoExcepcion)} />)}
           </div>
-        </DrawerSection>
+        </div>
       </DrawerStep>
 
       <DrawerStep index={1} step={paso}>
@@ -212,9 +223,10 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
       </DrawerStep>
 
       <DrawerStep index={3} step={paso}>
-        <DrawerSection title="Reason for exception" description="Select the reason for the exception.">
-          <TextArea label="Reason for exception" required placeholder="Enter a reason for the exception" value={b.motivo} onChange={(v) => set('motivo', v)} error={falta('motivo') ? 'Enter the reason.' : undefined} />
-        </DrawerSection>
+        <TextArea
+          label="Reason for exception" required placeholder="Enter a reason for the exception" hint="Select the reason for the exception."
+          value={b.motivo} onChange={(v) => set('motivo', v)} error={falta('motivo') ? 'Enter the reason.' : undefined}
+        />
       </DrawerStep>
     </ModalShell>
   )

@@ -91,7 +91,7 @@ test('Bulk Edit sube los New Fee y Save crea una versión nueva', async ({ app, 
 test('una excepción nueva se arma en cuatro pasos y se suma a la plantilla', async ({ app, screen }) => {
   await app.open('/settings/finance/coverage-table/premium-ppo/edit')
   await screen.getByRole('button', 'Manage Exceptions (3)').tap()
-  const drawer = screen.getByRole('dialog', 'Manage exceptions for standard with exceptions')
+  const drawer = screen.getByRole('dialog', 'Manage Exceptions')
   await drawer.getByRole('button', 'Add new exception').tap()
   await drawer.getByRole('button', /Next Step/).tap()
   await drawer.getByRole('button', /Next Step/).tap()
@@ -142,4 +142,17 @@ test('Bulk Edit con filas tildadas cambia sólo esas', async ({ app, screen }) =
   /* +$10: D0120 pasa de $52 a $62 (el Current Fee de la versión nueva); D0140 sigue en $68. */
   await expect(screen.getByRole('row', /^Select D0120 .* \$62\.00 \$62\.00$/)).toBeVisible()
   await expect(screen.getByRole('row', /^Select D0140 .* \$68\.00 \$68\.00$/)).toBeVisible()
+})
+
+test('Add Range avisa y el breadcrumb sigue la regla de Settings', async ({ app, screen }) => {
+  await app.open('/settings/finance/carriers/aetna/edit/insurance-plans/acme-ppo/edit')
+  const migas = screen.getByRole('navigation', 'Breadcrumb')
+  await expect(migas.getByRole('link', 'Billing')).toBeVisible()
+  await expect(migas.getByRole('link', 'Aetna Dental Plans')).toBeVisible()
+  await expect(migas.getByRole('link', 'Acme Corp')).toHaveCount(0)
+
+  await app.open('/settings/finance/coverage-table/medicaid-adults/edit')
+  await screen.getByRole('button', 'Add Range').tap()
+  await expect(screen.getByText('A new range was added at the end. Complete it and Save.')).toBeVisible()
+  await expect(screen.getByPlaceholder('R. Min').last()).toBeVisible()
 })

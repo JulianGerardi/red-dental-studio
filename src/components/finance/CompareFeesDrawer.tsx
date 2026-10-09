@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { DrawerSection } from '@/components/ui/drawer'
 import { cn } from '@/lib/utils'
 import { PROCEDIMIENTOS, dinero, fechaDMA, versionVigente, type Arancel } from '@/data/finanzas'
+import { TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO } from '@/lib/estilos'
 
 /* Compare fees (pedido de Julián): la diferencia es por procedimiento, contra un fee schedule de referencia elegido a la
    vista (UCR - Red, el Default, si no se elige otro). Compara las versiones vigentes. Ver settings-billing.md. */
@@ -62,8 +63,8 @@ export function CompareFeesDrawer({ arancel, aranceles, onClose, onEditar }: {
 
         <DrawerSection title="Fees">
           <div className="overflow-x-auto">
-            <div role="table" aria-label="Compared fees" className="min-w-[560px] text-[13px]">
-              <div role="row" className="grid grid-cols-[56px_1fr_88px_88px_120px] gap-3 border-b border-line pb-2 text-xs font-medium text-ink-muted">
+            <div role="table" aria-label="Compared fees" className={cn(TABLA_MARCO, 'min-w-[560px]')}>
+              <div role="row" className={cn('grid grid-cols-[56px_1fr_88px_88px_120px] gap-3', TABLA_ENCABEZADO)}>
                 <span role="columnheader">Code</span>
                 <span role="columnheader">Description</span>
                 <span role="columnheader" className="truncate text-right" title={arancel.nombre}>{arancel.nombre}</span>
@@ -71,14 +72,14 @@ export function CompareFeesDrawer({ arancel, aranceles, onClose, onEditar }: {
                 <span role="columnheader" className="text-right">Difference</span>
               </div>
               {filas.map((f) => (
-                <div key={f.code} role="row" className="grid grid-cols-[56px_1fr_88px_88px_120px] items-center gap-3 border-b border-line py-2 last:border-b-0">
-                  <span role="cell" className="font-medium tabular-nums">{f.code}</span>
-                  <span role="cell" className="min-w-0 truncate text-ink-muted" title={f.label}>{f.label}</span>
+                <div key={f.code} role="row" className={cn('grid grid-cols-[56px_1fr_88px_88px_120px] gap-3', TABLA_FILA)}>
+                  <span role="cell" className="tabular-nums">{f.code}</span>
+                  <span role="cell" className="min-w-0 truncate" title={f.label}>{f.label}</span>
                   <span role="cell" className="text-right tabular-nums">{propios[f.code] !== undefined ? dinero(propios[f.code]) : '—'}</span>
-                  <span role="cell" className="text-right text-ink-muted tabular-nums">{ajenos[f.code] !== undefined ? dinero(ajenos[f.code]) : '—'}</span>
-                  <span role="cell" className={cn('text-right tabular-nums', !f.d || f.d.monto === 0 ? 'text-ink-faint' : 'text-ink')}>
+                  <span role="cell" className="text-right tabular-nums">{ajenos[f.code] !== undefined ? dinero(ajenos[f.code]) : '—'}</span>
+                  <span role="cell" className={cn('text-right tabular-nums', (!f.d || f.d.monto === 0) && 'text-ink-faint')}>
                     {f.d
-                      ? <>{conSigno(f.d.monto, dinero(Math.abs(f.d.monto)))}{f.d.porcentaje !== null && f.d.monto !== 0 && <span className="text-ink-muted"> · {conSigno(f.d.porcentaje, `${Math.abs(f.d.porcentaje).toFixed(0)}%`)}</span>}</>
+                      ? <>{conSigno(f.d.monto, dinero(Math.abs(f.d.monto)))}{f.d.porcentaje !== null && f.d.monto !== 0 && <span> · {conSigno(f.d.porcentaje, `${Math.abs(f.d.porcentaje).toFixed(0)}%`)}</span>}</>
                       : '—'}
                   </span>
                 </div>

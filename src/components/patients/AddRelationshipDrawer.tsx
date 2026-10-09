@@ -137,7 +137,7 @@ export function AddRelationshipDrawer({
   return (
     <ModalShell
       title="Add Relationship"
-      description="Find or create person"
+      description="Link a family member, guardian or guarantor to this patient."
       onClose={onClose}
       width="max-w-[560px]"
       steps={PASOS}
