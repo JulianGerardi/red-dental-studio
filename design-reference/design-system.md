@@ -551,6 +551,20 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
   lo muestra y Specs → Rules lo suma. *Audit / Tables in the app* mide Lab Order desde su Playground.
 - Decisiones en `figma/modulos/clinical-mode.md` (2026-10-08).
 
+## Dashboard: fila de fecha (2026-10-09)
+
+- *Pages / Parts / Dashboard* deja de ser una lista suelta: **Playground** con la fila de fecha (*day*, *markedDays*),
+  **Parts** (selector, Today, línea de alcance; botón de filtro), **States** (otro día, hoy, Today en hover, calendario
+  abierto; filtro sin y con selección) y **Specs** (alto, padding, texto, radio, borde e ícono del selector y de Today,
+  leídos del render, y los tokens de Today).
+- Regla: Today es `Button` secondary md, 32px como el selector. Decisiones en `figma/modulos/dashboard.md` (2026-10-09).
+
+## Clinical Mode: View Problem List más ancho (2026-10-09)
+
+- *Components / Clinical / ExamLayout*: el flotante de View Problem List mide hasta 1240px y llega hasta el borde de
+  abajo de la pantalla con scroll adentro. Stories nuevas: *Problem list open*, *Problem list · row open* y **Specs**
+  (ancho, alto, posición y sombra del flotante). Decisiones en `figma/modulos/clinical-mode.md` (2026-10-09).
+
 ## Billing: cards como en Patients y la vista de un paciente (2026-10-09)
 
 - *Pages › Parts › Billing* pasa a la estructura de *Elements / Buttons* (antes era una sola historia suelta):

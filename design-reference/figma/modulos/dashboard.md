@@ -394,3 +394,13 @@ En Today Appointments (Patients) el stroke se veía raro: la lista tiene scroll 
 de la card, arriba y a los costados; sólo quedaba la sombra de abajo. Ahora la línea es `inset` (por dentro, negro al
 12%) y la sombra de afuera casi no se nota (0 1px 2px, 4%): el borde es igual en los cuatro lados en todas las cards de
 adentro.
+
+## Today, a la altura del selector de fecha (2026-10-09)
+
+Julián: "los inputs de date y today no tienen la misma medida". El selector mide 32px (`h-8`, como el resto de los
+inputs) y Today estaba armado a mano en 36px (`h-9`), así que quedaba más alto y desalineado. Ahora Today es
+`Button` secondary **md** (32px) y conserva la misma sombra sutil que el selector, para que se lean como par.
+
+La fila se mudó a `FiltroFecha` (exportado de `Dashboard.tsx`) para documentarla: *Pages / Parts / Dashboard* pasa a
+Playground, Parts, States (otro día, hoy, hover, calendario abierto, y el botón de filtro sin y con filtro) y Specs (las
+dos alturas leídas del render).
