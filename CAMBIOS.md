@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-09
 
-### Chips con la ✕ a la derecha en todo el sistema
+### Chips con la ✕ a la derecha en todo el sistema ([#23](https://github.com/JulianGerardi/red-dental-studio/pull/23))
 - *Selected area* de New Procedure y de New Condition (Radiography) y las franjas de Working Hours de Locations pasan al
   `Chip` del design system: celeste, texto azul y la ✕ a la derecha (antes a la izquierda, con tamaños y azules
   distintos). El *+N* de Working Hours toma el mismo alto y color.
