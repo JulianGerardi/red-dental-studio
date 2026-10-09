@@ -71,7 +71,7 @@ export function ToothCell({ pieza }: { pieza?: number }) {
 }
 
 const cuenta = <E extends string>(filas: { estado: E }[], e: E) => filas.filter((f) => f.estado === e).length
-const texto = (t: string) => <span className="text-[12px] text-ink">{t || '-'}</span>
+const texto = (t: string) => <span className="truncate">{t || '-'}</span>
 const estadoPill = (tono: PillTone, e: string) => <Pill tone={tono} size="sm" className="tracking-wide uppercase">{e}</Pill>
 
 export function ProblemList() {
@@ -121,23 +121,23 @@ export function ProblemList() {
   }
 
   const comunes = <T extends { fecha: string; ubicacion: string; pieza?: number; superficie: string }>(): DataTableColumn<T>[] => [
-    { key: 'fecha', header: 'Date', width: 72, cell: (r) => texto(r.fecha) },
+    { key: 'fecha', header: 'Date', width: 80, cell: (r) => texto(r.fecha) },
     { key: 'ubicacion', header: 'Location', width: 80, cell: (r) => texto(r.ubicacion) },
     { key: 'pieza', header: 'Tooth', width: 44, cell: (r) => <ToothCell pieza={r.pieza} /> },
-    { key: 'superficie', header: 'Surface', width: 56, cell: (r) => texto(r.superficie) },
+    { key: 'superficie', header: 'Surface', width: 48, cell: (r) => texto(r.superficie) },
   ]
   const colsProblema: DataTableColumn<Problema>[] = [
     ...comunes<Problema>(),
     { key: 'condicion', header: 'Condition', cell: (r) => texto(r.condicion) },
-    { key: 'examen', header: 'Exam', width: 84, cell: (r) => texto(r.examen) },
-    { key: 'proveedor', header: 'Provider', width: 88, cell: (r) => texto(r.proveedor) },
+    { key: 'examen', header: 'Exam', width: 76, cell: (r) => texto(r.examen) },
+    { key: 'proveedor', header: 'Provider', width: 96, cell: (r) => texto(r.proveedor) },
     { key: 'nota', header: 'Note', width: 36, align: 'center', cell: (r) => <NoteCell nota={r.nota} /> },
     { key: 'estado', header: 'Status', width: 104, cell: (r) => estadoPill(TONO_PROBLEMA[r.estado], r.estado) },
   ]
   const colsProcedimiento: DataTableColumn<ProcedimientoPaciente>[] = [
     ...comunes<ProcedimientoPaciente>(),
     { key: 'procedimiento', header: 'Procedure', cell: (r) => texto(`${r.codigo} - ${r.nombre}`) },
-    { key: 'proveedor', header: 'Provider', width: 88, cell: (r) => texto(r.proveedor) },
+    { key: 'proveedor', header: 'Provider', width: 96, cell: (r) => texto(r.proveedor) },
     { key: 'nota', header: 'Note', width: 36, align: 'center', cell: (r) => <NoteCell nota={r.nota} /> },
     { key: 'estado', header: 'Status', width: 104, cell: (r) => estadoPill(TONO_PROCEDIMIENTO[r.estado], r.estado) },
   ]

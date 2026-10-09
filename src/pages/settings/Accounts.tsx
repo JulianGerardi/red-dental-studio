@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { NewAccountDrawer } from '@/components/settings/NewAccountDrawer'
 import { ManageLicensesDrawer } from '@/components/settings/ManageLicensesDrawer'
+import { TABLA_LINK } from '@/lib/estilos'
 
 /* Settings → Accounts. Ver design-reference/figma/modulos/settings-accounts.md.
 
@@ -63,8 +64,8 @@ const FILTROS = ['All', 'Active', 'Draft', 'Pending'] as const
 /* La tabla estándar (ui/data-table) con las columnas de cuentas. Owners es la
    columna que se estira. */
 const COLUMNAS: DataTableColumn<Cuenta>[] = [
-  { key: 'nombre', header: 'Name', width: 120, cell: (c) => <Link to={`/settings/accounts/${c.id}`} className="text-dash-blue truncate font-medium hover:underline" title={c.nombre}>{c.nombre}</Link> },
-  { key: 'plan', header: 'Plan', width: 130, cell: (c) => <TextCell strong>{c.plan}</TextCell> },
+  { key: 'nombre', header: 'Name', width: 120, cell: (c) => <Link to={`/settings/accounts/${c.id}`} className={TABLA_LINK} title={c.nombre}>{c.nombre}</Link> },
+  { key: 'plan', header: 'Plan', width: 130, cell: (c) => <TextCell>{c.plan}</TextCell> },
   { key: 'suscripcion', header: 'Subscription', width: 90, cell: (c) => c.suscripcion },
   { key: 'vence', header: 'Expires on', width: 95, cell: (c) => c.vence },
   { key: 'estadoSub', header: 'Subscription Status', width: 110, cell: (c) => c.estadoSuscripcion },

@@ -48,3 +48,12 @@ export const BOTON_EXPANDIBLE =
    pasa la etiqueta más larga (View Problem List, 111): con más aire la animación tardaba en arrancar al cerrarse. */
 export const ETIQUETA_EXPANDIBLE =
   'max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,opacity,margin] duration-150 ease-out group-hover/btn:ml-2 group-hover/btn:max-w-[128px] group-hover/btn:opacity-100 group-focus-visible/btn:ml-2 group-focus-visible/btn:max-w-[128px] group-focus-visible/btn:opacity-100'
+
+/* Patrón de tablas (Julián, 2026-10-09; la guía son Locations, Employees y Patients): encabezado en banda gris con 11px
+   Semibold gris; celdas en 13px Regular ink-soft; azul y Semibold sólo cuando la celda es un link. Lo usan DataTable y las
+   tablas propias (role="table"). Ver design-system.md › Tablas. */
+export const TABLA_TEXTO = 'text-[13px] text-ink-soft'
+export const TABLA_MARCO = 'overflow-hidden rounded-lg border border-line-row bg-white'
+export const TABLA_ENCABEZADO = 'min-h-11 items-center bg-surface-alt px-4 text-[11px] font-semibold text-ink-muted'
+export const TABLA_FILA = `items-center border-t border-line-row px-4 py-2 ${TABLA_TEXTO}`
+export const TABLA_LINK = 'truncate font-semibold text-dash-blue hover:underline'

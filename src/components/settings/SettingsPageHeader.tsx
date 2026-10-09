@@ -5,9 +5,11 @@ import { PageTitle } from '@/components/ui/page-title'
    del título; acá va alineado con el título y el buscador queda en su
    propia fila. Ver design-reference/figma/modulos/settings-accounts.md. */
 export function SettingsPageHeader({
-  titulo, bajada, accion, children,
+  titulo, etiquetas, bajada, accion, children,
 }: {
   titulo: string
+  /** Pills al lado del título (estado, Default) en el detalle de un ítem. */
+  etiquetas?: React.ReactNode
   bajada: string
   /** Acción principal, alineada con el título. */
   accion?: React.ReactNode
@@ -18,7 +20,12 @@ export function SettingsPageHeader({
     <>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <PageTitle>{titulo}</PageTitle>
+          {etiquetas ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <PageTitle>{titulo}</PageTitle>
+              {etiquetas}
+            </div>
+          ) : <PageTitle>{titulo}</PageTitle>}
           <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">{bajada}</p>
         </div>
         {accion}

@@ -5,6 +5,26 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-09
 
+### Settings → Billing igual a red.dev: Fee Schedules, Carriers y Coverage Table ([#18](https://github.com/JulianGerardi/red-dental-studio/pull/18))
+- Billing se rehízo desde `red.dev` (lógica, pantallas, campos y textos; estilo nuestro): Carriers → Edit Carrier
+  (*Information* | *Insurance Plans / Employers*) → la página del plan con siete pestañas; Fee Schedules con versiones,
+  Copy form y Bulk Edit; Coverage Table como plantillas con rangos y excepciones (asistente de 4 pasos).
+- Correcciones de Julián: Fee Schedules es una tabla (Name, Type, Assignments, Effective, Last updated, Status, Actions:
+  Edit, View assignments, Compare fees); *Non-zero fees — n / 26* en el editor; Bulk Edit sobre las filas tildadas;
+  *Information* primero en todas las pestañas. Sin portada: `/settings/finance` redirige a Fee Schedules.
+- **Para el dev:** datos nuevos en `data/finanzas.ts` (Arancel con `versiones`, `tipo`, `actualizado`, `asignados`;
+  PlanSeguro con las siete secciones; TablaCobertura con `excepciones`) y store `data/finanzasStore.tsx`. Rutas
+  `…/:id/edit` como red.dev (`/:id` redirige). Componentes en `components/finance/` (fields, RangesTable, MasterList,
+  PlanFields, Assignments, CompareFeesDrawer y seis drawers); salieron CoverageBar, CoverageSummary, EditableAmount,
+  PlansTable y los drawers viejos. `TextField` / `SelectField` suman `hideLabel`; `control()` se exporta. Relevamiento
+  y anomalías en `design-reference/red-dev/settings-billing/` y `figma/modulos/settings-billing.md`.
+- Segunda vuelta: breadcrumbs de Billing como el resto de Settings (sin *Edit*, el último no es link); Manage Exceptions
+  ordenado y sin título repetido; Add Range avisa con un toast y lleva a la fila nueva; drawers sin títulos de sección que
+  repitan el rótulo; **patrón único de tablas** en toda la app.
+- **Para el dev (tablas):** usar `TABLA_MARCO`, `TABLA_ENCABEZADO`, `TABLA_FILA`, `TABLA_TEXTO` y `TABLA_LINK` de
+  `lib/estilos.ts` en cualquier tabla; azul sólo para links, nada de `font-medium`/`text-ink` en celdas. `AmountCell` ya no
+  es Medium; no usar `TextCell strong` en la app. `RangesTable` suma `nuevo` y `ExceptionsDrawer` suma `tabla`.
+
 ### Billing: cards como en Patients y la vista de un paciente ([#21](https://github.com/JulianGerardi/red-dental-studio/pull/21))
 - Recent Billing Activity, Find Patient y Today son `Panel` (título sin ícono); los resultados de Find Patient y los
   números adentro de un panel son `InnerCard`.

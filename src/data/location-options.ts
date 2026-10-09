@@ -1,3 +1,5 @@
+import { ARANCELES } from '@/data/finanzas'
+
 /* Opciones compartidas entre "New Location" (pantalla completa), la pestaña
    Information de la ficha de una locación y "New Employee": los mismos
    catálogos, para no repetirlos en cada formulario. */
@@ -13,4 +15,5 @@ export const ESTADOS = [
   'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming',
 ]
 export const ZONAS = ['America/Los_Angeles (GMT-7)', 'America/New_York (GMT-4)', 'Europe/Madrid (GMT+2)']
-export const FEES = ['Standard 2025', 'PPO Premiun Plan', 'Medicaid']
+/* Los fee schedules activos de Settings → Billing (datos de arranque: el store vive en la ruta de Settings). */
+export const FEES = ARANCELES.filter((a) => a.estado === 'Active').map((a) => a.nombre)

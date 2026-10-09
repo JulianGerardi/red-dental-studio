@@ -587,3 +587,48 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
   opacidad, 360ms con `cubic-bezier(0.32, 0.72, 0, 1)`.
 - Queda para decidir: la card elegida tiene dos lenguajes, el anillo azul (Card de página y AppointmentCard del
   Dashboard) y el celeste (los resultados de Billing). Decisiones en `figma/modulos/billing.md`.
+
+## Settings → Billing desde red.dev (2026-10-09)
+
+Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a `main`.
+
+- *Pages*: las rutas de red.dev (Fee Schedules en tabla, Edit Fee Schedule con la lista, New Fee Schedule, Carriers, Edit
+  Carrier y sus planes, New Insurance Plan, Edit Insurance Plan y su Coverage Table, Coverage Table con la lista, su alta
+  y los redirects de `/:id`). *Pages › Parts › Billing settings*: CarrierForm, CarrierPlans, las siete pestañas del plan,
+  FeeScheduleEditor y CoverageTableEditor, con Playground (parte e ítem), Parts, States (New, Missing fees, Empty, Save
+  disabled, Selected rows) y Specs (rutas y medidas).
+- *Components / Finance*, todos con Playground, Parts, States y Specs:
+  - **Fields** (UnitField, PhoneFields, MoneyInput) y **RangesTable** (la tabla de rangos de plantillas y planes).
+  - **MasterList**: la lista de la izquierda de red.dev (buscador, filtro, punto de estado, ⋮).
+  - **Assignments**: el número con desglose en Popover (hover o clic) y el drawer *View assignments*.
+  - **CompareFeesDrawer**: la diferencia por código contra una referencia explícita.
+  - Drawers con `kit-drawer`: CarrierDrawer, PlanDrawer (más *Fields* con los grupos de `PlanFields`),
+    LocationNumberDrawer, CopyFromDrawer, FeeScheduleTools (Copy form, Increase All / Increase Selected) y
+    ExceptionsDrawer (lista y asistente de cuatro pasos).
+- Salieron CoverageBar, CoverageSummary, EditableAmount, PlansTable, FeeScheduleDrawer, AdjustFeesDrawer,
+  CoverageTableDrawer y CoverageRuleDrawer con sus páginas.
+- `patients/form`: `hideLabel` en TextField y SelectField (rótulo sólo para lectores de pantalla, para campos dentro de
+  una celda) y `control()` exportado para inputs propios con el mismo borde. Siguen de la primera vuelta
+  **SettingsSearch**, `etiquetas` en SettingsPageHeader y `detail` en SettingsSectionCard.
+- `play.ts` suma `pulsarRol(rol, nombre)` para tocar una pestaña, un radio, una casilla o una opción de menú desde un
+  `play`.
+- Decisiones y anomalías en `figma/modulos/settings-billing.md`; relevamiento en `red-dev/settings-billing/`.
+
+## Patrón de tablas y drawers sin títulos repetidos (2026-10-09)
+
+- **Todas las tablas iguales** (Julián: "solo está en azul cuando tiene un hipervínculo"; guía: Locations, Employees y
+  Patients). Encabezado en banda `surface-alt` con 11px Semibold `ink-muted`; celdas en 13px Regular `ink-soft`, también
+  códigos, montos y descripciones; azul `dash-blue` Semibold sólo en lo que navega. Quedan el color semántico de un dato
+  (crédito verde, vencido rojo) y las pills.
+- Clases en `src/lib/estilos.ts`: `TABLA_MARCO`, `TABLA_ENCABEZADO`, `TABLA_FILA`, `TABLA_TEXTO` y `TABLA_LINK`.
+  `DataTable` las usa y las tablas propias (`role="table"`) también. *Elements / Tables › Specs* suma el bloque
+  *Pattern for every table*.
+- Ajustes: Carriers e Insurance Plans (nombre como link), Accounts (link en Semibold, Plan sin negrita), Billing (Patient y
+  Balance sin negrita), Lab Order (personas sin negrita), Documents (sin `ink-medium`), Problem List (de 12px negro a 13px
+  `ink-soft`, columnas reacomodadas para que entre a 1440px), Treatment Plan (todas las celdas en `ink-soft`) y las tablas
+  propias de Billing (fees, rangos, Compare fees, Location Number, Exceptions y las pestañas del plan). `AmountCell` deja
+  el Medium. `TextCell strong` queda sólo para el Builder.
+- **Drawers**: un título de sección no repite el rótulo del campo ni el título del drawer; un drawer de un solo campo va
+  sin sección. Arreglados Copy form, Increase All, Location Number, Copy from, Manage Exceptions, Add Relationship y Edit
+  Relationship.
+- Decisiones de Billing en `figma/modulos/settings-billing.md` (16 a 20).

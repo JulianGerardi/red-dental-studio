@@ -425,6 +425,11 @@ body { font-family: var(--font-sans); }
   --page-background: 225 67% 98.8%;
 }
 
+/* Add Range: el rango nuevo arranca resaltado y se apaga (settings-billing.md). */
+@keyframes rango-nuevo {
+  from { background-color: var(--color-dash-count-bg); }
+  to { background-color: transparent; }
+}
 @keyframes panel-in {
   from { transform: translateX(12px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }

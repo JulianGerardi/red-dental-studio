@@ -10,6 +10,7 @@ import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
 import { ManijaResize, useAnchoColumnas, useAnchoVisible } from '@/components/patients/ledger/useAnchoColumnas'
 import { cn } from '@/lib/utils'
+import { TABLA_ENCABEZADO, TABLA_LINK, TABLA_TEXTO } from '@/lib/estilos'
 
 /* Tabla estándar de la app: la misma anatomía que Patients, Team, Accounts y
    Documents -caja con borde, encabezado gris, filas con divisor, pie con
@@ -226,7 +227,7 @@ export function DataTable<T>({
         className={cn('overflow-x-auto rounded-lg border border-line-row bg-white', disabled && 'pointer-events-none select-none opacity-60')}
       >
         <div style={{ minWidth: minimo }}>
-          <div role="row" data-tabla-header className="group/fila flex h-11 items-center gap-3 bg-surface-alt px-4 text-[11px] font-semibold text-ink-muted">
+          <div role="row" data-tabla-header className={cn('group/fila flex h-11 gap-3', TABLA_ENCABEZADO)}>
             {reorder && <span className="w-5 shrink-0" aria-hidden />}
             {rowDetail && <span className="w-4 shrink-0" aria-hidden />}
             {selectable && <Checkbox on={todas} onChange={alternarTodas} label="Select all rows" disabled={inactiva || ids.length === 0} />}
@@ -309,7 +310,8 @@ export function DataTable<T>({
                     onClick={alHacerClic ? (e) => { if (!(e.target as HTMLElement).closest('[role="separator"]')) alHacerClic() } : undefined}
                     onKeyDown={alHacerClic ? (e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); alHacerClic() } } : undefined}
                     className={cn(
-                      'group/fila flex items-center gap-3 px-4 text-[13px] text-ink-soft transition-colors focus-visible:outline-none focus-visible:bg-surface-subtle',
+                      'group/fila flex items-center gap-3 px-4 transition-colors focus-visible:outline-none focus-visible:bg-surface-subtle',
+                      TABLA_TEXTO,
                       ALTO_FILA[density],
                       off ? 'text-ink-faint [&_*]:opacity-70' : elegida ? 'bg-dash-count-bg' : abierta ? 'bg-surface-subtle' : alHacerClic && 'cursor-pointer hover:bg-surface-subtle',
                     )}
@@ -404,7 +406,7 @@ export function PersonCell({ name, initials, to, onClick, tone = 'solid' }: {
   /** solid: pacientes. soft: equipo (círculo celeste, iniciales azules). */
   tone?: 'solid' | 'soft'
 }) {
-  const clase = 'text-dash-blue truncate text-[13px] font-semibold hover:underline'
+  const clase = cn(TABLA_LINK, 'text-[13px]')
   return (
     <span className="flex min-w-0 items-center gap-2.5">
       <span className={cn(
@@ -420,12 +422,13 @@ export function PersonCell({ name, initials, to, onClick, tone = 'solid' }: {
   )
 }
 
-/** Texto que se corta con "…" si no entra, con el texto completo al pasar el mouse. */
+/** Texto que se corta con "…" si no entra, con el texto completo al pasar el mouse. `strong` queda para el Builder: las
+    tablas de la app no lo usan (patrón de tablas, design-system.md). */
 export function TextCell({ children, strong }: { children: string; strong?: boolean }) {
   return <span title={children} className={cn('truncate', strong && 'font-medium text-ink')}>{children}</span>
 }
 
 /** Monto alineado a la derecha, con cifras de ancho fijo. */
 export function AmountCell({ value }: { value: number }) {
-  return <span className={cn('font-medium tabular-nums', value < 0 ? 'text-dash-ok-fg' : 'text-ink')}>{value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
+  return <span className={cn('tabular-nums', value < 0 && 'text-dash-ok-fg')}>{value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
 }

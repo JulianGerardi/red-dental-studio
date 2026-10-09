@@ -21,6 +21,11 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   deshace con Undo.
 - `tests/consents.e2e.ts` (2026-10-07): en Settings → Consents, Preview abre la hoja en un drawer (Patient View saca
   Diagnosis) y Save desde el preview lo cierra y deja los faltantes a la vista en el editor.
+- `tests/billing-settings.e2e.ts` (2026-10-09, rehecho desde red.dev): New Carrier pide lo obligatorio y el buscador
+  completa el Payer ID; un plan nuevo se arma en cuatro pasos y sigue en su Coverage Table (Copy from + Save); cambiar de
+  pestaña del plan con cambios pide confirmación; Bulk Edit +10% crea una versión nueva; una excepción se arma en cuatro
+  pasos; Assignments muestra el desglose y la lista; Compare fees compara contra UCR - Red; Bulk Edit con filas tildadas
+  cambia sólo esas.
 - `tests/billing.e2e.ts` (2026-10-09): elegir un paciente en Find Patient abre su vista (sólo sus movimientos, los
   botones de pago, Guarantor View con todo su garante) y la X vuelve al resumen; una fila del resumen abre la vista de
   ese paciente en Patient View; el círculo de info de Overdue Balance muestra su texto al pasar el mouse.
@@ -34,6 +39,10 @@ Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ni
 `agents.default` de `e2e.config.ts`. La clave va en una variable de entorno, nunca en el repo.
 
 ## Notas
+
+- Sin acceso a `cdn.playwright.dev` (sesiones en la nube), el runner no puede bajar su Chromium. Se corre con el que
+  ya está instalado apuntando `PLAYWRIGHT_BROWSERS_PATH` a una carpeta con enlaces `chromium-<versión>` y
+  `chromium_headless_shell-<versión>` hacia el binario de `/opt/pw-browsers`.
 
 - El CLI manda telemetría anónima de uso (comandos y errores, sin contenido de los tests). Se apaga con
   `npx e2e telemetry disable` o `E2E_TELEMETRY_DISABLED=1`.
