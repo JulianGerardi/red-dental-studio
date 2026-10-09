@@ -361,7 +361,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Header</td><td>Banda <Token nombre="surface-alt" />, 11px Semibold <Token nombre="ink-muted" /></td><td className="font-mono text-xs">TABLA_ENCABEZADO</td></tr>
           <tr><td className="font-semibold">Cell</td><td>13px Regular <Token nombre="ink-soft" />, también códigos, montos y descripciones: nada en negrita, negro ni gris claro</td><td className="font-mono text-xs">TABLA_TEXTO · TABLA_FILA</td></tr>
           <tr><td className="font-semibold">Link</td><td>Sólo lo que navega: <Token nombre="dash-blue" /> Semibold, subrayado al pasar el mouse (el nombre que abre la ficha)</td><td className="font-mono text-xs">TABLA_LINK · PersonCell</td></tr>
-          <tr><td className="font-semibold">Box</td><td>Borde <Token nombre="line-row" />, radius 8px, línea entre filas</td><td className="font-mono text-xs">TABLA_MARCO</td></tr>
+          <tr><td className="font-semibold">Box</td><td>Borde <Token nombre="line-row" />, radius 8px, línea entre filas. No recorta (sin overflow-hidden): un select de una celda se abre por encima</td><td className="font-mono text-xs">TABLA_MARCO</td></tr>
           <tr><td className="font-semibold">Exceptions</td><td>El color semántico de un dato (crédito en verde, vencido en rojo) y las pills de estado</td><td>—</td></tr>
         </Tabla>
       </Bloque>

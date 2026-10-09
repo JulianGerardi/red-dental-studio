@@ -51,9 +51,11 @@ export const ETIQUETA_EXPANDIBLE =
 
 /* Patrón de tablas (Julián, 2026-10-09; la guía son Locations, Employees y Patients): encabezado en banda gris con 11px
    Semibold gris; celdas en 13px Regular ink-soft; azul y Semibold sólo cuando la celda es un link. Lo usan DataTable y las
-   tablas propias (role="table"). Ver design-system.md › Tablas. */
+   tablas propias (role="table"). Ver design-system.md › Tablas.
+   El marco no recorta (sin overflow-hidden): las listas de los SelectField de una celda se abren por encima de la tabla.
+   Por eso las esquinas redondeadas las ponen el encabezado y la última fila. */
 export const TABLA_TEXTO = 'text-[13px] text-ink-soft'
-export const TABLA_MARCO = 'overflow-hidden rounded-lg border border-line-row bg-white'
-export const TABLA_ENCABEZADO = 'min-h-11 items-center bg-surface-alt px-4 text-[11px] font-semibold text-ink-muted'
-export const TABLA_FILA = `items-center border-t border-line-row px-4 py-2 ${TABLA_TEXTO}`
+export const TABLA_MARCO = 'rounded-lg border border-line-row bg-white'
+export const TABLA_ENCABEZADO = 'min-h-11 items-center rounded-t-[7px] bg-surface-alt px-4 text-[11px] font-semibold text-ink-muted'
+export const TABLA_FILA = `items-center border-t border-line-row px-4 py-2 last:rounded-b-[7px] ${TABLA_TEXTO}`
 export const TABLA_LINK = 'truncate font-semibold text-dash-blue hover:underline'

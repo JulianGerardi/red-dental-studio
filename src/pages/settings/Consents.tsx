@@ -1,8 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import {
-  Search, Plus, Bold, Italic, Underline, Heading1, Heading2,
-  Pilcrow, List, ListOrdered, X, Eye, Power, PowerOff, ArrowLeft, Check,
-} from 'lucide-react'
+import { Chip } from '@/components/ui/chip'
+import { Search, Plus, Bold, Italic, Underline, Heading1, Heading2, Pilcrow, List, ListOrdered, Eye, Power, PowerOff, ArrowLeft, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Drawer } from '@/components/ui/drawer'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
@@ -298,12 +296,9 @@ export function SelectorProcedimientos({ elegidos, onCambiar, error }: {
         elegidos.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {elegidos.map((codigo) => (
-              <span key={codigo} className="text-dash-blue flex items-center gap-1.5 rounded-full bg-info-bg py-1 pr-1.5 pl-2.5 text-[12px] font-medium">
+              <Chip key={codigo} removeLabel={`Remove ${codigo}`} onRemove={() => onCambiar(elegidos.filter((c) => c !== codigo))}>
                 {codigo} - {procedimiento(codigo)?.nombre}
-                <button type="button" aria-label={`Remove ${codigo}`} onClick={() => onCambiar(elegidos.filter((c) => c !== codigo))} className="rounded-full p-0.5 hover:bg-dash-blue/10">
-                  <X className="size-3" />
-                </button>
-              </span>
+              </Chip>
             ))}
           </div>
         )

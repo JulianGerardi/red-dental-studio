@@ -18,6 +18,8 @@
 20. **Patrón de tablas** (todas las de la app; guía: Locations, Employees, Patients): encabezado en banda gris, celdas en
     13px Regular ink-soft, azul y Semibold sólo en lo que navega. Los nombres de Carriers y de Insurance Plans pasan a ser
     links a su edición. Clases en `lib/estilos.ts` (`TABLA_*`); ver design-system.md.
+21. **Los selects de una tabla se abren por encima** (bug reportado por Julián en Fee Schedule By Location): el marco de
+    la tabla ya no recorta. Los procedimientos elegidos de una excepción son `Chip` (celeste), no una pill gris.
 
 ## 2026-10-09 · Rehecho desde red.dev, con las correcciones de Julián
 

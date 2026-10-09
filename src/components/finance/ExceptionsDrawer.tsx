@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Chip } from '@/components/ui/chip'
 import { Plus, SearchX, Trash2, X } from 'lucide-react'
 import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer'
 import { ModalShell, SearchField, SelectField, TextArea, TextField } from '@/components/patients/form'
@@ -172,12 +173,9 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
           />
           <div className="flex flex-wrap gap-2">
             {b.procedimientos.map((c) => (
-              <span key={c} className="inline-flex items-center gap-1 rounded-full bg-surface-muted py-1 pr-1 pl-2.5 text-xs text-ink">
+              <Chip key={c} removeLabel={`Remove ${c}`} onRemove={() => set('procedimientos', b.procedimientos.filter((x) => x !== c))}>
                 {opcionProcedimiento(c)}
-                <button type="button" aria-label={`Remove ${c}`} onClick={() => set('procedimientos', b.procedimientos.filter((x) => x !== c))} className="flex size-5 items-center justify-center rounded-full hover:bg-line">
-                  <X className="size-3" />
-                </button>
-              </span>
+              </Chip>
             ))}
           </div>
         </DrawerSection>
