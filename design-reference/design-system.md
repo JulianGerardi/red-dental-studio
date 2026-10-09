@@ -551,21 +551,28 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
   lo muestra y Specs → Rules lo suma. *Audit / Tables in the app* mide Lab Order desde su Playground.
 - Decisiones en `figma/modulos/clinical-mode.md` (2026-10-08).
 
-## Settings → Billing: Fee Schedules, Carriers y Coverage Tables (2026-10-08)
+## Settings → Billing desde red.dev (2026-10-09)
 
-- Pantallas nuevas en *Pages* (Billing, las tres listas, sus `/new` y sus detalles) y sus piezas internas en *Pages ›
-  Parts › Billing settings* (Setup checks, FeesTable, CarrierInformation, CoverageRulesTable y los kebabs), con
-  Playground, Parts, States (incluido *Carrier Information Errors*) y Specs (reglas de borrar y desactivar).
-- *Components / Finance* (nuevo módulo, `src/components/finance/`): **CoverageBar** (barra + %; verde 100, azul parcial,
-  "Not covered" en 0), **CoverageSummary** (el % por clase en una línea, con límites opcionales), **EditableAmount** (monto
-  que se edita en su celda; *Invalid Amount* comprueba `aria-invalid`), **PlansTable** (la tabla de planes que une las tres
-  secciones, con columnas que se ocultan según el detalle) y seis drawers documentados con `kit-drawer`
-  (FeeScheduleDrawer, AdjustFeesDrawer, CarrierDrawer, PlanDrawer, CoverageTableDrawer, CoverageRuleDrawer), cada uno
-  con *With Validation Errors*.
-- *Components / Settings*: **SettingsSearch** (nuevo), **SettingsPageHeader** suma `etiquetas` (pills al lado del
-  título) y **SettingsSectionCard** suma `detail` (dato al pie en azul); las dos páginas pasan a Playground, Parts,
-  States y Specs. *Elements / Page header* suma el control *tags* y la historia *Detail header*.
-- Kit: `Muestra` (título + nota + la pieza) y `TablaPartes` (Part · What it does · Component) en
-  `src/design-system/kit.tsx`. `esperar()` de `play.ts` acepta varias coincidencias: un formulario con dos campos vacíos
-  dice dos veces "required" y antes la story fallaba.
-- Decisiones en `figma/modulos/settings-billing.md`.
+Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a `main`.
+
+- *Pages*: las rutas de red.dev (Fee Schedules en tabla, Edit Fee Schedule con la lista, New Fee Schedule, Carriers, Edit
+  Carrier y sus planes, New Insurance Plan, Edit Insurance Plan y su Coverage Table, Coverage Table con la lista, su alta
+  y los redirects de `/:id`). *Pages › Parts › Billing settings*: CarrierForm, CarrierPlans, las siete pestañas del plan,
+  FeeScheduleEditor y CoverageTableEditor, con Playground (parte e ítem), Parts, States (New, Missing fees, Empty, Save
+  disabled, Selected rows) y Specs (rutas y medidas).
+- *Components / Finance*, todos con Playground, Parts, States y Specs:
+  - **Fields** (UnitField, PhoneFields, MoneyInput) y **RangesTable** (la tabla de rangos de plantillas y planes).
+  - **MasterList**: la lista de la izquierda de red.dev (buscador, filtro, punto de estado, ⋮).
+  - **Assignments**: el número con desglose en Popover (hover o clic) y el drawer *View assignments*.
+  - **CompareFeesDrawer**: la diferencia por código contra una referencia explícita.
+  - Drawers con `kit-drawer`: CarrierDrawer, PlanDrawer (más *Fields* con los grupos de `PlanFields`),
+    LocationNumberDrawer, CopyFromDrawer, FeeScheduleTools (Copy form, Increase All / Increase Selected) y
+    ExceptionsDrawer (lista y asistente de cuatro pasos).
+- Salieron CoverageBar, CoverageSummary, EditableAmount, PlansTable, FeeScheduleDrawer, AdjustFeesDrawer,
+  CoverageTableDrawer y CoverageRuleDrawer con sus páginas.
+- `patients/form`: `hideLabel` en TextField y SelectField (rótulo sólo para lectores de pantalla, para campos dentro de
+  una celda) y `control()` exportado para inputs propios con el mismo borde. Siguen de la primera vuelta
+  **SettingsSearch**, `etiquetas` en SettingsPageHeader y `detail` en SettingsSectionCard.
+- `play.ts` suma `pulsarRol(rol, nombre)` para tocar una pestaña, un radio, una casilla o una opción de menú desde un
+  `play`.
+- Decisiones y anomalías en `figma/modulos/settings-billing.md`; relevamiento en `red-dev/settings-billing/`.

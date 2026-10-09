@@ -27,8 +27,38 @@ export const SETTINGS_ICONS: Record<string, LucideIcon> = {
 /* El rastro se arma de la ruta, no lo escribe cada pantalla: así hay uno solo
    —el problema anterior eran dos— y siempre incluye la vuelta a General, que
    de otro modo obliga a abrir el menú flotante del rail. */
+/* Settings → Billing lleva el breadcrumb de red.dev: Settings › Finance › Carriers › Aetna Dental Plans › Edit ›
+   Insurance plans › Acme Corp › Edit. Un /new que abre un drawer sobre la lista termina en la lista. */
+const TITULOS_FINANZAS: Record<string, string> = { 'fee-schedule': 'Fee schedule', carriers: 'Carriers', 'coverage-table': 'Coverage table' }
+
+function migasFinanzas(pathname: string, nombre: (seccion: string, id: string) => string | undefined): Miga[] | null {
+  const m = pathname.match(/^\/settings\/finance\/(fee-schedule|carriers|coverage-table)(?:\/(.*))?$/)
+  if (!m) return null
+  const [, seccion, resto = ''] = m
+  const partes = resto.split('/').filter(Boolean)
+  let ruta = `/settings/finance/${seccion}`
+  const migas: Miga[] = [{ label: 'Settings', to: '/settings/general' }, { label: 'Finance' }, { label: TITULOS_FINANZAS[seccion], to: ruta }]
+  if (partes[0] === 'new' && seccion !== 'carriers') migas.push({ label: 'New' })
+  else if (partes[0] && partes[0] !== 'new') {
+    ruta += `/${partes[0]}/edit`
+    migas.push({ label: nombre(seccion, partes[0]) ?? partes[0], to: ruta }, { label: 'Edit', to: ruta })
+    if (partes[2] === 'insurance-plans') {
+      ruta += '/insurance-plans'
+      migas.push({ label: 'Insurance plans', to: ruta })
+      if (partes[3] && partes[3] !== 'new') {
+        const plan = `${ruta}/${partes[3]}/edit`
+        migas.push({ label: nombre('planes', partes[3]) ?? partes[3], to: plan }, { label: 'Edit', to: plan })
+      }
+    }
+  }
+  migas[migas.length - 1] = { label: migas[migas.length - 1].label }
+  return migas
+}
+
 function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string) => string | undefined): Miga[] {
   if (pathname === '/settings/general') return []
+  const finanzas = migasFinanzas(pathname, nombreFinanzas)
+  if (finanzas) return finanzas
   const migas: Miga[] = [{ label: 'Settings', to: '/settings/general' }]
 
   const item = SETTINGS_NAV.find(
@@ -38,9 +68,8 @@ function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string)
     /* .../new es la lista con el drawer de alta abierto. */
     const hoja = pathname === item.to || pathname === `${item.to}/new`
     migas.push({ label: item.label, to: hoja ? undefined : item.to })
-    /* En el detalle de un carrier o un fee schedule, la lista de arriba también es un link. */
     const hijo = item.children?.find((c) => pathname === c.to || pathname.startsWith(`${c.to}/`))
-    if (hijo) migas.push({ label: hijo.label, to: pathname === hijo.to || pathname === `${hijo.to}/new` ? undefined : hijo.to })
+    if (hijo) migas.push({ label: hijo.label })
   }
 
   /* El detalle de una locación o de un empleado no está en el menú: su
@@ -61,17 +90,13 @@ function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string)
     const cuenta = CUENTAS.find((c) => c.id === detalleCuenta[1])
     migas.push({ label: cuenta?.nombre ?? detalleCuenta[1] })
   }
-  const detalleFinanzas = pathname.match(/^\/settings\/finance\/([^/]+)\/([^/]+)$/)
-  if (detalleFinanzas && detalleFinanzas[2] !== 'new') {
-    migas.push({ label: nombreFinanzas(detalleFinanzas[1], detalleFinanzas[2]) ?? detalleFinanzas[2] })
-  }
   return migas
 }
 
 export function SettingsLayout() {
   const { pathname } = useLocation()
-  const { aranceles, aseguradoras, coberturas } = useFinanzas()
-  const listas: Record<string, { id: string; nombre: string }[]> = { 'fee-schedule': aranceles, carriers: aseguradoras, 'coverage-table': coberturas }
+  const { aranceles, aseguradoras, coberturas, planes } = useFinanzas()
+  const listas: Record<string, { id: string; nombre: string }[]> = { 'fee-schedule': aranceles, carriers: aseguradoras, 'coverage-table': coberturas, planes }
   const migas = migasDe(pathname, (seccion, id) => listas[seccion]?.find((x) => x.id === id)?.nombre)
   return (
     /* El sidebar propio de Settings se fue —sus pantallas cuelgan del menú

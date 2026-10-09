@@ -5,7 +5,8 @@ import {
 } from '@/data/finanzas'
 
 /* Store en memoria de Settings → Billing: lo que se crea o edita en una pantalla (un fee schedule, un plan) aparece en las
-   otras. Vive en la ruta de Settings, así que dura mientras se navega adentro; como patientsStore, no persiste. */
+   otras. Vive en la ruta de Settings; como patientsStore, no persiste. Los planes de un carrier borrado quedan sin mostrar
+   y vuelven con Undo. */
 
 type Datos = { aranceles: Arancel[]; aseguradoras: Aseguradora[]; planes: PlanSeguro[]; coberturas: TablaCobertura[] }
 export type Coleccion = keyof Datos
@@ -63,7 +64,3 @@ export function useFinanzas() {
   if (!ctx) throw new Error('useFinanzas va adentro de <FinanzasProvider>')
   return ctx
 }
-
-/* El fee schedule UCR por defecto: la base contra la que se comparan los demás. */
-export const ucrDe = (aranceles: Arancel[]) =>
-  aranceles.find((a) => a.tipo === 'UCR' && a.porDefecto) ?? aranceles.find((a) => a.tipo === 'UCR' && a.estado === 'Active')

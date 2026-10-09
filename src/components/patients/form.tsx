@@ -33,7 +33,7 @@ export function FieldHint({ children }: { children?: React.ReactNode }) {
 
 /* Aspecto común de los controles: borde gris, foco azul, error rojo y
    deshabilitado gris. Lo usan todos los campos de este archivo. */
-const control = (error?: string) =>
+export const control = (error?: string) =>
   cn(
     'w-full rounded-md border bg-white text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
     'disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-ink-faint disabled:shadow-none',
@@ -43,9 +43,11 @@ const control = (error?: string) =>
 const pie = (error?: string, hint?: React.ReactNode) => (error ? <FieldError>{error}</FieldError> : <FieldHint>{hint}</FieldHint>)
 
 export function TextField({
-  label, placeholder, required, className, value, onChange, error, hint, disabled,
+  label, placeholder, required, className, value, onChange, error, hint, disabled, hideLabel,
 }: {
   label: string
+  /** Rótulo sólo para lectores de pantalla: el campo va en una celda de tabla con su encabezado arriba. */
+  hideLabel?: boolean
   placeholder?: string
   required?: boolean
   className?: string
@@ -59,7 +61,7 @@ export function TextField({
 }) {
   return (
     <label className={cn('flex flex-col gap-2', className)}>
-      <FieldLabel required={required}>{label}</FieldLabel>
+      {hideLabel ? <span className="sr-only">{label}</span> : <FieldLabel required={required}>{label}</FieldLabel>}
       <input
         aria-invalid={!!error || undefined}
         placeholder={placeholder}
@@ -97,9 +99,11 @@ const OPCIONES_GENERICAS = ['Option A', 'Option B', 'Option C']
 
 export function SelectField({
   label, placeholder = 'Select', required, className, options,
-  value: valueProp, onChange, error, hint, disabled,
+  value: valueProp, onChange, error, hint, disabled, hideLabel,
 }: {
   label: string
+  /** Rótulo sólo para lectores de pantalla (el botón lo lleva como aria-label): para una celda de tabla. */
+  hideLabel?: boolean
   placeholder?: string
   required?: boolean
   className?: string
@@ -135,12 +139,13 @@ export function SelectField({
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
-      <FieldLabel required={required}>{label}</FieldLabel>
+      {!hideLabel && <FieldLabel required={required}>{label}</FieldLabel>}
       <div ref={ref} className="relative">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
+          aria-label={hideLabel ? label : undefined}
           aria-invalid={!!error || undefined}
           disabled={disabled}
           className={cn(

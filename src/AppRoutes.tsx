@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import Login from '@/pages/Login'
 import ForgotPassword from '@/pages/ForgotPassword'
@@ -24,10 +24,10 @@ import { SettingsAccounts } from '@/pages/settings/Accounts'
 import { SettingsAccount } from '@/pages/settings/Account'
 import { SettingsConsents } from '@/pages/settings/Consents'
 import { SettingsLedgerOptions } from '@/pages/settings/LedgerOptions'
-import { SettingsBilling } from '@/pages/settings/finance/Billing'
-import { SettingsFeeSchedules, SettingsFeeScheduleDetail } from '@/pages/settings/finance/FeeSchedules'
-import { SettingsCarriers, SettingsCarrierDetail } from '@/pages/settings/finance/Carriers'
-import { SettingsCoverageTables, SettingsCoverageTableDetail } from '@/pages/settings/finance/CoverageTables'
+import { SettingsFeeSchedules, SettingsFeeScheduleEdit, SettingsNewFeeSchedule } from '@/pages/settings/finance/FeeSchedules'
+import { SettingsCarriers, SettingsCarrierEdit } from '@/pages/settings/finance/Carriers'
+import { SettingsInsurancePlan } from '@/pages/settings/finance/InsurancePlan'
+import { SettingsCoverageTables, SettingsNewCoverageTable } from '@/pages/settings/finance/CoverageTables'
 import { FinanzasProvider } from '@/data/finanzasStore'
 import Help from '@/pages/Help'
 import Notifications from '@/pages/Notifications'
@@ -87,16 +87,23 @@ export function AppRoutes() {
           <Route path="account" element={<SettingsAccount />} />
           <Route path="consents" element={<SettingsConsents />} />
           <Route path="ledger" element={<SettingsLedgerOptions />} />
-          <Route path="finance" element={<SettingsBilling />} />
+          {/* Settings → Billing, con las rutas de red.dev. Ver figma/modulos/settings-billing.md. */}
+          <Route path="finance" element={<Navigate to="/settings/finance/fee-schedule" replace />} />
           <Route path="finance/fee-schedule" element={<SettingsFeeSchedules />} />
-          <Route path="finance/fee-schedule/new" element={<SettingsFeeSchedules nuevo />} />
-          <Route path="finance/fee-schedule/:feeId" element={<SettingsFeeScheduleDetail />} />
+          <Route path="finance/fee-schedule/new" element={<SettingsNewFeeSchedule />} />
+          <Route path="finance/fee-schedule/:feeId/edit" element={<SettingsFeeScheduleEdit />} />
+          <Route path="finance/fee-schedule/:feeId" element={<RedirigirAEdit />} />
           <Route path="finance/carriers" element={<SettingsCarriers />} />
           <Route path="finance/carriers/new" element={<SettingsCarriers nuevo />} />
-          <Route path="finance/carriers/:carrierId" element={<SettingsCarrierDetail />} />
+          <Route path="finance/carriers/:carrierId" element={<RedirigirAEdit />} />
+          <Route path="finance/carriers/:carrierId/edit" element={<SettingsCarrierEdit tab="carrier" />} />
+          <Route path="finance/carriers/:carrierId/edit/insurance-plans" element={<SettingsCarrierEdit tab="plans" />} />
+          <Route path="finance/carriers/:carrierId/edit/insurance-plans/new" element={<SettingsCarrierEdit tab="plans" nuevoPlan />} />
+          <Route path="finance/carriers/:carrierId/edit/insurance-plans/:planId/edit" element={<SettingsInsurancePlan />} />
           <Route path="finance/coverage-table" element={<SettingsCoverageTables />} />
-          <Route path="finance/coverage-table/new" element={<SettingsCoverageTables nuevo />} />
-          <Route path="finance/coverage-table/:tableId" element={<SettingsCoverageTableDetail />} />
+          <Route path="finance/coverage-table/new" element={<SettingsNewCoverageTable />} />
+          <Route path="finance/coverage-table/:tableId/edit" element={<SettingsCoverageTables />} />
+          <Route path="finance/coverage-table/:tableId" element={<RedirigirAEdit />} />
           {SETTINGS_PLACEHOLDERS.map((p) => (
             <Route key={p} path={p} element={<SettingsPlaceholder />} />
           ))}
@@ -106,4 +113,10 @@ export function AppRoutes() {
       </Route>
     </Routes>
   )
+}
+
+/* Las rutas de detalle de antes (sin /edit) van a la de red.dev. */
+function RedirigirAEdit() {
+  const { pathname } = useLocation()
+  return <Navigate to={`${pathname.replace(/\/$/, '')}/edit`} replace />
 }

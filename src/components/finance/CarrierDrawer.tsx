@@ -1,38 +1,43 @@
+import { useState } from 'react'
 import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer'
-import { ModalShell, SelectField, TextField } from '@/components/patients/form'
+import { ModalShell, OptionCheckbox, SearchField, SelectField, TextField } from '@/components/patients/form'
+import { PhoneFields, UnitField } from '@/components/finance/fields'
 import { useFormPasos } from '@/lib/useFormPasos'
 import { useFinanzas } from '@/data/finanzasStore'
-import { ESTADOS } from '@/data/location-options'
-import { RECLAMOS, idNuevo, type Aseguradora, type Reclamo } from '@/data/finanzas'
+import { FORMATOS_RECLAMO, PAGADORES, TELEFONO_VACIO, esNorteamerica, idNuevo, opcionPagador, type Aseguradora } from '@/data/finanzas'
 
-/* New Carrier: General, Contact y Address, como New Location. Los planes se cargan después, desde el detalle del carrier.
-   Editar un carrier es la pestaña Information de su detalle. Ver settings-billing.md. */
+/* New Carrier: la página de red.dev como drawer con dos pasos, General y Contact. Carrier Name busca el payer y completa su
+   Payer ID; Location Number se carga después, en Edit Carrier. Ver settings-billing.md. */
 
-const VACIO = {
-  nombre: '', payerId: '', reclamos: 'Electronic',
-  telefono: '', fax: '', email: '', sitio: '',
-  linea1: '', linea2: '', ciudad: '', estadoUs: '', zip: '',
-}
-
-const PASOS = ['General', 'Contact', 'Address'] as const
+const VACIO = { nombre: '', payerId: '', formato: '', dias: '', email: '', sitio: '', area: '', numero: '' }
+const PASOS = ['General', 'Contact'] as const
 
 export function CarrierDrawer({ onClose, onGuardar }: { onClose: () => void; onGuardar: (c: Aseguradora) => void }) {
   const { aseguradoras } = useFinanzas()
+  const [codigo, setCodigo] = useState(TELEFONO_VACIO.codigo)
   const { d, set, falta, paso, siguiente, atras, listo } = useFormPasos(VACIO, [
-    ['nombre', 'payerId', 'reclamos'],
-    ['telefono'],
-    ['linea1', 'ciudad', 'estadoUs', 'zip'],
+    ['nombre', 'payerId', 'formato', 'dias'],
+    esNorteamerica(codigo) ? ['email', 'area', 'numero'] : ['email', 'numero'],
   ])
-  const repetido = aseguradoras.some((a) => a.nombre.toLowerCase() === d.nombre.trim().toLowerCase())
+  const [sinDiagnosticos, setSinDiagnosticos] = useState(false)
+  const [noFacturar, setNoFacturar] = useState(false)
+
+  const repetido = !!d.nombre.trim() && aseguradoras.some((a) => a.nombre.toLowerCase() === d.nombre.trim().toLowerCase())
+
+  /* El buscador sugiere "Aetna Dental Plans - 60054": al elegirlo, se separan el nombre y el Payer ID. */
+  const elegirNombre = (v: string) => {
+    const p = PAGADORES.find((x) => opcionPagador(x) === v)
+    set('nombre')(p ? p.nombre : v)
+    if (p) set('payerId')(p.payerId)
+  }
 
   const guardar = () => {
     if (!listo() || repetido) return
     onGuardar({
       id: idNuevo(d.nombre, aseguradoras.map((a) => a.id)),
-      nombre: d.nombre.trim(), payerId: d.payerId.trim().toUpperCase(), reclamos: d.reclamos as Reclamo,
-      telefono: d.telefono.trim(), fax: d.fax.trim(), email: d.email.trim(), sitio: d.sitio.trim(),
-      linea1: d.linea1.trim(), linea2: d.linea2.trim(), ciudad: d.ciudad.trim(), estadoUs: d.estadoUs, zip: d.zip.trim(),
-      estado: 'Active',
+      nombre: d.nombre.trim(), payerId: d.payerId.trim(), formato: d.formato, diasResolucion: Number(d.dias),
+      sinDiagnosticos, noFacturar, email: d.email.trim(), sitio: d.sitio.trim(),
+      telefono: { codigo, area: esNorteamerica(codigo) ? d.area : '', numero: d.numero }, numerosLocacion: {},
     })
     onClose()
   }
@@ -40,7 +45,7 @@ export function CarrierDrawer({ onClose, onGuardar }: { onClose: () => void; onG
   return (
     <ModalShell
       title="New Carrier"
-      description="The insurance company you send claims to. Add its plans next."
+      description="The insurance company you send claims to. Add its insurance plans next."
       onClose={onClose}
       width="max-w-[560px]"
       steps={PASOS}
@@ -49,13 +54,23 @@ export function CarrierDrawer({ onClose, onGuardar }: { onClose: () => void; onG
     >
       <DrawerStep index={0} step={paso}>
         <DrawerSection title="General Information">
-          <TextField
-            label="Carrier Name" required placeholder="e.g. Delta Dental of California" value={d.nombre} onChange={set('nombre')}
-            error={falta('nombre') ?? (repetido ? 'This carrier already exists.' : undefined)}
+          <SearchField
+            label="Carrier Name" required placeholder="Select carrier" options={PAGADORES.map(opcionPagador)}
+            value={d.nombre} onChange={elegirNombre}
+            error={falta('nombre') ?? (repetido ? 'This carrier is already in your list.' : undefined)}
+            hint="Search the payer list, or type the name of a new one."
           />
           <div className="grid gap-4 sm:grid-cols-2">
-            <TextField label="Payer ID" required placeholder="e.g. 77777" value={d.payerId} onChange={set('payerId')} error={falta('payerId')} hint="The ID used to send electronic claims." />
-            <SelectField label="Claims Submission" required options={[...RECLAMOS]} value={d.reclamos} onChange={set('reclamos')} error={falta('reclamos')} />
+            <TextField label="Payer ID" required placeholder="00000" value={d.payerId} onChange={set('payerId')} error={falta('payerId')} />
+            <SelectField label="Printed Claim Format" required placeholder="Select a printed claim format" options={FORMATOS_RECLAMO} value={d.formato} onChange={set('formato')} error={falta('formato')} />
+          </div>
+          <UnitField
+            label="Expected Period of Insurance Claim Resolution" required unit="days" value={Number(d.dias) || 0}
+            onChange={(n) => set('dias')(n > 0 ? String(n) : '')} error={falta('dias')}
+          />
+          <div className="grid gap-2 sm:grid-cols-2">
+            <OptionCheckbox label="Do not include Dental Diagnostic Codes" checked={sinDiagnosticos} onChange={setSinDiagnosticos} />
+            <OptionCheckbox label="Do not bill Insurance" checked={noFacturar} onChange={setNoFacturar} />
           </div>
         </DrawerSection>
       </DrawerStep>
@@ -63,23 +78,14 @@ export function CarrierDrawer({ onClose, onGuardar }: { onClose: () => void; onG
       <DrawerStep index={1} step={paso}>
         <DrawerSection title="Contact Information">
           <div className="grid gap-4 sm:grid-cols-2">
-            <TextField label="Phone" required placeholder="(800) 000-0000" value={d.telefono} onChange={set('telefono')} error={falta('telefono')} />
-            <TextField label="Fax" placeholder="(800) 000-0000" value={d.fax} onChange={set('fax')} />
-            <TextField label="Email" placeholder="claims@carrier.com" value={d.email} onChange={set('email')} />
-            <TextField label="Website" placeholder="carrier.com" value={d.sitio} onChange={set('sitio')} />
+            <TextField label="Email" required placeholder="example@example.com" value={d.email} onChange={set('email')} error={falta('email')} />
+            <TextField label="Website" placeholder="Introduce your website link" value={d.sitio} onChange={set('sitio')} />
           </div>
-        </DrawerSection>
-      </DrawerStep>
-
-      <DrawerStep index={2} step={paso}>
-        <DrawerSection title="Claims Address" description="Where paper claims and attachments are mailed.">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <TextField label="Address Line 1" required placeholder="Street or PO Box" value={d.linea1} onChange={set('linea1')} error={falta('linea1')} />
-            <TextField label="Address Line 2" placeholder="Additional info" value={d.linea2} onChange={set('linea2')} />
-            <TextField label="City" required placeholder="City" value={d.ciudad} onChange={set('ciudad')} error={falta('ciudad')} />
-            <SelectField label="State" required placeholder="Select a state" options={ESTADOS} value={d.estadoUs} onChange={set('estadoUs')} error={falta('estadoUs')} />
-            <TextField label="ZIP Code" required placeholder="Postal code" value={d.zip} onChange={set('zip')} error={falta('zip')} />
-          </div>
+          <PhoneFields
+            required value={{ codigo, area: d.area, numero: d.numero }}
+            onChange={(t) => { setCodigo(t.codigo); set('area')(t.area); set('numero')(t.numero) }}
+            errores={{ area: falta('area'), numero: falta('numero') }}
+          />
         </DrawerSection>
       </DrawerStep>
     </ModalShell>

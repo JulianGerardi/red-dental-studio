@@ -3,17 +3,23 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
-## 2026-10-08
+## 2026-10-09
 
-### Settings → Billing: Fee Schedules, Carriers y Coverage Tables ([#18](https://github.com/JulianGerardi/red-dental-studio/pull/18))
-- Las tres pantallas de Billing dejan de ser placeholder: portada (`/settings/finance`) con Setup checks, Fee Schedules
-  (precios por código CDT editables en la celda, Adjust fees), Carriers con sus planes y Coverage Tables (% por categoría,
-  deducibles y máximos). Cada plan apunta a un fee schedule y a una coverage table. Armado con criterio propio: falta
-  compararlo con la app real.
-- **Para el dev:** store `data/finanzasStore.tsx` (`FinanzasProvider` envuelve la ruta de Settings) y datos en
-  `data/finanzas.ts`; componentes en `components/finance/` (`CoverageBar`, `CoverageSummary`, `EditableAmount`,
-  `PlansTable` y seis drawers) y `settings/SettingsSearch`. `SettingsPageHeader` suma `etiquetas` y `SettingsSectionCard`
-  suma `detail`. `location-options → FEES` sale de los fee schedules activos. El menú dice "Coverage Tables".
+### Settings → Billing igual a red.dev: Fee Schedules, Carriers y Coverage Table ([#18](https://github.com/JulianGerardi/red-dental-studio/pull/18))
+- Billing se rehízo desde `red.dev` (lógica, pantallas, campos y textos; estilo nuestro): Carriers → Edit Carrier
+  (*Information* | *Insurance Plans / Employers*) → la página del plan con siete pestañas; Fee Schedules con versiones,
+  Copy form y Bulk Edit; Coverage Table como plantillas con rangos y excepciones (asistente de 4 pasos).
+- Correcciones de Julián: Fee Schedules es una tabla (Name, Type, Assignments, Effective, Last updated, Status, Actions:
+  Edit, View assignments, Compare fees); *Non-zero fees — n / 26* en el editor; Bulk Edit sobre las filas tildadas;
+  *Information* primero en todas las pestañas. Sin portada: `/settings/finance` redirige a Fee Schedules.
+- **Para el dev:** datos nuevos en `data/finanzas.ts` (Arancel con `versiones`, `tipo`, `actualizado`, `asignados`;
+  PlanSeguro con las siete secciones; TablaCobertura con `excepciones`) y store `data/finanzasStore.tsx`. Rutas
+  `…/:id/edit` como red.dev (`/:id` redirige). Componentes en `components/finance/` (fields, RangesTable, MasterList,
+  PlanFields, Assignments, CompareFeesDrawer y seis drawers); salieron CoverageBar, CoverageSummary, EditableAmount,
+  PlansTable y los drawers viejos. `TextField` / `SelectField` suman `hideLabel`; `control()` se exporta. Relevamiento
+  y anomalías en `design-reference/red-dev/settings-billing/` y `figma/modulos/settings-billing.md`.
+
+## 2026-10-08
 
 ### Clinical Mode: Lab Order con la tabla, el buscador, el filtro y los botones de la app ([#17](https://github.com/JulianGerardi/red-dental-studio/pull/17))
 - Lab Order deja su tabla propia y usa la de la app (`DataTable`) en la card de la página: buscador, Filter que filtra

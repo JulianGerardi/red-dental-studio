@@ -31,7 +31,7 @@ export const SETTINGS_NAV: SettingsNavItem[] = [
     children: [
       { to: '/settings/finance/fee-schedule', label: 'Fee Schedules' },
       { to: '/settings/finance/carriers', label: 'Carriers' },
-      { to: '/settings/finance/coverage-table', label: 'Coverage Tables' },
+      { to: '/settings/finance/coverage-table', label: 'Coverage Table' },
     ],
   },
   { to: '/settings/ledger', label: 'Ledger', icon: 'credit-card' },

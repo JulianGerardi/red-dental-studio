@@ -21,9 +21,11 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   deshace con Undo.
 - `tests/consents.e2e.ts` (2026-10-07): en Settings → Consents, Preview abre la hoja en un drawer (Patient View saca
   Diagnosis) y Save desde el preview lo cierra y deja los faltantes a la vista en el editor.
-- `tests/billing-settings.e2e.ts` (2026-10-08): Settings → Billing. Un fee schedule nuevo copia el UCR con el ajuste y
-  un precio se edita en la celda; un plan nuevo de un carrier aparece en su coverage table; tocar una categoría cambia lo
-  que paga; un fee schedule en uso no se borra.
+- `tests/billing-settings.e2e.ts` (2026-10-09, rehecho desde red.dev): New Carrier pide lo obligatorio y el buscador
+  completa el Payer ID; un plan nuevo se arma en cuatro pasos y sigue en su Coverage Table (Copy from + Save); cambiar de
+  pestaña del plan con cambios pide confirmación; Bulk Edit +10% crea una versión nueva; una excepción se arma en cuatro
+  pasos; Assignments muestra el desglose y la lista; Compare fees compara contra UCR - Red; Bulk Edit con filas tildadas
+  cambia sólo esas.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 

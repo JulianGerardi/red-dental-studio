@@ -13,6 +13,11 @@ export const pulsar = (nombre: RegExp) => async (c: Contexto) => {
   await userEvent.click(await en(c).findByRole('button', { name: nombre }))
 }
 
+/* Lo mismo para lo que no es un botón: una pestaña, un radio, una casilla, una opción de menú. */
+export const pulsarRol = (rol: 'tab' | 'radio' | 'checkbox' | 'menuitem', nombre: RegExp) => async (c: Contexto) => {
+  await userEvent.click(await en(c).findByRole(rol, { name: nombre }))
+}
+
 /* Escribe en el campo con ese placeholder o rótulo. Asigna el valor con el
    setter nativo y dispara `input`: es lo que React escucha en un campo
    controlado. `userEvent.type` dejaba el valor en el DOM sin llegar al estado. */

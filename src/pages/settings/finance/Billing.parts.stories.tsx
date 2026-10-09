@@ -1,44 +1,53 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Bloque, Lienzo, Muestra, Tabla, TablaPartes } from '@/design-system/kit'
-import { escribir, esperar, pulsar, secuencia } from '@/design-system/play'
-import { RowActionsMenu } from '@/components/ui/row-actions-menu'
-import { FinanzasProvider, useFinanzas, ucrDe } from '@/data/finanzasStore'
-import { ARANCELES, ASEGURADORAS, COBERTURAS } from '@/data/finanzas'
-import { SetupChecks, usePendientes } from './Billing'
-import { FeesTable, MenuArancel, useAccionesArancel } from './FeeSchedules'
-import { CarrierInformation } from './Carriers'
-import { CoverageRulesTable, MenuCobertura, useAccionesCobertura } from './CoverageTables'
+import { FinanzasProvider, useFinanzas } from '@/data/finanzasStore'
+import { ARANCELES, ASEGURADORAS, COBERTURAS, PLANES, planVacio } from '@/data/finanzas'
+import { CarrierForm, CarrierPlans } from './Carriers'
+import {
+  PlanCoordination, PlanCoverage, PlanDeductibles, PlanDetail, PlanFeeByLocation, PlanPaymentTable, PlanPredeterminations,
+} from './InsurancePlan'
+import { FeeScheduleEditor } from './FeeSchedules'
+import { CoverageTableEditor } from './CoverageTables'
 
-/* Las piezas internas de Settings → Billing: Setup checks, la tabla de precios, la ficha de un carrier, la tabla de reglas
-   y los kebabs. Las pantallas completas están en Pages. Ver design-reference/figma/modulos/settings-billing.md. */
+/* Las piezas internas de Settings → Billing. Las pantallas completas están en Pages. Ver
+   design-reference/figma/modulos/settings-billing.md. */
 
-type Parte = 'Setup checks' | 'Fees table' | 'Carrier information' | 'Coverage rules' | 'Row menus'
-type Args = { parte: Parte; feeSchedule: string; carrier: string; coverageTable: string }
+const PARTES = [
+  'Carrier form', 'Carrier plans', 'Plan · Information', 'Plan · Coverage Table', 'Plan · Predeterminations', 'Plan · Payment Table',
+  'Plan · Deductibles And Benefits', 'Plan · Coordination Of Benefits', 'Plan · Fee Schedule By Location', 'Fee schedule editor',
+  'Coverage table editor',
+] as const
+type Parte = (typeof PARTES)[number]
+type Args = { parte: Parte; carrier: string; plan: string; feeSchedule: string; coverageTable: string }
 
 const meta = {
   title: 'Pages/Parts/Billing settings',
   parameters: {
     layout: 'padded',
     docs: {
-      decisionsFrom: ['pages/settings/finance/Billing.tsx', 'pages/settings/finance/FeeSchedules.tsx', 'pages/settings/finance/Carriers.tsx', 'pages/settings/finance/CoverageTables.tsx'],
+      decisionsFrom: ['pages/settings/finance/Carriers.tsx', 'pages/settings/finance/InsurancePlan.tsx', 'pages/settings/finance/FeeSchedules.tsx', 'pages/settings/finance/CoverageTables.tsx'],
       description: {
         component: [
-          'Las piezas de *Settings → Billing* que no son componentes sueltos. Billing tiene tres tablas conectadas: **Fee Schedules** (lo que cobra el consultorio por código CDT), **Carriers** con sus planes, y **Coverage Tables** (lo que paga el plan por categoría). Cada plan apunta a un fee schedule y a una coverage table.',
+          'Las piezas de *Settings → Billing* que no son componentes sueltos. La lógica, los campos y los textos salen de red.dev (relevamiento en `design-reference/red-dev/settings-billing/`); el estilo y los componentes son los nuestros.',
           '',
-          '**Las piezas:** *Setup checks* (lo que falta configurar, en la portada), *FeesTable* (precios con edición en la celda), *CarrierInformation* (la ficha editable de un carrier), *CoverageRulesTable* (una fila por categoría; tocarla abre su regla) y los kebabs de fee schedule y coverage table. Las pantallas completas están en *Pages*.',
+          '- **Carriers**: *CarrierForm* (pestaña *Information* de Edit Carrier: General Information y Contact Information, Location Number) y *CarrierPlans* (pestaña *Insurance Plans / Employers*).',
+          '- **Insurance plan**: las siete pestañas de Edit Insurance Plan, cada una con su Cancel · Save (Save deshabilitado hasta que algo cambie).',
+          '- **Fee schedule editor**: General information con Copy form y Bulk Edit, versiones, Save in draft state, Available From, Type, *Non-zero fees* y la tabla Code · Description · Current Fee · New Fee con selección.',
+          '- **Coverage table editor**: Manage Exceptions, Add Range, Name, Type y la tabla de rangos.',
           '',
-          '**Probalo:** en *Playground* elegí la parte y el ítem desde *Controls*; todo se puede usar (editar un precio, guardar la ficha, abrir un menú).',
+          '**Probalo:** en *Playground* elegí la parte y el ítem desde *Controls*; todo se puede usar y guardar (en memoria).',
         ].join('\n'),
       },
     },
   },
   decorators: [(Story) => <FinanzasProvider><div className="bg-page-background p-4 sm:p-6"><Story /></div></FinanzasProvider>],
-  args: { parte: 'Fees table', feeSchedule: ARANCELES[1].nombre, carrier: ASEGURADORAS[0].nombre, coverageTable: COBERTURAS[0].nombre },
+  args: { parte: 'Fee schedule editor', carrier: ASEGURADORAS[0].nombre, plan: PLANES[0].nombre, feeSchedule: ARANCELES[1].nombre, coverageTable: COBERTURAS[0].nombre },
   argTypes: {
-    parte: { control: 'select', options: ['Setup checks', 'Fees table', 'Carrier information', 'Coverage rules', 'Row menus'], description: 'Qué pieza mostrar.' },
-    feeSchedule: { control: 'select', options: ARANCELES.map((a) => a.nombre), description: 'Para Fees table y Row menus.' },
-    carrier: { control: 'select', options: ASEGURADORAS.map((c) => c.nombre), description: 'Para Carrier information.' },
-    coverageTable: { control: 'select', options: COBERTURAS.map((t) => t.nombre), description: 'Para Coverage rules y Row menus.' },
+    parte: { control: 'select', options: PARTES, description: 'Qué pieza mostrar.' },
+    carrier: { control: 'select', options: ASEGURADORAS.map((c) => c.nombre), description: 'Para Carrier form y Carrier plans.' },
+    plan: { control: 'select', options: PLANES.map((p) => p.nombre), description: 'Para las pestañas del plan.' },
+    feeSchedule: { control: 'select', options: ARANCELES.map((a) => a.nombre), description: 'Para Fee schedule editor.' },
+    coverageTable: { control: 'select', options: COBERTURAS.map((t) => t.nombre), description: 'Para Coverage table editor.' },
   },
 } satisfies Meta<Args>
 
@@ -48,73 +57,50 @@ type Story = StoryObj<Args>
 const sinControles = { controls: { disable: true } }
 const nada = () => {}
 
+const SECCION = {
+  'Plan · Information': PlanDetail, 'Plan · Coverage Table': PlanCoverage, 'Plan · Predeterminations': PlanPredeterminations,
+  'Plan · Payment Table': PlanPaymentTable, 'Plan · Deductibles And Benefits': PlanDeductibles,
+  'Plan · Coordination Of Benefits': PlanCoordination, 'Plan · Fee Schedule By Location': PlanFeeByLocation,
+} as const
+
 /* Cada pieza conectada al store, como en la pantalla. */
-function Checks() {
-  return <SetupChecks pendientes={usePendientes()} />
-}
-function Precios({ nombre }: { nombre: string }) {
-  const { aranceles, guardar } = useFinanzas()
-  const a = aranceles.find((x) => x.nombre === nombre) ?? aranceles[0]
-  return (
-    <FeesTable
-      arancel={a}
-      ucr={ucrDe(aranceles)}
-      onCambiar={(codigo, v) => {
-        const precios = { ...a.precios }
-        if (v === undefined) delete precios[codigo]
-        else precios[codigo] = v
-        guardar('aranceles', { ...a, precios })
-      }}
-    />
-  )
-}
-function Ficha({ nombre }: { nombre: string }) {
-  const c = ASEGURADORAS.find((x) => x.nombre === nombre) ?? ASEGURADORAS[0]
-  return <CarrierInformation key={c.id} carrier={c} onGuardar={nada} />
-}
-function Reglas({ nombre }: { nombre: string }) {
-  return <CoverageRulesTable tabla={COBERTURAS.find((t) => t.nombre === nombre) ?? COBERTURAS[0]} onEditar={nada} />
-}
-function Menus({ arancel, tabla }: { arancel: string; tabla: string }) {
-  const accA = useAccionesArancel()
-  const accC = useAccionesCobertura()
-  const { aranceles, coberturas } = useFinanzas()
-  const a = aranceles.find((x) => x.nombre === arancel) ?? aranceles[0]
-  const t = coberturas.find((x) => x.nombre === tabla) ?? coberturas[0]
-  return (
-    <div className="flex min-h-[240px] flex-wrap gap-x-56 gap-y-8">
-      <Muestra titulo={`Fee schedule · ${a.nombre}`}><RowActionsMenu label={a.nombre} abierto><MenuArancel a={a} acciones={accA} /></RowActionsMenu></Muestra>
-      <Muestra titulo={`Coverage table · ${t.nombre}`}><RowActionsMenu label={t.nombre} abierto><MenuCobertura t={t} acciones={accC} /></RowActionsMenu></Muestra>
-    </div>
-  )
+function Pieza({ parte, carrier, plan, feeSchedule, coverageTable }: Args) {
+  const { aseguradoras, planes, aranceles, coberturas, guardar } = useFinanzas()
+  const c = aseguradoras.find((x) => x.nombre === carrier) ?? aseguradoras[0]
+  const p = planes.find((x) => x.nombre === plan) ?? planes[0]
+  const a = aranceles.find((x) => x.nombre === feeSchedule) ?? aranceles[0]
+  const t = coberturas.find((x) => x.nombre === coverageTable) ?? coberturas[0]
+  if (parte === 'Carrier form') return <CarrierForm key={c.id} carrier={c} onGuardar={(x) => guardar('aseguradoras', x)} />
+  if (parte === 'Carrier plans') return <CarrierPlans carrier={c} />
+  if (parte === 'Fee schedule editor') return <FeeScheduleEditor key={`${a.id}-${a.versiones.length}`} arancel={a} />
+  if (parte === 'Coverage table editor') return <CoverageTableEditor key={t.id} tabla={t} />
+  const Seccion = SECCION[parte]
+  return <Seccion key={p.id} plan={p} onGuardar={(x) => guardar('planes', x)} />
 }
 
 export const Playground: Story = {
-  parameters: { docs: { story: { inline: false, iframeHeight: 760 } } },
-  render: (a) => (
-    <div key={JSON.stringify(a)}>
-      {a.parte === 'Setup checks' && <div className="max-w-[560px]"><Checks /></div>}
-      {a.parte === 'Fees table' && <Precios nombre={a.feeSchedule} />}
-      {a.parte === 'Carrier information' && <Ficha nombre={a.carrier} />}
-      {a.parte === 'Coverage rules' && <Reglas nombre={a.coverageTable} />}
-      {a.parte === 'Row menus' && <Menus arancel={a.feeSchedule} tabla={a.coverageTable} />}
-    </div>
-  ),
+  render: (args) => <Pieza {...args} />,
 }
 
 export const Parts: Story = {
   parameters: sinControles,
   render: () => (
-    <Lienzo className="max-w-[1100px]">
-      <TablaPartes partes={[
-        ['Setup checks', 'Card de la portada con lo que impide cobrar bien: carriers activos sin planes, planes que apuntan a algo inactivo y fee schedules en uso con códigos sin precio. Cada uno con Review. Sin pendientes: “Everything is set up.”', 'SetupChecks · usePendientes'],
-        ['Fees table', 'El catálogo CDT con el precio del fee schedule editable en la celda (EditableAmount), el UCR y la diferencia. Buscador, filtro por categoría y Columns.', 'FeesTable'],
-        ['Carrier information', 'Pestaña Information del carrier: General, Contact y Claims Address, con Cancel / Save al pie.', 'CarrierInformation'],
-        ['Coverage rules', 'Una fila por categoría CDT: códigos, clase, CoverageBar, deducible, espera y frecuencia. La fila abre CoverageRuleDrawer.', 'CoverageRulesTable'],
-        ['Row menus', 'Los kebabs de fila y de detalle: Set as default, Duplicate, Activate / Deactivate y Delete (fee schedule); Duplicate, Activate / Deactivate y Delete (coverage table).', 'MenuArancel · MenuCobertura'],
-      ]} />
-      <Muestra titulo="Setup checks"><div className="max-w-[560px]"><Checks /></div></Muestra>
-      <Muestra titulo="Coverage rules"><Reglas nombre="PPO Standard 100/80/50" /></Muestra>
+    <Lienzo>
+      <Bloque titulo="Parts">
+        <TablaPartes partes={[
+          ['CarrierForm', 'Carrier Name y Payer ID deshabilitados; Location Number abre su drawer; banner “Uncompleted fields” al guardar incompleto.', 'Carriers.tsx'],
+          ['CarrierPlans', 'Buscador “Search...”, columnas Plan/Employer Name · Group # · Status; ⋮ Edit, Inactive/Active, Delete con Undo.', 'Carriers.tsx'],
+          ['PlanDetail', 'Pestaña Information: los cuatro grupos de PlanFields en cards.', 'InsurancePlan.tsx'],
+          ['PlanCoverage', 'Type, Copy from, Add Range y la tabla de rangos.', 'InsurancePlan.tsx'],
+          ['PlanPredeterminations', 'Switch por código (columna “Requierd”, tal cual) y buscador.', 'InsurancePlan.tsx'],
+          ['PlanPaymentTable', 'Add Procedure, Filter procedures; Code · Description · Value.', 'InsurancePlan.tsx'],
+          ['PlanDeductibles', 'Deductibles (Preventive, Basic, Major, Ortho) y Benefits (Maximum), en $.', 'InsurancePlan.tsx'],
+          ['PlanCoordination', 'Un método por Source of Payment del plan primario.', 'InsurancePlan.tsx'],
+          ['PlanFeeByLocation', 'Un fee schedule por locación, con “Use the plan default”.', 'InsurancePlan.tsx'],
+          ['FeeScheduleEditor', 'Copy form, Bulk Edit, Name con lápiz, Version, Save in draft state, Available From, Type, Non-zero fees, selección y Current Fee · New Fee.', 'FeeSchedules.tsx'],
+          ['CoverageTableEditor', 'Manage Exceptions (n), Add Range, Name, Type (fijo al editar) y RangesTable.', 'CoverageTables.tsx'],
+        ]} />
+      </Bloque>
     </Lienzo>
   ),
 }
@@ -122,64 +108,55 @@ export const Parts: Story = {
 export const States: Story = {
   parameters: sinControles,
   render: () => (
-    <Lienzo className="max-w-[1100px]">
-      <Bloque titulo="Setup checks">
-        <div className="grid gap-4 md:grid-cols-2">
-          <Muestra titulo="With pending items" nota="Los datos de ejemplo: dos fee schedules en uso con códigos sin precio."><Checks /></Muestra>
-          <Muestra titulo="All set (empty)" nota="Sin pendientes."><SetupChecks pendientes={[]} /></Muestra>
+    <Lienzo>
+      <Bloque titulo="States">
+        <div className="flex flex-col gap-8">
+          <Muestra titulo="Fee schedule editor · New" nota="Sin fee schedule: Name y Type habilitados y sólo la columna New Fee.">
+            <FeeScheduleEditor />
+          </Muestra>
+          <Muestra titulo="Fee schedule editor · Missing fees" nota="Medicaid: Non-zero fees — 19 / 26; los códigos sin precio muestran “—” en Current Fee.">
+            <FeeScheduleEditor arancel={ARANCELES.find((a) => a.id === 'medicaid')} />
+          </Muestra>
+          <Muestra titulo="Carrier plans · Empty" nota="Cigna Dental todavía no tiene planes.">
+            <CarrierPlans carrier={ASEGURADORAS.find((c) => c.id === 'cigna')!} />
+          </Muestra>
+          <Muestra titulo="Plan coverage · Empty" nota="Un plan recién creado: “No procedure ranges found”.">
+            <PlanCoverage plan={{ ...planVacio('cigna'), id: 'nuevo', nombre: 'Globex Corp' }} onGuardar={nada} />
+          </Muestra>
+          <Muestra titulo="Coverage table editor · New" nota="Name y Type habilitados, sin Manage Exceptions.">
+            <CoverageTableEditor />
+          </Muestra>
+          <Muestra titulo="Save disabled" nota="Cada pestaña y editor deja Save deshabilitado hasta que algo cambie; con un error, el banner Uncompleted fields y el campo en rojo (error).">
+            <CarrierForm carrier={ASEGURADORAS[0]} onGuardar={nada} />
+          </Muestra>
+          <Muestra titulo="Selected rows" nota="En el editor de fee schedule, las filas tildadas quedan en azul y Bulk Edit cambia sólo esas.">
+            <FeeScheduleEditor arancel={ARANCELES[0]} />
+          </Muestra>
         </div>
-      </Bloque>
-      <Bloque titulo="Fees table">
-        <Muestra titulo="Compared with UCR" nota="Un PPO: UCR fee y vs UCR. Tocá un precio para editarlo."><Precios nombre="PPO Premium Plan" /></Muestra>
-        <Muestra titulo="The UCR itself" nota="Sin columnas de comparación."><Precios nombre="UCR - Red" /></Muestra>
-        <Muestra titulo="Codes without a fee" nota="Medicaid: los códigos que no cubre dicen “Not set”; se filtra por categoría para encontrarlos."><Precios nombre="Medicaid" /></Muestra>
-      </Bloque>
-      <Bloque titulo="Carrier information">
-        <Muestra titulo="Default" nota="Los datos del carrier, editables. Cancel descarta, Save guarda. Los errores de validación se ven en Carrier Information Errors."><Ficha nombre="Aetna" /></Muestra>
-      </Bloque>
-      <Bloque titulo="Coverage rules">
-        <Muestra titulo="Ranges and not covered" nota="DHMO Network: Endodontics paga distinto que el resto de Basic; Cosmetic no se cubre."><Reglas nombre="DHMO Network" /></Muestra>
-      </Bloque>
-      <Bloque titulo="Row menus" nota="Un fee schedule que no es el default suma Set as default; el default no lo muestra.">
-        <Menus arancel="PPO Premium Plan" tabla="PPO Plus 100/90/60" />
       </Bloque>
     </Lienzo>
   ),
 }
 
-/* Error: Save con el nombre del carrier vacío. */
-export const CarrierInformationErrors: Story = {
-  parameters: sinControles,
-  render: () => <Ficha nombre="Cigna" />,
-  play: secuencia(escribir(/carrier name/i, ''), pulsar(/^save$/i), esperar(/required/i)),
-}
-
-/* Reglas para borrar y desactivar: lo que se protege para que ningún plan quede sin cobrar. */
-const REGLAS: [string, string, string][] = [
-  ['Fee schedule', 'Default, o usado por algún plan', 'Toast de error: setear otro default o mover los planes. El default además no se desactiva.'],
-  ['Carrier', 'Con planes', 'Toast de error: borrar los planes o desactivar el carrier.'],
-  ['Plan', 'Con pacientes suscriptos', 'Toast de error: pasarlo a Inactive.'],
-  ['Coverage table', 'Usada por algún plan', 'Toast de error: mover los planes a otra tabla.'],
-  ['Cualquiera', 'Se puede borrar', 'Sale de la lista con un toast “… was deleted.” y Undo, que lo vuelve a su lugar.'],
-]
-
 export const Specs: Story = {
   parameters: sinControles,
   render: () => (
     <Lienzo>
-      <Bloque titulo="Delete and deactivate">
-        <Tabla encabezado={['Item', 'When', 'What happens']} minimo={640} arriba>
-          {REGLAS.map(([i, c, q]) => <tr key={`${i}${c}`}><td className="font-semibold whitespace-nowrap">{i}</td><td>{c}</td><td className="text-ink-medium">{q}</td></tr>)}
+      <Bloque titulo="Rutas">
+        <Tabla encabezado={['Ruta', 'Pieza']}>
+          <tr><td className="font-mono text-xs">/settings/finance/carriers/:id/edit</td><td>CarrierForm</td></tr>
+          <tr><td className="font-mono text-xs">…/edit/insurance-plans</td><td>CarrierPlans</td></tr>
+          <tr><td className="font-mono text-xs">…/insurance-plans/:planId/edit?section=</td><td>Plan* (sin section: Information)</td></tr>
+          <tr><td className="font-mono text-xs">/settings/finance/fee-schedule/:id/edit</td><td>FeeScheduleEditor con la lista</td></tr>
+          <tr><td className="font-mono text-xs">/settings/finance/coverage-table/:id/edit</td><td>CoverageTableEditor con la lista</td></tr>
         </Tabla>
       </Bloque>
-      <Bloque titulo="Shared rules">
-        <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
-          <li>One store (data/finanzasStore) wraps Settings: what is created in one screen shows up in the others and in the breadcrumb.</li>
-          <li>Every list: SettingsPageHeader + SettingsSearch + status filter (All / Active / Inactive) + DataTable. Every detail: header with tags and actions, StatStrip of four, Tabs and a table.</li>
-          <li>/new opens the list with the create drawer open, like Locations and Team.</li>
-          <li>The CDT catalog and its categories are the ones of Clinical Mode (clinical/dental/data).</li>
-          <li>“vs UCR” compares with the default UCR fee schedule; the typographic minus (−) keeps the numbers aligned.</li>
-        </ul>
+      <Bloque titulo="Measures">
+        <Tabla encabezado={['Piece', 'Value']}>
+          <tr><td className="font-semibold">Editor con lista</td><td className="tabular-nums">grid 260px + resto desde lg; TARJETA_PANEL con 20px de padding</td></tr>
+          <tr><td className="font-semibold">Tabla de fees</td><td className="tabular-nums">16 · 64 · 1fr · 96 · 120, gap 12; New Fee de 32px</td></tr>
+          <tr><td className="font-semibold">Pie de cada pestaña</td><td>Cancel a la izquierda, Save a la derecha</td></tr>
+        </Tabla>
       </Bloque>
     </Lienzo>
   ),
