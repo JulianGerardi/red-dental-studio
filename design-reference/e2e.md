@@ -21,6 +21,8 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   deshace con Undo.
 - `tests/consents.e2e.ts` (2026-10-07): en Settings → Consents, Preview abre la hoja en un drawer (Patient View saca
   Diagnosis) y Save desde el preview lo cierra y deja los faltantes a la vista en el editor.
+- `tests/billing.e2e.ts` (2026-10-09): elegir un paciente en Find Patient lo marca (`aria-current`) junto con sus filas
+  (`aria-selected`), una fila elige a otro y la X lo suelta.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 
@@ -34,5 +36,9 @@ Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ni
 
 - El CLI manda telemetría anónima de uso (comandos y errores, sin contenido de los tests). Se apaga con
   `npx e2e telemetry disable` o `E2E_TELEMETRY_DISABLED=1`.
+- En una sesión en la nube sin salida a `cdn.playwright.dev`, el runner no puede bajar su Chromium (pide la versión
+  de su `playwright-core`). Se puede apuntar `PLAYWRIGHT_BROWSERS_PATH` a una carpeta del scratchpad con
+  `chromium-<versión>/chrome-linux64` y `chromium_headless_shell-<versión>/chrome-headless-shell-linux64` enlazados
+  al Chromium que trae la máquina (`/opt/pw-browsers`).
 - No se instalaron la skill de e2e para agentes (`.claude/skills/e2e`) ni su servidor MCP (`.mcp.json`), que
   `npx e2e init` agrega por defecto.

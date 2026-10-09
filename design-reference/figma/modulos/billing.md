@@ -132,3 +132,35 @@ para tener más de tres cuentas distintas en "Find Patient".
 
 Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
 En Billing: las cinco tarjetas de números, Recent Billing Activity, Find Patient y Today. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.
+
+## Cards como en Patients y el paciente elegido marcado (2026-10-09)
+
+Pedido de Julián: que el paciente elegido para ver Recent Billing quede marcado con el celeste del rango nuevo de
+Coverage Table; sacar los íconos de los títulos de Recent Billing Activity, Find Patient y Today; que Find Patient siga
+la lógica de cards de Patients; y chequear que la tabla esté alineada con las otras.
+
+1. **Paneles.** Los tres bloques pasan a `Panel` (`dashboard/primitives`), el mismo de Today Appointments en Patients y
+   del Dashboard: título de 15px Bold **sin ícono** y encabezado de 52px. De paso, Recent Billing Activity y Find
+   Patient tienen el título a la misma altura (antes las Tabs agrandaban el encabezado de la izquierda).
+2. **Find Patient.** Cada resultado es una `InnerCard` como las de Today Appointments: iniciales en un cuadrado azul
+   de 32px, nombre 13px Semibold, último pago 11px y el saldo a la derecha. El buscador es el del panel de Patients
+   (32px, texto de 12px). Antes eran filas sueltas con hover, sin card.
+3. **Números adentro de un panel.** Today y los dos saldos de Selected patient eran cards de página (sombra de panel)
+   adentro de otro panel. Pasan a `InnerCard` (`Stat interna`); los cinco de arriba siguen como card de página.
+4. **El elegido, marcado.** Un paciente a la vez, desde una fila o desde Find Patient. Su card (`aria-current`) y
+   **todas sus filas** de la página (`aria-selected`) quedan en `dash-count-bg` hasta que se elige otro o se toca la X.
+   Todas las filas y no sólo la clickeada porque lo elegido es el paciente: así, elegido desde Find Patient, la tabla
+   también muestra qué movimientos son suyos. En la tabla es `selected` sin `selectable` (sin casillas).
+5. **Celular.** Find Patient queda debajo de la tabla: elegir ahí sube hasta los saldos (scroll *nearest*, sin
+   animación con movimiento reducido). En escritorio, con todo a la vista, no se mueve nada.
+6. **Encabezado de Panel.** Pasa de `h-[52px] py-3` a `min-h-[52px] py-2 flex-wrap`: unas Tabs sm (36px) entran sin
+   agrandarlo y en el celular bajan abajo del título en vez de pisarlo. En Dashboard y Patients no cambia ningún pixel
+   (comparado con capturas antes y después).
+7. **La tabla.** Es la misma `DataTable` que Patients, Team, Accounts y Lab Order (encabezado de 44px en banda gris con
+   11px, filas de 13px, pie con paginación), compacta (44px) por ir adentro de un panel y alineada con el cuerpo del
+   panel (16px). Lo único distinto es el peso: Patient en negrita negra y Amount y Balance en semibold. Eso ya lo
+   corrige el PR #18 (patrón único de tablas); acá no se duplicó para no pisarlo.
+
+**Para validar con usuarios:** si recepción lee el celeste como "elegido" (el Dashboard marca la card elegida con un
+anillo azul); si marcar todas las filas del paciente ayuda o conviene, en cambio, filtrar la tabla por ese paciente; y
+si el salto hacia arriba en el celular se entiende o desorienta.

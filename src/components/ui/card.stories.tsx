@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { SectionCard, TextField } from '@/components/patients/form'
 import { Bloque, Lienzo, Tabla, Token, useMedidas } from '@/design-system/kit'
 import { InnerCard } from '@/components/dashboard/primitives'
-import { TARJETA_PANEL } from '@/lib/estilos'
+import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 import * as StatCardStories from '@/components/dashboard/StatCard.stories'
 import * as AppointmentCardStories from '@/components/dashboard/AppointmentCard.stories'
 import * as OperatoryCardStories from '@/components/dashboard/OperatoryCard.stories'
@@ -215,12 +215,16 @@ export const Specs: Story = {
         <div className="flex flex-wrap gap-4 rounded-lg bg-surface-subtle p-5">
           <InnerCard className="flex h-20 w-48 items-center justify-center text-[12px] text-ink-muted">InnerCard</InnerCard>
           <InnerCard className="flex h-20 w-48 items-center justify-center text-[12px] text-ink-muted">InnerCard</InnerCard>
+          <div className={cn(TARJETA_INTERNA, 'flex h-20 w-48 items-center justify-center bg-surface-subtle text-[12px] text-ink-muted')}>Clickable · hover</div>
+          <div className={cn(TARJETA_INTERNA, 'flex h-20 w-48 items-center justify-center bg-dash-count-bg text-[12px] text-ink-muted')}>Selected</div>
         </div>
         <Tabla encabezado={['Part', 'Value']} minimo={560}>
           <tr><td className="font-semibold">Background</td><td><Token nombre="white" /></td></tr>
           <tr><td className="font-semibold">Stroke</td><td className="tabular-nums">0.5px, negro al 12%, por dentro de la card (sombra inset: un border de 0.5px se redondea a 1px y una línea por fuera la recorta una lista con scroll). En retina, medio pixel; en una pantalla común, 1px en #eeeeee; igual en los cuatro lados</td></tr>
           <tr><td className="font-semibold">Shadow</td><td className="tabular-nums">shadow-inner-card · inset 0 0 0 0.5px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 4%)</td></tr>
           <tr><td className="font-semibold">Radius</td><td className="tabular-nums">8px</td></tr>
+          <tr><td className="font-semibold">Hover (clickable)</td><td><Token nombre="surface-subtle" />, como la fila de una tabla</td></tr>
+          <tr><td className="font-semibold">Selected</td><td><Token nombre="dash-count-bg" />: el celeste de la fila elegida y del rango nuevo de Coverage Table. Lo usa Find Patient en Billing (Pages › Parts › Billing)</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Rules">
@@ -228,7 +232,9 @@ export const Specs: Story = {
           <li>One topic per card. If it needs two titles, it is two cards.</li>
           <li>The action that edits the card goes top right; the ones that save or cancel go in the footer.</li>
           <li>Cards sit on the grey page background, 16–24px apart, with a shadow and no border.</li>
-          <li>A card inside another card has a half-pixel stroke in a faint grey and a soft shadow (InnerCard).</li>
+          <li>A card inside another card has a half-pixel stroke in a faint grey and a soft shadow (InnerCard). That includes the numbers inside a panel (Today and Selected patient in Billing).</li>
+          <li>A panel title has no icon: Panel, 15px Bold. The icon only goes inside the card, next to what it explains.</li>
+          <li>A clickable inner card goes grey on hover; the chosen one stays light blue (dash-count-bg) while it is selected.</li>
           <li>Tables and the calendar grid keep their border: they are not cards.</li>
         </ul>
       </Bloque>

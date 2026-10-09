@@ -28,7 +28,8 @@ export function Panel({
     <section
       className={cn(TARJETA_PANEL, 'flex flex-col overflow-hidden', className)}
     >
-      <header className="flex h-[52px] shrink-0 items-center justify-between gap-2 px-5 py-3">
+      {/* min-h y wrap: unas Tabs (36px) entran sin agrandarlo y en el celular bajan abajo del título (billing.md, 2026-10-09). */}
+      <header className="flex min-h-[52px] shrink-0 flex-wrap items-center justify-between gap-2 px-5 py-2">
         {/* Figma: 13.5px. Subido a 15 para igualar el título del stat card. */}
         <h2 className="flex min-w-0 items-center gap-2 text-[15px] leading-none font-bold text-black">{title}</h2>
         {controls}

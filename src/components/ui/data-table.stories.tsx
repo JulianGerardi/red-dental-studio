@@ -55,6 +55,7 @@ type Args = {
   rowActions: boolean
   primaryAction: boolean
   clickableRows: boolean
+  markClicked: boolean
   density: 'regular' | 'compact'
   pageSize: number
   itemLabel: string
@@ -83,7 +84,7 @@ const meta = {
   args: {
     columns: ['Name', 'Email', 'Status', 'Balance'], rows: 24,
     search: true, filter: true, columnPicker: true, resizable: true, expandable: false, reorderable: false,
-    selectable: true, rowActions: true, primaryAction: true, clickableRows: false,
+    selectable: true, rowActions: true, primaryAction: true, clickableRows: false, markClicked: false,
     density: 'regular', pageSize: 10, itemLabel: 'patients', state: 'ready', disabledRows: false,
   },
   argTypes: {
@@ -99,6 +100,7 @@ const meta = {
     rowActions: { control: 'boolean', description: 'Menú ⋮ con Edit y Delete en cada fila.' },
     primaryAction: { control: 'boolean', description: 'Botón New patient a la derecha de la barra.' },
     clickableRows: { control: 'boolean', description: 'La fila entera abre el detalle (sin expandir).' },
+    markClicked: { control: 'boolean', description: 'Con clickableRows: las filas del paciente clickeado quedan en celeste, sin casillas (selected sin selectable), como Billing.' },
     density: { control: 'inline-radio', options: ['regular', 'compact'], description: 'regular 56px por fila · compact 44px. La fila crece si una celda tiene dos líneas.' },
     pageSize: { control: 'inline-radio', options: [5, 10, 20], description: 'Filas por página.' },
     itemLabel: { control: 'text', description: 'Qué se cuenta en el pie.' },
@@ -128,7 +130,7 @@ function Detalle({ p }: { p: Paciente }) {
   )
 }
 
-function Armada({ columns, rows, search, filter, columnPicker, resizable, expandable, reorderable, selectable, rowActions, primaryAction, clickableRows, density, pageSize, itemLabel, state = 'ready', disabledRows = false }: Args) {
+function Armada({ columns, rows, search, filter, columnPicker, resizable, expandable, reorderable, selectable, rowActions, primaryAction, clickableRows, markClicked = false, density, pageSize, itemLabel, state = 'ready', disabledRows = false }: Args) {
   const [reintentos, setReintentos] = useState(0)
   const [abierta, setAbierta] = useState<string | null>(null)
   const [orden, setOrden] = useState(PACIENTES)
@@ -157,6 +159,7 @@ function Armada({ columns, rows, search, filter, columnPicker, resizable, expand
         rowDetail={expandable ? (p) => <Detalle p={p} /> : undefined}
         reorder={reorderable ? { onReorder: reordenar } : undefined}
         selectable={selectable}
+        selected={markClicked && !selectable ? orden.filter((p) => p.nombre === abierta).map((p) => p.id) : undefined}
         rowActions={rowActions ? () => (
           <>
             <DropdownMenuItem><Pencil className="size-4 shrink-0" /> Edit</DropdownMenuItem>
@@ -182,7 +185,7 @@ function Armada({ columns, rows, search, filter, columnPicker, resizable, expand
 const BASE: Args = {
   columns: ['Name', 'Email', 'Status'], rows: 6,
   search: false, filter: false, columnPicker: false, resizable: false, expandable: false, reorderable: false,
-  selectable: false, rowActions: false, primaryAction: false, clickableRows: false,
+  selectable: false, rowActions: false, primaryAction: false, clickableRows: false, markClicked: false,
   density: 'regular', pageSize: 10, itemLabel: 'patients', state: 'ready', disabledRows: false,
 }
 
@@ -295,6 +298,9 @@ export const States: Story = {
       <Bloque titulo="Selected rows" nota="La fila elegida toma el fondo azul claro y el pie cuenta cuántas hay.">
         <Armada {...BASE} rows={4} selectable />
       </Bloque>
+      <Bloque titulo="Marked rows (row click)" nota="Sin casillas: clic en una fila y quedan en el mismo celeste todas las del mismo paciente (selected sin selectable). Es lo que hace Billing con el paciente elegido; arranca con Maria Abril Viola marcada.">
+        <FilasMarcadas />
+      </Bloque>
       <Bloque titulo="Compact" nota="44px por fila, para listas largas dentro de un panel.">
         <Armada {...BASE} rows={4} density="compact" />
       </Bloque>
@@ -303,6 +309,25 @@ export const States: Story = {
       </Bloque>
     </Lienzo>
   ),
+}
+
+/* Clic en una fila: se marcan todas las de ese paciente, como en Billing. */
+function FilasMarcadas() {
+  const filas = PACIENTES.slice(0, 15)
+  const [paciente, setPaciente] = useState('Maria Abril Viola')
+  return (
+    <DataTable
+      columns={[COLUMNAS.Name!, COLUMNAS.Provider!, COLUMNAS.Balance!]}
+      rows={filas}
+      rowKey={(p) => p.id}
+      rowLabel={(p) => p.nombre}
+      onRowClick={(p) => setPaciente(p.nombre)}
+      selected={filas.filter((p) => p.nombre === paciente).map((p) => p.id)}
+      density="compact"
+      pageSize={15}
+      itemLabel="entries"
+    />
+  )
 }
 
 /* Una fila desplegada desde el principio, en la segunda página. */
@@ -342,7 +367,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Container</td><td>—</td><td><Token nombre="white" /></td><td>—</td><td><Token nombre="line-row" /> · radius 8px</td></tr>
           <tr><td className="font-semibold">Header row</td><td className="tabular-nums">44px</td><td><Token nombre="surface-alt" /></td><td><Token nombre="ink-muted" /> 11px Semibold</td><td>—</td></tr>
           <tr><td className="font-semibold">Row</td><td className="tabular-nums">56px · 44px compact (grows if a cell has two lines)</td><td><Token nombre="white" /></td><td><Token nombre="ink-soft" /> 13px</td><td><Token nombre="line-row" /></td></tr>
-          <tr><td className="font-semibold">Selected row</td><td>—</td><td><Token nombre="dash-count-bg" /></td><td>—</td><td>—</td></tr>
+          <tr><td className="font-semibold">Selected / marked row</td><td>—</td><td><Token nombre="dash-count-bg" /> (the same light blue as a new range in Coverage Table)</td><td>—</td><td>—</td></tr>
           <tr><td className="font-semibold">Footer</td><td className="tabular-nums">52px</td><td><Token nombre="white" /></td><td><Token nombre="ink-muted" /> 12px Semibold</td><td><Token nombre="line-row" /></td></tr>
         </Tabla>
       </Bloque>
@@ -352,6 +377,7 @@ export const Specs: Story = {
           <li>Amounts align right with tabular numbers; text that does not fit ends in “…” and shows in full on hover.</li>
           <li>If the columns do not fit, the table scrolls inside its box: the page never scrolls sideways. An open row detail stays in the visible part while the table scrolls.</li>
           <li>Above the table, never inside it: search and filter on the left; Columns and the main action on the right.</li>
+          <li>A row picked with a click stays marked in light blue, without checkboxes (<code>onRowClick</code> + <code>selected</code>). In Billing every row of the chosen patient is marked.</li>
           <li>Filter options can carry the count and the color dot of their pill (<code>FilterOption</code>), as in Lab Order.</li>
           <li>Turn on Columns and resizable columns when the table has more columns than fit; search and filter when it has more rows than one page.</li>
         </ul>

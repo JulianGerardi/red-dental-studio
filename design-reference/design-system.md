@@ -551,3 +551,19 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
   lo muestra y Specs → Rules lo suma. *Audit / Tables in the app* mide Lab Order desde su Playground.
 - Decisiones en `figma/modulos/clinical-mode.md` (2026-10-08).
 
+## Billing: cards como en Patients y el paciente elegido marcado (2026-10-09)
+
+- *Pages › Parts › Billing* pasa a la estructura de *Elements / Buttons* (antes era una sola historia suelta):
+  **Playground** en iframe (paciente elegido, filtro, búsqueda y actividad vacía), **Parts** (la pantalla y qué hace
+  cada parte), **States** (Patient result: default, hover, selected, focus y nombre largo; Find Patient: con
+  resultados, buscando y sin resultados; Recent Billing Activity: paciente elegido, default, filtrado sin filas, vacío
+  y angosto; Numbers: en la página y adentro de un panel) y **Specs**. `Billing.tsx` exporta `ResultadoPaciente`,
+  `BuscarPaciente` y `ActividadReciente`, y `Billing` acepta `inicial` (sólo stories).
+- *Components / Dashboard / Panel and StatusPill* pasa a Playground, Parts, States y Specs. El encabezado de `Panel`
+  es `min-h-[52px] py-2 flex-wrap`: Tabs de 36px entran sin agrandarlo y en el celular bajan abajo del título.
+- *Elements / Tables*: `selected` sin `selectable` marca filas en celeste sin casillas (con `aria-selected`).
+  Playground suma *markClicked*, States suma *Marked rows (row click)* y Specs, la regla.
+- *Elements / Cards*: la InnerCard clickeable (hover `surface-subtle`) y la elegida (`dash-count-bg`), y dos reglas:
+  los números adentro de un panel son InnerCard y el título de un panel no lleva ícono.
+- Queda para decidir: la card elegida tiene dos lenguajes, el anillo azul (Card de página y AppointmentCard del
+  Dashboard) y el celeste (filas de tabla y los resultados de Billing). Decisiones en `figma/modulos/billing.md`.
