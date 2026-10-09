@@ -1,1 +1,1 @@
-claude/chips-derecha 9063c1840720ab88aa0e6918b0dc8d155d267cfb
+claude/chips-derecha 0e693c232ae14c91521b7a5c7b8d012761e56be8
