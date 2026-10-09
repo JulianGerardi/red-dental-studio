@@ -12,6 +12,7 @@ import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 export function Panel({
   title,
   controls,
+  top,
   className,
   bodyClassName,
   children,
@@ -20,6 +21,8 @@ export function Panel({
       Recent Patients en Patients.tsx- le agregan un globo con el total. */
   title: React.ReactNode
   controls?: React.ReactNode
+  /** Franja arriba del título, de borde a borde: el paciente elegido en Find Patient (Billing). */
+  top?: React.ReactNode
   className?: string
   bodyClassName?: string
   children?: React.ReactNode
@@ -28,7 +31,9 @@ export function Panel({
     <section
       className={cn(TARJETA_PANEL, 'flex flex-col overflow-hidden', className)}
     >
-      <header className="flex h-[52px] shrink-0 items-center justify-between gap-2 px-5 py-3">
+      {top}
+      {/* min-h y wrap: unas Tabs (36px) entran sin agrandarlo y en el celular bajan abajo del título (billing.md, 2026-10-09). */}
+      <header className="flex min-h-[52px] shrink-0 flex-wrap items-center justify-between gap-2 px-5 py-2">
         {/* Figma: 13.5px. Subido a 15 para igualar el título del stat card. */}
         <h2 className="flex min-w-0 items-center gap-2 text-[15px] leading-none font-bold text-black">{title}</h2>
         {controls}

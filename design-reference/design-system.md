@@ -564,3 +564,26 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
 - *Components / Clinical / ExamLayout*: el flotante de View Problem List mide hasta 1240px y llega hasta el borde de
   abajo de la pantalla con scroll adentro. Stories nuevas: *Problem list open*, *Problem list · row open* y **Specs**
   (ancho, alto, posición y sombra del flotante). Decisiones en `figma/modulos/clinical-mode.md` (2026-10-09).
+
+## Billing: cards como en Patients y la vista de un paciente (2026-10-09)
+
+- *Pages › Parts › Billing* pasa a la estructura de *Elements / Buttons* (antes era una sola historia suelta):
+  **Playground** en iframe (paciente o None para el resumen, Patient / Guarantor View, filtro, búsqueda y actividad
+  vacía), **Parts** (la pantalla con un paciente y qué hace cada parte), **States** (Header: resumen y con paciente;
+  Patient card: patient, guarantor y nombre largo; Patient result: default, hover, selected, focus y nombre largo; Find
+  Patient: resumen, con paciente, buscando y sin resultados; Recent Billing Activity: resumen, Patient View, Guarantor
+  View, paciente sin movimientos, filtrado sin filas, vacío y angosto; Numbers) y **Specs**. `Billing.tsx` exporta
+  `EncabezadoBilling`, `PacienteElegido`, `ResultadoPaciente`, `BuscarPaciente` y `ActividadReciente`, y `Billing`
+  acepta `inicial` (sólo stories).
+- *Components / Dashboard / Panel and StatusPill* pasa a Playground, Parts, States y Specs. `Panel` suma `top` (una
+  franja de borde a borde arriba del título) y su encabezado es `min-h-[52px] py-2 flex-wrap`: Tabs de 36px entran
+  sin agrandarlo y en el celular bajan abajo del título.
+- *Elements / Cards*: la InnerCard clickeable (hover `surface-subtle`) y la elegida (`dash-count-bg`), y dos reglas:
+  los números adentro de un panel son InnerCard y el título de un panel no lleva ícono.
+- *Components / UI / InfoTip* (nuevo): el círculo de info de una card con número, sobre `HoverCard` (abre con mouse,
+  toque y Tab). Playground, Parts, States (default, hover, focus, abierto, dos líneas) y Specs. Lo usan los números de
+  Billing (`Stat info`).
+- Animación nueva `paciente-entra` (`src/index.css`): sutil, estilo Apple: 2px, desenfoque leve que se aclara y
+  opacidad, 360ms con `cubic-bezier(0.32, 0.72, 0, 1)`.
+- Queda para decidir: la card elegida tiene dos lenguajes, el anillo azul (Card de página y AppointmentCard del
+  Dashboard) y el celeste (los resultados de Billing). Decisiones en `figma/modulos/billing.md`.
