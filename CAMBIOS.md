@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-09
 
+### Chips con la ✕ a la derecha en todo el sistema ([#23](https://github.com/JulianGerardi/red-dental-studio/pull/23))
+- *Selected area* de New Procedure y de New Condition (Radiography) y las franjas de Working Hours de Locations pasan al
+  `Chip` del design system: celeste, texto azul y la ✕ a la derecha (antes a la izquierda, con tamaños y azules
+  distintos). El *+N* de Working Hours toma el mismo alto y color.
+- **Para el dev:** regla nueva, la ✕ de un chip va siempre a la derecha; usar `ui/chip` y no armar chips a mano. No hay
+  cambios de datos ni de comportamiento.
+
 ### Selects que se abren dentro de una tabla y Chip del design system ([#22](https://github.com/JulianGerardi/red-dental-studio/pull/22))
 - Arreglo: en Fee Schedule By Location, Coordination Of Benefits y Deductible Type de las coverage tables la lista del
   select quedaba escondida (el marco de la tabla recortaba lo que sobresalía). Ahora se abre por encima.

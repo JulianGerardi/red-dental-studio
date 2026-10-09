@@ -1,9 +1,7 @@
 import { Drawer, DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
-import {
-  Plus, ZoomIn, ZoomOut, Trash2, Pencil, ChevronDown,
-  CirclePlus, X, ChevronLeft,
-} from 'lucide-react'
+import { Chip } from '@/components/ui/chip'
+import { Plus, ZoomIn, ZoomOut, Trash2, Pencil, ChevronDown, CirclePlus, ChevronLeft } from 'lucide-react'
 import { FilterTrigger } from '@/components/ui/filter-menu'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
@@ -112,12 +110,7 @@ export function NewCondition({ onClose }: { onClose: () => void }) {
           <p className="text-[13px] font-semibold text-ink">Selected area</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {zona ? (
-              <span className="bg-dash-count-bg text-dash-blue-hover flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] font-semibold">
-                <button onClick={() => setZona(null)} aria-label={`Remove ${zona}`} className="hover:opacity-70">
-                  <X className="size-3" />
-                </button>
-                {zona}
-              </span>
+              <Chip removeLabel={`Remove ${zona}`} onRemove={() => setZona(null)}>{zona}</Chip>
             ) : (
               <span className="text-[12px] text-ink-muted">Pick an area on the image.</span>
             )}

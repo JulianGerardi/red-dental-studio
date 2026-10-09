@@ -382,3 +382,9 @@ Misma regla que New Employee: `components/settings/NewLocationDrawer.tsx`, lg, p
 **Address**, mismos campos y catálogos que la pantalla anterior. `/settings/locations/new` abre la lista con el drawer
 abierto. La locación nueva entra primera en la tabla. Next Step valida sólo el paso a la vista (`lib/useFormPasos`).
 Design system: *Components / Settings / NewLocationDrawer*.
+
+## Working Hours con el Chip del design system (2026-10-09)
+
+Las franjas de horario de cada día pasan a `ui/chip` con la ✕ a la derecha (antes a la izquierda, 11px Semibold y
+`dash-blue-hover`). El *+N* toma el mismo alto (24px), color y tamaño de texto, y suma `aria-label` ("Show 2 more hours
+on Monday"). Mismo criterio que Clinical Mode: la ✕ va al final en todo el sistema.
