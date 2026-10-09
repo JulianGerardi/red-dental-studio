@@ -551,3 +551,8 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
   lo muestra y Specs → Rules lo suma. *Audit / Tables in the app* mide Lab Order desde su Playground.
 - Decisiones en `figma/modulos/clinical-mode.md` (2026-10-08).
 
+## Clinical Mode: View Problem List más ancho (2026-10-09)
+
+- *Components / Clinical / ExamLayout*: el flotante de View Problem List mide hasta 1240px y llega hasta el borde de
+  abajo de la pantalla con scroll adentro. Stories nuevas: *Problem list open*, *Problem list · row open* y **Specs**
+  (ancho, alto, posición y sombra del flotante). Decisiones en `figma/modulos/clinical-mode.md` (2026-10-09).

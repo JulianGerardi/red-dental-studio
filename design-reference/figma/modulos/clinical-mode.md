@@ -2168,3 +2168,20 @@ Desviación del frame: View History deja el pie y el ícono de documento de cada
 *Components / Clinical / LabOrderPanel* (Playground, Parts, States y Specs) y *Elements / Tables* (filtro con cantidad y
 color).
 
+
+## View Problem List con lugar para toda la tabla (2026-10-09)
+
+Julián, con captura de Vitals a ~1480px: el flotante de *View Problem List* cortaba la tabla. Medido: el flotante medía
+820px y la tabla pedía 146px más, así que Status quedaba cortado y Actions sólo se veía scrolleando de costado. Además,
+con una fila abierta el flotante pasaba el borde de abajo de la pantalla (910 en 830) y lo de abajo no se podía ver.
+
+1. **Ancho:** hasta 1240px (o la pantalla menos 32px). Desde 1024px la tabla entra entera, con Status y Actions, y a
+   1280 y 1480 la columna Condition ya no parte los nombres. Si no entra a la derecha del botón, Radix lo corre a la
+   izquierda dejando 16px (`collisionPadding`). A 768 y 390 la tabla sigue scrolleando de costado adentro de su caja.
+2. **Alto:** hasta el borde de abajo de la pantalla (`--radix-popover-content-available-height`) y scroll adentro del
+   flotante (`overscroll-contain`, para que la rueda no mueva la página de atrás).
+3. La sombra pasa al contenido del popover y el radio a 8px, el de la card de la tabla: con el scroll adentro, una
+   sombra en un hijo quedaría recortada.
+
+Se pensó en pasarlo a drawer (la regla de Pop ups), pero es una consulta rápida sin salir del examen, que es para lo que
+está el flotante. Si Julián quiere más lugar todavía, el siguiente paso es un drawer xl.
