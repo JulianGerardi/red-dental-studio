@@ -21,6 +21,8 @@ import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
 import { formatDMY } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 /* Figma 4430:57451 — rediseño del dashboard.
    Cambios respecto de la versión anterior (3605:56445 / 3636:57488):
@@ -48,6 +50,36 @@ export function BotonFiltro({
   onChange: (v: string[]) => void
 }) {
   return <FilterMenu label={label} options={options} value={value} onChange={onChange} size="sm" tour="dash-filter" />
+}
+
+/* La fecha de toda la pantalla y el atajo a hoy. Today va en md: la altura del
+   DatePicker (ver dashboard.md, 2026-10-09). */
+export function FiltroFecha({
+  value, onChange, marked, className,
+}: {
+  value: Date
+  onChange: (d: Date) => void
+  marked?: Date[]
+  className?: string
+}) {
+  return (
+    <div className={cn('flex flex-wrap items-center gap-2', className)} data-tour="dash-date">
+      <DatePicker value={value} onChange={onChange} marked={marked} />
+      {/* Volver a hoy sin tener que abrir el calendario y buscar el día.
+          Desaparece cuando ya estás en hoy: no tendría nada que hacer. */}
+      {!sameDay(value, new Date()) && (
+        <Button
+          variant="secondary" size="md" onClick={() => onChange(new Date())} title="Go to today"
+          className="shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]"
+        >
+          <CalendarClock /> Today
+        </Button>
+      )}
+      <span className="text-[12px] text-ink-muted">
+        Appointments, waiting room and tasks follow this date.
+      </span>
+    </div>
+  )
 }
 
 export default function Dashboard() {
@@ -177,23 +209,7 @@ export default function Dashboard() {
       {/* La fecha manda sobre las tres columnas, así que vive acá arriba y no
           adentro de Appointments: metida en una de las tres, parecía filtrar
           sólo esa. */}
-      <div className="mt-4 flex flex-wrap items-center gap-2" data-tour="dash-date">
-        <DatePicker value={date} onChange={setDate} marked={diasConDatos} />
-        {/* Volver a hoy sin tener que abrir el calendario y buscar el día.
-            Desaparece cuando ya estás en hoy: no tendría nada que hacer. */}
-        {!hoy && (
-          <button
-            onClick={() => setDate(new Date())}
-            title="Go to today"
-            className="flex h-9 items-center gap-1.5 rounded-md border border-line bg-white px-3 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle"
-          >
-            <CalendarClock className="size-4" /> Today
-          </button>
-        )}
-        <span className="text-[12px] text-ink-muted">
-          Appointments, waiting room and tasks follow this date.
-        </span>
-      </div>
+      <FiltroFecha className="mt-4" value={date} onChange={setDate} marked={diasConDatos} />
 
       <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Panel

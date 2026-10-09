@@ -551,3 +551,10 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
   lo muestra y Specs → Rules lo suma. *Audit / Tables in the app* mide Lab Order desde su Playground.
 - Decisiones en `figma/modulos/clinical-mode.md` (2026-10-08).
 
+## Dashboard: fila de fecha (2026-10-09)
+
+- *Pages / Parts / Dashboard* deja de ser una lista suelta: **Playground** con la fila de fecha (*day*, *markedDays*),
+  **Parts** (selector, Today, línea de alcance; botón de filtro), **States** (otro día, hoy, Today en hover, calendario
+  abierto; filtro sin y con selección) y **Specs** (alto, padding, texto, radio, borde e ícono del selector y de Today,
+  leídos del render, y los tokens de Today).
+- Regla: Today es `Button` secondary md, 32px como el selector. Decisiones en `figma/modulos/dashboard.md` (2026-10-09).
