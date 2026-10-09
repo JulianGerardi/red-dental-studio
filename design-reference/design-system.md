@@ -580,6 +580,10 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
   sin agrandarlo y en el celular bajan abajo del título.
 - *Elements / Cards*: la InnerCard clickeable (hover `surface-subtle`) y la elegida (`dash-count-bg`), y dos reglas:
   los números adentro de un panel son InnerCard y el título de un panel no lleva ícono.
-- Animación nueva `paciente-entra` (`src/index.css`): baja 6px y aparece, 220ms.
+- *Components / UI / InfoTip* (nuevo): el círculo de info de una card con número, sobre `HoverCard` (abre con mouse,
+  toque y Tab). Playground, Parts, States (default, hover, focus, abierto, dos líneas) y Specs. Lo usan los números de
+  Billing (`Stat info`).
+- Animación nueva `paciente-entra` (`src/index.css`): sutil, estilo Apple: 2px, desenfoque leve que se aclara y
+  opacidad, 360ms con `cubic-bezier(0.32, 0.72, 0, 1)`.
 - Queda para decidir: la card elegida tiene dos lenguajes, el anillo azul (Card de página y AppointmentCard del
   Dashboard) y el celeste (los resultados de Billing). Decisiones en `figma/modulos/billing.md`.

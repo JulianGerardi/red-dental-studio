@@ -16,6 +16,7 @@ import { AmountCell, DataTable, TextCell, type DataTableColumn } from '@/compone
 import { CONTENEDOR_PAGINA, ICONO_SUELTO, TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
 import { Panel } from '@/components/dashboard/primitives'
+import { InfoTip } from '@/components/ui/info-tip'
 import { cn } from '@/lib/utils'
 
 /* Figma 4481:9881 "Billing". Ver design-reference/figma/modulos/billing.md.
@@ -34,11 +35,15 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
     : { texto: 'Charge Adj', tono: 'danger' }
 }
 
-/* Sobre el fondo gris es card de página; adentro de Today o de Selected patient, InnerCard (billing.md, 2026-10-09). */
-export function Stat({ label, value, caption, interna }: { label: string; value: string; caption: string; interna?: boolean }) {
+/* Sobre el fondo gris es card de página; adentro de Today o de los saldos del garante, InnerCard. `info` suma el círculo
+   de info arriba a la derecha (billing.md, 2026-10-09). */
+export function Stat({ label, value, caption, info, interna }: { label: string; value: string; caption: string; info?: string; interna?: boolean }) {
   return (
     <div className={cn('min-w-0 p-4', interna ? TARJETA_INTERNA : TARJETA_PANEL)}>
-      <p className="truncate text-xs text-ink-muted" title={label}>{label}</p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="truncate text-xs text-ink-muted" title={label}>{label}</p>
+        {info && <InfoTip title={label}>{info}</InfoTip>}
+      </div>
       <p className="text-dash-blue mt-1 text-xl font-bold">{value}</p>
       <p className="mt-0.5 truncate text-[11px] text-ink-faint">{caption}</p>
     </div>
@@ -106,12 +111,15 @@ export function ResultadoPaciente({ paciente, saldo, elegido, onElegir }: {
   )
 }
 
-/* El paciente que se está viendo, de borde a borde arriba de Find Patient. Entra con una animación corta; la X vuelve al
+/* Entrada sutil, estilo Apple: aparece desenfocándose apenas, 2px y una curva que frena suave (billing.md, 2026-10-09). */
+const ENTRADA = 'motion-safe:animate-[paciente-entra_360ms_cubic-bezier(0.32,0.72,0,1)_both]'
+
+/* El paciente que se está viendo, de borde a borde arriba de Find Patient. Entra con la ENTRADA; la X vuelve al
    resumen de la clínica (billing.md, segunda vuelta del 2026-10-09). */
 export function PacienteElegido({ paciente, onCerrar }: { paciente: PacienteBilling; onCerrar: () => void }) {
   return (
-    <div className="flex items-center gap-3 border-b border-line-row bg-dash-count-bg px-5 py-3 motion-safe:animate-[paciente-entra_220ms_ease-out]">
-      <span className="bg-dash-blue flex size-10 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold text-white ring-2 ring-white motion-safe:animate-[tab-in_260ms_ease-out]">
+    <div className={cn('flex items-center gap-3 border-b border-line-row bg-dash-count-bg px-5 py-3', ENTRADA)}>
+      <span className="bg-dash-blue flex size-10 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold text-white">
         {initials(paciente.nombre)}
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -156,7 +164,7 @@ export function ActividadReciente({
         : <Tabs size="sm" aria-label="Filter activity" tabs={FILTROS_ACTIVIDAD} value={filtro} onChange={onFiltro} />}
     >
       {paciente && (
-        <div ref={refElegido} key={paciente.nombre} className="grid scroll-mt-20 grid-cols-1 gap-3 sm:grid-cols-2 motion-safe:animate-[paciente-entra_220ms_ease-out]">
+        <div ref={refElegido} key={paciente.nombre} className={cn('grid scroll-mt-20 grid-cols-1 gap-3 sm:grid-cols-2', ENTRADA)}>
           <Stat interna label="Guarantor Unapplied Credits" value={moneda(creditos)} caption="Available to apply" />
           <Stat interna label="Guarantor Open Balance" value={moneda(saldo)} caption="Total outstanding" />
         </div>
@@ -247,7 +255,7 @@ export function EncabezadoBilling({ conPaciente, onAccion, onExportar }: {
     <div className="flex min-h-9 flex-wrap items-center justify-between gap-3">
       <PageTitle>Billing</PageTitle>
       {conPaciente && (
-        <div className="flex flex-wrap items-center gap-2 motion-safe:animate-[paciente-entra_220ms_ease-out]">
+        <div className={cn('flex flex-wrap items-center gap-2', ENTRADA)}>
           <button type="button" onClick={() => onAccion('Patient Payment')} className={BOTON_ACCION}>
             <Wallet className="size-3.5" /> Patient Payment (-)
           </button>

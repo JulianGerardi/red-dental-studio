@@ -452,10 +452,11 @@ body { font-family: var(--font-sans); }
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* Billing: la card del paciente elegido baja arriba de Find Patient y aparecen los botones de pago (billing.md). */
+/* Billing: la card del paciente elegido arriba de Find Patient, sus saldos y los botones de pago. Sutil, estilo Apple:
+   2px, un desenfoque leve que se aclara y opacidad (billing.md). */
 @keyframes paciente-entra {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: none; }
+  from { opacity: 0; transform: translateY(-2px) scale(0.995); filter: blur(2px); }
+  to   { opacity: 1; transform: none; filter: none; }
 }
 
 /* Al abrir un Dialog o Drawer, Radix bloquea el scroll y define esta variable en :root. Heredable, obligaba a recalcular

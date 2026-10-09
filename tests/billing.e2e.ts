@@ -33,3 +33,10 @@ test('En el resumen, una fila abre la vista de ese paciente en Patient View', as
   await expect(screen.getByRole('tab', 'Patient View')).toHaveAttribute('aria-selected', 'true')
   await expect(screen.getByText(/Showing 1 to 3 of 3 entries/)).toBeVisible()
 })
+
+test('El círculo de info de un número explica qué cuenta', async ({ app, screen }) => {
+  await app.open('/billing')
+  await expect(screen.getByText(/Open charge balances older than 30 days/)).toHaveCount(0)
+  await screen.getByRole('button', /^Overdue Balance:/).hover()
+  await expect(screen.getByText(/^Open charge balances older than 30 days\.$/)).toBeVisible()
+})

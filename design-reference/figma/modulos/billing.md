@@ -191,10 +191,29 @@ la pantalla sin paciente queda como está; al elegir uno, Billing pasa a ser la 
    reducido aparece sin animar. La franja está en una región `aria-live`: el lector de pantalla dice el nombre.
 6. **Botones sólo con paciente.** Patient Payment, Credit Adjustment, Charge Adjustment y Export statement aparecen
    recién con un paciente: siempre postean para él. El encabezado reserva el alto (36px) para que la página no salte.
-7. **Mensajes de cada card.** red.dev tiene un ícono de info con un mensaje en cada número (por ejemplo *Payments
-   Posted Today: Sum of payment transactions posted today (practice timezone)*). Queda para la próxima tanda, con las
-   capturas que va a pasar Julián.
+7. **Mensajes de cada card.** red.dev tiene un ícono de info con un mensaje en cada número. Se sumó en la tercera
+   vuelta (abajo).
 
 **Para validar con usuarios:** si recepción encuentra cómo postear un pago sin los botones a la vista en el resumen
 (hay que elegir un paciente primero); si Guarantor View se entiende sin explicación; y si la X de la franja se
 encuentra para volver al resumen o hace falta un "Back to all activity" con texto.
+
+## Tercera vuelta (2026-10-09): círculos de info y animación más sutil
+
+1. **Círculo de info en cada número** (`ui/info-tip`, nuevo en el design system). Arriba a la derecha de los cinco
+   números y de los tres de Today; al pasar el mouse, tocar o llegar con Tab abre una card blanca con el título y qué
+   cuenta. Es un `HoverCard` y no un `Tooltip`: la regla del design system dice que el Tooltip oscuro sólo nombra y lo
+   que explica en una o dos líneas va en HoverCard, que es además lo que muestra red.dev. Gris como la etiqueta y azul
+   al abrirse. El HoverCard solo no abre con el dedo: `InfoTip` lo abre y cierra tocando.
+2. **Textos.** Los cinco de arriba y *Payments Posted Today* son los de red.dev (capturas de Julián). *Adjustments
+   created* y *Unapplied credits* no tenían captura: los textos son una **propuesta a validar** ("Credit and charge
+   adjustments created today (practice timezone)." y "Payments and credits received that are not applied to a charge
+   yet."). Los saldos del garante (con paciente) no llevan círculo: red.dev no les da texto.
+3. **Etiquetas como red.dev.** *Patient A/R* pasa a **Guarantor A/R** y *Patients with Open Balance* a **Guarantors
+   with Open Charges**, para que el título del mensaje sea el mismo que el de la card (y porque el saldo es del
+   garante, como en Guarantor View). Las bajadas acompañan: "Outstanding guarantor responsibility" y "Guarantors with a
+   remaining balance". Se apartan del Figma, que decía Patient.
+4. **Las iniciales de la card del paciente, sin borde.** Se sacó el anillo blanco (`ring-2`).
+5. **Animación más sutil, estilo Apple.** Antes bajaba 6px en 220ms y las iniciales hacían un pop. Ahora la card del
+   paciente, los saldos del garante y los botones aparecen con 2px, un desenfoque de 2px que se aclara y opacidad, en
+   360ms con `cubic-bezier(0.32, 0.72, 0, 1)` (arranca rápido y frena largo). Sin pop.

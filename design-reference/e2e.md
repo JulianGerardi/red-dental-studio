@@ -23,7 +23,7 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   Diagnosis) y Save desde el preview lo cierra y deja los faltantes a la vista en el editor.
 - `tests/billing.e2e.ts` (2026-10-09): elegir un paciente en Find Patient abre su vista (sólo sus movimientos, los
   botones de pago, Guarantor View con todo su garante) y la X vuelve al resumen; una fila del resumen abre la vista de
-  ese paciente en Patient View.
+  ese paciente en Patient View; el círculo de info de Overdue Balance muestra su texto al pasar el mouse.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 

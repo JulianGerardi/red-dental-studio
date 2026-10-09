@@ -4,7 +4,7 @@ import Billing from './Billing'
 import { ActividadReciente, BuscarPaciente, EncabezadoBilling, PacienteElegido, ResultadoPaciente, Stat } from './Billing'
 import { Bloque, Forzar, Lienzo, Tabla, Token, medidasDe, type Medidas } from '@/design-system/kit'
 import {
-  ACTIVIDAD_RECIENTE, FILTROS_ACTIVIDAD, PACIENTES_BILLING, STATS_HOY, VISTAS_PACIENTE, grupoDeGarante, saldoDe,
+  ACTIVIDAD_RECIENTE, FILTROS_ACTIVIDAD, PACIENTES_BILLING, STATS_BILLING, STATS_HOY, VISTAS_PACIENTE, grupoDeGarante, saldoDe,
   type FiltroActividad, type VistaPaciente,
 } from '@/data/billing'
 
@@ -78,10 +78,11 @@ export const Playground: Story = {
 const PARTES: [string, string, string][] = [
   ['Header', 'Billing. Con un paciente elegido suma Patient Payment, Credit Adjustment y Charge Adjustment (abren Post payment con el tipo ya elegido) y Export statement.', 'EncabezadoBilling'],
   ['Summary numbers', 'Cinco números de toda la clínica, cada uno en una card de página (sombra, sin borde). No cambian con el paciente.', 'Stat'],
+  ['Info circle', 'Arriba a la derecha de cada número de arriba y de Today: al pasar el mouse, tocar o llegar con Tab explica qué cuenta (los textos de red.dev).', 'InfoTip'],
   ['Recent Billing Activity', 'Resumen: toda la clínica y las Tabs de tipo. Paciente: su nombre en el título, Patient View / Guarantor View, los dos saldos del garante y sólo sus movimientos.', 'ActividadReciente · Panel'],
   ['Guarantor numbers', 'Sólo con paciente: Unapplied Credits y Open Balance de todo lo que paga su garante, en InnerCard.', 'Stat interna'],
   ['Activity table', 'La tabla de la app, compacta. En el resumen, clic en una fila abre la vista de ese paciente.', 'DataTable'],
-  ['Patient card', 'Sólo con paciente: de borde a borde arriba de Find Patient, con iniciales, nombre, rol (y su garante si es Patient) y la X que vuelve al resumen. Entra bajando y apareciendo (220ms).', 'PacienteElegido · Panel top'],
+  ['Patient card', 'Sólo con paciente: de borde a borde arriba de Find Patient, con iniciales (sin borde), nombre, rol (y su garante si es Patient) y la X que vuelve al resumen. Entra sutil, estilo Apple: 2px, un desenfoque leve que se aclara y opacidad (360ms).', 'PacienteElegido · Panel top'],
   ['Find Patient', 'Panel con el buscador (nombre, apellido o email) y los resultados.', 'BuscarPaciente · Panel'],
   ['Patient result', 'InnerCard con iniciales, nombre, último pago y saldo. Hover gris; el elegido queda en celeste.', 'ResultadoPaciente'],
   ['Today', 'Panel con tres números del día, cada uno en InnerCard.', 'Panel · Stat interna'],
@@ -168,12 +169,12 @@ export const States: Story = {
         <Bloque titulo="Header">
           <Fila>
             <Estado titulo="Overview" nota="Sin paciente: sólo el título. Los pagos y ajustes son de un paciente." ancho={720}><EncabezadoBilling conPaciente={false} onAccion={nada} onExportar={nada} /></Estado>
-            <Estado titulo="Patient selected" nota="Aparecen los tres botones y Export statement, bajando y apareciendo." ancho={720}><EncabezadoBilling conPaciente onAccion={nada} onExportar={nada} /></Estado>
+            <Estado titulo="Patient selected" nota="Aparecen los tres botones y Export statement, con la misma entrada sutil que la card del paciente." ancho={720}><EncabezadoBilling conPaciente onAccion={nada} onExportar={nada} /></Estado>
           </Fila>
         </Bloque>
         <Bloque titulo="Patient card">
           <Fila>
-            <Estado titulo="Patient" nota="Rol y quién paga. Entra bajando 6px y apareciendo (220ms); las iniciales, con un pop. La X vuelve al resumen." ancho={280}><div className="overflow-hidden rounded-lg bg-white"><PacienteElegido paciente={maria!} onCerrar={nada} /></div></Estado>
+            <Estado titulo="Patient" nota="Rol y quién paga. Entra sutil: 2px, un desenfoque leve que se aclara y opacidad, 360ms con una curva que frena suave. La X vuelve al resumen." ancho={280}><div className="overflow-hidden rounded-lg bg-white"><PacienteElegido paciente={maria!} onCerrar={nada} /></div></Estado>
             <Estado titulo="Guarantor" nota="El garante: sólo su rol." ancho={280}><div className="overflow-hidden rounded-lg bg-white"><PacienteElegido paciente={john!} onCerrar={nada} /></div></Estado>
             <Estado titulo="Long name" nota="El nombre se corta con “…” (completo al pasar el mouse); el rol baja a otra línea si no entra." ancho={280}><div className="overflow-hidden rounded-lg bg-white"><PacienteElegido paciente={{ ...diego!, nombre: 'Maria Fernanda Abril Viola de la Torre' }} onCerrar={nada} /></div></Estado>
           </Fila>
@@ -208,8 +209,9 @@ export const States: Story = {
         </Bloque>
         <Bloque titulo="Numbers">
           <Fila>
-            <Estado titulo="On the page" nota="Los cinco de arriba: card de página, sombra y sin borde." ancho={248}><Stat label="Total A/R" value="$2,131.86" caption="Across patient and insurance balances" /></Estado>
-            <Estado titulo="Inside a panel" nota="Today y los saldos del garante: InnerCard." ancho={248}><div className="rounded-lg bg-white p-4"><Stat interna {...STATS_HOY[0]!} /></div></Estado>
+            <Estado titulo="On the page" nota="Los cinco de arriba: card de página, sombra y sin borde, con el círculo de info." ancho={248}><Stat {...STATS_BILLING[0]!} /></Estado>
+            <Estado titulo="Inside a panel" nota="Today: InnerCard, también con el círculo de info." ancho={248}><div className="rounded-lg bg-white p-4"><Stat interna {...STATS_HOY[0]!} /></div></Estado>
+            <Estado titulo="Without info" nota="Los saldos del garante (con paciente): red.dev no les da texto, así que no llevan círculo." ancho={248}><div className="rounded-lg bg-white p-4"><Stat interna label="Guarantor Open Balance" value="$150.00" caption="Total outstanding" /></div></Estado>
           </Fila>
         </Bloque>
       </div>
@@ -279,7 +281,8 @@ function Medir() {
             <li>Two modes on one screen: the clinic overview (no patient) and one patient. The X on the patient card goes back to the overview exactly as it was (tab filter included).</li>
             <li>With a patient the table shows only their entries (Patient View) or everything their guarantor pays for (Guarantor View). Each new patient opens in Patient View.</li>
             <li>Payment and adjustment buttons only show with a patient selected: they always post for that patient.</li>
-            <li>The patient card enters by sliding 6px down and fading in (220ms); without motion (reduced motion) it just appears. Screen readers hear the name (aria-live).</li>
+            <li>The patient card, the guarantor numbers and the buttons enter subtly, Apple-style: 2px, a slight blur that clears and a fade, 360ms on a curve that eases out gently. Without motion (reduced motion) they just appear. Screen readers hear the name (aria-live).</li>
+            <li>Every number at the top and in Today has its info circle (InfoTip) explaining what it counts; the guarantor numbers have none.</li>
             <li>Columns: activity 1fr · Find Patient and Today 280px from 1024px; below that, one column. On the phone, picking in Find Patient scrolls up to the patient’s numbers.</li>
             <li>Panel titles have no icon (Panel, 15px Bold). A card on the grey page has a shadow and no border; anything inside a panel is an InnerCard.</li>
           </ul>
