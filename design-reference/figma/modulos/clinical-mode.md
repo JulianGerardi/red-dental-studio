@@ -2185,3 +2185,10 @@ con una fila abierta el flotante pasaba el borde de abajo de la pantalla (910 en
 
 Se pensó en pasarlo a drawer (la regla de Pop ups), pero es una consulta rápida sin salir del examen, que es para lo que
 está el flotante. Si Julián quiere más lugar todavía, el siguiente paso es un drawer xl.
+
+## Selected area con el Chip del design system (2026-10-09)
+
+El área elegida de **New Procedure** y de **New Condition** (Radiography) pasa a `ui/chip`: celeste, texto azul 12px y la
+✕ a la derecha (antes a la izquierda, 11px Semibold; la de Radiography además con esquinas cuadradas y un azul más
+oscuro). Julián eligió la ✕ a la derecha: se lee primero qué es y después la acción, es la convención de Gmail, Jira o
+Material y coincide con el cerrar de drawers y toasts. *"Uper left"* sigue tal cual (anomalía 88).

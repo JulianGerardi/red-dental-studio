@@ -15,7 +15,9 @@ const meta = {
         component: [
           'Algo **elegido que se puede sacar**: los códigos CDT de una excepción o de un consentimiento, un filtro aplicado. Celeste (`dash-count-bg`) con texto azul y la ✕ a la derecha.',
           '',
-          'No es un estado (eso es *Pills*, con borde y color semántico) ni una cuenta (*Counts*). Reemplaza los chips que cada pantalla dibujaba a mano: el gris de Manage Exceptions, el celeste de Consents y el de los filtros de Treatment.',
+          'No es un estado (eso es *Pills*, con borde y color semántico) ni una cuenta (*Counts*). Reemplaza los chips que cada pantalla dibujaba a mano: Manage Exceptions, Consents, los filtros de Treatment, *Selected area* de New Procedure y de Radiography y las franjas de Working Hours.',
+          '',
+          '**La ✕ siempre a la derecha:** se lee primero qué es y después la acción, es la convención de Gmail, Jira o Material, evita borrar sin querer al tocar el comienzo del chip y coincide con el cerrar de drawers y toasts.',
           '',
           '**Probalo:** en *Playground* cambiá el texto, sacá la ✕ o deshabilitalo desde *Controls*.',
         ].join('\n'),

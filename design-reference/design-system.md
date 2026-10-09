@@ -638,8 +638,8 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - *Elements / Chips* (nuevo, `ui/chip`): lo elegido que se puede sacar. Celeste `dash-count-bg`, texto `dash-blue` 12px
   Medium, ✕ a la derecha, 24px de alto. Playground, Parts (y Chip vs Pill), States (default, read only, disabled, long
   text, en lista) y Specs. Reemplaza los chips a mano de Manage Exceptions (gris), Consents y los filtros de Treatment.
-  Quedan para confirmar los de *Selected area* (New Procedure y Radiography) y las franjas de Working Hours, que vienen
-  del Figma con la ✕ a la izquierda.
+  Segunda vuelta: también *Selected area* (New Procedure y Radiography) y las franjas de Working Hours. **Regla: la ✕ va
+  siempre a la derecha** (Julián, 2026-10-09).
 - Patrón de tablas: `TABLA_MARCO` deja `overflow-hidden` porque escondía la lista de los `SelectField` de una celda; las
   esquinas las redondean el encabezado (`rounded-t`) y la última fila (`last:rounded-b`). *Elements / Tables › Specs*
   lo suma a la regla.

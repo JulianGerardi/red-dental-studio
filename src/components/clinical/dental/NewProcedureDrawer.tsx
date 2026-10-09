@@ -1,6 +1,7 @@
 import { Tabs } from '@/components/ui/tabs'
 import { useEffect, useState } from 'react'
-import { ChevronsLeft, ChevronsRight, Search, X } from 'lucide-react'
+import { Chip } from '@/components/ui/chip'
+import { ChevronsLeft, ChevronsRight, Search } from 'lucide-react'
 import { Drawer, DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { SelectField } from '@/components/patients/form'
@@ -138,9 +139,7 @@ export function NewProcedureDrawer({
             <div className="flex w-full flex-col items-start gap-2 border-b border-line pb-4">
               <span className="text-xs font-semibold text-ink-muted">Selected area</span>
               {keepArea ? (
-                <button type="button" onClick={() => setKeepArea(false)} aria-label={`Remove ${area}`} className="bg-dash-count-bg text-dash-blue inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold">
-                  <X className="size-3" /> {area}
-                </button>
+                <Chip removeLabel={`Remove ${area}`} onRemove={() => setKeepArea(false)}>{area}</Chip>
               ) : (
                 <span className="text-xs font-medium text-ink-faint">Full mouth</span>
               )}
