@@ -168,11 +168,14 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
             return modo ? <Fragment key={label}>{conAyuda(boton)}</Fragment> : (
               <Popover key={label} open={problemas} onOpenChange={setProblemas}>
                 {conAyuda(<PopoverTrigger asChild>{boton}</PopoverTrigger>)}
-                <PopoverContent align="start" sideOffset={8} aria-label="Problem list" className="w-[min(820px,calc(100vw-2rem))] gap-0 bg-transparent p-0 shadow-none ring-0">
-                  <div className="rounded-xl shadow-[0_16px_40px_rgb(0_0_0/0.18)]">
-                    {/* Un link del detalle lleva a otra pantalla: el flotante se cierra. */}
-                    <NavegacionClinica.Provider value={ir && ((d) => { setProblemas(false); ir(d) })}><ProblemList /></NavegacionClinica.Provider>
-                  </div>
+                {/* Ancho para que la tabla entre entera, y alto hasta el borde de la pantalla con scroll adentro: con una fila
+                    abierta se salía por abajo. Ver clinical-mode.md (2026-10-09). */}
+                <PopoverContent
+                  align="start" sideOffset={8} collisionPadding={16} aria-label="Problem list"
+                  className="max-h-(--radix-popover-content-available-height) w-[min(1240px,calc(100vw-2rem))] gap-0 overflow-y-auto overscroll-contain rounded-lg bg-transparent p-0 shadow-[0_16px_40px_rgb(0_0_0/0.18)] ring-0"
+                >
+                  {/* Un link del detalle lleva a otra pantalla: el flotante se cierra. */}
+                  <NavegacionClinica.Provider value={ir && ((d) => { setProblemas(false); ir(d) })}><ProblemList /></NavegacionClinica.Provider>
                 </PopoverContent>
               </Popover>
             )

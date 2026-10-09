@@ -558,3 +558,9 @@ controles, después Parts, States y Specs, con el kit `src/design-system/kit.tsx
   abierto; filtro sin y con selección) y **Specs** (alto, padding, texto, radio, borde e ícono del selector y de Today,
   leídos del render, y los tokens de Today).
 - Regla: Today es `Button` secondary md, 32px como el selector. Decisiones en `figma/modulos/dashboard.md` (2026-10-09).
+
+## Clinical Mode: View Problem List más ancho (2026-10-09)
+
+- *Components / Clinical / ExamLayout*: el flotante de View Problem List mide hasta 1240px y llega hasta el borde de
+  abajo de la pantalla con scroll adentro. Stories nuevas: *Problem list open*, *Problem list · row open* y **Specs**
+  (ancho, alto, posición y sombra del flotante). Decisiones en `figma/modulos/clinical-mode.md` (2026-10-09).
