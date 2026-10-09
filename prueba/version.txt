@@ -1,1 +1,1 @@
-claude/fix-dropdown-tablas a9993c0ae5bbabd5cc1e71eaf7cb05c05963fe52
+claude/chips-derecha 9063c1840720ab88aa0e6918b0dc8d155d267cfb
