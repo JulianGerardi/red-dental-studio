@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-09
 
+### Selects que se abren dentro de una tabla y Chip del design system ([#22](https://github.com/JulianGerardi/red-dental-studio/pull/22))
+- Arreglo: en Fee Schedule By Location, Coordination Of Benefits y Deductible Type de las coverage tables la lista del
+  select quedaba escondida (el marco de la tabla recortaba lo que sobresalía). Ahora se abre por encima.
+- Chip nuevo para lo elegido que se puede sacar (celeste, texto azul, ✕ a la derecha): lo usan los procedimientos de
+  Manage Exceptions (antes gris), los códigos de Consents y los filtros de Treatment.
+- **Para el dev:** `TABLA_MARCO` ya no lleva `overflow-hidden` (las esquinas las redondean `TABLA_ENCABEZADO` y la última
+  `TABLA_FILA`); no volver a recortar una tabla con selects adentro. Componente nuevo `ui/chip` (`Chip`, con `onRemove` y
+  `removeLabel`), en *Elements / Chips*.
+
 ### Settings → Billing igual a red.dev: Fee Schedules, Carriers y Coverage Table ([#18](https://github.com/JulianGerardi/red-dental-studio/pull/18))
 - Billing se rehízo desde `red.dev` (lógica, pantallas, campos y textos; estilo nuestro): Carriers → Edit Carrier
   (*Information* | *Insurance Plans / Employers*) → la página del plan con siete pestañas; Fee Schedules con versiones,

@@ -156,3 +156,11 @@ test('Add Range avisa y el breadcrumb sigue la regla de Settings', async ({ app,
   await expect(screen.getByText('A new range was added at the end. Complete it and Save.')).toBeVisible()
   await expect(screen.getByPlaceholder('R. Min').last()).toBeVisible()
 })
+
+test('el select de una celda se abre por encima de la tabla', async ({ app, screen }) => {
+  await app.open('/settings/finance/carriers/aetna/edit/insurance-plans/acme-ppo/edit?section=fee-schedule-by-location')
+  await screen.getByRole('button', /Riverside Care/).tap()
+  await screen.getByRole('button', 'UCR - Red').tap()
+  await screen.getByRole('button', 'Save').tap()
+  await expect(screen.getByText('Fee Schedule By Location was saved.')).toBeVisible()
+})
