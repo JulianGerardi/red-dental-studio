@@ -651,8 +651,21 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   `overflow-hidden` le corta la sombra) y la regla en *Rules*: **una card no va dentro de un `overflow-hidden`**; para
   topar el alto, el scroll va dentro de la card. Lo disparó Today Appointments en Patients, que se veía sin sombra (ver
   `figma/modulos/patients.md`, 2026-10-10).
-- **Propuesta pendiente: sombra de las cards madre** (Julián: "los shadows de las cards madre están muy duros"). Página
-  temporal *Proposals / Card shadow* con tres variantes sobre componentes reales y sobre pantallas reales (*In the app*):
-  A · Subtle (sólo el canto), B · Diffuse (la de hoy con un tercio de la intensidad, recomendada) y C · Floating (amplia y
-  corrida hacia abajo). Las tres sin borde y con `rgb(16 24 40)` en vez del gris neutro. La elegida pasa a
-  `--shadow-panel` y `shadow-stat` toma el mismo valor; la página se borra.
+- **Sombra más suave para todas las cards madre** (Julián: "los shadows de las cards madre están muy duros"). Se
+  propusieron tres variantes en una página temporal (*Proposals / Card shadow*, ya borrada) sobre componentes y pantallas
+  reales: A · Subtle (sólo el canto), B · Diffuse (contacto + difusa hacia abajo) y C · Floating (amplia y corrida hacia
+  abajo). Julián eligió primero la B y después se quedó con **dos alturas**:
+  - **Cards madre → A.** `--shadow-panel` pasa de `0 4px 14px` gris al 25% a `0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px
+    rgb(16 24 40 / 8%)`: casi planas, la sombra de contacto sólo marca el canto (el blanco casi no contrasta con el fondo
+    `#fafbfe`). En gris azulado, el del texto, en vez de gris neutro.
+  - **Pop ups flotantes → B.** Token nuevo `--shadow-floating`: `0 1px 2px rgb(16 24 40 / 4%), 0 4px 16px -2px rgb(16 24
+    40 / 10%)`. Lo que se abre desde un elemento y queda encima de la pantalla: el detalle del paciente de la card de turno
+    (`PatientDetailsPopover`) y su par de Scheduling (`AppointmentDetailsDrawer` en escritorio), `LocationSelector`,
+    `ViewFiltersPanel`, Appointment requests, el menú lateral de Billing/Settings (`Sidebar`), `PatientInSessionPopup`,
+    `ClinicalPopover`, los flotantes de `ClinicalTopBar`, Problem list en `ExamLayout`, `Confibot` y `CoachMark`. Antes
+    cada uno tenía su sombra a mano (`0 8px 24–28px` o `0 12px 32px`, negro del 12% al 22%).
+  - Quedan como estaban: las listas de opciones y menús chicos (`shadow-lg`), los toasts, los drawers (tienen fondo
+    oscurecido) y la hoja de abajo de Scheduling en el celular (su sombra va hacia arriba). Se pueden sumar después.
+- `shadow-stat` (los números del Dashboard: `StatCard` y `StatStrip`) se borra: usan `shadow-panel`. *Elements / Cards →
+  Specs* muestra las dos alturas (*Card on the page* y *Floating pop up*) y la regla; *Foundations / Radius and shadows*
+  las lee del CSS. No cambian `InnerCard` ni el anillo azul de hover y selección.

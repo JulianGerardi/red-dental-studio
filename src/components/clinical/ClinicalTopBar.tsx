@@ -65,7 +65,7 @@ export function Flotante({
       role="dialog"
       aria-label={titulo}
       style={{ left, top: ancla.bottom + 6, width: ancho }}
-      className="motion-safe:animate-[loc-in_120ms_ease-out] fixed z-50 rounded-lg border border-line bg-white p-3 shadow-[0_12px_32px_rgb(0_0_0/0.18)]"
+      className="motion-safe:animate-[loc-in_120ms_ease-out] fixed z-50 rounded-lg border border-line bg-white p-3 shadow-floating"
     >
       <p className="text-[13px] font-bold text-ink">{titulo}</p>
       {children}
@@ -386,7 +386,7 @@ export function ClinicalTopBar({
       </span>
 
       {abierto && (
-        <div className="absolute top-full right-0 z-40 mt-1 w-[220px] rounded-lg border border-line bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
+        <div className="absolute top-full right-0 z-40 mt-1 w-[220px] rounded-lg border border-line bg-white p-1 shadow-floating">
           {['End encounter', 'Discard encounter', 'Encounter settings'].map((t) => (
             <button
               key={t}

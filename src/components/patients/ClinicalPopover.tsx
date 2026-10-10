@@ -73,7 +73,7 @@ export function ClinicalPopover({
       role="dialog"
       aria-label={title}
       style={{ left, top, width: ancho }}
-      className="motion-safe:animate-[fab-panel-in_160ms_cubic-bezier(0.16,1,0.3,1)] absolute z-40 origin-top rounded-lg border border-line bg-[#fafcff] p-2 shadow-[0_8px_24px_rgb(0_0_0/0.12)]"
+      className="motion-safe:animate-[fab-panel-in_160ms_cubic-bezier(0.16,1,0.3,1)] absolute z-40 origin-top rounded-lg border border-line bg-[#fafcff] p-2 shadow-floating"
     >
       <div className="flex flex-col gap-1.5">
         {items.length === 0 && (

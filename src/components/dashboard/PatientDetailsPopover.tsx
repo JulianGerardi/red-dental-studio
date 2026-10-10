@@ -104,7 +104,7 @@ export function PatientDetailsPopover({
       role="dialog"
       aria-label={`Details for ${name}`}
       style={{ left, top, width: ancho }}
-      className="motion-safe:animate-[loc-in_160ms_ease-out] absolute z-50 overflow-hidden rounded-2xl bg-[#fafbfe] p-4 shadow-[0_8px_28px_rgb(0_0_0/0.22)]"
+      className="motion-safe:animate-[loc-in_160ms_ease-out] absolute z-50 overflow-hidden rounded-2xl bg-[#fafbfe] p-4 shadow-floating"
     >
       <button
         type="button"

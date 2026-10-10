@@ -169,7 +169,7 @@ export function LocationSelector() {
           aria-label="Select location"
           className={cn(
             'absolute top-[calc(100%+5px)] left-0 z-50 w-[320px] max-w-[calc(100vw-24px)] rounded-xl border border-line bg-white p-4',
-            'flex flex-col gap-3 shadow-[0_8px_28px_rgb(0_0_0/0.18)]',
+            'flex flex-col gap-3 shadow-floating',
             'motion-safe:animate-[loc-in_140ms_ease-out]',
           )}
         >

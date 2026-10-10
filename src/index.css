@@ -406,8 +406,12 @@
   --color-appt-cancelled-fg: var(--color-ink-medium);
   --color-appt-cancelled-dot: var(--color-ink-muted);
 
-  --shadow-stat: 0 4px 4px 0 rgb(0 0 0 / 0.05);
-  --shadow-panel: 0 4px 14px 0 rgb(100 100 100 / 0.25);
+  /* Dos alturas (Julián, 2026-10-10; ver design-system.md). Las cards madre, todas (también los números del Dashboard):
+     casi planas, sólo la sombra de contacto que marca el canto. Era 0 4px 14px gris al 25% y se veía dura. */
+  --shadow-panel: 0 1px 2px 0 rgb(16 24 40 / 0.06), 0 1px 3px 0 rgb(16 24 40 / 0.08);
+  /* Los pop ups que flotan sobre la pantalla (el detalle del paciente de la card de turno, filtros, locación…): contacto
+     más una difusa que cae hacia abajo. Antes cada uno tenía la suya, entre 12% y 22% de negro. */
+  --shadow-floating: 0 1px 2px 0 rgb(16 24 40 / 0.04), 0 4px 16px -2px rgb(16 24 40 / 0.10);
   /* La card de adentro: el stroke es una línea de medio pixel en gris tenue hecha con sombra (un border de 0.5px Chrome
      lo redondea a 1px), por DENTRO de la card (inset): por fuera, una lista con scroll la recortaba arriba y a los
      costados y sólo quedaba la sombra de abajo. La sombra de afuera es casi nada, para que el borde se vea parejo.

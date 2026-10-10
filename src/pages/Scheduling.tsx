@@ -244,7 +244,7 @@ export default function Scheduling() {
 
       {/* Panel flotante de solicitudes + FAB */}
       {reqOpen && (
-        <div className="motion-safe:animate-[fab-panel-in_180ms_cubic-bezier(0.16,1,0.3,1)] fixed right-[100px] bottom-8 z-30 flex max-h-[70svh] w-[260px] origin-bottom-right flex-col rounded-lg border border-line bg-white p-4 shadow-[0_4px_14px_0_rgb(100_100_100/0.25)]">
+        <div className="motion-safe:animate-[fab-panel-in_180ms_cubic-bezier(0.16,1,0.3,1)] fixed right-[100px] bottom-8 z-30 flex max-h-[70svh] w-[260px] origin-bottom-right flex-col rounded-lg border border-line bg-white p-4 shadow-floating">
           <p className="text-[13px] font-bold text-ink">Appointment requests</p>
           <Tabs
             size="sm"

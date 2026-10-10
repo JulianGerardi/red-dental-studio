@@ -119,7 +119,7 @@ export function PatientInSessionPopup() {
           queda en 0 la caja se queda quieta, sin apagarse del todo. */}
       <div
         className={cn(
-          'flex items-start overflow-hidden rounded-l-xl border border-r-0 border-line bg-white shadow-[0_8px_24px_rgb(0_0_0/0.16)] transition-[width] duration-300 ease-out',
+          'flex items-start overflow-hidden rounded-l-xl border border-r-0 border-line bg-white shadow-floating transition-[width] duration-300 ease-out',
           abierto ? 'w-[336px]' : 'w-[54px]',
           hayEnCurso && 'motion-safe:animate-[session-live_2.6s_ease-in-out_infinite]',
         )}

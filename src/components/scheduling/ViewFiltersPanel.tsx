@@ -107,7 +107,7 @@ export function ViewFiltersPanel({ onClose }: { onClose: () => void }) {
         /* En angosto los 360 fijos se salían de pantalla: ahí el panel se
            ancla a los bordes del viewport en vez de al botón. */
         className={cn(
-          'motion-safe:animate-[loc-in_150ms_ease-out] z-50 overflow-y-auto rounded-xl border border-line bg-white p-5 shadow-[0_8px_28px_rgb(0_0_0/0.18)] sm:p-6',
+          'motion-safe:animate-[loc-in_150ms_ease-out] z-50 overflow-y-auto rounded-xl border border-line bg-white p-5 shadow-floating sm:p-6',
           'fixed inset-x-3 top-[76px] max-h-[calc(100svh-96px)]',
           'sm:absolute sm:inset-x-auto sm:top-[calc(100%+6px)] sm:right-0 sm:max-h-[70vh] sm:w-[360px]',
         )}
