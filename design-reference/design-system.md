@@ -651,3 +651,8 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   `overflow-hidden` le corta la sombra) y la regla en *Rules*: **una card no va dentro de un `overflow-hidden`**; para
   topar el alto, el scroll va dentro de la card. Lo disparó Today Appointments en Patients, que se veía sin sombra (ver
   `figma/modulos/patients.md`, 2026-10-10).
+- **Propuesta pendiente: sombra de las cards madre** (Julián: "los shadows de las cards madre están muy duros"). Página
+  temporal *Proposals / Card shadow* con tres variantes sobre componentes reales y sobre pantallas reales (*In the app*):
+  A · Subtle (sólo el canto), B · Diffuse (la de hoy con un tercio de la intensidad, recomendada) y C · Floating (amplia y
+  corrida hacia abajo). Las tres sin borde y con `rgb(16 24 40)` en vez del gris neutro. La elegida pasa a
+  `--shadow-panel` y `shadow-stat` toma el mismo valor; la página se borra.
