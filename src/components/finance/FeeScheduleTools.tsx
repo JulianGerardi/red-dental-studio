@@ -62,7 +62,7 @@ export function IncreaseAllDrawer({ onClose, onAplicar, seleccionados = 0 }: {
       footer={<FormFooter onCancel={onClose} saveLabel="Confirm" onSave={() => { if (!valido) { setIntentado(true); return } onAplicar({ monto: Number(monto), por, excluirCeros, redondear }); onClose() }} />}
     >
       <div className="flex flex-col gap-4">
-        <div className="grid grid-cols-[1fr_96px] gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <TextField
             label={seleccionados ? 'Increase Selected Fees By' : 'Increase All Fees By'} required placeholder={por === '$' ? '$0.00' : '0'} value={monto}
             onChange={(v) => setMonto(v.replace(/[^\d.-]/g, ''))}

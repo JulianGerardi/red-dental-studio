@@ -9,9 +9,9 @@ import { aviso } from '@/components/ui/toaster'
 import type { Excepcion } from '@/data/location-detail'
 
 /* Figma 3864:317345 "Settings — Location (Exceptions — New Exception
-   Modal)". Name / Abreviattion (typo del frame) / Reason, y un recuadro
-   propio para el rango con Start Time / Date / End Time y "All day
-   exception". Los íconos de basura y guardar que trae el recuadro son
+   Modal)". Name / Abreviattion (typo del frame) / Reason y el rango (Date,
+   Start Time / End Time y "All day exception"); el frame lo pone en un
+   recuadro propio, acá va en la misma grilla de a dos (locations.md). Los íconos de basura y guardar que trae el recuadro son
    redundantes con Cancel/Save del pie —así está en el frame— y se los deja
    con la misma acción: borrar vacía el rango, guardar dispara el submit.
 
@@ -63,41 +63,41 @@ export function NewExceptionModal({
       width="max-w-[420px]"
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
+      {/* Campos de a dos y del mismo ancho (Components / UI / Drawer → Specs → Fields): el recuadro del frame se saca
+          para que el rango no quede más angosto que el resto. Ver locations.md. */}
       <div className="flex flex-col gap-4">
-        <TextField
-          label="Name" required placeholder="Select" value={nombre} onChange={setNombre}
-          error={intentado && !nombre.trim() ? 'This field is required.' : undefined}
-        />
-        <TextField
-          label="Abreviattion" required placeholder="Placeholder" value={abrev} onChange={setAbrev}
-          error={intentado && !abrev.trim() ? 'This field is required.' : undefined}
-        />
-        <SelectField label="Reason" options={RAZONES} value={razon} onChange={setRazon} />
-
-        <div className="rounded-lg border border-line p-3">
-          <div className="flex flex-col gap-4">
-            <SelectField
-              label="Start Time" required placeholder="00:00 hs" options={HORAS}
-              value={inicio} onChange={setInicio}
-              error={intentado && !todoElDia && !inicio.trim() ? 'Required.' : undefined}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField
+            label="Name" required placeholder="Select" value={nombre} onChange={setNombre}
+            error={intentado && !nombre.trim() ? 'This field is required.' : undefined}
+          />
+          <TextField
+            label="Abreviattion" required placeholder="Placeholder" value={abrev} onChange={setAbrev}
+            error={intentado && !abrev.trim() ? 'This field is required.' : undefined}
+          />
+          <SelectField label="Reason" options={RAZONES} value={razon} onChange={setRazon} />
+          <div className="flex flex-col gap-2">
+            <FieldLabel required>Date</FieldLabel>
+            <DatePicker
+              value={fecha} onChange={setFecha} className="h-9 w-full"
+              error={intentado && !fecha ? true : undefined}
             />
-            <div className="flex flex-col gap-2">
-              <FieldLabel required>Date</FieldLabel>
-              <DatePicker
-                value={fecha} onChange={setFecha} className="h-9 w-full"
-                error={intentado && !fecha ? true : undefined}
-              />
-            </div>
-            <SelectField
-              label="End Time" required placeholder="00:00 hs" options={HORAS}
-              value={fin} onChange={setFin}
-              error={intentado && !todoElDia && !fin.trim() ? 'Required.' : undefined}
-            />
-
-            <OptionCheckbox label="All day exception" checked={todoElDia} onChange={setTodoElDia} />
           </div>
+          <SelectField
+            label="Start Time" required placeholder="00:00 hs" options={HORAS}
+            value={inicio} onChange={setInicio}
+            error={intentado && !todoElDia && !inicio.trim() ? 'Required.' : undefined}
+          />
+          <SelectField
+            label="End Time" required placeholder="00:00 hs" options={HORAS}
+            value={fin} onChange={setFin}
+            error={intentado && !todoElDia && !fin.trim() ? 'Required.' : undefined}
+          />
+        </div>
 
-          <div className="mt-3 flex items-center gap-1">
+        <div className="flex items-center justify-between gap-3">
+          <OptionCheckbox label="All day exception" checked={todoElDia} onChange={setTodoElDia} />
+          <div className="flex items-center gap-1">
             <button
               type="button"
               aria-label="Clear range"

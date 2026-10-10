@@ -63,12 +63,12 @@ export function CarrierDrawer({ onClose, onGuardar }: { onClose: () => void; onG
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField label="Payer ID" required placeholder="00000" value={d.payerId} onChange={set('payerId')} error={falta('payerId')} />
             <SelectField label="Printed Claim Format" required placeholder="Select a printed claim format" options={FORMATOS_RECLAMO} value={d.formato} onChange={set('formato')} error={falta('formato')} />
+            <UnitField
+              label="Expected Period of Insurance Claim Resolution" required unit="days" value={Number(d.dias) || 0}
+              onChange={(n) => set('dias')(n > 0 ? String(n) : '')} error={falta('dias')}
+            />
           </div>
-          <UnitField
-            label="Expected Period of Insurance Claim Resolution" required unit="days" value={Number(d.dias) || 0}
-            onChange={(n) => set('dias')(n > 0 ? String(n) : '')} error={falta('dias')}
-          />
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
             <OptionCheckbox label="Do not include Dental Diagnostic Codes" checked={sinDiagnosticos} onChange={setSinDiagnosticos} />
             <OptionCheckbox label="Do not bill Insurance" checked={noFacturar} onChange={setNoFacturar} />
           </div>

@@ -54,8 +54,8 @@ export function NewAccountDrawer({ onClose, onGuardar }: { onClose: () => void; 
     >
       <DrawerStep index={0} step={paso}>
         <DrawerSection title="General Information">
-          <TextField label="Name" required placeholder="Clinic name" value={d.nombre} onChange={set('nombre')} error={falta('nombre')} />
           <div className="grid gap-4 sm:grid-cols-2">
+            <TextField label="Name" required placeholder="Clinic name" value={d.nombre} onChange={set('nombre')} error={falta('nombre')} />
             <TextField label="Subdomain" placeholder="clinic" value={d.subdominio} onChange={set('subdominio')} hint={d.subdominio.trim() ? `${d.subdominio.trim().toLowerCase()}.confidentally.com` : undefined} />
             <TextField label="Fee Schedule Name" placeholder="Fee schedule" value={d.fee} onChange={set('fee')} />
           </div>
@@ -66,8 +66,8 @@ export function NewAccountDrawer({ onClose, onGuardar }: { onClose: () => void; 
             <TextField label="Area Code (3 digits)" required placeholder="555" value={d.area} onChange={set('area')} error={falta('area')} />
             <TextField label="Number (7 digits)" required placeholder="000-0000" value={d.numero} onChange={set('numero')} error={falta('numero')} />
             <TextField label="Email" placeholder="example@example.com" value={d.email} onChange={set('email')} />
+            <TextField label="Website" placeholder="https://" value={d.sitio} onChange={set('sitio')} />
           </div>
-          <TextField label="Website" placeholder="https://" value={d.sitio} onChange={set('sitio')} />
         </DrawerSection>
       </DrawerStep>
 
@@ -80,8 +80,8 @@ export function NewAccountDrawer({ onClose, onGuardar }: { onClose: () => void; 
             <SelectField label="State" required placeholder="Select your region" options={ESTADOS} value={d.estado} onChange={set('estado')} error={falta('estado')} />
             <TextField label="City" required placeholder="Your city" value={d.ciudad} onChange={set('ciudad')} error={falta('ciudad')} />
             <TextField label="ZIP Code" required placeholder="Postal code (only numbers)" value={d.zip} onChange={set('zip')} error={falta('zip')} />
+            <SelectField label="Time Zone" required placeholder="Select your time zone" options={ZONAS} value={d.zona} onChange={set('zona')} error={falta('zona')} />
           </div>
-          <SelectField label="Time Zone" required placeholder="Select your time zone" options={ZONAS} value={d.zona} onChange={set('zona')} error={falta('zona')} />
         </DrawerSection>
       </DrawerStep>
 
@@ -92,8 +92,8 @@ export function NewAccountDrawer({ onClose, onGuardar }: { onClose: () => void; 
             <TextField label="Middle Name" placeholder="Middle name" value={d.middle} onChange={set('middle')} />
             <TextField label="Last Name" required placeholder="Last name" value={d.last} onChange={set('last')} error={falta('last')} />
             <DateField label="Birthdate" required placeholder="Select" onChange={set('nacimiento')} error={falta('nacimiento')} />
+            <TextField label="Email" required placeholder="owner@clinic.com" value={d.ownerEmail} onChange={set('ownerEmail')} error={falta('ownerEmail')} />
           </div>
-          <TextField label="Email" required placeholder="owner@clinic.com" value={d.ownerEmail} onChange={set('ownerEmail')} error={falta('ownerEmail')} />
         </DrawerSection>
         <DrawerSection title="Contact Information">
           <OptionCheckbox label="Copy contact information from account" checked={copiarContacto} onChange={setCopiarContacto} />

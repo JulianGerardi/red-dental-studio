@@ -2192,3 +2192,16 @@ El área elegida de **New Procedure** y de **New Condition** (Radiography) pasa 
 ✕ a la derecha (antes a la izquierda, 11px Semibold; la de Radiography además con esquinas cuadradas y un azul más
 oscuro). Julián eligió la ✕ a la derecha: se lee primero qué es y después la acción, es la convención de Gmail, Jira o
 Material y coincide con el cerrar de drawers y toasts. *"Uper left"* sigue tal cual (anomalía 88).
+
+## New Procedure y New Condition: rótulos y controles de la app (2026-10-10)
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`.
+
+1. **New Procedure**: Selected area, Procedure y Surfaces usan `FieldLabel` (12px Medium `ink`, la regla de la línea 809)
+   en vez de un rótulo semibold gris hecho a mano; los buscadores usan `control()`, con la misma sombra que los demás
+   campos.
+2. **New Condition** (visor de radiografías): lo mismo, más la lupa y el placeholder "Search by code or description" de
+   New Procedure, que busca en el mismo catálogo (antes decía "Select"). Note pasa a `TextArea`.
+3. La búsqueda con su botón Filter es una barra de catálogo, no un par de campos: queda fuera de la grilla.

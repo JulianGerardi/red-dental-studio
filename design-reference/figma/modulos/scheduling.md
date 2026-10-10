@@ -488,3 +488,12 @@ Lo que hay que saber al retomar:
 
 Con la regla nueva (cards con sombra y sin borde), las vistas de semana y mes del calendario siguen con borde: son una
 grilla, como las tablas.
+
+## New Appointment: la fecha del ancho de Start Time (2026-10-10)
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`. Date ocupaba todo el ancho entre pares de media columna; ahora va en la columna
+izquierda, encima de Start Time.
+Los rótulos de Treatment plan y Visit (paso 2) pasan a `FieldLabel`. Patient y los providers siguen de ancho entero:
+son búsquedas de persona.

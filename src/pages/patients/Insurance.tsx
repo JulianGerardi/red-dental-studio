@@ -219,7 +219,7 @@ export default function Insurance() {
                 value={d.orden} onChange={set('orden')} error={req('orden')}
               />
 
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="mt-4 flex flex-col gap-2">
                 <OptionCheckbox label="Assignment of Benefits" />
                 <OptionCheckbox label="Release of Information" />
               </div>
