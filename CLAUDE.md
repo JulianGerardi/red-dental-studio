@@ -36,6 +36,7 @@ npm run dev                                   # :5182 (en el Browser pane: previ
 npm run storybook                             # :6006
 npx tsc -b                                    # tipos
 npm run ds:check                              # cobertura del design system (ver abajo)
+npm run ds:campos                             # campos de los drawers de a dos y del mismo ancho (con Storybook andando)
 npx vite build                                # build de la app
 E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el dev server
 ```

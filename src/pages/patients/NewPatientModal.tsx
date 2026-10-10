@@ -108,14 +108,13 @@ export function NewPatientModal({
             </>
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {/* De a dos, como Edit Patient: nunca tres por fila (Components / UI / Drawer → Specs → Fields). */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <TextField label="First Name" required placeholder="John" value={d.first} onChange={set('first')} error={falta(d.first)} />
                 <TextField label="Middle Name" placeholder="Lorem" value={d.middle} onChange={set('middle')} />
                 <TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={set('last')} error={falta(d.last)} />
-              </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <TextField label="Email" placeholder="john.smith@hotmail.com" value={d.email} onChange={set('email')} />
                 <DateField label="Birthdate" required onChange={set('birthday')} error={falta(d.birthday)} />
+                <TextField label="Email" placeholder="john.smith@hotmail.com" value={d.email} onChange={set('email')} />
               </div>
             </>
           )}

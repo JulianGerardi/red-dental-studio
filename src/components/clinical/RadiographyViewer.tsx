@@ -1,7 +1,8 @@
 import { Drawer, DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
 import { Chip } from '@/components/ui/chip'
-import { Plus, ZoomIn, ZoomOut, Trash2, Pencil, ChevronDown, CirclePlus, ChevronLeft } from 'lucide-react'
+import { Plus, ZoomIn, ZoomOut, Trash2, Pencil, ChevronDown, CirclePlus, ChevronLeft, Search } from 'lucide-react'
+import { FieldLabel, TextArea, control } from '@/components/patients/form'
 import { FilterTrigger } from '@/components/ui/filter-menu'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
@@ -95,6 +96,7 @@ export function NewCondition({ onClose }: { onClose: () => void }) {
   const [zona, setZona] = useState<string | null>(ZONAS[0])
   const [elegido, setElegido] = useState(0)
   const [q, setQ] = useState('')
+  const [nota, setNota] = useState('')
 
   return (
     <Drawer
@@ -107,7 +109,8 @@ export function NewCondition({ onClose }: { onClose: () => void }) {
       )}
     >
         <div>
-          <p className="text-[13px] font-semibold text-ink">Selected area</p>
+          {/* Rótulos y controles de patients/form, como New Procedure (Drawer → Specs → Fields). */}
+          <FieldLabel>Selected area</FieldLabel>
           <div className="mt-2 flex flex-wrap gap-2">
             {zona ? (
               <Chip removeLabel={`Remove ${zona}`} onRemove={() => setZona(null)}>{zona}</Chip>
@@ -120,16 +123,18 @@ export function NewCondition({ onClose }: { onClose: () => void }) {
 
           {paso === 1 ? (
             <>
-              <span className="block text-xs font-medium text-ink">
-                Condition<span className="text-required">*</span>
-              </span>
-              <div className="mt-1.5 flex gap-2">
-                <input
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder="Select"
-                  className="focus:border-dash-blue h-9 min-w-0 flex-1 rounded-md border border-line px-3 text-[13px] placeholder:text-ink-faint focus:outline-none"
-                />
+              <FieldLabel required>Condition</FieldLabel>
+              <div className="mt-2 flex gap-2">
+                <div className="relative min-w-0 flex-1">
+                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+                  <input
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder="Search by code or description"
+                    aria-label="Condition"
+                    className={cn(control(), 'h-9 pr-3 pl-9')}
+                  />
+                </div>
                 <FilterTrigger onClick={() => aviso.info('Filters are not available in this release.')} />
               </div>
 
@@ -169,7 +174,7 @@ export function NewCondition({ onClose }: { onClose: () => void }) {
             </>
           ) : (
             <>
-              <span className="block text-xs font-medium text-ink">Descriptors</span>
+              <FieldLabel>Descriptors</FieldLabel>
               <div className="mt-2 flex flex-wrap gap-2">
                 {['Red', 'White', 'Ulcerated', 'Swollen', 'Painful'].map((d) => (
                   <button
@@ -181,12 +186,7 @@ export function NewCondition({ onClose }: { onClose: () => void }) {
                   </button>
                 ))}
               </div>
-              <span className="mt-4 block text-xs font-medium text-ink">Note</span>
-              <textarea
-                rows={4}
-                placeholder="Add a note for this finding"
-                className="focus:border-dash-blue mt-1.5 w-full resize-none rounded-md border border-line p-3 text-[13px] placeholder:text-ink-faint focus:outline-none"
-              />
+              <TextArea className="mt-4" label="Note" placeholder="Add a note for this finding" value={nota} onChange={setNota} />
             </>
           )}
         </div>

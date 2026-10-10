@@ -644,6 +644,24 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   esquinas las redondean el encabezado (`rounded-t`) y la última fila (`last:rounded-b`). *Elements / Tables › Specs*
   lo suma a la regla.
 
+## Campos de los drawers: de a dos y del mismo ancho (2026-10-10)
+
+- **Regla** (Julián, sobre una captura de Post payment: "no están prolijos o no tienen el mismo tamaño… esa regla aplica
+  para todo"): los campos van en `grid gap-4 sm:grid-cols-2` y llenan su celda; nunca anchos fijos, `flex-wrap` ni tres
+  por fila. El que queda solo va en la columna izquierda; sólo Notes y la búsqueda de paciente o persona ocupan el ancho
+  entero. Casillas una debajo de la otra. Rótulo siempre `FieldLabel` y controles de 36px (`control()` para un input
+  propio). En una card de página, la misma regla con `lg:grid-cols-4` (Ledger).
+- *Components / UI / Drawer*: **Parts → Fields** (Post payment armado con la regla) y **Specs → Fields** (la tabla de
+  reglas); tamaño nuevo **2xl** (1000px) para un paso con una tabla ancha, en el control *size* y en *Specs → Sizes*.
+- **`npm run ds:campos`** (`scripts/ds-campos.mjs`): con Storybook andando, abre cada story y mide los campos de los
+  drawers abiertos (mismo ancho por fila, alineados a la grilla, mismo alto y sin mezclar media columna con ancho entero
+  en un mismo paso). Las búsquedas con lupa y las barras de catálogo quedan afuera. `STORYBOOK_URL` y `CHROMIUM_PATH`
+  opcionales.
+- Arreglados con la medición: Post payment, New Patient, Edit Patient, Edit Contact Details, New Allergy / Medication /
+  Medical Condition / Past Surgery, New Subscription, New Depender, New Exception, New Hours, New Location, New Account,
+  New Employee, New Appointment, New Carrier (y *Information*), PhoneFields, Increase All, New Procedure, New Condition
+  y los paneles Payment / Credit / Charge del Ledger. Decisiones en el `.md` de cada módulo (2026-10-10).
+
 
 ## Cards: la sombra no se recorta (2026-10-10)
 

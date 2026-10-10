@@ -20,6 +20,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   *Elements / Cards → Specs* (*Shadow room*): una card no va dentro de un contenedor con `overflow-hidden`; para topar el
   alto, el scroll va adentro de la card.
 
+### Drawers: campos de a dos y del mismo ancho, Post payment y New Carrier ([#24](https://github.com/JulianGerardi/red-dental-studio/pull/24))
+- Regla de Julián para toda la app: en los drawers los campos van de a dos y del mismo ancho. Post payment ordenado
+  (fecha y monto, tipo y a quién se aplica) y más ancho, para que Ledger Transactions entre entera; la tabla sin ícono.
+  New Carrier con las dos casillas una debajo de la otra. La regla se aplicó en unos 20 drawers y en los formularios del
+  Ledger (cuatro columnas iguales, títulos sin ícono).
+- **Para el dev:** `grid gap-4 sm:grid-cols-2` y cada campo llena su celda; nada de anchos fijos, `flex-wrap` ni tres por
+  fila. Sólo Notes y la búsqueda de paciente o persona van a lo ancho. Casillas apiladas, `FieldLabel` y `control()`.
+  `ui/drawer` suma `2xl` (1000px). Nuevo `npm run ds:campos` (con Storybook andando) mide los campos de todos los
+  drawers. `data/clinicalItems.ts` pierde `ancho: 'full'`. Regla en *Components / UI / Drawer → Specs → Fields*.
+
 ## 2026-10-09
 
 ### Chips con la ✕ a la derecha en todo el sistema ([#23](https://github.com/JulianGerardi/red-dental-studio/pull/23))

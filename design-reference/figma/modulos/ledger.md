@@ -763,3 +763,16 @@ dos acciones tienen que estar disponibles a la vez.
 En la barra, Columns era más bajo (32px), con letra de 12px y gris, al lado de un Filter de 36px: no se veían parejos.
 `ColumnPicker` usa ahora el botón del filtro (`filterTriggerClasses` de `ui/filter-menu`): mismo alto, letra y borde, y
 azul con "visibles/total" cuando hay columnas ocultas. En el encabezado de la tabla de asignación va en tamaño sm.
+
+## Payment, Credit y Charge: campos en grilla de cuatro (2026-10-10)
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`. En una card de página la misma regla lleva más columnas.
+
+1. Los tres paneles (`PatientPaymentPanel`, `CreditAdjustmentPanel`, `ChargeAdjustmentPanel`) dejan los anchos fijos
+   (200, 160, 320px) en `flex-wrap` y pasan a `grid gap-4 sm:grid-cols-2 lg:grid-cols-4`: Charge queda en 4 + 2 y Credit en
+   una fila.
+2. En Payment, las filas de método de pago usan la misma grilla de cuatro (antes 2 o 4 según el método), y la fila de
+   arriba reserva el lugar del botón + / × para que las columnas queden alineadas.
+3. Los títulos de los paneles (Payment, Credit, Adjustment Information) y el de Ledger Transactions van sin ícono.

@@ -185,8 +185,9 @@ export function NewAppointmentModal({
             <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />
           </div>
           {/* onFocus burbujea: uno solo alcanza para la fecha y las horas. Una vez abierto, el calendario se queda. */}
-          <div onFocus={() => setTocoHorario(true)} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
+          <div onFocus={() => setTocoHorario(true)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* La fecha va en la columna izquierda, del ancho de Start Time (Drawer → Specs → Fields). */}
+            <div className="flex flex-col gap-2 sm:col-start-1">
               <FieldLabel required>Date</FieldLabel>
               <DatePicker
                 value={fecha}
@@ -197,10 +198,8 @@ export function NewAppointmentModal({
               />
               <FieldError>{req('date')}</FieldError>
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <SelectField label="Start Time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} />
-              <SelectField label="End Time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
-            </div>
+            <SelectField label="Start Time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} className="sm:col-start-1" />
+            <SelectField label="End Time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <SelectField label="Operatory" required value={d.operatory} onChange={set('operatory')} error={req('operatory')} />
@@ -212,11 +211,11 @@ export function NewAppointmentModal({
         <div className="flex flex-col gap-6">
           <DrawerSection title="Link to treatment plan visit" description="Optional. Show this only when the appointment should be tied to a planned treatment visit.">
             <div className="flex flex-col gap-2">
-              <p className="text-[12px] font-semibold text-ink">Treatment plan</p>
+              <FieldLabel>Treatment plan</FieldLabel>
               {PLANES.map((p) => <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />)}
             </div>
             <div className="flex flex-col gap-2">
-              <p className="text-[12px] font-semibold text-ink">Visit</p>
+              <FieldLabel>Visit</FieldLabel>
               {VISITAS.map((v) => <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />)}
             </div>
           </DrawerSection>
