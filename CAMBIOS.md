@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-10
 
-### Today Appointments en Patients con la sombra de las demás cards (#PR)
+### Today Appointments en Patients con la sombra de las demás cards ([#25](https://github.com/JulianGerardi/red-dental-studio/pull/25))
 - Arreglo: en escritorio el panel *Today Appointments* de Patients se veía sin sombra. La barra lateral que lo envuelve
   tenía `overflow-hidden` y le recortaba la sombra; ahora se ve igual que los paneles del Dashboard. El alto sigue topado
   al de la tabla y la lista de turnos scrollea adentro, como antes.
