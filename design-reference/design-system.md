@@ -644,3 +644,10 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   esquinas las redondean el encabezado (`rounded-t`) y la última fila (`last:rounded-b`). *Elements / Tables › Specs*
   lo suma a la regla.
 
+
+## Cards: la sombra no se recorta (2026-10-10)
+
+- *Elements / Cards → Specs* suma el bloque *Shadow room* (bien: la card scrollea adentro; mal: un contenedor con
+  `overflow-hidden` le corta la sombra) y la regla en *Rules*: **una card no va dentro de un `overflow-hidden`**; para
+  topar el alto, el scroll va dentro de la card. Lo disparó Today Appointments en Patients, que se veía sin sombra (ver
+  `figma/modulos/patients.md`, 2026-10-10).

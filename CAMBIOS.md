@@ -3,6 +3,15 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-10
+
+### Today Appointments en Patients con la sombra de las demás cards (#PR)
+- Arreglo: en escritorio el panel *Today Appointments* de Patients se veía sin sombra. La barra lateral que lo envuelve
+  tenía `overflow-hidden` y le recortaba la sombra; ahora se ve igual que los paneles del Dashboard. El alto sigue topado
+  al de la tabla y la lista de turnos scrollea adentro, como antes.
+- **Para el dev:** regla nueva en *Elements / Cards → Specs* (*Shadow room*): una card (`TARJETA_PANEL`, `Panel`, `Card`)
+  no va dentro de un contenedor con `overflow-hidden`; para topar el alto, el scroll va adentro de la card.
+
 ## 2026-10-09
 
 ### Chips con la ✕ a la derecha en todo el sistema ([#23](https://github.com/JulianGerardi/red-dental-studio/pull/23))

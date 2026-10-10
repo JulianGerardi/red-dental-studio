@@ -211,6 +211,30 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Radius</td><td className="tabular-nums">8px</td></tr>
         </Tabla>
       </Bloque>
+      <Bloque titulo="Shadow room" nota="La sombra sale 14px por fuera de la card: un contenedor con overflow-hidden de su mismo ancho la recorta y la card queda chata, como pasaba con Today Appointments en Patients (2026-10-10). Para topar el alto, el scroll va adentro de la card, no en quien la envuelve.">
+        <div className="flex flex-wrap gap-8 rounded-lg bg-page-background p-6">
+          <div className="flex flex-col gap-2">
+            <span className="text-[12px] font-semibold text-ink">Do · the card scrolls inside</span>
+            <div className={`${TARJETA_PANEL} flex h-28 w-56 flex-col overflow-hidden`}>
+              <span className="px-4 pt-3 text-[12px] font-semibold text-ink">Panel</span>
+              <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
+                {[1, 2, 3, 4].map((n) => <InnerCard key={n} className="h-8 shrink-0" />)}
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-[12px] font-semibold text-field-error">Don't · clipped by overflow-hidden</span>
+            <div className="w-56 overflow-hidden">
+              <div className={`${TARJETA_PANEL} flex h-28 flex-col overflow-hidden`}>
+                <span className="px-4 pt-3 text-[12px] font-semibold text-ink">Panel</span>
+                <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
+                  {[1, 2, 3, 4].map((n) => <InnerCard key={n} className="h-8 shrink-0" />)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Bloque>
       <Bloque titulo="Card inside a panel" nota="La misma superficie para todas las cards que van adentro de un panel (InnerCard): Appointments, Waiting Room, Rooms y Pending Task del Dashboard, los turnos y las tareas del Patient Dashboard y las cards chicas de Patients. Antes cada una tenía su sombra y la del Dashboard (0 4px 2px) se veía dura.">
         <div className="flex flex-wrap gap-4 rounded-lg bg-surface-subtle p-5">
           <InnerCard className="flex h-20 w-48 items-center justify-center text-[12px] text-ink-muted">InnerCard</InnerCard>
@@ -232,6 +256,7 @@ export const Specs: Story = {
           <li>One topic per card. If it needs two titles, it is two cards.</li>
           <li>The action that edits the card goes top right; the ones that save or cancel go in the footer.</li>
           <li>Cards sit on the grey page background, 16–24px apart, with a shadow and no border.</li>
+          <li>Never wrap a card in an overflow-hidden container: it clips the shadow. To cap the height, scroll inside the card.</li>
           <li>A card inside another card has a half-pixel stroke in a faint grey and a soft shadow (InnerCard). That includes the numbers inside a panel (Today and the guarantor numbers in Billing).</li>
           <li>A panel title has no icon: Panel, 15px Bold. The icon only goes inside the card, next to what it explains.</li>
           <li>A clickable inner card goes grey on hover; the chosen one stays light blue (dash-count-bg) while it is selected.</li>

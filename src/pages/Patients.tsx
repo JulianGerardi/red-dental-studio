@@ -175,8 +175,9 @@ export default function Patients() {
             altura tope sale de --patients-alto (ver el effect de arriba) y
             cada panel es flex-1 con scroll propio, así ninguno de los tres
             bloques le gana altura a los otros. Sin tope en mobile: ahí la
-            barra va debajo de la tabla y puede ser tan alta como haga falta. */}
-        <div className="flex w-full flex-col gap-4 lg:w-[336px] lg:shrink-0 lg:max-h-[var(--patients-alto,none)] lg:overflow-hidden">
+            barra va debajo de la tabla y puede ser tan alta como haga falta.
+            Sin overflow-hidden: recortaba la sombra del panel (patients.md, 2026-10-10). */}
+        <div className="flex w-full flex-col gap-4 lg:w-[336px] lg:shrink-0 lg:max-h-[var(--patients-alto,none)]">
           <Panel
             title={<>Today Appointments <Globo n={turnosHoyTodos.length} /></>}
             className="flex-1"

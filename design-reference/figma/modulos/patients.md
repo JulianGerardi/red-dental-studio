@@ -145,3 +145,18 @@ Pedido de Julián sobre el costado de la lista (`src/pages/Patients.tsx`):
   y los 10 turnos) y *Components / UI / RowActionsMenu → Open*. El kebab no tiene anillo de foco propio (usa el del
   navegador, como el de las tablas), por eso no hay un estado de foco dibujado.
 
+
+---
+
+## Patients — sombra de Today Appointments (2026-10-10)
+
+Pedido de Julián: el panel *Today Appointments* no tenía la misma sombra que el resto de las cards.
+
+- El panel ya era `Panel` con `TARJETA_PANEL` (`shadow-panel`, igual que el Dashboard); lo que fallaba era la barra
+  lateral que lo envuelve: tenía `lg:overflow-hidden` y el mismo ancho que el panel (336px), así que recortaba toda la
+  sombra y en escritorio la card se veía chata. En celular no pasaba (el `overflow-hidden` era sólo `lg:`).
+- Se saca el `overflow-hidden` de la barra. El tope de alto (`--patients-alto`, el de la tabla) sigue igual: el panel se
+  achica solo porque él mismo tiene `overflow-hidden` y la lista de turnos ya scrollea adentro. Medido a 1440 y 1024:
+  barra, panel y tabla siguen en 716px y la lista scrollea (688 de contenido en 592 visibles).
+- Regla nueva en *Elements / Cards → Specs* (bloque *Shadow room* y en *Rules*): una card no va dentro de un contenedor
+  con `overflow-hidden`; para topar el alto, el scroll va adentro de la card.
