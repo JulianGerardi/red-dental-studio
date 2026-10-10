@@ -76,7 +76,7 @@ Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span 
 
 Mercado Play, Confidentally y Batech tienen la misma lógica: una sección con las pantallas en detalle (cada decisión con su pantalla en una ventana de Safari sobre el color del proyecto, `swin()` en `_build/common.py`) y un **UI Kit** con cada componente y sus estados (`kit_section()`, `kit_comp()` y `kit_state()`). El kit toma el estilo de cada proyecto con variables CSS: Mercado Play oscuro y amarillo (por defecto), Confidentally claro y azul (`.kd--dental`) y Batech negro y cian (`.kd--batech`).
 
-- **Confidentally**: "Ficha del paciente" con el resumen, los planes de tratamiento, relaciones y facturación y el alta de paciente en dos pasos, desde las pantallas del Figma (`c-*.webp`, a 2x). Los componentes (`c-kit-*.webp`) están recortados de esas mismas pantallas. Esas pantallas también son la preview de la home y la portada del caso.
+- **Confidentally**: "Ficha del paciente" con el resumen, los planes de tratamiento, relaciones y facturación y el alta de paciente en dos pasos, desde las pantallas del Figma (`c-*.webp`, a 2x). Los componentes (`c-kit-*.webp`) están recortados de esas mismas pantallas. Esas pantallas también son la tira de la home y la portada del caso; la tarjeta que aparece al pasar por la palabra sigue mostrando el dashboard.
 - **Batech**: "Cada estado" con la lista de análisis, el bloque de cada fuente, la subida de video y la geocerca (`b-flow-*.webp`, recortadas del tablero del flujo). En el kit, las piezas del formulario están reconstruidas en HTML y renderizadas a 2x (`b-kit-h-*.webp`); el resto sale de las pantallas (`b-kit-*.webp`).
 
 ## Selected work

@@ -47,7 +47,8 @@ b = case_head(
      (T("Platform", "Plataforma"), T("Responsive web app", "Web app responsive")), (T("Scope", "Alcance"), T("Audit, UX, UI, prototype", "Auditoría, UX, UI, prototipo")),
      (T("Tools", "Herramientas"), "Figma, Claude Code, React, Storybook")],
 )
-b += rise(brand_scene(p, "dental", T, big=True), "dental")
+b += rise(f'<div class="bs bs--dental"><div class="bs__dev bs__dev--win">{browser(p, "c-overview", 1976, 2000, "app.confidentally.com", lazy=False)}</div>'
+          f'{notif("<span class=logo-dental>C</span>", T("Triage done for John Smith", "Triage listo para John Smith"), T("Chief complaint still missing", "Falta el motivo de consulta"), "9:41", "bs__nt bs__nt--a")}</div>', "dental")
 b += f"""  <section class="wrap gate-wrap" data-gate="nda-content" data-hash="dd113f6caa9a677a96e4c3a57f6dd18ea4a3e421f85fe9e4a70a3c2f9bd278fb">
     <div class="gate">
       <span class="gate__icon"><svg aria-hidden="true"><use href="#i-lock"/></svg></span>
