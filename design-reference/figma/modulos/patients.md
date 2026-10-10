@@ -160,3 +160,19 @@ controla con `npm run ds:campos`.
    Frequency, Status, Approx Start Date); van en la columna izquierda. Se va la opción `ancho: 'full'` de
    `data/clinicalItems.ts`.
 5. **Insurance** (la pestaña del paciente): Assignment of Benefits y Release of Information, una debajo de la otra.
+
+
+---
+
+## Patients — sombra de Today Appointments (2026-10-10)
+
+Pedido de Julián: el panel *Today Appointments* no tenía la misma sombra que el resto de las cards.
+
+- El panel ya era `Panel` con `TARJETA_PANEL` (`shadow-panel`, igual que el Dashboard); lo que fallaba era la barra
+  lateral que lo envuelve: tenía `lg:overflow-hidden` y el mismo ancho que el panel (336px), así que recortaba toda la
+  sombra y en escritorio la card se veía chata. En celular no pasaba (el `overflow-hidden` era sólo `lg:`).
+- Se saca el `overflow-hidden` de la barra. El tope de alto (`--patients-alto`, el de la tabla) sigue igual: el panel se
+  achica solo porque él mismo tiene `overflow-hidden` y la lista de turnos ya scrollea adentro. Medido a 1440 y 1024:
+  barra, panel y tabla siguen en 716px y la lista scrollea (688 de contenido en 592 visibles).
+- Regla nueva en *Elements / Cards → Specs* (bloque *Shadow room* y en *Rules*): una card no va dentro de un contenedor
+  con `overflow-hidden`; para topar el alto, el scroll va adentro de la card.

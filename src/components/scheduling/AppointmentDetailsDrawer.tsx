@@ -122,7 +122,7 @@ export function AppointmentDetailsDrawer({
       className={
         chico
           ? 'motion-safe:animate-[sheet-in_180ms_ease-out] fixed inset-x-0 bottom-0 z-50 overflow-hidden rounded-t-2xl border-t-[3px] bg-white shadow-[0_-8px_28px_rgb(0_0_0/0.22)]'
-          : 'motion-safe:animate-[loc-in_150ms_ease-out] absolute z-50 overflow-hidden rounded-xl border-t-[3px] bg-white shadow-[0_8px_28px_rgb(0_0_0/0.22)]'
+          : 'motion-safe:animate-[loc-in_150ms_ease-out] absolute z-50 overflow-hidden rounded-xl border-t-[3px] bg-white shadow-floating'
       }
     >
       {chico && (

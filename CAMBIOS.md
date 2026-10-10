@@ -5,6 +5,21 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-10
 
+### Sombras más suaves (cards y pop ups) y Today Appointments con sombra ([#25](https://github.com/JulianGerardi/red-dental-studio/pull/25))
+- Arreglo: en escritorio el panel *Today Appointments* de Patients se veía sin sombra. La barra lateral que lo envuelve
+  tenía `overflow-hidden` y le recortaba la sombra; ahora se ve igual que los paneles del Dashboard. El alto sigue topado
+  al de la tabla y la lista de turnos scrollea adentro, como antes.
+- Sombras más suaves, en dos alturas. Las cards madre (paneles, cards de las pantallas del paciente, Settings, Clinical
+  Mode, Billing y los números del Dashboard) quedan casi planas: sólo una sombra de contacto que marca el canto, en vez
+  del halo gris al 25%. Los pop ups que flotan sobre la pantalla (el detalle del paciente de la card de turno, el
+  selector de locación, filtros, Appointment requests, Patient in session, los flotantes de Clinical Mode, Confibot y
+  CoachMark) llevan una sombra propia, un poco más alta, igual para todos.
+- **Para el dev:** `--shadow-panel` cambia de valor, `shadow-stat` se borra (`StatCard` y `StatStrip` usan
+  `shadow-panel`) y hay un token nuevo, `shadow-floating`, para los pop ups flotantes. Card madre: `shadow-panel` /
+  `TARJETA_PANEL`; pop up flotante: `shadow-floating`; nunca una sombra a mano. Regla nueva en
+  *Elements / Cards → Specs* (*Shadow room*): una card no va dentro de un contenedor con `overflow-hidden`; para topar el
+  alto, el scroll va adentro de la card.
+
 ### Drawers: campos de a dos y del mismo ancho, Post payment y New Carrier ([#24](https://github.com/JulianGerardi/red-dental-studio/pull/24))
 - Regla de Julián para toda la app: en los drawers los campos van de a dos y del mismo ancho. Post payment ordenado
   (fecha y monto, tipo y a quién se aplica) y más ancho, para que Ledger Transactions entre entera; la tabla sin ícono.

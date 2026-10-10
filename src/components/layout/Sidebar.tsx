@@ -190,7 +190,7 @@ function useFlotante(forzarAbierto?: boolean) {
   return { abierto: abiertoPropio || !!forzarAbierto, setAbierto, abrir, cerrarConDelay, pathname }
 }
 
-const PANEL_FLOTANTE = 'motion-safe:animate-[loc-in_120ms_ease-out] z-50 rounded-2xl border border-line bg-white p-2 max-md:mt-2 max-md:max-h-[45svh] max-md:overflow-y-auto md:absolute md:left-full md:ml-2 md:w-[236px] md:shadow-[0_12px_32px_rgb(0_0_0/0.18)]'
+const PANEL_FLOTANTE = 'motion-safe:animate-[loc-in_120ms_ease-out] z-50 rounded-2xl border border-line bg-white p-2 max-md:mt-2 max-md:max-h-[45svh] max-md:overflow-y-auto md:absolute md:left-full md:ml-2 md:w-[236px] md:shadow-floating'
 
 /* Billing, como Settings: el ícono abre al costado un menú con la pantalla de Billing y las tablas que la alimentan
    (Fee Schedules, Carriers, Coverage Tables, las mismas de Settings → Billing). */

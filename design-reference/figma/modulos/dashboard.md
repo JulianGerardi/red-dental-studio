@@ -404,3 +404,12 @@ inputs) y Today estaba armado a mano en 36px (`h-9`), así que quedaba más alto
 La fila se mudó a `FiltroFecha` (exportado de `Dashboard.tsx`) para documentarla: *Pages / Parts / Dashboard* pasa a
 Playground, Parts, States (otro día, hoy, hover, calendario abierto, y el botón de filtro sin y con filtro) y Specs (las
 dos alturas leídas del render).
+
+## Sombra de las cards más suave (2026-10-10)
+
+Julián: "los shadows de las cards madre están muy duros". De tres propuestas, las cards madre van con la A:
+`shadow-panel` pasa a `0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 8%)` (antes la del Figma, `0 4px 14px`
+gris al 25%). Los números (`StatCard`, `StatStrip`) dejan su sombra propia del Figma (`0 4px 4px`, 5%) y usan la misma
+que los paneles. La B queda para los pop ups flotantes, empezando por el detalle del paciente que abre la card de turno
+(`PatientDetailsPopover`, antes `0 8px 28px` al 22%): `shadow-floating`. Las *Especificaciones confirmadas* de arriba quedan como estaban en el Figma;
+esto es una desviación deliberada (ver `figma/README.md`). El detalle de las variantes, en `design-system.md`.

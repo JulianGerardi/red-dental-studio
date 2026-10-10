@@ -172,7 +172,7 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
                     abierta se salía por abajo. Ver clinical-mode.md (2026-10-09). */}
                 <PopoverContent
                   align="start" sideOffset={8} collisionPadding={16} aria-label="Problem list"
-                  className="max-h-(--radix-popover-content-available-height) w-[min(1240px,calc(100vw-2rem))] gap-0 overflow-y-auto overscroll-contain rounded-lg bg-transparent p-0 shadow-[0_16px_40px_rgb(0_0_0/0.18)] ring-0"
+                  className="max-h-(--radix-popover-content-available-height) w-[min(1240px,calc(100vw-2rem))] gap-0 overflow-y-auto overscroll-contain rounded-lg bg-transparent p-0 shadow-floating ring-0"
                 >
                   {/* Un link del detalle lleva a otra pantalla: el flotante se cierra. */}
                   <NavegacionClinica.Provider value={ir && ((d) => { setProblemas(false); ir(d) })}><ProblemList /></NavegacionClinica.Provider>

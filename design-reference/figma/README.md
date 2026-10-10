@@ -103,6 +103,10 @@ Numeradas de forma continua entre módulos, para poder citarlas sin ambigüedad.
 Cambios pedidos que **no** son réplica del Figma:
 
 - Nombre de la tabla de Patients en azul y linkeado (en el Figma es gris `#71717a`).
+- **Sombras más suaves, en dos alturas** (2026-10-10): las cards madre (paneles, cards y números) casi planas
+  (`0 1px 2px` + `0 1px 3px`, gris azulado al 6% y 8%) en vez de las dos del Figma (`0 4px 14px` gris al 25% y
+  `0 4px 4px` al 5%); los pop ups flotantes con `0 1px 2px` + `0 4px 16px -2px` (4% y 10%). Ver `modulos/dashboard.md`
+  y `design-system.md`.
 - Borde del date picker azul sólo en estado activo (en el Figma es permanente).
 - Default del filtro de fecha en `28-02-2026`: al volverse un filtro real no podía
   quedar el `30-02-2026` del diseño.
