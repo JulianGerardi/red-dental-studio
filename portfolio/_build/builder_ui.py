@@ -1,4 +1,5 @@
-"""Confidentally UI, rebuilt in HTML for the scroll scenes:
+"""Confidentally UI, rebuilt in HTML. Both scenes play on their own when they come
+into view (data-play, in ms, see site.js) and can be played again:
 
 pipeline()  Figma → Claude Code → React → Storybook → developers, app and the AI Builder
 builder()   the Builder's Describe panel: the prompt types itself, the AI picks pieces
@@ -50,6 +51,11 @@ I = {
 }
 
 
+REPLAY = (f'<button class="replay" type="button" data-replay hidden>'
+          f'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>'
+          f'{T("Play again", "Ver de nuevo")}</button>')
+
+
 # ---------------- Figma → Claude Code → Storybook ----------------
 def _node(cls, x, y, w, h, on, icon, title, sub, small=False):
     sm = " pd__n--sm" if small else ""
@@ -98,12 +104,22 @@ def pipeline(title_en, title_es):
             ("Developers take them from there.", "Los devs los toman de ahí.",
              "The app imports the same components, and the AI Builder assembles new screens from the catalog.",
              "La app importa los mismos componentes, y el Builder con IA arma pantallas nuevas desde el catálogo.")]
-    cap = "".join(f'<div class="pipe__cap{" is-on" if i == 0 else ""}"><b>{T(a, b)}</b><span>{T(c, d)}</span></div>' for i, (a, b, c, d) in enumerate(caps))
-    return (f'  <section class="scene scene--pin pipe" data-scene="pipe" style="--len:300vh">\n    <div class="scene__pin">'
-            f'<div class="scene__copy"><h2 class="scene__h">{T(title_en, title_es)}</h2></div>'
-            f'<div class="pipe__screen"><div class="mon"><div class="mon__screen fitbox" data-fit="1440x620" data-fit-keep data-fit-pan><div class="fit"><div class="pd">'
+    # Each step also carries a small version of its nodes: on phones the diagram turns into
+    # a vertical flow made of these, so nothing is cropped or panned.
+    def chip(icon, name, cls=""):
+        return f'<span class="pv{cls}"><i>{icon}</i>{name}</span>'
+    vis = [chip(I["sliders"], "Variables") + chip(I["comp"], "Components") + chip(I["type"], "Styles"),
+           chip("", "Claude Code", " pv--claude") + '<span class="pv pv--pill">human-in-the-loop</span>',
+           chip("&lt;/&gt;", "React + Tailwind", " pv--code"),
+           chip("S", "Storybook", " pv--sb") + f'<span class="pv pv--pill pv--dark">{T("Audit in CI", "Auditoría en CI")}</span>',
+           chip(I["users"], T("Developers", "Devs"), " pv--dev") + chip(I["box"], "App", " pv--app") + chip(I["spark"], T("AI Builder", "Builder IA"), " pv--ai")]
+    steps = "".join(f'<li class="pipe__step" data-i="{i}"><span class="pipe__vis">{vis[i]}</span><span class="pipe__n">{i + 1:02d}</span>'
+                    f'<b>{T(a, b)}</b><span class="pipe__t">{T(c, d)}</span></li>' for i, (a, b, c, d) in enumerate(caps))
+    return (f'  <section class="scene pipe" data-scene="pipe" data-play="9000">\n    <div class="pipe__in">'
+            f'<div class="pipe__head"><h2 class="scene__h">{T(title_en, title_es)}</h2>{REPLAY}</div>'
+            f'<div class="pipe__screen"><div class="mon"><div class="mon__screen fitbox" data-fit="1440x620" data-fit-keep><div class="fit"><div class="pd">'
             f'<svg class="pd__wires" viewBox="0 0 1440 620" aria-hidden="true">{wires}</svg>{nodes}</div></div></div></div></div>'
-            f'<div class="pipe__caps" aria-live="polite">{cap}</div></div>\n  </section>\n')
+            f'<ol class="pipe__steps">{steps}</ol></div>\n  </section>\n')
 
 
 # ---------------- the Builder ----------------
@@ -161,9 +177,9 @@ def builder():
              f'<div class="bu__code">{code}</div></div></div>')
     site = (f'<div class="bu__site"><span class="bu__logo">{I["logo"]}</span><b>Confidentally UI</b><em>Design system</em>'
             f'<span class="bu__menu"><span>Foundations</span><span>Elements</span><span>Components</span><span>Pages</span><span>Audit</span><span class="on">Builder</span></span></div>')
-    chips = "".join(f"<span>{T(a, b)}</span>" for a, b in [("1 · Describe it", "1 · Describilo"), ("2 · The AI picks real pieces", "2 · La IA elige piezas reales"),
-                                                           ("3 · The screen assembles", "3 · Se arma la pantalla"), ("4 · Take the code", "4 · Llevate el código")])
-    return (f'  <section class="scene scene--pin bld" data-scene="builder" style="--len:320vh" aria-label="Builder">\n    <div class="scene__pin">'
-            f'<div class="scene__copy"><div class="bld__steps">{chips}</div></div>'
-            f'<div class="bld__box fitbox" data-fit="1440x900" data-fit-pan><div class="fit"><div class="bu">{site}<div class="bu__main">{canvas}{panel}</div></div></div></div>'
+    chips = "".join(f'<button type="button" data-stage="{i}">{T(a, b)}</button>' for i, (a, b) in enumerate( [("1 · Describe it", "1 · Describilo"), ("2 · The AI picks real pieces", "2 · La IA elige piezas reales"),
+                                                           ("3 · The screen assembles", "3 · Se arma la pantalla"), ("4 · Take the code", "4 · Llevate el código")]))
+    return (f'  <section class="scene bld" data-scene="builder" data-play="13000" aria-label="Builder">\n    <div class="bld__in">'
+            f'<div class="bld__head"><div class="bld__steps">{chips}</div>{REPLAY}</div>'
+            f'<div class="bld__box fitbox" data-fit="1440x900"><div class="fit"><div class="bu">{site}<div class="bu__main">{canvas}{panel}</div></div></div></div>'
             f'</div>\n  </section>\n')

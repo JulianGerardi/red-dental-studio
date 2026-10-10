@@ -3,6 +3,7 @@
 Text is bilingual: T(en, es) writes both versions and the page shows the one
 that matches <html data-lang>. The toggle in the nav switches it.
 """
+import re
 from mockups import browser, iphone, notif, brand_scene, far_browser, FAR_PHONE, ICO
 
 FONTS = "https://fonts.googleapis.com/css2?family=Geist:wght@300..800&amp;family=Geist+Mono:wght@400..600&amp;display=swap"
@@ -320,11 +321,11 @@ def tiles_batech(p):
 
 def tiles_dental(p):
     return "".join([
-        tile_screen(p, "dental", "d-dashboard", 1600, 1000, 0),
-        tile_phone(p, "dental", "d-m-patient", 1),
-        tile_card(p, "ds", "d-crop-apptcard", 800, 429, 2),
-        tile_screen(p, "dental", "d-clinical", 1600, 1000, 3),
-        tile_phone(p, "dental", "d-m-scheduling", 4),
+        tile_screen(p, "dental", "c-overview", 1976, 2000, 0),
+        tile_card(p, "ds", "c-kit-plan", 656, 440, 1),
+        tile_screen(p, "dental", "c-relationships", 1959, 1691, 2),
+        tile_card(p, "ds", "c-kit-task", 640, 210, 3),
+        tile_screen(p, "dental", "c-newpatient-2", 1957, 1788, 4),
     ])
 
 
@@ -434,6 +435,40 @@ def fig_phones(p, kind, items, cap_en="", cap_es=""):
 
 def pair(a, b):
     return f'<div class="pair">{a}{b}</div>'
+
+
+# ---------- UI kit: each component with its states (Mercado Play, Confidentally, Batech) ----------
+def _plain(html):
+    """The English text of a label, without tags (for alt text)."""
+    return re.sub(r"<[^>]+>", "", re.sub(r'<span lang="es">.*?</span>', "", html)).strip()
+
+
+def kit_state(p, name, w, h, label, disp=None):
+    """One state: the image shown `disp` CSS px wide (2x crops pass half their width)."""
+    return (f'<figure class="kd__st" data-reveal><div class="kd__img" style="--w:{round(disp or w)}px"><img src="{p}assets/img/{name}.webp" width="{w}" height="{h}" alt="{_plain(label)}" loading="lazy" decoding="async"></div>'
+            f'<figcaption>{label}</figcaption></figure>')
+
+
+def kit_comp(title_en, title_es, text_en, text_es, states, cls=""):
+    return (f'<article class="kd__comp {cls}"><header data-reveal><h3>{T(title_en, title_es)}</h3><p>{T(text_en, text_es)}</p></header>'
+            f'<div class="kd__states">{"".join(states)}</div></article>')
+
+
+def swin(p, name, w, h, url, panel, cap_en="", cap_es="", alt_en="", alt_es="", dark=False, maxw="", view="fit"):
+    """A screen in a Safari window on the project's colour, for the screens-in-detail sections."""
+    c = f"<figcaption>{T(cap_en, cap_es)}</figcaption>" if cap_en else ""
+    st = f' style="max-width:{maxw}"' if maxw else ""
+    return (f'<figure class="shot" data-reveal><div class="panel {panel} mpwin"><div class="mpwin__in"{st}>'
+            f'{browser(p, name, w, h, url, dark=dark, alt_en=alt_en, alt_es=alt_es, view=view)}</div></div>{c}</figure>')
+
+
+def kit_section(sid, theme, title, text, link, comps):
+    """title/text: (en, es); link: (href, en, es) or None."""
+    btn = (f'<a class="btn btn--ghost kd__btn" href="{link[0]}" target="_blank" rel="noopener" data-reveal>{T(link[1], link[2])} {arrow()}</a>' if link else "")
+    return (f'  <section class="kd {theme}" id="{sid}">\n    <div class="wrap">'
+            f'<header class="kd__head"><div class="label" data-reveal>UI Kit</div><h2 class="lines">{T(*title)}</h2>'
+            f'<p data-reveal>{T(*text)}</p>{btn}</header>'
+            f'<div class="kd__grid">{"".join(comps)}</div></div>\n  </section>\n')
 
 
 def decision(title_en, title_es, text, figure):

@@ -220,6 +220,50 @@
     pipe: function (sc, p) { if (sc._run) sc._run(p); },
     builder: function (sc, p) { if (sc._run) sc._run(p); }
   };
+  /* Scenes that play on their own: [data-play] always, [data-play-narrow] on phones.
+     When one comes into view its progress runs 0 → 1 over that many ms, once;
+     a replay button runs it again. */
+  function playMode(sc) { return !reduced && (sc.hasAttribute('data-play') || (sc.hasAttribute('data-play-narrow') && narrow())); }
+  function runScene(sc, p) {
+    setVar(sc, '--p', p);
+    if (sc._run) { sc._run(p); return; }
+    var h = SCENE[sc.getAttribute('data-scene')];
+    if (h) h(sc, p);
+  }
+  function stopPlay(sc) { if (sc._raf) cancelAnimationFrame(sc._raf); sc._raf = 0; sc._played = true; }
+  function play(sc) {
+    stopPlay(sc);
+    var dur = +(sc.getAttribute('data-play') || sc.getAttribute('data-play-narrow')) || 4000;
+    var t0 = 0;
+    var rb = sc.querySelector('[data-replay]');
+    if (rb) rb.hidden = true;
+    var step = function (now) {
+      if (!t0) t0 = now;
+      var t = Math.min(1, (now - t0) / dur);
+      runScene(sc, t);
+      if (t < 1) sc._raf = requestAnimationFrame(step); else { sc._raf = 0; sc._done(); }
+    };
+    sc._raf = requestAnimationFrame(step);
+  }
+  scenes.forEach(function (sc) {
+    sc._done = function () { var rb = sc.querySelector('[data-replay]'); if (rb) rb.hidden = false; };
+    var rb = sc.querySelector('[data-replay]');
+    if (rb) rb.addEventListener('click', function () { play(sc); });
+  });
+  if ('IntersectionObserver' in window) {
+    var playIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var sc = en.target;
+        if (!en.isIntersecting || sc._played || !playMode(sc)) return;
+        play(sc);
+      });
+    }, { threshold: 0.35 });
+    scenes.forEach(function (sc) {
+      if (!sc.hasAttribute('data-play') && !sc.hasAttribute('data-play-narrow')) return;
+      if (playMode(sc)) runScene(sc, 0);
+      playIO.observe(sc);
+    });
+  }
   function layoutScenes() {
     scenes.forEach(function (sc) {
       if (sc.getAttribute('data-scene') !== 'rail') return;
@@ -236,6 +280,7 @@
   function scenesTick(vh) {
     if (reduced) return;
     scenes.forEach(function (sc) {
+      if (playMode(sc)) return;
       var r = sc.getBoundingClientRect();
       if (r.bottom < -vh * 0.5 || r.top > vh * 1.5) return;
       var pin = sc._pin || (sc._pin = sc.querySelector('.scene__pin'));
@@ -246,7 +291,9 @@
       var h = SCENE[sc.getAttribute('data-scene')];
       if (h) h(sc, p);
     });
+    var small = narrow();
     panels.forEach(function (el) {
+      if (small) return;
       var r = el.getBoundingClientRect();
       if (r.bottom < -50) return;
       setVar(el, '--t', r.top > vh ? 0 : easeOut(clamp01((vh - r.top) / (vh * 0.62))));
@@ -299,7 +346,7 @@
   document.querySelectorAll('[data-scene="pipe"]').forEach(function (sc) {
     var nodes = Array.prototype.slice.call(sc.querySelectorAll('[data-on]'));
     var wires = Array.prototype.slice.call(sc.querySelectorAll('[data-wire]'));
-    var caps = Array.prototype.slice.call(sc.querySelectorAll('.pipe__cap'));
+    var caps = Array.prototype.slice.call(sc.querySelectorAll('.pipe__step'));
     var N = caps.length;
     sc._run = function (p) {
       var s = clamp01((p - 0.04) / 0.84) * N;
@@ -310,8 +357,7 @@
         n.classList.toggle('is-now', s >= at && cur === Math.floor(at));
       });
       wires.forEach(function (w) { w.style.strokeDashoffset = (1 - clamp01((s - +w.getAttribute('data-wire')) / 0.7)).toFixed(3); });
-      caps.forEach(function (c, i) { c.classList.toggle('is-on', i === cur); });
-      setVar(sc, '--pan', clamp01((s - 0.5) / (N - 1)));
+      caps.forEach(function (c, i) { c.classList.toggle('is-on', s >= i); c.classList.toggle('is-now', i === cur && p < 1); });
     };
     sc._run(reduced ? 1 : 0);
   });
@@ -329,7 +375,7 @@
     var lines = Array.prototype.slice.call(sc.querySelectorAll('.bu__code .l'));
     var count = sc.querySelector('[data-blocks]');
     var tabs = sc.querySelectorAll('.bu__tabs span');
-    var chips = sc.querySelectorAll('.bld__steps > span');
+    var chips = sc.querySelectorAll('.bld__steps > button');
     var label = sc.querySelector('[data-res-label]');
     var lastN = -1;
     sc._run = function (p) {
@@ -355,8 +401,10 @@
       lines.forEach(function (l, i) { l.classList.toggle('is-in', i < L); });
       var stage = t < 1 ? 0 : !done ? 1 : !code ? 2 : 3;
       chips.forEach(function (c, i) { c.classList.toggle('is-on', i === stage); });
-      setVar(sc, '--pan', stage === 1 || stage === 2 ? 0 : 1);
     };
+    /* each chip jumps to its stage */
+    var at = [0.32, 0.55, 0.74, 1];
+    chips.forEach(function (c, i) { c.addEventListener('click', function () { stopPlay(sc); sc._run(at[i]); sc._done(); }); });
     sc._run(reduced ? 0.74 : 0);
   });
 
@@ -382,22 +430,13 @@
 
   /* Fitted canvases: built at a fixed size (data-fit="WxH") and scaled to their box */
   var fits = Array.prototype.slice.call(document.querySelectorAll('[data-fit]'));
-  /* On phones a [data-fit-pan] canvas fills its box's height instead, so it stays
-     readable; it is wider than the box and the scene pans it with --pan. */
-  var panFit = function () { return window.innerWidth <= 760; };
   function fitAll() {
     fits.forEach(function (box) {
       var wh = box.getAttribute('data-fit').split('x');
-      var pan = box.hasAttribute('data-fit-pan') && panFit();
-      if (pan) box.style.height = '';
-      var k = pan ? box.clientHeight / +wh[1] : box.clientWidth / +wh[0];
+      var k = box.clientWidth / +wh[0];
       if (!k) return;
       box.firstElementChild.style.transform = 'scale(' + k.toFixed(5) + ')';
-      if (box.hasAttribute('data-fit-pan')) {
-        box.style.setProperty('--boxw', box.clientWidth + 'px');
-        box.style.setProperty('--fitw', (pan ? +wh[0] * k : box.clientWidth).toFixed(1) + 'px');
-      }
-      if (!pan && !box.hasAttribute('data-fit-keep')) box.style.height = (+wh[1] * k).toFixed(1) + 'px';
+      if (!box.hasAttribute('data-fit-keep')) box.style.height = (+wh[1] * k).toFixed(1) + 'px';
     });
   }
   fitAll();

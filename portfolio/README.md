@@ -67,10 +67,17 @@ Cada texto se escribe dos veces con `T(en, es)` en `_build/`, que genera `<span 
   - `fan`: los celulares se abren en abanico.
   - `wipe`: la baja fidelidad pasa a alta fidelidad bajo una línea (Mercado Play).
   - `scrub`: una página larga se desplaza dentro de su ventana.
-  - `pipe` y `builder` (Confidentally UI): el diagrama Figma → Claude Code → Storybook → devs se enciende paso a paso, y el Builder escribe el pedido, la IA elige piezas del catálogo y la pantalla se arma, hasta mostrar el código.
-  En el celular `wipe`, `scrub` y `fan` no quedan fijas: cada una se reproduce mientras cruza la pantalla, así nunca hay una pantalla vacía para scrollear. El diagrama y el Builder quedan dentro de su marco, con el contenido a un tamaño legible, y se desplazan adentro para seguir cada paso (`data-fit-pan`). Con "reducir movimiento" todas muestran su estado final.
+  - `pipe` y `builder` (Confidentally UI): no quedan fijas ni siguen el scroll. Se reproducen solas cuando aparecen en pantalla (`data-play`, en ms) y tienen un botón "Ver de nuevo". El diagrama Figma → Claude Code → Storybook → devs se enciende paso a paso con sus cinco pasos debajo (en el celular el diagrama pasa a ser un flujo vertical, sin recortes); el Builder escribe el pedido, la IA elige piezas del catálogo y la pantalla se arma hasta mostrar el código, y cada chip de arriba salta a su etapa.
+  En el celular `wipe`, `scrub` y `fan` no quedan fijas. El abanico se abre mientras cruza la pantalla; `wipe` y `scrub` se reproducen solos a su ritmo al aparecer (`data-play-narrow`), así un deslizamiento rápido no los apura. Las capturas de los casos entran sin inclinación. Con "reducir movimiento" todas muestran su estado final.
 - **Pantallas de los casos** (`.shot`): al entrar con el scroll, el panel de color se abre apenas y la pantalla sube y se asienta con una leve inclinación, al estilo Apple. El avance (`--t`, de 0 a 1) lo calcula `site.js`.
 - Con "reducir movimiento" activado en el sistema, todo queda quieto.
+
+## Pantallas en detalle y UI Kit
+
+Mercado Play, Confidentally y Batech tienen la misma lógica: una sección con las pantallas en detalle (cada decisión con su pantalla en una ventana de Safari sobre el color del proyecto, `swin()` en `_build/common.py`) y un **UI Kit** con cada componente y sus estados (`kit_section()`, `kit_comp()` y `kit_state()`). El kit toma el estilo de cada proyecto con variables CSS: Mercado Play oscuro y amarillo (por defecto), Confidentally claro y azul (`.kd--dental`) y Batech negro y cian (`.kd--batech`).
+
+- **Confidentally**: "Ficha del paciente" con el resumen, los planes de tratamiento, relaciones y facturación y el alta de paciente en dos pasos, desde las pantallas del Figma (`c-*.webp`, a 2x). Los componentes (`c-kit-*.webp`) están recortados de esas mismas pantallas. Esas pantallas también son la preview de la home y la portada del caso.
+- **Batech**: "Cada estado" con la lista de análisis, el bloque de cada fuente, la subida de video y la geocerca (`b-flow-*.webp`, recortadas del tablero del flujo). En el kit, las piezas del formulario están reconstruidas en HTML y renderizadas a 2x (`b-kit-h-*.webp`); el resto sale de las pantallas (`b-kit-*.webp`).
 
 ## Selected work
 

@@ -47,7 +47,7 @@ b = case_head(
      (T("Platform", "Plataforma"), T("Responsive web app", "Web app responsive")), (T("Scope", "Alcance"), T("Audit, UX, UI, prototype", "Auditoría, UX, UI, prototipo")),
      (T("Tools", "Herramientas"), "Figma, Claude Code, React, Storybook")],
 )
-b += rise(f'<div class="bs bs--dental"><div class="bs__dev bs__dev--win">{browser(p, "d-login", 1600, 1000, "app.confidentally.com", lazy=False, view="fit")}</div></div>', "dental")
+b += rise(brand_scene(p, "dental", T, big=True), "dental")
 b += f"""  <section class="wrap gate-wrap" data-gate="nda-content" data-hash="dd113f6caa9a677a96e4c3a57f6dd18ea4a3e421f85fe9e4a70a3c2f9bd278fb">
     <div class="gate">
       <span class="gate__icon"><svg aria-hidden="true"><use href="#i-lock"/></svg></span>
@@ -123,6 +123,72 @@ b += f'  <section class="wrap" style="margin-top:clamp(56px,7vw,110px)">' + pair
 b += fan(p, ["d-m-dashboard", "d-m-patient", "d-m-scheduling"], "The same product in a dentist’s pocket.", "El mismo producto en el bolsillo del odontólogo.",
          "Every screen is responsive. On a phone the patient menu turns into horizontal tabs and panels stack in the order a clinician reads them.",
          "Todas las pantallas son responsive. En el celular el menú del paciente pasa a pestañas horizontales y los paneles se apilan en el orden en que los lee un profesional.")
+# ---- the patient file, screen by screen (Figma), and its UI kit ----
+def cwin(name, w, h, ce="", cs="", ae="", as_="", maxw=""):
+    return swin(p, name, w, h, "app.confidentally.com", "panel--dental", ce, cs, ae, as_, maxw=maxw)
+
+
+b += chapter(T("Patient file", "Ficha del paciente"), h2("Everything about a patient, one click away.", "Todo sobre un paciente, a un clic.") + prose(
+    ("The patient file got its own redesign in Figma: a summary card that never leaves the left column, six sections under it, and every task as a drawer over the page, so the dentist never loses sight of the patient.",
+     "La ficha del paciente tuvo su propio rediseño en Figma: una card de resumen que nunca deja la columna izquierda, seis secciones debajo y cada tarea como un panel sobre la página, para que el odontólogo nunca pierda de vista al paciente.")) +
+    decision("Overview, before the chair", "Resumen, antes del sillón",
+             f"<p>{T('Triage and chief complaint on top, the four clinical histories folded with their counts, insurance coverage, pending tasks and the next appointment requests: what the dentist needs before sitting down.', 'Triage y motivo de consulta arriba, las cuatro historias clínicas plegadas con su cantidad, la cobertura, las tareas pendientes y los próximos turnos: lo que el odontólogo necesita antes de sentarse.')}</p>",
+             cwin("c-overview", 1976, 2000, ae="Patient overview with clinical status, histories, insurance, tasks and appointments", as_="Resumen del paciente con estado clínico, historias, cobertura, tareas y turnos", maxw="720px")) +
+    decision("Treatment plans as cards", "Planes de tratamiento en cards",
+             f"<p>{T('Each plan shows who it is for, its case code, a progress ring, the date it was created and the total, so status and amount read at a glance.', 'Cada plan muestra a quién corresponde, su código de caso, un anillo de progreso, la fecha de creación y el total, así el estado y el monto se leen de un vistazo.')}</p>",
+             cwin("c-treatment", 2000, 1751, ae="Treatment plan cards with progress and totals", as_="Cards de planes de tratamiento con progreso y totales")) +
+    decision("Relationships and billing", "Relaciones y facturación",
+             f"<p>{T('Guardians, guarantors and the household in one place. Editing a relationship opens a drawer: the person, found or created, and whether they are the guardian or the guarantor. The direction can’t change, and the drawer says so.', 'Tutores, garantes y grupo familiar en un solo lugar. Editar una relación abre un panel: la persona, encontrada o creada, y si es tutor o garante. La dirección no se puede cambiar, y el panel lo dice.')}</p>",
+             cwin("c-relationships", 1959, 1691, ae="Relationships and billing with the edit relationship drawer", as_="Relaciones y facturación con el panel para editar la relación")) +
+    decision("A new patient, in steps", "Un paciente nuevo, por pasos",
+             f"<p>{T('Step one links a person who already exists or creates the account with their email; step two adds the guardian, who can also be the guarantor, so a minor is never left without one.', 'El primer paso vincula a una persona que ya existe o crea la cuenta con su mail; el segundo suma al tutor, que también puede ser el garante, así un menor nunca queda sin uno.')}</p>",
+             pair(cwin("c-newpatient-1", 1957, 1787, "<b>Step 1.</b> Link an existing person or create the account.", "<b>Paso 1.</b> Vincular a una persona que ya existe o crear la cuenta.", "New patient drawer, step 1", "Panel de paciente nuevo, paso 1"),
+                  cwin("c-newpatient-2", 1957, 1788, "<b>Step 2.</b> The guardian, who can also be the guarantor.", "<b>Paso 2.</b> El tutor, que también puede ser el garante.", "New patient drawer, step 2", "Panel de paciente nuevo, paso 2"))), "patient-file")
+
+
+def ck(n, w, h, label):
+    return kit_state(p, n, w, h, label, w / 2)
+
+
+b += kit_section("kit", "kd--dental", ("Every component, every state.", "Cada componente, cada estado."),
+                 ("The patient file is built from a short list of pieces, each one designed with its states so the same card works on every screen. These are the ones it uses, straight from the Figma file.",
+                  "La ficha del paciente se arma con una lista corta de piezas, cada una diseñada con sus estados para que la misma card funcione en todas las pantallas. Estas son las que usa, tal cual están en el Figma."), None, [
+    kit_comp("Patient card", "Card del paciente", "Name, age and a verified check, with Start Encounter as the main action. It stays in the left column on every section.",
+             "Nombre, edad y un check de verificado, con Start Encounter como acción principal. Queda en la columna izquierda en todas las secciones.",
+             [ck("c-kit-patient", 356, 236, "Default")]),
+    kit_comp("Section menu", "Menú de secciones", "The six sections of the file. The active one fills with the primary blue.", "Las seis secciones de la ficha. La activa se llena con el azul primario.",
+             [ck("c-kit-menu", 360, 450, T("Active", "Activa"))]),
+    kit_comp("Clinical status", "Estado clínico", "Two chips say what is done and what is missing before the encounter; clinical mode is one click away.",
+             "Dos chips dicen qué está hecho y qué falta antes de la consulta; el modo clínico queda a un clic.",
+             [ck("c-kit-chips", 372, 72, T("Done · missing", "Hecho · falta")), ck("c-kit-clinical-btn", 296, 80, T("Primary with icon", "Primario con ícono"))]),
+    kit_comp("Pending task", "Tarea pendiente", "Who, which doctor and what kind of task, with the deadline and its state in red when it has passed.",
+             "Quién, qué doctor y qué tipo de tarea, con el vencimiento y su estado en rojo cuando ya pasó.",
+             [ck("c-kit-task", 640, 210, T("Expired", "Vencida")), ck("c-kit-filter", 130, 68, T("Filter", "Filtro"))]),
+    kit_comp("Clinical accordion", "Acordeón clínico", "Allergies, conditions, medication and surgeries show their count before they are opened.",
+             "Alergias, condiciones, medicación y cirugías muestran su cantidad antes de abrirlas.",
+             [ck("c-kit-acc-open", 656, 86, T("Open", "Abierto")), ck("c-kit-acc-closed", 656, 86, T("Closed", "Cerrado"))], "kd__comp--col"),
+    kit_comp("Treatment plan card", "Card de plan de tratamiento", "Patient, case code, progress ring, date and total amount.", "Paciente, código de caso, anillo de progreso, fecha y monto total.",
+             [ck("c-kit-plan", 656, 440, T("Completed · 100%", "Completado · 100%"))]),
+    kit_comp("Insurance coverage", "Cobertura", "Order, carrier, plan, subscriber and relation in one table, with primary and secondary told apart by colour.",
+             "Orden, aseguradora, plan, titular y relación en una tabla, con la primaria y la secundaria diferenciadas por color.",
+             [ck("c-kit-insurance", 1322, 354, T("Primary and secondary", "Primaria y secundaria"))], "kd__comp--span"),
+    kit_comp("Appointment requests", "Pedidos de turno", "Next, waiting list and past share one card; the next ones get the blue border and the rest step back.",
+             "Próximos, lista de espera y pasados comparten una card; los próximos llevan el borde azul y el resto queda atrás.",
+             [ck("c-kit-tabs", 1242, 64, T("Tabs", "Pestañas")), ck("c-kit-appt-on", 620, 126, T("Next", "Próximo")), ck("c-kit-appt-off", 620, 122, T("Waiting list · past", "En espera · pasado"))], "kd__comp--span"),
+    kit_comp("Person card", "Card de persona", "The person found by the search, and the same card once it is chosen.", "La persona que encontró la búsqueda, y la misma card una vez elegida.",
+             [ck("c-kit-person-off", 712, 140, T("Found", "Encontrada")), ck("c-kit-person-on", 712, 152, T("Selected", "Seleccionada"))], "kd__comp--col"),
+    kit_comp("Option", "Opción", "Radio options as cards: the chosen one gets the border, and it can hold two lines of explanation.",
+             "Opciones de radio como cards: la elegida lleva el borde, y puede sumar dos líneas de explicación.",
+             [ck("c-kit-radio-on", 712, 84, T("Selected", "Seleccionada")), ck("c-kit-radio-off", 712, 80, T("Unselected", "Sin seleccionar")), ck("c-kit-option-link", 712, 122, T("Two lines", "Dos líneas"))], "kd__comp--col"),
+    kit_comp("Stepper", "Pasos", "Where you are in the flow: the current step in blue, the finished ones in green.", "Dónde estás en el flujo: el paso actual en azul, los terminados en verde.",
+             [ck("c-kit-step1", 712, 86, T("Step 1 of 2", "Paso 1 de 2")), ck("c-kit-step2", 712, 86, T("Step 2 of 3", "Paso 2 de 3"))], "kd__comp--col"),
+    kit_comp("Fields", "Campos", "Label, a red asterisk when it is required, and a placeholder that shows the format.", "Label, un asterisco rojo cuando es obligatorio y un placeholder que muestra el formato.",
+             [ck("c-kit-input", 712, 114, T("Text", "Texto")), ck("c-kit-date", 712, 110, T("Date", "Fecha")), ck("c-kit-select", 712, 120, "Select"), ck("c-kit-search", 506, 62, T("Search", "Búsqueda"))], "kd__comp--col"),
+    kit_comp("Drawer actions", "Acciones del panel", "Every drawer ends the same way: the primary action full width and cancel under it.", "Todos los paneles terminan igual: la acción principal a todo el ancho y cancelar debajo.",
+             [ck("c-kit-save", 712, 168, T("Save · cancel", "Guardar · cancelar")), ck("c-kit-next", 712, 172, T("Next step · cancel", "Siguiente paso · cancelar"))], "kd__comp--col"),
+    kit_comp("Patients table", "Tabla de pacientes", "Initials in a blue avatar, name, birthday and email.", "Iniciales en un avatar azul, nombre, cumpleaños y mail.",
+             [ck("c-kit-row", 934, 92, T("Row", "Fila"))]),
+])
 b += chapter("Design system", h2("Confidentally UI keeps the redesign from drifting.", "Confidentally UI evita que el rediseño se desvíe.") + prose(
     ("The design system went from Figma to code with Claude Code and lives in Storybook, where the developers take each component. It has its own case study.",
      "El design system pasó de Figma al código con Claude Code y vive en Storybook, de donde los devs toman cada componente. Tiene su propio caso.")) +

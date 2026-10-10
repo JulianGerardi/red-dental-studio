@@ -115,8 +115,8 @@ def brand_scene(p, kind, T, big=False):
                 f'</div>')
     if kind == "dental":
         return (f'<div class="bs bs--dental">'
-                f'<div class="bs__dev bs__dev--win">{browser(p, "d-dashboard", 1600, 1000, "app.confidentally.com", lazy=lazy, view="fit")}</div>'
-                f'{notif("<span class=logo-dental>C</span>", T("Noah James checked in", "Noah James llegó"), T("Waiting room · Operatory 2", "Sala de espera · Consultorio 2"), "9:41", "bs__nt bs__nt--a")}'
+                f'<div class="bs__dev bs__dev--win">{browser(p, "c-overview", 1976, 2000, "app.confidentally.com", lazy=lazy)}</div>'
+                f'{notif("<span class=logo-dental>C</span>", T("Triage done for John Smith", "Triage listo para John Smith"), T("Chief complaint still missing", "Falta el motivo de consulta"), "9:41", "bs__nt bs__nt--a")}'
                 f'</div>')
     if kind == "ds":
         return (f'<div class="bs bs--ds">'

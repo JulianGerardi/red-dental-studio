@@ -109,6 +109,30 @@ flow = (f'      <figure class="shot" data-reveal><div class="zoomer" data-zoomer
         f'<figcaption>{T("<b>The to-be flow</b>, prototyped in high fidelity in Figma: the three source branches, the geofence, the confirmation and the report. Zoom in with the mouse wheel to read every screen, or open it in Figma.", "<b>El flujo to-be</b>, prototipado en alta fidelidad en Figma: las tres ramas de fuente, la geocerca, la confirmación y el reporte. Hacé zoom con la rueda del mouse para leer cada pantalla, o abrilo en Figma.")}</figcaption></figure>\n')
 body += chapter(T("The whole flow", "El flujo completo"), h2("Every branch, on one board.", "Cada rama, en un solo tablero.") + flow, "board")
 
+# ---- every source and state of the new analysis, screen by screen ----
+def bwin(name, w, h, ce="", cs="", ae="", as_="", maxw=""):
+    return swin(p, name, w, h, "app.batech.ai/analisis/nuevo", "panel--batech", ce, cs, ae, as_, dark=True, maxw=maxw)
+
+
+body += chapter(T("Every state", "Cada estado"), h2("Three sources, one form.", "Tres fuentes, un solo formulario.") + prose(
+    ("The form keeps its order whatever the source: the general aspects, the schedule and the source, and then only the block that source needs. Each option and each error was drawn before it was built.",
+     "El formulario mantiene su orden sea cual sea la fuente: aspectos generales, horarios y fuente, y después solo el bloque que esa fuente necesita. Cada opción y cada error se dibujó antes de construirse.")) +
+    decision("Start from the list", "Empezar desde la lista",
+             f"<p>{T('Each analysis is a row with its status at the end, in colour: retry, error, active or configured. Four filters and a page counter keep 300 pages navigable, and “Nuevo análisis” opens the form.', 'Cada análisis es una fila con su estado al final y en color: reintento, error, activo o configurado. Cuatro filtros y un contador de páginas mantienen navegables 300 páginas, y “Nuevo análisis” abre el formulario.')}</p>",
+             bwin("b-analisis", 1200, 857, ae="Analyses list with status badges", as_="Lista de análisis con estados", maxw="900px")) +
+    decision("A block for each source", "Un bloque para cada fuente",
+             f"<p>{T('A video service asks for the service and the camera; an RTSP link asks for the address and checks it; a file asks for the video. The rest of the form doesn’t move.', 'Un servicio de video pide el servicio y la cámara; un enlace RTSP pide la dirección y la valida; un archivo pide el video. El resto del formulario no se mueve.')}</p>",
+             pair(bwin("b-flow-service", 704, 761, "<b>Video service.</b> Service and camera number.", "<b>Servicio de video.</b> Servicio y número de cámara.", "Form with the video service block", "Formulario con el bloque de servicio de video"),
+                  bwin("b-flow-rtsp", 704, 761, "<b>RTSP link.</b> The address, checked before saving.", "<b>Enlace RTSP.</b> La dirección, validada antes de guardar.", "Form with the RTSP link block", "Formulario con el bloque de enlace RTSP"))) +
+    decision("Uploading a video", "Subir un video",
+             f"<p>{T('The file option explains formats and limits before asking for anything. The system picker opens over the page, and the chosen video comes back as a chip that can be removed.', 'La opción de archivo explica formatos y límites antes de pedir nada. El selector del sistema se abre sobre la página, y el video elegido vuelve como un chip que se puede quitar.')}</p>",
+             pair(bwin("b-flow-picker", 704, 724, "<b>Pick the file.</b> The system dialog, over the form.", "<b>Elegir el archivo.</b> El diálogo del sistema, sobre el formulario.", "System file picker over the form", "Selector de archivos del sistema sobre el formulario"),
+                  bwin("b-flow-uploaded", 704, 724, "<b>Uploaded.</b> “Cámara 03.mov”, in green, with an × to remove it.", "<b>Subido.</b> “Cámara 03.mov”, en verde, con una × para quitarlo.", "Form with the uploaded video chip", "Formulario con el chip del video subido"))) +
+    decision("Drawing the geofence", "Dibujar la geocerca",
+             f"<p>{T('A modal shows a real frame of the camera. The user outlines the area with the cursor and names it, and the geofence lands in a table under the form.', 'Un modal muestra un cuadro real de la cámara. El usuario delimita el área con el cursor y le pone nombre, y la geocerca queda en una tabla debajo del formulario.')}</p>",
+             pair(bwin("b-geocerca", 1200, 1233, "<b>Empty.</b> The frame and the name field.", "<b>Vacío.</b> El cuadro y el campo de nombre.", "Geofence modal, empty", "Modal de geocerca, vacío"),
+                  bwin("b-flow-geo-drawn", 704, 724, "<b>Drawn.</b> The area in yellow and its name, “Uso de celular”.", "<b>Dibujada.</b> El área en amarillo y su nombre, “Uso de celular”.", "Geofence drawn over the frame", "Geocerca dibujada sobre el cuadro"))), "states")
+
 body += rail("Hundreds of pages, scannable at a glance.", "Cientos de páginas, legibles de un vistazo.",
              "Once analyses run, the platform fills up. Each view answers one question without opening a single video.",
              "Cuando los análisis corren, la plataforma se llena. Cada vista responde una pregunta sin abrir un solo video.", [
@@ -122,6 +146,43 @@ body += chapter(T("Access and system", "Acceso y sistema"), h2("One dark system,
     ("Sign-in works with a phone or an email, switched with a segmented control. Every screen is built from the same Figma library (sidebar, filters, cards, tables, dialogs and pagination) on a dark theme with the brand’s cyan as the accent, so developers build from one source.",
      "El ingreso funciona con teléfono o con email, que se cambian con un control segmentado. Cada pantalla sale de la misma librería de Figma (barra lateral, filtros, tarjetas, tablas, diálogos y paginación) sobre un tema oscuro con el cian de la marca como acento, así desarrollo construye desde una sola fuente.")) +
     "      " + bf("b-login", 1200, 857, "Batech · Iniciar sesión", "Login with phone or email tabs", "Login con pestañas de teléfono o email") + "\n", "system")
+
+def bk(n, w, h, label, hi=False):
+    """hi: rendered at 2x from the HTML rebuild, shown at half width."""
+    return kit_state(p, n, w, h, label, w / 2 if hi else w)
+
+
+body += kit_section("kit", "kd--batech", ("Every component, every state.", "Cada componente, cada estado."),
+                    ("The Figma library behind every screen: a dark theme, the brand’s cyan as the only accent, and status colours kept for what needs attention. The form pieces are rebuilt in HTML from the file, so they show each state crisp.",
+                     "La librería de Figma detrás de cada pantalla: un tema oscuro, el cian de la marca como único acento, y los colores de estado reservados para lo que necesita atención. Las piezas del formulario están reconstruidas en HTML desde el archivo, así muestran cada estado nítido."),
+                    (FIGMA, "Open the file in Figma", "Abrir el archivo en Figma"), [
+    kit_comp("Header", "Encabezado", "The greeting, the language and the notifications, the same on every screen.", "El saludo, el idioma y las notificaciones, iguales en todas las pantallas.",
+             [bk("b-kit-h-topbar", 2456, 186, "Default", True)], "kd__comp--span"),
+    kit_comp("Navigation", "Navegación", "Seven sections and the account at the bottom; the current one gets a cyan outline.", "Siete secciones y la cuenta abajo; la actual lleva un borde cian.",
+             [bk("b-kit-nav", 180, 336, T("Active: Análisis", "Activa: Análisis")), bk("b-kit-user", 188, 57, T("Account", "Cuenta"))]),
+    kit_comp("Section card", "Card de sección", "Each part of the form is a card with a title, one line of help and its fields.", "Cada parte del formulario es una card con título, una línea de ayuda y sus campos.",
+             [bk("b-kit-h-card", 1276, 378, T("Filled", "Completa"), True)]),
+    kit_comp("Select", "Select", "Empty with a hint, filled with a cyan border, and open with the chosen option marked.", "Vacío con una pista, completo con borde cian y abierto con la opción elegida marcada.",
+             [bk("b-kit-h-sel-default", 556, 168, T("Empty", "Vacío"), True), bk("b-kit-h-sel-filled", 556, 168, T("Filled", "Completo"), True), bk("b-kit-h-sel-open", 556, 404, T("Open", "Abierto"), True)], "kd__comp--span"),
+    kit_comp("Time field", "Campo de horario", "A clock icon and the format in the hint.", "Un ícono de reloj y el formato en la pista.",
+             [bk("b-kit-h-time-default", 556, 168, T("Empty", "Vacío"), True), bk("b-kit-h-time-filled", 556, 170, T("Filled", "Completo"), True)], "kd__comp--col"),
+    kit_comp("Day chips", "Chips de días", "Execution days, from Monday to Sunday. Chosen days take the dark cyan.", "Los días de ejecución, de lunes a domingo. Los elegidos toman el cian oscuro.",
+             [bk("b-kit-h-days-off", 1130, 114, T("None chosen", "Sin elegir"), True), bk("b-kit-h-days-on", 1130, 114, T("Four chosen", "Cuatro elegidos"), True)], "kd__comp--col"),
+    kit_comp("Buttons", "Botones", "The main action in cyan only when the form is ready; until then it stays grey, next to cancel.", "La acción principal en cian solo cuando el formulario está listo; hasta entonces queda gris, al lado de cancelar.",
+             [bk("b-kit-h-btn-primary", 356, 130, T("Primary", "Primario"), True), bk("b-kit-h-btn-disabled", 356, 130, T("Disabled", "Deshabilitado"), True), bk("b-kit-h-btn-secondary", 356, 130, T("Secondary", "Secundario"), True), bk("b-kit-new", 138, 42, T("With icon", "Con ícono"))]),
+    kit_comp("Add and upload", "Agregar y subir", "Actions that add something to the form, and the file that came back from the picker.", "Acciones que suman algo al formulario, y el archivo que volvió del selector.",
+             [bk("b-kit-h-add-video", 444, 126, T("Add video", "Agregar video"), True), bk("b-kit-h-add-geo", 458, 126, T("Add geofence", "Agregar geocerca"), True), bk("b-kit-h-file-chip", 378, 126, T("Uploaded file", "Archivo subido"), True)], "kd__comp--col"),
+    kit_comp("Analyses table", "Tabla de análisis", "Fixed columns and the status last; the action menu at the end of each row.", "Columnas fijas y el estado al final; el menú de acciones al final de cada fila.",
+             [bk("b-kit-table", 934, 250, T("Rows", "Filas")), bk("b-kit-status", 134, 148, T("Status", "Estado"))], "kd__comp--span"),
+    kit_comp("Filters and pages", "Filtros y páginas", "Search by ID, date range, detection and branch, a clear button, and pagination with a jump-to field.", "Búsqueda por ID, rango de fechas, detección y sucursal, un botón para limpiar, y una paginación con campo para saltar.",
+             [bk("b-kit-filters", 934, 48, T("Filters", "Filtros")), bk("b-kit-pages", 794, 50, T("Pagination", "Paginación"))], "kd__comp--span kd__comp--col"),
+    kit_comp("Event card", "Card de evento", "The camera frame first, then ID, detection, branch and date. The bar tells if the video can be watched.", "El cuadro de la cámara primero, después ID, detección, sucursal y fecha. La barra dice si el video se puede ver.",
+             [bk("b-kit-event", 212, 219, T("Not processed", "No procesado")), bk("b-kit-event-ok", 209, 214, T("Ready to watch", "Listo para ver"))]),
+    kit_comp("Confirmation dialog", "Diálogo de confirmación", "Before a long task: what will happen, how long it can take and where to follow it.", "Antes de una tarea larga: qué va a pasar, cuánto puede tardar y dónde seguirla.",
+             [bk("b-kit-dialog", 594, 374, T("Start analysis", "Iniciar análisis"))]),
+    kit_comp("Geofence modal", "Modal de geocerca", "A real frame to draw on, the name of the area and the two actions.", "Un cuadro real para dibujar, el nombre del área y las dos acciones.",
+             [bk("b-kit-geomodal", 836, 652, T("Empty", "Vacío"))], "kd__comp--span"),
+])
 
 body += chapter(T("Outcome", "Resultado"), h2("One place to set up, follow and share every analysis.", "Un solo lugar para configurar, seguir y compartir cada análisis.") +
                 f"""      <div class="numbers" data-reveal>

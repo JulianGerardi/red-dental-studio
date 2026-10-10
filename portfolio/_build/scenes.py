@@ -6,6 +6,8 @@ rail()   a row of screens that moves sideways with the vertical scroll
 fan()    phones stacked in the middle that spread out
 wipe()   low fidelity turns into high fidelity under a moving line
 scrub()  a long page that scrolls inside its window as you scroll
+         (on phones these two don't follow the scroll: they play on their own when
+         they come into view, data-play-narrow, so a quick swipe can't rush them)
 words()  a paragraph whose words light up as it passes
 """
 import re
@@ -93,12 +95,12 @@ def wipe(p, lo, hi, url, tag_lo, tag_hi, title_en, title_es, length=160):
             f'<img class="wipe__hi" src="{p}assets/img/{hi_n}.webp" width="{hi_w}" height="{hi_h}" alt="" loading="lazy" decoding="async">'
             f'<i class="wipe__line"></i><span class="wipe__tag wipe__tag--lo">{tag_lo}</span><span class="wipe__tag wipe__tag--hi">{tag_hi}</span></div>')
     win = browser(p, "", 1200, 750, url, dark=True, body=body).replace('<div class="sf__view" style="--ar:1200/750">', '<div style="--ar:1200/750">')
-    return (f'  <section class="scene scene--pin wipe" data-scene="wipe" style="--len:{length}vh">'
+    return (f'  <section class="scene scene--pin wipe" data-scene="wipe" data-play-narrow="2800" style="--len:{length}vh">'
             f'<div class="scene__pin"><div class="scene__copy"><h2 class="scene__h">{T(title_en, title_es)}</h2></div><div class="wipe__win">{win}</div></div></section>\n')
 
 
 def scrub(p, name, w, h, url, dark=True, length=190, alt_en="", alt_es=""):
     shift = round((1 - 0.625 * w / h) * 100, 2)
     win = browser(p, name, w, h, url, dark, alt_en, alt_es)
-    return (f'  <section class="scene scene--pin scrubp" data-scene="scrub" style="--len:{length}vh;--shift:{shift}%">'
+    return (f'  <section class="scene scene--pin scrubp" data-scene="scrub" data-play-narrow="16000" style="--len:{length}vh;--shift:{shift}%">'
             f'<div class="scene__pin"><div class="scrubp__win">{win}</div></div></section>\n')
