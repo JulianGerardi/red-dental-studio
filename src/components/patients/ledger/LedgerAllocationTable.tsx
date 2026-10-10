@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CreditCard, MoveHorizontal } from 'lucide-react'
+import { MoveHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ColumnPicker } from './ColumnPicker'
 import { moneda, fechaCorta, type Movimiento } from '@/data/ledger'
@@ -37,7 +37,7 @@ const PADDING_FILA = 24
 
 const ANCHO_BASE: Record<ColId, number> = {
   fecha: 76, paciente: 76, provider: 72, diente: 40, superficie: 48, codigo: 52,
-  desc: 88, charge: 64, otroCredito: 68, guarEstimado: 76, applied: 72, balance: 64,
+  desc: 88, charge: 64, otroCredito: 78, guarEstimado: 76, applied: 72, balance: 64,
 }
 
 /* Piso de cada columna, para que las 12 entren aun con el menú lateral y el
@@ -92,7 +92,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
     { id: 'codigo', label: 'Code', px: 52, claseCelda: 'text-dash-blue font-medium', celda: (m) => m.codigo },
     { id: 'desc', label: 'Description', px: 88, elastica: true, claseCelda: 'truncate text-ink', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
     { id: 'charge', label: 'Charge', px: 64, derecha: true, claseCelda: 'font-medium tabular-nums text-ink', celda: (m) => moneda(m.monto) },
-    { id: 'otroCredito', label: 'Other Credit', px: 68, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * coberturaSeguro(m.codigo)) },
+    { id: 'otroCredito', label: 'Other Credit', px: 78, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * coberturaSeguro(m.codigo)) },
     { id: 'guarEstimado', label: 'Guar Estimate', px: 76, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * (1 - coberturaSeguro(m.codigo))) },
     {
       id: 'applied', label: 'Applied', px: 72, bloqueada: true,
@@ -142,9 +142,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   return (
     <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
-          <CreditCard className="size-4" /> Ledger Transactions
-        </h2>
+        <h2 className="text-sm font-bold text-ink">Ledger Transactions</h2>
         <div className="flex flex-wrap items-center gap-2">
           {cargos.length > 0 && (
             <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}

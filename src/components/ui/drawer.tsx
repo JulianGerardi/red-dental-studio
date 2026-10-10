@@ -18,7 +18,8 @@ import { StepIndicator } from '@/components/ui/step-indicator'
    - Un panel de apoyo (`aside`, el calendario de horarios de New Appointment) se despliega al costado del drawer.
    Radix Dialog por dentro: el foco queda adentro, Escape y la capa lo cierran. */
 
-const ANCHO = { md: 'max-w-[480px]', lg: 'max-w-[560px]', xl: 'max-w-[760px]' } as const
+/* 2xl: un paso con una tabla ancha (Post payment → Allocation), para que entre entera. */
+const ANCHO = { md: 'max-w-[480px]', lg: 'max-w-[560px]', xl: 'max-w-[760px]', '2xl': 'max-w-[1000px]' } as const
 export type DrawerSize = keyof typeof ANCHO
 
 /* Dentro de un drawer las secciones no llevan caja (SectionCard la deja). */
@@ -40,7 +41,7 @@ export function Drawer({
   steps?: readonly string[]
   /** Paso actual, desde 0. */
   step?: number
-  /** md 480 · lg 560 · xl 760, como los anchos de 2.0. */
+  /** md 480 · lg 560 · xl 760, como los anchos de 2.0; 2xl 1000 para una tabla ancha. */
   size?: DrawerSize
   /** Las acciones del pie, lado a lado y del mismo ancho. */
   footer?: React.ReactNode

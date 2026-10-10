@@ -92,3 +92,13 @@ La caja de sólo lectura de Cordination Order va en `#eff4ff`, no en el
 - **New Depender se abre desde "Add New" de Manage Suscription** y al cerrarse
   vuelve a ese modal. El frame lo muestra suelto sobre la página, sin indicar
   desde dónde se entra.
+
+## New Subscription y New Depender: campos de a dos (2026-10-10)
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`.
+
+1. New Subscriber: Name | Middle Name, Last Name | Birthday y Email (antes tres nombres por fila).
+2. Subscription Information: Plan name entra en la grilla al lado de Subscriber ID y Carrier name.
+3. New Depender: Coordination Order al lado de Carrier name y las cuatro fechas en una sola grilla.

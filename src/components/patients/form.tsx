@@ -443,7 +443,7 @@ export function SectionCard({
    varias partes. El ancho pedido elige el tamaño del drawer. Ver Components / UI / Drawer. */
 const tamanoDe = (width: string): DrawerSize => {
   const px = Number(width.match(/\d+/)?.[0] ?? 860)
-  return px <= 480 ? 'md' : px <= 640 ? 'lg' : 'xl'
+  return px <= 480 ? 'md' : px <= 640 ? 'lg' : px <= 860 ? 'xl' : '2xl'
 }
 
 export function ModalShell({

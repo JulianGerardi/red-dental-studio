@@ -118,3 +118,11 @@ Accounts y en el buscador de Transactions del Ledger de paciente repite el
 
 Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
 En Settings: las cards de la home (con el mouse encima, un anillo azul en vez del borde), las secciones de las fichas (Account, Location, Employee) con la Card de Settings y las páginas en construcción. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.
+
+## New Account: campos de a dos (2026-10-10)
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`. Name, Website, Time Zone y el Email del dueño entran en la grilla de su sección
+(antes iban de ancho entero
+entre campos de media columna).

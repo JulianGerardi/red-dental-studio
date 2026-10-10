@@ -55,7 +55,7 @@ export function UnitField({
 }
 
 /* Country Code y el número. Con (+1) el número va en dos campos, Area Code (3 digits) y Number (7 digits); con otro país,
-   uno solo. Sólo se guardan dígitos. */
+   uno solo. Sólo se guardan dígitos. De a dos como el resto del drawer, nunca tres por fila (Components / UI / Drawer → Specs). */
 export function PhoneFields({
   value, onChange, required, errores, className,
 }: {
@@ -69,7 +69,7 @@ export function PhoneFields({
   const nanp = esNorteamerica(value.codigo)
   const digitos = (k: 'area' | 'numero', max: number) => (v: string) => onChange({ ...value, [k]: v.replace(/\D/g, '').slice(0, max) })
   return (
-    <div className={cn('grid gap-4', nanp ? 'sm:grid-cols-3' : 'sm:grid-cols-2', className)}>
+    <div className={cn('grid gap-4 sm:grid-cols-2', className)}>
       <SelectField label="Country Code" required={required} options={CODIGOS} value={value.codigo} onChange={(codigo) => onChange({ ...value, codigo })} />
       {nanp && (
         <TextField label="Area Code (3 digits)" required={required} placeholder="555" value={value.area} onChange={digitos('area', 3)} error={errores?.area} />

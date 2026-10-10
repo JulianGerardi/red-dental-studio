@@ -12,21 +12,20 @@ export function EditContactModal({ onClose }: { onClose: () => void }) {
     >
       <div className="flex flex-col gap-6">
         <DrawerSection title="Contact Details">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[96px_1fr]">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <TextField label="Area Code" placeholder="+1" />
             <TextField label="Phone Number" placeholder="(555) 123-4567" />
+            <TextField label="Email Address" placeholder="john.smith@hotmail.com" />
           </div>
-          <TextField label="Email Address" placeholder="john.smith@hotmail.com" />
         </DrawerSection>
 
         <DrawerSection title="Address">
-          <TextField label="Address Line 1" placeholder="Street and number" />
-          <TextField label="Address Line 2" placeholder="Apartment, suite, etc." />
+          {/* De a dos como New Location y New Employee (Drawer → Specs → Fields). */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <TextField label="Address Line 1" placeholder="Street and number" />
+            <TextField label="Address Line 2" placeholder="Apartment, suite, etc." />
             <SelectField label="Country" required />
             <SelectField label="State" required />
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <TextField label="City" required placeholder="City" />
             <TextField label="ZIP Code" placeholder="00000" />
           </div>

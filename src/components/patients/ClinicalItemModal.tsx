@@ -70,7 +70,6 @@ export function ClinicalItemModal({
         return (
           <SelectField
             key={c.key} label={c.label} required={c.req} options={c.opciones}
-            className={c.ancho === 'full' ? 'sm:col-span-2' : undefined}
             value={v[c.key] ?? ''} onChange={set(c.key)} error={req(c.key)}
           />
         )
@@ -94,7 +93,6 @@ export function ClinicalItemModal({
         return (
           <DateTextField
             key={c.key} label={c.label} required={c.req}
-            className={c.ancho === 'full' ? 'sm:col-span-2' : undefined}
             value={v[c.key] ?? ''} onChange={set(c.key)} error={req(c.key)}
           />
         )
@@ -115,7 +113,7 @@ export function ClinicalItemModal({
       width="max-w-[480px]"
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
-      <div className="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {cfg.campos.map(render)}
       </div>
     </ModalShell>

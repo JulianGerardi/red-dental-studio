@@ -388,3 +388,15 @@ Design system: *Components / Settings / NewLocationDrawer*.
 Las franjas de horario de cada día pasan a `ui/chip` con la ✕ a la derecha (antes a la izquierda, 11px Semibold y
 `dash-blue-hover`). El *+N* toma el mismo alto (24px), color y tamaño de texto, y suma `aria-label` ("Show 2 more hours
 on Monday"). Mismo criterio que Clinical Mode: la ✕ va al final en todo el sistema.
+
+## New Exception, New Hours y New Location: campos de a dos (2026-10-10)
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`.
+
+1. **New Exception**: sale el recuadro del rango (sus campos quedaban 26px más angostos que el resto). Name |
+   Abreviattion, Reason | Date y Start Time | End Time; All day exception y los íconos de borrar y guardar el rango en la
+   misma línea, abajo.
+2. **New Hours**: Location en la columna izquierda, del ancho de Start Time.
+3. **New Location**: Name entra en la grilla con Abbreviation y Default Fee Schedule; Time Zone, en la de la dirección.

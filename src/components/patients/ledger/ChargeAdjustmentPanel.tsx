@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { CreditCard } from 'lucide-react'
 import {
   TextField, SelectField, TextArea, FieldLabel, FormFooter,
 } from '@/components/patients/form'
@@ -51,28 +50,24 @@ export function ChargeAdjustmentPanel({
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
-        <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
-          <CreditCard className="size-4" /> Adjustment Information
-        </h2>
+        <h2 className="text-sm font-bold text-ink">Adjustment Information</h2>
 
-        <div className="mt-4 flex flex-wrap gap-4">
-          <div className="flex w-full flex-col gap-2 sm:w-[200px]">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="flex flex-col gap-2">
             <FieldLabel required>Transaction date</FieldLabel>
             <DatePicker value={fecha} onChange={setFecha} className="h-9 w-full" error={intentado && !fecha ? true : undefined} />
           </div>
           <TextField
             label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto}
             error={intentado && !monto.trim() ? 'This field is required.' : undefined}
-            className="w-full sm:w-[160px]"
           />
-          <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} className="w-full sm:w-[200px]" />
-          <SelectField label="Provider" options={PROVIDERS} value={provider} onChange={setProvider} className="w-full sm:w-[200px]" />
+          <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} />
+          <SelectField label="Provider" options={PROVIDERS} value={provider} onChange={setProvider} />
           <SelectField
             label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
             error={intentado && !aplicaA.trim() ? 'This field is required.' : undefined}
-            className="w-full sm:w-[200px]"
           />
-          <SelectField label="Visit date" options={visitas} value={visita} onChange={setVisita} className="w-full sm:w-[320px]" />
+          <SelectField label="Visit date" options={visitas} value={visita} onChange={setVisita} />
         </div>
         <TextArea className="mt-4" label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
       </div>

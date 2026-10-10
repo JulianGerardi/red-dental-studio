@@ -217,3 +217,18 @@ encuentra para volver al resumen o hace falta un "Back to all activity" con text
 5. **Animación más sutil, estilo Apple.** Antes bajaba 6px en 220ms y las iniciales hacían un pop. Ahora la card del
    paciente, los saldos del garante y los botones aparecen con 2px, un desenfoque de 2px que se aclara y opacidad, en
    360ms con `cubic-bezier(0.32, 0.72, 0, 1)` (arranca rápido y frena largo). Sin pop.
+
+## Post payment: campos parejos y la tabla entera (2026-10-10)
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`.
+
+1. **Payment**: Transaction date | Amount y Type | Apply to, en `grid gap-4 sm:grid-cols-2`. Antes eran cuatro anchos fijos
+   (180, 160, 200 y 200px) en un `flex-wrap`, que dejaban la fila corta y a Apply to suelto. El buscador de paciente usa
+   `control()`, el mismo borde y sombra que los demás campos.
+2. **Allocation**: el drawer pasa a **2xl (1000px)**, un tamaño nuevo de `ui/drawer`, para que las 12 columnas de Ledger
+   Transactions entren enteras con sus anchos base (a 760px pedía scroll de costado). Se elige por `width` en
+   `ModalShell`: hasta 860px sigue siendo xl.
+3. **Ledger Transactions** sin el ícono de la tarjeta en el título (pedido de Julián), como el resto de los paneles: el
+   título de un panel no lleva ícono.

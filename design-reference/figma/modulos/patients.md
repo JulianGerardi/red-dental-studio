@@ -145,3 +145,18 @@ Pedido de Julián sobre el costado de la lista (`src/pages/Patients.tsx`):
   y los 10 turnos) y *Components / UI / RowActionsMenu → Open*. El kebab no tiene anillo de foco propio (usa el del
   navegador, como el de las tablas), por eso no hay un estado de foco dibujado.
 
+## Drawers del paciente: campos de a dos (2026-10-10)
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`.
+
+1. **New Patient**: First | Middle, Last | Birthdate y Email en la columna izquierda (antes tres nombres por fila).
+2. **Edit Patient**: Email entra en la grilla de los nombres; Demography pasa a dos columnas, como New Patient; la grilla
+   usa `gap-4` y `sm:` como el resto (antes `gap-6 md:`).
+3. **Edit Contact Details**: Area Code y Phone Number del mismo ancho (antes 96px + el resto) y la dirección de a dos,
+   como New Location.
+4. **New Allergy / Medication / Medical Condition / Past Surgery**: salen los campos de ancho entero (Reaction,
+   Frequency, Status, Approx Start Date); van en la columna izquierda. Se va la opción `ancho: 'full'` de
+   `data/clinicalItems.ts`.
+5. **Insurance** (la pestaña del paciente): Assignment of Benefits y Release of Information, una debajo de la otra.

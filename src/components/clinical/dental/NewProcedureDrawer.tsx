@@ -1,10 +1,11 @@
 import { Tabs } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { ChevronsLeft, ChevronsRight, Search } from 'lucide-react'
 import { Drawer, DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { FilterMenu } from '@/components/ui/filter-menu'
-import { SelectField } from '@/components/patients/form'
+import { FieldLabel, SelectField, control } from '@/components/patients/form'
 import { SurfaceWheel, type Surface } from './SurfaceWheel'
 import { LinkedDiagnosisCard, LinkedFindingCard } from './LinkedFindingCard'
 import { NOMBRE_ALCANCE, ScopeIcon } from './ScopeIcons'
@@ -137,7 +138,7 @@ export function NewProcedureDrawer({
         {actual === 'Procedure' && (
           <div className="flex w-full flex-col items-start gap-4">
             <div className="flex w-full flex-col items-start gap-2 border-b border-line pb-4">
-              <span className="text-xs font-semibold text-ink-muted">Selected area</span>
+              <FieldLabel>Selected area</FieldLabel>
               {keepArea ? (
                 <Chip removeLabel={`Remove ${area}`} onRemove={() => setKeepArea(false)}>{area}</Chip>
               ) : (
@@ -148,13 +149,13 @@ export function NewProcedureDrawer({
             {/* Como en la app real: búsqueda por código o descripción, el embudo con las áreas de tratamiento y las
                 categorías del catálogo. */}
             <div className="flex w-full flex-col items-start gap-1.5">
-              <span className="text-xs font-semibold text-ink-muted">Procedure<span className="text-field-error">*</span></span>
+              <FieldLabel required>Procedure</FieldLabel>
               <div className="flex w-full items-center gap-2">
                 <div className="relative flex-1">
                   <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
                   <input
                     value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by code or description"
-                    className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] placeholder:text-ink-faint focus:outline-none"
+                    className={cn(control(), 'h-9 pr-3 pl-9')}
                   />
                 </div>
                 {/* Sin áreas tildadas se ve todo ("Show all treatment"): Clear all vuelve a eso. */}
@@ -193,7 +194,7 @@ export function NewProcedureDrawer({
         {actual === 'Surfaces' && (
           <div className="flex w-full flex-col items-start gap-5">
             <div className="flex w-full flex-col items-start gap-1.5">
-              <span className="text-xs font-semibold text-ink-muted">Procedure<span className="text-field-error">*</span></span>
+              <FieldLabel required>Procedure</FieldLabel>
               <div className="border-dash-blue flex w-full items-center justify-between gap-2 rounded-md border px-3 py-2">
                 <span className="min-w-0 text-xs font-semibold text-ink">{procedure?.code} - {procedure?.label}</span>
                 <span className="flex shrink-0 items-center gap-1.5">
@@ -207,7 +208,7 @@ export function NewProcedureDrawer({
 
             <div className="flex w-full flex-col items-center gap-3">
               <span className="flex w-full flex-col gap-0.5">
-                <span className="text-xs font-semibold text-ink-muted">Surfaces<span className="text-field-error">*</span></span>
+                <FieldLabel required>Surfaces</FieldLabel>
                 <span className="text-[11px] text-ink-faint">Mark the surfaces this procedure goes on, tooth by tooth.</span>
               </span>
               <div className="flex flex-wrap items-center justify-center gap-2">
@@ -258,7 +259,7 @@ export function NewProcedureDrawer({
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
                 value={findingQuery} onChange={(e) => setFindingQuery(e.target.value)} placeholder="Search" aria-label="Search findings"
-                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] placeholder:text-ink-faint focus:outline-none"
+                className={cn(control(), 'h-9 pr-3 pl-9')}
               />
             </div>
 
@@ -287,7 +288,7 @@ export function NewProcedureDrawer({
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
                 value={diagnosisQuery} onChange={(e) => setDiagnosisQuery(e.target.value)} placeholder="Search by code or surface" aria-label="Search diagnoses"
-                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] placeholder:text-ink-faint focus:outline-none"
+                className={cn(control(), 'h-9 pr-3 pl-9')}
               />
             </div>
 

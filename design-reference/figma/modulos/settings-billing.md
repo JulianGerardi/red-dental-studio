@@ -1,5 +1,17 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
+## 2026-10-10 · Campos parejos en los drawers
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`.
+
+1. **New Carrier** y la pestaña *Information* de Edit Carrier: *Do not include Dental Diagnostic Codes* y *Do not bill
+   Insurance*, una debajo de la otra (pedido de Julián). En New Carrier, Expected Period of Insurance Claim Resolution
+   entra en la grilla, en la columna izquierda.
+2. **PhoneFields**: Country Code | Area Code y Number, de a dos (antes tres por fila con +1).
+3. **Increase All / Increase Selected**: el monto y *By* ($ o %) del mismo ancho (antes 1fr + 96px).
+
 ## 2026-10-09 · Segunda vuelta de correcciones de Julián
 
 16. **Breadcrumbs como el resto de Settings**: `Settings › Billing › Fee Schedules | Carriers | Coverage Table › ítem`
