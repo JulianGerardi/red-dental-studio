@@ -30,6 +30,10 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   botones de pago, Guarantor View con todo su garante) y la X vuelve al resumen; una fila del resumen abre la vista de
   ese paciente en Patient View; el círculo de info de Overdue Balance muestra su texto al pasar el mouse.
 
+- `tests/notifications.e2e.ts` (2026-10-12): el atajo *Last 7 days* acota la lista y la ✕ vuelve a *All dates*; dos
+  clics en el calendario arman un rango y, en Unread sin nada en esas fechas, el vacío ofrece *Clear dates*. Las
+  fechas se calculan desde hoy, como los datos.
+
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 
 ## Pendiente: el modelo para los pasos en lenguaje natural
