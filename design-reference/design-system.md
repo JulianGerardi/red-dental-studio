@@ -702,3 +702,13 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   que viven en `@theme inline` sin `--color-*`. Ahora prueba `hsl(var(--<token>))`; se corrige también *Settings
   section card*.
 
+## DatePicker: un calendario para toda la app y el look toolbar (2026-10-12)
+
+- *Components / UI / DatePicker* deja de ser una lista suelta: **Playground** (look, vacío o con fecha, puntos, error),
+  **Parts** (campo en los dos looks, el calendario y sus flechas), **States** (field: vacío, elegido, hover, foco, error;
+  toolbar: elegido, hover, foco; calendario: elegido y marcados, hoy, con tope), **Open** y **Specs** (*Which one goes
+  where*: DatePicker field, DatePicker toolbar y DateFilter; medidas del campo y del calendario; tokens; reglas).
+- `MonthCalendar` es el calendario de los dos (`DatePicker` y `DateFilter`) y `fechaTriggerClasses` el campo. El
+  `DatePicker` usa el popover de Radix. *Elements / Date filter* y *Pages / Parts / Dashboard* dicen que comparten
+  campo y calendario. Decisiones en `figma/modulos/dashboard.md` (2026-10-12).
+

@@ -18,7 +18,7 @@ const meta = {
         component: [
           'Las partes propias del dashboard (`@/pages/Dashboard`): la **fila de fecha** de arriba, que manda sobre toda la pantalla, y el **botón de filtro** de cada panel. La pantalla completa está en *Pages*.',
           '',
-          '**Cómo se usa:** el selector elige el día; *Today* vuelve a hoy sin abrir el calendario y sólo aparece cuando el día elegido no es hoy. Los dos miden 32px de alto, como el resto de los inputs de la app.',
+          '**Cómo se usa:** el selector elige el día; *Today* vuelve a hoy sin abrir el calendario y sólo aparece cuando el día elegido no es hoy. Los dos miden 32px de alto, como el resto de los inputs de la app. El selector es el `DatePicker` en su look *toolbar* ("Feb 28, 2026"): el mismo campo y calendario que el filtro de fecha de Notifications.',
           '',
           '**Probalo:** en *Playground* elegí el día y los días marcados desde *Controls*; tocá *Today* y el botón se va.',
         ].join('\n'),
@@ -67,7 +67,7 @@ export const Parts: Story = {
           <ConRotulo rotulo="Date picker · Today · scope line"><Fecha marcados={false} /></ConRotulo>
         </Muestras>
         <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
-          <li><strong>Date picker:</strong> el día de toda la pantalla, en dd-mm-aaaa.</li>
+          <li><strong>Date picker:</strong> el día de toda la pantalla, como "Feb 28, 2026" (<code>DatePicker variant="toolbar"</code>).</li>
           <li><strong>Today:</strong> <code>Button</code> secondary md con el ícono CalendarClock. Sólo cuando el día no es hoy.</li>
           <li><strong>Scope line:</strong> dice a qué afecta la fecha, 12px en <code>ink-muted</code>.</li>
         </ul>
@@ -162,6 +162,7 @@ export const Specs: Story = {
             <li>Today is <code>Button variant="secondary" size="md"</code>: 32px, the date picker height. Never a hand-made button.</li>
             <li>Both carry the same faint shadow (0 1px 2px, 5%), so they read as a pair.</li>
             <li>8px between parts. Today only when the chosen day is not today.</li>
+            <li>The date picker is <code>variant="toolbar"</code>: "Feb 28, 2026", medium, the same field and calendar as the Notifications date filter.</li>
           </ul>
         </Bloque>
       </Lienzo>

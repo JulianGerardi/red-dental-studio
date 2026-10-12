@@ -53,7 +53,7 @@ const turno = (
   extra: Partial<Turno & EnEspera> = {},
 ): Turno & EnEspera => ({ name, initials, provider, operatory, time, ...extra })
 
-/* Clave dd-mm-aaaa, la misma que muestra el chip del filtro. */
+/* Clave dd-mm-aaaa (`formatDMY`); el selector la muestra como "Feb 28, 2026". */
 export const DIAS: Record<string, DiaDashboard> = {
   '28-02-2026': {
     appointments: [
