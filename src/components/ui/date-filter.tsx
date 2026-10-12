@@ -1,13 +1,14 @@
 import { useState } from 'react'
-import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { Calendar, X } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { DAYS, MONTHS, NavBtn, sameDay } from '@/components/ui/date-picker'
+import { MonthCalendar, POPOVER_FECHA, fechaTriggerClasses, primeroDelMes, sameDay } from '@/components/ui/date-picker'
 import { cn } from '@/lib/utils'
 
 /* Filtro de fecha de una lista (Notifications): un solo campo que filtra un día o un rango. Un clic en un día filtra ese
    día; un segundo clic cierra el rango. Atajos a la izquierda (Last 7 days…), puntos en los días con contenido y los días
-   que vienen deshabilitados. Se aplica al tocar, como Filter. Ver Elements / Date filter y
-   design-reference/figma/modulos/notifications.md (2026-10-12). */
+   que vienen deshabilitados. Se aplica al tocar, como Filter. El campo y el calendario son los del DatePicker
+   (`fechaTriggerClasses`, `MonthCalendar`). Ver Elements / Date filter y design-reference/figma/modulos/notifications.md
+   (2026-10-12). */
 
 export type DateRange = { from: Date; to: Date }
 export type DatePreset = { label: string; range: () => DateRange }
@@ -53,8 +54,7 @@ export function DateFilterPanel({
   /** Arranca con el primer día ya tocado, esperando el segundo (para mostrar ese estado). */
   defaultAnchor?: Date
 }) {
-  const tope = dia(max)
-  const [mes, setMes] = useState(() => new Date((value?.to ?? defaultAnchor ?? tope).getFullYear(), (value?.to ?? defaultAnchor ?? tope).getMonth(), 1))
+  const [mes, setMes] = useState(() => primeroDelMes(value?.to ?? defaultAnchor ?? max))
   const [ancla, setAncla] = useState<Date | null>(defaultAnchor ?? null)
   const [sobre, setSobre] = useState<Date | null>(null)
 
@@ -78,10 +78,6 @@ export function DateFilterPanel({
     onChange(r)
     onDone?.()
   }
-
-  const primero = new Date(mes.getFullYear(), mes.getMonth(), 1)
-  const celdas = Array.from({ length: 42 }, (_, i) => sumarDias(primero, i - primero.getDay()))
-  const hayDespues = new Date(mes.getFullYear(), mes.getMonth() + 1, 1) <= tope
 
   const opciones: { label: string; r: DateRange | null }[] = [{ label: 'All dates', r: null }, ...presets.map((p) => ({ label: p.label, r: p.range() }))]
   const elegido = (r: DateRange | null) => !ancla && (r && value ? mismoRango(r, value) : r === value)
@@ -107,49 +103,7 @@ export function DateFilterPanel({
       </div>
 
       <div className="flex flex-col">
-        <div className="relative flex h-7 items-center justify-center">
-          <div className="absolute left-0"><NavBtn onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() - 1, 1))} label="Previous month"><ChevronLeft className="size-4" /></NavBtn></div>
-          <span className="text-sm font-medium" aria-live="polite">{MONTHS[mes.getMonth()]} {mes.getFullYear()}</span>
-          {/* No hay meses que vengan: el filtro mira hacia atrás. */}
-          <div className={cn('absolute right-0', !hayDespues && 'pointer-events-none invisible')}>
-            <NavBtn onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() + 1, 1))} label="Next month"><ChevronRight className="size-4" /></NavBtn>
-          </div>
-        </div>
-
-        <div className="mt-3 grid grid-cols-[repeat(7,36px)]" onMouseLeave={() => setSobre(null)}>
-          {DAYS.map((d) => (
-            <span key={d} className="flex size-9 items-center justify-center text-[0.8rem] text-muted-foreground">{d}</span>
-          ))}
-          {celdas.map((d) => {
-            const despues = d > tope
-            const fuera = d.getMonth() !== mes.getMonth()
-            const extremo = !!visto && (sameDay(d, visto.from) || sameDay(d, visto.to))
-            const medio = !!visto && !extremo && inRange(d, visto)
-            const hoy = sameDay(d, new Date())
-            return (
-              <button
-                key={d.toISOString()}
-                type="button"
-                disabled={despues}
-                aria-pressed={extremo || medio}
-                aria-label={d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-                onClick={() => elegir(d)}
-                onMouseEnter={() => setSobre(d)}
-                onFocus={() => setSobre(d)}
-                className={cn(
-                  'relative flex size-9 items-center justify-center rounded-md text-sm tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-dash-blue disabled:cursor-not-allowed disabled:opacity-35',
-                  extremo ? 'bg-primary text-primary-foreground' : medio ? 'rounded-none bg-accent text-accent-foreground' : 'hover:bg-accent',
-                  !extremo && hoy && 'font-semibold text-dash-blue',
-                  !extremo && !medio && fuera && 'text-muted-foreground opacity-50',
-                )}
-              >
-                {d.getDate()}
-                {!extremo && !despues && marked.some((m) => sameDay(m, d)) && <span aria-hidden className="absolute bottom-1 size-1 rounded-full bg-primary" />}
-              </button>
-            )
-          })}
-        </div>
-
+        <MonthCalendar month={mes} onMonthChange={setMes} from={visto?.from} to={visto?.to} onPick={elegir} onHover={setSobre} marked={marked} max={max} />
         <p className="mt-2 text-[12px] text-ink-muted" aria-live="polite">
           {ancla ? 'Now pick the end date.' : 'Pick a day, or two days for a range.'}
         </p>
@@ -182,16 +136,13 @@ export function DateFilter({
             type="button"
             disabled={disabled}
             aria-label={`${label}: ${texto}`}
-            className={cn(
-              'inline-flex h-8 items-center gap-2 rounded-md border px-3 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
-              value ? 'border-dash-blue bg-info-bg pr-8 text-dash-blue' : 'border-line bg-white text-ink hover:bg-surface-subtle data-[state=open]:border-dash-blue',
-            )}
+            className={cn(fechaTriggerClasses('toolbar'), value && 'border-dash-blue bg-info-bg pr-8 text-dash-blue hover:bg-info-bg')}
           >
             <Calendar aria-hidden />
             {texto}
           </button>
         </PopoverTrigger>
-        <PopoverContent align="end" collisionPadding={12} aria-label={label} className="w-auto max-w-[calc(100vw-24px)] p-3">
+        <PopoverContent align="end" collisionPadding={12} aria-label={label} className={POPOVER_FECHA}>
           <DateFilterPanel value={value} onChange={onChange} onDone={() => setAbierto(false)} marked={marked} max={max} presets={presets} />
         </PopoverContent>
       </Popover>

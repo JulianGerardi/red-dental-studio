@@ -20,7 +20,7 @@ const meta = {
           '',
           '**El campo:** *All dates* mientras no filtra; con fechas, azul como *Filter* con algo aplicado, dice el atajo ("Last 7 days") o las fechas ("Oct 3", "Sep 10 – Sep 20") y lleva una ✕ para sacarlas.',
           '',
-          '**El calendario:** punto en los días que tienen algo; los días que vienen, deshabilitados (no hay nada que filtrar ahí).',
+          '**El calendario:** el mismo del *DatePicker* (`MonthCalendar`), y el campo, su look *toolbar*: punto en los días que tienen algo, hoy en azul y negrita; los días que vienen, deshabilitados (no hay nada que filtrar ahí).',
           '',
           '**Probalo:** en *Playground* abrí el campo, tocá un atajo o dos días; desde *Controls* arrancá con un atajo, un día o un rango, sacá los puntos o deshabilitalo.',
         ].join('\n'),
@@ -74,8 +74,8 @@ const PARTES: [string, string, string][] = [
   ['Field', 'Dice qué fechas se ven: All dates, el atajo o las fechas. Abre el panel.', 'DateFilter'],
   ['Clear (✕)', 'Sólo con fechas elegidas: vuelve a All dates sin abrir el panel.', 'DateFilter'],
   ['Quick ranges', 'All dates y los cinco atajos. El elegido, en azul. Tocarlo aplica y cierra.', 'DateFilterPanel'],
-  ['Month', 'Mes a la vista y flechas. No hay flecha hacia meses que vienen.', 'DateFilterPanel · NavBtn'],
-  ['Day', 'Un clic filtra ese día; el segundo cierra el rango. Extremos en azul, el medio celeste, punto si tiene algo, hoy en azul y negrita.', 'DateFilterPanel'],
+  ['Month', 'Mes a la vista y flechas. No hay flecha hacia meses que vienen.', 'MonthCalendar · NavBtn'],
+  ['Day', 'Un clic filtra ese día; el segundo cierra el rango. Extremos en azul, el medio celeste, punto si tiene algo, hoy en azul y negrita.', 'MonthCalendar'],
   ['Hint', 'Qué hacer ahora: "Pick a day, or two days for a range." o "Now pick the end date."', 'DateFilterPanel'],
 ]
 
@@ -236,7 +236,7 @@ export const Specs: Story = {
           <li>Applies on click, like Filter: no Apply button. Quick ranges close the panel.</li>
           <li>With dates the field turns blue and has a ✕; All dates means no filter.</li>
           <li>Days with content get a dot; upcoming days are disabled.</li>
-          <li>Field 32px, like DatePicker and Button md. The panel keeps 12px from the screen edge.</li>
+          <li>Field 32px: the DatePicker toolbar look, like the Dashboard date. Same calendar (MonthCalendar). The panel keeps 12px from the screen edge.</li>
           <li>When nothing falls in the dates, the list says so and offers Clear dates.</li>
         </ul>
       </Bloque>

@@ -197,3 +197,6 @@ Verificado (2026-10-12): *Last 7 days* deja Inbox en las de la semana y saca los
 "Sep 10 – Sep 20" y en Unread el vacío ofrece *Clear dates*; en celular el panel entra con los atajos arriba. E2E en
 `tests/notifications.e2e.ts`. Design system: *Elements / Date filter* (Playground, Parts, States, Open, Specs) y los
 vacíos con fechas en *Pages / Parts / Notifications → Empty states*.
+
+**2026-10-12, después:** el campo y el calendario del filtro pasan a ser los del `DatePicker` (`fechaTriggerClasses` y
+`MonthCalendar`), así el Dashboard y Notifications no se vuelven a separar. Ver `dashboard.md` (2026-10-12).
