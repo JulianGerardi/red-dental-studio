@@ -55,7 +55,8 @@ export function BotonFiltro({
 }
 
 /* La fecha de toda la pantalla y el atajo a hoy. Today va en md: la altura del
-   DatePicker (ver dashboard.md, 2026-10-09). */
+   DatePicker (ver dashboard.md, 2026-10-09). El selector va como barra
+   ("Feb 28, 2026"), el mismo campo que el Date filter (dashboard.md, 2026-10-12). */
 export function FiltroFecha({
   value, onChange, marked, className,
 }: {
@@ -66,7 +67,7 @@ export function FiltroFecha({
 }) {
   return (
     <div className={cn('flex flex-wrap items-center gap-2', className)} data-tour="dash-date">
-      <DatePicker value={value} onChange={onChange} marked={marked} />
+      <DatePicker variant="toolbar" value={value} onChange={onChange} marked={marked} />
       {/* Volver a hoy sin tener que abrir el calendario y buscar el día.
           Desaparece cuando ya estás en hoy: no tendría nada que hacer. */}
       {!sameDay(value, new Date()) && (

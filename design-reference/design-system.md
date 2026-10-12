@@ -189,6 +189,8 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     `CalendarViews.tsx`). *Which card goes where*, estados de cada una, los
     siete estados del calendario en sus tres formas y *Specs*. Tocarlas abre lo
     mismo que en la app (ficha rápida, detalle del turno, modal de edición).
+    Suma la solicitud de turno (`SolicitudCard`), que es la misma card que la del
+    Overview (`TarjetaTurno`, 2026-10-12).
   - El Playground de **Navigation** monta la app con `PantallaReal`
     (`src/design-system/pantalla.tsx`, lo mismo que usa *Pages*); *Parts*,
     *States* y *Specs* montan sólo el `Sidebar` con su router (`Rail`, alto fijo
@@ -702,6 +704,28 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   que viven en `@theme inline` sin `--color-*`. Ahora prueba `hsl(var(--<token>))`; se corrige también *Settings
   section card*.
 
+## DatePicker: un calendario para toda la app y el look toolbar (2026-10-12)
+
+- *Components / UI / DatePicker* deja de ser una lista suelta: **Playground** (look, vacío o con fecha, puntos, error),
+  **Parts** (campo en los dos looks, el calendario y sus flechas), **States** (field: vacío, elegido, hover, foco, error;
+  toolbar: elegido, hover, foco; calendario: elegido y marcados, hoy, con tope), **Open** y **Specs** (*Which one goes
+  where*: DatePicker field, DatePicker toolbar y DateFilter; medidas del campo y del calendario; tokens; reglas).
+- `MonthCalendar` es el calendario de los dos (`DatePicker` y `DateFilter`) y `fechaTriggerClasses` el campo. El
+  `DatePicker` usa el popover de Radix. *Elements / Date filter* y *Pages / Parts / Dashboard* dicen que comparten
+  campo y calendario. Decisiones en `figma/modulos/dashboard.md` (2026-10-12).
+
+## Appointment cards: turno del paciente y solicitud, una sola card (2026-10-12)
+
+- Componente nuevo `TarjetaTurno` (`components/scheduling/`), base de `PatientAppointmentCard` (Patient Dashboard) y
+  `SolicitudCard` (*Appointment requests* de Scheduling): `InnerCard` con **barra de 3px a la izquierda del color de la
+  pill** (`BARRA_TONOS`, un tono de `Pill` → su token de borde), avatar, nombre (hasta dos renglones), `Pill`, motivo,
+  fecha, lugar y acciones con `ui/button` sm. Lo pidió Julián: a los turnos del paciente les faltaba la barra que tienen
+  las solicitudes. Decisiones en `figma/modulos/patient-dashboard.md` y `scheduling.md` (2026-10-12).
+- *Elements / Appointment cards*: *Appointment request* en el Playground (tipo y espera) y en *Which card goes where*;
+  *Patient overview and request: one card* (las dos lado a lado y Parts); *Request card: states* (ASAP, Waiting List,
+  hover y foco de Schedule, celular); *Long name* en los estados del Overview; *Specs* mide la solicitud y lista la barra
+  de cada estado. *Components / Scheduling / TarjetaTurno* con sus variantes; *Elements / Cards → Cards in the app* y
+  *Pages / Parts / Scheduling → Request Cards* actualizados.
 
 ## Propuesta: Dashboard con volumen (2026-10-12)
 

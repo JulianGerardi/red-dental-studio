@@ -5,6 +5,24 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-12
 
+### Appointments del Patient Dashboard y solicitudes de Scheduling: una sola card ([#27](https://github.com/JulianGerardi/red-dental-studio/pull/27))
+- Los turnos del Patient Dashboard recuperan la barra de 3px a la izquierda que tienen las solicitudes de *Appointment
+  requests*, y las dos cards pasan a ser la misma: barra y pill del mismo color (Booked azul, Fulfilled verde, No Show
+  ámbar, Cancelled rojo; ASAP rojo, lista de espera azul), avatar, nombre de hasta dos renglones y acciones con
+  `ui/button` sm. El panel de solicitudes pasa a 280px, el ancho de la columna Appointments del paciente.
+- **Para el dev:** componente nuevo `components/scheduling/TarjetaTurno.tsx` (`TarjetaTurno`, `BARRA_TONOS`), base de
+  `PatientAppointmentCard` y `SolicitudCard`; no armar otra card de turno a mano. La solicitud deja la pill y los botones
+  con hex en `style`. En *Elements / Appointment cards* y *Components / Scheduling / TarjetaTurno*.
+
+### Fecha del Dashboard alineada con el filtro de Notifications ([#28](https://github.com/JulianGerardi/red-dental-studio/pull/28))
+- El selector de fecha del Dashboard y el filtro de Notifications comparten campo y calendario. El Dashboard muestra
+  "Feb 28, 2026" (antes 28-02-2026), con texto medium, hover gris y anillo de foco; los formularios siguen en dd-mm-aaaa.
+  El `DatePicker` usa el popover de Radix (Escape, foco de vuelta al campo, se da vuelta si no entra) y hoy se marca en
+  azul y negrita en los dos calendarios.
+- **Para el dev:** `MonthCalendar` es el calendario de toda la app (no armar uno a mano); `fechaTriggerClasses` el campo.
+  `DatePicker` suma `variant="toolbar"` para la fecha de una pantalla; `field` sigue por defecto en formularios. Los días
+  llevan `aria-label` con la fecha completa. Página *Components / UI / DatePicker* con la estructura completa.
+
 ### Notifications: filtro de fecha y grupos por mes ([#26](https://github.com/JulianGerardi/red-dental-studio/pull/26))
 - Con muchas notificaciones, un campo de fecha junto a las pestañas: un clic filtra un día, el segundo arma un rango;
   atajos (Today, Yesterday, Last 7/30/90 days), punto en los días con notificaciones y la ✕ para sacarlo. Las fechas
