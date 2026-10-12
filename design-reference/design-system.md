@@ -690,6 +690,20 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   Specs* muestra las dos alturas (*Card on the page* y *Floating pop up*) y la regla; *Foundations / Radius and shadows*
   las lee del CSS. No cambian `InnerCard` ni el anillo azul de hover y selección.
 
+## Date filter: un día o un rango (2026-10-12)
+
+- Página nueva *Elements / Date filter* (`ui/date-filter.tsx`): **Playground** (arrancar sin filtro, con un atajo, un
+  día o un rango; puntos; deshabilitado), **Parts** (campo, ✕, atajos, mes, día, ayuda), **States** (campo: All dates,
+  hover, foco, atajo, un día, rango, deshabilitado; panel: nada elegido, eligiendo el segundo día, atajo), **Open** (el
+  popover de verdad) y **Specs** (en Notifications, medidas del campo y del panel, tokens y reglas).
+  `DateFilterPanel` es lo de adentro del popover, exportado para mostrarlo abierto; `defaultAnchor` sólo sirve para
+  dibujar el estado "eligiendo el segundo día".
+- *Pages / Parts / Notifications*: los vacíos de cada pestaña con fechas elegidas (con *Clear dates*) y las reglas de
+  los grupos por mes. Decisiones en `figma/modulos/notifications.md` (2026-10-12).
+- Arreglo del kit: `Token` (y `colorDeToken` de `medir.ts`) leía negro los tokens de shadcn (`primary`, `accent`…),
+  que viven en `@theme inline` sin `--color-*`. Ahora prueba `hsl(var(--<token>))`; se corrige también *Settings
+  section card*.
+
 ## Appointment cards: turno del paciente y solicitud, una sola card (2026-10-12)
 
 - Componente nuevo `TarjetaTurno` (`components/scheduling/`), base de `PatientAppointmentCard` (Patient Dashboard) y

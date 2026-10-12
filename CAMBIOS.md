@@ -14,6 +14,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   `PatientAppointmentCard` y `SolicitudCard`; no armar otra card de turno a mano. La solicitud deja la pill y los botones
   con hex en `style`. En *Elements / Appointment cards* y *Components / Scheduling / TarjetaTurno*.
 
+### Notifications: filtro de fecha y grupos por mes ([#26](https://github.com/JulianGerardi/red-dental-studio/pull/26))
+- Con muchas notificaciones, un campo de fecha junto a las pestañas: un clic filtra un día, el segundo arma un rango;
+  atajos (Today, Yesterday, Last 7/30/90 days), punto en los días con notificaciones y la ✕ para sacarlo. Las fechas
+  acotan las pestañas, la lista y las acciones en lote; sin resultados, el vacío ofrece *Clear dates*. Lo de más de una
+  semana se agrupa por mes, y Today / Yesterday / This week cuentan días de calendario.
+- **Para el dev:** componente nuevo `ui/date-filter` (`DateFilter`, `DateFilterPanel`), en *Elements / Date filter*;
+  usarlo para filtrar listas por fecha (el `DatePicker` sigue para campos de formulario). `grupoDe` devuelve un string
+  (grupos por mes) y hay `fechaDe` / `diasAtras` en `data/notificaciones.ts`; el store suma `HISTORIAL` (datos de
+  ejemplo). El `Token` del kit ya lee bien `primary` y `accent`.
+
 ## 2026-10-10
 
 ### Sombras más suaves (cards y pop ups) y Today Appointments con sombra ([#25](https://github.com/JulianGerardi/red-dental-studio/pull/25))
