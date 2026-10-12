@@ -7,11 +7,12 @@ const meta = { title: 'Pages/Parts/Scheduling', parameters: { layout: 'padded' }
 export default meta
 type Story = StoryObj<typeof meta>
 
-/* Tarjeta del panel de solicitudes: ASAP (acento rojo) y lista de espera (acento azul). */
+/* Tarjeta del panel de solicitudes: ASAP (barra y pill rojas) y lista de espera (azules). Es la misma card que los
+   turnos del Patient Dashboard; ver Elements / Appointment cards. */
 export const RequestCards: Story = {
   render: () => (
-    <div className="flex w-[300px] flex-col gap-3">
-      {SOLICITUDES.slice(0, 3).map((s) => <SolicitudCard key={s.id} s={s} onCancel={() => {}} onSchedule={() => {}} />)}
+    <div className="flex w-[248px] flex-col gap-2">
+      {SOLICITUDES.map((s) => <SolicitudCard key={s.id} s={s} onCancel={() => {}} onSchedule={() => {}} />)}
     </div>
   ),
 }

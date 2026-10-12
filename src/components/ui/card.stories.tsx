@@ -149,7 +149,7 @@ const EN_LA_APP: { nombre: string; uso: string; ancho: number; nodo: ReactNode }
   { nombre: 'OperatoryCard', uso: 'One room and who is in it.', ancho: 300, nodo: <Operatory /> },
   { nombre: 'PendingTaskCard', uso: 'A task that is waiting for someone.', ancho: 320, nodo: <Pending /> },
   { nombre: 'PatientCard', uso: 'A patient in the mobile list.', ancho: 340, nodo: <Patient /> },
-  { nombre: 'PatientAppointmentCard', uso: 'One appointment in the Patient Dashboard. Same surface as the dashboard cards.', ancho: 280, nodo: <PatientAppointment /> },
+  { nombre: 'PatientAppointmentCard', uso: 'One appointment in the Patient Dashboard. Same card as the appointment requests in Scheduling (TarjetaTurno): bar and pill in the status color.', ancho: 280, nodo: <PatientAppointment /> },
 ]
 
 export const InTheApp: Story = {

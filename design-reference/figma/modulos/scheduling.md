@@ -497,3 +497,16 @@ controla con `npm run ds:campos`. Date ocupaba todo el ancho entre pares de medi
 izquierda, encima de Start Time.
 Los rótulos de Treatment plan y Visit (paso 2) pasan a `FieldLabel`. Patient y los providers siguen de ancho entero:
 son búsquedas de persona.
+
+## Solicitudes: la misma card que los turnos del Patient Dashboard (2026-10-12)
+
+Pedido de Julián: las cards de *Appointment requests* y las de *Appointments* del Patient Dashboard con el mismo diseño
+(ver `patient-dashboard.md`, misma fecha). `SolicitudCard` pasa a usar `TarjetaTurno`:
+
+- Se va el punto de color al lado del nombre (repetía la barra y la pill) y entra el avatar con las iniciales.
+- La pill hecha a mano con hex sueltos (`#dc2626`, `#1d56bc` en `style`) pasa a `Pill` (danger / info), y la barra, a
+  token (`BARRA_TONOS`). Cancel y Schedule pasan a `ui/button` sm (28px): antes eran botones de 11px y unos 24px de alto.
+- El panel pasa de 260 a **280px**, el ancho de la columna Appointments del Patient Dashboard: la card mide lo mismo en
+  los dos lados. En el celular queda topado a `100vw - 116px` (259 en un iPhone de 375), como antes.
+- Con el avatar, en la lista de espera el nombre se recortaba demasiado ("Noah Ja…" junto a "Waiting 4 days"): ahora
+  baja a un segundo renglón.

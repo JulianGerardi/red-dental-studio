@@ -218,3 +218,28 @@ centro vertical igual al del título.
 
 El globo es ahora la pieza `Count` (`src/components/ui/count.tsx`, página *Elements / Counts* del Storybook), no un
 `<span>` suelto en `PatientDetail`: el design system es la fuente y la pantalla sólo la usa.
+
+## Appointments: la misma card que las solicitudes de Scheduling (2026-10-12)
+
+Julián: "las card de appointment request y las de appointment que están en el patient dashboard deben tener el mismo
+diseño; a las de appointments del dashboard patient les falta el stroke que tienen las otras". El stroke es la **barra de
+3px a la izquierda**: el 2026-10-06, al pasar a `InnerCard`, se le sacó a los turnos del paciente y la solicitud la
+conservó. Desde ese día eran dos cards escritas por separado y cada una fue por su lado (punto o avatar, pill propia o
+`Pill`, botones de 11px o `ui/button`).
+
+1. **Una sola card**, `TarjetaTurno` (`components/scheduling/TarjetaTurno.tsx`). `PatientAppointmentCard` y
+   `SolicitudCard` sólo traducen sus datos; no se pueden volver a separar sin tocarla.
+2. **La barra toma el color de la pill** (`BARRA_TONOS`): Booked azul, Fulfilled verde, No Show ámbar, Cancelled rojo; en
+   las solicitudes, ASAP rojo y lista de espera azul. Antes de sacarla era siempre azul, y la de la solicitud ya iba del
+   color de su pill: la regla "barra = pill" es la que vale para las dos y la que usan los bloques del calendario.
+3. Superficie `InnerCard` (línea de medio pixel y sombra suave) **más** la barra: la regla de las cards de adentro de un
+   panel sigue igual, la barra es un acento encima.
+4. El nombre baja a un segundo renglón antes de recortarse (en las solicitudes del celular se leía "Sofia …"); el nombre
+   completo queda en el `title`. El motivo, la fecha y el lugar siguen de un renglón.
+5. Validar con usuarios: si cuatro barras ámbar seguidas (No Show) se leen como alerta de más en la ficha. Si molesta, la
+   salida es dejar la barra en gris para los estados cerrados (Fulfilled, No Show, Cancelled) y en color sólo para el
+   que todavía pide algo (Booked).
+
+Storybook: *Elements / Appointment cards* (Playground con *Appointment request*, *Patient overview and request: one
+card*, *Request card: states*, *Long name* en los estados del Overview, barra por estado en *Specs*) y *Components /
+Scheduling / TarjetaTurno*.
