@@ -1,23 +1,25 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Archive, ArchiveRestore, CheckCheck, Clock, Inbox, Mail, MailOpen, type LucideIcon } from 'lucide-react'
+import { Archive, ArchiveRestore, CalendarX2, CheckCheck, Clock, Inbox, Mail, MailOpen, type LucideIcon } from 'lucide-react'
 import { PageTitle } from '@/components/ui/page-title'
 import { Tabs } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
+import { DateFilter, inRange, type DateRange } from '@/components/ui/date-filter'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA, ICONO_SUELTO } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
-import { grupoDe, haceCuanto, type EstadoNotificacion } from '@/data/notificaciones'
+import { fechaDe, grupoDe, haceCuanto, type EstadoNotificacion } from '@/data/notificaciones'
 import { useNotificaciones, type NotificacionViva } from '@/data/notificacionesStore'
 
 /* Notifications: todas las notificaciones, con la lógica del Inbox de Notion. Inbox muestra las leídas y las sin leer;
    Unread, sólo las sin leer; Archived, las archivadas. Suma Pending, lo que quedó para hacer (Notion no lo tiene; acá
    las notificaciones son tareas). Abrir una la marca leída y lleva a donde pasó. Se llega desde la campana ("View all
-   notifications"). Ver design-reference/figma/modulos/notifications.md. */
+   notifications"). Con muchas, el filtro de fecha acota pestañas, lista y acciones en lote. Ver
+   design-reference/figma/modulos/notifications.md. */
 
 export type Vista = 'Inbox' | 'Unread' | 'Pending' | 'Archived'
 
@@ -35,7 +37,13 @@ export const VACIO: Record<Vista, { icon: LucideIcon; title: string; detail: str
   Archived: { icon: Archive, title: 'No archived notifications', detail: 'Archive what’s done to keep your inbox short.' },
 }
 
-const GRUPOS = ['Today', 'Yesterday', 'This week', 'Older'] as const
+/* Con fechas elegidas y nada en ellas: lo dice y ofrece sacar el filtro (notifications.md, 2026-10-12). */
+export const VACIO_FECHAS: Record<Vista, string> = {
+  Inbox: 'No notifications on these dates',
+  Unread: 'No unread notifications on these dates',
+  Pending: 'Nothing pending on these dates',
+  Archived: 'No archived notifications on these dates',
+}
 
 /* Un botón de ícono de la fila, con su nombre para el lector de pantalla y el tooltip de la app (el oscuro, como en el
    menú del paciente), que dice qué hace antes de tocarlo. */
@@ -100,14 +108,25 @@ export default function Notifications() {
   const navigate = useNavigate()
   const notis = useNotificaciones()
   const [vista, setVista] = useState<Vista>('Inbox')
+  const [fechas, setFechas] = useState<DateRange | null>(null)
 
-  const ordenadas = [...notis.items].sort((a, b) => a.hace - b.hace)
-  const visibles = ordenadas.filter(EN_VISTA[vista])
-  const cuenta = (v: Vista) => notis.items.filter(EN_VISTA[v]).length
-  const sinLeer = notis.items.filter((n) => !n.archivada && n.estado === 'unread')
-  const leidas = notis.items.filter((n) => !n.archivada && n.estado === 'read')
-  const enInbox = notis.items.filter((n) => !n.archivada)
-  const archivadas = notis.items.filter((n) => n.archivada)
+  /* Las fechas acotan todo lo de abajo: los números de las pestañas, la lista y las acciones en lote. */
+  const delRango = notis.items.filter((n) => !fechas || inRange(fechaDe(n.hace), fechas))
+  const visibles = [...delRango].sort((a, b) => a.hace - b.hace).filter(EN_VISTA[vista])
+  const cuenta = (v: Vista) => delRango.filter(EN_VISTA[v]).length
+  const sinLeer = delRango.filter((n) => !n.archivada && n.estado === 'unread')
+  const leidas = delRango.filter((n) => !n.archivada && n.estado === 'read')
+  const enInbox = delRango.filter((n) => !n.archivada)
+  const archivadas = delRango.filter((n) => n.archivada)
+  /* El punto del calendario: días con algo en la pestaña abierta. */
+  const diasConNotis = notis.items.filter(EN_VISTA[vista]).map((n) => fechaDe(n.hace))
+  /* Grupos en el orden en que aparecen (la lista ya va de la más nueva a la más vieja). */
+  const grupos = visibles.reduce<{ titulo: string; items: NotificacionViva[] }[]>((acc, n) => {
+    const titulo = grupoDe(n.hace)
+    if (acc.at(-1)?.titulo === titulo) acc.at(-1)!.items.push(n)
+    else acc.push({ titulo, items: [n] })
+    return acc
+  }, [])
 
   /* Todo cambio masivo avisa con Undo, que devuelve cada una a como estaba. */
   const conUndo = (mensaje: string, antes: NotificacionViva[], hacer: () => void) => {
@@ -157,30 +176,37 @@ export default function Notifications() {
         </div>
       </div>
 
-      <Tabs
-        className="mt-5"
-        aria-label="Filter notifications"
-        tabs={(['Inbox', 'Unread', 'Pending', 'Archived'] as const).map((v) => ({ value: v, count: cuenta(v) }))}
-        value={vista}
-        onChange={setVista}
-      />
+      {/* Pestañas y fecha en la misma fila: las dos cambian qué se ve. En el celular la fecha baja. */}
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+        <Tabs
+          aria-label="Filter notifications"
+          tabs={(['Inbox', 'Unread', 'Pending', 'Archived'] as const).map((v) => ({ value: v, count: cuenta(v) }))}
+          value={vista}
+          onChange={setVista}
+        />
+        <DateFilter value={fechas} onChange={setFechas} marked={diasConNotis} label="Filter notifications by date" />
+      </div>
 
       <section aria-label={`${vista} notifications`} className="mt-4 overflow-hidden rounded-lg bg-white shadow-panel">
-        {visibles.length ? (
-          GRUPOS.map((g) => {
-            const del = visibles.filter((n) => grupoDe(n.hace) === g)
-            if (!del.length) return null
-            return (
-              <div key={g}>
-                <h2 className="border-b border-line-row bg-surface-subtle px-4 py-2 text-[11px] font-semibold tracking-[0.06em] text-ink-muted uppercase">{g}</h2>
-                <ul className="m-0 list-none p-0">
-                  {del.map((n) => (
-                    <FilaNotificacion key={n.id} n={n} onAbrir={abrir} onMarcar={(x, estado) => notis.marcar([x.id], estado)} onArchivar={archivar} />
-                  ))}
-                </ul>
-              </div>
-            )
-          })
+        {grupos.length ? (
+          grupos.map((g) => (
+            <div key={g.titulo}>
+              <h2 className="border-b border-line-row bg-surface-subtle px-4 py-2 text-[11px] font-semibold tracking-[0.06em] text-ink-muted uppercase">{g.titulo}</h2>
+              <ul className="m-0 list-none p-0">
+                {g.items.map((n) => (
+                  <FilaNotificacion key={n.id} n={n} onAbrir={abrir} onMarcar={(x, estado) => notis.marcar([x.id], estado)} onArchivar={archivar} />
+                ))}
+              </ul>
+            </div>
+          ))
+        ) : fechas ? (
+          <EmptyState
+            className="py-14"
+            icon={CalendarX2}
+            title={VACIO_FECHAS[vista]}
+            detail="Pick other dates, or clear them to see everything."
+            accion={{ label: 'Clear dates', onClick: () => setFechas(null) }}
+          />
         ) : (
           <EmptyState className="py-14" {...VACIO[vista]} />
         )}

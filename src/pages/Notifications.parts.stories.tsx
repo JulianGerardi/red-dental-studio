@@ -1,11 +1,11 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Archive, ArchiveRestore, Clock, Mail, MailOpen } from 'lucide-react'
+import { Archive, ArchiveRestore, CalendarX2, Clock, Mail, MailOpen } from 'lucide-react'
 import { NOTIFICACIONES, type EstadoNotificacion } from '@/data/notificaciones'
 import type { NotificacionViva } from '@/data/notificacionesStore'
 import { Bloque, ConRotulo, Forzar, Lienzo, Muestras, Tabla, Token, medidasDe, type Medidas } from '@/design-system/kit'
 import { EmptyState } from '@/components/ui/empty-state'
-import { Accion, FilaNotificacion, VACIO, type Vista } from './Notifications'
+import { Accion, FilaNotificacion, VACIO, VACIO_FECHAS, type Vista } from './Notifications'
 
 /* La fila de Notifications, documentada como Elements (Playground, Parts, States, Types, Row actions, Specs). La
    pantalla completa está en Pages › Notifications. */
@@ -38,6 +38,8 @@ const meta = {
           '**Tipos:** *Task* (firmar, confirmar, verificar; va al banner mientras no esté leída) · *Notice* (un pago, una mención). Se ven igual: lo que cambia es si va al banner.',
           '',
           '**En el celular** no hay hover: las acciones quedan siempre a la vista (ver *Guidelines › On each device*).',
+          '',
+          '**Con muchas notificaciones:** el filtro de fecha (*Elements / Date filter*) en la fila de las pestañas acota los números, la lista y las acciones en lote; lo de más de una semana se agrupa por mes (*Earlier this month*, *September*…), no en un solo *Older*.',
           '',
           '**Probalo:** en *Playground* cambiá estado, tipo, texto y hace cuánto llegó desde *Controls*; pasá el mouse por la fila para ver las acciones, cada una con su tooltip.',
         ].join('\n'),
@@ -261,7 +263,7 @@ export const Content: Story = {
   ),
 }
 
-/* Cada pestaña sin nada que mostrar: qué pasó y qué hacer. */
+/* Cada pestaña sin nada que mostrar: qué pasó y qué hacer. Con fechas elegidas, el vacío lo dice y ofrece sacarlas. */
 export const EmptyStates: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
@@ -270,6 +272,13 @@ export const EmptyStates: Story = {
         {(Object.keys(VACIO) as Vista[]).map((v) => (
           <Estado key={v} titulo={v} nota={VACIO[v].detail}>
             <div className="max-w-[820px] rounded-lg border border-line bg-white"><EmptyState className="py-10" {...VACIO[v]} /></div>
+          </Estado>
+        ))}
+        {(Object.keys(VACIO_FECHAS) as Vista[]).map((v) => (
+          <Estado key={`fechas-${v}`} titulo={`${v} · with dates`} nota="Nada en las fechas elegidas: lo dice y Clear dates vuelve a All dates.">
+            <div className="max-w-[820px] rounded-lg border border-line bg-white">
+              <EmptyState className="py-10" icon={CalendarX2} title={VACIO_FECHAS[v]} detail="Pick other dates, or clear them to see everything." accion={{ label: 'Clear dates', onClick: nada }} />
+            </div>
           </Estado>
         ))}
       </Lienzo>
@@ -359,6 +368,8 @@ function Medir() {
           <li>Row actions show on hover or keyboard focus, each with its tooltip; on small screens they are always visible.</li>
           <li>Tasks go to the banner while they are unread or pending and not archived.</li>
           <li>The icon is gray for every notification; it only turns amber when the notification is pending.</li>
+          <li>The date filter narrows the tab counts, the list and the bulk actions to the chosen dates.</li>
+          <li>Groups: Today, Yesterday, This week (calendar days), then one per month.</li>
         </ul>
       </Bloque>
     </Lienzo>

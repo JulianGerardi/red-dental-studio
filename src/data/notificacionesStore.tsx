@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
-import { NOTIFICACIONES, type EstadoNotificacion, type Notificacion } from './notificaciones'
+import { HISTORIAL, NOTIFICACIONES, type EstadoNotificacion, type Notificacion } from './notificaciones'
 
 /* Store en memoria de las notificaciones: lo comparten la campana, el banner y la pantalla Notifications. Como el de
    pacientes, no persiste entre recargas (es un prototipo; la demo arranca siempre igual). Ver
@@ -22,7 +22,7 @@ type Ctx = {
 const Contexto = createContext<Ctx | null>(null)
 
 export function NotificacionesProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<NotificacionViva[]>(() => NOTIFICACIONES.map((n) => ({ ...n, archivada: n.archivada ?? false })))
+  const [items, setItems] = useState<NotificacionViva[]>(() => [...NOTIFICACIONES, ...HISTORIAL].map((n) => ({ ...n, archivada: n.archivada ?? false })))
   const [ocultas, setOcultas] = useState<string[]>([])
 
   const cambiar = useCallback((ids: string[], f: (n: NotificacionViva) => NotificacionViva) =>

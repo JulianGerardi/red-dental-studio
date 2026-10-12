@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { AtSign, BadgeDollarSign, CalendarPlus, ClipboardCheck, FileCheck2, FileSignature, FlaskConical, ListTodo, LogIn, Package, Receipt, Send, ShieldAlert, TrendingUp, Truck, Wrench } from 'lucide-react'
+import { AtSign, BadgeDollarSign, CalendarPlus, CalendarX2, ClipboardCheck, FileCheck2, FileSignature, FlaskConical, ListTodo, LogIn, Package, Receipt, Send, ShieldAlert, ShieldCheck, TrendingUp, Truck, UserPlus, Wrench } from 'lucide-react'
 
 /* Las notificaciones del usuario, con la lógica del Inbox de Notion: cada una está sin leer, leída o pendiente
    (lo que quedó para hacer), y se archiva cuando ya no hace falta verla. Las que son tareas van además al banner
@@ -252,20 +252,73 @@ export const NOTIFICACIONES: Notificacion[] = [
   },
 ]
 
+/* Historial de los últimos meses, para ver la pantalla con muchas notificaciones (y usar el filtro de fecha). Todas
+   leídas o pendientes y ninguna tarea: no cambian la campana ni el banner. Ver notifications.md (2026-10-12). */
+const vieja = (n: number, dias: number, titulo: string, detalle: string, accion: string, to: string, icon: LucideIcon, extra: Partial<Notificacion> = {}): Notificacion =>
+  ({ id: `h${n}`, titulo, detalle, accion, to, icon, tarea: false, hace: dias * DIA + 3 * HORA, estado: 'read', ...extra })
+const REPORTE = ['Weekly report is ready', 'Production and collections for last week are ready to review.', 'Open billing', '/billing', TrendingUp] as const
+
+export const HISTORIAL: Notificacion[] = [
+  vieja(1, 12, 'Payment received', '$85.00 from Elias Aguirre was applied to his ledger.', 'Open ledger', '/patients/patient-0001/ledger', BadgeDollarSign),
+  vieja(2, 13, 'Appointment canceled', 'Sofía Romero canceled her 2:30 PM cleaning with Dr. Martinez.', 'Open scheduling', '/scheduling', CalendarX2),
+  vieja(3, 15, 'Lab results are back', 'Bite registration for Mara Otero came back from Lakeside Lab.', 'View documents', '/patients/patient-0001/documents', FlaskConical),
+  vieja(4, 16, 'Consent signed', 'John Smith signed the root canal consent.', 'View documents', '/patients/patient-0001/documents', FileCheck2),
+  vieja(5, 18, ...REPORTE),
+  vieja(6, 18, 'New appointment request', 'Lucía Benítez asked for a consultation next Tuesday.', 'Open scheduling', '/scheduling', CalendarPlus),
+  vieja(7, 20, 'Insurance verified', 'Delta Dental confirmed coverage for Noah James.', 'Open insurance', '/patients/patient-0001/insurance', ShieldCheck),
+  vieja(8, 23, 'Dr. Emily Chen mentioned you', '“@Sarah please call Mr. Smith about his crown.”', 'Open treatment plan', '/patients/patient-0001/treatments', AtSign, { autor: 'Dr. Emily Chen' }),
+  vieja(9, 25, ...REPORTE),
+  vieja(10, 26, 'Claim paid', 'Northwind Dental Plan paid $340.00 for Mara Otero.', 'Open billing', '/billing', Receipt),
+  vieja(11, 28, 'Treatment plan accepted', 'Elias Aguirre accepted his treatment plan (2 procedures).', 'Open treatment plan', '/patients/patient-0001/treatments', ClipboardCheck),
+  vieja(12, 31, 'Supply order delivered', 'Composite and bonding agent arrived at Abril - Los Angeles.', 'Open locations', '/settings/locations', Package, { archivada: true }),
+  vieja(13, 32, ...REPORTE),
+  vieja(14, 33, 'Payment received', '$200.00 from John Smith was applied to his ledger.', 'Open ledger', '/patients/patient-0001/ledger', BadgeDollarSign),
+  vieja(15, 38, 'Referral answered', 'Dr. Salgado scheduled John Smith for an evaluation.', 'Open referral', '/patients/patient-0001/treatments', Send, { autor: 'Dr. Salgado’s office' }),
+  vieja(16, 39, ...REPORTE),
+  vieja(17, 41, 'Operatory 2 is back in service', 'Maintenance is done; it’s available for appointments again.', 'Open locations', '/settings/locations', Wrench),
+  vieja(18, 44, 'New fee schedule from Northwind', 'Updated allowed amounts are ready to review.', 'Open billing', '/billing', Receipt, { estado: 'pending' }),
+  vieja(19, 46, ...REPORTE),
+  vieja(20, 47, 'Lab case shipped', 'Lakeside Lab shipped the night guard for Sofía Romero.', 'View documents', '/patients/patient-0001/documents', Truck, { archivada: true }),
+  vieja(21, 52, 'Consent signed', 'Lucía Benítez signed the whitening consent.', 'View documents', '/patients/patient-0001/documents', FileCheck2),
+  vieja(22, 53, ...REPORTE),
+  vieja(23, 55, 'Appointment canceled', 'Noah James canceled his 9:00 AM check-up.', 'Open scheduling', '/scheduling', CalendarX2),
+  vieja(24, 60, 'Insurance verified', 'Northwind Dental Plan confirmed coverage for Elias Aguirre.', 'Open insurance', '/patients/patient-0001/insurance', ShieldCheck, { archivada: true }),
+  vieja(25, 64, 'Dr. Elena Martinez mentioned you', '“@Sarah can you move my Friday patients to Monday?”', 'Open scheduling', '/scheduling', AtSign, { autor: 'Dr. Elena Martinez' }),
+  vieja(26, 70, 'Payment received', '$60.00 from Sofía Romero was applied to her ledger.', 'Open ledger', '/patients/patient-0001/ledger', BadgeDollarSign),
+  vieja(27, 78, 'New team member', 'Sarah Stone joined Abril - Los Angeles as a hygienist.', 'Open team', '/settings/team', UserPlus),
+]
+
+/** El momento en que llegó. */
+export const fechaDe = (minutos: number) => new Date(Date.now() - minutos * 60_000)
+
+/* Cuántos días de calendario atrás llegó (0 hoy, 1 ayer), no cuántas veces 24 horas: así el grupo Today y el filtro
+   Today muestran lo mismo. */
+export function diasAtras(minutos: number): number {
+  const f = fechaDe(minutos)
+  const hoy = new Date()
+  return Math.round((new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()).getTime() - new Date(f.getFullYear(), f.getMonth(), f.getDate()).getTime()) / (DIA * 60_000))
+}
+
 /* "2h ago", "Yesterday", "Mar 3": corto, como en el Inbox de Notion. */
 export function haceCuanto(minutos: number): string {
   if (minutos < 1) return 'Just now'
   if (minutos < HORA) return `${Math.round(minutos)}m ago`
   if (minutos < DIA) return `${Math.floor(minutos / HORA)}h ago`
-  if (minutos < 2 * DIA) return 'Yesterday'
-  if (minutos < 7 * DIA) return `${Math.floor(minutos / DIA)}d ago`
-  return new Date(Date.now() - minutos * 60_000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  const dias = diasAtras(minutos)
+  if (dias <= 1) return 'Yesterday'
+  if (dias < 7) return `${dias}d ago`
+  return fechaDe(minutos).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-/* Los grupos de la lista, del más nuevo al más viejo. */
-export function grupoDe(minutos: number): 'Today' | 'Yesterday' | 'This week' | 'Older' {
-  if (minutos < DIA) return 'Today'
-  if (minutos < 2 * DIA) return 'Yesterday'
-  if (minutos < 7 * DIA) return 'This week'
-  return 'Older'
+/* Los grupos de la lista, del más nuevo al más viejo: Today, Yesterday, This week y después un grupo por mes, para que
+   una lista larga no termine en un solo "Older". */
+export function grupoDe(minutos: number): string {
+  const dias = diasAtras(minutos)
+  if (dias === 0) return 'Today'
+  if (dias === 1) return 'Yesterday'
+  if (dias < 7) return 'This week'
+  const f = fechaDe(minutos)
+  const hoy = new Date()
+  if (f.getFullYear() === hoy.getFullYear() && f.getMonth() === hoy.getMonth()) return 'Earlier this month'
+  return f.toLocaleDateString('en-US', { month: 'long', year: f.getFullYear() === hoy.getFullYear() ? undefined : 'numeric' })
 }
