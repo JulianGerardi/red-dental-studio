@@ -243,3 +243,16 @@ conservó. Desde ese día eran dos cards escritas por separado y cada una fue po
 Storybook: *Elements / Appointment cards* (Playground con *Appointment request*, *Patient overview and request: one
 card*, *Request card: states*, *Long name* en los estados del Overview, barra por estado en *Specs*) y *Components /
 Scheduling / TarjetaTurno*.
+
+## Listas largas con "Show more" (2026-10-12)
+
+Misma regla que el Dashboard (ver `dashboard.md`, mismo día, y *Elements / Show more*): se ven unos pocos y "Show N
+more" abre el resto con scroll adentro.
+
+- **Pending Task:** las tareas pasan a `TaskRow`, la fila del Dashboard (mismo contenido que `PendingTaskCard`, menos
+  alto), dentro de `ListGroup`; se ven 3.
+- **Appointments:** la misma `PatientAppointmentCard`; se ven 3.
+- **Pending documents:** se ven los primeros 4 en el orden de los grupos (Overdue, Due this week, Later); cada rótulo
+  sigue contando todos los de su grupo.
+
+Con los datos de la demo el Overview pasa de 1.842px a 1.291px de alto.

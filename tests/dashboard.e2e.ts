@@ -21,3 +21,19 @@ test('La fecha se lee "Feb 28, 2026"; elegir un día lo cambia y Today vuelve a 
   await expect(screen.getByRole('button', largo(new Date()))).toBeVisible()
   await expect(screen.getByRole('button', /Today/)).toHaveCount(0)
 })
+
+/* Listas largas: se ven unos pocos y "Show N more" abre el resto con scroll adentro; "Show less" vuelve
+   (ui/show-more, dashboard.md 2026-10-12). Con ?day=busy hay 35 turnos. */
+test('Con muchos turnos se ven cinco y Show more abre el resto con scroll', async ({ app, screen }) => {
+  await app.open('/?day=busy')
+  await expect(screen.getByRole('button', 'Show 30 more')).toBeVisible()
+  await expect(screen.getByRole('region', 'All appointments')).toHaveCount(0)
+
+  await screen.getByRole('button', 'Show 30 more').tap()
+  await expect(screen.getByRole('region', 'All appointments')).toBeVisible()
+  await expect(screen.getByRole('button', 'Show less')).toBeVisible()
+
+  await screen.getByRole('button', 'Show less').tap()
+  await expect(screen.getByRole('region', 'All appointments')).toHaveCount(0)
+  await expect(screen.getByRole('button', 'Show 30 more')).toBeVisible()
+})

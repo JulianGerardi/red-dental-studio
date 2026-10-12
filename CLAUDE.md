@@ -106,6 +106,9 @@ El código lo toman **jonatan784** y **betsyMb**, y se enteran de cada cambio po
 - **Rediseñar no es cambiar el contenido.** Una propuesta de layout (filas en vez de cards, grupos, columnas) muestra los
   mismos datos, textos y acciones que la pantalla original —chips como TR y CC, Check Out, Cancel—; nada inventado
   (estados, métricas, botones, flujos). Lo nuevo se propone aparte y espera su ok.
+- **Listas largas** (muchas cards o mucha información): se ven unos pocos y "Show N more" abre el resto con scroll
+  adentro, sin estirar la página (`ui/show-more`; filas en caja con `ui/list-group`). Turnos y tareas, con las filas de
+  `dashboard/DashboardRows` en vez de las cards grandes.
 
 ## Design system
 

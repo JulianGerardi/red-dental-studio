@@ -727,21 +727,24 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   de cada estado. *Components / Scheduling / TarjetaTurno* con sus variantes; *Elements / Cards → Cards in the app* y
   *Pages / Parts / Scheduling → Request Cards* actualizados.
 
-## Propuesta: Dashboard con volumen (2026-10-12)
+## Listas largas: filas y "Show more" con scroll (2026-10-12)
 
-- Página temporal **Proposals / Dashboard with volume** (`src/pages/Dashboard.variantes.stories.tsx`): Playground con la
-  pantalla real (variante y día desde *Controls*), Parts (la barra de la propuesta y el cuerpo de A y de B con el día
-  cargado), States (día de la demo, día vacío, filtro sin resultados) y Specs (altos medidos y breakpoints). En la app,
-  el selector `BarraPropuesta` arriba del Dashboard (`?variant=a|b`, `?day=busy`). Cuando Julián elija, la variante pasa
-  a ser el Dashboard y la página y el selector se borran.
-- **Elements / List group** (`ui/list-group.tsx`, nuevo): una lista larga dentro de una card, en grupos. Rótulo en
-  versalitas con la cuenta (opcional), filas en caja de línea fina, plegable, con tope ("Show N more") y rótulo pegado
-  arriba en un panel con scroll.
-- **Components / Dashboard / Dashboard rows** (`dashboard/DashboardRows.tsx`, nuevo): `AppointmentRow` y `TaskRow`, **con
-  el mismo contenido que `AppointmentCard` y `PendingTaskCard`** (chips TR y CC, Check In, Check Out o Cancel, Edit
-  appointment; Requested, documento, Expired date, fechas, Complete this Task), y `RoomStrip` con `OperatoryCard`. Se
-  adaptan al ancho de su lista con `@container`. La acción del pie de la card de turno pasó a `accionTurno` y la de la
-  tarea a `completarTarea`, para que card y fila hagan lo mismo.
-- Regla que dejó la corrección de Julián: **rediseñar no es cambiar el contenido**. Una propuesta de diseño muestra los
-  mismos datos, textos y acciones que la pantalla original; nada inventado (estados, métricas, botones). Ver
-  `figma/modulos/dashboard.md`.
+- La propuesta de dos variantes del Dashboard se cerró: queda el layout de siempre y, para toda la app, la regla de
+  Julián para muchas cards o mucha información: **se ven unos pocos y "Show N more" abre el resto con scroll adentro**.
+  La página temporal *Proposals / Dashboard with volume* y el selector de la app se borraron.
+- **Elements / Show more** (`ui/show-more.tsx`, nuevo): `ShowMore` dibuja los primeros `limit` ítems (función hija);
+  abierta, alto máximo `max(alto cerrado, min(70vh, 640px))` con scroll, degradé abajo que avisa que hay más (color del
+  fondo: `fade`) y "Show less". Sin pasar el tope, no hay botón. La zona con scroll es una región con nombre, alcanzable
+  con Tab.
+- **Elements / List group** (`ui/list-group.tsx`, nuevo): filas en una caja de línea fina con rótulo opcional, y el tope
+  de `ShowMore` por dentro.
+- **Components / Dashboard / Dashboard rows** (`dashboard/DashboardRows.tsx`, nuevo): `AppointmentRow` y `TaskRow`, con
+  el mismo contenido que `AppointmentCard` y `PendingTaskCard`. Se adaptan al ancho de su lista con `@container`
+  (columnas desde 768px el turno y 1024px la tarea). La acción del pie de la card de turno pasó a `accionTurno` y la de
+  la tarea a `completarTarea`, para que card y fila hagan lo mismo.
+- Dónde: Dashboard (turnos, sala de espera, salas, tareas), Patient Dashboard (Pending Task con `TaskRow`, Appointments,
+  Pending documents) y Treatments. *Pages / Dashboard Busy Day* muestra el Dashboard con 35 turnos (`?day=busy`).
+- **Documents Manager** con el encabezado de las tablas por defecto: `SettingsPageHeader` (la bajada pasa a ser
+  opcional) y `SettingsSearch`. *SettingsPageHeader → States* suma *Without subtitle*.
+- Regla que dejó la corrección de Julián sobre la propuesta: **rediseñar no es cambiar el contenido** (mismos datos,
+  textos y acciones que la pantalla original). Ver `figma/modulos/dashboard.md`.

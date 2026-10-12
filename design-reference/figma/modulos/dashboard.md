@@ -497,3 +497,21 @@ Quedan el diseño de filas, los grupos, el scroll por panel, los tabs y los anch
 
 **Qué validar con usuarios:** si recepción deja el dashboard abierto todo el día en un monitor (favorece A); si los
 odontólogos quieren ver sólo sus turnos por defecto (el viejo toggle Provider / Recepcionista, como filtro por rol).
+
+## Cierre de la propuesta: el layout de siempre, filas y "Show more" (2026-10-12)
+
+Julián, después de ver A y B: "me quedo con la opción que tenemos", y para toda la app, cuando hay muchas cards o mucha
+información, **como en la A: un scroll y un "Show more" que lo activa**, con **las cards que se diseñaron para la A**,
+que ocupan menos. Las variantes, el selector de propuesta y la página *Proposals / Dashboard with volume* se borraron.
+
+- **Layout:** el del Figma, sin cambios (Appointments · Waiting Room · Rooms y Pending Task a lo ancho).
+- **Filas:** turnos y sala de espera con `AppointmentRow`, tareas con `TaskRow` (`DashboardRows.tsx`), con el mismo
+  contenido que las cards. `TaskRow` vuelve a mostrar el tipo (en la A iba en el rótulo del grupo) y pasa a columnas
+  recién desde 1024px de lista. Las salas siguen con `OperatoryCard`.
+- **Tope y scroll** (`ui/show-more`, *Elements / Show more*): se ven 5 turnos, 5 en espera, 6 salas y 5 tareas; "Show N
+  more" abre el resto adentro de un scroll (alto máximo `min(70vh, 640px)`, nunca menos que cerrado) sin estirar la
+  página, con un degradé abajo que avisa que hay más; "Show less" vuelve. El orden de las listas es el de los datos.
+- **Día cargado:** `?day=busy` sigue cargando 35 turnos, 8 en espera y 28 tareas en la fecha de la demo para ver el
+  Dashboard con volumen (*Pages / Dashboard Busy Day*): 1.381px de alto contra 10.614px con cards.
+- Las acciones de las cards pasaron a funciones compartidas (`accionTurno`, `completarTarea`): la card y la fila hacen
+  lo mismo.

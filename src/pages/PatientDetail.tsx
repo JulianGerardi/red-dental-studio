@@ -8,7 +8,10 @@ import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
 import { ClinicalItemModal } from '@/components/patients/ClinicalItemModal'
 import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clinicalItems'
 import { aviso } from '@/components/ui/toaster'
-import { PendingTaskCard, type PendingTask } from '@/components/dashboard/PendingTaskCard'
+import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
+import { TaskRow } from '@/components/dashboard/DashboardRows'
+import { ListGroup } from '@/components/ui/list-group'
+import { ShowMore } from '@/components/ui/show-more'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
@@ -29,6 +32,9 @@ const TASKS: PendingTask[] = Array.from({ length: 6 }, () => ({
   kind: 'Referrals', state: 'Requested', person: 'Elena Marquez', initials: 'EM',
   register: 'March 17, 2025', expiration: 'March 15, 2025',
 }))
+
+/* Cuántos se ven en cada bloque antes de "Show N more" (ui/show-more; patient-dashboard.md, 2026-10-12). */
+const TOPE = { tareas: 3, turnos: 3 }
 
 const APPTS: { status: PatientAppointmentStatus; cancel?: boolean }[] = [
   { status: 'Booked', cancel: true }, { status: 'Cancelled' }, { status: 'Fulfilled' },
@@ -142,27 +148,30 @@ export default function PatientDetail() {
                 <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
                 <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
               </div>
-              <div className="mt-4 grid gap-4 xl:grid-cols-2">
-                {TASKS.map((t, i) => <PendingTaskCard key={i} task={t} />)}
-              </div>
+              {/* Las tareas en filas, las mismas del Dashboard: menos alto con las mismas partes. */}
+              <ListGroup className="mt-4" limit={TOPE.tareas} label="pending tasks">
+                {TASKS.map((t, i) => <TaskRow key={i} task={t} />)}
+              </ListGroup>
             </Card>
 
             <Card className="p-4">
               <h2 className="text-[15px] font-bold text-ink">Appointments</h2>
               <Tabs size="sm" fullWidth className="mt-3" aria-label="Appointments" tabs={['Next', 'Next Appointments'] as const} value={apptTab} onChange={setApptTab} />
-              <div className="mt-3 flex flex-col gap-2">
-                {APPTS.map((a, i) => (
-                  <PatientAppointmentCard
-                    key={i}
-                    name="Maria Abril Viola"
-                    initials="av"
-                    status={a.status}
-                    reason="Routine cleaning appointment"
-                    when="12 Mar 2025 · 10:00 - 11:00 AM"
-                    place="Los Angeles - 789 N Sunrise Street"
-                    onCancel={a.cancel ? () => aviso.warn('Appointment cancelled.') : undefined}
-                  />
-                ))}
+              <div className="mt-3">
+                <ShowMore total={APPTS.length} limit={TOPE.turnos} label="appointments" className="flex flex-col gap-2">
+                  {(n) => APPTS.slice(0, n).map((a, i) => (
+                    <PatientAppointmentCard
+                      key={i}
+                      name="Maria Abril Viola"
+                      initials="av"
+                      status={a.status}
+                      reason="Routine cleaning appointment"
+                      when="12 Mar 2025 · 10:00 - 11:00 AM"
+                      place="Los Angeles - 789 N Sunrise Street"
+                      onCancel={a.cancel ? () => aviso.warn('Appointment cancelled.') : undefined}
+                    />
+                  ))}
+                </ShowMore>
               </div>
             </Card>
           </div>

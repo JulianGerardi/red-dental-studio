@@ -1,15 +1,13 @@
 import { ArrowRight, Check, FileText, TriangleAlert, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { TARJETA_PANEL } from '@/lib/estilos'
 import { StatusPill } from './primitives'
 import { MenuCard, accionTurno, type Appointment } from './AppointmentCard'
-import { OperatoryCard, type Operatory } from './OperatoryCard'
 import { completarTarea, type PendingTask } from './PendingTaskCard'
 
 /* Las filas del Dashboard con volumen (propuesta del 2026-10-12, ver design-reference/figma/modulos/dashboard.md): lo
    mismo que cada card del Figma, en una fila. Mismos datos, mismos chips y mismas acciones; cambia sólo cómo se acomodan.
-   Con @container la fila se adapta al ancho de su lista: en renglones en angosto, en columnas desde 768px. */
+   Con @container la fila se adapta al ancho de su lista: en renglones en angosto, en columnas cuando entra. */
 
 /* Los chips TR y CC de la card de turno (AppointmentCard), a 24px de alto. */
 export function ChipsTurno() {
@@ -126,9 +124,11 @@ export function DocYVencida() {
   )
 }
 
-/* Una tarea: lo mismo que PendingTaskCard (paciente, Requested, documento, Expired date, Register, Expiration date y
-   Complete this Task). El tipo va en el rótulo del grupo. */
+/* Una tarea: lo mismo que PendingTaskCard (tipo, Requested, paciente, documento, Expired date, Register, Expiration
+   date y Complete this Task), en el mismo orden pero más compacta. En columnas recién desde 1024px de lista: tiene más
+   partes que el turno. */
 export function TaskRow({ task }: { task: PendingTask }) {
+  const tipo = <span className="text-dash-name truncate text-sm leading-none font-bold">{task.kind}</span>
   const persona = (
     <span className="flex min-w-0 items-center gap-2">
       <span className="bg-dash-count-bg text-dash-blue-hover flex size-7 shrink-0 items-center justify-center rounded-md text-[11px] font-semibold">
@@ -148,50 +148,39 @@ export function TaskRow({ task }: { task: PendingTask }) {
       <span className={cn('font-medium whitespace-nowrap', color)}>{valor}</span>
     </span>
   )
+  const fechas = (
+    <span className="flex gap-4">
+      {fecha('Register', task.register, 'text-dash-blue')}
+      {fecha('Expiration date', task.expiration, 'text-dash-bad-fg')}
+    </span>
+  )
   const boton = (
     <Button size="sm" className="shrink-0" onClick={() => completarTarea(task)}>Complete this Task <ArrowRight /></Button>
   )
 
   return (
     <div className="@container">
-      <div className="flex flex-col gap-2 py-2.5 pr-2 pl-3 @3xl:hidden">
-        {/* Si no entra, el documento y Expired date bajan en vez de cortar el nombre. */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="flex min-w-[min(210px,100%)] flex-1 items-center gap-2">{persona}{estado}</span>
+      <div className="flex flex-col gap-2 py-2.5 pr-2 pl-3 @5xl:hidden">
+        <div className="flex items-center justify-between gap-2">{tipo}{estado}</div>
+        {/* Si no entran, el documento y Expired date bajan en vez de cortar el nombre; lo mismo el botón. */}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="flex min-w-[min(180px,100%)] flex-1">{persona}</span>
           <DocYVencida />
         </div>
-        <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2 pl-9">
-          <span className="flex gap-4">
-            {fecha('Register', task.register, 'text-dash-blue')}
-            {fecha('Expiration date', task.expiration, 'text-dash-bad-fg')}
-          </span>
-          {boton}
+        <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+          {fechas}
+          <span className="ml-auto">{boton}</span>
         </div>
       </div>
 
-      <div className="hidden items-center gap-4 py-2 pr-2 pl-3 @3xl:flex">
-        <span className="flex w-48 shrink-0">{persona}</span>
+      <div className="hidden items-center gap-4 py-2 pr-2 pl-3 @5xl:flex">
+        <span className="flex w-28 shrink-0">{tipo}</span>
+        <span className="flex w-44 shrink-0">{persona}</span>
         <span className="w-24 shrink-0">{estado}</span>
         <DocYVencida />
-        <span className="flex min-w-0 flex-1 justify-end gap-6">
-          {fecha('Register', task.register, 'text-dash-blue')}
-          {fecha('Expiration date', task.expiration, 'text-dash-bad-fg')}
-        </span>
+        <span className="flex min-w-0 flex-1 justify-end">{fechas}</span>
         {boton}
       </div>
     </div>
-  )
-}
-
-/* Las salas arriba del tablero: la misma card de operatorio, en grilla. Seis por fila recién desde 1536px: más angosto,
-   el nombre y "Unavailable" no entraban juntos y el nombre se cortaba. */
-export function RoomStrip({ rooms }: { rooms: Operatory[] }) {
-  return (
-    <section aria-label="Rooms" className={cn(TARJETA_PANEL, 'flex flex-col gap-3 p-4')}>
-      <h2 className="text-[15px] font-bold text-ink">Rooms</h2>
-      <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
-        {rooms.map((r, i) => <li key={i}><OperatoryCard room={r} /></li>)}
-      </ul>
-    </section>
   )
 }

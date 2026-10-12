@@ -1,10 +1,10 @@
 import { Children, isValidElement, useState, type ReactNode } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ShowMore } from './show-more'
 
-/* Una lista larga adentro de una card, en grupos: rótulo en versalitas con la cuenta, plegable y con tope de ítems
-   ("Show 12 more"). Generaliza el agrupado de Pending documents para el Dashboard con volumen. Ver
-   design-reference/figma/modulos/dashboard.md (2026-10-12). */
+/* Filas en una caja de línea fina dentro de una card, con rótulo opcional y el tope de ShowMore: se ven los primeros
+   `limit` y "Show N more" abre el resto con scroll. Ver design-reference/figma/modulos/dashboard.md (2026-10-12). */
 
 export const LIST_GROUP_TONES = {
   default: 'text-ink-muted',
@@ -14,28 +14,27 @@ export const LIST_GROUP_TONES = {
 export type ListGroupTone = keyof typeof LIST_GROUP_TONES
 
 export function ListGroup({
-  title, tone = 'default', collapsible, defaultOpen = true, limit, sticky, className, children,
+  title, tone = 'default', collapsible, defaultOpen = true, limit, maxHeight, label, className, children,
 }: {
-  /** Nombre del grupo; va en versalitas con la cuenta. Sin título, es sólo la lista (la Waiting Room). */
+  /** Nombre del grupo; va en versalitas con la cuenta. Sin título, es sólo la lista. */
   title?: string
-  /** Color del rótulo: azul para lo que sigue (Scheduled), gris para el resto. */
+  /** Color del rótulo. */
   tone?: ListGroupTone
-  /** El rótulo pliega y despliega el grupo (Completed arranca plegado). */
+  /** El rótulo pliega y despliega el grupo. */
   collapsible?: boolean
   defaultOpen?: boolean
-  /** Cuántos ítems se ven antes de "Show N more". Sin tope, se ven todos. */
+  /** Cuántas filas se ven antes de "Show N more". Sin tope, se ven todas. */
   limit?: number
-  /** El rótulo queda pegado arriba mientras se scrollea la lista de un panel. */
-  sticky?: boolean
+  /** Alto máximo de la lista abierta (ver ShowMore). */
+  maxHeight?: string
+  /** Nombre de lo que se lista, para el lector de pantalla. */
+  label?: string
   className?: string
   children?: ReactNode
 }) {
   const [abierto, setAbierto] = useState(defaultOpen)
-  const [todos, setTodos] = useState(false)
   const items = Children.toArray(children).filter(isValidElement)
   if (items.length === 0) return null
-  const visibles = limit && !todos ? items.slice(0, limit) : items
-  const resto = items.length - visibles.length
   const rotulo = (
     <>
       {collapsible && <ChevronDown aria-hidden className={cn('size-3.5 transition-transform', !abierto && '-rotate-90')} />}
@@ -47,7 +46,7 @@ export function ListGroup({
   return (
     <section aria-label={title} className={cn('flex flex-col gap-1.5', className)}>
       {title && (
-        <div className={cn('flex min-h-6 items-center', sticky && 'sticky top-0 z-10 -mx-1 bg-white px-1 py-1')}>
+        <div className="flex min-h-6 items-center">
           {collapsible ? (
             <button
               type="button" aria-expanded={abierto} onClick={() => setAbierto((v) => !v)}
@@ -62,18 +61,13 @@ export function ListGroup({
       )}
 
       {abierto && (
-        <ul className="flex flex-col divide-y divide-line-soft rounded-lg bg-white shadow-hairline">
-          {visibles.map((it) => <li key={it.key}>{it}</li>)}
-        </ul>
-      )}
-
-      {abierto && (resto > 0 || (todos && limit && items.length > limit)) && (
-        <button
-          type="button" onClick={() => setTodos((v) => !v)}
-          className="self-start rounded text-[12px] font-medium text-dash-blue hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
-        >
-          {resto > 0 ? `Show ${resto} more` : 'Show less'}
-        </button>
+        <ShowMore total={items.length} limit={limit ?? items.length} maxHeight={maxHeight} label={label ?? title}>
+          {(cuantos) => (
+            <ul className="flex flex-col divide-y divide-line-soft rounded-lg bg-white shadow-hairline">
+              {items.slice(0, cuantos).map((it) => <li key={it.key}>{it}</li>)}
+            </ul>
+          )}
+        </ShowMore>
       )}
     </section>
   )

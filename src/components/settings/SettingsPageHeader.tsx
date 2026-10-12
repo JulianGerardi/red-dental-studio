@@ -10,7 +10,8 @@ export function SettingsPageHeader({
   titulo: string
   /** Pills al lado del título (estado, Default) en el detalle de un ítem. */
   etiquetas?: React.ReactNode
-  bajada: string
+  /** La bajada gris debajo del título. Sin ella, va sólo el título (Documents Manager no la tiene en el Figma). */
+  bajada?: string
   /** Acción principal, alineada con el título. */
   accion?: React.ReactNode
   /** Buscador y filtros, en la fila de abajo. */
@@ -26,7 +27,7 @@ export function SettingsPageHeader({
               {etiquetas}
             </div>
           ) : <PageTitle>{titulo}</PageTitle>}
-          <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">{bajada}</p>
+          {bajada && <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">{bajada}</p>}
         </div>
         {accion}
       </div>

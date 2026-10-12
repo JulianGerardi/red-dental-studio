@@ -6,16 +6,17 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { PageTitle } from '@/components/ui/page-title'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
-import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
+import type { Appointment } from '@/components/dashboard/AppointmentCard'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
 import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import { OperatoryCard } from '@/components/dashboard/OperatoryCard'
-import { PendingTaskCard } from '@/components/dashboard/PendingTaskCard'
+import { AppointmentRow, TaskRow } from '@/components/dashboard/DashboardRows'
+import { ListGroup } from '@/components/ui/list-group'
+import { ShowMore } from '@/components/ui/show-more'
 import {
   DIAS, DIA_CARGADO, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
   type DiaDashboard, type Origen,
 } from '@/components/dashboard/dashboard-data'
-import { BarraPropuesta, CuerpoFoco, CuerpoTablero, type PropsCuerpo, type Variante } from './Dashboard.variantes'
 import {
   NewAppointmentModal, type DatosTurno,
 } from '@/components/scheduling/NewAppointmentModal'
@@ -33,8 +34,8 @@ import { cn } from '@/lib/utils'
    - Los tres stat cards se juntaron en una sola tira arriba a la derecha.
    - Las columnas son Appointments · Waiting Room · Rooms, fijas: el toggle
      Provider / Recepcionista ya no está en el diseño.
-   - Pending Task bajó a una franja a lo ancho, con las tareas en tres
-     columnas (cuatro desde 1360px: con tres, las 8 del día dejaban un hueco; más angosto el nombre se cortaba). Los tabs se sacaron: hacían lo mismo que el embudo.
+   - Pending Task bajó a una franja a lo ancho. Los tabs se sacaron: hacían lo mismo que el embudo.
+   - Turnos y tareas van en filas con las mismas partes que las cards, con tope y "Show N more" (2026-10-12).
    - Desapareció el cuarto panel "Rooms" vacío del pie.
 
    **Toda la pantalla cuelga del filtro de fecha** del panel de Appointments:
@@ -85,21 +86,16 @@ export function FiltroFecha({
   )
 }
 
-/* El día de la demo con 40 pacientes y 28 tareas, para la propuesta de volumen (?day=busy). */
+/* Un día real de una clínica (35 turnos, 8 en espera, 28 tareas) en la fecha de la demo, para ver el Dashboard con
+   volumen: ?day=busy (dashboard.md, 2026-10-12). */
 const conDiaCargado = (dias: Record<string, DiaDashboard>) => ({ ...dias, [claveFecha(HOY_DEMO)]: DIA_CARGADO })
 
+/* Cuántas filas se ven en cada panel antes de "Show N more" (ver ui/show-more). */
+const TOPE = { turnos: 5, espera: 5, salas: 6, tareas: 5 }
+
 export default function Dashboard() {
-  /* Propuesta del 2026-10-12 (dashboard.md): ?variant=a|b elige la variante y ?day=busy carga un día real. */
-  const [params, setParams] = useSearchParams()
-  const variante: Variante = params.get('variant') === 'a' ? 'a' : params.get('variant') === 'b' ? 'b' : 'current'
+  const [params] = useSearchParams()
   const cargado = params.get('day') === 'busy'
-  const cambiarParam = (k: string, v: string | null) =>
-    setParams((prev) => {
-      const n = new URLSearchParams(prev)
-      if (v) n.set(k, v)
-      else n.delete(k)
-      return n
-    }, { replace: true })
 
   const [date, setDate] = useState(DEFAULT_DATE)
   const [salas, setSalas] = useState<string[]>([])
@@ -219,19 +215,8 @@ export default function Dashboard() {
   })
   const diaSemana = date.toLocaleDateString('en-US', { weekday: 'long' })
 
-  /* Lo que reciben las variantes A y B de la propuesta: el mismo día, filtros, ficha rápida y edición. */
-  const cuerpo: PropsCuerpo = {
-    dia, operatorios, salas, onSalas: setSalas, tipos, onTipos: setTipos, seleccion: selected?.id, onSelect: pick,
-    onEdit: (a, panel, index) => editar(a, { clave: claveFecha(date), panel, index }),
-  }
-
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <BarraPropuesta
-        variante={variante} cargado={cargado}
-        onVariante={(v) => cambiarParam('variant', v === 'current' ? null : v)}
-        onCargado={(c) => cambiarParam('day', c ? 'busy' : null)}
-      />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <p className="text-dash-blue text-sm">
@@ -249,96 +234,98 @@ export default function Dashboard() {
           sólo esa. */}
       <FiltroFecha className="mt-4" value={date} onChange={setDate} marked={diasConDatos} />
 
-      {variante === 'a' && <CuerpoTablero {...cuerpo} />}
-      {variante === 'b' && <CuerpoFoco {...cuerpo} />}
-      {variante === 'current' && (
-        <>
-          <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Panel
-              title="Appointments"
-              controls={
-                <BotonFiltro
-                  label="Filter appointments" options={operatorios}
-                  value={salas} onChange={setSalas}
-                />
+      {/* Mucho volumen: filas en lugar de cards (las mismas partes) y un tope por panel; "Show N more" abre el resto con
+          scroll adentro (dashboard.md, 2026-10-12). */}
+      <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Panel
+          title="Appointments"
+          controls={
+            <BotonFiltro
+              label="Filter appointments" options={operatorios}
+              value={salas} onChange={setSalas}
+            />
+          }
+        >
+          {turnos.length === 0 ? (
+            <EmptyState
+              icon={CalendarDays}
+              title="No appointments today"
+              detail={
+                salas.length > 0
+                  ? 'No appointments match the selected operatories.'
+                  : 'Your schedule is clear. Add an appointment or check pending requests.'
               }
-            >
-              {turnos.length === 0 ? (
-                <EmptyState
-                  icon={CalendarDays}
-                  title="No appointments today"
-                  detail={
-                    salas.length > 0
-                      ? 'No appointments match the selected operatories.'
-                      : 'Your schedule is clear. Add an appointment or check pending requests.'
-                  }
-                  accion={{ label: 'New appointment', onClick: () => aviso.info('Use Scheduling to create an appointment.') }}
+              accion={{ label: 'New appointment', onClick: () => aviso.info('Use Scheduling to create an appointment.') }}
+            />
+          ) : (
+            <ListGroup limit={TOPE.turnos} label="appointments">
+              {turnos.map((a, i) => (
+                <AppointmentRow
+                  key={i} appt={a} id={`appt-${i}`} activa={selected?.id === `appt-${i}`}
+                  onSelect={pick}
+                  onEdit={(x) => editar(x, {
+                    clave: claveFecha(date), panel: 'appointments',
+                    index: dia.appointments.indexOf(a),
+                  })}
                 />
-              ) : (
-                turnos.map((a, i) => (
-                  <AppointmentCard
-                    key={i} appt={a} id={`appt-${i}`} activa={selected?.id === `appt-${i}`}
-                    onSelect={pick}
-                    onEdit={(x) => editar(x, {
-                      clave: claveFecha(date), panel: 'appointments',
-                      index: dia.appointments.indexOf(a),
-                    })}
-                  />
-                ))
-              )}
-            </Panel>
+              ))}
+            </ListGroup>
+          )}
+        </Panel>
 
-            <Panel title="Waiting Room">
-              {dia.waiting.length === 0 ? (
-                <EmptyState
-                  icon={Clock}
-                  title="Waiting room is empty"
-                  detail="No patients have checked in for this day yet."
+        <Panel title="Waiting Room">
+          {dia.waiting.length === 0 ? (
+            <EmptyState
+              icon={Clock}
+              title="Waiting room is empty"
+              detail="No patients have checked in for this day yet."
+            />
+          ) : (
+            <ListGroup limit={TOPE.espera} label="patients waiting">
+              {dia.waiting.map((a, i) => (
+                <AppointmentRow
+                  key={i} appt={a} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
+                  onSelect={pick}
+                  onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: i })}
                 />
-              ) : (
-                dia.waiting.map((a, i) => (
-                  <AppointmentCard
-                    key={i} appt={a} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
-                    onSelect={pick}
-                    onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: i })}
-                  />
-                ))
-              )}
-            </Panel>
+              ))}
+            </ListGroup>
+          )}
+        </Panel>
 
-            <Panel title="Rooms">
-              {dia.rooms.map((r, i) => <OperatoryCard key={i} room={r} />)}
-            </Panel>
-          </div>
+        <Panel title="Rooms">
+          <ShowMore total={dia.rooms.length} limit={TOPE.salas} label="rooms" className="flex flex-col gap-3">
+            {(n) => dia.rooms.slice(0, n).map((r, i) => <OperatoryCard key={i} room={r} />)}
+          </ShowMore>
+        </Panel>
+      </div>
 
-          <div className="mt-4">
-            <Panel
-              title="Pending Task"
-              controls={
-                <BotonFiltro
-                  label="Filter tasks" options={TASK_KINDS} value={tipos} onChange={setTipos}
-                />
+      <div className="mt-4">
+        <Panel
+          title="Pending Task"
+          controls={
+            <BotonFiltro
+              label="Filter tasks" options={TASK_KINDS} value={tipos} onChange={setTipos}
+            />
+          }
+        >
+          {tareas.length === 0 ? (
+            <EmptyState
+              icon={Activity}
+              title="Nothing pending"
+              detail={
+                dia.tasks.length === 0
+                  ? 'There are no tasks waiting on this day.'
+                  : 'No pending tasks match the selected types.'
               }
-            >
-              {tareas.length === 0 ? (
-                <EmptyState
-                  icon={Activity}
-                  title="Nothing pending"
-                  detail={
-                    dia.tasks.length === 0
-                      ? 'There are no tasks waiting on this day.'
-                      : 'No pending tasks match the selected types.'
-                  }
-                />
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 min-[1360px]:grid-cols-4">
-                  {tareas.map((t, i) => <PendingTaskCard key={i} task={t} />)}
-                </div>
-              )}
-            </Panel>
-          </div>
-        </>
-      )}
+            />
+          ) : (
+            <ListGroup limit={TOPE.tareas} label="pending tasks">
+              {tareas.map((t, i) => <TaskRow key={i} task={t} />)}
+            </ListGroup>
+          )}
+        </Panel>
+      </div>
 
       {editando && (
         <NewAppointmentModal

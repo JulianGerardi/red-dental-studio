@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { AppointmentRow, ChipsTurno, DocYVencida, NombreTurno, RoomStrip, TaskRow } from './DashboardRows'
+import { AppointmentRow, ChipsTurno, DocYVencida, NombreTurno, TaskRow } from './DashboardRows'
 import { DIAS } from './dashboard-data'
 import { Bloque, Lienzo, Muestra, Tabla, TablaPartes, Token, useMedidas } from '@/design-system/kit'
 import { TARJETA_PANEL } from '@/lib/estilos'
@@ -27,9 +27,11 @@ const meta = {
     docs: {
       description: {
         component: [
-          'Las filas del Dashboard con volumen (`@/components/dashboard/DashboardRows`), de la propuesta del 2026-10-12: **lo mismo que cada card del Figma, en una fila**. El turno trae la hora, las iniciales, el nombre, *Check In*, provider y operatorio, los chips **TR** y **CC**, **Check Out** o **Cancel** y el kebab con *Edit appointment*; la tarea trae el paciente, *Requested*, el documento, *Expired date*, *Register*, *Expiration date* y **Complete this Task**. No hay datos ni acciones nuevas: cambia sólo cómo se acomodan.',
+          'Las filas del Dashboard (`@/components/dashboard/DashboardRows`, 2026-10-12): **lo mismo que cada card del Figma, en menos alto**. El turno trae la hora, las iniciales, el nombre, *Check In*, provider y operatorio, los chips **TR** y **CC**, **Check Out** o **Cancel** y el kebab con *Edit appointment*; la tarea trae el tipo, *Requested*, el paciente, el documento, *Expired date*, *Register*, *Expiration date* y **Complete this Task**. No hay datos ni acciones nuevas.',
           '',
-          '**Se adaptan al ancho de su lista**, no al de la pantalla (`@container`): en angosto, en renglones (el botón baja a su propio renglón si no entra); desde 768px de lista, en columnas, como una tabla. Las salas van con la misma card de operatorio (`RoomStrip`).',
+          '**Dónde:** Appointments, Waiting Room y Pending Task del Dashboard, y Pending Task del Patient Dashboard, adentro de *List group* (tope y "Show N more" con scroll).',
+          '',
+          '**Se adaptan al ancho de su lista**, no al de la pantalla (`@container`): en angosto, en renglones (lo que no entra baja a su propio renglón en vez de cortarse); en columnas, como una tabla, desde 768px de lista el turno y desde 1024px la tarea, que tiene más partes.',
           '',
           '**Probalo:** en *Playground* cambiá la pieza, la acción y el ancho desde *Controls*; tocá el nombre, el botón y el kebab: hacen lo mismo que en la card.',
         ].join('\n'),
@@ -40,7 +42,7 @@ const meta = {
   argTypes: {
     piece: { control: 'inline-radio', options: ['Appointment row', 'Task row'], description: 'Qué fila se ve.' },
     action: { control: 'inline-radio', options: ['Check Out', 'Cancel'], description: 'El botón del turno, el mismo de la card.' },
-    width: { control: { type: 'range', min: 300, max: 1100, step: 10 }, description: 'Ancho de la lista: desde 768px, en columnas.' },
+    width: { control: { type: 'range', min: 300, max: 1200, step: 10 }, description: 'Ancho de la lista: en columnas desde 768px (turno) y 1024px (tarea).' },
     selected: { control: 'boolean', description: 'Con la ficha rápida abierta desde esta fila.' },
   },
 } satisfies Meta<Args>
@@ -59,7 +61,7 @@ export const Parts: Story = {
   parameters: sinControles,
   render: () => (
     <Lienzo>
-      <Bloque titulo="Appointment row" nota="Angosta (una columna del tablero, variante A) y ancha (la lista a lo ancho, variante B). Lo mismo que AppointmentCard.">
+      <Bloque titulo="Appointment row" nota="Angosta (una columna del Dashboard) y ancha. Lo mismo que AppointmentCard.">
         <Caja ancho={400}><li><AppointmentRow appt={TURNO} onSelect={() => {}} onEdit={() => {}} /></li></Caja>
         <Caja ancho={900}><li><AppointmentRow appt={TURNO} onSelect={() => {}} onEdit={() => {}} /></li></Caja>
         <TablaPartes partes={[
@@ -77,20 +79,18 @@ export const Parts: Story = {
           <ChipsTurno />
         </div>
       </Bloque>
-      <Bloque titulo="Task row" nota="Lo mismo que PendingTaskCard; el tipo (Clinical Note, Lab Orders…) va en el rótulo del grupo.">
+      <Bloque titulo="Task row" nota="Lo mismo que PendingTaskCard, en el mismo orden: angosta (Patient Dashboard) y ancha (Pending Task del Dashboard, a lo ancho).">
         <Caja ancho={400}><li><TaskRow task={TAREA} /></li></Caja>
-        <Caja ancho={900}><li><TaskRow task={TAREA} /></li></Caja>
+        <Caja ancho={1100}><li><TaskRow task={TAREA} /></li></Caja>
         <TablaPartes partes={[
-          ['Patient', 'Iniciales en el cuadrado celeste y el nombre, como en la card.', 'task.initials · task.person'],
+          ['Kind', 'El tipo de tarea en 14px Bold, el título de la card.', 'task.kind'],
           ['Requested', 'El estado con el punto azul.', 'task.state'],
+          ['Patient', 'Iniciales en el cuadrado celeste y el nombre, como en la card.', 'task.initials · task.person'],
           ['Document · Expired date', 'El botón rojo del documento y el aviso ámbar de la card.', 'DocYVencida'],
           ['Register · Expiration date', 'Las dos fechas con su rótulo: Register en azul, Expiration date en rojo.', 'task.register · task.expiration'],
           ['Complete this Task', 'El botón de la card, en sm: el mismo texto y el mismo aviso.', 'Button · completarTarea'],
         ]} />
         <DocYVencida />
-      </Bloque>
-      <Bloque titulo="Room strip" nota="Las salas con la card de operatorio de siempre, en grilla: tres por fila y seis desde 1536px.">
-        <RoomStrip rooms={DIA.rooms} />
       </Bloque>
     </Lienzo>
   ),
@@ -111,8 +111,9 @@ export const States: Story = {
           <Caja ancho={340}><li><AppointmentRow appt={TURNO} /></li><li><TaskRow task={TAREA} /></li></Caja>
         </Muestra>
         <div className="md:col-span-2">
-          <Muestra titulo="Wide (900px)" nota="En columnas, alineadas fila con fila.">
-            <Caja ancho={900}><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CANCEL} /></li><li><TaskRow task={TAREA} /></li></Caja>
+          <Muestra titulo="Wide" nota="En columnas, alineadas fila con fila: turnos a 900px, tareas a 1100px.">
+            <Caja ancho={900}><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CANCEL} /></li></Caja>
+            <Caja ancho={1100}><li><TaskRow task={TAREA} /></li><li><TaskRow task={DIA.tasks[2]!} /></li></Caja>
           </Muestra>
         </div>
       </div>
