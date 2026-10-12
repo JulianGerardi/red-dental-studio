@@ -12,11 +12,10 @@ import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import { OperatoryCard } from '@/components/dashboard/OperatoryCard'
 import { PendingTaskCard } from '@/components/dashboard/PendingTaskCard'
 import {
-  DIAS, DIA_CARGADO, DIA_VACIO, HOY_DEMO, TASK_KINDS, avanzarTurno, claveFecha, fechaDesdeClave, reprogramar,
+  DIAS, DIA_CARGADO, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
   type DiaDashboard, type Origen,
 } from '@/components/dashboard/dashboard-data'
-import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
-import { BarraPropuesta, CuerpoFoco, CuerpoTablero, agruparTurnos, type PropsCuerpo, type Variante } from './Dashboard.variantes'
+import { BarraPropuesta, CuerpoFoco, CuerpoTablero, type PropsCuerpo, type Variante } from './Dashboard.variantes'
 import {
   NewAppointmentModal, type DatosTurno,
 } from '@/components/scheduling/NewAppointmentModal'
@@ -183,20 +182,10 @@ export default function Dashboard() {
     }
   }
 
-  /* Los números salen de las listas del día, no de un mock aparte. En las variantes, los encuentros abiertos son los
-     que están en el sillón y la espera dice cuánto lleva el que más espera. */
+  /* Los números salen de las listas del día, no de un mock aparte. */
   const stats: Stat[] = useMemo(() => {
     const completados = dia.appointments.filter((a) => a.completado).length
     const nuevos = dia.waiting.filter((w) => w.nuevo).length
-    if (variante !== 'current') {
-      const g = agruparTurnos(dia, [])
-      const espera = g.espera[0]?.espera
-      return [
-        { label: 'Appointments', value: String(dia.appointments.length), nota: `${completados} completed`, icon: CalendarDays },
-        { label: 'Waiting', value: String(dia.waiting.length), nota: espera !== undefined ? `longest ${espera} min` : 'nobody waiting', icon: Clock },
-        { label: 'Open encounters', value: String(g.enSillon.length), nota: dia.encuentros.promedio, icon: Activity },
-      ]
-    }
     return [
       {
         label: 'Appointments', value: String(dia.appointments.length),
@@ -211,7 +200,7 @@ export default function Dashboard() {
         nota: dia.encuentros.promedio, icon: Activity,
       },
     ]
-  }, [dia, variante])
+  }, [dia])
 
   const operatorios = useMemo(
     () => [...new Set(dia.appointments.map((a) => a.operatory))].sort(),
@@ -229,28 +218,10 @@ export default function Dashboard() {
   })
   const diaSemana = date.toLocaleDateString('en-US', { weekday: 'long' })
 
-  /* El paso que sigue de un turno (Check In, Seat, Check Out) y completar una tarea, en las variantes A y B. */
-  const clave = claveFecha(date)
-  const avanzar = (panel: 'appointments' | 'waiting', index: number) => {
-    const t = dia[panel][index]
-    if (!t) return
-    setSelected(null)
-    setDias((prev) => avanzarTurno(prev, clave, panel, index))
-    if (panel === 'waiting') aviso.ok(`${t.name} seated in ${t.operatory}.`)
-    else if ('enSillon' in t && t.enSillon) aviso.ok(`${t.name} checked out.`)
-    else aviso.ok(`${t.name} checked in and is now in the waiting room.`)
-  }
-  const completar = (t: PendingTask) => {
-    const antes = dia.tasks
-    setDias((prev) => ({ ...prev, [clave]: { ...dia, tasks: dia.tasks.filter((x) => x !== t) } }))
-    aviso.ok(`${t.kind} for ${t.person} marked as complete.`, {
-      label: 'Undo',
-      onClick: () => setDias((prev) => ({ ...prev, [clave]: { ...(prev[clave] ?? dia), tasks: antes } })),
-    })
-  }
+  /* Lo que reciben las variantes A y B de la propuesta: el mismo día, filtros, ficha rápida y edición. */
   const cuerpo: PropsCuerpo = {
     dia, operatorios, salas, onSalas: setSalas, tipos, onTipos: setTipos, seleccion: selected?.id, onSelect: pick,
-    onEdit: (a, panel, index) => editar(a, { clave, panel, index }), onAvanzar: avanzar, onCompletar: completar,
+    onEdit: (a, panel, index) => editar(a, { clave: claveFecha(date), panel, index }),
   }
 
   return (

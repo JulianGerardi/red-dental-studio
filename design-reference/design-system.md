@@ -707,14 +707,17 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 
 - Página temporal **Proposals / Dashboard with volume** (`src/pages/Dashboard.variantes.stories.tsx`): Playground con la
   pantalla real (variante y día desde *Controls*), Parts (la barra de la propuesta y el cuerpo de A y de B con el día
-  cargado), States (día de la demo, día vacío, filtro sin resultados) y Specs (altos medidos, botones azules, turnos en la
-  primera pantalla y breakpoints). En la app, el selector `BarraPropuesta` arriba del Dashboard (`?variant=a|b`,
-  `?day=busy`). Cuando Julián elija, la variante pasa a ser el Dashboard y la página y el selector se borran.
-- **Elements / List group** (`ui/list-group.tsx`, nuevo): el grupo de una lista larga dentro de una card. Rótulo en
-  versalitas con la cuenta y el tono de urgencia (`LIST_GROUP_TONES`), filas en caja de línea fina, plegable, con tope
-  ("Show N more"), rótulo pegado arriba en un panel con scroll y texto de vacío.
-- **Components / Dashboard / Dashboard rows** (`dashboard/DashboardRows.tsx`, nuevo): `AppointmentRow` (cuatro etapas con
-  la barra de color del estado de Scheduling y la acción que sigue), `NextAppointment` (la única acción azul), `TaskRow`
-  (vencimiento en palabras y color), `RoomTile` / `RoomStrip`. Se adaptan al ancho de su lista con `@container`.
-- `Panel` suma `footer` (pie fijo debajo del cuerpo con scroll). `PendingTask` suma `vence`, `Operatory` suma `paciente`,
-  y los turnos `enSillon` y `espera`: sólo los usan las variantes.
+  cargado), States (día de la demo, día vacío, filtro sin resultados) y Specs (altos medidos y breakpoints). En la app,
+  el selector `BarraPropuesta` arriba del Dashboard (`?variant=a|b`, `?day=busy`). Cuando Julián elija, la variante pasa
+  a ser el Dashboard y la página y el selector se borran.
+- **Elements / List group** (`ui/list-group.tsx`, nuevo): una lista larga dentro de una card, en grupos. Rótulo en
+  versalitas con la cuenta (opcional), filas en caja de línea fina, plegable, con tope ("Show N more") y rótulo pegado
+  arriba en un panel con scroll.
+- **Components / Dashboard / Dashboard rows** (`dashboard/DashboardRows.tsx`, nuevo): `AppointmentRow` y `TaskRow`, **con
+  el mismo contenido que `AppointmentCard` y `PendingTaskCard`** (chips TR y CC, Check In, Check Out o Cancel, Edit
+  appointment; Requested, documento, Expired date, fechas, Complete this Task), y `RoomStrip` con `OperatoryCard`. Se
+  adaptan al ancho de su lista con `@container`. La acción del pie de la card de turno pasó a `accionTurno` y la de la
+  tarea a `completarTarea`, para que card y fila hagan lo mismo.
+- Regla que dejó la corrección de Julián: **rediseñar no es cambiar el contenido**. Una propuesta de diseño muestra los
+  mismos datos, textos y acciones que la pantalla original; nada inventado (estados, métricas, botones). Ver
+  `figma/modulos/dashboard.md`.

@@ -9,9 +9,10 @@ export type PendingTask = {
   initials: string
   register: string
   expiration: string
-  /** Días hasta el vencimiento; negativo si ya venció. Lo usan las filas de las variantes (dashboard.md, 2026-10-12). */
-  vence?: number
 }
+
+/* Lo que hace "Complete this Task". Lo comparten la card y la fila de la propuesta (DashboardRows). */
+export const completarTarea = (task: PendingTask) => aviso.ok(`${task.kind} for ${task.person} marked as complete.`)
 
 export function PendingTaskCard({ task }: { task: PendingTask }) {
   return (
@@ -56,7 +57,7 @@ export function PendingTaskCard({ task }: { task: PendingTask }) {
 
       <button
         type="button"
-        onClick={() => aviso.ok(`${task.kind} for ${task.person} marked as complete.`)}
+        onClick={() => completarTarea(task)}
         className="bg-dash-blue hover:bg-dash-blue-hover flex w-full items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13px] font-medium text-white transition-colors"
       >
         Complete this Task <ArrowRight className="size-3.5" />

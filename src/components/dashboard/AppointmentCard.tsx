@@ -130,9 +130,7 @@ export function AppointmentCard({
         type="button"
         onClick={(e) => {
           e.stopPropagation()
-          accion === 'Cancel'
-            ? aviso.warn(`Appointment for ${appt.name} was cancelled.`)
-            : aviso.ok(`${appt.name} checked out.`)
+          accionTurno(appt)
         }}
         className="bg-dash-blue hover:bg-dash-blue-hover flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold text-white transition-colors"
       >
@@ -140,6 +138,12 @@ export function AppointmentCard({
       </button>
     </InnerCard>
   )
+}
+
+/* Lo que hace el botón del pie (Check Out o Cancel). Lo comparten la card y la fila de la propuesta (DashboardRows). */
+export function accionTurno(appt: Appointment) {
+  if ((appt.accion ?? 'Check Out') === 'Cancel') aviso.warn(`Appointment for ${appt.name} was cancelled.`)
+  else aviso.ok(`${appt.name} checked out.`)
 }
 
 /* Una fila, no una card de dos pisos: avatar, nombre y hora/provider abajo

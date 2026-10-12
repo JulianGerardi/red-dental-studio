@@ -103,6 +103,9 @@ El código lo toman **jonatan784** y **betsyMb**, y se enteran de cada cambio po
   literal y el import de `cn` mal: mover a `src/`, corregir a `@/lib/utils` y `npm uninstall cn`.
 - Textos de la app en inglés; los del Figma se copian tal cual (incluidos errores como "Adress", anotados como anomalía
   en el `.md`).
+- **Rediseñar no es cambiar el contenido.** Una propuesta de layout (filas en vez de cards, grupos, columnas) muestra los
+  mismos datos, textos y acciones que la pantalla original —chips como TR y CC, Check Out, Cancel—; nada inventado
+  (estados, métricas, botones, flujos). Lo nuevo se propone aparte y espera su ok.
 
 ## Design system
 

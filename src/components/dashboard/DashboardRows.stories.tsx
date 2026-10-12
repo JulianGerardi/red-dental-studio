@@ -1,39 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import {
-  AppointmentRow, ETAPAS, MenuTurno, NextAppointment, NombreTurno, RoomStrip, RoomTile, TaskRow, tonoEspera, tonoVence,
-  venceTexto, type EtapaTurno,
-} from './DashboardRows'
-import { DIA_CARGADO, type EnEspera, type Turno } from './dashboard-data'
-import type { Operatory } from './OperatoryCard'
-import { BLOCK_STYLE } from '@/components/scheduling/calendar-data'
+import { AppointmentRow, ChipsTurno, DocYVencida, NombreTurno, RoomStrip, TaskRow } from './DashboardRows'
+import { DIAS } from './dashboard-data'
 import { Bloque, Lienzo, Muestra, Tabla, TablaPartes, Token, useMedidas } from '@/design-system/kit'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
-/* Una persona del día cargado en cada etapa. */
-const TURNO: Turno & EnEspera = { name: 'Emily Clark', initials: 'EC', provider: 'Dr. Emily Chen', operatory: 'Operatory 3', time: '10:45' }
-const EN: Record<EtapaTurno, Turno & EnEspera> = {
-  upcoming: TURNO,
-  waiting: { ...TURNO, espera: 27 },
-  'in-chair': { ...TURNO, time: '09:30', enSillon: '09:31' },
-  done: { ...TURNO, time: '08:15', completado: true },
-}
-const TAREA = DIA_CARGADO.tasks[0]!
-const SALAS: Operatory[] = [
-  { name: 'Operatory 1', status: 'Busy', patientsToday: 8, provider: 'Dr. Elena Martinez', paciente: 'Lucia Vidal' },
-  { name: 'Operatory 6', status: 'Available', patientsToday: 0, provider: 'Hygiene' },
-  { name: 'Operatory 7', status: 'Unavailable', patientsToday: 0, provider: 'Maintenance' },
-]
-const ETAPAS_LISTA = Object.keys(ETAPAS) as EtapaTurno[]
+/* Los datos del día de la demo, los mismos de las cards. */
+const DIA = DIAS['28-02-2026']!
+const TURNO = DIA.appointments[1]!
+const CANCEL = DIA.waiting[0]!
+const TAREA = DIA.tasks[0]!
 
-/* Una lista de una sola fila, con la caja de ListGroup. */
+/* Una lista con la caja de ListGroup. */
 const Caja = ({ ancho, children }: { ancho?: number; children: React.ReactNode }) => (
   <div className={cn(TARJETA_PANEL, 'max-w-full p-3')} style={ancho ? { width: ancho } : undefined}>
     <ul className="flex flex-col divide-y divide-line-soft rounded-lg bg-white shadow-hairline">{children}</ul>
   </div>
 )
 
-type Args = { piece: 'Appointment row' | 'Next appointment' | 'Task row'; stage: EtapaTurno; width: number; waitMinutes: number; dueInDays: number; newPatient: boolean; selected: boolean }
+type Args = { piece: 'Appointment row' | 'Task row'; action: 'Check Out' | 'Cancel'; width: number; selected: boolean }
 
 const meta = {
   title: 'Components/Dashboard/Dashboard rows',
@@ -42,23 +27,20 @@ const meta = {
     docs: {
       description: {
         component: [
-          'Las filas del Dashboard con volumen (`@/components/dashboard/DashboardRows`), de la propuesta del 2026-10-12: una fila por turno o tarea en lugar de una card de 190px. Cada fila lleva **la barra del color de su estado en Scheduling** (Booked azul, Check-in verde, In progress violeta, Fulfilled verde claro) y **una sola acción, la que sigue**: Check In → Seat → Check Out. El próximo paciente es la única pieza con el botón azul (`NextAppointment`).',
+          'Las filas del Dashboard con volumen (`@/components/dashboard/DashboardRows`), de la propuesta del 2026-10-12: **lo mismo que cada card del Figma, en una fila**. El turno trae la hora, las iniciales, el nombre, *Check In*, provider y operatorio, los chips **TR** y **CC**, **Check Out** o **Cancel** y el kebab con *Edit appointment*; la tarea trae el paciente, *Requested*, el documento, *Expired date*, *Register*, *Expiration date* y **Complete this Task**. No hay datos ni acciones nuevas: cambia sólo cómo se acomodan.',
           '',
-          '**Se adaptan al ancho de su lista**, no al de la pantalla (`@container`): angosta en dos renglones; por debajo de 384px los minutos bajan al segundo renglón; desde 768px en columnas, como una tabla. Las salas van en una tira (`RoomStrip`).',
+          '**Se adaptan al ancho de su lista**, no al de la pantalla (`@container`): en angosto, en renglones (el botón baja a su propio renglón si no entra); desde 768px de lista, en columnas, como una tabla. Las salas van con la misma card de operatorio (`RoomStrip`).',
           '',
-          '**Probalo:** en *Playground* cambiá la pieza, la etapa y el ancho desde *Controls*; tocá el nombre (abre la ficha rápida en la app) y el kebab.',
+          '**Probalo:** en *Playground* cambiá la pieza, la acción y el ancho desde *Controls*; tocá el nombre, el botón y el kebab: hacen lo mismo que en la card.',
         ].join('\n'),
       },
     },
   },
-  args: { piece: 'Appointment row', stage: 'waiting', width: 400, waitMinutes: 27, dueInDays: -3, newPatient: false, selected: false },
+  args: { piece: 'Appointment row', action: 'Check Out', width: 400, selected: false },
   argTypes: {
-    piece: { control: 'inline-radio', options: ['Appointment row', 'Next appointment', 'Task row'], description: 'Qué pieza se ve.' },
-    stage: { control: 'inline-radio', options: ETAPAS_LISTA, description: 'Etapa del turno: color de la barra y acción.' },
-    width: { control: { type: 'range', min: 300, max: 1100, step: 10 }, description: 'Ancho de la lista. Menos de 384: minutos abajo. Desde 768: columnas.' },
-    waitMinutes: { control: { type: 'range', min: 0, max: 45 }, description: 'Minutos en la sala de espera: ámbar desde 15, rojo desde 25.' },
-    dueInDays: { control: { type: 'range', min: -7, max: 14 }, description: 'Días al vencimiento de la tarea; negativo, vencida.' },
-    newPatient: { control: 'boolean', description: 'Paciente nuevo: pill violeta "New".' },
+    piece: { control: 'inline-radio', options: ['Appointment row', 'Task row'], description: 'Qué fila se ve.' },
+    action: { control: 'inline-radio', options: ['Check Out', 'Cancel'], description: 'El botón del turno, el mismo de la card.' },
+    width: { control: { type: 'range', min: 300, max: 1100, step: 10 }, description: 'Ancho de la lista: desde 768px, en columnas.' },
     selected: { control: 'boolean', description: 'Con la ficha rápida abierta desde esta fila.' },
   },
 } satisfies Meta<Args>
@@ -68,43 +50,47 @@ type Story = StoryObj<Args>
 const sinControles = { controls: { disable: true } }
 
 export const Playground: Story = {
-  render: (a) => {
-    const appt = { ...EN[a.stage], nuevo: a.newPatient, ...(a.stage === 'waiting' ? { espera: a.waitMinutes } : {}) }
-    if (a.piece === 'Next appointment') return <div className={cn(TARJETA_PANEL, 'p-3')} style={{ width: a.width }}><NextAppointment appt={TURNO} activa={a.selected} /></div>
-    if (a.piece === 'Task row') return <Caja ancho={a.width}><li><TaskRow task={{ ...TAREA, vence: a.dueInDays }} /></li></Caja>
-    return <Caja ancho={a.width}><li><AppointmentRow appt={appt} etapa={a.stage} activa={a.selected} /></li></Caja>
-  },
+  render: (a) => a.piece === 'Task row'
+    ? <Caja ancho={a.width}><li><TaskRow task={TAREA} /></li></Caja>
+    : <Caja ancho={a.width}><li><AppointmentRow appt={{ ...TURNO, accion: a.action }} activa={a.selected} onSelect={() => {}} onEdit={() => {}} /></li></Caja>,
 }
 
 export const Parts: Story = {
   parameters: sinControles,
   render: () => (
     <Lienzo>
-      <Bloque titulo="Appointment row" nota="Angosta (en una columna del tablero) y ancha (la lista a lo ancho de la variante B).">
-        <Caja ancho={400}><li><AppointmentRow appt={{ ...EN.waiting, nuevo: true }} etapa="waiting" /></li></Caja>
-        <Caja ancho={900}><li><AppointmentRow appt={EN.waiting} etapa="waiting" /></li></Caja>
+      <Bloque titulo="Appointment row" nota="Angosta (una columna del tablero, variante A) y ancha (la lista a lo ancho, variante B). Lo mismo que AppointmentCard.">
+        <Caja ancho={400}><li><AppointmentRow appt={TURNO} onSelect={() => {}} onEdit={() => {}} /></li></Caja>
+        <Caja ancho={900}><li><AppointmentRow appt={TURNO} onSelect={() => {}} onEdit={() => {}} /></li></Caja>
         <TablaPartes partes={[
-          ['State bar', 'Barra de 3px del color del estado del turno en Scheduling: se reconoce el mismo turno en el calendario y en el dashboard.', 'BLOCK_STYLE[estado].bar'],
-          ['Time', '13px Semibold con números tabulares: es la columna por la que se lee una agenda.', 'appt.time'],
-          ['Name', 'Botón: abre la ficha rápida anclada a la fila. "New" en violeta si es paciente nuevo.', 'NombreTurno'],
-          ['Sub line', 'Provider y operatorio en 11px. Ancha: pasan a sus columnas. Muy angosta: los minutos van acá.', '—'],
-          ['Minutes', 'En la sala de espera o en el sillón. La espera cambia de color con el umbral.', 'minutosEnEtapa · tonoEspera'],
-          ['Action', 'La que sigue, en secondary sm: Check In, Seat o Check Out. Terminado: un check.', 'Button'],
-          ['Menu', 'Kebab de las tablas: Edit appointment y Go to appointment.', 'MenuTurno · RowActionsMenu'],
+          ['Time', 'La hora del turno, 13px Semibold con números tabulares: la columna por la que se lee una agenda.', 'appt.time'],
+          ['Initials', 'Las iniciales en el cuadrado azul de la card, a 28px.', 'appt.initials'],
+          ['Name', 'Botón: abre la ficha rápida anclada a la fila, como tocar la card.', 'NombreTurno'],
+          ['Check In', 'La pill verde de la card.', 'StatusPill'],
+          ['Provider · Operatory', 'Los dos campos grises de la card. Angosta, en un renglón; ancha, cada uno en su columna.', 'appt.provider · appt.operatory'],
+          ['TR · CC', 'Los chips de la card, a 24px de alto.', 'ChipsTurno'],
+          ['Check Out / Cancel', 'El botón del pie de la card, en sm: el mismo texto, la flecha y el mismo aviso.', 'Button · accionTurno'],
+          ['Menu', 'El kebab de la card con Edit appointment.', 'MenuCard'],
         ]} />
         <div className="flex items-center gap-4">
-          <span className="text-[13px]"><NombreTurno appt={TURNO}>Name as a button</NombreTurno></span>
-          <MenuTurno nombre={TURNO.name} />
+          <NombreTurno appt={TURNO} onSelect={() => {}} />
+          <ChipsTurno />
         </div>
       </Bloque>
-      <Bloque titulo="Next appointment" nota="El turno en foco: el único con la acción en azul y a lo ancho.">
-        <div className={cn(TARJETA_PANEL, 'w-[400px] p-3')}><NextAppointment appt={TURNO} /></div>
-      </Bloque>
-      <Bloque titulo="Task row" nota="Ícono del tipo en el color de su urgencia, tipo y paciente, vencimiento en palabras y Complete.">
+      <Bloque titulo="Task row" nota="Lo mismo que PendingTaskCard; el tipo (Clinical Note, Lab Orders…) va en el rótulo del grupo.">
         <Caja ancho={400}><li><TaskRow task={TAREA} /></li></Caja>
+        <Caja ancho={900}><li><TaskRow task={TAREA} /></li></Caja>
+        <TablaPartes partes={[
+          ['Patient', 'Iniciales en el cuadrado celeste y el nombre, como en la card.', 'task.initials · task.person'],
+          ['Requested', 'El estado con el punto azul.', 'task.state'],
+          ['Document · Expired date', 'El botón rojo del documento y el aviso ámbar de la card.', 'DocYVencida'],
+          ['Register · Expiration date', 'Las dos fechas con su rótulo: Register en azul, Expiration date en rojo.', 'task.register · task.expiration'],
+          ['Complete this Task', 'El botón de la card, en sm: el mismo texto y el mismo aviso.', 'Button · completarTarea'],
+        ]} />
+        <DocYVencida />
       </Bloque>
-      <Bloque titulo="Room strip" nota="Las salas en una fila: punto y estado en color, y quién está (o el provider). Con muchas, se desliza de costado.">
-        <RoomStrip rooms={DIA_CARGADO.rooms} />
+      <Bloque titulo="Room strip" nota="Las salas con la card de operatorio de siempre, en grilla: tres por fila y seis desde 1536px.">
+        <RoomStrip rooms={DIA.rooms} />
       </Bloque>
     </Lienzo>
   ),
@@ -114,29 +100,21 @@ export const States: Story = {
   parameters: sinControles,
   render: () => (
     <Lienzo>
-      <Bloque titulo="Appointment row · stages">
-        <Caja ancho={400}>{ETAPAS_LISTA.map((e) => <li key={e}><AppointmentRow appt={EN[e]} etapa={e} /></li>)}</Caja>
-        <Caja ancho={900}>{ETAPAS_LISTA.map((e) => <li key={e}><AppointmentRow appt={EN[e]} etapa={e} /></li>)}</Caja>
-      </Bloque>
       <div className="grid gap-6 md:grid-cols-2">
-        <Muestra titulo="Waiting time" nota="Gris hasta 14 min, ámbar desde 15, rojo desde 25 (umbral a validar con recepción).">
-          <Caja>{[6, 18, 27].map((m) => <li key={m}><AppointmentRow appt={{ ...EN.waiting, espera: m }} etapa="waiting" /></li>)}</Caja>
-        </Muestra>
-        <Muestra titulo="Narrow (under 384px)" nota="Los minutos bajan al segundo renglón para no cortar el nombre.">
-          <Caja ancho={340}>{(['waiting', 'in-chair'] as const).map((e) => <li key={e}><AppointmentRow appt={EN[e]} etapa={e} /></li>)}</Caja>
+        <Muestra titulo="Check Out and Cancel" nota="Las dos acciones de la card: el primero de la sala de espera trae Cancel.">
+          <Caja><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CANCEL} /></li></Caja>
         </Muestra>
         <Muestra titulo="Selected" nota="Con la ficha rápida abierta desde la fila: fondo celeste.">
-          <Caja><li><AppointmentRow appt={EN.upcoming} etapa="upcoming" activa /></li></Caja>
+          <Caja><li><AppointmentRow appt={TURNO} activa onSelect={() => {}} /></li></Caja>
         </Muestra>
-        <Muestra titulo="Next appointment, selected">
-          <div className={cn(TARJETA_PANEL, 'p-3')}><NextAppointment appt={TURNO} activa /></div>
+        <Muestra titulo="Narrow (340px)" nota="El botón baja a su propio renglón para no cortar provider y operatorio; un nombre largo se corta con elipsis y se lee entero al pasar el mouse.">
+          <Caja ancho={340}><li><AppointmentRow appt={TURNO} /></li><li><TaskRow task={TAREA} /></li></Caja>
         </Muestra>
-        <Muestra titulo="Task row · due" nota="Vencida en rojo, hoy en ámbar, después en gris.">
-          <Caja>{[-3, 0, 4].map((v) => <li key={v}><TaskRow task={{ ...TAREA, vence: v }} /></li>)}</Caja>
-        </Muestra>
-        <Muestra titulo="Room tile · status">
-          <div className="flex flex-wrap gap-2">{SALAS.map((r) => <div key={r.name} className="w-[160px]"><RoomTile room={r} /></div>)}</div>
-        </Muestra>
+        <div className="md:col-span-2">
+          <Muestra titulo="Wide (900px)" nota="En columnas, alineadas fila con fila.">
+            <Caja ancho={900}><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CANCEL} /></li><li><TaskRow task={TAREA} /></li></Caja>
+          </Muestra>
+        </div>
       </div>
     </Lienzo>
   ),
@@ -144,49 +122,33 @@ export const States: Story = {
 
 function MedidasFila() {
   const fila = useMedidas('[data-appt-row]')
-  const nombre = useMedidas('[data-appt-row] button span span')
+  const nombre = useMedidas('[data-appt-row] button span')
   return (
     <>
       <div ref={fila.ref}>
-        <div ref={nombre.ref}><Caja ancho={400}><li><AppointmentRow appt={EN.waiting} etapa="waiting" onSelect={() => {}} /></li></Caja></div>
+        <div ref={nombre.ref}><Caja ancho={400}><li><AppointmentRow appt={TURNO} onSelect={() => {}} /></li></Caja></div>
       </div>
-      <Tabla encabezado={['Part', 'Height', 'Padding', 'Text', 'Gap']} minimo={560}>
-        <tr><td className="font-semibold">Row</td><td className="tabular-nums">{fila.m?.alto}</td><td className="tabular-nums">{fila.m?.padding}</td><td>—</td><td className="tabular-nums">{fila.m?.gap}</td></tr>
-        <tr><td className="font-semibold">Name</td><td>—</td><td>—</td><td className="tabular-nums">{nombre.m?.texto} · {nombre.m?.peso}</td><td>—</td></tr>
+      <Tabla encabezado={['Part', 'Height', 'Padding', 'Text']} minimo={480}>
+        <tr><td className="font-semibold">Row</td><td className="tabular-nums">{fila.m?.alto}</td><td className="tabular-nums">{fila.m?.padding}</td><td>—</td></tr>
+        <tr><td className="font-semibold">Name</td><td>—</td><td>—</td><td className="tabular-nums">{nombre.m?.texto} · {nombre.m?.peso}</td></tr>
       </Tabla>
     </>
   )
 }
 
-const tokenDeBarra = (estado: string) => BLOCK_STYLE[estado]!.bar.match(/--color-([\w-]+)/)?.[1] ?? null
-
 export const Specs: Story = {
   parameters: sinControles,
   render: () => (
     <Lienzo>
-      <Bloque titulo="Size" nota="Leído de la fila dibujada. La acción es Button sm (28px); el kebab, el de las tablas (28px).">
+      <Bloque titulo="Size" nota="Leído de la fila dibujada (angosta, 400px). El botón es Button sm (28px); el kebab, el de la card (32px). La card de turno mide 190px; la fila, menos de la mitad.">
         <MedidasFila />
       </Bloque>
-      <Bloque titulo="Stage colors" nota="La barra usa los tokens de estado de Scheduling (--color-appt-*-bar en src/index.css).">
-        <Tabla encabezado={['Stage', 'Scheduling state', 'Bar', 'Action']} minimo={620}>
-          {ETAPAS_LISTA.map((e) => (
-            <tr key={e}>
-              <td className="font-semibold">{ETAPAS[e].rotulo}</td>
-              <td>{ETAPAS[e].estado}</td>
-              <td><Token nombre={tokenDeBarra(ETAPAS[e].estado)} /></td>
-              <td>{ETAPAS[e].accion ?? '—'}</td>
-            </tr>
-          ))}
-        </Tabla>
-      </Bloque>
-      <Bloque titulo="Urgency colors" nota="Espera (tonoEspera) y vencimiento de tareas (tonoVence).">
-        <Tabla encabezado={['Case', 'Text', 'Sample']} minimo={560}>
-          {[6, 18, 27].map((m) => (
-            <tr key={m}><td className="font-semibold">Waiting {m} min</td><td><Token nombre={tonoEspera(m).replace('text-', '')} /></td><td className={cn('font-semibold', tonoEspera(m))}>{m} min</td></tr>
-          ))}
-          {[-3, 0, 4].map((v) => (
-            <tr key={v}><td className="font-semibold">Task due {v}</td><td><Token nombre={tonoVence(v).texto.replace('text-', '')} /></td><td className={cn('font-semibold', tonoVence(v).texto)}>{venceTexto({ ...TAREA, vence: v })}</td></tr>
-          ))}
+      <Bloque titulo="Colors" nota="Los mismos tokens que la card de turno y la de tarea (src/index.css).">
+        <Tabla encabezado={['Part', 'Fill', 'Text']} minimo={560}>
+          <tr><td className="font-semibold">TR chip</td><td><Token nombre="green-soft" /></td><td><Token nombre="dash-ok-fg" /></td></tr>
+          <tr><td className="font-semibold">CC chip</td><td><Token nombre="dash-bad-chip" /></td><td><Token nombre="field-error" /></td></tr>
+          <tr><td className="font-semibold">Check Out / Cancel</td><td><Token nombre="dash-blue" /></td><td><Token nombre="white" /></td></tr>
+          <tr><td className="font-semibold">Selected row</td><td><Token nombre="info-bg" /></td><td>—</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>

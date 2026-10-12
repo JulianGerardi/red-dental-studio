@@ -13,7 +13,6 @@ export function Panel({
   title,
   controls,
   top,
-  footer,
   className,
   bodyClassName,
   children,
@@ -24,8 +23,6 @@ export function Panel({
   controls?: React.ReactNode
   /** Franja arriba del título, de borde a borde: el paciente elegido en Find Patient (Billing). */
   top?: React.ReactNode
-  /** Pie fijo debajo del cuerpo: "Open Scheduling" en las listas con scroll de la variante A (dashboard.md, 2026-10-12). */
-  footer?: React.ReactNode
   className?: string
   bodyClassName?: string
   children?: React.ReactNode
@@ -44,7 +41,6 @@ export function Panel({
       <div className={cn('flex min-h-px flex-1 flex-col gap-3 p-4', bodyClassName)}>
         {children}
       </div>
-      {footer && <footer className="shrink-0 border-t border-line-soft px-5 py-2.5">{footer}</footer>}
     </section>
   )
 }
