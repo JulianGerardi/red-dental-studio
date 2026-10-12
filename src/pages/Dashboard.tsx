@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { CalendarDays, Clock, Activity, CalendarClock } from 'lucide-react'
 import { Panel } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -11,9 +12,11 @@ import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import { OperatoryCard } from '@/components/dashboard/OperatoryCard'
 import { PendingTaskCard } from '@/components/dashboard/PendingTaskCard'
 import {
-  DIAS, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
+  DIAS, DIA_CARGADO, DIA_VACIO, HOY_DEMO, TASK_KINDS, avanzarTurno, claveFecha, fechaDesdeClave, reprogramar,
   type DiaDashboard, type Origen,
 } from '@/components/dashboard/dashboard-data'
+import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
+import { BarraPropuesta, CuerpoFoco, CuerpoTablero, agruparTurnos, type PropsCuerpo, type Variante } from './Dashboard.variantes'
 import {
   NewAppointmentModal, type DatosTurno,
 } from '@/components/scheduling/NewAppointmentModal'
@@ -82,7 +85,22 @@ export function FiltroFecha({
   )
 }
 
+/* El día de la demo con 40 pacientes y 28 tareas, para la propuesta de volumen (?day=busy). */
+const conDiaCargado = (dias: Record<string, DiaDashboard>) => ({ ...dias, [claveFecha(HOY_DEMO)]: DIA_CARGADO })
+
 export default function Dashboard() {
+  /* Propuesta del 2026-10-12 (dashboard.md): ?variant=a|b elige la variante y ?day=busy carga un día real. */
+  const [params, setParams] = useSearchParams()
+  const variante: Variante = params.get('variant') === 'a' ? 'a' : params.get('variant') === 'b' ? 'b' : 'current'
+  const cargado = params.get('day') === 'busy'
+  const cambiarParam = (k: string, v: string | null) =>
+    setParams((prev) => {
+      const n = new URLSearchParams(prev)
+      if (v) n.set(k, v)
+      else n.delete(k)
+      return n
+    }, { replace: true })
+
   const [date, setDate] = useState(DEFAULT_DATE)
   const [salas, setSalas] = useState<string[]>([])
   const [tipos, setTipos] = useState<string[]>([])
@@ -91,7 +109,16 @@ export default function Dashboard() {
   const [editando, setEditando] = useState<{ datos: DatosTurno; origen: Origen } | null>(null)
   /* Los días viven en estado: reprogramar un turno tiene que moverlo de fecha
      y verse en el día nuevo. */
-  const [dias, setDias] = useState(DIAS)
+  const [dias, setDias] = useState(() => (cargado ? conDiaCargado(DIAS) : DIAS))
+  /* Al cambiar de día cargado a demo (o al revés) se vuelve a la fecha de la demo, que es la que cambia. */
+  const [cargadoAntes, setCargadoAntes] = useState(cargado)
+  useEffect(() => {
+    if (cargado === cargadoAntes) return
+    setCargadoAntes(cargado)
+    setDias(cargado ? conDiaCargado(DIAS) : DIAS)
+    setDate(HOY_DEMO)
+    setSelected(null)
+  }, [cargado, cargadoAntes])
 
   const dia: DiaDashboard = useMemo(
     () => dias[claveFecha(date)] ?? DIA_VACIO,
@@ -156,10 +183,20 @@ export default function Dashboard() {
     }
   }
 
-  /* Los números salen de las listas del día, no de un mock aparte. */
+  /* Los números salen de las listas del día, no de un mock aparte. En las variantes, los encuentros abiertos son los
+     que están en el sillón y la espera dice cuánto lleva el que más espera. */
   const stats: Stat[] = useMemo(() => {
     const completados = dia.appointments.filter((a) => a.completado).length
     const nuevos = dia.waiting.filter((w) => w.nuevo).length
+    if (variante !== 'current') {
+      const g = agruparTurnos(dia, [])
+      const espera = g.espera[0]?.espera
+      return [
+        { label: 'Appointments', value: String(dia.appointments.length), nota: `${completados} completed`, icon: CalendarDays },
+        { label: 'Waiting', value: String(dia.waiting.length), nota: espera !== undefined ? `longest ${espera} min` : 'nobody waiting', icon: Clock },
+        { label: 'Open encounters', value: String(g.enSillon.length), nota: dia.encuentros.promedio, icon: Activity },
+      ]
+    }
     return [
       {
         label: 'Appointments', value: String(dia.appointments.length),
@@ -174,7 +211,7 @@ export default function Dashboard() {
         nota: dia.encuentros.promedio, icon: Activity,
       },
     ]
-  }, [dia])
+  }, [dia, variante])
 
   const operatorios = useMemo(
     () => [...new Set(dia.appointments.map((a) => a.operatory))].sort(),
@@ -192,8 +229,37 @@ export default function Dashboard() {
   })
   const diaSemana = date.toLocaleDateString('en-US', { weekday: 'long' })
 
+  /* El paso que sigue de un turno (Check In, Seat, Check Out) y completar una tarea, en las variantes A y B. */
+  const clave = claveFecha(date)
+  const avanzar = (panel: 'appointments' | 'waiting', index: number) => {
+    const t = dia[panel][index]
+    if (!t) return
+    setSelected(null)
+    setDias((prev) => avanzarTurno(prev, clave, panel, index))
+    if (panel === 'waiting') aviso.ok(`${t.name} seated in ${t.operatory}.`)
+    else if ('enSillon' in t && t.enSillon) aviso.ok(`${t.name} checked out.`)
+    else aviso.ok(`${t.name} checked in and is now in the waiting room.`)
+  }
+  const completar = (t: PendingTask) => {
+    const antes = dia.tasks
+    setDias((prev) => ({ ...prev, [clave]: { ...dia, tasks: dia.tasks.filter((x) => x !== t) } }))
+    aviso.ok(`${t.kind} for ${t.person} marked as complete.`, {
+      label: 'Undo',
+      onClick: () => setDias((prev) => ({ ...prev, [clave]: { ...(prev[clave] ?? dia), tasks: antes } })),
+    })
+  }
+  const cuerpo: PropsCuerpo = {
+    dia, operatorios, salas, onSalas: setSalas, tipos, onTipos: setTipos, seleccion: selected?.id, onSelect: pick,
+    onEdit: (a, panel, index) => editar(a, { clave, panel, index }), onAvanzar: avanzar, onCompletar: completar,
+  }
+
   return (
     <div className={CONTENEDOR_PAGINA}>
+      <BarraPropuesta
+        variante={variante} cargado={cargado}
+        onVariante={(v) => cambiarParam('variant', v === 'current' ? null : v)}
+        onCargado={(c) => cambiarParam('day', c ? 'busy' : null)}
+      />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <p className="text-dash-blue text-sm">
@@ -211,90 +277,96 @@ export default function Dashboard() {
           sólo esa. */}
       <FiltroFecha className="mt-4" value={date} onChange={setDate} marked={diasConDatos} />
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Panel
-          title="Appointments"
-          controls={
-            <BotonFiltro
-              label="Filter appointments" options={operatorios}
-              value={salas} onChange={setSalas}
-            />
-          }
-        >
-          {turnos.length === 0 ? (
-            <EmptyState
-              icon={CalendarDays}
-              title="No appointments today"
-              detail={
-                salas.length > 0
-                  ? 'No appointments match the selected operatories.'
-                  : 'Your schedule is clear. Add an appointment or check pending requests.'
+      {variante === 'a' && <CuerpoTablero {...cuerpo} />}
+      {variante === 'b' && <CuerpoFoco {...cuerpo} />}
+      {variante === 'current' && (
+        <>
+          <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Panel
+              title="Appointments"
+              controls={
+                <BotonFiltro
+                  label="Filter appointments" options={operatorios}
+                  value={salas} onChange={setSalas}
+                />
               }
-              accion={{ label: 'New appointment', onClick: () => aviso.info('Use Scheduling to create an appointment.') }}
-            />
-          ) : (
-            turnos.map((a, i) => (
-              <AppointmentCard
-                key={i} appt={a} id={`appt-${i}`} activa={selected?.id === `appt-${i}`}
-                onSelect={pick}
-                onEdit={(x) => editar(x, {
-                  clave: claveFecha(date), panel: 'appointments',
-                  index: dia.appointments.indexOf(a),
-                })}
-              />
-            ))
-          )}
-        </Panel>
+            >
+              {turnos.length === 0 ? (
+                <EmptyState
+                  icon={CalendarDays}
+                  title="No appointments today"
+                  detail={
+                    salas.length > 0
+                      ? 'No appointments match the selected operatories.'
+                      : 'Your schedule is clear. Add an appointment or check pending requests.'
+                  }
+                  accion={{ label: 'New appointment', onClick: () => aviso.info('Use Scheduling to create an appointment.') }}
+                />
+              ) : (
+                turnos.map((a, i) => (
+                  <AppointmentCard
+                    key={i} appt={a} id={`appt-${i}`} activa={selected?.id === `appt-${i}`}
+                    onSelect={pick}
+                    onEdit={(x) => editar(x, {
+                      clave: claveFecha(date), panel: 'appointments',
+                      index: dia.appointments.indexOf(a),
+                    })}
+                  />
+                ))
+              )}
+            </Panel>
 
-        <Panel title="Waiting Room">
-          {dia.waiting.length === 0 ? (
-            <EmptyState
-              icon={Clock}
-              title="Waiting room is empty"
-              detail="No patients have checked in for this day yet."
-            />
-          ) : (
-            dia.waiting.map((a, i) => (
-              <AppointmentCard
-                key={i} appt={a} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
-                onSelect={pick}
-                onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: i })}
-              />
-            ))
-          )}
-        </Panel>
+            <Panel title="Waiting Room">
+              {dia.waiting.length === 0 ? (
+                <EmptyState
+                  icon={Clock}
+                  title="Waiting room is empty"
+                  detail="No patients have checked in for this day yet."
+                />
+              ) : (
+                dia.waiting.map((a, i) => (
+                  <AppointmentCard
+                    key={i} appt={a} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
+                    onSelect={pick}
+                    onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: i })}
+                  />
+                ))
+              )}
+            </Panel>
 
-        <Panel title="Rooms">
-          {dia.rooms.map((r, i) => <OperatoryCard key={i} room={r} />)}
-        </Panel>
-      </div>
+            <Panel title="Rooms">
+              {dia.rooms.map((r, i) => <OperatoryCard key={i} room={r} />)}
+            </Panel>
+          </div>
 
-      <div className="mt-4">
-        <Panel
-          title="Pending Task"
-          controls={
-            <BotonFiltro
-              label="Filter tasks" options={TASK_KINDS} value={tipos} onChange={setTipos}
-            />
-          }
-        >
-          {tareas.length === 0 ? (
-            <EmptyState
-              icon={Activity}
-              title="Nothing pending"
-              detail={
-                dia.tasks.length === 0
-                  ? 'There are no tasks waiting on this day.'
-                  : 'No pending tasks match the selected types.'
+          <div className="mt-4">
+            <Panel
+              title="Pending Task"
+              controls={
+                <BotonFiltro
+                  label="Filter tasks" options={TASK_KINDS} value={tipos} onChange={setTipos}
+                />
               }
-            />
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 min-[1360px]:grid-cols-4">
-              {tareas.map((t, i) => <PendingTaskCard key={i} task={t} />)}
-            </div>
-          )}
-        </Panel>
-      </div>
+            >
+              {tareas.length === 0 ? (
+                <EmptyState
+                  icon={Activity}
+                  title="Nothing pending"
+                  detail={
+                    dia.tasks.length === 0
+                      ? 'There are no tasks waiting on this day.'
+                      : 'No pending tasks match the selected types.'
+                  }
+                />
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 min-[1360px]:grid-cols-4">
+                  {tareas.map((t, i) => <PendingTaskCard key={i} task={t} />)}
+                </div>
+              )}
+            </Panel>
+          </div>
+        </>
+      )}
 
       {editando && (
         <NewAppointmentModal

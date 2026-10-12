@@ -9,6 +9,8 @@ export type PendingTask = {
   initials: string
   register: string
   expiration: string
+  /** Días hasta el vencimiento; negativo si ya venció. Lo usan las filas de las variantes (dashboard.md, 2026-10-12). */
+  vence?: number
 }
 
 export function PendingTaskCard({ task }: { task: PendingTask }) {

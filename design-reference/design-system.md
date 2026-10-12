@@ -687,3 +687,20 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `shadow-stat` (los números del Dashboard: `StatCard` y `StatStrip`) se borra: usan `shadow-panel`. *Elements / Cards →
   Specs* muestra las dos alturas (*Card on the page* y *Floating pop up*) y la regla; *Foundations / Radius and shadows*
   las lee del CSS. No cambian `InnerCard` ni el anillo azul de hover y selección.
+
+
+## Propuesta: Dashboard con volumen (2026-10-12)
+
+- Página temporal **Proposals / Dashboard with volume** (`src/pages/Dashboard.variantes.stories.tsx`): Playground con la
+  pantalla real (variante y día desde *Controls*), Parts (la barra de la propuesta y el cuerpo de A y de B con el día
+  cargado), States (día de la demo, día vacío, filtro sin resultados) y Specs (altos medidos, botones azules, turnos en la
+  primera pantalla y breakpoints). En la app, el selector `BarraPropuesta` arriba del Dashboard (`?variant=a|b`,
+  `?day=busy`). Cuando Julián elija, la variante pasa a ser el Dashboard y la página y el selector se borran.
+- **Elements / List group** (`ui/list-group.tsx`, nuevo): el grupo de una lista larga dentro de una card. Rótulo en
+  versalitas con la cuenta y el tono de urgencia (`LIST_GROUP_TONES`), filas en caja de línea fina, plegable, con tope
+  ("Show N more"), rótulo pegado arriba en un panel con scroll y texto de vacío.
+- **Components / Dashboard / Dashboard rows** (`dashboard/DashboardRows.tsx`, nuevo): `AppointmentRow` (cuatro etapas con
+  la barra de color del estado de Scheduling y la acción que sigue), `NextAppointment` (la única acción azul), `TaskRow`
+  (vencimiento en palabras y color), `RoomTile` / `RoomStrip`. Se adaptan al ancho de su lista con `@container`.
+- `Panel` suma `footer` (pie fijo debajo del cuerpo con scroll). `PendingTask` suma `vence`, `Operatory` suma `paciente`,
+  y los turnos `enSillon` y `espera`: sólo los usan las variantes.

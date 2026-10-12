@@ -8,6 +8,8 @@ export type Operatory = {
   status: OperatoryStatus
   patientsToday: number
   provider: string
+  /** Quién está en el sillón ahora (variantes A y B). */
+  paciente?: string
 }
 
 const TONE = {
