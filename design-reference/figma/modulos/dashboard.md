@@ -413,3 +413,31 @@ gris al 25%). Los números (`StatCard`, `StatStrip`) dejan su sombra propia del 
 que los paneles. La B queda para los pop ups flotantes, empezando por el detalle del paciente que abre la card de turno
 (`PatientDetailsPopover`, antes `0 8px 28px` al 22%): `shadow-floating`. Las *Especificaciones confirmadas* de arriba quedan como estaban en el Figma;
 esto es una desviación deliberada (ver `figma/README.md`). El detalle de las variantes, en `design-system.md`.
+
+## El selector de fecha, alineado con el filtro de Notifications (2026-10-12)
+
+Julián preguntó si el input de fecha del Dashboard estaba alineado con el filtro de fecha nuevo de Notifications. Tenían
+la misma base (32px, borde, radio, sombra, ícono, días de 36px, puntos) pero se separaban en el texto (regular y un
+color escrito a mano), el formato, el hover, el foco de teclado, el popover y cómo se marcaba hoy. Con su ok:
+
+1. **Un solo calendario**: `MonthCalendar` (en `ui/date-picker.tsx`) lo usan el `DatePicker` y el `DateFilter`. Hoy va
+   en azul y negrita en los dos (antes, en el `DatePicker`, con fondo celeste; el celeste ahora es el medio de un rango).
+2. **Popover de Radix** también en el `DatePicker` (antes una caja propia): Escape lo cierra, el foco vuelve al campo y se
+   da vuelta si no entra (en New appointment ahora abre hacia arriba en vez de cortarse). Mismo radio y anillo que el
+   del filtro.
+3. **Dos looks del campo**, con las clases compartidas (`fechaTriggerClasses`):
+   - `field` (formularios y drawers): dd-mm-aaaa como el Figma, texto regular y foco con borde azul, como los demás
+     campos (`control()`).
+   - `toolbar` (Dashboard): **"Feb 28, 2026"**, medium, hover gris y anillo de foco: el mismo campo que el filtro de
+     Notifications.
+4. **Formato "Feb 28, 2026" en el Dashboard** (decisión de Julián): `28-02-2026` venía del Figma, pero en EE. UU.
+   `03-04-2026` se lee 4 de marzo o 3 de abril. En los formularios queda dd-mm-aaaa (anomalía del Figma conservada).
+5. El texto del campo pasa a `text-ink` (antes `text-[#0f172a]`, sin token). Al abrir, el calendario muestra el mes del
+   día elegido (antes quedaba en el mes en que se abrió la primera vez, aunque Today cambiara el día).
+
+La ilustración de ayuda (`help/demos.tsx`) muestra el chip como "Feb 28, 2026". Verificado: elegir un día cierra y
+cambia el campo; Today y reabrir muestran el mes de hoy; Escape devuelve el foco; `ds:campos` sin problemas en los
+siete drawers con fecha; e2e en `tests/dashboard.e2e.ts`.
+
+**Para validar con usuarios:** si en recepción "Feb 28, 2026" se lee más rápido que 28-02-2026 (y si conviene llevarlo
+también a los formularios), y si alguien extraña el fondo celeste de hoy.

@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-12
 
+### Fecha del Dashboard alineada con el filtro de Notifications ([#28](https://github.com/JulianGerardi/red-dental-studio/pull/28))
+- El selector de fecha del Dashboard y el filtro de Notifications comparten campo y calendario. El Dashboard muestra
+  "Feb 28, 2026" (antes 28-02-2026), con texto medium, hover gris y anillo de foco; los formularios siguen en dd-mm-aaaa.
+  El `DatePicker` usa el popover de Radix (Escape, foco de vuelta al campo, se da vuelta si no entra) y hoy se marca en
+  azul y negrita en los dos calendarios.
+- **Para el dev:** `MonthCalendar` es el calendario de toda la app (no armar uno a mano); `fechaTriggerClasses` el campo.
+  `DatePicker` suma `variant="toolbar"` para la fecha de una pantalla; `field` sigue por defecto en formularios. Los días
+  llevan `aria-label` con la fecha completa. Página *Components / UI / DatePicker* con la estructura completa.
+
 ### Notifications: filtro de fecha y grupos por mes ([#26](https://github.com/JulianGerardi/red-dental-studio/pull/26))
 - Con muchas notificaciones, un campo de fecha junto a las pestañas: un clic filtra un día, el segundo arma un rango;
   atajos (Today, Yesterday, Last 7/30/90 days), punto en los días con notificaciones y la ✕ para sacarlo. Las fechas

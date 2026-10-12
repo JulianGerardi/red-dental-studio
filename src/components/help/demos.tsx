@@ -39,7 +39,7 @@ export function DateDrivesPanelsDemo() {
         className="flex w-fit items-center gap-1.5 rounded-lg border border-line bg-white px-2 py-1 text-[10px] font-semibold text-ink shadow-sm"
         style={{ animation: 'tour-pulse 4s ease-in-out infinite' }}
       >
-        28-02-2026 <ChevronDown className="size-2.5" />
+        Feb 28, 2026 <ChevronDown className="size-2.5" />
       </span>
       <div className="mt-2 grid grid-cols-2 gap-2">
         <Panel title="Appointments">
