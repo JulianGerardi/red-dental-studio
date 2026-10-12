@@ -11,8 +11,8 @@ import { cn } from '@/lib/utils'
    `bg-accent` y el elegido con `bg-primary`. Todo con los tokens de la app
    (`--accent`, `--primary`, `--muted-foreground`, `--popover`). */
 
-const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-const MONTHS = [
+export const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+export const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ]
