@@ -3,6 +3,17 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-12
+
+### Appointments del Patient Dashboard y solicitudes de Scheduling: una sola card ([#27](https://github.com/JulianGerardi/red-dental-studio/pull/27))
+- Los turnos del Patient Dashboard recuperan la barra de 3px a la izquierda que tienen las solicitudes de *Appointment
+  requests*, y las dos cards pasan a ser la misma: barra y pill del mismo color (Booked azul, Fulfilled verde, No Show
+  ámbar, Cancelled rojo; ASAP rojo, lista de espera azul), avatar, nombre de hasta dos renglones y acciones con
+  `ui/button` sm. El panel de solicitudes pasa a 280px, el ancho de la columna Appointments del paciente.
+- **Para el dev:** componente nuevo `components/scheduling/TarjetaTurno.tsx` (`TarjetaTurno`, `BARRA_TONOS`), base de
+  `PatientAppointmentCard` y `SolicitudCard`; no armar otra card de turno a mano. La solicitud deja la pill y los botones
+  con hex en `style`. En *Elements / Appointment cards* y *Components / Scheduling / TarjetaTurno*.
+
 ## 2026-10-10
 
 ### Sombras más suaves (cards y pop ups) y Today Appointments con sombra ([#25](https://github.com/JulianGerardi/red-dental-studio/pull/25))
