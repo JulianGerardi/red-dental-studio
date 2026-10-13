@@ -441,3 +441,88 @@ siete drawers con fecha; e2e en `tests/dashboard.e2e.ts`.
 
 **Para validar con usuarios:** si en recepción "Feb 28, 2026" se lee más rápido que 28-02-2026 (y si conviene llevarlo
 también a los formularios), y si alguien extraña el fondo celeste de hoy.
+
+## Propuesta: el Dashboard con volumen, dos variantes (2026-10-12)
+
+Julián: "la app maneja volúmenes de información importantes, ¿qué se te ocurre para cuando tenemos muchas cards?". Con un
+día real de una clínica de cinco sillones (35 turnos, 8 en la sala de espera, 28 tareas; `DIA_CARGADO` en
+`dashboard-data.ts`, `?day=busy`) el Dashboard mide **10.614px** en escritorio y **16.882px** en el celular, y Pending
+Task arranca a los 8.630px. Las causas: cada turno y cada tarea es una card de 190px, las listas crecen sin tope y
+empujan lo de abajo, no hay orden (los turnos vienen 10:00, 10:30, 11:00, 11:30, 08:30, 09:00) y las tres columnas
+crecen cada una por su lado.
+
+Pidió dos variantes para elegir. Están las dos andando en la app, con un selector arriba del Dashboard (`BarraPropuesta`,
+`?variant=a|b`), y en *Proposals / Dashboard with volume*. La versión actual no cambia. El día cargado tiene **los mismos
+campos que el día de la demo**, sólo más cantidad.
+
+**Lo común a las dos**:
+- **Filas en lugar de cards** (`DashboardRows.tsx`), con **el mismo contenido de cada card**. Turno (`AppointmentRow`):
+  hora, iniciales, nombre (abre la ficha rápida), Check In, provider, operatorio, los chips **TR** y **CC**, **Check Out**
+  o **Cancel** (el mismo aviso que la card, `accionTurno`) y el kebab con Edit appointment (`MenuCard`). Tarea
+  (`TaskRow`): paciente, Requested, el documento, Expired date, Register, Expiration date y **Complete this Task**
+  (`completarTarea`). Salas: la misma `OperatoryCard`. La fila se adapta al ancho de su lista con `@container`: en
+  renglones en angosto (el botón baja a su renglón si no entra, para no cortar provider y operatorio), en columnas desde
+  768px.
+- **Grupos con lo que ya dicen los datos** (`ui/list-group`, *Elements / List group*): los turnos en Scheduled (por hora)
+  y Completed (plegado; es el dato de "2 completed"), las tareas por tipo (las cuatro categorías del filtro). La Waiting
+  Room, sin grupos y en el orden de siempre.
+- La tira de números, los filtros, los vacíos y la edición son los de siempre.
+
+**A · Board (todo a la vista).** Appointments, Waiting Room y Pending Task a la par desde 1200px, cada panel con **alto
+máximo** (la pantalla menos el encabezado, mínimo 520px) y su scroll, con los rótulos de grupo pegados arriba; las salas,
+abajo, en grilla (tres por fila, seis desde 1536px: más angosto el nombre se cortaba). Debajo de 1200px, una lista por vez
+con tabs. Con el día cargado: 1.214px de alto y Pending Task a la vista.
+
+**B · Focus (la clínica primero).** Arriba, Waiting Room (con tope de 5) y Rooms a la par; abajo, Appointments y Pending
+Task en una sola lista a lo ancho con tabs, en columnas como una tabla y con tope por grupo. Con el día cargado: 1.517px.
+
+### Corrección: el contenido de las cards no se toca (2026-10-12)
+
+Julián, sobre la primera versión: "hay datos que no debes cambiar o no agregues cosas que no están en la pantalla
+original: en las cards faltan TR y CC, que son los botones rojos y verdes, y los botones de Check Out y Cancel". La
+primera versión había inventado contenido, contra la regla de este módulo ("arreglar sólo lo visual, el contenido va tal
+cual"). Se sacó todo lo que no estaba en las cards:
+
+- El flujo Check In → Seat → Check Out que movía pacientes entre listas (vuelven Check Out y Cancel, con su aviso).
+- Los minutos de espera con umbrales de color, el "en el sillón" y la columna *In the clinic* (vuelve *Waiting Room*).
+- Los vencimientos inventados ("Overdue 3 days", grupos Overdue / Due today / Later) y "Complete" en lugar de "Complete
+  this Task".
+- La card "Next" con el único botón azul, la pill "New", "Open Scheduling", "Go to appointment" en el kebab y la barra
+  de color por estado (decía estados que la card no tiene: todas dicen Check In).
+- Los cambios en la tira de números ("longest 27 min", encuentros contados del sillón) y el paciente de cada sala.
+
+Quedan el diseño de filas, los grupos, el scroll por panel, los tabs y los anchos.
+
+**Anomalía que se mantiene, para decidir aparte:** los turnos completados siguen mostrando **Check Out**, como en la card.
+
+**Qué validar con usuarios:** si recepción deja el dashboard abierto todo el día en un monitor (favorece A); si los
+odontólogos quieren ver sólo sus turnos por defecto (el viejo toggle Provider / Recepcionista, como filtro por rol).
+
+## Cierre de la propuesta: el layout de siempre, filas y "Show more" (2026-10-12)
+
+Julián, después de ver A y B: "me quedo con la opción que tenemos", y para toda la app, cuando hay muchas cards o mucha
+información, **como en la A: un scroll y un "Show more" que lo activa**, con **las cards que se diseñaron para la A**,
+que ocupan menos. Las variantes, el selector de propuesta y la página *Proposals / Dashboard with volume* se borraron.
+
+- **Layout:** el del Figma, sin cambios (Appointments · Waiting Room · Rooms y Pending Task a lo ancho).
+- **Filas:** turnos y sala de espera con `AppointmentRow`, tareas con `TaskRow` (`DashboardRows.tsx`), con el mismo
+  contenido que las cards. `TaskRow` vuelve a mostrar el tipo (en la A iba en el rótulo del grupo) y pasa a columnas
+  recién desde 1024px de lista. Las salas siguen con `OperatoryCard`.
+- **Tope y scroll** (`ui/show-more`, *Elements / Show more*): se ven 5 turnos, 5 en espera, 6 salas y 5 tareas; "Show N
+  more" abre el resto adentro de un scroll (alto máximo `min(70vh, 640px)`, nunca menos que cerrado) sin estirar la
+  página, con un degradé abajo que avisa que hay más; "Show less" vuelve. El orden de las listas es el de los datos.
+- **Día cargado:** `?day=busy` sigue cargando 35 turnos, 8 en espera y 28 tareas en la fecha de la demo para ver el
+  Dashboard con volumen (*Pages / Dashboard Busy Day*): 1.381px de alto contra 10.614px con cards.
+- Las acciones de las cards pasaron a funciones compartidas (`accionTurno`, `completarTarea`): la card y la fila hacen
+  lo mismo.
+
+## Filas: la hora en su caja y las tareas agrupadas (2026-10-13)
+
+Julián: "veo medio descolgado el horario" y en Pending Task "quedó muy separado el nombre, el request, los iconos".
+
+- **La hora vuelve a la caja de la card** (`bg-dash-field`, reloj y hora, la "caja de hora" del Figma): en la fila
+  angosta va a la izquierda y ocupa el alto de toda la fila, así la ancla; antes era texto suelto arriba y quedaba
+  colgando sobre el hueco de los renglones de abajo. En la fila ancha, la misma caja en una línea (72×32).
+- **Tareas agrupadas:** cada parte va pegada a la que acompaña, como en la card: el tipo con Requested, el paciente con
+  el documento y Expired date, y las fechas a continuación. El aire libre queda antes de Complete this Task, no entre los
+  datos. Antes los anchos fijos y un espacio flexible en el medio las repartían por toda la fila.

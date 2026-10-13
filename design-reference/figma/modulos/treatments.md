@@ -75,3 +75,22 @@ exista.
     suelto en `x=1407` con 1px de ancho, fuera del canvas.
 36. **El footer de la tabla de documentos dice "Showing 3 of 15 referrals"** —
     otra instancia del mismo `table/referral-table` sin relabelar (ver anomalía 13).
+
+## Treatments con "Show more" (2026-10-12)
+
+Regla de listas largas (ver `dashboard.md`, *Elements / Show more*): se ven los primeros 4 planes (dos filas de la
+grilla) y "Show 4 more" abre el resto con scroll adentro; el degradé de abajo va del color de la página porque las
+cards están sobre el fondo gris.
+
+## Documents Manager alineado a las tablas por defecto (2026-10-12)
+
+Julián: "la tabla de documents manager no está alineada a las tablas que tenemos por default". Se apartaba del patrón
+de Locations y Employees en tres cosas, y ahora lo sigue:
+
+- **Encabezado:** `SettingsPageHeader` (título con la acción alineada, sin bajada porque el Figma no la trae) y el
+  buscador compartido `SettingsSearch`: campo de 36px y hasta 320px con el botón **Search** al lado (antes un campo
+  propio de 265×32 sin botón).
+- **Descarga:** el botón de descarga va alineado con el título, como la acción principal de las otras tablas.
+- **Last Update** alineada a la izquierda como el resto de las columnas (estaba a la derecha).
+
+Desviación deliberada sobre el Figma (`3753:80195`), que traía el buscador de 265×32.

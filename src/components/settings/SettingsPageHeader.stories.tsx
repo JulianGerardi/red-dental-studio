@@ -61,6 +61,7 @@ export const States: Story = {
   render: () => (
     <Lienzo>
       <Muestra titulo="Title only"><SettingsPageHeader titulo="Billing" bajada="Manage fee schedules, carriers, and coverage tables." /></Muestra>
+      <Muestra titulo="Without subtitle" nota="Documents Manager: el Figma no trae bajada; el buscador queda igual."><SettingsPageHeader titulo="Documents Manager"><span className="text-[12px] text-ink-muted">(search row)</span></SettingsPageHeader></Muestra>
       <Muestra titulo="With action and search">
         <SettingsPageHeader titulo="Team" bajada="People who work at this clinic and what they can do." accion={<Button><Plus /> New employee</Button>}>
           <SettingsSearch value="" onChange={() => {}} placeholder="Search employees" />

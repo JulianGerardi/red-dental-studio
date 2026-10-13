@@ -36,6 +36,8 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 
 - `tests/dashboard.e2e.ts` (2026-10-12): el selector de fecha se lee "Feb 28, 2026"; elegir un día cierra el calendario
   y lo cambia; Today vuelve a hoy y se va.
+  Con `?day=busy` (35 turnos) se ven cinco; *Show 30 more* abre el resto en una región con scroll y *Show less* la
+  cierra (`ui/show-more`).
 - `tests/clinical-mode.e2e.ts` (2026-10-13): el detalle de D4341 en Procedures muestra Clinic location, Outstanding
   balance $170 y lo aplicado; la referencia de un pago abre su registro.
 

@@ -25,5 +25,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Playground: Story = {}
+/* Muchos documentos: se ven los primeros cuatro y "Show N more" abre el resto con scroll (2026-10-12). Copias de los
+   mismos del mock, con otro id: sólo para mostrar el tope. */
+export const ManyDocuments: Story = {
+  name: 'Many documents (show more)',
+  args: { docs: [0, 1, 2].flatMap((k) => DOCS_PENDIENTES.map((d) => ({ ...d, id: `${d.id}-${k}` }))) },
+}
 /* Todo resuelto: queda el estado vacío. */
 export const Empty: Story = { args: { docs: DOCS_PENDIENTES.map((d) => ({ ...d, resuelto: 'Oct 5, 2026' })) } }

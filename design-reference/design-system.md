@@ -727,6 +727,40 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   de cada estado. *Components / Scheduling / TarjetaTurno* con sus variantes; *Elements / Cards → Cards in the app* y
   *Pages / Parts / Scheduling → Request Cards* actualizados.
 
+## Listas largas: filas y "Show more" con scroll (2026-10-12)
+
+- La propuesta de dos variantes del Dashboard se cerró: queda el layout de siempre y, para toda la app, la regla de
+  Julián para muchas cards o mucha información: **se ven unos pocos y "Show N more" abre el resto con scroll adentro**.
+  La página temporal *Proposals / Dashboard with volume* y el selector de la app se borraron.
+- **Elements / Show more** (`ui/show-more.tsx`, nuevo): `ShowMore` dibuja los primeros `limit` ítems (función hija);
+  abierta, alto máximo `max(alto cerrado, min(70vh, 640px))` con scroll, degradé abajo que avisa que hay más (color del
+  fondo: `fade`) y "Show less". Sin pasar el tope, no hay botón. La zona con scroll es una región con nombre, alcanzable
+  con Tab.
+- **Elements / List group** (`ui/list-group.tsx`, nuevo): filas en una caja de línea fina con rótulo opcional, y el tope
+  de `ShowMore` por dentro.
+- **Components / Dashboard / Dashboard rows** (`dashboard/DashboardRows.tsx`, nuevo): `AppointmentRow` y `TaskRow`, con
+  el mismo contenido que `AppointmentCard` y `PendingTaskCard`. Se adaptan al ancho de su lista con `@container`
+  (columnas desde 768px el turno y 1024px la tarea). La acción del pie de la card de turno pasó a `accionTurno` y la de
+  la tarea a `completarTarea`, para que card y fila hagan lo mismo.
+- Dónde: Dashboard (turnos, sala de espera, salas, tareas), Patient Dashboard (Pending Task con `TaskRow`, Appointments,
+  Pending documents) y Treatments. *Pages / Dashboard Busy Day* muestra el Dashboard con 35 turnos (`?day=busy`).
+- **Documents Manager** con el encabezado de las tablas por defecto: `SettingsPageHeader` (la bajada pasa a ser
+  opcional) y `SettingsSearch`. *SettingsPageHeader → States* suma *Without subtitle*.
+- Regla que dejó la corrección de Julián sobre la propuesta: **rediseñar no es cambiar el contenido** (mismos datos,
+  textos y acciones que la pantalla original). Ver `figma/modulos/dashboard.md`.
+
+## Filas del Dashboard: caja de hora y tareas agrupadas (2026-10-13)
+
+- `AppointmentRow`: la hora va en la caja gris de la card (reloj y hora) del alto de la fila; ancha, en una línea.
+  `TaskRow`: el tipo con Requested, el paciente con el documento y Expired date, las fechas, y el aire antes del botón.
+  *Components / Dashboard / Dashboard rows → Parts* lo explica. Ver `figma/modulos/dashboard.md`.
+
+## Casillas en una página con grilla de dos (2026-10-13)
+
+- En una página (no un drawer) con campos de a dos, las casillas siguen la misma grilla: una por columna, del ancho del
+  campo de arriba (Edit Carrier › *Information*, pedido de Julián). En los drawers siguen una debajo de la otra
+  (*Components / UI / Drawer → Specs → Fields*).
+
 ## Lista de detalle y detalle del procedimiento (2026-10-13)
 
 - *Components / UI / DetailList* (nuevo, `ui/detail-list.tsx`): la lista que se despliega debajo de una fila de tabla
