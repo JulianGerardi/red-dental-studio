@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-13
 
+### Edit Carrier: las dos casillas en la misma fila
+- En Edit Carrier › *Information*, *Do not include Dental Diagnostic Codes* y *Do not bill Insurance* van lado a lado, cada
+  una bajo una de las columnas de arriba (en el celular, apiladas). El drawer New Carrier no cambia.
+- **Para el dev:** en una página con campos de a dos, las casillas van en el mismo `grid gap-4 sm:grid-cols-2`; en los
+  drawers siguen apiladas.
+
 ### Listas largas con "Show more" y scroll: Dashboard, Patient Dashboard y Treatments ([#29](https://github.com/JulianGerardi/red-dental-studio/pull/29))
 - Con muchas cards o mucha información se ven unos pocos y **"Show N more" abre el resto con scroll adentro**, sin
   estirar la página; "Show less" vuelve. Dashboard: 5 turnos, 5 en espera, 6 salas y 5 tareas. Patient Dashboard: 3
