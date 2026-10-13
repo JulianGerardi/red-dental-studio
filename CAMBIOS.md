@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-13
 
-### Patient Dashboard sin huecos y breadcrumbs del paciente
+### Patient Dashboard sin huecos y breadcrumbs del paciente ([#37](https://github.com/JulianGerardi/red-dental-studio/pull/37))
 - El menú del paciente baja hasta el final de la pantalla y Pending Task y Appointments terminan a la misma altura: el
   Overview cierra parejo, sin espacios grises.
 - Las siete pantallas del paciente llevan **Patients › John Smith › sección** en lugar del "‹ Patients" (el Overview
