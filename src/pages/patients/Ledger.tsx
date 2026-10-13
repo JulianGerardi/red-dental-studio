@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import {
-  ChevronLeft, Search, Receipt, CreditCard, Wallet, HandCoins, Download, MoveHorizontal,
+  Search, Receipt, CreditCard, Wallet, HandCoins, Download, MoveHorizontal,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { SearchButton } from '@/components/ui/search-button'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
@@ -239,14 +240,8 @@ export default function Ledger() {
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <Link
-        to="/patients"
-        className="text-dash-blue mb-3 inline-flex items-center gap-1 text-sm hover:underline"
-      >
-        <ChevronLeft className="size-4" /> Patients
-      </Link>
-
-      <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-start">
+      <PatientBreadcrumb name="John Smith" section="Ledger" />
+      <div className="flex flex-col gap-5 lg:flex-row">
         <PatientSidePanel
           name="John Smith" initials="JS" section="Ledger"
           basePath={`/patients/${id}`}

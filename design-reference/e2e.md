@@ -39,6 +39,10 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   Con `?day=busy` (35 turnos) se ven cinco; *Show 30 more* abre el resto en una región con scroll y *Show less* la
   cierra (`ui/show-more`).
 
+- `tests/patient-dashboard.e2e.ts` (2026-10-13): en Ledger el rastro es Patients › John Smith › Ledger (el último sin
+  link); John Smith vuelve al Overview, donde termina el rastro, y Patients a la lista, que no lleva. Billing tampoco.
+  Edit Patient cuelga del paciente.
+
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 
 ## Pendiente: el modelo para los pasos en lenguaje natural

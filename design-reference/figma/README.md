@@ -329,10 +329,10 @@ Decisiones que valen la pena anotar:
   arrastrar para enterarse de que existían. En angosto ocupa todo el ancho y
   reparte las tres en columnas, con el icono arriba del texto; desde `lg`
   vuelve a la fila compacta del Figma.
-- **Sin breadcrumb en las pantallas del paciente** (dashboard, Treatments,
-  Insurance, Documents, Relationships, Add Relationship y Edit Patient). El
-  panel lateral ya dice en qué paciente y en qué sección estás; el breadcrumb
-  repetía eso y en Insurance además apuntaba a "Documents" (anomalía 61).
+- ~~**Sin breadcrumb en las pantallas del paciente**~~ (revertido el
+  2026-10-13, ver `modulos/patient-dashboard.md`): llevan `Patients › paciente
+  › sección` (`PatientBreadcrumb`); las pantallas de primer nivel, ninguno. El
+  de Insurance dice "Insurance", no el "Documents" del Figma (anomalía 61).
 - **La leyenda de estados dejó de ser una franja a lo ancho** y pasó a un botón
   "Status legend" que despliega la lista. La franja obligaba a arrastrarla de
   costado en celular y se comía un renglón entero en escritorio. La muestra de

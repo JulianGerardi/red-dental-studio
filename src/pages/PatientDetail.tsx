@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, ChevronDown, PersonStanding, Clipboard, Pill as PillIcon, ClipboardList, type LucideIcon } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { ChevronDown, PersonStanding, Clipboard, Pill as PillIcon, ClipboardList, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Count } from '@/components/ui/count'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
 import { ClinicalItemModal } from '@/components/patients/ClinicalItemModal'
 import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clinicalItems'
@@ -80,15 +81,8 @@ export default function PatientDetail() {
   return (
     <div className={CONTENEDOR_PAGINA}>
 
-      {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
-          El breadcrumb completo repetía lo que ya dice el panel lateral. */}
-      <Link
-        to="/patients"
-        className="text-dash-blue mb-3 inline-flex items-center gap-1 text-sm hover:underline"
-      >
-        <ChevronLeft className="size-4" /> Patients
-      </Link>
-      <div className="mt-4 flex flex-col gap-5 lg:flex-row lg:items-start">
+      <PatientBreadcrumb name="John Smith" />
+      <div className="flex flex-col gap-5 lg:flex-row">
         <PatientSidePanel
           name="John Smith"
           initials="JS"
@@ -140,9 +134,9 @@ export default function PatientDetail() {
             <PendingDocuments />
           </Card>
 
-          {/* Cada card del alto de su contenido: estiradas a la par de Appointments, a Pending Task le quedaba un
-              bloque blanco abajo. */}
-          <div className="grid gap-5 lg:grid-cols-[1fr_280px] lg:items-start">
+          {/* Bento sin huecos: las dos cards terminan a la misma altura, y la fila crece si el panel del paciente es más
+              alto que la columna (patient-dashboard.md, 2026-10-13). */}
+          <div className="grid gap-5 lg:flex-1 lg:grid-cols-[1fr_280px]">
             <Card className="p-5">
               <div className="flex items-center justify-between gap-3">
                 <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>

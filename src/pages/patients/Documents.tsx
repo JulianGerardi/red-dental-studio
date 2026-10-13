@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { ChevronLeft, Download, FileText } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { Download, FileText } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table'
 import { Button } from '@/components/ui/button'
@@ -54,15 +55,8 @@ export default function Documents() {
   return (
     <div className={CONTENEDOR_PAGINA}>
 
-      {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
-          El breadcrumb completo repetía lo que ya dice el panel lateral. */}
-      <Link
-        to="/patients"
-        className="text-dash-blue mb-3 inline-flex items-center gap-1 text-sm hover:underline"
-      >
-        <ChevronLeft className="size-4" /> Patients
-      </Link>
-      <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-start">
+      <PatientBreadcrumb name="John Smith" section="Documents" />
+      <div className="flex flex-col gap-5 lg:flex-row">
         <PatientSidePanel
           name="John Smith"
           initials="JS"

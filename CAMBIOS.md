@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-13
 
+### Patient Dashboard sin huecos y breadcrumbs del paciente
+- El menú del paciente baja hasta el final de la pantalla y Pending Task y Appointments terminan a la misma altura: el
+  Overview cierra parejo, sin espacios grises.
+- Las siete pantallas del paciente llevan **Patients › John Smith › sección** en lugar del "‹ Patients" (el Overview
+  termina en el paciente; Edit Patient también lo tiene). Las de primer nivel (Patients, Billing, Dashboard, Settings,
+  Profile…) no llevan; Profile mostraba un "Settings" suelto y ya no.
+- **Para el dev:** componente nuevo `components/patients/PatientBreadcrumb` (`migasPaciente`), no armar el rastro a
+  mano. `PatientSidePanel` va con `lg:self-stretch` (el contenedor ya no necesita `lg:items-start`). `Breadcrumb` suma
+  foco visible y `aria-current`. Storybook: *Elements / Breadcrumb* (reemplaza a *Components / UI / Breadcrumb*) y
+  *Components / Patients / PatientBreadcrumb*. e2e nuevo: `tests/patient-dashboard.e2e.ts`.
+
 ### Edit Carrier: las dos casillas en la misma fila ([#32](https://github.com/JulianGerardi/red-dental-studio/pull/32))
 - En Edit Carrier › *Information*, *Do not include Dental Diagnostic Codes* y *Do not bill Insurance* van lado a lado, cada
   una bajo una de las columnas de arriba (en el celular, apiladas). El drawer New Carrier no cambia.

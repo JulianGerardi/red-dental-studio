@@ -1,5 +1,6 @@
 import { PageTitle } from '@/components/ui/page-title'
 import { TextField, SelectField, OptionCheckbox, FormFooter, ModalShell } from '@/components/patients/form'
+import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { DrawerActions, DrawerSection, useEnDrawer } from '@/components/ui/drawer'
 import { useState } from 'react'
 import { aviso } from '@/components/ui/toaster'
@@ -98,6 +99,7 @@ export function EditPatientModal({ onClose }: { onClose: () => void }) {
 export default function EditPatientPage() {
   return (
     <div className={CONTENEDOR_PAGINA}>
+      <PatientBreadcrumb name="John Smith" section="Edit Patient" />
       <div className="flex flex-col gap-[15px]">
         <PageTitle>Edit Patient</PageTitle>
       </div>
