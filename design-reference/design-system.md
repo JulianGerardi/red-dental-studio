@@ -755,6 +755,12 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   `TaskRow`: el tipo con Requested, el paciente con el documento y Expired date, las fechas, y el aire antes del botón.
   *Components / Dashboard / Dashboard rows → Parts* lo explica. Ver `figma/modulos/dashboard.md`.
 
+## Casillas en una página con grilla de dos (2026-10-13)
+
+- En una página (no un drawer) con campos de a dos, las casillas siguen la misma grilla: una por columna, del ancho del
+  campo de arriba (Edit Carrier › *Information*, pedido de Julián). En los drawers siguen una debajo de la otra
+  (*Components / UI / Drawer → Specs → Fields*).
+
 ## List group: cada fila en su card (2026-10-13)
 
 - `ListGroup` deja la caja con divisores: cada fila va en su `TARJETA_INTERNA` con 12px entre cards, como las salas y los

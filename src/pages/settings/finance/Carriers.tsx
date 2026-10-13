@@ -142,7 +142,8 @@ export function CarrierForm({ carrier, onGuardar }: { carrier: Aseguradora; onGu
             <SelectField label="Printed Claim Format" required placeholder="Select a printed claim format" options={FORMATOS_RECLAMO} value={d.formato} onChange={set('formato')} error={falta('formato')} />
             <UnitField label="Expected Period of Insurance Claim Resolution" required unit="days" value={d.diasResolucion} onChange={set('diasResolucion')} error={falta('dias')} />
           </div>
-          <div className="flex flex-col gap-2">
+          {/* Las dos casillas en la misma fila, bajo las dos columnas de arriba (Julián, 2026-10-13). */}
+          <div className="grid gap-4 sm:grid-cols-2">
             <OptionCheckbox label="Do not include Dental Diagnostic Codes" checked={d.sinDiagnosticos} onChange={set('sinDiagnosticos')} />
             <OptionCheckbox label="Do not bill Insurance" checked={d.noFacturar} onChange={set('noFacturar')} />
           </div>

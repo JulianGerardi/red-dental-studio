@@ -1,5 +1,12 @@
 # Settings → Billing (Fee Schedules, Carriers, Coverage Table)
 
+## 2026-10-13 · Casillas de Edit Carrier en la misma fila
+
+Pedido de Julián sobre una captura de Edit Carrier › *Information*: *Do not include Dental Diagnostic Codes* y *Do not bill
+Insurance* van en la misma fila, cada una bajo una de las dos columnas de arriba (`grid gap-4 sm:grid-cols-2`); en el
+celular se apilan. Cambia lo decidido el 2026-10-10 (una debajo de la otra) sólo en esta pantalla: en el drawer New
+Carrier siguen apiladas, como pide la regla de campos de los drawers.
+
 ## 2026-10-10 · Campos parejos en los drawers
 
 Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
