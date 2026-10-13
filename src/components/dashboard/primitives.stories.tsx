@@ -38,7 +38,7 @@ const meta = {
   args: { title: 'Recent Billing Activity', controls: 'tabs', top: false, cards: 2, width: 560 },
   argTypes: {
     title: { control: 'text', description: 'Título del panel. Sin ícono.' },
-    controls: { control: 'inline-radio', options: ['none', 'tabs', 'link'], description: 'A la derecha del título: nada, Tabs sm (Billing) o View all (Patients).' },
+    controls: { control: 'inline-radio', options: ['none', 'tabs', 'link'], description: 'A la derecha del título: nada, Tabs sm (Billing) o un link chico como All treatment (Treatment plans).' },
     top: { control: 'boolean', description: 'Franja arriba del título, de borde a borde (Find Patient con un paciente elegido).' },
     cards: { control: { type: 'range', min: 0, max: 5, step: 1 }, description: 'InnerCards en el cuerpo. 0 muestra el estado vacío.' },
     width: { control: { type: 'range', min: 300, max: 760, step: 20 }, description: 'Ancho en px.' },
@@ -55,7 +55,7 @@ const FILTROS = ['All', 'Pt Payment', 'Charge Adj', 'Credit Adj'] as const
 function Controles({ tipo }: { tipo: Args['controls'] }) {
   const [filtro, setFiltro] = useState<(typeof FILTROS)[number]>('All')
   if (tipo === 'tabs') return <Tabs size="sm" aria-label="Filter activity" tabs={FILTROS} value={filtro} onChange={setFiltro} />
-  if (tipo === 'link') return <button type="button" className="text-dash-blue shrink-0 text-[12px] font-semibold hover:underline">View all</button>
+  if (tipo === 'link') return <button type="button" className="text-dash-blue shrink-0 text-[12px] font-semibold hover:underline">All treatment</button>
   return null
 }
 
@@ -142,7 +142,7 @@ export const States: Story = {
       <Estado titulo="With tabs" nota="Tabs sm (36px) al lado del título: el encabezado sigue en 52px." ancho={560}><Armado title="Recent Billing Activity" controls="tabs" cards={2} /></Estado>
       <Estado titulo="Narrow · tabs wrap" nota="En el celular (343px) las Tabs no entran al lado del título y bajan a una segunda línea. Si ni solas entran, se deslizan de costado." ancho={343}><Armado title="Recent Billing Activity" controls="tabs" cards={1} /></Estado>
       <Estado titulo="With top band" nota="top: la franja va arriba del título, de borde a borde, con una línea abajo." ancho={320}><Armado title="Find Patient" controls="none" top cards={2} /></Estado>
-      <Estado titulo="With View all" nota="Un link chico a la derecha, como Today Appointments en Patients." ancho={320}><Armado title="Today Appointments" controls="link" cards={2} /></Estado>
+      <Estado titulo="With link" nota="Un link chico a la derecha, como All treatment en Treatment plans." ancho={320}><Armado title="Treatment plans" controls="link" cards={2} /></Estado>
       <Estado titulo="Empty" nota="Sin contenido: el EmptyState dice por qué y qué hacer." ancho={320}><Armado title="Waiting Room" controls="none" cards={0} /></Estado>
       <Estado titulo="StatusPill" nota="La pastilla de estado de Rooms y las cards del Dashboard." ancho={320}>
         <div className="flex gap-2">

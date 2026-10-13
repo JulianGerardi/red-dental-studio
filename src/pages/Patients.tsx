@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, ChevronRight, Search, Plus, CalendarDays } from 'lucide-react'
+import { ChevronDown, Search, Plus, CalendarDays, Users } from 'lucide-react'
 import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTable'
+import { PatientCard } from '@/components/patients/PatientCard'
 import { usePatients } from '@/data/patientsStore'
 import { PageTitle } from '@/components/ui/page-title'
 import { SearchButton } from '@/components/ui/search-button'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
+import { ShowMore } from '@/components/ui/show-more'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
 import { Panel } from '@/components/dashboard/primitives'
 import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
@@ -16,18 +18,15 @@ import { formatDMY } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
 import { TURNOS_PATIENTS } from '@/components/dashboard/dashboard-data'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
-import { cn } from '@/lib/utils'
 
-/* Barra lateral junto a la tabla, no arriba: reemplaza al estante de
-   "Active"/"Recent Patients" en grilla de la vuelta anterior. Mismos paneles
-   que el Dashboard -Panel + AppointmentCard- para Today Appointments, así la
-   card de turno es una sola en todo el sistema y no una versión propia acá,
-   en su variante `compact` (sin los chips TR/CC ni Check Out).
-   La altura de la barra la fija la tabla, no el contenido: se mide con
-   ResizeObserver -mismo patrón que `useAnchoVisible` en ledger- y se publica
-   como variable CSS; cada panel es `flex-1` con scroll propio adentro de esa
-   altura, así ninguno de los tres bloques queda más alto que los otros. */
-const CANTIDAD_TURNOS = 10
+/* Barra lateral junto a la tabla, desde la altura del título: Today Appointments y Recent Patients, los dos con el
+   mismo Panel que el Dashboard y la card compacta de cada fila. Cada lista muestra unas pocas filas enteras y "Show N
+   more" abre el resto con scroll adentro (ui/show-more): nunca queda una fila cortada ni la barra se estira con la
+   tabla. Decisiones en design-reference/figma/modulos/patients.md (2026-10-13). */
+/* 4 y 3 filas: así la barra termina a la altura de la tabla (a 1440 px; cada fila de la barra pesa 70 px). */
+const LIMITE_TURNOS = 4
+const LIMITE_RECIENTES = 3
+const CANTIDAD_RECIENTES = 10
 
 /* Globo con el total -no el filtrado ni el visible- al lado del título del
    panel, mismo color que el de notificaciones de la campana. */
@@ -36,29 +35,6 @@ export function Globo({ n }: { n: number }) {
     <span className="bg-dash-blue flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold text-white">
       {n}
     </span>
-  )
-}
-
-/* "View all" en el header del panel, mismo lugar y estilo que "All treatment"
-   en TreatmentPlanList. Se esconde solo si no hay nada de más para mostrar. */
-export function BotonVerTodos({
-  total, cantidad, mostrando, onToggle,
-}: {
-  total: number
-  cantidad: number
-  mostrando: boolean
-  onToggle: () => void
-}) {
-  if (total <= cantidad) return null
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className="text-dash-blue flex shrink-0 items-center gap-0.5 text-[12px] font-semibold hover:underline"
-    >
-      {mostrando ? 'Show less' : 'View all'}
-      <ChevronRight className={cn('size-3.5 transition-transform', mostrando && 'rotate-90')} />
-    </button>
   )
 }
 
@@ -72,38 +48,28 @@ export default function Patients() {
   const [modal, setModal] = useState<'new' | null>(null)
   const [editando, setEditando] = useState<PatientRow | null>(null)
   const [buscarTurno, setBuscarTurno] = useState('')
-  const [verTodosTurnos, setVerTodosTurnos] = useState(false)
+  const [buscarReciente, setBuscarReciente] = useState('')
   const [turnoEditando, setTurnoEditando] = useState<DatosTurno | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const contenidoRef = useRef<HTMLDivElement>(null)
-
-  /* La barra lateral no tiene alto propio: toma el de este bloque -búsqueda
-     + tabla-, que es su hermano en la fila. La variable se publica en el
-     padre común porque un hijo no ve el CSS custom property de su hermano. */
-  useEffect(() => {
-    const el = contenidoRef.current
-    if (!el) return
-    const medir = () => el.parentElement?.style.setProperty('--patients-alto', `${el.getBoundingClientRect().height}px`)
-    medir()
-    const ro = new ResizeObserver(medir)
-    ro.observe(el)
-    window.addEventListener('resize', medir)
-    return () => {
-      ro.disconnect()
-      window.removeEventListener('resize', medir)
-    }
-  }, [])
 
   const rows = useMemo(
     () => patients.filter((r) => r.name.toLowerCase().includes(query.toLowerCase())),
     [patients, query],
   )
 
-  /* La barra lateral muestra siempre el mismo pulso de la cuenta: no se
-     filtra por la búsqueda de la tabla, igual que las cards de resumen de
-     Billing. "View all" saca el tope de a uno; buscar en Today Appointments
-     también lo saca -no tendría sentido recortar un resultado que se buscó
-     a propósito-. */
+  /* La barra lateral muestra siempre el mismo pulso de la cuenta: no se filtra con la búsqueda de la tabla, igual que
+     las cards de resumen de Billing; cada panel tiene su buscador. Los nuevos pacientes entran primero en el store:
+     los 10 primeros son los recientes. */
+  const recientes = useMemo(() => patients.slice(0, CANTIDAD_RECIENTES), [patients])
+  const recientesFiltrados = useMemo(
+    () => recientes.filter((r) => r.name.toLowerCase().includes(buscarReciente.toLowerCase())),
+    [recientes, buscarReciente],
+  )
+  const turnosFiltrados = useMemo(
+    () => TURNOS_PATIENTS.filter((a) => a.name.toLowerCase().includes(buscarTurno.toLowerCase())),
+    [buscarTurno],
+  )
+
   /* Edit abre el mismo modal que el Dashboard con lo que la card ya sabe. */
   const editarTurno = (a: Appointment) => {
     const h = Number(a.time.slice(0, 2))
@@ -113,15 +79,19 @@ export default function Patients() {
       start: inicio, end: HORAS[HORAS.indexOf(inicio) + 1] ?? '', status: 'Check-in',
     })
   }
-  const turnosHoyTodos = TURNOS_PATIENTS
-  const turnosFiltrados = useMemo(
-    () => turnosHoyTodos.filter((a) => a.name.toLowerCase().includes(buscarTurno.toLowerCase())),
-    [turnosHoyTodos, buscarTurno],
+
+  const buscador = (valor: string, cambiar: (v: string) => void, placeholder: string) => (
+    <div className="relative shrink-0">
+      <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
+      <input
+        value={valor}
+        onChange={(e) => cambiar(e.target.value)}
+        placeholder={placeholder}
+        aria-label={placeholder}
+        className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-2 pl-8 text-[12px] placeholder:text-ink-faint focus:outline-none"
+      />
+    </div>
   )
-  const buscandoTurno = buscarTurno.length > 0
-  const turnosVisibles = buscandoTurno || verTodosTurnos
-    ? turnosFiltrados
-    : turnosFiltrados.slice(0, CANTIDAD_TURNOS)
 
   return (
     <div className={CONTENEDOR_PAGINA}>
@@ -131,26 +101,26 @@ export default function Patients() {
         Patients <ChevronDown className="size-[15px]" />
       </Link>
 
-      {/* Misma disposición que el resto de las listas: el botón principal va
-          en la fila del título -antes quedaba abajo, al lado del buscador- y
-          la búsqueda pasa a su propia fila. */}
-      <div className="mt-[15px] flex flex-wrap items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-[9px]">
-          <PageTitle>Patients</PageTitle>
-          {/* Copy de locación en una pantalla de pacientes: es del Figma. */}
-          <p className="text-xs leading-[17px] text-[#a3a3a3]">
-            Set your location name. Add the location you need.
-          </p>
-        </div>
+      {/* Dos columnas desde el título: la tabla con su encabezado, y la barra lateral arrancando a la misma altura.
+          Abajo de lg la barra va debajo de la tabla. */}
+      <div className="mt-[15px] flex flex-col gap-5 lg:flex-row lg:items-start">
+        <div className="min-w-0 flex-1">
+          {/* El botón principal va en la fila del título, al borde derecho de la columna de la tabla. */}
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex min-w-0 flex-col gap-[9px]">
+              <PageTitle>Patients</PageTitle>
+              {/* Copy de locación en una pantalla de pacientes: es del Figma. */}
+              <p className="text-xs leading-[17px] text-[#a3a3a3]">
+                Set your location name. Add the location you need.
+              </p>
+            </div>
 
-        <Button size="md" onClick={() => setModal('new')} data-tour="pat-new">
-          <Plus /> New Patient
-        </Button>
-      </div>
+            <Button size="md" onClick={() => setModal('new')} data-tour="pat-new">
+              <Plus /> New Patient
+            </Button>
+          </div>
 
-      <div className="mt-5 flex flex-col gap-5 lg:flex-row lg:items-start">
-        <div ref={contenidoRef} className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="mt-5 flex flex-wrap items-center gap-3">
             <div className="relative w-full sm:w-[320px]" data-tour="pat-search">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
               <input
@@ -170,48 +140,40 @@ export default function Patients() {
           </div>
         </div>
 
-        {/* Al costado de la tabla, no arriba: mismo Panel que usa el Dashboard,
-            para que la card de turno sea la misma en las dos pantallas. La
-            altura tope sale de --patients-alto (ver el effect de arriba) y
-            cada panel es flex-1 con scroll propio, así ninguno de los tres
-            bloques le gana altura a los otros. Sin tope en mobile: ahí la
-            barra va debajo de la tabla y puede ser tan alta como haga falta.
-            Sin overflow-hidden: recortaba la sombra del panel (patients.md, 2026-10-10). */}
-        <div className="flex w-full flex-col gap-4 lg:w-[336px] lg:shrink-0 lg:max-h-[var(--patients-alto,none)]">
-          <Panel
-            title={<>Today Appointments <Globo n={turnosHoyTodos.length} /></>}
-            className="flex-1"
-            bodyClassName="min-h-0 gap-2"
-            controls={
-              <BotonVerTodos
-                total={turnosHoyTodos.length} cantidad={CANTIDAD_TURNOS}
-                mostrando={verTodosTurnos} onToggle={() => setVerTodosTurnos((v) => !v)}
+        {/* Mismo Panel que usa el Dashboard. Sin overflow-hidden acá: recortaba la sombra del panel (patients.md,
+            2026-10-10); el scroll va adentro de cada panel, en ShowMore. */}
+        <div className="flex w-full flex-col gap-4 lg:w-[336px] lg:shrink-0">
+          <Panel title={<>Today Appointments <Globo n={TURNOS_PATIENTS.length} /></>} bodyClassName="gap-2">
+            {buscador(buscarTurno, setBuscarTurno, "Search today's appointments")}
+            {turnosFiltrados.length === 0 ? (
+              <EmptyState
+                icon={CalendarDays}
+                title={buscarTurno ? 'No matching appointments' : 'No appointments today'}
+                detail={buscarTurno ? 'Try a different name.' : 'Your schedule is clear for today.'}
+                className="py-6"
               />
-            }
-          >
-            <div className="relative shrink-0">
-              <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
-              <input
-                value={buscarTurno}
-                onChange={(e) => setBuscarTurno(e.target.value)}
-                placeholder="Search today's appointments"
-                className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-2 pl-8 text-[12px] placeholder:text-ink-faint focus:outline-none"
-              />
-            </div>
-            <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
-              {turnosVisibles.length === 0 ? (
-                <EmptyState
-                  icon={CalendarDays}
-                  title={buscandoTurno ? 'No matching appointments' : 'No appointments today'}
-                  detail={buscandoTurno ? 'Try a different name.' : 'Your schedule is clear for today.'}
-                  className="py-6"
-                />
-              ) : (
-                turnosVisibles.map((a, i) => <AppointmentCard key={i} appt={a} onEdit={editarTurno} compact />)
-              )}
-            </div>
+            ) : (
+              <ShowMore total={turnosFiltrados.length} limit={LIMITE_TURNOS} label="appointments" className="flex flex-col gap-3">
+                {(n) => turnosFiltrados.slice(0, n).map((a, i) => <AppointmentCard key={i} appt={a} onEdit={editarTurno} compact />)}
+              </ShowMore>
+            )}
           </Panel>
 
+          <Panel title={<>Recent Patients <Globo n={recientes.length} /></>} bodyClassName="gap-2">
+            {buscador(buscarReciente, setBuscarReciente, 'Search recent patients')}
+            {recientesFiltrados.length === 0 ? (
+              <EmptyState
+                icon={Users}
+                title={buscarReciente ? 'No matching patients' : 'No patients yet'}
+                detail={buscarReciente ? 'Try a different name.' : 'New patients will show up here.'}
+                className="py-6"
+              />
+            ) : (
+              <ShowMore total={recientesFiltrados.length} limit={LIMITE_RECIENTES} label="recent patients" className="flex flex-col gap-3">
+                {(n) => recientesFiltrados.slice(0, n).map((r) => <PatientCard key={r.id} row={r} onEdit={setEditando} />)}
+              </ShowMore>
+            )}
+          </Panel>
         </div>
       </div>
 
