@@ -27,9 +27,9 @@ const meta = {
         component: [
           'La regla de toda la app para **muchas cards o mucha información** (`@/components/ui/show-more`, Julián, 2026-10-12): se ven los primeros ítems y **"Show N more" abre el resto adentro de un scroll**, sin estirar la página; **"Show less"** vuelve. Así una lista de 35 turnos ocupa lo mismo que una de 5.',
           '',
-          '**Dónde se usa:** Appointments, Waiting Room, Rooms y Pending Task del Dashboard; Appointments, Pending Task y Pending documents del Patient Dashboard; Treatments. Con filas (turnos, tareas), va adentro de *List group*, que pone cada fila en su card; con otras cards (salas, turnos del paciente, planes), directo, con la grilla o la columna en `className`.',
+          '**Dónde se usa:** Appointments, Waiting Room, la tira de salas y Pending Task del Dashboard; Appointments, Pending Task y Pending documents del Patient Dashboard; Treatments. Con filas (turnos, tareas), va adentro de *List group*, que pone cada fila en su card; con otras cards (salas, turnos del paciente, planes), directo, con la grilla o la columna en `className`.',
           '',
-          '**Cómo se comporta:** si el total no pasa el tope, no hay botón ni scroll. Abierta, la lista crece hasta `min(70vh, 640px)` (nunca menos que cerrada) y después scrollea; un degradé abajo avisa que hay más (en Mac la barra no se ve hasta scrollear) y se va al llegar al final. La zona con scroll se alcanza con Tab y se mueve con las flechas.',
+          '**Cómo se comporta:** si el total no pasa el tope, no hay botón ni scroll. Abierta, la lista crece hasta `min(70vh, 640px)` (nunca menos que cerrada) y después scrollea; un degradé abajo avisa que hay más (en Mac la barra no se ve hasta scrollear) y se va al llegar al final. Si abierta entra entera, no hay degradé (2026-10-13). La zona con scroll se alcanza con Tab y se mueve con las flechas.',
           '',
           '**Probalo:** en *Playground* cambiá el total y el tope desde *Controls*; tocá "Show N more", scrolleá y volvé con "Show less".',
         ].join('\n'),
@@ -96,12 +96,12 @@ export const States: Story = {
         <Muestra titulo="Empty" nota="Sin ítems no dibuja nada: el panel muestra su EmptyState.">
           <div className={cn(TARJETA_PANEL, 'p-4 text-[12px] text-ink-muted')}><ShowMore total={0} limit={5} label="appointments">{filas}</ShowMore>(nothing drawn)</div>
         </Muestra>
-        <Muestra titulo="Cards in a column" nota="Las salas del Dashboard: la card de operatorio, de a seis.">
-          <div className={cn(TARJETA_PANEL, 'p-4')}>
-            <ShowMore total={8} limit={3} label="rooms" className="flex flex-col gap-3">
-              {(n) => [...DIA_CARGADO.rooms, ...DIA_CARGADO.rooms].slice(0, n).map((r, i) => <OperatoryCard key={i} room={r} />)}
+        <Muestra titulo="Open, fits" nota="Si abierta entra entera (una o dos de más), no scrollea ni lleva degradé.">
+          <Forzar selector="[data-show-more]" estado="click" className={cn(TARJETA_PANEL, 'p-4')}>
+            <ShowMore total={4} limit={3} label="rooms" className="flex flex-col gap-3">
+              {(n) => DIA_CARGADO.rooms.slice(0, n).map((r, i) => <OperatoryCard key={i} room={r} />)}
             </ShowMore>
-          </div>
+          </Forzar>
         </Muestra>
       </div>
       <Muestra titulo="Cards in a grid, on the page" nota="Treatments (en la app, de a cuatro): los primeros planes y el resto con scroll; el degradé va del color de la página.">
@@ -130,7 +130,7 @@ export const Specs: Story = {
       <Bloque titulo="Limits in the app" nota="Cuántos se ven cerrado en cada lugar.">
         <Tabla encabezado={['Screen', 'Block', 'Limit']} minimo={480}>
           <tr><td>Dashboard</td><td>Appointments · Waiting Room · Pending Task</td><td className="tabular-nums">5</td></tr>
-          <tr><td>Dashboard</td><td>Rooms</td><td className="tabular-nums">6</td></tr>
+          <tr><td>Dashboard</td><td>Rooms (strip on top)</td><td>As many as fit in one row (Operatory strip)</td></tr>
           <tr><td>Patient Dashboard</td><td>Pending Task · Appointments</td><td className="tabular-nums">3</td></tr>
           <tr><td>Patient Dashboard</td><td>Pending documents</td><td className="tabular-nums">4</td></tr>
           <tr><td>Treatments</td><td>Treatment plans</td><td className="tabular-nums">4</td></tr>

@@ -38,6 +38,8 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   y lo cambia; Today vuelve a hoy y se va.
   Con `?day=busy` (35 turnos) se ven cinco; *Show 30 more* abre el resto en una región con scroll y *Show less* la
   cierra (`ui/show-more`).
+  (2026-10-13) La tira de salas de arriba abre el resto con *Show N more* (el número depende del ancho); *Check In*
+  avisa "checked in" y el escudo de al lado de Today lleva a Help.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 

@@ -2,7 +2,7 @@ import { ArrowRight, Check, Clock, FileText, TriangleAlert, X } from 'lucide-rea
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { StatusPill } from './primitives'
-import { MenuCard, accionTurno, type Appointment } from './AppointmentCard'
+import { ACCION_TURNO, MenuCard, accionTurno, type Appointment } from './AppointmentCard'
 import { completarTarea, type PendingTask } from './PendingTaskCard'
 
 /* Las filas del Dashboard con volumen (propuesta del 2026-10-12, ver design-reference/figma/modulos/dashboard.md): lo
@@ -60,7 +60,7 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurn
     </span>
   )
   const boton = (
-    <Button size="sm" className="shrink-0" onClick={() => accionTurno(appt)}>{accion} <ArrowRight /></Button>
+    <Button size="sm" variant={ACCION_TURNO[accion]} className="shrink-0" onClick={() => accionTurno(appt)}>{accion} <ArrowRight /></Button>
   )
   const menu = <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
   const donde = `${appt.provider} · ${appt.operatory}`
@@ -70,7 +70,7 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurn
       <div data-appt-row className={cn('rounded-lg p-2.5', activa && 'bg-info-bg')}>
         {/* La hora en la caja gris de la card (reloj y hora), del alto de la fila: suelta arriba quedaba descolgada
             (Julián, 2026-10-13). */}
-        <div className="flex items-stretch gap-2.5 @3xl:hidden">
+        <div className="flex items-stretch gap-2.5 @4xl:hidden">
           <span className="bg-dash-field flex w-12 shrink-0 flex-col items-center justify-center gap-1 rounded-lg py-2">
             <Clock className="size-3.5 text-ink-medium" />
             <span className="text-[12px] font-semibold text-ink tabular-nums">{appt.time}</span>
@@ -93,7 +93,7 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurn
           </div>
         </div>
 
-        <div className="hidden items-center gap-4 @3xl:flex">
+        <div className="hidden items-center gap-4 @4xl:flex">
           <span className="bg-dash-field flex h-8 w-[72px] shrink-0 items-center justify-center gap-1.5 rounded-lg text-[12px] font-semibold text-ink tabular-nums">
             <Clock className="size-3.5 text-ink-medium" />{appt.time}
           </span>
