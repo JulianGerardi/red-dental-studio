@@ -153,6 +153,8 @@ Treatments, sigue en 60px.
 
 ## Billing abre su menú flotante (2026-10-06)
 
+> Reemplazado el 2026-10-13: Billing vuelve a ser un link directo (ver *Billing sin menú* más abajo).
+
 Como Settings: al pasar el mouse por Billing (o con su flecha, expandido o en el celular) se abre al costado un menú
 con **Billing**, **Fee Schedules**, **Carriers** y **Coverage Table** (las tablas de Settings → Billing). Billing queda
 activo en `/billing` y en esas tres; Settings deja de marcarse ahí. `BillingItem` en `Sidebar.tsx`, con la lógica de
@@ -181,3 +183,19 @@ Parts, States y Specs. Specs lee del rail dibujado: 176 y 58 de ancho, logo de 6
 padding, colapsado 32×32. No lleva estado de foco: los ítems no tienen anillo propio (usan el del navegador) y el addon
 de pseudo-estados sólo fuerza reglas de CSS, así que la muestra salía igual al default.
 
+## Billing sin menú: las tablas viven sólo en Settings (2026-10-13)
+
+Pedido de Julián, con una captura del menú de Billing marcando en amarillo Fee Schedules, Carriers y Coverage Table:
+"no irían, solo queda Billing; eso va solamente en Settings". Son la configuración que alimenta Billing (aranceles,
+aseguradoras y coberturas): se arman una vez y las toca administración, no recepción en el día a día, así que su lugar
+es Settings → Billing, donde ya estaban.
+
+**Sin menú, no un menú de un solo ítem.** Con sólo "Billing" el flotante repetía el destino del propio ícono: un paso
+y una flecha de más para llegar al mismo lugar. Billing pasa a ser un ítem como Patients o Scheduling: link directo,
+con tooltip cuando el rail está colapsado. Se borran `BillingItem` y `billingMenu` (`navigation-preview.ts`).
+
+**El azul sigue a Settings.** En `/settings/finance/*` el ítem activo vuelve a ser Settings (antes se marcaba Billing),
+y su menú abre Billing desplegado con la tabla actual en azul. Billing se marca sólo en `/billing`.
+
+Design system: *Elements / Navigation → States* reemplaza *Billing menu* por *Billing* (link directo) y suma *Settings
+menu · Billing tables*; el Playground ya no ofrece *billing menu* en *open*.

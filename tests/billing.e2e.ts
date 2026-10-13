@@ -40,3 +40,17 @@ test('El círculo de info de un número explica qué cuenta', async ({ app, scre
   await screen.getByRole('button', /^Overdue Balance:/).hover()
   await expect(screen.getByText(/^Open charge balances older than 30 days\.$/)).toBeVisible()
 })
+
+test('Billing en el menú lateral va directo a su pantalla; sus tablas están sólo en Settings', async ({ app, screen }) => {
+  await app.open('/')
+  await expect(screen.getByRole('button', 'Billing menu')).toHaveCount(0)
+  await screen.getByRole('link', 'Billing').first().hover()
+  await expect(screen.getByRole('link', 'Fee Schedules')).toHaveCount(0)
+  await screen.getByRole('link', 'Billing').first().tap()
+  await expect(screen.getByRole('heading', 'Billing')).toBeVisible()
+
+  await screen.getByRole('link', 'Settings').hover()
+  await screen.getByRole('button', 'Billing options').tap()
+  await screen.getByRole('link', 'Carriers').tap()
+  await expect(screen.getByRole('heading', 'Carriers')).toBeVisible()
+})

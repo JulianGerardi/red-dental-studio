@@ -18,7 +18,7 @@ const RUTAS = {
   'Settings / Accounts': '/settings/accounts',
 } as const
 
-type Abierto = 'nothing' | 'item tooltip' | 'billing menu' | 'settings menu'
+type Abierto = 'nothing' | 'item tooltip' | 'settings menu'
 
 type Args = {
   screen: keyof typeof RUTAS
@@ -41,12 +41,12 @@ const meta = {
           '- **Expandido:** no hay tooltips, el nombre ya se ve.',
           '- **Ítem activo:** azul con texto blanco, según la pantalla en la que estás.',
           '- **Settings:** queda abajo, en el mismo lugar colapsado y expandido. Al pasar el mouse abre un menú flotante con sus secciones.',
-          '- **Billing:** al pasar el mouse (o con su flecha) abre al costado un menú con Billing, Fee Schedules, Carriers y Coverage Tables. Queda activo en Billing y en esas tres tablas.',
+          '- **Billing:** un link directo a la pantalla de Billing, sin menú. Fee Schedules, Carriers y Coverage Table están sólo en Settings → Billing, y ahí el que queda en azul es Settings.',
           '- **En el celular:** el menú es un panel de 234px que tapa el contenido y se cierra solo al elegir una pantalla (ver *On each device*).',
           '',
           'El menú del paciente está en *Elements / Patient menu*.',
           '',
-          '**Probalo:** en *Playground* elegí la pantalla y usá el botón de la barra de arriba; pasá el mouse por los íconos, por Billing y por Settings. Con *open* dejás abierto un tooltip o un menú.',
+          '**Probalo:** en *Playground* elegí la pantalla y usá el botón de la barra de arriba; pasá el mouse por los íconos y por Settings. Con *open* dejás abierto un tooltip o un menú.',
         ].join('\n'),
       },
     },
@@ -57,7 +57,7 @@ const meta = {
     expanded: { control: 'boolean', description: 'Cómo arranca el menú: 176px con nombres o 58px con íconos. En la app se cambia con el botón de la barra de arriba.' },
     open: {
       control: 'select',
-      options: ['nothing', 'item tooltip', 'billing menu', 'settings menu'],
+      options: ['nothing', 'item tooltip', 'settings menu'],
       description: 'Deja abierto lo que en la app se abre con el mouse. El tooltip sólo existe colapsado: al elegirlo, el menú se colapsa.',
       table: { category: 'Preview' },
     },
@@ -70,7 +70,6 @@ type Story = StoryObj<Args>
 function previewDe(open: Abierto): NavigationPreviewState {
   switch (open) {
     case 'item tooltip': return { tooltip: 'Scheduling' }
-    case 'billing menu': return { billingMenu: true }
     case 'settings menu': return { settingsMenu: true }
     default: return {}
   }
@@ -111,10 +110,9 @@ const Fondo = ({ children }: { children: ReactNode }) => (
 /* Qué es cada parte y qué pasa al tocarla. */
 const PARTES: [string, string, string][] = [
   ['Logo', 'Bloque azul oscuro con el nombre. Mide lo mismo que la barra de arriba (64px) para que las dos queden alineadas.', 'Sólo el ícono.'],
-  ['Items', 'Dashboard, Patients, Scheduling, Message, Contacts, Documents, Reports y Help: cada uno abre su pantalla. El de la pantalla actual va en azul.', 'Sólo íconos de 32×32, con el nombre en un tooltip.'],
-  ['Billing', 'Abre Billing. Al pasar el mouse (o con su flecha) muestra al costado Billing, Fee Schedules, Carriers y Coverage Tables.', 'El ícono; el menú sale igual al pasar el mouse.'],
+  ['Items', 'Dashboard, Patients, Scheduling, Billing, Message, Contacts, Documents, Reports y Help: cada uno abre su pantalla. El de la pantalla actual va en azul.', 'Sólo íconos de 32×32, con el nombre en un tooltip.'],
   ['Confibot', 'No es una pantalla: abre y cierra la hoja de chat de ayuda. Queda en azul mientras está abierta.', 'Ícono con tooltip.'],
-  ['Settings', 'Al pie, en el mismo lugar abierto o cerrado. Al pasar el mouse muestra sus secciones; Billing despliega sus tablas con su flecha.', 'El ícono, sin tooltip: el menú ya sale ahí mismo.'],
+  ['Settings', 'Al pie, en el mismo lugar abierto o cerrado. Al pasar el mouse muestra sus secciones; Billing despliega con su flecha Fee Schedules, Carriers y Coverage Table, que viven sólo acá.', 'El ícono, sin tooltip: el menú ya sale ahí mismo.'],
   ['Toggle', 'Está en la barra de arriba, a la izquierda del saludo: expande a 176px o colapsa a 58px.', 'Cambia el ícono.'],
 ]
 
@@ -166,11 +164,14 @@ export const States: Story = {
             <Estado titulo="Hover on an item" nota="Fondo gris: se puede elegir." ancho={176}>
               <Forzar selector='a[href="/patients"]' estado="hover"><Rail /></Forzar>
             </Estado>
-            <Estado titulo="Billing menu" nota="Al pasar el mouse por Billing, o con su flecha." ancho={430}>
-              <Rail ruta="/billing" preview={{ billingMenu: true }} />
+            <Estado titulo="Billing" nota="Link directo, sin menú." ancho={176}>
+              <Rail ruta="/billing" />
             </Estado>
             <Estado titulo="Settings menu" nota="Sale hacia arriba: Settings vive al pie." ancho={430}>
               <Rail ruta="/settings/accounts" preview={{ settingsMenu: true }} />
+            </Estado>
+            <Estado titulo="Settings menu · Billing tables" nota="En Fee Schedules, Carriers o Coverage Table el azul va en Settings y Billing se despliega solo." ancho={430}>
+              <Rail ruta="/settings/finance/carriers" preview={{ settingsMenu: true }} />
             </Estado>
           </div>
         </Bloque>
