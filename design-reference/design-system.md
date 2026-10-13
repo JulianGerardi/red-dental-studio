@@ -761,3 +761,12 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   campo de arriba (Edit Carrier › *Information*, pedido de Julián). En los drawers siguen una debajo de la otra
   (*Components / UI / Drawer → Specs → Fields*).
 
+## Notifications sin Pending ni Archived; banner de punta a punta (2026-10-13)
+
+- *Pages / Parts / Notifications*: sin los estados ni variantes de *Pending* y *Archived*; *Row actions* muestra el
+  ojo (*Mark as read* / *Mark as unread*); *Empty states* con *Inbox* y *Unread* (con y sin fechas); colores y reglas al
+  día. *Elements / Date filter → Specs* muestra las dos pestañas que quedan.
+- *Components / Layout / NotificationBanner*: de punta a punta del contenido, con la X sola a la derecha; las stories
+  usan las tareas que el banner muestra de verdad (`delBanner`), así el paginador dice "1 of 4" y no "1 of 16".
+  Decisiones en `figma/modulos/notifications.md` y `header-sidebar.md` (2026-10-13).
+

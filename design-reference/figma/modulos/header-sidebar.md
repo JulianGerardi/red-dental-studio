@@ -181,3 +181,14 @@ Parts, States y Specs. Specs lee del rail dibujado: 176 y 58 de ancho, logo de 6
 padding, colapsado 32×32. No lleva estado de foco: los ítems no tienen anillo propio (usan el del navegador) y el addon
 de pseudo-estados sólo fuerza reglas de CSS, así que la muestra salía igual al default.
 
+
+## El banner de punta a punta (2026-10-13)
+
+Julián, con una captura: el banner amarillo va **de punta a punta del contenido de la página** (alineado con el título
+y con las cards de abajo), no del ancho de su texto como se había elegido el 2026-10-06. Adentro, la tarea, *Review* y
+el paginador siguen juntos a la izquierda y la **X va sola en el extremo derecho** (`ml-auto`). Es el mismo componente
+en todas las pantallas (`NotificationBanner` en `AppShell`), así que cambia en toda la app. Verificado: en
+Notifications y en el Dashboard el banner mide lo mismo que la lista y el título (1334px a 1440).
+
+Desde que Notifications no tiene *Pending* ni *Archived* (`notifications.md`, 2026-10-13), el banner muestra las
+**tareas sin leer** no ocultas con la X.
