@@ -1,3 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{m as n,u as r}from"./data-table-BTRydb02.js";import{i,u as a}from"./ledger-88mvrIwW.js";var o,s,c,l;function u(){return(u=e((()=>{a(),n(),o=t(),s={title:`Components/Ledger/LedgerRowModal`,parameters:{layout:`fullscreen`,docs:{story:{inline:!1,iframeHeight:560}}}},c={render:()=>(0,o.jsx)(r,{m:i[0],onClose:()=>{}})},l=[`FullRecord`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{
-  render: () => <LedgerRowModal m={MOVIMIENTOS[0]} onClose={() => {}} />
-}`,...c.parameters?.docs?.source}}}})))()}u();export{c as FullRecord,l as __namedExportsOrder,s as default};
