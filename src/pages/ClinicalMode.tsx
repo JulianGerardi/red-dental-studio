@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { Maximize2, Minimize2, TriangleAlert, Stethoscope } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
@@ -37,19 +37,15 @@ import { PATIENTS } from '@/data/mock'
 
 export default function ClinicalMode() {
   const { id } = useParams()
-  /* Desde el detalle de una fila del Ledger: ?case= abre ese caso en Treatment Plan y ?procedure= esa fila del Overview. */
-  const [busqueda] = useSearchParams()
-  const casoPedido = busqueda.get('case') ?? undefined
-  const procedimientoPedido = busqueda.get('procedure') ?? undefined
   const patient = PATIENTS.find((p) => p.id === id) ?? PATIENTS[0]
   /* Overwiev no es una pestaña más: es el estado inicial y el botón de la
      barra vuelve acá desde cualquier examen o registro. */
-  const [enOverview, setEnOverview] = useState(!casoPedido)
-  const [pestana, setPestana] = useState<Pestana>(casoPedido ? 'Treatment Plan' : 'Vitals')
+  const [enOverview, setEnOverview] = useState(true)
+  const [pestana, setPestana] = useState<Pestana>('Vitals')
   const [encuentro, setEncuentro] = useState(false)
   const [ampliado, setAmpliado] = useState(false)
   /* El caso que se abrió desde una card del Overview; sin caso, Treatment Plan entra por Unassigned. */
-  const [casoAbierto, setCasoAbierto] = useState<string | undefined>(casoPedido)
+  const [casoAbierto, setCasoAbierto] = useState<string | undefined>()
 
   const [exam, setExam] = useState(makeMockExam)
   const [seleccion, setSeleccion] = useState<number[]>([ULTIMA_CONDICION.pieza])
@@ -125,7 +121,7 @@ export default function ClinicalMode() {
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         {modelo}
-        {!ampliado && <ProblemList procedimientoInicial={procedimientoPedido} />}
+        {!ampliado && <ProblemList />}
       </div>
     </div>
   )

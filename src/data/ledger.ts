@@ -21,7 +21,7 @@ export type Movimiento = {
   creditoDisponible?: number
   /** La sede donde se registró; sin dato, la principal (`SEDE_PRINCIPAL`). */
   sede?: string
-  /** Sólo cargos: el procedimiento de Clinical Mode (id de PROCEDIMIENTOS) que se cobra. De ahí sale su caso. */
+  /** Sólo cargos: el procedimiento de Clinical Mode (id de PROCEDIMIENTOS) que se cobra. */
   procedimiento?: string
 }
 
@@ -51,7 +51,7 @@ export const MOVIMIENTOS: Movimiento[] = [
   /* Credit Adjustment con crédito sin aplicar todavía: mismo mecanismo que
      m27, para probar el indicador en el otro tipo que lo puede tener. */
   { id: 'm28', fecha: 'March 29, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Overpayment credit adjustment', provider: 'Front desk', tipo: 'Adjustment', monto: -80, estado: 'Posted', creditoDisponible: 80 },
-  { id: 'm12', fecha: 'March 31, 2025', paciente: 'John Smith', codigo: 'D2392', descripcion: 'Resin composite – two surfaces', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 220, estado: 'Posted', diente: '14', superficie: 'OD', procedimiento: 'pr7' },
+  { id: 'm12', fecha: 'March 31, 2025', paciente: 'John Smith', codigo: 'D2392', descripcion: 'Resin composite – two surfaces', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 220, estado: 'Posted', diente: '30', superficie: 'MO' },
   { id: 'm13', fecha: 'April 3, 2025', paciente: 'John Smith', codigo: 'D4341', descripcion: 'Periodontal scaling – per quadrant', provider: 'Dr. Salgado', tipo: 'Charge', monto: 310, estado: 'Posted', sede: 'Northgate Clinic', procedimiento: 'pr11' },
   { id: 'm14', fecha: 'April 7, 2025', paciente: 'John Smith', codigo: 'D0220', descripcion: 'Intraoral periapical – first image', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 38, estado: 'Posted', diente: '7', procedimiento: 'pr1' },
   { id: 'm15', fecha: 'March 30, 2025', paciente: 'Emma Smith', codigo: 'D1206', descripcion: 'Topical fluoride varnish', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 40, estado: 'Posted' },
@@ -73,9 +73,10 @@ export const MOVIMIENTOS: Movimiento[] = [
   { id: 'm26', fecha: 'April 25, 2025', paciente: 'Emma Smith', codigo: 'D2391', descripcion: 'Resin-based composite – one surface, posterior', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 185, estado: 'Posted', diente: '12', superficie: 'O' },
 ]
 
-/* A qué cargo fue cada pago, ajuste o pago del seguro, y cuánto. Cierra con los datos de arriba: lo aplicado por cada
-   origen más su `creditoDisponible` da su monto, y ningún cargo recibe más que lo que vale (D2392 queda con $80, como el
-   mock de Julián). Los Denied y lo que todavía no se aplicó no aparecen. Ver ledger.md (2026-10-13). */
+/* A qué cargo fue cada pago, ajuste o pago del seguro, y cuánto: lo lee el detalle de un procedimiento en Clinical Mode
+   (Financial details y Applied transactions). Cierra con los datos de arriba: lo aplicado por cada origen más su
+   `creditoDisponible` da su monto, y ningún cargo recibe más que lo que vale. Los Denied y lo que todavía no se aplicó
+   no aparecen. Ver clinical-mode.md (2026-10-13). */
 export type Aplicacion = { id: string; origen: string; cargo: string; fecha: string; monto: number }
 
 export const APLICACIONES: Aplicacion[] = [
@@ -85,10 +86,10 @@ export const APLICACIONES: Aplicacion[] = [
   { id: 'a4', origen: 'm5', cargo: 'm4', fecha: 'March 21, 2025', monto: 35 },
   { id: 'a5', origen: 'm10', cargo: 'm9', fecha: 'March 22, 2025', monto: 90 },
   { id: 'a6', origen: 'm8', cargo: 'm4', fecha: 'March 26, 2025', monto: 25 },
-  { id: 'a7', origen: 'm27', cargo: 'm12', fecha: 'March 31, 2025', monto: 50 },
-  { id: 'a8', origen: 'm8', cargo: 'm12', fecha: 'March 31, 2025', monto: 20 },
+  { id: 'a7', origen: 'm27', cargo: 'm13', fecha: 'April 3, 2025', monto: 50 },
+  { id: 'a8', origen: 'm8', cargo: 'm13', fecha: 'April 3, 2025', monto: 20 },
   { id: 'a9', origen: 'm19', cargo: 'm17', fecha: 'April 12, 2025', monto: 3200 },
-  { id: 'a10', origen: 'm22', cargo: 'm12', fecha: 'April 18, 2025', monto: 70 },
+  { id: 'a10', origen: 'm22', cargo: 'm13', fecha: 'April 18, 2025', monto: 70 },
   { id: 'a11', origen: 'm22', cargo: 'm17', fecha: 'April 18, 2025', monto: 1650 },
   { id: 'a12', origen: 'm22', cargo: 'm20', fecha: 'April 18, 2025', monto: 1180 },
   { id: 'a13', origen: 'm22', cargo: 'm21', fecha: 'April 18, 2025', monto: 2100 },

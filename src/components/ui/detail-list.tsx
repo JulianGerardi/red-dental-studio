@@ -3,7 +3,7 @@ import { ArrowUpRight, ChevronRight, Maximize2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Count } from '@/components/ui/count'
 
-/* Lista de detalle: lo que se despliega debajo de una fila de tabla (Clinical Mode, Ledger). Una fila por tema, una
+/* Lista de detalle: lo que se despliega debajo de una fila de tabla (Clinical Mode). Una fila por tema, una
    debajo de la otra y sin cards, con el título a la izquierda y los datos a la derecha. Sólo lectura: cada dato lleva a
    la pantalla donde se trabaja. Ver Components / UI / DetailList. */
 

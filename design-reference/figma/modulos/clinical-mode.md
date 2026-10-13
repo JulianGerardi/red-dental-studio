@@ -2206,14 +2206,34 @@ controla con `npm run ds:campos`.
    New Procedure, que busca en el mismo catálogo (antes decía "Select"). Note pasa a `TextArea`.
 3. La búsqueda con su botón Filter es una barra de catálogo, no un par de campos: queda fuera de la grilla.
 
-## Orden del detalle por importancia (2026-10-13)
+## Orden del detalle por importancia y lo del cobro (2026-10-13)
 
-Julián, con dos tablas de orden recomendado:
+Julián, con dos tablas de orden recomendado y el prototipo *Expanded transaction detail* (que es para el detalle de
+**Procedures** de esta tabla, no para el Ledger: una primera vuelta lo puso en el Ledger por error y se deshizo).
 
 - **Procedimiento:** Treatment (el caso, su aceptación, visitas), **Procedure consent** (después de ver la aceptación,
-  si el consentimiento está), Findings / diagnoses (qué condición resuelve), Referral y Lab order.
+  si el consentimiento está), Findings / diagnoses (qué condición resuelve), Referral y Lab order; y después lo del
+  cobro, en el orden del prototipo: **Clinic location**, **Financial details** y **Applied transactions**.
 - **Problema (finding):** Procedures (qué procedimientos lo resuelven y en qué estado), Treatment, Referral, Lab order y
-  Source exam (la trazabilidad, al final).
+  Source exam (la trazabilidad, al final). No lleva cobro: se cobra el procedimiento.
+
+Lo del cobro sale del cargo del Ledger que cobra el procedimiento (`procedimiento` en `data/ledger.ts`):
+
+1. *Financial details*: Original charge, Insurance paid, Payments applied, Credit adjustments applied y **Outstanding
+   balance** (destacado), con la nota "Balance of this charge only, not the patient or guarantor balance.". Los números
+   van en columnas de 112px como mínimo, tantas como entren, y el monto abajo de su rótulo para que queden alineados
+   aunque un rótulo se parta.
+2. *Applied transactions*: fecha, tipo, la transacción y lo aplicado a este cargo. La referencia abre la transacción en
+   el mismo registro de sólo lectura del Ledger (`LedgerRowModal`), sin salir de Clinical Mode.
+3. **Clinic location** y no "Location" como el prototipo: la tabla ya tiene una columna Location que es la zona de la
+   boca (Soft Palate, Upper Arch).
+4. Sin cargo, las tres filas quedan y lo dicen ("Not charged yet."). Hoy tienen cargo D0120, D1110, D0220 y D4341; el
+   ejemplo con pagos parciales es D4341 ($310, faltan $170).
+5. `APLICACIONES` en `data/ledger.ts` dice a qué cargo fue cada pago, ajuste o seguro; cierra con `creditoDisponible`
+   (lo aplicado por cada origen más lo disponible da su monto) y ningún cargo recibe más de lo que vale. El Ledger no
+   cambia.
+
+Las fechas del Ledger (2025) y las de Clinical Mode (2026) vienen de mocks distintos y no coinciden; queda anotado.
 
 El drawer de *View full record* sigue el mismo orden. Las piezas de la lista pasan a `ui/detail-list`
-(*Components / UI / DetailList*) porque ahora también las usa el detalle del Ledger.
+(*Components / UI / DetailList*).

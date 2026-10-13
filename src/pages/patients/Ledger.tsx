@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import {
   ChevronLeft, Search, Receipt, CreditCard, Wallet, HandCoins, Download, MoveHorizontal,
 } from 'lucide-react'
@@ -11,7 +11,7 @@ import { FilterMenu } from '@/components/ui/filter-menu'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import {
-  APLICACIONES, MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda, pendienteDe, tieneCredito,
+  MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda, tieneCredito,
   type Movimiento,
 } from '@/data/ledger'
 import { aviso } from '@/components/ui/toaster'
@@ -132,9 +132,6 @@ type Tab = (typeof TABS)[number]['id']
 export default function Ledger() {
   const { id = 'john-smith' } = useParams()
   const [movs, setMovs] = useState(MOVIMIENTOS)
-  /* A qué cargo fue cada pago o ajuste: lo lee el detalle de la fila y lo suma Apply credit. */
-  const [aplicaciones, setAplicaciones] = useState(APLICACIONES)
-  const navegar = useNavigate()
   const [vista, setVista] = useState<Vista>('Patient View')
   const [q, setQ] = useState('')
   const [tipos, setTipos] = useState<string[]>([])
@@ -155,12 +152,10 @@ export default function Ledger() {
   /* Aplicar crédito no genera un movimiento nuevo -esa plata ya está
      contada en el saldo desde que el Payment/Adjustment se registró-, sólo
      descuenta lo aplicado del remanente de la transacción de origen. */
-  const aplicarCredito = (id: string, monto: number, porCargo: Record<string, number>) => {
+  const aplicarCredito = (id: string, monto: number) => {
     setMovs((prev) => prev.map((mv) =>
       mv.id === id ? { ...mv, creditoDisponible: Math.max((mv.creditoDisponible ?? 0) - monto, 0) } : mv,
     ))
-    const hoy = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-    setAplicaciones((p) => [...p, ...Object.entries(porCargo).map(([cargo, m], i) => ({ id: `a-${Date.now()}-${i}`, origen: id, cargo, fecha: hoy, monto: m }))])
     aviso.ok(`${moneda(monto)} of credit applied.`)
     setEnCredito(null)
   }
@@ -377,11 +372,7 @@ export default function Ledger() {
                         {abierta && (
                           <LedgerRowDetail
                             m={m}
-                            aplicaciones={aplicaciones}
-                            movimientos={movs}
                             onVerTodo={() => setEnModal(m)}
-                            onVerTransaccion={(x) => setEnModal(conSaldoTotal.find((f) => f.id === x.id) ?? null)}
-                            onAbrirClinica={({ caso, procedimiento }) => navegar(`/patients/${id}/clinical-mode?${new URLSearchParams(caso ? { case: caso } : { procedure: procedimiento ?? '' })}`)}
                             onAplicarCredito={tieneCredito(m) ? () => setEnCredito(m) : undefined}
                           />
                         )}
@@ -459,10 +450,9 @@ export default function Ledger() {
       {enCredito && (
         <AplicarCreditoModal
           m={enCredito}
-          /* Lo que falta de cada cargo, no su monto original: lo ya pagado no se puede volver a cubrir. */
-          cargos={cargosDeLaCuenta.filter((c) => c.paciente === enCredito.paciente && pendienteDe(c, aplicaciones) > 0).map((c) => ({ ...c, monto: pendienteDe(c, aplicaciones) }))}
+          cargos={cargosDeLaCuenta.filter((c) => c.paciente === enCredito.paciente)}
           onClose={() => setEnCredito(null)}
-          onAplicar={(monto, porCargo) => aplicarCredito(enCredito.id, monto, porCargo)}
+          onAplicar={(monto) => aplicarCredito(enCredito.id, monto)}
         />
       )}
     </div>

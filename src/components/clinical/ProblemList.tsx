@@ -74,18 +74,15 @@ const cuenta = <E extends string>(filas: { estado: E }[], e: E) => filas.filter(
 const texto = (t: string) => <span className="truncate">{t || '-'}</span>
 const estadoPill = (tono: PillTone, e: string) => <Pill tone={tono} size="sm" className="tracking-wide uppercase">{e}</Pill>
 
-export function ProblemList({ procedimientoInicial }: {
-  /** Abre en Procedures con esa fila desplegada (el link "View procedure" del Ledger). */
-  procedimientoInicial?: string
-} = {}) {
-  const [pestana, setPestana] = useState<Pestana>(procedimientoInicial ? 'Procedures' : 'Problem List')
+export function ProblemList() {
+  const [pestana, setPestana] = useState<Pestana>('Problem List')
   const [problemas, setProblemas] = useState(PROBLEMAS)
   const [procedimientos, setProcedimientos] = useState(PROCEDIMIENTOS)
   const [filtroProblema, setFiltroProblema] = useState<EstadoProblema>('Active')
   const [filtroProcedimiento, setFiltroProcedimiento] = useState<EstadoProcedimiento | 'All'>('All')
   const [q, setQ] = useState('')
   /* La fila que se abre al llegar desde el detalle de la otra pestaña. */
-  const [enfoque, setEnfoque] = useState<string | undefined>(procedimientoInicial)
+  const [enfoque, setEnfoque] = useState<string>()
 
   const t = q.trim().toLowerCase()
   const filasProblema = problemas.filter((p) => p.estado === filtroProblema && (!t || `${p.fecha} ${p.ubicacion} ${p.pieza ?? ''} ${p.condicion} ${p.examen} ${p.proveedor}`.toLowerCase().includes(t)))

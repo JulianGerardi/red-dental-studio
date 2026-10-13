@@ -124,3 +124,17 @@ test('Lab Order filtra por estado y cancela una orden con Undo', async ({ app, s
   await screen.getByRole('button', 'Undo').tap()
   await expect(screen.getByText(/Showing 1 to 2 of 2 active prescriptions/)).toBeVisible()
 })
+
+test('el detalle de un procedimiento cobrado muestra la plata y lo aplicado', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('tab', 'Procedures').tap()
+  await screen.getByLabel('Rows per page').selectOption('20')
+  await screen.getByText(/D4341 - Periodontal scaling/).tap()
+
+  await expect(screen.getByText('Clinic location')).toBeVisible()
+  await expect(screen.getByText('Northgate Clinic')).toBeVisible()
+  await expect(screen.getByText('Outstanding balance')).toBeVisible()
+  await expect(screen.getByText('$170.00')).toBeVisible()
+  await screen.getByRole('button', /Check payment ····1234/).tap()
+  await expect(screen.getByRole('dialog', /Check payment/)).toBeVisible()
+})

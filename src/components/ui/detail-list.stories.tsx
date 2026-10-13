@@ -57,7 +57,7 @@ const meta = {
     docs: {
       description: {
         component: [
-          'La **lista de detalle**: lo que se despliega debajo de una fila de tabla (Elements / Tables, `rowDetail`). La usan el detalle de Problem List y Procedures en Clinical Mode y el de Transactions en el Ledger, así los dos se leen igual.',
+          'La **lista de detalle**: lo que se despliega debajo de una fila de tabla (Elements / Tables, `rowDetail`). La usa el detalle de Problem List y Procedures en Clinical Mode; otra tabla con detalle de fila puede usarla para leerse igual.',
           '',
           '**Cómo es:** el título del registro y un dato al costado (pieza, superficie); una fila por tema, una debajo de la otra y **sin cards**, con el título a la izquierda (arriba en angosto) y los datos a la derecha; cada dato en una línea con su link, su estado y el contexto; al pie *View full record* y *Read-only summary*. Lo que no entra se pliega en "N more…"; una fila sin datos queda y dice qué falta.',
           '',

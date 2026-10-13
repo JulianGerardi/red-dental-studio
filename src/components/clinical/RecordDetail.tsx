@@ -3,7 +3,12 @@ import { Pencil, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
-import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, MasItems, Vacio, VerRegistroCompleto } from '@/components/ui/detail-list'
+import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, MasItems, NotaDetalle, Vacio, VerRegistroCompleto } from '@/components/ui/detail-list'
+import { LedgerRowModal } from '@/components/patients/ledger/LedgerRowDetail'
+import {
+  APLICACIONES, MOVIMIENTOS, SEDE_PRINCIPAL, aplicadoA, fechaCorta, moneda, pendienteDe, sedeDe, totalAplicado,
+  type Aplicacion, type Movimiento,
+} from '@/data/ledger'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { Drawer, DrawerSection } from '@/components/ui/drawer'
 import { ORDEN_TONO } from '@/components/clinical/LabOrderPanel'
@@ -201,6 +206,92 @@ export function ContenidoExamen({ problema }: { problema: Problema }) {
   )
 }
 
+/* ── Lo que se cobró (el cargo del Ledger) ─────────────────────────
+
+   Julián (2026-10-13, prototipo "Expanded transaction detail"): el procedimiento también dice dónde se hizo, cuánto
+   se cobró, cuánto se pagó y con qué. Sale del cargo del Ledger que lo cobra (`procedimiento` en data/ledger). */
+
+export const cargoDe = (pr: ProcedimientoPaciente) => MOVIMIENTOS.find((m) => m.procedimiento === pr.id && m.monto > 0)
+
+const aplicadasA = (cargo?: Movimiento) =>
+  cargo ? aplicadoA(cargo.id, APLICACIONES)
+    .map((a) => ({ a, otra: MOVIMIENTOS.find((m) => m.id === a.origen) }))
+    .filter((f): f is { a: Aplicacion; otra: Movimiento } => !!f.otra) : []
+
+const etiquetaTipo = (m: Movimiento) =>
+  m.tipo === 'Insurance' ? 'Insurance Payment' : m.tipo === 'Payment' ? 'Patient Payment' : m.monto < 0 ? 'Credit Adjustment' : 'Charge Adjustment'
+
+/** Un número de Financial details; el que falta pagar va destacado. El monto va abajo: si un rótulo se parte, los
+    números siguen alineados. */
+export function Metrica({ label, valor, destacado }: { label: string; valor: number; destacado?: boolean }) {
+  return (
+    <div className="flex min-w-0 flex-col">
+      <dt className="text-[11px] text-ink-muted">{label}</dt>
+      <dd className={cn('mt-auto pt-1 text-[15px] tabular-nums', destacado ? 'text-dash-blue font-semibold' : 'font-medium text-ink')}>{moneda(valor)}</dd>
+    </div>
+  )
+}
+
+export function ContenidoSede({ cargo }: { cargo?: Movimiento }) {
+  return <Entrada><span className="text-[12px] text-ink">{cargo ? sedeDe(cargo) : SEDE_PRINCIPAL}</span></Entrada>
+}
+
+/** Cargo original, lo pagado por el seguro, pagos y ajustes aplicados y lo que falta: el saldo de este cargo. */
+export function ContenidoFinanzas({ cargo }: { cargo?: Movimiento }) {
+  if (!cargo) return <Vacio>Not charged yet.</Vacio>
+  const filas = aplicadasA(cargo)
+  const deTipo = (t: Movimiento['tipo']) => totalAplicado(filas.filter((f) => f.otra.tipo === t).map((f) => f.a))
+  return (
+    <>
+      <dl className="grid grid-cols-[repeat(auto-fit,minmax(112px,1fr))] gap-x-6 gap-y-3 py-0.5">
+        <Metrica label="Original charge" valor={cargo.monto} />
+        <Metrica label="Insurance paid" valor={deTipo('Insurance')} />
+        <Metrica label="Payments applied" valor={deTipo('Payment')} />
+        <Metrica label="Credit adjustments applied" valor={deTipo('Adjustment')} />
+        <Metrica label="Outstanding balance" valor={pendienteDe(cargo, APLICACIONES)} destacado />
+      </dl>
+      <NotaDetalle>Balance of this charge only, not the patient or guarantor balance.</NotaDetalle>
+    </>
+  )
+}
+
+/** Qué pago, ajuste o pago del seguro se aplicó al cargo, cuándo y cuánto. La referencia abre esa transacción (el mismo
+    registro de sólo lectura del Ledger). */
+export function ContenidoAplicadas({ cargo }: { cargo?: Movimiento }) {
+  const [viendo, setViendo] = useState<Movimiento | null>(null)
+  if (!cargo) return <Vacio>Not charged yet.</Vacio>
+  const filas = aplicadasA(cargo)
+  if (filas.length === 0) return <Vacio>Nothing applied to this charge yet.</Vacio>
+  return (
+    <>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-[12px]">
+          <thead className="text-[11px] text-ink-muted">
+            <tr>
+              <th className="py-1.5 pr-3 font-medium">Date applied</th>
+              <th className="py-1.5 pr-3 font-medium">Type</th>
+              <th className="py-1.5 pr-3 font-medium">Reference / description</th>
+              <th className="py-1.5 text-right font-medium">Applied amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filas.map(({ a, otra }) => (
+              <tr key={a.id} className="border-t border-line-soft">
+                <td className="py-2 pr-3 whitespace-nowrap text-ink">{fechaCorta(a.fecha)}</td>
+                <td className="py-2 pr-3 text-ink">{etiquetaTipo(otra)}</td>
+                <td className="py-2 pr-3"><EnlaceRegistro onClick={() => setViendo(otra)}>{otra.descripcion}</EnlaceRegistro></td>
+                <td className="py-2 text-right font-medium whitespace-nowrap text-ink tabular-nums">{moneda(a.monto)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <NotaDetalle>Only the part applied to this charge, not the full amount of each transaction.</NotaDetalle>
+      {viendo && <LedgerRowModal m={viendo} onClose={() => setViendo(null)} />}
+    </>
+  )
+}
+
 /* ── El detalle de la fila ────────────────────────────────────────── */
 
 type Registro =
@@ -223,6 +314,7 @@ function datosProcedimiento(r: ProcedimientoPaciente, c: ContextoDetalle) {
     ordenes: v?.ordenes ?? [],
     derivaciones: v?.derivaciones ?? [],
     hallazgos: c.problemas.filter((p) => v?.problemas?.includes(p.id)),
+    cargo: cargoDe(r),
   }
 }
 
@@ -257,7 +349,8 @@ export function DetalleRegistro({ registro, contexto }: { registro: Registro; co
 }
 
 /* El orden va por importancia (Julián, 2026-10-13): procedimiento Treatment, consentimiento, hallazgos, Referral y
-   Lab order; problema Procedures, Treatment, Referral, Lab order y Source exam. Ver clinical-mode.md. */
+   Lab order, y después lo del cobro (sede, plata y aplicaciones); problema Procedures, Treatment, Referral, Lab order y
+   Source exam. Ver clinical-mode.md. */
 export function FilasProcedimiento({ r, c }: { r: ProcedimientoPaciente; c: ContextoDetalle }) {
   const d = datosProcedimiento(r, c)
   return (
@@ -269,6 +362,9 @@ export function FilasProcedimiento({ r, c }: { r: ProcedimientoPaciente; c: Cont
       </FilaDetalle>
       <FilaDetalle titulo="Referral" cuenta={d.derivaciones.length}><ContenidoDerivaciones derivaciones={d.derivaciones} /></FilaDetalle>
       <FilaDetalle titulo="Lab order" cuenta={d.ordenes.length}><ContenidoOrdenes ordenes={d.ordenes} /></FilaDetalle>
+      <FilaDetalle titulo="Clinic location"><ContenidoSede cargo={d.cargo} /></FilaDetalle>
+      <FilaDetalle titulo="Financial details"><ContenidoFinanzas cargo={d.cargo} /></FilaDetalle>
+      <FilaDetalle titulo="Applied transactions" cuenta={aplicadasA(d.cargo).length}><ContenidoAplicadas cargo={d.cargo} /></FilaDetalle>
     </>
   )
 }
@@ -345,6 +441,9 @@ export function SeccionesProcedimiento({ r, c }: { r: ProcedimientoPaciente; c: 
       <DrawerSection title="Findings / diagnoses"><div><ContenidoHallazgos hallazgos={d.hallazgos} onAbrir={c.onAbrirProblema} completo /></div></DrawerSection>
       <DrawerSection title="Referrals"><div><ContenidoDerivaciones derivaciones={d.derivaciones} /></div></DrawerSection>
       <DrawerSection title="Lab orders"><div><ContenidoOrdenes ordenes={d.ordenes} /></div></DrawerSection>
+      <DrawerSection title="Clinic location"><ContenidoSede cargo={d.cargo} /></DrawerSection>
+      <DrawerSection title="Financial details"><div><ContenidoFinanzas cargo={d.cargo} /></div></DrawerSection>
+      <DrawerSection title="Applied transactions"><div><ContenidoAplicadas cargo={d.cargo} /></div></DrawerSection>
     </>
   )
 }

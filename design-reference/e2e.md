@@ -36,9 +36,8 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 
 - `tests/dashboard.e2e.ts` (2026-10-12): el selector de fecha se lee "Feb 28, 2026"; elegir un día cierra el calendario
   y lo cambia; Today vuelve a hoy y se va.
-- `tests/ledger.e2e.ts` (2026-10-13): el detalle de D2392 en Transactions muestra el caso, Outstanding balance $80 y
-  lo aplicado; *View procedure* abre Procedures con esa fila desplegada. El de un pago dice a qué cargos fue, el crédito
-  sin aplicar y *Apply credit*.
+- `tests/clinical-mode.e2e.ts` (2026-10-13): el detalle de D4341 en Procedures muestra Clinic location, Outstanding
+  balance $170 y lo aplicado; la referencia de un pago abre su registro.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 

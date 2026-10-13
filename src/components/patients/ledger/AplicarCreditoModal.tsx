@@ -31,8 +31,7 @@ export function AplicarCreditoModal({
       Payment y Credit Adjustment para su propia tabla de aplicación. */
   cargos: Movimiento[]
   onClose: () => void
-  /** El total y cuánto va a cada cargo (id → monto), para que el detalle de la fila muestre a dónde fue. */
-  onAplicar: (montoAplicado: number, porCargo: Record<string, number>) => void
+  onAplicar: (montoAplicado: number) => void
 }) {
   const disponible = m.creditoDisponible ?? 0
   const [aplicado, setAplicado] = useState<Record<string, string>>({})
@@ -71,7 +70,7 @@ export function AplicarCreditoModal({
 
   const aplicar = () => {
     if (totalAplicado <= 0) return
-    onAplicar(totalAplicado, Object.fromEntries(cargos.map((c) => [c.id, Number(aplicado[c.id]) || 0]).filter(([, v]) => (v as number) > 0)))
+    onAplicar(totalAplicado)
   }
 
   return (

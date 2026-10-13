@@ -777,34 +777,9 @@ controla con `npm run ds:campos`. En una card de página la misma regla lleva m�
    arriba reserva el lugar del botón + / × para que las columnas queden alineadas.
 3. Los títulos de los paneles (Payment, Credit, Adjustment Information) y el de Ledger Transactions van sin ícono.
 
-## El detalle de la fila con tratamiento, plata y aplicaciones (2026-10-13)
+## Datos para el detalle de Clinical Mode (2026-10-13)
 
-Pedido de Julián con un prototipo HTML (*Expanded transaction detail*): el detalle de Transactions tiene que decir más
-que repetir los campos de la fila. Pasa a la **lista de detalle** (`ui/detail-list`), la misma de Problem List y
-Procedures en Clinical Mode, así los dos detalles se leen igual. Los campos sueltos (Code, Status, Amount…) siguen en
-*View full record*.
-
-1. **Un cargo:** *Treatment* (el caso de Treatment Plan del procedimiento que se cobra, con su estado y la visita),
-   *Location* (la sede), *Financial details* (Original charge, Insurance paid, Payments applied, Credit adjustments
-   applied y **Outstanding balance**, destacado) con la nota "Balance of this charge only, not the patient or guarantor
-   balance." y *Applied transactions* (fecha, tipo, la transacción como link y lo aplicado, con la nota de que es sólo
-   lo aplicado a ese cargo). Al pie *View procedure* (abre Clinical Mode con esa fila desplegada) y *View full record*.
-2. **Un pago, ajuste o pago del seguro:** el mismo detalle al revés: *Location*, *Financial details* (monto, aplicado a
-   cargos y **Unapplied credit**) y *Applied to* (a qué cargos fue). Un seguro denegado lo dice. *Apply credit* queda al
-   pie cuando hay crédito.
-3. **Por qué la contraparte:** el prototipo sólo trae el cargo. Recepción también abre un pago para ver a dónde fue la
-   plata; con la misma lista y la misma tabla no hay nada nuevo que aprender.
-4. **Datos:** `APLICACIONES` en `data/ledger.ts` dice a qué cargo fue cada pago, ajuste o seguro y cuánto. Cierra con
-   lo que ya había: lo aplicado por cada origen más su `creditoDisponible` da su monto, y ningún cargo recibe más de lo
-   que vale. D2392 queda con $80 pendientes, los números del prototipo. Los cargos suman `sede` (sin dato, Bayside
-   Dental) y `procedimiento` (el id de Clinical Mode, de ahí sale el caso); D2392 pasa a la pieza 14 OD y D0220 a la 7,
-   las del procedimiento que cobran.
-5. **Apply credit** ahora registra a qué cargos fue (`onAplicar(total, porCargo)`), y el modal muestra lo que falta de
-   cada cargo, no su monto original: lo ya pagado no se puede volver a cubrir y los cargos saldados no aparecen.
-6. Clinical Mode acepta `?case=` (abre ese caso en Treatment Plan) y `?procedure=` (abre Procedures con esa fila
-   desplegada), para los links del detalle.
-7. El detalle quedaba 24px más ancho que la parte visible de la tabla (el ancho visible más el padding) y lo alineado a
-   la derecha se cortaba: el ancho descuenta ahora el padding.
-
-Pendiente: Patient Payment y Credit Adjustment siguen ofreciendo el monto original de cada cargo en su tabla de
-asignación; conviene que usen el mismo pendiente.
+`data/ledger.ts` suma `APLICACIONES` (a qué cargo fue cada pago, ajuste o pago del seguro, y cuánto) y, en los cargos,
+`sede` y `procedimiento` (el id de Clinical Mode que cobran). Los lee el detalle de un procedimiento en Clinical Mode
+(Clinic location, Financial details y Applied transactions); la pantalla del Ledger no cambia. D0220 pasa a la pieza 7,
+la del procedimiento que cobra. Ver `clinical-mode.md` (2026-10-13).
