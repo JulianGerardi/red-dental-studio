@@ -3,6 +3,24 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-13
+
+### Listas largas con "Show more" y scroll: Dashboard, Patient Dashboard y Treatments ([#29](https://github.com/JulianGerardi/red-dental-studio/pull/29))
+- Con muchas cards o mucha información se ven unos pocos y **"Show N more" abre el resto con scroll adentro**, sin
+  estirar la página; "Show less" vuelve. Dashboard: 5 turnos, 5 en espera, 6 salas y 5 tareas. Patient Dashboard: 3
+  tareas, 3 turnos y 4 documentos pendientes. Treatments: 4 planes. Con un día real (`?day=busy`) el Dashboard pasa de
+  10.614px a 1.381px de alto.
+- Turnos, sala de espera y tareas van en **filas** en lugar de las cards grandes, con el mismo contenido (TR, CC, Check
+  In, Check Out o Cancel, Edit appointment; Requested, documento, Expired date, fechas, Complete this Task) y la hora en
+  la caja gris de la card. Documents Manager toma el encabezado de las tablas por defecto (buscador de 36px con Search) y
+  Last Update a la izquierda.
+- **Para el dev:** componentes nuevos `ui/show-more` (`ShowMore`, *Elements / Show more*), `ui/list-group`
+  (`ListGroup`, filas en caja con el tope) y `dashboard/DashboardRows` (`AppointmentRow`, `TaskRow`); usarlos para toda
+  lista larga en vez de apilar cards. La acción del pie de la card de turno es `accionTurno` y la de la tarea
+  `completarTarea` (card y fila hacen lo mismo). `SettingsPageHeader` acepta ir sin `bajada`. `DIA_CARGADO` en
+  `dashboard-data.ts` (`?day=busy`). Dos reglas nuevas en `CLAUDE.md`: listas largas y "rediseñar no es cambiar el
+  contenido".
+
 ## 2026-10-12
 
 ### Appointments del Patient Dashboard y solicitudes de Scheduling: una sola card ([#27](https://github.com/JulianGerardi/red-dental-studio/pull/27))

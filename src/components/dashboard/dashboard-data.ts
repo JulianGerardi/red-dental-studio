@@ -165,3 +165,35 @@ export function reprogramar(
   }
   return salida
 }
+
+/* Propuesta de volumen (dashboard.md, 2026-10-12): un día real de una clínica con cinco sillones, con los mismos datos
+   que el día de la demo —los mismos campos, nada nuevo—, en más cantidad: 35 turnos, 8 en la sala de espera y 28 tareas.
+   Lo carga `?day=busy`. */
+const NOMBRES = [
+  'Mara Otero', 'Elias Aguirre', 'Ines Bermudez', 'Noah James Smith', 'Sofia Chen', 'Daniel Ortiz', 'Lena Park',
+  'Thomas Davis', 'Maria Abril Viola', 'John Smith', 'Nadia Serrano', 'Tomas Vidal', 'Bruno Calvo', 'Alma Duarte',
+  'Ciro Esquivel', 'Lucia Vidal', 'Ruben Serrano', 'Emily Clark', 'Robert Brown', 'Sophia Johnson', 'Mark Wilson',
+  'Marco Rivera', 'Julia Romero', 'Pablo Ferrer', 'Valentina Ruiz', 'Diego Navarro', 'Camila Ortega', 'Hugo Medina',
+  'Olivia Grant', 'Lucas Moreno', 'Emma Fischer', 'Mateo Rossi', 'Chloe Martin', 'Samuel Ortiz', 'Zoe Turner',
+  'Leo Bianchi', 'Martina Paz', 'Iker Soto', 'Elena Marquez', 'Abril Viola', 'Julian Vega', 'Rosa Medina', 'Ana Ibarra',
+]
+const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Salgado', 'Dr. Emily Chen', 'Dr. Elena Martinez', 'Dr. Salgado']
+const iniciales = (n: string) => n.split(' ').map((x) => x[0]).slice(0, 2).join('').toUpperCase()
+const hora = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`
+
+export const DIA_CARGADO: DiaDashboard = {
+  /* Cinco operatorios, un turno cada 45 minutos desde las 8; los doce primeros, completados. */
+  appointments: NOMBRES.slice(0, 35).map((name, i) =>
+    turno(
+      name, iniciales(name), PROVIDERS[i % 5]!, `Operatory ${(i % 5) + 1}`,
+      hora(480 + Math.floor(i / 5) * 45 + [0, 15, 30, 0, 15][i % 5]!), i < 12 ? { completado: true } : {},
+    )),
+  /* Como en la demo: el primero con Cancel y los nuevos marcados para la tira de números. */
+  waiting: NOMBRES.slice(35).map((name, i) =>
+    turno(name, iniciales(name), PROVIDERS[i % 5]!, `Operatory ${(i % 5) + 1}`, hora(615 + i * 15), {
+      ...(i === 0 && { accion: 'Cancel' as const }), nuevo: i % 3 === 0,
+    })),
+  rooms: salas(['Busy', 'Busy', 'Available', 'Busy', 'Unavailable', 'Busy'], 12),
+  tasks: tareas(7, 'March 17, 2025', 'March 15, 2025'),
+  encuentros: { abiertos: 4, promedio: '21 min avg.' },
+}

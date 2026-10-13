@@ -22,6 +22,8 @@ const P = '/patients/patient-0001'
 export const Login = pantalla('/login')
 export const ForgotPassword = pantalla('/forgot-password')
 export const Dashboard = pantalla('/')
+/* Un día real (35 turnos, 8 en espera, 28 tareas): las filas con tope y "Show N more" (dashboard.md, 2026-10-12). */
+export const DashboardBusyDay = pantalla('/?day=busy')
 export const Patients = pantalla('/patients')
 export const PatientOverview = pantalla(P)
 export const PatientTreatments = pantalla(`${P}/treatments`)

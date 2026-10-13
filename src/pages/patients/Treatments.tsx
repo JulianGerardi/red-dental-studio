@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
+import { ShowMore } from '@/components/ui/show-more'
 
 /* Figma 3768:803852 (poblado) y 3769:808875 (vacío).
    Sección "Patient Profile — Treatment Plan & Documents". */
@@ -140,8 +141,11 @@ export default function Treatments() {
               </p>
             </div>
           ) : (
-            <div className="mt-4 grid gap-5 lg:grid-cols-2">
-              {PLANS.map((p, i) => <TreatmentCard key={i} plan={p} />)}
+            /* Cuatro planes (dos filas) y "Show N more" abre el resto con scroll (treatments.md, 2026-10-12). */
+            <div className="mt-4">
+              <ShowMore total={PLANS.length} limit={4} label="treatment plans" fade="from-page-background" className="grid gap-5 lg:grid-cols-2">
+                {(n) => PLANS.slice(0, n).map((p, i) => <TreatmentCard key={i} plan={p} />)}
+              </ShowMore>
             </div>
           )}
         </div>
