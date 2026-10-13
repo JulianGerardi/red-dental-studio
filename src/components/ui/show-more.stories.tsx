@@ -5,14 +5,14 @@ import { OperatoryCard } from '@/components/dashboard/OperatoryCard'
 import { DIA_CARGADO } from '@/components/dashboard/dashboard-data'
 import { TreatmentCard, PLANS } from '@/pages/patients/Treatments'
 import { Bloque, Lienzo, Muestra, Tabla, TablaPartes, Forzar } from '@/design-system/kit'
-import { TARJETA_PANEL } from '@/lib/estilos'
+import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
 /* Ítems de ejemplo: los turnos del día cargado del Dashboard. */
 const TURNOS = DIA_CARGADO.appointments
 const filas = (n: number) => (
-  <ul className="flex flex-col divide-y divide-line-soft rounded-lg bg-white shadow-hairline">
-    {TURNOS.slice(0, n).map((a, i) => <li key={i}><AppointmentRow appt={a} /></li>)}
+  <ul className="flex flex-col gap-3">
+    {TURNOS.slice(0, n).map((a, i) => <li key={i} className={TARJETA_INTERNA}><AppointmentRow appt={a} /></li>)}
   </ul>
 )
 
@@ -27,7 +27,7 @@ const meta = {
         component: [
           'La regla de toda la app para **muchas cards o mucha información** (`@/components/ui/show-more`, Julián, 2026-10-12): se ven los primeros ítems y **"Show N more" abre el resto adentro de un scroll**, sin estirar la página; **"Show less"** vuelve. Así una lista de 35 turnos ocupa lo mismo que una de 5.',
           '',
-          '**Dónde se usa:** Appointments, Waiting Room, Rooms y Pending Task del Dashboard; Appointments, Pending Task y Pending documents del Patient Dashboard; Treatments. Con filas en una caja, va adentro de *List group*; con cards (salas, turnos del paciente, planes), directo, con la grilla o la columna en `className`.',
+          '**Dónde se usa:** Appointments, Waiting Room, Rooms y Pending Task del Dashboard; Appointments, Pending Task y Pending documents del Patient Dashboard; Treatments. Con filas (turnos, tareas), va adentro de *List group*, que pone cada fila en su card; con otras cards (salas, turnos del paciente, planes), directo, con la grilla o la columna en `className`.',
           '',
           '**Cómo se comporta:** si el total no pasa el tope, no hay botón ni scroll. Abierta, la lista crece hasta `min(70vh, 640px)` (nunca menos que cerrada) y después scrollea; un degradé abajo avisa que hay más (en Mac la barra no se ve hasta scrollear) y se va al llegar al final. La zona con scroll se alcanza con Tab y se mueve con las flechas.',
           '',

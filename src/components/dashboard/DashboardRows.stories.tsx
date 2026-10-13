@@ -11,10 +11,10 @@ const TURNO = DIA.appointments[1]!
 const CANCEL = DIA.waiting[0]!
 const TAREA = DIA.tasks[0]!
 
-/* Una lista con la caja de ListGroup. */
+/* Una lista como la de ListGroup: cada fila en su card interna. */
 const Caja = ({ ancho, children }: { ancho?: number; children: React.ReactNode }) => (
   <div className={cn(TARJETA_PANEL, 'max-w-full p-3')} style={ancho ? { width: ancho } : undefined}>
-    <ul className="flex flex-col divide-y divide-line-soft rounded-lg bg-white shadow-hairline">{children}</ul>
+    <ul className="flex flex-col gap-3 [&>li]:rounded-lg [&>li]:bg-white [&>li]:shadow-inner-card">{children}</ul>
   </div>
 )
 
@@ -29,7 +29,7 @@ const meta = {
         component: [
           'Las filas del Dashboard (`@/components/dashboard/DashboardRows`, 2026-10-12): **lo mismo que cada card del Figma, en menos alto**. El turno trae la hora, las iniciales, el nombre, *Check In*, provider y operatorio, los chips **TR** y **CC**, **Check Out** o **Cancel** y el kebab con *Edit appointment*; la tarea trae el tipo, *Requested*, el paciente, el documento, *Expired date*, *Register*, *Expiration date* y **Complete this Task**. No hay datos ni acciones nuevas.',
           '',
-          '**Dónde:** Appointments, Waiting Room y Pending Task del Dashboard, y Pending Task del Patient Dashboard, adentro de *List group* (tope y "Show N more" con scroll).',
+          '**Dónde:** Appointments, Waiting Room y Pending Task del Dashboard, y Pending Task del Patient Dashboard, adentro de *List group*: cada fila en su card interna (línea fina y sombra suave, como las salas), con tope y "Show N more" con scroll.',
           '',
           '**Se adaptan al ancho de su lista**, no al de la pantalla (`@container`): en angosto, en renglones (lo que no entra baja a su propio renglón en vez de cortarse); en columnas, como una tabla, desde 768px de lista el turno y desde 1024px la tarea, que tiene más partes.',
           '',

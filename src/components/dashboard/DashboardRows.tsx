@@ -67,7 +67,7 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurn
 
   return (
     <div className="@container">
-      <div data-appt-row className={cn('py-2 pr-2 pl-3', activa && 'bg-info-bg')}>
+      <div data-appt-row className={cn('rounded-lg p-2.5', activa && 'bg-info-bg')}>
         {/* La hora en la caja gris de la card (reloj y hora), del alto de la fila: suelta arriba quedaba descolgada
             (Julián, 2026-10-13). */}
         <div className="flex items-stretch gap-2.5 @3xl:hidden">
@@ -168,7 +168,7 @@ export function TaskRow({ task }: { task: PendingTask }) {
      Expired date. El aire libre va antes del botón, no entre los datos (Julián, 2026-10-13). */
   return (
     <div className="@container">
-      <div className="flex flex-col gap-2 py-2.5 pr-2 pl-3 @5xl:hidden">
+      <div className="flex flex-col gap-2 p-2.5 @5xl:hidden">
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">{tipo}{estado}</div>
         <div className="flex flex-wrap items-center gap-2">{persona}<DocYVencida /></div>
         <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
@@ -177,7 +177,7 @@ export function TaskRow({ task }: { task: PendingTask }) {
         </div>
       </div>
 
-      <div className="hidden items-center gap-5 py-2 pr-2 pl-3 @5xl:flex">
+      <div className="hidden items-center gap-5 p-2.5 @5xl:flex">
         <span className="flex w-48 shrink-0 items-center gap-2.5">{tipo}{estado}</span>
         <span className="flex w-40 shrink-0">{persona}</span>
         <DocYVencida />

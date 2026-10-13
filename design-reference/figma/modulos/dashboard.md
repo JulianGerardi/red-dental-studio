@@ -526,3 +526,12 @@ Julián: "veo medio descolgado el horario" y en Pending Task "quedó muy separad
 - **Tareas agrupadas:** cada parte va pegada a la que acompaña, como en la card: el tipo con Requested, el paciente con
   el documento y Expired date, y las fechas a continuación. El aire libre queda antes de Complete this Task, no entre los
   datos. Antes los anchos fijos y un espacio flexible en el medio las repartían por toda la fila.
+
+## Cada fila, su card (2026-10-13)
+
+Julián: "debe ser estilo card, no debe estar todo unido; si no, no tiene continuidad el diseño" (Appointments, Waiting
+Room y Pending Task). Las filas estaban todas en una caja de línea fina con divisores; ahora **cada fila va en su card
+interna** (`TARJETA_INTERNA`: blanca, línea de medio pixel y sombra suave), con 12px entre una y otra, igual que las
+salas de la columna de al lado y los turnos del Patient Dashboard. Adentro no cambia nada; el margen interno pasa a
+10px parejo en los cuatro lados (antes 12 a la izquierda y 8 arriba y a la derecha). Lo hace `ListGroup`, así que el
+Pending Task del Patient Dashboard toma lo mismo.
