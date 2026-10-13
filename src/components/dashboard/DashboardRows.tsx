@@ -1,4 +1,4 @@
-import { ArrowRight, Check, FileText, TriangleAlert, X } from 'lucide-react'
+import { ArrowRight, Check, Clock, FileText, TriangleAlert, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { StatusPill } from './primitives'
@@ -54,7 +54,6 @@ const CHECK_IN = <StatusPill tone="ok" className="px-1.5 py-[2px] text-[10px]">C
    Edit appointment. Angosta en dos renglones; ancha en columnas. */
 export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurno) {
   const accion = appt.accion ?? 'Check Out'
-  const hora = <span className="w-10 shrink-0 text-[13px] font-semibold text-ink tabular-nums">{appt.time}</span>
   const iniciales = (
     <span className="bg-dash-blue flex size-7 shrink-0 items-center justify-center rounded-lg text-[11px] font-semibold text-white">
       {appt.initials}
@@ -69,18 +68,23 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurn
   return (
     <div className="@container">
       <div data-appt-row className={cn('py-2 pr-2 pl-3', activa && 'bg-info-bg')}>
-        <div className="flex items-start gap-2 @3xl:hidden">
-          <span className="flex h-7 items-center">{hora}</span>
-          {iniciales}
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
+        {/* La hora en la caja gris de la card (reloj y hora), del alto de la fila: suelta arriba quedaba descolgada
+            (Julián, 2026-10-13). */}
+        <div className="flex items-stretch gap-2.5 @3xl:hidden">
+          <span className="bg-dash-field flex w-12 shrink-0 flex-col items-center justify-center gap-1 rounded-lg py-2">
+            <Clock className="size-3.5 text-ink-medium" />
+            <span className="text-[12px] font-semibold text-ink tabular-nums">{appt.time}</span>
+          </span>
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             <div className="flex min-h-7 items-center gap-2">
+              {iniciales}
               <NombreTurno appt={appt} id={id} activa={activa} onSelect={onSelect} className="flex-1" />
               <ChipsTurno />
               {menu}
             </div>
             {/* Si no entra, el botón baja a su propio renglón en vez de cortar el provider. */}
             <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
-              <span className="flex min-w-[min(240px,100%)] flex-1 items-center gap-1.5">
+              <span className="flex min-w-[min(220px,100%)] flex-1 items-center gap-1.5">
                 {CHECK_IN}
                 <span className="truncate text-[11px] text-ink-muted" title={donde}>{donde}</span>
               </span>
@@ -90,7 +94,9 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurn
         </div>
 
         <div className="hidden items-center gap-4 @3xl:flex">
-          {hora}
+          <span className="bg-dash-field flex h-8 w-[72px] shrink-0 items-center justify-center gap-1.5 rounded-lg text-[12px] font-semibold text-ink tabular-nums">
+            <Clock className="size-3.5 text-ink-medium" />{appt.time}
+          </span>
           {iniciales}
           <span className="flex w-52 shrink-0 items-center gap-2">
             <NombreTurno appt={appt} id={id} activa={activa} onSelect={onSelect} />
@@ -158,28 +164,25 @@ export function TaskRow({ task }: { task: PendingTask }) {
     <Button size="sm" className="shrink-0" onClick={() => completarTarea(task)}>Complete this Task <ArrowRight /></Button>
   )
 
+  /* Cada parte pegada a la que acompaña, como en la card: el tipo con Requested, el paciente con el documento y
+     Expired date. El aire libre va antes del botón, no entre los datos (Julián, 2026-10-13). */
   return (
     <div className="@container">
       <div className="flex flex-col gap-2 py-2.5 pr-2 pl-3 @5xl:hidden">
-        <div className="flex items-center justify-between gap-2">{tipo}{estado}</div>
-        {/* Si no entran, el documento y Expired date bajan en vez de cortar el nombre; lo mismo el botón. */}
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="flex min-w-[min(180px,100%)] flex-1">{persona}</span>
-          <DocYVencida />
-        </div>
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">{tipo}{estado}</div>
+        <div className="flex flex-wrap items-center gap-2">{persona}<DocYVencida /></div>
         <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
           {fechas}
           <span className="ml-auto">{boton}</span>
         </div>
       </div>
 
-      <div className="hidden items-center gap-4 py-2 pr-2 pl-3 @5xl:flex">
-        <span className="flex w-28 shrink-0">{tipo}</span>
-        <span className="flex w-44 shrink-0">{persona}</span>
-        <span className="w-24 shrink-0">{estado}</span>
+      <div className="hidden items-center gap-5 py-2 pr-2 pl-3 @5xl:flex">
+        <span className="flex w-48 shrink-0 items-center gap-2.5">{tipo}{estado}</span>
+        <span className="flex w-40 shrink-0">{persona}</span>
         <DocYVencida />
-        <span className="flex min-w-0 flex-1 justify-end">{fechas}</span>
-        {boton}
+        {fechas}
+        <span className="ml-auto">{boton}</span>
       </div>
     </div>
   )

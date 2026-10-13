@@ -60,12 +60,13 @@ export const Playground: Story = {
 export const Parts: Story = {
   parameters: sinControles,
   render: () => (
-    <Lienzo>
+    /* La tarea pasa a columnas desde 1024px de lista: el lienzo necesita más que los 960 de siempre. */
+    <Lienzo className="max-w-[1200px]">
       <Bloque titulo="Appointment row" nota="Angosta (una columna del Dashboard) y ancha. Lo mismo que AppointmentCard.">
         <Caja ancho={400}><li><AppointmentRow appt={TURNO} onSelect={() => {}} onEdit={() => {}} /></li></Caja>
         <Caja ancho={900}><li><AppointmentRow appt={TURNO} onSelect={() => {}} onEdit={() => {}} /></li></Caja>
         <TablaPartes partes={[
-          ['Time', 'La hora del turno, 13px Semibold con números tabulares: la columna por la que se lee una agenda.', 'appt.time'],
+          ['Time box', 'La caja gris de la card (dash-field) con el reloj y la hora en 12px Semibold tabular, del alto de la fila: ancla la fila y es la columna por la que se lee una agenda. Ancha, en una línea.', 'appt.time'],
           ['Initials', 'Las iniciales en el cuadrado azul de la card, a 28px.', 'appt.initials'],
           ['Name', 'Botón: abre la ficha rápida anclada a la fila, como tocar la card.', 'NombreTurno'],
           ['Check In', 'La pill verde de la card.', 'StatusPill'],
@@ -79,7 +80,7 @@ export const Parts: Story = {
           <ChipsTurno />
         </div>
       </Bloque>
-      <Bloque titulo="Task row" nota="Lo mismo que PendingTaskCard, en el mismo orden: angosta (Patient Dashboard) y ancha (Pending Task del Dashboard, a lo ancho).">
+      <Bloque titulo="Task row" nota="Lo mismo que PendingTaskCard, en el mismo orden y cada parte pegada a la que acompaña: el tipo con Requested, el paciente con el documento y Expired date, las fechas; el aire libre va antes del botón. Angosta (Patient Dashboard) y ancha (Pending Task del Dashboard).">
         <Caja ancho={400}><li><TaskRow task={TAREA} /></li></Caja>
         <Caja ancho={1100}><li><TaskRow task={TAREA} /></li></Caja>
         <TablaPartes partes={[
@@ -99,7 +100,7 @@ export const Parts: Story = {
 export const States: Story = {
   parameters: sinControles,
   render: () => (
-    <Lienzo>
+    <Lienzo className="max-w-[1200px]">
       <div className="grid gap-6 md:grid-cols-2">
         <Muestra titulo="Check Out and Cancel" nota="Las dos acciones de la card: el primero de la sala de espera trae Cancel.">
           <Caja><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CANCEL} /></li></Caja>

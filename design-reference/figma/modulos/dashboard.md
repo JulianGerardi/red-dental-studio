@@ -515,3 +515,14 @@ que ocupan menos. Las variantes, el selector de propuesta y la página *Proposal
   Dashboard con volumen (*Pages / Dashboard Busy Day*): 1.381px de alto contra 10.614px con cards.
 - Las acciones de las cards pasaron a funciones compartidas (`accionTurno`, `completarTarea`): la card y la fila hacen
   lo mismo.
+
+## Filas: la hora en su caja y las tareas agrupadas (2026-10-13)
+
+Julián: "veo medio descolgado el horario" y en Pending Task "quedó muy separado el nombre, el request, los iconos".
+
+- **La hora vuelve a la caja de la card** (`bg-dash-field`, reloj y hora, la "caja de hora" del Figma): en la fila
+  angosta va a la izquierda y ocupa el alto de toda la fila, así la ancla; antes era texto suelto arriba y quedaba
+  colgando sobre el hueco de los renglones de abajo. En la fila ancha, la misma caja en una línea (72×32).
+- **Tareas agrupadas:** cada parte va pegada a la que acompaña, como en la card: el tipo con Requested, el paciente con
+  el documento y Expired date, y las fechas a continuación. El aire libre queda antes de Complete this Task, no entre los
+  datos. Antes los anchos fijos y un espacio flexible en el medio las repartían por toda la fila.

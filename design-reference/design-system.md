@@ -748,3 +748,9 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   opcional) y `SettingsSearch`. *SettingsPageHeader → States* suma *Without subtitle*.
 - Regla que dejó la corrección de Julián sobre la propuesta: **rediseñar no es cambiar el contenido** (mismos datos,
   textos y acciones que la pantalla original). Ver `figma/modulos/dashboard.md`.
+
+## Filas del Dashboard: caja de hora y tareas agrupadas (2026-10-13)
+
+- `AppointmentRow`: la hora va en la caja gris de la card (reloj y hora) del alto de la fila; ancha, en una línea.
+  `TaskRow`: el tipo con Requested, el paciente con el documento y Expired date, las fechas, y el aire antes del botón.
+  *Components / Dashboard / Dashboard rows → Parts* lo explica. Ver `figma/modulos/dashboard.md`.
