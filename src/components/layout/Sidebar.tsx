@@ -142,9 +142,8 @@ export function Sidebar({
             </NavLink>
           </ConTooltip>
         ))}
-        {/* No es una ruta: abre la hoja de chat de Confibot, que antes vivía
-            flotando solo sobre la pantalla y tapaba otros botones flotantes
-            -el de Appointment requests en Scheduling, por ejemplo-. */}
+        {/* No es una ruta: abre la misma hoja de chat que el botón flotante de
+            Confibot, y es el camino que queda cuando ese botón está recogido. */}
         <ConTooltip label="Confibot" mostrar={!expanded}>
           <button
             type="button"

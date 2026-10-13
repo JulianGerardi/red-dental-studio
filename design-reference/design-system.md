@@ -761,3 +761,17 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   campo de arriba (Edit Carrier › *Information*, pedido de Julián). En los drawers siguen una debajo de la otra
   (*Components / UI / Drawer → Specs → Fields*).
 
+
+## Confibot flotante abajo a la derecha (2026-10-13)
+
+- Vuelve el botón flotante de Confibot (el último que había, antes de pasar al menú): `ConfibotLanzador` en
+  `help/Confibot.tsx`. Círculo de 48px con degradé, se estira a "Confibot" con hover o foco; flechita para recogerlo y
+  pestaña al pie para traerlo (se recuerda entre visitas). Lo monta `AppShell`; no se dibuja con el chat o un CoachMark
+  abiertos.
+- **Botones flotantes que conviven:** una pantalla con su propio flotante en esa esquina llama a `useFabDePagina()`
+  (`help/HelpProvider.tsx`) y Confibot se apila 12px arriba. Hoy sólo Scheduling (Appointment requests).
+- `AppShell` vuelve a reservar el alto del botón al pie del `main` (`pb-24 sm:pb-28`).
+- Token nuevo `dash-blue-glow` (`#2f74f5`), el celeste del medio del degradé.
+- *Components / Help / Confibot* pasa a la estructura de Buttons: Playground (vista de arranque y *overPageFab*), Parts,
+  States (reposo, hover, recogido, sobre el FAB de Scheduling, oculto, chat vacío, con respuesta y sin resultados) y
+  Specs. *Navigation → Parts* aclara que el ítem del menú abre la misma hoja. Ver `figma/modulos/help.md`.
