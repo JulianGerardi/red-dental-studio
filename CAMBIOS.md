@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-13
 
-### Edit Carrier: las dos casillas en la misma fila
+### Edit Carrier: las dos casillas en la misma fila ([#32](https://github.com/JulianGerardi/red-dental-studio/pull/32))
 - En Edit Carrier › *Information*, *Do not include Dental Diagnostic Codes* y *Do not bill Insurance* van lado a lado, cada
   una bajo una de las columnas de arriba (en el celular, apiladas). El drawer New Carrier no cambia.
 - **Para el dev:** en una página con campos de a dos, las casillas van en el mismo `grid gap-4 sm:grid-cols-2`; en los
