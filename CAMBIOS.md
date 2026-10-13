@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-13
 
+### Billing: bento con Find Patient arriba, la tabla hasta abajo y los botones del paciente dentro del panel ([#33](https://github.com/JulianGerardi/red-dental-studio/pull/33))
+- Bento: izquierda los números y Recent Billing Activity; derecha Find Patient (a la altura de los números) y Today.
+  Las dos columnas terminan juntas: la tabla muestra 15 filas por página y Find Patient scrollea adentro.
+- Con un paciente, los botones de pago van arriba del título de su actividad y el bento guarda el alto del resumen.
+- **Para el dev:** `Stat enFila` alinea etiqueta, número y bajada entre cards con subgrid. `AccionesPaciente` (con
+  `ui/button` md, en el `top` del Panel) reemplaza a `EncabezadoBilling`. La columna derecha va absoluta desde `lg`
+  y toma el alto de la izquierda (`--billing-alto` con paciente). Tres pacientes más en `data/billing.ts`.
+
 ### Edit Carrier: las dos casillas en la misma fila ([#32](https://github.com/JulianGerardi/red-dental-studio/pull/32))
 - En Edit Carrier › *Information*, *Do not include Dental Diagnostic Codes* y *Do not bill Insurance* van lado a lado, cada
   una bajo una de las columnas de arriba (en el celular, apiladas). El drawer New Carrier no cambia.
