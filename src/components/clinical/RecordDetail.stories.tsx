@@ -6,9 +6,9 @@ import { Bloque, Lienzo, Tabla, Token } from '@/design-system/kit'
 import { esperar } from '@/design-system/play'
 import { PROBLEMAS, PROCEDIMIENTOS } from '@/data/clinical-mode'
 import {
-  ContenidoConsentimiento, ContenidoDerivaciones, ContenidoExamen, FilaDetalle, FilasProblema, FilasProcedimiento,
-  ContenidoHallazgos, ContenidoOrdenes, ContenidoProcedimientos, ContenidoTratamiento, DetalleRegistro, EnlaceRegistro,
-  Entrada, MasItems, RegistroCompletoDrawer, SeccionesProblema, SeccionesProcedimiento, Vacio,
+  ContenidoConsentimiento, ContenidoDerivaciones, ContenidoExamen, FilasProblema, FilasProcedimiento,
+  ContenidoHallazgos, ContenidoOrdenes, ContenidoProcedimientos, ContenidoTratamiento, DetalleRegistro,
+  RegistroCompletoDrawer, SeccionesProblema, SeccionesProcedimiento,
   type ContextoDetalle,
 } from './RecordDetail'
 
@@ -49,7 +49,7 @@ const meta = {
         component: [
           'El detalle que se despliega en cada fila de la tabla del Overview de Clinical Mode (**Problem List** y **Procedures**), con el mismo desplegable del Ledger: el chevron, clic en la fila, y *Expand all / Collapse all* desde que hay una abierta (`rowDetail` de Elements / Tables).',
           '',
-          '**Qué muestra:** lo que cuelga del registro, en una **lista sin cards**: una fila debajo de la otra, el título a la izquierda y los datos a la derecha, cada dato en una línea. Un procedimiento: *Treatment* (el caso, su grupo, la visita con su turno, las otras visitas y los casos históricos), *Lab order*, *Referral*, *Findings / diagnoses* y *Procedure consent*. Un problema, en el mismo orden: *Treatment*, *Lab order*, *Referral* (con el procedimiento relacionado), *Procedures* y *Source exam*. Lo que no entra en el resumen se pliega detrás de "N more…".',
+          '**Qué muestra:** lo que cuelga del registro, en una **lista sin cards**: una fila debajo de la otra, el título a la izquierda y los datos a la derecha, cada dato en una línea. Van por importancia (Julián, 2026-10-13). Un procedimiento: *Treatment* (el caso, su grupo, la visita con su turno, las otras visitas y los casos históricos), *Procedure consent*, *Findings / diagnoses*, *Referral* y *Lab order*. Un problema: *Procedures*, *Treatment*, *Referral*, *Lab order* (con el procedimiento relacionado) y *Source exam*. Lo que no entra en el resumen se pliega detrás de "N more…". Las piezas de la lista son *Components / UI / DetailList*, las mismas del detalle del Ledger.',
           '',
           '**Reusa** lo que ya hay: el turno de la visita de Treatment Plan (`CitaVisita`), el estado de consentimiento de sus tablas, las pills de caso, de Lab Order y de la tabla, y el drawer para *View full record*. Cada link lleva a la pantalla donde se trabaja (Treatment Plan con el caso abierto, Lab Order, Referral, el examen) o abre el registro en la otra pestaña. Sólo lectura.',
           '',
@@ -86,34 +86,19 @@ export const Parts: Story = {
         <Bloque titulo="The detail, procedure" nota="Título completo y pieza arriba; la lista; al pie View full record y Read-only summary.">
           <EnFila tipo="procedure" procedure="pr10" problem="p9" ancho="wide" />
         </Bloque>
-        <Bloque titulo="Rows of a procedure" nota="FilasProcedimiento, en el orden que pidió Julián: Treatment, Lab order, Referral, Findings / diagnoses y Procedure consent.">
+        <Bloque titulo="Rows of a procedure" nota="FilasProcedimiento, por importancia: Treatment, Procedure consent, Findings / diagnoses, Referral y Lab order.">
           <div className="@container flex w-[880px] max-w-full flex-col"><FilasProcedimiento r={r10} c={CONTEXTO} /></div>
         </Bloque>
-        <Bloque titulo="Rows of a problem" nota="FilasProblema, en el mismo orden: Treatment (sin visitas), Lab order y Referral con el procedimiento relacionado, Procedures y Source exam.">
+        <Bloque titulo="Rows of a problem" nota="FilasProblema, por importancia: Procedures, Treatment (sin visitas), Referral y Lab order con el procedimiento relacionado, y Source exam.">
           <div className="@container flex w-[880px] max-w-full flex-col"><FilasProblema r={p9} c={CONTEXTO} /></div>
-        </Bloque>
-        <Bloque titulo="Pieces">
-          <div className="@container flex w-[880px] max-w-full flex-col">
-            <FilaDetalle titulo="Row" cuenta={2}>
-              <Entrada estado={<span className="text-[11px] text-ink-muted">status</span>} sub="Context">
-                <EnlaceRegistro onClick={() => aviso.info('Opens the record.')}>Link to the record</EnlaceRegistro>
-              </Entrada>
-              <Entrada rotulo="Label"><span className="text-[12px] text-ink">Plain value</span></Entrada>
-            </FilaDetalle>
-            <FilaDetalle titulo="Folded">
-              <Entrada><span className="text-[12px] text-ink">First item</span></Entrada>
-              <MasItems label="2 more items"><Entrada><span className="text-[12px] text-ink">Second item</span></Entrada><Entrada><span className="text-[12px] text-ink">Third item</span></Entrada></MasItems>
-            </FilaDetalle>
-            <FilaDetalle titulo="Nothing linked" cuenta={0}><Vacio>Nothing linked.</Vacio></FilaDetalle>
-          </div>
         </Bloque>
         <Bloque titulo="What each part is">
           <Tabla encabezado={['Part', 'What it does', 'Component']} minimo={720} arriba>
-            <tr><td className="font-semibold">Row</td><td>Una fila de la lista, sin card: título de 11px y la cuenta a la izquierda (arriba en angosto), los datos a la derecha. Una línea fina separa las filas.</td><td>FilaDetalle</td></tr>
-            <tr><td className="font-semibold">Entry</td><td>Un dato en una línea: rótulo opcional (Finding, Diagnosis), link o texto, su estado y el contexto.</td><td>Entrada</td></tr>
-            <tr><td className="font-semibold">Link</td><td>Lleva a donde vive el registro; la flecha dice que sale de la tabla.</td><td>EnlaceRegistro</td></tr>
-            <tr><td className="font-semibold">N more…</td><td>Lo que no entra en el resumen, plegado: visitas, casos históricos, hallazgos y diagnósticos.</td><td>MasItems</td></tr>
-            <tr><td className="font-semibold">Nothing linked</td><td>La fila queda y dice qué falta: así se sabe que no hay, no que no cargó.</td><td>Vacio</td></tr>
+            <tr><td className="font-semibold">Row</td><td>Una fila de la lista, sin card: título de 11px y la cuenta a la izquierda (arriba en angosto), los datos a la derecha. Una línea fina separa las filas.</td><td>FilaDetalle (UI / DetailList)</td></tr>
+            <tr><td className="font-semibold">Entry</td><td>Un dato en una línea: rótulo opcional (Finding, Diagnosis), link o texto, su estado y el contexto.</td><td>Entrada (UI / DetailList)</td></tr>
+            <tr><td className="font-semibold">Link</td><td>Lleva a donde vive el registro; la flecha dice que sale de la tabla.</td><td>EnlaceRegistro (UI / DetailList)</td></tr>
+            <tr><td className="font-semibold">N more…</td><td>Lo que no entra en el resumen, plegado: visitas, casos históricos, hallazgos y diagnósticos.</td><td>MasItems (UI / DetailList)</td></tr>
+            <tr><td className="font-semibold">Nothing linked</td><td>La fila queda y dice qué falta: así se sabe que no hay, no que no cargó.</td><td>Vacio (UI / DetailList)</td></tr>
             <tr><td className="font-semibold">Contents</td><td>Lo mismo en la fila y en el drawer: el drawer lo muestra todo, sin plegar.</td><td>ContenidoTratamiento, ContenidoOrdenes, ContenidoDerivaciones, ContenidoHallazgos, ContenidoConsentimiento, ContenidoProcedimientos, ContenidoExamen</td></tr>
             <tr><td className="font-semibold">Full record</td><td>Drawer de sólo lectura: los datos de la fila de a dos y una sección por fila de la lista. Close y Edit.</td><td>RegistroCompletoDrawer, SeccionesProcedimiento, SeccionesProblema</td></tr>
           </Tabla>

@@ -2205,3 +2205,15 @@ controla con `npm run ds:campos`.
 2. **New Condition** (visor de radiografías): lo mismo, más la lupa y el placeholder "Search by code or description" de
    New Procedure, que busca en el mismo catálogo (antes decía "Select"). Note pasa a `TextArea`.
 3. La búsqueda con su botón Filter es una barra de catálogo, no un par de campos: queda fuera de la grilla.
+
+## Orden del detalle por importancia (2026-10-13)
+
+Julián, con dos tablas de orden recomendado:
+
+- **Procedimiento:** Treatment (el caso, su aceptación, visitas), **Procedure consent** (después de ver la aceptación,
+  si el consentimiento está), Findings / diagnoses (qué condición resuelve), Referral y Lab order.
+- **Problema (finding):** Procedures (qué procedimientos lo resuelven y en qué estado), Treatment, Referral, Lab order y
+  Source exam (la trazabilidad, al final).
+
+El drawer de *View full record* sigue el mismo orden. Las piezas de la lista pasan a `ui/detail-list`
+(*Components / UI / DetailList*) porque ahora también las usa el detalle del Ledger.

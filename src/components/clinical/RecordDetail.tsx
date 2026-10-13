@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
-import { ArrowUpRight, ChevronRight, Maximize2, Pencil, X } from 'lucide-react'
+import { Pencil, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
-import { Count } from '@/components/ui/count'
+import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, MasItems, Vacio, VerRegistroCompleto } from '@/components/ui/detail-list'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { Drawer, DrawerSection } from '@/components/ui/drawer'
 import { ORDEN_TONO } from '@/components/clinical/LabOrderPanel'
@@ -53,9 +53,9 @@ const PESTANA_EXAMEN: Record<string, Pestana> = {
 
 /* ── Datos de cada registro ───────────────────────────────────────── */
 
-type Tratamiento = { caso: Caso; grupo: Caso[]; visita?: Visita; procCaso?: Procedimiento }
+export type Tratamiento = { caso: Caso; grupo: Caso[]; visita?: Visita; procCaso?: Procedimiento }
 
-function tratamientoDe(pr: ProcedimientoPaciente): Tratamiento | undefined {
+export function tratamientoDe(pr: ProcedimientoPaciente): Tratamiento | undefined {
   const v = VINCULOS_PROCEDIMIENTO[pr.id]?.caso
   const caso = v && CASOS.find((c) => c.id === v.id)
   if (!caso) return undefined
@@ -74,60 +74,7 @@ const pieza = (r: { pieza?: number; superficie: string; ubicacion: string }) =>
 
 /* ── Piezas ───────────────────────────────────────────────────────── */
 
-/** Link a la pantalla donde vive el registro, con la flecha de "sale de acá". */
-export function EnlaceRegistro({ children, onClick }: { children: ReactNode; onClick: () => void }) {
-  return (
-    <button type="button" onClick={onClick} className="group/link text-dash-blue min-w-0 text-left text-[12px] leading-[1.45] font-medium break-words hover:underline">
-      {children}
-      <ArrowUpRight aria-hidden className="ml-0.5 inline size-3 align-[-1px] transition-transform group-hover/link:translate-x-px group-hover/link:-translate-y-px" />
-    </button>
-  )
-}
-
-/** Lo que no entra en el resumen: plegado detrás de "N more…", como el "más" de las listas del Figma. */
-export function MasItems({ label, children, abierto: inicial = false }: { label: string; children: ReactNode; abierto?: boolean }) {
-  const [abierto, setAbierto] = useState(inicial)
-  return (
-    <div className="mt-1">
-      <button
-        type="button" aria-expanded={abierto} onClick={() => setAbierto((v) => !v)}
-        className="text-dash-blue flex items-center gap-1 py-1 text-[11px] font-semibold hover:underline"
-      >
-        <ChevronRight aria-hidden className={cn('size-3.5 transition-transform', abierto && 'rotate-90')} /> {label}
-      </button>
-      {abierto && <div className="pl-[18px]">{children}</div>}
-    </div>
-  )
-}
-
-/** Un dato de la fila, en una sola línea: rótulo opcional, el link (o el texto), su estado y el contexto. */
-export function Entrada({ children, estado, sub, rotulo }: { children: ReactNode; estado?: ReactNode; sub?: ReactNode; rotulo?: string }) {
-  return (
-    <div className="flex min-h-6 flex-wrap items-center gap-x-2 gap-y-0.5 py-0.5">
-      {rotulo && <span className="text-[11px] text-ink-muted">{rotulo}:</span>}
-      {children}
-      {estado}
-      {sub && <span className="text-[11px] leading-[1.45] text-ink-muted">{sub}</span>}
-    </div>
-  )
-}
-
-export const Vacio = ({ children }: { children: ReactNode }) => <p className="flex min-h-6 items-center text-[12px] text-ink-faint">{children}</p>
-
-/** Una fila de la lista: el título (y la cuenta) a la izquierda y lo vinculado a la derecha, sin card (Julián,
-    2026-10-08: las cards ocupaban lugar). En angosto el título va arriba. */
-export function FilaDetalle({ titulo, cuenta, children }: { titulo: string; cuenta?: number; children: ReactNode }) {
-  return (
-    <section className="grid gap-x-4 gap-y-1 border-t border-line-soft py-2 first:border-t-0 first:pt-0 last:pb-0 @md:grid-cols-[150px_minmax(0,1fr)]">
-      <header className="flex min-h-6 items-center gap-2 self-start">
-        <h4 className="text-[11px] font-semibold text-ink-muted">{titulo}</h4>
-        {cuenta !== undefined && <Count>{cuenta}</Count>}
-      </header>
-      <div className="min-w-0">{children}</div>
-    </section>
-  )
-}
-
+/* La lista (filas, entradas, links, "more") es ui/detail-list, la misma del detalle del Ledger. */
 const pill = (tono: PillTone, texto: string, mayusculas?: boolean) => (
   <Pill tone={tono} size="sm" className={cn('whitespace-nowrap', mayusculas && 'tracking-wide uppercase')}>{texto}</Pill>
 )
@@ -300,38 +247,28 @@ export function DetalleRegistro({ registro, contexto }: { registro: Registro; co
   const [completo, setCompleto] = useState(false)
   const lugar = pieza(registro.r)
   return (
-    <div className="@container">
-      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
-        <h3 className="text-[13px] font-semibold text-ink">{nombreDe(registro)}</h3>
-        {lugar && <span className="text-[11px] text-ink-muted">{lugar}</span>}
-      </div>
-      <div className="flex flex-col">
+    <>
+      <ListaDetalle titulo={nombreDe(registro)} lado={lugar} pie={<VerRegistroCompleto onClick={() => setCompleto(true)} />}>
         {registro.tipo === 'procedimiento' ? <FilasProcedimiento r={registro.r} c={contexto} /> : <FilasProblema r={registro.r} c={contexto} />}
-      </div>
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        <button type="button" onClick={() => setCompleto(true)} className="text-dash-blue inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline">
-          <Maximize2 className="size-3.5" /> View full record
-        </button>
-        <span className="text-[11px] text-ink-faint">Read-only summary</span>
-      </div>
+      </ListaDetalle>
       <RegistroCompletoDrawer registro={completo ? registro : null} contexto={contexto} onClose={() => setCompleto(false)} />
-    </div>
+    </>
   )
 }
 
-/* El orden lo pidió Julián: Treatment, Lab order, Findings, Procedure consent. El problema sigue el mismo orden con su
-   contraparte: Procedures donde va Findings y Source exam donde va el consentimiento. */
+/* El orden va por importancia (Julián, 2026-10-13): procedimiento Treatment, consentimiento, hallazgos, Referral y
+   Lab order; problema Procedures, Treatment, Referral, Lab order y Source exam. Ver clinical-mode.md. */
 export function FilasProcedimiento({ r, c }: { r: ProcedimientoPaciente; c: ContextoDetalle }) {
   const d = datosProcedimiento(r, c)
   return (
     <>
       <FilaDetalle titulo="Treatment"><ContenidoTratamiento t={d.t} visitas /></FilaDetalle>
-      <FilaDetalle titulo="Lab order" cuenta={d.ordenes.length}><ContenidoOrdenes ordenes={d.ordenes} /></FilaDetalle>
-      <FilaDetalle titulo="Referral" cuenta={d.derivaciones.length}><ContenidoDerivaciones derivaciones={d.derivaciones} /></FilaDetalle>
+      <FilaDetalle titulo="Procedure consent"><ContenidoConsentimiento t={d.t} /></FilaDetalle>
       <FilaDetalle titulo="Findings / diagnoses" cuenta={d.hallazgos.length * 2}>
         <ContenidoHallazgos hallazgos={d.hallazgos} onAbrir={c.onAbrirProblema} />
       </FilaDetalle>
-      <FilaDetalle titulo="Procedure consent"><ContenidoConsentimiento t={d.t} /></FilaDetalle>
+      <FilaDetalle titulo="Referral" cuenta={d.derivaciones.length}><ContenidoDerivaciones derivaciones={d.derivaciones} /></FilaDetalle>
+      <FilaDetalle titulo="Lab order" cuenta={d.ordenes.length}><ContenidoOrdenes ordenes={d.ordenes} /></FilaDetalle>
     </>
   )
 }
@@ -340,12 +277,12 @@ export function FilasProblema({ r, c }: { r: Problema; c: ContextoDetalle }) {
   const d = datosProblema(r, c)
   return (
     <>
-      <FilaDetalle titulo="Treatment"><ContenidoTratamiento t={d.t} /></FilaDetalle>
-      <FilaDetalle titulo="Lab order" cuenta={d.ordenes.length}><ContenidoOrdenes ordenes={d.ordenes} /></FilaDetalle>
-      <FilaDetalle titulo="Referral" cuenta={d.derivaciones.length}><ContenidoDerivaciones derivaciones={d.derivaciones} /></FilaDetalle>
       <FilaDetalle titulo="Procedures" cuenta={d.procs.length}>
         <ContenidoProcedimientos procedimientos={d.procs} onAbrir={c.onAbrirProcedimiento} />
       </FilaDetalle>
+      <FilaDetalle titulo="Treatment"><ContenidoTratamiento t={d.t} /></FilaDetalle>
+      <FilaDetalle titulo="Referral" cuenta={d.derivaciones.length}><ContenidoDerivaciones derivaciones={d.derivaciones} /></FilaDetalle>
+      <FilaDetalle titulo="Lab order" cuenta={d.ordenes.length}><ContenidoOrdenes ordenes={d.ordenes} /></FilaDetalle>
       <FilaDetalle titulo="Source exam"><ContenidoExamen problema={r} /></FilaDetalle>
     </>
   )
@@ -404,10 +341,10 @@ export function SeccionesProcedimiento({ r, c }: { r: ProcedimientoPaciente; c: 
   return (
     <>
       <DrawerSection title="Treatment"><ContenidoTratamiento t={d.t} visitas completo /></DrawerSection>
-      <DrawerSection title="Lab orders"><div><ContenidoOrdenes ordenes={d.ordenes} /></div></DrawerSection>
-      <DrawerSection title="Referrals"><div><ContenidoDerivaciones derivaciones={d.derivaciones} /></div></DrawerSection>
-      <DrawerSection title="Findings / diagnoses"><div><ContenidoHallazgos hallazgos={d.hallazgos} onAbrir={c.onAbrirProblema} completo /></div></DrawerSection>
       <DrawerSection title="Procedure consent"><ContenidoConsentimiento t={d.t} /></DrawerSection>
+      <DrawerSection title="Findings / diagnoses"><div><ContenidoHallazgos hallazgos={d.hallazgos} onAbrir={c.onAbrirProblema} completo /></div></DrawerSection>
+      <DrawerSection title="Referrals"><div><ContenidoDerivaciones derivaciones={d.derivaciones} /></div></DrawerSection>
+      <DrawerSection title="Lab orders"><div><ContenidoOrdenes ordenes={d.ordenes} /></div></DrawerSection>
     </>
   )
 }
@@ -416,10 +353,10 @@ export function SeccionesProblema({ r, c }: { r: Problema; c: ContextoDetalle })
   const d = datosProblema(r, c)
   return (
     <>
-      <DrawerSection title="Treatment"><ContenidoTratamiento t={d.t} completo /></DrawerSection>
-      <DrawerSection title="Lab orders"><div><ContenidoOrdenes ordenes={d.ordenes} /></div></DrawerSection>
-      <DrawerSection title="Referrals"><div><ContenidoDerivaciones derivaciones={d.derivaciones} /></div></DrawerSection>
       <DrawerSection title="Procedures"><div><ContenidoProcedimientos procedimientos={d.procs} onAbrir={c.onAbrirProcedimiento} /></div></DrawerSection>
+      <DrawerSection title="Treatment"><ContenidoTratamiento t={d.t} completo /></DrawerSection>
+      <DrawerSection title="Referrals"><div><ContenidoDerivaciones derivaciones={d.derivaciones} /></div></DrawerSection>
+      <DrawerSection title="Lab orders"><div><ContenidoOrdenes ordenes={d.ordenes} /></div></DrawerSection>
       <DrawerSection title="Source exam"><ContenidoExamen problema={r} /></DrawerSection>
     </>
   )

@@ -726,3 +726,15 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   hover y foco de Schedule, celular); *Long name* en los estados del Overview; *Specs* mide la solicitud y lista la barra
   de cada estado. *Components / Scheduling / TarjetaTurno* con sus variantes; *Elements / Cards → Cards in the app* y
   *Pages / Parts / Scheduling → Request Cards* actualizados.
+
+## Lista de detalle compartida y detalle del Ledger (2026-10-13)
+
+- *Components / UI / DetailList* (nuevo, `ui/detail-list.tsx`): la lista que se despliega debajo de una fila de tabla
+  (`ListaDetalle`, `FilaDetalle`, `Entrada`, `EnlaceRegistro`, `MasItems`, `Vacio`, `NotaDetalle`, `VerRegistroCompleto`).
+  Salen de `RecordDetail` y las usan el detalle de Clinical Mode y el del Ledger. Playground, Parts, States, More open y
+  Specs.
+- *Components / Ledger / LedgerRowDetail* rehecho: Playground (la transacción y el ancho), Parts (cargo, pago y las piezas
+  `Metrica`, `TablaAplicaciones`, `TratamientoDelCargo`), States (parcialmente pagado, pagado por el seguro, nada
+  aplicado, crédito sin aplicar, seguro denegado, angosto) y Specs.
+- *Components / Clinical / RecordDetail*: el orden nuevo de las filas. Decisiones en `figma/modulos/ledger.md` y
+  `figma/modulos/clinical-mode.md` (2026-10-13).
