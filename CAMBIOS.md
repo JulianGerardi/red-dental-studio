@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-13
 
+### Notifications sin Pending ni Archived, el ojo y el banner de punta a punta ([#34](https://github.com/JulianGerardi/red-dental-studio/pull/34))
+- Notifications queda con dos estados (sin leer y leída) y dos pestañas (*Inbox* y *Unread*): se van Pending, Archived,
+  archivar y el menú ⋮ (sólo tenía acciones de archivar). La acción de la fila es un ojo: *Mark as read* / *Mark as
+  unread*. El banner amarillo va de punta a punta del contenido en toda la app, con la X sola a la derecha.
+- **Para el dev:** `EstadoNotificacion` es `'unread' | 'read'` y `Notificacion` ya no tiene `archivada`; el store pierde
+  `archivar`. `delBanner` = tareas sin leer no ocultas. `NotificationBanner` pasa a `w-full` con la X en `ml-auto`. Las
+  tareas pendientes de ejemplo quedan sin leer (Unread 8) y las archivadas se sacan.
+
 ### Edit Carrier: las dos casillas en la misma fila ([#32](https://github.com/JulianGerardi/red-dental-studio/pull/32))
 - En Edit Carrier › *Information*, *Do not include Dental Diagnostic Codes* y *Do not bill Insurance* van lado a lado, cada
   una bajo una de las columnas de arriba (en el celular, apiladas). El drawer New Carrier no cambia.
