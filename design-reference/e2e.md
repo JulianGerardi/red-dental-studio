@@ -40,6 +40,14 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   y lo cambia; Today vuelve a hoy y se va.
   Con `?day=busy` (35 turnos) se ven cinco; *Show 30 more* abre el resto en una región con scroll y *Show less* la
   cierra (`ui/show-more`).
+- `tests/clinical-mode.e2e.ts` (2026-10-13): en DentAssmt, *View full record* del menú del finding Tooth 3 abre su
+  registro (Source exam) y el link a D2391 cambia el drawer a ese procedimiento.
+- `tests/ledger.e2e.ts` (2026-10-14): el detalle de D4341 muestra Northgate Clinic, Outstanding balance $170 y lo
+  aplicado; la referencia de un pago abre su registro. `tests/billing.e2e.ts` suma: con Maria Abril Viola, la fila del
+  pago dice a qué cargo fue y D1110 abre su registro.
+- `tests/treatment-plan.e2e.ts` (2026-10-13): una fila de Unassigned se despliega (No treatment linked, Collapse all), y
+  la fila D2391 de Restorative Plan muestra Procedure consent; su hallazgo se abre en el drawer sin salir de Treatment
+  Plan.
 
 - `tests/confibot.e2e.ts` (2026-10-13): el botón flotante abre el chat y se esconde mientras está abierto; la flechita
   lo recoge en una pestaña que sigue ahí al cambiar de pantalla y lo trae de vuelta. En Scheduling queda centrado

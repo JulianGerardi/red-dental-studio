@@ -11,7 +11,7 @@ import { ClinicalToolbar } from '@/components/clinical/ClinicalToolbar'
 import { DentalAssessmentExam } from '@/components/clinical/DentalAssessmentExam'
 import { TreatmentPlanList } from '@/components/clinical/TreatmentPlanList'
 import { ProblemList } from '@/components/clinical/ProblemList'
-import { NavegacionClinica, type DestinoClinico } from '@/components/clinical/RecordDetail'
+import { NavegacionClinica, examenDePestana, type DestinoClinico } from '@/components/clinical/RecordDetail'
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
 import { LabOrderPanel } from '@/components/clinical/LabOrderPanel'
 import { RadiographyPanel } from '@/components/clinical/RadiographyPanel'
@@ -155,7 +155,7 @@ export default function ClinicalMode() {
             : pestana === 'DentAssmt'
               ? <DentalAssessmentExam />
               : esExamen
-                ? <ExamLayout>{enConstruccion}</ExamLayout>
+                ? <ExamLayout examen={examenDePestana(pestana)}>{enConstruccion}</ExamLayout>
                 : enConstruccion
 
   return (

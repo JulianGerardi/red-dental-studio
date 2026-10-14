@@ -31,7 +31,7 @@ const meta = {
           'Los cobros de la clínica (`@/pages/Billing`). Tiene **dos modos** en la misma pantalla:',
           '',
           '- **Resumen** (sin paciente): los cinco números, **Recent Billing Activity** de toda la clínica con las Tabs de tipo, **Find Patient** y **Today**. No hay botones de pago.',
-          '- **Paciente** (elegido desde una fila o desde Find Patient): su card baja arriba de Find Patient con una animación corta, el título dice su nombre, las Tabs pasan a **Patient View / Guarantor View**, la tabla muestra **sólo sus movimientos** (o los de todo su garante) y aparecen los botones de pago. La X de la card vuelve al resumen.',
+          '- **Paciente** (elegido desde una fila o desde Find Patient): su card baja arriba de Find Patient con una animación corta, el título dice su nombre, las Tabs pasan a **Patient View / Guarantor View**, la tabla muestra **sólo sus movimientos** (o los de todo su garante) y aparecen los botones de pago. **Cada fila se despliega** con el detalle del Ledger: los datos de la transacción, *Clinic location*, *Financial details* y *Applied transactions* (2026-10-14; *Components / Ledger / LedgerRowDetail*). La X de la card vuelve al resumen.',
           '',
           '**Cards:** los paneles son `Panel` (título de 15px sin ícono, como Patients y el Dashboard); lo que va adentro (resultados, números de Today y del garante) es `InnerCard`. La pantalla completa está en *Pages*.',
           '',
@@ -81,7 +81,8 @@ const PARTES: [string, string, string][] = [
   ['Info circle', 'Arriba a la derecha de cada número de arriba y de Today: al pasar el mouse, tocar o llegar con Tab explica qué cuenta (los textos de red.dev).', 'InfoTip'],
   ['Recent Billing Activity', 'Resumen: toda la clínica y las Tabs de tipo. Paciente: su nombre en el título, Patient View / Guarantor View, los dos saldos del garante y sólo sus movimientos.', 'ActividadReciente · Panel'],
   ['Guarantor numbers', 'Sólo con paciente: Unapplied Credits y Open Balance de todo lo que paga su garante, en InnerCard.', 'Stat interna'],
-  ['Activity table', 'La tabla de la app, compacta. En el resumen, clic en una fila abre la vista de ese paciente.', 'DataTable'],
+  ['Activity table', 'La tabla de la app, compacta. En el resumen, clic en una fila abre la vista de ese paciente. Con paciente, la fila se despliega (chevron, Collapse all / Expand all).', 'DataTable'],
+  ['Row detail', 'Con paciente: el detalle del Ledger. Los datos de la transacción y lo del cobro: dónde, cuánto se cobró, pagó o aplicó y a qué cargo fue; la referencia abre esa transacción. View full record abre el registro completo.', 'DetalleMovimiento · LedgerRowModal'],
   ['Patient card', 'Sólo con paciente: de borde a borde arriba de Find Patient, con iniciales (sin borde), nombre, rol (y su garante si es Patient) y la X que vuelve al resumen. Entra sutil, estilo Apple: 2px, un desenfoque leve que se aclara y opacidad (360ms).', 'PacienteElegido · Panel top'],
   ['Find Patient', 'Panel con el buscador (nombre, apellido o email) y los resultados.', 'BuscarPaciente · Panel'],
   ['Patient result', 'InnerCard con iniciales, nombre, último pago y saldo. Hover gris; el elegido queda en celeste.', 'ResultadoPaciente'],
@@ -142,8 +143,8 @@ function Buscador({ q, elegido }: { q: string; elegido?: string }) {
 
 /* Recent Billing Activity con su estado. `sinCoincidencias`: hay actividad pero ninguna del tipo elegido (con los datos
    de ejemplo cada tipo tiene filas). `sinMovimientos`: un paciente sin nada posteado. */
-function Actividad({ filtro: inicialFiltro = 'All', elegido, vista: inicialVista = 'Patient View', vacia, sinCoincidencias, sinMovimientos }: {
-  filtro?: FiltroActividad; elegido?: string; vista?: VistaPaciente; vacia?: boolean; sinCoincidencias?: boolean; sinMovimientos?: boolean
+function Actividad({ filtro: inicialFiltro = 'All', elegido, vista: inicialVista = 'Patient View', vacia, sinCoincidencias, sinMovimientos, abierta }: {
+  filtro?: FiltroActividad; elegido?: string; vista?: VistaPaciente; vacia?: boolean; sinCoincidencias?: boolean; sinMovimientos?: boolean; abierta?: string
 }) {
   const [filtro, setFiltro] = useState(inicialFiltro)
   const [sel, setSel] = useState<string | null>(elegido ?? null)
@@ -157,6 +158,7 @@ function Actividad({ filtro: inicialFiltro = 'All', elegido, vista: inicialVista
       filas={filas} sinActividad={vacia} filtro={filtro} onFiltro={setFiltro} paciente={paciente} vista={vista} onVista={setVista}
       creditos={grupo.reduce((n, p) => n + p.creditosNoAplicados, 0)} saldo={grupo.reduce((n, p) => n + saldoDe(p.nombre), 0)}
       onElegir={(n) => { setSel(n); setVista('Patient View') }}
+      abierta={abierta}
     />
   )
 }
@@ -200,6 +202,8 @@ export const States: Story = {
           <Fila>
             <Estado titulo="Overview" nota="Toda la clínica, con las Tabs de tipo. Hover gris en cada fila." ancho={960}><Actividad /></Estado>
             <Estado titulo="Patient View" nota="Su nombre en el título, los saldos de su garante y sólo sus movimientos. Las filas ya no eligen." ancho={960}><Actividad elegido="Maria Abril Viola" /></Estado>
+            <Estado titulo="Patient View, payment open" nota="Una fila desplegada: los datos del pago, la sede, cuánto se recibió y aplicó, y el cargo al que fue (D1110 abre su registro)." ancho={960}><Actividad elegido="Maria Abril Viola" abierta="act-Maria Abril Viola-1" /></Estado>
+            <Estado titulo="Patient View, charge open" nota="Un cargo: lo cobrado, lo que pagaron el seguro y el paciente, y lo que falta de ese cargo." ancho={960}><Actividad elegido="Brent Crosby" abierta="act-Brent Crosby-0" /></Estado>
             <Estado titulo="Guarantor View" nota="Todo lo que paga su garante (acá John Hayes y Maria Abril Viola), con la columna Patient para distinguirlos." ancho={960}><Actividad elegido="Maria Abril Viola" vista="Guarantor View" /></Estado>
             <Estado titulo="Patient without activity" nota="Un paciente sin nada posteado: se puede registrar el primer pago desde los botones de arriba." ancho={960}><Actividad elegido="Brent Crosby" sinMovimientos /></Estado>
             <Estado titulo="Filtered, no entries" nota="Resumen: hay actividad pero ninguna del tipo elegido en las Tabs." ancho={960}><Actividad filtro="Charge Adj" sinCoincidencias /></Estado>
@@ -280,6 +284,7 @@ function Medir() {
           <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
             <li>Two modes on one screen: the clinic overview (no patient) and one patient. The X on the patient card goes back to the overview exactly as it was (tab filter included).</li>
             <li>With a patient the table shows only their entries (Patient View) or everything their guarantor pays for (Guarantor View). Each new patient opens in Patient View.</li>
+            <li>With a patient each row expands with the Ledger’s row detail (Clinic location, Financial details, Applied transactions): the same transaction reads the same in Billing and in the Ledger. In the overview a row picks the patient instead.</li>
             <li>Payment and adjustment buttons only show with a patient selected: they always post for that patient.</li>
             <li>The patient card, the guarantor numbers and the buttons enter subtly, Apple-style: 2px, a slight blur that clears and a fade, 360ms on a curve that eases out gently. Without motion (reduced motion) they just appear. Screen readers hear the name (aria-live).</li>
             <li>Every number at the top and in Today has its info circle (InfoTip) explaining what it counts; the guarantor numbers have none.</li>

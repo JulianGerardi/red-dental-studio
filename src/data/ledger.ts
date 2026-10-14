@@ -19,7 +19,12 @@ export type Movimiento = {
       todavía no se aplicó a ningún cargo. Julián pidió poder verlo en la
       fila y aplicarlo desde un modal -ver AplicarCreditoModal-. */
   creditoDisponible?: number
+  /** La sede donde se registró; sin dato, la principal (`SEDE_PRINCIPAL`). */
+  sede?: string
 }
+
+export const SEDE_PRINCIPAL = 'Bayside Dental'
+export const sedeDe = (m: Movimiento) => m.sede ?? SEDE_PRINCIPAL
 
 export const GUARANTOR = 'John Smith'
 /* Un dependiente de nombre largo a propósito: las columnas Patient/Provider
@@ -45,7 +50,7 @@ export const MOVIMIENTOS: Movimiento[] = [
      m27, para probar el indicador en el otro tipo que lo puede tener. */
   { id: 'm28', fecha: 'March 29, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Overpayment credit adjustment', provider: 'Front desk', tipo: 'Adjustment', monto: -80, estado: 'Posted', creditoDisponible: 80 },
   { id: 'm12', fecha: 'March 31, 2025', paciente: 'John Smith', codigo: 'D2392', descripcion: 'Resin composite – two surfaces', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 220, estado: 'Posted', diente: '30', superficie: 'MO' },
-  { id: 'm13', fecha: 'April 3, 2025', paciente: 'John Smith', codigo: 'D4341', descripcion: 'Periodontal scaling – per quadrant', provider: 'Dr. Salgado', tipo: 'Charge', monto: 310, estado: 'Posted' },
+  { id: 'm13', fecha: 'April 3, 2025', paciente: 'John Smith', codigo: 'D4341', descripcion: 'Periodontal scaling – per quadrant', provider: 'Dr. Salgado', tipo: 'Charge', monto: 310, estado: 'Posted', sede: 'Northgate Clinic' },
   { id: 'm14', fecha: 'April 7, 2025', paciente: 'John Smith', codigo: 'D0220', descripcion: 'Intraoral periapical – first image', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 38, estado: 'Posted' },
   { id: 'm15', fecha: 'March 30, 2025', paciente: 'Emma Smith', codigo: 'D1206', descripcion: 'Topical fluoride varnish', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 40, estado: 'Posted' },
   { id: 'm16', fecha: 'April 5, 2025', paciente: 'Emma Smith', codigo: 'D0150', descripcion: 'Comprehensive oral evaluation', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 75, estado: 'Posted' },
@@ -57,14 +62,45 @@ export const MOVIMIENTOS: Movimiento[] = [
   { id: 'm17', fecha: 'April 9, 2025', paciente: 'John Smith', codigo: 'D6010', descripcion: 'Surgical placement of implant body: endosteal implant, mandible', provider: 'Dr. Konstantinos Papadopoulos', tipo: 'Charge', monto: 4850, estado: 'Pending', diente: '30', superficie: 'B' },
   { id: 'm18', fecha: 'April 11, 2025', paciente: 'John Smith', codigo: 'D6114', descripcion: 'Implant/abutment supported fixed denture for edentulous arch – maxillary', provider: 'Dr. Konstantinos Papadopoulos', tipo: 'Charge', monto: 9850, estado: 'Pending', diente: '14', superficie: 'MOD' },
   { id: 'm19', fecha: 'April 12, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Delta Dental PPO claim 55210-A – predetermination approved', provider: 'Delta Dental Insurance', tipo: 'Insurance', monto: -3200, estado: 'Posted' },
-  { id: 'm20', fecha: 'April 14, 2025', paciente: 'John Smith', codigo: 'D7240', descripcion: 'Removal of impacted tooth – completely bony, with unusual surgical complications', provider: 'Dr. Salgado', tipo: 'Charge', monto: 1180, estado: 'Posted', diente: '32', superficie: 'DL' },
-  { id: 'm21', fecha: 'April 16, 2025', paciente: 'John Smith', codigo: 'D4260', descripcion: 'Osseous surgery – four or more contiguous teeth per quadrant', provider: 'Dr. Salgado', tipo: 'Charge', monto: 2340, estado: 'Posted', diente: '19', superficie: 'ML' },
+  { id: 'm20', fecha: 'April 14, 2025', paciente: 'John Smith', codigo: 'D7240', descripcion: 'Removal of impacted tooth – completely bony, with unusual surgical complications', provider: 'Dr. Salgado', tipo: 'Charge', monto: 1180, estado: 'Posted', diente: '32', superficie: 'DL', sede: 'Northgate Clinic' },
+  { id: 'm21', fecha: 'April 16, 2025', paciente: 'John Smith', codigo: 'D4260', descripcion: 'Osseous surgery – four or more contiguous teeth per quadrant', provider: 'Dr. Salgado', tipo: 'Charge', monto: 2340, estado: 'Posted', diente: '19', superficie: 'ML', sede: 'Northgate Clinic' },
   { id: 'm22', fecha: 'April 18, 2025', paciente: 'John Smith', codigo: '—', descripcion: 'Wire transfer received – Chase ····8891', provider: 'Front desk', tipo: 'Payment', monto: -5000, estado: 'Posted' },
   { id: 'm23', fecha: 'April 19, 2025', paciente: 'Maximiliano Fernández-Ugarte', codigo: 'D2750', descripcion: 'Crown – porcelain fused to high noble metal, with custom milled abutment', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 1620, estado: 'Posted', diente: '8', superficie: 'MODBL' },
   { id: 'm24', fecha: 'April 21, 2025', paciente: 'Maximiliano Fernández-Ugarte', codigo: 'D0180', descripcion: 'Comprehensive periodontal evaluation – new or established patient', provider: 'Dr. Konstantinos Papadopoulos', tipo: 'Charge', monto: 165, estado: 'Posted', diente: '3', superficie: 'DO' },
   { id: 'm25', fecha: 'April 23, 2025', paciente: 'Maximiliano Fernández-Ugarte', codigo: '—', descripcion: 'Family courtesy adjustment – long-standing patient discount', provider: 'Front desk', tipo: 'Adjustment', monto: -240, estado: 'Posted' },
   { id: 'm26', fecha: 'April 25, 2025', paciente: 'Emma Smith', codigo: 'D2391', descripcion: 'Resin-based composite – one surface, posterior', provider: 'Dr. Emily Chen', tipo: 'Charge', monto: 185, estado: 'Posted', diente: '12', superficie: 'O' },
 ]
+
+/* A qué cargo fue cada pago, ajuste o pago del seguro, y cuánto: lo lee el detalle de la fila del Ledger (Financial
+   details y Applied transactions) y lo suma Apply credit. Cierra con los datos de arriba: lo aplicado por cada origen más
+   su `creditoDisponible` da su monto, y ningún cargo recibe más que lo que vale. Los Denied y lo que todavía no se aplicó
+   no aparecen. Ver ledger.md (2026-10-14). */
+export type Aplicacion = { id: string; origen: string; cargo: string; fecha: string; monto: number }
+
+export const APLICACIONES: Aplicacion[] = [
+  { id: 'a1', origen: 'm3', cargo: 'm1', fecha: 'March 18, 2025', monto: 85 },
+  { id: 'a2', origen: 'm3', cargo: 'm2', fecha: 'March 18, 2025', monto: 55 },
+  { id: 'a3', origen: 'm5', cargo: 'm2', fecha: 'March 21, 2025', monto: 65 },
+  { id: 'a4', origen: 'm5', cargo: 'm4', fecha: 'March 21, 2025', monto: 35 },
+  { id: 'a5', origen: 'm10', cargo: 'm9', fecha: 'March 22, 2025', monto: 90 },
+  { id: 'a6', origen: 'm8', cargo: 'm4', fecha: 'March 26, 2025', monto: 25 },
+  { id: 'a7', origen: 'm27', cargo: 'm13', fecha: 'April 3, 2025', monto: 50 },
+  { id: 'a8', origen: 'm8', cargo: 'm13', fecha: 'April 3, 2025', monto: 20 },
+  { id: 'a9', origen: 'm19', cargo: 'm17', fecha: 'April 12, 2025', monto: 3200 },
+  { id: 'a10', origen: 'm22', cargo: 'm13', fecha: 'April 18, 2025', monto: 70 },
+  { id: 'a11', origen: 'm22', cargo: 'm17', fecha: 'April 18, 2025', monto: 1650 },
+  { id: 'a12', origen: 'm22', cargo: 'm20', fecha: 'April 18, 2025', monto: 1180 },
+  { id: 'a13', origen: 'm22', cargo: 'm21', fecha: 'April 18, 2025', monto: 2100 },
+  { id: 'a14', origen: 'm25', cargo: 'm24', fecha: 'April 23, 2025', monto: 165 },
+  { id: 'a15', origen: 'm25', cargo: 'm23', fecha: 'April 23, 2025', monto: 75 },
+]
+
+export const aplicadoA = (cargo: string, apls: Aplicacion[]) => apls.filter((a) => a.cargo === cargo)
+export const aplicadoDesde = (origen: string, apls: Aplicacion[]) => apls.filter((a) => a.origen === origen)
+const suma = (apls: Aplicacion[]) => apls.reduce((t, a) => t + a.monto, 0)
+/** Lo que falta pagar de un cargo: su monto menos todo lo aplicado. No es el saldo de la cuenta. */
+export const pendienteDe = (cargo: Movimiento, apls: Aplicacion[]) => Math.max(cargo.monto - suma(aplicadoA(cargo.id, apls)), 0)
+export const totalAplicado = suma
 
 export const TIPOS: TipoMovimiento[] = ['Charge', 'Payment', 'Adjustment', 'Insurance']
 
