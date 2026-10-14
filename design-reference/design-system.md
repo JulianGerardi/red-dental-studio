@@ -761,6 +761,36 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   campo de arriba (Edit Carrier › *Information*, pedido de Julián). En los drawers siguen una debajo de la otra
   (*Components / UI / Drawer → Specs → Fields*).
 
+## Navigation: el menú en blanco (2026-10-13)
+
+- El rail de la app pasa de `surface-subtle` (`#fafafa`) a **blanco**; el bloque del logo sigue azul. *Elements /
+  Navigation → Specs → Colors* lo muestra con el token `white`, y Playground, Parts y States ya lo dibujan así porque
+  montan el `Sidebar` real. La interfaz de Storybook mantiene su riel `#fafafa` (ver *Interfaz de Storybook*).
+  Decisiones en `figma/modulos/header-sidebar.md` (2026-10-13).
+
+## Confibot flotante abajo a la derecha (2026-10-13)
+
+- Vuelve el botón flotante de Confibot (el último que había, antes de pasar al menú): `ConfibotLanzador` en
+  `help/Confibot.tsx`. Círculo de 48px con degradé, se estira a "Confibot" con hover o foco; flechita para recogerlo y
+  pestaña al pie para traerlo (se recuerda entre visitas). Lo monta `AppShell`; no se dibuja con el chat o un CoachMark
+  abiertos.
+- **Botones flotantes que conviven:** una pantalla con su propio flotante en esa esquina llama a `useFabDePagina()`
+  (`help/HelpProvider.tsx`) y Confibot se apila 12px arriba. Hoy sólo Scheduling (Appointment requests).
+- `AppShell` vuelve a reservar el alto del botón al pie del `main` (`pb-24 sm:pb-28`).
+- Token nuevo `dash-blue-glow` (`#2f74f5`), el celeste del medio del degradé.
+- *Components / Help / Confibot* pasa a la estructura de Buttons: Playground (vista de arranque y *overPageFab*), Parts,
+  States (reposo, hover, recogido, sobre el FAB de Scheduling, oculto, chat vacío, con respuesta y sin resultados) y
+  Specs. *Navigation → Parts* aclara que el ítem del menú abre la misma hoja. Ver `figma/modulos/help.md`.
+
+## Notifications sin Pending ni Archived; banner de punta a punta (2026-10-13)
+
+- *Pages / Parts / Notifications*: sin los estados ni variantes de *Pending* y *Archived*; *Row actions* muestra el
+  ojo (*Mark as read* / *Mark as unread*); *Empty states* con *Inbox* y *Unread* (con y sin fechas); colores y reglas al
+  día. *Elements / Date filter → Specs* muestra las dos pestañas que quedan.
+- *Components / Layout / NotificationBanner*: de punta a punta del contenido, con la X sola a la derecha; las stories
+  usan las tareas que el banner muestra de verdad (`delBanner`), así el paginador dice "1 of 4" y no "1 of 16".
+  Decisiones en `figma/modulos/notifications.md` y `header-sidebar.md` (2026-10-13).
+
 ## Billing: bento y botones del paciente dentro del panel (2026-10-13)
 
 - *Pages › Parts › Billing*: Parts suma *Bento* y *Patient actions*; States cambia *Header* por **Patient actions**

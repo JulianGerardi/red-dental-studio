@@ -3,7 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import { NotificationBanner } from './NotificationBanner'
-import { Confibot } from '@/components/help/Confibot'
+import { Confibot, ConfibotLanzador, useConfibotRecogido } from '@/components/help/Confibot'
 import { useHelp } from '@/components/help/HelpProvider'
 import { delBanner, useNotificaciones } from '@/data/notificacionesStore'
 import { aviso } from '@/components/ui/toaster'
@@ -13,7 +13,8 @@ import { NavigationPreview } from './navigation-preview'
 export function AppShell() {
   const [expanded, setExpanded] = useState(useContext(NavigationPreview).expanded ?? false)
   const { pathname } = useLocation()
-  const { showOnScreen, confibotAbierto, closeConfibot } = useHelp()
+  const { showOnScreen, explicando, confibotAbierto, openConfibot, closeConfibot, fabDePagina } = useHelp()
+  const [confibotRecogido, setConfibotRecogido] = useConfibotRecogido()
 
   /* Las notificaciones viven en su store (data/notificacionesStore): tienen
      que sobrevivir a la navegación y las comparten el banner, la campana y
@@ -53,7 +54,7 @@ export function AppShell() {
         <Topbar
           expanded={expanded}
           onToggleSidebar={() => setExpanded((v) => !v)}
-          notificaciones={notis.items.filter((n) => !n.archivada)}
+          notificaciones={notis.items}
           ocultasDelBanner={notis.ocultas}
           onVolverAlBanner={volverAlBanner}
           onAbrirNotificacion={notis.abrir}
@@ -65,8 +66,10 @@ export function AppShell() {
           onCursor={setCursor}
           onOcultar={ocultarDelBanner}
         />
-        {/* `clip`, no `hidden`: hidden vuelve a <main> contenedor de scroll y deja sin efecto todo sticky de adentro. */}
-        <main className="bg-page-background flex-1 overflow-x-clip">
+        {/* `clip`, no `hidden`: hidden vuelve a <main> contenedor de scroll y deja sin efecto todo sticky de adentro.
+            El pb reserva el alto del botón flotante de Confibot: lo que cae al pie de una página (Cancel/Save,
+            paginación) se puede scrollear por encima de él. Ver help.md. */}
+        <main className="bg-page-background flex-1 overflow-x-clip pb-24 sm:pb-28">
           <Outlet />
         </main>
       </div>
@@ -74,6 +77,16 @@ export function AppShell() {
           saber quién está en el sillón esté donde esté navegando-. ClinicalMode
           queda afuera igual porque ese layout no pasa por AppShell. */}
       <PatientInSessionPopup />
+      {/* Mientras habla la hoja de chat o un CoachMark, que ocupan su esquina, el botón no se dibuja. */}
+      {!confibotAbierto && !explicando && (
+        <ConfibotLanzador
+          recogido={confibotRecogido}
+          sobreFab={fabDePagina}
+          onAbrir={openConfibot}
+          onRecoger={() => setConfibotRecogido(true)}
+          onTraer={() => setConfibotRecogido(false)}
+        />
+      )}
       <Confibot abierto={confibotAbierto} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
     </div>
   )
