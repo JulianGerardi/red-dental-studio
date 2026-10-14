@@ -200,3 +200,13 @@ Figma) a **blanco**, en escritorio (58 y 176) y en el panel del celular. Es un d
 Verificado con Playwright en `/`, `/scheduling` y `/patients` a 1440, 820 y 390px: el `aside` da `rgb(255, 255, 255)`
 en todos. Design system: *Elements / Navigation → Specs → Colors* (Rail → `white`).
 
+## El banner de punta a punta (2026-10-13)
+
+Julián, con una captura: el banner amarillo va **de punta a punta del contenido de la página** (alineado con el título
+y con las cards de abajo), no del ancho de su texto como se había elegido el 2026-10-06. Adentro, la tarea, *Review* y
+el paginador siguen juntos a la izquierda y la **X va sola en el extremo derecho** (`ml-auto`). Es el mismo componente
+en todas las pantallas (`NotificationBanner` en `AppShell`), así que cambia en toda la app. Verificado: en
+Notifications y en el Dashboard el banner mide lo mismo que la lista y el título (1334px a 1440).
+
+Desde que Notifications no tiene *Pending* ni *Archived* (`notifications.md`, 2026-10-13), el banner muestra las
+**tareas sin leer** no ocultas con la X.
