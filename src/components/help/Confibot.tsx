@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bot, X, ArrowUp, Sparkles, ChevronRight } from 'lucide-react'
+import { Bot, X, ArrowUp, Sparkles, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react'
 import { TOPICS, MODULES, puntuarTema } from './topics'
+import { cn } from '@/lib/utils'
 
 /* Sin IA real: sólo búsqueda por palabras clave sobre TOPICS -decisión de
    Julián, para no pedirle consentimiento ni cobrarle a quien abra el
    artifact. Ver design-reference/figma/modulos/help.md. */
-type Mensaje = { de: 'bot'; texto: string; temas?: string[] } | { de: 'user'; texto: string }
+export type Mensaje = { de: 'bot'; texto: string; temas?: string[] } | { de: 'user'; texto: string }
 
 const SALUDO = 'Hi — I\'m Confibot. Ask me how something works and I\'ll take you to the screen it lives on and explain it there.'
 
@@ -19,6 +20,7 @@ const SUGERENCIAS = [
 ]
 
 const CLAVE_HISTORIAL = 'confidentally.confibot-history'
+const CLAVE_RECOGIDO = 'confidentally.confibot-tucked'
 
 function cargarHistorial(): Mensaje[] {
   try {
@@ -30,7 +32,7 @@ function cargarHistorial(): Mensaje[] {
   }
 }
 
-function buscarRespuesta(consulta: string): Mensaje {
+export function buscarRespuesta(consulta: string): Mensaje {
   const hits = TOPICS.map((t) => ({ t, puntaje: puntuarTema(t, consulta) }))
     .filter((r) => r.puntaje > 0)
     .sort((a, b) => b.puntaje - a.puntaje)
@@ -44,21 +46,92 @@ function buscarRespuesta(consulta: string): Mensaje {
     : { de: 'bot', texto: 'I couldn\'t find that one. I know about the dashboard, scheduling, patients, clinical mode and settings — try naming one of those.' }
 }
 
+/* Recogido o no se recuerda entre visitas: quien lo esconde porque le
+   estorba no tiene que volver a hacerlo cada vez que abre la app. */
+export function useConfibotRecogido() {
+  const [recogido, setRecogido] = useState(() => {
+    try { return localStorage.getItem(CLAVE_RECOGIDO) === '1' } catch { return false }
+  })
+  useEffect(() => {
+    try { localStorage.setItem(CLAVE_RECOGIDO, recogido ? '1' : '0') } catch { /* sin storage: sólo dura la visita */ }
+  }, [recogido])
+  return [recogido, setRecogido] as const
+}
+
+const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-dash-blue-glow),var(--color-dash-ring),var(--color-dash-blue))] bg-[length:200%_100%]'
+
+/* El disparador flotante, abajo a la derecha. Sobre el botón flotante de una
+   pantalla (Appointment requests en Scheduling) se apila arriba en vez de
+   taparlo. Ver design-reference/figma/modulos/help.md. */
+export function ConfibotLanzador({
+  recogido, sobreFab = false, onAbrir, onRecoger, onTraer,
+}: {
+  recogido: boolean
+  sobreFab?: boolean
+  onAbrir: () => void
+  onRecoger: () => void
+  onTraer: () => void
+}) {
+  if (recogido) {
+    return (
+      <button
+        type="button" onClick={onTraer} aria-label="Bring Confibot back"
+        className={cn(
+          DEGRADE,
+          'fixed bottom-0 z-40 flex h-8 items-center gap-1.5 rounded-t-xl px-3 text-white shadow-lg hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring',
+          sobreFab ? 'right-[108px]' : 'right-4 sm:right-6',
+        )}
+      >
+        <ChevronUp className="size-4 shrink-0" />
+        <span className="text-[13px] font-semibold">Confibot</span>
+      </button>
+    )
+  }
+  return (
+    <div className={cn('fixed z-40 flex flex-col items-end gap-1', sobreFab ? 'right-[38px] bottom-[104px]' : 'right-4 bottom-4 sm:right-6 sm:bottom-6')}>
+      {/* 24px a la vista, 40px de área de toque. */}
+      <button
+        type="button" onClick={onRecoger} aria-label="Tuck Confibot away"
+        className="relative flex size-6 items-center justify-center rounded-full border border-line bg-white text-ink-muted shadow-sm before:absolute before:-inset-2 before:content-[''] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+      >
+        <ChevronDown className="size-3.5" />
+      </button>
+      <div className="group relative">
+        <span
+          aria-hidden
+          className={cn(DEGRADE, 'pointer-events-none absolute -inset-[5px] rounded-full opacity-0 transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 group-hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite]')}
+        />
+        <button
+          type="button" onClick={onAbrir} aria-label="Open Confibot"
+          className={cn(DEGRADE, 'relative flex h-12 items-center rounded-full px-3.5 text-white shadow-lg ring-white transition-[padding,box-shadow] duration-300 outline-none group-focus-within:pr-5 group-focus-within:ring-2 group-hover:pr-5 group-hover:ring-2')}
+        >
+          <Bot className="size-5 shrink-0" />
+          <span className="max-w-0 overflow-hidden text-sm font-semibold whitespace-nowrap opacity-0 transition-all duration-300 group-focus-within:ml-2 group-focus-within:max-w-[90px] group-focus-within:opacity-100 group-hover:ml-2 group-hover:max-w-[90px] group-hover:opacity-100">
+            Confibot
+          </span>
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export function Confibot({
-  abierto, onClose, onShowOnScreen,
+  abierto, onClose, onShowOnScreen, historialInicial,
 }: {
   abierto: boolean
   onClose: () => void
   onShowOnScreen: (topicId: string) => void
+  /** Sólo para mostrar estados en Storybook: arranca con esta conversación en vez de la guardada. */
+  historialInicial?: Mensaje[]
 }) {
   const [borrador, setBorrador] = useState('')
-  const [historial, setHistorial] = useState<Mensaje[]>(() => cargarHistorial())
+  const [historial, setHistorial] = useState<Mensaje[]>(() => historialInicial ?? cargarHistorial())
   const listaRef = useRef<HTMLDivElement>(null)
   const ultimaRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    localStorage.setItem(CLAVE_HISTORIAL, JSON.stringify(historial))
-  }, [historial])
+    if (!historialInicial) localStorage.setItem(CLAVE_HISTORIAL, JSON.stringify(historial))
+  }, [historial, historialInicial])
 
   useEffect(() => {
     if (!abierto) return
@@ -72,10 +145,7 @@ export function Confibot({
     setHistorial((h) => [...h, { de: 'user', texto: q }, buscarRespuesta(q)])
   }
 
-  /* El disparador ya no flota sobre la pantalla -tapaba otros botones
-     flotantes, como el de Appointment requests en Scheduling-: ahora vive en
-     el menú (Sidebar.tsx) y acá sólo queda la hoja de chat, montada nada más
-     mientras está abierta. */
+  /* La hoja ocupa el lugar del botón flotante: montada nada más mientras está abierta. */
   if (!abierto) return null
 
   const preguntas = historial.filter((m) => m.de === 'user').length
