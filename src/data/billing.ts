@@ -21,6 +21,10 @@ export const PACIENTES_BILLING: PacienteBilling[] = [
   { nombre: 'Brent Crosby', rol: 'Guarantor', garante: 'Brent Crosby', ultimoPago: '1d ago', creditosNoAplicados: 0 },
   { nombre: 'Diego Molina', rol: 'Patient', garante: 'Sophie Tran', ultimoPago: '4d ago', creditosNoAplicados: 120 },
   { nombre: 'Sophie Tran', rol: 'Guarantor', garante: 'Sophie Tran', ultimoPago: '6d ago', creditosNoAplicados: 260 },
+  /* Tres más (2026-10-13): con cinco, Find Patient no llenaba su columna del bento (billing.md). */
+  { nombre: 'Nadia Duarte', rol: 'Guarantor', garante: 'Nadia Duarte', ultimoPago: '1w ago', creditosNoAplicados: 40 },
+  { nombre: 'Tomás Rivas', rol: 'Patient', garante: 'Nadia Duarte', ultimoPago: '1w ago', creditosNoAplicados: 0 },
+  { nombre: 'Lucía Paz', rol: 'Guarantor', garante: 'Lucía Paz', ultimoPago: '2w ago', creditosNoAplicados: 75 },
 ]
 
 /* Todos los que paga el mismo garante (el garante y los pacientes a su cargo): la Guarantor View de Billing. */
@@ -64,6 +68,18 @@ const ACTIVIDAD_POR_PACIENTE: Record<string, Omit<Movimiento, 'id' | 'paciente' 
   'Sophie Tran': [
     { fecha: 'May 9, 2026', codigo: 'D6010', descripcion: 'Surgical placement of implant body', provider: 'Dr Konstantinos Papadopoulos', tipo: 'Charge', monto: 4850, estado: 'Pending', diente: '30' },
     { fecha: 'May 15, 2026', codigo: '—', descripcion: 'Wire Transfer Received', provider: 'Front desk', tipo: 'Payment', monto: -2710, estado: 'Posted' },
+  ],
+  'Nadia Duarte': [
+    { fecha: 'May 11, 2026', codigo: 'D0150', descripcion: 'Comprehensive oral evaluation', provider: 'Dr Emily Chen', tipo: 'Charge', monto: 95, estado: 'Posted' },
+    { fecha: 'May 14, 2026', codigo: '—', descripcion: 'Card Payment ····0412', provider: 'Front desk', tipo: 'Payment', monto: -95, estado: 'Posted' },
+  ],
+  'Tomás Rivas': [
+    { fecha: 'May 12, 2026', codigo: 'D1120', descripcion: 'Prophylaxis – child', provider: 'Dr Emily Chen', tipo: 'Charge', monto: 85, estado: 'Posted' },
+    { fecha: 'May 17, 2026', codigo: '—', descripcion: 'Insurance Payment – Cigna', provider: 'Cigna', tipo: 'Insurance', monto: -60, estado: 'Posted' },
+  ],
+  'Lucía Paz': [
+    { fecha: 'May 13, 2026', codigo: 'D2391', descripcion: 'Resin-based composite – one surface', provider: 'Dr Salgado', tipo: 'Charge', monto: 180, estado: 'Posted', diente: '14' },
+    { fecha: 'May 20, 2026', codigo: '—', descripcion: 'Check Payment $100.00', provider: 'Front desk', tipo: 'Payment', monto: -100, estado: 'Posted' },
   ],
 }
 

@@ -21,7 +21,7 @@ export function Panel({
       Recent Patients en Patients.tsx- le agregan un globo con el total. */
   title: React.ReactNode
   controls?: React.ReactNode
-  /** Franja arriba del título, de borde a borde: el paciente elegido en Find Patient (Billing). */
+  /** Arriba del título: el paciente elegido en Find Patient y los botones del paciente en Recent Billing Activity (Billing). */
   top?: React.ReactNode
   className?: string
   bodyClassName?: string
