@@ -1,11 +1,11 @@
 import type { LucideIcon } from 'lucide-react'
-import { AtSign, BadgeDollarSign, CalendarPlus, CalendarX2, ClipboardCheck, FileCheck2, FileSignature, FlaskConical, ListTodo, LogIn, Package, Receipt, Send, ShieldAlert, ShieldCheck, TrendingUp, Truck, UserPlus, Wrench } from 'lucide-react'
+import { AtSign, BadgeDollarSign, CalendarPlus, CalendarX2, ClipboardCheck, FileCheck2, FileSignature, FlaskConical, ListTodo, LogIn, Receipt, Send, ShieldAlert, ShieldCheck, TrendingUp, UserPlus, Wrench } from 'lucide-react'
 
-/* Las notificaciones del usuario, con la lógica del Inbox de Notion: cada una está sin leer, leída o pendiente
-   (lo que quedó para hacer), y se archiva cuando ya no hace falta verla. Las que son tareas van además al banner
-   de arriba hasta resolverse. Ver design-reference/figma/modulos/notifications.md y header-sidebar.md. */
+/* Las notificaciones del usuario, con la lógica del Inbox de Notion: cada una está sin leer o leída (Pending y
+   Archived se sacaron, Julián 2026-10-13). Las que son tareas van además al banner de arriba mientras estén sin leer.
+   Ver design-reference/figma/modulos/notifications.md y header-sidebar.md. */
 
-export type EstadoNotificacion = 'unread' | 'read' | 'pending'
+export type EstadoNotificacion = 'unread' | 'read'
 
 export type Notificacion = {
   id: string
@@ -14,7 +14,7 @@ export type Notificacion = {
   accion: string
   to: string
   icon: LucideIcon
-  /** Es algo para hacer (firmar, revisar, llamar): va al banner mientras no esté leída ni archivada. */
+  /** Es algo para hacer (firmar, revisar, llamar): va al banner mientras esté sin leer. */
   tarea: boolean
   /** Hace cuántos minutos llegó: relativo a "ahora" para que el ejemplo no envejezca. */
   hace: number
@@ -22,8 +22,6 @@ export type Notificacion = {
   estado: EstadoNotificacion
   /** Quién la generó, si fue una persona. */
   autor?: string
-  /** Arranca archivada. */
-  archivada?: boolean
 }
 
 const HORA = 60
@@ -75,7 +73,7 @@ export const NOTIFICACIONES: Notificacion[] = [
     icon: ShieldAlert,
     tarea: true,
     hace: 5 * HORA,
-    estado: 'pending',
+    estado: 'unread',
   },
   {
     id: 'n5',
@@ -120,7 +118,7 @@ export const NOTIFICACIONES: Notificacion[] = [
     icon: ListTodo,
     tarea: true,
     hace: 3 * DIA,
-    estado: 'pending',
+    estado: 'unread',
     autor: 'Front desk',
   },
   {
@@ -167,7 +165,7 @@ export const NOTIFICACIONES: Notificacion[] = [
     hace: 11 * DIA,
     estado: 'read',
   },
-  /* Las que completan cada combinación en la app (estado × tipo, archivadas, texto largo, "Just now"). */
+  /* Las que completan cada combinación en la app (estado × tipo, texto largo, "Just now"). */
   {
     id: 'n13',
     titulo: 'Maria Abril Viola checked in',
@@ -200,7 +198,7 @@ export const NOTIFICACIONES: Notificacion[] = [
     icon: Receipt,
     tarea: false,
     hace: 2 * DIA + 3 * HORA,
-    estado: 'pending',
+    estado: 'read',
   },
   {
     id: 'n16',
@@ -214,46 +212,10 @@ export const NOTIFICACIONES: Notificacion[] = [
     estado: 'unread',
     autor: 'Dr. Alvarez’s office',
   },
-  {
-    id: 'n17',
-    titulo: 'Lab case shipped',
-    detalle: 'Lakeside Lab shipped the crown for Noah James. Arrives Thursday.',
-    accion: 'View documents',
-    to: '/patients/patient-0001/documents',
-    icon: Truck,
-    tarea: false,
-    hace: 5 * DIA,
-    estado: 'read',
-    archivada: true,
-  },
-  {
-    id: 'n18',
-    titulo: 'Supply order delivered',
-    detalle: 'Gloves, masks and impression material arrived at Abril - Los Angeles.',
-    accion: 'Open locations',
-    to: '/settings/locations',
-    icon: Package,
-    tarea: false,
-    hace: 8 * DIA,
-    estado: 'unread',
-    archivada: true,
-  },
-  {
-    id: 'n19',
-    titulo: 'Follow up on an overdue balance',
-    detalle: 'Elias Aguirre has $48.50 overdue for 45 days.',
-    accion: 'Open ledger',
-    to: '/patients/patient-0001/ledger',
-    icon: BadgeDollarSign,
-    tarea: true,
-    hace: 10 * DIA,
-    estado: 'pending',
-    archivada: true,
-  },
 ]
 
 /* Historial de los últimos meses, para ver la pantalla con muchas notificaciones (y usar el filtro de fecha). Todas
-   leídas o pendientes y ninguna tarea: no cambian la campana ni el banner. Ver notifications.md (2026-10-12). */
+   leídas y ninguna tarea: no cambian la campana ni el banner. Ver notifications.md (2026-10-12). */
 const vieja = (n: number, dias: number, titulo: string, detalle: string, accion: string, to: string, icon: LucideIcon, extra: Partial<Notificacion> = {}): Notificacion =>
   ({ id: `h${n}`, titulo, detalle, accion, to, icon, tarea: false, hace: dias * DIA + 3 * HORA, estado: 'read', ...extra })
 const REPORTE = ['Weekly report is ready', 'Production and collections for last week are ready to review.', 'Open billing', '/billing', TrendingUp] as const
@@ -270,19 +232,16 @@ export const HISTORIAL: Notificacion[] = [
   vieja(9, 25, ...REPORTE),
   vieja(10, 26, 'Claim paid', 'Northwind Dental Plan paid $340.00 for Mara Otero.', 'Open billing', '/billing', Receipt),
   vieja(11, 28, 'Treatment plan accepted', 'Elias Aguirre accepted his treatment plan (2 procedures).', 'Open treatment plan', '/patients/patient-0001/treatments', ClipboardCheck),
-  vieja(12, 31, 'Supply order delivered', 'Composite and bonding agent arrived at Abril - Los Angeles.', 'Open locations', '/settings/locations', Package, { archivada: true }),
   vieja(13, 32, ...REPORTE),
   vieja(14, 33, 'Payment received', '$200.00 from John Smith was applied to his ledger.', 'Open ledger', '/patients/patient-0001/ledger', BadgeDollarSign),
   vieja(15, 38, 'Referral answered', 'Dr. Salgado scheduled John Smith for an evaluation.', 'Open referral', '/patients/patient-0001/treatments', Send, { autor: 'Dr. Salgado’s office' }),
   vieja(16, 39, ...REPORTE),
   vieja(17, 41, 'Operatory 2 is back in service', 'Maintenance is done; it’s available for appointments again.', 'Open locations', '/settings/locations', Wrench),
-  vieja(18, 44, 'New fee schedule from Northwind', 'Updated allowed amounts are ready to review.', 'Open billing', '/billing', Receipt, { estado: 'pending' }),
+  vieja(18, 44, 'New fee schedule from Northwind', 'Updated allowed amounts are ready to review.', 'Open billing', '/billing', Receipt),
   vieja(19, 46, ...REPORTE),
-  vieja(20, 47, 'Lab case shipped', 'Lakeside Lab shipped the night guard for Sofía Romero.', 'View documents', '/patients/patient-0001/documents', Truck, { archivada: true }),
   vieja(21, 52, 'Consent signed', 'Lucía Benítez signed the whitening consent.', 'View documents', '/patients/patient-0001/documents', FileCheck2),
   vieja(22, 53, ...REPORTE),
   vieja(23, 55, 'Appointment canceled', 'Noah James canceled his 9:00 AM check-up.', 'Open scheduling', '/scheduling', CalendarX2),
-  vieja(24, 60, 'Insurance verified', 'Northwind Dental Plan confirmed coverage for Elias Aguirre.', 'Open insurance', '/patients/patient-0001/insurance', ShieldCheck, { archivada: true }),
   vieja(25, 64, 'Dr. Elena Martinez mentioned you', '“@Sarah can you move my Friday patients to Monday?”', 'Open scheduling', '/scheduling', AtSign, { autor: 'Dr. Elena Martinez' }),
   vieja(26, 70, 'Payment received', '$60.00 from Sofía Romero was applied to her ledger.', 'Open ledger', '/patients/patient-0001/ledger', BadgeDollarSign),
   vieja(27, 78, 'New team member', 'Sarah Stone joined Abril - Los Angeles as a hygienist.', 'Open team', '/settings/team', UserPlus),

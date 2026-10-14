@@ -200,3 +200,34 @@ vacíos con fechas en *Pages / Parts / Notifications → Empty states*.
 
 **2026-10-12, después:** el campo y el calendario del filtro pasan a ser los del `DatePicker` (`fechaTriggerClasses` y
 `MonthCalendar`), así el Dashboard y Notifications no se vuelven a separar. Ver `dashboard.md` (2026-10-12).
+
+## Sin Pending ni Archived, el ojo y el banner de punta a punta (2026-10-13)
+
+Julián mandó una captura de cómo tiene que quedar la pantalla y tres pedidos:
+
+1. **No va más Pending ni Archived.** Quedan dos estados (*unread* y *read*) y dos pestañas (*Inbox* y *Unread*). Se
+   fueron el estado pendiente (punto y fondo amarillos, el reloj), archivar y sus acciones (*Archive*, *Move to inbox*,
+   *Archive read*, *Archive all*, *Move all to inbox*) y sus vacíos. Las secciones 2, 4 y 5 de arriba quedan como
+   historia.
+   - **El menú ⋮ de arriba se sacó:** sólo tenía acciones de archivar y quedaba vacío (en la captura todavía se ve).
+     *Mark all as read* sigue, con Undo.
+   - **Los datos:** las cuatro pendientes de ejemplo pasan a otro estado. Las dos que son tareas (*Insurance
+     verification pending* y *Call to confirm tomorrow's appointment*) quedan **sin leer**, porque siguen por hacer y
+     así siguen en el banner ("1 of 4", como en la captura). Las dos que eran avisos (*New fee schedule from Delta
+     Dental* y *from Northwind*) quedan leídas. Las seis archivadas se borran de los ejemplos (en la captura no
+     aparecen). Inbox queda en 40, como en la captura, y Unread en 8 (la captura dice 6: no contaba esas dos tareas).
+   - **El banner** muestra las tareas sin leer que no se ocultaron con la X.
+2. **La acción de la fila es un ojo:** *Mark as read* con el ojo abierto en las sin leer y *Mark as unread* con el ojo
+   tachado en las leídas, con su tooltip. Es la única acción de la fila; aparece al pasar el mouse o con Tab, y en el
+   celular queda a la vista.
+3. **El banner amarillo va de punta a punta** del contenido, con la X sola a la derecha (ver `header-sidebar.md`,
+   2026-10-13).
+
+La bajada de la pantalla pasa a *Open one to go where it happened, or mark it as read or unread.* La campana pierde el
+amarillo de las pendientes. Verificado: pestañas *Inbox (40)* y *Unread (8)*; el ojo pasa Unread de 8 a 7 y la deja
+como estaba al volver; banner y lista del mismo ancho. E2E en `tests/notifications.e2e.ts`. Design system: *Pages /
+Parts / Notifications* (estados, variantes, el ojo en *Row actions*, specs y reglas) y *Components / Layout /
+NotificationBanner*.
+
+**Para validar con usuarios:** sin *Pending*, ¿recepción usa "sin leer" para lo que queda por hacer, o le falta una
+forma de dejar algo para después? Y si el ojo se entiende como "marcar leída" sin el tooltip.

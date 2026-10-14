@@ -139,11 +139,11 @@ export const Open: Story = {
 
 /* En Notifications: en la fila de las pestañas, a la derecha; en el celular baja. */
 function EnNotificaciones() {
-  const [v, setV] = useState<'Inbox' | 'Unread' | 'Pending' | 'Archived'>('Inbox')
+  const [v, setV] = useState<'Inbox' | 'Unread'>('Inbox')
   const [r, setR] = useState<DateRange | null>(ARRANQUE.preset)
   return (
     <div className="flex w-full max-w-[820px] flex-wrap items-center justify-between gap-3 rounded-lg bg-page-background p-4">
-      <Tabs aria-label="Filter notifications" tabs={[{ value: 'Inbox', count: 9 }, { value: 'Unread', count: 3 }, { value: 'Pending', count: 1 }, { value: 'Archived' }]} value={v} onChange={setV} />
+      <Tabs aria-label="Filter notifications" tabs={[{ value: 'Inbox', count: 9 }, { value: 'Unread', count: 3 }]} value={v} onChange={setV} />
       <DateFilter value={r} onChange={setR} marked={MARCADOS} label="Filter notifications by date" />
     </div>
   )
@@ -207,7 +207,7 @@ export const Specs: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
     <Lienzo>
-      <Bloque titulo="In Notifications" nota="En la fila de las pestañas, a la derecha: las dos cambian qué se ve. Las fechas acotan los números de las pestañas, la lista y las acciones en lote (Mark all as read, Archive…).">
+      <Bloque titulo="In Notifications" nota="En la fila de las pestañas, a la derecha: las dos cambian qué se ve. Las fechas acotan los números de las pestañas, la lista y Mark all as read.">
         <EnNotificaciones />
       </Bloque>
       <Bloque titulo="Field" nota="Medidas leídas del campo dibujado.">

@@ -54,7 +54,7 @@ export function AppShell() {
         <Topbar
           expanded={expanded}
           onToggleSidebar={() => setExpanded((v) => !v)}
-          notificaciones={notis.items.filter((n) => !n.archivada)}
+          notificaciones={notis.items}
           ocultasDelBanner={notis.ocultas}
           onVolverAlBanner={volverAlBanner}
           onAbrirNotificacion={notis.abrir}
