@@ -37,8 +37,8 @@ export function ConTooltip({
 }
 
 /* Figma 3605:56447 "Sidebar Rail (Collapsed Icons)".
-   Rail 58px sobre #fafafa, bloque de logo 64px en #1a4da9 (un azul más
-   oscuro que el primario #1d56bc, que es el del ítem activo).
+   Rail 58px en blanco (el Figma lo trae en #fafafa; cambio de Julián, header-sidebar.md),
+   bloque de logo 64px en #1a4da9 (un azul más oscuro que el primario #1d56bc, que es el del ítem activo).
    Los ítems van 32×32 con pitch de 50px → gap de 18. */
 const NAV: NavItem[] = [
   { to: '/', label: 'Dashboard', icon: House, end: true },
@@ -95,7 +95,7 @@ export function Sidebar({
         className={cn(
           /* El scroll va sólo en mobile: en desktop un overflow acá recorta el
              menú flotante de Settings, que se sale del ancho del rail. */
-          'flex h-svh flex-col bg-surface-subtle transition-[width,transform] duration-200',
+          'flex h-svh flex-col bg-white transition-[width,transform] duration-200',
           'max-md:overflow-y-auto md:overflow-visible',
           /* Mobile: panel fijo que entra desde la izquierda. Sigue en 234: tapa el contenido en vez de correrlo. */
           'fixed top-0 left-0 z-50 w-[234px]',

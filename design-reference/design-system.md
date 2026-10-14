@@ -761,3 +761,11 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   campo de arriba (Edit Carrier › *Information*, pedido de Julián). En los drawers siguen una debajo de la otra
   (*Components / UI / Drawer → Specs → Fields*).
 
+
+## Navigation: el menú en blanco (2026-10-13)
+
+- El rail de la app pasa de `surface-subtle` (`#fafafa`) a **blanco**; el bloque del logo sigue azul. *Elements /
+  Navigation → Specs → Colors* lo muestra con el token `white`, y Playground, Parts y States ya lo dibujan así porque
+  montan el `Sidebar` real. La interfaz de Storybook mantiene su riel `#fafafa` (ver *Interfaz de Storybook*).
+  Decisiones en `figma/modulos/header-sidebar.md` (2026-10-13).
+

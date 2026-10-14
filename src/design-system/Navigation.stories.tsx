@@ -251,7 +251,7 @@ function Medidas() {
 const Colores = () => (
   <Bloque titulo="Colors">
     <Tabla encabezado={['Part', 'Token']} minimo={480}>
-      <tr><td className="font-semibold">Rail</td><td><Token nombre="surface-subtle" /></td></tr>
+      <tr><td className="font-semibold">Rail</td><td><Token nombre="white" /></td></tr>
       <tr><td className="font-semibold">Logo</td><td><Token nombre="dash-blue-hover" /> · text <Token nombre="white" /></td></tr>
       <tr><td className="font-semibold">Item</td><td>text <Token nombre="dash-muted" /> · hover black 5%</td></tr>
       <tr><td className="font-semibold">Active item</td><td><Token nombre="dash-blue" /> · text <Token nombre="white" /></td></tr>
