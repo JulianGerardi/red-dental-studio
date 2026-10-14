@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useContext, useEffect, useState, type ReactNode } from 'react'
 import {
   Bookmark, Pencil, Plus, MoreVertical, CornerUpLeft, ChevronDown, ChevronRight, Captions, Check, Eye, Save, Link2, ClipboardList, Scan, GripVertical, Trash2, TimerOff, Ban, FilePen, CheckCheck, Presentation, CircleCheck, CircleX, CalendarCheck2, CalendarX2, CalendarDays, FileCheck2, FileClock, FileMinus2, FileX2, type LucideIcon,
 } from 'lucide-react'
@@ -21,6 +21,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
+import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
+import { useAnchoVisible } from '@/components/patients/ledger/useAnchoColumnas'
+import { DetalleRegistro, NavegacionClinica, registroDePlan, useVerRegistro, type DestinoClinico } from '@/components/clinical/RecordDetail'
 
 /* Figma 4118:220403 "Treatment Plan — Section (Cases, Workflow & Dialogs)":
    el rail de estados, la tabla de no asignados, el caso con sus visitas y los
@@ -466,7 +469,7 @@ export function Casilla({ on, onChange, label }: { on: boolean; onChange: (v: bo
 }
 
 export function TablaProcedimientos({
-  filas, acciones, consentimiento, seleccion, onSeleccion, onAccion, onCompletar, arrastrable, sinMenu,
+  filas, acciones, consentimiento, seleccion, onSeleccion, onAccion, onCompletar, arrastrable, sinMenu, detalle, abiertas, onAlternar,
 }: {
   filas: Procedimiento[]
   acciones?: boolean
@@ -481,18 +484,33 @@ export function TablaProcedimientos({
   onSeleccion?: (ids: string[]) => void
   onAccion: (p: Procedimiento) => void
   onCompletar?: () => void
+  /** Lo que se despliega debajo de la fila, como en la Problem List: chevron al inicio y clic en la fila. */
+  detalle?: (p: Procedimiento) => ReactNode
+  /** Las filas abiertas, cuando las maneja quien tiene el Collapse all / Expand all; sin esto, la tabla las maneja sola. */
+  abiertas?: string[]
+  onAlternar?: (id: string) => void
 }) {
   const conCasillas = !!seleccion && !!onSeleccion
   const todas = conCasillas && filas.length > 0 && filas.every((f) => seleccion.includes(f.id))
   const columnas = [...COLUMNAS, ...(consentimiento ? ['Consent'] : []), 'Actions']
+  const propias = useFilasAbiertas(filas.map((f) => f.id))
+  const abiertasDe = abiertas ?? propias.abiertas
+  const alternar = onAlternar ?? propias.alternar
+  const refVisible = useAnchoVisible<HTMLDivElement>()
+  const total = columnas.length + (arrastrable ? 1 : 0) + (detalle ? 1 : 0) + (conCasillas ? 1 : 0)
+  /* La fila se abre con un clic en cualquier lado menos en sus controles (casilla, menú, íconos). */
+  const alClic = (id: string) => (e: React.MouseEvent) => {
+    if (!(e.target as HTMLElement).closest('button, a, input, textarea')) alternar(id)
+  }
 
   return (
     <TooltipProvider delayDuration={200}>
-    <div className="overflow-x-auto">
+    <div ref={refVisible} className="overflow-x-auto">
       <table className="w-full min-w-[860px] border-collapse">
         <thead>
           <tr className="border-y border-line-soft bg-surface-alt">
             {arrastrable && <th className="w-8" aria-label="Drag" />}
+            {detalle && <th className="w-7" aria-hidden />}
             {conCasillas && (
               <th className="w-10 px-3">
                 <Casilla
@@ -510,19 +528,30 @@ export function TablaProcedimientos({
           </tr>
         </thead>
         <tbody>
-          {filas.map((p) => (
+          {filas.map((p) => {
+            const abierta = !!detalle && abiertasDe.includes(p.id)
+            const elegida = conCasillas && seleccion.includes(p.id)
+            return (
+            <Fragment key={p.id}>
             <tr
-              key={p.id}
               draggable={arrastrable}
               onDragStart={arrastrable ? (e) => { e.dataTransfer.setData('text/plain', p.id); e.dataTransfer.effectAllowed = 'move' } : undefined}
+              tabIndex={detalle ? 0 : undefined}
+              aria-expanded={detalle ? abierta : undefined}
+              onClick={detalle ? alClic(p.id) : undefined}
+              onKeyDown={detalle ? (e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); alternar(p.id) } } : undefined}
               className={cn(
                 'border-b border-line-soft last:border-0',
-                conCasillas && seleccion.includes(p.id) && 'bg-dash-count-bg',
+                elegida ? 'bg-dash-count-bg' : abierta && 'bg-surface-subtle',
+                detalle && 'cursor-pointer transition-colors hover:bg-surface-subtle focus-visible:bg-surface-subtle focus-visible:outline-none',
                 arrastrable && 'cursor-grab active:cursor-grabbing',
               )}
             >
               {arrastrable && (
                 <td className="pl-3 text-ink-faint" aria-label={`Drag ${p.codigo} to another visit`}><GripVertical className="size-4" /></td>
+              )}
+              {detalle && (
+                <td className="pl-3"><ChevronRight aria-hidden className={cn('size-4 text-ink-faint transition-transform', abierta && 'rotate-90')} /></td>
               )}
               {conCasillas && (
                 <td className="px-3">
@@ -538,9 +567,11 @@ export function TablaProcedimientos({
               <td className="h-12 px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.fecha}</td>
               <td className="px-3 text-[13px] text-ink-soft">{p.superficie}</td>
               <td className="px-3 text-[13px] text-ink-soft">{p.pieza}</td>
-              <td className="px-3 text-[13px] text-ink-soft">{p.ubicacion}</td>
-              <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">
-                {p.codigo} {p.nombre}
+              <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.ubicacion}</td>
+              {/* La celda corta los nombres largos (D7140 Extraction…) en vez de estirar la tabla; el nombre entero está en
+                  el tooltip y en el detalle, como en la tabla del Overview. */}
+              <td className="w-full max-w-0 min-w-[160px] px-3 text-[13px] text-ink-soft">
+                <span className="block truncate" title={`${p.codigo} ${p.nombre}`}>{p.codigo} {p.nombre}</span>
               </td>
               <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft">{p.proveedor}</td>
               <td className="px-3 text-[13px] whitespace-nowrap text-ink-soft tabular-nums">{p.fee}</td>
@@ -579,12 +610,40 @@ export function TablaProcedimientos({
                 </span>
               </td>
             </tr>
-          ))}
+            {/* Con la tabla más ancha que la vista, el detalle queda fijo en la parte que se ve (como en DataTable). */}
+            {abierta && (
+              <tr className="border-b border-line-soft last:border-0">
+                <td colSpan={total} className="p-0">
+                  <div className="sticky left-0 w-[var(--tabla-visible,100%)] bg-surface-subtle px-4 py-3 pl-11 text-[13px] text-ink-soft">{detalle(p)}</div>
+                </td>
+              </tr>
+            )}
+            </Fragment>
+            )
+          })}
         </tbody>
       </table>
     </div>
     </TooltipProvider>
   )
+}
+
+/* Las filas abiertas de una o varias tablas, con Collapse all / Expand all como en DataTable (desde que hay una abierta). */
+function useFilasAbiertas(ids: string[]) {
+  const [abiertas, setAbiertas] = useState<string[]>([])
+  const hay = ids.some((id) => abiertas.includes(id))
+  const alternar = (id: string) => setAbiertas((a) => (a.includes(id) ? a.filter((x) => x !== id) : [...a, id]))
+  const boton = hay && (
+    <div className="flex">
+      <BotonExpandirTodo
+        todasAbiertas={ids.every((id) => abiertas.includes(id))}
+        hayAlgunaAbierta
+        onExpandirTodo={() => setAbiertas((a) => [...new Set([...a, ...ids])])}
+        onColapsarTodo={() => setAbiertas((a) => a.filter((x) => !ids.includes(x)))}
+      />
+    </div>
+  )
+  return { abiertas, alternar, boton }
 }
 
 /* ── Caso ─────────────────────────────────────────────────────────── */
@@ -646,7 +705,7 @@ export function CitaVisita({ cita }: { cita?: Cita }) {
    permiso (`sinPermiso`) lleva el aviso de acceso limitado y tampoco se edita. Las filas de las visitas se marcan
    siempre; lo que se hace con ellas depende del estado. */
 export function VistaCaso({
-  caso, favorito, onFavorito, onDialogo, onMover, onCompletar, onNuevaAlternativa, onVisitas,
+  caso, favorito, onFavorito, onDialogo, onMover, onCompletar, onNuevaAlternativa, onVisitas, detalle,
 }: {
   caso: Caso
   favorito: boolean
@@ -656,8 +715,12 @@ export function VistaCaso({
   onCompletar: () => void
   onNuevaAlternativa?: () => void
   onVisitas?: (visitas: Visita[]) => void
+  /** El detalle de cada fila de las visitas (el de la Problem List). */
+  detalle?: (p: Procedimiento) => ReactNode
 }) {
   const [categoria, setCategoria] = useState('')
+  /* Un solo Collapse all / Expand all para las filas de todas las visitas. */
+  const filas = useFilasAbiertas(caso.visitas.flatMap((v) => v.procedimientos.map((p) => p.id)))
   const [notas, setNotas] = useState('')
   const [colapsado, setColapsado] = useState(false)
   const [soltando, setSoltando] = useState<string | null>(null)
@@ -842,6 +905,8 @@ export function VistaCaso({
         </div>
       )}
 
+      {filas.boton}
+
       {/* El turno de la visita va afuera de su tabla, arriba a la derecha; la visita queda como estaba. */}
       {caso.visitas.map((v) => (
         <section key={v.id} aria-label={v.nombre} className="flex flex-col gap-2">
@@ -865,6 +930,9 @@ export function VistaCaso({
               onSeleccion={marcarEn(v.procedimientos.map((p) => p.id))}
               onAccion={() => onDialogo('removeProcedure')}
               onCompletar={onCompletar}
+              detalle={detalle}
+              abiertas={filas.abiertas}
+              onAlternar={filas.alternar}
             />
           </div>
         </section>
@@ -904,6 +972,21 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
   const caso = casos.find((c) => c.id === casoId) ?? casos[0]!
   const cambiarCaso = (cambio: Partial<Caso>) => setCasos((cs) => cs.map((c) => (c.id === caso.id ? { ...c, ...cambio } : c)))
 
+  /* Cada fila se despliega con el detalle de la Problem List (Julián, 2026-10-13). Un hallazgo o procedimiento
+     vinculado se abre en el drawer de View full record; el link a un caso lo abre acá mismo. Ver clinical-mode.md. */
+  const { contexto, drawer } = useVerRegistro()
+  const noAsignadas = useFilasAbiertas(NO_ASIGNADOS.map((p) => p.id))
+  const alternativas = casos.filter((c) => c.grupo === caso.grupo && c.creado === caso.creado)
+  const detalle = (deCaso?: Caso) => (p: Procedimiento) => (
+    <DetalleRegistro registro={registroDePlan(p, deCaso, deCaso && alternativas)} contexto={contexto} />
+  )
+  const fuera = useContext(NavegacionClinica)
+  const ir = (d: DestinoClinico) => {
+    if (d.pestana === 'Treatment Plan') { if (d.caso) { setCasoId(d.caso); setVista('caso') } }
+    else if (fuera) fuera(d)
+    else aviso.info(`Opens ${d.pestana}.`)
+  }
+
   /* La alternativa nace como copia del caso, en Planning y con la misma fecha: queda al lado en la lista. */
   const nuevaAlternativa = () => {
     const id = `${caso.id}-alt-${Date.now()}`
@@ -917,6 +1000,7 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
     setFavoritos((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]))
 
   return (
+    <NavegacionClinica.Provider value={ir}>
     <div className="flex flex-col gap-4 lg:flex-row">
       <Rail
         casos={casos}
@@ -976,12 +1060,16 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
                 </button>
               </div>
             )}
+            {noAsignadas.boton && <div className="mt-3">{noAsignadas.boton}</div>}
             <div className="mt-4 -mx-4 sm:-mx-5">
               <TablaProcedimientos
                 filas={NO_ASIGNADOS}
                 seleccion={seleccion}
                 onSeleccion={setSeleccion}
                 onAccion={() => setDialogo('removeProcedure')}
+                detalle={detalle()}
+                abiertas={noAsignadas.abiertas}
+                onAlternar={noAsignadas.alternar}
               />
             </div>
             {/* El pie del frame dice "insurances" en una tabla de
@@ -1001,6 +1089,7 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
             onCompletar={() => setCompletar(true)}
             onNuevaAlternativa={nuevaAlternativa}
             onVisitas={(visitas) => cambiarCaso({ visitas })}
+            detalle={detalle(caso)}
           />
         )}
       </div>
@@ -1028,6 +1117,8 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
           }}
         />
       )}
+      {drawer}
     </div>
+    </NavegacionClinica.Provider>
   )
 }

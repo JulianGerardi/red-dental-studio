@@ -13,10 +13,10 @@ import { Pill, type PillTone } from '@/components/ui/pill'
 import { Drawer, DrawerSection } from '@/components/ui/drawer'
 import { ORDEN_TONO } from '@/components/clinical/LabOrderPanel'
 import { CitaVisita, EstadoConsentimiento, SIN_CONSENTIMIENTO_NI_TURNO, TONO_CASO, estadoGrupo } from '@/components/clinical/TreatmentPlanSection'
-import { codigoDiagnostico } from '@/components/clinical/dental/data'
+import { codigoDiagnostico, type Finding, type FindingStatus } from '@/components/clinical/dental/data'
 import { CASOS, CONSENTIMIENTO, type Caso, type Procedimiento, type Visita } from '@/data/treatment-plan'
 import {
-  DERIVACIONES_PROBLEMA, VINCULOS_PROCEDIMIENTO,
+  DERIVACIONES_PROBLEMA, PROBLEMAS, PROCEDIMIENTOS, VINCULOS_PROCEDIMIENTO,
   type Derivacion, type EstadoDerivacion, type EstadoProblema, type EstadoProcedimiento, type OrdenVinculada, type Pestana,
   type Problema, type ProcedimientoPaciente,
 } from '@/data/clinical-mode'
@@ -55,6 +55,9 @@ const PESTANA_EXAMEN: Record<string, Pestana> = {
   Intraoral: 'Intra Oral', Extraoral: 'Extra Oral', Physical: 'Physical', ROS: 'Ros', 'Dental Assessment': 'DentAssmt',
   Periodontal: 'Periodontal', Radiography: 'Radiography',
 }
+
+/** El nombre del examen como lo escribe la Problem List, desde su pestaña (DentAssmt → Dental Assessment). */
+export const examenDePestana = (p: string) => Object.keys(PESTANA_EXAMEN).find((e) => PESTANA_EXAMEN[e] === p) ?? p
 
 /* ── Datos de cada registro ───────────────────────────────────────── */
 
@@ -196,6 +199,7 @@ export function ContenidoProcedimientos({ procedimientos, onAbrir }: { procedimi
 
 export function ContenidoExamen({ problema }: { problema: Problema }) {
   const ir = useIr()
+  if (!problema.examen) return <Vacio>No source exam recorded.</Vacio>
   const pestana = PESTANA_EXAMEN[problema.examen]
   return (
     <Entrada sub={`Charted ${problema.fecha} · ${problema.proveedor}`}>
@@ -294,9 +298,12 @@ export function ContenidoAplicadas({ cargo }: { cargo?: Movimiento }) {
 
 /* ── El detalle de la fila ────────────────────────────────────────── */
 
-type Registro =
-  | { tipo: 'procedimiento'; r: ProcedimientoPaciente }
-  | { tipo: 'problema'; r: Problema }
+/* `plan`: el procedimiento se abre desde Treatment Plan, y su caso es el que se está viendo (sin caso, es suelto).
+   `descriptor`: el hallazgo viene del panel de Findings de un examen, que lo lleva. */
+type Plan = { t?: Tratamiento }
+export type Registro =
+  | { tipo: 'procedimiento'; r: ProcedimientoPaciente; plan?: Plan }
+  | { tipo: 'problema'; r: Problema; descriptor?: string }
 
 /* Lo que el detalle necesita de la tabla: las listas al día (un estado cambiado desde el menú se ve en el detalle) y
    cómo abrir un registro de la otra pestaña. */
@@ -307,10 +314,10 @@ export type ContextoDetalle = {
   onAbrirProcedimiento: (p: ProcedimientoPaciente) => void
 }
 
-function datosProcedimiento(r: ProcedimientoPaciente, c: ContextoDetalle) {
+function datosProcedimiento(r: ProcedimientoPaciente, c: ContextoDetalle, plan?: Plan) {
   const v = VINCULOS_PROCEDIMIENTO[r.id]
   return {
-    t: tratamientoDe(r),
+    t: plan ? plan.t : tratamientoDe(r),
     ordenes: v?.ordenes ?? [],
     derivaciones: v?.derivaciones ?? [],
     hallazgos: c.problemas.filter((p) => v?.problemas?.includes(p.id)),
@@ -341,7 +348,7 @@ export function DetalleRegistro({ registro, contexto }: { registro: Registro; co
   return (
     <>
       <ListaDetalle titulo={nombreDe(registro)} lado={lugar} pie={<VerRegistroCompleto onClick={() => setCompleto(true)} />}>
-        {registro.tipo === 'procedimiento' ? <FilasProcedimiento r={registro.r} c={contexto} /> : <FilasProblema r={registro.r} c={contexto} />}
+        {registro.tipo === 'procedimiento' ? <FilasProcedimiento r={registro.r} c={contexto} plan={registro.plan} /> : <FilasProblema r={registro.r} c={contexto} />}
       </ListaDetalle>
       <RegistroCompletoDrawer registro={completo ? registro : null} contexto={contexto} onClose={() => setCompleto(false)} />
     </>
@@ -351,8 +358,8 @@ export function DetalleRegistro({ registro, contexto }: { registro: Registro; co
 /* El orden va por importancia (Julián, 2026-10-13): procedimiento Treatment, consentimiento, hallazgos, Referral y
    Lab order, y después lo del cobro (sede, plata y aplicaciones); problema Procedures, Treatment, Referral, Lab order y
    Source exam. Ver clinical-mode.md. */
-export function FilasProcedimiento({ r, c }: { r: ProcedimientoPaciente; c: ContextoDetalle }) {
-  const d = datosProcedimiento(r, c)
+export function FilasProcedimiento({ r, c, plan }: { r: ProcedimientoPaciente; c: ContextoDetalle; plan?: Plan }) {
+  const d = datosProcedimiento(r, c, plan)
   return (
     <>
       <FilaDetalle titulo="Treatment"><ContenidoTratamiento t={d.t} visitas /></FilaDetalle>
@@ -396,7 +403,8 @@ export function RegistroCompletoDrawer({ registro, contexto, onClose }: { regist
   const campos: [string, ReactNode][] = [
     ['Date', r.fecha], ['Location', guion(r.ubicacion)], ['Tooth', r.pieza ?? '—'], ['Surface', guion(r.superficie)],
     ['Provider', r.proveedor], ['Status', pill(esProc ? TONO_PROCEDIMIENTO[registro.r.estado] : TONO_PROBLEMA[registro.r.estado], r.estado, true)],
-    ...(!esProc ? [['Exam', registro.r.examen] as [string, ReactNode]] : []),
+    ...(!esProc ? [['Exam', guion(registro.r.examen)] as [string, ReactNode]] : []),
+    ...(!esProc && registro.descriptor ? [['Descriptors', registro.descriptor] as [string, ReactNode]] : []),
   ]
   /* Al abrir otro registro o ir a otra pantalla, el drawer se cierra. */
   const cerrarY = <T,>(f: (x: T) => void) => (x: T) => { onClose(); f(x) }
@@ -425,15 +433,15 @@ export function RegistroCompletoDrawer({ registro, contexto, onClose }: { regist
               </div>
             </dl>
           </DrawerSection>
-          {esProc ? <SeccionesProcedimiento r={registro.r} c={ctx} /> : <SeccionesProblema r={registro.r} c={ctx} />}
+          {esProc ? <SeccionesProcedimiento r={registro.r} c={ctx} plan={registro.plan} /> : <SeccionesProblema r={registro.r} c={ctx} />}
         </div>
       </Drawer>
     </NavegacionClinica.Provider>
   )
 }
 
-export function SeccionesProcedimiento({ r, c }: { r: ProcedimientoPaciente; c: ContextoDetalle }) {
-  const d = datosProcedimiento(r, c)
+export function SeccionesProcedimiento({ r, c, plan }: { r: ProcedimientoPaciente; c: ContextoDetalle; plan?: Plan }) {
+  const d = datosProcedimiento(r, c, plan)
   return (
     <>
       <DrawerSection title="Treatment"><ContenidoTratamiento t={d.t} visitas completo /></DrawerSection>
@@ -459,4 +467,57 @@ export function SeccionesProblema({ r, c }: { r: Problema; c: ContextoDetalle })
       <DrawerSection title="Source exam"><ContenidoExamen problema={r} /></DrawerSection>
     </>
   )
+}
+
+/* ── Desde otras pantallas ────────────────────────────────────────── */
+
+/* Julián (2026-10-13): lo de la Problem List también se ve parado en un examen (el menú de cada finding) y en Treatment
+   Plan (cada fila se despliega). Ver clinical-mode.md. */
+
+const ESTADO_HALLAZGO: Record<FindingStatus, EstadoProblema> = {
+  Active: 'Active', Monitoring: 'Monitoring', 'In Treatment': 'In treatment', Treated: 'Treated', 'Externally Treated': 'Externally treated',
+  'No Treatment Needed': 'No treatment needed', 'Patient Declined': 'Patient declined', 'Clinic Declined': 'Clinic declined', Discarded: 'Discarded',
+}
+
+/** Un finding del panel de un examen como registro: sus datos y, si es una fila de la Problem List, lo vinculado a ella. */
+export function registroDeHallazgo(f: Finding): Registro {
+  return {
+    tipo: 'problema',
+    descriptor: f.descriptor,
+    r: {
+      id: f.problema ?? f.id, fecha: f.date, ubicacion: f.tooth === null ? f.area : '-', pieza: f.tooth ?? undefined,
+      superficie: f.surfaces.join(', ') || '-', condicion: f.condition.charAt(0).toUpperCase() + f.condition.slice(1),
+      examen: f.examen ?? '', proveedor: f.provider, nota: f.notes || undefined, estado: ESTADO_HALLAZGO[f.status],
+    },
+  }
+}
+
+/** Un procedimiento de Treatment Plan como registro: los datos de su fila, el caso donde está (`grupo`: sus alternativas)
+    y lo vinculado al procedimiento del paciente que es (VINCULOS_PROCEDIMIENTO). Sin caso, es un procedimiento suelto. */
+export function registroDePlan(p: Procedimiento, caso?: Caso, grupo: Caso[] = caso ? [caso] : []): Registro {
+  const vinculado = PROCEDIMIENTOS.find((pr) => VINCULOS_PROCEDIMIENTO[pr.id]?.caso?.procedimiento === p.id)
+  const visita = caso?.visitas.find((v) => v.procedimientos.some((x) => x.id === p.id))
+  return {
+    tipo: 'procedimiento',
+    plan: { t: caso && { caso, grupo, visita, procCaso: p } },
+    r: {
+      id: vinculado?.id ?? p.id, fecha: p.fecha, ubicacion: p.ubicacion, pieza: Number(p.pieza) || undefined, superficie: p.superficie,
+      codigo: p.codigo, nombre: p.nombre, proveedor: p.proveedor,
+      /* Removed es quitarlo del plan: para el paciente queda descartado. */
+      estado: p.estado === 'Removed' ? 'Discarded' : p.estado,
+    },
+  }
+}
+
+/** Fuera de la tabla del Overview el registro se abre en el drawer de View full record, y un link a otro registro
+    cambia el drawer a ese: no se sale de la pantalla. Los links a otra pestaña siguen yendo a esa pestaña. */
+export function useVerRegistro() {
+  const [viendo, setViendo] = useState<Registro | null>(null)
+  const contexto: ContextoDetalle = {
+    problemas: PROBLEMAS,
+    procedimientos: PROCEDIMIENTOS,
+    onAbrirProblema: (r) => setViendo({ tipo: 'problema', r }),
+    onAbrirProcedimiento: (r) => setViendo({ tipo: 'procedimiento', r }),
+  }
+  return { ver: setViendo, contexto, drawer: <RegistroCompletoDrawer registro={viendo} contexto={contexto} onClose={() => setViendo(null)} /> }
 }

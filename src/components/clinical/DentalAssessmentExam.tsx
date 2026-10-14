@@ -15,7 +15,7 @@ export function DentalAssessmentExam() {
   const [lienzo, setLienzo] = useState<HTMLDivElement | null>(null)
 
   return (
-    <ExamLayout>
+    <ExamLayout examen="Dental Assessment">
       <div ref={setLienzo} className="relative flex min-w-0 flex-col items-center gap-3 overflow-x-auto rounded-xl border border-line p-4" data-examen style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fafbfe' }}>
         <OdontogramEmbed controlesAbiertos={false} onCerrarControles={() => {}} accionesBarra={<BotoneraDientes raiz={lienzo} />} />
       </div>

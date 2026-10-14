@@ -2237,3 +2237,42 @@ Las fechas del Ledger (2025) y las de Clinical Mode (2026) vienen de mocks disti
 
 El drawer de *View full record* sigue el mismo orden. Las piezas de la lista pasan a `ui/detail-list`
 (*Components / UI / DetailList*).
+
+## El detalle de la Problem List desde un examen y desde Treatment Plan (2026-10-13)
+
+Julián: la Problem List lista todos los findings, pero parado en un examen también hay que poder ver esa información,
+desde los tres puntos de cada finding; y cada tabla de Treatment Plan (Unassigned y los casos por fecha) tiene que
+desplegarse como la Problem List, porque ahí se ve el estado del consentimiento.
+
+1. **Findings del examen** (`ExamLayout`): el menú de cada finding empieza con **View full record**, junto a Edit (mirar
+   antes de cambiar). Abre el mismo drawer de sólo lectura de la Problem List: los datos del finding (con
+   *Descriptors*, que la tabla no tiene) y Procedures, Treatment, Referrals, Lab orders y Source exam. Un hallazgo o
+   procedimiento vinculado cambia el drawer a ese registro sin salir del examen; un caso, una orden, una derivación o un
+   examen llevan a su pestaña. No se suma un desplegable en la card: el panel mide 300px y el drawer es el patrón de
+   "ver todo" (Pop ups = drawer).
+2. **Los findings del examen y las filas de la Problem List son mocks distintos.** Cada finding lleva ahora `examen`
+   (el Source exam; lo cargado desde un examen toma ese examen) y, si es una fila de la tabla, `problema`. Hoy sólo
+   *Tooth 3 · chronic enamel dental caries* es una fila (p5: procedimiento D2391 en Restorative Plan); los otros cuatro
+   muestran las filas vacías ("No procedures linked."). El estado y los datos del drawer son los del finding.
+3. **Treatment Plan**: cada fila de Unassigned y de las visitas de un caso se despliega con el detalle de la Problem
+   List (`detalle` de `TablaProcedimientos`): chevron, clic en la fila menos en sus controles (casilla, menú, íconos;
+   arrastrar sigue igual) y un solo *Collapse all / Expand all* arriba de las visitas del caso o de Unassigned, desde
+   que hay una abierta. El detalle muestra el caso que se está viendo con la visita y su turno, **Procedure consent**
+   (el estado del consentimiento de ese procedimiento, o que se genera al aceptar), los hallazgos, derivaciones y
+   órdenes del procedimiento del paciente que es, y lo cobrado. Una fila suelta no tiene caso ni consentimiento: esas
+   filas quedan y lo dicen. El link al caso lo abre en Treatment Plan mismo; un hallazgo, en el drawer.
+4. **Las filas del caso que son procedimientos del paciente llevan sus datos** (`DEL_PACIENTE` en
+   `data/treatment-plan.ts`): c1v2p1 D4341 Upper Arch, c3v1p1 D2391 pieza 3 O, c3v1p2 D2392 pieza 14 O, D, c5v2p1 D3330
+   pieza 19 y c7v1p1 D7140 pieza 16. Antes decían D0120 pieza 1 como el resto del frame, y el detalle mostraba un
+   hallazgo de la pieza 3 debajo de una fila de la pieza 1. Fecha, provider y fee quedan como el frame.
+5. **Procedure** corta los nombres largos con "…" (tooltip con el nombre entero; el detalle lo muestra completo), como
+   la tabla del Overview, y **Location** no se parte: con el chevron y los nombres reales la visita de un caso aceptado
+   pedía 1054px en 1026. A 1440 entra entera; más angosto scrollea de costado como antes y el detalle queda en la parte
+   visible.
+
+Radiography no cambia: sus findings viven en el visor de cada placa y no tienen menú.
+
+Para validar con usuarios: si en el examen alcanza con el drawer o hace falta ver el resumen sin abrir nada, y si el
+odontólogo usa el detalle de Treatment Plan para revisar el consentimiento antes de la visita o sigue mirando la columna
+Consent.
+

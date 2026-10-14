@@ -5,12 +5,14 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { Bloque, Lienzo, Tabla, Token } from '@/design-system/kit'
 import { esperar } from '@/design-system/play'
 import { PROBLEMAS, PROCEDIMIENTOS } from '@/data/clinical-mode'
+import { CASOS, NO_ASIGNADOS } from '@/data/treatment-plan'
+import type { Finding } from './dental/data'
 import {
   ContenidoConsentimiento, ContenidoDerivaciones, ContenidoExamen, FilasProblema, FilasProcedimiento,
   ContenidoHallazgos, ContenidoOrdenes, ContenidoProcedimientos, ContenidoTratamiento, DetalleRegistro,
   ContenidoAplicadas, ContenidoFinanzas, ContenidoSede, Metrica, cargoDe,
-  RegistroCompletoDrawer, SeccionesProblema, SeccionesProcedimiento,
-  type ContextoDetalle,
+  RegistroCompletoDrawer, SeccionesProblema, SeccionesProcedimiento, registroDeHallazgo, registroDePlan,
+  type ContextoDetalle, type Registro,
 } from './RecordDetail'
 
 /* En la app los links cambian de pestaña (ClinicalMode provee NavegacionClinica); acá avisan adónde irían. */
@@ -51,6 +53,8 @@ const meta = {
           'El detalle que se despliega en cada fila de la tabla del Overview de Clinical Mode (**Problem List** y **Procedures**), con el mismo desplegable del Ledger: el chevron, clic en la fila, y *Expand all / Collapse all* desde que hay una abierta (`rowDetail` de Elements / Tables).',
           '',
           '**Qué muestra:** lo que cuelga del registro, en una **lista sin cards**: una fila debajo de la otra, el título a la izquierda y los datos a la derecha, cada dato en una línea. Van por importancia (Julián, 2026-10-13). Un procedimiento: *Treatment* (el caso, su grupo, la visita con su turno, las otras visitas y los casos históricos), *Procedure consent*, *Findings / diagnoses*, *Referral* y *Lab order*, y después lo del cobro (prototipo *Expanded transaction detail*): *Clinic location*, *Financial details* (cargo, seguro, pagos y ajustes aplicados, y lo que falta de ese cargo) y *Applied transactions* (qué se aplicó, cuándo y cuánto; la referencia abre la transacción). Un problema: *Procedures*, *Treatment*, *Referral*, *Lab order* (con el procedimiento relacionado) y *Source exam*. Lo que no entra en el resumen se pliega detrás de "N more…". Las piezas de la lista son *Components / UI / DetailList*, las mismas del detalle del Ledger.',
+          '',
+          '**También fuera de la tabla** (2026-10-13): en cada fila de **Treatment Plan** (Unassigned y las visitas de un caso; `registroDePlan`: el caso que se está viendo y lo del procedimiento del paciente que es) y en el menú de cada finding de un **examen** (*View full record*; `registroDeHallazgo`: los datos del finding y lo de su fila de la Problem List). Ahí un hallazgo o procedimiento vinculado se abre en el mismo drawer (`useVerRegistro`), sin salir de la pantalla.',
           '',
           '**Reusa** lo que ya hay: el turno de la visita de Treatment Plan (`CitaVisita`), el estado de consentimiento de sus tablas, las pills de caso, de Lab Order y de la tabla, y el drawer para *View full record*. Cada link lleva a la pantalla donde se trabaja (Treatment Plan con el caso abierto, Lab Order, Referral, el examen) o abre el registro en la otra pestaña. Sólo lectura.',
           '',
@@ -105,6 +109,9 @@ export const Parts: Story = {
             <tr><td className="font-semibold">Applied transactions</td><td>Fecha, tipo, la transacción (abre su registro de sólo lectura, el mismo del Ledger) y lo aplicado a este cargo.</td><td>ContenidoAplicadas</td></tr>
             <tr><td className="font-semibold">Clinic location</td><td>La sede donde se hizo (la del cargo). Se llama así para no confundirla con la columna Location de la tabla, que es la zona de la boca.</td><td>ContenidoSede</td></tr>
             <tr><td className="font-semibold">Full record</td><td>Drawer de sólo lectura: los datos de la fila de a dos y una sección por fila de la lista. Close y Edit.</td><td>RegistroCompletoDrawer, SeccionesProcedimiento, SeccionesProblema</td></tr>
+            <tr><td className="font-semibold">From Treatment Plan</td><td>La fila de un caso o suelta como registro: sus datos, el caso que se está viendo (Treatment y Procedure consent) y lo vinculado al procedimiento del paciente que es.</td><td>registroDePlan</td></tr>
+            <tr><td className="font-semibold">From an exam</td><td>Un finding del panel de un examen como registro: sus datos (con Descriptors) y lo de su fila de la Problem List, si la tiene.</td><td>registroDeHallazgo</td></tr>
+            <tr><td className="font-semibold">Outside the table</td><td>El drawer y los links de un examen o de Treatment Plan: un registro vinculado cambia el drawer a ese.</td><td>useVerRegistro</td></tr>
           </Tabla>
         </Bloque>
       </Lienzo>
@@ -116,6 +123,24 @@ export const Parts: Story = {
 
 const procDe = (id: string) => PROCEDIMIENTOS.find((p) => p.id === id)!
 const probDe = (id: string) => PROBLEMAS.find((p) => p.id === id)!
+const c3 = CASOS.find((c) => c.id === 'c3')!
+
+/* Un registro armado desde otra pantalla (Treatment Plan), en el mismo marco de la fila. */
+function EnRegistro({ registro }: { registro: Registro }) {
+  return (
+    <TooltipProvider>
+      <div className="rounded-lg border border-line-row bg-surface-subtle px-4 py-3 pl-11 text-[13px] text-ink-soft" style={{ width: ANCHOS.wide }}>
+        <DetalleRegistro registro={registro} contexto={CONTEXTO} />
+      </div>
+    </TooltipProvider>
+  )
+}
+
+/* El finding Tooth 3 del panel de un examen: es la fila Chronic enamel dental caries de la Problem List. */
+const HALLAZGO: Finding = {
+  id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: 'May 14, 2026', status: 'Discarded',
+  tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [], examen: 'Dental Assessment', problema: 'p5',
+}
 
 export const States: Story = {
   parameters: { controls: { disable: true }, docs: { story: { inline: true } } },
@@ -145,6 +170,12 @@ export const States: Story = {
         </Bloque>
         <Bloque titulo="Problem with its own referral" nota="Un problema derivado sin procedimiento: la derivación es del problema.">
           <EnFila tipo="problem" procedure="pr10" problem="p11" ancho="wide" />
+        </Bloque>
+        <Bloque titulo="From Treatment Plan" nota="La fila D2391 de Restorative Plan: el caso que se está viendo, el consentimiento Pending de ese procedimiento y el hallazgo que resuelve.">
+          <EnRegistro registro={registroDePlan(c3.visitas[0]!.procedimientos[0]!, c3)} />
+        </Bloque>
+        <Bloque titulo="Unassigned procedure" nota="Una fila suelta de Treatment Plan: sin caso ni consentimiento.">
+          <EnRegistro registro={registroDePlan(NO_ASIGNADOS[0]!)} />
         </Bloque>
         <Bloque titulo="Overlay width" nota="790px, el flotante de View Problem List: la misma lista, con el título a la izquierda.">
           <EnFila tipo="procedure" procedure="pr6" problem="p9" ancho="overlay" />
@@ -192,6 +223,17 @@ export const FullRecordProblem: Story = {
   ),
 }
 
+/* El drawer desde el menú de un finding de un examen: los datos del finding, con Descriptors, y lo de su fila. */
+export const FullRecordFinding: Story = {
+  name: 'Full record · exam finding',
+  parameters: { controls: { disable: true }, docs: { story: { inline: false, iframeHeight: 720 } } },
+  render: () => (
+    <TooltipProvider>
+      <RegistroCompletoDrawer registro={registroDeHallazgo(HALLAZGO)} contexto={CONTEXTO} onClose={() => {}} />
+    </TooltipProvider>
+  ),
+}
+
 /* Las secciones del drawer y los contenidos sueltos, para ver cada uno sin el marco. */
 export const Contents: Story = {
   parameters: { controls: { disable: true }, docs: { story: { inline: true } } },
@@ -211,7 +253,7 @@ export const Contents: Story = {
             <div><ContenidoHallazgos hallazgos={[probDe('p5')]} onAbrir={CONTEXTO.onAbrirProblema} completo /></div>
             <div><ContenidoProcedimientos procedimientos={[procDe('pr6')]} onAbrir={CONTEXTO.onAbrirProcedimiento} /></div>
             <div><ContenidoConsentimiento t={undefined} /></div>
-            <div><ContenidoExamen problema={probDe('p7')} /></div>
+            <div><ContenidoExamen problema={probDe('p7')} /><ContenidoExamen problema={{ ...probDe('p7'), examen: '' }} /></div>
             <div><ContenidoSede cargo={cargoDe(procDe('pr11'))} /></div>
             <div className="md:col-span-2"><ContenidoFinanzas cargo={cargoDe(procDe('pr11'))} /></div>
             <div className="md:col-span-3"><ContenidoAplicadas cargo={cargoDe(procDe('pr11'))} /></div>
@@ -260,6 +302,7 @@ export const Specs: Story = {
           <li>Show the first items in the summary (the visit of the procedure, the finding and its diagnosis); the rest goes behind “N more…”. The full record shows everything.</li>
           <li>Statuses use the pills of their own screen: cases as in Treatment Plan, lab orders as in Lab Order, consent as in the visit table.</li>
           <li>No appointment and no consent before the case is accepted (Planning, Pending, Presented), as in Treatment Plan.</li>
+          <li>The same detail wherever the record is opened: the Overview table, View Problem List, a Treatment Plan row or an exam finding.</li>
         </ul>
       </Bloque>
     </Lienzo>

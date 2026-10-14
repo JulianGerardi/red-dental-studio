@@ -138,3 +138,16 @@ test('el detalle de un procedimiento cobrado muestra la plata y lo aplicado', as
   await screen.getByRole('button', /Check payment ····1234/).tap()
   await expect(screen.getByRole('dialog', /Check payment/)).toBeVisible()
 })
+
+/* Parado en un examen, el menú de un finding abre lo mismo que la Problem List; un link cambia el drawer al registro. */
+test('el menú de un finding del examen abre su registro', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'DentAssmt').tap()
+  await screen.getByRole('button', /^Actions for Tooth 3$/).tap()
+  await screen.getByRole('menuitem', 'View full record').tap()
+
+  const drawer = screen.getByRole('dialog', /Chronic enamel dental caries/)
+  await expect(drawer.getByText('Source exam')).toBeVisible()
+  await drawer.getByRole('button', /^D2391 · Resin-based composite/).tap()
+  await expect(screen.getByRole('dialog', /D2391 · Resin-based composite/)).toBeVisible()
+})

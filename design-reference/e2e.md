@@ -40,6 +40,11 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   cierra (`ui/show-more`).
 - `tests/clinical-mode.e2e.ts` (2026-10-13): el detalle de D4341 en Procedures muestra Clinic location, Outstanding
   balance $170 y lo aplicado; la referencia de un pago abre su registro.
+  También: en DentAssmt, *View full record* del menú del finding Tooth 3 abre su registro (Source exam) y el link a
+  D2391 cambia el drawer a ese procedimiento.
+- `tests/treatment-plan.e2e.ts` (2026-10-13): una fila de Unassigned se despliega (No treatment linked, Collapse all), y
+  la fila D2391 de Restorative Plan muestra Procedure consent; su hallazgo se abre en el drawer sin salir de Treatment
+  Plan.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 

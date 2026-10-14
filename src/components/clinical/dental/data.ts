@@ -98,6 +98,10 @@ export type Finding = {
   /** Ids de los hallazgos del chart que este procedimiento resuelve. */
   linked: string[]
   diagnoses: string[]
+  /** El examen donde se cargó, con el nombre de la Problem List (Dental Assessment, Intraoral…). */
+  examen?: string
+  /** La fila de la Problem List que es este hallazgo: de ahí salen sus procedimientos, caso y derivaciones. */
+  problema?: string
 }
 
 /* Existing: algo que el paciente ya tiene hecho (una condition ya hecha); Planned: lo que se va a hacer. En Existing sólo

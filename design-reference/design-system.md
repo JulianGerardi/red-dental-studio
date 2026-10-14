@@ -770,3 +770,16 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   Financial details, Applied transactions: `ContenidoSede`, `ContenidoFinanzas`, `Metrica`, `ContenidoAplicadas`). States
   suma *Charged and partly paid* y *Paid by insurance*; Parts, Contents y Specs, las piezas nuevas. Decisiones en
   `figma/modulos/clinical-mode.md` (2026-10-13).
+
+## El detalle de la Problem List en los exámenes y en Treatment Plan (2026-10-13)
+
+- *Components / Clinical / Dental / FindingActionsMenu*: rehecha con Playground, Parts, States y Specs; suma *View full
+  record* (`onVer`), primero junto a Edit. *Components / Clinical / ExamLayout* suma *Finding record open* y Specs →
+  *Finding record*.
+- *Components / Clinical / TreatmentPlanSection table* (nueva): `TablaProcedimientos` con el detalle de fila
+  (`detalle`, `abiertas`, `onAlternar`): chevron, clic en la fila, Collapse all / Expand all, Procedure cortado con
+  tooltip. Playground, Parts, States, *Linked finding open* y Specs. Las stories sueltas de la tabla salen de
+  *TreatmentPlanSection parts*; *TreatmentPlanSection* suma *Row open*.
+- *Components / Clinical / RecordDetail*: `registroDePlan`, `registroDeHallazgo` y `useVerRegistro` en Parts; States suma
+  *From Treatment Plan* y *Unassigned procedure*; *Full record · exam finding* nueva. Decisiones en
+  `figma/modulos/clinical-mode.md` (2026-10-13).
