@@ -25,6 +25,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { Button } from '@/components/ui/button'
 import { TarjetaTurno } from '@/components/scheduling/TarjetaTurno'
+import { useFabDePagina } from '@/components/help/HelpProvider'
 
 
 /* Interruptor de lo que está en el tablero pero todavía no se usa. En false
@@ -42,6 +43,8 @@ export default function Scheduling() {
   /* Arranca cerrado: el panel de solicitudes es el estado desplegado del FAB
      y aparecía solo al entrar a Scheduling. */
   const [reqOpen, setReqOpen] = useState(false)
+  /* El FAB de solicitudes ocupa la esquina: Confibot se apila arriba (help.md). */
+  useFabDePagina()
   /* El detalle se queda con el turno entero: la hora y la fecha que muestra
      tienen que ser las del bloque que se clickeó, no un texto fijo. */
   const [detail, setDetail] = useState<{ ev: EventoConFecha; rect: DOMRect } | null>(null)
