@@ -10,7 +10,6 @@ import type { Finding } from './dental/data'
 import {
   ContenidoConsentimiento, ContenidoDerivaciones, ContenidoExamen, FilasProblema, FilasProcedimiento,
   ContenidoHallazgos, ContenidoOrdenes, ContenidoProcedimientos, ContenidoTratamiento, DetalleRegistro,
-  ContenidoAplicadas, ContenidoFinanzas, ContenidoSede, Metrica, cargoDe,
   RegistroCompletoDrawer, SeccionesProblema, SeccionesProcedimiento, registroDeHallazgo, registroDePlan,
   type ContextoDetalle, type Registro,
 } from './RecordDetail'
@@ -52,7 +51,7 @@ const meta = {
         component: [
           'El detalle que se despliega en cada fila de la tabla del Overview de Clinical Mode (**Problem List** y **Procedures**), con el mismo desplegable del Ledger: el chevron, clic en la fila, y *Expand all / Collapse all* desde que hay una abierta (`rowDetail` de Elements / Tables).',
           '',
-          '**Qué muestra:** lo que cuelga del registro, en una **lista sin cards**: una fila debajo de la otra, el título a la izquierda y los datos a la derecha, cada dato en una línea. Van por importancia (Julián, 2026-10-13). Un procedimiento: *Treatment* (el caso, su grupo, la visita con su turno, las otras visitas y los casos históricos), *Procedure consent*, *Findings / diagnoses*, *Referral* y *Lab order*, y después lo del cobro (prototipo *Expanded transaction detail*): *Clinic location*, *Financial details* (cargo, seguro, pagos y ajustes aplicados, y lo que falta de ese cargo) y *Applied transactions* (qué se aplicó, cuándo y cuánto; la referencia abre la transacción). Un problema: *Procedures*, *Treatment*, *Referral*, *Lab order* (con el procedimiento relacionado) y *Source exam*. Lo que no entra en el resumen se pliega detrás de "N more…". Las piezas de la lista son *Components / UI / DetailList*, las mismas del detalle del Ledger.',
+          '**Qué muestra:** lo que cuelga del registro, en una **lista sin cards**: una fila debajo de la otra, el título a la izquierda y los datos a la derecha, cada dato en una línea. Van por importancia (Julián, 2026-10-13). Un procedimiento: *Treatment* (el caso, su grupo, la visita con su turno, las otras visitas y los casos históricos), *Procedure consent*, *Findings / diagnoses*, *Referral* y *Lab order*. Lo del cobro (*Clinic location*, *Financial details*, *Applied transactions*) no va acá: está en el detalle de la fila del Ledger y de Billing (2026-10-14). Un problema: *Procedures*, *Treatment*, *Referral*, *Lab order* (con el procedimiento relacionado) y *Source exam*. Lo que no entra en el resumen se pliega detrás de "N more…". Las piezas de la lista son *Components / UI / DetailList*. **Pills:** una por dato, chicas y en minúscula inicial como en toda la app; el estado del grupo va como texto y sólo cuando no es el del caso.',
           '',
           '**También fuera de la tabla** (2026-10-13): en cada fila de **Treatment Plan** (Unassigned y las visitas de un caso; `registroDePlan`: el caso que se está viendo y lo del procedimiento del paciente que es) y en el menú de cada finding de un **examen** (*View full record*; `registroDeHallazgo`: los datos del finding y lo de su fila de la Problem List). Ahí un hallazgo o procedimiento vinculado se abre en el mismo drawer (`useVerRegistro`), sin salir de la pantalla.',
           '',
@@ -80,7 +79,7 @@ export const Playground: Story = { render: (args) => <EnFila {...args} /> }
 
 /* ── Parts ─────────────────────────────────────────────────────────── */
 
-const rProc = PROCEDIMIENTOS.find((p) => p.id === 'pr11')!
+const rProc = PROCEDIMIENTOS.find((p) => p.id === 'pr10')!
 const p9 = PROBLEMAS.find((p) => p.id === 'p9')!
 
 export const Parts: Story = {
@@ -91,7 +90,7 @@ export const Parts: Story = {
         <Bloque titulo="The detail, procedure" nota="Título completo y pieza arriba; la lista; al pie View full record y Read-only summary.">
           <EnFila tipo="procedure" procedure="pr10" problem="p9" ancho="wide" />
         </Bloque>
-        <Bloque titulo="Rows of a procedure" nota="FilasProcedimiento, por importancia: Treatment, Procedure consent, Findings / diagnoses, Referral y Lab order, y después Clinic location, Financial details y Applied transactions (del cargo del Ledger).">
+        <Bloque titulo="Rows of a procedure" nota="FilasProcedimiento, por importancia: Treatment, Procedure consent, Findings / diagnoses, Referral y Lab order.">
           <div className="@container flex w-[880px] max-w-full flex-col"><FilasProcedimiento r={rProc} c={CONTEXTO} /></div>
         </Bloque>
         <Bloque titulo="Rows of a problem" nota="FilasProblema, por importancia: Procedures, Treatment (sin visitas), Referral y Lab order con el procedimiento relacionado, y Source exam.">
@@ -105,9 +104,6 @@ export const Parts: Story = {
             <tr><td className="font-semibold">N more…</td><td>Lo que no entra en el resumen, plegado: visitas, casos históricos, hallazgos y diagnósticos.</td><td>MasItems (UI / DetailList)</td></tr>
             <tr><td className="font-semibold">Nothing linked</td><td>La fila queda y dice qué falta: así se sabe que no hay, no que no cargó.</td><td>Vacio (UI / DetailList)</td></tr>
             <tr><td className="font-semibold">Contents</td><td>Lo mismo en la fila y en el drawer: el drawer lo muestra todo, sin plegar.</td><td>ContenidoTratamiento, ContenidoOrdenes, ContenidoDerivaciones, ContenidoHallazgos, ContenidoConsentimiento, ContenidoProcedimientos, ContenidoExamen</td></tr>
-            <tr><td className="font-semibold">Financial details</td><td>El cargo del Ledger que cobra el procedimiento: cargo original, seguro, pagos, ajustes y Outstanding balance (destacado: el saldo de ese cargo, no el de la cuenta). Sin cargo: Not charged yet.</td><td>ContenidoFinanzas, Metrica</td></tr>
-            <tr><td className="font-semibold">Applied transactions</td><td>Fecha, tipo, la transacción (abre su registro de sólo lectura, el mismo del Ledger) y lo aplicado a este cargo.</td><td>ContenidoAplicadas</td></tr>
-            <tr><td className="font-semibold">Clinic location</td><td>La sede donde se hizo (la del cargo). Se llama así para no confundirla con la columna Location de la tabla, que es la zona de la boca.</td><td>ContenidoSede</td></tr>
             <tr><td className="font-semibold">Full record</td><td>Drawer de sólo lectura: los datos de la fila de a dos y una sección por fila de la lista. Close y Edit.</td><td>RegistroCompletoDrawer, SeccionesProcedimiento, SeccionesProblema</td></tr>
             <tr><td className="font-semibold">From Treatment Plan</td><td>La fila de un caso o suelta como registro: sus datos, el caso que se está viendo (Treatment y Procedure consent) y lo vinculado al procedimiento del paciente que es.</td><td>registroDePlan</td></tr>
             <tr><td className="font-semibold">From an exam</td><td>Un finding del panel de un examen como registro: sus datos (con Descriptors) y lo de su fila de la Problem List, si la tiene.</td><td>registroDeHallazgo</td></tr>
@@ -155,12 +151,6 @@ export const States: Story = {
         </Bloque>
         <Bloque titulo="Before the case is accepted" nota="Planning, Pending o Presented: la visita sin turno y el consentimiento todavía no existe (la misma regla que Treatment Plan).">
           <EnFila tipo="procedure" procedure="pr11" problem="p9" ancho="wide" />
-        </Bloque>
-        <Bloque titulo="Charged and partly paid" nota="D4341: $310 cobrados, con pago, ajuste y transferencia aplicados; faltan $170.">
-          <EnFila tipo="procedure" procedure="pr11" problem="p9" ancho="wide" />
-        </Bloque>
-        <Bloque titulo="Paid by insurance" nota="D0120: lo cubrió el seguro entero; Outstanding en $0.">
-          <EnFila tipo="procedure" procedure="pr9" problem="p9" ancho="wide" />
         </Bloque>
         <Bloque titulo="Empty" nota="Nada vinculado: cada fila queda y dice qué no hay (No treatment linked, No lab orders linked…).">
           <EnFila tipo="procedure" procedure="pr1" problem="p9" ancho="wide" />
@@ -254,11 +244,6 @@ export const Contents: Story = {
             <div><ContenidoProcedimientos procedimientos={[procDe('pr6')]} onAbrir={CONTEXTO.onAbrirProcedimiento} /></div>
             <div><ContenidoConsentimiento t={undefined} /></div>
             <div><ContenidoExamen problema={probDe('p7')} /><ContenidoExamen problema={{ ...probDe('p7'), examen: '' }} /></div>
-            <div><ContenidoSede cargo={cargoDe(procDe('pr11'))} /></div>
-            <div className="md:col-span-2"><ContenidoFinanzas cargo={cargoDe(procDe('pr11'))} /></div>
-            <div className="md:col-span-3"><ContenidoAplicadas cargo={cargoDe(procDe('pr11'))} /></div>
-            <div><ContenidoFinanzas cargo={undefined} /><ContenidoAplicadas cargo={undefined} /></div>
-            <div><dl className="grid grid-cols-2 gap-4"><Metrica label="Original charge" valor={310} /><Metrica label="Outstanding balance" valor={170} destacado /></dl></div>
           </div>
         </Bloque>
       </Lienzo>
@@ -279,8 +264,6 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Entry</td><td>Una línea de 24px como mínimo (el alto del botón de turno); si no entra, sigue en la siguiente.</td></tr>
           <tr><td className="font-semibold">Gap</td><td>12px entre el título del registro, la lista y el pie.</td></tr>
           <tr><td className="font-semibold">In the table</td><td>Debajo de la fila, con la sangría del chevron (44px) y fondo <code>surface-subtle</code>. Si la tabla scrollea de costado, el detalle queda fijo en la parte visible.</td></tr>
-          <tr><td className="font-semibold">Financial details</td><td>Números en columnas de 112px como mínimo, tantas como entren (5 en el Overview, 2 en el teléfono); el monto abajo de su rótulo, 15px; el que falta pagar en Semibold <Token nombre="dash-blue" />.</td></tr>
-          <tr><td className="font-semibold">Applied transactions</td><td>Tabla de 12px con encabezado de 11px <Token nombre="ink-muted" />; fecha MM/DD/YYYY y monto sin partir.</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Type and color">
@@ -301,6 +284,7 @@ export const Specs: Story = {
           <li>Every row stays even when it is empty, so the detail always has the same shape and order.</li>
           <li>Show the first items in the summary (the visit of the procedure, the finding and its diagnosis); the rest goes behind “N more…”. The full record shows everything.</li>
           <li>Statuses use the pills of their own screen: cases as in Treatment Plan, lab orders as in Lab Order, consent as in the visit table.</li>
+          <li>One pill per entry, small (sm) and in sentence case like the rest of the app. The group status is plain text, and only when it differs from the case.</li>
           <li>No appointment and no consent before the case is accepted (Planning, Pending, Presented), as in Treatment Plan.</li>
           <li>The same detail wherever the record is opened: the Overview table, View Problem List, a Treatment Plan row or an exam finding.</li>
         </ul>

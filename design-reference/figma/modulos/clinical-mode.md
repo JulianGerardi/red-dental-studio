@@ -2276,3 +2276,18 @@ Para validar con usuarios: si en el examen alcanza con el drawer o hace falta ve
 odontólogo usa el detalle de Treatment Plan para revisar el consentimiento antes de la visita o sigue mirando la columna
 Consent.
 
+### Pills de una sola forma, y el cobro sale de acá (2026-10-14)
+
+Julián, con capturas del detalle de Treatment Plan: había pills repetidas (el caso *Planning* y al lado *Group status
+PLANNING*), algunas en mayúsculas y otras no, y la de Status del drawer más grande.
+
+1. **Una pill por dato**, chica (sm) y en **minúscula inicial**, como las 50 pills del resto de la app. El estado del
+   grupo pasa a texto en la línea del caso ("Group status: Accepted") y sólo cuando no es el del caso (una alternativa
+   descartada de un grupo aceptado); si es el mismo, no se repite.
+2. Las únicas pills en mayúsculas de la app eran de Clinical Mode y venían de red.dev: Status de la Problem List y
+   Procedures, el estado de cada fecha del rail de Treatment Plan y la card de Treatment plans del Overview. Pasan a
+   minúscula inicial, así la fila y su detalle dicen el estado igual.
+3. **Lo del cobro (Clinic location, Financial details, Applied transactions) sale del detalle de Clinical Mode** y de
+   Treatment Plan: va en el detalle de la fila del Ledger y de Billing (ver `ledger.md` y `billing.md`, 2026-10-14).
+   El detalle de un procedimiento termina en Lab order.
+

@@ -383,7 +383,7 @@ export function Rail({
                 className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors hover:bg-surface-muted"
               >
                 <span className="text-[13px] text-ink tabular-nums">{f}</span>
-                <Pill tone={TONO_CASO[estado]} size="sm" className="ml-auto tracking-wide whitespace-nowrap uppercase">{estado}</Pill>
+                <Pill tone={TONO_CASO[estado]} size="sm" className="ml-auto whitespace-nowrap">{estado}</Pill>
                 <ChevronRight className={cn('size-4 shrink-0 text-ink-faint transition-transform', abierta && 'rotate-90')} />
               </button>
               {abierta && (

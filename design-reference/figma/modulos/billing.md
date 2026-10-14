@@ -232,3 +232,20 @@ controla con `npm run ds:campos`.
    `ModalShell`: hasta 860px sigue siendo xl.
 3. **Ledger Transactions** sin el ícono de la tarjeta en el título (pedido de Julián), como el resto de los paneles: el
    título de un panel no lleva ícono.
+
+## Con un paciente, cada fila se despliega (2026-10-14)
+
+Julián: lo del cobro (Clinic location, Financial details y Applied transactions) va en Billing cuando se entra en un
+paciente, y en el Ledger.
+
+1. Con un paciente elegido, cada fila de **Recent Billing Activity** se despliega (`rowDetail` de la tabla: chevron,
+   clic en la fila, Collapse all / Expand all) con el **mismo detalle del Ledger** (`DetalleMovimiento`): los datos de
+   la transacción y lo del cobro. Una transacción se lee igual en los dos lados. View full record y la referencia de
+   una aplicación abren el registro de sólo lectura del Ledger.
+2. En el resumen (sin paciente) la fila sigue eligiendo al paciente: no se despliega.
+3. **Datos:** `APLICACIONES_BILLING` en `data/billing.ts` dice a qué cargo fue cada pago o ajuste de la actividad. Cierra
+   con el Balance de cada paciente (John Hayes $120, Maria $30, Brent $220, Diego $860, Sophie $2,140).
+4. *Guarantor Unapplied Credits* sale de `creditosNoAplicados`, otro dato de prueba: con las aplicaciones de arriba no
+   queda crédito sin aplicar en los movimientos, y el número de arriba dice $210. Queda anotado para cuando haya datos
+   reales.
+

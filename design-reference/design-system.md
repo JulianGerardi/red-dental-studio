@@ -813,3 +813,16 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - *Components / Clinical / RecordDetail*: `registroDePlan`, `registroDeHallazgo` y `useVerRegistro` en Parts; States suma
   *From Treatment Plan* y *Unassigned procedure*; *Full record · exam finding* nueva. Decisiones en
   `figma/modulos/clinical-mode.md` (2026-10-13).
+
+## Pills de una sola forma y el cobro en Ledger y Billing (2026-10-14)
+
+- **Pills:** una por dato, en minúscula inicial como en toda la app; las de Clinical Mode que iban en mayúsculas
+  (Problem List, rail y card de Treatment Plan, detalle) se alinean. *Components / Clinical / RecordDetail → Specs →
+  Rules* lo dice.
+- *Components / Ledger / LedgerRowDetail* rehecha con Playground, Parts, States, *Reference open* y Specs: los datos de
+  la transacción más Clinic location, Financial details y Applied transactions (`FilasCobro`, `Metrica`,
+  `DetalleMovimiento`). *Pages / Parts / Billing* suma *Row detail* en Parts y dos filas abiertas en States.
+- *Components / Clinical / RecordDetail*: sin lo del cobro (sale `ContenidoSede`, `ContenidoFinanzas`,
+  `ContenidoAplicadas`, `Metrica` y `cargoDe`). Decisiones en `figma/modulos/ledger.md`, `billing.md` y
+  `clinical-mode.md` (2026-10-14).
+

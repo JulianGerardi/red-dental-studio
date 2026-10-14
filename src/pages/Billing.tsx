@@ -7,10 +7,11 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
 import { moneda, type Movimiento } from '@/data/ledger'
 import {
-  PACIENTES_BILLING, buscarPacientes, grupoDeGarante, ACTIVIDAD_RECIENTE, STATS_BILLING, STATS_HOY, FILTROS_ACTIVIDAD,
+  APLICACIONES_BILLING, PACIENTES_BILLING, buscarPacientes, grupoDeGarante, ACTIVIDAD_RECIENTE, STATS_BILLING, STATS_HOY, FILTROS_ACTIVIDAD,
   VISTAS_PACIENTE, type FiltroActividad, type PacienteBilling, type TipoAjusteBilling, type VistaPaciente,
 } from '@/data/billing'
 import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
+import { DetalleMovimiento, LedgerRowModal } from '@/components/patients/ledger/LedgerRowDetail'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { AmountCell, DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { CONTENEDOR_PAGINA, ICONO_SUELTO, TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
@@ -136,9 +137,11 @@ export function PacienteElegido({ paciente, onCerrar }: { paciente: PacienteBill
 }
 
 /* Recent Billing Activity. Sin paciente: toda la clínica, con las Tabs de tipo y filas que eligen al paciente. Con uno:
-   su nombre en el título, Patient / Guarantor View, los saldos del garante y sólo sus movimientos. */
+   su nombre en el título, Patient / Guarantor View, los saldos del garante y sólo sus movimientos; cada fila se despliega
+   con el detalle del Ledger (los datos, Clinic location, Financial details y Applied transactions; billing.md,
+   2026-10-14). */
 export function ActividadReciente({
-  filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, creditos, saldo, onElegir, refElegido,
+  filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, creditos, saldo, onElegir, refElegido, abierta,
 }: {
   /** Las filas ya filtradas: por tipo en el resumen, por paciente o garante con uno elegido. */
   filas: (Movimiento & { saldo: number })[]
@@ -154,7 +157,12 @@ export function ActividadReciente({
   saldo: number
   onElegir: (nombre: string) => void
   refElegido?: Ref<HTMLDivElement>
+  /** Con paciente: la fila que arranca desplegada (Storybook). */
+  abierta?: string
 }) {
+  /* View full record y la referencia de una aplicación abren la transacción en el registro de sólo lectura del Ledger. */
+  const [enModal, setEnModal] = useState<(Movimiento & { saldo: number }) | null>(null)
+  const ver = (x: Movimiento) => setEnModal(filas.find((f) => f.id === x.id) ?? ACTIVIDAD_RECIENTE.find((f) => f.id === x.id) ?? null)
   return (
     <Panel
       title={paciente ? `${paciente.nombre} — Recent Billing Activity` : 'Recent Billing Activity'}
@@ -177,6 +185,10 @@ export function ActividadReciente({
         rowKey={(m) => m.id}
         rowLabel={(m) => m.paciente}
         onRowClick={paciente ? undefined : (m) => onElegir(m.paciente)}
+        defaultExpanded={paciente && abierta ? [abierta] : undefined}
+        rowDetail={paciente ? (m) => (
+          <DetalleMovimiento m={m} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} onVerTodo={() => setEnModal(m)} />
+        ) : undefined}
         density="compact"
         itemLabel="entries"
         empty={paciente
@@ -185,6 +197,9 @@ export function ActividadReciente({
             ? { icon: CreditCard, title: 'No financial transaction has been posted yet.' }
             : { icon: CreditCard, title: 'No entries', detail: 'Nothing matches the current filter.' }}
       />
+      {enModal && (
+        <LedgerRowModal key={enModal.id} m={enModal} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} onClose={() => setEnModal(null)} />
+      )}
     </Panel>
   )
 }

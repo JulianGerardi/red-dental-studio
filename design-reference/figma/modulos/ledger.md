@@ -777,9 +777,30 @@ controla con `npm run ds:campos`. En una card de página la misma regla lleva m�
    arriba reserva el lugar del botón + / × para que las columnas queden alineadas.
 3. Los títulos de los paneles (Payment, Credit, Adjustment Information) y el de Ledger Transactions van sin ícono.
 
-## Datos para el detalle de Clinical Mode (2026-10-13)
+## El detalle de la fila suma lo del cobro (2026-10-14)
 
-`data/ledger.ts` suma `APLICACIONES` (a qué cargo fue cada pago, ajuste o pago del seguro, y cuánto) y, en los cargos,
-`sede` y `procedimiento` (el id de Clinical Mode que cobran). Los lee el detalle de un procedimiento en Clinical Mode
-(Clinic location, Financial details y Applied transactions); la pantalla del Ledger no cambia. D0220 pasa a la pieza 7,
-la del procedimiento que cobra. Ver `clinical-mode.md` (2026-10-13).
+Julián (prototipo *Expanded transaction detail*): Clinic location, Financial details y Applied transactions van en el
+detalle de la fila del **Ledger** y de **Billing** con un paciente elegido, no en Clinical Mode (una vuelta anterior lo
+había puesto en el detalle de un procedimiento de Clinical Mode; se saca de ahí).
+
+1. **Debajo de lo que ya había.** El detalle sigue con los datos de la transacción (Description, Transaction date…
+   Balance) y, debajo de una línea, suma tres filas con la lista de `ui/detail-list`. Rediseñar no es cambiar el
+   contenido: los campos de siempre quedan.
+   - **Clinic location**: la sede donde se registró (`sede`; sin dato, `SEDE_PRINCIPAL`, Bayside Dental).
+   - **Financial details**: un cargo, Original charge, Insurance paid, Payments applied, Credit adjustments applied y
+     **Outstanding balance** (destacado, con la nota "Balance of this charge only, not the patient or guarantor
+     balance."). Un pago, ajuste o pago del seguro: lo recibido, lo aplicado a cargos y **Unapplied credit**; un claim
+     denegado, todo en $0 y la nota lo dice.
+   - **Applied transactions**: fecha, tipo, la otra transacción (link a su registro de sólo lectura) y lo aplicado. En
+     un cargo, los pagos y ajustes que lo cubren; en un pago, los cargos a los que fue. Sin nada, la fila queda y lo dice.
+2. **View full record** (el drawer) muestra lo mismo, sin plegar. La referencia de una aplicación abre esa transacción.
+3. **Apply credit** suma sus aplicaciones (`onAplicar` devuelve cuánto va a cada cargo) y ofrece lo que falta de cada
+   cargo, no su monto original: antes se podía volver a cubrir lo ya pagado.
+4. **Datos:** `APLICACIONES` en `data/ledger.ts` (cierra con `creditoDisponible` y ningún cargo recibe más de lo que
+   vale) y `sede` en los cargos de Northgate Clinic. El vínculo con los procedimientos de Clinical Mode
+   (`procedimiento`) se va, y D0220 vuelve a no tener pieza.
+5. El detalle descuenta el padding de su marco del ancho visible: lo alineado a la derecha (Applied amount) se cortaba
+   12px.
+
+Piezas: `FilasCobro`, `Metrica` y `DetalleMovimiento` (el contenido sin el marco, que usa Billing) en
+`LedgerRowDetail.tsx`. Storybook: *Components / Ledger / LedgerRowDetail*.

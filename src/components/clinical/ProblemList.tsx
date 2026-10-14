@@ -72,7 +72,8 @@ export function ToothCell({ pieza }: { pieza?: number }) {
 
 const cuenta = <E extends string>(filas: { estado: E }[], e: E) => filas.filter((f) => f.estado === e).length
 const texto = (t: string) => <span className="truncate">{t || '-'}</span>
-const estadoPill = (tono: PillTone, e: string) => <Pill tone={tono} size="sm" className="tracking-wide uppercase">{e}</Pill>
+/* En minúscula inicial, como las pills de toda la app (Julián, 2026-10-14). */
+const estadoPill = (tono: PillTone, e: string) => <Pill tone={tono} size="sm" className="whitespace-nowrap">{e}</Pill>
 
 export function ProblemList() {
   const [pestana, setPestana] = useState<Pestana>('Problem List')

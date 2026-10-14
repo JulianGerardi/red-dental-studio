@@ -17,7 +17,7 @@ const meta = {
           '',
           '**Según el estado del caso:** en Planning todo se edita; antes de aceptar el plan (Planning, Pending, Presented) **no hay consentimiento ni turno**: no se ven el bloque de consentimiento, la columna Consent ni el turno de cada visita. Desde Waiting for consent aparecen.',
           '',
-          '**Cada fila se despliega** (Unassigned y las visitas de cada caso) con el detalle de la Problem List: el caso, el estado del consentimiento de ese procedimiento, los hallazgos, derivaciones, órdenes y lo cobrado. La tabla está en *Components / Clinical / TreatmentPlanSection table*.',
+          '**Cada fila se despliega** (Unassigned y las visitas de cada caso) con el detalle de la Problem List: el caso, el estado del consentimiento de ese procedimiento, los hallazgos, derivaciones y órdenes. La tabla está en *Components / Clinical / TreatmentPlanSection table*.',
           '',
           '**Probalo:** en *Playground* elegí otro plan de la lista y abrí una fila; en *Accepted Case* se ven el consentimiento y los turnos.',
         ].join('\n'),

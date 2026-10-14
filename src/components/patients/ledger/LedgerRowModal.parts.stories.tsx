@@ -7,5 +7,5 @@ const meta = { title: 'Components/Ledger/LedgerRowModal', parameters: { layout: 
 export default meta
 type Story = StoryObj<typeof meta>
 
-/* El detalle completo de un movimiento, en un modal ("View full record"). */
+/* El detalle completo de un movimiento, en un modal ("View full record"): los datos y lo del cobro, sin plegar. */
 export const FullRecord: Story = { render: () => <LedgerRowModal m={MOVIMIENTOS[0]} onClose={() => {}} /> }

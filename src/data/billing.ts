@@ -1,4 +1,4 @@
-import { conSaldo, type Movimiento } from '@/data/ledger'
+import { conSaldo, type Aplicacion, type Movimiento } from '@/data/ledger'
 
 /* Figma 4481:9881 "Billing". Ver design-reference/figma/modulos/billing.md. */
 
@@ -71,6 +71,25 @@ export const ACTIVIDAD_RECIENTE = Object.entries(ACTIVIDAD_POR_PACIENTE)
   .flatMap(([paciente, movs]) =>
     conSaldo(movs.map((m, i) => ({ ...m, id: `act-${paciente}-${i}`, paciente }))))
   .sort((a, b) => +new Date(b.fecha) - +new Date(a.fecha))
+
+/* A qué cargo fue cada pago o ajuste de la actividad, para el detalle de la fila con un paciente elegido (Financial
+   details y Applied transactions, como el Ledger). Cierra con el Balance de cada paciente: lo que falta de sus cargos da
+   su último saldo (John Hayes $120, Maria $30, Brent $220, Diego $860, Sophie $2,140). Ver billing.md (2026-10-14). */
+const fila = (paciente: string, i: number) => `act-${paciente}-${i}`
+const aplica = (paciente: string, origen: number, cargo: number, fecha: string, monto: number): Aplicacion =>
+  ({ id: `ap-${paciente}-${origen}-${cargo}`, origen: fila(paciente, origen), cargo: fila(paciente, cargo), fecha, monto })
+
+export const APLICACIONES_BILLING: Aplicacion[] = [
+  aplica('John Hayes', 0, 1, 'May 16, 2026', 30),
+  aplica('John Hayes', 2, 4, 'May 19, 2026', 30),
+  aplica('John Hayes', 3, 4, 'May 19, 2026', 30),
+  aplica('John Hayes', 5, 4, 'May 20, 2026', 30),
+  aplica('Maria Abril Viola', 1, 0, 'May 19, 2026', 90),
+  aplica('Brent Crosby', 1, 0, 'May 14, 2026', 250),
+  aplica('Brent Crosby', 2, 0, 'May 16, 2026', 30),
+  aplica('Diego Molina', 1, 0, 'May 13, 2026', 410),
+  aplica('Sophie Tran', 1, 0, 'May 15, 2026', 2710),
+]
 
 export function saldoDe(paciente: string): number {
   return ACTIVIDAD_RECIENTE.find((m) => m.paciente === paciente)?.saldo ?? 0
