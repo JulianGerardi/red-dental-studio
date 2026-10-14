@@ -41,6 +41,10 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   (2026-10-13) La tira de salas de arriba abre el resto con *Show N more* (el número depende del ancho); *Check In*
   avisa "checked in" y el escudo de al lado de Today lleva a Help.
 
+- `tests/confibot.e2e.ts` (2026-10-13): el botón flotante abre el chat y se esconde mientras está abierto; la flechita
+  lo recoge en una pestaña que sigue ahí al cambiar de pantalla y lo trae de vuelta. En Scheduling queda centrado
+  arriba del botón de Appointment requests, sin tocarlo.
+
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 
 ## Pendiente: el modelo para los pasos en lenguaje natural
