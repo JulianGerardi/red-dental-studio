@@ -801,3 +801,25 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `AccionesPaciente` reemplaza a `EncabezadoBilling`: los botones del paciente con `ui/button` md, en el `top` del Panel
   de la actividad. *Components / Dashboard / Panel and StatusPill* actualiza la descripción de `top`.
 - Decisiones en `figma/modulos/billing.md` (2026-10-13).
+
+## List group: cada fila en su card (2026-10-13)
+
+- `ListGroup` deja la caja con divisores: cada fila va en su `TARJETA_INTERNA` con 12px entre cards, como las salas y los
+  turnos del paciente (Julián: "debe ser estilo card", por continuidad). Las filas de `DashboardRows` pasan a 10px de
+  margen interno parejo. *Elements / List group*, *Elements / Show more* y *Components / Dashboard / Dashboard rows*
+  muestran las cards. Ver `figma/modulos/dashboard.md`.
+
+
+## Dashboard reorganizado: tira de salas, Button success y saludo (2026-10-13)
+
+- **Button `success`** (*Elements / Buttons*): verde `dash-ok-fg`, hover `green-deep`, foco del mismo verde. Para lo que
+  arranca o llega (Check In del turno). En los turnos, el color dice la acción (`ACCION_TURNO`): Check In `success`,
+  Check Out `primary`, Cancel `destructive`.
+- **Components / Dashboard / Operatory strip** (nuevo, `OperatoryStrip`): las salas en una fila arriba del Dashboard,
+  tantas como entran de 232px; el resto en "Show N more". `OperatoryCard` suma `enPagina` (card de página, sin borde) y
+  su página pasa a Playground, Parts, States y Specs.
+- **Components / Layout / Greeting** (nuevo, `Saludo`): el saludo del Topbar que se escribe y deja la fecha del día;
+  una vez por sesión y sin animación con reducir movimiento.
+- *Pages / Parts / Dashboard*: la fila de fecha suma el link a las preguntas frecuentes y pierde la línea de alcance.
+- `ShowMore`: sin degradé cuando la lista abierta no scrollea. Las filas de turno pasan a columnas desde 896px.
+  Ver `figma/modulos/dashboard.md`.

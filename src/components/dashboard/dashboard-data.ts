@@ -58,7 +58,7 @@ export const DIAS: Record<string, DiaDashboard> = {
   '28-02-2026': {
     appointments: [
       turno('Noah James', 'NJ', 'Dr. Elena Martinez', 'Operatory 2', '10:00'),
-      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:30'),
+      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:30', { accion: 'Check In' }),
       turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '11:00'),
       turno('Mara Otero', 'MO', 'Dr. Salgado', 'Operatory 1', '11:30'),
       turno('Elias Aguirre', 'EA', 'Dr. Salgado', 'Operatory 3', '08:30', { completado: true }),

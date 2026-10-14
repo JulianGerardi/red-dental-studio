@@ -17,7 +17,10 @@ const USO: Record<ButtonVariant, string> = {
   ghost: 'Low emphasis, no box: toolbars and row actions.',
   link: 'Reads as a link: navigate or see more.',
   destructive: 'Deletes or discards. Usually inside a confirmation dialog.',
+  success: 'Starts or arrives: Check In on an appointment. Same green as the Check In pill.',
 }
+/* El texto de ejemplo de cada variante: el que tiene en la app. */
+const TEXTO: Partial<Record<ButtonVariant, string>> = { destructive: 'Delete', success: 'Check In' }
 const ALTO: Record<ButtonSize, string> = { sm: '28px', md: '32px', lg: '36px' }
 
 /* Estado forzado con el addon de pseudo-estados: la clase va en un
@@ -34,7 +37,7 @@ const meta = {
         component: [
           'El botón estándar de la app (`@/components/ui/button`). Cada variante es el look más usado en el código para ese tipo de botón y los tamaños son las tres alturas más usadas.',
           '',
-          '**Cuál usar:** *Primary* para la acción principal (una por vista) · *Secondary* para la alternativa (Cancel, Back) · *Ghost* para acciones de poco peso · *Link* para navegar · *Destructive* para borrar o descartar.',
+          '**Cuál usar:** *Primary* para la acción principal (una por vista) · *Secondary* para la alternativa (Cancel, Back) · *Ghost* para acciones de poco peso · *Link* para navegar · *Destructive* para borrar, descartar o cancelar un turno · *Success* para lo que arranca o llega (Check In del turno). En los turnos del Dashboard el color dice la acción: Check In verde, Check Out azul, Cancel rojo (2026-10-13).',
           '',
           '**Probalo:** en *Playground* cambiá variante, tamaño, texto, ícono y estado desde el panel *Controls*.',
         ].join('\n'),
@@ -81,10 +84,10 @@ export const Variants: Story = {
   parameters: { controls: { include: ['size', 'label'] } },
   render: ({ size, label }) => (
     <Lienzo>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {VARIANTES.map((v) => (
           <div key={v} className="flex flex-col items-start gap-2">
-            <Button variant={v} size={size}>{v === 'destructive' ? 'Delete' : label}</Button>
+            <Button variant={v} size={size}>{TEXTO[v] ?? label}</Button>
             <p className="text-[12px] font-semibold capitalize">{v}</p>
             <p className="text-[12px] leading-snug text-ink-muted">{USO[v]}</p>
           </div>
@@ -125,7 +128,7 @@ export const States: Story = {
             {COLUMNAS_ESTADO.map(([n, e]) => (
               <td key={n}>
                 <div className={e === 'disabled' || e === 'loading' ? '' : PSEUDO[e]}>
-                  <Button variant={v} size={size} disabled={e === 'disabled'} loading={e === 'loading'}>{v === 'destructive' ? 'Delete' : 'Save'}</Button>
+                  <Button variant={v} size={size} disabled={e === 'disabled'} loading={e === 'loading'}>{TEXTO[v] ?? 'Save'}</Button>
                 </div>
               </td>
             ))}

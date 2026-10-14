@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { AppointmentCard, AppointmentCardCompacta, type Appointment } from '@/components/dashboard/AppointmentCard'
+import { AppointmentCard, AppointmentCardCompacta, type AccionTurno, type Appointment } from '@/components/dashboard/AppointmentCard'
 import { TURNOS_PATIENTS } from '@/components/dashboard/dashboard-data'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
 import { NewAppointmentModal } from '@/components/scheduling/NewAppointmentModal'
@@ -42,7 +42,7 @@ type Args = {
   provider: string
   operatory: string
   reason: string
-  action: 'Check Out' | 'Cancel'
+  action: AccionTurno
   status: PatientAppointmentStatus
   cancellable: boolean
   request: 'ASAP' | 'Waiting List'
@@ -106,7 +106,7 @@ const meta = {
     provider: { control: 'text', description: 'Profesional. Dashboard, Patients list y el detalle del calendario.' },
     operatory: { control: 'text', description: 'Sala. Dashboard y el detalle del calendario.' },
     reason: { control: 'text', description: 'Motivo. Patient overview y el detalle del calendario.' },
-    action: { control: 'inline-radio', options: ['Check Out', 'Cancel'], description: 'El botón del pie: la acción que sigue.', if: { arg: 'card', eq: 'Dashboard' } },
+    action: { control: 'inline-radio', options: ['Check In', 'Check Out', 'Cancel'], description: 'El botón del pie: la acción que sigue. El color la dice: Check In verde, Check Out azul, Cancel rojo.', if: { arg: 'card', eq: 'Dashboard' } },
     status: { control: 'inline-radio', options: ESTADOS_PACIENTE, description: 'Estado del turno: el tono de la pill.', if: { arg: 'card', eq: 'Patient overview' } },
     cancellable: { control: 'boolean', description: 'Si todavía se puede cancelar: muestra Cancel.', if: { arg: 'card', eq: 'Patient overview' } },
     request: { control: 'inline-radio', options: ['ASAP', 'Waiting List'], description: 'Tipo de solicitud: ASAP en rojo, lista de espera en azul (barra y pill).', if: { arg: 'card', eq: 'Appointment request' } },
@@ -324,7 +324,10 @@ export const DashboardStates: Story = {
       <Fila estado="Menu open" nota="El kebab: Edit appointment abre el modal con los datos de la card.">
         <Forzar selector='button[aria-label^="Actions for"]' estado="click" className="w-[340px] pb-12"><AppointmentCard appt={NOAH} onSelect={nada} onEdit={nada} /></Forzar>
       </Fila>
-      <Fila estado="Cancel" nota="Un turno que todavía no llegó: la acción que sigue es cancelarlo.">
+      <Fila estado="Check In" nota="El paciente todavía no llegó: la acción que sigue es recibirlo. Verde (Button success).">
+        <div className="w-[340px]"><AppointmentCard appt={{ ...NOAH, accion: 'Check In' }} onSelect={nada} onEdit={nada} /></div>
+      </Fila>
+      <Fila estado="Cancel" nota="Un turno que todavía no llegó: la acción que sigue es cancelarlo. Rojo (Button destructive).">
         <div className="w-[340px]"><AppointmentCard appt={{ ...NOAH, accion: 'Cancel' }} onSelect={nada} onEdit={nada} /></div>
       </Fila>
       <Fila estado="Long name" nota="El nombre se recorta: los chips no bajan de renglón.">
@@ -502,7 +505,9 @@ function Medicion() {
       </Bloque>
       <Bloque titulo="Colors">
         <Tabla encabezado={['Part', 'Token']} minimo={560}>
-          <tr><td className="font-semibold">Dashboard · photo and action</td><td><Token nombre="dash-blue" /> · hover <Token nombre="dash-blue-hover" /></td></tr>
+          <tr><td className="font-semibold">Dashboard · photo and Check Out</td><td><Token nombre="dash-blue" /> · hover <Token nombre="dash-blue-hover" /></td></tr>
+          <tr><td className="font-semibold">Dashboard · Check In</td><td><Token nombre="dash-ok-fg" /> · hover <Token nombre="green-deep" /></td></tr>
+          <tr><td className="font-semibold">Dashboard · Cancel</td><td><Token nombre="dash-bad-fg" /> · hover <Token nombre="dash-bad-hover" /></td></tr>
           <tr><td className="font-semibold">Dashboard · fields and time</td><td><Token nombre="dash-field" /></td></tr>
           <tr><td className="font-semibold">Dashboard · selected ring</td><td><Token nombre="dash-ring" /></td></tr>
           <tr><td className="font-semibold">Dashboard · TR / CC chips</td><td><Token nombre="green-soft" /> · <Token nombre="dash-bad-chip" /></td></tr>

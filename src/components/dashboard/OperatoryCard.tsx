@@ -1,5 +1,7 @@
 import { Calendar, User } from 'lucide-react'
-import { InnerCard, StatusPill } from './primitives'
+import { StatusPill } from './primitives'
+import { cn } from '@/lib/utils'
+import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 
 export type OperatoryStatus = 'Available' | 'Busy' | 'Unavailable'
 
@@ -18,10 +20,16 @@ const TONE = {
 
 /* Figma I3636:58505;7350:4654 — este panel NO venía escalado: sus
    valores ya eran limpios (px-13 py-10 gap-5, radius 5, icons 10px,
-   textos 11/9/8). Se sube ~1.3× para acompañar al resto. */
-export function OperatoryCard({ room }: { room: Operatory }) {
+   textos 11/9/8). Se sube ~1.3× para acompañar al resto.
+   Va adentro de un panel (card interna) o suelta sobre la página, en la tira de arriba del Dashboard (card de página,
+   2026-10-13). */
+export function OperatoryCard({ room, enPagina }: {
+  room: Operatory
+  /** Sobre el fondo gris de la página, no adentro de un panel. */
+  enPagina?: boolean
+}) {
   return (
-    <InnerCard className="flex w-full flex-col gap-1.5 px-3.5 py-3">
+    <div className={cn(enPagina ? TARJETA_PANEL : TARJETA_INTERNA, 'flex w-full min-w-0 flex-col gap-1.5 px-3.5 py-3')}>
       <div className="flex items-center justify-between gap-2">
         <p className="text-dash-name truncate text-sm leading-none font-semibold">
           {room.name}
@@ -41,6 +49,6 @@ export function OperatoryCard({ room }: { room: Operatory }) {
         <User className="size-3.5 shrink-0" />
         <span className="truncate">{room.provider}</span>
       </div>
-    </InnerCard>
+    </div>
   )
 }
