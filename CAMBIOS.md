@@ -14,6 +14,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   derecha llama a `useFabDePagina()` (`help/HelpProvider.tsx`) y Confibot se apila arriba. Token nuevo
   `dash-blue-glow`. Storybook: *Components / Help / Confibot*.
 
+### Menú lateral en blanco ([#38](https://github.com/JulianGerardi/red-dental-studio/pull/38))
+- El fondo del menú lateral pasa de gris (`#fafafa`) a **blanco**, en escritorio y en el panel del celular. El bloque del
+  logo sigue azul; hover, ítem activo y menús flotantes no cambian.
+- **Para el dev:** el `aside` de `Sidebar.tsx` usa `bg-white` en lugar de `bg-surface-subtle` (el token sigue en uso en
+  otros lados). En *Elements / Navigation → Specs → Colors*.
+
 ### Edit Carrier: las dos casillas en la misma fila ([#32](https://github.com/JulianGerardi/red-dental-studio/pull/32))
 - En Edit Carrier › *Information*, *Do not include Dental Diagnostic Codes* y *Do not bill Insurance* van lado a lado, cada
   una bajo una de las columnas de arriba (en el celular, apiladas). El drawer New Carrier no cambia.
