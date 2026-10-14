@@ -782,6 +782,15 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   States (reposo, hover, recogido, sobre el FAB de Scheduling, oculto, chat vacío, con respuesta y sin resultados) y
   Specs. *Navigation → Parts* aclara que el ítem del menú abre la misma hoja. Ver `figma/modulos/help.md`.
 
+## Notifications sin Pending ni Archived; banner de punta a punta (2026-10-13)
+
+- *Pages / Parts / Notifications*: sin los estados ni variantes de *Pending* y *Archived*; *Row actions* muestra el
+  ojo (*Mark as read* / *Mark as unread*); *Empty states* con *Inbox* y *Unread* (con y sin fechas); colores y reglas al
+  día. *Elements / Date filter → Specs* muestra las dos pestañas que quedan.
+- *Components / Layout / NotificationBanner*: de punta a punta del contenido, con la X sola a la derecha; las stories
+  usan las tareas que el banner muestra de verdad (`delBanner`), así el paginador dice "1 of 4" y no "1 of 16".
+  Decisiones en `figma/modulos/notifications.md` y `header-sidebar.md` (2026-10-13).
+
 ## Breadcrumb: dónde va, y el del paciente (2026-10-13)
 
 - **Elements / Breadcrumb** reemplaza a *Components / UI / Breadcrumb* (que eran dos historias sueltas): Playground,
