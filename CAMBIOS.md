@@ -16,6 +16,21 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   foco visible y `aria-current`. Storybook: *Elements / Breadcrumb* (reemplaza a *Components / UI / Breadcrumb*) y
   *Components / Patients / PatientBreadcrumb*. e2e nuevo: `tests/patient-dashboard.e2e.ts`.
 
+### Confibot vuelve a flotar abajo a la derecha ([#35](https://github.com/JulianGerardi/red-dental-studio/pull/35))
+- Vuelve el botón flotante de Confibot (el de antes de pasar al menú): se estira a "Confibot" con el mouse o el foco, se
+  recoge con la flechita en una pestaña al pie y eso se recuerda entre visitas. En Scheduling se apila arriba de
+  Appointment requests; no se dibuja con el chat o un CoachMark abiertos. El ítem del menú lateral se queda.
+- **Para el dev:** `ConfibotLanzador` y `useConfibotRecogido()` en `help/Confibot.tsx`, montados por `AppShell`, que
+  vuelve a reservar su alto al pie del `main` (`pb-24 sm:pb-28`). Una pantalla con su propio botón flotante abajo a la
+  derecha llama a `useFabDePagina()` (`help/HelpProvider.tsx`) y Confibot se apila arriba. Token nuevo
+  `dash-blue-glow`. Storybook: *Components / Help / Confibot*.
+
+### Menú lateral en blanco ([#38](https://github.com/JulianGerardi/red-dental-studio/pull/38))
+- El fondo del menú lateral pasa de gris (`#fafafa`) a **blanco**, en escritorio y en el panel del celular. El bloque del
+  logo sigue azul; hover, ítem activo y menús flotantes no cambian.
+- **Para el dev:** el `aside` de `Sidebar.tsx` usa `bg-white` en lugar de `bg-surface-subtle` (el token sigue en uso en
+  otros lados). En *Elements / Navigation → Specs → Colors*.
+
 ### Edit Carrier: las dos casillas en la misma fila ([#32](https://github.com/JulianGerardi/red-dental-studio/pull/32))
 - En Edit Carrier › *Information*, *Do not include Dental Diagnostic Codes* y *Do not bill Insurance* van lado a lado, cada
   una bajo una de las columnas de arriba (en el celular, apiladas). El drawer New Carrier no cambia.

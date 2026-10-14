@@ -14,6 +14,8 @@ con dropdown abierto `3605:56446`.
 **pitch de 50px** · icono 16px · **9 ítems**, incluido `CircleHelp` que faltaba ·
 Settings al pie. Se hizo `sticky` porque con la página larga quedaba en y=1390.
 
+> Actualizado el 2026-10-13: el rail pasa a **blanco** a pedido de Julián (ver *Menú en blanco*, al final).
+
 **Settings no cambia de lugar al colapsar (pedido de Julián).** Va al pie del
 rail en los dos estados, con el ícono a la misma altura: el ítem colapsado mide
 32 y el expandido 36, así que colapsado lleva 2px más de padding abajo. (Se
@@ -180,4 +182,21 @@ y los flotantes de Billing y Settings siguen saliendo al costado.
 Parts, States y Specs. Specs lee del rail dibujado: 176 y 58 de ancho, logo de 64, ítem expandido 152×36 con 12px de
 padding, colapsado 32×32. No lleva estado de foco: los ítems no tienen anillo propio (usan el del navegador) y el addon
 de pseudo-estados sólo fuerza reglas de CSS, así que la muestra salía igual al default.
+
+## Menú en blanco (2026-10-13)
+
+Pedido de Julián: "cambiar el color del menú a blanco". El fondo del rail pasa de `#fafafa` (`surface-subtle`, el del
+Figma) a **blanco**, en escritorio (58 y 176) y en el panel del celular. Es un desvío consciente del Figma.
+
+- **El bloque del logo sigue azul** (`dash-blue-hover`): es la marca y se alinea con el alto del header; el pedido es
+  por el fondo del menú, no por la marca.
+- **Sin borde nuevo.** Header y rail quedan blancos los dos y arman una "L" alrededor del contenido sobre
+  `page-background` (`#FAFBFE`), igual que el header, que tampoco lleva línea. Agregar una línea sería algo nuevo.
+- Hover (`black/5`), ítem activo, tooltip y menús flotantes no cambian; el texto `dash-muted` sobre blanco gana un poco
+  de contraste.
+- La interfaz de Storybook sigue con su riel en `#fafafa` (`.storybook/theme.ts`): es el menú del sitio de
+  documentación, no el de la app.
+
+Verificado con Playwright en `/`, `/scheduling` y `/patients` a 1440, 820 y 390px: el `aside` da `rgb(255, 255, 255)`
+en todos. Design system: *Elements / Navigation → Specs → Colors* (Rail → `white`).
 
