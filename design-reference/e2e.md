@@ -33,6 +33,8 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 - `tests/notifications.e2e.ts` (2026-10-12): el atajo *Last 7 days* acota la lista y la ✕ vuelve a *All dates*; dos
   clics en el calendario arman un rango y, en Unread sin nada en esas fechas, el vacío ofrece *Clear dates*. Las
   fechas se calculan desde hoy, como los datos.
+  Desde el 2026-10-13 también: sólo hay *Inbox* y *Unread*, y el ojo de una fila la marca leída o sin leer (Unread de
+  8 a 7 y de vuelta).
 
 - `tests/dashboard.e2e.ts` (2026-10-12): el selector de fecha se lee "Feb 28, 2026"; elegir un día cierra el calendario
   y lo cambia; Today vuelve a hoy y se va.
@@ -45,6 +47,10 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 - `tests/treatment-plan.e2e.ts` (2026-10-13): una fila de Unassigned se despliega (No treatment linked, Collapse all), y
   la fila D2391 de Restorative Plan muestra Procedure consent; su hallazgo se abre en el drawer sin salir de Treatment
   Plan.
+
+- `tests/confibot.e2e.ts` (2026-10-13): el botón flotante abre el chat y se esconde mientras está abierto; la flechita
+  lo recoge en una pestaña que sigue ahí al cambiar de pantalla y lo trae de vuelta. En Scheduling queda centrado
+  arriba del botón de Appointment requests, sin tocarlo.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 
