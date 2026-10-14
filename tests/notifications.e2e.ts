@@ -48,3 +48,17 @@ test('Dos clics en el calendario arman un rango; sin nada en él, el vacío ofre
   await screen.getByRole('button', 'Clear dates').first().tap()
   await expect(screen.getByText(/^Referral expires today/)).toBeVisible()
 })
+
+test('Sólo Inbox y Unread; el ojo marca leída o no leída y cambia el número de Unread', async ({ app, screen }) => {
+  await app.open('/notifications')
+  await expect(screen.getByRole('tab')).toHaveCount(2)
+  await expect(screen.getByRole('tab', /Pending|Archived/)).toHaveCount(0)
+  await expect(screen.getByRole('tab', /Unread/)).toHaveText(/8/)
+
+  const fila = screen.getByRole('listitem').filter({ hasText: 'Lab results are back' }).first()
+  await fila.hover()
+  await fila.getByRole('button', 'Mark as read').tap()
+  await expect(screen.getByRole('tab', /Unread/)).toHaveText(/7/)
+  await fila.getByRole('button', 'Mark as unread').tap()
+  await expect(screen.getByRole('tab', /Unread/)).toHaveText(/8/)
+})

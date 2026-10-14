@@ -111,7 +111,7 @@ const Fondo = ({ children }: { children: ReactNode }) => (
 const PARTES: [string, string, string][] = [
   ['Logo', 'Bloque azul oscuro con el nombre. Mide lo mismo que la barra de arriba (64px) para que las dos queden alineadas.', 'Sólo el ícono.'],
   ['Items', 'Dashboard, Patients, Scheduling, Billing, Message, Contacts, Documents, Reports y Help: cada uno abre su pantalla. El de la pantalla actual va en azul.', 'Sólo íconos de 32×32, con el nombre en un tooltip.'],
-  ['Confibot', 'No es una pantalla: abre y cierra la hoja de chat de ayuda. Queda en azul mientras está abierta.', 'Ícono con tooltip.'],
+  ['Confibot', 'No es una pantalla: abre y cierra la misma hoja de chat que el botón flotante de abajo a la derecha, y es el camino que queda con ese botón recogido. Queda en azul mientras está abierta.', 'Ícono con tooltip.'],
   ['Settings', 'Al pie, en el mismo lugar abierto o cerrado. Al pasar el mouse muestra sus secciones; Billing despliega con su flecha Fee Schedules, Carriers y Coverage Table, que viven sólo acá.', 'El ícono, sin tooltip: el menú ya sale ahí mismo.'],
   ['Toggle', 'Está en la barra de arriba, a la izquierda del saludo: expande a 176px o colapsa a 58px.', 'Cambia el ícono.'],
 ]
@@ -252,7 +252,7 @@ function Medidas() {
 const Colores = () => (
   <Bloque titulo="Colors">
     <Tabla encabezado={['Part', 'Token']} minimo={480}>
-      <tr><td className="font-semibold">Rail</td><td><Token nombre="surface-subtle" /></td></tr>
+      <tr><td className="font-semibold">Rail</td><td><Token nombre="white" /></td></tr>
       <tr><td className="font-semibold">Logo</td><td><Token nombre="dash-blue-hover" /> · text <Token nombre="white" /></td></tr>
       <tr><td className="font-semibold">Item</td><td>text <Token nombre="dash-muted" /> · hover black 5%</td></tr>
       <tr><td className="font-semibold">Active item</td><td><Token nombre="dash-blue" /> · text <Token nombre="white" /></td></tr>
