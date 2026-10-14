@@ -1,12 +1,17 @@
-import { Maximize2, ChevronsDownUp, ChevronsUpDown, HandCoins } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { ArrowUpRight, Maximize2, ChevronsDownUp, ChevronsUpDown, HandCoins } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { aviso } from '@/components/ui/toaster'
-import { EnlaceRegistro, Entrada, FilaDetalle, NotaDetalle, Vacio } from '@/components/ui/detail-list'
+import { Pill } from '@/components/ui/pill'
+import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, NotaDetalle, Vacio } from '@/components/ui/detail-list'
 import { cn } from '@/lib/utils'
+import { tratamientoDe } from '@/components/clinical/RecordDetail'
+import { TONO_CASO } from '@/components/clinical/TreatmentPlanSection'
+import { PROCEDIMIENTOS } from '@/data/clinical-mode'
 import {
-  APLICACIONES, MOVIMIENTOS, aplicadoA, aplicadoDesde, fechaCorta, moneda, pendienteDe, sedeDe, tieneCredito, totalAplicado,
-  type Aplicacion, type Movimiento,
+  APLICACIONES, MOVIMIENTOS, alcanceDe, aplicadoA, aplicadoDesde, fechaCorta, moneda, pendienteDe, refDe, sedeDe, tieneCredito,
+  totalAplicado, type Aplicacion, type Movimiento,
 } from '@/data/ledger'
 
 /* Resumen de la fila al pasar el mouse, para leerla completa sin abrirla.
@@ -115,28 +120,40 @@ export function Campos({ m }: { m: Movimiento & { saldo?: number } }) {
   )
 }
 
-/* ── Lo del cobro (2026-10-14) ──────────────────────────────────────
+/* ── El detalle de cada tipo (2026-10-14) ─────────────────────────────
 
-   Julián (prototipo "Expanded transaction detail"): Clinic location, Financial details y Applied transactions van en el
-   detalle de la fila del Ledger y de Billing, no en Clinical Mode. Un cargo dice dónde se hizo, cuánto se pagó, con qué
-   y cuánto falta; un pago, ajuste o pago del seguro, a qué cargos fue y cuánto queda sin aplicar. Ver ledger.md. */
+   Historia de usuario de Julián con el prototipo "Ledger · Transaction relationships": al desplegar una fila se ve su
+   contexto, el detalle financiero y las transacciones relacionadas, en filas compactas (ui/detail-list), sin abrir el
+   registro completo. Procedure, Charge Adjustment, Patient Payment y Credit Adjustment; Insurance Payment queda fuera y
+   sigue con los datos de siempre. Sólo lectura. Ver design-reference/figma/modulos/ledger.md. */
 
-/** Lo que el detalle lee para el cobro: las aplicaciones al día (Apply credit suma las suyas) y las transacciones. */
+export type TipoDetalle = 'Procedure' | 'Charge Adjustment' | 'Patient Payment' | 'Credit Adjustment'
+
+/** El tipo del detalle; null para lo que queda fuera (Insurance Payment). */
+export const tipoDetalle = (m: Movimiento): TipoDetalle | null =>
+  m.tipo === 'Charge' ? 'Procedure'
+    : m.tipo === 'Payment' ? 'Patient Payment'
+      : m.tipo === 'Adjustment' ? (m.monto > 0 ? 'Charge Adjustment' : 'Credit Adjustment')
+        : null
+
+const nombreTipo = (m: Movimiento) => tipoDetalle(m) ?? 'Insurance Payment'
+const esCargo = (m: Movimiento) => m.monto > 0
+const cuenta = (m: Movimiento) => (alcanceDe(m) === 'guarantor' ? 'Guarantor / Account' : m.paciente)
+const motivoDe = (m: Movimiento) => m.motivo ?? (m.descripcion && m.descripcion !== '—' ? m.descripcion : undefined)
+
+/** Lo que el detalle lee: las aplicaciones al día (Apply credit suma las suyas), las transacciones y a dónde llevan los
+    links. */
 export type DatosCobro = {
   aplicaciones?: Aplicacion[]
   movimientos?: Movimiento[]
-  /** Abre otra transacción (la referencia de una aplicación) en su registro de sólo lectura. */
+  /** Un registro relacionado: la pantalla lleva a su fila y la despliega si está en la tabla; si no, abre su registro. */
   onVerTransaccion?: (m: Movimiento) => void
+  /** Clinical Mode con el caso o el procedimiento abiertos. */
+  onAbrirClinica?: (d: { caso?: string; procedimiento?: string }) => void
 }
 
-const etiquetaTipo = (m: Movimiento) =>
-  m.tipo === 'Insurance' ? 'Insurance Payment'
-    : m.tipo === 'Payment' ? 'Patient Payment'
-      : m.tipo === 'Adjustment' ? (m.monto < 0 ? 'Credit Adjustment' : 'Charge Adjustment')
-        : 'Charge'
-
-/** Un número de Financial details; el último (lo que falta o lo que queda) va destacado. El monto va abajo: si un rótulo
-    se parte, los números siguen alineados. */
+/** Un número de Financial details; el que importa (lo que falta del cargo, el crédito sin aplicar) va destacado. El
+    monto va abajo: si un rótulo se parte, los números siguen alineados. */
 export function Metrica({ label, valor, destacado }: { label: string; valor: number; destacado?: boolean }) {
   return (
     <div className="flex min-w-0 flex-col">
@@ -146,121 +163,195 @@ export function Metrica({ label, valor, destacado }: { label: string; valor: num
   )
 }
 
-/** Clinic location, Financial details y Applied transactions de una transacción, como filas de ui/detail-list. */
-export function FilasCobro({ m, aplicaciones = APLICACIONES, movimientos = MOVIMIENTOS, onVerTransaccion }: DatosCobro & { m: Movimiento }) {
-  const esCargo = m.monto > 0
-  const ver = onVerTransaccion ?? ((x: Movimiento) => aviso.info(`Opens ${x.descripcion}.`))
-  const filas = (esCargo ? aplicadoA(m.id, aplicaciones) : aplicadoDesde(m.id, aplicaciones))
-    .map((a) => ({ a, otra: movimientos.find((x) => x.id === (esCargo ? a.origen : a.cargo)) }))
+const Texto = ({ children }: { children: ReactNode }) => <Entrada><span className="text-[12px] text-ink">{children}</span></Entrada>
+const Pista = ({ children, arriba }: { children: ReactNode; arriba?: boolean }) => (
+  <p className={cn('text-[11px] leading-[1.5] text-ink-muted', arriba ? 'mb-1 flex min-h-6 items-center' : 'mt-2')}>{children}</p>
+)
+
+/** El caso de Treatment Plan del procedimiento que se cobra (por su vínculo, nunca por código): el aceptado primero,
+    con la visita, y después los históricos. */
+export function TratamientoDelCargo({ m, onAbrir }: { m: Movimiento; onAbrir: (caso: string) => void }) {
+  const pr = m.procedimiento ? PROCEDIMIENTOS.find((p) => p.id === m.procedimiento) : undefined
+  const t = pr && tratamientoDe(pr)
+  if (!t) return <Vacio>No treatment linked.</Vacio>
+  const casos = [t.caso, ...t.grupo.filter((c) => c.id !== t.caso.id && c.estado === 'Discarded')]
+    .sort((a, b) => Number(b.estado === 'Accepted') - Number(a.estado === 'Accepted'))
+  return (
+    <div>
+      {casos.map((c) => (
+        <div key={c.id}>
+          <Entrada rotulo={c.id === t.caso.id ? undefined : 'Historical'} estado={<Pill tone={TONO_CASO[c.estado]} size="sm" className="whitespace-nowrap">{c.estado}</Pill>}>
+            <EnlaceRegistro onClick={() => onAbrir(c.id)}>{c.nombre}</EnlaceRegistro>
+          </Entrada>
+          {/* El modelo no tiene fases: Phase no se muestra hasta que exista. */}
+          {c.id === t.caso.id && t.visita && <p className="text-[11px] text-ink-muted">{t.visita.nombre} · This procedure</p>}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** Payment methods: cada componente del pago con su referencia y su monto. */
+export function MetodosDePago({ m }: { m: Movimiento }) {
+  if (!m.metodos?.length) return <Vacio>No payment method details available.</Vacio>
+  return m.metodos.map((x, i) => (
+    <Texto key={i}>{x.metodo}{x.ref && ` ${x.ref}`} — <span className="tabular-nums">{moneda(x.monto)}</span></Texto>
+  ))
+}
+
+/** Adjustment reason: el tipo de ajuste y la nota. */
+export function Motivo({ m }: { m: Movimiento }) {
+  const motivo = motivoDe(m)
+  if (!motivo) return <Vacio>Adjustment reason unavailable.</Vacio>
+  return (
+    <div>
+      <Texto>{motivo}</Texto>
+      {m.nota && <p className="text-[11px] text-ink-muted">{m.nota}</p>}
+    </div>
+  )
+}
+
+/** Las filas del detalle según el tipo, en el orden de la historia. */
+export function FilasTransaccion({ m, aplicaciones = APLICACIONES, movimientos = MOVIMIENTOS, onVerTransaccion, onAbrirClinica }: DatosCobro & { m: Movimiento }) {
+  const tipo = tipoDetalle(m)
+  if (!tipo) return null
+  const cargo = esCargo(m)
+  const ver = onVerTransaccion ?? ((x: Movimiento) => aviso.info(`Opens ${nombreTipo(x)} ${refDe(x)}.`))
+  const abrirCaso = (caso: string) => (onAbrirClinica ? onAbrirClinica({ caso }) : aviso.info('Opens the case in Treatment Plan.'))
+  const filas = (cargo ? aplicadoA(m.id, aplicaciones) : aplicadoDesde(m.id, aplicaciones))
+    .map((a) => ({ a, otra: movimientos.find((x) => x.id === (cargo ? a.origen : a.cargo)) }))
     .filter((f): f is { a: Aplicacion; otra: Movimiento } => !!f.otra)
-  const deTipo = (tipo: Movimiento['tipo']) => totalAplicado(filas.filter((f) => f.otra.tipo === tipo).map((f) => f.a))
   const aplicado = totalAplicado(filas.map((f) => f.a))
-  const sinAplicar = m.estado === 'Denied' ? 0 : m.creditoDisponible ?? Math.max(-m.monto - aplicado, 0)
+  const deTipo = (t: string) => totalAplicado(filas.filter((f) => nombreTipo(f.otra) === t).map((f) => f.a))
+  const sinAplicar = m.creditoDisponible ?? Math.max(-m.monto - aplicado, 0)
+  const sede = sedeDe(m)
+  const alcance = alcanceDe(m) === 'guarantor' ? 'guarantor · Household credit' : `patient · ${m.paciente}`
+
   return (
     <>
-      <FilaDetalle titulo="Clinic location"><Entrada><span className="text-[12px] text-ink">{sedeDe(m)}</span></Entrada></FilaDetalle>
+      {tipo === 'Procedure' && <FilaDetalle titulo="Treatment"><TratamientoDelCargo m={m} onAbrir={abrirCaso} /></FilaDetalle>}
+      {tipo === 'Charge Adjustment' && <FilaDetalle titulo="Adjustment reason"><Motivo m={m} /></FilaDetalle>}
+      {!cargo && <FilaDetalle titulo="Scope"><Texto>{alcance}</Texto></FilaDetalle>}
+      {tipo === 'Patient Payment' && <FilaDetalle titulo="Payment methods"><MetodosDePago m={m} /></FilaDetalle>}
+      {tipo === 'Credit Adjustment' && <FilaDetalle titulo="Adjustment reason"><Motivo m={m} /></FilaDetalle>}
+      <FilaDetalle titulo="Location">{sede ? <Texto>{sede}</Texto> : <Vacio>Location unavailable.</Vacio>}</FilaDetalle>
       <FilaDetalle titulo="Financial details">
         <dl className="grid grid-cols-[repeat(auto-fit,minmax(112px,1fr))] gap-x-6 gap-y-3 py-0.5">
-          {esCargo ? (
+          {cargo ? (
             <>
               <Metrica label="Original charge" valor={m.monto} />
-              <Metrica label="Insurance paid" valor={deTipo('Insurance')} />
-              <Metrica label="Payments applied" valor={deTipo('Payment')} />
-              <Metrica label="Credit adjustments applied" valor={deTipo('Adjustment')} />
-              <Metrica label="Outstanding balance" valor={pendienteDe(m, aplicaciones)} destacado />
+              <Metrica label="Payments applied" valor={deTipo('Patient Payment')} />
+              <Metrica label="Credit adjustments applied" valor={deTipo('Credit Adjustment')} />
+              {/* Insurance Payment queda fuera de la historia, pero si cubrió parte del cargo sin esto los números no
+                  cierran: va sólo cuando hay (ledger.md, 2026-10-14). */}
+              {deTipo('Insurance Payment') > 0 && <Metrica label="Insurance applied" valor={deTipo('Insurance Payment')} />}
+              <Metrica label="Outstanding transaction balance" valor={pendienteDe(m, aplicaciones)} destacado />
             </>
           ) : (
             <>
-              <Metrica label={m.tipo === 'Insurance' ? 'Paid by insurance' : m.tipo === 'Payment' ? 'Amount received' : 'Credit amount'} valor={m.estado === 'Denied' ? 0 : -m.monto} />
+              <Metrica label={tipo === 'Patient Payment' ? 'Original payment' : 'Original credit'} valor={-m.monto} />
               <Metrica label="Applied to charges" valor={aplicado} />
               <Metrica label="Unapplied credit" valor={sinAplicar} destacado />
+              <Metrica label="Transaction balance" valor={0} />
             </>
           )}
         </dl>
         <NotaDetalle>
-          {esCargo ? 'Balance of this charge only, not the patient or guarantor balance.'
-            : m.estado === 'Denied' ? 'Denied claim: nothing was paid or applied.' : 'What this transaction paid, not the patient or guarantor balance.'}
+          {cargo ? 'Current balance of this charge only, not the patient or guarantor balance.'
+            : 'A payment or credit has no outstanding balance: what is left to use is its unapplied credit.'}
         </NotaDetalle>
       </FilaDetalle>
-      <FilaDetalle titulo="Applied transactions" cuenta={filas.length}>
+      <FilaDetalle titulo={cargo ? 'Payments & credits applied to this charge' : 'Charges paid or credited by this transaction'} cuenta={filas.length}>
+        <Pista arriba>{cargo ? 'Incoming applications: the payments and credits that reduced this charge.' : 'Outgoing applications: the charges this payment or credit was applied to.'}</Pista>
         {filas.length === 0 ? (
-          <Vacio>{esCargo ? 'Nothing applied to this charge yet.' : 'Not applied to any charge yet.'}</Vacio>
+          <Vacio>{cargo ? 'No payments or credits have been applied to this charge.' : 'This transaction has not been applied to any charges.'}</Vacio>
         ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-[12px]">
-                <thead className="text-[11px] text-ink-muted">
-                  <tr>
-                    <th className="py-1.5 pr-3 font-medium">Date applied</th>
-                    <th className="py-1.5 pr-3 font-medium">Type</th>
-                    <th className="py-1.5 pr-3 font-medium">{esCargo ? 'Reference / description' : 'Charge'}</th>
-                    <th className="py-1.5 text-right font-medium">Applied amount</th>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[560px] text-left text-[12px]">
+              <thead className="text-[11px] text-ink-muted">
+                <tr>
+                  <th className="py-1.5 pr-3 font-medium">Date applied</th>
+                  <th className="py-1.5 pr-3 font-medium">{cargo ? 'Source transaction' : 'Destination charge'}</th>
+                  <th className="py-1.5 pr-3 font-medium">Patient / Account</th>
+                  <th className="py-1.5 pr-3 font-medium">{cargo ? 'Reference / reason' : 'Procedure / reason'}</th>
+                  <th className="py-1.5 text-right font-medium">Applied amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filas.map(({ a, otra }) => (
+                  <tr key={a.id} className="border-t border-line-soft">
+                    <td className="py-2 pr-3 whitespace-nowrap text-ink">{fechaCorta(a.fecha)}</td>
+                    <td className="py-2 pr-3"><EnlaceRegistro onClick={() => ver(otra)}>{nombreTipo(otra)} · {refDe(otra)}</EnlaceRegistro></td>
+                    <td className="py-2 pr-3 text-ink">{cuenta(otra)}</td>
+                    <td className="py-2 pr-3 text-ink">{otra.tipo === 'Charge' ? `${otra.codigo} · ${otra.descripcion}` : motivoDe(otra) ?? '—'}</td>
+                    <td className="py-2 text-right font-medium whitespace-nowrap text-ink tabular-nums">{moneda(a.monto)}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {filas.map(({ a, otra }) => (
-                    <tr key={a.id} className="border-t border-line-soft">
-                      <td className="py-2 pr-3 whitespace-nowrap text-ink">{fechaCorta(a.fecha)}</td>
-                      <td className="py-2 pr-3 whitespace-nowrap text-ink">{etiquetaTipo(otra)}</td>
-                      <td className="py-2 pr-3">
-                        <EnlaceRegistro onClick={() => ver(otra)}>{otra.codigo !== '—' ? `${otra.codigo} · ${otra.descripcion}` : otra.descripcion}</EnlaceRegistro>
-                      </td>
-                      <td className="py-2 text-right font-medium whitespace-nowrap text-ink tabular-nums">{moneda(a.monto)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <NotaDetalle>{esCargo ? 'Only the part applied to this charge, not the full amount of each transaction.' : 'Only the part of this transaction applied to each charge.'}</NotaDetalle>
-          </>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
+        <Pista>
+          {cargo ? 'Amounts show only the part applied to this charge, not the full payment or credit.'
+            : 'Amounts show how this transaction was allocated. Applying existing credit does not create another payment or reduce the account balance again.'}
+        </Pista>
       </FilaDetalle>
     </>
   )
 }
 
-/* Lo del cobro debajo de los datos de la transacción, separado por una línea; las filas, como en ui/detail-list. */
-const Cobro = (p: DatosCobro & { m: Movimiento }) => (
-  <div className="@container mt-4 flex flex-col border-t border-line-row pt-3"><FilasCobro {...p} /></div>
-)
+const BOTON_CREDITO = 'text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-info-bg px-2.5 py-1 text-[12px] font-medium hover:bg-[#e3edff]'
+const BOTON_VER = 'text-dash-blue inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline'
 
-/** El contenido del detalle, sin el marco: los datos de la transacción, lo del cobro y el pie. Lo usan el Ledger y la
-    tabla de Billing (que pone su propio marco, el de DataTable). */
+/** El contenido del detalle, sin el marco. Las cuatro transacciones de la historia llevan su lista (título, filas y pie
+    con su acción y Read-only summary); Insurance Payment, los datos de siempre. Lo usan el Ledger y la tabla de Billing
+    (que pone su propio marco, el de DataTable). */
 export function DetalleMovimiento({
-  m, onVerTodo, onAplicarCredito, ...cobro
+  m, onVerTodo, onAplicarCredito, ...datos
 }: DatosCobro & {
   m: Movimiento & { saldo?: number }
+  /** El registro completo de la transacción. */
   onVerTodo: () => void
+  /** Sólo con crédito sin aplicar y permiso: abre Apply credit (Unapplied Credit Management) con esta fuente. */
   onAplicarCredito?: () => void
 }) {
+  const tipo = tipoDetalle(m)
+  if (!tipo) {
+    return (
+      <>
+        <Campos m={m} />
+        <div className="mt-3 flex flex-wrap items-center gap-4">
+          <button type="button" onClick={onVerTodo} className={BOTON_VER}><Maximize2 className="size-3.5" /> View full record</button>
+        </div>
+      </>
+    )
+  }
+  /* View procedure abre el procedimiento del paciente; sin vínculo, el registro. */
+  const verProcedimiento = m.procedimiento && datos.onAbrirClinica ? () => datos.onAbrirClinica!({ procedimiento: m.procedimiento }) : onVerTodo
+  const accion = tipo === 'Procedure' ? 'View procedure' : tipo === 'Patient Payment' ? 'View payment' : 'View adjustment'
+  const lado = [refDe(m), m.estado, m.diente && `Tooth ${m.diente}`, m.superficie && `Surface ${m.superficie}`].filter(Boolean).join(' · ')
   return (
-    <>
-      <Campos m={m} />
-      <Cobro m={m} {...cobro} />
-      <div className="mt-3 flex flex-wrap items-center gap-4">
-        <button
-          type="button"
-          onClick={onVerTodo}
-          className="text-dash-blue inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline"
-        >
-          <Maximize2 className="size-3.5" /> View full record
-        </button>
-        {onAplicarCredito && (
-          <button
-            type="button"
-            onClick={onAplicarCredito}
-            className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-info-bg px-2.5 py-1 text-[12px] font-medium hover:bg-[#e3edff]"
-          >
-            <HandCoins className="size-3.5" /> Apply credit
+    <ListaDetalle
+      titulo={m.tipo === 'Charge' ? `${m.codigo} · ${m.descripcion}` : m.descripcion}
+      lado={lado}
+      pie={(
+        <>
+          <button type="button" onClick={tipo === 'Procedure' ? verProcedimiento : onVerTodo} className={BOTON_VER}>
+            <ArrowUpRight className="size-3.5" /> {accion}
           </button>
-        )}
-      </div>
-    </>
+          {onAplicarCredito && (
+            <button type="button" onClick={onAplicarCredito} className={BOTON_CREDITO}><HandCoins className="size-3.5" /> Apply credit</button>
+          )}
+        </>
+      )}
+    >
+      <FilasTransaccion m={m} {...datos} />
+    </ListaDetalle>
   )
 }
 
 export function LedgerRowDetail({
-  m, onVerTodo, onAplicarCredito, ...cobro
+  m, onVerTodo, onAplicarCredito, ...datos
 }: DatosCobro & {
   m: Movimiento & { saldo?: number }
   onVerTodo: () => void
@@ -278,14 +369,15 @@ export function LedgerRowDetail({
           contenedor); cuando la tabla entra entera, ese valor ya es el 100%.
           Menos el padding del contenedor (24px): si no, lo alineado a la derecha (Applied amount) quedaba cortado. */}
       <div className="sticky left-3 w-[calc(var(--tabla-visible,calc(100%+1.5rem))-1.5rem)]">
-        <DetalleMovimiento m={m} onVerTodo={onVerTodo} onAplicarCredito={onAplicarCredito} {...cobro} />
+        <DetalleMovimiento m={m} onVerTodo={onVerTodo} onAplicarCredito={onAplicarCredito} {...datos} />
       </div>
     </div>
   )
 }
 
+/** El registro completo: todos los datos de la transacción y, para las cuatro de la historia, sus filas sin plegar. */
 export function LedgerRowModal({
-  m, onClose, ...cobro
+  m, onClose, ...datos
 }: DatosCobro & {
   m: Movimiento & { saldo?: number }
   onClose: () => void
@@ -308,7 +400,9 @@ export function LedgerRowModal({
       )}
     >
       <Campos m={m} />
-      <Cobro m={m} {...cobro} />
+      {tipoDetalle(m) && (
+        <div className="@container mt-4 flex flex-col border-t border-line-row pt-3"><FilasTransaccion m={m} {...datos} /></div>
+      )}
     </ModalShell>
   )
 }

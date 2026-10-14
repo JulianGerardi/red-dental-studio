@@ -819,9 +819,11 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - **Pills:** una por dato, en minúscula inicial como en toda la app; las de Clinical Mode que iban en mayúsculas
   (Problem List, rail y card de Treatment Plan, detalle) se alinean. *Components / Clinical / RecordDetail → Specs →
   Rules* lo dice.
-- *Components / Ledger / LedgerRowDetail* rehecha con Playground, Parts, States, *Reference open* y Specs: los datos de
-  la transacción más Clinic location, Financial details y Applied transactions (`FilasCobro`, `Metrica`,
-  `DetalleMovimiento`). *Pages / Parts / Billing* suma *Row detail* en Parts y dos filas abiertas en States.
+- *Components / Ledger / LedgerRowDetail* rehecha con Playground, Parts, States, *Related record* y Specs: el detalle de
+  la fila según el tipo (Procedure, Charge Adjustment, Patient Payment, Credit Adjustment; Insurance Payment con los
+  datos de siempre), con los datos del prototipo de Julián (`FilasTransaccion`, `TratamientoDelCargo`, `MetodosDePago`,
+  `Motivo`, `Metrica`, `DetalleMovimiento`). *Pages / Parts / Billing* suma *Row detail* en Parts y dos filas abiertas en
+  States.
 - *Components / Clinical / RecordDetail*: sin lo del cobro (sale `ContenidoSede`, `ContenidoFinanzas`,
   `ContenidoAplicadas`, `Metrica` y `cargoDe`). Decisiones en `figma/modulos/ledger.md`, `billing.md` y
   `clinical-mode.md` (2026-10-14).

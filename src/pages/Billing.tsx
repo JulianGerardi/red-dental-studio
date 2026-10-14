@@ -138,8 +138,7 @@ export function PacienteElegido({ paciente, onCerrar }: { paciente: PacienteBill
 
 /* Recent Billing Activity. Sin paciente: toda la clínica, con las Tabs de tipo y filas que eligen al paciente. Con uno:
    su nombre en el título, Patient / Guarantor View, los saldos del garante y sólo sus movimientos; cada fila se despliega
-   con el detalle del Ledger (los datos, Clinic location, Financial details y Applied transactions; billing.md,
-   2026-10-14). */
+   con el detalle del Ledger según el tipo (billing.md y ledger.md, 2026-10-14). */
 export function ActividadReciente({
   filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, creditos, saldo, onElegir, refElegido, abierta,
 }: {

@@ -48,8 +48,8 @@ test('Con un paciente, la fila de un pago dice a qué cargo fue', async ({ app, 
   await screen.getByRole('button', /Maria Abril Viola/).tap()
   await screen.getByText(/^Card Payment ····5521$/).tap()
 
-  await expect(screen.getByText('Clinic location')).toBeVisible()
+  await expect(screen.getByText(/Card payment ····5521 — \$90\.00/)).toBeVisible()
   await expect(screen.getByText('Applied to charges')).toBeVisible()
-  await screen.getByRole('button', /^D1110 · Prophylaxis – adult/).tap()
+  await screen.getByRole('button', /^Procedure · TX-2010/).tap()
   await expect(screen.getByRole('dialog', /Prophylaxis – adult/)).toBeVisible()
 })

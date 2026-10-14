@@ -75,15 +75,18 @@ const texto = (t: string) => <span className="truncate">{t || '-'}</span>
 /* En minúscula inicial, como las pills de toda la app (Julián, 2026-10-14). */
 const estadoPill = (tono: PillTone, e: string) => <Pill tone={tono} size="sm" className="whitespace-nowrap">{e}</Pill>
 
-export function ProblemList() {
-  const [pestana, setPestana] = useState<Pestana>('Problem List')
+export function ProblemList({ procedimientoInicial }: {
+  /** Abre en Procedures con esa fila desplegada (View procedure del detalle del Ledger). */
+  procedimientoInicial?: string
+} = {}) {
+  const [pestana, setPestana] = useState<Pestana>(procedimientoInicial ? 'Procedures' : 'Problem List')
   const [problemas, setProblemas] = useState(PROBLEMAS)
   const [procedimientos, setProcedimientos] = useState(PROCEDIMIENTOS)
   const [filtroProblema, setFiltroProblema] = useState<EstadoProblema>('Active')
   const [filtroProcedimiento, setFiltroProcedimiento] = useState<EstadoProcedimiento | 'All'>('All')
   const [q, setQ] = useState('')
   /* La fila que se abre al llegar desde el detalle de la otra pestaña. */
-  const [enfoque, setEnfoque] = useState<string>()
+  const [enfoque, setEnfoque] = useState<string | undefined>(procedimientoInicial)
 
   const t = q.trim().toLowerCase()
   const filasProblema = problemas.filter((p) => p.estado === filtroProblema && (!t || `${p.fecha} ${p.ubicacion} ${p.pieza ?? ''} ${p.condicion} ${p.examen} ${p.proveedor}`.toLowerCase().includes(t)))

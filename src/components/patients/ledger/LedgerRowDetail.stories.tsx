@@ -4,39 +4,65 @@ import { aviso } from '@/components/ui/toaster'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Bloque, Lienzo, Tabla, Token } from '@/design-system/kit'
 import { esperar } from '@/design-system/play'
-import { MOVIMIENTOS, conSaldo, tieneCredito } from '@/data/ledger'
+import { MOVIMIENTOS, conSaldo, refDe, type Aplicacion, type Movimiento } from '@/data/ledger'
 import { ACTIVIDAD_RECIENTE, APLICACIONES_BILLING } from '@/data/billing'
-import { BotonExpandirTodo, DetalleMovimiento, FilasCobro, LedgerRowDetail, Metrica } from './LedgerRowDetail'
+import { BotonExpandirTodo, DetalleMovimiento, FilasTransaccion, LedgerRowDetail, MetodosDePago, Metrica, Motivo, TratamientoDelCargo, tipoDetalle } from './LedgerRowDetail'
 
-/* Las transacciones de ejemplo, una por caso del cobro. */
-const CASOS = {
-  'charge-partly-paid': { titulo: 'D4341 · charge, partly paid (Northgate Clinic)', id: 'm13' },
-  'charge-paid': { titulo: 'D0120 · charge paid by insurance', id: 'm1' },
-  'charge-unpaid': { titulo: 'D0220 · charge, nothing applied', id: 'm14' },
-  'payment-several': { titulo: 'Wire transfer · applied to four charges', id: 'm22' },
-  'payment-credit': { titulo: 'Check payment · with unapplied credit', id: 'm27' },
-  'insurance-denied': { titulo: 'BCBS claim · denied', id: 'm7' },
+/* Los datos del prototipo de Julián ("Ledger · Transaction relationships"): un procedimiento, un Charge Adjustment de
+   la cuenta, un pago combinado de la cuenta, un crédito y un pago de un paciente sin aplicar. */
+const base = { paciente: 'John Smith', provider: 'Front desk', estado: 'Posted' as const, codigo: '—', sede: 'Downtown' }
+const EJEMPLO: (Movimiento & { saldo: number })[] = conSaldo([
+  { ...base, id: 'C1', ref: 'C1', fecha: 'October 10, 2026', tipo: 'Charge', monto: 200, codigo: 'D3330', descripcion: 'Endodontic therapy, molar tooth', provider: 'Dr. Elena Martinez', diente: '19', procedimiento: 'pr10' },
+  { ...base, id: 'C2', ref: 'C2', fecha: 'October 11, 2026', tipo: 'Adjustment', monto: 50, descripcion: 'Returned payment fee', alcance: 'guarantor', nota: 'Check returned by the bank.' },
+  { ...base, id: 'P1', ref: 'P1', fecha: 'October 12, 2026', tipo: 'Payment', monto: -150, descripcion: 'Cash $50.00 + Card ····4218 $100.00', alcance: 'guarantor', metodos: [{ metodo: 'Cash payment', monto: 50 }, { metodo: 'Card payment', ref: '····4218', monto: 100 }], creditoDisponible: 30 },
+  { ...base, id: 'A1', ref: 'A1', fecha: 'October 13, 2026', tipo: 'Adjustment', monto: -50, descripcion: 'Courtesy adjustment', alcance: 'guarantor', creditoDisponible: 20 },
+  { ...base, id: 'P2', ref: 'P2', fecha: 'October 14, 2026', tipo: 'Payment', monto: -40, descripcion: 'Cash payment', creditoDisponible: 40 },
+])
+const APLICACIONES: Aplicacion[] = [
+  { id: 'x1', origen: 'P1', cargo: 'C1', fecha: 'October 12, 2026', monto: 100 },
+  { id: 'x2', origen: 'P1', cargo: 'C2', fecha: 'October 12, 2026', monto: 20 },
+  { id: 'x3', origen: 'A1', cargo: 'C1', fecha: 'October 13, 2026', monto: 20 },
+  { id: 'x4', origen: 'A1', cargo: 'C2', fecha: 'October 13, 2026', monto: 10 },
+]
+/* Casos que el prototipo no tiene: sin tratamiento ni aplicaciones, sin sede ni motivo, y un pago del seguro (fuera). */
+const EXTRA: (Movimiento & { saldo: number })[] = [
+  { ...base, id: 'C3', ref: 'C3', fecha: 'October 15, 2026', tipo: 'Charge', monto: 95, codigo: 'D0274', descripcion: 'Bitewings – four radiographic images', saldo: 0 },
+  { ...base, id: 'A2', ref: 'A2', fecha: 'October 15, 2026', tipo: 'Adjustment', monto: -25, descripcion: '', sede: '', saldo: 0 },
+  { ...conSaldo(MOVIMIENTOS).find((m) => m.id === 'm3')! },
+]
+const TODAS = [...EJEMPLO, ...EXTRA]
+const por = (id: string) => TODAS.find((m) => m.id === id)!
+
+const OPCIONES = {
+  C1: 'Procedure · C1 (treatment, paid and credited)',
+  C2: 'Charge Adjustment · C2 (account fee)',
+  P1: 'Patient Payment · P1 (cash + card, unapplied credit)',
+  A1: 'Credit Adjustment · A1 (household credit)',
+  P2: 'Patient Payment · P2 (not applied, no method details)',
+  C3: 'Procedure · C3 (no treatment, nothing applied)',
+  A2: 'Credit Adjustment · A2 (location and reason unavailable)',
+  m3: 'Insurance Payment (out of scope: the fields as before)',
 } as const
-type Caso = keyof typeof CASOS
-const CON_SALDO = conSaldo(MOVIMIENTOS)
-const de = (c: Caso) => CON_SALDO.find((m) => m.id === CASOS[c].id)!
 const ANCHOS = { table: 1094, phone: 356 } as const
+type Args = { transaccion: keyof typeof OPCIONES; ancho: keyof typeof ANCHOS }
 
-type Args = { caso: Caso; ancho: keyof typeof ANCHOS }
-
-const ver = (x: { descripcion: string }) => aviso.info(`Opens ${x.descripcion} in its full record.`)
+const avisar = (texto: string) => () => aviso.info(texto)
 
 /* La fila desplegada como en el Ledger, con el ancho visible de la tabla. */
-function Ejemplo({ caso, ancho }: Args) {
-  const m = de(caso)
+function Ejemplo({ transaccion, ancho }: Args) {
+  const m = por(transaccion)
+  const sinAplicar = m.creditoDisponible ?? 0
   return (
     <TooltipProvider>
       <div className="rounded-lg border border-line-row bg-white" style={{ width: ANCHOS[ancho], maxWidth: '100%', ['--tabla-visible' as string]: `${ANCHOS[ancho]}px` }}>
         <LedgerRowDetail
           m={m}
-          onVerTodo={() => aviso.info('Opens View full record.')}
-          onVerTransaccion={ver}
-          onAplicarCredito={tieneCredito(m) ? () => aviso.info('Opens Apply credit.') : undefined}
+          aplicaciones={APLICACIONES}
+          movimientos={TODAS}
+          onVerTransaccion={(x) => aviso.info(`Goes to ${refDe(x)} in the table and opens it.`)}
+          onAbrirClinica={(d) => aviso.info(d.caso ? 'Opens the case in Treatment Plan.' : 'Opens the procedure in Clinical Mode.')}
+          onVerTodo={avisar('Opens the full record.')}
+          onAplicarCredito={tipoDetalle(m) && sinAplicar > 0 ? avisar('Opens Apply credit with this transaction as the source.') : undefined}
         />
       </div>
     </TooltipProvider>
@@ -50,24 +76,25 @@ const meta = {
     docs: {
       description: {
         component: [
-          'Lo que se despliega debajo de una fila del **Ledger** y de **Billing** con un paciente elegido (en Billing, adentro del `rowDetail` de la tabla de la app).',
+          'Lo que se despliega debajo de una fila del **Ledger** (y de **Billing** con un paciente elegido): el contexto de la transacción, su detalle financiero y las transacciones relacionadas, en filas compactas (*Components / UI / DetailList*), sin abrir el registro completo. Historia de usuario y prototipo de Julián (2026-10-14). Sólo lectura.',
           '',
-          '**Qué muestra:** los datos de la transacción (Description, Transaction date, Patient, Type, Code, Provider, Status, Tooth, Surface, Amount, Balance) y, debajo de una línea, lo del cobro (prototipo *Expanded transaction detail*, Julián 2026-10-14), con las filas de *Components / UI / DetailList*:',
+          '**Arriba**, la descripción y al costado el identificador, el estado y la pieza. **Las filas, según el tipo:**',
           '',
-          '- **Clinic location**: la sede donde se registró.',
-          '- **Financial details**: un cargo, Original charge, Insurance paid, Payments applied, Credit adjustments applied y **Outstanding balance** (lo que falta de ese cargo, no el saldo de la cuenta). Un pago o ajuste, lo recibido, lo aplicado a cargos y **Unapplied credit**.',
-          '- **Applied transactions**: fecha, tipo, la otra transacción (abre su registro de sólo lectura) y lo aplicado. En un cargo, los pagos y ajustes que lo cubren; en un pago, los cargos a los que fue.',
+          '- **Procedure:** Treatment (el caso del procedimiento, por su vínculo; el aceptado primero y después los históricos, con la visita), Location, Financial details y *Payments & credits applied to this charge*. Pie: **View procedure** (Clinical Mode).',
+          '- **Charge Adjustment:** Adjustment reason, Location, Financial details y *Payments & credits applied to this charge*. Pie: **View adjustment**.',
+          '- **Patient Payment:** Scope, Payment methods, Location, Financial details y *Charges paid or credited by this transaction*. Pie: **View payment** y, con crédito disponible, **Apply credit**.',
+          '- **Credit Adjustment:** Scope, Adjustment reason, Location, Financial details y *Charges paid or credited by this transaction*. Pie: **View adjustment** y **Apply credit**.',
           '',
-          'Al pie, **View full record** (el mismo contenido en un drawer) y, si queda crédito sin aplicar, **Apply credit**, que suma sus aplicaciones al detalle. Lo del cobro no está en Clinical Mode.',
+          'Los montos aplicados van en positivo; un cargo muestra lo que recibió y un pago o crédito, a dónde fue. El link de una transacción lleva a su fila (y la despliega) si está en la tabla; si no, abre su registro. **Insurance Payment** queda fuera y muestra los datos de siempre.',
           '',
-          '**Probalo:** en *Playground* elegí la transacción y el ancho desde *Controls*; tocá una referencia de Applied transactions.',
+          '**Probalo:** en *Playground* elegí la transacción y el ancho desde *Controls*; tocá los links.',
         ].join('\n'),
       },
     },
   },
-  args: { caso: 'charge-partly-paid', ancho: 'table' },
+  args: { transaccion: 'C1', ancho: 'table' },
   argTypes: {
-    caso: { name: 'transaction', control: 'select', options: Object.keys(CASOS), labels: Object.fromEntries(Object.entries(CASOS).map(([k, v]) => [k, v.titulo])), description: 'Un cargo (pagado, en parte o nada), un pago aplicado a varios cargos, uno con crédito sin aplicar o un claim denegado.' },
+    transaccion: { name: 'transaction', control: 'select', options: Object.keys(OPCIONES), labels: OPCIONES, description: 'Los cuatro tipos de la historia, sus vacíos y un pago del seguro (fuera de la historia).' },
     ancho: { name: 'width', control: 'inline-radio', options: Object.keys(ANCHOS), description: 'table 1094 (el Ledger a 1440) · phone 356 (la tabla scrollea y el detalle queda en la parte visible).' },
   },
 } satisfies Meta<Args>
@@ -83,18 +110,20 @@ export const Parts: Story = {
   render: () => (
     <TooltipProvider>
       <Lienzo>
-        <Bloque titulo="The detail" nota="Los datos de la transacción, la línea, lo del cobro y el pie.">
-          <Ejemplo caso="charge-partly-paid" ancho="table" />
+        <Bloque titulo="A charge" nota="Procedure C1: el caso con su visita, la sede, los números y lo que recibió.">
+          <Ejemplo transaccion="C1" ancho="table" />
         </Bloque>
-        <Bloque titulo="Billing" nota="El mismo contenido sin el marco (DetalleMovimiento): lo pone la tabla de la app. Card Payment de Maria Abril Viola, aplicado a D1110.">
-          <div className="w-[960px] max-w-full rounded-lg border border-line-row bg-surface-subtle px-4 py-3 pl-11">
-            <DetalleMovimiento m={ACTIVIDAD_RECIENTE.find((m) => m.id === 'act-Maria Abril Viola-1')!} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} onVerTodo={() => aviso.info('Opens View full record.')} />
+        <Bloque titulo="In Billing" nota="El mismo contenido sin el marco (DetalleMovimiento): lo pone la tabla de la app. Card Payment de Maria Abril Viola, aplicado a D1110.">
+          <div className="@container w-[960px] max-w-full rounded-lg border border-line-row bg-surface-subtle px-4 py-3 pl-11">
+            <DetalleMovimiento m={ACTIVIDAD_RECIENTE.find((m) => m.id === 'act-Maria Abril Viola-1')!} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTodo={avisar('Opens the full record.')} />
           </div>
         </Bloque>
         <Bloque titulo="Pieces">
           <div className="flex flex-col gap-4">
-            <div className="@container flex w-[880px] max-w-full flex-col"><FilasCobro m={de('payment-several')} onVerTransaccion={ver} /></div>
-            <dl className="grid w-[420px] grid-cols-2 gap-4"><Metrica label="Original charge" valor={310} /><Metrica label="Outstanding balance" valor={170} destacado /></dl>
+            <div className="flex w-[480px] flex-col gap-2"><MetodosDePago m={por('P1')} /><MetodosDePago m={por('P2')} /><Motivo m={por('C2')} /><Motivo m={por('A2')} /></div>
+            <div className="@container flex w-[880px] max-w-full flex-col"><FilasTransaccion m={por('A1')} aplicaciones={APLICACIONES} movimientos={TODAS} /></div>
+            <div className="w-[480px]"><TratamientoDelCargo m={por('C1')} onAbrir={avisar('Opens the case.')} /></div>
+            <dl className="grid w-[420px] grid-cols-2 gap-4"><Metrica label="Original charge" valor={200} /><Metrica label="Outstanding transaction balance" valor={80} destacado /></dl>
             <div className="flex gap-3">
               <BotonExpandirTodo todasAbiertas={false} hayAlgunaAbierta onExpandirTodo={() => {}} onColapsarTodo={() => {}} />
               <BotonExpandirTodo todasAbiertas hayAlgunaAbierta onExpandirTodo={() => {}} onColapsarTodo={() => {}} />
@@ -103,13 +132,17 @@ export const Parts: Story = {
         </Bloque>
         <Bloque titulo="What each part is">
           <Tabla encabezado={['Part', 'What it does', 'Component']} minimo={720} arriba>
-            <tr><td className="font-semibold">Fields</td><td>Los datos de la transacción, de a tres columnas (una en el teléfono).</td><td>Campos</td></tr>
-            <tr><td className="font-semibold">Clinic location</td><td>La sede donde se registró; sin dato, la principal.</td><td>FilasCobro</td></tr>
-            <tr><td className="font-semibold">Financial details</td><td>Los números en columnas de 112px como mínimo, el monto abajo de su rótulo; el último destacado (lo que falta del cargo o el crédito sin aplicar). Una nota dice qué mide.</td><td>FilasCobro, Metrica</td></tr>
-            <tr><td className="font-semibold">Applied transactions</td><td>Tabla chica: Date applied, Type, la referencia (link a su registro) y Applied amount. Sin aplicaciones, la fila queda y lo dice.</td><td>FilasCobro</td></tr>
-            <tr><td className="font-semibold">Footer</td><td>View full record y, con crédito sin aplicar, Apply credit.</td><td>DetalleMovimiento</td></tr>
+            <tr><td className="font-semibold">Header</td><td>La descripción (con el código en un procedimiento) y al costado el identificador, el estado, la pieza y la superficie.</td><td>ListaDetalle</td></tr>
+            <tr><td className="font-semibold">Treatment</td><td>Sólo Procedure: el caso del procedimiento (por su vínculo, nunca por código) con su estado y link; la visita debajo; los históricos después. Sin caso: No treatment linked. No repite consentimiento, hallazgos, derivaciones ni órdenes.</td><td>TratamientoDelCargo</td></tr>
+            <tr><td className="font-semibold">Adjustment reason</td><td>Charge y Credit Adjustment: el tipo de ajuste y la nota. Sin dato: Adjustment reason unavailable.</td><td>FilasTransaccion</td></tr>
+            <tr><td className="font-semibold">Scope</td><td>Pagos y créditos: patient · nombre, o guarantor · Household credit. No se deduce de los cargos.</td><td>FilasTransaccion</td></tr>
+            <tr><td className="font-semibold">Payment methods</td><td>Sólo Patient Payment: cada componente con su referencia enmascarada y su monto. Sin dato: No payment method details available.</td><td>FilasTransaccion</td></tr>
+            <tr><td className="font-semibold">Location</td><td>La sede de la transacción, nunca la de la pantalla. Sin dato: Location unavailable.</td><td>FilasTransaccion</td></tr>
+            <tr><td className="font-semibold">Financial details</td><td>Cargo: Original charge, Payments applied, Credit adjustments applied y Outstanding transaction balance (destacado). Pago o crédito: Original payment / credit, Applied to charges, Unapplied credit (destacado) y Transaction balance en $0.00.</td><td>Metrica</td></tr>
+            <tr><td className="font-semibold">Applications</td><td>Cargo: Payments &amp; credits applied to this charge (de dónde vino). Pago o crédito: Charges paid or credited by this transaction (a dónde fue). Fecha de aplicación, la otra transacción con link, Patient / Account, referencia o motivo, y el monto aplicado en positivo. La cuenta es la cantidad de líneas.</td><td>FilasTransaccion</td></tr>
+            <tr><td className="font-semibold">Footer</td><td>View procedure, View payment o View adjustment; Apply credit con crédito disponible; Read-only summary.</td><td>DetalleMovimiento</td></tr>
             <tr><td className="font-semibold">Frame</td><td>En el Ledger, fondo gris y fijo en la parte visible de la tabla; en Billing lo pone DataTable.</td><td>LedgerRowDetail</td></tr>
-            <tr><td className="font-semibold">Collapse all / Expand all</td><td>Al lado de las herramientas de la tabla desde que hay una fila abierta.</td><td>BotonExpandirTodo</td></tr>
+            <tr><td className="font-semibold">Collapse all / Expand all</td><td>En la barra de la tabla, desde que hay una fila abierta.</td><td>BotonExpandirTodo</td></tr>
           </Tabla>
         </Bloque>
       </Lienzo>
@@ -122,39 +155,45 @@ export const States: Story = {
   render: () => (
     <TooltipProvider>
       <Lienzo>
-        <Bloque titulo="Charge, partly paid" nota="D4341: $310 cobrados en Northgate Clinic; un pago, un ajuste y una transferencia aplicados; faltan $170.">
-          <Ejemplo caso="charge-partly-paid" ancho="table" />
+        <Bloque titulo="Procedure" nota="C1: Endodontic Treatment aceptado, Visit 2; $100 de un pago y $20 de un crédito; faltan $80.">
+          <Ejemplo transaccion="C1" ancho="table" />
         </Bloque>
-        <Bloque titulo="Charge paid by insurance" nota="D0120: lo cubrió el seguro entero; Outstanding en $0.">
-          <Ejemplo caso="charge-paid" ancho="table" />
+        <Bloque titulo="Charge Adjustment" nota="C2: un cargo de la cuenta (Returned payment fee) con su nota; sin tratamiento.">
+          <Ejemplo transaccion="C2" ancho="table" />
         </Bloque>
-        <Bloque titulo="Charge, nothing applied" nota="Applied transactions queda y lo dice.">
-          <Ejemplo caso="charge-unpaid" ancho="table" />
+        <Bloque titulo="Patient Payment" nota="P1: efectivo y tarjeta, de la cuenta; $120 aplicados a dos cargos y $30 para aplicar (Apply credit).">
+          <Ejemplo transaccion="P1" ancho="table" />
         </Bloque>
-        <Bloque titulo="Payment applied to several charges" nota="La transferencia: a qué cargos fue y cuánto a cada uno.">
-          <Ejemplo caso="payment-several" ancho="table" />
+        <Bloque titulo="Credit Adjustment" nota="A1: crédito de la cuenta, sin Payment methods (no es dinero recibido).">
+          <Ejemplo transaccion="A1" ancho="table" />
         </Bloque>
-        <Bloque titulo="Unapplied credit" nota="Un pago con crédito sin aplicar: Unapplied credit destacado y Apply credit al pie.">
-          <Ejemplo caso="payment-credit" ancho="table" />
+        <Bloque titulo="Payment not applied" nota="P2: todavía no se aplicó y no hay detalle del método.">
+          <Ejemplo transaccion="P2" ancho="table" />
         </Bloque>
-        <Bloque titulo="Denied claim" nota="No pagó nada: todo en $0 y la nota lo dice.">
-          <Ejemplo caso="insurance-denied" ancho="table" />
+        <Bloque titulo="Procedure, nothing linked" nota="C3: sin caso y sin aplicaciones; las filas quedan y lo dicen. View procedure abre el registro.">
+          <Ejemplo transaccion="C3" ancho="table" />
         </Bloque>
-        <Bloque titulo="Narrow" nota="Teléfono: los datos en una columna y el título de cada fila del cobro arriba de sus datos.">
-          <Ejemplo caso="charge-partly-paid" ancho="phone" />
+        <Bloque titulo="Unavailable" nota="A2: sin sede ni motivo.">
+          <Ejemplo transaccion="A2" ancho="table" />
+        </Bloque>
+        <Bloque titulo="Insurance Payment" nota="Fuera de la historia: los datos de la transacción y View full record, como antes.">
+          <Ejemplo transaccion="m3" ancho="table" />
+        </Bloque>
+        <Bloque titulo="Narrow" nota="Teléfono: el título de cada fila arriba de sus datos; la tabla de aplicaciones scrollea de costado.">
+          <Ejemplo transaccion="P1" ancho="phone" />
         </Bloque>
       </Lienzo>
     </TooltipProvider>
   ),
 }
 
-/* Tocar una referencia de Applied transactions: abre esa transacción. */
-export const ReferenceOpen: Story = {
-  name: 'Reference open',
+/* El link de una transacción relacionada: en el Ledger lleva a su fila y la despliega. */
+export const RelatedRecord: Story = {
+  name: 'Related record',
   render: (a) => <Ejemplo {...a} />,
   play: async (c) => {
-    await userEvent.click(await within(c.canvasElement).findByRole('button', { name: /Check payment ····1234/ }))
-    await esperar(/Opens Check payment/)(c)
+    await userEvent.click(await within(c.canvasElement).findByRole('button', { name: /Patient Payment · P1/ }))
+    await esperar(/Goes to P1/)(c)
   },
 }
 
@@ -165,16 +204,20 @@ export const Specs: Story = {
       <Bloque titulo="Layout">
         <Tabla encabezado={['Item', 'Value']} minimo={560}>
           <tr><td className="font-semibold">Frame (Ledger)</td><td>Padding 12px; fijo a la izquierda de la parte visible y del ancho visible menos el padding, así lo alineado a la derecha no se corta.</td></tr>
-          <tr><td className="font-semibold">Cobro</td><td>16px debajo de los datos, con una línea <Token nombre="line-row" /> arriba y 12px de aire. Filas de ui/detail-list: título en una columna de 150px desde 448px de ancho.</td></tr>
-          <tr><td className="font-semibold">Financial details</td><td>Columnas de 112px como mínimo, tantas como entren (5 en el Ledger a 1440, 2 en el teléfono). Monto 15px; el destacado Semibold <Token nombre="dash-blue" />.</td></tr>
-          <tr><td className="font-semibold">Applied transactions</td><td>Tabla de 12px, encabezado 11px <Token nombre="ink-muted" />, fecha MM/DD/YYYY y monto sin partir, alineado a la derecha.</td></tr>
+          <tr><td className="font-semibold">Rows</td><td>Las de ui/detail-list: título de 11px en una columna de 150px desde 448px de ancho (arriba en angosto), línea de 1px <Token nombre="line-soft" /> entre filas.</td></tr>
+          <tr><td className="font-semibold">Financial details</td><td>Columnas de 112px como mínimo, tantas como entren. Monto 15px; el destacado Semibold <Token nombre="dash-blue" />.</td></tr>
+          <tr><td className="font-semibold">Applications</td><td>Tabla de 12px (560px como mínimo, scrollea en angosto), encabezado 11px <Token nombre="ink-muted" />, fecha MM/DD/YYYY, monto a la derecha. Una pista arriba (de dónde viene o a dónde va) y otra abajo (qué mide el monto).</td></tr>
+          <tr><td className="font-semibold">Case status</td><td>Pill sm en minúscula inicial, como en toda la app.</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Rules">
         <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
-          <li>Outstanding balance is the balance of that charge only, not the patient or guarantor balance; the note says so.</li>
-          <li>Every row stays even when empty, so the detail always has the same shape.</li>
-          <li>The same detail in the Ledger and in Billing: a transaction reads the same in both. Clinical Mode does not show billing.</li>
+          <li>Read-only: it never creates, edits, reverses or voids a transaction. Apply credit opens the existing flow with this transaction as the source.</li>
+          <li>Charges show the payments and credits they received; payments and credits show the charges they went to. The same application can be seen from both sides but counts once.</li>
+          <li>Applied amounts are positive and dated when they were applied, not when the payment or charge was posted.</li>
+          <li>Balances are the transaction’s current ones, not the running account balance.</li>
+          <li>A related record in the table opens on its row (on its page, without touching filters); otherwise its record opens.</li>
+          <li>If an insurance payment covered part of a charge, Insurance applied joins the numbers so they add up (insurance payments themselves are out of scope).</li>
         </ul>
       </Bloque>
     </Lienzo>

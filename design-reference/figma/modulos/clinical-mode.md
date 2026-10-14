@@ -2290,4 +2290,5 @@ PLANNING*), algunas en mayúsculas y otras no, y la de Status del drawer más gr
 3. **Lo del cobro (Clinic location, Financial details, Applied transactions) sale del detalle de Clinical Mode** y de
    Treatment Plan: va en el detalle de la fila del Ledger y de Billing (ver `ledger.md` y `billing.md`, 2026-10-14).
    El detalle de un procedimiento termina en Lab order.
-
+4. Clinical Mode abre desde el Ledger: `?case=` abre ese caso en Treatment Plan y `?procedure=` abre Procedures con esa
+   fila desplegada (el link del caso y *View procedure* del detalle de una fila del Ledger; ver `ledger.md`).

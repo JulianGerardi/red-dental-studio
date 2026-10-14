@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   ChevronLeft, Search, Receipt, CreditCard, Wallet, HandCoins, Download, MoveHorizontal,
 } from 'lucide-react'
@@ -145,6 +145,9 @@ export default function Ledger() {
   const alternarCol = (id: ColLedger) =>
     setOcultas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
   const [enModal, setEnModal] = useState<Fila | null>(null)
+  /* La fila a la que se llegó desde el link de otra transacción: se resalta un momento. */
+  const [resaltada, setResaltada] = useState<string | null>(null)
+  const navegar = useNavigate()
   const [enCredito, setEnCredito] = useState<Fila | null>(null)
   const anchos = useAnchoColumnas<ColLedger>(ANCHO_BASE)
   const refVisible = useAnchoVisible<HTMLDivElement>()
@@ -239,8 +242,24 @@ export default function Ledger() {
   }
 
   const cargosDeLaCuenta = movs.filter((m) => m.tipo === 'Charge')
-  /* La referencia de una aplicación abre esa transacción en el registro de sólo lectura. */
-  const verTransaccion = (x: Movimiento) => setEnModal(conSaldoTotal.find((f) => f.id === x.id) ?? null)
+  /* El link a otra transacción (ledger.md, 2026-10-14): si está en la tabla con la búsqueda y el filtro de ahora, va a
+     su página, la despliega y la resalta; si no, abre su registro. Nunca cambia los filtros. */
+  const verTransaccion = (x: Movimiento) => {
+    const i = filas.findIndex((f) => f.id === x.id)
+    if (i < 0) return setEnModal(conSaldoTotal.find((f) => f.id === x.id) ?? null)
+    setEnModal(null)
+    setPagina(Math.floor(i / TAM_PAGINA) + 1)
+    setExpandidas((p) => (p.includes(x.id) ? p : [...p, x.id]))
+    setResaltada(x.id)
+  }
+  const abrirClinica = ({ caso, procedimiento }: { caso?: string; procedimiento?: string }) =>
+    navegar(`/patients/${id}/clinical-mode?${new URLSearchParams(caso ? { case: caso } : { procedure: procedimiento ?? '' })}`)
+  useEffect(() => {
+    if (!resaltada) return
+    document.getElementById(`fila-${resaltada}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    const t = setTimeout(() => setResaltada(null), 1800)
+    return () => clearTimeout(t)
+  }, [resaltada])
   const volver = () => setTab('transacciones')
   const tituloActivo = TABS.find((t) => t.id === tab)?.titulo ?? 'Ledger'
 
@@ -334,6 +353,7 @@ export default function Ledger() {
                       return (
                       <div
                         key={m.id}
+                        id={`fila-${m.id}`}
                         className={cn(
                           'border-t border-line-row',
                           /* Barra azul de 4px al borde de las filas con crédito
@@ -361,8 +381,8 @@ export default function Ledger() {
                             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
                           }}
                           className={cn(
-                            'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-ink-soft hover:bg-surface-subtle',
-                            abierta && 'bg-surface-subtle',
+                            'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-ink-soft transition-colors duration-700 hover:bg-surface-subtle',
+                            resaltada === m.id ? 'bg-dash-count-bg' : abierta && 'bg-surface-subtle',
                           )}
                         >
                           {columnasVisibles.map((c) => (
@@ -382,6 +402,7 @@ export default function Ledger() {
                             aplicaciones={aplicaciones}
                             movimientos={movs}
                             onVerTransaccion={verTransaccion}
+                            onAbrirClinica={abrirClinica}
                             onVerTodo={() => setEnModal(m)}
                             onAplicarCredito={tieneCredito(m) ? () => setEnCredito(m) : undefined}
                           />
@@ -456,7 +477,7 @@ export default function Ledger() {
         </div>
       </div>
 
-      {enModal && <LedgerRowModal key={enModal.id} m={enModal} aplicaciones={aplicaciones} movimientos={movs} onVerTransaccion={verTransaccion} onClose={() => setEnModal(null)} />}
+      {enModal && <LedgerRowModal key={enModal.id} m={enModal} aplicaciones={aplicaciones} movimientos={movs} onVerTransaccion={verTransaccion} onAbrirClinica={abrirClinica} onClose={() => setEnModal(null)} />}
       {enCredito && (
         <AplicarCreditoModal
           m={enCredito}
