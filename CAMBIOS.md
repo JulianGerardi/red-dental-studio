@@ -5,6 +5,11 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-17
 
+### Detalle del registro en Clinical Mode y Treatment Plan; detalle por tipo en Ledger y Billing ([#30](https://github.com/JulianGerardi/red-dental-studio/pull/30))
+- **Clinical Mode:** el detalle de Procedures y Problem List ordena sus filas por importancia (Treatment, Procedure consent, Findings, Referral, Lab order; en un problema, Procedures, Treatment, Referral, Lab order, Source exam). *View full record* también sale del menú de cada finding de los exámenes y las filas de Treatment Plan se despliegan con el mismo detalle. Las pills van de a una por dato, chicas y con minúscula inicial.
+- **Ledger y Billing:** la fila se despliega según su tipo (Procedure, Charge Adjustment, Patient Payment, Credit Adjustment) con Location, Financial details y las transacciones aplicadas; Billing lo muestra con un paciente elegido. Lo del cobro vive sólo ahí, no en Clinical Mode. Insurance Payment sigue con los datos de siempre.
+- **Para el dev:** `ui/detail-list` (`ListaDetalle`, `FilaDetalle`…), `LedgerRowDetail` / `DetalleMovimiento` (lo usa Billing), `RecordDetail` con `registroDePlan`, `registroDeHallazgo` y `useVerRegistro`; Clinical Mode acepta `?case=` y `?procedure=`. Datos: `APLICACIONES` en `data/ledger.ts` y `APLICACIONES_BILLING` en `data/billing.ts`. Storybook: *Components / UI / DetailList*, *Ledger / LedgerRowDetail*, *Clinical / RecordDetail*, *Pages / Parts / Billing*.
+
 ### Dashboard: filas en cards, salas arriba con color y filtro, colores por acción y saludo animado ([#31](https://github.com/JulianGerardi/red-dental-studio/pull/31))
 - **Filas en cards:** las de Appointments, Waiting Room y Pending Task (también el Pending Task del Patient Dashboard)
   van cada una en su card interna, con 12px entre una y otra.
