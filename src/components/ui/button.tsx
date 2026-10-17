@@ -19,6 +19,8 @@ export const BUTTON_VARIANTS = {
   link: 'text-dash-blue underline-offset-2 hover:underline active:text-dash-blue-active focus-visible:outline-dash-blue',
   /** Borra o descarta. Casi siempre dentro de un diálogo de confirmación. */
   destructive: 'bg-dash-bad-fg text-white hover:bg-dash-bad-hover active:bg-dash-bad-hover focus-visible:outline-dash-bad-fg',
+  /** Algo que arranca o llega: Check In del turno. El verde de la pill Check In, con contraste AA sobre blanco. */
+  success: 'bg-dash-ok-fg text-white hover:bg-green-deep active:bg-green-deep focus-visible:outline-dash-ok-fg',
 } as const
 
 export const BUTTON_SIZES = {
