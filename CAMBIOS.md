@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-13
 
+### Billing en el menú lateral, sin menú: sus tablas, sólo en Settings ([#36](https://github.com/JulianGerardi/red-dental-studio/pull/36))
+- El ítem **Billing** del menú lateral va directo a su pantalla, sin menú flotante. **Fee Schedules, Carriers y Coverage
+  Table** quedan sólo en Settings → Billing; ahí el ítem marcado es Settings.
+- **Para el dev:** se borran `BillingItem` y `billingMenu` (`NavigationPreview`); Billing es un ítem más de `NAV` y
+  `SettingsItem` queda activo en todo `/settings/*`. En *Elements / Navigation → States*: *Billing* y *Settings menu ·
+  Billing tables*.
+
 ### Billing: bento con Find Patient arriba, la tabla hasta abajo y los botones del paciente dentro del panel ([#33](https://github.com/JulianGerardi/red-dental-studio/pull/33))
 - Bento: izquierda los números y Recent Billing Activity; derecha Find Patient (a la altura de los números) y Today.
   Las dos columnas terminan juntas: la tabla muestra 15 filas por página y Find Patient scrollea adentro.

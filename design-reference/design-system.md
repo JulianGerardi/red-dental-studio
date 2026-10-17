@@ -197,7 +197,7 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     y sin el z-40, que lo ponía encima de la barra del sitio). Lo que en la
     app se abre con el mouse se deja a la vista con dos contextos que la app no
     usa: `NavigationPreview` (`components/layout/navigation-preview.ts`:
-    expanded, tooltip, settingsMenu, billingMenu) y `PatientMenuPreview`
+    expanded, tooltip, settingsMenu) y `PatientMenuPreview`
     (`components/patients/patient-menu-preview.ts`: collapsed y encounter por
     instancia, tooltip, infoCard, encounterOptions). Abrirlos con una función
     `play` no alcanza: al terminar, la historia se vuelve a dibujar. Para
@@ -801,6 +801,13 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `AccionesPaciente` reemplaza a `EncabezadoBilling`: los botones del paciente con `ui/button` md, en el `top` del Panel
   de la actividad. *Components / Dashboard / Panel and StatusPill* actualiza la descripción de `top`.
 - Decisiones en `figma/modulos/billing.md` (2026-10-13).
+
+## Navigation: Billing sin menú (2026-10-13)
+
+- *Elements / Navigation*: Billing es un ítem más del rail (link directo, tooltip colapsado); Fee Schedules, Carriers y
+  Coverage Table están sólo en el menú de Settings. *States* cambia *Billing menu* por *Billing* y suma *Settings menu ·
+  Billing tables* (Settings en azul y Billing desplegado en `/settings/finance/carriers`). Sin `BillingItem` ni
+  `billingMenu`. Ver `figma/modulos/header-sidebar.md`.
 
 ## List group: cada fila en su card (2026-10-13)
 
