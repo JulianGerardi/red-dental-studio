@@ -34,7 +34,7 @@ import { cn } from '@/lib/utils'
    - Los tres stat cards se juntaron en una sola tira arriba a la derecha.
    - Las salas van en una tira arriba y Appointments · Waiting Room en dos columnas a todo el ancho (Julián,
      2026-10-13). El toggle Provider / Recepcionista ya no está en el diseño.
-   - Pending Task bajó a una franja a lo ancho. Los tabs se sacaron: hacían lo mismo que el embudo.
+   - Pending Task: tercera columna desde 1280px; más angosto, una franja a lo ancho. Los tabs se sacaron: hacían lo mismo que el embudo.
    - Turnos y tareas van en filas con las mismas partes que las cards, con tope y "Show N more" (2026-10-12).
    - Desapareció el cuarto panel "Rooms" vacío del pie.
 
@@ -249,8 +249,8 @@ export default function Dashboard() {
       </div>
 
       {/* Mucho volumen: filas en lugar de cards (las mismas partes) y un tope por panel; "Show N more" abre el resto con
-          scroll adentro (dashboard.md, 2026-10-12). Turnos y sala de espera se reparten el ancho (2026-10-13). */}
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          scroll adentro (dashboard.md, 2026-10-12). Turnos y sala de espera se reparten el ancho (2026-10-13); desde 1280px, Pending Task es la tercera columna (2026-10-18). */}
+      <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
         <Panel
           title="Appointments"
           controls={
@@ -321,11 +321,9 @@ export default function Dashboard() {
           )}
         </Panel>
         </div>
-      </div>
 
-      <div className="mt-4">
         <Panel
-          title="Pending Task"
+          title="Pending Task" className="lg:col-span-2 xl:col-span-1"
           controls={
             <BotonFiltro
               label="Filter tasks" options={TASK_KINDS} value={tipos} onChange={setTipos}
