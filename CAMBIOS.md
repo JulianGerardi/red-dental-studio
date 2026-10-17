@@ -3,6 +3,18 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-17
+
+### Patient Overview: Pending Task y Pending documents a la izquierda, Appointments en su columna
+- El Overview del paciente pasa a dos columnas desde 1024px: a la izquierda Pending Task y debajo Pending documents; a
+  la derecha Appointments (280px) del alto de las dos, con 7 turnos a la vista. Abajo de 1024px, una columna. Mismo
+  contenido, otro orden.
+- En una columna angosta, la fila de Pending documents baja el vencimiento y el botón a un segundo renglón en vez de
+  aplastar el nombre.
+- **Para el dev:** `PatientDetail.tsx` (grilla `lg:grid-cols-[minmax(0,1fr)_280px]`, `TOPE.turnosColumna` con `useMedia`);
+  `PendingDocuments.tsx` (`basis-56` + `ml-auto`). Storybook: *Pages / Parts / Patient Overview* y *PendingDocuments →
+  Narrow column*. Nuevo e2e `tests/patient-overview.e2e.ts`.
+
 ## 2026-10-13
 
 ### Billing: bento con Find Patient arriba, la tabla hasta abajo y los botones del paciente dentro del panel ([#33](https://github.com/JulianGerardi/red-dental-studio/pull/33))

@@ -18,6 +18,7 @@ import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
 import { PatientAppointmentCard, type PatientAppointmentStatus } from '@/components/patients/PatientAppointmentCard'
 import { PendingDocuments } from '@/components/patients/PendingDocuments'
+import { useMedia } from '@/lib/media'
 
 /* Figma 3646:58836 "Patient Dashboard". */
 
@@ -34,7 +35,7 @@ const TASKS: PendingTask[] = Array.from({ length: 6 }, () => ({
 }))
 
 /* Cuántos se ven en cada bloque antes de "Show N more" (ui/show-more; patient-dashboard.md, 2026-10-12). */
-const TOPE = { tareas: 3, turnos: 3 }
+export const TOPE = { tareas: 3, turnos: 3, turnosColumna: 7 }
 
 const APPTS: { status: PatientAppointmentStatus; cancel?: boolean }[] = [
   { status: 'Booked', cancel: true }, { status: 'Cancelled' }, { status: 'Fulfilled' },
@@ -45,8 +46,10 @@ export function Card({ className, children }: { className?: string; children: Re
   return <div className={cn(TARJETA_PANEL, className)}>{children}</div>
 }
 
-export default function PatientDetail() {
+/* `turnos` sólo lo cambia el design system, para probar la columna con más o menos turnos. */
+export default function PatientDetail({ turnos = APPTS.length }: { turnos?: number }) {
   const { id = 'john-smith' } = useParams()
+  const appts = Array.from({ length: turnos }, (_, i) => APPTS[i % APPTS.length])
   const navigate = useNavigate()
   const [section, setSection] = useState('Overview')
   const [open, setOpen] = useState<{ label: Categoria; rect: DOMRect } | null>(null)
@@ -76,6 +79,8 @@ export default function PatientDetail() {
   const [modal, setModal] = useState<'contact' | 'edit' | null>(null)
   const [taskTab, setTaskTab] = useState<'Pending Task' | 'Activity'>('Pending Task')
   const [apptTab, setApptTab] = useState<'Next' | 'Next Appointments'>('Next')
+  /* Desde lg Appointments es una columna del alto de Pending Task + Pending documents: entran más turnos. */
+  const enColumna = useMedia('(min-width: 1024px)')
 
   return (
     <div className={CONTENEDOR_PAGINA}>
@@ -135,31 +140,33 @@ export default function PatientDetail() {
             })}
           </div>
 
-          {/* En lugar de la tabla de Insurance (que sigue en su sección): los documentos pendientes a resolver. */}
-          <Card className="p-5">
-            <PendingDocuments />
-          </Card>
+          {/* Izquierda Pending Task y Pending documents; derecha Appointments, del alto de las dos
+              (patient-dashboard.md, 2026-10-17). */}
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+            <div className="flex min-w-0 flex-col gap-5">
+              <Card className="p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
+                  <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
+                </div>
+                {/* Las tareas en filas, las mismas del Dashboard: menos alto con las mismas partes. */}
+                <ListGroup className="mt-4" limit={TOPE.tareas} label="pending tasks">
+                  {TASKS.map((t, i) => <TaskRow key={i} task={t} />)}
+                </ListGroup>
+              </Card>
 
-          {/* Cada card del alto de su contenido: estiradas a la par de Appointments, a Pending Task le quedaba un
-              bloque blanco abajo. */}
-          <div className="grid gap-5 lg:grid-cols-[1fr_280px] lg:items-start">
-            <Card className="p-5">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
-                <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
-              </div>
-              {/* Las tareas en filas, las mismas del Dashboard: menos alto con las mismas partes. */}
-              <ListGroup className="mt-4" limit={TOPE.tareas} label="pending tasks">
-                {TASKS.map((t, i) => <TaskRow key={i} task={t} />)}
-              </ListGroup>
-            </Card>
+              {/* En lugar de la tabla de Insurance (que sigue en su sección): los documentos pendientes a resolver. */}
+              <Card className="p-5">
+                <PendingDocuments />
+              </Card>
+            </div>
 
             <Card className="p-4">
               <h2 className="text-[15px] font-bold text-ink">Appointments</h2>
               <Tabs size="sm" fullWidth className="mt-3" aria-label="Appointments" tabs={['Next', 'Next Appointments'] as const} value={apptTab} onChange={setApptTab} />
               <div className="mt-3">
-                <ShowMore total={APPTS.length} limit={TOPE.turnos} label="appointments" className="flex flex-col gap-2">
-                  {(n) => APPTS.slice(0, n).map((a, i) => (
+                <ShowMore total={appts.length} limit={enColumna ? TOPE.turnosColumna : TOPE.turnos} label="appointments" className="flex flex-col gap-2">
+                  {(n) => appts.slice(0, n).map((a, i) => (
                     <PatientAppointmentCard
                       key={i}
                       name="Maria Abril Viola"

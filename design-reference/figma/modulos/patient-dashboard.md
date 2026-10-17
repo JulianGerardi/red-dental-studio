@@ -256,3 +256,22 @@ more" abre el resto con scroll adentro.
   sigue contando todos los de su grupo.
 
 Con los datos de la demo el Overview pasa de 1.842px a 1.291px de alto.
+
+## Overview en dos columnas: Pending Task y Pending documents, Appointments al costado (2026-10-17)
+
+Julián pasó una referencia: Pending Task y Pending documents **apilados a la izquierda** y Appointments en una columna
+de punta a punta a la derecha. Antes Pending documents iba a todo el ancho, arriba de Pending Task + Appointments.
+
+- Desde 1024px: grilla `minmax(0,1fr) · 280px`; la columna izquierda lleva Pending Task y debajo Pending documents, y
+  Appointments se estira al alto de las dos (ya no `items-start`). Abajo de 1024px, una columna en ese orden.
+- Con más alto disponible, Appointments muestra **7** turnos en la columna (`TOPE.turnosColumna`) y 3 apilado, así
+  termina a la par de la izquierda en vez de dejar un bloque blanco. Más allá, "Show N more".
+- Pending documents pasa de ~1.100px a ~800px de ancho a 1500: el nombre del documento pide 14rem (`basis-56`) y, si no
+  entra, el vencimiento y el botón bajan juntos a un segundo renglón, a la derecha. Antes, a 1024px y en el celular el
+  nombre se aplastaba ("Informed / Consent –…") y se superponía con "Overdue 5 days".
+- Contenido igual: mismos datos, textos y acciones; sólo cambia el orden.
+- Validar con usuarios: si recepción prefiere los documentos arriba de las tareas (hoy mandan las tareas por ir primero).
+
+Storybook: *Pages / Parts / Patient Overview* (Playground con cantidad de turnos, Parts, States, Specs) y *Components /
+Patients / PendingDocuments → Narrow column*. E2E: `tests/patient-overview.e2e.ts`.
+
