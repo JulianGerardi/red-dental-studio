@@ -1,24 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { AppointmentRow, ChipsTurno, DocYVencida, NombreTurno, TaskRow } from './DashboardRows'
 import { DIAS } from './dashboard-data'
+import type { AccionTurno } from './AppointmentCard'
 import { Bloque, Lienzo, Muestra, Tabla, TablaPartes, Token, useMedidas } from '@/design-system/kit'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
 /* Los datos del día de la demo, los mismos de las cards. */
 const DIA = DIAS['28-02-2026']!
-const TURNO = DIA.appointments[1]!
+const TURNO = DIA.appointments[0]!
+const CHECK_IN = DIA.appointments[1]!
 const CANCEL = DIA.waiting[0]!
 const TAREA = DIA.tasks[0]!
 
-/* Una lista con la caja de ListGroup. */
+/* Una lista como la de ListGroup: cada fila en su card interna. */
 const Caja = ({ ancho, children }: { ancho?: number; children: React.ReactNode }) => (
   <div className={cn(TARJETA_PANEL, 'max-w-full p-3')} style={ancho ? { width: ancho } : undefined}>
-    <ul className="flex flex-col divide-y divide-line-soft rounded-lg bg-white shadow-hairline">{children}</ul>
+    <ul className="flex flex-col gap-3 [&>li]:rounded-lg [&>li]:bg-white [&>li]:shadow-inner-card">{children}</ul>
   </div>
 )
 
-type Args = { piece: 'Appointment row' | 'Task row'; action: 'Check Out' | 'Cancel'; width: number; selected: boolean }
+type Args = { piece: 'Appointment row' | 'Task row'; action: AccionTurno; width: number; selected: boolean }
 
 const meta = {
   title: 'Components/Dashboard/Dashboard rows',
@@ -27,11 +29,11 @@ const meta = {
     docs: {
       description: {
         component: [
-          'Las filas del Dashboard (`@/components/dashboard/DashboardRows`, 2026-10-12): **lo mismo que cada card del Figma, en menos alto**. El turno trae la hora, las iniciales, el nombre, *Check In*, provider y operatorio, los chips **TR** y **CC**, **Check Out** o **Cancel** y el kebab con *Edit appointment*; la tarea trae el tipo, *Requested*, el paciente, el documento, *Expired date*, *Register*, *Expiration date* y **Complete this Task**. No hay datos ni acciones nuevas.',
+          'Las filas del Dashboard (`@/components/dashboard/DashboardRows`, 2026-10-12): **lo mismo que cada card del Figma, en menos alto**. El turno trae la hora, las iniciales, el nombre, *Check In*, provider y operatorio, los chips **TR** y **CC**, **Check In**, **Check Out** o **Cancel** (cada uno con su color: verde, azul y rojo, 2026-10-13) y el kebab con *Edit appointment*; la tarea trae el tipo, *Requested*, el paciente, el documento, *Expired date*, *Register*, *Expiration date* y **Complete this Task**. No hay datos ni acciones nuevas.',
           '',
-          '**Dónde:** Appointments, Waiting Room y Pending Task del Dashboard, y Pending Task del Patient Dashboard, adentro de *List group* (tope y "Show N more" con scroll).',
+          '**Dónde:** Appointments, Waiting Room y Pending Task del Dashboard, y Pending Task del Patient Dashboard, adentro de *List group*: cada fila en su card interna (línea fina y sombra suave, como las salas), con tope y "Show N more" con scroll.',
           '',
-          '**Se adaptan al ancho de su lista**, no al de la pantalla (`@container`): en angosto, en renglones (lo que no entra baja a su propio renglón en vez de cortarse); en columnas, como una tabla, desde 768px de lista el turno y desde 1024px la tarea, que tiene más partes.',
+          '**Se adaptan al ancho de su lista**, no al de la pantalla (`@container`): en angosto, en renglones (lo que no entra baja a su propio renglón en vez de cortarse); en columnas, como una tabla, desde 896px de lista el turno y desde 1024px la tarea, que tiene más partes. Con Appointments y Waiting Room a la par, una fila de 1440 o de 1920 queda en renglones: así no se corta el provider (2026-10-13).',
           '',
           '**Probalo:** en *Playground* cambiá la pieza, la acción y el ancho desde *Controls*; tocá el nombre, el botón y el kebab: hacen lo mismo que en la card.',
         ].join('\n'),
@@ -41,8 +43,8 @@ const meta = {
   args: { piece: 'Appointment row', action: 'Check Out', width: 400, selected: false },
   argTypes: {
     piece: { control: 'inline-radio', options: ['Appointment row', 'Task row'], description: 'Qué fila se ve.' },
-    action: { control: 'inline-radio', options: ['Check Out', 'Cancel'], description: 'El botón del turno, el mismo de la card.' },
-    width: { control: { type: 'range', min: 300, max: 1200, step: 10 }, description: 'Ancho de la lista: en columnas desde 768px (turno) y 1024px (tarea).' },
+    action: { control: 'inline-radio', options: ['Check In', 'Check Out', 'Cancel'], description: 'El botón del turno, el mismo de la card: verde, azul o rojo.' },
+    width: { control: { type: 'range', min: 300, max: 1200, step: 10 }, description: 'Ancho de la lista: en columnas desde 896px (turno) y 1024px (tarea).' },
     selected: { control: 'boolean', description: 'Con la ficha rápida abierta desde esta fila.' },
   },
 } satisfies Meta<Args>
@@ -64,7 +66,7 @@ export const Parts: Story = {
     <Lienzo className="max-w-[1200px]">
       <Bloque titulo="Appointment row" nota="Angosta (una columna del Dashboard) y ancha. Lo mismo que AppointmentCard.">
         <Caja ancho={400}><li><AppointmentRow appt={TURNO} onSelect={() => {}} onEdit={() => {}} /></li></Caja>
-        <Caja ancho={900}><li><AppointmentRow appt={TURNO} onSelect={() => {}} onEdit={() => {}} /></li></Caja>
+        <Caja ancho={1000}><li><AppointmentRow appt={TURNO} onSelect={() => {}} onEdit={() => {}} /></li></Caja>
         <TablaPartes partes={[
           ['Time box', 'La caja gris de la card (dash-field) con el reloj y la hora en 12px Semibold tabular, del alto de la fila: ancla la fila y es la columna por la que se lee una agenda. Ancha, en una línea.', 'appt.time'],
           ['Initials', 'Las iniciales en el cuadrado azul de la card, a 28px.', 'appt.initials'],
@@ -72,7 +74,7 @@ export const Parts: Story = {
           ['Check In', 'La pill verde de la card.', 'StatusPill'],
           ['Provider · Operatory', 'Los dos campos grises de la card. Angosta, en un renglón; ancha, cada uno en su columna.', 'appt.provider · appt.operatory'],
           ['TR · CC', 'Los chips de la card, a 24px de alto.', 'ChipsTurno'],
-          ['Check Out / Cancel', 'El botón del pie de la card, en sm: el mismo texto, la flecha y el mismo aviso.', 'Button · accionTurno'],
+          ['Check In / Check Out / Cancel', 'El botón del pie de la card, en sm: el mismo texto, la flecha y el mismo aviso. El color dice la acción: success, primary o destructive (ACCION_TURNO).', 'Button · accionTurno'],
           ['Menu', 'El kebab de la card con Edit appointment.', 'MenuCard'],
         ]} />
         <div className="flex items-center gap-4">
@@ -102,8 +104,8 @@ export const States: Story = {
   render: () => (
     <Lienzo className="max-w-[1200px]">
       <div className="grid gap-6 md:grid-cols-2">
-        <Muestra titulo="Check Out and Cancel" nota="Las dos acciones de la card: el primero de la sala de espera trae Cancel.">
-          <Caja><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CANCEL} /></li></Caja>
+        <Muestra titulo="Check In, Check Out and Cancel" nota="Las tres acciones, cada una con su color para no confundirlas: Check In verde, Check Out azul, Cancel rojo.">
+          <Caja><li><AppointmentRow appt={CHECK_IN} /></li><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CANCEL} /></li></Caja>
         </Muestra>
         <Muestra titulo="Selected" nota="Con la ficha rápida abierta desde la fila: fondo celeste.">
           <Caja><li><AppointmentRow appt={TURNO} activa onSelect={() => {}} /></li></Caja>
@@ -112,8 +114,8 @@ export const States: Story = {
           <Caja ancho={340}><li><AppointmentRow appt={TURNO} /></li><li><TaskRow task={TAREA} /></li></Caja>
         </Muestra>
         <div className="md:col-span-2">
-          <Muestra titulo="Wide" nota="En columnas, alineadas fila con fila: turnos a 900px, tareas a 1100px.">
-            <Caja ancho={900}><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CANCEL} /></li></Caja>
+          <Muestra titulo="Wide" nota="En columnas, alineadas fila con fila: turnos a 1000px, tareas a 1100px.">
+            <Caja ancho={1000}><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CHECK_IN} /></li><li><AppointmentRow appt={CANCEL} /></li></Caja>
             <Caja ancho={1100}><li><TaskRow task={TAREA} /></li><li><TaskRow task={DIA.tasks[2]!} /></li></Caja>
           </Muestra>
         </div>
@@ -149,7 +151,9 @@ export const Specs: Story = {
         <Tabla encabezado={['Part', 'Fill', 'Text']} minimo={560}>
           <tr><td className="font-semibold">TR chip</td><td><Token nombre="green-soft" /></td><td><Token nombre="dash-ok-fg" /></td></tr>
           <tr><td className="font-semibold">CC chip</td><td><Token nombre="dash-bad-chip" /></td><td><Token nombre="field-error" /></td></tr>
-          <tr><td className="font-semibold">Check Out / Cancel</td><td><Token nombre="dash-blue" /></td><td><Token nombre="white" /></td></tr>
+          <tr><td className="font-semibold">Check In</td><td><Token nombre="dash-ok-fg" /></td><td><Token nombre="white" /></td></tr>
+          <tr><td className="font-semibold">Check Out</td><td><Token nombre="dash-blue" /></td><td><Token nombre="white" /></td></tr>
+          <tr><td className="font-semibold">Cancel</td><td><Token nombre="dash-bad-fg" /></td><td><Token nombre="white" /></td></tr>
           <tr><td className="font-semibold">Selected row</td><td><Token nombre="info-bg" /></td><td>—</td></tr>
         </Tabla>
       </Bloque>

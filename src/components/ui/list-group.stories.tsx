@@ -20,7 +20,7 @@ const meta = {
     docs: {
       description: {
         component: [
-          'Filas en una caja de línea fina adentro de una card (`@/components/ui/list-group`), con rótulo opcional y el tope de *Show more*: se ven las primeras y **"Show N more" abre el resto con scroll**, sin estirar la página. Es lo que usan los turnos, la sala de espera y las tareas del Dashboard y las tareas del Patient Dashboard.',
+          'Filas adentro de una card (`@/components/ui/list-group`), **cada una en su card interna** (línea fina y sombra suave, `TARJETA_INTERNA`) y separadas, con rótulo opcional y el tope de *Show more*: se ven las primeras y **"Show N more" abre el resto con scroll**, sin estirar la página. Es lo que usan los turnos, la sala de espera y las tareas del Dashboard y las tareas del Patient Dashboard. Cards y no una caja con divisores: así siguen el lenguaje de las demás cards (las salas, los turnos del paciente).',
           '',
           '**Cuándo usarlo:** una lista de filas (no de cards sueltas) que puede crecer. Sin título es sólo la lista, debajo del título del panel. Para cards en grilla o en columna, *Show more* directo.',
           '',
@@ -57,14 +57,14 @@ export const Parts: Story = {
   parameters: sinControles,
   render: () => (
     <Lienzo>
-      <Bloque nota="Rótulo (opcional), filas en una caja de línea fina (shadow-hairline) separadas por una línea más tenue, y Show N more.">
+      <Bloque nota="Rótulo (opcional), cada fila en su card interna con 12px entre una y otra, y Show N more.">
         <div className={cn(TARJETA_PANEL, 'max-w-[420px] p-4')}>
           <ListGroup title="Appointments" limit={3} label="appointments">{turnos(8)}</ListGroup>
         </div>
       </Bloque>
       <TablaPartes partes={[
         ['Label', 'Opcional. Nombre y cuenta en 11px Semibold versalitas, en el color del tono; plegable con chevron y aria-expanded.', 'title · tone · collapsible'],
-        ['Rows', 'Cada hijo es una fila (un <li>). Caja blanca con línea de medio pixel; entre filas, line-soft.', 'children'],
+        ['Rows', 'Cada hijo es una fila (un <li>) en su card interna: blanca, línea de medio pixel y sombra suave (shadow-inner-card), radio 8px; 12px entre cards.', 'children · TARJETA_INTERNA'],
         ['Show more', 'El tope y el scroll de Elements / Show more.', 'limit · maxHeight · label'],
       ]} />
     </Lienzo>
@@ -114,7 +114,7 @@ export const Specs: Story = {
   parameters: sinControles,
   render: () => (
     <Lienzo>
-      <Bloque titulo="Size" nota="Leído del rótulo dibujado. Entre el rótulo y la caja, 6px.">
+      <Bloque titulo="Size" nota="Leído del rótulo dibujado. Entre el rótulo y la primera card, 6px; entre cards, 12px.">
         <MedidaRotulo />
       </Bloque>
       <Bloque titulo="Tones" nota="De LIST_GROUP_TONES (list-group.tsx) y src/index.css.">
