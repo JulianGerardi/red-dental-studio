@@ -16,6 +16,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   foco visible y `aria-current`. Storybook: *Elements / Breadcrumb* (reemplaza a *Components / UI / Breadcrumb*) y
   *Components / Patients / PatientBreadcrumb*. e2e nuevo: `tests/patient-dashboard.e2e.ts`.
 
+### Billing: bento con Find Patient arriba, la tabla hasta abajo y los botones del paciente dentro del panel ([#33](https://github.com/JulianGerardi/red-dental-studio/pull/33))
+- Bento: izquierda los números y Recent Billing Activity; derecha Find Patient (a la altura de los números) y Today.
+  Las dos columnas terminan juntas: la tabla muestra 15 filas por página y Find Patient scrollea adentro.
+- Con un paciente, los botones de pago van arriba del título de su actividad y el bento guarda el alto del resumen.
+- **Para el dev:** `Stat enFila` alinea etiqueta, número y bajada entre cards con subgrid. `AccionesPaciente` (con
+  `ui/button` md, en el `top` del Panel) reemplaza a `EncabezadoBilling`. La columna derecha va absoluta desde `lg`
+  y toma el alto de la izquierda (`--billing-alto` con paciente). Tres pacientes más en `data/billing.ts`.
+
 ### Notifications sin Pending ni Archived, el ojo y el banner de punta a punta ([#34](https://github.com/JulianGerardi/red-dental-studio/pull/34))
 - Notifications queda con dos estados (sin leer y leída) y dos pestañas (*Inbox* y *Unread*): se van Pending, Archived,
   archivar y el menú ⋮ (sólo tenía acciones de archivar). La acción de la fila es un ojo: *Mark as read* / *Mark as

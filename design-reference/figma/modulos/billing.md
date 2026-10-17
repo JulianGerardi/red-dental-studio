@@ -232,3 +232,31 @@ controla con `npm run ds:campos`.
    `ModalShell`: hasta 860px sigue siendo xl.
 3. **Ledger Transactions** sin el ícono de la tarjeta en el título (pedido de Julián), como el resto de los paneles: el
    título de un panel no lleva ícono.
+
+## Bento y botones dentro del panel (2026-10-13)
+
+Julián, con dos capturas armadas sobre la app: el bento organizado de otra manera, "todo prolijamente armado", la
+lista hasta abajo sin espacios en blanco, y con un paciente los botones arriba del título de su actividad.
+
+1. **Bento.** Izquierda: los cinco números y Recent Billing Activity. Derecha (280px): **Find Patient arriba, a la altura
+   de los números**, y Today abajo. Antes los números ocupaban todo el ancho y la columna derecha empezaba más abajo.
+2. **Las dos columnas terminan juntas.** El alto lo fija la columna izquierda; la derecha va absoluta desde 1024px y
+   toma ese alto: Today entero y Find Patient con scroll propio (el mismo criterio que la barra de Patients, "la altura
+   de la barra la fija la tabla"). La tabla pasa a **15 filas por página**, así la lista llega hasta abajo del panel.
+   Mínimo de 780px para que Today y Find Patient entren cuando la tabla es corta (actividad vacía).
+3. **Con un paciente el bento no se achica.** Se guarda el alto del resumen (ResizeObserver) y se usa de mínimo: la tabla
+   del paciente es corta y queda aire abajo, como en la captura, pero Find Patient y Today no saltan al entrar y salir.
+4. **Botones dentro del panel.** Patient Payment, Credit Adjustment, Charge Adjustment y Export statement van arriba del
+   título de la actividad, a la izquierda y alineados con la tabla (en `top` del Panel), ya no en el encabezado de la
+   página. Pasan a `ui/button` md (32px) y secondary sólo ícono para exportar, como pide el design system. En el
+   celular, elegir en Find Patient sube hasta los botones (antes hasta los saldos, y los botones quedaban fuera de
+   vista).
+5. **Números prolijos.** Cinco en fila desde 1280px, 3 + 2 del mismo ancho por fila entre 1024 y 1279 (y en tablet), 2 +
+   2 + 1 en el celular. La etiqueta y la bajada ya no se cortan con "…" (bajan a dos líneas como mucho) y con subgrid
+   la etiqueta, el número y la bajada quedan a la misma altura en las cinco cards aunque una etiqueta use dos líneas.
+6. **Datos.** Tres pacientes más (Nadia Duarte, garante de Tomás Rivas, y Lucía Paz) con dos movimientos cada uno: con
+   cinco, Find Patient no llenaba su columna. La actividad pasa de 15 a 21 movimientos (dos páginas de 15).
+
+**Para validar con usuarios:** si 15 filas por página se leen bien en pantallas de 768px de alto (la tabla queda más
+larga que la ventana); y si Find Patient con scroll propio se descubre (el último resultado queda cortado a propósito,
+como pista).
