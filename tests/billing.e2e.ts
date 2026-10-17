@@ -6,7 +6,7 @@ import { expect } from 'e2e'
 test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor View y los botones; la X vuelve al resumen', async ({ app, screen }) => {
   await app.open('/billing')
   await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
-  await expect(screen.getByText(/Showing 1 to 10 of 15 entries/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 15 of 21 entries/)).toBeVisible()
 
   const maria = screen.getByRole('button', /Maria Abril Viola/)
   await maria.tap()
@@ -22,7 +22,7 @@ test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor View y los b
   await screen.getByRole('button', 'Clear selected patient').tap()
   await expect(screen.getByRole('heading', 'Recent Billing Activity')).toBeVisible()
   await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
-  await expect(screen.getByText(/Showing 1 to 10 of 15 entries/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 15 of 21 entries/)).toBeVisible()
   await expect(maria).not.toHaveAttribute('aria-current')
 })
 

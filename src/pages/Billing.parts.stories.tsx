@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import Billing from './Billing'
-import { ActividadReciente, BuscarPaciente, EncabezadoBilling, PacienteElegido, ResultadoPaciente, Stat } from './Billing'
+import { AccionesPaciente, ActividadReciente, BuscarPaciente, PacienteElegido, ResultadoPaciente, Stat } from './Billing'
 import { Bloque, Forzar, Lienzo, Tabla, Token, medidasDe, type Medidas } from '@/design-system/kit'
 import {
   ACTIVIDAD_RECIENTE, FILTROS_ACTIVIDAD, PACIENTES_BILLING, STATS_BILLING, STATS_HOY, VISTAS_PACIENTE, grupoDeGarante, saldoDe,
@@ -76,10 +76,12 @@ export const Playground: Story = {
 /* ── Parts ─────────────────────────────────────────────────────────── */
 
 const PARTES: [string, string, string][] = [
-  ['Header', 'Billing. Con un paciente elegido suma Patient Payment, Credit Adjustment y Charge Adjustment (abren Post payment con el tipo ya elegido) y Export statement.', 'EncabezadoBilling'],
-  ['Summary numbers', 'Cinco números de toda la clínica, cada uno en una card de página (sombra, sin borde). No cambian con el paciente.', 'Stat'],
+  ['Title', 'Billing, sin botones: los pagos y ajustes son de un paciente.', 'PageTitle'],
+  ['Bento', 'Izquierda: los números y la actividad. Derecha (280px desde 1024px): Find Patient arriba, a la altura de los números, y Today abajo. Las dos columnas terminan juntas: el alto lo fija la tabla (15 filas por página) y Find Patient scrollea adentro. Con un paciente el bento guarda el alto del resumen.', 'Billing'],
+  ['Summary numbers', 'Cinco números de toda la clínica, cada uno en una card de página (sombra, sin borde). Cinco en fila desde 1280px, 3 + 2 antes, 2 + 2 + 1 en el celular; etiqueta, número y bajada alineados entre cards (subgrid). No cambian con el paciente.', 'Stat enFila'],
   ['Info circle', 'Arriba a la derecha de cada número de arriba y de Today: al pasar el mouse, tocar o llegar con Tab explica qué cuenta (los textos de red.dev).', 'InfoTip'],
-  ['Recent Billing Activity', 'Resumen: toda la clínica y las Tabs de tipo. Paciente: su nombre en el título, Patient View / Guarantor View, los dos saldos del garante y sólo sus movimientos.', 'ActividadReciente · Panel'],
+  ['Recent Billing Activity', 'Resumen: toda la clínica y las Tabs de tipo. Paciente: los botones arriba del título, su nombre en el título, Patient View / Guarantor View, los dos saldos del garante y sólo sus movimientos.', 'ActividadReciente · Panel'],
+  ['Patient actions', 'Sólo con paciente, arriba del título y a la izquierda: Patient Payment, Credit Adjustment y Charge Adjustment (abren Post payment con el tipo ya elegido) y Export statement. Button md.', 'AccionesPaciente · Panel top'],
   ['Guarantor numbers', 'Sólo con paciente: Unapplied Credits y Open Balance de todo lo que paga su garante, en InnerCard.', 'Stat interna'],
   ['Activity table', 'La tabla de la app, compacta. En el resumen, clic en una fila abre la vista de ese paciente. Con paciente, la fila se despliega (chevron, Collapse all / Expand all).', 'DataTable'],
   ['Row detail', 'Con paciente: el detalle del Ledger según el tipo (Procedure, Charge Adjustment, Patient Payment, Credit Adjustment; el pago del seguro con los datos de siempre). La acción del pie y los links abren el registro de sólo lectura.', 'DetalleMovimiento · LedgerRowModal'],
@@ -158,6 +160,7 @@ function Actividad({ filtro: inicialFiltro = 'All', elegido, vista: inicialVista
       filas={filas} sinActividad={vacia} filtro={filtro} onFiltro={setFiltro} paciente={paciente} vista={vista} onVista={setVista}
       creditos={grupo.reduce((n, p) => n + p.creditosNoAplicados, 0)} saldo={grupo.reduce((n, p) => n + saldoDe(p.nombre), 0)}
       onElegir={(n) => { setSel(n); setVista('Patient View') }}
+      onAccion={nada} onExportar={nada}
       abierta={abierta}
     />
   )
@@ -168,10 +171,10 @@ export const States: Story = {
   render: () => (
     <Fondo>
       <div className="flex flex-col gap-10">
-        <Bloque titulo="Header">
+        <Bloque titulo="Patient actions" nota="Sin paciente no hay botones (ni arriba ni en el panel): los pagos y ajustes son de un paciente.">
           <Fila>
-            <Estado titulo="Overview" nota="Sin paciente: sólo el título. Los pagos y ajustes son de un paciente." ancho={720}><EncabezadoBilling conPaciente={false} onAccion={nada} onExportar={nada} /></Estado>
-            <Estado titulo="Patient selected" nota="Aparecen los tres botones y Export statement, con la misma entrada sutil que la card del paciente." ancho={720}><EncabezadoBilling conPaciente onAccion={nada} onExportar={nada} /></Estado>
+            <Estado titulo="Patient selected" nota="Arriba del título de su actividad, alineados con la tabla. Entran con la misma entrada sutil que la card del paciente." ancho={720}><div className="rounded-lg bg-white pb-4"><AccionesPaciente onAccion={nada} onExportar={nada} /></div></Estado>
+            <Estado titulo="Narrow" nota="En el celular bajan de a uno o de a dos; Export statement queda al lado del último." ancho={343}><div className="rounded-lg bg-white pb-4"><AccionesPaciente onAccion={nada} onExportar={nada} /></div></Estado>
           </Fila>
         </Bloque>
         <Bloque titulo="Patient card">
@@ -213,7 +216,10 @@ export const States: Story = {
         </Bloque>
         <Bloque titulo="Numbers">
           <Fila>
-            <Estado titulo="On the page" nota="Los cinco de arriba: card de página, sombra y sin borde, con el círculo de info." ancho={248}><Stat {...STATS_BILLING[0]!} /></Estado>
+            <Estado titulo="In a row" nota="Los cinco de arriba a 880px (1280px de pantalla): una etiqueta en dos líneas no baja el número; etiqueta, número y bajada quedan alineados entre cards (subgrid)." ancho={880}>
+              <div className="grid grid-cols-5 gap-3">{STATS_BILLING.map((x) => <Stat key={x.label} {...x} enFila />)}</div>
+            </Estado>
+            <Estado titulo="On the page" nota="Card de página, sombra y sin borde, con el círculo de info." ancho={248}><Stat {...STATS_BILLING[0]!} /></Estado>
             <Estado titulo="Inside a panel" nota="Today: InnerCard, también con el círculo de info." ancho={248}><div className="rounded-lg bg-white p-4"><Stat interna {...STATS_HOY[0]!} /></div></Estado>
             <Estado titulo="Without info" nota="Los saldos del garante (con paciente): red.dev no les da texto, así que no llevan círculo." ancho={248}><div className="rounded-lg bg-white p-4"><Stat interna label="Guarantor Open Balance" value="$150.00" caption="Total outstanding" /></div></Estado>
           </Fila>
@@ -285,10 +291,11 @@ function Medir() {
             <li>Two modes on one screen: the clinic overview (no patient) and one patient. The X on the patient card goes back to the overview exactly as it was (tab filter included).</li>
             <li>With a patient the table shows only their entries (Patient View) or everything their guarantor pays for (Guarantor View). Each new patient opens in Patient View.</li>
             <li>With a patient each row expands with the Ledger’s row detail for its type: the same transaction reads the same in Billing and in the Ledger. In the overview a row picks the patient instead.</li>
-            <li>Payment and adjustment buttons only show with a patient selected: they always post for that patient.</li>
+            <li>Payment and adjustment buttons only show with a patient selected, above the title of their activity: they always post for that patient.</li>
             <li>The patient card, the guarantor numbers and the buttons enter subtly, Apple-style: 2px, a slight blur that clears and a fade, 360ms on a curve that eases out gently. Without motion (reduced motion) they just appear. Screen readers hear the name (aria-live).</li>
             <li>Every number at the top and in Today has its info circle (InfoTip) explaining what it counts; the guarantor numbers have none.</li>
-            <li>Columns: activity 1fr · Find Patient and Today 280px from 1024px; below that, one column. On the phone, picking in Find Patient scrolls up to the patient’s numbers.</li>
+            <li>Bento from 1024px: left 1fr (numbers + activity), right 280px (Find Patient + Today). Both columns end together: the table sets the height (15 rows a page) and Find Patient scrolls inside; with a patient the bento keeps the overview height (780px minimum). Below 1024px, one column. On the phone, picking in Find Patient scrolls up to the patient’s buttons.</li>
+            <li>The five numbers: five in a row from 1280px, 3 + 2 before, 2 + 2 + 1 on the phone; label, number and caption line up across cards and nothing is cut (two lines at most).</li>
             <li>Panel titles have no icon (Panel, 15px Bold). A card on the grey page has a shadow and no border; anything inside a panel is an InnerCard.</li>
           </ul>
         </Bloque>
