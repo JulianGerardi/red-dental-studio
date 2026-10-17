@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-18
 
-### Dashboard: Pending Task como tercera columna ([#39](https://github.com/JulianGerardi/red-dental-studio/pull/39))
+### Dashboard: Pending Task como tercera columna ([#40](https://github.com/JulianGerardi/red-dental-studio/pull/40))
 - Appointments, Waiting Room y Pending Task se reparten el ancho desde 1280px. Entre 1024 y 1280, Pending Task queda
   abajo, a lo ancho; más angosto, una columna. Sin componentes nuevos: sólo la grilla de `pages/Dashboard.tsx`
   (`xl:grid-cols-3`; el panel lleva `lg:col-span-2 xl:col-span-1`).
