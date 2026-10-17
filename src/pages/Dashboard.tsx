@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CalendarDays, Clock, Activity, CalendarClock, ShieldQuestionMark } from 'lucide-react'
 import { Panel } from '@/components/dashboard/primitives'
@@ -12,6 +12,7 @@ import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import { OperatoryStrip } from '@/components/dashboard/OperatoryStrip'
 import { AppointmentRow, TaskRow } from '@/components/dashboard/DashboardRows'
 import { ListGroup } from '@/components/ui/list-group'
+import { Chip } from '@/components/ui/chip'
 import {
   DIAS, DIA_CARGADO, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
   type DiaDashboard, type Origen,
@@ -103,6 +104,9 @@ export default function Dashboard() {
   const [date, setDate] = useState(DEFAULT_DATE)
   const [salas, setSalas] = useState<string[]>([])
   const [tipos, setTipos] = useState<string[]>([])
+  /* La sala elegida en la tira de arriba: la sala de espera muestra sólo a los suyos (dashboard.md, 2026-10-17). */
+  const [salaEspera, setSalaEspera] = useState<string | null>(null)
+  const panelEspera = useRef<HTMLDivElement>(null)
   const [selected, setSelected] =
     useState<{ appt: Appointment; rect: DOMRect; id?: string } | null>(null)
   const [editando, setEditando] = useState<{ datos: DatosTurno; origen: Origen } | null>(null)
@@ -210,6 +214,19 @@ export default function Dashboard() {
     (a) => salas.length === 0 || salas.includes(a.operatory),
   )
   const tareas = dia.tasks.filter((t) => tipos.length === 0 || tipos.includes(t.kind))
+  const enEspera = dia.waiting.filter((w) => !salaEspera || w.operatory === salaEspera)
+
+  /* Elegir una sala filtra la sala de espera; si quedó fuera de la vista (en el celular va abajo de todo), se trae. */
+  const elegirSala = (sala: string | null) => {
+    setSalaEspera(sala)
+    const el = panelEspera.current
+    if (!sala || !el) return
+    const { top, bottom } = el.getBoundingClientRect()
+    if (top < 0 || bottom > window.innerHeight + 200) {
+      const reducido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      el.scrollIntoView({ block: 'start', behavior: reducido ? 'auto' : 'smooth' })
+    }
+  }
 
   return (
     <div className={CONTENEDOR_PAGINA}>
@@ -228,7 +245,7 @@ export default function Dashboard() {
 
       {/* Las salas en una tira arriba, sin ocupar una columna (Julián, 2026-10-13). */}
       <div className="mt-5">
-        <OperatoryStrip rooms={dia.rooms} />
+        <OperatoryStrip rooms={dia.rooms} elegida={salaEspera} onElegir={elegirSala} />
       </div>
 
       {/* Mucho volumen: filas en lugar de cards (las mismas partes) y un tope por panel; "Show N more" abre el resto con
@@ -270,26 +287,40 @@ export default function Dashboard() {
           )}
         </Panel>
 
-        <Panel title="Waiting Room">
-          {dia.waiting.length === 0 ? (
-            <EmptyState
-              icon={Clock}
-              title="Waiting room is empty"
-              detail="No patients have checked in for this day yet."
-            />
+        <div ref={panelEspera} className="flex scroll-mt-4 flex-col">
+        {/* El filtro se lee pegado al título (a la derecha lo tapaba la pestaña del paciente). */}
+        <Panel
+          className="flex-1"
+          title={<>Waiting Room{salaEspera && <Chip onRemove={() => setSalaEspera(null)} removeLabel="Show all rooms">{salaEspera}</Chip>}</>}
+        >
+          {enEspera.length === 0 ? (
+            salaEspera && dia.waiting.length > 0 ? (
+              <EmptyState
+                icon={Clock}
+                title={`No one is waiting for ${salaEspera}`}
+                detail="Pick another room above, or show the whole waiting room."
+                accion={{ label: 'Show all rooms', onClick: () => setSalaEspera(null) }}
+              />
+            ) : (
+              <EmptyState
+                icon={Clock}
+                title="Waiting room is empty"
+                detail="No patients have checked in for this day yet."
+              />
+            )
           ) : (
-            <ListGroup limit={TOPE.espera} label="patients waiting">
-              {dia.waiting.map((a, i) => (
+            <ListGroup key={salaEspera ?? 'todas'} limit={TOPE.espera} label="patients waiting">
+              {enEspera.map((a, i) => (
                 <AppointmentRow
                   key={i} appt={a} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
                   onSelect={pick}
-                  onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: i })}
+                  onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: dia.waiting.indexOf(a) })}
                 />
               ))}
             </ListGroup>
           )}
         </Panel>
-
+        </div>
       </div>
 
       <div className="mt-4">

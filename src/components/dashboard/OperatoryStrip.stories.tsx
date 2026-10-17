@@ -7,7 +7,7 @@ import { Bloque, Forzar, Lienzo, Muestra, Tabla, TablaPartes } from '@/design-sy
 /* Salas de ejemplo: los estados del día de la demo, repetidos para tener volumen. */
 const ESTADOS: OperatoryStatus[] = ['Available', 'Busy', 'Busy', 'Busy', 'Unavailable', 'Busy']
 const salas = (n: number): Operatory[] =>
-  Array.from({ length: n }, (_, i) => ({ name: 'Operatory name', status: ESTADOS[i % ESTADOS.length]!, patientsToday: 12, provider: 'Daniel Anderson' }))
+  Array.from({ length: n }, (_, i) => ({ name: `Operatory ${i + 1}`, status: ESTADOS[i % ESTADOS.length]!, patientsToday: 12, provider: 'Daniel Anderson' }))
 
 /* Cuántas entran en una fila, con la misma cuenta que OperatoryStrip (gap de 16px). */
 const entran = (ancho: number) => Math.max(1, Math.floor((ancho + 16) / (OPERATORY_MIN + 16)))
@@ -25,7 +25,9 @@ const meta = {
           '',
           '**Cómo se comporta:** una fila de *OperatoryCard* sobre la página que **llena el ancho**. Cuántas entran sale del ancho (cada card mide al menos 232px, lo justo para el nombre con la pill más larga); las que no entran van a **"Show N more"**, la regla de listas largas (*Elements / Show more*). Con menos salas que lugares, las que hay se reparten el ancho. Sin salas no se dibuja.',
           '',
-          '**Probalo:** en *Playground* cambiá la cantidad de salas y el ancho desde *Controls*; tocá "Show N more".',
+          '**Cada sala con el color de su estado** y, al tocarla, **filtra la sala de espera** del Dashboard por esa sala: la elegida lleva el anillo azul, las demás se apagan, y la sala de espera muestra el filtro como chip junto a su título (Julián, 2026-10-17). Tocarla de nuevo, o la ✕ del chip, la suelta.',
+          '',
+          '**Probalo:** en *Playground* cambiá la cantidad de salas y el ancho desde *Controls*; tocá una sala para elegirla y "Show N more".',
         ].join('\n'),
       },
     },
@@ -68,8 +70,14 @@ function Pagina({ ancho, children }: { ancho: number; children: React.ReactNode 
   )
 }
 
+/* Con la sala elegida en estado, como en el Dashboard. */
+function Elegible({ rooms, inicial = null }: { rooms: Operatory[]; inicial?: string | null }) {
+  const [elegida, setElegida] = useState<string | null>(inicial)
+  return <OperatoryStrip rooms={rooms} elegida={elegida} onElegir={setElegida} />
+}
+
 export const Playground: Story = {
-  render: (a) => <Pagina ancho={a.width}><OperatoryStrip rooms={salas(a.rooms)} /></Pagina>,
+  render: (a) => <Pagina ancho={a.width}><Elegible key={a.rooms} rooms={salas(a.rooms)} /></Pagina>,
 }
 
 export const Parts: Story = {
@@ -81,6 +89,7 @@ export const Parts: Story = {
       </Bloque>
       <TablaPartes partes={[
         ['Row', 'Una fila que llena el ancho: tantas columnas como entran de 232px, nunca más que las salas.', 'OperatoryStrip'],
+        ['Selection', 'Tocar una sala la elige (filtra la sala de espera del Dashboard) y tocarla de nuevo la suelta; la elegida lleva el anillo y las demás se apagan.', 'elegida · onElegir'],
         ['Card', 'La sala, como card de página (sombra, sin borde).', 'OperatoryCard enPagina'],
         ['Show N more', 'Las que no entran; abre el resto en filas, con scroll si hace falta.', 'ShowMore'],
       ]} />
@@ -97,6 +106,9 @@ export const States: Story = {
       </Muestra>
       <Muestra titulo="More than fit" nota="Doce salas: una fila y Show N more.">
         <Pagina ancho={1352}><OperatoryStrip rooms={salas(12)} /></Pagina>
+      </Muestra>
+      <Muestra titulo="One selected" nota="Operatory 2 filtra la sala de espera: anillo azul; las demás al 60% hasta el hover.">
+        <Pagina ancho={1352}><Elegible rooms={salas(6)} inicial="Operatory 2" /></Pagina>
       </Muestra>
       <Muestra titulo="Open" nota="Todas, en filas; con muchas, scroll adentro.">
         <Forzar selector="[data-show-more]" estado="click">

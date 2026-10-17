@@ -577,3 +577,33 @@ cortarse, y en el Topbar el "Hi! Dentist" escribiéndose y después la fecha del
 (verde, estado) en la misma fila: la pill dice "Check In" aunque el paciente todavía no haya llegado. Convendría que la
 pill diga el estado real (por ejemplo "Scheduled" antes de llegar); no se tocó porque cambia contenido y espera el ok de
 Julián. También si la tira de salas arriba se consulta lo suficiente o conviene plegarla.
+
+## Salas con color y filtro de la sala de espera (2026-10-17)
+
+Julián: "si toco en una room debería aparecer en Waiting Room los pacientes que están en esa room, pero debería tener
+un cambio visual para situar al usuario". Y en la imagen nueva, las salas con colores; aclaró después: "solo aplicá los
+colores a las rooms" (las cards de turno quedan blancas).
+
+- **Color por estado en la tira de arriba** (`OPERATORY_SURFACES` en `OperatoryCard.tsx`): borde de 1px y fondo con el
+  mismo par de tokens de su pill: Available `dash-ok-fg`/`dash-ok-bg`, Busy `dash-busy-fg`/`dash-busy-bg`,
+  Unavailable `dash-bad-fg`/`dash-bad-bg`. Adentro de un panel la card sigue blanca.
+- **Tocar una sala filtra la Waiting Room** por esa sala; tocarla de nuevo la suelta. La card es un botón con
+  `aria-pressed`. **Elegida:** el anillo azul de selección de la app (`dash-ring`, 2px a 2px, como la card de turno
+  activa) y sombra; **las demás se apagan al 60%** hasta el hover o el foco. Así se ve de qué sala sale la lista sin
+  perder el estado de las otras.
+- **En la Waiting Room**, el filtro se lee como *Chip* pegado al título ("Waiting Room · Operatory 2 ×"); la ✕ ("Show all
+  rooms") lo saca. A la derecha lo tapaba la pestaña del paciente que flota en el borde. Si la sala no tiene a nadie
+  esperando: "No one is waiting for Operatory 1" con el botón *Show all rooms*. El filtro sigue al cambiar de día, como
+  el de Appointments.
+- **En el celular** la sala de espera queda abajo de todo: al elegir una sala, la pantalla baja hasta ella (sin
+  animación con reducir movimiento).
+- **Las salas se llaman como en los turnos** ("Operatory 1" … "Operatory 6"): el Figma decía "Operatory name" en todas,
+  un texto de relleno; con ese nombre no se podía saber qué sala filtraba ni cruzarla con "Dr. Elena Martinez ·
+  Operatory 2" de las filas.
+- Arreglo de paso: editar un turno de la sala de espera filtrada guardaba sobre el índice de la lista filtrada; ahora
+  usa el del día (`dia.waiting.indexOf`).
+
+**Pendiente de Julián** (aparece en la imagen pero no en el pedido, no se tocó): Pending Task en una tercera columna,
+la fecha azul arriba del título, y estados nuevos en la pill de cada turno (Confirmed, Waiting, In Progress,
+Cancelled). **Para validar con usuarios:** si apagar las otras salas se entiende como "filtro activo" y no como "salas
+deshabilitadas".

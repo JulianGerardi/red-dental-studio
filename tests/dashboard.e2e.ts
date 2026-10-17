@@ -53,3 +53,20 @@ test('Las salas van arriba con Show more; Check In avisa; FAQ lleva a Help', asy
   await screen.getByRole('link', 'Frequently asked questions').tap()
   await expect(screen.getByRole('heading', 'What can we help you with?')).toBeVisible()
 })
+
+/* Tocar una sala filtra la sala de espera por esa sala; el chip junto al título la suelta (dashboard.md, 2026-10-17). */
+test('Tocar una sala filtra la sala de espera y el chip lo deshace', async ({ app, screen }) => {
+  await app.open('/')
+  const salas = screen.getByRole('region', 'Rooms')
+  await salas.getByRole('button', /Show \d+ more/).tap()
+
+  await salas.getByRole('button', /^Operatory 1/).tap()
+  await expect(screen.getByText('No one is waiting for Operatory 1')).toBeVisible()
+
+  await salas.getByRole('button', /^Operatory 2/).tap()
+  await expect(screen.getByText('No one is waiting for Operatory 1')).toHaveCount(0)
+  await expect(screen.getByRole('button', 'Show all rooms')).toBeVisible()
+
+  await screen.getByRole('button', 'Show all rooms').tap()
+  await expect(screen.getByRole('button', 'Show all rooms')).toHaveCount(0)
+})

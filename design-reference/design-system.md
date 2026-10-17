@@ -823,3 +823,11 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - *Pages / Parts / Dashboard*: la fila de fecha suma el link a las preguntas frecuentes y pierde la línea de alcance.
 - `ShowMore`: sin degradé cuando la lista abierta no scrollea. Las filas de turno pasan a columnas desde 896px.
   Ver `figma/modulos/dashboard.md`.
+
+## OperatoryCard: color por estado y selección (2026-10-17)
+
+- Sobre la página (`enPagina`), la card de sala toma el color de su estado: borde de 1px y fondo con los tokens de su
+  pill (`OPERATORY_SURFACES`). Con `onClick` es un botón (`aria-pressed`): `seleccionada` lleva el anillo `dash-ring`
+  (2px a 2px) y `atenuada` la baja al 60% hasta el hover o el foco. `OperatoryStrip` suma `elegida` y `onElegir`.
+- *Components / Dashboard / OperatoryCard* y *Operatory strip* muestran colores, elegida, apagada, hover y foco.
+  Ver `figma/modulos/dashboard.md`.

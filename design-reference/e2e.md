@@ -42,6 +42,8 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   cierra (`ui/show-more`).
   (2026-10-13) La tira de salas de arriba abre el resto con *Show N more* (el número depende del ancho); *Check In*
   avisa "checked in" y el escudo de al lado de Today lleva a Help.
+  (2026-10-17) Tocar una sala filtra la sala de espera (Operatory 1 queda vacía, Operatory 2 trae a los suyos) y la ✕
+  del chip junto al título vuelve a mostrar a todos.
 
 - `tests/confibot.e2e.ts` (2026-10-13): el botón flotante abre el chat y se esconde mientras está abierto; la flechita
   lo recoge en una pestaña que sigue ahí al cambiar de pantalla y lo trae de vuelta. En Scheduling queda centrado
