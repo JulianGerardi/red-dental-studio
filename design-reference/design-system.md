@@ -809,6 +809,23 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   Billing tables* (Settings en azul y Billing desplegado en `/settings/finance/carriers`). Sin `BillingItem` ni
   `billingMenu`. Ver `figma/modulos/header-sidebar.md`.
 
+## Breadcrumb: dónde va, y el del paciente (2026-10-13)
+
+- **Elements / Breadcrumb** reemplaza a *Components / UI / Breadcrumb* (que eran dos historias sueltas): Playground,
+  Parts, States (hover, foco, Overview, rastro largo en angosto, pantalla de primer nivel) y Specs con la tabla *Where
+  it goes*. Regla: las pantallas de primer nivel (menú lateral o de la cuenta) no llevan rastro; las que se abren desde
+  otra, sí, armado desde la ruta (layout de Settings o `PatientBreadcrumb`), nunca a mano. El link suma foco azul y el
+  último tramo `aria-current="page"`.
+- **Components / Patients / PatientBreadcrumb**: `Patients › paciente › sección` en las siete pantallas del paciente.
+- **Elements / Patient menu → States → Next to the screen**: el menú baja hasta el final de la pantalla (expandido y
+  colapsado). *Page header → Headers in the app* reconoce `PatientBreadcrumb`. Ver `figma/modulos/patient-dashboard.md`.
+
+## Breadcrumb con "/" (2026-10-17)
+
+- `Breadcrumb` separa los tramos con "/" (`ink-faint`, `aria-hidden`, 6px de aire) en lugar del chevron. *Elements /
+  Breadcrumb → Parts* y *Specs* lo muestran; cambia en todos los rastros (Settings y paciente). Ver
+  `figma/modulos/patient-dashboard.md`.
+
 ## List group: cada fila en su card (2026-10-13)
 
 - `ListGroup` deja la caja con divisores: cada fila va en su `TARJETA_INTERNA` con 12px entre cards, como las salas y los

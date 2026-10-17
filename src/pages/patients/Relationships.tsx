@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, Pencil, Plus, Trash2, Calendar, Phone, Mail, MapPin, Users, type LucideIcon } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { Pencil, Plus, Trash2, Calendar, Phone, Mail, MapPin, Users, type LucideIcon } from 'lucide-react'
 import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { EmptyState } from '@/components/ui/empty-state'
 import { EditRelationshipModal } from '@/components/patients/EditRelationshipModal'
 import { AddRelationshipDrawer, DIRECTORIO, type NuevaRelacion } from '@/components/patients/AddRelationshipDrawer'
@@ -157,15 +158,8 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
   return (
     <div className={CONTENEDOR_PAGINA}>
 
-      {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
-          El breadcrumb completo repetía lo que ya dice el panel lateral. */}
-      <Link
-        to="/patients"
-        className="text-dash-blue mb-3 inline-flex items-center gap-1 text-sm hover:underline"
-      >
-        <ChevronLeft className="size-4" /> Patients
-      </Link>
-      <div className="mt-4 flex flex-col gap-5 lg:flex-row lg:items-start">
+      <PatientBreadcrumb name="John Smith" section="Relationships &amp; Billing" />
+      <div className="flex flex-col gap-5 lg:flex-row">
         <PatientSidePanel
           name="John Smith"
           initials="JS"
