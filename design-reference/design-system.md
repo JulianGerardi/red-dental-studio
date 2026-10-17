@@ -197,7 +197,7 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     y sin el z-40, que lo ponía encima de la barra del sitio). Lo que en la
     app se abre con el mouse se deja a la vista con dos contextos que la app no
     usa: `NavigationPreview` (`components/layout/navigation-preview.ts`:
-    expanded, tooltip, settingsMenu, billingMenu) y `PatientMenuPreview`
+    expanded, tooltip, settingsMenu) y `PatientMenuPreview`
     (`components/patients/patient-menu-preview.ts`: collapsed y encounter por
     instancia, tooltip, infoCard, encounterOptions). Abrirlos con una función
     `play` no alcanza: al terminar, la historia se vuelve a dibujar. Para
@@ -801,6 +801,60 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `AccionesPaciente` reemplaza a `EncabezadoBilling`: los botones del paciente con `ui/button` md, en el `top` del Panel
   de la actividad. *Components / Dashboard / Panel and StatusPill* actualiza la descripción de `top`.
 - Decisiones en `figma/modulos/billing.md` (2026-10-13).
+
+## Navigation: Billing sin menú (2026-10-13)
+
+- *Elements / Navigation*: Billing es un ítem más del rail (link directo, tooltip colapsado); Fee Schedules, Carriers y
+  Coverage Table están sólo en el menú de Settings. *States* cambia *Billing menu* por *Billing* y suma *Settings menu ·
+  Billing tables* (Settings en azul y Billing desplegado en `/settings/finance/carriers`). Sin `BillingItem` ni
+  `billingMenu`. Ver `figma/modulos/header-sidebar.md`.
+
+## Breadcrumb: dónde va, y el del paciente (2026-10-13)
+
+- **Elements / Breadcrumb** reemplaza a *Components / UI / Breadcrumb* (que eran dos historias sueltas): Playground,
+  Parts, States (hover, foco, Overview, rastro largo en angosto, pantalla de primer nivel) y Specs con la tabla *Where
+  it goes*. Regla: las pantallas de primer nivel (menú lateral o de la cuenta) no llevan rastro; las que se abren desde
+  otra, sí, armado desde la ruta (layout de Settings o `PatientBreadcrumb`), nunca a mano. El link suma foco azul y el
+  último tramo `aria-current="page"`.
+- **Components / Patients / PatientBreadcrumb**: `Patients › paciente › sección` en las siete pantallas del paciente.
+- **Elements / Patient menu → States → Next to the screen**: el menú baja hasta el final de la pantalla (expandido y
+  colapsado). *Page header → Headers in the app* reconoce `PatientBreadcrumb`. Ver `figma/modulos/patient-dashboard.md`.
+
+## Breadcrumb con "/" (2026-10-17)
+
+- `Breadcrumb` separa los tramos con "/" (`ink-faint`, `aria-hidden`, 6px de aire) en lugar del chevron. *Elements /
+  Breadcrumb → Parts* y *Specs* lo muestran; cambia en todos los rastros (Settings y paciente). Ver
+  `figma/modulos/patient-dashboard.md`.
+
+## List group: cada fila en su card (2026-10-13)
+
+- `ListGroup` deja la caja con divisores: cada fila va en su `TARJETA_INTERNA` con 12px entre cards, como las salas y los
+  turnos del paciente (Julián: "debe ser estilo card", por continuidad). Las filas de `DashboardRows` pasan a 10px de
+  margen interno parejo. *Elements / List group*, *Elements / Show more* y *Components / Dashboard / Dashboard rows*
+  muestran las cards. Ver `figma/modulos/dashboard.md`.
+
+
+## Dashboard reorganizado: tira de salas, Button success y saludo (2026-10-13)
+
+- **Button `success`** (*Elements / Buttons*): verde `dash-ok-fg`, hover `green-deep`, foco del mismo verde. Para lo que
+  arranca o llega (Check In del turno). En los turnos, el color dice la acción (`ACCION_TURNO`): Check In `success`,
+  Check Out `primary`, Cancel `destructive`.
+- **Components / Dashboard / Operatory strip** (nuevo, `OperatoryStrip`): las salas en una fila arriba del Dashboard,
+  tantas como entran de 232px; el resto en "Show N more". `OperatoryCard` suma `enPagina` (card de página, sin borde) y
+  su página pasa a Playground, Parts, States y Specs.
+- **Components / Layout / Greeting** (nuevo, `Saludo`): el saludo del Topbar que se escribe y deja la fecha del día;
+  una vez por sesión y sin animación con reducir movimiento.
+- *Pages / Parts / Dashboard*: la fila de fecha suma el link a las preguntas frecuentes y pierde la línea de alcance.
+- `ShowMore`: sin degradé cuando la lista abierta no scrollea. Las filas de turno pasan a columnas desde 896px.
+  Ver `figma/modulos/dashboard.md`.
+
+## OperatoryCard: color por estado y selección (2026-10-17)
+
+- Sobre la página (`enPagina`), la card de sala toma el color de su estado: borde de 1px y fondo con los tokens de su
+  pill (`OPERATORY_SURFACES`). Con `onClick` es un botón (`aria-pressed`): `seleccionada` lleva el anillo `dash-ring`
+  (2px a 2px) y `atenuada` la baja al 60% hasta el hover o el foco. `OperatoryStrip` suma `elegida` y `onElegir`.
+- *Components / Dashboard / OperatoryCard* y *Operatory strip* muestran colores, elegida, apagada, hover y foco.
+  Ver `figma/modulos/dashboard.md`.
 
 ## Lista de detalle y detalle del procedimiento (2026-10-13)
 

@@ -5,6 +5,7 @@ import {
   CircleUserRound, CreditCard, CircleHelp, Info, LogOut, EyeOff, ArrowRight, CheckCheck,
 } from 'lucide-react'
 import { LocationSelector } from './LocationSelector'
+import { Saludo } from './Saludo'
 import { haceCuanto, type Notificacion } from '@/data/notificaciones'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -75,9 +76,8 @@ export function Topbar({
           <ToggleIcon className="size-[18px] transition-transform duration-200" />
         </button>
 
-        <p className="hidden items-center gap-1.5 text-[19px] whitespace-nowrap text-black lg:flex">
-          <span aria-hidden>👋</span> Hi! Dentist Sarah
-        </p>
+        {/* Se escribe el saludo y después la fecha del día (Saludo, 2026-10-13). */}
+        <Saludo className="hidden lg:flex" />
       </div>
 
       <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-4 xl:gap-6">

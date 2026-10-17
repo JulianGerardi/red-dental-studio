@@ -40,6 +40,10 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   y lo cambia; Today vuelve a hoy y se va.
   Con `?day=busy` (35 turnos) se ven cinco; *Show 30 more* abre el resto en una región con scroll y *Show less* la
   cierra (`ui/show-more`).
+  (2026-10-13) La tira de salas de arriba abre el resto con *Show N more* (el número depende del ancho); *Check In*
+  avisa "checked in" y el escudo de al lado de Today lleva a Help.
+  (2026-10-17) Tocar una sala filtra la sala de espera (Operatory 1 queda vacía, Operatory 2 trae a los suyos) y la ✕
+  del chip junto al título vuelve a mostrar a todos.
 - `tests/clinical-mode.e2e.ts` (2026-10-13): en DentAssmt, *View full record* del menú del finding Tooth 3 abre su
   registro (Source exam) y el link a D2391 cambia el drawer a ese procedimiento.
 - `tests/ledger.e2e.ts` (2026-10-14): el detalle de D4341 muestra su caso, Northgate Clinic y Outstanding transaction
@@ -54,6 +58,10 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 - `tests/confibot.e2e.ts` (2026-10-13): el botón flotante abre el chat y se esconde mientras está abierto; la flechita
   lo recoge en una pestaña que sigue ahí al cambiar de pantalla y lo trae de vuelta. En Scheduling queda centrado
   arriba del botón de Appointment requests, sin tocarlo.
+
+- `tests/patient-dashboard.e2e.ts` (2026-10-13): en Ledger el rastro es Patients › John Smith › Ledger (el último sin
+  link); John Smith vuelve al Overview, donde termina el rastro, y Patients a la lista, que no lleva. Billing tampoco.
+  Edit Patient cuelga del paciente.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 

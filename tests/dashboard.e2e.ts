@@ -37,3 +37,36 @@ test('Con muchos turnos se ven cinco y Show more abre el resto con scroll', asyn
   await expect(screen.getByRole('region', 'All appointments')).toHaveCount(0)
   await expect(screen.getByRole('button', 'Show 30 more')).toBeVisible()
 })
+
+/* La organización del 2026-10-13 (dashboard.md): las salas en una tira arriba con "Show N more", cada acción del turno
+   avisa lo suyo y el escudo de al lado de Today lleva a las preguntas frecuentes. */
+test('Las salas van arriba con Show more; Check In avisa; FAQ lleva a Help', async ({ app, screen }) => {
+  await app.open('/')
+  const salas = screen.getByRole('region', 'Rooms')
+  await expect(salas).toBeVisible()
+  await salas.getByRole('button', /Show \d+ more/).tap()
+  await expect(salas.getByRole('button', 'Show less')).toBeVisible()
+
+  await screen.getByRole('button', /^Check In/).tap()
+  await expect(screen.getByText('Noah James Smith checked in.')).toBeVisible()
+
+  await screen.getByRole('link', 'Frequently asked questions').tap()
+  await expect(screen.getByRole('heading', 'What can we help you with?')).toBeVisible()
+})
+
+/* Tocar una sala filtra la sala de espera por esa sala; el chip junto al título la suelta (dashboard.md, 2026-10-17). */
+test('Tocar una sala filtra la sala de espera y el chip lo deshace', async ({ app, screen }) => {
+  await app.open('/')
+  const salas = screen.getByRole('region', 'Rooms')
+  await salas.getByRole('button', /Show \d+ more/).tap()
+
+  await salas.getByRole('button', /^Operatory 1/).tap()
+  await expect(screen.getByText('No one is waiting for Operatory 1')).toBeVisible()
+
+  await salas.getByRole('button', /^Operatory 2/).tap()
+  await expect(screen.getByText('No one is waiting for Operatory 1')).toHaveCount(0)
+  await expect(screen.getByRole('button', 'Show all rooms')).toBeVisible()
+
+  await screen.getByRole('button', 'Show all rooms').tap()
+  await expect(screen.getByRole('button', 'Show all rooms')).toHaveCount(0)
+})

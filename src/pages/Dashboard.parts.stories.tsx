@@ -16,9 +16,9 @@ const meta = {
       decisionsFrom: 'pages/Dashboard.tsx',
       description: {
         component: [
-          'Las partes propias del dashboard (`@/pages/Dashboard`): la **fila de fecha** de arriba, que manda sobre toda la pantalla, y el **botón de filtro** de cada panel. La pantalla completa está en *Pages*.',
+          'Las partes propias del dashboard (`@/pages/Dashboard`): la **fila de fecha** de arriba, que manda sobre toda la pantalla, con el atajo a las **preguntas frecuentes**, y el **botón de filtro** de cada panel. La pantalla completa está en *Pages*.',
           '',
-          '**Cómo se usa:** el selector elige el día; *Today* vuelve a hoy sin abrir el calendario y sólo aparece cuando el día elegido no es hoy. Los dos miden 32px de alto, como el resto de los inputs de la app. El selector es el `DatePicker` en su look *toolbar* ("Feb 28, 2026"): el mismo campo y calendario que el filtro de fecha de Notifications.',
+          '**Cómo se usa:** el selector elige el día; *Today* vuelve a hoy sin abrir el calendario y sólo aparece cuando el día elegido no es hoy; el escudo con el signo de pregunta lleva a las preguntas frecuentes (*Help*, con el Dashboard abierto; Julián, 2026-10-13). Los tres miden 32px de alto, como el resto de los inputs de la app. El selector es el `DatePicker` en su look *toolbar* ("Feb 28, 2026"): el mismo campo y calendario que el filtro de fecha de Notifications.',
           '',
           '**Probalo:** en *Playground* elegí el día y los días marcados desde *Controls*; tocá *Today* y el botón se va.',
         ].join('\n'),
@@ -37,6 +37,7 @@ type Story = StoryObj<Args>
 
 const sinControles = { controls: { disable: true } }
 const HOY_SEL = 'button[title="Go to today"]'
+const FAQ_SEL = 'a[aria-label="Frequently asked questions"]'
 
 function Fecha({ inicial = HOY_DEMO, marcados = true }: { inicial?: Date; marcados?: boolean }) {
   const [d, setD] = useState(inicial)
@@ -62,14 +63,14 @@ export const Parts: Story = {
   parameters: sinControles,
   render: () => (
     <Lienzo>
-      <Bloque titulo="Date row" nota="Arriba de las tres columnas: si viviera adentro de Appointments parecería filtrar sólo esa.">
+      <Bloque titulo="Date row" nota="Arriba de las salas y de los paneles: si viviera adentro de Appointments parecería filtrar sólo esa.">
         <Muestras>
-          <ConRotulo rotulo="Date picker · Today · scope line"><Fecha marcados={false} /></ConRotulo>
+          <ConRotulo rotulo="Date picker · Today · FAQ"><Fecha marcados={false} /></ConRotulo>
         </Muestras>
         <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
           <li><strong>Date picker:</strong> el día de toda la pantalla, como "Feb 28, 2026" (<code>DatePicker variant="toolbar"</code>).</li>
           <li><strong>Today:</strong> <code>Button</code> secondary md con el ícono CalendarClock. Sólo cuando el día no es hoy.</li>
-          <li><strong>Scope line:</strong> dice a qué afecta la fecha, 12px en <code>ink-muted</code>.</li>
+          <li><strong>FAQ:</strong> link con el look de <code>Button</code> secondary md de sólo ícono (ShieldQuestionMark): lleva a Help, donde arranca abierto el Dashboard. Siempre visible.</li>
         </ul>
       </Bloque>
       <Bloque titulo="Panel filter button" nota="El embudo de Appointments y de Pending Task: FilterMenu en sm.">
@@ -89,6 +90,8 @@ export const States: Story = {
           <ConRotulo rotulo="Another day: Today shows up"><Fecha /></ConRotulo>
           <ConRotulo rotulo="Today: the button goes away"><Fecha inicial={new Date()} /></ConRotulo>
           <ConRotulo rotulo="Today, hover"><Forzar selector={HOY_SEL} estado="hover"><Fecha /></Forzar></ConRotulo>
+          <ConRotulo rotulo="FAQ, hover"><Forzar selector={FAQ_SEL} estado="hover"><Fecha /></Forzar></ConRotulo>
+          <ConRotulo rotulo="FAQ, keyboard focus"><Forzar selector={FAQ_SEL} estado="focus-visible"><Fecha /></Forzar></ConRotulo>
           <ConRotulo rotulo="Calendar open">
             <Forzar selector="button[aria-haspopup]" estado="click" className="h-[380px]"><Fecha /></Forzar>
           </ConRotulo>
@@ -104,7 +107,7 @@ export const States: Story = {
   ),
 }
 
-const PARTES = [['Date picker', 'button[aria-haspopup]'], ['Today', HOY_SEL]] as const
+const PARTES = [['Date picker', 'button[aria-haspopup]'], ['Today', HOY_SEL], ['FAQ', FAQ_SEL]] as const
 
 /* Dibuja la fila y lee el selector y Today del mismo render. */
 function MedidasFila() {
@@ -147,7 +150,7 @@ export const Specs: Story = {
         <Bloque titulo="Date row" nota="Leído de la fila ya dibujada. El selector y Today miden lo mismo de alto: si uno cambia, el otro tiene que acompañar.">
           <MedidasFila />
         </Bloque>
-        <Bloque titulo="Today colors" nota="Los de Button secondary (button.tsx y src/index.css).">
+        <Bloque titulo="Today and FAQ colors" nota="Los de Button secondary (button.tsx y src/index.css).">
           <Tabla encabezado={['Fill', 'Text', 'Border', 'Hover fill']} minimo={560}>
             <tr>
               <td><Token nombre={t.fondo} /></td>
@@ -160,8 +163,9 @@ export const Specs: Story = {
         <Bloque titulo="Rules">
           <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
             <li>Today is <code>Button variant="secondary" size="md"</code>: 32px, the date picker height. Never a hand-made button.</li>
+            <li>FAQ is a link (it navigates) with <code>buttonClasses</code> secondary md icon-only: 32×32, with an aria-label and the same text as a tooltip.</li>
             <li>Both carry the same faint shadow (0 1px 2px, 5%), so they read as a pair.</li>
-            <li>8px between parts. Today only when the chosen day is not today.</li>
+            <li>8px between parts. Today only when the chosen day is not today; FAQ always.</li>
             <li>The date picker is <code>variant="toolbar"</code>: "Feb 28, 2026", medium, the same field and calendar as the Notifications date filter.</li>
           </ul>
         </Bloque>
