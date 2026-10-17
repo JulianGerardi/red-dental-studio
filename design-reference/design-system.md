@@ -791,6 +791,17 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   usan las tareas que el banner muestra de verdad (`delBanner`), así el paginador dice "1 of 4" y no "1 of 16".
   Decisiones en `figma/modulos/notifications.md` y `header-sidebar.md` (2026-10-13).
 
+## Billing: bento y botones del paciente dentro del panel (2026-10-13)
+
+- *Pages › Parts › Billing*: Parts suma *Bento* y *Patient actions*; States cambia *Header* por **Patient actions**
+  (con paciente y angosto) y suma **Numbers › In a row** (los cinco números a 880px, alineados); Specs › Shared rules
+  suma el bento (columna derecha del alto de la izquierda, 15 filas por página, mínimo 780px) y la fila de números.
+- `Stat` suma `enFila`: en una fila de cards usa `grid-rows-subgrid` y tres filas, así etiqueta, número y bajada quedan
+  alineados entre cards aunque una etiqueta use dos líneas. La etiqueta y la bajada ya no se cortan con "…".
+- `AccionesPaciente` reemplaza a `EncabezadoBilling`: los botones del paciente con `ui/button` md, en el `top` del Panel
+  de la actividad. *Components / Dashboard / Panel and StatusPill* actualiza la descripción de `top`.
+- Decisiones en `figma/modulos/billing.md` (2026-10-13).
+
 ## Navigation: Billing sin menú (2026-10-13)
 
 - *Elements / Navigation*: Billing es un ítem más del rail (link directo, tooltip colapsado); Fee Schedules, Carriers y
