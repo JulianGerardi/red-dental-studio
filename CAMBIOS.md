@@ -5,6 +5,24 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-17
 
+### Dashboard: filas en cards, salas arriba con color y filtro, colores por acción y saludo animado ([#31](https://github.com/JulianGerardi/red-dental-studio/pull/31))
+- **Filas en cards:** las de Appointments, Waiting Room y Pending Task (también el Pending Task del Patient Dashboard)
+  van cada una en su card interna, con 12px entre una y otra.
+- **Salas en una tira arriba** que llena el ancho (mínimo 232px por card; las que no entran, a "Show N more"), con el
+  **color de su estado** (borde y fondo de su pill). **Tocar una sala filtra la Waiting Room**: la elegida lleva el
+  anillo azul, las demás se apagan y el filtro va como chip junto al título. Las salas se llaman "Operatory 1…6", como
+  en los turnos.
+- **Appointments y Waiting Room a la par**, a todo el ancho desde 1024px. **Un color por acción:** Check In verde,
+  Check Out azul, Cancel rojo. Link a **preguntas frecuentes** (Help) al lado de Today. Salen la fecha de arriba del
+  título y la línea de alcance de la fecha.
+- **Topbar:** "Hi! Dentist Sarah" se escribe y deja la fecha del día con un calendario, una vez por sesión.
+- **Para el dev:** `Button` suma la variante `success`. `ACCION_TURNO` (`AppointmentCard`) mapea acción → variante y
+  `AccionTurno` suma `'Check In'`. Nuevos: `dashboard/OperatoryStrip` (`elegida`, `onElegir`) y `layout/Saludo` (usa
+  `sessionStorage` `saludo-visto`). `OperatoryCard` suma `enPagina` con `OPERATORY_SURFACES`, `seleccionada`,
+  `atenuada` y `onClick` (botón con `aria-pressed`). `ListGroup` pone cada hijo en un `<li>` con `TARJETA_INTERNA`;
+  `ShowMore` no lleva degradé si la lista abierta no scrollea; `AppointmentRow` pasa a columnas desde `@4xl`. Storybook:
+  nuevas *Components / Dashboard / Operatory strip* y *Components / Layout / Greeting*. e2e en `tests/dashboard.e2e.ts`.
+
 ### Patient Dashboard sin huecos y breadcrumbs del paciente ([#37](https://github.com/JulianGerardi/red-dental-studio/pull/37))
 - El menú del paciente baja hasta el final de la pantalla y Pending Task y Appointments terminan a la misma altura: el
   Overview cierra parejo, sin espacios grises.
