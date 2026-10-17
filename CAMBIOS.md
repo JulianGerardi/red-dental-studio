@@ -3,18 +3,21 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
-## 2026-10-13
+## 2026-10-17
 
 ### Patient Dashboard sin huecos y breadcrumbs del paciente ([#37](https://github.com/JulianGerardi/red-dental-studio/pull/37))
 - El menú del paciente baja hasta el final de la pantalla y Pending Task y Appointments terminan a la misma altura: el
   Overview cierra parejo, sin espacios grises.
-- Las siete pantallas del paciente llevan **Patients › John Smith › sección** en lugar del "‹ Patients" (el Overview
+- Las siete pantallas del paciente llevan **Patients / John Smith / sección** en lugar del "‹ Patients" (el Overview
   termina en el paciente; Edit Patient también lo tiene). Las de primer nivel (Patients, Billing, Dashboard, Settings,
   Profile…) no llevan; Profile mostraba un "Settings" suelto y ya no.
 - **Para el dev:** componente nuevo `components/patients/PatientBreadcrumb` (`migasPaciente`), no armar el rastro a
   mano. `PatientSidePanel` va con `lg:self-stretch` (el contenedor ya no necesita `lg:items-start`). `Breadcrumb` suma
   foco visible y `aria-current`. Storybook: *Elements / Breadcrumb* (reemplaza a *Components / UI / Breadcrumb*) y
   *Components / Patients / PatientBreadcrumb*. e2e nuevo: `tests/patient-dashboard.e2e.ts`.
+- Todos los breadcrumbs (también los de Settings) separan los tramos con **"/"** en lugar de la flecha.
+
+## 2026-10-13
 
 ### Billing: bento con Find Patient arriba, la tabla hasta abajo y los botones del paciente dentro del panel ([#33](https://github.com/JulianGerardi/red-dental-studio/pull/33))
 - Bento: izquierda los números y Recent Billing Activity; derecha Find Patient (a la altura de los números) y Today.

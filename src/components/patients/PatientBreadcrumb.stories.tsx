@@ -13,7 +13,7 @@ const meta = {
     docs: {
       description: {
         component: [
-          'El rastro de todas las pantallas de un paciente (`@/components/patients/PatientBreadcrumb`, Julián, 2026-10-13): **Patients › paciente › sección**. Reemplaza al "‹ Patients" que tenían arriba: ahora se vuelve a la lista o al Overview del paciente con un toque. Es el `Breadcrumb` de *Elements / Breadcrumb* con las migas armadas por `migasPaciente`.',
+          'El rastro de todas las pantallas de un paciente (`@/components/patients/PatientBreadcrumb`, Julián, 2026-10-13): **Patients / paciente / sección**. Reemplaza al "‹ Patients" que tenían arriba: ahora se vuelve a la lista o al Overview del paciente con un toque. Es el `Breadcrumb` de *Elements / Breadcrumb* con las migas armadas por `migasPaciente`.',
           '',
           'En el **Overview** termina en el paciente; en una sección, el paciente lleva al Overview y la sección es el último tramo, con el mismo nombre que en el menú del paciente. **Edit Patient** cuelga del paciente. Add Relationship abre un drawer sobre la lista, así que termina en *Relationships & Billing*. La lista de Patients no lleva rastro: es de primer nivel.',
           '',
@@ -85,7 +85,7 @@ export const Specs: Story = {
             <tr key={s}>
               <td className="font-semibold">{s}</td>
               <td className="font-mono text-[12px] text-ink-muted">{s === 'Edit Patient' ? '/patients/edit' : `/patients/:id${s === 'Overview' ? '' : `/${s.split(' ')[0].toLowerCase()}`}`}</td>
-              <td className="text-ink-medium">{migasPaciente('John Smith', '/patients/john-smith', seccionDe(s)).map((m) => (m.to ? `${m.label} →` : m.label)).join(' › ')}</td>
+              <td className="text-ink-medium">{migasPaciente('John Smith', '/patients/john-smith', seccionDe(s)).map((m) => (m.to ? `${m.label} →` : m.label)).join(' / ')}</td>
             </tr>
           ))}
         </Tabla>

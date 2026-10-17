@@ -290,3 +290,10 @@ entero en pantallas de menos de 900px de alto).
 
 Storybook: *Elements / Breadcrumb* (regla de dónde va, en *Specs*), *Components / Patients / PatientBreadcrumb* y
 *Elements / Patient menu* › *States* › *Next to the screen*.
+
+## Breadcrumb con "/" (2026-10-17)
+
+Julián: "hacelo con slash / en vez de la flecha". `ui/breadcrumb` separa los tramos con una **"/"** en `ink-faint`
+(antes el chevron de 14px), con 6px a cada lado y `aria-hidden` para que el lector de pantalla no la lea. Vale para todos
+los rastros de la app, no sólo los del paciente: `Patients / John Smith / Ledger`, `Settings / Locations / Abril`.
+Storybook: *Elements / Breadcrumb* (Parts, Specs).

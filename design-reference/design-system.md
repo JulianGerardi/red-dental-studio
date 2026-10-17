@@ -812,3 +812,9 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - **Components / Patients / PatientBreadcrumb**: `Patients › paciente › sección` en las siete pantallas del paciente.
 - **Elements / Patient menu → States → Next to the screen**: el menú baja hasta el final de la pantalla (expandido y
   colapsado). *Page header → Headers in the app* reconoce `PatientBreadcrumb`. Ver `figma/modulos/patient-dashboard.md`.
+
+## Breadcrumb con "/" (2026-10-17)
+
+- `Breadcrumb` separa los tramos con "/" (`ink-faint`, `aria-hidden`, 6px de aire) en lugar del chevron. *Elements /
+  Breadcrumb → Parts* y *Specs* lo muestran; cambia en todos los rastros (Settings y paciente). Ver
+  `figma/modulos/patient-dashboard.md`.

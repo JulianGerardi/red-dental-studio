@@ -20,7 +20,7 @@ const meta = {
         component: [
           'El rastro de navegación (`@/components/ui/breadcrumb`): dice dónde estás y cada tramo, menos el último, lleva de vuelta. El último es la pantalla actual: va en gris, no es link y lleva `aria-current="page"`.',
           '',
-          '**Dónde va (Julián, 2026-10-13):** sólo en las pantallas a las que **se entra desde otra**. Las de primer nivel —las que se abren desde el menú lateral o el de la cuenta: Dashboard, Patients, Scheduling, Billing, Help, Notifications, Settings y Profile— **no llevan**. La pantalla nunca lo escribe a mano: en Settings lo arma el layout a partir de la ruta y en las pantallas del paciente `PatientBreadcrumb` (*Patients › paciente › sección*). Ver *Where it goes* en *Specs*.',
+          '**Dónde va (Julián, 2026-10-13):** sólo en las pantallas a las que **se entra desde otra**. Las de primer nivel —las que se abren desde el menú lateral o el de la cuenta: Dashboard, Patients, Scheduling, Billing, Help, Notifications, Settings y Profile— **no llevan**. La pantalla nunca lo escribe a mano: en Settings lo arma el layout a partir de la ruta y en las pantallas del paciente `PatientBreadcrumb` (*Patients / paciente / sección*). Ver *Where it goes* en *Specs*.',
           '',
           '**Probalo:** en *Playground* escribí el rastro desde *Controls*, separando los tramos con ">"; pasá el mouse y llegá con Tab a los links.',
         ].join('\n'),
@@ -48,7 +48,7 @@ export const Parts: Story = {
       </Bloque>
       <TablaPartes partes={[
         ['Link', 'Un nivel de arriba: lleva a esa pantalla. Azul, subrayado con el mouse, anillo azul con Tab.', 'items[i].to'],
-        ['Separator', 'Chevron de 14px en gris tenue entre tramos; no se lee en voz alta.', 'ChevronRight'],
+        ['Separator', 'Una "/" en gris tenue entre tramos (Julián, 2026-10-17); no se lee en voz alta.', 'span aria-hidden'],
         ['Current screen', 'El último tramo, sin link (llevaría al mismo lugar), en gris y con aria-current="page".', 'items[last] sin to'],
       ]} />
     </Lienzo>
@@ -87,14 +87,14 @@ export const States: Story = {
 const DONDE: [string, string][] = [
   ['Dashboard · Patients · Scheduling · Billing · Help · Notifications', '—'],
   ['Settings (General) · Profile (/settings/account)', '—'],
-  ['Patient overview', 'Patients › John Smith'],
-  ['Patient section (Treatments, Insurance, Ledger, Documents, Relationships & Billing)', 'Patients › John Smith › Ledger'],
-  ['Add Relationship (drawer over the list)', 'Patients › John Smith › Relationships & Billing'],
-  ['Edit Patient', 'Patients › John Smith › Edit Patient'],
-  ['Settings section', 'Settings › Locations'],
-  ['Settings item', 'Settings › Locations › Abril'],
-  ['Settings › Billing', 'Settings › Billing › Carriers › Aetna Dental Plans'],
-  ['A /new that opens a drawer', 'Ends in the list: Settings › Employees'],
+  ['Patient overview', 'Patients / John Smith'],
+  ['Patient section (Treatments, Insurance, Ledger, Documents, Relationships & Billing)', 'Patients / John Smith / Ledger'],
+  ['Add Relationship (drawer over the list)', 'Patients / John Smith / Relationships & Billing'],
+  ['Edit Patient', 'Patients / John Smith / Edit Patient'],
+  ['Settings section', 'Settings / Locations'],
+  ['Settings item', 'Settings / Locations / Abril'],
+  ['Settings / Billing', 'Settings / Billing / Carriers / Aetna Dental Plans'],
+  ['A /new that opens a drawer', 'Ends in the list: Settings / Employees'],
 ]
 
 function Medida() {
@@ -121,7 +121,7 @@ export const Specs: Story = {
       <Bloque titulo="Type and spacing" nota="Medido sobre el rastro dibujado.">
         <Medida />
         <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
-          <li>13px, links Regular. Chevron 14px; 4px entre tramos y chevrons.</li>
+          <li>13px, links Regular. Separador "/" en ink-faint, con 6px a cada lado.</li>
           <li>Settings: 20px desde arriba de la página. Paciente: arriba de la página, 16px sobre el panel y el contenido.</li>
         </ul>
       </Bloque>

@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 import { Breadcrumb, type Miga } from '@/components/ui/breadcrumb'
 import { cn } from '@/lib/utils'
 
-/** Las migas de una pantalla del paciente: Patients › paciente › sección. Sin sección (Overview) termina en el paciente. */
+/** Las migas de una pantalla del paciente: Patients / paciente / sección. Sin sección (Overview) termina en el paciente. */
 export function migasPaciente(nombre: string, base: string, seccion?: string): Miga[] {
   return [
     { label: 'Patients', to: '/patients' },
