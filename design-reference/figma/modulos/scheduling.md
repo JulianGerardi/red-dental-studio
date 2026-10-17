@@ -510,3 +510,24 @@ Pedido de Julián: las cards de *Appointment requests* y las de *Appointments* d
   los dos lados. En el celular queda topado a `100vw - 116px` (259 en un iPhone de 375), como antes.
 - Con el avatar, en la lista de espera el nombre se recortaba demasiado ("Noah Ja…" junto a "Waiting 4 days"): ahora
   baja a un segundo renglón.
+
+## View: filtro rediseñado (2026-10-17)
+
+Pedido de Julián con un diseño nuevo del filtro **View** (reemplaza al frame `3856:208346`). Es de **un solo valor por grupo** (radios,
+con "Select all …" como una opción más), no de casillas: así está en el diseño.
+
+- **Estructura:** Status en una fila; Providers con buscador por nombre o especialidad y la lista de a dos; Rooms al costado con
+  *Current view* (lo que se verá al guardar); pie con el resumen ("1 provider · 1 room"), Cancel y Save.
+- **Es un popover** (`ui/popover` vía `ViewMenu`): debajo de View, alineado a su borde derecho, sin fondo oscuro; Radix lo corre para
+  que entre en pantalla, cierra con Escape, clic afuera o ✕ y devuelve el foco a View. Cancel, ✕, Escape y clic afuera **descartan**;
+  Save guarda en `Scheduling` (`vista`) y el panel reabre desde lo guardado.
+- **Responsive por la caja** (container queries): 976px en escritorio (Rooms al costado desde 896px de caja); en tablet Rooms baja y va
+  de a dos; en celular todo de a uno. Con poca altura scrollea el cuerpo y el encabezado y el pie quedan fijos.
+- **Decisiones de UX:** la búsqueda no cambia lo elegido (esconder al provider elegido no lo saca; el conteo y Current view lo siguen
+  diciendo); sin resultados hay estado vacío con *Clear search*; teclado de radio nativo (Tab entra por la elegida, flechas
+  recorren y eligen); textos secundarios en `ink-muted` en vez del gris claro del diseño (contraste 4.8:1 vs 2.6:1).
+- **Anomalía 91:** las salas repiten "Operatory 2" cuatro veces y sus subtítulos son especialidades de providers (se suma a la 28). Se
+  copia tal cual.
+- **Pendiente de validar con usuarios:** si recepción necesita **varios** providers o salas a la vez (el diseño sólo permite uno o
+  todos) y si el filtro de Status debería afectar también a Day/Week/Month: hoy el prototipo guarda la vista pero la grilla no
+  filtra (no hay backend ni datos para 12 providers).

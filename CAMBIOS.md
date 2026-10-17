@@ -3,6 +3,15 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-17
+
+### Scheduling: View rediseñado (PR_PENDIENTE)
+- El filtro **View** tiene el diseño nuevo: Status en una fila, Providers con buscador y de a dos, Rooms al costado con *Current view* y pie con resumen,
+  Cancel y Save. Es un popover bajo el botón: Save guarda la vista; Cancel, ✕, Escape o clic afuera la descartan. En tablet y celular se reacomoda.
+- **Para el dev:** `ViewMenu` (en `ViewFiltersPanel.tsx`) reemplaza al panel absoluto y a `data-view-trigger`; `Scheduling` guarda `vista`
+  (`VistaCalendario`) pero la grilla todavía no filtra. Sale `Group`; entran `OpcionFiltro`, `GrupoFiltro` y `SeccionFiltro`. Storybook:
+  *Components / Scheduling / ViewFiltersPanel*.
+
 ## 2026-10-13
 
 ### Billing: bento con Find Patient arriba, la tabla hasta abajo y los botones del paciente dentro del panel ([#33](https://github.com/JulianGerardi/red-dental-studio/pull/33))

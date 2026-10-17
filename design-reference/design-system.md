@@ -801,3 +801,12 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `AccionesPaciente` reemplaza a `EncabezadoBilling`: los botones del paciente con `ui/button` md, en el `top` del Panel
   de la actividad. *Components / Dashboard / Panel and StatusPill* actualiza la descripción de `top`.
 - Decisiones en `figma/modulos/billing.md` (2026-10-13).
+
+## Scheduling: View rediseñado (2026-10-17)
+
+- *Components / Scheduling / ViewFiltersPanel* con **Playground** (ancho, selección, búsqueda, nombres largos), **In the toolbar**
+  (el botón real abierto), **Parts**, **States** (opción: default, hover, foco, elegida, nombre largo; panel: default, todo
+  elegido, búsqueda con y sin resultados, provider elegido escondido, poca altura, nombres largos), **Widths** (976, 744 y 351) y
+  **Specs** (medidas, tokens y reglas).
+- Piezas nuevas: `OpcionFiltro`, `GrupoFiltro` (radiogroup con flechas), `SeccionFiltro` y `ViewMenu`. Se va `Group`. Reusa
+  `Radio`, `EmptyState`, `Button`, `Popover` e `ICONO_SUELTO`. Decisiones en `figma/modulos/scheduling.md`.
