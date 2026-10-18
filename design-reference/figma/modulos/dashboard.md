@@ -615,3 +615,19 @@ el ancho **desde 1280px** (`xl:grid-cols-3`). Entre 1024 y 1280 siguen Appointme
 Task abajo, a lo ancho (`lg:col-span-2`): con tres columnas a 1024px cada una mediría ~320px y los turnos se cortarían.
 Más angosto, todo en una columna. Las filas toman su forma angosta (`@container`): a 1440px las de turno bajan el botón
 a su renglón, como las tareas. Pending Task sigue con su filtro, Show more y vacío de siempre.
+
+## Botón por panel, íconos de Pending Task a la derecha y más gente en la agenda (2026-10-18)
+
+Julián: "en Appointments siempre va a decir Check In y en Waiting Room Check Out", "en Pending Task los íconos van a la
+derecha, alineados al botón azul" y "agregá más cards, así queda prolijo y vemos opciones cuando la agenda está llena".
+
+- **La acción la dice el panel, no el turno**: Appointments (el paciente todavía no llegó) siempre *Check In*, verde;
+  Waiting Room (ya está adentro) siempre *Check Out*, azul. Lo pasa `pages/Dashboard.tsx` (`accion`), y los datos del
+  día ya no traen `accion`. **Cancel** deja de aparecer en el Dashboard (era una card suelta del frame); el componente
+  lo sigue soportando (`AccionTurno`, *Dashboard rows → States*). Pendiente de Julián: si Cancel va como opción del
+  kebab de cada turno.
+- **Pending Task angosto**: el documento y *Expired date* van contra el borde derecho (`ml-auto`), alineados con el
+  botón azul de abajo, como en la imagen.
+- **Día de la demo con más gente**: la sala de espera pasa de 3 a 6 y se reparte entre Operatory 1 a 4 (antes todos en la
+  2), así el filtro por sala tiene a quién mostrar (Operatory 1 y 2, dos cada una; Operatory 5 y 6, vacías). La tira de
+  números lo refleja (Waiting 6). Con el día cargado (`?day=busy`) se ven los topes y "Show N more".

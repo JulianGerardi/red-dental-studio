@@ -97,6 +97,9 @@ const conDiaCargado = (dias: Record<string, DiaDashboard>) => ({ ...dias, [clave
 /* Cuántas filas se ven en cada panel antes de "Show N more" (ver ui/show-more). */
 const TOPE = { turnos: 5, espera: 5, tareas: 5 }
 
+/* La acción la dice el panel, no el turno (Julián, 2026-10-18): en Appointments el paciente todavía no llegó (Check In,
+   verde) y en Waiting Room ya está adentro (Check Out, azul). Ver dashboard.md. */
+
 export default function Dashboard() {
   const [params] = useSearchParams()
   const cargado = params.get('day') === 'busy'
@@ -275,7 +278,7 @@ export default function Dashboard() {
             <ListGroup limit={TOPE.turnos} label="appointments">
               {turnos.map((a, i) => (
                 <AppointmentRow
-                  key={i} appt={a} id={`appt-${i}`} activa={selected?.id === `appt-${i}`}
+                  key={i} appt={{ ...a, accion: 'Check In' }} id={`appt-${i}`} activa={selected?.id === `appt-${i}`}
                   onSelect={pick}
                   onEdit={(x) => editar(x, {
                     clave: claveFecha(date), panel: 'appointments',
@@ -312,7 +315,7 @@ export default function Dashboard() {
             <ListGroup key={salaEspera ?? 'todas'} limit={TOPE.espera} label="patients waiting">
               {enEspera.map((a, i) => (
                 <AppointmentRow
-                  key={i} appt={a} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
+                  key={i} appt={{ ...a, accion: 'Check Out' }} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
                   onSelect={pick}
                   onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: dia.waiting.indexOf(a) })}
                 />

@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-18
 
+### Dashboard: botón por panel, íconos de Pending Task a la derecha y más gente en la agenda
+- **Appointments** siempre muestra **Check In** (verde) y **Waiting Room** siempre **Check Out** (azul): la acción la
+  decide el panel. **Cancel** sale del Dashboard; si se quiere, va como opción del kebab.
+- **Pending Task:** en angosto, el documento y *Expired date* van contra el borde derecho, alineados con el botón azul.
+- **Día de la demo con más gente:** 6 en la sala de espera, repartidos entre las salas (el filtro por sala tiene a quién
+  mostrar).
+- **Para el dev:** `Dashboard.tsx` pasa `accion` según el panel; `dashboard-data` ya no trae `accion`. `AccionTurno`
+  sigue aceptando `'Cancel'`. e2e actualizado en `tests/dashboard.e2e.ts`.
+
 ### Dashboard: Pending Task como tercera columna ([#40](https://github.com/JulianGerardi/red-dental-studio/pull/40))
 - Appointments, Waiting Room y Pending Task se reparten el ancho desde 1280px. Entre 1024 y 1280, Pending Task queda
   abajo, a lo ancho; más angosto, una columna. Sin componentes nuevos: sólo la grilla de `pages/Dashboard.tsx`

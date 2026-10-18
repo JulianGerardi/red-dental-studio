@@ -60,16 +60,20 @@ export const DIAS: Record<string, DiaDashboard> = {
   '28-02-2026': {
     appointments: [
       turno('Noah James', 'NJ', 'Dr. Elena Martinez', 'Operatory 2', '10:00'),
-      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:30', { accion: 'Check In' }),
+      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:30'),
       turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '11:00'),
       turno('Mara Otero', 'MO', 'Dr. Salgado', 'Operatory 1', '11:30'),
       turno('Elias Aguirre', 'EA', 'Dr. Salgado', 'Operatory 3', '08:30', { completado: true }),
       turno('Ines Bermudez', 'IB', 'Dr. Elena Martinez', 'Operatory 1', '09:00', { completado: true }),
     ],
     waiting: [
-      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:00', { accion: 'Cancel', nuevo: true }),
-      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:00'),
-      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:00'),
+      /* Seis, repartidos en las salas: el filtro por sala tiene a quién mostrar (Julián, 2026-10-18). */
+      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:00', { nuevo: true }),
+      turno('Noah James', 'NJ', 'Dr. Elena Martinez', 'Operatory 2', '10:00'),
+      turno('Mara Otero', 'MO', 'Dr. Salgado', 'Operatory 1', '11:30'),
+      turno('Ines Bermudez', 'IB', 'Dr. Elena Martinez', 'Operatory 1', '09:00'),
+      turno('Elias Aguirre', 'EA', 'Dr. Salgado', 'Operatory 3', '08:30'),
+      turno('Sofia Chen', 'SC', 'Dr. Emily Chen', 'Operatory 4', '12:00'),
     ],
     rooms: salas(['Available', 'Busy', 'Busy', 'Busy', 'Unavailable', 'Busy'], 12),
     tasks: tareas(2, 'March 17, 2025', 'March 15, 2025'),
@@ -190,10 +194,10 @@ export const DIA_CARGADO: DiaDashboard = {
       name, iniciales(name), PROVIDERS[i % 5]!, `Operatory ${(i % 5) + 1}`,
       hora(480 + Math.floor(i / 5) * 45 + [0, 15, 30, 0, 15][i % 5]!), i < 12 ? { completado: true } : {},
     )),
-  /* Como en la demo: el primero con Cancel y los nuevos marcados para la tira de números. */
+  /* Como en la demo: los nuevos marcados para la tira de números. */
   waiting: NOMBRES.slice(35).map((name, i) =>
     turno(name, iniciales(name), PROVIDERS[i % 5]!, `Operatory ${(i % 5) + 1}`, hora(615 + i * 15), {
-      ...(i === 0 && { accion: 'Cancel' as const }), nuevo: i % 3 === 0,
+      nuevo: i % 3 === 0,
     })),
   rooms: salas(['Busy', 'Busy', 'Available', 'Busy', 'Unavailable', 'Busy'], 12),
   tasks: tareas(7, 'March 17, 2025', 'March 15, 2025'),

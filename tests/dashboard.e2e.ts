@@ -47,8 +47,8 @@ test('Las salas van arriba con Show more; Check In avisa; FAQ lleva a Help', asy
   await salas.getByRole('button', /Show \d+ more/).tap()
   await expect(salas.getByRole('button', 'Show less')).toBeVisible()
 
-  await screen.getByRole('button', /^Check In/).tap()
-  await expect(screen.getByText('Noah James Smith checked in.')).toBeVisible()
+  await screen.getByRole('button', /^Check In/).first().tap()
+  await expect(screen.getByText('Noah James checked in.')).toBeVisible()
 
   await screen.getByRole('link', 'Frequently asked questions').tap()
   await expect(screen.getByRole('heading', 'What can we help you with?')).toBeVisible()
@@ -61,12 +61,12 @@ test('Tocar una sala filtra la sala de espera y el chip lo deshace', async ({ ap
   await salas.getByRole('button', /Show \d+ more/).tap()
 
   await salas.getByRole('button', /^Operatory 1/).tap()
-  await expect(screen.getByText('No one is waiting for Operatory 1')).toBeVisible()
-
-  await salas.getByRole('button', /^Operatory 2/).tap()
-  await expect(screen.getByText('No one is waiting for Operatory 1')).toHaveCount(0)
   await expect(screen.getByRole('button', 'Show all rooms')).toBeVisible()
+  await expect(screen.getByText('No one is waiting for Operatory 1')).toHaveCount(0)
 
-  await screen.getByRole('button', 'Show all rooms').tap()
+  await salas.getByRole('button', /^Operatory 5/).tap()
+  await expect(screen.getByText('No one is waiting for Operatory 5')).toBeVisible()
+
+  await screen.getByRole('button', 'Show all rooms').first().tap()
   await expect(screen.getByRole('button', 'Show all rooms')).toHaveCount(0)
 })
