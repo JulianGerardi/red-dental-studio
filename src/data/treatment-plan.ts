@@ -127,6 +127,9 @@ export const CASOS: Caso[] = [
   },
 ]
 
+/* El paciente del encabezado de Clinical Mode (ClinicalTopBar), para los diálogos que lo nombran. */
+export const PACIENTE = 'Julio Perez'
+
 /* DD/MM/YYYY a un número que ordena: el más nuevo, mayor. */
 export const ordenFecha = (fecha: string) => {
   const [d, m, a] = fecha.split('/').map(Number)
@@ -215,6 +218,32 @@ export const DIALOGOS = {
   },
 } as const
 export type ClaveDialogo = keyof typeof DIALOGOS
+
+/* Al cambiar el estado de un procedimiento (Complete en Treatment Plan, Start en Procedures): los textos del prototipo de
+   Julián "Consent modals revised" para CON-3927, CON-3946 y CON-3950. Ver clinical-mode.md (2026-10-17). */
+export const CONSENTIMIENTO_REQUERIDO = {
+  titulo: 'Consent required',
+  /* Sin documento, un borrador sin enviar o uno vencido: se manda (o se reusa el borrador) y el paciente firma después. */
+  'sin-enviar': {
+    texto: 'This procedure requires a consent document. Send it to the patient to sign later, or have it signed now.',
+    textoVarios: 'These procedures require a consent document. Send it to the patient to sign later, or have it signed now.',
+    accion: 'Send consent and sign later',
+  },
+  /* El documento ya se mandó y falta la firma: se sigue con la firma pendiente, sin mandar otro. */
+  pendiente: {
+    texto: 'A consent document already exists for this procedure. You can sign it now or continue with the signature pending.',
+    textoVarios: 'Consent documents already exist for these procedures. You can sign them now or continue with the signatures pending.',
+    accion: 'Continue without signed consent',
+  },
+  firmar: 'Sign now',
+  ver: 'View consent',
+  /* El caso todavía no se aceptó: no hay consentimiento que pedir, el procedimiento no se actualiza. */
+  noListo: {
+    titulo: 'Procedure cannot be updated',
+    texto: 'The treatment case must be Accepted and its treatment plan must be Accepted or In Progress.',
+    accion: 'View case',
+  },
+} as const
 
 export const OPCIONES_BORRAR_CASO = [
   {

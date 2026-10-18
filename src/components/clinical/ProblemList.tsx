@@ -11,7 +11,9 @@ import { DataTable, type DataTableColumn } from '@/components/ui/data-table'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
-import { DetalleRegistro, TONO_PROBLEMA, TONO_PROCEDIMIENTO, type ContextoDetalle } from '@/components/clinical/RecordDetail'
+import { DetalleRegistro, TONO_PROBLEMA, TONO_PROCEDIMIENTO, tratamientoDe, useIr, type ContextoDetalle } from '@/components/clinical/RecordDetail'
+import { CASO_LISTO, ConsentRequiredDialog, avisarCasoNoListo, consentimientoRequerido, type TipoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
+import type { ConsentProcedimiento } from '@/data/treatment-plan'
 import {
   ESTADOS_PROBLEMA, ESTADOS_PROCEDIMIENTO, PROBLEMAS, PROCEDIMIENTOS,
   type EstadoProblema, type EstadoProcedimiento, type Problema, type ProcedimientoPaciente,
@@ -23,7 +25,8 @@ import {
 
 type Pestana = 'Problem List' | 'Procedures'
 
-type Accion<E extends string> = { label: string; icono: LucideIcon; a?: E; peligro?: boolean; borrar?: boolean }
+/* `realiza`: hacer el procedimiento (Start); antes se chequean el caso y el consentimiento (clinical-mode.md, 2026-10-17). */
+type Accion<E extends string> = { label: string; icono: LucideIcon; a?: E; peligro?: boolean; borrar?: boolean; realiza?: boolean }
 
 const EDITAR = { label: 'Edit', icono: Pencil } as const
 const ROLLBACK = { label: 'Rollback', icono: RotateCcw } as const
@@ -49,7 +52,7 @@ export function accionesProblema(e: EstadoProblema): Accion<EstadoProblema>[][] 
 }
 export function accionesProcedimiento(e: EstadoProcedimiento): Accion<EstadoProcedimiento>[][] {
   if (e === 'In progress') return [[EDITAR], [{ label: 'Discontinue', icono: CircleSlash, a: 'Discontinued' }, { ...ROLLBACK, a: 'Planned' }], [BORRAR]]
-  if (e === 'Planned') return [[EDITAR], [{ label: 'Start', icono: Play, a: 'In progress' }, { label: 'Refer', icono: Send, a: 'Referred' }, { label: 'Discard', icono: XCircle, a: 'Discarded', peligro: true }], [BORRAR]]
+  if (e === 'Planned') return [[EDITAR], [{ label: 'Start', icono: Play, a: 'In progress', realiza: true }, { label: 'Refer', icono: Send, a: 'Referred' }, { label: 'Discard', icono: XCircle, a: 'Discarded', peligro: true }], [BORRAR]]
   return [[EDITAR], [{ ...ROLLBACK, a: e === 'Completed' ? 'In progress' : 'Planned' }], [BORRAR]]
 }
 
@@ -83,16 +86,31 @@ export function ProblemList() {
   const [q, setQ] = useState('')
   /* La fila que se abre al llegar desde el detalle de la otra pestaña. */
   const [enfoque, setEnfoque] = useState<string>()
+  /* Start con una firma pendiente: Consent required encima; lo mandado desde acá, por procedimiento del caso. */
+  const [pedido, setPedido] = useState<{ tipo: TipoConsentimiento; fila: ProcedimientoPaciente; ac: Accion<EstadoProcedimiento>; caso: string; procCaso: string } | null>(null)
+  const [consentimientos, setConsentimientos] = useState<Record<string, ConsentProcedimiento>>({})
+  const ir = useIr()
 
   const t = q.trim().toLowerCase()
   const filasProblema = problemas.filter((p) => p.estado === filtroProblema && (!t || `${p.fecha} ${p.ubicacion} ${p.pieza ?? ''} ${p.condicion} ${p.examen} ${p.proveedor}`.toLowerCase().includes(t)))
   const filasProcedimiento = procedimientos.filter((p) => (filtroProcedimiento === 'All' || p.estado === filtroProcedimiento) && (!t || `${p.fecha} ${p.ubicacion} ${p.pieza ?? ''} ${p.codigo} ${p.nombre} ${p.proveedor}`.toLowerCase().includes(t)))
 
-  /* Cambiar el estado desde el menú: con aviso y Deshacer. Borrar saca la fila. */
-  function aplicar<T extends { id: string; estado: string }>(set: (xs: T[]) => void, antes: T[], fila: T, nombre: string, ac: Accion<string>) {
+  /* Cambiar el estado desde el menú: con aviso y Deshacer. Borrar saca la fila. `nota` se suma al aviso. */
+  function aplicar<T extends { id: string; estado: string }>(set: (xs: T[]) => void, antes: T[], fila: T, nombre: string, ac: Accion<string>, nota = '') {
     if (!ac.a && !ac.borrar) return aviso.info('Editing is not available in this release.')
     set(ac.borrar ? antes.filter((x) => x.id !== fila.id) : antes.map((x) => (x.id === fila.id ? { ...x, estado: ac.a! } : x)))
-    aviso.ok(ac.borrar ? `${nombre} deleted.` : `${nombre} moved to ${ac.a}.`, { label: 'Undo', onClick: () => set(antes) })
+    aviso.ok(ac.borrar ? `${nombre} deleted.` : `${nombre} moved to ${ac.a}.${nota}`, { label: 'Undo', onClick: () => set(antes) })
+  }
+
+  /* Start de un procedimiento de un caso: sin caso aceptado no cambia y el aviso lleva al caso; con la firma pendiente
+     decide Consent required. Los procedimientos sueltos no llevan consentimiento. */
+  function elegirProcedimiento(fila: ProcedimientoPaciente, ac: Accion<EstadoProcedimiento>) {
+    const tr = ac.realiza ? tratamientoDe(fila, consentimientos) : undefined
+    if (!tr?.procCaso) return aplicar(setProcedimientos, procedimientos, fila, fila.codigo, ac)
+    if (!CASO_LISTO.includes(tr.caso.estado)) return avisarCasoNoListo(() => ir({ pestana: 'Treatment Plan', caso: tr.caso.id }))
+    const tipo = consentimientoRequerido([tr.procCaso.consentimiento])
+    if (!tipo) return aplicar(setProcedimientos, procedimientos, fila, fila.codigo, ac)
+    setPedido({ tipo, fila, ac, caso: tr.caso.nombre, procCaso: tr.procCaso.id })
   }
 
   function menu<E extends string>(grupos: Accion<E>[][], elegir: (a: Accion<E>) => void) {
@@ -115,7 +133,7 @@ export function ProblemList() {
 
   /* Un link del detalle a un registro de la otra pestaña: cambia de pestaña, deja el filtro donde se ve y lo abre. */
   const contexto: ContextoDetalle = {
-    problemas, procedimientos,
+    problemas, procedimientos, consentimientos,
     onAbrirProblema: (p) => { setQ(''); setFiltroProblema(p.estado); setEnfoque(p.id); setPestana('Problem List') },
     onAbrirProcedimiento: (p) => { setQ(''); setFiltroProcedimiento('All'); setEnfoque(p.id); setPestana('Procedures') },
   }
@@ -190,7 +208,7 @@ export function ProblemList() {
           <DataTable
             key="procedimientos"
             columns={colsProcedimiento} rows={filasProcedimiento} rowKey={(r) => r.id} rowLabel={(r) => `${r.codigo} ${r.nombre}`}
-            rowActions={(r) => menu(accionesProcedimiento(r.estado), (a) => aplicar(setProcedimientos, procedimientos, r, r.codigo, a))}
+            rowActions={(r) => menu(accionesProcedimiento(r.estado), (a) => elegirProcedimiento(r, a))}
             rowDetail={(r) => <DetalleRegistro registro={{ tipo: 'procedimiento', r }} contexto={contexto} />}
             defaultExpanded={enfoque ? [enfoque] : undefined}
             pageSize={5} pageSizeOptions={[5, 10, 20]} pageSizeLabel="Show:" density="compact"
@@ -198,6 +216,24 @@ export function ProblemList() {
           />
         )}
       </div>
+      {pedido && (
+        <ConsentRequiredDialog
+          tipo={pedido.tipo}
+          procedimientos={[pedido.fila]}
+          caso={pedido.caso}
+          onCancel={() => setPedido(null)}
+          onSignNow={() => {
+            setPedido(null)
+            aviso.info('The signature workflow is not available in this release.')
+          }}
+          onContinue={() => {
+            const { tipo, fila, ac, procCaso } = pedido
+            if (tipo === 'sin-enviar') setConsentimientos((c) => ({ ...c, [procCaso]: 'Pending' }))
+            aplicar(setProcedimientos, procedimientos, fila, fila.codigo, ac, tipo === 'sin-enviar' ? ' Consent sent to the patient.' : ' Consent signature pending.')
+            setPedido(null)
+          }}
+        />
+      )}
     </TooltipProvider>
   )
 }

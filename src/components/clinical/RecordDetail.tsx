@@ -9,7 +9,7 @@ import { Drawer, DrawerSection } from '@/components/ui/drawer'
 import { ORDEN_TONO } from '@/components/clinical/LabOrderPanel'
 import { CitaVisita, EstadoConsentimiento, SIN_CONSENTIMIENTO_NI_TURNO, TONO_CASO, estadoGrupo } from '@/components/clinical/TreatmentPlanSection'
 import { codigoDiagnostico } from '@/components/clinical/dental/data'
-import { CASOS, CONSENTIMIENTO, type Caso, type Procedimiento, type Visita } from '@/data/treatment-plan'
+import { CASOS, CONSENTIMIENTO, type Caso, type ConsentProcedimiento, type Procedimiento, type Visita } from '@/data/treatment-plan'
 import {
   DERIVACIONES_PROBLEMA, VINCULOS_PROCEDIMIENTO,
   type Derivacion, type EstadoDerivacion, type EstadoProblema, type EstadoProcedimiento, type OrdenVinculada, type Pestana,
@@ -40,7 +40,7 @@ export const TONO_DERIVACION: Record<EstadoDerivacion, PillTone> = {
 export type DestinoClinico = { pestana: Pestana; caso?: string }
 export const NavegacionClinica = createContext<((d: DestinoClinico) => void) | null>(null)
 
-function useIr() {
+export function useIr() {
   const ir = useContext(NavegacionClinica)
   return (d: DestinoClinico) => (ir ? ir(d) : aviso.info(`Opens ${d.pestana}.`))
 }
@@ -55,14 +55,16 @@ const PESTANA_EXAMEN: Record<string, Pestana> = {
 
 type Tratamiento = { caso: Caso; grupo: Caso[]; visita?: Visita; procCaso?: Procedimiento }
 
-function tratamientoDe(pr: ProcedimientoPaciente): Tratamiento | undefined {
+/* `consentimientos`: lo mandado desde la tabla (Consent required) pisa el estado de los datos. */
+export function tratamientoDe(pr: ProcedimientoPaciente, consentimientos: Record<string, ConsentProcedimiento> = {}): Tratamiento | undefined {
   const v = VINCULOS_PROCEDIMIENTO[pr.id]?.caso
   const caso = v && CASOS.find((c) => c.id === v.id)
   if (!caso) return undefined
   /* Las alternativas son los casos del mismo grupo y la misma fecha, como en el rail de Treatment Plan. */
   const grupo = CASOS.filter((c) => c.grupo === caso.grupo && c.creado === caso.creado)
   const visita = caso.visitas.find((vi) => vi.procedimientos.some((p) => p.id === v.procedimiento))
-  return { caso, grupo, visita, procCaso: visita?.procedimientos.find((p) => p.id === v.procedimiento) }
+  const procCaso = visita?.procedimientos.find((p) => p.id === v.procedimiento)
+  return { caso, grupo, visita, procCaso: procCaso && { ...procCaso, consentimiento: consentimientos[procCaso.id] ?? procCaso.consentimiento } }
 }
 
 const vinculadosA = (problema: string, procedimientos: ProcedimientoPaciente[]) =>
@@ -267,12 +269,14 @@ export type ContextoDetalle = {
   procedimientos: ProcedimientoPaciente[]
   onAbrirProblema: (p: Problema) => void
   onAbrirProcedimiento: (p: ProcedimientoPaciente) => void
+  /** El consentimiento mandado desde la tabla, por procedimiento del caso. */
+  consentimientos?: Record<string, ConsentProcedimiento>
 }
 
 function datosProcedimiento(r: ProcedimientoPaciente, c: ContextoDetalle) {
   const v = VINCULOS_PROCEDIMIENTO[r.id]
   return {
-    t: tratamientoDe(r),
+    t: tratamientoDe(r, c.consentimientos),
     ordenes: v?.ordenes ?? [],
     derivaciones: v?.derivaciones ?? [],
     hallazgos: c.problemas.filter((p) => v?.problemas?.includes(p.id)),
@@ -283,7 +287,7 @@ function datosProblema(r: Problema, c: ContextoDetalle) {
   const procs = vinculadosA(r.id, c.procedimientos)
   return {
     procs,
-    t: procs.map(tratamientoDe).find(Boolean),
+    t: procs.map((p) => tratamientoDe(p, c.consentimientos)).find(Boolean),
     ordenes: procs.flatMap((p) => (VINCULOS_PROCEDIMIENTO[p.id]?.ordenes ?? []).map((o) => ({ ...o, proc: p }))),
     derivaciones: [
       ...(DERIVACIONES_PROBLEMA[r.id] ?? []),

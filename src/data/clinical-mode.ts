@@ -145,6 +145,7 @@ export const PROCEDIMIENTOS: ProcedimientoPaciente[] = [
   { id: 'pr5', fecha: '15/05/2026', ubicacion: 'Soft Palate', superficie: '-', codigo: 'D7286', nombre: 'Incisional biopsy of oral tissue – soft', proveedor: 'Perez Martinez', estado: 'Discarded' },
   { id: 'pr6', fecha: '02/05/2026', ubicacion: '', pieza: 3, superficie: 'O', codigo: 'D2391', nombre: 'Resin-based composite – one surface, posterior', proveedor: 'Perez Martinez', estado: 'Planned' },
   { id: 'pr7', fecha: '02/05/2026', ubicacion: '', pieza: 14, superficie: 'O, D', codigo: 'D2392', nombre: 'Resin-based composite – two surfaces, posterior', proveedor: 'Perez Martinez', estado: 'Planned' },
+  { id: 'pr12', fecha: '28/04/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D2740', nombre: 'Crown – porcelain/ceramic', proveedor: 'Perez Martinez', estado: 'Planned' },
   { id: 'pr8', fecha: '18/04/2026', ubicacion: '', superficie: '-', codigo: 'D1110', nombre: 'Prophylaxis – adult', proveedor: 'Michael Johnson', nota: 'Light calculus on lower anteriors.', estado: 'Completed' },
   { id: 'pr9', fecha: '18/04/2026', ubicacion: '', superficie: '-', codigo: 'D0120', nombre: 'Periodic oral evaluation – established patient', proveedor: 'Michael Johnson', estado: 'Completed' },
   { id: 'pr10', fecha: '03/03/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D3330', nombre: 'Endodontic therapy, molar tooth', proveedor: 'Perez Martinez', estado: 'Referred' },
@@ -183,6 +184,8 @@ export const VINCULOS_PROCEDIMIENTO: Record<string, VinculoProcedimiento> = {
     problemas: ['p9'],
     derivaciones: [{ id: 'rf-1', a: 'Dr. Laura Chen', especialidad: 'Endodontics', pedida: 'Mar 03, 2026', estado: 'Accepted' }],
   },
+  /* Su caso (Crown Option) sigue en Presented: Start avisa que el caso todavía no se aceptó (clinical-mode.md, 2026-10-17). */
+  pr12: { caso: { id: 'c4', procedimiento: 'c4v1p1' } },
   /* Se discontinuó y vuelve a planearse en el plan periodontal, que todavía está en Planning: sin turno ni consentimiento. */
   pr11: { caso: { id: 'c1', procedimiento: 'c1v2p1' } },
 }

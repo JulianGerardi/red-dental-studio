@@ -3,6 +3,21 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-17
+
+### Consent required al completar o empezar un procedimiento sin firma (PR pendiente)
+- Nuevo diálogo **Consent required** para CON-3927, CON-3946 y CON-3950 (prototipo de Julián *Consent modals revised*):
+  sale al tocar *Complete* en un caso aceptado de Treatment Plan y *Start* en la tabla Procedures del Overview, cuando el
+  consentimiento del procedimiento no está firmado. Dos variantes: **No consent sent** (manda el documento y sigue, sin
+  segunda confirmación) y **Signature pending** (sigue con la firma pendiente, con *View consent*); las dos ofrecen
+  *Sign now* y *Cancel*. Si el caso todavía no se aceptó, no hay diálogo: aviso de error *Procedure cannot be updated*
+  con *View case*.
+- **Para el dev:** `clinical/ConsentRequiredDialog.tsx` (`ConsentRequiredDialog`, `consentimientoRequerido`,
+  `avisarCasoNoListo`, `CASO_LISTO`); textos en `CONSENTIMIENTO_REQUERIDO` (`data/treatment-plan.ts`). `ui/confirm-dialog`
+  suma `icon="warning"`, `otherAction` y `loading`. `aviso.ok/error/warn/info` aceptan `{ titulo, texto }` además de un
+  string. Decisiones en `figma/modulos/clinical-mode.md`. No se pudieron leer los tickets de Jira en esta sesión (el
+  conector de Atlassian no estaba conectado): conviene cotejar contra sus criterios de aceptación.
+
 ## 2026-10-13
 
 ### Billing: bento con Find Patient arriba, la tabla hasta abajo y los botones del paciente dentro del panel ([#33](https://github.com/JulianGerardi/red-dental-studio/pull/33))

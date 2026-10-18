@@ -2205,3 +2205,48 @@ controla con `npm run ds:campos`.
 2. **New Condition** (visor de radiografías): lo mismo, más la lupa y el placeholder "Search by code or description" de
    New Procedure, que busca en el mismo catálogo (antes decía "Select"). Note pasa a `TextArea`.
 3. La búsqueda con su botón Filter es una barra de catálogo, no un par de campos: queda fuera de la grilla.
+
+## Consent required al cambiar el estado de un procedimiento (2026-10-17)
+
+Julián armó el diseño en un prototipo HTML (*Consent modals revised*) para tres historias de Jira: CON-3927, CON-3946 y
+CON-3950. **No se pudieron leer los tickets** (el conector de Atlassian de esta sesión no estaba conectado): lo de abajo
+sale del prototipo y de cómo ya funciona la app. Conviene cotejarlo con los criterios de aceptación.
+
+**Problema:** cambiar el estado de un procedimiento (completarlo, empezarlo) sin consentimiento firmado dejaba seguir
+sin avisar. Quien lo usa es el odontólogo o la recepción, en pleno turno, y necesita decidir rápido: mandar el documento
+para que el paciente firme después, firmarlo ahí mismo o seguir igual.
+
+1. **Dónde sale.** *Complete* en Treatment Plan (el ícono de la fila o el *Complete* de la barra con filas marcadas, ya
+   después de Confirm en Complete Procedure) y *Start* en el menú de la fila de **Procedures** del Overview. Un
+   procedimiento suelto (sin caso) no lleva consentimiento: cambia directo.
+2. **Dos variantes**, según el consentimiento (`consentimientoRequerido()`):
+   - **No consent sent** (sin documento, borrador sin mandar o vencido): *Cancel · Sign now · Send consent and sign
+     later*. La acción principal manda el documento (o reusa el borrador) y aplica el estado, **sin segunda
+     confirmación**; el consentimiento queda Pending.
+   - **Signature pending** (se mandó y falta la firma): *Cancel · Sign now · Continue without signed consent* y el link
+     *View consent ↗* al documento. Aplica el estado con la firma pendiente: no crea otro documento ni lo reenvía.
+   - Con varios procedimientos manda el peor caso: si uno no se mandó, es No consent sent. Todos firmados, sin diálogo.
+3. **Sign now no es una firma.** Abre la revisión y la firma que ya existen (el prototipo aclara que ese flujo no se
+   rediseña); acá avisa que no está en esta versión y el estado no cambia. Cancel, la X y Esc dejan todo como estaba.
+4. **Caso no listo.** Si el caso no está aceptado (Planning, Pending, Presented) no hay diálogo: el procedimiento no
+   cambia y sale un aviso de error con título **Procedure cannot be updated** ("The treatment case must be Accepted and
+   its treatment plan must be Accepted or In Progress.") y la acción *View case*, que abre el caso en Treatment Plan.
+   *Waiting for consent* cuenta como aceptado (espera las firmas). En Treatment Plan, antes de aceptar, la fila **no
+   ofrece Complete** (lo que no corresponde se oculta, como el resto de la pantalla); un procedimiento ya completado
+   tampoco.
+5. **Desvíos del prototipo, a propósito.** El prototipo muestra el toast fijo arriba a la derecha; el sistema ya tiene
+   toasts abajo a la izquierda, así que el aviso usa ese (`aviso.error` ahora acepta `{ titulo, texto }`). El prototipo
+   usa una X propia para cerrar; `ConfirmDialog` no la lleva (Cancel y Esc cierran, como el resto de las confirmaciones).
+   El diálogo es **un `ConfirmDialog`** (no un drawer): se contesta sin cargar nada, igual que Discard o Accept.
+6. **Undo.** El aviso de *Start* sigue ofreciendo Undo y deshace el estado, pero **no retira el consentimiento ya
+   enviado** (el documento salió). Si se vuelve a tocar Start, el diálogo ya dice *Signature pending*.
+7. **Datos de ejemplo.** D2740 (Crown) cuelga de Crown Option, que está en Presented: Start muestra el aviso. D2391 y
+   D2392 cuelgan de Restorative Plan (Waiting for consent): Pending y Not sent, una por variante.
+
+**A validar con usuarios:** si *Expired* debe ir con No consent sent (se manda uno nuevo) o pedir *Replace document*; si
+al elegir varios procedimientos conviene un único diálogo (como ahora) o uno por procedimiento; y si *Sign now* debería
+volver al paso siguiente después de firmar sin que la persona tenga que repetir la acción.
+
+Código: `clinical/ConsentRequiredDialog.tsx` (`ConsentRequiredDialog`, `ResumenConsentimiento`,
+`consentimientoRequerido`, `avisarCasoNoListo`, `CASO_LISTO`); textos en `CONSENTIMIENTO_REQUERIDO` (`data/treatment-plan.ts`).
+Design system: *Components / Clinical / ConsentRequiredDialog*, *Elements / ConfirmDialog* y *Components / UI / Toast*.
