@@ -45,6 +45,10 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   lo recoge en una pestaña que sigue ahí al cambiar de pantalla y lo trae de vuelta. En Scheduling queda centrado
   arriba del botón de Appointment requests, sin tocarlo.
 
+- `tests/scheduling-linked-visit.e2e.ts` (2026-10-17): en New Appointment, Visit 2 muestra el turno donde ya está
+  linkeada; Save pregunta *Move treatment visit?* y Cancel deja el drawer como estaba; *Move visit* guarda y avisa que
+  la visita se movió; una visita sin otro turno se guarda sin preguntar.
+
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 
 ## Pendiente: el modelo para los pasos en lenguaje natural

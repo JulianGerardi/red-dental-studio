@@ -7,7 +7,7 @@ import {
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
 import { AppointmentSlotPicker, HORAS } from '@/components/scheduling/AppointmentSlotPicker'
 import {
-  PlanCard, VisitRow, type Plan, type Visita,
+  PlanCard, VisitRow, MoverVisitaDialog, type Plan, type Visita,
 } from '@/components/scheduling/TreatmentPlanPicker'
 import { aviso } from '@/components/ui/toaster'
 
@@ -20,7 +20,10 @@ import { aviso } from '@/components/ui/toaster'
    Desde 2026-10-06 es un drawer con la organización de New Appointment de Confidentally 2.0: paso 1 "Patient and
    Scheduling" en una columna, paso 2 "Link to treatment plan visit" con Additional y las notas. El calendario del día
    (AppointmentSlotPicker) se despliega al costado del drawer cuando se toca la fecha o la hora. Ver
-   design-reference/design-system.md, "Pop ups". */
+   design-reference/design-system.md, "Pop ups".
+
+   Desde 2026-10-17, una visita que ya está linkeada a otro turno lo muestra en su fila y, al guardar, pregunta si se
+   mueve (MoverVisitaDialog). Ver scheduling.md. */
 
 const PACIENTES = ['John Smith', 'Noah James Smith', 'Maria Abril Viola', 'Elias Aguirre']
 const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado', 'Sarah Stone']
@@ -39,9 +42,11 @@ const VISITAS: Visita[] = [
       'D9310 – Consultation',
     ],
   },
+  /* Ya linkeada a otro turno (cumplido): para usarla en éste hay que moverla. Igual que en el prototipo de Julián. */
   {
     id: 'v2', name: 'Visit 2', total: '$860.00',
     procedimientos: ['D0120 – Periodic oral evaluation', 'D1110 – Prophylaxis – adult'],
+    vinculada: { fecha: 'Sep 28, 2026', hora: '1:15 PM', estado: 'Fulfilled' },
   },
   /* Las tres siguientes siguen el hilo de la Comprehensive Implant Therapy:
      cirugía, pilar y corona. */
@@ -113,6 +118,9 @@ export function NewAppointmentModal({
   const [asap, setAsap] = useState(true)
   const [plan, setPlan] = useState('p1')
   const [visita, setVisita] = useState('v1')
+  const elegida = VISITAS.find((v) => v.id === visita)
+  /* La pregunta de mover la visita, abierta sobre el drawer. */
+  const [moviendo, setMoviendo] = useState(false)
   const [intentado, setIntentado] = useState(false)
   /* El calendario del día se despliega al costado cuando se toca la fecha o la hora (sólo en el paso 1). */
   const [tocoHorario, setTocoHorario] = useState(false)
@@ -142,6 +150,11 @@ export function NewAppointmentModal({
   const guardar = () => {
     setIntentado(true)
     if (obligatorios.some((k) => !d[k].trim())) return
+    if (elegida?.vinculada) setMoviendo(true)
+    else terminar()
+  }
+
+  const terminar = () => {
     const manejado = onGuardar?.(d)
     if (!manejado) {
       aviso.ok(
@@ -150,6 +163,8 @@ export function NewAppointmentModal({
           : `Appointment for ${d.patient} booked at ${d.start}.`,
       )
     }
+    /* Toast aparte: el del turno lo arma a veces la pantalla que abrió el drawer. */
+    if (elegida?.vinculada) aviso.ok(`${elegida.name} moved from the ${elegida.vinculada.fecha} appointment.`)
     onClose()
   }
 
@@ -228,6 +243,9 @@ export function NewAppointmentModal({
             <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
           </DrawerSection>
         </div>
+      )}
+      {moviendo && elegida?.vinculada && (
+        <MoverVisitaDialog visita={elegida.name} turno={elegida.vinculada} onConfirm={terminar} onCancel={() => setMoviendo(false)} />
       )}
     </ModalShell>
   )

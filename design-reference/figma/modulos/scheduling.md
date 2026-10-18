@@ -510,3 +510,56 @@ Pedido de Julián: las cards de *Appointment requests* y las de *Appointments* d
   los dos lados. En el celular queda topado a `100vw - 116px` (259 en un iPhone de 375), como antes.
 - Con el avatar, en la lista de espera el nombre se recortaba demasiado ("Noah Ja…" junto a "Waiting 4 days"): ahora
   baja a un segundo renglón.
+
+## New Appointment: visita linkeada a otro turno (2026-10-17)
+
+Pedido de Julián, con un prototipo en HTML (`appointment-linked-visit_1.html`): al agendar un turno, la visita del plan
+que se elige puede **ya estar linkeada a otro turno**. Una visita pertenece a un solo turno, así que hay que decirlo y
+dejar que se mueva.
+
+**"Otro paso" → una pregunta, no un tercer paso.** El pedido decía "otro paso" para ese escenario. El prototipo lo
+resuelve con el paso 2 (con el bloque *Linked appointment* en la visita) y una confirmación al guardar. Se hizo igual,
+con `ConfirmDialog`, y no como un paso más del drawer, por tres razones: (1) sólo aparece con algunos datos, y un
+indicador que a veces dice dos pasos y a veces tres miente sobre cuánto falta; (2) es una pregunta de sí o no, y esas
+son las únicas que siguen como confirmación chica (`design-system.md`, *Pop ups*, punto 6); (3) llega recién al
+guardar, cuando ya se sabe qué visita se eligió. Si Julián quería un paso real en el indicador, se cambia sin tocar los
+datos: es mover `MoverVisitaDialog` a un `DrawerStep`.
+
+**Qué se ve y cuándo**
+- La fila de una visita linkeada (`VisitRow` con `vinculada`) muestra, **aunque no esté elegida**, el bloque
+  *Linked appointment*: fecha y hora del otro turno, su estado en una `Pill` y un círculo de info (`InfoTip`) con "To use
+  this visit for the new appointment, you'll need to move it from the linked appointment." Así se decide antes de
+  tocarla, no después de apretar Save.
+- Save con esa visita elegida abre **Move treatment visit?** ("Visit 2 is linked to the appointment on Sep 28, 2026 at
+  1:15 PM. Continuing will unlink this visit from that appointment and link it to the appointment you are saving."), con
+  *Cancel* y *Move visit*. Cancel vuelve al drawer con todo lo cargado y el foco en Save; Move visit guarda, cierra y
+  suma un segundo toast: "Visit 2 moved from the Sep 28, 2026 appointment."
+- En los datos de ejemplo la linkeada es **Visit 2**, igual que en el prototipo (Sep 28, 2026 · 1:15 PM).
+
+**Qué cambió respecto del prototipo, y por qué**
+1. **El estado dice "Fulfilled", no "Completed"**: es el vocabulario de los turnos de la app (leyenda del calendario y
+   `PatientAppointmentCard`); el gris del prototipo pasa a la `Pill` con el tono del estado (verde). Anomalía de
+   vocabulario ya anotada el 2026-09-25.
+2. **El tooltip oscuro pasa a `InfoTip`**: el Tooltip es sólo para nombrar un ícono; esto explica en dos líneas, y el
+   InfoTip abre con mouse, toque y teclado. El clic en el círculo no elige la visita.
+3. **Un solo diálogo de la app**: el overlay propio del prototipo es el `ConfirmDialog` de siempre (foco en Cancel).
+4. **Return, no Back**: en el prototipo "Back" vaciaba la selección; en el drawer es Return y vuelve al paso 1.
+5. **No se replicó** el plan "Provider Pruebas / caso 1", el total de $332 ni el calendario de la derecha: son datos
+   del prototipo; el drawer ya tiene su calendario del día al costado.
+6. **Sin estado "movida" persistente**: el prototipo cambiaba el bloque a "Linked to this appointment" después de mover.
+   Acá el drawer se cierra al guardar, así que no hay nada que mostrar; los datos son de muestra y la visita sigue
+   figurando linkeada la próxima vez que se abre el drawer.
+
+**Se corrigió de paso:** `ConfirmDialog` devolvía el foco a ningún lado al cerrarse (Radix lo manda a un `Trigger` que
+acá no existe), así que después de Cancel el teclado perdía el lugar. Ahora vuelve al botón que la abrió.
+
+**Para validar con usuarios**
+- ¿Se entiende "mover" una visita? Alternativa: "Use anyway" / "Replace the link".
+- **Visita linkeada a un turno ya cumplido** (Fulfilled): moverla reescribe el historial de un turno atendido. ¿Se
+  permite igual, se deshabilita, o sólo con permiso? El prototipo la deja mover; acá se hizo igual y se anota como
+  decisión abierta.
+- **"Optional" pero siempre elegida:** el paso dice que el link es opcional, pero la visita 1 arranca elegida y no se
+  puede soltar. En el prototipo la selección arranca vacía y se puede limpiar. Se propone arrancar sin visita elegida y
+  sumar un "No visit"; **no se hizo** porque cambia el comportamiento actual y espera su ok.
+- Si el otro turno ya pasó o ya se canceló, ¿hace falta la pregunta, o se mueve sin preguntar?
+
