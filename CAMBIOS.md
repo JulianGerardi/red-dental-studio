@@ -3,6 +3,16 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-17
+
+### New Appointment: visita linkeada a otro turno ([#41](https://github.com/JulianGerardi/red-dental-studio/pull/41))
+- Si la visita del plan que se elige ya está linkeada a otro turno, su fila lo muestra (fecha, hora, estado e info) y
+  Save pregunta *Move treatment visit?*: *Move visit* la mueve al turno nuevo; *Cancel* vuelve al drawer sin cambios.
+  Es una pregunta, no un tercer paso: así el indicador siempre dice dos.
+- **Para el dev:** `Visita.vinculada`, `TurnoVinculadoInfo` y `MoverVisitaDialog` en `TreatmentPlanPicker.tsx`.
+  `ConfirmDialog` ahora devuelve el foco al botón que lo abrió (aplica a todas). Storybook: *Components / Scheduling /
+  TreatmentPlanPicker* y *NewAppointmentModal*. e2e nuevo: `tests/scheduling-linked-visit.e2e.ts`.
+
 ## 2026-10-13
 
 ### Billing: bento con Find Patient arriba, la tabla hasta abajo y los botones del paciente dentro del panel ([#33](https://github.com/JulianGerardi/red-dental-studio/pull/33))
