@@ -1,11 +1,10 @@
-import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Pencil } from 'lucide-react'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { CASOS, NO_ASIGNADOS } from '@/data/treatment-plan'
+import { CASOS } from '@/data/treatment-plan'
 import { esperar, pulsar, secuencia } from '@/design-system/play'
 import {
-  Dialogo, DialogoBorrarCaso, DialogoCompletar, DialogoMover, DialogoNuevoGrupo, OpcionRadio, Rail, TablaProcedimientos, VistaCaso, EstadoConsentimiento, AccionCaso, CitaVisita,
+  Dialogo, DialogoBorrarCaso, DialogoCompletar, DialogoMover, DialogoNuevoGrupo, OpcionRadio, Rail, VistaCaso, EstadoConsentimiento, AccionCaso, CitaVisita,
 } from './TreatmentPlanSection'
 
 const meta = {
@@ -39,12 +38,7 @@ export const CaseRail: Story = {
   render: () => <div className="w-[300px]"><Rail casos={CASOS} vista="caso" casoId={CASOS[0].id} onUnassigned={() => {}} onCaso={() => {}} /></div>,
 }
 
-function ConSeleccion() {
-  const [sel, setSel] = useState<string[]>([NO_ASIGNADOS[0].id])
-  return <TablaProcedimientos filas={NO_ASIGNADOS.slice(0, 5)} acciones seleccion={sel} onSeleccion={setSel} onAccion={() => {}} onCompletar={() => {}} />
-}
-export const ProceduresTable: Story = { render: () => <ConSeleccion /> }
-export const ProceduresTableReadOnly: Story = { render: () => <TablaProcedimientos filas={NO_ASIGNADOS.slice(0, 5)} onAccion={() => {}} /> }
+/* La tabla de procedimientos tiene su página: Components / Clinical / TreatmentPlanSection table. */
 
 export const CaseView: Story = {
   render: () => <VistaCaso caso={CASOS[0]} favorito={false} onFavorito={() => {}} onDialogo={() => {}} onMover={() => {}} onCompletar={() => {}} />,

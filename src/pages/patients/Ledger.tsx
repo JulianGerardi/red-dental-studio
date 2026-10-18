@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   Search, Receipt, CreditCard, Wallet, HandCoins, Download, MoveHorizontal,
 } from 'lucide-react'
@@ -12,7 +12,7 @@ import { FilterMenu } from '@/components/ui/filter-menu'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import {
-  MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda, tieneCredito,
+  APLICACIONES, MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda, pendienteDe, tieneCredito,
   type Movimiento,
 } from '@/data/ledger'
 import { aviso } from '@/components/ui/toaster'
@@ -133,6 +133,9 @@ type Tab = (typeof TABS)[number]['id']
 export default function Ledger() {
   const { id = 'john-smith' } = useParams()
   const [movs, setMovs] = useState(MOVIMIENTOS)
+  /* A qué cargo fue cada pago o ajuste: lo lee el detalle de la fila (Financial details, Applied transactions) y lo suma
+     Apply credit. Ver ledger.md (2026-10-14). */
+  const [aplicaciones, setAplicaciones] = useState(APLICACIONES)
   const [vista, setVista] = useState<Vista>('Patient View')
   const [q, setQ] = useState('')
   const [tipos, setTipos] = useState<string[]>([])
@@ -143,6 +146,9 @@ export default function Ledger() {
   const alternarCol = (id: ColLedger) =>
     setOcultas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
   const [enModal, setEnModal] = useState<Fila | null>(null)
+  /* La fila a la que se llegó desde el link de otra transacción: se resalta un momento. */
+  const [resaltada, setResaltada] = useState<string | null>(null)
+  const navegar = useNavigate()
   const [enCredito, setEnCredito] = useState<Fila | null>(null)
   const anchos = useAnchoColumnas<ColLedger>(ANCHO_BASE)
   const refVisible = useAnchoVisible<HTMLDivElement>()
@@ -153,10 +159,12 @@ export default function Ledger() {
   /* Aplicar crédito no genera un movimiento nuevo -esa plata ya está
      contada en el saldo desde que el Payment/Adjustment se registró-, sólo
      descuenta lo aplicado del remanente de la transacción de origen. */
-  const aplicarCredito = (id: string, monto: number) => {
+  const aplicarCredito = (id: string, monto: number, porCargo: Record<string, number>) => {
     setMovs((prev) => prev.map((mv) =>
       mv.id === id ? { ...mv, creditoDisponible: Math.max((mv.creditoDisponible ?? 0) - monto, 0) } : mv,
     ))
+    const hoy = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    setAplicaciones((p) => [...p, ...Object.entries(porCargo).map(([cargo, m], i) => ({ id: `a-${Date.now()}-${i}`, origen: id, cargo, fecha: hoy, monto: m }))])
     aviso.ok(`${moneda(monto)} of credit applied.`)
     setEnCredito(null)
   }
@@ -235,6 +243,24 @@ export default function Ledger() {
   }
 
   const cargosDeLaCuenta = movs.filter((m) => m.tipo === 'Charge')
+  /* El link a otra transacción (ledger.md, 2026-10-14): si está en la tabla con la búsqueda y el filtro de ahora, va a
+     su página, la despliega y la resalta; si no, abre su registro. Nunca cambia los filtros. */
+  const verTransaccion = (x: Movimiento) => {
+    const i = filas.findIndex((f) => f.id === x.id)
+    if (i < 0) return setEnModal(conSaldoTotal.find((f) => f.id === x.id) ?? null)
+    setEnModal(null)
+    setPagina(Math.floor(i / TAM_PAGINA) + 1)
+    setExpandidas((p) => (p.includes(x.id) ? p : [...p, x.id]))
+    setResaltada(x.id)
+  }
+  const abrirClinica = ({ caso, procedimiento }: { caso?: string; procedimiento?: string }) =>
+    navegar(`/patients/${id}/clinical-mode?${new URLSearchParams(caso ? { case: caso } : { procedure: procedimiento ?? '' })}`)
+  useEffect(() => {
+    if (!resaltada) return
+    document.getElementById(`fila-${resaltada}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    const t = setTimeout(() => setResaltada(null), 1800)
+    return () => clearTimeout(t)
+  }, [resaltada])
   const volver = () => setTab('transacciones')
   const tituloActivo = TABS.find((t) => t.id === tab)?.titulo ?? 'Ledger'
 
@@ -322,6 +348,7 @@ export default function Ledger() {
                       return (
                       <div
                         key={m.id}
+                        id={`fila-${m.id}`}
                         className={cn(
                           'border-t border-line-row',
                           /* Barra azul de 4px al borde de las filas con crédito
@@ -349,8 +376,8 @@ export default function Ledger() {
                             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
                           }}
                           className={cn(
-                            'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-ink-soft hover:bg-surface-subtle',
-                            abierta && 'bg-surface-subtle',
+                            'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-ink-soft transition-colors duration-700 hover:bg-surface-subtle',
+                            resaltada === m.id ? 'bg-dash-count-bg' : abierta && 'bg-surface-subtle',
                           )}
                         >
                           {columnasVisibles.map((c) => (
@@ -367,6 +394,10 @@ export default function Ledger() {
                         {abierta && (
                           <LedgerRowDetail
                             m={m}
+                            aplicaciones={aplicaciones}
+                            movimientos={movs}
+                            onVerTransaccion={verTransaccion}
+                            onAbrirClinica={abrirClinica}
                             onVerTodo={() => setEnModal(m)}
                             onAplicarCredito={tieneCredito(m) ? () => setEnCredito(m) : undefined}
                           />
@@ -441,13 +472,14 @@ export default function Ledger() {
         </div>
       </div>
 
-      {enModal && <LedgerRowModal m={enModal} onClose={() => setEnModal(null)} />}
+      {enModal && <LedgerRowModal key={enModal.id} m={enModal} aplicaciones={aplicaciones} movimientos={movs} onVerTransaccion={verTransaccion} onAbrirClinica={abrirClinica} onClose={() => setEnModal(null)} />}
       {enCredito && (
         <AplicarCreditoModal
           m={enCredito}
-          cargos={cargosDeLaCuenta.filter((c) => c.paciente === enCredito.paciente)}
+          /* Lo que falta de cada cargo, no su monto original: lo ya pagado no se vuelve a cubrir. */
+          cargos={cargosDeLaCuenta.filter((c) => c.paciente === enCredito.paciente && pendienteDe(c, aplicaciones) > 0).map((c) => ({ ...c, monto: pendienteDe(c, aplicaciones) }))}
           onClose={() => setEnCredito(null)}
-          onAplicar={(monto) => aplicarCredito(enCredito.id, monto)}
+          onAplicar={(monto, porCargo) => aplicarCredito(enCredito.id, monto, porCargo)}
         />
       )}
     </div>
