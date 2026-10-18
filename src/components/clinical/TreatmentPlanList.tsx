@@ -45,7 +45,7 @@ export function PlanCard({ p, onAbrir }: { p: Plan; onAbrir?: () => void }) {
           <span className="block text-[14px] leading-snug font-bold text-ink">{p.nombre}</span>
           <span className="mt-0.5 block text-[11px] text-ink-muted">{p.grupo} · {p.procedimientos} procedures</span>
         </span>
-        <Pill tone={TONO_CASO[p.estado]} size="sm" className="mt-0.5 shrink-0 tracking-wide whitespace-nowrap uppercase">{p.estado}</Pill>
+        <Pill tone={TONO_CASO[p.estado]} size="sm" className="mt-0.5 shrink-0 whitespace-nowrap">{p.estado}</Pill>
       </span>
 
       <span className="mt-3 grid grid-cols-2 gap-1.5">

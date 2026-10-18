@@ -88,20 +88,24 @@ export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES }: { docs?:
                   <p className={cn('text-[11px] font-semibold tracking-wide uppercase', g.color)}>{g.titulo} · {visibles.filter(g.filtro).length}</p>
                   <ul className="shadow-hairline flex flex-col divide-y divide-line-soft rounded-lg">
                     {del.map((d) => (
-                      <li key={d.id} className="flex flex-wrap items-center gap-3 px-3 py-2.5">
+                      <li key={d.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5">
                         <IconoDoc d={d} />
-                        <span className="min-w-0 flex-1">
+                        {/* El nombre pide 14rem: en una columna angosta el vencimiento y el botón bajan a otro renglón
+                            en vez de aplastarlo (patient-dashboard.md, 2026-10-17). */}
+                        <span className="min-w-0 flex-1 basis-56">
                           <span className="flex flex-wrap items-center gap-2">
                             <span className="text-[13px] font-semibold text-ink">{d.nombre}</span>
                             <Pill tone={TONO_MOTIVO[d.motivo]} size="sm">{d.motivo}</Pill>
                           </span>
                           <span className="block truncate text-[12px] text-ink-muted">{d.detalle}</span>
                         </span>
-                        <span className="flex shrink-0 flex-col items-end gap-0.5 text-right">
-                          <span className={cn('text-[12px] font-semibold tabular-nums', d.dias < 0 ? 'text-dash-bad-fg' : 'text-ink')}>{venceTexto(d)}</span>
-                          <span className="text-[11px] text-ink-muted">{QUIEN[d.responsable]}</span>
+                        <span className="ml-auto flex shrink-0 items-center gap-3">
+                          <span className="flex flex-col items-end gap-0.5 text-right">
+                            <span className={cn('text-[12px] font-semibold tabular-nums', d.dias < 0 ? 'text-dash-bad-fg' : 'text-ink')}>{venceTexto(d)}</span>
+                            <span className="text-[11px] text-ink-muted">{QUIEN[d.responsable]}</span>
+                          </span>
+                          <Button size="sm" variant={d.dias < 0 ? 'primary' : 'secondary'} onClick={() => resolver(d)}>{d.accion}</Button>
                         </span>
-                        <Button size="sm" variant={d.dias < 0 ? 'primary' : 'secondary'} onClick={() => resolver(d)} className="shrink-0">{d.accion}</Button>
                       </li>
                     ))}
                   </ul>

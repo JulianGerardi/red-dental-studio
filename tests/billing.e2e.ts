@@ -41,6 +41,19 @@ test('El círculo de info de un número explica qué cuenta', async ({ app, scre
   await expect(screen.getByText(/^Open charge balances older than 30 days\.$/)).toBeVisible()
 })
 
+/* Con un paciente elegido, cada fila se despliega con el detalle del Ledger: lo del cobro y la referencia que abre la
+   transacción (billing.md, 2026-10-14). */
+test('Con un paciente, la fila de un pago dice a qué cargo fue', async ({ app, screen }) => {
+  await app.open('/billing')
+  await screen.getByRole('button', /Maria Abril Viola/).tap()
+  await screen.getByText(/^Card Payment ····5521$/).tap()
+
+  await expect(screen.getByText(/Card payment ····5521 — \$90\.00/)).toBeVisible()
+  await expect(screen.getByText('Applied to charges')).toBeVisible()
+  await screen.getByRole('button', /^Procedure · TX-2010/).tap()
+  await expect(screen.getByRole('dialog', /Prophylaxis – adult/)).toBeVisible()
+})
+
 test('Billing en el menú lateral va directo a su pantalla; sus tablas están sólo en Settings', async ({ app, screen }) => {
   await app.open('/')
   await expect(screen.getByRole('button', 'Billing menu')).toHaveCount(0)
