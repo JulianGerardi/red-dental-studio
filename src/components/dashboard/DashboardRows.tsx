@@ -2,7 +2,7 @@ import { ArrowRight, Check, Clock, FileText, TriangleAlert, X } from 'lucide-rea
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { StatusPill } from './primitives'
-import { MenuCard, accionTurno, type Appointment } from './AppointmentCard'
+import { ACCION_TURNO, MenuCard, accionTurno, type Appointment } from './AppointmentCard'
 import { completarTarea, type PendingTask } from './PendingTaskCard'
 
 /* Las filas del Dashboard con volumen (propuesta del 2026-10-12, ver design-reference/figma/modulos/dashboard.md): lo
@@ -60,17 +60,17 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurn
     </span>
   )
   const boton = (
-    <Button size="sm" className="shrink-0" onClick={() => accionTurno(appt)}>{accion} <ArrowRight /></Button>
+    <Button size="sm" variant={ACCION_TURNO[accion]} className="shrink-0" onClick={() => accionTurno(appt)}>{accion} <ArrowRight /></Button>
   )
   const menu = <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
   const donde = `${appt.provider} · ${appt.operatory}`
 
   return (
     <div className="@container">
-      <div data-appt-row className={cn('py-2 pr-2 pl-3', activa && 'bg-info-bg')}>
+      <div data-appt-row className={cn('rounded-lg p-2.5', activa && 'bg-info-bg')}>
         {/* La hora en la caja gris de la card (reloj y hora), del alto de la fila: suelta arriba quedaba descolgada
             (Julián, 2026-10-13). */}
-        <div className="flex items-stretch gap-2.5 @3xl:hidden">
+        <div className="flex items-stretch gap-2.5 @4xl:hidden">
           <span className="bg-dash-field flex w-12 shrink-0 flex-col items-center justify-center gap-1 rounded-lg py-2">
             <Clock className="size-3.5 text-ink-medium" />
             <span className="text-[12px] font-semibold text-ink tabular-nums">{appt.time}</span>
@@ -93,7 +93,7 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurn
           </div>
         </div>
 
-        <div className="hidden items-center gap-4 @3xl:flex">
+        <div className="hidden items-center gap-4 @4xl:flex">
           <span className="bg-dash-field flex h-8 w-[72px] shrink-0 items-center justify-center gap-1.5 rounded-lg text-[12px] font-semibold text-ink tabular-nums">
             <Clock className="size-3.5 text-ink-medium" />{appt.time}
           </span>
@@ -168,7 +168,7 @@ export function TaskRow({ task }: { task: PendingTask }) {
      Expired date. El aire libre va antes del botón, no entre los datos (Julián, 2026-10-13). */
   return (
     <div className="@container">
-      <div className="flex flex-col gap-2 py-2.5 pr-2 pl-3 @5xl:hidden">
+      <div className="flex flex-col gap-2 p-2.5 @5xl:hidden">
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">{tipo}{estado}</div>
         <div className="flex flex-wrap items-center gap-2">{persona}<DocYVencida /></div>
         <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
@@ -177,7 +177,7 @@ export function TaskRow({ task }: { task: PendingTask }) {
         </div>
       </div>
 
-      <div className="hidden items-center gap-5 py-2 pr-2 pl-3 @5xl:flex">
+      <div className="hidden items-center gap-5 p-2.5 @5xl:flex">
         <span className="flex w-48 shrink-0 items-center gap-2.5">{tipo}{estado}</span>
         <span className="flex w-40 shrink-0">{persona}</span>
         <DocYVencida />

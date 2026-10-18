@@ -2,9 +2,11 @@ import { Children, isValidElement, useState, type ReactNode } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ShowMore } from './show-more'
+import { TARJETA_INTERNA } from '@/lib/estilos'
 
-/* Filas en una caja de línea fina dentro de una card, con rótulo opcional y el tope de ShowMore: se ven los primeros
-   `limit` y "Show N more" abre el resto con scroll. Ver design-reference/figma/modulos/dashboard.md (2026-10-12). */
+/* Filas dentro de una card, cada una en su card interna (TARJETA_INTERNA) y separadas, con rótulo opcional y el tope de
+   ShowMore: se ven los primeros `limit` y "Show N more" abre el resto con scroll. Cards y no una caja con divisores: así
+   siguen el lenguaje de las demás cards de la app (Julián, 2026-10-13). Ver design-reference/figma/modulos/dashboard.md. */
 
 export const LIST_GROUP_TONES = {
   default: 'text-ink-muted',
@@ -63,8 +65,8 @@ export function ListGroup({
       {abierto && (
         <ShowMore total={items.length} limit={limit ?? items.length} maxHeight={maxHeight} label={label ?? title}>
           {(cuantos) => (
-            <ul className="flex flex-col divide-y divide-line-soft rounded-lg bg-white shadow-hairline">
-              {items.slice(0, cuantos).map((it) => <li key={it.key}>{it}</li>)}
+            <ul className="flex flex-col gap-3">
+              {items.slice(0, cuantos).map((it) => <li key={it.key} className={TARJETA_INTERNA}>{it}</li>)}
             </ul>
           )}
         </ShowMore>

@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { aviso } from '@/components/ui/toaster'
+import { BUTTON_VARIANTS, type ButtonVariant } from '@/components/ui/button'
 
 export type Appointment = {
   name: string
@@ -15,8 +16,18 @@ export type Appointment = {
   provider: string
   operatory: string
   time: string
-  /* Botón del pie. En el frame casi todas dicen "Check Out" y una "Cancel". */
-  accion?: 'Check Out' | 'Cancel'
+  /* Botón del pie. En el frame casi todas dicen "Check Out" y una "Cancel"; Julián sumó "Check In" (2026-10-13). */
+  accion?: AccionTurno
+}
+
+export type AccionTurno = 'Check In' | 'Check Out' | 'Cancel'
+
+/* El color dice la acción, para no confundirlas en una lista larga (Julián, 2026-10-13): Check In verde, Check Out
+   azul, Cancel rojo. Son variantes de ui/button. Ver design-reference/figma/modulos/dashboard.md. */
+export const ACCION_TURNO: Record<AccionTurno, ButtonVariant> = {
+  'Check In': 'success',
+  'Check Out': 'primary',
+  Cancel: 'destructive',
 }
 
 /* Figma 4430:57451. El card se rediseñó: sin borde, con la foto y el badge
@@ -132,7 +143,10 @@ export function AppointmentCard({
           e.stopPropagation()
           accionTurno(appt)
         }}
-        className="bg-dash-blue hover:bg-dash-blue-hover flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold text-white transition-colors"
+        className={cn(
+          BUTTON_VARIANTS[ACCION_TURNO[accion]],
+          'flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
+        )}
       >
         {accion} <ArrowRight className="size-4" />
       </button>
@@ -140,9 +154,11 @@ export function AppointmentCard({
   )
 }
 
-/* Lo que hace el botón del pie (Check Out o Cancel). Lo comparten la card y la fila de la propuesta (DashboardRows). */
+/* Lo que hace el botón del pie (Check In, Check Out o Cancel). Lo comparten la card y la fila (DashboardRows). */
 export function accionTurno(appt: Appointment) {
-  if ((appt.accion ?? 'Check Out') === 'Cancel') aviso.warn(`Appointment for ${appt.name} was cancelled.`)
+  const accion = appt.accion ?? 'Check Out'
+  if (accion === 'Cancel') aviso.warn(`Appointment for ${appt.name} was cancelled.`)
+  else if (accion === 'Check In') aviso.ok(`${appt.name} checked in.`)
   else aviso.ok(`${appt.name} checked out.`)
 }
 
