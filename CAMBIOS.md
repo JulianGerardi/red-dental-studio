@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
-### Dashboard: sala siempre elegida, "Patients today" que coincide y salas con scroll horizontal ([#NN](https://github.com/JulianGerardi/red-dental-studio/pull/NN))
+### Dashboard: sala siempre elegida, "Patients today" que coincide y salas con scroll horizontal ([#50](https://github.com/JulianGerardi/red-dental-studio/pull/50))
 - **La sala elegida filtra Appointments y Waiting Room** (antes sólo la sala de espera) y **siempre hay una**, la primera
   por defecto; tocar otra la cambia. El chip junto al título dice cuál. El filtro por operatorio de Appointments sale
   (lo reemplaza la sala); Pending Task conserva el suyo.
