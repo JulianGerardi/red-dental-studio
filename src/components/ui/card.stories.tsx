@@ -10,7 +10,7 @@ import { InnerCard } from '@/components/dashboard/primitives'
 import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 import * as StatCardStories from '@/components/dashboard/StatCard.stories'
 import * as AppointmentCardStories from '@/components/dashboard/AppointmentCard.stories'
-import * as OperatoryCardStories from '@/components/dashboard/OperatoryCard.stories'
+import { OperatoryCard } from '@/components/dashboard/OperatoryCard'
 import * as PendingTaskCardStories from '@/components/dashboard/PendingTaskCard.stories'
 import * as PatientCardStories from '@/components/patients/PatientCard.stories'
 import * as PatientAppointmentCardStories from '@/components/patients/PatientAppointmentCard.stories'
@@ -136,7 +136,6 @@ export const Anatomy: Story = {
 /* Las cards que ya usa la app, con sus datos de ejemplo. */
 const { Default: Stat } = composeStories(StatCardStories)
 const { Default: Appointment } = composeStories(AppointmentCardStories)
-const { Available: Operatory } = composeStories(OperatoryCardStories)
 const { Default: Pending } = composeStories(PendingTaskCardStories)
 const { Active: Patient } = composeStories(PatientCardStories)
 const { Booked: PatientAppointment } = composeStories(PatientAppointmentCardStories)
@@ -146,7 +145,7 @@ const EN_LA_APP: { nombre: string; uso: string; ancho: number; nodo: ReactNode }
   { nombre: 'SectionCard', uso: 'A block of a form: groups related fields under a title.', ancho: 340, nodo: <SectionCard title="General"><TextField label="Name" placeholder="Name" /></SectionCard> },
   { nombre: 'StatCard', uso: 'One number of the day with its change.', ancho: 260, nodo: <Stat /> },
   { nombre: 'AppointmentCard', uso: 'One appointment in the dashboard list.', ancho: 360, nodo: <Appointment /> },
-  { nombre: 'OperatoryCard', uso: 'One room and who is in it.', ancho: 300, nodo: <Operatory /> },
+  { nombre: 'OperatoryCard', uso: 'One room and who is in it.', ancho: 300, nodo: <OperatoryCard room={{ name: 'Operatory 2', status: 'Available', patientsToday: 4, provider: 'Daniel Anderson' }} /> },
   { nombre: 'PendingTaskCard', uso: 'A task that is waiting for someone.', ancho: 320, nodo: <Pending /> },
   { nombre: 'PatientCard', uso: 'A patient in the mobile list.', ancho: 340, nodo: <Patient /> },
   { nombre: 'PatientAppointmentCard', uso: 'One appointment in the Patient Dashboard. Same card as the appointment requests in Scheduling (TarjetaTurno): bar and pill in the status color.', ancho: 280, nodo: <PatientAppointment /> },

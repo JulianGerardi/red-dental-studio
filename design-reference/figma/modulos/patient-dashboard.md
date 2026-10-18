@@ -275,3 +275,44 @@ de punta a punta a la derecha. Antes Pending documents iba a todo el ancho, arri
 Storybook: *Pages / Parts / Patient Overview* (Playground con cantidad de turnos, Parts, States, Specs) y *Components /
 Patients / PendingDocuments → Narrow column*. E2E: `tests/patient-overview.e2e.ts`.
 
+
+## Bento sin huecos y breadcrumb del paciente (2026-10-13)
+
+Julián: "organizar mejor el bento, no deben quedar espacios en blanco; el menú interno debe ocupar el largo de la
+pantalla. El breadcrumb debe ser Patients › nombre del paciente › …; en las pantallas que abro una vez (Patients,
+Billing) no debe tener breadcrumbs".
+
+1. **El menú del paciente baja hasta el final** (`PatientSidePanel`, `lg:self-stretch`): la card se estira al alto del
+   contenido de al lado en las seis pantallas del paciente. A 1440 terminaba 160px antes que Pending Task y
+   Appointments; ahora las tres columnas cierran en la misma línea. Colapsado (60px) es un riel blanco de punta a punta.
+2. **Pending Task y Appointments terminan a la misma altura.** Se deshace el `lg:items-start` del 2026-10-06: aquel
+   bloque blanco salía de los 7 turnos sin tope; con "Show more" (3 y 3) la diferencia es de ~30px a 1440 y ~90px a
+   1024, adentro de la card, igual que los paneles del Dashboard. La fila además es `lg:flex-1`: si el panel es más
+   alto que la columna (todos los documentos resueltos), crece y no deja hueco gris.
+3. **Breadcrumb `Patients › John Smith › sección`** (`PatientBreadcrumb`) en lugar del "‹ Patients", en las siete
+   pantallas: Overview (termina en el paciente), Treatments, Insurance, Ledger, Documents, Relationships & Billing (Add
+   Relationship es un drawer sobre la lista y termina ahí) y Edit Patient, que antes no tenía ninguna salida hacia
+   arriba. La sección se llama como en el menú del paciente. Se revierte la decisión de README.md ("sin breadcrumb en
+   las pantallas del paciente"): el "‹ Patients" sólo volvía a la lista y desde una sección no había vuelta al Overview.
+4. **Regla de la app:** las pantallas de primer nivel (Dashboard, Patients, Scheduling, Billing, Help, Notifications,
+   Settings y Profile) no llevan rastro; las que se abren desde otra, sí. Auditadas las 40 rutas: el único error era
+   `/settings/account` (Profile), que mostraba un "Settings" suelto sin la pantalla actual; ahora no lleva.
+5. `Breadcrumb` suma anillo de foco azul en los links y `aria-current="page"` en el último tramo.
+
+Pendiente (no se tocó): el nombre sale fijo, "John Smith", igual que el panel. Desde la tabla se entra con el id de
+cada paciente (`/patients/abril-viola`) y la ficha siempre muestra a John Smith; cuando el panel lea al paciente de la
+ruta, el rastro tiene que leer el mismo nombre.
+
+Validar con usuarios: si recepción usa el rastro para volver a la lista o sigue yendo por el menú lateral; y si el
+blanco al pie del menú del paciente se lee como espacio vacío o como columna (alternativa: menú `sticky`, que no entra
+entero en pantallas de menos de 900px de alto).
+
+Storybook: *Elements / Breadcrumb* (regla de dónde va, en *Specs*), *Components / Patients / PatientBreadcrumb* y
+*Elements / Patient menu* › *States* › *Next to the screen*.
+
+## Breadcrumb con "/" (2026-10-17)
+
+Julián: "hacelo con slash / en vez de la flecha". `ui/breadcrumb` separa los tramos con una **"/"** en `ink-faint`
+(antes el chevron de 14px), con 6px a cada lado y `aria-hidden` para que el lector de pantalla no la lea. Vale para todos
+los rastros de la app, no sólo los del paciente: `Patients / John Smith / Ledger`, `Settings / Locations / Abril`.
+Storybook: *Elements / Breadcrumb* (Parts, Specs).

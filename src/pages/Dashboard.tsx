@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { CalendarDays, Clock, Activity, CalendarClock } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { CalendarDays, Clock, Activity, CalendarClock, ShieldQuestionMark } from 'lucide-react'
 import { Panel } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FilterMenu } from '@/components/ui/filter-menu'
@@ -9,10 +9,10 @@ import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import type { Appointment } from '@/components/dashboard/AppointmentCard'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
 import { DatePicker, sameDay } from '@/components/ui/date-picker'
-import { OperatoryCard } from '@/components/dashboard/OperatoryCard'
+import { OperatoryStrip } from '@/components/dashboard/OperatoryStrip'
 import { AppointmentRow, TaskRow } from '@/components/dashboard/DashboardRows'
 import { ListGroup } from '@/components/ui/list-group'
-import { ShowMore } from '@/components/ui/show-more'
+import { Chip } from '@/components/ui/chip'
 import {
   DIAS, DIA_CARGADO, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
   type DiaDashboard, type Origen,
@@ -24,7 +24,7 @@ import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
 import { formatDMY } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
-import { Button } from '@/components/ui/button'
+import { Button, buttonClasses } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 /* Figma 4430:57451 — rediseño del dashboard.
@@ -32,8 +32,8 @@ import { cn } from '@/lib/utils'
    - El frame lo rotula "Patients"; es un error del archivo (anomalía 54) y
      Julián confirmó que va "Dashboard".
    - Los tres stat cards se juntaron en una sola tira arriba a la derecha.
-   - Las columnas son Appointments · Waiting Room · Rooms, fijas: el toggle
-     Provider / Recepcionista ya no está en el diseño.
+   - Las salas van en una tira arriba y Appointments · Waiting Room en dos columnas a todo el ancho (Julián,
+     2026-10-13). El toggle Provider / Recepcionista ya no está en el diseño.
    - Pending Task bajó a una franja a lo ancho. Los tabs se sacaron: hacían lo mismo que el embudo.
    - Turnos y tareas van en filas con las mismas partes que las cards, con tope y "Show N more" (2026-10-12).
    - Desapareció el cuarto panel "Rooms" vacío del pie.
@@ -55,7 +55,7 @@ export function BotonFiltro({
   return <FilterMenu label={label} options={options} value={value} onChange={onChange} size="sm" tour="dash-filter" />
 }
 
-/* La fecha de toda la pantalla y el atajo a hoy. Today va en md: la altura del
+/* La fecha de toda la pantalla, el atajo a hoy y las preguntas frecuentes. Today va en md: la altura del
    DatePicker (ver dashboard.md, 2026-10-09). El selector va como barra
    ("Feb 28, 2026"), el mismo campo que el Date filter (dashboard.md, 2026-10-12). */
 export function FiltroFecha({
@@ -79,9 +79,13 @@ export function FiltroFecha({
           <CalendarClock /> Today
         </Button>
       )}
-      <span className="text-[12px] text-ink-muted">
-        Appointments, waiting room and tasks follow this date.
-      </span>
+      {/* Las preguntas frecuentes, en Help con el Dashboard abierto (Julián, 2026-10-13). */}
+      <Link
+        to="/help" aria-label="Frequently asked questions" title="Frequently asked questions"
+        className={buttonClasses({ variant: 'secondary', size: 'md', iconOnly: true, className: 'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]' })}
+      >
+        <ShieldQuestionMark />
+      </Link>
     </div>
   )
 }
@@ -91,7 +95,7 @@ export function FiltroFecha({
 const conDiaCargado = (dias: Record<string, DiaDashboard>) => ({ ...dias, [claveFecha(HOY_DEMO)]: DIA_CARGADO })
 
 /* Cuántas filas se ven en cada panel antes de "Show N more" (ver ui/show-more). */
-const TOPE = { turnos: 5, espera: 5, salas: 6, tareas: 5 }
+const TOPE = { turnos: 5, espera: 5, tareas: 5 }
 
 export default function Dashboard() {
   const [params] = useSearchParams()
@@ -100,6 +104,9 @@ export default function Dashboard() {
   const [date, setDate] = useState(DEFAULT_DATE)
   const [salas, setSalas] = useState<string[]>([])
   const [tipos, setTipos] = useState<string[]>([])
+  /* La sala elegida en la tira de arriba: la sala de espera muestra sólo a los suyos (dashboard.md, 2026-10-17). */
+  const [salaEspera, setSalaEspera] = useState<string | null>(null)
+  const panelEspera = useRef<HTMLDivElement>(null)
   const [selected, setSelected] =
     useState<{ appt: Appointment; rect: DOMRect; id?: string } | null>(null)
   const [editando, setEditando] = useState<{ datos: DatosTurno; origen: Origen } | null>(null)
@@ -207,23 +214,25 @@ export default function Dashboard() {
     (a) => salas.length === 0 || salas.includes(a.operatory),
   )
   const tareas = dia.tasks.filter((t) => tipos.length === 0 || tipos.includes(t.kind))
+  const enEspera = dia.waiting.filter((w) => !salaEspera || w.operatory === salaEspera)
 
-  /* "Today" sólo si la fecha elegida es de verdad hoy; si no, el día que sea. */
-  const hoy = sameDay(date, new Date())
-  const encabezado = date.toLocaleDateString('en-US', {
-    month: 'long', day: 'numeric', year: 'numeric',
-  })
-  const diaSemana = date.toLocaleDateString('en-US', { weekday: 'long' })
+  /* Elegir una sala filtra la sala de espera; si quedó fuera de la vista (en el celular va abajo de todo), se trae. */
+  const elegirSala = (sala: string | null) => {
+    setSalaEspera(sala)
+    const el = panelEspera.current
+    if (!sala || !el) return
+    const { top, bottom } = el.getBoundingClientRect()
+    if (top < 0 || bottom > window.innerHeight + 200) {
+      const reducido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      el.scrollIntoView({ block: 'start', behavior: reducido ? 'auto' : 'smooth' })
+    }
+  }
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <p className="text-dash-blue text-sm">
-            {hoy ? 'Today' : diaSemana} • {encabezado}
-          </p>
-          <PageTitle size="lg">Dashboard</PageTitle>
-        </div>
+      {/* El día de hoy pasó al Topbar y el elegido lo dice el selector (Julián, 2026-10-13). */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <PageTitle size="lg">Dashboard</PageTitle>
         <div data-tour="dash-stats">
           <StatStrip stats={stats} />
         </div>
@@ -234,9 +243,14 @@ export default function Dashboard() {
           sólo esa. */}
       <FiltroFecha className="mt-4" value={date} onChange={setDate} marked={diasConDatos} />
 
+      {/* Las salas en una tira arriba, sin ocupar una columna (Julián, 2026-10-13). */}
+      <div className="mt-5">
+        <OperatoryStrip rooms={dia.rooms} elegida={salaEspera} onElegir={elegirSala} />
+      </div>
+
       {/* Mucho volumen: filas en lugar de cards (las mismas partes) y un tope por panel; "Show N more" abre el resto con
-          scroll adentro (dashboard.md, 2026-10-12). */}
-      <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          scroll adentro (dashboard.md, 2026-10-12). Turnos y sala de espera se reparten el ancho (2026-10-13). */}
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <Panel
           title="Appointments"
           controls={
@@ -273,31 +287,40 @@ export default function Dashboard() {
           )}
         </Panel>
 
-        <Panel title="Waiting Room">
-          {dia.waiting.length === 0 ? (
-            <EmptyState
-              icon={Clock}
-              title="Waiting room is empty"
-              detail="No patients have checked in for this day yet."
-            />
+        <div ref={panelEspera} className="flex scroll-mt-4 flex-col">
+        {/* El filtro se lee pegado al título (a la derecha lo tapaba la pestaña del paciente). */}
+        <Panel
+          className="flex-1"
+          title={<>Waiting Room{salaEspera && <Chip onRemove={() => setSalaEspera(null)} removeLabel="Show all rooms">{salaEspera}</Chip>}</>}
+        >
+          {enEspera.length === 0 ? (
+            salaEspera && dia.waiting.length > 0 ? (
+              <EmptyState
+                icon={Clock}
+                title={`No one is waiting for ${salaEspera}`}
+                detail="Pick another room above, or show the whole waiting room."
+                accion={{ label: 'Show all rooms', onClick: () => setSalaEspera(null) }}
+              />
+            ) : (
+              <EmptyState
+                icon={Clock}
+                title="Waiting room is empty"
+                detail="No patients have checked in for this day yet."
+              />
+            )
           ) : (
-            <ListGroup limit={TOPE.espera} label="patients waiting">
-              {dia.waiting.map((a, i) => (
+            <ListGroup key={salaEspera ?? 'todas'} limit={TOPE.espera} label="patients waiting">
+              {enEspera.map((a, i) => (
                 <AppointmentRow
                   key={i} appt={a} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
                   onSelect={pick}
-                  onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: i })}
+                  onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: dia.waiting.indexOf(a) })}
                 />
               ))}
             </ListGroup>
           )}
         </Panel>
-
-        <Panel title="Rooms">
-          <ShowMore total={dia.rooms.length} limit={TOPE.salas} label="rooms" className="flex flex-col gap-3">
-            {(n) => dia.rooms.slice(0, n).map((r, i) => <OperatoryCard key={i} room={r} />)}
-          </ShowMore>
-        </Panel>
+        </div>
       </div>
 
       <div className="mt-4">

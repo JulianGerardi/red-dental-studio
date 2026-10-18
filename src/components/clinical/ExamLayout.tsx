@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
 import { ProblemList } from '@/components/clinical/ProblemList'
-import { NavegacionClinica } from '@/components/clinical/RecordDetail'
+import { NavegacionClinica, registroDeHallazgo, useVerRegistro } from '@/components/clinical/RecordDetail'
 import { ExamPanelHeader } from './dental/ExamPanelHeader'
 import { ReviewList, type ExamReview } from './dental/ReviewList'
 import { ReviewExamDialog } from './dental/ReviewExamDialog'
@@ -27,11 +27,11 @@ import { quadrantTeeth, type Finding } from './dental/data'
 const HOY = 'May 14, 2026'
 
 const INITIAL_FINDINGS: Finding[] = [
-  { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: HOY, status: 'Discarded', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [] },
-  { id: 'F-2', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Discarded', tooth: null, provider: 'Elena Martinez', surfaces: [], notes: '', linked: [], diagnoses: [] },
-  { id: 'F-3', area: 'Tooth 20', condition: 'localized periodontal pocketing', descriptor: 'Moderate', date: HOY, status: 'Active', tooth: 20, provider: 'Elena Martinez', surfaces: ['B', 'MB'], notes: '', linked: ['#10987231', '#10987232'], diagnoses: [] },
-  { id: 'F-4', area: 'Tooth 30', condition: 'severe root surface decay', descriptor: 'Advanced', date: HOY, status: 'In Treatment', tooth: 30, provider: 'Emily Chen', surfaces: ['O'], notes: '', linked: ['#10987233'], diagnoses: [] },
-  { id: 'F-5', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [] },
+  { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: HOY, status: 'Discarded', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [], examen: 'Dental Assessment', problema: 'p5' },
+  { id: 'F-2', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Discarded', tooth: null, provider: 'Elena Martinez', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral' },
+  { id: 'F-3', area: 'Tooth 20', condition: 'localized periodontal pocketing', descriptor: 'Moderate', date: HOY, status: 'Active', tooth: 20, provider: 'Elena Martinez', surfaces: ['B', 'MB'], notes: '', linked: ['#10987231', '#10987232'], diagnoses: [], examen: 'Periodontal' },
+  { id: 'F-4', area: 'Tooth 30', condition: 'severe root surface decay', descriptor: 'Advanced', date: HOY, status: 'In Treatment', tooth: 30, provider: 'Emily Chen', surfaces: ['O'], notes: '', linked: ['#10987233'], diagnoses: [], examen: 'Dental Assessment' },
+  { id: 'F-5', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral' },
 ]
 
 const INITIAL_REVIEWS: ExamReview[] = [
@@ -61,9 +61,11 @@ export function ExamFindingsProvider({ children }: { children: ReactNode }) {
   return <FindingsCtx.Provider value={estado}>{children}</FindingsCtx.Provider>
 }
 
-export function ExamLayout({ findings: conFindings = true, extra, children }: {
+export function ExamLayout({ findings: conFindings = true, examen, extra, children }: {
   /** El panel de Findings a la izquierda. Vitals no lo lleva. */
   findings?: boolean
+  /** El examen, como lo nombra la Problem List: es el Source exam de lo que se carga acá. */
+  examen?: string
   /** Lo propio del examen en la misma fila de las acciones, a la derecha (el buscador de Radiography). */
   extra?: ReactNode
   children: ReactNode
@@ -77,6 +79,8 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
   const [confirming, setConfirming] = useState<{ action: Exclude<FindingAction, 'edit'>; finding: Finding } | null>(null)
   const [problemas, setProblemas] = useState(false)
   const ir = useContext(NavegacionClinica)
+  /* View full record de cada finding: el drawer de la Problem List, sin salir del examen. */
+  const { ver, drawer } = useVerRegistro()
 
   function saveProcedure(draft: ProcedureDraft) {
     const tooth = draft.tooth
@@ -87,7 +91,7 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
         condition: `${draft.procedure.code} - ${draft.procedure.label}`,
         descriptor: draft.surfaces.join(', ') || draft.scope,
         date: HOY, status: draft.status === 'Existing' ? 'Externally Treated' : 'Active', tooth, provider: 'Elena Martinez',
-        surfaces: draft.surfaces, notes: '', linked: draft.linked, diagnoses: draft.diagnoses,
+        surfaces: draft.surfaces, notes: '', linked: draft.linked, diagnoses: draft.diagnoses, examen,
       },
       ...f,
     ])
@@ -133,7 +137,7 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
               findings.map((f) => (
                 <FindingCard
                   key={f.id} finding={f}
-                  action={<FindingActionsMenu finding={f} onEdit={() => setEditing(f)} onAction={(action) => setConfirming({ action, finding: f })} />}
+                  action={<FindingActionsMenu finding={f} onVer={() => ver(registroDeHallazgo(f))} onEdit={() => setEditing(f)} onAction={(action) => setConfirming({ action, finding: f })} />}
                 />
               ))
             ) : (
@@ -211,6 +215,7 @@ export function ExamLayout({ findings: conFindings = true, extra, children }: {
       />
 
       <ReviewExamDialog open={reviewState.dialogOpen} onCancel={reviewState.closeDialog} onConfirm={reviewState.confirm} />
+      {drawer}
     </div>
   )
 }
