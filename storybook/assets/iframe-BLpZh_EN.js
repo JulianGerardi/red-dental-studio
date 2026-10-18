@@ -1,1 +1,0 @@
-import{t as e}from"./iframe-BajFVX-0.js";e();
