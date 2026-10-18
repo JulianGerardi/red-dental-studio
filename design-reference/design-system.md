@@ -951,3 +951,11 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   (variante, cuántos procedimientos, enviando), Parts (partes, qué hace cada botón, cuándo aparece, dónde se usa),
   States (cada caso en su iframe, más la caja de resumen sola) y Specs (medidas, colores y la lógica).
   Decisiones en `figma/modulos/clinical-mode.md` (2026-10-17).
+
+## Operatory strip con scroll horizontal y sala siempre elegida (2026-10-19)
+
+- `OperatoryStrip` es una sola fila con scroll horizontal (cards de 232px como mínimo, snap al borde) en lugar de la
+  grilla con "Show N more". `elegida` es la sala mostrada y `onElegir(nombre)` la cambia: siempre hay una, no se suelta.
+- `OperatoryCard`: "Patients today" lo calcula la pantalla (turnos de esa sala), no es un dato fijo. *Components /
+  Dashboard / Operatory strip* y *OperatoryCard* describen la selección y el scroll. `ui/show-more` ya no lista las
+  salas. Ver `figma/modulos/dashboard.md`.

@@ -38,7 +38,36 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 
 - `tests/dashboard.e2e.ts` (2026-10-12): el selector de fecha se lee "Feb 28, 2026"; elegir un día cierra el calendario
   y lo cambia; Today vuelve a hoy y se va.
-  Con `?day=busy` (35 turnos) se ven cinco; *Show 30 more* abre el resto en una región con scroll y *Show less* la
+  Con `?day=busy` (35 turnos, 7 en la sala elegida) se ven cinco; *Show 2 more* abre el resto en una región con scroll y *Show less* la
+  cierra (`ui/show-more`).
+  (2026-10-13) *Check In* avisa "checked in" y el escudo de al lado de Today lleva a Help.
+  (2026-10-19) La tira de salas tiene siempre una elegida (Operatory 1 al empezar); Appointments y Waiting Room
+  muestran sólo a los de esa sala, el "Patients today" de la card coincide con sus turnos (2 y 3) y una sala sin
+  gente (Operatory 5) muestra los dos vacíos.
+- `tests/clinical-mode.e2e.ts`: la app abre, y Add Procedure carga un D0120 desde DentAssmt recorriendo los tres
+  pasos del drawer hasta el aviso de guardado.
+  Desde el 2026-10-08 también Lab Order: Filter por Requested deja 2 de 9, y Cancel order desde el menú de la fila se
+  deshace con Undo.
+- `tests/consents.e2e.ts` (2026-10-07): en Settings → Consents, Preview abre la hoja en un drawer (Patient View saca
+  Diagnosis) y Save desde el preview lo cierra y deja los faltantes a la vista en el editor.
+- `tests/billing-settings.e2e.ts` (2026-10-09, rehecho desde red.dev): New Carrier pide lo obligatorio y el buscador
+  completa el Payer ID; un plan nuevo se arma en cuatro pasos y sigue en su Coverage Table (Copy from + Save); cambiar de
+  pestaña del plan con cambios pide confirmación; Bulk Edit +10% crea una versión nueva; una excepción se arma en cuatro
+  pasos; Assignments muestra el desglose y la lista; Compare fees compara contra UCR - Red; Bulk Edit con filas tildadas
+  cambia sólo esas.
+- `tests/billing.e2e.ts` (2026-10-09): elegir un paciente en Find Patient abre su vista (sólo sus movimientos, los
+  botones de pago, Guarantor View con todo su garante) y la X vuelve al resumen; una fila del resumen abre la vista de
+  ese paciente en Patient View; el círculo de info de Overdue Balance muestra su texto al pasar el mouse.
+
+- `tests/notifications.e2e.ts` (2026-10-12): el atajo *Last 7 days* acota la lista y la ✕ vuelve a *All dates*; dos
+  clics en el calendario arman un rango y, en Unread sin nada en esas fechas, el vacío ofrece *Clear dates*. Las
+  fechas se calculan desde hoy, como los datos.
+  Desde el 2026-10-13 también: sólo hay *Inbox* y *Unread*, y el ojo de una fila la marca leída o sin leer (Unread de
+  8 a 7 y de vuelta).
+
+- `tests/dashboard.e2e.ts` (2026-10-12): el selector de fecha se lee "Feb 28, 2026"; elegir un día cierra el calendario
+  y lo cambia; Today vuelve a hoy y se va.
+  Con `?day=busy` (35 turnos, 7 en la sala elegida) se ven cinco; *Show 2 more* abre el resto en una región con scroll y *Show less* la
   cierra (`ui/show-more`).
   (2026-10-13) La tira de salas de arriba abre el resto con *Show N more* (el número depende del ancho); *Check In*
   avisa "checked in" y el escudo de al lado de Today lleva a Help.
