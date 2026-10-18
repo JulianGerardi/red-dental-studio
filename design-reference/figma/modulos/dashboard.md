@@ -653,3 +653,12 @@ derecha, alineados al botón azul" y "agregá más cards, así queda prolijo y v
 El avatar de la card de Appointments (44px, esquina 12) es la referencia que se toma para toda la app: `ui/avatar`.
 Pending Task y las filas pasan del celeste al azul; el popover del paciente, del círculo al cuadrado redondeado (sin el
 borde blanco). Regla en `../README.md`.
+
+## Topbar: inputs del header más chicos (2026-10-18)
+
+Julián: "achicá un poco esos inputs del header" (locación, buscador y perfil).
+
+- Locación y buscador: 32 → **28px** (tamaño `sm` de los botones); texto 13px y 12px, íconos de 14px. Perfil: avatar de 28
+  y botón de 32px (antes 40); nombre y rol a 11px. La campana ya era de 28.
+- **A validar:** que 12px en el buscador siga leyéndose bien en monitores chicos y para quien tiene baja visión; el área
+  de toque de 28px queda justo para el mouse, pero es el mínimo para pantallas táctiles.

@@ -5,6 +5,11 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-18
 
+### Topbar: locación, buscador y perfil más chicos
+- Locación y buscador pasan de 32 a **28px** de alto (texto de 13 y 12px, íconos de 14px) y el botón del perfil de 40 a 32px
+  (avatar de 28). La campana ya medía 28; el botón del menú sigue en 32.
+- **Para el dev:** `h-7` en `LocationSelector.tsx` y en `GlobalSearch`; `Avatar size={28}` en `MenuCuenta`.
+
 ### Un solo avatar de persona en toda la app ([#49](https://github.com/JulianGerardi/red-dental-studio/pull/49))
 - Pacientes, providers, empleados y la cuenta usan el avatar de la card de Appointments: cuadrado con esquinas
   redondeadas, azul con iniciales blancas. Se van los círculos (Patients, Employees, Relationships, panel del paciente)
