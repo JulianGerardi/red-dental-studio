@@ -176,3 +176,36 @@ Pedido de Julián: el panel *Today Appointments* no tenía la misma sombra que e
   barra, panel y tabla siguen en 716px y la lista scrollea (688 de contenido en 592 visibles).
 - Regla nueva en *Elements / Cards → Specs* (bloque *Shadow room* y en *Rules*): una card no va dentro de un contenedor
   con `overflow-hidden`; para topar el alto, el scroll va adentro de la card.
+
+---
+
+## Patients — barra lateral desde el título, Recent Patients de vuelta y filas enteras (2026-10-13)
+
+Pedido de Julián, con una captura de cómo lo quiere: (1) vuelve Recent Patients con los últimos 10, (2) el botón *New
+Patient* cambia de lugar y (3) la fila de un paciente no se corta.
+
+- **Layout.** El título, la bajada y *New Patient* pasan a la columna de la tabla: el botón va al borde derecho de esa
+  columna, en la fila del título. La barra lateral arranca a la misma altura que el título y el botón (195 px a 1440).
+  Antes el botón estaba al borde de la página y la barra empezaba debajo. Abajo de `lg` todo se apila: encabezado,
+  búsqueda, tabla y después los dos paneles.
+- **Recent Patients vuelve con 10.** Los pacientes nuevos entran primero en el store, así que los 10 primeros son los
+  recientes. Misma card que antes (`PatientCard`: avatar, nombre con link al perfil, pill, mail y kebab con Edit) y
+  el mismo `Panel` + globo con el total. La captura lo rotula "Recents"; se dejó "Recent Patients".
+- **Filas enteras: `ui/show-more`.** La fila cortada era del tope de alto que se medía en la tabla (`--patients-alto`,
+  con ResizeObserver) y de los paneles `flex-1` con scroll adentro: la lista scrolleaba con cualquier alto y quedaba
+  una card a medias o un hueco en blanco abajo. Ahora cada lista usa la regla de listas largas (2026-10-12): se ven
+  **4 turnos y 3 pacientes** enteros y "Show N more" abre el resto con scroll adentro (hasta `min(70vh, 640px)`), con el
+  degradé abajo. 4 y 3 filas porque así la barra termina a la altura de la tabla a 1440 px (cada fila pesa 70 px).
+  Se van `--patients-alto`, el `useEffect` que lo medía y `BotonVerTodos` ("View all" pasa a "Show N more").
+- **Buscadores.** Cada panel tiene el suyo. El de Recent Patients está en la captura (con el placeholder de turnos
+  copiado: se puso "Search recent patients"). Buscar ya no saca el tope: con muchos resultados siguen "Show N more".
+- Anomalía a validar: la primera página de la tabla muestra los mismos 10 pacientes que Recent Patients (por eso se
+  había sacado el 2026-10-07). Conviene probar con usuarios si el panel aporta o si "reciente" tendría que ser otra
+  cosa (último turno, última visita).
+
+### Se saca el link "Patients ⌄" (2026-10-18)
+
+Pedido de Julián: el link de arriba de la pantalla no abría nada distinto de esta misma pantalla -navegaba a
+`/patients` estando ya en `/patients`-, así que era un adorno sin función. Se saca, junto con el `mt-[15px]` que
+compensaba su alto (`CONTENEDOR_PAGINA` ya trae `py-6`).
+

@@ -762,6 +762,14 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   campo de arriba (Edit Carrier › *Information*, pedido de Julián). En los drawers siguen una debajo de la otra
   (*Components / UI / Drawer → Specs → Fields*).
 
+## Patients: barra lateral con Show more (2026-10-13)
+
+- Today Appointments (4 filas) y Recent Patients (3) usan `ui/show-more`: filas enteras y "Show N more" con scroll
+  adentro. Están en la tabla *Limits in the app* de *Elements / Show more*, y la pantalla completa en *Pages / Patients*.
+- `BotonVerTodos` se va de `pages/Patients.tsx` y de *Pages / Parts / Patients* (queda `CountBubble`). La muestra *With
+  link* de *Components / Dashboard / Panel* (antes *With View all*) toma el link de *All treatment* en Treatment plans.
+- Decisiones y motivos en `figma/modulos/patients.md` (2026-10-13).
+
 ## Navigation: el menú en blanco (2026-10-13)
 
 - El rail de la app pasa de `surface-subtle` (`#fafafa`) a **blanco**; el bloque del logo sigue azul. *Elements /
@@ -913,3 +921,12 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - *Components / Clinical / RecordDetail*: sin lo del cobro (sale `ContenidoSede`, `ContenidoFinanzas`,
   `ContenidoAplicadas`, `Metrica` y `cargoDe`). Decisiones en `figma/modulos/ledger.md`, `billing.md` y
   `clinical-mode.md` (2026-10-14).
+
+## Scheduling: View rediseñado (2026-10-17)
+
+- *Components / Scheduling / ViewFiltersPanel* con **Playground** (ancho, selección, búsqueda, nombres largos), **In the toolbar**
+  (el botón real abierto), **Parts**, **States** (opción: default, hover, foco, elegida, nombre largo; panel: default, todo
+  elegido, búsqueda con y sin resultados, provider elegido escondido, poca altura, nombres largos), **Widths** (976, 744 y 351) y
+  **Specs** (medidas, tokens y reglas).
+- Piezas nuevas: `OpcionFiltro`, `GrupoFiltro` (radiogroup con flechas), `SeccionFiltro` y `ViewMenu`. Se va `Group`. Reusa
+  `Radio`, `EmptyState`, `Button`, `Popover` e `ICONO_SUELTO`. Decisiones en `figma/modulos/scheduling.md`.
