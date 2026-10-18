@@ -827,3 +827,19 @@ transactions debajo de los campos de siempre; la historia la reemplaza.)
 Piezas en `LedgerRowDetail.tsx`: `tipoDetalle`, `FilasTransaccion`, `TratamientoDelCargo`, `MetodosDePago`, `Motivo`,
 `Metrica` y `DetalleMovimiento` (el contenido sin el marco, que usa Billing). Storybook: *Components / Ledger /
 LedgerRowDetail*.
+
+## La flecha en las filas que se despliegan (2026-10-18)
+
+Julián: unas tablas tenían flecha para desplegar la fila (Billing con paciente, Problem List, Treatment Plan) y otras no
+(el Ledger y Ledger Transactions de los pagos, que se desplegaban igual con un clic). Tiene que ser la misma lógica en
+todas.
+
+1. **La flecha va en toda fila que se despliega**: `RowChevron` de `ui/data-table.tsx`, primera columna, gira al abrir.
+   El Ledger y `LedgerAllocationTable` la suman con un hueco de 16px en el encabezado; el ancho mínimo de la tabla suma
+   la flecha y su gap. A 1440 las dos siguen entrando sin scroll.
+2. **El detalle arranca en la primera columna**, después de la flecha, como en Billing (DataTable): `LedgerRowDetail`
+   suma `sangria` (40px en el Ledger: 12 + 16 + 12; 34px en Ledger Transactions, que usa gap de 6).
+3. Una fila que **navega o abre un drawer** (Billing sin paciente, Patients, Team) no lleva flecha: no se despliega.
+4. *Audit / Tables in the app* marca **Expandable rows without chevron** si alguna tabla vuelve a desplegarse sin flecha.
+5. **A validar con usuarios:** si en recepción se entiende que la fila entera se abre (no sólo la flecha); la flecha es
+   la pista, el clic sigue siendo en toda la fila.

@@ -141,7 +141,7 @@ export const Parts: Story = {
             <tr><td className="font-semibold">Financial details</td><td>Cargo: Original charge, Payments applied, Credit adjustments applied y Outstanding transaction balance (destacado). Pago o crédito: Original payment / credit, Applied to charges, Unapplied credit (destacado) y Transaction balance en $0.00.</td><td>Metrica</td></tr>
             <tr><td className="font-semibold">Applications</td><td>Cargo: Payments &amp; credits applied to this charge (de dónde vino). Pago o crédito: Charges paid or credited by this transaction (a dónde fue). Fecha de aplicación, la otra transacción con link, Patient / Account, referencia o motivo, y el monto aplicado en positivo. La cuenta es la cantidad de líneas.</td><td>FilasTransaccion</td></tr>
             <tr><td className="font-semibold">Footer</td><td>View procedure, View payment o View adjustment; Apply credit con crédito disponible; Read-only summary.</td><td>DetalleMovimiento</td></tr>
-            <tr><td className="font-semibold">Frame</td><td>En el Ledger, fondo gris y fijo en la parte visible de la tabla; en Billing lo pone DataTable.</td><td>LedgerRowDetail</td></tr>
+            <tr><td className="font-semibold">Frame</td><td>En el Ledger, fondo gris y fijo en la parte visible de la tabla, arrancando en la primera columna, después de la flecha de la fila (`sangria`: 40px en el Ledger, 34 en Ledger Transactions); en Billing lo pone DataTable.</td><td>LedgerRowDetail</td></tr>
             <tr><td className="font-semibold">Collapse all / Expand all</td><td>En la barra de la tabla, desde que hay una fila abierta.</td><td>BotonExpandirTodo</td></tr>
           </Tabla>
         </Bloque>

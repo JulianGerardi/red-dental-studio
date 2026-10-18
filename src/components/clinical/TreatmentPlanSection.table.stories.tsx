@@ -95,7 +95,7 @@ export const Parts: Story = {
       </Bloque>
       <Bloque titulo="What each part is">
         <Tabla encabezado={['Part', 'What it does', 'Component']} minimo={720} arriba>
-          <tr><td className="font-semibold">Chevron</td><td>Columna de 28px al inicio (después del arrastre en Planning); gira al abrir.</td><td>TablaProcedimientos (`detalle`)</td></tr>
+          <tr><td className="font-semibold">Chevron</td><td>Columna de 28px al inicio (después del arrastre en Planning); gira al abrir. La misma flecha de todas las tablas.</td><td>RowChevron (DataTable)</td></tr>
           <tr><td className="font-semibold">Row</td><td>Clic o Enter / Espacio la abre y la cierra; los clics en la casilla, el menú y los íconos no. Abierta, fondo gris claro; marcada, celeste.</td><td>TablaProcedimientos</td></tr>
           <tr><td className="font-semibold">Detail</td><td>Debajo de la fila, a lo ancho de la parte visible de la tabla, con la sangría del chevron.</td><td>DetalleRegistro + registroDePlan (RecordDetail)</td></tr>
           <tr><td className="font-semibold">Collapse all / Expand all</td><td>Arriba de las visitas del caso (uno para todas) o arriba de Unassigned, desde que hay una fila abierta.</td><td>BotonExpandirTodo (Ledger)</td></tr>

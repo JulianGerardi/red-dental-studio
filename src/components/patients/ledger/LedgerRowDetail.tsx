@@ -351,24 +351,29 @@ export function DetalleMovimiento({
 }
 
 export function LedgerRowDetail({
-  m, onVerTodo, onAplicarCredito, ...datos
+  m, onVerTodo, onAplicarCredito, sangria = 40, ...datos
 }: DatosCobro & {
   m: Movimiento & { saldo?: number }
   onVerTodo: () => void
   /** Sólo viene si la fila tiene crédito sin aplicar -ver `tieneCredito` en
       Ledger.tsx-, así que alcanza con chequear que exista. */
   onAplicarCredito?: () => void
+  /** Dónde arranca el detalle, en px: alineado con la primera columna, después de la flecha de la fila (`RowChevron`). */
+  sangria?: number
 }) {
   return (
-    <div className="border-t border-line-row bg-surface-subtle px-3 py-3">
+    <div className="border-t border-line-row bg-surface-subtle py-3 pr-3" style={{ paddingLeft: sangria }}>
       {/* La fila vive dentro del ancho mínimo de la tabla, que en pantallas
           chicas es más ancho que la vista. Sin esto el detalle nacía de 864px
           y había que scrollear para leerlo -lo contrario de para qué está-.
-          `sticky left-0` lo deja fijo en la parte visible mientras la tabla
+          `sticky` lo deja fijo en la parte visible mientras la tabla
           se mueve, y el ancho sale de `--tabla-visible` (lo publica el
           contenedor); cuando la tabla entra entera, ese valor ya es el 100%.
-          Menos el padding del contenedor (24px): si no, lo alineado a la derecha (Applied amount) quedaba cortado. */}
-      <div className="sticky left-3 w-[calc(var(--tabla-visible,calc(100%+1.5rem))-1.5rem)]">
+          Menos el padding del contenedor (`--resto`): si no, lo alineado a la derecha (Applied amount) quedaba cortado. */}
+      <div
+        className="sticky w-[calc(var(--tabla-visible,calc(100%+var(--resto)))-var(--resto))]"
+        style={{ left: sangria, '--resto': `${sangria + 12}px` } as React.CSSProperties}
+      >
         <DetalleMovimiento m={m} onVerTodo={onVerTodo} onAplicarCredito={onAplicarCredito} {...datos} />
       </div>
     </div>
