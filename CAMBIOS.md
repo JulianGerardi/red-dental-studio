@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-18
 
-### El icono 3D va sólo en el saludo, y el texto más chico
+### El icono 3D va sólo en el saludo, y el texto más chico ([#47](https://github.com/JulianGerardi/red-dental-studio/pull/47))
 - El calendario del saludo ("Sunday - October 18, 2026") pasa a ser el emoji 📅, 3D como la manito. El campo de fecha y
   *Today* vuelven al icono lineal (lo de #43 se revierte). El saludo baja de 19 a 16px.
 - **Para el dev:** se va `emojiFecha` de `ui/date-picker.tsx`; `Saludo.tsx` usa 📅 en vez de `CalendarDays`.
