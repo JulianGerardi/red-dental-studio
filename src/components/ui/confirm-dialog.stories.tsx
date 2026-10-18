@@ -89,6 +89,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Width</td><td>420px, centrada; 480px con una tercera salida.</td></tr>
           <tr><td className="font-semibold">Title</td><td>16px Bold</td></tr>
           <tr><td className="font-semibold">Text</td><td>13px</td></tr>
+          <tr><td className="font-semibold">Focus</td><td>Entra en Cancel (lo seguro). Al cerrar vuelve al botón que la abrió (Save, Delete…), no al principio de la página.</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Where" nota="Todo lo demás es un drawer.">
@@ -99,6 +100,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Discard, Expire, Cancel, Present, Accept del caso</td><td>danger o primary según la acción</td></tr>
           <tr><td className="font-semibold">Confirm procedure</td><td>primary</td></tr>
           <tr><td className="font-semibold">Consent required (Complete, Start)</td><td>primary con ícono de alerta y tercera salida</td></tr>
+          <tr><td className="font-semibold">Move treatment visit? (New Appointment, al guardar con una visita linkeada a otro turno)</td><td>primary</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>

@@ -31,6 +31,17 @@ export type ConsentProcedimiento = 'Signed' | 'Pending' | 'Not sent' | 'Expired'
 export type Cita = { fecha: string; hora: string; proveedor: string }
 export type Visita = { id: string; nombre: string; total: string; procedimientos: Procedimiento[]; cita?: Cita }
 
+/* Los procedimientos del caso que son procedimientos del paciente (VINCULOS_PROCEDIMIENTO en data/clinical-mode) llevan
+   su código, pieza y superficie: así la fila y su detalle dicen lo mismo. El resto queda como el frame. Ver
+   clinical-mode.md (2026-10-13). */
+const DEL_PACIENTE: Record<string, Partial<Procedimiento>> = {
+  c1v2p1: { codigo: 'D4341', nombre: 'Periodontal scaling and root planing – four or more teeth per quadrant', superficie: '-', pieza: '-', ubicacion: 'Upper Arch' },
+  c3v1p1: { codigo: 'D2391', nombre: 'Resin-based composite – one surface, posterior', superficie: 'O', pieza: '3', ubicacion: '-' },
+  c3v1p2: { codigo: 'D2392', nombre: 'Resin-based composite – two surfaces, posterior', superficie: 'O, D', pieza: '14', ubicacion: '-' },
+  c5v2p1: { codigo: 'D3330', nombre: 'Endodontic therapy, molar tooth', superficie: '-', pieza: '19', ubicacion: '-' },
+  c7v1p1: { codigo: 'D7140', nombre: 'Extraction – erupted tooth or exposed root (elevation and/or forceps removal)', superficie: '-', pieza: '16', ubicacion: '-' },
+}
+
 const proc = (id: string, estado: Procedimiento['estado'] = 'Planned', consentimiento?: ConsentProcedimiento): Procedimiento => ({
   id,
   fecha: '2025/01/24',
@@ -43,6 +54,7 @@ const proc = (id: string, estado: Procedimiento['estado'] = 'Planned', consentim
   fee: '$234',
   estado,
   consentimiento,
+  ...DEL_PACIENTE[id],
 })
 
 /* Los procedimientos de una visita, cada uno con el estado de su consentimiento. */

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
 import { CircleAlert } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -25,9 +25,15 @@ export function ConfirmDialog({
   /** La acción principal está en curso: spinner en su botón y los otros quietos. */
   loading?: boolean
 }) {
+  /* Radix devuelve el foco a un Trigger que acá no hay: al cerrar vuelve al botón que abrió la pregunta (Save, Delete…). */
+  const previo = useRef<HTMLElement | null>(document.activeElement as HTMLElement | null)
   return (
     <Dialog open onOpenChange={(v) => !v && !loading && onCancel()}>
-      <DialogContent showCloseButton={false} className={cn('gap-3 p-5', otherAction ? 'sm:max-w-[480px]' : 'sm:max-w-[420px]')}>
+      <DialogContent
+        showCloseButton={false}
+        className={cn('gap-3 p-5', otherAction ? 'sm:max-w-[480px]' : 'sm:max-w-[420px]')}
+        onCloseAutoFocus={(e) => { e.preventDefault(); if (previo.current?.isConnected) previo.current.focus() }}
+      >
         <div className="flex items-center gap-3">
           {icon === 'warning' && (
             <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-warn-bg text-warn-fg ring-1 ring-warn-fg/20">

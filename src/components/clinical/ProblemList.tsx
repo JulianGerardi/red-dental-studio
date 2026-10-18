@@ -75,17 +75,21 @@ export function ToothCell({ pieza }: { pieza?: number }) {
 
 const cuenta = <E extends string>(filas: { estado: E }[], e: E) => filas.filter((f) => f.estado === e).length
 const texto = (t: string) => <span className="truncate">{t || '-'}</span>
-const estadoPill = (tono: PillTone, e: string) => <Pill tone={tono} size="sm" className="tracking-wide uppercase">{e}</Pill>
+/* En minúscula inicial, como las pills de toda la app (Julián, 2026-10-14). */
+const estadoPill = (tono: PillTone, e: string) => <Pill tone={tono} size="sm" className="whitespace-nowrap">{e}</Pill>
 
-export function ProblemList() {
-  const [pestana, setPestana] = useState<Pestana>('Problem List')
+export function ProblemList({ procedimientoInicial }: {
+  /** Abre en Procedures con esa fila desplegada (View procedure del detalle del Ledger). */
+  procedimientoInicial?: string
+} = {}) {
+  const [pestana, setPestana] = useState<Pestana>(procedimientoInicial ? 'Procedures' : 'Problem List')
   const [problemas, setProblemas] = useState(PROBLEMAS)
   const [procedimientos, setProcedimientos] = useState(PROCEDIMIENTOS)
   const [filtroProblema, setFiltroProblema] = useState<EstadoProblema>('Active')
   const [filtroProcedimiento, setFiltroProcedimiento] = useState<EstadoProcedimiento | 'All'>('All')
   const [q, setQ] = useState('')
   /* La fila que se abre al llegar desde el detalle de la otra pestaña. */
-  const [enfoque, setEnfoque] = useState<string>()
+  const [enfoque, setEnfoque] = useState<string | undefined>(procedimientoInicial)
   /* Start con una firma pendiente: Consent required encima; lo mandado desde acá, por procedimiento del caso. */
   const [pedido, setPedido] = useState<{ tipo: TipoConsentimiento; fila: ProcedimientoPaciente; ac: Accion<EstadoProcedimiento>; caso: string; procCaso: string } | null>(null)
   const [consentimientos, setConsentimientos] = useState<Record<string, ConsentProcedimiento>>({})
