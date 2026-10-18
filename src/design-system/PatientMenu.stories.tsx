@@ -295,8 +295,8 @@ const MEDIDAS: [string, 'exp' | 'col', string][] = [
   ['Section · collapsed', 'col', 'nav a'],
   ['Encounter', 'exp', '.relative.w-full > span'],
   ['Clinical Mode', 'exp', 'a[href$="/clinical-mode"]'],
-  ['Photo · expanded', 'exp', 'aside .rounded-full'],
-  ['Photo · collapsed', 'col', 'aside .rounded-full'],
+  ['Photo · expanded', 'exp', 'aside .rounded-avatar'],
+  ['Photo · collapsed', 'col', 'aside .rounded-avatar'],
 ]
 
 function Medidas() {

@@ -9,6 +9,7 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { aviso } from '@/components/ui/toaster'
 import { BUTTON_VARIANTS, type ButtonVariant } from '@/components/ui/button'
+import { Avatar } from '@/components/ui/avatar'
 
 export type Appointment = {
   name: string
@@ -102,9 +103,7 @@ export function AppointmentCard({
             onSelect && 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
           )}
         >
-          <span className="bg-dash-blue flex size-11 shrink-0 items-center justify-center rounded-xl text-sm font-semibold text-white">
-            {appt.initials}
-          </span>
+          <Avatar initials={appt.initials} size={44} />
           <span className="flex min-w-0 flex-col gap-1">
             <span className="text-dash-name truncate text-[15px] leading-none font-bold">
               {appt.name}
@@ -176,9 +175,7 @@ export function AppointmentCardCompacta({
   const navigate = useNavigate()
   return (
     <InnerCard className="flex items-center gap-2.5 p-2.5">
-      <span className="bg-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold text-white">
-        {appt.initials}
-      </span>
+      <Avatar initials={appt.initials} />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="truncate text-[13px] font-semibold text-ink">{appt.name}</span>
         <span className="flex items-center gap-1 text-[11px] text-ink-muted">

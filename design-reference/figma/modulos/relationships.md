@@ -92,3 +92,9 @@ armadas con la persona, los roles y el paciente, y Relationship to Patient). Se 
 Relationships & Billing; `/patients/:id/relationships/new` abre la lista con el drawer abierto. La relación nueva entra
 primera, con Legal contact (Guardian) y/o Financial contact (Guarantor). `DIRECTORIO` y `PersonaSeleccionada` se mudaron
 al archivo del drawer. Design system: *Components / Patients / AddRelationshipDrawer*.
+
+## Un solo avatar de persona (2026-10-18)
+
+El avatar de cada card deja el círculo de 40px del Figma (ver *Especificación*) y pasa al cuadrado con esquinas
+redondeadas de `ui/avatar`, mismo tamaño y color. Las cards de Add relationship ya eran cuadradas. Regla en
+`../README.md`.

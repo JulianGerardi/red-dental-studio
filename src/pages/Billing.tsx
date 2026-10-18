@@ -20,6 +20,7 @@ import { Panel } from '@/components/dashboard/primitives'
 import { InfoTip } from '@/components/ui/info-tip'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Figma 4481:9881 "Billing". Ver design-reference/figma/modulos/billing.md.
    Las 4 pantallas del frame son estados de una sola vista: vacía, poblada,
@@ -109,9 +110,7 @@ export function ResultadoPaciente({ paciente, saldo, elegido, onElegir }: {
         elegido ? 'bg-dash-count-bg' : 'hover:bg-surface-subtle',
       )}
     >
-      <span className="bg-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold text-white">
-        {initials(paciente.nombre)}
-      </span>
+      <Avatar initials={initials(paciente.nombre)} />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="truncate text-[13px] font-semibold text-ink">{paciente.nombre}</span>
         {/* Typo tal cual el Figma: "Las payment" en vez de "Last payment". Ver billing.md. */}
@@ -133,9 +132,7 @@ const ENTRADA = 'motion-safe:animate-[paciente-entra_360ms_cubic-bezier(0.32,0.7
 export function PacienteElegido({ paciente, onCerrar }: { paciente: PacienteBilling; onCerrar: () => void }) {
   return (
     <div className={cn('flex items-center gap-3 border-b border-line-row bg-dash-count-bg px-5 py-3', ENTRADA)}>
-      <span className="bg-dash-blue flex size-10 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold text-white">
-        {initials(paciente.nombre)}
-      </span>
+      <Avatar initials={initials(paciente.nombre)} size={40} />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="text-dash-blue truncate text-[14px] font-semibold" title={paciente.nombre}>{paciente.nombre}</span>
         <span className="text-[11px] leading-snug text-ink-muted">

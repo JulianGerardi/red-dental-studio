@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { NotebookText } from 'lucide-react'
 import { Drawer } from '@/components/ui/drawer'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar } from '@/components/ui/avatar'
 
 export type ExamReview = { id: string; date: string; provider: string; note: string }
 
@@ -38,9 +38,7 @@ export function ReviewList({ reviews }: { reviews: ExamReview[] }) {
               </button>
             </div>
             <div className="flex items-center gap-2">
-              <Avatar className="size-8">
-                <AvatarFallback className="bg-dash-count-bg text-dash-blue text-[11px] font-bold">{iniciales(r.provider)}</AvatarFallback>
-              </Avatar>
+              <Avatar initials={iniciales(r.provider)} />
               <span className="min-w-0">
                 <span className="block truncate text-sm font-bold text-ink">{r.provider}</span>
                 <span className="block text-xs text-ink-faint">Provider</span>

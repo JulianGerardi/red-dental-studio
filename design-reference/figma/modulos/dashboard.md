@@ -640,3 +640,9 @@ derecha, alineados al botón azul" y "agregá más cards, así queda prolijo y v
 - **Día de la demo con más gente**: la sala de espera pasa de 3 a 6 y se reparte entre Operatory 1 a 4 (antes todos en la
   2), así el filtro por sala tiene a quién mostrar (Operatory 1 y 2, dos cada una; Operatory 5 y 6, vacías). La tira de
   números lo refleja (Waiting 6). Con el día cargado (`?day=busy`) se ven los topes y "Show N more".
+
+## Un solo avatar de persona (2026-10-18)
+
+El avatar de la card de Appointments (44px, esquina 12) es la referencia que se toma para toda la app: `ui/avatar`.
+Pending Task y las filas pasan del celeste al azul; el popover del paciente, del círculo al cuadrado redondeado (sin el
+borde blanco). Regla en `../README.md`.

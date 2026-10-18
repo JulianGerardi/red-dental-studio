@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AlarmClock, GripVertical } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Avatar, inicialesDe } from '@/components/ui/avatar'
 
 /* Figma 3862:224820 "appointment-item-2" — la columna de 190px que acompaña al
    modal de New Appointment. No es parte del modal: en el frame arranca en
@@ -53,9 +54,7 @@ export function AppointmentSlotPicker({
     >
       <header className="shrink-0 border-b border-line px-3 py-3">
         <div className="flex items-center gap-2">
-          <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
-            {provider.split(' ').map((w) => w[0]).slice(0, 2).join('')}
-          </span>
+          <Avatar initials={inicialesDe(provider)} />
           <span className="min-w-0 leading-tight">
             <span className="block truncate text-[13px] font-bold text-ink">{provider}</span>
             <span className="block truncate text-[13px] font-bold text-ink">{especialidad}</span>

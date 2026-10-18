@@ -14,6 +14,7 @@ import {
 import { aviso } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
 import { ANCHO_PAGINA } from '@/lib/estilos'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Figma 3636:57489 (Secretary) y 3605:56446 (Provider). Alto 64, fondo blanco.
    El glifo ⌘ del buscador aparece solo en el frame Provider — en recepcionista
@@ -120,9 +121,7 @@ export function MenuCuenta() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-1 py-1 transition-colors hover:bg-surface-muted">
-        <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold">
-          SS
-        </span>
+        <Avatar initials="SS" />
         {/* Los dos frames del Figma difieren acá: Provider usa nombre negro
             medium + rol gris semibold; Secretary pone ambos en gris semibold.
             Se toma la versión del Provider, que da jerarquía real. */}

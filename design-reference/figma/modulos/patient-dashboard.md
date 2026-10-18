@@ -316,3 +316,8 @@ Julián: "hacelo con slash / en vez de la flecha". `ui/breadcrumb` separa los tr
 (antes el chevron de 14px), con 6px a cada lado y `aria-hidden` para que el lector de pantalla no la lea. Vale para todos
 los rastros de la app, no sólo los del paciente: `Patients / John Smith / Ledger`, `Settings / Locations / Abril`.
 Storybook: *Elements / Breadcrumb* (Parts, Specs).
+
+## Un solo avatar de persona (2026-10-18)
+
+El avatar del panel izquierdo (62px, 36 colapsado) deja el círculo y pasa al cuadrado con esquinas redondeadas de
+`ui/avatar`; los turnos de la columna Appointments y Pending Task, también. Regla en `../README.md`.
