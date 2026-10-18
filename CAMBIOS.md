@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-18
 
-### Dashboard: botón por panel, íconos de Pending Task a la derecha y más gente en la agenda
+### Dashboard: botón por panel, íconos de Pending Task a la derecha y más gente en la agenda ([#45](https://github.com/JulianGerardi/red-dental-studio/pull/45))
 - **Appointments** siempre muestra **Check In** (verde) y **Waiting Room** siempre **Check Out** (azul): la acción la
   decide el panel. **Cancel** sale del Dashboard; si se quiere, va como opción del kebab.
 - **Pending Task:** en angosto, el documento y *Expired date* van contra el borde derecho, alineados con el botón azul.
