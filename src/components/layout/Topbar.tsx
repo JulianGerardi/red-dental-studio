@@ -120,16 +120,16 @@ export function MenuCuenta() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-1 py-1 transition-colors hover:bg-surface-muted">
-        <Avatar initials="SS" />
+      <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-1 py-0.5 transition-colors hover:bg-surface-muted">
+        <Avatar initials="SS" size={28} />
         {/* Los dos frames del Figma difieren acá: Provider usa nombre negro
             medium + rol gris semibold; Secretary pone ambos en gris semibold.
             Se toma la versión del Provider, que da jerarquía real. */}
-        <span className="hidden flex-col items-start text-[12px] leading-[1.35] sm:flex">
+        <span className="hidden flex-col items-start text-[11px] leading-[1.25] sm:flex">
           <span className="font-medium text-ink">Sarah Stone</span>
           <span className="font-semibold text-ink-muted">Dentist</span>
         </span>
-        <ChevronDown className="hidden size-4 shrink-0 text-ink-muted sm:block" />
+        <ChevronDown className="hidden size-3.5 shrink-0 text-ink-muted sm:block" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-[248px]">
@@ -264,21 +264,21 @@ export function GlobalSearch({ showCommandHint }: { showCommandHint: boolean }) 
 
   return (
     <div ref={ref} className="relative w-full min-w-0 max-w-[304px]">
-      <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+      <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
       <input
         value={q}
         onChange={(e) => { setQ(e.target.value); setOpen(true) }}
         onFocus={() => setOpen(true)}
         placeholder="Search..."
         className={cn(
-          'h-8 w-full rounded-md border border-line bg-white pl-9 text-[13px] font-medium',
+          'h-7 w-full rounded-md border border-line bg-white pl-8 text-[12px] font-medium',
           'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint',
           'focus:border-dash-blue focus:outline-none',
-          showCommandHint ? 'pr-9' : 'pr-3',
+          showCommandHint ? 'pr-8' : 'pr-3',
         )}
       />
       {showCommandHint && (
-        <span aria-hidden className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-ink-muted">
+        <span aria-hidden className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-[13px] text-ink-muted">
           ⌘
         </span>
       )}
