@@ -802,6 +802,13 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   de la actividad. *Components / Dashboard / Panel and StatusPill* actualiza la descripción de `top`.
 - Decisiones en `figma/modulos/billing.md` (2026-10-13).
 
+## Patient Overview en dos columnas (2026-10-17)
+- Página nueva *Pages / Parts / Patient Overview* (Playground, Parts, States, Specs). `PatientDetail` acepta `turnos`
+  (sólo para el Storybook) y exporta `TOPE`. `PendingDocuments` tiene la historia *Narrow column*.
+- Regla: una fila con nombre + vencimiento + botón le reserva 14rem al nombre y deja que el resto baje a otro renglón.
+  Decisiones en `figma/modulos/patient-dashboard.md`.
+
+
 ## Navigation: Billing sin menú (2026-10-13)
 
 - *Elements / Navigation*: Billing es un ítem más del rail (link directo, tooltip colapsado); Fee Schedules, Carriers y
