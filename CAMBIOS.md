@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-18
 
+### Un solo avatar de persona en toda la app ([#49](https://github.com/JulianGerardi/red-dental-studio/pull/49))
+- Pacientes, providers, empleados y la cuenta usan el avatar de la card de Appointments: cuadrado con esquinas
+  redondeadas, azul con iniciales blancas. Se van los círculos (Patients, Employees, Relationships, panel del paciente)
+  y el celeste del equipo. Esquina con el token nuevo `--radius-avatar` (27%, `rounded-avatar`).
+- **Para el dev:** `<Avatar initials size photo />` de `ui/avatar` (se va `AvatarFallback`; tamaños 24 a 72 en
+  `AVATAR_SIZES`). `PersonCell` pierde `tone`; `EditableAvatar` recibe `size` en vez de `avatarClassName`. No escribir
+  avatares a mano. Storybook: *Elements / Avatars*.
+
 ### Topbar: el saludo un poco más separado del botón del menú ([#48](https://github.com/JulianGerardi/red-dental-studio/pull/48))
 - Entre el botón de expandir el menú y el saludo hay 14px en lugar de 8. Nada más cambia.
 - **Para el dev:** `gap-3.5` en el bloque izquierdo de `Topbar.tsx`.

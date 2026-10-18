@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 
@@ -15,9 +14,8 @@ export default function ForgotPassword() {
         <div className="w-full max-w-md">
           <div className="space-y-2">
             <div className="mb-3">
-              <Avatar className="h-[60px] w-[60px]">
-                <AvatarFallback>RD</AvatarFallback>
-              </Avatar>
+              {/* La marca de la clínica, no una persona: queda redonda (Elements / Avatars es sólo para personas). */}
+              <span className="bg-primary text-primary-foreground flex size-[60px] items-center justify-center rounded-full font-medium">RD</span>
             </div>
             <h1 className="text-card-foreground text-3xl font-bold">Forgot your password?</h1>
             <p className="text-muted-foreground text-small">

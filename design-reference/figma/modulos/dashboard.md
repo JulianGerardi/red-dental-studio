@@ -647,3 +647,9 @@ derecha, alineados al botón azul" y "agregá más cards, así queda prolijo y v
   después la fecha, **una vez por sesión**; en las visitas siguientes de la misma pestaña se ve la fecha directo.
 - Inputs del header medidos: locación 32, buscador 32, botón de perfil 40 (avatar de 32 + 4 de aire), campana 28. Los
   de 32 son el tamaño `md` de los botones; no se tocaron.
+
+## Un solo avatar de persona (2026-10-18)
+
+El avatar de la card de Appointments (44px, esquina 12) es la referencia que se toma para toda la app: `ui/avatar`.
+Pending Task y las filas pasan del celeste al azul; el popover del paciente, del círculo al cuadrado redondeado (sin el
+borde blanco). Regla en `../README.md`.

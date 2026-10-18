@@ -190,10 +190,8 @@ export function PatientSidePanel({
             iniciales={initials}
             onChange={setFoto}
             label={name}
-            avatarClassName={cn(
-              'bg-dash-blue-hover rounded-full text-white size-[62px] text-lg',
-              colapsado && 'lg:size-9 lg:text-[11px]',
-            )}
+            size={62}
+            className={cn(colapsado && 'lg:size-9 lg:text-[13px]')}
           />
           {colapsado && conTooltip(`${name} · Active · 50 years`, (
             <span

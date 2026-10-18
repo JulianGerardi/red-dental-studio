@@ -1,5 +1,5 @@
 import { Plus, Search, ListFilter, ChevronDown, Link2, LayoutGrid, ClipboardList, FileCheck2 } from 'lucide-react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 
 /* Demos de Help: piezas chicas y esquemáticas -un puntero, algunos bloques,
@@ -46,7 +46,7 @@ export function DateDrivesPanelsDemo() {
           <div className="mt-1.5 space-y-1.5">
             {filas.map((f, i) => (
               <div key={f.n} className="flex items-center gap-1.5" style={{ animation: `tour-card-in 4s ${0.3 + i * 0.2}s ease-out infinite` }}>
-                <Avatar className="size-4"><AvatarFallback className="bg-dash-count-bg text-dash-blue-hover text-[7px]">{f.i}</AvatarFallback></Avatar>
+                <Avatar initials={f.i} size={24} className="size-4 text-[7px]" />
                 <span className="truncate text-[9px] font-semibold text-ink">{f.n}</span>
               </div>
             ))}
@@ -166,11 +166,9 @@ export function PatientTabsDemo({ activa = 'Treatments' }: { activa?: string }) 
 export function AddRelationshipDemo() {
   return (
     <Stage className="flex items-center justify-center gap-3 p-3">
-      <Avatar className="size-9"><AvatarFallback className="bg-dash-count-bg text-dash-blue-hover text-[11px]">JS</AvatarFallback></Avatar>
+      <Avatar initials="JS" size={36} />
       <Link2 className="size-4 shrink-0 text-ink-faint" style={{ animation: 'tour-pulse 4s ease-in-out infinite' }} />
-      <Avatar className="size-9" style={{ animation: 'tour-block-appear 4s ease-out infinite' }}>
-        <AvatarFallback className="bg-dash-count-bg text-dash-blue-hover text-[11px]">EV</AvatarFallback>
-      </Avatar>
+      <Avatar initials="EV" size={36} style={{ animation: 'tour-block-appear 4s ease-out infinite' }} />
     </Stage>
   )
 }
@@ -271,7 +269,7 @@ export function TeamListDemo() {
       <div className="mt-2 space-y-1.5">
         {filas.map((f, i) => (
           <div key={f.n} className="flex items-center gap-1.5" style={{ animation: `tour-card-in 4s ${0.4 + i * 0.2}s ease-out infinite` }}>
-            <Avatar className="size-5"><AvatarFallback className="bg-dash-count-bg text-dash-blue-hover text-[8px]">{f.c}</AvatarFallback></Avatar>
+            <Avatar initials={f.c} size={24} className="size-5 text-[8px]" />
             <span className="text-[9px] font-medium text-ink">{f.n}</span>
           </div>
         ))}

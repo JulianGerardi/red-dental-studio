@@ -3,6 +3,7 @@ import { Clock, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { InnerCard } from '@/components/dashboard/primitives'
 import { Pill, type PillTone } from '@/components/ui/pill'
+import { Avatar } from '@/components/ui/avatar'
 
 /* La card de un turno en una lista angosta, con estado y acciones: los turnos del Patient Dashboard
    (PatientAppointmentCard) y las solicitudes de Scheduling (SolicitudCard). Una sola para que no se
@@ -49,9 +50,7 @@ export function TarjetaTurno({
   return (
     <InnerCard className={cn('border-l-[3px] p-2.5', BARRA_TONOS[tono], className)}>
       <div className="flex items-start gap-2">
-        <span className="bg-dash-blue-hover flex size-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white">
-          {iniciales ?? inicialesDe(nombre)}
-        </span>
+        <Avatar initials={iniciales ?? inicialesDe(nombre)} size={24} />
         <span className="line-clamp-2 min-w-0 flex-1 text-xs leading-4 font-semibold break-words text-ink" title={nombre}>{nombre}</span>
         <Pill tone={tono} className="shrink-0">{etiqueta}</Pill>
       </div>

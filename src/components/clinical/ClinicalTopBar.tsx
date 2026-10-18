@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
 import { ClinicalItemModal } from '@/components/patients/ClinicalItemModal'
 import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clinicalItems'
+import { Avatar } from '@/components/ui/avatar'
 
 const ICONO_CONTADOR = { link: Link2, signos: Activity, personas: Users, info: Info }
 
@@ -350,9 +351,7 @@ export function ClinicalTopBar({
 
       {/* "user-info-bar": avatar de 23.71 y el nombre en 11.95/600. */}
       <span className="flex shrink-0 items-center gap-[3.19px]">
-        <span className="bg-dash-count-bg text-dash-blue-hover flex size-[23.71px] items-center justify-center rounded-full text-[10px] font-semibold">
-          JP
-        </span>
+        <Avatar initials="JP" size={24} />
         <span className="text-[11.95px] leading-[14px] font-semibold whitespace-nowrap text-[#18181B]">
           Julio Perez
         </span>

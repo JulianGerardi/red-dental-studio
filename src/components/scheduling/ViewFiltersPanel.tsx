@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { Radio } from './TreatmentPlanPicker'
+import { Avatar } from '@/components/ui/avatar'
 
 /* El filtro View de Scheduling: qué estado, provider y sala muestra la agenda. Diseño de Julián del 2026-10-17
    (antes Figma 3856:208346); decisiones en design-reference/figma/modulos/scheduling.md. */
@@ -85,9 +86,7 @@ export function OpcionFiltro({
     >
       <Radio on={on} />
       {marca === 'avatar' && (
-        <span aria-hidden className="bg-dash-count-bg text-dash-blue flex size-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
-          {iniciales(nombre)}
-        </span>
+        <Avatar aria-hidden initials={iniciales(nombre)} size={28} />
       )}
       {marca === 'sala' && <span aria-hidden className="bg-dash-blue size-7 shrink-0 rounded-full" />}
       <span className="min-w-0">
