@@ -197,7 +197,7 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     y sin el z-40, que lo ponía encima de la barra del sitio). Lo que en la
     app se abre con el mouse se deja a la vista con dos contextos que la app no
     usa: `NavigationPreview` (`components/layout/navigation-preview.ts`:
-    expanded, tooltip, settingsMenu, billingMenu) y `PatientMenuPreview`
+    expanded, tooltip, settingsMenu) y `PatientMenuPreview`
     (`components/patients/patient-menu-preview.ts`: collapsed y encounter por
     instancia, tooltip, infoCard, encounterOptions). Abrirlos con una función
     `play` no alcanza: al terminar, la historia se vuelve a dibujar. Para
@@ -769,3 +769,141 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   link* de *Components / Dashboard / Panel* (antes *With View all*) toma el link de *All treatment* en Treatment plans.
 - Decisiones y motivos en `figma/modulos/patients.md` (2026-10-13).
 
+## Navigation: el menú en blanco (2026-10-13)
+
+- El rail de la app pasa de `surface-subtle` (`#fafafa`) a **blanco**; el bloque del logo sigue azul. *Elements /
+  Navigation → Specs → Colors* lo muestra con el token `white`, y Playground, Parts y States ya lo dibujan así porque
+  montan el `Sidebar` real. La interfaz de Storybook mantiene su riel `#fafafa` (ver *Interfaz de Storybook*).
+  Decisiones en `figma/modulos/header-sidebar.md` (2026-10-13).
+
+## Confibot flotante abajo a la derecha (2026-10-13)
+
+- Vuelve el botón flotante de Confibot (el último que había, antes de pasar al menú): `ConfibotLanzador` en
+  `help/Confibot.tsx`. Círculo de 48px con degradé, se estira a "Confibot" con hover o foco; flechita para recogerlo y
+  pestaña al pie para traerlo (se recuerda entre visitas). Lo monta `AppShell`; no se dibuja con el chat o un CoachMark
+  abiertos.
+- **Botones flotantes que conviven:** una pantalla con su propio flotante en esa esquina llama a `useFabDePagina()`
+  (`help/HelpProvider.tsx`) y Confibot se apila 12px arriba. Hoy sólo Scheduling (Appointment requests).
+- `AppShell` vuelve a reservar el alto del botón al pie del `main` (`pb-24 sm:pb-28`).
+- Token nuevo `dash-blue-glow` (`#2f74f5`), el celeste del medio del degradé.
+- *Components / Help / Confibot* pasa a la estructura de Buttons: Playground (vista de arranque y *overPageFab*), Parts,
+  States (reposo, hover, recogido, sobre el FAB de Scheduling, oculto, chat vacío, con respuesta y sin resultados) y
+  Specs. *Navigation → Parts* aclara que el ítem del menú abre la misma hoja. Ver `figma/modulos/help.md`.
+
+## Notifications sin Pending ni Archived; banner de punta a punta (2026-10-13)
+
+- *Pages / Parts / Notifications*: sin los estados ni variantes de *Pending* y *Archived*; *Row actions* muestra el
+  ojo (*Mark as read* / *Mark as unread*); *Empty states* con *Inbox* y *Unread* (con y sin fechas); colores y reglas al
+  día. *Elements / Date filter → Specs* muestra las dos pestañas que quedan.
+- *Components / Layout / NotificationBanner*: de punta a punta del contenido, con la X sola a la derecha; las stories
+  usan las tareas que el banner muestra de verdad (`delBanner`), así el paginador dice "1 of 4" y no "1 of 16".
+  Decisiones en `figma/modulos/notifications.md` y `header-sidebar.md` (2026-10-13).
+
+## Billing: bento y botones del paciente dentro del panel (2026-10-13)
+
+- *Pages › Parts › Billing*: Parts suma *Bento* y *Patient actions*; States cambia *Header* por **Patient actions**
+  (con paciente y angosto) y suma **Numbers › In a row** (los cinco números a 880px, alineados); Specs › Shared rules
+  suma el bento (columna derecha del alto de la izquierda, 15 filas por página, mínimo 780px) y la fila de números.
+- `Stat` suma `enFila`: en una fila de cards usa `grid-rows-subgrid` y tres filas, así etiqueta, número y bajada quedan
+  alineados entre cards aunque una etiqueta use dos líneas. La etiqueta y la bajada ya no se cortan con "…".
+- `AccionesPaciente` reemplaza a `EncabezadoBilling`: los botones del paciente con `ui/button` md, en el `top` del Panel
+  de la actividad. *Components / Dashboard / Panel and StatusPill* actualiza la descripción de `top`.
+- Decisiones en `figma/modulos/billing.md` (2026-10-13).
+
+## Patient Overview en dos columnas (2026-10-17)
+- Página nueva *Pages / Parts / Patient Overview* (Playground, Parts, States, Specs). `PatientDetail` acepta `turnos`
+  (sólo para el Storybook) y exporta `TOPE`. `PendingDocuments` tiene la historia *Narrow column*.
+- Regla: una fila con nombre + vencimiento + botón le reserva 14rem al nombre y deja que el resto baje a otro renglón.
+  Decisiones en `figma/modulos/patient-dashboard.md`.
+
+
+## Navigation: Billing sin menú (2026-10-13)
+
+- *Elements / Navigation*: Billing es un ítem más del rail (link directo, tooltip colapsado); Fee Schedules, Carriers y
+  Coverage Table están sólo en el menú de Settings. *States* cambia *Billing menu* por *Billing* y suma *Settings menu ·
+  Billing tables* (Settings en azul y Billing desplegado en `/settings/finance/carriers`). Sin `BillingItem` ni
+  `billingMenu`. Ver `figma/modulos/header-sidebar.md`.
+
+## Breadcrumb: dónde va, y el del paciente (2026-10-13)
+
+- **Elements / Breadcrumb** reemplaza a *Components / UI / Breadcrumb* (que eran dos historias sueltas): Playground,
+  Parts, States (hover, foco, Overview, rastro largo en angosto, pantalla de primer nivel) y Specs con la tabla *Where
+  it goes*. Regla: las pantallas de primer nivel (menú lateral o de la cuenta) no llevan rastro; las que se abren desde
+  otra, sí, armado desde la ruta (layout de Settings o `PatientBreadcrumb`), nunca a mano. El link suma foco azul y el
+  último tramo `aria-current="page"`.
+- **Components / Patients / PatientBreadcrumb**: `Patients › paciente › sección` en las siete pantallas del paciente.
+- **Elements / Patient menu → States → Next to the screen**: el menú baja hasta el final de la pantalla (expandido y
+  colapsado). *Page header → Headers in the app* reconoce `PatientBreadcrumb`. Ver `figma/modulos/patient-dashboard.md`.
+
+## Breadcrumb con "/" (2026-10-17)
+
+- `Breadcrumb` separa los tramos con "/" (`ink-faint`, `aria-hidden`, 6px de aire) en lugar del chevron. *Elements /
+  Breadcrumb → Parts* y *Specs* lo muestran; cambia en todos los rastros (Settings y paciente). Ver
+  `figma/modulos/patient-dashboard.md`.
+
+## List group: cada fila en su card (2026-10-13)
+
+- `ListGroup` deja la caja con divisores: cada fila va en su `TARJETA_INTERNA` con 12px entre cards, como las salas y los
+  turnos del paciente (Julián: "debe ser estilo card", por continuidad). Las filas de `DashboardRows` pasan a 10px de
+  margen interno parejo. *Elements / List group*, *Elements / Show more* y *Components / Dashboard / Dashboard rows*
+  muestran las cards. Ver `figma/modulos/dashboard.md`.
+
+
+## Dashboard reorganizado: tira de salas, Button success y saludo (2026-10-13)
+
+- **Button `success`** (*Elements / Buttons*): verde `dash-ok-fg`, hover `green-deep`, foco del mismo verde. Para lo que
+  arranca o llega (Check In del turno). En los turnos, el color dice la acción (`ACCION_TURNO`): Check In `success`,
+  Check Out `primary`, Cancel `destructive`.
+- **Components / Dashboard / Operatory strip** (nuevo, `OperatoryStrip`): las salas en una fila arriba del Dashboard,
+  tantas como entran de 232px; el resto en "Show N more". `OperatoryCard` suma `enPagina` (card de página, sin borde) y
+  su página pasa a Playground, Parts, States y Specs.
+- **Components / Layout / Greeting** (nuevo, `Saludo`): el saludo del Topbar que se escribe y deja la fecha del día;
+  una vez por sesión y sin animación con reducir movimiento.
+- *Pages / Parts / Dashboard*: la fila de fecha suma el link a las preguntas frecuentes y pierde la línea de alcance.
+- `ShowMore`: sin degradé cuando la lista abierta no scrollea. Las filas de turno pasan a columnas desde 896px.
+  Ver `figma/modulos/dashboard.md`.
+
+## OperatoryCard: color por estado y selección (2026-10-17)
+
+- Sobre la página (`enPagina`), la card de sala toma el color de su estado: borde de 1px y fondo con los tokens de su
+  pill (`OPERATORY_SURFACES`). Con `onClick` es un botón (`aria-pressed`): `seleccionada` lleva el anillo `dash-ring`
+  (2px a 2px) y `atenuada` la baja al 60% hasta el hover o el foco. `OperatoryStrip` suma `elegida` y `onElegir`.
+- *Components / Dashboard / OperatoryCard* y *Operatory strip* muestran colores, elegida, apagada, hover y foco.
+  Ver `figma/modulos/dashboard.md`.
+
+## Lista de detalle y detalle del procedimiento (2026-10-13)
+
+- *Components / UI / DetailList* (nuevo, `ui/detail-list.tsx`): la lista que se despliega debajo de una fila de tabla
+  (`ListaDetalle`, `FilaDetalle`, `Entrada`, `EnlaceRegistro`, `MasItems`, `Vacio`, `NotaDetalle`, `VerRegistroCompleto`).
+  Salen de `RecordDetail`. Playground, Parts, States, More open y Specs.
+- *Components / Clinical / RecordDetail*: el orden nuevo de las filas y lo del cobro del procedimiento (Clinic location,
+  Financial details, Applied transactions: `ContenidoSede`, `ContenidoFinanzas`, `Metrica`, `ContenidoAplicadas`). States
+  suma *Charged and partly paid* y *Paid by insurance*; Parts, Contents y Specs, las piezas nuevas. Decisiones en
+  `figma/modulos/clinical-mode.md` (2026-10-13).
+
+## El detalle de la Problem List en los exámenes y en Treatment Plan (2026-10-13)
+
+- *Components / Clinical / Dental / FindingActionsMenu*: rehecha con Playground, Parts, States y Specs; suma *View full
+  record* (`onVer`), primero junto a Edit. *Components / Clinical / ExamLayout* suma *Finding record open* y Specs →
+  *Finding record*.
+- *Components / Clinical / TreatmentPlanSection table* (nueva): `TablaProcedimientos` con el detalle de fila
+  (`detalle`, `abiertas`, `onAlternar`): chevron, clic en la fila, Collapse all / Expand all, Procedure cortado con
+  tooltip. Playground, Parts, States, *Linked finding open* y Specs. Las stories sueltas de la tabla salen de
+  *TreatmentPlanSection parts*; *TreatmentPlanSection* suma *Row open*.
+- *Components / Clinical / RecordDetail*: `registroDePlan`, `registroDeHallazgo` y `useVerRegistro` en Parts; States suma
+  *From Treatment Plan* y *Unassigned procedure*; *Full record · exam finding* nueva. Decisiones en
+  `figma/modulos/clinical-mode.md` (2026-10-13).
+
+## Pills de una sola forma y el cobro en Ledger y Billing (2026-10-14)
+
+- **Pills:** una por dato, en minúscula inicial como en toda la app; las de Clinical Mode que iban en mayúsculas
+  (Problem List, rail y card de Treatment Plan, detalle) se alinean. *Components / Clinical / RecordDetail → Specs →
+  Rules* lo dice.
+- *Components / Ledger / LedgerRowDetail* rehecha con Playground, Parts, States, *Related record* y Specs: el detalle de
+  la fila según el tipo (Procedure, Charge Adjustment, Patient Payment, Credit Adjustment; Insurance Payment con los
+  datos de siempre), con los datos del prototipo de Julián (`FilasTransaccion`, `TratamientoDelCargo`, `MetodosDePago`,
+  `Motivo`, `Metrica`, `DetalleMovimiento`). *Pages / Parts / Billing* suma *Row detail* en Parts y dos filas abiertas en
+  States.
+- *Components / Clinical / RecordDetail*: sin lo del cobro (sale `ContenidoSede`, `ContenidoFinanzas`,
+  `ContenidoAplicadas`, `Metrica` y `cargoDe`). Decisiones en `figma/modulos/ledger.md`, `billing.md` y
+  `clinical-mode.md` (2026-10-14).

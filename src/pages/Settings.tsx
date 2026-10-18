@@ -90,7 +90,8 @@ function migasDe(pathname: string, nombreFinanzas: (seccion: string, id: string)
     const cuenta = CUENTAS.find((c) => c.id === detalleCuenta[1])
     migas.push({ label: cuenta?.nombre ?? detalleCuenta[1] })
   }
-  return migas
+  /* Sin tramo propio (Profile, /settings/account, se abre desde el menú de la cuenta) es de primer nivel: sin rastro. */
+  return migas.length > 1 ? migas : []
 }
 
 export function SettingsLayout() {

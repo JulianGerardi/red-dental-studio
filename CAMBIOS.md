@@ -3,7 +3,99 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-18
+
+### Dashboard: Pending Task como tercera columna ([#40](https://github.com/JulianGerardi/red-dental-studio/pull/40))
+- Appointments, Waiting Room y Pending Task se reparten el ancho desde 1280px. Entre 1024 y 1280, Pending Task queda
+  abajo, a lo ancho; más angosto, una columna. Sin componentes nuevos: sólo la grilla de `pages/Dashboard.tsx`
+  (`xl:grid-cols-3`; el panel lleva `lg:col-span-2 xl:col-span-1`).
+
+## 2026-10-17
+
+### Patient Overview: Pending Task y Pending documents a la izquierda, Appointments en su columna ([#42](https://github.com/JulianGerardi/red-dental-studio/pull/42))
+- El Overview del paciente pasa a dos columnas desde 1024px: a la izquierda Pending Task y debajo Pending documents; a
+  la derecha Appointments (280px) del alto de las dos, con 7 turnos a la vista. Abajo de 1024px, una columna. Mismo
+  contenido, otro orden.
+- En una columna angosta, la fila de Pending documents baja el vencimiento y el botón a un segundo renglón en vez de
+  aplastar el nombre.
+- **Para el dev:** `PatientDetail.tsx` (grilla `lg:grid-cols-[minmax(0,1fr)_280px]`, `TOPE.turnosColumna` con `useMedia`);
+  `PendingDocuments.tsx` (`basis-56` + `ml-auto`). Storybook: *Pages / Parts / Patient Overview* y *PendingDocuments →
+  Narrow column*. Nuevo e2e `tests/patient-overview.e2e.ts`.
+
+### Detalle del registro en Clinical Mode y Treatment Plan; detalle por tipo en Ledger y Billing ([#30](https://github.com/JulianGerardi/red-dental-studio/pull/30))
+- **Clinical Mode:** el detalle de Procedures y Problem List ordena sus filas por importancia (Treatment, Procedure consent, Findings, Referral, Lab order; en un problema, Procedures, Treatment, Referral, Lab order, Source exam). *View full record* también sale del menú de cada finding de los exámenes y las filas de Treatment Plan se despliegan con el mismo detalle. Las pills van de a una por dato, chicas y con minúscula inicial.
+- **Ledger y Billing:** la fila se despliega según su tipo (Procedure, Charge Adjustment, Patient Payment, Credit Adjustment) con Location, Financial details y las transacciones aplicadas; Billing lo muestra con un paciente elegido. Lo del cobro vive sólo ahí, no en Clinical Mode. Insurance Payment sigue con los datos de siempre.
+- **Para el dev:** `ui/detail-list` (`ListaDetalle`, `FilaDetalle`…), `LedgerRowDetail` / `DetalleMovimiento` (lo usa Billing), `RecordDetail` con `registroDePlan`, `registroDeHallazgo` y `useVerRegistro`; Clinical Mode acepta `?case=` y `?procedure=`. Datos: `APLICACIONES` en `data/ledger.ts` y `APLICACIONES_BILLING` en `data/billing.ts`. Storybook: *Components / UI / DetailList*, *Ledger / LedgerRowDetail*, *Clinical / RecordDetail*, *Pages / Parts / Billing*.
+
+### Dashboard: filas en cards, salas arriba con color y filtro, colores por acción y saludo animado ([#31](https://github.com/JulianGerardi/red-dental-studio/pull/31))
+- **Filas en cards:** las de Appointments, Waiting Room y Pending Task (también el Pending Task del Patient Dashboard)
+  van cada una en su card interna, con 12px entre una y otra.
+- **Salas en una tira arriba** que llena el ancho (mínimo 232px por card; las que no entran, a "Show N more"), con el
+  **color de su estado** (borde y fondo de su pill). **Tocar una sala filtra la Waiting Room**: la elegida lleva el
+  anillo azul, las demás se apagan y el filtro va como chip junto al título. Las salas se llaman "Operatory 1…6", como
+  en los turnos.
+- **Appointments y Waiting Room a la par**, a todo el ancho desde 1024px. **Un color por acción:** Check In verde,
+  Check Out azul, Cancel rojo. Link a **preguntas frecuentes** (Help) al lado de Today. Salen la fecha de arriba del
+  título y la línea de alcance de la fecha.
+- **Topbar:** "Hi! Dentist Sarah" se escribe y deja la fecha del día con un calendario, una vez por sesión.
+- **Para el dev:** `Button` suma la variante `success`. `ACCION_TURNO` (`AppointmentCard`) mapea acción → variante y
+  `AccionTurno` suma `'Check In'`. Nuevos: `dashboard/OperatoryStrip` (`elegida`, `onElegir`) y `layout/Saludo` (usa
+  `sessionStorage` `saludo-visto`). `OperatoryCard` suma `enPagina` con `OPERATORY_SURFACES`, `seleccionada`,
+  `atenuada` y `onClick` (botón con `aria-pressed`). `ListGroup` pone cada hijo en un `<li>` con `TARJETA_INTERNA`;
+  `ShowMore` no lleva degradé si la lista abierta no scrollea; `AppointmentRow` pasa a columnas desde `@4xl`. Storybook:
+  nuevas *Components / Dashboard / Operatory strip* y *Components / Layout / Greeting*. e2e en `tests/dashboard.e2e.ts`.
+
+### Patient Dashboard sin huecos y breadcrumbs del paciente ([#37](https://github.com/JulianGerardi/red-dental-studio/pull/37))
+- El menú del paciente baja hasta el final de la pantalla y Pending Task y Appointments terminan a la misma altura: el
+  Overview cierra parejo, sin espacios grises.
+- Las siete pantallas del paciente llevan **Patients / John Smith / sección** en lugar del "‹ Patients" (el Overview
+  termina en el paciente; Edit Patient también lo tiene). Las de primer nivel (Patients, Billing, Dashboard, Settings,
+  Profile…) no llevan; Profile mostraba un "Settings" suelto y ya no.
+- **Para el dev:** componente nuevo `components/patients/PatientBreadcrumb` (`migasPaciente`), no armar el rastro a
+  mano. `PatientSidePanel` va con `lg:self-stretch` (el contenedor ya no necesita `lg:items-start`). `Breadcrumb` suma
+  foco visible y `aria-current`. Storybook: *Elements / Breadcrumb* (reemplaza a *Components / UI / Breadcrumb*) y
+  *Components / Patients / PatientBreadcrumb*. e2e nuevo: `tests/patient-dashboard.e2e.ts`.
+- Todos los breadcrumbs (también los de Settings) separan los tramos con **"/"** en lugar de la flecha.
+
 ## 2026-10-13
+
+### Billing en el menú lateral, sin menú: sus tablas, sólo en Settings ([#36](https://github.com/JulianGerardi/red-dental-studio/pull/36))
+- El ítem **Billing** del menú lateral va directo a su pantalla, sin menú flotante. **Fee Schedules, Carriers y Coverage
+  Table** quedan sólo en Settings → Billing; ahí el ítem marcado es Settings.
+- **Para el dev:** se borran `BillingItem` y `billingMenu` (`NavigationPreview`); Billing es un ítem más de `NAV` y
+  `SettingsItem` queda activo en todo `/settings/*`. En *Elements / Navigation → States*: *Billing* y *Settings menu ·
+  Billing tables*.
+
+### Billing: bento con Find Patient arriba, la tabla hasta abajo y los botones del paciente dentro del panel ([#33](https://github.com/JulianGerardi/red-dental-studio/pull/33))
+- Bento: izquierda los números y Recent Billing Activity; derecha Find Patient (a la altura de los números) y Today.
+  Las dos columnas terminan juntas: la tabla muestra 15 filas por página y Find Patient scrollea adentro.
+- Con un paciente, los botones de pago van arriba del título de su actividad y el bento guarda el alto del resumen.
+- **Para el dev:** `Stat enFila` alinea etiqueta, número y bajada entre cards con subgrid. `AccionesPaciente` (con
+  `ui/button` md, en el `top` del Panel) reemplaza a `EncabezadoBilling`. La columna derecha va absoluta desde `lg`
+  y toma el alto de la izquierda (`--billing-alto` con paciente). Tres pacientes más en `data/billing.ts`.
+
+### Notifications sin Pending ni Archived, el ojo y el banner de punta a punta ([#34](https://github.com/JulianGerardi/red-dental-studio/pull/34))
+- Notifications queda con dos estados (sin leer y leída) y dos pestañas (*Inbox* y *Unread*): se van Pending, Archived,
+  archivar y el menú ⋮ (sólo tenía acciones de archivar). La acción de la fila es un ojo: *Mark as read* / *Mark as
+  unread*. El banner amarillo va de punta a punta del contenido en toda la app, con la X sola a la derecha.
+- **Para el dev:** `EstadoNotificacion` es `'unread' | 'read'` y `Notificacion` ya no tiene `archivada`; el store pierde
+  `archivar`. `delBanner` = tareas sin leer no ocultas. `NotificationBanner` pasa a `w-full` con la X en `ml-auto`. Las
+  tareas pendientes de ejemplo quedan sin leer (Unread 8) y las archivadas se sacan.
+
+### Confibot vuelve a flotar abajo a la derecha ([#35](https://github.com/JulianGerardi/red-dental-studio/pull/35))
+- Vuelve el botón flotante de Confibot (el de antes de pasar al menú): se estira a "Confibot" con el mouse o el foco, se
+  recoge con la flechita en una pestaña al pie y eso se recuerda entre visitas. En Scheduling se apila arriba de
+  Appointment requests; no se dibuja con el chat o un CoachMark abiertos. El ítem del menú lateral se queda.
+- **Para el dev:** `ConfibotLanzador` y `useConfibotRecogido()` en `help/Confibot.tsx`, montados por `AppShell`, que
+  vuelve a reservar su alto al pie del `main` (`pb-24 sm:pb-28`). Una pantalla con su propio botón flotante abajo a la
+  derecha llama a `useFabDePagina()` (`help/HelpProvider.tsx`) y Confibot se apila arriba. Token nuevo
+  `dash-blue-glow`. Storybook: *Components / Help / Confibot*.
+
+### Menú lateral en blanco ([#38](https://github.com/JulianGerardi/red-dental-studio/pull/38))
+- El fondo del menú lateral pasa de gris (`#fafafa`) a **blanco**, en escritorio y en el panel del celular. El bloque del
+  logo sigue azul; hover, ítem activo y menús flotantes no cambian.
+- **Para el dev:** el `aside` de `Sidebar.tsx` usa `bg-white` en lugar de `bg-surface-subtle` (el token sigue en uso en
+  otros lados). En *Elements / Navigation → Specs → Colors*.
 
 ### Edit Carrier: las dos casillas en la misma fila ([#32](https://github.com/JulianGerardi/red-dental-studio/pull/32))
 - En Edit Carrier › *Information*, *Do not include Dental Diagnostic Codes* y *Do not bill Insurance* van lado a lado, cada

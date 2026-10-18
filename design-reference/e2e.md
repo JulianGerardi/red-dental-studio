@@ -33,11 +33,35 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 - `tests/notifications.e2e.ts` (2026-10-12): el atajo *Last 7 days* acota la lista y la ✕ vuelve a *All dates*; dos
   clics en el calendario arman un rango y, en Unread sin nada en esas fechas, el vacío ofrece *Clear dates*. Las
   fechas se calculan desde hoy, como los datos.
+  Desde el 2026-10-13 también: sólo hay *Inbox* y *Unread*, y el ojo de una fila la marca leída o sin leer (Unread de
+  8 a 7 y de vuelta).
 
 - `tests/dashboard.e2e.ts` (2026-10-12): el selector de fecha se lee "Feb 28, 2026"; elegir un día cierra el calendario
   y lo cambia; Today vuelve a hoy y se va.
   Con `?day=busy` (35 turnos) se ven cinco; *Show 30 more* abre el resto en una región con scroll y *Show less* la
   cierra (`ui/show-more`).
+  (2026-10-13) La tira de salas de arriba abre el resto con *Show N more* (el número depende del ancho); *Check In*
+  avisa "checked in" y el escudo de al lado de Today lleva a Help.
+  (2026-10-17) Tocar una sala filtra la sala de espera (Operatory 1 queda vacía, Operatory 2 trae a los suyos) y la ✕
+  del chip junto al título vuelve a mostrar a todos.
+- `tests/clinical-mode.e2e.ts` (2026-10-13): en DentAssmt, *View full record* del menú del finding Tooth 3 abre su
+  registro (Source exam) y el link a D2391 cambia el drawer a ese procedimiento.
+- `tests/ledger.e2e.ts` (2026-10-14): el detalle de D4341 muestra su caso, Northgate Clinic y Outstanding transaction
+  balance $170; con la búsqueda puesta, el link del pago abre su registro. El de un pago muestra Scope, Payment methods,
+  a qué cargos fue y Apply credit. View procedure abre Procedures en Clinical Mode con la fila abierta.
+  `tests/billing.e2e.ts` suma: con Maria Abril Viola, la fila del pago dice cómo se pagó y a qué cargo fue, y el link
+  abre su registro.
+- `tests/treatment-plan.e2e.ts` (2026-10-13): una fila de Unassigned se despliega (No treatment linked, Collapse all), y
+  la fila D2391 de Restorative Plan muestra Procedure consent; su hallazgo se abre en el drawer sin salir de Treatment
+  Plan.
+
+- `tests/confibot.e2e.ts` (2026-10-13): el botón flotante abre el chat y se esconde mientras está abierto; la flechita
+  lo recoge en una pestaña que sigue ahí al cambiar de pantalla y lo trae de vuelta. En Scheduling queda centrado
+  arriba del botón de Appointment requests, sin tocarlo.
+
+- `tests/patient-dashboard.e2e.ts` (2026-10-13): en Ledger el rastro es Patients › John Smith › Ledger (el último sin
+  link); John Smith vuelve al Overview, donde termina el rastro, y Patients a la lista, que no lleva. Billing tampoco.
+  Edit Patient cuelga del paciente.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 

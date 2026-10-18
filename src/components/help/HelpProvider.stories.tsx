@@ -21,7 +21,7 @@ const meta = {
   component: HelpProvider,
   parameters: {
     layout: 'padded',
-    docs: { description: { component: 'Contexto de Help: `useHelp()` da `showOnScreen(topicId)` y el estado del Confibot. Vive en la raíz de la app.' } },
+    docs: { description: { component: 'Contexto de Help: `useHelp()` da `showOnScreen(topicId)` y el estado del Confibot (abierto, y si hay una explicación en pantalla). Una pantalla con su propio botón flotante abajo a la derecha llama a `useFabDePagina()` para que Confibot se apile arriba. Vive en la raíz de la app.' } },
   },
   args: { children: null },
 } satisfies Meta<typeof HelpProvider>

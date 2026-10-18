@@ -37,8 +37,8 @@ export function ConTooltip({
 }
 
 /* Figma 3605:56447 "Sidebar Rail (Collapsed Icons)".
-   Rail 58px sobre #fafafa, bloque de logo 64px en #1a4da9 (un azul más
-   oscuro que el primario #1d56bc, que es el del ítem activo).
+   Rail 58px en blanco (el Figma lo trae en #fafafa; cambio de Julián, header-sidebar.md),
+   bloque de logo 64px en #1a4da9 (un azul más oscuro que el primario #1d56bc, que es el del ítem activo).
    Los ítems van 32×32 con pitch de 50px → gap de 18. */
 const NAV: NavItem[] = [
   { to: '/', label: 'Dashboard', icon: House, end: true },
@@ -95,7 +95,7 @@ export function Sidebar({
         className={cn(
           /* El scroll va sólo en mobile: en desktop un overflow acá recorta el
              menú flotante de Settings, que se sale del ancho del rail. */
-          'flex h-svh flex-col bg-surface-subtle transition-[width,transform] duration-200',
+          'flex h-svh flex-col bg-white transition-[width,transform] duration-200',
           'max-md:overflow-y-auto md:overflow-visible',
           /* Mobile: panel fijo que entra desde la izquierda. Sigue en 234: tapa el contenido en vez de correrlo. */
           'fixed top-0 left-0 z-50 w-[234px]',
@@ -132,9 +132,7 @@ export function Sidebar({
           expanded ? '' : 'md:items-center md:gap-[18px]',
         )}
       >
-        {NAV.map(({ to, label, icon: Icon, end }) => to === '/billing' ? (
-          <BillingItem key={to} clase={item} mostrarLabel={expanded} forzarAbierto={vista.billingMenu} />
-        ) : (
+        {NAV.map(({ to, label, icon: Icon, end }) => (
           <ConTooltip key={to} label={label} mostrar={!expanded} abierto={vista.tooltip === label}>
             <NavLink to={to} end={end} aria-label={label} className={item(activa(to, end))}>
               <Icon className="size-4 shrink-0" />
@@ -142,9 +140,8 @@ export function Sidebar({
             </NavLink>
           </ConTooltip>
         ))}
-        {/* No es una ruta: abre la hoja de chat de Confibot, que antes vivía
-            flotando solo sobre la pantalla y tapaba otros botones flotantes
-            -el de Appointment requests en Scheduling, por ejemplo-. */}
+        {/* No es una ruta: abre la misma hoja de chat que el botón flotante de
+            Confibot, y es el camino que queda cuando ese botón está recogido. */}
         <ConTooltip label="Confibot" mostrar={!expanded}>
           <button
             type="button"
@@ -192,67 +189,6 @@ function useFlotante(forzarAbierto?: boolean) {
 
 const PANEL_FLOTANTE = 'motion-safe:animate-[loc-in_120ms_ease-out] z-50 rounded-2xl border border-line bg-white p-2 max-md:mt-2 max-md:max-h-[45svh] max-md:overflow-y-auto md:absolute md:left-full md:ml-2 md:w-[236px] md:shadow-floating'
 
-/* Billing, como Settings: el ícono abre al costado un menú con la pantalla de Billing y las tablas que la alimentan
-   (Fee Schedules, Carriers, Coverage Tables, las mismas de Settings → Billing). */
-const BILLING_MENU = [
-  { to: '/billing', label: 'Billing' },
-  ...(SETTINGS_NAV.find((s) => s.to === '/settings/finance')?.children ?? []),
-]
-
-export function BillingItem({
-  clase,
-  mostrarLabel,
-  forzarAbierto,
-}: {
-  clase: (active: boolean) => string
-  mostrarLabel: boolean
-  forzarAbierto?: boolean
-}) {
-  const { abierto, setAbierto, abrir, cerrarConDelay, pathname } = useFlotante(forzarAbierto)
-  const activo = pathname.startsWith('/billing') || pathname.startsWith('/settings/finance')
-
-  return (
-    <div className={cn('relative', mostrarLabel && 'w-full')} onMouseEnter={abrir} onMouseLeave={cerrarConDelay}>
-      <div className={cn(clase(activo), mostrarLabel && 'md:mx-3')} data-tour="billing-menu">
-        <NavLink to="/billing" aria-label="Billing" className={cn('flex min-w-0 flex-1 items-center gap-3', !mostrarLabel && 'md:justify-center')}>
-          <CreditCard className="size-4 shrink-0" />
-          <span className={cn(mostrarLabel ? '' : 'md:hidden')}>Billing</span>
-        </NavLink>
-        <button
-          type="button"
-          aria-label="Billing menu"
-          aria-expanded={abierto}
-          onClick={() => setAbierto((v) => !v)}
-          className={cn('shrink-0 opacity-60 hover:opacity-100', mostrarLabel ? '' : 'md:hidden')}
-        >
-          <ChevronRight className="size-4" />
-        </button>
-      </div>
-
-      {abierto && (
-        /* Anclado arriba: el ítem está en la parte alta del rail. */
-        <div className={cn(PANEL_FLOTANTE, 'md:top-0')} onMouseEnter={abrir} onMouseLeave={cerrarConDelay}>
-          {BILLING_MENU.map((m) => (
-            <NavLink
-              key={m.to}
-              to={m.to}
-              end
-              className={({ isActive }) =>
-                cn(
-                  'block rounded-lg px-3 py-2 text-sm transition-colors',
-                  isActive ? 'bg-dash-count-bg text-dash-blue-hover font-medium' : 'text-ink hover:bg-surface-muted',
-                )
-              }
-            >
-              {m.label}
-            </NavLink>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
 /* Settings ya no abre un sidebar propio adentro de la sección: sus pantallas
    cuelgan de un menú flotante que sale al costado del ítem, como en el
    ejemplo que pasó Julián. Se abre con hover en escritorio y con clic en el
@@ -270,8 +206,8 @@ export function SettingsItem({
   /* Billing es el único con sub-items: se despliega con su chevron en vez de
      mostrarlos siempre. */
   const [grupo, setGrupo] = useState<string | null>(null)
-  /* Las tablas de Billing se marcan en el ítem de Billing del rail, no acá. */
-  const activo = pathname.startsWith('/settings') && !pathname.startsWith('/settings/finance')
+  /* Fee Schedules, Carriers y Coverage Table viven sólo acá, no en el ítem de Billing (header-sidebar.md, 2026-10-13). */
+  const activo = pathname.startsWith('/settings')
 
   useEffect(() => {
     const dentro = SETTINGS_NAV.find((s) => s.children && pathname.startsWith(s.to))

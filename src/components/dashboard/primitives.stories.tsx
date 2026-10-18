@@ -26,7 +26,7 @@ const meta = {
         component: [
           'El **panel** (`Panel` de `@/components/dashboard/primitives`) es la card de página con título: Appointments, Waiting Room, Rooms y Pending Task del Dashboard, Today Appointments de Patients y Recent Billing Activity, Find Patient y Today de Billing. Adentro van `InnerCard`, una tabla o un estado vacío.',
           '',
-          '**Partes:** franja de arriba opcional (`top`, de borde a borde: el paciente elegido en Find Patient de Billing), encabezado (título de 15px Bold, **sin ícono**, y a la derecha sus controles: un filtro, Tabs o *View all*) y cuerpo con 16px de aire y 12px entre piezas.',
+          '**Partes:** franja de arriba opcional (`top`: en Billing, el paciente elegido de borde a borde en Find Patient y los botones del paciente en Recent Billing Activity), encabezado (título de 15px Bold, **sin ícono**, y a la derecha sus controles: un filtro, Tabs o *View all*) y cuerpo con 16px de aire y 12px entre piezas.',
           '',
           '**El encabezado mide 52px** aunque los controles sean unas Tabs de 36px; si no entran al lado del título (en el celular), bajan a una segunda línea y el encabezado crece.',
           '',

@@ -5,6 +5,7 @@ import {
   CircleUserRound, CreditCard, CircleHelp, Info, LogOut, EyeOff, ArrowRight, CheckCheck,
 } from 'lucide-react'
 import { LocationSelector } from './LocationSelector'
+import { Saludo } from './Saludo'
 import { haceCuanto, type Notificacion } from '@/data/notificaciones'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -75,9 +76,8 @@ export function Topbar({
           <ToggleIcon className="size-[18px] transition-transform duration-200" />
         </button>
 
-        <p className="hidden items-center gap-1.5 text-[19px] whitespace-nowrap text-black lg:flex">
-          <span aria-hidden>👋</span> Hi! Dentist Sarah
-        </p>
+        {/* Se escribe el saludo y después la fecha del día (Saludo, 2026-10-13). */}
+        <Saludo className="hidden lg:flex" />
       </div>
 
       <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-4 xl:gap-6">
@@ -158,7 +158,7 @@ export function MenuCuenta() {
 
 /* La campana: las últimas notificaciones, con la lógica del Inbox de Notion. El número son las que no se leyeron;
    abrir una la marca leída y lleva a donde pasó. Todas están en Notifications ("View all notifications"), donde se
-   marcan como leídas, pendientes o sin leer y se archivan. Nada se borra desde acá. Ver
+   marcan como leídas o sin leer. Nada se borra desde acá. Ver
    design-reference/figma/modulos/notifications.md. */
 const EN_CAMPANA = 5
 
@@ -211,17 +211,16 @@ export function Campana({
               <DropdownMenuItem
                 key={n.id}
                 onSelect={() => { onAbrir?.(n.id); onVolverAlBanner?.(n.id); navigate(n.to) }}
-                className={cn('items-start gap-2.5 py-2.5 pl-1.5', n.estado === 'pending' && 'bg-warn-bg')}
+                className="items-start gap-2.5 py-2.5 pl-1.5"
               >
-                <span aria-hidden className={cn('mt-[7px] size-1.5 shrink-0 rounded-full', n.estado === 'unread' ? 'bg-dash-blue' : n.estado === 'pending' ? 'bg-amber' : 'bg-transparent')} />
-                <n.icon className={cn('mt-0.5 size-4 shrink-0', n.estado === 'pending' ? 'text-attn-fg' : 'text-ink-muted')} />
+                <span aria-hidden className={cn('mt-[7px] size-1.5 shrink-0 rounded-full', n.estado === 'unread' ? 'bg-dash-blue' : 'bg-transparent')} />
+                <n.icon className="mt-0.5 size-4 shrink-0 text-ink-muted" />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-baseline justify-between gap-2">
                     <span className={cn('truncate text-[13px] text-ink', n.estado === 'read' ? 'font-medium' : 'font-semibold')}>{n.titulo}</span>
                     <span className="shrink-0 text-[11px] text-ink-faint">{haceCuanto(n.hace)}</span>
                   </span>
                   <span className="block text-[12px] leading-snug text-ink-muted">{n.detalle}</span>
-                  {n.estado === 'pending' && <span className="sr-only">(pending)</span>}
                   {ocultas.includes(n.id) && (
                     <span className="mt-1 flex items-center gap-1 text-[11px] font-medium text-ink-faint">
                       <EyeOff className="size-3" /> Hidden from banner

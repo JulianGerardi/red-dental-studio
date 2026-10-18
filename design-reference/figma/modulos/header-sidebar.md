@@ -14,6 +14,8 @@ con dropdown abierto `3605:56446`.
 **pitch de 50px** · icono 16px · **9 ítems**, incluido `CircleHelp` que faltaba ·
 Settings al pie. Se hizo `sticky` porque con la página larga quedaba en y=1390.
 
+> Actualizado el 2026-10-13: el rail pasa a **blanco** a pedido de Julián (ver *Menú en blanco*, al final).
+
 **Settings no cambia de lugar al colapsar (pedido de Julián).** Va al pie del
 rail en los dos estados, con el ícono a la misma altura: el ítem colapsado mide
 32 y el expandido 36, así que colapsado lleva 2px más de padding abajo. (Se
@@ -153,6 +155,8 @@ Treatments, sigue en 60px.
 
 ## Billing abre su menú flotante (2026-10-06)
 
+> Reemplazado el 2026-10-13: Billing vuelve a ser un link directo (ver *Billing sin menú* más abajo).
+
 Como Settings: al pasar el mouse por Billing (o con su flecha, expandido o en el celular) se abre al costado un menú
 con **Billing**, **Fee Schedules**, **Carriers** y **Coverage Table** (las tablas de Settings → Billing). Billing queda
 activo en `/billing` y en esas tres; Settings deja de marcarse ahí. `BillingItem` en `Sidebar.tsx`, con la lógica de
@@ -181,3 +185,47 @@ Parts, States y Specs. Specs lee del rail dibujado: 176 y 58 de ancho, logo de 6
 padding, colapsado 32×32. No lleva estado de foco: los ítems no tienen anillo propio (usan el del navegador) y el addon
 de pseudo-estados sólo fuerza reglas de CSS, así que la muestra salía igual al default.
 
+## Menú en blanco (2026-10-13)
+
+Pedido de Julián: "cambiar el color del menú a blanco". El fondo del rail pasa de `#fafafa` (`surface-subtle`, el del
+Figma) a **blanco**, en escritorio (58 y 176) y en el panel del celular. Es un desvío consciente del Figma.
+
+- **El bloque del logo sigue azul** (`dash-blue-hover`): es la marca y se alinea con el alto del header; el pedido es
+  por el fondo del menú, no por la marca.
+- **Sin borde nuevo.** Header y rail quedan blancos los dos y arman una "L" alrededor del contenido sobre
+  `page-background` (`#FAFBFE`), igual que el header, que tampoco lleva línea. Agregar una línea sería algo nuevo.
+- Hover (`black/5`), ítem activo, tooltip y menús flotantes no cambian; el texto `dash-muted` sobre blanco gana un poco
+  de contraste.
+- La interfaz de Storybook sigue con su riel en `#fafafa` (`.storybook/theme.ts`): es el menú del sitio de
+  documentación, no el de la app.
+
+Verificado con Playwright en `/`, `/scheduling` y `/patients` a 1440, 820 y 390px: el `aside` da `rgb(255, 255, 255)`
+en todos. Design system: *Elements / Navigation → Specs → Colors* (Rail → `white`).
+
+## El banner de punta a punta (2026-10-13)
+
+Julián, con una captura: el banner amarillo va **de punta a punta del contenido de la página** (alineado con el título
+y con las cards de abajo), no del ancho de su texto como se había elegido el 2026-10-06. Adentro, la tarea, *Review* y
+el paginador siguen juntos a la izquierda y la **X va sola en el extremo derecho** (`ml-auto`). Es el mismo componente
+en todas las pantallas (`NotificationBanner` en `AppShell`), así que cambia en toda la app. Verificado: en
+Notifications y en el Dashboard el banner mide lo mismo que la lista y el título (1334px a 1440).
+
+Desde que Notifications no tiene *Pending* ni *Archived* (`notifications.md`, 2026-10-13), el banner muestra las
+**tareas sin leer** no ocultas con la X.
+
+## Billing sin menú: las tablas viven sólo en Settings (2026-10-13)
+
+Pedido de Julián, con una captura del menú de Billing marcando en amarillo Fee Schedules, Carriers y Coverage Table:
+"no irían, solo queda Billing; eso va solamente en Settings". Son la configuración que alimenta Billing (aranceles,
+aseguradoras y coberturas): se arman una vez y las toca administración, no recepción en el día a día, así que su lugar
+es Settings → Billing, donde ya estaban.
+
+**Sin menú, no un menú de un solo ítem.** Con sólo "Billing" el flotante repetía el destino del propio ícono: un paso
+y una flecha de más para llegar al mismo lugar. Billing pasa a ser un ítem como Patients o Scheduling: link directo,
+con tooltip cuando el rail está colapsado. Se borran `BillingItem` y `billingMenu` (`navigation-preview.ts`).
+
+**El azul sigue a Settings.** En `/settings/finance/*` el ítem activo vuelve a ser Settings (antes se marcaba Billing),
+y su menú abre Billing desplegado con la tabla actual en azul. Billing se marca sólo en `/billing`.
+
+Design system: *Elements / Navigation → States* reemplaza *Billing menu* por *Billing* (link directo) y suma *Settings
+menu · Billing tables*; el Playground ya no ofrece *billing menu* en *open*.

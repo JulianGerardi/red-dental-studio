@@ -12,7 +12,7 @@ export function NotificationBanner({
   items: Notificacion[]
   cursor: number
   onCursor: (i: number) => void
-  /** Saca la tarea del banner; sigue pendiente y sigue en la campana. */
+  /** Saca la tarea del banner; sigue sin leer y sigue en la campana. */
   onOcultar: (id: string) => void
 }) {
   if (items.length === 0) return null
@@ -48,19 +48,20 @@ export function NotificationBanner({
       )}
       <button
         type="button" onClick={() => onOcultar(actual.id)} aria-label={`Hide from banner: ${actual.titulo}`} title="Hide from banner — stays in notifications"
-        className="flex size-6 shrink-0 items-center justify-center rounded-md text-attn-fg/70 hover:bg-white hover:text-attn-fg"
+        className="ml-auto flex size-6 shrink-0 items-center justify-center rounded-md text-attn-fg/70 hover:bg-white hover:text-attn-fg"
       >
         <X className="size-4" />
       </button>
     </>
   )
 
-  /* El aviso ámbar del design system (tono warning de Alert), del ancho de su contenido y alineado con la página: la
-     tarea, Review, el paginador y la X juntos, sin hueco en el medio (Julián eligió esta opción, 2026-10-06). */
+  /* El aviso ámbar del design system (tono warning de Alert), de punta a punta del contenido de la página: la tarea,
+     Review y el paginador juntos a la izquierda y la X sola a la derecha (Julián, 2026-10-13; antes iba del ancho de
+     su contenido). Ver header-sidebar.md. */
   return (
     <div className="bg-page-background">
       <div className={cn(ANCHO_PAGINA, 'px-4 pt-4 sm:px-6')}>
-        <div role="status" className="flex w-fit max-w-full items-center gap-3 rounded-lg border border-warn-fg/25 bg-warn-bg py-2 pr-2 pl-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]">
+        <div role="status" className="flex w-full items-center gap-3 rounded-lg border border-warn-fg/25 bg-warn-bg py-2 pr-2 pl-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]">
           {contenido}
         </div>
       </div>

@@ -40,9 +40,11 @@ const tareas = (porTipo: number, register: string, expiration: string): PendingT
     })),
   )
 
+/* Cada sala con el nombre que dicen los turnos ("Operatory 2"): tocarla filtra la sala de espera por ese nombre. El
+   Figma decía "Operatory name" en todas (dashboard.md, 2026-10-17). */
 const salas = (statuses: Operatory['status'][], pacientes: number): Operatory[] =>
-  statuses.map((status) => ({
-    name: 'Operatory name',
+  statuses.map((status, i) => ({
+    name: `Operatory ${i + 1}`,
     status,
     patientsToday: pacientes,
     provider: 'Daniel Anderson',
@@ -58,7 +60,7 @@ export const DIAS: Record<string, DiaDashboard> = {
   '28-02-2026': {
     appointments: [
       turno('Noah James', 'NJ', 'Dr. Elena Martinez', 'Operatory 2', '10:00'),
-      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:30'),
+      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:30', { accion: 'Check In' }),
       turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '11:00'),
       turno('Mara Otero', 'MO', 'Dr. Salgado', 'Operatory 1', '11:30'),
       turno('Elias Aguirre', 'EA', 'Dr. Salgado', 'Operatory 3', '08:30', { completado: true }),
