@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-18
 
-### Icono de calendario 3D en la fecha del Dashboard
+### Icono de calendario 3D en la fecha del Dashboard ([#43](https://github.com/JulianGerardi/red-dental-studio/pull/43))
 - El campo de fecha ("Feb 28, 2026") y el botón *Today* usan el emoji 📅 / 🗓️ (3D, como la manito del saludo) en lugar
   del icono lineal. La tira de números, los formularios y el Date filter no cambian.
 - **Para el dev:** `emojiFecha` en `ui/date-picker.tsx`; `DatePicker variant="toolbar"` lo usa. Para otro icono 3D, el
