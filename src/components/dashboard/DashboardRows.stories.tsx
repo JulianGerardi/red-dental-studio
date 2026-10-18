@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils'
 /* Los datos del día de la demo, los mismos de las cards. */
 const DIA = DIAS['28-02-2026']!
 const TURNO = DIA.appointments[0]!
-const CHECK_IN = DIA.appointments[1]!
-const CANCEL = DIA.waiting[0]!
+const CHECK_IN = { ...DIA.appointments[1]!, accion: 'Check In' as const }
+const CANCEL = { ...DIA.waiting[0]!, accion: 'Cancel' as const }
 const TAREA = DIA.tasks[0]!
 
 /* Una lista como la de ListGroup: cada fila en su card interna. */
@@ -29,7 +29,7 @@ const meta = {
     docs: {
       description: {
         component: [
-          'Las filas del Dashboard (`@/components/dashboard/DashboardRows`, 2026-10-12): **lo mismo que cada card del Figma, en menos alto**. El turno trae la hora, las iniciales, el nombre, *Check In*, provider y operatorio, los chips **TR** y **CC**, **Check In**, **Check Out** o **Cancel** (cada uno con su color: verde, azul y rojo, 2026-10-13) y el kebab con *Edit appointment*; la tarea trae el tipo, *Requested*, el paciente, el documento, *Expired date*, *Register*, *Expiration date* y **Complete this Task**. No hay datos ni acciones nuevas.',
+          'Las filas del Dashboard (`@/components/dashboard/DashboardRows`, 2026-10-12): **lo mismo que cada card del Figma, en menos alto**. El turno trae la hora, las iniciales, el nombre, *Check In*, provider y operatorio, los chips **TR** y **CC**, **Check In**, **Check Out** o **Cancel** (cada uno con su color: verde, azul y rojo, 2026-10-13; en el Dashboard, Appointments dice siempre Check In y Waiting Room siempre Check Out) y el kebab con *Edit appointment*; la tarea trae el tipo, *Requested*, el paciente, el documento, *Expired date*, *Register*, *Expiration date* y **Complete this Task**. No hay datos ni acciones nuevas.',
           '',
           '**Dónde:** Appointments, Waiting Room y Pending Task del Dashboard, y Pending Task del Patient Dashboard, adentro de *List group*: cada fila en su card interna (línea fina y sombra suave, como las salas), con tope y "Show N more" con scroll.',
           '',

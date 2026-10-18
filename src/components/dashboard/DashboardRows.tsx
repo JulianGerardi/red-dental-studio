@@ -165,12 +165,13 @@ export function TaskRow({ task }: { task: PendingTask }) {
   )
 
   /* Cada parte pegada a la que acompaña, como en la card: el tipo con Requested, el paciente con el documento y
-     Expired date. El aire libre va antes del botón, no entre los datos (Julián, 2026-10-13). */
+     Expired date. El aire libre va antes del botón, no entre los datos (Julián, 2026-10-13). En angosto el documento y
+     Expired date van contra el borde derecho, alineados con el botón azul (2026-10-18). */
   return (
     <div className="@container">
       <div className="flex flex-col gap-2 p-2.5 @5xl:hidden">
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">{tipo}{estado}</div>
-        <div className="flex flex-wrap items-center gap-2">{persona}<DocYVencida /></div>
+        <div className="flex flex-wrap items-center gap-2">{persona}<span className="ml-auto"><DocYVencida /></span></div>
         <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
           {fechas}
           <span className="ml-auto">{boton}</span>
