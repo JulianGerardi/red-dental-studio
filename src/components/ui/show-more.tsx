@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -33,6 +33,12 @@ export function ShowMore({
   const sobran = total - limit
   const conTope = sobran > 0
   const scroll = conTope && abierto
+
+  /* Si todo entra sin scroll (pocas de más), no hay nada abajo que avisar: el degradé no va. */
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (scroll && el) setAlFinal(el.scrollTop + el.clientHeight >= el.scrollHeight - 4)
+  }, [scroll, total])
 
   const alternar = () => {
     if (!abierto) setAltoCerrado(ref.current?.offsetHeight ?? 0)

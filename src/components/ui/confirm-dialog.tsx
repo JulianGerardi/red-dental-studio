@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
@@ -16,9 +16,15 @@ export function ConfirmDialog({
   tone?: 'primary' | 'danger'
   cancelLabel?: string
 }) {
+  /* Radix devuelve el foco a un Trigger que acá no hay: al cerrar vuelve al botón que abrió la pregunta (Save, Delete…). */
+  const previo = useRef<HTMLElement | null>(document.activeElement as HTMLElement | null)
   return (
     <Dialog open onOpenChange={(v) => !v && onCancel()}>
-      <DialogContent showCloseButton={false} className="gap-3 p-5 sm:max-w-[420px]">
+      <DialogContent
+        showCloseButton={false}
+        className="gap-3 p-5 sm:max-w-[420px]"
+        onCloseAutoFocus={(e) => { e.preventDefault(); if (previo.current?.isConnected) previo.current.focus() }}
+      >
         <DialogTitle className="text-base leading-snug font-bold text-ink">{title}</DialogTitle>
         <DialogDescription asChild>
           <div className="text-[13px] leading-relaxed text-ink-soft">{children}</div>

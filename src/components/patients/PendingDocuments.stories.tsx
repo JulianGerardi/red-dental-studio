@@ -12,7 +12,10 @@ const meta = {
         component: [
           'Los documentos del paciente que alguien tiene que resolver (firmar, subir, actualizar o revisar), en el Patient Dashboard en lugar de la tabla de Insurance. Agrupados en Overdue, Due this week y Later, con quién tiene que actuar (Patient, Provider, Front desk) y un botón para resolverlo; los vencidos con el botón azul. Se filtra entre All, Patient y Office.',
           '',
-          '**Probalo:** en *Playground* resolvé documentos o filtrá por quién tiene que actuar.',
+          '',
+          'En una columna angosta (el Overview a 1024px, el celular) el vencimiento y el botón bajan a un segundo renglón en vez de aplastar el nombre.',
+          '',
+          '**Probalo:** en *Playground* resolvé documentos o filtrá por quién tiene que actuar; *Narrow column* la muestra a 380px.',
         ].join('\n'),
       },
     },
@@ -33,3 +36,8 @@ export const ManyDocuments: Story = {
 }
 /* Todo resuelto: queda el estado vacío. */
 export const Empty: Story = { args: { docs: DOCS_PENDIENTES.map((d) => ({ ...d, resuelto: 'Oct 5, 2026' })) } }
+/* La columna izquierda del Overview a 1024px: vencimiento y botón en un segundo renglón (2026-10-17). */
+export const NarrowColumn: Story = {
+  name: 'Narrow column',
+  decorators: [(Story) => <div className="w-[380px] rounded-lg border border-line bg-white p-5"><Story /></div>],
+}

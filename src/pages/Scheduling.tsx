@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, ChevronLeft, ChevronRight, Plus, CalendarCheck, Inbox } from 'lucide-react'
 import { AppointmentDetailsDrawer } from '@/components/scheduling/AppointmentDetailsDrawer'
-import { ViewFiltersPanel } from '@/components/scheduling/ViewFiltersPanel'
+import { ViewMenu, VISTA_INICIAL, type VistaCalendario } from '@/components/scheduling/ViewFiltersPanel'
 import { NewAppointmentModal } from '@/components/scheduling/NewAppointmentModal'
 import {
   SOLICITUDES, datosDeSolicitud, fechaLegible, type Solicitud,
@@ -50,7 +50,9 @@ export default function Scheduling() {
   const [detail, setDetail] = useState<{ ev: EventoConFecha; rect: DOMRect } | null>(null)
   const abrirDetalle = (e: EventoConFecha, el: HTMLElement) =>
     setDetail({ ev: e, rect: el.getBoundingClientRect() })
-  const [panel, setPanel] = useState<'view' | 'new' | null>(null)
+  const [panel, setPanel] = useState<'new' | null>(null)
+  /* Lo que se guardó en View: el panel arranca de acá y Cancel lo deja como estaba. */
+  const [vista, setVista] = useState<VistaCalendario>(VISTA_INICIAL)
   /* Las solicitudes son estado: se agendan o se caen, y en los dos casos
      desaparecen de la lista. */
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>(SOLICITUDES)
@@ -188,18 +190,7 @@ export default function Scheduling() {
               </button>
             ))}
           </div>
-          <div className="relative">
-            <button
-              data-view-trigger
-              onClick={() => setPanel((p) => (p === 'view' ? null : 'view'))}
-              aria-expanded={panel === 'view'}
-              className="bg-dash-blue hover:bg-dash-blue-hover flex h-8 items-center gap-1.5 rounded-md px-4 text-xs font-medium text-white transition-colors"
-            >
-              View
-              <ChevronDown className={cn('size-3.5 transition-transform', panel === 'view' && 'rotate-180')} />
-            </button>
-            {panel === 'view' && <ViewFiltersPanel onClose={() => setPanel(null)} />}
-          </div>
+          <ViewMenu valor={vista} onGuardar={setVista} />
           {/* Event y Register appointment quedan fuera de la barra hasta que se
               defina qué hacen. No se borran: el markup sigue acá detrás de
               PENDIENTES, así volver a mostrarlos es cambiar una constante y no

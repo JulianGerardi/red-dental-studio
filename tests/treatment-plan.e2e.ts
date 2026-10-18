@@ -54,3 +54,23 @@ test('las filas de las visitas se marcan y el menú cambia con el estado', async
   await expect(screen.getByRole('menuitem', /Delete/)).toBeVisible()
   await expect(screen.getByRole('menuitem', /Finish Planning/)).toBeVisible()
 })
+
+/* Cada fila se despliega con el detalle de la Problem List: en un caso, con el estado de su consentimiento. */
+test('las filas del caso y las sueltas se despliegan con su detalle', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', /^Exams/).tap()
+  await screen.getByRole('menuitem', 'Treatment Plan').tap()
+  await screen.getByText(/^D0120 Periodic oral evaluation$/).first().tap()
+  await expect(screen.getByText('No treatment linked.')).toBeVisible()
+  await expect(screen.getByRole('button', 'Collapse all')).toBeVisible()
+
+  const planes = screen.getByRole('navigation', 'Treatment plans')
+  await planes.getByRole('button', /^26\/08\/2026, Waiting for consent/).tap()
+  await planes.getByRole('button', /Restorative Plan, Waiting for consent/).tap()
+  await screen.getByText(/^D2391 Resin-based composite/).tap()
+  await expect(screen.getByText('Procedure consent')).toBeVisible()
+  await expect(screen.getByRole('button', /^Informed Consent for Dental Treatment/)).toBeVisible()
+  // El hallazgo vinculado se abre en el drawer, sin salir de Treatment Plan.
+  await screen.getByRole('button', /^Chronic enamel dental caries · Tooth 3/).tap()
+  await expect(screen.getByRole('dialog', /Chronic enamel dental caries/)).toBeVisible()
+})

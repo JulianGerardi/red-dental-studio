@@ -137,7 +137,7 @@ function Marca({ n, children, className }: { n: number; children: ReactNode; cla
 }
 
 const PARTES = [
-  ['Breadcrumb', 'Dónde estás. Cada tramo menos el último lleva de vuelta. En Settings lo pone el layout: la pantalla no lo dibuja.'],
+  ['Breadcrumb', 'Dónde estás. Cada tramo menos el último lleva de vuelta. Sólo en pantallas a las que se entra desde otra: en Settings lo pone el layout y en las del paciente PatientBreadcrumb. Las de primer nivel no llevan.'],
   ['Title', 'El nombre de la pantalla. En el detalle de un ítem, con sus pills al lado (etiquetas).'],
   ['Description', 'Una línea que dice qué se hace acá. 14px, ink-muted.'],
   ['Primary action', 'Una sola, la más importante, alineada con el título. Button primary lg.'],
@@ -231,7 +231,7 @@ function detectar(): Fila[] {
     const pantalla = archivo.replace(/^pages\//, '').replace(/\.tsx$/, '')
     if (SUELTAS.test(pantalla)) continue
     const settings = archivo.startsWith('pages/settings/')
-    const rastro = settings ? 'Settings layout' : /ChevronDown className="size-\[15px\]"|<Link to="\/patients" className/.test(texto) ? 'Module link' : '—'
+    const rastro = settings ? 'Settings layout' : /<PatientBreadcrumb/.test(texto) ? 'PatientBreadcrumb' : /ChevronDown className="size-\[15px\]"|<Link to="\/patients" className/.test(texto) ? 'Module link' : '—'
     const accion = /accion=\{|bg-dash-blue[^"]*text-white|<Button[\s>]|buttonClasses\(/.test(texto)
     const buscador = /placeholder="Search/.test(texto)
     const sph = texto.match(/<SettingsPageHeader[\s\S]*?titulo="([^"]+)"/)

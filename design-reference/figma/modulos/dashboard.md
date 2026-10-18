@@ -537,3 +537,91 @@ Julián: el icono de calendario tiene que ser en 3D, con la misma estética que 
 - Se probó en la tira de números y Julián lo descartó: el cambio es sólo en la fecha.
 - **A validar:** el emoji se dibuja distinto según el sistema (Apple, Windows, Android); el 📅 muestra una fecha fija
   ("17"), que no es la elegida.
+## Cada fila, su card (2026-10-13)
+
+Julián: "debe ser estilo card, no debe estar todo unido; si no, no tiene continuidad el diseño" (Appointments, Waiting
+Room y Pending Task). Las filas estaban todas en una caja de línea fina con divisores; ahora **cada fila va en su card
+interna** (`TARJETA_INTERNA`: blanca, línea de medio pixel y sombra suave), con 12px entre una y otra, igual que las
+salas de la columna de al lado y los turnos del Patient Dashboard. Adentro no cambia nada; el margen interno pasa a
+10px parejo en los cuatro lados (antes 12 a la izquierda y 8 arriba y a la derecha). Lo hace `ListGroup`, así que el
+Pending Task del Patient Dashboard toma lo mismo.
+
+## Nueva organización: salas arriba, turnos a lo ancho y colores por acción (2026-10-13)
+
+Julián pasó una imagen con la pantalla reorganizada y estos pedidos: Appointments y Waiting Room llenando el ancho, los
+operatorios arriba "para que no ocupen espacio" (abierto a otra propuesta), un color por botón "para no confundir al
+usuario", un botón al lado de Today para las preguntas frecuentes, que las filas ocupen toda la card blanca sin
+cortarse, y en el Topbar el "Hi! Dentist" escribiéndose y después la fecha del día con otro ícono que no sea la mano.
+
+- **Salas en una tira arriba** (`dashboard/OperatoryStrip.tsx`, *Components / Dashboard / Operatory strip*): una fila
+  de `OperatoryCard` sobre la página (`enPagina`: card de página, sin borde) que llena el ancho. Cuántas entran sale del
+  ancho: cada card mide al menos 232px, lo justo para "Operatory name" con la pill más larga (Unavailable); con 200px el
+  nombre se cortaba. Las que no entran van a "Show N more" (la regla de listas largas), así que la tira nunca empuja los
+  turnos para abajo: a 1440 se ven 5 (como en la imagen) y la sexta queda en "Show 1 more"; a 1920, las 6; en el celular,
+  una. Sin título visible, como en la imagen; para el lector de pantalla la región se llama "Rooms".
+- **Appointments y Waiting Room a la par** desde 1024px (`lg:grid-cols-2`), cada uno con la mitad del ancho; abajo de
+  1024, uno debajo del otro a lo ancho. Las dos cards quedan del mismo alto.
+- **Que no se corte:** con la mitad del ancho, la fila del turno queda en dos renglones y el botón al lado de "Dr. Elena
+  Martinez · Operatory 2", que se lee entero (como en la imagen, pero sin el "Operator…"). La versión en una línea pasó
+  de 768 a 896px de lista: a 1920 cada panel mide unos 840px y en una línea el provider se cortaba en "Dr. Elena …".
+- **Un color por acción** (`ACCION_TURNO` en `AppointmentCard.tsx`, variantes de `ui/button`): Check In verde (variante
+  nueva `success`: `dash-ok-fg`, el verde de la pill Check In, 4,9:1 con blanco; hover `green-deep`), Check Out azul
+  (`primary`) y Cancel rojo (`destructive`). La imagen dibujaba Check In con borde negro; Julián pidió buscarle otro
+  color del design system, y el verde es el de "llegó / arranca" en la app (pill Check In, Start Enconter). Lo usan la
+  fila y la card de turno. `accionTurno` avisa "X checked in." para Check In.
+- **Check In en los datos:** el turno de las 10:30 del día de la demo trae Check In, como en la imagen.
+- **Preguntas frecuentes:** al lado de Today, un link con el look de `Button` secondary md de sólo ícono
+  (`ShieldQuestionMark`, el escudo con el signo de la imagen) que lleva a Help, donde el Dashboard arranca abierto.
+  Siempre visible; nombre accesible y tooltip "Frequently asked questions".
+- **Fuera de la pantalla, como en la imagen:** la línea azul con la fecha arriba del título (la fecha del día pasó al
+  Topbar y la elegida la dice el selector) y la línea "Appointments, waiting room and tasks follow this date.".
+- **Saludo del Topbar** (`layout/Saludo.tsx`, *Components / Layout / Greeting*): "Hi! Dentist Sarah" se escribe letra
+  por letra (60ms), queda 1,6s, se borra y se escribe la fecha del día ("Tuesday - October 13, 2026", el formato de la
+  imagen) con el calendario azul en lugar de la mano; unos 5s en total. Una vez por sesión del navegador (sessionStorage):
+  al recargar o volver va la fecha directo, para que no salude cada vez. Con reducir movimiento, la fecha directo. El
+  lector de pantalla lee saludo y fecha juntos. Una copia invisible del texto más largo reserva el ancho, así el
+  buscador no se corre mientras se escribe. La fecha es la de hoy, no la de la demo (el Dashboard sigue en Feb 28, 2026).
+- `ShowMore`: si abierta entra entera (la sexta sala), no lleva el degradé de "hay más abajo".
+
+**Para validar con usuarios:** si recepción lee los colores sin confundir Check In (verde, botón) con la pill Check In
+(verde, estado) en la misma fila: la pill dice "Check In" aunque el paciente todavía no haya llegado. Convendría que la
+pill diga el estado real (por ejemplo "Scheduled" antes de llegar); no se tocó porque cambia contenido y espera el ok de
+Julián. También si la tira de salas arriba se consulta lo suficiente o conviene plegarla.
+
+## Salas con color y filtro de la sala de espera (2026-10-17)
+
+Julián: "si toco en una room debería aparecer en Waiting Room los pacientes que están en esa room, pero debería tener
+un cambio visual para situar al usuario". Y en la imagen nueva, las salas con colores; aclaró después: "solo aplicá los
+colores a las rooms" (las cards de turno quedan blancas).
+
+- **Color por estado en la tira de arriba** (`OPERATORY_SURFACES` en `OperatoryCard.tsx`): borde de 1px y fondo con el
+  mismo par de tokens de su pill: Available `dash-ok-fg`/`dash-ok-bg`, Busy `dash-busy-fg`/`dash-busy-bg`,
+  Unavailable `dash-bad-fg`/`dash-bad-bg`. Adentro de un panel la card sigue blanca.
+- **Tocar una sala filtra la Waiting Room** por esa sala; tocarla de nuevo la suelta. La card es un botón con
+  `aria-pressed`. **Elegida:** el anillo azul de selección de la app (`dash-ring`, 2px a 2px, como la card de turno
+  activa) y sombra; **las demás se apagan al 60%** hasta el hover o el foco. Así se ve de qué sala sale la lista sin
+  perder el estado de las otras.
+- **En la Waiting Room**, el filtro se lee como *Chip* pegado al título ("Waiting Room · Operatory 2 ×"); la ✕ ("Show all
+  rooms") lo saca. A la derecha lo tapaba la pestaña del paciente que flota en el borde. Si la sala no tiene a nadie
+  esperando: "No one is waiting for Operatory 1" con el botón *Show all rooms*. El filtro sigue al cambiar de día, como
+  el de Appointments.
+- **En el celular** la sala de espera queda abajo de todo: al elegir una sala, la pantalla baja hasta ella (sin
+  animación con reducir movimiento).
+- **Las salas se llaman como en los turnos** ("Operatory 1" … "Operatory 6"): el Figma decía "Operatory name" en todas,
+  un texto de relleno; con ese nombre no se podía saber qué sala filtraba ni cruzarla con "Dr. Elena Martinez ·
+  Operatory 2" de las filas.
+- Arreglo de paso: editar un turno de la sala de espera filtrada guardaba sobre el índice de la lista filtrada; ahora
+  usa el del día (`dia.waiting.indexOf`).
+
+**Pendiente de Julián** (aparece en la imagen pero no en el pedido, no se tocó): Pending Task en una tercera columna,
+la fecha azul arriba del título, y estados nuevos en la pill de cada turno (Confirmed, Waiting, In Progress,
+Cancelled). **Para validar con usuarios:** si apagar las otras salas se entiende como "filtro activo" y no como "salas
+deshabilitadas".
+
+## Pending Task, tercera columna (2026-10-18)
+
+Julián, con la imagen: "aplicá la Pending Task en tres columnas". Appointments · Waiting Room · Pending Task se reparten
+el ancho **desde 1280px** (`xl:grid-cols-3`). Entre 1024 y 1280 siguen Appointments y Waiting Room a la par y Pending
+Task abajo, a lo ancho (`lg:col-span-2`): con tres columnas a 1024px cada una mediría ~320px y los turnos se cortarían.
+Más angosto, todo en una columna. Las filas toman su forma angosta (`@container`): a 1440px las de turno bajan el botón
+a su renglón, como las tareas. Pending Task sigue con su filtro, Show more y vacío de siempre.
