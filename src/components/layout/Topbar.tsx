@@ -59,7 +59,7 @@ export function Topbar({
           el saludo, la locación, el nombre del perfil y por último el ancho
           fijo del buscador. */}
       <div className="flex min-w-0 flex-1 items-center justify-between gap-3 xl:gap-6">
-      <div className="flex min-w-0 shrink-0 items-center gap-2">
+      <div className="flex min-w-0 shrink-0 items-center gap-3.5">
         {/* Botón con borde, no un icono suelto. La flecha invierte su
             dirección según el estado, con un pulso corto al presionar. */}
         <button

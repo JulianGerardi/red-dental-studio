@@ -640,3 +640,10 @@ derecha, alineados al botón azul" y "agregá más cards, así queda prolijo y v
 - **Día de la demo con más gente**: la sala de espera pasa de 3 a 6 y se reparte entre Operatory 1 a 4 (antes todos en la
   2), así el filtro por sala tiene a quién mostrar (Operatory 1 y 2, dos cada una; Operatory 5 y 6, vacías). La tira de
   números lo refleja (Waiting 6). Con el día cargado (`?day=busy`) se ven los topes y "Show N more".
+
+## Topbar: el saludo más separado del menú (2026-10-18)
+
+- Entre el botón de expandir el menú y el saludo: 14px (antes 8). El saludo sigue igual: se escribe "Hi! Dentist Sarah" y
+  después la fecha, **una vez por sesión**; en las visitas siguientes de la misma pestaña se ve la fecha directo.
+- Inputs del header medidos: locación 32, buscador 32, botón de perfil 40 (avatar de 32 + 4 de aire), campana 28. Los
+  de 32 son el tamaño `md` de los botones; no se tocaron.

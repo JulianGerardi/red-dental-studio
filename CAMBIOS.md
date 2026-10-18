@@ -5,6 +5,10 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-18
 
+### Topbar: el saludo un poco más separado del botón del menú ([#48](https://github.com/JulianGerardi/red-dental-studio/pull/48))
+- Entre el botón de expandir el menú y el saludo hay 14px en lugar de 8. Nada más cambia.
+- **Para el dev:** `gap-3.5` en el bloque izquierdo de `Topbar.tsx`.
+
 ### El icono 3D va sólo en el saludo, y el texto más chico ([#47](https://github.com/JulianGerardi/red-dental-studio/pull/47))
 - El calendario del saludo ("Sunday - October 18, 2026") pasa a ser el emoji 📅, 3D como la manito. El campo de fecha y
   *Today* vuelven al icono lineal (lo de #43 se revierte). El saludo baja de 19 a 16px.
