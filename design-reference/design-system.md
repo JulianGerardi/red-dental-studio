@@ -811,6 +811,11 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   de la actividad. *Components / Dashboard / Panel and StatusPill* actualiza la descripción de `top`.
 - Decisiones en `figma/modulos/billing.md` (2026-10-13).
 
+## Icono 3D en el encabezado de fecha (2026-10-18)
+
+- `DatePicker` `variant="toolbar"` dibuja el emoji 📅 en vez del `Calendar` de lucide (`emojiFecha`, exportado de
+  `ui/date-picker`); el botón *Today* del Dashboard usa 🗓️. `field` y Date filter no cambian. *Elements / Date picker*
+  lo muestra (Playground con `toolbar`, Parts, States y Specs montan el componente real). Ver `figma/modulos/dashboard.md`.
 ## New Appointment: visita linkeada y pregunta de mover (2026-10-17)
 
 - *Components / Scheduling / TreatmentPlanPicker* pasa a la estructura de *Elements / Buttons* (Playground con controles
@@ -930,3 +935,18 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   **Specs** (medidas, tokens y reglas).
 - Piezas nuevas: `OpcionFiltro`, `GrupoFiltro` (radiogroup con flechas), `SeccionFiltro` y `ViewMenu`. Se va `Group`. Reusa
   `Radio`, `EmptyState`, `Button`, `Popover` e `ICONO_SUELTO`. Decisiones en `figma/modulos/scheduling.md`.
+
+## Consent required: ConfirmDialog con ícono y tres salidas, y toast con título (2026-10-17)
+
+- **`ConfirmDialog`** suma tres props opcionales: `icon="warning"` (círculo ámbar de 36px a la izquierda del título: la
+  acción pedida quedó frenada por algo que falta), `otherAction` (una tercera salida secondary entre Cancel y la
+  principal; el diálogo pasa de 420 a 480px y en el celular los tres botones se reparten el ancho) y `loading` (spinner en
+  la principal y el resto deshabilitado; la X y Esc no cierran mientras dura). Sin props nuevas se ve igual que antes.
+  *Elements / ConfirmDialog* suma las historias *ThreeActions* y *Loading*.
+- **Toast con título** (`aviso.ok / error / warn / info` aceptan `string` o `{ titulo, texto }`): el título va en 13px
+  Semibold y el texto en 12.5px; la acción baja debajo del texto en vez de ir a la derecha. *Components / UI / Toast*
+  suma el control *title* y *with title and action*.
+- **`ConsentRequiredDialog`** y **`ResumenConsentimiento`** (*Components / Clinical / ConsentRequiredDialog*): Playground
+  (variante, cuántos procedimientos, enviando), Parts (partes, qué hace cada botón, cuándo aparece, dónde se usa),
+  States (cada caso en su iframe, más la caja de resumen sola) y Specs (medidas, colores y la lógica).
+  Decisiones en `figma/modulos/clinical-mode.md` (2026-10-17).

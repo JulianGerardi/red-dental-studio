@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-18
 
+### Icono de calendario 3D en la fecha del Dashboard ([#43](https://github.com/JulianGerardi/red-dental-studio/pull/43))
+- El campo de fecha ("Feb 28, 2026") y el botón *Today* usan el emoji 📅 / 🗓️ (3D, como la manito del saludo) en lugar
+  del icono lineal. La tira de números, los formularios y el Date filter no cambian.
+- **Para el dev:** `emojiFecha` en `ui/date-picker.tsx`; `DatePicker variant="toolbar"` lo usa. Para otro icono 3D, el
+  mismo componente con el emoji que corresponda.
+
 ### Patients: barra lateral, Recent Patients de vuelta y sin el link "Patients ⌄" ([#44](https://github.com/JulianGerardi/red-dental-studio/pull/44))
 - *New Patient* pasa a la fila del título; la barra lateral (*Today Appointments* / *Recent Patients*, de vuelta con
   los últimos 10) arranca a esa misma altura. Las dos listas usan `ui/show-more` (4 turnos, 3 pacientes): nunca queda
@@ -26,6 +32,19 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   (`xl:grid-cols-3`; el panel lleva `lg:col-span-2 xl:col-span-1`).
 
 ## 2026-10-17
+
+### Consent required al completar o empezar un procedimiento sin firma ([#46](https://github.com/JulianGerardi/red-dental-studio/pull/46))
+- Nuevo diálogo **Consent required** para CON-3927, CON-3946 y CON-3950 (prototipo de Julián *Consent modals revised*):
+  sale al tocar *Complete* en un caso aceptado de Treatment Plan y *Start* en la tabla Procedures del Overview, cuando el
+  consentimiento del procedimiento no está firmado. Dos variantes: **No consent sent** (manda el documento y sigue, sin
+  segunda confirmación) y **Signature pending** (sigue con la firma pendiente, con *View consent*); las dos ofrecen
+  *Sign now* y *Cancel*. Si el caso todavía no se aceptó, no hay diálogo: aviso de error *Procedure cannot be updated*
+  con *View case*.
+- **Para el dev:** `clinical/ConsentRequiredDialog.tsx` (`ConsentRequiredDialog`, `consentimientoRequerido`,
+  `avisarCasoNoListo`, `CASO_LISTO`); textos en `CONSENTIMIENTO_REQUERIDO` (`data/treatment-plan.ts`). `ui/confirm-dialog`
+  suma `icon="warning"`, `otherAction` y `loading`. `aviso.ok/error/warn/info` aceptan `{ titulo, texto }` además de un
+  string. Decisiones en `figma/modulos/clinical-mode.md`. No se pudieron leer los tickets de Jira en esta sesión (el
+  conector de Atlassian no estaba conectado): conviene cotejar contra sus criterios de aceptación.
 
 ### New Appointment: visita linkeada a otro turno ([#41](https://github.com/JulianGerardi/red-dental-studio/pull/41))
 - Si la visita del plan que se elige ya está linkeada a otro turno, su fila lo muestra (fecha, hora, estado e info) y

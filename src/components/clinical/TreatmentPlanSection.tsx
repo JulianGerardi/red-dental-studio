@@ -5,6 +5,7 @@ import {
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { ConsentBlock } from '@/components/clinical/ConsentBlock'
+import { CASO_LISTO, ConsentRequiredDialog, consentimientoRequerido, type TipoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
 import {
   CASOS, NO_ASIGNADOS, CATEGORIAS, DIALOGOS, OPCIONES_BORRAR_CASO, MOVER,
   NUEVO_GRUPO, COMPLETAR, ordenFecha,
@@ -108,7 +109,7 @@ export function AccionCaso({
 /* Con contenido para elegir (Move to, New group, Complete, Delete case) se abre como drawer; si es sólo una pregunta
    (Discard, Expire, Present…) es una confirmación chica. Ver Components / UI / Drawer. */
 export function Dialogo({
-  titulo, bajada, texto, children, onConfirm, onClose, confirmar = 'Confirm',
+  titulo, bajada, texto, children, onConfirm, onClose, confirmar = 'Confirm', cierra = true,
 }: {
   titulo: string
   /** Bajada del título. */
@@ -118,8 +119,10 @@ export function Dialogo({
   onConfirm: () => void
   onClose: () => void
   confirmar?: string
+  /** false: queda abierto al confirmar y el que lo abrió decide (Complete espera el chequeo del consentimiento). */
+  cierra?: boolean
 }) {
-  const confirmarYCerrar = () => { onConfirm(); onClose() }
+  const confirmarYCerrar = () => { onConfirm(); if (cierra) onClose() }
   if (!children) {
     return (
       <ConfirmDialog title={titulo} confirmLabel={confirmar} onCancel={onClose} onConfirm={confirmarYCerrar}>
@@ -234,22 +237,25 @@ export function DialogoNuevoGrupo({ onClose }: { onClose: () => void }) {
   )
 }
 
+/* El aviso de Complete: cuántos procedimientos y cuántas condiciones quedaron tratadas. */
+const textoCompletado = (procs: number, tratadas: number) =>
+  `${procs > 1 ? `${procs} procedures` : 'Procedure'} completed${tratadas ? ` and ${tratadas} condition${tratadas > 1 ? 's' : ''} marked as treated` : ''}.`
+
 /* Figma 4122:250957. Las tarjetas llevan casilla: el texto pide seleccionar
    las condiciones y en el frame no había con qué. */
-export function DialogoCompletar({ onClose }: { onClose: () => void }) {
+export function DialogoCompletar({ onClose, onConfirm }: {
+  onClose: () => void
+  /** Con las condiciones marcadas; el drawer queda abierto hasta que el que lo abrió aplica el estado. */
+  onConfirm?: (tratadas: number) => void
+}) {
   const [marcadas, setMarcadas] = useState<string[]>([])
   return (
     <Dialogo
       titulo={COMPLETAR.titulo}
       bajada={COMPLETAR.texto}
       onClose={onClose}
-      onConfirm={() =>
-        aviso.ok(
-          marcadas.length === 0
-            ? 'Procedure completed.'
-            : `Procedure completed and ${marcadas.length} condition${marcadas.length > 1 ? 's' : ''} marked as treated.`,
-        )
-      }
+      cierra={!onConfirm}
+      onConfirm={() => (onConfirm ? onConfirm(marcadas.length) : aviso.ok(textoCompletado(1, marcadas.length)))}
     >
       <div className="mt-4 flex max-h-[340px] flex-col gap-3 overflow-y-auto">
         {COMPLETAR.condiciones.map((c) => {
@@ -483,7 +489,8 @@ export function TablaProcedimientos({
   seleccion?: string[]
   onSeleccion?: (ids: string[]) => void
   onAccion: (p: Procedimiento) => void
-  onCompletar?: () => void
+  /** Sin él no hay Complete: el caso no está aceptado (clinical-mode.md, 2026-10-17). */
+  onCompletar?: (p: Procedimiento) => void
   /** Lo que se despliega debajo de la fila, como en la Problem List: chevron al inicio y clic en la fila. */
   detalle?: (p: Procedimiento) => ReactNode
   /** Las filas abiertas, cuando las maneja quien tiene el Collapse all / Expand all; sin esto, la tabla las maneja sola. */
@@ -590,11 +597,14 @@ export function TablaProcedimientos({
                   )}
                   {acciones && (
                     <>
-                      <ConAyuda texto="Complete procedure">
-                        <button onClick={() => onCompletar?.()} aria-label={`Complete ${p.codigo}`} className={ICONO_SUELTO}>
-                          <ClipboardList className="size-4" />
-                        </button>
-                      </ConAyuda>
+                      {/* Lo ya completado no se vuelve a completar. */}
+                      {onCompletar && p.estado !== 'Completed' && (
+                        <ConAyuda texto="Complete procedure">
+                          <button onClick={() => onCompletar(p)} aria-label={`Complete ${p.codigo}`} className={ICONO_SUELTO}>
+                            <ClipboardList className="size-4" />
+                          </button>
+                        </ConAyuda>
+                      )}
                       <ConAyuda texto="Imaging">
                         <button onClick={() => aviso.info('Imaging is not available in this release.')} aria-label={`Imaging for ${p.codigo}`} className={ICONO_SUELTO}>
                           <Scan className="size-4" />
@@ -712,7 +722,8 @@ export function VistaCaso({
   onFavorito: () => void
   onDialogo: (d: ClaveDialogo | 'delete') => void
   onMover: () => void
-  onCompletar: () => void
+  /** Los procedimientos a completar: el de la fila o los marcados. */
+  onCompletar: (ids: string[]) => void
   onNuevaAlternativa?: () => void
   onVisitas?: (visitas: Visita[]) => void
   /** El detalle de cada fila de las visitas (el de la Problem List). */
@@ -727,6 +738,8 @@ export function VistaCaso({
   const [seleccion, setSeleccion] = useState<string[]>([])
   const planificando = caso.estado === 'Planning' && !caso.sinPermiso
   const antesDePresentar = caso.estado === 'Planning' || caso.estado === 'Pending'
+  /* Complete sólo con el caso aceptado: antes, la fila no lo ofrece (lo que no corresponde se oculta). */
+  const completable = CASO_LISTO.includes(caso.estado)
   /* Cada tabla marca y desmarca sólo sus filas: las de las otras visitas quedan como estaban. */
   const marcarEn = (ids: string[]) => (nuevos: string[]) => setSeleccion((sel) => [...new Set([...sel.filter((x) => !ids.includes(x)), ...nuevos])])
   const elegir = (a: AccionMenu) => {
@@ -898,8 +911,8 @@ export function VistaCaso({
               <button onClick={() => onDialogo('removeProcedure')} className="text-[13px] font-semibold text-dash-bad-fg hover:underline">Remove</button>
             </>
           )}
-          {(caso.estado === 'Accepted' || caso.estado === 'Waiting for consent') && (
-            <button onClick={onCompletar} className="text-dash-blue text-[13px] font-semibold hover:underline">Complete</button>
+          {completable && (
+            <button onClick={() => onCompletar(seleccion)} className="text-dash-blue text-[13px] font-semibold hover:underline">Complete</button>
           )}
           <button onClick={() => setSeleccion([])} className="ml-auto text-[13px] font-medium text-ink-muted hover:underline">Clear</button>
         </div>
@@ -929,7 +942,7 @@ export function VistaCaso({
               seleccion={seleccion}
               onSeleccion={marcarEn(v.procedimientos.map((p) => p.id))}
               onAccion={() => onDialogo('removeProcedure')}
-              onCompletar={onCompletar}
+              onCompletar={completable ? (p) => onCompletar([p.id]) : undefined}
               detalle={detalle}
               abiertas={filas.abiertas}
               onAlternar={filas.alternar}
@@ -965,7 +978,9 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
   const [dialogo, setDialogo] = useState<ClaveDialogo | 'delete' | null>(null)
   const [mover, setMover] = useState(false)
   const [grupo, setGrupo] = useState(false)
-  const [completar, setCompletar] = useState(false)
+  /* Complete: los procedimientos del drawer y, si falta una firma, el diálogo de consentimiento encima. */
+  const [completar, setCompletar] = useState<string[] | null>(null)
+  const [pedido, setPedido] = useState<{ tipo: TipoConsentimiento; ids: string[]; tratadas: number } | null>(null)
   const [favoritos, setFavoritos] = useState<string[]>([])
   const [seleccion, setSeleccion] = useState<string[]>([])
   const [casos, setCasos] = useState<Caso[]>(CASOS)
@@ -994,6 +1009,37 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
     setCasos((cs) => [...cs, { ...caso, id, nombre: `${caso.nombre.replace(/ Alternative( \d+)?$/, '')} Alternative ${n}`, estado: 'Planning' }])
     setCasoId(id)
     aviso.ok('Alternative case created.')
+  }
+
+  /* Los que faltan completar de los pedidos: lo ya completado se saltea. */
+  const porCompletar = (ids: string[]) => caso.visitas.flatMap((v) => v.procedimientos).filter((p) => ids.includes(p.id) && p.estado !== 'Completed')
+
+  /* Aplica Completed; con `enviar`, el consentimiento sin mandar o vencido sale al paciente y queda Pending. */
+  const aplicarCompletar = (ids: string[], tratadas: number, enviar: boolean, nota = '') => {
+    cambiarCaso({
+      visitas: caso.visitas.map((v) => ({
+        ...v,
+        procedimientos: v.procedimientos.map((p) => (ids.includes(p.id)
+          ? { ...p, estado: 'Completed' as const, consentimiento: enviar && (p.consentimiento === 'Not sent' || p.consentimiento === 'Expired') ? 'Pending' as const : p.consentimiento }
+          : p)),
+      })),
+    })
+    setCompletar(null)
+    setPedido(null)
+    aviso.ok(`${textoCompletado(ids.length, tratadas)}${nota}`)
+  }
+
+  /* Confirm del drawer: con todo firmado se aplica; si falta una firma, Consent required decide cómo seguir. */
+  const pedirCompletar = (tratadas: number) => {
+    const procs = porCompletar(completar ?? [])
+    if (procs.length === 0) {
+      setCompletar(null)
+      return aviso.info('The selected procedures are already completed.')
+    }
+    const ids = procs.map((p) => p.id)
+    const tipo = consentimientoRequerido(procs.map((p) => p.consentimiento))
+    if (tipo) setPedido({ tipo, ids, tratadas })
+    else aplicarCompletar(ids, tratadas, false)
   }
 
   const alternarFavorito = (id: string) =>
@@ -1086,7 +1132,7 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
             onFavorito={() => alternarFavorito(caso.id)}
             onDialogo={setDialogo}
             onMover={() => setMover(true)}
-            onCompletar={() => setCompletar(true)}
+            onCompletar={setCompletar}
             onNuevaAlternativa={nuevaAlternativa}
             onVisitas={(visitas) => cambiarCaso({ visitas })}
             detalle={detalle(caso)}
@@ -1096,7 +1142,23 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
 
       {mover && <DialogoMover onClose={() => setMover(false)} />}
       {grupo && <DialogoNuevoGrupo onClose={() => setGrupo(false)} />}
-      {completar && <DialogoCompletar onClose={() => setCompletar(false)} />}
+      {completar && <DialogoCompletar onClose={() => setCompletar(null)} onConfirm={pedirCompletar} />}
+      {pedido && (
+        <ConsentRequiredDialog
+          tipo={pedido.tipo}
+          procedimientos={porCompletar(pedido.ids)}
+          caso={caso.nombre}
+          onCancel={() => setPedido(null)}
+          onSignNow={() => {
+            setPedido(null)
+            setCompletar(null)
+            aviso.info('The signature workflow is not available in this release.')
+          }}
+          onContinue={() => (pedido.tipo === 'sin-enviar'
+            ? aplicarCompletar(pedido.ids, pedido.tratadas, true, ' Consent sent to the patient.')
+            : aplicarCompletar(pedido.ids, pedido.tratadas, false, ' Consent signature pending.'))}
+        />
+      )}
       {dialogo === 'delete' && (
         <DialogoBorrarCaso
           onClose={() => setDialogo(null)}

@@ -55,6 +55,30 @@ test('las filas de las visitas se marcan y el menú cambia con el estado', async
   await expect(screen.getByRole('menuitem', /Finish Planning/)).toBeVisible()
 })
 
+/* Complete en un caso aceptado: con una firma que falta abre Consent required; recién ahí cambia el estado. */
+test('Complete pide Consent required si falta una firma y Complete antes de aceptar no existe', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', /^Exams/).tap()
+  await screen.getByRole('menuitem', 'Treatment Plan').tap()
+  const planes = screen.getByRole('navigation', 'Treatment plans')
+
+  // Antes de aceptar el caso no hay Complete en las filas.
+  await planes.getByRole('button', /Periodontists Recommended, Planning/).tap()
+  await expect(screen.getByRole('button', /Complete D0120/)).toHaveCount(0)
+
+  // Waiting for consent ya está aceptado: la fila ofrece Complete y el consentimiento Not sent (D2392) lo frena.
+  await planes.getByRole('button', /^26\/08\/2026/).tap()
+  await planes.getByRole('button', /Restorative Plan, Waiting for consent/).tap()
+  await screen.getByRole('button', /Complete D2392/).tap()
+  await screen.getByRole('button', 'Confirm').tap()
+  const dialogo = screen.getByRole('dialog', 'Consent required')
+  await expect(dialogo.getByText(/This procedure requires a consent document/)).toBeVisible()
+  await expect(dialogo.getByText(/Case: Restorative Plan/)).toBeVisible()
+  await dialogo.getByRole('button', 'Send consent and sign later').tap()
+  await expect(screen.getByText(/Procedure completed\. Consent sent to the patient\./)).toBeVisible()
+  await expect(screen.getByRole('dialog')).toHaveCount(0)
+})
+
 /* Cada fila se despliega con el detalle de la Problem List: en un caso, con el estado de su consentimiento. */
 test('las filas del caso y las sueltas se despliegan con su detalle', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
