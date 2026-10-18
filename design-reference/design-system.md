@@ -811,6 +811,11 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   de la actividad. *Components / Dashboard / Panel and StatusPill* actualiza la descripción de `top`.
 - Decisiones en `figma/modulos/billing.md` (2026-10-13).
 
+## Icono 3D en el encabezado de fecha (2026-10-18)
+
+- `DatePicker` `variant="toolbar"` dibuja el emoji 📅 en vez del `Calendar` de lucide (`emojiFecha`, exportado de
+  `ui/date-picker`); el botón *Today* del Dashboard usa 🗓️. `field` y Date filter no cambian. *Elements / Date picker*
+  lo muestra (Playground con `toolbar`, Parts, States y Specs montan el componente real). Ver `figma/modulos/dashboard.md`.
 ## New Appointment: visita linkeada y pregunta de mover (2026-10-17)
 
 - *Components / Scheduling / TreatmentPlanPicker* pasa a la estructura de *Elements / Buttons* (Playground con controles

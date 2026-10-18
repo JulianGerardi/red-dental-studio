@@ -17,7 +17,7 @@ const meta = {
         component: [
           'Elegir **un día** (`@/components/ui/date-picker`). Para filtrar una lista por un día o un rango está *Elements / Date filter*, que usa el mismo campo y el mismo calendario (`MonthCalendar`).',
           '',
-          '**Dos looks:** *field* en formularios y drawers (dd-mm-aaaa, como el Figma; texto regular y foco con borde azul, como los demás campos; 36px con `className="h-9 w-full"`) · *toolbar* en la barra de una pantalla (Dashboard): "Feb 28, 2026", medium, hover gris y anillo de foco, el mismo campo que el Date filter.',
+          '**Dos looks:** *field* en formularios y drawers (dd-mm-aaaa, como el Figma; texto regular y foco con borde azul, como los demás campos; 36px con `className="h-9 w-full"`) · *toolbar* en la barra de una pantalla (Dashboard): "Feb 28, 2026", medium, hover gris y anillo de foco, el mismo campo que el Date filter; su icono es el emoji 📅 (3D, como la manito del saludo) y el de Today, 🗓️.',
           '',
           '**El calendario:** el elegido en azul lleno, hoy en azul y negrita, punto en los días con contenido, saltos de mes y de año. Se abre en un popover de Radix: devuelve el foco al cerrar, Escape lo cierra y se da vuelta si no entra.',
           '',
