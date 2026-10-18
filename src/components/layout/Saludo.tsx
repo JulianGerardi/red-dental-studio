@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /* El saludo del Topbar (Julián, 2026-10-13): "Hi! Dentist Sarah" se escribe letra por letra, se borra y en su lugar se
@@ -62,12 +61,12 @@ export function Saludo({ fecha = new Date(), animar = 'sesion', fase: fija, clas
   const escribiendo = !fija && estado.fase !== 'listo'
 
   return (
-    <p className={cn('flex items-center gap-1.5 text-[19px] whitespace-nowrap text-black', className)}>
+    <p className={cn('flex items-center gap-1.5 text-base whitespace-nowrap text-black', className)}>
       {/* El lector de pantalla lee los dos de una vez, no letra por letra. */}
       <span className="sr-only">{SALUDO}. {textoFecha}</span>
       <span aria-hidden className="flex items-center gap-1.5">
         {enFecha
-          ? <CalendarDays key="fecha" data-saludo-icono className={cn('text-dash-blue size-5 shrink-0', escribiendo && 'motion-safe:animate-[saludo-icono_240ms_ease-out]')} />
+          ? <span key="fecha" data-saludo-icono className={cn(escribiendo && 'inline-block motion-safe:animate-[saludo-icono_240ms_ease-out]')}>📅</span>
           : <span data-saludo-icono>👋</span>}
         {/* Las dos capas en la misma celda: la invisible reserva el ancho del texto más largo y la barra no se corre. */}
         <span className="grid">

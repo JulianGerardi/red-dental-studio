@@ -527,16 +527,15 @@ Julián: "veo medio descolgado el horario" y en Pending Task "quedó muy separad
   el documento y Expired date, y las fechas a continuación. El aire libre queda antes de Complete this Task, no entre los
   datos. Antes los anchos fijos y un espacio flexible en el medio las repartían por toda la fila.
 
-## Icono 3D en la fecha del Dashboard (2026-10-18)
+## Icono 3D en el saludo (2026-10-18)
 
-Julián: el icono de calendario tiene que ser en 3D, con la misma estética que la manito del saludo.
+Julián marcó el calendario del saludo ("Sunday - October 18, 2026"): ahí va el icono 3D, con la estética de la manito.
 
-- Es el **emoji nativo** (el mismo recurso que 👋 en el saludo): 📅 en el campo de fecha y 🗓️ en *Today*. Cambia **sólo
-  el encabezado de la fecha** del Dashboard: el `DatePicker` `toolbar` y el botón *Today*. La tira de números, los
-  formularios (`field`) y el Date filter siguen con el icono lineal.
-- Se probó en la tira de números y Julián lo descartó: el cambio es sólo en la fecha.
-- **A validar:** el emoji se dibuja distinto según el sistema (Apple, Windows, Android); el 📅 muestra una fecha fija
-  ("17"), que no es la elegida.
+- Es el **emoji nativo** 📅 (el mismo recurso que 👋). Cambia **sólo ese icono**; el campo de fecha y *Today* de la fila
+  de abajo, la tira de números y los formularios siguen con el icono lineal (una versión anterior los había cambiado).
+- El saludo pasa de 19 a **16px**: a 19 se veía enorme al lado de los controles.
+- **A validar:** el emoji se dibuja distinto según el sistema; el 📅 muestra una fecha fija ("17").
+
 ## Cada fila, su card (2026-10-13)
 
 Julián: "debe ser estilo card, no debe estar todo unido; si no, no tiene continuidad el diseño" (Appointments, Waiting
