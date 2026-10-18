@@ -1,4 +1,8 @@
 import { cn } from '@/lib/utils'
+import { Pill } from '@/components/ui/pill'
+import { InfoTip } from '@/components/ui/info-tip'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { PATIENT_APPOINTMENT_TONES, type PatientAppointmentStatus } from '@/components/patients/PatientAppointmentCard'
 
 /* Diseño propio de las cards de "Link to treatment plan visit"
    (Figma 4430:61940). No replica el frame: está armado con piezas que ya
@@ -29,7 +33,12 @@ export type Visita = {
   name: string
   procedimientos: string[]
   total: string
+  /** El turno al que ya está linkeada: elegirla para otro pide moverla (MoverVisitaDialog). */
+  vinculada?: TurnoVinculado
 }
+
+/* Estados con el vocabulario de los turnos de la app (Fulfilled, no "Completed"): ver scheduling.md, 2026-10-17. */
+export type TurnoVinculado = { fecha: string; hora: string; estado: PatientAppointmentStatus }
 
 const ESTADO = {
   Accepted: { pill: 'border-dash-ok-fg bg-dash-ok-bg text-dash-ok-fg', barra: '#1a804d' },
@@ -139,6 +148,13 @@ export function VisitRow({ visita, on, onClick }: { visita: Visita; on: boolean;
         </span>
       </div>
 
+      {/* Linkeada a otro turno: se ve aunque no esté elegida, para decidir antes de tocarla. */}
+      {visita.vinculada && (
+        <div className="w-full px-3 pb-3">
+          <TurnoVinculadoInfo turno={visita.vinculada} />
+        </div>
+      )}
+
       {/* La visita elegida abre la tabla completa, con la cabecera gris que
           usan Insurance y Documents. */}
       {on && (
@@ -166,5 +182,42 @@ export function VisitRow({ visita, on, onClick }: { visita: Visita; on: boolean;
         </div>
       )}
     </Seleccionable>
+  )
+}
+
+/* ── Visita linkeada a otro turno (scheduling.md, 2026-10-17) ────────── */
+
+export function TurnoVinculadoInfo({ turno }: { turno: TurnoVinculado }) {
+  return (
+    <div className="flex flex-col gap-1 rounded-md bg-dash-field px-3 py-2">
+      <span className="flex items-center gap-1.5 text-[11px] text-ink-muted">
+        Linked appointment
+        {/* El círculo no elige la visita: el clic y el teclado no llegan a la fila. */}
+        <span className="flex" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+          <InfoTip title="Linked appointment">
+            To use this visit for the new appointment, you’ll need to move it from the linked appointment.
+          </InfoTip>
+        </span>
+      </span>
+      <span className="flex flex-wrap items-center gap-2 text-[12px] text-ink">
+        {turno.fecha} · {turno.hora}
+        <Pill tone={PATIENT_APPOINTMENT_TONES[turno.estado]} size="sm">{turno.estado}</Pill>
+      </span>
+    </div>
+  )
+}
+
+/* Sí o no antes de guardar: es ConfirmDialog, no un paso más del drawer (design-system.md, Pop ups). */
+export function MoverVisitaDialog({ visita, turno, onConfirm, onCancel }: {
+  visita: string
+  turno: TurnoVinculado
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  return (
+    <ConfirmDialog title="Move treatment visit?" confirmLabel="Move visit" onConfirm={onConfirm} onCancel={onCancel}>
+      <p>{visita} is linked to the appointment on {turno.fecha} at {turno.hora}.</p>
+      <p className="mt-2">Continuing will unlink this visit from that appointment and link it to the appointment you are saving.</p>
+    </ConfirmDialog>
   )
 }

@@ -420,7 +420,8 @@ esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Proc
    review y el AI Narrative Editor (xl).
 6. **Siguen como confirmación chica** (`ui/confirm-dialog`, *Elements / ConfirmDialog*), igual que en 2.0: las
    preguntas de sí o no -Discard and close?, Back to permanent dentition?, limpiar la selección del odontograma,
-   Discard / Expire / Cancel / Present / Accept del caso, Confirm procedure- y el aviso de Clinical Note.
+   Discard / Expire / Cancel / Present / Accept del caso, Confirm procedure-, el aviso de Clinical Note y *Move treatment
+   visit?* de New Appointment (2026-10-17).
 7. **No cambian** los desplegables anclados (popovers, calendario, filtros) ni el visor de radiografías.
    `AppointmentDetailsDrawer` es una card anclada al turno y `LinkTreatmentPlanDrawer` no se usa en la app.
 8. **Add Relationship** (2026-10-06): drawer de 2.0 con Person, Contact y Relationship (*Components / Patients /
@@ -809,6 +810,19 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `AccionesPaciente` reemplaza a `EncabezadoBilling`: los botones del paciente con `ui/button` md, en el `top` del Panel
   de la actividad. *Components / Dashboard / Panel and StatusPill* actualiza la descripción de `top`.
 - Decisiones en `figma/modulos/billing.md` (2026-10-13).
+
+## New Appointment: visita linkeada y pregunta de mover (2026-10-17)
+
+- *Components / Scheduling / TreatmentPlanPicker* pasa a la estructura de *Elements / Buttons* (Playground con controles
+  para *seleccionada*, *vinculada* y el estado del turno; Parts; States; Specs) y suma dos piezas: `TurnoVinculadoInfo`
+  (el bloque *Linked appointment* dentro de la fila, con `Pill` e `InfoTip`) y `MoverVisitaDialog` (la pregunta).
+  `VisitRow` toma `visita.vinculada` y la muestra aunque la fila no esté elegida.
+- *Components / Scheduling / NewAppointmentModal* también: Playground, Parts (los dos pasos), States (default, edit,
+  validación, visita linkeada, pregunta, movida) y Specs; las stories `Linked Visit` y `Move Visit Question` llegan hasta
+  ahí con un `play`.
+- *Elements / ConfirmDialog*: **al cerrarse devuelve el foco al botón que la abrió** (antes quedaba en `body`) y suma
+  la pregunta de mover a *Where*. Aplica a todas las confirmaciones.
+- Decisión y alternativas en `figma/modulos/scheduling.md` (2026-10-17). e2e: `tests/scheduling-linked-visit.e2e.ts`.
 
 ## Patient Overview en dos columnas (2026-10-17)
 - Página nueva *Pages / Parts / Patient Overview* (Playground, Parts, States, Specs). `PatientDetail` acepta `turnos`
