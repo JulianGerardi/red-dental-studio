@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ChevronDown, Search, Plus, CalendarDays, Users } from 'lucide-react'
+import { Search, Plus, CalendarDays, Users } from 'lucide-react'
 import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTable'
 import { PatientCard } from '@/components/patients/PatientCard'
 import { usePatients } from '@/data/patientsStore'
@@ -95,15 +94,10 @@ export default function Patients() {
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      {/* Era un <button> sin acción. Ahora es el mismo link que en el
-          resto de las pantallas del módulo. */}
-      <Link to="/patients" className="flex items-center gap-1 self-start text-sm text-[#0056ef]">
-        Patients <ChevronDown className="size-[15px]" />
-      </Link>
-
       {/* Dos columnas desde el título: la tabla con su encabezado, y la barra lateral arrancando a la misma altura.
-          Abajo de lg la barra va debajo de la tabla. */}
-      <div className="mt-[15px] flex flex-col gap-5 lg:flex-row lg:items-start">
+          Abajo de lg la barra va debajo de la tabla. Antes llevaba un link "Patients ⌄" arriba -no abría nada
+          distinto de esta misma pantalla- (patients.md, 2026-10-18). */}
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
         <div className="min-w-0 flex-1">
           {/* El botón principal va en la fila del título, al borde derecho de la columna de la tabla. */}
           <div className="flex flex-wrap items-start justify-between gap-3">
