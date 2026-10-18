@@ -3,6 +3,14 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-18
+
+### Icono de calendario 3D en la fecha del Dashboard
+- El campo de fecha ("Feb 28, 2026") y el botón *Today* usan el emoji 📅 / 🗓️ (3D, como la manito del saludo) en lugar
+  del icono lineal. La tira de números, los formularios y el Date filter no cambian.
+- **Para el dev:** `emojiFecha` en `ui/date-picker.tsx`; `DatePicker variant="toolbar"` lo usa. Para otro icono 3D, el
+  mismo componente con el emoji que corresponda.
+
 ## 2026-10-13
 
 ### Billing: bento con Find Patient arriba, la tabla hasta abajo y los botones del paciente dentro del panel ([#33](https://github.com/JulianGerardi/red-dental-studio/pull/33))

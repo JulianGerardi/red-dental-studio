@@ -41,6 +41,11 @@ export const fechaTriggerClasses = (variant: 'field' | 'toolbar') => cn(
     : 'font-medium hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
 )
 
+/* Icono 3D (emoji nativo, como la manito del saludo) del encabezado de fecha del Dashboard (dashboard.md, 2026-10-18). */
+export const emojiFecha = (emoji: string) => (
+  <span aria-hidden className="shrink-0 text-base leading-none">{emoji}</span>
+)
+
 /** El popover del calendario: el de Radix, a 12px del borde de la pantalla. */
 export const POPOVER_FECHA = 'w-auto max-w-[calc(100vw-24px)] p-3'
 
@@ -159,7 +164,7 @@ export function DatePicker({
             className,
           )}
         >
-          <Calendar aria-hidden />
+          {variant === 'toolbar' ? emojiFecha("📅") : <Calendar aria-hidden />}
           {value ? (variant === 'toolbar' ? formatLargo(value) : formatDMY(value)) : placeholder}
         </button>
       </PopoverTrigger>
