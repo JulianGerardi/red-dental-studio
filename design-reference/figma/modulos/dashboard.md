@@ -607,3 +607,11 @@ colores a las rooms" (las cards de turno quedan blancas).
 la fecha azul arriba del título, y estados nuevos en la pill de cada turno (Confirmed, Waiting, In Progress,
 Cancelled). **Para validar con usuarios:** si apagar las otras salas se entiende como "filtro activo" y no como "salas
 deshabilitadas".
+
+## Pending Task, tercera columna (2026-10-18)
+
+Julián, con la imagen: "aplicá la Pending Task en tres columnas". Appointments · Waiting Room · Pending Task se reparten
+el ancho **desde 1280px** (`xl:grid-cols-3`). Entre 1024 y 1280 siguen Appointments y Waiting Room a la par y Pending
+Task abajo, a lo ancho (`lg:col-span-2`): con tres columnas a 1024px cada una mediría ~320px y los turnos se cortarían.
+Más angosto, todo en una columna. Las filas toman su forma angosta (`@container`): a 1440px las de turno bajan el botón
+a su renglón, como las tareas. Pending Task sigue con su filtro, Show more y vacío de siempre.
