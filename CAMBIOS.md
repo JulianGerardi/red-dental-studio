@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-18
 
+### Patients: barra lateral, Recent Patients de vuelta y sin el link "Patients ⌄" ([#44](https://github.com/JulianGerardi/red-dental-studio/pull/44))
+- *New Patient* pasa a la fila del título; la barra lateral (*Today Appointments* / *Recent Patients*, de vuelta con
+  los últimos 10) arranca a esa misma altura. Las dos listas usan `ui/show-more` (4 turnos, 3 pacientes): nunca queda
+  una fila cortada. Se saca el link "Patients ⌄" de arriba, que no abría nada.
+- **Para el dev:** `BotonVerTodos` se va de `pages/Patients.tsx`; para una lista larga nueva, `ui/show-more`.
+
 ### Dashboard: botón por panel, íconos de Pending Task a la derecha y más gente en la agenda ([#45](https://github.com/JulianGerardi/red-dental-studio/pull/45))
 - **Appointments** siempre muestra **Check In** (verde) y **Waiting Room** siempre **Check Out** (azul): la acción la
   decide el panel. **Cancel** sale del Dashboard; si se quiere, va como opción del kebab.
@@ -20,6 +26,21 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   (`xl:grid-cols-3`; el panel lleva `lg:col-span-2 xl:col-span-1`).
 
 ## 2026-10-17
+
+### New Appointment: visita linkeada a otro turno ([#41](https://github.com/JulianGerardi/red-dental-studio/pull/41))
+- Si la visita del plan que se elige ya está linkeada a otro turno, su fila lo muestra (fecha, hora, estado e info) y
+  Save pregunta *Move treatment visit?*: *Move visit* la mueve al turno nuevo; *Cancel* vuelve al drawer sin cambios.
+  Es una pregunta, no un tercer paso: así el indicador siempre dice dos.
+- **Para el dev:** `Visita.vinculada`, `TurnoVinculadoInfo` y `MoverVisitaDialog` en `TreatmentPlanPicker.tsx`.
+  `ConfirmDialog` ahora devuelve el foco al botón que lo abrió (aplica a todas). Storybook: *Components / Scheduling /
+  TreatmentPlanPicker* y *NewAppointmentModal*. e2e nuevo: `tests/scheduling-linked-visit.e2e.ts`.
+
+### Scheduling: View rediseñado ([#39](https://github.com/JulianGerardi/red-dental-studio/pull/39))
+- El filtro **View** tiene el diseño nuevo: Status en una fila, Providers con buscador y de a dos, Rooms al costado con *Current view* y pie con resumen,
+  Cancel y Save. Es un popover bajo el botón: Save guarda la vista; Cancel, ✕, Escape o clic afuera la descartan. En tablet y celular se reacomoda.
+- **Para el dev:** `ViewMenu` (en `ViewFiltersPanel.tsx`) reemplaza al panel absoluto y a `data-view-trigger`; `Scheduling` guarda `vista`
+  (`VistaCalendario`) pero la grilla todavía no filtra. Sale `Group`; entran `OpcionFiltro`, `GrupoFiltro` y `SeccionFiltro`. Storybook:
+  *Components / Scheduling / ViewFiltersPanel*.
 
 ### Patient Overview: Pending Task y Pending documents a la izquierda, Appointments en su columna ([#42](https://github.com/JulianGerardi/red-dental-studio/pull/42))
 - El Overview del paciente pasa a dos columnas desde 1024px: a la izquierda Pending Task y debajo Pending documents; a

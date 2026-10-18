@@ -420,7 +420,8 @@ esta plataforma (antes la regla era la contraria: nada de drawers salvo Add Proc
    review y el AI Narrative Editor (xl).
 6. **Siguen como confirmación chica** (`ui/confirm-dialog`, *Elements / ConfirmDialog*), igual que en 2.0: las
    preguntas de sí o no -Discard and close?, Back to permanent dentition?, limpiar la selección del odontograma,
-   Discard / Expire / Cancel / Present / Accept del caso, Confirm procedure- y el aviso de Clinical Note.
+   Discard / Expire / Cancel / Present / Accept del caso, Confirm procedure-, el aviso de Clinical Note y *Move treatment
+   visit?* de New Appointment (2026-10-17).
 7. **No cambian** los desplegables anclados (popovers, calendario, filtros) ni el visor de radiografías.
    `AppointmentDetailsDrawer` es una card anclada al turno y `LinkTreatmentPlanDrawer` no se usa en la app.
 8. **Add Relationship** (2026-10-06): drawer de 2.0 con Person, Contact y Relationship (*Components / Patients /
@@ -761,6 +762,14 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   campo de arriba (Edit Carrier › *Information*, pedido de Julián). En los drawers siguen una debajo de la otra
   (*Components / UI / Drawer → Specs → Fields*).
 
+## Patients: barra lateral con Show more (2026-10-13)
+
+- Today Appointments (4 filas) y Recent Patients (3) usan `ui/show-more`: filas enteras y "Show N more" con scroll
+  adentro. Están en la tabla *Limits in the app* de *Elements / Show more*, y la pantalla completa en *Pages / Patients*.
+- `BotonVerTodos` se va de `pages/Patients.tsx` y de *Pages / Parts / Patients* (queda `CountBubble`). La muestra *With
+  link* de *Components / Dashboard / Panel* (antes *With View all*) toma el link de *All treatment* en Treatment plans.
+- Decisiones y motivos en `figma/modulos/patients.md` (2026-10-13).
+
 ## Navigation: el menú en blanco (2026-10-13)
 
 - El rail de la app pasa de `surface-subtle` (`#fafafa`) a **blanco**; el bloque del logo sigue azul. *Elements /
@@ -801,6 +810,19 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `AccionesPaciente` reemplaza a `EncabezadoBilling`: los botones del paciente con `ui/button` md, en el `top` del Panel
   de la actividad. *Components / Dashboard / Panel and StatusPill* actualiza la descripción de `top`.
 - Decisiones en `figma/modulos/billing.md` (2026-10-13).
+
+## New Appointment: visita linkeada y pregunta de mover (2026-10-17)
+
+- *Components / Scheduling / TreatmentPlanPicker* pasa a la estructura de *Elements / Buttons* (Playground con controles
+  para *seleccionada*, *vinculada* y el estado del turno; Parts; States; Specs) y suma dos piezas: `TurnoVinculadoInfo`
+  (el bloque *Linked appointment* dentro de la fila, con `Pill` e `InfoTip`) y `MoverVisitaDialog` (la pregunta).
+  `VisitRow` toma `visita.vinculada` y la muestra aunque la fila no esté elegida.
+- *Components / Scheduling / NewAppointmentModal* también: Playground, Parts (los dos pasos), States (default, edit,
+  validación, visita linkeada, pregunta, movida) y Specs; las stories `Linked Visit` y `Move Visit Question` llegan hasta
+  ahí con un `play`.
+- *Elements / ConfirmDialog*: **al cerrarse devuelve el foco al botón que la abrió** (antes quedaba en `body`) y suma
+  la pregunta de mover a *Where*. Aplica a todas las confirmaciones.
+- Decisión y alternativas en `figma/modulos/scheduling.md` (2026-10-17). e2e: `tests/scheduling-linked-visit.e2e.ts`.
 
 ## Patient Overview en dos columnas (2026-10-17)
 - Página nueva *Pages / Parts / Patient Overview* (Playground, Parts, States, Specs). `PatientDetail` acepta `turnos`
@@ -899,3 +921,12 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - *Components / Clinical / RecordDetail*: sin lo del cobro (sale `ContenidoSede`, `ContenidoFinanzas`,
   `ContenidoAplicadas`, `Metrica` y `cargoDe`). Decisiones en `figma/modulos/ledger.md`, `billing.md` y
   `clinical-mode.md` (2026-10-14).
+
+## Scheduling: View rediseñado (2026-10-17)
+
+- *Components / Scheduling / ViewFiltersPanel* con **Playground** (ancho, selección, búsqueda, nombres largos), **In the toolbar**
+  (el botón real abierto), **Parts**, **States** (opción: default, hover, foco, elegida, nombre largo; panel: default, todo
+  elegido, búsqueda con y sin resultados, provider elegido escondido, poca altura, nombres largos), **Widths** (976, 744 y 351) y
+  **Specs** (medidas, tokens y reglas).
+- Piezas nuevas: `OpcionFiltro`, `GrupoFiltro` (radiogroup con flechas), `SeccionFiltro` y `ViewMenu`. Se va `Group`. Reusa
+  `Radio`, `EmptyState`, `Button`, `Popover` e `ICONO_SUELTO`. Decisiones en `figma/modulos/scheduling.md`.
