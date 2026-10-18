@@ -67,8 +67,8 @@ export const Parts: Story = {
         </div>
       </Bloque>
       <TablaPartes partes={[
-        ['Icon', 'La mano con el saludo; el calendario azul (20px) con la fecha, que entra con un giro corto.', 'CalendarDays'],
-        ['Text', '19px Regular negro, en una línea. El saludo es el del Figma; la fecha, "Weekday - Month D, YYYY".', 'SALUDO · fechaDelDia'],
+        ['Icon', 'La mano 👋 con el saludo; el calendario 📅 con la fecha, que entra con un giro corto. Los dos son emoji (3D).', 'Saludo'],
+        ['Text', '16px Regular negro, en una línea. El saludo es el del Figma; la fecha, "Weekday - Month D, YYYY".', 'SALUDO · fechaDelDia'],
         ['Caret', 'Barra azul de 2px que titila mientras se escribe; se va al terminar.', 'saludo-cursor'],
         ['Reserved width', 'Una copia invisible del texto más largo: la barra de arriba no se corre mientras se escribe.', 'grid'],
         ['Screen reader text', 'Saludo y fecha en un texto oculto; la parte animada va con aria-hidden.', 'sr-only'],

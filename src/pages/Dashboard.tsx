@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { CalendarDays, Clock, Activity, ShieldQuestionMark } from 'lucide-react'
+import { CalendarDays, Clock, Activity, ShieldQuestionMark, CalendarClock } from 'lucide-react'
 import { Panel } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FilterMenu } from '@/components/ui/filter-menu'
@@ -8,7 +8,7 @@ import { PageTitle } from '@/components/ui/page-title'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import type { Appointment } from '@/components/dashboard/AppointmentCard'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
-import { DatePicker, emojiFecha, sameDay } from '@/components/ui/date-picker'
+import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import { OperatoryStrip } from '@/components/dashboard/OperatoryStrip'
 import { AppointmentRow, TaskRow } from '@/components/dashboard/DashboardRows'
 import { ListGroup } from '@/components/ui/list-group'
@@ -76,7 +76,7 @@ export function FiltroFecha({
           variant="secondary" size="md" onClick={() => onChange(new Date())} title="Go to today"
           className="shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]"
         >
-          {emojiFecha("🗓️")} Today
+          <CalendarClock /> Today
         </Button>
       )}
       {/* Las preguntas frecuentes, en Help con el Dashboard abierto (Julián, 2026-10-13). */}
