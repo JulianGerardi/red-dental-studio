@@ -483,7 +483,7 @@ con su barra) con el dev server:
 
 | Pantalla | 1440×780 | 1920×950 |
 |---|---|---|
-| Dashboard | **entra** (2026-10-19, desde 1280px) | **entra** |
+| Dashboard | la fila de tres entra (2026-10-19, desde 1280px); Pending Task queda debajo | ídem |
 | Patients | +306 | +136 |
 | Patient Dashboard | +602 | +432 |
 | Treatments / Documents / Ledger / Relationships | +450 | +280 |

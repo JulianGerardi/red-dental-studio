@@ -698,7 +698,7 @@ la línea en esa room y que no aparezca en la waiting room"; "que la waiting roo
 como en Today Appointments, manteniendo la estética y la organización"; y "hay que evitar el scroll en general: se debe
 ver la información a simple vista".
 
-- **Rooms es un panel de acordeones** (`OperatoryList` + `OperatoryCard`), la tercera de cuatro columnas. Cada sala
+- **Rooms es un panel de acordeones** (`OperatoryList` + `OperatoryCard`), la tercera de las tres columnas de arriba. Cada sala
   muestra nombre, estado, *Patients today* y profesional; al tocarla se despliega **la línea del día de esa sala**: hora y
   punto (tilde verde = Complete, aro azul = Upcoming) unidos por una línea, y el turno con paciente, motivo, profesional y
   estado; los que vienen, resaltados en azul. Varias salas pueden estar abiertas; ninguna al empezar. Tocar un turno de la
@@ -709,16 +709,22 @@ ver la información a simple vista".
   turno (Check-up, Cleaning, Consultation, Filling); el artifact lo muestra y el Figma original no lo traía.
 - **Waiting Room independiente**: se va el filtro por sala y el chip ✕; tiene su propio *Filter* por operatorio, como
   Appointments, con el mismo `FilterMenu`. Vacío: "No one is waiting there".
-- **Entra en la pantalla.** Desde 1280px las cuatro columnas (Appointments · Waiting Room · Rooms · Pending Task) toman el
-  alto que queda hasta el pie de la ventana (`useAltoRestante`) y **scrollean adentro** (`Panel scroll`, con degradé
-  abajo); ya no hay "Show N more" ahí: están todas las filas. Para ganar alto: título, fecha y números van en una sola
-  fila, el pie reservado al botón de Confibot no se usa en esta pantalla (la última columna deja `pb-16` para que el fin
-  del scroll quede sobre el botón). Debajo de 1280px sigue lo de antes (dos columnas, tope por panel y "Show N more") y
-  la página scrollea, que es lo esperable en una tablet o un celular.
+- **Fila de tres que entra en la pantalla.** Desde 1280px las tres columnas (Appointments · Waiting Room · Rooms) toman
+  el alto que queda hasta el pie de la ventana (`useAltoRestante`) y **scrollean adentro** (`Panel scroll`, con degradé
+  abajo); ya no hay "Show N more" ahí: están todas las filas. Para ganar alto, título, fecha y números van en una sola
+  fila. Debajo de 1280px sigue lo de antes (dos columnas, tope por panel y "Show N more") y la página scrollea, lo
+  esperable en una tablet o un celular.
+- **Pending Task, abajo y a todo el ancho** (Julián, "pasá pending task abajo así queda la fila de a tres"): vuelve la
+  fila ancha de la tarea, con "Show N more". Es lo único que queda debajo del primer pantallazo, así que la página
+  scrollea para llegar a las tareas. Alternativa si se quiere todo sin scroll: partir el alto 60/40 entre la fila de
+  tres y Pending Task (cada una con scroll adentro); deja ~1,5 filas de tarea visibles a 1440×780.
+- **Tipo y estado de la tarea.** "Clinical Note • Requested" era el tipo con un punto azul y texto suelto al lado; ahora el
+  estado es una **pill** (la de Check In de los turnos, en azul) y, en la fila ancha, va **debajo del tipo**, como el
+  nombre y el Check In del turno; en angosto va al lado.
 - **Fila de turno en columna angosta** (`AppointmentRow`): a 250–320px el nombre quedaba en "No…"; ahora TR y CC bajan
   junto a Check In y el provider·operatorio va en su renglón (container query `@sm`, 384px).
-- **Medido** (altura de la página / ventana): 1280×720, 1366×768, 1440×780, 1440×900, 1536×800 y 1920×950 entran sin
-  scroll; 1024 y celular scrollean.
+- **Medido:** la fila de tres ocupa justo el alto de la ventana en 1280×720, 1366×768, 1440×780/900, 1536×800 y 1920×950;
+  Pending Task queda debajo.
 - **A validar con usuarios:** si recepción prefiere una sola sala abierta a la vez (hoy, varias) y si 3–4 filas por
   columna a la vista alcanzan en 1280×720 o conviene un modo más denso.
 

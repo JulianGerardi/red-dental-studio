@@ -88,7 +88,7 @@ export const Parts: Story = {
         <Caja ancho={1100}><li><TaskRow task={TAREA} /></li></Caja>
         <TablaPartes partes={[
           ['Kind', 'El tipo de tarea en 14px Bold, el título de la card.', 'task.kind'],
-          ['Requested', 'El estado con el punto azul.', 'task.state'],
+          ['Requested', 'El estado en una pill azul (la del Check In de los turnos): debajo del tipo en la fila ancha, al lado en la angosta (2026-10-19).', 'task.state · StatusPill'],
           ['Patient', 'Iniciales en el cuadrado celeste y el nombre, como en la card.', 'task.initials · task.person'],
           ['Document · Expired date', 'El botón rojo del documento y el aviso ámbar de la card.', 'DocYVencida'],
           ['Register · Expiration date', 'Las dos fechas con su rótulo: Register en azul, Expiration date en rojo.', 'task.register · task.expiration'],

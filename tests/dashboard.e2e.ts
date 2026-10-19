@@ -22,11 +22,11 @@ test('La fecha se lee "Feb 28, 2026"; elegir un día lo cambia y Today vuelve a 
   await expect(screen.getByRole('button', /Today/)).toHaveCount(0)
 })
 
-/* Desde 1280px las cuatro columnas toman el alto de la ventana y scrollean adentro: no hay "Show N more" y están todas
-   las filas (dashboard.md, 2026-10-19). Con ?day=busy hay 35 turnos. */
-test('Con muchos turnos las columnas scrollean adentro, sin Show more', async ({ app, screen }) => {
+/* Desde 1280px las tres columnas de arriba toman el alto de la ventana y scrollean adentro: no hay "Show N more" y
+   están todas las filas; Pending Task, abajo, sí lo lleva (dashboard.md, 2026-10-19). Con ?day=busy hay 35 turnos. */
+test('Con muchos turnos las columnas scrollean adentro; sólo Pending Task lleva Show more', async ({ app, screen }) => {
   await app.open('/?day=busy')
-  await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(0)
+  await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(1)
   await expect(screen.getByRole('button', /^Check In/)).toHaveCount(35)
 })
 

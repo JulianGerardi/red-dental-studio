@@ -110,10 +110,10 @@ export default function Dashboard() {
   const [tipos, setTipos] = useState<string[]>([])
   /* La Waiting Room tiene su propio filtro, como Appointments; las salas ya no la filtran (dashboard.md, 2026-10-19). */
   const [salasEspera, setSalasEspera] = useState<string[]>([])
-  /* Desde 1280px las cuatro columnas toman el alto de la ventana y scrollean adentro: la pantalla entra sin scroll. */
+  /* Desde 1280px las tres columnas toman el alto de la ventana y scrollean adentro; Pending Task va abajo, a todo el ancho. */
   const ajusta = useMedia('(min-width: 1280px)')
   const grilla = useRef<HTMLDivElement>(null)
-  const altoGrilla = useAltoRestante(grilla, ajusta)
+  const altoGrilla = useAltoRestante(grilla, ajusta, { abajo: 16 })
   const [selected, setSelected] =
     useState<{ appt: Appointment; rect: DOMRect; id?: string } | null>(null)
   const [editando, setEditando] = useState<{ datos: DatosTurno; origen: Origen } | null>(null)
@@ -228,7 +228,7 @@ export default function Dashboard() {
   const enEspera = dia.waiting.filter((w) => salasEspera.length === 0 || salasEspera.includes(w.operatory))
 
   return (
-    <div className={cn(CONTENEDOR_PAGINA, 'min-[1280px]:-mb-28')}>
+    <div className={CONTENEDOR_PAGINA}>
       {/* El día de hoy pasó al Topbar y el elegido lo dice el selector (Julián, 2026-10-13). Título, fecha y números en una
           sola fila: así las columnas de abajo se llevan el alto (2026-10-19). La fecha manda sobre toda la pantalla y vive
           acá arriba, no adentro de Appointments: metida en una de las columnas, parecía filtrar sólo esa. */}
@@ -243,10 +243,10 @@ export default function Dashboard() {
       </div>
 
       {/* Mucho volumen: filas en lugar de cards (las mismas partes). Hasta 1279px, un tope por panel y "Show N more" abre el resto con
-          scroll adentro (dashboard.md, 2026-10-12); desde ahí, cuatro columnas que toman el alto de la ventana y scrollean adentro. */}
+          scroll adentro (dashboard.md, 2026-10-12); desde ahí, tres columnas que toman el alto de la ventana y scrollean adentro. */}
       <div
         ref={grilla} style={altoGrilla ? { height: altoGrilla } : undefined}
-        className="mt-4 grid gap-4 lg:max-[1279px]:grid-cols-2 min-[1280px]:grid-cols-4 min-[1280px]:grid-rows-[minmax(0,1fr)]"
+        className="mt-4 grid gap-4 lg:max-[1279px]:grid-cols-2 min-[1280px]:grid-cols-3 min-[1280px]:grid-rows-[minmax(0,1fr)]"
       >
         <Panel
           title="Appointments" scroll={ajusta}
@@ -319,34 +319,33 @@ export default function Dashboard() {
         <Panel title="Rooms" scroll={ajusta}>
           <OperatoryList rooms={dia.rooms} turnos={dia.appointments} onSelect={(a, el) => pick(a, el)} />
         </Panel>
-
-        <Panel
-          title="Pending Task" scroll={ajusta}
-          /* El botón flotante de Confibot cae sobre la esquina de abajo: el fin del scroll queda por encima. */
-          bodyClassName={ajusta ? 'pb-16' : undefined}
-          controls={
-            <BotonFiltro
-              label="Filter tasks" options={TASK_KINDS} value={tipos} onChange={setTipos}
-            />
-          }
-        >
-          {tareas.length === 0 ? (
-            <EmptyState
-              icon={Activity}
-              title="Nothing pending"
-              detail={
-                dia.tasks.length === 0
-                  ? 'There are no tasks waiting on this day.'
-                  : 'No pending tasks match the selected types.'
-              }
-            />
-          ) : (
-            <ListGroup limit={ajusta ? undefined : TOPE.tareas} label="pending tasks">
-              {tareas.map((t, i) => <TaskRow key={i} task={t} />)}
-            </ListGroup>
-          )}
-        </Panel>
       </div>
+
+      {/* Pending Task va abajo, a todo el ancho: arriba queda la fila de tres (Julián, 2026-10-19). */}
+      <Panel
+        title="Pending Task" className="mt-4"
+        controls={
+          <BotonFiltro
+            label="Filter tasks" options={TASK_KINDS} value={tipos} onChange={setTipos}
+          />
+        }
+      >
+        {tareas.length === 0 ? (
+          <EmptyState
+            icon={Activity}
+            title="Nothing pending"
+            detail={
+              dia.tasks.length === 0
+                ? 'There are no tasks waiting on this day.'
+                : 'No pending tasks match the selected types.'
+            }
+          />
+        ) : (
+          <ListGroup limit={TOPE.tareas} label="pending tasks">
+            {tareas.map((t, i) => <TaskRow key={i} task={t} />)}
+          </ListGroup>
+        )}
+      </Panel>
 
       {editando && (
         <NewAppointmentModal

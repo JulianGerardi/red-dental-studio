@@ -5,15 +5,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
-### Dashboard: salas como acordeón, Waiting Room independiente y columnas que entran en la pantalla ([#64](https://github.com/JulianGerardi/red-dental-studio/pull/64))
+### Dashboard: salas como acordeón, Waiting Room independiente y fila de tres que entra en la pantalla ([#64](https://github.com/JulianGerardi/red-dental-studio/pull/64))
 - **Rooms** pasa a ser la tercera de cuatro columnas, con el diseño del artifact: tocar una sala despliega la línea del
   día de esa sala (hora, paciente, motivo, profesional, Complete / Upcoming) y ya no filtra la Waiting Room. "Patients
   today" es la cantidad de turnos de la sala.
 - **Waiting Room independiente**, con su propio Filter por operatorio.
-- **Sin scroll de página desde 1280px:** las cuatro columnas toman el alto de la ventana y scrollean adentro; abajo de
-  1280px sigue como antes. Medido sin scroll en 1280×720, 1366×768, 1440×780/900, 1536×800 y 1920×950.
+- **Fila de tres que entra en la pantalla desde 1280px:** Appointments, Waiting Room y Rooms toman el alto de la ventana
+  y scrollean adentro; abajo de 1280px sigue como antes. **Pending Task va abajo, a todo el ancho**, y su fila muestra
+  el estado (Requested) en una pill debajo del tipo.
 - **Para el dev:** `OperatoryStrip` se borra; `OperatoryList` + `OperatoryCard` (`turnos`, `abierta`, `onToggle`,
-  `onSelect`) y `LineaDelDia`. `Panel` suma `scroll`; hook `useAltoRestante`. `Appointment.motivo` (mock). `AppointmentRow`
+  `onSelect`) y `LineaDelDia`. `Panel` suma `scroll`; hook `useAltoRestante`. `TaskRow` usa `StatusPill` para el estado. `Appointment.motivo` (mock). `AppointmentRow`
   baja TR/CC junto a Check In con `@sm`. El e2e del Dashboard se reescribió (ya no hay Show more a 1440px).
 
 ### Dashboard: tocar un turno abre la ficha flotante ([#61](https://github.com/JulianGerardi/red-dental-studio/pull/61))

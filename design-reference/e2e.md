@@ -43,7 +43,8 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   (2026-10-13) *Check In* avisa "checked in" y el escudo de al lado de Today lleva a Help.
   (2026-10-19) Tocar un turno abre la ficha flotante del paciente y Check In no. Las salas son acordeones: tocar una
   despliega su día y no filtra la Waiting Room, que se filtra con su propio Filter (Operatory 4 deja 1 de 6). Con
-  `?day=busy` no hay "Show more" a 1440px: los 35 turnos están en la columna, que scrollea adentro.
+  `?day=busy` no hay "Show more" en las tres columnas de arriba a 1440px (los 35 turnos están en la columna, que scrollea
+  adentro); sólo Pending Task, abajo, lo lleva.
   (2026-10-19) La tira de salas va en una fila con scroll (sin Show more); elegir una sala filtra la Waiting Room y
   una sala sin gente (Operatory 5) la deja vacía.
 - `tests/clinical-mode.e2e.ts`: la app abre, y Add Procedure carga un D0120 desde DentAssmt recorriendo los tres

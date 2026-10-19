@@ -143,15 +143,13 @@ export function DocYVencida() {
    partes que el turno. */
 export function TaskRow({ task }: { task: PendingTask }) {
   const tipo = <span className="text-dash-name truncate text-sm leading-none font-bold">{task.kind}</span>
+  /* El estado va en una pill, como el Check In del turno, y no como un punto con texto suelto al lado del tipo (Julián,
+     2026-10-19). Angosto, junto al tipo; ancho, debajo. */
+  const pill = <StatusPill tone="busy" className="px-1.5 py-[2px] text-[10px]">{task.state}</StatusPill>
   const persona = (
     <span className="flex min-w-0 items-center gap-2">
       <Avatar initials={task.initials} size={28} />
       <span className="text-dash-name truncate text-[13px] font-semibold">{task.person}</span>
-    </span>
-  )
-  const estado = (
-    <span className="text-dash-blue flex shrink-0 items-center gap-1.5 text-xs">
-      <span className="bg-dash-blue size-1.5 rounded-full" /> {task.state}
     </span>
   )
   const fecha = (rotulo: string, valor: string, color: string) => (
@@ -176,7 +174,7 @@ export function TaskRow({ task }: { task: PendingTask }) {
   return (
     <div className="@container">
       <div className="flex flex-col gap-2 p-2.5 @5xl:hidden">
-        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">{tipo}{estado}</div>
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">{tipo}{pill}</div>
         <div className="flex flex-wrap items-center gap-2">{persona}<span className="ml-auto"><DocYVencida /></span></div>
         <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
           {fechas}
@@ -185,7 +183,7 @@ export function TaskRow({ task }: { task: PendingTask }) {
       </div>
 
       <div className="hidden items-center gap-5 p-2.5 @5xl:flex">
-        <span className="flex w-48 shrink-0 items-center gap-2.5">{tipo}{estado}</span>
+        <span className="flex w-48 shrink-0 flex-col items-start gap-1.5">{tipo}{pill}</span>
         <span className="flex w-40 shrink-0">{persona}</span>
         <DocYVencida />
         {fechas}
