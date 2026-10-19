@@ -42,11 +42,15 @@ const tareas = (porTipo: number, register: string, expiration: string): PendingT
 
 /* Cada sala con el nombre que dicen los turnos ("Operatory 2"), para armar su línea del día. El Figma decía
    "Operatory name" en todas (dashboard.md, 2026-10-17). */
-const salas = (statuses: Operatory['status'][], pacientes: number): Operatory[] =>
+/* "Patients today" venía con el mismo número fijo en las seis salas, y no coincidía con nada (Julián, 2026-10-19): se
+   turnan 12 / 10 / 4 para que se vea que cada sala puede traer un número distinto. No sale de los turnos reales (eso
+   quedó descartado el mismo día por pisarse con el filtro de la sala de espera); es sólo el dato de mock variando. */
+const PACIENTES_POR_SALA = [12, 10, 4]
+const salas = (statuses: Operatory['status'][], pacientes: number[] = PACIENTES_POR_SALA): Operatory[] =>
   statuses.map((status, i) => ({
     name: `Operatory ${i + 1}`,
     status,
-    patientsToday: pacientes,
+    patientsToday: pacientes[i % pacientes.length]!,
     provider: 'Daniel Anderson',
   }))
 
@@ -76,7 +80,7 @@ export const DIAS: Record<string, DiaDashboard> = {
       turno('Elias Aguirre', 'EA', 'Dr. Salgado', 'Operatory 3', '08:30'),
       turno('Sofia Chen', 'SC', 'Dr. Emily Chen', 'Operatory 4', '12:00'),
     ],
-    rooms: salas(['Available', 'Busy', 'Busy', 'Busy', 'Unavailable', 'Available'], 12),
+    rooms: salas(['Available', 'Busy', 'Busy', 'Busy', 'Unavailable', 'Available']),
     tasks: tareas(2, 'March 17, 2025', 'March 15, 2025'),
     encuentros: { abiertos: 2, promedio: '18 min avg.' },
   },
@@ -90,7 +94,7 @@ export const DIAS: Record<string, DiaDashboard> = {
     waiting: [
       turno('Mara Otero', 'MO', 'Dr. Elena Martinez', 'Operatory 1', '09:00', { nuevo: true }),
     ],
-    rooms: salas(['Busy', 'Available', 'Available', 'Busy', 'Available', 'Unavailable'], 7),
+    rooms: salas(['Busy', 'Available', 'Available', 'Busy', 'Available', 'Unavailable']),
     tasks: tareas(1, 'March 20, 2025', 'March 18, 2025'),
     encuentros: { abiertos: 1, promedio: '22 min avg.' },
   },
@@ -101,7 +105,7 @@ export const DIAS: Record<string, DiaDashboard> = {
       turno('Maria Abril Viola', 'AV', 'Dr. Emily Chen', 'Operatory 1', '14:00'),
     ],
     waiting: [],
-    rooms: salas(['Available', 'Available', 'Busy', 'Available', 'Available', 'Available'], 4),
+    rooms: salas(['Available', 'Available', 'Busy', 'Available', 'Available', 'Available']),
     tasks: tareas(1, 'March 24, 2025', 'March 22, 2025').slice(0, 2),
     encuentros: { abiertos: 1, promedio: '12 min avg.' },
   },
@@ -110,7 +114,7 @@ export const DIAS: Record<string, DiaDashboard> = {
 export const DIA_VACIO: DiaDashboard = {
   appointments: [],
   waiting: [],
-  rooms: salas(['Available', 'Available', 'Available', 'Available', 'Available', 'Available'], 0),
+  rooms: salas(['Available', 'Available', 'Available', 'Available', 'Available', 'Available'], [0]),
   tasks: [],
   encuentros: { abiertos: 0, promedio: 'no data' },
 }
@@ -202,7 +206,7 @@ export const DIA_CARGADO: DiaDashboard = {
     turno(name, iniciales(name), PROVIDERS[i % 5]!, `Operatory ${(i % 5) + 1}`, hora(615 + i * 15), {
       nuevo: i % 3 === 0,
     })),
-  rooms: salas(['Busy', 'Busy', 'Available', 'Busy', 'Unavailable', 'Busy'], 12),
+  rooms: salas(['Busy', 'Busy', 'Available', 'Busy', 'Unavailable', 'Busy']),
   tasks: tareas(7, 'March 17, 2025', 'March 15, 2025'),
   encuentros: { abiertos: 4, promedio: '21 min avg.' },
 }

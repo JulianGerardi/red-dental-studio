@@ -32,6 +32,8 @@ type PropsTurno = {
   activa?: boolean
   onSelect?: (appt: Appointment, el: HTMLElement, id?: string) => void
   onEdit?: (appt: Appointment) => void
+  /** La sala de arriba ya la dice el chip del título: repetirla en cada fila es ruido (Julián, 2026-10-19). */
+  ocultarOperatorio?: boolean
 }
 
 /* El nombre abre la ficha rápida y es el camino con teclado: la fila entera no puede ser un botón porque tiene otros adentro. */
@@ -53,14 +55,14 @@ const CHECK_IN = <StatusPill tone="ok" className="px-1.5 py-[2px] text-[10px]">C
 
 /* Un turno: hora, iniciales, nombre con Check In, provider y operatorio, TR y CC, Check Out o Cancel y el kebab con
    Edit appointment. Angosta en dos renglones; ancha en columnas. */
-export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurno) {
+export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOperatorio }: PropsTurno) {
   const accion = appt.accion ?? 'Check Out'
   const iniciales = <Avatar initials={appt.initials} size={28} />
   const boton = (
     <Button size="sm" variant={ACCION_TURNO[accion]} className="shrink-0" onClick={(e) => { e.stopPropagation(); accionTurno(appt) }}>{accion} <ArrowRight /></Button>
   )
   const menu = <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
-  const donde = `${appt.provider} · ${appt.operatory}`
+  const donde = ocultarOperatorio ? appt.provider : `${appt.provider} · ${appt.operatory}`
 
   return (
     <div className="@container">
@@ -111,7 +113,7 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurn
             {CHECK_IN}
           </span>
           <span className="min-w-0 flex-1 truncate text-[12px] text-ink-soft">{appt.provider}</span>
-          <span className="w-24 shrink-0 truncate text-[12px] text-ink-soft">{appt.operatory}</span>
+          {!ocultarOperatorio && <span className="w-24 shrink-0 truncate text-[12px] text-ink-soft">{appt.operatory}</span>}
           <ChipsTurno />
           <span className="flex w-28 shrink-0 justify-end">{boton}</span>
           {menu}

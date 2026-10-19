@@ -28,7 +28,9 @@ const meta = {
           '',
           '**Pasos:** cada paso dice su nombre (General, Contact, Address…), así el usuario sabe qué está haciendo. Al avanzar, el tilde rebota, la línea se llena en verde y el contenido entra desde la derecha (con Return, desde la izquierda).',
           '',
-          '**Probalo:** en *Playground* cambiá la cantidad de pasos y el tamaño desde *Controls*.',
+          '**Con poco alto de ventana** (2026-10-19): un paso con muchos campos (New Appointment, paso 1) puede no entrar entero. El contenido scrollea solo, pero el pie no se movía y el último campo quedaba cortado contra él sin ningún aviso (parecía un bug, no que seguía con scroll). Ahora, mientras falte contenido por ver, el pie lleva una sombra arriba, igual que una barra elevada tapando lo que sigue debajo; al llegar al final se va. Ver *Parts → Footer shadow*.',
+          '',
+          '**Probalo:** en *Playground* cambiá la cantidad de pasos y el tamaño desde *Controls*; achicá la ventana del navegador (o el panel de Storybook) con varios pasos para ver la sombra del pie aparecer y desaparecer al llegar al final.',
         ].join('\n'),
       },
     },
@@ -124,6 +126,16 @@ export const Parts: Story = {
               </div>
             </ConRotulo>
           ))}
+        </Muestras>
+      </Bloque>
+      <Bloque titulo="Footer shadow" nota="El drawer mide si el contenido sigue por abajo (scrollHeight contra clientHeight, con ResizeObserver) y le agrega la sombra al pie mientras eso sea cierto; al llegar al final se va sola. En Playground, con varios pasos, achicar la ventana muestra el caso real: el campo cortado a mitad de camino, con la sombra separándolo del pie.">
+        <Muestras>
+          <ConRotulo rotulo="At rest">
+            <div className="flex h-10 w-[260px] items-center justify-end border-t border-line-soft px-4 text-[11px] text-ink-muted">footer</div>
+          </ConRotulo>
+          <ConRotulo rotulo="With more below">
+            <div className="flex h-10 w-[260px] items-center justify-end border-t border-line-soft px-4 text-[11px] text-ink-muted shadow-[0_-6px_10px_-6px_rgb(0_0_0/0.15)]">footer</div>
+          </ConRotulo>
         </Muestras>
       </Bloque>
     </Lienzo>

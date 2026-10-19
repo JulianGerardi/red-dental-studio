@@ -18,6 +18,8 @@ const meta = {
           '',
           '**Visita linkeada a otro turno** (desde 2026-10-17): una visita pertenece a un solo turno. Si la que se elige ya tiene uno, su fila lo muestra —fecha, hora y estado— con un círculo de info, y **Save pregunta *Move treatment visit?***. *Move visit* la desvincula del turno anterior y la linkea al nuevo; *Cancel* vuelve al drawer sin tocar nada. Es una pregunta de sí o no, por eso es un `ConfirmDialog` y no un tercer paso.',
           '',
+          '**Las sugerencias de Patient y los dos Provider llevan una segunda línea** (2026-10-19): fecha de nacimiento y email del paciente, email del provider (`SearchField` → prop `subtext`, *Elements / Fields*). Julián: "antes además del nombre decía la fecha de nacimiento y email". El del provider sale de Settings → Employees; el del paciente es mock propio de esta pantalla, sin ficha única para esos cuatro nombres.',
+          '',
           '**Probalo:** en *Playground* completá el paso 1, avanzá y elegí **Visit 2** (es la linkeada); después apretá Save.',
         ].join('\n'),
       },

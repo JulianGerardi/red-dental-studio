@@ -754,3 +754,33 @@ lo nuevo el scroll de las room". Se deshace lo anterior de este mismo día, salv
   coincidiría con el filtro de la Waiting Room. Queda a decisión de Julián.
 - **Se conserva** `OperatoryStrip` en una fila con scroll horizontal (232px mínimo, snap) sin "Show N more", y los datos
   nuevos (Operatory 6 Available, turno de Sofia Chen).
+
+## Cuatro ajustes sobre la tira de salas y la sala de espera filtrada (2026-10-19)
+
+Julián: 1) "cuando selecciono operatory 1 aparece cortado el stroke azul"; 2) el número de "Patients today" no coincide
+con la sala de espera, pedido de volver a variarlo (12, 10, 4...); 3) no le gusta cómo se ve la sala de espera al
+filtrar por un operatorio; 4) recordar que las cards van hasta el final del contenedor blanco.
+
+1. **El anillo de la primera sala se cortaba contra el borde del scroll.** `OperatoryStrip` reserva aire con
+   `-m-1.5 p-1.5` para que el anillo y la sombra de la elegida no se corten, pero `snap-start` alineaba la primera card
+   justo contra el borde del scrollport, pisando ese aire (`scrollLeft` quedaba en 6px, el mismo valor del padding, en
+   vez de 0). `scroll-p-1.5` le pide al snap que respete ese margen al elegir dónde parar. Ver *Components / Dashboard /
+   Operatory strip → Parts → Selection ring* y *States → First room selected*.
+2. **"Patients today" vuelve a variar por sala.** Había quedado en un número fijo igual para las seis salas (12, o 7, o
+   4 según el día), sin relación con nada. Julián pidió que vuelva a variar, no necesariamente que coincida con la sala
+   de espera (eso se probó el mismo 19 y se descartó por pisarse con el filtro). `salas()` en `dashboard-data.ts` turna
+   ahora 12 / 10 / 4 entre las salas de cada día, mock, no calculado.
+3. **Elegir una sala ya no repite la sala en cada fila de abajo.** El chip del título de Waiting Room ya dice qué sala
+   está filtrada ("Waiting Room · Operatory 1 ×"); que cada fila debajo volviera a decir "Dr. Salgado · Operatory 1" era
+   ruido redundante. `AppointmentRow` suma `ocultarOperatorio`: con el filtro activo, la fila muestra sólo el provider.
+   Sin filtro (Appointments, o Waiting Room completa) sigue mostrando la sala, como siempre. Ver *Components / Dashboard
+   / Dashboard rows → States → Operatory hidden*.
+4. **La card blanca ya no quedaba con un hueco enorme al filtrar.** La grilla estira Appointments, Waiting Room y
+   Pending Task a la altura del más alto (decisión de siempre, ver más arriba, 2026-08-25); con la sala de espera
+   filtrada a dos turnos eso dejaba un bloque blanco vacío de cientos de píxeles debajo, nada armonioso. Filtrada, el
+   contenedor de Waiting Room pasa a `self-start`: abraza sus propias filas en vez de estirarse parejo con sus vecinas.
+   Sin filtro, las tres siguen parejas como siempre.
+
+**Para validar con usuarios:** el punto 3 es una lectura de "no me gusta cómo se muestra" (sacar la sala repetida); si
+lo que buscaba era otra cosa —por ejemplo, un vínculo visual más fuerte entre la sala tocada arriba y la lista
+filtrada abajo—, decime y lo ajusto.

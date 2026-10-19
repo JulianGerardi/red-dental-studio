@@ -5,8 +5,28 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Dashboard: anillo de sala, Patients today variable y Waiting Room filtrada sin hueco ([#60](https://github.com/JulianGerardi/red-dental-studio/pull/60))
+- El anillo azul de la sala elegida ya no se corta contra el borde del scroll al elegir Operatory 1 (la primera de la
+  tira). "Patients today" vuelve a variar por sala (12/10/4) en vez del número fijo e igual en las seis. Elegir una
+  sala ya no repite su nombre en cada fila de Waiting Room (el chip del título ya lo dice) y el panel filtrado abraza
+  sus filas en vez de dejar un hueco blanco enorme debajo.
+- En New Appointment, paso 1: con poco alto de ventana el último campo quedaba cortado contra el pie sin ningún aviso.
+  Arreglado en `ui/drawer` (vale para todos los drawers): el pie lleva una sombra elevada mientras el paso siga con
+  scroll.
+- New Appointment: las sugerencias de Patient y de los dos Provider llevan una segunda línea (fecha de nacimiento y
+  email del paciente; email del provider), que antes faltaba.
+- **Para el dev:** `OperatoryStrip` suma `scroll-p-1.5`; `dashboard-data.ts#salas()` recibe un array de números en vez
+  de uno fijo; `AppointmentRow` suma la prop `ocultarOperatorio`; el wrapper de Waiting Room en `Dashboard.tsx` agrega
+  `self-start` con sala elegida; `Drawer` mide con `ResizeObserver` si falta contenido por ver; `SearchField` suma la
+  prop opcional `subtext` (sin ella no cambia nada para sus otros usos).
+
+### El banner amarillo sin padding arriba ni a los costados ([#62](https://github.com/JulianGerardi/red-dental-studio/pull/62))
+- El aviso de tareas pendientes va pegado al header y a los bordes del contenido de la página (antes tenía
+  `px-4 pt-4 sm:px-6`). El ancho y el orden interno no cambiaron.
+- **Para el dev:** `NotificationBanner` — el wrapper de `ANCHO_PAGINA` pasa a `px-0 pt-0`.
+
 ### Dashboard: salas como acordeón, Waiting Room independiente y fila de tres que entra en la pantalla ([#64](https://github.com/JulianGerardi/red-dental-studio/pull/64))
-- **Rooms** pasa a ser la tercera de cuatro columnas, con el diseño del artifact: tocar una sala despliega la línea del
+- **Rooms** pasa a ser la tercera de tres columnas, con el diseño del artifact: tocar una sala despliega la línea del
   día de esa sala (hora, paciente, motivo, profesional, Complete / Upcoming) y ya no filtra la Waiting Room. "Patients
   today" es la cantidad de turnos de la sala.
 - **Waiting Room independiente**, con su propio Filter por operatorio.
