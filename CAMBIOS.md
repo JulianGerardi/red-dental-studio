@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Detalle del Ledger y Billing más corto, con un solo "View full record" ([#57](https://github.com/JulianGerardi/red-dental-studio/pull/57))
+- En el detalle de una fila: los pies **View procedure / View payment / View adjustment** pasan a **View full record**,
+  igual que en Procedures y en los findings. Se van **Adjustment reason** (ya es el título), **Payment methods** y las
+  frases explicativas de debajo de Financial details y de las aplicaciones.
+- **Para el dev:** `LedgerRowDetail` usa `VerRegistroCompleto` (`ui/detail-list`) y pierde `Motivo` y `MetodosDePago`. El
+  e2e de Ledger busca ahora *View full record*.
+
 ### Billing: sin los saldos del garante ni la columna Balance ([#56](https://github.com/JulianGerardi/red-dental-studio/pull/56))
 - Con un paciente elegido se van *Guarantor Unapplied Credits* y *Guarantor Open Balance*, y la tabla pierde la columna
   Balance (también el campo Balance del detalle de la fila y de *View full record*): son de la cuenta en todas las
