@@ -13,7 +13,7 @@ import { ClinicalBadge, type TipoBadge } from '@/components/clinical/ClinicalBad
 import { useWorkflows } from '@/components/clinical/WorkflowsContext'
 import { WORKFLOWS, WORKFLOW_DEL_BADGE, contestada, preguntasVisibles, textoRespuesta, type ProgresoWorkflow } from '@/data/workflows'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
 import { ClinicalItemModal } from '@/components/patients/ClinicalItemModal'
 import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clinicalItems'
@@ -129,22 +129,21 @@ export function ResumenWorkflow({ k, progreso, onAbrir }: { k: TipoBadge; progre
   )
 }
 
-/* Figma 4540:27072: al cerrar el encuentro se ofrece firmar la Clinical Note ahora o más tarde. */
+/* Figma 4540:27072: al cerrar el encuentro se ofrece firmar la Clinical Note ahora o más tarde. Con ui/confirm-dialog
+   como el resto de la app (antes rearmaba Dialog a mano, clinical-mode.md 2026-10-19); cerrarlo con Esc o el fondo
+   cuenta como Remind me later, igual que en cualquier otro ConfirmDialog. */
 export function ClinicalNoteDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  if (!open) return null
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent showCloseButton={false} className="gap-0 p-6 sm:max-w-[440px]">
-        <DialogTitle className="text-[18px] font-semibold text-ink">Clinical Note</DialogTitle>
-        <DialogDescription className="mt-3 text-[13px] leading-relaxed text-ink-muted">
-          The clinical encounter has been completed.<br />
-          You can sign the Clinical Note now or defer the signature and complete it later.
-        </DialogDescription>
-        <div className="mt-6 flex flex-wrap justify-end gap-2">
-          <Button variant="secondary" onClick={() => { onClose(); aviso.info('We will remind you to sign the Clinical Note.') }}>Remind me later</Button>
-          <Button onClick={() => { onClose(); aviso.ok('Clinical Note signed.') }}>Review and sign</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <ConfirmDialog
+      title="Clinical Note"
+      confirmLabel="Review and sign"
+      cancelLabel="Remind me later"
+      onCancel={() => { onClose(); aviso.info('We will remind you to sign the Clinical Note.') }}
+      onConfirm={() => { onClose(); aviso.ok('Clinical Note signed.') }}
+    >
+      <p>The clinical encounter has been completed.<br />You can sign the Clinical Note now or defer the signature and complete it later.</p>
+    </ConfirmDialog>
   )
 }
 

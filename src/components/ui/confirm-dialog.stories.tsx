@@ -101,6 +101,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Confirm procedure</td><td>primary</td></tr>
           <tr><td className="font-semibold">Consent required (Complete, Start)</td><td>primary con ícono de alerta y tercera salida</td></tr>
           <tr><td className="font-semibold">Move treatment visit? (New Appointment, al guardar con una visita linkeada a otro turno)</td><td>primary</td></tr>
+          <tr><td className="font-semibold">Clinical Note (al terminar el encuentro; Cancel es "Remind me later")</td><td>primary</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>
