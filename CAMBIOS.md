@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### El banner amarillo, sin el tope de ancho de la página ([#66](https://github.com/JulianGerardi/red-dental-studio/pull/66))
+- Ajuste sobre el PR #62: el banner amarillo medía lo mismo que el `max-w-[1400px]/1800px` de `ANCHO_PAGINA` (el
+  mismo tope que el título y las cards), así que en pantallas muy anchas seguía con aire a los costados en vez de ir
+  de punta a punta de verdad. Ahora mide el 100% de la columna de contenido (sidebar aparte).
+- **Para el dev:** `NotificationBanner` deja de usar `ANCHO_PAGINA`; es un único `<div role="status" className="w-full …">`, sin wrapper.
+
 ### Billing y Patients: título pegado al buscador ([#65](https://github.com/JulianGerardi/red-dental-studio/pull/65))
 - Find Patient (Billing) y Today Appointments / Recent Patients (Patients): el encabezado del panel baja de 52 a 40px y
   el cuerpo arranca sin padding arriba. Today (Billing) usa la medida de las cards compactas de Patients.

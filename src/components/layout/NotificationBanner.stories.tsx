@@ -17,7 +17,7 @@ const meta = {
       story: { inline: false, iframeHeight: 620 },
       description: {
         component: [
-          "El aviso de tareas sin leer arriba de cada pantalla (documentos para firmar, derivaciones, llamados). Es la **tarjeta** ámbar del design system, de punta a punta del contenido de la página (Julián, 2026-10-13; antes iba del ancho de su texto), sin padding arriba ni a los costados (Julián, 2026-10-19), pegado al header y a los bordes del contenido.",
+          "El aviso de tareas sin leer arriba de cada pantalla (documentos para firmar, derivaciones, llamados). Es la **tarjeta** ámbar del design system, de punta a punta de la columna de contenido (Julián, 2026-10-13; antes iba del ancho de su texto), sin padding ni tope de ancho (Julián, 2026-10-19): pegado al header, al rail y al borde derecho, sin el `max-w` que acota el resto de la página.",
           "",
           "**Cómo se ordena:** la tarea, Review y el paginador juntos a la izquierda; la X sola, a la derecha.",
           "",
@@ -53,7 +53,7 @@ export const Empty: Story = {
   ),
 }
 
-/* En la página: el aviso del ancho de su contenido, alineado con el título. */
+/* En la página: el aviso de punta a punta de la columna, el contenido de abajo con su propio ancho acotado. */
 function Pagina() {
   const [cursor, setCursor] = useState(0)
   return (
@@ -109,8 +109,8 @@ export const Specs: Story = {
     <Lienzo>
       <Bloque titulo="Specs">
         <Tabla encabezado={["Item", "Value"]} minimo={560}>
-          <tr><td className="font-semibold">Width</td><td>De punta a punta del contenido de la página (w-full dentro de ANCHO_PAGINA): alineado con el título y con las cards.</td></tr>
-          <tr><td className="font-semibold">Padding</td><td>Ninguno arriba ni a los costados: pegado al header y a los bordes del contenido.</td></tr>
+          <tr><td className="font-semibold">Width</td><td>100% de la columna de contenido (sidebar aparte), sin el <code>max-w</code> de ANCHO_PAGINA que acota el título y las cards.</td></tr>
+          <tr><td className="font-semibold">Padding</td><td>Ninguno arriba ni a los costados: pegado al header, al rail y al borde derecho.</td></tr>
           <tr><td className="font-semibold">Order</td><td>Ícono, tarea, Review y paginador a la izquierda; la X con <code>ml-auto</code>, sola a la derecha.</td></tr>
           <tr><td className="font-semibold">Fill</td><td><Token nombre="warn-bg" /></td></tr>
           <tr><td className="font-semibold">Text and border</td><td><Token nombre="warn-fg" /></td></tr>

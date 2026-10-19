@@ -213,11 +213,14 @@ Notifications y en el Dashboard el banner mide lo mismo que la lista y el títul
 Desde que Notifications no tiene *Pending* ni *Archived* (`notifications.md`, 2026-10-13), el banner muestra las
 **tareas sin leer** no ocultas con la X.
 
-## El banner sin margen arriba ni a los costados (2026-10-19)
+## El banner sin margen arriba ni a los costados, ni tope de ancho (2026-10-19)
 
 Pedido de Julián: el banner amarillo va con **0 padding arriba y a los costados** (antes `px-4 pt-4 sm:px-6`), pegado
-al header y a los bordes del contenido de la página. Sigue alineado con el título y las cards de abajo (el ancho no
-cambió, sólo el aire alrededor).
+al header y a los bordes del contenido de la página. Primer intento: sólo saqué el padding pero dejé `ANCHO_PAGINA`
+(`max-w-[1400px] 2xl:max-w-[1800px]`), así que en pantallas muy anchas seguía recortado y centrado, con aire a los
+costados — Julián mandó una captura propia mostrándolo de punta a punta de verdad. Ajustado: el componente ya no usa
+`ANCHO_PAGINA`, mide el 100% de la columna de contenido (la sidebar aparte), no el ancho acotado que usa el título y
+las cards de abajo.
 
 ## Billing sin menú: las tablas viven sólo en Settings (2026-10-13)
 
