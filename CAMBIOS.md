@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Dashboard: la sala vuelve a ser opcional y quedan las salas con scroll horizontal ([#54](https://github.com/JulianGerardi/red-dental-studio/pull/54))
+- Se deshace lo de #50 salvo el scroll: sin sala elegida por defecto; tocar una filtra sólo la Waiting Room y tocarla de
+  nuevo (o el chip ✕) la suelta. Appointments muestra todas las salas y recupera su Filter. "Patients today" vuelve al 12
+  fijo del dato. Se conserva la tira en una fila con scroll horizontal.
+- **Para el dev:** `OperatoryStrip` `onElegir(sala | null)` (toca la elegida para soltar); `Dashboard.tsx` recupera `salas`
+  y `salaEspera`. Datos: Operatory 6 Available y un turno de Sofia Chen en Operatory 4 se mantienen.
+
 ### Overview: el chart de DentAssmt de sólo lectura y Treatment Plan hasta abajo ([#53](https://github.com/JulianGerardi/red-dental-studio/pull/53))
 - El chart del Overview de Clinical Mode es el mismo de DentAssmt, sin controles, con lo mismo cargado. La pieza de la
   última condición queda resaltada; la última condición cambia al cargar otra con Add Condition y *Show details* lleva

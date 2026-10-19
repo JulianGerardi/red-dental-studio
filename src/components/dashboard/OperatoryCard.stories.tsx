@@ -22,7 +22,7 @@ const meta = {
           '',
           '**Dónde:** en la tira de salas de arriba del Dashboard, suelta sobre la página (`enPagina`). Ahí **toma el color de su estado**: borde y fondo, los mismos de su pill (verde, azul, rojo), para ver de un vistazo qué sala está libre (Julián, 2026-10-17). Adentro de un panel va como card interna, blanca.',
           '',
-          '**Tocarla la elige** (con `onClick` es un botón con `aria-pressed`): Appointments y Waiting Room muestran sólo a los de esa sala. La elegida lleva el anillo azul de selección y las demás se apagan hasta que se pasa el mouse. "Patients today" es la cantidad de turnos de la sala, así que coincide con las cards que se ven al elegirla (2026-10-19).',
+          '**Tocarla la elige** (con `onClick` es un botón con `aria-pressed`): la Waiting Room muestra sólo a los de esa sala y tocarla de nuevo la suelta. La elegida lleva el anillo azul de selección y las demás se apagan hasta que se pasa el mouse.',
           '',
           '**Probalo:** en *Playground* cambiá el estado, los textos, la superficie y el ancho desde *Controls*; con *clickable*, tocala.',
         ].join('\n'),
@@ -100,7 +100,7 @@ export const States: Story = {
         ))}
       </div>
       <div className="grid gap-6 md:grid-cols-2">
-        <Muestra titulo="Selected" nota="La sala que muestran Appointments y Waiting Room: anillo azul y sombra.">
+        <Muestra titulo="Selected" nota="La sala por la que se filtra la Waiting Room: anillo azul y sombra.">
           <Fondo enPagina><OperatoryCard room={SALA} enPagina seleccionada onClick={nada} /></Fondo>
         </Muestra>
         <Muestra titulo="Another one selected" nota="Se apaga al 60%; vuelve al pasar el mouse o con el foco.">

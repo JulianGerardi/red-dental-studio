@@ -688,3 +688,16 @@ room por defecto"; y "las rooms en scroll horizontal, así queda más intuitivo 
 
 **Para validar con usuarios:** si recepción encuentra la agenda del día entera sin la vista de "todas las salas" (hoy
 sólo se ve una sala por vez), y si la sexta card asomando alcanza para entender que la tira se desliza.
+
+## Vuelve la sala opcional; queda sólo el scroll horizontal (2026-10-19, más tarde)
+
+Julián: "yo si quisiera puedo ver todos los appointments de todas las room, entonces lo anterior estaba bien; sólo dejá de
+lo nuevo el scroll de las room". Se deshace lo anterior de este mismo día, salvo la tira.
+
+- **Sala opcional otra vez**: sin ninguna elegida al empezar; tocar una la elige y filtra **sólo la Waiting Room**, tocarla
+  de nuevo la suelta, y el chip ✕ "Show all rooms" junto al título también. Vacío: "No one is waiting for Operatory 5".
+- **Appointments muestra todas las salas** y vuelve su botón Filter (por operatorio).
+- **"Patients today" vuelve al 12 fijo** del dato. Ojo: no coincide con los turnos que se ven; si se calcula, tampoco
+  coincidiría con el filtro de la Waiting Room. Queda a decisión de Julián.
+- **Se conserva** `OperatoryStrip` en una fila con scroll horizontal (232px mínimo, snap) sin "Show N more", y los datos
+  nuevos (Operatory 6 Available, turno de Sofia Chen).

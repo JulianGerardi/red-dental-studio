@@ -38,12 +38,11 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 
 - `tests/dashboard.e2e.ts` (2026-10-12): el selector de fecha se lee "Feb 28, 2026"; elegir un día cierra el calendario
   y lo cambia; Today vuelve a hoy y se va.
-  Con `?day=busy` (35 turnos, 7 en la sala elegida) se ven cinco; *Show 2 more* abre el resto en una región con scroll y *Show less* la
+  Con `?day=busy` (35 turnos) se ven cinco; *Show 30 more* abre el resto en una región con scroll y *Show less* la
   cierra (`ui/show-more`).
   (2026-10-13) *Check In* avisa "checked in" y el escudo de al lado de Today lleva a Help.
-  (2026-10-19) La tira de salas tiene siempre una elegida (Operatory 1 al empezar); Appointments y Waiting Room
-  muestran sólo a los de esa sala, el "Patients today" de la card coincide con sus turnos (2 y 3) y una sala sin
-  gente (Operatory 5) muestra los dos vacíos.
+  (2026-10-19) La tira de salas va en una fila con scroll (sin Show more); elegir una sala filtra la Waiting Room y
+  una sala sin gente (Operatory 5) la deja vacía.
 - `tests/clinical-mode.e2e.ts`: la app abre, y Add Procedure carga un D0120 desde DentAssmt recorriendo los tres
   pasos del drawer hasta el aviso de guardado.
   Desde el 2026-10-08 también Lab Order: Filter por Requested deja 2 de 9, y Cancel order desde el menú de la fila se
