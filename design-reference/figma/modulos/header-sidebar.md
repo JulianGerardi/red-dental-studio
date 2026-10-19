@@ -213,6 +213,12 @@ Notifications y en el Dashboard el banner mide lo mismo que la lista y el títul
 Desde que Notifications no tiene *Pending* ni *Archived* (`notifications.md`, 2026-10-13), el banner muestra las
 **tareas sin leer** no ocultas con la X.
 
+## El banner sin margen arriba ni a los costados (2026-10-19)
+
+Pedido de Julián: el banner amarillo va con **0 padding arriba y a los costados** (antes `px-4 pt-4 sm:px-6`), pegado
+al header y a los bordes del contenido de la página. Sigue alineado con el título y las cards de abajo (el ancho no
+cambió, sólo el aire alrededor).
+
 ## Billing sin menú: las tablas viven sólo en Settings (2026-10-13)
 
 Pedido de Julián, con una captura del menú de Billing marcando en amarillo Fee Schedules, Carriers y Coverage Table:

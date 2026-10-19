@@ -17,7 +17,7 @@ const meta = {
       story: { inline: false, iframeHeight: 620 },
       description: {
         component: [
-          "El aviso de tareas sin leer arriba de cada pantalla (documentos para firmar, derivaciones, llamados). Es la **tarjeta** ámbar del design system, de punta a punta del contenido de la página (Julián, 2026-10-13; antes iba del ancho de su texto).",
+          "El aviso de tareas sin leer arriba de cada pantalla (documentos para firmar, derivaciones, llamados). Es la **tarjeta** ámbar del design system, de punta a punta del contenido de la página (Julián, 2026-10-13; antes iba del ancho de su texto), sin padding arriba ni a los costados (Julián, 2026-10-19), pegado al header y a los bordes del contenido.",
           "",
           "**Cómo se ordena:** la tarea, Review y el paginador juntos a la izquierda; la X sola, a la derecha.",
           "",
@@ -110,6 +110,7 @@ export const Specs: Story = {
       <Bloque titulo="Specs">
         <Tabla encabezado={["Item", "Value"]} minimo={560}>
           <tr><td className="font-semibold">Width</td><td>De punta a punta del contenido de la página (w-full dentro de ANCHO_PAGINA): alineado con el título y con las cards.</td></tr>
+          <tr><td className="font-semibold">Padding</td><td>Ninguno arriba ni a los costados: pegado al header y a los bordes del contenido.</td></tr>
           <tr><td className="font-semibold">Order</td><td>Ícono, tarea, Review y paginador a la izquierda; la X con <code>ml-auto</code>, sola a la derecha.</td></tr>
           <tr><td className="font-semibold">Fill</td><td><Token nombre="warn-bg" /></td></tr>
           <tr><td className="font-semibold">Text and border</td><td><Token nombre="warn-fg" /></td></tr>
