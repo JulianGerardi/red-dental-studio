@@ -1,7 +1,5 @@
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { ANCHO_PAGINA } from '@/lib/estilos'
 import type { Notificacion } from '@/data/notificaciones'
 
 /* Banner de tareas pendientes, arriba de la página. Muestra una por vez con flechas ‹ › y el contador; queda hasta que
@@ -55,17 +53,14 @@ export function NotificationBanner({
     </>
   )
 
-  /* El aviso ámbar del design system (tono warning de Alert), de punta a punta del contenido de la página: la tarea,
-     Review y el paginador juntos a la izquierda y la X sola a la derecha (Julián, 2026-10-13; antes iba del ancho de
-     su contenido). Sin padding arriba ni a los costados (Julián, 2026-10-19), pegado al header y a los bordes del
-     contenido. Ver header-sidebar.md. */
+  /* El aviso ámbar del design system (tono warning de Alert), de punta a punta: la tarea, Review y el paginador
+     juntos a la izquierda y la X sola a la derecha (Julián, 2026-10-13; antes iba del ancho de su contenido). Sin
+     padding arriba ni a los costados, ni tope de ancho (Julián, 2026-10-19, con una captura propia): ya no usa
+     ANCHO_PAGINA, mide lo mismo que la columna de contenido entera (sidebar aparte), no el `max-w` que acota el
+     resto de la página. Ver header-sidebar.md. */
   return (
-    <div className="bg-page-background">
-      <div className={cn(ANCHO_PAGINA, 'px-0 pt-0')}>
-        <div role="status" className="flex w-full items-center gap-3 rounded-lg border border-warn-fg/25 bg-warn-bg py-2 pr-2 pl-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]">
-          {contenido}
-        </div>
-      </div>
+    <div role="status" className="flex w-full items-center gap-3 rounded-lg border border-warn-fg/25 bg-warn-bg py-2 pr-2 pl-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]">
+      {contenido}
     </div>
   )
 }
