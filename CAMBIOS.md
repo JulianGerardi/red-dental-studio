@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Patients: Today Appointments con el nombre como link (PR_PENDIENTE)
+- El nombre de cada fila de *Today Appointments* lleva directo a la ficha del paciente, como ya hacía *Recent
+  Patients*. El kebab sigue igual (Edit, Go to appointment).
+- **Para el dev:** `AppointmentCardCompacta` (`dashboard/AppointmentCard.tsx`) pasa el nombre a `Link`; el id sale de
+  `slug(appt.name)`, ahora exportado de `data/patientsStore.tsx` (el turno no trae el id del paciente). *Recent
+  Patients* ya mostraba sólo 10 con scroll interno desde el 13 de octubre, no se tocó.
+
 ### Dashboard: la sala vuelve a ser opcional y quedan las salas con scroll horizontal ([#54](https://github.com/JulianGerardi/red-dental-studio/pull/54))
 - Se deshace lo de #50 salvo el scroll: sin sala elegida por defecto; tocar una filtra sólo la Waiting Room y tocarla de
   nuevo (o el chip ✕) la suelta. Appointments muestra todas las salas y recupera su Filter. "Patients today" vuelve al 12
