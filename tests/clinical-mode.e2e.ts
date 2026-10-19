@@ -56,6 +56,23 @@ test('Existing no tiene Link to finding: sin superficie se guarda en un paso', a
   await expect(screen.getByText(/D2740 charted as existing/)).toBeVisible()
 })
 
+test('Overview: el chart de DentAssmt muestra la última condición y sigue a Add Condition', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await expect(screen.getByText(/Last Condition: Caries/)).toBeVisible()
+  await expect(screen.getByText('Last Update: 20/06/2025')).toBeVisible()
+
+  // Show details lleva a DentAssmt, donde se carga otra con Add Condition.
+  await screen.getByRole('button', 'Show details').tap()
+  await screen.getByRole('button', 'Add Condition').tap()
+  const drawer = screen.getByRole('dialog', 'New Condition')
+  await drawer.getByRole('button', 'D2740 on tooth').tap()
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText(/D2740 charted as existing/)).toBeVisible()
+
+  await screen.getByRole('button', /Overwiev/).first().tap()
+  await expect(screen.getByText(/Last Condition: Crown/)).toBeVisible()
+})
+
 test('CC y TR siguen a los workflows de Treatment: completar Triage pone TR en verde', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await expect(screen.getByRole('button', 'Chief Complaint: completed').first()).toBeVisible()

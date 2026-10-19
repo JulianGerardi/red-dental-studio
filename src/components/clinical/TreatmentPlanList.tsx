@@ -70,9 +70,13 @@ export function PlanCard({ p, onAbrir }: { p: Plan; onAbrir?: () => void }) {
   )
 }
 
-export function TreatmentPlanList({ onAbrir }: { onAbrir?: (casoId?: string) => void }) {
+export function TreatmentPlanList({ onAbrir, llena }: {
+  onAbrir?: (casoId?: string) => void
+  /** En desktop ocupa todo el alto de su contenedor (con `position: relative`) sin estirarlo, y la lista scrollea. */
+  llena?: boolean
+}) {
   return (
-    <div className="rounded-lg bg-white shadow-panel p-4">
+    <div className={cn('flex flex-col rounded-lg bg-white p-4 shadow-panel', llena && 'lg:absolute lg:inset-0')}>
       <div className="flex items-center justify-between gap-2">
         <p className="text-[15px] font-bold text-ink">Treatment Plan</p>
         <button onClick={() => onAbrir?.()} className="text-dash-blue flex shrink-0 items-center gap-0.5 text-[12px] font-semibold hover:underline">
@@ -80,7 +84,7 @@ export function TreatmentPlanList({ onAbrir }: { onAbrir?: (casoId?: string) => 
         </button>
       </div>
       {/* La columna scrollea sola para no estirar la página hasta el doble del alto del odontograma. */}
-      <div className="mt-3 flex max-h-[560px] flex-col gap-3 overflow-y-auto pr-1">
+      <div className={cn('mt-3 flex max-h-[560px] min-h-0 flex-col gap-3 overflow-y-auto pr-1', llena && 'lg:max-h-none lg:flex-1')}>
         {PLANES.map((p) => <PlanCard key={p.id} p={p} onAbrir={() => onAbrir?.(p.id)} />)}
       </div>
     </div>

@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Overview: el chart de DentAssmt de sólo lectura y Treatment Plan hasta abajo ([#53](https://github.com/JulianGerardi/red-dental-studio/pull/53))
+- El chart del Overview de Clinical Mode es el mismo de DentAssmt, sin controles, con lo mismo cargado. La pieza de la
+  última condición queda resaltada; la última condición cambia al cargar otra con Add Condition y *Show details* lleva
+  al examen donde se cargó. Treatment Plan llega hasta el final de la tabla en desktop. Las caries oclusales salen en rojo.
+- **Para el dev:** `OdontogramaOverview` / `OdontogramaLectura` (`clinical/OdontogramaOverview.tsx`),
+  `dental/estadoOdontograma.ts` (estado compartido de la librería), `useUltimaCondicion()` en `ExamLayout`, `llena` en
+  `TreatmentPlanList`. `Odontogram` ya no se usa en la app (queda en el Builder).
+
 ### La flecha de desplegar, en toda fila que se despliega ([#52](https://github.com/JulianGerardi/red-dental-studio/pull/52))
 - El Ledger y Ledger Transactions (Patient Payment, Credit Adjustment, Post Payment) se desplegaban sin flecha; Billing,
   Problem List y Treatment Plan la tenían. Ahora todas llevan la misma flecha al inicio y el detalle arranca en la primera

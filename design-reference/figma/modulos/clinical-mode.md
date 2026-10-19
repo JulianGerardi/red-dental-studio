@@ -79,9 +79,11 @@ hasta 7752px de ancho.
 - **Treatment Plan**: cuatro planes con profesional, nombre, pill
   "Available", tres datos (Created On en azul / Total Procedures / Total
   Amount) y el porcentaje grande con la barra. La columna scrollea sola para no
-  estirar la pagina al doble del alto del odontograma.
+  estirar la pagina al doble del alto del odontograma; desde el 2026-10-18 llega
+  hasta el final de la tabla (ver abajo).
 - **Centro**: el odontograma sobre fondo punteado, con el boton de ampliar y el
-  aviso de ultima condicion anclado abajo.
+  aviso de ultima condicion anclado abajo. Desde el 2026-10-18 es el chart de
+  DentAssmt, de solo lectura (ver abajo).
 - **Problem list**: Date, Surface, Condition, Exam, Provider, Note, Status,
   Actions. Sin columna de pieza: el frame no la tiene.
 
@@ -2337,3 +2339,62 @@ volver al paso siguiente después de firmar sin que la persona tenga que repetir
 Código: `clinical/ConsentRequiredDialog.tsx` (`ConsentRequiredDialog`, `ResumenConsentimiento`,
 `consentimientoRequerido`, `avisarCasoNoListo`, `CASO_LISTO`); textos en `CONSENTIMIENTO_REQUERIDO` (`data/treatment-plan.ts`).
 Design system: *Components / Clinical / ConsentRequiredDialog*, *Elements / ConfirmDialog* y *Components / UI / Toast*.
+
+## Overview: el chart de DentAssmt y Treatment Plan hasta abajo (2026-10-18)
+
+Pedido de Julián, sobre una captura del Overview: *"sumarle el mismo gráfico que tenemos en dental assessment, que te
+muestre la última condition que cargaste a modo informativo"* y *"el treatment plan se corta muy temprano, debería
+llegar hasta abajo justo cuando termina la tabla, así no queda espacio muerto"*.
+
+**Problema:** el Overview tenía su propio odontograma (`Odontogram`, el viejo de 32 piezas por 7 superficies, con datos
+inventados) y DentAssmt otro (la librería). Dos dibujos distintos del mismo paciente: lo cargado en uno no se veía en el
+otro. Quien entra a Clinical Mode (el odontólogo, al empezar el turno) quiere ver de un vistazo cómo está la boca y qué
+fue lo último que se cargó, sin editar nada.
+
+1. **El mismo chart, de sólo lectura** (`OdontogramaLectura` en `clinical/OdontogramaOverview.tsx`): la grilla de
+   react-advanced-odontogram (`OdontogramProvider` + `OdontogramChartSurface`, sin controles ni panel) con `readOnly`,
+   las caras linguales de los anteriores (`CarasLinguales`) y el mismo tema. Por CSS (`.odonto-resumen`) se van la ayuda
+   "Click a tooth. For multi-select…", Status / Plan y los botones de vista: acá no hacen nada. El hover de la pieza
+   también se va.
+2. **Un solo odontograma** (`dental/estadoOdontograma.ts`). La librería guarda su estado en el módulo y lo borra al
+   desmontarse (`destroyOdontogram`), así que DentAssmt y el Overview, que nunca están montados a la vez, lo comparten
+   copiándolo: al armarse cada uno carga lo guardado (`importStatus`) y DentAssmt guarda cada cambio (`getStatusChart`).
+   Arranca con **la caries oclusal de la pieza 3**, que es la última condición del frame (Problem List p5, Chronic enamel
+   dental caries, superficie O): ahora se ve también en DentAssmt.
+3. **La última condición.** Al entrar es la del frame (Caries, 20/06/2025, pieza 3). Cuando se carga otra con **Add
+   Condition** en cualquier examen pasa a ser esa: el procedimiento elegido, la fecha de hoy y su pieza
+   (`ultima` en el estado de `ExamFindingsProvider`, `useUltimaCondicion()`). Add Procedure no la cambia: es algo
+   planeado, no una condición. En DentAssmt no se pinta el chart desde la app (no hay controles desde el 2026-10-03), así
+   que la condición nueva se ve en el aviso y en la pieza resaltada, no dibujada.
+4. **La pieza resaltada** como la elegida del frame: borde azul y fondo `dash-count-bg` en sus dos celdas y el número en
+   una pastilla azul. Sin pieza (una condición de zona, como un Mucocele) no se resalta nada. Para lectores de pantalla,
+   el aviso suma "on tooth N".
+5. **Show details** antes elegía la pieza en el chart y avisaba con un toast; en un chart de sólo lectura no tiene
+   sentido. Ahora **lleva al examen donde se cargó** (el mismo destino que el link *Exam* del detalle de la Problem List)
+   y, si es DentAssmt, abre con la pieza ya elegida. Sin examen con pestaña, no hay botón.
+6. **El aviso en una línea desde sm**: con un nombre largo ("Resin-based composite crown, anterior") se partía en dos y
+   tapaba los números de abajo. El nombre se corta (el completo va en el tooltip) y el aviso llega hasta 600px. En el
+   celular sigue a todo el ancho y en dos líneas.
+7. **Ancho:** el chart usa toda la columna (antes se topaba en 900); ampliado va de 900 a 1100 centrado, para que las
+   piezas no se estiren de más. Debajo de 720 scrollea a lo ancho adentro de la card, como antes.
+8. **Caries en rojo, de verdad.** Las caras oclusal, mesial y distal son un grupo (`g#caries-occlusal`) con la forma
+   adentro, y el negro horneado está en la forma: la regla de 2026-09-14 pintaba el grupo y la caries seguía casi negra.
+   Se pinta también `*-shape`. Pasaba igual en DentAssmt.
+9. **Treatment Plan hasta abajo.** En desktop la card (`TreatmentPlanList llena`) es absoluta dentro de su columna: el
+   alto lo marca la columna de al lado (chart + Problem List) y la lista scrollea adentro, así termina justo donde
+   termina la tabla y no estira la fila. Si la tabla crece (otra página, una fila abierta) la card la acompaña. Apilado
+   (menos de 1024px) sigue con el tope de 560px.
+
+**Desvío anotado:** el frame muestra "Last Condition" con un texto fijo; ahora cambia con lo que se carga, que es lo que
+pidió Julián ("la última condition que cargaste").
+
+**A validar con usuarios:** si "Last Condition" debería decir también la pieza a la vista (hoy sólo la marca el chart);
+si una condición cargada en DentAssmt debería pintarse en el chart (eso pide volver a tener controles o mapear cada
+código a un estado de la librería); y si Show details tiene que quedarse en el Overview abriendo el detalle de la
+Problem List en vez de cambiar de examen.
+
+Código: `clinical/OdontogramaOverview.tsx` (`OdontogramaOverview`, `OdontogramaLectura`),
+`clinical/dental/estadoOdontograma.ts`, `ULTIMA_CONDICION` / `UltimaCondicion` en `data/clinical-mode.ts`,
+`useUltimaCondicion` en `ExamLayout.tsx`, `pestanaDeExamen` en `RecordDetail.tsx`, `llena` en `TreatmentPlanList`.
+Design system: *Components / Clinical / Overview chart* y *Components / Clinical / TreatmentPlanList* (*Fill the
+column*, *Specs*).

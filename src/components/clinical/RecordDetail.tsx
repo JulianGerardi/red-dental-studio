@@ -50,6 +50,9 @@ const PESTANA_EXAMEN: Record<string, Pestana> = {
   Periodontal: 'Periodontal', Radiography: 'Radiography',
 }
 
+/** La pestaña de un examen como lo escribe la Problem List (Dental Assessment → DentAssmt). */
+export const pestanaDeExamen = (examen: string): Pestana | undefined => PESTANA_EXAMEN[examen]
+
 /** El nombre del examen como lo escribe la Problem List, desde su pestaña (DentAssmt → Dental Assessment). */
 export const examenDePestana = (p: string) => Object.keys(PESTANA_EXAMEN).find((e) => PESTANA_EXAMEN[e] === p) ?? p
 

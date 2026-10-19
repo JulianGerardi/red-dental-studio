@@ -194,10 +194,15 @@ export const DERIVACIONES_PROBLEMA: Record<string, Derivacion[]> = {
   p11: [{ id: 'rf-3', a: 'Dr. Omar Haddad', especialidad: 'Oral Surgery', pedida: 'Jun 21, 2026', estado: 'Scheduled' }],
 }
 
-export const ULTIMA_CONDICION = {
+/* La última condición cargada, para el aviso del Overview. La del frame es la caries de la pieza 3 (p5); al cargar otra
+   con Add Condition pasa a ser esa (ExamLayout). `examen` es el de la Problem List: Show details lleva a esa pestaña. */
+export type UltimaCondicion = { condicion: string; actualizado: string; pieza: number | null; examen?: string }
+
+export const ULTIMA_CONDICION: UltimaCondicion = {
   condicion: 'Caries',
   actualizado: '20/06/2025',
   pieza: 3,
+  examen: 'Dental Assessment',
 }
 
 /* ── Lab Order (Figma 4070:148911, listado) ────────────────────────── */
