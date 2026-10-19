@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
-### Dashboard: salas como acordeón, Waiting Room independiente y columnas que entran en la pantalla ([#62](https://github.com/JulianGerardi/red-dental-studio/pull/62))
+### Dashboard: salas como acordeón, Waiting Room independiente y columnas que entran en la pantalla ([#64](https://github.com/JulianGerardi/red-dental-studio/pull/64))
 - **Rooms** pasa a ser la tercera de cuatro columnas, con el diseño del artifact: tocar una sala despliega la línea del
   día de esa sala (hora, paciente, motivo, profesional, Complete / Upcoming) y ya no filtra la Waiting Room. "Patients
   today" es la cantidad de turnos de la sala.
