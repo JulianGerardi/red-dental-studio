@@ -35,6 +35,8 @@ const meta = {
           '',
           '**Se adaptan al ancho de su lista**, no al de la pantalla (`@container`): en angosto, en renglones (lo que no entra baja a su propio renglón en vez de cortarse); en columnas, como una tabla, desde 896px de lista el turno y desde 1024px la tarea, que tiene más partes. Con Appointments y Waiting Room a la par, una fila de 1440 o de 1920 queda en renglones: así no se corta el provider (2026-10-13).',
           '',
+          '**`ocultarOperatorio`** (2026-10-19): saca el operatorio de la fila cuando la lista ya está filtrada por sala y lo dice el chip del título (la Waiting Room del Dashboard); el resto de `donde` (el provider) sigue igual. Ver *States → Operatory hidden*.',
+          '',
           '**Probalo:** en *Playground* cambiá la pieza, la acción y el ancho desde *Controls*; tocá la fila, el botón y el kebab: hacen lo mismo que en la card (la fila abre la ficha rápida; el botón y el kebab, lo suyo).',
         ].join('\n'),
       },
@@ -73,7 +75,7 @@ export const Parts: Story = {
           ['Row', 'Tocar la fila abre la ficha rápida flotando al lado (2026-10-19), como la card; el botón, el kebab y los links de adentro no la abren. Hover gris.', 'onSelect · data-appt-row'],
           ['Name', 'Botón: abre la misma ficha y es el camino con teclado (aria-expanded).', 'NombreTurno'],
           ['Check In', 'La pill verde de la card.', 'StatusPill'],
-          ['Provider · Operatory', 'Los dos campos grises de la card. Angosta, en un renglón; ancha, cada uno en su columna.', 'appt.provider · appt.operatory'],
+          ['Provider · Operatory', 'Los dos campos grises de la card. Angosta, en un renglón; ancha, cada uno en su columna. Con ocultarOperatorio, sólo el provider: ver States.', 'appt.provider · appt.operatory'],
           ['TR · CC', 'Los chips de la card, a 24px de alto.', 'ChipsTurno'],
           ['Check In / Check Out / Cancel', 'El botón del pie de la card, en sm: el mismo texto, la flecha y el mismo aviso. El color dice la acción: success, primary o destructive (ACCION_TURNO).', 'Button · accionTurno'],
           ['Menu', 'El kebab de la card con Edit appointment.', 'MenuCard'],
@@ -113,6 +115,9 @@ export const States: Story = {
         </Muestra>
         <Muestra titulo="Narrow (340px)" nota="El botón baja a su propio renglón para no cortar provider y operatorio; un nombre largo se corta con elipsis y se lee entero al pasar el mouse.">
           <Caja ancho={340}><li><AppointmentRow appt={TURNO} /></li><li><TaskRow task={TAREA} /></li></Caja>
+        </Muestra>
+        <Muestra titulo="Operatory hidden" nota="Con ocultarOperatorio: la Waiting Room del Dashboard, filtrada por una sala de la tira de arriba, ya dice la sala en el chip del título; repetirla en cada fila era ruido (Julián, 2026-10-19).">
+          <Caja><li><AppointmentRow appt={TURNO} ocultarOperatorio /></li></Caja>
         </Muestra>
         <div className="md:col-span-2">
           <Muestra titulo="Wide" nota="En columnas, alineadas fila con fila: turnos a 1000px, tareas a 1100px.">

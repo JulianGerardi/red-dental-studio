@@ -10,6 +10,7 @@ import {
   PlanCard, VisitRow, MoverVisitaDialog, type Plan, type Visita,
 } from '@/components/scheduling/TreatmentPlanPicker'
 import { aviso } from '@/components/ui/toaster'
+import { EMPLEADOS } from '@/data/employees'
 
 /* Figma 4430:61940 "Scheduling — Calendar (New Appointment Modal)".
 
@@ -27,6 +28,26 @@ import { aviso } from '@/components/ui/toaster'
 
 const PACIENTES = ['John Smith', 'Noah James Smith', 'Maria Abril Viola', 'Elias Aguirre']
 const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado', 'Sarah Stone']
+
+/* Julián: en el buscador de Patient faltaba la fecha de nacimiento y el email para desambiguar (antes los traía). No
+   hay una ficha única para estos cuatro nombres (son de esta pantalla, no de la tabla de Patients ni de Billing/Ledger,
+   que tienen su propio mock de 271), así que es mock propio, con el mismo formato que usa la tabla de Patients
+   ("Month D, YYYY" y nombre.apellido@email.com). Ver scheduling.md, 2026-10-19. */
+const DATOS_PACIENTE: Record<string, { nacimiento: string; email: string }> = {
+  'John Smith': { nacimiento: 'June 14, 1985', email: 'john.smith@email.com' },
+  'Noah James Smith': { nacimiento: 'September 2, 2018', email: 'noah.smith@email.com' },
+  'Maria Abril Viola': { nacimiento: 'November 23, 1991', email: 'maria.viola@email.com' },
+  'Elias Aguirre': { nacimiento: 'March 5, 1979', email: 'elias.aguirre@email.com' },
+}
+const pacienteSubtexto = (nombre: string) => {
+  const d = DATOS_PACIENTE[nombre]
+  return d && `${d.nacimiento} · ${d.email}`
+}
+
+/* El email del provider sale de la plantilla del consultorio (Settings → Employees), que ya los tiene cargados.
+   "Dr. " es sólo el tratamiento que usa esta pantalla; el nombre de abajo es el que figura en Employees. */
+const providerSubtexto = (nombre: string) =>
+  EMPLEADOS.find((e) => e.nombre === nombre.replace(/^Dr\.\s*/, ''))?.email
 
 const VISITAS: Visita[] = [
   {
@@ -184,15 +205,15 @@ export function NewAppointmentModal({
            dos. Al tocar la fecha o la hora se despliega al costado el calendario del día para elegir la franja. */
         <DrawerSection title="Patient and Scheduling" description="Complete the details below to schedule the appointment.">
           <SearchField
-            label="Patient" required placeholder="Search by Name" options={PACIENTES}
+            label="Patient" required placeholder="Search by Name" options={PACIENTES} subtext={pacienteSubtexto}
             value={d.patient} onChange={set('patient')} error={req('patient')}
           />
           <SearchField
-            label="Primary Provider" required placeholder="Search by Name" options={PROVIDERS}
+            label="Primary Provider" required placeholder="Search by Name" options={PROVIDERS} subtext={providerSubtexto}
             value={d.primary} onChange={set('primary')} error={req('primary')}
           />
           <SearchField
-            label="Additional Provider" placeholder="Search by Name" options={PROVIDERS}
+            label="Additional Provider" placeholder="Search by Name" options={PROVIDERS} subtext={providerSubtexto}
             value={d.additional} onChange={set('additional')}
           />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
