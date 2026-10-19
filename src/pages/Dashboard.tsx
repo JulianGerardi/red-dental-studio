@@ -10,7 +10,8 @@ import type { Appointment } from '@/components/dashboard/AppointmentCard'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
 import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import { OperatoryList } from '@/components/dashboard/OperatoryList'
-import { AppointmentRow, TaskRow } from '@/components/dashboard/DashboardRows'
+import { AppointmentRow } from '@/components/dashboard/DashboardRows'
+import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
 import { ListGroup } from '@/components/ui/list-group'
 import {
   DIAS, DIA_CARGADO, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
@@ -341,9 +342,7 @@ export default function Dashboard() {
             }
           />
         ) : (
-          <ListGroup limit={TOPE.tareas} label="pending tasks">
-            {tareas.map((t, i) => <TaskRow key={i} task={t} />)}
-          </ListGroup>
+          <PendingTaskList tasks={tareas} limit={TOPE.tareas} />
         )}
       </Panel>
 

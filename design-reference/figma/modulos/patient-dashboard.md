@@ -321,3 +321,11 @@ Storybook: *Elements / Breadcrumb* (Parts, Specs).
 
 El avatar del panel izquierdo (62px, 36 colapsado) deja el círculo y pasa al cuadrado con esquinas redondeadas de
 `ui/avatar`; los turnos de la columna Appointments y Pending Task, también. Regla en `../README.md`.
+
+## Pending documents primero y Pending Task con su diseño (2026-10-19)
+
+Julián: "poné primero Pending documents y abajo Pending Task", y que Pending Task tenga el diseño de Pending documents.
+
+- En la columna de la izquierda del Overview, **Pending documents va arriba y Pending Task abajo**; Appointments, a la derecha, arranca ahora a la altura de Pending documents.
+- **Pending Task usa el diseño de Pending documents** (`PendingTaskList`): grupos por tipo con rótulo en versalitas y cuenta, filas en una caja con divisores finos, ícono del tipo, pills *Requested* y *Expired date*, vencimiento, documento y *Complete this Task*. Es el mismo del Dashboard. Se ven 3 filas y "Show N more".
+- El e2e `patient-overview` se invirtió: ahora comprueba Pending documents arriba de Pending Task.

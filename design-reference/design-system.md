@@ -981,6 +981,10 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   *Audit / Tables in the app* marca **Expandable rows without chevron** si alguna tabla se despliega sin flecha.
   Decisiones en `figma/modulos/ledger.md` (2026-10-18).
 
+## Pending Task con el diseño de Pending documents y salas con color (2026-10-19, madrugada)
+
+- *Components / Dashboard / Pending task list* (nueva): las tareas agrupadas por tipo, en una caja con divisores finos, como Pending documents. `TaskRow` se rehízo con ese diseño (*DashboardRows → Task row*). *OperatoryCard* vuelve a tomar el color de su estado (`OPERATORY_SURFACES`, tabla *Colors* en Specs). Ver `figma/modulos/dashboard.md`.
+
 ## Dashboard: salas como acordeón y fila de tres que entra en la pantalla (2026-10-19, noche)
 
 - *Components / Dashboard / Operatory list* (nueva) y *OperatoryCard* (rehecha): acordeón con la línea del día de la sala
