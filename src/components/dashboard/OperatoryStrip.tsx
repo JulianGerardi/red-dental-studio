@@ -5,6 +5,9 @@ import { OperatoryCard, type Operatory } from './OperatoryCard'
    pocas salas se reparten el ancho; con muchas, cada una mide OPERATORY_MIN y se desliza. Con onElegir, tocar una sala la
    elige (filtra la Waiting Room) y tocarla de nuevo la suelta. Ver design-reference/figma/modulos/dashboard.md. */
 
+/* Bug: elegir Operatory 1 cortaba el anillo azul contra el borde izquierdo (2026-10-19). `snap-start` alinea la primera
+   card al borde del scrollport y pisa el aire de -m-1.5 p-1.5; scroll-p-1.5 le dice al snap que deje ese mismo margen. */
+
 export const OPERATORY_MIN = 232
 
 export function OperatoryStrip({ rooms, elegida, onElegir }: {
@@ -19,7 +22,7 @@ export function OperatoryStrip({ rooms, elegida, onElegir }: {
     /* -m-1.5 p-1.5: aire para que el scroll no corte el anillo de la elegida ni la sombra. */
     <section
       aria-label="Rooms"
-      className="-m-1.5 grid snap-x snap-proximity auto-cols-[minmax(var(--operatory-min),1fr)] grid-flow-col gap-4 overflow-x-auto overscroll-x-contain p-1.5 [scrollbar-width:thin]"
+      className="-m-1.5 grid snap-x snap-proximity auto-cols-[minmax(var(--operatory-min),1fr)] grid-flow-col gap-4 overflow-x-auto overscroll-x-contain p-1.5 scroll-p-1.5 [scrollbar-width:thin]"
       style={{ '--operatory-min': `${OPERATORY_MIN}px` } as React.CSSProperties}
     >
       {rooms.map((r) => (

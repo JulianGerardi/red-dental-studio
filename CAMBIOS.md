@@ -5,6 +5,32 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Billing: todo a la vista sin scroll ([#63](https://github.com/JulianGerardi/red-dental-studio/pull/63))
+- Find Patient muestra 3 pacientes y "Show N more" abre el resto con scroll adentro; Today pasa a filas compactas y las
+  5 cards de arriba llevan menos padding. La tabla de Recent Billing Activity muestra 8 filas por página (antes 15).
+- **Para el dev:** `Stat` suma la prop `compacta`; `BuscarPaciente` usa `ui/show-more` con `LIMITE_PACIENTES = 3`; el
+  tamaño de página es `PAGINA_ACTIVIDAD = 8`. El e2e de Billing espera `Showing 1 to 8 of 21 entries`.
+
+### Dashboard: anillo de sala, Patients today variable y Waiting Room filtrada sin hueco ([#60](https://github.com/JulianGerardi/red-dental-studio/pull/60))
+- El anillo azul de la sala elegida ya no se corta contra el borde del scroll al elegir Operatory 1 (la primera de la
+  tira). "Patients today" vuelve a variar por sala (12/10/4) en vez del número fijo e igual en las seis. Elegir una
+  sala ya no repite su nombre en cada fila de Waiting Room (el chip del título ya lo dice) y el panel filtrado abraza
+  sus filas en vez de dejar un hueco blanco enorme debajo.
+- En New Appointment, paso 1: con poco alto de ventana el último campo quedaba cortado contra el pie sin ningún aviso.
+  Arreglado en `ui/drawer` (vale para todos los drawers): el pie lleva una sombra elevada mientras el paso siga con
+  scroll.
+- New Appointment: las sugerencias de Patient y de los dos Provider llevan una segunda línea (fecha de nacimiento y
+  email del paciente; email del provider), que antes faltaba.
+- **Para el dev:** `OperatoryStrip` suma `scroll-p-1.5`; `dashboard-data.ts#salas()` recibe un array de números en vez
+  de uno fijo; `AppointmentRow` suma la prop `ocultarOperatorio`; el wrapper de Waiting Room en `Dashboard.tsx` agrega
+  `self-start` con sala elegida; `Drawer` mide con `ResizeObserver` si falta contenido por ver; `SearchField` suma la
+  prop opcional `subtext` (sin ella no cambia nada para sus otros usos).
+
+### El banner amarillo sin padding arriba ni a los costados ([#62](https://github.com/JulianGerardi/red-dental-studio/pull/62))
+- El aviso de tareas pendientes va pegado al header y a los bordes del contenido de la página (antes tenía
+  `px-4 pt-4 sm:px-6`). El ancho y el orden interno no cambiaron.
+- **Para el dev:** `NotificationBanner` — el wrapper de `ANCHO_PAGINA` pasa a `px-0 pt-0`.
+
 ### Dashboard: tocar un turno abre la ficha flotante ([#61](https://github.com/JulianGerardi/red-dental-studio/pull/61))
 - La fila del turno (Appointments y Waiting Room) abre la ficha del paciente flotando al lado, como la card; antes sólo
   el nombre. El botón de acción, el kebab y los links no la abren. La ficha es la del Figma `4430:57474`, ya existente.

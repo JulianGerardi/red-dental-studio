@@ -18,6 +18,10 @@ import { StepIndicator } from '@/components/ui/step-indicator'
    - Un panel de apoyo (`aside`, el calendario de horarios de New Appointment) se despliega al costado del drawer.
    Radix Dialog por dentro: el foco queda adentro, Escape y la capa lo cierran. */
 
+/* Bug: con poca altura de ventana, un paso con muchos campos (New Appointment, paso 1) quedaba cortado a mitad del
+   último campo contra el pie, sin ningún aviso de que seguía con scroll (Julián, 2026-10-19). El resto de la app avisa
+   con un degradé cuando hay más (ver ui/show-more); el drawer no tenía el suyo. */
+
 /* 2xl: un paso con una tabla ancha (Post payment → Allocation), para que entre entera. */
 const ANCHO = { md: 'max-w-[480px]', lg: 'max-w-[560px]', xl: 'max-w-[760px]', '2xl': 'max-w-[1000px]' } as const
 export type DrawerSize = keyof typeof ANCHO
@@ -55,6 +59,27 @@ export function Drawer({
   const anterior = React.useRef(step)
   const sentido: 1 | -1 = step < anterior.current ? -1 : 1
   React.useEffect(() => { anterior.current = step }, [step])
+
+  /* Una sombra sobre el pie avisa que el paso sigue con scroll (no hay otra pista: el pie no se mueve). Un degradé como
+     el de ui/show-more no sirve acá: tapaba el último campo entero contra el fondo blanco del drawer, dejándolo en
+     blanco en vez de recortado (probado y descartado). */
+  const scroll = React.useRef<HTMLDivElement>(null)
+  const contenido = React.useRef<HTMLDivElement>(null)
+  const [masAbajo, setMasAbajo] = React.useState(false)
+  const medir = React.useCallback(() => {
+    const el = scroll.current
+    if (el) setMasAbajo(el.scrollHeight - el.scrollTop - el.clientHeight > 4)
+  }, [])
+  React.useEffect(() => {
+    medir()
+    const el = contenido.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(medir)
+    ro.observe(el)
+    window.addEventListener('resize', medir)
+    return () => { ro.disconnect(); window.removeEventListener('resize', medir) }
+  }, [medir, open])
+
   return (
     <DialogPrimitive.Root open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogPrimitive.Portal>
@@ -81,14 +106,22 @@ export function Drawer({
             {conPasos && <StepIndicator total={steps.length} current={step + 1} labels={steps} className="px-6 pt-6" />}
             <Sentido.Provider value={sentido}>
             <EnDrawer.Provider value>
-              <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
-                {children}
-                {aside && <div className="mt-6 lg:hidden">{aside}</div>}
+              <div ref={scroll} onScroll={medir} className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+                <div ref={contenido}>
+                  {children}
+                  {aside && <div className="mt-6 lg:hidden">{aside}</div>}
+                </div>
               </div>
             </EnDrawer.Provider>
             </Sentido.Provider>
             {footer && (
-              <div className={cn('flex items-center gap-3 border-t border-line-soft px-6 py-4 [&>button]:flex-1 [&>div]:flex-1', footerClassName)}>
+              <div
+                className={cn(
+                  'flex items-center gap-3 border-t border-line-soft px-6 py-4 transition-shadow [&>button]:flex-1 [&>div]:flex-1',
+                  masAbajo && 'shadow-[0_-6px_10px_-6px_rgb(0_0_0/0.15)]',
+                  footerClassName,
+                )}
+              >
                 {footer}
               </div>
             )}
