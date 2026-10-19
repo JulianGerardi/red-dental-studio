@@ -968,6 +968,19 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   `rounded-avatar`.
 - Decisiones en `figma/README.md`, *Regla: un solo avatar de persona*.
 
+## La flecha de las filas que se despliegan, igual en todas las tablas (2026-10-18)
+
+- Pedido de Julián: unas tablas tenían flecha para desplegar la fila y otras no. Regla: **toda fila que despliega un
+  detalle lleva la flecha al inicio**, en todas las tablas; una fila que navega o abre un drawer no.
+- **`RowChevron`** (nuevo, `ui/data-table.tsx`): la flecha de 16px `ink-faint` que gira 90° al abrir. La usan
+  `DataTable` (`rowDetail`), `TablaProcedimientos` (Treatment Plan) y ahora también el **Ledger** y **Ledger
+  Transactions** (`LedgerAllocationTable`: Patient Payment, Credit Adjustment, Post Payment), que se desplegaban sin
+  flecha. El detalle arranca en la primera columna, como en DataTable (`LedgerRowDetail` suma `sangria`).
+- *Elements / Tables*: Specs suma *Row chevron* (closed / open) en Parts, la regla y *Row that unfolds* en *Pattern for
+  every table*. *Components / Ledger / LedgerAllocationTable* rehecha con Playground, Parts, States, *Row open* y Specs.
+  *Audit / Tables in the app* marca **Expandable rows without chevron** si alguna tabla se despliega sin flecha.
+  Decisiones en `figma/modulos/ledger.md` (2026-10-18).
+
 ## Operatory strip con scroll horizontal y sala siempre elegida (2026-10-19)
 
 - `OperatoryStrip` es una sola fila con scroll horizontal (cards de 232px como mínimo, snap al borde) en lugar de la

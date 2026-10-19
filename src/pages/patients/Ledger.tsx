@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
+import { RowChevron } from '@/components/ui/data-table'
 import { SearchButton } from '@/components/ui/search-button'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
@@ -188,9 +189,10 @@ export default function Ledger() {
   }
   const columnasVisibles = COLUMNAS.filter((c) => !ocultas.includes(c.id))
 
+  /* + la flecha de la fila (16 y su gap). */
   const anchoMinimo = columnasVisibles.reduce(
     (a, c) => a + (anchos.manual(c.id) ?? ANCHO_MINIMO[c.id]), 0,
-  ) + (columnasVisibles.length - 1) * 12 + 24
+  ) + columnasVisibles.length * 12 + 16 + 24
 
   const conSaldoTotal = useMemo(() => conSaldo(movs), [movs])
   const delaVista = useMemo(
@@ -327,6 +329,7 @@ export default function Ledger() {
               <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
                 <div style={{ minWidth: anchoMinimo }}>
                   <div data-tabla-header className="group/fila flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
+                    <span className="w-4 shrink-0" aria-hidden />
                     {columnasVisibles.map((c, i) => (
                       <span
                         key={c.id}
@@ -380,6 +383,7 @@ export default function Ledger() {
                             resaltada === m.id ? 'bg-dash-count-bg' : abierta && 'bg-surface-subtle',
                           )}
                         >
+                          <RowChevron open={abierta} />
                           {columnasVisibles.map((c) => (
                             <span
                               key={c.id}

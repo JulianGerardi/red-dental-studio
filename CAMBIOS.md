@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### La flecha de desplegar, en toda fila que se despliega ([#52](https://github.com/JulianGerardi/red-dental-studio/pull/52))
+- El Ledger y Ledger Transactions (Patient Payment, Credit Adjustment, Post Payment) se desplegaban sin flecha; Billing,
+  Problem List y Treatment Plan la tenían. Ahora todas llevan la misma flecha al inicio y el detalle arranca en la primera
+  columna. Una fila que navega o abre un drawer sigue sin flecha.
+- **Para el dev:** `RowChevron` nuevo en `ui/data-table.tsx`; lo usan DataTable (`rowDetail`), `TablaProcedimientos`,
+  el Ledger y `LedgerAllocationTable`. `LedgerRowDetail` suma `sangria`. *Audit / Tables in the app* marca una tabla
+  que se despliegue sin flecha.
+
 ### Dashboard: sala siempre elegida, "Patients today" que coincide y salas con scroll horizontal ([#50](https://github.com/JulianGerardi/red-dental-studio/pull/50))
 - **La sala elegida filtra Appointments y Waiting Room** (antes sólo la sala de espera) y **siempre hay una**, la primera
   por defecto; tocar otra la cambia. El chip junto al título dice cuál. El filtro por operatorio de Appointments sale

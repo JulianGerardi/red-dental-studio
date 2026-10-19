@@ -21,7 +21,7 @@ const TABLAS: Tabla[] = [
   { nombre: 'Locations (Settings)', archivo: 'pages/settings/Locations.tsx', historia: 'pages--settings-locations', uso: 'The practice locations. The name links to the location.' },
   { nombre: 'Insurance (Patient)', archivo: 'pages/patients/Insurance.tsx', historia: 'pages--patient-insurance', uso: 'The patient’s insurance plans. The priority is changed by dragging a row.' },
   { nombre: 'Ledger (Patient)', archivo: 'pages/patients/Ledger.tsx', historia: 'pages--patient-ledger', uso: 'The patient’s financial entries, with Patient / Guarantor views. It has the most features.' },
-  { nombre: 'Ledger allocation', archivo: 'components/patients/ledger/LedgerAllocationTable.tsx', historia: 'components-ledger-ledgerallocationtable--default', uso: 'The charges a payment is applied to. It has its own set of 12 columns.' },
+  { nombre: 'Ledger allocation', archivo: 'components/patients/ledger/LedgerAllocationTable.tsx', historia: 'components-ledger-ledgerallocationtable--playground', uso: 'The charges a payment is applied to. It has its own set of 12 columns.' },
   { nombre: 'Documents (Patient)', archivo: 'pages/patients/Documents.tsx', historia: 'pages--patient-documents', uso: 'The patient’s documents and their signature status.' },
   { nombre: 'Recent activity (Billing)', archivo: 'pages/Billing.tsx', historia: 'pages--billing', uso: 'The latest financial movements. Clicking a row selects that patient.' },
   { nombre: 'Problem list (Clinical)', archivo: 'components/clinical/ProblemList.tsx', historia: 'components-clinical-problemlist--playground', uso: 'The patient’s problems in Clinical Mode.' },

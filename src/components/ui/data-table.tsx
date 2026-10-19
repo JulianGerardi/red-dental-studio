@@ -334,7 +334,7 @@ export function DataTable<T>({
                         </button>
                       ) : <span className="w-5 shrink-0" aria-hidden />
                     )}
-                    {rowDetail && <ChevronRight aria-hidden className={cn('size-4 shrink-0 text-ink-faint transition-transform', abierta && 'rotate-90')} />}
+                    {rowDetail && <RowChevron open={abierta} />}
                     {selectable && (
                       <span onClick={(e) => e.stopPropagation()} className="flex">
                         <Checkbox on={elegida} onChange={() => alternar(id)} label={`Select ${nombre(r)}`} disabled={off} />
@@ -397,6 +397,12 @@ export function DataTable<T>({
 }
 
 /* Celdas que se repiten en las tablas de la app. */
+
+/** La flecha de la fila que se despliega: primera columna, gira al abrir. La llevan todas las tablas con detalle por
+    fila (DataTable, Ledger, Treatment Plan); una fila que navega o abre un drawer no. Ver design-system.md (2026-10-18). */
+export function RowChevron({ open }: { open: boolean }) {
+  return <ChevronRight aria-hidden className={cn('size-4 shrink-0 text-ink-faint transition-transform', open && 'rotate-90')} />
+}
 
 /** El Avatar (ui/avatar, 32px) y el nombre como link. Pacientes y equipo, igual. */
 export function PersonCell({ name, initials, to, onClick }: {
