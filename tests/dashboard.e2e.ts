@@ -68,3 +68,14 @@ test('Tocar una sala filtra la sala de espera y el chip lo deshace', async ({ ap
   await screen.getByRole('button', 'Show all rooms').first().tap()
   await expect(screen.getByRole('button', 'Show all rooms')).toHaveCount(0)
 })
+
+/* Tocar el turno abre la ficha flotante del paciente; el botón de acción no (dashboard.md, 2026-10-19). */
+test('Tocar un turno abre la ficha flotante y Check In no', async ({ app, screen }) => {
+  await app.open('/')
+  await screen.getByRole('button', /^Check In/).first().tap()
+  await expect(screen.getByRole('dialog', /Details for/)).toHaveCount(0)
+
+  await screen.getByText(/Dr\. Elena Martinez/).first().tap()
+  await expect(screen.getByRole('dialog', 'Details for Noah James')).toBeVisible()
+  await expect(screen.getByText('Reason for Visit')).toBeVisible()
+})

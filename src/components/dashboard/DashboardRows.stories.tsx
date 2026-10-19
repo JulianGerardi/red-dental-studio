@@ -35,7 +35,7 @@ const meta = {
           '',
           '**Se adaptan al ancho de su lista**, no al de la pantalla (`@container`): en angosto, en renglones (lo que no entra baja a su propio renglón en vez de cortarse); en columnas, como una tabla, desde 896px de lista el turno y desde 1024px la tarea, que tiene más partes. Con Appointments y Waiting Room a la par, una fila de 1440 o de 1920 queda en renglones: así no se corta el provider (2026-10-13).',
           '',
-          '**Probalo:** en *Playground* cambiá la pieza, la acción y el ancho desde *Controls*; tocá el nombre, el botón y el kebab: hacen lo mismo que en la card.',
+          '**Probalo:** en *Playground* cambiá la pieza, la acción y el ancho desde *Controls*; tocá la fila, el botón y el kebab: hacen lo mismo que en la card (la fila abre la ficha rápida; el botón y el kebab, lo suyo).',
         ].join('\n'),
       },
     },
@@ -70,7 +70,8 @@ export const Parts: Story = {
         <TablaPartes partes={[
           ['Time box', 'La caja gris de la card (dash-field) con el reloj y la hora en 12px Semibold tabular, del alto de la fila: ancla la fila y es la columna por la que se lee una agenda. Ancha, en una línea.', 'appt.time'],
           ['Initials', 'Las iniciales en el cuadrado azul de la card, a 28px.', 'appt.initials'],
-          ['Name', 'Botón: abre la ficha rápida anclada a la fila, como tocar la card.', 'NombreTurno'],
+          ['Row', 'Tocar la fila abre la ficha rápida flotando al lado (2026-10-19), como la card; el botón, el kebab y los links de adentro no la abren. Hover gris.', 'onSelect · data-appt-row'],
+          ['Name', 'Botón: abre la misma ficha y es el camino con teclado (aria-expanded).', 'NombreTurno'],
           ['Check In', 'La pill verde de la card.', 'StatusPill'],
           ['Provider · Operatory', 'Los dos campos grises de la card. Angosta, en un renglón; ancha, cada uno en su columna.', 'appt.provider · appt.operatory'],
           ['TR · CC', 'Los chips de la card, a 24px de alto.', 'ChipsTurno'],

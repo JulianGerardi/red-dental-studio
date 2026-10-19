@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Dashboard: tocar un turno abre la ficha flotante ([#60](https://github.com/JulianGerardi/red-dental-studio/pull/60))
+- La fila del turno (Appointments y Waiting Room) abre la ficha del paciente flotando al lado, como la card; antes sólo
+  el nombre. El botón de acción, el kebab y los links no la abren. La ficha es la del Figma `4430:57474`, ya existente.
+- **Para el dev:** `AppointmentRow` (`DashboardRows.tsx`) suma `onClick` en `[data-appt-row]` que llama a `onSelect`;
+  ignora clics dentro de `button, a, [role=menu], [role=menuitem]`. El botón de acción hace `stopPropagation`.
+
 ### Patients: el scroll de Today Appointments y Recent Patients queda adentro de la caja ([#59](https://github.com/JulianGerardi/red-dental-studio/pull/59))
 - Al abrir "Show N more", la lista ya no agranda el panel: mide lo mismo que cerrada y scrollea adentro, así la barra no
   se sale de la grilla de la tabla.
