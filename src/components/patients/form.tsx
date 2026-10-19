@@ -297,7 +297,7 @@ export function LinkPersonCheckbox(props: Omit<React.ComponentProps<typeof Optio
    (3648:59976 y hermanos): el campo principal siempre es una búsqueda. */
 export function SearchField({
   label, required, className, options = [], value = '', onChange, error,
-  placeholder = 'Search...', hint, disabled,
+  placeholder = 'Search...', hint, disabled, subtext,
 }: {
   label: string
   required?: boolean
@@ -309,6 +309,9 @@ export function SearchField({
   placeholder?: string
   hint?: React.ReactNode
   disabled?: boolean
+  /** Segunda línea por sugerencia, para desambiguar (New Appointment: fecha de nacimiento y email del paciente, email
+      del provider). Sin esto, cada sugerencia es sólo el nombre, como siempre (Julián, 2026-10-19). */
+  subtext?: (opcion: string) => React.ReactNode
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -340,17 +343,21 @@ export function SearchField({
           className={cn(control(error), 'h-9 pr-3 pl-9')}
         />
         {abierto && sugerencias.length > 0 && (
-          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
-            {sugerencias.map((o) => (
-              <button
-                key={o}
-                type="button"
-                onClick={() => { onChange?.(o); setAbierto(false) }}
-                className="block w-full px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
-              >
-                {o}
-              </button>
-            ))}
+          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-60 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
+            {sugerencias.map((o) => {
+              const sub = subtext?.(o)
+              return (
+                <button
+                  key={o}
+                  type="button"
+                  onClick={() => { onChange?.(o); setAbierto(false) }}
+                  className="flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left hover:bg-surface-muted"
+                >
+                  <span className="text-[13px]">{o}</span>
+                  {sub && <span className="text-[11px] text-ink-muted">{sub}</span>}
+                </button>
+              )
+            })}
           </div>
         )}
       </div>

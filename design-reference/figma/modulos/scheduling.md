@@ -596,3 +596,22 @@ contenido por ver, el pie lleva una sombra elevada arriba (como una barra de scr
 sola. Se probó primero un degradé blanco como el de `ui/show-more`, pero sobre un campo blanco liso (no una card con avatar y chips)
 tapaba el control entero dejándolo en blanco, peor que el corte original; la sombra no esconde el campo, sólo separa visualmente el
 pie. Ver `design-system.md` (2026-10-19) y *Components / UI / Drawer → Parts → Footer shadow*.
+
+## El buscador de Patient y Provider sin fecha de nacimiento ni email (2026-10-19)
+
+Julián: "me di cuenta que faltaría cuando buscas un paciente más información. Antes además del nombre decía la fecha de
+nacimiento y email. Lo mismo con provider, nombre + email". `SearchField` (`patients/form.tsx`) sólo mostraba el nombre en cada
+sugerencia; ahora cada una lleva una segunda línea:
+
+- **Patient:** fecha de nacimiento y email. No hay una ficha única para los cuatro nombres de este campo (son de esta pantalla,
+  no de la tabla de Patients ni del mock de 271 de Billing/Ledger, que tampoco los tiene): es mock propio, con el mismo formato
+  que usa la tabla de Patients ("Month D, YYYY" y nombre.apellido@email.com).
+- **Primary y Additional Provider:** el email de la plantilla del consultorio (`data/employees.ts`, Settings → Employees), que
+  ya tiene a estos cuatro cargados. "Dr. " es sólo el tratamiento que usa esta pantalla; el nombre de abajo es el de Employees.
+
+`SearchField` suma una prop opcional `subtext` (una función de la opción a la segunda línea); sin ella sigue mostrando sólo el
+nombre, como el resto de sus usos (Carrier name, CDT codes, medicamentos, etc., sin tocar). Ver *Elements / Fields* y
+*Components / Scheduling / NewAppointmentModal*.
+
+**Para validar con usuarios:** si conviene la misma segunda línea en Requestor (hoy un `SelectField`, no busca) o en otros
+buscadores de persona de la app (Add Relationship, por ejemplo).

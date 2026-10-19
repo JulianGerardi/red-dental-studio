@@ -38,6 +38,8 @@ const meta = {
           '',
           '**Cuál usar:** *Text* para texto corto · *Select* para elegir de una lista · *Search* para buscar con sugerencias · *Date* para una fecha tipeada · *Textarea* para texto largo · *Checkbox* para aceptar o activar una opción.',
           '',
+          '**Search puede llevar una segunda línea por sugerencia** (`subtext`, 2026-10-19): para desambiguar cuando el nombre no alcanza, como Patient y Provider en *Components / Scheduling / NewAppointmentModal* (fecha de nacimiento y email del paciente; email del provider). Sin `subtext`, la sugerencia es sólo el nombre, como siempre.',
+          '',
           '**Probalo:** en *Playground* cambiá tipo, rótulo, valor, ayuda, error y estado desde *Controls*.',
         ].join('\n'),
       },
