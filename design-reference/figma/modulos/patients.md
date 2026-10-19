@@ -238,3 +238,35 @@ nada que cambiar ahí.
   con cómo ya se comporta cualquier otro link a `/patients/:id` en el prototipo.
 - El kebab se queda igual (Edit, Go to appointment): el link es sólo para ir a ver al paciente; editar el turno sigue
   en el menú.
+
+## Recent Patients, sin hueco ni disparejo contra la tabla (2026-10-19)
+
+Julián, con una captura: "fijate que no quede en blanco o disparejo el bento, por ejemplo Recent Patients debe
+coincidir con el final de la tabla, así no queda el espacio que te marco, y ambas card deben tener el mismo largo
+tanto Recent Patients como Find Patients" (lo mismo pasaba en Billing, ver billing.md).
+
+**La causa:** `LIMITE_TURNOS` y `LIMITE_RECIENTES` eran números fijos (4 y 3), elegidos a mano para que la barra
+terminara a la altura de la tabla *a 1440px, con esta tabla*. Cualquier cambio de cualquiera de los dos lados -más o
+menos pacientes, otra página, el ancho de ventana- los desajustaba de nuevo; no era la primera vez (Billing tiene el
+mismo historial: "con cinco, Find Patient no llenaba su columna" llevó a agregar tres pacientes más al mock en vez de
+arreglar la causa).
+
+**El arreglo, en dos partes:**
+1. La barra ya no se estira contra la tabla (`items-stretch`): eso crea un bucle, porque cuánto mide la barra
+   dependería de cuántas filas decide mostrar Recent Patients, que a su vez depende de cuánto mide la barra. Se mide
+   el alto de la columna de la tabla por separado (`altoTabla`, con `ResizeObserver`) y la barra toma ese valor fijo
+   como su propio alto (`lg:h-[var(--alto-tabla)]`), sin volver a depender de ella.
+2. Adentro de la barra, **Recent Patients** (la última card) lleva `flex-1`: se queda con lo que sobra después de
+   Today Appointments (`shrink-0`, con su `limit` de siempre). Su `ShowMore` suma la prop `llenarAlto`
+   (`ui/show-more`, *Elements / Show more*): mide la primera fila ya dibujada y el alto disponible, y calcula cuántas
+   filas enteras entran -nunca un número adivinado. `min-h-[220px]` en la card es el piso para cuando la tabla es tan
+   corta (la última página, con un solo paciente) que Today Appointments por sí solo ya pide más alto que toda la
+   barra: sin ese piso, Recent Patients quedaba en 0 y desaparecía entera.
+
+Verificado: con la tabla llena (10 de 11), el borde de Recent Patients cae a menos de 2px del borde de la tabla; en
+la página 2 (1 paciente), Today Appointments se queda con sus 4 filas y Recent Patients no desaparece, se achica a su
+piso. `tests/billing.e2e.ts` tenía un test que esperaba "tres pacientes" a mano; pasa a contar cuántos hay antes y
+después de "Show more" en vez de un número fijo, porque ahora varía con el alto real de la ventana.
+
+**Para validar con usuarios:** si 220px de piso alcanza en una pantalla angosta antes de que se note que Recent
+Patients pisa el alto de la tabla (hoy ahí no tienen por qué coincidir: no hay suficiente tabla para igualar).

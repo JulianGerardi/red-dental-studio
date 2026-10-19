@@ -234,7 +234,9 @@ export function ActividadReciente({
 /** Filas por página de la actividad: con ocho la pantalla entra entera a 1440 × 900, sin scroll. */
 const PAGINA_ACTIVIDAD = 8
 
-/** Cuántos pacientes se ven en Find Patient antes de "Show N more". */
+/** Arranque de cuántos pacientes se ven en Find Patient antes de "Show N more": su `ShowMore llenarAlto` mide cuántas
+    filas enteras entran en el alto que le deja el flex-1 (billing.md, 2026-10-19), así que este valor es sólo el
+    primer render, antes de esa medición. */
 /* El título más cerca de lo que sigue (Patients y Billing; billing.md, 2026-10-19). */
 const TITULO_PEGADO = '[&>header]:min-h-10'
 const LIMITE_PACIENTES = 3
@@ -282,7 +284,7 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
       ) : (
         /* Se ven tres y "Show N more" abre el resto con scroll adentro, sin estirar el panel: la regla de las listas largas
            (ui/show-more, como Patients). Al buscar, el scroll vuelve a cero. */
-        <ShowMore key={busqueda} total={resultados.length} limit={LIMITE_PACIENTES} enCaja label="patients" className="flex flex-col gap-3">
+        <ShowMore key={busqueda} total={resultados.length} limit={LIMITE_PACIENTES} enCaja llenarAlto label="patients" className="flex flex-col gap-3">
           {(cuantos) => resultados.slice(0, cuantos).map((p) => (
             <ResultadoPaciente
               key={p.nombre}
@@ -382,11 +384,15 @@ export default function Billing({ inicial }: {
     <div className={CONTENEDOR_PAGINA}>
       <PageTitle>Billing</PageTitle>
 
-      {/* Bento: la columna derecha (Find Patient con tres, y Today compacto) va en su altura natural; con un paciente el
-          alto del resumen queda de mínimo, así no salta al entrar (billing.md, 2026-10-19). */}
+      {/* Bento: la columna derecha toma el alto medido de refIzquierda (--billing-alto, de altoResumen) en vez de
+          estirarse contra ella -estirarse las dos entre sí crea un bucle: cuántas filas entran en Find Patient
+          dependería de su propio alto ya estirado, que a su vez depende de cuántas filas decide mostrar- (Julián,
+          2026-10-19). items-start en vez de stretch: cada columna toma sólo el alto que se le da. Adentro, Find
+          Patient (flex-1) se queda con lo que sobra después de Today (shrink-0). Con un paciente, altoResumen deja de
+          medirse (ver el efecto de arriba) y la columna derecha queda al alto del resumen, así no salta al entrar. */}
       <div
-        className="mt-5 grid grid-cols-1 gap-4 lg:min-h-[var(--billing-alto,0px)] lg:grid-cols-[minmax(0,1fr)_280px]"
-        style={seleccionado && altoResumen ? ({ '--billing-alto': `${altoResumen}px` } as CSSProperties) : undefined}
+        className="mt-5 grid grid-cols-1 items-start gap-4 lg:min-h-[var(--billing-alto,0px)] lg:grid-cols-[minmax(0,1fr)_280px]"
+        style={altoResumen ? ({ '--billing-alto': `${altoResumen}px` } as CSSProperties) : undefined}
       >
         <div ref={refIzquierda} className="flex min-w-0 flex-col gap-4">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-6 xl:grid-cols-5">
@@ -408,8 +414,12 @@ export default function Billing({ inicial }: {
           />
         </div>
 
-        <div className="flex min-w-0 flex-col gap-4">
+        <div className="flex min-w-0 flex-col gap-4 lg:h-[var(--billing-alto,auto)]">
+          {/* flex-1: abraza el resto del alto de la columna (lg:h-[var(--billing-alto)] arriba), después de Today.
+              min-h-[220px]: una actividad muy corta (un paciente con pocos movimientos) deja a Today -shrink-0- de
+              igual pidiendo más alto que toda la columna; sin este piso, Find Patient quedaba en 0 y desaparecía. */}
           <BuscarPaciente
+            className="min-h-[220px] flex-1"
             busqueda={busqueda}
             onBusqueda={setBusqueda}
             paciente={pacienteSeleccionado}

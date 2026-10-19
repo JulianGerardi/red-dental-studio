@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Patients y Billing: la barra lateral termina a la altura de la tabla, sin hueco ni disparejo ([#68](https://github.com/JulianGerardi/red-dental-studio/pull/68))
+- Recent Patients (Patients) y Find Patient (Billing) ya no adivinan un número fijo de filas: toman el alto medido de
+  la columna de la tabla y muestran las que entren completas ahí, sin dejar hueco ni pasarse.
+- **Para el dev:** `ui/show-more` suma `llenarAlto` (sólo junto con `enCaja`, sólo en el panel `flex-1` de verdad: mide
+  la primera fila + `ResizeObserver` en vez de usar `limit` fijo). `children` tiene que devolver las filas sueltas, no
+  envueltas en un único contenedor (`<ul>`). Piso de `min-h-[220px]` para cuando la tabla es muy corta.
+
 ### Pending Task con el diseño de Pending documents, Pending documents primero y salas con color ([#67](https://github.com/JulianGerardi/red-dental-studio/pull/67))
 - **Pending Task** (Dashboard y Patient Dashboard) toma el diseño de Pending documents: grupos por tipo, filas en una caja
   con divisores y, en cada una, ícono del tipo, pills *Requested* y *Expired date*, vencimiento, documento y *Complete this

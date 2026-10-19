@@ -321,3 +321,33 @@ Julián: ver toda la pantalla de un vistazo, sin scroll. Tres cambios sobre el b
   padding arriba (`[&>header]:min-h-10` + `pt-0`), con 8px hasta el buscador.
 - Today: las filas usan la medida de las cards compactas de Patients: `InnerCard` con `p-2.5`, 12px entre cards, nombre
   de 13px semibold y bajada de 11px `ink-muted`; el número queda a la derecha.
+
+## Find Patient, sin hueco ni disparejo contra la actividad (2026-10-19)
+
+Julián, con una captura de Patients: "lo mismo te pasa en Billing" -el mismo problema del lado de acá: la columna
+derecha (Find Patient y Today) no terminaba a la misma altura que Recent Billing Activity, con un bloque vacío debajo.
+
+**La causa, otra vez un número fijo que se corre.** `LIMITE_PACIENTES = 3` (del punto 1 de "Todo a la vista sin
+scroll") ya se había calibrado una vez a mano -y antes de eso, "con cinco, Find Patient no llenaba su columna" llevó
+a sumar tres pacientes más al mock (`PACIENTES_BILLING`) en vez de arreglar la causa. Cualquier cambio en Recent
+Billing Activity (otra cantidad de filas por página, otro paciente elegido) lo desajusta de nuevo.
+
+**El arreglo** es el mismo que en Patients (ver patients.md, 2026-10-19), reusando lo que esta pantalla ya tenía a
+medias:
+1. `refIzquierda` + `altoResumen` ya medían el alto de la columna de la izquierda (para que el bento no saltara al
+   entrar a un paciente). Ahora ese valor se aplica siempre -no sólo con un paciente elegido- como el alto explícito
+   de la columna derecha (`lg:h-[var(--billing-alto)]`), y el grid pasa a `items-start` en vez de depender del
+   stretch por defecto: estirarse contra Find Patient creaba el mismo bucle que en Patients (cuántas filas muestra
+   dependería de su propio alto ya estirado).
+2. Adentro, **Find Patient** lleva `flex-1` y su `ShowMore` suma `llenarAlto` (`ui/show-more`): mide la fila y el alto
+   disponible, y calcula cuántas entran -ya no `LIMITE_PACIENTES` fijo. **Today** se queda `shrink-0` con sus tres de
+   siempre. `min-h-[220px]` en Find Patient es el piso para cuando la actividad es muy corta (un paciente con pocos
+   movimientos) y Today por sí solo ya pide más alto que toda la columna.
+
+`tests/billing.e2e.ts` tenía un test que esperaba exactamente tres pacientes visibles (buscaba "Brent Crosby" visible
+y "Diego Molina" no); pasa a contar cuántos botones de resultado hay antes y después de "Show more", porque el número
+ya no es fijo.
+
+**No se deshacen** los tres pacientes de más agregados al mock en 2026-10-13: ya no hacen falta para llenar la
+columna, pero tampoco está de más tener ocho para probar el scroll de Show more. **Para validar con usuarios:** igual
+que en Patients, si el piso de 220px alcanza en una ventana angosta.
