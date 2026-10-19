@@ -295,3 +295,21 @@ eran precisos.
    cuenta, no de la location). No se tocó porque no estaba marcado; si corresponde, se rotula como "all locations" o se
    saca igual. `creditosNoAplicados` y `saldoDe` quedan en los datos, sin uso en la tabla.
 
+## Todo a la vista sin scroll (2026-10-19)
+
+Julián: ver toda la pantalla de un vistazo, sin scroll. Tres cambios sobre el bento de 2026-10-13:
+
+1. **Find Patient muestra tres** pacientes y *Show N more* abre el resto con el scroll de las listas largas (`ui/show-more`,
+   `enCaja`: abierto mide lo mismo y scrollea adentro; es el de Patients). Al buscar vuelve a tres.
+2. **Today en cards bajas** (`Stat compacta`): la etiqueta con su círculo de info y la bajada a la izquierda, el número a
+   la derecha. Mismo contenido (etiqueta, número, bajada, info) en la mitad de alto. La bajada puede ir en dos líneas:
+   cortarla perdía texto.
+3. **Los cinco números de arriba con menos padding** (16 → 12px).
+4. **Efecto en el layout:** con Find Patient en tres y Today bajo, la columna derecha ya no necesita ir absoluta ni el
+   mínimo de 780px: cada columna toma su alto natural. Con un paciente elegido el alto del resumen queda de mínimo, para
+   que no salte.
+5. **Decisión a validar:** para que entre a 1440 × 900 la tabla pasa de **15 a 8 filas por página** (21 movimientos: tres
+   páginas). Con 15 filas la pantalla medía ~1340px aun con los tres cambios. A 1440 × 900 el contenido termina en ~890px
+   (queda el aire de abajo de la página y el botón de Confibot, así que puede asomar una barra de scroll sin nada
+   escondido); a 1920 × 1080 entra con lugar. Si prefieren más filas con scroll, es el valor `PAGINA_ACTIVIDAD`.
+

@@ -6,7 +6,7 @@ import { expect } from 'e2e'
 test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor View y los botones; la X vuelve al resumen', async ({ app, screen }) => {
   await app.open('/billing')
   await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
-  await expect(screen.getByText(/Showing 1 to 15 of 21 entries/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 8 of 21 entries/)).toBeVisible()
 
   const maria = screen.getByRole('button', /Maria Abril Viola/)
   await maria.tap()
@@ -22,16 +22,16 @@ test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor View y los b
   await screen.getByRole('button', 'Clear selected patient').tap()
   await expect(screen.getByRole('heading', 'Recent Billing Activity')).toBeVisible()
   await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
-  await expect(screen.getByText(/Showing 1 to 15 of 21 entries/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 8 of 21 entries/)).toBeVisible()
   await expect(maria).not.toHaveAttribute('aria-current')
 })
 
 test('En el resumen, una fila abre la vista de ese paciente en Patient View', async ({ app, screen }) => {
   await app.open('/billing')
-  await screen.getByRole('row', /Brent Crosby/).first().tap()
-  await expect(screen.getByRole('heading', 'Brent Crosby — Recent Billing Activity')).toBeVisible()
+  await screen.getByRole('row', /Lucía Paz/).first().tap()
+  await expect(screen.getByRole('heading', 'Lucía Paz — Recent Billing Activity')).toBeVisible()
   await expect(screen.getByRole('tab', 'Patient View')).toHaveAttribute('aria-selected', 'true')
-  await expect(screen.getByText(/Showing 1 to 3 of 3 entries/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 entries/)).toBeVisible()
 })
 
 test('El círculo de info de un número explica qué cuenta', async ({ app, screen }) => {
@@ -66,4 +66,14 @@ test('Billing en el menú lateral va directo a su pantalla; sus tablas están s�
   await screen.getByRole('button', 'Billing options').tap()
   await screen.getByRole('link', 'Carriers').tap()
   await expect(screen.getByRole('heading', 'Carriers')).toBeVisible()
+})
+
+/* Find Patient muestra tres y "Show N more" abre el resto con scroll adentro (billing.md, 2026-10-19). */
+test('Find Patient muestra tres pacientes y Show more abre el resto', async ({ app, screen }) => {
+  await app.open('/billing')
+  await expect(screen.getByRole('button', /Brent Crosby/)).toBeVisible()
+  await expect(screen.getByRole('button', /Diego Molina/)).toHaveCount(0)
+  await screen.getByRole('button', /^Show \d+ more/).tap()
+  await expect(screen.getByRole('region', 'All patients')).toBeVisible()
+  await expect(screen.getByRole('button', /Diego Molina/)).toBeVisible()
 })

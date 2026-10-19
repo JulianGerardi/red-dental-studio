@@ -16,6 +16,7 @@ import { Pill, type PillTone } from '@/components/ui/pill'
 import { AmountCell, DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { CONTENEDOR_PAGINA, ICONO_SUELTO, TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
+import { ShowMore } from '@/components/ui/show-more'
 import { Panel } from '@/components/dashboard/primitives'
 import { InfoTip } from '@/components/ui/info-tip'
 import { Button } from '@/components/ui/button'
@@ -42,14 +43,30 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
 
 /* Sobre el fondo gris es card de página; adentro de Today, InnerCard. `info` suma el círculo
    de info arriba a la derecha (billing.md, 2026-10-09). */
-export function Stat({ label, value, caption, info, interna, enFila, className }: {
+export function Stat({ label, value, caption, info, interna, enFila, compacta, className }: {
   label: string; value: string; caption: string; info?: string; interna?: boolean
+  /** Today: etiqueta y bajada a la izquierda, el número a la derecha, en una sola fila baja (billing.md, 2026-10-19). */
+  compacta?: boolean
   /** En una fila de cards: etiqueta, número y bajada se alinean con los de al lado (subgrid de tres filas). */
   enFila?: boolean
   className?: string
 }) {
+  if (compacta) {
+    return (
+      <div className={cn('flex min-w-0 items-center justify-between gap-3 px-3 py-2', interna ? TARJETA_INTERNA : TARJETA_PANEL, className)}>
+        <div className="min-w-0">
+          <p className="flex items-center gap-1 text-xs leading-snug text-ink-muted">
+            {label}
+            {info && <InfoTip title={label}>{info}</InfoTip>}
+          </p>
+          <p className="line-clamp-2 text-[11px] leading-snug text-ink-faint" title={caption}>{caption}</p>
+        </div>
+        <p className="text-dash-blue shrink-0 text-base font-bold tabular-nums">{value}</p>
+      </div>
+    )
+  }
   return (
-    <div className={cn('min-w-0 p-4', interna ? TARJETA_INTERNA : TARJETA_PANEL, enFila && 'row-span-3 grid grid-rows-subgrid gap-y-0', className)}>
+    <div className={cn('min-w-0', enFila ? 'p-3' : 'p-4', interna ? TARJETA_INTERNA : TARJETA_PANEL, enFila && 'row-span-3 grid grid-rows-subgrid gap-y-0', className)}>
       {/* En una card angosta la etiqueta y la bajada pasan a dos líneas en vez de cortarse (billing.md, 2026-10-13). */}
       <div className="flex items-start justify-between gap-2">
         <p className="text-xs leading-snug text-ink-muted">{label}</p>
@@ -197,7 +214,7 @@ export function ActividadReciente({
           <DetalleMovimiento m={{ ...m, saldo: undefined }} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} onVerTodo={() => setEnModal(m)} />
         ) : undefined}
         density="compact"
-        pageSize={15}
+        pageSize={PAGINA_ACTIVIDAD}
         itemLabel="entries"
         empty={paciente
           ? { icon: CreditCard, title: 'No billing activity yet.', detail: 'Payments and adjustments posted for this patient show up here.' }
@@ -214,6 +231,12 @@ export function ActividadReciente({
 
 /* Find Patient: arriba el paciente que se está viendo; abajo el buscador y los resultados como InnerCard, como la lista
    lateral de Patients. */
+/** Filas por página de la actividad: con ocho la pantalla entra entera a 1440 × 900, sin scroll. */
+const PAGINA_ACTIVIDAD = 8
+
+/** Cuántos pacientes se ven en Find Patient antes de "Show N more". */
+const LIMITE_PACIENTES = 3
+
 export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onElegir, onCerrar, className }: {
   className?: string
   busqueda: string
@@ -255,9 +278,10 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
       {resultados.length === 0 ? (
         <EmptyState title="No recent patients/guarantors to show yet." className="py-6" />
       ) : (
-        /* Scroll propio cuando la columna es más baja que la lista; el aire de los costados deja ver el anillo de foco. */
-        <div className="-m-1 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-1">
-          {resultados.map((p) => (
+        /* Se ven tres y "Show N more" abre el resto con scroll adentro, sin estirar el panel: la regla de las listas largas
+           (ui/show-more, como Patients). Al buscar, el scroll vuelve a cero. */
+        <ShowMore key={busqueda} total={resultados.length} limit={LIMITE_PACIENTES} enCaja label="patients" className="flex flex-col gap-3">
+          {(cuantos) => resultados.slice(0, cuantos).map((p) => (
             <ResultadoPaciente
               key={p.nombre}
               paciente={p}
@@ -266,7 +290,7 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
               onElegir={() => onElegir(p.nombre)}
             />
           ))}
-        </div>
+        </ShowMore>
       )}
     </Panel>
   )
@@ -356,11 +380,11 @@ export default function Billing({ inicial }: {
     <div className={CONTENEDOR_PAGINA}>
       <PageTitle>Billing</PageTitle>
 
-      {/* Bento: la columna derecha no suma alto (va absoluta desde lg) y toma el de la izquierda. El mínimo deja lugar a
-          Today y a Find Patient cuando la tabla es corta. */}
+      {/* Bento: la columna derecha (Find Patient con tres, y Today compacto) va en su altura natural; con un paciente el
+          alto del resumen queda de mínimo, así no salta al entrar (billing.md, 2026-10-19). */}
       <div
-        className="mt-5 grid grid-cols-1 gap-4 lg:min-h-[var(--billing-alto,780px)] lg:grid-cols-[minmax(0,1fr)_280px]"
-        style={seleccionado && altoResumen ? ({ '--billing-alto': `${Math.max(altoResumen, 780)}px` } as CSSProperties) : undefined}
+        className="mt-5 grid grid-cols-1 gap-4 lg:min-h-[var(--billing-alto,0px)] lg:grid-cols-[minmax(0,1fr)_280px]"
+        style={seleccionado && altoResumen ? ({ '--billing-alto': `${altoResumen}px` } as CSSProperties) : undefined}
       >
         <div ref={refIzquierda} className="flex min-w-0 flex-col gap-4">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-6 xl:grid-cols-5">
@@ -382,21 +406,20 @@ export default function Billing({ inicial }: {
           />
         </div>
 
-        <div className="relative">
-          <div className="flex flex-col gap-4 lg:absolute lg:inset-0">
-            <BuscarPaciente
-              className="lg:min-h-0 lg:flex-1"
-              busqueda={busqueda}
-              onBusqueda={setBusqueda}
-              paciente={pacienteSeleccionado}
-              saldoDe={saldoActual}
-              onElegir={elegirDeLaLista}
-              onCerrar={() => setSeleccionado(null)}
-            />
-            <Panel title="Today" className="shrink-0">
-              {STATS_HOY.map((s) => <Stat key={s.label} interna {...s} />)}
-            </Panel>
-          </div>
+        <div className="flex min-w-0 flex-col gap-4">
+          <BuscarPaciente
+            busqueda={busqueda}
+            onBusqueda={setBusqueda}
+            paciente={pacienteSeleccionado}
+            saldoDe={saldoActual}
+            onElegir={elegirDeLaLista}
+            onCerrar={() => setSeleccionado(null)}
+          />
+          <Panel title="Today" className="shrink-0">
+            <div className="flex flex-col gap-2">
+              {STATS_HOY.map((s) => <Stat key={s.label} interna compacta {...s} />)}
+            </div>
+          </Panel>
         </div>
       </div>
 
