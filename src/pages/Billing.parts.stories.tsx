@@ -88,7 +88,7 @@ const PARTES: [string, string, string][] = [
   ['Patient card', 'Sólo con paciente: de borde a borde arriba de Find Patient, con iniciales (sin borde), nombre, rol (y su garante si es Patient) y la X que vuelve al resumen. Entra sutil, estilo Apple: 2px, un desenfoque leve que se aclara y opacidad (360ms).', 'PacienteElegido · Panel top'],
   ['Find Patient', 'Panel con el buscador (nombre, apellido o email) y los resultados: se ven tres y "Show N more" abre el resto con scroll adentro, sin estirar el panel (ui/show-more, como Patients).', 'BuscarPaciente · Panel · ShowMore'],
   ['Patient result', 'InnerCard con iniciales, nombre, último pago y saldo. Hover gris; el elegido queda en celeste.', 'ResultadoPaciente'],
-  ['Today', 'Panel con tres números del día, cada uno en una InnerCard baja: etiqueta con su círculo de info y bajada a la izquierda, el número a la derecha.', 'Panel · Stat compacta'],
+  ['Today', 'Panel con tres números del día, cada uno en una InnerCard baja (p-2.5, como las cards de Patients): etiqueta con su círculo de info y bajada a la izquierda, el número a la derecha.', 'Panel · Stat compacta'],
   ['Post payment', 'Drawer para registrar el pago o el ajuste del paciente elegido.', 'PostPaymentDialog'],
 ]
 
@@ -219,7 +219,7 @@ export const States: Story = {
               <div className="grid grid-cols-5 gap-3">{STATS_BILLING.map((x) => <Stat key={x.label} {...x} enFila />)}</div>
             </Estado>
             <Estado titulo="On the page" nota="Card de página, sombra y sin borde, con el círculo de info." ancho={248}><Stat {...STATS_BILLING[0]!} /></Estado>
-            <Estado titulo="Inside a panel" nota="Today: InnerCard baja (compacta), con el círculo de info; el número a la derecha. Ocupa la mitad de alto que antes." ancho={248}><div className="flex flex-col gap-2 rounded-lg bg-white p-4">{STATS_HOY.map((s) => <Stat key={s.label} interna compacta {...s} />)}</div></Estado>
+            <Estado titulo="Inside a panel" nota="Today: InnerCard baja (p-2.5, como las cards de Patients), con el círculo de info; el número a la derecha." ancho={248}><div className="flex flex-col gap-3 rounded-lg bg-white px-4 pb-4">{STATS_HOY.map((s) => <Stat key={s.label} interna compacta {...s} />)}</div></Estado>
           </Fila>
         </Bloque>
       </div>

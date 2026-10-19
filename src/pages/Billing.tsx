@@ -53,13 +53,13 @@ export function Stat({ label, value, caption, info, interna, enFila, compacta, c
 }) {
   if (compacta) {
     return (
-      <div className={cn('flex min-w-0 items-center justify-between gap-3 px-3 py-2', interna ? TARJETA_INTERNA : TARJETA_PANEL, className)}>
-        <div className="min-w-0">
-          <p className="flex items-center gap-1 text-xs leading-snug text-ink-muted">
+      <div className={cn('flex min-w-0 items-center justify-between gap-2.5 p-2.5', interna ? TARJETA_INTERNA : TARJETA_PANEL, className)}>
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <p className="flex items-center gap-1 text-[13px] leading-snug font-semibold text-ink">
             {label}
             {info && <InfoTip title={label}>{info}</InfoTip>}
           </p>
-          <p className="line-clamp-2 text-[11px] leading-snug text-ink-faint" title={caption}>{caption}</p>
+          <p className="line-clamp-2 text-[11px] leading-snug text-ink-muted" title={caption}>{caption}</p>
         </div>
         <p className="text-dash-blue shrink-0 text-base font-bold tabular-nums">{value}</p>
       </div>
@@ -235,6 +235,8 @@ export function ActividadReciente({
 const PAGINA_ACTIVIDAD = 8
 
 /** Cuántos pacientes se ven en Find Patient antes de "Show N more". */
+/* El título más cerca de lo que sigue (Patients y Billing; billing.md, 2026-10-19). */
+const TITULO_PEGADO = '[&>header]:min-h-10'
 const LIMITE_PACIENTES = 3
 
 export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onElegir, onCerrar, className }: {
@@ -250,8 +252,8 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
   return (
     <Panel
       title="Find Patient"
-      className={className}
-      bodyClassName="min-h-0"
+      className={cn(TITULO_PEGADO, className)}
+      bodyClassName="min-h-0 gap-2 pt-0"
       top={<div aria-live="polite">{paciente && <PacienteElegido key={paciente.nombre} paciente={paciente} onCerrar={onCerrar} />}</div>}
     >
       <div className="relative shrink-0">
@@ -415,10 +417,8 @@ export default function Billing({ inicial }: {
             onElegir={elegirDeLaLista}
             onCerrar={() => setSeleccionado(null)}
           />
-          <Panel title="Today" className="shrink-0">
-            <div className="flex flex-col gap-2">
-              {STATS_HOY.map((s) => <Stat key={s.label} interna compacta {...s} />)}
-            </div>
+          <Panel title="Today" className={cn('shrink-0', TITULO_PEGADO)} bodyClassName="gap-3 pt-0">
+            {STATS_HOY.map((s) => <Stat key={s.label} interna compacta {...s} />)}
           </Panel>
         </div>
       </div>
