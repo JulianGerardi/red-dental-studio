@@ -30,7 +30,7 @@ export const OPERATORY_SURFACES = {
    valores ya eran limpios (px-13 py-10 gap-5, radius 5, icons 10px,
    textos 11/9/8). Se sube ~1.3× para acompañar al resto.
    Va adentro de un panel (card interna, blanca) o suelta sobre la página, en la tira de arriba del Dashboard (con el
-   color de su estado). Con onClick es un botón que elige la sala (Appointments y Waiting Room muestran sólo a los suyos): la elegida lleva el anillo y las demás se
+   color de su estado). Con onClick es un botón que elige la sala (filtra la Waiting Room; tocarla de nuevo la suelta): la elegida lleva el anillo y las demás se
    apagan (2026-10-17). */
 export function OperatoryCard({ room, enPagina, seleccionada, atenuada, onClick }: {
   room: Operatory
@@ -78,7 +78,7 @@ export function OperatoryCard({ room, enPagina, seleccionada, atenuada, onClick 
   return (
     <button
       type="button" aria-pressed={!!seleccionada} onClick={onClick}
-      title={seleccionada ? `${room.name} is shown` : `Show ${room.name}`}
+      title={seleccionada ? 'Show everyone in the waiting room' : `Show who is waiting for ${room.name}`}
       className={clases}
     >
       {contenido}

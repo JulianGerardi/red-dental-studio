@@ -22,7 +22,7 @@ const meta = {
           '',
           '**Scroll horizontal** (2026-10-19): una sola fila, sin importar cuántas salas haya. Cada card mide al menos 232px y se desliza; la que asoma por el borde avisa que hay más. Con pocas salas se reparten el ancho. Sin salas no se dibuja.',
           '',
-          '**Siempre hay una sala elegida** (la primera por defecto): lleva el anillo azul y las demás se apagan. Tocar otra la cambia; no se puede soltar. Appointments y Waiting Room del Dashboard muestran sólo a los de la sala elegida, y el número "Patients today" de cada card es la cantidad de turnos de esa sala (Julián, 2026-10-19). Cada sala toma el color de su estado.',
+          '**Elegir una sala es opcional:** tocarla filtra la Waiting Room del Dashboard (lleva el anillo azul y las demás se apagan); tocarla de nuevo la suelta. Appointments siempre muestra todas las salas y se filtra con su propio botón Filter. Cada sala toma el color de su estado.',
           '',
           '**Probalo:** en *Playground* cambiá la cantidad de salas y el ancho desde *Controls*; tocá una sala y deslizá la tira.',
         ].join('\n'),
@@ -45,9 +45,9 @@ const Pagina = ({ ancho, children }: { ancho: number; children: React.ReactNode 
   <div className="max-w-full rounded-lg bg-page-background p-4" style={{ width: ancho + 32 }}>{children}</div>
 )
 
-/* Con la sala elegida en estado, como en el Dashboard: siempre una, la primera al empezar. */
+/* Con la sala elegida en estado, como en el Dashboard: ninguna al empezar; tocar la elegida la suelta. */
 function Elegible({ rooms, inicial }: { rooms: Operatory[]; inicial?: string }) {
-  const [elegida, setElegida] = useState(inicial ?? rooms[0]?.name ?? null)
+  const [elegida, setElegida] = useState<string | null>(inicial ?? null)
   return <OperatoryStrip rooms={rooms} elegida={elegida} onElegir={setElegida} />
 }
 
@@ -64,8 +64,8 @@ export const Parts: Story = {
       </Bloque>
       <TablaPartes partes={[
         ['Row', 'Una sola fila con scroll horizontal; cada card mide al menos 232px y, con pocas salas, se reparten el ancho.', 'OperatoryStrip'],
-        ['Card', 'La sala, con el color de su estado. "Patients today" es la cantidad de turnos de esa sala.', 'OperatoryCard enPagina'],
-        ['Selection', 'Siempre una elegida (anillo azul); las demás al 60%. Tocar otra la cambia y filtra Appointments y Waiting Room.', 'elegida · onElegir'],
+        ['Card', 'La sala, con el color de su estado.', 'OperatoryCard enPagina'],
+        ['Selection', 'Opcional: la elegida lleva el anillo azul y las demás van al 60%. Tocar una filtra la Waiting Room; tocarla de nuevo la suelta.', 'elegida · onElegir'],
         ['Snap', 'Al soltar el deslizamiento, la tira se acomoda en el borde de una card, sin dejarla cortada a la mitad.', 'snap-x'],
       ]} />
     </Lienzo>
@@ -109,7 +109,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Card min width</td><td className="tabular-nums">{OPERATORY_MIN}px (1fr cuando sobra lugar)</td></tr>
           <tr><td className="font-semibold">Gap</td><td className="tabular-nums">16px, el mismo que entre paneles</td></tr>
           <tr><td className="font-semibold">Scroll</td><td>Horizontal, con snap al borde de la card; no contagia al scroll de la página</td></tr>
-          <tr><td className="font-semibold">Room shown</td><td>Siempre una; la primera por defecto</td></tr>
+          <tr><td className="font-semibold">Room selected</td><td>Ninguna por defecto; tocar la elegida la suelta</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Per screen" nota="Cuántas salas se ven completas en el Dashboard, con la barra lateral cerrada.">

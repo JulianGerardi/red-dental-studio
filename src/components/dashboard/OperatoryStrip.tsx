@@ -2,8 +2,8 @@ import { OperatoryCard, type Operatory } from './OperatoryCard'
 
 /* Las salas del Dashboard en una tira arriba de los turnos (Julián, 2026-10-13), en una sola fila con scroll horizontal
    (2026-10-19): ocupa un renglón sin importar cuántas salas haya y la card que asoma al borde avisa que hay más. Con
-   pocas salas se reparten el ancho; con muchas, cada una mide OPERATORY_MIN y se desliza. Siempre hay una elegida: tocar
-   otra la cambia (Appointments y Waiting Room muestran sólo a los suyos). Ver design-reference/figma/modulos/dashboard.md. */
+   pocas salas se reparten el ancho; con muchas, cada una mide OPERATORY_MIN y se desliza. Con onElegir, tocar una sala la
+   elige (filtra la Waiting Room) y tocarla de nuevo la suelta. Ver design-reference/figma/modulos/dashboard.md. */
 
 export const OPERATORY_MIN = 232
 
@@ -11,8 +11,8 @@ export function OperatoryStrip({ rooms, elegida, onElegir }: {
   rooms: Operatory[]
   /** El nombre de la sala elegida. */
   elegida?: string | null
-  /** Tocar una sala: su nombre. */
-  onElegir?: (sala: string) => void
+  /** Tocar una sala: su nombre, o null si era la elegida. */
+  onElegir?: (sala: string | null) => void
 }) {
   if (rooms.length === 0) return null
   return (
@@ -28,7 +28,7 @@ export function OperatoryStrip({ rooms, elegida, onElegir }: {
             room={r} enPagina
             seleccionada={!!elegida && elegida === r.name}
             atenuada={!!elegida && elegida !== r.name}
-            onClick={onElegir && (() => onElegir(r.name))}
+            onClick={onElegir && (() => onElegir(elegida === r.name ? null : r.name))}
           />
         </div>
       ))}
