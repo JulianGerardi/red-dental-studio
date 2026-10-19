@@ -313,3 +313,11 @@ Julián: ver toda la pantalla de un vistazo, sin scroll. Tres cambios sobre el b
    (queda el aire de abajo de la página y el botón de Confibot, así que puede asomar una barra de scroll sin nada
    escondido); a 1920 × 1080 entra con lugar. Si prefieren más filas con scroll, es el valor `PAGINA_ACTIVIDAD`.
 
+
+## Título pegado al buscador y Today como las cards de Patients (2026-10-19)
+
+- Pedido de Julián: había mucho aire entre el título del panel y el buscador (Find Patient en Billing; Today
+  Appointments y Recent Patients en Patients). El encabezado de esos paneles baja de 52 a 40px y el cuerpo arranca sin
+  padding arriba (`[&>header]:min-h-10` + `pt-0`), con 8px hasta el buscador.
+- Today: las filas usan la medida de las cards compactas de Patients: `InnerCard` con `p-2.5`, 12px entre cards, nombre
+  de 13px semibold y bajada de 11px `ink-muted`; el número queda a la derecha.

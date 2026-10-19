@@ -137,7 +137,7 @@ export default function Patients() {
         {/* Mismo Panel que usa el Dashboard. Sin overflow-hidden acá: recortaba la sombra del panel (patients.md,
             2026-10-10); el scroll va adentro de cada panel, en ShowMore. */}
         <div className="flex w-full flex-col gap-4 lg:w-[336px] lg:shrink-0">
-          <Panel title={<>Today Appointments <Globo n={TURNOS_PATIENTS.length} /></>} bodyClassName="gap-2">
+          <Panel title={<>Today Appointments <Globo n={TURNOS_PATIENTS.length} /></>} bodyClassName="gap-2 pt-0" className="[&>header]:min-h-10">
             {buscador(buscarTurno, setBuscarTurno, "Search today's appointments")}
             {turnosFiltrados.length === 0 ? (
               <EmptyState
@@ -153,7 +153,7 @@ export default function Patients() {
             )}
           </Panel>
 
-          <Panel title={<>Recent Patients <Globo n={recientes.length} /></>} bodyClassName="gap-2">
+          <Panel title={<>Recent Patients <Globo n={recientes.length} /></>} bodyClassName="gap-2 pt-0" className="[&>header]:min-h-10">
             {buscador(buscarReciente, setBuscarReciente, 'Search recent patients')}
             {recientesFiltrados.length === 0 ? (
               <EmptyState

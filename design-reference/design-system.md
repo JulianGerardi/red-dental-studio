@@ -1069,3 +1069,8 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
   Appointments y Pending Task, como siempre.
 - "Patients today" vuelve a variar por sala (12 / 10 / 4, mock) en vez del número fijo que traían las seis.
   Decisiones en `figma/modulos/dashboard.md` (2026-10-19).
+
+## Paneles con buscador: título pegado (2026-10-19)
+
+- *Pages / Parts / Billing* (Find Patient, Today) y Patients: encabezado de 40px y cuerpo sin padding arriba; las filas
+  de Today con la medida de las cards compactas de Patients. Decisión en `figma/modulos/billing.md` (2026-10-19).
