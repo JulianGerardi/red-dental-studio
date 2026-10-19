@@ -1032,6 +1032,13 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
   pie de los cuatro tipos es **View full record** (`VerRegistroCompleto`). Playground, Parts, States y Specs al día.
   Decisiones en `figma/modulos/ledger.md` (2026-10-19).
 
+## Billing: todo a la vista (2026-10-19)
+
+- *Pages / Parts / Billing*: Find Patient con tres y *Show N more* (story *Show more open*), Today en cards bajas
+  (`Stat compacta`, en *Numbers → Inside a panel*), los cinco números con 12px de padding y la tabla de a 8 filas. Parts,
+  States y la regla de Bento al día. Decisión en `figma/modulos/billing.md` (2026-10-19).
+
+
 ## Drawer: sombra en el pie cuando sigue con scroll (2026-10-19)
 
 - *Components / UI / Drawer*: un paso con muchos campos y poco alto de ventana (New Appointment, paso 1) quedaba

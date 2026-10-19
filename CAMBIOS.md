@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Billing: todo a la vista sin scroll ([#63](https://github.com/JulianGerardi/red-dental-studio/pull/63))
+- Find Patient muestra 3 pacientes y "Show N more" abre el resto con scroll adentro; Today pasa a filas compactas y las
+  5 cards de arriba llevan menos padding. La tabla de Recent Billing Activity muestra 8 filas por página (antes 15).
+- **Para el dev:** `Stat` suma la prop `compacta`; `BuscarPaciente` usa `ui/show-more` con `LIMITE_PACIENTES = 3`; el
+  tamaño de página es `PAGINA_ACTIVIDAD = 8`. El e2e de Billing espera `Showing 1 to 8 of 21 entries`.
+
 ### Dashboard: anillo de sala, Patients today variable y Waiting Room filtrada sin hueco ([#60](https://github.com/JulianGerardi/red-dental-studio/pull/60))
 - El anillo azul de la sala elegida ya no se corta contra el borde del scroll al elegir Operatory 1 (la primera de la
   tira). "Patients today" vuelve a variar por sala (12/10/4) en vez del número fijo e igual en las seis. Elegir una

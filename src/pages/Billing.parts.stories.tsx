@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, within } from 'storybook/test'
 import Billing from './Billing'
 import { AccionesPaciente, ActividadReciente, BuscarPaciente, PacienteElegido, ResultadoPaciente, Stat } from './Billing'
 import { Bloque, Forzar, Lienzo, Tabla, Token, medidasDe, type Medidas } from '@/design-system/kit'
@@ -77,7 +78,7 @@ export const Playground: Story = {
 
 const PARTES: [string, string, string][] = [
   ['Title', 'Billing, sin botones: los pagos y ajustes son de un paciente.', 'PageTitle'],
-  ['Bento', 'Izquierda: los números y la actividad. Derecha (280px desde 1024px): Find Patient arriba, a la altura de los números, y Today abajo. Las dos columnas terminan juntas: el alto lo fija la tabla (15 filas por página) y Find Patient scrollea adentro. Con un paciente el bento guarda el alto del resumen.', 'Billing'],
+  ['Bento', 'Izquierda: los números y la actividad. Derecha (280px desde 1024px): Find Patient arriba, a la altura de los números, y Today abajo, cada uno con su alto natural. La tabla va de a 8 filas: a 1440 × 900 la pantalla se ve entera, sin scroll. Con un paciente el bento guarda el alto del resumen.', 'Billing'],
   ['Summary numbers', 'Cinco números de toda la clínica, cada uno en una card de página (sombra, sin borde). Cinco en fila desde 1280px, 3 + 2 antes, 2 + 2 + 1 en el celular; etiqueta, número y bajada alineados entre cards (subgrid). No cambian con el paciente.', 'Stat enFila'],
   ['Info circle', 'Arriba a la derecha de cada número de arriba y de Today: al pasar el mouse, tocar o llegar con Tab explica qué cuenta (los textos de red.dev).', 'InfoTip'],
   ['Recent Billing Activity', 'Resumen: toda la clínica y las Tabs de tipo. Paciente: los botones arriba del título, su nombre en el título, Patient View / Guarantor View y sólo sus movimientos (sin saldos: son de la cuenta entera, no de la location).', 'ActividadReciente · Panel'],
@@ -85,9 +86,9 @@ const PARTES: [string, string, string][] = [
   ['Activity table', 'La tabla de la app, compacta. En el resumen, clic en una fila abre la vista de ese paciente. Con paciente, la fila se despliega (chevron, Collapse all / Expand all).', 'DataTable'],
   ['Row detail', 'Con paciente: el detalle del Ledger según el tipo (Procedure, Charge Adjustment, Patient Payment, Credit Adjustment; el pago del seguro con los datos de siempre). La acción del pie y los links abren el registro de sólo lectura.', 'DetalleMovimiento · LedgerRowModal'],
   ['Patient card', 'Sólo con paciente: de borde a borde arriba de Find Patient, con iniciales (sin borde), nombre, rol (y su garante si es Patient) y la X que vuelve al resumen. Entra sutil, estilo Apple: 2px, un desenfoque leve que se aclara y opacidad (360ms).', 'PacienteElegido · Panel top'],
-  ['Find Patient', 'Panel con el buscador (nombre, apellido o email) y los resultados.', 'BuscarPaciente · Panel'],
+  ['Find Patient', 'Panel con el buscador (nombre, apellido o email) y los resultados: se ven tres y "Show N more" abre el resto con scroll adentro, sin estirar el panel (ui/show-more, como Patients).', 'BuscarPaciente · Panel · ShowMore'],
   ['Patient result', 'InnerCard con iniciales, nombre, último pago y saldo. Hover gris; el elegido queda en celeste.', 'ResultadoPaciente'],
-  ['Today', 'Panel con tres números del día, cada uno en InnerCard.', 'Panel · Stat interna'],
+  ['Today', 'Panel con tres números del día, cada uno en una InnerCard baja: etiqueta con su círculo de info y bajada a la izquierda, el número a la derecha.', 'Panel · Stat compacta'],
   ['Post payment', 'Drawer para registrar el pago o el ajuste del paciente elegido.', 'PostPaymentDialog'],
 ]
 
@@ -193,7 +194,7 @@ export const States: Story = {
         </Bloque>
         <Bloque titulo="Find Patient">
           <Fila>
-            <Estado titulo="Overview" nota="Sin paciente: el buscador y los recientes. Tocá uno." ancho={280}><Buscador q="" /></Estado>
+            <Estado titulo="Overview" nota="Sin paciente: el buscador y tres recientes; 'Show N more' abre el resto (ver Show more open). Tocá uno." ancho={280}><Buscador q="" /></Estado>
             <Estado titulo="Patient selected" nota="Su card arriba de todo y su resultado en celeste. La X lo suelta." ancho={280}><Buscador q="" elegido="Maria Abril Viola" /></Estado>
             <Estado titulo="Searching" nota="Filtra por nombre mientras se escribe; la X del buscador limpia la búsqueda." ancho={280}><Buscador q="ma" /></Estado>
             <Estado titulo="No results" nota="Nada coincide con lo escrito." ancho={280}><Buscador q="zzz" /></Estado>
@@ -218,7 +219,7 @@ export const States: Story = {
               <div className="grid grid-cols-5 gap-3">{STATS_BILLING.map((x) => <Stat key={x.label} {...x} enFila />)}</div>
             </Estado>
             <Estado titulo="On the page" nota="Card de página, sombra y sin borde, con el círculo de info." ancho={248}><Stat {...STATS_BILLING[0]!} /></Estado>
-            <Estado titulo="Inside a panel" nota="Today: InnerCard, también con el círculo de info." ancho={248}><div className="rounded-lg bg-white p-4"><Stat interna {...STATS_HOY[0]!} /></div></Estado>
+            <Estado titulo="Inside a panel" nota="Today: InnerCard baja (compacta), con el círculo de info; el número a la derecha. Ocupa la mitad de alto que antes." ancho={248}><div className="flex flex-col gap-2 rounded-lg bg-white p-4">{STATS_HOY.map((s) => <Stat key={s.label} interna compacta {...s} />)}</div></Estado>
           </Fila>
         </Bloque>
       </div>
@@ -290,7 +291,7 @@ function Medir() {
             <li>Payment and adjustment buttons only show with a patient selected, above the title of their activity: they always post for that patient.</li>
             <li>The patient card, the guarantor numbers and the buttons enter subtly, Apple-style: 2px, a slight blur that clears and a fade, 360ms on a curve that eases out gently. Without motion (reduced motion) they just appear. Screen readers hear the name (aria-live).</li>
             <li>Every number at the top and in Today has its info circle (InfoTip) explaining what it counts; the guarantor numbers have none.</li>
-            <li>Bento from 1024px: left 1fr (numbers + activity), right 280px (Find Patient + Today). Both columns end together: the table sets the height (15 rows a page) and Find Patient scrolls inside; with a patient the bento keeps the overview height (780px minimum). Below 1024px, one column. On the phone, picking in Find Patient scrolls up to the patient’s buttons.</li>
+            <li>Bento from 1024px: left 1fr (numbers + activity), right 280px (Find Patient + Today). Each column has its natural height: the table goes eight rows a page, so the whole screen is visible at 1440 × 900 without scrolling; with a patient the bento keeps the overview height. Below 1024px, one column. On the phone, picking in Find Patient scrolls up to the patient’s buttons.</li>
             <li>The five numbers: five in a row from 1280px, 3 + 2 before, 2 + 2 + 1 on the phone; label, number and caption line up across cards and nothing is cut (two lines at most).</li>
             <li>Panel titles have no icon (Panel, 15px Bold). A card on the grey page has a shadow and no border; anything inside a panel is an InnerCard.</li>
           </ul>
@@ -298,6 +299,17 @@ function Medir() {
       </Lienzo>
     </div>
   )
+}
+
+/* Find Patient con "Show N more" abierto: el resto con scroll adentro y el panel con el mismo alto. */
+export const ShowMoreOpen: Story = {
+  name: 'Show more open',
+  parameters: { controls: { disable: true }, docs: { story: { inline: false, iframeHeight: 520 } } },
+  render: () => <Fondo><div className="w-[280px]"><Buscador q="" /></div></Fondo>,
+  play: async (c) => {
+    await userEvent.click(await within(c.canvasElement).findByRole('button', { name: /Show \d+ more/ }))
+    await within(c.canvasElement).findByRole('region', { name: 'All patients' })
+  },
 }
 
 /* Medidas y colores, leídos de los paneles dibujados y de src/index.css. */
