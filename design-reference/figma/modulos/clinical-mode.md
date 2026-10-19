@@ -2398,3 +2398,28 @@ Código: `clinical/OdontogramaOverview.tsx` (`OdontogramaOverview`, `Odontograma
 `useUltimaCondicion` en `ExamLayout.tsx`, `pestanaDeExamen` en `RecordDetail.tsx`, `llena` en `TreatmentPlanList`.
 Design system: *Components / Clinical / Overview chart* y *Components / Clinical / TreatmentPlanList* (*Fill the
 column*, *Specs*).
+
+## Confirm Procedure y Clinical Note pasan a ConfirmDialog (2026-10-19)
+
+Julián sintió que clinical mode necesitaba su propia definición de pop up. No era así: el sistema ya está decidido
+(`ui/drawer` para todo lo que carga o edita, `ui/confirm-dialog` sólo para una pregunta antes de seguir, un flotante
+anclado para consultar sin bloquear — CLAUDE.md y `design-system.md` 2026-10-06) y `ConsentRequiredDialog` ya lo sigue
+bien. Lo que pasaba es que dos piezas de clinical mode se escribieron rearmando `Dialog` a mano, antes de `ConfirmDialog`
+o sin encontrarlo, con botones `<button>` propios y colores hardcodeados (`bg-dash-blue`, `bg-field-error`) en vez de
+`ui/button` y sus variantes.
+
+- **`ConfirmProcedureDialog`** (`dental/ConfirmProcedureDialog.tsx`): confirma el cambio de estado de un finding, con un
+  checklist opcional para marcar como Treated las condiciones vinculadas del área. Pasa a `ConfirmDialog`, con el
+  checklist como children (igual que `ResumenConsentimiento` en `ConsentRequiredDialog`). `tone="danger"` en las
+  acciones destructivas de `actions.ts` (discard, delete, no-treatment, patient/clinic declined), `primary` en el resto.
+- **`ClinicalNoteDialog`** (`ClinicalTopBar.tsx`): ofrece firmar la Clinical Note al cerrar el encuentro. Pasa a
+  `ConfirmDialog` con `cancelLabel="Remind me later"` en vez de "Cancel". Efecto colateral, a propósito: cerrar con Esc
+  o clickeando afuera ahora también dispara el aviso "We will remind you to sign the Clinical Note" (antes sólo lo hacía
+  el botón) — como en cualquier otro `ConfirmDialog` de la app, cerrarlo de cualquier forma es la misma decisión de no
+  seguir ahora.
+
+No se suma ningún patrón nuevo ni cambia el flujo de ninguna pantalla: es una corrección de consistencia, no una
+decisión de UX nueva.
+
+Código: `clinical/dental/ConfirmProcedureDialog.tsx`, `clinical/ClinicalTopBar.tsx` (`ClinicalNoteDialog`).
+Design system: *Elements / ConfirmDialog* (fila nueva en *Specs* › *Where*).

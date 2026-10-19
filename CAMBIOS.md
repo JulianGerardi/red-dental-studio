@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Clinical mode: ConfirmProcedureDialog y ClinicalNoteDialog pasan a ConfirmDialog ([#58](https://github.com/JulianGerardi/red-dental-studio/pull/58))
+- Los dos rearmaban `Dialog` a mano (botones propios, colores sin token) en vez de usar `ui/confirm-dialog`, el patrón
+  que ya sigue el resto de la app para una pregunta de sí/no. No es un pop up nuevo, es la corrección de dos piezas que
+  no seguían el sistema ya definido.
+- **Para el dev:** mismas props y comportamiento externo en los dos componentes. En `ConfirmProcedureDialog`
+  (`clinical/dental/`) el checklist de condiciones vinculadas va como children de `ConfirmDialog`. En
+  `ClinicalNoteDialog` (`ClinicalTopBar.tsx`), cerrar con Esc o clic afuera ahora también cuenta como "Remind me later".
+  *Elements / ConfirmDialog* suma una fila en Specs › Where.
+
 ### Detalle del Ledger y Billing más corto, con un solo "View full record" ([#57](https://github.com/JulianGerardi/red-dental-studio/pull/57))
 - En el detalle de una fila: los pies **View procedure / View payment / View adjustment** pasan a **View full record**,
   igual que en Procedures y en los findings. Se van **Adjustment reason** (ya es el título), **Payment methods** y las

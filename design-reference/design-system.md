@@ -999,6 +999,14 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `Odontogram` (el odontograma propio) deja de usarse en la app; sigue en el Builder y en su página. Decisiones en
   `figma/modulos/clinical-mode.md` (2026-10-18).
 
+## Confirm Procedure y Clinical Note pasan a ConfirmDialog (2026-10-19)
+
+- `ConfirmProcedureDialog` y `ClinicalNoteDialog` (clinical mode) rearmaban `Dialog` a mano, con botones propios y
+  colores sin token, en vez de usar `ConfirmDialog` como el resto de la app. Pasan a `ConfirmDialog`: el checklist de
+  condiciones vinculadas de `ConfirmProcedureDialog` entra como children (igual que `ResumenConsentimiento`); en
+  `ClinicalNoteDialog`, `cancelLabel="Remind me later"`. No es un patrón nuevo, es la corrección de dos piezas que no
+  seguían el sistema. *Elements / ConfirmDialog* suma una fila en *Specs* › *Where*. Decisiones en
+  `figma/modulos/clinical-mode.md` (2026-10-19).
 
 ## Today Appointments: el nombre es link (2026-10-19)
 
