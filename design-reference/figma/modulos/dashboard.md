@@ -662,3 +662,29 @@ Julián: "achicá un poco esos inputs del header" (locación, buscador y perfil)
   y botón de 32px (antes 40); nombre y rol a 11px. La campana ya era de 28.
 - **A validar:** que 12px en el buscador siga leyéndose bien en monitores chicos y para quien tiene baja visión; el área
   de toque de 28px queda justo para el mouse, pero es el mínimo para pantallas táctiles.
+
+## Sala siempre elegida, número que coincide y tira con scroll horizontal (2026-10-19)
+
+Julián: "los Patients today, cuando clickeo, no coinciden con las cards que muestra"; "siempre debería estar marcada una
+room por defecto"; y "las rooms en scroll horizontal, así queda más intuitivo y ganamos espacio".
+
+- **El número coincide.** Era un 12 fijo en todas las salas. Ahora "Patients today" es la cantidad de turnos de esa sala
+  en el día (`dia.appointments` filtrado por operatorio, calculado en `pages/Dashboard.tsx`). Elegir la sala 2 dice 3 y
+  Appointments muestra 3 cards. Tocar una sala filtra **los dos paneles**, no sólo Waiting Room: si el número cuenta
+  turnos y sólo cambiaba la sala de espera, no podía coincidir con nada de lo que se veía.
+- **Siempre una sala elegida**, la primera por defecto; tocar otra la cambia y no se puede soltar (como las tabs: sin
+  "todas"). Si el día no trae la sala elegida, la primera. El chip junto al título de Appointments y de Waiting Room dice
+  la sala, sin ✕ (siempre hay una). Vacío propio: "No appointments in Operatory 5" / "No one is waiting for Operatory 5".
+  Se fue el estado "Show all rooms".
+- **Filter de Appointments sale**: filtraba por operatorio, que ahora decide la tira de arriba; con una sala siempre
+  elegida los dos se pisaban (elegir otro operatorio en el filtro dejaba la lista vacía). Pending Task conserva el suyo.
+  Pendiente de Julián: si Appointments necesita otro filtro (por provider, por estado).
+- **Salas en scroll horizontal** (`OperatoryStrip`): una sola fila, cada card de 232px como mínimo, con snap al borde. A
+  1440px se ven cinco y la sexta asoma, que avisa que se desliza; con pocas salas se reparten el ancho. Se fue "Show N
+  more" de las salas: una fila sola ocupa el mismo alto con 6 que con 20, y sin botón de más.
+- Dato: Operatory 6 pasa a Available (figuraba Busy con 0 pacientes) y se suma un turno de Sofia Chen en Operatory 4, que
+  ya estaba en la sala de espera sin turno. El día de la demo queda en 7 turnos. Con `?day=busy`, 7 por sala ("Show 2
+  more").
+
+**Para validar con usuarios:** si recepción encuentra la agenda del día entera sin la vista de "todas las salas" (hoy
+sólo se ve una sala por vez), y si la sexta card asomando alcanza para entender que la tira se desliza.
