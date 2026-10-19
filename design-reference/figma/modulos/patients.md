@@ -213,3 +213,18 @@ compensaba su alto (`CONTENEDOR_PAGINA` ya trae `py-6`).
 
 La tabla, las cards de celular y Today Appointments / Recent Patients usan `ui/avatar`: cuadrado con esquinas
 redondeadas en vez del círculo (Julián marcó que no seguía el estilo del Dashboard). Regla en `../README.md`.
+
+## Today Appointments: el nombre lleva al paciente (2026-10-19)
+
+Pedido de Julián: en *Today Appointments* el nombre del turno tiene que ir directo al perfil del paciente, como ya
+hacía *Recent Patients* (`PatientCard`). *Recent Patients* ya mostraba sólo 10 con scroll adentro desde el 2026-10-13;
+nada que cambiar ahí.
+
+- `AppointmentCardCompacta` (usada sólo acá, con `compact`) pasa el nombre de `<span>` a `Link`, mismo azul y
+  subrayado al hover que `PersonCell` y `PatientCard`. El turno no trae el id del paciente -no hay backend-, así que
+  el id sale de `slug(appt.name)` (ahora exportado de `data/patientsStore.tsx`): los turnos de pacientes que están en
+  la lista (Sofia Chen, Daniel Ortiz, Thomas Davis, Lena Park) van a su ficha real; los que no existen en la demo
+  (Noah James, Mara Otero…) abren igual la pantalla del paciente -es mock, siempre muestra "John Smith"-, consistente
+  con cómo ya se comporta cualquier otro link a `/patients/:id` en el prototipo.
+- El kebab se queda igual (Edit, Go to appointment): el link es sólo para ir a ver al paciente; editar el turno sigue
+  en el menú.

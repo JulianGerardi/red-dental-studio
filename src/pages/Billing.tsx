@@ -40,7 +40,7 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
     : { texto: 'Charge Adj', tono: 'danger' }
 }
 
-/* Sobre el fondo gris es card de página; adentro de Today o de los saldos del garante, InnerCard. `info` suma el círculo
+/* Sobre el fondo gris es card de página; adentro de Today, InnerCard. `info` suma el círculo
    de info arriba a la derecha (billing.md, 2026-10-09). */
 export function Stat({ label, value, caption, info, interna, enFila, className }: {
   label: string; value: string; caption: string; info?: string; interna?: boolean
@@ -86,7 +86,6 @@ const COLUMNAS: DataTableColumn<Movimiento & { saldo: number }>[] = [
   { key: 'desc', header: 'Description', cell: (m) => <TextCell>{m.descripcion}</TextCell> },
   { key: 'provider', header: 'Provider', width: 124, cell: (m) => <TextCell>{m.provider}</TextCell> },
   { key: 'monto', header: 'Amount', width: 88, align: 'right', cell: (m) => <AmountCell value={m.monto} /> },
-  { key: 'saldo', header: 'Balance', width: 92, align: 'right', cell: (m) => <span className="tabular-nums">{moneda(m.saldo)}</span> },
 ]
 
 const initials = (nombre: string) => nombre.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
@@ -147,10 +146,10 @@ export function PacienteElegido({ paciente, onCerrar }: { paciente: PacienteBill
 }
 
 /* Recent Billing Activity. Sin paciente: toda la clínica, con las Tabs de tipo y filas que eligen al paciente. Con uno:
-   su nombre en el título, Patient / Guarantor View, los saldos del garante y sólo sus movimientos; cada fila se despliega
+   su nombre en el título, Patient / Guarantor View y sólo sus movimientos, sin saldos ni columna Balance (son de la cuenta de todas las locations); cada fila se despliega
    con el detalle del Ledger según el tipo (billing.md y ledger.md, 2026-10-14). */
 export function ActividadReciente({
-  filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, creditos, saldo, onElegir, onAccion, onExportar, refElegido, className, abierta,
+  filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, onElegir, onAccion, onExportar, refElegido, className, abierta,
 }: {
   /** Las filas ya filtradas: por tipo en el resumen, por paciente o garante con uno elegido. */
   filas: (Movimiento & { saldo: number })[]
@@ -161,9 +160,6 @@ export function ActividadReciente({
   paciente?: PacienteBilling
   vista: VistaPaciente
   onVista: (v: VistaPaciente) => void
-  /** Unapplied Credits y Open Balance del garante, con lo posteado en la sesión. */
-  creditos: number
-  saldo: number
   onElegir: (nombre: string) => void
   /** Los botones de pago y ajuste, arriba del título, sólo con paciente. */
   onAccion: (tipo: TipoAjusteBilling) => void
@@ -189,13 +185,6 @@ export function ActividadReciente({
         ? <Tabs size="sm" aria-label="Whose activity" tabs={VISTAS_PACIENTE} value={vista} onChange={onVista} />
         : <Tabs size="sm" aria-label="Filter activity" tabs={FILTROS_ACTIVIDAD} value={filtro} onChange={onFiltro} />}
     >
-      {paciente && (
-        <div key={paciente.nombre} className={cn('grid grid-cols-1 gap-3 sm:grid-cols-2', ENTRADA)}>
-          <Stat interna label="Guarantor Unapplied Credits" value={moneda(creditos)} caption="Available to apply" />
-          <Stat interna label="Guarantor Open Balance" value={moneda(saldo)} caption="Total outstanding" />
-        </div>
-      )}
-
       {/* En el resumen, clic en una fila abre la vista de ese paciente. */}
       <DataTable
         columns={COLUMNAS}
@@ -205,7 +194,7 @@ export function ActividadReciente({
         onRowClick={paciente ? undefined : (m) => onElegir(m.paciente)}
         defaultExpanded={paciente && abierta ? [abierta] : undefined}
         rowDetail={paciente ? (m) => (
-          <DetalleMovimiento m={m} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} onVerTodo={() => setEnModal(m)} />
+          <DetalleMovimiento m={{ ...m, saldo: undefined }} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} onVerTodo={() => setEnModal(m)} />
         ) : undefined}
         density="compact"
         pageSize={15}
@@ -217,7 +206,7 @@ export function ActividadReciente({
             : { icon: CreditCard, title: 'No entries', detail: 'Nothing matches the current filter.' }}
       />
       {enModal && (
-        <LedgerRowModal key={enModal.id} m={enModal} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} onClose={() => setEnModal(null)} />
+        <LedgerRowModal key={enModal.id} m={{ ...enModal, saldo: undefined }} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} onClose={() => setEnModal(null)} />
       )}
     </Panel>
   )
@@ -386,8 +375,6 @@ export default function Billing({ inicial }: {
             paciente={pacienteSeleccionado}
             vista={vista}
             onVista={setVista}
-            creditos={grupo.reduce((n, p) => n + p.creditosNoAplicados, 0)}
-            saldo={grupo.reduce((n, p) => n + saldoActual(p.nombre), 0)}
             onElegir={elegir}
             onAccion={setModal}
             onExportar={() => aviso.ok('Statement exported.')}

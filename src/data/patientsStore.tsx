@@ -28,7 +28,9 @@ const SEMILLA: PatientRow[] = [
   { id: 'james-wilson', name: 'James Wilson', initials: 'jw', birthday: 'Jun 3, 2025', email: 'j.wilson@corp.com', status: 'Active' },
 ]
 
-const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
+/* Se exporta: lo usa también AppointmentCardCompacta (dashboard/AppointmentCard.tsx) para armar el id del paciente a
+   partir del nombre del turno, sin pasar por el store (patients.md, 2026-10-19). */
+export const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
 /* Las iniciales van en minúscula, como en el Figma. */
 const iniciales = (first: string, last: string) =>
   ((first[0] ?? '') + (last[0] ?? '')).toLowerCase()
