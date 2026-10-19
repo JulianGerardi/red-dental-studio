@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 export const SHOW_MORE_ALTO = 'min(70vh, 640px)'
 
 export function ShowMore({
-  total, limit, maxHeight = SHOW_MORE_ALTO, label = 'items', fade = 'from-white', className, children,
+  total, limit, maxHeight = SHOW_MORE_ALTO, enCaja, label = 'items', fade = 'from-white', className, children,
 }: {
   /** Cuántos ítems hay en total. */
   total: number
@@ -17,6 +17,8 @@ export function ShowMore({
   limit: number
   /** Alto máximo de la lista abierta; más allá, scroll. Nunca queda más baja que la lista cerrada. */
   maxHeight?: string
+  /** Abierta mide lo mismo que cerrada y scrollea adentro: el panel no crece (barras junto a una tabla, Patients). */
+  enCaja?: boolean
   /** Nombre de lo que se lista, para el lector de pantalla ("appointments"). */
   label?: string
   /** Color del fondo de abajo, para el degradé que avisa que hay más: el de la card (blanco) o el de la página. */
@@ -59,7 +61,7 @@ export function ShowMore({
           setAlFinal(el.scrollTop + el.clientHeight >= el.scrollHeight - 4)
         } : undefined}
         className={cn('-m-1 p-1', scroll && 'overflow-y-auto overscroll-contain rounded-lg focus-visible:outline-2 focus-visible:outline-dash-blue')}
-        style={scroll ? { maxHeight: `max(${altoCerrado}px, ${maxHeight})` } : undefined}
+        style={scroll ? { maxHeight: enCaja ? `${altoCerrado}px` : `max(${altoCerrado}px, ${maxHeight})` } : undefined}
       >
         <div className={className}>{children(conTope && !abierto ? limit : total)}</div>
         {/* En Mac la barra de scroll no se ve hasta que se scrollea: el degradé avisa que hay más abajo. */}

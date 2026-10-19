@@ -147,7 +147,7 @@ export default function Patients() {
                 className="py-6"
               />
             ) : (
-              <ShowMore total={turnosFiltrados.length} limit={LIMITE_TURNOS} label="appointments" className="flex flex-col gap-3">
+              <ShowMore total={turnosFiltrados.length} limit={LIMITE_TURNOS} label="appointments" enCaja className="flex flex-col gap-3">
                 {(n) => turnosFiltrados.slice(0, n).map((a, i) => <AppointmentCard key={i} appt={a} onEdit={editarTurno} compact />)}
               </ShowMore>
             )}
@@ -163,7 +163,7 @@ export default function Patients() {
                 className="py-6"
               />
             ) : (
-              <ShowMore total={recientesFiltrados.length} limit={LIMITE_RECIENTES} label="recent patients" className="flex flex-col gap-3">
+              <ShowMore total={recientesFiltrados.length} limit={LIMITE_RECIENTES} label="recent patients" enCaja className="flex flex-col gap-3">
                 {(n) => recientesFiltrados.slice(0, n).map((r) => <PatientCard key={r.id} row={r} onEdit={setEditando} />)}
               </ShowMore>
             )}

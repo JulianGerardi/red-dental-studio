@@ -16,7 +16,7 @@ const filas = (n: number) => (
   </ul>
 )
 
-type Args = { total: number; limit: number }
+type Args = { total: number; limit: number; enCaja: boolean }
 
 const meta = {
   title: 'Elements/Show more',
@@ -29,17 +29,18 @@ const meta = {
           '',
           '**Dónde se usa:** Appointments, Waiting Room y Pending Task del Dashboard; Appointments, Pending Task y Pending documents del Patient Dashboard; Treatments; Today Appointments y Recent Patients de Patients. Con filas (turnos, tareas), va adentro de *List group*, que pone cada fila en su card; con otras cards (salas, turnos del paciente, planes), directo, con la grilla o la columna en `className`.',
           '',
-          '**Cómo se comporta:** si el total no pasa el tope, no hay botón ni scroll. Abierta, la lista crece hasta `min(70vh, 640px)` (nunca menos que cerrada) y después scrollea; un degradé abajo avisa que hay más (en Mac la barra no se ve hasta scrollear) y se va al llegar al final. Si abierta entra entera, no hay degradé (2026-10-13). La zona con scroll se alcanza con Tab y se mueve con las flechas.',
+          '**Cómo se comporta:** si el total no pasa el tope, no hay botón ni scroll. Abierta, la lista crece hasta `min(70vh, 640px)` (nunca menos que cerrada) y después scrollea; con `enCaja` no crece: mide lo mismo que cerrada y scrollea adentro, para que el panel no se salga de la grilla (Today Appointments y Recent Patients de Patients, Julián, 2026-10-19); un degradé abajo avisa que hay más (en Mac la barra no se ve hasta scrollear) y se va al llegar al final. Si abierta entra entera, no hay degradé (2026-10-13). La zona con scroll se alcanza con Tab y se mueve con las flechas.',
           '',
           '**Probalo:** en *Playground* cambiá el total y el tope desde *Controls*; tocá "Show N more", scrolleá y volvé con "Show less".',
         ].join('\n'),
       },
     },
   },
-  args: { total: 20, limit: 5 },
+  args: { total: 20, limit: 5, enCaja: false },
   argTypes: {
     total: { control: { type: 'range', min: 0, max: 35 }, description: 'Cuántos ítems hay.' },
     limit: { control: { type: 'range', min: 1, max: 12 }, description: 'Cuántos se ven cerrado. Si el total no lo pasa, no hay botón.' },
+    enCaja: { control: 'boolean', description: 'Abierta mide lo mismo que cerrada y scrollea adentro (el panel no crece).' },
   },
 } satisfies Meta<Args>
 
@@ -50,7 +51,7 @@ const sinControles = { controls: { disable: true } }
 export const Playground: Story = {
   render: (a) => (
     <div className={cn(TARJETA_PANEL, 'max-w-[420px] p-4')}>
-      <ShowMore key={`${a.total}-${a.limit}`} total={a.total} limit={a.limit} label="appointments">{filas}</ShowMore>
+      <ShowMore key={`${a.total}-${a.limit}-${a.enCaja}`} total={a.total} limit={a.limit} enCaja={a.enCaja} label="appointments">{filas}</ShowMore>
     </div>
   ),
 }
@@ -90,6 +91,11 @@ export const States: Story = {
             <ShowMore total={20} limit={5} label="appointments">{filas}</ShowMore>
           </Forzar>
         </Muestra>
+        <Muestra titulo="Open, in a box" nota="enCaja: abierta mide lo mismo que cerrada y scrollea adentro; el panel no crece.">
+          <Forzar selector="[data-show-more]" estado="click" className={cn(TARJETA_PANEL, 'p-4')}>
+            <ShowMore total={20} limit={5} enCaja label="appointments">{filas}</ShowMore>
+          </Forzar>
+        </Muestra>
         <Muestra titulo="Fits: no button" nota="Si no pasa el tope, no hay botón ni scroll.">
           <div className={cn(TARJETA_PANEL, 'p-4')}><ShowMore total={3} limit={5} label="appointments">{filas}</ShowMore></div>
         </Muestra>
@@ -122,6 +128,7 @@ export const Specs: Story = {
       <Bloque titulo="Behavior" nota="De show-more.tsx.">
         <Tabla encabezado={['Part', 'Value']} minimo={480}>
           <tr><td className="font-semibold">Open height</td><td className="font-mono text-[12px]">max(closed height, {SHOW_MORE_ALTO})</td></tr>
+          <tr><td className="font-semibold">Open height, enCaja</td><td className="font-mono text-[12px]">closed height (no growth)</td></tr>
           <tr><td className="font-semibold">Fade</td><td>32px, from the background color (white in a card, page-background on the page) to transparent</td></tr>
           <tr><td className="font-semibold">Button</td><td>12px Medium, dash-blue, chevron 14px; underline on hover</td></tr>
           <tr><td className="font-semibold">Gap list → button</td><td className="tabular-nums">8px</td></tr>

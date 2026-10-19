@@ -209,6 +209,16 @@ Pedido de Julián: el link de arriba de la pantalla no abría nada distinto de e
 `/patients` estando ya en `/patients`-, así que era un adorno sin función. Se saca, junto con el `mt-[15px]` que
 compensaba su alto (`CONTENEDOR_PAGINA` ya trae `py-6`).
 
+## Today Appointments y Recent Patients: el scroll queda adentro de la caja (2026-10-19)
+
+Julián: "el scroll debe ser interior, no debe expandirse todo el cuadro en Today Appointments y Recent Patients, porque
+si no pierde el grid de la pantalla y no queda en caja como está por default".
+
+- Abierta, la lista crecía hasta `min(70vh, 640px)` y la barra quedaba mucho más alta que la tabla. Ahora `ShowMore`
+  lleva `enCaja`: abierta mide **lo mismo que cerrada** y el resto se ve scrolleando adentro; el panel y la barra no se
+  mueven. "Show N more" / "Show less" siguen igual. El resto de la app conserva el comportamiento de crecer.
+- **A validar:** que con 4 y 3 filas a la vista alcance, o si conviene dejar más filas a la vista en pantallas altas.
+
 ## Un solo avatar de persona (2026-10-18)
 
 La tabla, las cards de celular y Today Appointments / Recent Patients usan `ui/avatar`: cuadrado con esquinas
