@@ -209,3 +209,7 @@ Pedido de Julián: el link de arriba de la pantalla no abría nada distinto de e
 `/patients` estando ya en `/patients`-, así que era un adorno sin función. Se saca, junto con el `mt-[15px]` que
 compensaba su alto (`CONTENEDOR_PAGINA` ya trae `py-6`).
 
+## Un solo avatar de persona (2026-10-18)
+
+La tabla, las cards de celular y Today Appointments / Recent Patients usan `ui/avatar`: cuadrado con esquinas
+redondeadas en vez del círculo (Julián marcó que no seguía el estilo del Dashboard). Regla en `../README.md`.

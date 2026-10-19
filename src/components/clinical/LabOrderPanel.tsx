@@ -8,6 +8,7 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { ORDENES, type EstadoOrden, type OrdenLab } from '@/data/clinical-mode'
+import { Avatar } from '@/components/ui/avatar'
 
 /* En el orden del pedido: es también el orden del filtro. */
 export const ORDEN_TONO: Record<EstadoOrden, PillTone> = {
@@ -27,12 +28,10 @@ function iniciales(nombre: string) {
   return nombre.replace(/^Dr\.\s*/, '').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
 }
 
-/* Las iniciales en el círculo celeste del equipo (PersonCell soft), sin link: la orden no lleva a la ficha. */
+/* El Avatar y el nombre, como PersonCell pero sin link: la orden no lleva a la ficha. */
 const persona = (nombre: string) => (
   <span className="flex min-w-0 items-center gap-2.5">
-    <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold">
-      {iniciales(nombre)}
-    </span>
+    <Avatar initials={iniciales(nombre)} />
     <TextCell>{nombre}</TextCell>
   </span>
 )

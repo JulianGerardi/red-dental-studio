@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer'
 import { FieldError, FieldLabel, ModalShell, OptionCheckbox, SelectField, TextField } from '@/components/patients/form'
 import { useFormPasos } from '@/lib/useFormPasos'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Add Relationship: antes una pantalla aparte (Figma 3716:61372, 3716:62815 y 3716:63601); ahora el drawer de
    Confidentally 2.0 con sus tres pasos: buscar o crear a la persona, sus datos de contacto y la relación con el
@@ -26,9 +27,7 @@ export const DIRECTORIO: PersonaDirectorio[] = [
 export function PersonaSeleccionada({ p }: { p: PersonaDirectorio }) {
   return (
     <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3">
-      <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">
-        {p.initials}
-      </span>
+      <Avatar initials={p.initials} size={36} />
       <span className="min-w-0 flex-1 leading-tight">
         <span className="block text-[13px] font-semibold text-ink">{p.name}</span>
         <span className="block text-[11px] text-ink-muted">
@@ -171,7 +170,7 @@ export function AddRelationshipDrawer({
                 onClick={() => { setPersona(p); setQ(p.name) }}
                 className="flex items-center gap-3 rounded-lg border border-line bg-white p-3 text-left hover:bg-surface-subtle"
               >
-                <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">{p.initials}</span>
+                <Avatar initials={p.initials} size={36} />
                 <span className="min-w-0 leading-tight">
                   <span className="block text-[13px] font-semibold text-ink">{p.name}</span>
                   <span className="block text-[11px] text-ink-muted">DOB: {p.dob}</span>

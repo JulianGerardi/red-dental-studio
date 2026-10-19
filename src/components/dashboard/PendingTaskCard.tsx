@@ -1,6 +1,7 @@
 import { FileText, TriangleAlert, ArrowRight } from 'lucide-react'
 import { InnerCard } from './primitives'
 import { aviso } from '@/components/ui/toaster'
+import { Avatar } from '@/components/ui/avatar'
 
 export type PendingTask = {
   kind: string
@@ -26,9 +27,7 @@ export function PendingTaskCard({ task }: { task: PendingTask }) {
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="bg-dash-count-bg text-dash-blue-hover flex size-7 shrink-0 items-center justify-center rounded-md text-[11px] font-semibold">
-          {task.initials}
-        </span>
+        <Avatar initials={task.initials} size={28} />
         <p className="text-dash-name min-w-0 flex-1 truncate text-[13px] font-semibold">
           {task.person}
         </p>

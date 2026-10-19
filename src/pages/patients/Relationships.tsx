@@ -14,6 +14,7 @@ import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Figma 3712:60564 (poblado) y 3712:59142 (vacío). */
 
@@ -93,9 +94,7 @@ export function PersonaCard({
   return (
     <article className={cn(TARJETA_PANEL, 'px-5 py-4')}>
       <header className="flex flex-wrap items-center gap-3">
-        <span className="bg-dash-blue flex size-10 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold text-white">
-          {p.initials}
-        </span>
+        <Avatar initials={p.initials} size={40} />
         <span className="leading-tight">
           <span className="block text-[15px] font-bold text-ink">{p.name}</span>
           <span className="block text-xs text-ink-muted">{p.rol}</span>

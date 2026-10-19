@@ -94,3 +94,8 @@ de Locations y Employees en tres cosas, y ahora lo sigue:
 - **Last Update** alineada a la izquierda como el resto de las columnas (estaba a la derecha).
 
 Desviación deliberada sobre el Figma (`3753:80195`), que traía el buscador de 265×32.
+
+## Un solo avatar de persona (2026-10-18)
+
+El avatar del header de la card deja el `#eff4ff` / `#0056ef` del Figma (ver *Especificación de la card*) y pasa a
+`ui/avatar` de 36px: azul con iniciales blancas, como el resto de la app. Regla en `../README.md`.

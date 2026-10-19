@@ -240,7 +240,7 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     **Documents**, **Insurance** y **Billing** (2026-09-26), con `Button` /
     `buttonClasses()` para su acción principal. Para esas pantallas se sumaron:
     selección controlada (`selected`, `onSelectedChange`), filas por página
-    (`pageSizeOptions`), avatar `soft` en `PersonCell`, `reorder` (manija para
+    (`pageSizeOptions`), `reorder` (manija para
     reordenar arrastrando o con ↑ ↓; Insurance), filas clickeables con teclado
     (Billing) y filas que crecen si una celda tiene dos líneas.
     **Estados:** `loading` (filas grises con la forma de las columnas),
@@ -951,6 +951,22 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   (variante, cuántos procedimientos, enviando), Parts (partes, qué hace cada botón, cuándo aparece, dónde se usa),
   States (cada caso en su iframe, más la caja de resumen sola) y Specs (medidas, colores y la lógica).
   Decisiones en `figma/modulos/clinical-mode.md` (2026-10-17).
+
+## Elements / Avatars: un solo avatar de persona (2026-10-18)
+
+- **`ui/avatar`** cambia de API: `<Avatar initials="NJ" size={44} photo={url} />`. Se van `AvatarFallback` y los tonos;
+  forma (`rounded-avatar`, token `--radius-avatar: 27%`) y color (`dash-blue` + blanco) son siempre los mismos. Exporta
+  `AVATAR_SIZES` (24 a 72, con su letra), `AVATAR_BASE` e `inicialesDe(nombre)`.
+- Reemplaza los ~30 avatares escritos a mano (círculos y cuadrados, azul y celeste) en tablas, cards, drawers, paneles,
+  topbar, Clinical Mode, el Builder (bloque *Person* y su código) y las demos de Help.
+- **`PersonCell`** pierde `tone`: pacientes y equipo, igual. **`EditableAvatar`** recibe `size` (y `className` sólo
+  para el logo de la cuenta) en vez de `avatarClassName`.
+- La página pasa de *Components / UI / Avatar* a **Elements / Avatars**, con la estructura de Buttons: Playground
+  (iniciales, tamaño, foto), Parts (partes y persona vs cosa), States (iniciales, una letra, nombre largo, foto,
+  editable en reposo, hover y foco, y en una tabla) y Specs (la escala medida, con radio y dónde va cada tamaño, y los
+  tokens). *Components / UI / EditableAvatar* suma Parts, States y Specs. *Foundations / Radius and shadows* muestra
+  `rounded-avatar`.
+- Decisiones en `figma/README.md`, *Regla: un solo avatar de persona*.
 
 ## La flecha de las filas que se despliegan, igual en todas las tablas (2026-10-18)
 

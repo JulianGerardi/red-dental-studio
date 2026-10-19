@@ -10,6 +10,7 @@ import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
 import { ManijaResize, useAnchoColumnas, useAnchoVisible } from '@/components/patients/ledger/useAnchoColumnas'
 import { cn } from '@/lib/utils'
+import { Avatar } from '@/components/ui/avatar'
 import { TABLA_ENCABEZADO, TABLA_LINK, TABLA_TEXTO } from '@/lib/estilos'
 
 /* Tabla estándar de la app: la misma anatomía que Patients, Team, Accounts y
@@ -403,22 +404,17 @@ export function RowChevron({ open }: { open: boolean }) {
   return <ChevronRight aria-hidden className={cn('size-4 shrink-0 text-ink-faint transition-transform', open && 'rotate-90')} />
 }
 
-/** Iniciales en un círculo azul y el nombre como link. */
-export function PersonCell({ name, initials, to, onClick, tone = 'solid' }: {
+/** El Avatar (ui/avatar, 32px) y el nombre como link. Pacientes y equipo, igual. */
+export function PersonCell({ name, initials, to, onClick }: {
   name: string
   initials: string
   to?: string
   onClick?: () => void
-  /** solid: pacientes. soft: equipo (círculo celeste, iniciales azules). */
-  tone?: 'solid' | 'soft'
 }) {
   const clase = cn(TABLA_LINK, 'text-[13px]')
   return (
     <span className="flex min-w-0 items-center gap-2.5">
-      <span className={cn(
-        'flex size-8 shrink-0 items-center justify-center rounded-full font-semibold',
-        tone === 'solid' ? 'bg-dash-blue-hover text-[13px] text-surface-subtle' : 'bg-dash-count-bg text-dash-blue-hover text-[11px]',
-      )}>{initials}</span>
+      <Avatar initials={initials} />
       {to ? (
         <Link to={to} onClick={(e) => e.stopPropagation()} className={clase}>{name}</Link>
       ) : (
