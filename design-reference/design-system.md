@@ -1025,3 +1025,23 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
 - *Components / Ledger / LedgerRowDetail*: sin Adjustment reason, sin Payment methods y sin las frases explicativas; el
   pie de los cuatro tipos es **View full record** (`VerRegistroCompleto`). Playground, Parts, States y Specs al día.
   Decisiones en `figma/modulos/ledger.md` (2026-10-19).
+
+## Drawer: sombra en el pie cuando sigue con scroll (2026-10-19)
+
+- *Components / UI / Drawer*: un paso con muchos campos y poco alto de ventana (New Appointment, paso 1) quedaba
+  cortado contra el pie sin ningún aviso de que seguía con scroll. El drawer mide con `ResizeObserver` si falta
+  contenido por ver y le agrega una sombra elevada al pie mientras eso sea cierto; al llegar al final se va sola.
+  *Parts* suma **Footer shadow**; la descripción del componente lo explica. Decisiones en `figma/modulos/dashboard.md`
+  (2026-10-19), que es donde apareció el caso (New Appointment).
+
+## Dashboard: sala de espera filtrada, sin repetir la sala y sin el hueco blanco (2026-10-19)
+
+- *Components / Dashboard / Operatory strip*: el anillo de la primera sala ya no se corta contra el borde del scroll
+  (`scroll-p-1.5`); *Parts → Selection ring* y *States → First room selected* lo muestran.
+- *Components / Dashboard / Dashboard rows*: `AppointmentRow` suma `ocultarOperatorio`, para cuando la fila ya está en
+  una lista filtrada por sala (la sala va en el chip del título, no hace falta repetirla). *States → Operatory hidden*.
+- El panel de Waiting Room, filtrado, abraza sus filas en vez de estirarse a la altura de sus vecinas (`self-start`):
+  sin eso, dos turnos en un panel estirado a 671px dejaban un bloque blanco vacío enorme. Sin filtro sigue parejo con
+  Appointments y Pending Task, como siempre.
+- "Patients today" vuelve a variar por sala (12 / 10 / 4, mock) en vez del número fijo que traían las seis.
+  Decisiones en `figma/modulos/dashboard.md` (2026-10-19).

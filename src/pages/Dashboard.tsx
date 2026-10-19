@@ -290,7 +290,10 @@ export default function Dashboard() {
           )}
         </Panel>
 
-        <div ref={panelEspera} className="flex scroll-mt-4 flex-col">
+        {/* Filtrada, la card abraza sus filas en vez de estirarse a la altura de sus vecinas: dos turnos estirados a
+            671px dejaban un hueco blanco enorme debajo, nada armonioso (Julián, 2026-10-19). Sin filtro, sigue
+            estirándose pareja con Appointments y Pending Task, como siempre. */}
+        <div ref={panelEspera} className={cn('flex scroll-mt-4 flex-col', salaEspera && 'self-start')}>
         {/* El filtro se lee pegado al título (a la derecha lo tapaba la pestaña del paciente). */}
         <Panel
           className="flex-1"
@@ -318,6 +321,7 @@ export default function Dashboard() {
                   key={i} appt={{ ...a, accion: 'Check Out' }} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
                   onSelect={pick}
                   onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: dia.waiting.indexOf(a) })}
+                  ocultarOperatorio={!!salaEspera}
                 />
               ))}
             </ListGroup>

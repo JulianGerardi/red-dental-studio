@@ -583,3 +583,16 @@ con "Select all …" como una opción más), no de casillas: así está en el di
 - **Pendiente de validar con usuarios:** si recepción necesita **varios** providers o salas a la vez (el diseño sólo permite uno o
   todos) y si el filtro de Status debería afectar también a Day/Week/Month: hoy el prototipo guarda la vista pero la grilla no
   filtra (no hay backend ni datos para 12 providers).
+
+## New Appointment: los campos del paso 1 quedaban cortados contra el pie (2026-10-19)
+
+Julián: "fijate que los inputs quedan cortados en el paso 1". Con poco alto de ventana (celular, o una ventana de escritorio baja),
+el paso "Patient and Scheduling" tiene nueve campos y no entra entero: el contenido scrollea solo, pero el pie (Cancel / Next Step)
+no se movía y el último campo (End Time, Operatory o Status según cuánto entre) quedaba recortado justo contra él, sin ningún aviso
+de que seguía con scroll. Se veía como un campo roto, no como "hay más abajo".
+
+No es un bug de este drawer en particular: es `ui/drawer`, el mismo de todos los formularios. El arreglo va ahí: mientras falte
+contenido por ver, el pie lleva una sombra elevada arriba (como una barra de scroll tapando lo que sigue); al llegar al final se va
+sola. Se probó primero un degradé blanco como el de `ui/show-more`, pero sobre un campo blanco liso (no una card con avatar y chips)
+tapaba el control entero dejándolo en blanco, peor que el corte original; la sombra no esconde el campo, sólo separa visualmente el
+pie. Ver `design-system.md` (2026-10-19) y *Components / UI / Drawer → Parts → Footer shadow*.

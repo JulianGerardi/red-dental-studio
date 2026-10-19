@@ -67,6 +67,7 @@ export const Parts: Story = {
         ['Card', 'La sala, con el color de su estado.', 'OperatoryCard enPagina'],
         ['Selection', 'Opcional: la elegida lleva el anillo azul y las demás van al 60%. Tocar una filtra la Waiting Room; tocarla de nuevo la suelta.', 'elegida · onElegir'],
         ['Snap', 'Al soltar el deslizamiento, la tira se acomoda en el borde de una card, sin dejarla cortada a la mitad.', 'snap-x'],
+        ['Selection ring', 'Elegir la primera sala la llevaba pegada al borde del scroll y el anillo azul se cortaba de ese lado (Julián, 2026-10-19): el snap corre -m-1.5 p-1.5, el aire para el anillo, al medir dónde parar. scroll-p-1.5 le pide al snap que deje ese mismo margen.', 'scroll-p-1.5'],
       ]} />
     </Lienzo>
   ),
@@ -81,6 +82,9 @@ export const States: Story = {
       </Muestra>
       <Muestra titulo="Scrolling" nota="Ocho salas a 1000px: entran cuatro y la quinta asoma por el borde.">
         <Pagina ancho={1000}><Elegible rooms={salas(8)} /></Pagina>
+      </Muestra>
+      <Muestra titulo="First room selected" nota="Operatory 1 elegida: el anillo entra completo contra el borde izquierdo del scroll (bug arreglado, 2026-10-19).">
+        <Pagina ancho={1000}><Elegible rooms={salas(8)} inicial="Operatory 1" /></Pagina>
       </Muestra>
       <Muestra titulo="Another one selected" nota="Operatory 3 elegida: anillo azul; las demás al 60% hasta el hover.">
         <Pagina ancho={1352}><Elegible rooms={salas(5)} inicial="Operatory 3" /></Pagina>
