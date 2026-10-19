@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Patients: el scroll de Today Appointments y Recent Patients queda adentro de la caja ([#55](https://github.com/JulianGerardi/red-dental-studio/pull/55))
+- Al abrir "Show N more", la lista ya no agranda el panel: mide lo mismo que cerrada y scrollea adentro, así la barra no
+  se sale de la grilla de la tabla.
+- **Para el dev:** `ShowMore` suma `enCaja`; lo pasan los dos paneles de `pages/Patients.tsx`. El resto de las listas
+  conserva el crecimiento hasta `min(70vh, 640px)`.
+
 ### Clinical mode: ConfirmProcedureDialog y ClinicalNoteDialog pasan a ConfirmDialog ([#58](https://github.com/JulianGerardi/red-dental-studio/pull/58))
 - Los dos rearmaban `Dialog` a mano (botones propios, colores sin token) en vez de usar `ui/confirm-dialog`, el patrón
   que ya sigue el resto de la app para una pregunta de sí/no. No es un pop up nuevo, es la corrección de dos piezas que
