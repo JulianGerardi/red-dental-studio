@@ -278,3 +278,20 @@ paciente, y en el Ledger.
 4. *Guarantor Unapplied Credits* sale de `creditosNoAplicados`, otro dato de prueba: con las aplicaciones de arriba no
    queda crédito sin aplicar en los movimientos, y el número de arriba dice $210. Queda anotado para cuando haya datos
    reales.
+
+## Sin saldos de la cuenta en la tabla (2026-10-19)
+
+Julián: los dos saldos del garante y la columna Balance salen de Billing. Esta pantalla filtra las transacciones por
+location, pero esos números son de la cuenta del paciente en **todas** las locations: al lado de una tabla filtrada no
+eran precisos.
+
+1. Con un paciente elegido se van *Guarantor Unapplied Credits* y *Guarantor Open Balance*; el panel va del título y las
+   Tabs directo a la tabla.
+2. Sale la columna **Balance** (el saldo corrido de la cuenta) de la tabla, en el resumen y con paciente, y el campo
+   Balance del detalle de la fila y de *View full record*.
+3. Queda lo que sí es de la transacción: el Original charge, lo aplicado y el Outstanding transaction balance del
+   detalle de cada fila.
+4. **Para decidir:** *Find Patient* sigue mostrando el Balance de cada paciente y es el mismo tipo de número (de la
+   cuenta, no de la location). No se tocó porque no estaba marcado; si corresponde, se rotula como "all locations" o se
+   saca igual. `creditosNoAplicados` y `saldoDe` quedan en los datos, sin uso en la tabla.
+

@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Billing: sin los saldos del garante ni la columna Balance ([#56](https://github.com/JulianGerardi/red-dental-studio/pull/56))
+- Con un paciente elegido se van *Guarantor Unapplied Credits* y *Guarantor Open Balance*, y la tabla pierde la columna
+  Balance (también el campo Balance del detalle de la fila y de *View full record*): son de la cuenta en todas las
+  locations y la pantalla filtra por una. *Find Patient* sigue mostrando el Balance de cada paciente: queda a decidir.
+- **Para el dev:** `ActividadReciente` pierde `creditos` y `saldo`; Billing pasa `saldo: undefined` al detalle y al
+  registro completo. `creditosNoAplicados` y `saldoDe` quedan en `data/billing.ts` sin uso en la tabla.
+
 ### Patients: Today Appointments con el nombre como link ([#55](https://github.com/JulianGerardi/red-dental-studio/pull/55))
 - El nombre de cada fila de *Today Appointments* lleva directo a la ficha del paciente, como ya hacía *Recent
   Patients*. El kebab sigue igual (Edit, Go to appointment).
