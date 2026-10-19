@@ -57,10 +57,11 @@ export function NotificationBanner({
 
   /* El aviso ámbar del design system (tono warning de Alert), de punta a punta del contenido de la página: la tarea,
      Review y el paginador juntos a la izquierda y la X sola a la derecha (Julián, 2026-10-13; antes iba del ancho de
-     su contenido). Ver header-sidebar.md. */
+     su contenido). Sin padding arriba ni a los costados (Julián, 2026-10-19), pegado al header y a los bordes del
+     contenido. Ver header-sidebar.md. */
   return (
     <div className="bg-page-background">
-      <div className={cn(ANCHO_PAGINA, 'px-4 pt-4 sm:px-6')}>
+      <div className={cn(ANCHO_PAGINA, 'px-0 pt-0')}>
         <div role="status" className="flex w-full items-center gap-3 rounded-lg border border-warn-fg/25 bg-warn-bg py-2 pr-2 pl-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]">
           {contenido}
         </div>
