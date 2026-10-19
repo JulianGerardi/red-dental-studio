@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
-### Detalle del Ledger y Billing más corto, con un solo "View full record"
+### Detalle del Ledger y Billing más corto, con un solo "View full record" ([#57](https://github.com/JulianGerardi/red-dental-studio/pull/57))
 - En el detalle de una fila: los pies **View procedure / View payment / View adjustment** pasan a **View full record**,
   igual que en Procedures y en los findings. Se van **Adjustment reason** (ya es el título), **Payment methods** y las
   frases explicativas de debajo de Financial details y de las aplicaciones.
