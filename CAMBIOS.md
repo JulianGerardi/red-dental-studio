@@ -5,6 +5,11 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### El banner amarillo sin padding arriba ni a los costados ([#62](https://github.com/JulianGerardi/red-dental-studio/pull/62))
+- El aviso de tareas pendientes va pegado al header y a los bordes del contenido de la página (antes tenía
+  `px-4 pt-4 sm:px-6`). El ancho y el orden interno no cambiaron.
+- **Para el dev:** `NotificationBanner` — el wrapper de `ANCHO_PAGINA` pasa a `px-0 pt-0`.
+
 ### Dashboard: tocar un turno abre la ficha flotante ([#61](https://github.com/JulianGerardi/red-dental-studio/pull/61))
 - La fila del turno (Appointments y Waiting Room) abre la ficha del paciente flotando al lado, como la card; antes sólo
   el nombre. El botón de acción, el kebab y los links no la abren. La ficha es la del Figma `4430:57474`, ya existente.
