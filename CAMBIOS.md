@@ -34,7 +34,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Para el dev:** `ActividadReciente` pierde `creditos` y `saldo`; Billing pasa `saldo: undefined` al detalle y al
   registro completo. `creditosNoAplicados` y `saldoDe` quedan en `data/billing.ts` sin uso en la tabla.
 
-### Patients: Today Appointments con el nombre como link ([#59](https://github.com/JulianGerardi/red-dental-studio/pull/59))
+### Patients: Today Appointments con el nombre como link ([#55](https://github.com/JulianGerardi/red-dental-studio/pull/55))
 - El nombre de cada fila de *Today Appointments* lleva directo a la ficha del paciente, como ya hacía *Recent
   Patients*. El kebab sigue igual (Edit, Go to appointment).
 - **Para el dev:** `AppointmentCardCompacta` (`dashboard/AppointmentCard.tsx`) pasa el nombre a `Link`; el id sale de
