@@ -1,1 +1,1 @@
-claude/compassionate-archimedes-iclkm7 464dcd9c2679747a93999adac0a4beebdac51033
+claude/patients-today-recent 30ef38e4cfb06a0dc27b8fdbb79afd23ec8637e2
