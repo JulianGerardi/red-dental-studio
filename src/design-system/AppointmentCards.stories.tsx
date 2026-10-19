@@ -83,7 +83,7 @@ const meta = {
           'Un turno se muestra en cuatro lugares y en cada uno con la card que le sirve a ese lugar. Las cuatro son el mismo turno: mismo paciente, misma hora, mismo estado.',
           '',
           '- **Dashboard** (`AppointmentCard`): la de trabajo del día, en Appointments y Waiting Room. Trae todo para atender sin abrir nada y la acción que sigue.',
-          '- **Patients list** (`AppointmentCard compact`): una fila en Today Appointments, al costado de la lista de pacientes. Sólo quién y a qué hora; el kebab abre Edit y Go to appointment.',
+          '- **Patients list** (`AppointmentCard compact`): una fila en Today Appointments, al costado de la lista de pacientes. El nombre lleva a la ficha del paciente; el kebab abre Edit y Go to appointment.',
           '- **Patient overview** (`PatientAppointmentCard`): los turnos de un paciente, con su estado. Sólo el que todavía se puede cancelar tiene Cancel.',
           '- **Appointment request** (`SolicitudCard`, en el panel *Appointment requests* de Scheduling): un pedido de turno, ASAP o en lista de espera, con Cancel y Schedule. **Es la misma card que Patient overview** (`TarjetaTurno`): barra de 3px a la izquierda y pill del mismo color, avatar, motivo, fecha y lugar, y las acciones abajo a la derecha.',
           '- **Scheduling calendar** (`TurnoCalendario`): el turno en la agenda, del color de su estado. Bloque en Day y Week, chip en Month y fila en el celular.',
@@ -237,7 +237,7 @@ export const WhichCardWhere: Story = {
         <td><div className="w-[300px]"><AppointmentCard appt={NOAH} compact /></div></td>
         <td className="font-semibold">Patients<br /><span className="font-normal text-ink-muted">Today Appointments</span></td>
         <td className="text-ink-medium">Paciente, hora y profesional.</td>
-        <td className="text-ink-medium">El kebab: Edit abre el modal del turno; Go to appointment lleva a Scheduling.</td>
+        <td className="text-ink-medium">El nombre lleva a la ficha del paciente. El kebab: Edit abre el modal del turno; Go to appointment lleva a Scheduling.</td>
       </tr>
       <tr>
         <td><div className="w-[300px]"><PatientAppointmentCard name="Noah James" initials="NJ" status="Booked" reason="Routine cleaning appointment" when="12 Mar 2025 · 10:00 AM" place="Los Angeles - 789 N Sunrise Street" onCancel={nada} /></div></td>

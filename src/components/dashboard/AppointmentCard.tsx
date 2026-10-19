@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Check, X, EllipsisVertical, Pencil, User, DoorClosed, Clock, ArrowRight, CalendarDays,
 } from 'lucide-react'
@@ -10,6 +10,7 @@ import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { aviso } from '@/components/ui/toaster'
 import { BUTTON_VARIANTS, type ButtonVariant } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
+import { slug } from '@/data/patientsStore'
 
 export type Appointment = {
   name: string
@@ -161,9 +162,10 @@ export function accionTurno(appt: Appointment) {
   else aviso.ok(`${appt.name} checked out.`)
 }
 
-/* Una fila, no una card de dos pisos: avatar, nombre y hora/provider abajo
-   en gris, y el kebab de las tablas (RowActionsMenu) con Edit y Go to
-   appointment -antes era una flecha suelta a Scheduling-. */
+/* Una fila, no una card de dos pisos: avatar, nombre-link a la ficha del paciente (como el resto de la app:
+   PatientsTable, PatientCard) y hora/provider abajo en gris, y el kebab de las tablas (RowActionsMenu) con Edit y
+   Go to appointment -antes era una flecha suelta a Scheduling-. El id sale de `slug(appt.name)`: el turno no trae
+   el id del paciente, y da el mismo id que patientsStore para los que están en la lista (patients.md, 2026-10-19). */
 export function AppointmentCardCompacta({
   appt, onEdit, menuAbierto,
 }: {
@@ -177,7 +179,12 @@ export function AppointmentCardCompacta({
     <InnerCard className="flex items-center gap-2.5 p-2.5">
       <Avatar initials={appt.initials} />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="truncate text-[13px] font-semibold text-ink">{appt.name}</span>
+        <Link
+          to={`/patients/${slug(appt.name)}`}
+          className="text-dash-blue min-w-0 truncate text-[13px] font-semibold hover:underline"
+        >
+          {appt.name}
+        </Link>
         <span className="flex items-center gap-1 text-[11px] text-ink-muted">
           <Clock className="size-3 shrink-0" />
           <span className="truncate">{appt.time} · {appt.provider}</span>
