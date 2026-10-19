@@ -22,30 +22,18 @@ test('La fecha se lee "Feb 28, 2026"; elegir un día lo cambia y Today vuelve a 
   await expect(screen.getByRole('button', /Today/)).toHaveCount(0)
 })
 
-/* Listas largas: se ven unos pocos y "Show N more" abre el resto con scroll adentro; "Show less" vuelve
-   (ui/show-more, dashboard.md 2026-10-12). Con ?day=busy hay 35 turnos. */
-test('Con muchos turnos se ven cinco y Show more abre el resto con scroll', async ({ app, screen }) => {
+/* Desde 1280px las cuatro columnas toman el alto de la ventana y scrollean adentro: no hay "Show N more" y están todas
+   las filas (dashboard.md, 2026-10-19). Con ?day=busy hay 35 turnos. */
+test('Con muchos turnos las columnas scrollean adentro, sin Show more', async ({ app, screen }) => {
   await app.open('/?day=busy')
-  await expect(screen.getByRole('button', 'Show 30 more')).toBeVisible()
-  await expect(screen.getByRole('region', 'All appointments')).toHaveCount(0)
-
-  await screen.getByRole('button', 'Show 30 more').tap()
-  await expect(screen.getByRole('region', 'All appointments')).toBeVisible()
-  await expect(screen.getByRole('button', 'Show less')).toBeVisible()
-
-  await screen.getByRole('button', 'Show less').tap()
-  await expect(screen.getByRole('region', 'All appointments')).toHaveCount(0)
-  await expect(screen.getByRole('button', 'Show 30 more')).toBeVisible()
+  await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(0)
+  await expect(screen.getByRole('button', /^Check In/)).toHaveCount(35)
 })
 
-/* La organización del 2026-10-13 (dashboard.md): las salas en una tira arriba con "Show N more", cada acción del turno
-   avisa lo suyo y el escudo de al lado de Today lleva a las preguntas frecuentes. */
-test('Las salas van arriba en una fila; Check In avisa; FAQ lleva a Help', async ({ app, screen }) => {
+/* Cada acción del turno avisa lo suyo y el escudo de al lado de Today lleva a las preguntas frecuentes (dashboard.md,
+   2026-10-13). */
+test('Check In avisa; FAQ lleva a Help', async ({ app, screen }) => {
   await app.open('/')
-  const salas = screen.getByRole('region', 'Rooms')
-  await expect(salas).toBeVisible()
-  await expect(salas.getByRole('button', /Show \d+ more/)).toHaveCount(0)
-
   await screen.getByRole('button', /^Check In/).first().tap()
   await expect(screen.getByText('Noah James checked in.')).toBeVisible()
 
@@ -53,20 +41,29 @@ test('Las salas van arriba en una fila; Check In avisa; FAQ lleva a Help', async
   await expect(screen.getByRole('heading', 'What can we help you with?')).toBeVisible()
 })
 
-/* Tocar una sala filtra la sala de espera por esa sala; el chip junto al título la suelta (dashboard.md, 2026-10-17). */
-test('Tocar una sala filtra la sala de espera y el chip lo deshace', async ({ app, screen }) => {
+/* Las salas son acordeones: tocar una despliega su línea del día y no filtra la Waiting Room, que tiene su propio Filter
+   (dashboard.md, 2026-10-19). */
+test('Tocar una sala despliega su día sin filtrar la Waiting Room', async ({ app, screen }) => {
   await app.open('/')
-  const salas = screen.getByRole('region', 'Rooms')
+  const salas = screen.getByRole('group', 'Rooms')
+  await expect(screen.getByRole('list', 'Operatory 1 today')).toHaveCount(0)
 
   await salas.getByRole('button', /^Operatory 1/).tap()
-  await expect(screen.getByRole('button', 'Show all rooms')).toBeVisible()
-  await expect(screen.getByText('No one is waiting for Operatory 1')).toHaveCount(0)
+  await expect(screen.getByRole('list', 'Operatory 1 today')).toBeVisible()
+  await expect(screen.getByText('Complete')).toBeVisible()
+  await expect(screen.getByRole('button', /^Check Out/)).toHaveCount(6)
 
-  await salas.getByRole('button', /^Operatory 5/).tap()
-  await expect(screen.getByText('No one is waiting for Operatory 5')).toBeVisible()
+  await salas.getByRole('button', /^Operatory 1/).tap()
+  await expect(screen.getByRole('list', 'Operatory 1 today')).toHaveCount(0)
+})
 
-  await screen.getByRole('button', 'Show all rooms').first().tap()
-  await expect(screen.getByRole('button', 'Show all rooms')).toHaveCount(0)
+test('La Waiting Room se filtra con su propio Filter', async ({ app, screen }) => {
+  await app.open('/')
+  await expect(screen.getByRole('button', /^Check Out/)).toHaveCount(6)
+  await screen.getByRole('button', /Filter waiting room/).tap()
+  await screen.getByRole('menuitemcheckbox', /Operatory 4/).tap()
+  await screen.getByRole('menuitemcheckbox', /Operatory 4/).press('Escape')
+  await expect(screen.getByRole('button', /^Check Out/)).toHaveCount(1)
 })
 
 /* Tocar el turno abre la ficha flotante del paciente; el botón de acción no (dashboard.md, 2026-10-19). */

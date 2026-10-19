@@ -689,6 +689,39 @@ room por defecto"; y "las rooms en scroll horizontal, así queda más intuitivo 
 **Para validar con usuarios:** si recepción encuentra la agenda del día entera sin la vista de "todas las salas" (hoy
 sólo se ve una sala por vez), y si la sexta card asomando alcanza para entender que la tira se desliza.
 
+> **Reemplazado el 2026-10-19 (noche):** las salas dejaron de ser una tira; ver *Salas como acordeón…* más arriba.
+
+## Salas como acordeón, Waiting Room independiente y cuatro columnas que entran en la pantalla (2026-10-19, noche)
+
+Julián, con un artifact de referencia (Dashboard con el panel *Rooms*): "cuando aprieto una room se despliega el detalle de
+la línea en esa room y que no aparezca en la waiting room"; "que la waiting room sea independiente, y ahí podés filtrar
+como en Today Appointments, manteniendo la estética y la organización"; y "hay que evitar el scroll en general: se debe
+ver la información a simple vista".
+
+- **Rooms es un panel de acordeones** (`OperatoryList` + `OperatoryCard`), la tercera de cuatro columnas. Cada sala
+  muestra nombre, estado, *Patients today* y profesional; al tocarla se despliega **la línea del día de esa sala**: hora y
+  punto (tilde verde = Complete, aro azul = Upcoming) unidos por una línea, y el turno con paciente, motivo, profesional y
+  estado; los que vienen, resaltados en azul. Varias salas pueden estar abiertas; ninguna al empezar. Tocar un turno de la
+  línea abre la ficha del paciente. Se va la tira horizontal (`OperatoryStrip`, `OperatoryCard` suelta con colores de
+  estado): las salas ya no filtran nada.
+- **"Patients today" = turnos de la sala** (se calcula de la lista del día): coincide con las filas de su línea. Se
+  resuelve así, por segunda vez, la queja de que el número no coincidía con las cards. Dato nuevo en el mock: `motivo` del
+  turno (Check-up, Cleaning, Consultation, Filling); el artifact lo muestra y el Figma original no lo traía.
+- **Waiting Room independiente**: se va el filtro por sala y el chip ✕; tiene su propio *Filter* por operatorio, como
+  Appointments, con el mismo `FilterMenu`. Vacío: "No one is waiting there".
+- **Entra en la pantalla.** Desde 1280px las cuatro columnas (Appointments · Waiting Room · Rooms · Pending Task) toman el
+  alto que queda hasta el pie de la ventana (`useAltoRestante`) y **scrollean adentro** (`Panel scroll`, con degradé
+  abajo); ya no hay "Show N more" ahí: están todas las filas. Para ganar alto: título, fecha y números van en una sola
+  fila, el pie reservado al botón de Confibot no se usa en esta pantalla (la última columna deja `pb-16` para que el fin
+  del scroll quede sobre el botón). Debajo de 1280px sigue lo de antes (dos columnas, tope por panel y "Show N more") y
+  la página scrollea, que es lo esperable en una tablet o un celular.
+- **Fila de turno en columna angosta** (`AppointmentRow`): a 250–320px el nombre quedaba en "No…"; ahora TR y CC bajan
+  junto a Check In y el provider·operatorio va en su renglón (container query `@sm`, 384px).
+- **Medido** (altura de la página / ventana): 1280×720, 1366×768, 1440×780, 1440×900, 1536×800 y 1920×950 entran sin
+  scroll; 1024 y celular scrollean.
+- **A validar con usuarios:** si recepción prefiere una sola sala abierta a la vez (hoy, varias) y si 3–4 filas por
+  columna a la vista alcanzan en 1280×720 o conviene un modo más denso.
+
 ## Tocar el turno abre la ficha flotante (2026-10-19, tarde)
 
 Julián: "cuando aprieto un appointment debería desplegarse en modo flotante al lado de la card la siguiente información"

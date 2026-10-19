@@ -11,9 +11,9 @@ import { Avatar } from '@/components/ui/avatar'
    Con @container la fila se adapta al ancho de su lista: en renglones en angosto, en columnas cuando entra. */
 
 /* Los chips TR y CC de la card de turno (AppointmentCard), a 24px de alto. */
-export function ChipsTurno() {
+export function ChipsTurno({ className }: { className?: string }) {
   return (
-    <span className="flex shrink-0 items-center gap-1">
+    <span className={cn('flex shrink-0 items-center gap-1', className)}>
       <span className="flex h-6 items-center gap-0.5 rounded-md bg-green-soft px-1.5 text-[11px] text-ink">
         TR <Check className="text-dash-ok-fg size-3.5" strokeWidth={2.5} />
       </span>
@@ -85,15 +85,17 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurn
             <div className="flex min-h-7 items-center gap-2">
               {iniciales}
               <NombreTurno appt={appt} id={id} activa={activa} onSelect={onSelect} className="flex-1" />
-              <ChipsTurno />
+              <ChipsTurno className="@max-sm:hidden" />
               {menu}
             </div>
-            {/* Si no entra, el botón baja a su propio renglón en vez de cortar el provider. */}
-            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
-              <span className="flex min-w-[min(220px,100%)] flex-1 items-center gap-1.5">
+            {/* En una columna angosta (desde 1280px son cuatro) el nombre se cortaba: los chips bajan junto a Check In y el
+                provider va en su renglón (2026-10-19). Si no entra, el botón baja a su propio renglón. */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+              <span className="flex items-center gap-1.5">
                 {CHECK_IN}
-                <span className="truncate text-[11px] text-ink-muted" title={donde}>{donde}</span>
+                <ChipsTurno className="@sm:hidden" />
               </span>
+              <span className="min-w-0 basis-full truncate text-[11px] text-ink-muted @sm:min-w-[140px] @sm:flex-1 @sm:basis-0" title={donde}>{donde}</span>
               <span className="ml-auto">{boton}</span>
             </div>
           </div>

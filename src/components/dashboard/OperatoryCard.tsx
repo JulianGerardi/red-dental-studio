@@ -1,7 +1,8 @@
-import { Calendar, User } from 'lucide-react'
-import { StatusPill } from './primitives'
+import { Calendar, Check, ChevronDown, User } from 'lucide-react'
+import { StatusPill, InnerCard } from './primitives'
+import type { Appointment } from './AppointmentCard'
+import { Avatar } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
-import { TARJETA_INTERNA } from '@/lib/estilos'
 
 export type OperatoryStatus = 'Available' | 'Busy' | 'Unavailable'
 
@@ -18,70 +19,118 @@ const TONE = {
   Unavailable: 'bad',
 } as const
 
-/* Sobre la página, la card toma el color de su estado (borde y fondo, los de su pill): de un vistazo se ve qué sala está
-   libre (Julián, 2026-10-17). Ver design-reference/figma/modulos/dashboard.md. */
-export const OPERATORY_SURFACES = {
-  Available: 'border-dash-ok-fg bg-dash-ok-bg',
-  Busy: 'border-dash-busy-fg bg-dash-busy-bg',
-  Unavailable: 'border-dash-bad-fg bg-dash-bad-bg',
-} as const
-
-/* Figma I3636:58505;7350:4654 — este panel NO venía escalado: sus
-   valores ya eran limpios (px-13 py-10 gap-5, radius 5, icons 10px,
-   textos 11/9/8). Se sube ~1.3× para acompañar al resto.
-   Va adentro de un panel (card interna, blanca) o suelta sobre la página, en la tira de arriba del Dashboard (con el
-   color de su estado). Con onClick es un botón que elige la sala (filtra la Waiting Room; tocarla de nuevo la suelta): la elegida lleva el anillo y las demás se
-   apagan (2026-10-17). */
-export function OperatoryCard({ room, enPagina, seleccionada, atenuada, onClick }: {
+/* Una sala del Dashboard, con el diseño del 2026-10-19 (artifact de Julián): nombre, estado, cuántos pacientes tiene hoy y
+   el profesional. Con `onToggle` es un acordeón: tocarla despliega la línea del día de esa sala -hora, paciente, motivo,
+   profesional y si ya se atendió o viene-, y no filtra nada de afuera. Va adentro de un panel (card interna, blanca).
+   Ver design-reference/figma/modulos/dashboard.md. */
+export function OperatoryCard({ room, turnos, abierta, onToggle, onSelect }: {
   room: Operatory
-  /** Sobre el fondo gris de la página, no adentro de un panel: toma el color de su estado. */
-  enPagina?: boolean
-  /** La sala por la que está filtrada la sala de espera. */
-  seleccionada?: boolean
-  /** Hay otra sala elegida: ésta se apaga hasta que se pasa el mouse. */
-  atenuada?: boolean
-  /** La card se vuelve un botón (aria-pressed). */
-  onClick?: () => void
+  /** Los turnos del día en esta sala. Con ellos, "Patients today" es su cantidad y coincide con la línea. */
+  turnos?: Appointment[]
+  abierta?: boolean
+  /** La card se vuelve un botón (aria-expanded) que despliega la línea. */
+  onToggle?: () => void
+  /** Tocar un turno de la línea (abre la ficha del paciente). */
+  onSelect?: (appt: Appointment, el: HTMLElement) => void
 }) {
-  const clases = cn(
-    enPagina ? cn('rounded-lg border', OPERATORY_SURFACES[room.status]) : TARJETA_INTERNA,
-    'flex w-full min-w-0 flex-col gap-1.5 px-3.5 py-3 text-left',
-    onClick && 'transition-[opacity,box-shadow] hover:shadow-panel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
-    seleccionada && '[outline-style:solid] outline-2 outline-offset-2 outline-dash-ring shadow-panel',
-    atenuada && 'opacity-60 hover:opacity-100 focus-visible:opacity-100',
-  )
-  const contenido = (
+  const cuantos = turnos ? turnos.length : room.patientsToday
+  const cabecera = (
     <>
       <span className="flex items-center justify-between gap-2">
-        <span className="text-dash-name truncate text-sm leading-none font-semibold">
-          {room.name}
-        </span>
-        <StatusPill tone={TONE[room.status]}>{room.status}</StatusPill>
-      </span>
-
-      <span className="text-dash-muted flex items-center gap-1 text-xs">
-        <Calendar className="size-3.5 shrink-0" />
-        <span>Patients today:</span>
-        <span className="bg-dash-count-bg text-dash-blue-hover rounded-full px-2 py-[3px] text-[11px] leading-none font-medium">
-          {room.patientsToday}
+        <span className="text-dash-name truncate text-sm leading-none font-semibold">{room.name}</span>
+        <span className="flex shrink-0 items-center gap-1.5">
+          <StatusPill tone={TONE[room.status]}>{room.status}</StatusPill>
+          {onToggle && <ChevronDown aria-hidden className={cn('text-ink-muted size-4 transition-transform', abierta && 'rotate-180')} />}
         </span>
       </span>
-
-      <span className="text-dash-muted flex items-center gap-1.5 text-xs">
-        <User className="size-3.5 shrink-0" />
-        <span className="truncate">{room.provider}</span>
+      <span className="text-dash-muted flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs">
+        <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
+          <Calendar className="size-3.5 shrink-0" />
+          <span>Patients today:</span>
+          <span className="bg-dash-count-bg text-dash-blue-hover rounded-full px-2 py-[3px] text-[11px] leading-none font-medium">{cuantos}</span>
+        </span>
+        <span className="flex min-w-0 items-center gap-1.5">
+          <User className="size-3.5 shrink-0" />
+          <span className="truncate">{room.provider}</span>
+        </span>
       </span>
     </>
   )
 
-  if (!onClick) return <div className={clases}>{contenido}</div>
   return (
-    <button
-      type="button" aria-pressed={!!seleccionada} onClick={onClick}
-      title={seleccionada ? 'Show everyone in the waiting room' : `Show who is waiting for ${room.name}`}
-      className={clases}
-    >
-      {contenido}
-    </button>
+    <InnerCard className={cn('flex flex-col', abierta && 'ring-dash-blue ring-1')}>
+      {onToggle ? (
+        <button
+          type="button" aria-expanded={!!abierta} onClick={onToggle} title={abierta ? `Hide ${room.name}'s day` : `Show ${room.name}'s day`}
+          className="flex w-full min-w-0 flex-col gap-1.5 rounded-lg px-3.5 py-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
+        >
+          {cabecera}
+        </button>
+      ) : (
+        <div className="flex w-full min-w-0 flex-col gap-1.5 px-3.5 py-3">{cabecera}</div>
+      )}
+      {abierta && <LineaDelDia room={room} turnos={turnos ?? []} onSelect={onSelect} />}
+    </InnerCard>
+  )
+}
+
+/* La línea de la sala: a la izquierda la hora y el punto (tilde verde si ya se atendió, aro azul si viene), unidos por una
+   línea; a la derecha el turno. Los que vienen van resaltados en azul. */
+export function LineaDelDia({ room, turnos, onSelect }: {
+  room: Operatory
+  turnos: Appointment[]
+  onSelect?: (appt: Appointment, el: HTMLElement) => void
+}) {
+  const ordenados = [...turnos].sort((a, b) => a.time.localeCompare(b.time))
+  if (ordenados.length === 0) {
+    return <p className="text-ink-muted px-3.5 pb-3 text-xs">No appointments in {room.name} today.</p>
+  }
+  return (
+    <ol aria-label={`${room.name} today`} className="flex flex-col px-3.5 pt-1 pb-3 motion-safe:animate-[loc-in_160ms_ease-out]">
+      {ordenados.map((t, i) => {
+        const hecho = !!(t as { completado?: boolean }).completado
+        const ultimo = i === ordenados.length - 1
+        const contenido = (
+          <>
+            <Avatar initials={t.initials} size={28} />
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="text-dash-name truncate text-[13px] font-semibold" title={t.name}>{t.name}</span>
+              <span className="flex items-center justify-between gap-2 text-[11px]">
+                <span className="text-ink-muted truncate">{t.motivo ?? 'Check-up'}</span>
+                <span className={cn('shrink-0 font-semibold', hecho ? 'text-dash-ok-fg' : 'text-dash-blue')}>
+                  {hecho ? 'Complete' : 'Upcoming'}
+                </span>
+              </span>
+              <span className="text-ink-muted flex items-center gap-1 truncate text-[11px]"><User className="size-3 shrink-0" />{t.provider}</span>
+            </span>
+          </>
+        )
+        const claseCard = cn(
+          'flex w-full min-w-0 items-start gap-2 rounded-lg border p-2 text-left',
+          hecho ? 'border-line-row bg-white' : 'border-dash-blue bg-info-bg',
+        )
+        return (
+          <li key={i} className="grid grid-cols-[44px_minmax(0,1fr)] gap-2">
+            <div className="relative flex flex-col items-center pt-2">
+              <span className="text-dash-name text-[11px] leading-none font-semibold tabular-nums">{t.time}</span>
+              <span
+                aria-hidden
+                className={cn('z-10 mt-1.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-white', hecho ? 'bg-dash-ok-fg text-white' : 'border-dash-blue border-[3px]')}
+              >
+                {hecho && <Check className="size-2.5" strokeWidth={3} />}
+              </span>
+              {!ultimo && <span aria-hidden className="bg-line absolute top-[34px] -bottom-2 w-px" />}
+            </div>
+            <div className="pb-2">
+              {onSelect ? (
+                <button type="button" onClick={(e) => onSelect(t, e.currentTarget)} className={cn(claseCard, 'hover:shadow-inner-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue')}>
+                  {contenido}
+                </button>
+              ) : <div className={claseCard}>{contenido}</div>}
+            </div>
+          </li>
+        )
+      })}
+    </ol>
   )
 }

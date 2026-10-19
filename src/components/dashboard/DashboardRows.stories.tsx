@@ -114,6 +114,9 @@ export const States: Story = {
         <Muestra titulo="Narrow (340px)" nota="El botón baja a su propio renglón para no cortar provider y operatorio; un nombre largo se corta con elipsis y se lee entero al pasar el mouse.">
           <Caja ancho={340}><li><AppointmentRow appt={TURNO} /></li><li><TaskRow task={TAREA} /></li></Caja>
         </Muestra>
+        <Muestra titulo="Column (290px)" nota="La columna del Dashboard desde 1280px (cuatro): el nombre queda entero porque TR y CC bajan junto a Check In y el provider va en su renglón (2026-10-19).">
+          <Caja ancho={290}><li><AppointmentRow appt={TURNO} onSelect={() => {}} /></li><li><AppointmentRow appt={CHECK_IN} onSelect={() => {}} /></li></Caja>
+        </Muestra>
         <div className="md:col-span-2">
           <Muestra titulo="Wide" nota="En columnas, alineadas fila con fila: turnos a 1000px, tareas a 1100px.">
             <Caja ancho={1000}><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CHECK_IN} /></li><li><AppointmentRow appt={CANCEL} /></li></Caja>

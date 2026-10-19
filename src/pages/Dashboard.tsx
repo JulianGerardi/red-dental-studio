@@ -9,10 +9,9 @@ import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import type { Appointment } from '@/components/dashboard/AppointmentCard'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
 import { DatePicker, sameDay } from '@/components/ui/date-picker'
-import { OperatoryStrip } from '@/components/dashboard/OperatoryStrip'
+import { OperatoryList } from '@/components/dashboard/OperatoryList'
 import { AppointmentRow, TaskRow } from '@/components/dashboard/DashboardRows'
 import { ListGroup } from '@/components/ui/list-group'
-import { Chip } from '@/components/ui/chip'
 import {
   DIAS, DIA_CARGADO, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
   type DiaDashboard, type Origen,
@@ -26,6 +25,8 @@ import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { Button, buttonClasses } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useMedia } from '@/lib/media'
+import { useAltoRestante } from '@/lib/altoRestante'
 
 /* Figma 4430:57451 — rediseño del dashboard.
    Cambios respecto de la versión anterior (3605:56445 / 3636:57488):
@@ -107,9 +108,12 @@ export default function Dashboard() {
   const [date, setDate] = useState(DEFAULT_DATE)
   const [salas, setSalas] = useState<string[]>([])
   const [tipos, setTipos] = useState<string[]>([])
-  /* La sala elegida en la tira de arriba: la sala de espera muestra sólo a los suyos (dashboard.md, 2026-10-17). */
-  const [salaEspera, setSalaEspera] = useState<string | null>(null)
-  const panelEspera = useRef<HTMLDivElement>(null)
+  /* La Waiting Room tiene su propio filtro, como Appointments; las salas ya no la filtran (dashboard.md, 2026-10-19). */
+  const [salasEspera, setSalasEspera] = useState<string[]>([])
+  /* Desde 1280px las cuatro columnas toman el alto de la ventana y scrollean adentro: la pantalla entra sin scroll. */
+  const ajusta = useMedia('(min-width: 1280px)')
+  const grilla = useRef<HTMLDivElement>(null)
+  const altoGrilla = useAltoRestante(grilla, ajusta)
   const [selected, setSelected] =
     useState<{ appt: Appointment; rect: DOMRect; id?: string } | null>(null)
   const [editando, setEditando] = useState<{ datos: DatosTurno; origen: Origen } | null>(null)
@@ -217,45 +221,35 @@ export default function Dashboard() {
     (a) => salas.length === 0 || salas.includes(a.operatory),
   )
   const tareas = dia.tasks.filter((t) => tipos.length === 0 || tipos.includes(t.kind))
-  const enEspera = dia.waiting.filter((w) => !salaEspera || w.operatory === salaEspera)
-
-  /* Elegir una sala filtra la sala de espera; si quedó fuera de la vista (en el celular va abajo de todo), se trae. */
-  const elegirSala = (sala: string | null) => {
-    setSalaEspera(sala)
-    const el = panelEspera.current
-    if (!sala || !el) return
-    const { top, bottom } = el.getBoundingClientRect()
-    if (top < 0 || bottom > window.innerHeight + 200) {
-      const reducido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-      el.scrollIntoView({ block: 'start', behavior: reducido ? 'auto' : 'smooth' })
-    }
-  }
+  const operatoriosEspera = useMemo(
+    () => [...new Set(dia.waiting.map((w) => w.operatory))].sort(),
+    [dia],
+  )
+  const enEspera = dia.waiting.filter((w) => salasEspera.length === 0 || salasEspera.includes(w.operatory))
 
   return (
-    <div className={CONTENEDOR_PAGINA}>
-      {/* El día de hoy pasó al Topbar y el elegido lo dice el selector (Julián, 2026-10-13). */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <PageTitle size="lg">Dashboard</PageTitle>
+    <div className={cn(CONTENEDOR_PAGINA, 'min-[1280px]:-mb-28')}>
+      {/* El día de hoy pasó al Topbar y el elegido lo dice el selector (Julián, 2026-10-13). Título, fecha y números en una
+          sola fila: así las columnas de abajo se llevan el alto (2026-10-19). La fecha manda sobre toda la pantalla y vive
+          acá arriba, no adentro de Appointments: metida en una de las columnas, parecía filtrar sólo esa. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <PageTitle size="lg">Dashboard</PageTitle>
+          <FiltroFecha value={date} onChange={setDate} marked={diasConDatos} />
+        </div>
         <div data-tour="dash-stats">
           <StatStrip stats={stats} />
         </div>
       </div>
 
-      {/* La fecha manda sobre las tres columnas, así que vive acá arriba y no
-          adentro de Appointments: metida en una de las tres, parecía filtrar
-          sólo esa. */}
-      <FiltroFecha className="mt-4" value={date} onChange={setDate} marked={diasConDatos} />
-
-      {/* Las salas en una tira arriba, sin ocupar una columna (Julián, 2026-10-13). */}
-      <div className="mt-5">
-        <OperatoryStrip rooms={dia.rooms} elegida={salaEspera} onElegir={elegirSala} />
-      </div>
-
-      {/* Mucho volumen: filas en lugar de cards (las mismas partes) y un tope por panel; "Show N more" abre el resto con
-          scroll adentro (dashboard.md, 2026-10-12). Turnos y sala de espera se reparten el ancho (2026-10-13); desde 1280px, Pending Task es la tercera columna (2026-10-18). */}
-      <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+      {/* Mucho volumen: filas en lugar de cards (las mismas partes). Hasta 1279px, un tope por panel y "Show N more" abre el resto con
+          scroll adentro (dashboard.md, 2026-10-12); desde ahí, cuatro columnas que toman el alto de la ventana y scrollean adentro. */}
+      <div
+        ref={grilla} style={altoGrilla ? { height: altoGrilla } : undefined}
+        className="mt-4 grid gap-4 lg:max-[1279px]:grid-cols-2 min-[1280px]:grid-cols-4 min-[1280px]:grid-rows-[minmax(0,1fr)]"
+      >
         <Panel
-          title="Appointments"
+          title="Appointments" scroll={ajusta}
           controls={
             <BotonFiltro
               label="Filter appointments" options={operatorios}
@@ -275,7 +269,7 @@ export default function Dashboard() {
               accion={{ label: 'New appointment', onClick: () => aviso.info('Use Scheduling to create an appointment.') }}
             />
           ) : (
-            <ListGroup limit={TOPE.turnos} label="appointments">
+            <ListGroup limit={ajusta ? undefined : TOPE.turnos} label="appointments">
               {turnos.map((a, i) => (
                 <AppointmentRow
                   key={i} appt={{ ...a, accion: 'Check In' }} id={`appt-${i}`} activa={selected?.id === `appt-${i}`}
@@ -290,29 +284,27 @@ export default function Dashboard() {
           )}
         </Panel>
 
-        <div ref={panelEspera} className="flex scroll-mt-4 flex-col">
-        {/* El filtro se lee pegado al título (a la derecha lo tapaba la pestaña del paciente). */}
         <Panel
-          className="flex-1"
-          title={<>Waiting Room{salaEspera && <Chip onRemove={() => setSalaEspera(null)} removeLabel="Show all rooms">{salaEspera}</Chip>}</>}
+          title="Waiting Room" scroll={ajusta}
+          controls={
+            <BotonFiltro
+              label="Filter waiting room" options={operatoriosEspera}
+              value={salasEspera} onChange={setSalasEspera}
+            />
+          }
         >
           {enEspera.length === 0 ? (
-            salaEspera && dia.waiting.length > 0 ? (
-              <EmptyState
-                icon={Clock}
-                title={`No one is waiting for ${salaEspera}`}
-                detail="Pick another room above, or show the whole waiting room."
-                accion={{ label: 'Show all rooms', onClick: () => setSalaEspera(null) }}
-              />
-            ) : (
-              <EmptyState
-                icon={Clock}
-                title="Waiting room is empty"
-                detail="No patients have checked in for this day yet."
-              />
-            )
+            <EmptyState
+              icon={Clock}
+              title={salasEspera.length > 0 ? 'No one is waiting there' : 'Waiting room is empty'}
+              detail={
+                salasEspera.length > 0
+                  ? 'No patients match the selected operatories.'
+                  : 'No patients have checked in for this day yet.'
+              }
+            />
           ) : (
-            <ListGroup key={salaEspera ?? 'todas'} limit={TOPE.espera} label="patients waiting">
+            <ListGroup limit={ajusta ? undefined : TOPE.espera} label="patients waiting">
               {enEspera.map((a, i) => (
                 <AppointmentRow
                   key={i} appt={{ ...a, accion: 'Check Out' }} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
@@ -323,10 +315,15 @@ export default function Dashboard() {
             </ListGroup>
           )}
         </Panel>
-        </div>
+
+        <Panel title="Rooms" scroll={ajusta}>
+          <OperatoryList rooms={dia.rooms} turnos={dia.appointments} onSelect={(a, el) => pick(a, el)} />
+        </Panel>
 
         <Panel
-          title="Pending Task" className="lg:col-span-2 xl:col-span-1"
+          title="Pending Task" scroll={ajusta}
+          /* El botón flotante de Confibot cae sobre la esquina de abajo: el fin del scroll queda por encima. */
+          bodyClassName={ajusta ? 'pb-16' : undefined}
           controls={
             <BotonFiltro
               label="Filter tasks" options={TASK_KINDS} value={tipos} onChange={setTipos}
@@ -344,7 +341,7 @@ export default function Dashboard() {
               }
             />
           ) : (
-            <ListGroup limit={TOPE.tareas} label="pending tasks">
+            <ListGroup limit={ajusta ? undefined : TOPE.tareas} label="pending tasks">
               {tareas.map((t, i) => <TaskRow key={i} task={t} />)}
             </ListGroup>
           )}
