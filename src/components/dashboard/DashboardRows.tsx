@@ -36,7 +36,7 @@ type PropsTurno = {
   ocultarOperatorio?: boolean
 }
 
-/* El nombre abre la ficha rápida, como en la card: la fila entera no puede ser un botón porque tiene otros adentro. */
+/* El nombre abre la ficha rápida y es el camino con teclado: la fila entera no puede ser un botón porque tiene otros adentro. */
 export function NombreTurno({ appt, id, activa, onSelect, className }: Omit<PropsTurno, 'onEdit'> & { className?: string }) {
   const texto = <span className="truncate text-[13px] font-semibold text-ink">{appt.name}</span>
   if (!onSelect) return <span className={cn('flex min-w-0', className)} title={appt.name}>{texto}</span>
@@ -59,14 +59,23 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOper
   const accion = appt.accion ?? 'Check Out'
   const iniciales = <Avatar initials={appt.initials} size={28} />
   const boton = (
-    <Button size="sm" variant={ACCION_TURNO[accion]} className="shrink-0" onClick={() => accionTurno(appt)}>{accion} <ArrowRight /></Button>
+    <Button size="sm" variant={ACCION_TURNO[accion]} className="shrink-0" onClick={(e) => { e.stopPropagation(); accionTurno(appt) }}>{accion} <ArrowRight /></Button>
   )
   const menu = <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
   const donde = ocultarOperatorio ? appt.provider : `${appt.provider} · ${appt.operatory}`
 
   return (
     <div className="@container">
-      <div data-appt-row className={cn('rounded-lg p-2.5', activa && 'bg-info-bg')}>
+      {/* Tocar la fila abre la ficha, como la card (Julián, 2026-10-19); los botones, links y menús de adentro hacen lo
+          suyo. Con el teclado se llega por el nombre. */}
+      <div
+        data-appt-row
+        onClick={onSelect && ((e) => {
+          if ((e.target as HTMLElement).closest('button, a, [role="menu"], [role="menuitem"]')) return
+          onSelect(appt, e.currentTarget, id)
+        })}
+        className={cn('rounded-lg p-2.5 transition-colors', onSelect && 'cursor-pointer hover:bg-surface-alt', activa && 'bg-info-bg hover:bg-info-bg')}
+      >
         {/* La hora en la caja gris de la card (reloj y hora), del alto de la fila: suelta arriba quedaba descolgada
             (Julián, 2026-10-13). */}
         <div className="flex items-stretch gap-2.5 @4xl:hidden">

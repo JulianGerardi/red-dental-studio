@@ -689,6 +689,20 @@ room por defecto"; y "las rooms en scroll horizontal, así queda más intuitivo 
 **Para validar con usuarios:** si recepción encuentra la agenda del día entera sin la vista de "todas las salas" (hoy
 sólo se ve una sala por vez), y si la sexta card asomando alcanza para entender que la tira se desliza.
 
+## Tocar el turno abre la ficha flotante (2026-10-19, tarde)
+
+Julián: "cuando aprieto un appointment debería desplegarse en modo flotante al lado de la card la siguiente información"
+(Figma `4430:57474`, Patient Info Content). La ficha ya existía (`PatientDetailsPopover`, hecha de ese mismo nodo): lo
+que faltaba era el gesto. Con las filas, sólo el **nombre** la abría; la card entera sí.
+
+- **La fila entera abre la ficha**, anclada al costado (con volteo si no entra), igual que la card. El botón de acción
+  (Check In / Check Out), el kebab y los links de adentro no la abren. Hover gris en la fila y celeste mientras está abierta.
+- El nombre sigue siendo un botón (`aria-expanded`): es el camino con teclado, porque la fila no puede ser un botón con
+  otros adentro. Aplica a Appointments y Waiting Room.
+- La ficha es la del Figma: avatar, *Start Enconter* (sic), nombre y *Planned*, motivo, visita con la tabla CODE /
+  PROCEDURE y el total, y las filas de datos. Datos de ejemplo iguales para todos los turnos (no hay backend).
+- **A validar:** si recepción espera encontrar ahí el estado real del turno y sus datos propios, hoy fijos.
+
 ## Vuelve la sala opcional; queda sólo el scroll horizontal (2026-10-19, más tarde)
 
 Julián: "yo si quisiera puedo ver todos los appointments de todas las room, entonces lo anterior estaba bien; sólo dejá de

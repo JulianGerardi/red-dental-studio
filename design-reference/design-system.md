@@ -981,6 +981,12 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   *Audit / Tables in the app* marca **Expandable rows without chevron** si alguna tabla se despliega sin flecha.
   Decisiones en `figma/modulos/ledger.md` (2026-10-18).
 
+## Show more: enCaja (2026-10-19)
+
+- `ShowMore` suma `enCaja`: abierta mide lo mismo que cerrada y scrollea adentro, sin agrandar el panel. Lo usan Today
+  Appointments y Recent Patients de Patients. *Elements / Show more* suma el control y el estado *Open, in a box*. Ver
+  `figma/modulos/patients.md`.
+
 ## Operatory strip con scroll horizontal (2026-10-19)
 
 - `OperatoryStrip` es una sola fila con scroll horizontal (cards de 232px como mínimo, snap al borde) en lugar de la
