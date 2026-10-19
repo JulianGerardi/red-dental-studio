@@ -1,10 +1,11 @@
-import { ArrowRight, Check, Clock, FileText, TriangleAlert, X } from 'lucide-react'
+import { ArrowRight, Check, ClipboardList, Clock, FileText, FlaskConical, Pill, Send, TriangleAlert, X, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { StatusPill } from './primitives'
 import { ACCION_TURNO, MenuCard, accionTurno, type Appointment } from './AppointmentCard'
 import { completarTarea, type PendingTask } from './PendingTaskCard'
 import { Avatar } from '@/components/ui/avatar'
+import { Pill as PillTag } from '@/components/ui/pill'
 
 /* Las filas del Dashboard con volumen (propuesta del 2026-10-12, ver design-reference/figma/modulos/dashboard.md): lo
    mismo que cada card del Figma, en una fila. Mismos datos, mismos chips y mismas acciones; cambia sólo cómo se acomodan.
@@ -123,74 +124,41 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOper
   )
 }
 
-/* El documento y "Expired date" de la card de tarea. */
-export function DocYVencida() {
-  return (
-    <span className="flex shrink-0 items-center gap-1.5">
-      <button
-        type="button" aria-label="Open document"
-        className="bg-dash-bad-chip border-dash-bad-fg flex size-7 shrink-0 items-center justify-center rounded-md border"
-      >
-        <FileText className="text-dash-bad-fg size-3.5" />
-      </button>
-      <span className="flex shrink-0 items-center gap-1 rounded-md border border-amber-400 bg-amber-50 px-2 py-1.5 text-[11px] font-medium text-amber-700">
-        <TriangleAlert className="size-3" /> Expired date
-      </span>
-    </span>
-  )
+const ICONO_TAREA: Record<string, LucideIcon> = {
+  'Clinical Note': ClipboardList, 'Lab Orders': FlaskConical, Prescriptions: Pill, Referrals: Send,
 }
 
-/* Una tarea: lo mismo que PendingTaskCard (tipo, Requested, paciente, documento, Expired date, Register, Expiration
-   date y Complete this Task), en el mismo orden pero más compacta. En columnas recién desde 1024px de lista: tiene más
-   partes que el turno. */
+/* Una tarea con el diseño de Pending documents (Julián, 2026-10-19): el ícono del tipo en su cuadrado, el tipo con su
+   estado en pills, quién y cuándo se registró abajo, el vencimiento a la derecha, el documento y Complete this Task.
+   Son las mismas partes que la card (tipo, Requested, paciente, documento, Expired date, Register, Expiration date,
+   botón). Va adentro de la lista con divisores de PendingTaskList. Ver design-reference/figma/modulos/dashboard.md. */
 export function TaskRow({ task }: { task: PendingTask }) {
-  const tipo = <span className="text-dash-name truncate text-sm leading-none font-bold">{task.kind}</span>
-  /* El estado va en una pill, como el Check In del turno, y no como un punto con texto suelto al lado del tipo (Julián,
-     2026-10-19). Angosto, junto al tipo; ancho, debajo. */
-  const pill = <StatusPill tone="busy" className="px-1.5 py-[2px] text-[10px]">{task.state}</StatusPill>
-  const persona = (
-    <span className="flex min-w-0 items-center gap-2">
-      <Avatar initials={task.initials} size={28} />
-      <span className="text-dash-name truncate text-[13px] font-semibold">{task.person}</span>
-    </span>
-  )
-  const fecha = (rotulo: string, valor: string, color: string) => (
-    <span className="flex flex-col gap-0.5 text-[11px]">
-      <span className="text-dash-delta">{rotulo}</span>
-      <span className={cn('font-medium whitespace-nowrap', color)}>{valor}</span>
-    </span>
-  )
-  const fechas = (
-    <span className="flex gap-4">
-      {fecha('Register', task.register, 'text-dash-blue')}
-      {fecha('Expiration date', task.expiration, 'text-dash-bad-fg')}
-    </span>
-  )
-  const boton = (
-    <Button size="sm" className="shrink-0" onClick={() => completarTarea(task)}>Complete this Task <ArrowRight /></Button>
-  )
-
-  /* Cada parte pegada a la que acompaña, como en la card: el tipo con Requested, el paciente con el documento y
-     Expired date. El aire libre va antes del botón, no entre los datos (Julián, 2026-10-13). En angosto el documento y
-     Expired date van contra el borde derecho, alineados con el botón azul (2026-10-18). */
+  const Icono = ICONO_TAREA[task.kind] ?? ClipboardList
   return (
-    <div className="@container">
-      <div className="flex flex-col gap-2 p-2.5 @5xl:hidden">
-        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">{tipo}{pill}</div>
-        <div className="flex flex-wrap items-center gap-2">{persona}<span className="ml-auto"><DocYVencida /></span></div>
-        <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
-          {fechas}
-          <span className="ml-auto">{boton}</span>
-        </div>
-      </div>
-
-      <div className="hidden items-center gap-5 p-2.5 @5xl:flex">
-        <span className="flex w-48 shrink-0 flex-col items-start gap-1.5">{tipo}{pill}</span>
-        <span className="flex w-40 shrink-0">{persona}</span>
-        <DocYVencida />
-        {fechas}
-        <span className="ml-auto">{boton}</span>
-      </div>
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-info-bg text-dash-busy-fg"><Icono className="size-4" /></span>
+      {/* El nombre pide 14rem: en una columna angosta el vencimiento y el botón bajan a otro renglón en vez de aplastarlo. */}
+      <span className="min-w-0 flex-1 basis-56">
+        <span className="flex flex-wrap items-center gap-2">
+          <span className="text-[13px] font-semibold text-ink">{task.kind}</span>
+          <PillTag tone="info" size="sm">{task.state}</PillTag>
+          <PillTag tone="warning" size="sm"><TriangleAlert className="mr-1 size-2.5" />Expired date</PillTag>
+        </span>
+        <span className="block truncate text-[12px] text-ink-muted" title={task.person}>{task.person} · Register {task.register}</span>
+      </span>
+      <span className="ml-auto flex shrink-0 items-center gap-3">
+        <span className="flex flex-col items-end gap-0.5 text-right">
+          <span className="text-dash-bad-fg text-[12px] font-semibold tabular-nums">{task.expiration}</span>
+          <span className="text-[11px] text-ink-muted">Expiration date</span>
+        </span>
+        <button
+          type="button" aria-label="Open document"
+          className="bg-dash-bad-chip border-dash-bad-fg flex size-7 shrink-0 items-center justify-center rounded-md border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
+        >
+          <FileText className="text-dash-bad-fg size-3.5" />
+        </button>
+        <Button size="sm" className="shrink-0" onClick={() => completarTarea(task)}>Complete this Task <ArrowRight /></Button>
+      </span>
     </div>
   )
 }

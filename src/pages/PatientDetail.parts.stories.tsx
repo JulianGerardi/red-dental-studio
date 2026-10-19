@@ -55,7 +55,7 @@ export const Playground: Story = {
 const PARTES: [string, string, string][] = [
   ['Patient menu', 'Avatar, Start Encounter, Clinical Mode, las seis secciones y los datos General y Contact.', 'PatientSidePanel'],
   ['Clinical cards', 'Allergies, Medical Conditions, Medication y Past Surgery and Hospitalization, de a dos. Cada una abre su listado flotante.', 'Card · ClinicalPopover'],
-  ['Pending Task', 'Arriba a la izquierda: lo que hay que hacer por este paciente, en filas. Se ven 3.', 'Card · ListGroup · TaskRow'],
+  ['Pending Task', 'Abajo de Pending documents, con el mismo diseño: lo que hay que hacer por este paciente, agrupado por tipo y en filas. Se ven 3.', 'Card · PendingTaskList'],
   ['Pending documents', 'Debajo de Pending Task: los documentos a resolver por urgencia, con quién actúa y la acción. Se ven 4. En una columna angosta el vencimiento y el botón bajan a otro renglón.', 'Card · PendingDocuments'],
   ['Appointments', 'Columna derecha de 280px, del alto de Pending Task + Pending documents. Se ven 7 en la columna y 3 apilado.', 'Card · ShowMore · PatientAppointmentCard'],
 ]

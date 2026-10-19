@@ -1,5 +1,5 @@
 import { Calendar, Check, ChevronDown, User } from 'lucide-react'
-import { StatusPill, InnerCard } from './primitives'
+import { StatusPill } from './primitives'
 import type { Appointment } from './AppointmentCard'
 import { Avatar } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
@@ -17,6 +17,14 @@ const TONE = {
   Available: 'ok',
   Busy: 'busy',
   Unavailable: 'bad',
+} as const
+
+/* La card toma el color de su estado (borde y fondo, los de su pill): de un vistazo se ve qué sala está libre (Julián,
+   2026-10-17; los vuelve a pedir el 2026-10-19 en el acordeón). Ver design-reference/figma/modulos/dashboard.md. */
+export const OPERATORY_SURFACES = {
+  Available: 'border-dash-ok-fg bg-dash-ok-bg',
+  Busy: 'border-dash-busy-fg bg-dash-busy-bg',
+  Unavailable: 'border-dash-bad-fg bg-dash-bad-bg',
 } as const
 
 /* Una sala del Dashboard, con el diseño del 2026-10-19 (artifact de Julián): nombre, estado, cuántos pacientes tiene hoy y
@@ -58,7 +66,7 @@ export function OperatoryCard({ room, turnos, abierta, onToggle, onSelect }: {
   )
 
   return (
-    <InnerCard className={cn('flex flex-col', abierta && 'ring-dash-blue ring-1')}>
+    <div className={cn('flex flex-col overflow-hidden rounded-lg border', OPERATORY_SURFACES[room.status], abierta && 'shadow-panel')}>
       {onToggle ? (
         <button
           type="button" aria-expanded={!!abierta} onClick={onToggle} title={abierta ? `Hide ${room.name}'s day` : `Show ${room.name}'s day`}
@@ -69,8 +77,12 @@ export function OperatoryCard({ room, turnos, abierta, onToggle, onSelect }: {
       ) : (
         <div className="flex w-full min-w-0 flex-col gap-1.5 px-3.5 py-3">{cabecera}</div>
       )}
-      {abierta && <LineaDelDia room={room} turnos={turnos ?? []} onSelect={onSelect} />}
-    </InnerCard>
+      {abierta && (
+        <div className={cn('border-t bg-white', OPERATORY_SURFACES[room.status].split(' ')[0])}>
+          <LineaDelDia room={room} turnos={turnos ?? []} onSelect={onSelect} />
+        </div>
+      )}
+    </div>
   )
 }
 
