@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-18
 
+### Overview: el chart de DentAssmt de sólo lectura y Treatment Plan hasta abajo ([#53](https://github.com/JulianGerardi/red-dental-studio/pull/53))
+- El chart del Overview de Clinical Mode es el mismo de DentAssmt, sin controles, con lo mismo cargado. La pieza de la
+  última condición queda resaltada; la última condición cambia al cargar otra con Add Condition y *Show details* lleva
+  al examen donde se cargó. Treatment Plan llega hasta el final de la tabla en desktop. Las caries oclusales salen en rojo.
+- **Para el dev:** `OdontogramaOverview` / `OdontogramaLectura` (`clinical/OdontogramaOverview.tsx`),
+  `dental/estadoOdontograma.ts` (estado compartido de la librería), `useUltimaCondicion()` en `ExamLayout`, `llena` en
+  `TreatmentPlanList`. `Odontogram` ya no se usa en la app (queda en el Builder).
+
 ### El icono 3D va sólo en el saludo, y el texto más chico ([#47](https://github.com/JulianGerardi/red-dental-studio/pull/47))
 - El calendario del saludo ("Sunday - October 18, 2026") pasa a ser el emoji 📅, 3D como la manito. El campo de fecha y
   *Today* vuelven al icono lineal (lo de #43 se revierte). El saludo baja de 19 a 16px.
