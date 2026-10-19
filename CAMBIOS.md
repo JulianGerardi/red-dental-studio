@@ -31,6 +31,20 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   `px-4 pt-4 sm:px-6`). El ancho y el orden interno no cambiaron.
 - **Para el dev:** `NotificationBanner` — el wrapper de `ANCHO_PAGINA` pasa a `px-0 pt-0`.
 
+### Dashboard: salas como acordeón, Waiting Room independiente y fila de tres que entra en la pantalla ([#64](https://github.com/JulianGerardi/red-dental-studio/pull/64))
+- **Rooms** pasa a ser la tercera de tres columnas, con el diseño del artifact: tocar una sala despliega la línea del
+  día de esa sala (hora, paciente, motivo, profesional, Complete / Upcoming) y ya no filtra la Waiting Room. "Patients
+  today" es la cantidad de turnos de la sala.
+- **Waiting Room independiente**, con su propio Filter por operatorio.
+- **Fila de tres que entra en la pantalla desde 1280px:** Appointments, Waiting Room y Rooms toman el alto de la ventana
+  y scrollean adentro; abajo de 1280px sigue como antes. **Pending Task va abajo, a todo el ancho**, y su fila muestra
+  el estado (Requested) en una pill debajo del tipo.
+- **Para el dev:** `OperatoryStrip` se borra; `OperatoryList` + `OperatoryCard` (`turnos`, `abierta`, `onToggle`,
+  `onSelect`) y `LineaDelDia`. `Panel` suma `scroll`; hook `useAltoRestante`. `TaskRow` usa `StatusPill` para el estado. `Appointment.motivo` (mock). `AppointmentRow`
+  baja TR/CC junto a Check In con `@sm`. El e2e del Dashboard se reescribió (ya no hay Show more a 1440px).
+  Además, `tests/scheduling-linked-visit.e2e.ts` busca las sugerencias por el comienzo del nombre: la segunda línea que
+  sumó #60 las había roto.
+
 ### Dashboard: tocar un turno abre la ficha flotante ([#61](https://github.com/JulianGerardi/red-dental-studio/pull/61))
 - La fila del turno (Appointments y Waiting Room) abre la ficha del paciente flotando al lado, como la card; antes sólo
   el nombre. El botón de acción, el kebab y los links no la abren. La ficha es la del Figma `4430:57474`, ya existente.

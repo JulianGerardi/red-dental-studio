@@ -67,9 +67,9 @@ const Franja = () => (
   </div>
 )
 
-function Armado({ title, controls, top = false, cards }: Omit<Args, 'width' | 'top'> & { top?: boolean }) {
+function Armado({ title, controls, top = false, cards, scroll = false }: Omit<Args, 'width' | 'top'> & { top?: boolean; scroll?: boolean }) {
   return (
-    <Panel title={title} controls={<Controles tipo={controls} />} top={top ? <Franja /> : undefined} className="max-w-full" bodyClassName="min-h-[120px]">
+    <Panel title={title} controls={<Controles tipo={controls} />} top={top ? <Franja /> : undefined} scroll={scroll} className={scroll ? 'h-full max-w-full' : 'max-w-full'} bodyClassName="min-h-[120px]">
       {cards === 0
         ? <EmptyState icon={Inbox} title="Nothing here yet" detail="The panel says why it is empty and what to do." className="py-6" />
         : Array.from({ length: cards }, (_, i) => <InnerCard key={i} className="p-3 text-[13px] text-ink-muted">InnerCard {i + 1}</InnerCard>)}
@@ -97,6 +97,7 @@ const PARTES: [string, string][] = [
   ['Title', '15px Bold, negro, sin ícono. Puede llevar un globo con el total (Today Appointments).'],
   ['Controls', 'Lo que cambia el contenido del panel: un filtro (Dashboard), Tabs sm (Billing) o View all (Patients).'],
   ['Body', '16px de aire, 12px entre piezas. InnerCards, una tabla o un EmptyState.'],
+  ['Scroll', 'Con scroll, el cuerpo scrollea adentro y el panel toma el alto que le dan; un degradé abajo avisa que hay más.'],
 ]
 
 export const Parts: Story = {
@@ -144,6 +145,9 @@ export const States: Story = {
       <Estado titulo="With top band" nota="top: la franja va arriba del título, de borde a borde, con una línea abajo." ancho={320}><Armado title="Find Patient" controls="none" top cards={2} /></Estado>
       <Estado titulo="With link" nota="Un link chico a la derecha, como All treatment en Treatment plans." ancho={320}><Armado title="Treatment plans" controls="link" cards={2} /></Estado>
       <Estado titulo="Empty" nota="Sin contenido: el EmptyState dice por qué y qué hacer." ancho={320}><Armado title="Waiting Room" controls="none" cards={0} /></Estado>
+      <Estado titulo="Scrolling body" nota="scroll: el panel toma el alto que le dan (acá 320px) y el cuerpo scrollea adentro; un degradé abajo avisa que hay más y se va al llegar al final. Así las cuatro columnas del Dashboard entran en la pantalla (2026-10-19)." ancho={320}>
+        <div className="h-[320px]"><Armado title="Appointments" controls="none" cards={6} scroll /></div>
+      </Estado>
       <Estado titulo="StatusPill" nota="La pastilla de estado de Rooms y las cards del Dashboard." ancho={320}>
         <div className="flex gap-2">
           <StatusPill tone="ok">Available</StatusPill>

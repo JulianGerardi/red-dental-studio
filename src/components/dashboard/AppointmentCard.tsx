@@ -18,6 +18,8 @@ export type Appointment = {
   provider: string
   operatory: string
   time: string
+  /* Para qué viene: lo muestra la línea del día de cada sala (OperatoryCard). */
+  motivo?: string
   /* Botón del pie. En el frame casi todas dicen "Check Out" y una "Cancel"; Julián sumó "Check In" (2026-10-13). */
   accion?: AccionTurno
 }

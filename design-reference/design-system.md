@@ -981,6 +981,17 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   *Audit / Tables in the app* marca **Expandable rows without chevron** si alguna tabla se despliega sin flecha.
   Decisiones en `figma/modulos/ledger.md` (2026-10-18).
 
+## Dashboard: salas como acordeón y fila de tres que entra en la pantalla (2026-10-19, noche)
+
+- *Components / Dashboard / Operatory list* (nueva) y *OperatoryCard* (rehecha): acordeón con la línea del día de la sala
+  (`LineaDelDia`); *Playground*, *Parts*, *States* y *Specs*. Se retira *Operatory strip* (la tira horizontal).
+- `Panel` suma `scroll`: el cuerpo scrollea adentro, el panel toma el alto que le dan y un degradé abajo avisa que hay más
+  (estado *Scrolling body* en *Panel and StatusPill*). Hook nuevo `useAltoRestante` (`lib/altoRestante.ts`): el alto desde
+  el elemento hasta el pie de la ventana.
+- *DashboardRows* suma el estado *Column (290px)*: TR y CC bajan junto a Check In en una columna angosta. `TaskRow` lleva
+  el estado (Requested) en una pill, debajo del tipo en la fila ancha. Pending Task va abajo, a todo el ancho. Ver
+  `figma/modulos/dashboard.md`.
+
 ## Show more: enCaja (2026-10-19)
 
 - `ShowMore` suma `enCaja`: abierta mide lo mismo que cerrada y scrollea adentro, sin agrandar el panel. Lo usan Today

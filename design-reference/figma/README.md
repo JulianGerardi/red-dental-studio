@@ -473,3 +473,33 @@ una foto real puesta, tapaba una parte de la cara todo el tiempo, no sólo al
 interactuar. Ahora es un lápiz -ícono de edición, no de cámara- que cubre el
 avatar completo pero sólo se ve con `hover`/foco: en reposo la foto queda
 íntegra, sin nada superpuesto.
+
+
+## Pantallas sin scroll de página (auditoría del 2026-10-19)
+
+Pedido de Julián: la información tiene que verse a simple vista, sin scrollear la página, "en casi todas las pantallas
+siempre hay un scroll". Se midió el alto de cada pantalla contra la ventana (1440×780 y 1920×950, un navegador real
+con su barra) con el dev server:
+
+| Pantalla | 1440×780 | 1920×950 |
+|---|---|---|
+| Dashboard | la fila de tres entra (2026-10-19, desde 1280px); Pending Task queda debajo | ídem |
+| Patients | +306 | +136 |
+| Patient Dashboard | +602 | +432 |
+| Treatments / Documents / Ledger / Relationships | +450 | +280 |
+| Insurance | +718 | +548 |
+| Scheduling | +397 | +227 |
+| Billing | +566 | +364 |
+| Notifications | +3633 | +3463 |
+| Settings (General · Team · Accounts · Consents) | +100 a +350 | 0 a +180 |
+| Help, Locations, Ledger options | +0 a +100 | 0 |
+
+Causas, en orden de peso: (1) el cromo fijo se come ~230px antes del contenido (barra, banner de avisos, título); (2) el
+pie reservado al botón de Confibot suma 96–112px en toda pantalla; (3) listas y tablas que se muestran enteras en vez de
+scrollear adentro de su card (Notifications, Insurance, Billing).
+
+**Regla propuesta** (aplicada primero al Dashboard): en pantallas de consulta, desde 1280px, las columnas o cards toman el
+alto que queda y scrollean adentro (`Panel scroll` + `useAltoRestante`), con el título y los filtros en una sola fila;
+las pantallas de formulario o de lectura larga (Settings, Help, Notifications) no se fuerzan, pero sus listas largas
+scrollean adentro de la card. No se persigue "cero scroll" en tablet y celular. Orden sugerido: Patient Dashboard,
+Billing, Patients, Scheduling, Insurance/Ledger.
