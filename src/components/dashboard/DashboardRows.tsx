@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { StatusPill } from './primitives'
 import { ACCION_TURNO, MenuCard, accionTurno, type Appointment } from './AppointmentCard'
 import { completarTarea, type PendingTask } from './PendingTaskCard'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Las filas del Dashboard con volumen (propuesta del 2026-10-12, ver design-reference/figma/modulos/dashboard.md): lo
    mismo que cada card del Figma, en una fila. Mismos datos, mismos chips y mismas acciones; cambia sólo cómo se acomodan.
@@ -54,11 +55,7 @@ const CHECK_IN = <StatusPill tone="ok" className="px-1.5 py-[2px] text-[10px]">C
    Edit appointment. Angosta en dos renglones; ancha en columnas. */
 export function AppointmentRow({ appt, id, activa, onSelect, onEdit }: PropsTurno) {
   const accion = appt.accion ?? 'Check Out'
-  const iniciales = (
-    <span className="bg-dash-blue flex size-7 shrink-0 items-center justify-center rounded-lg text-[11px] font-semibold text-white">
-      {appt.initials}
-    </span>
-  )
+  const iniciales = <Avatar initials={appt.initials} size={28} />
   const boton = (
     <Button size="sm" variant={ACCION_TURNO[accion]} className="shrink-0" onClick={() => accionTurno(appt)}>{accion} <ArrowRight /></Button>
   )
@@ -137,9 +134,7 @@ export function TaskRow({ task }: { task: PendingTask }) {
   const tipo = <span className="text-dash-name truncate text-sm leading-none font-bold">{task.kind}</span>
   const persona = (
     <span className="flex min-w-0 items-center gap-2">
-      <span className="bg-dash-count-bg text-dash-blue-hover flex size-7 shrink-0 items-center justify-center rounded-md text-[11px] font-semibold">
-        {task.initials}
-      </span>
+      <Avatar initials={task.initials} size={28} />
       <span className="text-dash-name truncate text-[13px] font-semibold">{task.person}</span>
     </span>
   )

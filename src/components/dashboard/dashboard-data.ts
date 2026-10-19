@@ -65,6 +65,7 @@ export const DIAS: Record<string, DiaDashboard> = {
       turno('Mara Otero', 'MO', 'Dr. Salgado', 'Operatory 1', '11:30'),
       turno('Elias Aguirre', 'EA', 'Dr. Salgado', 'Operatory 3', '08:30', { completado: true }),
       turno('Ines Bermudez', 'IB', 'Dr. Elena Martinez', 'Operatory 1', '09:00', { completado: true }),
+      turno('Sofia Chen', 'SC', 'Dr. Emily Chen', 'Operatory 4', '12:00'),
     ],
     waiting: [
       /* Seis, repartidos en las salas: el filtro por sala tiene a quién mostrar (Julián, 2026-10-18). */
@@ -75,7 +76,7 @@ export const DIAS: Record<string, DiaDashboard> = {
       turno('Elias Aguirre', 'EA', 'Dr. Salgado', 'Operatory 3', '08:30'),
       turno('Sofia Chen', 'SC', 'Dr. Emily Chen', 'Operatory 4', '12:00'),
     ],
-    rooms: salas(['Available', 'Busy', 'Busy', 'Busy', 'Unavailable', 'Busy'], 12),
+    rooms: salas(['Available', 'Busy', 'Busy', 'Busy', 'Unavailable', 'Available'], 12),
     tasks: tareas(2, 'March 17, 2025', 'March 15, 2025'),
     encuentros: { abiertos: 2, promedio: '18 min avg.' },
   },

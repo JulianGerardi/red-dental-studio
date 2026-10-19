@@ -1,54 +1,37 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
-import { ShowMore } from '@/components/ui/show-more'
 import { OperatoryCard, type Operatory } from './OperatoryCard'
 
-/* Las salas del Dashboard en una tira arriba de los turnos (Julián, 2026-10-13): una fila de cards sobre la página que
-   llena el ancho. Cuántas entran sale del ancho (una card no baja de OPERATORY_MIN); las que no entran van a
-   "Show N more", la regla de listas largas. Con onElegir, tocar una sala la elige (filtra la sala de espera) y tocarla
-   de nuevo la suelta (2026-10-17). Ver design-reference/figma/modulos/dashboard.md. */
+/* Las salas del Dashboard en una tira arriba de los turnos (Julián, 2026-10-13), en una sola fila con scroll horizontal
+   (2026-10-19): ocupa un renglón sin importar cuántas salas haya y la card que asoma al borde avisa que hay más. Con
+   pocas salas se reparten el ancho; con muchas, cada una mide OPERATORY_MIN y se desliza. Siempre hay una elegida: tocar
+   otra la cambia (Appointments y Waiting Room muestran sólo a los suyos). Ver design-reference/figma/modulos/dashboard.md. */
 
 export const OPERATORY_MIN = 232
-const GAP = 16
 
 export function OperatoryStrip({ rooms, elegida, onElegir }: {
   rooms: Operatory[]
   /** El nombre de la sala elegida. */
   elegida?: string | null
-  /** Tocar una sala: su nombre, o null si era la elegida. */
-  onElegir?: (sala: string | null) => void
+  /** Tocar una sala: su nombre. */
+  onElegir?: (sala: string) => void
 }) {
-  const ref = useRef<HTMLElement>(null)
-  const [entran, setEntran] = useState(6)
-
-  useLayoutEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const medir = () => setEntran(Math.max(1, Math.floor((el.clientWidth + GAP) / (OPERATORY_MIN + GAP))))
-    medir()
-    const ro = new ResizeObserver(medir)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
   if (rooms.length === 0) return null
-  /* Con menos salas que lugares, las que hay se reparten el ancho en vez de dejar un hueco a la derecha. */
-  const columnas = Math.min(entran, rooms.length)
-
   return (
-    <section ref={ref} aria-label="Rooms" style={{ '--columnas': columnas } as CSSProperties}>
-      <ShowMore
-        total={rooms.length} limit={entran} label="rooms" fade="from-page-background"
-        className="grid grid-cols-[repeat(var(--columnas),minmax(0,1fr))] gap-4"
-      >
-        {(n) => rooms.slice(0, n).map((r, i) => (
+    /* -m-1.5 p-1.5: aire para que el scroll no corte el anillo de la elegida ni la sombra. */
+    <section
+      aria-label="Rooms"
+      className="-m-1.5 grid snap-x snap-proximity auto-cols-[minmax(var(--operatory-min),1fr)] grid-flow-col gap-4 overflow-x-auto overscroll-x-contain p-1.5 [scrollbar-width:thin]"
+      style={{ '--operatory-min': `${OPERATORY_MIN}px` } as React.CSSProperties}
+    >
+      {rooms.map((r) => (
+        <div key={r.name} className="snap-start">
           <OperatoryCard
-            key={i} room={r} enPagina
+            room={r} enPagina
             seleccionada={!!elegida && elegida === r.name}
             atenuada={!!elegida && elegida !== r.name}
-            onClick={onElegir && (() => onElegir(elegida === r.name ? null : r.name))}
+            onClick={onElegir && (() => onElegir(r.name))}
           />
-        ))}
-      </ShowMore>
+        </div>
+      ))}
     </section>
   )
 }

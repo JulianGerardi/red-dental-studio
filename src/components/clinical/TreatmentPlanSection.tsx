@@ -24,6 +24,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
 import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
 import { useAnchoVisible } from '@/components/patients/ledger/useAnchoColumnas'
+import { RowChevron } from '@/components/ui/data-table'
 import { DetalleRegistro, NavegacionClinica, registroDePlan, useVerRegistro, type DestinoClinico } from '@/components/clinical/RecordDetail'
 
 /* Figma 4118:220403 "Treatment Plan — Section (Cases, Workflow & Dialogs)":
@@ -558,7 +559,7 @@ export function TablaProcedimientos({
                 <td className="pl-3 text-ink-faint" aria-label={`Drag ${p.codigo} to another visit`}><GripVertical className="size-4" /></td>
               )}
               {detalle && (
-                <td className="pl-3"><ChevronRight aria-hidden className={cn('size-4 text-ink-faint transition-transform', abierta && 'rotate-90')} /></td>
+                <td className="pl-3"><RowChevron open={abierta} /></td>
               )}
               {conCasillas && (
                 <td className="px-3">

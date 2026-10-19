@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/components/ui/switch'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar } from '@/components/ui/avatar'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Breadcrumb } from '@/components/ui/breadcrumb'
 import { TextField } from '@/components/patients/form'
@@ -201,9 +201,7 @@ export const PIEZAS: Pieza[] = [
     titulo: 'Avatar', seccion: 'Components', que: 'La foto o las iniciales de un paciente o del equipo.',
     muestra: (
       <div className="flex -space-x-2">
-        {[['MV', 'bg-dash-blue'], ['NS', 'bg-dash-blue-hover'], ['EA', 'bg-green'], ['JS', 'bg-ink']].map(([t, c]) => (
-          <Avatar key={t} className="size-11 ring-2 ring-white"><AvatarFallback className={cn('text-[13px] font-semibold text-white', c)}>{t}</AvatarFallback></Avatar>
-        ))}
+        {['MV', 'NS', 'EA', 'JS'].map((t) => <Avatar key={t} initials={t} size={44} className="ring-2 ring-white" />)}
       </div>
     ),
   },

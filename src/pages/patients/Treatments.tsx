@@ -7,6 +7,7 @@ import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 import { ShowMore } from '@/components/ui/show-more'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Figma 3768:803852 (poblado) y 3769:808875 (vacío).
    Sección "Patient Profile — Treatment Plan & Documents". */
@@ -52,9 +53,7 @@ export function TreatmentCard({ plan }: { plan: Plan }) {
   return (
     <article className={cn(TARJETA_PANEL, 'overflow-hidden')}>
       <header className="flex items-center gap-3 px-4 py-3">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#eff4ff] text-xs font-semibold text-[#0056ef]">
-          {plan.initials}
-        </span>
+        <Avatar initials={plan.initials} size={36} />
         <span className="min-w-0 flex-1 leading-tight">
           <span className="block truncate text-[13px] font-bold text-ink">{plan.patient}</span>
           <span className="block text-[11px] text-ink-muted">Patient</span>

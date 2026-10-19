@@ -78,7 +78,7 @@ export const Parts: Story = {
           <tr><td className="font-semibold">Filter</td><td>Estados de la orden, de a varios, con cantidad y color; sin nada tildado se ve todo. Se borra con Clear all.</td><td><code>DataTable filter</code> → FilterMenu</td></tr>
           <tr><td className="font-semibold">View History</td><td>Acción secundaria. Avisa que no está en esta versión.</td><td><code>Button secondary</code></td></tr>
           <tr><td className="font-semibold">New Prescription</td><td>La acción principal. Avisa que no está en esta versión.</td><td><code>Button</code></td></tr>
-          <tr><td className="font-semibold">Provider · Patient</td><td>Iniciales en el círculo celeste del equipo y el nombre, sin link.</td><td>como <code>PersonCell tone=soft</code></td></tr>
+          <tr><td className="font-semibold">Provider · Patient</td><td>El Avatar y el nombre, sin link.</td><td>como <code>PersonCell</code></td></tr>
           <tr><td className="font-semibold">Status</td><td>La pill del estado.</td><td><code>Pill</code></td></tr>
           <tr><td className="font-semibold">Expiration Date</td><td>En rojo y semibold si vence pronto (<code>urgente</code>).</td><td>—</td></tr>
           <tr><td className="font-semibold">Row menu</td><td>View order, Edit order y, en Requested / Pending / Delayed, Cancel order (rojo) con Undo.</td><td><code>RowActionsMenu</code></td></tr>
@@ -170,7 +170,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Toolbar</td><td>Alto 36 · search 260 · Filter md · botones lg · 8 entre piezas · 12 hasta la tabla</td></tr>
           <tr><td className="font-semibold">Table</td><td>La estándar: encabezado 44 en <Token nombre="surface-alt" />, filas 56, texto 13px <Token nombre="ink-soft" />, divisor <Token nombre="line-row" /></td></tr>
           <tr><td className="font-semibold">Columns</td><td>Provider y Patient se estiran (mín. 160) · Status 110 · Updated 110 · Created 110 · Expiration Date 120 · Actions 40</td></tr>
-          <tr><td className="font-semibold">People</td><td>Círculo 32 en <Token nombre="dash-count-bg" />, iniciales 11px <Token nombre="dash-blue-hover" />; nombre 13px medium <Token nombre="ink" /></td></tr>
+          <tr><td className="font-semibold">People</td><td>Avatar de 32 (Elements / Avatars); nombre 13px medium <Token nombre="ink" /></td></tr>
           <tr><td className="font-semibold">Expiring soon</td><td>Semibold <Token nombre="dash-bad-fg" /></td></tr>
           <tr><td className="font-semibold">Rows per page</td><td>10 (entran las 9 del frame), con Show 5 / 10 / 20</td></tr>
         </Tabla>

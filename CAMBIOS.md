@@ -3,7 +3,7 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
-## 2026-10-18
+## 2026-10-19
 
 ### Overview: el chart de DentAssmt de sólo lectura y Treatment Plan hasta abajo ([#53](https://github.com/JulianGerardi/red-dental-studio/pull/53))
 - El chart del Overview de Clinical Mode es el mismo de DentAssmt, sin controles, con lo mismo cargado. La pieza de la
@@ -12,6 +12,43 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Para el dev:** `OdontogramaOverview` / `OdontogramaLectura` (`clinical/OdontogramaOverview.tsx`),
   `dental/estadoOdontograma.ts` (estado compartido de la librería), `useUltimaCondicion()` en `ExamLayout`, `llena` en
   `TreatmentPlanList`. `Odontogram` ya no se usa en la app (queda en el Builder).
+
+### La flecha de desplegar, en toda fila que se despliega ([#52](https://github.com/JulianGerardi/red-dental-studio/pull/52))
+- El Ledger y Ledger Transactions (Patient Payment, Credit Adjustment, Post Payment) se desplegaban sin flecha; Billing,
+  Problem List y Treatment Plan la tenían. Ahora todas llevan la misma flecha al inicio y el detalle arranca en la primera
+  columna. Una fila que navega o abre un drawer sigue sin flecha.
+- **Para el dev:** `RowChevron` nuevo en `ui/data-table.tsx`; lo usan DataTable (`rowDetail`), `TablaProcedimientos`,
+  el Ledger y `LedgerAllocationTable`. `LedgerRowDetail` suma `sangria`. *Audit / Tables in the app* marca una tabla
+  que se despliegue sin flecha.
+
+### Dashboard: sala siempre elegida, "Patients today" que coincide y salas con scroll horizontal ([#50](https://github.com/JulianGerardi/red-dental-studio/pull/50))
+- **La sala elegida filtra Appointments y Waiting Room** (antes sólo la sala de espera) y **siempre hay una**, la primera
+  por defecto; tocar otra la cambia. El chip junto al título dice cuál. El filtro por operatorio de Appointments sale
+  (lo reemplaza la sala); Pending Task conserva el suyo.
+- **"Patients today" es la cantidad de turnos de esa sala** (era un 12 fijo): coincide con las cards que se ven.
+- **Las salas van en una fila con scroll horizontal** (232px mínimo, snap) en lugar de "Show N more".
+- **Para el dev:** `OperatoryStrip` pierde `ShowMore`; `elegida` es la sala mostrada y `onElegir(nombre)` la cambia (sin
+  soltar). `Dashboard.tsx` calcula `patientsToday` de `dia.appointments`; se van `salas` (filtro) y `salaEspera`. Datos:
+  Operatory 6 Available y un turno nuevo en Operatory 4. e2e en `tests/dashboard.e2e.ts`.
+
+## 2026-10-18
+
+### Topbar: locación, buscador y perfil más chicos ([#51](https://github.com/JulianGerardi/red-dental-studio/pull/51))
+- Locación y buscador pasan de 32 a **28px** de alto (texto de 13 y 12px, íconos de 14px) y el botón del perfil de 40 a 32px
+  (avatar de 28). La campana ya medía 28; el botón del menú sigue en 32.
+- **Para el dev:** `h-7` en `LocationSelector.tsx` y en `GlobalSearch`; `Avatar size={28}` en `MenuCuenta`.
+
+### Un solo avatar de persona en toda la app ([#49](https://github.com/JulianGerardi/red-dental-studio/pull/49))
+- Pacientes, providers, empleados y la cuenta usan el avatar de la card de Appointments: cuadrado con esquinas
+  redondeadas, azul con iniciales blancas. Se van los círculos (Patients, Employees, Relationships, panel del paciente)
+  y el celeste del equipo. Esquina con el token nuevo `--radius-avatar` (27%, `rounded-avatar`).
+- **Para el dev:** `<Avatar initials size photo />` de `ui/avatar` (se va `AvatarFallback`; tamaños 24 a 72 en
+  `AVATAR_SIZES`). `PersonCell` pierde `tone`; `EditableAvatar` recibe `size` en vez de `avatarClassName`. No escribir
+  avatares a mano. Storybook: *Elements / Avatars*.
+
+### Topbar: el saludo un poco más separado del botón del menú ([#48](https://github.com/JulianGerardi/red-dental-studio/pull/48))
+- Entre el botón de expandir el menú y el saludo hay 14px en lugar de 8. Nada más cambia.
+- **Para el dev:** `gap-3.5` en el bloque izquierdo de `Topbar.tsx`.
 
 ### El icono 3D va sólo en el saludo, y el texto más chico ([#47](https://github.com/JulianGerardi/red-dental-studio/pull/47))
 - El calendario del saludo ("Sunday - October 18, 2026") pasa a ser el emoji 📅, 3D como la manito. El campo de fecha y

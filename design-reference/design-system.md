@@ -240,7 +240,7 @@ npm run ds:tokenize      # pasa colores escritos a mano a su token
     **Documents**, **Insurance** y **Billing** (2026-09-26), con `Button` /
     `buttonClasses()` para su acción principal. Para esas pantallas se sumaron:
     selección controlada (`selected`, `onSelectedChange`), filas por página
-    (`pageSizeOptions`), avatar `soft` en `PersonCell`, `reorder` (manija para
+    (`pageSizeOptions`), `reorder` (manija para
     reordenar arrastrando o con ↑ ↓; Insurance), filas clickeables con teclado
     (Billing) y filas que crecen si una celda tiene dos líneas.
     **Estados:** `loading` (filas grises con la forma de las columnas),
@@ -951,6 +951,43 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   (variante, cuántos procedimientos, enviando), Parts (partes, qué hace cada botón, cuándo aparece, dónde se usa),
   States (cada caso en su iframe, más la caja de resumen sola) y Specs (medidas, colores y la lógica).
   Decisiones en `figma/modulos/clinical-mode.md` (2026-10-17).
+
+## Elements / Avatars: un solo avatar de persona (2026-10-18)
+
+- **`ui/avatar`** cambia de API: `<Avatar initials="NJ" size={44} photo={url} />`. Se van `AvatarFallback` y los tonos;
+  forma (`rounded-avatar`, token `--radius-avatar: 27%`) y color (`dash-blue` + blanco) son siempre los mismos. Exporta
+  `AVATAR_SIZES` (24 a 72, con su letra), `AVATAR_BASE` e `inicialesDe(nombre)`.
+- Reemplaza los ~30 avatares escritos a mano (círculos y cuadrados, azul y celeste) en tablas, cards, drawers, paneles,
+  topbar, Clinical Mode, el Builder (bloque *Person* y su código) y las demos de Help.
+- **`PersonCell`** pierde `tone`: pacientes y equipo, igual. **`EditableAvatar`** recibe `size` (y `className` sólo
+  para el logo de la cuenta) en vez de `avatarClassName`.
+- La página pasa de *Components / UI / Avatar* a **Elements / Avatars**, con la estructura de Buttons: Playground
+  (iniciales, tamaño, foto), Parts (partes y persona vs cosa), States (iniciales, una letra, nombre largo, foto,
+  editable en reposo, hover y foco, y en una tabla) y Specs (la escala medida, con radio y dónde va cada tamaño, y los
+  tokens). *Components / UI / EditableAvatar* suma Parts, States y Specs. *Foundations / Radius and shadows* muestra
+  `rounded-avatar`.
+- Decisiones en `figma/README.md`, *Regla: un solo avatar de persona*.
+
+## La flecha de las filas que se despliegan, igual en todas las tablas (2026-10-18)
+
+- Pedido de Julián: unas tablas tenían flecha para desplegar la fila y otras no. Regla: **toda fila que despliega un
+  detalle lleva la flecha al inicio**, en todas las tablas; una fila que navega o abre un drawer no.
+- **`RowChevron`** (nuevo, `ui/data-table.tsx`): la flecha de 16px `ink-faint` que gira 90° al abrir. La usan
+  `DataTable` (`rowDetail`), `TablaProcedimientos` (Treatment Plan) y ahora también el **Ledger** y **Ledger
+  Transactions** (`LedgerAllocationTable`: Patient Payment, Credit Adjustment, Post Payment), que se desplegaban sin
+  flecha. El detalle arranca en la primera columna, como en DataTable (`LedgerRowDetail` suma `sangria`).
+- *Elements / Tables*: Specs suma *Row chevron* (closed / open) en Parts, la regla y *Row that unfolds* en *Pattern for
+  every table*. *Components / Ledger / LedgerAllocationTable* rehecha con Playground, Parts, States, *Row open* y Specs.
+  *Audit / Tables in the app* marca **Expandable rows without chevron** si alguna tabla se despliega sin flecha.
+  Decisiones en `figma/modulos/ledger.md` (2026-10-18).
+
+## Operatory strip con scroll horizontal y sala siempre elegida (2026-10-19)
+
+- `OperatoryStrip` es una sola fila con scroll horizontal (cards de 232px como mínimo, snap al borde) en lugar de la
+  grilla con "Show N more". `elegida` es la sala mostrada y `onElegir(nombre)` la cambia: siempre hay una, no se suelta.
+- `OperatoryCard`: "Patients today" lo calcula la pantalla (turnos de esa sala), no es un dato fijo. *Components /
+  Dashboard / Operatory strip* y *OperatoryCard* describen la selección y el scroll. `ui/show-more` ya no lista las
+  salas. Ver `figma/modulos/dashboard.md`.
 
 ## Clinical Mode: el chart del Overview es el de DentAssmt (2026-10-18)
 

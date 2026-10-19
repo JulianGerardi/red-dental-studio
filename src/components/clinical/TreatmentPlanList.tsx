@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { Pill } from '@/components/ui/pill'
 import { TONO_CASO } from '@/components/clinical/TreatmentPlanSection'
 import { PLANES, type Plan } from '@/data/clinical-mode'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Cards de Treatment Plan del Overview, con la estructura de red.dev: profesional, nombre y estado del caso, su grupo, dos
    datos (total y fecha de creación) y el avance en su caja. Toda la card abre el caso en Treatment Plan. El ícono de
@@ -30,7 +31,7 @@ export function PlanCard({ p, onAbrir }: { p: Plan; onAbrir?: () => void }) {
       className="hover:border-dash-blue focus-visible:outline-dash-blue group block w-full rounded-lg border border-line bg-white p-3.5 text-left transition-colors hover:shadow-[0_4px_14px_rgb(29_86_188/0.08)]"
     >
       <span className="flex items-center gap-2.5">
-        <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold">{iniciales(p.doctor)}</span>
+        <Avatar initials={iniciales(p.doctor)} />
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[13px] font-semibold text-ink">{p.doctor}</span>
           <span className="block text-[11px] text-ink-muted">{p.rol}</span>

@@ -3,6 +3,7 @@ import { FilterTrigger } from '@/components/ui/filter-menu'
 import { aviso } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
 import type { RecordStatus } from '@/data/mock'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Lab Order, Prescription y Referral comparten esta fila en el original:
    borde azul a la izquierda, avatar + provider, un slot central variable,
@@ -33,9 +34,7 @@ export function RecordRow({
   return (
     <div className="border-l-primary flex items-center gap-6 rounded-lg border border-l-4 bg-background px-4 py-3 shadow-sm">
       <div className="flex w-[190px] shrink-0 items-center gap-3">
-        <span className="bg-primary text-primary-foreground flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-medium">
-          {initials}
-        </span>
+        <Avatar initials={initials} size={36} />
         <span className="min-w-0 leading-tight">
           <span className="block truncate text-sm font-medium">{provider}</span>
           {providerRole && <span className="text-muted-foreground block text-xs">{providerRole}</span>}
