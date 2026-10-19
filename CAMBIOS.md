@@ -13,9 +13,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - En New Appointment, paso 1: con poco alto de ventana el último campo quedaba cortado contra el pie sin ningún aviso.
   Arreglado en `ui/drawer` (vale para todos los drawers): el pie lleva una sombra elevada mientras el paso siga con
   scroll.
+- New Appointment: las sugerencias de Patient y de los dos Provider llevan una segunda línea (fecha de nacimiento y
+  email del paciente; email del provider), que antes faltaba.
 - **Para el dev:** `OperatoryStrip` suma `scroll-p-1.5`; `dashboard-data.ts#salas()` recibe un array de números en vez
   de uno fijo; `AppointmentRow` suma la prop `ocultarOperatorio`; el wrapper de Waiting Room en `Dashboard.tsx` agrega
-  `self-start` con sala elegida; `Drawer` mide con `ResizeObserver` si falta contenido por ver.
+  `self-start` con sala elegida; `Drawer` mide con `ResizeObserver` si falta contenido por ver; `SearchField` suma la
+  prop opcional `subtext` (sin ella no cambia nada para sus otros usos).
 
 ### Clinical mode: ConfirmProcedureDialog y ClinicalNoteDialog pasan a ConfirmDialog ([#58](https://github.com/JulianGerardi/red-dental-studio/pull/58))
 - Los dos rearmaban `Dialog` a mano (botones propios, colores sin token) en vez de usar `ui/confirm-dialog`, el patrón
