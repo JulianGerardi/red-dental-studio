@@ -1008,3 +1008,20 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   seguían el sistema. *Elements / ConfirmDialog* suma una fila en *Specs* › *Where*. Decisiones en
   `figma/modulos/clinical-mode.md` (2026-10-19).
 
+## Today Appointments: el nombre es link (2026-10-19)
+
+*Elements / Appointment cards*: la fila *Patients list* dice ahora que el nombre lleva a la ficha del paciente (antes
+sólo el kebab hacía algo). Sin página nueva: `AppointmentCardCompacta` reusa el mismo estilo de link que `PersonCell`
+y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
+
+## Billing sin saldos de la cuenta (2026-10-19)
+
+- *Pages / Parts / Billing*: sin *Guarantor numbers*, sin la columna Balance y sin los saldos en States y Specs; la tabla
+  y el detalle de la fila no muestran el saldo de la cuenta (es de todas las locations y la pantalla filtra por una).
+  Decisión en `figma/modulos/billing.md` (2026-10-19).
+
+## LedgerRowDetail más corto (2026-10-19)
+
+- *Components / Ledger / LedgerRowDetail*: sin Adjustment reason, sin Payment methods y sin las frases explicativas; el
+  pie de los cuatro tipos es **View full record** (`VerRegistroCompleto`). Playground, Parts, States y Specs al día.
+  Decisiones en `figma/modulos/ledger.md` (2026-10-19).

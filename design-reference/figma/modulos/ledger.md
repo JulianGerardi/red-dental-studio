@@ -843,3 +843,20 @@ todas.
 4. *Audit / Tables in the app* marca **Expandable rows without chevron** si alguna tabla vuelve a desplegarse sin flecha.
 5. **A validar con usuarios:** si en recepción se entiende que la fila entera se abre (no sólo la flecha); la flecha es
    la pista, el clic sigue siendo en toda la fila.
+
+## Detalle de la fila más corto y un solo link al registro (2026-10-19)
+
+Julián, revisando el detalle con capturas:
+
+1. **Un solo botón de pie.** View procedure, View payment y View adjustment pasan a **View full record**, el mismo
+   botón (`VerRegistroCompleto`, `ui/detail-list`) que ya usan el detalle de Procedures y el menú de los findings.
+   En un procedimiento sigue abriendo Clinical Mode (Procedures con esa fila abierta); en los demás, el registro.
+2. **Sin Adjustment reason** (Charge y Credit Adjustment): el motivo ya es el título del bloque, así que la fila lo
+   repetía ("Discount" arriba y "Adjustment reason: Discount" abajo). Se va también su nota.
+3. **Sin Payment methods** en Patient Payment.
+4. **Sin las frases explicativas:** *Current balance of this charge only…*, *A payment or credit has no outstanding
+   balance…* y *Amounts show…* (las dos versiones). Los números y la tabla se leen solos; quedan las leyendas cortas de
+   cada tabla (*Incoming / Outgoing applications*) y *Read-only summary*.
+
+Salen `Motivo` y `MetodosDePago` de `LedgerRowDetail`. Qué validar con usuarios: si quien concilia pagos echa de menos
+el método de pago (efectivo, cheque, tarjeta) en el detalle; sigue en la descripción de la fila y en el registro.

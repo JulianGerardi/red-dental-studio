@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react'
-import { ArrowUpRight, Maximize2, ChevronsDownUp, ChevronsUpDown, HandCoins } from 'lucide-react'
+import { ChevronsDownUp, ChevronsUpDown, HandCoins } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { aviso } from '@/components/ui/toaster'
 import { Pill } from '@/components/ui/pill'
-import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, NotaDetalle, Vacio } from '@/components/ui/detail-list'
+import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, Vacio, VerRegistroCompleto } from '@/components/ui/detail-list'
 import { cn } from '@/lib/utils'
 import { tratamientoDe } from '@/components/clinical/RecordDetail'
 import { TONO_CASO } from '@/components/clinical/TreatmentPlanSection'
@@ -191,26 +191,6 @@ export function TratamientoDelCargo({ m, onAbrir }: { m: Movimiento; onAbrir: (c
   )
 }
 
-/** Payment methods: cada componente del pago con su referencia y su monto. */
-export function MetodosDePago({ m }: { m: Movimiento }) {
-  if (!m.metodos?.length) return <Vacio>No payment method details available.</Vacio>
-  return m.metodos.map((x, i) => (
-    <Texto key={i}>{x.metodo}{x.ref && ` ${x.ref}`} — <span className="tabular-nums">{moneda(x.monto)}</span></Texto>
-  ))
-}
-
-/** Adjustment reason: el tipo de ajuste y la nota. */
-export function Motivo({ m }: { m: Movimiento }) {
-  const motivo = motivoDe(m)
-  if (!motivo) return <Vacio>Adjustment reason unavailable.</Vacio>
-  return (
-    <div>
-      <Texto>{motivo}</Texto>
-      {m.nota && <p className="text-[11px] text-ink-muted">{m.nota}</p>}
-    </div>
-  )
-}
-
 /** Las filas del detalle según el tipo, en el orden de la historia. */
 export function FilasTransaccion({ m, aplicaciones = APLICACIONES, movimientos = MOVIMIENTOS, onVerTransaccion, onAbrirClinica }: DatosCobro & { m: Movimiento }) {
   const tipo = tipoDetalle(m)
@@ -230,10 +210,7 @@ export function FilasTransaccion({ m, aplicaciones = APLICACIONES, movimientos =
   return (
     <>
       {tipo === 'Procedure' && <FilaDetalle titulo="Treatment"><TratamientoDelCargo m={m} onAbrir={abrirCaso} /></FilaDetalle>}
-      {tipo === 'Charge Adjustment' && <FilaDetalle titulo="Adjustment reason"><Motivo m={m} /></FilaDetalle>}
       {!cargo && <FilaDetalle titulo="Scope"><Texto>{alcance}</Texto></FilaDetalle>}
-      {tipo === 'Patient Payment' && <FilaDetalle titulo="Payment methods"><MetodosDePago m={m} /></FilaDetalle>}
-      {tipo === 'Credit Adjustment' && <FilaDetalle titulo="Adjustment reason"><Motivo m={m} /></FilaDetalle>}
       <FilaDetalle titulo="Location">{sede ? <Texto>{sede}</Texto> : <Vacio>Location unavailable.</Vacio>}</FilaDetalle>
       <FilaDetalle titulo="Financial details">
         <dl className="grid grid-cols-[repeat(auto-fit,minmax(112px,1fr))] gap-x-6 gap-y-3 py-0.5">
@@ -256,10 +233,6 @@ export function FilasTransaccion({ m, aplicaciones = APLICACIONES, movimientos =
             </>
           )}
         </dl>
-        <NotaDetalle>
-          {cargo ? 'Current balance of this charge only, not the patient or guarantor balance.'
-            : 'A payment or credit has no outstanding balance: what is left to use is its unapplied credit.'}
-        </NotaDetalle>
       </FilaDetalle>
       <FilaDetalle titulo={cargo ? 'Payments & credits applied to this charge' : 'Charges paid or credited by this transaction'} cuenta={filas.length}>
         <Pista arriba>{cargo ? 'Incoming applications: the payments and credits that reduced this charge.' : 'Outgoing applications: the charges this payment or credit was applied to.'}</Pista>
@@ -291,17 +264,12 @@ export function FilasTransaccion({ m, aplicaciones = APLICACIONES, movimientos =
             </table>
           </div>
         )}
-        <Pista>
-          {cargo ? 'Amounts show only the part applied to this charge, not the full payment or credit.'
-            : 'Amounts show how this transaction was allocated. Applying existing credit does not create another payment or reduce the account balance again.'}
-        </Pista>
       </FilaDetalle>
     </>
   )
 }
 
 const BOTON_CREDITO = 'text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-info-bg px-2.5 py-1 text-[12px] font-medium hover:bg-[#e3edff]'
-const BOTON_VER = 'text-dash-blue inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline'
 
 /** El contenido del detalle, sin el marco. Las cuatro transacciones de la historia llevan su lista (título, filas y pie
     con su acción y Read-only summary); Insurance Payment, los datos de siempre. Lo usan el Ledger y la tabla de Billing
@@ -321,14 +289,13 @@ export function DetalleMovimiento({
       <>
         <Campos m={m} />
         <div className="mt-3 flex flex-wrap items-center gap-4">
-          <button type="button" onClick={onVerTodo} className={BOTON_VER}><Maximize2 className="size-3.5" /> View full record</button>
+          <VerRegistroCompleto onClick={onVerTodo} />
         </div>
       </>
     )
   }
   /* View procedure abre el procedimiento del paciente; sin vínculo, el registro. */
   const verProcedimiento = m.procedimiento && datos.onAbrirClinica ? () => datos.onAbrirClinica!({ procedimiento: m.procedimiento }) : onVerTodo
-  const accion = tipo === 'Procedure' ? 'View procedure' : tipo === 'Patient Payment' ? 'View payment' : 'View adjustment'
   const lado = [refDe(m), m.estado, m.diente && `Tooth ${m.diente}`, m.superficie && `Surface ${m.superficie}`].filter(Boolean).join(' · ')
   return (
     <ListaDetalle
@@ -336,9 +303,7 @@ export function DetalleMovimiento({
       lado={lado}
       pie={(
         <>
-          <button type="button" onClick={tipo === 'Procedure' ? verProcedimiento : onVerTodo} className={BOTON_VER}>
-            <ArrowUpRight className="size-3.5" /> {accion}
-          </button>
+          <VerRegistroCompleto onClick={tipo === 'Procedure' ? verProcedimiento : onVerTodo} />
           {onAplicarCredito && (
             <button type="button" onClick={onAplicarCredito} className={BOTON_CREDITO}><HandCoins className="size-3.5" /> Apply credit</button>
           )}

@@ -33,7 +33,7 @@ const meta = {
           '- **Resumen** (sin paciente): los cinco números, **Recent Billing Activity** de toda la clínica con las Tabs de tipo, **Find Patient** y **Today**. No hay botones de pago.',
           '- **Paciente** (elegido desde una fila o desde Find Patient): su card baja arriba de Find Patient con una animación corta, el título dice su nombre, las Tabs pasan a **Patient View / Guarantor View**, la tabla muestra **sólo sus movimientos** (o los de todo su garante) y aparecen los botones de pago. **Cada fila se despliega** con el detalle del Ledger según el tipo: contexto, *Location*, *Financial details* y las transacciones relacionadas (2026-10-14; *Components / Ledger / LedgerRowDetail*). La X de la card vuelve al resumen.',
           '',
-          '**Cards:** los paneles son `Panel` (título de 15px sin ícono, como Patients y el Dashboard); lo que va adentro (resultados, números de Today y del garante) es `InnerCard`. La pantalla completa está en *Pages*.',
+          '**Cards:** los paneles son `Panel` (título de 15px sin ícono, como Patients y el Dashboard); lo que va adentro (resultados y números de Today) es `InnerCard`. La pantalla completa está en *Pages*.',
           '',
           '**Probalo:** en *Playground* elegí paciente, vista, filtro, búsqueda y actividad vacía desde *Controls*, o tocá filas, resultados y la X. *Parts* dice qué hace cada parte, *States* muestra cada una en cada estado y *Specs* trae medidas y colores.',
         ].join('\n'),
@@ -80,9 +80,8 @@ const PARTES: [string, string, string][] = [
   ['Bento', 'Izquierda: los números y la actividad. Derecha (280px desde 1024px): Find Patient arriba, a la altura de los números, y Today abajo. Las dos columnas terminan juntas: el alto lo fija la tabla (15 filas por página) y Find Patient scrollea adentro. Con un paciente el bento guarda el alto del resumen.', 'Billing'],
   ['Summary numbers', 'Cinco números de toda la clínica, cada uno en una card de página (sombra, sin borde). Cinco en fila desde 1280px, 3 + 2 antes, 2 + 2 + 1 en el celular; etiqueta, número y bajada alineados entre cards (subgrid). No cambian con el paciente.', 'Stat enFila'],
   ['Info circle', 'Arriba a la derecha de cada número de arriba y de Today: al pasar el mouse, tocar o llegar con Tab explica qué cuenta (los textos de red.dev).', 'InfoTip'],
-  ['Recent Billing Activity', 'Resumen: toda la clínica y las Tabs de tipo. Paciente: los botones arriba del título, su nombre en el título, Patient View / Guarantor View, los dos saldos del garante y sólo sus movimientos.', 'ActividadReciente · Panel'],
+  ['Recent Billing Activity', 'Resumen: toda la clínica y las Tabs de tipo. Paciente: los botones arriba del título, su nombre en el título, Patient View / Guarantor View y sólo sus movimientos (sin saldos: son de la cuenta entera, no de la location).', 'ActividadReciente · Panel'],
   ['Patient actions', 'Sólo con paciente, arriba del título y a la izquierda: Patient Payment, Credit Adjustment y Charge Adjustment (abren Post payment con el tipo ya elegido) y Export statement. Button md.', 'AccionesPaciente · Panel top'],
-  ['Guarantor numbers', 'Sólo con paciente: Unapplied Credits y Open Balance de todo lo que paga su garante, en InnerCard.', 'Stat interna'],
   ['Activity table', 'La tabla de la app, compacta. En el resumen, clic en una fila abre la vista de ese paciente. Con paciente, la fila se despliega (chevron, Collapse all / Expand all).', 'DataTable'],
   ['Row detail', 'Con paciente: el detalle del Ledger según el tipo (Procedure, Charge Adjustment, Patient Payment, Credit Adjustment; el pago del seguro con los datos de siempre). La acción del pie y los links abren el registro de sólo lectura.', 'DetalleMovimiento · LedgerRowModal'],
   ['Patient card', 'Sólo con paciente: de borde a borde arriba de Find Patient, con iniciales (sin borde), nombre, rol (y su garante si es Patient) y la X que vuelve al resumen. Entra sutil, estilo Apple: 2px, un desenfoque leve que se aclara y opacidad (360ms).', 'PacienteElegido · Panel top'],
@@ -158,7 +157,6 @@ function Actividad({ filtro: inicialFiltro = 'All', elegido, vista: inicialVista
   return (
     <ActividadReciente
       filas={filas} sinActividad={vacia} filtro={filtro} onFiltro={setFiltro} paciente={paciente} vista={vista} onVista={setVista}
-      creditos={grupo.reduce((n, p) => n + p.creditosNoAplicados, 0)} saldo={grupo.reduce((n, p) => n + saldoDe(p.nombre), 0)}
       onElegir={(n) => { setSel(n); setVista('Patient View') }}
       onAccion={nada} onExportar={nada}
       abierta={abierta}
@@ -204,8 +202,8 @@ export const States: Story = {
         <Bloque titulo="Recent Billing Activity" nota="Tocá una fila del resumen para abrir la vista de ese paciente, y las Tabs para cambiar de vista.">
           <Fila>
             <Estado titulo="Overview" nota="Toda la clínica, con las Tabs de tipo. Hover gris en cada fila." ancho={960}><Actividad /></Estado>
-            <Estado titulo="Patient View" nota="Su nombre en el título, los saldos de su garante y sólo sus movimientos. Las filas ya no eligen." ancho={960}><Actividad elegido="Maria Abril Viola" /></Estado>
-            <Estado titulo="Patient View, payment open" nota="Un pago desplegado: Scope, Payment methods, la sede, cuánto se recibió y aplicó, y el cargo al que fue (el link abre su registro)." ancho={960}><Actividad elegido="Maria Abril Viola" abierta="act-Maria Abril Viola-1" /></Estado>
+            <Estado titulo="Patient View" nota="Su nombre en el título y sólo sus movimientos, sin saldos ni columna Balance. Las filas ya no eligen." ancho={960}><Actividad elegido="Maria Abril Viola" /></Estado>
+            <Estado titulo="Patient View, payment open" nota="Un pago desplegado: Scope, la sede, cuánto se recibió y aplicó, y el cargo al que fue (el link abre su registro)." ancho={960}><Actividad elegido="Maria Abril Viola" abierta="act-Maria Abril Viola-1" /></Estado>
             <Estado titulo="Patient View, charge open" nota="Un cargo: lo cobrado, lo que pagaron el seguro y el paciente, y lo que falta de ese cargo." ancho={960}><Actividad elegido="Brent Crosby" abierta="act-Brent Crosby-0" /></Estado>
             <Estado titulo="Guarantor View" nota="Todo lo que paga su garante (acá John Hayes y Maria Abril Viola), con la columna Patient para distinguirlos." ancho={960}><Actividad elegido="Maria Abril Viola" vista="Guarantor View" /></Estado>
             <Estado titulo="Patient without activity" nota="Un paciente sin nada posteado: se puede registrar el primer pago desde los botones de arriba." ancho={960}><Actividad elegido="Brent Crosby" sinMovimientos /></Estado>
@@ -221,7 +219,6 @@ export const States: Story = {
             </Estado>
             <Estado titulo="On the page" nota="Card de página, sombra y sin borde, con el círculo de info." ancho={248}><Stat {...STATS_BILLING[0]!} /></Estado>
             <Estado titulo="Inside a panel" nota="Today: InnerCard, también con el círculo de info." ancho={248}><div className="rounded-lg bg-white p-4"><Stat interna {...STATS_HOY[0]!} /></div></Estado>
-            <Estado titulo="Without info" nota="Los saldos del garante (con paciente): red.dev no les da texto, así que no llevan círculo." ancho={248}><div className="rounded-lg bg-white p-4"><Stat interna label="Guarantor Open Balance" value="$150.00" caption="Total outstanding" /></div></Estado>
           </Fila>
         </Bloque>
       </div>
@@ -238,7 +235,6 @@ const MEDIDAS: [string, string][] = [
   ['Patient card · initials', '[aria-live] > div > span'],
   ['Find Patient search', 'input[aria-label="Find patient"]'],
   ['Patient result', 'button[aria-current="true"]'],
-  ['Guarantor number', 'section [class*="shadow-inner-card"]'],
   ['Table row (compact)', '[role="row"]:not([data-tabla-header])'],
 ]
 

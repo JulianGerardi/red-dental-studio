@@ -14,6 +14,27 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   `ClinicalNoteDialog` (`ClinicalTopBar.tsx`), cerrar con Esc o clic afuera ahora también cuenta como "Remind me later".
   *Elements / ConfirmDialog* suma una fila en Specs › Where.
 
+### Detalle del Ledger y Billing más corto, con un solo "View full record" ([#57](https://github.com/JulianGerardi/red-dental-studio/pull/57))
+- En el detalle de una fila: los pies **View procedure / View payment / View adjustment** pasan a **View full record**,
+  igual que en Procedures y en los findings. Se van **Adjustment reason** (ya es el título), **Payment methods** y las
+  frases explicativas de debajo de Financial details y de las aplicaciones.
+- **Para el dev:** `LedgerRowDetail` usa `VerRegistroCompleto` (`ui/detail-list`) y pierde `Motivo` y `MetodosDePago`. El
+  e2e de Ledger busca ahora *View full record*.
+
+### Billing: sin los saldos del garante ni la columna Balance ([#56](https://github.com/JulianGerardi/red-dental-studio/pull/56))
+- Con un paciente elegido se van *Guarantor Unapplied Credits* y *Guarantor Open Balance*, y la tabla pierde la columna
+  Balance (también el campo Balance del detalle de la fila y de *View full record*): son de la cuenta en todas las
+  locations y la pantalla filtra por una. *Find Patient* sigue mostrando el Balance de cada paciente: queda a decidir.
+- **Para el dev:** `ActividadReciente` pierde `creditos` y `saldo`; Billing pasa `saldo: undefined` al detalle y al
+  registro completo. `creditosNoAplicados` y `saldoDe` quedan en `data/billing.ts` sin uso en la tabla.
+
+### Patients: Today Appointments con el nombre como link ([#55](https://github.com/JulianGerardi/red-dental-studio/pull/55))
+- El nombre de cada fila de *Today Appointments* lleva directo a la ficha del paciente, como ya hacía *Recent
+  Patients*. El kebab sigue igual (Edit, Go to appointment).
+- **Para el dev:** `AppointmentCardCompacta` (`dashboard/AppointmentCard.tsx`) pasa el nombre a `Link`; el id sale de
+  `slug(appt.name)`, ahora exportado de `data/patientsStore.tsx` (el turno no trae el id del paciente). *Recent
+  Patients* ya mostraba sólo 10 con scroll interno desde el 13 de octubre, no se tocó.
+
 ### Dashboard: la sala vuelve a ser opcional y quedan las salas con scroll horizontal ([#54](https://github.com/JulianGerardi/red-dental-studio/pull/54))
 - Se deshace lo de #50 salvo el scroll: sin sala elegida por defecto; tocar una filtra sólo la Waiting Room y tocarla de
   nuevo (o el chip ✕) la suelta. Appointments muestra todas las salas y recupera su Filter. "Patients today" vuelve al 12
