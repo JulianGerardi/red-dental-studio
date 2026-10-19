@@ -999,3 +999,9 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `Odontogram` (el odontograma propio) deja de usarse en la app; sigue en el Builder y en su página. Decisiones en
   `figma/modulos/clinical-mode.md` (2026-10-18).
 
+
+## Today Appointments: el nombre es link (2026-10-19)
+
+*Elements / Appointment cards*: la fila *Patients list* dice ahora que el nombre lleva a la ficha del paciente (antes
+sólo el kebab hacía algo). Sin página nueva: `AppointmentCardCompacta` reusa el mismo estilo de link que `PersonCell`
+y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
