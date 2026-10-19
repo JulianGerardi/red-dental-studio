@@ -1,5 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{d as t,i as n}from"./ledger-2F-x73ca.js";import{n as r,t as i}from"./AplicarCreditoModal-BSkMjzrN.js";var a,o,s,c,l,u;function d(){return(d=e((()=>{t(),r(),a=n.find(e=>(e.creditoDisponible??0)>0)??n[0],o={title:`Components/Ledger/AplicarCreditoModal`,component:i,parameters:{layout:`fullscreen`,docs:{story:{inline:!1,iframeHeight:620}}},args:{m:a,cargos:n.filter(e=>e.tipo===`Charge`),onClose:()=>{},onAplicar:()=>{}}},s={},c={},l={args:{cargos:[]}},u=[`Default`,`ApplyDisabledUntilAmount`,`NoOpenCharges`],s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{}`,...s.parameters?.docs?.source}}},c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
-  args: {
-    cargos: []
-  }
-}`,...l.parameters?.docs?.source}}}})))()}d();export{c as ApplyDisabledUntilAmount,s as Default,l as NoOpenCharges,u as __namedExportsOrder,o as default};
