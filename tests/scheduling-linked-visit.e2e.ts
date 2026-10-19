@@ -9,9 +9,9 @@ async function hastaElPlan(app: any, screen: any) {
   await screen.getByRole('button', 'New appointment').first().tap()
   const drawer = screen.getByRole('dialog', 'New Appointment')
   await drawer.getByPlaceholder('Search by Name').first().fill('John')
-  await drawer.getByRole('button', 'John Smith').tap()
+  await drawer.getByRole('button', /^John Smith/).tap()
   await drawer.getByPlaceholder('Search by Name').nth(1).fill('Emily')
-  await drawer.getByRole('button', 'Dr. Emily Chen').tap()
+  await drawer.getByRole('button', /^Dr. Emily Chen/).tap()
   // Tocar Start Time despliega el calendario del día: elegir una franja completa la fecha y las dos horas.
   await drawer.getByRole('button', /^Select$/).nth(1).tap()
   await screen.getByRole('button', 'Schedule at 10 AM').tap()

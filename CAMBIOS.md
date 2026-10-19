@@ -36,6 +36,8 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Para el dev:** `OperatoryStrip` se borra; `OperatoryList` + `OperatoryCard` (`turnos`, `abierta`, `onToggle`,
   `onSelect`) y `LineaDelDia`. `Panel` suma `scroll`; hook `useAltoRestante`. `TaskRow` usa `StatusPill` para el estado. `Appointment.motivo` (mock). `AppointmentRow`
   baja TR/CC junto a Check In con `@sm`. El e2e del Dashboard se reescribió (ya no hay Show more a 1440px).
+  Además, `tests/scheduling-linked-visit.e2e.ts` busca las sugerencias por el comienzo del nombre: la segunda línea que
+  sumó #60 las había roto.
 
 ### Dashboard: tocar un turno abre la ficha flotante ([#61](https://github.com/JulianGerardi/red-dental-studio/pull/61))
 - La fila del turno (Appointments y Waiting Room) abre la ficha del paciente flotando al lado, como la card; antes sólo
