@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
-### Patients: Today Appointments con el nombre como link (PR_PENDIENTE)
+### Patients: Today Appointments con el nombre como link ([#55](https://github.com/JulianGerardi/red-dental-studio/pull/55))
 - El nombre de cada fila de *Today Appointments* lleva directo a la ficha del paciente, como ya hacía *Recent
   Patients*. El kebab sigue igual (Edit, Go to appointment).
 - **Para el dev:** `AppointmentCardCompacta` (`dashboard/AppointmentCard.tsx`) pasa el nombre a `Link`; el id sale de
