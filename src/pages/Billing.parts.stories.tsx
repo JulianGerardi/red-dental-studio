@@ -205,7 +205,7 @@ export const States: Story = {
           <Fila>
             <Estado titulo="Overview" nota="Toda la clínica, con las Tabs de tipo. Hover gris en cada fila." ancho={960}><Actividad /></Estado>
             <Estado titulo="Patient View" nota="Su nombre en el título, los saldos de su garante y sólo sus movimientos. Las filas ya no eligen." ancho={960}><Actividad elegido="Maria Abril Viola" /></Estado>
-            <Estado titulo="Patient View, payment open" nota="Un pago desplegado: Scope, Payment methods, la sede, cuánto se recibió y aplicó, y el cargo al que fue (el link abre su registro)." ancho={960}><Actividad elegido="Maria Abril Viola" abierta="act-Maria Abril Viola-1" /></Estado>
+            <Estado titulo="Patient View, payment open" nota="Un pago desplegado: Scope, la sede, cuánto se recibió y aplicó, y el cargo al que fue (el link abre su registro)." ancho={960}><Actividad elegido="Maria Abril Viola" abierta="act-Maria Abril Viola-1" /></Estado>
             <Estado titulo="Patient View, charge open" nota="Un cargo: lo cobrado, lo que pagaron el seguro y el paciente, y lo que falta de ese cargo." ancho={960}><Actividad elegido="Brent Crosby" abierta="act-Brent Crosby-0" /></Estado>
             <Estado titulo="Guarantor View" nota="Todo lo que paga su garante (acá John Hayes y Maria Abril Viola), con la columna Patient para distinguirlos." ancho={960}><Actividad elegido="Maria Abril Viola" vista="Guarantor View" /></Estado>
             <Estado titulo="Patient without activity" nota="Un paciente sin nada posteado: se puede registrar el primer pago desde los botones de arriba." ancho={960}><Actividad elegido="Brent Crosby" sinMovimientos /></Estado>

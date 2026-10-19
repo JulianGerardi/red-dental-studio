@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Detalle del Ledger y Billing más corto, con un solo "View full record"
+- En el detalle de una fila: los pies **View procedure / View payment / View adjustment** pasan a **View full record**,
+  igual que en Procedures y en los findings. Se van **Adjustment reason** (ya es el título), **Payment methods** y las
+  frases explicativas de debajo de Financial details y de las aplicaciones.
+- **Para el dev:** `LedgerRowDetail` usa `VerRegistroCompleto` (`ui/detail-list`) y pierde `Motivo` y `MetodosDePago`. El
+  e2e de Ledger busca ahora *View full record*.
+
+## 2026-10-19
+
 ### Dashboard: la sala vuelve a ser opcional y quedan las salas con scroll horizontal ([#54](https://github.com/JulianGerardi/red-dental-studio/pull/54))
 - Se deshace lo de #50 salvo el scroll: sin sala elegida por defecto; tocar una filtra sólo la Waiting Room y tocarla de
   nuevo (o el chip ✕) la suelta. Appointments muestra todas las salas y recupera su Filter. "Patients today" vuelve al 12

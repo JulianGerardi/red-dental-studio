@@ -999,3 +999,9 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `Odontogram` (el odontograma propio) deja de usarse en la app; sigue en el Builder y en su página. Decisiones en
   `figma/modulos/clinical-mode.md` (2026-10-18).
 
+
+## LedgerRowDetail más corto (2026-10-19)
+
+- *Components / Ledger / LedgerRowDetail*: sin Adjustment reason, sin Payment methods y sin las frases explicativas; el
+  pie de los cuatro tipos es **View full record** (`VerRegistroCompleto`). Playground, Parts, States y Specs al día.
+  Decisiones en `figma/modulos/ledger.md` (2026-10-19).
