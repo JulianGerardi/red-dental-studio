@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { OperatoryCard, LineaDelDia, type Operatory, type OperatoryStatus } from './OperatoryCard'
+import { OperatoryCard, LineaDelDia, OPERATORY_SURFACES, type Operatory, type OperatoryStatus } from './OperatoryCard'
 import type { Appointment } from './AppointmentCard'
 import { Bloque, Forzar, Lienzo, Muestra, Tabla, TablaPartes, Token, useMedidas } from '@/design-system/kit'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
+import { tokensDe } from '@/design-system/medir'
 
 type Args = { status: OperatoryStatus; name: string; provider: string; appointments: number; open: boolean; width: number }
 
@@ -28,6 +29,8 @@ const meta = {
       description: {
         component: [
           'Una sala del Dashboard (`@/components/dashboard/OperatoryCard`, diseño del artifact de Julián, 2026-10-19): el nombre, su estado (**Available**, **Busy**, **Unavailable**), cuántos pacientes tiene hoy y el profesional.',
+          '',
+          '**Toma el color de su estado:** borde y fondo, los de su pill (verde Available, azul Busy, rojo Unavailable), para ver de un vistazo qué sala está libre. La línea desplegada va sobre blanco (Julián, 2026-10-19).',
           '',
           '**Es un acordeón:** con `onToggle` la card es un botón (`aria-expanded`) y **tocarla despliega la línea del día de esa sala**: a la izquierda la hora y un punto unidos por una línea (tilde verde si ya se atendió, aro azul si viene), a la derecha el turno con el paciente, el motivo, el profesional y *Complete* o *Upcoming*; los que vienen van resaltados en azul. **No filtra nada de afuera**: la Waiting Room es independiente. Tocar un turno abre la ficha del paciente.',
           '',
@@ -88,7 +91,7 @@ export const Parts: Story = {
         ['Provider', 'Ícono de persona y el profesional; baja de renglón si no entra.', 'room.provider'],
         ['Timeline', 'Hora y punto a la izquierda, unidos por una línea; el turno a la derecha. Tilde verde = Complete, aro azul = Upcoming.', 'LineaDelDia'],
         ['Appointment', 'Iniciales, nombre, motivo, profesional y el estado. Upcoming va con borde y fondo azul; tocarlo abre la ficha.', 'turnos · onSelect'],
-        ['Open', 'La card desplegada lleva un anillo azul de 1px.', 'abierta'],
+        ['Surface', 'Borde de 1px y fondo del color del estado, los de su pill; desplegada, suma la sombra de panel y la línea va sobre blanco.', 'OPERATORY_SURFACES · abierta'],
       ]} />
       <Bloque titulo="The timeline on its own" nota="LineaDelDia es lo que se despliega; se puede usar suelta.">
         <Panel ancho={320}><LineaDelDia room={SALA} turnos={TURNOS.slice(0, 3)} onSelect={nada} /></Panel>
@@ -164,11 +167,18 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Complete card</td><td>white · <Token nombre="line-row" /> border</td></tr>
         </Tabla>
       </Bloque>
+      <Bloque titulo="Colors" nota="De OPERATORY_SURFACES (OperatoryCard.tsx): el mismo par de tokens que la pill de cada estado.">
+        <Tabla encabezado={['Status', 'Fill', 'Border']} minimo={480}>
+          {(Object.keys(OPERATORY_SURFACES) as OperatoryStatus[]).map((s) => {
+            const t = tokensDe(OPERATORY_SURFACES[s])
+            return <tr key={s}><td className="font-semibold">{s}</td><td><Token nombre={t.fondo} /></td><td><Token nombre={t.borde} /></td></tr>
+          })}
+        </Tabla>
+      </Bloque>
       <Bloque titulo="Card">
         <Tabla encabezado={['Part', 'Value']} minimo={480}>
-          <tr><td className="font-semibold">Open ring</td><td><Token nombre="dash-blue" /> · 1px</td></tr>
+          <tr><td className="font-semibold">Open</td><td>shadow-panel · timeline on white</td></tr>
           <tr><td className="font-semibold">Patients today</td><td><Token nombre="dash-count-bg" /> · <Token nombre="dash-blue-hover" /></td></tr>
-          <tr><td className="font-semibold">Surface</td><td>white · shadow-inner-card (TARJETA_INTERNA)</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>

@@ -691,6 +691,15 @@ sólo se ve una sala por vez), y si la sexta card asomando alcanza para entender
 
 > **Reemplazado el 2026-10-19 (noche):** las salas dejaron de ser una tira; ver *Salas como acordeón…* más arriba.
 
+## Colores en las salas y Pending Task con el diseño de Pending documents (2026-10-19, madrugada)
+
+Julián: "acordate que las rooms tenían colores"; "que los pending task tengan el mismo diseño que Pending documents del Patient Dashboard, y ya que estás ahí cambiá también el de Pending Task, así queda amoldado; poné primero Pending documents y abajo Pending Task".
+
+- **Las salas vuelven con el color de su estado** (borde y fondo, los de su pill: verde, azul, rojo; `OPERATORY_SURFACES`), ahora sobre el acordeón. Desplegada, la línea del día va sobre blanco dentro de la misma caja.
+- **Pending Task con el diseño de Pending documents** (`PendingTaskList` + `TaskRow`): grupos por tipo con el rótulo en versalitas y la cuenta (Clinical Note · 2…), las filas en una caja con divisores finos, y cada fila con el ícono del tipo en un cuadrado celeste, el tipo con las pills *Requested* y *Expired date*, "paciente · Register fecha" en gris, el vencimiento a la derecha (fecha en rojo y *Expiration date* debajo), el botón del documento y *Complete this Task*. Es el mismo diseño en el Dashboard y en el Patient Dashboard. Mismas partes que la card; se fue el avatar con las iniciales del paciente (queda el nombre).
+- **Patient Dashboard:** Pending documents va primero y Pending Task abajo.
+- **A validar:** que agrupar por tipo sirva a quien atiende (hoy el filtro del panel hace lo mismo) y que el avatar del paciente no se extrañe.
+
 ## Salas como acordeón, Waiting Room independiente y cuatro columnas que entran en la pantalla (2026-10-19, noche)
 
 Julián, con un artifact de referencia (Dashboard con el panel *Rooms*): "cuando aprieto una room se despliega el detalle de

@@ -10,8 +10,7 @@ import { ClinicalItemModal } from '@/components/patients/ClinicalItemModal'
 import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clinicalItems'
 import { aviso } from '@/components/ui/toaster'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
-import { TaskRow } from '@/components/dashboard/DashboardRows'
-import { ListGroup } from '@/components/ui/list-group'
+import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
 import { ShowMore } from '@/components/ui/show-more'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
@@ -138,20 +137,20 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
               (patient-dashboard.md, 2026-10-17). */}
           <div className="grid gap-5 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_280px]">
             <div className="flex min-w-0 flex-col gap-5">
+              {/* En lugar de la tabla de Insurance (que sigue en su sección): los documentos pendientes a resolver. Van
+                  primero y las tareas abajo, con el mismo diseño (Julián, 2026-10-19). */}
+              <Card className="p-5">
+                <PendingDocuments />
+              </Card>
+
               <Card className="p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
                   <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
                 </div>
-                {/* Las tareas en filas, las mismas del Dashboard: menos alto con las mismas partes. */}
-                <ListGroup className="mt-4" limit={TOPE.tareas} label="pending tasks">
-                  {TASKS.map((t, i) => <TaskRow key={i} task={t} />)}
-                </ListGroup>
-              </Card>
-
-              {/* En lugar de la tabla de Insurance (que sigue en su sección): los documentos pendientes a resolver. */}
-              <Card className="p-5">
-                <PendingDocuments />
+                <div className="mt-4">
+                  <PendingTaskList tasks={TASKS} limit={TOPE.tareas} />
+                </div>
               </Card>
             </div>
 

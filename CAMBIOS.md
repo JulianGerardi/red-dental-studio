@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Pending Task con el diseño de Pending documents, Pending documents primero y salas con color ([#67](https://github.com/JulianGerardi/red-dental-studio/pull/67))
+- **Pending Task** (Dashboard y Patient Dashboard) toma el diseño de Pending documents: grupos por tipo, filas en una caja
+  con divisores y, en cada una, ícono del tipo, pills *Requested* y *Expired date*, vencimiento, documento y *Complete this
+  Task*. En el Patient Dashboard, **Pending documents va primero** y Pending Task abajo.
+- **Las salas vuelven a tener el color de su estado** (verde, azul, rojo) sobre el acordeón.
+- **Para el dev:** `PendingTaskList` nuevo; `TaskRow` (`DashboardRows.tsx`) rehecho y sin `DocYVencida`; `OPERATORY_SURFACES`
+  vuelve a `OperatoryCard.tsx`. `PatientDetail.tsx` usa `PendingTaskList` y cambia el orden de los dos bloques.
+
 ### El banner amarillo, sin el tope de ancho de la página ([#66](https://github.com/JulianGerardi/red-dental-studio/pull/66))
 - Ajuste sobre el PR #62: el banner amarillo medía lo mismo que el `max-w-[1400px]/1800px` de `ANCHO_PAGINA` (el
   mismo tope que el título y las cards), así que en pantallas muy anchas seguía con aire a los costados en vez de ir

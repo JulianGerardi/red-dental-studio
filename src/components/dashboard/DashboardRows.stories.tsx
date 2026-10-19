@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { AppointmentRow, ChipsTurno, DocYVencida, NombreTurno, TaskRow } from './DashboardRows'
+import { AppointmentRow, ChipsTurno, NombreTurno, TaskRow } from './DashboardRows'
 import { DIAS } from './dashboard-data'
 import type { AccionTurno } from './AppointmentCard'
 import { Bloque, Lienzo, Muestra, Tabla, TablaPartes, Token, useMedidas } from '@/design-system/kit'
@@ -85,18 +85,17 @@ export const Parts: Story = {
           <ChipsTurno />
         </div>
       </Bloque>
-      <Bloque titulo="Task row" nota="Lo mismo que PendingTaskCard, en el mismo orden y cada parte pegada a la que acompaña: el tipo con Requested, el paciente con el documento y Expired date, las fechas; el aire libre va antes del botón. Angosta (Patient Dashboard) y ancha (Pending Task del Dashboard).">
+      <Bloque titulo="Task row" nota="Con el diseño de Pending documents (2026-10-19): el ícono del tipo, el tipo con sus pills, quién y cuándo se registró, el vencimiento, el documento y el botón. Las mismas partes que PendingTaskCard. Se agrupa en PendingTaskList.">
         <Caja ancho={400}><li><TaskRow task={TAREA} /></li></Caja>
         <Caja ancho={1100}><li><TaskRow task={TAREA} /></li></Caja>
         <TablaPartes partes={[
-          ['Kind', 'El tipo de tarea en 14px Bold, el título de la card.', 'task.kind'],
-          ['Requested', 'El estado en una pill azul (la del Check In de los turnos): debajo del tipo en la fila ancha, al lado en la angosta (2026-10-19).', 'task.state · StatusPill'],
-          ['Patient', 'Iniciales en el cuadrado celeste y el nombre, como en la card.', 'task.initials · task.person'],
-          ['Document · Expired date', 'El botón rojo del documento y el aviso ámbar de la card.', 'DocYVencida'],
-          ['Register · Expiration date', 'Las dos fechas con su rótulo: Register en azul, Expiration date en rojo.', 'task.register · task.expiration'],
-          ['Complete this Task', 'El botón de la card, en sm: el mismo texto y el mismo aviso.', 'Button · completarTarea'],
+          ['Icon', 'El ícono del tipo (nota clínica, laboratorio, receta, derivación) en un cuadrado celeste de 36px.', 'task.kind'],
+          ['Kind · Requested · Expired date', 'El tipo en 13px Semibold y dos pills al lado: el estado (azul) y Expired date (ámbar).', 'task.kind · task.state · Pill'],
+          ['Patient · Register', 'Una línea gris: el paciente y la fecha en que se registró.', 'task.person · task.register'],
+          ['Expiration date', 'A la derecha, la fecha en rojo y su rótulo debajo.', 'task.expiration'],
+          ['Document', 'El botón rojo del documento.', 'Open document'],
+          ['Complete this Task', 'El botón en sm: el mismo texto y el mismo aviso.', 'Button · completarTarea'],
         ]} />
-        <DocYVencida />
       </Bloque>
     </Lienzo>
   ),
