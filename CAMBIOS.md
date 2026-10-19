@@ -3,7 +3,7 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
-## 2026-10-18
+## 2026-10-19
 
 ### La flecha de desplegar, en toda fila que se despliega ([#52](https://github.com/JulianGerardi/red-dental-studio/pull/52))
 - El Ledger y Ledger Transactions (Patient Payment, Credit Adjustment, Post Payment) se desplegaban sin flecha; Billing,
@@ -12,6 +12,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Para el dev:** `RowChevron` nuevo en `ui/data-table.tsx`; lo usan DataTable (`rowDetail`), `TablaProcedimientos`,
   el Ledger y `LedgerAllocationTable`. `LedgerRowDetail` suma `sangria`. *Audit / Tables in the app* marca una tabla
   que se despliegue sin flecha.
+
+### Dashboard: sala siempre elegida, "Patients today" que coincide y salas con scroll horizontal ([#50](https://github.com/JulianGerardi/red-dental-studio/pull/50))
+- **La sala elegida filtra Appointments y Waiting Room** (antes sólo la sala de espera) y **siempre hay una**, la primera
+  por defecto; tocar otra la cambia. El chip junto al título dice cuál. El filtro por operatorio de Appointments sale
+  (lo reemplaza la sala); Pending Task conserva el suyo.
+- **"Patients today" es la cantidad de turnos de esa sala** (era un 12 fijo): coincide con las cards que se ven.
+- **Las salas van en una fila con scroll horizontal** (232px mínimo, snap) en lugar de "Show N more".
+- **Para el dev:** `OperatoryStrip` pierde `ShowMore`; `elegida` es la sala mostrada y `onElegir(nombre)` la cambia (sin
+  soltar). `Dashboard.tsx` calcula `patientsToday` de `dia.appointments`; se van `salas` (filtro) y `salaEspera`. Datos:
+  Operatory 6 Available y un turno nuevo en Operatory 4. e2e en `tests/dashboard.e2e.ts`.
+
+## 2026-10-18
 
 ### Topbar: locación, buscador y perfil más chicos ([#51](https://github.com/JulianGerardi/red-dental-studio/pull/51))
 - Locación y buscador pasan de 32 a **28px** de alto (texto de 13 y 12px, íconos de 14px) y el botón del perfil de 40 a 32px
