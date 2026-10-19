@@ -999,3 +999,9 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
 - `Odontogram` (el odontograma propio) deja de usarse en la app; sigue en el Builder y en su página. Decisiones en
   `figma/modulos/clinical-mode.md` (2026-10-18).
 
+## Billing sin saldos de la cuenta (2026-10-19)
+
+- *Pages / Parts / Billing*: sin *Guarantor numbers*, sin la columna Balance y sin los saldos en States y Specs; la tabla
+  y el detalle de la fila no muestran el saldo de la cuenta (es de todas las locations y la pantalla filtra por una).
+  Decisión en `figma/modulos/billing.md` (2026-10-19).
+
