@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Patients y Billing: la barra lateral termina a la altura de la tabla, sin hueco ni disparejo ([#68](https://github.com/JulianGerardi/red-dental-studio/pull/68))
+- Recent Patients (Patients) y Find Patient (Billing) ya no adivinan un número fijo de filas: toman el alto medido de
+  la columna de la tabla y muestran las que entren completas ahí, sin dejar hueco ni pasarse.
+- **Para el dev:** `ui/show-more` suma `llenarAlto` (sólo junto con `enCaja`, sólo en el panel `flex-1` de verdad: mide
+  la primera fila + `ResizeObserver` en vez de usar `limit` fijo). `children` tiene que devolver las filas sueltas, no
+  envueltas en un único contenedor (`<ul>`). Piso de `min-h-[220px]` para cuando la tabla es muy corta.
+
 ### El banner amarillo, sin el tope de ancho de la página ([#66](https://github.com/JulianGerardi/red-dental-studio/pull/66))
 - Ajuste sobre el PR #62: el banner amarillo medía lo mismo que el `max-w-[1400px]/1800px` de `ANCHO_PAGINA` (el
   mismo tope que el título y las cards), así que en pantallas muy anchas seguía con aire a los costados en vez de ir
