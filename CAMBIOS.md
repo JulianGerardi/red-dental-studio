@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-19
 
+### Billing y Patients: título pegado al buscador ([#65](https://github.com/JulianGerardi/red-dental-studio/pull/65))
+- Find Patient (Billing) y Today Appointments / Recent Patients (Patients): el encabezado del panel baja de 52 a 40px y
+  el cuerpo arranca sin padding arriba. Today (Billing) usa la medida de las cards compactas de Patients.
+- **Para el dev:** se aplica con `[&>header]:min-h-10` y `pt-0` en esos paneles (`TITULO_PEGADO` en `Billing.tsx`);
+  `Panel` no cambia.
+
 ### Billing: todo a la vista sin scroll ([#63](https://github.com/JulianGerardi/red-dental-studio/pull/63))
 - Find Patient muestra 3 pacientes y "Show N more" abre el resto con scroll adentro; Today pasa a filas compactas y las
   5 cards de arriba llevan menos padding. La tabla de Recent Billing Activity muestra 8 filas por página (antes 15).
