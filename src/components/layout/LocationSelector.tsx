@@ -145,19 +145,19 @@ export function LocationSelector() {
         aria-expanded={open}
         aria-haspopup="dialog"
         className={cn(
-          'flex h-8 items-center gap-3 rounded-md border bg-white py-1 pr-[11px] pl-[7px] transition-colors',
+          'flex h-7 items-center gap-2.5 rounded-md border bg-white py-1 pr-[9px] pl-[7px] transition-colors',
           /* Abierto, el selector toma borde azul (Figma: border-dash-blue). */
           open ? 'border-dash-blue' : 'border-line',
         )}
       >
-        <MapPin className="text-dash-blue size-4 shrink-0" />
-        <span className="text-sm leading-none whitespace-nowrap">
+        <MapPin className="text-dash-blue size-3.5 shrink-0" />
+        <span className="text-[13px] leading-none whitespace-nowrap">
           <span className="text-dash-blue">{elegida.name}</span>{' '}
           <span className="font-medium text-black">- {elegida.ciudad}</span>
         </span>
         <ChevronDown
           className={cn(
-            'size-4 shrink-0 text-[#0f172a] transition-transform duration-200',
+            'size-3.5 shrink-0 text-[#0f172a] transition-transform duration-200',
             open && 'rotate-180',
           )}
         />

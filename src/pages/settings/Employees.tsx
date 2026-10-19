@@ -107,7 +107,7 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
         <DataTable
           columns={[
             /* El nombre es el acceso a la ficha, como en la tabla de pacientes. */
-            { key: 'nombre', header: 'Full Name', width: 240, cell: (e) => <PersonCell tone="soft" name={e.nombre} initials={e.iniciales} to={`/settings/team/${e.id}`} /> },
+            { key: 'nombre', header: 'Full Name', width: 240, cell: (e) => <PersonCell name={e.nombre} initials={e.iniciales} to={`/settings/team/${e.id}`} /> },
             { key: 'cumple', header: 'Birthdate', width: 120, cell: (e) => <TextCell>{e.cumpleanos}</TextCell> },
             { key: 'email', header: 'Email', cell: (e) => <TextCell>{e.email}</TextCell> },
             { key: 'provider', header: 'Is Provider', width: 100, cell: (e) => <ProviderPill si={e.esProvider} /> },
@@ -243,7 +243,7 @@ export function SettingsEmployeeDetail() {
                     iniciales={empleado.iniciales}
                     onChange={setFoto}
                     label={empleado.nombre}
-                    avatarClassName="bg-dash-count-bg text-dash-blue-hover size-14 rounded-lg text-base"
+                    size={56}
                   />
                   <span>
                     <span className="block text-xl font-bold text-ink">{empleado.nombre}</span>

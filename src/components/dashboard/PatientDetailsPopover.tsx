@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { useAnclaje } from '@/lib/anclaje'
 import { ICONO_SUELTO } from '@/lib/estilos'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Figma 4430:57474 — rediseño del popup del paciente (357×488).
    Ya no es la tarjeta con barra azul y avatar montado: ahora es una card
@@ -116,9 +117,7 @@ export function PatientDetailsPopover({
       </button>
 
       <div className="flex items-center gap-3 pr-9">
-        <span className="bg-dash-blue-hover flex size-[72px] shrink-0 items-center justify-center rounded-full border-4 border-white text-xl font-semibold text-white">
-          {initials}
-        </span>
+        <Avatar initials={initials} size={72} />
         {/* Verde y radio de 4430:57478 (#1e9850, radio 8), el mismo botón que
             la ficha. El alto va en el escalón md del sistema (36) y no en los
             32 del nodo, que quedaban chicos al lado del avatar.

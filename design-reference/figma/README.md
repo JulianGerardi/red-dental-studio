@@ -420,6 +420,28 @@ Todos los controles de formulario responden, no son decorativos:
 - La **búsqueda de Patients** ya filtraba la tabla; el **filtro de fecha** del
   Dashboard ya filtraba los turnos.
 
+## Regla: un solo avatar de persona (2026-10-18)
+
+Julián marcó que los avatares no seguían un estilo: las tablas de Patients y Employees, Relationships, el panel del
+paciente y varias listas los dibujaban en círculo (azul o celeste), mientras el Dashboard y Billing usaban un cuadrado
+con esquinas redondeadas. Pidió homologar todo al de la card de **Appointments** del Dashboard ("NJ").
+
+- **Toda persona** (paciente, provider, empleado, dueño de la cuenta, el usuario del topbar) va con `ui/avatar`:
+  cuadrado con esquinas redondeadas, `dash-blue` con las iniciales en blanco Semibold. Se acabó el celeste para el
+  equipo: la tabla ya dice quién es quién y el color distinto no agregaba información (además, no era parejo: el
+  paciente del drawer de Scheduling y el de Pending Task iban en celeste).
+- **Esquina proporcional:** token `--radius-avatar` = 27% (`rounded-avatar`). A 44px da los 12px de la card de turno;
+  a 32px, 9px. Un radio fijo se veía casi redondo en 24px y casi recto en 72px.
+- **Escala de nueve tamaños** (24, 28, 32, 36, 40, 44, 56, 62, 72), cada uno con su letra. No se cambió el tamaño de
+  ninguna pantalla: se tomaron los que ya había. El de Clinical Mode (23.71 del Figma) pasa a 24.
+- **Lo que no es una persona no usa el avatar:** las locaciones siguen en su cuadrado celeste, el logo vacío de la
+  cuenta en celeste (misma forma que el del Owner, que era la intención) y la marca "RD" de Forgot password redonda.
+- *Currently being seen* deja el verde en los avatares: el "en vivo" ya lo dice el glow del borde y el título verde.
+- El popover del paciente del Dashboard pierde el borde blanco de 4px: sobre el fondo `#fafbfe` no se veía y sólo
+  achicaba el color a 64px.
+
+Elements / Avatars documenta la escala, las partes y los estados (con foto y editable).
+
 ## Foto de perfil editable (2026-09-03)
 
 Los avatares de iniciales de un empleado y de un paciente se pueden cambiar
@@ -430,10 +452,13 @@ de archivos del sistema; la imagen elegida reemplaza las iniciales
 los dos lugares, con distinto `avatarClassName` porque la forma y el color no
 son los mismos:
 
-- **Ficha de un empleado** (`Employees.tsx`): cuadrado, fondo celeste
-  (`bg-dash-count-bg`). Elena Martinez es el caso de prueba.
+- **Ficha de un empleado** (`Employees.tsx`): 56px. Elena Martinez es el caso de prueba.
 - **Panel del paciente** (`PatientSidePanel.tsx`, el panel izquierdo de las
-  seis pantallas del dashboard): círculo, fondo azul sólido.
+  seis pantallas del dashboard): 62px.
+
+Desde el 2026-10-18 los dos tienen la forma y el color de todos los avatares (ver *Regla: un solo avatar de persona*);
+antes uno era un cuadrado celeste y el otro un círculo azul. `EditableAvatar` recibe `size` en vez de
+`avatarClassName`.
 
 La foto se guarda en `localStorage` (`usePhoto` en `src/lib/usePhoto.ts`), no
 en el estado del componente: el panel del paciente se vuelve a montar en cada

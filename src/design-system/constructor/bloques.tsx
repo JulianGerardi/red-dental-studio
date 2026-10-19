@@ -37,7 +37,7 @@ import { StepIndicator } from '@/components/ui/step-indicator'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { SearchButton } from '@/components/ui/search-button'
 import { FilterMenu } from '@/components/ui/filter-menu'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar } from '@/components/ui/avatar'
 import { StatStrip } from '@/components/dashboard/StatStrip'
 import { OperatoryCard, type Operatory } from '@/components/dashboard/OperatoryCard'
 import { PatientCard } from '@/components/patients/PatientCard'
@@ -727,9 +727,7 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
     case 'persona':
       return (
         <div className="flex items-center gap-3">
-          <Avatar className={b.grande ? 'size-[62px]' : 'size-10'}>
-            <AvatarFallback className={cn('bg-dash-blue-hover text-surface-subtle', b.grande ? 'text-xl' : 'text-[13px]')}>{iniciales(b.nombre)}</AvatarFallback>
-          </Avatar>
+          <Avatar initials={iniciales(b.nombre)} size={b.grande ? 62 : 40} />
           <div className="flex min-w-0 flex-col gap-0.5">
             <span className="flex items-center gap-2">
               <span className={cn('truncate font-semibold text-ink', b.grande ? 'text-lg' : 'text-[15px]')}>{b.nombre}</span>
@@ -1430,13 +1428,11 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor): string[
       ]
     }
     case 'persona': {
-      importar(c, '@/components/ui/avatar', 'Avatar', 'AvatarFallback')
+      importar(c, '@/components/ui/avatar', 'Avatar')
       if (b.estado) importar(c, '@/components/ui/pill', 'Pill')
       return [
         `<div className="flex items-center gap-3">`,
-        `  <Avatar className="${b.grande ? 'size-[62px]' : 'size-10'}">`,
-        `    <AvatarFallback className="bg-dash-blue-hover text-surface-subtle ${b.grande ? 'text-xl' : 'text-[13px]'}">${iniciales(b.nombre)}</AvatarFallback>`,
-        `  </Avatar>`,
+        `  <Avatar initials="${iniciales(b.nombre)}" size={${b.grande ? 62 : 40}} />`,
         `  <div className="flex min-w-0 flex-col gap-0.5">`,
         `    <span className="flex items-center gap-2">`,
         `      <span className="truncate font-semibold text-ink ${b.grande ? 'text-lg' : 'text-[15px]'}">${texto(b.nombre)}</span>`,

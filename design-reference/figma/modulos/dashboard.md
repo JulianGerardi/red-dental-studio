@@ -648,6 +648,21 @@ derecha, alineados al botón azul" y "agregá más cards, así queda prolijo y v
 - Inputs del header medidos: locación 32, buscador 32, botón de perfil 40 (avatar de 32 + 4 de aire), campana 28. Los
   de 32 son el tamaño `md` de los botones; no se tocaron.
 
+## Un solo avatar de persona (2026-10-18)
+
+El avatar de la card de Appointments (44px, esquina 12) es la referencia que se toma para toda la app: `ui/avatar`.
+Pending Task y las filas pasan del celeste al azul; el popover del paciente, del círculo al cuadrado redondeado (sin el
+borde blanco). Regla en `../README.md`.
+
+## Topbar: inputs del header más chicos (2026-10-18)
+
+Julián: "achicá un poco esos inputs del header" (locación, buscador y perfil).
+
+- Locación y buscador: 32 → **28px** (tamaño `sm` de los botones); texto 13px y 12px, íconos de 14px. Perfil: avatar de 28
+  y botón de 32px (antes 40); nombre y rol a 11px. La campana ya era de 28.
+- **A validar:** que 12px en el buscador siga leyéndose bien en monitores chicos y para quien tiene baja visión; el área
+  de toque de 28px queda justo para el mouse, pero es el mínimo para pantallas táctiles.
+
 ## Sala siempre elegida, número que coincide y tira con scroll horizontal (2026-10-19)
 
 Julián: "los Patients today, cuando clickeo, no coinciden con las cards que muestra"; "siempre debería estar marcada una
