@@ -46,6 +46,8 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   del chip junto al título vuelve a mostrar a todos.
 - `tests/clinical-mode.e2e.ts` (2026-10-13): en DentAssmt, *View full record* del menú del finding Tooth 3 abre su
   registro (Source exam) y el link a D2391 cambia el drawer a ese procedimiento.
+  (2026-10-18) El Overview arranca con *Last Condition: Caries* (20/06/2025); Show details lleva a DentAssmt, Add
+  Condition carga un D2740 y al volver con Overwiev el aviso dice *Last Condition: Crown…*.
 - `tests/ledger.e2e.ts` (2026-10-14): el detalle de D4341 muestra su caso, Northgate Clinic y Outstanding transaction
   balance $170; con la búsqueda puesta, el link del pago abre su registro. El de un pago muestra Scope, Payment methods,
   a qué cargos fue y Apply credit. View procedure abre Procedures en Clinical Mode con la fila abierta.

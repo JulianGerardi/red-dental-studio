@@ -9,6 +9,7 @@ import { ToothInfoPanel } from '@/components/clinical/dental/ToothInfoPanel'
 import { CarasLinguales } from '@/components/clinical/dental/CarasLinguales'
 import { PeriodontalTabs } from '@/components/clinical/dental/PeriodontalTabs'
 import { PerioPdArrastre } from '@/components/clinical/dental/PerioPdArrastre'
+import { sincronizarOdontograma } from '@/components/clinical/dental/estadoOdontograma'
 import '@/styles/odontogram-scoped.css'
 import '@/styles/odontogram-theme.css'
 
@@ -36,13 +37,13 @@ const COLORES = {
   accent2: '#1a804d',
 }
 
-const TEMA: OdontogramThemeConfig = { colors: COLORES }
+export const TEMA: OdontogramThemeConfig = { colors: COLORES }
 
 /* `themeConfig` sólo alcanza al nodo interno de la librería, pero el CSS
    acotado define `--text: var(--odon-text, ...)` en `.odonto-embed` -este
    wrapper-, que está más arriba: las variables no llegaban y quedaban los
    colores de fábrica. Se declaran también acá, que es donde se leen. */
-const VARIABLES = {
+export const VARIABLES = {
   '--odon-bg': COLORES.background,
   '--odon-panel': COLORES.panel,
   '--odon-card': COLORES.card,
@@ -137,6 +138,9 @@ export function OdontogramEmbed({
   const [reinicio, setReinicio] = useState(0)
   /* Pasos en los que se cambió algo: el resto queda como pendiente. */
   const [tocados, setTocados] = useState<string[]>([])
+
+  /* Lo cargado sigue al volver al examen y se ve en el Overview (estadoOdontograma). */
+  useEffect(() => sincronizarOdontograma({ editable: true }), [])
 
   /* La cruz descarta: vuelve el odontograma al default. Para guardar lo
      hecho y sacar los controles de en medio está el minimizar. Se apoya en

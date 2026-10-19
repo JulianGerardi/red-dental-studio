@@ -733,6 +733,16 @@
   stroke: #dc2626 !important;
 }
 
+/* Las caras oclusal, mesial y distal son un grupo (`g#caries-occlusal`) con
+   la forma adentro (`*-shape`), y el negro horneado está en esa forma: el
+   selector por `id` pintaba el grupo y la caries seguía negra
+   (2026-10-18). Los `*-patch` son el brillo blanco y no se tocan. */
+.odonto-embed [id^="caries-"] [id$="-shape"],
+.odonto-embed .caries-clon [id$="-shape"] {
+  fill: #dc2626 !important;
+  stroke: #dc2626 !important;
+}
+
 /* El "None" del selector de superposición (arriba de cada tab) quedaba
    ilegible al activarse: el CSS de la librería trae DOS reglas para
    `.is-active` -una pone el texto en blanco, la otra (más abajo en la
@@ -742,3 +752,41 @@
   color: #fff;
 }
 
+
+/* ─── Overview de Clinical Mode: el chart de DentAssmt de sólo lectura ────
+   `OdontogramaResumen` monta sólo la grilla (`OdontogramChartSurface`) con
+   `readOnly`. Se van la ayuda "Click a tooth…", Status/Plan y los botones de
+   vista: acá no se toca nada. La pieza de la última condición (`.es-ultima`)
+   va como la elegida del frame: borde azul y el número en una pastilla
+   azul. Ver clinical-mode.md (2026-10-18). */
+.odonto-embed.odonto-resumen .chart-hint,
+.odonto-embed.odonto-resumen .chart-mode-toggle,
+.odonto-embed.odonto-resumen .proposed-legend,
+.odonto-embed.odonto-resumen .chart-actions {
+  display: none;
+}
+
+.odonto-embed.odonto-resumen .tooth-tile,
+.odonto-embed.odonto-resumen .tooth-label-cell {
+  cursor: default;
+}
+
+.odonto-embed.odonto-resumen .tooth-tile:hover {
+  background: #ffffffb3;
+}
+
+.odonto-embed.odonto-resumen .tooth-tile.es-ultima {
+  border-color: var(--color-dash-blue);
+  background: var(--color-dash-count-bg);
+}
+
+.odonto-embed.odonto-resumen .tooth-label-cell.es-ultima {
+  align-self: center;
+  justify-self: center;
+  min-width: 36px;
+  min-height: 0;
+  padding: 2px 0;
+  border-radius: 6px;
+  background: var(--color-dash-blue);
+  color: #fff;
+}

@@ -951,3 +951,15 @@ Reemplaza la sección del 2026-10-08 de este mismo PR (#18), que nunca llegó a 
   (variante, cuántos procedimientos, enviando), Parts (partes, qué hace cada botón, cuándo aparece, dónde se usa),
   States (cada caso en su iframe, más la caja de resumen sola) y Specs (medidas, colores y la lógica).
   Decisiones en `figma/modulos/clinical-mode.md` (2026-10-17).
+
+## Clinical Mode: el chart del Overview es el de DentAssmt (2026-10-18)
+
+- *Components / Clinical / Overview chart* nueva (`OdontogramaOverview` y `OdontogramaLectura`): **Playground** en iframe
+  (condición: la del frame, una recién cargada, sin pieza, nombre largo; ampliado), **Parts** (qué hace cada parte y de
+  dónde sale la última condición), **States** (cada uno en su iframe: Default, Charted now, Without a tooth, Long name,
+  Expanded, Chart only, porque la librería del odontograma es una sola por página) y **Specs** (medidas, tokens y reglas).
+- *Components / Clinical / TreatmentPlanList* suma el control *llena*, **Fill the column** (la card al alto de la
+  columna de al lado) y **Specs**.
+- `Odontogram` (el odontograma propio) deja de usarse en la app; sigue en el Builder y en su página. Decisiones en
+  `figma/modulos/clinical-mode.md` (2026-10-18).
+

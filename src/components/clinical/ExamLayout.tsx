@@ -18,6 +18,7 @@ import { ConfirmProcedureDialog } from './dental/ConfirmProcedureDialog'
 import { useExamReviews } from './dental/useExamReviews'
 import { ACTIONS, type FindingAction } from './dental/actions'
 import { quadrantTeeth, type Finding } from './dental/data'
+import { ULTIMA_CONDICION, type UltimaCondicion } from '@/data/clinical-mode'
 
 /* Lo que comparten todos los exámenes de Clinical Mode (Julián, 2026-10-03): el panel de Findings a la izquierda (menos
    en Vitals) y arriba del contenido las acciones Add Procedure, Add Condition y View Problem List, blancas y con el texto
@@ -50,7 +51,9 @@ const BOTON_ACCION = cn(BOTON_EXPANDIBLE, 'border-line bg-white shadow-[0_1px_2p
 function useEstadoFindings() {
   const [findings, setFindings] = useState<Finding[]>(INITIAL_FINDINGS)
   const reviews = useExamReviews(INITIAL_REVIEWS, HOY)
-  return { findings, setFindings, reviews }
+  /* Lo último que se cargó con Add Condition: lo muestra el Overview (clinical-mode.md, 2026-10-18). */
+  const [ultima, setUltima] = useState<UltimaCondicion>(ULTIMA_CONDICION)
+  return { findings, setFindings, reviews, ultima, setUltima }
 }
 type EstadoFindings = ReturnType<typeof useEstadoFindings>
 const FindingsCtx = createContext<EstadoFindings | null>(null)
@@ -60,6 +63,9 @@ export function ExamFindingsProvider({ children }: { children: ReactNode }) {
   const estado = useEstadoFindings()
   return <FindingsCtx.Provider value={estado}>{children}</FindingsCtx.Provider>
 }
+
+/** La última condición cargada; sin provider (un story), la del frame. */
+export const useUltimaCondicion = () => useContext(FindingsCtx)?.ultima ?? ULTIMA_CONDICION
 
 export function ExamLayout({ findings: conFindings = true, examen, extra, children }: {
   /** El panel de Findings a la izquierda. Vitals no lo lleva. */
@@ -72,7 +78,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, childr
 }) {
   /* Fuera de ClinicalMode (un story) no hay provider: el examen usa su propio estado. */
   const local = useEstadoFindings()
-  const { findings, setFindings, reviews: reviewState } = useContext(FindingsCtx) ?? local
+  const { findings, setFindings, reviews: reviewState, setUltima } = useContext(FindingsCtx) ?? local
 
   const [procedureOpen, setProcedureOpen] = useState<'procedure' | 'condition' | null>(null)
   const [editing, setEditing] = useState<Finding | null>(null)
@@ -95,6 +101,9 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, childr
       },
       ...f,
     ])
+    if (procedureOpen === 'condition') {
+      setUltima({ condicion: draft.procedure.label, actualizado: new Date().toLocaleDateString('en-GB'), pieza: tooth, examen })
+    }
     aviso.ok(`${draft.procedure.code} charted as ${draft.status.toLowerCase()} on ${tooth !== null ? `tooth ${tooth}` : draft.area.toLowerCase()}.`)
   }
 
