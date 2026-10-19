@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { Search, Plus, CalendarDays, Users } from 'lucide-react'
 import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTable'
 import { PatientCard } from '@/components/patients/PatientCard'
@@ -21,8 +21,11 @@ import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 /* Barra lateral junto a la tabla, desde la altura del título: Today Appointments y Recent Patients, los dos con el
    mismo Panel que el Dashboard y la card compacta de cada fila. Cada lista muestra unas pocas filas enteras y "Show N
    more" abre el resto con scroll adentro (ui/show-more): nunca queda una fila cortada ni la barra se estira con la
-   tabla. Decisiones en design-reference/figma/modulos/patients.md (2026-10-13). */
-/* 4 y 3 filas: así la barra termina a la altura de la tabla (a 1440 px; cada fila de la barra pesa 70 px). */
+   tabla. Decisiones en design-reference/figma/modulos/patients.md (2026-10-13 y 2026-10-19). */
+/* Recent Patients (la última card) termina siempre a la altura de la tabla: la barra entera toma el alto medido de la
+   tabla (`altoTabla` más abajo) y su `ShowMore llenarAlto` mide cuántas filas enteras entran ahí, no un número fijo
+   (patients.md, 2026-10-19). Today Appointments sigue con `limit` fijo: no tiene un alto propio del que tirar.
+   Estos dos valores son sólo el arranque, antes de medir. */
 const LIMITE_TURNOS = 4
 const LIMITE_RECIENTES = 3
 const CANTIDAD_RECIENTES = 10
@@ -50,6 +53,23 @@ export default function Patients() {
   const [buscarReciente, setBuscarReciente] = useState('')
   const [turnoEditando, setTurnoEditando] = useState<DatosTurno | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  /* Alto de la columna de la tabla, para que la barra lateral termine a esa misma altura (más abajo). Se mide ésta,
+     no al revés: si en cambio las dos columnas se estiran entre sí (`items-stretch`), cuántas filas entran en la
+     barra depende de su propio alto ya estirado, que a su vez depende de cuántas filas decide mostrar -un bucle que
+     nunca termina de asentarse exacto. Midiendo sólo la tabla, independiente de la barra, no hay vuelta (Julián,
+     2026-10-19; design-reference/figma/modulos/patients.md). */
+  const refTabla = useRef<HTMLDivElement>(null)
+  const [altoTabla, setAltoTabla] = useState(0)
+  useEffect(() => {
+    const el = refTabla.current
+    if (!el) return
+    const medir = () => setAltoTabla(el.offsetHeight)
+    medir()
+    const ro = new ResizeObserver(medir)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const rows = useMemo(
     () => patients.filter((r) => r.name.toLowerCase().includes(query.toLowerCase())),
@@ -96,9 +116,11 @@ export default function Patients() {
     <div className={CONTENEDOR_PAGINA}>
       {/* Dos columnas desde el título: la tabla con su encabezado, y la barra lateral arrancando a la misma altura.
           Abajo de lg la barra va debajo de la tabla. Antes llevaba un link "Patients ⌄" arriba -no abría nada
-          distinto de esta misma pantalla- (patients.md, 2026-10-18). */}
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
-        <div className="min-w-0 flex-1">
+          distinto de esta misma pantalla- (patients.md, 2026-10-18). lg:items-start, no stretch (2026-10-19): la
+          barra toma el alto medido de la tabla (`--alto-tabla`) en vez de estirarse contra ella -estirarse las dos
+          entre sí crea un bucle (ver altoTabla más arriba). */}
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start" style={{ '--alto-tabla': altoTabla ? `${altoTabla}px` : undefined } as CSSProperties}>
+        <div className="min-w-0 flex-1" ref={refTabla}>
           {/* El botón principal va en la fila del título, al borde derecho de la columna de la tabla. */}
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex min-w-0 flex-col gap-[9px]">
@@ -135,9 +157,10 @@ export default function Patients() {
         </div>
 
         {/* Mismo Panel que usa el Dashboard. Sin overflow-hidden acá: recortaba la sombra del panel (patients.md,
-            2026-10-10); el scroll va adentro de cada panel, en ShowMore. */}
-        <div className="flex w-full flex-col gap-4 lg:w-[336px] lg:shrink-0">
-          <Panel title={<>Today Appointments <Globo n={TURNOS_PATIENTS.length} /></>} bodyClassName="gap-2 pt-0" className="[&>header]:min-h-10">
+            2026-10-10); el scroll va adentro de cada panel, en ShowMore. lg:h-[var(--alto-tabla)]: el alto de la
+            tabla, medido arriba. */}
+        <div className="flex w-full flex-col gap-4 lg:h-[var(--alto-tabla,auto)] lg:w-[336px] lg:shrink-0">
+          <Panel title={<>Today Appointments <Globo n={TURNOS_PATIENTS.length} /></>} bodyClassName="gap-2 pt-0" className="shrink-0 [&>header]:min-h-10">
             {buscador(buscarTurno, setBuscarTurno, "Search today's appointments")}
             {turnosFiltrados.length === 0 ? (
               <EmptyState
@@ -153,7 +176,11 @@ export default function Patients() {
             )}
           </Panel>
 
-          <Panel title={<>Recent Patients <Globo n={recientes.length} /></>} bodyClassName="gap-2 pt-0" className="[&>header]:min-h-10">
+          {/* flex-1: abraza el resto de la altura de la barra (ya tomó el alto de la tabla más arriba); min-h-0 para
+              que no se niegue a achicarse por debajo de su contenido. min-h-[220px]: una tabla muy corta (la última
+              página, con un solo paciente) deja a Today Appointments -shrink-0- de igual pidiendo más alto que toda la
+              barra; sin este piso, Recent Patients quedaba en 0 y desaparecía entera. */}
+          <Panel title={<>Recent Patients <Globo n={recientes.length} /></>} bodyClassName="gap-2 pt-0" className="min-h-[220px] flex-1 [&>header]:min-h-10">
             {buscador(buscarReciente, setBuscarReciente, 'Search recent patients')}
             {recientesFiltrados.length === 0 ? (
               <EmptyState
@@ -163,7 +190,7 @@ export default function Patients() {
                 className="py-6"
               />
             ) : (
-              <ShowMore total={recientesFiltrados.length} limit={LIMITE_RECIENTES} label="recent patients" enCaja className="flex flex-col gap-3">
+              <ShowMore total={recientesFiltrados.length} limit={LIMITE_RECIENTES} label="recent patients" enCaja llenarAlto className="flex flex-col gap-3">
                 {(n) => recientesFiltrados.slice(0, n).map((r) => <PatientCard key={r.id} row={r} onEdit={setEditando} />)}
               </ShowMore>
             )}

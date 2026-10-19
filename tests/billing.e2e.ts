@@ -68,12 +68,15 @@ test('Billing en el menú lateral va directo a su pantalla; sus tablas están s�
   await expect(screen.getByRole('heading', 'Carriers')).toBeVisible()
 })
 
-/* Find Patient muestra tres y "Show N more" abre el resto con scroll adentro (billing.md, 2026-10-19). */
-test('Find Patient muestra tres pacientes y Show more abre el resto', async ({ app, screen }) => {
+/* Find Patient mide cuántas filas enteras entran en el alto de Recent Billing Activity (llenarAlto, no un número
+   fijo: billing.md, 2026-10-19) y "Show N more" abre el resto con scroll adentro. */
+test('Find Patient muestra algunos pacientes y Show more abre el resto', async ({ app, screen }) => {
   await app.open('/billing')
-  await expect(screen.getByRole('button', /Brent Crosby/)).toBeVisible()
-  await expect(screen.getByRole('button', /Diego Molina/)).toHaveCount(0)
+  const filas = screen.getByRole('button', /Las payment/)
+  const antes = await filas.count()
+  expect(antes).toBeGreaterThan(0)
   await screen.getByRole('button', /^Show \d+ more/).tap()
   await expect(screen.getByRole('region', 'All patients')).toBeVisible()
-  await expect(screen.getByRole('button', /Diego Molina/)).toBeVisible()
+  const despues = await filas.count()
+  expect(despues).toBeGreaterThan(antes)
 })

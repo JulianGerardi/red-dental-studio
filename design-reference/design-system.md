@@ -1074,3 +1074,11 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
 
 - *Pages / Parts / Billing* (Find Patient, Today) y Patients: encabezado de 40px y cuerpo sin padding arriba; las filas
   de Today con la medida de las cards compactas de Patients. Decisión en `figma/modulos/billing.md` (2026-10-19).
+
+## Show more: `llenarAlto`, para el último panel de una barra al lado de una tabla (2026-10-19)
+
+- *Elements / Show more* suma **States → Fills the height**: la nueva prop `llenarAlto` (sólo junto con `enCaja`, y
+  sólo en el panel que de verdad tiene `flex-1` en una columna ya estirada a la altura de otra cosa) mide cuántas
+  filas enteras entran en el alto disponible en vez de un `limit` fijo. Reemplaza los números adivinados a mano de
+  Recent Patients (Patients) y Find Patient (Billing), que se desajustaban cada vez que cambiaba el contenido de al
+  lado. Decisiones en `figma/modulos/patients.md` y `billing.md` (2026-10-19).
