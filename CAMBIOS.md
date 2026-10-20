@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-20
 
+### Margen reservado en AppShell para que "Currently being seen" no tape contenido en tablet ([#73](https://github.com/JulianGerardi/red-dental-studio/pull/73))
+- Auditoría UX en tablet: la pestaña fija de "quién está en el sillón" (`PatientInSessionPopup`, borde derecho,
+  centrada verticalmente) quedaba encima de kebabs, badges y filas reales en ocho pantallas (Dashboard, Patients,
+  Patient Dashboard, Insurance, Ledger, Settings → Locations, Notifications, Help), porque de 640 a ~1500px el
+  contenido llega hasta ese mismo borde.
+- **Para el dev:** `AppShell` suma `sm:pr-16` al `main` -mismo mecanismo que ya reserva `pb-24 sm:pb-28` para
+  Confibot-, así ningún panel o tabla llega nunca hasta donde flota la pestaña. No se tocó `PatientInSessionPopup`.
+
 ### El banner amarillo sin esquinas redondeadas, y colapsable ([#69](https://github.com/JulianGerardi/red-dental-studio/pull/69))
 - Sin `rounded-lg`: con el aviso ya de punta a punta y sin padding, las esquinas redondeadas no correspondían.
 - Nuevo: una flecha para **colapsar el aviso entero** a una tira angosta con el total ("4 pending tasks"), que se
