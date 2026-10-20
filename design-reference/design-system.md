@@ -1096,6 +1096,16 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
   Recent Patients (Patients) y Find Patient (Billing), que se desajustaban cada vez que cambiaba el contenido de al
   lado. Decisiones en `figma/modulos/patients.md` y `billing.md` (2026-10-19).
 
+## AppShell: margen reservado para la pestaña "Currently being seen" (2026-10-20)
+
+- Auditoría UX en tablet (pedido de Julián): de 640 a ~1500px el contenido llegaba hasta el borde derecho de la
+  ventana, el mismo borde donde vive la pestaña fija de `PatientInSessionPopup` (54px, centrada verticalmente, sin
+  moverse con el scroll). Quedaba encima de kebabs, badges y filas reales en ocho pantallas (Dashboard, Patients,
+  Patient Dashboard, Insurance, Ledger, Settings → Locations, Notifications, Help).
+- Mismo mecanismo que ya reserva el alto de Confibot (`pb-24 sm:pb-28`, ver *Confibot flotante abajo a la derecha*):
+  `AppShell` suma `sm:pr-16` al `main`, así ningún panel o tabla llega nunca hasta donde flota la pestaña. No se tocó
+  `PatientInSessionPopup`. Decisión y verificación en `figma/README.md` → *Responsive* (2026-10-20).
+
 ## `PersonSearchField`: buscar una persona se ve igual en toda la app (2026-10-20)
 
 - Julián: "cuando busco un patient el parte de appointment o en cualquier buscador de la app el diseño debe ser el

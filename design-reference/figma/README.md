@@ -503,3 +503,25 @@ alto que queda y scrollean adentro (`Panel scroll` + `useAltoRestante`), con el 
 las pantallas de formulario o de lectura larga (Settings, Help, Notifications) no se fuerzan, pero sus listas largas
 scrollean adentro de la card. No se persigue "cero scroll" en tablet y celular. Orden sugerido: Patient Dashboard,
 Billing, Patients, Scheduling, Insurance/Ledger.
+
+## Auditoría UX en tablet (2026-10-20)
+
+Pedido de Julián: revisar que la app esté bien diagramada en tablet y corregir lo incoherente. Relevado con Playwright
+a 834×1194 (portrait) y 1194×834 (landscape, iPad Air) sobre las 16 rutas más dos drawers (New Patient, New
+Appointment): **0 desborde horizontal** en todas -el trabajo de `Responsive` de arriba sigue sosteniéndose-, pero
+apareció un problema real y repetido.
+
+**La pestaña "Currently being seen" (`PatientInSessionPopup`) tapaba contenido interactivo real.** Está fija al borde
+derecho de la ventana, centrada verticalmente, sin moverse con el scroll (a propósito: ver el historial en el
+componente). El contenedor de página mide `max-w-[1400px]`: en monitores de ≳1510px sobra un margen vacío ahí donde
+flota, pero de 640 a ~1500px -todo el rango tablet y buena parte del desktop angosto- el contenido llega hasta ese
+mismo borde, así que la pestaña (54px, opaca, con su propia sombra) quedaba encima de kebabs, badges y filas reales.
+Confirmado en ocho pantallas: Dashboard (Waiting Room), Patients (Today Appointments), Patient Dashboard
+(Appointments), Insurance (Cordination Order), Ledger (columnas Amount/Balance y "Export statement"), Settings →
+Locations (la última fila), Notifications y Help.
+
+De las salidas posibles -achicar la pestaña, mostrarla sólo con alguien en curso, o no tocar nada-, Julián eligió
+**reservar el margen**: igual que `main` ya reserva `pb-24 sm:pb-28` para que nada quede debajo del botón de Confibot,
+ahora suma `sm:pr-16` (64px, desde el mismo breakpoint que el resto del cromo) para que ningún panel o tabla llegue
+nunca hasta donde vive la pestaña. No se tocó `PatientInSessionPopup` ni su comportamiento. Verificado sin desborde y
+sin superposición en las ocho pantallas, a los dos anchos de tablet.
