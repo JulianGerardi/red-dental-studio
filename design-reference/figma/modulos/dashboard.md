@@ -793,3 +793,7 @@ filtrar por un operatorio; 4) recordar que las cards van hasta el final del cont
 **Para validar con usuarios:** el punto 3 es una lectura de "no me gusta cómo se muestra" (sacar la sala repetida); si
 lo que buscaba era otra cosa —por ejemplo, un vínculo visual más fuerte entre la sala tocada arriba y la lista
 filtrada abajo—, decime y lo ajusto.
+
+## Aire en la línea del día (2026-10-20)
+
+Julián marcó que al desplegar una sala la primera card quedaba pegada a la línea que separa el encabezado de la línea del día. `LineaDelDia` pasa de 4px a 12px de aire arriba.

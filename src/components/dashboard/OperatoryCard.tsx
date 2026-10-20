@@ -98,7 +98,7 @@ export function LineaDelDia({ room, turnos, onSelect }: {
     return <p className="text-ink-muted px-3.5 pb-3 text-xs">No appointments in {room.name} today.</p>
   }
   return (
-    <ol aria-label={`${room.name} today`} className="flex flex-col px-3.5 pt-1 pb-3 motion-safe:animate-[loc-in_160ms_ease-out]">
+    <ol aria-label={`${room.name} today`} className="flex flex-col px-3.5 pt-3 pb-3 motion-safe:animate-[loc-in_160ms_ease-out]">
       {ordenados.map((t, i) => {
         const hecho = !!(t as { completado?: boolean }).completado
         const ultimo = i === ordenados.length - 1

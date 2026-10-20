@@ -13,6 +13,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Para el dev:** `NotificationBanner` suma estado local `colapsado` (`useState`, no persiste entre sesiones);
   `ChevronUp` junto a la X cuando está abierto, tira con `ChevronDown` cuando está colapsado.
 
+## 2026-10-20
+
+### Salas: más aire entre el encabezado y la primera card de la línea ([#68](https://github.com/JulianGerardi/red-dental-studio/pull/68))
+- Al desplegar una sala, la primera card quedaba pegada a la línea que separa el encabezado de la línea del día; ahora hay 12px.
+- **Para el dev:** `LineaDelDia` (`OperatoryCard.tsx`): `pt-1` pasa a `pt-3`.
+
 ## 2026-10-19
 
 ### Patients y Billing: la barra lateral termina a la altura de la tabla, sin hueco ni disparejo ([#68](https://github.com/JulianGerardi/red-dental-studio/pull/68))
