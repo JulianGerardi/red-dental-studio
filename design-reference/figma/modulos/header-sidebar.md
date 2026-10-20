@@ -222,6 +222,23 @@ costados — Julián mandó una captura propia mostrándolo de punta a punta de 
 `ANCHO_PAGINA`, mide el 100% de la columna de contenido (la sidebar aparte), no el ancho acotado que usa el título y
 las cards de abajo.
 
+## El banner sin esquinas redondeadas, y colapsable (2026-10-20)
+
+Dos pedidos de Julián sobre el mismo aviso:
+
+- **Sin esquinas redondeadas.** Con el banner ya de punta a punta y sin padding (2026-10-19), el `rounded-lg` quedaba
+  fuera de lugar: se saca, 0px en las cuatro esquinas.
+- **Colapsable**, con una flecha que lo deja escondido pero visible para volver a abrirlo. Es distinto de la X que ya
+  existe: la X oculta **esa tarea puntual** del banner (la tarea sigue sin leer en la campana); la flecha nueva
+  colapsa **el aviso entero**, sea cual sea la tarea que esté mostrando. Colapsado queda una tira angosta de punta a
+  punta, con el total ("4 pending tasks") y una flecha hacia abajo para reabrirlo; al reabrir vuelve mostrando la
+  misma tarea en la que estaba.
+  - `ChevronUp` junto a la X, en el extremo derecho del aviso abierto; `ChevronDown` en la tira cerrada.
+  - Estado local (`useState` en `NotificationBanner`): no se guarda entre sesiones ni recarga de página, a diferencia
+    de ocultar una tarea con la X (que sí persiste en `notificacionesStore`). **A validar con Julián/usuarios:**
+    si conviene que el colapso también persista (localStorage o el store), y qué pasa si llega una tarea nueva
+    estando colapsado -por ahora, nada: el total de la tira se actualiza solo, sin reabrirse solo-.
+
 ## Billing sin menú: las tablas viven sólo en Settings (2026-10-13)
 
 Pedido de Julián, con una captura del menú de Billing marcando en amarillo Fee Schedules, Carriers y Coverage Table:

@@ -3,6 +3,16 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-20
+
+### El banner amarillo sin esquinas redondeadas, y colapsable ([#69](https://github.com/JulianGerardi/red-dental-studio/pull/69))
+- Sin `rounded-lg`: con el aviso ya de punta a punta y sin padding, las esquinas redondeadas no correspondían.
+- Nuevo: una flecha para **colapsar el aviso entero** a una tira angosta con el total ("4 pending tasks"), que se
+  vuelve a abrir con un clic. Es distinto de la X que ya existía, que sólo oculta la tarea puntual que se esté
+  mostrando (sigue sin leer en la campana); la flecha nueva no toca ninguna tarea, sólo el estado visual del aviso.
+- **Para el dev:** `NotificationBanner` suma estado local `colapsado` (`useState`, no persiste entre sesiones);
+  `ChevronUp` junto a la X cuando está abierto, tira con `ChevronDown` cuando está colapsado.
+
 ## 2026-10-19
 
 ### Patients y Billing: la barra lateral termina a la altura de la tabla, sin hueco ni disparejo ([#68](https://github.com/JulianGerardi/red-dental-studio/pull/68))
