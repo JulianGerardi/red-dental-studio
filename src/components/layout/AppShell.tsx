@@ -68,8 +68,12 @@ export function AppShell() {
         />
         {/* `clip`, no `hidden`: hidden vuelve a <main> contenedor de scroll y deja sin efecto todo sticky de adentro.
             El pb reserva el alto del botón flotante de Confibot: lo que cae al pie de una página (Cancel/Save,
-            paginación) se puede scrollear por encima de él. Ver help.md. */}
-        <main className="bg-page-background flex-1 overflow-x-clip pb-24 sm:pb-28">
+            paginación) se puede scrollear por encima de él. El pr (desde sm) reserva el ancho de la pestaña
+            "Currently being seen" (PatientInSessionPopup, 54px, fija al borde derecho): de 640 a ~1500px el
+            contenido llegaba hasta ese borde y la pestaña quedaba encima de kebabs y filas reales -recién a partir
+            de ~1510 (1400 + el propio margen) sobraba hueco vacío donde flotar sin tapar nada. Ver figma/README.md
+            › Responsive. */}
+        <main className="bg-page-background flex-1 overflow-x-clip pb-24 sm:pr-16 sm:pb-28">
           <Outlet />
         </main>
       </div>
