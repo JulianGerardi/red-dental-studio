@@ -1,7 +1,9 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { DateTextField, OptionCheckbox, SearchField, SelectField, TextArea, TextField } from '@/components/patients/form'
-import { Bloque, Lienzo, Swatch, Tabla, useMedidas } from './kit'
+import {
+  DateTextField, OptionCheckbox, PersonSearchField, SearchField, SelectField, TextArea, TextField,
+} from '@/components/patients/form'
+import { Bloque, ConRotulo, Lienzo, Swatch, Tabla, TablaPartes, useMedidas } from './kit'
 import { cn } from '@/lib/utils'
 import { hex } from './medir'
 
@@ -40,7 +42,9 @@ const meta = {
           '',
           '**Search puede llevar una segunda línea por sugerencia** (`subtext`, 2026-10-19): para desambiguar cuando el nombre no alcanza, como Patient y Provider en *Components / Scheduling / NewAppointmentModal* (fecha de nacimiento y email del paciente; email del provider). Sin `subtext`, la sugerencia es sólo el nombre, como siempre.',
           '',
-          '**Probalo:** en *Playground* cambiá tipo, rótulo, valor, ayuda, error y estado desde *Controls*.',
+          '**Buscar una persona es `PersonSearchField`, no `Search`** (2026-10-20): mismo campo, pero las sugerencias y la elegida son cards con avatar y hasta dos líneas (DOB, email…), en flujo -no un menú flotante- y la elegida queda remarcada con borde azul y un visto; nada se ve mientras no se escribe nada. Es el diseño de *Components / Patients / AddRelationshipDrawer → Select person*, ahora compartido por cualquier buscador de persona de la app (Patient y Provider de New Appointment, Select Person de New Patient y de los modales de Insurance): Julián, "cuando busco un patient… el diseño debe ser el mismo que tenemos en add relationship". Ver *States → Person search* acá abajo.',
+          '',
+          '**Probalo:** en *Playground* cambiá tipo, rótulo, valor, ayuda, error y estado desde *Controls*; en *States → Person search*, escribí un nombre de la lista para ver las sugerencias y elegí una.',
         ].join('\n'),
       },
     },
@@ -129,6 +133,57 @@ export const States: Story = {
         </tr>
       ))}
     </Tabla>
+  ),
+}
+
+/* Mismas tres personas que Add Relationship → Select person (Components / Patients / AddRelationshipDrawer), para que
+   se vea el mismo resultado: escribir "mi" muestra a las tres Miller con avatar, DOB y email; elegir una la deja con
+   borde azul y el visto. */
+const PERSONAS_DEMO = [
+  { name: 'Michael Miller', dob: 'May 14, 1982', email: 'mm.thompson@yahoo.com' },
+  { name: 'Jessica Miller', dob: 'May 14, 1982', email: 'jessica.miller@gmail.com' },
+  { name: 'Robert Miller', dob: 'March 2, 1979', email: 'rob.miller@outlook.com' },
+]
+const lineasDemo = (nombre: string) => {
+  const p = PERSONAS_DEMO.find((x) => x.name === nombre)
+  return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
+}
+
+function PersonSearchDemo({ inicial = '', disabled }: { inicial?: string; disabled?: boolean }) {
+  const [v, setV] = useState(inicial)
+  return (
+    <PersonSearchField
+      label="Select person" required placeholder="Search by Name or Last Name"
+      personas={PERSONAS_DEMO.map((p) => p.name)} lineas={lineasDemo}
+      value={v} onChange={setV} disabled={disabled}
+    />
+  )
+}
+
+export const PersonSearch: Story = {
+  name: 'Person search',
+  parameters: { controls: { disable: true } },
+  decorators: [(Story) => <div className="w-[360px] max-w-full"><Story /></div>],
+  render: () => (
+    <Lienzo>
+      <Bloque titulo="Parts">
+        <TablaPartes
+          partes={[
+            ['Input', 'Igual que Search: lupa + texto; filtra mientras se escribe.', 'PersonSearchField'],
+            ['Suggestion card', 'Avatar + nombre + hasta dos líneas (DOB, email…), una por persona que matchea.', 'PersonSearchField'],
+            ['Selected card', 'La elegida, con borde azul y el visto arriba a la derecha.', 'PersonSearchField'],
+          ]}
+        />
+      </Bloque>
+      <Bloque titulo="States" nota="Nada se ve con el campo vacío; dejá de escribir sobre una sugerencia para volver a buscar.">
+        <div className="flex flex-col gap-6">
+          <ConRotulo rotulo="Empty"><div className="w-[320px]"><PersonSearchDemo /></div></ConRotulo>
+          <ConRotulo rotulo="Typing (suggestions)"><div className="w-[320px]"><PersonSearchDemo inicial="mi" /></div></ConRotulo>
+          <ConRotulo rotulo="Selected"><div className="w-[320px]"><PersonSearchDemo inicial="Jessica Miller" /></div></ConRotulo>
+          <ConRotulo rotulo="Disabled"><div className="w-[320px]"><PersonSearchDemo inicial="Jessica Miller" disabled /></div></ConRotulo>
+        </div>
+      </Bloque>
+    </Lienzo>
   ),
 }
 

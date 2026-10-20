@@ -635,3 +635,18 @@ contenido (el `onScroll` de siempre) ya funcionaba antes del arreglo —por eso 
 **Para el dev:** `ui/drawer` cambia `scroll`/`contenido` de `useRef` a `useState` + ref por callback (`ref={setScroll}`,
 `ref={setContenido}`); el resto del componente no cambia. No es un bug de `NewAppointmentModal`: cualquier drawer con
 muchos campos y poco alto de ventana tenía el mismo problema.
+
+## Patient, Primary y Additional Provider pasan a `PersonSearchField` (2026-10-20)
+
+Julián pidió que buscar una persona se vea igual en toda la app, como en Add Relationship → Select person (ver
+`relationships.md`, 2026-10-20, por el porqué completo). Las tres búsquedas de persona de este drawer usaban
+`SearchField`: un menú flotante, una sola línea de texto por sugerencia. Pasan a `PersonSearchField`: la sugerencia es
+una card con avatar y, debajo del nombre, DOB y email en líneas separadas (antes una sola línea unida con "·",
+`pacienteSubtexto`/`providerSubtexto`, agregada el 2026-10-19); la elegida queda remarcada con borde azul y un visto,
+en vez de sólo completar el campo.
+
+**Para el dev:** `pacienteSubtexto`/`providerSubtexto` pasan a `pacienteLineas`/`providerLineas` (devuelven un array de
+líneas, `['DOB: …', 'Email: …']` o `['Email: …']`, en vez de un string ya unido). El avatar de la card lleva
+`aria-hidden`: sin eso, sus iniciales se cuelan antes del nombre en el nombre accesible del botón y rompían
+`tests/scheduling-linked-visit.e2e.ts` (que busca el botón por `/^John Smith/`, `/^Dr. Emily Chen/`); verificado que
+sigue encontrando el botón y completando el campo igual que antes.

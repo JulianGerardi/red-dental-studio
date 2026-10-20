@@ -1095,3 +1095,18 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
   filas enteras entran en el alto disponible en vez de un `limit` fijo. Reemplaza los números adivinados a mano de
   Recent Patients (Patients) y Find Patient (Billing), que se desajustaban cada vez que cambiaba el contenido de al
   lado. Decisiones en `figma/modulos/patients.md` y `billing.md` (2026-10-19).
+
+## `PersonSearchField`: buscar una persona se ve igual en toda la app (2026-10-20)
+
+- Julián: "cuando busco un patient el parte de appointment o en cualquier buscador de la app el diseño debe ser el
+  mismo que tenemos en add relationship cuando pongo: select person". Nuevo campo en `patients/form.tsx`, al lado de
+  `SearchField`: mismo input, pero las sugerencias y la elegida son cards con avatar y hasta dos líneas de datos
+  (`lineas`, por ejemplo "DOB: …" / "Email: …") en vez de un menú flotante con una sola línea de texto; la elegida
+  queda con borde azul y un visto. Es el diseño que ya tenía *Components / Patients / AddRelationshipDrawer → Select
+  person*, ahora compartido.
+- *Elements / Fields* suma **States → Person search** (Empty, Typing, Selected, Disabled) y una descripción nueva.
+  Aplicado en New Appointment (Patient, Primary/Additional Provider), New Patient (Select Person) y los dos
+  buscadores de persona de Insurance (Select Subscriber, Dependent Patient); de paso corrige dos bugs de Select
+  Subscriber (el rótulo decía "Plan name" y la card de la elegida se mostraba siempre, aunque no se hubiera elegido a
+  nadie). Decisiones en `figma/modulos/relationships.md` (el porqué completo), `scheduling.md`, `patients.md` e
+  `insurance.md` (2026-10-20).

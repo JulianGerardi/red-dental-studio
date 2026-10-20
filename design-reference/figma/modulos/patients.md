@@ -270,3 +270,12 @@ después de "Show more" en vez de un número fijo, porque ahora varía con el al
 
 **Para validar con usuarios:** si 220px de piso alcanza en una pantalla angosta antes de que se note que Recent
 Patients pisa el alto de la tabla (hoy ahí no tienen por qué coincidir: no hay suficiente tabla para igualar).
+
+## New Patient: Select Person pasa a `PersonSearchField` (2026-10-20)
+
+Mismo pedido y mismo cambio que `scheduling.md` (2026-10-20): los dos "Select Person" de New Patient (vincular a una
+persona existente, y el guardián) usaban `SearchField`; pasan a `PersonSearchField`, con avatar y DOB/email por
+sugerencia, como Add Relationship → Select person (el porqué completo está en `relationships.md`, 2026-10-20). Las
+líneas de DOB/email salen de `DIRECTORIO` (el mismo directorio de Add Relationship, reexportado desde
+`AddRelationshipDrawer.tsx`); los dos nombres de `PERSONAS` que no están ahí (Sarah Stone, Daniel Anderson) muestran
+sólo el nombre, sin inventar fecha de nacimiento ni email.
