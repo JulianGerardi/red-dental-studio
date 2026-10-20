@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, within } from 'storybook/test'
 import { Bloque, Lienzo, Tabla, Token } from '@/design-system/kit'
 import { NOTIFICACIONES } from '@/data/notificaciones'
 import { delBanner } from '@/data/notificacionesStore'
@@ -17,13 +18,13 @@ const meta = {
       story: { inline: false, iframeHeight: 620 },
       description: {
         component: [
-          "El aviso de tareas sin leer arriba de cada pantalla (documentos para firmar, derivaciones, llamados). Es la **tarjeta** ámbar del design system, de punta a punta de la columna de contenido (Julián, 2026-10-13; antes iba del ancho de su texto), sin padding ni tope de ancho (Julián, 2026-10-19): pegado al header, al rail y al borde derecho, sin el `max-w` que acota el resto de la página.",
+          "El aviso de tareas sin leer arriba de cada pantalla (documentos para firmar, derivaciones, llamados). Es la **tarjeta** ámbar del design system, de punta a punta de la columna de contenido (Julián, 2026-10-13; antes iba del ancho de su texto), sin padding, sin esquinas redondeadas ni tope de ancho (Julián, 2026-10-19): pegado al header, al rail y al borde derecho, sin el `max-w` que acota el resto de la página.",
           "",
-          "**Cómo se ordena:** la tarea, Review y el paginador juntos a la izquierda; la X sola, a la derecha.",
+          "**Cómo se ordena:** la tarea, Review y el paginador juntos a la izquierda; colapsar y la X, a la derecha.",
           "",
-          "**Qué tiene:** ícono, la tarea y su detalle, Review, el paginador cuando hay más de una y la X para ocultarlo.",
+          "**Qué tiene:** ícono, la tarea y su detalle, Review, el paginador cuando hay más de una, la flecha para colapsar el aviso entero y la X para ocultar esa tarea puntual.",
           "",
-          "**Probalo:** en *Playground* pasá de tarea con las flechas.",
+          "**Probalo:** en *Playground* pasá de tarea con las flechas o colapsá el aviso con la flecha de arriba.",
         ].join('\n'),
       },
     },
@@ -53,6 +54,14 @@ export const Empty: Story = {
   ),
 }
 
+/* Colapsado con la flecha: una tira angosta con el total, para volver a abrirlo. */
+export const Collapsed: Story = {
+  render: () => <Demo items={TAREAS} />,
+  play: async (c) => {
+    await userEvent.click(await within(c.canvasElement).findByRole('button', { name: 'Collapse banner' }))
+  },
+}
+
 /* En la página: el aviso de punta a punta de la columna, el contenido de abajo con su propio ancho acotado. */
 function Pagina() {
   const [cursor, setCursor] = useState(0)
@@ -79,7 +88,8 @@ export const Parts: Story = {
           <tr><td className="font-semibold">Title and detail</td><td>Qué hay que hacer y para quién, con cuándo se mandó.</td></tr>
           <tr><td className="font-semibold">Review</td><td>Lleva a la tarea.</td></tr>
           <tr><td className="font-semibold">Pager</td><td>1 of 4 con flechas; sólo con más de una tarea. Separado por una línea.</td></tr>
-          <tr><td className="font-semibold">Close</td><td>Oculta esa tarea del banner; sigue sin leer en la campana y en Notifications. Va sola, en el extremo derecho.</td></tr>
+          <tr><td className="font-semibold">Collapse</td><td>Colapsa el aviso entero a una tira angosta con el total ("4 pending tasks"); un clic ahí lo vuelve a abrir.</td></tr>
+          <tr><td className="font-semibold">Close</td><td>Oculta esa tarea puntual del banner; sigue sin leer en la campana y en Notifications. No colapsa el aviso.</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>
@@ -95,6 +105,7 @@ export const States: Story = {
         <Tabla encabezado={["State", "When", "Story"]} minimo={560}>
           <tr><td className="font-semibold">Several</td><td>Más de una tarea: paginador.</td><td>Playground</td></tr>
           <tr><td className="font-semibold">Single</td><td>Una tarea: sin paginador.</td><td>Single</td></tr>
+          <tr><td className="font-semibold">Collapsed</td><td>Colapsado con la flecha: tira angosta con el total.</td><td>Collapsed</td></tr>
           <tr><td className="font-semibold">Empty</td><td>Sin tareas: no se dibuja.</td><td>Empty</td></tr>
         </Tabla>
       </Bloque>
@@ -111,7 +122,8 @@ export const Specs: Story = {
         <Tabla encabezado={["Item", "Value"]} minimo={560}>
           <tr><td className="font-semibold">Width</td><td>100% de la columna de contenido (sidebar aparte), sin el <code>max-w</code> de ANCHO_PAGINA que acota el título y las cards.</td></tr>
           <tr><td className="font-semibold">Padding</td><td>Ninguno arriba ni a los costados: pegado al header, al rail y al borde derecho.</td></tr>
-          <tr><td className="font-semibold">Order</td><td>Ícono, tarea, Review y paginador a la izquierda; la X con <code>ml-auto</code>, sola a la derecha.</td></tr>
+          <tr><td className="font-semibold">Corners</td><td>Sin redondear (0px): <code>rounded-lg</code> se saca a propósito.</td></tr>
+          <tr><td className="font-semibold">Order</td><td>Ícono, tarea, Review y paginador a la izquierda; colapsar y la X juntas, con <code>ml-auto</code>, a la derecha.</td></tr>
           <tr><td className="font-semibold">Fill</td><td><Token nombre="warn-bg" /></td></tr>
           <tr><td className="font-semibold">Text and border</td><td><Token nombre="warn-fg" /></td></tr>
         </Tabla>
