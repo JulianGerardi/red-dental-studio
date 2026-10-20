@@ -13,6 +13,10 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Para el dev:** `AppShell` suma `sm:pr-16` al `main` -mismo mecanismo que ya reserva `pb-24 sm:pb-28` para
   Confibot-, así ningún panel o tabla llega nunca hasta donde flota la pestaña. No se tocó `PatientInSessionPopup`.
 
+### El banner amarillo, borde sólo abajo ([#71](https://github.com/JulianGerardi/red-dental-studio/pull/71))
+- `border` (las cuatro caras) pasa a `border-b`: arriba, a la izquierda y a la derecha el aviso ya está pegado al
+  header, al rail y al borde de la ventana, así que esas caras no necesitan línea propia.
+
 ### El banner amarillo sin esquinas redondeadas, y colapsable ([#69](https://github.com/JulianGerardi/red-dental-studio/pull/69))
 - Sin `rounded-lg`: con el aviso ya de punta a punta y sin padding, las esquinas redondeadas no correspondían.
 - Nuevo: una flecha para **colapsar el aviso entero** a una tira angosta con el total ("4 pending tasks"), que se
@@ -20,6 +24,10 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   mostrando (sigue sin leer en la campana); la flecha nueva no toca ninguna tarea, sólo el estado visual del aviso.
 - **Para el dev:** `NotificationBanner` suma estado local `colapsado` (`useState`, no persiste entre sesiones);
   `ChevronUp` junto a la X cuando está abierto, tira con `ChevronDown` cuando está colapsado.
+
+### Salas: más aire entre el encabezado y la primera card de la línea ([#70](https://github.com/JulianGerardi/red-dental-studio/pull/70))
+- Al desplegar una sala, la primera card quedaba pegada a la línea que separa el encabezado de la línea del día; ahora hay 12px.
+- **Para el dev:** `LineaDelDia` (`OperatoryCard.tsx`): `pt-1` pasa a `pt-3`.
 
 ## 2026-10-19
 

@@ -123,6 +123,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Width</td><td>100% de la columna de contenido (sidebar aparte), sin el <code>max-w</code> de ANCHO_PAGINA que acota el título y las cards.</td></tr>
           <tr><td className="font-semibold">Padding</td><td>Ninguno arriba ni a los costados: pegado al header, al rail y al borde derecho.</td></tr>
           <tr><td className="font-semibold">Corners</td><td>Sin redondear (0px): <code>rounded-lg</code> se saca a propósito.</td></tr>
+          <tr><td className="font-semibold">Border</td><td>Sólo abajo (<code>border-b</code>); arriba, a la izquierda y a la derecha ya delimitan el header, el rail y el borde de la ventana.</td></tr>
           <tr><td className="font-semibold">Order</td><td>Ícono, tarea, Review y paginador a la izquierda; colapsar y la X juntas, con <code>ml-auto</code>, a la derecha.</td></tr>
           <tr><td className="font-semibold">Fill</td><td><Token nombre="warn-bg" /></td></tr>
           <tr><td className="font-semibold">Text and border</td><td><Token nombre="warn-fg" /></td></tr>
