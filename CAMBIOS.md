@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-20
 
-### El banner amarillo, borde sólo abajo ([#70](https://github.com/JulianGerardi/red-dental-studio/pull/70))
+### El banner amarillo, borde sólo abajo ([#71](https://github.com/JulianGerardi/red-dental-studio/pull/71))
 - `border` (las cuatro caras) pasa a `border-b`: arriba, a la izquierda y a la derecha el aviso ya está pegado al
   header, al rail y al borde de la ventana, así que esas caras no necesitan línea propia.
 
