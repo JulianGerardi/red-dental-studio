@@ -1,7 +1,7 @@
 import { DrawerActions, DrawerSection } from '@/components/ui/drawer'
 import { useMemo, useState } from 'react'
 import {
-  ModalShell, SelectField, SearchField, TextArea,
+  ModalShell, SelectField, PersonSearchField, TextArea,
   OptionCheckbox, FieldLabel, FieldError,
 } from '@/components/patients/form'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
@@ -39,15 +39,17 @@ const DATOS_PACIENTE: Record<string, { nacimiento: string; email: string }> = {
   'Maria Abril Viola': { nacimiento: 'November 23, 1991', email: 'maria.viola@email.com' },
   'Elias Aguirre': { nacimiento: 'March 5, 1979', email: 'elias.aguirre@email.com' },
 }
-const pacienteSubtexto = (nombre: string) => {
+const pacienteLineas = (nombre: string) => {
   const d = DATOS_PACIENTE[nombre]
-  return d && `${d.nacimiento} · ${d.email}`
+  return d && [`DOB: ${d.nacimiento}`, `Email: ${d.email}`]
 }
 
 /* El email del provider sale de la plantilla del consultorio (Settings → Employees), que ya los tiene cargados.
    "Dr. " es sólo el tratamiento que usa esta pantalla; el nombre de abajo es el que figura en Employees. */
-const providerSubtexto = (nombre: string) =>
-  EMPLEADOS.find((e) => e.nombre === nombre.replace(/^Dr\.\s*/, ''))?.email
+const providerLineas = (nombre: string) => {
+  const email = EMPLEADOS.find((e) => e.nombre === nombre.replace(/^Dr\.\s*/, ''))?.email
+  return email ? [`Email: ${email}`] : undefined
+}
 
 const VISITAS: Visita[] = [
   {
@@ -204,16 +206,16 @@ export function NewAppointmentModal({
         /* Como New Appointment de Confidentally 2.0: una columna, Requestor y Reason, Start y End, Operatory y Status de a
            dos. Al tocar la fecha o la hora se despliega al costado el calendario del día para elegir la franja. */
         <DrawerSection title="Patient and Scheduling" description="Complete the details below to schedule the appointment.">
-          <SearchField
-            label="Patient" required placeholder="Search by Name" options={PACIENTES} subtext={pacienteSubtexto}
+          <PersonSearchField
+            label="Patient" required placeholder="Search by Name" personas={PACIENTES} lineas={pacienteLineas}
             value={d.patient} onChange={set('patient')} error={req('patient')}
           />
-          <SearchField
-            label="Primary Provider" required placeholder="Search by Name" options={PROVIDERS} subtext={providerSubtexto}
+          <PersonSearchField
+            label="Primary Provider" required placeholder="Search by Name" personas={PROVIDERS} lineas={providerLineas}
             value={d.primary} onChange={set('primary')} error={req('primary')}
           />
-          <SearchField
-            label="Additional Provider" placeholder="Search by Name" options={PROVIDERS} subtext={providerSubtexto}
+          <PersonSearchField
+            label="Additional Provider" placeholder="Search by Name" personas={PROVIDERS} lineas={providerLineas}
             value={d.additional} onChange={set('additional')}
           />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

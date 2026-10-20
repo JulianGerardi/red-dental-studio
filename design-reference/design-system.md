@@ -1062,6 +1062,15 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
   *Parts* suma **Footer shadow**; la descripción del componente lo explica. Decisiones en `figma/modulos/dashboard.md`
   (2026-10-19), que es donde apareció el caso (New Appointment).
 
+## Drawer: la sombra del pie nunca se disparaba (2026-10-20)
+
+- *Components / UI / Drawer*: la sombra del 2026-10-19 (arriba) no llegaba a aparecer con ningún alto de ventana —
+  el `ResizeObserver` se armaba en un `useEffect` que leía la ref todavía en `null` (el contenido del `Dialog` de
+  Radix se monta un tick después) y, como el efecto no volvía a correr, el `ResizeObserver` y el listener de
+  `resize` nunca llegaban a conectarse. `scroll`/`contenido` pasan de `useRef` a `useState` (ref por callback): el
+  efecto depende del nodo real y corre de nuevo en cuanto aparece. Decisiones en `figma/modulos/scheduling.md`
+  (2026-10-20), que es donde volvió a aparecer el caso (New Appointment).
+
 ## Dashboard: sala de espera filtrada, sin repetir la sala y sin el hueco blanco (2026-10-19)
 
 - *Components / Dashboard / Operatory strip*: el anillo de la primera sala ya no se corta contra el borde del scroll
@@ -1096,6 +1105,21 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
 - Mismo mecanismo que ya reserva el alto de Confibot (`pb-24 sm:pb-28`, ver *Confibot flotante abajo a la derecha*):
   `AppShell` suma `sm:pr-16` al `main`, así ningún panel o tabla llega nunca hasta donde flota la pestaña. No se tocó
   `PatientInSessionPopup`. Decisión y verificación en `figma/README.md` → *Responsive* (2026-10-20).
+
+## `PersonSearchField`: buscar una persona se ve igual en toda la app (2026-10-20)
+
+- Julián: "cuando busco un patient el parte de appointment o en cualquier buscador de la app el diseño debe ser el
+  mismo que tenemos en add relationship cuando pongo: select person". Nuevo campo en `patients/form.tsx`, al lado de
+  `SearchField`: mismo input, pero las sugerencias y la elegida son cards con avatar y hasta dos líneas de datos
+  (`lineas`, por ejemplo "DOB: …" / "Email: …") en vez de un menú flotante con una sola línea de texto; la elegida
+  queda con borde azul y un visto. Es el diseño que ya tenía *Components / Patients / AddRelationshipDrawer → Select
+  person*, ahora compartido.
+- *Elements / Fields* suma **States → Person search** (Empty, Typing, Selected, Disabled) y una descripción nueva.
+  Aplicado en New Appointment (Patient, Primary/Additional Provider), New Patient (Select Person) y los dos
+  buscadores de persona de Insurance (Select Subscriber, Dependent Patient); de paso corrige dos bugs de Select
+  Subscriber (el rótulo decía "Plan name" y la card de la elegida se mostraba siempre, aunque no se hubiera elegido a
+  nadie). Decisiones en `figma/modulos/relationships.md` (el porqué completo), `scheduling.md`, `patients.md` e
+  `insurance.md` (2026-10-20).
 
 ## New Procedure: vincular pide un procedimiento ya cargado (2026-10-20)
 

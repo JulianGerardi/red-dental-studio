@@ -102,3 +102,16 @@ controla con `npm run ds:campos`.
 1. New Subscriber: Name | Middle Name, Last Name | Birthday y Email (antes tres nombres por fila).
 2. Subscription Information: Plan name entra en la grilla al lado de Subscriber ID y Carrier name.
 3. New Depender: Coordination Order al lado de Carrier name y las cuatro fechas en una sola grilla.
+
+## Select Subscriber y Dependent Patient pasan a `PersonSearchField` (2026-10-20)
+
+Mismo pedido que `relationships.md` (2026-10-20): buscar una persona, igual en toda la app. Estos dos ya mostraban la
+card de `PersonaSeleccionada` (avatar, DOB, email, borde azul) debajo del buscador, pero armada a mano con dos piezas
+sueltas y dos bugs de paso: **Select Subscriber** (New Subscription) tenía el `SearchField` con el rótulo "Plan name"
+pegado -copiado de otro campo- y la card de `PersonaSeleccionada` se mostraba siempre con `DIRECTORIO[0]` (Michael
+Miller) aunque no se hubiera elegido a nadie todavía. Con `PersonSearchField` las dos cosas quedan resueltas de taquito:
+el rótulo pasa a "Select person" y la card sólo aparece cuando `d.persona` matchea un nombre de verdad.
+
+`ManageSubscriptionModal` no cambia: su `PersonaSeleccionada` con `DIRECTORIO[0]` es un display fijo (el suscriptor y
+los dependientes ya cargados de esa suscripción, con lápiz para editar, no un buscador), y su propio bug de mostrar
+siempre el mismo nombre hardcodeado es otro tema, no el de esta tanda.

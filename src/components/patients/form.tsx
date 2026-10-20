@@ -3,6 +3,7 @@ import { Drawer, DrawerSection, useEnDrawer, type DrawerSize } from '@/component
 import { ChevronDown, Calendar, Check, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
+import { Avatar, inicialesDe } from '@/components/ui/avatar'
 
 /* Primitivos de los formularios de Patients (Figma 3640:73356 y hermanos).
    Campo = label 12px + control de 36px, alto total 56 con gap.
@@ -362,6 +363,95 @@ export function SearchField({
         )}
       </div>
       {pie(error, hint)}
+    </div>
+  )
+}
+
+/* Nombre + hasta dos líneas de abajo ("DOB: …", "Email: …"): la etiqueta antes de los ":" sale apagada, el valor no.
+   Una línea sin ":" se muestra entera, sin partir. */
+function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?: string[]; className?: string }) {
+  return (
+    <span className={cn('min-w-0 flex-1 leading-tight', className)}>
+      <span className="block text-[13px] font-semibold text-ink">{nombre}</span>
+      {lineas?.map((linea, i) => {
+        const corte = linea.indexOf(':')
+        return (
+          <span key={i} className="block text-[11px] text-ink-muted">
+            {corte > -1
+              ? <><span className="text-ink-faint">{linea.slice(0, corte + 1)}</span>{linea.slice(corte + 1)}</>
+              : linea}
+          </span>
+        )
+      })}
+    </span>
+  )
+}
+
+/* Buscador de una persona (paciente, provider, contacto…): igual que SearchField, pero las sugerencias y la elegida
+   son cards con avatar y hasta dos líneas de datos (DOB, email…) en vez de un texto suelto en un menú flotante -el
+   mismo diseño de Add Relationship → "Select person", para que buscar a alguien se vea igual en toda la app (Julián,
+   2026-10-20, ver design-reference/design-system.md). Sin resultados mientras no se escribe nada: no vuelca todo el
+   directorio como SearchField. "Elegida" sale sólo de comparar `value` contra `personas` (no hay estado propio): basta
+   con que lo que esté tipeado sea exactamente un nombre de la lista. */
+export function PersonSearchField({
+  label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas,
+}: {
+  label: string
+  required?: boolean
+  className?: string
+  /** Nombres buscables. */
+  personas?: string[]
+  value?: string
+  onChange?: (v: string) => void
+  error?: string
+  placeholder?: string
+  hint?: React.ReactNode
+  disabled?: boolean
+  /** Las líneas de abajo de una persona ("DOB: …", "Email: …"); sin esto, la card sólo lleva el nombre. */
+  lineas?: (nombre: string) => string[] | undefined
+}) {
+  const elegida = !!value.trim() && personas.includes(value)
+  const sugerencias = !elegida && value.trim()
+    ? personas.filter((p) => p.toLowerCase().includes(value.trim().toLowerCase()))
+    : []
+
+  return (
+    <div className={cn('flex flex-col gap-2', className)}>
+      <FieldLabel required={required}>{label}</FieldLabel>
+      <div className="relative">
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+        <input
+          value={value}
+          placeholder={placeholder}
+          aria-invalid={!!error || undefined}
+          disabled={disabled}
+          onChange={(e) => onChange?.(e.target.value)}
+          className={cn(control(error), 'h-9 pr-3 pl-9')}
+        />
+      </div>
+      {pie(error, hint)}
+      {sugerencias.map((nombre) => (
+        <button
+          key={nombre}
+          type="button"
+          onClick={() => onChange?.(nombre)}
+          className="flex items-center gap-3 rounded-lg border border-line bg-white p-3 text-left hover:bg-surface-subtle"
+        >
+          <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
+          <PersonaLineas nombre={nombre} lineas={lineas?.(nombre)} />
+        </button>
+      ))}
+      {elegida && (
+        <div className="relative">
+          <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3">
+            <Avatar aria-hidden initials={inicialesDe(value)} size={36} />
+            <PersonaLineas nombre={value} lineas={lineas?.(value)} />
+          </div>
+          <span className="bg-dash-ok-fg absolute top-1/2 right-3 flex size-5 -translate-y-1/2 items-center justify-center rounded-full text-white" aria-label="Selected">
+            <Check className="size-3" strokeWidth={3} />
+          </span>
+        </div>
+      )}
     </div>
   )
 }

@@ -16,6 +16,19 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   `linked`/`diagnoses` sobre ese id, sin crear uno nuevo). Quien lo use tiene que devolver el id en `onSave` y pasar
   `onLink`.
 
+### Buscar una persona se ve igual en toda la app, y la sombra del pie del drawer que no se disparaba ([#72](https://github.com/JulianGerardi/red-dental-studio/pull/72))
+- **Buscar una persona** (Patient y Provider de New Appointment, Select Person de New Patient, Select Subscriber y
+  Dependent Patient de Insurance) ya no es un menú flotante con una línea de texto: las sugerencias y la elegida son
+  cards con avatar y hasta dos líneas de datos (DOB, email…), borde azul y un visto al elegir — el diseño de Add
+  Relationship → Select person, ahora compartido. De paso corrige dos bugs en Select Subscriber (rótulo "Plan name"
+  mal copiado, y la card de la elegida se mostraba siempre aunque no se hubiera elegido a nadie).
+- **`ui/drawer`:** la sombra que avisa "seguís con scroll" (agregada el 2026-10-19) nunca se disparaba con ningún
+  alto de ventana: el `ResizeObserver` se armaba con la ref del contenido todavía en `null`. Arreglado con ref por
+  callback (`useState` en vez de `useRef`).
+- **Para el dev:** `patients/form.tsx` suma `PersonSearchField` (junto a `SearchField`, con la prop `lineas`);
+  `AddRelationshipDrawer` ahora lo usa en vez de tener su propio bloque de búsqueda. `ui/drawer` cambia
+  `scroll`/`contenido` de `useRef` a `useState` + `ref={setScroll}`/`ref={setContenido}`.
+
 ### Margen reservado en AppShell para que "Currently being seen" no tape contenido en tablet ([#73](https://github.com/JulianGerardi/red-dental-studio/pull/73))
 - Auditoría UX en tablet: la pestaña fija de "quién está en el sillón" (`PatientInSessionPopup`, borde derecho,
   centrada verticalmente) quedaba encima de kebabs, badges y filas reales en ocho pantallas (Dashboard, Patients,

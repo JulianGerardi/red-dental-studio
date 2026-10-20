@@ -615,3 +615,38 @@ nombre, como el resto de sus usos (Carrier name, CDT codes, medicamentos, etc., 
 
 **Para validar con usuarios:** si conviene la misma segunda línea en Requestor (hoy un `SelectField`, no busca) o en otros
 buscadores de persona de la app (Add Relationship, por ejemplo).
+
+## New Appointment: Start Time, End Time, Operatory y Status seguían sin verse (2026-10-20)
+
+Julián: "fijate que los inputs de star time end time operatory y status no se ven se cortan" — el mismo síntoma que el
+2026-10-19 (campos del paso 1 cortados contra el pie), con ventanas de escritorio bajas (probado a 1024×768). La sombra
+del pie que se agregó ese día (`ui/drawer`, *Parts → Footer shadow*) nunca llegaba a dispararse: medía el contenido con
+un `useRef` + `useEffect`, pero ese efecto corría con la ref todavía en `null` -el contenido del `Dialog` de Radix se
+monta en el DOM un tick después del primer render del Drawer- y como las dependencias del efecto no volvían a cambiar,
+ni el `ResizeObserver` ni el listener de `resize` llegaban a conectarse nunca: la sombra no aparecía con ningún alto de
+ventana, y el campo seguía viéndose cortado sin aviso de que había que scrollear.
+
+Confirmado con Playwright: a 1024×768, el contenido medía 610px contra 564px visibles (y hasta 396px achicando la
+ventana a 600px de alto) sin que el pie mostrara nunca la sombra, ni al redimensionar. Arreglado en `ui/drawer`
+reemplazando esas dos refs por `useState<HTMLDivElement | null>` (ref por callback): el efecto que arma el
+`ResizeObserver` ahora depende del nodo real y corre de nuevo en cuanto Radix lo monta. Scrollear manualmente el
+contenido (el `onScroll` de siempre) ya funcionaba antes del arreglo —por eso el paso 1 no estaba roto, sólo sin aviso.
+
+**Para el dev:** `ui/drawer` cambia `scroll`/`contenido` de `useRef` a `useState` + ref por callback (`ref={setScroll}`,
+`ref={setContenido}`); el resto del componente no cambia. No es un bug de `NewAppointmentModal`: cualquier drawer con
+muchos campos y poco alto de ventana tenía el mismo problema.
+
+## Patient, Primary y Additional Provider pasan a `PersonSearchField` (2026-10-20)
+
+Julián pidió que buscar una persona se vea igual en toda la app, como en Add Relationship → Select person (ver
+`relationships.md`, 2026-10-20, por el porqué completo). Las tres búsquedas de persona de este drawer usaban
+`SearchField`: un menú flotante, una sola línea de texto por sugerencia. Pasan a `PersonSearchField`: la sugerencia es
+una card con avatar y, debajo del nombre, DOB y email en líneas separadas (antes una sola línea unida con "·",
+`pacienteSubtexto`/`providerSubtexto`, agregada el 2026-10-19); la elegida queda remarcada con borde azul y un visto,
+en vez de sólo completar el campo.
+
+**Para el dev:** `pacienteSubtexto`/`providerSubtexto` pasan a `pacienteLineas`/`providerLineas` (devuelven un array de
+líneas, `['DOB: …', 'Email: …']` o `['Email: …']`, en vez de un string ya unido). El avatar de la card lleva
+`aria-hidden`: sin eso, sus iniciales se cuelan antes del nombre en el nombre accesible del botón y rompían
+`tests/scheduling-linked-visit.e2e.ts` (que busca el botón por `/^John Smith/`, `/^Dr. Emily Chen/`); verificado que
+sigue encontrando el botón y completando el campo igual que antes.
