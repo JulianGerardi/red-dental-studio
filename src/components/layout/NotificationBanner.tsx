@@ -84,9 +84,11 @@ export function NotificationBanner({
      juntos a la izquierda, la flecha para colapsar y la X al final a la derecha (Julián, 2026-10-13; antes iba del
      ancho de su contenido). Sin padding arriba ni a los costados, ni tope de ancho, ni esquinas redondeadas (Julián,
      2026-10-19, con una captura propia): ya no usa ANCHO_PAGINA, mide lo mismo que la columna de contenido entera
-     (sidebar aparte), no el `max-w` que acota el resto de la página. Ver header-sidebar.md. */
+     (sidebar aparte), no el `max-w` que acota el resto de la página. El borde queda sólo abajo (Julián, 2026-10-20),
+     igual que el colapsado: arriba, a la izquierda y a la derecha ya lo delimitan el header, el rail y el borde de
+     la ventana. Ver header-sidebar.md. */
   return (
-    <div role="status" className="flex w-full items-center gap-3 border border-warn-fg/25 bg-warn-bg py-2 pr-2 pl-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]">
+    <div role="status" className="flex w-full items-center gap-3 border-b border-warn-fg/25 bg-warn-bg py-2 pr-2 pl-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]">
       {contenido}
     </div>
   )
