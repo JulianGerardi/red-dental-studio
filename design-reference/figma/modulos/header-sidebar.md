@@ -239,6 +239,12 @@ Dos pedidos de Julián sobre el mismo aviso:
     si conviene que el colapso también persista (localStorage o el store), y qué pasa si llega una tarea nueva
     estando colapsado -por ahora, nada: el total de la tira se actualiza solo, sin reabrirse solo-.
 
+## El borde sólo abajo (2026-10-20)
+
+Pedido de Julián: el `border` de las cuatro caras pasa a `border-b` (ya era así en la tira colapsada). Con el aviso
+pegado al header, al rail y al borde de la ventana, esas tres caras ya quedan delimitadas por lo que tienen al lado;
+sólo la de abajo, contra `page-background`, necesita la línea.
+
 ## Billing sin menú: las tablas viven sólo en Settings (2026-10-13)
 
 Pedido de Julián, con una captura del menú de Billing marcando en amarillo Fee Schedules, Carriers y Coverage Table:
