@@ -1,0 +1,83 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./react-BZJXY1be.js";import{n,t as r}from"./utils-D-bRdWGo.js";import{t as i}from"./jsx-runtime-DeHZSEgm.js";import{h as a,m as o}from"./estilos-CE-FcrPI.js";import{$ as s,Q as c,Z as l,et as u}from"./iframe-DhyuiKyB.js";import{a as d,c as f,d as p,g as m,h,i as g,l as _,p as v,r as y,t as b,u as x}from"./kit-CWUgB5-0.js";function S(e){let[t,n]=(0,w.useState)(e.open);return(0,T.jsx)(s,{room:{name:e.name,status:e.status,patientsToday:e.appointments,provider:e.provider},turnos:O.slice(0,e.appointments).map(t=>({...t,operatory:e.name})),abierta:t,onToggle:()=>n(e=>!e),onSelect:k})}function C(){let e=v(`:scope > div > div`),t=v(`:scope > div > button > span > span`);return(0,T.jsxs)(T.Fragment,{children:[(0,T.jsx)(`div`,{ref:e.ref,className:`w-[320px]`,children:(0,T.jsx)(`div`,{ref:t.ref,children:(0,T.jsx)(s,{room:E,turnos:O.slice(0,3),onToggle:k})})}),(0,T.jsxs)(f,{encabezado:[`Part`,`Height`,`Padding`,`Radius`,`Gap`,`Text`],minimo:560,children:[(0,T.jsxs)(`tr`,{children:[(0,T.jsx)(`td`,{className:`font-semibold`,children:`Card (closed)`}),(0,T.jsx)(`td`,{className:`tabular-nums`,children:e.m?.alto}),(0,T.jsx)(`td`,{className:`tabular-nums`,children:e.m?.padding}),(0,T.jsx)(`td`,{className:`tabular-nums`,children:e.m?.radio}),(0,T.jsx)(`td`,{className:`tabular-nums`,children:e.m?.gap}),(0,T.jsx)(`td`,{children:`—`})]}),(0,T.jsxs)(`tr`,{children:[(0,T.jsx)(`td`,{className:`font-semibold`,children:`Name`}),(0,T.jsx)(`td`,{children:`—`}),(0,T.jsx)(`td`,{children:`—`}),(0,T.jsx)(`td`,{children:`—`}),(0,T.jsx)(`td`,{children:`—`}),(0,T.jsxs)(`td`,{className:`tabular-nums`,children:[t.m?.texto,` · `,t.m?.peso]})]})]})]})}var w,T,E,D,O,k,A,j,M,N,P,F,I,L;function R(){return(R=e((()=>{w=t(),u(),p(),a(),n(),h(),T=i(),E={name:`Operatory 2`,status:`Busy`,patientsToday:3,provider:`Daniel Anderson`},D=(e,t,n,r,i=!1)=>({name:e,initials:t,provider:`Dr. Elena Martinez`,operatory:`Operatory 2`,time:n,motivo:r,completado:i}),O=[D(`Ines Bermudez`,`IB`,`09:00`,`Consultation`,!0),D(`Noah James`,`NJ`,`10:00`,`Cleaning`,!0),D(`Mara Otero`,`MO`,`11:30`,`Check-up`),D(`Sofia Chen`,`SC`,`12:00`,`Cleaning`),D(`Elias Aguirre`,`EA`,`13:15`,`Consultation`)],k=()=>{},A={title:`Components/Dashboard/OperatoryCard`,parameters:{layout:`padded`,docs:{description:{component:["Una sala del Dashboard (`@/components/dashboard/OperatoryCard`, diseño del artifact de Julián, 2026-10-19): el nombre, su estado (**Available**, **Busy**, **Unavailable**), cuántos pacientes tiene hoy y el profesional.",``,`**Toma el color de su estado:** borde y fondo, los de su pill (verde Available, azul Busy, rojo Unavailable), para ver de un vistazo qué sala está libre. La línea desplegada va sobre blanco (Julián, 2026-10-19).`,``,"**Es un acordeón:** con `onToggle` la card es un botón (`aria-expanded`) y **tocarla despliega la línea del día de esa sala**: a la izquierda la hora y un punto unidos por una línea (tilde verde si ya se atendió, aro azul si viene), a la derecha el turno con el paciente, el motivo, el profesional y *Complete* o *Upcoming*; los que vienen van resaltados en azul. **No filtra nada de afuera**: la Waiting Room es independiente. Tocar un turno abre la ficha del paciente.",``,'**"Patients today"** es la cantidad de turnos de la sala (`turnos`), así que coincide con las filas de su línea.',``,`**Probalo:** en *Playground* cambiá el estado, los textos, la cantidad de turnos y el ancho desde *Controls*; tocá la card para desplegarla.`].join(`
+`)}}},args:{status:`Busy`,name:`Operatory 2`,provider:`Daniel Anderson`,appointments:3,open:!1,width:320},argTypes:{status:{control:`inline-radio`,options:[`Available`,`Busy`,`Unavailable`],description:`El estado: el color de la pill.`},name:{control:`text`,description:`Nombre de la sala, el mismo que dicen los turnos. Uno largo se corta con elipsis.`},provider:{control:`text`,description:`Profesional de la sala.`},appointments:{control:{type:`range`,min:0,max:5},description:`Turnos del día en esta sala: el globo celeste y las filas de la línea.`},open:{control:`boolean`,description:`Arranca desplegada.`},width:{control:{type:`range`,min:240,max:480,step:4},description:`Ancho de la card. En el Dashboard, de 250px (1280) a 430px (1920).`}}},j={controls:{disable:!0}},M=({children:e,ancho:t})=>(0,T.jsx)(`div`,{className:r(o,`max-w-full p-4`),style:t?{width:t+32}:void 0,children:e}),N={render:e=>(0,T.jsx)(M,{ancho:e.width,children:(0,T.jsx)(S,{...e},`${e.open}-${e.appointments}`)})},P={parameters:j,render:()=>(0,T.jsxs)(g,{children:[(0,T.jsx)(b,{nota:`Arriba el nombre, la pill de estado y la flecha; abajo, los pacientes de hoy y el profesional. Desplegada, la línea del día.`,children:(0,T.jsx)(M,{ancho:320,children:(0,T.jsx)(s,{room:E,turnos:O.slice(0,3),abierta:!0,onToggle:k,onSelect:k})})}),(0,T.jsx)(_,{partes:[[`Name`,`El nombre de la sala, 14px Semibold, el mismo que dicen los turnos ("Operatory 2"); se corta con elipsis si no entra.`,`room.name`],[`Status`,`La pill del estado: verde Available, azul Busy, rojo Unavailable.`,`StatusPill`],[`Arrow`,`Chevron a la derecha de la pill; gira al desplegar. Sólo si la card es un acordeón.`,`onToggle · aria-expanded`],[`Patients today`,`Ícono de calendario y la cantidad de turnos de la sala en el globo celeste.`,`turnos.length`],[`Provider`,`Ícono de persona y el profesional; baja de renglón si no entra.`,`room.provider`],[`Timeline`,`Hora y punto a la izquierda, unidos por una línea; el turno a la derecha. Tilde verde = Complete, aro azul = Upcoming.`,`LineaDelDia`],[`Appointment`,`Iniciales, nombre, motivo, profesional y el estado. Upcoming va con borde y fondo azul; tocarlo abre la ficha.`,`turnos · onSelect`],[`Surface`,`Borde de 1px y fondo del color del estado, los de su pill; desplegada, suma la sombra de panel y la línea va sobre blanco.`,`OPERATORY_SURFACES · abierta`]]}),(0,T.jsx)(b,{titulo:`The timeline on its own`,nota:`LineaDelDia es lo que se despliega; se puede usar suelta.`,children:(0,T.jsx)(M,{ancho:320,children:(0,T.jsx)(l,{room:E,turnos:O.slice(0,3),onSelect:k})})})]})},F={parameters:j,render:()=>(0,T.jsxs)(g,{children:[(0,T.jsx)(`div`,{className:`flex flex-wrap gap-6`,children:[`Available`,`Busy`,`Unavailable`].map((e,t)=>(0,T.jsx)(d,{titulo:e,ancho:344,children:(0,T.jsx)(M,{children:(0,T.jsx)(s,{room:{...E,name:`Operatory ${t+1}`,status:e},turnos:O.slice(0,t+1),onToggle:k})})},e))}),(0,T.jsxs)(`div`,{className:`grid gap-6 md:grid-cols-2`,children:[(0,T.jsx)(d,{titulo:`Open`,nota:`La línea del día: los que ya se atendieron con tilde verde, los que vienen con aro azul y resaltados.`,children:(0,T.jsx)(M,{children:(0,T.jsx)(s,{room:E,turnos:O.slice(0,4),abierta:!0,onToggle:k,onSelect:k})})}),(0,T.jsx)(d,{titulo:`Open, no appointments`,nota:`Una sala sin turnos dice que no tiene nada hoy.`,children:(0,T.jsx)(M,{children:(0,T.jsx)(s,{room:{...E,status:`Available`},turnos:[],abierta:!0,onToggle:k})})}),(0,T.jsx)(d,{titulo:`Hover`,nota:`Suma la sombra de las cards.`,children:(0,T.jsx)(y,{selector:`button`,estado:`hover`,children:(0,T.jsx)(M,{children:(0,T.jsx)(s,{room:E,turnos:O.slice(0,3),onToggle:k})})})}),(0,T.jsx)(d,{titulo:`Keyboard focus`,nota:`El anillo de foco de la app; Enter o espacio la despliegan.`,children:(0,T.jsx)(y,{selector:`button`,estado:`focus-visible`,children:(0,T.jsx)(M,{children:(0,T.jsx)(s,{room:E,turnos:O.slice(0,3),onToggle:k})})})}),(0,T.jsx)(d,{titulo:`Static (no accordion)`,nota:`Sin onToggle es sólo la ficha de la sala, sin flecha ni línea.`,children:(0,T.jsx)(M,{children:(0,T.jsx)(s,{room:E,turnos:O.slice(0,3)})})}),(0,T.jsx)(d,{titulo:`Narrow (250px), long name`,nota:`El ancho de la columna a 1280px: el nombre se corta con elipsis y el profesional baja de renglón.`,children:(0,T.jsx)(M,{ancho:250,children:(0,T.jsx)(s,{room:{...E,name:`Operatory 12 · Surgery room`,status:`Unavailable`},turnos:O.slice(0,2),abierta:!0,onToggle:k,onSelect:k})})})]})]})},I={parameters:j,render:()=>(0,T.jsxs)(g,{children:[(0,T.jsx)(b,{titulo:`Size`,nota:`Leído de la card dibujada, a 320px.`,children:(0,T.jsx)(C,{})}),(0,T.jsx)(b,{titulo:`Timeline`,children:(0,T.jsxs)(f,{encabezado:[`Part`,`Value`],minimo:480,children:[(0,T.jsxs)(`tr`,{children:[(0,T.jsx)(`td`,{className:`font-semibold`,children:`Time column`}),(0,T.jsx)(`td`,{className:`tabular-nums`,children:`44px · 11px Semibold`})]}),(0,T.jsxs)(`tr`,{children:[(0,T.jsx)(`td`,{className:`font-semibold`,children:`Dot`}),(0,T.jsxs)(`td`,{children:[`16px · `,(0,T.jsx)(x,{nombre:`dash-ok-fg`}),` filled with check (Complete) · `,(0,T.jsx)(x,{nombre:`dash-blue`}),` 3px ring (Upcoming)`]})]}),(0,T.jsxs)(`tr`,{children:[(0,T.jsx)(`td`,{className:`font-semibold`,children:`Connector`}),(0,T.jsxs)(`td`,{children:[`1px · `,(0,T.jsx)(x,{nombre:`line`})]})]}),(0,T.jsxs)(`tr`,{children:[(0,T.jsx)(`td`,{className:`font-semibold`,children:`Upcoming card`}),(0,T.jsxs)(`td`,{children:[(0,T.jsx)(x,{nombre:`info-bg`}),` fill · `,(0,T.jsx)(x,{nombre:`dash-blue`}),` border`]})]}),(0,T.jsxs)(`tr`,{children:[(0,T.jsx)(`td`,{className:`font-semibold`,children:`Complete card`}),(0,T.jsxs)(`td`,{children:[`white · `,(0,T.jsx)(x,{nombre:`line-row`}),` border`]})]})]})}),(0,T.jsx)(b,{titulo:`Colors`,nota:`De OPERATORY_SURFACES (OperatoryCard.tsx): el mismo par de tokens que la pill de cada estado.`,children:(0,T.jsx)(f,{encabezado:[`Status`,`Fill`,`Border`],minimo:480,children:Object.keys(c).map(e=>{let t=m(c[e]);return(0,T.jsxs)(`tr`,{children:[(0,T.jsx)(`td`,{className:`font-semibold`,children:e}),(0,T.jsx)(`td`,{children:(0,T.jsx)(x,{nombre:t.fondo})}),(0,T.jsx)(`td`,{children:(0,T.jsx)(x,{nombre:t.borde})})]},e)})})}),(0,T.jsx)(b,{titulo:`Card`,children:(0,T.jsxs)(f,{encabezado:[`Part`,`Value`],minimo:480,children:[(0,T.jsxs)(`tr`,{children:[(0,T.jsx)(`td`,{className:`font-semibold`,children:`Open`}),(0,T.jsx)(`td`,{children:`shadow-panel · timeline on white`})]}),(0,T.jsxs)(`tr`,{children:[(0,T.jsx)(`td`,{className:`font-semibold`,children:`Patients today`}),(0,T.jsxs)(`td`,{children:[(0,T.jsx)(x,{nombre:`dash-count-bg`}),` · `,(0,T.jsx)(x,{nombre:`dash-blue-hover`})]})]})]})})]})},L=[`Playground`,`Parts`,`States`,`Specs`],N.parameters={...N.parameters,docs:{...N.parameters?.docs,source:{originalSource:"{\n  render: a => <Panel ancho={a.width}><Plegable key={`${a.open}-${a.appointments}`} {...a} /></Panel>\n}",...N.parameters?.docs?.source}}},P.parameters={...P.parameters,docs:{...P.parameters?.docs,source:{originalSource:`{
+  parameters: sinControles,
+  render: () => <Lienzo>
+      <Bloque nota="Arriba el nombre, la pill de estado y la flecha; abajo, los pacientes de hoy y el profesional. Desplegada, la línea del día.">
+        <Panel ancho={320}><OperatoryCard room={SALA} turnos={TURNOS.slice(0, 3)} abierta onToggle={nada} onSelect={nada} /></Panel>
+      </Bloque>
+      <TablaPartes partes={[['Name', 'El nombre de la sala, 14px Semibold, el mismo que dicen los turnos ("Operatory 2"); se corta con elipsis si no entra.', 'room.name'], ['Status', 'La pill del estado: verde Available, azul Busy, rojo Unavailable.', 'StatusPill'], ['Arrow', 'Chevron a la derecha de la pill; gira al desplegar. Sólo si la card es un acordeón.', 'onToggle · aria-expanded'], ['Patients today', 'Ícono de calendario y la cantidad de turnos de la sala en el globo celeste.', 'turnos.length'], ['Provider', 'Ícono de persona y el profesional; baja de renglón si no entra.', 'room.provider'], ['Timeline', 'Hora y punto a la izquierda, unidos por una línea; el turno a la derecha. Tilde verde = Complete, aro azul = Upcoming.', 'LineaDelDia'], ['Appointment', 'Iniciales, nombre, motivo, profesional y el estado. Upcoming va con borde y fondo azul; tocarlo abre la ficha.', 'turnos · onSelect'], ['Surface', 'Borde de 1px y fondo del color del estado, los de su pill; desplegada, suma la sombra de panel y la línea va sobre blanco.', 'OPERATORY_SURFACES · abierta']]} />
+      <Bloque titulo="The timeline on its own" nota="LineaDelDia es lo que se despliega; se puede usar suelta.">
+        <Panel ancho={320}><LineaDelDia room={SALA} turnos={TURNOS.slice(0, 3)} onSelect={nada} /></Panel>
+      </Bloque>
+    </Lienzo>
+}`,...P.parameters?.docs?.source}}},F.parameters={...F.parameters,docs:{...F.parameters?.docs,source:{originalSource:`{
+  parameters: sinControles,
+  render: () => <Lienzo>
+      <div className="flex flex-wrap gap-6">
+        {(['Available', 'Busy', 'Unavailable'] as const).map((s, i) => <Muestra key={s} titulo={s} ancho={344}>
+            <Panel><OperatoryCard room={{
+            ...SALA,
+            name: \`Operatory \${i + 1}\`,
+            status: s
+          }} turnos={TURNOS.slice(0, i + 1)} onToggle={nada} /></Panel>
+          </Muestra>)}
+      </div>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Muestra titulo="Open" nota="La línea del día: los que ya se atendieron con tilde verde, los que vienen con aro azul y resaltados.">
+          <Panel><OperatoryCard room={SALA} turnos={TURNOS.slice(0, 4)} abierta onToggle={nada} onSelect={nada} /></Panel>
+        </Muestra>
+        <Muestra titulo="Open, no appointments" nota="Una sala sin turnos dice que no tiene nada hoy.">
+          <Panel><OperatoryCard room={{
+            ...SALA,
+            status: 'Available'
+          }} turnos={[]} abierta onToggle={nada} /></Panel>
+        </Muestra>
+        <Muestra titulo="Hover" nota="Suma la sombra de las cards.">
+          <Forzar selector="button" estado="hover"><Panel><OperatoryCard room={SALA} turnos={TURNOS.slice(0, 3)} onToggle={nada} /></Panel></Forzar>
+        </Muestra>
+        <Muestra titulo="Keyboard focus" nota="El anillo de foco de la app; Enter o espacio la despliegan.">
+          <Forzar selector="button" estado="focus-visible"><Panel><OperatoryCard room={SALA} turnos={TURNOS.slice(0, 3)} onToggle={nada} /></Panel></Forzar>
+        </Muestra>
+        <Muestra titulo="Static (no accordion)" nota="Sin onToggle es sólo la ficha de la sala, sin flecha ni línea.">
+          <Panel><OperatoryCard room={SALA} turnos={TURNOS.slice(0, 3)} /></Panel>
+        </Muestra>
+        <Muestra titulo="Narrow (250px), long name" nota="El ancho de la columna a 1280px: el nombre se corta con elipsis y el profesional baja de renglón.">
+          <Panel ancho={250}><OperatoryCard room={{
+            ...SALA,
+            name: 'Operatory 12 · Surgery room',
+            status: 'Unavailable'
+          }} turnos={TURNOS.slice(0, 2)} abierta onToggle={nada} onSelect={nada} /></Panel>
+        </Muestra>
+      </div>
+    </Lienzo>
+}`,...F.parameters?.docs?.source}}},I.parameters={...I.parameters,docs:{...I.parameters?.docs,source:{originalSource:`{
+  parameters: sinControles,
+  render: () => <Lienzo>
+      <Bloque titulo="Size" nota="Leído de la card dibujada, a 320px.">
+        <Medidas />
+      </Bloque>
+      <Bloque titulo="Timeline">
+        <Tabla encabezado={['Part', 'Value']} minimo={480}>
+          <tr><td className="font-semibold">Time column</td><td className="tabular-nums">44px · 11px Semibold</td></tr>
+          <tr><td className="font-semibold">Dot</td><td>16px · <Token nombre="dash-ok-fg" /> filled with check (Complete) · <Token nombre="dash-blue" /> 3px ring (Upcoming)</td></tr>
+          <tr><td className="font-semibold">Connector</td><td>1px · <Token nombre="line" /></td></tr>
+          <tr><td className="font-semibold">Upcoming card</td><td><Token nombre="info-bg" /> fill · <Token nombre="dash-blue" /> border</td></tr>
+          <tr><td className="font-semibold">Complete card</td><td>white · <Token nombre="line-row" /> border</td></tr>
+        </Tabla>
+      </Bloque>
+      <Bloque titulo="Colors" nota="De OPERATORY_SURFACES (OperatoryCard.tsx): el mismo par de tokens que la pill de cada estado.">
+        <Tabla encabezado={['Status', 'Fill', 'Border']} minimo={480}>
+          {(Object.keys(OPERATORY_SURFACES) as OperatoryStatus[]).map(s => {
+          const t = tokensDe(OPERATORY_SURFACES[s]);
+          return <tr key={s}><td className="font-semibold">{s}</td><td><Token nombre={t.fondo} /></td><td><Token nombre={t.borde} /></td></tr>;
+        })}
+        </Tabla>
+      </Bloque>
+      <Bloque titulo="Card">
+        <Tabla encabezado={['Part', 'Value']} minimo={480}>
+          <tr><td className="font-semibold">Open</td><td>shadow-panel · timeline on white</td></tr>
+          <tr><td className="font-semibold">Patients today</td><td><Token nombre="dash-count-bg" /> · <Token nombre="dash-blue-hover" /></td></tr>
+        </Tabla>
+      </Bloque>
+    </Lienzo>
+}`,...I.parameters?.docs?.source}}}})))()}R();export{P as Parts,N as Playground,I as Specs,F as States,L as __namedExportsOrder,A as default};
