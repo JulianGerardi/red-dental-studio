@@ -98,3 +98,24 @@ al archivo del drawer. Design system: *Components / Patients / AddRelationshipDr
 El avatar de cada card deja el círculo de 40px del Figma (ver *Especificación*) y pasa al cuadrado con esquinas
 redondeadas de `ui/avatar`, mismo tamaño y color. Las cards de Add relationship ya eran cuadradas. Regla en
 `../README.md`.
+
+## "Select person" pasa a `PersonSearchField`, compartido por toda la app (2026-10-20)
+
+Julián: "cuando busco un patient el parte de appointment o en cualquier buscador de la app el diseño debe ser el mismo
+que tenemos en add relationship cuando pongo: select person". Buscar una persona se veía distinto según la pantalla:
+acá (y en los modales de Insurance) las sugerencias ya eran cards con avatar, DOB y email, y la elegida quedaba con
+borde azul y un visto; en New Appointment (Patient, Primary/Additional Provider) y en New Patient (Select Person del
+guardián) la misma búsqueda usaba `ui/SearchField`, un menú flotante sin avatar con una sola línea de texto por
+sugerencia.
+
+Se extrajo el diseño de acá a `PersonSearchField` (`patients/form.tsx`, al lado de `SearchField`): mismo campo, pero
+las sugerencias y la elegida son las cards de Add Relationship -avatar, nombre y hasta dos líneas (`lineas`, como
+"DOB: …" / "Email: …")- en vez de un menú flotante, sin resultados mientras no se escribe nada. `AddRelationshipDrawer`
+pasa a usarlo (ya no tiene su propio bloque de búsqueda); también se armó con New Appointment, New Patient y los dos
+buscadores de persona de Insurance (Select Subscriber, Dependent Patient) — ver `scheduling.md`, `patients.md` e
+`insurance.md` (2026-10-20). Fuera de alcance: `PlanFields.tsx` → "Contact" (un contacto de la aseguradora, con su
+propia `X` para vaciar al lado, no un buscador de paciente/provider) y los dos displays fijos de
+`ManageSubscriptionModal` (muestran al suscriptor/dependiente ya elegido, sin buscador).
+
+**Para el dev:** *Elements / Fields → States → Person search* documenta el campo nuevo y sus estados (vacío,
+escribiendo, elegido, deshabilitado). Ver `design-system.md` (2026-10-20).

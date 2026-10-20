@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import {
-  ModalShell, TextField, SelectField, DateField, SearchField,
+  ModalShell, TextField, SelectField, DateField, PersonSearchField,
   LinkPersonCheckbox, OptionCheckbox,
 } from '@/components/patients/form'
 import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer'
 import { Alert } from '@/components/ui/alert'
 import { usePatients, type NuevoPaciente } from '@/data/patientsStore'
 import { aviso } from '@/components/ui/toaster'
+import { DIRECTORIO } from '@/components/patients/AddRelationshipDrawer'
 
 /* Figma 3639:55808 (base) y 3640:56478 (con guardián).
    La variante con guardián sólo agrega una tercera sección debajo de la
@@ -30,6 +31,12 @@ function esMenor(texto: string) {
 }
 const VACIO: NuevoPaciente = { first: '', middle: '', last: '', email: '', birthday: '', gender: '' }
 const PERSONAS = ['Jessica Miller', 'Michael Miller', 'Robert Miller', 'Sarah Stone', 'Daniel Anderson']
+/* DOB y email para quienes están en el directorio de Add Relationship (mismo diseño: Julián, 2026-10-20); el resto
+   de PERSONAS sólo muestra el nombre, como cualquier buscador sin datos de más. */
+const personaLineas = (nombre: string) => {
+  const p = DIRECTORIO.find((x) => x.name === nombre)
+  return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
+}
 
 export function NewPatientModal({
   title = 'New Patient',
@@ -100,8 +107,8 @@ export function NewPatientModal({
           <OptionCheckbox label="Create a new user account with this email address" />
           {vincular ? (
             <>
-              <SearchField
-                label="Select Person" required placeholder="Search by Name or Last Name" options={PERSONAS}
+              <PersonSearchField
+                label="Select Person" required placeholder="Search by Name or Last Name" personas={PERSONAS} lineas={personaLineas}
                 value={persona} onChange={setPersona} error={falta(persona)}
               />
               {persona && <Alert tone="warning" title="If underage, you must enable a guarantor in the next step" />}
@@ -126,7 +133,7 @@ export function NewPatientModal({
           <DrawerSection title="Guardian Information">
             <OptionCheckbox label="Add new person" defaultChecked={false} />
             <OptionCheckbox label="This person is also the guarantor" defaultChecked={false} />
-            <SearchField label="Select Person" placeholder="Search by Name or Last Name" options={PERSONAS} />
+            <PersonSearchField label="Select Person" placeholder="Search by Name or Last Name" personas={PERSONAS} lineas={personaLineas} />
             <SelectField label="Relationship to Patient" required options={['Parent', 'Guardian', 'Sibling', 'Spouse', 'Other']} />
           </DrawerSection>
         </DrawerStep>
