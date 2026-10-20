@@ -62,23 +62,26 @@ export function Drawer({
 
   /* Una sombra sobre el pie avisa que el paso sigue con scroll (no hay otra pista: el pie no se mueve). Un degradé como
      el de ui/show-more no sirve acá: tapaba el último campo entero contra el fondo blanco del drawer, dejándolo en
-     blanco en vez de recortado (probado y descartado). */
-  const scroll = React.useRef<HTMLDivElement>(null)
-  const contenido = React.useRef<HTMLDivElement>(null)
+     blanco en vez de recortado (probado y descartado).
+     Bug: con un `ref` de `useRef`, el efecto que arma el ResizeObserver corría con la ref todavía en null -el
+     contenido del Dialog de Radix se monta en el DOM un tick después del primer render del Drawer- y nunca más se
+     reintentaba: la sombra no aparecía nunca, con cualquier alto de ventana (Julián, 2026-10-20, ver
+     design-reference/figma/modulos/scheduling.md). Con `useState` en vez de `useRef`, el callback ref dispara un
+     render en cuanto el nodo real aparece y el efecto (que depende de ese estado) corre de nuevo. */
+  const [scroll, setScroll] = React.useState<HTMLDivElement | null>(null)
+  const [contenido, setContenido] = React.useState<HTMLDivElement | null>(null)
   const [masAbajo, setMasAbajo] = React.useState(false)
   const medir = React.useCallback(() => {
-    const el = scroll.current
-    if (el) setMasAbajo(el.scrollHeight - el.scrollTop - el.clientHeight > 4)
-  }, [])
+    if (scroll) setMasAbajo(scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight > 4)
+  }, [scroll])
   React.useEffect(() => {
     medir()
-    const el = contenido.current
-    if (!el || typeof ResizeObserver === 'undefined') return
+    if (!contenido || typeof ResizeObserver === 'undefined') return
     const ro = new ResizeObserver(medir)
-    ro.observe(el)
+    ro.observe(contenido)
     window.addEventListener('resize', medir)
     return () => { ro.disconnect(); window.removeEventListener('resize', medir) }
-  }, [medir, open])
+  }, [medir, contenido, open])
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={(v) => !v && onClose()}>
@@ -106,8 +109,8 @@ export function Drawer({
             {conPasos && <StepIndicator total={steps.length} current={step + 1} labels={steps} className="px-6 pt-6" />}
             <Sentido.Provider value={sentido}>
             <EnDrawer.Provider value>
-              <div ref={scroll} onScroll={medir} className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
-                <div ref={contenido}>
+              <div ref={setScroll} onScroll={medir} className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+                <div ref={setContenido}>
                   {children}
                   {aside && <div className="mt-6 lg:hidden">{aside}</div>}
                 </div>

@@ -1062,6 +1062,15 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
   *Parts* suma **Footer shadow**; la descripción del componente lo explica. Decisiones en `figma/modulos/dashboard.md`
   (2026-10-19), que es donde apareció el caso (New Appointment).
 
+## Drawer: la sombra del pie nunca se disparaba (2026-10-20)
+
+- *Components / UI / Drawer*: la sombra del 2026-10-19 (arriba) no llegaba a aparecer con ningún alto de ventana —
+  el `ResizeObserver` se armaba en un `useEffect` que leía la ref todavía en `null` (el contenido del `Dialog` de
+  Radix se monta un tick después) y, como el efecto no volvía a correr, el `ResizeObserver` y el listener de
+  `resize` nunca llegaban a conectarse. `scroll`/`contenido` pasan de `useRef` a `useState` (ref por callback): el
+  efecto depende del nodo real y corre de nuevo en cuanto aparece. Decisiones en `figma/modulos/scheduling.md`
+  (2026-10-20), que es donde volvió a aparecer el caso (New Appointment).
+
 ## Dashboard: sala de espera filtrada, sin repetir la sala y sin el hueco blanco (2026-10-19)
 
 - *Components / Dashboard / Operatory strip*: el anillo de la primera sala ya no se corta contra el borde del scroll
