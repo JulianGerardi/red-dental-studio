@@ -2423,3 +2423,28 @@ decisión de UX nueva.
 
 Código: `clinical/dental/ConfirmProcedureDialog.tsx`, `clinical/ClinicalTopBar.tsx` (`ClinicalNoteDialog`).
 Design system: *Elements / ConfirmDialog* (fila nueva en *Specs* › *Where*).
+
+## New Procedure: vincular pide un procedimiento ya cargado (2026-10-20)
+
+Julián vio el problema: para vincular un finding y un diagnóstico hace falta tener el procedimiento cargado, pero el
+drawer no lo cargaba hasta el final. Los cuatro pasos (Procedure, Surfaces, Link to finding, Link to diagnosis)
+compartían un único Save al cierre, así que nada quedaba guardado si se cerraba antes, y conceptualmente se pedía
+vincular algo que todavía no existía.
+
+1. **Procedure (y Surfaces, si el procedimiento va en superficie) ya no llevan a "Next Step" hacia los pasos de
+   vínculo**: ese paso es ahora el último antes de guardar, con el botón **Save**. Guarda el procedimiento sin
+   vínculos (`linked: []`, `diagnoses: []`) y dispara el mismo aviso de siempre ("D0120 charted as planned on tooth
+   21").
+2. **Recién con eso guardado aparecen Link to finding y Link to diagnosis** en el indicador de pasos, para vincular
+   hallazgos y diagnósticos al procedimiento que ya existe. El Save de Link to diagnosis guarda esos vínculos sobre
+   ese mismo procedimiento (no crea uno nuevo) y cierra el drawer.
+3. **Existing no cambia**: nunca tuvo pasos de vínculo (lo ya hecho no resuelve un hallazgo), así que sigue siendo un
+   solo paso, sin indicador, con Save.
+
+`NewProcedureDrawer` separa `onSave` (crea el procedimiento y devuelve su id) de `onLink` (guarda `linked`/`diagnoses`
+sobre ese id); `ExamLayout.saveProcedure` devuelve el id generado y suma `linkProcedure` para el segundo guardado. La
+UI y el catálogo de procedimientos no cambian, sólo cuándo se guarda cada parte.
+
+Código: `clinical/dental/NewProcedureDrawer.tsx`, `clinical/ExamLayout.tsx`.
+Design system: *Components / Clinical / Dental / NewProcedureDrawer* (Parts, Specs y los estados `LinkToFindingStep` /
+`LinkToDiagnosisStep` actualizados).

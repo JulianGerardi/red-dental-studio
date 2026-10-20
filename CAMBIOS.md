@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-20
 
+### New Procedure: vincular un finding o un diagnóstico pide un procedimiento ya cargado ([#74](https://github.com/JulianGerardi/red-dental-studio/pull/74))
+- El drawer de Add Procedure/Add Condition guardaba todo junto al final (Procedure, Surfaces, Link to finding, Link to
+  diagnosis), así que nada quedaba cargado hasta terminar los cuatro pasos, aunque vincular pide un procedimiento que
+  ya exista.
+- Ahora el paso de Procedure (y Surfaces, si el procedimiento va en superficie) termina en **Save**: guarda el
+  procedimiento ahí mismo, sin vínculos. Recién con eso guardado **aparecen** los pasos Link to finding y Link to
+  diagnosis, para vincularlo. Existing sin superficie sigue igual (un solo paso, Save).
+- **Para el dev:** `NewProcedureDrawer` separa `onSave` (crea el procedimiento y devuelve su id) de `onLink` (guarda
+  `linked`/`diagnoses` sobre ese id, sin crear uno nuevo). Quien lo use tiene que devolver el id en `onSave` y pasar
+  `onLink`.
+
 ### Buscar una persona se ve igual en toda la app, y la sombra del pie del drawer que no se disparaba ([#72](https://github.com/JulianGerardi/red-dental-studio/pull/72))
 - **Buscar una persona** (Patient y Provider de New Appointment, Select Person de New Patient, Select Subscriber y
   Dependent Patient de Insurance) ya no es un menú flotante con una línea de texto: las sugerencias y la elegida son

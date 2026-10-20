@@ -16,15 +16,15 @@ test('Add Procedure carga un D0120 desde DentAssmt', async ({ app, screen }) => 
   const drawer = screen.getByRole('dialog', 'New Procedure')
   await expect(drawer).toBeVisible()
   await drawer.getByRole('button', /^D0120\s*-/).first().tap()
-  // Sin superficie: de Procedure pasa directo a Link to finding y después a Link to diagnosis, con los códigos.
-  await drawer.getByRole('button', /Next Step/).tap()
+  // Sin superficie, Procedure ya es el último paso antes de guardar: el botón dice Save.
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText(/D0120 charted as planned/)).toBeVisible()
+  // Al guardar el procedimiento aparecen los pasos para vincularlo.
   await expect(drawer.getByText('You can link clinical findings that may be resolved by this procedure.')).toBeVisible()
   await drawer.getByRole('button', /Next Step/).tap()
   await expect(drawer.getByText(/K05\.31/).first()).toBeVisible()
   await drawer.getByRole('button', /^Link K05\.31/).tap()
   await drawer.getByRole('button', /^Save/).tap()
-
-  await expect(screen.getByText(/D0120 charted as planned/)).toBeVisible()
 })
 
 test('Surfaces aparece sólo con un procedimiento de diente + superficie', async ({ app, screen }) => {
@@ -36,12 +36,14 @@ test('Surfaces aparece sólo con un procedimiento de diente + superficie', async
   await drawer.getByRole('button', 'D2140 on surface').tap()
   await drawer.getByRole('button', /Next Step/).tap()
   await expect(drawer.getByText('Apply to unset')).toBeVisible()
-  await expect(drawer.getByRole('button', /Next Step/)).toBeDisabled()
+  // Surfaces es el último paso antes de guardar: el botón ya dice Save.
+  await expect(drawer.getByRole('button', /^Save/)).toBeDisabled()
   await drawer.getByRole('checkbox', 'Occlusal').tap()
-  await drawer.getByRole('button', /Next Step/).tap()
-  await drawer.getByRole('button', /Next Step/).tap()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/D2140 charted as planned/)).toBeVisible()
+  // Al guardar el procedimiento aparecen los pasos para vincularlo.
+  await drawer.getByRole('button', /Next Step/).tap()
+  await drawer.getByRole('button', /^Save/).tap()
 })
 
 test('Existing no tiene Link to finding: sin superficie se guarda en un paso', async ({ app, screen }) => {
