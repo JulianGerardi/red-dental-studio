@@ -1096,3 +1096,14 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
 - Mismo mecanismo que ya reserva el alto de Confibot (`pb-24 sm:pb-28`, ver *Confibot flotante abajo a la derecha*):
   `AppShell` suma `sm:pr-16` al `main`, así ningún panel o tabla llega nunca hasta donde flota la pestaña. No se tocó
   `PatientInSessionPopup`. Decisión y verificación en `figma/README.md` → *Responsive* (2026-10-20).
+
+## New Procedure: vincular pide un procedimiento ya cargado (2026-10-20)
+
+- Julián: para vincular un finding o un diagnóstico, el procedimiento tiene que existir primero, y antes no era así:
+  el drawer juntaba Procedure, Surfaces, Link to finding y Link to diagnosis en un único Save al final, así que nada
+  quedaba cargado hasta terminar los cuatro pasos.
+- Ahora el paso de **Procedure** (y **Surfaces**, si el procedimiento va en superficie) termina en **Save**, que
+  guarda el procedimiento ahí mismo, sin vínculos todavía. Recién con eso guardado **aparecen** Link to finding y
+  Link to diagnosis, para vincular hallazgos y diagnósticos al procedimiento que ya existe; su Save guarda esos
+  vínculos y cierra. Existing sin superficie sigue igual: un solo paso, sin indicador, con Save (no tiene vínculos).
+- Decisión y verificación en `figma/modulos/clinical-mode.md` (2026-10-20).

@@ -89,10 +89,11 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, childr
   const { ver, drawer } = useVerRegistro()
 
   function saveProcedure(draft: ProcedureDraft) {
+    const id = `F-${Date.now()}`
     const tooth = draft.tooth
     setFindings((f) => [
       {
-        id: `F-${Date.now()}`,
+        id,
         area: tooth !== null ? `Tooth ${tooth}` : draft.area,
         condition: `${draft.procedure.code} - ${draft.procedure.label}`,
         descriptor: draft.surfaces.join(', ') || draft.scope,
@@ -105,6 +106,12 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, childr
       setUltima({ condicion: draft.procedure.label, actualizado: new Date().toLocaleDateString('en-GB'), pieza: tooth, examen })
     }
     aviso.ok(`${draft.procedure.code} charted as ${draft.status.toLowerCase()} on ${tooth !== null ? `tooth ${tooth}` : draft.area.toLowerCase()}.`)
+    return id
+  }
+
+  /** Link to finding / Link to diagnosis: se guardan sobre el procedimiento ya cargado con saveProcedure. */
+  function linkProcedure(id: string, patch: { linked: string[]; diagnoses: string[] }) {
+    setFindings((all) => all.map((f) => (f.id === id ? { ...f, ...patch } : f)))
   }
 
   function applyConfirm(treatedIds: string[]) {
@@ -207,6 +214,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, childr
         findings={findings}
         onClose={() => setProcedureOpen(null)}
         onSave={saveProcedure}
+        onLink={linkProcedure}
       />
 
       <EditFindingDrawer

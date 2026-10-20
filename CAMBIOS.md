@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-20
 
+### New Procedure: vincular un finding o un diagnóstico pide un procedimiento ya cargado ([#74](https://github.com/JulianGerardi/red-dental-studio/pull/74))
+- El drawer de Add Procedure/Add Condition guardaba todo junto al final (Procedure, Surfaces, Link to finding, Link to
+  diagnosis), así que nada quedaba cargado hasta terminar los cuatro pasos, aunque vincular pide un procedimiento que
+  ya exista.
+- Ahora el paso de Procedure (y Surfaces, si el procedimiento va en superficie) termina en **Save**: guarda el
+  procedimiento ahí mismo, sin vínculos. Recién con eso guardado **aparecen** los pasos Link to finding y Link to
+  diagnosis, para vincularlo. Existing sin superficie sigue igual (un solo paso, Save).
+- **Para el dev:** `NewProcedureDrawer` separa `onSave` (crea el procedimiento y devuelve su id) de `onLink` (guarda
+  `linked`/`diagnoses` sobre ese id, sin crear uno nuevo). Quien lo use tiene que devolver el id en `onSave` y pasar
+  `onLink`.
+
 ### Margen reservado en AppShell para que "Currently being seen" no tape contenido en tablet ([#73](https://github.com/JulianGerardi/red-dental-studio/pull/73))
 - Auditoría UX en tablet: la pestaña fija de "quién está en el sillón" (`PatientInSessionPopup`, borde derecho,
   centrada verticalmente) quedaba encima de kebabs, badges y filas reales en ocho pantallas (Dashboard, Patients,

@@ -30,14 +30,18 @@ export type ProcedureDraft = {
 /* Los pasos dependen de lo elegido (Julián, 2026-10-05 y 2026-10-06): Surfaces sólo si el procedimiento elegido lleva
    superficie, sea Planned o Existing; Link to finding y Link to diagnosis sólo para lo planeado: algo que el paciente ya
    tiene hecho (Existing) no resuelve un hallazgo. Link to diagnosis muestra los diagnósticos de los hallazgos por código
-   y superficie. */
+   y superficie.
+
+   Vincular pide un procedimiento ya cargado (Julián, 2026-10-20): el paso de Procedure/Surfaces termina en Save, que
+   guarda el procedimiento ahí mismo (sin vínculos todavía); recién con eso guardado aparecen Link to finding y Link to
+   diagnosis, para agregarle los vínculos al procedimiento que ya existe. */
 type Paso = 'Procedure' | 'Surfaces' | 'Link to finding' | 'Link to diagnosis'
 
 /* Drawer a la derecha, a pedido de Julián (Figma UX-UI 2.0, 1669:87207 y 1669:87208): el chart queda a la vista mientras
    se carga. Add Procedure abre en Planned; Add Condition, en Existing (algo que el paciente ya tiene hecho). Ver
    design-reference/figma/modulos/clinical-mode.md. */
 export function NewProcedureDrawer({
-  open, mode = 'procedure', area, teeth, findings, onClose, onSave,
+  open, mode = 'procedure', area, teeth, findings, onClose, onSave, onLink,
 }: {
   open: boolean
   /** De qué botón se abrió: cambia el título y la pestaña con que arranca la búsqueda. */
@@ -49,7 +53,10 @@ export function NewProcedureDrawer({
   /** Los hallazgos del examen, para vincularlos en el último paso. */
   findings: Finding[]
   onClose: () => void
-  onSave: (draft: ProcedureDraft) => void
+  /** Crea el procedimiento (sin vínculos todavía) y devuelve su id, para vincularlo después. */
+  onSave: (draft: ProcedureDraft) => string
+  /** Guarda los vínculos sobre el procedimiento ya creado. */
+  onLink: (id: string, patch: { linked: string[]; diagnoses: string[] }) => void
 }) {
   const [paso, setPaso] = useState(0)
   const [keepArea, setKeepArea] = useState(true)
@@ -66,18 +73,22 @@ export function NewProcedureDrawer({
   const [diagnosisQuery, setDiagnosisQuery] = useState('')
   const [linked, setLinked] = useState<string[]>([])
   const [diagnoses, setDiagnoses] = useState<string[]>([])
+  /* Id del procedimiento ya guardado (null hasta el primer Save): recién con esto los pasos de vínculo aparecen. */
+  const [creadoId, setCreadoId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) return
     setPaso(0); setKeepArea(true); setQuery(''); setStatus(mode === 'condition' ? 'Existing' : 'Planned'); setGroup('All'); setAreas([]); setCode(null); setScope('Tooth')
     setTooth(teeth[Math.floor(teeth.length / 2)] ?? null); setSurfaces({})
-    setFindingQuery(''); setDiagnosisQuery(''); setLinked([]); setDiagnoses([])
+    setFindingQuery(''); setDiagnosisQuery(''); setLinked([]); setDiagnoses([]); setCreadoId(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const procedure = PROCEDURES.find((p) => p.code === code) ?? null
   const conSuperficies = procedure?.area === 'Surface'
-  const pasos: Paso[] = ['Procedure', ...(conSuperficies ? ['Surfaces' as const] : []), ...(status === 'Planned' ? ['Link to finding' as const, 'Link to diagnosis' as const] : [])]
+  const pasosBase: Paso[] = ['Procedure', ...(conSuperficies ? ['Surfaces' as const] : [])]
+  const pasosVinculo: Paso[] = status === 'Planned' ? ['Link to finding', 'Link to diagnosis'] : []
+  const pasos: Paso[] = creadoId ? [...pasosBase, ...pasosVinculo] : pasosBase
   const actual = pasos[Math.min(paso, pasos.length - 1)]!
   const hayAlguna = Object.values(surfaces).some((x) => x.length > 0)
   const q = query.trim().toLowerCase()
@@ -91,11 +102,12 @@ export function NewProcedureDrawer({
   const current = tooth ?? teeth[0] ?? null
   const currentSurfaces = current !== null ? (surfaces[current] ?? []) : []
   const fq = findingQuery.trim().toLowerCase()
-  const vinculables = findings.filter((f) => f.status !== 'Discarded' && (!fq || `${f.condition} ${f.area} ${f.surfaces.join(' ')}`.toLowerCase().includes(fq)))
+  /* El procedimiento recién guardado ya está en `findings` (lo agrega el padre): no se vincula a sí mismo. */
+  const vinculables = findings.filter((f) => f.id !== creadoId && f.status !== 'Discarded' && (!fq || `${f.condition} ${f.area} ${f.surfaces.join(' ')}`.toLowerCase().includes(fq)))
   const dq = diagnosisQuery.trim().toLowerCase()
   /* Un diagnóstico por hallazgo del examen, con su código y sus superficies. Se guarda como "K05.31 · B, MB". */
   const diagnosticos = findings
-    .filter((f) => f.status !== 'Discarded')
+    .filter((f) => f.id !== creadoId && f.status !== 'Discarded')
     .map((f) => ({ id: f.id, code: codigoDiagnostico(f.condition), surfaces: f.surfaces }))
     .map((d) => ({ ...d, valor: d.surfaces.length ? `${d.code} · ${d.surfaces.join(', ')}` : d.code }))
     .filter((d) => !dq || d.valor.toLowerCase().includes(dq))
@@ -116,10 +128,16 @@ export function NewProcedureDrawer({
     })
   }
 
-  function save() {
+  /** Save del paso de Procedure/Surfaces: guarda el procedimiento, sin vínculos, y recién ahí aparecen sus pasos. */
+  function crear() {
     if (!procedure) return
-    const vincula = status === 'Planned'
-    onSave({ procedure, status, scope, area: keepArea ? area : 'Full mouth', tooth: current, surfaces: conSuperficies ? currentSurfaces : [], linked: vincula ? linked : [], diagnoses: vincula ? diagnoses : [] })
+    const id = onSave({ procedure, status, scope, area: keepArea ? area : 'Full mouth', tooth: current, surfaces: conSuperficies ? currentSurfaces : [], linked: [], diagnoses: [] })
+    if (pasosVinculo.length) { setCreadoId(id); setPaso(paso + 1) } else onClose()
+  }
+
+  /** Save de Link to diagnosis: guarda los vínculos sobre el procedimiento que ya existe. */
+  function vincular() {
+    if (creadoId) onLink(creadoId, { linked, diagnoses })
     onClose()
   }
 
@@ -127,7 +145,7 @@ export function NewProcedureDrawer({
   const bloqueado = (actual === 'Procedure' && !procedure) || (actual === 'Surfaces' && !hayAlguna)
   const footer = (
     <DrawerActions
-      step={paso} total={pasos.length} onNext={() => setPaso(paso + 1)} onBack={() => setPaso(paso - 1)} onCancel={onClose} onSave={save}
+      step={paso} total={pasos.length} onNext={() => setPaso(paso + 1)} onBack={() => setPaso(paso - 1)} onCancel={onClose} onSave={creadoId ? vincular : crear}
       nextDisabled={bloqueado} saveDisabled={bloqueado}
     />
   )
