@@ -102,7 +102,34 @@ export type Finding = {
   examen?: string
   /** La fila de la Problem List que es este hallazgo: de ahí salen sus procedimientos, caso y derivaciones. */
   problema?: string
+  /** De qué botón se cargó (Add Procedure o Add Condition): sólo una condition lleva la guía visual de descriptores. */
+  kind?: 'procedure' | 'condition'
+  /** La guía visual de descriptores (Figma *Platform Design*, 5294:107675): una opción por fila, por id de fila. `descriptor`
+     sigue siendo el texto que se ve en la card -lo elegido acá, unido con coma-, para no duplicar esa lectura en todos lados. */
+  descriptors?: Record<string, string>
 }
+
+/* La guía visual de descriptores de una condition (Figma *Platform Design*, 5294:107675, pantalla "Edit Finding"): una
+   fila por atributo, con sus opciones como píldoras de una sola elección, ninguna obligatoria. El frame repite el mismo
+   set de 13 filas para cualquier condition -acá va igual, sin filtrar por tipo (ver anomalías en clinical-mode.md)-.
+   Copiado tal cual del frame, con sus erratas (Peculate, Ulcerate, Smoothr) anotadas como anomalía; no se repite
+   "Papillated" dos veces en Consistency, que es un bug de lista, no una opción. */
+export type DescriptorRow = { id: string; label: string; options: string[] }
+export const DESCRIPTOR_ROWS: DescriptorRow[] = [
+  { id: 'borders', label: 'Borders', options: ['Well Defined', 'Irregular or Ill Defined'] },
+  { id: 'attachment', label: 'Attachment', options: ['Sessile', 'Peculate'] },
+  { id: 'color', label: 'Color', options: ['Normal', 'White', 'Red', 'Yellow'] },
+  { id: 'depth', label: 'Depth', options: ['Ulcerate', 'Raised', 'Flat'] },
+  { id: 'shape', label: 'Shape', options: ['Round', 'Oval', 'Triangular'] },
+  { id: 'size', label: 'Size', options: ['Small', 'Medium', 'Large'] },
+  { id: 'lesionColor', label: 'Color', options: ['Red', 'Purple', 'Brown'] },
+  { id: 'surface', label: 'Surface', options: ['Smooth', 'Rough', 'Scaly'] },
+  { id: 'consistency', label: 'Consistency', options: ['Hard', 'Smoothr', 'Papillated', 'Hairy'] },
+  { id: 'mobility', label: 'Mobility', options: ['Fixed', 'Movable'] },
+  { id: 'pain', label: 'Pain', options: ['Painful', 'Painless'] },
+  { id: 'bleeding', label: 'Bleeding', options: ['Present', 'Absent'] },
+  { id: 'exudate', label: 'Exudate', options: ['Absent', 'Serous', 'Purulent'] },
+]
 
 /* Existing: algo que el paciente ya tiene hecho (una condition ya hecha); Planned: lo que se va a hacer. En Existing sólo
    aparecen los procedimientos que quedan en la boca (restauraciones, endodoncias, implantes y prótesis). */

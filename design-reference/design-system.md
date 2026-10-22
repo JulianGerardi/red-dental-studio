@@ -1131,3 +1131,21 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
   Link to diagnosis, para vincular hallazgos y diagnósticos al procedimiento que ya existe; su Save guarda esos
   vínculos y cierra. Existing sin superficie sigue igual: un solo paso, sin indicador, con Save (no tiene vínculos).
 - Decisión y verificación en `figma/modulos/clinical-mode.md` (2026-10-20).
+
+## `DescriptorFields`: la guía visual de descriptores de una condition (2026-10-22)
+
+- Julián pasó el Figma *Platform Design* (5294:107675, "Edit Finding") pidiendo mejorar esa guía: trece filas -Borders,
+  Attachment, Color, Depth, Shape, Size, Color (de nuevo), Surface, Consistency, Mobility, Pain, Bleeding, Exudate-,
+  cada una con sus opciones como píldoras de una sola elección. `Finding.descriptor` era un texto libre que ni New
+  Condition ni Edit Finding tocaban.
+- **`DescriptorFields`** (nuevo, *Components / Clinical / Dental / DescriptorFields*): `FieldLabel` arriba de cada fila
+  -como Provider y Notes del mismo drawer- y las píldoras envolviendo debajo, en vez de la grilla fija de 5 columnas
+  del frame (ocho de las trece filas tienen menos de 5 opciones). Ninguna fila es obligatoria; tocar la ya elegida la
+  deselecciona.
+- La usan **New Condition** -paso nuevo *Descriptors*, opcional, sólo desde Add Condition- y **Edit Finding** -misma
+  sección, sólo si `finding.kind === 'condition'`-. Un procedure no la lleva.
+- **No se construyó** el flujo real de Add Condition de Extraoral (red.dev): el entorno de esta sesión no tiene acceso
+  a `red.dev.confidentally.com`. Queda pendiente con acceso real o capturas; no se inventó el diagrama de regiones.
+- Decisión completa, las cuatro erratas del frame copiadas tal cual (Peculate, Ulcerate, Smoothr, la fila "Color"
+  repetida) y por qué no se filtran las trece filas por tipo de condition, en `figma/modulos/clinical-mode.md`
+  (2026-10-22).

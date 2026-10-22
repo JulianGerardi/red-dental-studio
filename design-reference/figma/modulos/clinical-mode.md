@@ -2448,3 +2448,61 @@ UI y el catálogo de procedimientos no cambian, sólo cuándo se guarda cada par
 Código: `clinical/dental/NewProcedureDrawer.tsx`, `clinical/ExamLayout.tsx`.
 Design system: *Components / Clinical / Dental / NewProcedureDrawer* (Parts, Specs y los estados `LinkToFindingStep` /
 `LinkToDiagnosisStep` actualizados).
+
+## La guía visual de descriptores de una condition (2026-10-22)
+
+Julián pasó el Figma *Platform Design* (5294:107675, pantalla "Edit Finding") pidiendo una mejora de esa guía visual:
+trece filas -Borders, Attachment, Color, Depth, Shape, Size, Color (de nuevo), Surface, Consistency, Mobility, Pain,
+Bleeding, Exudate-, cada una con sus opciones como píldoras de una sola elección. Hoy `Finding.descriptor` es un solo
+texto libre y ni New Condition ni Edit Finding lo tocan: se ve, no se carga ni se edita.
+
+También pidió revisar el flujo real de Add Condition en **Extraoral** (red.dev, un examen todavía sin construir acá,
+con el `EmptyState` genérico), copiando esa pantalla. **No se pudo**: `red.dev.confidentally.com` no resuelve desde
+esta sesión en la nube -la política de red del entorno no lo tiene en *Allowed domains*-, y agregarlo a mitad de
+sesión tampoco alcanzó (el proxy lo siguió rechazando). Queda pendiente para una vuelta con acceso real o con capturas
+de Julián; no se inventa el diagrama de regiones de Extraoral ni su flujo de Add Condition sin esa referencia.
+
+**Lo que sí se hizo, con lo que había (el Figma, alcanzable):**
+
+1. **`DescriptorFields`** (`dental/DescriptorFields.tsx`), nuevo: las trece filas de `DESCRIPTOR_ROWS` (`dental/data.ts`),
+   cada una con su `FieldLabel` arriba -como Provider, Surfaces y Notes del mismo drawer- y las píldoras envolviendo
+   debajo, en vez de la grilla fija de 5 columnas del frame -ahí sólo cierra con exactamente 5 opciones, y ocho de las
+   trece filas tienen menos y dejan columnas vacías-. Una elección por fila, ninguna obligatoria; tocar la píldora ya
+   elegida la deselecciona (el frame no muestra esto, pero una guía con todo opcional necesita poder volver a "nada
+   elegido"). `textoDescriptores` arma el texto de `Finding.descriptor` -lo que ve la card- con lo elegido, unido por
+   coma.
+2. **Nueva en New Condition, nunca en Add Procedure**: el paso **Descriptors** -opcional, no bloquea Next Step/Save-
+   aparece sólo con `mode="condition"`, después de Procedure (y Surfaces, si corresponde) y antes de guardar. Un
+   procedure no tiene esta guía: su "descriptor" sigue saliendo de la superficie o el alcance, como hoy.
+3. **Edit Finding** suma la misma sección, cargada con lo que el finding ya tenía, sólo si `finding.kind === 'condition'`.
+   `Finding` suma `kind?: 'procedure' | 'condition'` -qué botón lo cargó- y `descriptors?: Record<string, string>` -la
+   guía, por id de fila-; `ExamLayout.saveProcedure` los completa al crear.
+4. **Corrige el punto 3 de "vincular pide un procedimiento ya cargado" (2026-10-20):** Existing ya no es siempre un
+   solo paso sin indicador. Sin superficie son dos (Procedure, Descriptors); con superficie, tres. Sigue sin Link to
+   finding/diagnosis -lo ya hecho no resuelve un hallazgo-, que es lo que decía ese punto.
+
+**Sin resolver, a propósito:** las trece filas son siempre las mismas para cualquier condition -el frame tampoco
+filtra-, así que una caries (D2391) muestra Attachment, Mobility o Bleeding, que son de una lesión de tejido blando,
+no de una pieza. Con sólo este Figma como referencia no hay de dónde sacar qué fila va con qué condition sin
+inventarlo; **a validar con Julián** si conviene agrupar o filtrar por tipo en otra vuelta, con una fuente (red.dev o
+el catálogo clínico) que diga qué corresponde a cada una.
+
+### Anomalías del frame (5294:107675)
+
+| # | Que | Donde |
+|---|---|---|
+| 98 | Attachment dice **"Peculate"** (Pedunculate) | Edit Finding |
+| 99 | Depth dice **"Ulcerate"** (Ulcerated) | Edit Finding |
+| 100 | Dos filas se llaman **"Color"**: Normal/White/Red/Yellow y, más abajo, Red/Purple/Brown | Edit Finding |
+| 101 | Consistency dice **"Smoothr"** (Smooth) | Edit Finding |
+
+Se replican las cuatro (contenido, como "Adress"): van tal cual en `DESCRIPTOR_ROWS`. **No se replica** que
+Consistency repite "Papillated" dos veces -esa fila tiene Hard, Smoothr, Papillated, Papillated, Hairy en el frame-:
+es un bug de lista, como la paginación `1 2 3 4 5 3` de la anomalía 71, no una opción.
+
+Código: `clinical/dental/DescriptorFields.tsx`, `clinical/dental/data.ts` (`DESCRIPTOR_ROWS`, `Finding.kind`,
+`Finding.descriptors`), `clinical/dental/NewProcedureDrawer.tsx`, `clinical/dental/EditFindingDrawer.tsx`,
+`clinical/ExamLayout.tsx` (`saveProcedure`).
+Design system: *Components / Clinical / Dental / DescriptorFields* (nueva), *NewProcedureDrawer* (paso Descriptors en
+Parts/Specs, estado `DescriptorsStep`) y *EditFindingDrawer* (sección Descriptors, estado `ProcedureFinding` sin
+ella).

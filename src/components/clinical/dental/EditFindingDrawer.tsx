@@ -2,14 +2,19 @@ import { useEffect, useState } from 'react'
 import { Check, X } from 'lucide-react'
 import { Drawer } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
-import { SelectField, TextArea } from '@/components/patients/form'
+import { FieldLabel, SelectField, TextArea } from '@/components/patients/form'
 import { FindingCard } from './FindingCard'
 import { SurfaceWheel, type Surface } from './SurfaceWheel'
+import { DescriptorFields, textoDescriptores } from './DescriptorFields'
 import { PROVIDERS, type Finding } from './data'
 
 /* Editar un finding, en el drawer de la derecha como New Procedure (Julián, 2026-10-03): el finding entero arriba, con su
    estado, fecha, zona, condición y descriptores, y debajo lo que se edita (proveedor, superficies y notas) y lo que tiene
-   vinculado. Las acciones fijas al pie. Ver design-reference/figma/modulos/clinical-mode.md. */
+   vinculado. Las acciones fijas al pie. Ver design-reference/figma/modulos/clinical-mode.md.
+
+   La guía visual de descriptores (Figma *Platform Design*, 5294:107675) sólo en una condition (Julián, 2026-10-22): un
+   procedure no la tiene -no es su guía, ahí "descriptor" sale de la superficie o el alcance-, así que la sección sólo
+   aparece con `finding.kind === 'condition'`. */
 export function EditFindingDrawer({
   finding, onClose, onSave,
 }: {
@@ -20,13 +25,27 @@ export function EditFindingDrawer({
   const [provider, setProvider] = useState('')
   const [surfaces, setSurfaces] = useState<Surface[]>([])
   const [notes, setNotes] = useState('')
+  const [descriptors, setDescriptors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     if (!finding) return
     setProvider(finding.provider)
     setSurfaces(finding.surfaces as Surface[])
     setNotes(finding.notes)
+    setDescriptors(finding.descriptors ?? {})
   }, [finding])
+
+  const esCondicion = finding?.kind === 'condition'
+
+  function guardar() {
+    const patch: Partial<Finding> = { provider, surfaces, notes }
+    if (esCondicion) {
+      patch.descriptors = descriptors
+      patch.descriptor = textoDescriptores(descriptors)
+    }
+    onSave(patch)
+    onClose()
+  }
 
   return (
     <Drawer
@@ -36,7 +55,7 @@ export function EditFindingDrawer({
       description={finding ? `${finding.area} · ${finding.condition}` : undefined}
       footer={
         <>
-          <Button className="w-full" onClick={() => { onSave({ provider, surfaces, notes }); onClose() }}><Check /> Save</Button>
+          <Button className="w-full" onClick={guardar}><Check /> Save</Button>
           <Button variant="secondary" className="w-full" onClick={onClose}><X /> Cancel</Button>
         </>
       }
@@ -46,6 +65,13 @@ export function EditFindingDrawer({
           <FindingCard finding={finding} className="border border-line shadow-none" />
 
           <SelectField label="Provider" required options={PROVIDERS} value={provider} onChange={setProvider} />
+
+          {esCondicion && (
+            <div className="flex w-full flex-col gap-1.5">
+              <FieldLabel>Descriptors</FieldLabel>
+              <DescriptorFields value={descriptors} onChange={setDescriptors} />
+            </div>
+          )}
 
           {finding.tooth !== null && (
             <div className="flex w-full flex-col items-center gap-2">

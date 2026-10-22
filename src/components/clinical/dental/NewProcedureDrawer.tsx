@@ -10,6 +10,7 @@ import { SurfaceWheel, type Surface } from './SurfaceWheel'
 import { LinkedDiagnosisCard, LinkedFindingCard } from './LinkedFindingCard'
 import { NOMBRE_ALCANCE, ScopeIcon } from './ScopeIcons'
 import { CajaIcono, ConAyuda, ProcedureRow } from './ProcedureRow'
+import { DescriptorFields } from './DescriptorFields'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import {
   EXISTING_GROUPS, PROCEDURES, codigoDiagnostico, PROCEDURE_GROUPS, PROCEDURE_STATUSES, SCOPES, TREATMENT_AREAS,
@@ -25,6 +26,8 @@ export type ProcedureDraft = {
   surfaces: Surface[]
   linked: string[]
   diagnoses: string[]
+  /** La guía visual de descriptores, sólo desde Add Condition. */
+  descriptors: Record<string, string>
 }
 
 /* Los pasos dependen de lo elegido (Julián, 2026-10-05 y 2026-10-06): Surfaces sólo si el procedimiento elegido lleva
@@ -34,8 +37,13 @@ export type ProcedureDraft = {
 
    Vincular pide un procedimiento ya cargado (Julián, 2026-10-20): el paso de Procedure/Surfaces termina en Save, que
    guarda el procedimiento ahí mismo (sin vínculos todavía); recién con eso guardado aparecen Link to finding y Link to
-   diagnosis, para agregarle los vínculos al procedimiento que ya existe. */
-type Paso = 'Procedure' | 'Surfaces' | 'Link to finding' | 'Link to diagnosis'
+   diagnosis, para agregarle los vínculos al procedimiento que ya existe.
+
+   Descriptors sólo en Add Condition (Julián, 2026-10-22): la guía visual del Figma *Platform Design* (5294:107675),
+   opcional, siempre antes de guardar -no después, como Link to finding/diagnosis-, porque son datos de la condition
+   misma, no un vínculo sobre algo ya guardado. Va aunque se cambie a Planned dentro del paso Procedure: sigue siendo
+   Add Condition. */
+type Paso = 'Procedure' | 'Surfaces' | 'Descriptors' | 'Link to finding' | 'Link to diagnosis'
 
 /* Drawer a la derecha, a pedido de Julián (Figma UX-UI 2.0, 1669:87207 y 1669:87208): el chart queda a la vista mientras
    se carga. Add Procedure abre en Planned; Add Condition, en Existing (algo que el paciente ya tiene hecho). Ver
@@ -69,6 +77,7 @@ export function NewProcedureDrawer({
   const [scope, setScope] = useState<ProcedureScope>('Tooth')
   const [tooth, setTooth] = useState<number | null>(null)
   const [surfaces, setSurfaces] = useState<Record<number, Surface[]>>({})
+  const [descriptors, setDescriptors] = useState<Record<string, string>>({})
   const [findingQuery, setFindingQuery] = useState('')
   const [diagnosisQuery, setDiagnosisQuery] = useState('')
   const [linked, setLinked] = useState<string[]>([])
@@ -79,14 +88,14 @@ export function NewProcedureDrawer({
   useEffect(() => {
     if (!open) return
     setPaso(0); setKeepArea(true); setQuery(''); setStatus(mode === 'condition' ? 'Existing' : 'Planned'); setGroup('All'); setAreas([]); setCode(null); setScope('Tooth')
-    setTooth(teeth[Math.floor(teeth.length / 2)] ?? null); setSurfaces({})
+    setTooth(teeth[Math.floor(teeth.length / 2)] ?? null); setSurfaces({}); setDescriptors({})
     setFindingQuery(''); setDiagnosisQuery(''); setLinked([]); setDiagnoses([]); setCreadoId(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const procedure = PROCEDURES.find((p) => p.code === code) ?? null
   const conSuperficies = procedure?.area === 'Surface'
-  const pasosBase: Paso[] = ['Procedure', ...(conSuperficies ? ['Surfaces' as const] : [])]
+  const pasosBase: Paso[] = ['Procedure', ...(conSuperficies ? ['Surfaces' as const] : []), ...(mode === 'condition' ? ['Descriptors' as const] : [])]
   const pasosVinculo: Paso[] = status === 'Planned' ? ['Link to finding', 'Link to diagnosis'] : []
   const pasos: Paso[] = creadoId ? [...pasosBase, ...pasosVinculo] : pasosBase
   const actual = pasos[Math.min(paso, pasos.length - 1)]!
@@ -131,7 +140,11 @@ export function NewProcedureDrawer({
   /** Save del paso de Procedure/Surfaces: guarda el procedimiento, sin vínculos, y recién ahí aparecen sus pasos. */
   function crear() {
     if (!procedure) return
-    const id = onSave({ procedure, status, scope, area: keepArea ? area : 'Full mouth', tooth: current, surfaces: conSuperficies ? currentSurfaces : [], linked: [], diagnoses: [] })
+    const id = onSave({
+      procedure, status, scope, area: keepArea ? area : 'Full mouth', tooth: current,
+      surfaces: conSuperficies ? currentSurfaces : [], linked: [], diagnoses: [],
+      descriptors: mode === 'condition' ? descriptors : {},
+    })
     if (pasosVinculo.length) { setCreadoId(id); setPaso(paso + 1) } else onClose()
   }
 
@@ -261,6 +274,18 @@ export function NewProcedureDrawer({
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {actual === 'Descriptors' && (
+          <div className="flex w-full flex-col items-start gap-4">
+            <div className="flex w-full flex-col gap-1">
+              <p className="text-sm font-bold text-ink">Descriptors</p>
+              <p className="text-[11px] leading-relaxed text-ink-faint">
+                Optional: describe what the condition looks like. Tap a pill again to clear it.
+              </p>
+            </div>
+            <DescriptorFields value={descriptors} onChange={setDescriptors} />
           </div>
         )}
 

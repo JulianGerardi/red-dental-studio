@@ -14,6 +14,7 @@ import { FindingCard } from './dental/FindingCard'
 import { FindingActionsMenu } from './dental/FindingActionsMenu'
 import { NewProcedureDrawer, type ProcedureDraft } from './dental/NewProcedureDrawer'
 import { EditFindingDrawer } from './dental/EditFindingDrawer'
+import { textoDescriptores } from './dental/DescriptorFields'
 import { ConfirmProcedureDialog } from './dental/ConfirmProcedureDialog'
 import { useExamReviews } from './dental/useExamReviews'
 import { ACTIONS, type FindingAction } from './dental/actions'
@@ -28,11 +29,11 @@ import { ULTIMA_CONDICION, type UltimaCondicion } from '@/data/clinical-mode'
 const HOY = 'May 14, 2026'
 
 const INITIAL_FINDINGS: Finding[] = [
-  { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: HOY, status: 'Discarded', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [], examen: 'Dental Assessment', problema: 'p5' },
-  { id: 'F-2', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Discarded', tooth: null, provider: 'Elena Martinez', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral' },
-  { id: 'F-3', area: 'Tooth 20', condition: 'localized periodontal pocketing', descriptor: 'Moderate', date: HOY, status: 'Active', tooth: 20, provider: 'Elena Martinez', surfaces: ['B', 'MB'], notes: '', linked: ['#10987231', '#10987232'], diagnoses: [], examen: 'Periodontal' },
-  { id: 'F-4', area: 'Tooth 30', condition: 'severe root surface decay', descriptor: 'Advanced', date: HOY, status: 'In Treatment', tooth: 30, provider: 'Emily Chen', surfaces: ['O'], notes: '', linked: ['#10987233'], diagnoses: [], examen: 'Dental Assessment' },
-  { id: 'F-5', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral' },
+  { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: HOY, status: 'Discarded', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [], examen: 'Dental Assessment', problema: 'p5', kind: 'condition' },
+  { id: 'F-2', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Discarded', tooth: null, provider: 'Elena Martinez', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral', kind: 'condition', descriptors: { lesionColor: 'Red' } },
+  { id: 'F-3', area: 'Tooth 20', condition: 'localized periodontal pocketing', descriptor: 'Moderate', date: HOY, status: 'Active', tooth: 20, provider: 'Elena Martinez', surfaces: ['B', 'MB'], notes: '', linked: ['#10987231', '#10987232'], diagnoses: [], examen: 'Periodontal', kind: 'condition' },
+  { id: 'F-4', area: 'Tooth 30', condition: 'severe root surface decay', descriptor: 'Advanced', date: HOY, status: 'In Treatment', tooth: 30, provider: 'Emily Chen', surfaces: ['O'], notes: '', linked: ['#10987233'], diagnoses: [], examen: 'Dental Assessment', kind: 'condition' },
+  { id: 'F-5', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral', kind: 'condition', descriptors: { lesionColor: 'Red' } },
 ]
 
 const INITIAL_REVIEWS: ExamReview[] = [
@@ -91,14 +92,17 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, childr
   function saveProcedure(draft: ProcedureDraft) {
     const id = `F-${Date.now()}`
     const tooth = draft.tooth
+    const esCondicion = procedureOpen === 'condition'
+    const descriptorTexto = esCondicion ? textoDescriptores(draft.descriptors) : ''
     setFindings((f) => [
       {
         id,
         area: tooth !== null ? `Tooth ${tooth}` : draft.area,
         condition: `${draft.procedure.code} - ${draft.procedure.label}`,
-        descriptor: draft.surfaces.join(', ') || draft.scope,
+        descriptor: descriptorTexto || draft.surfaces.join(', ') || draft.scope,
         date: HOY, status: draft.status === 'Existing' ? 'Externally Treated' : 'Active', tooth, provider: 'Elena Martinez',
         surfaces: draft.surfaces, notes: '', linked: draft.linked, diagnoses: draft.diagnoses, examen,
+        kind: procedureOpen ?? 'procedure', descriptors: esCondicion ? draft.descriptors : undefined,
       },
       ...f,
     ])

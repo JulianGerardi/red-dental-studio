@@ -19,13 +19,13 @@ const meta = {
       story: { inline: false, iframeHeight: 720 },
       description: {
         component: [
-          "Add Procedure y Add Condition del odontograma. Los pasos dependen de lo elegido: **Procedure**; **Surfaces** si el procedimiento elegido va en superficie, sea Planned o Existing; y, sólo para Planned, **Link to finding** (los hallazgos por nombre) y **Link to diagnosis** (los diagnósticos por código y superficie, sin estado ni fecha).",
+          "Add Procedure y Add Condition del odontograma. Los pasos dependen de lo elegido: **Procedure**; **Surfaces** si el procedimiento elegido va en superficie, sea Planned o Existing; **Descriptors**, sólo desde Add Condition (la guía visual de [DescriptorFields](/docs/components-clinical-dental-descriptorfields--docs)); y, sólo para Planned, **Link to finding** (los hallazgos por nombre) y **Link to diagnosis** (los diagnósticos por código y superficie, sin estado ni fecha).",
           "",
           "**Vincular pide un procedimiento ya cargado:** el paso de Procedure (y Surfaces, si lo hay) termina en Save, que guarda el procedimiento ahí mismo, sin vínculos todavía. Recién con eso guardado aparecen Link to finding y Link to diagnosis, para agregarle los vínculos al procedimiento que ya existe; su Save los guarda y cierra.",
           "",
-          "**Pie:** el de todos los drawers (Cancel o Return, Next Step o Save); Next Step/Save quedan deshabilitados hasta elegir un procedimiento o marcar una superficie.",
+          "**Pie:** el de todos los drawers (Cancel o Return, Next Step o Save); Next Step/Save quedan deshabilitados hasta elegir un procedimiento o marcar una superficie. Descriptors no bloquea: es opcional.",
           "",
-          "**Probalo:** en *Playground* elegí un procedimiento en superficie (D2140) y avanzá.",
+          "**Probalo:** en *Playground* elegí un procedimiento en superficie (D2140) y avanzá. En *FromAddCondition*, avanzá hasta Descriptors.",
         ].join('\n'),
       },
     },
@@ -49,6 +49,13 @@ export const SurfacesStep: Story = {
   play: secuencia(pulsar(/^D2140 on surface$/i), pulsar(/next step/i), esperar(/apply to unset/i)),
 }
 
+/* Descriptors: sólo desde Add Condition, y sólo si el procedimiento no va en superficie (si va, Surfaces es el paso
+   anterior y Descriptors sigue siendo el último antes de guardar). */
+export const DescriptorsStep: Story = {
+  args: { mode: 'condition' },
+  play: secuencia(pulsar(/^D2740 on tooth$/i), pulsar(/next step/i), esperar(/tap a pill again to clear it/i)),
+}
+
 /* Link to finding: cada hallazgo con su nombre y, si tiene, sus superficies. Un procedimiento sin superficie llega
    directo desde Procedure, donde el botón es Save: lo guarda y recién ahí aparece el paso. */
 export const LinkToFindingStep: Story = {
@@ -69,6 +76,7 @@ export const Parts: Story = {
         <Tabla encabezado={["Step", "What it asks", "When it shows"]} minimo={560}>
           <tr><td className="font-semibold">Procedure</td><td>Buscar y elegir el procedimiento (Existing o Planned), con el filtro por área.</td><td>Siempre</td></tr>
           <tr><td className="font-semibold">Surfaces</td><td>Marcar las superficies, pieza por pieza. Save de este paso guarda el procedimiento.</td><td>Si el procedimiento va en superficie</td></tr>
+          <tr><td className="font-semibold">Descriptors</td><td>La guía visual de descriptores (DescriptorFields), opcional. Save de este paso guarda el procedimiento.</td><td>Desde Add Condition</td></tr>
           <tr><td className="font-semibold">Link to finding</td><td>Vincular los hallazgos que resuelve, por nombre, con estado y fecha, sobre el procedimiento ya guardado.</td><td>Si es Planned, recién después de guardar el procedimiento</td></tr>
           <tr><td className="font-semibold">Link to diagnosis</td><td>Vincular los diagnósticos que trata: código ICD-10 y superficies, sin estado ni fecha. Save de este paso guarda los vínculos.</td><td>Si es Planned, recién después de guardar el procedimiento</td></tr>
         </Tabla>
