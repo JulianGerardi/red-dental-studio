@@ -55,7 +55,7 @@ test('Existing no tiene Link to finding: Descriptors es el único paso antes de 
   await drawer.getByRole('button', 'D2740 on tooth').tap()
   // Sin superficie, Descriptors es el paso que sigue a Procedure; no hay Link to finding/diagnosis en una condition.
   await drawer.getByRole('button', /Next Step/).tap()
-  await expect(drawer.getByText('Descriptors')).toBeVisible()
+  await expect(drawer.getByText(/tap a pill again to clear it/i)).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/D2740 charted as existing/)).toBeVisible()
 })
