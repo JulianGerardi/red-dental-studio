@@ -17,13 +17,18 @@ const meta = {
           '',
           '**Pasos:** buscar a la persona o crear una nueva; sus datos de contacto; y la relación: Guardian y/o Guarantor, quién es responsable de quién y el vínculo con el paciente. Al guardar aparece primera en la lista.',
           '',
-          '**Probalo:** en *Playground* buscá "Miller", elegí a alguien y avanzá; o tildá Add New Person.',
+          '**Relación archivada** (CON-3958, 2026-10-22): si la persona elegida ya tiene una relación archivada con el paciente, debajo del buscador aparece *An archived relationship already exists between [Paciente] and [Persona]* con **Open reactivation**, que lleva a revisar y reactivar esa relación en vez de crear otra. Es un aviso: no bloquea seguir.',
+          '',
+          '**Probalo:** en *Playground* buscá "Miller", elegí a alguien y avanzá; o tildá Add New Person. Con "Michael Miller" (archivada en la lista de ejemplo) aparece el aviso de reactivación.',
         ].join('\n'),
       },
     },
   },
-  args: { paciente: 'John Smith', onClose: () => {}, onGuardar: () => {} },
-  argTypes: { paciente: { control: 'text', description: 'El paciente de la ficha: aparece en las frases de Direction.' } },
+  args: { paciente: 'John Smith', archivadas: ['Michael Miller'], onReactivar: () => {}, onClose: () => {}, onGuardar: () => {} },
+  argTypes: {
+    paciente: { control: 'text', description: 'El paciente de la ficha: aparece en las frases de Direction.' },
+    archivadas: { control: 'object', description: 'Nombres con una relación archivada con este paciente: al elegirlos se ofrece reactivarla.' },
+  },
 } satisfies Meta<typeof AddRelationshipDrawer>
 
 export default meta
@@ -37,7 +42,7 @@ export const Parts: Story = {
   render: () => (
     <div className="flex flex-col gap-8">
       <PasosDelDrawer pasos={[
-        { nombre: 'Person', secciones: 'Find or create person: buscador por nombre con resultados; la persona elegida con tilde; o Add New Person con First Name, Last Name y Email', obligatorios: 'Una persona elegida, o First y Last Name' },
+        { nombre: 'Person', secciones: 'Find or create person: buscador por nombre con resultados; la persona elegida con una ✕ para quitarla; o Add New Person con First Name, Last Name y Email', obligatorios: 'Una persona elegida, o First y Last Name' },
         { nombre: 'Contact', secciones: 'General Information: Country, Number, Email · Adress Information: líneas 1 y 2, Country, Region, City, Postal Code', obligatorios: 'Todos' },
         { nombre: 'Relationship', secciones: 'Assign relationship role: Guardian, Guarantor · Direction · Relationship to Patient', obligatorios: 'Al menos un rol, una dirección y el vínculo' },
       ]} />
@@ -48,7 +53,7 @@ export const Parts: Story = {
             <ConRotulo rotulo="Direction option"><div className="flex w-[340px] flex-col gap-2"><OpcionDireccion texto="Michael Miller is Guardian for John Smith." elegida onElegir={() => {}} /><OpcionDireccion texto="John Smith is Guardian of Michael Miller." elegida={false} onElegir={() => {}} /></div></ConRotulo>
           </Muestras>
           <Tabla encabezado={['Piece', 'What it does']}>
-            <tr><td className="font-semibold">Selected person</td><td>Borde azul, avatar cuadrado, DOB y email; en el drawer, con el tilde verde.</td></tr>
+            <tr><td className="font-semibold">Selected person</td><td>Borde azul, avatar cuadrado, DOB y email; en el drawer (PersonSearchField), con una ✕ para quitarla y volver a buscar.</td></tr>
             <tr><td className="font-semibold">Direction option</td><td>Las dos frases se arman con la persona, los roles elegidos y el paciente.</td></tr>
           </Tabla>
         </Bloque>
@@ -63,7 +68,8 @@ export const States: Story = {
     <EstadosDelDrawer estados={[
       { estado: 'Default', cuando: 'Abre en el buscador.', story: 'Playground' },
       { estado: 'Validation errors', cuando: 'Next Step sin persona elegida ni Add New Person: aviso debajo del buscador. En los otros pasos, los obligatorios en rojo.', story: 'With Validation Errors' },
-      { estado: 'Selected', cuando: 'Persona elegida: su card con tilde.', story: 'Person Selected' },
+      { estado: 'Selected', cuando: 'Persona elegida: su card con borde azul y una ✕ para quitarla.', story: 'Person Selected' },
+      { estado: 'Archived relationship found', cuando: 'La persona elegida ya tiene una relación archivada con el paciente: aviso con Open reactivation debajo del buscador.', story: 'Archived Relationship Found' },
       { estado: 'Disabled search', cuando: 'Con Add New Person tildado el buscador queda deshabilitado y aparecen los campos de la persona nueva.' },
       { estado: 'Saved', cuando: 'La relación entra primera en la lista, con Legal contact (Guardian) y/o Financial contact (Guarantor).' },
     ]} />
@@ -77,7 +83,12 @@ export const WithValidationErrors: Story = {
 
 /* Persona elegida desde el buscador. */
 export const PersonSelected: Story = {
-  play: secuencia(escribir(/search by name/i, 'Miller'), pulsar(/^MM Michael Miller/), esperar(/mm\.thompson/i)),
+  play: secuencia(escribir(/search by name/i, 'Miller'), pulsar(/^Michael Miller/), esperar(/mm\.thompson/i)),
+}
+
+/* Michael Miller tiene una relación archivada: aparece el aviso con Open reactivation. */
+export const ArchivedRelationshipFound: Story = {
+  play: secuencia(escribir(/search by name/i, 'Michael'), pulsar(/^Michael Miller/), esperar(/An archived relationship already exists/i)),
 }
 
 export const Specs: Story = {

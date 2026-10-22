@@ -1,157 +1,60 @@
 import { useState } from 'react'
+import { ModalShell } from '@/components/patients/form'
+import { DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import {
-  ModalShell, TextField, SelectField, DateField, PersonSearchField,
-  LinkPersonCheckbox, OptionCheckbox,
-} from '@/components/patients/form'
-import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer'
-import { Alert } from '@/components/ui/alert'
-import { usePatients, type NuevoPaciente } from '@/data/patientsStore'
+  CamposDemography, CamposGeneral, CamposGuardian, SECCIONES_PACIENTE, limpiarPaciente, useFormPaciente,
+} from '@/components/patients/PacienteCampos'
+import { usePatients, VACIO_PACIENTE, type DatosPaciente } from '@/data/patientsStore'
 import { aviso } from '@/components/ui/toaster'
-import { DIRECTORIO } from '@/components/patients/AddRelationshipDrawer'
 
-/* Figma 3639:55808 (base) y 3640:56478 (con guardián).
-   La variante con guardián sólo agrega una tercera sección debajo de la
-   columna izquierda; el resto es idéntico.
+/* Figma 3751:73452 (Patients — List): New Patient en tres pasos, General → Guardian → Demography. Guardian y Demography son
+   opcionales (cada uno lo dice en su aviso) y siempre están: ya no aparece sólo para un menor. Next revisa lo obligatorio
+   del paso; Save revisa los tres y vuelve al primero con algo por corregir. Para cambiar un paciente que ya existe, ver
+   EditPatientModal (pestañas y Save Changes). Decisiones y anomalías del Figma en modulos/patients.md, 2026-10-22.
 
-   El Figma muestra las dos variantes como frames sueltos y NO indica qué las
-   alterna: los dos checkboxes de General Information tienen texto propio y
-   ninguno habla de guardianes. Acá la sección aparece cuando la fecha de
-   nacimiento da **menor de 18**, que es la regla real detrás del guardián y no
-   obliga a inventar un control. Ver README.md, Desviaciones. */
-const MAYORIA = 18
-
-function esMenor(texto: string) {
-  const f = new Date(texto)
-  if (Number.isNaN(f.getTime())) return false
-  const hoy = new Date()
-  let edad = hoy.getFullYear() - f.getFullYear()
-  const m = hoy.getMonth() - f.getMonth()
-  if (m < 0 || (m === 0 && hoy.getDate() < f.getDate())) edad--
-  return edad < MAYORIA
-}
-const VACIO: NuevoPaciente = { first: '', middle: '', last: '', email: '', birthday: '', gender: '' }
-const PERSONAS = ['Jessica Miller', 'Michael Miller', 'Robert Miller', 'Sarah Stone', 'Daniel Anderson']
-/* DOB y email para quienes están en el directorio de Add Relationship (mismo diseño: Julián, 2026-10-20); el resto
-   de PERSONAS sólo muestra el nombre, como cualquier buscador sin datos de más. */
-const personaLineas = (nombre: string) => {
-  const p = DIRECTORIO.find((x) => x.name === nombre)
-  return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
-}
-
+   `inicial` y `pasoInicial` son para Storybook: abrir el formulario con datos o en un paso. */
 export function NewPatientModal({
-  title = 'New Patient',
-  forceGuardian = false,
-  editId,
-  inicial,
-  onClose,
+  inicial, pasoInicial = 0, onClose,
 }: {
-  title?: string
-  forceGuardian?: boolean
-  /** Si viene, guarda sobre ese paciente en vez de crear uno nuevo. */
-  editId?: string
-  inicial?: Partial<NuevoPaciente>
+  inicial?: Partial<DatosPaciente>
+  pasoInicial?: number
   onClose: () => void
 }) {
-  const { addPatient, updatePatient } = usePatients()
-  const [d, setD] = useState<NuevoPaciente>({ ...VACIO, ...inicial })
-  /* Como New Patient de Confidentally 2.0: "link a person that already exists" cambia los datos por un buscador y suma
-     el paso de guardián. El guardián también aparece si la fecha de nacimiento da menor de edad (regla de acá). */
-  const [vincular, setVincular] = useState(false)
-  const [persona, setPersona] = useState('')
-  const withGuardian = forceGuardian || vincular || esMenor(d.birthday)
-  const [intentado, setIntentado] = useState(false)
-  const set = (k: keyof NuevoPaciente) => (v: string) => setD((p) => ({ ...p, [k]: v }))
-  /* Los obligatorios se marcan en rojo recién después del primer intento de seguir o guardar. */
-  const falta = (v: string) => (intentado && !v.trim() ? 'This field is required.' : undefined)
-  const pasos = withGuardian ? ['General', 'Guardian', 'Demography'] : ['General', 'Demography']
-  const [paso, setPaso] = useState(0)
-  const actual = pasos[Math.min(paso, pasos.length - 1)]!
-  const faltaGeneral = vincular ? !persona.trim() : !d.first.trim() || !d.last.trim() || !d.birthday.trim()
-  const siguiente = () => {
-    if (actual === 'General' && faltaGeneral) { setIntentado(true); return }
-    setIntentado(false)
-    setPaso((n) => Math.min(n + 1, pasos.length - 1))
-  }
+  const { addPatient } = usePatients()
+  const f = useFormPaciente({ ...VACIO_PACIENTE, ...inicial })
+  const [paso, setPaso] = useState(pasoInicial)
+  const actual = SECCIONES_PACIENTE[paso]!
 
+  const siguiente = () => {
+    const error = f.revisar([actual])
+    if (error) { f.enfocar(error.campo); return }
+    f.reiniciarIntento()
+    setPaso((n) => Math.min(n + 1, SECCIONES_PACIENTE.length - 1))
+  }
+  const atras = () => { f.reiniciarIntento(); setPaso((n) => Math.max(n - 1, 0)) }
   const guardar = () => {
-    setIntentado(true)
-    if (faltaGeneral) { setPaso(0); return }
-    if (!d.gender.trim()) return
-    const [first = '', ...resto] = vincular ? persona.split(' ') : [d.first]
-    const datos = vincular ? { ...d, first, last: resto.join(' ') } : d
-    const nombre = [datos.first, datos.last].filter(Boolean).join(' ')
-    if (editId) {
-      updatePatient(editId, datos)
-      aviso.ok(`${nombre} has been updated.`)
-    } else {
-      addPatient(datos)
-      aviso.ok(`${nombre} has been added to the patient list.`)
-    }
+    const error = f.revisar(SECCIONES_PACIENTE)
+    if (error) { setPaso(SECCIONES_PACIENTE.indexOf(error.seccion)); f.enfocar(error.campo); return }
+    const datos = limpiarPaciente(f.d)
+    addPatient(datos)
+    aviso.ok(`${[datos.first, datos.last].filter(Boolean).join(' ')} has been added to the patient list.`)
     onClose()
   }
 
+  const comunes = { d: f.d, cambiar: f.cambiar, errores: f.errores }
   return (
     <ModalShell
-      title={title}
-      description={editId ? 'Update the patient details' : 'Create the patient record'}
+      title="New Patient"
+      description="Create the patient record"
       onClose={onClose}
       width="max-w-[560px]"
-      steps={pasos}
+      steps={SECCIONES_PACIENTE}
       step={paso}
-      actions={<DrawerActions step={paso} total={pasos.length} onNext={siguiente} onBack={() => setPaso((n) => n - 1)} onCancel={onClose} onSave={guardar} />}
+      actions={<DrawerActions step={paso} total={SECCIONES_PACIENTE.length} onNext={siguiente} onBack={atras} onCancel={onClose} onSave={guardar} />}
     >
-      <DrawerStep index={pasos.indexOf('General')} step={paso}>
-        <DrawerSection title="General Information">
-          <LinkPersonCheckbox checked={vincular} onChange={(v) => { setVincular(v); setIntentado(false) }} />
-          <OptionCheckbox label="Interpreter Required" defaultChecked={false} />
-          <OptionCheckbox label="Create a new user account with this email address" />
-          {vincular ? (
-            <>
-              <PersonSearchField
-                label="Select Person" required placeholder="Search by Name or Last Name" personas={PERSONAS} lineas={personaLineas}
-                value={persona} onChange={setPersona} error={falta(persona)}
-              />
-              {persona && <Alert tone="warning" title="If underage, you must enable a guarantor in the next step" />}
-            </>
-          ) : (
-            <>
-              {/* De a dos, como Edit Patient: nunca tres por fila (Components / UI / Drawer → Specs → Fields). */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <TextField label="First Name" required placeholder="John" value={d.first} onChange={set('first')} error={falta(d.first)} />
-                <TextField label="Middle Name" placeholder="Lorem" value={d.middle} onChange={set('middle')} />
-                <TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={set('last')} error={falta(d.last)} />
-                <DateField label="Birthdate" required onChange={set('birthday')} error={falta(d.birthday)} />
-                <TextField label="Email" placeholder="john.smith@hotmail.com" value={d.email} onChange={set('email')} />
-              </div>
-            </>
-          )}
-        </DrawerSection>
-      </DrawerStep>
-
-      {withGuardian && (
-        <DrawerStep index={pasos.indexOf('Guardian')} step={paso}>
-          <DrawerSection title="Guardian Information">
-            <OptionCheckbox label="Add new person" defaultChecked={false} />
-            <OptionCheckbox label="This person is also the guarantor" defaultChecked={false} />
-            <PersonSearchField label="Select Person" placeholder="Search by Name or Last Name" personas={PERSONAS} lineas={personaLineas} />
-            <SelectField label="Relationship to Patient" required options={['Parent', 'Guardian', 'Sibling', 'Spouse', 'Other']} />
-          </DrawerSection>
-        </DrawerStep>
-      )}
-
-      <DrawerStep index={pasos.indexOf('Demography')} step={paso}>
-        <DrawerSection title="Demography Information">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <SelectField label="Gender" required value={d.gender} onChange={set('gender')} error={falta(d.gender)} />
-            <SelectField label="Race" />
-            <SelectField label="Ethnicity" />
-            <SelectField label="Profession" />
-            <SelectField label="Nationality" />
-            <SelectField label="Language" />
-            <SelectField label="Religion" />
-          </div>
-        </DrawerSection>
-      </DrawerStep>
+      <DrawerStep index={0} step={paso}><CamposGeneral {...comunes} /></DrawerStep>
+      <DrawerStep index={1} step={paso}><CamposGuardian {...comunes} /></DrawerStep>
+      <DrawerStep index={2} step={paso}><CamposDemography {...comunes} /></DrawerStep>
     </ModalShell>
   )
 }

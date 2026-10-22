@@ -1131,3 +1131,16 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
   Link to diagnosis, para vincular hallazgos y diagnósticos al procedimiento que ya existe; su Save guarda esos
   vínculos y cierra. Existing sin superficie sigue igual: un solo paso, sin indicador, con Save (no tiene vínculos).
 - Decisión y verificación en `figma/modulos/clinical-mode.md` (2026-10-20).
+
+## Pestañas en el drawer, aviso de sección y buscador de persona en desplegable (2026-10-21 y 22)
+
+- *Elements / Section notice* (nuevo, `ui/section-notice`): la franja cálida con barra a la izquierda que explica una sección de formulario ("Optional section. Use this section
+  when a guardian…", Figma `5277:125202`). No es un Alert: sin ícono ni título, no avisa de nada que haya pasado.
+- *Elements / Tabs → States → Needs attention*: `alerta` en una pestaña = punto rojo (y "has errors" para el lector de pantalla). Lo usa Edit Patient para señalar la sección que
+  falla al guardar.
+- *Components / UI / Drawer → Parts → Tabs*: el drawer suma `tabs`, en el lugar del indicador de pasos. Regla: **al editar algo que ya existe, pestañas y un solo "Save Changes"; al
+  crear, pasos.** Cambiar de pestaña no guarda; si falla algo en otra, se marca y se lleva al campo (patients.md, 2026-10-22).
+- *Elements / Fields*: `DateField` suma `valorInicial` (abre con la fecha cargada); **`PersonSearchField`** pasa a un **desplegable** para las sugerencias (no empujan lo de abajo) y la
+  elegida lleva una **✕** para quitarla (relationships.md, 2026-10-21). *States → Person search* muestra el desplegable abierto, la elegida y la deshabilitada.
+- *Pages / Parts / Patient modals* y *Pages / Parts / Relationships*: New Patient (un paso por story, con sus errores), Edit Patient (pestañas, sin portal, error en otra sección), los campos
+  sueltos y los pop ups de archivar, quitar Guardian y reactivar.

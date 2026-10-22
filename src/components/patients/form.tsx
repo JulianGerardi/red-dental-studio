@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Drawer, DrawerSection, useEnDrawer, type DrawerSize } from '@/components/ui/drawer'
-import { ChevronDown, Calendar, Check, Search } from 'lucide-react'
+import { ChevronDown, Calendar, Check, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
 import { Avatar, inicialesDe } from '@/components/ui/avatar'
@@ -184,7 +184,7 @@ export function SelectField({
 }
 
 export function DateField({
-  label, required, className, onChange, error, placeholder = 'Pick a date',
+  label, required, className, onChange, error, placeholder = 'Pick a date', valorInicial,
 }: {
   label: string
   required?: boolean
@@ -192,8 +192,13 @@ export function DateField({
   onChange?: (texto: string) => void
   error?: string
   placeholder?: string
+  /** Una fecha ya cargada, como la devuelve onChange ("April 2, 2025"): Edit Patient abre con el nacimiento puesto. */
+  valorInicial?: string
 }) {
-  const [value, setValueRaw] = useState<Date | null>(null)
+  const [value, setValueRaw] = useState<Date | null>(() => {
+    const f = valorInicial ? new Date(valorInicial) : null
+    return f && !Number.isNaN(f.getTime()) ? f : null
+  })
   const setValue = (d: Date | null) => {
     setValueRaw(d)
     if (d && onChange) onChange(d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }))
@@ -202,7 +207,7 @@ export function DateField({
     <div className={cn('flex flex-col gap-2', className)}>
       <FieldLabel required={required}>{label}</FieldLabel>
       {value ? (
-        <DatePicker value={value} onChange={setValue} />
+        <DatePicker value={value} onChange={setValue} className="h-9 w-full" />
       ) : (
         <div className="relative">
           <button
@@ -387,12 +392,13 @@ function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?:
   )
 }
 
-/* Buscador de una persona (paciente, provider, contacto…): igual que SearchField, pero las sugerencias y la elegida
-   son cards con avatar y hasta dos líneas de datos (DOB, email…) en vez de un texto suelto en un menú flotante -el
-   mismo diseño de Add Relationship → "Select person", para que buscar a alguien se vea igual en toda la app (Julián,
-   2026-10-20, ver design-reference/design-system.md). Sin resultados mientras no se escribe nada: no vuelca todo el
-   directorio como SearchField. "Elegida" sale sólo de comparar `value` contra `personas` (no hay estado propio): basta
-   con que lo que esté tipeado sea exactamente un nombre de la lista. */
+/* Buscador de una persona (paciente, provider, contacto…): igual que SearchField, pero cada sugerencia y la elegida son
+   cards con avatar y hasta dos líneas de datos (DOB, email…) -el diseño de Add Relationship → "Select person", para que
+   buscar a alguien se vea igual en toda la app (Julián, 2026-10-20)-. Las sugerencias flotan en un desplegable pegado
+   al input, sin empujar lo de abajo (Julián, 2026-10-21); la elegida queda a la vista debajo, con una ✕ para quitarla y
+   volver a buscar. Sin resultados mientras no se escribe nada: no vuelca todo el directorio como SearchField.
+   "Elegida" sale sólo de comparar `value` contra `personas` (no hay estado propio): basta con que lo tipeado sea
+   exactamente un nombre de la lista. Ver design-reference/design-system.md. */
 export function PersonSearchField({
   label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas,
 }: {
@@ -410,46 +416,69 @@ export function PersonSearchField({
   /** Las líneas de abajo de una persona ("DOB: …", "Email: …"); sin esto, la card sólo lleva el nombre. */
   lineas?: (nombre: string) => string[] | undefined
 }) {
+  const [abierto, setAbierto] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
   const elegida = !!value.trim() && personas.includes(value)
   const sugerencias = !elegida && value.trim()
     ? personas.filter((p) => p.toLowerCase().includes(value.trim().toLowerCase()))
     : []
 
+  useEffect(() => {
+    if (!abierto) return
+    const onDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setAbierto(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [abierto])
+
   return (
     <div className={cn('flex flex-col gap-2', className)}>
       <FieldLabel required={required}>{label}</FieldLabel>
-      <div className="relative">
+      <div ref={ref} className="relative">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
         <input
           value={value}
           placeholder={placeholder}
           aria-invalid={!!error || undefined}
           disabled={disabled}
-          onChange={(e) => onChange?.(e.target.value)}
+          onChange={(e) => { onChange?.(e.target.value); setAbierto(true) }}
+          onFocus={() => setAbierto(true)}
           className={cn(control(error), 'h-9 pr-3 pl-9')}
         />
+        {abierto && sugerencias.length > 0 && (
+          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg">
+            {sugerencias.map((nombre) => (
+              <button
+                key={nombre}
+                type="button"
+                onClick={() => { onChange?.(nombre); setAbierto(false) }}
+                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-surface-muted"
+              >
+                <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
+                <PersonaLineas nombre={nombre} lineas={lineas?.(nombre)} />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       {pie(error, hint)}
-      {sugerencias.map((nombre) => (
-        <button
-          key={nombre}
-          type="button"
-          onClick={() => onChange?.(nombre)}
-          className="flex items-center gap-3 rounded-lg border border-line bg-white p-3 text-left hover:bg-surface-subtle"
-        >
-          <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
-          <PersonaLineas nombre={nombre} lineas={lineas?.(nombre)} />
-        </button>
-      ))}
       {elegida && (
         <div className="relative">
-          <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3">
+          <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3 pr-11">
             <Avatar aria-hidden initials={inicialesDe(value)} size={36} />
             <PersonaLineas nombre={value} lineas={lineas?.(value)} />
           </div>
-          <span className="bg-dash-ok-fg absolute top-1/2 right-3 flex size-5 -translate-y-1/2 items-center justify-center rounded-full text-white" aria-label="Selected">
-            <Check className="size-3" strokeWidth={3} />
-          </span>
+          {!disabled && (
+            <button
+              type="button"
+              aria-label={`Remove ${label}`}
+              onClick={() => { onChange?.(''); setAbierto(false) }}
+              className="absolute top-1/2 right-2.5 flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dash-blue"
+            >
+              <X className="size-4" />
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -544,7 +573,7 @@ const tamanoDe = (width: string): DrawerSize => {
 }
 
 export function ModalShell({
-  title, description, onClose, children, footer, actions, aside, width = 'max-w-[860px]', steps, step,
+  title, description, onClose, children, footer, actions, aside, width = 'max-w-[860px]', steps, step, tabs,
 }: {
   title: string
   description?: string
@@ -559,6 +588,8 @@ export function ModalShell({
   width?: string
   steps?: readonly string[]
   step?: number
+  /** Pestañas en lugar de pasos (ver Drawer). */
+  tabs?: React.ReactNode
 }) {
   return (
     <Drawer
@@ -568,6 +599,7 @@ export function ModalShell({
       description={description}
       steps={steps}
       step={step}
+      tabs={tabs}
       size={tamanoDe(width)}
       footer={actions ?? footer}
       footerClassName={actions ? undefined : '[&_[data-form-footer]]:w-full [&_[data-form-footer]_button]:flex-1'}
