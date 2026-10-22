@@ -525,3 +525,14 @@ De las salidas posibles -achicar la pestaña, mostrarla sólo con alguien en cur
 ahora suma `sm:pr-16` (64px, desde el mismo breakpoint que el resto del cromo) para que ningún panel o tabla llegue
 nunca hasta donde vive la pestaña. No se tocó `PatientInSessionPopup` ni su comportamiento. Verificado sin desborde y
 sin superposición en las ocho pantallas, a los dos anchos de tablet.
+
+**Seguimiento (2026-10-22): esos 64px quedaban de más y se veían como un padding roto.** Julián lo marcó con un
+screenshot de Patients en escritorio ancho (~1512px): a la derecha quedaba una franja vacía de punta a punta de la
+pantalla, mucho más ancha que cualquier otro margen de la app -highlight en la imagen desde el header hasta el pie,
+con sólo la pestaña y el FAB de Confibot adentro-. La causa: `sm:pr-16` se suma por encima del propio padding de
+`CONTENEDOR_PAGINA`/`ANCHO_PAGINA` (`px-6`/`px-8`, 24-32px) en vez de reemplazarlo, así que entre el contenido real y
+el borde de la ventana quedaban 88-96px en vez de los ~54-64px que la pestaña necesita. Bajado a `sm:pr-10` (40px):
+sumados a esos 24-32px ya existentes da ~64-72px, lo mismo que antes medido desde el contenido real, así que sigue
+sin superposición -reverificado con Playwright en los mismos ocho anchos de la auditoría de tablet más 1366, 1512
+(el del screenshot), 1536, 1680 y 1920 de escritorio, mínimo 27px de aire en todos-, pero la franja vacía que se ve
+deja de duplicar el padding de la página.
