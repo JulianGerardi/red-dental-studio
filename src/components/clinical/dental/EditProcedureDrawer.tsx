@@ -91,7 +91,7 @@ export function EditProcedureDrawer({
             selected={vinculables.filter((x) => linked.includes(x.id))}
             onSelect={(x) => setLinked((prev) => [...new Set([...prev, x.id])])}
             onRemove={(x) => setLinked((prev) => prev.filter((id) => id !== x.id))}
-            placeholder="Search by code or description" ariaLabel="Search findings" emptyText="No finding matches that search."
+            placeholder="Search by code or description" ariaLabel="Search findings" emptyText="No finding matches that search." accion="vincular" tituloElegidos="Linked findings"
           />
         </div>
       )}
@@ -105,12 +105,12 @@ export function EditProcedureDrawer({
             </p>
           </div>
           <SearchPicker
-            multiple items={diagnosticos} getId={(x) => x.valor} getText={(x) => x.valor}
-            renderOption={(x) => <OpcionDiagnostico code={x.code} surfaces={x.surfaces} />}
+            multiple items={diagnosticos} getId={(x) => x.valor} getText={(x) => `${x.valor} ${x.descripcion}`}
+            renderOption={(x) => <OpcionDiagnostico code={x.code} descripcion={x.descripcion} detalle={x.detalle} />}
             selected={diagnosticos.filter((x) => diagnoses.includes(x.valor))}
             onSelect={(x) => setDiagnoses((prev) => [...new Set([...prev, x.valor])])}
             onRemove={(x) => setDiagnoses((prev) => prev.filter((v) => v !== x.valor))}
-            placeholder="Search by code or description" ariaLabel="Search diagnoses" emptyText="No diagnosis matches that search."
+            placeholder="Search by code or description" ariaLabel="Search diagnoses" emptyText="No diagnosis matches that search." accion="vincular" tituloElegidos="Linked diagnoses"
           />
         </div>
       )}

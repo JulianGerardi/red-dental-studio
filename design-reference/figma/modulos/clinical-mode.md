@@ -2740,3 +2740,24 @@ Código: `ui/search-picker.tsx`, `clinical/dental/{EditFindingDrawer,EditProcedu
 RegionConditionDrawer,IntraOralDiagram,RegionDiagram,OpcionesVinculo}.tsx`, `index.css` (`region-active`). Storybook sin
 tocar: las historias de RegionConditionDrawer y NewProcedureDrawer que eligen de la lista van a tener que escribir en el
 buscador cuando se documente.
+
+### Buscadores como en red.dev (2026-10-24)
+
+Julián, con dos grabaciones de red.dev (New Procedure y Edit Procedure): "es un buscador independiente que busca"; "no me
+gusta cómo quedó el diseño del search cuando busco un finding o una condition: lo haría como el video, pero con el estilo
+de nuestra app".
+
+- **New Procedure / New Condition (DentAssmt)**: la lista del catálogo queda como está, filtrada por Category, área y
+  Existing/Planned. El buscador ya no la filtra: es **independiente**, busca en todo el catálogo del estado elegido y
+  abre su propio desplegable encima de la lista, con código, descripción y los alcances posibles (Tooth, Quadrant…).
+  Elegir un resultado lo marca en la lista y la desplaza hasta él; si la categoría o el área lo escondían, se limpian.
+- **`SearchPicker`**: los resultados son **cards** con el estilo de la app (`TARJETA_INTERNA`) sobre un fondo gris
+  claro. Un finding se ve como la card de finding (estado, fecha, nombre en negrita, Exams, Location), un diagnóstico
+  como "código - descripción" con el área debajo, una condition con su grupo. Al pasar el mouse aparece la acción
+  (vincular o agregar). Lo elegido queda debajo en una card con borde azul y su botón para desvincular o sacar; arriba,
+  "Linked findings" / "Linked diagnoses". El input lleva una ✕ para limpiar.
+- En red.dev los resultados de Edit Procedure quedan en el panel y no en un desplegable, y los findings aparecen de
+  entrada: acá se mantiene el pedido anterior (nada hasta escribir, desplegable como el resto de los buscadores).
+  La descripción del diagnóstico es la condition del finding (no hay catálogo de diagnósticos con su texto).
+
+Código: `ui/search-picker.tsx`, `clinical/dental/{OpcionesVinculo,NewProcedureDrawer,EditProcedureDrawer,RegionConditionDrawer}.tsx`.

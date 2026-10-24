@@ -296,3 +296,18 @@ test('Edit Procedure: pestañas General Information, Findings y Diagnostic', asy
   await expect(editar.getByText('Link Diagnosis')).toBeVisible()
   await editar.getByRole('button', /^Save/).tap()
 })
+
+/* New Procedure: el buscador es independiente de la lista (red.dev): busca en todo el catálogo y elegir un resultado lo
+   marca en la lista, sin filtrarla. */
+test('New Procedure: el buscador independiente elige un procedimiento de la lista', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'DentAssmt').first().tap()
+  await screen.getByRole('button', 'Add Procedure').tap()
+  const drawer = screen.getByRole('dialog', 'New Procedure')
+  await drawer.getByPlaceholder('Search by code or description').fill('crown')
+  await drawer.getByRole('button', /^D2740 - Crown.*Quadrant/).tap()
+  await expect(drawer.getByRole('button', /^D0120\s*-/).first()).toBeVisible()
+  await drawer.getByRole('button', 'D2740 on tooth').tap()
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText(/D2740 charted as planned/)).toBeVisible()
+})

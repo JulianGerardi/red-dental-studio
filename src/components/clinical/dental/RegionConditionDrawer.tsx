@@ -4,6 +4,7 @@ import { SearchPicker } from '@/components/ui/search-picker'
 import { Drawer, DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { FieldLabel } from '@/components/patients/form'
 import { DescriptorFields } from './DescriptorFields'
+import { OpcionCondicion } from './OpcionesVinculo'
 import { REGION_CONDITIONS } from './data'
 
 export type RegionConditionDraft = {
@@ -73,7 +74,7 @@ export function RegionConditionDrawer({
               <FieldLabel required>Condition</FieldLabel>
               <SearchPicker
                 items={REGION_CONDITIONS} getId={(c) => c.code} getText={(c) => `${c.label} ${c.group}`}
-                renderOption={(c) => <span className="font-semibold text-ink">{c.label} <span className="font-medium text-ink-faint">({c.group})</span></span>}
+                renderOption={(c) => <OpcionCondicion nombre={c.label} grupo={c.group} />}
                 selected={condition ? [condition] : []} onSelect={(c) => setCode(c.code)} onRemove={() => setCode(null)}
                 placeholder="Search a Condition Here..." emptyText="No condition matches that search."
               />
