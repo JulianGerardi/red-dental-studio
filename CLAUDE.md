@@ -7,6 +7,8 @@ respondé igual.
 - App publicada: https://juliangerardi.github.io/red-dental-studio/
 - Design system (Storybook, "Confidentally UI"): https://juliangerardi.github.io/red-dental-studio/storybook/
 - Repo: `JulianGerardi/red-dental-studio` (privado), rama `main`.
+- Historias (Jira, proyecto `CON`, label `design-system`):
+  https://confidetally.atlassian.net/issues?jql=labels%20%3D%20%22design-system%22%20ORDER%20BY%20assignee%20ASC
 
 ## Comandos
 
@@ -31,14 +33,32 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
 - Proyecto hermano con la lógica de 2.0: `~/Desktop/Work/dashboard-figma/src/components` (buscá ahí el `*Drawer.tsx`
   equivalente antes de armar uno).
 
+## Jira
+
+Las historias de la app están en Jira (`confidetally.atlassian.net`, proyecto `CON`, label `design-system`; link
+arriba).
+
+- Es la fuente del alcance y de la lógica. Si algo del Figma, del código o del `.md` no cierra, o parece que falta algo,
+  **buscalo ahí antes de preguntar o de inventar**. Si no hay historia para lo que se pide, avisale a Julián.
+- Cada historia se titula `[Módulo] …` y trae una tabla numerada de diferencias (red.dev hoy vs Confidentally UI) y el
+  link a su página del Storybook. Para encontrarla: `labels = "design-system" AND summary ~ "Patient"`.
+- Antes de tocar un módulo, leé su historia junto con su `.md`.
+- Todo lo que se arma queda linkeado: la sección con fecha del `.md` del módulo arranca con la clave (`CON-3830`) y el
+  commit y el PR la nombran.
+- Solo lectura: no cambiar estados, comentar ni crear historias sin el ok de Julián.
+- Se lee con el conector de Atlassian (`cloudId`: `confidetally.atlassian.net`). La búsqueda devuelve todo junto y se
+  pasa del límite: pedí `fields` acotados, filtrá el archivo guardado con `jq` y leé cada historia por clave con
+  `getJiraIssue`.
+
 ## Cómo se trabaja una tanda
 
 La app va primero y el Storybook al final: documentar en Storybook consume mucho crédito, así que no se hace hasta que
 la app esté aprobada y publicada.
 
-1. Implementar y mirarlo en el dev server (Browser pane o Playwright en el scratchpad si el pane está oculto).
-2. Dejar anotado, sin que lo pida, la sección con fecha en el `.md` del módulo (decisiones y anomalías). **No** tocar
-   stories ni `design-system.md` en este paso.
+1. Leer la historia del módulo en Jira y su `.md`; implementar y mirarlo en el dev server (Browser pane o Playwright en
+   el scratchpad si el pane está oculto).
+2. Dejar anotado, sin que lo pida, la sección con fecha en el `.md` del módulo (clave de Jira, decisiones y anomalías).
+   **No** tocar stories ni `design-system.md` en este paso.
 3. Checks: `tsc -b`, `vite build`, e2e. Si un cambio rompe un e2e, se arregla el test o el código, no se saltea.
 4. Pasarle a Julián **el link de localhost** de la pantalla exacta que cambió, con el dev server andando, por ejemplo
    `http://localhost:5182/patients/1/relationships`. Localmente las rutas van sin `#`.
