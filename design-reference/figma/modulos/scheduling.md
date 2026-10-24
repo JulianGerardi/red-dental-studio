@@ -3,6 +3,14 @@
 
 # Scheduling — hallazgos del Figma
 
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
+
+- Epics: CON-367 Calendarización · CON-747 Calendarizacion V2 · CON-1493 Calendarizacion front end 2.0 · CON-3119
+  [Post Demo] Calendario · CON-3600 Treatment Visit & Appointment
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-367%2CCON-747%2CCON-1493%2CCON-3119%2CCON-3600%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2934
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2934%29%20ORDER%20BY%20key%20ASC))
+
 ## Módulo Scheduling (sección `3847:166204`)
 
 Seis pantallas + un frame de referencia de colores:

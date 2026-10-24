@@ -2,6 +2,14 @@
 
 # Treatments — hallazgos del Figma
 
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
+
+- Epics: CON-1138 Cases · CON-2709 Cases 2 · CON-2982 [Post Demo] Cases · CON-3939 Treatment & Case · CON-3207
+  Treatment / Workflow · CON-3695 Caso y estimaciones final MVP · CON-2140 Documents 2.0
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-1138%2CCON-2709%2CCON-2982%2CCON-3939%2CCON-3207%2CCON-3695%2CCON-2140%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2861
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2861%29%20ORDER%20BY%20key%20ASC))
+
 Sección **"Patient Profile — Treatment Plan & Documents"** (`3763:254355`), 4 frames:
 
 | Nodo | Frame | Estado |

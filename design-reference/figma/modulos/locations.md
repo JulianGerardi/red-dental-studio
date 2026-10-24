@@ -1,5 +1,10 @@
 # Settings - Locations
 
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
+
+- Epics: CON-1590 Location · CON-38 Configuracion aplicacion · CON-1173 [Location] Settings Billing
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-1590%2CCON-38%2CCON-1173%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+
 
 ## Breadcrumb de Settings (2026-08-30)
 

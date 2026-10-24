@@ -3,6 +3,15 @@
 
 # Patient Dashboard — hallazgos del Figma
 
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
+
+- Epics: CON-2107 Patient · CON-1749 Personas · CON-2798 Post demo · CON-3919 Perfil Clínico, Provider in Charge y
+  Additional Provider · CON-3193 Contacts
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-2107%2CCON-1749%2CCON-2798%2CCON-3919%2CCON-3193%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2946, CON-2940, CON-2942, CON-2952, CON-2954, CON-2840, CON-2916, CON-2847, CON-2944,
+  CON-2945, CON-2953
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2946%2CCON-2940%2CCON-2942%2CCON-2952%2CCON-2954%2CCON-2840%2CCON-2916%2CCON-2847%2CCON-2944%2CCON-2945%2CCON-2953%29%20ORDER%20BY%20key%20ASC))
+
 ## Patient Dashboard (`3646:58836`) y flujo de navegación
 
 Pantalla nueva: panel izquierdo de 218px (avatar, nombre, badge Active, edad,

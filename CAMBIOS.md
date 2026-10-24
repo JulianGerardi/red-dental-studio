@@ -5,6 +5,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-24
 
+### Docs: Storybook al final de la tanda y la lógica de la app linkeada a Jira ([#76](https://github.com/JulianGerardi/red-dental-studio/pull/76))
+- **Storybook al final.** Documentar en Storybook consume mucho crédito: ahora se hace como último paso, cuando Julián lo
+  pide, después de que la app esté aprobada y publicada. Antes de eso sólo va la sección con fecha del `.md` del
+  módulo. El "subilo" publica la app; el Storybook tiene su propio "subilo" al final. Sin cambios de código: `ds:check`
+  sigue corriendo en el deploy con `continue-on-error`.
+- **Jira.** La lógica de la app (reglas de negocio, estados, flujos) está en el proyecto `CON`; las historias de abril
+  de 2026 son las más detalladas. Las del label `design-system` son de diseño y no se usan. Cada `.md` de módulo trae
+  un bloque **Jira** con sus epics e historias, e `design-reference/jira.md` los indexa.
+- **Para el dev:** sólo `CLAUDE.md`, `design-reference/jira.md` (nuevo) y el bloque **Jira** en
+  `design-reference/figma/modulos/*.md` y en `design-reference/figma/README.md`. El mapeo historia → módulo salió de los
+  títulos: si una historia quedó en el módulo equivocado, corregirla en `jira.md` y en el `.md` del módulo.
+
 ### Patients y toda la app: achicar el margen de la pestaña "Currently being seen" ([#77](https://github.com/JulianGerardi/red-dental-studio/pull/77))
 - El margen que reserva `AppShell` para que la pestaña flotante no tape kebabs ni filas reales (PR #73) pasa de 64px a
   24px: los 64 se sumaban por encima del padding propio de la página en vez de contarlo, y dejaban una franja vacía a

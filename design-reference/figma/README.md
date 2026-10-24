@@ -15,6 +15,10 @@ Archivo: `9fYLxX9hlTj5unFthG4bBg`. Relevado durante el rediseño de `red-clone`.
 | Consents (Settings) | `4106:170620` | [modulos/consents.md](modulos/consents.md) |
 | Design system (Storybook) | — | [../design-system.md](../design-system.md) |
 
+## Historias de Jira
+
+La lógica de cada módulo (epics e historias de funcionamiento) está indexada en [../jira.md](../jira.md). Las historias con el label `design-system` son de diseño, para los devs, y no se usan.
+
 ## Convenciones acordadas
 
 - **Escala:** proporciones fieles del Figma con tamaños cómodos. El chrome exterior

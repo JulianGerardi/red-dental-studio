@@ -5,6 +5,11 @@
 
 # Dashboard — hallazgos del Figma (Platform Design, 9fYLxX9hlTj5unFthG4bBg)
 
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
+
+- Epics: CON-2639 Dashboard – Pending Tasks · CON-3116 [Post Demo] Dashboard
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-2639%2CCON-3116%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+
 Relevado 2026-08-25. Nodos:
 - Provider: sección `3749:72259` → frame `3605:56445` (Default)
 - Secretary: sección `3751:72342` → frames `3636:57488` (Populated) y `3632:58557` (Empty State)

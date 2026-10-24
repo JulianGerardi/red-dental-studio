@@ -1,5 +1,13 @@
 # Consents (Settings → Consent Templates)
 
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
+
+- Epics: CON-2094 Consent · CON-3118 [Consent] Procedure · CON-505 Document - Template · CON-1132 Firma
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-2094%2CCON-3118%2CCON-505%2CCON-1132%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2860, CON-2862, CON-2905, CON-2907, CON-2908, CON-2909, CON-2910, CON-2911, CON-2912,
+  CON-2913, CON-2914, CON-2865, CON-2866, CON-2923, CON-2927, CON-2928, CON-2959, CON-2960
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2860%2CCON-2862%2CCON-2905%2CCON-2907%2CCON-2908%2CCON-2909%2CCON-2910%2CCON-2911%2CCON-2912%2CCON-2913%2CCON-2914%2CCON-2865%2CCON-2866%2CCON-2923%2CCON-2927%2CCON-2928%2CCON-2959%2CCON-2960%29%20ORDER%20BY%20key%20ASC))
+
 Nodo Figma: `4106:170620` ("New Consent Template"). Lista de templates a la
 izquierda, editor en el medio, preview a la derecha (desde 2026-10-07 el preview
 se abre en un drawer, ver al final). Código en
