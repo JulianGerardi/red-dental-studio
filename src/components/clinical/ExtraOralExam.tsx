@@ -48,10 +48,11 @@ function ExtraOralExamInterno() {
   function guardar(draft: RegionConditionDraft) {
     const id = `F-${Date.now()}`
     const descriptor = textoDescriptores(draft.descriptors)
+    const area = draft.regions.length ? draft.regions.join(', ') : 'Not Localized'
     estado.setFindings((f) => [
       {
         id,
-        area: draft.regions.join(', '),
+        area,
         condition: `${draft.condition.label} (${draft.condition.group})`,
         descriptor,
         date: HOY,
@@ -68,7 +69,7 @@ function ExtraOralExamInterno() {
       },
       ...f,
     ])
-    aviso.ok(`${draft.condition.label} charted on ${draft.regions.join(', ')}.`)
+    aviso.ok(`${draft.condition.label} charted on ${area}.`)
     cerrar()
   }
 

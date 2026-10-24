@@ -18,7 +18,6 @@
   "components/dashboard/primitives.tsx#CuerpoConScroll": "El cuerpo del Panel con scroll interior (control scroll). Se ve en Components / Dashboard / Panel and StatusPill, estado Scrolling body.",
   "components/patients/form.tsx#PersonaLineas": "Nombre + líneas de abajo de cada card de PersonSearchField (sugerencia o elegida). Se ve en Elements / Fields, States → Person search.",
   "components/clinical/ExtraOralExam.tsx#ExtraOralExamInterno": "El examen en sí, una vez que hay `ExamFindingsProvider` (propio o heredado de ClinicalMode). Se ve en Components / Clinical / ExtraOralExam.",
-  "components/clinical/dental/ExtraOralDiagram.tsx#Panel": "Una de las cuatro vistas del gráfico, repetida con distintas formas. Se ve en Components / Clinical / Dental / ExtraOralDiagram.",
   "components/patients/PacienteCampos.tsx#CuentaPortal": "La cuenta del portal ya vinculada, arriba de General en Edit Patient. Se ve en Pages / Parts / Patient modals → Edit Patient.",
   "components/patients/RelationshipDialogs.tsx#AvisoCuentaDesactivada": "La línea de la cuenta que se desactiva, dentro de los pop ups de archivar y quitar Guardian. Se ve en Pages / Parts / Relationships → Archive — last guardian relationship."
 }

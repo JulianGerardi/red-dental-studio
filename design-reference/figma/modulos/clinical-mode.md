@@ -2647,3 +2647,36 @@ Código: `clinical/ExtraOralExam.tsx`, `clinical/dental/ExtraOralDiagram.tsx`, `
 `useFindingsEstado`), `ui/drawer.tsx` (`DrawerActions.nextLabel`), `pages/ClinicalMode.tsx`.
 Design system: *Components / Clinical / Dental / ExtraOralDiagram* y *RegionConditionDrawer* (nuevas), *Components /
 Clinical / ExtraOralExam* (nueva).
+
+## Extraoral: el gráfico es el PNG del Figma, no un dibujo (2026-10-24)
+
+**CON-881 (Exam "Extra Oral") y CON-934 ([Exam] Add condition).** Julián: "no cambies los gráficos que te pasé, los
+diseños deben ser lo que están en Figma" -el SVG propio de la tanda anterior (#78) se descarta-.
+
+- `ExtraOralDiagram` ahora muestra el **PNG original del Figma** (Platform Design, *Clinical Exam — Extra Oral*, nodo
+  `4106:158958`, `src/assets/extraoral-heads.png`, el mismo a 2048 px) sin trazarlo ni retocarlo, con una zona
+  clickeable por región encima. Mismos props y mismo comportamiento que antes (`pending` ámbar, `active` verde,
+  una región en más de una vista se marca junta); lo único que cambia es el arte.
+- **Las zonas salen del propio PNG**: las formas celestes que trae (frente, nuca, perfil) son las zonas reales de la app;
+  se extrajeron como polígonos y se completaron por simetría (lado opuesto de la frente y de la nuca, y el espejo entre
+  los dos perfiles). Los ojos y Scalp son una aproximación mía a partir de la partición que se ve en red.dev. Right =
+  lado derecho del paciente: en el frente queda a la izquierda del dibujo, en la nuca a la derecha.
+- **Anomalía del Figma (#102)**: el PNG viene con una región de ejemplo ya pintada de celeste (la del chip "Uper left",
+  con typo). Hasta tener la cabeza limpia se muestra en gris con un filtro (`grayscale`), sin tocar el archivo: se ve
+  como un parche gris en la frente, la nuca y la nariz. Se probó borrarlo (inpainting) y también aclararlo con
+  `brightness`: lo primero deja manchas y se pierde la nariz de los perfiles, lo segundo lava todo el dibujo.
+- **Pendiente: los assets de red.dev** (cabeza sin celeste y una capa por región, que también cubre las zonas sin nombre
+  que se ven en la app: nariz, cara, orejas, cuello). red.dev pide sesión: Julián los saca de Network.
+- **Not Localized** (CON-881): sin región elegida, Add Condition abre el drawer con el chip "Not Localized" y se guarda
+  con esa área -antes quedaba vacía-.
+- **Jira vs. app real, sin cambiar**: CON-881/CON-934 dicen "una fila por locación" al elegir varias regiones; la
+  grabación de red.dev muestra **una sola card con todas las locaciones**. Se deja lo que hace la app real. También
+  quedan sin aplicar, por no verse en la app: pestañas *Most Used / All Conditions* y códigos SNOMED en la lista de
+  condiciones, textos "Condition successfully saved to the exam." / "Please select at least one condition to continue." /
+  "This condition has already been added for the selected location.", y descriptores en orden alfabético (la app los
+  muestra en el orden de `DESCRIPTOR_ROWS`).
+- **Regiones de cuello y hombro** (Jira da "Right Anterior Neck", "Left Shoulder"): no se agregan, el Figma no las
+  marca y las grabaciones no mostraron sus límites.
+
+Código: `clinical/dental/ExtraOralDiagram.tsx`, `clinical/ExtraOralExam.tsx`, `clinical/dental/RegionConditionDrawer.tsx`.
+Storybook sin tocar (se hace al final, cuando Julián lo pida).

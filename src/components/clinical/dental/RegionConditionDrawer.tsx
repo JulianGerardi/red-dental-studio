@@ -18,7 +18,8 @@ export type RegionConditionDraft = {
    StepIndicator con nombre de paso, y no hay motivo para sacarlo sólo en éste). Paso 1: las regiones elegidas en el
    gráfico (afuera, como chips removibles) y el catálogo de condición, propio -no el de procedimientos-, con buscador.
    Paso 2: la guía visual de descriptores (DescriptorFields), igual que Add/Edit Condition del resto de la app.
-   El botón del paso 1 dice "Select descriptors" en vez de "Next Step" -así lo dice la app real-. Ver
+   El botón del paso 1 dice "Select descriptors" en vez de "Next Step" -así lo dice la app real-. Sin región elegida
+   se carga como "Not Localized" (CON-881). Ver
    design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
 export function RegionConditionDrawer({
   open, regions, onRemoveRegion, onClose, onSave,
@@ -68,7 +69,7 @@ export function RegionConditionDrawer({
               <div className="flex w-full flex-wrap gap-2">
                 {regions.length
                   ? regions.map((r) => <Chip key={r} removeLabel={`Remove ${r}`} onRemove={() => onRemoveRegion(r)}>{r}</Chip>)
-                  : <span className="text-xs font-medium text-ink-faint">Click a region on the diagram.</span>}
+                  : <Chip>Not Localized</Chip>}
               </div>
             </div>
 
