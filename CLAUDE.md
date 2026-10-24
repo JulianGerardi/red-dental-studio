@@ -33,18 +33,23 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
 
 ## Cómo se trabaja una tanda
 
+La app va primero y el Storybook al final: documentar en Storybook consume mucho crédito, así que no se hace hasta que
+la app esté aprobada y publicada.
+
 1. Implementar y mirarlo en el dev server (Browser pane o Playwright en el scratchpad si el pane está oculto).
-2. Documentar **en la misma tanda**, sin que lo pida: story del componente y sección con fecha en el `.md` del módulo y
-   en `design-system.md`.
-3. Checks: `tsc -b`, `ds:check`, `vite build`, e2e. Si un cambio rompe un e2e, se arregla el test o el código, no se
-   saltea.
-4. Pasarle a Julián **los links de localhost** para que vea los cambios antes de publicar, con el dev server (y
-   Storybook, si cambió el design system) andando: la pantalla exacta que cambió, por ejemplo
-   `http://localhost:5182/patients/1/relationships`, y la página del DS, por ejemplo
-   `http://localhost:6006/?path=/docs/elements-cards--docs`. Localmente las rutas van sin `#`.
-5. **No hacer push sin su ok** ("subilo"). Subir a `main` publica app y Storybook juntos.
+2. Dejar anotado, sin que lo pida, la sección con fecha en el `.md` del módulo (decisiones y anomalías). **No** tocar
+   stories ni `design-system.md` en este paso.
+3. Checks: `tsc -b`, `vite build`, e2e. Si un cambio rompe un e2e, se arregla el test o el código, no se saltea.
+4. Pasarle a Julián **el link de localhost** de la pantalla exacta que cambió, con el dev server andando, por ejemplo
+   `http://localhost:5182/patients/1/relationships`. Localmente las rutas van sin `#`.
+5. **No hacer push sin su ok** ("subilo"). Subir a `main` publica app y Storybook juntos, pero el Storybook sale con lo
+   que ya tenía.
 6. Después del push: `gh run list` hasta que termine el deploy y confirmar en el bundle publicado. Pages cachea hasta
-   ~10 min; para probar, agregá `?cb=<n>`.
+   ~10 min; para probar, agregá `?cb=<n>`. Pasarle el link en vivo de la app.
+7. **Último paso, solo cuando Julián dé otro ok** ("documentá en Storybook" o similar): story del componente, ruta en
+   `Pages.stories.tsx` y sección con fecha en `design-system.md`; correr `ds:check`; pasarle el link de localhost del
+   DS (con Storybook andando), por ejemplo `http://localhost:6006/?path=/docs/elements-cards--docs`; push con su ok y
+   confirmar el deploy como en el paso 6. Si Julián no lo pide, no se hace ni se sugiere hacerlo por cuenta propia.
 
 ## Reglas de UI
 
@@ -65,7 +70,8 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
 
 ## Design system
 
-- Todo componente lleva su `.stories.tsx` al lado; toda ruta nueva va en `src/design-system/Pages.stories.tsx`.
+- Todo componente lleva su `.stories.tsx` al lado; toda ruta nueva va en `src/design-system/Pages.stories.tsx`. Se
+  escriben en el último paso de la tanda (ver arriba), no mientras se implementa la app.
 - `ds:check` falla si una función de React con mayúscula no está importada por ninguna story (o en
   `src/design-system/exentos.json`), si falta un estado soportado o si aparece un hex con token.
 - Cada página sigue la estructura de *Elements / Buttons*: descripción que termina en "**Probalo:**", Playground con
