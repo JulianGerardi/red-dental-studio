@@ -2587,8 +2587,10 @@ el `Odontogram` ("no una foto", más arriba en este archivo). `ExtraOralDiagram.
 derecho, frente, nuca, perfil izquierdo, el orden de una foto clínica- a mano, con las siete regiones vistas en las
 grabaciones (Scalp, Right/Left Forehead, Right/Left Eye, Right/Left Posterior Head) como `<path>` clickeables.
 **Los límites de cada región son una aproximación** -no hay fuente vectorial de la app real, se estimaron a ojo sobre
-capturas de video-; ajustar cuando haya más referencia. Una región puede dibujarse en más de una vista (Scalp, en la
-frente y las dos vistas de perfil) y todas sus formas se marcan juntas.
+capturas de video-; ajustar cuando haya más referencia. Una región puede dibujarse en más de una vista (Right/Left
+Forehead, en su perfil y en el frente) y todas sus formas se marcan juntas. Scalp queda sólo en el frente por ahora:
+en las grabaciones también se veía en los dos perfiles, pero ahí se pisaba con Forehead/Posterior Head -pendiente
+para la próxima pasada, con más espacio en el dibujo-.
 
 **Estados del color, los mismos tokens que ya usa la app**: `pending` (ámbar, `warn-fg`, mientras se elige antes de
 guardar) y `active` (verde, `dash-ok-fg`, el mismo de un finding Active) -nada de colores nuevos.

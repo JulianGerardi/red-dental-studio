@@ -49,7 +49,7 @@ export const Parts: Story = {
     <Lienzo>
       <Bloque titulo="Regions" nota="Clickeable en cualquier vista donde se dibuje; todas sus formas marcan juntas.">
         <Tabla encabezado={['Region', 'Views']} minimo={420}>
-          <tr><td className="font-semibold">Scalp</td><td>Front, right profile, left profile</td></tr>
+          <tr><td className="font-semibold">Scalp</td><td>Front (pendiente en los dos perfiles: se pisaba con Forehead/Posterior Head)</td></tr>
           <tr><td className="font-semibold">Right Forehead</td><td>Front, right profile</td></tr>
           <tr><td className="font-semibold">Left Forehead</td><td>Front, left profile</td></tr>
           <tr><td className="font-semibold">Right Eye</td><td>Front</td></tr>

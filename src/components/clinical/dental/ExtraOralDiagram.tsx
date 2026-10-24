@@ -6,8 +6,9 @@ import type { ExtraOralRegion } from './data'
    como SVG propio, no una foto ni el PNG del Figma: mismo criterio que el Odontogram ("no una foto", clinical-mode.md).
    Las siete regiones y el orden de las vistas salen de grabaciones de pantalla de red.dev (Julián, 2026-10-24); los
    límites exactos de cada zona son una aproximación -quedan para ajustar cuando se vea con más referencia-. Una
-   región puede dibujarse en más de una vista (Scalp en las tres de arriba, por ejemplo): todas sus formas comparten
-   el mismo id y se marcan juntas. */
+   región puede dibujarse en más de una vista (Right/Left Forehead, en su perfil y en el frente): todas sus formas
+   comparten el mismo id y se marcan juntas. Scalp sólo en el frente por ahora -las grabaciones también la mostraban
+   en los dos perfiles, pero ahí no entraba sin pisar Forehead/Posterior Head; queda para la próxima pasada-. */
 
 type EstadoRegion = 'default' | 'pending' | 'active'
 

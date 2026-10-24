@@ -242,7 +242,7 @@ test('Extraoral: elegir regiones en el gráfico y cargar una condition', async (
   await screen.getByRole('button', 'Extra Oral').tap()
 
   await screen.getByRole('button', /^Scalp$/).tap()
-  await screen.getByRole('button', /^Right Forehead$/).tap()
+  await screen.getByRole('button', /^Right Forehead$/).first().tap()
   await screen.getByRole('button', 'Add Condition').tap()
 
   const drawer = screen.getByRole('dialog', 'New Condition')
