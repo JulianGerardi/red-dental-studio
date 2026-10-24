@@ -2,8 +2,8 @@ import { cn } from '@/lib/utils'
 
 /* Base de los gráficos por regiones (Extraoral, Intraoral): el PNG del Figma tal cual y, encima, una zona clickeable
    por región. Una región puede tener más de una forma (en dos vistas del dibujo): todas se marcan juntas. Colores por
-   estado con los tokens de la app: ámbar mientras se elige (`warn-fg`), turquesa cuando ya tiene una condition activa
-   guardada (`dash-ok-fg`). Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
+   estado: ámbar mientras se elige (`warn-fg`) y, cuando ya tiene una condition activa guardada, el celeste con el que el
+   Figma y red.dev marcan una región (`region-active`). Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
 
 export type EstadoRegion = 'default' | 'pending' | 'active'
 export type Forma<R extends string> = { region: R; d: string }
@@ -11,7 +11,7 @@ export type Forma<R extends string> = { region: R; d: string }
 const RELLENO: Record<EstadoRegion, string> = {
   default: 'fill-transparent hover:fill-ink/10',
   pending: 'fill-warn-fg/40 hover:fill-warn-fg/50',
-  active: 'fill-dash-ok-fg/35 hover:fill-dash-ok-fg/45',
+  active: 'fill-region-active/85 hover:fill-region-active',
 }
 
 export function RegionDiagram<R extends string>({

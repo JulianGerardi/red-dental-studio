@@ -8,7 +8,8 @@ import type { IntraOralRegion } from './data'
    clickeable en el paladar duro (CON-882) y el paladar blando (la forma celeste del propio PNG; "Soft Palate" es el
    nombre que usa el Figma): el resto de las zonas que se ven en red.dev (labios, arcada, mejillas, lengua, piso de
    boca) esperan su lista de nombres, no se inventan. Right = lado derecho del
-   paciente, a la izquierda del dibujo. Coordenadas del PNG original (3831 px). */
+   paciente, a la izquierda del dibujo. Mide como en red.dev: unos 740 px de ancho, no todo el examen. Coordenadas del PNG
+   original (3831 px). */
 
 const FORMAS: Forma<IntraOralRegion>[] = [
   { region: 'Right Hard Palate', d: 'M1144 563L1100 566L1040 585L985 620L940 665L900 720L868 770L840 805L1144 805Z' },
@@ -25,7 +26,7 @@ export function IntraOralDiagram({
 }) {
   return (
     <RegionDiagram
-      titulo="Intra oral diagram" imagen={boca} ancho={3831} alto={1900} viewBox="200 60 3380 1840" className="max-h-[560px]"
+      titulo="Intra oral diagram" imagen={boca} ancho={3831} alto={1900} viewBox="200 60 3380 1840" className="mx-auto max-w-[740px]"
       formas={FORMAS} pending={pending} active={active} onToggle={onToggle}
     />
   )

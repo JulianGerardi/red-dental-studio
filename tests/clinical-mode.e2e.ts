@@ -22,8 +22,10 @@ test('Add Procedure carga un D0120 desde DentAssmt', async ({ app, screen }) => 
   // Al guardar el procedimiento aparecen los pasos para vincularlo.
   await expect(drawer.getByText('You can link clinical findings that may be resolved by this procedure.')).toBeVisible()
   await drawer.getByRole('button', /Next Step/).tap()
-  await expect(drawer.getByText(/K05\.31/).first()).toBeVisible()
-  await drawer.getByRole('button', /^Link K05\.31/).tap()
+  // El buscador no muestra nada hasta escribir; lo elegido queda debajo con su ✕.
+  await drawer.getByPlaceholder('Search by code or surface').fill('K05')
+  await drawer.getByRole('button', /^K05\.31/).first().tap()
+  await expect(drawer.getByRole('button', /^Remove K05\.31/).first()).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
 })
 
@@ -248,6 +250,7 @@ test('Extraoral: elegir regiones en el gráfico y cargar una condition', async (
   const drawer = screen.getByRole('dialog', 'New Condition')
   await expect(drawer.getByText('Scalp')).toBeVisible()
   await expect(drawer.getByText('Right Forehead')).toBeVisible()
+  await drawer.getByPlaceholder('Search a Condition Here...').fill('Atro')
   await drawer.getByRole('button', /^Atrophy/).tap()
   await drawer.getByRole('button', /select descriptors/i).tap()
   await drawer.getByRole('button', 'Painful').tap()
@@ -265,6 +268,7 @@ test('Intraoral: Add Condition sin región se carga como Not Localized', async (
   await screen.getByRole('button', 'Add Condition').tap()
   const drawer = screen.getByRole('dialog', 'New Condition')
   await expect(drawer.getByText('Not Localized')).toBeVisible()
+  await drawer.getByPlaceholder('Search a Condition Here...').fill('Absc')
   await drawer.getByRole('button', /^Abscess/).tap()
   await drawer.getByRole('button', /select descriptors/i).tap()
   await drawer.getByRole('button', /^Save/).tap()

@@ -2711,3 +2711,32 @@ Código: `clinical/dental/{RegionDiagram,ExtraOralDiagram,IntraOralDiagram,Regio
 EditConditionDrawer,EditProcedureDrawer,DescriptorFields}.tsx`, `clinical/{RegionExam,ExtraOralExam,IntraOralExam,ExamLayout}.tsx`,
 `dental/data.ts` (`INTRAORAL_REGIONS`, `Finding.fee`), `data/finanzas.ts`, `pages/ClinicalMode.tsx`. Storybook sin tocar
 (se hace al final, cuando Julián lo pida).
+
+### Ajustes: notas, Intraoral más chico, buscadores y contraste con Jira (2026-10-24)
+
+**CON-2770 (Edit Finding), CON-934 (Add condition), CON-1399.** Julián: "edit finding falta el note"; "el intra oral está
+enorme, achicalo (tomá de referencia el video)"; "los search deben funcionar como un search: no deberían estar por
+default las condition cargadas, deben aparecer cuando las busco".
+
+- **Edit Finding** suma **Notes** y la fila **Treatment Area** (el área del finding). Así cumple CON-2770, que pide
+  mostrar fecha, estado, condition, examen y área de tratamiento de sólo lectura, y editar superficie (si corresponde),
+  notas y descriptores. El Figma de Edit Finding no trae ni Notes ni Treatment Area: manda Jira.
+- **Intraoral** mide como en la grabación de red.dev: unos 740 px de ancho, centrado, en vez de todo el examen.
+- **Buscadores**: `ui/search-picker.tsx` (nuevo, `SearchPicker`), el mismo formato que `PersonSearchField`. No muestra
+  nada hasta escribir; las coincidencias flotan en un desplegable pegado al input y lo elegido queda debajo con una ✕. Se
+  usa en la condition de New Condition (Extraoral/Intraoral), en Findings / Diagnostic de Edit Procedure y en Link to
+  finding / Link to diagnosis de New Procedure. **Contradice CON-934**, que lista las condiciones de entrada (pestañas
+  *Most Used / All Conditions*) y usa la búsqueda para filtrar: se sigue lo que pidió Julián. El catálogo de
+  procedimientos de New Procedure/New Condition de DentAssmt (con embudo, Category y Existing/Planned) **no se tocó**: es
+  la pantalla de la app real; queda a confirmar si también pasa a buscador.
+- La región con una condition activa se pinta con el celeste del Figma y de red.dev (token nuevo `region-active`,
+  `#90dbd5`); el verde de la app sobre el rosa del Intraoral quedaba oliva.
+- **Jira consultado**: CON-2770 (Edit Finding, la más nueva, manda sobre CON-1399, de 2025, que además dejaba editar
+  locación y estado), CON-3142 / CON-3143 (VOL 2 Edit Procedure / Edit Condition: sin descripción) y CON-774 (Edit
+  Procedure del catálogo de admin, no aplica al examen). Para Edit Procedure del examen no hay historia con campos: la
+  lógica sigue siendo la nuestra (proveedor, notas, vínculos).
+
+Código: `ui/search-picker.tsx`, `clinical/dental/{EditFindingDrawer,EditProcedureDrawer,NewProcedureDrawer,
+RegionConditionDrawer,IntraOralDiagram,RegionDiagram,OpcionesVinculo}.tsx`, `index.css` (`region-active`). Storybook sin
+tocar: las historias de RegionConditionDrawer y NewProcedureDrawer que eligen de la lista van a tener que escribir en el
+buscador cuando se documente.
