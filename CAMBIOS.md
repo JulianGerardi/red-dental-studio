@@ -5,6 +5,22 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-24
 
+### Clinical Mode: Extraoral e Intraoral con el gráfico del Figma, Edit drawers y buscadores ([#79](https://github.com/JulianGerardi/red-dental-studio/pull/79))
+- **Extraoral e Intraoral** muestran el PNG del Figma sin ninguna región marcada (`RegionDiagram`, base común;
+  `ExtraOralDiagram`, `IntraOralDiagram` nuevo) con una zona clickeable por región. El SVG propio de #78 se descarta.
+  La pestaña Intra Oral deja de ser placeholder (`IntraOralExam`, y `RegionExam` como examen común). Sin región
+  elegida, Add Condition carga como "Not Localized".
+- **Edit Procedure / Edit Condition / Edit Finding** con el diseño del Figma: `EditFindingDrawer` elige el drawer según
+  el finding (procedimiento, condition en un diente, condition sin diente). Edit Finding suma Notes y Treatment Area
+  (CON-2770). `DescriptorFields` pasa a control segmentado en toda la app. Pie: Cancel a la izquierda, Save a la derecha.
+- **Buscadores**: `ui/search-picker` (`SearchPicker`, nuevo): nada hasta escribir, resultados en cards en un desplegable,
+  lo vinculado en una card azul. En New Procedure el buscador es independiente de la lista del catálogo.
+- **Para el dev:** `Finding.fee?` (Fee de Edit Procedure, de `precioUcr()` en `data/finanzas.ts`), `INTRAORAL_REGIONS`,
+  token `--color-region-active`. `RegionConditionDrawer` recibe regiones como `string[]`. Storybook sin actualizar en
+  esta tanda: las historias que eligen de una lista van a tener que escribir en el buscador.
+- **Pendiente:** nombres del resto de las zonas del Intraoral, la rueda de superficies del Figma (BC/B/D/M/P/PC/O) vs.
+  la nuestra, y los assets limpios de red.dev para reemplazar la reconstrucción de los PNG.
+
 ### Clinical Mode: guía visual de descriptores y Extraoral con gráfico de regiones ([#78](https://github.com/JulianGerardi/red-dental-studio/pull/78))
 - **Guía visual de descriptores** (`DescriptorFields`, nuevo): doce filas de una sola elección —Quantity, Symmetry,
   Size, Shape, Borders, Colors, Surface, Consistency, Mobility, Pain, Bleeding, Exudate—, tomadas de la app real
