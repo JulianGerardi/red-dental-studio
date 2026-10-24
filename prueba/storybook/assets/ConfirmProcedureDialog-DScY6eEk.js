@@ -1,0 +1,50 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./react-BZJXY1be.js";import{t as n}from"./jsx-runtime-DeHZSEgm.js";import{n as r,t as i}from"./check-CIZB-Kh7.js";import{n as a,t as o}from"./confirm-dialog-ClIi13bP.js";import{n as s,t as c}from"./FindingCard-Boq0ocTl.js";import{n as l,t as u}from"./actions-wxBOAYhg.js";function d({action:e,finding:t,linkedConditions:n,onCancel:r,onConfirm:a}){let[s,l]=(0,f.useState)([]);if((0,f.useEffect)(()=>{l(n.map(e=>e.id))},[e,t?.id]),!e||!t)return null;let d=u[e],m=n.length>0&&e!==`delete`;return(0,p.jsx)(o,{title:d.title,confirmLabel:`Confirm`,tone:d.destructive?`danger`:`primary`,onConfirm:()=>a(s),onCancel:r,children:m?(0,p.jsxs)(p.Fragment,{children:[(0,p.jsxs)(`p`,{children:[`You are about to `,d.verb,`.`,(0,p.jsx)(`br`,{}),`Select any linked conditions you want to mark as Treated.`]}),(0,p.jsx)(`div`,{className:`mt-3 flex max-h-[46vh] flex-col gap-2.5 overflow-y-auto`,children:n.map(e=>{let t=s.includes(e.id);return(0,p.jsx)(`button`,{type:`button`,"aria-pressed":t,onClick:()=>l(n=>t?n.filter(t=>t!==e.id):[...n,e.id]),className:`rounded-md text-left transition-shadow outline-none ${t?`ring-dash-blue ring-2`:`ring-1 ring-transparent hover:ring-line`}`,children:(0,p.jsx)(c,{finding:e,action:(0,p.jsx)(`span`,{"aria-hidden":!0,className:`flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors ${t?`bg-dash-blue border-dash-blue text-white`:`border-line-strong bg-white`}`,children:t&&(0,p.jsx)(i,{className:`size-2.5`,strokeWidth:3})})})},e.id)})})]}):(0,p.jsx)(`p`,{children:d.question})})}var f,p;function m(){return(m=e((()=>{f=t(),r(),a(),s(),l(),p=n(),d.__docgenInfo={description:``,methods:[],displayName:`ConfirmProcedureDialog`,props:{action:{required:!0,tsType:{name:`union`,raw:`Exclude<FindingAction, 'edit'> | null`,elements:[{name:`Exclude`,elements:[{name:`union`,raw:`| 'edit' | 'monitor' | 'treat' | 'treated' | 'externally-treated'
+| 'no-treatment' | 'patient-declined' | 'clinic-declined' | 'discard' | 'delete'`,elements:[{name:`literal`,value:`'edit'`},{name:`literal`,value:`'monitor'`},{name:`literal`,value:`'treat'`},{name:`literal`,value:`'treated'`},{name:`literal`,value:`'externally-treated'`},{name:`literal`,value:`'no-treatment'`},{name:`literal`,value:`'patient-declined'`},{name:`literal`,value:`'clinic-declined'`},{name:`literal`,value:`'discard'`},{name:`literal`,value:`'delete'`}]},{name:`literal`,value:`'edit'`}],raw:`Exclude<FindingAction, 'edit'>`},{name:`null`}]},description:``},finding:{required:!0,tsType:{name:`union`,raw:`Finding | null`,elements:[{name:`signature`,type:`object`,raw:`{
+  id: string
+  area: string
+  condition: string
+  descriptor: string
+  date: string
+  status: FindingStatus
+  tooth: number | null
+  provider: string
+  surfaces: string[]
+  notes: string
+  /** Ids de los hallazgos del chart que este procedimiento resuelve. */
+  linked: string[]
+  diagnoses: string[]
+  /** El examen donde se cargó, con el nombre de la Problem List (Dental Assessment, Intraoral…). */
+  examen?: string
+  /** La fila de la Problem List que es este hallazgo: de ahí salen sus procedimientos, caso y derivaciones. */
+  problema?: string
+  /** De qué botón se cargó (Add Procedure o Add Condition): sólo una condition lleva la guía visual de descriptores. */
+  kind?: 'procedure' | 'condition'
+  /** La guía visual de descriptores: una opción por fila, por id de fila. \`descriptor\` sigue siendo el texto que se ve
+     en la card -lo elegido acá, unido con coma-, para no duplicar esa lectura en todos lados. */
+  descriptors?: Record<string, string>
+}`,signature:{properties:[{key:`id`,value:{name:`string`,required:!0}},{key:`area`,value:{name:`string`,required:!0}},{key:`condition`,value:{name:`string`,required:!0}},{key:`descriptor`,value:{name:`string`,required:!0}},{key:`date`,value:{name:`string`,required:!0}},{key:`status`,value:{name:`union`,raw:`| 'Active' | 'Monitoring' | 'In Treatment' | 'Treated' | 'Externally Treated'
+| 'No Treatment Needed' | 'Patient Declined' | 'Clinic Declined' | 'Discarded'`,elements:[{name:`literal`,value:`'Active'`},{name:`literal`,value:`'Monitoring'`},{name:`literal`,value:`'In Treatment'`},{name:`literal`,value:`'Treated'`},{name:`literal`,value:`'Externally Treated'`},{name:`literal`,value:`'No Treatment Needed'`},{name:`literal`,value:`'Patient Declined'`},{name:`literal`,value:`'Clinic Declined'`},{name:`literal`,value:`'Discarded'`}],required:!0}},{key:`tooth`,value:{name:`union`,raw:`number | null`,elements:[{name:`number`},{name:`null`}],required:!0}},{key:`provider`,value:{name:`string`,required:!0}},{key:`surfaces`,value:{name:`Array`,elements:[{name:`string`}],raw:`string[]`,required:!0}},{key:`notes`,value:{name:`string`,required:!0}},{key:`linked`,value:{name:`Array`,elements:[{name:`string`}],raw:`string[]`,required:!0},description:`Ids de los hallazgos del chart que este procedimiento resuelve.`},{key:`diagnoses`,value:{name:`Array`,elements:[{name:`string`}],raw:`string[]`,required:!0}},{key:`examen`,value:{name:`string`,required:!1},description:`El examen donde se cargó, con el nombre de la Problem List (Dental Assessment, Intraoral…).`},{key:`problema`,value:{name:`string`,required:!1},description:`La fila de la Problem List que es este hallazgo: de ahí salen sus procedimientos, caso y derivaciones.`},{key:`kind`,value:{name:`union`,raw:`'procedure' | 'condition'`,elements:[{name:`literal`,value:`'procedure'`},{name:`literal`,value:`'condition'`}],required:!1},description:`De qué botón se cargó (Add Procedure o Add Condition): sólo una condition lleva la guía visual de descriptores.`},{key:`descriptors`,value:{name:`Record`,elements:[{name:`string`},{name:`string`}],raw:`Record<string, string>`,required:!1},description:"La guía visual de descriptores: una opción por fila, por id de fila. `descriptor` sigue siendo el texto que se ve\n     en la card -lo elegido acá, unido con coma-, para no duplicar esa lectura en todos lados."}]}},{name:`null`}]},description:``},linkedConditions:{required:!0,tsType:{name:`Array`,elements:[{name:`signature`,type:`object`,raw:`{
+  id: string
+  area: string
+  condition: string
+  descriptor: string
+  date: string
+  status: FindingStatus
+  tooth: number | null
+  provider: string
+  surfaces: string[]
+  notes: string
+  /** Ids de los hallazgos del chart que este procedimiento resuelve. */
+  linked: string[]
+  diagnoses: string[]
+  /** El examen donde se cargó, con el nombre de la Problem List (Dental Assessment, Intraoral…). */
+  examen?: string
+  /** La fila de la Problem List que es este hallazgo: de ahí salen sus procedimientos, caso y derivaciones. */
+  problema?: string
+  /** De qué botón se cargó (Add Procedure o Add Condition): sólo una condition lleva la guía visual de descriptores. */
+  kind?: 'procedure' | 'condition'
+  /** La guía visual de descriptores: una opción por fila, por id de fila. \`descriptor\` sigue siendo el texto que se ve
+     en la card -lo elegido acá, unido con coma-, para no duplicar esa lectura en todos lados. */
+  descriptors?: Record<string, string>
+}`,signature:{properties:[{key:`id`,value:{name:`string`,required:!0}},{key:`area`,value:{name:`string`,required:!0}},{key:`condition`,value:{name:`string`,required:!0}},{key:`descriptor`,value:{name:`string`,required:!0}},{key:`date`,value:{name:`string`,required:!0}},{key:`status`,value:{name:`union`,raw:`| 'Active' | 'Monitoring' | 'In Treatment' | 'Treated' | 'Externally Treated'
+| 'No Treatment Needed' | 'Patient Declined' | 'Clinic Declined' | 'Discarded'`,elements:[{name:`literal`,value:`'Active'`},{name:`literal`,value:`'Monitoring'`},{name:`literal`,value:`'In Treatment'`},{name:`literal`,value:`'Treated'`},{name:`literal`,value:`'Externally Treated'`},{name:`literal`,value:`'No Treatment Needed'`},{name:`literal`,value:`'Patient Declined'`},{name:`literal`,value:`'Clinic Declined'`},{name:`literal`,value:`'Discarded'`}],required:!0}},{key:`tooth`,value:{name:`union`,raw:`number | null`,elements:[{name:`number`},{name:`null`}],required:!0}},{key:`provider`,value:{name:`string`,required:!0}},{key:`surfaces`,value:{name:`Array`,elements:[{name:`string`}],raw:`string[]`,required:!0}},{key:`notes`,value:{name:`string`,required:!0}},{key:`linked`,value:{name:`Array`,elements:[{name:`string`}],raw:`string[]`,required:!0},description:`Ids de los hallazgos del chart que este procedimiento resuelve.`},{key:`diagnoses`,value:{name:`Array`,elements:[{name:`string`}],raw:`string[]`,required:!0}},{key:`examen`,value:{name:`string`,required:!1},description:`El examen donde se cargó, con el nombre de la Problem List (Dental Assessment, Intraoral…).`},{key:`problema`,value:{name:`string`,required:!1},description:`La fila de la Problem List que es este hallazgo: de ahí salen sus procedimientos, caso y derivaciones.`},{key:`kind`,value:{name:`union`,raw:`'procedure' | 'condition'`,elements:[{name:`literal`,value:`'procedure'`},{name:`literal`,value:`'condition'`}],required:!1},description:`De qué botón se cargó (Add Procedure o Add Condition): sólo una condition lleva la guía visual de descriptores.`},{key:`descriptors`,value:{name:`Record`,elements:[{name:`string`},{name:`string`}],raw:`Record<string, string>`,required:!1},description:"La guía visual de descriptores: una opción por fila, por id de fila. `descriptor` sigue siendo el texto que se ve\n     en la card -lo elegido acá, unido con coma-, para no duplicar esa lectura en todos lados."}]}}],raw:`Finding[]`},description:``},onCancel:{required:!0,tsType:{name:`signature`,type:`function`,raw:`() => void`,signature:{arguments:[],return:{name:`void`}}},description:``},onConfirm:{required:!0,tsType:{name:`signature`,type:`function`,raw:`(treatedIds: string[]) => void`,signature:{arguments:[{type:{name:`Array`,elements:[{name:`string`}],raw:`string[]`},name:`treatedIds`}],return:{name:`void`}}},description:``}}}})))()}export{m as n,d as t};
