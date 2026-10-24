@@ -1,5 +1,7 @@
 # Notifications (pantalla nueva, 2026-09-29)
 
+**Jira:** sin historia con el label `design-system` (revisado el 2026-10-24).
+
 Pedido de Julián: una sección con **todas** las notificaciones, donde cada una
 se pueda marcar como **leída, pendiente o no leída**, siguiendo la lógica del
 Inbox de Notion y manteniendo el estilo de la app. Se entra desde la campana

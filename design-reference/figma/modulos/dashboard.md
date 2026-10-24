@@ -5,6 +5,11 @@
 
 # Dashboard — hallazgos del Figma (Platform Design, 9fYLxX9hlTj5unFthG4bBg)
 
+**Jira** (label `design-system`):
+
+- [CON-3804](https://confidetally.atlassian.net/browse/CON-3804) · [Dasboard] Corregir cards, filtros, tamañanos
+- [CON-3806](https://confidetally.atlassian.net/browse/CON-3806) · [Dashboard] Alinear el diseño del Dashboard con Confidentally UI
+
 Relevado 2026-08-25. Nodos:
 - Provider: sección `3749:72259` → frame `3605:56445` (Default)
 - Secretary: sección `3751:72342` → frames `3636:57488` (Populated) y `3632:58557` (Empty State)

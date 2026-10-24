@@ -1,5 +1,9 @@
 # Settings → Ledger (Ledger Options)
 
+**Jira** (label `design-system`):
+
+- [CON-3821](https://confidetally.atlassian.net/browse/CON-3821) · [Settings] Alinear Ledger Settings con Confidentally UI (y sumar al sistema lo que red.dev ya tiene)
+
 Figma 4293:57917. Dos pantallas que comparten encabezado y se alternan con un
 par de tabs arriba a la derecha: **Adjustments Types** y **Payment Method**.
 

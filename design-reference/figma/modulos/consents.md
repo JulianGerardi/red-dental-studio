@@ -1,5 +1,9 @@
 # Consents (Settings → Consent Templates)
 
+**Jira** (label `design-system`):
+
+- [CON-3906](https://confidetally.atlassian.net/browse/CON-3906) · [Consent] Alinear el diseño del consent con Confidentally UI
+
 Nodo Figma: `4106:170620` ("New Consent Template"). Lista de templates a la
 izquierda, editor en el medio, preview a la derecha. Código en
 `src/pages/settings/Consents.tsx` (pantalla) y

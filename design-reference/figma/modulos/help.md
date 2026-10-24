@@ -1,5 +1,7 @@
 # Help (Confibot + Help Center)
 
+**Jira:** sin historia con el label `design-system` (revisado el 2026-10-24).
+
 ## De acordeón de FAQ a temas que te llevan a la pantalla real (2026-09-08)
 
 `Help.tsx` era un acordeón estático -categorías en pills, preguntas y

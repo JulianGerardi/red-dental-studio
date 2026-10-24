@@ -1,5 +1,7 @@
 # Ledger
 
+**Jira:** sin historia con el label `design-system` (revisado el 2026-10-24).
+
 Figma 4582:28487 "Ledger — Screens": Empty State, Overview (Patient View),
 Overview (Guarantor View), y tres modales de acción -Credit (+) Adjustment,
 Credit (-) Adjustment, Enter Payment (-), este último en variante Single y

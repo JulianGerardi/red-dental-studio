@@ -2,6 +2,11 @@
 
 # Relationships & Billing — hallazgos del Figma
 
+**Jira** (label `design-system`):
+
+- [CON-3811](https://confidetally.atlassian.net/browse/CON-3811) · [Patient] Alinear el diseño de Relationships & Billing con Confidentally UI
+- [CON-3835](https://confidetally.atlassian.net/browse/CON-3835) · [Patient] Alinear la pantalla Add Relationship con Confidentally UI
+
 Sección `3751:76507`, 6 frames:
 
 | Nodo | Frame | Estado |

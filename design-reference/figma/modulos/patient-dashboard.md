@@ -3,6 +3,11 @@
 
 # Patient Dashboard — hallazgos del Figma
 
+**Jira** (label `design-system`):
+
+- [CON-3808](https://confidetally.atlassian.net/browse/CON-3808) · [Patient] Alinear el diseño de la ficha del paciente (Overview) con Confidentally UI
+- [CON-3833](https://confidetally.atlassian.net/browse/CON-3833) · [Patient] Alinear el popover de Allergies con Confidentally UI
+
 ## Patient Dashboard (`3646:58836`) y flujo de navegación
 
 Pantalla nueva: panel izquierdo de 218px (avatar, nombre, badge Active, edad,

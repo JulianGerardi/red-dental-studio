@@ -1,5 +1,9 @@
 # Billing
 
+**Jira** (label `design-system`):
+
+- [CON-3816](https://confidetally.atlassian.net/browse/CON-3816) · [Billing] Alinear el diseño de Billing con Confidentally UI
+
 Figma 4481:9881, sección "Billing" con 4 pantallas hijas (todas nombradas
 "Billing" a secas -hay que mirar el contenido, no el nombre de capa). No es
 el mismo frame que "Relationships & Billing" de `modulos/relationships.md`

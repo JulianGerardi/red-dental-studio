@@ -3,6 +3,11 @@
 
 # Header y Sidebar — hallazgos del Figma
 
+**Jira** (label `design-system`):
+
+- [CON-3807](https://confidetally.atlassian.net/browse/CON-3807) · [Menú] Corregir alineaciones del menú, espaciados y interlineado
+- [CON-3843](https://confidetally.atlassian.net/browse/CON-3843) · [Menú] Corregir alineaciones del menú, espaciados y interlineado
+
 ## Header y Sidebar (2026-08-25, segunda pasada)
 
 Nodos: Sidebar `3605:56447` · Header Secretary `3636:57489` · Header Provider

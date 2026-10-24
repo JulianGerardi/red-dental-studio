@@ -3,6 +3,10 @@
 
 # Patients — hallazgos del Figma
 
+**Jira** (label `design-system`):
+
+- [CON-3830](https://confidetally.atlassian.net/browse/CON-3830) · [Patients] Alinear el modal New Patient con Confidentally UI
+
 ## Patients — List (nodo `3638:59529`) y Patient Details Modal (`3632:58405`)
 
 ### Especificaciones aplicadas

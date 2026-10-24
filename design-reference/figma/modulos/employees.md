@@ -1,5 +1,10 @@
 # Settings - Employees
 
+**Jira** (label `design-system`):
+
+- [CON-3818](https://confidetally.atlassian.net/browse/CON-3818) · [Settings] Alinear la navegación de Settings y la pantalla Employees con Confidentally UI
+- [CON-3836](https://confidetally.atlassian.net/browse/CON-3836) · [Settings] Alinear los formularios New Employee y New Location con Confidentally UI
+
 ## "Link existing person" no hacía nada en "New Employee" (2026-09-07)
 
 Comparando contra un proyecto hermano armado sobre el mismo Figma (ver

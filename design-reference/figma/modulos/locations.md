@@ -1,5 +1,11 @@
 # Settings - Locations
 
+**Jira** (label `design-system`):
+
+- [CON-3819](https://confidetally.atlassian.net/browse/CON-3819) · [Settings] Alinear el diseño de Locations con Confidentally UI
+- [CON-3841](https://confidetally.atlassian.net/browse/CON-3841) · [Setting - Location] Corregir alineaciones
+- [CON-3836](https://confidetally.atlassian.net/browse/CON-3836) · [Settings] Alinear los formularios New Employee y New Location con Confidentally UI
+
 
 ## Breadcrumb de Settings (2026-08-30)
 

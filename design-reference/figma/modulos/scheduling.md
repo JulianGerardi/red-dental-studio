@@ -3,6 +3,12 @@
 
 # Scheduling — hallazgos del Figma
 
+**Jira** (label `design-system`):
+
+- [CON-3815](https://confidetally.atlassian.net/browse/CON-3815) · [Scheduling] Alinear el diseño de la agenda con Confidentally UI
+- [CON-3831](https://confidetally.atlassian.net/browse/CON-3831) · [Scheduling] Alinear el modal New Appointment con Confidentally UI
+- [CON-3832](https://confidetally.atlassian.net/browse/CON-3832) · [Scheduling] Alinear el detalle del turno con Confidentally UI
+
 ## Módulo Scheduling (sección `3847:166204`)
 
 Seis pantallas + un frame de referencia de colores:

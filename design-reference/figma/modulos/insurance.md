@@ -2,6 +2,11 @@
 
 # Insurance — hallazgos del Figma
 
+**Jira** (label `design-system`):
+
+- [CON-3810](https://confidetally.atlassian.net/browse/CON-3810) · [Patient] Alinear el diseño de Insurance con Confidentally UI
+- [CON-3834](https://confidetally.atlassian.net/browse/CON-3834) · [Patient] Alinear el modal New Subscription con Confidentally UI
+
 Sección `3817:865128`, 9 frames. **Los nueve se llaman igual**:
 "Patiens Plans — Documents (Default)". Las capas de modal, además, se llaman
 todas "New Patient Form (With Guardian)", que no tiene nada que ver.

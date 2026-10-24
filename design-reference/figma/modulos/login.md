@@ -1,5 +1,10 @@
 # Login
 
+**Jira** (label `design-system`):
+
+- [CON-3805](https://confidetally.atlassian.net/browse/CON-3805) · [Login] Alinear el diseño del login con Confidentally UI
+- [CON-3839](https://confidetally.atlassian.net/browse/CON-3839) · [Login] Alinear Forgot password con Confidentally UI
+
 Figma 3749:72258 ("Log in"). El frame trae dos variantes que comparten la
 misma card de la derecha y cambian el panel de la izquierda: una con un
 degradé azul liso y otra con una foto de la clínica.

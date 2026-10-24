@@ -1,5 +1,9 @@
 # Settings → Accounts
 
+**Jira** (label `design-system`):
+
+- [CON-3820](https://confidetally.atlassian.net/browse/CON-3820) · [Settings] Alinear el diseño de Edit Account con Confidentally UI
+
 Pantalla nueva (2026-09-09), armada desde una captura que pasó Julián de la
 plataforma real. No hay frame de Figma para esta.
 

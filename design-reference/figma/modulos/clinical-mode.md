@@ -1,5 +1,11 @@
 # Clinical Mode
 
+**Jira** (label `design-system`):
+
+- [CON-3814](https://confidetally.atlassian.net/browse/CON-3814) · [Clinical Mode] Alinear el diseño de Clinical Mode con Confidentally UI
+- [CON-3837](https://confidetally.atlassian.net/browse/CON-3837) · [Clinical Mode] Alinear Vitals con Confidentally UI
+- [CON-3838](https://confidetally.atlassian.net/browse/CON-3838) · [Clinical Mode] Alinear Lab Order con Confidentally UI
+
 Figma:
 
 | Que | Nodo |

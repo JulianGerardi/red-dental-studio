@@ -2,6 +2,11 @@
 
 # Treatments — hallazgos del Figma
 
+**Jira** (label `design-system`):
+
+- [CON-3809](https://confidetally.atlassian.net/browse/CON-3809) · [Patient] Alinear el diseño de Treatments con Confidentally UI
+- [CON-3813](https://confidetally.atlassian.net/browse/CON-3813) · [Patient] Alinear el diseño de Documents con Confidentally UI
+
 Sección **"Patient Profile — Treatment Plan & Documents"** (`3763:254355`), 4 frames:
 
 | Nodo | Frame | Estado |
