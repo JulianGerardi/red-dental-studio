@@ -28,6 +28,8 @@ const meta = {
         component: [
           'Las pestañas de la app (`@/components/ui/tabs`): una caja gris con la pestaña activa en azul. Cambian entre vistas de un mismo bloque —Transactions / Patient Payment en el Ledger, Patient / Guarantor View, ASAP / Waiting List— y no entre páginas.',
           '',
+          '**Una pestaña puede pedir atención** (`alerta`, 2026-10-22): un punto rojo marca la sección donde quedó un campo con error, para guardar desde cualquier pestaña sin perder de vista cuál falló. Ver *States → Needs attention* y *Pages / Parts / Patient modals → Edit Patient — Error in another section*.',
+          '',
           '**Cuándo:** 2 a 6 opciones de lo mismo. Si son más o cambian de pantalla, va otro componente (un menú, el menú del paciente, un select).',
           '',
           '**Probalo:** en *Playground* sumá o sacá pestañas con *count*, escribí tus propios nombres en *labels* (separados por coma), achicá el ancho con *width* para ver qué pasa cuando no entran, y probá con el teclado: Tab entra, ← → Inicio Fin mueven.',
@@ -130,6 +132,11 @@ export const States: Story = {
         <td className="font-semibold">Disabled</td>
         <td><Tabs tabs={['Findings', { value: 'Diagnostics', disabled: true }]} value="Findings" onChange={() => {}} /></td>
         <td className="text-ink-medium">Todavía no se puede usar (por ejemplo, falta cargar el examen). Al 40% y el teclado la saltea.</td>
+      </tr>
+      <tr>
+        <td className="font-semibold">Needs attention</td>
+        <td><Tabs tabs={['General', { value: 'Guardian', alerta: true }, 'Demography']} value="General" onChange={() => {}} /></td>
+        <td className="text-ink-medium">Punto rojo en la pestaña donde quedó algo por corregir (`alerta`), con "has errors" para el lector de pantalla: Edit Patient señala así la sección que falla al guardar. En la activa, el punto lleva un anillo para verse sobre el azul.</td>
       </tr>
     </Tabla>
   ),

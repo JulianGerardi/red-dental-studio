@@ -22,6 +22,41 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   negrita como la app real (afectaría a todos los exámenes). Ver `figma/modulos/clinical-mode.md` (2026-10-22 y
   2026-10-24).
 
+### Docs: Storybook al final de la tanda y la lógica de la app linkeada a Jira ([#76](https://github.com/JulianGerardi/red-dental-studio/pull/76))
+- **Storybook al final.** Documentar en Storybook consume mucho crédito: ahora se hace como último paso, cuando Julián lo
+  pide, después de que la app esté aprobada y publicada. Antes de eso sólo va la sección con fecha del `.md` del
+  módulo. El "subilo" publica la app; el Storybook tiene su propio "subilo" al final. Sin cambios de código: `ds:check`
+  sigue corriendo en el deploy con `continue-on-error`.
+- **Jira.** La lógica de la app (reglas de negocio, estados, flujos) está en el proyecto `CON`; las historias de abril
+  de 2026 son las más detalladas. Las del label `design-system` son de diseño y no se usan. Cada `.md` de módulo trae
+  un bloque **Jira** con sus epics e historias, e `design-reference/jira.md` los indexa.
+- **Para el dev:** sólo `CLAUDE.md`, `design-reference/jira.md` (nuevo) y el bloque **Jira** en
+  `design-reference/figma/modulos/*.md` y en `design-reference/figma/README.md`. El mapeo historia → módulo salió de los
+  títulos: si una historia quedó en el módulo equivocado, corregirla en `jira.md` y en el `.md` del módulo.
+
+### Patients y toda la app: achicar el margen de la pestaña "Currently being seen" ([#77](https://github.com/JulianGerardi/red-dental-studio/pull/77))
+- El margen que reserva `AppShell` para que la pestaña flotante no tape kebabs ni filas reales (PR #73) pasa de 64px a
+  24px: los 64 se sumaban por encima del padding propio de la página en vez de contarlo, y dejaban una franja vacía a
+  la derecha mucho más ancha que cualquier otro margen de la app.
+- **Para el dev:** `AppShell.tsx`, `sm:pr-16` → `sm:pr-6` en el `<main>`. No se tocó `PatientInSessionPopup`.
+
+## 2026-10-22
+
+### New/Edit Patient según el Figma nuevo, archivar y reactivar relaciones, buscador de persona en desplegable ([#75](https://github.com/JulianGerardi/red-dental-studio/pull/75))
+- **New Patient:** tres pasos General → Guardian → Demography; Guardian y Demography son opcionales y siempre están.
+  **Edit Patient** (menú de la tabla y lápiz del dashboard del paciente): pestañas con los datos precargados y **Save Changes**
+  desde cualquier sección; cambiar de pestaña no guarda; si falla algo en otra sección se marca la pestaña y se lleva al campo.
+  New Patient ya no trae *Link a person that already exists* ni *Select Person* (el Figma nuevo no los dibuja). Las anomalías del
+  Figma y cómo se resolvieron están en `modulos/patients.md`.
+- **Relationships (CON-3958):** *Delete relationship* pasa a **Archive relationship** (no borra: queda en Archived); reactivar desde
+  un drawer de revisión; Add Relationship avisa si ya hay una archivada (*Open reactivation*); Edit Relationship pide confirmar
+  *Remove Guardian access*; filtro **Active / Archived** en la pantalla.
+- **Buscador de persona:** las sugerencias flotan en un desplegable pegado al input y la elegida lleva una ✕ para quitarla.
+- **Para el dev:** `NuevoPaciente` → `DatosPaciente` (store) y `usePatients().datosDe(id)`; `components/patients/PacienteCampos.tsx`
+  (secciones + `useFormPaciente`), `pages/patients/EditPatientModal.tsx` nuevo, `NewPatientModal` pierde `title`/`forceGuardian`/`editId`;
+  `components/patients/RelationshipDialogs.tsx`; `MenuAcciones` usa `onArchive`/`onReactivate` en vez de `onDelete`. Nuevos:
+  `ui/section-notice`, `Tabs.alerta`, `Drawer.tabs`, `DateField.valorInicial`.
+
 ## 2026-10-20
 
 ### New Procedure: vincular un finding o un diagnóstico pide un procedimiento ya cargado ([#74](https://github.com/JulianGerardi/red-dental-studio/pull/74))

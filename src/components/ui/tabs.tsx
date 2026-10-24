@@ -15,7 +15,9 @@ import { cn } from '@/lib/utils'
    - Una sola línea: si no entran, la tira se desliza de costado en vez de
      partirse en dos renglones, que cambiaría el orden en que se leen.
    - Teclado: flechas, Inicio y Fin mueven entre pestañas; sólo la activa
-     recibe Tab (patrón WAI-ARIA de tabs). */
+     recibe Tab (patrón WAI-ARIA de tabs).
+   - `alerta` marca con un punto rojo la pestaña donde quedó algo por corregir (Edit Patient: el guardado revisa las tres
+     secciones y señala la que falla; patients.md, 2026-10-22). */
 
 export type TabItem<T extends string> =
   | T
@@ -26,6 +28,8 @@ export type TabItem<T extends string> =
       count?: number
       icon?: LucideIcon
       disabled?: boolean
+      /** Algo de esta pestaña necesita atención (un campo con error en otra sección): punto rojo y aviso para el lector. */
+      alerta?: boolean
       className?: string
     }
 
@@ -110,6 +114,12 @@ export function Tabs<T extends string>({
             {Icono && <Icono aria-hidden />}
             {t.label ?? t.value}
             {t.count !== undefined && t.count > 0 && <span className={cn('tabular-nums', activa ? 'text-white/80' : 'text-ink-faint')}>({t.count})</span>}
+            {t.alerta && (
+              <>
+                <span aria-hidden className={cn('size-1.5 shrink-0 rounded-full', activa ? 'bg-white ring-2 ring-field-error' : 'bg-field-error')} />
+                <span className="sr-only">has errors</span>
+              </>
+            )}
           </button>
         )
       })}

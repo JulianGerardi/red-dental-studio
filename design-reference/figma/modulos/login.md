@@ -1,5 +1,7 @@
 # Login
 
+**Jira:** sin epics ni historias de funcionamiento (revisado el 2026-10-24).
+
 Figma 3749:72258 ("Log in"). El frame trae dos variantes que comparten la
 misma card de la derecha y cambian el panel de la izquierda: una con un
 degradé azul liso y otra con una foto de la clínica.

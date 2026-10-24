@@ -16,6 +16,8 @@ import { StepIndicator } from '@/components/ui/step-indicator'
    - Contenido en una sola columna, con secciones de título suelto -sin caja ni borde- y campos de a dos por fila.
    - Pie con dos botones del mismo ancho: a la izquierda Cancel o Return, a la derecha Next Step o Save.
    - Un panel de apoyo (`aside`, el calendario de horarios de New Appointment) se despliega al costado del drawer.
+   - Al editar algo que ya existe, las secciones van en pestañas (`tabs`) en vez de pasos: se entra directo a la que hace
+     falta y un solo "Save Changes" guarda todo (Edit Patient, Julián, 2026-10-22).
    Radix Dialog por dentro: el foco queda adentro, Escape y la capa lo cierran. */
 
 /* Bug: con poca altura de ventana, un paso con muchos campos (New Appointment, paso 1) quedaba cortado a mitad del
@@ -34,7 +36,7 @@ export const useEnDrawer = () => React.useContext(EnDrawer)
 const Sentido = React.createContext<1 | -1>(1)
 
 export function Drawer({
-  open, onClose, title, description, steps, step = 0, size = 'md', footer, footerClassName, aside, children, className,
+  open, onClose, title, description, steps, step = 0, tabs, size = 'md', footer, footerClassName, aside, children, className,
 }: {
   open: boolean
   onClose: () => void
@@ -45,6 +47,8 @@ export function Drawer({
   steps?: readonly string[]
   /** Paso actual, desde 0. */
   step?: number
+  /** Pestañas en lugar de los pasos, justo debajo del título: todas las secciones a un clic, sin orden (Edit Patient). */
+  tabs?: React.ReactNode
   /** md 480 · lg 560 · xl 760, como los anchos de 2.0; 2xl 1000 para una tabla ancha. */
   size?: DrawerSize
   /** Las acciones del pie, lado a lado y del mismo ancho. */
@@ -107,6 +111,7 @@ export function Drawer({
             </div>
             {/* Cada paso con su nombre: el usuario ve qué está haciendo y qué le falta. */}
             {conPasos && <StepIndicator total={steps.length} current={step + 1} labels={steps} className="px-6 pt-6" />}
+            {tabs && <div className="px-6 pt-5">{tabs}</div>}
             <Sentido.Provider value={sentido}>
             <EnDrawer.Provider value>
               <div ref={setScroll} onScroll={medir} className="min-h-0 flex-1 overflow-y-auto px-6 py-5">

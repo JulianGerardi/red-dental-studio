@@ -3,6 +3,11 @@
 
 # Header y Sidebar — hallazgos del Figma
 
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
+
+- Historias de abril: CON-2933
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2933%29%20ORDER%20BY%20key%20ASC))
+
 ## Header y Sidebar (2026-08-25, segunda pasada)
 
 Nodos: Sidebar `3605:56447` · Header Secretary `3636:57489` · Header Provider

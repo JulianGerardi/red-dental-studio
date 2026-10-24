@@ -5,13 +5,44 @@ import type { PatientRow, PatientStatus } from '@/components/patients/PatientsTa
    tabla al instante. No persiste entre recargas: es un prototipo de diseño y
    guardar en localStorage haría que la demo arranque con datos sucios. */
 
-export type NuevoPaciente = {
+/* Los datos del formulario de paciente (New Patient y Edit Patient: General, Guardian y Demography). Ver
+   design-reference/figma/modulos/patients.md, 2026-10-22. */
+export type DatosPaciente = {
   first: string
   middle: string
   last: string
-  email: string
   birthday: string
-  gender: string
+  email: string
+  interpreter: boolean
+  /** Alta: pedir la cuenta del portal. Edición: la cuenta ya existe (se muestra "Linked"). */
+  portal: boolean
+  guardian: boolean
+  guardianName: string
+  guardianRel: string
+  phone: string
+  language: string
+  address: string
+  city: string
+  zip: string
+}
+
+export const VACIO_PACIENTE: DatosPaciente = {
+  first: '', middle: '', last: '', birthday: '', email: '', interpreter: false, portal: false,
+  guardian: false, guardianName: '', guardianRel: '', phone: '', language: '', address: '', city: '', zip: '',
+}
+
+/* Lo que se sabe de cada paciente más allá de la fila de la tabla, para que Edit Patient abra con los datos cargados.
+   Los que no están acá arman lo que tienen de la fila (nombre, nacimiento, email). */
+const DETALLE_SEMILLA: Record<string, Partial<DatosPaciente>> = {
+  'abril-viola': { portal: true, phone: '(555) 123-4567', language: 'English', address: '123 Maple Street', city: 'Phoenix', zip: '85016' },
+  'sofia-chen': { guardian: true, guardianName: 'Elena Chen', guardianRel: 'Parent', phone: '(555) 987-6543', language: 'Spanish', city: 'Miami' },
+  'daniel-ortiz': { interpreter: true, language: 'Spanish', portal: true },
+}
+
+/* El paciente del dashboard (/patients/john-smith) no está en la tabla. */
+export const DATOS_JOHN_SMITH: DatosPaciente = {
+  ...VACIO_PACIENTE, first: 'John', last: 'Smith', birthday: 'January 28, 1999', email: 'john.smith@hotmail.com', portal: true,
+  phone: '(555) 010-4477', language: 'Spanish', address: '456 Oak Avenue', city: 'Los Angeles', zip: '90012',
 }
 
 const SEMILLA: PatientRow[] = [
@@ -35,7 +66,7 @@ export const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
 const iniciales = (first: string, last: string) =>
   ((first[0] ?? '') + (last[0] ?? '')).toLowerCase()
 
-function aFila(d: NuevoPaciente, id: string): PatientRow {
+function aFila(d: DatosPaciente, id: string): PatientRow {
   const name = [d.first, d.middle, d.last].filter(Boolean).join(' ').trim()
   return {
     id,
@@ -47,19 +78,27 @@ function aFila(d: NuevoPaciente, id: string): PatientRow {
   }
 }
 
+function datosDeFila(r: PatientRow): DatosPaciente {
+  const [first = '', ...resto] = r.name.split(' ')
+  return { ...VACIO_PACIENTE, first, last: resto.join(' '), birthday: r.birthday, email: r.email === '—' ? '' : r.email, ...DETALLE_SEMILLA[r.id] }
+}
+
 type Ctx = {
   patients: PatientRow[]
-  addPatient: (d: NuevoPaciente) => PatientRow
-  updatePatient: (id: string, d: NuevoPaciente) => void
+  addPatient: (d: DatosPaciente) => PatientRow
+  updatePatient: (id: string, d: DatosPaciente) => void
   getPatient: (id: string) => PatientRow | undefined
+  /** Todo lo cargado de un paciente, para precargar Edit Patient. */
+  datosDe: (id: string) => DatosPaciente | undefined
 }
 
 const PatientsCtx = createContext<Ctx | null>(null)
 
 export function PatientsProvider({ children }: { children: React.ReactNode }) {
   const [patients, setPatients] = useState<PatientRow[]>(SEMILLA)
+  const [guardados, setGuardados] = useState<Record<string, DatosPaciente>>({})
 
-  const addPatient = useCallback((d: NuevoPaciente) => {
+  const addPatient = useCallback((d: DatosPaciente) => {
     const base = slug([d.first, d.last].filter(Boolean).join(' ')) || 'paciente'
     let id = base
     let n = 2
@@ -67,11 +106,13 @@ export function PatientsProvider({ children }: { children: React.ReactNode }) {
       while (prev.some((p) => p.id === id)) id = `${base}-${n++}`
       return [aFila(d, id), ...prev]
     })
+    setGuardados((prev) => ({ ...prev, [id]: d }))
     return aFila(d, id)
   }, [])
 
-  const updatePatient = useCallback((id: string, d: NuevoPaciente) => {
+  const updatePatient = useCallback((id: string, d: DatosPaciente) => {
     setPatients((prev) => prev.map((p) => (p.id === id ? { ...aFila(d, id) , status: p.status } : p)))
+    setGuardados((prev) => ({ ...prev, [id]: d }))
   }, [])
 
   const getPatient = useCallback(
@@ -79,9 +120,14 @@ export function PatientsProvider({ children }: { children: React.ReactNode }) {
     [patients],
   )
 
+  const datosDe = useCallback((id: string) => {
+    const fila = patients.find((p) => p.id === id)
+    return guardados[id] ?? (fila ? datosDeFila(fila) : undefined)
+  }, [patients, guardados])
+
   const value = useMemo(
-    () => ({ patients, addPatient, updatePatient, getPatient }),
-    [patients, addPatient, updatePatient, getPatient],
+    () => ({ patients, addPatient, updatePatient, getPatient, datosDe }),
+    [patients, addPatient, updatePatient, getPatient, datosDe],
   )
   return <PatientsCtx.Provider value={value}>{children}</PatientsCtx.Provider>
 }

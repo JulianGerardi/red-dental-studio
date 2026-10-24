@@ -11,6 +11,8 @@ shadcn/ui (Radix), con datos mock en `src/data/` (no hay backend). Lo pide y apr
 - **Link de prueba** (la última rama subida, antes de publicar): https://juliangerardi.github.io/red-dental-studio/prueba/
   y https://juliangerardi.github.io/red-dental-studio/prueba/storybook/
 - Repo: `JulianGerardi/red-dental-studio` (privado), rama `main`.
+- Lógica de la app (Jira, proyecto `CON`, historias de abril de 2026):
+  https://confidetally.atlassian.net/issues?jql=project%20%3D%20CON%20AND%20created%20%3E%3D%20%222026-04-01%22%20AND%20created%20%3C%20%222026-05-01%22%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20ORDER%20BY%20key%20ASC
 
 ## Tu rol
 
@@ -49,32 +51,63 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
 - **`design-reference/figma/modulos/<módulo>.md`**: decisiones y anomalías numeradas de cada módulo. Es la fuente más
   confiable para retomar algo; leé el del módulo antes de tocarlo.
 - `design-reference/design-system.md` (cómo está armado el Storybook y sus reglas), `design-reference/figma/README.md`
-  (reglas transversales), `design-reference/e2e.md`.
+  (reglas transversales), `design-reference/e2e.md`, `design-reference/jira.md` (historias de Jira por módulo).
 - Proyecto hermano con la lógica de 2.0: `~/Desktop/Work/dashboard-figma/src/components` (buscá ahí el `*Drawer.tsx`
   equivalente antes de armar uno).
 
+## Jira
+
+El funcionamiento de la app (reglas de negocio, estados, flujos) está en Jira (`confidetally.atlassian.net`, proyecto
+`CON`). Las historias de abril de 2026 son las más detalladas: historia de usuario, precondiciones, regla de negocio,
+escenarios de aceptación y restricciones. Ejemplo: `CON-2835` (al aceptar un Treatment Case, sus findings pasan a
+In Treatment).
+
+- Es la fuente de la lógica. Si algo del Figma, del código o del `.md` no cierra, o parece que falta algo, **buscalo
+  ahí antes de preguntar o de inventar**. Si no hay historia para lo que se pide, avisale a Julián.
+- **No se usa el label `design-system`**: esas historias son de diseño y son para los devs. Tampoco bugs ni cancelados.
+- `design-reference/jira.md` indexa epics e historias de abril por módulo, y cada `.md` de módulo lleva su bloque
+  **Jira** debajo del título. El mapeo salió de los títulos: si una historia está en el módulo equivocado, se corrige
+  en los dos lugares.
+- Antes de tocar un módulo, leé sus historias (`getJiraIssue`) junto con su `.md`. Para más: `parent = CON-3114` trae
+  las historias de un epic.
+- Todo lo que se arma queda linkeado: la sección con fecha del `.md` del módulo arranca con la clave (`CON-2835`) y el
+  commit y el PR la nombran.
+- Solo lectura: no cambiar estados, comentar ni crear historias sin el ok de Julián.
+- Se lee con el conector de Atlassian (`cloudId`: `confidetally.atlassian.net`). La búsqueda devuelve todo junto y se
+  pasa del límite: pedí `fields` acotados y filtrá el archivo guardado con `jq`.
+
 ## Cómo se trabaja una tanda
 
-1. Implementar y mirarlo en el dev server (Browser pane o Playwright en el scratchpad si el pane está oculto).
-2. Documentar **todo en Storybook en la misma tanda**, sin que lo pida, con la regla de la sección *Design system*;
-   además, sección con fecha en el `.md` del módulo y en `design-system.md`.
-3. Checks: `tsc -b`, `ds:check`, `vite build`, e2e. Si un cambio rompe un e2e, se arregla el test o el código, no se
-   saltea.
-4. Pasarle a Julián los links para que vea los cambios antes de publicar:
-   - **Localhost**, con el dev server (y Storybook, si cambió el design system) andando: la pantalla exacta que cambió,
-     por ejemplo `http://localhost:5182/patients/1/relationships`, y la página del DS, por ejemplo
-     `http://localhost:6006/?path=/docs/elements-cards--docs`. Localmente las rutas van sin `#`.
+La app va primero y el Storybook al final: documentar en Storybook consume mucho crédito, así que no se hace hasta que
+la app esté aprobada y publicada.
+
+1. Leer la historia del módulo en Jira y su `.md`; implementar y mirarlo en el dev server (Browser pane o Playwright en
+   el scratchpad si el pane está oculto).
+2. Dejar anotado, sin que lo pida, la sección con fecha en el `.md` del módulo (clave de Jira, decisiones y anomalías).
+   **No** tocar stories ni `design-system.md` en este paso.
+3. Checks: `tsc -b`, `vite build`, e2e. Si un cambio rompe un e2e, se arregla el test o el código, no se saltea.
+4. Pasarle a Julián los links de la app para que vea los cambios antes de publicar:
+   - **Localhost**, con el dev server andando: la pantalla exacta que cambió, por ejemplo
+     `http://localhost:5182/patients/1/relationships`. Localmente las rutas van sin `#`.
    - **Link de prueba general**: push de la rama de la sesión (nunca `main`); el workflow *Deploy preview* la publica en
-     `…/red-dental-studio/prueba/` (la app va con `#`, por ejemplo `…/prueba/#/patients/1/relationships`) y
-     `…/prueba/storybook/`. Muestra sólo la última rama subida: antes de pasarlo, esperá el workflow
-     (`gh run list --workflow "Deploy preview"`) y confirmá que `…/prueba/version.txt` dice tu rama y tu commit. Pages
-     cachea hasta ~10 min: agregá `?cb=<n>` antes del `#`.
-5. **No publicar sin su ok.** Subir la rama de la sesión para el link de prueba no publica nada; `main` sí. Su "subilo" es la única validación y significa **publicar en todos lados**: la app en
-   vivo y el design system. Con esa palabra se hace todo de corrido, sin volver a preguntar en ningún paso (nada de
-   "¿commiteo?", "¿abro el PR?", "¿mergeo?"): commit con la entrada de `CAMBIOS.md`, push, PR con los reviewers de
-   *Avisar al dev* y merge a `main`. El merge a `main` dispara el deploy de la app y del Storybook juntos.
+     `…/red-dental-studio/prueba/` (la app va con `#`, por ejemplo `…/prueba/#/patients/1/relationships`). Muestra sólo
+     la última rama subida: antes de pasarlo, esperá el workflow (`gh run list --workflow "Deploy preview"`) y confirmá
+     que `…/prueba/version.txt` dice tu rama y tu commit. Pages cachea hasta ~10 min: agregá `?cb=<n>` antes del `#`.
+     El Storybook de prueba (`…/prueba/storybook/`) se pasa recién en el paso 7.
+5. **No publicar sin su ok.** Subir la rama de la sesión para el link de prueba no publica nada; `main` sí. Su "subilo"
+   es la única validación y significa **publicar la app en vivo**. Con esa palabra se hace todo de corrido, sin volver
+   a preguntar en ningún paso (nada de "¿commiteo?", "¿abro el PR?", "¿mergeo?"): commit con la entrada de `CAMBIOS.md`,
+   push, PR con los reviewers de *Avisar al dev* y merge a `main`. El merge dispara el deploy de la app y del Storybook
+   juntos, pero el Storybook sale con lo que ya tenía.
 6. Después del merge: `gh run list` hasta que termine el deploy, confirmar que `…/red-dental-studio/version.txt` dice el
-   commit del merge y que el cambio se ve en la app y el Storybook publicados, y pasarle los dos links. Pages cachea hasta ~10 min; para probar, agregá `?cb=<n>`.
+   commit del merge y que el cambio se ve en la app publicada, y pasarle el link en vivo. Pages cachea hasta ~10 min;
+   para probar, agregá `?cb=<n>`.
+7. **Último paso, solo cuando Julián pida documentar** ("documentá en Storybook" o similar): story del componente, ruta
+   en `Pages.stories.tsx` y sección con fecha en `design-system.md`; correr `ds:check`; pasarle el link de localhost del
+   DS (con Storybook andando), por ejemplo `http://localhost:6006/?path=/docs/elements-cards--docs`, y el de prueba
+   `…/prueba/storybook/`. Su "subilo" publica de corrido, como en el paso 5 (otra entrada en `CAMBIOS.md`, otro PR), y
+   se confirma el Storybook publicado como en el paso 6. Si Julián no lo pide, no se hace ni se sugiere hacerlo por
+   cuenta propia.
 
 ## Avisar al dev
 
@@ -112,9 +145,9 @@ El código lo toman **jonatan784** y **betsyMb**, y se enteran de cada cambio po
 
 ## Design system
 
-- **Todo se documenta en Storybook antes de subir.** Cada componente, pantalla, estado, variante o regla nueva o
-  cambiada en la tanda tiene su página con la estructura de abajo; sin eso no se pide aprobación ni se sube. `ds:check`
-  en verde no alcanza: no exige Parts, States ni Specs.
+- **El Storybook se documenta al final**, no mientras se implementa la app: es el último paso de la tanda y lo pide
+  Julián (ver *Cómo se trabaja una tanda*). Ahí, cada componente, pantalla, estado, variante o regla nueva o cambiada en
+  la tanda tiene su página con la estructura de abajo. `ds:check` en verde no alcanza: no exige Parts, States ni Specs.
 - Todo componente lleva su `.stories.tsx` al lado; toda ruta nueva va en `src/design-system/Pages.stories.tsx`.
 - `ds:check` falla si una función de React con mayúscula no está importada por ninguna story (o en
   `src/design-system/exentos.json`), si falta un estado soportado o si aparece un hex con token.

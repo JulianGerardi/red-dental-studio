@@ -3,6 +3,13 @@
 
 # Patients — hallazgos del Figma
 
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
+
+- Epics: CON-833 Pacientes - Migracion back graphQL · CON-3910 Consultar pacientes · CON-2107 Patient
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-833%2CCON-3910%2CCON-2107%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2858
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2858%29%20ORDER%20BY%20key%20ASC))
+
 ## Patients — List (nodo `3638:59529`) y Patient Details Modal (`3632:58405`)
 
 ### Especificaciones aplicadas
@@ -279,3 +286,64 @@ sugerencia, como Add Relationship → Select person (el porqué completo está e
 líneas de DOB/email salen de `DIRECTORIO` (el mismo directorio de Add Relationship, reexportado desde
 `AddRelationshipDrawer.tsx`); los dos nombres de `PERSONAS` que no están ahí (Sarah Stone, Daniel Anderson) muestran
 sólo el nombre, sin inventar fecha de nacimiento ni email.
+
+## New Patient y Edit Patient según el Figma nuevo (2026-10-22)
+
+Julián pasó dos secciones nuevas de Patients: **New Patient** (`3751:73452`, "Patients — List") y **Edit Patient desde la tabla**
+(`5277:123056`, "Patients — Edit"). Los dos formularios comparten las mismas tres secciones -**General, Guardian y Demography**-
+pero se usan distinto, y el flujo también:
+
+- **New Patient: tres pasos**, Next Step / Return / Save. Next revisa lo obligatorio del paso y marca en rojo lo que falta; Save revisa los tres
+  y vuelve al primero con algo por corregir. Guardian y Demography son opcionales (cada uno lo dice en su aviso) y **siempre están**:
+  antes el paso Guardian aparecía sólo para un menor de 18 o con un checkbox.
+- **Edit Patient: tres pestañas**, no pasos. Es la especificación de Julián, punto por punto:
+  1. Las tres secciones accesibles directamente (`ui/tabs`, `fullWidth`), en cualquier orden.
+  2. Los datos existentes, precargados (nombre, nacimiento, email, y lo demás que se sepa del paciente: `usePatients().datosDe(id)`).
+  3. El botón principal es **Save Changes**, disponible desde cualquier pestaña.
+  4. Cambiar de pestaña **no guarda**: se guarda al apretar Save Changes (los paneles quedan montados, ocultos, así no se pierde lo escrito).
+  5. Si al guardar falla algo de otra sección, **esa pestaña queda marcada** (punto rojo, `alerta` de Tabs) y se lleva al usuario a la sección y **al
+     campo** que falla (`useFormPaciente`: `revisar` devuelve sección y campo; `enfocar` busca `[data-campo]`). Al corregir, la marca se va sola.
+  Si el usuario entra sólo a corregir el email, lo cambia y guarda desde General, sin pasar por Guardian ni Demography.
+- **Los datos**: `NuevoPaciente` pasa a `DatosPaciente` (store) con los campos de las tres secciones; `usePatients()` suma `datosDe(id)`. El
+  paciente de la tabla y el del dashboard (`/patients/john-smith`, `DATOS_JOHN_SMITH`) abren con sus datos; Abril Viola, Sofia Chen y
+  Daniel Ortiz traen datos de ejemplo (portal vinculado, guardián, intérprete).
+- **Validación**: obligatorios nombre, apellido y nacimiento; con *Associate a guardian* tildado, también el nombre y la relación del guardián
+  (destildado, esos campos se deshabilitan y no se guardan); el email, si está, tiene que ser válido, y con la cuenta del portal pedida hace falta.
+  Demography es opcional entero, como dice su aviso.
+- **Cuenta del portal**: en New, la opción *Create a patient portal account using this email address*. En Edit, si ya existe se muestra como un estado
+  (*Patient portal account · Linked*); si no, ofrece la misma opción que New.
+
+### Anomalías del Figma y cómo se resolvieron
+
+Cuando el Figma se contradice a sí mismo o trae un texto pegado de otra pantalla, ganó el sentido y queda anotado (cambiarlo es una línea):
+
+1. **Subtítulo de New Patient** = el de Add Relationship ("Link a family member, guardian or guarantor to this patient."). Se deja "Create the patient record".
+2. **Paso 3 de New Patient** (`5277:125924`) dice "Add Relationship", con los pasos *Person / Contact / Relationship* y "Next Step" en el último. Es
+   New Patient (*General / Guardian / Demography*) y el último paso guarda (Save).
+3. **Middle Name lleva asterisco** en los dos flujos y tres placeholders cruzados ("Last name" en Middle Name, "First name" en Last Name, "Last name" en
+   Birthdate). Middle Name sigue **opcional** (mucha gente no tiene segundo nombre) y los placeholders son los de siempre (John / Lorem / Smith).
+4. **Pie del paso Guardian** con tres botones (Cancel, Back, Next Step). Se mantiene la regla de dos botones del mismo ancho: Return y Next Step; Cancel
+   sigue en la ✕.
+5. **Avisos de Demography**: en New repite el del Guardian ("Optional section. Use this section when a guardian…") y en Edit dice "…These fields are
+   optional in this prototype". Va uno solo para los dos: *Additional contact and address information. These fields are optional.*
+6. **Dirección**: en New, "Adress line 1" es un select y Adress, City y Postal Code llevan asterisco; en Edit es "Address" (un input) y sólo City lleva
+   asterisco, y el aviso dice que todo es opcional. Un solo campo "Address" (input), City (select) y "ZIP / Postal Code", **todos opcionales**, como dice el aviso.
+7. **Preferred Language** con placeholder "408-XXX-XXXX" (el del teléfono): va "English".
+8. **La cuenta del portal está arriba de las pestañas** y sólo en General, así que las pestañas bajarían y subirían al cambiar. Va dentro de General,
+   debajo de las pestañas, que quedan fijas.
+9. **El pie de General en Edit dice "Next Step"** y los otros dos "Save Changes": en Edit es **Save Changes en las tres** (especificación de Julián).
+10. **Títulos de sección copiados**: Guardian y Demography de Edit dicen "General Information". Van "Guardian Information" y "Demographic Information".
+11. **Datos de relleno** en Edit ("Abril" en Guardian Full Name, Phone, Address y ZIP; nacimiento 19/02/1993 con una tabla que dice April 2, 2025): se cargan los de la fila.
+12. **Email a todo el ancho** en los dos frames. La regla de los drawers (de a dos, del mismo ancho; 2026-10-10) gana: Email va en la grilla, en la columna izquierda.
+13. **New Patient ya no trae** *Link a person that already exists* ni el buscador *Select Person*: el Figma sólo dibuja Interpreter Required y la cuenta
+    del portal. Se sacaron del alta (el componente de Settings → Employees que usa `LinkPersonCheckbox` no cambia). El guardián se escribe, no se busca.
+14. **Gender** (era obligatorio en Demography) no está en el Figma nuevo: sale de los dos formularios.
+
+La página completa `/patients/edit` (Figma `3640:72713`) no cambia: es otra pantalla, con otros campos (Address Line 1 y 2, Country, State…).
+
+**Para validar con usuarios / con Julián:**
+- ¿Middle Name obligatorio de verdad? (el Figma lo marca; acá es opcional.)
+- ¿La dirección es opcional, como dice el aviso, o City y Postal Code deben serlo?
+- **Menores de 18**: el paso Guardian ya no se impone. Toda la tabla de ejemplo tiene fecha de nacimiento 2025: ¿conviene un aviso o hacerlo obligatorio para un menor?
+- ¿Cancelar o cerrar Edit con cambios sin guardar debería preguntar?
+- ¿El guardián se escribe o se busca entre las personas del sistema (como en Add Relationship)? El Figma lo dibuja como texto.

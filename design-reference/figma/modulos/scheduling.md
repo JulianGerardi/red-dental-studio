@@ -3,6 +3,14 @@
 
 # Scheduling — hallazgos del Figma
 
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
+
+- Epics: CON-367 Calendarización · CON-747 Calendarizacion V2 · CON-1493 Calendarizacion front end 2.0 · CON-3119
+  [Post Demo] Calendario · CON-3600 Treatment Visit & Appointment
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-367%2CCON-747%2CCON-1493%2CCON-3119%2CCON-3600%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2934
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2934%29%20ORDER%20BY%20key%20ASC))
+
 ## Módulo Scheduling (sección `3847:166204`)
 
 Seis pantallas + un frame de referencia de colores:
@@ -650,3 +658,8 @@ líneas, `['DOB: …', 'Email: …']` o `['Email: …']`, en vez de un string ya
 `aria-hidden`: sin eso, sus iniciales se cuelan antes del nombre en el nombre accesible del botón y rompían
 `tests/scheduling-linked-visit.e2e.ts` (que busca el botón por `/^John Smith/`, `/^Dr. Emily Chen/`); verificado que
 sigue encontrando el botón y completando el campo igual que antes.
+
+## Patient y Provider: el buscador en desplegable, con ✕ (2026-10-21)
+
+Las sugerencias de Patient, Primary Provider y Additional Provider (`PersonSearchField`) ahora flotan en un desplegable pegado al input en vez de empujar los campos de abajo, y
+la persona elegida lleva una ✕ para quitarla (en Additional Provider, opcional, es la forma de dejarlo vacío otra vez). El porqué está en `relationships.md` (2026-10-21).
