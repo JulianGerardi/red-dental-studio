@@ -2,7 +2,9 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Drawer, DrawerActions, DrawerSection, DrawerStep, type DrawerSize } from './drawer'
 import { Button } from './button'
-import { TextField, SelectField } from '@/components/patients/form'
+import { TextField, SelectField, TextArea, OptionCheckbox, FieldLabel } from '@/components/patients/form'
+import { DatePicker } from './date-picker'
+import { Tabs } from './tabs'
 import { Bloque, ConRotulo, Lienzo, Muestras, Tabla } from '@/design-system/kit'
 
 type Args = { title: string; description: string; steps: number; size: DrawerSize; open: boolean }
@@ -21,11 +23,17 @@ const meta = {
           '',
           '**Como en Confidentally 2.0:** una columna, secciones con título suelto sin caja (`DrawerSection`), campos de a dos por fila; con varias partes, los pasos (Step 1, 2, 3) debajo del título y cada parte en un `DrawerStep` (la que no se ve no se desmonta). **Pie (`DrawerActions`):** dos botones del mismo ancho: Cancel / Next Step en el primer paso, Return / Next Step en los del medio, Return / Save en el último. **Panel al costado (`aside`):** el calendario de New Appointment se despliega a la izquierda del drawer.',
           '',
-          '**Tamaños:** md 480 (formularios cortos), lg 560 (formularios con pasos), xl 760 (tablas y editores), como los anchos de 2.0.',
+          '**Tamaños:** md 480 (formularios cortos), lg 560 (formularios con pasos), xl 760 (tablas y editores), como los anchos de 2.0; 2xl 1000 cuando un paso lleva una tabla ancha (Post payment).',
+          '',
+          '**Campos (Julián, 2026-10-10):** de a dos y del mismo ancho, en `grid gap-4 sm:grid-cols-2`: cada campo llena su celda; nunca anchos fijos, `flex-wrap` ni tres por fila. El que queda solo va en la columna izquierda; sólo Notes y la búsqueda de paciente o persona ocupan el ancho entero. Las casillas, una debajo de la otra. Se controla con `npm run ds:campos`. Ver *Parts → Fields* y *Specs → Fields*.',
           '',
           '**Pasos:** cada paso dice su nombre (General, Contact, Address…), así el usuario sabe qué está haciendo. Al avanzar, el tilde rebota, la línea se llena en verde y el contenido entra desde la derecha (con Return, desde la izquierda).',
           '',
-          '**Probalo:** en *Playground* cambiá la cantidad de pasos y el tamaño desde *Controls*.',
+          '**Pestañas en vez de pasos** (`tabs`, 2026-10-22): al *editar* algo que ya existe, las secciones van en pestañas debajo del título —todas a un clic, con los datos cargados— y un solo *Save Changes* guarda todo, desde cualquier pestaña; cambiar de pestaña no guarda. Si algo falla en otra sección, esa pestaña se marca y el foco va al campo. Los pasos quedan para *crear* (New Patient), donde el orden ayuda. Ver *Parts → Tabs* y *Pages / Parts / Patient modals*.',
+          '',
+          '**Con poco alto de ventana** (2026-10-19): un paso con muchos campos (New Appointment, paso 1) puede no entrar entero. El contenido scrollea solo, pero el pie no se movía y el último campo quedaba cortado contra él sin ningún aviso (parecía un bug, no que seguía con scroll). Ahora, mientras falte contenido por ver, el pie lleva una sombra arriba, igual que una barra elevada tapando lo que sigue debajo; al llegar al final se va. Ver *Parts → Footer shadow*.',
+          '',
+          '**Probalo:** en *Playground* cambiá la cantidad de pasos y el tamaño desde *Controls*; achicá la ventana del navegador (o el panel de Storybook) con varios pasos para ver la sombra del pie aparecer y desaparecer al llegar al final.',
         ].join('\n'),
       },
     },
@@ -35,7 +43,7 @@ const meta = {
     title: { control: 'text', description: 'Qué se carga.' },
     description: { control: 'text', description: 'Una línea de contexto. Vacía, no se muestra.' },
     steps: { control: { type: 'range', min: 1, max: 4, step: 1 }, description: 'Cantidad de pasos. Con 1 no se muestran pasos.' },
-    size: { control: 'inline-radio', options: ['md', 'lg', 'xl'], description: 'md 480 · lg 560 · xl 760.' },
+    size: { control: 'inline-radio', options: ['md', 'lg', 'xl', '2xl'], description: 'md 480 · lg 560 · xl 760 · 2xl 1000 (a wide table).' },
     open: { control: 'boolean', description: 'Abierto al cargar. Apagado: se abre con el botón.' },
   },
 } satisfies Meta<Args>
@@ -63,8 +71,8 @@ function Demo({ title, description, steps, size, open }: Args) {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <TextField label="First Name" required placeholder="John" />
                 <TextField label="Last Name" required placeholder="Smith" />
+                <SelectField label="Country" options={['United States', 'Mexico', 'Argentina']} />
               </div>
-              <SelectField label="Country" options={['United States', 'Mexico', 'Argentina']} />
             </DrawerSection>
           </DrawerStep>
         ))}
@@ -87,6 +95,26 @@ export const Parts: Story = {
           </DrawerSection>
         </div>
       </Bloque>
+      <Bloque titulo="Fields" nota="Post payment: de a dos y del mismo ancho, en grid gap-4 sm:grid-cols-2. Notes ocupa el ancho entero; las casillas van una debajo de la otra.">
+        <div className="w-[560px] max-w-full rounded-lg border border-dashed border-line p-5">
+          <div className="flex flex-col gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="flex flex-col gap-2">
+                <FieldLabel required>Transaction date</FieldLabel>
+                <DatePicker value={null} onChange={() => {}} className="h-9 w-full" />
+              </div>
+              <TextField label="Amount" required placeholder="$ 0.00" />
+              <SelectField label="Type" required options={['Patient Payment', 'Credit Adjustment', 'Charge Adjustment']} value="Charge Adjustment" onChange={() => {}} />
+              <SelectField label="Apply to" required options={['John Hayes', 'Mara Otero']} value="John Hayes" onChange={() => {}} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <OptionCheckbox label="Do not include Dental Diagnostic Codes" />
+              <OptionCheckbox label="Do not bill Insurance" />
+            </div>
+            <TextArea label="Notes" placeholder="Placeholder" />
+          </div>
+        </div>
+      </Bloque>
       <Bloque titulo="Footer" nota="DrawerActions: dos botones del mismo ancho, Cancel o Return a la izquierda y Next Step o Save a la derecha.">
         <Muestras>
           {[
@@ -101,6 +129,28 @@ export const Parts: Story = {
               </div>
             </ConRotulo>
           ))}
+        </Muestras>
+      </Bloque>
+      <Bloque titulo="Tabs" nota="En lugar del indicador de pasos, justo debajo del título: la caja gris de Elements / Tabs a todo el ancho. El pie lleva Cancel y Save Changes (DrawerActions con saveLabel), siempre los dos, en cualquier pestaña.">
+        <Muestras>
+          <ConRotulo rotulo="Tabs slot">
+            <div className="w-[360px]"><Tabs fullWidth aria-label="Sections" value="General" onChange={() => {}} tabs={['General', 'Guardian', 'Demography']} /></div>
+          </ConRotulo>
+          <ConRotulo rotulo="Footer">
+            <div className="flex w-[320px] items-center gap-3 rounded-lg border border-line p-4 [&>button]:flex-1">
+              <DrawerActions onCancel={() => {}} onSave={() => {}} saveLabel="Save Changes" />
+            </div>
+          </ConRotulo>
+        </Muestras>
+      </Bloque>
+      <Bloque titulo="Footer shadow" nota="El drawer mide si el contenido sigue por abajo (scrollHeight contra clientHeight, con ResizeObserver) y le agrega la sombra al pie mientras eso sea cierto; al llegar al final se va sola. En Playground, con varios pasos, achicar la ventana muestra el caso real: el campo cortado a mitad de camino, con la sombra separándolo del pie.">
+        <Muestras>
+          <ConRotulo rotulo="At rest">
+            <div className="flex h-10 w-[260px] items-center justify-end border-t border-line-soft px-4 text-[11px] text-ink-muted">footer</div>
+          </ConRotulo>
+          <ConRotulo rotulo="With more below">
+            <div className="flex h-10 w-[260px] items-center justify-end border-t border-line-soft px-4 text-[11px] text-ink-muted shadow-[0_-6px_10px_-6px_rgb(0_0_0/0.15)]">footer</div>
+          </ConRotulo>
         </Muestras>
       </Bloque>
     </Lienzo>
@@ -134,7 +184,21 @@ export const Specs: Story = {
         <Tabla encabezado={['Size', 'Width', 'For']} minimo={560}>
           <tr><td className="font-semibold">md</td><td className="tabular-nums">480px</td><td>Formularios cortos: Edit Contact, Edit Relationship, medicamentos y alergias, New Room, New Hours, Review Exam.</td></tr>
           <tr><td className="font-semibold">lg</td><td className="tabular-nums">560px</td><td>Formularios con pasos: New Patient, Edit Patient, New Appointment, subscriptions.</td></tr>
-          <tr><td className="font-semibold">xl</td><td className="tabular-nums">760px</td><td>Tablas o editores: Post payment, Apply credit, Assign Role, AI Narrative Editor.</td></tr>
+          <tr><td className="font-semibold">xl</td><td className="tabular-nums">760px</td><td>Tablas o editores: Apply credit, Assign Role, AI Narrative Editor.</td></tr>
+          <tr><td className="font-semibold">2xl</td><td className="tabular-nums">1000px</td><td>Un paso con una tabla ancha que tiene que entrar entera: Post payment (Allocation, las 12 columnas de Ledger Transactions).</td></tr>
+        </Tabla>
+      </Bloque>
+      <Bloque titulo="Fields" nota="Vale para todos los drawers y para los formularios dentro de una card de página. Con Storybook andando, npm run ds:campos abre cada story y mide los campos de los drawers abiertos.">
+        <Tabla encabezado={['Rule', 'How']} minimo={640}>
+          <tr><td className="font-semibold">Pairs</td><td><code>grid gap-4 sm:grid-cols-2</code>: dos columnas iguales y cada campo llena su celda. En el teléfono, uno por fila.</td></tr>
+          <tr><td className="font-semibold">Same width</td><td>Nunca un ancho fijo (<code>w-[200px]</code>, <code>grid-cols-[96px_1fr]</code>), <code>flex-wrap</code> ni tres por fila: en un mismo paso, todos los campos cortos miden lo mismo.</td></tr>
+          <tr><td className="font-semibold">Odd field</td><td>El que queda solo va en la columna izquierda, con el mismo ancho que los de arriba.</td></tr>
+          <tr><td className="font-semibold">Full width</td><td>Sólo Notes (TextArea) y la búsqueda de paciente o persona (Patient, Provider, Carrier Name). Address Line, Email y Website van de a dos como el resto.</td></tr>
+          <tr><td className="font-semibold">Height</td><td>36px todos los controles (TextField, SelectField, DatePicker, búsqueda). Un input propio usa <code>control()</code> de <code>patients/form</code>.</td></tr>
+          <tr><td className="font-semibold">Label</td><td><code>FieldLabel</code>: 12px Medium <code>ink</code>, con el asterisco rojo si es obligatorio. Nada de rótulos hechos a mano.</td></tr>
+          <tr><td className="font-semibold">Checkboxes</td><td>Una debajo de la otra (<code>flex flex-col gap-2</code>), nunca lado a lado.</td></tr>
+          <tr><td className="font-semibold">Page card</td><td>Un formulario dentro de una card de página (Ledger: Payment, Credit, Charge) usa la misma regla con más columnas: <code>grid gap-4 sm:grid-cols-2 lg:grid-cols-4</code>. Si una fila lleva un botón al costado (+ / × de Payment method), las demás reservan ese lugar para que las columnas queden alineadas.</td></tr>
+          <tr><td className="font-semibold">Not fields</td><td>La barra de una tabla o de un catálogo (buscador con lupa + Filter + botón: Manage Exceptions, New Procedure, New Condition) sigue el patrón de tablas.</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Steps" nota="Elements / StepIndicator tiene la barra de pasos completa.">
@@ -153,7 +217,8 @@ export const Specs: Story = {
           <tr><td className="font-semibold">New Account</td><td>Information · Address · Owner</td><td>lg</td></tr>
           <tr><td className="font-semibold">Add Relationship</td><td>Person · Contact · Relationship</td><td>lg</td></tr>
           <tr><td className="font-semibold">New Procedure</td><td>Procedure · Surfaces (si el procedimiento lleva superficie) · Link to finding · Link to diagnosis (si es Planned)</td><td>md</td></tr>
-          <tr><td className="font-semibold">Edit Patient, subscriptions, Post payment</td><td>Ver cada componente</td><td>lg / xl</td></tr>
+          <tr><td className="font-semibold">Edit Patient, subscriptions</td><td>Ver cada componente</td><td>lg / xl</td></tr>
+          <tr><td className="font-semibold">Post payment</td><td>Payment · Allocation</td><td>2xl</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>

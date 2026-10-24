@@ -40,11 +40,17 @@ const tareas = (porTipo: number, register: string, expiration: string): PendingT
     })),
   )
 
-const salas = (statuses: Operatory['status'][], pacientes: number): Operatory[] =>
-  statuses.map((status) => ({
-    name: 'Operatory name',
+/* Cada sala con el nombre que dicen los turnos ("Operatory 2"), para armar su línea del día. El Figma decía
+   "Operatory name" en todas (dashboard.md, 2026-10-17). */
+/* "Patients today" venía con el mismo número fijo en las seis salas, y no coincidía con nada (Julián, 2026-10-19): se
+   turnan 12 / 10 / 4 para que se vea que cada sala puede traer un número distinto. No sale de los turnos reales (eso
+   quedó descartado el mismo día por pisarse con el filtro de la sala de espera); es sólo el dato de mock variando. */
+const PACIENTES_POR_SALA = [12, 10, 4]
+const salas = (statuses: Operatory['status'][], pacientes: number[] = PACIENTES_POR_SALA): Operatory[] =>
+  statuses.map((status, i) => ({
+    name: `Operatory ${i + 1}`,
     status,
-    patientsToday: pacientes,
+    patientsToday: pacientes[i % pacientes.length]!,
     provider: 'Daniel Anderson',
   }))
 
@@ -53,23 +59,28 @@ const turno = (
   extra: Partial<Turno & EnEspera> = {},
 ): Turno & EnEspera => ({ name, initials, provider, operatory, time, ...extra })
 
-/* Clave dd-mm-aaaa, la misma que muestra el chip del filtro. */
+/* Clave dd-mm-aaaa (`formatDMY`); el selector la muestra como "Feb 28, 2026". */
 export const DIAS: Record<string, DiaDashboard> = {
   '28-02-2026': {
     appointments: [
-      turno('Noah James', 'NJ', 'Dr. Elena Martinez', 'Operatory 2', '10:00'),
-      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:30'),
-      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '11:00'),
-      turno('Mara Otero', 'MO', 'Dr. Salgado', 'Operatory 1', '11:30'),
-      turno('Elias Aguirre', 'EA', 'Dr. Salgado', 'Operatory 3', '08:30', { completado: true }),
-      turno('Ines Bermudez', 'IB', 'Dr. Elena Martinez', 'Operatory 1', '09:00', { completado: true }),
+      turno('Noah James', 'NJ', 'Dr. Elena Martinez', 'Operatory 2', '10:00', { motivo: 'Consultation' }),
+      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:30', { motivo: 'Cleaning' }),
+      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '11:00', { motivo: 'Check-up' }),
+      turno('Mara Otero', 'MO', 'Dr. Salgado', 'Operatory 1', '11:30', { motivo: 'Cleaning' }),
+      turno('Elias Aguirre', 'EA', 'Dr. Salgado', 'Operatory 3', '08:30', { completado: true, motivo: 'Check-up' }),
+      turno('Ines Bermudez', 'IB', 'Dr. Elena Martinez', 'Operatory 1', '09:00', { completado: true, motivo: 'Consultation' }),
+      turno('Sofia Chen', 'SC', 'Dr. Emily Chen', 'Operatory 4', '12:00', { motivo: 'Cleaning' }),
     ],
     waiting: [
-      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:00', { accion: 'Cancel', nuevo: true }),
-      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:00'),
-      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:00'),
+      /* Seis, repartidos en las salas: el filtro por sala tiene a quién mostrar (Julián, 2026-10-18). */
+      turno('Noah James Smith', 'NS', 'Dr. Elena Martinez', 'Operatory 2', '10:00', { nuevo: true }),
+      turno('Noah James', 'NJ', 'Dr. Elena Martinez', 'Operatory 2', '10:00'),
+      turno('Mara Otero', 'MO', 'Dr. Salgado', 'Operatory 1', '11:30'),
+      turno('Ines Bermudez', 'IB', 'Dr. Elena Martinez', 'Operatory 1', '09:00'),
+      turno('Elias Aguirre', 'EA', 'Dr. Salgado', 'Operatory 3', '08:30'),
+      turno('Sofia Chen', 'SC', 'Dr. Emily Chen', 'Operatory 4', '12:00'),
     ],
-    rooms: salas(['Available', 'Busy', 'Busy', 'Busy', 'Unavailable', 'Busy'], 12),
+    rooms: salas(['Available', 'Busy', 'Busy', 'Busy', 'Unavailable', 'Available']),
     tasks: tareas(2, 'March 17, 2025', 'March 15, 2025'),
     encuentros: { abiertos: 2, promedio: '18 min avg.' },
   },
@@ -83,7 +94,7 @@ export const DIAS: Record<string, DiaDashboard> = {
     waiting: [
       turno('Mara Otero', 'MO', 'Dr. Elena Martinez', 'Operatory 1', '09:00', { nuevo: true }),
     ],
-    rooms: salas(['Busy', 'Available', 'Available', 'Busy', 'Available', 'Unavailable'], 7),
+    rooms: salas(['Busy', 'Available', 'Available', 'Busy', 'Available', 'Unavailable']),
     tasks: tareas(1, 'March 20, 2025', 'March 18, 2025'),
     encuentros: { abiertos: 1, promedio: '22 min avg.' },
   },
@@ -94,7 +105,7 @@ export const DIAS: Record<string, DiaDashboard> = {
       turno('Maria Abril Viola', 'AV', 'Dr. Emily Chen', 'Operatory 1', '14:00'),
     ],
     waiting: [],
-    rooms: salas(['Available', 'Available', 'Busy', 'Available', 'Available', 'Available'], 4),
+    rooms: salas(['Available', 'Available', 'Busy', 'Available', 'Available', 'Available']),
     tasks: tareas(1, 'March 24, 2025', 'March 22, 2025').slice(0, 2),
     encuentros: { abiertos: 1, promedio: '12 min avg.' },
   },
@@ -103,7 +114,7 @@ export const DIAS: Record<string, DiaDashboard> = {
 export const DIA_VACIO: DiaDashboard = {
   appointments: [],
   waiting: [],
-  rooms: salas(['Available', 'Available', 'Available', 'Available', 'Available', 'Available'], 0),
+  rooms: salas(['Available', 'Available', 'Available', 'Available', 'Available', 'Available'], [0]),
   tasks: [],
   encuentros: { abiertos: 0, promedio: 'no data' },
 }
@@ -164,4 +175,38 @@ export function reprogramar(
     [origen.panel]: [...dDestino[origen.panel], turnoNuevo],
   }
   return salida
+}
+
+/* Propuesta de volumen (dashboard.md, 2026-10-12): un día real de una clínica con cinco sillones, con los mismos datos
+   que el día de la demo —los mismos campos, nada nuevo—, en más cantidad: 35 turnos, 8 en la sala de espera y 28 tareas.
+   Lo carga `?day=busy`. */
+const NOMBRES = [
+  'Mara Otero', 'Elias Aguirre', 'Ines Bermudez', 'Noah James Smith', 'Sofia Chen', 'Daniel Ortiz', 'Lena Park',
+  'Thomas Davis', 'Maria Abril Viola', 'John Smith', 'Nadia Serrano', 'Tomas Vidal', 'Bruno Calvo', 'Alma Duarte',
+  'Ciro Esquivel', 'Lucia Vidal', 'Ruben Serrano', 'Emily Clark', 'Robert Brown', 'Sophia Johnson', 'Mark Wilson',
+  'Marco Rivera', 'Julia Romero', 'Pablo Ferrer', 'Valentina Ruiz', 'Diego Navarro', 'Camila Ortega', 'Hugo Medina',
+  'Olivia Grant', 'Lucas Moreno', 'Emma Fischer', 'Mateo Rossi', 'Chloe Martin', 'Samuel Ortiz', 'Zoe Turner',
+  'Leo Bianchi', 'Martina Paz', 'Iker Soto', 'Elena Marquez', 'Abril Viola', 'Julian Vega', 'Rosa Medina', 'Ana Ibarra',
+]
+const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Salgado', 'Dr. Emily Chen', 'Dr. Elena Martinez', 'Dr. Salgado']
+const iniciales = (n: string) => n.split(' ').map((x) => x[0]).slice(0, 2).join('').toUpperCase()
+const hora = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`
+
+const MOTIVOS = ['Check-up', 'Cleaning', 'Consultation', 'Filling']
+
+export const DIA_CARGADO: DiaDashboard = {
+  /* Cinco operatorios, un turno cada 45 minutos desde las 8; los doce primeros, completados. */
+  appointments: NOMBRES.slice(0, 35).map((name, i) =>
+    turno(
+      name, iniciales(name), PROVIDERS[i % 5]!, `Operatory ${(i % 5) + 1}`,
+      hora(480 + Math.floor(i / 5) * 45 + [0, 15, 30, 0, 15][i % 5]!), { motivo: MOTIVOS[i % 4], ...(i < 12 ? { completado: true } : {}) },
+    )),
+  /* Como en la demo: los nuevos marcados para la tira de números. */
+  waiting: NOMBRES.slice(35).map((name, i) =>
+    turno(name, iniciales(name), PROVIDERS[i % 5]!, `Operatory ${(i % 5) + 1}`, hora(615 + i * 15), {
+      nuevo: i % 3 === 0,
+    })),
+  rooms: salas(['Busy', 'Busy', 'Available', 'Busy', 'Unavailable', 'Busy']),
+  tasks: tareas(7, 'March 17, 2025', 'March 15, 2025'),
+  encuentros: { abiertos: 4, promedio: '21 min avg.' },
 }

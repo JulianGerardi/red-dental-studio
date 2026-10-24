@@ -32,7 +32,7 @@ export function StatStripApilada({ stats }: { stats: Stat[] }) {
   return (
     <div className="@container w-full">
       <div className={cn(
-        'shadow-stat grid w-full rounded-xl bg-white',
+        'shadow-panel grid w-full rounded-xl bg-white',
         stats.length === 4 ? 'grid-cols-2 @2xl:grid-cols-4' : 'grid-cols-3',
       )}>
         {stats.map(({ label, value, nota, icon: Icon }, i) => (
@@ -72,7 +72,7 @@ export function StatStrip({ stats = STATS, apilada = false }: { stats?: Stat[]; 
        3+1 en dos filas desparejas-, así que el mobile grid se adapta a
        cuántas hay en vez de asumir siempre tres. */
     <div className={cn(
-      'shadow-stat grid w-full rounded-xl bg-white lg:flex lg:w-fit lg:max-w-full lg:items-center lg:px-2',
+      'shadow-panel grid w-full rounded-xl bg-white lg:flex lg:w-fit lg:max-w-full lg:items-center lg:px-2',
       stats.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3',
     )}>
       {stats.map(({ label, value, nota, icon: Icon }, i) => (

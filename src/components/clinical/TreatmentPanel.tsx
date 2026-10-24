@@ -1,8 +1,6 @@
 import { useState } from 'react'
-import {
-  Bot, CalendarDays, Check, ChevronDown, ChevronRight, CircleAlert, CircleCheck, ClipboardList, Eye, EyeOff, MoreVertical, Play, Search, Siren, Sparkles,
-  Stethoscope, Workflow as IconoWorkflow, X, type LucideIcon,
-} from 'lucide-react'
+import { Chip } from '@/components/ui/chip'
+import { Bot, CalendarDays, Check, ChevronDown, ChevronRight, CircleAlert, CircleCheck, ClipboardList, Eye, EyeOff, MoreVertical, Play, Search, Siren, Sparkles, Stethoscope, Workflow as IconoWorkflow, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { Button } from '@/components/ui/button'
@@ -184,23 +182,12 @@ export const filtrar = (lista: Workflow[], f: Filtros) => {
 /* Lo aplicado, debajo del título de Workflows: un chip por filtro para sacarlo, y Clear. */
 export function FiltrosAplicados({ value, onChange }: { value: Filtros; onChange: (f: Filtros) => void }) {
   if (!value.categorias.length && !value.q.trim()) return null
-  const chip = 'bg-dash-count-bg text-dash-blue flex h-6 items-center gap-1 rounded-full pr-1.5 pl-2.5 text-[11px] font-medium'
   return (
     <div className="mt-2 flex flex-wrap items-center gap-1.5 px-1">
       {value.categorias.map((c) => (
-        <span key={c} className={chip}>
-          {c}
-          <button type="button" aria-label={`Remove ${c} filter`} onClick={() => onChange({ ...value, categorias: value.categorias.filter((x) => x !== c) })} className="rounded-full p-0.5 hover:bg-white">
-            <X className="size-3" />
-          </button>
-        </span>
+        <Chip key={c} removeLabel={`Remove ${c} filter`} onRemove={() => onChange({ ...value, categorias: value.categorias.filter((x) => x !== c) })}>{c}</Chip>
       ))}
-      {value.q.trim() && (
-        <span className={chip}>
-          “{value.q.trim()}”
-          <button type="button" aria-label="Remove search filter" onClick={() => onChange({ ...value, q: '' })} className="rounded-full p-0.5 hover:bg-white"><X className="size-3" /></button>
-        </span>
-      )}
+      {value.q.trim() && <Chip removeLabel="Remove search filter" onRemove={() => onChange({ ...value, q: '' })}>“{value.q.trim()}”</Chip>}
       <button type="button" onClick={() => onChange({ categorias: [], q: '' })} className="text-[11px] text-ink-muted hover:text-ink hover:underline">Clear</button>
     </div>
   )

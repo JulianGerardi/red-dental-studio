@@ -52,6 +52,8 @@ const meta = {
           '',
           'Se colapsa de 218px a 60px para darle ancho a la pantalla (el Ledger lo necesita) y lo recuerda al pasar de una sección a otra. En pantallas de menos de 1024px no colapsa: las secciones pasan a una tira horizontal (ver *On each device*).',
           '',
+          'En computadora **baja hasta el final de la pantalla del paciente** (Julián, 2026-10-13): la card se estira al alto del contenido de al lado, así el bento no deja un hueco debajo del menú. Arriba de todo va el rastro *Patients › paciente › sección* (`PatientBreadcrumb`).',
+          '',
           '**Probalo:** en *Playground* tocá las secciones, colapsá con el botón de arriba del panel y mirá cuánto ancho gana el recuadro; pasá el mouse por los íconos colapsados y por la tarjeta de ficha; cambiá el encuentro con el chevron. Con *open* dejás abierto cada tooltip o menú.',
         ].join('\n'),
       },
@@ -248,6 +250,22 @@ export const States: Story = {
             </Estado>
           </div>
         </Bloque>
+        <Bloque titulo="Next to the screen">
+          <div className="flex flex-wrap items-start gap-x-6 gap-y-8">
+            <Estado titulo="Full height" nota="Junto a una pantalla más alta que él, el panel baja hasta el final: sin hueco debajo." ancho={560}>
+              <div className="flex gap-5">
+                <Menu preview={EXPANDIDO} />
+                <div className="flex h-[1100px] flex-1 items-center justify-center rounded-lg border border-dashed border-ink-faint/60 text-[12px] text-ink-muted">Screen, 1100px</div>
+              </div>
+            </Estado>
+            <Estado titulo="Collapsed, full height" nota="Colapsado también: un riel blanco de punta a punta." ancho={400}>
+              <div className="flex gap-5">
+                <Menu preview={COLAPSADO} />
+                <div className="flex h-[1100px] flex-1 items-center justify-center rounded-lg border border-dashed border-ink-faint/60 text-[12px] text-ink-muted">Screen, 1100px</div>
+              </div>
+            </Estado>
+          </div>
+        </Bloque>
         <Bloque titulo="Collapsed · 60px">
           <div className="flex flex-wrap items-start gap-x-6 gap-y-8">
             <Estado titulo="Collapsed" nota="Sólo íconos; el estado es el punto verde." ancho={120}>
@@ -277,8 +295,8 @@ const MEDIDAS: [string, 'exp' | 'col', string][] = [
   ['Section · collapsed', 'col', 'nav a'],
   ['Encounter', 'exp', '.relative.w-full > span'],
   ['Clinical Mode', 'exp', 'a[href$="/clinical-mode"]'],
-  ['Photo · expanded', 'exp', 'aside .rounded-full'],
-  ['Photo · collapsed', 'col', 'aside .rounded-full'],
+  ['Photo · expanded', 'exp', 'aside .rounded-avatar'],
+  ['Photo · collapsed', 'col', 'aside .rounded-avatar'],
 ]
 
 function Medidas() {

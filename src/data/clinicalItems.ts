@@ -25,11 +25,11 @@ export type Categoria =
   | 'Past Surgery and Hospitalization'
 
 export type Campo =
-  | { tipo: 'buscador'; key: string; label: string; req?: boolean; opciones: string[]; ancho?: 'full' }
+  | { tipo: 'buscador'; key: string; label: string; req?: boolean; opciones: string[] }
   | { tipo: 'texto'; key: string; label: string; req?: boolean; ph?: string }
-  | { tipo: 'select'; key: string; label: string; req?: boolean; opciones: string[]; ancho?: 'full' }
+  | { tipo: 'select'; key: string; label: string; req?: boolean; opciones: string[] }
   | { tipo: 'unidad'; key: string; opciones: string[] }
-  | { tipo: 'fecha'; key: string; label: string; req?: boolean; ancho?: 'full' }
+  | { tipo: 'fecha'; key: string; label: string; req?: boolean }
   | { tipo: 'notas'; key: string; label: string; req?: boolean; ph: string }
   | { tipo: 'titulo'; label: string }
 
@@ -55,7 +55,7 @@ export const CONFIG: Record<Categoria, ConfigCategoria> = {
       { tipo: 'buscador', key: 'allergy', label: 'Allergy', req: true, opciones: ['Penicillin', 'Latex', 'Peanuts', 'Pollen', 'Ibuprofen', 'Shellfish'] },
       { tipo: 'select', key: 'status', label: 'Status', req: true, opciones: ESTADOS },
       { tipo: 'select', key: 'severity', label: 'Severity', req: true, opciones: ['Mild', 'Moderate', 'Severe'] },
-      { tipo: 'select', key: 'reaction', label: 'Reaction', req: true, ancho: 'full', opciones: ['Rash', 'Swelling', 'Anaphylaxis', 'Nausea', 'Shortness of breath'] },
+      { tipo: 'select', key: 'reaction', label: 'Reaction', req: true, opciones: ['Rash', 'Swelling', 'Anaphylaxis', 'Nausea', 'Shortness of breath'] },
       { tipo: 'fecha', key: 'start', label: 'Approx Start Date', req: true },
       { tipo: 'fecha', key: 'end', label: 'Approx End Date' },
       { tipo: 'notas', key: 'notes', label: 'Notes', ph: 'Add notes' },
@@ -69,7 +69,7 @@ export const CONFIG: Record<Categoria, ConfigCategoria> = {
     principal: 'condition',
     campos: [
       { tipo: 'buscador', key: 'condition', label: 'Medical Condition', req: true, opciones: ['Hypertension', 'Type 2 Diabetes', 'Asthma', 'Anemia', 'Hypothyroidism'] },
-      { tipo: 'select', key: 'status', label: 'Status', req: true, ancho: 'full', opciones: ESTADOS },
+      { tipo: 'select', key: 'status', label: 'Status', req: true, opciones: ESTADOS },
       { tipo: 'fecha', key: 'start', label: 'Approx Start Date', req: true },
       { tipo: 'fecha', key: 'end', label: 'Approx End Date' },
       { tipo: 'notas', key: 'notes', label: 'Notes', ph: 'Add notes' },
@@ -95,7 +95,7 @@ export const CONFIG: Record<Categoria, ConfigCategoria> = {
       { tipo: 'titulo', label: 'Direction for Use' },
       { tipo: 'texto', key: 'dose', label: 'Dose', req: true, ph: '1' },
       { tipo: 'unidad', key: 'doseUnit', opciones: ['Tablet', 'Capsule', 'ml', 'Drop'] },
-      { tipo: 'select', key: 'frequency', label: 'Frequency', req: true, ancho: 'full', opciones: ['Once daily', 'Twice daily', 'Three times daily', 'As needed'] },
+      { tipo: 'select', key: 'frequency', label: 'Frequency', req: true, opciones: ['Once daily', 'Twice daily', 'Three times daily', 'As needed'] },
       /* Notes obligatorio sólo acá, y con el placeholder de un formulario de
          referrals. Anomalía 46. */
       { tipo: 'notas', key: 'notes', label: 'Notes', req: true, ph: 'Include patient history, previous treatments, and specific questions for the specialist...' },
@@ -111,8 +111,8 @@ export const CONFIG: Record<Categoria, ConfigCategoria> = {
     principal: 'surgery',
     campos: [
       { tipo: 'buscador', key: 'surgery', label: 'Past Surgery or Hospitalization', req: true, opciones: ['Appendectomy', 'Cesarean section', 'Tonsillectomy', 'Gallbladder removal', 'Hernia repair'] },
-      /* Sin fecha de fin y a lo ancho de la fila, como en el frame. */
-      { tipo: 'fecha', key: 'start', label: 'Approx Start Date', req: true, ancho: 'full' },
+      /* Sin fecha de fin, como en el frame; la fecha va en la columna izquierda, como en los demás (Drawer → Specs → Fields). */
+      { tipo: 'fecha', key: 'start', label: 'Approx Start Date', req: true },
       { tipo: 'notas', key: 'notes', label: 'Notes', ph: 'Add notes' },
     ],
     resumen: (v) => v.notes || '—',

@@ -73,7 +73,7 @@ export function CoachMark({
       {coaching.anchor && <Spotlight anchor={coaching.anchor} topicId={coaching.id} />}
 
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center p-3 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:justify-end sm:p-0">
-        <div className="pointer-events-auto motion-safe:animate-[loc-in_180ms_ease-out] flex w-full max-w-[380px] flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-[0_8px_28px_rgb(0_0_0/0.18)]">
+        <div className="pointer-events-auto motion-safe:animate-[loc-in_180ms_ease-out] flex w-full max-w-[380px] flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-floating">
           <div className="flex items-center gap-2 px-4 pt-3.5">
             <span className="text-dash-blue text-[10px] font-semibold tracking-wide uppercase">{modulo}</span>
             <span className="text-[10px] text-ink-faint">{coaching.index + 1}/{coaching.total}</span>

@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { ChevronLeft, CirclePlus, Search, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { CirclePlus, Search, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { SelectField, DateTextField, TextArea, OptionCheckbox, FormFooter } from '@/components/patients/form'
 import {
@@ -112,18 +113,9 @@ export default function Insurance() {
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      {/* El último tramo del breadcrumb dice "Documents" en una pantalla de
-          Insurance. Es del Figma. */}
-
-      {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
-          El breadcrumb completo repetía lo que ya dice el panel lateral. */}
-      <Link
-        to="/patients"
-        className="text-dash-blue mb-3 inline-flex items-center gap-1 text-sm hover:underline"
-      >
-        <ChevronLeft className="size-4" /> Patients
-      </Link>
-      <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-start">
+      {/* El Figma termina el rastro en "Documents" (anomalía 61): acá dice la sección. */}
+      <PatientBreadcrumb name="John Smith" section="Insurance" />
+      <div className="flex flex-col gap-5 lg:flex-row">
         <PatientSidePanel
           name="John Smith" initials="JS" section="Insurance"
           basePath={`/patients/${id}`} 
@@ -219,7 +211,7 @@ export default function Insurance() {
                 value={d.orden} onChange={set('orden')} error={req('orden')}
               />
 
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="mt-4 flex flex-col gap-2">
                 <OptionCheckbox label="Assignment of Benefits" />
                 <OptionCheckbox label="Release of Information" />
               </div>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Search, Delete, X } from 'lucide-react'
 import { LinkPersonCheckbox, FieldLabel } from '@/components/patients/form'
 import { EMPLEADOS, type Empleado } from '@/data/employees'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Compartido por la ficha de empleado y "New Employee". Ver
    design-reference/figma/modulos/employees.md. */
@@ -59,9 +60,7 @@ export function LinkExistingPerson({
               key={p.id} type="button" onClick={() => { onSeleccionar(p); setBusqueda(p.nombre) }}
               className="flex items-center gap-3 rounded-lg border border-line bg-white p-3 text-left hover:bg-surface-subtle"
             >
-              <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">
-                {p.iniciales}
-              </span>
+              <Avatar initials={p.iniciales} size={36} />
               <span className="min-w-0 leading-tight">
                 <span className="block text-[13px] font-semibold text-ink">{p.nombre}</span>
                 <span className="block text-[11px] text-ink-muted">DOB: {p.cumpleanos}</span>
@@ -71,9 +70,7 @@ export function LinkExistingPerson({
 
           {vinculado && (
             <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-[#eff6ff] p-3">
-              <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">
-                {vinculado.iniciales}
-              </span>
+              <Avatar initials={vinculado.iniciales} size={36} />
               <span className="min-w-0 leading-tight">
                 <span className="block text-[13px] font-bold text-ink uppercase">{vinculado.nombre}</span>
                 <span className="block text-[11px] text-ink-muted">

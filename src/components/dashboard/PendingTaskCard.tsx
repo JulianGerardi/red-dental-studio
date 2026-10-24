@@ -1,6 +1,7 @@
 import { FileText, TriangleAlert, ArrowRight } from 'lucide-react'
 import { InnerCard } from './primitives'
 import { aviso } from '@/components/ui/toaster'
+import { Avatar } from '@/components/ui/avatar'
 
 export type PendingTask = {
   kind: string
@@ -10,6 +11,9 @@ export type PendingTask = {
   register: string
   expiration: string
 }
+
+/* Lo que hace "Complete this Task". Lo comparten la card y la fila de la propuesta (DashboardRows). */
+export const completarTarea = (task: PendingTask) => aviso.ok(`${task.kind} for ${task.person} marked as complete.`)
 
 export function PendingTaskCard({ task }: { task: PendingTask }) {
   return (
@@ -23,9 +27,7 @@ export function PendingTaskCard({ task }: { task: PendingTask }) {
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="bg-dash-count-bg text-dash-blue-hover flex size-7 shrink-0 items-center justify-center rounded-md text-[11px] font-semibold">
-          {task.initials}
-        </span>
+        <Avatar initials={task.initials} size={28} />
         <p className="text-dash-name min-w-0 flex-1 truncate text-[13px] font-semibold">
           {task.person}
         </p>
@@ -54,7 +56,7 @@ export function PendingTaskCard({ task }: { task: PendingTask }) {
 
       <button
         type="button"
-        onClick={() => aviso.ok(`${task.kind} for ${task.person} marked as complete.`)}
+        onClick={() => completarTarea(task)}
         className="bg-dash-blue hover:bg-dash-blue-hover flex w-full items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13px] font-medium text-white transition-colors"
       >
         Complete this Task <ArrowRight className="size-3.5" />

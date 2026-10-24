@@ -22,3 +22,16 @@ export const Default: Story = {
     </div>
   ),
 }
+
+/* `abierto` deja el menú a la vista sin bloquear la página: sólo para documentar. */
+export const Open: Story = {
+  render: (args) => (
+    <div className="h-48">
+      <RowActionsMenu {...args} abierto>
+        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem>Duplicate</DropdownMenuItem>
+        <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+      </RowActionsMenu>
+    </div>
+  ),
+}

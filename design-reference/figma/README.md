@@ -107,6 +107,10 @@ Numeradas de forma continua entre módulos, para poder citarlas sin ambigüedad.
 Cambios pedidos que **no** son réplica del Figma:
 
 - Nombre de la tabla de Patients en azul y linkeado (en el Figma es gris `#71717a`).
+- **Sombras más suaves, en dos alturas** (2026-10-10): las cards madre (paneles, cards y números) casi planas
+  (`0 1px 2px` + `0 1px 3px`, gris azulado al 6% y 8%) en vez de las dos del Figma (`0 4px 14px` gris al 25% y
+  `0 4px 4px` al 5%); los pop ups flotantes con `0 1px 2px` + `0 4px 16px -2px` (4% y 10%). Ver `modulos/dashboard.md`
+  y `design-system.md`.
 - Borde del date picker azul sólo en estado activo (en el Figma es permanente).
 - Default del filtro de fecha en `28-02-2026`: al volverse un filtro real no podía
   quedar el `30-02-2026` del diseño.
@@ -302,7 +306,7 @@ Cómo se comporta cada pieza:
 
 | Pieza | < 768 | ≥ 768 | ≥ 1024 |
 |---|---|---|---|
-| Sidebar | panel sobre el contenido, con fondo oscuro y cierre al navegar | rail de 58 con iconos | igual, expandible a 234 |
+| Sidebar | panel sobre el contenido, con fondo oscuro y cierre al navegar | rail de 58 con iconos | igual, expandible a 176 |
 | Topbar | sólo buscador, campana y avatar | + locación | + saludo y nombre del perfil |
 | Dashboard | una columna | dos | tres |
 | Panel del paciente | arriba del contenido, avatar al lado del nombre y nav en tira horizontal | igual | columna de 218 a la izquierda |
@@ -329,10 +333,10 @@ Decisiones que valen la pena anotar:
   arrastrar para enterarse de que existían. En angosto ocupa todo el ancho y
   reparte las tres en columnas, con el icono arriba del texto; desde `lg`
   vuelve a la fila compacta del Figma.
-- **Sin breadcrumb en las pantallas del paciente** (dashboard, Treatments,
-  Insurance, Documents, Relationships, Add Relationship y Edit Patient). El
-  panel lateral ya dice en qué paciente y en qué sección estás; el breadcrumb
-  repetía eso y en Insurance además apuntaba a "Documents" (anomalía 61).
+- ~~**Sin breadcrumb en las pantallas del paciente**~~ (revertido el
+  2026-10-13, ver `modulos/patient-dashboard.md`): llevan `Patients › paciente
+  › sección` (`PatientBreadcrumb`); las pantallas de primer nivel, ninguno. El
+  de Insurance dice "Insurance", no el "Documents" del Figma (anomalía 61).
 - **La leyenda de estados dejó de ser una franja a lo ancho** y pasó a un botón
   "Status legend" que despliega la lista. La franja obligaba a arrastrarla de
   costado en celular y se comía un renglón entero en escritorio. La muestra de
@@ -420,6 +424,28 @@ Todos los controles de formulario responden, no son decorativos:
 - La **búsqueda de Patients** ya filtraba la tabla; el **filtro de fecha** del
   Dashboard ya filtraba los turnos.
 
+## Regla: un solo avatar de persona (2026-10-18)
+
+Julián marcó que los avatares no seguían un estilo: las tablas de Patients y Employees, Relationships, el panel del
+paciente y varias listas los dibujaban en círculo (azul o celeste), mientras el Dashboard y Billing usaban un cuadrado
+con esquinas redondeadas. Pidió homologar todo al de la card de **Appointments** del Dashboard ("NJ").
+
+- **Toda persona** (paciente, provider, empleado, dueño de la cuenta, el usuario del topbar) va con `ui/avatar`:
+  cuadrado con esquinas redondeadas, `dash-blue` con las iniciales en blanco Semibold. Se acabó el celeste para el
+  equipo: la tabla ya dice quién es quién y el color distinto no agregaba información (además, no era parejo: el
+  paciente del drawer de Scheduling y el de Pending Task iban en celeste).
+- **Esquina proporcional:** token `--radius-avatar` = 27% (`rounded-avatar`). A 44px da los 12px de la card de turno;
+  a 32px, 9px. Un radio fijo se veía casi redondo en 24px y casi recto en 72px.
+- **Escala de nueve tamaños** (24, 28, 32, 36, 40, 44, 56, 62, 72), cada uno con su letra. No se cambió el tamaño de
+  ninguna pantalla: se tomaron los que ya había. El de Clinical Mode (23.71 del Figma) pasa a 24.
+- **Lo que no es una persona no usa el avatar:** las locaciones siguen en su cuadrado celeste, el logo vacío de la
+  cuenta en celeste (misma forma que el del Owner, que era la intención) y la marca "RD" de Forgot password redonda.
+- *Currently being seen* deja el verde en los avatares: el "en vivo" ya lo dice el glow del borde y el título verde.
+- El popover del paciente del Dashboard pierde el borde blanco de 4px: sobre el fondo `#fafbfe` no se veía y sólo
+  achicaba el color a 64px.
+
+Elements / Avatars documenta la escala, las partes y los estados (con foto y editable).
+
 ## Foto de perfil editable (2026-09-03)
 
 Los avatares de iniciales de un empleado y de un paciente se pueden cambiar
@@ -430,10 +456,13 @@ de archivos del sistema; la imagen elegida reemplaza las iniciales
 los dos lugares, con distinto `avatarClassName` porque la forma y el color no
 son los mismos:
 
-- **Ficha de un empleado** (`Employees.tsx`): cuadrado, fondo celeste
-  (`bg-dash-count-bg`). Elena Martinez es el caso de prueba.
+- **Ficha de un empleado** (`Employees.tsx`): 56px. Elena Martinez es el caso de prueba.
 - **Panel del paciente** (`PatientSidePanel.tsx`, el panel izquierdo de las
-  seis pantallas del dashboard): círculo, fondo azul sólido.
+  seis pantallas del dashboard): 62px.
+
+Desde el 2026-10-18 los dos tienen la forma y el color de todos los avatares (ver *Regla: un solo avatar de persona*);
+antes uno era un cuadrado celeste y el otro un círculo azul. `EditableAvatar` recibe `size` en vez de
+`avatarClassName`.
 
 La foto se guarda en `localStorage` (`usePhoto` en `src/lib/usePhoto.ts`), no
 en el estado del componente: el panel del paciente se vuelve a montar en cada
@@ -448,3 +477,69 @@ una foto real puesta, tapaba una parte de la cara todo el tiempo, no sólo al
 interactuar. Ahora es un lápiz -ícono de edición, no de cámara- que cubre el
 avatar completo pero sólo se ve con `hover`/foco: en reposo la foto queda
 íntegra, sin nada superpuesto.
+
+
+## Pantallas sin scroll de página (auditoría del 2026-10-19)
+
+Pedido de Julián: la información tiene que verse a simple vista, sin scrollear la página, "en casi todas las pantallas
+siempre hay un scroll". Se midió el alto de cada pantalla contra la ventana (1440×780 y 1920×950, un navegador real
+con su barra) con el dev server:
+
+| Pantalla | 1440×780 | 1920×950 |
+|---|---|---|
+| Dashboard | la fila de tres entra (2026-10-19, desde 1280px); Pending Task queda debajo | ídem |
+| Patients | +306 | +136 |
+| Patient Dashboard | +602 | +432 |
+| Treatments / Documents / Ledger / Relationships | +450 | +280 |
+| Insurance | +718 | +548 |
+| Scheduling | +397 | +227 |
+| Billing | +566 | +364 |
+| Notifications | +3633 | +3463 |
+| Settings (General · Team · Accounts · Consents) | +100 a +350 | 0 a +180 |
+| Help, Locations, Ledger options | +0 a +100 | 0 |
+
+Causas, en orden de peso: (1) el cromo fijo se come ~230px antes del contenido (barra, banner de avisos, título); (2) el
+pie reservado al botón de Confibot suma 96–112px en toda pantalla; (3) listas y tablas que se muestran enteras en vez de
+scrollear adentro de su card (Notifications, Insurance, Billing).
+
+**Regla propuesta** (aplicada primero al Dashboard): en pantallas de consulta, desde 1280px, las columnas o cards toman el
+alto que queda y scrollean adentro (`Panel scroll` + `useAltoRestante`), con el título y los filtros en una sola fila;
+las pantallas de formulario o de lectura larga (Settings, Help, Notifications) no se fuerzan, pero sus listas largas
+scrollean adentro de la card. No se persigue "cero scroll" en tablet y celular. Orden sugerido: Patient Dashboard,
+Billing, Patients, Scheduling, Insurance/Ledger.
+
+## Auditoría UX en tablet (2026-10-20)
+
+Pedido de Julián: revisar que la app esté bien diagramada en tablet y corregir lo incoherente. Relevado con Playwright
+a 834×1194 (portrait) y 1194×834 (landscape, iPad Air) sobre las 16 rutas más dos drawers (New Patient, New
+Appointment): **0 desborde horizontal** en todas -el trabajo de `Responsive` de arriba sigue sosteniéndose-, pero
+apareció un problema real y repetido.
+
+**La pestaña "Currently being seen" (`PatientInSessionPopup`) tapaba contenido interactivo real.** Está fija al borde
+derecho de la ventana, centrada verticalmente, sin moverse con el scroll (a propósito: ver el historial en el
+componente). El contenedor de página mide `max-w-[1400px]`: en monitores de ≳1510px sobra un margen vacío ahí donde
+flota, pero de 640 a ~1500px -todo el rango tablet y buena parte del desktop angosto- el contenido llega hasta ese
+mismo borde, así que la pestaña (54px, opaca, con su propia sombra) quedaba encima de kebabs, badges y filas reales.
+Confirmado en ocho pantallas: Dashboard (Waiting Room), Patients (Today Appointments), Patient Dashboard
+(Appointments), Insurance (Cordination Order), Ledger (columnas Amount/Balance y "Export statement"), Settings →
+Locations (la última fila), Notifications y Help.
+
+De las salidas posibles -achicar la pestaña, mostrarla sólo con alguien en curso, o no tocar nada-, Julián eligió
+**reservar el margen**: igual que `main` ya reserva `pb-24 sm:pb-28` para que nada quede debajo del botón de Confibot,
+ahora suma `sm:pr-16` (64px, desde el mismo breakpoint que el resto del cromo) para que ningún panel o tabla llegue
+nunca hasta donde vive la pestaña. No se tocó `PatientInSessionPopup` ni su comportamiento. Verificado sin desborde y
+sin superposición en las ocho pantallas, a los dos anchos de tablet.
+
+**Seguimiento (2026-10-22): esos 64px quedaban de más y se veían como un padding roto.** Julián lo marcó con un
+screenshot de Patients en escritorio ancho (~1512px): a la derecha quedaba una franja vacía de punta a punta de la
+pantalla, mucho más ancha que cualquier otro margen de la app -highlight en la imagen desde el header hasta el pie,
+con sólo la pestaña y el FAB de Confibot adentro-. La causa: `sm:pr-16` se suma por encima del propio padding de
+`CONTENEDOR_PAGINA`/`ANCHO_PAGINA` (`px-6`/`px-8`, 24-32px) en vez de reemplazarlo, así que entre el contenido real y
+el borde de la ventana quedaban 88-96px en vez de los ~54-64px que la pestaña necesita. Primer intento: `sm:pr-10`
+(40px) -sumados a los 24-32px ya existentes da ~64-72px, así que seguía sin superposición, pero Julián lo vio
+igual como un padding aparte y mandó un mockup propio en Figma de cómo tiene que verse: el mismo padding que el
+resto de la página, sin hueco raro (2026-10-24). Bajado a `sm:pr-6` (24px) -el mismo valor que ya pone
+`CONTENEDOR_PAGINA`/`ANCHO_PAGINA` del otro lado del contenido-: sumado a esos 24-32px ya existentes sigue
+alcanzando para que los 54px de la pestaña no lleguen a tocar kebabs ni filas reales -reverificado con Playwright en
+los mismos ocho anchos de la auditoría de tablet más 1366, 1512, 1536 y 1920 de escritorio, mínimo 11px de aire en
+todos-, y ahora sí deja de notarse como una franja aparte.

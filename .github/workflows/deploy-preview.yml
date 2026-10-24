@@ -1,0 +1,46 @@
+name: Deploy preview
+
+# El link de prueba general: cada push a una rama que no sea main la publica en /prueba (app y Storybook), para ver
+# los cambios antes de "subilo". Muestra sólo la última rama subida. Ver CLAUDE.md.
+on:
+  push:
+    branches-ignore: [main, gh-pages]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prueba
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx vite build --base=/red-dental-studio/prueba/
+        env:
+          VITE_HASH_ROUTER: 'true'
+
+      - run: npm run ds:scan
+      - run: npx storybook build -o dist/storybook
+        env:
+          VITE_GEMINI_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      # Qué rama y commit muestra el link, para confirmarlo antes de pasarlo.
+      - run: echo "$GITHUB_REF_NAME $GITHUB_SHA" > dist/version.txt
+
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          destination_dir: prueba

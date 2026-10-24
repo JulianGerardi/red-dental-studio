@@ -31,6 +31,17 @@ export type ConsentProcedimiento = 'Signed' | 'Pending' | 'Not sent' | 'Expired'
 export type Cita = { fecha: string; hora: string; proveedor: string }
 export type Visita = { id: string; nombre: string; total: string; procedimientos: Procedimiento[]; cita?: Cita }
 
+/* Los procedimientos del caso que son procedimientos del paciente (VINCULOS_PROCEDIMIENTO en data/clinical-mode) llevan
+   su código, pieza y superficie: así la fila y su detalle dicen lo mismo. El resto queda como el frame. Ver
+   clinical-mode.md (2026-10-13). */
+const DEL_PACIENTE: Record<string, Partial<Procedimiento>> = {
+  c1v2p1: { codigo: 'D4341', nombre: 'Periodontal scaling and root planing – four or more teeth per quadrant', superficie: '-', pieza: '-', ubicacion: 'Upper Arch' },
+  c3v1p1: { codigo: 'D2391', nombre: 'Resin-based composite – one surface, posterior', superficie: 'O', pieza: '3', ubicacion: '-' },
+  c3v1p2: { codigo: 'D2392', nombre: 'Resin-based composite – two surfaces, posterior', superficie: 'O, D', pieza: '14', ubicacion: '-' },
+  c5v2p1: { codigo: 'D3330', nombre: 'Endodontic therapy, molar tooth', superficie: '-', pieza: '19', ubicacion: '-' },
+  c7v1p1: { codigo: 'D7140', nombre: 'Extraction – erupted tooth or exposed root (elevation and/or forceps removal)', superficie: '-', pieza: '16', ubicacion: '-' },
+}
+
 const proc = (id: string, estado: Procedimiento['estado'] = 'Planned', consentimiento?: ConsentProcedimiento): Procedimiento => ({
   id,
   fecha: '2025/01/24',
@@ -43,6 +54,7 @@ const proc = (id: string, estado: Procedimiento['estado'] = 'Planned', consentim
   fee: '$234',
   estado,
   consentimiento,
+  ...DEL_PACIENTE[id],
 })
 
 /* Los procedimientos de una visita, cada uno con el estado de su consentimiento. */
@@ -126,6 +138,9 @@ export const CASOS: Caso[] = [
     ],
   },
 ]
+
+/* El paciente del encabezado de Clinical Mode (ClinicalTopBar), para los diálogos que lo nombran. */
+export const PACIENTE = 'Julio Perez'
 
 /* DD/MM/YYYY a un número que ordena: el más nuevo, mayor. */
 export const ordenFecha = (fecha: string) => {
@@ -215,6 +230,32 @@ export const DIALOGOS = {
   },
 } as const
 export type ClaveDialogo = keyof typeof DIALOGOS
+
+/* Al cambiar el estado de un procedimiento (Complete en Treatment Plan, Start en Procedures): los textos del prototipo de
+   Julián "Consent modals revised" para CON-3927, CON-3946 y CON-3950. Ver clinical-mode.md (2026-10-17). */
+export const CONSENTIMIENTO_REQUERIDO = {
+  titulo: 'Consent required',
+  /* Sin documento, un borrador sin enviar o uno vencido: se manda (o se reusa el borrador) y el paciente firma después. */
+  'sin-enviar': {
+    texto: 'This procedure requires a consent document. Send it to the patient to sign later, or have it signed now.',
+    textoVarios: 'These procedures require a consent document. Send it to the patient to sign later, or have it signed now.',
+    accion: 'Send consent and sign later',
+  },
+  /* El documento ya se mandó y falta la firma: se sigue con la firma pendiente, sin mandar otro. */
+  pendiente: {
+    texto: 'A consent document already exists for this procedure. You can sign it now or continue with the signature pending.',
+    textoVarios: 'Consent documents already exist for these procedures. You can sign them now or continue with the signatures pending.',
+    accion: 'Continue without signed consent',
+  },
+  firmar: 'Sign now',
+  ver: 'View consent',
+  /* El caso todavía no se aceptó: no hay consentimiento que pedir, el procedimiento no se actualiza. */
+  noListo: {
+    titulo: 'Procedure cannot be updated',
+    texto: 'The treatment case must be Accepted and its treatment plan must be Accepted or In Progress.',
+    accion: 'View case',
+  },
+} as const
 
 export const OPCIONES_BORRAR_CASO = [
   {

@@ -19,6 +19,8 @@ con dropdown abierto `3605:56446`.
 **pitch de 50px** · icono 16px · **9 ítems**, incluido `CircleHelp` que faltaba ·
 Settings al pie. Se hizo `sticky` porque con la página larga quedaba en y=1390.
 
+> Actualizado el 2026-10-13: el rail pasa a **blanco** a pedido de Julián (ver *Menú en blanco*, al final).
+
 **Settings no cambia de lugar al colapsar (pedido de Julián).** Va al pie del
 rail en los dos estados, con el ícono a la misma altura: el ítem colapsado mide
 32 y el expandido 36, así que colapsado lleva 2px más de padding abajo. (Se
@@ -158,7 +160,109 @@ Treatments, sigue en 60px.
 
 ## Billing abre su menú flotante (2026-10-06)
 
+> Reemplazado el 2026-10-13: Billing vuelve a ser un link directo (ver *Billing sin menú* más abajo).
+
 Como Settings: al pasar el mouse por Billing (o con su flecha, expandido o en el celular) se abre al costado un menú
 con **Billing**, **Fee Schedules**, **Carriers** y **Coverage Table** (las tablas de Settings → Billing). Billing queda
 activo en `/billing` y en esas tres; Settings deja de marcarse ahí. `BillingItem` en `Sidebar.tsx`, con la lógica de
-abrir y cerrar compartida (`useFlotante`). Design system: *Elements / Navigation → Billing menu*.
+abrir y cerrar compartida (`useFlotante`). Design system: *Elements / Navigation → States → Billing menu*.
+
+## Menú expandido más angosto: 234 → 176px (2026-10-07)
+
+Pedido de Julián, con una captura y una línea negra marcando hasta dónde: con 234px el menú abierto le quitaba
+demasiado a la pantalla. La línea caía a ~178px reales (la captura venía escalada ×1,33: el bloque del logo, de 64px,
+medía 85); se tomó **176**. Entra todo sin cortar: "Confidentally", "Scheduling" y "Documents" son lo más largo, y los
+ítems quedan a 12px de cada borde (`mx-3`, de 12 a 164). Colapsado sigue en 58.
+
+**Sólo escritorio.** En el celular el menú es un panel encima del contenido y no le roba lugar a nadie, así que sigue
+en 234: ahí además el menú de Settings se despliega adentro, con sus sub-items.
+
+**Settings se salía del rail 12px.** Su ítem llevaba `w-full` además del `mx-3` de todos: medía el ancho entero del
+rail más el margen y se pasaba por la derecha (se ve en la captura de Julián, la barra azul cruza el borde). Se quitó el
+`w-full`; ahora va de 12 a 164 como el resto, en escritorio y en el celular.
+
+Verificado con Playwright en `/settings/consents` a 1500px: rail de 176, ningún ítem desborda, desborde horizontal 0,
+y los flotantes de Billing y Settings siguen saliendo al costado.
+
+**Navigation en Storybook, completa** (misma fecha). Con la regla nueva de documentar todo antes de subir, la página
+*Elements / Navigation* deja de ser una lista de historias y pasa a Playground (con *open* para tooltip y menús),
+Parts, States y Specs. Specs lee del rail dibujado: 176 y 58 de ancho, logo de 64, ítem expandido 152×36 con 12px de
+padding, colapsado 32×32. No lleva estado de foco: los ítems no tienen anillo propio (usan el del navegador) y el addon
+de pseudo-estados sólo fuerza reglas de CSS, así que la muestra salía igual al default.
+
+## Menú en blanco (2026-10-13)
+
+Pedido de Julián: "cambiar el color del menú a blanco". El fondo del rail pasa de `#fafafa` (`surface-subtle`, el del
+Figma) a **blanco**, en escritorio (58 y 176) y en el panel del celular. Es un desvío consciente del Figma.
+
+- **El bloque del logo sigue azul** (`dash-blue-hover`): es la marca y se alinea con el alto del header; el pedido es
+  por el fondo del menú, no por la marca.
+- **Sin borde nuevo.** Header y rail quedan blancos los dos y arman una "L" alrededor del contenido sobre
+  `page-background` (`#FAFBFE`), igual que el header, que tampoco lleva línea. Agregar una línea sería algo nuevo.
+- Hover (`black/5`), ítem activo, tooltip y menús flotantes no cambian; el texto `dash-muted` sobre blanco gana un poco
+  de contraste.
+- La interfaz de Storybook sigue con su riel en `#fafafa` (`.storybook/theme.ts`): es el menú del sitio de
+  documentación, no el de la app.
+
+Verificado con Playwright en `/`, `/scheduling` y `/patients` a 1440, 820 y 390px: el `aside` da `rgb(255, 255, 255)`
+en todos. Design system: *Elements / Navigation → Specs → Colors* (Rail → `white`).
+
+## El banner de punta a punta (2026-10-13)
+
+Julián, con una captura: el banner amarillo va **de punta a punta del contenido de la página** (alineado con el título
+y con las cards de abajo), no del ancho de su texto como se había elegido el 2026-10-06. Adentro, la tarea, *Review* y
+el paginador siguen juntos a la izquierda y la **X va sola en el extremo derecho** (`ml-auto`). Es el mismo componente
+en todas las pantallas (`NotificationBanner` en `AppShell`), así que cambia en toda la app. Verificado: en
+Notifications y en el Dashboard el banner mide lo mismo que la lista y el título (1334px a 1440).
+
+Desde que Notifications no tiene *Pending* ni *Archived* (`notifications.md`, 2026-10-13), el banner muestra las
+**tareas sin leer** no ocultas con la X.
+
+## El banner sin margen arriba ni a los costados, ni tope de ancho (2026-10-19)
+
+Pedido de Julián: el banner amarillo va con **0 padding arriba y a los costados** (antes `px-4 pt-4 sm:px-6`), pegado
+al header y a los bordes del contenido de la página. Primer intento: sólo saqué el padding pero dejé `ANCHO_PAGINA`
+(`max-w-[1400px] 2xl:max-w-[1800px]`), así que en pantallas muy anchas seguía recortado y centrado, con aire a los
+costados — Julián mandó una captura propia mostrándolo de punta a punta de verdad. Ajustado: el componente ya no usa
+`ANCHO_PAGINA`, mide el 100% de la columna de contenido (la sidebar aparte), no el ancho acotado que usa el título y
+las cards de abajo.
+
+## El banner sin esquinas redondeadas, y colapsable (2026-10-20)
+
+Dos pedidos de Julián sobre el mismo aviso:
+
+- **Sin esquinas redondeadas.** Con el banner ya de punta a punta y sin padding (2026-10-19), el `rounded-lg` quedaba
+  fuera de lugar: se saca, 0px en las cuatro esquinas.
+- **Colapsable**, con una flecha que lo deja escondido pero visible para volver a abrirlo. Es distinto de la X que ya
+  existe: la X oculta **esa tarea puntual** del banner (la tarea sigue sin leer en la campana); la flecha nueva
+  colapsa **el aviso entero**, sea cual sea la tarea que esté mostrando. Colapsado queda una tira angosta de punta a
+  punta, con el total ("4 pending tasks") y una flecha hacia abajo para reabrirlo; al reabrir vuelve mostrando la
+  misma tarea en la que estaba.
+  - `ChevronUp` junto a la X, en el extremo derecho del aviso abierto; `ChevronDown` en la tira cerrada.
+  - Estado local (`useState` en `NotificationBanner`): no se guarda entre sesiones ni recarga de página, a diferencia
+    de ocultar una tarea con la X (que sí persiste en `notificacionesStore`). **A validar con Julián/usuarios:**
+    si conviene que el colapso también persista (localStorage o el store), y qué pasa si llega una tarea nueva
+    estando colapsado -por ahora, nada: el total de la tira se actualiza solo, sin reabrirse solo-.
+
+## El borde sólo abajo (2026-10-20)
+
+Pedido de Julián: el `border` de las cuatro caras pasa a `border-b` (ya era así en la tira colapsada). Con el aviso
+pegado al header, al rail y al borde de la ventana, esas tres caras ya quedan delimitadas por lo que tienen al lado;
+sólo la de abajo, contra `page-background`, necesita la línea.
+
+## Billing sin menú: las tablas viven sólo en Settings (2026-10-13)
+
+Pedido de Julián, con una captura del menú de Billing marcando en amarillo Fee Schedules, Carriers y Coverage Table:
+"no irían, solo queda Billing; eso va solamente en Settings". Son la configuración que alimenta Billing (aranceles,
+aseguradoras y coberturas): se arman una vez y las toca administración, no recepción en el día a día, así que su lugar
+es Settings → Billing, donde ya estaban.
+
+**Sin menú, no un menú de un solo ítem.** Con sólo "Billing" el flotante repetía el destino del propio ícono: un paso
+y una flecha de más para llegar al mismo lugar. Billing pasa a ser un ítem como Patients o Scheduling: link directo,
+con tooltip cuando el rail está colapsado. Se borran `BillingItem` y `billingMenu` (`navigation-preview.ts`).
+
+**El azul sigue a Settings.** En `/settings/finance/*` el ítem activo vuelve a ser Settings (antes se marcaba Billing),
+y su menú abre Billing desplegado con la tabla actual en azul. Billing se marca sólo en `/billing`.
+
+Design system: *Elements / Navigation → States* reemplaza *Billing menu* por *Billing* (link directo) y suma *Settings
+menu · Billing tables*; el Playground ya no ofrece *billing menu* en *open*.

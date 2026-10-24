@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CreditCard, MoveHorizontal } from 'lucide-react'
+import { MoveHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ColumnPicker } from './ColumnPicker'
 import { moneda, fechaCorta, type Movimiento } from '@/data/ledger'
@@ -7,6 +7,7 @@ import { Pagination } from '@/components/patients/ledger/Pagination'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
 import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip } from '@/components/patients/ledger/LedgerRowDetail'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { RowChevron } from '@/components/ui/data-table'
 
 /* Figma 4582:29618 / 4582:30251. Ver design-reference/figma/modulos/ledger.md. */
 function coberturaSeguro(codigo: string) {
@@ -37,7 +38,7 @@ const PADDING_FILA = 24
 
 const ANCHO_BASE: Record<ColId, number> = {
   fecha: 76, paciente: 76, provider: 72, diente: 40, superficie: 48, codigo: 52,
-  desc: 88, charge: 64, otroCredito: 68, guarEstimado: 76, applied: 72, balance: 64,
+  desc: 88, charge: 64, otroCredito: 78, guarEstimado: 76, applied: 72, balance: 64,
 }
 
 /* Piso de cada columna, para que las 12 entren aun con el menú lateral y el
@@ -92,7 +93,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
     { id: 'codigo', label: 'Code', px: 52, claseCelda: 'text-dash-blue font-medium', celda: (m) => m.codigo },
     { id: 'desc', label: 'Description', px: 88, elastica: true, claseCelda: 'truncate text-ink', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
     { id: 'charge', label: 'Charge', px: 64, derecha: true, claseCelda: 'font-medium tabular-nums text-ink', celda: (m) => moneda(m.monto) },
-    { id: 'otroCredito', label: 'Other Credit', px: 68, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * coberturaSeguro(m.codigo)) },
+    { id: 'otroCredito', label: 'Other Credit', px: 78, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * coberturaSeguro(m.codigo)) },
     { id: 'guarEstimado', label: 'Guar Estimate', px: 76, derecha: true, claseCelda: 'tabular-nums', celda: (m) => moneda(m.monto * (1 - coberturaSeguro(m.codigo))) },
     {
       id: 'applied', label: 'Applied', px: 72, bloqueada: true,
@@ -115,9 +116,10 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
     { id: 'balance', label: 'Balance', px: 64, derecha: true, claseCelda: 'font-semibold tabular-nums text-ink', bloqueada: true, celda: (m, ap) => moneda(Math.max(m.monto - ap, 0)) },
   ]
   const columnasVisibles = columnas.filter((c) => !ocultas.includes(c.id))
+  /* + la flecha de la fila (16 y su gap). */
   const anchoMinimo = columnasVisibles.reduce(
     (a, c) => a + (anchos.manual(c.id) ?? ANCHO_MINIMO[c.id]), 0,
-  ) + (columnasVisibles.length - 1) * GAP + PADDING_FILA
+  ) + columnasVisibles.length * GAP + 16 + PADDING_FILA
 
   /* Una columna movida a mano se queda donde la dejaron: no encoge ni
      crece. El resto cede hasta su piso para que las 12 entren enteras.
@@ -142,9 +144,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   return (
     <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
-          <CreditCard className="size-4" /> Ledger Transactions
-        </h2>
+        <h2 className="text-sm font-bold text-ink">Ledger Transactions</h2>
         <div className="flex flex-wrap items-center gap-2">
           {cargos.length > 0 && (
             <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
@@ -166,6 +166,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
           <div ref={refVisible} data-tabla-scroll className="mt-3 w-full overflow-x-auto rounded-md border border-line-row">
             <div style={{ minWidth: anchoMinimo }}>
               <div data-tabla-header className="group/fila flex items-center gap-1.5 bg-surface-alt px-3 py-2.5 text-[11px] font-semibold text-ink-muted">
+                <span className="w-4 shrink-0" aria-hidden />
                 {columnasVisibles.map((c, i) => (
                   <span
                     key={c.id}
@@ -204,6 +205,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                         abierta && 'bg-surface-subtle',
                       )}
                     >
+                      <RowChevron open={abierta} />
                       {columnasVisibles.map((c) => (
                         <span
                           key={c.id}
@@ -215,7 +217,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                       ))}
                     </div>
                     </FilaConTooltip>
-                    {abierta && <LedgerRowDetail m={m} onVerTodo={() => setEnModal(m)} />}
+                    {abierta && <LedgerRowDetail m={m} onVerTodo={() => setEnModal(m)} sangria={PADDING_FILA / 2 + 16 + GAP} />}
                   </div>
                 )
               })}

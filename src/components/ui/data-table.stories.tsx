@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Pencil, Plus, Trash2, Users } from 'lucide-react'
-import { AmountCell, DataTable, PersonCell, TextCell, type DataTableColumn } from './data-table'
+import { AmountCell, DataTable, PersonCell, RowChevron, TextCell, type DataTableColumn } from './data-table'
 import { Button } from './button'
 import { DropdownMenuItem } from './dropdown-menu'
 import { Pill, type PillTone } from './pill'
-import { Bloque, Lienzo, Tabla, Token } from '@/design-system/kit'
+import { Bloque, Lienzo, Muestra, Tabla, Token } from '@/design-system/kit'
 
 /* ── Datos de ejemplo ─────────────────────────────────────────────────────── */
 type Paciente = { id: string; nombre: string; iniciales: string; email: string; nacimiento: string; provider: string; estado: 'Active' | 'Inactive' | 'Pending'; saldo: number; visita: string }
@@ -93,7 +93,7 @@ const meta = {
     filter: { control: 'boolean', description: 'Embudo para filtrar por estado.', table: { category: 'Reduce, resize and filter' } },
     columnPicker: { control: 'boolean', description: 'Botón Columns para ocultar columnas. Full name no se puede ocultar.', table: { category: 'Reduce, resize and filter' } },
     resizable: { control: 'boolean', description: 'Arrastrá el borde de una columna para achicarla o ensancharla. Doble clic la devuelve a su ancho.', table: { category: 'Reduce, resize and filter' } },
-    expandable: { control: 'boolean', description: 'Clic en la fila despliega el detalle, con Expand / Collapse all.', table: { category: 'Reduce, resize and filter' } },
+    expandable: { control: 'boolean', description: 'Clic en la fila despliega el detalle: flecha al inicio y Expand / Collapse all.', table: { category: 'Reduce, resize and filter' } },
     reorderable: { control: 'boolean', description: 'Manija para reordenar filas arrastrando (o con ↑ ↓), como los planes de Insurance.' },
     selectable: { control: 'boolean', description: 'Casilla por fila y "seleccionar todo".' },
     rowActions: { control: 'boolean', description: 'Menú ⋮ con Edit y Delete en cada fila.' },
@@ -110,7 +110,12 @@ const meta = {
 export default meta
 type Story = StoryObj<Args>
 
-const FILTRO_ESTADO = { label: 'Filter by status', options: ['Active', 'Inactive', 'Pending'], match: (p: Paciente, sel: string[]) => sel.includes(p.estado) }
+/* Cada opción con su cantidad y el punto del color de su pill, como el filtro de Lab Order. */
+const filtroEstado = (filas: Paciente[]) => ({
+  label: 'Filter by status',
+  options: (['Active', 'Inactive', 'Pending'] as const).map((e) => ({ value: e, count: filas.filter((p) => p.estado === e).length, tone: TONO[e] })),
+  match: (p: Paciente, sel: string[]) => sel.includes(p.estado),
+})
 const BUSQUEDA = { placeholder: 'Search patients', match: (p: Paciente, q: string) => `${p.nombre} ${p.email}`.toLowerCase().includes(q.toLowerCase()) }
 
 function Detalle({ p }: { p: Paciente }) {
@@ -146,7 +151,7 @@ function Armada({ columns, rows, search, filter, columnPicker, resizable, expand
         rowKey={(p) => p.id}
         rowLabel={(p) => p.nombre}
         search={search ? BUSQUEDA : undefined}
-        filter={filter ? FILTRO_ESTADO : undefined}
+        filter={filter ? filtroEstado(orden.slice(0, rows)) : undefined}
         columnPicker={columnPicker}
         resizable={resizable}
         rowDetail={expandable ? (p) => <Detalle p={p} /> : undefined}
@@ -234,7 +239,7 @@ const PASOS: { titulo: string; texto: string; codigo: string }[] = [
     codigo: `<DataTable
   columns={columns} rows={patients} rowKey={(p) => p.id}
   search={{ placeholder: 'Search patients', match: (p, q) => p.name.toLowerCase().includes(q.toLowerCase()) }}
-  filter={{ label: 'Filter by status', options: ['Active', 'Inactive'], match: (p, sel) => sel.includes(p.status) }}
+  filter={{ label: 'Filter by status', options: [{ value: 'Active', count: 12, tone: 'success' }, 'Inactive'], match: (p, sel) => sel.includes(p.status) }}
   columnPicker
   resizable
   rowDetail={(p) => <PatientSummary patient={p} />}
@@ -293,8 +298,26 @@ export const States: Story = {
       <Bloque titulo="Compact" nota="44px por fila, para listas largas dentro de un panel.">
         <Armada {...BASE} rows={4} density="compact" />
       </Bloque>
+      <Bloque titulo="Expanded row" nota="defaultExpanded: la fila arranca desplegada y la tabla abre en su página (Clinical Mode lo usa al saltar de una pestaña a la otra). Con una fila abierta aparecen Collapse all y Expand all.">
+        <ConDetalleAbierto />
+      </Bloque>
     </Lienzo>
   ),
+}
+
+/* Una fila desplegada desde el principio, en la segunda página. */
+function ConDetalleAbierto() {
+  return (
+    <DataTable
+      columns={[COLUMNAS.Name!, COLUMNAS.Email!, COLUMNAS.Status!]}
+      rows={PACIENTES.slice(0, 8)}
+      rowKey={(p) => p.id}
+      rowDetail={(p) => <Detalle p={p} />}
+      defaultExpanded={['p-7']}
+      pageSize={5}
+      itemLabel="patients"
+    />
+  )
 }
 
 /* Búsqueda sin resultados: la tabla con el buscador ya cargado. */
@@ -320,17 +343,37 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Header row</td><td className="tabular-nums">44px</td><td><Token nombre="surface-alt" /></td><td><Token nombre="ink-muted" /> 11px Semibold</td><td>—</td></tr>
           <tr><td className="font-semibold">Row</td><td className="tabular-nums">56px · 44px compact (grows if a cell has two lines)</td><td><Token nombre="white" /></td><td><Token nombre="ink-soft" /> 13px</td><td><Token nombre="line-row" /></td></tr>
           <tr><td className="font-semibold">Selected row</td><td>—</td><td><Token nombre="dash-count-bg" /></td><td>—</td><td>—</td></tr>
+          <tr><td className="font-semibold">Row chevron</td><td className="tabular-nums">16px icon, first column</td><td>—</td><td><Token nombre="ink-faint" /> · turns 90° open</td><td>—</td></tr>
+          <tr><td className="font-semibold">Open row detail</td><td>—</td><td><Token nombre="surface-subtle" /></td><td><Token nombre="ink-soft" /> 13px · starts at the first column (44px)</td><td><Token nombre="line-soft" /></td></tr>
           <tr><td className="font-semibold">Footer</td><td className="tabular-nums">52px</td><td><Token nombre="white" /></td><td><Token nombre="ink-muted" /> 12px Semibold</td><td><Token nombre="line-row" /></td></tr>
         </Tabla>
+      </Bloque>
+      <Bloque titulo="Row chevron" nota="RowChevron, la flecha de la fila que se despliega. La usan DataTable (rowDetail), el Ledger, Ledger Transactions de los pagos y la tabla de Treatment Plan: misma pieza en todas.">
+        <div className="flex flex-wrap gap-8">
+          <Muestra titulo="Closed" nota="Apunta a la derecha."><span className="flex h-10 items-center"><RowChevron open={false} /></span></Muestra>
+          <Muestra titulo="Open" nota="Gira 90° y apunta al detalle."><span className="flex h-10 items-center"><RowChevron open /></span></Muestra>
+        </div>
       </Bloque>
       <Bloque titulo="Rules">
         <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-ink-medium">
           <li>One column stretches (the one without a width); the rest have a fixed width so header and rows line up.</li>
           <li>Amounts align right with tabular numbers; text that does not fit ends in “…” and shows in full on hover.</li>
-          <li>If the columns do not fit, the table scrolls inside its box: the page never scrolls sideways.</li>
+          <li>A row that unfolds a detail always starts with the chevron (<code>RowChevron</code>), in every table: DataTable, Ledger, Ledger Transactions of a payment and Treatment Plan. A row that navigates or opens a drawer does not carry it.</li>
+          <li>If the columns do not fit, the table scrolls inside its box: the page never scrolls sideways. An open row detail stays in the visible part while the table scrolls.</li>
           <li>Above the table, never inside it: search and filter on the left; Columns and the main action on the right.</li>
+          <li>Filter options can carry the count and the color dot of their pill (<code>FilterOption</code>), as in Lab Order.</li>
           <li>Turn on Columns and resizable columns when the table has more columns than fit; search and filter when it has more rows than one page.</li>
         </ul>
+      </Bloque>
+      <Bloque titulo="Pattern for every table" nota="Julián, 2026-10-09. La guía son Locations, Employees y Patients. Las tablas propias (role=table: el editor de un fee schedule, los rangos de una coverage table, las de los drawers) usan las mismas clases de lib/estilos.ts.">
+        <Tabla encabezado={['Piece', 'Rule', 'Class']} minimo={760}>
+          <tr><td className="font-semibold">Header</td><td>Banda <Token nombre="surface-alt" />, 11px Semibold <Token nombre="ink-muted" /></td><td className="font-mono text-xs">TABLA_ENCABEZADO</td></tr>
+          <tr><td className="font-semibold">Cell</td><td>13px Regular <Token nombre="ink-soft" />, también códigos, montos y descripciones: nada en negrita, negro ni gris claro</td><td className="font-mono text-xs">TABLA_TEXTO · TABLA_FILA</td></tr>
+          <tr><td className="font-semibold">Link</td><td>Sólo lo que navega: <Token nombre="dash-blue" /> Semibold, subrayado al pasar el mouse (el nombre que abre la ficha)</td><td className="font-mono text-xs">TABLA_LINK · PersonCell</td></tr>
+          <tr><td className="font-semibold">Box</td><td>Borde <Token nombre="line-row" />, radius 8px, línea entre filas. No recorta (sin overflow-hidden): un select de una celda se abre por encima</td><td className="font-mono text-xs">TABLA_MARCO</td></tr>
+          <tr><td className="font-semibold">Row that unfolds</td><td>Flecha al inicio que gira al abrir, clic en toda la fila, <i>Collapse all / Expand all</i> desde que hay una abierta y el detalle alineado con la primera columna. Igual en todas las tablas (Julián, 2026-10-18)</td><td className="font-mono text-xs">rowDetail · RowChevron</td></tr>
+          <tr><td className="font-semibold">Exceptions</td><td>El color semántico de un dato (crédito en verde, vencido en rojo) y las pills de estado</td><td>—</td></tr>
+        </Tabla>
       </Bloque>
     </Lienzo>
   ),

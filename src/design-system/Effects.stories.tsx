@@ -15,9 +15,9 @@ export const Efectos: Story = {
   name: 'Radius and shadows',
   render: () => (
     <Page titulo="Radius and shadows" bajada="Los tokens del sistema y lo que el código escribe a mano.">
-      <Seccion titulo="Radio (tokens)" nota="Salen de --radius en src/index.css.">
+      <Seccion titulo="Radio (tokens)" nota="Salen de --radius en src/index.css. avatar es un porcentaje (27%): la esquina crece con el tamaño (Elements / Avatars).">
         <div className="flex flex-wrap gap-4">
-          {['sm', 'md', 'lg', 'xl', '2xl'].map((r) => (
+          {['sm', 'md', 'lg', 'xl', '2xl', 'avatar'].map((r) => (
             <div key={r} className="flex flex-col items-center gap-2">
               <div className={`size-16 border border-line bg-surface-subtle rounded-${r}`} />
               <Codigo>rounded-{r}</Codigo>

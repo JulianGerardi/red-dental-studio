@@ -1,7 +1,7 @@
 import { PageTitle } from '@/components/ui/page-title'
-import { TextField, SelectField, OptionCheckbox, FormFooter, ModalShell } from '@/components/patients/form'
-import { DrawerActions, DrawerSection, useEnDrawer } from '@/components/ui/drawer'
-import { useState } from 'react'
+import { TextField, SelectField, OptionCheckbox, FormFooter } from '@/components/patients/form'
+import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
+import { DrawerSection, useEnDrawer } from '@/components/ui/drawer'
 import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
@@ -21,28 +21,23 @@ export function Section({ title, children }: { title: string; children: React.Re
   )
 }
 
-/* El cuerpo es el mismo en la página y en el drawer que abre el lápiz de "General" en el dashboard del paciente. En el
-   drawer va por pasos (`paso`): se ve una sección y las otras quedan escondidas, sin perder lo escrito. */
-export const PASOS_EDIT_PATIENT = ['General', 'Demography', 'Address'] as const
-
-export function EditPatientForm({ paso }: { paso?: number }) {
-  const ver = (i: number) => paso === undefined || paso === i
+/* El cuerpo de la página completa (Figma 3640:72713). El drawer de Edit Patient que abre el menú de la tabla es otro
+   formulario, con pestañas: ver EditPatientModal (Figma 5277:123056). */
+export function EditPatientForm() {
   return (
     <div className="flex flex-col gap-6">
-        <div hidden={!ver(0)}>
-        <Section title="General Information">
-          <div className="grid gap-6 md:grid-cols-2">
-            <TextField label="First Name" required placeholder="John" />
-            <TextField label="Middle Name" placeholder="Lorem" />
-            <TextField label="Last Name" required placeholder="Smith" />
-            <TextField label="Preferred Name" placeholder="Johnny" />
-          </div>
+      <Section title="General Information">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField label="First Name" required placeholder="John" />
+          <TextField label="Middle Name" placeholder="Lorem" />
+          <TextField label="Last Name" required placeholder="Smith" />
+          <TextField label="Preferred Name" placeholder="Johnny" />
           <TextField label="Email" placeholder="john.smith@hotmail.com" />
-        </Section>
         </div>
+      </Section>
 
-        <div hidden={!ver(1)}>
-        <Section title="Demography Information">
+      <Section title="Demography Information">
+        <div className="grid gap-4 sm:grid-cols-2">
           <SelectField label="Gender" required />
           <SelectField label="Race" />
           <SelectField label="Ethnicity" />
@@ -50,52 +45,28 @@ export function EditPatientForm({ paso }: { paso?: number }) {
           <SelectField label="Nationality" />
           <SelectField label="Language" />
           <SelectField label="Religion" />
-          <OptionCheckbox label="Interpreter Required" />
-        </Section>
         </div>
+        <OptionCheckbox label="Interpreter Required" />
+      </Section>
 
-        <div hidden={!ver(2)}>
-        <Section title="Address Information">
-          <div className="grid gap-6 md:grid-cols-2">
-            <TextField label="Address Line 1" placeholder="Street and number" />
-            <TextField label="Address Line 2" placeholder="Apartment, suite, etc." />
-            <SelectField label="Country" required />
-            <SelectField label="State" required />
-            <TextField label="City" required placeholder="City" />
-            <TextField label="ZIP Code" placeholder="00000" />
-          </div>
-        </Section>
+      <Section title="Address Information">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField label="Address Line 1" placeholder="Street and number" />
+          <TextField label="Address Line 2" placeholder="Apartment, suite, etc." />
+          <SelectField label="Country" required />
+          <SelectField label="State" required />
+          <TextField label="City" required placeholder="City" />
+          <TextField label="ZIP Code" placeholder="00000" />
         </div>
-
+      </Section>
     </div>
-  )
-}
-
-export function EditPatientModal({ onClose }: { onClose: () => void }) {
-  const [paso, setPaso] = useState(0)
-  return (
-    <ModalShell
-      title="Edit Patient"
-      description="General, demography and address"
-      onClose={onClose}
-      width="max-w-[560px]"
-      steps={PASOS_EDIT_PATIENT}
-      step={paso}
-      actions={(
-        <DrawerActions
-          step={paso} total={PASOS_EDIT_PATIENT.length} onNext={() => setPaso((n) => n + 1)} onBack={() => setPaso((n) => n - 1)}
-          onCancel={onClose} onSave={() => { aviso.ok('Patient details saved.'); onClose() }}
-        />
-      )}
-    >
-      <EditPatientForm paso={paso} />
-    </ModalShell>
   )
 }
 
 export default function EditPatientPage() {
   return (
     <div className={CONTENEDOR_PAGINA}>
+      <PatientBreadcrumb name="John Smith" section="Edit Patient" />
       <div className="flex flex-col gap-[15px]">
         <PageTitle>Edit Patient</PageTitle>
       </div>

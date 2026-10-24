@@ -13,10 +13,11 @@ import { ClinicalBadge, type TipoBadge } from '@/components/clinical/ClinicalBad
 import { useWorkflows } from '@/components/clinical/WorkflowsContext'
 import { WORKFLOWS, WORKFLOW_DEL_BADGE, contestada, preguntasVisibles, textoRespuesta, type ProgresoWorkflow } from '@/data/workflows'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
 import { ClinicalItemModal } from '@/components/patients/ClinicalItemModal'
 import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clinicalItems'
+import { Avatar } from '@/components/ui/avatar'
 
 const ICONO_CONTADOR = { link: Link2, signos: Activity, personas: Users, info: Info }
 
@@ -65,7 +66,7 @@ export function Flotante({
       role="dialog"
       aria-label={titulo}
       style={{ left, top: ancla.bottom + 6, width: ancho }}
-      className="motion-safe:animate-[loc-in_120ms_ease-out] fixed z-50 rounded-lg border border-line bg-white p-3 shadow-[0_12px_32px_rgb(0_0_0/0.18)]"
+      className="motion-safe:animate-[loc-in_120ms_ease-out] fixed z-50 rounded-lg border border-line bg-white p-3 shadow-floating"
     >
       <p className="text-[13px] font-bold text-ink">{titulo}</p>
       {children}
@@ -128,22 +129,21 @@ export function ResumenWorkflow({ k, progreso, onAbrir }: { k: TipoBadge; progre
   )
 }
 
-/* Figma 4540:27072: al cerrar el encuentro se ofrece firmar la Clinical Note ahora o más tarde. */
+/* Figma 4540:27072: al cerrar el encuentro se ofrece firmar la Clinical Note ahora o más tarde. Con ui/confirm-dialog
+   como el resto de la app (antes rearmaba Dialog a mano, clinical-mode.md 2026-10-19); cerrarlo con Esc o el fondo
+   cuenta como Remind me later, igual que en cualquier otro ConfirmDialog. */
 export function ClinicalNoteDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  if (!open) return null
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent showCloseButton={false} className="gap-0 p-6 sm:max-w-[440px]">
-        <DialogTitle className="text-[18px] font-semibold text-ink">Clinical Note</DialogTitle>
-        <DialogDescription className="mt-3 text-[13px] leading-relaxed text-ink-muted">
-          The clinical encounter has been completed.<br />
-          You can sign the Clinical Note now or defer the signature and complete it later.
-        </DialogDescription>
-        <div className="mt-6 flex flex-wrap justify-end gap-2">
-          <Button variant="secondary" onClick={() => { onClose(); aviso.info('We will remind you to sign the Clinical Note.') }}>Remind me later</Button>
-          <Button onClick={() => { onClose(); aviso.ok('Clinical Note signed.') }}>Review and sign</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <ConfirmDialog
+      title="Clinical Note"
+      confirmLabel="Review and sign"
+      cancelLabel="Remind me later"
+      onCancel={() => { onClose(); aviso.info('We will remind you to sign the Clinical Note.') }}
+      onConfirm={() => { onClose(); aviso.ok('Clinical Note signed.') }}
+    >
+      <p>The clinical encounter has been completed.<br />You can sign the Clinical Note now or defer the signature and complete it later.</p>
+    </ConfirmDialog>
   )
 }
 
@@ -350,9 +350,7 @@ export function ClinicalTopBar({
 
       {/* "user-info-bar": avatar de 23.71 y el nombre en 11.95/600. */}
       <span className="flex shrink-0 items-center gap-[3.19px]">
-        <span className="bg-dash-count-bg text-dash-blue-hover flex size-[23.71px] items-center justify-center rounded-full text-[10px] font-semibold">
-          JP
-        </span>
+        <Avatar initials="JP" size={24} />
         <span className="text-[11.95px] leading-[14px] font-semibold whitespace-nowrap text-[#18181B]">
           Julio Perez
         </span>
@@ -386,7 +384,7 @@ export function ClinicalTopBar({
       </span>
 
       {abierto && (
-        <div className="absolute top-full right-0 z-40 mt-1 w-[220px] rounded-lg border border-line bg-white p-1 shadow-[0_12px_32px_rgb(0_0_0/0.18)]">
+        <div className="absolute top-full right-0 z-40 mt-1 w-[220px] rounded-lg border border-line bg-white p-1 shadow-floating">
           {['End encounter', 'Discard encounter', 'Encounter settings'].map((t) => (
             <button
               key={t}

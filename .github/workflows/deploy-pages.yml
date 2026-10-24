@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: produccion
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -37,6 +41,11 @@ jobs:
       - run: npx storybook build -o dist/storybook
         env:
           VITE_GEMINI_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      # El commit publicado, para confirmar el deploy; y el link de prueba (/prueba, de deploy-preview.yml), que
+      # publicar main borraría.
+      - run: echo "main $GITHUB_SHA" > dist/version.txt
+      - run: git fetch --depth=1 origin gh-pages && git archive --format=tar FETCH_HEAD prueba | tar -x -C dist || true
 
       - uses: peaceiris/actions-gh-pages@v4
         with:

@@ -136,3 +136,31 @@ export function Forzar({ selector, estado, children, className }: { selector: st
   })
   return <div ref={ref} className={className}>{children}</div>
 }
+
+/* Una muestra de un estado: título y nota arriba, la pieza abajo, al ancho que tiene en la pantalla. */
+export function Muestra({ titulo, nota, ancho, children }: { titulo: string; nota?: ReactNode; ancho?: number; children: ReactNode }) {
+  return (
+    <figure className="m-0 flex max-w-full flex-col gap-2" style={ancho ? { width: ancho } : undefined}>
+      <figcaption className="flex flex-col gap-0.5">
+        <span className="text-[12.5px] font-semibold text-ink">{titulo}</span>
+        {nota && <span className="text-[11.5px] leading-snug text-ink-muted">{nota}</span>}
+      </figcaption>
+      {children}
+    </figure>
+  )
+}
+
+/* Tabla "Part · What it does · Component" de la sección Parts. */
+export function TablaPartes({ partes }: { partes: [string, string, string][] }) {
+  return (
+    <Tabla encabezado={['Part', 'What it does', 'Component']} minimo={640} arriba>
+      {partes.map(([parte, que, componente]) => (
+        <tr key={parte}>
+          <td className="font-semibold whitespace-nowrap">{parte}</td>
+          <td className="text-ink-medium">{que}</td>
+          <td className="font-mono text-[12px] text-ink-muted">{componente}</td>
+        </tr>
+      ))}
+    </Tabla>
+  )
+}

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Drawer, DrawerSection, useEnDrawer, type DrawerSize } from '@/components/ui/drawer'
-import { ChevronDown, Calendar, Check, Search } from 'lucide-react'
+import { ChevronDown, Calendar, Check, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
+import { Avatar, inicialesDe } from '@/components/ui/avatar'
 
 /* Primitivos de los formularios de Patients (Figma 3640:73356 y hermanos).
    Campo = label 12px + control de 36px, alto total 56 con gap.
@@ -33,7 +34,7 @@ export function FieldHint({ children }: { children?: React.ReactNode }) {
 
 /* Aspecto común de los controles: borde gris, foco azul, error rojo y
    deshabilitado gris. Lo usan todos los campos de este archivo. */
-const control = (error?: string) =>
+export const control = (error?: string) =>
   cn(
     'w-full rounded-md border bg-white text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none',
     'disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-ink-faint disabled:shadow-none',
@@ -43,9 +44,11 @@ const control = (error?: string) =>
 const pie = (error?: string, hint?: React.ReactNode) => (error ? <FieldError>{error}</FieldError> : <FieldHint>{hint}</FieldHint>)
 
 export function TextField({
-  label, placeholder, required, className, value, onChange, error, hint, disabled,
+  label, placeholder, required, className, value, onChange, error, hint, disabled, hideLabel,
 }: {
   label: string
+  /** Rótulo sólo para lectores de pantalla: el campo va en una celda de tabla con su encabezado arriba. */
+  hideLabel?: boolean
   placeholder?: string
   required?: boolean
   className?: string
@@ -59,7 +62,7 @@ export function TextField({
 }) {
   return (
     <label className={cn('flex flex-col gap-2', className)}>
-      <FieldLabel required={required}>{label}</FieldLabel>
+      {hideLabel ? <span className="sr-only">{label}</span> : <FieldLabel required={required}>{label}</FieldLabel>}
       <input
         aria-invalid={!!error || undefined}
         placeholder={placeholder}
@@ -97,9 +100,11 @@ const OPCIONES_GENERICAS = ['Option A', 'Option B', 'Option C']
 
 export function SelectField({
   label, placeholder = 'Select', required, className, options,
-  value: valueProp, onChange, error, hint, disabled,
+  value: valueProp, onChange, error, hint, disabled, hideLabel,
 }: {
   label: string
+  /** Rótulo sólo para lectores de pantalla (el botón lo lleva como aria-label): para una celda de tabla. */
+  hideLabel?: boolean
   placeholder?: string
   required?: boolean
   className?: string
@@ -135,12 +140,13 @@ export function SelectField({
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
-      <FieldLabel required={required}>{label}</FieldLabel>
+      {!hideLabel && <FieldLabel required={required}>{label}</FieldLabel>}
       <div ref={ref} className="relative">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
+          aria-label={hideLabel ? label : undefined}
           aria-invalid={!!error || undefined}
           disabled={disabled}
           className={cn(
@@ -178,7 +184,7 @@ export function SelectField({
 }
 
 export function DateField({
-  label, required, className, onChange, error, placeholder = 'Pick a date',
+  label, required, className, onChange, error, placeholder = 'Pick a date', valorInicial,
 }: {
   label: string
   required?: boolean
@@ -186,8 +192,13 @@ export function DateField({
   onChange?: (texto: string) => void
   error?: string
   placeholder?: string
+  /** Una fecha ya cargada, como la devuelve onChange ("April 2, 2025"): Edit Patient abre con el nacimiento puesto. */
+  valorInicial?: string
 }) {
-  const [value, setValueRaw] = useState<Date | null>(null)
+  const [value, setValueRaw] = useState<Date | null>(() => {
+    const f = valorInicial ? new Date(valorInicial) : null
+    return f && !Number.isNaN(f.getTime()) ? f : null
+  })
   const setValue = (d: Date | null) => {
     setValueRaw(d)
     if (d && onChange) onChange(d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }))
@@ -196,7 +207,7 @@ export function DateField({
     <div className={cn('flex flex-col gap-2', className)}>
       <FieldLabel required={required}>{label}</FieldLabel>
       {value ? (
-        <DatePicker value={value} onChange={setValue} />
+        <DatePicker value={value} onChange={setValue} className="h-9 w-full" />
       ) : (
         <div className="relative">
           <button
@@ -292,7 +303,7 @@ export function LinkPersonCheckbox(props: Omit<React.ComponentProps<typeof Optio
    (3648:59976 y hermanos): el campo principal siempre es una búsqueda. */
 export function SearchField({
   label, required, className, options = [], value = '', onChange, error,
-  placeholder = 'Search...', hint, disabled,
+  placeholder = 'Search...', hint, disabled, subtext,
 }: {
   label: string
   required?: boolean
@@ -304,6 +315,9 @@ export function SearchField({
   placeholder?: string
   hint?: React.ReactNode
   disabled?: boolean
+  /** Segunda línea por sugerencia, para desambiguar (New Appointment: fecha de nacimiento y email del paciente, email
+      del provider). Sin esto, cada sugerencia es sólo el nombre, como siempre (Julián, 2026-10-19). */
+  subtext?: (opcion: string) => React.ReactNode
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -335,21 +349,138 @@ export function SearchField({
           className={cn(control(error), 'h-9 pr-3 pl-9')}
         />
         {abierto && sugerencias.length > 0 && (
-          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-52 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
-            {sugerencias.map((o) => (
+          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-60 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
+            {sugerencias.map((o) => {
+              const sub = subtext?.(o)
+              return (
+                <button
+                  key={o}
+                  type="button"
+                  onClick={() => { onChange?.(o); setAbierto(false) }}
+                  className="flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left hover:bg-surface-muted"
+                >
+                  <span className="text-[13px]">{o}</span>
+                  {sub && <span className="text-[11px] text-ink-muted">{sub}</span>}
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
+      {pie(error, hint)}
+    </div>
+  )
+}
+
+/* Nombre + hasta dos líneas de abajo ("DOB: …", "Email: …"): la etiqueta antes de los ":" sale apagada, el valor no.
+   Una línea sin ":" se muestra entera, sin partir. */
+function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?: string[]; className?: string }) {
+  return (
+    <span className={cn('min-w-0 flex-1 leading-tight', className)}>
+      <span className="block text-[13px] font-semibold text-ink">{nombre}</span>
+      {lineas?.map((linea, i) => {
+        const corte = linea.indexOf(':')
+        return (
+          <span key={i} className="block text-[11px] text-ink-muted">
+            {corte > -1
+              ? <><span className="text-ink-faint">{linea.slice(0, corte + 1)}</span>{linea.slice(corte + 1)}</>
+              : linea}
+          </span>
+        )
+      })}
+    </span>
+  )
+}
+
+/* Buscador de una persona (paciente, provider, contacto…): igual que SearchField, pero cada sugerencia y la elegida son
+   cards con avatar y hasta dos líneas de datos (DOB, email…) -el diseño de Add Relationship → "Select person", para que
+   buscar a alguien se vea igual en toda la app (Julián, 2026-10-20)-. Las sugerencias flotan en un desplegable pegado
+   al input, sin empujar lo de abajo (Julián, 2026-10-21); la elegida queda a la vista debajo, con una ✕ para quitarla y
+   volver a buscar. Sin resultados mientras no se escribe nada: no vuelca todo el directorio como SearchField.
+   "Elegida" sale sólo de comparar `value` contra `personas` (no hay estado propio): basta con que lo tipeado sea
+   exactamente un nombre de la lista. Ver design-reference/design-system.md. */
+export function PersonSearchField({
+  label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas,
+}: {
+  label: string
+  required?: boolean
+  className?: string
+  /** Nombres buscables. */
+  personas?: string[]
+  value?: string
+  onChange?: (v: string) => void
+  error?: string
+  placeholder?: string
+  hint?: React.ReactNode
+  disabled?: boolean
+  /** Las líneas de abajo de una persona ("DOB: …", "Email: …"); sin esto, la card sólo lleva el nombre. */
+  lineas?: (nombre: string) => string[] | undefined
+}) {
+  const [abierto, setAbierto] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const elegida = !!value.trim() && personas.includes(value)
+  const sugerencias = !elegida && value.trim()
+    ? personas.filter((p) => p.toLowerCase().includes(value.trim().toLowerCase()))
+    : []
+
+  useEffect(() => {
+    if (!abierto) return
+    const onDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setAbierto(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [abierto])
+
+  return (
+    <div className={cn('flex flex-col gap-2', className)}>
+      <FieldLabel required={required}>{label}</FieldLabel>
+      <div ref={ref} className="relative">
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+        <input
+          value={value}
+          placeholder={placeholder}
+          aria-invalid={!!error || undefined}
+          disabled={disabled}
+          onChange={(e) => { onChange?.(e.target.value); setAbierto(true) }}
+          onFocus={() => setAbierto(true)}
+          className={cn(control(error), 'h-9 pr-3 pl-9')}
+        />
+        {abierto && sugerencias.length > 0 && (
+          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg">
+            {sugerencias.map((nombre) => (
               <button
-                key={o}
+                key={nombre}
                 type="button"
-                onClick={() => { onChange?.(o); setAbierto(false) }}
-                className="block w-full px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
+                onClick={() => { onChange?.(nombre); setAbierto(false) }}
+                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-surface-muted"
               >
-                {o}
+                <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
+                <PersonaLineas nombre={nombre} lineas={lineas?.(nombre)} />
               </button>
             ))}
           </div>
         )}
       </div>
       {pie(error, hint)}
+      {elegida && (
+        <div className="relative">
+          <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3 pr-11">
+            <Avatar aria-hidden initials={inicialesDe(value)} size={36} />
+            <PersonaLineas nombre={value} lineas={lineas?.(value)} />
+          </div>
+          {!disabled && (
+            <button
+              type="button"
+              aria-label={`Remove ${label}`}
+              onClick={() => { onChange?.(''); setAbierto(false) }}
+              className="absolute top-1/2 right-2.5 flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dash-blue"
+            >
+              <X className="size-4" />
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -438,11 +569,11 @@ export function SectionCard({
    varias partes. El ancho pedido elige el tamaño del drawer. Ver Components / UI / Drawer. */
 const tamanoDe = (width: string): DrawerSize => {
   const px = Number(width.match(/\d+/)?.[0] ?? 860)
-  return px <= 480 ? 'md' : px <= 640 ? 'lg' : 'xl'
+  return px <= 480 ? 'md' : px <= 640 ? 'lg' : px <= 860 ? 'xl' : '2xl'
 }
 
 export function ModalShell({
-  title, description, onClose, children, footer, actions, aside, width = 'max-w-[860px]', steps, step,
+  title, description, onClose, children, footer, actions, aside, width = 'max-w-[860px]', steps, step, tabs,
 }: {
   title: string
   description?: string
@@ -457,6 +588,8 @@ export function ModalShell({
   width?: string
   steps?: readonly string[]
   step?: number
+  /** Pestañas en lugar de pasos (ver Drawer). */
+  tabs?: React.ReactNode
 }) {
   return (
     <Drawer
@@ -466,6 +599,7 @@ export function ModalShell({
       description={description}
       steps={steps}
       step={step}
+      tabs={tabs}
       size={tamanoDe(width)}
       footer={actions ?? footer}
       footerClassName={actions ? undefined : '[&_[data-form-footer]]:w-full [&_[data-form-footer]_button]:flex-1'}

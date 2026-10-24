@@ -1,10 +1,9 @@
 import { Tabs } from '@/components/ui/tabs'
 import { PageTitle } from '@/components/ui/page-title'
 import { useState } from 'react'
+import { Chip } from '@/components/ui/chip'
 import { useParams } from 'react-router-dom'
-import {
-  Pencil, DoorOpen, Plus, CalendarDays, ChevronRight, Trash2, X,
-} from 'lucide-react'
+import { Pencil, DoorOpen, Plus, CalendarDays, ChevronRight, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ICONO_SUELTO } from '@/lib/estilos'
@@ -143,28 +142,25 @@ export function WorkingHoursTab() {
                     muestra sólo las dos primeras franjas y un chip "+N" con
                     las que faltan; al tocarlo aparecen todas. */}
                 {(expandido === key ? dia.rangos : dia.rangos.slice(0, 2)).map((r, i) => (
-                  <span key={i} className="bg-dash-count-bg text-dash-blue-hover flex items-center gap-1 rounded-full py-[3px] pr-2 pl-1.5 text-[11px] font-semibold">
-                    <button
-                      type="button"
-                      aria-label={`Remove ${r} on ${label}`}
-                      onClick={() =>
-                        setHorario((p) => {
-                          const rangos = p[key].rangos.filter((_, j) => j !== i)
-                          return { ...p, [key]: { abierto: rangos.length > 0, rangos } }
-                        })
-                      }
-                      className="hover:opacity-60"
-                    >
-                      <X className="size-3" strokeWidth={2.5} />
-                    </button>
+                  <Chip
+                    key={i}
+                    removeLabel={`Remove ${r} on ${label}`}
+                    onRemove={() =>
+                      setHorario((p) => {
+                        const rangos = p[key].rangos.filter((_, j) => j !== i)
+                        return { ...p, [key]: { abierto: rangos.length > 0, rangos } }
+                      })
+                    }
+                  >
                     {r}
-                  </span>
+                  </Chip>
                 ))}
                 {expandido !== key && dia.rangos.length > 2 && (
                   <button
                     type="button"
                     onClick={() => setExpandido(key)}
-                    className="bg-dash-count-bg text-dash-blue-hover rounded-full px-2 py-[3px] text-[11px] font-semibold hover:underline"
+                    aria-label={`Show ${dia.rangos.length - 2} more hours on ${label}`}
+                    className="inline-flex h-6 items-center rounded-full bg-dash-count-bg px-2.5 text-[12px] font-medium text-dash-blue hover:underline"
                   >
                     +{dia.rangos.length - 2}
                   </button>

@@ -7,10 +7,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { SectionCard, TextField } from '@/components/patients/form'
 import { Bloque, Lienzo, Tabla, Token, useMedidas } from '@/design-system/kit'
 import { InnerCard } from '@/components/dashboard/primitives'
-import { TARJETA_PANEL } from '@/lib/estilos'
+import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 import * as StatCardStories from '@/components/dashboard/StatCard.stories'
 import * as AppointmentCardStories from '@/components/dashboard/AppointmentCard.stories'
-import * as OperatoryCardStories from '@/components/dashboard/OperatoryCard.stories'
+import { OperatoryCard } from '@/components/dashboard/OperatoryCard'
 import * as PendingTaskCardStories from '@/components/dashboard/PendingTaskCard.stories'
 import * as PatientCardStories from '@/components/patients/PatientCard.stories'
 import * as PatientAppointmentCardStories from '@/components/patients/PatientAppointmentCard.stories'
@@ -136,7 +136,6 @@ export const Anatomy: Story = {
 /* Las cards que ya usa la app, con sus datos de ejemplo. */
 const { Default: Stat } = composeStories(StatCardStories)
 const { Default: Appointment } = composeStories(AppointmentCardStories)
-const { Available: Operatory } = composeStories(OperatoryCardStories)
 const { Default: Pending } = composeStories(PendingTaskCardStories)
 const { Active: Patient } = composeStories(PatientCardStories)
 const { Booked: PatientAppointment } = composeStories(PatientAppointmentCardStories)
@@ -146,10 +145,10 @@ const EN_LA_APP: { nombre: string; uso: string; ancho: number; nodo: ReactNode }
   { nombre: 'SectionCard', uso: 'A block of a form: groups related fields under a title.', ancho: 340, nodo: <SectionCard title="General"><TextField label="Name" placeholder="Name" /></SectionCard> },
   { nombre: 'StatCard', uso: 'One number of the day with its change.', ancho: 260, nodo: <Stat /> },
   { nombre: 'AppointmentCard', uso: 'One appointment in the dashboard list.', ancho: 360, nodo: <Appointment /> },
-  { nombre: 'OperatoryCard', uso: 'One room and who is in it.', ancho: 300, nodo: <Operatory /> },
+  { nombre: 'OperatoryCard', uso: 'One room and who is in it.', ancho: 300, nodo: <OperatoryCard room={{ name: 'Operatory 2', status: 'Available', patientsToday: 4, provider: 'Daniel Anderson' }} /> },
   { nombre: 'PendingTaskCard', uso: 'A task that is waiting for someone.', ancho: 320, nodo: <Pending /> },
   { nombre: 'PatientCard', uso: 'A patient in the mobile list.', ancho: 340, nodo: <Patient /> },
-  { nombre: 'PatientAppointmentCard', uso: 'One appointment in the Patient Dashboard. Same surface as the dashboard cards.', ancho: 280, nodo: <PatientAppointment /> },
+  { nombre: 'PatientAppointmentCard', uso: 'One appointment in the Patient Dashboard. Same card as the appointment requests in Scheduling (TarjetaTurno): bar and pill in the status color.', ancho: 280, nodo: <PatientAppointment /> },
 ]
 
 export const InTheApp: Story = {
@@ -207,20 +206,64 @@ export const Specs: Story = {
         <Tabla encabezado={['Part', 'Value']} minimo={560}>
           <tr><td className="font-semibold">Background</td><td><Token nombre="white" /></td></tr>
           <tr><td className="font-semibold">Border</td><td>None</td></tr>
-          <tr><td className="font-semibold">Shadow</td><td className="tabular-nums">shadow-panel · 0 4px 14px rgb(100 100 100 / 25%)</td></tr>
+          <tr><td className="font-semibold">Shadow</td><td className="tabular-nums">shadow-panel · 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 8%). Almost flat: only the contact shadow that marks the edge. The Dashboard numbers use it too</td></tr>
           <tr><td className="font-semibold">Radius</td><td className="tabular-nums">8px</td></tr>
+        </Tabla>
+      </Bloque>
+      <Bloque titulo="Shadow room" nota="La sombra sale unos pocos px por fuera de la card: un contenedor con overflow-hidden de su mismo ancho la recorta y la card pierde el canto contra el fondo, como pasaba con Today Appointments en Patients (2026-10-10). Para topar el alto, el scroll va adentro de la card, no en quien la envuelve.">
+        <div className="flex flex-wrap gap-8 rounded-lg bg-page-background p-6">
+          <div className="flex flex-col gap-2">
+            <span className="text-[12px] font-semibold text-ink">Do · the card scrolls inside</span>
+            <div className={`${TARJETA_PANEL} flex h-28 w-56 flex-col overflow-hidden`}>
+              <span className="px-4 pt-3 text-[12px] font-semibold text-ink">Panel</span>
+              <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
+                {[1, 2, 3, 4].map((n) => <InnerCard key={n} className="h-8 shrink-0" />)}
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-[12px] font-semibold text-field-error">Don't · clipped by overflow-hidden</span>
+            <div className="w-56 overflow-hidden">
+              <div className={`${TARJETA_PANEL} flex h-28 flex-col overflow-hidden`}>
+                <span className="px-4 pt-3 text-[12px] font-semibold text-ink">Panel</span>
+                <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3">
+                  {[1, 2, 3, 4].map((n) => <InnerCard key={n} className="h-8 shrink-0" />)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Bloque>
+      <Bloque titulo="Floating pop up" nota="Lo que se abre desde un elemento y queda por encima de la pantalla lleva más altura que una card (Julián, 2026-10-10): shadow-floating. Lo usan el detalle del paciente de la card de turno (Dashboard) y el de Scheduling, el selector de locación, los filtros de Scheduling, Appointment requests, el menú lateral de Billing y Settings, Patient in session, los flotantes de Clinical Mode, Confibot y los CoachMark. Las listas de opciones, los toasts y los drawers no cambian.">
+        <div className="relative h-44 rounded-lg bg-page-background p-6">
+          <div className={`${TARJETA_PANEL} flex h-28 w-72 flex-col gap-2 p-4`}>
+            <span className="text-[12px] font-semibold text-ink">Card on the page</span>
+            <InnerCard className="h-10" />
+          </div>
+          <div className="shadow-floating absolute top-14 left-48 flex w-60 flex-col gap-1 rounded-2xl bg-white p-4">
+            <span className="text-[12px] font-semibold text-ink">Floating pop up</span>
+            <span className="text-[11.5px] text-ink-muted">Opens from the card and floats over the page.</span>
+          </div>
+        </div>
+        <Tabla encabezado={['Part', 'Value']} minimo={560}>
+          <tr><td className="font-semibold">Shadow</td><td className="tabular-nums">shadow-floating · 0 1px 2px rgb(16 24 40 / 4%), 0 4px 16px -2px rgb(16 24 40 / 10%). Contact shadow plus a soft one that falls downwards</td></tr>
+          <tr><td className="font-semibold">Before</td><td>Each pop up had its own shadow: 0 8px 24–28px or 0 12px 32px, black at 12% to 22%</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Card inside a panel" nota="La misma superficie para todas las cards que van adentro de un panel (InnerCard): Appointments, Waiting Room, Rooms y Pending Task del Dashboard, los turnos y las tareas del Patient Dashboard y las cards chicas de Patients. Antes cada una tenía su sombra y la del Dashboard (0 4px 2px) se veía dura.">
         <div className="flex flex-wrap gap-4 rounded-lg bg-surface-subtle p-5">
           <InnerCard className="flex h-20 w-48 items-center justify-center text-[12px] text-ink-muted">InnerCard</InnerCard>
           <InnerCard className="flex h-20 w-48 items-center justify-center text-[12px] text-ink-muted">InnerCard</InnerCard>
+          <div className={cn(TARJETA_INTERNA, 'flex h-20 w-48 items-center justify-center bg-surface-subtle text-[12px] text-ink-muted')}>Clickable · hover</div>
+          <div className={cn(TARJETA_INTERNA, 'flex h-20 w-48 items-center justify-center bg-dash-count-bg text-[12px] text-ink-muted')}>Selected</div>
         </div>
         <Tabla encabezado={['Part', 'Value']} minimo={560}>
           <tr><td className="font-semibold">Background</td><td><Token nombre="white" /></td></tr>
           <tr><td className="font-semibold">Stroke</td><td className="tabular-nums">0.5px, negro al 12%, por dentro de la card (sombra inset: un border de 0.5px se redondea a 1px y una línea por fuera la recorta una lista con scroll). En retina, medio pixel; en una pantalla común, 1px en #eeeeee; igual en los cuatro lados</td></tr>
           <tr><td className="font-semibold">Shadow</td><td className="tabular-nums">shadow-inner-card · inset 0 0 0 0.5px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 4%)</td></tr>
           <tr><td className="font-semibold">Radius</td><td className="tabular-nums">8px</td></tr>
+          <tr><td className="font-semibold">Hover (clickable)</td><td><Token nombre="surface-subtle" />, como la fila de una tabla</td></tr>
+          <tr><td className="font-semibold">Selected</td><td><Token nombre="dash-count-bg" />: el celeste de la fila elegida y del rango nuevo de Coverage Table. Lo usa Find Patient en Billing (Pages › Parts › Billing)</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Rules">
@@ -228,7 +271,11 @@ export const Specs: Story = {
           <li>One topic per card. If it needs two titles, it is two cards.</li>
           <li>The action that edits the card goes top right; the ones that save or cancel go in the footer.</li>
           <li>Cards sit on the grey page background, 16–24px apart, with a shadow and no border.</li>
-          <li>A card inside another card has a half-pixel stroke in a faint grey and a soft shadow (InnerCard).</li>
+          <li>Never wrap a card in an overflow-hidden container: it clips the shadow. To cap the height, scroll inside the card.</li>
+          <li>Two heights only: every page card has shadow-panel (the Dashboard numbers too); every pop up that floats over the page has shadow-floating. Never a hand-written shadow.</li>
+          <li>A card inside another card has a half-pixel stroke in a faint grey and a soft shadow (InnerCard). That includes the numbers inside a panel (Today and the guarantor numbers in Billing).</li>
+          <li>A panel title has no icon: Panel, 15px Bold. The icon only goes inside the card, next to what it explains.</li>
+          <li>A clickable inner card goes grey on hover; the chosen one stays light blue (dash-count-bg) while it is selected.</li>
           <li>Tables and the calendar grid keep their border: they are not cards.</li>
         </ul>
       </Bloque>

@@ -62,7 +62,7 @@ export function NewEmployeeDrawer({ onClose, onGuardar }: { onClose: () => void;
               <TextField label="Middle name" placeholder="Middle name" value={d.middle} onChange={set('middle')} />
               <TextField label="Last name" required placeholder="Last name" value={d.last} onChange={set('last')} error={falta('last')} />
               <DateField label="Birthdate" required placeholder="Birthdate" onChange={set('birthday')} error={falta('birthday')} />
-              <TextField className="sm:col-span-2" label="Email" required placeholder="Email" value={d.email} onChange={set('email')} error={falta('email')} />
+              <TextField label="Email" required placeholder="Email" value={d.email} onChange={set('email')} error={falta('email')} />
             </div>
           )}
         </DrawerSection>

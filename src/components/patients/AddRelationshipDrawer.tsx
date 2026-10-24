@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
-import { Check, Search } from 'lucide-react'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer'
-import { FieldError, FieldLabel, ModalShell, OptionCheckbox, SelectField, TextField } from '@/components/patients/form'
+import { FieldError, ModalShell, OptionCheckbox, PersonSearchField, SelectField, TextField } from '@/components/patients/form'
 import { useFormPasos } from '@/lib/useFormPasos'
+import { Avatar } from '@/components/ui/avatar'
+import { Alert } from '@/components/ui/alert'
 
 /* Add Relationship: antes una pantalla aparte (Figma 3716:61372, 3716:62815 y 3716:63601); ahora el drawer de
    Confidentally 2.0 con sus tres pasos: buscar o crear a la persona, sus datos de contacto y la relación con el
@@ -26,9 +27,7 @@ export const DIRECTORIO: PersonaDirectorio[] = [
 export function PersonaSeleccionada({ p }: { p: PersonaDirectorio }) {
   return (
     <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3">
-      <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">
-        {p.initials}
-      </span>
+      <Avatar initials={p.initials} size={36} />
       <span className="min-w-0 flex-1 leading-tight">
         <span className="block text-[13px] font-semibold text-ink">{p.name}</span>
         <span className="block text-[11px] text-ink-muted">
@@ -86,15 +85,18 @@ const PASOS = ['Person', 'Contact', 'Relationship'] as const
 const iniciales = (nombre: string) => nombre.trim().split(/\s+/).slice(0, 2).map((x) => x[0]).join('').toUpperCase()
 
 export function AddRelationshipDrawer({
-  paciente = 'John Smith', onClose, onGuardar,
+  paciente = 'John Smith', archivadas = [], onReactivar, onClose, onGuardar,
 }: {
   /** El paciente de la ficha: aparece en las frases de Direction. */
   paciente?: string
+  /** Nombres de quienes ya tienen una relación archivada con este paciente: al elegirlos se ofrece reactivarla. */
+  archivadas?: string[]
+  /** "Open reactivation": abre la reactivación de la relación archivada de esa persona (CON-3958). */
+  onReactivar?: (nombre: string) => void
   onClose: () => void
   onGuardar: (r: NuevaRelacion) => void
 }) {
-  const [q, setQ] = useState('')
-  const [persona, setPersona] = useState<PersonaDirectorio | null>(null)
+  const [personaNombre, setPersonaNombre] = useState('')
   const [nueva, setNueva] = useState(false)
   const [guardian, setGuardian] = useState(false)
   const [guarantor, setGuarantor] = useState(false)
@@ -107,10 +109,7 @@ export function AddRelationshipDrawer({
     ['rel'],
   ])
 
-  const resultados = useMemo(
-    () => (q.trim() && !persona ? DIRECTORIO.filter((p) => p.name.toLowerCase().includes(q.trim().toLowerCase())) : []),
-    [q, persona],
-  )
+  const persona = DIRECTORIO.find((p) => p.name === personaNombre)
   const nombre = persona?.name ?? [d.first.trim(), d.last.trim()].filter(Boolean).join(' ')
   const rolTexto = guardian && guarantor ? 'Guardian and Guarantor' : guarantor ? 'Guarantor' : 'Guardian'
   const sinPersona = aviso && paso === 0 && !persona && !nueva
@@ -137,7 +136,7 @@ export function AddRelationshipDrawer({
   return (
     <ModalShell
       title="Add Relationship"
-      description="Find or create person"
+      description="Link a family member, guardian or guarantor to this patient."
       onClose={onClose}
       width="max-w-[560px]"
       steps={PASOS}
@@ -146,51 +145,28 @@ export function AddRelationshipDrawer({
     >
       <DrawerStep index={0} step={paso}>
         <DrawerSection title="Find or create person">
-          <div className="flex flex-col gap-2">
-            <FieldLabel required>Select person</FieldLabel>
-            <div className="relative">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-              <input
-                value={q}
-                onChange={(e) => { setQ(e.target.value); setPersona(null) }}
-                placeholder="Search by Name or Last Name"
-                aria-label="Select person"
-                aria-invalid={sinPersona || undefined}
-                disabled={nueva}
-                className={cn(
-                  'h-9 w-full rounded-md border bg-white pr-3 pl-9 text-[13px] placeholder:text-ink-faint focus:outline-none disabled:bg-surface-subtle',
-                  sinPersona ? 'border-field-error' : 'focus:border-dash-blue border-line',
-                )}
-              />
-            </div>
-            <FieldError>{sinPersona ? 'Select a person or tick the option to create a new one.' : undefined}</FieldError>
-            {resultados.map((p) => (
-              <button
-                key={p.name}
-                type="button"
-                onClick={() => { setPersona(p); setQ(p.name) }}
-                className="flex items-center gap-3 rounded-lg border border-line bg-white p-3 text-left hover:bg-surface-subtle"
-              >
-                <span className="bg-dash-blue flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold text-white">{p.initials}</span>
-                <span className="min-w-0 leading-tight">
-                  <span className="block text-[13px] font-semibold text-ink">{p.name}</span>
-                  <span className="block text-[11px] text-ink-muted">DOB: {p.dob}</span>
-                </span>
+          <PersonSearchField
+            label="Select person" required placeholder="Search by Name or Last Name"
+            personas={DIRECTORIO.map((p) => p.name)}
+            value={personaNombre} onChange={setPersonaNombre}
+            disabled={nueva}
+            error={sinPersona ? 'Select a person or tick the option to create a new one.' : undefined}
+            lineas={(n) => {
+              const p = DIRECTORIO.find((x) => x.name === n)
+              return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
+            }}
+          />
+          {persona && archivadas.includes(persona.name) && (
+            <Alert tone="warning" title={`An archived relationship already exists between ${paciente} and ${persona.name}.`}>
+              <button type="button" onClick={() => onReactivar?.(persona.name)} className="text-dash-blue font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue">
+                Open reactivation
               </button>
-            ))}
-            {persona && (
-              <div className="relative">
-                <PersonaSeleccionada p={persona} />
-                <span className="bg-dash-ok-fg absolute top-1/2 right-3 flex size-5 -translate-y-1/2 items-center justify-center rounded-full text-white" aria-label="Selected">
-                  <Check className="size-3" strokeWidth={3} />
-                </span>
-              </div>
-            )}
-          </div>
+            </Alert>
+          )}
           <OptionCheckbox
             label="Add New Person"
             checked={nueva}
-            onChange={(v) => { setNueva(v); setAviso(false); if (v) { setPersona(null); setQ('') } }}
+            onChange={(v) => { setNueva(v); setAviso(false); if (v) setPersonaNombre('') }}
           />
           {nueva && (
             <div className="grid gap-4 sm:grid-cols-2">

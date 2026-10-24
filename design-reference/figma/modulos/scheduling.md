@@ -496,3 +496,170 @@ Lo que hay que saber al retomar:
 
 Con la regla nueva (cards con sombra y sin borde), las vistas de semana y mes del calendario siguen con borde: son una
 grilla, como las tablas.
+
+## New Appointment: la fecha del ancho de Start Time (2026-10-10)
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`. Date ocupaba todo el ancho entre pares de media columna; ahora va en la columna
+izquierda, encima de Start Time.
+Los rótulos de Treatment plan y Visit (paso 2) pasan a `FieldLabel`. Patient y los providers siguen de ancho entero:
+son búsquedas de persona.
+
+## Solicitudes: la misma card que los turnos del Patient Dashboard (2026-10-12)
+
+Pedido de Julián: las cards de *Appointment requests* y las de *Appointments* del Patient Dashboard con el mismo diseño
+(ver `patient-dashboard.md`, misma fecha). `SolicitudCard` pasa a usar `TarjetaTurno`:
+
+- Se va el punto de color al lado del nombre (repetía la barra y la pill) y entra el avatar con las iniciales.
+- La pill hecha a mano con hex sueltos (`#dc2626`, `#1d56bc` en `style`) pasa a `Pill` (danger / info), y la barra, a
+  token (`BARRA_TONOS`). Cancel y Schedule pasan a `ui/button` sm (28px): antes eran botones de 11px y unos 24px de alto.
+- El panel pasa de 260 a **280px**, el ancho de la columna Appointments del Patient Dashboard: la card mide lo mismo en
+  los dos lados. En el celular queda topado a `100vw - 116px` (259 en un iPhone de 375), como antes.
+- Con el avatar, en la lista de espera el nombre se recortaba demasiado ("Noah Ja…" junto a "Waiting 4 days"): ahora
+  baja a un segundo renglón.
+
+## New Appointment: visita linkeada a otro turno (2026-10-17)
+
+Pedido de Julián, con un prototipo en HTML (`appointment-linked-visit_1.html`): al agendar un turno, la visita del plan
+que se elige puede **ya estar linkeada a otro turno**. Una visita pertenece a un solo turno, así que hay que decirlo y
+dejar que se mueva.
+
+**"Otro paso" → una pregunta, no un tercer paso.** El pedido decía "otro paso" para ese escenario. El prototipo lo
+resuelve con el paso 2 (con el bloque *Linked appointment* en la visita) y una confirmación al guardar. Se hizo igual,
+con `ConfirmDialog`, y no como un paso más del drawer, por tres razones: (1) sólo aparece con algunos datos, y un
+indicador que a veces dice dos pasos y a veces tres miente sobre cuánto falta; (2) es una pregunta de sí o no, y esas
+son las únicas que siguen como confirmación chica (`design-system.md`, *Pop ups*, punto 6); (3) llega recién al
+guardar, cuando ya se sabe qué visita se eligió. Si Julián quería un paso real en el indicador, se cambia sin tocar los
+datos: es mover `MoverVisitaDialog` a un `DrawerStep`.
+
+**Qué se ve y cuándo**
+- La fila de una visita linkeada (`VisitRow` con `vinculada`) muestra, **aunque no esté elegida**, el bloque
+  *Linked appointment*: fecha y hora del otro turno, su estado en una `Pill` y un círculo de info (`InfoTip`) con "To use
+  this visit for the new appointment, you'll need to move it from the linked appointment." Así se decide antes de
+  tocarla, no después de apretar Save.
+- Save con esa visita elegida abre **Move treatment visit?** ("Visit 2 is linked to the appointment on Sep 28, 2026 at
+  1:15 PM. Continuing will unlink this visit from that appointment and link it to the appointment you are saving."), con
+  *Cancel* y *Move visit*. Cancel vuelve al drawer con todo lo cargado y el foco en Save; Move visit guarda, cierra y
+  suma un segundo toast: "Visit 2 moved from the Sep 28, 2026 appointment."
+- En los datos de ejemplo la linkeada es **Visit 2**, igual que en el prototipo (Sep 28, 2026 · 1:15 PM).
+
+**Qué cambió respecto del prototipo, y por qué**
+1. **El estado dice "Fulfilled", no "Completed"**: es el vocabulario de los turnos de la app (leyenda del calendario y
+   `PatientAppointmentCard`); el gris del prototipo pasa a la `Pill` con el tono del estado (verde). Anomalía de
+   vocabulario ya anotada el 2026-09-25.
+2. **El tooltip oscuro pasa a `InfoTip`**: el Tooltip es sólo para nombrar un ícono; esto explica en dos líneas, y el
+   InfoTip abre con mouse, toque y teclado. El clic en el círculo no elige la visita.
+3. **Un solo diálogo de la app**: el overlay propio del prototipo es el `ConfirmDialog` de siempre (foco en Cancel).
+4. **Return, no Back**: en el prototipo "Back" vaciaba la selección; en el drawer es Return y vuelve al paso 1.
+5. **No se replicó** el plan "Provider Pruebas / caso 1", el total de $332 ni el calendario de la derecha: son datos
+   del prototipo; el drawer ya tiene su calendario del día al costado.
+6. **Sin estado "movida" persistente**: el prototipo cambiaba el bloque a "Linked to this appointment" después de mover.
+   Acá el drawer se cierra al guardar, así que no hay nada que mostrar; los datos son de muestra y la visita sigue
+   figurando linkeada la próxima vez que se abre el drawer.
+
+**Se corrigió de paso:** `ConfirmDialog` devolvía el foco a ningún lado al cerrarse (Radix lo manda a un `Trigger` que
+acá no existe), así que después de Cancel el teclado perdía el lugar. Ahora vuelve al botón que la abrió.
+
+**Para validar con usuarios**
+- ¿Se entiende "mover" una visita? Alternativa: "Use anyway" / "Replace the link".
+- **Visita linkeada a un turno ya cumplido** (Fulfilled): moverla reescribe el historial de un turno atendido. ¿Se
+  permite igual, se deshabilita, o sólo con permiso? El prototipo la deja mover; acá se hizo igual y se anota como
+  decisión abierta.
+- **"Optional" pero siempre elegida:** el paso dice que el link es opcional, pero la visita 1 arranca elegida y no se
+  puede soltar. En el prototipo la selección arranca vacía y se puede limpiar. Se propone arrancar sin visita elegida y
+  sumar un "No visit"; **no se hizo** porque cambia el comportamiento actual y espera su ok.
+- Si el otro turno ya pasó o ya se canceló, ¿hace falta la pregunta, o se mueve sin preguntar?
+
+## View: filtro rediseñado (2026-10-17)
+
+Pedido de Julián con un diseño nuevo del filtro **View** (reemplaza al frame `3856:208346`). Es de **un solo valor por grupo** (radios,
+con "Select all …" como una opción más), no de casillas: así está en el diseño.
+
+- **Estructura:** Status en una fila; Providers con buscador por nombre o especialidad y la lista de a dos; Rooms al costado con
+  *Current view* (lo que se verá al guardar); pie con el resumen ("1 provider · 1 room"), Cancel y Save.
+- **Es un popover** (`ui/popover` vía `ViewMenu`): debajo de View, alineado a su borde derecho, sin fondo oscuro; Radix lo corre para
+  que entre en pantalla, cierra con Escape, clic afuera o ✕ y devuelve el foco a View. Cancel, ✕, Escape y clic afuera **descartan**;
+  Save guarda en `Scheduling` (`vista`) y el panel reabre desde lo guardado.
+- **Responsive por la caja** (container queries): 976px en escritorio (Rooms al costado desde 896px de caja); en tablet Rooms baja y va
+  de a dos; en celular todo de a uno. Con poca altura scrollea el cuerpo y el encabezado y el pie quedan fijos.
+- **Decisiones de UX:** la búsqueda no cambia lo elegido (esconder al provider elegido no lo saca; el conteo y Current view lo siguen
+  diciendo); sin resultados hay estado vacío con *Clear search*; teclado de radio nativo (Tab entra por la elegida, flechas
+  recorren y eligen); textos secundarios en `ink-muted` en vez del gris claro del diseño (contraste 4.8:1 vs 2.6:1).
+- **Anomalía 91:** las salas repiten "Operatory 2" cuatro veces y sus subtítulos son especialidades de providers (se suma a la 28). Se
+  copia tal cual.
+- **Pendiente de validar con usuarios:** si recepción necesita **varios** providers o salas a la vez (el diseño sólo permite uno o
+  todos) y si el filtro de Status debería afectar también a Day/Week/Month: hoy el prototipo guarda la vista pero la grilla no
+  filtra (no hay backend ni datos para 12 providers).
+
+## New Appointment: los campos del paso 1 quedaban cortados contra el pie (2026-10-19)
+
+Julián: "fijate que los inputs quedan cortados en el paso 1". Con poco alto de ventana (celular, o una ventana de escritorio baja),
+el paso "Patient and Scheduling" tiene nueve campos y no entra entero: el contenido scrollea solo, pero el pie (Cancel / Next Step)
+no se movía y el último campo (End Time, Operatory o Status según cuánto entre) quedaba recortado justo contra él, sin ningún aviso
+de que seguía con scroll. Se veía como un campo roto, no como "hay más abajo".
+
+No es un bug de este drawer en particular: es `ui/drawer`, el mismo de todos los formularios. El arreglo va ahí: mientras falte
+contenido por ver, el pie lleva una sombra elevada arriba (como una barra de scroll tapando lo que sigue); al llegar al final se va
+sola. Se probó primero un degradé blanco como el de `ui/show-more`, pero sobre un campo blanco liso (no una card con avatar y chips)
+tapaba el control entero dejándolo en blanco, peor que el corte original; la sombra no esconde el campo, sólo separa visualmente el
+pie. Ver `design-system.md` (2026-10-19) y *Components / UI / Drawer → Parts → Footer shadow*.
+
+## El buscador de Patient y Provider sin fecha de nacimiento ni email (2026-10-19)
+
+Julián: "me di cuenta que faltaría cuando buscas un paciente más información. Antes además del nombre decía la fecha de
+nacimiento y email. Lo mismo con provider, nombre + email". `SearchField` (`patients/form.tsx`) sólo mostraba el nombre en cada
+sugerencia; ahora cada una lleva una segunda línea:
+
+- **Patient:** fecha de nacimiento y email. No hay una ficha única para los cuatro nombres de este campo (son de esta pantalla,
+  no de la tabla de Patients ni del mock de 271 de Billing/Ledger, que tampoco los tiene): es mock propio, con el mismo formato
+  que usa la tabla de Patients ("Month D, YYYY" y nombre.apellido@email.com).
+- **Primary y Additional Provider:** el email de la plantilla del consultorio (`data/employees.ts`, Settings → Employees), que
+  ya tiene a estos cuatro cargados. "Dr. " es sólo el tratamiento que usa esta pantalla; el nombre de abajo es el de Employees.
+
+`SearchField` suma una prop opcional `subtext` (una función de la opción a la segunda línea); sin ella sigue mostrando sólo el
+nombre, como el resto de sus usos (Carrier name, CDT codes, medicamentos, etc., sin tocar). Ver *Elements / Fields* y
+*Components / Scheduling / NewAppointmentModal*.
+
+**Para validar con usuarios:** si conviene la misma segunda línea en Requestor (hoy un `SelectField`, no busca) o en otros
+buscadores de persona de la app (Add Relationship, por ejemplo).
+
+## New Appointment: Start Time, End Time, Operatory y Status seguían sin verse (2026-10-20)
+
+Julián: "fijate que los inputs de star time end time operatory y status no se ven se cortan" — el mismo síntoma que el
+2026-10-19 (campos del paso 1 cortados contra el pie), con ventanas de escritorio bajas (probado a 1024×768). La sombra
+del pie que se agregó ese día (`ui/drawer`, *Parts → Footer shadow*) nunca llegaba a dispararse: medía el contenido con
+un `useRef` + `useEffect`, pero ese efecto corría con la ref todavía en `null` -el contenido del `Dialog` de Radix se
+monta en el DOM un tick después del primer render del Drawer- y como las dependencias del efecto no volvían a cambiar,
+ni el `ResizeObserver` ni el listener de `resize` llegaban a conectarse nunca: la sombra no aparecía con ningún alto de
+ventana, y el campo seguía viéndose cortado sin aviso de que había que scrollear.
+
+Confirmado con Playwright: a 1024×768, el contenido medía 610px contra 564px visibles (y hasta 396px achicando la
+ventana a 600px de alto) sin que el pie mostrara nunca la sombra, ni al redimensionar. Arreglado en `ui/drawer`
+reemplazando esas dos refs por `useState<HTMLDivElement | null>` (ref por callback): el efecto que arma el
+`ResizeObserver` ahora depende del nodo real y corre de nuevo en cuanto Radix lo monta. Scrollear manualmente el
+contenido (el `onScroll` de siempre) ya funcionaba antes del arreglo —por eso el paso 1 no estaba roto, sólo sin aviso.
+
+**Para el dev:** `ui/drawer` cambia `scroll`/`contenido` de `useRef` a `useState` + ref por callback (`ref={setScroll}`,
+`ref={setContenido}`); el resto del componente no cambia. No es un bug de `NewAppointmentModal`: cualquier drawer con
+muchos campos y poco alto de ventana tenía el mismo problema.
+
+## Patient, Primary y Additional Provider pasan a `PersonSearchField` (2026-10-20)
+
+Julián pidió que buscar una persona se vea igual en toda la app, como en Add Relationship → Select person (ver
+`relationships.md`, 2026-10-20, por el porqué completo). Las tres búsquedas de persona de este drawer usaban
+`SearchField`: un menú flotante, una sola línea de texto por sugerencia. Pasan a `PersonSearchField`: la sugerencia es
+una card con avatar y, debajo del nombre, DOB y email en líneas separadas (antes una sola línea unida con "·",
+`pacienteSubtexto`/`providerSubtexto`, agregada el 2026-10-19); la elegida queda remarcada con borde azul y un visto,
+en vez de sólo completar el campo.
+
+**Para el dev:** `pacienteSubtexto`/`providerSubtexto` pasan a `pacienteLineas`/`providerLineas` (devuelven un array de
+líneas, `['DOB: …', 'Email: …']` o `['Email: …']`, en vez de un string ya unido). El avatar de la card lleva
+`aria-hidden`: sin eso, sus iniciales se cuelan antes del nombre en el nombre accesible del botón y rompían
+`tests/scheduling-linked-visit.e2e.ts` (que busca el botón por `/^John Smith/`, `/^Dr. Emily Chen/`); verificado que
+sigue encontrando el botón y completando el campo igual que antes.
+
+## Patient y Provider: el buscador en desplegable, con ✕ (2026-10-21)
+
+Las sugerencias de Patient, Primary Provider y Additional Provider (`PersonSearchField`) ahora flotan en un desplegable pegado al input en vez de empujar los campos de abajo, y
+la persona elegida lleva una ✕ para quitarla (en Additional Provider, opcional, es la forma de dejarlo vacío otra vez). El porqué está en `relationships.md` (2026-10-21).

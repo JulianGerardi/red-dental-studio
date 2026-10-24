@@ -1,7 +1,9 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { DateTextField, OptionCheckbox, SearchField, SelectField, TextArea, TextField } from '@/components/patients/form'
-import { Bloque, Lienzo, Swatch, Tabla, useMedidas } from './kit'
+import {
+  DateTextField, OptionCheckbox, PersonSearchField, SearchField, SelectField, TextArea, TextField,
+} from '@/components/patients/form'
+import { Bloque, ConRotulo, Lienzo, Swatch, Tabla, TablaPartes, useMedidas } from './kit'
 import { cn } from '@/lib/utils'
 import { hex } from './medir'
 
@@ -38,7 +40,13 @@ const meta = {
           '',
           '**Cuál usar:** *Text* para texto corto · *Select* para elegir de una lista · *Search* para buscar con sugerencias · *Date* para una fecha tipeada · *Textarea* para texto largo · *Checkbox* para aceptar o activar una opción.',
           '',
-          '**Probalo:** en *Playground* cambiá tipo, rótulo, valor, ayuda, error y estado desde *Controls*.',
+          '**Search puede llevar una segunda línea por sugerencia** (`subtext`, 2026-10-19): para desambiguar cuando el nombre no alcanza, como Patient y Provider en *Components / Scheduling / NewAppointmentModal* (fecha de nacimiento y email del paciente; email del provider). Sin `subtext`, la sugerencia es sólo el nombre, como siempre.',
+          '',
+          '**Buscar una persona es `PersonSearchField`, no `Search`** (2026-10-20): mismo campo, pero cada sugerencia y la elegida son cards con avatar y hasta dos líneas (DOB, email…) -el diseño de *Components / Patients / AddRelationshipDrawer → Select person*, compartido por cualquier buscador de persona de la app (Patient y Provider de New Appointment, Select person de Add Relationship y de los modales de Insurance)-. Nada se ve mientras no se escribe nada. **Las sugerencias flotan en un desplegable pegado al input** (2026-10-21), sin empujar los campos de abajo, y la elegida queda debajo con una **✕ para quitarla** y volver a buscar. Ver *States → Person search* acá abajo.',
+          '',
+          '**Date puede abrir con una fecha cargada** (`valorInicial`, 2026-10-22): Edit Patient abre con el nacimiento puesto, como lo devuelve `onChange` ("April 2, 2025"). Sin ella sigue pidiendo la fecha.',
+          '',
+          '**Probalo:** en *Playground* cambiá tipo, rótulo, valor, ayuda, error y estado desde *Controls*; en *States → Person search*, escribí un nombre de la lista para ver el desplegable, elegí uno y quitalo con la ✕.',
         ].join('\n'),
       },
     },
@@ -127,6 +135,63 @@ export const States: Story = {
         </tr>
       ))}
     </Tabla>
+  ),
+}
+
+/* Mismas tres personas que Add Relationship → Select person (Components / Patients / AddRelationshipDrawer), para que
+   se vea el mismo resultado: escribir "mi" muestra a las tres Miller con avatar, DOB y email; elegir una la deja con
+   borde azul y el visto. */
+const PERSONAS_DEMO = [
+  { name: 'Michael Miller', dob: 'May 14, 1982', email: 'mm.thompson@yahoo.com' },
+  { name: 'Jessica Miller', dob: 'May 14, 1982', email: 'jessica.miller@gmail.com' },
+  { name: 'Robert Miller', dob: 'March 2, 1979', email: 'rob.miller@outlook.com' },
+]
+const lineasDemo = (nombre: string) => {
+  const p = PERSONAS_DEMO.find((x) => x.name === nombre)
+  return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
+}
+
+/* `abierto`: deja el desplegable a la vista enfocando el input (sin eso, las sugerencias sólo salen al tocar el campo). */
+function PersonSearchDemo({ inicial = '', disabled, abierto }: { inicial?: string; disabled?: boolean; abierto?: boolean }) {
+  const [v, setV] = useState(inicial)
+  const ref = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => { if (abierto) ref.current?.querySelector('input')?.focus() }, [abierto])
+  return (
+    <div ref={ref}>
+      <PersonSearchField
+        label="Select person" required placeholder="Search by Name or Last Name"
+        personas={PERSONAS_DEMO.map((p) => p.name)} lineas={lineasDemo}
+        value={v} onChange={setV} disabled={disabled}
+      />
+    </div>
+  )
+}
+
+export const PersonSearch: Story = {
+  name: 'Person search',
+  parameters: { controls: { disable: true } },
+  decorators: [(Story) => <div className="w-[720px] max-w-full"><Story /></div>],
+  render: () => (
+    <Lienzo>
+      <Bloque titulo="Parts">
+        <TablaPartes
+          partes={[
+            ['Input', 'Igual que Search: lupa + texto; filtra mientras se escribe.', 'PersonSearchField'],
+            ['Suggestions', 'Desplegable pegado al input, sobre los campos de abajo: una card por persona que matchea, con avatar, nombre y hasta dos líneas (DOB, email…). Se cierra al elegir o al tocar afuera.', 'PersonSearchField'],
+            ['Selected card', 'La elegida, debajo del input y con borde azul.', 'PersonSearchField'],
+            ['Remove', 'La ✕ de la card elegida: vacía el campo para buscar a otra persona. No está con el campo deshabilitado.', 'PersonSearchField'],
+          ]}
+        />
+      </Bloque>
+      <Bloque titulo="States" nota="Nada se ve con el campo vacío. Las sugerencias flotan sobre lo que sigue; elegir una la deja con borde azul y la ✕ la quita.">
+        <div className="flex flex-col gap-6">
+          <ConRotulo rotulo="Empty"><div className="w-[320px]"><PersonSearchDemo /></div></ConRotulo>
+          <ConRotulo rotulo="Typing (suggestions open)"><div className="min-h-[300px] w-[320px]"><PersonSearchDemo inicial="mi" abierto /></div></ConRotulo>
+          <ConRotulo rotulo="Selected"><div className="w-[320px]"><PersonSearchDemo inicial="Jessica Miller" /></div></ConRotulo>
+          <ConRotulo rotulo="Disabled"><div className="w-[320px]"><PersonSearchDemo inicial="Jessica Miller" disabled /></div></ConRotulo>
+        </div>
+      </Bloque>
+    </Lienzo>
   ),
 }
 

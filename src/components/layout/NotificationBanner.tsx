@@ -1,24 +1,41 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { ANCHO_PAGINA } from '@/lib/estilos'
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, X } from 'lucide-react'
 import type { Notificacion } from '@/data/notificaciones'
 
 /* Banner de tareas pendientes, arriba de la página. Muestra una por vez con flechas ‹ › y el contador; queda hasta que
-   se descarta. Ver design-reference/figma/modulos/header-sidebar.md. */
+   se descarta. Colapsable con la flecha (Julián, 2026-10-19): se achica a una tira con el total, para no perderlo de
+   vista del todo; vuelve a abrirse igual de lleno que se dejó. No se guarda entre sesiones -a diferencia de ocultar
+   una tarea puntual con la X, que si persiste en el store-, a validar si conviene que si lo haga. Ver
+   design-reference/figma/modulos/header-sidebar.md. */
 export function NotificationBanner({
   items, cursor, onCursor, onOcultar,
 }: {
   items: Notificacion[]
   cursor: number
   onCursor: (i: number) => void
-  /** Saca la tarea del banner; sigue pendiente y sigue en la campana. */
+  /** Saca la tarea del banner; sigue sin leer y sigue en la campana. */
   onOcultar: (id: string) => void
 }) {
+  const [colapsado, setColapsado] = useState(false)
   if (items.length === 0) return null
   const actual = items[cursor]
   const Icono = actual.icon
   const mover = (paso: number) => onCursor((cursor + paso + items.length) % items.length)
+
+  if (colapsado) {
+    return (
+      <div className="flex w-full items-center justify-center border-b border-warn-fg/25 bg-warn-bg">
+        <button
+          type="button" onClick={() => setColapsado(false)}
+          className="flex items-center gap-1.5 px-3 py-1 text-[11px] font-semibold text-attn-fg hover:bg-white/60"
+        >
+          {items.length} pending {items.length === 1 ? 'task' : 'tasks'}
+          <ChevronDown aria-hidden className="size-3.5" />
+        </button>
+      </div>
+    )
+  }
 
   const contenido = (
     <>
@@ -46,24 +63,33 @@ export function NotificationBanner({
           </button>
         </span>
       )}
-      <button
-        type="button" onClick={() => onOcultar(actual.id)} aria-label={`Hide from banner: ${actual.titulo}`} title="Hide from banner — stays in notifications"
-        className="flex size-6 shrink-0 items-center justify-center rounded-md text-attn-fg/70 hover:bg-white hover:text-attn-fg"
-      >
-        <X className="size-4" />
-      </button>
+      <span className="ml-auto flex shrink-0 items-center gap-0.5">
+        <button
+          type="button" onClick={() => setColapsado(true)} aria-label="Collapse banner" title="Collapse — shows again with the arrow"
+          className="flex size-6 items-center justify-center rounded-md text-attn-fg/70 hover:bg-white hover:text-attn-fg"
+        >
+          <ChevronUp className="size-4" />
+        </button>
+        <button
+          type="button" onClick={() => onOcultar(actual.id)} aria-label={`Hide from banner: ${actual.titulo}`} title="Hide from banner — stays in notifications"
+          className="flex size-6 items-center justify-center rounded-md text-attn-fg/70 hover:bg-white hover:text-attn-fg"
+        >
+          <X className="size-4" />
+        </button>
+      </span>
     </>
   )
 
-  /* El aviso ámbar del design system (tono warning de Alert), del ancho de su contenido y alineado con la página: la
-     tarea, Review, el paginador y la X juntos, sin hueco en el medio (Julián eligió esta opción, 2026-10-06). */
+  /* El aviso ámbar del design system (tono warning de Alert), de punta a punta: la tarea, Review y el paginador
+     juntos a la izquierda, la flecha para colapsar y la X al final a la derecha (Julián, 2026-10-13; antes iba del
+     ancho de su contenido). Sin padding arriba ni a los costados, ni tope de ancho, ni esquinas redondeadas (Julián,
+     2026-10-19, con una captura propia): ya no usa ANCHO_PAGINA, mide lo mismo que la columna de contenido entera
+     (sidebar aparte), no el `max-w` que acota el resto de la página. El borde queda sólo abajo (Julián, 2026-10-20),
+     igual que el colapsado: arriba, a la izquierda y a la derecha ya lo delimitan el header, el rail y el borde de
+     la ventana. Ver header-sidebar.md. */
   return (
-    <div className="bg-page-background">
-      <div className={cn(ANCHO_PAGINA, 'px-4 pt-4 sm:px-6')}>
-        <div role="status" className="flex w-fit max-w-full items-center gap-3 rounded-lg border border-warn-fg/25 bg-warn-bg py-2 pr-2 pl-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]">
-          {contenido}
-        </div>
-      </div>
+    <div role="status" className="flex w-full items-center gap-3 border-b border-warn-fg/25 bg-warn-bg py-2 pr-2 pl-3 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]">
+      {contenido}
     </div>
   )
 }

@@ -41,8 +41,8 @@ export function NewLocationDrawer({ onClose, onGuardar }: { onClose: () => void;
     >
       <DrawerStep index={0} step={paso}>
         <DrawerSection title="General Information">
-          <TextField label="Name" required placeholder="Introduce your location name" value={d.nombre} onChange={set('nombre')} error={falta('nombre')} />
           <div className="grid gap-4 sm:grid-cols-2">
+            <TextField label="Name" required placeholder="Introduce your location name" value={d.nombre} onChange={set('nombre')} error={falta('nombre')} />
             <TextField label="Abbreviation" placeholder="Introduce abbreviation" value={d.abreviatura} onChange={set('abreviatura')} />
             <SelectField label="Default Fee Schedule" required placeholder="Select fee schedule" options={FEES} value={d.fee} onChange={set('fee')} error={falta('fee')} />
           </div>
@@ -69,8 +69,8 @@ export function NewLocationDrawer({ onClose, onGuardar }: { onClose: () => void;
             <SelectField label="State" required placeholder="Select your region" options={ESTADOS} value={d.estado} onChange={set('estado')} error={falta('estado')} />
             <TextField label="City" required placeholder="Your city" value={d.ciudad} onChange={set('ciudad')} error={falta('ciudad')} />
             <TextField label="ZIP Code" required placeholder="Postal code (only numbers)" value={d.zip} onChange={set('zip')} error={falta('zip')} />
+            <SelectField label="Time Zone" required placeholder="Select your time zone" options={ZONAS} value={d.zona} onChange={set('zona')} error={falta('zona')} />
           </div>
-          <SelectField label="Time Zone" required placeholder="Select your time zone" options={ZONAS} value={d.zona} onChange={set('zona')} error={falta('zona')} />
         </DrawerSection>
       </DrawerStep>
     </ModalShell>

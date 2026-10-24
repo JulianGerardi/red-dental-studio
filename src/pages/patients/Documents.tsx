@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { ChevronLeft, Search, Download, FileText } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { Download, FileText } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
-import { PageTitle } from '@/components/ui/page-title'
+import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table'
 import { Button } from '@/components/ui/button'
@@ -32,12 +34,12 @@ const COLUMNAS: DataTableColumn<Doc>[] = [
     key: 'name', header: 'Name', cell: (d) => (
       <span className="flex min-w-0 items-center gap-3">
         <span className="bg-dash-blue flex size-7 shrink-0 items-center justify-center rounded text-white"><FileText className="size-4" /></span>
-        <span className="truncate text-ink-medium">{d.name}</span>
+        <span className="truncate">{d.name}</span>
       </span>
     ),
   },
   { key: 'firma', header: 'Signature', width: 200, cell: (d) => <Pill tone={FIRMA_TONO[d.firma]}>{d.firma}</Pill> },
-  { key: 'fecha', header: 'Last Update', width: 140, align: 'right', cell: (d) => <span className="text-ink-medium">{d.fecha}</span> },
+  { key: 'fecha', header: 'Last Update', width: 140, cell: (d) => d.fecha },
 ]
 
 export default function Documents() {
@@ -53,15 +55,8 @@ export default function Documents() {
   return (
     <div className={CONTENEDOR_PAGINA}>
 
-      {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
-          El breadcrumb completo repetía lo que ya dice el panel lateral. */}
-      <Link
-        to="/patients"
-        className="text-dash-blue mb-3 inline-flex items-center gap-1 text-sm hover:underline"
-      >
-        <ChevronLeft className="size-4" /> Patients
-      </Link>
-      <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-start">
+      <PatientBreadcrumb name="John Smith" section="Documents" />
+      <div className="flex flex-col gap-5 lg:flex-row">
         <PatientSidePanel
           name="John Smith"
           initials="JS"
@@ -70,35 +65,30 @@ export default function Documents() {
         />
 
         <div className="min-w-0 flex-1">
-          <PageTitle>Documents Manager</PageTitle>
+          {/* El encabezado de las tablas por defecto (Locations, Employees): título con la acción alineada y el buscador de
+              36px con Search en su fila (documents en treatments.md, 2026-10-12). */}
+          <SettingsPageHeader
+            titulo="Documents Manager"
+            accion={(
+              <Button
+                variant="secondary"
+                size="md"
+                iconOnly
+                aria-label="Download selected"
+                onClick={() =>
+                  sel.length
+                    ? aviso.ok(`${sel.length} document${sel.length > 1 ? 's' : ''} downloaded.`)
+                    : aviso.warn('Select at least one document to download.')
+                }
+              >
+                <Download />
+              </Button>
+            )}
+          >
+            <SettingsSearch value={q} onChange={setQ} placeholder="Search documents" />
+          </SettingsPageHeader>
 
-          <div className="mt-4 flex items-center gap-3">
-            <div className="relative w-[265px]">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Search documents"
-                className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-              />
-            </div>
-            <Button
-              variant="secondary"
-              size="md"
-              iconOnly
-              aria-label="Download selected"
-              className="ml-auto"
-              onClick={() =>
-                sel.length
-                  ? aviso.ok(`${sel.length} document${sel.length > 1 ? 's' : ''} downloaded.`)
-                  : aviso.warn('Select at least one document to download.')
-              }
-            >
-              <Download />
-            </Button>
-          </div>
-
-          <div className="mt-3">
+          <div className="mt-4">
             <DataTable
               columns={COLUMNAS}
               rows={filas}

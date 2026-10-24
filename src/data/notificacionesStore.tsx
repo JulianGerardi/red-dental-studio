@@ -1,20 +1,20 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
-import { NOTIFICACIONES, type EstadoNotificacion, type Notificacion } from './notificaciones'
+import { HISTORIAL, NOTIFICACIONES, type EstadoNotificacion, type Notificacion } from './notificaciones'
 
 /* Store en memoria de las notificaciones: lo comparten la campana, el banner y la pantalla Notifications. Como el de
    pacientes, no persiste entre recargas (es un prototipo; la demo arranca siempre igual). Ver
    design-reference/figma/modulos/notifications.md. */
 
-export type NotificacionViva = Notificacion & { archivada: boolean }
+/** La notificación con su estado de ahora (leída o no). */
+export type NotificacionViva = Notificacion
 
 type Ctx = {
   items: NotificacionViva[]
   /** Sacadas del banner con la X: siguen en la campana y en la pantalla. */
   ocultas: string[]
   marcar: (ids: string[], estado: EstadoNotificacion) => void
-  /** Abrirla la marca leída, como en Notion; una pendiente sigue pendiente. */
+  /** Abrirla la marca leída, como en Notion. */
   abrir: (id: string) => void
-  archivar: (ids: string[], archivada: boolean) => void
   ocultarDelBanner: (id: string) => void
   volverAlBanner: (id: string) => void
 }
@@ -22,7 +22,7 @@ type Ctx = {
 const Contexto = createContext<Ctx | null>(null)
 
 export function NotificacionesProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<NotificacionViva[]>(() => NOTIFICACIONES.map((n) => ({ ...n, archivada: n.archivada ?? false })))
+  const [items, setItems] = useState<NotificacionViva[]>(() => [...NOTIFICACIONES, ...HISTORIAL])
   const [ocultas, setOcultas] = useState<string[]>([])
 
   const cambiar = useCallback((ids: string[], f: (n: NotificacionViva) => NotificacionViva) =>
@@ -32,8 +32,7 @@ export function NotificacionesProvider({ children }: { children: ReactNode }) {
     items,
     ocultas,
     marcar: (ids, estado) => cambiar(ids, (n) => ({ ...n, estado })),
-    abrir: (id) => cambiar([id], (n) => (n.estado === 'unread' ? { ...n, estado: 'read' } : n)),
-    archivar: (ids, archivada) => cambiar(ids, (n) => ({ ...n, archivada })),
+    abrir: (id) => cambiar([id], (n) => ({ ...n, estado: 'read' })),
     ocultarDelBanner: (id) => setOcultas((xs) => (xs.includes(id) ? xs : [...xs, id])),
     volverAlBanner: (id) => setOcultas((xs) => xs.filter((x) => x !== id)),
   }), [items, ocultas, cambiar])
@@ -47,6 +46,6 @@ export function useNotificaciones() {
   return ctx
 }
 
-/* Las del banner: tareas sin resolver (sin leer o pendientes), no archivadas ni sacadas con la X. */
+/* Las del banner: tareas sin leer, no sacadas con la X. */
 export const delBanner = (items: NotificacionViva[], ocultas: string[]) =>
-  items.filter((n) => n.tarea && n.estado !== 'read' && !n.archivada && !ocultas.includes(n.id))
+  items.filter((n) => n.tarea && n.estado === 'unread' && !ocultas.includes(n.id))

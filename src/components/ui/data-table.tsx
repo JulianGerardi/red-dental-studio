@@ -4,12 +4,14 @@ import { ChevronRight, GripVertical, MoveHorizontal, RotateCw, Search, SearchX, 
 import { Checkbox } from '@/components/ui/checkbox'
 import { EmptyState } from '@/components/ui/empty-state'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
-import { FilterMenu } from '@/components/ui/filter-menu'
+import { FilterMenu, type FilterOption } from '@/components/ui/filter-menu'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
-import { ManijaResize, useAnchoColumnas } from '@/components/patients/ledger/useAnchoColumnas'
+import { ManijaResize, useAnchoColumnas, useAnchoVisible } from '@/components/patients/ledger/useAnchoColumnas'
 import { cn } from '@/lib/utils'
+import { Avatar } from '@/components/ui/avatar'
+import { TABLA_ENCABEZADO, TABLA_LINK, TABLA_TEXTO } from '@/lib/estilos'
 
 /* Tabla estándar de la app: la misma anatomía que Patients, Team, Accounts y
    Documents -caja con borde, encabezado gris, filas con divisor, pie con
@@ -43,7 +45,7 @@ const GAP = 12
 const PADDING = 32
 
 export function DataTable<T>({
-  columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail, reorder,
+  columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail, defaultExpanded, reorder,
   search, filter, columnPicker, resizable, actions,
   pageSize: pageSizeInicial = 10, pageSizeOptions, pageSizeLabel = 'Rows per page:',
   itemLabel = 'results', density = 'regular', selected, onSelectedChange,
@@ -66,13 +68,15 @@ export function DataTable<T>({
   onRowClick?: (row: T) => void
   /** Detalle que se despliega al hacer clic en la fila, como en el Ledger. */
   rowDetail?: (row: T) => ReactNode
+  /** Filas que arrancan desplegadas (ids); la tabla abre en la página de la primera. */
+  defaultExpanded?: string[]
   /** Manija para reordenar filas arrastrando (o con ↑ ↓ desde el teclado).
       `canMove` deja fijas las filas que no se pueden mover. */
   reorder?: { onReorder: (from: T, to: T) => void; canMove?: (row: T) => boolean }
   /** Buscador arriba de la tabla. `match` decide si la fila coincide. */
   search?: { placeholder?: string; match: (row: T, query: string) => boolean }
-  /** Filtro por categorías (el embudo). Sin nada tildado, se ve todo. */
-  filter?: { label: string; options: string[]; match: (row: T, selected: string[]) => boolean }
+  /** Filtro por categorías (el embudo). Sin nada tildado, se ve todo. Cada opción puede llevar cantidad y color. */
+  filter?: { label: string; options: FilterOption[]; match: (row: T, selected: string[]) => boolean }
   /** Botón Columns para elegir qué columnas se ven. */
   columnPicker?: boolean
   /** Bordes de columna que se arrastran para achicar o ensanchar. */
@@ -96,8 +100,11 @@ export function DataTable<T>({
   /** Filas que no se pueden elegir ni accionar: se ven atenuadas. */
   isRowDisabled?: (row: T) => boolean
 }) {
-  const [pagina, setPagina] = useState(1)
   const [pageSize, setPageSize] = useState(pageSizeInicial)
+  const [pagina, setPagina] = useState(() => {
+    const i = defaultExpanded?.length ? rows.findIndex((r) => rowKey(r) === defaultExpanded[0]) : -1
+    return i < 0 ? 1 : Math.floor(i / pageSizeInicial) + 1
+  })
   const [elegidasPropias, setElegidasPropias] = useState<string[]>([])
   const elegidas = selected ?? elegidasPropias
   /* La última selección, para que dos clics seguidos no se pisen antes de
@@ -113,7 +120,8 @@ export function DataTable<T>({
   const [q, setQ] = useState('')
   const [filtro, setFiltro] = useState<string[]>([])
   const [ocultas, setOcultas] = useState<string[]>(() => columns.filter((c) => c.hidden && !c.locked).map((c) => c.key))
-  const [abiertas, setAbiertas] = useState<string[]>([])
+  const [abiertas, setAbiertas] = useState<string[]>(defaultExpanded ?? [])
+  const refVisible = useAnchoVisible<HTMLDivElement>()
   const arrastrada = useRef<T | null>(null)
   const anchos = useAnchoColumnas<string>(Object.fromEntries(columns.map((c) => [c.key, c.width ?? MIN_FLEX])))
 
@@ -213,13 +221,14 @@ export function DataTable<T>({
       )}
 
       <div
+        ref={refVisible}
         data-tabla-scroll
         aria-busy={loading || undefined}
         aria-disabled={disabled || undefined}
         className={cn('overflow-x-auto rounded-lg border border-line-row bg-white', disabled && 'pointer-events-none select-none opacity-60')}
       >
         <div style={{ minWidth: minimo }}>
-          <div role="row" data-tabla-header className="group/fila flex h-11 items-center gap-3 bg-surface-alt px-4 text-[11px] font-semibold text-ink-muted">
+          <div role="row" data-tabla-header className={cn('group/fila flex h-11 gap-3', TABLA_ENCABEZADO)}>
             {reorder && <span className="w-5 shrink-0" aria-hidden />}
             {rowDetail && <span className="w-4 shrink-0" aria-hidden />}
             {selectable && <Checkbox on={todas} onChange={alternarTodas} label="Select all rows" disabled={inactiva || ids.length === 0} />}
@@ -302,7 +311,8 @@ export function DataTable<T>({
                     onClick={alHacerClic ? (e) => { if (!(e.target as HTMLElement).closest('[role="separator"]')) alHacerClic() } : undefined}
                     onKeyDown={alHacerClic ? (e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); alHacerClic() } } : undefined}
                     className={cn(
-                      'group/fila flex items-center gap-3 px-4 text-[13px] text-ink-soft transition-colors focus-visible:outline-none focus-visible:bg-surface-subtle',
+                      'group/fila flex items-center gap-3 px-4 transition-colors focus-visible:outline-none focus-visible:bg-surface-subtle',
+                      TABLA_TEXTO,
                       ALTO_FILA[density],
                       off ? 'text-ink-faint [&_*]:opacity-70' : elegida ? 'bg-dash-count-bg' : abierta ? 'bg-surface-subtle' : alHacerClic && 'cursor-pointer hover:bg-surface-subtle',
                     )}
@@ -324,7 +334,7 @@ export function DataTable<T>({
                         </button>
                       ) : <span className="w-5 shrink-0" aria-hidden />
                     )}
-                    {rowDetail && <ChevronRight aria-hidden className={cn('size-4 shrink-0 text-ink-faint transition-transform', abierta && 'rotate-90')} />}
+                    {rowDetail && <RowChevron open={abierta} />}
                     {selectable && (
                       <span onClick={(e) => e.stopPropagation()} className="flex">
                         <Checkbox on={elegida} onChange={() => alternar(id)} label={`Select ${nombre(r)}`} disabled={off} />
@@ -338,7 +348,10 @@ export function DataTable<T>({
                       </div>
                     )}
                   </div>
-                  {rowDetail && abierta && <div className="border-t border-line-soft bg-surface-subtle px-4 py-3 pl-11 text-[13px] text-ink-soft">{rowDetail(r)}</div>}
+                  {/* Con la tabla más ancha que la vista, el detalle queda fijo en la parte que se ve (como en el Ledger). */}
+                  {rowDetail && abierta && (
+                    <div className="sticky left-0 w-[var(--tabla-visible,100%)] border-t border-line-soft bg-surface-subtle px-4 py-3 pl-11 text-[13px] text-ink-soft">{rowDetail(r)}</div>
+                  )}
                 </div>
               )
             })
@@ -385,22 +398,23 @@ export function DataTable<T>({
 
 /* Celdas que se repiten en las tablas de la app. */
 
-/** Iniciales en un círculo azul y el nombre como link. */
-export function PersonCell({ name, initials, to, onClick, tone = 'solid' }: {
+/** La flecha de la fila que se despliega: primera columna, gira al abrir. La llevan todas las tablas con detalle por
+    fila (DataTable, Ledger, Treatment Plan); una fila que navega o abre un drawer no. Ver design-system.md (2026-10-18). */
+export function RowChevron({ open }: { open: boolean }) {
+  return <ChevronRight aria-hidden className={cn('size-4 shrink-0 text-ink-faint transition-transform', open && 'rotate-90')} />
+}
+
+/** El Avatar (ui/avatar, 32px) y el nombre como link. Pacientes y equipo, igual. */
+export function PersonCell({ name, initials, to, onClick }: {
   name: string
   initials: string
   to?: string
   onClick?: () => void
-  /** solid: pacientes. soft: equipo (círculo celeste, iniciales azules). */
-  tone?: 'solid' | 'soft'
 }) {
-  const clase = 'text-dash-blue truncate text-[13px] font-semibold hover:underline'
+  const clase = cn(TABLA_LINK, 'text-[13px]')
   return (
     <span className="flex min-w-0 items-center gap-2.5">
-      <span className={cn(
-        'flex size-8 shrink-0 items-center justify-center rounded-full font-semibold',
-        tone === 'solid' ? 'bg-dash-blue-hover text-[13px] text-surface-subtle' : 'bg-dash-count-bg text-dash-blue-hover text-[11px]',
-      )}>{initials}</span>
+      <Avatar initials={initials} />
       {to ? (
         <Link to={to} onClick={(e) => e.stopPropagation()} className={clase}>{name}</Link>
       ) : (
@@ -410,12 +424,13 @@ export function PersonCell({ name, initials, to, onClick, tone = 'solid' }: {
   )
 }
 
-/** Texto que se corta con "…" si no entra, con el texto completo al pasar el mouse. */
+/** Texto que se corta con "…" si no entra, con el texto completo al pasar el mouse. `strong` queda para el Builder: las
+    tablas de la app no lo usan (patrón de tablas, design-system.md). */
 export function TextCell({ children, strong }: { children: string; strong?: boolean }) {
   return <span title={children} className={cn('truncate', strong && 'font-medium text-ink')}>{children}</span>
 }
 
 /** Monto alineado a la derecha, con cifras de ancho fijo. */
 export function AmountCell({ value }: { value: number }) {
-  return <span className={cn('font-medium tabular-nums', value < 0 ? 'text-dash-ok-fg' : 'text-ink')}>{value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
+  return <span className={cn('tabular-nums', value < 0 && 'text-dash-ok-fg')}>{value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
 }

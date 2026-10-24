@@ -5,6 +5,7 @@ import {
   CircleUserRound, CreditCard, CircleHelp, Info, LogOut, EyeOff, ArrowRight, CheckCheck,
 } from 'lucide-react'
 import { LocationSelector } from './LocationSelector'
+import { Saludo } from './Saludo'
 import { haceCuanto, type Notificacion } from '@/data/notificaciones'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -13,6 +14,7 @@ import {
 import { aviso } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
 import { ANCHO_PAGINA } from '@/lib/estilos'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Figma 3636:57489 (Secretary) y 3605:56446 (Provider). Alto 64, fondo blanco.
    El glifo ⌘ del buscador aparece solo en el frame Provider — en recepcionista
@@ -58,7 +60,7 @@ export function Topbar({
           el saludo, la locación, el nombre del perfil y por último el ancho
           fijo del buscador. */}
       <div className="flex min-w-0 flex-1 items-center justify-between gap-3 xl:gap-6">
-      <div className="flex min-w-0 shrink-0 items-center gap-2">
+      <div className="flex min-w-0 shrink-0 items-center gap-3.5">
         {/* Botón con borde, no un icono suelto. La flecha invierte su
             dirección según el estado, con un pulso corto al presionar. */}
         <button
@@ -75,9 +77,8 @@ export function Topbar({
           <ToggleIcon className="size-[18px] transition-transform duration-200" />
         </button>
 
-        <p className="hidden items-center gap-1.5 text-[19px] whitespace-nowrap text-black lg:flex">
-          <span aria-hidden>👋</span> Hi! Dentist Sarah
-        </p>
+        {/* Se escribe el saludo y después la fecha del día (Saludo, 2026-10-13). */}
+        <Saludo className="hidden lg:flex" />
       </div>
 
       <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-4 xl:gap-6">
@@ -119,18 +120,16 @@ export function MenuCuenta() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-1 py-1 transition-colors hover:bg-surface-muted">
-        <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold">
-          SS
-        </span>
+      <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-md px-1 py-0.5 transition-colors hover:bg-surface-muted">
+        <Avatar initials="SS" size={28} />
         {/* Los dos frames del Figma difieren acá: Provider usa nombre negro
             medium + rol gris semibold; Secretary pone ambos en gris semibold.
             Se toma la versión del Provider, que da jerarquía real. */}
-        <span className="hidden flex-col items-start text-[12px] leading-[1.35] sm:flex">
+        <span className="hidden flex-col items-start text-[11px] leading-[1.25] sm:flex">
           <span className="font-medium text-ink">Sarah Stone</span>
           <span className="font-semibold text-ink-muted">Dentist</span>
         </span>
-        <ChevronDown className="hidden size-4 shrink-0 text-ink-muted sm:block" />
+        <ChevronDown className="hidden size-3.5 shrink-0 text-ink-muted sm:block" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-[248px]">
@@ -158,7 +157,7 @@ export function MenuCuenta() {
 
 /* La campana: las últimas notificaciones, con la lógica del Inbox de Notion. El número son las que no se leyeron;
    abrir una la marca leída y lleva a donde pasó. Todas están en Notifications ("View all notifications"), donde se
-   marcan como leídas, pendientes o sin leer y se archivan. Nada se borra desde acá. Ver
+   marcan como leídas o sin leer. Nada se borra desde acá. Ver
    design-reference/figma/modulos/notifications.md. */
 const EN_CAMPANA = 5
 
@@ -211,17 +210,16 @@ export function Campana({
               <DropdownMenuItem
                 key={n.id}
                 onSelect={() => { onAbrir?.(n.id); onVolverAlBanner?.(n.id); navigate(n.to) }}
-                className={cn('items-start gap-2.5 py-2.5 pl-1.5', n.estado === 'pending' && 'bg-warn-bg')}
+                className="items-start gap-2.5 py-2.5 pl-1.5"
               >
-                <span aria-hidden className={cn('mt-[7px] size-1.5 shrink-0 rounded-full', n.estado === 'unread' ? 'bg-dash-blue' : n.estado === 'pending' ? 'bg-amber' : 'bg-transparent')} />
-                <n.icon className={cn('mt-0.5 size-4 shrink-0', n.estado === 'pending' ? 'text-attn-fg' : 'text-ink-muted')} />
+                <span aria-hidden className={cn('mt-[7px] size-1.5 shrink-0 rounded-full', n.estado === 'unread' ? 'bg-dash-blue' : 'bg-transparent')} />
+                <n.icon className="mt-0.5 size-4 shrink-0 text-ink-muted" />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-baseline justify-between gap-2">
                     <span className={cn('truncate text-[13px] text-ink', n.estado === 'read' ? 'font-medium' : 'font-semibold')}>{n.titulo}</span>
                     <span className="shrink-0 text-[11px] text-ink-faint">{haceCuanto(n.hace)}</span>
                   </span>
                   <span className="block text-[12px] leading-snug text-ink-muted">{n.detalle}</span>
-                  {n.estado === 'pending' && <span className="sr-only">(pending)</span>}
                   {ocultas.includes(n.id) && (
                     <span className="mt-1 flex items-center gap-1 text-[11px] font-medium text-ink-faint">
                       <EyeOff className="size-3" /> Hidden from banner
@@ -266,21 +264,21 @@ export function GlobalSearch({ showCommandHint }: { showCommandHint: boolean }) 
 
   return (
     <div ref={ref} className="relative w-full min-w-0 max-w-[304px]">
-      <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+      <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
       <input
         value={q}
         onChange={(e) => { setQ(e.target.value); setOpen(true) }}
         onFocus={() => setOpen(true)}
         placeholder="Search..."
         className={cn(
-          'h-8 w-full rounded-md border border-line bg-white pl-9 text-[13px] font-medium',
+          'h-7 w-full rounded-md border border-line bg-white pl-8 text-[12px] font-medium',
           'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint',
           'focus:border-dash-blue focus:outline-none',
-          showCommandHint ? 'pr-9' : 'pr-3',
+          showCommandHint ? 'pr-8' : 'pr-3',
         )}
       />
       {showCommandHint && (
-        <span aria-hidden className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-ink-muted">
+        <span aria-hidden className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-[13px] text-ink-muted">
           ⌘
         </span>
       )}

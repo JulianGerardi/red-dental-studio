@@ -1,17 +1,20 @@
-import { useMemo, useState } from 'react'
-import { CalendarDays, Clock, Activity, CalendarClock } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { CalendarDays, Clock, Activity, ShieldQuestionMark, CalendarClock } from 'lucide-react'
 import { Panel } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { PageTitle } from '@/components/ui/page-title'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
-import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
+import type { Appointment } from '@/components/dashboard/AppointmentCard'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
 import { DatePicker, sameDay } from '@/components/ui/date-picker'
-import { OperatoryCard } from '@/components/dashboard/OperatoryCard'
-import { PendingTaskCard } from '@/components/dashboard/PendingTaskCard'
+import { OperatoryList } from '@/components/dashboard/OperatoryList'
+import { AppointmentRow } from '@/components/dashboard/DashboardRows'
+import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
+import { ListGroup } from '@/components/ui/list-group'
 import {
-  DIAS, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
+  DIAS, DIA_CARGADO, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
   type DiaDashboard, type Origen,
 } from '@/components/dashboard/dashboard-data'
 import {
@@ -21,16 +24,20 @@ import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
 import { formatDMY } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { Button, buttonClasses } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { useMedia } from '@/lib/media'
+import { useAltoRestante } from '@/lib/altoRestante'
 
 /* Figma 4430:57451 — rediseño del dashboard.
    Cambios respecto de la versión anterior (3605:56445 / 3636:57488):
    - El frame lo rotula "Patients"; es un error del archivo (anomalía 54) y
      Julián confirmó que va "Dashboard".
    - Los tres stat cards se juntaron en una sola tira arriba a la derecha.
-   - Las columnas son Appointments · Waiting Room · Rooms, fijas: el toggle
-     Provider / Recepcionista ya no está en el diseño.
-   - Pending Task bajó a una franja a lo ancho, con las tareas en tres
-     columnas (cuatro desde 1360px: con tres, las 8 del día dejaban un hueco; más angosto el nombre se cortaba). Los tabs se sacaron: hacían lo mismo que el embudo.
+   - Las salas van en una tira arriba y Appointments · Waiting Room en dos columnas a todo el ancho (Julián,
+     2026-10-13). El toggle Provider / Recepcionista ya no está en el diseño.
+   - Pending Task: tercera columna desde 1280px; más angosto, una franja a lo ancho. Los tabs se sacaron: hacían lo mismo que el embudo.
+   - Turnos y tareas van en filas con las mismas partes que las cards, con tope y "Show N more" (2026-10-12).
    - Desapareció el cuarto panel "Rooms" vacío del pie.
 
    **Toda la pantalla cuelga del filtro de fecha** del panel de Appointments:
@@ -50,16 +57,79 @@ export function BotonFiltro({
   return <FilterMenu label={label} options={options} value={value} onChange={onChange} size="sm" tour="dash-filter" />
 }
 
+/* La fecha de toda la pantalla, el atajo a hoy y las preguntas frecuentes. Today va en md: la altura del
+   DatePicker (ver dashboard.md, 2026-10-09). El selector va como barra
+   ("Feb 28, 2026"), el mismo campo que el Date filter (dashboard.md, 2026-10-12). */
+export function FiltroFecha({
+  value, onChange, marked, className,
+}: {
+  value: Date
+  onChange: (d: Date) => void
+  marked?: Date[]
+  className?: string
+}) {
+  return (
+    <div className={cn('flex flex-wrap items-center gap-2', className)} data-tour="dash-date">
+      <DatePicker variant="toolbar" value={value} onChange={onChange} marked={marked} />
+      {/* Volver a hoy sin tener que abrir el calendario y buscar el día.
+          Desaparece cuando ya estás en hoy: no tendría nada que hacer. */}
+      {!sameDay(value, new Date()) && (
+        <Button
+          variant="secondary" size="md" onClick={() => onChange(new Date())} title="Go to today"
+          className="shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]"
+        >
+          <CalendarClock /> Today
+        </Button>
+      )}
+      {/* Las preguntas frecuentes, en Help con el Dashboard abierto (Julián, 2026-10-13). */}
+      <Link
+        to="/help" aria-label="Frequently asked questions" title="Frequently asked questions"
+        className={buttonClasses({ variant: 'secondary', size: 'md', iconOnly: true, className: 'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]' })}
+      >
+        <ShieldQuestionMark />
+      </Link>
+    </div>
+  )
+}
+
+/* Un día real de una clínica (35 turnos, 8 en espera, 28 tareas) en la fecha de la demo, para ver el Dashboard con
+   volumen: ?day=busy (dashboard.md, 2026-10-12). */
+const conDiaCargado = (dias: Record<string, DiaDashboard>) => ({ ...dias, [claveFecha(HOY_DEMO)]: DIA_CARGADO })
+
+/* Cuántas filas se ven en cada panel antes de "Show N more" (ver ui/show-more). */
+const TOPE = { turnos: 5, espera: 5, tareas: 5 }
+
+/* La acción la dice el panel, no el turno (Julián, 2026-10-18): en Appointments el paciente todavía no llegó (Check In,
+   verde) y en Waiting Room ya está adentro (Check Out, azul). Ver dashboard.md. */
+
 export default function Dashboard() {
+  const [params] = useSearchParams()
+  const cargado = params.get('day') === 'busy'
+
   const [date, setDate] = useState(DEFAULT_DATE)
   const [salas, setSalas] = useState<string[]>([])
   const [tipos, setTipos] = useState<string[]>([])
+  /* La Waiting Room tiene su propio filtro, como Appointments; las salas ya no la filtran (dashboard.md, 2026-10-19). */
+  const [salasEspera, setSalasEspera] = useState<string[]>([])
+  /* Desde 1280px las tres columnas toman el alto de la ventana y scrollean adentro; Pending Task va abajo, a todo el ancho. */
+  const ajusta = useMedia('(min-width: 1280px)')
+  const grilla = useRef<HTMLDivElement>(null)
+  const altoGrilla = useAltoRestante(grilla, ajusta, { abajo: 16 })
   const [selected, setSelected] =
     useState<{ appt: Appointment; rect: DOMRect; id?: string } | null>(null)
   const [editando, setEditando] = useState<{ datos: DatosTurno; origen: Origen } | null>(null)
   /* Los días viven en estado: reprogramar un turno tiene que moverlo de fecha
      y verse en el día nuevo. */
-  const [dias, setDias] = useState(DIAS)
+  const [dias, setDias] = useState(() => (cargado ? conDiaCargado(DIAS) : DIAS))
+  /* Al cambiar de día cargado a demo (o al revés) se vuelve a la fecha de la demo, que es la que cambia. */
+  const [cargadoAntes, setCargadoAntes] = useState(cargado)
+  useEffect(() => {
+    if (cargado === cargadoAntes) return
+    setCargadoAntes(cargado)
+    setDias(cargado ? conDiaCargado(DIAS) : DIAS)
+    setDate(HOY_DEMO)
+    setSelected(null)
+  }, [cargado, cargadoAntes])
 
   const dia: DiaDashboard = useMemo(
     () => dias[claveFecha(date)] ?? DIA_VACIO,
@@ -152,52 +222,35 @@ export default function Dashboard() {
     (a) => salas.length === 0 || salas.includes(a.operatory),
   )
   const tareas = dia.tasks.filter((t) => tipos.length === 0 || tipos.includes(t.kind))
-
-  /* "Today" sólo si la fecha elegida es de verdad hoy; si no, el día que sea. */
-  const hoy = sameDay(date, new Date())
-  const encabezado = date.toLocaleDateString('en-US', {
-    month: 'long', day: 'numeric', year: 'numeric',
-  })
-  const diaSemana = date.toLocaleDateString('en-US', { weekday: 'long' })
+  const operatoriosEspera = useMemo(
+    () => [...new Set(dia.waiting.map((w) => w.operatory))].sort(),
+    [dia],
+  )
+  const enEspera = dia.waiting.filter((w) => salasEspera.length === 0 || salasEspera.includes(w.operatory))
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <p className="text-dash-blue text-sm">
-            {hoy ? 'Today' : diaSemana} • {encabezado}
-          </p>
+      {/* El día de hoy pasó al Topbar y el elegido lo dice el selector (Julián, 2026-10-13). Título, fecha y números en una
+          sola fila: así las columnas de abajo se llevan el alto (2026-10-19). La fecha manda sobre toda la pantalla y vive
+          acá arriba, no adentro de Appointments: metida en una de las columnas, parecía filtrar sólo esa. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
           <PageTitle size="lg">Dashboard</PageTitle>
+          <FiltroFecha value={date} onChange={setDate} marked={diasConDatos} />
         </div>
         <div data-tour="dash-stats">
           <StatStrip stats={stats} />
         </div>
       </div>
 
-      {/* La fecha manda sobre las tres columnas, así que vive acá arriba y no
-          adentro de Appointments: metida en una de las tres, parecía filtrar
-          sólo esa. */}
-      <div className="mt-4 flex flex-wrap items-center gap-2" data-tour="dash-date">
-        <DatePicker value={date} onChange={setDate} marked={diasConDatos} />
-        {/* Volver a hoy sin tener que abrir el calendario y buscar el día.
-            Desaparece cuando ya estás en hoy: no tendría nada que hacer. */}
-        {!hoy && (
-          <button
-            onClick={() => setDate(new Date())}
-            title="Go to today"
-            className="flex h-9 items-center gap-1.5 rounded-md border border-line bg-white px-3 text-[13px] font-medium shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors hover:bg-surface-subtle"
-          >
-            <CalendarClock className="size-4" /> Today
-          </button>
-        )}
-        <span className="text-[12px] text-ink-muted">
-          Appointments, waiting room and tasks follow this date.
-        </span>
-      </div>
-
-      <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* Mucho volumen: filas en lugar de cards (las mismas partes). Hasta 1279px, un tope por panel y "Show N more" abre el resto con
+          scroll adentro (dashboard.md, 2026-10-12); desde ahí, tres columnas que toman el alto de la ventana y scrollean adentro. */}
+      <div
+        ref={grilla} style={altoGrilla ? { height: altoGrilla } : undefined}
+        className="mt-4 grid gap-4 lg:max-[1279px]:grid-cols-2 min-[1280px]:grid-cols-3 min-[1280px]:grid-rows-[minmax(0,1fr)]"
+      >
         <Panel
-          title="Appointments"
+          title="Appointments" scroll={ajusta}
           controls={
             <BotonFiltro
               label="Filter appointments" options={operatorios}
@@ -217,68 +270,81 @@ export default function Dashboard() {
               accion={{ label: 'New appointment', onClick: () => aviso.info('Use Scheduling to create an appointment.') }}
             />
           ) : (
-            turnos.map((a, i) => (
-              <AppointmentCard
-                key={i} appt={a} id={`appt-${i}`} activa={selected?.id === `appt-${i}`}
-                onSelect={pick}
-                onEdit={(x) => editar(x, {
-                  clave: claveFecha(date), panel: 'appointments',
-                  index: dia.appointments.indexOf(a),
-                })}
-              />
-            ))
+            <ListGroup limit={ajusta ? undefined : TOPE.turnos} label="appointments">
+              {turnos.map((a, i) => (
+                <AppointmentRow
+                  key={i} appt={{ ...a, accion: 'Check In' }} id={`appt-${i}`} activa={selected?.id === `appt-${i}`}
+                  onSelect={pick}
+                  onEdit={(x) => editar(x, {
+                    clave: claveFecha(date), panel: 'appointments',
+                    index: dia.appointments.indexOf(a),
+                  })}
+                />
+              ))}
+            </ListGroup>
           )}
         </Panel>
 
-        <Panel title="Waiting Room">
-          {dia.waiting.length === 0 ? (
-            <EmptyState
-              icon={Clock}
-              title="Waiting room is empty"
-              detail="No patients have checked in for this day yet."
-            />
-          ) : (
-            dia.waiting.map((a, i) => (
-              <AppointmentCard
-                key={i} appt={a} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
-                onSelect={pick}
-                onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: i })}
-              />
-            ))
-          )}
-        </Panel>
-
-        <Panel title="Rooms">
-          {dia.rooms.map((r, i) => <OperatoryCard key={i} room={r} />)}
-        </Panel>
-      </div>
-
-      <div className="mt-4">
         <Panel
-          title="Pending Task"
+          title="Waiting Room" scroll={ajusta}
           controls={
             <BotonFiltro
-              label="Filter tasks" options={TASK_KINDS} value={tipos} onChange={setTipos}
+              label="Filter waiting room" options={operatoriosEspera}
+              value={salasEspera} onChange={setSalasEspera}
             />
           }
         >
-          {tareas.length === 0 ? (
+          {enEspera.length === 0 ? (
             <EmptyState
-              icon={Activity}
-              title="Nothing pending"
+              icon={Clock}
+              title={salasEspera.length > 0 ? 'No one is waiting there' : 'Waiting room is empty'}
               detail={
-                dia.tasks.length === 0
-                  ? 'There are no tasks waiting on this day.'
-                  : 'No pending tasks match the selected types.'
+                salasEspera.length > 0
+                  ? 'No patients match the selected operatories.'
+                  : 'No patients have checked in for this day yet.'
               }
             />
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 min-[1360px]:grid-cols-4">
-              {tareas.map((t, i) => <PendingTaskCard key={i} task={t} />)}
-            </div>
+            <ListGroup limit={ajusta ? undefined : TOPE.espera} label="patients waiting">
+              {enEspera.map((a, i) => (
+                <AppointmentRow
+                  key={i} appt={{ ...a, accion: 'Check Out' }} id={`wait-${i}`} activa={selected?.id === `wait-${i}`}
+                  onSelect={pick}
+                  onEdit={(x) => editar(x, { clave: claveFecha(date), panel: 'waiting', index: dia.waiting.indexOf(a) })}
+                />
+              ))}
+            </ListGroup>
           )}
         </Panel>
+
+        <Panel title="Rooms" scroll={ajusta}>
+          <OperatoryList rooms={dia.rooms} turnos={dia.appointments} onSelect={(a, el) => pick(a, el)} />
+        </Panel>
       </div>
+
+      {/* Pending Task va abajo, a todo el ancho: arriba queda la fila de tres (Julián, 2026-10-19). */}
+      <Panel
+        title="Pending Task" className="mt-4"
+        controls={
+          <BotonFiltro
+            label="Filter tasks" options={TASK_KINDS} value={tipos} onChange={setTipos}
+          />
+        }
+      >
+        {tareas.length === 0 ? (
+          <EmptyState
+            icon={Activity}
+            title="Nothing pending"
+            detail={
+              dia.tasks.length === 0
+                ? 'There are no tasks waiting on this day.'
+                : 'No pending tasks match the selected types.'
+            }
+          />
+        ) : (
+          <PendingTaskList tasks={tareas} limit={TOPE.tareas} />
+        )}
+      </Panel>
 
       {editando && (
         <NewAppointmentModal

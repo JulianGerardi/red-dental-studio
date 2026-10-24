@@ -51,7 +51,9 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
           </p>
         </div>
 
-        <div>
+        {/* De a dos como los horarios de abajo: Location va en la columna izquierda (Drawer → Specs → Fields). */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
           <SelectField
             label="Location"
             options={['Abril', 'Alaska Medical', 'Bayside Dental']}
@@ -60,11 +62,12 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
             error={intentado && !locacion.trim() ? 'This field is required.' : undefined}
           />
           <p className="mt-1.5 text-[11px] text-ink-muted">{ZONA}</p>
+          </div>
         </div>
 
         {rangos.map((r, i) => (
           <div key={i}>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <SelectField
                 label="Start Time" placeholder="00:00 hs" options={HORAS} value={r.inicio}
                 onChange={(v) => setRangos((p) => p.map((x, j) => (j === i ? { ...x, inicio: v } : x)))}

@@ -145,19 +145,19 @@ export function LocationSelector() {
         aria-expanded={open}
         aria-haspopup="dialog"
         className={cn(
-          'flex h-8 items-center gap-3 rounded-md border bg-white py-1 pr-[11px] pl-[7px] transition-colors',
+          'flex h-7 items-center gap-2.5 rounded-md border bg-white py-1 pr-[9px] pl-[7px] transition-colors',
           /* Abierto, el selector toma borde azul (Figma: border-dash-blue). */
           open ? 'border-dash-blue' : 'border-line',
         )}
       >
-        <MapPin className="text-dash-blue size-4 shrink-0" />
-        <span className="text-sm leading-none whitespace-nowrap">
+        <MapPin className="text-dash-blue size-3.5 shrink-0" />
+        <span className="text-[13px] leading-none whitespace-nowrap">
           <span className="text-dash-blue">{elegida.name}</span>{' '}
           <span className="font-medium text-black">- {elegida.ciudad}</span>
         </span>
         <ChevronDown
           className={cn(
-            'size-4 shrink-0 text-[#0f172a] transition-transform duration-200',
+            'size-3.5 shrink-0 text-[#0f172a] transition-transform duration-200',
             open && 'rotate-180',
           )}
         />
@@ -169,7 +169,7 @@ export function LocationSelector() {
           aria-label="Select location"
           className={cn(
             'absolute top-[calc(100%+5px)] left-0 z-50 w-[320px] max-w-[calc(100vw-24px)] rounded-xl border border-line bg-white p-4',
-            'flex flex-col gap-3 shadow-[0_8px_28px_rgb(0_0_0/0.18)]',
+            'flex flex-col gap-3 shadow-floating',
             'motion-safe:animate-[loc-in_140ms_ease-out]',
           )}
         >

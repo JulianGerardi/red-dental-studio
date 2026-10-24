@@ -2,10 +2,16 @@ import { DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { useState } from 'react'
 import { CirclePlus, Pencil, ShieldHalf, Hospital, AArrowUp } from 'lucide-react'
 import {
-  ModalShell, SectionCard, SearchField, SelectField, TextField,
+  ModalShell, SectionCard, SearchField, PersonSearchField, SelectField, TextField,
   DateTextField, TextArea, OptionCheckbox,
 } from '@/components/patients/form'
 import { PersonaSeleccionada, DIRECTORIO } from '@/components/patients/AddRelationshipDrawer'
+
+/* DOB y email de quien está en el directorio (mismo diseño que Add Relationship → Select person: Julián, 2026-10-20). */
+const personaLineas = (nombre: string) => {
+  const p = DIRECTORIO.find((x) => x.name === nombre)
+  return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
+}
 import { CARRIERS, PLANES_NOMBRE, ORDENES, SUSCRIPCION } from '@/data/insurance'
 import { aviso } from '@/components/ui/toaster'
 
@@ -68,29 +74,26 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
 
           {modo === 'existente' && (
             <SectionCard title="Select Subscriber">
-              <SearchField
-                label="Plan name"
-                options={DIRECTORIO.map((p) => p.name)}
+              <PersonSearchField
+                label="Select person" placeholder="Search by Name or Last Name"
+                personas={DIRECTORIO.map((p) => p.name)}
                 value={d.persona}
                 onChange={set('persona')}
-              />
-              <PersonaSeleccionada
-                p={DIRECTORIO.find((p) => p.name === d.persona) ?? DIRECTORIO[0]}
+                lineas={personaLineas}
               />
             </SectionCard>
           )}
 
           {modo === 'nuevo' && (
             <SectionCard title="New Subscriber">
-              <div className="grid gap-4 sm:grid-cols-3">
+              {/* De a dos, como New Patient: nunca tres por fila (Components / UI / Drawer → Specs → Fields). */}
+              <div className="grid gap-4 sm:grid-cols-2">
                 {/* "Loremp" es el placeholder del Figma. */}
                 <TextField label="Name" required placeholder="Loremp" value={d.nombre} onChange={set('nombre')} error={req('nombre')} />
                 <TextField label="Middle Name" placeholder="Loremp" value={d.medio} onChange={set('medio')} />
                 <TextField label="Last Name" required placeholder="Loremp" value={d.apellido} onChange={set('apellido')} error={req('apellido')} />
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <TextField label="Email" placeholder="abril@gmai.com" value={d.email} onChange={set('email')} />
                 <DateTextField label="Birthday" required value={d.cumple} onChange={set('cumple')} error={req('cumple')} />
+                <TextField label="Email" placeholder="abril@gmai.com" value={d.email} onChange={set('email')} />
               </div>
             </SectionCard>
           )}
@@ -101,8 +104,8 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
           <div className="grid gap-4 sm:grid-cols-2">
             <SearchField label="Subcriber ID" options={[SUSCRIPCION.subscriberId]} value={d.subId} onChange={set('subId')} />
             <SearchField label="Carrier name" required options={CARRIERS} value={d.carrier} onChange={set('carrier')} error={req('carrier')} />
+            <SearchField label="Plan name" options={PLANES_NOMBRE} value={d.plan} onChange={set('plan')} />
           </div>
-          <SearchField label="Plan name" options={PLANES_NOMBRE} value={d.plan} onChange={set('plan')} />
           <div className="grid gap-4 sm:grid-cols-2">
             <DateTextField label="Approx Start Date" required value={d.inicio} onChange={set('inicio')} error={req('inicio')} />
             <DateTextField label="Approx End Date" value={d.fin} onChange={set('fin')} />
@@ -224,20 +227,18 @@ export function NewDependerModal({ onClose }: { onClose: () => void }) {
        está bien escrito. */
     <ModalShell title="New Depender" onClose={onClose} width="max-w-[420px]" actions={<DrawerActions onCancel={onClose} onSave={guardar} />}>
       <div className="flex flex-col gap-4">
-        <SearchField
-          label="Dependent Patient" options={DIRECTORIO.map((p) => p.name)}
-          value={d.paciente} onChange={set('paciente')}
+        <PersonSearchField
+          label="Dependent Patient" placeholder="Search by Name or Last Name" personas={DIRECTORIO.map((p) => p.name)}
+          value={d.paciente} onChange={set('paciente')} lineas={personaLineas}
         />
         <div className="grid gap-4 sm:grid-cols-2">
           <SearchField label="Subcriber ID" options={[SUSCRIPCION.subscriberId]} value={d.subId} onChange={set('subId')} />
           <SearchField label="Carrier name" required options={CARRIERS} value={d.carrier} onChange={set('carrier')} error={req('carrier')} />
+          <SelectField label="Coordination Order" required options={ORDENES} value={d.orden} onChange={set('orden')} error={req('orden')} />
         </div>
-        <SelectField label="Coordination Order" required options={ORDENES} value={d.orden} onChange={set('orden')} error={req('orden')} />
         <div className="grid gap-4 sm:grid-cols-2">
           <DateTextField label="Coverage Start" value={d.inicio} onChange={set('inicio')} />
           <DateTextField label="Coverage End" value={d.fin} onChange={set('fin')} />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
           <DateTextField label="Eligibility" value={d.elegibilidad} onChange={set('elegibilidad')} />
           <DateTextField label="Verification Date" value={d.verificacion} onChange={set('verificacion')} />
         </div>

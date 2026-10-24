@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TOPICS, MODULE_PAGE } from './topics'
 import { CoachMark } from './CoachMark'
@@ -9,9 +9,13 @@ import { CoachMark } from './CoachMark'
    design-reference/figma/modulos/help.md. */
 const HelpContext = createContext<{
   showOnScreen: (topicId: string) => void
+  explicando: boolean
   confibotAbierto: boolean
+  openConfibot: () => void
   toggleConfibot: () => void
   closeConfibot: () => void
+  fabDePagina: boolean
+  setFabsDePagina: (cambio: (n: number) => number) => void
 } | null>(null)
 
 export function useHelp() {
@@ -20,17 +24,28 @@ export function useHelp() {
   return ctx
 }
 
+/* Una pantalla con su propio botón flotante abajo a la derecha (Appointment
+   requests en Scheduling) lo avisa, y Confibot se apila arriba en vez de
+   taparlo. Sin HelpProvider (una story suelta) no hace nada. Ver help.md. */
+export function useFabDePagina() {
+  const set = useContext(HelpContext)?.setFabsDePagina
+  useEffect(() => {
+    if (!set) return
+    set((n) => n + 1)
+    return () => set((n) => n - 1)
+  }, [set])
+}
+
 export function HelpProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const [coachingId, setCoachingId] = useState<string | null>(null)
   const coaching = coachingId ? (TOPICS.find((t) => t.id === coachingId) ?? null) : null
   const hermanos = coaching ? TOPICS.filter((t) => t.module === coaching.module) : []
   const indice = coaching ? hermanos.findIndex((t) => t.id === coaching.id) : -1
-  /* El Confibot ya no flota solo sobre la pantalla -tapaba otros botones
-     flotantes, como el de Appointment requests en Scheduling-: el disparador
-     vive en el menú (ver Sidebar.tsx) y este estado es lo único que los
-     conecta. */
+  /* Dos disparadores abren la misma hoja: el botón flotante (AppShell) y el
+     ítem del menú (Sidebar.tsx). Este estado es lo que los conecta. */
   const [confibotAbierto, setConfibotAbierto] = useState(false)
+  const [fabsDePagina, setFabsDePagina] = useState(0)
 
   function showOnScreen(topicId: string) {
     const tema = TOPICS.find((t) => t.id === topicId)
@@ -43,9 +58,13 @@ export function HelpProvider({ children }: { children: ReactNode }) {
     <HelpContext.Provider
       value={{
         showOnScreen,
+        explicando: coaching !== null,
         confibotAbierto,
+        openConfibot: () => setConfibotAbierto(true),
         toggleConfibot: () => setConfibotAbierto((v) => !v),
         closeConfibot: () => setConfibotAbierto(false),
+        fabDePagina: fabsDePagina > 0,
+        setFabsDePagina,
       }}
     >
       {children}

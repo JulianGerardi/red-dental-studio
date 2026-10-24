@@ -1,5 +1,5 @@
 import {
-  Activity, ArchiveX, CheckCheck, CircleOff, MoreVertical, Pencil, Play, ShieldX, Trash2, UserRoundX,
+  Activity, ArchiveX, CheckCheck, CircleOff, Maximize2, MoreVertical, Pencil, Play, ShieldX, Trash2, UserRoundX,
 } from 'lucide-react'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -21,11 +21,13 @@ const FILAS: Fila[] = [
 ]
 
 export function FindingActionsMenu({
-  finding, onEdit, onAction,
+  finding, onEdit, onAction, onVer,
 }: {
   finding: Finding
   onEdit: () => void
   onAction: (action: Exclude<FindingAction, 'edit'>) => void
+  /** View full record: el drawer de la Problem List con lo vinculado al finding. Ver clinical-mode.md (2026-10-13). */
+  onVer?: () => void
 }) {
   /* El tratamiento sólo puede arrancar sobre algo todavía abierto. */
   const puedeTratar = finding.status === 'Active' || finding.status === 'Monitoring'
@@ -39,6 +41,11 @@ export function FindingActionsMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[248px]">
         <p className="px-2 py-1.5 text-sm font-bold text-ink">Actions</p>
+        {onVer && (
+          <DropdownMenuItem onSelect={onVer}>
+            <Maximize2 className="size-4" /> View full record
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onSelect={onEdit}>
           <Pencil className="size-4" /> Edit
         </DropdownMenuItem>

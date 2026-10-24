@@ -4,6 +4,7 @@ import { applyPrimaryDentition, clearSelection, resetMouth } from 'react-advance
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import { UNIVERSAL_A_FDI } from './estadoOdontograma'
 
 /* La botonera de la app real (red.dev, Dental assessment): dentición, arcadas, cuadrantes, limpiar y moverse de pieza en
    pieza. Maneja la selección de la librería del odontograma: sus botones de selección (por id) para todas y las arcadas, y
@@ -13,8 +14,6 @@ import { cn } from '@/lib/utils'
    poco, para compartir la fila con Odontogram / Periodontal Status. Lo elegido queda en azul hasta que la selección cambia
    desde el chart. Ver design-reference/figma/modulos/clinical-mode.md. */
 
-/* Las piezas en orden Universal, 1 a 32, con su número FDI. */
-const UNIVERSAL_A_FDI = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28, 38, 37, 36, 35, 34, 33, 32, 31, 41, 42, 43, 44, 45, 46, 47, 48]
 const CUADRANTES = [1, 2, 3, 4].map((q) => UNIVERSAL_A_FDI.slice((q - 1) * 8, q * 8))
 
 const GRUPO = 'inline-flex shrink-0 items-stretch divide-x divide-line overflow-hidden rounded-md border border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]'

@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { Pill } from '@/components/ui/pill'
 import { TONO_CASO } from '@/components/clinical/TreatmentPlanSection'
 import { PLANES, type Plan } from '@/data/clinical-mode'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Cards de Treatment Plan del Overview, con la estructura de red.dev: profesional, nombre y estado del caso, su grupo, dos
    datos (total y fecha de creación) y el avance en su caja. Toda la card abre el caso en Treatment Plan. El ícono de
@@ -30,7 +31,7 @@ export function PlanCard({ p, onAbrir }: { p: Plan; onAbrir?: () => void }) {
       className="hover:border-dash-blue focus-visible:outline-dash-blue group block w-full rounded-lg border border-line bg-white p-3.5 text-left transition-colors hover:shadow-[0_4px_14px_rgb(29_86_188/0.08)]"
     >
       <span className="flex items-center gap-2.5">
-        <span className="bg-dash-count-bg text-dash-blue-hover flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold">{iniciales(p.doctor)}</span>
+        <Avatar initials={iniciales(p.doctor)} />
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[13px] font-semibold text-ink">{p.doctor}</span>
           <span className="block text-[11px] text-ink-muted">{p.rol}</span>
@@ -45,7 +46,7 @@ export function PlanCard({ p, onAbrir }: { p: Plan; onAbrir?: () => void }) {
           <span className="block text-[14px] leading-snug font-bold text-ink">{p.nombre}</span>
           <span className="mt-0.5 block text-[11px] text-ink-muted">{p.grupo} · {p.procedimientos} procedures</span>
         </span>
-        <Pill tone={TONO_CASO[p.estado]} size="sm" className="mt-0.5 shrink-0 tracking-wide whitespace-nowrap uppercase">{p.estado}</Pill>
+        <Pill tone={TONO_CASO[p.estado]} size="sm" className="mt-0.5 shrink-0 whitespace-nowrap">{p.estado}</Pill>
       </span>
 
       <span className="mt-3 grid grid-cols-2 gap-1.5">
@@ -69,9 +70,13 @@ export function PlanCard({ p, onAbrir }: { p: Plan; onAbrir?: () => void }) {
   )
 }
 
-export function TreatmentPlanList({ onAbrir }: { onAbrir?: (casoId?: string) => void }) {
+export function TreatmentPlanList({ onAbrir, llena }: {
+  onAbrir?: (casoId?: string) => void
+  /** En desktop ocupa todo el alto de su contenedor (con `position: relative`) sin estirarlo, y la lista scrollea. */
+  llena?: boolean
+}) {
   return (
-    <div className="rounded-lg bg-white shadow-panel p-4">
+    <div className={cn('flex flex-col rounded-lg bg-white p-4 shadow-panel', llena && 'lg:absolute lg:inset-0')}>
       <div className="flex items-center justify-between gap-2">
         <p className="text-[15px] font-bold text-ink">Treatment Plan</p>
         <button onClick={() => onAbrir?.()} className="text-dash-blue flex shrink-0 items-center gap-0.5 text-[12px] font-semibold hover:underline">
@@ -79,7 +84,7 @@ export function TreatmentPlanList({ onAbrir }: { onAbrir?: (casoId?: string) => 
         </button>
       </div>
       {/* La columna scrollea sola para no estirar la página hasta el doble del alto del odontograma. */}
-      <div className="mt-3 flex max-h-[560px] flex-col gap-3 overflow-y-auto pr-1">
+      <div className={cn('mt-3 flex max-h-[560px] min-h-0 flex-col gap-3 overflow-y-auto pr-1', llena && 'lg:max-h-none lg:flex-1')}>
         {PLANES.map((p) => <PlanCard key={p.id} p={p} onAbrir={() => onAbrir?.(p.id)} />)}
       </div>
     </div>

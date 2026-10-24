@@ -224,3 +224,117 @@ del Dashboard, los contadores de la barra de Clinical Mode). Ahora es `h-5 min-w
 dígito, píldora si el conteo pasa a dos. Mismos colores (`bg-dash-count-bg`, `text-dash-blue-hover`); activa, el fondo
 pasó del hex suelto `#eff6ff` al token `bg-info-bg` (`#f0f5ff`, imperceptible). Verificado: 4 globos de 20×20 con el
 centro vertical igual al del título.
+
+El globo es ahora la pieza `Count` (`src/components/ui/count.tsx`, página *Elements / Counts* del Storybook), no un
+`<span>` suelto en `PatientDetail`: el design system es la fuente y la pantalla sólo la usa.
+
+## Appointments: la misma card que las solicitudes de Scheduling (2026-10-12)
+
+Julián: "las card de appointment request y las de appointment que están en el patient dashboard deben tener el mismo
+diseño; a las de appointments del dashboard patient les falta el stroke que tienen las otras". El stroke es la **barra de
+3px a la izquierda**: el 2026-10-06, al pasar a `InnerCard`, se le sacó a los turnos del paciente y la solicitud la
+conservó. Desde ese día eran dos cards escritas por separado y cada una fue por su lado (punto o avatar, pill propia o
+`Pill`, botones de 11px o `ui/button`).
+
+1. **Una sola card**, `TarjetaTurno` (`components/scheduling/TarjetaTurno.tsx`). `PatientAppointmentCard` y
+   `SolicitudCard` sólo traducen sus datos; no se pueden volver a separar sin tocarla.
+2. **La barra toma el color de la pill** (`BARRA_TONOS`): Booked azul, Fulfilled verde, No Show ámbar, Cancelled rojo; en
+   las solicitudes, ASAP rojo y lista de espera azul. Antes de sacarla era siempre azul, y la de la solicitud ya iba del
+   color de su pill: la regla "barra = pill" es la que vale para las dos y la que usan los bloques del calendario.
+3. Superficie `InnerCard` (línea de medio pixel y sombra suave) **más** la barra: la regla de las cards de adentro de un
+   panel sigue igual, la barra es un acento encima.
+4. El nombre baja a un segundo renglón antes de recortarse (en las solicitudes del celular se leía "Sofia …"); el nombre
+   completo queda en el `title`. El motivo, la fecha y el lugar siguen de un renglón.
+5. Validar con usuarios: si cuatro barras ámbar seguidas (No Show) se leen como alerta de más en la ficha. Si molesta, la
+   salida es dejar la barra en gris para los estados cerrados (Fulfilled, No Show, Cancelled) y en color sólo para el
+   que todavía pide algo (Booked).
+
+Storybook: *Elements / Appointment cards* (Playground con *Appointment request*, *Patient overview and request: one
+card*, *Request card: states*, *Long name* en los estados del Overview, barra por estado en *Specs*) y *Components /
+Scheduling / TarjetaTurno*.
+
+## Listas largas con "Show more" (2026-10-12)
+
+Misma regla que el Dashboard (ver `dashboard.md`, mismo día, y *Elements / Show more*): se ven unos pocos y "Show N
+more" abre el resto con scroll adentro.
+
+- **Pending Task:** las tareas pasan a `TaskRow`, la fila del Dashboard (mismo contenido que `PendingTaskCard`, menos
+  alto), dentro de `ListGroup`; se ven 3.
+- **Appointments:** la misma `PatientAppointmentCard`; se ven 3.
+- **Pending documents:** se ven los primeros 4 en el orden de los grupos (Overdue, Due this week, Later); cada rótulo
+  sigue contando todos los de su grupo.
+
+Con los datos de la demo el Overview pasa de 1.842px a 1.291px de alto.
+
+## Overview en dos columnas: Pending Task y Pending documents, Appointments al costado (2026-10-17)
+
+Julián pasó una referencia: Pending Task y Pending documents **apilados a la izquierda** y Appointments en una columna
+de punta a punta a la derecha. Antes Pending documents iba a todo el ancho, arriba de Pending Task + Appointments.
+
+- Desde 1024px: grilla `minmax(0,1fr) · 280px`; la columna izquierda lleva Pending Task y debajo Pending documents, y
+  Appointments se estira al alto de las dos (ya no `items-start`). Abajo de 1024px, una columna en ese orden.
+- Con más alto disponible, Appointments muestra **7** turnos en la columna (`TOPE.turnosColumna`) y 3 apilado, así
+  termina a la par de la izquierda en vez de dejar un bloque blanco. Más allá, "Show N more".
+- Pending documents pasa de ~1.100px a ~800px de ancho a 1500: el nombre del documento pide 14rem (`basis-56`) y, si no
+  entra, el vencimiento y el botón bajan juntos a un segundo renglón, a la derecha. Antes, a 1024px y en el celular el
+  nombre se aplastaba ("Informed / Consent –…") y se superponía con "Overdue 5 days".
+- Contenido igual: mismos datos, textos y acciones; sólo cambia el orden.
+- Validar con usuarios: si recepción prefiere los documentos arriba de las tareas (hoy mandan las tareas por ir primero).
+
+Storybook: *Pages / Parts / Patient Overview* (Playground con cantidad de turnos, Parts, States, Specs) y *Components /
+Patients / PendingDocuments → Narrow column*. E2E: `tests/patient-overview.e2e.ts`.
+
+
+## Bento sin huecos y breadcrumb del paciente (2026-10-13)
+
+Julián: "organizar mejor el bento, no deben quedar espacios en blanco; el menú interno debe ocupar el largo de la
+pantalla. El breadcrumb debe ser Patients › nombre del paciente › …; en las pantallas que abro una vez (Patients,
+Billing) no debe tener breadcrumbs".
+
+1. **El menú del paciente baja hasta el final** (`PatientSidePanel`, `lg:self-stretch`): la card se estira al alto del
+   contenido de al lado en las seis pantallas del paciente. A 1440 terminaba 160px antes que Pending Task y
+   Appointments; ahora las tres columnas cierran en la misma línea. Colapsado (60px) es un riel blanco de punta a punta.
+2. **Pending Task y Appointments terminan a la misma altura.** Se deshace el `lg:items-start` del 2026-10-06: aquel
+   bloque blanco salía de los 7 turnos sin tope; con "Show more" (3 y 3) la diferencia es de ~30px a 1440 y ~90px a
+   1024, adentro de la card, igual que los paneles del Dashboard. La fila además es `lg:flex-1`: si el panel es más
+   alto que la columna (todos los documentos resueltos), crece y no deja hueco gris.
+3. **Breadcrumb `Patients › John Smith › sección`** (`PatientBreadcrumb`) en lugar del "‹ Patients", en las siete
+   pantallas: Overview (termina en el paciente), Treatments, Insurance, Ledger, Documents, Relationships & Billing (Add
+   Relationship es un drawer sobre la lista y termina ahí) y Edit Patient, que antes no tenía ninguna salida hacia
+   arriba. La sección se llama como en el menú del paciente. Se revierte la decisión de README.md ("sin breadcrumb en
+   las pantallas del paciente"): el "‹ Patients" sólo volvía a la lista y desde una sección no había vuelta al Overview.
+4. **Regla de la app:** las pantallas de primer nivel (Dashboard, Patients, Scheduling, Billing, Help, Notifications,
+   Settings y Profile) no llevan rastro; las que se abren desde otra, sí. Auditadas las 40 rutas: el único error era
+   `/settings/account` (Profile), que mostraba un "Settings" suelto sin la pantalla actual; ahora no lleva.
+5. `Breadcrumb` suma anillo de foco azul en los links y `aria-current="page"` en el último tramo.
+
+Pendiente (no se tocó): el nombre sale fijo, "John Smith", igual que el panel. Desde la tabla se entra con el id de
+cada paciente (`/patients/abril-viola`) y la ficha siempre muestra a John Smith; cuando el panel lea al paciente de la
+ruta, el rastro tiene que leer el mismo nombre.
+
+Validar con usuarios: si recepción usa el rastro para volver a la lista o sigue yendo por el menú lateral; y si el
+blanco al pie del menú del paciente se lee como espacio vacío o como columna (alternativa: menú `sticky`, que no entra
+entero en pantallas de menos de 900px de alto).
+
+Storybook: *Elements / Breadcrumb* (regla de dónde va, en *Specs*), *Components / Patients / PatientBreadcrumb* y
+*Elements / Patient menu* › *States* › *Next to the screen*.
+
+## Breadcrumb con "/" (2026-10-17)
+
+Julián: "hacelo con slash / en vez de la flecha". `ui/breadcrumb` separa los tramos con una **"/"** en `ink-faint`
+(antes el chevron de 14px), con 6px a cada lado y `aria-hidden` para que el lector de pantalla no la lea. Vale para todos
+los rastros de la app, no sólo los del paciente: `Patients / John Smith / Ledger`, `Settings / Locations / Abril`.
+Storybook: *Elements / Breadcrumb* (Parts, Specs).
+
+## Un solo avatar de persona (2026-10-18)
+
+El avatar del panel izquierdo (62px, 36 colapsado) deja el círculo y pasa al cuadrado con esquinas redondeadas de
+`ui/avatar`; los turnos de la columna Appointments y Pending Task, también. Regla en `../README.md`.
+
+## Pending documents primero y Pending Task con su diseño (2026-10-19)
+
+Julián: "poné primero Pending documents y abajo Pending Task", y que Pending Task tenga el diseño de Pending documents.
+
+- En la columna de la izquierda del Overview, **Pending documents va arriba y Pending Task abajo**; Appointments, a la derecha, arranca ahora a la altura de Pending documents.
+- **Pending Task usa el diseño de Pending documents** (`PendingTaskList`): grupos por tipo con rótulo en versalitas y cuenta, filas en una caja con divisores finos, ícono del tipo, pills *Requested* y *Expired date*, vencimiento, documento y *Complete this Task*. Es el mismo del Dashboard. Se ven 3 filas y "Show N more".
+- El e2e `patient-overview` se invirtió: ahora comprueba Pending documents arriba de Pending Task.

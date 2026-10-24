@@ -19,7 +19,9 @@ export function colorDeToken(token: string): string {
   if (token === 'white') return '#ffffff'
   if (token === 'transparent') return 'transparent'
   const sonda = document.createElement('span')
-  sonda.style.color = `var(--color-${token})`
+  /* Los de shadcn (primary, accent…) están en `@theme inline`: no hay `--color-*`, sólo el HSL suelto en `--primary`. */
+  const raiz = getComputedStyle(document.documentElement)
+  sonda.style.color = !raiz.getPropertyValue(`--color-${token}`).trim() && raiz.getPropertyValue(`--${token}`).trim() ? `hsl(var(--${token}))` : `var(--color-${token})`
   document.body.appendChild(sonda)
   const c = getComputedStyle(sonda).color
   sonda.remove()

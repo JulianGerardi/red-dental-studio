@@ -123,7 +123,8 @@ export function medir(doc: Document): Medida | null {
   if ([...c.querySelectorAll('button')].some((b) => /Previous|Next/.test(b.textContent ?? '') || /page|previous|next/i.test(b.getAttribute('aria-label') ?? ''))) dentro.push('Pagination')
   if (hay('[draggable="true"]')) dentro.push('Drag to reorder')
   if (hay('[role="separator"]')) dentro.push('Resizable columns')
-  if (hay('[aria-expanded]:not([aria-haspopup])')) dentro.push('Expandable rows')
+  /* Toda fila que se despliega lleva la flecha (RowChevron): sin ella, la auditoría lo marca. */
+  if (hay('[aria-expanded]:not([aria-haspopup])')) dentro.push(hay('[aria-expanded]:not([aria-haspopup]) .lucide-chevron-right') ? 'Expandable rows' : 'Expandable rows without chevron')
 
   const alrededor: string[] = []
   const region = contenedor.parentElement ?? contenedor

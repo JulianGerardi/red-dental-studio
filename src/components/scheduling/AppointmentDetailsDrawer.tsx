@@ -7,6 +7,7 @@ import { BLOCK_STYLE, type ApptState } from './calendar-data'
 import { useAnclaje } from '@/lib/anclaje'
 import { useEsChico } from '@/lib/media'
 import { aviso } from '@/components/ui/toaster'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Figma 3856:214039 "Appointment Details Drawer".
 
@@ -122,7 +123,7 @@ export function AppointmentDetailsDrawer({
       className={
         chico
           ? 'motion-safe:animate-[sheet-in_180ms_ease-out] fixed inset-x-0 bottom-0 z-50 overflow-hidden rounded-t-2xl border-t-[3px] bg-white shadow-[0_-8px_28px_rgb(0_0_0/0.22)]'
-          : 'motion-safe:animate-[loc-in_150ms_ease-out] absolute z-50 overflow-hidden rounded-xl border-t-[3px] bg-white shadow-[0_8px_28px_rgb(0_0_0/0.22)]'
+          : 'motion-safe:animate-[loc-in_150ms_ease-out] absolute z-50 overflow-hidden rounded-xl border-t-[3px] bg-white shadow-floating'
       }
     >
       {chico && (
@@ -133,9 +134,7 @@ export function AppointmentDetailsDrawer({
           fondo tintado además, la pill quedaba color sobre color y perdía
           contraste. Ahora la pill lleva el tinte y el fondo se retira. */}
       <div className="flex items-start gap-2.5 px-4 pt-3.5 pb-3">
-        <span className="bg-dash-count-bg text-dash-blue-hover flex size-9 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold">
-          {initials}
-        </span>
+        <Avatar initials={initials} size={36} />
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[15px] leading-tight font-bold text-ink">
             {patient}

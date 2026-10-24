@@ -21,11 +21,11 @@ const TABLAS: Tabla[] = [
   { nombre: 'Locations (Settings)', archivo: 'pages/settings/Locations.tsx', historia: 'pages--settings-locations', uso: 'The practice locations. The name links to the location.' },
   { nombre: 'Insurance (Patient)', archivo: 'pages/patients/Insurance.tsx', historia: 'pages--patient-insurance', uso: 'The patient’s insurance plans. The priority is changed by dragging a row.' },
   { nombre: 'Ledger (Patient)', archivo: 'pages/patients/Ledger.tsx', historia: 'pages--patient-ledger', uso: 'The patient’s financial entries, with Patient / Guarantor views. It has the most features.' },
-  { nombre: 'Ledger allocation', archivo: 'components/patients/ledger/LedgerAllocationTable.tsx', historia: 'components-ledger-ledgerallocationtable--default', uso: 'The charges a payment is applied to. It has its own set of 12 columns.' },
+  { nombre: 'Ledger allocation', archivo: 'components/patients/ledger/LedgerAllocationTable.tsx', historia: 'components-ledger-ledgerallocationtable--playground', uso: 'The charges a payment is applied to. It has its own set of 12 columns.' },
   { nombre: 'Documents (Patient)', archivo: 'pages/patients/Documents.tsx', historia: 'pages--patient-documents', uso: 'The patient’s documents and their signature status.' },
   { nombre: 'Recent activity (Billing)', archivo: 'pages/Billing.tsx', historia: 'pages--billing', uso: 'The latest financial movements. Clicking a row selects that patient.' },
   { nombre: 'Problem list (Clinical)', archivo: 'components/clinical/ProblemList.tsx', historia: 'components-clinical-problemlist--playground', uso: 'The patient’s problems in Clinical Mode.' },
-  { nombre: 'Lab orders (Clinical)', archivo: 'components/clinical/LabOrderPanel.tsx', historia: 'components-clinical-laborderpanel--default', uso: 'The active lab prescriptions in Clinical Mode.' },
+  { nombre: 'Lab orders (Clinical)', archivo: 'components/clinical/LabOrderPanel.tsx', historia: 'components-clinical-laborderpanel--playground', uso: 'The lab orders in Clinical Mode, on the standard table with search, status filter and row menu.' },
   { nombre: 'Procedures (Treatment plan)', archivo: 'components/clinical/TreatmentPlanSection.tsx', historia: 'components-clinical-treatmentplansection--playground', uso: 'The procedures of a treatment case, with checkbox selection.' },
   { nombre: 'Insurance summary (Patient overview)', archivo: 'pages/PatientDetail.tsx', historia: 'pages--patient-overview', uso: 'The insurance table inside the patient overview: a compact <table>.', archivoCompartido: true },
 ]

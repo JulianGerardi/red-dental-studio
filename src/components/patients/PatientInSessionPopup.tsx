@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ChevronRight, LogOut, Radio, UserRound } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Mismo slug que usa patientsStore para armar el id de un paciente nuevo:
    acá no hay un id real detrás del turno -sólo `name`-, así que se
@@ -119,7 +120,7 @@ export function PatientInSessionPopup() {
           queda en 0 la caja se queda quieta, sin apagarse del todo. */}
       <div
         className={cn(
-          'flex items-start overflow-hidden rounded-l-xl border border-r-0 border-line bg-white shadow-[0_8px_24px_rgb(0_0_0/0.16)] transition-[width] duration-300 ease-out',
+          'flex items-start overflow-hidden rounded-l-xl border border-r-0 border-line bg-white shadow-floating transition-[width] duration-300 ease-out',
           abierto ? 'w-[336px]' : 'w-[54px]',
           hayEnCurso && 'motion-safe:animate-[session-live_2.6s_ease-in-out_infinite]',
         )}
@@ -148,11 +149,9 @@ export function PatientInSessionPopup() {
               <ChevronRight className="size-4" />
             </span>
           ) : hayEnCurso ? (
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-green-tint text-[10px] font-bold text-green-deep">
-              {primero.initials}
-            </span>
+            <Avatar initials={primero.initials} />
           ) : (
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-muted text-ink-faint">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-avatar bg-surface-muted text-ink-faint">
               <UserRound className="size-4" />
             </span>
           )}
@@ -188,9 +187,7 @@ export function PatientInSessionPopup() {
                 const i = enCurso.indexOf(p)
                 return (
                   <div key={i} className="group flex items-center gap-2.5 py-2.5 first:pt-0.5 last:pb-0.5">
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-green-tint text-[10px] font-bold text-green-deep">
-                      {p.initials}
-                    </span>
+                    <Avatar initials={p.initials} />
                     <Link to={`/patients/${slug(p.name)}`} className="min-w-0 flex-1">
                       <p className="truncate text-[12.5px] font-bold text-ink group-hover:underline">{p.name}</p>
                       <div className="mt-1 flex min-w-0 items-center gap-1.5">

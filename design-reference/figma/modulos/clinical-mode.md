@@ -95,9 +95,11 @@ hasta 7752px de ancho.
 - **Treatment Plan**: cuatro planes con profesional, nombre, pill
   "Available", tres datos (Created On en azul / Total Procedures / Total
   Amount) y el porcentaje grande con la barra. La columna scrollea sola para no
-  estirar la pagina al doble del alto del odontograma.
+  estirar la pagina al doble del alto del odontograma; desde el 2026-10-18 llega
+  hasta el final de la tabla (ver abajo).
 - **Centro**: el odontograma sobre fondo punteado, con el boton de ampliar y el
-  aviso de ultima condicion anclado abajo.
+  aviso de ultima condicion anclado abajo. Desde el 2026-10-18 es el chart de
+  DentAssmt, de solo lectura (ver abajo).
 - **Problem list**: Date, Surface, Condition, Exam, Provider, Note, Status,
   Actions. Sin columna de pieza: el frame no la tiene.
 
@@ -124,7 +126,9 @@ semicircular con el valor adentro, los campos con -/+ y el rango abajo.
 Tabla de Provider / Patient / Status / Updated / Created / Expiration Date /
 Actions, con Filter, New Prescription y el pie "Showing 9 active
 prescriptions". Las que vencen pronto van en rojo. El detalle y el modal
-"New Laboratory" quedan pendientes.
+"New Laboratory" quedan pendientes. Desde el 2026-10-08 va con la estética de
+la app (tabla estándar, filtro y botones): ver *Lab Order con la estética de la
+app* más abajo.
 
 ## Desviaciones deliberadas
 
@@ -2089,3 +2093,374 @@ Julián eligió la **A** (las tarjetas, la que ya estaba publicada). B y C se sa
 - **Surfaces** depende del procedimiento elegido (lleva superficie o no), tanto en Planned como en Existing.
 - **Los pasos dicen su nombre** en todos los drawers (Procedure, Surfaces, Link to finding, Link to diagnosis…), no
   "Step": así se sabe qué se está haciendo.
+
+## Detalle desplegable en Problem List y Procedures (2026-10-08)
+
+Pedido de Julián con un prototipo HTML (*Compact clinical details*): que cada fila de la tabla del Overview muestre lo
+que cuelga del registro, reusando el desplegable del Ledger.
+
+1. **El desplegable es el del Ledger** (`rowDetail` de `DataTable`): chevron al inicio, clic en la fila, *Collapse all /
+   Expand all* desde que hay una abierta, y el detalle con fondo gris claro debajo. Vale en el Overview y en el flotante
+   de *View Problem List* de los exámenes.
+2. **Bloques** (`RecordDetail.tsx`, cards adentro de un panel), en 3 columnas, 2 o 1 según el ancho **de la tabla**
+   (container query, no media query: el flotante del examen es más angosto que la pantalla). Arriba, el nombre completo
+   y la pieza / superficie: la celda de la fila corta los nombres largos.
+   - *Procedimiento:* **Treatment** (estado del grupo, el caso con su estado, la visita del procedimiento con su turno,
+     las otras visitas y los casos históricos plegados), **Lab order** + **Referral** en un mismo bloque, **Findings /
+     diagnoses** (el hallazgo y su diagnóstico ICD-10 + superficie, como Link to diagnosis) y **Procedure consent** a lo
+     ancho.
+   - *Problema:* **Procedures** que lo resuelven, **Treatment** (sólo el caso, sin visitas), **Lab order** + **Referral**
+     con el procedimiento relacionado y **Source exam** a lo ancho.
+   - Lo que no entra en el resumen va detrás de "N more…"; un bloque vacío queda y dice qué no hay ("No lab orders
+     linked."), así el detalle tiene siempre la misma forma.
+3. **Se reusa lo que ya había**: el turno de la visita es `CitaVisita` de Treatment Plan ("No appointment" avisa igual),
+   el consentimiento es `EstadoConsentimiento` de sus tablas, y las pills son las de cada pantalla (casos como el rail,
+   órdenes como Lab Order, la tabla como la tabla). **Antes de aceptar el caso** (Planning, Pending, Presented) no hay
+   turno ni consentimiento, la misma regla que Treatment Plan.
+4. **Los links llevan a donde se trabaja**, en vez del diálogo de "preview" del prototipo: el caso y el consentimiento a
+   Treatment Plan con ese caso abierto, la orden a Lab Order, la derivación a Referral, el examen de origen a su pestaña.
+   Un hallazgo o un procedimiento cambia a la otra pestaña, ajusta el filtro para que se vea y abre esa fila
+   (`defaultExpanded` de DataTable, que abre en la página de la fila). Desde el flotante de un examen, el flotante se
+   cierra al navegar. La navegación la provee ClinicalMode (`NavegacionClinica`); sin provider, el link avisa adónde iría.
+5. **View full record** abre un drawer de sólo lectura (Pop ups = drawer): los datos de la fila de a dos y una sección
+   por bloque, sin nada plegado. Pie: Close y Edit, que avisa como Edit del menú de la fila.
+6. **Datos** (`VINCULOS_PROCEDIMIENTO` y `DERIVACIONES_PROBLEMA` en `data/clinical-mode.ts`): cada procedimiento apunta
+   a un caso de `CASOS` y al procedimiento del caso (de ahí salen visita, turno y consentimiento), a sus hallazgos, órdenes
+   y derivaciones. Los problemas toman lo de sus procedimientos. Quedan registros sin nada para que se vea el vacío
+   (D0220).
+7. **Columnas**: el chevron suma 28px y la Problem List pasaba de 934 a 960 a 1440 (scroll lateral). Location 96 → 80,
+   Exam 88 → 84 y Provider 96 → 88: las dos pestañas entran otra vez a 1440 sin scroll.
+8. **En el teléfono** la tabla scrollea de costado; el detalle queda fijo en la parte visible (`sticky` + el ancho
+   visible de la tabla, como el Ledger), ahora para toda tabla con detalle.
+
+Del prototipo no se toma: el "Phase" de cada visita (el modelo no tiene fases) y el "Dental chart context".
+
+### Anomalía
+
+| # | Qué | Dónde |
+|---|---|---|
+| 97 | El contador de Referrals de la barra dice **0** aunque hay procedimientos y problemas en estado Referred (y ahora derivaciones vinculadas) | barra / detalle |
+
+No se tocó la barra en esta tanda: queda para decidir si el contador sale de las derivaciones.
+
+### Segunda vuelta: lista en vez de cards (2026-10-08)
+
+Julián: las cards ocupaban lugar. El detalle pasa a ser **una lista**: una fila debajo de la otra, separadas por una
+línea fina, sin card ni sombra, con el título (y la cuenta) en una columna de 150px a la izquierda y los datos a la
+derecha; en angosto el título va arriba.
+
+1. **Orden, el que pidió:** Treatment, Lab order, Findings, Procedure consent. Referral sale del bloque de Lab order y
+   pasa a su propia fila, justo después. El problema sigue el mismo orden con su contraparte: Treatment, Lab order,
+   Referral, **Procedures** (donde va Findings) y **Source exam** (donde va el consentimiento). El drawer de *View full
+   record* usa el mismo orden.
+2. **Cada dato en una línea**: link, estado y contexto seguidos. El estado del grupo se suma a la línea del caso
+   ("Group status") en vez de ocupar una línea propia, y la visita va sin la caja gris.
+3. Con más ancho por fila, el hallazgo **y** su diagnóstico se ven sin abrir nada (antes el diagnóstico iba plegado);
+   se pliega desde el tercero. Las otras visitas y los casos históricos siguen detrás de "N more…".
+4. `BloqueDetalle` y `SubtituloBloque` se van; quedan `FilaDetalle`, `FilasProcedimiento` y `FilasProblema`.
+
+## Lab Order con la estética de la app (2026-10-08)
+
+Pedido de Julián: unificar Lab Order con el resto de la app -tabla, buscador, botones y filtros-. Tenía una `<table>`
+propia con borde, un link azul suelto para New Prescription, un `FilterTrigger` que no filtraba y un pie armado a mano.
+
+1. **Card de la página** (`TARJETA_PANEL`, sombra y sin borde, 16px de aire) con la **tabla estándar** (`DataTable`)
+   adentro, como la Problem List del Overview.
+2. **Barra**: el buscador primero (provider, paciente o estado) y después **Filter**, que ahora filtra: los seis estados
+   de a varios, con su cantidad y el punto del color de su pill (`ORDEN_TONO`, en el orden del pedido: Requested,
+   Pending, Delayed, Delivered, Canceled, Rejected). Para eso el `filter` de `DataTable` acepta opciones con `count` y
+   `tone` (`FilterOption`), no sólo texto.
+3. **Botones** con `ui/button` (36px, el alto del buscador y de Filter): *New Prescription* es la acción principal
+   (azul sólido, antes un link) y *View History* pasa del pie a la barra como secundario: el pie es el de la tabla.
+4. **Filas**: las iniciales en el círculo celeste del equipo (32px, como `PersonCell tone="soft"`) sin link -la orden no
+   lleva a la ficha-; los nombres en `ink` medium. La pill y el rojo de lo que vence pronto quedan.
+5. **Acciones**: el ícono de documento y el kebab se juntan en el kebab estándar (`RowActionsMenu`): *View order*,
+   *Edit order* y, mientras la orden sigue abierta (Requested, Pending, Delayed), *Cancel order* en rojo, que la pasa
+   a Canceled con Undo. View y Edit avisan que no están en esta versión, como antes el ícono.
+6. **Pie** de la tabla estándar: "Showing 1 to 9 of 9 active prescriptions" (anomalía 85, se mantiene), *Show* 5 / 10 / 20
+   y la paginación. 10 por página: entran las 9 del frame.
+7. **Vacíos**: la búsqueda sin resultados usa el de la tabla ("No results"); sin órdenes, "No lab orders yet".
+8. El panel recibe `ordenes` opcional (por defecto las del frame), para mostrar el vacío y la paginación en Storybook.
+
+Desviación del frame: View History deja el pie y el ícono de documento de cada fila pasa al menú. Storybook:
+*Components / Clinical / LabOrderPanel* (Playground, Parts, States y Specs) y *Elements / Tables* (filtro con cantidad y
+color).
+
+
+## View Problem List con lugar para toda la tabla (2026-10-09)
+
+Julián, con captura de Vitals a ~1480px: el flotante de *View Problem List* cortaba la tabla. Medido: el flotante medía
+820px y la tabla pedía 146px más, así que Status quedaba cortado y Actions sólo se veía scrolleando de costado. Además,
+con una fila abierta el flotante pasaba el borde de abajo de la pantalla (910 en 830) y lo de abajo no se podía ver.
+
+1. **Ancho:** hasta 1240px (o la pantalla menos 32px). Desde 1024px la tabla entra entera, con Status y Actions, y a
+   1280 y 1480 la columna Condition ya no parte los nombres. Si no entra a la derecha del botón, Radix lo corre a la
+   izquierda dejando 16px (`collisionPadding`). A 768 y 390 la tabla sigue scrolleando de costado adentro de su caja.
+2. **Alto:** hasta el borde de abajo de la pantalla (`--radix-popover-content-available-height`) y scroll adentro del
+   flotante (`overscroll-contain`, para que la rueda no mueva la página de atrás).
+3. La sombra pasa al contenido del popover y el radio a 8px, el de la card de la tabla: con el scroll adentro, una
+   sombra en un hijo quedaría recortada.
+
+Se pensó en pasarlo a drawer (la regla de Pop ups), pero es una consulta rápida sin salir del examen, que es para lo que
+está el flotante. Si Julián quiere más lugar todavía, el siguiente paso es un drawer xl.
+
+## Selected area con el Chip del design system (2026-10-09)
+
+El área elegida de **New Procedure** y de **New Condition** (Radiography) pasa a `ui/chip`: celeste, texto azul 12px y la
+✕ a la derecha (antes a la izquierda, 11px Semibold; la de Radiography además con esquinas cuadradas y un azul más
+oscuro). Julián eligió la ✕ a la derecha: se lee primero qué es y después la acción, es la convención de Gmail, Jira o
+Material y coincide con el cerrar de drawers y toasts. *"Uper left"* sigue tal cual (anomalía 88).
+
+## New Procedure y New Condition: rótulos y controles de la app (2026-10-10)
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`.
+
+1. **New Procedure**: Selected area, Procedure y Surfaces usan `FieldLabel` (12px Medium `ink`, la regla de la línea 809)
+   en vez de un rótulo semibold gris hecho a mano; los buscadores usan `control()`, con la misma sombra que los demás
+   campos.
+2. **New Condition** (visor de radiografías): lo mismo, más la lupa y el placeholder "Search by code or description" de
+   New Procedure, que busca en el mismo catálogo (antes decía "Select"). Note pasa a `TextArea`.
+3. La búsqueda con su botón Filter es una barra de catálogo, no un par de campos: queda fuera de la grilla.
+
+## Orden del detalle por importancia y lo del cobro (2026-10-13)
+
+Julián, con dos tablas de orden recomendado y el prototipo *Expanded transaction detail* (que es para el detalle de
+**Procedures** de esta tabla, no para el Ledger: una primera vuelta lo puso en el Ledger por error y se deshizo).
+
+- **Procedimiento:** Treatment (el caso, su aceptación, visitas), **Procedure consent** (después de ver la aceptación,
+  si el consentimiento está), Findings / diagnoses (qué condición resuelve), Referral y Lab order; y después lo del
+  cobro, en el orden del prototipo: **Clinic location**, **Financial details** y **Applied transactions**.
+- **Problema (finding):** Procedures (qué procedimientos lo resuelven y en qué estado), Treatment, Referral, Lab order y
+  Source exam (la trazabilidad, al final). No lleva cobro: se cobra el procedimiento.
+
+Lo del cobro sale del cargo del Ledger que cobra el procedimiento (`procedimiento` en `data/ledger.ts`):
+
+1. *Financial details*: Original charge, Insurance paid, Payments applied, Credit adjustments applied y **Outstanding
+   balance** (destacado), con la nota "Balance of this charge only, not the patient or guarantor balance.". Los números
+   van en columnas de 112px como mínimo, tantas como entren, y el monto abajo de su rótulo para que queden alineados
+   aunque un rótulo se parta.
+2. *Applied transactions*: fecha, tipo, la transacción y lo aplicado a este cargo. La referencia abre la transacción en
+   el mismo registro de sólo lectura del Ledger (`LedgerRowModal`), sin salir de Clinical Mode.
+3. **Clinic location** y no "Location" como el prototipo: la tabla ya tiene una columna Location que es la zona de la
+   boca (Soft Palate, Upper Arch).
+4. Sin cargo, las tres filas quedan y lo dicen ("Not charged yet."). Hoy tienen cargo D0120, D1110, D0220 y D4341; el
+   ejemplo con pagos parciales es D4341 ($310, faltan $170).
+5. `APLICACIONES` en `data/ledger.ts` dice a qué cargo fue cada pago, ajuste o seguro; cierra con `creditoDisponible`
+   (lo aplicado por cada origen más lo disponible da su monto) y ningún cargo recibe más de lo que vale. El Ledger no
+   cambia.
+
+Las fechas del Ledger (2025) y las de Clinical Mode (2026) vienen de mocks distintos y no coinciden; queda anotado.
+
+El drawer de *View full record* sigue el mismo orden. Las piezas de la lista pasan a `ui/detail-list`
+(*Components / UI / DetailList*).
+
+## El detalle de la Problem List desde un examen y desde Treatment Plan (2026-10-13)
+
+Julián: la Problem List lista todos los findings, pero parado en un examen también hay que poder ver esa información,
+desde los tres puntos de cada finding; y cada tabla de Treatment Plan (Unassigned y los casos por fecha) tiene que
+desplegarse como la Problem List, porque ahí se ve el estado del consentimiento.
+
+1. **Findings del examen** (`ExamLayout`): el menú de cada finding empieza con **View full record**, junto a Edit (mirar
+   antes de cambiar). Abre el mismo drawer de sólo lectura de la Problem List: los datos del finding (con
+   *Descriptors*, que la tabla no tiene) y Procedures, Treatment, Referrals, Lab orders y Source exam. Un hallazgo o
+   procedimiento vinculado cambia el drawer a ese registro sin salir del examen; un caso, una orden, una derivación o un
+   examen llevan a su pestaña. No se suma un desplegable en la card: el panel mide 300px y el drawer es el patrón de
+   "ver todo" (Pop ups = drawer).
+2. **Los findings del examen y las filas de la Problem List son mocks distintos.** Cada finding lleva ahora `examen`
+   (el Source exam; lo cargado desde un examen toma ese examen) y, si es una fila de la tabla, `problema`. Hoy sólo
+   *Tooth 3 · chronic enamel dental caries* es una fila (p5: procedimiento D2391 en Restorative Plan); los otros cuatro
+   muestran las filas vacías ("No procedures linked."). El estado y los datos del drawer son los del finding.
+3. **Treatment Plan**: cada fila de Unassigned y de las visitas de un caso se despliega con el detalle de la Problem
+   List (`detalle` de `TablaProcedimientos`): chevron, clic en la fila menos en sus controles (casilla, menú, íconos;
+   arrastrar sigue igual) y un solo *Collapse all / Expand all* arriba de las visitas del caso o de Unassigned, desde
+   que hay una abierta. El detalle muestra el caso que se está viendo con la visita y su turno, **Procedure consent**
+   (el estado del consentimiento de ese procedimiento, o que se genera al aceptar), los hallazgos, derivaciones y
+   órdenes del procedimiento del paciente que es, y lo cobrado. Una fila suelta no tiene caso ni consentimiento: esas
+   filas quedan y lo dicen. El link al caso lo abre en Treatment Plan mismo; un hallazgo, en el drawer.
+4. **Las filas del caso que son procedimientos del paciente llevan sus datos** (`DEL_PACIENTE` en
+   `data/treatment-plan.ts`): c1v2p1 D4341 Upper Arch, c3v1p1 D2391 pieza 3 O, c3v1p2 D2392 pieza 14 O, D, c5v2p1 D3330
+   pieza 19 y c7v1p1 D7140 pieza 16. Antes decían D0120 pieza 1 como el resto del frame, y el detalle mostraba un
+   hallazgo de la pieza 3 debajo de una fila de la pieza 1. Fecha, provider y fee quedan como el frame.
+5. **Procedure** corta los nombres largos con "…" (tooltip con el nombre entero; el detalle lo muestra completo), como
+   la tabla del Overview, y **Location** no se parte: con el chevron y los nombres reales la visita de un caso aceptado
+   pedía 1054px en 1026. A 1440 entra entera; más angosto scrollea de costado como antes y el detalle queda en la parte
+   visible.
+
+Radiography no cambia: sus findings viven en el visor de cada placa y no tienen menú.
+
+Para validar con usuarios: si en el examen alcanza con el drawer o hace falta ver el resumen sin abrir nada, y si el
+odontólogo usa el detalle de Treatment Plan para revisar el consentimiento antes de la visita o sigue mirando la columna
+Consent.
+
+### Pills de una sola forma, y el cobro sale de acá (2026-10-14)
+
+Julián, con capturas del detalle de Treatment Plan: había pills repetidas (el caso *Planning* y al lado *Group status
+PLANNING*), algunas en mayúsculas y otras no, y la de Status del drawer más grande.
+
+1. **Una pill por dato**, chica (sm) y en **minúscula inicial**, como las 50 pills del resto de la app. El estado del
+   grupo pasa a texto en la línea del caso ("Group status: Accepted") y sólo cuando no es el del caso (una alternativa
+   descartada de un grupo aceptado); si es el mismo, no se repite.
+2. Las únicas pills en mayúsculas de la app eran de Clinical Mode y venían de red.dev: Status de la Problem List y
+   Procedures, el estado de cada fecha del rail de Treatment Plan y la card de Treatment plans del Overview. Pasan a
+   minúscula inicial, así la fila y su detalle dicen el estado igual.
+3. **Lo del cobro (Clinic location, Financial details, Applied transactions) sale del detalle de Clinical Mode** y de
+   Treatment Plan: va en el detalle de la fila del Ledger y de Billing (ver `ledger.md` y `billing.md`, 2026-10-14).
+   El detalle de un procedimiento termina en Lab order.
+4. Clinical Mode abre desde el Ledger: `?case=` abre ese caso en Treatment Plan y `?procedure=` abre Procedures con esa
+   fila desplegada (el link del caso y *View procedure* del detalle de una fila del Ledger; ver `ledger.md`).
+
+## Consent required al cambiar el estado de un procedimiento (2026-10-17)
+
+Julián armó el diseño en un prototipo HTML (*Consent modals revised*) para tres historias de Jira: CON-3927, CON-3946 y
+CON-3950. **No se pudieron leer los tickets** (el conector de Atlassian de esta sesión no estaba conectado): lo de abajo
+sale del prototipo y de cómo ya funciona la app. Conviene cotejarlo con los criterios de aceptación.
+
+**Problema:** cambiar el estado de un procedimiento (completarlo, empezarlo) sin consentimiento firmado dejaba seguir
+sin avisar. Quien lo usa es el odontólogo o la recepción, en pleno turno, y necesita decidir rápido: mandar el documento
+para que el paciente firme después, firmarlo ahí mismo o seguir igual.
+
+1. **Dónde sale.** *Complete* en Treatment Plan (el ícono de la fila o el *Complete* de la barra con filas marcadas, ya
+   después de Confirm en Complete Procedure) y *Start* en el menú de la fila de **Procedures** del Overview. Un
+   procedimiento suelto (sin caso) no lleva consentimiento: cambia directo.
+2. **Dos variantes**, según el consentimiento (`consentimientoRequerido()`):
+   - **No consent sent** (sin documento, borrador sin mandar o vencido): *Cancel · Sign now · Send consent and sign
+     later*. La acción principal manda el documento (o reusa el borrador) y aplica el estado, **sin segunda
+     confirmación**; el consentimiento queda Pending.
+   - **Signature pending** (se mandó y falta la firma): *Cancel · Sign now · Continue without signed consent* y el link
+     *View consent ↗* al documento. Aplica el estado con la firma pendiente: no crea otro documento ni lo reenvía.
+   - Con varios procedimientos manda el peor caso: si uno no se mandó, es No consent sent. Todos firmados, sin diálogo.
+3. **Sign now no es una firma.** Abre la revisión y la firma que ya existen (el prototipo aclara que ese flujo no se
+   rediseña); acá avisa que no está en esta versión y el estado no cambia. Cancel, la X y Esc dejan todo como estaba.
+4. **Caso no listo.** Si el caso no está aceptado (Planning, Pending, Presented) no hay diálogo: el procedimiento no
+   cambia y sale un aviso de error con título **Procedure cannot be updated** ("The treatment case must be Accepted and
+   its treatment plan must be Accepted or In Progress.") y la acción *View case*, que abre el caso en Treatment Plan.
+   *Waiting for consent* cuenta como aceptado (espera las firmas). En Treatment Plan, antes de aceptar, la fila **no
+   ofrece Complete** (lo que no corresponde se oculta, como el resto de la pantalla); un procedimiento ya completado
+   tampoco.
+5. **Desvíos del prototipo, a propósito.** El prototipo muestra el toast fijo arriba a la derecha; el sistema ya tiene
+   toasts abajo a la izquierda, así que el aviso usa ese (`aviso.error` ahora acepta `{ titulo, texto }`). El prototipo
+   usa una X propia para cerrar; `ConfirmDialog` no la lleva (Cancel y Esc cierran, como el resto de las confirmaciones).
+   El diálogo es **un `ConfirmDialog`** (no un drawer): se contesta sin cargar nada, igual que Discard o Accept.
+6. **Undo.** El aviso de *Start* sigue ofreciendo Undo y deshace el estado, pero **no retira el consentimiento ya
+   enviado** (el documento salió). Si se vuelve a tocar Start, el diálogo ya dice *Signature pending*.
+7. **Datos de ejemplo.** D2740 (Crown) cuelga de Crown Option, que está en Presented: Start muestra el aviso. D2391 y
+   D2392 cuelgan de Restorative Plan (Waiting for consent): Pending y Not sent, una por variante.
+
+**A validar con usuarios:** si *Expired* debe ir con No consent sent (se manda uno nuevo) o pedir *Replace document*; si
+al elegir varios procedimientos conviene un único diálogo (como ahora) o uno por procedimiento; y si *Sign now* debería
+volver al paso siguiente después de firmar sin que la persona tenga que repetir la acción.
+
+Código: `clinical/ConsentRequiredDialog.tsx` (`ConsentRequiredDialog`, `ResumenConsentimiento`,
+`consentimientoRequerido`, `avisarCasoNoListo`, `CASO_LISTO`); textos en `CONSENTIMIENTO_REQUERIDO` (`data/treatment-plan.ts`).
+Design system: *Components / Clinical / ConsentRequiredDialog*, *Elements / ConfirmDialog* y *Components / UI / Toast*.
+
+## Overview: el chart de DentAssmt y Treatment Plan hasta abajo (2026-10-18)
+
+Pedido de Julián, sobre una captura del Overview: *"sumarle el mismo gráfico que tenemos en dental assessment, que te
+muestre la última condition que cargaste a modo informativo"* y *"el treatment plan se corta muy temprano, debería
+llegar hasta abajo justo cuando termina la tabla, así no queda espacio muerto"*.
+
+**Problema:** el Overview tenía su propio odontograma (`Odontogram`, el viejo de 32 piezas por 7 superficies, con datos
+inventados) y DentAssmt otro (la librería). Dos dibujos distintos del mismo paciente: lo cargado en uno no se veía en el
+otro. Quien entra a Clinical Mode (el odontólogo, al empezar el turno) quiere ver de un vistazo cómo está la boca y qué
+fue lo último que se cargó, sin editar nada.
+
+1. **El mismo chart, de sólo lectura** (`OdontogramaLectura` en `clinical/OdontogramaOverview.tsx`): la grilla de
+   react-advanced-odontogram (`OdontogramProvider` + `OdontogramChartSurface`, sin controles ni panel) con `readOnly`,
+   las caras linguales de los anteriores (`CarasLinguales`) y el mismo tema. Por CSS (`.odonto-resumen`) se van la ayuda
+   "Click a tooth. For multi-select…", Status / Plan y los botones de vista: acá no hacen nada. El hover de la pieza
+   también se va.
+2. **Un solo odontograma** (`dental/estadoOdontograma.ts`). La librería guarda su estado en el módulo y lo borra al
+   desmontarse (`destroyOdontogram`), así que DentAssmt y el Overview, que nunca están montados a la vez, lo comparten
+   copiándolo: al armarse cada uno carga lo guardado (`importStatus`) y DentAssmt guarda cada cambio (`getStatusChart`).
+   Arranca con **la caries oclusal de la pieza 3**, que es la última condición del frame (Problem List p5, Chronic enamel
+   dental caries, superficie O): ahora se ve también en DentAssmt.
+3. **La última condición.** Al entrar es la del frame (Caries, 20/06/2025, pieza 3). Cuando se carga otra con **Add
+   Condition** en cualquier examen pasa a ser esa: el procedimiento elegido, la fecha de hoy y su pieza
+   (`ultima` en el estado de `ExamFindingsProvider`, `useUltimaCondicion()`). Add Procedure no la cambia: es algo
+   planeado, no una condición. En DentAssmt no se pinta el chart desde la app (no hay controles desde el 2026-10-03), así
+   que la condición nueva se ve en el aviso y en la pieza resaltada, no dibujada.
+4. **La pieza resaltada** como la elegida del frame: borde azul y fondo `dash-count-bg` en sus dos celdas y el número en
+   una pastilla azul. Sin pieza (una condición de zona, como un Mucocele) no se resalta nada. Para lectores de pantalla,
+   el aviso suma "on tooth N".
+5. **Show details** antes elegía la pieza en el chart y avisaba con un toast; en un chart de sólo lectura no tiene
+   sentido. Ahora **lleva al examen donde se cargó** (el mismo destino que el link *Exam* del detalle de la Problem List)
+   y, si es DentAssmt, abre con la pieza ya elegida. Sin examen con pestaña, no hay botón.
+6. **El aviso en una línea desde sm**: con un nombre largo ("Resin-based composite crown, anterior") se partía en dos y
+   tapaba los números de abajo. El nombre se corta (el completo va en el tooltip) y el aviso llega hasta 600px. En el
+   celular sigue a todo el ancho y en dos líneas.
+7. **Ancho:** el chart usa toda la columna (antes se topaba en 900); ampliado va de 900 a 1100 centrado, para que las
+   piezas no se estiren de más. Debajo de 720 scrollea a lo ancho adentro de la card, como antes.
+8. **Caries en rojo, de verdad.** Las caras oclusal, mesial y distal son un grupo (`g#caries-occlusal`) con la forma
+   adentro, y el negro horneado está en la forma: la regla de 2026-09-14 pintaba el grupo y la caries seguía casi negra.
+   Se pinta también `*-shape`. Pasaba igual en DentAssmt.
+9. **Treatment Plan hasta abajo.** En desktop la card (`TreatmentPlanList llena`) es absoluta dentro de su columna: el
+   alto lo marca la columna de al lado (chart + Problem List) y la lista scrollea adentro, así termina justo donde
+   termina la tabla y no estira la fila. Si la tabla crece (otra página, una fila abierta) la card la acompaña. Apilado
+   (menos de 1024px) sigue con el tope de 560px.
+
+**Desvío anotado:** el frame muestra "Last Condition" con un texto fijo; ahora cambia con lo que se carga, que es lo que
+pidió Julián ("la última condition que cargaste").
+
+**A validar con usuarios:** si "Last Condition" debería decir también la pieza a la vista (hoy sólo la marca el chart);
+si una condición cargada en DentAssmt debería pintarse en el chart (eso pide volver a tener controles o mapear cada
+código a un estado de la librería); y si Show details tiene que quedarse en el Overview abriendo el detalle de la
+Problem List en vez de cambiar de examen.
+
+Código: `clinical/OdontogramaOverview.tsx` (`OdontogramaOverview`, `OdontogramaLectura`),
+`clinical/dental/estadoOdontograma.ts`, `ULTIMA_CONDICION` / `UltimaCondicion` en `data/clinical-mode.ts`,
+`useUltimaCondicion` en `ExamLayout.tsx`, `pestanaDeExamen` en `RecordDetail.tsx`, `llena` en `TreatmentPlanList`.
+Design system: *Components / Clinical / Overview chart* y *Components / Clinical / TreatmentPlanList* (*Fill the
+column*, *Specs*).
+
+## Confirm Procedure y Clinical Note pasan a ConfirmDialog (2026-10-19)
+
+Julián sintió que clinical mode necesitaba su propia definición de pop up. No era así: el sistema ya está decidido
+(`ui/drawer` para todo lo que carga o edita, `ui/confirm-dialog` sólo para una pregunta antes de seguir, un flotante
+anclado para consultar sin bloquear — CLAUDE.md y `design-system.md` 2026-10-06) y `ConsentRequiredDialog` ya lo sigue
+bien. Lo que pasaba es que dos piezas de clinical mode se escribieron rearmando `Dialog` a mano, antes de `ConfirmDialog`
+o sin encontrarlo, con botones `<button>` propios y colores hardcodeados (`bg-dash-blue`, `bg-field-error`) en vez de
+`ui/button` y sus variantes.
+
+- **`ConfirmProcedureDialog`** (`dental/ConfirmProcedureDialog.tsx`): confirma el cambio de estado de un finding, con un
+  checklist opcional para marcar como Treated las condiciones vinculadas del área. Pasa a `ConfirmDialog`, con el
+  checklist como children (igual que `ResumenConsentimiento` en `ConsentRequiredDialog`). `tone="danger"` en las
+  acciones destructivas de `actions.ts` (discard, delete, no-treatment, patient/clinic declined), `primary` en el resto.
+- **`ClinicalNoteDialog`** (`ClinicalTopBar.tsx`): ofrece firmar la Clinical Note al cerrar el encuentro. Pasa a
+  `ConfirmDialog` con `cancelLabel="Remind me later"` en vez de "Cancel". Efecto colateral, a propósito: cerrar con Esc
+  o clickeando afuera ahora también dispara el aviso "We will remind you to sign the Clinical Note" (antes sólo lo hacía
+  el botón) — como en cualquier otro `ConfirmDialog` de la app, cerrarlo de cualquier forma es la misma decisión de no
+  seguir ahora.
+
+No se suma ningún patrón nuevo ni cambia el flujo de ninguna pantalla: es una corrección de consistencia, no una
+decisión de UX nueva.
+
+Código: `clinical/dental/ConfirmProcedureDialog.tsx`, `clinical/ClinicalTopBar.tsx` (`ClinicalNoteDialog`).
+Design system: *Elements / ConfirmDialog* (fila nueva en *Specs* › *Where*).
+
+## New Procedure: vincular pide un procedimiento ya cargado (2026-10-20)
+
+Julián vio el problema: para vincular un finding y un diagnóstico hace falta tener el procedimiento cargado, pero el
+drawer no lo cargaba hasta el final. Los cuatro pasos (Procedure, Surfaces, Link to finding, Link to diagnosis)
+compartían un único Save al cierre, así que nada quedaba guardado si se cerraba antes, y conceptualmente se pedía
+vincular algo que todavía no existía.
+
+1. **Procedure (y Surfaces, si el procedimiento va en superficie) ya no llevan a "Next Step" hacia los pasos de
+   vínculo**: ese paso es ahora el último antes de guardar, con el botón **Save**. Guarda el procedimiento sin
+   vínculos (`linked: []`, `diagnoses: []`) y dispara el mismo aviso de siempre ("D0120 charted as planned on tooth
+   21").
+2. **Recién con eso guardado aparecen Link to finding y Link to diagnosis** en el indicador de pasos, para vincular
+   hallazgos y diagnósticos al procedimiento que ya existe. El Save de Link to diagnosis guarda esos vínculos sobre
+   ese mismo procedimiento (no crea uno nuevo) y cierra el drawer.
+3. **Existing no cambia**: nunca tuvo pasos de vínculo (lo ya hecho no resuelve un hallazgo), así que sigue siendo un
+   solo paso, sin indicador, con Save.
+
+`NewProcedureDrawer` separa `onSave` (crea el procedimiento y devuelve su id) de `onLink` (guarda `linked`/`diagnoses`
+sobre ese id); `ExamLayout.saveProcedure` devuelve el id generado y suma `linkProcedure` para el segundo guardado. La
+UI y el catálogo de procedimientos no cambian, sólo cuándo se guarda cada parte.
+
+Código: `clinical/dental/NewProcedureDrawer.tsx`, `clinical/ExamLayout.tsx`.
+Design system: *Components / Clinical / Dental / NewProcedureDrawer* (Parts, Specs y los estados `LinkToFindingStep` /
+`LinkToDiagnosisStep` actualizados).

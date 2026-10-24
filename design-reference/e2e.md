@@ -17,6 +17,89 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 - `e2e.config.ts`: un target web a 1440 × 900 contra `http://localhost:5182` (o `APP_URL`).
 - `tests/clinical-mode.e2e.ts`: la app abre, y Add Procedure carga un D0120 desde DentAssmt recorriendo los tres
   pasos del drawer hasta el aviso de guardado.
+  Desde el 2026-10-08 también Lab Order: Filter por Requested deja 2 de 9, y Cancel order desde el menú de la fila se
+  deshace con Undo.
+- `tests/consents.e2e.ts` (2026-10-07): en Settings → Consents, Preview abre la hoja en un drawer (Patient View saca
+  Diagnosis) y Save desde el preview lo cierra y deja los faltantes a la vista en el editor.
+- `tests/billing-settings.e2e.ts` (2026-10-09, rehecho desde red.dev): New Carrier pide lo obligatorio y el buscador
+  completa el Payer ID; un plan nuevo se arma en cuatro pasos y sigue en su Coverage Table (Copy from + Save); cambiar de
+  pestaña del plan con cambios pide confirmación; Bulk Edit +10% crea una versión nueva; una excepción se arma en cuatro
+  pasos; Assignments muestra el desglose y la lista; Compare fees compara contra UCR - Red; Bulk Edit con filas tildadas
+  cambia sólo esas.
+- `tests/billing.e2e.ts` (2026-10-09): elegir un paciente en Find Patient abre su vista (sólo sus movimientos, los
+  botones de pago, Guarantor View con todo su garante) y la X vuelve al resumen; una fila del resumen abre la vista de
+  ese paciente en Patient View; el círculo de info de Overdue Balance muestra su texto al pasar el mouse.
+
+- `tests/notifications.e2e.ts` (2026-10-12): el atajo *Last 7 days* acota la lista y la ✕ vuelve a *All dates*; dos
+  clics en el calendario arman un rango y, en Unread sin nada en esas fechas, el vacío ofrece *Clear dates*. Las
+  fechas se calculan desde hoy, como los datos.
+  Desde el 2026-10-13 también: sólo hay *Inbox* y *Unread*, y el ojo de una fila la marca leída o sin leer (Unread de
+  8 a 7 y de vuelta).
+
+- `tests/dashboard.e2e.ts` (2026-10-12): el selector de fecha se lee "Feb 28, 2026"; elegir un día cierra el calendario
+  y lo cambia; Today vuelve a hoy y se va.
+  Con `?day=busy` (35 turnos) se ven cinco; *Show 30 more* abre el resto en una región con scroll y *Show less* la
+  cierra (`ui/show-more`).
+  (2026-10-13) *Check In* avisa "checked in" y el escudo de al lado de Today lleva a Help.
+  (2026-10-19) Tocar un turno abre la ficha flotante del paciente y Check In no. Las salas son acordeones: tocar una
+  despliega su día y no filtra la Waiting Room, que se filtra con su propio Filter (Operatory 4 deja 1 de 6). Con
+  `?day=busy` no hay "Show more" en las tres columnas de arriba a 1440px (los 35 turnos están en la columna, que scrollea
+  adentro); sólo Pending Task, abajo, lo lleva.
+  (2026-10-19) La tira de salas va en una fila con scroll (sin Show more); elegir una sala filtra la Waiting Room y
+  una sala sin gente (Operatory 5) la deja vacía.
+- `tests/clinical-mode.e2e.ts`: la app abre, y Add Procedure carga un D0120 desde DentAssmt recorriendo los tres
+  pasos del drawer hasta el aviso de guardado.
+  Desde el 2026-10-08 también Lab Order: Filter por Requested deja 2 de 9, y Cancel order desde el menú de la fila se
+  deshace con Undo.
+- `tests/consents.e2e.ts` (2026-10-07): en Settings → Consents, Preview abre la hoja en un drawer (Patient View saca
+  Diagnosis) y Save desde el preview lo cierra y deja los faltantes a la vista en el editor.
+- `tests/billing-settings.e2e.ts` (2026-10-09, rehecho desde red.dev): New Carrier pide lo obligatorio y el buscador
+  completa el Payer ID; un plan nuevo se arma en cuatro pasos y sigue en su Coverage Table (Copy from + Save); cambiar de
+  pestaña del plan con cambios pide confirmación; Bulk Edit +10% crea una versión nueva; una excepción se arma en cuatro
+  pasos; Assignments muestra el desglose y la lista; Compare fees compara contra UCR - Red; Bulk Edit con filas tildadas
+  cambia sólo esas.
+- `tests/billing.e2e.ts` (2026-10-09): elegir un paciente en Find Patient abre su vista (sólo sus movimientos, los
+  botones de pago, Guarantor View con todo su garante) y la X vuelve al resumen; una fila del resumen abre la vista de
+  ese paciente en Patient View; el círculo de info de Overdue Balance muestra su texto al pasar el mouse.
+
+- `tests/notifications.e2e.ts` (2026-10-12): el atajo *Last 7 days* acota la lista y la ✕ vuelve a *All dates*; dos
+  clics en el calendario arman un rango y, en Unread sin nada en esas fechas, el vacío ofrece *Clear dates*. Las
+  fechas se calculan desde hoy, como los datos.
+  Desde el 2026-10-13 también: sólo hay *Inbox* y *Unread*, y el ojo de una fila la marca leída o sin leer (Unread de
+  8 a 7 y de vuelta).
+
+- `tests/dashboard.e2e.ts` (2026-10-12): el selector de fecha se lee "Feb 28, 2026"; elegir un día cierra el calendario
+  y lo cambia; Today vuelve a hoy y se va.
+  Con `?day=busy` (35 turnos, 7 en la sala elegida) se ven cinco; *Show 2 more* abre el resto en una región con scroll y *Show less* la
+  cierra (`ui/show-more`).
+  (2026-10-13) La tira de salas de arriba abre el resto con *Show N more* (el número depende del ancho); *Check In*
+  avisa "checked in" y el escudo de al lado de Today lleva a Help.
+  (2026-10-17) Tocar una sala filtra la sala de espera (Operatory 1 trae a los suyos, Operatory 5 queda vacía) y la ✕
+  del chip junto al título vuelve a mostrar a todos.
+- `tests/clinical-mode.e2e.ts` (2026-10-13): en DentAssmt, *View full record* del menú del finding Tooth 3 abre su
+  registro (Source exam) y el link a D2391 cambia el drawer a ese procedimiento.
+  (2026-10-18) El Overview arranca con *Last Condition: Caries* (20/06/2025); Show details lleva a DentAssmt, Add
+  Condition carga un D2740 y al volver con Overwiev el aviso dice *Last Condition: Crown…*.
+- `tests/ledger.e2e.ts` (2026-10-14): el detalle de D4341 muestra su caso, Northgate Clinic y Outstanding transaction
+  balance $170; con la búsqueda puesta, el link del pago abre su registro. El de un pago muestra Scope, Payment methods,
+  a qué cargos fue y Apply credit. View procedure abre Procedures en Clinical Mode con la fila abierta.
+  `tests/billing.e2e.ts` suma: con Maria Abril Viola, la fila del pago dice cómo se pagó y a qué cargo fue, y el link
+  abre su registro.
+- `tests/treatment-plan.e2e.ts` (2026-10-13): una fila de Unassigned se despliega (No treatment linked, Collapse all), y
+  la fila D2391 de Restorative Plan muestra Procedure consent; su hallazgo se abre en el drawer sin salir de Treatment
+  Plan.
+
+- `tests/confibot.e2e.ts` (2026-10-13): el botón flotante abre el chat y se esconde mientras está abierto; la flechita
+  lo recoge en una pestaña que sigue ahí al cambiar de pantalla y lo trae de vuelta. En Scheduling queda centrado
+  arriba del botón de Appointment requests, sin tocarlo.
+
+- `tests/patient-dashboard.e2e.ts` (2026-10-13): en Ledger el rastro es Patients › John Smith › Ledger (el último sin
+  link); John Smith vuelve al Overview, donde termina el rastro, y Patients a la lista, que no lleva. Billing tampoco.
+  Edit Patient cuelga del paciente.
+
+- `tests/scheduling-linked-visit.e2e.ts` (2026-10-17): en New Appointment, Visit 2 muestra el turno donde ya está
+  linkeada; Save pregunta *Move treatment visit?* y Cancel deja el drawer como estaba; *Move visit* guarda y avisa que
+  la visita se movió; una visita sin otro turno se guarda sin preguntar.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 
@@ -28,7 +111,15 @@ Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ni
 
 ## Notas
 
+- Sin acceso a `cdn.playwright.dev` (sesiones en la nube), el runner no puede bajar su Chromium. Se corre con el que
+  ya está instalado apuntando `PLAYWRIGHT_BROWSERS_PATH` a una carpeta con enlaces `chromium-<versión>` y
+  `chromium_headless_shell-<versión>` hacia el binario de `/opt/pw-browsers`.
+
 - El CLI manda telemetría anónima de uso (comandos y errores, sin contenido de los tests). Se apaga con
   `npx e2e telemetry disable` o `E2E_TELEMETRY_DISABLED=1`.
+- En una sesión en la nube sin salida a `cdn.playwright.dev`, el runner no puede bajar su Chromium (pide la versión
+  de su `playwright-core`). Se puede apuntar `PLAYWRIGHT_BROWSERS_PATH` a una carpeta del scratchpad con
+  `chromium-<versión>/chrome-linux64` y `chromium_headless_shell-<versión>/chrome-headless-shell-linux64` enlazados
+  al Chromium que trae la máquina (`/opt/pw-browsers`).
 - No se instalaron la skill de e2e para agentes (`.claude/skills/e2e`) ni su servidor MCP (`.mcp.json`), que
   `npx e2e init` agrega por defecto.

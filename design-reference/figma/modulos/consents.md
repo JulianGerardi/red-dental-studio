@@ -9,7 +9,8 @@
   ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2860%2CCON-2862%2CCON-2905%2CCON-2907%2CCON-2908%2CCON-2909%2CCON-2910%2CCON-2911%2CCON-2912%2CCON-2913%2CCON-2914%2CCON-2865%2CCON-2866%2CCON-2923%2CCON-2927%2CCON-2928%2CCON-2959%2CCON-2960%29%20ORDER%20BY%20key%20ASC))
 
 Nodo Figma: `4106:170620` ("New Consent Template"). Lista de templates a la
-izquierda, editor en el medio, preview a la derecha. Código en
+izquierda, editor en el medio, preview a la derecha (desde 2026-10-07 el preview
+se abre en un drawer, ver al final). Código en
 `src/pages/settings/Consents.tsx` (pantalla) y
 `src/components/settings/ConsentDocument.tsx` (la hoja del preview).
 
@@ -158,3 +159,47 @@ design system.
 
 Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
 En Consents: Templates y el editor. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.
+
+## El preview pasa a un drawer (2026-10-07)
+
+Pedido de Julián: el preview ocupaba mucho lugar como tercera columna; que sea flotante, para abrirlo cuando se quiera,
+o un drawer como los formularios. Se eligió el **drawer** (es la regla de pop ups de la app) abierto desde un botón que
+siempre está a mano:
+
+1. **Dos columnas**: Templates (288px) y el editor, que se queda con todo el resto. Sin preview al costado, el editor
+   deja de verse apretado; la lista vale 288px también con dos columnas (antes 280).
+2. **Preview en el pie fijo del editor**, a la izquierda de Cancel y Save (botón secondary con el ojo). Como el pie es
+   `sticky`, se abre desde cualquier punto del scroll: eso cubre lo "flotante" sin sumar un botón suelto encima de la
+   pantalla.
+3. **Drawer lg (560px)** con título "Preview" y bajada "What the patient receives". Todo el panel es el **escritorio
+   gris** (`surface-muted`) con la hoja blanca encima, como estaba la columna: la hoja entra justa (512px de los 520 de
+   tope). Arriba de la hoja, *Patient View* y una línea que dice qué se está viendo (con o sin diagnóstico y hallazgos).
+4. **Pie de dos botones del mismo ancho**: *Back to editor* y *Save*. Save cierra el drawer y guarda; si falta algo, los
+   errores quedan a la vista en el editor (el aviso rojo y cada campo).
+5. La hoja muestra lo escrito hasta ese momento (el borrador, sin guardar). Se pierde el preview en vivo mientras se
+   tipea: es el costo de sacarlo de la pantalla. La bajada del editor ya no dice "Changes show in the preview as you
+   type" sino "Preview shows the sheet with your changes".
+6. `PanelPreview` pasa a ser `DrawerPreview`. Design system (*Pages › Parts › Consents*): Playground en su propio iframe
+   y con el control *previewOpen*; *Preview · Clinic view* y *Patient view* con el drawer abierto; el botón Preview en
+   Specs.
+
+### Segunda vuelta: pie en angosto y Storybook con Parts y States (2026-10-07)
+
+Releyendo el CLAUDE.md nuevo se auditó la tanda contra cada regla de los `.md`. Quedaron dos arreglos y un cambio de
+documentación:
+
+1. **El pie del editor se cortaba en angosto.** Con Preview, Cancel y Save en una fila sin wrap (unos 302px), a 320px
+   Preview quedaba fuera de la pantalla y a 360 se metía en el padding: rompía "de 320 a 1440+ nada se recorta"
+   (`figma/README.md`, *Responsive*). Ahora el pie hace wrap: por debajo de ~370px **Cancel y Save bajan juntos** a una
+   segunda línea, a la derecha (van en su propio grupo), y **Preview queda solo arriba**, a la izquierda. El pie pasa de
+   61 a 109px de alto en ese rango. Medido en 320, 360, 390 y 1440: ningún botón sale del contenido de la card.
+2. **Specs → Colors decía "Panels: border line"**, de antes de las cards sin borde (2026-10-06). Ahora dice
+   `white · shadow-panel, no border`.
+3. **La página de Storybook pasa a Playground, Parts, States y Specs**, como *Elements / Navigation* (#9): el CLAUDE.md
+   dice "nada de listas sueltas" y que `ds:check` no alcanza. Reemplaza la lista de historias sueltas del 2026-09-29 (punto
+   6), pero **cada estado sigue siendo su propia muestra**, con título y nota, dentro de *States* (agrupadas por parte:
+   Template card, Templates list, Procedure picker, Consent text, Formatting toolbar, Editor y Preview drawer). *Parts*
+   es la pantalla con una tabla de qué hace cada parte. Los dos estados del drawer siguen en historias aparte, en
+   iframe, porque el drawer es `position: fixed`. *Narrow footer* es un iframe de 320px con la historia `NarrowFooter`
+   (fuera de la página de docs): inline, las clases `sm:` responden a la ventana de escritorio y el editor salía de
+   340px, así que no mostraba lo mismo que un celular.

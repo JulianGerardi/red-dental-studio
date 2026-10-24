@@ -1,15 +1,16 @@
 import { DrawerActions, DrawerSection } from '@/components/ui/drawer'
 import { useMemo, useState } from 'react'
 import {
-  ModalShell, SelectField, SearchField, TextArea,
+  ModalShell, SelectField, PersonSearchField, TextArea,
   OptionCheckbox, FieldLabel, FieldError,
 } from '@/components/patients/form'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
 import { AppointmentSlotPicker, HORAS } from '@/components/scheduling/AppointmentSlotPicker'
 import {
-  PlanCard, VisitRow, type Plan, type Visita,
+  PlanCard, VisitRow, MoverVisitaDialog, type Plan, type Visita,
 } from '@/components/scheduling/TreatmentPlanPicker'
 import { aviso } from '@/components/ui/toaster'
+import { EMPLEADOS } from '@/data/employees'
 
 /* Figma 4430:61940 "Scheduling — Calendar (New Appointment Modal)".
 
@@ -20,10 +21,35 @@ import { aviso } from '@/components/ui/toaster'
    Desde 2026-10-06 es un drawer con la organización de New Appointment de Confidentally 2.0: paso 1 "Patient and
    Scheduling" en una columna, paso 2 "Link to treatment plan visit" con Additional y las notas. El calendario del día
    (AppointmentSlotPicker) se despliega al costado del drawer cuando se toca la fecha o la hora. Ver
-   design-reference/design-system.md, "Pop ups". */
+   design-reference/design-system.md, "Pop ups".
+
+   Desde 2026-10-17, una visita que ya está linkeada a otro turno lo muestra en su fila y, al guardar, pregunta si se
+   mueve (MoverVisitaDialog). Ver scheduling.md. */
 
 const PACIENTES = ['John Smith', 'Noah James Smith', 'Maria Abril Viola', 'Elias Aguirre']
 const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado', 'Sarah Stone']
+
+/* Julián: en el buscador de Patient faltaba la fecha de nacimiento y el email para desambiguar (antes los traía). No
+   hay una ficha única para estos cuatro nombres (son de esta pantalla, no de la tabla de Patients ni de Billing/Ledger,
+   que tienen su propio mock de 271), así que es mock propio, con el mismo formato que usa la tabla de Patients
+   ("Month D, YYYY" y nombre.apellido@email.com). Ver scheduling.md, 2026-10-19. */
+const DATOS_PACIENTE: Record<string, { nacimiento: string; email: string }> = {
+  'John Smith': { nacimiento: 'June 14, 1985', email: 'john.smith@email.com' },
+  'Noah James Smith': { nacimiento: 'September 2, 2018', email: 'noah.smith@email.com' },
+  'Maria Abril Viola': { nacimiento: 'November 23, 1991', email: 'maria.viola@email.com' },
+  'Elias Aguirre': { nacimiento: 'March 5, 1979', email: 'elias.aguirre@email.com' },
+}
+const pacienteLineas = (nombre: string) => {
+  const d = DATOS_PACIENTE[nombre]
+  return d && [`DOB: ${d.nacimiento}`, `Email: ${d.email}`]
+}
+
+/* El email del provider sale de la plantilla del consultorio (Settings → Employees), que ya los tiene cargados.
+   "Dr. " es sólo el tratamiento que usa esta pantalla; el nombre de abajo es el que figura en Employees. */
+const providerLineas = (nombre: string) => {
+  const email = EMPLEADOS.find((e) => e.nombre === nombre.replace(/^Dr\.\s*/, ''))?.email
+  return email ? [`Email: ${email}`] : undefined
+}
 
 const VISITAS: Visita[] = [
   {
@@ -39,9 +65,11 @@ const VISITAS: Visita[] = [
       'D9310 – Consultation',
     ],
   },
+  /* Ya linkeada a otro turno (cumplido): para usarla en éste hay que moverla. Igual que en el prototipo de Julián. */
   {
     id: 'v2', name: 'Visit 2', total: '$860.00',
     procedimientos: ['D0120 – Periodic oral evaluation', 'D1110 – Prophylaxis – adult'],
+    vinculada: { fecha: 'Sep 28, 2026', hora: '1:15 PM', estado: 'Fulfilled' },
   },
   /* Las tres siguientes siguen el hilo de la Comprehensive Implant Therapy:
      cirugía, pilar y corona. */
@@ -113,6 +141,9 @@ export function NewAppointmentModal({
   const [asap, setAsap] = useState(true)
   const [plan, setPlan] = useState('p1')
   const [visita, setVisita] = useState('v1')
+  const elegida = VISITAS.find((v) => v.id === visita)
+  /* La pregunta de mover la visita, abierta sobre el drawer. */
+  const [moviendo, setMoviendo] = useState(false)
   const [intentado, setIntentado] = useState(false)
   /* El calendario del día se despliega al costado cuando se toca la fecha o la hora (sólo en el paso 1). */
   const [tocoHorario, setTocoHorario] = useState(false)
@@ -142,6 +173,11 @@ export function NewAppointmentModal({
   const guardar = () => {
     setIntentado(true)
     if (obligatorios.some((k) => !d[k].trim())) return
+    if (elegida?.vinculada) setMoviendo(true)
+    else terminar()
+  }
+
+  const terminar = () => {
     const manejado = onGuardar?.(d)
     if (!manejado) {
       aviso.ok(
@@ -150,6 +186,8 @@ export function NewAppointmentModal({
           : `Appointment for ${d.patient} booked at ${d.start}.`,
       )
     }
+    /* Toast aparte: el del turno lo arma a veces la pantalla que abrió el drawer. */
+    if (elegida?.vinculada) aviso.ok(`${elegida.name} moved from the ${elegida.vinculada.fecha} appointment.`)
     onClose()
   }
 
@@ -168,16 +206,16 @@ export function NewAppointmentModal({
         /* Como New Appointment de Confidentally 2.0: una columna, Requestor y Reason, Start y End, Operatory y Status de a
            dos. Al tocar la fecha o la hora se despliega al costado el calendario del día para elegir la franja. */
         <DrawerSection title="Patient and Scheduling" description="Complete the details below to schedule the appointment.">
-          <SearchField
-            label="Patient" required placeholder="Search by Name" options={PACIENTES}
+          <PersonSearchField
+            label="Patient" required placeholder="Search by Name" personas={PACIENTES} lineas={pacienteLineas}
             value={d.patient} onChange={set('patient')} error={req('patient')}
           />
-          <SearchField
-            label="Primary Provider" required placeholder="Search by Name" options={PROVIDERS}
+          <PersonSearchField
+            label="Primary Provider" required placeholder="Search by Name" personas={PROVIDERS} lineas={providerLineas}
             value={d.primary} onChange={set('primary')} error={req('primary')}
           />
-          <SearchField
-            label="Additional Provider" placeholder="Search by Name" options={PROVIDERS}
+          <PersonSearchField
+            label="Additional Provider" placeholder="Search by Name" personas={PROVIDERS} lineas={providerLineas}
             value={d.additional} onChange={set('additional')}
           />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -185,8 +223,9 @@ export function NewAppointmentModal({
             <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />
           </div>
           {/* onFocus burbujea: uno solo alcanza para la fecha y las horas. Una vez abierto, el calendario se queda. */}
-          <div onFocus={() => setTocoHorario(true)} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
+          <div onFocus={() => setTocoHorario(true)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* La fecha va en la columna izquierda, del ancho de Start Time (Drawer → Specs → Fields). */}
+            <div className="flex flex-col gap-2 sm:col-start-1">
               <FieldLabel required>Date</FieldLabel>
               <DatePicker
                 value={fecha}
@@ -197,10 +236,8 @@ export function NewAppointmentModal({
               />
               <FieldError>{req('date')}</FieldError>
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <SelectField label="Start Time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} />
-              <SelectField label="End Time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
-            </div>
+            <SelectField label="Start Time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} className="sm:col-start-1" />
+            <SelectField label="End Time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <SelectField label="Operatory" required value={d.operatory} onChange={set('operatory')} error={req('operatory')} />
@@ -212,11 +249,11 @@ export function NewAppointmentModal({
         <div className="flex flex-col gap-6">
           <DrawerSection title="Link to treatment plan visit" description="Optional. Show this only when the appointment should be tied to a planned treatment visit.">
             <div className="flex flex-col gap-2">
-              <p className="text-[12px] font-semibold text-ink">Treatment plan</p>
+              <FieldLabel>Treatment plan</FieldLabel>
               {PLANES.map((p) => <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />)}
             </div>
             <div className="flex flex-col gap-2">
-              <p className="text-[12px] font-semibold text-ink">Visit</p>
+              <FieldLabel>Visit</FieldLabel>
               {VISITAS.map((v) => <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />)}
             </div>
           </DrawerSection>
@@ -229,6 +266,9 @@ export function NewAppointmentModal({
             <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
           </DrawerSection>
         </div>
+      )}
+      {moviendo && elegida?.vinculada && (
+        <MoverVisitaDialog visita={elegida.name} turno={elegida.vinculada} onConfirm={terminar} onCancel={() => setMoviendo(false)} />
       )}
     </ModalShell>
   )

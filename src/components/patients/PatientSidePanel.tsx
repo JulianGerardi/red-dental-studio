@@ -164,7 +164,9 @@ export function PatientSidePanel({
 
   return (
     <TooltipProvider delayDuration={150}>
-    <aside className={cn(TARJETA_PANEL, 'w-full p-4 lg:shrink-0', colapsado ? 'lg:w-[60px] lg:p-2' : 'lg:w-[218px]')}>
+    {/* lg:self-stretch: en columna baja hasta el final de la pantalla del paciente, sin hueco debajo (patient-dashboard.md,
+        2026-10-13). */}
+    <aside className={cn(TARJETA_PANEL, 'w-full p-4 lg:shrink-0 lg:self-stretch', colapsado ? 'lg:w-[60px] lg:p-2' : 'lg:w-[218px]')}>
       <button
         type="button"
         onClick={() => setColapsado((v) => !v)}
@@ -188,10 +190,8 @@ export function PatientSidePanel({
             iniciales={initials}
             onChange={setFoto}
             label={name}
-            avatarClassName={cn(
-              'bg-dash-blue-hover rounded-full text-white size-[62px] text-lg',
-              colapsado && 'lg:size-9 lg:text-[11px]',
-            )}
+            size={62}
+            className={cn(colapsado && 'lg:size-9 lg:text-[13px]')}
           />
           {colapsado && conTooltip(`${name} · Active · 50 years`, (
             <span

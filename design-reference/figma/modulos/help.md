@@ -73,3 +73,31 @@ como los drawers: 18px Bold y bajada de 12px; los rótulos en mayúsculas pasan 
 
 Julián pidió que en toda la app las cards generales lleven la sombra de los paneles del Dashboard en vez de stroke.
 En Help: cada módulo plegable. Las cards de adentro siguen con borde fino y sombra suave (`InnerCard`). Ver *Elements / Cards*.
+
+## Confibot vuelve a flotar abajo a la derecha (2026-10-13)
+
+Julián pidió volver a tener Confibot flotando en la esquina inferior derecha, con el último botón que habíamos hecho.
+Se recupera tal cual el de antes del 2026-09-18 (`0d8611bb`, cuando pasó al menú): círculo de 48px con el degradé azul
+e ícono Bot que, con el mouse o el foco, se estira a "Confibot" y prende un halo con el degradé que corre; una flechita
+arriba para recogerlo y, recogido, una pestaña pegada al borde de abajo que lo trae de vuelta. Ahora como
+`ConfibotLanzador` en `Confibot.tsx`, con tokens en vez de hex (`dash-blue`, `dash-blue-glow` nuevo para el `#2f74f5`
+del medio, `dash-ring`).
+
+Lo que hizo que lo sacáramos, resuelto en vez de esquivado:
+
+1. **Tapaba Appointment requests en Scheduling.** Una pantalla con su propio botón flotante llama a `useFabDePagina()`
+   (en `HelpProvider`) y Confibot se apila centrado arriba de ese botón, a 12px. Recogido, la pestaña se corre a la
+   izquierda del botón de la pantalla. Con el panel de solicitudes abierto, la pestaña queda debajo del panel, tocándolo:
+   es un estado de paso y se aceptó.
+2. **Tapaba Cancel/Save al pie de las páginas.** Vuelve la reserva de alto en el `main` de `AppShell` (`pb-24
+   sm:pb-28`, la misma de 2026-09-08): lo que cae al pie se puede scrollear por encima del botón. Los drawers (z-50)
+   lo tapan, así que sus pies no compiten con él.
+3. **Chocaba con el CoachMark**, que usa la misma esquina: mientras hay una explicación abierta, o la hoja de chat, el
+   botón no se dibuja.
+
+**Decisiones nuevas.** Recogido o no se recuerda entre visitas (`confidentally.confibot-tucked` en localStorage): quien
+lo esconde porque le estorba no tiene que volver a hacerlo cada vez. La flechita sigue viéndose de 24px pero tiene 40px
+de área de toque, y la pestaña y la flechita muestran el anillo de foco con teclado (`dash-ring`).
+
+**El ítem Confibot del menú lateral se queda**: abre la misma hoja y es el camino que queda con el botón recogido.
+Pendiente de validar con Julián si lo prefiere sólo flotante.

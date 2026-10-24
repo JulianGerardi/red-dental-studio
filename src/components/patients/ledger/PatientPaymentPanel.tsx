@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
-import { CreditCard, Plus, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Plus, X } from 'lucide-react'
 import {
   TextField, SelectField, TextArea, FieldLabel, FormFooter,
 } from '@/components/patients/form'
@@ -62,26 +61,27 @@ export function PatientPaymentPanel({
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
-        <h2 className="flex items-center gap-2 text-sm font-bold text-ink">
-          <CreditCard className="size-4" /> Payment Information
-        </h2>
+        <h2 className="text-sm font-bold text-ink">Payment Information</h2>
 
-        <div className="mt-4 flex flex-wrap gap-4">
-          <div className="flex w-full flex-col gap-2 sm:w-[200px]">
-            <FieldLabel required>Transaction date</FieldLabel>
-            <DatePicker value={fecha} onChange={setFecha} className="h-9 w-full" error={intentado && !fecha ? true : undefined} />
+        {/* Misma grilla de cuatro que las filas de pago; el hueco de la derecha es el del botón + / ×, para que las columnas queden alineadas. */}
+        <div className="mt-4 flex items-start gap-2">
+          <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="flex flex-col gap-2">
+              <FieldLabel required>Transaction date</FieldLabel>
+              <DatePicker value={fecha} onChange={setFecha} className="h-9 w-full" error={intentado && !fecha ? true : undefined} />
+            </div>
+            <SelectField
+              label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
+              error={intentado && !aplicaA.trim() ? 'This field is required.' : undefined}
+            />
           </div>
-          <SelectField
-            label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
-            error={intentado && !aplicaA.trim() ? 'This field is required.' : undefined}
-            className="w-full sm:w-[200px]"
-          />
+          <span aria-hidden className="w-9 shrink-0" />
         </div>
 
         <div className="mt-4 flex flex-col gap-3">
           {metodos.map((f, i) => (
             <div key={f.id} className="flex items-start gap-2">
-              <div className={cn(f.metodo === 'Check payment' ? 'sm:grid-cols-4' : 'sm:grid-cols-2', 'grid flex-1 grid-cols-1 gap-4')}>
+              <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <TextField
                   label="Amount" required placeholder="$ 0.00" value={f.monto} onChange={(v) => setFila(f.id, { monto: v })}
                   error={intentado && !f.monto.trim() ? 'Required.' : undefined}

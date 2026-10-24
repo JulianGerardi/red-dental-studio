@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Check, X, EllipsisVertical, Pencil, User, DoorClosed, Clock, ArrowRight, CalendarDays,
 } from 'lucide-react'
@@ -8,6 +8,9 @@ import { cn } from '@/lib/utils'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { aviso } from '@/components/ui/toaster'
+import { BUTTON_VARIANTS, type ButtonVariant } from '@/components/ui/button'
+import { Avatar } from '@/components/ui/avatar'
+import { slug } from '@/data/patientsStore'
 
 export type Appointment = {
   name: string
@@ -15,8 +18,20 @@ export type Appointment = {
   provider: string
   operatory: string
   time: string
-  /* Botón del pie. En el frame casi todas dicen "Check Out" y una "Cancel". */
-  accion?: 'Check Out' | 'Cancel'
+  /* Para qué viene: lo muestra la línea del día de cada sala (OperatoryCard). */
+  motivo?: string
+  /* Botón del pie. En el frame casi todas dicen "Check Out" y una "Cancel"; Julián sumó "Check In" (2026-10-13). */
+  accion?: AccionTurno
+}
+
+export type AccionTurno = 'Check In' | 'Check Out' | 'Cancel'
+
+/* El color dice la acción, para no confundirlas en una lista larga (Julián, 2026-10-13): Check In verde, Check Out
+   azul, Cancel rojo. Son variantes de ui/button. Ver design-reference/figma/modulos/dashboard.md. */
+export const ACCION_TURNO: Record<AccionTurno, ButtonVariant> = {
+  'Check In': 'success',
+  'Check Out': 'primary',
+  Cancel: 'destructive',
 }
 
 /* Figma 4430:57451. El card se rediseñó: sin borde, con la foto y el badge
@@ -91,9 +106,7 @@ export function AppointmentCard({
             onSelect && 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
           )}
         >
-          <span className="bg-dash-blue flex size-11 shrink-0 items-center justify-center rounded-xl text-sm font-semibold text-white">
-            {appt.initials}
-          </span>
+          <Avatar initials={appt.initials} size={44} />
           <span className="flex min-w-0 flex-col gap-1">
             <span className="text-dash-name truncate text-[15px] leading-none font-bold">
               {appt.name}
@@ -130,11 +143,12 @@ export function AppointmentCard({
         type="button"
         onClick={(e) => {
           e.stopPropagation()
-          accion === 'Cancel'
-            ? aviso.warn(`Appointment for ${appt.name} was cancelled.`)
-            : aviso.ok(`${appt.name} checked out.`)
+          accionTurno(appt)
         }}
-        className="bg-dash-blue hover:bg-dash-blue-hover flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold text-white transition-colors"
+        className={cn(
+          BUTTON_VARIANTS[ACCION_TURNO[accion]],
+          'flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
+        )}
       >
         {accion} <ArrowRight className="size-4" />
       </button>
@@ -142,24 +156,43 @@ export function AppointmentCard({
   )
 }
 
-/* Una fila, no una card de dos pisos: avatar, nombre y hora/provider abajo
-   en gris, y el kebab de las tablas (RowActionsMenu) con Edit y Go to
-   appointment -antes era una flecha suelta a Scheduling-. */
-export function AppointmentCardCompacta({ appt, onEdit }: { appt: Appointment; onEdit?: (appt: Appointment) => void }) {
+/* Lo que hace el botón del pie (Check In, Check Out o Cancel). Lo comparten la card y la fila (DashboardRows). */
+export function accionTurno(appt: Appointment) {
+  const accion = appt.accion ?? 'Check Out'
+  if (accion === 'Cancel') aviso.warn(`Appointment for ${appt.name} was cancelled.`)
+  else if (accion === 'Check In') aviso.ok(`${appt.name} checked in.`)
+  else aviso.ok(`${appt.name} checked out.`)
+}
+
+/* Una fila, no una card de dos pisos: avatar, nombre-link a la ficha del paciente (como el resto de la app:
+   PatientsTable, PatientCard) y hora/provider abajo en gris, y el kebab de las tablas (RowActionsMenu) con Edit y
+   Go to appointment -antes era una flecha suelta a Scheduling-. El id sale de `slug(appt.name)`: el turno no trae
+   el id del paciente, y da el mismo id que patientsStore para los que están en la lista (patients.md, 2026-10-19). */
+export function AppointmentCardCompacta({
+  appt, onEdit, menuAbierto,
+}: {
+  appt: Appointment
+  onEdit?: (appt: Appointment) => void
+  /** Sólo para las stories: deja el menú del kebab abierto. */
+  menuAbierto?: boolean
+}) {
   const navigate = useNavigate()
   return (
     <InnerCard className="flex items-center gap-2.5 p-2.5">
-      <span className="bg-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold text-white">
-        {appt.initials}
-      </span>
+      <Avatar initials={appt.initials} />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="truncate text-[13px] font-semibold text-ink">{appt.name}</span>
+        <Link
+          to={`/patients/${slug(appt.name)}`}
+          className="text-dash-blue min-w-0 truncate text-[13px] font-semibold hover:underline"
+        >
+          {appt.name}
+        </Link>
         <span className="flex items-center gap-1 text-[11px] text-ink-muted">
           <Clock className="size-3 shrink-0" />
           <span className="truncate">{appt.time} · {appt.provider}</span>
         </span>
       </span>
-      <RowActionsMenu label={appt.name} className="shrink-0">
+      <RowActionsMenu label={appt.name} className="shrink-0" abierto={menuAbierto}>
         <DropdownMenuItem onSelect={() => onEdit?.(appt)}>
           <Pencil className="size-4 shrink-0" /> Edit
         </DropdownMenuItem>

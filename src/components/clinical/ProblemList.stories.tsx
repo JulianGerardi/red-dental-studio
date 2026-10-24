@@ -18,7 +18,9 @@ const meta = {
           "",
           "**Barra:** el buscador primero y después el filtro de estado (Elements / Filter): Active por defecto en Problem List, All en Procedures. Cambiar un estado desde el menú de la fila se puede deshacer.",
           "",
-          "**Probalo:** en *Playground* cambiá de pestaña, buscá y filtrá.",
+          "**Detalle de fila** (2026-10-08): clic en una fila la despliega como en el Ledger, con *Expand all / Collapse all*, y muestra lo que cuelga del registro: caso, visitas y turno, órdenes de laboratorio, derivaciones, hallazgos y consentimiento (Components / Clinical / RecordDetail). Un link a un registro de la otra pestaña cambia de pestaña y lo abre.",
+          "",
+          "**Probalo:** en *Playground* cambiá de pestaña, buscá, filtrá y abrí una fila.",
         ].join('\n'),
       },
     },
@@ -36,6 +38,30 @@ export const Procedures: Story = {
   play: async (c) => {
     await userEvent.click(await within(c.canvasElement).findByRole('tab', { name: 'Procedures' }))
     await esperar(/D0220/)(c)
+  },
+}
+
+/* Una fila desplegada: el detalle con sus bloques y View full record. */
+export const ExpandedRow: Story = {
+  name: 'Expanded row',
+  play: async (c) => {
+    const canvas = within(c.canvasElement)
+    await userEvent.click(await canvas.findByRole('tab', { name: 'Procedures' }))
+    await userEvent.click(await canvas.findByText(/Extraction – erupted tooth/))
+    await esperar(/View full record/)(c)
+    await esperar(/Bridge Option/)(c)
+  },
+}
+
+/* Del detalle de un procedimiento a su hallazgo: cambia a Problem List con la fila abierta. */
+export const JumpToFinding: Story = {
+  name: 'Jump to finding',
+  play: async (c) => {
+    const canvas = within(c.canvasElement)
+    await userEvent.click(await canvas.findByRole('tab', { name: 'Procedures' }))
+    await userEvent.click(await canvas.findByText(/Incisional biopsy/))
+    await userEvent.click(await canvas.findByRole('button', { name: /Abscess \(morphologic abnormality\)/ }))
+    await esperar(/Source exam/)(c)
   },
 }
 
@@ -84,6 +110,8 @@ export const States: Story = {
           <tr><td className="font-semibold">Procedures</td><td>La otra pestaña, con el filtro en All.</td><td>Procedures</td></tr>
           <tr><td className="font-semibold">Empty</td><td>Búsqueda o filtro sin resultados: No problems found.</td><td>No Results</td></tr>
           <tr><td className="font-semibold">Row menu</td><td>Edit, los cambios de estado (los que cierran, en rojo) y Delete.</td><td>Row Menu</td></tr>
+          <tr><td className="font-semibold">Expanded row</td><td>Clic en la fila: el detalle (RecordDetail) y, arriba, Collapse all / Expand all.</td><td>Expanded Row</td></tr>
+          <tr><td className="font-semibold">Jump</td><td>Un link a un registro de la otra pestaña: cambia de pestaña, ajusta el filtro y abre esa fila.</td><td>Jump To Finding</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>
@@ -100,6 +128,8 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Rows per page</td><td>5, con Show para cambiarlo.</td></tr>
           <tr><td className="font-semibold">Text</td><td>12px, para que entre a 1440 sin scroll.</td></tr>
           <tr><td className="font-semibold">Note and tooth</td><td>NoteCell muestra la nota en un tooltip; ToothCell la pieza o un guion.</td></tr>
+          <tr><td className="font-semibold">Columns</td><td>Date 72 · Location 80 · Tooth 44 · Surface 56 · Exam 84 · Provider 88 · Note 36 · Status 104; Condition / Procedure se estira. Con el chevron del detalle las dos pestañas entran a 1440 sin scroll.</td></tr>
+          <tr><td className="font-semibold">Row detail</td><td>Ver Components / Clinical / RecordDetail → Specs.</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>

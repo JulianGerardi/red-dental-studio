@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
 
-/* Figma 3605:64575 — p-24, radius 8, shadow 0 4px 4px rgba(0,0,0,.05),
-   gap 8. Header: título 15px Medium + icon slot 28px con glifo 18px.
+/* Figma 3605:64575 — p-24, radius 8, gap 8. La sombra del Figma (0 4px 4px)
+   pasó a la de todas las cards madre, shadow-panel (dashboard.md, 2026-10-10). Header: título 15px Medium + icon slot 28px con glifo 18px.
    Valor 26px Bold, delta 13px #b8b8b8, gap 2. */
 export function StatCard({
   title,
@@ -15,7 +15,7 @@ export function StatCard({
   icon: LucideIcon
 }) {
   return (
-    <div className="shadow-stat flex flex-col gap-2 overflow-hidden rounded-lg bg-white p-6">
+    <div className="shadow-panel flex flex-col gap-2 overflow-hidden rounded-lg bg-white p-6">
       <div className="flex items-center gap-4">
         <p className="min-w-px flex-1 text-[15px] leading-[1.4] font-medium text-black">
           {title}

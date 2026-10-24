@@ -44,3 +44,14 @@ existe o nombre, nacimiento y email), **Contact** y **Address**. Con la casilla 
 hasta elegir a la persona. `/settings/team/new` sigue existiendo y abre la lista con el drawer abierto; el breadcrumb
 queda en "Employees". El empleado nuevo entra primero en la tabla (al final caía en la página 2). Design system:
 *Components / Settings / NewEmployeeDrawer*.
+
+## New Employee: Email del ancho de los demás (2026-10-10)
+
+Regla de Julián (2026-10-10, sobre una captura de Post payment con campos de anchos distintos): en los drawers los
+campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / UI / Drawer → Specs → Fields* y se
+controla con `npm run ds:campos`. Email deja el `sm:col-span-2` y va en la columna izquierda, debajo de Last name.
+
+## Un solo avatar de persona (2026-10-18)
+
+La tabla (`PersonCell`, sin el tono celeste) y la ficha del empleado (`EditableAvatar` de 56) usan `ui/avatar`: azul
+con iniciales blancas y esquinas redondeadas, igual que un paciente. Regla en `../README.md`.

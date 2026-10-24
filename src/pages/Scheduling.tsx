@@ -1,9 +1,9 @@
 import { Tabs } from '@/components/ui/tabs'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, ChevronLeft, ChevronRight, Plus, CalendarCheck, Inbox, MapPin, Clock } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Plus, CalendarCheck, Inbox } from 'lucide-react'
 import { AppointmentDetailsDrawer } from '@/components/scheduling/AppointmentDetailsDrawer'
-import { ViewFiltersPanel } from '@/components/scheduling/ViewFiltersPanel'
+import { ViewMenu, VISTA_INICIAL, type VistaCalendario } from '@/components/scheduling/ViewFiltersPanel'
 import { NewAppointmentModal } from '@/components/scheduling/NewAppointmentModal'
 import {
   SOLICITUDES, datosDeSolicitud, fechaLegible, type Solicitud,
@@ -23,6 +23,9 @@ import {
 import { StatusLegend } from '@/components/scheduling/StatusLegend'
 import { EmptyState } from '@/components/ui/empty-state'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
+import { Button } from '@/components/ui/button'
+import { TarjetaTurno } from '@/components/scheduling/TarjetaTurno'
+import { useFabDePagina } from '@/components/help/HelpProvider'
 
 
 /* Interruptor de lo que está en el tablero pero todavía no se usa. En false
@@ -40,12 +43,16 @@ export default function Scheduling() {
   /* Arranca cerrado: el panel de solicitudes es el estado desplegado del FAB
      y aparecía solo al entrar a Scheduling. */
   const [reqOpen, setReqOpen] = useState(false)
+  /* El FAB de solicitudes ocupa la esquina: Confibot se apila arriba (help.md). */
+  useFabDePagina()
   /* El detalle se queda con el turno entero: la hora y la fecha que muestra
      tienen que ser las del bloque que se clickeó, no un texto fijo. */
   const [detail, setDetail] = useState<{ ev: EventoConFecha; rect: DOMRect } | null>(null)
   const abrirDetalle = (e: EventoConFecha, el: HTMLElement) =>
     setDetail({ ev: e, rect: el.getBoundingClientRect() })
-  const [panel, setPanel] = useState<'view' | 'new' | null>(null)
+  const [panel, setPanel] = useState<'new' | null>(null)
+  /* Lo que se guardó en View: el panel arranca de acá y Cancel lo deja como estaba. */
+  const [vista, setVista] = useState<VistaCalendario>(VISTA_INICIAL)
   /* Las solicitudes son estado: se agendan o se caen, y en los dos casos
      desaparecen de la lista. */
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>(SOLICITUDES)
@@ -183,18 +190,7 @@ export default function Scheduling() {
               </button>
             ))}
           </div>
-          <div className="relative">
-            <button
-              data-view-trigger
-              onClick={() => setPanel((p) => (p === 'view' ? null : 'view'))}
-              aria-expanded={panel === 'view'}
-              className="bg-dash-blue hover:bg-dash-blue-hover flex h-8 items-center gap-1.5 rounded-md px-4 text-xs font-medium text-white transition-colors"
-            >
-              View
-              <ChevronDown className={cn('size-3.5 transition-transform', panel === 'view' && 'rotate-180')} />
-            </button>
-            {panel === 'view' && <ViewFiltersPanel onClose={() => setPanel(null)} />}
-          </div>
+          <ViewMenu valor={vista} onGuardar={setVista} />
           {/* Event y Register appointment quedan fuera de la barra hasta que se
               defina qué hacen. No se borran: el markup sigue acá detrás de
               PENDIENTES, así volver a mostrarlos es cambiar una constante y no
@@ -242,9 +238,10 @@ export default function Scheduling() {
         <VistaMes eventos={eventos} fecha={fecha} onMover={mover} onAbrir={abrirDetalle} />
       )}
 
-      {/* Panel flotante de solicitudes + FAB */}
+      {/* Panel flotante de solicitudes + FAB. 280 de ancho, como la columna Appointments del Patient Dashboard: la
+          card de solicitud es la misma y mide lo mismo (scheduling.md, 2026-10-12). */}
       {reqOpen && (
-        <div className="motion-safe:animate-[fab-panel-in_180ms_cubic-bezier(0.16,1,0.3,1)] fixed right-[100px] bottom-8 z-30 flex max-h-[70svh] w-[260px] origin-bottom-right flex-col rounded-lg border border-line bg-white p-4 shadow-[0_4px_14px_0_rgb(100_100_100/0.25)]">
+        <div className="motion-safe:animate-[fab-panel-in_180ms_cubic-bezier(0.16,1,0.3,1)] fixed right-[100px] bottom-8 z-30 flex max-h-[70svh] w-[min(280px,calc(100vw-116px))] origin-bottom-right flex-col rounded-lg border border-line bg-white p-4 shadow-floating">
           <p className="text-[13px] font-bold text-ink">Appointment requests</p>
           <Tabs
             size="sm"
@@ -331,8 +328,8 @@ export default function Scheduling() {
   )
 }
 
-/* Una solicitud tiene dos salidas y las dos están en la card. El acento rojo
-   es sólo para ASAP: en la lista de espera nada es urgente por definición. */
+/* Una solicitud tiene dos salidas y las dos están en la card. Es la misma card que los turnos del Patient
+   Dashboard (TarjetaTurno); el rojo es sólo para ASAP: en la lista de espera nada es urgente por definición. */
 export function SolicitudCard({
   s, onCancel, onSchedule,
 }: {
@@ -341,49 +338,20 @@ export function SolicitudCard({
   onSchedule: () => void
 }) {
   const urgente = s.tipo === 'ASAP'
-  const acento = urgente ? '#dc2626' : '#1d56bc'
   return (
-    <div
-      className="shadow-inner-card rounded-md border-l-[3px] bg-white p-2.5"
-      style={{ borderLeftColor: acento }}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <span className="flex min-w-0 items-center gap-1.5">
-          <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: acento }} />
-          <span className="truncate text-xs font-bold text-ink">{s.patient}</span>
-        </span>
-        {/* Misma pill que el resto del sistema: 11px y con aire vertical. El
-            frame la dibujaba a 10px y sin padding, y quedaba aplastada al lado
-            de las de Insurance o Treatment plans. */}
-        <span
-          className="shrink-0 rounded-full border px-2 py-[2px] text-[11px] font-semibold"
-          style={{ borderColor: acento, color: acento }}
-        >
-          {urgente ? 'ASAP' : s.espera}
-        </span>
-      </div>
-      <p className="mt-1 text-[11px] text-ink-muted">{s.reason}</p>
-      <p className="mt-1 flex items-center gap-1.5 text-[11px] text-ink-muted">
-        <Clock className="size-3 shrink-0" /> {fechaLegible(s.date)} · {s.start} - {s.end}
-      </p>
-      <p className="mt-0.5 flex items-center gap-1.5 truncate text-[11px] text-ink-muted">
-        <MapPin className="size-3 shrink-0" /> {s.location}
-      </p>
-      {/* Cancel y la acción principal, uno al lado del otro. */}
-      <div className="mt-2 flex items-center justify-end gap-2">
-        <button
-          onClick={onCancel}
-          className="rounded-md border border-line px-2.5 py-1 text-[11px] font-medium hover:bg-surface-subtle"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={onSchedule}
-          className="bg-dash-blue hover:bg-dash-blue-hover rounded-md px-2.5 py-1 text-[11px] font-semibold text-white transition-colors"
-        >
-          Schedule
-        </button>
-      </div>
-    </div>
+    <TarjetaTurno
+      tono={urgente ? 'danger' : 'info'}
+      etiqueta={urgente ? 'ASAP' : (s.espera ?? 'Waiting List')}
+      nombre={s.patient}
+      motivo={s.reason}
+      cuando={`${fechaLegible(s.date)} · ${s.start} - ${s.end}`}
+      lugar={s.location}
+      acciones={
+        <>
+          <Button variant="secondary" size="sm" onClick={onCancel}>Cancel</Button>
+          <Button size="sm" onClick={onSchedule}>Schedule</Button>
+        </>
+      }
+    />
   )
 }

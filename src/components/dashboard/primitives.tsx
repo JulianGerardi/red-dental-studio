@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 
@@ -12,31 +13,71 @@ import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 export function Panel({
   title,
   controls,
+  top,
   className,
   bodyClassName,
+  scroll,
   children,
 }: {
   /** String en casi todos los paneles; algunos -Today Appointments,
       Recent Patients en Patients.tsx- le agregan un globo con el total. */
   title: React.ReactNode
   controls?: React.ReactNode
+  /** Arriba del título: el paciente elegido en Find Patient y los botones del paciente en Recent Billing Activity (Billing). */
+  top?: React.ReactNode
   className?: string
   bodyClassName?: string
+  /** El cuerpo scrollea adentro y el panel toma el alto que le dan (columnas que entran en la pantalla); un degradé avisa que hay más. */
+  scroll?: boolean
   children?: React.ReactNode
 }) {
   return (
     <section
-      className={cn(TARJETA_PANEL, 'flex flex-col overflow-hidden', className)}
+      className={cn(TARJETA_PANEL, 'flex flex-col overflow-hidden', scroll && 'min-h-0', className)}
     >
-      <header className="flex h-[52px] shrink-0 items-center justify-between gap-2 px-5 py-3">
+      {top}
+      {/* min-h y wrap: unas Tabs (36px) entran sin agrandarlo y en el celular bajan abajo del título (billing.md, 2026-10-09). */}
+      <header className="flex min-h-[52px] shrink-0 flex-wrap items-center justify-between gap-2 px-5 py-2">
         {/* Figma: 13.5px. Subido a 15 para igualar el título del stat card. */}
         <h2 className="flex min-w-0 items-center gap-2 text-[15px] leading-none font-bold text-black">{title}</h2>
         {controls}
       </header>
-      <div className={cn('flex min-h-px flex-1 flex-col gap-3 p-4', bodyClassName)}>
-        {children}
-      </div>
+      {scroll ? (
+        <CuerpoConScroll className={bodyClassName}>{children}</CuerpoConScroll>
+      ) : (
+        <div className={cn('flex min-h-px flex-1 flex-col gap-3 p-4', bodyClassName)}>
+          {children}
+        </div>
+      )}
     </section>
+  )
+}
+
+/* El cuerpo del panel con scroll interior (dashboard.md, 2026-10-19). Como en ShowMore, en Mac la barra no se ve hasta
+   scrollear: un degradé abajo avisa que hay más y se va al llegar al final o si todo entra. */
+function CuerpoConScroll({ className, children }: { className?: string; children?: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [alFinal, setAlFinal] = useState(true)
+  const medir = () => {
+    const el = ref.current
+    if (el) setAlFinal(el.scrollTop + el.clientHeight >= el.scrollHeight - 4)
+  }
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    medir()
+    const ro = new ResizeObserver(medir)
+    ro.observe(el)
+    if (el.firstElementChild) ro.observe(el.firstElementChild)
+    return () => ro.disconnect()
+  }, [])
+  return (
+    <div className="relative flex min-h-0 flex-1 flex-col">
+      <div ref={ref} onScroll={medir} className={cn('flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain p-4 [scrollbar-width:thin]', className)}>
+        <div className="flex flex-col gap-3">{children}</div>
+      </div>
+      <div aria-hidden className={cn('pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white to-transparent transition-opacity', alFinal && 'opacity-0')} />
+    </div>
   )
 }
 

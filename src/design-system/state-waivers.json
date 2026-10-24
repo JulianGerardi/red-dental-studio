@@ -57,8 +57,8 @@
   },
   "components/scheduling/NewAppointmentModal.tsx": {
     "selected": {
-      "story": "components/scheduling/TreatmentPlanPicker.stories.tsx#Plans",
-      "reason": "La selección de plan y de visita usa PlanCard/VisitRow, que se documentan ahí con la tarjeta elegida."
+      "story": "components/scheduling/TreatmentPlanPicker.stories.tsx#States",
+      "reason": "La selección de plan y de visita usa PlanCard/VisitRow, que se documentan ahí con la tarjeta elegida y la visita linkeada."
     }
   },
   "components/ui/tooltip.tsx": {

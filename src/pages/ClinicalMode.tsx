@@ -1,16 +1,15 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { Maximize2, Minimize2, TriangleAlert, Stethoscope } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useParams, useSearchParams } from 'react-router-dom'
+import { Stethoscope } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
-import { Odontogram } from '@/components/clinical/Odontogram'
-import { makeMockExam } from '@/data/odontogram'
+import { OdontogramaOverview } from '@/components/clinical/OdontogramaOverview'
 import { ClinicalTopBar } from '@/components/clinical/ClinicalTopBar'
 import { ClinicalToolbar } from '@/components/clinical/ClinicalToolbar'
 import { DentalAssessmentExam } from '@/components/clinical/DentalAssessmentExam'
 import { TreatmentPlanList } from '@/components/clinical/TreatmentPlanList'
 import { ProblemList } from '@/components/clinical/ProblemList'
+import { NavegacionClinica, examenDePestana, type DestinoClinico } from '@/components/clinical/RecordDetail'
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
 import { LabOrderPanel } from '@/components/clinical/LabOrderPanel'
 import { RadiographyPanel } from '@/components/clinical/RadiographyPanel'
@@ -18,7 +17,7 @@ import { TreatmentPlanSection } from '@/components/clinical/TreatmentPlanSection
 import { TreatmentPanel } from '@/components/clinical/TreatmentPanel'
 import { WorkflowsProvider } from '@/components/clinical/WorkflowsContext'
 import { ExamFindingsProvider, ExamLayout } from '@/components/clinical/ExamLayout'
-import { EXAMENES, ULTIMA_CONDICION, type Pestana } from '@/data/clinical-mode'
+import { EXAMENES, type Pestana } from '@/data/clinical-mode'
 import { PATIENTS } from '@/data/mock'
 
 /* Clinical Mode — Figma 4235:135661 (barra, botonera y overview),
@@ -30,95 +29,45 @@ import { PATIENTS } from '@/data/mock'
    salida es "Exit clinical Mode".
 
    Desviación anotada: el frame pone en el centro un **render 3D** de la boca,
-   que es una imagen. Acá va el odontograma que ya tiene el sistema —32 piezas
-   por 7 superficies—: dice lo mismo, se puede operar y es un componente
-   nuestro, no una foto. Ver modulos/clinical-mode.md. */
+   que es una imagen. Acá va el odontograma de DentAssmt, de sólo lectura y con
+   la última condición resaltada (2026-10-18). Ver modulos/clinical-mode.md. */
 
 export default function ClinicalMode() {
   const { id } = useParams()
+  /* Desde el detalle de una fila del Ledger: ?case= abre ese caso en Treatment Plan y ?procedure= esa fila de Procedures
+     en el Overview (ledger.md, 2026-10-14). */
+  const [busqueda] = useSearchParams()
+  const casoPedido = busqueda.get('case') ?? undefined
+  const procedimientoPedido = busqueda.get('procedure') ?? undefined
   const patient = PATIENTS.find((p) => p.id === id) ?? PATIENTS[0]
   /* Overwiev no es una pestaña más: es el estado inicial y el botón de la
      barra vuelve acá desde cualquier examen o registro. */
-  const [enOverview, setEnOverview] = useState(true)
-  const [pestana, setPestana] = useState<Pestana>('Vitals')
+  const [enOverview, setEnOverview] = useState(!casoPedido)
+  const [pestana, setPestana] = useState<Pestana>(casoPedido ? 'Treatment Plan' : 'Vitals')
   const [encuentro, setEncuentro] = useState(false)
   const [ampliado, setAmpliado] = useState(false)
   /* El caso que se abrió desde una card del Overview; sin caso, Treatment Plan entra por Unassigned. */
-  const [casoAbierto, setCasoAbierto] = useState<string | undefined>()
-
-  const [exam, setExam] = useState(makeMockExam)
-  const [seleccion, setSeleccion] = useState<number[]>([ULTIMA_CONDICION.pieza])
-
-  const alternarPieza = (n: number) =>
-    setSeleccion((s) => (s.includes(n) ? s.filter((x) => x !== n) : [...s, n]))
-
-  const pintarSuperficie = (n: number, i: number) =>
-    setExam((e) => ({
-      ...e,
-      teeth: e.teeth.map((t) =>
-        t.number === n
-          ? { ...t, surfaces: t.surfaces.map((c, j) => (j === i ? (c ? '' : '#fe0000') : c)) }
-          : t,
-      ),
-    }))
+  const [casoAbierto, setCasoAbierto] = useState<string | undefined>(casoPedido)
 
   const irA = (p: Pestana) => { setPestana(p); setEnOverview(false) }
-
-  const modelo = (
-    <div className="relative overflow-hidden rounded-lg bg-white shadow-panel">
-      {/* Fondo punteado: es el del frame y da la sensación de mesa de trabajo. */}
-      <div
-        className="overflow-x-auto p-4 pb-16"
-        style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fafbfe' }}
-      >
-        <div className={cn('mx-auto', ampliado ? 'min-w-[900px]' : 'min-w-[720px] max-w-[900px]')}>
-          <Odontogram exam={exam} selected={seleccion} onToggle={alternarPieza} onSurface={pintarSuperficie} />
-        </div>
-      </div>
-
-      <button
-        onClick={() => setAmpliado((v) => !v)}
-        aria-label={ampliado ? 'Collapse chart' : 'Expand chart'}
-        aria-pressed={ampliado}
-        className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-lg border border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle"
-      >
-        {ampliado ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
-      </button>
-
-      <div className="absolute right-3 bottom-3 left-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-line bg-white/95 px-3 py-2 shadow-[0_4px_14px_rgb(0_0_0/0.1)] backdrop-blur-sm sm:left-auto">
-        <span className="flex min-w-0 items-center gap-2">
-          <TriangleAlert className="size-4 shrink-0 text-warn-fg" />
-          <span className="truncate text-[13px] font-semibold text-ink">
-            Last Condition: {ULTIMA_CONDICION.condicion}
-          </span>
-        </span>
-        <span className="text-[11px] text-ink-muted">Last Update: {ULTIMA_CONDICION.actualizado}</span>
-        <button
-          onClick={() => {
-            setSeleccion([ULTIMA_CONDICION.pieza])
-            aviso.info(`Tooth ${ULTIMA_CONDICION.pieza} selected on the chart.`)
-          }}
-          className="bg-dash-blue hover:bg-dash-blue-hover ml-auto shrink-0 rounded-md px-2.5 py-1 text-[11px] font-semibold text-white transition-colors"
-        >
-          Show details
-        </button>
-      </div>
-    </div>
-  )
+  /* Los links del detalle de la Problem List: la pestaña y, para Treatment Plan, el caso. */
+  const ir = ({ pestana: p, caso }: DestinoClinico) => { if (caso) setCasoAbierto(caso); irA(p) }
 
   const overview = (
     <div className="flex flex-col gap-4 lg:flex-row">
       {/* 360 y no 300: con 300 las tres cajas de datos del plan no entraban en
           una línea y "Total Procedures" se partía en dos. Medido: la etiqueta
-          más larga pide 72px y con 360 la caja da 80. */}
+          más larga pide 72px y con 360 la caja da 80. En desktop llega hasta
+          el final de la tabla sin estirar la fila: el alto lo marca la columna
+          de al lado (2026-10-18). */}
       {!ampliado && (
-        <div className="shrink-0 lg:w-[360px]">
-          <TreatmentPlanList onAbrir={(id) => { setCasoAbierto(id); irA('Treatment Plan') }} />
+        <div className="relative shrink-0 lg:w-[360px]">
+          <TreatmentPlanList llena onAbrir={(id) => { setCasoAbierto(id); irA('Treatment Plan') }} />
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-4">
-        {modelo}
-        {!ampliado && <ProblemList />}
+        <OdontogramaOverview ampliado={ampliado} onAmpliar={() => setAmpliado((v) => !v)} onDetalle={irA} />
+        {!ampliado && <ProblemList procedimientoInicial={procedimientoPedido} />}
       </div>
     </div>
   )
@@ -152,7 +101,7 @@ export default function ClinicalMode() {
             : pestana === 'DentAssmt'
               ? <DentalAssessmentExam />
               : esExamen
-                ? <ExamLayout>{enConstruccion}</ExamLayout>
+                ? <ExamLayout examen={examenDePestana(pestana)}>{enConstruccion}</ExamLayout>
                 : enConstruccion
 
   return (
@@ -170,6 +119,7 @@ export default function ClinicalMode() {
        `bg-page-background` que usa AppShell, definido en :root así que
        funciona igual en este take-over sin shell-. */
     <WorkflowsProvider onAbrir={() => irA('Treatment')}>
+    <NavegacionClinica.Provider value={ir}>
     <div className="bg-page-background min-h-svh p-4 sm:p-[30px] lg:px-12">
       <div className="mx-auto w-full max-w-[1440px]">
       <ClinicalTopBar
@@ -198,6 +148,7 @@ export default function ClinicalMode() {
       </ExamFindingsProvider>
       </div>
     </div>
+    </NavegacionClinica.Provider>
     </WorkflowsProvider>
   )
 }

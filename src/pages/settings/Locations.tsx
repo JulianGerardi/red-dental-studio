@@ -8,6 +8,7 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { NewLocationDrawer } from '@/components/settings/NewLocationDrawer'
 import { DataTable, TextCell } from '@/components/ui/data-table'
+import { TABLA_LINK } from '@/lib/estilos'
 
 /* Settings → Locations. La tabla de entrada: nombre, empleados, salas e
    información de contacto. El detalle de cada fila —Information / Working
@@ -74,7 +75,7 @@ export function SettingsLocations({ nuevo = false }: { nuevo?: boolean }) {
         <DataTable
           columns={[
             /* El nombre es el acceso, como en la tabla de pacientes. */
-            { key: 'nombre', header: 'Location name', width: 180, cell: (l) => <Link to={`/settings/locations/${l.id}`} className="text-dash-blue truncate font-semibold hover:underline">{l.nombre}</Link> },
+            { key: 'nombre', header: 'Location name', width: 180, cell: (l) => <Link to={`/settings/locations/${l.id}`} className={TABLA_LINK}>{l.nombre}</Link> },
             { key: 'empleados', header: 'Employees', width: 100, cell: (l) => l.empleados },
             { key: 'salas', header: 'Room', width: 80, cell: (l) => l.salas },
             { key: 'info', header: 'Information', cell: (l) => <TextCell>{l.info}</TextCell> },

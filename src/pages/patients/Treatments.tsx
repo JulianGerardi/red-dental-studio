@@ -1,10 +1,13 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { ChevronLeft, Calendar, DollarSign, Circle } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { Calendar, DollarSign, Circle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
+import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
+import { ShowMore } from '@/components/ui/show-more'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Figma 3768:803852 (poblado) y 3769:808875 (vacío).
    Sección "Patient Profile — Treatment Plan & Documents". */
@@ -50,9 +53,7 @@ export function TreatmentCard({ plan }: { plan: Plan }) {
   return (
     <article className={cn(TARJETA_PANEL, 'overflow-hidden')}>
       <header className="flex items-center gap-3 px-4 py-3">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#eff4ff] text-xs font-semibold text-[#0056ef]">
-          {plan.initials}
-        </span>
+        <Avatar initials={plan.initials} size={36} />
         <span className="min-w-0 flex-1 leading-tight">
           <span className="block truncate text-[13px] font-bold text-ink">{plan.patient}</span>
           <span className="block text-[11px] text-ink-muted">Patient</span>
@@ -101,15 +102,8 @@ export default function Treatments() {
   return (
     <div className={CONTENEDOR_PAGINA}>
 
-      {/* Único rastro de navegación que queda arriba: la vuelta a la tabla.
-          El breadcrumb completo repetía lo que ya dice el panel lateral. */}
-      <Link
-        to="/patients"
-        className="text-dash-blue mb-3 inline-flex items-center gap-1 text-sm hover:underline"
-      >
-        <ChevronLeft className="size-4" /> Patients
-      </Link>
-      <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-start">
+      <PatientBreadcrumb name="John Smith" section="Treatments" />
+      <div className="flex flex-col gap-5 lg:flex-row">
         <PatientSidePanel
           name="John Smith"
           initials="JS"
@@ -140,8 +134,11 @@ export default function Treatments() {
               </p>
             </div>
           ) : (
-            <div className="mt-4 grid gap-5 lg:grid-cols-2">
-              {PLANS.map((p, i) => <TreatmentCard key={i} plan={p} />)}
+            /* Cuatro planes (dos filas) y "Show N more" abre el resto con scroll (treatments.md, 2026-10-12). */
+            <div className="mt-4">
+              <ShowMore total={PLANS.length} limit={4} label="treatment plans" fade="from-page-background" className="grid gap-5 lg:grid-cols-2">
+                {(n) => PLANS.slice(0, n).map((p, i) => <TreatmentCard key={i} plan={p} />)}
+              </ShowMore>
             </div>
           )}
         </div>

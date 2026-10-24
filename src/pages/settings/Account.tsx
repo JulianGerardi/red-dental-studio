@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
 import { CUENTAS, ESTADO_TONO as ESTADO_TONO_CUENTA } from '@/pages/settings/Accounts'
 import { Tabs } from '@/components/ui/tabs'
+import { Avatar } from '@/components/ui/avatar'
 
 /* Settings → Account. Calcado de red.dev.confidentally.com/settings/account
    -la referencia de flujo real, no el Figma-, tab por tab, tras poder
@@ -98,7 +99,7 @@ export function SettingsAccount() {
                   grid-: son dos identidades visuales (cuenta y dueño) y
                   tenían dos tratamientos distintos por error. */}
               <div className="mb-4 flex items-center gap-3">
-                <EditableAvatar foto={logo} iniciales="" onChange={setLogo} label="Account logo" avatarClassName="bg-dash-count-bg size-11 rounded-lg" />
+                <EditableAvatar foto={logo} iniciales="" onChange={setLogo} label="Account logo" size={44} className="bg-dash-count-bg" />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <TextField label="Name" value={general.nombre} onChange={(v) => setGeneral((g) => ({ ...g, nombre: v }))} />
@@ -220,9 +221,7 @@ export function SettingsAccount() {
                 <Card title="Owner Information">
                   {cuenta && (
                     <div className="mb-4 flex items-center gap-3">
-                      <span className="bg-dash-count-bg text-dash-blue-hover flex size-11 shrink-0 items-center justify-center rounded-lg text-sm font-semibold">
-                        {iniciales(cuenta.duenos)}
-                      </span>
+                      <Avatar initials={iniciales(cuenta.duenos)} size={44} />
                       <span className="inline-flex items-center gap-1 rounded-full border border-purple-fg bg-purple-bg px-2 py-[2px] text-[11px] font-semibold text-purple-fg">
                         <Crown className="size-3" /> Practice Owner
                       </span>

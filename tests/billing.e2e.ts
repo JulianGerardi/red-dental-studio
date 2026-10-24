@@ -1,0 +1,82 @@
+import { test } from '@e2e-dev/web'
+import { expect } from 'e2e'
+
+/* Billing: resumen de la clínica y vista de un paciente. Ver design-reference/figma/modulos/billing.md. */
+
+test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor View y los botones; la X vuelve al resumen', async ({ app, screen }) => {
+  await app.open('/billing')
+  await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
+  await expect(screen.getByText(/Showing 1 to 8 of 21 entries/)).toBeVisible()
+
+  const maria = screen.getByRole('button', /Maria Abril Viola/)
+  await maria.tap()
+  await expect(maria).toHaveAttribute('aria-current', 'true')
+  await expect(screen.getByRole('heading', 'Maria Abril Viola — Recent Billing Activity')).toBeVisible()
+  await expect(screen.getByText(/Patient · Guarantor: John Hayes/)).toBeVisible()
+  await expect(screen.getByRole('button', /Patient Payment/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 entries/)).toBeVisible()
+
+  await screen.getByRole('tab', 'Guarantor View').tap()
+  await expect(screen.getByText(/Showing 1 to 8 of 8 entries/)).toBeVisible()
+
+  await screen.getByRole('button', 'Clear selected patient').tap()
+  await expect(screen.getByRole('heading', 'Recent Billing Activity')).toBeVisible()
+  await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
+  await expect(screen.getByText(/Showing 1 to 8 of 21 entries/)).toBeVisible()
+  await expect(maria).not.toHaveAttribute('aria-current')
+})
+
+test('En el resumen, una fila abre la vista de ese paciente en Patient View', async ({ app, screen }) => {
+  await app.open('/billing')
+  await screen.getByRole('row', /Lucía Paz/).first().tap()
+  await expect(screen.getByRole('heading', 'Lucía Paz — Recent Billing Activity')).toBeVisible()
+  await expect(screen.getByRole('tab', 'Patient View')).toHaveAttribute('aria-selected', 'true')
+  await expect(screen.getByText(/Showing 1 to 2 of 2 entries/)).toBeVisible()
+})
+
+test('El círculo de info de un número explica qué cuenta', async ({ app, screen }) => {
+  await app.open('/billing')
+  await expect(screen.getByText(/Open charge balances older than 30 days/)).toHaveCount(0)
+  await screen.getByRole('button', /^Overdue Balance:/).hover()
+  await expect(screen.getByText(/^Open charge balances older than 30 days\.$/)).toBeVisible()
+})
+
+/* Con un paciente elegido, cada fila se despliega con el detalle del Ledger: lo del cobro y la referencia que abre la
+   transacción (billing.md, 2026-10-14). */
+test('Con un paciente, la fila de un pago dice a qué cargo fue', async ({ app, screen }) => {
+  await app.open('/billing')
+  await screen.getByRole('button', /Maria Abril Viola/).tap()
+  await screen.getByText(/^Card Payment ····5521$/).tap()
+
+  await expect(screen.getByText('Applied to charges')).toBeVisible()
+  await expect(screen.getByText('Payment methods')).toHaveCount(0)
+  await screen.getByRole('button', /^Procedure · TX-2010/).tap()
+  await expect(screen.getByRole('dialog', /Prophylaxis – adult/)).toBeVisible()
+})
+
+test('Billing en el menú lateral va directo a su pantalla; sus tablas están sólo en Settings', async ({ app, screen }) => {
+  await app.open('/')
+  await expect(screen.getByRole('button', 'Billing menu')).toHaveCount(0)
+  await screen.getByRole('link', 'Billing').first().hover()
+  await expect(screen.getByRole('link', 'Fee Schedules')).toHaveCount(0)
+  await screen.getByRole('link', 'Billing').first().tap()
+  await expect(screen.getByRole('heading', 'Billing')).toBeVisible()
+
+  await screen.getByRole('link', 'Settings').hover()
+  await screen.getByRole('button', 'Billing options').tap()
+  await screen.getByRole('link', 'Carriers').tap()
+  await expect(screen.getByRole('heading', 'Carriers')).toBeVisible()
+})
+
+/* Find Patient mide cuántas filas enteras entran en el alto de Recent Billing Activity (llenarAlto, no un número
+   fijo: billing.md, 2026-10-19) y "Show N more" abre el resto con scroll adentro. */
+test('Find Patient muestra algunos pacientes y Show more abre el resto', async ({ app, screen }) => {
+  await app.open('/billing')
+  const filas = screen.getByRole('button', /Las payment/)
+  const antes = await filas.count()
+  expect(antes).toBeGreaterThan(0)
+  await screen.getByRole('button', /^Show \d+ more/).tap()
+  await expect(screen.getByRole('region', 'All patients')).toBeVisible()
+  const despues = await filas.count()
+  expect(despues).toBeGreaterThan(antes)
+})
