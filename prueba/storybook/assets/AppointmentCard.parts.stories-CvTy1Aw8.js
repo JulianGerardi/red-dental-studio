@@ -1,7 +1,0 @@
-import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{Ct as n,Dt as r,Tt as i}from"./iframe-CSX-SRjf.js";var a,o,s,c,l,u,d;function f(){return(f=e((()=>{r(),a=t(),o={title:`Components/Dashboard/AppointmentCard parts`,parameters:{layout:`padded`}},s={name:`Noah James`,initials:`NJ`,provider:`Dr. Elena Martinez`,operatory:`Operatory 2`,time:`10:00`},c={render:()=>(0,a.jsx)(`div`,{className:`w-[280px]`,children:(0,a.jsx)(n,{appt:s})})},l={render:()=>(0,a.jsx)(`div`,{className:`h-28 w-[280px]`,children:(0,a.jsx)(n,{appt:s,onEdit:()=>{},menuAbierto:!0})})},u={render:()=>(0,a.jsx)(`div`,{className:`h-40`,children:(0,a.jsx)(i,{nombre:`Noah James`,onEdit:()=>{}})})},d=[`CompactRow`,`CompactRowMenuOpen`,`CardMenu`],c.parameters={...c.parameters,docs:{...c.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="w-[280px]"><AppointmentCardCompacta appt={appt} /></div>
-}`,...c.parameters?.docs?.source}}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="h-28 w-[280px]"><AppointmentCardCompacta appt={appt} onEdit={() => {}} menuAbierto /></div>
-}`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
-  render: () => <div className="h-40"><MenuCard nombre="Noah James" onEdit={() => {}} /></div>
-}`,...u.parameters?.docs?.source}}}})))()}f();export{u as CardMenu,c as CompactRow,l as CompactRowMenuOpen,d as __namedExportsOrder,o as default};
