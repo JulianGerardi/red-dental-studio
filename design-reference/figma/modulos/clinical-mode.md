@@ -2647,3 +2647,117 @@ Código: `clinical/ExtraOralExam.tsx`, `clinical/dental/ExtraOralDiagram.tsx`, `
 `useFindingsEstado`), `ui/drawer.tsx` (`DrawerActions.nextLabel`), `pages/ClinicalMode.tsx`.
 Design system: *Components / Clinical / Dental / ExtraOralDiagram* y *RegionConditionDrawer* (nuevas), *Components /
 Clinical / ExtraOralExam* (nueva).
+
+## Extraoral e Intraoral con el gráfico del Figma, y los tres Edit con su diseño (2026-10-24)
+
+**CON-881, CON-882 y CON-934** (Exam Extra Oral, Exam Intra Oral, [Exam] Add condition). Julián: "no cambies los gráficos que
+te pasé, los diseños deben ser lo que están en Figma"; "el intra oral también debe aparecer sin nada marcado"; "la lógica
+usa la que armamos, pero el diseño el del Figma".
+
+**Los gráficos son los PNG del Figma**, no un dibujo (`clinical/dental/RegionDiagram.tsx` es la base; `ExtraOralDiagram` e
+`IntraOralDiagram` la usan; `assets/extraoral-heads.png` e `assets/intraoral-mouth.png`, a 2048 px).
+
+- Los dos PNG traen una región de ejemplo ya pintada de celeste (el chip "Uper left", con typo, **anomalía #102**), y el
+  Figma no tiene una versión limpia. Se probó borrarla con inpainting (deja manchas y se pierde la nariz de los perfiles)
+  y aclararla con un filtro (lava todo el dibujo). Lo que funcionó: **deshacer la mezcla por cálculo**. La capa celeste es
+  translúcida, así que se estimó cómo se mezcla con el dibujo y se invirtió; en Extraoral, donde el arte es gris, queda
+  el dibujo original. En Intraoral el color de debajo no se puede recuperar entero: el labio se completó con su espejo
+  (el dibujo es simétrico, eje 1144 px), y en el paladar blando se recuperó la luz y el color se rellenó con el del
+  paladar de al lado; se borraron los bordes blancos que traía la capa. Los resultados se ven limpios, pero **son una
+  reconstrucción**: el reemplazo correcto es el asset de red.dev (cabeza y boca sin celeste y una capa por región).
+- **Las zonas** (invisibles hasta pasar el mouse) salen de las formas celestes del propio PNG, completadas por simetría, y
+  de la partición que se ve en red.dev. Los ojos, Scalp y el paladar duro son una aproximación mía. Right = lado derecho
+  del paciente: en el frente queda a la izquierda del dibujo, en la nuca a la derecha, en el Intraoral a la izquierda.
+- **Extraoral**: 7 zonas (Scalp, Right/Left Forehead, Right/Left Eye, Right/Left Posterior Head). **Intraoral**: sólo las
+  de nombre confirmado: Right/Left Hard Palate (CON-882 da "Right Hard Palate") y Soft Palate (el nombre del Figma). El
+  resto de lo que se ve en red.dev -labios, arcada, mejillas, lengua, piso de boca- espera su lista de nombres: no se
+  inventan. Tampoco cuello y hombro (Jira da "Right Anterior Neck", "Left Shoulder"): el Figma no los marca.
+- `RegionExam` (`clinical/RegionExam.tsx`) es el examen de los dos: pending ámbar, active turquesa, el mismo Add Condition
+  por región (`RegionConditionDrawer`, que ahora acepta cualquier nombre de región). Sin región elegida se carga como
+  **Not Localized** (CON-881/CON-882). La pestaña Intra Oral deja de ser un placeholder.
+- **Jira vs. app real, sin cambiar**: Jira dice "una fila por locación" al elegir varias regiones; red.dev muestra **una
+  sola card con todas las locaciones**. Se deja lo que hace la app real. También sin aplicar, por no verse en la app: las
+  pestañas *Most Used / All Conditions* y los códigos SNOMED, los textos exactos de CON-934 ("Condition successfully saved
+  to the exam." y los dos errores) y los descriptores en orden alfabético.
+
+**Los tres Edit con el diseño del Figma y nuestra lógica.** `EditFindingDrawer` ahora elige según el finding:
+
+| Finding | Drawer | Figma |
+|---|---|---|
+| Procedimiento (Add Procedure) | **Edit Procedure**: General Information / Findings / Diagnostic | 5294:85084 |
+| Condition en un diente | **Edit Condition**: Selected Area con la rueda y las superficies, descriptores, notas | 5301:149072 |
+| Condition sin diente (Extraoral, Intraoral) | **Edit Finding**: Selected Descriptors | 5294:107675 |
+
+- Las filas de datos de arriba (Creation date, Provider, Exams, nombre con su estado) son `DatosHallazgo.tsx`: card con la
+  línea azul a la izquierda y sombra suave. La píldora de estado del Figma mide **6,5 px de texto**: se usa la `Pill` chica
+  del sistema (10 px), que sí se lee (**anomalía #103**).
+- **DescriptorFields** pasa al diseño del Figma en toda la app (New Condition, Edit, Extraoral/Intraoral): rótulo a la
+  izquierda y control segmentado (caja gris, la opción elegida en azul). Antes eran píldoras sueltas debajo de cada rótulo.
+  La lógica no cambia (una opción por fila, ninguna obligatoria, tocar la elegida la deselecciona).
+- El pie es Cancel a la izquierda y Save a la derecha, del mismo ancho (antes estaban al revés). Los drawers ya no
+  llevan bajada con el área y la condition: ese dato es ahora una fila.
+- **Edit Condition**: el proveedor va como dato, sin editar, como en el Figma. Las superficies y los descriptores se
+  corrigen acá, independientes entre sí (CON-2770); el Figma de esta pantalla no trae descriptores, así que van con el
+  diseño de Edit Finding debajo del área. **La rueda es la nuestra** (MB/B/DB/O/ML/L/DL), no la del Figma
+  (BC/B/D/M/P/PC/O) ni sus nombres ("D - Distal", "M - Masial", "B - Bucal"): es otro vocabulario de superficies, no se
+  mezcla sin confirmar con Julián.
+- **Edit Procedure**: el Fee sale del arancel UCR del código (`precioUcr`, `data/finanzas.ts`) y se guarda en el finding al
+  cargar el procedimiento; si no hay precio, la fila no aparece. Findings y Diagnostic reusan las cards y el buscador de
+  Link to finding / Link to diagnosis de New Procedure; un solo Save guarda proveedor, notas y vínculos.
+- Una condition de un diente con descriptores ya no se edita desde "Edit Finding" sino desde "Edit Condition" (el e2e se
+  actualizó).
+
+Código: `clinical/dental/{RegionDiagram,ExtraOralDiagram,IntraOralDiagram,RegionConditionDrawer,DatosHallazgo,EditFindingDrawer,
+EditConditionDrawer,EditProcedureDrawer,DescriptorFields}.tsx`, `clinical/{RegionExam,ExtraOralExam,IntraOralExam,ExamLayout}.tsx`,
+`dental/data.ts` (`INTRAORAL_REGIONS`, `Finding.fee`), `data/finanzas.ts`, `pages/ClinicalMode.tsx`. Storybook sin tocar
+(se hace al final, cuando Julián lo pida).
+
+### Ajustes: notas, Intraoral más chico, buscadores y contraste con Jira (2026-10-24)
+
+**CON-2770 (Edit Finding), CON-934 (Add condition), CON-1399.** Julián: "edit finding falta el note"; "el intra oral está
+enorme, achicalo (tomá de referencia el video)"; "los search deben funcionar como un search: no deberían estar por
+default las condition cargadas, deben aparecer cuando las busco".
+
+- **Edit Finding** suma **Notes** y la fila **Treatment Area** (el área del finding). Así cumple CON-2770, que pide
+  mostrar fecha, estado, condition, examen y área de tratamiento de sólo lectura, y editar superficie (si corresponde),
+  notas y descriptores. El Figma de Edit Finding no trae ni Notes ni Treatment Area: manda Jira.
+- **Intraoral** mide como en la grabación de red.dev: unos 740 px de ancho, centrado, en vez de todo el examen.
+- **Buscadores**: `ui/search-picker.tsx` (nuevo, `SearchPicker`), el mismo formato que `PersonSearchField`. No muestra
+  nada hasta escribir; las coincidencias flotan en un desplegable pegado al input y lo elegido queda debajo con una ✕. Se
+  usa en la condition de New Condition (Extraoral/Intraoral), en Findings / Diagnostic de Edit Procedure y en Link to
+  finding / Link to diagnosis de New Procedure. **Contradice CON-934**, que lista las condiciones de entrada (pestañas
+  *Most Used / All Conditions*) y usa la búsqueda para filtrar: se sigue lo que pidió Julián. El catálogo de
+  procedimientos de New Procedure/New Condition de DentAssmt (con embudo, Category y Existing/Planned) **no se tocó**: es
+  la pantalla de la app real; queda a confirmar si también pasa a buscador.
+- La región con una condition activa se pinta con el celeste del Figma y de red.dev (token nuevo `region-active`,
+  `#90dbd5`); el verde de la app sobre el rosa del Intraoral quedaba oliva.
+- **Jira consultado**: CON-2770 (Edit Finding, la más nueva, manda sobre CON-1399, de 2025, que además dejaba editar
+  locación y estado), CON-3142 / CON-3143 (VOL 2 Edit Procedure / Edit Condition: sin descripción) y CON-774 (Edit
+  Procedure del catálogo de admin, no aplica al examen). Para Edit Procedure del examen no hay historia con campos: la
+  lógica sigue siendo la nuestra (proveedor, notas, vínculos).
+
+Código: `ui/search-picker.tsx`, `clinical/dental/{EditFindingDrawer,EditProcedureDrawer,NewProcedureDrawer,
+RegionConditionDrawer,IntraOralDiagram,RegionDiagram,OpcionesVinculo}.tsx`, `index.css` (`region-active`). Storybook sin
+tocar: las historias de RegionConditionDrawer y NewProcedureDrawer que eligen de la lista van a tener que escribir en el
+buscador cuando se documente.
+
+### Buscadores como en red.dev (2026-10-24)
+
+Julián, con dos grabaciones de red.dev (New Procedure y Edit Procedure): "es un buscador independiente que busca"; "no me
+gusta cómo quedó el diseño del search cuando busco un finding o una condition: lo haría como el video, pero con el estilo
+de nuestra app".
+
+- **New Procedure / New Condition (DentAssmt)**: la lista del catálogo queda como está, filtrada por Category, área y
+  Existing/Planned. El buscador ya no la filtra: es **independiente**, busca en todo el catálogo del estado elegido y
+  abre su propio desplegable encima de la lista, con código, descripción y los alcances posibles (Tooth, Quadrant…).
+  Elegir un resultado lo marca en la lista y la desplaza hasta él; si la categoría o el área lo escondían, se limpian.
+- **`SearchPicker`**: los resultados son **cards** con el estilo de la app (`TARJETA_INTERNA`) sobre un fondo gris
+  claro. Un finding se ve como la card de finding (estado, fecha, nombre en negrita, Exams, Location), un diagnóstico
+  como "código - descripción" con el área debajo, una condition con su grupo. Al pasar el mouse aparece la acción
+  (vincular o agregar). Lo elegido queda debajo en una card con borde azul y su botón para desvincular o sacar; arriba,
+  "Linked findings" / "Linked diagnoses". El input lleva una ✕ para limpiar.
+- En red.dev los resultados de Edit Procedure quedan en el panel y no en un desplegable, y los findings aparecen de
+  entrada: acá se mantiene el pedido anterior (nada hasta escribir, desplegable como el resto de los buscadores).
+  La descripción del diagnóstico es la condition del finding (no hay catálogo de diagnósticos con su texto).
+
+Código: `ui/search-picker.tsx`, `clinical/dental/{OpcionesVinculo,NewProcedureDrawer,EditProcedureDrawer,RegionConditionDrawer}.tsx`.

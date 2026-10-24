@@ -22,8 +22,10 @@ test('Add Procedure carga un D0120 desde DentAssmt', async ({ app, screen }) => 
   // Al guardar el procedimiento aparecen los pasos para vincularlo.
   await expect(drawer.getByText('You can link clinical findings that may be resolved by this procedure.')).toBeVisible()
   await drawer.getByRole('button', /Next Step/).tap()
-  await expect(drawer.getByText(/K05\.31/).first()).toBeVisible()
-  await drawer.getByRole('button', /^Link K05\.31/).tap()
+  // El buscador no muestra nada hasta escribir; lo elegido queda debajo con su ✕.
+  await drawer.getByPlaceholder('Search by code or surface').fill('K05')
+  await drawer.getByRole('button', /^K05\.31/).first().tap()
+  await expect(drawer.getByRole('button', /^Remove K05\.31/).first()).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
 })
 
@@ -78,7 +80,7 @@ test('Add Condition con descriptores: se eligen al crear y se corrigen desde Edi
 
   await screen.getByRole('button', /^Actions for Tooth 13$/).tap()
   await screen.getByRole('menuitem', 'Edit').tap()
-  const editar = screen.getByRole('dialog', 'Edit Finding')
+  const editar = screen.getByRole('dialog', 'Edit Condition')
   await editar.getByRole('button', 'Painless').tap()
   await editar.getByRole('button', /^Save/).tap()
   await expect(screen.getByText('Descriptors: Painless, Round')).toBeVisible()
@@ -248,6 +250,7 @@ test('Extraoral: elegir regiones en el gráfico y cargar una condition', async (
   const drawer = screen.getByRole('dialog', 'New Condition')
   await expect(drawer.getByText('Scalp')).toBeVisible()
   await expect(drawer.getByText('Right Forehead')).toBeVisible()
+  await drawer.getByPlaceholder('Search a Condition Here...').fill('Atro')
   await drawer.getByRole('button', /^Atrophy/).tap()
   await drawer.getByRole('button', /select descriptors/i).tap()
   await drawer.getByRole('button', 'Painful').tap()
@@ -256,4 +259,55 @@ test('Extraoral: elegir regiones en el gráfico y cargar una condition', async (
   await expect(screen.getByText(/Atrophy charted on Scalp, Right Forehead/)).toBeVisible()
   await expect(screen.getByText('Condition: Atrophy (morphologic abnormality)')).toBeVisible()
   await expect(screen.getByText('Descriptors: Painful')).toBeVisible()
+})
+
+/* Intraoral: el mismo Add Condition por región que Extraoral; sin región elegida se carga como Not Localized (CON-882). */
+test('Intraoral: Add Condition sin región se carga como Not Localized', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'Intra Oral').tap()
+  await screen.getByRole('button', 'Add Condition').tap()
+  const drawer = screen.getByRole('dialog', 'New Condition')
+  await expect(drawer.getByText('Not Localized')).toBeVisible()
+  await drawer.getByPlaceholder('Search a Condition Here...').fill('Absc')
+  await drawer.getByRole('button', /^Abscess/).tap()
+  await drawer.getByRole('button', /select descriptors/i).tap()
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText(/Abscess charted on Not Localized/)).toBeVisible()
+})
+
+/* Edit Procedure (Figma 5294:85084): tres pestañas; Findings y Diagnostic traen lo vinculable y un solo Save guarda todo. */
+test('Edit Procedure: pestañas General Information, Findings y Diagnostic', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'DentAssmt').first().tap()
+  await screen.getByRole('button', 'Add Procedure').tap()
+  const nuevo = screen.getByRole('dialog', 'New Procedure')
+  await nuevo.getByRole('button', /^D0120\s*-/).first().tap()
+  await nuevo.getByRole('button', /^Save/).tap()
+  await nuevo.getByRole('button', 'Close').tap()
+
+  await screen.getByRole('button', /^Actions for Tooth 13$/).tap()
+  await screen.getByRole('menuitem', 'Edit').tap()
+  const editar = screen.getByRole('dialog', 'Edit Procedure')
+  await expect(editar.getByText('Creation date')).toBeVisible()
+  await expect(editar.getByText('Fee')).toBeVisible()
+  await editar.getByRole('tab', 'Findings').tap()
+  await expect(editar.getByText('Link Findings')).toBeVisible()
+  await editar.getByRole('tab', 'Diagnostic').tap()
+  await expect(editar.getByText('Link Diagnosis')).toBeVisible()
+  await editar.getByRole('button', /^Save/).tap()
+})
+
+/* New Procedure: el buscador es independiente de la lista (red.dev): busca en todo el catálogo y elegir un resultado lo
+   marca en la lista, sin filtrarla. */
+test('New Procedure: el buscador independiente elige un procedimiento de la lista', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'DentAssmt').first().tap()
+  await screen.getByRole('button', 'Add Procedure').tap()
+  const drawer = screen.getByRole('dialog', 'New Procedure')
+  await drawer.getByPlaceholder('Search by code or description').fill('crown')
+  await drawer.getByRole('button', /^D2740 - Crown.*Quadrant/).tap()
+  await expect(drawer.getByRole('button', /^D0120\s*-/).first()).toBeVisible()
+  await drawer.getByRole('button', 'D2740 on tooth').tap()
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText(/D2740 charted as planned/)).toBeVisible()
 })

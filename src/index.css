@@ -313,6 +313,8 @@
 
   --color-dash-ok-fg: #1a804d;
   --color-dash-ok-bg: #f0fcf5;
+  /* Región marcada en los gráficos de Extraoral/Intraoral: el celeste de la capa del Figma y de red.dev. */
+  --color-region-active: #90dbd5;
   --color-dash-busy-fg: #174596;
   --color-dash-busy-bg: #f0f2ff;
   --color-dash-bad-fg: #b22626;

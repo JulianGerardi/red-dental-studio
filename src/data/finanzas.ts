@@ -73,6 +73,8 @@ const UCR: Record<string, number> = {
   D2390: 520, D2720: 1180, D2740: 1250, D3310: 850, D3330: 1250, D4341: 260, D4910: 150, D5110: 1850, D5986: 180,
   D6010: 2200, D6750: 1150, D7140: 195, D7240: 495, D8080: 5800, D9110: 95, D9972: 300,
 }
+/** El precio UCR de un código del catálogo (lo que muestra Edit Procedure como Fee); sin precio, undefined. */
+export const precioUcr = (codigo: string): number | undefined => UCR[codigo]
 const derivado = (factor: number, sin: string[] = []) =>
   Object.fromEntries(Object.entries(UCR).filter(([c]) => !sin.includes(c)).map(([c, v]) => [c, Math.round(v * factor)]))
 const version = (id: string, desde: string, precios: Record<string, number>): VersionArancel => ({ id, desde, precios })

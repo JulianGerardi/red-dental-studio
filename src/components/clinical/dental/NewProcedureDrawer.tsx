@@ -1,19 +1,19 @@
 import { Tabs } from '@/components/ui/tabs'
-import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
-import { ChevronsLeft, ChevronsRight, Search } from 'lucide-react'
+import { ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { Drawer, DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { FilterMenu } from '@/components/ui/filter-menu'
-import { FieldLabel, SelectField, control } from '@/components/patients/form'
+import { FieldLabel, SelectField } from '@/components/patients/form'
 import { SurfaceWheel, type Surface } from './SurfaceWheel'
-import { LinkedDiagnosisCard, LinkedFindingCard } from './LinkedFindingCard'
+import { SearchPicker } from '@/components/ui/search-picker'
+import { OpcionDiagnostico, OpcionFinding, OpcionProcedimiento, candidatosDiagnostico } from './OpcionesVinculo'
 import { NOMBRE_ALCANCE, ScopeIcon } from './ScopeIcons'
 import { CajaIcono, ConAyuda, ProcedureRow } from './ProcedureRow'
 import { DescriptorFields } from './DescriptorFields'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import {
-  EXISTING_GROUPS, PROCEDURES, codigoDiagnostico, PROCEDURE_GROUPS, PROCEDURE_STATUSES, SCOPES, TREATMENT_AREAS,
+  EXISTING_GROUPS, PROCEDURES, PROCEDURE_GROUPS, PROCEDURE_STATUSES, SCOPES, TREATMENT_AREAS,
   type Finding, type ProcedureFilter, type ProcedureOption, type ProcedureScope, type ProcedureStatus, type TreatmentArea,
 } from './data'
 
@@ -68,7 +68,6 @@ export function NewProcedureDrawer({
 }) {
   const [paso, setPaso] = useState(0)
   const [keepArea, setKeepArea] = useState(true)
-  const [query, setQuery] = useState('')
   const [status, setStatus] = useState<ProcedureStatus>('Planned')
   const [group, setGroup] = useState<ProcedureFilter>('All')
   /* Áreas de tratamiento del embudo; vacío = todas ("Show all treatment"). */
@@ -78,8 +77,6 @@ export function NewProcedureDrawer({
   const [tooth, setTooth] = useState<number | null>(null)
   const [surfaces, setSurfaces] = useState<Record<number, Surface[]>>({})
   const [descriptors, setDescriptors] = useState<Record<string, string>>({})
-  const [findingQuery, setFindingQuery] = useState('')
-  const [diagnosisQuery, setDiagnosisQuery] = useState('')
   const [linked, setLinked] = useState<string[]>([])
   const [diagnoses, setDiagnoses] = useState<string[]>([])
   /* Id del procedimiento ya guardado (null hasta el primer Save): recién con esto los pasos de vínculo aparecen. */
@@ -87,9 +84,9 @@ export function NewProcedureDrawer({
 
   useEffect(() => {
     if (!open) return
-    setPaso(0); setKeepArea(true); setQuery(''); setStatus(mode === 'condition' ? 'Existing' : 'Planned'); setGroup('All'); setAreas([]); setCode(null); setScope('Tooth')
+    setPaso(0); setKeepArea(true); setStatus(mode === 'condition' ? 'Existing' : 'Planned'); setGroup('All'); setAreas([]); setCode(null); setScope('Tooth')
     setTooth(teeth[Math.floor(teeth.length / 2)] ?? null); setSurfaces({}); setDescriptors({})
-    setFindingQuery(''); setDiagnosisQuery(''); setLinked([]); setDiagnoses([]); setCreadoId(null)
+    setLinked([]); setDiagnoses([]); setCreadoId(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
@@ -100,26 +97,25 @@ export function NewProcedureDrawer({
   const pasos: Paso[] = creadoId ? [...pasosBase, ...pasosVinculo] : pasosBase
   const actual = pasos[Math.min(paso, pasos.length - 1)]!
   const hayAlguna = Object.values(surfaces).some((x) => x.length > 0)
-  const q = query.trim().toLowerCase()
+  /* La lista se filtra por categoría, área y Existing/Planned; el buscador es independiente: busca en todo el catálogo
+     del estado elegido y elegir un resultado lo marca en la lista (red.dev, grabación de Julián, 2026-10-24). */
+  const delEstado = (p: ProcedureOption, s: ProcedureStatus) => s === 'Planned' || EXISTING_GROUPS.includes(p.group)
   const coincide = (p: ProcedureOption, s: ProcedureStatus) =>
-    (s === 'Planned' || EXISTING_GROUPS.includes(p.group)) &&
-    (group === 'All' || p.group === group) &&
-    (!areas.length || areas.includes(p.area)) &&
-    (!q || p.code.toLowerCase().includes(q) || p.label.toLowerCase().includes(q))
+    delEstado(p, s) && (group === 'All' || p.group === group) && (!areas.length || areas.includes(p.area))
   const list = PROCEDURES.filter((p) => coincide(p, status))
+
+  function elegirDeBusqueda(p: ProcedureOption) {
+    if (!coincide(p, status)) { setGroup('All'); setAreas([]) }
+    setCode(p.code)
+    if (p.area === 'Surface') setScope('Surface')
+    setTimeout(() => document.querySelector(`[data-codigo="${p.code}"]`)?.scrollIntoView({ block: 'nearest' }), 0)
+  }
 
   const current = tooth ?? teeth[0] ?? null
   const currentSurfaces = current !== null ? (surfaces[current] ?? []) : []
-  const fq = findingQuery.trim().toLowerCase()
   /* El procedimiento recién guardado ya está en `findings` (lo agrega el padre): no se vincula a sí mismo. */
-  const vinculables = findings.filter((f) => f.id !== creadoId && f.status !== 'Discarded' && (!fq || `${f.condition} ${f.area} ${f.surfaces.join(' ')}`.toLowerCase().includes(fq)))
-  const dq = diagnosisQuery.trim().toLowerCase()
-  /* Un diagnóstico por hallazgo del examen, con su código y sus superficies. Se guarda como "K05.31 · B, MB". */
-  const diagnosticos = findings
-    .filter((f) => f.id !== creadoId && f.status !== 'Discarded')
-    .map((f) => ({ id: f.id, code: codigoDiagnostico(f.condition), surfaces: f.surfaces }))
-    .map((d) => ({ ...d, valor: d.surfaces.length ? `${d.code} · ${d.surfaces.join(', ')}` : d.code }))
-    .filter((d) => !dq || d.valor.toLowerCase().includes(dq))
+  const vinculables = findings.filter((f) => f.id !== creadoId && f.status !== 'Discarded')
+  const diagnosticos = candidatosDiagnostico(vinculables)
 
   function step2Move(delta: number) {
     if (current === null) return
@@ -182,13 +178,12 @@ export function NewProcedureDrawer({
             <div className="flex w-full flex-col items-start gap-1.5">
               <FieldLabel required>Procedure</FieldLabel>
               <div className="flex w-full items-center gap-2">
-                <div className="relative flex-1">
-                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-                  <input
-                    value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by code or description"
-                    className={cn(control(), 'h-9 pr-3 pl-9')}
-                  />
-                </div>
+                <SearchPicker
+                  className="flex-1" items={PROCEDURES.filter((p) => delEstado(p, status))} getId={(p) => p.code}
+                  getText={(p) => `${p.code} ${p.label}`} renderOption={(p) => <OpcionProcedimiento procedure={p} />}
+                  onSelect={elegirDeBusqueda} ocultarElegidos placeholder="Search by code or description"
+                  emptyText="No procedure matches that search."
+                />
                 {/* Sin áreas tildadas se ve todo ("Show all treatment"): Clear all vuelve a eso. */}
                 <FilterMenu label="Filter by treatment area" groups={[{ title: 'Treatment Area', options: [...TREATMENT_AREAS], value: areas, onChange: (v) => setAreas(v as TreatmentArea[]) }]} />
               </div>
@@ -208,16 +203,18 @@ export function NewProcedureDrawer({
               {list.map((p) => {
                 const on = p.code === code
                 return (
+                  <div key={p.code} data-codigo={p.code} className="w-full">
                   <ProcedureRow
-                    key={p.code} procedure={p} estado={on ? 'selected' : 'default'}
+                    procedure={p} estado={on ? 'selected' : 'default'}
                     scopes={SCOPES.filter((s) => s !== 'Surface' || p.area === 'Surface')}
                     scope={on ? scope : null}
                     onSelect={() => { setCode(p.code); if (p.area === 'Surface') setScope('Surface') }}
                     onScope={(s) => { setCode(p.code); setScope(s) }}
                   />
+                  </div>
                 )
               })}
-              {!list.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No procedure matches that search, category or treatment area.</p>}
+              {!list.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No procedure matches that category or treatment area.</p>}
             </div>
           </div>
         )}
@@ -298,23 +295,14 @@ export function NewProcedureDrawer({
               </p>
             </div>
 
-            <div className="relative w-full">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-              <input
-                value={findingQuery} onChange={(e) => setFindingQuery(e.target.value)} placeholder="Search" aria-label="Search findings"
-                className={cn(control(), 'h-9 pr-3 pl-9')}
-              />
-            </div>
-
-            <div className="flex max-h-[280px] w-full flex-col gap-2.5 overflow-y-auto">
-              {vinculables.map((f) => (
-                <LinkedFindingCard
-                  key={f.id} finding={f} linked={linked.includes(f.id)}
-                  onToggle={(on) => setLinked((prev) => (on ? [...new Set([...prev, f.id])] : prev.filter((x) => x !== f.id)))}
-                />
-              ))}
-              {!vinculables.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No finding matches that search.</p>}
-            </div>
+            <SearchPicker
+              multiple items={vinculables} getId={(f) => f.id} getText={(f) => `${f.condition} ${f.area} ${f.surfaces.join(' ')}`}
+              renderOption={(f) => <OpcionFinding finding={f} />}
+              selected={vinculables.filter((f) => linked.includes(f.id))}
+              onSelect={(f) => setLinked((prev) => [...new Set([...prev, f.id])])}
+              onRemove={(f) => setLinked((prev) => prev.filter((x) => x !== f.id))}
+              placeholder="Search" ariaLabel="Search findings" emptyText="No finding matches that search." accion="vincular" tituloElegidos="Linked findings"
+            />
           </div>
         )}
 
@@ -327,23 +315,14 @@ export function NewProcedureDrawer({
               </p>
             </div>
 
-            <div className="relative w-full">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-              <input
-                value={diagnosisQuery} onChange={(e) => setDiagnosisQuery(e.target.value)} placeholder="Search by code or surface" aria-label="Search diagnoses"
-                className={cn(control(), 'h-9 pr-3 pl-9')}
-              />
-            </div>
-
-            <div className="flex max-h-[280px] w-full flex-col gap-2.5 overflow-y-auto">
-              {diagnosticos.map((d) => (
-                <LinkedDiagnosisCard
-                  key={d.id} code={d.code} surfaces={d.surfaces} linked={diagnoses.includes(d.valor)}
-                  onToggle={(on) => setDiagnoses((prev) => (on ? [...new Set([...prev, d.valor])] : prev.filter((x) => x !== d.valor)))}
-                />
-              ))}
-              {!diagnosticos.length && <p className="w-full py-6 text-center text-xs text-ink-faint">No diagnosis matches that search.</p>}
-            </div>
+            <SearchPicker
+              multiple items={diagnosticos} getId={(d) => d.valor} getText={(d) => `${d.valor} ${d.descripcion}`}
+              renderOption={(d) => <OpcionDiagnostico code={d.code} descripcion={d.descripcion} detalle={d.detalle} />}
+              selected={diagnosticos.filter((d) => diagnoses.includes(d.valor))}
+              onSelect={(d) => setDiagnoses((prev) => [...new Set([...prev, d.valor])])}
+              onRemove={(d) => setDiagnoses((prev) => prev.filter((x) => x !== d.valor))}
+              placeholder="Search by code or surface" ariaLabel="Search diagnoses" emptyText="No diagnosis matches that search." accion="vincular" tituloElegidos="Linked diagnoses"
+            />
           </div>
         )}
       </DrawerStep>
