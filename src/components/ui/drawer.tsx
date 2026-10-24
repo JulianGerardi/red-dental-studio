@@ -170,7 +170,7 @@ export function DrawerStep({ index, step, children, className }: { index: number
 /* El pie de un drawer, como en 2.0: a la izquierda Cancel (primer paso) o Return; a la derecha Next Step o, en el
    último paso, Save. */
 export function DrawerActions({
-  step = 0, total = 1, onNext, onBack, onCancel, onSave, nextDisabled, saveDisabled, saveLabel = 'Save', cancelLabel = 'Cancel',
+  step = 0, total = 1, onNext, onBack, onCancel, onSave, nextDisabled, saveDisabled, saveLabel = 'Save', cancelLabel = 'Cancel', nextLabel = 'Next Step',
 }: {
   step?: number
   total?: number
@@ -182,6 +182,8 @@ export function DrawerActions({
   saveDisabled?: boolean
   saveLabel?: string
   cancelLabel?: string
+  /** El texto de "avanzar" cuando no es genérico: "Select descriptors" en New Condition de Extraoral/Intraoral. */
+  nextLabel?: string
 }) {
   const ultimo = step >= total - 1
   return (
@@ -194,7 +196,7 @@ export function DrawerActions({
       {ultimo ? (
         <Button disabled={saveDisabled} onClick={onSave}><Check /> {saveLabel}</Button>
       ) : (
-        <Button disabled={nextDisabled} onClick={onNext}>Next Step <ArrowRight /></Button>
+        <Button disabled={nextDisabled} onClick={onNext}>{nextLabel} <ArrowRight /></Button>
       )}
     </>
   )

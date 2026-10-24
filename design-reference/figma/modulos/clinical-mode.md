@@ -2569,3 +2569,63 @@ pixeles de una grabación) ni el catálogo de condiciones por examen. Extraoral 
 Código: `clinical/dental/data.ts` (`DESCRIPTOR_ROWS`).
 Design system: *Components / Clinical / Dental / DescriptorFields* (Playground, Parts y States actualizados con el
 catálogo real).
+
+## Extraoral: el gráfico de regiones (2026-10-24)
+
+Julián pidió seguir con Extraoral en la misma tanda. Dos fuentes nuevas, además de las grabaciones:
+
+1. **El Figma real tiene las cuatro vistas de cabeza**, como imagen plana (nodo 4106:157537/4106:158958 de *Platform
+   Design*, página "Clinical Exam — Extra Oral"), con una región ya pintada de ejemplo. Se intentó sacarle esa pintura
+   con inpainting (OpenCV, TELEA y Navier-Stokes) para reusarla como base limpia: **no salió bien** -quedan manchas y
+   un borde fantasma en la frente, la parte más visible de las cuatro vistas-, así que no se usó. El PNG de
+   `extra-oral-diagram.ts` (ya en el repo de una vuelta anterior) es este mismo asset, en baja resolución.
+2. **Jira** (CON-2770, CON-2066, CON-1860, CON-2063): confirma que el área se guarda como `location` -una región con
+   nombre, no un diente- y que el gráfico es clickeable de verdad.
+
+**Se construye el gráfico como SVG propio**, no la imagen del Figma ni una reinterpretación de ella: mismo criterio que
+el `Odontogram` ("no una foto", más arriba en este archivo). `ExtraOralDiagram.tsx` dibuja las cuatro vistas -perfil
+derecho, frente, nuca, perfil izquierdo, el orden de una foto clínica- a mano, con las siete regiones vistas en las
+grabaciones (Scalp, Right/Left Forehead, Right/Left Eye, Right/Left Posterior Head) como `<path>` clickeables.
+**Los límites de cada región son una aproximación** -no hay fuente vectorial de la app real, se estimaron a ojo sobre
+capturas de video-; ajustar cuando haya más referencia. Una región puede dibujarse en más de una vista (Scalp, en la
+frente y las dos vistas de perfil) y todas sus formas se marcan juntas.
+
+**Estados del color, los mismos tokens que ya usa la app**: `pending` (ámbar, `warn-fg`, mientras se elige antes de
+guardar) y `active` (verde, `dash-ok-fg`, el mismo de un finding Active) -nada de colores nuevos.
+
+**El flujo, calcado de las grabaciones**:
+
+1. Clickear una o más regiones las agrega a "pending" -queda en ámbar-, estén o no con el drawer abierto.
+2. **Add Condition** abre `RegionConditionDrawer`: dos pasos, los dos titulados "New Condition" (la app real no
+   muestra un indicador de pasos; acá sí, como todos los drawers del sistema). Paso 1, **Condition**: las regiones
+   elegidas como chips removibles y el catálogo de condición -propio, no el de procedimientos: sólo **Atrophy**,
+   **Blister** y **Abscess** (todas "morphologic abnormality") aparecieron en las grabaciones, seguro hay más y no se
+   inventan sin verlas-. El botón de avance dice **"Select descriptors"**, no "Next Step" -así lo dice la app real-,
+   y se suma un `nextLabel` opcional a `DrawerActions` para esto (con "Next Step" de default, no cambia ningún otro
+   drawer). Paso 2, **Descriptors**: la misma guía visual de `DescriptorFields`.
+3. **Save** crea el finding -`kind: 'condition'`, `area` con las regiones unidas por coma, `examen: 'Extraoral'`- y
+   limpia la selección; las regiones quedan en verde.
+
+**`ExamLayout` suma `onCondicion`**, opcional: si se pasa, Add Condition lo llama en vez de abrir el
+`NewProcedureDrawer` genérico (que siempre carga contra un diente). Add Procedure no cambia -sigue siendo el genérico,
+pendiente para otra vuelta; CON-2063 sugiere que ahí el área se autodetecta como "todo el examen", no se elige una
+región, pero no alcanza a verse bien en las grabaciones-. También se suma `useFindingsEstado`, el hook para que un
+examen con su propio Add Condition pueda guardar un finding directo (sin pasar por `NewProcedureDrawer`); `ExtraOralExam`
+se envuelve en su propio `ExamFindingsProvider` si no hay uno puesto (para andar suelto en Storybook, como ya podía
+`DentalAssessmentExam` con su fallback).
+
+**Lo que vieron las grabaciones y no se replicó, a propósito**:
+
+- La card de un finding muestra la **condition en negrita** arriba ("Atrophy (morphologic abnormality)") y
+  "Location:"/"Exams:" como líneas con rótulo debajo; acá `FindingCard` sigue mostrando el área en negrita y
+  "Condition:" como línea, la decisión ya documentada en "Findings según el design system" (más arriba). Son dos
+  formatos de card distintos -no sólo Extraoral: cambiaría la de todos los exámenes-. **A confirmar con Julián** antes
+  de tocarlo.
+- El catálogo de condición completo (más que Atrophy/Blister/Abscess) y los límites exactos de cada región: sin una
+  fuente mejor que un video, no se inventan.
+
+Código: `clinical/ExtraOralExam.tsx`, `clinical/dental/ExtraOralDiagram.tsx`, `clinical/dental/RegionConditionDrawer.tsx`,
+`clinical/dental/data.ts` (`EXTRAORAL_REGIONS`, `REGION_CONDITIONS`), `clinical/ExamLayout.tsx` (`onCondicion`,
+`useFindingsEstado`), `ui/drawer.tsx` (`DrawerActions.nextLabel`), `pages/ClinicalMode.tsx`.
+Design system: *Components / Clinical / Dental / ExtraOralDiagram* y *RegionConditionDrawer* (nuevas), *Components /
+Clinical / ExtraOralExam* (nueva).

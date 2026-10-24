@@ -1165,3 +1165,18 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
   excepción a la regla de no usar drawers (2026-10-03); cambiarlo queda pendiente de que lo confirme.
 - Decisión completa, con las regiones y la card vistas en las grabaciones, en `figma/modulos/clinical-mode.md`
   (2026-10-24).
+
+## Extraoral: el gráfico de regiones, nuevo (2026-10-24)
+
+- Nuevas: *Components / Clinical / Dental / ExtraOralDiagram* y *RegionConditionDrawer*, *Components / Clinical /
+  ExtraOralExam*. Extraoral deja el `EmptyState` genérico.
+- El gráfico (cuatro vistas de cabeza, siete regiones clickeables) es **SVG propio, no la imagen del Figma** -se
+  probó sacarle con inpainting la región de ejemplo que trae pintada y no salió limpio-: mismo criterio que el
+  `Odontogram` ("no una foto"). Los límites de cada región son una aproximación, sin fuente vectorial.
+- **Add Condition abre un drawer propio** (por región, no por diente): dos pasos, catálogo de condición aparte del de
+  procedimientos (Atrophy, Blister, Abscess vistas en las grabaciones), y la misma guía de `DescriptorFields` como
+  paso 2. `ExamLayout` suma `onCondicion` para que un examen reemplace el `NewProcedureDrawer` genérico por el suyo;
+  Add Procedure sigue sin cambios.
+- Decisión completa -por qué no se usó la imagen del Figma, qué vieron las grabaciones y qué queda pendiente
+  (catálogo de condición completo, límites de las regiones, si la card debería mostrar la condition en negrita como
+  la app real)- en `figma/modulos/clinical-mode.md` (2026-10-24).

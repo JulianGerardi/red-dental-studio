@@ -130,6 +130,24 @@ export const DESCRIPTOR_ROWS: DescriptorRow[] = [
   { id: 'exudate', label: 'Exudate', options: ['Absent', 'Serous', 'Purulent', 'Bloody'] },
 ]
 
+/* Extra Oral: regiones de la cabeza, no dientes -el área se elige clickeando el gráfico, de a una o varias a la vez.
+   Confirmado en grabaciones de pantalla de red.dev (Julián, 2026-10-24); seguro hay más de las siete que aparecieron
+   ahí -quedan pendientes hasta verlas-. Mismo catálogo e interacción que Intraoral, pero con otro gráfico. */
+export const EXTRAORAL_REGIONS = [
+  'Scalp', 'Right Forehead', 'Left Forehead', 'Right Eye', 'Left Eye', 'Right Posterior Head', 'Left Posterior Head',
+] as const
+export type ExtraOralRegion = (typeof EXTRAORAL_REGIONS)[number]
+
+/* El catálogo de "New Condition" en Extraoral/Intraoral es propio, no el de procedimientos (D-codes): condiciones
+   morfológicas con su búsqueda y filtro aparte. Sólo estas tres aparecieron en las grabaciones; el buscador de la app
+   real sugiere que hay más -no se inventan sin verlas-. */
+export type RegionCondition = { code: string; label: string; group: string }
+export const REGION_CONDITIONS: RegionCondition[] = [
+  { code: 'atrophy', label: 'Atrophy', group: 'morphologic abnormality' },
+  { code: 'blister', label: 'Blister', group: 'morphologic abnormality' },
+  { code: 'abscess', label: 'Abscess', group: 'morphologic abnormality' },
+]
+
 /* Existing: algo que el paciente ya tiene hecho (una condition ya hecha); Planned: lo que se va a hacer. En Existing sólo
    aparecen los procedimientos que quedan en la boca (restauraciones, endodoncias, implantes y prótesis). */
 export type ProcedureStatus = 'Existing' | 'Planned'

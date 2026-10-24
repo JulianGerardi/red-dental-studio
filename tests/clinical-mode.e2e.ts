@@ -234,3 +234,26 @@ test('el menú de un finding del examen abre su registro', async ({ app, screen 
   await drawer.getByRole('button', /^D2391 · Resin-based composite/).tap()
   await expect(screen.getByRole('dialog', /D2391 · Resin-based composite/)).toBeVisible()
 })
+
+/* Extraoral: el gráfico de regiones reemplaza el odontograma. Add Condition abre el drawer propio (por región, no por
+   diente), con lo ya elegido en el gráfico. */
+test('Extraoral: elegir regiones en el gráfico y cargar una condition', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'Extra Oral').tap()
+
+  await screen.getByRole('button', /^Scalp$/).tap()
+  await screen.getByRole('button', /^Right Forehead$/).tap()
+  await screen.getByRole('button', 'Add Condition').tap()
+
+  const drawer = screen.getByRole('dialog', 'New Condition')
+  await expect(drawer.getByText('Scalp')).toBeVisible()
+  await expect(drawer.getByText('Right Forehead')).toBeVisible()
+  await drawer.getByRole('button', /^Atrophy/).tap()
+  await drawer.getByRole('button', /select descriptors/i).tap()
+  await drawer.getByRole('button', 'Painful').tap()
+  await drawer.getByRole('button', /^Save/).tap()
+
+  await expect(screen.getByText(/Atrophy charted on Scalp, Right Forehead/)).toBeVisible()
+  await expect(screen.getByText('Condition: Atrophy (morphologic abnormality)')).toBeVisible()
+  await expect(screen.getByText('Descriptors: Painful')).toBeVisible()
+})

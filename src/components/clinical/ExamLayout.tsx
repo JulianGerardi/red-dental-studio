@@ -68,13 +68,20 @@ export function ExamFindingsProvider({ children }: { children: ReactNode }) {
 /** La última condición cargada; sin provider (un story), la del frame. */
 export const useUltimaCondicion = () => useContext(FindingsCtx)?.ultima ?? ULTIMA_CONDICION
 
-export function ExamLayout({ findings: conFindings = true, examen, extra, children }: {
+/** Los findings del paciente y cómo guardar uno nuevo, para un examen con su propio Add Condition (Extraoral,
+   Intraoral: por región, no por diente). Sin provider (un story), nada -ese examen no corre fuera de ClinicalMode. */
+export const useFindingsEstado = () => useContext(FindingsCtx)
+
+export function ExamLayout({ findings: conFindings = true, examen, extra, onCondicion, children }: {
   /** El panel de Findings a la izquierda. Vitals no lo lleva. */
   findings?: boolean
   /** El examen, como lo nombra la Problem List: es el Source exam de lo que se carga acá. */
   examen?: string
   /** Lo propio del examen en la misma fila de las acciones, a la derecha (el buscador de Radiography). */
   extra?: ReactNode
+  /** Reemplaza el drawer genérico de Add Condition (NewProcedureDrawer, por diente) por el propio del examen -
+     Extraoral e Intraoral cargan por región, no por pieza. Ver ExtraOralExam.tsx. */
+  onCondicion?: () => void
   children: ReactNode
 }) {
   /* Fuera de ClinicalMode (un story) no hay provider: el examen usa su propio estado. */
@@ -176,7 +183,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, childr
               <button
                 type="button"
                 aria-label={label}
-                onClick={modo ? () => setProcedureOpen(modo) : undefined}
+                onClick={modo ? () => (modo === 'condition' && onCondicion ? onCondicion() : setProcedureOpen(modo)) : undefined}
                 className={cn(BOTON_ACCION, !modo && problemas && 'border-dash-blue bg-dash-count-bg text-dash-blue-hover hover:bg-dash-count-bg')}
               >
                 <Icono className="size-[18px] shrink-0" />
