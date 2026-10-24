@@ -30,10 +30,10 @@ const HOY = 'May 14, 2026'
 
 const INITIAL_FINDINGS: Finding[] = [
   { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: HOY, status: 'Discarded', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [], examen: 'Dental Assessment', problema: 'p5', kind: 'condition' },
-  { id: 'F-2', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Discarded', tooth: null, provider: 'Elena Martinez', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral', kind: 'condition', descriptors: { lesionColor: 'Red' } },
+  { id: 'F-2', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Discarded', tooth: null, provider: 'Elena Martinez', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral', kind: 'condition', descriptors: { colors: 'Red' } },
   { id: 'F-3', area: 'Tooth 20', condition: 'localized periodontal pocketing', descriptor: 'Moderate', date: HOY, status: 'Active', tooth: 20, provider: 'Elena Martinez', surfaces: ['B', 'MB'], notes: '', linked: ['#10987231', '#10987232'], diagnoses: [], examen: 'Periodontal', kind: 'condition' },
   { id: 'F-4', area: 'Tooth 30', condition: 'severe root surface decay', descriptor: 'Advanced', date: HOY, status: 'In Treatment', tooth: 30, provider: 'Emily Chen', surfaces: ['O'], notes: '', linked: ['#10987233'], diagnoses: [], examen: 'Dental Assessment', kind: 'condition' },
-  { id: 'F-5', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral', kind: 'condition', descriptors: { lesionColor: 'Red' } },
+  { id: 'F-5', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral', kind: 'condition', descriptors: { colors: 'Red' } },
 ]
 
 const INITIAL_REVIEWS: ExamReview[] = [

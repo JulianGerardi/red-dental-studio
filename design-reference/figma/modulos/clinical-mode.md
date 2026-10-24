@@ -2506,3 +2506,66 @@ Código: `clinical/dental/DescriptorFields.tsx`, `clinical/dental/data.ts` (`DES
 Design system: *Components / Clinical / Dental / DescriptorFields* (nueva), *NewProcedureDrawer* (paso Descriptors en
 Parts/Specs, estado `DescriptorsStep`) y *EditFindingDrawer* (sección Descriptors, estado `ProcedureFinding` sin
 ella).
+
+## Las doce filas reales, no las del Figma (2026-10-24)
+
+Julián consiguió acceso real a red.dev (el bloqueo de red de esta sesión en la nube se resolvió) y mandó, además,
+dos grabaciones de pantalla navegando **Extraoral** e **Intraoral** -de ahí sale todo lo de más abajo-. Primer dato
+importante: la guía visual de descriptores de la vuelta anterior (2026-10-22) copiaba el Figma *Platform Design*
+(5294:107675), pero **la app real usa otro catálogo**, igual en los dos exámenes. Se reemplaza `DESCRIPTOR_ROWS` por
+el real; las cuatro anomalías de la sección anterior (Peculate, Ulcerate, Smoothr, la fila "Color" repetida) ya no
+aplican -eran erratas del frame viejo, no de este catálogo-.
+
+**Las doce filas** (`dental/data.ts`, `DESCRIPTOR_ROWS`), confirmadas en los dos exámenes:
+
+| Fila | Opciones |
+|---|---|
+| Quantity | Solitary · Multiple diffuse · Multiple coalescing |
+| Symmetry | Unilateral · Bilateral |
+| Size | Small (e.g., 0.5 cm) · Medium (e.g., 1-2 cm) · Large (e.g., >2 cm) |
+| Shape | Round · Oval · Irregular · Linear |
+| Borders | Well demarcated · Poorly defined · Raised · Flat |
+| Colors | Red · Pale · Pink · White · Gray · Blue · Brown · Black · Yellow |
+| Surface | Smooth · Rough · Papillated · Ulcerated · Hairy |
+| Consistency | Hard · Soft · Firm · Fluctuant · Indurated |
+| Mobility | Fixed · Movable |
+| Pain | Painful · Painless |
+| Bleeding | Present · Absent |
+| Exudate | Absent · Serous · Purulent · Bloody |
+
+Sin erratas que anotar esta vez: son los rótulos tal cual los escribe la app real.
+
+### Lo que las grabaciones muestran de Extraoral e Intraoral (sin construir todavía)
+
+No alcanza el tiempo de esta tanda para armar las dos pantallas enteras, pero queda documentado para la próxima:
+
+1. **El gráfico tiene regiones clickeables, de verdad.** Extraoral son cuatro vistas de cabeza (perfil izquierdo,
+   frente, nuca, perfil derecho); Intraoral, boca y lengua desde dos ángulos. Clickear una región la resalta
+   (amarillo mientras se está por cargar; verde azulado cuando ya tiene una condition activa).
+2. **Se pueden elegir varias regiones a la vez** antes de cargar la condition: cada una queda como chip en "Selected
+   area", con su ✕ para sacarla. Regiones vistas: Scalp, Right/Left Posterior Head, Right/Left Forehead, Right/Left
+   Eye (Extraoral); Right/Left Maxillary Gingiva, Right Mandibular Gingiva, Right/Left Ventral Tongue, Right Hard
+   Palate, Soft Palate (Intraoral). Seguro hay más: esto es sólo lo que aparece en las dos grabaciones.
+3. **"Add Condition" es un catálogo propio, no el de procedimientos**: en las grabaciones, "Atrophy (morphologic
+   abnormality)", "Blister (morphologic abnormality)", "Abscess (morphologic abnormality)" y "No Findings". El
+   buscador dice "Search a Condition Here...", con un botón "Filter" al lado.
+4. **Dos pasos, mismo título "New Condition", sin indicador de pasos visible**: 1) área + catálogo de condición, con
+   "Select descriptors" como botón de avance (no "Next Step"); 2) las doce filas de arriba, con "Save". Ninguna fila
+   es obligatoria: las condiciones de ejemplo quedan con 2 a 12 filas elegidas, nunca las doce completas.
+5. **La card del finding dice "Location:"**, no "Area", con las regiones separadas por coma si son varias, y
+   "Descriptors:" sólo con lo elegido (overflow como "+9 more").
+6. **Add Procedure no cambia**: catálogo de códigos, pestañas Existing/Planned -igual al `NewProcedureDrawer` que ya
+   existe acá-.
+7. **Edit Procedure es un modal centrado**, no el drawer con pasos de acá: General Information a la izquierda (Created
+   date, Status, Fee, el código, Provider, Note) y, a la derecha, pestañas **Findings**/**Diagnostics** -el mismo
+   buscador de vincular, pero las dos conviven en pestañas en vez de ser pasos sucesivos del wizard-. **No se tocó**:
+   `NewProcedureDrawer` sigue siendo drawer, que fue un pedido explícito de Julián (2026-10-03) como excepción a la
+   regla de no usar drawers; cambiarlo a este modal de dos columnas queda pendiente de que lo confirme, no es un
+   cambio que se decida solo.
+
+No se armó el gráfico de regiones (necesitaría los límites de cada zona, que no se pueden sacar con precisión de
+pixeles de una grabación) ni el catálogo de condiciones por examen. Extraoral sigue con el `EmptyState` genérico.
+
+Código: `clinical/dental/data.ts` (`DESCRIPTOR_ROWS`).
+Design system: *Components / Clinical / Dental / DescriptorFields* (Playground, Parts y States actualizados con el
+catálogo real).

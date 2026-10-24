@@ -70,18 +70,18 @@ test('Add Condition con descriptores: se eligen al crear y se corrigen desde Edi
   const drawer = screen.getByRole('dialog', 'New Condition')
   await drawer.getByRole('button', 'D2740 on tooth').tap()
   await drawer.getByRole('button', /Next Step/).tap()
-  await drawer.getByRole('button', 'Well Defined').tap()
+  await drawer.getByRole('button', 'Painful').tap()
   await drawer.getByRole('button', 'Round').tap()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/D2740 charted as existing/)).toBeVisible()
-  await expect(screen.getByText('Descriptors: Well Defined, Round')).toBeVisible()
+  await expect(screen.getByText('Descriptors: Painful, Round')).toBeVisible()
 
   await screen.getByRole('button', /^Actions for Tooth 13$/).tap()
   await screen.getByRole('menuitem', 'Edit').tap()
   const editar = screen.getByRole('dialog', 'Edit Finding')
-  await editar.getByRole('button', 'Irregular or Ill Defined').tap()
+  await editar.getByRole('button', 'Painless').tap()
   await editar.getByRole('button', /^Save/).tap()
-  await expect(screen.getByText('Descriptors: Irregular or Ill Defined, Round')).toBeVisible()
+  await expect(screen.getByText('Descriptors: Painless, Round')).toBeVisible()
 })
 
 test('Overview: el chart de DentAssmt muestra la última condición y sigue a Add Condition', async ({ app, screen }) => {

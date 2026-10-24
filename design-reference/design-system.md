@@ -1149,3 +1149,19 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
 - Decisión completa, las cuatro erratas del frame copiadas tal cual (Peculate, Ulcerate, Smoothr, la fila "Color"
   repetida) y por qué no se filtran las trece filas por tipo de condition, en `figma/modulos/clinical-mode.md`
   (2026-10-22).
+
+## `DescriptorFields`: las doce filas reales, no las del Figma (2026-10-24)
+
+- Julián consiguió acceso a red.dev y mandó grabaciones de pantalla de Extraoral e Intraoral: la guía de descriptores
+  de la vuelta anterior copiaba el Figma, pero la app real usa otro catálogo -igual en los dos exámenes-, sin ninguna
+  de las erratas que se habían documentado como anomalía.
+- `DESCRIPTOR_ROWS` pasa a **Quantity, Symmetry, Size, Shape, Borders, Colors, Surface, Consistency, Mobility, Pain,
+  Bleeding, Exudate** (doce filas), con las opciones de la app real.
+- Extraoral e Intraoral siguen sin construirse -el gráfico de regiones clickeables necesita sus límites exactos, que
+  no se pueden sacar con precisión de una grabación-, pero quedan documentados el catálogo de condición (propio, no
+  el de procedimientos), el flujo de dos pasos y el formato de la card ("Location:" con varias regiones).
+- De paso se ve que **Edit Procedure en la app real es un modal centrado** (General Information + pestañas
+  Findings/Diagnostics), no el drawer con pasos de acá. No se tocó: ese drawer fue un pedido explícito de Julián como
+  excepción a la regla de no usar drawers (2026-10-03); cambiarlo queda pendiente de que lo confirme.
+- Decisión completa, con las regiones y la card vistas en las grabaciones, en `figma/modulos/clinical-mode.md`
+  (2026-10-24).

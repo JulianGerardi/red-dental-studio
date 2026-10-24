@@ -12,9 +12,9 @@ const meta = {
     docs: {
       description: {
         component: [
-          'La guía visual de descriptores de una condition (Figma *Platform Design*, 5294:107675, pantalla "Edit Finding"): trece filas, una por atributo, cada una con sus opciones como píldoras de una sola elección. Ninguna es obligatoria -una condition puede no tener nada elegido, o sólo algunas filas-. La usan [New Condition](/docs/components-clinical-dental-newproceduredrawer--docs) (paso *Descriptors*) y [Edit Finding](/docs/components-clinical-dental-editfindingdrawer--docs), sólo en una condition.',
+          'La guía visual de descriptores de una condition: doce filas, una por atributo, cada una con sus opciones como píldoras de una sola elección. Ninguna es obligatoria -una condition puede no tener nada elegido, o sólo algunas filas-. La usan [New Condition](/docs/components-clinical-dental-newproceduredrawer--docs) (paso *Descriptors*) y [Edit Finding](/docs/components-clinical-dental-editfindingdrawer--docs), sólo en una condition.',
           '',
-          '**Copiado del frame con sus erratas** (Peculate, Ulcerate, Smoothr), anotadas como anomalía en `clinical-mode.md`; el frame repite "Papillated" dos veces en Consistency, que es un bug de lista y no se replica. Las dos filas que el frame llama "Color" también se dejan así -ver la anomalía-.',
+          '**Tomadas de la app real** (red.dev, Extraoral e Intraoral, New Condition → Select descriptors), no del Figma: Quantity, Symmetry, Size, Shape, Borders, Colors, Surface, Consistency, Mobility, Pain, Bleeding y Exudate, con las mismas opciones -confirmado el 2026-10-24 con grabaciones de pantalla de Julián en los dos exámenes-.',
           '',
           '**Probalo:** tocá una píldora para elegirla: la fila cambia a una sola opción, en azul. Tocarla de nuevo la deselecciona.',
         ].join('\n'),
@@ -35,7 +35,7 @@ export const Playground: Story = {
   },
 }
 
-/* Las trece filas, cada una con su rótulo y sus opciones. */
+/* Las doce filas, cada una con su rótulo y sus opciones. */
 export const Parts: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
@@ -57,8 +57,8 @@ export const States: Story = {
         <Bloque titulo="Empty" nota="Nada elegido: la condición creada sin tocar la guía.">
           <div className="max-w-[380px]"><DescriptorFields value={{}} onChange={() => {}} /></div>
         </Bloque>
-        <Bloque titulo="Selected" nota="Una fila elegida (hover y foco: Playground).">
-          <div className="max-w-[380px]"><DescriptorFields value={{ color: 'White', depth: 'Raised' }} onChange={() => {}} /></div>
+        <Bloque titulo="Selected" nota="Dos filas elegidas (hover y foco: Playground).">
+          <div className="max-w-[380px]"><DescriptorFields value={{ colors: 'White', borders: 'Raised' }} onChange={() => {}} /></div>
         </Bloque>
       </div>
     </Lienzo>
@@ -70,7 +70,7 @@ function PildoraMedida() {
   return (
     <tr>
       <td className="font-semibold">Selected pill</td>
-      <td><div ref={ref} className="inline-block"><DescriptorFields value={{ borders: 'Well Defined' }} onChange={() => {}} rows={[DESCRIPTOR_ROWS[0]!]} /></div></td>
+      <td><div ref={ref} className="inline-block"><DescriptorFields value={{ quantity: 'Solitary' }} onChange={() => {}} rows={[DESCRIPTOR_ROWS[0]!]} /></div></td>
       <td className="tabular-nums">{m?.padding}</td>
       <td className="tabular-nums">{m?.radio}</td>
     </tr>
