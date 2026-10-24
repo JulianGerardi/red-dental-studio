@@ -8,6 +8,7 @@ import { ClinicalTopBar } from '@/components/clinical/ClinicalTopBar'
 import { ClinicalToolbar } from '@/components/clinical/ClinicalToolbar'
 import { DentalAssessmentExam } from '@/components/clinical/DentalAssessmentExam'
 import { ExtraOralExam } from '@/components/clinical/ExtraOralExam'
+import { IntraOralExam } from '@/components/clinical/IntraOralExam'
 import { TreatmentPlanList } from '@/components/clinical/TreatmentPlanList'
 import { ProblemList } from '@/components/clinical/ProblemList'
 import { NavegacionClinica, examenDePestana, type DestinoClinico } from '@/components/clinical/RecordDetail'
@@ -103,9 +104,11 @@ export default function ClinicalMode() {
               ? <DentalAssessmentExam />
               : pestana === 'Extra Oral'
                 ? <ExtraOralExam />
-                : esExamen
-                  ? <ExamLayout examen={examenDePestana(pestana)}>{enConstruccion}</ExamLayout>
-                  : enConstruccion
+                : pestana === 'Intra Oral'
+                  ? <IntraOralExam />
+                  : esExamen
+                    ? <ExamLayout examen={examenDePestana(pestana)}>{enConstruccion}</ExamLayout>
+                    : enConstruccion
 
   return (
         /* Sin tope de ancho: en pantallas grandes el contenido —las tablas, el

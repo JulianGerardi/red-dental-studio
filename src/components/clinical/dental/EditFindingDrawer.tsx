@@ -1,100 +1,69 @@
 import { useEffect, useState } from 'react'
-import { Check, X } from 'lucide-react'
-import { Drawer } from '@/components/ui/drawer'
-import { Button } from '@/components/ui/button'
-import { FieldLabel, SelectField, TextArea } from '@/components/patients/form'
-import { FindingCard } from './FindingCard'
-import { SurfaceWheel, type Surface } from './SurfaceWheel'
+import { Drawer, DrawerActions } from '@/components/ui/drawer'
+import { Pill } from '@/components/ui/pill'
 import { DescriptorFields, textoDescriptores } from './DescriptorFields'
-import { PROVIDERS, type Finding } from './data'
+import { EditConditionDrawer } from './EditConditionDrawer'
+import { EditProcedureDrawer } from './EditProcedureDrawer'
+import { FilaDato, FilaNombre, IconoExamen, IconoFecha, TONO_ESTADO, fechaCorta, mayuscula } from './DatosHallazgo'
+import type { Finding } from './data'
 
-/* Editar un finding, en el drawer de la derecha como New Procedure (Julián, 2026-10-03): el finding entero arriba, con su
-   estado, fecha, zona, condición y descriptores, y debajo lo que se edita (proveedor, superficies y notas) y lo que tiene
-   vinculado. Las acciones fijas al pie. Ver design-reference/figma/modulos/clinical-mode.md.
-
-   La guía visual de descriptores (Figma *Platform Design*, 5294:107675) sólo en una condition (Julián, 2026-10-22): un
-   procedure no la tiene -no es su guía, ahí "descriptor" sale de la superficie o el alcance-, así que la sección sólo
-   aparece con `finding.kind === 'condition'`. */
+/* Editar un finding desde el menú de su card. Cada tipo tiene su drawer, con el diseño del Figma *Platform Design* y la
+   lógica que ya teníamos (Julián, 2026-10-24):
+   - un procedimiento -> Edit Procedure (5294:85084): proveedor, notas y lo que vincula;
+   - una condition en un diente -> Edit Condition (5301:149072): superficies, descriptores y notas;
+   - el resto de las conditions (Extraoral, Intraoral) -> Edit Finding (5294:107675): los descriptores.
+   Ver design-reference/figma/modulos/clinical-mode.md. */
 export function EditFindingDrawer({
+  finding, findings = [], onClose, onSave,
+}: {
+  finding: Finding | null
+  /** Todos los findings del examen: Edit Procedure los ofrece para vincular. */
+  findings?: Finding[]
+  onClose: () => void
+  onSave: (patch: Partial<Finding>) => void
+}) {
+  const esCondicion = finding?.kind === 'condition'
+  const enDiente = finding?.tooth != null
+  const props = { onClose, onSave }
+  return (
+    <>
+      <EditProcedureDrawer finding={finding && !esCondicion ? finding : null} findings={findings} {...props} />
+      <EditConditionDrawer finding={finding && esCondicion && enDiente ? finding : null} {...props} />
+      <EditFindingView finding={finding && esCondicion && !enDiente ? finding : null} {...props} />
+    </>
+  )
+}
+
+function EditFindingView({
   finding, onClose, onSave,
 }: {
   finding: Finding | null
   onClose: () => void
   onSave: (patch: Partial<Finding>) => void
 }) {
-  const [provider, setProvider] = useState('')
-  const [surfaces, setSurfaces] = useState<Surface[]>([])
-  const [notes, setNotes] = useState('')
   const [descriptors, setDescriptors] = useState<Record<string, string>>({})
-
-  useEffect(() => {
-    if (!finding) return
-    setProvider(finding.provider)
-    setSurfaces(finding.surfaces as Surface[])
-    setNotes(finding.notes)
-    setDescriptors(finding.descriptors ?? {})
-  }, [finding])
-
-  const esCondicion = finding?.kind === 'condition'
+  useEffect(() => { if (finding) setDescriptors(finding.descriptors ?? {}) }, [finding])
 
   function guardar() {
-    const patch: Partial<Finding> = { provider, surfaces, notes }
-    if (esCondicion) {
-      patch.descriptors = descriptors
-      patch.descriptor = textoDescriptores(descriptors)
-    }
-    onSave(patch)
+    onSave({ descriptors, descriptor: textoDescriptores(descriptors) })
     onClose()
   }
 
   return (
-    <Drawer
-      open={!!finding}
-      onClose={onClose}
-      title="Edit Finding"
-      description={finding ? `${finding.area} · ${finding.condition}` : undefined}
-      footer={
-        <>
-          <Button className="w-full" onClick={guardar}><Check /> Save</Button>
-          <Button variant="secondary" className="w-full" onClick={onClose}><X /> Cancel</Button>
-        </>
-      }
-    >
+    <Drawer open={!!finding} onClose={onClose} title="Edit Finding" footer={<DrawerActions onCancel={onClose} onSave={guardar} />}>
       {finding && (
         <div className="flex flex-col gap-5">
-          <FindingCard finding={finding} className="border border-line shadow-none" />
-
-          <SelectField label="Provider" required options={PROVIDERS} value={provider} onChange={setProvider} />
-
-          {esCondicion && (
-            <div className="flex w-full flex-col gap-1.5">
-              <FieldLabel>Descriptors</FieldLabel>
-              <DescriptorFields value={descriptors} onChange={setDescriptors} />
-            </div>
-          )}
-
-          {finding.tooth !== null && (
-            <div className="flex w-full flex-col items-center gap-2">
-              <span className="flex w-full flex-col gap-0.5">
-                <span className="text-xs font-semibold text-ink-muted">Surfaces</span>
-                <span className="text-[11px] text-ink-faint">Tooth {finding.tooth}: tap a surface to add or remove it.</span>
-              </span>
-              <SurfaceWheel value={surfaces} onChange={setSurfaces} size={180} />
-            </div>
-          )}
-
-          <TextArea label="Notes" placeholder="Document questions, answers, clarifications, or additional notes" value={notes} onChange={setNotes} />
-
-          {finding.linked.length > 0 && (
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs font-semibold text-ink-muted">Linked procedures</span>
-              <div className="flex flex-wrap gap-1.5">
-                {finding.linked.map((id) => (
-                  <span key={id} className="bg-dash-count-bg text-dash-blue rounded-full px-2 py-0.5 text-[11px] font-semibold">{id}</span>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="flex flex-col gap-4">
+            <FilaDato icono={<IconoFecha />} rotulo="Creation date">{fechaCorta(finding.date)}</FilaDato>
+            <FilaDato icono={<IconoExamen />} rotulo="Exams">
+              <Pill tone="success" size="sm">{finding.examen ?? 'Dental Assessment'}</Pill>
+            </FilaDato>
+            <FilaNombre nombre={mayuscula(finding.condition)} estado={finding.status} tono={TONO_ESTADO[finding.status]} />
+          </div>
+          <section className="flex flex-col gap-3.5">
+            <p className="text-xs font-medium text-ink">Selected Descriptors</p>
+            <DescriptorFields value={descriptors} onChange={setDescriptors} />
+          </section>
         </div>
       )}
     </Drawer>

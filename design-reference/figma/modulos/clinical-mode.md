@@ -2648,35 +2648,66 @@ Código: `clinical/ExtraOralExam.tsx`, `clinical/dental/ExtraOralDiagram.tsx`, `
 Design system: *Components / Clinical / Dental / ExtraOralDiagram* y *RegionConditionDrawer* (nuevas), *Components /
 Clinical / ExtraOralExam* (nueva).
 
-## Extraoral: el gráfico es el PNG del Figma, no un dibujo (2026-10-24)
+## Extraoral e Intraoral con el gráfico del Figma, y los tres Edit con su diseño (2026-10-24)
 
-**CON-881 (Exam "Extra Oral") y CON-934 ([Exam] Add condition).** Julián: "no cambies los gráficos que te pasé, los
-diseños deben ser lo que están en Figma" -el SVG propio de la tanda anterior (#78) se descarta-.
+**CON-881, CON-882 y CON-934** (Exam Extra Oral, Exam Intra Oral, [Exam] Add condition). Julián: "no cambies los gráficos que
+te pasé, los diseños deben ser lo que están en Figma"; "el intra oral también debe aparecer sin nada marcado"; "la lógica
+usa la que armamos, pero el diseño el del Figma".
 
-- `ExtraOralDiagram` ahora muestra el **PNG original del Figma** (Platform Design, *Clinical Exam — Extra Oral*, nodo
-  `4106:158958`, `src/assets/extraoral-heads.png`, el mismo a 2048 px) sin trazarlo ni retocarlo, con una zona
-  clickeable por región encima. Mismos props y mismo comportamiento que antes (`pending` ámbar, `active` verde,
-  una región en más de una vista se marca junta); lo único que cambia es el arte.
-- **Las zonas salen del propio PNG**: las formas celestes que trae (frente, nuca, perfil) son las zonas reales de la app;
-  se extrajeron como polígonos y se completaron por simetría (lado opuesto de la frente y de la nuca, y el espejo entre
-  los dos perfiles). Los ojos y Scalp son una aproximación mía a partir de la partición que se ve en red.dev. Right =
-  lado derecho del paciente: en el frente queda a la izquierda del dibujo, en la nuca a la derecha.
-- **Anomalía del Figma (#102)**: el PNG viene con una región de ejemplo ya pintada de celeste (la del chip "Uper left",
-  con typo). Hasta tener la cabeza limpia se muestra en gris con un filtro (`grayscale`), sin tocar el archivo: se ve
-  como un parche gris en la frente, la nuca y la nariz. Se probó borrarlo (inpainting) y también aclararlo con
-  `brightness`: lo primero deja manchas y se pierde la nariz de los perfiles, lo segundo lava todo el dibujo.
-- **Pendiente: los assets de red.dev** (cabeza sin celeste y una capa por región, que también cubre las zonas sin nombre
-  que se ven en la app: nariz, cara, orejas, cuello). red.dev pide sesión: Julián los saca de Network.
-- **Not Localized** (CON-881): sin región elegida, Add Condition abre el drawer con el chip "Not Localized" y se guarda
-  con esa área -antes quedaba vacía-.
-- **Jira vs. app real, sin cambiar**: CON-881/CON-934 dicen "una fila por locación" al elegir varias regiones; la
-  grabación de red.dev muestra **una sola card con todas las locaciones**. Se deja lo que hace la app real. También
-  quedan sin aplicar, por no verse en la app: pestañas *Most Used / All Conditions* y códigos SNOMED en la lista de
-  condiciones, textos "Condition successfully saved to the exam." / "Please select at least one condition to continue." /
-  "This condition has already been added for the selected location.", y descriptores en orden alfabético (la app los
-  muestra en el orden de `DESCRIPTOR_ROWS`).
-- **Regiones de cuello y hombro** (Jira da "Right Anterior Neck", "Left Shoulder"): no se agregan, el Figma no las
-  marca y las grabaciones no mostraron sus límites.
+**Los gráficos son los PNG del Figma**, no un dibujo (`clinical/dental/RegionDiagram.tsx` es la base; `ExtraOralDiagram` e
+`IntraOralDiagram` la usan; `assets/extraoral-heads.png` e `assets/intraoral-mouth.png`, a 2048 px).
 
-Código: `clinical/dental/ExtraOralDiagram.tsx`, `clinical/ExtraOralExam.tsx`, `clinical/dental/RegionConditionDrawer.tsx`.
-Storybook sin tocar (se hace al final, cuando Julián lo pida).
+- Los dos PNG traen una región de ejemplo ya pintada de celeste (el chip "Uper left", con typo, **anomalía #102**), y el
+  Figma no tiene una versión limpia. Se probó borrarla con inpainting (deja manchas y se pierde la nariz de los perfiles)
+  y aclararla con un filtro (lava todo el dibujo). Lo que funcionó: **deshacer la mezcla por cálculo**. La capa celeste es
+  translúcida, así que se estimó cómo se mezcla con el dibujo y se invirtió; en Extraoral, donde el arte es gris, queda
+  el dibujo original. En Intraoral el color de debajo no se puede recuperar entero: el labio se completó con su espejo
+  (el dibujo es simétrico, eje 1144 px), y en el paladar blando se recuperó la luz y el color se rellenó con el del
+  paladar de al lado; se borraron los bordes blancos que traía la capa. Los resultados se ven limpios, pero **son una
+  reconstrucción**: el reemplazo correcto es el asset de red.dev (cabeza y boca sin celeste y una capa por región).
+- **Las zonas** (invisibles hasta pasar el mouse) salen de las formas celestes del propio PNG, completadas por simetría, y
+  de la partición que se ve en red.dev. Los ojos, Scalp y el paladar duro son una aproximación mía. Right = lado derecho
+  del paciente: en el frente queda a la izquierda del dibujo, en la nuca a la derecha, en el Intraoral a la izquierda.
+- **Extraoral**: 7 zonas (Scalp, Right/Left Forehead, Right/Left Eye, Right/Left Posterior Head). **Intraoral**: sólo las
+  de nombre confirmado: Right/Left Hard Palate (CON-882 da "Right Hard Palate") y Soft Palate (el nombre del Figma). El
+  resto de lo que se ve en red.dev -labios, arcada, mejillas, lengua, piso de boca- espera su lista de nombres: no se
+  inventan. Tampoco cuello y hombro (Jira da "Right Anterior Neck", "Left Shoulder"): el Figma no los marca.
+- `RegionExam` (`clinical/RegionExam.tsx`) es el examen de los dos: pending ámbar, active turquesa, el mismo Add Condition
+  por región (`RegionConditionDrawer`, que ahora acepta cualquier nombre de región). Sin región elegida se carga como
+  **Not Localized** (CON-881/CON-882). La pestaña Intra Oral deja de ser un placeholder.
+- **Jira vs. app real, sin cambiar**: Jira dice "una fila por locación" al elegir varias regiones; red.dev muestra **una
+  sola card con todas las locaciones**. Se deja lo que hace la app real. También sin aplicar, por no verse en la app: las
+  pestañas *Most Used / All Conditions* y los códigos SNOMED, los textos exactos de CON-934 ("Condition successfully saved
+  to the exam." y los dos errores) y los descriptores en orden alfabético.
+
+**Los tres Edit con el diseño del Figma y nuestra lógica.** `EditFindingDrawer` ahora elige según el finding:
+
+| Finding | Drawer | Figma |
+|---|---|---|
+| Procedimiento (Add Procedure) | **Edit Procedure**: General Information / Findings / Diagnostic | 5294:85084 |
+| Condition en un diente | **Edit Condition**: Selected Area con la rueda y las superficies, descriptores, notas | 5301:149072 |
+| Condition sin diente (Extraoral, Intraoral) | **Edit Finding**: Selected Descriptors | 5294:107675 |
+
+- Las filas de datos de arriba (Creation date, Provider, Exams, nombre con su estado) son `DatosHallazgo.tsx`: card con la
+  línea azul a la izquierda y sombra suave. La píldora de estado del Figma mide **6,5 px de texto**: se usa la `Pill` chica
+  del sistema (10 px), que sí se lee (**anomalía #103**).
+- **DescriptorFields** pasa al diseño del Figma en toda la app (New Condition, Edit, Extraoral/Intraoral): rótulo a la
+  izquierda y control segmentado (caja gris, la opción elegida en azul). Antes eran píldoras sueltas debajo de cada rótulo.
+  La lógica no cambia (una opción por fila, ninguna obligatoria, tocar la elegida la deselecciona).
+- El pie es Cancel a la izquierda y Save a la derecha, del mismo ancho (antes estaban al revés). Los drawers ya no
+  llevan bajada con el área y la condition: ese dato es ahora una fila.
+- **Edit Condition**: el proveedor va como dato, sin editar, como en el Figma. Las superficies y los descriptores se
+  corrigen acá, independientes entre sí (CON-2770); el Figma de esta pantalla no trae descriptores, así que van con el
+  diseño de Edit Finding debajo del área. **La rueda es la nuestra** (MB/B/DB/O/ML/L/DL), no la del Figma
+  (BC/B/D/M/P/PC/O) ni sus nombres ("D - Distal", "M - Masial", "B - Bucal"): es otro vocabulario de superficies, no se
+  mezcla sin confirmar con Julián.
+- **Edit Procedure**: el Fee sale del arancel UCR del código (`precioUcr`, `data/finanzas.ts`) y se guarda en el finding al
+  cargar el procedimiento; si no hay precio, la fila no aparece. Findings y Diagnostic reusan las cards y el buscador de
+  Link to finding / Link to diagnosis de New Procedure; un solo Save guarda proveedor, notas y vínculos.
+- Una condition de un diente con descriptores ya no se edita desde "Edit Finding" sino desde "Edit Condition" (el e2e se
+  actualizó).
+
+Código: `clinical/dental/{RegionDiagram,ExtraOralDiagram,IntraOralDiagram,RegionConditionDrawer,DatosHallazgo,EditFindingDrawer,
+EditConditionDrawer,EditProcedureDrawer,DescriptorFields}.tsx`, `clinical/{RegionExam,ExtraOralExam,IntraOralExam,ExamLayout}.tsx`,
+`dental/data.ts` (`INTRAORAL_REGIONS`, `Finding.fee`), `data/finanzas.ts`, `pages/ClinicalMode.tsx`. Storybook sin tocar
+(se hace al final, cuando Julián lo pida).

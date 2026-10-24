@@ -78,7 +78,7 @@ test('Add Condition con descriptores: se eligen al crear y se corrigen desde Edi
 
   await screen.getByRole('button', /^Actions for Tooth 13$/).tap()
   await screen.getByRole('menuitem', 'Edit').tap()
-  const editar = screen.getByRole('dialog', 'Edit Finding')
+  const editar = screen.getByRole('dialog', 'Edit Condition')
   await editar.getByRole('button', 'Painless').tap()
   await editar.getByRole('button', /^Save/).tap()
   await expect(screen.getByText('Descriptors: Painless, Round')).toBeVisible()
@@ -256,4 +256,39 @@ test('Extraoral: elegir regiones en el gráfico y cargar una condition', async (
   await expect(screen.getByText(/Atrophy charted on Scalp, Right Forehead/)).toBeVisible()
   await expect(screen.getByText('Condition: Atrophy (morphologic abnormality)')).toBeVisible()
   await expect(screen.getByText('Descriptors: Painful')).toBeVisible()
+})
+
+/* Intraoral: el mismo Add Condition por región que Extraoral; sin región elegida se carga como Not Localized (CON-882). */
+test('Intraoral: Add Condition sin región se carga como Not Localized', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'Intra Oral').tap()
+  await screen.getByRole('button', 'Add Condition').tap()
+  const drawer = screen.getByRole('dialog', 'New Condition')
+  await expect(drawer.getByText('Not Localized')).toBeVisible()
+  await drawer.getByRole('button', /^Abscess/).tap()
+  await drawer.getByRole('button', /select descriptors/i).tap()
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText(/Abscess charted on Not Localized/)).toBeVisible()
+})
+
+/* Edit Procedure (Figma 5294:85084): tres pestañas; Findings y Diagnostic traen lo vinculable y un solo Save guarda todo. */
+test('Edit Procedure: pestañas General Information, Findings y Diagnostic', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'DentAssmt').first().tap()
+  await screen.getByRole('button', 'Add Procedure').tap()
+  const nuevo = screen.getByRole('dialog', 'New Procedure')
+  await nuevo.getByRole('button', /^D0120\s*-/).first().tap()
+  await nuevo.getByRole('button', /^Save/).tap()
+  await nuevo.getByRole('button', 'Close').tap()
+
+  await screen.getByRole('button', /^Actions for Tooth 13$/).tap()
+  await screen.getByRole('menuitem', 'Edit').tap()
+  const editar = screen.getByRole('dialog', 'Edit Procedure')
+  await expect(editar.getByText('Creation date')).toBeVisible()
+  await expect(editar.getByText('Fee')).toBeVisible()
+  await editar.getByRole('tab', 'Findings').tap()
+  await expect(editar.getByText('Link Findings')).toBeVisible()
+  await editar.getByRole('tab', 'Diagnostic').tap()
+  await expect(editar.getByText('Link Diagnosis')).toBeVisible()
+  await editar.getByRole('button', /^Save/).tap()
 })

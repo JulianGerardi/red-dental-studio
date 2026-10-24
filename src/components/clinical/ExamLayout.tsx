@@ -13,6 +13,7 @@ import { ReviewExamDialog } from './dental/ReviewExamDialog'
 import { FindingCard } from './dental/FindingCard'
 import { FindingActionsMenu } from './dental/FindingActionsMenu'
 import { NewProcedureDrawer, type ProcedureDraft } from './dental/NewProcedureDrawer'
+import { precioUcr } from '@/data/finanzas'
 import { EditFindingDrawer } from './dental/EditFindingDrawer'
 import { textoDescriptores } from './dental/DescriptorFields'
 import { ConfirmProcedureDialog } from './dental/ConfirmProcedureDialog'
@@ -110,6 +111,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
         date: HOY, status: draft.status === 'Existing' ? 'Externally Treated' : 'Active', tooth, provider: 'Elena Martinez',
         surfaces: draft.surfaces, notes: '', linked: draft.linked, diagnoses: draft.diagnoses, examen,
         kind: procedureOpen ?? 'procedure', descriptors: esCondicion ? draft.descriptors : undefined,
+        fee: esCondicion ? undefined : precioUcr(draft.procedure.code),
       },
       ...f,
     ])
@@ -230,6 +232,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
 
       <EditFindingDrawer
         finding={editing}
+        findings={findings}
         onClose={() => setEditing(null)}
         onSave={(patch) => setFindings((all) => all.map((f) => (f.id === editing?.id ? { ...f, ...patch } : f)))}
       />

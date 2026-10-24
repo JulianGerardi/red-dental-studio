@@ -5,15 +5,15 @@ import { Chip } from '@/components/ui/chip'
 import { Drawer, DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { FieldLabel, control } from '@/components/patients/form'
 import { DescriptorFields } from './DescriptorFields'
-import { REGION_CONDITIONS, type ExtraOralRegion } from './data'
+import { REGION_CONDITIONS } from './data'
 
 export type RegionConditionDraft = {
   condition: { code: string; label: string; group: string }
-  regions: ExtraOralRegion[]
+  regions: string[]
   descriptors: Record<string, string>
 }
 
-/* New Condition de Extraoral/Intraoral: dos pasos, los dos titulados "New Condition" como en la app real (sin
+/* New Condition de Extraoral/Intraoral (el mismo drawer para los dos): dos pasos, los dos titulados "New Condition" como en la app real (sin
    indicador de pasos -ahí no lo tiene-, pero acá sí lo mostramos: es la convención de todos los drawers de la app,
    StepIndicator con nombre de paso, y no hay motivo para sacarlo sólo en éste). Paso 1: las regiones elegidas en el
    gráfico (afuera, como chips removibles) y el catálogo de condición, propio -no el de procedimientos-, con buscador.
@@ -26,8 +26,8 @@ export function RegionConditionDrawer({
 }: {
   open: boolean
   /** Las regiones elegidas en el gráfico, afuera de este drawer. */
-  regions: ExtraOralRegion[]
-  onRemoveRegion: (region: ExtraOralRegion) => void
+  regions: string[]
+  onRemoveRegion: (region: string) => void
   onClose: () => void
   onSave: (draft: RegionConditionDraft) => void
 }) {

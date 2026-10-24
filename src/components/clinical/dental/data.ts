@@ -107,6 +107,8 @@ export type Finding = {
   /** La guía visual de descriptores: una opción por fila, por id de fila. `descriptor` sigue siendo el texto que se ve
      en la card -lo elegido acá, unido con coma-, para no duplicar esa lectura en todos lados. */
   descriptors?: Record<string, string>
+  /** Lo que cuesta el procedimiento, en dólares: lo muestra Edit Procedure (Figma 5294:85084) cuando existe. */
+  fee?: number
 }
 
 /* La guía visual de descriptores de una condition: una fila por atributo, con sus opciones como píldoras de una sola
@@ -137,6 +139,11 @@ export const EXTRAORAL_REGIONS = [
   'Scalp', 'Right Forehead', 'Left Forehead', 'Right Eye', 'Left Eye', 'Right Posterior Head', 'Left Posterior Head',
 ] as const
 export type ExtraOralRegion = (typeof EXTRAORAL_REGIONS)[number]
+
+/* Intra Oral: sólo las zonas con nombre confirmado (CON-882 da "Right Hard Palate, Right Middle Dorsal Tongue, etc."; el
+   Figma usa "Soft Palate", "Upper Arch", "Lower Lip"); el resto de las zonas del gráfico espera su lista, no se inventa. */
+export const INTRAORAL_REGIONS = ['Right Hard Palate', 'Left Hard Palate', 'Soft Palate'] as const
+export type IntraOralRegion = (typeof INTRAORAL_REGIONS)[number]
 
 /* El catálogo de "New Condition" en Extraoral/Intraoral es propio, no el de procedimientos (D-codes): condiciones
    morfológicas con su búsqueda y filtro aparte. Sólo estas tres aparecieron en las grabaciones; el buscador de la app

@@ -1,13 +1,11 @@
 import { cn } from '@/lib/utils'
-import { FieldLabel } from '@/components/patients/form'
 import { DESCRIPTOR_ROWS, type DescriptorRow } from './data'
 
-/* La guía visual de descriptores de una condition (Figma *Platform Design*, 5294:107675, pantalla "Edit Finding").
-   Ahí cada fila va en una grilla fija de 5 columnas, con el rótulo a la izquierda de las píldoras -algo que sólo
-   cierra con exactamente 5 opciones, y la mitad de las filas tiene menos-. Acá el rótulo pasa a `FieldLabel` arriba,
-   como el resto del drawer (Provider, Surfaces, Notes), y las píldoras envuelven: mismo ritmo vertical que las otras
-   secciones, sin columnas vacías. Cada fila es de una sola elección y ninguna es obligatoria; tocar la píldora ya
-   marcada la deselecciona. Ver design-reference/figma/modulos/clinical-mode.md. */
+/* La guía visual de descriptores de una condition, con el diseño de Figma *Platform Design* 5294:107675 ("Edit Finding",
+   Selected Descriptors): una fila por atributo, con el rótulo a la izquierda y las opciones como un control segmentado
+   -caja gris con la elegida en azul-. La lógica es la nuestra: cada fila es de una sola elección y ninguna es
+   obligatoria; tocar la opción ya marcada la deselecciona, y las filas con muchas opciones (Colors) pasan a otra línea
+   en vez de achicarse. Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
 export function DescriptorFields({
   value, onChange, rows = DESCRIPTOR_ROWS,
 }: {
@@ -16,11 +14,11 @@ export function DescriptorFields({
   rows?: DescriptorRow[]
 }) {
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex w-full flex-col gap-5">
       {rows.map((row) => (
-        <div key={row.id} className="flex w-full flex-col gap-1.5">
-          <FieldLabel>{row.label}</FieldLabel>
-          <div className="flex flex-wrap gap-1.5">
+        <div key={row.id} role="group" aria-label={row.label} className="flex w-full items-center gap-3">
+          <span className="w-[72px] shrink-0 text-[10px] leading-[14px] font-semibold text-ink">{row.label}</span>
+          <div className="flex min-w-0 flex-1 flex-wrap gap-1 rounded-[4px] bg-surface-muted p-[3px]">
             {row.options.map((opt) => {
               const on = value[row.id] === opt
               return (
@@ -28,8 +26,8 @@ export function DescriptorFields({
                   key={opt} type="button" aria-pressed={on}
                   onClick={() => onChange({ ...value, [row.id]: on ? '' : opt })}
                   className={cn(
-                    'rounded-md px-2.5 py-1 text-[11px] font-semibold transition-colors',
-                    on ? 'bg-dash-blue text-white' : 'text-ink-muted hover:bg-surface-subtle',
+                    'min-w-[52px] flex-1 rounded-[4px] px-2 py-[3px] text-center text-[10px] leading-[14px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-dash-blue',
+                    on ? 'bg-dash-blue text-white' : 'text-ink-muted hover:bg-white',
                   )}
                 >
                   {opt}
