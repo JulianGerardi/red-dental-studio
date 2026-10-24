@@ -1144,3 +1144,52 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
   elegida lleva una **✕** para quitarla (relationships.md, 2026-10-21). *States → Person search* muestra el desplegable abierto, la elegida y la deshabilitada.
 - *Pages / Parts / Patient modals* y *Pages / Parts / Relationships*: New Patient (un paso por story, con sus errores), Edit Patient (pestañas, sin portal, error en otra sección), los campos
   sueltos y los pop ups de archivar, quitar Guardian y reactivar.
+
+## `DescriptorFields`: la guía visual de descriptores de una condition (2026-10-22)
+
+- Julián pasó el Figma *Platform Design* (5294:107675, "Edit Finding") pidiendo mejorar esa guía: trece filas -Borders,
+  Attachment, Color, Depth, Shape, Size, Color (de nuevo), Surface, Consistency, Mobility, Pain, Bleeding, Exudate-,
+  cada una con sus opciones como píldoras de una sola elección. `Finding.descriptor` era un texto libre que ni New
+  Condition ni Edit Finding tocaban.
+- **`DescriptorFields`** (nuevo, *Components / Clinical / Dental / DescriptorFields*): `FieldLabel` arriba de cada fila
+  -como Provider y Notes del mismo drawer- y las píldoras envolviendo debajo, en vez de la grilla fija de 5 columnas
+  del frame (ocho de las trece filas tienen menos de 5 opciones). Ninguna fila es obligatoria; tocar la ya elegida la
+  deselecciona.
+- La usan **New Condition** -paso nuevo *Descriptors*, opcional, sólo desde Add Condition- y **Edit Finding** -misma
+  sección, sólo si `finding.kind === 'condition'`-. Un procedure no la lleva.
+- **No se construyó** el flujo real de Add Condition de Extraoral (red.dev): el entorno de esta sesión no tiene acceso
+  a `red.dev.confidentally.com`. Queda pendiente con acceso real o capturas; no se inventó el diagrama de regiones.
+- Decisión completa, las cuatro erratas del frame copiadas tal cual (Peculate, Ulcerate, Smoothr, la fila "Color"
+  repetida) y por qué no se filtran las trece filas por tipo de condition, en `figma/modulos/clinical-mode.md`
+  (2026-10-22).
+
+## `DescriptorFields`: las doce filas reales, no las del Figma (2026-10-24)
+
+- Julián consiguió acceso a red.dev y mandó grabaciones de pantalla de Extraoral e Intraoral: la guía de descriptores
+  de la vuelta anterior copiaba el Figma, pero la app real usa otro catálogo -igual en los dos exámenes-, sin ninguna
+  de las erratas que se habían documentado como anomalía.
+- `DESCRIPTOR_ROWS` pasa a **Quantity, Symmetry, Size, Shape, Borders, Colors, Surface, Consistency, Mobility, Pain,
+  Bleeding, Exudate** (doce filas), con las opciones de la app real.
+- Extraoral e Intraoral siguen sin construirse -el gráfico de regiones clickeables necesita sus límites exactos, que
+  no se pueden sacar con precisión de una grabación-, pero quedan documentados el catálogo de condición (propio, no
+  el de procedimientos), el flujo de dos pasos y el formato de la card ("Location:" con varias regiones).
+- De paso se ve que **Edit Procedure en la app real es un modal centrado** (General Information + pestañas
+  Findings/Diagnostics), no el drawer con pasos de acá. No se tocó: ese drawer fue un pedido explícito de Julián como
+  excepción a la regla de no usar drawers (2026-10-03); cambiarlo queda pendiente de que lo confirme.
+- Decisión completa, con las regiones y la card vistas en las grabaciones, en `figma/modulos/clinical-mode.md`
+  (2026-10-24).
+
+## Extraoral: el gráfico de regiones, nuevo (2026-10-24)
+
+- Nuevas: *Components / Clinical / Dental / ExtraOralDiagram* y *RegionConditionDrawer*, *Components / Clinical /
+  ExtraOralExam*. Extraoral deja el `EmptyState` genérico.
+- El gráfico (cuatro vistas de cabeza, siete regiones clickeables) es **SVG propio, no la imagen del Figma** -se
+  probó sacarle con inpainting la región de ejemplo que trae pintada y no salió limpio-: mismo criterio que el
+  `Odontogram` ("no una foto"). Los límites de cada región son una aproximación, sin fuente vectorial.
+- **Add Condition abre un drawer propio** (por región, no por diente): dos pasos, catálogo de condición aparte del de
+  procedimientos (Atrophy, Blister, Abscess vistas en las grabaciones), y la misma guía de `DescriptorFields` como
+  paso 2. `ExamLayout` suma `onCondicion` para que un examen reemplace el `NewProcedureDrawer` genérico por el suyo;
+  Add Procedure sigue sin cambios.
+- Decisión completa -por qué no se usó la imagen del Figma, qué vieron las grabaciones y qué queda pendiente
+  (catálogo de condición completo, límites de las regiones, si la card debería mostrar la condition en negrita como
+  la app real)- en `figma/modulos/clinical-mode.md` (2026-10-24).

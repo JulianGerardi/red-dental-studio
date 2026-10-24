@@ -46,16 +46,42 @@ test('Surfaces aparece sólo con un procedimiento de diente + superficie', async
   await drawer.getByRole('button', /^Save/).tap()
 })
 
-test('Existing no tiene Link to finding: sin superficie se guarda en un paso', async ({ app, screen }) => {
+test('Existing no tiene Link to finding: Descriptors es el único paso antes de guardar', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', 'DentAssmt').first().tap()
   await screen.getByRole('button', 'Add Condition').tap()
 
   const drawer = screen.getByRole('dialog', 'New Condition')
   await drawer.getByRole('button', 'D2740 on tooth').tap()
-  await expect(drawer.getByRole('button', /Next Step/)).toHaveCount(0)
+  // Sin superficie, Descriptors es el paso que sigue a Procedure; no hay Link to finding/diagnosis en una condition.
+  await drawer.getByRole('button', /Next Step/).tap()
+  await expect(drawer.getByText(/tap a pill again to clear it/i)).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/D2740 charted as existing/)).toBeVisible()
+})
+
+/* La guía visual de descriptores (Figma Platform Design, 5294:107675): se elige al crear la condition y se puede
+   corregir después desde Edit, sin perder lo que no se tocó. */
+test('Add Condition con descriptores: se eligen al crear y se corrigen desde Edit', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'DentAssmt').first().tap()
+  await screen.getByRole('button', 'Add Condition').tap()
+
+  const drawer = screen.getByRole('dialog', 'New Condition')
+  await drawer.getByRole('button', 'D2740 on tooth').tap()
+  await drawer.getByRole('button', /Next Step/).tap()
+  await drawer.getByRole('button', 'Painful').tap()
+  await drawer.getByRole('button', 'Round').tap()
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText(/D2740 charted as existing/)).toBeVisible()
+  await expect(screen.getByText('Descriptors: Painful, Round')).toBeVisible()
+
+  await screen.getByRole('button', /^Actions for Tooth 13$/).tap()
+  await screen.getByRole('menuitem', 'Edit').tap()
+  const editar = screen.getByRole('dialog', 'Edit Finding')
+  await editar.getByRole('button', 'Painless').tap()
+  await editar.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText('Descriptors: Painless, Round')).toBeVisible()
 })
 
 test('Overview: el chart de DentAssmt muestra la última condición y sigue a Add Condition', async ({ app, screen }) => {
@@ -68,6 +94,7 @@ test('Overview: el chart de DentAssmt muestra la última condición y sigue a Ad
   await screen.getByRole('button', 'Add Condition').tap()
   const drawer = screen.getByRole('dialog', 'New Condition')
   await drawer.getByRole('button', 'D2740 on tooth').tap()
+  await drawer.getByRole('button', /Next Step/).tap()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/D2740 charted as existing/)).toBeVisible()
 
@@ -206,4 +233,27 @@ test('el menú de un finding del examen abre su registro', async ({ app, screen 
   await expect(drawer.getByText('Source exam')).toBeVisible()
   await drawer.getByRole('button', /^D2391 · Resin-based composite/).tap()
   await expect(screen.getByRole('dialog', /D2391 · Resin-based composite/)).toBeVisible()
+})
+
+/* Extraoral: el gráfico de regiones reemplaza el odontograma. Add Condition abre el drawer propio (por región, no por
+   diente), con lo ya elegido en el gráfico. */
+test('Extraoral: elegir regiones en el gráfico y cargar una condition', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'Extra Oral').tap()
+
+  await screen.getByRole('button', /^Scalp$/).tap()
+  await screen.getByRole('button', /^Right Forehead$/).first().tap()
+  await screen.getByRole('button', 'Add Condition').tap()
+
+  const drawer = screen.getByRole('dialog', 'New Condition')
+  await expect(drawer.getByText('Scalp')).toBeVisible()
+  await expect(drawer.getByText('Right Forehead')).toBeVisible()
+  await drawer.getByRole('button', /^Atrophy/).tap()
+  await drawer.getByRole('button', /select descriptors/i).tap()
+  await drawer.getByRole('button', 'Painful').tap()
+  await drawer.getByRole('button', /^Save/).tap()
+
+  await expect(screen.getByText(/Atrophy charted on Scalp, Right Forehead/)).toBeVisible()
+  await expect(screen.getByText('Condition: Atrophy (morphologic abnormality)')).toBeVisible()
+  await expect(screen.getByText('Descriptors: Painful')).toBeVisible()
 })

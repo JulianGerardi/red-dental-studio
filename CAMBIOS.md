@@ -5,6 +5,23 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-24
 
+### Clinical Mode: guía visual de descriptores y Extraoral con gráfico de regiones ([#78](https://github.com/JulianGerardi/red-dental-studio/pull/78))
+- **Guía visual de descriptores** (`DescriptorFields`, nuevo): doce filas de una sola elección —Quantity, Symmetry,
+  Size, Shape, Borders, Colors, Surface, Consistency, Mobility, Pain, Bleeding, Exudate—, tomadas de la app real
+  (grabaciones de pantalla en Extraoral e Intraoral). Se eligen al crear una condition (paso *Descriptors* en Add
+  Condition) y se corrigen después desde Edit Finding, ya precargadas. Add/Edit Procedure no cambia.
+- **Extraoral** deja el placeholder genérico: `ExtraOralDiagram` (gráfico de 4 vistas de cabeza, SVG propio, 7
+  regiones clickeables con multi-selección) y `RegionConditionDrawer` (Add Condition por región, no por diente;
+  catálogo de condición propio —Atrophy, Blister, Abscess—, con la misma guía de descriptores como paso 2).
+- **Para el dev:** `Finding` suma `kind?: 'procedure' | 'condition'` y `descriptors?: Record<string, string>`.
+  `ExamLayout` suma `onCondicion?: () => void` (reemplaza el `NewProcedureDrawer` genérico por el drawer propio de un
+  examen) y el hook `useFindingsEstado`. `DrawerActions` suma `nextLabel` opcional (default "Next Step", no cambia
+  ningún otro drawer).
+- **Pendiente, sin inventar:** los límites exactos de cada región del gráfico (sin fuente vectorial real), el
+  catálogo completo de condiciones de Extraoral/Intraoral, y si la card de un finding debería mostrar la condition en
+  negrita como la app real (afectaría a todos los exámenes). Ver `figma/modulos/clinical-mode.md` (2026-10-22 y
+  2026-10-24).
+
 ### Docs: Storybook al final de la tanda y la lógica de la app linkeada a Jira ([#76](https://github.com/JulianGerardi/red-dental-studio/pull/76))
 - **Storybook al final.** Documentar en Storybook consume mucho crédito: ahora se hace como último paso, cuando Julián lo
   pide, después de que la app esté aprobada y publicada. Antes de eso sólo va la sección con fecha del `.md` del

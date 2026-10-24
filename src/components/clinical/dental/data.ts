@@ -102,7 +102,51 @@ export type Finding = {
   examen?: string
   /** La fila de la Problem List que es este hallazgo: de ahí salen sus procedimientos, caso y derivaciones. */
   problema?: string
+  /** De qué botón se cargó (Add Procedure o Add Condition): sólo una condition lleva la guía visual de descriptores. */
+  kind?: 'procedure' | 'condition'
+  /** La guía visual de descriptores: una opción por fila, por id de fila. `descriptor` sigue siendo el texto que se ve
+     en la card -lo elegido acá, unido con coma-, para no duplicar esa lectura en todos lados. */
+  descriptors?: Record<string, string>
 }
+
+/* La guía visual de descriptores de una condition: una fila por atributo, con sus opciones como píldoras de una sola
+   elección, ninguna obligatoria. Doce filas, tomadas de la app real (red.dev, Extraoral e Intraoral, New Condition
+   paso 2 "Select descriptors") -no del Figma *Platform Design* 5294:107675, que traía otro set (Borders, Attachment,
+   Depth, Color x2...): esta es la que usa la pantalla real, igual en los dos exámenes (Julián, grabación de pantalla,
+   2026-10-24). Pendiente confirmar si también es la de Radiography/Dental Assessment. */
+export type DescriptorRow = { id: string; label: string; options: string[] }
+export const DESCRIPTOR_ROWS: DescriptorRow[] = [
+  { id: 'quantity', label: 'Quantity', options: ['Solitary', 'Multiple diffuse', 'Multiple coalescing'] },
+  { id: 'symmetry', label: 'Symmetry', options: ['Unilateral', 'Bilateral'] },
+  { id: 'size', label: 'Size', options: ['Small (e.g., 0.5 cm)', 'Medium (e.g., 1-2 cm)', 'Large (e.g., >2 cm)'] },
+  { id: 'shape', label: 'Shape', options: ['Round', 'Oval', 'Irregular', 'Linear'] },
+  { id: 'borders', label: 'Borders', options: ['Well demarcated', 'Poorly defined', 'Raised', 'Flat'] },
+  { id: 'colors', label: 'Colors', options: ['Red', 'Pale', 'Pink', 'White', 'Gray', 'Blue', 'Brown', 'Black', 'Yellow'] },
+  { id: 'surface', label: 'Surface', options: ['Smooth', 'Rough', 'Papillated', 'Ulcerated', 'Hairy'] },
+  { id: 'consistency', label: 'Consistency', options: ['Hard', 'Soft', 'Firm', 'Fluctuant', 'Indurated'] },
+  { id: 'mobility', label: 'Mobility', options: ['Fixed', 'Movable'] },
+  { id: 'pain', label: 'Pain', options: ['Painful', 'Painless'] },
+  { id: 'bleeding', label: 'Bleeding', options: ['Present', 'Absent'] },
+  { id: 'exudate', label: 'Exudate', options: ['Absent', 'Serous', 'Purulent', 'Bloody'] },
+]
+
+/* Extra Oral: regiones de la cabeza, no dientes -el área se elige clickeando el gráfico, de a una o varias a la vez.
+   Confirmado en grabaciones de pantalla de red.dev (Julián, 2026-10-24); seguro hay más de las siete que aparecieron
+   ahí -quedan pendientes hasta verlas-. Mismo catálogo e interacción que Intraoral, pero con otro gráfico. */
+export const EXTRAORAL_REGIONS = [
+  'Scalp', 'Right Forehead', 'Left Forehead', 'Right Eye', 'Left Eye', 'Right Posterior Head', 'Left Posterior Head',
+] as const
+export type ExtraOralRegion = (typeof EXTRAORAL_REGIONS)[number]
+
+/* El catálogo de "New Condition" en Extraoral/Intraoral es propio, no el de procedimientos (D-codes): condiciones
+   morfológicas con su búsqueda y filtro aparte. Sólo estas tres aparecieron en las grabaciones; el buscador de la app
+   real sugiere que hay más -no se inventan sin verlas-. */
+export type RegionCondition = { code: string; label: string; group: string }
+export const REGION_CONDITIONS: RegionCondition[] = [
+  { code: 'atrophy', label: 'Atrophy', group: 'morphologic abnormality' },
+  { code: 'blister', label: 'Blister', group: 'morphologic abnormality' },
+  { code: 'abscess', label: 'Abscess', group: 'morphologic abnormality' },
+]
 
 /* Existing: algo que el paciente ya tiene hecho (una condition ya hecha); Planned: lo que se va a hacer. En Existing sólo
    aparecen los procedimientos que quedan en la boca (restauraciones, endodoncias, implantes y prótesis). */

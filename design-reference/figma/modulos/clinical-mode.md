@@ -2464,3 +2464,186 @@ UI y el catálogo de procedimientos no cambian, sólo cuándo se guarda cada par
 Código: `clinical/dental/NewProcedureDrawer.tsx`, `clinical/ExamLayout.tsx`.
 Design system: *Components / Clinical / Dental / NewProcedureDrawer* (Parts, Specs y los estados `LinkToFindingStep` /
 `LinkToDiagnosisStep` actualizados).
+
+## La guía visual de descriptores de una condition (2026-10-22)
+
+Julián pasó el Figma *Platform Design* (5294:107675, pantalla "Edit Finding") pidiendo una mejora de esa guía visual:
+trece filas -Borders, Attachment, Color, Depth, Shape, Size, Color (de nuevo), Surface, Consistency, Mobility, Pain,
+Bleeding, Exudate-, cada una con sus opciones como píldoras de una sola elección. Hoy `Finding.descriptor` es un solo
+texto libre y ni New Condition ni Edit Finding lo tocan: se ve, no se carga ni se edita.
+
+También pidió revisar el flujo real de Add Condition en **Extraoral** (red.dev, un examen todavía sin construir acá,
+con el `EmptyState` genérico), copiando esa pantalla. **No se pudo**: `red.dev.confidentally.com` no resuelve desde
+esta sesión en la nube -la política de red del entorno no lo tiene en *Allowed domains*-, y agregarlo a mitad de
+sesión tampoco alcanzó (el proxy lo siguió rechazando). Queda pendiente para una vuelta con acceso real o con capturas
+de Julián; no se inventa el diagrama de regiones de Extraoral ni su flujo de Add Condition sin esa referencia.
+
+**Lo que sí se hizo, con lo que había (el Figma, alcanzable):**
+
+1. **`DescriptorFields`** (`dental/DescriptorFields.tsx`), nuevo: las trece filas de `DESCRIPTOR_ROWS` (`dental/data.ts`),
+   cada una con su `FieldLabel` arriba -como Provider, Surfaces y Notes del mismo drawer- y las píldoras envolviendo
+   debajo, en vez de la grilla fija de 5 columnas del frame -ahí sólo cierra con exactamente 5 opciones, y ocho de las
+   trece filas tienen menos y dejan columnas vacías-. Una elección por fila, ninguna obligatoria; tocar la píldora ya
+   elegida la deselecciona (el frame no muestra esto, pero una guía con todo opcional necesita poder volver a "nada
+   elegido"). `textoDescriptores` arma el texto de `Finding.descriptor` -lo que ve la card- con lo elegido, unido por
+   coma.
+2. **Nueva en New Condition, nunca en Add Procedure**: el paso **Descriptors** -opcional, no bloquea Next Step/Save-
+   aparece sólo con `mode="condition"`, después de Procedure (y Surfaces, si corresponde) y antes de guardar. Un
+   procedure no tiene esta guía: su "descriptor" sigue saliendo de la superficie o el alcance, como hoy.
+3. **Edit Finding** suma la misma sección, cargada con lo que el finding ya tenía, sólo si `finding.kind === 'condition'`.
+   `Finding` suma `kind?: 'procedure' | 'condition'` -qué botón lo cargó- y `descriptors?: Record<string, string>` -la
+   guía, por id de fila-; `ExamLayout.saveProcedure` los completa al crear.
+4. **Corrige el punto 3 de "vincular pide un procedimiento ya cargado" (2026-10-20):** Existing ya no es siempre un
+   solo paso sin indicador. Sin superficie son dos (Procedure, Descriptors); con superficie, tres. Sigue sin Link to
+   finding/diagnosis -lo ya hecho no resuelve un hallazgo-, que es lo que decía ese punto.
+
+**Sin resolver, a propósito:** las trece filas son siempre las mismas para cualquier condition -el frame tampoco
+filtra-, así que una caries (D2391) muestra Attachment, Mobility o Bleeding, que son de una lesión de tejido blando,
+no de una pieza. Con sólo este Figma como referencia no hay de dónde sacar qué fila va con qué condition sin
+inventarlo; **a validar con Julián** si conviene agrupar o filtrar por tipo en otra vuelta, con una fuente (red.dev o
+el catálogo clínico) que diga qué corresponde a cada una.
+
+### Anomalías del frame (5294:107675)
+
+| # | Que | Donde |
+|---|---|---|
+| 98 | Attachment dice **"Peculate"** (Pedunculate) | Edit Finding |
+| 99 | Depth dice **"Ulcerate"** (Ulcerated) | Edit Finding |
+| 100 | Dos filas se llaman **"Color"**: Normal/White/Red/Yellow y, más abajo, Red/Purple/Brown | Edit Finding |
+| 101 | Consistency dice **"Smoothr"** (Smooth) | Edit Finding |
+
+Se replican las cuatro (contenido, como "Adress"): van tal cual en `DESCRIPTOR_ROWS`. **No se replica** que
+Consistency repite "Papillated" dos veces -esa fila tiene Hard, Smoothr, Papillated, Papillated, Hairy en el frame-:
+es un bug de lista, como la paginación `1 2 3 4 5 3` de la anomalía 71, no una opción.
+
+Código: `clinical/dental/DescriptorFields.tsx`, `clinical/dental/data.ts` (`DESCRIPTOR_ROWS`, `Finding.kind`,
+`Finding.descriptors`), `clinical/dental/NewProcedureDrawer.tsx`, `clinical/dental/EditFindingDrawer.tsx`,
+`clinical/ExamLayout.tsx` (`saveProcedure`).
+Design system: *Components / Clinical / Dental / DescriptorFields* (nueva), *NewProcedureDrawer* (paso Descriptors en
+Parts/Specs, estado `DescriptorsStep`) y *EditFindingDrawer* (sección Descriptors, estado `ProcedureFinding` sin
+ella).
+
+## Las doce filas reales, no las del Figma (2026-10-24)
+
+Julián consiguió acceso real a red.dev (el bloqueo de red de esta sesión en la nube se resolvió) y mandó, además,
+dos grabaciones de pantalla navegando **Extraoral** e **Intraoral** -de ahí sale todo lo de más abajo-. Primer dato
+importante: la guía visual de descriptores de la vuelta anterior (2026-10-22) copiaba el Figma *Platform Design*
+(5294:107675), pero **la app real usa otro catálogo**, igual en los dos exámenes. Se reemplaza `DESCRIPTOR_ROWS` por
+el real; las cuatro anomalías de la sección anterior (Peculate, Ulcerate, Smoothr, la fila "Color" repetida) ya no
+aplican -eran erratas del frame viejo, no de este catálogo-.
+
+**Las doce filas** (`dental/data.ts`, `DESCRIPTOR_ROWS`), confirmadas en los dos exámenes:
+
+| Fila | Opciones |
+|---|---|
+| Quantity | Solitary · Multiple diffuse · Multiple coalescing |
+| Symmetry | Unilateral · Bilateral |
+| Size | Small (e.g., 0.5 cm) · Medium (e.g., 1-2 cm) · Large (e.g., >2 cm) |
+| Shape | Round · Oval · Irregular · Linear |
+| Borders | Well demarcated · Poorly defined · Raised · Flat |
+| Colors | Red · Pale · Pink · White · Gray · Blue · Brown · Black · Yellow |
+| Surface | Smooth · Rough · Papillated · Ulcerated · Hairy |
+| Consistency | Hard · Soft · Firm · Fluctuant · Indurated |
+| Mobility | Fixed · Movable |
+| Pain | Painful · Painless |
+| Bleeding | Present · Absent |
+| Exudate | Absent · Serous · Purulent · Bloody |
+
+Sin erratas que anotar esta vez: son los rótulos tal cual los escribe la app real.
+
+### Lo que las grabaciones muestran de Extraoral e Intraoral (sin construir todavía)
+
+No alcanza el tiempo de esta tanda para armar las dos pantallas enteras, pero queda documentado para la próxima:
+
+1. **El gráfico tiene regiones clickeables, de verdad.** Extraoral son cuatro vistas de cabeza (perfil izquierdo,
+   frente, nuca, perfil derecho); Intraoral, boca y lengua desde dos ángulos. Clickear una región la resalta
+   (amarillo mientras se está por cargar; verde azulado cuando ya tiene una condition activa).
+2. **Se pueden elegir varias regiones a la vez** antes de cargar la condition: cada una queda como chip en "Selected
+   area", con su ✕ para sacarla. Regiones vistas: Scalp, Right/Left Posterior Head, Right/Left Forehead, Right/Left
+   Eye (Extraoral); Right/Left Maxillary Gingiva, Right Mandibular Gingiva, Right/Left Ventral Tongue, Right Hard
+   Palate, Soft Palate (Intraoral). Seguro hay más: esto es sólo lo que aparece en las dos grabaciones.
+3. **"Add Condition" es un catálogo propio, no el de procedimientos**: en las grabaciones, "Atrophy (morphologic
+   abnormality)", "Blister (morphologic abnormality)", "Abscess (morphologic abnormality)" y "No Findings". El
+   buscador dice "Search a Condition Here...", con un botón "Filter" al lado.
+4. **Dos pasos, mismo título "New Condition", sin indicador de pasos visible**: 1) área + catálogo de condición, con
+   "Select descriptors" como botón de avance (no "Next Step"); 2) las doce filas de arriba, con "Save". Ninguna fila
+   es obligatoria: las condiciones de ejemplo quedan con 2 a 12 filas elegidas, nunca las doce completas.
+5. **La card del finding dice "Location:"**, no "Area", con las regiones separadas por coma si son varias, y
+   "Descriptors:" sólo con lo elegido (overflow como "+9 more").
+6. **Add Procedure no cambia**: catálogo de códigos, pestañas Existing/Planned -igual al `NewProcedureDrawer` que ya
+   existe acá-.
+7. **Edit Procedure es un modal centrado**, no el drawer con pasos de acá: General Information a la izquierda (Created
+   date, Status, Fee, el código, Provider, Note) y, a la derecha, pestañas **Findings**/**Diagnostics** -el mismo
+   buscador de vincular, pero las dos conviven en pestañas en vez de ser pasos sucesivos del wizard-. **No se tocó**:
+   `NewProcedureDrawer` sigue siendo drawer, que fue un pedido explícito de Julián (2026-10-03) como excepción a la
+   regla de no usar drawers; cambiarlo a este modal de dos columnas queda pendiente de que lo confirme, no es un
+   cambio que se decida solo.
+
+No se armó el gráfico de regiones (necesitaría los límites de cada zona, que no se pueden sacar con precisión de
+pixeles de una grabación) ni el catálogo de condiciones por examen. Extraoral sigue con el `EmptyState` genérico.
+
+Código: `clinical/dental/data.ts` (`DESCRIPTOR_ROWS`).
+Design system: *Components / Clinical / Dental / DescriptorFields* (Playground, Parts y States actualizados con el
+catálogo real).
+
+## Extraoral: el gráfico de regiones (2026-10-24)
+
+Julián pidió seguir con Extraoral en la misma tanda. Dos fuentes nuevas, además de las grabaciones:
+
+1. **El Figma real tiene las cuatro vistas de cabeza**, como imagen plana (nodo 4106:157537/4106:158958 de *Platform
+   Design*, página "Clinical Exam — Extra Oral"), con una región ya pintada de ejemplo. Se intentó sacarle esa pintura
+   con inpainting (OpenCV, TELEA y Navier-Stokes) para reusarla como base limpia: **no salió bien** -quedan manchas y
+   un borde fantasma en la frente, la parte más visible de las cuatro vistas-, así que no se usó. El PNG de
+   `extra-oral-diagram.ts` (ya en el repo de una vuelta anterior) es este mismo asset, en baja resolución.
+2. **Jira** (CON-2770, CON-2066, CON-1860, CON-2063): confirma que el área se guarda como `location` -una región con
+   nombre, no un diente- y que el gráfico es clickeable de verdad.
+
+**Se construye el gráfico como SVG propio**, no la imagen del Figma ni una reinterpretación de ella: mismo criterio que
+el `Odontogram` ("no una foto", más arriba en este archivo). `ExtraOralDiagram.tsx` dibuja las cuatro vistas -perfil
+derecho, frente, nuca, perfil izquierdo, el orden de una foto clínica- a mano, con las siete regiones vistas en las
+grabaciones (Scalp, Right/Left Forehead, Right/Left Eye, Right/Left Posterior Head) como `<path>` clickeables.
+**Los límites de cada región son una aproximación** -no hay fuente vectorial de la app real, se estimaron a ojo sobre
+capturas de video-; ajustar cuando haya más referencia. Una región puede dibujarse en más de una vista (Right/Left
+Forehead, en su perfil y en el frente) y todas sus formas se marcan juntas. Scalp queda sólo en el frente por ahora:
+en las grabaciones también se veía en los dos perfiles, pero ahí se pisaba con Forehead/Posterior Head -pendiente
+para la próxima pasada, con más espacio en el dibujo-.
+
+**Estados del color, los mismos tokens que ya usa la app**: `pending` (ámbar, `warn-fg`, mientras se elige antes de
+guardar) y `active` (verde, `dash-ok-fg`, el mismo de un finding Active) -nada de colores nuevos.
+
+**El flujo, calcado de las grabaciones**:
+
+1. Clickear una o más regiones las agrega a "pending" -queda en ámbar-, estén o no con el drawer abierto.
+2. **Add Condition** abre `RegionConditionDrawer`: dos pasos, los dos titulados "New Condition" (la app real no
+   muestra un indicador de pasos; acá sí, como todos los drawers del sistema). Paso 1, **Condition**: las regiones
+   elegidas como chips removibles y el catálogo de condición -propio, no el de procedimientos: sólo **Atrophy**,
+   **Blister** y **Abscess** (todas "morphologic abnormality") aparecieron en las grabaciones, seguro hay más y no se
+   inventan sin verlas-. El botón de avance dice **"Select descriptors"**, no "Next Step" -así lo dice la app real-,
+   y se suma un `nextLabel` opcional a `DrawerActions` para esto (con "Next Step" de default, no cambia ningún otro
+   drawer). Paso 2, **Descriptors**: la misma guía visual de `DescriptorFields`.
+3. **Save** crea el finding -`kind: 'condition'`, `area` con las regiones unidas por coma, `examen: 'Extraoral'`- y
+   limpia la selección; las regiones quedan en verde.
+
+**`ExamLayout` suma `onCondicion`**, opcional: si se pasa, Add Condition lo llama en vez de abrir el
+`NewProcedureDrawer` genérico (que siempre carga contra un diente). Add Procedure no cambia -sigue siendo el genérico,
+pendiente para otra vuelta; CON-2063 sugiere que ahí el área se autodetecta como "todo el examen", no se elige una
+región, pero no alcanza a verse bien en las grabaciones-. También se suma `useFindingsEstado`, el hook para que un
+examen con su propio Add Condition pueda guardar un finding directo (sin pasar por `NewProcedureDrawer`); `ExtraOralExam`
+se envuelve en su propio `ExamFindingsProvider` si no hay uno puesto (para andar suelto en Storybook, como ya podía
+`DentalAssessmentExam` con su fallback).
+
+**Lo que vieron las grabaciones y no se replicó, a propósito**:
+
+- La card de un finding muestra la **condition en negrita** arriba ("Atrophy (morphologic abnormality)") y
+  "Location:"/"Exams:" como líneas con rótulo debajo; acá `FindingCard` sigue mostrando el área en negrita y
+  "Condition:" como línea, la decisión ya documentada en "Findings según el design system" (más arriba). Son dos
+  formatos de card distintos -no sólo Extraoral: cambiaría la de todos los exámenes-. **A confirmar con Julián** antes
+  de tocarlo.
+- El catálogo de condición completo (más que Atrophy/Blister/Abscess) y los límites exactos de cada región: sin una
+  fuente mejor que un video, no se inventan.
+
+Código: `clinical/ExtraOralExam.tsx`, `clinical/dental/ExtraOralDiagram.tsx`, `clinical/dental/RegionConditionDrawer.tsx`,
+`clinical/dental/data.ts` (`EXTRAORAL_REGIONS`, `REGION_CONDITIONS`), `clinical/ExamLayout.tsx` (`onCondicion`,
+`useFindingsEstado`), `ui/drawer.tsx` (`DrawerActions.nextLabel`), `pages/ClinicalMode.tsx`.
+Design system: *Components / Clinical / Dental / ExtraOralDiagram* y *RegionConditionDrawer* (nuevas), *Components /
+Clinical / ExtraOralExam* (nueva).
