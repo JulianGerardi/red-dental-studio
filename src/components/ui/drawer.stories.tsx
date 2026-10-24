@@ -4,6 +4,7 @@ import { Drawer, DrawerActions, DrawerSection, DrawerStep, type DrawerSize } fro
 import { Button } from './button'
 import { TextField, SelectField, TextArea, OptionCheckbox, FieldLabel } from '@/components/patients/form'
 import { DatePicker } from './date-picker'
+import { Tabs } from './tabs'
 import { Bloque, ConRotulo, Lienzo, Muestras, Tabla } from '@/design-system/kit'
 
 type Args = { title: string; description: string; steps: number; size: DrawerSize; open: boolean }
@@ -27,6 +28,8 @@ const meta = {
           '**Campos (Julián, 2026-10-10):** de a dos y del mismo ancho, en `grid gap-4 sm:grid-cols-2`: cada campo llena su celda; nunca anchos fijos, `flex-wrap` ni tres por fila. El que queda solo va en la columna izquierda; sólo Notes y la búsqueda de paciente o persona ocupan el ancho entero. Las casillas, una debajo de la otra. Se controla con `npm run ds:campos`. Ver *Parts → Fields* y *Specs → Fields*.',
           '',
           '**Pasos:** cada paso dice su nombre (General, Contact, Address…), así el usuario sabe qué está haciendo. Al avanzar, el tilde rebota, la línea se llena en verde y el contenido entra desde la derecha (con Return, desde la izquierda).',
+          '',
+          '**Pestañas en vez de pasos** (`tabs`, 2026-10-22): al *editar* algo que ya existe, las secciones van en pestañas debajo del título —todas a un clic, con los datos cargados— y un solo *Save Changes* guarda todo, desde cualquier pestaña; cambiar de pestaña no guarda. Si algo falla en otra sección, esa pestaña se marca y el foco va al campo. Los pasos quedan para *crear* (New Patient), donde el orden ayuda. Ver *Parts → Tabs* y *Pages / Parts / Patient modals*.',
           '',
           '**Con poco alto de ventana** (2026-10-19): un paso con muchos campos (New Appointment, paso 1) puede no entrar entero. El contenido scrollea solo, pero el pie no se movía y el último campo quedaba cortado contra él sin ningún aviso (parecía un bug, no que seguía con scroll). Ahora, mientras falte contenido por ver, el pie lleva una sombra arriba, igual que una barra elevada tapando lo que sigue debajo; al llegar al final se va. Ver *Parts → Footer shadow*.',
           '',
@@ -126,6 +129,18 @@ export const Parts: Story = {
               </div>
             </ConRotulo>
           ))}
+        </Muestras>
+      </Bloque>
+      <Bloque titulo="Tabs" nota="En lugar del indicador de pasos, justo debajo del título: la caja gris de Elements / Tabs a todo el ancho. El pie lleva Cancel y Save Changes (DrawerActions con saveLabel), siempre los dos, en cualquier pestaña.">
+        <Muestras>
+          <ConRotulo rotulo="Tabs slot">
+            <div className="w-[360px]"><Tabs fullWidth aria-label="Sections" value="General" onChange={() => {}} tabs={['General', 'Guardian', 'Demography']} /></div>
+          </ConRotulo>
+          <ConRotulo rotulo="Footer">
+            <div className="flex w-[320px] items-center gap-3 rounded-lg border border-line p-4 [&>button]:flex-1">
+              <DrawerActions onCancel={() => {}} onSave={() => {}} saveLabel="Save Changes" />
+            </div>
+          </ConRotulo>
         </Muestras>
       </Bloque>
       <Bloque titulo="Footer shadow" nota="El drawer mide si el contenido sigue por abajo (scrollHeight contra clientHeight, con ResizeObserver) y le agrega la sombra al pie mientras eso sea cierto; al llegar al final se va sola. En Playground, con varios pasos, achicar la ventana muestra el caso real: el campo cortado a mitad de camino, con la sombra separándolo del pie.">

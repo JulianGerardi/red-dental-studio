@@ -4,6 +4,7 @@ import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer
 import { FieldError, ModalShell, OptionCheckbox, PersonSearchField, SelectField, TextField } from '@/components/patients/form'
 import { useFormPasos } from '@/lib/useFormPasos'
 import { Avatar } from '@/components/ui/avatar'
+import { Alert } from '@/components/ui/alert'
 
 /* Add Relationship: antes una pantalla aparte (Figma 3716:61372, 3716:62815 y 3716:63601); ahora el drawer de
    Confidentally 2.0 con sus tres pasos: buscar o crear a la persona, sus datos de contacto y la relación con el
@@ -84,10 +85,14 @@ const PASOS = ['Person', 'Contact', 'Relationship'] as const
 const iniciales = (nombre: string) => nombre.trim().split(/\s+/).slice(0, 2).map((x) => x[0]).join('').toUpperCase()
 
 export function AddRelationshipDrawer({
-  paciente = 'John Smith', onClose, onGuardar,
+  paciente = 'John Smith', archivadas = [], onReactivar, onClose, onGuardar,
 }: {
   /** El paciente de la ficha: aparece en las frases de Direction. */
   paciente?: string
+  /** Nombres de quienes ya tienen una relación archivada con este paciente: al elegirlos se ofrece reactivarla. */
+  archivadas?: string[]
+  /** "Open reactivation": abre la reactivación de la relación archivada de esa persona (CON-3958). */
+  onReactivar?: (nombre: string) => void
   onClose: () => void
   onGuardar: (r: NuevaRelacion) => void
 }) {
@@ -151,6 +156,13 @@ export function AddRelationshipDrawer({
               return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
             }}
           />
+          {persona && archivadas.includes(persona.name) && (
+            <Alert tone="warning" title={`An archived relationship already exists between ${paciente} and ${persona.name}.`}>
+              <button type="button" onClick={() => onReactivar?.(persona.name)} className="text-dash-blue font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue">
+                Open reactivation
+              </button>
+            </Alert>
+          )}
           <OptionCheckbox
             label="Add New Person"
             checked={nueva}
