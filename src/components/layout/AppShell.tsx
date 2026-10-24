@@ -70,15 +70,16 @@ export function AppShell() {
             El pb reserva el alto del botón flotante de Confibot: lo que cae al pie de una página (Cancel/Save,
             paginación) se puede scrollear por encima de él. El pr (desde sm) reserva el ancho de la pestaña
             "Currently being seen" (PatientInSessionPopup, 54px, fija al borde derecho): de 640 a ~1500px el
-            contenido llegaba hasta ese borde y la pestaña quedaba encima de kebabs y filas reales. Antes eran 64px
-            (sm:pr-16): de más, porque CONTENEDOR_PAGINA/ANCHO_PAGINA ya ponen 24-32px propios de margen (px-6/px-8)
-            entre el contenido real y ese borde, así que sumados daban 88-96px -una franja vacía mucho más ancha que
-            cualquier otro margen de la app (Julián, 2026-10-22, a partir del screenshot de Patients). 40px (pr-10) de
-            extra alcanzan igual para que los 54px de la pestaña no lleguen a tocar nada -sigue probado sin
-            superposición en las mismas ocho pantallas y los mismos dos anchos de tablet de la auditoría-, y a
-            cualquier ancho la franja vacía queda pareja con el resto de la página en vez de duplicada. Ver
-            figma/README.md › Responsive. */}
-        <main className="bg-page-background flex-1 overflow-x-clip pb-24 sm:pr-10 sm:pb-28">
+            contenido llegaba hasta ese borde y la pestaña quedaba encima de kebabs y filas reales. Primero eran 64px
+            (sm:pr-16), después 40px (sm:pr-10): los dos de más, porque CONTENEDOR_PAGINA/ANCHO_PAGINA ya ponen
+            24-32px propios de margen (px-6/px-8) entre el contenido real y ese borde, y el extra se sumaba arriba en
+            vez de contarlo -quedaba una franja vacía más ancha que cualquier otro margen de la app (Julián,
+            2026-10-22 y 2026-10-24, con un mockup en Figma de cómo tiene que verse: el mismo padding que el resto de
+            la página, sin hueco raro). Bajado a 24px (sm:pr-6) -el mismo que ya pone CONTENEDOR_PAGINA/ANCHO_PAGINA
+            del otro lado-: sumado a esos 24-32px existentes alcanza para que los 54px de la pestaña no lleguen a
+            tocar ningún kebab ni fila real -reverificado sin superposición en los mismos anchos de la auditoría de
+            tablet y de escritorio-, y ya no se nota como un padding aparte. Ver figma/README.md › Responsive. */}
+        <main className="bg-page-background flex-1 overflow-x-clip pb-24 sm:pr-6 sm:pb-28">
           <Outlet />
         </main>
       </div>

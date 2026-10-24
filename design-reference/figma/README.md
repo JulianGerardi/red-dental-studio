@@ -531,8 +531,11 @@ screenshot de Patients en escritorio ancho (~1512px): a la derecha quedaba una f
 pantalla, mucho más ancha que cualquier otro margen de la app -highlight en la imagen desde el header hasta el pie,
 con sólo la pestaña y el FAB de Confibot adentro-. La causa: `sm:pr-16` se suma por encima del propio padding de
 `CONTENEDOR_PAGINA`/`ANCHO_PAGINA` (`px-6`/`px-8`, 24-32px) en vez de reemplazarlo, así que entre el contenido real y
-el borde de la ventana quedaban 88-96px en vez de los ~54-64px que la pestaña necesita. Bajado a `sm:pr-10` (40px):
-sumados a esos 24-32px ya existentes da ~64-72px, lo mismo que antes medido desde el contenido real, así que sigue
-sin superposición -reverificado con Playwright en los mismos ocho anchos de la auditoría de tablet más 1366, 1512
-(el del screenshot), 1536, 1680 y 1920 de escritorio, mínimo 27px de aire en todos-, pero la franja vacía que se ve
-deja de duplicar el padding de la página.
+el borde de la ventana quedaban 88-96px en vez de los ~54-64px que la pestaña necesita. Primer intento: `sm:pr-10`
+(40px) -sumados a los 24-32px ya existentes da ~64-72px, así que seguía sin superposición, pero Julián lo vio
+igual como un padding aparte y mandó un mockup propio en Figma de cómo tiene que verse: el mismo padding que el
+resto de la página, sin hueco raro (2026-10-24). Bajado a `sm:pr-6` (24px) -el mismo valor que ya pone
+`CONTENEDOR_PAGINA`/`ANCHO_PAGINA` del otro lado del contenido-: sumado a esos 24-32px ya existentes sigue
+alcanzando para que los 54px de la pestaña no lleguen a tocar kebabs ni filas reales -reverificado con Playwright en
+los mismos ocho anchos de la auditoría de tablet más 1366, 1512, 1536 y 1920 de escritorio, mínimo 11px de aire en
+todos-, y ahora sí deja de notarse como una franja aparte.
