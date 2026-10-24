@@ -3,6 +3,23 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-22
+
+### New/Edit Patient según el Figma nuevo, archivar y reactivar relaciones, buscador de persona en desplegable ([#75](https://github.com/JulianGerardi/red-dental-studio/pull/75))
+- **New Patient:** tres pasos General → Guardian → Demography; Guardian y Demography son opcionales y siempre están.
+  **Edit Patient** (menú de la tabla y lápiz del dashboard del paciente): pestañas con los datos precargados y **Save Changes**
+  desde cualquier sección; cambiar de pestaña no guarda; si falla algo en otra sección se marca la pestaña y se lleva al campo.
+  New Patient ya no trae *Link a person that already exists* ni *Select Person* (el Figma nuevo no los dibuja). Las anomalías del
+  Figma y cómo se resolvieron están en `modulos/patients.md`.
+- **Relationships (CON-3958):** *Delete relationship* pasa a **Archive relationship** (no borra: queda en Archived); reactivar desde
+  un drawer de revisión; Add Relationship avisa si ya hay una archivada (*Open reactivation*); Edit Relationship pide confirmar
+  *Remove Guardian access*; filtro **Active / Archived** en la pantalla.
+- **Buscador de persona:** las sugerencias flotan en un desplegable pegado al input y la elegida lleva una ✕ para quitarla.
+- **Para el dev:** `NuevoPaciente` → `DatosPaciente` (store) y `usePatients().datosDe(id)`; `components/patients/PacienteCampos.tsx`
+  (secciones + `useFormPaciente`), `pages/patients/EditPatientModal.tsx` nuevo, `NewPatientModal` pierde `title`/`forceGuardian`/`editId`;
+  `components/patients/RelationshipDialogs.tsx`; `MenuAcciones` usa `onArchive`/`onReactivate` en vez de `onDelete`. Nuevos:
+  `ui/section-notice`, `Tabs.alerta`, `Drawer.tabs`, `DateField.valorInicial`.
+
 ## 2026-10-20
 
 ### New Procedure: vincular un finding o un diagnóstico pide un procedimiento ya cargado ([#74](https://github.com/JulianGerardi/red-dental-studio/pull/74))

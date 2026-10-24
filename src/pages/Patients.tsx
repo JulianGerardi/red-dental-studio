@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ShowMore } from '@/components/ui/show-more'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
+import { EditPatientModal } from '@/pages/patients/EditPatientModal'
 import { Panel } from '@/components/dashboard/primitives'
 import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
@@ -207,22 +208,8 @@ export default function Patients() {
         />
       )}
       {modal === 'new' && <NewPatientModal onClose={() => setModal(null)} />}
-      {/* Mismo formulario que New Patient (variante con guardián), otro título.
-          Se le pasa la fila para que guarde sobre ese paciente. */}
-      {editando && (
-        <NewPatientModal
-          title="Edit Patient"
-          forceGuardian
-          editId={editando.id}
-          inicial={{
-            first: editando.name.split(' ')[0] ?? '',
-            last: editando.name.split(' ').slice(1).join(' '),
-            email: editando.email,
-            birthday: editando.birthday,
-          }}
-          onClose={() => setEditando(null)}
-        />
-      )}
+      {/* Edit Patient: pestañas y Save Changes (Figma 5277:123056), con los datos del paciente de la fila. */}
+      {editando && <EditPatientModal id={editando.id} onClose={() => setEditando(null)} />}
     </div>
   )
 }

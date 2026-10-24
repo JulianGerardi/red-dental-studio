@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { PantallaReal } from './pantalla'
+import { pulsarRol } from './play'
 
 /* Cada pantalla de la app, montada con las mismas rutas y providers que en
    producción (src/AppRoutes.tsx). `npm run ds:coverage` avisa si una ruta
@@ -32,6 +33,8 @@ export const PatientInsurance = pantalla(`${P}/insurance`)
 export const PatientLedger = pantalla(`${P}/ledger`)
 export const PatientRelationships = pantalla(`${P}/relationships`)
 export const AddRelationship = pantalla(`${P}/relationships/new`)
+/* El filtro en Archived: sólo las relaciones archivadas, con su menú para reactivarlas (relationships.md, 2026-10-22). */
+export const PatientRelationshipsArchived: Story = { ...pantalla(`${P}/relationships`), play: pulsarRol('tab', /^Archived/) }
 export const EditPatient = pantalla('/patients/edit')
 export const ClinicalMode = pantalla(`${P}/clinical-mode`)
 export const Scheduling = pantalla('/scheduling')

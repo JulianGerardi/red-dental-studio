@@ -650,3 +650,8 @@ líneas, `['DOB: …', 'Email: …']` o `['Email: …']`, en vez de un string ya
 `aria-hidden`: sin eso, sus iniciales se cuelan antes del nombre en el nombre accesible del botón y rompían
 `tests/scheduling-linked-visit.e2e.ts` (que busca el botón por `/^John Smith/`, `/^Dr. Emily Chen/`); verificado que
 sigue encontrando el botón y completando el campo igual que antes.
+
+## Patient y Provider: el buscador en desplegable, con ✕ (2026-10-21)
+
+Las sugerencias de Patient, Primary Provider y Additional Provider (`PersonSearchField`) ahora flotan en un desplegable pegado al input en vez de empujar los campos de abajo, y
+la persona elegida lleva una ✕ para quitarla (en Additional Provider, opcional, es la forma de dejarlo vacío otra vez). El porqué está en `relationships.md` (2026-10-21).
