@@ -3,6 +3,14 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-24
+
+### Patients y toda la app: achicar el margen de la pestaña "Currently being seen" ([#77](https://github.com/JulianGerardi/red-dental-studio/pull/77))
+- El margen que reserva `AppShell` para que la pestaña flotante no tape kebabs ni filas reales (PR #73) pasa de 64px a
+  24px: los 64 se sumaban por encima del padding propio de la página en vez de contarlo, y dejaban una franja vacía a
+  la derecha mucho más ancha que cualquier otro margen de la app.
+- **Para el dev:** `AppShell.tsx`, `sm:pr-16` → `sm:pr-6` en el `<main>`. No se tocó `PatientInSessionPopup`.
+
 ## 2026-10-20
 
 ### New Procedure: vincular un finding o un diagnóstico pide un procedimiento ya cargado ([#74](https://github.com/JulianGerardi/red-dental-studio/pull/74))
