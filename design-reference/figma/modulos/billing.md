@@ -1,8 +1,9 @@
 # Billing
 
-**Jira** (label `design-system`):
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
 
-- [CON-3816](https://confidetally.atlassian.net/browse/CON-3816) · [Billing] Alinear el diseño de Billing con Confidentally UI
+- Epics: CON-1060 Billing
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-1060%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
 
 Figma 4481:9881, sección "Billing" con 4 pantallas hijas (todas nombradas
 "Billing" a secas -hay que mirar el contenido, no el nombre de capa). No es

@@ -1,10 +1,20 @@
 # Clinical Mode
 
-**Jira** (label `design-system`):
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
 
-- [CON-3814](https://confidetally.atlassian.net/browse/CON-3814) · [Clinical Mode] Alinear el diseño de Clinical Mode con Confidentally UI
-- [CON-3837](https://confidetally.atlassian.net/browse/CON-3837) · [Clinical Mode] Alinear Vitals con Confidentally UI
-- [CON-3838](https://confidetally.atlassian.net/browse/CON-3838) · [Clinical Mode] Alinear Lab Order con Confidentally UI
+- Epics: CON-1611 Encounter · CON-1610 Encounter Events · CON-1608 Vitals · CON-2825 [Post Demo] Vitals · CON-1609
+  Procedure · CON-771 [CLINICA] Procedimientos, Conditions y Diagnosis · CON-3114 [Post Demo] Clinical Mode · CON-1397
+  Exams 2.0 · CON-2067 Exams continuacion · CON-2083 [Exams] Procedure & Conditions · CON-880 Exam "Physical" ·
+  CON-881 Exam "Extra Oral" · CON-882 Exam "Intra Oral" · CON-883 Exam "Dental Assessment" · CON-965 Examen "Review of
+  Systems" · CON-810 Extraoral · CON-1649 Radiographic · CON-2212 Prescription · CON-2214 Lab Order · CON-2321
+  Referral · CON-2724 Nota Clinica · CON-2793 Encounter continuacion · CON-900 Medical conditions · CON-1751 Cambios
+  Procedure y Condition · CON-1961 Condition [Treatment Area] · CON-3900 Modelo de procedimientos · CON-3742 Dental
+  Asessment nueva libreria · CON-3686 Patient Dentition · CON-570 Workflow · CON-2258 Workflow configuration ·
+  CON-2412 Llenado de preguntas workflow
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-1611%2CCON-1610%2CCON-1608%2CCON-2825%2CCON-1609%2CCON-771%2CCON-3114%2CCON-1397%2CCON-2067%2CCON-2083%2CCON-880%2CCON-881%2CCON-882%2CCON-883%2CCON-965%2CCON-810%2CCON-1649%2CCON-2212%2CCON-2214%2CCON-2321%2CCON-2724%2CCON-2793%2CCON-900%2CCON-1751%2CCON-1961%2CCON-3900%2CCON-3742%2CCON-3686%2CCON-570%2CCON-2258%2CCON-2412%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2827, CON-2828, CON-2829, CON-2830, CON-2936, CON-2832, CON-2833, CON-2834, CON-2835,
+  CON-2845, CON-2852, CON-2939, CON-2846, CON-2854, CON-2955, CON-2937, CON-2884, CON-2885, CON-2886
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2827%2CCON-2828%2CCON-2829%2CCON-2830%2CCON-2936%2CCON-2832%2CCON-2833%2CCON-2834%2CCON-2835%2CCON-2845%2CCON-2852%2CCON-2939%2CCON-2846%2CCON-2854%2CCON-2955%2CCON-2937%2CCON-2884%2CCON-2885%2CCON-2886%29%20ORDER%20BY%20key%20ASC))
 
 Figma:
 

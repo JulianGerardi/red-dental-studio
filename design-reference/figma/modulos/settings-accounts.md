@@ -1,8 +1,9 @@
 # Settings → Accounts
 
-**Jira** (label `design-system`):
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
 
-- [CON-3820](https://confidetally.atlassian.net/browse/CON-3820) · [Settings] Alinear el diseño de Edit Account con Confidentally UI
+- Epics: CON-895 Accounts
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-895%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
 
 Pantalla nueva (2026-09-09), armada desde una captura que pasó Julián de la
 plataforma real. No hay frame de Figma para esta.

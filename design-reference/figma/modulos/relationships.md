@@ -2,10 +2,13 @@
 
 # Relationships & Billing — hallazgos del Figma
 
-**Jira** (label `design-system`):
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
 
-- [CON-3811](https://confidetally.atlassian.net/browse/CON-3811) · [Patient] Alinear el diseño de Relationships & Billing con Confidentally UI
-- [CON-3835](https://confidetally.atlassian.net/browse/CON-3835) · [Patient] Alinear la pantalla Add Relationship con Confidentally UI
+- Epics: CON-2879 Relationship · CON-3958 [Relationship] Guardian & Guardian · CON-3973 Ordenar historias de
+  [Relationship] Guardian & Guardian
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-2879%2CCON-3958%2CCON-3973%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2858
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2858%29%20ORDER%20BY%20key%20ASC))
 
 Sección `3751:76507`, 6 frames:
 

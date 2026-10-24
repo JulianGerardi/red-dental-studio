@@ -17,44 +17,7 @@ Archivo: `9fYLxX9hlTj5unFthG4bBg`. Relevado durante el rediseño de `red-clone`.
 
 ## Historias de Jira
 
-Proyecto `CON`, label `design-system`: [todas las historias](https://confidetally.atlassian.net/issues?jql=labels%20%3D%20%22design-system%22%20ORDER%20BY%20assignee%20ASC).
-Cada módulo lleva sus claves debajo del título de su `.md`. Sin historia: `help`, `ledger` y `notifications`.
-
-| Historia | Título | Documento |
-|---|---|---|
-| [CON-3804](https://confidetally.atlassian.net/browse/CON-3804) | [Dasboard] Corregir cards, filtros, tamañanos | [modulos/dashboard.md](modulos/dashboard.md) |
-| [CON-3805](https://confidetally.atlassian.net/browse/CON-3805) | [Login] Alinear el diseño del login con Confidentally UI | [modulos/login.md](modulos/login.md) |
-| [CON-3806](https://confidetally.atlassian.net/browse/CON-3806) | [Dashboard] Alinear el diseño del Dashboard con Confidentally UI | [modulos/dashboard.md](modulos/dashboard.md) |
-| [CON-3807](https://confidetally.atlassian.net/browse/CON-3807) | [Menú] Corregir alineaciones del menú, espaciados y interlineado | [modulos/header-sidebar.md](modulos/header-sidebar.md) |
-| [CON-3808](https://confidetally.atlassian.net/browse/CON-3808) | [Patient] Alinear el diseño de la ficha del paciente (Overview) con Confidentally UI | [modulos/patient-dashboard.md](modulos/patient-dashboard.md) |
-| [CON-3809](https://confidetally.atlassian.net/browse/CON-3809) | [Patient] Alinear el diseño de Treatments con Confidentally UI | [modulos/treatments.md](modulos/treatments.md) |
-| [CON-3810](https://confidetally.atlassian.net/browse/CON-3810) | [Patient] Alinear el diseño de Insurance con Confidentally UI | [modulos/insurance.md](modulos/insurance.md) |
-| [CON-3811](https://confidetally.atlassian.net/browse/CON-3811) | [Patient] Alinear el diseño de Relationships & Billing con Confidentally UI | [modulos/relationships.md](modulos/relationships.md) |
-| [CON-3813](https://confidetally.atlassian.net/browse/CON-3813) | [Patient] Alinear el diseño de Documents con Confidentally UI | [modulos/treatments.md](modulos/treatments.md) |
-| [CON-3814](https://confidetally.atlassian.net/browse/CON-3814) | [Clinical Mode] Alinear el diseño de Clinical Mode con Confidentally UI | [modulos/clinical-mode.md](modulos/clinical-mode.md) |
-| [CON-3815](https://confidetally.atlassian.net/browse/CON-3815) | [Scheduling] Alinear el diseño de la agenda con Confidentally UI | [modulos/scheduling.md](modulos/scheduling.md) |
-| [CON-3816](https://confidetally.atlassian.net/browse/CON-3816) | [Billing] Alinear el diseño de Billing con Confidentally UI | [modulos/billing.md](modulos/billing.md) |
-| [CON-3817](https://confidetally.atlassian.net/browse/CON-3817) | [Settings] Alinear el diseño de Settings General con Confidentally UI | sin `.md` propio · Settings en general |
-| [CON-3818](https://confidetally.atlassian.net/browse/CON-3818) | [Settings] Alinear la navegación de Settings y la pantalla Employees con Confidentally UI | [modulos/employees.md](modulos/employees.md) |
-| [CON-3819](https://confidetally.atlassian.net/browse/CON-3819) | [Settings] Alinear el diseño de Locations con Confidentally UI | [modulos/locations.md](modulos/locations.md) |
-| [CON-3820](https://confidetally.atlassian.net/browse/CON-3820) | [Settings] Alinear el diseño de Edit Account con Confidentally UI | [modulos/settings-accounts.md](modulos/settings-accounts.md) |
-| [CON-3821](https://confidetally.atlassian.net/browse/CON-3821) | [Settings] Alinear Ledger Settings con Confidentally UI (y sumar al sistema lo que red.dev ya tiene) | [modulos/settings-ledger.md](modulos/settings-ledger.md) |
-| [CON-3829](https://confidetally.atlassian.net/browse/CON-3829) | [General] Unificar los modales: cabecera con botón de cerrar, títulos de sección y pie | sin `.md` propio · transversal a todos los modales |
-| [CON-3830](https://confidetally.atlassian.net/browse/CON-3830) | [Patients] Alinear el modal New Patient con Confidentally UI | [modulos/patients.md](modulos/patients.md) |
-| [CON-3831](https://confidetally.atlassian.net/browse/CON-3831) | [Scheduling] Alinear el modal New Appointment con Confidentally UI | [modulos/scheduling.md](modulos/scheduling.md) |
-| [CON-3832](https://confidetally.atlassian.net/browse/CON-3832) | [Scheduling] Alinear el detalle del turno con Confidentally UI | [modulos/scheduling.md](modulos/scheduling.md) |
-| [CON-3833](https://confidetally.atlassian.net/browse/CON-3833) | [Patient] Alinear el popover de Allergies con Confidentally UI | [modulos/patient-dashboard.md](modulos/patient-dashboard.md) |
-| [CON-3834](https://confidetally.atlassian.net/browse/CON-3834) | [Patient] Alinear el modal New Subscription con Confidentally UI | [modulos/insurance.md](modulos/insurance.md) |
-| [CON-3835](https://confidetally.atlassian.net/browse/CON-3835) | [Patient] Alinear la pantalla Add Relationship con Confidentally UI | [modulos/relationships.md](modulos/relationships.md) |
-| [CON-3836](https://confidetally.atlassian.net/browse/CON-3836) | [Settings] Alinear los formularios New Employee y New Location con Confidentally UI | [modulos/employees.md](modulos/employees.md) · [modulos/locations.md](modulos/locations.md) |
-| [CON-3837](https://confidetally.atlassian.net/browse/CON-3837) | [Clinical Mode] Alinear Vitals con Confidentally UI | [modulos/clinical-mode.md](modulos/clinical-mode.md) |
-| [CON-3838](https://confidetally.atlassian.net/browse/CON-3838) | [Clinical Mode] Alinear Lab Order con Confidentally UI | [modulos/clinical-mode.md](modulos/clinical-mode.md) |
-| [CON-3839](https://confidetally.atlassian.net/browse/CON-3839) | [Login] Alinear Forgot password con Confidentally UI | [modulos/login.md](modulos/login.md) |
-| [CON-3840](https://confidetally.atlassian.net/browse/CON-3840) | [Settings] Corregir el diseño de Carriers, Fee Schedules, Coverage Table y Roles | sin `.md` propio · Settings |
-| [CON-3841](https://confidetally.atlassian.net/browse/CON-3841) | [Setting - Location] Corregir alineaciones | [modulos/locations.md](modulos/locations.md) |
-| [CON-3842](https://confidetally.atlassian.net/browse/CON-3842) | [Settings] Corregir alineaciones, menu, cards | sin `.md` propio · Settings en general |
-| [CON-3843](https://confidetally.atlassian.net/browse/CON-3843) | [Menú] Corregir alineaciones del menú, espaciados y interlineado | [modulos/header-sidebar.md](modulos/header-sidebar.md) |
-| [CON-3906](https://confidetally.atlassian.net/browse/CON-3906) | [Consent] Alinear el diseño del consent con Confidentally UI | [modulos/consents.md](modulos/consents.md) |
+La lógica de cada módulo (epics e historias de funcionamiento) está indexada en [../jira.md](../jira.md). Las historias con el label `design-system` son de diseño, para los devs, y no se usan.
 
 ## Convenciones acordadas
 

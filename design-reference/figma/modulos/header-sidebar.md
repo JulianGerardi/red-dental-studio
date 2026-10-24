@@ -3,10 +3,10 @@
 
 # Header y Sidebar — hallazgos del Figma
 
-**Jira** (label `design-system`):
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
 
-- [CON-3807](https://confidetally.atlassian.net/browse/CON-3807) · [Menú] Corregir alineaciones del menú, espaciados y interlineado
-- [CON-3843](https://confidetally.atlassian.net/browse/CON-3843) · [Menú] Corregir alineaciones del menú, espaciados y interlineado
+- Historias de abril: CON-2933
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2933%29%20ORDER%20BY%20key%20ASC))
 
 ## Header y Sidebar (2026-08-25, segunda pasada)
 

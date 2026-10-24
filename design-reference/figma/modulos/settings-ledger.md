@@ -1,8 +1,9 @@
 # Settings → Ledger (Ledger Options)
 
-**Jira** (label `design-system`):
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
 
-- [CON-3821](https://confidetally.atlassian.net/browse/CON-3821) · [Settings] Alinear Ledger Settings con Confidentally UI (y sumar al sistema lo que red.dev ya tiene)
+- Epics: CON-3732 Ledger 2
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-3732%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
 
 Figma 4293:57917. Dos pantallas que comparten encabezado y se alternan con un
 par de tabs arriba a la derecha: **Adjustments Types** y **Payment Method**.

@@ -2,10 +2,16 @@
 
 # Insurance — hallazgos del Figma
 
-**Jira** (label `design-system`):
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
 
-- [CON-3810](https://confidetally.atlassian.net/browse/CON-3810) · [Patient] Alinear el diseño de Insurance con Confidentally UI
-- [CON-3834](https://confidetally.atlassian.net/browse/CON-3834) · [Patient] Alinear el modal New Subscription con Confidentally UI
+- Epics: CON-1252 [Patient] Patient Insurance Information · CON-1063 [Insurance Plan] Coverage Table · CON-1096
+  [Insurance Plan] Predeterminations · CON-1100 [Insurance Plan] Deductibles and Benefits · CON-1109 [Insurance Plan]
+  Coordination of Benefits · CON-1130 [Insurance Plan] Payment Table · CON-1113 [Organization] Carrier & Plan ·
+  CON-1598 Insurance Estimate · CON-2687 Insurance Continuacion · CON-3283 Seguros 2 · CON-3259 Plan & Subscriptions ·
+  CON-57 [Organization] Fee schedule
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-1252%2CCON-1063%2CCON-1096%2CCON-1100%2CCON-1109%2CCON-1130%2CCON-1113%2CCON-1598%2CCON-2687%2CCON-3283%2CCON-3259%2CCON-57%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2941
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2941%29%20ORDER%20BY%20key%20ASC))
 
 Sección `3817:865128`, 9 frames. **Los nueve se llaman igual**:
 "Patiens Plans — Documents (Default)". Las capas de modal, además, se llaman

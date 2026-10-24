@@ -7,8 +7,8 @@ respondé igual.
 - App publicada: https://juliangerardi.github.io/red-dental-studio/
 - Design system (Storybook, "Confidentally UI"): https://juliangerardi.github.io/red-dental-studio/storybook/
 - Repo: `JulianGerardi/red-dental-studio` (privado), rama `main`.
-- Historias (Jira, proyecto `CON`, label `design-system`):
-  https://confidetally.atlassian.net/issues?jql=labels%20%3D%20%22design-system%22%20ORDER%20BY%20assignee%20ASC
+- Lógica de la app (Jira, proyecto `CON`, historias de abril de 2026):
+  https://confidetally.atlassian.net/issues?jql=project%20%3D%20CON%20AND%20created%20%3E%3D%20%222026-04-01%22%20AND%20created%20%3C%20%222026-05-01%22%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20ORDER%20BY%20key%20ASC
 
 ## Comandos
 
@@ -29,26 +29,30 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
 - **`design-reference/figma/modulos/<módulo>.md`**: decisiones y anomalías numeradas de cada módulo. Es la fuente más
   confiable para retomar algo; leé el del módulo antes de tocarlo.
 - `design-reference/design-system.md` (cómo está armado el Storybook y sus reglas), `design-reference/figma/README.md`
-  (reglas transversales), `design-reference/e2e.md`.
+  (reglas transversales), `design-reference/e2e.md`, `design-reference/jira.md` (historias de Jira por módulo).
 - Proyecto hermano con la lógica de 2.0: `~/Desktop/Work/dashboard-figma/src/components` (buscá ahí el `*Drawer.tsx`
   equivalente antes de armar uno).
 
 ## Jira
 
-Las historias de la app están en Jira (`confidetally.atlassian.net`, proyecto `CON`, label `design-system`; link
-arriba).
+El funcionamiento de la app (reglas de negocio, estados, flujos) está en Jira (`confidetally.atlassian.net`, proyecto
+`CON`). Las historias de abril de 2026 son las más detalladas: historia de usuario, precondiciones, regla de negocio,
+escenarios de aceptación y restricciones. Ejemplo: `CON-2835` (al aceptar un Treatment Case, sus findings pasan a
+In Treatment).
 
-- Es la fuente del alcance y de la lógica. Si algo del Figma, del código o del `.md` no cierra, o parece que falta algo,
-  **buscalo ahí antes de preguntar o de inventar**. Si no hay historia para lo que se pide, avisale a Julián.
-- Cada historia se titula `[Módulo] …` y trae una tabla numerada de diferencias (red.dev hoy vs Confidentally UI) y el
-  link a su página del Storybook. Para encontrarla: `labels = "design-system" AND summary ~ "Patient"`.
-- Antes de tocar un módulo, leé su historia junto con su `.md`.
-- Todo lo que se arma queda linkeado: la sección con fecha del `.md` del módulo arranca con la clave (`CON-3830`) y el
+- Es la fuente de la lógica. Si algo del Figma, del código o del `.md` no cierra, o parece que falta algo, **buscalo
+  ahí antes de preguntar o de inventar**. Si no hay historia para lo que se pide, avisale a Julián.
+- **No se usa el label `design-system`**: esas historias son de diseño y son para los devs. Tampoco bugs ni cancelados.
+- `design-reference/jira.md` indexa epics e historias de abril por módulo, y cada `.md` de módulo lleva su bloque
+  **Jira** debajo del título. El mapeo salió de los títulos: si una historia está en el módulo equivocado, se corrige
+  en los dos lugares.
+- Antes de tocar un módulo, leé sus historias (`getJiraIssue`) junto con su `.md`. Para más: `parent = CON-3114` trae
+  las historias de un epic.
+- Todo lo que se arma queda linkeado: la sección con fecha del `.md` del módulo arranca con la clave (`CON-2835`) y el
   commit y el PR la nombran.
 - Solo lectura: no cambiar estados, comentar ni crear historias sin el ok de Julián.
 - Se lee con el conector de Atlassian (`cloudId`: `confidetally.atlassian.net`). La búsqueda devuelve todo junto y se
-  pasa del límite: pedí `fields` acotados, filtrá el archivo guardado con `jq` y leé cada historia por clave con
-  `getJiraIssue`.
+  pasa del límite: pedí `fields` acotados y filtrá el archivo guardado con `jq`.
 
 ## Cómo se trabaja una tanda
 

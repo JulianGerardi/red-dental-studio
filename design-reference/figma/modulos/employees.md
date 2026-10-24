@@ -1,9 +1,12 @@
 # Settings - Employees
 
-**Jira** (label `design-system`):
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
 
-- [CON-3818](https://confidetally.atlassian.net/browse/CON-3818) · [Settings] Alinear la navegación de Settings y la pantalla Employees con Confidentally UI
-- [CON-3836](https://confidetally.atlassian.net/browse/CON-3836) · [Settings] Alinear los formularios New Employee y New Location con Confidentally UI
+- Epics: CON-1548 Employee · CON-2889 Employee 2 · CON-3115 Roles y Permisos · CON-3120 [Post Demo] Admin · CON-3230
+  Usuarios Admin · CON-3506 Configuración de permisos · CON-3853 List Permission
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-1548%2CCON-2889%2CCON-3115%2CCON-3120%2CCON-3230%2CCON-3506%2CCON-3853%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2890
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2890%29%20ORDER%20BY%20key%20ASC))
 
 ## "Link existing person" no hacía nada en "New Employee" (2026-09-07)
 

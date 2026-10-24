@@ -3,9 +3,12 @@
 
 # Patients — hallazgos del Figma
 
-**Jira** (label `design-system`):
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
 
-- [CON-3830](https://confidetally.atlassian.net/browse/CON-3830) · [Patients] Alinear el modal New Patient con Confidentally UI
+- Epics: CON-833 Pacientes - Migracion back graphQL · CON-3910 Consultar pacientes · CON-2107 Patient
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-833%2CCON-3910%2CCON-2107%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2858
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2858%29%20ORDER%20BY%20key%20ASC))
 
 ## Patients — List (nodo `3638:59529`) y Patient Details Modal (`3632:58405`)
 

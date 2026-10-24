@@ -1,6 +1,11 @@
 # Ledger
 
-**Jira:** sin historia con el label `design-system` (revisado el 2026-10-24).
+**Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
+
+- Epics: CON-3732 Ledger 2
+  ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-3732%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
+- Historias de abril: CON-2863
+  ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2863%29%20ORDER%20BY%20key%20ASC))
 
 Figma 4582:28487 "Ledger — Screens": Empty State, Overview (Patient View),
 Overview (Guarantor View), y tres modales de acción -Credit (+) Adjustment,
