@@ -347,11 +347,11 @@ Julián, al comparar con la app de red: "el patient dashboard te faltó" (el hue
 - La card de **Pending Task** pasa a `flex-1`: llena el alto que le sobra y las tres columnas terminan a 24px del borde, a 1440 y a 1024px. Sin contenido de más: sólo crece la card, el contenido queda arriba.
 - Documents, Treatments y Ledger tenían lo mismo: se resolvió en la sección siguiente.
 
-## Documents, Treatments y Ledger cierran igual; Pending Task y Treatments, completos y con scroll adentro (2026-10-25)
+## Documents, Treatments y Ledger cierran igual; Treatments completo con scroll adentro (2026-10-25)
 
 Julián, con una grabación del Patient Dashboard: "alineá también Documents, Treatments y Ledger", y que las tareas "aparezcan por default como en el video" (después de tocar *Show 3 more*) "y el scroll es dentro de la card".
 
-- **Pending Task** (Patient Dashboard) muestra sus 6 tareas de entrada, sin *Show N more*. Desde `lg` la card llena el alto que deja el menú (mínimo 420px) y la lista scrollea adentro; el contenido está en un `absolute inset-0` para que el alto de la fila lo siga mandando el menú, no la lista. Pending documents conserva su *Show 2 more*: en el video no lo abre.
+- **Pending Task** (Patient Dashboard): una primera vuelta la dejó con las 6 tareas a la vista y sin *Show N more*; Julián pidió volver: se ven 3 y *Show 3 more* abre el resto **con scroll adentro de la lista, sin que la card crezca** (`enCaja`, como Appointments). La card sigue en `flex-1`, así cierra al nivel del menú; debajo de las 3 filas queda aire hasta el pie de la card. Pending documents conserva su *Show 2 more*.
 - **Treatments** muestra todos los planes (sin *Show 4 more*) en un área que llena el alto hasta el pie del menú, con scroll adentro y un degradé abajo que avisa que hay más. `lg:auto-rows-max`: sin eso la grilla comprimía las filas y cortaba el pie de cada card.
 - **Documents** y **Ledger**: la tabla se estira hasta el pie del menú y el pie (*Showing…* + paginación) queda abajo de la card. `DataTable` suma `llenar` (desde `lg`); el Ledger tiene su propia tabla y lleva las mismas clases.
 - Verificado con Playwright a 1519×829 (la pantalla de Julián) y 1024px: el borde de abajo del menú y de la card coinciden (24px del borde). Por debajo de `lg` nada cambia, salvo que Pending Task ya no se corta en 3.
