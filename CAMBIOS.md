@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-25
 
+### Dashboard: la fila del turno no se rompe al expandir el menú lateral ([#83](https://github.com/JulianGerardi/red-dental-studio/pull/83))
+- Con el menú expandido la lista de Appointments mide 381px, 3px por debajo del corte de 384px (`@sm`), y la fila saltaba de 86 a 139px: el provider
+  ocupaba el renglón del medio y el botón (Check In / Check Out) quedaba solo en un cuarto renglón. Ahora el botón sube al renglón de Check In y los
+  chips, y el provider queda último: 109px expandido; colapsado no cambia.
+- **Para el dev:** una clase en `AppointmentRow` (`DashboardRows.tsx`): `order-last … @sm:order-none` en el provider; sólo afecta el layout angosto.
+
 ### Patient Dashboard: las tres columnas cierran al mismo nivel ([#82](https://github.com/JulianGerardi/red-dental-studio/pull/82))
 - Pending Task (columna del medio) terminaba ~180px antes que el menú del paciente y Appointments, que llegan hasta el
   final de la página. Ahora la card llena el alto que le sobra y las tres columnas cierran juntas, como en la app de red.
