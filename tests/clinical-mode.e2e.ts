@@ -140,7 +140,7 @@ test('el detalle de un procedimiento lleva a su caso y a su hallazgo', async ({ 
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('tab', 'Procedures').tap()
   await screen.getByText(/D7286 - Incisional biopsy/).tap()
-  await expect(screen.getByRole('button', /View full record/)).toBeVisible()
+  await expect(screen.getByRole('button', /View full record/)).toHaveCount(0)
   await expect(screen.getByRole('button', 'Collapse all')).toBeVisible()
   // El hallazgo vinculado abre Problem List con esa fila desplegada.
   await screen.getByRole('button', /^Abscess \(morphologic abnormality\) · Soft Palate/).tap()

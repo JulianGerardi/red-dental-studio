@@ -4,7 +4,7 @@ import { ModalShell } from '@/components/patients/form'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { aviso } from '@/components/ui/toaster'
 import { Pill } from '@/components/ui/pill'
-import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, Vacio, VerRegistroCompleto } from '@/components/ui/detail-list'
+import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, Vacio } from '@/components/ui/detail-list'
 import { cn } from '@/lib/utils'
 import { tratamientoDe } from '@/components/clinical/RecordDetail'
 import { TONO_CASO } from '@/components/clinical/TreatmentPlanSection'
@@ -275,39 +275,23 @@ const BOTON_CREDITO = 'text-dash-blue inline-flex items-center gap-1.5 rounded-m
     con su acción y Read-only summary); Insurance Payment, los datos de siempre. Lo usan el Ledger y la tabla de Billing
     (que pone su propio marco, el de DataTable). */
 export function DetalleMovimiento({
-  m, onVerTodo, onAplicarCredito, ...datos
+  m, onAplicarCredito, ...datos
 }: DatosCobro & {
   m: Movimiento & { saldo?: number }
-  /** El registro completo de la transacción. */
-  onVerTodo: () => void
   /** Sólo con crédito sin aplicar y permiso: abre Apply credit (Unapplied Credit Management) con esta fuente. */
   onAplicarCredito?: () => void
 }) {
   const tipo = tipoDetalle(m)
   if (!tipo) {
-    return (
-      <>
-        <Campos m={m} />
-        <div className="mt-3 flex flex-wrap items-center gap-4">
-          <VerRegistroCompleto onClick={onVerTodo} />
-        </div>
-      </>
-    )
+    return <Campos m={m} />
   }
-  /* View procedure abre el procedimiento del paciente; sin vínculo, el registro. */
-  const verProcedimiento = m.procedimiento && datos.onAbrirClinica ? () => datos.onAbrirClinica!({ procedimiento: m.procedimiento }) : onVerTodo
   const lado = [refDe(m), m.estado, m.diente && `Tooth ${m.diente}`, m.superficie && `Surface ${m.superficie}`].filter(Boolean).join(' · ')
   return (
     <ListaDetalle
       titulo={m.tipo === 'Charge' ? `${m.codigo} · ${m.descripcion}` : m.descripcion}
       lado={lado}
-      pie={(
-        <>
-          <VerRegistroCompleto onClick={tipo === 'Procedure' ? verProcedimiento : onVerTodo} />
-          {onAplicarCredito && (
-            <button type="button" onClick={onAplicarCredito} className={BOTON_CREDITO}><HandCoins className="size-3.5" /> Apply credit</button>
-          )}
-        </>
+      pie={onAplicarCredito && (
+        <button type="button" onClick={onAplicarCredito} className={BOTON_CREDITO}><HandCoins className="size-3.5" /> Apply credit</button>
       )}
     >
       <FilasTransaccion m={m} {...datos} />
@@ -316,10 +300,9 @@ export function DetalleMovimiento({
 }
 
 export function LedgerRowDetail({
-  m, onVerTodo, onAplicarCredito, sangria = 40, ...datos
+  m, onAplicarCredito, sangria = 40, ...datos
 }: DatosCobro & {
   m: Movimiento & { saldo?: number }
-  onVerTodo: () => void
   /** Sólo viene si la fila tiene crédito sin aplicar -ver `tieneCredito` en
       Ledger.tsx-, así que alcanza con chequear que exista. */
   onAplicarCredito?: () => void
@@ -339,7 +322,7 @@ export function LedgerRowDetail({
         className="sticky w-[calc(var(--tabla-visible,calc(100%+var(--resto)))-var(--resto))]"
         style={{ left: sangria, '--resto': `${sangria + 12}px` } as React.CSSProperties}
       >
-        <DetalleMovimiento m={m} onVerTodo={onVerTodo} onAplicarCredito={onAplicarCredito} {...datos} />
+        <DetalleMovimiento m={m} onAplicarCredito={onAplicarCredito} {...datos} />
       </div>
     </div>
   )

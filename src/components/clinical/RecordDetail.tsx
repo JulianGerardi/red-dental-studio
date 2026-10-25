@@ -2,7 +2,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react'
 import { Pencil, X } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
-import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, MasItems, Vacio, VerRegistroCompleto } from '@/components/ui/detail-list'
+import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, MasItems, Vacio } from '@/components/ui/detail-list'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { Drawer, DrawerSection } from '@/components/ui/drawer'
 import { ORDEN_TONO } from '@/components/clinical/LabOrderPanel'
@@ -257,17 +257,12 @@ function datosProblema(r: Problema, c: ContextoDetalle) {
 const guion = (t: string) => (!t || t === '-' ? '—' : t)
 const nombreDe = (x: Registro) => (x.tipo === 'procedimiento' ? `${x.r.codigo} · ${x.r.nombre}` : x.r.condicion)
 
-/** El detalle desplegado de una fila: título completo, la lista y el pie con View full record. */
+/** El detalle desplegado de una fila: título completo y la lista. Sin botón de registro completo: ya está todo acá. */
 export function DetalleRegistro({ registro, contexto }: { registro: Registro; contexto: ContextoDetalle }) {
-  const [completo, setCompleto] = useState(false)
-  const lugar = pieza(registro.r)
   return (
-    <>
-      <ListaDetalle titulo={nombreDe(registro)} lado={lugar} pie={<VerRegistroCompleto onClick={() => setCompleto(true)} />}>
-        {registro.tipo === 'procedimiento' ? <FilasProcedimiento r={registro.r} c={contexto} plan={registro.plan} /> : <FilasProblema r={registro.r} c={contexto} />}
-      </ListaDetalle>
-      <RegistroCompletoDrawer registro={completo ? registro : null} contexto={contexto} onClose={() => setCompleto(false)} />
-    </>
+    <ListaDetalle titulo={nombreDe(registro)} lado={pieza(registro.r)}>
+      {registro.tipo === 'procedimiento' ? <FilasProcedimiento r={registro.r} c={contexto} plan={registro.plan} /> : <FilasProblema r={registro.r} c={contexto} />}
+    </ListaDetalle>
   )
 }
 

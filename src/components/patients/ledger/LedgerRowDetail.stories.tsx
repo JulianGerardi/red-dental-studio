@@ -61,7 +61,6 @@ function Ejemplo({ transaccion, ancho }: Args) {
           movimientos={TODAS}
           onVerTransaccion={(x) => aviso.info(`Goes to ${refDe(x)} in the table and opens it.`)}
           onAbrirClinica={(d) => aviso.info(d.caso ? 'Opens the case in Treatment Plan.' : 'Opens the procedure in Clinical Mode.')}
-          onVerTodo={avisar('Opens the full record.')}
           onAplicarCredito={tipoDetalle(m) && sinAplicar > 0 ? avisar('Opens Apply credit with this transaction as the source.') : undefined}
         />
       </div>
@@ -80,10 +79,10 @@ const meta = {
           '',
           '**Arriba**, la descripción y al costado el identificador, el estado y la pieza. **Las filas, según el tipo:**',
           '',
-          '- **Procedure:** Treatment (el caso del procedimiento, por su vínculo; el aceptado primero y después los históricos, con la visita), Location, Financial details y *Payments & credits applied to this charge*. Pie: **View full record** (en un procedimiento abre Clinical Mode).',
-          '- **Charge Adjustment:** Location, Financial details y *Payments & credits applied to this charge*. Pie: **View full record**.',
-          '- **Patient Payment:** Scope, Location, Financial details y *Charges paid or credited by this transaction*. Pie: **View full record** y, con crédito disponible, **Apply credit**.',
-          '- **Credit Adjustment:** Scope, Location, Financial details y *Charges paid or credited by this transaction*. Pie: **View full record** y **Apply credit**.',
+          '- **Procedure:** Treatment (el caso del procedimiento, por su vínculo; el aceptado primero y después los históricos, con la visita), Location, Financial details y *Payments & credits applied to this charge*.',
+          '- **Charge Adjustment:** Location, Financial details y *Payments & credits applied to this charge*.',
+          '- **Patient Payment:** Scope, Location, Financial details y *Charges paid or credited by this transaction*. Pie: con crédito disponible, **Apply credit**.',
+          '- **Credit Adjustment:** Scope, Location, Financial details y *Charges paid or credited by this transaction*. Pie: **Apply credit**.',
           '',
           'Los montos aplicados van en positivo; un cargo muestra lo que recibió y un pago o crédito, a dónde fue. El link de una transacción lleva a su fila (y la despliega) si está en la tabla; si no, abre su registro. **Insurance Payment** queda fuera y muestra los datos de siempre. Sin notas explicativas: los números se leen solos, y el motivo de un ajuste ya es el título (Julián, 2026-10-19). Todos los pies usan el mismo botón que Procedures y los findings.',
           '',
@@ -115,7 +114,7 @@ export const Parts: Story = {
         </Bloque>
         <Bloque titulo="In Billing" nota="El mismo contenido sin el marco (DetalleMovimiento): lo pone la tabla de la app. Card Payment de Maria Abril Viola, aplicado a D1110.">
           <div className="@container w-[960px] max-w-full rounded-lg border border-line-row bg-surface-subtle px-4 py-3 pl-11">
-            <DetalleMovimiento m={ACTIVIDAD_RECIENTE.find((m) => m.id === 'act-Maria Abril Viola-1')!} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTodo={avisar('Opens the full record.')} />
+            <DetalleMovimiento m={ACTIVIDAD_RECIENTE.find((m) => m.id === 'act-Maria Abril Viola-1')!} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} />
           </div>
         </Bloque>
         <Bloque titulo="Pieces">
@@ -137,7 +136,7 @@ export const Parts: Story = {
             <tr><td className="font-semibold">Location</td><td>La sede de la transacción, nunca la de la pantalla. Sin dato: Location unavailable.</td><td>FilasTransaccion</td></tr>
             <tr><td className="font-semibold">Financial details</td><td>Cargo: Original charge, Payments applied, Credit adjustments applied y Outstanding transaction balance (destacado). Pago o crédito: Original payment / credit, Applied to charges, Unapplied credit (destacado) y Transaction balance en $0.00.</td><td>Metrica</td></tr>
             <tr><td className="font-semibold">Applications</td><td>Cargo: Payments &amp; credits applied to this charge (de dónde vino). Pago o crédito: Charges paid or credited by this transaction (a dónde fue). Fecha de aplicación, la otra transacción con link, Patient / Account, referencia o motivo, y el monto aplicado en positivo. La cuenta es la cantidad de líneas.</td><td>FilasTransaccion</td></tr>
-            <tr><td className="font-semibold">Footer</td><td>View full record (el mismo de Procedures y los findings); Apply credit con crédito disponible; Read-only summary.</td><td>DetalleMovimiento</td></tr>
+            <tr><td className="font-semibold">Footer</td><td>Sólo Apply credit, con crédito disponible, y Read-only summary. Sin View full record: el detalle ya lo tiene todo (Julián, 2026-10-25).</td><td>DetalleMovimiento</td></tr>
             <tr><td className="font-semibold">Frame</td><td>En el Ledger, fondo gris y fijo en la parte visible de la tabla, arrancando en la primera columna, después de la flecha de la fila (`sangria`: 40px en el Ledger, 34 en Ledger Transactions); en Billing lo pone DataTable.</td><td>LedgerRowDetail</td></tr>
             <tr><td className="font-semibold">Collapse all / Expand all</td><td>En la barra de la tabla, desde que hay una fila abierta.</td><td>BotonExpandirTodo</td></tr>
           </Tabla>
@@ -167,13 +166,13 @@ export const States: Story = {
         <Bloque titulo="Payment not applied" nota="P2: todavía no se aplicó.">
           <Ejemplo transaccion="P2" ancho="table" />
         </Bloque>
-        <Bloque titulo="Procedure, nothing linked" nota="C3: sin caso y sin aplicaciones; las filas quedan y lo dicen. View full record abre el registro.">
+        <Bloque titulo="Procedure, nothing linked" nota="C3: sin caso y sin aplicaciones; las filas quedan y lo dicen.">
           <Ejemplo transaccion="C3" ancho="table" />
         </Bloque>
         <Bloque titulo="Unavailable" nota="A2: sin sede.">
           <Ejemplo transaccion="A2" ancho="table" />
         </Bloque>
-        <Bloque titulo="Insurance Payment" nota="Fuera de la historia: los datos de la transacción y View full record, como antes.">
+        <Bloque titulo="Insurance Payment" nota="Fuera de la historia: los datos de la transacción, como antes.">
           <Ejemplo transaccion="m3" ancho="table" />
         </Bloque>
         <Bloque titulo="Narrow" nota="Teléfono: el título de cada fila arriba de sus datos; la tabla de aplicaciones scrollea de costado.">

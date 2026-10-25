@@ -4,7 +4,7 @@ import { aviso } from '@/components/ui/toaster'
 import { Pill } from '@/components/ui/pill'
 import { Bloque, Lienzo, Tabla, Token } from '@/design-system/kit'
 import { esperar } from '@/design-system/play'
-import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, MasItems, NotaDetalle, Vacio, VerRegistroCompleto } from './detail-list'
+import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, MasItems, NotaDetalle, Vacio } from './detail-list'
 
 type Args = { filas: number; vacia: boolean; mas: boolean; ancho: 'table' | 'overlay' | 'phone' }
 const ANCHOS = { table: 880, overlay: 700, phone: 320 } as const
@@ -43,7 +43,7 @@ function Ejemplo({ filas, vacia, mas, ancho }: Args) {
   ]
   return (
     <div className="rounded-lg border border-line-row bg-surface-subtle px-4 py-3 pl-11" style={{ width: ANCHOS[ancho] }}>
-      <ListaDetalle titulo="D2392 · Resin-based composite – two surfaces" lado="Tooth 14 · Surface OD" pie={<VerRegistroCompleto onClick={abrir('the full record')} />}>
+      <ListaDetalle titulo="D2392 · Resin-based composite – two surfaces" lado="Tooth 14 · Surface OD">
         {todas.slice(0, filas)}
       </ListaDetalle>
     </div>
@@ -85,7 +85,7 @@ export const Parts: Story = {
   parameters: { controls: { disable: true }, docs: { story: { inline: true } } },
   render: () => (
     <Lienzo>
-      <Bloque titulo="The list" nota="ListaDetalle: título, dato del costado, las filas y el pie.">
+      <Bloque titulo="The list" nota="ListaDetalle: título, dato del costado, las filas y, si hay una acción (Apply credit), el pie.">
         <Ejemplo filas={4} vacia={false} mas ancho="table" />
       </Bloque>
       <Bloque titulo="Pieces">
@@ -106,14 +106,13 @@ export const Parts: Story = {
       </Bloque>
       <Bloque titulo="What each part is">
         <Tabla encabezado={['Part', 'What it does', 'Component']} minimo={720} arriba>
-          <tr><td className="font-semibold">List</td><td>El detalle entero: título del registro, dato al costado, filas y pie con Read-only summary.</td><td>ListaDetalle</td></tr>
+          <tr><td className="font-semibold">List</td><td>El detalle entero: título del registro, dato al costado, filas y un pie opcional (una acción y Read-only summary).</td><td>ListaDetalle</td></tr>
           <tr><td className="font-semibold">Row</td><td>Un tema: título de 11px y cuenta a la izquierda (150px; arriba en angosto), datos a la derecha. Una línea fina separa las filas.</td><td>FilaDetalle</td></tr>
           <tr><td className="font-semibold">Entry</td><td>Un dato en una línea: rótulo opcional, link o texto, estado y contexto.</td><td>Entrada</td></tr>
           <tr><td className="font-semibold">Link</td><td>Lleva a la pantalla donde se trabaja el registro; la flecha dice que sale de la tabla.</td><td>EnlaceRegistro</td></tr>
           <tr><td className="font-semibold">N more…</td><td>Lo que no entra en el resumen, plegado.</td><td>MasItems</td></tr>
           <tr><td className="font-semibold">Nothing linked</td><td>La fila queda y dice qué falta.</td><td>Vacio</td></tr>
           <tr><td className="font-semibold">Note</td><td>Aclara qué mide un dato (por ejemplo, saldo de la transacción y no de la cuenta).</td><td>NotaDetalle</td></tr>
-          <tr><td className="font-semibold">View full record</td><td>Abre el registro completo (drawer o modal de sólo lectura).</td><td>VerRegistroCompleto</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>

@@ -211,7 +211,7 @@ export function ActividadReciente({
         onRowClick={paciente ? undefined : (m) => onElegir(m.paciente)}
         defaultExpanded={paciente && abierta ? [abierta] : undefined}
         rowDetail={paciente ? (m) => (
-          <DetalleMovimiento m={{ ...m, saldo: undefined }} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} onVerTodo={() => setEnModal(m)} />
+          <DetalleMovimiento m={{ ...m, saldo: undefined }} aplicaciones={APLICACIONES_BILLING} movimientos={ACTIVIDAD_RECIENTE} onVerTransaccion={ver} />
         ) : undefined}
         density="compact"
         pageSize={PAGINA_ACTIVIDAD}
