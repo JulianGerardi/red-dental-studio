@@ -65,12 +65,14 @@ export function ShowMore({
     if (!caja || !contenido) return
     const medir = () => {
       if (filas) {
-        const dibujadas = contenido.querySelectorAll<HTMLElement>(filas)
-        const altoFila = dibujadas[0]?.offsetHeight
+        const dibujadas = [...contenido.querySelectorAll<HTMLElement>(filas)]
+        if (!dibujadas.length) return
+        /* La más alta de las dibujadas: si unas filas envuelven a más renglones que otras, ninguna queda cortada. */
+        const altoFila = Math.max(...dibujadas.map((f) => f.offsetHeight))
         if (!altoFila) return
         const estilo = getComputedStyle(caja)
         const aire = (parseFloat(estilo.paddingTop) || 0) + (parseFloat(estilo.paddingBottom) || 0)
-        const alrededor = contenido.offsetHeight - dibujadas.length * altoFila
+        const alrededor = contenido.offsetHeight - dibujadas.reduce((a, f) => a + f.offsetHeight, 0)
         const cuantas = Math.max(1, Math.floor((caja.clientHeight - aire - alrededor) / altoFila))
         setLimiteMedido((previo) => (previo === cuantas ? previo : cuantas))
         return

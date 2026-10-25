@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-25
 
+### Pending documents: la card llena su parte del alto, con "Show N more" y el scroll adentro de la lista ([#86](https://github.com/JulianGerardi/red-dental-studio/pull/86))
+- Igual que Pending Task en el #85: las dos cards del centro del Patient Dashboard se reparten el alto que deja el menú,
+  muestran las filas que entran enteras y *Show N more* abre el resto con scroll adentro, sin que la card crezca (antes
+  Pending documents crecía y empujaba a Pending Task).
+- **Para el dev:** `PendingDocuments` suma `llenar`; `ShowMore` con `filas` mide con la fila más alta de las dibujadas.
+  Storybook sin actualizar.
+
 ### Pending Task: la card llena el alto, con "Show N more" y el scroll adentro de la lista ([#85](https://github.com/JulianGerardi/red-dental-studio/pull/85))
 - En el #84 Pending Task (Patient Dashboard) había pasado a mostrar todas sus tareas sin botón. Ahora la card sigue
   llenando el alto que deja el menú (sin hueco en blanco), muestra las tareas que entran enteras y *Show N more* abre
