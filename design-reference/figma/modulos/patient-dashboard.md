@@ -338,3 +338,11 @@ Julián: "poné primero Pending documents y abajo Pending Task", y que Pending T
 - En la columna de la izquierda del Overview, **Pending documents va arriba y Pending Task abajo**; Appointments, a la derecha, arranca ahora a la altura de Pending documents.
 - **Pending Task usa el diseño de Pending documents** (`PendingTaskList`): grupos por tipo con rótulo en versalitas y cuenta, filas en una caja con divisores finos, ícono del tipo, pills *Requested* y *Expired date*, vencimiento, documento y *Complete this Task*. Es el mismo del Dashboard. Se ven 3 filas y "Show N more".
 - El e2e `patient-overview` se invirtió: ahora comprueba Pending documents arriba de Pending Task.
+
+## Las tres columnas cierran al mismo nivel (2026-10-25)
+
+Julián, al comparar con la app de red: "el patient dashboard te faltó" (el hueco del final de la página, ver `../README.md` → Responsive 2026-10-25).
+
+- Con el padding del final ya a 24px, el menú del paciente (izquierda) y Appointments (derecha) llegaban hasta el borde, pero **Pending Task** (centro) terminaba ~180px antes, con la página en blanco debajo. En red, el menú y la card central cierran al mismo nivel.
+- La card de **Pending Task** pasa a `flex-1`: llena el alto que le sobra y las tres columnas terminan a 24px del borde, a 1440 y a 1024px. Sin contenido de más: sólo crece la card, el contenido queda arriba.
+- **Pendiente de decidir con Julián:** Documents, Treatments y Ledger tienen lo mismo (la card de contenido termina antes que el menú). No se tocaron.

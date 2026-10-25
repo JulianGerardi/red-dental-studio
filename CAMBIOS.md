@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-25
 
+### Patient Dashboard: las tres columnas cierran al mismo nivel ([#82](https://github.com/JulianGerardi/red-dental-studio/pull/82))
+- Pending Task (columna del medio) terminaba ~180px antes que el menú del paciente y Appointments, que llegan hasta el
+  final de la página. Ahora la card llena el alto que le sobra y las tres columnas cierran juntas, como en la app de red.
+- **Para el dev:** `PatientDetail.tsx`, la card de Pending Task suma `flex-1` (sólo crece; en celular no cambia nada).
+  Documents, Treatments y Ledger tienen el mismo desnivel y no se tocaron. Storybook sin actualizar.
+
 ### La página termina a ras: sin el hueco de ~110px al final del scroll ([#80](https://github.com/JulianGerardi/red-dental-studio/pull/80))
 - Comparado con la app de red, al final de cada página quedaban ~137px vacíos (en red, ~16px). Era la reserva de alto
   para el botón de Confibot, que desde que el contenido deja una columna a la derecha ya no hace falta en pantallas
