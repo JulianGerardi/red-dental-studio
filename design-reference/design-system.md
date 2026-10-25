@@ -1193,3 +1193,12 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
 - Decisión completa -por qué no se usó la imagen del Figma, qué vieron las grabaciones y qué queda pendiente
   (catálogo de condición completo, límites de las regiones, si la card debería mostrar la condition en negrita como
   la app real)- en `figma/modulos/clinical-mode.md` (2026-10-24).
+
+## AppShell: la página termina a ras (2026-10-25)
+
+- Julián, comparando la grabación de la app de red con la nuestra: al final del scroll quedaban ~137px de hueco contra
+  ~16px en red. Venía de `py-6` de la página + `pb-24 sm:pb-28` del `main` (reserva para el botón de Confibot).
+- `main` pasa a `pb-24 sm:pb-0`: desde 640px la página termina con los mismos 24px de los costados; en celular se
+  conserva la reserva para scrollear Cancel/Save por encima del botón. *Components / Layout / AppShell* suma
+  descripción y **Specs → Page end spacing**. Decisión y verificación en `figma/README.md` → *Responsive* (2026-10-25).
+

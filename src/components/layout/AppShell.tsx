@@ -67,8 +67,7 @@ export function AppShell() {
           onOcultar={ocultarDelBanner}
         />
         {/* `clip`, no `hidden`: hidden vuelve a <main> contenedor de scroll y deja sin efecto todo sticky de adentro.
-            El pb reserva el alto del botón flotante de Confibot: lo que cae al pie de una página (Cancel/Save,
-            paginación) se puede scrollear por encima de él. El pr (desde sm) reserva el ancho de la pestaña
+            El pr (desde sm) reserva el ancho de la pestaña
             "Currently being seen" (PatientInSessionPopup, 54px, fija al borde derecho): de 640 a ~1500px el
             contenido llegaba hasta ese borde y la pestaña quedaba encima de kebabs y filas reales. Primero eran 64px
             (sm:pr-16), después 40px (sm:pr-10): los dos de más, porque CONTENEDOR_PAGINA/ANCHO_PAGINA ya ponen
@@ -78,8 +77,11 @@ export function AppShell() {
             la página, sin hueco raro). Bajado a 24px (sm:pr-6) -el mismo que ya pone CONTENEDOR_PAGINA/ANCHO_PAGINA
             del otro lado-: sumado a esos 24-32px existentes alcanza para que los 54px de la pestaña no lleguen a
             tocar ningún kebab ni fila real -reverificado sin superposición en los mismos anchos de la auditoría de
-            tablet y de escritorio-, y ya no se nota como un padding aparte. Ver figma/README.md › Responsive. */}
-        <main className="bg-page-background flex-1 overflow-x-clip pb-24 sm:pr-6 sm:pb-28">
+            tablet y de escritorio-, y ya no se nota como un padding aparte. Ver figma/README.md › Responsive.
+            El pb reserva el alto del botón flotante de Confibot sólo en celular (lo que cae al pie, Cancel/Save, se
+            puede scrollear por encima de él); desde sm la página termina a ras, con el py de la página, como en la app
+            de red (Julián, 2026-10-25: el hueco de ~110px al final no estaba alineado con el resto del padding). */}
+        <main className="bg-page-background flex-1 overflow-x-clip pb-24 sm:pr-6 sm:pb-0">
           <Outlet />
         </main>
       </div>

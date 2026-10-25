@@ -3,6 +3,16 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-25
+
+### La página termina a ras: sin el hueco de ~110px al final del scroll ([#80](https://github.com/JulianGerardi/red-dental-studio/pull/80))
+- Comparado con la app de red, al final de cada página quedaban ~137px vacíos (en red, ~16px). Era la reserva de alto
+  para el botón de Confibot, que desde que el contenido deja una columna a la derecha ya no hace falta en pantallas
+  desde 640px. Ahora la página termina a 24px, igual que el padding de los costados; en celular se conserva la reserva.
+- **Para el dev:** `AppShell`, `main`: `pb-24 sm:pb-28` pasa a `pb-24 sm:pb-0`. El botón de Confibot puede quedar sobre
+  el padding interno de la última card (no tapa texto ni controles en las pantallas revisadas). *Components / Layout /
+  AppShell* suma descripción y Specs.
+
 ## 2026-10-24
 
 ### Clinical Mode: Extraoral e Intraoral con el gráfico del Figma, Edit drawers y buscadores ([#79](https://github.com/JulianGerardi/red-dental-studio/pull/79))
