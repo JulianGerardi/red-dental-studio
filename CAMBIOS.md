@@ -5,13 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-25
 
-### Pending Task vuelve a tener "Show 3 more", con el scroll adentro de la lista ([#85](https://github.com/JulianGerardi/red-dental-studio/pull/85))
-- En el #84 Pending Task (Patient Dashboard) había pasado a mostrar sus 6 tareas sin botón. Vuelve a mostrar 3 con
-  *Show 3 more*; al abrirlo el resto se ve con scroll adentro de la lista y la card no crece, como Appointments. La
-  card sigue cerrando al nivel del menú del paciente.
-- **Para el dev:** `PatientDetail.tsx`: `PendingTaskList` con `limit={TOPE.tareas} enCaja` (se sacó el contenedor
-  `absolute`). Treatments sigue sin *Show N more*. El e2e `patient-overview` vuelve a esperar dos *Show N more*.
-  Storybook sin actualizar.
+### Pending Task: la card llena el alto, con "Show N more" y el scroll adentro de la lista ([#85](https://github.com/JulianGerardi/red-dental-studio/pull/85))
+- En el #84 Pending Task (Patient Dashboard) había pasado a mostrar todas sus tareas sin botón. Ahora la card sigue
+  llenando el alto que deja el menú (sin hueco en blanco), muestra las tareas que entran enteras y *Show N more* abre
+  el resto con scroll adentro de la lista, sin que la card crezca, como Appointments.
+- **Para el dev:** `ShowMore` suma `filas` (selector de la fila, junto a `llenarAlto`, para listas agrupadas);
+  `PendingTaskList` suma `llenarAlto`. En `PatientDetail.tsx` el mock de tareas pasa de 6 a 9 para que el botón exista.
+  Treatments sigue sin *Show N more*. Storybook sin actualizar.
 
 ### Patient: Documents, Treatments y Ledger cierran al pie del menú; Pending Task y Treatments, completos y con scroll adentro ([#84](https://github.com/JulianGerardi/red-dental-studio/pull/84))
 - Documents, Treatments y Ledger terminaban antes que el menú del paciente. Ahora la card de contenido llega al mismo

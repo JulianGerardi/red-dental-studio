@@ -30,7 +30,7 @@ const CLINICAL: { label: Categoria; icon: LucideIcon }[] = [
   { label: 'Past Surgery and Hospitalization', icon: ClipboardList },
 ]
 
-const TASKS: PendingTask[] = Array.from({ length: 6 }, () => ({
+const TASKS: PendingTask[] = Array.from({ length: 9 }, () => ({
   kind: 'Referrals', state: 'Requested', person: 'Elena Marquez', initials: 'EM',
   register: 'March 17, 2025', expiration: 'March 15, 2025',
 }))
@@ -145,15 +145,15 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
                 <PendingDocuments />
               </Card>
 
-              {/* flex-1: la card llena el alto que deja el menú, así las tres columnas cierran juntas. Se ven 3 tareas y "Show N more"
-                  abre el resto con scroll adentro, sin que la card crezca (enCaja, como Appointments; patient-dashboard.md, 2026-10-25). */}
-              <Card className="flex-1 p-5">
+              {/* La card llena el alto que deja el menú y la lista muestra las tareas que entran enteras (llenarAlto); "Show N more" abre
+                  el resto con scroll adentro, sin que la card crezca (enCaja, como Appointments; patient-dashboard.md, 2026-10-25). */}
+              <Card className="flex flex-1 flex-col p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
                   <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
                 </div>
-                <div className="mt-4">
-                  <PendingTaskList tasks={TASKS} limit={TOPE.tareas} enCaja />
+                <div className="mt-4 flex min-h-0 flex-1 flex-col">
+                  <PendingTaskList tasks={TASKS} limit={TOPE.tareas} enCaja llenarAlto />
                 </div>
               </Card>
             </div>
