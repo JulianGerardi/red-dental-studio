@@ -47,7 +47,7 @@ const PADDING = 32
 export function DataTable<T>({
   columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail, defaultExpanded, reorder,
   search, filter, columnPicker, resizable, actions,
-  pageSize: pageSizeInicial = 10, pageSizeOptions, pageSizeLabel = 'Rows per page:',
+  llenar, pageSize: pageSizeInicial = 10, pageSizeOptions, pageSizeLabel = 'Rows per page:',
   itemLabel = 'results', density = 'regular', selected, onSelectedChange,
   loading, error, disabled, isRowDisabled,
   empty = { title: 'No results', detail: 'Try a different search or filter.' },
@@ -83,6 +83,8 @@ export function DataTable<T>({
   resizable?: boolean
   /** A la derecha de la barra: acción principal, exportar… */
   actions?: ReactNode
+  /** Con el alto que le sobra a la pantalla (junto a un menú más alto): la tabla se estira y el pie queda abajo. */
+  llenar?: boolean
   pageSize?: number
   /** Selector de filas por página en el pie, por ejemplo [10, 25, 50]. */
   pageSizeOptions?: number[]
@@ -181,7 +183,7 @@ export function DataTable<T>({
   const reiniciar = () => setPagina(1)
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className={cn('flex flex-col gap-3', llenar && 'lg:min-h-0 lg:flex-1')}>
       {hayBarra && (
         <div className={cn('flex flex-wrap items-center gap-2', inactiva && 'pointer-events-none opacity-50')} aria-disabled={inactiva || undefined}>
           {search && (
@@ -225,9 +227,9 @@ export function DataTable<T>({
         data-tabla-scroll
         aria-busy={loading || undefined}
         aria-disabled={disabled || undefined}
-        className={cn('overflow-x-auto rounded-lg border border-line-row bg-white', disabled && 'pointer-events-none select-none opacity-60')}
+        className={cn('overflow-x-auto rounded-lg border border-line-row bg-white', llenar && 'lg:flex lg:flex-1 lg:flex-col', disabled && 'pointer-events-none select-none opacity-60')}
       >
-        <div style={{ minWidth: minimo }}>
+        <div style={{ minWidth: minimo }} className={cn(llenar && 'lg:flex lg:flex-1 lg:flex-col')}>
           <div role="row" data-tabla-header className={cn('group/fila flex h-11 gap-3', TABLA_ENCABEZADO)}>
             {reorder && <span className="w-5 shrink-0" aria-hidden />}
             {rowDetail && <span className="w-4 shrink-0" aria-hidden />}
@@ -358,7 +360,7 @@ export function DataTable<T>({
           )}
 
           {filtradas.length > 0 && !loading && !error && (
-            <div className="flex min-h-[52px] flex-wrap items-center justify-between gap-3 border-t border-line-row px-4 py-2">
+            <div className={cn('flex min-h-[52px] flex-wrap items-center justify-between gap-3 border-t border-line-row px-4 py-2', llenar && 'lg:mt-auto')}>
               <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-ink-muted">
                 <span>
                   {selectable && elegidas.length > 0 ? `${elegidas.length} selected · ` : ''}
