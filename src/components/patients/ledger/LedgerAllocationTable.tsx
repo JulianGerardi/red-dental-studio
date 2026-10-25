@@ -5,7 +5,7 @@ import { ColumnPicker } from './ColumnPicker'
 import { moneda, fechaCorta, type Movimiento } from '@/data/ledger'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
-import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip } from '@/components/patients/ledger/LedgerRowDetail'
+import { LedgerRowDetail, BotonExpandirTodo, FilaConTooltip } from '@/components/patients/ledger/LedgerRowDetail'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { RowChevron } from '@/components/ui/data-table'
 
@@ -61,7 +61,6 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
   const alternarCol = (id: ColId) => setOcultas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
   const [pagina, setPagina] = useState(1)
   const [expandidas, setExpandidas] = useState<string[]>([])
-  const [enModal, setEnModal] = useState<Movimiento | null>(null)
   const anchos = useAnchoColumnas<ColId>(ANCHO_BASE)
   const refVisible = useAnchoVisible<HTMLDivElement>()
 
@@ -217,7 +216,7 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
                       ))}
                     </div>
                     </FilaConTooltip>
-                    {abierta && <LedgerRowDetail m={m} onVerTodo={() => setEnModal(m)} sangria={PADDING_FILA / 2 + 16 + GAP} />}
+                    {abierta && <LedgerRowDetail m={m} sangria={PADDING_FILA / 2 + 16 + GAP} />}
                   </div>
                 )
               })}
@@ -259,7 +258,6 @@ export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
         </>
       )}
 
-      {enModal && <LedgerRowModal m={enModal} onClose={() => setEnModal(null)} />}
     </div>
   )
 }

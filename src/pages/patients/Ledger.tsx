@@ -402,7 +402,6 @@ export default function Ledger() {
                             movimientos={movs}
                             onVerTransaccion={verTransaccion}
                             onAbrirClinica={abrirClinica}
-                            onVerTodo={() => setEnModal(m)}
                             onAplicarCredito={tieneCredito(m) ? () => setEnCredito(m) : undefined}
                           />
                         )}

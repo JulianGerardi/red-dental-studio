@@ -27,12 +27,11 @@ test('el detalle de un pago dice a qué cargos fue y ofrece Apply credit', async
   await expect(screen.getByRole('button', /^Apply credit$/)).toBeVisible()
 })
 
-test('View full record abre el procedimiento en Clinical Mode', async ({ app, screen }) => {
+/* El detalle de la fila ya tiene todo: sin View full record (ledger.md, 2026-10-25). */
+test('el detalle de una fila del Ledger no tiene View full record', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
   await screen.getByPlaceholder(/Search by code/).fill('D4341')
   await screen.getByRole('button', /Toggle details/).first().tap()
-  await screen.getByRole('button', /View full record/).tap()
-
-  await expect(screen.getByRole('tab', 'Procedures')).toHaveAttribute('aria-selected', 'true')
-  await expect(screen.getByText('D4341 · Periodontal scaling and root planing – four or more teeth per quadrant')).toBeVisible()
+  await expect(screen.getByText('Financial details')).toBeVisible()
+  await expect(screen.getByRole('button', /View full record/)).toHaveCount(0)
 })
