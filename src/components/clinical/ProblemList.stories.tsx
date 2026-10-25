@@ -41,14 +41,13 @@ export const Procedures: Story = {
   },
 }
 
-/* Una fila desplegada: el detalle con sus bloques y View full record. */
+/* Una fila desplegada: el detalle con sus bloques, sin botón de registro completo. */
 export const ExpandedRow: Story = {
   name: 'Expanded row',
   play: async (c) => {
     const canvas = within(c.canvasElement)
     await userEvent.click(await canvas.findByRole('tab', { name: 'Procedures' }))
     await userEvent.click(await canvas.findByText(/Extraction – erupted tooth/))
-    await esperar(/View full record/)(c)
     await esperar(/Bridge Option/)(c)
   },
 }

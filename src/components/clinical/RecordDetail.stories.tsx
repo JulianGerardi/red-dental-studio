@@ -87,7 +87,7 @@ export const Parts: Story = {
   render: () => (
     <TooltipProvider>
       <Lienzo>
-        <Bloque titulo="The detail, procedure" nota="Título completo y pieza arriba; la lista; al pie View full record y Read-only summary.">
+        <Bloque titulo="The detail, procedure" nota="Título completo y pieza arriba; la lista, sin botón al pie: el detalle ya tiene todo.">
           <EnFila tipo="procedure" procedure="pr10" problem="p9" ancho="wide" />
         </Bloque>
         <Bloque titulo="Rows of a procedure" nota="FilasProcedimiento, por importancia: Treatment, Procedure consent, Findings / diagnoses, Referral y Lab order.">

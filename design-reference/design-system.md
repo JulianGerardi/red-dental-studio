@@ -1193,3 +1193,8 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
 - Decisión completa -por qué no se usó la imagen del Figma, qué vieron las grabaciones y qué queda pendiente
   (catálogo de condición completo, límites de las regiones, si la card debería mostrar la condition en negrita como
   la app real)- en `figma/modulos/clinical-mode.md` (2026-10-24).
+
+## Desplegables de tablas sin View full record (2026-10-25)
+
+- *Components / Clinical / RecordDetail*, *Ledger / LedgerRowDetail*, *Pages / Parts / Billing* y *UI / DetailList*: el pie del
+  detalle de una fila ya no lleva View full record (sale `VerRegistroCompleto`); en el Ledger queda Apply credit. Decisión en `figma/modulos/ledger.md` (2026-10-25).

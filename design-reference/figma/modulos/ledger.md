@@ -867,3 +867,15 @@ Julián, revisando el detalle con capturas:
 
 Salen `Motivo` y `MetodosDePago` de `LedgerRowDetail`. Qué validar con usuarios: si quien concilia pagos echa de menos
 el método de pago (efectivo, cheque, tarjeta) en el detalle; sigue en la descripción de la fila y en el registro.
+
+## Sin View full record en el desplegable de las tablas (2026-10-25)
+
+- Pedido de Julián: el detalle que se despliega ya tiene toda la información, así que el botón **View full record** del
+  pie sale de los desplegables de las tablas: Problem List, Procedures y las visitas de Treatment Plan (`DetalleRegistro`),
+  el Ledger y la tabla de Billing con un paciente (`DetalleMovimiento`). Revierte el "un solo link al registro" del
+  2026-10-19.
+- En el pie del Ledger queda sólo **Apply credit** (con crédito sin aplicar) y *Read-only summary*; sin acciones, no hay pie.
+- Sigue en el menú de los tres puntos de cada finding de los exámenes (ahí no hay desplegable) y en las referencias de
+  *Applied transactions* (abren la transacción en el modal).
+- Se pierde el atajo de un cargo de procedimiento del Ledger a Clinical Mode con el procedimiento abierto; quedan el link al
+  caso de la fila Treatment y el de cada hallazgo. A validar con usuarios si se extraña.

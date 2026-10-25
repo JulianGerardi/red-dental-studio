@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { ArrowUpRight, ChevronRight, Maximize2 } from 'lucide-react'
+import { ArrowUpRight, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Count } from '@/components/ui/count'
 
@@ -7,7 +7,7 @@ import { Count } from '@/components/ui/count'
    debajo de la otra y sin cards, con el título a la izquierda y los datos a la derecha. Sólo lectura: cada dato lleva a
    la pantalla donde se trabaja. Ver Components / UI / DetailList. */
 
-/** El detalle entero: título y dato del costado arriba, las filas, y el pie (View full record y Read-only summary). */
+/** El detalle entero: título y dato del costado arriba, las filas, y un pie opcional (una acción, como Apply credit, y Read-only summary). */
 export function ListaDetalle({ titulo, lado, pie, children }: { titulo: string; lado?: ReactNode; pie?: ReactNode; children: ReactNode }) {
   return (
     <div className="@container">
@@ -82,12 +82,3 @@ export const Vacio = ({ children }: { children: ReactNode }) => <p className="fl
 
 /** Nota chica debajo de un dato, para aclarar qué mide (por ejemplo, un saldo de la transacción y no de la cuenta). */
 export const NotaDetalle = ({ children }: { children: ReactNode }) => <p className="mt-2 text-[11px] leading-[1.5] text-ink-muted">{children}</p>
-
-/** El botón del pie que abre el registro completo. */
-export function VerRegistroCompleto({ onClick, label = 'View full record' }: { onClick: () => void; label?: string }) {
-  return (
-    <button type="button" onClick={onClick} className="text-dash-blue inline-flex items-center gap-1.5 text-[12px] font-semibold hover:underline">
-      <Maximize2 className="size-3.5" /> {label}
-    </button>
-  )
-}

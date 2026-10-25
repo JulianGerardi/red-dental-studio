@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-25
 
+### Tablas: el desplegable ya no lleva View full record ([#86](https://github.com/JulianGerardi/red-dental-studio/pull/86))
+- El pie del detalle de una fila sale en Problem List, Procedures, Treatment Plan, Ledger y Billing: el desplegable ya
+  tiene toda la información. En el Ledger queda sólo Apply credit. Sigue en el menú de los tres puntos de cada finding.
+- **Para el dev:** `DetalleRegistro` y `DetalleMovimiento` / `LedgerRowDetail` pierden la prop `onVerTodo`; se elimina
+  `VerRegistroCompleto` (`ui/detail-list`). Se pierde el atajo de un cargo de procedimiento del Ledger a Clinical Mode.
+
 ### Pending Task: la card llena el alto, con "Show N more" y el scroll adentro de la lista ([#85](https://github.com/JulianGerardi/red-dental-studio/pull/85))
 - En el #84 Pending Task (Patient Dashboard) había pasado a mostrar todas sus tareas sin botón. Ahora la card sigue
   llenando el alto que deja el menú (sin hueco en blanco), muestra las tareas que entran enteras y *Show N more* abre
