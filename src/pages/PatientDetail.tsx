@@ -145,7 +145,8 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
                 <PendingDocuments />
               </Card>
 
-              <Card className="p-5">
+              {/* flex-1: la última card llena el alto que le sobra, así las tres columnas cierran al mismo nivel que el menú del paciente. */}
+              <Card className="flex-1 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
                   <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
