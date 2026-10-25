@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-25
 
-### Patient: Documents, Treatments y Ledger cierran al pie del menú; Pending Task y Treatments, completos y con scroll adentro ([#83](https://github.com/JulianGerardi/red-dental-studio/pull/83))
+### Patient: Documents, Treatments y Ledger cierran al pie del menú; Pending Task y Treatments, completos y con scroll adentro ([#84](https://github.com/JulianGerardi/red-dental-studio/pull/84))
 - Documents, Treatments y Ledger terminaban antes que el menú del paciente. Ahora la card de contenido llega al mismo
   nivel (Documents y Ledger con el pie de paginación abajo de la card).
 - Pending Task (Patient Dashboard) y Treatments muestran todo de entrada, sin *Show N more*; la lista scrollea adentro de
