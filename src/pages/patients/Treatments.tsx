@@ -6,7 +6,6 @@ import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
-import { ShowMore } from '@/components/ui/show-more'
 import { Avatar } from '@/components/ui/avatar'
 
 /* Figma 3768:803852 (poblado) y 3769:808875 (vacío).
@@ -111,7 +110,7 @@ export default function Treatments() {
           basePath={`/patients/${id}`}
         />
 
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-center justify-between gap-3">
             {/* El título dice "Treatments plan" y el breadcrumb "Treatment plan". */}
             <PageTitle>Treatments plan</PageTitle>
@@ -124,7 +123,7 @@ export default function Treatments() {
           </div>
 
           {vacio ? (
-            <div className={cn(TARJETA_PANEL, 'mt-4 flex min-h-[560px] flex-col items-center justify-center')}>
+            <div className={cn(TARJETA_PANEL, 'mt-4 flex min-h-[560px] flex-col items-center justify-center lg:flex-1')}>
               <span className="flex size-11 items-center justify-center rounded-lg bg-[#eff4ff]">
                 <Circle className="size-4 fill-dash-blue text-dash-blue" />
               </span>
@@ -134,11 +133,13 @@ export default function Treatments() {
               </p>
             </div>
           ) : (
-            /* Cuatro planes (dos filas) y "Show N more" abre el resto con scroll (treatments.md, 2026-10-12). */
-            <div className="mt-4">
-              <ShowMore total={PLANS.length} limit={4} label="treatment plans" fade="from-page-background" className="grid gap-5 lg:grid-cols-2">
-                {(n) => PLANS.slice(0, n).map((p, i) => <TreatmentCard key={i} plan={p} />)}
-              </ShowMore>
+            /* Todos los planes a la vista; desde lg la lista llena el alto que deja el menú y scrollea adentro
+               (patient-dashboard.md, 2026-10-25). El absolute saca la lista del cálculo del alto de la fila: lo manda el menú. */
+            <div className="mt-4 lg:relative lg:min-h-[320px] lg:flex-1">
+              <div tabIndex={0} aria-label="Treatment plans" role="region" className="-m-1 grid gap-5 overflow-y-auto p-1 focus-visible:outline-2 focus-visible:outline-dash-blue lg:absolute lg:inset-0 lg:m-0 lg:grid-cols-2 lg:auto-rows-max lg:content-start lg:p-1">
+                {PLANS.map((p, i) => <TreatmentCard key={i} plan={p} />)}
+                <div aria-hidden className="pointer-events-none sticky bottom-0 -mt-10 hidden h-10 bg-gradient-to-t from-page-background to-transparent lg:col-span-2 lg:block" />
+              </div>
             </div>
           )}
         </div>

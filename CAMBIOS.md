@@ -5,6 +5,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-25
 
+### Patient: Documents, Treatments y Ledger cierran al pie del menú; Pending Task y Treatments, completos y con scroll adentro ([#84](https://github.com/JulianGerardi/red-dental-studio/pull/84))
+- Documents, Treatments y Ledger terminaban antes que el menú del paciente. Ahora la card de contenido llega al mismo
+  nivel (Documents y Ledger con el pie de paginación abajo de la card).
+- Pending Task (Patient Dashboard) y Treatments muestran todo de entrada, sin *Show N more*; la lista scrollea adentro de
+  la card y, en Treatments, con un degradé abajo. Pending documents conserva su *Show 2 more*.
+- **Para el dev:** `DataTable` suma la prop `llenar` (estira la tabla y deja el pie abajo, desde `lg`). Pending Task y
+  Treatments usan un contenedor `lg:relative` con la lista en `lg:absolute lg:inset-0 overflow-y-auto`, así el alto de la
+  fila lo sigue mandando el menú. Treatments ya no usa `ShowMore`. El e2e `patient-overview` pasa a esperar un solo
+  *Show N more* y las 6 tareas. Storybook sin actualizar.
+
 ### Dashboard: la fila del turno no se rompe al expandir el menú lateral ([#83](https://github.com/JulianGerardi/red-dental-studio/pull/83))
 - Con el menú expandido la lista de Appointments mide 381px, 3px por debajo del corte de 384px (`@sm`), y la fila saltaba de 86 a 139px: el provider
   ocupaba el renglón del medio y el botón (Check In / Check Out) quedaba solo en un cuarto renglón. Ahora el botón sube al renglón de Check In y los
