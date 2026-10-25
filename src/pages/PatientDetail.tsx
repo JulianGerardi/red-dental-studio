@@ -141,8 +141,8 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
             <div className="flex min-w-0 flex-col gap-5">
               {/* En lugar de la tabla de Insurance (que sigue en su sección): los documentos pendientes a resolver. Van
                   primero y las tareas abajo, con el mismo diseño (Julián, 2026-10-19). */}
-              <Card className="p-5">
-                <PendingDocuments />
+              <Card className="flex flex-1 flex-col p-5">
+                <PendingDocuments llenar />
               </Card>
 
               {/* La card llena el alto que deja el menú y la lista muestra las tareas que entran enteras (llenarAlto); "Show N more" abre

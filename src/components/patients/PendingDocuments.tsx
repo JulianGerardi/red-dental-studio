@@ -51,14 +51,18 @@ const GRUPOS: { titulo: string; filtro: (d: DocPendiente) => boolean; color: str
   { titulo: 'Later', filtro: (d) => d.dias > 7, color: 'text-ink-muted' },
 ]
 
-export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES }: { docs?: DocPendiente[] }) {
+export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES, llenar }: {
+  docs?: DocPendiente[]
+  /** Dentro de una card `flex-1`: llena el alto que le toca, muestra las filas que entran y "Show N more" abre el resto con scroll adentro. */
+  llenar?: boolean
+}) {
   const { docs, resolver } = useDocsPendientes(iniciales)
   const [quien, setQuien] = useState<'All' | 'Patient' | 'Office'>('All')
   const pendientes = docs.filter((d) => !d.resuelto)
   const visibles = pendientes.filter((d) => quien === 'All' || (quien === 'Patient' ? d.responsable === 'Patient' : d.responsable !== 'Patient'))
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className={cn('flex flex-col gap-4', llenar && 'min-h-0 flex-1')}>
       <div className="flex flex-wrap items-center gap-3">
         <h2 className="text-[15px] font-bold text-ink">Pending documents</h2>
         {pendientes.length > 0 && <Pill tone="warning" size="sm">{pendientes.length} to resolve</Pill>}
@@ -77,7 +81,7 @@ export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES }: { docs?:
         <EmptyState icon={Inbox} title="Nothing to resolve" detail="Every document of this patient is signed, uploaded and up to date." className="py-8" />
       ) : (
         /* Los primeros TOPE documentos, en el orden de los grupos; "Show N more" abre el resto con scroll (ui/show-more). */
-        <ShowMore total={visibles.length} limit={TOPE} label="pending documents" className="flex flex-col gap-4">
+        <ShowMore total={visibles.length} limit={TOPE} enCaja={llenar} llenarAlto={llenar} filas={llenar ? 'li' : undefined} label="pending documents" className="flex flex-col gap-4">
           {(n) => {
             const enOrden = GRUPOS.flatMap((g) => visibles.filter(g.filtro)).slice(0, n)
             return GRUPOS.map((g) => {

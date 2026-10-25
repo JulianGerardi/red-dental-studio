@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-25
 
+### Pending documents: la card llena su parte del alto, con "Show N more" y el scroll adentro de la lista ([#87](https://github.com/JulianGerardi/red-dental-studio/pull/87))
+- Igual que Pending Task en el #85: las dos cards del centro del Patient Dashboard se reparten el alto que deja el menú,
+  muestran las filas que entran enteras y *Show N more* abre el resto con scroll adentro, sin que la card crezca (antes
+  Pending documents crecía y empujaba a Pending Task).
+- **Para el dev:** `PendingDocuments` suma `llenar`; `ShowMore` con `filas` mide con la fila más alta de las dibujadas.
+  Storybook sin actualizar.
+
 ### Tablas: el desplegable ya no lleva View full record ([#86](https://github.com/JulianGerardi/red-dental-studio/pull/86))
 - El pie del detalle de una fila sale en Problem List, Procedures, Treatment Plan, Ledger y Billing: el desplegable ya
   tiene toda la información. En el Ledger queda sólo Apply credit. Sigue en el menú de los tres puntos de cada finding.

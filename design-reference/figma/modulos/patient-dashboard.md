@@ -357,3 +357,12 @@ Julián, con una grabación del Patient Dashboard: "alineá también Documents, 
 - **Documents** y **Ledger**: la tabla se estira hasta el pie del menú y el pie (*Showing…* + paginación) queda abajo de la card. `DataTable` suma `llenar` (desde `lg`); el Ledger tiene su propia tabla y lleva las mismas clases.
 - Verificado con Playwright a 1519×829 (la pantalla de Julián) y 1024px: el borde de abajo del menú y de la card coinciden (24px del borde). Por debajo de `lg` nada cambia, salvo que Pending Task ya no se corta en 3.
 - **A validar con usuarios:** si con muchas tareas conviene volver a agrupar o filtrar en vez de una lista larga con scroll adentro.
+
+## Pending documents, igual que Pending Task (2026-10-25)
+
+Julián: "lo mismo hace en pending documents".
+
+- Las dos cards del centro (**Pending documents** y **Pending Task**) son `flex-1`: se reparten por igual el alto que deja el menú (453px cada una a 1440-1920px de ancho) y cada una muestra las filas que entran enteras (`llenarAlto`). *Show N more* abre el resto **con scroll adentro de la lista, sin que la card crezca** (`enCaja`). A 1519×829: Pending documents muestra 4 y *Show 2 more*; Pending Task, 5 y *Show 4 more*.
+- Antes, Pending documents mostraba 4 fijas y al abrir la card crecía y empujaba a Pending Task.
+- `PendingDocuments` suma la prop `llenar`. `ShowMore` con `filas` mide ahora con la fila **más alta** de las dibujadas (en columnas angostas unas filas envuelven a más renglones que otras) para que ninguna quede cortada.
+- **A validar:** a 1024px las filas de documentos envuelven a 3 renglones y entra una sola antes de *Show 5 more*; si molesta, subir el mínimo de la card.
