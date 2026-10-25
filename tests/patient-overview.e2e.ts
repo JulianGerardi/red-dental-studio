@@ -15,7 +15,5 @@ test('Pending documents arriba de Pending Task y Appointments a la derecha', asy
   expect(turnos!.x).toBeGreaterThan(docs!.x + 400)
   expect(Math.abs(turnos!.y - docs!.y)).toBeLessThan(20)
   await expect(screen.getByText('Routine cleaning appointment')).toHaveCount(7)
-  // Pending documents sigue con "Show 2 more"; Pending Task muestra sus 6 tareas de entrada, sin botón (patient-dashboard.md, 2026-10-25).
-  await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(1)
-  await expect(screen.getByText('Referrals', { exact: true })).toHaveCount(6)
+  await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(2)
 })

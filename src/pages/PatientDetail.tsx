@@ -30,7 +30,7 @@ const CLINICAL: { label: Categoria; icon: LucideIcon }[] = [
   { label: 'Past Surgery and Hospitalization', icon: ClipboardList },
 ]
 
-const TASKS: PendingTask[] = Array.from({ length: 6 }, () => ({
+const TASKS: PendingTask[] = Array.from({ length: 9 }, () => ({
   kind: 'Referrals', state: 'Requested', person: 'Elena Marquez', initials: 'EM',
   register: 'March 17, 2025', expiration: 'March 15, 2025',
 }))
@@ -145,17 +145,15 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
                 <PendingDocuments />
               </Card>
 
-              {/* Todas las tareas a la vista; la card llena el alto que deja el menú y la lista scrollea adentro (desde lg). El
-                  absolute saca la lista del cálculo del alto de la fila: lo manda el menú (patient-dashboard.md, 2026-10-25). */}
-              <Card className="flex flex-1 flex-col p-5 lg:min-h-[420px]">
+              {/* La card llena el alto que deja el menú y la lista muestra las tareas que entran enteras (llenarAlto); "Show N more" abre
+                  el resto con scroll adentro, sin que la card crezca (enCaja, como Appointments; patient-dashboard.md, 2026-10-25). */}
+              <Card className="flex flex-1 flex-col p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
                   <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
                 </div>
-                <div className="mt-4 lg:relative lg:min-h-0 lg:flex-1">
-                  <div tabIndex={0} role="region" aria-label="All pending tasks" className="focus-visible:outline-2 focus-visible:outline-dash-blue lg:absolute lg:inset-0 lg:overflow-y-auto lg:overscroll-contain">
-                    <PendingTaskList tasks={TASKS} />
-                  </div>
+                <div className="mt-4 flex min-h-0 flex-1 flex-col">
+                  <PendingTaskList tasks={TASKS} limit={TOPE.tareas} enCaja llenarAlto />
                 </div>
               </Card>
             </div>
