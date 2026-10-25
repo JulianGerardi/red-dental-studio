@@ -64,7 +64,7 @@ export default function Documents() {
           basePath={`/patients/${id}`}
         />
 
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-col">
           {/* El encabezado de las tablas por defecto (Locations, Employees): título con la acción alineada y el buscador de
               36px con Search en su fila (documents en treatments.md, 2026-10-12). */}
           <SettingsPageHeader
@@ -88,8 +88,9 @@ export default function Documents() {
             <SettingsSearch value={q} onChange={setQ} placeholder="Search documents" />
           </SettingsPageHeader>
 
-          <div className="mt-4">
+          <div className="mt-4 flex flex-col lg:flex-1">
             <DataTable
+              llenar
               columns={COLUMNAS}
               rows={filas}
               rowKey={(d) => d.id}

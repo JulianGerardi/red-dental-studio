@@ -802,3 +802,19 @@ filtrada abajo—, decime y lo ajusto.
 ## Aire en la línea del día (2026-10-20)
 
 Julián marcó que al desplegar una sala la primera card quedaba pegada a la línea que separa el encabezado de la línea del día. `LineaDelDia` pasa de 4px a 12px de aire arriba.
+
+## La fila del turno al expandir el menú lateral (2026-10-25)
+
+Julián, con una grabación de pantalla: "cuando descolapso el menú se rompe la estructura de la card de los appointments". Medido a 1519px: con el menú
+colapsado la lista de Appointments mide 408px y la fila 86px (dos renglones); al expandirlo mide 381px, **3px por debajo del corte de 384px** (`@sm`), y la fila
+salta a **139px** (+62%): el provider tomaba el renglón del medio (`basis-full`) y el botón, último en el orden, quedaba solo en un cuarto renglón a la derecha, con la
+hora estirada en una columna gris alta.
+
+Arreglo en `AppointmentRow` (sólo el layout angosto, `< @sm`): el provider pasa a `order-last`, así **el botón sube al renglón de Check In y los chips** y el provider
+queda último, en el suyo. Son tres renglones parejos (109px expandido, −22%); el colapsado no cambia (86px). Si ni Check In + chips + botón entran (celular, 326px de
+lista, 2px de margen), el botón baja solo como antes: no es parte de este cambio.
+
+Storybook: *Components / Dashboard / Dashboard rows → States* suma **Menu expanded (381px)** y **Menu collapsed (408px)** para ver los dos juntos.
+
+**Para validar con usuarios:** si conviene que la fila mantenga dos renglones también expandida (hoy no entra: Check In + provider + botón piden ~306px y hay 303), por
+ejemplo con el provider más corto o el botón sólo con ícono en angosto.

@@ -115,8 +115,14 @@ export const States: Story = {
         <Muestra titulo="Narrow (340px)" nota="El botón baja a su propio renglón para no cortar provider y operatorio; un nombre largo se corta con elipsis y se lee entero al pasar el mouse.">
           <Caja ancho={340}><li><AppointmentRow appt={TURNO} /></li><li><TaskRow task={TAREA} /></li></Caja>
         </Muestra>
-        <Muestra titulo="Column (290px)" nota="La columna del Dashboard desde 1280px (son tres, con Pending Task abajo): el nombre queda entero porque TR y CC bajan junto a Check In y el provider va en su renglón (2026-10-19).">
+        <Muestra titulo="Column (290px)" nota="La columna del Dashboard desde 1280px (son tres, con Pending Task abajo): el nombre queda entero porque TR y CC bajan junto a Check In, el botón sube a ese mismo renglón y el provider va último, en el suyo (2026-10-19; el botón arriba, 2026-10-25).">
           <Caja ancho={290}><li><AppointmentRow appt={TURNO} onSelect={() => {}} /></li><li><AppointmentRow appt={CHECK_IN} onSelect={() => {}} /></li></Caja>
+        </Muestra>
+        <Muestra titulo="Menu expanded (381px)" nota="Con el menú lateral expandido, a 1519px, la lista de Appointments mide 381px: 3px por debajo del corte de 384px (@sm). Antes la fila saltaba de 86 a 139px porque el provider ocupaba el renglón del medio y el botón quedaba solo en un cuarto; ahora son tres renglones parejos (109px). Julián, 2026-10-25.">
+          <Caja ancho={381}><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CHECK_IN} /></li></Caja>
+        </Muestra>
+        <Muestra titulo="Menu collapsed (408px)" nota="El mismo dashboard con el menú colapsado: dos renglones (86px), con TR y CC junto al nombre y el botón en el renglón del provider.">
+          <Caja ancho={408}><li><AppointmentRow appt={TURNO} /></li><li><AppointmentRow appt={CHECK_IN} /></li></Caja>
         </Muestra>
         <Muestra titulo="Operatory hidden" nota="Con ocultarOperatorio: la Waiting Room del Dashboard, filtrada por una sala, ya decía la sala en el chip del título (hoy la Waiting Room tiene su propio Filter y no la usa); repetirla en cada fila era ruido (Julián, 2026-10-19).">
           <Caja><li><AppointmentRow appt={TURNO} ocultarOperatorio /></li></Caja>

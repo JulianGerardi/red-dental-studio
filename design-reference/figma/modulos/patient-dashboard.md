@@ -345,4 +345,15 @@ Julián, al comparar con la app de red: "el patient dashboard te faltó" (el hue
 
 - Con el padding del final ya a 24px, el menú del paciente (izquierda) y Appointments (derecha) llegaban hasta el borde, pero **Pending Task** (centro) terminaba ~180px antes, con la página en blanco debajo. En red, el menú y la card central cierran al mismo nivel.
 - La card de **Pending Task** pasa a `flex-1`: llena el alto que le sobra y las tres columnas terminan a 24px del borde, a 1440 y a 1024px. Sin contenido de más: sólo crece la card, el contenido queda arriba.
-- **Pendiente de decidir con Julián:** Documents, Treatments y Ledger tienen lo mismo (la card de contenido termina antes que el menú). No se tocaron.
+- Documents, Treatments y Ledger tenían lo mismo: se resolvió en la sección siguiente.
+
+## Documents, Treatments y Ledger cierran igual; Treatments completo con scroll adentro (2026-10-25)
+
+Julián, con una grabación del Patient Dashboard: "alineá también Documents, Treatments y Ledger", y que las tareas "aparezcan por default como en el video" (después de tocar *Show 3 more*) "y el scroll es dentro de la card".
+
+- **Pending Task** (Patient Dashboard): la card llena el alto que deja el menú y la lista muestra las tareas que entran enteras (`llenarAlto`); *Show N more* abre el resto **con scroll adentro de la lista, sin que la card crezca** (`enCaja`, como Appointments). Sin hueco en blanco debajo, abierto o cerrado. Una primera vuelta las mostraba todas sin botón y otra mostraba 3 fijas con aire debajo; Julián pidió la card llena **y** con *Show more*. Para que el botón exista el mock pasa de 6 a 9 tareas (a 1519×829 se ven 6 y *Show 3 more*; a 1024px, 3 y *Show 6 more*). Pending documents conserva su *Show 2 more*.
+- `ShowMore` suma `filas` (selector de la fila, `"li"`): con `llenarAlto` mide el alto de la fila y lo que suman los rótulos y espacios de alrededor, porque `PendingTaskList` agrupa por tipo y el primer hijo ya no es una fila.
+- **Treatments** muestra todos los planes (sin *Show 4 more*) en un área que llena el alto hasta el pie del menú, con scroll adentro y un degradé abajo que avisa que hay más. `lg:auto-rows-max`: sin eso la grilla comprimía las filas y cortaba el pie de cada card.
+- **Documents** y **Ledger**: la tabla se estira hasta el pie del menú y el pie (*Showing…* + paginación) queda abajo de la card. `DataTable` suma `llenar` (desde `lg`); el Ledger tiene su propia tabla y lleva las mismas clases.
+- Verificado con Playwright a 1519×829 (la pantalla de Julián) y 1024px: el borde de abajo del menú y de la card coinciden (24px del borde). Por debajo de `lg` nada cambia, salvo que Pending Task ya no se corta en 3.
+- **A validar con usuarios:** si con muchas tareas conviene volver a agrupar o filtrar en vez de una lista larga con scroll adentro.

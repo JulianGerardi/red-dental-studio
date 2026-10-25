@@ -92,13 +92,16 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOper
               {menu}
             </div>
             {/* En una columna angosta (desde 1280px son cuatro) el nombre se cortaba: los chips bajan junto a Check In y el
-                provider va en su renglón (2026-10-19). Si no entra, el botón baja a su propio renglón. */}
+                provider va en su renglón (2026-10-19). Ahí el botón sube al renglón de Check In y los chips y el provider
+                queda último (`order-last`): antes el provider ocupaba el renglón del medio y el botón quedaba solo en un
+                cuarto, y al expandir el menú -de 408 a 381px de panel- la fila pasaba de 86 a 139px (Julián, 2026-10-25). Si
+                tampoco entra, el botón baja a su propio renglón. */}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
               <span className="flex items-center gap-1.5">
                 {CHECK_IN}
                 <ChipsTurno className="@sm:hidden" />
               </span>
-              <span className="min-w-0 basis-full truncate text-[11px] text-ink-muted @sm:min-w-[140px] @sm:flex-1 @sm:basis-0" title={donde}>{donde}</span>
+              <span className="order-last min-w-0 basis-full truncate text-[11px] text-ink-muted @sm:order-none @sm:min-w-[140px] @sm:flex-1 @sm:basis-0" title={donde}>{donde}</span>
               <span className="ml-auto">{boton}</span>
             </div>
           </div>

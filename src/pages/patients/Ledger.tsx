@@ -275,7 +275,7 @@ export default function Ledger() {
           basePath={`/patients/${id}`}
         />
 
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-col">
           <h1 className="text-xl leading-[1.3] font-semibold text-ink">{tituloActivo}</h1>
 
           <Tabs className="mt-4" aria-label="Ledger sections" tabs={TABS.map((t) => ({ value: t.id, label: t.label }))} value={tab} onChange={setTab} />
@@ -326,8 +326,8 @@ export default function Ledger() {
                   instante -y alcanza a mostrar el contenido de la anterior-, que
                   es el parpadeo que hacía imposible leerlo. */}
               <TooltipProvider delayDuration={500} skipDelayDuration={0}>
-              <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
-                <div style={{ minWidth: anchoMinimo }}>
+              <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white lg:flex lg:flex-1 lg:flex-col">
+                <div style={{ minWidth: anchoMinimo }} className="lg:flex lg:flex-1 lg:flex-col">
                   <div data-tabla-header className="group/fila flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
                     <span className="w-4 shrink-0" aria-hidden />
                     {columnasVisibles.map((c, i) => (
@@ -423,7 +423,7 @@ export default function Ledger() {
                     </dl>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3 lg:mt-auto">
                     <span className="flex items-center gap-3 text-xs font-semibold text-ink-muted">
                       Showing {filasPagina.length} of {filas.length} entries
                       {anchos.avisando && (

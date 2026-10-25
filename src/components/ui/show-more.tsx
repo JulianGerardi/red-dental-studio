@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 export const SHOW_MORE_ALTO = 'min(70vh, 640px)'
 
 export function ShowMore({
-  total, limit, maxHeight = SHOW_MORE_ALTO, enCaja, llenarAlto, label = 'items', fade = 'from-white', className, children,
+  total, limit, maxHeight = SHOW_MORE_ALTO, enCaja, llenarAlto, filas, label = 'items', fade = 'from-white', className, children,
 }: {
   /** Cuántos ítems hay en total. */
   total: number
@@ -31,6 +31,9 @@ export function ShowMore({
       cualquier otro contenedor único: se mide el primer HIJO del div de contenido como si fuera una fila, y si en
       cambio es un `<ul>` que las agrupa a todas, mide el alto de la lista entera y el cálculo sale mal. */
   llenarAlto?: boolean
+  /** Con `llenarAlto` y filas dentro de grupos (PendingTaskList: rótulo + caja por tipo): selector de la fila ("li"). Se mide su alto y lo que
+      suman los rótulos y espacios de alrededor, en vez de tomar el primer hijo como si fuera una fila. */
+  filas?: string
   /** Nombre de lo que se lista, para el lector de pantalla ("appointments"). */
   label?: string
   /** Color del fondo de abajo, para el degradé que avisa que hay más: el de la card (blanco) o el de la página. */
@@ -61,6 +64,17 @@ export function ShowMore({
     const contenido = contenidoRef.current
     if (!caja || !contenido) return
     const medir = () => {
+      if (filas) {
+        const dibujadas = contenido.querySelectorAll<HTMLElement>(filas)
+        const altoFila = dibujadas[0]?.offsetHeight
+        if (!altoFila) return
+        const estilo = getComputedStyle(caja)
+        const aire = (parseFloat(estilo.paddingTop) || 0) + (parseFloat(estilo.paddingBottom) || 0)
+        const alrededor = contenido.offsetHeight - dibujadas.length * altoFila
+        const cuantas = Math.max(1, Math.floor((caja.clientHeight - aire - alrededor) / altoFila))
+        setLimiteMedido((previo) => (previo === cuantas ? previo : cuantas))
+        return
+      }
       const fila = contenido.children[0] as HTMLElement | undefined
       const altoFila = fila?.offsetHeight
       if (!altoFila) return
@@ -72,7 +86,7 @@ export function ShowMore({
     const ro = new ResizeObserver(medir)
     ro.observe(caja)
     return () => ro.disconnect()
-  }, [llenarAlto, total])
+  }, [llenarAlto, filas, total])
 
   /* Si todo entra sin scroll (pocas de más), no hay nada abajo que avisar: el degradé no va. */
   useLayoutEffect(() => {
