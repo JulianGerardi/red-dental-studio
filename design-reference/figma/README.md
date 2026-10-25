@@ -543,3 +543,14 @@ resto de la página, sin hueco raro (2026-10-24). Bajado a `sm:pr-6` (24px) -el 
 alcanzando para que los 54px de la pestaña no lleguen a tocar kebabs ni filas reales -reverificado con Playwright en
 los mismos ocho anchos de la auditoría de tablet más 1366, 1512, 1536 y 1920 de escritorio, mínimo 11px de aire en
 todos-, y ahora sí deja de notarse como una franja aparte.
+
+**Seguimiento (2026-10-25): el aire al final de la página.** Julián grabó la app de red y la nuestra scrolleadas hasta
+el final: en red la última card queda a ~16px del borde de la ventana; en la nuestra quedaban ~137px. Medido en los
+frames, los costados ya coincidían (24px). El hueco salía de dos sumas: el `py-6` de la página (24px) más el `pb-24
+sm:pb-28` (96-112px) que `main` reserva desde 2026-09-08 para que el botón flotante de Confibot no tape Cancel/Save
+(`modulos/ledger.md`, `modulos/help.md`). Desde `sm` esa reserva ya no hace falta: el botón vive en la columna derecha
+(24-72px del borde) y no cae sobre el contenido, así que `main` pasa a `pb-24 sm:pb-0`. En celular, sin columna
+lateral, la reserva se queda. Verificado con Playwright a 1440, 1024 y 390px en Dashboard, Patients, Patient, Ledger y
+Billing: la página termina a ~24px; el botón de Confibot queda sobre el padding interno de las cards, sin tapar texto
+ni controles -el caso más justo es Billing a 1024px, donde "$610" queda a ~3px del botón-. **A validar:** si en
+pantallas con algo alineado a la derecha al pie (paginación, totales) conviene un respiro extra.
