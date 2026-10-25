@@ -10,8 +10,8 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   para el botón de Confibot, que desde que el contenido deja una columna a la derecha ya no hace falta en pantallas
   desde 640px. Ahora la página termina a 24px, igual que el padding de los costados; en celular se conserva la reserva.
 - **Para el dev:** `AppShell`, `main`: `pb-24 sm:pb-28` pasa a `pb-24 sm:pb-0`. El botón de Confibot puede quedar sobre
-  el padding interno de la última card (no tapa texto ni controles en las pantallas revisadas). *Components / Layout /
-  AppShell* suma descripción y Specs.
+  el padding interno de la última card (no tapa texto ni controles en las pantallas revisadas). Decisión en
+  `figma/README.md` → Responsive (2026-10-25). Storybook sin actualizar.
 
 ## 2026-10-24
 
