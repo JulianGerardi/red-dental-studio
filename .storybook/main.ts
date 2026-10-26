@@ -8,6 +8,8 @@ const config: StorybookConfig = {
   addons: ['@storybook/addon-docs', '@storybook/addon-a11y', 'storybook-addon-pseudo-states'],
   framework: '@storybook/react-vite',
   core: { disableTelemetry: true },
+  /* public/ también: Storybook toma de ahí el favicon de la marca (public/favicon.svg), el mismo de la app. */
+  staticDirs: ['../public'],
 }
 
 export default config
