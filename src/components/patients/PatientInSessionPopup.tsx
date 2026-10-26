@@ -1,9 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, LogOut, Radio, UserRound } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
 import { Avatar } from '@/components/ui/avatar'
+import { useArrastrable, type Posicion } from '@/lib/useArrastrable'
+
+/* Tamaño de la pestaña cerrada: con esto alcanza para clampear el arrastre (ver 6. abajo). */
+const ANCHO_CERRADO = 46
+const ALTO_CERRADO = 48
 
 /* Mismo slug que usa patientsStore para armar el id de un paciente nuevo:
    acá no hay un id real detrás del turno -sólo `name`-, así que se
@@ -73,7 +78,32 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
       mismo elemento, y lo que se ve es esa caja desplegándose en el lugar
       donde ya estaba, no una segunda pieza independiente entrando desde
       otro lado. Cierra con click afuera o Escape, a mano -ya no lo maneja
-      Radix-. */
+      Radix-.
+
+   5. Pestaña cerrada un poco más chica (Julián, 2026-10-26, junto con el
+      ícono de Confibot: la misma estética -pestaña blanca pegada al borde,
+      sin texto cerrada- pasa a ser también la del disparador de Confibot,
+      ver Confibot.tsx). Avatar de 32 a 28px (`size={28}`), padding del
+      botón más justo; la pestaña cerrada queda en 46px (antes 54). La card
+      abierta no cambia: lo que ocupa lugar todo el tiempo es la pestaña, no
+      la lista, que sólo se ve al tocarla.
+
+   6. Arrastrable a cualquier parte (Julián, 2026-10-26, junto con Confibot:
+      `useArrastrable` en lib/, compartido entre los dos). Deja de estar
+      anclada siempre al borde derecho -ahora es `left`/`top` en px, con la
+      posición guardada en localStorage (sobrevive a recargar)-. Por eso dos
+      cosas más cambian:
+      - **Sin la media estética de "pestaña pegada al borde"**: antes tenía
+        un borde menos y esquinas redondeadas sólo de un lado porque siempre
+        tocaba el borde físico de la ventana. Suelta en cualquier parte de
+        la pantalla eso se veía roto, así que pasa a una pastilla redondeada
+        entera (`rounded-full` cerrada, `rounded-xl` abierta) con las cuatro
+        esquinas y el borde completo.
+      - **La card abierta crece para el lado con más lugar**, no siempre a la
+        izquierda: si se arrastra cerca del borde izquierdo, abre hacia la
+        derecha. Mismo cálculo para el alto si se arrastra cerca del borde de
+        abajo (abre hacia arriba). Un clic corto abre o colapsa como siempre;
+        uno largo la mueve -no hace falta un modo "arrastre" aparte-. */
 export function PatientInSessionPopup() {
   const enCurso = useMemo(
     () => datosDelDia(HOY_DEMO).appointments.filter((a) => !a.completado),
@@ -82,6 +112,17 @@ export function PatientInSessionPopup() {
   const [ocultos, setOcultos] = useState<Set<number>>(() => new Set())
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+
+  const defecto = useCallback((): Posicion => ({
+    x: window.innerWidth - ANCHO_CERRADO,
+    y: window.innerHeight / 2 - ALTO_CERRADO / 2,
+  }), [])
+  const { pos, handlers } = useArrastrable({
+    clave: 'confidentally.patient-popup-pos',
+    ancho: ANCHO_CERRADO, alto: ALTO_CERRADO,
+    defecto,
+    onTap: () => setAbierto((v) => !v),
+  })
 
   useEffect(() => {
     if (!abierto) return
@@ -101,12 +142,22 @@ export function PatientInSessionPopup() {
   const hayEnCurso = visibles.length > 0
   const primero = visibles[0]
 
+  /* De qué lado hay más lugar: el cierre abre para ahí en vez de siempre hacia la izquierda, ahora que la pestaña
+     puede estar en cualquier parte de la pantalla (arrastrable, punto 6 arriba). */
+  const haciaIzquierda = pos.x + ANCHO_CERRADO / 2 > window.innerWidth / 2
+  const haciaArriba = pos.y + ALTO_CERRADO / 2 > window.innerHeight / 2
+
   return (
-    <div ref={ref} className="fixed top-1/2 right-0 z-30 -translate-y-1/2">
-      {/* El ancho es lo único que anima: crece desde la pestaña (54px) hasta
-          la card completa (336px), siempre pegada al mismo borde derecho
-          -por eso el ancla es `right-0` y no `left`, así el lado del avatar
-          no se mueve, sólo se abre hacia la izquierda-.
+    <div
+      ref={ref}
+      className="fixed z-30"
+      style={{
+        ...(haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
+        ...(abierto && haciaArriba ? { bottom: window.innerHeight - pos.y - ALTO_CERRADO } : { top: pos.y }),
+      }}
+    >
+      {/* El ancho (y, si hace falta, el alto) son lo único que anima: crece desde la pestaña (46px) hasta la card
+          completa (336px), hacia el lado con más lugar -no siempre a la izquierda, desde que es arrastrable-.
 
           `items-start` en vez de `items-stretch`: con stretch, el botón del
           avatar se estiraba a lo alto de toda la card abierta -un ícono
@@ -120,39 +171,39 @@ export function PatientInSessionPopup() {
           queda en 0 la caja se queda quieta, sin apagarse del todo. */}
       <div
         className={cn(
-          'flex items-start overflow-hidden rounded-l-xl border border-r-0 border-line bg-white shadow-floating transition-[width] duration-300 ease-out',
-          abierto ? 'w-[336px]' : 'w-[54px]',
+          'flex items-start overflow-hidden border border-line bg-white shadow-floating transition-[width,border-radius] duration-300 ease-out',
+          abierto ? 'w-[336px] rounded-xl' : 'w-[46px] rounded-full',
           hayEnCurso && 'motion-safe:animate-[session-live_2.6s_ease-in-out_infinite]',
         )}
       >
-        {/* Mismo botón siempre, pero lo que muestra depende del estado: el
-            avatar (o un ícono neutro si no hay nadie en curso) cerrado, un
-            chevron de "colapsar" abierto -así hay algo útil arriba en vez de
-            repetir un avatar que ya está abajo, en cada fila de la lista-. */}
+        {/* Mismo botón siempre: agarra y arrastra (useArrastrable), y lo que muestra depende del estado -el avatar
+            (o un ícono neutro si no hay nadie en curso) cerrado, un chevron de "colapsar" abierto, así hay algo útil
+            arriba en vez de repetir un avatar que ya está abajo, en cada fila de la lista-. Un clic corto llama a
+            onTap (abre/colapsa); uno largo mueve la pestaña y el clic no se dispara. */}
         <button
           type="button"
-          onClick={() => setAbierto((v) => !v)}
+          {...handlers}
           aria-expanded={abierto}
           aria-label={
             abierto
               ? 'Collapse'
               : hayEnCurso
                 ? visibles.length > 1
-                  ? `Currently being seen: ${visibles.length} patients`
-                  : `Currently being seen: ${primero.name}`
-                : 'Currently being seen: no patients'
+                  ? `Currently being seen: ${visibles.length} patients. Drag to move.`
+                  : `Currently being seen: ${primero.name}. Drag to move.`
+                : 'Currently being seen: no patients. Drag to move.'
           }
-          className="flex shrink-0 items-center py-3 pr-2.5 pl-3 hover:bg-surface-subtle"
+          className="flex shrink-0 cursor-grab items-center py-2.5 pr-2 pl-2.5 active:cursor-grabbing hover:bg-surface-subtle"
         >
           {abierto ? (
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-muted">
-              <ChevronRight className="size-4" />
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-full text-ink-muted">
+              <ChevronRight className="size-3.5" />
             </span>
           ) : hayEnCurso ? (
-            <Avatar initials={primero.initials} />
+            <Avatar initials={primero.initials} size={28} />
           ) : (
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-avatar bg-surface-muted text-ink-faint">
-              <UserRound className="size-4" />
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-avatar bg-surface-muted text-ink-faint">
+              <UserRound className="size-3.5" />
             </span>
           )}
         </button>
