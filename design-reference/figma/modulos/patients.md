@@ -313,6 +313,14 @@ pero se usan distinto, y el flujo también:
 - **Cuenta del portal**: en New, la opción *Create a patient portal account using this email address*. En Edit, si ya existe se muestra como un estado
   (*Patient portal account · Linked*); si no, ofrece la misma opción que New.
 
+## "Currently being seen" arrastrable (2026-10-26)
+
+Pedido de Julián: el ícono de "currently being seen" (quién está en el sillón ahora, visible en toda la app) pasa a
+ser arrastrable a cualquier parte de la pantalla, junto con el disparador de Confibot (mismo pedido, mismo día). Sin
+historia de Jira detrás -es UI pura, no una regla de negocio-. Todo el razonamiento y el historial de esta pieza
+vive en el comentario de `PatientInSessionPopup.tsx` (punto 6), como siempre fue con este componente; esta entrada
+es sólo el puntero. Ver también `help.md` para el lado de Confibot.
+
 ### Anomalías del Figma y cómo se resolvieron
 
 Cuando el Figma se contradice a sí mismo o trae un texto pegado de otra pantalla, ganó el sentido y queda anotado (cambiarlo es una línea):

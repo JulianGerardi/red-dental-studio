@@ -1,7 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
-import { Bot, X, ArrowUp, Sparkles, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Bot, X, ArrowUp, Sparkles, ChevronRight, ChevronDown, ChevronLeft } from 'lucide-react'
 import { TOPICS, MODULES, puntuarTema } from './topics'
 import { cn } from '@/lib/utils'
+import { useArrastrable, type Posicion } from '@/lib/useArrastrable'
+
+/* Tamaño del botón cerrado (círculo): con esto alcanza para clampear el arrastre. */
+const ANCHO_CERRADO = 44
+const ALTO_CERRADO = 44
 
 /* Sin IA real: sólo búsqueda por palabras clave sobre TOPICS -decisión de
    Julián, para no pedirle consentimiento ni cobrarle a quien abra el
@@ -60,9 +65,27 @@ export function useConfibotRecogido() {
 
 const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-dash-blue-glow),var(--color-dash-ring),var(--color-dash-blue))] bg-[length:200%_100%]'
 
-/* El disparador flotante, abajo a la derecha. Sobre el botón flotante de una
-   pantalla (Appointment requests en Scheduling) se apila arriba en vez de
-   taparlo. Ver design-reference/figma/modulos/help.md. */
+/* El disparador flotante, en reposo la misma pestaña blanca que PatientInSessionPopup -mismo lado, misma estética,
+   las dos un poco más chicas (Julián, 2026-10-26)-. Círculo entero (`rounded-full`), como el botón original (antes
+   degradé azul) y como el video de referencia que mandó Julián de otra app -un paso intermedio había probado
+   `rounded-xl` (cuadrado con esquinas redondeadas), que resultó ser para el estado recogido, no para el de reposo-.
+
+   Arrastrable a cualquier parte (Julián, 2026-10-26, junto con PatientInSessionPopup: mismo hook,
+   `useArrastrable`, misma razón -ver el punto 6 de PatientInSessionPopup.tsx-). Por default arranca abajo a la
+   derecha (donde ya estaba, corrido si hay un FAB de página), pero eso es sólo el arranque: una vez que se
+   arrastra, la posición se guarda y no vuelve sola.
+
+   Sin el texto "Confibot" que aparecía al hover (Julián, 2026-10-26, mismo video de referencia: ahí el círculo es
+   sólo el ícono, siempre). Con eso se cae la lógica de "hacia qué lado crece": el botón ya no cambia de ancho, un
+   círculo de 44px siempre, así que ancla directo con `left`/`top` -ya no hace falta elegir `right` cerca del borde
+   derecho real como si tuviera algo que desbordar-. La hoja de chat (`Confibot`, más abajo) sigue abriendo siempre
+   en su lugar de siempre -abajo a la derecha-, no seguís el botón: moverlo no corre a dónde abre el chat.
+
+   La pestaña recogida (`recogido`) pasa de pegarse al **borde de abajo** a pegarse al **costado derecho** (Julián,
+   2026-10-26): no es arrastrable -es un estado ya escondido a propósito, no hace falta moverla-, pero sí toma el
+   mismo `pos.y` de dónde estaba el botón antes de esconderse, para que quede ahí mismo, sólo contra el borde. Sigue
+   con el degradé, a propósito -es la señal para volver a traerlo, no un estado de reposo-. Ver
+   design-reference/figma/modulos/help.md. */
 export function ConfibotLanzador({
   recogido, sobreFab = false, onAbrir, onRecoger, onTraer,
 }: {
@@ -72,23 +95,38 @@ export function ConfibotLanzador({
   onRecoger: () => void
   onTraer: () => void
 }) {
+  const defecto = useCallback((): Posicion => ({
+    x: window.innerWidth - ANCHO_CERRADO,
+    y: window.innerHeight - (sobreFab ? 100 : window.innerWidth >= 640 ? 24 : 16) - ALTO_CERRADO,
+  }), [sobreFab])
+  const { pos, handlers } = useArrastrable({
+    clave: 'confidentally.confibot-pos',
+    ancho: ANCHO_CERRADO, alto: ALTO_CERRADO,
+    defecto,
+    onTap: onAbrir,
+  })
+
   if (recogido) {
     return (
       <button
         type="button" onClick={onTraer} aria-label="Bring Confibot back"
+        style={{ top: pos.y }}
         className={cn(
           DEGRADE,
-          'fixed bottom-0 z-40 flex h-8 items-center gap-1.5 rounded-t-xl px-3 text-white shadow-lg hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring',
-          sobreFab ? 'right-[108px]' : 'right-4 sm:right-6',
+          'fixed right-0 z-40 flex h-8 items-center gap-1.5 rounded-l-xl px-3 text-white shadow-lg hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring',
         )}
       >
-        <ChevronUp className="size-4 shrink-0" />
+        <ChevronLeft className="size-4 shrink-0" />
         <span className="text-[13px] font-semibold">Confibot</span>
       </button>
     )
   }
+
   return (
-    <div className={cn('fixed z-40 flex flex-col items-end gap-1', sobreFab ? 'right-[38px] bottom-[104px]' : 'right-4 bottom-4 sm:right-6 sm:bottom-6')}>
+    <div
+      className="fixed z-40 flex flex-col items-end gap-1"
+      style={{ top: pos.y, left: pos.x }}
+    >
       {/* 24px a la vista, 40px de área de toque. */}
       <button
         type="button" onClick={onRecoger} aria-label="Tuck Confibot away"
@@ -96,21 +134,16 @@ export function ConfibotLanzador({
       >
         <ChevronDown className="size-3.5" />
       </button>
-      <div className="group relative">
-        <span
-          aria-hidden
-          className={cn(DEGRADE, 'pointer-events-none absolute -inset-[5px] rounded-full opacity-0 transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 group-hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite]')}
-        />
-        <button
-          type="button" onClick={onAbrir} aria-label="Open Confibot"
-          className={cn(DEGRADE, 'relative flex h-12 items-center rounded-full px-3.5 text-white shadow-lg ring-white transition-[padding,box-shadow] duration-300 outline-none group-focus-within:pr-5 group-focus-within:ring-2 group-hover:pr-5 group-hover:ring-2')}
-        >
-          <Bot className="size-5 shrink-0" />
-          <span className="max-w-0 overflow-hidden text-sm font-semibold whitespace-nowrap opacity-0 transition-all duration-300 group-focus-within:ml-2 group-focus-within:max-w-[90px] group-focus-within:opacity-100 group-hover:ml-2 group-hover:max-w-[90px] group-hover:opacity-100">
-            Confibot
-          </span>
-        </button>
-      </div>
+      {/* Sólo el ícono, sin el texto "Confibot" que aparecía al hover (Julián, 2026-10-26: así es en el video de
+          referencia). Ancho fijo -ya no hay nada que crezca-, así que no hace falta elegir de qué lado anclar. */}
+      <button
+        type="button" {...handlers} aria-label="Open Confibot. Drag to move."
+        className="flex size-11 shrink-0 cursor-grab items-center justify-center rounded-full border border-line bg-white text-ink shadow-floating outline-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+      >
+        <span className="bg-dash-count-bg text-dash-blue flex size-7 shrink-0 items-center justify-center rounded-full">
+          <Bot className="size-3.5" />
+        </span>
+      </button>
     </div>
   )
 }

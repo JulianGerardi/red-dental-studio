@@ -101,3 +101,92 @@ de área de toque, y la pestaña y la flechita muestran el anillo de foco con te
 
 **El ítem Confibot del menú lateral se queda**: abre la misma hoja y es el camino que queda con el botón recogido.
 Pendiente de validar con Julián si lo prefiere sólo flotante.
+
+## El botón de reposo pasa a la estética de "currently being seen" (2026-10-26)
+
+Pedido de Julián: que el disparador de Confibot y el ícono de "currently being seen" (`PatientInSessionPopup`, en
+`patients/`) queden **del mismo lado, separados, con la misma estética**, y los dos un poco más chicos para ocupar
+menos pantalla.
+
+- **Mismo lado, misma estética.** El círculo de 48px con el degradé azul y el halo al hover se reemplaza por la misma
+  pestaña blanca pegada al borde derecho que ya usa `PatientInSessionPopup` (`rounded-l-xl border border-r-0
+  shadow-floating`), con el ícono Bot en un círculo celeste (`bg-dash-count-bg`/`dash-blue`, el mismo par que ya usa
+  el encabezado de la hoja de chat) en vez del avatar. De 48px pasa a 44px de alto; el texto "Confibot" que aparece al
+  hover pasa de 14px a 13px.
+- **Separados, no agrupados.** Siguen siendo dos pestañas en posiciones distintas, no una al lado de la otra: ésta
+  queda abajo a la derecha (donde ya estaba) y la de currently being seen a media altura. Moverlas a estar pegadas
+  requeriría repensar desde dónde abre la hoja de chat -hoy ancla a esa misma esquina de abajo, con todo el alto
+  disponible arriba suyo; a media altura, una hoja de ~560px de alto no tendría dónde abrir en una pantalla baja-.
+  Si Julián las quiere una al lado de la otra igual, es un paso más: agruparlas en un único contenedor flex en
+  `AppShell.tsx` en vez de cada una con su propio `fixed`.
+- **Página con su propio botón (Scheduling).** Antes el círculo se centraba arriba del botón redondo de la pantalla
+  (`right-[38px] bottom-[104px]`, para quedar alineado con su centro). La pestaña nueva no es redonda, así que ya no
+  hace falta centrarla: sigue pegada al borde derecho, sólo sube (`bottom-[100px]`) lo justo para no tocarlo.
+- **La pestaña recogida (`recogido`) no cambia.** Sigue con el degradé: es la señal para volver a traerlo después de
+  esconderlo a propósito, no el estado de reposo que se quería discreto. Si Julián la quiere pareja también, es una
+  vuelta más.
+- **A validar con Julián:** este botón existe para que se note -es la puerta de entrada a Confibot, que antes de
+  2026-10-13 vivía sólo en el menú y se sacó porque nadie lo encontraba-. Pasarlo a neutro (como pide este pedido)
+  puede volver a esconderlo un poco; si después de probarlo cuesta encontrarlo, una vuelta intermedia sería un acento
+  de color sólo en el ícono (ya lo tiene, `dash-blue`) sin el degradé ni el halo del círculo.
+
+## Arrastrable a cualquier parte (2026-10-26)
+
+Mismo pedido que el de "currently being seen" (`patients.md`): el disparador de Confibot se puede arrastrar a
+cualquier parte de la pantalla con mouse o touch, y se guarda en localStorage (`confidentally.confibot-pos`), así
+que no vuelve sola al lugar de siempre entre recargas. Sin historia de Jira -UI pura-.
+
+- **`useArrastrable`** (nuevo, en `lib/`), compartido con `PatientInSessionPopup`: pointer events (mouse y touch con
+  la misma lógica), clampeado dentro de la ventana, recalcula si la ventana cambia de tamaño. Un movimiento chico
+  (<5px) cuenta como click -abre Confibot-, uno más grande mueve el botón y el click no se dispara.
+- **Deja de estar pegado al borde físico**: la pestaña `rounded-l-xl border-r-0` (flush contra el borde real de la
+  ventana) no tenía sentido suelta en cualquier parte -se veía con un lado cortado sin motivo-. Pasa a una pastilla
+  entera (`rounded-full`, border en las cuatro caras), misma estética que "currently being seen".
+- **El hover que revela "Confibot"** (antes siempre crecía hacia la izquierda, porque siempre estaba pegado al
+  borde derecho) ahora crece para el lado de la pantalla con más lugar: si el botón quedó en la mitad izquierda,
+  crece hacia la derecha, y viceversa.
+- **La posición por default sigue siendo abajo a la derecha** (corrida si hay un FAB de página), pero eso es sólo el
+  primer arranque: en cuanto se arrastra una vez, la posición guardada manda.
+- **La pestaña recogida (`recogido`) no es arrastrable** -ya es un estado escondido a propósito, no hace falta
+  moverla- y la hoja de chat sigue abriendo siempre en su lugar de siempre, abajo a la derecha: no sigue al botón
+  arrastrado. Si mover el botón lejos de esa esquina resulta confuso al abrir el chat en otro lado, es la próxima
+  vuelta.
+
+## Cuadrado con esquinas redondeadas, y recogido al costado (2026-10-26)
+
+Dos correcciones de Julián sobre lo de arriba, mismo día:
+
+- **El `rounded-full` de la entrada anterior no quedó bien.** Vuelve a `rounded-xl` -cuadrado con esquinas
+  redondeadas, como tenía antes de ser arrastrable- en vez de la pastilla entera. Mismo cambio en
+  `PatientInSessionPopup`.
+- **La pestaña recogida (`recogido`) pasa del borde de abajo al costado derecho.** Antes era `bottom-0` con
+  `rounded-t-xl` (una lengüeta que asoma desde abajo) y la flecha apuntaba para arriba; ahora es `right-0` con
+  `rounded-l-xl` (asoma desde el costado) y la flecha apunta para la izquierda (`ChevronLeft`). Toma el mismo
+  `pos.y` de dónde estaba el botón antes de esconderse -no es arrastrable, pero al menos queda a la altura en la
+  que se la dejó, no en un lugar fijo nuevo-.
+
+## El botón en reposo es un círculo, no un cuadrado (2026-10-26)
+
+Julián mandó un video de otra app (otro asistente flotante) como referencia: en reposo -suelto, sin arrastrar- es un
+**círculo entero**. El cuadrado con esquinas redondeadas de la entrada de arriba era para el estado **recogido**
+(la pestaña al costado), que en el video se ve así -medio círculo asomando del borde- al tocar el botón chico de
+esconder; no era para el estado de reposo. Se corrige: `rounded-full` en reposo (cerrada), `rounded-xl` sólo en la
+card/hoja abierta -ya estaba así-. Mismo cambio en `PatientInSessionPopup` (`rounded-full` cerrada, `rounded-xl`
+abierta). Sin tocar nada más de lo que ya quedó bien: arrastrable a cualquier parte, recogido al costado con la
+altura (`pos.y`) de donde se dejó.
+
+## Sólo el ícono, sin el texto al hover; y "currently being seen" suma la misma flechita (2026-10-26)
+
+Dos pedidos más de Julián, mismo video de referencia:
+
+- **El círculo de Confibot pierde el texto "Confibot"** que aparecía al pasar el mouse (en el video, el círculo es
+  siempre sólo el ícono). Con eso se cae toda la lógica de "ancla a la izquierda o a la derecha según el lado con
+  más lugar": el botón ya no cambia de ancho -siempre 44×44-, así que ancla directo con `left`/`top`, sin elegir.
+  `ANCHO_CERRADO` baja de 50 a 44 (antes el ancho incluía el padding del texto).
+- **`PatientInSessionPopup` suma la misma funcionalidad de esconder que Confibot**: la flechita chica
+  (`ChevronDown`, mismo lugar y estética) manda la pestaña a un costado, como `recogido` en Confibot. No comparten
+  código -cada una coordina su propio estado; Confibot además tiene que avisarle a `AppShell` para que no dibuje la
+  hoja de chat vieja, acá no hay nada externo que depender-. Se guarda en localStorage
+  (`confidentally.patient-popup-tucked`) y toma el `pos.y` de donde estaba antes de esconderse, igual que Confibot.
+  La pestaña recogida dice "Patients" y es blanca, no el degradé azul -ese color es la señal de Confibot
+  puntualmente, no corresponde en un indicador de pacientes-.
