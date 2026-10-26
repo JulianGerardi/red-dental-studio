@@ -4,8 +4,8 @@ import { TOPICS, MODULES, puntuarTema } from './topics'
 import { cn } from '@/lib/utils'
 import { useArrastrable, type Posicion } from '@/lib/useArrastrable'
 
-/* Tamaño del botón cerrado: con esto alcanza para clampear el arrastre. */
-const ANCHO_CERRADO = 50
+/* Tamaño del botón cerrado (círculo): con esto alcanza para clampear el arrastre. */
+const ANCHO_CERRADO = 44
 const ALTO_CERRADO = 44
 
 /* Sin IA real: sólo búsqueda por palabras clave sobre TOPICS -decisión de
@@ -75,10 +75,11 @@ const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-d
    derecha (donde ya estaba, corrido si hay un FAB de página), pero eso es sólo el arranque: una vez que se
    arrastra, la posición se guarda y no vuelve sola.
 
-   Antes crecía siempre hacia la izquierda (pegada al borde derecho real); ahora, con el botón en cualquier parte,
-   el hover que revela "Confibot" crece para el lado con más lugar (mismo cálculo que el ancho/alto de
-   PatientInSessionPopup). La hoja de chat (`Confibot`, más abajo) sigue abriendo siempre en su lugar de siempre
-   -abajo a la derecha-, no seguís el botón: moverlo no corre a dónde abre el chat.
+   Sin el texto "Confibot" que aparecía al hover (Julián, 2026-10-26, mismo video de referencia: ahí el círculo es
+   sólo el ícono, siempre). Con eso se cae la lógica de "hacia qué lado crece": el botón ya no cambia de ancho, un
+   círculo de 44px siempre, así que ancla directo con `left`/`top` -ya no hace falta elegir `right` cerca del borde
+   derecho real como si tuviera algo que desbordar-. La hoja de chat (`Confibot`, más abajo) sigue abriendo siempre
+   en su lugar de siempre -abajo a la derecha-, no seguís el botón: moverlo no corre a dónde abre el chat.
 
    La pestaña recogida (`recogido`) pasa de pegarse al **borde de abajo** a pegarse al **costado derecho** (Julián,
    2026-10-26): no es arrastrable -es un estado ya escondido a propósito, no hace falta moverla-, pero sí toma el
@@ -121,15 +122,10 @@ export function ConfibotLanzador({
     )
   }
 
-  const haciaIzquierda = pos.x + ANCHO_CERRADO / 2 > window.innerWidth / 2
-
   return (
     <div
       className="fixed z-40 flex flex-col items-end gap-1"
-      style={{
-        top: pos.y,
-        ...(haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
-      }}
+      style={{ top: pos.y, left: pos.x }}
     >
       {/* 24px a la vista, 40px de área de toque. */}
       <button
@@ -138,18 +134,14 @@ export function ConfibotLanzador({
       >
         <ChevronDown className="size-3.5" />
       </button>
-      {/* Misma pestaña blanca que el disparador de "currently being seen" (PatientInSessionPopup): misma estética,
-          esquinas redondeadas (ya no pegada a un borde físico), un poco más chica. Agarra y arrastra con el mismo
-          botón que abre -un clic corto abre, uno largo mueve-. */}
+      {/* Sólo el ícono, sin el texto "Confibot" que aparecía al hover (Julián, 2026-10-26: así es en el video de
+          referencia). Ancho fijo -ya no hay nada que crezca-, así que no hace falta elegir de qué lado anclar. */}
       <button
         type="button" {...handlers} aria-label="Open Confibot. Drag to move."
-        className="group relative flex h-11 shrink-0 cursor-grab items-center overflow-hidden rounded-full border border-line bg-white pr-2.5 pl-3 text-ink shadow-floating transition-[padding] duration-300 outline-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+        className="flex size-11 shrink-0 cursor-grab items-center justify-center rounded-full border border-line bg-white text-ink shadow-floating outline-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
       >
         <span className="bg-dash-count-bg text-dash-blue flex size-7 shrink-0 items-center justify-center rounded-full">
           <Bot className="size-3.5" />
-        </span>
-        <span className="max-w-0 overflow-hidden text-[13px] font-semibold whitespace-nowrap opacity-0 transition-all duration-300 group-focus-within:ml-2 group-focus-within:max-w-[70px] group-focus-within:opacity-100 group-hover:ml-2 group-hover:max-w-[70px] group-hover:opacity-100">
-          Confibot
         </span>
       </button>
     </div>

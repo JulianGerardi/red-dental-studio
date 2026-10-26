@@ -174,3 +174,19 @@ esconder; no era para el estado de reposo. Se corrige: `rounded-full` en reposo 
 card/hoja abierta -ya estaba así-. Mismo cambio en `PatientInSessionPopup` (`rounded-full` cerrada, `rounded-xl`
 abierta). Sin tocar nada más de lo que ya quedó bien: arrastrable a cualquier parte, recogido al costado con la
 altura (`pos.y`) de donde se dejó.
+
+## Sólo el ícono, sin el texto al hover; y "currently being seen" suma la misma flechita (2026-10-26)
+
+Dos pedidos más de Julián, mismo video de referencia:
+
+- **El círculo de Confibot pierde el texto "Confibot"** que aparecía al pasar el mouse (en el video, el círculo es
+  siempre sólo el ícono). Con eso se cae toda la lógica de "ancla a la izquierda o a la derecha según el lado con
+  más lugar": el botón ya no cambia de ancho -siempre 44×44-, así que ancla directo con `left`/`top`, sin elegir.
+  `ANCHO_CERRADO` baja de 50 a 44 (antes el ancho incluía el padding del texto).
+- **`PatientInSessionPopup` suma la misma funcionalidad de esconder que Confibot**: la flechita chica
+  (`ChevronDown`, mismo lugar y estética) manda la pestaña a un costado, como `recogido` en Confibot. No comparten
+  código -cada una coordina su propio estado; Confibot además tiene que avisarle a `AppShell` para que no dibuje la
+  hoja de chat vieja, acá no hay nada externo que depender-. Se guarda en localStorage
+  (`confidentally.patient-popup-tucked`) y toma el `pos.y` de donde estaba antes de esconderse, igual que Confibot.
+  La pestaña recogida dice "Patients" y es blanca, no el degradé azul -ese color es la señal de Confibot
+  puntualmente, no corresponde en un indicador de pacientes-.

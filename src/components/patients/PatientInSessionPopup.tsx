@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, LogOut, Radio, UserRound } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, LogOut, Radio, UserRound } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
 import { Avatar } from '@/components/ui/avatar'
@@ -9,6 +9,8 @@ import { useArrastrable, type Posicion } from '@/lib/useArrastrable'
 /* Tamaño de la pestaña cerrada: con esto alcanza para clampear el arrastre (ver 6. abajo). */
 const ANCHO_CERRADO = 46
 const ALTO_CERRADO = 48
+
+const CLAVE_RECOGIDA = 'confidentally.patient-popup-tucked'
 
 /* Mismo slug que usa patientsStore para armar el id de un paciente nuevo:
    acá no hay un id real detrás del turno -sólo `name`-, así que se
@@ -106,7 +108,20 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
         izquierda: si se arrastra cerca del borde izquierdo, abre hacia la
         derecha. Mismo cálculo para el alto si se arrastra cerca del borde de
         abajo (abre hacia arriba). Un clic corto abre o colapsa como siempre;
-        uno largo la mueve -no hace falta un modo "arrastre" aparte-. */
+        uno largo la mueve -no hace falta un modo "arrastre" aparte-.
+
+   7. Misma funcionalidad de esconder que Confibot (Julián, 2026-10-26):
+      flechita chica arriba del avatar (`ChevronDown`, igual estética que la
+      de Confibot) que la manda a una pestaña angosta pegada al costado
+      derecho -mismo patrón que `recogido` en Confibot.tsx, no comparten
+      código porque cada una coordina estados propios (acá no hay nada
+      externo que avisar; Confibot sí, por la hoja de chat aparte)-. Se
+      recuerda entre visitas (`confidentally.patient-popup-tucked` en
+      localStorage). La pestaña recogida toma el mismo `pos.y` de dónde
+      estaba antes de esconderse, no es arrastrable -ya es un estado
+      escondido a propósito-, y el texto dice "Patients" en vez de
+      "Confibot": blanca, no el degradé azul -ese color es la señal propia
+      de Confibot, no corresponde acá-. */
 export function PatientInSessionPopup() {
   const enCurso = useMemo(
     () => datosDelDia(HOY_DEMO).appointments.filter((a) => !a.completado),
@@ -114,7 +129,14 @@ export function PatientInSessionPopup() {
   )
   const [ocultos, setOcultos] = useState<Set<number>>(() => new Set())
   const [abierto, setAbierto] = useState(false)
+  const [recogido, setRecogido] = useState(() => {
+    try { return localStorage.getItem(CLAVE_RECOGIDA) === '1' } catch { return false }
+  })
   const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    try { localStorage.setItem(CLAVE_RECOGIDA, recogido ? '1' : '0') } catch { /* sin storage: sólo dura la visita */ }
+  }, [recogido])
 
   const defecto = useCallback((): Posicion => ({
     x: window.innerWidth - ANCHO_CERRADO,
@@ -145,6 +167,19 @@ export function PatientInSessionPopup() {
   const hayEnCurso = visibles.length > 0
   const primero = visibles[0]
 
+  if (recogido) {
+    return (
+      <button
+        type="button" onClick={() => setRecogido(false)} aria-label="Bring back currently being seen"
+        style={{ top: pos.y }}
+        className="fixed right-0 z-30 flex h-8 items-center gap-1.5 rounded-l-xl border border-r-0 border-line bg-white px-3 text-ink-muted shadow-sm hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+      >
+        <ChevronLeft className="size-4 shrink-0" />
+        <span className="text-[13px] font-semibold">Patients</span>
+      </button>
+    )
+  }
+
   /* De qué lado hay más lugar: el cierre abre para ahí en vez de siempre hacia la izquierda, ahora que la pestaña
      puede estar en cualquier parte de la pantalla (arrastrable, punto 6 arriba). */
   const haciaIzquierda = pos.x + ANCHO_CERRADO / 2 > window.innerWidth / 2
@@ -153,12 +188,19 @@ export function PatientInSessionPopup() {
   return (
     <div
       ref={ref}
-      className="fixed z-30"
+      className="fixed z-30 flex flex-col items-end gap-1"
       style={{
         ...(haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
         ...(abierto && haciaArriba ? { bottom: window.innerHeight - pos.y - ALTO_CERRADO } : { top: pos.y }),
       }}
     >
+      {/* 24px a la vista, 40px de área de toque -mismo patrón que la flechita de Confibot-. */}
+      <button
+        type="button" onClick={() => setRecogido(true)} aria-label="Hide currently being seen"
+        className="relative flex size-6 items-center justify-center rounded-full border border-line bg-white text-ink-muted shadow-sm before:absolute before:-inset-2 before:content-[''] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+      >
+        <ChevronDown className="size-3.5" />
+      </button>
       {/* El ancho (y, si hace falta, el alto) son lo único que anima: crece desde la pestaña (46px) hasta la card
           completa (336px), hacia el lado con más lugar -no siempre a la izquierda, desde que es arrastrable-.
 
