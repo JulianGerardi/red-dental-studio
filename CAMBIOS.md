@@ -3,6 +3,15 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-26
+
+### Favicon de la marca en la app y en Storybook ([#88](https://github.com/JulianGerardi/red-dental-studio/pull/88))
+- La pestaña del navegador mostraba el rayo violeta por defecto de Vite. Ahora lleva la marca del sidebar (ícono
+  `GalleryVerticalEnd` blanco sobre `#1a4da9`), en la app y en Storybook.
+- **Para el dev:** `public/favicon.svg` cambia y se suman `public/favicon-32.png` y `public/apple-touch-icon.png`;
+  `index.html` los enlaza. Storybook suma `staticDirs: ['../public']` y los PNG en `manager-head.html`. El título de la
+  pestaña no cambia. Storybook sin actualizar (no hay stories nuevos).
+
 ## 2026-10-25
 
 ### Pending documents: la card llena su parte del alto, con "Show N more" y el scroll adentro de la lista ([#87](https://github.com/JulianGerardi/red-dental-studio/pull/87))
