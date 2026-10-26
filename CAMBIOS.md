@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-26
 
+### Confibot y "currently being seen": arrastrables, círculo en reposo, esconder al costado ([#90](https://github.com/JulianGerardi/red-dental-studio/pull/90))
+- Los dos widgets flotantes se arrastran con mouse o touch a cualquier parte de la pantalla (se guarda la posición,
+  no vuelve sola). En reposo son un círculo completo; abiertos (la card de "currently being seen", la hoja de
+  Confibot) siguen con esquinas redondeadas. Confibot muestra sólo el ícono, sin el texto que aparecía al hover.
+- Los dos se pueden esconder a una pestaña angosta pegada al costado derecho, a la altura donde se dejaron (antes
+  Confibot se escondía pegado abajo; "currently being seen" no tenía esta opción).
+- **Para el dev:** `useArrastrable` (nuevo, en `lib/`), compartido entre `ConfibotLanzador` y
+  `PatientInSessionPopup`: pointer events, clampeado a la ventana, posición en localStorage. Cada componente maneja
+  su propio estado de "recogido" (no comparten código ahí). Documentado en `help.md` y `patients.md`; Storybook sin
+  actualizar (pendiente de que Julián lo pida).
+
 ### El título de la pestaña dice Confidentally ([#89](https://github.com/JulianGerardi/red-dental-studio/pull/89))
 - La pestaña de la app decía `red-clone` (el nombre de la carpeta). Ahora dice `Confidentally`, como el sidebar.
 - **Para el dev:** sólo `<title>` en `index.html`. Storybook no cambia: su pestaña sigue con el título que le pone
