@@ -129,7 +129,11 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
       mouse (`group-hover`, ancho de 0 a 70px). Al traerla de vuelta (clic
       en la pestaña), la pestaña de reposo entra con `panel-in` -la misma
       animación de deslizarse desde el borde derecho que usa el drawer
-      (`ui/drawer.tsx`)-, no crece desde un círculo. */
+      (`ui/drawer.tsx`)-, no crece desde un círculo.
+   9. Ese clic trae la pestaña Y la abre de una (Julián, 2026-10-26: no
+      tenía que hacer falta un segundo clic sobre el avatar para recién ahí
+      ver el popup). `setAbierto(true)` junto con `setRecogido(false)` en el
+      mismo handler. */
 export function PatientInSessionPopup() {
   const enCurso = useMemo(
     () => datosDelDia(HOY_DEMO).appointments.filter((a) => !a.completado),
@@ -178,7 +182,7 @@ export function PatientInSessionPopup() {
   if (recogido) {
     return (
       <button
-        type="button" onClick={() => setRecogido(false)} aria-label="Bring back currently being seen"
+        type="button" onClick={() => { setRecogido(false); setAbierto(true) }} aria-label="Bring back currently being seen"
         style={{ top: pos.y }}
         className="group fixed right-0 z-30 flex h-8 items-center gap-1.5 rounded-l-xl border border-r-0 border-line bg-white py-0 pr-3 pl-2.5 text-ink-muted shadow-sm hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
       >

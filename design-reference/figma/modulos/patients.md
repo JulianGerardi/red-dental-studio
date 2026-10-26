@@ -318,8 +318,9 @@ pero se usan distinto, y el flujo también:
 Pedido de Julián: el ícono de "currently being seen" (quién está en el sillón ahora, visible en toda la app) pasa a
 ser arrastrable a cualquier parte de la pantalla, junto con el disparador de Confibot (mismo pedido, mismo día). Sin
 historia de Jira detrás -es UI pura, no una regla de negocio-. Todo el razonamiento y el historial de esta pieza
-vive en el comentario de `PatientInSessionPopup.tsx` (punto 6), como siempre fue con este componente; esta entrada
-es sólo el puntero. Ver también `help.md` para el lado de Confibot.
+vive en el comentario de `PatientInSessionPopup.tsx` (puntos 6-9), como siempre fue con este componente; esta
+entrada es sólo el puntero. Ver también `help.md` para el lado de Confibot, incluido el ajuste del 2026-10-26 sobre
+la pestaña recogida (ícono en vez de nombre, un solo clic para abrir) y un bug de `sobreFab` encontrado de paso.
 
 ### Anomalías del Figma y cómo se resolvieron
 

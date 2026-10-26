@@ -96,7 +96,7 @@ export function AppShell() {
           sobreFab={fabDePagina}
           onAbrir={openConfibot}
           onRecoger={() => setConfibotRecogido(true)}
-          onTraer={() => setConfibotRecogido(false)}
+          onTraer={() => { setConfibotRecogido(false); openConfibot() }}
         />
       )}
       <Confibot abierto={confibotAbierto} onClose={closeConfibot} onShowOnScreen={showOnScreen} />

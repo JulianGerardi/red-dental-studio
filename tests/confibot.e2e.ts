@@ -6,7 +6,7 @@ import { expect } from 'e2e'
 
 test('El botón flotante abre el chat, se recoge y sigue recogido al volver', async ({ app, screen }) => {
   await app.open('/')
-  const boton = screen.getByRole('button', 'Open Confibot')
+  const boton = screen.getByRole('button', 'Open Confibot. Drag to move.')
   await expect(boton).toBeVisible()
 
   await boton.tap()
@@ -21,13 +21,14 @@ test('El botón flotante abre el chat, se recoge y sigue recogido al volver', as
 
   await app.open('/patients')
   await expect(screen.getByRole('button', 'Bring Confibot back')).toBeVisible()
+  /* Un solo clic trae Y abre el chat -no hace falta un segundo clic sobre el botón de reposo (2026-10-26). */
   await screen.getByRole('button', 'Bring Confibot back').tap()
-  await expect(boton).toBeVisible()
+  await expect(screen.getByText('Here to explain the app')).toBeVisible()
 })
 
 test('En Scheduling queda arriba del botón de Appointment requests, sin taparlo', async ({ app, screen }) => {
   await app.open('/scheduling')
-  const confibot = await screen.getByRole('button', 'Open Confibot').boundingBox()
+  const confibot = await screen.getByRole('button', 'Open Confibot. Drag to move.').boundingBox()
   const solicitudes = await screen.getByRole('button', 'Appointment requests').boundingBox()
   expect(confibot && solicitudes).toBeTruthy()
   expect(confibot!.y + confibot!.height).toBeLessThan(solicitudes!.y)

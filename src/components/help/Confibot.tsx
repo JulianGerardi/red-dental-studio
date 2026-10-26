@@ -90,7 +90,12 @@ const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-d
    chevron -mismo cambio en PatientInSessionPopup, con su propio ícono-, y el nombre aparece recién al pasar el mouse
    (`group-hover`, ancho de 0 a 70px). Al traerlo de vuelta (clic en la pestaña), el botón de reposo entra con
    `panel-in` -la misma animación de deslizarse desde el borde derecho que usa el drawer (`ui/drawer.tsx`)-, no
-   crece desde un círculo. Ver design-reference/figma/modulos/help.md. */
+   crece desde un círculo.
+
+   Ese mismo clic ya abre el chat directo (Julián, 2026-10-26, igual que PatientInSessionPopup: no debía hacer falta
+   un segundo clic sobre el botón de reposo para recién ahí abrirlo). `onTraer` en AppShell.tsx llama
+   `setConfibotRecogido(false)` y `openConfibot()` juntos -acá en `ConfibotLanzador` no cambia nada, sólo deja de
+   mostrarse porque `confibotAbierto` pasa a true-. Ver design-reference/figma/modulos/help.md. */
 export function ConfibotLanzador({
   recogido, sobreFab = false, onAbrir, onRecoger, onTraer,
 }: {
@@ -100,9 +105,15 @@ export function ConfibotLanzador({
   onRecoger: () => void
   onTraer: () => void
 }) {
+  /* El FAB de la página (Appointment requests, Scheduling): `right-8` + 60px, centro a 32+30=62px del borde
+     derecho. Sobre ese FAB, Confibot se centra arriba (mismo eje x) en vez de pegarse al borde. */
+  const CENTRO_FAB_DESDE_BORDE = 62
   const defecto = useCallback((): Posicion => ({
-    x: window.innerWidth - ANCHO_CERRADO,
-    y: window.innerHeight - (sobreFab ? 100 : window.innerWidth >= 640 ? 24 : 16) - ALTO_CERRADO,
+    x: sobreFab ? window.innerWidth - CENTRO_FAB_DESDE_BORDE - ANCHO_CERRADO / 2 : window.innerWidth - ANCHO_CERRADO,
+    /* `sobreFab` deja 8px libres entre el FAB y el botón real -no el wrapper-: 128 = 100 (el viejo colchón, de
+       cuando el círculo era todo el flotante) + 28 (la flechita de recoger, arriba del círculo, que ahora también
+       entra en el wrapper -ver `pos.y` más abajo-). */
+    y: window.innerHeight - (sobreFab ? 128 : window.innerWidth >= 640 ? 24 : 16) - ALTO_CERRADO,
   }), [sobreFab])
   const { pos, handlers } = useArrastrable({
     clave: 'confidentally.confibot-pos',
