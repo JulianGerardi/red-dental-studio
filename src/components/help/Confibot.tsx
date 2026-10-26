@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Bot, X, ArrowUp, Sparkles, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react'
+import { Bot, X, ArrowUp, Sparkles, ChevronRight, ChevronDown, ChevronLeft } from 'lucide-react'
 import { TOPICS, MODULES, puntuarTema } from './topics'
 import { cn } from '@/lib/utils'
 import { useArrastrable, type Posicion } from '@/lib/useArrastrable'
@@ -67,19 +67,23 @@ const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-d
 
 /* El disparador flotante, en reposo la misma pestaña blanca que PatientInSessionPopup -mismo lado, misma estética,
    las dos un poco más chicas (Julián, 2026-10-26; antes círculo de 48px con el degradé azul y un halo al hover)-.
-   La pestaña recogida (`recogido`) no cambia: sigue con el degradé, a propósito -es la señal para volver a traerlo,
-   no un estado de reposo-.
+   Esquinas redondeadas (`rounded-xl`), no un círculo entero -Julián probó `rounded-full` primero y pidió volver al
+   cuadrado con bordes redondeados de siempre, mismo día-.
 
    Arrastrable a cualquier parte (Julián, 2026-10-26, junto con PatientInSessionPopup: mismo hook,
    `useArrastrable`, misma razón -ver el punto 6 de PatientInSessionPopup.tsx-). Por default arranca abajo a la
    derecha (donde ya estaba, corrido si hay un FAB de página), pero eso es sólo el arranque: una vez que se
-   arrastra, la posición se guarda y no vuelve sola. La pestaña recogida no es arrastrable -es un estado ya
-   escondido a propósito, no hace falta moverla-.
+   arrastra, la posición se guarda y no vuelve sola.
 
    Antes crecía siempre hacia la izquierda (pegada al borde derecho real); ahora, con el botón en cualquier parte,
    el hover que revela "Confibot" crece para el lado con más lugar (mismo cálculo que el ancho/alto de
    PatientInSessionPopup). La hoja de chat (`Confibot`, más abajo) sigue abriendo siempre en su lugar de siempre
-   -abajo a la derecha-, no seguís el botón: moverlo no corre a dónde abre el chat. Ver
+   -abajo a la derecha-, no seguís el botón: moverlo no corre a dónde abre el chat.
+
+   La pestaña recogida (`recogido`) pasa de pegarse al **borde de abajo** a pegarse al **costado derecho** (Julián,
+   2026-10-26): no es arrastrable -es un estado ya escondido a propósito, no hace falta moverla-, pero sí toma el
+   mismo `pos.y` de dónde estaba el botón antes de esconderse, para que quede ahí mismo, sólo contra el borde. Sigue
+   con el degradé, a propósito -es la señal para volver a traerlo, no un estado de reposo-. Ver
    design-reference/figma/modulos/help.md. */
 export function ConfibotLanzador({
   recogido, sobreFab = false, onAbrir, onRecoger, onTraer,
@@ -105,13 +109,13 @@ export function ConfibotLanzador({
     return (
       <button
         type="button" onClick={onTraer} aria-label="Bring Confibot back"
+        style={{ top: pos.y }}
         className={cn(
           DEGRADE,
-          'fixed bottom-0 z-40 flex h-8 items-center gap-1.5 rounded-t-xl px-3 text-white shadow-lg hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring',
-          sobreFab ? 'right-[108px]' : 'right-4 sm:right-6',
+          'fixed right-0 z-40 flex h-8 items-center gap-1.5 rounded-l-xl px-3 text-white shadow-lg hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring',
         )}
       >
-        <ChevronUp className="size-4 shrink-0" />
+        <ChevronLeft className="size-4 shrink-0" />
         <span className="text-[13px] font-semibold">Confibot</span>
       </button>
     )
@@ -135,11 +139,11 @@ export function ConfibotLanzador({
         <ChevronDown className="size-3.5" />
       </button>
       {/* Misma pestaña blanca que el disparador de "currently being seen" (PatientInSessionPopup): misma estética,
-          pastilla redondeada entera (ya no pegada a un borde físico), un poco más chica. Agarra y arrastra con el
-          mismo botón que abre -un clic corto abre, uno largo mueve-. */}
+          esquinas redondeadas (ya no pegada a un borde físico), un poco más chica. Agarra y arrastra con el mismo
+          botón que abre -un clic corto abre, uno largo mueve-. */}
       <button
         type="button" {...handlers} aria-label="Open Confibot. Drag to move."
-        className="group relative flex h-11 shrink-0 cursor-grab items-center overflow-hidden rounded-full border border-line bg-white pr-2.5 pl-3 text-ink shadow-floating transition-[padding] duration-300 outline-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+        className="group relative flex h-11 shrink-0 cursor-grab items-center overflow-hidden rounded-xl border border-line bg-white pr-2.5 pl-3 text-ink shadow-floating transition-[padding] duration-300 outline-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
       >
         <span className="bg-dash-count-bg text-dash-blue flex size-7 shrink-0 items-center justify-center rounded-full">
           <Bot className="size-3.5" />

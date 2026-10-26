@@ -151,3 +151,16 @@ que no vuelve sola al lugar de siempre entre recargas. Sin historia de Jira -UI 
   moverla- y la hoja de chat sigue abriendo siempre en su lugar de siempre, abajo a la derecha: no sigue al botón
   arrastrado. Si mover el botón lejos de esa esquina resulta confuso al abrir el chat en otro lado, es la próxima
   vuelta.
+
+## Cuadrado con esquinas redondeadas, y recogido al costado (2026-10-26)
+
+Dos correcciones de Julián sobre lo de arriba, mismo día:
+
+- **El `rounded-full` de la entrada anterior no quedó bien.** Vuelve a `rounded-xl` -cuadrado con esquinas
+  redondeadas, como tenía antes de ser arrastrable- en vez de la pastilla entera. Mismo cambio en
+  `PatientInSessionPopup`.
+- **La pestaña recogida (`recogido`) pasa del borde de abajo al costado derecho.** Antes era `bottom-0` con
+  `rounded-t-xl` (una lengüeta que asoma desde abajo) y la flecha apuntaba para arriba; ahora es `right-0` con
+  `rounded-l-xl` (asoma desde el costado) y la flecha apunta para la izquierda (`ChevronLeft`). Toma el mismo
+  `pos.y` de dónde estaba el botón antes de esconderse -no es arrastrable, pero al menos queda a la altura en la
+  que se la dejó, no en un lugar fijo nuevo-.
