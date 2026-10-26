@@ -5,6 +5,11 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-26
 
+### El título de la pestaña dice Confidentally ([#89](https://github.com/JulianGerardi/red-dental-studio/pull/89))
+- La pestaña de la app decía `red-clone` (el nombre de la carpeta). Ahora dice `Confidentally`, como el sidebar.
+- **Para el dev:** sólo `<title>` en `index.html`. Storybook no cambia: su pestaña sigue con el título que le pone
+  Storybook por cada página.
+
 ### Favicon de la marca en la app y en Storybook ([#88](https://github.com/JulianGerardi/red-dental-studio/pull/88))
 - La pestaña del navegador mostraba el rayo violeta por defecto de Vite. Ahora lleva la marca del sidebar (ícono
   `GalleryVerticalEnd` blanco sobre `#1a4da9`), en la app y en Storybook.
