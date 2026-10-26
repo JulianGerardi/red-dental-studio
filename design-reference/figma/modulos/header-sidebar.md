@@ -274,4 +274,4 @@ Julián: "tanto en el Storybook como en el prototipo tengamos un favicon de la m
 - El favicon era el rayo violeta que trae Vite por defecto. Pasa a ser la marca del sidebar: el ícono `GalleryVerticalEnd` en blanco sobre el azul `#1a4da9` del bloque del logo (el mismo cuadrado con esquinas redondeadas, 32px, radio 7). No hay un logo oficial en el repo: se derivó del que ya usan el sidebar y el tema de Storybook.
 - `public/favicon.svg` (la marca), `public/favicon-32.png` (respaldo para navegadores sin favicon SVG) y `public/apple-touch-icon.png` (180px, sin esquinas redondeadas: iOS las pone). Los tres salen del mismo SVG.
 - La app los enlaza en `index.html`. Storybook toma `public/` como `staticDirs` (por eso `favicon.svg` es el mismo) y `.storybook/manager-head.html` suma los PNG.
-- **A validar:** si hay un logo oficial de Confidentally (Figma o marca), reemplazar los tres archivos; el título de la pestaña sigue siendo `red-clone`.
+- **A validar:** si hay un logo oficial de Confidentally (Figma o marca), reemplazar los tres archivos; el título de la pestaña pasó de `red-clone` a `Confidentally` (2026-10-26, a pedido de Julián).
