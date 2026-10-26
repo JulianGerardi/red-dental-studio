@@ -164,3 +164,13 @@ Dos correcciones de Julián sobre lo de arriba, mismo día:
   `rounded-l-xl` (asoma desde el costado) y la flecha apunta para la izquierda (`ChevronLeft`). Toma el mismo
   `pos.y` de dónde estaba el botón antes de esconderse -no es arrastrable, pero al menos queda a la altura en la
   que se la dejó, no en un lugar fijo nuevo-.
+
+## El botón en reposo es un círculo, no un cuadrado (2026-10-26)
+
+Julián mandó un video de otra app (otro asistente flotante) como referencia: en reposo -suelto, sin arrastrar- es un
+**círculo entero**. El cuadrado con esquinas redondeadas de la entrada de arriba era para el estado **recogido**
+(la pestaña al costado), que en el video se ve así -medio círculo asomando del borde- al tocar el botón chico de
+esconder; no era para el estado de reposo. Se corrige: `rounded-full` en reposo (cerrada), `rounded-xl` sólo en la
+card/hoja abierta -ya estaba así-. Mismo cambio en `PatientInSessionPopup` (`rounded-full` cerrada, `rounded-xl`
+abierta). Sin tocar nada más de lo que ya quedó bien: arrastrable a cualquier parte, recogido al costado con la
+altura (`pos.y`) de donde se dejó.

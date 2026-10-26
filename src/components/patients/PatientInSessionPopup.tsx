@@ -97,9 +97,11 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
         un borde menos y esquinas redondeadas sólo de un lado porque siempre
         tocaba el borde físico de la ventana. Suelta en cualquier parte de la
         pantalla eso se veía roto, así que pasa a tener las cuatro esquinas y
-        el borde completo (`rounded-xl`, cerrada y abierta -Julián probó
-        `rounded-full` cerrada primero y pidió volver al cuadrado con
-        esquinas redondeadas de siempre, 2026-10-26-).
+        el borde completo: círculo cerrada (`rounded-full`), rectángulo con
+        esquinas redondeadas abierta (`rounded-xl`) -Julián mandó un video de
+        referencia (otra app) con el ícono en reposo como círculo completo,
+        2026-10-26; un paso intermedio había probado `rounded-xl` también
+        cerrada, que no era lo que pedía-.
       - **La card abierta crece para el lado con más lugar**, no siempre a la
         izquierda: si se arrastra cerca del borde izquierdo, abre hacia la
         derecha. Mismo cálculo para el alto si se arrastra cerca del borde de
@@ -172,8 +174,8 @@ export function PatientInSessionPopup() {
           queda en 0 la caja se queda quieta, sin apagarse del todo. */}
       <div
         className={cn(
-          'flex items-start overflow-hidden rounded-xl border border-line bg-white shadow-floating transition-[width] duration-300 ease-out',
-          abierto ? 'w-[336px]' : 'w-[46px]',
+          'flex items-start overflow-hidden border border-line bg-white shadow-floating transition-[width,border-radius] duration-300 ease-out',
+          abierto ? 'w-[336px] rounded-xl' : 'w-[46px] rounded-full',
           hayEnCurso && 'motion-safe:animate-[session-live_2.6s_ease-in-out_infinite]',
         )}
       >

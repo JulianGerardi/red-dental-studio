@@ -66,9 +66,9 @@ export function useConfibotRecogido() {
 const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-dash-blue-glow),var(--color-dash-ring),var(--color-dash-blue))] bg-[length:200%_100%]'
 
 /* El disparador flotante, en reposo la misma pestaña blanca que PatientInSessionPopup -mismo lado, misma estética,
-   las dos un poco más chicas (Julián, 2026-10-26; antes círculo de 48px con el degradé azul y un halo al hover)-.
-   Esquinas redondeadas (`rounded-xl`), no un círculo entero -Julián probó `rounded-full` primero y pidió volver al
-   cuadrado con bordes redondeados de siempre, mismo día-.
+   las dos un poco más chicas (Julián, 2026-10-26)-. Círculo entero (`rounded-full`), como el botón original (antes
+   degradé azul) y como el video de referencia que mandó Julián de otra app -un paso intermedio había probado
+   `rounded-xl` (cuadrado con esquinas redondeadas), que resultó ser para el estado recogido, no para el de reposo-.
 
    Arrastrable a cualquier parte (Julián, 2026-10-26, junto con PatientInSessionPopup: mismo hook,
    `useArrastrable`, misma razón -ver el punto 6 de PatientInSessionPopup.tsx-). Por default arranca abajo a la
@@ -143,7 +143,7 @@ export function ConfibotLanzador({
           botón que abre -un clic corto abre, uno largo mueve-. */}
       <button
         type="button" {...handlers} aria-label="Open Confibot. Drag to move."
-        className="group relative flex h-11 shrink-0 cursor-grab items-center overflow-hidden rounded-xl border border-line bg-white pr-2.5 pl-3 text-ink shadow-floating transition-[padding] duration-300 outline-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+        className="group relative flex h-11 shrink-0 cursor-grab items-center overflow-hidden rounded-full border border-line bg-white pr-2.5 pl-3 text-ink shadow-floating transition-[padding] duration-300 outline-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
       >
         <span className="bg-dash-count-bg text-dash-blue flex size-7 shrink-0 items-center justify-center rounded-full">
           <Bot className="size-3.5" />
