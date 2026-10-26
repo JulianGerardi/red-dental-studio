@@ -84,8 +84,13 @@ const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-d
    La pestaña recogida (`recogido`) pasa de pegarse al **borde de abajo** a pegarse al **costado derecho** (Julián,
    2026-10-26): no es arrastrable -es un estado ya escondido a propósito, no hace falta moverla-, pero sí toma el
    mismo `pos.y` de dónde estaba el botón antes de esconderse, para que quede ahí mismo, sólo contra el borde. Sigue
-   con el degradé, a propósito -es la señal para volver a traerlo, no un estado de reposo-. Ver
-   design-reference/figma/modulos/help.md. */
+   con el degradé, a propósito -es la señal para volver a traerlo, no un estado de reposo-.
+
+   La pestaña recogida ya no lleva el nombre siempre visible (Julián, 2026-10-26): el ícono del bot queda al lado del
+   chevron -mismo cambio en PatientInSessionPopup, con su propio ícono-, y el nombre aparece recién al pasar el mouse
+   (`group-hover`, ancho de 0 a 70px). Al traerlo de vuelta (clic en la pestaña), el botón de reposo entra con
+   `panel-in` -la misma animación de deslizarse desde el borde derecho que usa el drawer (`ui/drawer.tsx`)-, no
+   crece desde un círculo. Ver design-reference/figma/modulos/help.md. */
 export function ConfibotLanzador({
   recogido, sobreFab = false, onAbrir, onRecoger, onTraer,
 }: {
@@ -113,18 +118,21 @@ export function ConfibotLanzador({
         style={{ top: pos.y }}
         className={cn(
           DEGRADE,
-          'fixed right-0 z-40 flex h-8 items-center gap-1.5 rounded-l-xl px-3 text-white shadow-lg hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring',
+          'group fixed right-0 z-40 flex h-8 items-center gap-1.5 rounded-l-xl py-0 pr-3 pl-2.5 text-white shadow-lg hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring',
         )}
       >
         <ChevronLeft className="size-4 shrink-0" />
-        <span className="text-[13px] font-semibold">Confibot</span>
+        <Bot className="size-3.5 shrink-0" />
+        <span className="max-w-0 overflow-hidden text-[13px] font-semibold whitespace-nowrap transition-[max-width] duration-200 group-hover:max-w-[70px]">
+          Confibot
+        </span>
       </button>
     )
   }
 
   return (
     <div
-      className="fixed z-40 flex flex-col items-end gap-1"
+      className="fixed z-40 flex flex-col items-end gap-1 motion-safe:animate-[panel-in_180ms_ease-out]"
       style={{ top: pos.y, left: pos.x }}
     >
       {/* 24px a la vista, 40px de área de toque. */}
