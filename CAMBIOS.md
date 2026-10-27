@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-27
 
+### Confibot: la hoja no se sale de la pantalla y cierra con Escape o clic afuera ([#94](https://github.com/JulianGerardi/red-dental-studio/pull/94))
+- Con el botón cerca de la mitad de la pantalla, la hoja de chat se iba por arriba y el botón de cerrar quedaba
+  fuera de vista. Ahora el alto se achica al lugar libre (margen de 8px) y la lista de mensajes scrollea por dentro.
+- La hoja cierra con Escape o con un clic afuera, como la card de "currently being seen". Ojo: un borrador sin
+  enviar se pierde si se cierra así (lo ya enviado se guarda).
+- **Para el dev:** el ítem *Confibot* del menú lateral lleva `data-confibot-toggle` para quedar excluido del clic
+  afuera (su clic ya hace toggle). Documentado en `help.md`; Storybook sin actualizar (pendiente de que Julián lo
+  pida).
+
 ### Confibot: el chat abre donde está el botón, no siempre abajo a la derecha ([#93](https://github.com/JulianGerardi/red-dental-studio/pull/93))
 - La hoja de chat de Confibot ya no abre siempre en el mismo rincón fijo: abre anclada a donde esté el botón
   (arrastrado o no), creciendo hacia el lado con más lugar en pantalla, igual que la card de "currently being
