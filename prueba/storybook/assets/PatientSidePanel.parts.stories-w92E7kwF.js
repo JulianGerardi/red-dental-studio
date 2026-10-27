@@ -1,0 +1,19 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{n,t as r}from"./calendar-days-aAv0FTpR.js";import{n as i,t as a}from"./mail-CHKec-0i.js";import{$u as o,Bt as s,Qu as c,Ut as l,Vt as u}from"./iframe-BJyg8v08.js";import{n as d,r as f}from"./decorators-B0sTMpDJ.js";var p,m,h,g,_;function v(){return(v=e((()=>{n(),i(),o(),f(),l(),p=t(),m={title:`Components/Patients/PatientSidePanel parts`,parameters:{layout:`padded`},decorators:[d]},h={render:()=>(0,p.jsx)(`div`,{className:`w-[260px]`,children:(0,p.jsx)(u,{title:`Contact`,onEdit:()=>{},items:[{icon:r,label:`Birthday`,value:`May 14, 1982`},{icon:c,label:`Phone`,value:`(555) 123-4567`},{icon:a,label:`Email`,value:`abrilviola@gmail.com`}]})})},g={render:()=>(0,p.jsx)(`div`,{className:`h-40 w-[260px]`,children:(0,p.jsx)(s,{})})},_=[`InfoSection`,`StartEncounter`],h.parameters={...h.parameters,docs:{...h.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="w-[260px]">
+      <InfoBlock title="Contact" onEdit={() => {}} items={[{
+      icon: CalendarDays,
+      label: 'Birthday',
+      value: 'May 14, 1982'
+    }, {
+      icon: Phone,
+      label: 'Phone',
+      value: '(555) 123-4567'
+    }, {
+      icon: Mail,
+      label: 'Email',
+      value: 'abrilviola@gmail.com'
+    }]} />
+    </div>
+}`,...h.parameters?.docs?.source}}},g.parameters={...g.parameters,docs:{...g.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="h-40 w-[260px]"><EncounterButton /></div>
+}`,...g.parameters?.docs?.source}}}})))()}v();export{h as InfoSection,g as StartEncounter,_ as __namedExportsOrder,m as default};
