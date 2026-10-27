@@ -109,6 +109,39 @@ export type Finding = {
   descriptors?: Record<string, string>
   /** Lo que cuesta el procedimiento, en dólares: lo muestra Edit Procedure (Figma 5294:85084) cuando existe. */
   fee?: number
+  /** El área de tratamiento con que se guardó: tipo y valor (CON-3700, `findings.specs`). null: sin área. Si falta, la
+     deduce `areaDeTratamiento`. */
+  treatmentArea?: AreaTratamiento | null
+}
+
+/* El área de tratamiento de un finding o procedimiento (CON-3700): el tipo -Tooth, Range, Quadrant, Arch, Mouth, o la
+   ubicación de Intraoral/Extraoral (en el backend, un único INTRA_EXTRA_ORAL)- y su valor: el diente, el cuadrante
+   ("Upper Left", código 20), la arcada ("Maxillary", 01), las regiones marcadas en el gráfico. Cada tipo tiene su ícono
+   (`IconoArea`). */
+export type TipoArea = 'Tooth' | 'Range' | 'Quadrant' | 'Arch' | 'Mouth' | 'Intraoral' | 'Extraoral'
+export type AreaTratamiento = { tipo: TipoArea; valor: string }
+export const NOMBRE_AREA: Record<TipoArea, string> = {
+  Tooth: 'Tooth', Range: 'Range', Quadrant: 'Quadrant', Arch: 'Arch', Mouth: 'Mouth', Intraoral: 'Intra Oral', Extraoral: 'Extra Oral',
+}
+
+/** El área de un finding: la que se guardó o, en lo cargado antes de guardarla, la que se deduce del diente o del examen. */
+export function areaDeTratamiento(f: Pick<Finding, 'treatmentArea' | 'tooth' | 'examen' | 'area'>): AreaTratamiento | null {
+  if (f.treatmentArea !== undefined) return f.treatmentArea
+  if (f.tooth !== null) return { tipo: 'Tooth', valor: String(f.tooth) }
+  if (f.examen === 'Extraoral') return { tipo: 'Extraoral', valor: f.area }
+  if (f.examen === 'Intraoral') return { tipo: 'Intraoral', valor: f.area }
+  return null
+}
+
+const titulo = (t: string) => t.replace(/\b\w/g, (c) => c.toUpperCase())
+
+/** El área que guarda Add Procedure / Add Condition según el alcance elegido: diente (con o sin superficies), cuadrante,
+   arcada, o la boca entera si se quitó el área seleccionada. */
+export function areaDeAlcance(scope: ProcedureScope, area: string, tooth: number | null): AreaTratamiento {
+  if ((scope === 'Tooth' || scope === 'Surface') && tooth !== null) return { tipo: 'Tooth', valor: String(tooth) }
+  if (area === 'Full mouth') return { tipo: 'Mouth', valor: 'Entire oral cavity' }
+  if (scope === 'Arch') return { tipo: 'Arch', valor: /upper/i.test(area) ? 'Maxillary' : 'Mandibular' }
+  return { tipo: 'Quadrant', valor: titulo(area) }
 }
 
 /* La guía visual de descriptores de una condition: una fila por atributo, con sus opciones como píldoras de una sola

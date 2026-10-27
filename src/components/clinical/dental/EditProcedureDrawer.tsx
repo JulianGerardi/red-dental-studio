@@ -5,16 +5,16 @@ import { Tabs } from '@/components/ui/tabs'
 import { SelectField, TextArea } from '@/components/patients/form'
 import { SearchPicker } from '@/components/ui/search-picker'
 import { OpcionDiagnostico, OpcionFinding, candidatosDiagnostico } from './OpcionesVinculo'
-import { ScopeIcon } from './ScopeIcons'
-import { FilaDato, FilaNombre, IconoFecha, TONO_ESTADO, fechaCorta, mayuscula } from './DatosHallazgo'
-import { PROVIDERS, type Finding } from './data'
+import { FilaArea, FilaDato, FilaNombre, IconoFecha, TONO_ESTADO, fechaCorta, mayuscula } from './DatosHallazgo'
+import { PROVIDERS, areaDeTratamiento, type Finding } from './data'
 
 /* Edit Procedure (Figma *Platform Design* 5294:85084): tres pestañas -General Information, Findings y Diagnostic- en vez
    de pasos, porque es algo que ya existe (Edit Patient, 2026-10-22). General Information: los datos del procedimiento
    arriba, el proveedor y las notas. Findings y Diagnostic: lo que el procedimiento tiene vinculado, con un buscador que
    no muestra nada hasta escribir (Julián, 2026-10-24), igual que Link to finding / Link to diagnosis de New Procedure.
    Un solo Save guarda todo. El
-   Fee sólo aparece si el procedimiento lo trae. Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
+   Fee sólo aparece si el procedimiento lo trae. Arriba, primero el procedimiento, después el precio y la fecha, y el área
+   de tratamiento con el ícono de su tipo (CON-3700; Julián, 2026-10-27). Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
 type Pestana = 'General Information' | 'Findings' | 'Diagnostic'
 const PESTANAS = ['General Information', 'Findings', 'Diagnostic'] as const
 
@@ -40,6 +40,8 @@ export function EditProcedureDrawer({
   const vinculables = findings.filter((x) => x.id !== finding?.id && x.status !== 'Discarded')
   const diagnosticos = candidatosDiagnostico(vinculables)
 
+  const area = finding && areaDeTratamiento(finding)
+
   function guardar() {
     onSave({ provider, notes, linked, diagnoses })
     onClose()
@@ -53,7 +55,7 @@ export function EditProcedureDrawer({
       {finding && pestana === 'General Information' && (
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4">
-            <FilaDato icono={<IconoFecha />} rotulo="Creation date">{fechaCorta(finding.date)}</FilaDato>
+            <FilaNombre nombre={mayuscula(finding.condition)} estado={finding.status} tono={TONO_ESTADO[finding.status]} />
             {finding.fee !== undefined && (
               <FilaDato
                 icono={<span className="flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-white text-ink"><BadgeDollarSign className="size-[14px]" /></span>}
@@ -62,15 +64,8 @@ export function EditProcedureDrawer({
                 $ {finding.fee.toFixed(2)}
               </FilaDato>
             )}
-            {finding.tooth !== null && (
-              <FilaDato
-                icono={<span className="flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-dash-blue"><ScopeIcon scope="Tooth" /></span>}
-                rotulo="Tooth"
-              >
-                {finding.tooth}
-              </FilaDato>
-            )}
-            <FilaNombre nombre={mayuscula(finding.condition)} estado={finding.tooth !== null ? 'Tooth' : finding.area} tono={TONO_ESTADO[finding.status]} />
+            <FilaDato icono={<IconoFecha />} rotulo="Creation date">{fechaCorta(finding.date)}</FilaDato>
+            {area && <FilaArea area={area} />}
           </div>
           <SelectField label="Provider" required options={PROVIDERS} value={provider} onChange={setProvider} />
           <TextArea label="Notes" placeholder="Document questions, answers, clarifications, or additional notes" value={notes} onChange={setNotes} />
