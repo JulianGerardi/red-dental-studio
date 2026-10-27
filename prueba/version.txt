@@ -1,1 +1,1 @@
-claude/kind-hawking-tshp5b ba85f2752f92b7f2c840a11753bac8ec6552fe3a
+claude/confibot-boton-colapsar 6a56f883dcf1f870693f147d85a6cecc19ff4ba2
