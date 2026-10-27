@@ -17,13 +17,16 @@ test('El botón flotante abre el chat, se recoge y sigue recogido al volver', as
 
   await screen.getByRole('button', 'Tuck Confibot away').tap()
   await expect(boton).toHaveCount(0)
-  await expect(screen.getByRole('button', 'Bring Confibot back')).toBeVisible()
+  await expect(screen.getByRole('button', 'Open Confibot')).toBeVisible()
 
   await app.open('/patients')
-  await expect(screen.getByRole('button', 'Bring Confibot back')).toBeVisible()
-  /* Un solo clic trae Y abre el chat -no hace falta un segundo clic sobre el botón de reposo (2026-10-26). */
-  await screen.getByRole('button', 'Bring Confibot back').tap()
+  await expect(screen.getByRole('button', 'Open Confibot')).toBeVisible()
+  /* Un solo clic en la pestaña abre el chat, y la pestaña se queda (con el chat abierto dice Hide Confibot chat). */
+  await screen.getByRole('button', 'Open Confibot').tap()
   await expect(screen.getByText('Here to explain the app')).toBeVisible()
+  await screen.getByRole('button', 'Hide Confibot chat').tap()
+  await expect(screen.getByText('Here to explain the app')).toHaveCount(0)
+  await expect(screen.getByRole('button', 'Open Confibot')).toBeVisible()
 })
 
 test('En Scheduling queda arriba del botón de Appointment requests, sin taparlo', async ({ app, screen }) => {
