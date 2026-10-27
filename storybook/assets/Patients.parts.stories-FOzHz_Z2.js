@@ -1,0 +1,3 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{r as n,t as r}from"./Patients-co6DqbzC.js";var i,a,o,s;function c(){return(c=e((()=>{n(),i=t(),a={title:`Pages/Parts/Patients`,parameters:{layout:`padded`}},o={render:()=>(0,i.jsxs)(`div`,{className:`flex gap-2`,children:[(0,i.jsx)(r,{n:3}),(0,i.jsx)(r,{n:12})]})},s=[`CountBubble`],o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="flex gap-2"><Globo n={3} /><Globo n={12} /></div>
+}`,...o.parameters?.docs?.source}}}})))()}c();export{o as CountBubble,s as __namedExportsOrder,a as default};
