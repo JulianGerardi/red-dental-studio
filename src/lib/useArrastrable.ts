@@ -4,7 +4,7 @@ export type Posicion = { x: number; y: number }
 
 /* El lugar que ocupa un flotante cerrado (pestaña o círculo), para que la hoja/card del otro no lo tape
    (Julián, 2026-10-27: al abrir Confibot, la pestaña de "currently being seen" tiene que seguir a la vista). */
-export type RectFlotante = { x1: number; x2: number; y1: number; y2: number }
+export type RectFlotante = { x1: number; x2: number; y1: number; y2: number; tab?: boolean }
 
 /* Alto máximo de una hoja/card de `ancho` px que ocupa [y, y+alto] (o [y-alto, y] si `haciaArriba`) y arranca en `y`,
    para no pisar a `otro`. Sólo cuenta si `otro` se cruza en horizontal con la hoja (x1..x1+ancho). Nunca baja de

@@ -300,3 +300,28 @@ vista, no quedar encima de la hoja.
   al otro como `evitar`. Con los dos en su lugar por default (1440×900): la hoja de Confibot queda de y=466 a 832 y
   la pestaña de Patients (426-458) a la vista; la card de Patients (458-810) no toca la pestaña de Confibot (832).
 - El `z-[41]` de Patients queda como red de seguridad (si el recorte llega al mínimo).
+
+## Columna del borde derecho: las dos pestañas y cada panel empujando al otro (2026-10-27)
+
+Julián, con tres capturas (pantalla 1 = default, pantalla Patients, pantalla Confibot), después de que la hoja
+tapara o desplazara al otro botón: así es el layout y así se despliega, con microanimación y sin saltos.
+
+- **Default:** las dos pestañas recogidas pegadas al borde derecho, una abajo de la otra (Patients arriba, Confibot
+  abajo), a la altura de Patients. `recogido` pasa a ser `true` por default en los dos (antes `false`: el círculo
+  arrastrable era el default).
+- **Abrir Patients:** pestaña arriba (chevron › y el nombre), la card abajo de ella, y la pestaña de Confibot
+  empujada abajo de la card.
+- **Abrir Confibot:** pestaña de Patients arriba, la hoja en el medio, la pestaña de Confibot abajo de todo.
+- **Cómo está hecho** (`layout/DockFlotantes.tsx`): una columna `fixed right-0` con los tres en orden (Patients,
+  hoja de Confibot, pestaña de Confibot); lo recogido se dibuja estático adentro, no `fixed`. `PanelDock` despliega
+  el panel creciendo en alto (`grid-template-rows` 0fr→1fr + opacidad, ~260ms; al cerrar, al revés), así lo de abajo
+  baja suave, sin salto. La columna mide su alto (ResizeObserver) y se corre para arriba si no entra, siguiendo la
+  animación cuadro a cuadro. El chevron de la pestaña gira 180° al abrir. Escape o clic afuera cierran; otro clic en la
+  pestaña también.
+- **Alto de los paneles:** sheet = `min(560, ventana - 16 - 70)`; card = `min(360, …)` (la lista scrollea por dentro).
+  Sólo desde 640px; en celular la hoja de Confibot sigue siendo la de abajo a todo el ancho.
+- **El círculo arrastrable sigue en el código** (para quien lo tenga guardado) pero desde la pestaña no hay un clic
+  para volver a él, y `altoSinPisar`/`evitar` sólo cubren ese caso. A validar: si el círculo y el arrastre ya no
+  hacen falta, se pueden sacar (`useArrastrable`, el botón de esconder, `onPosicion`).
+- **Storybook sin tocar:** `PatientInSessionPopup` ahora arranca recogido por default, su story se ve distinta hasta
+  que se documente (pendiente de que Julián lo pida).
