@@ -2,8 +2,8 @@ import type { ReactNode } from 'react'
 import { CalendarDays, FileSpreadsheet, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Pill, type PillTone } from '@/components/ui/pill'
-import { ScopeIcon } from './ScopeIcons'
-import type { FindingStatus, ProcedureScope } from './data'
+import { IconoArea, ScopeIcon } from './ScopeIcons'
+import { NOMBRE_AREA, type AreaTratamiento, type FindingStatus, type ProcedureScope } from './data'
 
 /* Los datos de un finding arriba de Edit Finding, Edit Condition y Edit Procedure (Figma 5294:107675, 5301:149072 y
    5294:85084): una fila por dato, card blanca con la línea azul a la izquierda y sombra suave, con el ícono en un
@@ -65,4 +65,16 @@ export const mayuscula = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
 export const TONO_ESTADO: Record<FindingStatus, PillTone> = {
   Active: 'success', Monitoring: 'warning', 'In Treatment': 'info', Treated: 'success', 'Externally Treated': 'success',
   'No Treatment Needed': 'danger', 'Patient Declined': 'danger', 'Clinic Declined': 'danger', Discarded: 'danger',
+}
+
+/** El área de tratamiento: el ícono de su tipo en el cuadrado azul (como el del diente), el tipo y su valor. */
+export function FilaArea({ area }: { area: AreaTratamiento }) {
+  return (
+    <FilaDato
+      icono={<span className="flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-dash-blue"><IconoArea tipo={area.tipo} /></span>}
+      rotulo={NOMBRE_AREA[area.tipo]}
+    >
+      {area.valor}
+    </FilaDato>
+  )
 }

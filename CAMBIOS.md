@@ -5,6 +5,19 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-27
 
+### Clinical Mode: los Edit con el orden del mockup y "Edit Finding" también en el diente ([#98](https://github.com/JulianGerardi/red-dental-studio/pull/98))
+- Los datos de arriba van en este orden: nombre con su estado → Creation date → Fee (sólo procedimientos) → Exams →
+  Provider → el área de tratamiento al final, con su ícono en el cuadrado azul (CON-3700).
+- El drawer de una condition en un diente se titula **Edit Finding** (antes "Edit Condition"): una condition
+  cargada siempre es un finding. La fila **Tooth · "20 · Permanent"** es la cabecera de la card de la rueda de
+  superficies; se fueron el título "Selected Area" y la cabecera interna.
+- Edit Finding (diente y Extraoral/Intraoral) separa **General Information** y **Descriptors** en pestañas
+  (`ui/tabs`), como Edit Procedure.
+- **Para el dev:** el componente sigue llamándose `EditConditionDrawer` (sólo cambia el título); el área de
+  tratamiento se lee con `areaDeTratamiento(finding)` y se pinta con `FilaArea` (`clinical/dental/DatosHallazgo.tsx`).
+  Detalle en `design-reference/figma/modulos/clinical-mode.md` (2026-10-27). Storybook sin actualizar (pendiente de
+  que Julián lo pida).
+
 ### Confibot y "currently being seen": columna en el borde derecho, como en las capturas ([#97](https://github.com/JulianGerardi/red-dental-studio/pull/97))
 - Los dos recogidos viven ahora en una columna pegada al borde derecho. **Default:** las dos pestañas una abajo de
   la otra (Patients arriba, Confibot abajo). **Abrir Patients:** la card se despliega abajo de su pestaña y empuja a

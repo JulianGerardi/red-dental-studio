@@ -67,6 +67,7 @@ function RegionExamInterno<R extends string>({ examen, diagrama }: { examen: str
         linked: [],
         diagnoses: [],
         examen,
+        treatmentArea: { tipo: examen === 'Extraoral' ? 'Extraoral' : 'Intraoral', valor: area },
         kind: 'condition',
         descriptors: draft.descriptors,
       },

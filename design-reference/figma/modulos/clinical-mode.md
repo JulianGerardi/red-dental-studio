@@ -2773,3 +2773,42 @@ Código: `ui/search-picker.tsx`, `clinical/dental/{OpcionesVinculo,NewProcedureD
   *Applied transactions* (abren la transacción en el modal).
 - Se pierde el atajo de un cargo de procedimiento del Ledger a Clinical Mode con el procedimiento abierto; quedan el link al
   caso de la fila Treatment y el de cada hallazgo. A validar con usuarios si se extraña.
+
+## Los Edit: orden de los datos, dos pestañas y el área de tratamiento (2026-10-27)
+
+**CON-3700 (Findings, cambios de modelo), CON-1761 ([Condition] Treatment Area), CON-2770 (Edit Finding).** Julián:
+"el procedure arriba, luego fecha, precio y capaz arriba el precio"; "separá en 2 tabs General de Descriptors tanto en
+Edit Condition como en Edit Finding (así queda más corto)"; "Treatment area iría con el símbolo de extra oral o intra
+oral, el ícono diseñado igual que cuando marcamos un tooth (fondo azul e ícono en blanco)… cada procedure y finding
+tiene un treatment area o no tiene; si tiene, el sistema guarda cuál es esa área y cuál es el valor".
+
+- **Orden de los datos**, según el mockup que mandó Julián después ("nuevo orden"): nombre con su estado → Creation
+  date → (Fee, sólo procedimientos) → Exams → Provider → el área de tratamiento al final. Edit Procedure no muestra
+  Exams y su proveedor es el select editable de abajo, así que queda nombre → fecha → Fee → área. Un primer intento
+  ponía el Fee antes de la fecha y el área antes del examen; quedó descartado.
+- **"Edit Condition" se llama "Edit Finding".** Julián: "dice condition pero siempre es finding": una condition
+  cargada es un finding, así que el drawer de una condition en un diente (`EditConditionDrawer`, Figma 5301:149072)
+  también se titula **Edit Finding**, igual que el de Extraoral/Intraoral. Anomalía: el Figma lo titula "Edit
+  Condition". El componente conserva su nombre interno; sólo cambia lo que ve el usuario.
+- **El diente encabeza la rueda.** En ese drawer ya no van el título "Selected Area" ni la cabecera "Tooth N ·
+  Permanent" adentro de la card: la fila del área (`FilaArea`, Tooth · "20 · Permanent") es la cabecera de una card
+  `TARJETA_INTERNA` con la rueda de superficies, "Selected surface" y la ayuda, como en el mockup.
+- **Edit Finding (las dos variantes)** pasa a dos pestañas, **General Information** (datos, área, notas) y
+  **Descriptors**, con `ui/tabs` en el drawer, como Edit Procedure.
+- **Área de tratamiento** (CON-3700, `findings.specs`): `Finding.treatmentArea` guarda `{ tipo, valor }`. Tipos: Tooth,
+  Range, Quadrant, Arch, Mouth e Intraoral/Extraoral (en el backend, un único `INTRA_EXTRA_ORAL` con la lista de
+  `location`). El valor es el diente, el cuadrante ("Upper Left", código 20), la arcada ("Maxillary", 01), la boca entera
+  ("Entire oral cavity", 00) o las regiones marcadas en el gráfico. Se guarda al cargar: Add Procedure / Add Condition
+  según el alcance elegido (`areaDeAlcance`), Extraoral / Intraoral con su ubicación. Lo cargado antes, sin el dato, lo
+  deduce `areaDeTratamiento` (diente → Tooth, examen Extraoral/Intraoral → su región).
+- La fila muestra el ícono del tipo en el cuadrado azul con el ícono en blanco, como el del diente (`IconoArea`,
+  `FilaArea`), el nombre del tipo ("Intra Oral", "Quadrant") y su valor. En Edit Procedure reemplaza la fila "Tooth".
+- **A validar con usuarios:** si recepción y odontólogos esperan ver "Condition" en algún lugar (la acción del
+  odontograma sigue siendo *Add Condition* y el drawer de alta, *New Condition*): cargar una condition y editarla como
+  finding es coherente con el modelo, pero conviene confirmar que el cambio de nombre no confunde.
+- **Íconos, a confirmar**: diente, boca y arcada son los del design system; Range usa el diente. Para Extraoral e
+  Intraoral el Figma no tiene ícono: Extraoral lleva la cara de lucide (`ScanFace`) e Intraoral la boca abierta, que el
+  Figma también usa para Quadrant (y acá para Mouth). Conviene que diseño defina un ícono propio para cada tipo.
+
+Código: `clinical/dental/{data.ts,ScopeIcons,DatosHallazgo,EditFindingDrawer,EditConditionDrawer,EditProcedureDrawer}.tsx`,
+`clinical/{ExamLayout,RegionExam}.tsx`, `tests/clinical-mode.e2e.ts`.
