@@ -10,6 +10,7 @@ import { delBanner, useNotificaciones } from '@/data/notificacionesStore'
 import { aviso } from '@/components/ui/toaster'
 import { PatientInSessionPopup } from '@/components/patients/PatientInSessionPopup'
 import { NavigationPreview } from './navigation-preview'
+import { DockFlotantes } from './DockFlotantes'
 
 export function AppShell() {
   const [expanded, setExpanded] = useState(useContext(NavigationPreview).expanded ?? false)
@@ -17,7 +18,6 @@ export function AppShell() {
   const { showOnScreen, explicando, confibotAbierto, openConfibot, closeConfibot, fabDePagina } = useHelp()
   const [confibotRecogido, setConfibotRecogido] = useConfibotRecogido()
   const [confibotPos, setConfibotPos] = useState<Posicion | null>(null)
-  const [confibotRect, setConfibotRect] = useState<RectFlotante | null>(null)
   const [pacientesRect, setPacientesRect] = useState<RectFlotante | null>(null)
 
   /* Las notificaciones viven en su store (data/notificacionesStore): tienen
@@ -92,27 +92,28 @@ export function AppShell() {
       {/* Activo en toda la app, no sólo en Patients -Julián lo pidió así: quiere
           saber quién está en el sillón esté donde esté navegando-. ClinicalMode
           queda afuera igual porque ese layout no pasa por AppShell. */}
-      <PatientInSessionPopup onRect={setPacientesRect} evitar={confibotRect} />
-      {/* Mientras habla la hoja de chat, el botón queda montado pero oculto (`oculto`, no un desmonte): así al
-          cerrar el chat reaparece quieto en el lugar donde estaba, en vez de reanimarse como si volviera de estar
-          recogido (Julián, 2026-10-27; ver el comentario de `ConfibotLanzador`). Mientras habla un CoachMark sigue
-          desmontándose -es un caso mucho menos frecuente, y de todos modos vuelve a la misma posición guardada-. */}
-      {!explicando && (
-        <ConfibotLanzador
-          recogido={confibotRecogido}
-          oculto={confibotAbierto}
-          sobreFab={fabDePagina}
-          onAbrir={openConfibot}
-          onRecoger={() => setConfibotRecogido(true)}
-          onTraer={openConfibot}
-          onCerrar={closeConfibot}
-          onPosicion={setConfibotPos}
-          onRect={setConfibotRect}
-        />
-      )}
-      {/* La hoja abre anclada a `confibotPos` -dónde está el botón ahora-, no siempre abajo a la derecha (Julián,
-          2026-10-27; ver el comentario de `Confibot`, más abajo del todo en Confibot.tsx). */}
-      <Confibot abierto={confibotAbierto} pos={confibotPos ?? undefined} acoplada={confibotRecogido} evitar={pacientesRect} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
+      {/* Los dos flotantes recogidos viven en una columna pegada al borde derecho (DockFlotantes): Patients arriba, su
+          card abajo, la hoja de Confibot, y la pestaña de Confibot abajo de todo -cada panel empuja al otro-. Lo que
+          no está recogido (el círculo arrastrable) sigue siendo `fixed` y no depende de la columna. La columna arranca
+          en la altura de Patients: su pestaña si está recogida, o abajo de su círculo (Julián, 2026-10-27). */}
+      <DockFlotantes baseY={pacientesRect ? (pacientesRect.tab ? pacientesRect.y1 : pacientesRect.y2 + 8) : Math.round(window.innerHeight / 2 - 24)}>
+        <PatientInSessionPopup onRect={setPacientesRect} />
+        <Confibot abierto={confibotAbierto} pos={confibotPos ?? undefined} acoplada={confibotRecogido} evitar={pacientesRect} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
+        {/* Mientras habla un CoachMark el botón no se dibuja; con el chat abierto sigue montado (`oculto`) para no
+            reanimarse al cerrarlo (ver `ConfibotLanzador`). */}
+        {!explicando && (
+          <ConfibotLanzador
+            recogido={confibotRecogido}
+            oculto={confibotAbierto}
+            sobreFab={fabDePagina}
+            onAbrir={openConfibot}
+            onRecoger={() => setConfibotRecogido(true)}
+            onTraer={openConfibot}
+            onCerrar={closeConfibot}
+            onPosicion={setConfibotPos}
+          />
+        )}
+      </DockFlotantes>
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { TOPICS, MODULES, puntuarTema } from './topics'
 import { cn } from '@/lib/utils'
 import { altoSinPisar, useArrastrable, type Posicion, type RectFlotante } from '@/lib/useArrastrable'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { PanelDock } from '@/components/layout/DockFlotantes'
 
 /* Tamaño del botón cerrado (círculo): con esto alcanza para clampear el arrastre. */
 const ANCHO_CERRADO = 44
@@ -56,7 +57,7 @@ export function buscarRespuesta(consulta: string): Mensaje {
    estorba no tiene que volver a hacerlo cada vez que abre la app. */
 export function useConfibotRecogido() {
   const [recogido, setRecogido] = useState(() => {
-    try { return localStorage.getItem(CLAVE_RECOGIDO) === '1' } catch { return false }
+    try { return localStorage.getItem(CLAVE_RECOGIDO) !== '0' } catch { return true }
   })
   useEffect(() => {
     try { localStorage.setItem(CLAVE_RECOGIDO, recogido ? '1' : '0') } catch { /* sin storage: sólo dura la visita */ }
@@ -118,7 +119,7 @@ const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-d
    `AppShell` guarda esa posición y se la pasa a `Confibot` (más abajo) para anclar la hoja ahí. Ver
    design-reference/figma/modulos/help.md. */
 export function ConfibotLanzador({
-  recogido, oculto = false, sobreFab = false, onAbrir, onRecoger, onTraer, onCerrar, onPosicion, onRect,
+  recogido, oculto = false, sobreFab = false, onAbrir, onRecoger, onTraer, onCerrar, onPosicion,
 }: {
   recogido: boolean
   /** Montado pero sin dibujarse -no lo reemplaza `AppShell` desmontándolo-, para no perder `pos` ni reanimar la
@@ -133,8 +134,6 @@ export function ConfibotLanzador({
   onCerrar?: () => void
   /** Dónde está el botón ahora, para que `Confibot` abra la hoja ahí en vez de siempre abajo a la derecha. */
   onPosicion?: (pos: Posicion) => void
-  /** El lugar que ocupa ahora (pestaña o círculo), para que el otro flotante no lo tape al abrir. */
-  onRect?: (r: RectFlotante) => void
 }) {
   /* El FAB de la página (Appointment requests, Scheduling): `right-8` + 60px, centro a 32+30=62px del borde
      derecho. Sobre ese FAB, Confibot se centra arriba (mismo eje x) en vez de pegarse al borde. */
@@ -155,16 +154,6 @@ export function ConfibotLanzador({
 
   useEffect(() => { onPosicion?.(pos) }, [pos, onPosicion])
 
-  useEffect(() => {
-    if (!onRect) return
-    const avisar = () => onRect(recogido
-      ? { x1: window.innerWidth - 130, x2: window.innerWidth, y1: pos.y, y2: pos.y + 32 }
-      : { x1: pos.x, x2: pos.x + ANCHO_CERRADO, y1: pos.y, y2: pos.y + 28 + ALTO_CERRADO })
-    avisar()
-    window.addEventListener('resize', avisar)
-    return () => window.removeEventListener('resize', avisar)
-  }, [pos, recogido, onRect])
-
   if (oculto && !recogido) return null
 
   if (recogido) {
@@ -178,13 +167,12 @@ export function ConfibotLanzador({
         onClick={abierta ? onCerrar : onTraer}
         aria-label={abierta ? 'Hide Confibot chat' : 'Open Confibot'}
         aria-expanded={abierta}
-        style={{ top: pos.y }}
         className={cn(
           DEGRADE,
-          'group fixed right-0 z-40 flex h-8 items-center gap-1.5 rounded-l-xl py-0 pr-3 pl-2.5 text-white shadow-lg hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring',
+          'pointer-events-auto group flex h-8 shrink-0 items-center gap-1.5 rounded-l-xl py-0 pr-3 pl-2.5 text-white shadow-lg hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring',
         )}
       >
-        {abierta ? <ChevronRight className="size-4 shrink-0" /> : <ChevronLeft className="size-4 shrink-0" />}
+        <ChevronLeft className={cn('size-4 shrink-0 transition-transform duration-200', abierta && 'rotate-180')} />
         <Bot className="size-3.5 shrink-0" />
         <span className={cn(
           'overflow-hidden text-[13px] font-semibold whitespace-nowrap transition-[max-width] duration-200',
@@ -286,8 +274,10 @@ export function Confibot({
     }
   }, [abierto, onClose])
 
-  /* La hoja ocupa el lugar del botón flotante: montada nada más mientras está abierta. */
-  if (!abierto) return null
+  /* Con la pestaña recogida y pantalla de escritorio la hoja vive en la columna del borde derecho (DockFlotantes), entre
+     las dos pestañas; si no, la hoja ocupa el lugar del botón flotante, montada nada más mientras está abierta. */
+  const enDock = acoplada && window.innerWidth >= 640
+  if (!abierto && !enDock) return null
 
   const preguntas = historial.filter((m) => m.de === 'user').length
 
@@ -302,34 +292,138 @@ export function Confibot({
      la abrió. */
   const ALTO_FLECHA_GAP = 28
   const esDesktop = window.innerWidth >= 640
-  /* Acoplada a la pestaña recogida (Julián, 2026-10-27, mockup): pegada al borde derecho, arriba de la pestaña -que
-     mide 32px y arranca en `pos.y`, sin el offset de la flechita- o abajo si la pestaña está en la mitad de arriba. */
-  const ALTO_PESTANA = 32
-  const acopladaArriba = pos ? pos.y + ALTO_PESTANA / 2 > window.innerHeight / 2 : false
   const haciaIzquierda = pos ? pos.x + ANCHO_CERRADO / 2 > window.innerWidth / 2 : false
-  const haciaArriba = acoplada ? acopladaArriba : pos ? pos.y + ALTO_FLECHA_GAP + ALTO_CERRADO / 2 > window.innerHeight / 2 : false
+  const haciaArriba = pos ? pos.y + ALTO_FLECHA_GAP + ALTO_CERRADO / 2 > window.innerHeight / 2 : false
   /* Margen de 8px contra el borde, y el alto se achica al lugar que queda del lado elegido: sin esto, con el botón
      cerca de la mitad de la pantalla la hoja de 560px se salía por arriba y el encabezado (con el botón de cerrar)
      quedaba afuera (Julián, 2026-10-27). La lista de mensajes ya scrollea por dentro, achicar no pierde nada. */
   const MARGEN = 8
-  const bottom = acoplada
-    ? window.innerHeight - (pos?.y ?? 0)
-    : Math.max(MARGEN, window.innerHeight - (pos?.y ?? 0) - ALTO_FLECHA_GAP - ALTO_CERRADO)
-  const top = acoplada ? (pos?.y ?? 0) + ALTO_PESTANA : (pos?.y ?? 0) + ALTO_FLECHA_GAP
+  const bottom = Math.max(MARGEN, window.innerHeight - (pos?.y ?? 0) - ALTO_FLECHA_GAP - ALTO_CERRADO)
+  const top = (pos?.y ?? 0) + ALTO_FLECHA_GAP
   const altoLibre = haciaArriba ? window.innerHeight - bottom - MARGEN : window.innerHeight - top - MARGEN
   const anclaPos: CSSProperties | undefined = pos && esDesktop ? {
-    ...(acoplada ? { right: 0 } : haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
+    ...(haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
     ...(haciaArriba ? { bottom } : { top }),
   } : undefined
   /* La hoja ocupa [x1, x1+400] en horizontal: pegada al borde si está acoplada, si no, desde `pos.x` o hasta su `right`. */
-  const x1Hoja = acoplada ? window.innerWidth - 400 : haciaIzquierda ? (pos?.x ?? 0) + ANCHO_CERRADO - 400 : (pos?.x ?? 0)
+  const x1Hoja = haciaIzquierda ? (pos?.x ?? 0) + ANCHO_CERRADO - 400 : (pos?.x ?? 0)
   const anclaY = haciaArriba ? window.innerHeight - bottom : top
-  const altoHoja: CSSProperties | undefined = pos && esDesktop
-    ? { height: altoSinPisar({ x1: x1Hoja, ancho: 400, y: anclaY, haciaArriba, alto: Math.min(560, altoLibre), otro: evitar }) }
-    : undefined
-  const esquinas = pos && esDesktop && acoplada
-    ? (haciaArriba ? 'sm:rounded-tl-2xl sm:rounded-tr-2xl sm:rounded-bl-2xl' : 'sm:rounded-tl-2xl sm:rounded-tr-none sm:rounded-bl-2xl sm:rounded-br-2xl')
-    : 'sm:rounded-2xl'
+  /* En la columna del borde (DockFlotantes) la hoja entra con el alto que deja la ventana descontando las dos pestañas
+     (32px cada una), y las esquinas de la derecha quedan rectas contra el borde. */
+  const altoHoja: CSSProperties | undefined = enDock
+    ? { height: Math.min(560, window.innerHeight - 16 - 70) }
+    : pos && esDesktop
+      ? { height: altoSinPisar({ x1: x1Hoja, ancho: 400, y: anclaY, haciaArriba, alto: Math.min(560, altoLibre), otro: evitar }) }
+      : undefined
+  const esquinas = enDock ? 'rounded-l-2xl rounded-r-none border-r-0' : 'sm:rounded-2xl'
+
+  const hoja = (
+    <div style={altoHoja} className={cn('flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-white shadow-floating sm:max-w-[400px]', enDock ? 'w-[400px] max-w-full' : 'motion-safe:[animation:sheet-in_220ms_ease-out]', esquinas)}>
+      <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-line sm:hidden" />
+
+      <div className="flex items-center gap-3 border-b border-line px-4 py-3.5">
+        <span className="bg-dash-count-bg text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-full">
+          <Bot className="size-4" />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-[18px] leading-tight font-bold text-ink">Confibot</span>
+          <span className="mt-0.5 block text-[12px] text-ink-muted">Here to explain the app</span>
+        </span>
+        <button
+          type="button" aria-label="Close Confibot" onClick={onClose}
+          className="ml-auto flex size-7 shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"
+        >
+          <X className="size-4" />
+        </button>
+      </div>
+
+      <div ref={listaRef} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4">
+        <div className="max-w-[90%] rounded-2xl rounded-tl-sm bg-surface-slate px-3 py-2 text-[13px] leading-relaxed text-ink">
+          {SALUDO}
+        </div>
+
+        {preguntas > 0 && (
+          <span className="flex items-center gap-2 pt-1 text-[11px] font-semibold tracking-wide text-ink-faint uppercase">
+            <span className="h-px flex-1 bg-line" /> Your questions <span className="h-px flex-1 bg-line" />
+          </span>
+        )}
+
+        {historial.map((m, i) =>
+          m.de === 'bot' ? (
+            <div key={i} ref={i === historial.length - 1 ? ultimaRef : undefined} className="flex flex-col gap-2">
+              <div className="max-w-[90%] rounded-2xl rounded-tl-sm bg-surface-slate px-3 py-2 text-[13px] leading-relaxed text-ink">
+                {m.texto}
+              </div>
+              {m.temas?.map((id) => {
+                const t = TOPICS.find((x) => x.id === id)
+                if (!t) return null
+                const mod = MODULES.find((x) => x.id === t.module)
+                return (
+                  <button
+                    key={id} type="button"
+                    onClick={() => { onShowOnScreen(t.id); onClose() }}
+                    className="group flex w-full items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 text-left hover:border-dash-blue"
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="text-dash-blue block text-[11px] font-semibold tracking-wide uppercase">{mod?.label}</span>
+                      <span className="block truncate text-[13px] font-semibold text-ink">{t.title}</span>
+                    </span>
+                    <ChevronRight className="group-hover:text-dash-blue size-3.5 shrink-0 text-ink-faint" />
+                  </button>
+                )
+              })}
+            </div>
+          ) : (
+            <div
+              key={i} ref={i === historial.length - 1 ? ultimaRef : undefined}
+              className="bg-dash-blue ml-auto max-w-[90%] rounded-2xl rounded-tr-sm px-3 py-2 text-[13px] leading-relaxed text-white"
+            >
+              {m.texto}
+            </div>
+          ),
+        )}
+
+        <div className="flex flex-col gap-1.5 pt-1">
+          <span className="text-dash-blue flex items-center gap-1.5 text-[12px] font-semibold">
+            <Sparkles className="size-3" /> {preguntas === 0 ? 'Try one of these' : 'Or pick another'}
+          </span>
+          {SUGERENCIAS.map((s) => (
+            <button
+              key={s} type="button" onClick={() => preguntar(s)}
+              className="hover:border-dash-blue w-full rounded-lg border border-line bg-white px-3 py-2 text-left text-[13px] text-ink-muted hover:text-ink"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <form
+        onSubmit={(e) => { e.preventDefault(); preguntar(borrador) }}
+        className="flex items-center gap-2 border-t border-line p-3"
+      >
+        <input
+          value={borrador} onChange={(e) => setBorrador(e.target.value)}
+          placeholder="Ask me anything about the app" aria-label="Ask Confibot"
+          className="focus:border-dash-blue h-9 min-w-0 flex-1 rounded-lg border border-line bg-white px-3 text-[13px] text-ink placeholder:text-ink-faint focus:outline-none"
+        />
+        <button
+          type="submit" aria-label="Send" disabled={!borrador.trim()}
+          className="bg-dash-blue hover:bg-dash-blue-hover flex size-9 shrink-0 items-center justify-center rounded-md text-white disabled:opacity-40"
+        >
+          <ArrowUp className="size-4" />
+        </button>
+      </form>
+    </div>
+  )
+
+  if (enDock) {
+    return (
+      <div ref={hojaRef} className="contents">
+        <PanelDock abierto={abierto}>{hoja}</PanelDock>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -340,103 +434,7 @@ export function Confibot({
       )}
       style={anclaPos}
     >
-      <div style={altoHoja} className={cn('motion-safe:[animation:sheet-in_220ms_ease-out] flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-white shadow-floating sm:max-w-[400px]', esquinas)}>
-        <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-line sm:hidden" />
-
-        <div className="flex items-center gap-3 border-b border-line px-4 py-3.5">
-          <span className="bg-dash-count-bg text-dash-blue flex size-9 shrink-0 items-center justify-center rounded-full">
-            <Bot className="size-4" />
-          </span>
-          <span className="min-w-0">
-            <span className="block text-[18px] leading-tight font-bold text-ink">Confibot</span>
-            <span className="mt-0.5 block text-[12px] text-ink-muted">Here to explain the app</span>
-          </span>
-          <button
-            type="button" aria-label="Close Confibot" onClick={onClose}
-            className="ml-auto flex size-7 shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"
-          >
-            <X className="size-4" />
-          </button>
-        </div>
-
-        <div ref={listaRef} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4">
-          <div className="max-w-[90%] rounded-2xl rounded-tl-sm bg-surface-slate px-3 py-2 text-[13px] leading-relaxed text-ink">
-            {SALUDO}
-          </div>
-
-          {preguntas > 0 && (
-            <span className="flex items-center gap-2 pt-1 text-[11px] font-semibold tracking-wide text-ink-faint uppercase">
-              <span className="h-px flex-1 bg-line" /> Your questions <span className="h-px flex-1 bg-line" />
-            </span>
-          )}
-
-          {historial.map((m, i) =>
-            m.de === 'bot' ? (
-              <div key={i} ref={i === historial.length - 1 ? ultimaRef : undefined} className="flex flex-col gap-2">
-                <div className="max-w-[90%] rounded-2xl rounded-tl-sm bg-surface-slate px-3 py-2 text-[13px] leading-relaxed text-ink">
-                  {m.texto}
-                </div>
-                {m.temas?.map((id) => {
-                  const t = TOPICS.find((x) => x.id === id)
-                  if (!t) return null
-                  const mod = MODULES.find((x) => x.id === t.module)
-                  return (
-                    <button
-                      key={id} type="button"
-                      onClick={() => { onShowOnScreen(t.id); onClose() }}
-                      className="group flex w-full items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 text-left hover:border-dash-blue"
-                    >
-                      <span className="min-w-0 flex-1">
-                        <span className="text-dash-blue block text-[11px] font-semibold tracking-wide uppercase">{mod?.label}</span>
-                        <span className="block truncate text-[13px] font-semibold text-ink">{t.title}</span>
-                      </span>
-                      <ChevronRight className="group-hover:text-dash-blue size-3.5 shrink-0 text-ink-faint" />
-                    </button>
-                  )
-                })}
-              </div>
-            ) : (
-              <div
-                key={i} ref={i === historial.length - 1 ? ultimaRef : undefined}
-                className="bg-dash-blue ml-auto max-w-[90%] rounded-2xl rounded-tr-sm px-3 py-2 text-[13px] leading-relaxed text-white"
-              >
-                {m.texto}
-              </div>
-            ),
-          )}
-
-          <div className="flex flex-col gap-1.5 pt-1">
-            <span className="text-dash-blue flex items-center gap-1.5 text-[12px] font-semibold">
-              <Sparkles className="size-3" /> {preguntas === 0 ? 'Try one of these' : 'Or pick another'}
-            </span>
-            {SUGERENCIAS.map((s) => (
-              <button
-                key={s} type="button" onClick={() => preguntar(s)}
-                className="hover:border-dash-blue w-full rounded-lg border border-line bg-white px-3 py-2 text-left text-[13px] text-ink-muted hover:text-ink"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <form
-          onSubmit={(e) => { e.preventDefault(); preguntar(borrador) }}
-          className="flex items-center gap-2 border-t border-line p-3"
-        >
-          <input
-            value={borrador} onChange={(e) => setBorrador(e.target.value)}
-            placeholder="Ask me anything about the app" aria-label="Ask Confibot"
-            className="focus:border-dash-blue h-9 min-w-0 flex-1 rounded-lg border border-line bg-white px-3 text-[13px] text-ink placeholder:text-ink-faint focus:outline-none"
-          />
-          <button
-            type="submit" aria-label="Send" disabled={!borrador.trim()}
-            className="bg-dash-blue hover:bg-dash-blue-hover flex size-9 shrink-0 items-center justify-center rounded-md text-white disabled:opacity-40"
-          >
-            <ArrowUp className="size-4" />
-          </button>
-        </form>
-      </div>
+      {hoja}
     </div>
   )
 }

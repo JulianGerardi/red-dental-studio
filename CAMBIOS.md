@@ -18,6 +18,21 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   Detalle en `design-reference/figma/modulos/clinical-mode.md` (2026-10-27). Storybook sin actualizar (pendiente de
   que Julián lo pida).
 
+### Confibot y "currently being seen": columna en el borde derecho, como en las capturas ([#97](https://github.com/JulianGerardi/red-dental-studio/pull/97))
+- Los dos recogidos viven ahora en una columna pegada al borde derecho. **Default:** las dos pestañas una abajo de
+  la otra (Patients arriba, Confibot abajo). **Abrir Patients:** la card se despliega abajo de su pestaña y empuja a
+  la de Confibot. **Abrir Confibot:** la hoja queda entre la pestaña de Patients (arriba) y la de Confibot (abajo de
+  todo). Nada se pisa. Los paneles crecen en alto con una microanimación (~260ms, también al cerrar) y la columna se
+  corre para arriba si no entra; el chevron de la pestaña gira al abrir.
+- Recogido pasa a ser el estado por default en los dos (antes arrancaban como círculo arrastrable).
+- **A validar:** el círculo arrastrable sigue en el código pero desde la pestaña no hay un clic para volver a él. Si
+  ya no hace falta, se puede sacar (arrastre, botón de esconder, `useArrastrable`).
+- **Para el dev:** `layout/DockFlotantes.tsx` (`DockFlotantes` + `PanelDock`); `AppShell` arma la columna con
+  `PatientInSessionPopup`, `Confibot` y `ConfibotLanzador` en ese orden. Lo recogido se dibuja estático adentro de la
+  columna (no `fixed`); lo demás no cambia. `tests/confibot.e2e.ts` reescrito para este flujo. Sin cambios de
+  Storybook (la story de `PatientInSessionPopup` se ve recogida por el nuevo default hasta que se documente).
+  Documentado en `help.md`.
+
 ### Confibot y "currently being seen": la hoja/card no tapa al otro flotante ([#96](https://github.com/JulianGerardi/red-dental-studio/pull/96))
 - Al abrir Confibot, la pestaña de "currently being seen" quedaba encima de la hoja. Ahora cada flotante avisa el
   lugar que ocupa cerrado y la hoja/card del otro recorta su alto para no cruzarlo (8px de margen, mínimo 200px): con
