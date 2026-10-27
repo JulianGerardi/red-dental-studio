@@ -335,6 +335,22 @@ card de Patients abajo de la suya. Lo que cambia respecto a la entrada anterior 
 `DockFlotantes` en `AppShell`; la card de Patients sigue empujando a la pestaña de Confibot hacia abajo. Con 1440×900 la
 columna sube para que entre la hoja de 560px (Patients 264-296, pestaña azul 298-330, hoja 332-892).
 
+## El botón de Confibot abre y cierra, sin cruz y con ícono de colapsar (2026-10-27)
+
+Sin historia de Jira (el módulo no tiene). Julián: el botón tiene que cerrar el chat también y no quedar activo, la
+cruz de la hoja sobra, y conviene un ícono de colapsar mientras está activo para que se lea que otro clic lo cierra.
+
+- **Sidebar:** el ítem Confibot ya alternaba (`toggleConfibot`); activo ahora cambia el ícono de `Bot` a
+  `PanelRightClose` (el mismo de "esconder al costado" del resto de la app) y el tooltip del rail dice "Hide
+  Confibot". Al cerrar vuelve a `Bot` y pierde el fondo azul.
+- **Cruz de la hoja:** sólo en celular (`md:hidden`). Desde md siempre hay un botón a la vista que cierra -el ítem del
+  sidebar y la pestaña azul, que ya giraba su chevron-, además de Escape y clic afuera. En celular el sidebar es un
+  menú que se abre aparte, así que ahí la cruz sigue siendo la salida obvia.
+- **No pude reproducir que "no cierra"** en `main` (Playwright, 1440×900, clic real en el sidebar y en la pestaña): los
+  dos cierran. Si se ve en otro ancho o navegador, anotarlo acá con el caso.
+- **A validar con usuarios:** si el cambio de ícono en el rail se entiende como "cerrar" o si confunde con salir de
+  Confibot; alternativa: dejar `Bot` y sumar un chevron chico al lado (sólo con el sidebar expandido entra).
+
 ## La columna sube la mitad de lo que crece (2026-10-27)
 
 Julián: con la card de Patients abierta, todo quedaba muy abajo y la pestaña de Confibot caía lejos. Ahora
