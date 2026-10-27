@@ -334,3 +334,11 @@ mueve al abrir (queda a 2px de la de Patients, como en el default) y la hoja se 
 card de Patients abajo de la suya. Lo que cambia respecto a la entrada anterior es sólo el orden de los hijos de
 `DockFlotantes` en `AppShell`; la card de Patients sigue empujando a la pestaña de Confibot hacia abajo. Con 1440×900 la
 columna sube para que entre la hoja de 560px (Patients 264-296, pestaña azul 298-330, hoja 332-892).
+
+## La columna sube la mitad de lo que crece (2026-10-27)
+
+Julián: con la card de Patients abierta, todo quedaba muy abajo y la pestaña de Confibot caía lejos. Ahora
+`DockFlotantes` sube la columna la mitad de lo que crece al desplegarse un panel (`top = baseY - crecimiento/2`, con
+66px = las dos pestañas como alto sin paneles), siempre dentro de la ventana: el crecimiento se reparte arriba y abajo.
+En 1440×900 con Patients abierto: Patients 249-281, Confibot 637-669 (antes 814-846); con Confibot abierto las pestañas
+quedan en 145-211 y la hoja en 213-773.

@@ -27,7 +27,11 @@ export function DockFlotantes({ baseY, children }: { baseY: number; children: Re
 
   /* El alto de la columna crece de a poco mientras se despliega un panel (ver PanelDock), así que `top` la sigue cuadro
      a cuadro y la columna sube suave en vez de pegar un salto. */
-  const top = Math.max(8, Math.min(baseY, vh - 8 - alto))
+  /* Al desplegarse un panel la columna sube la mitad de lo que crece (Julián, 2026-10-27: con la card de Patients abierta
+     la pestaña de Confibot quedaba muy abajo): el crecimiento se reparte arriba y abajo en vez de caer todo hacia abajo.
+     66 = las dos pestañas (32 + 2 + 32), la columna sin ningún panel abierto. */
+  const crecimiento = Math.max(0, alto - 66)
+  const top = Math.max(8, Math.min(baseY - crecimiento / 2, vh - 8 - alto))
 
   return (
     <div ref={ref} style={{ top }} className="pointer-events-none fixed right-0 z-[41] flex flex-col items-end gap-0.5">
