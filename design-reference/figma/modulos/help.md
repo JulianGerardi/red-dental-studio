@@ -325,3 +325,12 @@ tapara o desplazara al otro botón: así es el layout y así se despliega, con m
   hacen falta, se pueden sacar (`useArrastrable`, el botón de esconder, `onPosicion`).
 - **Storybook sin tocar:** `PatientInSessionPopup` ahora arranca recogido por default, su story se ve distinta hasta
   que se documente (pendiente de que Julián lo pida).
+
+## La pestaña azul de Confibot queda arriba, pegada a la de Patients (2026-10-27)
+
+Julián: con el chat abierto, la pestaña azul quedaba abajo de todo y había que ir lejos para cerrarlo. Ahora la
+columna del borde es Patients (pestaña y su card) → pestaña de Confibot → hoja de Confibot: la pestaña azul no se
+mueve al abrir (queda a 2px de la de Patients, como en el default) y la hoja se despliega abajo de ella, igual que la
+card de Patients abajo de la suya. Lo que cambia respecto a la entrada anterior es sólo el orden de los hijos de
+`DockFlotantes` en `AppShell`; la card de Patients sigue empujando a la pestaña de Confibot hacia abajo. Con 1440×900 la
+columna sube para que entre la hoja de 560px (Patients 264-296, pestaña azul 298-330, hoja 332-892).
