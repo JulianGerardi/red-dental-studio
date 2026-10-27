@@ -80,7 +80,9 @@ test('Add Condition con descriptores: se eligen al crear y se corrigen desde Edi
 
   await screen.getByRole('button', /^Actions for Tooth 13$/).tap()
   await screen.getByRole('menuitem', 'Edit').tap()
-  const editar = screen.getByRole('dialog', 'Edit Condition')
+  // Una condition cargada siempre es un finding: el drawer se titula Edit Finding; el diente encabeza la rueda.
+  const editar = screen.getByRole('dialog', 'Edit Finding')
+  await expect(editar.getByText('13 · Permanent')).toBeVisible()
   // General Information y Descriptors van en dos pestañas.
   await editar.getByRole('tab', 'Descriptors').tap()
   await editar.getByRole('button', 'Painless').tap()

@@ -13,8 +13,8 @@ import { PROVIDERS, areaDeTratamiento, type Finding } from './data'
    arriba, el proveedor y las notas. Findings y Diagnostic: lo que el procedimiento tiene vinculado, con un buscador que
    no muestra nada hasta escribir (Julián, 2026-10-24), igual que Link to finding / Link to diagnosis de New Procedure.
    Un solo Save guarda todo. El
-   Fee sólo aparece si el procedimiento lo trae. Arriba, primero el procedimiento, después el precio y la fecha, y el área
-   de tratamiento con el ícono de su tipo (CON-3700; Julián, 2026-10-27). Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
+   Fee sólo aparece si el procedimiento lo trae. Arriba: el procedimiento, la fecha, el precio y el área de
+   tratamiento con el ícono de su tipo (CON-3700; mockup de Julián, 2026-10-27). Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
 type Pestana = 'General Information' | 'Findings' | 'Diagnostic'
 const PESTANAS = ['General Information', 'Findings', 'Diagnostic'] as const
 
@@ -56,6 +56,7 @@ export function EditProcedureDrawer({
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4">
             <FilaNombre nombre={mayuscula(finding.condition)} estado={finding.status} tono={TONO_ESTADO[finding.status]} />
+            <FilaDato icono={<IconoFecha />} rotulo="Creation date">{fechaCorta(finding.date)}</FilaDato>
             {finding.fee !== undefined && (
               <FilaDato
                 icono={<span className="flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-white text-ink"><BadgeDollarSign className="size-[14px]" /></span>}
@@ -64,7 +65,6 @@ export function EditProcedureDrawer({
                 $ {finding.fee.toFixed(2)}
               </FilaDato>
             )}
-            <FilaDato icono={<IconoFecha />} rotulo="Creation date">{fechaCorta(finding.date)}</FilaDato>
             {area && <FilaArea area={area} />}
           </div>
           <SelectField label="Provider" required options={PROVIDERS} value={provider} onChange={setProvider} />

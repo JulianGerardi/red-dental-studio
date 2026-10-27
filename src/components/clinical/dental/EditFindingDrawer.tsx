@@ -6,18 +6,19 @@ import { TextArea } from '@/components/patients/form'
 import { DescriptorFields, textoDescriptores } from './DescriptorFields'
 import { EditConditionDrawer } from './EditConditionDrawer'
 import { EditProcedureDrawer } from './EditProcedureDrawer'
-import { FilaArea, FilaDato, FilaNombre, IconoExamen, IconoFecha, TONO_ESTADO, fechaCorta, mayuscula } from './DatosHallazgo'
+import { FilaArea, FilaDato, FilaNombre, IconoExamen, IconoFecha, IconoProveedor, TONO_ESTADO, fechaCorta, mayuscula } from './DatosHallazgo'
 import { areaDeTratamiento, type Finding } from './data'
 
 /* Editar un finding desde el menú de su card. Cada tipo tiene su drawer, con el diseño del Figma *Platform Design* y la
    lógica que ya teníamos (Julián, 2026-10-24):
    - un procedimiento -> Edit Procedure (5294:85084): proveedor, notas y lo que vincula;
-   - una condition en un diente -> Edit Condition (5301:149072): superficies, descriptores y notas;
-   - el resto de las conditions (Extraoral, Intraoral) -> Edit Finding (5294:107675): los descriptores y las notas.
+   - una condition en un diente -> EditConditionDrawer (5301:149072): superficies, descriptores y notas;
+   - el resto de las conditions (Extraoral, Intraoral) -> EditFindingView (5294:107675): los descriptores y las notas.
+   Las dos se titulan "Edit Finding": una condition cargada siempre es un finding (Julián, 2026-10-27).
    Qué se ve y qué se edita sale de CON-2770 (Edit Finding): fecha, estado, condition, examen y área de tratamiento de
-   sólo lectura; superficie (si corresponde), notas y descriptores editables. Arriba va primero el nombre, después el
-   precio (si hay) y la fecha (Julián, 2026-10-27); Edit Condition y Edit Finding separan General Information de
-   Descriptors en dos pestañas, para que no queden tan largos.
+   sólo lectura; superficie (si corresponde), notas y descriptores editables. Arriba: nombre, fecha, (precio), examen,
+   proveedor y el área al final, como el mockup de Julián (2026-10-27); General Information y Descriptors van en dos
+   pestañas, para que no queden tan largos.
    Ver design-reference/figma/modulos/clinical-mode.md. */
 export function EditFindingDrawer({
   finding, findings = [], onClose, onSave,
@@ -76,10 +77,11 @@ function EditFindingView({
           <div className="flex flex-col gap-4">
             <FilaNombre nombre={mayuscula(finding.condition)} estado={finding.status} tono={TONO_ESTADO[finding.status]} />
             <FilaDato icono={<IconoFecha />} rotulo="Creation date">{fechaCorta(finding.date)}</FilaDato>
-            {area && <FilaArea area={area} />}
             <FilaDato icono={<IconoExamen />} rotulo="Exams">
               <Pill tone="success" size="sm">{finding.examen ?? 'Dental Assessment'}</Pill>
             </FilaDato>
+            <FilaDato icono={<IconoProveedor />} rotulo="Provider">{finding.provider}</FilaDato>
+            {area && <FilaArea area={area} />}
           </div>
           <TextArea label="Notes" placeholder="Document questions, answers, clarifications, or additional notes" value={notes} onChange={setNotes} />
         </div>
