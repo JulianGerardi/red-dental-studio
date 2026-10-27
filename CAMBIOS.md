@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-27
 
+### Confibot: el botón abre y cierra, con ícono de colapsar, y la hoja sin cruz desde md ([#101](https://github.com/JulianGerardi/red-dental-studio/pull/101))
+- El ítem Confibot del sidebar abre y cierra el chat; activo muestra `PanelRightClose` (colapsar) en vez de `Bot` y el
+  tooltip del rail dice "Hide Confibot".
+- La cruz de la hoja de Confibot sólo queda en celular (`md:hidden`): desde md cierran el ítem del sidebar, la pestaña
+  azul, Escape o clic afuera.
+- **Para el dev:** `layout/Sidebar.tsx` y `help/Confibot.tsx`; `tests/confibot.e2e.ts` cierra con el sidebar en vez
+  de la cruz. Detalle en `design-reference/figma/modulos/help.md` (2026-10-27). Storybook sin actualizar (pendiente
+  de que Julián lo pida).
+
 ### El banner de avisos colapsado dice "pending notifications" ([#100](https://github.com/JulianGerardi/red-dental-studio/pull/100))
 - Colapsado, el banner decía "4 pending tasks"; ahora dice "4 pending notifications" ("1 pending notification" en
   singular). Quedó afuera de lo publicado antes.
