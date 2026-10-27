@@ -329,9 +329,11 @@ export function Confibot({
           <span className="block text-[18px] leading-tight font-bold text-ink">Confibot</span>
           <span className="mt-0.5 block text-[12px] text-ink-muted">Here to explain the app</span>
         </span>
+        {/* La cruz sólo en celular: desde md el botón de Confibot del sidebar (y la pestaña) abre y cierra, y la cruz
+            quedaba repetida (help.md, 2026-10-27). */}
         <button
           type="button" aria-label="Close Confibot" onClick={onClose}
-          className="ml-auto flex size-7 shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted"
+          className="ml-auto flex size-7 shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted md:hidden"
         >
           <X className="size-4" />
         </button>

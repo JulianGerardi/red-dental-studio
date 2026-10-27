@@ -16,8 +16,12 @@ test('La pestaña de Confibot abre el chat, y la pestaña se queda y lo cierra',
   await expect(screen.getByText('Here to explain the app')).toHaveCount(0)
   await expect(pestana).toBeVisible()
 
-  await pestana.tap()
-  await screen.getByRole('button', 'Close Confibot').tap()
+  /* El botón del sidebar también abre y cierra (sin cruz en la hoja desde md). */
+  const delSidebar = screen.getByRole('button', 'Confibot')
+  await delSidebar.tap()
+  await expect(screen.getByText('Here to explain the app')).toBeVisible()
+  await expect(screen.getByRole('button', 'Close Confibot')).not.toBeVisible()
+  await delSidebar.tap()
   await expect(screen.getByText('Here to explain the app')).toHaveCount(0)
 
   await app.open('/patients')
