@@ -139,7 +139,14 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
       (Julián, 2026-10-27: una flecha sola no decía que esto manda el
       widget a un costado, no lo cierra) -mismo ícono que ya usa la app
       para "colapsar un panel lateral" (Topbar, PatientSidePanel)-, con un
-      tooltip ("Hide") por la misma razón. Mismo cambio en Confibot.tsx. */
+      tooltip ("Hide") por la misma razón. Mismo cambio en Confibot.tsx.
+   11. `z-[41]` en vez de `z-30` (Julián, 2026-10-27): la hoja de chat de
+      Confibot ahora abre anclada a su propio botón (Confibot.tsx), que por
+      default cae cerca del borde derecho -el mismo costado donde vive esta
+      pestaña-, así que la hoja puede terminar pasando justo por donde está.
+      Con z-30 quedaba tapada del todo. Por arriba del z-40 de Confibot (el
+      botón y la hoja) pero por debajo del z-50 de los drawers/diálogos, que
+      tienen que seguir ganándole a cualquier flotante. */
 export function PatientInSessionPopup() {
   const enCurso = useMemo(
     () => datosDelDia(HOY_DEMO).appointments.filter((a) => !a.completado),
@@ -190,7 +197,7 @@ export function PatientInSessionPopup() {
       <button
         type="button" onClick={() => { setRecogido(false); setAbierto(true) }} aria-label="Bring back currently being seen"
         style={{ top: pos.y }}
-        className="group fixed right-0 z-30 flex h-8 items-center gap-1.5 rounded-l-xl border border-r-0 border-line bg-white py-0 pr-3 pl-2.5 text-ink-muted shadow-sm hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+        className="group fixed right-0 z-[41] flex h-8 items-center gap-1.5 rounded-l-xl border border-r-0 border-line bg-white py-0 pr-3 pl-2.5 text-ink-muted shadow-sm hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
       >
         <ChevronLeft className="size-4 shrink-0" />
         <UserRound className="size-3.5 shrink-0" />
@@ -209,7 +216,7 @@ export function PatientInSessionPopup() {
   return (
     <div
       ref={ref}
-      className="fixed z-30 flex flex-col items-end gap-1 motion-safe:animate-[panel-in_180ms_ease-out]"
+      className="fixed z-[41] flex flex-col items-end gap-1 motion-safe:animate-[panel-in_180ms_ease-out]"
       style={{
         ...(haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
         ...(abierto && haciaArriba ? { bottom: window.innerHeight - pos.y - ALTO_CERRADO } : { top: pos.y }),

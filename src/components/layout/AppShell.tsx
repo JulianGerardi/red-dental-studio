@@ -4,6 +4,7 @@ import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import { NotificationBanner } from './NotificationBanner'
 import { Confibot, ConfibotLanzador, useConfibotRecogido } from '@/components/help/Confibot'
+import type { Posicion } from '@/lib/useArrastrable'
 import { useHelp } from '@/components/help/HelpProvider'
 import { delBanner, useNotificaciones } from '@/data/notificacionesStore'
 import { aviso } from '@/components/ui/toaster'
@@ -15,6 +16,7 @@ export function AppShell() {
   const { pathname } = useLocation()
   const { showOnScreen, explicando, confibotAbierto, openConfibot, closeConfibot, fabDePagina } = useHelp()
   const [confibotRecogido, setConfibotRecogido] = useConfibotRecogido()
+  const [confibotPos, setConfibotPos] = useState<Posicion | null>(null)
 
   /* Las notificaciones viven en su store (data/notificacionesStore): tienen
      que sobrevivir a la navegación y las comparten el banner, la campana y
@@ -101,9 +103,12 @@ export function AppShell() {
           onAbrir={openConfibot}
           onRecoger={() => setConfibotRecogido(true)}
           onTraer={() => { setConfibotRecogido(false); openConfibot() }}
+          onPosicion={setConfibotPos}
         />
       )}
-      <Confibot abierto={confibotAbierto} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
+      {/* La hoja abre anclada a `confibotPos` -dónde está el botón ahora-, no siempre abajo a la derecha (Julián,
+          2026-10-27; ver el comentario de `Confibot`, más abajo del todo en Confibot.tsx). */}
+      <Confibot abierto={confibotAbierto} pos={confibotPos ?? undefined} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
     </div>
   )
 }
