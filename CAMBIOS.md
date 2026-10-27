@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-27
 
+### Confibot: la pestaña azul queda pegada a la de Patients y la hoja se despliega abajo ([#99](https://github.com/JulianGerardi/red-dental-studio/pull/99))
+- Con el chat abierto, la pestaña azul de Confibot ya no baja al final de la columna: queda pegada abajo de la de
+  Patients (como en el default) y la hoja se despliega abajo de ella, así el botón de cerrar no se aleja. La card de
+  Patients sigue empujando a la pestaña de Confibot hacia abajo.
+- **Para el dev:** sólo cambia el orden de los hijos de `DockFlotantes` en `AppShell` (Patients, pestaña de Confibot,
+  hoja de Confibot). `tests/confibot.e2e.ts` ajustado al nuevo orden. Documentado en `help.md`; Storybook sin
+  actualizar (pendiente de que Julián lo pida).
+
 ### Clinical Mode: los Edit con el orden del mockup y "Edit Finding" también en el diente ([#98](https://github.com/JulianGerardi/red-dental-studio/pull/98))
 - Los datos de arriba van en este orden: nombre con su estado → Creation date → Fee (sólo procedimientos) → Exams →
   Provider → el área de tratamiento al final, con su ícono en el cuadrado azul (CON-3700).
