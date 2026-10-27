@@ -1,0 +1,9 @@
+import{n as e}from"./rolldown-runtime-DkW27tQK.js";import{t}from"./jsx-runtime-DeHZSEgm.js";import{a as n,i as r,t as i}from"./ScopeIcons-HmS7_TkI.js";import{o as a,t as o}from"./ProcedureRow-B7TSK7nE.js";import{g as s,u as c}from"./data-BSVyNc9h.js";var l,u,d,f,p,m;function h(){return(h=e((()=>{n(),a(),s(),l=t(),u={title:`Components/Clinical/Dental/ScopeIcon`,component:r,args:{scope:`Tooth`},argTypes:{scope:{control:`select`,options:c}}},d={render:e=>(0,l.jsx)(o,{estado:`default`,children:(0,l.jsx)(r,{...e})})},f={render:()=>(0,l.jsx)(`div`,{className:`flex items-center gap-4`,children:c.map(e=>(0,l.jsxs)(`span`,{className:`flex items-center gap-1.5 text-sm`,children:[(0,l.jsx)(o,{estado:`default`,children:(0,l.jsx)(r,{scope:e})}),` `,e]},e))})},p={render:()=>(0,l.jsx)(o,{estado:`default`,children:(0,l.jsx)(i,{})})},m=[`Default`,`AllScopes`,`ArchGlyph`],d.parameters={...d.parameters,docs:{...d.parameters?.docs,source:{originalSource:`{
+  render: args => <CajaIcono estado="default"><ScopeIcon {...args} /></CajaIcono>
+}`,...d.parameters?.docs?.source}}},f.parameters={...f.parameters,docs:{...f.parameters?.docs,source:{originalSource:`{
+  render: () => <div className="flex items-center gap-4">
+      {SCOPES.map(s => <span key={s} className="flex items-center gap-1.5 text-sm"><CajaIcono estado="default"><ScopeIcon scope={s} /></CajaIcono> {s}</span>)}
+    </div>
+}`,...f.parameters?.docs?.source}}},p.parameters={...p.parameters,docs:{...p.parameters?.docs,source:{originalSource:`{
+  render: () => <CajaIcono estado="default"><ArchIcon /></CajaIcono>
+}`,...p.parameters?.docs?.source}}}})))()}h();export{f as AllScopes,p as ArchGlyph,d as Default,m as __namedExportsOrder,u as default};
