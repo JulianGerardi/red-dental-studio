@@ -254,3 +254,19 @@ lugar de su propia pestaña-.
   `PatientInSessionPopup` sube de `z-30` a `z-[41]` (por encima del `z-40` de Confibot, por debajo del `z-50` de
   drawers/diálogos): si se cruzan, "currently being seen" queda arriba y siempre se puede seguir viendo y
   tocando, en vez de taparse del todo. No es un layout sin superposición, es "ninguno de los dos desaparece".
+
+## La hoja de chat no se sale de la pantalla y cierra como "currently being seen" (2026-10-27)
+
+Julián: con el chat anclado al botón (entrada anterior), al abrirlo se iba muy arriba -el encabezado, con el botón de
+cerrar, quedaba fuera de la pantalla- y tapaba lo que se estaba haciendo; "la experiencia debe ser como la de
+patient".
+
+- **Alto acotado al lugar libre.** Desde 640px la hoja ya no es siempre de 560px: `min(560, lugar del lado elegido -
+  8px de margen)`. Con el botón cerca de la mitad de la pantalla la hoja anclada abajo arrancaba por encima del borde
+  de arriba (ej.: 700px de alto, botón a y=378 → top en -110). La lista de mensajes ya scrollea por dentro, achicar
+  no pierde contenido. El `bottom` también se piso a 8px como mínimo (el botón por default asoma 4px por debajo).
+- **Cierra con Escape o clic afuera**, igual que la card de `PatientInSessionPopup`. El ítem *Confibot* del menú
+  lateral queda excluido (`data-confibot-toggle`): su clic ya hace toggle y el `mousedown` cerraría primero, el clic
+  lo volvería a abrir.
+- A validar con usuarios: si cerrar con un clic afuera molesta a quien está escribiendo y toca la pantalla sin querer
+  (el historial se guarda, no se pierde lo ya enviado, pero sí un borrador sin mandar).

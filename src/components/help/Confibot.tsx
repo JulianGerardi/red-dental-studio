@@ -236,6 +236,25 @@ export function Confibot({
     setHistorial((h) => [...h, { de: 'user', texto: q }, buscarRespuesta(q)])
   }
 
+  /* Cierra con Escape o con un clic afuera, como la card de PatientInSessionPopup (Julián, 2026-10-27: la
+     experiencia tiene que ser la de "currently being seen"). El ítem Confibot del menú lateral se excluye: su clic
+     ya hace toggle, y si el mousedown cerrara primero el clic lo volvería a abrir. */
+  const hojaRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!abierto) return
+    const fuera = (e: MouseEvent) => {
+      const t = e.target as Element
+      if (hojaRef.current && !hojaRef.current.contains(t) && !t.closest('[data-confibot-toggle]')) onClose()
+    }
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('mousedown', fuera)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('mousedown', fuera)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [abierto, onClose])
+
   /* La hoja ocupa el lugar del botón flotante: montada nada más mientras está abierta. */
   if (!abierto) return null
 
@@ -254,22 +273,29 @@ export function Confibot({
   const esDesktop = window.innerWidth >= 640
   const haciaIzquierda = pos ? pos.x + ANCHO_CERRADO / 2 > window.innerWidth / 2 : false
   const haciaArriba = pos ? pos.y + ALTO_FLECHA_GAP + ALTO_CERRADO / 2 > window.innerHeight / 2 : false
+  /* Margen de 8px contra el borde, y el alto se achica al lugar que queda del lado elegido: sin esto, con el botón
+     cerca de la mitad de la pantalla la hoja de 560px se salía por arriba y el encabezado (con el botón de cerrar)
+     quedaba afuera (Julián, 2026-10-27). La lista de mensajes ya scrollea por dentro, achicar no pierde nada. */
+  const MARGEN = 8
+  const bottom = Math.max(MARGEN, window.innerHeight - (pos?.y ?? 0) - ALTO_FLECHA_GAP - ALTO_CERRADO)
+  const top = (pos?.y ?? 0) + ALTO_FLECHA_GAP
+  const altoLibre = haciaArriba ? window.innerHeight - bottom - MARGEN : window.innerHeight - top - MARGEN
   const anclaPos: CSSProperties | undefined = pos && esDesktop ? {
     ...(haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
-    ...(haciaArriba
-      ? { bottom: window.innerHeight - pos.y - ALTO_FLECHA_GAP - ALTO_CERRADO }
-      : { top: pos.y + ALTO_FLECHA_GAP }),
+    ...(haciaArriba ? { bottom } : { top }),
   } : undefined
+  const altoHoja: CSSProperties | undefined = pos && esDesktop ? { height: Math.min(560, altoLibre) } : undefined
 
   return (
     <div
+      ref={hojaRef}
       className={cn(
         'fixed inset-x-0 bottom-0 z-40 flex justify-center',
         pos ? 'sm:inset-x-auto sm:bottom-auto' : 'sm:inset-x-auto sm:right-6 sm:bottom-6',
       )}
       style={anclaPos}
     >
-      <div className="motion-safe:[animation:sheet-in_220ms_ease-out] flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-white shadow-floating sm:max-w-[400px] sm:rounded-2xl">
+      <div style={altoHoja} className="motion-safe:[animation:sheet-in_220ms_ease-out] flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-white shadow-floating sm:max-w-[400px] sm:rounded-2xl">
         <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-line sm:hidden" />
 
         <div className="flex items-center gap-3 border-b border-line px-4 py-3.5">

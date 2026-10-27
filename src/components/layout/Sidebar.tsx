@@ -147,6 +147,7 @@ export function Sidebar({
             type="button"
             aria-label="Confibot"
             aria-pressed={confibotAbierto}
+            data-confibot-toggle
             onClick={toggleConfibot}
             className={item(confibotAbierto)}
           >
