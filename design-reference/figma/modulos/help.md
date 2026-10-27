@@ -190,3 +190,26 @@ Dos pedidos más de Julián, mismo video de referencia:
   (`confidentally.patient-popup-tucked`) y toma el `pos.y` de donde estaba antes de esconderse, igual que Confibot.
   La pestaña recogida dice "Patients" y es blanca, no el degradé azul -ese color es la señal de Confibot
   puntualmente, no corresponde en un indicador de pacientes-.
+
+## La pestaña recogida: ícono en vez de nombre, un solo clic para abrir (2026-10-26)
+
+Dos ajustes más de Julián sobre la pestaña recogida, en los dos widgets:
+
+- **El nombre ya no está siempre a la vista.** Al lado del chevron va el ícono del widget (`Bot` en Confibot,
+  `UserRound` en `PatientInSessionPopup`); el nombre aparece recién al pasar el mouse (`group-hover`, el `<span>`
+  crece de `max-w-0` a 70px). Al traerla de vuelta, la pestaña de reposo entra con `panel-in` -la misma animación
+  de deslizarse desde el borde derecho que usa el drawer (`ui/drawer.tsx`)-, no aparece de golpe ni "se despliega
+  en forma de círculo" (pedido explícito de Julián, como referencia de lo que no quería).
+- **Un solo clic trae y abre, ya no hacen falta dos.** Antes traer la pestaña sólo mostraba el botón/avatar de
+  reposo, y recién un segundo clic abría el chat o el popup. Ahora `onTraer` (Confibot, vía `AppShell`) llama
+  `setConfibotRecogido(false)` + `openConfibot()` juntos, y el botón de la pestaña de `PatientInSessionPopup` llama
+  `setRecogido(false)` + `setAbierto(true)` juntos.
+- **Bug de paso, encontrado por el e2e de Confibot** (no es de esta tanda, viene de "Confibot y currently being
+  seen, arrastrables a cualquier parte"): `useArrastrable` persistía la posición por default ya en el primer
+  montaje, así que `sobreFab` (Confibot arriba del FAB de Appointment requests en Scheduling) sólo se tenía en
+  cuenta la primera vez que el flotante se dibujaba en la app entera -después quedaba pegado a esa posición vieja
+  para siempre, tapando el FAB-. Ahora sólo persiste si ya había una posición guardada o si de verdad se arrastra
+  (`useArrastrable.ts`); mientras tanto, un efecto recalcula con el `defecto()` del momento si `sobreFab` cambia.
+  De paso, el colchón para no tapar el FAB (`128`) y el centrado en `x` sobre él se ajustan: la flechita de
+  recoger, arriba del círculo, ahora también entra en el wrapper posicionado, así que el círculo visible ya no
+  arranca en `pos.y`.

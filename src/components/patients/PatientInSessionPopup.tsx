@@ -121,7 +121,19 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
       estaba antes de esconderse, no es arrastrable -ya es un estado
       escondido a propósito-, y el texto dice "Patients" en vez de
       "Confibot": blanca, no el degradé azul -ese color es la señal propia
-      de Confibot, no corresponde acá-. */
+      de Confibot, no corresponde acá-.
+
+   8. La pestaña recogida ya no lleva "Patients" siempre visible (Julián,
+      2026-10-26, mismo cambio en Confibot.tsx): el ícono (`UserRound`)
+      queda al lado del chevron, y el nombre aparece recién al pasar el
+      mouse (`group-hover`, ancho de 0 a 70px). Al traerla de vuelta (clic
+      en la pestaña), la pestaña de reposo entra con `panel-in` -la misma
+      animación de deslizarse desde el borde derecho que usa el drawer
+      (`ui/drawer.tsx`)-, no crece desde un círculo.
+   9. Ese clic trae la pestaña Y la abre de una (Julián, 2026-10-26: no
+      tenía que hacer falta un segundo clic sobre el avatar para recién ahí
+      ver el popup). `setAbierto(true)` junto con `setRecogido(false)` en el
+      mismo handler. */
 export function PatientInSessionPopup() {
   const enCurso = useMemo(
     () => datosDelDia(HOY_DEMO).appointments.filter((a) => !a.completado),
@@ -170,12 +182,15 @@ export function PatientInSessionPopup() {
   if (recogido) {
     return (
       <button
-        type="button" onClick={() => setRecogido(false)} aria-label="Bring back currently being seen"
+        type="button" onClick={() => { setRecogido(false); setAbierto(true) }} aria-label="Bring back currently being seen"
         style={{ top: pos.y }}
-        className="fixed right-0 z-30 flex h-8 items-center gap-1.5 rounded-l-xl border border-r-0 border-line bg-white px-3 text-ink-muted shadow-sm hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+        className="group fixed right-0 z-30 flex h-8 items-center gap-1.5 rounded-l-xl border border-r-0 border-line bg-white py-0 pr-3 pl-2.5 text-ink-muted shadow-sm hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
       >
         <ChevronLeft className="size-4 shrink-0" />
-        <span className="text-[13px] font-semibold">Patients</span>
+        <UserRound className="size-3.5 shrink-0" />
+        <span className="max-w-0 overflow-hidden text-[13px] font-semibold whitespace-nowrap transition-[max-width] duration-200 group-hover:max-w-[70px]">
+          Patients
+        </span>
       </button>
     )
   }
@@ -188,7 +203,7 @@ export function PatientInSessionPopup() {
   return (
     <div
       ref={ref}
-      className="fixed z-30 flex flex-col items-end gap-1"
+      className="fixed z-30 flex flex-col items-end gap-1 motion-safe:animate-[panel-in_180ms_ease-out]"
       style={{
         ...(haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
         ...(abierto && haciaArriba ? { bottom: window.innerHeight - pos.y - ALTO_CERRADO } : { top: pos.y }),

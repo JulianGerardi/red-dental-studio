@@ -33,10 +33,19 @@ export function useArrastrable({
     return { x: Math.min(Math.max(p.x, margen), maxX), y: Math.min(Math.max(p.y, margen), maxY) }
   }, [ancho, alto])
 
+  /* Si ya había una posición guardada (se arrastró alguna vez) o recién se arrastra ahora: a partir de ahí sí se
+     persiste. Mientras siga en el default, NO se escribe -si no, el primer montaje ya lo guardaba y de ahí en más
+     `defecto()` nunca se volvía a llamar, ni siquiera en una página distinta con un `defecto` distinto (ej.: Confibot
+     arriba del FAB de Scheduling, `sobreFab`): quedaba pegado a la posición del primer mount para siempre. */
+  const huboGuardado = useRef(false)
+
   const [pos, setPos] = useState<Posicion>(() => {
     try {
       const raw = localStorage.getItem(clave)
-      if (raw) return clamp(JSON.parse(raw))
+      if (raw) {
+        huboGuardado.current = true
+        return clamp(JSON.parse(raw))
+      }
     } catch { /* sin storage: arranca en el default de siempre */ }
     return clamp(defecto())
   })
@@ -47,7 +56,19 @@ export function useArrastrable({
     return () => window.removeEventListener('resize', onResize)
   }, [clamp])
 
+  /* `defecto()` sólo se llama una vez, al armar el estado inicial -el valor de `sobreFab` (Confibot en Scheduling, se
+     apila arriba del FAB de Appointment requests) llega recién después, por un useEffect de useFabDePagina en el
+     componente de la página, no en el primer render-. Sin este efecto el botón quedaba pegado a la posición
+     calculada con el `sobreFab` viejo (false) para siempre -tapaba el FAB-. Sólo corre mientras nunca se guardó nada
+     -no pisa una posición ya arrastrada-. */
   useEffect(() => {
+    if (huboGuardado.current) return
+    setPos(clamp(defecto()))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defecto])
+
+  useEffect(() => {
+    if (!huboGuardado.current) return
     try { localStorage.setItem(clave, JSON.stringify(pos)) } catch { /* sin storage: no persiste, no rompe nada */ }
   }, [pos, clave])
 
@@ -67,7 +88,7 @@ export function useArrastrable({
     if (!arrastrando.current) return
     const dx = e.clientX - inicio.current.pointerX
     const dy = e.clientY - inicio.current.pointerY
-    if (!movido.current && Math.hypot(dx, dy) > 5) movido.current = true
+    if (!movido.current && Math.hypot(dx, dy) > 5) { movido.current = true; huboGuardado.current = true }
     if (!movido.current) return
     setPos(clamp({ x: inicio.current.posX + dx, y: inicio.current.posY + dy }))
   }
