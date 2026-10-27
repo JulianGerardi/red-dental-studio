@@ -80,7 +80,11 @@ test('Add Condition con descriptores: se eligen al crear y se corrigen desde Edi
 
   await screen.getByRole('button', /^Actions for Tooth 13$/).tap()
   await screen.getByRole('menuitem', 'Edit').tap()
-  const editar = screen.getByRole('dialog', 'Edit Condition')
+  // Una condition cargada siempre es un finding: el drawer se titula Edit Finding; el diente encabeza la rueda.
+  const editar = screen.getByRole('dialog', 'Edit Finding')
+  await expect(editar.getByText('13 · Permanent')).toBeVisible()
+  // General Information y Descriptors van en dos pestañas.
+  await editar.getByRole('tab', 'Descriptors').tap()
   await editar.getByRole('button', 'Painless').tap()
   await editar.getByRole('button', /^Save/).tap()
   await expect(screen.getByText('Descriptors: Painless, Round')).toBeVisible()
@@ -273,6 +277,14 @@ test('Intraoral: Add Condition sin región se carga como Not Localized', async (
   await drawer.getByRole('button', /select descriptors/i).tap()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/Abscess charted on Not Localized/)).toBeVisible()
+
+  // Edit Finding: el área con el tipo con que se guardó (CON-3700) y los descriptores en su pestaña.
+  await screen.getByRole('button', /^Actions for Not Localized$/).tap()
+  await screen.getByRole('menuitem', 'Edit').tap()
+  const editar = screen.getByRole('dialog', 'Edit Finding')
+  await expect(editar.getByText('Intra Oral')).toBeVisible()
+  await editar.getByRole('tab', 'Descriptors').tap()
+  await expect(editar.getByText('Selected Descriptors')).toBeVisible()
 })
 
 /* Edit Procedure (Figma 5294:85084): tres pestañas; Findings y Diagnostic traen lo vinculable y un solo Save guarda todo. */
@@ -290,6 +302,8 @@ test('Edit Procedure: pestañas General Information, Findings y Diagnostic', asy
   const editar = screen.getByRole('dialog', 'Edit Procedure')
   await expect(editar.getByText('Creation date')).toBeVisible()
   await expect(editar.getByText('Fee')).toBeVisible()
+  // El área de tratamiento con que se guardó (CON-3700): D0120 sobre el diente 13.
+  await expect(editar.getByText(/^Tooth$/)).toBeVisible()
   await editar.getByRole('tab', 'Findings').tap()
   await expect(editar.getByText('Link Findings')).toBeVisible()
   await editar.getByRole('tab', 'Diagnostic').tap()

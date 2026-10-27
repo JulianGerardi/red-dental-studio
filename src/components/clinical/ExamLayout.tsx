@@ -19,7 +19,7 @@ import { textoDescriptores } from './dental/DescriptorFields'
 import { ConfirmProcedureDialog } from './dental/ConfirmProcedureDialog'
 import { useExamReviews } from './dental/useExamReviews'
 import { ACTIONS, type FindingAction } from './dental/actions'
-import { quadrantTeeth, type Finding } from './dental/data'
+import { areaDeAlcance, quadrantTeeth, type Finding } from './dental/data'
 import { ULTIMA_CONDICION, type UltimaCondicion } from '@/data/clinical-mode'
 
 /* Lo que comparten todos los exámenes de Clinical Mode (Julián, 2026-10-03): el panel de Findings a la izquierda (menos
@@ -112,6 +112,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
         surfaces: draft.surfaces, notes: '', linked: draft.linked, diagnoses: draft.diagnoses, examen,
         kind: procedureOpen ?? 'procedure', descriptors: esCondicion ? draft.descriptors : undefined,
         fee: esCondicion ? undefined : precioUcr(draft.procedure.code),
+        treatmentArea: areaDeAlcance(draft.scope, draft.area, tooth),
       },
       ...f,
     ])
