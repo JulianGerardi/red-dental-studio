@@ -270,3 +270,33 @@ patient".
   lo volvería a abrir.
 - A validar con usuarios: si cerrar con un clic afuera molesta a quien está escribiendo y toca la pantalla sin querer
   (el historial se guarda, no se pierde lo ya enviado, pero sí un borrador sin mandar).
+
+## La pestaña se queda al abrir: la hoja sale acoplada al borde (2026-10-27)
+
+Julián, con un mockup de los dos widgets: con la pestaña recogida, abrir no la trae de vuelta al círculo; la
+pestaña se queda en el borde -chevron al revés (›) y el nombre a la vista-, y la hoja/card sale pegada al borde
+derecho arriba de ella (abajo si la pestaña está en la mitad de arriba de la pantalla).
+
+- **Confibot:** `onTraer` sólo abre el chat (ya no pone `recogido` en false). `ConfibotLanzador` sigue dibujando la
+  pestaña con el chat abierto (`oculto` sólo oculta el círculo) y otro clic la cierra (`onCerrar`). `Confibot` suma
+  `acoplada` (= recogido): `right: 0`, `bottom = innerHeight - pos.y` (o `top = pos.y + 32`), esquina pegada a la
+  pestaña sin redondear. Alto = `min(560, lugar libre)`. La pestaña lleva `data-confibot-toggle` para que el clic
+  afuera de la hoja no la cierre antes del clic de la pestaña (si no, la reabriría).
+- **Currently being seen:** misma idea (`PatientInSessionPopup`, punto 12): `recogido` no cambia al abrir, la card
+  acoplada reusa la lista (`detalle`) de la card que crece desde el círculo.
+- **A validar con Julián:** desde la pestaña ya no hay un clic para volver al círculo arrastrable (antes, tocar la
+  pestaña lo traía). Propuesta si hace falta: un control chico en el encabezado de la hoja/card, p. ej. "Pin to
+  screen"; no lo agregué por no inventar controles.
+
+## La hoja/card no tapa al otro flotante (2026-10-27)
+
+Julián, con la captura de referencia: al abrir Confibot, la pestaña de "currently being seen" tiene que seguir a la
+vista, no quedar encima de la hoja.
+
+- **`altoSinPisar`** (`lib/useArrastrable.ts`): recorta el alto de la hoja/card para que no cruce el lugar que ocupa
+  el otro flotante cerrado (`RectFlotante`: pestaña o círculo), con 8px de margen, sólo si se cruzan en horizontal.
+  Mínimo 200px: una hoja inutilizable es peor que un roce.
+- `ConfibotLanzador` y `PatientInSessionPopup` avisan su rect (`onRect`, también en resize); `AppShell` se lo pasa
+  al otro como `evitar`. Con los dos en su lugar por default (1440×900): la hoja de Confibot queda de y=466 a 832 y
+  la pestaña de Patients (426-458) a la vista; la card de Patients (458-810) no toca la pestaña de Confibot (832).
+- El `z-[41]` de Patients queda como red de seguridad (si el recorte llega al mínimo).

@@ -4,7 +4,7 @@ import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import { NotificationBanner } from './NotificationBanner'
 import { Confibot, ConfibotLanzador, useConfibotRecogido } from '@/components/help/Confibot'
-import type { Posicion } from '@/lib/useArrastrable'
+import type { Posicion, RectFlotante } from '@/lib/useArrastrable'
 import { useHelp } from '@/components/help/HelpProvider'
 import { delBanner, useNotificaciones } from '@/data/notificacionesStore'
 import { aviso } from '@/components/ui/toaster'
@@ -17,6 +17,8 @@ export function AppShell() {
   const { showOnScreen, explicando, confibotAbierto, openConfibot, closeConfibot, fabDePagina } = useHelp()
   const [confibotRecogido, setConfibotRecogido] = useConfibotRecogido()
   const [confibotPos, setConfibotPos] = useState<Posicion | null>(null)
+  const [confibotRect, setConfibotRect] = useState<RectFlotante | null>(null)
+  const [pacientesRect, setPacientesRect] = useState<RectFlotante | null>(null)
 
   /* Las notificaciones viven en su store (data/notificacionesStore): tienen
      que sobrevivir a la navegación y las comparten el banner, la campana y
@@ -90,7 +92,7 @@ export function AppShell() {
       {/* Activo en toda la app, no sólo en Patients -Julián lo pidió así: quiere
           saber quién está en el sillón esté donde esté navegando-. ClinicalMode
           queda afuera igual porque ese layout no pasa por AppShell. */}
-      <PatientInSessionPopup />
+      <PatientInSessionPopup onRect={setPacientesRect} evitar={confibotRect} />
       {/* Mientras habla la hoja de chat, el botón queda montado pero oculto (`oculto`, no un desmonte): así al
           cerrar el chat reaparece quieto en el lugar donde estaba, en vez de reanimarse como si volviera de estar
           recogido (Julián, 2026-10-27; ver el comentario de `ConfibotLanzador`). Mientras habla un CoachMark sigue
@@ -102,13 +104,15 @@ export function AppShell() {
           sobreFab={fabDePagina}
           onAbrir={openConfibot}
           onRecoger={() => setConfibotRecogido(true)}
-          onTraer={() => { setConfibotRecogido(false); openConfibot() }}
+          onTraer={openConfibot}
+          onCerrar={closeConfibot}
           onPosicion={setConfibotPos}
+          onRect={setConfibotRect}
         />
       )}
       {/* La hoja abre anclada a `confibotPos` -dónde está el botón ahora-, no siempre abajo a la derecha (Julián,
           2026-10-27; ver el comentario de `Confibot`, más abajo del todo en Confibot.tsx). */}
-      <Confibot abierto={confibotAbierto} pos={confibotPos ?? undefined} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
+      <Confibot abierto={confibotAbierto} pos={confibotPos ?? undefined} acoplada={confibotRecogido} evitar={pacientesRect} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
     </div>
   )
 }

@@ -5,6 +5,28 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-27
 
+### Confibot y "currently being seen": la hoja/card no tapa al otro flotante ([#96](https://github.com/JulianGerardi/red-dental-studio/pull/96))
+- Al abrir Confibot, la pestaña de "currently being seen" quedaba encima de la hoja. Ahora cada flotante avisa el
+  lugar que ocupa cerrado y la hoja/card del otro recorta su alto para no cruzarlo (8px de margen, mínimo 200px): con
+  los dos en su lugar por default, el botón de Patients queda a la vista arriba de la hoja de Confibot.
+- **Para el dev:** `altoSinPisar` y `RectFlotante` en `lib/useArrastrable.ts`; `ConfibotLanzador` y
+  `PatientInSessionPopup` suman `onRect` y reciben `evitar` vía `AppShell` (props opcionales, Storybook compila sin
+  cambios). El `z-[41]` de Patients queda de respaldo. Documentado en `help.md`; Storybook sin actualizar (pendiente
+  de que Julián lo pida).
+
+### Pestaña recogida: se queda al abrir y la hoja/card sale acoplada al borde ([#95](https://github.com/JulianGerardi/red-dental-studio/pull/95))
+- Con Confibot o "currently being seen" recogidos en la pestaña del borde, abrir ya no los trae de vuelta al círculo:
+  la pestaña se queda (chevron al revés y nombre a la vista) y la hoja o card sale pegada al borde derecho, arriba de
+  la pestaña (abajo si la pestaña está en la mitad de arriba de la pantalla). Otro clic en la pestaña, Escape o un
+  clic afuera la cierran.
+- **A validar:** desde la pestaña ya no hay un clic para volver al círculo arrastrable. Propuesta si hace falta: un
+  control chico en el encabezado ("Pin to screen").
+- **Para el dev:** `Confibot` suma `acoplada` y `ConfibotLanzador` suma `onCerrar` (opcionales, Storybook compila sin
+  cambios); `onTraer` ahora sólo abre el chat. El botón de la pestaña lleva `data-confibot-toggle`. En
+  `PatientInSessionPopup` la lista se extrajo a `detalle` y se reusa en la card acoplada. `tests/confibot.e2e.ts`
+  actualizado (la pestaña se llama "Open Confibot" / "Hide Confibot chat"). Documentado en `help.md`; Storybook sin
+  actualizar (pendiente de que Julián lo pida).
+
 ### Confibot: la hoja no se sale de la pantalla y cierra con Escape o clic afuera ([#94](https://github.com/JulianGerardi/red-dental-studio/pull/94))
 - Con el botón cerca de la mitad de la pantalla, la hoja de chat se iba por arriba y el botón de cerrar quedaba
   fuera de vista. Ahora el alto se achica al lugar libre (margen de 8px) y la lista de mensajes scrollea por dentro.
