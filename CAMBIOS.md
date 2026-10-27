@@ -3,6 +3,19 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-27
+
+### Pestaña recogida de Confibot y "currently being seen": ícono, un clic para abrir ([#91](https://github.com/JulianGerardi/red-dental-studio/pull/91))
+- La pestaña escondida de los dos widgets ya no muestra el nombre siempre: va un ícono, y el nombre aparece recién
+  al pasar el mouse. Al traerla de vuelta entra deslizándose desde el borde (no aparece de golpe ni se despliega
+  desde un círculo), y ese mismo clic ya abre el chat o el popup -antes hacía falta un segundo clic sobre el botón
+  de reposo-.
+- **Para el dev:** de paso se corrigió un bug de `useArrastrable` (de la tanda anterior, #90): la posición por
+  default se guardaba ya en el primer montaje, así que Confibot dejaba de apilarse arriba del FAB de "Appointment
+  requests" en Scheduling (lo tapaba) apenas se visitaba cualquier otra pantalla antes. Ahora sólo persiste si ya
+  había una posición guardada o si se arrastra de verdad. Documentado en `help.md` y `patients.md`; Storybook sin
+  actualizar (pendiente de que Julián lo pida).
+
 ## 2026-10-26
 
 ### Confibot y "currently being seen": arrastrables, círculo en reposo, esconder al costado ([#90](https://github.com/JulianGerardi/red-dental-studio/pull/90))
