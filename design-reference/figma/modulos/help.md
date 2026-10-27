@@ -213,3 +213,20 @@ Dos ajustes más de Julián sobre la pestaña recogida, en los dos widgets:
   De paso, el colchón para no tapar el FAB (`128`) y el centrado en `x` sobre él se ajustan: la flechita de
   recoger, arriba del círculo, ahora también entra en el wrapper posicionado, así que el círculo visible ya no
   arranca en `pos.y`.
+
+## Cerrar el chat ya no remonta el botón; ícono y tooltip de esconder más claros (2026-10-27)
+
+Dos correcciones más de Julián sobre los dos widgets:
+
+- **Al cerrar el chat de Confibot, el círculo volvía a entrar con `panel-in`** (la animación de "deslizarse desde
+  el borde") cada vez, porque `AppShell` desmontaba `ConfibotLanzador` entero mientras `confibotAbierto` era
+  true -cerrar el chat remonta el componente, React no distingue eso de traerlo de vuelta desde recogido-. En
+  `PatientInSessionPopup` cerrar el popup no tiene este problema: es la misma caja que nunca se desmonta, sólo
+  cambia de ancho. Se pareja el comportamiento: `ConfibotLanzador` suma una prop `oculto` (true mientras
+  `confibotAbierto`) y devuelve `null` *después* de calcular la posición (useArrastrable sigue corriendo, no
+  pierde `pos`) en vez de que `AppShell` lo saque del árbol. Al cerrar el chat el círculo reaparece quieto, en el
+  mismo lugar, igual que la pestaña de "currently being seen".
+- **El botón de esconder (la flechita chica) pasa de `ChevronDown` a `PanelRightClose`** -mismo ícono que ya usa
+  la app para "colapsar un panel lateral" (Topbar, PatientSidePanel)-, con un tooltip (`ui/tooltip`, "Tuck away" /
+  "Hide") porque una flecha sola no decía con claridad que esto manda el widget a una pestaña en el costado, no lo
+  cierra ni lo borra. Mismo ícono y mismo tooltip en los dos widgets.

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Bot, X, ArrowUp, Sparkles, ChevronRight, ChevronDown, ChevronLeft } from 'lucide-react'
+import { Bot, X, ArrowUp, Sparkles, ChevronRight, PanelRightClose, ChevronLeft } from 'lucide-react'
 import { TOPICS, MODULES, puntuarTema } from './topics'
 import { cn } from '@/lib/utils'
 import { useArrastrable, type Posicion } from '@/lib/useArrastrable'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 /* Tamaño del botón cerrado (círculo): con esto alcanza para clampear el arrastre. */
 const ANCHO_CERRADO = 44
@@ -95,11 +96,27 @@ const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-d
    Ese mismo clic ya abre el chat directo (Julián, 2026-10-26, igual que PatientInSessionPopup: no debía hacer falta
    un segundo clic sobre el botón de reposo para recién ahí abrirlo). `onTraer` en AppShell.tsx llama
    `setConfibotRecogido(false)` y `openConfibot()` juntos -acá en `ConfibotLanzador` no cambia nada, sólo deja de
-   mostrarse porque `confibotAbierto` pasa a true-. Ver design-reference/figma/modulos/help.md. */
+   mostrarse porque `confibotAbierto` pasa a true-.
+
+   `oculto` reemplaza al `{!confibotAbierto && ...}` que antes decidía si `AppShell` montaba este componente
+   (Julián, 2026-10-27: al cerrar el chat, el círculo volvía a aparecer con la animación de "entra deslizándose
+   desde el borde" -`panel-in`-, de más: ese remount era indistinguible de traerlo de vuelta desde recogido. En
+   `PatientInSessionPopup` cerrar el popup no remonta nada -es la misma caja que cambia de ancho-, así que no tiene
+   ese problema). Ahora `AppShell` siempre monta `ConfibotLanzador` (salvo `explicando`) y le pasa `oculto`; acá
+   adentro, después de los hooks -para no perder la posición ya calculada-, devuelve `null` en vez de desmontarse,
+   así que al cerrar el chat el círculo reaparece quieto, como la pestaña de `PatientInSessionPopup`.
+
+   El botón de esconder cambia de `ChevronDown` a `PanelRightClose` -mismo ícono que ya usa la app para "colapsar
+   un panel lateral" (Topbar, PatientSidePanel)-, con un tooltip ("Tuck away") porque una flecha sola no decía
+   claramente que esto manda el widget a un costado, no lo cierra. Mismo cambio en `PatientInSessionPopup`. Ver
+   design-reference/figma/modulos/help.md. */
 export function ConfibotLanzador({
-  recogido, sobreFab = false, onAbrir, onRecoger, onTraer,
+  recogido, oculto = false, sobreFab = false, onAbrir, onRecoger, onTraer,
 }: {
   recogido: boolean
+  /** Montado pero sin dibujarse -no lo reemplaza `AppShell` desmontándolo-, para no perder `pos` ni reanimar la
+      entrada cuando vuelve a mostrarse (p. ej. al cerrar el chat). */
+  oculto?: boolean
   sobreFab?: boolean
   onAbrir: () => void
   onRecoger: () => void
@@ -121,6 +138,8 @@ export function ConfibotLanzador({
     defecto,
     onTap: onAbrir,
   })
+
+  if (oculto) return null
 
   if (recogido) {
     return (
@@ -147,12 +166,19 @@ export function ConfibotLanzador({
       style={{ top: pos.y, left: pos.x }}
     >
       {/* 24px a la vista, 40px de área de toque. */}
-      <button
-        type="button" onClick={onRecoger} aria-label="Tuck Confibot away"
-        className="relative flex size-6 items-center justify-center rounded-full border border-line bg-white text-ink-muted shadow-sm before:absolute before:-inset-2 before:content-[''] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
-      >
-        <ChevronDown className="size-3.5" />
-      </button>
+      <TooltipProvider delayDuration={200}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button" onClick={onRecoger} aria-label="Tuck Confibot away"
+              className="relative flex size-6 items-center justify-center rounded-full border border-line bg-white text-ink-muted shadow-sm before:absolute before:-inset-2 before:content-[''] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+            >
+              <PanelRightClose className="size-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="left" className="bg-ink text-white">Tuck away</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       {/* Sólo el ícono, sin el texto "Confibot" que aparecía al hover (Julián, 2026-10-26: así es en el video de
           referencia). Ancho fijo -ya no hay nada que crezca-, así que no hace falta elegir de qué lado anclar. */}
       <button
