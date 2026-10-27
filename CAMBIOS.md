@@ -5,6 +5,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-27
 
+### Confibot: el chat abre donde está el botón, no siempre abajo a la derecha ([#93](https://github.com/JulianGerardi/red-dental-studio/pull/93))
+- La hoja de chat de Confibot ya no abre siempre en el mismo rincón fijo: abre anclada a donde esté el botón
+  (arrastrado o no), creciendo hacia el lado con más lugar en pantalla, igual que la card de "currently being
+  seen". En celular sigue siendo la hoja de abajo a todo el ancho.
+- Como ahora puede abrir en cualquier parte, puede terminar pasando por donde está la pestaña de "currently being
+  seen" (las dos caen cerca del borde derecho por default). Si se cruzan, "currently being seen" queda siempre
+  visible y tocable arriba del chat, en vez de taparse del todo.
+- **Para el dev:** `ConfibotLanzador` avisa su posición (`onPosicion`) y `AppShell` se la pasa a `Confibot`; las
+  dos props son opcionales, Storybook sigue compilando sin tocar `Confibot.stories.tsx` (ahí la hoja sigue
+  cayendo en el rincón fijo de siempre). `PatientInSessionPopup` sube de `z-30` a `z-[41]`. Documentado en
+  `help.md`; Storybook sin actualizar (pendiente de que Julián lo pida).
+
 ### Confibot: cerrar el chat ya no remonta el botón; ícono y tooltip de esconder más claros ([#92](https://github.com/JulianGerardi/red-dental-studio/pull/92))
 - Al cerrar el chat de Confibot, el círculo volvía a aparecer con la animación de "entra deslizándose desde el
   borde" cada vez. Ahora reaparece quieto en el mismo lugar, igual que la pestaña de "currently being seen".
