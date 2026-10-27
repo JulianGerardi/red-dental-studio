@@ -236,3 +236,10 @@ NotificationBanner*.
 
 **Para validar con usuarios:** sin *Pending*, ¿recepción usa "sin leer" para lo que queda por hacer, o le falta una
 forma de dejar algo para después? Y si el ojo se entiende como "marcar leída" sin el tooltip.
+
+## El banner colapsado dice "N pending notification(s)" (2026-10-27)
+
+Julián: el banner de avisos, colapsado, decía "4 pending tasks"; tiene que decir **"4 pending notifications"**
+("1 pending notification" en singular). Los avisos del banner son las notificaciones (la campana y la pantalla
+Notifications), no sólo tareas. El cambio había quedado afuera de lo publicado. Sólo el texto de
+`NotificationBanner.tsx`; nada más cambia.

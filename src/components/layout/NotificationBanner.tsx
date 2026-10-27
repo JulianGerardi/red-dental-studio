@@ -30,7 +30,7 @@ export function NotificationBanner({
           type="button" onClick={() => setColapsado(false)}
           className="flex items-center gap-1.5 px-3 py-1 text-[11px] font-semibold text-attn-fg hover:bg-white/60"
         >
-          {items.length} pending {items.length === 1 ? 'task' : 'tasks'}
+          {items.length} pending {items.length === 1 ? 'notification' : 'notifications'}
           <ChevronDown aria-hidden className="size-3.5" />
         </button>
       </div>
