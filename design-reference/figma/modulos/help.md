@@ -287,3 +287,16 @@ derecho arriba de ella (abajo si la pestaña está en la mitad de arriba de la p
 - **A validar con Julián:** desde la pestaña ya no hay un clic para volver al círculo arrastrable (antes, tocar la
   pestaña lo traía). Propuesta si hace falta: un control chico en el encabezado de la hoja/card, p. ej. "Pin to
   screen"; no lo agregué por no inventar controles.
+
+## La hoja/card no tapa al otro flotante (2026-10-27)
+
+Julián, con la captura de referencia: al abrir Confibot, la pestaña de "currently being seen" tiene que seguir a la
+vista, no quedar encima de la hoja.
+
+- **`altoSinPisar`** (`lib/useArrastrable.ts`): recorta el alto de la hoja/card para que no cruce el lugar que ocupa
+  el otro flotante cerrado (`RectFlotante`: pestaña o círculo), con 8px de margen, sólo si se cruzan en horizontal.
+  Mínimo 200px: una hoja inutilizable es peor que un roce.
+- `ConfibotLanzador` y `PatientInSessionPopup` avisan su rect (`onRect`, también en resize); `AppShell` se lo pasa
+  al otro como `evitar`. Con los dos en su lugar por default (1440×900): la hoja de Confibot queda de y=466 a 832 y
+  la pestaña de Patients (426-458) a la vista; la card de Patients (458-810) no toca la pestaña de Confibot (832).
+- El `z-[41]` de Patients queda como red de seguridad (si el recorte llega al mínimo).

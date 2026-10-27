@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, LogOut, PanelRightClose, Radio, UserRound } 
 import { cn } from '@/lib/utils'
 import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
 import { Avatar } from '@/components/ui/avatar'
-import { useArrastrable, type Posicion } from '@/lib/useArrastrable'
+import { altoSinPisar, useArrastrable, type Posicion, type RectFlotante } from '@/lib/useArrastrable'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 /* Tamaño de la pestaña cerrada: con esto alcanza para clampear el arrastre (ver 6. abajo). */
@@ -154,7 +154,12 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
       arriba). `recogido` no cambia al abrir, así que cerrar vuelve a la
       pestaña sola. Consecuencia a validar: desde ahí no hay un clic para
       volver al círculo arrastrable. */
-export function PatientInSessionPopup() {
+export function PatientInSessionPopup({ onRect, evitar }: {
+  /** El lugar que ocupa ahora (pestaña o círculo), para que la hoja de Confibot no lo tape al abrir. */
+  onRect?: (r: RectFlotante) => void
+  /** Lo que no hay que tapar con la card acoplada: Confibot (pestaña o círculo). */
+  evitar?: RectFlotante | null
+}) {
   const enCurso = useMemo(
     () => datosDelDia(HOY_DEMO).appointments.filter((a) => !a.completado),
     [],
@@ -180,6 +185,16 @@ export function PatientInSessionPopup() {
     defecto,
     onTap: () => setAbierto((v) => !v),
   })
+
+  useEffect(() => {
+    if (!onRect) return
+    const avisar = () => onRect(recogido
+      ? { x1: window.innerWidth - 130, x2: window.innerWidth, y1: pos.y, y2: pos.y + 32 }
+      : { x1: pos.x, x2: pos.x + ANCHO_CERRADO, y1: pos.y, y2: pos.y + 28 + ALTO_CERRADO })
+    avisar()
+    window.addEventListener('resize', avisar)
+    return () => window.removeEventListener('resize', avisar)
+  }, [pos, recogido, onRect])
 
   useEffect(() => {
     if (!abierto) return
@@ -253,7 +268,10 @@ export function PatientInSessionPopup() {
        con el chevron para el otro lado y el nombre a la vista. Otro clic en la pestaña, Escape o un clic afuera la
        cierran. `ref` en un `contents`: tiene que cubrir la pestaña y la card, que son dos `fixed` separados. */
     const arriba = pos.y + 16 > window.innerHeight / 2
-    const espacio = arriba ? pos.y - 8 : window.innerHeight - pos.y - 32 - 8
+    const espacio = altoSinPisar({
+      x1: window.innerWidth - 336, ancho: 336, y: arriba ? pos.y : pos.y + 32, haciaArriba: arriba,
+      alto: arriba ? pos.y - 8 : window.innerHeight - pos.y - 32 - 8, otro: evitar,
+    })
     return (
       <div ref={ref} className="contents">
         <button
