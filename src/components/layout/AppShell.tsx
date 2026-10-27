@@ -102,13 +102,14 @@ export function AppShell() {
           sobreFab={fabDePagina}
           onAbrir={openConfibot}
           onRecoger={() => setConfibotRecogido(true)}
-          onTraer={() => { setConfibotRecogido(false); openConfibot() }}
+          onTraer={openConfibot}
+          onCerrar={closeConfibot}
           onPosicion={setConfibotPos}
         />
       )}
       {/* La hoja abre anclada a `confibotPos` -dónde está el botón ahora-, no siempre abajo a la derecha (Julián,
           2026-10-27; ver el comentario de `Confibot`, más abajo del todo en Confibot.tsx). */}
-      <Confibot abierto={confibotAbierto} pos={confibotPos ?? undefined} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
+      <Confibot abierto={confibotAbierto} pos={confibotPos ?? undefined} acoplada={confibotRecogido} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
     </div>
   )
 }

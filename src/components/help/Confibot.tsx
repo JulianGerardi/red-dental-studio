@@ -93,10 +93,11 @@ const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-d
    `panel-in` -la misma animación de deslizarse desde el borde derecho que usa el drawer (`ui/drawer.tsx`)-, no
    crece desde un círculo.
 
-   Ese mismo clic ya abre el chat directo (Julián, 2026-10-26, igual que PatientInSessionPopup: no debía hacer falta
-   un segundo clic sobre el botón de reposo para recién ahí abrirlo). `onTraer` en AppShell.tsx llama
-   `setConfibotRecogido(false)` y `openConfibot()` juntos -acá en `ConfibotLanzador` no cambia nada, sólo deja de
-   mostrarse porque `confibotAbierto` pasa a true-.
+   Ese mismo clic ya abre el chat directo (Julián, 2026-10-26, igual que PatientInSessionPopup). Desde 2026-10-27
+   (mockup de Julián) la pestaña no se va al abrir: `onTraer` en AppShell.tsx sólo abre el chat, `recogido` queda como
+   está, y la pestaña pasa a mostrar › y el nombre mientras el chat está abierto (`oculto` es true); otro clic la
+   cierra (`onCerrar`). La hoja sale acoplada al borde derecho, arriba de la pestaña (`acoplada` en `Confibot`).
+   Consecuencia a validar: desde la pestaña ya no hay un clic para volver al círculo arrastrable.
 
    `oculto` reemplaza al `{!confibotAbierto && ...}` que antes decidía si `AppShell` montaba este componente
    (Julián, 2026-10-27: al cerrar el chat, el círculo volvía a aparecer con la animación de "entra deslizándose
@@ -117,7 +118,7 @@ const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-d
    `AppShell` guarda esa posición y se la pasa a `Confibot` (más abajo) para anclar la hoja ahí. Ver
    design-reference/figma/modulos/help.md. */
 export function ConfibotLanzador({
-  recogido, oculto = false, sobreFab = false, onAbrir, onRecoger, onTraer, onPosicion,
+  recogido, oculto = false, sobreFab = false, onAbrir, onRecoger, onTraer, onCerrar, onPosicion,
 }: {
   recogido: boolean
   /** Montado pero sin dibujarse -no lo reemplaza `AppShell` desmontándolo-, para no perder `pos` ni reanimar la
@@ -126,7 +127,10 @@ export function ConfibotLanzador({
   sobreFab?: boolean
   onAbrir: () => void
   onRecoger: () => void
+  /** Clic en la pestaña recogida: abre el chat (la pestaña no se va, ver arriba). */
   onTraer: () => void
+  /** Clic en la pestaña recogida con el chat abierto: lo cierra. */
+  onCerrar?: () => void
   /** Dónde está el botón ahora, para que `Confibot` abra la hoja ahí en vez de siempre abajo a la derecha. */
   onPosicion?: (pos: Posicion) => void
 }) {
@@ -149,21 +153,31 @@ export function ConfibotLanzador({
 
   useEffect(() => { onPosicion?.(pos) }, [pos, onPosicion])
 
-  if (oculto) return null
+  if (oculto && !recogido) return null
 
   if (recogido) {
+    /* Con el chat abierto la pestaña se queda (Julián, 2026-10-27, mockup): chevron para el otro lado (›), el nombre
+       a la vista, y la hoja sale pegada al borde arriba de ella. Otro clic en la pestaña la cierra. `data-confibot-toggle`:
+       el clic afuera de la hoja no tiene que cerrarla antes de que este clic la cierre -si no, el clic la reabriría-. */
+    const abierta = oculto
     return (
       <button
-        type="button" onClick={onTraer} aria-label="Bring Confibot back"
+        type="button" data-confibot-toggle
+        onClick={abierta ? onCerrar : onTraer}
+        aria-label={abierta ? 'Hide Confibot chat' : 'Open Confibot'}
+        aria-expanded={abierta}
         style={{ top: pos.y }}
         className={cn(
           DEGRADE,
           'group fixed right-0 z-40 flex h-8 items-center gap-1.5 rounded-l-xl py-0 pr-3 pl-2.5 text-white shadow-lg hover:motion-safe:[animation:confibot-sheen_2.4s_linear_infinite] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring',
         )}
       >
-        <ChevronLeft className="size-4 shrink-0" />
+        {abierta ? <ChevronRight className="size-4 shrink-0" /> : <ChevronLeft className="size-4 shrink-0" />}
         <Bot className="size-3.5 shrink-0" />
-        <span className="max-w-0 overflow-hidden text-[13px] font-semibold whitespace-nowrap transition-[max-width] duration-200 group-hover:max-w-[70px]">
+        <span className={cn(
+          'overflow-hidden text-[13px] font-semibold whitespace-nowrap transition-[max-width] duration-200',
+          abierta ? 'max-w-[70px]' : 'max-w-0 group-hover:max-w-[70px]',
+        )}>
           Confibot
         </span>
       </button>
@@ -204,12 +218,15 @@ export function ConfibotLanzador({
 }
 
 export function Confibot({
-  abierto, pos, onClose, onShowOnScreen, historialInicial,
+  abierto, pos, acoplada = false, onClose, onShowOnScreen, historialInicial,
 }: {
   abierto: boolean
   /** Dónde está el botón flotante ahora mismo (`ConfibotLanzador`, vía `onPosicion`): la hoja ancla ahí en vez de
       siempre abajo a la derecha. Sin esto (p. ej. en Storybook, que no pasa esta prop) cae al rincón de siempre. */
   pos?: Posicion
+  /** El botón está recogido en la pestaña del borde: la hoja sale pegada al borde derecho, arriba (o abajo) de la
+      pestaña, en vez de anclada a un círculo. */
+  acoplada?: boolean
   onClose: () => void
   onShowOnScreen: (topicId: string) => void
   /** Sólo para mostrar estados en Storybook: arranca con esta conversación en vez de la guardada. */
@@ -271,20 +288,29 @@ export function Confibot({
      la abrió. */
   const ALTO_FLECHA_GAP = 28
   const esDesktop = window.innerWidth >= 640
+  /* Acoplada a la pestaña recogida (Julián, 2026-10-27, mockup): pegada al borde derecho, arriba de la pestaña -que
+     mide 32px y arranca en `pos.y`, sin el offset de la flechita- o abajo si la pestaña está en la mitad de arriba. */
+  const ALTO_PESTANA = 32
+  const acopladaArriba = pos ? pos.y + ALTO_PESTANA / 2 > window.innerHeight / 2 : false
   const haciaIzquierda = pos ? pos.x + ANCHO_CERRADO / 2 > window.innerWidth / 2 : false
-  const haciaArriba = pos ? pos.y + ALTO_FLECHA_GAP + ALTO_CERRADO / 2 > window.innerHeight / 2 : false
+  const haciaArriba = acoplada ? acopladaArriba : pos ? pos.y + ALTO_FLECHA_GAP + ALTO_CERRADO / 2 > window.innerHeight / 2 : false
   /* Margen de 8px contra el borde, y el alto se achica al lugar que queda del lado elegido: sin esto, con el botón
      cerca de la mitad de la pantalla la hoja de 560px se salía por arriba y el encabezado (con el botón de cerrar)
      quedaba afuera (Julián, 2026-10-27). La lista de mensajes ya scrollea por dentro, achicar no pierde nada. */
   const MARGEN = 8
-  const bottom = Math.max(MARGEN, window.innerHeight - (pos?.y ?? 0) - ALTO_FLECHA_GAP - ALTO_CERRADO)
-  const top = (pos?.y ?? 0) + ALTO_FLECHA_GAP
+  const bottom = acoplada
+    ? window.innerHeight - (pos?.y ?? 0)
+    : Math.max(MARGEN, window.innerHeight - (pos?.y ?? 0) - ALTO_FLECHA_GAP - ALTO_CERRADO)
+  const top = acoplada ? (pos?.y ?? 0) + ALTO_PESTANA : (pos?.y ?? 0) + ALTO_FLECHA_GAP
   const altoLibre = haciaArriba ? window.innerHeight - bottom - MARGEN : window.innerHeight - top - MARGEN
   const anclaPos: CSSProperties | undefined = pos && esDesktop ? {
-    ...(haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
+    ...(acoplada ? { right: 0 } : haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
     ...(haciaArriba ? { bottom } : { top }),
   } : undefined
   const altoHoja: CSSProperties | undefined = pos && esDesktop ? { height: Math.min(560, altoLibre) } : undefined
+  const esquinas = pos && esDesktop && acoplada
+    ? (haciaArriba ? 'sm:rounded-tl-2xl sm:rounded-tr-2xl sm:rounded-bl-2xl' : 'sm:rounded-tl-2xl sm:rounded-tr-none sm:rounded-bl-2xl sm:rounded-br-2xl')
+    : 'sm:rounded-2xl'
 
   return (
     <div
@@ -295,7 +321,7 @@ export function Confibot({
       )}
       style={anclaPos}
     >
-      <div style={altoHoja} className="motion-safe:[animation:sheet-in_220ms_ease-out] flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-white shadow-floating sm:max-w-[400px] sm:rounded-2xl">
+      <div style={altoHoja} className={cn('motion-safe:[animation:sheet-in_220ms_ease-out] flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-white shadow-floating sm:max-w-[400px]', esquinas)}>
         <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-line sm:hidden" />
 
         <div className="flex items-center gap-3 border-b border-line px-4 py-3.5">

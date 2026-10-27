@@ -146,7 +146,14 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
       pestaña-, así que la hoja puede terminar pasando justo por donde está.
       Con z-30 quedaba tapada del todo. Por arriba del z-40 de Confibot (el
       botón y la hoja) pero por debajo del z-50 de los drawers/diálogos, que
-      tienen que seguir ganándole a cualquier flotante. */
+      tienen que seguir ganándole a cualquier flotante.
+   12. Con la pestaña recogida, abrir ya no la trae de vuelta al círculo
+      (Julián, 2026-10-27, mockup): la pestaña se queda, con el chevron al
+      revés (›) y el nombre a la vista, y la card sale pegada al borde
+      derecho arriba de ella (abajo si la pestaña está en la mitad de
+      arriba). `recogido` no cambia al abrir, así que cerrar vuelve a la
+      pestaña sola. Consecuencia a validar: desde ahí no hay un clic para
+      volver al círculo arrastrable. */
 export function PatientInSessionPopup() {
   const enCurso = useMemo(
     () => datosDelDia(HOY_DEMO).appointments.filter((a) => !a.completado),
@@ -192,19 +199,90 @@ export function PatientInSessionPopup() {
   const hayEnCurso = visibles.length > 0
   const primero = visibles[0]
 
+  /* La lista de "Currently being seen", la misma en la card que crece desde el círculo y en la acoplada a la pestaña
+     recogida (punto 12 arriba). */
+  const detalle = (
+    <>
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-green uppercase">
+          <Radio className="size-3" /> Currently being seen
+        </div>
+        {hayEnCurso && <span className="text-[10px] font-semibold text-ink-faint">{visibles.length}</span>}
+      </div>
+
+      {hayEnCurso ? (
+        <div className="flex flex-col divide-y divide-line-soft overflow-y-auto">
+          {visibles.map((p) => {
+            const i = enCurso.indexOf(p)
+            return (
+              <div key={i} className="group flex items-center gap-2.5 py-2.5 first:pt-0.5 last:pb-0.5">
+                <Avatar initials={p.initials} />
+                <Link to={`/patients/${slug(p.name)}`} className="min-w-0 flex-1">
+                  <p className="truncate text-[12.5px] font-bold text-ink group-hover:underline">{p.name}</p>
+                  <div className="mt-1 flex min-w-0 items-center gap-1.5">
+                    <span className="bg-dash-count-bg text-dash-blue-hover shrink-0 rounded-full px-1.5 py-[1px] text-[10px] font-semibold whitespace-nowrap">
+                      {p.operatory}
+                    </span>
+                    <span className="truncate text-[10.5px] text-ink-muted">{p.provider}</span>
+                  </div>
+                </Link>
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  <span className="text-[10px] whitespace-nowrap text-ink-faint">{p.time}</span>
+                  <button
+                    type="button"
+                    aria-label={`Check out ${p.name}`}
+                    onClick={() => setOcultos((prev) => new Set(prev).add(i))}
+                    className="flex size-6 items-center justify-center rounded-md text-ink-faint hover:bg-[#eef1f5] hover:text-ink"
+                  >
+                    <LogOut className="size-3.5" />
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      ) : (
+        <p className="px-1 py-3 text-[11.5px] text-ink-faint">No patients currently being seen.</p>
+      )}
+    </>
+  )
+
   if (recogido) {
+    /* La pestaña no se va al abrir (Julián, 2026-10-27, con un mockup): la card sale pegada al borde derecho,
+       arriba de la pestaña -o abajo, si la pestaña está en la mitad de arriba de la pantalla-, y la pestaña queda
+       con el chevron para el otro lado y el nombre a la vista. Otro clic en la pestaña, Escape o un clic afuera la
+       cierran. `ref` en un `contents`: tiene que cubrir la pestaña y la card, que son dos `fixed` separados. */
+    const arriba = pos.y + 16 > window.innerHeight / 2
+    const espacio = arriba ? pos.y - 8 : window.innerHeight - pos.y - 32 - 8
     return (
-      <button
-        type="button" onClick={() => { setRecogido(false); setAbierto(true) }} aria-label="Bring back currently being seen"
-        style={{ top: pos.y }}
-        className="group fixed right-0 z-[41] flex h-8 items-center gap-1.5 rounded-l-xl border border-r-0 border-line bg-white py-0 pr-3 pl-2.5 text-ink-muted shadow-sm hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
-      >
-        <ChevronLeft className="size-4 shrink-0" />
-        <UserRound className="size-3.5 shrink-0" />
-        <span className="max-w-0 overflow-hidden text-[13px] font-semibold whitespace-nowrap transition-[max-width] duration-200 group-hover:max-w-[70px]">
-          Patients
-        </span>
-      </button>
+      <div ref={ref} className="contents">
+        <button
+          type="button" onClick={() => setAbierto((v) => !v)} aria-expanded={abierto}
+          aria-label={abierto ? 'Hide currently being seen list' : 'Open currently being seen'}
+          style={{ top: pos.y }}
+          className="group fixed right-0 z-[41] flex h-8 items-center gap-1.5 rounded-l-xl border border-r-0 border-line bg-white py-0 pr-3 pl-2.5 text-ink-muted shadow-sm hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+        >
+          {abierto ? <ChevronRight className="size-4 shrink-0" /> : <ChevronLeft className="size-4 shrink-0" />}
+          <UserRound className="size-3.5 shrink-0" />
+          <span className={cn(
+            'overflow-hidden text-[13px] font-semibold whitespace-nowrap transition-[max-width] duration-200',
+            abierto ? 'max-w-[70px]' : 'max-w-0 group-hover:max-w-[70px]',
+          )}>
+            Patients
+          </span>
+        </button>
+        {abierto && (
+          <div
+            style={{ maxHeight: Math.min(360, espacio), ...(arriba ? { bottom: window.innerHeight - pos.y } : { top: pos.y + 32 }) }}
+            className={cn(
+              'motion-safe:animate-[panel-in_180ms_ease-out] fixed right-0 z-[41] flex w-[336px] max-w-full flex-col gap-2 overflow-hidden rounded-l-xl border border-r-0 border-line bg-white p-3 shadow-floating',
+              arriba ? 'rounded-br-none' : 'rounded-tr-none',
+            )}
+          >
+            {detalle}
+          </div>
+        )}
+      </div>
     )
   }
 
@@ -305,47 +383,7 @@ export function PatientInSessionPopup() {
             abierto ? 'max-h-[320px] opacity-100 delay-100' : 'pointer-events-none max-h-0 opacity-0',
           )}
         >
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-green uppercase">
-              <Radio className="size-3" /> Currently being seen
-            </div>
-            {hayEnCurso && <span className="text-[10px] font-semibold text-ink-faint">{visibles.length}</span>}
-          </div>
-
-          {hayEnCurso ? (
-            <div className="flex flex-col divide-y divide-line-soft overflow-y-auto">
-              {visibles.map((p) => {
-                const i = enCurso.indexOf(p)
-                return (
-                  <div key={i} className="group flex items-center gap-2.5 py-2.5 first:pt-0.5 last:pb-0.5">
-                    <Avatar initials={p.initials} />
-                    <Link to={`/patients/${slug(p.name)}`} className="min-w-0 flex-1">
-                      <p className="truncate text-[12.5px] font-bold text-ink group-hover:underline">{p.name}</p>
-                      <div className="mt-1 flex min-w-0 items-center gap-1.5">
-                        <span className="bg-dash-count-bg text-dash-blue-hover shrink-0 rounded-full px-1.5 py-[1px] text-[10px] font-semibold whitespace-nowrap">
-                          {p.operatory}
-                        </span>
-                        <span className="truncate text-[10.5px] text-ink-muted">{p.provider}</span>
-                      </div>
-                    </Link>
-                    <div className="flex shrink-0 flex-col items-end gap-1">
-                      <span className="text-[10px] whitespace-nowrap text-ink-faint">{p.time}</span>
-                      <button
-                        type="button"
-                        aria-label={`Check out ${p.name}`}
-                        onClick={() => setOcultos((prev) => new Set(prev).add(i))}
-                        className="flex size-6 items-center justify-center rounded-md text-ink-faint hover:bg-[#eef1f5] hover:text-ink"
-                      >
-                        <LogOut className="size-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          ) : (
-            <p className="px-1 py-3 text-[11.5px] text-ink-faint">No patients currently being seen.</p>
-          )}
+          {detalle}
         </div>
       </div>
     </div>
