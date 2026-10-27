@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-27
 
+### Las pestañas suben la mitad de lo que crece el panel al desplegarse ([#102](https://github.com/JulianGerardi/red-dental-studio/pull/102))
+- Con la card de Patients abierta todo quedaba muy abajo y la pestaña de Confibot caía lejos. Ahora la columna del
+  borde derecho sube la mitad de lo que crece el panel (siempre dentro de la ventana): en 1440×900 con Patients
+  abierto, la pestaña de Confibot queda en y=637 en vez de 814.
+- **Para el dev:** sólo `layout/DockFlotantes.tsx` (`top = baseY - crecimiento/2`). Documentado en `help.md`; Storybook
+  sin actualizar (pendiente de que Julián lo pida).
+
 ### Confibot: el botón abre y cierra, con ícono de colapsar, y la hoja sin cruz desde md ([#101](https://github.com/JulianGerardi/red-dental-studio/pull/101))
 - El ítem Confibot del sidebar abre y cierra el chat; activo muestra `PanelRightClose` (colapsar) en vez de `Bot` y el
   tooltip del rail dice "Hide Confibot".

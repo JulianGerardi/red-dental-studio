@@ -350,3 +350,11 @@ cruz de la hoja sobra, y conviene un ícono de colapsar mientras está activo pa
   dos cierran. Si se ve en otro ancho o navegador, anotarlo acá con el caso.
 - **A validar con usuarios:** si el cambio de ícono en el rail se entiende como "cerrar" o si confunde con salir de
   Confibot; alternativa: dejar `Bot` y sumar un chevron chico al lado (sólo con el sidebar expandido entra).
+
+## La columna sube la mitad de lo que crece (2026-10-27)
+
+Julián: con la card de Patients abierta, todo quedaba muy abajo y la pestaña de Confibot caía lejos. Ahora
+`DockFlotantes` sube la columna la mitad de lo que crece al desplegarse un panel (`top = baseY - crecimiento/2`, con
+66px = las dos pestañas como alto sin paneles), siempre dentro de la ventana: el crecimiento se reparte arriba y abajo.
+En 1440×900 con Patients abierto: Patients 249-281, Confibot 637-669 (antes 814-846); con Confibot abierto las pestañas
+quedan en 145-211 y la hoja en 213-773.
