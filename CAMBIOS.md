@@ -5,6 +5,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-27
 
+### Confibot: cerrar el chat ya no remonta el botón; ícono y tooltip de esconder más claros ([#92](https://github.com/JulianGerardi/red-dental-studio/pull/92))
+- Al cerrar el chat de Confibot, el círculo volvía a aparecer con la animación de "entra deslizándose desde el
+  borde" cada vez. Ahora reaparece quieto en el mismo lugar, igual que la pestaña de "currently being seen".
+- El botón de esconder (la flechita chica) cambia de una flecha simple a un ícono de "colapsar panel lateral", con
+  un tooltip ("Tuck away" / "Hide") para dejar claro que esconde el widget a un costado, no lo cierra. Mismo cambio
+  en los dos widgets.
+- **Para el dev:** `ConfibotLanzador` suma una prop `oculto` -se queda montado pero sin dibujarse mientras el chat
+  está abierto, en vez de que `AppShell` lo desmonte-, así no pierde la posición arrastrada ni reanima la entrada.
+  Documentado en `help.md`.
+
 ### Pestaña recogida de Confibot y "currently being seen": ícono, un clic para abrir ([#91](https://github.com/JulianGerardi/red-dental-studio/pull/91))
 - La pestaña escondida de los dos widgets ya no muestra el nombre siempre: va un ícono, y el nombre aparece recién
   al pasar el mouse. Al traerla de vuelta entra deslizándose desde el borde (no aparece de golpe ni se despliega
