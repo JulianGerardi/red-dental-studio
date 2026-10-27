@@ -93,12 +93,11 @@ export function AppShell() {
           saber quién está en el sillón esté donde esté navegando-. ClinicalMode
           queda afuera igual porque ese layout no pasa por AppShell. */}
       {/* Los dos flotantes recogidos viven en una columna pegada al borde derecho (DockFlotantes): Patients arriba, su
-          card abajo, la hoja de Confibot, y la pestaña de Confibot abajo de todo -cada panel empuja al otro-. Lo que
+          card abajo, la pestaña de Confibot y su hoja abajo de ella -cada panel empuja a lo que tiene abajo-. Lo que
           no está recogido (el círculo arrastrable) sigue siendo `fixed` y no depende de la columna. La columna arranca
           en la altura de Patients: su pestaña si está recogida, o abajo de su círculo (Julián, 2026-10-27). */}
       <DockFlotantes baseY={pacientesRect ? (pacientesRect.tab ? pacientesRect.y1 : pacientesRect.y2 + 8) : Math.round(window.innerHeight / 2 - 24)}>
         <PatientInSessionPopup onRect={setPacientesRect} />
-        <Confibot abierto={confibotAbierto} pos={confibotPos ?? undefined} acoplada={confibotRecogido} evitar={pacientesRect} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
         {/* Mientras habla un CoachMark el botón no se dibuja; con el chat abierto sigue montado (`oculto`) para no
             reanimarse al cerrarlo (ver `ConfibotLanzador`). */}
         {!explicando && (
@@ -113,6 +112,7 @@ export function AppShell() {
             onPosicion={setConfibotPos}
           />
         )}
+        <Confibot abierto={confibotAbierto} pos={confibotPos ?? undefined} acoplada={confibotRecogido} evitar={pacientesRect} onClose={closeConfibot} onShowOnScreen={showOnScreen} />
       </DockFlotantes>
     </div>
   )

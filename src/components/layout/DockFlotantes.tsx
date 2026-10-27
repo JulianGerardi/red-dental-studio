@@ -3,8 +3,8 @@ import { cn } from '@/lib/utils'
 
 /* Los flotantes recogidos (Patients y Confibot) viven en una columna pegada al borde derecho (Julián, 2026-10-27, tres
    capturas): por default las dos pestañas una abajo de la otra, y al abrir una, su hoja/card se despliega en la
-   columna y empuja a la otra pestaña -Patients arriba, su card abajo, y Confibot abajo de todo; la hoja de Confibot
-   queda entre las dos pestañas-. La columna se corre para arriba si no entra. Ver design-reference/figma/modulos/help.md. */
+   columna abajo de su pestaña -la de Confibot queda siempre pegada a la de Patients, así el botón de cerrar no se
+   aleja; la card de Patients sí empuja a la pestaña de Confibot-. La columna se corre para arriba si no entra. Ver design-reference/figma/modulos/help.md. */
 export function DockFlotantes({ baseY, children }: { baseY: number; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null)
   const [alto, setAlto] = useState(0)

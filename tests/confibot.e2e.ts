@@ -39,9 +39,11 @@ test('Por default las dos pestañas van una abajo de la otra, y al abrir Confibo
   const pacientesAbierto = await screen.getByRole('button', 'Open currently being seen').boundingBox()
   const hoja = await screen.getByText('Here to explain the app').boundingBox()
   const pestanaConfibot = await screen.getByRole('button', 'Hide Confibot chat').boundingBox()
-  /* Patients arriba, la hoja en el medio, la pestaña de Confibot abajo de todo: nada se pisa. */
-  expect(pacientesAbierto!.y + pacientesAbierto!.height).toBeLessThanOrEqual(hoja!.y)
-  expect(hoja!.y + hoja!.height).toBeLessThanOrEqual(pestanaConfibot!.y)
+  /* Patients arriba, la pestaña de Confibot pegada abajo de ella (el botón de cerrar no se aleja) y la hoja abajo de la
+     pestaña: nada se pisa. */
+  expect(pacientesAbierto!.y + pacientesAbierto!.height).toBeLessThanOrEqual(pestanaConfibot!.y)
+  expect(pestanaConfibot!.y - (pacientesAbierto!.y + pacientesAbierto!.height)).toBeLessThan(8)
+  expect(pestanaConfibot!.y + pestanaConfibot!.height).toBeLessThanOrEqual(hoja!.y)
 })
 
 test('En Scheduling la pestaña de Confibot no tapa el botón de Appointment requests', async ({ app, screen }) => {
