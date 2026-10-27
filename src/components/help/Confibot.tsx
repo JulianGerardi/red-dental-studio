@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from 're
 import { Bot, X, ArrowUp, Sparkles, ChevronRight, PanelRightClose, ChevronLeft } from 'lucide-react'
 import { TOPICS, MODULES, puntuarTema } from './topics'
 import { cn } from '@/lib/utils'
-import { useArrastrable, type Posicion } from '@/lib/useArrastrable'
+import { altoSinPisar, useArrastrable, type Posicion, type RectFlotante } from '@/lib/useArrastrable'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 /* Tamaño del botón cerrado (círculo): con esto alcanza para clampear el arrastre. */
@@ -118,7 +118,7 @@ const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-d
    `AppShell` guarda esa posición y se la pasa a `Confibot` (más abajo) para anclar la hoja ahí. Ver
    design-reference/figma/modulos/help.md. */
 export function ConfibotLanzador({
-  recogido, oculto = false, sobreFab = false, onAbrir, onRecoger, onTraer, onCerrar, onPosicion,
+  recogido, oculto = false, sobreFab = false, onAbrir, onRecoger, onTraer, onCerrar, onPosicion, onRect,
 }: {
   recogido: boolean
   /** Montado pero sin dibujarse -no lo reemplaza `AppShell` desmontándolo-, para no perder `pos` ni reanimar la
@@ -133,6 +133,8 @@ export function ConfibotLanzador({
   onCerrar?: () => void
   /** Dónde está el botón ahora, para que `Confibot` abra la hoja ahí en vez de siempre abajo a la derecha. */
   onPosicion?: (pos: Posicion) => void
+  /** El lugar que ocupa ahora (pestaña o círculo), para que el otro flotante no lo tape al abrir. */
+  onRect?: (r: RectFlotante) => void
 }) {
   /* El FAB de la página (Appointment requests, Scheduling): `right-8` + 60px, centro a 32+30=62px del borde
      derecho. Sobre ese FAB, Confibot se centra arriba (mismo eje x) en vez de pegarse al borde. */
@@ -152,6 +154,16 @@ export function ConfibotLanzador({
   })
 
   useEffect(() => { onPosicion?.(pos) }, [pos, onPosicion])
+
+  useEffect(() => {
+    if (!onRect) return
+    const avisar = () => onRect(recogido
+      ? { x1: window.innerWidth - 130, x2: window.innerWidth, y1: pos.y, y2: pos.y + 32 }
+      : { x1: pos.x, x2: pos.x + ANCHO_CERRADO, y1: pos.y, y2: pos.y + 28 + ALTO_CERRADO })
+    avisar()
+    window.addEventListener('resize', avisar)
+    return () => window.removeEventListener('resize', avisar)
+  }, [pos, recogido, onRect])
 
   if (oculto && !recogido) return null
 
@@ -218,7 +230,7 @@ export function ConfibotLanzador({
 }
 
 export function Confibot({
-  abierto, pos, acoplada = false, onClose, onShowOnScreen, historialInicial,
+  abierto, pos, acoplada = false, evitar, onClose, onShowOnScreen, historialInicial,
 }: {
   abierto: boolean
   /** Dónde está el botón flotante ahora mismo (`ConfibotLanzador`, vía `onPosicion`): la hoja ancla ahí en vez de
@@ -227,6 +239,8 @@ export function Confibot({
   /** El botón está recogido en la pestaña del borde: la hoja sale pegada al borde derecho, arriba (o abajo) de la
       pestaña, en vez de anclada a un círculo. */
   acoplada?: boolean
+  /** Lo que no hay que tapar: el otro flotante ("currently being seen"), a la vista aunque la hoja esté abierta. */
+  evitar?: RectFlotante | null
   onClose: () => void
   onShowOnScreen: (topicId: string) => void
   /** Sólo para mostrar estados en Storybook: arranca con esta conversación en vez de la guardada. */
@@ -307,7 +321,12 @@ export function Confibot({
     ...(acoplada ? { right: 0 } : haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
     ...(haciaArriba ? { bottom } : { top }),
   } : undefined
-  const altoHoja: CSSProperties | undefined = pos && esDesktop ? { height: Math.min(560, altoLibre) } : undefined
+  /* La hoja ocupa [x1, x1+400] en horizontal: pegada al borde si está acoplada, si no, desde `pos.x` o hasta su `right`. */
+  const x1Hoja = acoplada ? window.innerWidth - 400 : haciaIzquierda ? (pos?.x ?? 0) + ANCHO_CERRADO - 400 : (pos?.x ?? 0)
+  const anclaY = haciaArriba ? window.innerHeight - bottom : top
+  const altoHoja: CSSProperties | undefined = pos && esDesktop
+    ? { height: altoSinPisar({ x1: x1Hoja, ancho: 400, y: anclaY, haciaArriba, alto: Math.min(560, altoLibre), otro: evitar }) }
+    : undefined
   const esquinas = pos && esDesktop && acoplada
     ? (haciaArriba ? 'sm:rounded-tl-2xl sm:rounded-tr-2xl sm:rounded-bl-2xl' : 'sm:rounded-tl-2xl sm:rounded-tr-none sm:rounded-bl-2xl sm:rounded-br-2xl')
     : 'sm:rounded-2xl'

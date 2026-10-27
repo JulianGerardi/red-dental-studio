@@ -2,6 +2,24 @@ import { useCallback, useEffect, useRef, useState, type MouseEvent as ReactMouse
 
 export type Posicion = { x: number; y: number }
 
+/* El lugar que ocupa un flotante cerrado (pestaña o círculo), para que la hoja/card del otro no lo tape
+   (Julián, 2026-10-27: al abrir Confibot, la pestaña de "currently being seen" tiene que seguir a la vista). */
+export type RectFlotante = { x1: number; x2: number; y1: number; y2: number }
+
+/* Alto máximo de una hoja/card de `ancho` px que ocupa [y, y+alto] (o [y-alto, y] si `haciaArriba`) y arranca en `y`,
+   para no pisar a `otro`. Sólo cuenta si `otro` se cruza en horizontal con la hoja (x1..x1+ancho). Nunca baja de
+   `minimo`: una hoja inutilizable es peor que un roce. */
+export function altoSinPisar(
+  { x1, ancho, y, haciaArriba, alto, otro, margen = 8, minimo = 200 }:
+  { x1: number; ancho: number; y: number; haciaArriba: boolean; alto: number; otro?: RectFlotante | null; margen?: number; minimo?: number },
+) {
+  if (!otro || otro.x2 <= x1 || otro.x1 >= x1 + ancho) return alto
+  const lugar = haciaArriba
+    ? (otro.y2 <= y ? y - (otro.y2 + margen) : Infinity)
+    : (otro.y1 >= y ? otro.y1 - margen - y : Infinity)
+  return Math.max(minimo, Math.min(alto, lugar))
+}
+
 /* Posición libre de un flotante (Confibot, currently being seen): se arrastra con mouse o touch (Pointer Events,
    cubre los dos) y se guarda en localStorage, así sobrevive a la navegación y a recargar la página. Siempre clampeada
    adentro de la ventana, con un margen chico; si la ventana se achica (resize) se recalcula para que no quede
