@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-27
 
+### El banner de avisos colapsado dice "pending notifications" ([#100](https://github.com/JulianGerardi/red-dental-studio/pull/100))
+- Colapsado, el banner decía "4 pending tasks"; ahora dice "4 pending notifications" ("1 pending notification" en
+  singular). Quedó afuera de lo publicado antes.
+- **Para el dev:** sólo el texto en `NotificationBanner.tsx`. Documentado en `notifications.md`; la story del banner
+  (`NotificationBanner.stories.tsx`) todavía dice "pending tasks" -Storybook sin actualizar, pendiente de que Julián lo
+  pida-.
+
 ### Confibot: la pestaña azul queda pegada a la de Patients y la hoja se despliega abajo ([#99](https://github.com/JulianGerardi/red-dental-studio/pull/99))
 - Con el chat abierto, la pestaña azul de Confibot ya no baja al final de la columna: queda pegada abajo de la de
   Patients (como en el default) y la hoja se despliega abajo de ella, así el botón de cerrar no se aleja. La card de
