@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-27
 
-### Clinical Mode: los Edit con el orden del mockup y "Edit Finding" también en el diente ([#97](https://github.com/JulianGerardi/red-dental-studio/pull/97))
+### Clinical Mode: los Edit con el orden del mockup y "Edit Finding" también en el diente ([#98](https://github.com/JulianGerardi/red-dental-studio/pull/98))
 - Los datos de arriba van en este orden: nombre con su estado → Creation date → Fee (sólo procedimientos) → Exams →
   Provider → el área de tratamiento al final, con su ícono en el cuadrado azul (CON-3700).
 - El drawer de una condition en un diente se titula **Edit Finding** (antes "Edit Condition"): una condition
