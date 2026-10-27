@@ -230,3 +230,27 @@ Dos correcciones más de Julián sobre los dos widgets:
   la app para "colapsar un panel lateral" (Topbar, PatientSidePanel)-, con un tooltip (`ui/tooltip`, "Tuck away" /
   "Hide") porque una flecha sola no decía con claridad que esto manda el widget a una pestaña en el costado, no lo
   cierra ni lo borra. Mismo ícono y mismo tooltip en los dos widgets.
+
+## El chat de Confibot abre donde está el botón, no siempre abajo a la derecha (2026-10-27)
+
+Julián: la hoja de chat abría siempre en el mismo rincón fijo sin importar a dónde se hubiera arrastrado el botón
+-"debería abrir en el mismo lugar donde está", como ya hace la card de `PatientInSessionPopup` al abrirse en el
+lugar de su propia pestaña-.
+
+- **`ConfibotLanzador` avisa su posición hacia afuera** (`onPosicion`, un efecto que corre antes de cualquier
+  `return`, así se conoce incluso oculto o recogido). `AppShell` la guarda (`confibotPos`) y se la pasa a
+  `Confibot`. Storybook no pasa esta prop -las dos quedan opcionales, nada se rompe sin tocar `Confibot.stories.tsx`
+  y el `Specs`/`Parts` ahí documentados siguen siendo el fallback real-, así que ahí la hoja sigue cayendo en el
+  rincón fijo de siempre.
+- **Mismo criterio "hacia dónde hay más lugar" que `PatientInSessionPopup`** (`haciaIzquierda`/`haciaArriba` según
+  en qué mitad de la pantalla quedó el botón), sólo desde 640px -en celular la hoja sigue siendo la de abajo a
+  todo el ancho, arrastrar el botón importa menos en una pantalla angosta-. El ancla resta 28px (`ALTO_FLECHA_GAP`)
+  al `top`/suma al `bottom`: `pos` es la esquina del *wrapper* (incluye la flechita de esconder arriba del
+  círculo), no la del círculo en sí -mismo motivo por el que la card de `PatientInSessionPopup` tampoco arranca
+  pegada a `pos.y`-.
+- **La hoja, ahora en cualquier parte de la pantalla, puede terminar pasando por donde está la pestaña de
+  "currently being seen"** (las dos caen cerca del borde derecho por default). En vez de resolverlo moviendo una
+  u otra -con dos flotantes arrastrables de forma independiente, evitar todo cruce es mucho más que esta vuelta-,
+  `PatientInSessionPopup` sube de `z-30` a `z-[41]` (por encima del `z-40` de Confibot, por debajo del `z-50` de
+  drawers/diálogos): si se cruzan, "currently being seen" queda arriba y siempre se puede seguir viendo y
+  tocando, en vez de taparse del todo. No es un layout sin superposición, es "ninguno de los dos desaparece".

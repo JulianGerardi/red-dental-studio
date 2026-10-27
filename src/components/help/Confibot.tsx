@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Bot, X, ArrowUp, Sparkles, ChevronRight, PanelRightClose, ChevronLeft } from 'lucide-react'
 import { TOPICS, MODULES, puntuarTema } from './topics'
 import { cn } from '@/lib/utils'
@@ -108,10 +108,16 @@ const DEGRADE = 'bg-[linear-gradient(110deg,var(--color-dash-blue),var(--color-d
 
    El botón de esconder cambia de `ChevronDown` a `PanelRightClose` -mismo ícono que ya usa la app para "colapsar
    un panel lateral" (Topbar, PatientSidePanel)-, con un tooltip ("Tuck away") porque una flecha sola no decía
-   claramente que esto manda el widget a un costado, no lo cierra. Mismo cambio en `PatientInSessionPopup`. Ver
+   claramente que esto manda el widget a un costado, no lo cierra. Mismo cambio en `PatientInSessionPopup`.
+
+   `onPosicion` avisa a `AppShell` dónde está el botón ahora (Julián, 2026-10-27: la hoja de chat abría siempre
+   abajo a la derecha, sin importar a dónde se hubiera arrastrado el botón -"debería abrir en el mismo lugar donde
+   está", como ya hace la card de `PatientInSessionPopup`-). Se llama en un efecto, antes de cualquier return, para
+   que corra también mientras `oculto` o `recogido` -la posición hay que conocerla siempre, no sólo en reposo-.
+   `AppShell` guarda esa posición y se la pasa a `Confibot` (más abajo) para anclar la hoja ahí. Ver
    design-reference/figma/modulos/help.md. */
 export function ConfibotLanzador({
-  recogido, oculto = false, sobreFab = false, onAbrir, onRecoger, onTraer,
+  recogido, oculto = false, sobreFab = false, onAbrir, onRecoger, onTraer, onPosicion,
 }: {
   recogido: boolean
   /** Montado pero sin dibujarse -no lo reemplaza `AppShell` desmontándolo-, para no perder `pos` ni reanimar la
@@ -121,6 +127,8 @@ export function ConfibotLanzador({
   onAbrir: () => void
   onRecoger: () => void
   onTraer: () => void
+  /** Dónde está el botón ahora, para que `Confibot` abra la hoja ahí en vez de siempre abajo a la derecha. */
+  onPosicion?: (pos: Posicion) => void
 }) {
   /* El FAB de la página (Appointment requests, Scheduling): `right-8` + 60px, centro a 32+30=62px del borde
      derecho. Sobre ese FAB, Confibot se centra arriba (mismo eje x) en vez de pegarse al borde. */
@@ -138,6 +146,8 @@ export function ConfibotLanzador({
     defecto,
     onTap: onAbrir,
   })
+
+  useEffect(() => { onPosicion?.(pos) }, [pos, onPosicion])
 
   if (oculto) return null
 
@@ -194,9 +204,12 @@ export function ConfibotLanzador({
 }
 
 export function Confibot({
-  abierto, onClose, onShowOnScreen, historialInicial,
+  abierto, pos, onClose, onShowOnScreen, historialInicial,
 }: {
   abierto: boolean
+  /** Dónde está el botón flotante ahora mismo (`ConfibotLanzador`, vía `onPosicion`): la hoja ancla ahí en vez de
+      siempre abajo a la derecha. Sin esto (p. ej. en Storybook, que no pasa esta prop) cae al rincón de siempre. */
+  pos?: Posicion
   onClose: () => void
   onShowOnScreen: (topicId: string) => void
   /** Sólo para mostrar estados en Storybook: arranca con esta conversación en vez de la guardada. */
@@ -228,8 +241,34 @@ export function Confibot({
 
   const preguntas = historial.filter((m) => m.de === 'user').length
 
+  /* Desde 640px, si hay `pos` (el botón real, no Storybook), la hoja ancla ahí en vez de siempre abajo a la
+     derecha: mismo criterio de "hacia dónde hay más lugar" que usa PatientInSessionPopup (la mitad de pantalla en
+     la que quedó el botón), así nunca se abre hacia el borde más cerca. En celular sigue siendo la hoja de abajo
+     a todo el ancho, sin importar `pos` -dónde se arrastró el botón importa menos en una pantalla angosta-.
+
+     `pos` es la esquina del wrapper de `ConfibotLanzador`, no la del círculo: arriba del círculo va la flechita
+     de esconder (24px) + el gap (4px, `gap-1`) -el mismo offset que tiene PatientInSessionPopup, por eso su card
+     abierta tampoco arranca pegada a `pos.y`-. Sin este offset la hoja quedaba 28px más arriba que el círculo que
+     la abrió. */
+  const ALTO_FLECHA_GAP = 28
+  const esDesktop = window.innerWidth >= 640
+  const haciaIzquierda = pos ? pos.x + ANCHO_CERRADO / 2 > window.innerWidth / 2 : false
+  const haciaArriba = pos ? pos.y + ALTO_FLECHA_GAP + ALTO_CERRADO / 2 > window.innerHeight / 2 : false
+  const anclaPos: CSSProperties | undefined = pos && esDesktop ? {
+    ...(haciaIzquierda ? { right: window.innerWidth - pos.x - ANCHO_CERRADO } : { left: pos.x }),
+    ...(haciaArriba
+      ? { bottom: window.innerHeight - pos.y - ALTO_FLECHA_GAP - ALTO_CERRADO }
+      : { top: pos.y + ALTO_FLECHA_GAP }),
+  } : undefined
+
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 flex justify-center sm:inset-x-auto sm:right-6 sm:bottom-6">
+    <div
+      className={cn(
+        'fixed inset-x-0 bottom-0 z-40 flex justify-center',
+        pos ? 'sm:inset-x-auto sm:bottom-auto' : 'sm:inset-x-auto sm:right-6 sm:bottom-6',
+      )}
+      style={anclaPos}
+    >
       <div className="motion-safe:[animation:sheet-in_220ms_ease-out] flex h-[min(560px,82svh)] w-full flex-col overflow-hidden rounded-t-2xl border border-line bg-white shadow-floating sm:max-w-[400px] sm:rounded-2xl">
         <span aria-hidden className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-line sm:hidden" />
 
