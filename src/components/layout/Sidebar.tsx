@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   GalleryVerticalEnd, House, Users, CalendarRange, CreditCard,
-  MessageSquare, Phone, Files, ChartPie, CircleHelp, Settings, Bot,
+  MessageSquare, Phone, Files, ChartPie, CircleHelp, Settings, Bot, PanelRightClose,
   ChevronRight, ChevronDown, type LucideIcon,
 } from 'lucide-react'
 import { SETTINGS_NAV } from '@/data/settings-nav'
@@ -140,9 +140,9 @@ export function Sidebar({
             </NavLink>
           </ConTooltip>
         ))}
-        {/* No es una ruta: abre la misma hoja de chat que el botón flotante de
-            Confibot, y es el camino que queda cuando ese botón está recogido. */}
-        <ConTooltip label="Confibot" mostrar={!expanded}>
+        {/* No es una ruta: abre y cierra la misma hoja de chat que el botón flotante de
+            Confibot. Activo muestra el ícono de colapsar, así se lee que otro clic la cierra (help.md, 2026-10-27). */}
+        <ConTooltip label={confibotAbierto ? 'Hide Confibot' : 'Confibot'} mostrar={!expanded}>
           <button
             type="button"
             aria-label="Confibot"
@@ -151,7 +151,7 @@ export function Sidebar({
             onClick={toggleConfibot}
             className={item(confibotAbierto)}
           >
-            <Bot className="size-4 shrink-0" />
+            {confibotAbierto ? <PanelRightClose className="size-4 shrink-0" /> : <Bot className="size-4 shrink-0" />}
             <span className={cn(expanded ? '' : 'md:hidden')}>Confibot</span>
           </button>
         </ConTooltip>
