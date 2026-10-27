@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown, ChevronLeft, ChevronRight, LogOut, Radio, UserRound } from 'lucide-react'
+import { ChevronLeft, ChevronRight, LogOut, PanelRightClose, Radio, UserRound } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { HOY_DEMO, datosDelDia } from '@/components/dashboard/dashboard-data'
 import { Avatar } from '@/components/ui/avatar'
 import { useArrastrable, type Posicion } from '@/lib/useArrastrable'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 /* Tamaño de la pestaña cerrada: con esto alcanza para clampear el arrastre (ver 6. abajo). */
 const ANCHO_CERRADO = 46
@@ -111,9 +112,9 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
         uno largo la mueve -no hace falta un modo "arrastre" aparte-.
 
    7. Misma funcionalidad de esconder que Confibot (Julián, 2026-10-26):
-      flechita chica arriba del avatar (`ChevronDown`, igual estética que la
-      de Confibot) que la manda a una pestaña angosta pegada al costado
-      derecho -mismo patrón que `recogido` en Confibot.tsx, no comparten
+      flechita chica arriba del avatar (igual estética que la de Confibot)
+      que la manda a una pestaña angosta pegada al costado derecho -mismo
+      patrón que `recogido` en Confibot.tsx, no comparten
       código porque cada una coordina estados propios (acá no hay nada
       externo que avisar; Confibot sí, por la hoja de chat aparte)-. Se
       recuerda entre visitas (`confidentally.patient-popup-tucked` en
@@ -133,7 +134,12 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
    9. Ese clic trae la pestaña Y la abre de una (Julián, 2026-10-26: no
       tenía que hacer falta un segundo clic sobre el avatar para recién ahí
       ver el popup). `setAbierto(true)` junto con `setRecogido(false)` en el
-      mismo handler. */
+      mismo handler.
+   10. El botón de esconder cambia de `ChevronDown` a `PanelRightClose`
+      (Julián, 2026-10-27: una flecha sola no decía que esto manda el
+      widget a un costado, no lo cierra) -mismo ícono que ya usa la app
+      para "colapsar un panel lateral" (Topbar, PatientSidePanel)-, con un
+      tooltip ("Hide") por la misma razón. Mismo cambio en Confibot.tsx. */
 export function PatientInSessionPopup() {
   const enCurso = useMemo(
     () => datosDelDia(HOY_DEMO).appointments.filter((a) => !a.completado),
@@ -209,13 +215,20 @@ export function PatientInSessionPopup() {
         ...(abierto && haciaArriba ? { bottom: window.innerHeight - pos.y - ALTO_CERRADO } : { top: pos.y }),
       }}
     >
-      {/* 24px a la vista, 40px de área de toque -mismo patrón que la flechita de Confibot-. */}
-      <button
-        type="button" onClick={() => setRecogido(true)} aria-label="Hide currently being seen"
-        className="relative flex size-6 items-center justify-center rounded-full border border-line bg-white text-ink-muted shadow-sm before:absolute before:-inset-2 before:content-[''] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
-      >
-        <ChevronDown className="size-3.5" />
-      </button>
+      {/* 24px a la vista, 40px de área de toque -mismo patrón que el botón de esconder de Confibot-. */}
+      <TooltipProvider delayDuration={200}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button" onClick={() => setRecogido(true)} aria-label="Hide currently being seen"
+              className="relative flex size-6 items-center justify-center rounded-full border border-line bg-white text-ink-muted shadow-sm before:absolute before:-inset-2 before:content-[''] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-ring"
+            >
+              <PanelRightClose className="size-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="left" className="bg-ink text-white">Hide</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       {/* El ancho (y, si hace falta, el alto) son lo único que anima: crece desde la pestaña (46px) hasta la card
           completa (336px), hacia el lado con más lugar -no siempre a la izquierda, desde que es arrastrable-.
 

@@ -89,10 +89,14 @@ export function AppShell() {
           saber quién está en el sillón esté donde esté navegando-. ClinicalMode
           queda afuera igual porque ese layout no pasa por AppShell. */}
       <PatientInSessionPopup />
-      {/* Mientras habla la hoja de chat o un CoachMark, que ocupan su esquina, el botón no se dibuja. */}
-      {!confibotAbierto && !explicando && (
+      {/* Mientras habla la hoja de chat, el botón queda montado pero oculto (`oculto`, no un desmonte): así al
+          cerrar el chat reaparece quieto en el lugar donde estaba, en vez de reanimarse como si volviera de estar
+          recogido (Julián, 2026-10-27; ver el comentario de `ConfibotLanzador`). Mientras habla un CoachMark sigue
+          desmontándose -es un caso mucho menos frecuente, y de todos modos vuelve a la misma posición guardada-. */}
+      {!explicando && (
         <ConfibotLanzador
           recogido={confibotRecogido}
+          oculto={confibotAbierto}
           sobreFab={fabDePagina}
           onAbrir={openConfibot}
           onRecoger={() => setConfibotRecogido(true)}
