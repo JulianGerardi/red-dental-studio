@@ -53,7 +53,8 @@ const GRUPOS: { titulo: string; filtro: (d: DocPendiente) => boolean; color: str
 
 export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES, llenar }: {
   docs?: DocPendiente[]
-  /** Dentro de una card `flex-1`: llena el alto que le toca, muestra las filas que entran y "Show N more" abre el resto con scroll adentro. */
+  /** Dentro de una card `flex-1`: llena el alto que le toca, muestra las filas que entran y el resto se carga solo al
+      acercarse al final del scroll, sin botón -mismo comportamiento que Pending Task (patient-dashboard.md, 2026-10-28). */
   llenar?: boolean
 }) {
   const { docs, resolver } = useDocsPendientes(iniciales)
@@ -81,7 +82,7 @@ export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES, llenar }: 
         <EmptyState icon={Inbox} title="Nothing to resolve" detail="Every document of this patient is signed, uploaded and up to date." className="py-8" />
       ) : (
         /* Los primeros TOPE documentos, en el orden de los grupos; "Show N more" abre el resto con scroll (ui/show-more). */
-        <ShowMore total={visibles.length} limit={TOPE} enCaja={llenar} llenarAlto={llenar} filas={llenar ? 'li' : undefined} label="pending documents" className="flex flex-col gap-4">
+        <ShowMore total={visibles.length} limit={TOPE} enCaja={llenar} llenarAlto={llenar} filas={llenar ? 'li' : undefined} cargarAlScroll={llenar} label="pending documents" className="flex flex-col gap-4">
           {(n) => {
             const enOrden = GRUPOS.flatMap((g) => visibles.filter(g.filtro)).slice(0, n)
             return GRUPOS.map((g) => {

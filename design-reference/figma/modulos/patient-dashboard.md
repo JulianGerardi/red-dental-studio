@@ -391,8 +391,9 @@ filtrar").
    cuántas filas entran (para que asome un poco de la próxima y se note que hay más) y, al acercarse al final, suma
    otra tanda hasta mostrarlas todas. Nada de paginar contra un backend: son las mismas tareas ya cargadas, mostrando
    más de a poco. El degradé de abajo (ya existía) sigue avisando que falta; sin botón no hay "Show less" -no hace
-   falta, no crece la card-. Sólo lo lleva Pending Task: Pending documents y el Pending Task del Dashboard siguen con
-   el botón, que ahí sigue andando bien.
+   falta, no crece la card-. ~~Sólo lo lleva Pending Task: Pending documents y el Pending Task del Dashboard siguen
+   con el botón, que ahí sigue andando bien.~~ Pending documents se suma el mismo día (ver más abajo); el Pending
+   Task del Dashboard sigue con el botón.
 3. La región sigue siendo alcanzable con Tab y navegable con flechas/Page Down (son las mismas que ya disparan
    `onScroll`), así que el teclado también carga más. Lo que un lector de pantalla no tiene es un control explícito
    tipo "cargar todo": antes "Show N more" lo anunciaba con `aria-expanded`; ahora depende de que el usuario scrollee
@@ -405,3 +406,18 @@ filtrar").
 `tests/patient-overview.e2e.ts`: el test de layout ya no espera dos "Show N more" (uno solo, el de Pending documents) y
 un test nuevo prueba que *Filter tasks* acota a 2 tareas en Referrals, *Clear all* vuelve a las 9, y que dentro de la
 caja de Pending Task no hay botón.
+
+## Pending documents se suma al scroll de Pending Task (2026-10-28)
+
+Julián, sobre el punto 2 de arriba: el *Show more* de Pending documents "se ve mal porque no podés ver más cards"; pidió
+que las dos cards tengan **la misma funcionalidad de scroll**, fluida.
+
+- `PendingDocuments` suma `cargarAlScroll={llenar}` a su `ShowMore` -mismo condicional que ya usaba para `enCaja` /
+  `llenarAlto` / `filas="li"`-, así que se activa en el mismo lugar donde hoy se activa `llenar` (`PatientDetail.tsx`,
+  junto a Pending Task). Ningún cambio de lógica nuevo: es la pieza que ya se armó para Pending Task, aplicada acá.
+- Con los 6 documentos de la demo entran los seis sin necesitar scroll a 1519×829 -ya no hay botón ni degradé-, así
+  que para ver la carga por tandas hace falta una pantalla más baja o más documentos; igual que Pending Task, con
+  pantallas bajas sigue sumando de a tandas en vez de saltar a todos de una.
+- `tests/patient-overview.e2e.ts`: el test de layout pasa a esperar **cero** "Show N more" en toda la pantalla (antes
+  esperaba uno, el de Pending documents) y un test nuevo prueba que Pending documents tiene la misma caja scrolleable
+  con nombre ("All pending documents") que Pending Task, sin botón.
