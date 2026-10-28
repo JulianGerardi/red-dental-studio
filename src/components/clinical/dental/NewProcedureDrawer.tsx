@@ -46,10 +46,11 @@ export type ProcedureDraft = {
 type Paso = 'Procedure' | 'Surfaces' | 'Descriptors' | 'Link to finding' | 'Link to diagnosis'
 
 /* Drawer a la derecha, a pedido de Julián (Figma UX-UI 2.0, 1669:87207 y 1669:87208): el chart queda a la vista mientras
-   se carga. Add Procedure abre en Planned; Add Condition, en Existing (algo que el paciente ya tiene hecho). Ver
-   design-reference/figma/modulos/clinical-mode.md. */
+   se carga. Add Procedure abre en Planned; Add Condition, en Existing (algo que el paciente ya tiene hecho). Con
+   `regiones` (Extraoral, Intraoral) se carga sobre las regiones del gráfico, como en red.dev: sin alcance por diente
+   ni paso Surfaces (clinical-mode.md, 2026-10-28). Ver design-reference/figma/modulos/clinical-mode.md. */
 export function NewProcedureDrawer({
-  open, mode = 'procedure', area, teeth, findings, onClose, onSave, onLink,
+  open, mode = 'procedure', area, teeth, regiones, onRemoveRegion, findings, onClose, onSave, onLink,
 }: {
   open: boolean
   /** De qué botón se abrió: cambia el título y la pestaña con que arranca la búsqueda. */
@@ -58,6 +59,9 @@ export function NewProcedureDrawer({
   area: string
   /** Dientes contra los que se puede cargar el procedimiento; el del medio arranca elegido. */
   teeth: number[]
+  /** Extraoral e Intraoral: las regiones elegidas en el gráfico; reemplazan el área y los dientes. */
+  regiones?: string[]
+  onRemoveRegion?: (region: string) => void
   /** Los hallazgos del examen, para vincularlos en el último paso. */
   findings: Finding[]
   onClose: () => void
@@ -91,7 +95,8 @@ export function NewProcedureDrawer({
   }, [open])
 
   const procedure = PROCEDURES.find((p) => p.code === code) ?? null
-  const conSuperficies = procedure?.area === 'Surface'
+  const porRegion = regiones !== undefined
+  const conSuperficies = !porRegion && procedure?.area === 'Surface'
   const pasosBase: Paso[] = ['Procedure', ...(conSuperficies ? ['Surfaces' as const] : []), ...(mode === 'condition' ? ['Descriptors' as const] : [])]
   const pasosVinculo: Paso[] = status === 'Planned' ? ['Link to finding', 'Link to diagnosis'] : []
   const pasos: Paso[] = creadoId ? [...pasosBase, ...pasosVinculo] : pasosBase
@@ -107,7 +112,7 @@ export function NewProcedureDrawer({
   function elegirDeBusqueda(p: ProcedureOption) {
     if (!coincide(p, status)) { setGroup('All'); setAreas([]) }
     setCode(p.code)
-    if (p.area === 'Surface') setScope('Surface')
+    if (!porRegion && p.area === 'Surface') setScope('Surface')
     setTimeout(() => document.querySelector(`[data-codigo="${p.code}"]`)?.scrollIntoView({ block: 'nearest' }), 0)
   }
 
@@ -137,7 +142,7 @@ export function NewProcedureDrawer({
   function crear() {
     if (!procedure) return
     const id = onSave({
-      procedure, status, scope, area: keepArea ? area : 'Full mouth', tooth: current,
+      procedure, status, scope, area: porRegion ? regiones.join(', ') : keepArea ? area : 'Full mouth', tooth: porRegion ? null : current,
       surfaces: conSuperficies ? currentSurfaces : [], linked: [], diagnoses: [],
       descriptors: mode === 'condition' ? descriptors : {},
     })
@@ -151,7 +156,7 @@ export function NewProcedureDrawer({
   }
 
   /* El pie de todos los drawers (como en Confidentally 2.0): Cancel o Return a la izquierda, Next Step o Save a la derecha. */
-  const bloqueado = (actual === 'Procedure' && !procedure) || (actual === 'Surfaces' && !hayAlguna)
+  const bloqueado = (actual === 'Procedure' && (!procedure || (porRegion && !regiones.length))) || (actual === 'Surfaces' && !hayAlguna)
   const footer = (
     <DrawerActions
       step={paso} total={pasos.length} onNext={() => setPaso(paso + 1)} onBack={() => setPaso(paso - 1)} onCancel={onClose} onSave={creadoId ? vincular : crear}
@@ -165,8 +170,14 @@ export function NewProcedureDrawer({
         {actual === 'Procedure' && (
           <div className="flex w-full flex-col items-start gap-4">
             <div className="flex w-full flex-col items-start gap-2 border-b border-line pb-4">
-              <FieldLabel>Selected area</FieldLabel>
-              {keepArea ? (
+              <FieldLabel required={porRegion}>Selected area</FieldLabel>
+              {porRegion ? (
+                <div className="flex w-full flex-wrap gap-2">
+                  {regiones.length
+                    ? regiones.map((r) => <Chip key={r} removeLabel={`Remove ${r}`} onRemove={() => onRemoveRegion?.(r)}>{r}</Chip>)
+                    : <span className="text-xs font-medium text-ink-faint">Select at least one area on the chart.</span>}
+                </div>
+              ) : keepArea ? (
                 <Chip removeLabel={`Remove ${area}`} onRemove={() => setKeepArea(false)}>{area}</Chip>
               ) : (
                 <span className="text-xs font-medium text-ink-faint">Full mouth</span>
@@ -206,9 +217,9 @@ export function NewProcedureDrawer({
                   <div key={p.code} data-codigo={p.code} className="w-full">
                   <ProcedureRow
                     procedure={p} estado={on ? 'selected' : 'default'}
-                    scopes={SCOPES.filter((s) => s !== 'Surface' || p.area === 'Surface')}
+                    scopes={porRegion ? [] : SCOPES.filter((s) => s !== 'Surface' || p.area === 'Surface')}
                     scope={on ? scope : null}
-                    onSelect={() => { setCode(p.code); if (p.area === 'Surface') setScope('Surface') }}
+                    onSelect={() => { setCode(p.code); if (!porRegion && p.area === 'Surface') setScope('Surface') }}
                     onScope={(s) => { setCode(p.code); setScope(s) }}
                   />
                   </div>

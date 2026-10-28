@@ -2824,3 +2824,32 @@ es innecesario el ícono, porque el ícono de la location ya lo pusiste en el to
 - Anomalía: el Figma 5301:149072 pone el ícono del diente delante del nombre; acá se saca para no duplicar el dato.
 
 Código: `clinical/dental/{DatosHallazgo,EditConditionDrawer}.tsx`.
+
+## Extraoral e Intraoral: sin región elegida no se carga nada (2026-10-28)
+
+**CON-1398 ([Intra Oral / Extra Oral] Add Finding), CON-1401 ([Intra Oral / Extra Oral] Exam), CON-881, CON-882.**
+Julián: "en red.dev, en el flujo de Add Condition y Add Procedure hay una validación antes que te dice que no podés
+cargar una condition sin antes seleccionar una parte de la cabeza (para ambos exámenes va esto)".
+
+- **Validación:** en Extraoral e Intraoral, Add Condition y Add Procedure sin ninguna región elegida no abren el drawer;
+  avisan con un toast de advertencia: "Select at least one area on the chart to add a condition." / "…to add a
+  procedure." (mismo patrón que "Select at least one document to download." de Documents). Lo resuelve `ExamLayout`
+  con la prop `regiones`, así vale para los dos botones y los dos exámenes.
+- **Add Procedure va a la región.** Hasta ahora, en estos exámenes Add Procedure abría el New Procedure de diente
+  ("Upper left", dientes del cuadrante). Las grabaciones de red.dev (2026-10-24) muestran New Procedure con "Selected
+  area: Right Malar Region ×": se carga sobre las regiones del gráfico. Ahora `NewProcedureDrawer` con `regiones`
+  muestra esas regiones como chips (requeridas, se pueden sacar), sin los íconos de alcance por diente ni el paso
+  Surfaces, y guarda `area` = las regiones y `treatmentArea` = Extraoral/Intraoral con ese valor (CON-3700).
+- **Si se sacan todas las regiones dentro del drawer** (New Condition o New Procedure), en lugar de los chips dice
+  "Select at least one area on the chart." y no deja avanzar ni guardar.
+- **Se va "Not Localized".** Anomalía / conflicto con Jira: CON-1398 y CON-1401 dicen que sin locación elegida se usa
+  `"Not Localized"`; red.dev hoy valida, y Julián pidió seguir a red.dev. En las grabaciones del 2026-10-24 red.dev
+  todavía abría los dos drawers sin región, así que la validación es posterior. Conviene que la historia se actualice
+  (no se tocó Jira: es sólo lectura).
+- **Texto a confirmar:** no se pudo entrar a red.dev (pide login) para copiar el mensaje exacto de la validación; el
+  texto de arriba es provisorio hasta tener una captura.
+- **FindingCard** ya no muestra "Descriptors:" vacío: la línea aparece sólo si hay descriptores (una condition sin
+  descriptores o un procedimiento por región dejaban el rótulo solo).
+
+Código: `clinical/{ExamLayout,RegionExam}.tsx`, `clinical/dental/{NewProcedureDrawer,RegionConditionDrawer,FindingCard}.tsx`,
+`tests/clinical-mode.e2e.ts`.
