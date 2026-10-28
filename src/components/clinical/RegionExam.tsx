@@ -12,8 +12,9 @@ const ACTIVOS = new Set(['Active', 'Monitoring', 'In Treatment'])
 
 /* Extraoral e Intraoral: un gráfico de regiones reemplaza el odontograma. Clickear una región la agrega a "pending"
    -se puede elegir más de una antes de cargar la condition-; Add Condition abre el drawer propio (RegionConditionDrawer,
-   por región, no por diente) con lo ya elegido. Sin región elegida se carga como "Not Localized" (CON-881/CON-882).
-   Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24).
+   por región, no por diente) con lo ya elegido, y Add Procedure, New Procedure sobre esas regiones. Sin región elegida
+   ninguno de los dos abre: avisa que hay que elegir una (red.dev, Julián 2026-10-28; Jira CON-1398 decía "Not
+   Localized"). Ver design-reference/figma/modulos/clinical-mode.md (2026-10-24 y 2026-10-28).
 
    Necesita su propio ExamFindingsProvider (a diferencia de DentAssmt): se guarda directo con `setFindings`, así que
    hace falta el `estado` del contexto. Dentro de ClinicalMode ya hay un provider puesto (no se anida, es el mismo);
@@ -51,7 +52,7 @@ function RegionExamInterno<R extends string>({ examen, diagrama }: { examen: str
   function guardar(draft: RegionConditionDraft) {
     const id = `F-${Date.now()}`
     const descriptor = textoDescriptores(draft.descriptors)
-    const area = draft.regions.length ? draft.regions.join(', ') : 'Not Localized'
+    const area = draft.regions.join(', ')
     estado.setFindings((f) => [
       {
         id,
@@ -78,7 +79,10 @@ function RegionExamInterno<R extends string>({ examen, diagrama }: { examen: str
   }
 
   return (
-    <ExamLayout examen={examen} onCondicion={() => setOpen(true)}>
+    <ExamLayout
+      examen={examen} onCondicion={() => setOpen(true)}
+      regiones={{ elegidas: pending, quitar: (r) => alternar(r as R), limpiar: () => setPending([]), tipo: examen === 'Extraoral' ? 'Extraoral' : 'Intraoral' }}
+    >
       <div className="rounded-xl border border-line bg-white p-6" style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fff' }}>
         {diagrama({ pending, active: [...activas] as R[], onToggle: alternar })}
       </div>

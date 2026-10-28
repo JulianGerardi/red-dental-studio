@@ -73,7 +73,10 @@ export const useUltimaCondicion = () => useContext(FindingsCtx)?.ultima ?? ULTIM
    Intraoral: por región, no por diente). Sin provider (un story), nada -ese examen no corre fuera de ClinicalMode. */
 export const useFindingsEstado = () => useContext(FindingsCtx)
 
-export function ExamLayout({ findings: conFindings = true, examen, extra, onCondicion, children }: {
+/** Extraoral e Intraoral: las regiones elegidas en el gráfico, sobre las que se carga lo nuevo. */
+export type RegionesElegidas = { elegidas: string[]; quitar: (region: string) => void; limpiar: () => void; tipo: 'Extraoral' | 'Intraoral' }
+
+export function ExamLayout({ findings: conFindings = true, examen, extra, onCondicion, regiones, children }: {
   /** El panel de Findings a la izquierda. Vitals no lo lleva. */
   findings?: boolean
   /** El examen, como lo nombra la Problem List: es el Source exam de lo que se carga acá. */
@@ -83,6 +86,9 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
   /** Reemplaza el drawer genérico de Add Condition (NewProcedureDrawer, por diente) por el propio del examen -
      Extraoral e Intraoral cargan por región, no por pieza. Ver ExtraOralExam.tsx. */
   onCondicion?: () => void
+  /** Con regiones, Add Procedure y Add Condition piden al menos una elegida (red.dev, Julián 2026-10-28) y New
+     Procedure se carga sobre ellas en vez de sobre un diente. */
+  regiones?: RegionesElegidas
   children: ReactNode
 }) {
   /* Fuera de ClinicalMode (un story) no hay provider: el examen usa su propio estado. */
@@ -99,28 +105,39 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
 
   function saveProcedure(draft: ProcedureDraft) {
     const id = `F-${Date.now()}`
-    const tooth = draft.tooth
+    const tooth = regiones ? null : draft.tooth
     const esCondicion = procedureOpen === 'condition'
+    const area = regiones ? regiones.elegidas.join(', ') : tooth !== null ? `Tooth ${tooth}` : draft.area
     const descriptorTexto = esCondicion ? textoDescriptores(draft.descriptors) : ''
     setFindings((f) => [
       {
         id,
-        area: tooth !== null ? `Tooth ${tooth}` : draft.area,
+        area,
         condition: `${draft.procedure.code} - ${draft.procedure.label}`,
-        descriptor: descriptorTexto || draft.surfaces.join(', ') || draft.scope,
+        descriptor: descriptorTexto || draft.surfaces.join(', ') || (regiones ? '' : draft.scope),
         date: HOY, status: draft.status === 'Existing' ? 'Externally Treated' : 'Active', tooth, provider: 'Elena Martinez',
         surfaces: draft.surfaces, notes: '', linked: draft.linked, diagnoses: draft.diagnoses, examen,
         kind: procedureOpen ?? 'procedure', descriptors: esCondicion ? draft.descriptors : undefined,
         fee: esCondicion ? undefined : precioUcr(draft.procedure.code),
-        treatmentArea: areaDeAlcance(draft.scope, draft.area, tooth),
+        treatmentArea: regiones ? { tipo: regiones.tipo, valor: area } : areaDeAlcance(draft.scope, draft.area, tooth),
       },
       ...f,
     ])
     if (procedureOpen === 'condition') {
       setUltima({ condicion: draft.procedure.label, actualizado: new Date().toLocaleDateString('en-GB'), pieza: tooth, examen })
     }
-    aviso.ok(`${draft.procedure.code} charted as ${draft.status.toLowerCase()} on ${tooth !== null ? `tooth ${tooth}` : draft.area.toLowerCase()}.`)
+    aviso.ok(`${draft.procedure.code} charted as ${draft.status.toLowerCase()} on ${regiones ? area : tooth !== null ? `tooth ${tooth}` : draft.area.toLowerCase()}.`)
     return id
+  }
+
+  /** Add Procedure / Add Condition. En Extraoral e Intraoral, sin región elegida avisa en vez de abrir. */
+  function abrir(modo: 'procedure' | 'condition') {
+    if (regiones && !regiones.elegidas.length) {
+      aviso.warn(`Select at least one area on the chart to add a ${modo}.`)
+      return
+    }
+    if (modo === 'condition' && onCondicion) onCondicion()
+    else setProcedureOpen(modo)
   }
 
   /** Link to finding / Link to diagnosis: se guardan sobre el procedimiento ya cargado con saveProcedure. */
@@ -186,7 +203,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
               <button
                 type="button"
                 aria-label={label}
-                onClick={modo ? () => (modo === 'condition' && onCondicion ? onCondicion() : setProcedureOpen(modo)) : undefined}
+                onClick={modo ? () => abrir(modo) : undefined}
                 className={cn(BOTON_ACCION, !modo && problemas && 'border-dash-blue bg-dash-count-bg text-dash-blue-hover hover:bg-dash-count-bg')}
               >
                 <Icono className="size-[18px] shrink-0" />
@@ -225,8 +242,10 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
         mode={procedureOpen ?? 'procedure'}
         area="Upper left"
         teeth={quadrantTeeth(9)}
+        regiones={regiones?.elegidas}
+        onRemoveRegion={regiones?.quitar}
         findings={findings}
-        onClose={() => setProcedureOpen(null)}
+        onClose={() => { setProcedureOpen(null); regiones?.limpiar() }}
         onSave={saveProcedure}
         onLink={linkProcedure}
       />

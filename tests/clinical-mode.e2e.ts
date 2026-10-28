@@ -265,26 +265,56 @@ test('Extraoral: elegir regiones en el gráfico y cargar una condition', async (
   await expect(screen.getByText('Descriptors: Painful')).toBeVisible()
 })
 
-/* Intraoral: el mismo Add Condition por región que Extraoral; sin región elegida se carga como Not Localized (CON-882). */
-test('Intraoral: Add Condition sin región se carga como Not Localized', async ({ app, screen }) => {
+/* Intraoral: el mismo Add Condition por región que Extraoral. Sin región elegida, Add Condition y Add Procedure no
+   abren: avisan que hay que elegir una (red.dev, 2026-10-28). */
+test('Intraoral: sin región elegida no deja cargar; con una, la condition va a esa región', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', 'Intra Oral').tap()
+
+  await screen.getByRole('button', 'Add Condition').tap()
+  await expect(screen.getByText('Select at least one area on the chart to add a condition.')).toBeVisible()
+  await expect(screen.getByRole('dialog', 'New Condition')).toHaveCount(0)
+  await screen.getByRole('button', 'Add Procedure').tap()
+  await expect(screen.getByText('Select at least one area on the chart to add a procedure.')).toBeVisible()
+  await expect(screen.getByRole('dialog', 'New Procedure')).toHaveCount(0)
+
+  await screen.getByRole('button', /^Left Hard Palate$/).tap()
   await screen.getByRole('button', 'Add Condition').tap()
   const drawer = screen.getByRole('dialog', 'New Condition')
-  await expect(drawer.getByText('Not Localized')).toBeVisible()
+  await expect(drawer.getByText('Left Hard Palate')).toBeVisible()
   await drawer.getByPlaceholder('Search a Condition Here...').fill('Absc')
   await drawer.getByRole('button', /^Abscess/).tap()
   await drawer.getByRole('button', /select descriptors/i).tap()
   await drawer.getByRole('button', /^Save/).tap()
-  await expect(screen.getByText(/Abscess charted on Not Localized/)).toBeVisible()
+  await expect(screen.getByText(/Abscess charted on Left Hard Palate/)).toBeVisible()
 
   // Edit Finding: el área con el tipo con que se guardó (CON-3700) y los descriptores en su pestaña.
-  await screen.getByRole('button', /^Actions for Not Localized$/).tap()
+  await screen.getByRole('button', /^Actions for Left Hard Palate$/).tap()
   await screen.getByRole('menuitem', 'Edit').tap()
   const editar = screen.getByRole('dialog', 'Edit Finding')
   await expect(editar.getByText('Intra Oral')).toBeVisible()
   await editar.getByRole('tab', 'Descriptors').tap()
   await expect(editar.getByText('Selected Descriptors')).toBeVisible()
+})
+
+/* Extraoral: Add Procedure se carga sobre las regiones elegidas, no sobre un diente (red.dev, 2026-10-28). */
+test('Extraoral: Add Procedure va a la región elegida en el gráfico', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'Extra Oral').tap()
+  await screen.getByRole('button', /^Scalp$/).tap()
+  await screen.getByRole('button', 'Add Procedure').tap()
+
+  const nuevo = screen.getByRole('dialog', 'New Procedure')
+  await expect(nuevo.getByRole('button', 'Remove Scalp')).toBeVisible()
+  await nuevo.getByRole('button', /^D0120\s*-/).first().tap()
+  await nuevo.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText(/D0120 charted as planned on Scalp/)).toBeVisible()
+  await nuevo.getByRole('button', 'Close').tap()
+
+  await screen.getByRole('button', /^Actions for Scalp$/).first().tap()
+  await screen.getByRole('menuitem', 'Edit').tap()
+  const editar = screen.getByRole('dialog', 'Edit Procedure')
+  await expect(editar.getByText('Extra Oral')).toBeVisible()
 })
 
 /* Edit Procedure (Figma 5294:85084): tres pestañas; Findings y Diagnostic traen lo vinculable y un solo Save guarda todo. */
