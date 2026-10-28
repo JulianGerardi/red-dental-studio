@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-28
 
+### Pending documents: la misma funcionalidad de scroll que Pending Task ([#106](https://github.com/JulianGerardi/red-dental-studio/pull/106))
+- El **Show more** de Pending documents se veía mal (no se notaba que había más cards). Ahora tiene la misma
+  funcionalidad que Pending Task: sin botón, la caja arranca scrolleable y carga el resto sola al acercarse al final.
+- **Para el dev:** `PendingDocuments.tsx` suma `cargarAlScroll={llenar}` a su `ShowMore` (mismo condicional que ya
+  usaba `enCaja`/`llenarAlto`/`filas`). No hay prop ni componente nuevo: es la pieza de `ui/show-more` que se armó
+  para el PR anterior. Detalle en `patient-dashboard.md` (2026-10-28).
+
 ### Patient Dashboard: Pending Task filtra por tipo y carga al scrollear ([#105](https://github.com/JulianGerardi/red-dental-studio/pull/105))
 - Pending Task del Patient Dashboard suma el mismo **Filter** por tipo que ya usa el Dashboard (checkboxes Clinical
   Note / Lab Orders / Prescriptions / Referrals, nada tildado muestra todo), junto a los tabs Pending Task / Activity.

@@ -15,9 +15,9 @@ test('Pending documents arriba de Pending Task y Appointments a la derecha', asy
   expect(turnos!.x).toBeGreaterThan(docs!.x + 400)
   expect(Math.abs(turnos!.y - docs!.y)).toBeLessThan(20)
   await expect(screen.getByText('Routine cleaning appointment')).toHaveCount(7)
-  /* Pending Task ya no lleva "Show N more" (va con scroll, ver el test de abajo); sólo Pending documents lo
-     conserva (patient-dashboard.md, 2026-10-28). */
-  await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(1)
+  /* Ni Pending Task ni Pending documents llevan "Show N more": las dos cargan solas al scrollear, con la misma
+     funcionalidad (patient-dashboard.md, 2026-10-28). Sólo Appointments, a la derecha, conserva el botón. */
+  await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(0)
 })
 
 /* Pending Task filtra por tipo con el mismo embudo que el Dashboard, en vez de tabs (dashboard.md, 2026-08-28) y
@@ -45,4 +45,16 @@ test('Pending Task: Filter tasks acota por tipo y el resto se ve scrolleando, si
 
   await caja.swipe({ direction: 'up', momentum: 'fast' })
   await expect(screen.getByText('Complete this Task')).toHaveCount(9)
+})
+
+/* Pending documents carga igual que Pending Task: sin botón, misma caja scrolleable (patient-dashboard.md, 2026-10-28). */
+test('Pending documents: la misma caja scrolleable que Pending Task, sin botón', async ({ app, screen }) => {
+  await app.open('/patients/1')
+  const caja = screen.getByRole('region', 'All pending documents')
+  await expect(caja).toBeVisible()
+  await expect(caja.getByRole('button', /Show \d+ more/)).toHaveCount(0)
+  await expect(screen.getByText('Informed Consent – Periodontal treatment')).toBeVisible()
+
+  await caja.swipe({ direction: 'up', momentum: 'fast' })
+  await expect(screen.getByText('Medical history')).toBeVisible()
 })
