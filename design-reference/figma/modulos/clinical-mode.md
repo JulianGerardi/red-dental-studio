@@ -2812,3 +2812,15 @@ tiene un treatment area o no tiene; si tiene, el sistema guarda cuál es esa ár
 
 Código: `clinical/dental/{data.ts,ScopeIcons,DatosHallazgo,EditFindingDrawer,EditConditionDrawer,EditProcedureDrawer}.tsx`,
 `clinical/{ExamLayout,RegionExam}.tsx`, `tests/clinical-mode.e2e.ts`.
+
+## Edit Finding: el nombre sin el ícono del diente (2026-10-28)
+
+**CON-2770 (Edit Finding).** Julián, sobre el drawer de una condition en un diente: "en el nombre de la condición creo que
+es innecesario el ícono, porque el ícono de la location ya lo pusiste en el tooth".
+
+- La fila del nombre (`FilaNombre`) muestra sólo el nombre y el estado, en los tres Edit. El ícono del área va una sola
+  vez, en su fila (`FilaArea`: Tooth, Quadrant, Intra Oral…), y no se repite arriba. Se quitó la prop `alcances`, que
+  sólo usaba este drawer.
+- Anomalía: el Figma 5301:149072 pone el ícono del diente delante del nombre; acá se saca para no duplicar el dato.
+
+Código: `clinical/dental/{DatosHallazgo,EditConditionDrawer}.tsx`.
