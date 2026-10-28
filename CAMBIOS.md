@@ -3,6 +3,15 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-28
+
+### Edit Finding: el nombre sin el ícono del diente, que ya va en la fila del área ([#103](https://github.com/JulianGerardi/red-dental-studio/pull/103))
+- En el Edit Finding de una condition en un diente, la fila del nombre ya no repite el ícono del diente: va una sola
+  vez, en la fila **Tooth** que encabeza la rueda. Los tres Edit muestran ahora sólo nombre y estado arriba.
+- **Para el dev:** `FilaNombre` (`clinical/dental/DatosHallazgo.tsx`) ya no recibe `alcances`; el ícono del área se
+  pinta sólo con `FilaArea`. Anomalía (el Figma sí lo pone) en `clinical-mode.md` (2026-10-28). Storybook sin
+  actualizar (pendiente de que Julián lo pida).
+
 ## 2026-10-27
 
 ### Las pestañas suben la mitad de lo que crece el panel al desplegarse ([#102](https://github.com/JulianGerardi/red-dental-studio/pull/102))
