@@ -7,8 +7,9 @@ import type { Caso, Visita } from '@/data/treatment-plan'
  *  esa foto (Update needed) hasta que se recalcule. */
 export type Estimacion = {
   estado: 'sin-calcular' | 'al-dia' | 'desactualizada' | 'calculando' | 'fallo'
-  calculada?: string
   visitas?: Visita[]
+  /** Lo fija Prototype controls: muestra el escenario elegido aunque el estado del caso diga otra cosa. */
+  forzar?: 'editable' | 'bloqueada'
 }
 
 export type FilaEstimacion = {
@@ -68,19 +69,15 @@ export const totales = (filas: FilaEstimacion[]): TotalesEstimacion => {
 
 export const dinero = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
-/** Fecha del cálculo, como la muestra la pantalla. */
-export const ahora = () =>
-  new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(/, (\d+:)/, ' · $1')
-
 /* Estimaciones de arranque: Periodontists Recommended cambió después del último cálculo (la foto no tiene el último
    procedimiento de la Visit 2), la alternativa nunca se calculó y el resto quedó calculado. */
 export function estimacionesIniciales(casos: Caso[]): Record<string, Estimacion> {
   return Object.fromEntries(casos.map((c) => {
     if (c.id === 'c1') {
       const foto = c.visitas.map((v, i) => (i === c.visitas.length - 1 ? { ...v, procedimientos: v.procedimientos.slice(0, -1) } : v))
-      return [c.id, { estado: 'desactualizada', calculada: 'Oct 27, 2026 · 10:42 AM', visitas: foto }]
+      return [c.id, { estado: 'desactualizada', visitas: foto }]
     }
     if (c.id === 'c2') return [c.id, { estado: 'sin-calcular' }]
-    return [c.id, { estado: 'al-dia', calculada: 'Oct 20, 2026 · 11:15 AM', visitas: c.visitas }]
+    return [c.id, { estado: 'al-dia', visitas: c.visitas }]
   }))
 }

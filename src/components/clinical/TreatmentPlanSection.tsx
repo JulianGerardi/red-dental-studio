@@ -26,8 +26,8 @@ import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
 import { useAnchoVisible } from '@/components/patients/ledger/useAnchoColumnas'
 import { RowChevron } from '@/components/ui/data-table'
 import { DetalleRegistro, NavegacionClinica, registroDePlan, useVerRegistro, type DestinoClinico } from '@/components/clinical/RecordDetail'
-import { EstimateDetails } from '@/components/clinical/EstimateDetails'
-import { ahora, estimacionesIniciales, type Estimacion } from '@/data/estimaciones'
+import { EstimateDetails, PrototypeControls, situacionDe, type Escenario } from '@/components/clinical/EstimateDetails'
+import { estimacionesIniciales, type Estimacion } from '@/data/estimaciones'
 
 /* Figma 4118:220403 "Treatment Plan — Section (Cases, Workflow & Dialogs)":
    el rail de estados, la tabla de no asignados, el caso con sus visitas y los
@@ -1042,19 +1042,43 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial }: {
      un procedimiento de visita deja la estimación desactualizada. Ver clinical-mode.md (2026-10-28). */
   const [estimaciones, setEstimaciones] = useState<Record<string, Estimacion>>(() => estimacionesIniciales(CASOS))
   const estimacion = estimaciones[caso.id] ?? { estado: 'sin-calcular' }
+  const ponerEstimacion = (e: Estimacion) => setEstimaciones((es) => ({ ...es, [caso.id]: e }))
+  /* Prototype controls: el próximo cálculo falla y deja el anterior a la vista. */
+  const [fallar, setFallar] = useState(false)
   const calcular = () => {
-    const grupo = casos.filter((c) => c.grupo === caso.grupo && c.creado === caso.creado && c.estado === 'Planning' && !c.sinPermiso)
+    const alternativas = casos.filter((c) => c.grupo === caso.grupo && c.creado === caso.creado && c.estado === 'Planning' && !c.sinPermiso)
+    const grupo = alternativas.some((c) => c.id === caso.id) ? alternativas : [caso, ...alternativas]
     const marcar = (cambio: (c: Caso) => Partial<Estimacion>) =>
       setEstimaciones((es) => ({ ...es, ...Object.fromEntries(grupo.map((c) => [c.id, { ...es[c.id], ...cambio(c) } as Estimacion])) }))
+    const falla = fallar
     marcar(() => ({ estado: 'calculando' }))
     window.setTimeout(() => {
-      marcar((c) => ({ estado: 'al-dia', calculada: ahora(), visitas: c.visitas }))
+      if (falla) {
+        setFallar(false)
+        marcar(() => ({ estado: 'fallo' }))
+        return aviso.error('Update failed. Previous calculation preserved.')
+      }
+      marcar((c) => ({ estado: 'al-dia', visitas: c.visitas }))
       aviso.ok(grupo.length > 1 ? `Estimates updated for ${grupo.length} treatment alternatives.` : 'Estimates updated.')
     }, 1200)
   }
   const cambiarVisitas = (visitas: Visita[]) => {
     cambiarCaso({ visitas })
-    if (estimacion.visitas) setEstimaciones((es) => ({ ...es, [caso.id]: { ...estimacion, estado: 'desactualizada' } }))
+    if (estimacion.visitas) ponerEstimacion({ ...estimacion, estado: 'desactualizada' })
+  }
+  const elegirEscenario = (e: Escenario) => {
+    const foto = estimacion.visitas ?? caso.visitas
+    ponerEstimacion({
+      'Update needed': { estado: 'desactualizada', visitas: foto, forzar: 'editable' },
+      'Up to date': { estado: 'al-dia', visitas: caso.visitas, forzar: 'editable' },
+      'Not calculated': { estado: 'sin-calcular', forzar: 'editable' },
+      'Update failed': { estado: 'fallo', visitas: foto, forzar: 'editable' },
+      'Presented / Locked': { estado: 'al-dia', visitas: foto, forzar: 'bloqueada' },
+    }[e] as Estimacion)
+  }
+  const simularCambio = () => {
+    ponerEstimacion({ ...estimacion, estado: 'desactualizada' })
+    aviso.info('Plan change detected. Previous estimates remain unchanged.')
   }
 
   /* Cada fila se despliega con el detalle de la Problem List (Julián, 2026-10-13). Un hallazgo o procedimiento
@@ -1120,7 +1144,16 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial }: {
     <NavegacionClinica.Provider value={ir}>
     {vista === 'estimado' ? (
       /* A todo el ancho, sin el rail: la tabla tiene nueve columnas. Se vuelve con Back to Case. */
-      <EstimateDetails caso={caso} estimacion={estimacion} onVolver={() => setVista('caso')} onCalcular={calcular} />
+      <div className="flex flex-col gap-4">
+        <PrototypeControls
+          situacion={situacionDe(caso, estimacion)}
+          onEscenario={elegirEscenario}
+          onSimular={simularCambio}
+          fallar={fallar}
+          onFallar={setFallar}
+        />
+        <EstimateDetails caso={caso} estimacion={estimacion} onVolver={() => setVista('caso')} onCalcular={calcular} />
+      </div>
     ) : (
     <div className="flex flex-col gap-4 lg:flex-row">
       <Rail

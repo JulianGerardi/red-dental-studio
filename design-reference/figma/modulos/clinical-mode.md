@@ -2871,8 +2871,8 @@ login, así que la pantalla de ahí no se pudo ver.
   Copayment, Deductible applied, Insurance portion, Insurance adjustment y Patient portion, y la fila Case total.
 - **Estados:** Not calculated (estado vacío + Calculate estimates), Up to date, Update needed (los números son el cálculo
   anterior y se dice), Updating estimates… (spinner, se siguen viendo los anteriores), Update failed (Alert + Retry
-  update) y Locked (desde Pending; "Locked at presentation" desde Presented). Update failed queda armado pero el mock
-  nunca falla.
+  update) y Locked (desde Pending; "Locked at presentation" desde Presented). Update failed se ve con Prototype
+  controls (abajo).
 - **Regla (CON-2529):** sólo se calcula en Planning y con permiso sobre la ubicación; después la estimación es de sólo
   lectura. Calcular actualiza todas las alternativas en Planning del grupo ("Updates all treatment alternatives").
   Sin amount charged no se estima.
@@ -2891,6 +2891,21 @@ login, así que la pantalla de ahí no se pudo ver.
   allowable del 90 % / 85 %, deducible de $50 que se consume en orden en lo no preventivo, copago 0. Charged = insurance
   + adjustment + patient en cada fila. Arranque: Periodontists Recommended desactualizado (la foto no tiene el último
   procedimiento de la Visit 2), Periodontist Alternative sin calcular, el resto calculado.
+
+**Segunda vuelta (Julián, mismo día):**
+
+- La pill del estado va **al lado del título**, no debajo.
+- Sin "Last calculated …", sin el texto bajo el botón ("Updates all treatment alternatives") y sin bajada en Up to date
+  ("No changes affecting estimates…"): con la pill alcanza. El resto de los estados conserva su bajada porque dice algo
+  que la pill no (que los números son del cálculo anterior, que está congelado). Calcular sigue actualizando todas las
+  alternativas del grupo; lo dice el toast.
+- El rótulo de arriba ("Treatment case · …") pasa al rótulo chico del sistema (el de ListGroup): 11px, semibold,
+  `tracking-wide`, `text-ink-muted`. Tenía 10px y `tracking-[0.12em]`, demasiado interletrado.
+- **Prototype controls**, como en su HTML: una franja punteada arriba de la pantalla con el escenario (Update needed /
+  Up to date / Not calculated / Update failed / Presented / Locked), "Simulate plan change" y "Fail next calculation".
+  Es una herramienta de demo, no parte del producto: el escenario fuerza la estimación (`forzar`) aunque el estado del
+  caso diga otra cosa, y así Update failed y Locked se pueden mostrar en cualquier caso. Antes de pasarlo a los devs
+  hay que sacarlo o esconderlo detrás de un flag.
 
 A validar con usuarios: si recepción entiende "Allowable amount" e "Insurance adjustment" sin ayuda (quizá un InfoTip en
 el encabezado); si el aviso con confirmación suma o alcanza con el botón de la pantalla; y si Patient portion es el dato

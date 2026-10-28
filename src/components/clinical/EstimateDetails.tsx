@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import { AlertTriangle, ArrowLeft, Calculator, Check, ChevronRight, Circle, Loader2, Lock, RefreshCw, type LucideIcon } from 'lucide-react'
+import { AlertTriangle, ArrowLeft, Calculator, Check, ChevronRight, Circle, Loader2, Lock, Plus, RefreshCw, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 import { Button } from '@/components/ui/button'
@@ -7,13 +7,25 @@ import { Alert } from '@/components/ui/alert'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PageTitle } from '@/components/ui/page-title'
 import { Pill, type PillTone } from '@/components/ui/pill'
+import { Checkbox } from '@/components/ui/checkbox'
+import { SelectField } from '@/components/patients/form'
 import type { Caso } from '@/data/treatment-plan'
 import { dinero, filasDeVisitas, totales, type Estimacion, type TotalesEstimacion } from '@/data/estimaciones'
 
 /* Estimate details: el desglose del Total Amount de un caso, por visita y procedimiento (CON-3710, CON-2529). Sólo en
    Planning se calcula; después queda la foto con la que se presentó. Ver modulos/clinical-mode.md (2026-10-28). */
 
-type Situacion = Estimacion['estado'] | 'bloqueada'
+export type Situacion = Estimacion['estado'] | 'bloqueada'
+
+/** Sólo en Planning y con permiso sobre la ubicación: desde Pending el plan ya no cambia (precondición de CON-2529).
+ *  Prototype controls puede forzar el escenario. */
+export const estimacionEditable = (caso: Caso, e: Estimacion) =>
+  e.forzar ? e.forzar === 'editable' : caso.estado === 'Planning' && !caso.sinPermiso
+
+export const situacionDe = (caso: Caso, e: Estimacion): Situacion =>
+  e.forzar === 'bloqueada' ? 'bloqueada' : estimacionEditable(caso, e) || e.estado === 'sin-calcular' ? e.estado : 'bloqueada'
+
+/* Al día no lleva bajada: no hay nada que avisar (Julián, 2026-10-28). */
 
 const ESTADO: Record<Situacion, { tono: PillTone; icono: LucideIcon; texto: string }> = {
   'sin-calcular': { tono: 'neutral', icono: Circle, texto: 'Not calculated' },
@@ -26,7 +38,7 @@ const ESTADO: Record<Situacion, { tono: PillTone; icono: LucideIcon; texto: stri
 
 const DESCRIPCION: Record<Situacion, string> = {
   'sin-calcular': 'Generate an estimate before presenting this treatment plan.',
-  'al-dia': 'No changes affecting estimates have been detected since the last calculation.',
+  'al-dia': '',
   desactualizada: 'Changes affecting estimates were detected. Amounts shown reflect the previous calculation.',
   calculando: 'Calculating with the latest plan information. Previous results remain visible until the update completes.',
   fallo: 'Changes affecting estimates were detected. Amounts shown reflect the previous calculation.',
@@ -53,12 +65,11 @@ export function EstimateDetails({ caso, estimacion, onVolver, onCalcular }: {
   onVolver: () => void
   onCalcular: () => void
 }) {
-  /* Sólo en Planning y con permiso sobre la ubicación: desde Pending el plan ya no cambia (precondición de CON-2529). */
-  const editable = caso.estado === 'Planning' && !caso.sinPermiso
-  const situacion: Situacion = editable || estimacion.estado === 'sin-calcular' ? estimacion.estado : 'bloqueada'
+  const editable = estimacionEditable(caso, estimacion)
+  const situacion = situacionDe(caso, estimacion)
   const { tono, icono: Icono } = ESTADO[situacion]
   /* Pending terminó de planear pero todavía no se presentó. */
-  const presentado = caso.estado !== 'Pending'
+  const presentado = caso.estado !== 'Pending' || estimacion.forzar === 'bloqueada'
   const texto = situacion === 'bloqueada' && !presentado ? 'Locked' : ESTADO[situacion].texto
   const descripcion = situacion === 'sin-calcular' && !editable
     ? 'No estimate was calculated while this case was in planning.'
@@ -83,19 +94,16 @@ export function EstimateDetails({ caso, estimacion, onVolver, onCalcular }: {
 
   /* Calcular está siempre a mano mientras se planea (CON-3710: para corroborar). Al día baja a secundario. */
   const accion = editable && (
-    <div className="flex flex-col items-start gap-1.5 sm:items-end">
-      <Button
-        variant={situacion === 'al-dia' ? 'secondary' : 'primary'}
-        loading={situacion === 'calculando'}
-        onClick={onCalcular}
-        className="min-w-[180px]"
-      >
-        {situacion === 'calculando' ? 'Updating estimates…' : situacion === 'sin-calcular'
-          ? <><Calculator /> Calculate estimates</>
-          : <><RefreshCw /> {situacion === 'fallo' ? 'Retry update' : situacion === 'al-dia' ? 'Recalculate' : 'Update estimates'}</>}
-      </Button>
-      <span className="text-[11px] text-ink-faint">Updates all treatment alternatives</span>
-    </div>
+    <Button
+      variant={situacion === 'al-dia' ? 'secondary' : 'primary'}
+      loading={situacion === 'calculando'}
+      onClick={onCalcular}
+      className="min-w-[180px] self-start"
+    >
+      {situacion === 'calculando' ? 'Updating estimates…' : situacion === 'sin-calcular'
+        ? <><Calculator /> Calculate estimates</>
+        : <><RefreshCw /> {situacion === 'fallo' ? 'Retry update' : situacion === 'al-dia' ? 'Recalculate' : 'Update estimates'}</>}
+    </Button>
   )
 
   return (
@@ -106,21 +114,17 @@ export function EstimateDetails({ caso, estimacion, onVolver, onCalcular }: {
 
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold tracking-[0.12em] text-ink-faint uppercase">Treatment case · {caso.nombre}</p>
-          <div className="mt-2"><PageTitle>Estimate details</PageTitle></div>
-          <div className="mt-2 flex flex-wrap items-center gap-2.5" aria-live="polite">
+          {/* El rótulo chico del sistema (el de ListGroup): 11px, semibold, tracking-wide. */}
+          <p className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Treatment case · {caso.nombre}</p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5" aria-live="polite">
+            <PageTitle>Estimate details</PageTitle>
             <Pill tone={tono} size="sm" className="gap-1 whitespace-nowrap">
               <Icono className={cn('size-3', situacion === 'calculando' && 'animate-spin')} aria-hidden /> {texto}
             </Pill>
-            {estimacion.calculada && (
-              <span className="text-[12px] text-ink-muted">
-                {situacion === 'bloqueada' ? 'Calculated' : 'Last calculated'} {estimacion.calculada}
-              </span>
-            )}
           </div>
-          <p className="mt-2 max-w-[560px] text-[13px] leading-[1.5] text-ink-muted">
-            {descripcion}
-          </p>
+          {descripcion && (
+            <p className="mt-2 max-w-[560px] text-[13px] leading-[1.5] text-ink-muted">{descripcion}</p>
+          )}
         </div>
         {accion}
       </div>
@@ -238,6 +242,52 @@ export function EstimateDetails({ caso, estimacion, onVolver, onCalcular }: {
           </p>
         </>
       )}
+    </div>
+  )
+}
+
+/* Prototype controls, como el HTML de referencia de Julián: elegir el escenario, simular un cambio del plan y forzar que
+   el próximo cálculo falle. Es una herramienta de demo, no parte del producto (clinical-mode.md, 2026-10-28). */
+export const ESCENARIOS = ['Update needed', 'Up to date', 'Not calculated', 'Update failed', 'Presented / Locked'] as const
+export type Escenario = (typeof ESCENARIOS)[number]
+
+const ESCENARIO_DE: Partial<Record<Situacion, Escenario>> = {
+  desactualizada: 'Update needed', 'al-dia': 'Up to date', 'sin-calcular': 'Not calculated', fallo: 'Update failed', bloqueada: 'Presented / Locked',
+}
+
+export function PrototypeControls({ situacion, onEscenario, onSimular, fallar, onFallar }: {
+  situacion: Situacion
+  onEscenario: (e: Escenario) => void
+  onSimular: () => void
+  fallar: boolean
+  onFallar: (v: boolean) => void
+}) {
+  const calculando = situacion === 'calculando'
+  return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 rounded-lg border border-dashed border-line-strong bg-white/60 px-4 py-3">
+      <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Prototype controls</span>
+      <SelectField
+        label="Estimate scenario"
+        hideLabel
+        value={ESCENARIO_DE[situacion] ?? ''}
+        onChange={(v) => onEscenario(v as Escenario)}
+        options={[...ESCENARIOS]}
+        disabled={calculando}
+        className="w-[200px]"
+      />
+      <Button
+        variant="secondary"
+        size="md"
+        onClick={onSimular}
+        disabled={calculando || situacion === 'bloqueada' || situacion === 'sin-calcular'}
+      >
+        <Plus /> Simulate plan change
+      </Button>
+      <span className="flex items-center gap-2 text-[13px] text-ink">
+        <Checkbox on={fallar} onChange={onFallar} label="Fail next calculation" disabled={calculando} />
+        <span aria-hidden>Fail next calculation</span>
+      </span>
+      <span className="ml-auto text-[11px] text-ink-faint">Demo only · No server connection</span>
     </div>
   )
 }
