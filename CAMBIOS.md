@@ -5,6 +5,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-28
 
+### Extraoral e Intraoral: sin región elegida no se carga nada; New Procedure va a la región ([#104](https://github.com/JulianGerardi/red-dental-studio/pull/104))
+- Como en red.dev: en Extra Oral e Intra Oral, Add Condition y Add Procedure sin región elegida en el gráfico no
+  abren el drawer y avisan "Select at least one area on the chart to add a condition/procedure." (texto provisorio:
+  no se pudo copiar el de red.dev).
+- Add Procedure en esos exámenes ya no abre el New Procedure de diente: muestra las regiones elegidas como chips, sin
+  alcance por diente ni Surfaces, y guarda el área de tratamiento Extra Oral / Intra Oral. Si se sacan todas las
+  regiones dentro del drawer, no deja guardar.
+- Se va "Not Localized" (lo pedían CON-1398/CON-1401; conflicto anotado en `clinical-mode.md`, 2026-10-28). La card
+  del finding ya no muestra "Descriptors:" vacío.
+- **Para el dev:** `ExamLayout` suma la prop `regiones` (`RegionesElegidas`) y `NewProcedureDrawer`, `regiones` /
+  `onRemoveRegion`. Storybook sin actualizar (pendiente de que Julián lo pida).
+
 ### Edit Finding: el nombre sin el ícono del diente, que ya va en la fila del área ([#103](https://github.com/JulianGerardi/red-dental-studio/pull/103))
 - En el Edit Finding de una condition en un diente, la fila del nombre ya no repite el ícono del diente: va una sola
   vez, en la fila **Tooth** que encabeza la rueda. Los tres Edit muestran ahora sólo nombre y estado arriba.
