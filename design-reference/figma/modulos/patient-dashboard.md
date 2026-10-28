@@ -366,3 +366,42 @@ Julián: "lo mismo hace en pending documents".
 - Antes, Pending documents mostraba 4 fijas y al abrir la card crecía y empujaba a Pending Task.
 - `PendingDocuments` suma la prop `llenar`. `ShowMore` con `filas` mide ahora con la fila **más alta** de las dibujadas (en columnas angostas unas filas envuelven a más renglones que otras) para que ninguna quede cortada.
 - **A validar:** a 1024px las filas de documentos envuelven a 3 renglones y entra una sola antes de *Show 5 more*; si molesta, subir el mínimo de la card.
+
+## CON-2643: Pending Task filtra por tipo y carga al scrollear, sin tabs (2026-10-28)
+
+Julián pasó un video de referencia (la app de red) donde Pending Task divide las tareas en tabs -Clinical Notes, Lab
+Orders, Prescriptions, Referrals- y un botón "Ver más" al pie de la lista. Pidió el mismo comportamiento pero **sin
+copiar esos dos controles**: filtro en vez de tabs ("creo que lo tenemos en formato filtro") y, en vez del botón,
+que el resto cargue solo al scrollear.
+
+Esto ya estaba resuelto del lado del Dashboard: **CON-2641** (Pending Tasks de la secretaria) pide exactamente filtro
+por tipo de tarea (CA1) y "la lista debe permitir scroll completo" (CA7), y `dashboard.md` (2026-08-28) ya había sacado
+los tabs del Figma por redundantes con el embudo. CON-2643 (Pending Tasks del paciente) no pide filtro ni scroll
+propio, así que esto es extender a la ficha del paciente el mismo patrón que ya corre en el Dashboard, no inventar uno
+nuevo -responde además al "a validar" que había quedado abierto el 2026-10-25 ("si con muchas tareas conviene agrupar o
+filtrar").
+
+1. **Filtro, no tabs.** Junto a los tabs *Pending Task / Activity* (que son otra cosa: alternan toda la sección, no
+   las tareas) va el mismo `FilterMenu` del Dashboard, por tipo (`TASK_KINDS`: Clinical Note, Lab Orders,
+   Prescriptions, Referrals), checkboxes, sin nada tildado se ve todo. Antes de esto el mock de `PatientDetail.tsx`
+   tenía las 9 tareas como `'Referrals'`: no había nada que filtrar. Pasan a repartirse entre los cuatro tipos (3/2/2/2,
+   mismo total que fijó el *Show N more* del 2026-10-25) para que el filtro tenga sentido en la demo.
+2. **Carga al scrollear, sin botón** (`ShowMore`, prop nueva `cargarAlScroll`): sólo tiene sentido junto con `enCaja` +
+   `llenarAlto` -el alto ya lo da el flex-1 del panel-. La caja arranca scrolleable con dos tandas de las que miden
+   cuántas filas entran (para que asome un poco de la próxima y se note que hay más) y, al acercarse al final, suma
+   otra tanda hasta mostrarlas todas. Nada de paginar contra un backend: son las mismas tareas ya cargadas, mostrando
+   más de a poco. El degradé de abajo (ya existía) sigue avisando que falta; sin botón no hay "Show less" -no hace
+   falta, no crece la card-. Sólo lo lleva Pending Task: Pending documents y el Pending Task del Dashboard siguen con
+   el botón, que ahí sigue andando bien.
+3. La región sigue siendo alcanzable con Tab y navegable con flechas/Page Down (son las mismas que ya disparan
+   `onScroll`), así que el teclado también carga más. Lo que un lector de pantalla no tiene es un control explícito
+   tipo "cargar todo": antes "Show N more" lo anunciaba con `aria-expanded`; ahora depende de que el usuario scrollee
+   la región (que sí tiene nombre, "All pending tasks"). **A validar con usuarios y con accesibilidad.**
+4. Anomalía ya anotada en Jira, no de hoy: CON-2643 sólo admite Referrals/Lab Orders/Prescriptions como tipos de
+   Pending Task del paciente; "Clinical Note" es una cuarta categoría que ya traía `TASK_KINDS` desde el Dashboard
+   (CON-2640/2641, que tampoco la listan pero el Figma sí la dibuja). No se tocó: es compartida con el Dashboard y
+   cambiarla ahí tiene que ser una decisión aparte.
+
+`tests/patient-overview.e2e.ts`: el test de layout ya no espera dos "Show N more" (uno solo, el de Pending documents) y
+un test nuevo prueba que *Filter tasks* acota a 2 tareas en Referrals, *Clear all* vuelve a las 9, y que dentro de la
+caja de Pending Task no hay botón.

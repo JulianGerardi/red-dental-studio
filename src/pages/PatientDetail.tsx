@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronDown, PersonStanding, Clipboard, Pill as PillIcon, ClipboardList, type LucideIcon } from 'lucide-react'
+import { ChevronDown, PersonStanding, Clipboard, Pill as PillIcon, ClipboardList, Activity, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Count } from '@/components/ui/count'
+import { EmptyState } from '@/components/ui/empty-state'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
@@ -11,7 +12,9 @@ import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clini
 import { aviso } from '@/components/ui/toaster'
 import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
+import { TASK_KINDS } from '@/components/dashboard/dashboard-data'
 import { ShowMore } from '@/components/ui/show-more'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { EditPatientModal } from '@/pages/patients/EditPatientModal'
 import { DATOS_JOHN_SMITH, usePatients } from '@/data/patientsStore'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
@@ -30,10 +33,10 @@ const CLINICAL: { label: Categoria; icon: LucideIcon }[] = [
   { label: 'Past Surgery and Hospitalization', icon: ClipboardList },
 ]
 
-const TASKS: PendingTask[] = Array.from({ length: 9 }, () => ({
-  kind: 'Referrals', state: 'Requested', person: 'Elena Marquez', initials: 'EM',
-  register: 'March 17, 2025', expiration: 'March 15, 2025',
-}))
+/* Repartidas entre los cuatro tipos (antes las 9 eran "Referrals"): así el filtro por tipo tiene algo que filtrar
+   (patient-dashboard.md, 2026-10-28). Mismo total que fijó el Show N more del 2026-10-25, sin tocar esa cuenta. */
+const TASKS: PendingTask[] = ['Clinical Note', 'Clinical Note', 'Clinical Note', 'Lab Orders', 'Lab Orders', 'Prescriptions', 'Prescriptions', 'Referrals', 'Referrals']
+  .map((kind) => ({ kind, state: 'Requested', person: 'Elena Marquez', initials: 'EM', register: 'March 17, 2025', expiration: 'March 15, 2025' }))
 
 /* Cuántos se ven en cada bloque antes de "Show N more" (ui/show-more; patient-dashboard.md, 2026-10-12). */
 export const TOPE = { tareas: 3, turnos: 3, turnosColumna: 7 }
@@ -80,6 +83,10 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
   }
   const [modal, setModal] = useState<'contact' | 'edit' | null>(null)
   const [taskTab, setTaskTab] = useState<'Pending Task' | 'Activity'>('Pending Task')
+  /* Igual que el Dashboard (dashboard.md, 2026-08-28): filtro por tipo en vez de tabs -son las mismas categorías-,
+     sin nada tildado se ve todo. */
+  const [tiposTarea, setTiposTarea] = useState<string[]>([])
+  const tareas = TASKS.filter((t) => tiposTarea.length === 0 || tiposTarea.includes(t.kind))
   const [apptTab, setApptTab] = useState<'Next' | 'Next Appointments'>('Next')
   /* Desde lg Appointments es una columna del alto de Pending Task + Pending documents: entran más turnos. */
   const enColumna = useMedia('(min-width: 1024px)')
@@ -150,10 +157,17 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
               <Card className="flex flex-1 flex-col p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
-                  <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
+                  <div className="flex items-center gap-2">
+                    <FilterMenu label="Filter tasks" options={TASK_KINDS} value={tiposTarea} onChange={setTiposTarea} size="sm" />
+                    <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
+                  </div>
                 </div>
                 <div className="mt-4 flex min-h-0 flex-1 flex-col">
-                  <PendingTaskList tasks={TASKS} limit={TOPE.tareas} enCaja llenarAlto />
+                  {tareas.length === 0 ? (
+                    <EmptyState icon={Activity} title="Nothing pending" detail="No pending tasks match the selected types." className="py-8" />
+                  ) : (
+                    <PendingTaskList tasks={tareas} limit={TOPE.tareas} enCaja llenarAlto cargarAlScroll />
+                  )}
                 </div>
               </Card>
             </div>
