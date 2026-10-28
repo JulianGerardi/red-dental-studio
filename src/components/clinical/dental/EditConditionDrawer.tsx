@@ -52,7 +52,7 @@ export function EditConditionDrawer({
       {finding && pestana === 'General Information' && (
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4">
-            <FilaNombre alcances={['Tooth']} nombre={mayuscula(finding.condition)} estado={finding.status} tono={TONO_ESTADO[finding.status]} />
+            <FilaNombre nombre={mayuscula(finding.condition)} estado={finding.status} tono={TONO_ESTADO[finding.status]} />
             <FilaDato icono={<IconoFecha />} rotulo="Creation date">{fechaCorta(finding.date)}</FilaDato>
             <FilaDato icono={<IconoExamen />} rotulo="Exams">
               <Pill tone="success" size="sm">{finding.examen ?? 'Dental Assessment'}</Pill>

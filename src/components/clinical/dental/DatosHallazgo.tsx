@@ -1,9 +1,8 @@
 import type { ReactNode } from 'react'
 import { CalendarDays, FileSpreadsheet, User } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { Pill, type PillTone } from '@/components/ui/pill'
-import { IconoArea, ScopeIcon } from './ScopeIcons'
-import { NOMBRE_AREA, type AreaTratamiento, type FindingStatus, type ProcedureScope } from './data'
+import { IconoArea } from './ScopeIcons'
+import { NOMBRE_AREA, type AreaTratamiento, type FindingStatus } from './data'
 
 /* Los datos de un finding arriba de Edit Finding, Edit Condition y Edit Procedure (Figma 5294:107675, 5301:149072 y
    5294:85084): una fila por dato, card blanca con la línea azul a la izquierda y sombra suave, con el ícono en un
@@ -29,23 +28,15 @@ export const IconoFecha = () => <span className={CUADRADO}><CalendarDays /></spa
 export const IconoProveedor = () => <span className={CUADRADO}><User /></span>
 export const IconoExamen = () => <span className={CUADRADO}><FileSpreadsheet /></span>
 
-/** El nombre del finding con su estado a la derecha; con `alcances`, los íconos de diente/cuadrante/arcada delante. */
-export function FilaNombre({ alcances, nombre, estado, tono = 'success' }: {
-  alcances?: ProcedureScope[]
+/** El nombre del finding con su estado a la derecha. Sin ícono: el del área ya va en su fila (Julián, 2026-10-28). */
+export function FilaNombre({ nombre, estado, tono = 'success' }: {
   nombre: string
   estado: string
   tono?: PillTone
 }) {
   return (
-    <div className={cn(TARJETA)}>
-      <span className="flex min-w-0 flex-1 items-center gap-1.5">
-        {alcances?.map((a) => (
-          <span key={a} className="flex size-[22px] shrink-0 items-center justify-center rounded-[4px] bg-dash-blue">
-            <ScopeIcon scope={a} />
-          </span>
-        ))}
-        <span className="min-w-0 text-xs font-semibold text-ink">{nombre}</span>
-      </span>
+    <div className={TARJETA}>
+      <span className="min-w-0 flex-1 text-xs font-semibold text-ink">{nombre}</span>
       <Pill tone={tono} size="sm" className="shrink-0">{estado}</Pill>
     </div>
   )
