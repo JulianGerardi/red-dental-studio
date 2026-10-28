@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-28
 
+### Patient Dashboard: Pending Task filtra por tipo y carga al scrollear ([#105](https://github.com/JulianGerardi/red-dental-studio/pull/105))
+- Pending Task del Patient Dashboard suma el mismo **Filter** por tipo que ya usa el Dashboard (checkboxes Clinical
+  Note / Lab Orders / Prescriptions / Referrals, nada tildado muestra todo), junto a los tabs Pending Task / Activity.
+- La lista ya no tiene botón **"Show N more"**: la caja arranca scrolleable y, al acercarse al final, suma otra tanda
+  de tareas sola, hasta mostrarlas todas.
+- **Para el dev:** `ui/show-more` suma la prop `cargarAlScroll` (sólo tiene sentido junto con `enCaja` + `llenarAlto`);
+  por ahora sólo la usa `PendingTaskList` del Patient Dashboard (`PatientDetail.tsx`) — Pending documents y el Pending
+  Task del Dashboard siguen con el botón. El mock `TASKS` de `PatientDetail.tsx` pasa de ser las 9 tareas "Referrals"
+  a repartirse entre los cuatro tipos. Detalle, anomalía de Jira anotada y qué validar con usuarios en
+  `patient-dashboard.md` (2026-10-28).
+
 ### Extraoral e Intraoral: sin región elegida no se carga nada; New Procedure va a la región ([#104](https://github.com/JulianGerardi/red-dental-studio/pull/104))
 - Como en red.dev: en Extra Oral e Intra Oral, Add Condition y Add Procedure sin región elegida en el gráfico no
   abren el drawer y avisan "Select at least one area on the chart to add a condition/procedure." (texto provisorio:
