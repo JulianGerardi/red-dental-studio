@@ -107,3 +107,8 @@ Desviación deliberada sobre el Figma (`3753:80195`), que traía el buscador de 
 
 El avatar del header de la card deja el `#eff4ff` / `#0056ef` del Figma (ver *Especificación de la card*) y pasa a
 `ui/avatar` de 36px: azul con iniciales blancas, como el resto de la app. Regla en `../README.md`.
+
+## Estimate details del Treatment Plan (2026-10-28)
+
+**CON-3710, CON-2529** (epic CON-3695). La pantalla vive en Clinical Mode › Treatment Plan: ver
+`clinical-mode.md` › *Treatment Plan: Estimate details desde el Total Amount (2026-10-28)*.
