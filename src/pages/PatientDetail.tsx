@@ -81,7 +81,6 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
     })
   }
   const [modal, setModal] = useState<'contact' | 'edit' | null>(null)
-  const [taskTab, setTaskTab] = useState<'Pending Task' | 'Activity'>('Pending Task')
   /* Igual que el Dashboard (dashboard.md, 2026-10-29): tabs por tipo, en vez del filtro. */
   const [tipoTarea, setTipoTarea] = useState('All')
   const tareas = tipoTarea === 'All' ? TASKS : TASKS.filter((t) => t.kind === tipoTarea)
@@ -145,33 +144,30 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
           <div className="grid gap-5 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_280px]">
             <div className="flex min-w-0 flex-col gap-5">
               {/* En lugar de la tabla de Insurance (que sigue en su sección): los documentos pendientes a resolver. Van
-                  primero y las tareas abajo, con el mismo diseño (Julián, 2026-10-19). */}
-              <Card className="flex flex-1 flex-col p-5">
-                <PendingDocuments llenar />
+                  primero y las tareas abajo, con el mismo diseño (Julián, 2026-10-19). Ninguna de las dos fuerza su
+                  alto al de Appointments: miden lo que pide el contenido, sin espacio de más, y scrollean adentro
+                  pasado cierto alto (patient-dashboard.md, 2026-10-29). */}
+              <Card className="flex flex-col p-5">
+                <PendingDocuments />
               </Card>
 
-              {/* La card llena el alto que deja el menú y la lista muestra las tareas que entran enteras (llenarAlto); "Show N more" abre
-                  el resto con scroll adentro, sin que la card crezca (enCaja, como Appointments; patient-dashboard.md, 2026-10-25). */}
-              <Card className="flex flex-1 flex-col p-5">
-                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+              <Card className="flex flex-col p-5">
+                <div className="flex items-center justify-between gap-3">
                   <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Tabs
-                      size="sm" aria-label="Filter tasks"
-                      tabs={[
-                        { value: 'All', count: TASKS.length },
-                        ...TASK_KINDS.map((k) => ({ value: k, count: TASKS.filter((t) => t.kind === k).length })),
-                      ]}
-                      value={tipoTarea} onChange={setTipoTarea}
-                    />
-                    <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
-                  </div>
+                  <Tabs
+                    size="sm" aria-label="Filter tasks"
+                    tabs={[
+                      { value: 'All', count: TASKS.length },
+                      ...TASK_KINDS.map((k) => ({ value: k, count: TASKS.filter((t) => t.kind === k).length })),
+                    ]}
+                    value={tipoTarea} onChange={setTipoTarea}
+                  />
                 </div>
-                <div className="mt-4 flex min-h-0 flex-1 flex-col">
+                <div className="mt-4">
                   {tareas.length === 0 ? (
                     <EmptyState icon={Activity} title="Nothing pending" detail="No pending tasks of this type." className="py-8" />
                   ) : (
-                    <PendingTaskList tasks={tareas} limit={TOPE.tareas} enCaja llenarAlto cargarAlScroll />
+                    <PendingTaskList tasks={tareas} limit={TOPE.tareas} cargarAlScroll />
                   )}
                 </div>
               </Card>

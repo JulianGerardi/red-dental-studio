@@ -51,11 +51,8 @@ const GRUPOS: { titulo: string; filtro: (d: DocPendiente) => boolean; color: str
   { titulo: 'Later', filtro: (d) => d.dias > 7, color: 'text-ink-muted' },
 ]
 
-export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES, llenar }: {
+export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES }: {
   docs?: DocPendiente[]
-  /** Dentro de una card `flex-1`: llena el alto que le toca, muestra las filas que entran y el resto se carga solo al
-      acercarse al final del scroll, sin botón -mismo comportamiento que Pending Task (patient-dashboard.md, 2026-10-28). */
-  llenar?: boolean
 }) {
   const { docs, resolver } = useDocsPendientes(iniciales)
   /* Tabs por urgencia en vez de por quién actúa -mismas categorías que Pending Task, como tabs en las dos
@@ -66,7 +63,7 @@ export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES, llenar }: 
   const visibles = pendientes.filter(grupoActivo.filtro)
 
   return (
-    <div className={cn('flex flex-col gap-4', llenar && 'min-h-0 flex-1')}>
+    <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
         <h2 className="text-[15px] font-bold text-ink">Pending documents</h2>
         {pendientes.length > 0 && <Pill tone="warning" size="sm">{pendientes.length} to resolve</Pill>}
@@ -84,8 +81,9 @@ export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES, llenar }: 
           className="py-8"
         />
       ) : (
-        /* Los primeros TOPE documentos, en el orden de los grupos; "Show N more" abre el resto con scroll (ui/show-more). */
-        <ShowMore total={visibles.length} limit={TOPE} enCaja={llenar} llenarAlto={llenar} filas={llenar ? 'li' : undefined} cargarAlScroll={llenar} label="pending documents" className="flex flex-col gap-4">
+        /* Los primeros TOPE documentos, en el orden de los grupos; el resto se carga solo al acercarse al final del
+           scroll, sin botón ni espacio de más si son pocos (ui/show-more, patient-dashboard.md 2026-10-29). */
+        <ShowMore total={visibles.length} limit={TOPE} cargarAlScroll label="pending documents" className="flex flex-col gap-4">
           {(n) => {
             const enOrden = GRUPOS.flatMap((g) => visibles.filter(g.filtro)).slice(0, n)
             return GRUPOS.map((g) => {

@@ -44,23 +44,21 @@ test('Pending Task: tabs por tipo acotan la lista y el resto se ve scrolleando, 
   await expect(screen.getByText('Complete this Task')).toHaveCount(9)
 })
 
-/* Pending documents carga igual que Pending Task (sin botón, misma caja scrolleable) y ahora filtra con las mismas
-   tres categorías de urgencia que ya agrupaban la lista, como tabs (Julián, 2026-10-29; antes era All/Patient/Office). */
-test('Pending documents: tabs por urgencia, la misma caja scrolleable que Pending Task, sin botón', async ({ app, screen }) => {
+/* Pending documents filtra con las mismas tres categorías de urgencia que ya agrupaban la lista, como tabs (Julián,
+   2026-10-29; antes era All/Patient/Office). Misma pieza que Pending Task (ui/show-more, cargarAlScroll): sin
+   `llenarAlto` la caja no fuerza su alto al del panel -con pocos documentos no hay ni región con scroll ni botón,
+   nada de espacio de más-. */
+test('Pending documents: tabs por urgencia, sin espacio de más con pocos documentos', async ({ app, screen }) => {
   await app.open('/patients/1')
-  const caja = screen.getByRole('region', 'All pending documents')
-  await expect(caja).toBeVisible()
-  await expect(caja.getByRole('button', /Show \d+ more/)).toHaveCount(0)
-
-  /* Arranca en Overdue (el primer grupo): sólo esos dos documentos. */
+  /* Arranca en Overdue (el primer grupo, 2 documentos): entran enteros, sin región de scroll ni botón. */
   await expect(screen.getByRole('tab', 'Overdue (2)')).toBeVisible()
   await expect(screen.getByText('Informed Consent – Periodontal treatment')).toBeVisible()
   await expect(screen.getByText('Notice of privacy practices (HIPAA)')).toHaveCount(0)
+  await expect(screen.getByRole('region', 'All pending documents')).toHaveCount(0)
+  await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(0)
 
   await screen.getByRole('tab', /^Later/).tap()
   await expect(screen.getByText('Notice of privacy practices (HIPAA)')).toBeVisible()
-  await expect(screen.getByText('Informed Consent – Periodontal treatment')).toHaveCount(0)
-
-  await caja.swipe({ direction: 'up', momentum: 'fast' })
   await expect(screen.getByText('Panoramic X-ray from previous dentist')).toBeVisible()
+  await expect(screen.getByText('Informed Consent – Periodontal treatment')).toHaveCount(0)
 })
