@@ -123,8 +123,12 @@ test('CC y TR siguen a los workflows de Treatment: completar Triage pone TR en v
   await expect(screen.getByRole('button', 'Triage: completed').first()).toBeVisible()
 })
 
-test('la tabla del Overview tiene Problem List y Procedures', async ({ app, screen }) => {
+/* La tabla ya no va abajo del chart: el Overview entra en la pantalla y la tabla flota desde View Problem List
+   (clinical-mode.md, 2026-10-29). */
+test('la tabla del Overview flota desde View Problem List y tiene Problem List y Procedures', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
+  await expect(screen.getByText('Generally unwell')).toHaveCount(0)
+  await screen.getByRole('button', 'View Problem List').tap()
   await expect(screen.getByText('Generally unwell')).toBeVisible()
   await screen.getByRole('tab', 'Procedures').tap()
   await expect(screen.getByText(/D0220 - Intraoral/)).toBeVisible()
@@ -142,6 +146,7 @@ test('Generate Narrative arma el borrador con lo guardado de Chief Complaint', a
 
 test('el detalle de un procedimiento lleva a su caso y a su hallazgo', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'View Problem List').tap()
   await screen.getByRole('tab', 'Procedures').tap()
   await screen.getByText(/D7286 - Incisional biopsy/).tap()
   await expect(screen.getByRole('button', /View full record/)).toHaveCount(0)
@@ -181,6 +186,7 @@ test('Lab Order filtra por estado y cancela una orden con Undo', async ({ app, s
    mandar abre Consent required (CON-3927, CON-3946, CON-3950). Ver clinical-mode.md, 2026-10-17. */
 test('Start de un procedimiento cuyo caso no está aceptado avisa y lleva al caso', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'View Problem List').tap()
   await screen.getByRole('tab', 'Procedures').tap()
   await screen.getByPlaceholder('Search...').fill('D2740')
   await screen.getByRole('button', /Actions for D2740/).tap()
@@ -196,6 +202,7 @@ test('Start de un procedimiento cuyo caso no está aceptado avisa y lleva al cas
 
 test('Start con la firma pendiente: Cancel no cambia nada y Continue sigue sin firmar', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'View Problem List').tap()
   await screen.getByRole('tab', 'Procedures').tap()
   await screen.getByPlaceholder('Search...').fill('D2391')
   await screen.getByRole('button', /Actions for D2391/).tap()
@@ -204,7 +211,7 @@ test('Start con la firma pendiente: Cancel no cambia nada y Continue sigue sin f
   await expect(dialogo.getByText(/A consent document already exists/)).toBeVisible()
   await expect(dialogo.getByRole('button', /View consent/)).toBeVisible()
   await dialogo.getByRole('button', 'Cancel').tap()
-  await expect(screen.getByRole('dialog')).toHaveCount(0)
+  await expect(screen.getByRole('dialog', 'Consent required')).toHaveCount(0)
   await expect(screen.getByRole('cell', 'Planned')).toBeVisible()
 
   await screen.getByRole('button', /Actions for D2391/).tap()
@@ -216,6 +223,7 @@ test('Start con la firma pendiente: Cancel no cambia nada y Continue sigue sin f
 
 test('Start sin consentimiento enviado: se manda y se sigue, sin pedir otra confirmación', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', 'View Problem List').tap()
   await screen.getByRole('tab', 'Procedures').tap()
   await screen.getByPlaceholder('Search...').fill('D2392')
   await screen.getByRole('button', /Actions for D2392/).tap()
@@ -224,7 +232,7 @@ test('Start sin consentimiento enviado: se manda y se sigue, sin pedir otra conf
   await expect(dialogo.getByText(/This procedure requires a consent document/)).toBeVisible()
   await expect(dialogo.getByRole('button', /View consent/)).toHaveCount(0)
   await dialogo.getByRole('button', 'Send consent and sign later').tap()
-  await expect(screen.getByRole('dialog')).toHaveCount(0)
+  await expect(screen.getByRole('dialog', 'Consent required')).toHaveCount(0)
   await expect(screen.getByText(/D2392 moved to In progress\. Consent sent to the patient\./)).toBeVisible()
 })
 

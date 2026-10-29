@@ -500,3 +500,27 @@ pocos ítems, antes que el salto.
 - `tests/patient-overview.e2e.ts`: el test de Pending documents deja de asumir que con pocos ítems nunca hay región
   de scroll (depende del alto disponible, no de la cantidad); sigue probando que las tabs filtran bien y que no hay
   botón "Show more".
+
+## La pantalla termina donde termina Address; todo lo demás scrollea adentro (2026-10-29)
+
+Julián: "que el patient dashboard corte la pantalla cuando termina el address del paciente: la idea es ver la pantalla toda
+a simple vista, así que Pending documents y Pending Task tienen el scroll interno y siempre el mismo largo de background,
+para conservar el bento".
+
+- **Antes** el alto de la fila lo ponía el contenido del medio: con las 9 tareas montadas la página medía 1.329px y el menú del
+  paciente se estiraba 250px más allá de Address, con las cards de Pending Task enteras y sin scroll. El `flex-1` del
+  2026-10-25 no fijaba nada: sin un alto del que tirar, la card simplemente crecía con lo que traía.
+- **Ahora** el alto lo da el menú del paciente: la columna del medio es `lg:relative` con el contenido en `lg:absolute
+  inset-0`, así que no aporta alto a la fila y se acomoda adentro. Piso `lg:min-h-[56rem]` (≈ el menú expandido) para que
+  colapsado -riel de 60px- el layout no se achique ni salte al alternar. Pending documents y Pending Task se reparten
+  el alto que queda abajo de los cuatro bloques clínicos (373px cada una a 1440×900) y las tres columnas -menú,
+  centro y Appointments- cierran en la misma línea (1.077px a 1024, 1519 y 1920 de ancho). Página: 1.329 → 1.101px.
+- La grilla de abajo lleva `grid-rows-[minmax(0,1fr)]` (sin eso la fila crece con su contenido) y las cards `min-h-0`.
+- **Appointments** pasa al mismo mecanismo que Pending Task desde `lg` (`enCaja` + `llenarAlto` + `cargarAlScroll`): caja de
+  alto fijo, scroll adentro y carga por tandas, sin "Show N more". Apilado (< lg) sigue con el botón y 3 turnos.
+- Efecto buscado y ya aceptado el 2026-10-29: con pocos ítems en una tab queda aire abajo (Overdue tiene 2 documentos en
+  una card de 373px); a cambio no hay saltos de alto.
+- **A validar con usuarios:** a 1440×900 entran 2 documentos o ~2 filas de tareas antes de scrollear; si recepción trabaja
+  con muchas, subir el alto (hoy el piso es 56rem) o ceder alto a los cuatro bloques clínicos.
+- `tests/patient-overview.e2e.ts`: Pending Task ya no asume las 9 tareas montadas (arranca con 6 y suma al scrollear con
+  `scrollIntoView`); Appointments tiene su región `All appointments`.
