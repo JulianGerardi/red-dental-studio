@@ -50,8 +50,10 @@ export default function ClinicalMode() {
   const [ampliado, setAmpliado] = useState(false)
   /* El caso que se abrió desde una card del Overview; sin caso, Treatment Plan entra por Unassigned. */
   const [casoAbierto, setCasoAbierto] = useState<string | undefined>(casoPedido)
+  /* Desde el Total amount de una card: el caso abre en Estimate details. */
+  const [estimadoAbierto, setEstimadoAbierto] = useState(false)
 
-  const irA = (p: Pestana) => { setPestana(p); setEnOverview(false) }
+  const irA = (p: Pestana) => { setPestana(p); setEnOverview(false); setEstimadoAbierto(false) }
   /* Los links del detalle de la Problem List: la pestaña y, para Treatment Plan, el caso. */
   const ir = ({ pestana: p, caso }: DestinoClinico) => { if (caso) setCasoAbierto(caso); irA(p) }
 
@@ -64,7 +66,11 @@ export default function ClinicalMode() {
           de al lado (2026-10-18). */}
       {!ampliado && (
         <div className="relative shrink-0 lg:w-[360px]">
-          <TreatmentPlanList llena onAbrir={(id) => { setCasoAbierto(id); irA('Treatment Plan') }} />
+          <TreatmentPlanList
+            llena
+            onAbrir={(id) => { setCasoAbierto(id); irA('Treatment Plan') }}
+            onEstimado={(id) => { setCasoAbierto(id); irA('Treatment Plan'); setEstimadoAbierto(true) }}
+          />
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-4">
@@ -99,7 +105,7 @@ export default function ClinicalMode() {
         : pestana === 'Radiography'
           ? <RadiographyPanel />
           : pestana === 'Treatment Plan'
-            ? <TreatmentPlanSection key={casoAbierto ?? 'todos'} casoInicial={casoAbierto} />
+            ? <TreatmentPlanSection key={`${casoAbierto ?? 'todos'}-${estimadoAbierto}`} casoInicial={casoAbierto} estimadoInicial={estimadoAbierto} />
             : pestana === 'Treatment'
             ? <TreatmentPanel onTreatmentPlan={() => irA('Treatment Plan')} />
             : pestana === 'DentAssmt'

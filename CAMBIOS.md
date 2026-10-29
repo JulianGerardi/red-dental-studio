@@ -5,6 +5,19 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-29
 
+### Treatment Plan: Estimate details desde el Total Amount ([#110](https://github.com/JulianGerardi/red-dental-studio/pull/110))
+- **CON-3710 / CON-2529.** El *Total Amount* del caso y el *Total amount* de las cards del Overview de Clinical Mode
+  abren **Estimate details**: cinco totales y el desglose por visita y procedimiento (Amount charged, Allowable amount,
+  Coverage %, Copayment, Deductible applied, Insurance portion, Insurance adjustment, Patient portion).
+- Estados: Not calculated, Up to date, Update needed, Updating…, Update failed y Locked. Sólo se calcula en Planning
+  (actualiza todas las alternativas del grupo); mover un procedimiento de visita la deja desactualizada y el caso
+  muestra *Ins. est. update available*, que confirma con el modal de CON-2529.
+- **Para el dev:** `components/clinical/EstimateDetails.tsx` (`EstimateDetails`, `PrototypeControls`, `situacionDe`,
+  `estimacionEditable`) y `data/estimaciones.ts` (cálculo **mock** por categoría del CDT; el real es el de CON-2041).
+  **`PrototypeControls` es de demo y no va a producto.** `PlanCard` pasa a `div` con un botón que la cubre y otro encima
+  para el total. El `total` de cada caso ahora sale de la suma de sus fees. Storybook sin actualizar. Detalle en
+  `clinical-mode.md` (2026-10-28).
+
 ### Clinical Mode: la tabla del Overview flota; Patient Dashboard termina en Address ([#109](https://github.com/JulianGerardi/red-dental-studio/pull/109))
 - **Clinical Mode, Overview:** la Problem List / Procedures ya no va fija debajo del chart: se abre flotando desde el botón
   *View Problem List* (ícono de tabla), el mismo y en el mismo lugar que en los exámenes. La pantalla entra sin scroll en

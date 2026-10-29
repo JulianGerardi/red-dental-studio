@@ -98,3 +98,54 @@ test('las filas del caso y las sueltas se despliegan con su detalle', async ({ a
   await screen.getByRole('button', /^Chronic enamel dental caries · Tooth 3/).tap()
   await expect(screen.getByRole('dialog', /Chronic enamel dental caries/)).toBeVisible()
 })
+
+/* Estimate details (CON-3710, CON-2529): el Total Amount abre el desglose; si el plan cambió, se actualiza desde ahí o
+   desde el aviso del caso. */
+test('el Total amount de la card abre Estimate details y se actualiza', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', /Total amount .* View estimate details/).first().tap()
+  await expect(screen.getByRole('heading', 'Estimate details')).toBeVisible()
+  await expect(screen.getByText('Update needed').first()).toBeVisible()
+  await screen.getByRole('button', /Update estimates/).tap()
+  await expect(screen.getByRole('button', /Recalculate/)).toBeVisible()
+  await screen.getByRole('button', 'Back to Case').tap()
+  await expect(screen.getByRole('button', /Ins\. est\. update available/)).toHaveCount(0)
+})
+
+test('el aviso del caso pide confirmar y desde Presented la estimación queda bloqueada', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', /^Exams/).tap()
+  await screen.getByRole('menuitem', 'Treatment Plan').tap()
+  const planes = screen.getByRole('navigation', 'Treatment plans')
+  await planes.getByRole('button', /Periodontists Recommended, Planning/).tap()
+
+  await screen.getByRole('button', /Ins\. est\. update available/).tap()
+  await expect(screen.getByText('Insurance Estimate Update Available')).toBeVisible()
+  await screen.getByRole('button', 'Update').tap()
+  await screen.getByRole('button', /Total Amount .* View estimate details/).last().tap()
+  await expect(screen.getByRole('button', /Recalculate/)).toBeVisible()
+
+  await screen.getByRole('button', 'Back to Case').tap()
+  await planes.getByRole('button', /^24\/08\/2026, Presented/).tap()
+  await planes.getByRole('button', /Crown Option, Presented/).tap()
+  await screen.getByRole('button', /Total Amount .* View estimate details/).last().tap()
+  await expect(screen.getByText('Locked at presentation')).toBeVisible()
+  await expect(screen.getByRole('button', /Update estimates|Recalculate/)).toHaveCount(0)
+})
+
+test('Prototype controls: el cálculo que falla deja el anterior y el escenario bloqueado no se edita', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', /Total amount .* View estimate details/).first().tap()
+  await screen.getByRole('checkbox', 'Fail next calculation').tap()
+  await screen.getByRole('button', /Update estimates/).tap()
+  await expect(screen.getByText('Estimates couldn’t be updated')).toBeVisible()
+  await screen.getByRole('button', /Retry update/).tap()
+  await expect(screen.getByRole('button', /Recalculate/)).toBeVisible()
+
+  await screen.getByRole('button', /Simulate plan change/).tap()
+  await expect(screen.getByRole('button', /Update estimates/)).toBeVisible()
+  await screen.getByRole('button', /Estimate scenario/).tap()
+  await screen.getByRole('button', 'Presented / Locked').tap()
+  await expect(screen.getByText('Locked at presentation')).toBeVisible()
+  await expect(screen.getByRole('button', /Update estimates|Recalculate/)).toHaveCount(0)
+})
