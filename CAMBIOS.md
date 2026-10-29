@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-29
 
+### Pending Task/documents: vuelve el alto fijo, no salta al cambiar de tab ([#108](https://github.com/JulianGerardi/red-dental-studio/pull/108))
+- Revierte el punto de "sin espacio en blanco" del PR anterior: cambiar de tab hacía crecer o achicar la card según
+  cuántos ítems traía esa categoría. Pending Task y Pending documents vuelven al alto fijo del 2026-10-25 -se
+  reparten el alto que deja el menú, sin acomodarse al total-, combinado con la carga al scrollear sin botón.
+- **Para el dev:** `ui/show-more` pierde el modo de `cargarAlScroll` sin `llenarAlto` que se había sumado para esto
+  (nadie más lo usaba); vuelve a tener sentido sólo junto con `enCaja` + `llenarAlto`, como en #105. Detalle en
+  `patient-dashboard.md` (2026-10-29).
+
 ### Pending Task: tabs en vez de Filter; sin tab Activity; sin espacio en blanco ([#107](https://github.com/JulianGerardi/red-dental-studio/pull/107))
 - Pending Task (Dashboard y Patient Dashboard) filtra por tipo con **tabs** en vez del Filter -vuelve el camino que
   el Dashboard había dejado por el embudo (2026-08-28)-. Pending documents cambia sus tabs de *All/Patient/Office* a
