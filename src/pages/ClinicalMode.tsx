@@ -10,7 +10,7 @@ import { DentalAssessmentExam } from '@/components/clinical/DentalAssessmentExam
 import { ExtraOralExam } from '@/components/clinical/ExtraOralExam'
 import { IntraOralExam } from '@/components/clinical/IntraOralExam'
 import { TreatmentPlanList } from '@/components/clinical/TreatmentPlanList'
-import { ProblemList } from '@/components/clinical/ProblemList'
+import { ProblemListFlotante } from '@/components/clinical/ProblemListFlotante'
 import { NavegacionClinica, examenDePestana, type DestinoClinico } from '@/components/clinical/RecordDetail'
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
 import { LabOrderPanel } from '@/components/clinical/LabOrderPanel'
@@ -68,8 +68,10 @@ export default function ClinicalMode() {
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-4">
+        {/* La Problem List flota desde el mismo botón que en los exámenes: el Overview entra en la pantalla sin scroll
+            (clinical-mode.md, 2026-10-29). */}
+        <div><ProblemListFlotante procedimientoInicial={procedimientoPedido} /></div>
         <OdontogramaOverview ampliado={ampliado} onAmpliar={() => setAmpliado((v) => !v)} onDetalle={irA} />
-        {!ampliado && <ProblemList procedimientoInicial={procedimientoPedido} />}
       </div>
     </div>
   )

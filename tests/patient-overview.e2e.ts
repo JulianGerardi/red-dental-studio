@@ -14,9 +14,9 @@ test('Pending documents arriba de Pending Task y Appointments a la derecha', asy
   expect(Math.abs(docs!.x - tareas!.x)).toBeLessThan(2)
   expect(turnos!.x).toBeGreaterThan(docs!.x + 400)
   expect(Math.abs(turnos!.y - docs!.y)).toBeLessThan(20)
-  await expect(screen.getByText('Routine cleaning appointment')).toHaveCount(7)
-  /* Ni Pending Task ni Pending documents llevan "Show N more": las dos cargan solas al scrollear, con la misma
-     funcionalidad (patient-dashboard.md, 2026-10-28). Sólo Appointments, a la derecha, conserva el botón. */
+  /* Appointments también scrollea adentro, del alto fijo de la fila (patient-dashboard.md, 2026-10-29). */
+  await expect(screen.getByRole('region', 'All appointments')).toBeVisible()
+  /* Ninguna de las tres lleva "Show N more": cargan solas al scrollear (patient-dashboard.md, 2026-10-28). */
   await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(0)
 })
 
@@ -25,9 +25,10 @@ test('Pending documents arriba de Pending Task y Appointments a la derecha', asy
    2026-10-28). */
 test('Pending Task: tabs por tipo acotan la lista y el resto se ve scrolleando, sin botón', async ({ app, screen }) => {
   await app.open('/patients/1')
-  await expect(screen.getByText('Complete this Task')).toHaveCount(9)
   await expect(screen.getByRole('tab', 'All (9)')).toBeVisible()
 
+  /* La card mide lo que deja el menú del paciente (la pantalla termina en Address, 2026-10-29): arrancan montadas
+     unas pocas y el resto se suma al scrollear. */
   const caja = screen.getByRole('region', 'All pending tasks')
   await expect(caja).toBeVisible()
   /* Dentro de esa caja no hay "Show more": a diferencia de Pending documents, que sí lo lleva. */
@@ -38,9 +39,8 @@ test('Pending Task: tabs por tipo acotan la lista y el resto se ve scrolleando, 
   await expect(screen.getByText('Referrals · 2')).toBeVisible()
 
   await screen.getByRole('tab', /^All/).tap()
-  await expect(screen.getByText('Complete this Task')).toHaveCount(9)
-
-  await caja.swipe({ direction: 'up', momentum: 'fast' })
+  // Llegar a la última fila montada acerca el scroll al final y carga la tanda siguiente.
+  for (let i = 0; i < 3; i++) await screen.getByText('Complete this Task').last().scrollIntoView()
   await expect(screen.getByText('Complete this Task')).toHaveCount(9)
 })
 

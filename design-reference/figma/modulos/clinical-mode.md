@@ -2853,3 +2853,25 @@ cargar una condition sin antes seleccionar una parte de la cabeza (para ambos ex
 
 Código: `clinical/{ExamLayout,RegionExam}.tsx`, `clinical/dental/{NewProcedureDrawer,RegionConditionDrawer,FindingCard}.tsx`,
 `tests/clinical-mode.e2e.ts`.
+
+## El Overview sin scroll: la tabla flota desde View Problem List (2026-10-29)
+
+Julián: en Clinical Mode el ícono de la tabla tiene que ser igual al de las demás pantallas, en la misma ubicación y
+flotante, para ver toda la pantalla a simple vista sin scroll.
+
+- El Overview tenía la **Problem List / Procedures** fija debajo del chart (la pantalla medía 1.274px a 829 de alto, 445
+  más que la ventana). Ahora la tabla sale del flujo y se abre **flotando** desde el botón *View Problem List* (ícono
+  `Table2`), el mismo de los exámenes: arriba a la izquierda del contenido, blanco, con el texto al pasar el mouse y el
+  tooltip "Open the patient's problem list". Página: 1.274 → 891px a 1519×829 (en 1080 de alto entra entera).
+- Una sola pieza: `ProblemListFlotante` (botón + tooltip + popover con la tabla). `ExamLayout` ya no arma su propio
+  popover: la usa en la fila de acciones. Con `?procedure=` (el link del Ledger) el Overview abre la tabla ya en
+  Procedures con esa fila, como antes.
+- El botón está también con el chart ampliado, donde antes la tabla se escondía.
+- Sin cambio de contenido: las mismas pestañas, filtros, filas y acciones, ahora en el flotante.
+- **Anomalía de nombre:** el pedido habla de "Clinical Notes"; no hay pantalla con ese nombre en la app (sólo la
+  Clinical Note que se ofrece firmar al cerrar el encuentro). Se tomó como el Overview de Clinical Mode, que es donde la
+  tabla estaba fija. Confirmar con Julián.
+- **A validar con usuarios:** si el odontólogo abre seguido la tabla en el Overview (en ese caso conviene dejarla
+  anclada) o la consulta de paso; y si el botón de sólo ícono se descubre sin el texto.
+- `tests/clinical-mode.e2e.ts`: los tests que usaban la tabla del Overview abren primero *View Problem List*; los de
+  consentimiento cuentan el dialog *Consent required* (el popover de la tabla también es `dialog`).

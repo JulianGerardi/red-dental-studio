@@ -92,7 +92,10 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
     <div className={CONTENEDOR_PAGINA}>
 
       <PatientBreadcrumb name="John Smith" />
-      <div className="flex flex-col gap-5 lg:flex-row">
+      {/* Desde lg el alto lo da el menú del paciente -la pantalla termina donde termina Address-, con un piso para que
+          colapsado no se achique: el contenido de al lado no lo estira, se acomoda adentro (patient-dashboard.md,
+          2026-10-29). */}
+      <div className="flex flex-col gap-5 lg:min-h-[56rem] lg:flex-row">
         <PatientSidePanel
           name="John Smith"
           initials="JS"
@@ -105,7 +108,8 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
           onEditContact={() => setModal('contact')}
         />
 
-        <div className="flex min-w-0 flex-1 flex-col gap-5">
+        <div className="min-w-0 flex-1 lg:relative">
+        <div className="flex flex-col gap-5 lg:absolute lg:inset-0">
           <div className="grid gap-4 lg:grid-cols-2">
             {CLINICAL.map(({ label, icon: Icon }) => {
               const activa = open?.label === label
@@ -141,17 +145,17 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
 
           {/* Izquierda Pending Task y Pending documents; derecha Appointments, del alto de las dos
               (patient-dashboard.md, 2026-10-17). */}
-          <div className="grid gap-5 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_280px]">
-            <div className="flex min-w-0 flex-col gap-5">
+          <div className="grid gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_280px] lg:grid-rows-[minmax(0,1fr)]">
+            <div className="flex min-h-0 min-w-0 flex-col gap-5">
               {/* En lugar de la tabla de Insurance (que sigue en su sección): los documentos pendientes a resolver. Van
                   primero y las tareas abajo, con el mismo diseño (Julián, 2026-10-19). Las dos llenan el alto que
                   deja el menú -alto fijo, no se acomoda al total: no salta al cambiar de tab (Julián, 2026-10-29)- y
                   scrollean adentro pasado ese alto (patient-dashboard.md, 2026-10-25). */}
-              <Card className="flex flex-1 flex-col p-5">
+              <Card className="flex min-h-0 flex-1 flex-col p-5">
                 <PendingDocuments />
               </Card>
 
-              <Card className="flex flex-1 flex-col p-5">
+              <Card className="flex min-h-0 flex-1 flex-col p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
                   <Tabs
@@ -173,11 +177,12 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
               </Card>
             </div>
 
-            <Card className="p-4">
+            <Card className="flex min-h-0 flex-col p-4">
               <h2 className="text-[15px] font-bold text-ink">Appointments</h2>
               <Tabs size="sm" fullWidth className="mt-3" aria-label="Appointments" tabs={['Next', 'Next Appointments'] as const} value={apptTab} onChange={setApptTab} />
-              <div className="mt-3">
-                <ShowMore total={appts.length} limit={enColumna ? TOPE.turnosColumna : TOPE.turnos} label="appointments" className="flex flex-col gap-2">
+              <div className="mt-3 flex min-h-0 flex-1 flex-col">
+                {/* En columna, alto fijo y scroll adentro, como Pending Task; apilado, "Show N more". */}
+                <ShowMore total={appts.length} limit={enColumna ? TOPE.turnosColumna : TOPE.turnos} enCaja={enColumna} llenarAlto={enColumna} cargarAlScroll={enColumna} label="appointments" className="flex flex-col gap-2">
                   {(n) => appts.slice(0, n).map((a, i) => (
                     <PatientAppointmentCard
                       key={i}
@@ -194,6 +199,7 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
               </div>
             </Card>
           </div>
+        </div>
         </div>
       </div>
 
