@@ -3,6 +3,21 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-29
+
+### Pending Task: tabs en vez de Filter; sin tab Activity; sin espacio en blanco ([#107](https://github.com/JulianGerardi/red-dental-studio/pull/107))
+- Pending Task (Dashboard y Patient Dashboard) filtra por tipo con **tabs** en vez del Filter -vuelve el camino que
+  el Dashboard había dejado por el embudo (2026-08-28)-. Pending documents cambia sus tabs de *All/Patient/Office* a
+  **Overdue / Due this week / Later**, las mismas categorías que ya agrupaban la lista.
+- Sale el tab *Pending Task / Activity* del Patient Dashboard (nunca tuvo una vista de Activity armada): el tab de
+  tipo queda solo, a la derecha del título.
+- Pending Task y Pending documents ya no fuerzan su alto al de Appointments: miden lo que pide su contenido, sin
+  espacio de más, y recién pasado un alto máximo (~640px) entra el scroll interno.
+- **Para el dev:** `ui/show-more` suma un modo de `cargarAlScroll` sin `llenarAlto` -sin alto fijo del que tirar,
+  monta todas las filas de una (nada de tandas) y cap en `maxHeight`-; antes sólo tenía sentido junto con
+  `llenarAlto`. `PendingDocuments` pierde la prop `llenar`. Detalle en `dashboard.md` y `patient-dashboard.md`
+  (2026-10-29).
+
 ## 2026-10-28
 
 ### Pending documents: la misma funcionalidad de scroll que Pending Task ([#106](https://github.com/JulianGerardi/red-dental-studio/pull/106))

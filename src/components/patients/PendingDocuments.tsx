@@ -51,38 +51,39 @@ const GRUPOS: { titulo: string; filtro: (d: DocPendiente) => boolean; color: str
   { titulo: 'Later', filtro: (d) => d.dias > 7, color: 'text-ink-muted' },
 ]
 
-export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES, llenar }: {
+export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES }: {
   docs?: DocPendiente[]
-  /** Dentro de una card `flex-1`: llena el alto que le toca, muestra las filas que entran y el resto se carga solo al
-      acercarse al final del scroll, sin botón -mismo comportamiento que Pending Task (patient-dashboard.md, 2026-10-28). */
-  llenar?: boolean
 }) {
   const { docs, resolver } = useDocsPendientes(iniciales)
-  const [quien, setQuien] = useState<'All' | 'Patient' | 'Office'>('All')
+  /* Tabs por urgencia en vez de por quién actúa -mismas categorías que Pending Task, como tabs en las dos
+     (Julián, 2026-10-29)-. Quién tiene que actuar sigue viéndose en cada fila. */
+  const [urgencia, setUrgencia] = useState(GRUPOS[0]!.titulo)
+  const grupoActivo = GRUPOS.find((g) => g.titulo === urgencia)!
   const pendientes = docs.filter((d) => !d.resuelto)
-  const visibles = pendientes.filter((d) => quien === 'All' || (quien === 'Patient' ? d.responsable === 'Patient' : d.responsable !== 'Patient'))
+  const visibles = pendientes.filter(grupoActivo.filtro)
 
   return (
-    <div className={cn('flex flex-col gap-4', llenar && 'min-h-0 flex-1')}>
+    <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
         <h2 className="text-[15px] font-bold text-ink">Pending documents</h2>
         {pendientes.length > 0 && <Pill tone="warning" size="sm">{pendientes.length} to resolve</Pill>}
         <Tabs
-          size="sm" className="ml-auto" aria-label="Who has to act"
-          tabs={[
-            { value: 'All' as const, count: pendientes.length },
-            { value: 'Patient' as const, count: pendientes.filter((d) => d.responsable === 'Patient').length },
-            { value: 'Office' as const, count: pendientes.filter((d) => d.responsable !== 'Patient').length },
-          ]}
-          value={quien} onChange={setQuien}
+          size="sm" className="ml-auto" aria-label="Filter by urgency"
+          tabs={GRUPOS.map((g) => ({ value: g.titulo, count: pendientes.filter(g.filtro).length }))}
+          value={urgencia} onChange={setUrgencia}
         />
       </div>
 
       {visibles.length === 0 ? (
-        <EmptyState icon={Inbox} title="Nothing to resolve" detail="Every document of this patient is signed, uploaded and up to date." className="py-8" />
+        <EmptyState
+          icon={Inbox} title="Nothing here"
+          detail={pendientes.length === 0 ? 'Every document of this patient is signed, uploaded and up to date.' : 'No pending documents in this group.'}
+          className="py-8"
+        />
       ) : (
-        /* Los primeros TOPE documentos, en el orden de los grupos; "Show N more" abre el resto con scroll (ui/show-more). */
-        <ShowMore total={visibles.length} limit={TOPE} enCaja={llenar} llenarAlto={llenar} filas={llenar ? 'li' : undefined} cargarAlScroll={llenar} label="pending documents" className="flex flex-col gap-4">
+        /* Los primeros TOPE documentos, en el orden de los grupos; el resto se carga solo al acercarse al final del
+           scroll, sin botón ni espacio de más si son pocos (ui/show-more, patient-dashboard.md 2026-10-29). */
+        <ShowMore total={visibles.length} limit={TOPE} cargarAlScroll label="pending documents" className="flex flex-col gap-4">
           {(n) => {
             const enOrden = GRUPOS.flatMap((g) => visibles.filter(g.filtro)).slice(0, n)
             return GRUPOS.map((g) => {

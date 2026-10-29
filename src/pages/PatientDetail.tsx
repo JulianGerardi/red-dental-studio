@@ -14,7 +14,6 @@ import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
 import { TASK_KINDS } from '@/components/dashboard/dashboard-data'
 import { ShowMore } from '@/components/ui/show-more'
-import { FilterMenu } from '@/components/ui/filter-menu'
 import { EditPatientModal } from '@/pages/patients/EditPatientModal'
 import { DATOS_JOHN_SMITH, usePatients } from '@/data/patientsStore'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
@@ -82,11 +81,9 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
     })
   }
   const [modal, setModal] = useState<'contact' | 'edit' | null>(null)
-  const [taskTab, setTaskTab] = useState<'Pending Task' | 'Activity'>('Pending Task')
-  /* Igual que el Dashboard (dashboard.md, 2026-08-28): filtro por tipo en vez de tabs -son las mismas categorías-,
-     sin nada tildado se ve todo. */
-  const [tiposTarea, setTiposTarea] = useState<string[]>([])
-  const tareas = TASKS.filter((t) => tiposTarea.length === 0 || tiposTarea.includes(t.kind))
+  /* Igual que el Dashboard (dashboard.md, 2026-10-29): tabs por tipo, en vez del filtro. */
+  const [tipoTarea, setTipoTarea] = useState('All')
+  const tareas = tipoTarea === 'All' ? TASKS : TASKS.filter((t) => t.kind === tipoTarea)
   const [apptTab, setApptTab] = useState<'Next' | 'Next Appointments'>('Next')
   /* Desde lg Appointments es una columna del alto de Pending Task + Pending documents: entran más turnos. */
   const enColumna = useMedia('(min-width: 1024px)')
@@ -147,26 +144,30 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
           <div className="grid gap-5 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_280px]">
             <div className="flex min-w-0 flex-col gap-5">
               {/* En lugar de la tabla de Insurance (que sigue en su sección): los documentos pendientes a resolver. Van
-                  primero y las tareas abajo, con el mismo diseño (Julián, 2026-10-19). */}
-              <Card className="flex flex-1 flex-col p-5">
-                <PendingDocuments llenar />
+                  primero y las tareas abajo, con el mismo diseño (Julián, 2026-10-19). Ninguna de las dos fuerza su
+                  alto al de Appointments: miden lo que pide el contenido, sin espacio de más, y scrollean adentro
+                  pasado cierto alto (patient-dashboard.md, 2026-10-29). */}
+              <Card className="flex flex-col p-5">
+                <PendingDocuments />
               </Card>
 
-              {/* La card llena el alto que deja el menú y la lista muestra las tareas que entran enteras (llenarAlto); "Show N more" abre
-                  el resto con scroll adentro, sin que la card crezca (enCaja, como Appointments; patient-dashboard.md, 2026-10-25). */}
-              <Card className="flex flex-1 flex-col p-5">
+              <Card className="flex flex-col p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-[15px] font-bold text-ink">Pending Task</h2>
-                  <div className="flex items-center gap-2">
-                    <FilterMenu label="Filter tasks" options={TASK_KINDS} value={tiposTarea} onChange={setTiposTarea} size="sm" />
-                    <Tabs size="sm" aria-label="Tasks" tabs={['Pending Task', 'Activity'] as const} value={taskTab} onChange={setTaskTab} />
-                  </div>
+                  <Tabs
+                    size="sm" aria-label="Filter tasks"
+                    tabs={[
+                      { value: 'All', count: TASKS.length },
+                      ...TASK_KINDS.map((k) => ({ value: k, count: TASKS.filter((t) => t.kind === k).length })),
+                    ]}
+                    value={tipoTarea} onChange={setTipoTarea}
+                  />
                 </div>
-                <div className="mt-4 flex min-h-0 flex-1 flex-col">
+                <div className="mt-4">
                   {tareas.length === 0 ? (
-                    <EmptyState icon={Activity} title="Nothing pending" detail="No pending tasks match the selected types." className="py-8" />
+                    <EmptyState icon={Activity} title="Nothing pending" detail="No pending tasks of this type." className="py-8" />
                   ) : (
-                    <PendingTaskList tasks={tareas} limit={TOPE.tareas} enCaja llenarAlto cargarAlScroll />
+                    <PendingTaskList tasks={tareas} limit={TOPE.tareas} cargarAlScroll />
                   )}
                 </div>
               </Card>
