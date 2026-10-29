@@ -3,7 +3,60 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-29
+
+### Clinical Mode: la tabla del Overview flota; Patient Dashboard termina en Address ([#109](https://github.com/JulianGerardi/red-dental-studio/pull/109))
+- **Clinical Mode, Overview:** la Problem List / Procedures ya no va fija debajo del chart: se abre flotando desde el botón
+  *View Problem List* (ícono de tabla), el mismo y en el mismo lugar que en los exámenes. La pantalla entra sin scroll en
+  ventanas de ~1080px de alto.
+- **Patient Dashboard:** la pantalla termina donde termina Address (el alto lo da el menú del paciente). Pending documents,
+  Pending Task y Appointments scrollean adentro con alto fijo y cierran en la misma línea; Appointments ya no lleva
+  "Show N more" desde `lg`, carga al scrollear.
+- **Para el dev:** pieza nueva `ProblemListFlotante` (`components/clinical/ProblemListFlotante.tsx`), que `ExamLayout` y
+  el Overview comparten. En `PatientDetail.tsx` la columna del medio es `lg:relative` con el contenido en `lg:absolute
+  inset-0` y la fila lleva `lg:min-h-[56rem]`. Los e2e que usaban la tabla del Overview abren primero *View Problem
+  List*. Storybook sin actualizar. Detalle en `clinical-mode.md` y `patient-dashboard.md` (2026-10-29).
+
+### Pending Task/documents: vuelve el alto fijo, no salta al cambiar de tab ([#108](https://github.com/JulianGerardi/red-dental-studio/pull/108))
+- Revierte el punto de "sin espacio en blanco" del PR anterior: cambiar de tab hacía crecer o achicar la card según
+  cuántos ítems traía esa categoría. Pending Task y Pending documents vuelven al alto fijo del 2026-10-25 -se
+  reparten el alto que deja el menú, sin acomodarse al total-, combinado con la carga al scrollear sin botón.
+- **Para el dev:** `ui/show-more` pierde el modo de `cargarAlScroll` sin `llenarAlto` que se había sumado para esto
+  (nadie más lo usaba); vuelve a tener sentido sólo junto con `enCaja` + `llenarAlto`, como en #105. Detalle en
+  `patient-dashboard.md` (2026-10-29).
+
+### Pending Task: tabs en vez de Filter; sin tab Activity; sin espacio en blanco ([#107](https://github.com/JulianGerardi/red-dental-studio/pull/107))
+- Pending Task (Dashboard y Patient Dashboard) filtra por tipo con **tabs** en vez del Filter -vuelve el camino que
+  el Dashboard había dejado por el embudo (2026-08-28)-. Pending documents cambia sus tabs de *All/Patient/Office* a
+  **Overdue / Due this week / Later**, las mismas categorías que ya agrupaban la lista.
+- Sale el tab *Pending Task / Activity* del Patient Dashboard (nunca tuvo una vista de Activity armada): el tab de
+  tipo queda solo, a la derecha del título.
+- Pending Task y Pending documents ya no fuerzan su alto al de Appointments: miden lo que pide su contenido, sin
+  espacio de más, y recién pasado un alto máximo (~640px) entra el scroll interno.
+- **Para el dev:** `ui/show-more` suma un modo de `cargarAlScroll` sin `llenarAlto` -sin alto fijo del que tirar,
+  monta todas las filas de una (nada de tandas) y cap en `maxHeight`-; antes sólo tenía sentido junto con
+  `llenarAlto`. `PendingDocuments` pierde la prop `llenar`. Detalle en `dashboard.md` y `patient-dashboard.md`
+  (2026-10-29).
+
 ## 2026-10-28
+
+### Pending documents: la misma funcionalidad de scroll que Pending Task ([#106](https://github.com/JulianGerardi/red-dental-studio/pull/106))
+- El **Show more** de Pending documents se veía mal (no se notaba que había más cards). Ahora tiene la misma
+  funcionalidad que Pending Task: sin botón, la caja arranca scrolleable y carga el resto sola al acercarse al final.
+- **Para el dev:** `PendingDocuments.tsx` suma `cargarAlScroll={llenar}` a su `ShowMore` (mismo condicional que ya
+  usaba `enCaja`/`llenarAlto`/`filas`). No hay prop ni componente nuevo: es la pieza de `ui/show-more` que se armó
+  para el PR anterior. Detalle en `patient-dashboard.md` (2026-10-28).
+
+### Patient Dashboard: Pending Task filtra por tipo y carga al scrollear ([#105](https://github.com/JulianGerardi/red-dental-studio/pull/105))
+- Pending Task del Patient Dashboard suma el mismo **Filter** por tipo que ya usa el Dashboard (checkboxes Clinical
+  Note / Lab Orders / Prescriptions / Referrals, nada tildado muestra todo), junto a los tabs Pending Task / Activity.
+- La lista ya no tiene botón **"Show N more"**: la caja arranca scrolleable y, al acercarse al final, suma otra tanda
+  de tareas sola, hasta mostrarlas todas.
+- **Para el dev:** `ui/show-more` suma la prop `cargarAlScroll` (sólo tiene sentido junto con `enCaja` + `llenarAlto`);
+  por ahora sólo la usa `PendingTaskList` del Patient Dashboard (`PatientDetail.tsx`) — Pending documents y el Pending
+  Task del Dashboard siguen con el botón. El mock `TASKS` de `PatientDetail.tsx` pasa de ser las 9 tareas "Referrals"
+  a repartirse entre los cuatro tipos. Detalle, anomalía de Jira anotada y qué validar con usuarios en
+  `patient-dashboard.md` (2026-10-28).
 
 ### Extraoral e Intraoral: sin región elegida no se carga nada; New Procedure va a la región ([#104](https://github.com/JulianGerardi/red-dental-studio/pull/104))
 - Como en red.dev: en Extra Oral e Intra Oral, Add Condition y Add Procedure sin región elegida en el gráfico no

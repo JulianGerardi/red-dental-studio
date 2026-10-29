@@ -818,3 +818,25 @@ Storybook: *Components / Dashboard / Dashboard rows → States* suma **Menu expa
 
 **Para validar con usuarios:** si conviene que la fila mantenga dos renglones también expandida (hoy no entra: Check In + provider + botón piden ~306px y hay 303), por
 ejemplo con el provider más corto o el botón sólo con ícono en angosto.
+
+## Pending Task vuelve a tabs, ya no Filter (2026-10-29)
+
+Revierte la decisión de "Filtros del dashboard" (2026-08-28, más arriba): en ese momento el embudo reemplazó a los tabs
+del Figma por redundantes. Julián, después de llevar el mismo Filter al Patient Dashboard (CON-2643, patient-dashboard.md
+2026-10-28), pidió el camino inverso para las dos pantallas: tabs en vez de Filter, con el mismo criterio -una sola
+categoría a la vez en vez de combinarlas- para Pending Task del Dashboard y del Patient Dashboard.
+
+- `BotonFiltro` (el `FilterMenu` con checkboxes) sale del `controls` del Panel de Pending Task; en su lugar va `ui/tabs`,
+  con **All** y los cuatro tipos (`TASK_KINDS`), cada uno con su cuenta entre paréntesis -mismo criterio que ya usaban
+  los tabs All/Patient/Office de Pending documents-. Selección única: tocar un tipo lo deja solo, tocar **All** vuelve
+  a mostrarlos todos.
+  - **Appointments** y **Waiting Room**, en la fila de arriba, siguen con su `BotonFiltro` por operatorio -eso no
+    cambió, sólo Pending Task-.
+- La agrupación por tipo adentro de `PendingTaskList` (rótulo "Tipo · cuenta") no se tocó: con un tab elegido queda un
+  solo grupo (el mismo tipo que dice el tab), igual que antes pasaba al tildar un solo tipo en el Filter.
+- `tests/dashboard.e2e.ts` suma un test para las tabs de Pending Task. `tests/patient-overview.e2e.ts`, el equivalente
+  del lado del paciente (ver patient-dashboard.md, misma fecha).
+
+**A validar con usuarios:** al perder el multi-select del Filter, ya no se puede ver "Lab Orders + Referrals" juntos sin
+el resto; si hace falta esa combinación, el camino sería volver a un Filter pero sólo para Pending Task (dejando las
+tabs en el resto) o sumar un modo "varios" a `ui/tabs`.
