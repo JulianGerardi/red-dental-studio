@@ -1,1 +1,0 @@
-import{t as e}from"./iframe-BrDfP2_y.js";e();
