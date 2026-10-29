@@ -421,3 +421,31 @@ que las dos cards tengan **la misma funcionalidad de scroll**, fluida.
 - `tests/patient-overview.e2e.ts`: el test de layout pasa a esperar **cero** "Show N more" en toda la pantalla (antes
   esperaba uno, el de Pending documents) y un test nuevo prueba que Pending documents tiene la misma caja scrolleable
   con nombre ("All pending documents") que Pending Task, sin botón.
+
+## Las categorías pasan a tabs; Pending documents cambia las suyas (2026-10-29)
+
+Julián: sacar el Filter de Pending Task y ponerlo en tabs -"también aplicalo al Dashboard, que es un componente que
+tenemos ahí también"-, y en Pending documents, en vez de sus tabs de hoy, usar **Overdue / Due this week / Later**.
+Ver `dashboard.md` (misma fecha) por el lado que comparten las dos pantallas.
+
+1. **Pending Task** (acá y en el Dashboard): el `FilterMenu` del 2026-10-28 sale; en su lugar, `ui/tabs` con **All**
+   y los cuatro tipos (`TASK_KINDS`), cada uno con su cuenta. Selección única -tocar un tipo lo deja solo, **All**
+   vuelve a mostrarlos todos-, a diferencia del Filter, que combinaba varios a la vez.
+2. **Pending documents**: sus tabs *All / Patient / Office* (quién tiene que actuar) pasan a ser **Overdue / Due this
+   week / Later** -las mismas tres categorías que ya agrupaban la lista como texto plano desde el 2026-10-05-, con
+   selección única y arrancando en **Overdue**. Quién tiene que actuar (Patient, Provider, Front desk) se sigue
+   viendo en cada fila; lo que se pierde es poder filtrar por eso desde arriba.
+   - El estado vacío distingue ahora "no hay nada pendiente" de "no hay nada en este grupo" (antes sólo existía el
+     primer caso, porque *All* siempre tenía algo si había pendientes).
+3. Ninguna de las dos pantallas necesitó tocar la agrupación interna (`PendingTaskList` por tipo, `PendingDocuments`
+   por los mismos `GRUPOS` de siempre): con una sola categoría activa a la vez, esa agrupación ya hacía lo mismo que
+   iba a hacer el tab -queda un solo grupo visible, el que dice el tab-.
+
+**A validar con usuarios:**
+- Pending Task pierde el multi-select del Filter (ver, p. ej., "Lab Orders + Referrals" juntos sin el resto).
+- Pending documents pierde el filtro por **quién** actúa (Patient/Office) del header; si hace falta, podría volver
+  como un segundo control más chico, o dejar que la fila sea el único lugar donde se ve.
+
+`tests/patient-overview.e2e.ts` y `tests/dashboard.e2e.ts`: los tests de *Filter tasks* pasan a tocar las tabs
+(`getByRole('tab', …)`); un test nuevo cubre las tabs de urgencia de Pending documents (arranca en Overdue, cambiar a
+Later muestra otros documentos).

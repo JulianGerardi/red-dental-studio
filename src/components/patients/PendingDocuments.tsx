@@ -58,9 +58,12 @@ export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES, llenar }: 
   llenar?: boolean
 }) {
   const { docs, resolver } = useDocsPendientes(iniciales)
-  const [quien, setQuien] = useState<'All' | 'Patient' | 'Office'>('All')
+  /* Tabs por urgencia en vez de por quién actúa -mismas categorías que Pending Task, como tabs en las dos
+     (Julián, 2026-10-29)-. Quién tiene que actuar sigue viéndose en cada fila. */
+  const [urgencia, setUrgencia] = useState(GRUPOS[0]!.titulo)
+  const grupoActivo = GRUPOS.find((g) => g.titulo === urgencia)!
   const pendientes = docs.filter((d) => !d.resuelto)
-  const visibles = pendientes.filter((d) => quien === 'All' || (quien === 'Patient' ? d.responsable === 'Patient' : d.responsable !== 'Patient'))
+  const visibles = pendientes.filter(grupoActivo.filtro)
 
   return (
     <div className={cn('flex flex-col gap-4', llenar && 'min-h-0 flex-1')}>
@@ -68,18 +71,18 @@ export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES, llenar }: 
         <h2 className="text-[15px] font-bold text-ink">Pending documents</h2>
         {pendientes.length > 0 && <Pill tone="warning" size="sm">{pendientes.length} to resolve</Pill>}
         <Tabs
-          size="sm" className="ml-auto" aria-label="Who has to act"
-          tabs={[
-            { value: 'All' as const, count: pendientes.length },
-            { value: 'Patient' as const, count: pendientes.filter((d) => d.responsable === 'Patient').length },
-            { value: 'Office' as const, count: pendientes.filter((d) => d.responsable !== 'Patient').length },
-          ]}
-          value={quien} onChange={setQuien}
+          size="sm" className="ml-auto" aria-label="Filter by urgency"
+          tabs={GRUPOS.map((g) => ({ value: g.titulo, count: pendientes.filter(g.filtro).length }))}
+          value={urgencia} onChange={setUrgencia}
         />
       </div>
 
       {visibles.length === 0 ? (
-        <EmptyState icon={Inbox} title="Nothing to resolve" detail="Every document of this patient is signed, uploaded and up to date." className="py-8" />
+        <EmptyState
+          icon={Inbox} title="Nothing here"
+          detail={pendientes.length === 0 ? 'Every document of this patient is signed, uploaded and up to date.' : 'No pending documents in this group.'}
+          className="py-8"
+        />
       ) : (
         /* Los primeros TOPE documentos, en el orden de los grupos; "Show N more" abre el resto con scroll (ui/show-more). */
         <ShowMore total={visibles.length} limit={TOPE} enCaja={llenar} llenarAlto={llenar} filas={llenar ? 'li' : undefined} cargarAlScroll={llenar} label="pending documents" className="flex flex-col gap-4">

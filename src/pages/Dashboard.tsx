@@ -13,6 +13,7 @@ import { OperatoryList } from '@/components/dashboard/OperatoryList'
 import { AppointmentRow } from '@/components/dashboard/DashboardRows'
 import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
 import { ListGroup } from '@/components/ui/list-group'
+import { Tabs } from '@/components/ui/tabs'
 import {
   DIAS, DIA_CARGADO, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, fechaDesdeClave, reprogramar,
   type DiaDashboard, type Origen,
@@ -108,7 +109,10 @@ export default function Dashboard() {
 
   const [date, setDate] = useState(DEFAULT_DATE)
   const [salas, setSalas] = useState<string[]>([])
-  const [tipos, setTipos] = useState<string[]>([])
+  /* Tabs en vez del embudo (Julián, 2026-10-29): vuelve lo que `dashboard.md` (2026-08-28) había sacado del Figma por
+     redundante con el filtro -ahora el filtro se saca a favor de las tabs, en las dos pantallas que comparten
+     PendingTaskList-. */
+  const [tipoTarea, setTipoTarea] = useState('All')
   /* La Waiting Room tiene su propio filtro, como Appointments; las salas ya no la filtran (dashboard.md, 2026-10-19). */
   const [salasEspera, setSalasEspera] = useState<string[]>([])
   /* Desde 1280px las tres columnas toman el alto de la ventana y scrollean adentro; Pending Task va abajo, a todo el ancho. */
@@ -221,7 +225,7 @@ export default function Dashboard() {
   const turnos = dia.appointments.filter(
     (a) => salas.length === 0 || salas.includes(a.operatory),
   )
-  const tareas = dia.tasks.filter((t) => tipos.length === 0 || tipos.includes(t.kind))
+  const tareas = tipoTarea === 'All' ? dia.tasks : dia.tasks.filter((t) => t.kind === tipoTarea)
   const operatoriosEspera = useMemo(
     () => [...new Set(dia.waiting.map((w) => w.operatory))].sort(),
     [dia],
@@ -326,8 +330,13 @@ export default function Dashboard() {
       <Panel
         title="Pending Task" className="mt-4"
         controls={
-          <BotonFiltro
-            label="Filter tasks" options={TASK_KINDS} value={tipos} onChange={setTipos}
+          <Tabs
+            size="sm" aria-label="Filter tasks"
+            tabs={[
+              { value: 'All', count: dia.tasks.length },
+              ...TASK_KINDS.map((k) => ({ value: k, count: dia.tasks.filter((t) => t.kind === k).length })),
+            ]}
+            value={tipoTarea} onChange={setTipoTarea}
           />
         }
       >
@@ -338,7 +347,7 @@ export default function Dashboard() {
             detail={
               dia.tasks.length === 0
                 ? 'There are no tasks waiting on this day.'
-                : 'No pending tasks match the selected types.'
+                : 'No pending tasks of this type today.'
             }
           />
         ) : (
