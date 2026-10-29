@@ -2875,3 +2875,23 @@ flotante, para ver toda la pantalla a simple vista sin scroll.
   anclada) o la consulta de paso; y si el botón de sólo ícono se descubre sin el texto.
 - `tests/clinical-mode.e2e.ts`: los tests que usaban la tabla del Overview abren primero *View Problem List*; los de
   consentimiento cuentan el dialog *Consent required* (el popover de la tabla también es `dialog`).
+
+## El fondo del panel del examen llega hasta el borde de Findings (2026-10-29)
+
+Julián, con captura: en los exámenes (Extra Oral entre otros) el panel blanco de la derecha quedaba corto -terminaba
+bien antes que la lista de Findings de la izquierda y dejaba a la vista una franja del gris de la página abajo.
+
+- La fila de `ExamLayout` (columna de Findings + columna del examen) tenía `lg:items-start`: cada columna tomaba sólo
+  el alto de su propio contenido, sin importar la otra. Pasa a `lg:items-stretch` -el default de flexbox, que se había
+  pisado a propósito- así las dos columnas quedan parejas, a la altura de la más alta.
+- Eso sólo empareja la columna; el panel propio de cada examen (el borde con el gráfico, el odontograma, el
+  "Planned" de los exámenes sin armar) seguía siendo alto por su contenido. Ahora `ExamLayout` envuelve `children` en
+  un `div` `flex-1` y cada panel (`RegionExam`, `DentalAssessmentExam`, el `enConstruccion` de `ClinicalMode`) lleva
+  `h-full`: el fondo blanco (o el punteado de Extra/Intra Oral) estira hasta el final de esa columna, no sólo el
+  contenido.
+- Vitals (`findings={false}`, sin columna de Findings) no cambia: con una sola columna `items-stretch` no tiene nada
+  contra qué emparejar.
+- Cuando el examen tiene más contenido que Findings (DentAssmt con el odontograma completo), ahora es la columna de
+  Findings la que se estira pareja -antes quedaba corta del lado del examen-.
+
+Código: `clinical/{ExamLayout,RegionExam,DentalAssessmentExam}.tsx`, `pages/ClinicalMode.tsx`.
