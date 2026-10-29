@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-29
 
+### Clinical Mode: el panel del examen estira el fondo hasta Findings ([#111](https://github.com/JulianGerardi/red-dental-studio/pull/111))
+- En los exámenes (Extra Oral, Intra Oral, DentAssmt, los "Planned") el panel de la derecha quedaba corto frente a la
+  lista de Findings y dejaba ver el gris de la página debajo. Ahora las dos columnas se estiran a la altura de la más
+  alta y el fondo de cada panel (blanco, o el punteado de Extra/Intra Oral) llega hasta el borde.
+- **Para el dev:** `ExamLayout` pasa de `lg:items-start` a `lg:items-stretch` y envuelve `children` en un `div
+  flex-1`; `RegionExam`, `DentalAssessmentExam` y el `enConstruccion` de `ClinicalMode` suman `h-full`. Vitals
+  (sin columna de Findings) no cambia. Detalle en `clinical-mode.md` (2026-10-29).
+
 ### Treatment Plan: Estimate details desde el Total Amount ([#110](https://github.com/JulianGerardi/red-dental-studio/pull/110))
 - **CON-3710 / CON-2529.** El *Total Amount* del caso y el *Total amount* de las cards del Overview de Clinical Mode
   abren **Estimate details**: cinco totales y el desglose por visita y procedimiento (Amount charged, Allowable amount,

@@ -86,7 +86,7 @@ export default function ClinicalMode() {
      también, porque sus findings ya viven en el visor de cada placa. Los registros (Treatment Plan…) no. */
   const esExamen = (EXAMENES as readonly string[]).includes(pestana)
   const enConstruccion = (
-    <div className="rounded-lg bg-white shadow-panel">
+    <div className="flex h-full flex-col rounded-lg bg-white shadow-panel">
       <EmptyState
         icon={Stethoscope}
         title={pestana}

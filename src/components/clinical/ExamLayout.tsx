@@ -171,7 +171,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
     : []
 
   return (
-    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-start">
+    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-stretch">
       {conFindings && (
         <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-lg bg-white shadow-panel p-3 lg:order-1 lg:w-[300px]">
           <ExamPanelHeader tab={reviewState.tab} onTabChange={reviewState.setTab} onNewReview={reviewState.openDialog} />
@@ -209,7 +209,8 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
           {extra && <div className="ml-auto flex items-center gap-2">{extra}</div>}
         </div>
         </TooltipProvider>
-        {children}
+        {/* El panel propio del examen estira su fondo hasta el borde de la columna de Findings (clinical-mode.md, 2026-10-29). */}
+        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
       </div>
 
       <NewProcedureDrawer
