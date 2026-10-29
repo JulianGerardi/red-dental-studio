@@ -77,8 +77,16 @@ export type Caso = {
 }
 
 /* Los planes del paciente. La pantalla los agrupa por fecha de creación (DD/MM/YYYY, como la app real), la más nueva
-   arriba; los de una fecha son las alternativas de un grupo: al aceptar una, las otras se descartan. */
-export const CASOS: Caso[] = [
+   arriba; los de una fecha son las alternativas de un grupo: al aceptar una, las otras se descartan.
+   El total sale de los fees: es el mismo número que desglosa Estimate details (clinical-mode.md, 2026-10-28). */
+const totalDeFees = (c: Caso): Caso => ({
+  ...c,
+  total: c.visitas.flatMap((v) => v.procedimientos).filter((p) => p.estado !== 'Removed')
+    .reduce((t, p) => t + (Number(p.fee.replace(/[^0-9.]/g, '')) || 0), 0)
+    .toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+})
+
+export const CASOS: Caso[] = ([
   {
     id: 'c1', nombre: 'Periodontists Recommended', grupo: 'Periodontal', estado: 'Planning',
     creado: '27/08/2026', creadoPor: 'Provider 1', total: '231.12',
@@ -137,7 +145,7 @@ export const CASOS: Caso[] = [
       { id: 'v1', nombre: 'Visit 1', total: '$980.000', procedimientos: visita('c7v1', ['Signed', 'Signed']) },
     ],
   },
-]
+] satisfies Caso[]).map(totalDeFees)
 
 /* El paciente del encabezado de Clinical Mode (ClinicalTopBar), para los diálogos que lo nombran. */
 export const PACIENTE = 'Julio Perez'
