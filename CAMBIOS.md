@@ -5,6 +5,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-29
 
+### Clinical Mode: la tabla del Overview flota; Patient Dashboard termina en Address ([#109](https://github.com/JulianGerardi/red-dental-studio/pull/109))
+- **Clinical Mode, Overview:** la Problem List / Procedures ya no va fija debajo del chart: se abre flotando desde el botón
+  *View Problem List* (ícono de tabla), el mismo y en el mismo lugar que en los exámenes. La pantalla entra sin scroll en
+  ventanas de ~1080px de alto.
+- **Patient Dashboard:** la pantalla termina donde termina Address (el alto lo da el menú del paciente). Pending documents,
+  Pending Task y Appointments scrollean adentro con alto fijo y cierran en la misma línea; Appointments ya no lleva
+  "Show N more" desde `lg`, carga al scrollear.
+- **Para el dev:** pieza nueva `ProblemListFlotante` (`components/clinical/ProblemListFlotante.tsx`), que `ExamLayout` y
+  el Overview comparten. En `PatientDetail.tsx` la columna del medio es `lg:relative` con el contenido en `lg:absolute
+  inset-0` y la fila lleva `lg:min-h-[56rem]`. Los e2e que usaban la tabla del Overview abren primero *View Problem
+  List*. Storybook sin actualizar. Detalle en `clinical-mode.md` y `patient-dashboard.md` (2026-10-29).
+
 ### Pending Task/documents: vuelve el alto fijo, no salta al cambiar de tab ([#108](https://github.com/JulianGerardi/red-dental-studio/pull/108))
 - Revierte el punto de "sin espacio en blanco" del PR anterior: cambiar de tab hacía crecer o achicar la card según
   cuántos ítems traía esa categoría. Pending Task y Pending documents vuelven al alto fijo del 2026-10-25 -se
