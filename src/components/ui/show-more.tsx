@@ -34,12 +34,10 @@ export function ShowMore({
   /** Con `llenarAlto` y filas dentro de grupos (PendingTaskList: rótulo + caja por tipo): selector de la fila ("li"). Se mide su alto y lo que
       suman los rótulos y espacios de alrededor, en vez de tomar el primer hijo como si fuera una fila. */
   filas?: string
-  /** Sin botón "Show more". Con `llenarAlto` (el alto ya lo da el flex-1 de afuera): arranca con dos tandas y, al
-      acercarse al final, suma otra de `limiteEfectivo` ítems, hasta mostrarlas todas (Pending Task del Patient
-      Dashboard, Julián 2026-10-28, sobre el video de referencia). Sin `llenarAlto` (Pending Task y Pending documents,
-      Julián 2026-10-29): sin alto fijo del que tirar, van todas montadas de una -nada que batchear- y la caja mide
-      lo que pide el contenido hasta `maxHeight` (nada de espacio en blanco con pocos ítems); de ahí para arriba,
-      scroll de verdad, con overflow -no hay forma de "pedir más" scrolleando si ya está todo montado-. */
+  /** Sin botón "Show more": la caja (sólo tiene sentido con `enCaja` + `llenarAlto`, que le dan su alto propio y fijo
+      -no se acomoda al total, así no salta de alto al cambiar de tab (Julián, 2026-10-29)-) arranca ya scrolleable y,
+      al acercarse al final, suma otra tanda de `limiteEfectivo` ítems, hasta mostrarlas todas (Pending Task del
+      Patient Dashboard, Julián 2026-10-28, sobre el video de referencia). */
   cargarAlScroll?: boolean
   /** Nombre de lo que se lista, para el lector de pantalla ("appointments"). */
   label?: string
@@ -63,12 +61,9 @@ export function ShowMore({
   const sobran = total - limiteEfectivo
   const conTope = sobran > 0
   const scroll = cargarAlScroll ? conTope : conTope && abierto
-  /* Con llenarAlto, la caja mide un alto fijo (el que da el flex-1): arranca con dos tandas -con una sola, si entra
-     justa no asoma nada para scrollear y no hay cómo enterarse de que sigue, sin botón que lo diga- y el resto se
-     suma al acercarse al final. Sin llenarAlto, la caja mide lo que pide el contenido hasta `maxHeight`: ahí no hay
-     tandas -nada que batchear, si closed el total ya entra, no corre scroll para pedir más-, van todas de una y el
-     `overflow-y-auto` + el tope en `maxHeight` hacen el scroll solos. */
-  const mostrando = cargarAlScroll ? (llenarAlto ? Math.min(visiblesScroll ?? limiteEfectivo * 2, total) : total) : conTope && !abierto ? limiteEfectivo : total
+  /* Arranca con dos tandas: con una sola, si entra justa en la caja no asoma nada para scrollear y no hay cómo
+     enterarse de que sigue (sin botón que lo diga). */
+  const mostrando = cargarAlScroll ? Math.min(visiblesScroll ?? limiteEfectivo * 2, total) : conTope && !abierto ? limiteEfectivo : total
 
   /* Cambió el filtro (otro total): la próxima tanda vuelve a arrancar en `limiteEfectivo`. */
   useLayoutEffect(() => {
@@ -122,12 +117,11 @@ export function ShowMore({
     setAbierto((v) => !v)
   }
 
-  /* A ~120px del final suma otra tanda, para que lleguen antes de que el usuario vea el borde de la lista. Sólo con
-     llenarAlto: sin eso ya están todas montadas (ver `mostrando`). */
+  /* A ~120px del final suma otra tanda, para que lleguen antes de que el usuario vea el borde de la lista. */
   const alScrollear = (e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget
     setAlFinal(el.scrollTop + el.clientHeight >= el.scrollHeight - 4)
-    if (cargarAlScroll && llenarAlto && mostrando < total && el.scrollTop + el.clientHeight >= el.scrollHeight - 120) {
+    if (cargarAlScroll && mostrando < total && el.scrollTop + el.clientHeight >= el.scrollHeight - 120) {
       setVisiblesScroll(Math.min(mostrando + limiteEfectivo, total))
     }
   }
@@ -149,12 +143,9 @@ export function ShowMore({
              esquina de la card. */
           llenarAlto && !scroll && 'overflow-hidden',
         )}
-        /* Con llenarAlto + cargarAlScroll el alto ya lo da el flex-1 de afuera (no hay click que mida un "alto
-           cerrado"). En cualquier otro caso hace falta el tope acá: con click, `altoCerrado` es lo medido al abrir;
-           sin click (cargarAlScroll solo, sin llenarAlto), nunca se mide nada y el tope queda fijo en `maxHeight`,
-           así que la caja mide lo que pide el contenido hasta ese techo y de ahí no pasa -nada de espacio de más con
-           pocos ítems-. */
-        style={scroll && !(llenarAlto && cargarAlScroll) ? { maxHeight: enCaja ? `${altoCerrado}px` : `max(${altoCerrado}px, ${maxHeight})` } : undefined}
+        /* cargarAlScroll vive siempre junto a enCaja + llenarAlto (ver su doc): el alto ya lo da el flex-1 de afuera,
+           sin necesitar el alto cerrado que acá nunca se llega a medir (no hay click que lo dispare). */
+        style={scroll && !cargarAlScroll ? { maxHeight: enCaja ? `${altoCerrado}px` : `max(${altoCerrado}px, ${maxHeight})` } : undefined}
       >
         <div ref={contenidoRef} className={className}>{children(mostrando)}</div>
         {/* En Mac la barra de scroll no se ve hasta que se scrollea: el degradé avisa que hay más abajo. */}

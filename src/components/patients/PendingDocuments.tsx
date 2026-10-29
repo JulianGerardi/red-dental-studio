@@ -63,7 +63,7 @@ export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES }: {
   const visibles = pendientes.filter(grupoActivo.filtro)
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
         <h2 className="text-[15px] font-bold text-ink">Pending documents</h2>
         {pendientes.length > 0 && <Pill tone="warning" size="sm">{pendientes.length} to resolve</Pill>}
@@ -82,8 +82,9 @@ export function PendingDocuments({ docs: iniciales = DOCS_PENDIENTES }: {
         />
       ) : (
         /* Los primeros TOPE documentos, en el orden de los grupos; el resto se carga solo al acercarse al final del
-           scroll, sin botón ni espacio de más si son pocos (ui/show-more, patient-dashboard.md 2026-10-29). */
-        <ShowMore total={visibles.length} limit={TOPE} cargarAlScroll label="pending documents" className="flex flex-col gap-4">
+           scroll, sin botón (ui/show-more). Alto fijo (enCaja + llenarAlto): no se acomoda al total, para no saltar
+           de alto al cambiar de tab (patient-dashboard.md, 2026-10-29). */
+        <ShowMore total={visibles.length} limit={TOPE} enCaja llenarAlto filas="li" cargarAlScroll label="pending documents" className="flex flex-col gap-4">
           {(n) => {
             const enOrden = GRUPOS.flatMap((g) => visibles.filter(g.filtro)).slice(0, n)
             return GRUPOS.map((g) => {

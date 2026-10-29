@@ -479,3 +479,24 @@ derecha), y que ni Pending Task ni Pending documents dejen espacio en blanco -la
 
 `tests/patient-overview.e2e.ts`: el test de Pending documents pasa a probar el caso chico (sin región de scroll, sin
 botón, Overdue entero visible) en vez de asumir que la caja de scroll siempre existe.
+
+## Vuelve el alto fijo: no saltar al cambiar de tab (2026-10-29)
+
+Julián, después de probar lo de arriba: "el largo del background no debe acomodarse, siempre debe tener un largo ya
+estipulado -como el que definimos al inicio-". Cambiar de tab hacía que la card creciera o se achicara según cuántos
+ítems traía esa categoría; prefiere la card de alto fijo (la del 2026-10-25) aunque eso signifique aire debajo con
+pocos ítems, antes que el salto.
+
+- Pending Task y Pending documents vuelven a ser `flex-1` (se reparten el alto que deja el menú, como el
+  2026-10-25) y `PendingTaskList` / el `ShowMore` de `PendingDocuments` vuelven a `enCaja llenarAlto` **junto con**
+  `cargarAlScroll` -la combinación con la que se armó `cargarAlScroll` en #105, antes de la vuelta de ayer-.
+- `ui/show-more` pierde el modo sin `llenarAlto` que se había sumado ayer (mostrar todo montado, cap en `maxHeight`
+  sin alto fijo): no lo usa nadie más y agregaba una rama sólo para este round-trip. `cargarAlScroll` vuelve a tener
+  sentido únicamente junto con `enCaja` + `llenarAlto`, como en #105.
+- Efecto colateral correcto: con la card dividida en dos (Pending documents arriba, Pending Task abajo) y poco alto
+  de ventana, hasta un grupo de 2 ítems puede no entrar entero y pedir scroll -ya pasaba así desde el 2026-10-25,
+  antes de todo este ida y vuelta-. No es el caso que Julián pidió evitar (ítems sin mostrar): es la caja de siempre,
+  con su scroll de siempre.
+- `tests/patient-overview.e2e.ts`: el test de Pending documents deja de asumir que con pocos ítems nunca hay región
+  de scroll (depende del alto disponible, no de la cantidad); sigue probando que las tabs filtran bien y que no hay
+  botón "Show more".
