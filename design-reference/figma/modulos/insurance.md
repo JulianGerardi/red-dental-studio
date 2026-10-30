@@ -144,3 +144,8 @@ adentro (ver patient-dashboard.md, misma fecha).
   que en Treatments, Ledger y Documents (1101px); antes era mayor porque el bloque entero empujaba la página.
 - `tests/patient-dashboard.e2e.ts` suma un test: la región de scroll existe y, al scrollear adentro, el menú del
   paciente (el link "Treatments") sigue visible.
+
+Julián, de paso: **"Manage Subscription" baja al piso de su card** (`mt-auto` en vez de `mt-5`) para quedar a la misma
+altura que Cancel/Save de Patient Information -la card de Subscription Information es más corta y el grid las estira
+igual, así que sin eso el botón quedaba más arriba-. Verificado con Playwright: los dos botones comparten la misma
+coordenada `y`.

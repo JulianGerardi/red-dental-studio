@@ -185,10 +185,12 @@ export default function Insurance() {
                     <FilaDato icon={Eye} label="Dependents" value={SUSCRIPCION.dependientes} />
                   </div>
 
+                  {/* mt-auto: empuja el botón al piso de la card para que quede a la
+                      misma altura que Cancel/Save del panel de al lado (Julián, 2026-10-30). */}
                   <button
                     type="button"
                     onClick={() => setModal('gestionar')}
-                    className="bg-dash-blue hover:bg-dash-blue-hover mt-5 h-9 self-end rounded-md px-5 text-[13px] font-medium text-white transition-colors"
+                    className="bg-dash-blue hover:bg-dash-blue-hover mt-auto h-9 self-end rounded-md px-5 text-[13px] font-medium text-white transition-colors"
                   >
                     Manage Subscription
                   </button>
