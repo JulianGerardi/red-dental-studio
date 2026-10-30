@@ -2853,3 +2853,105 @@ cargar una condition sin antes seleccionar una parte de la cabeza (para ambos ex
 
 Código: `clinical/{ExamLayout,RegionExam}.tsx`, `clinical/dental/{NewProcedureDrawer,RegionConditionDrawer,FindingCard}.tsx`,
 `tests/clinical-mode.e2e.ts`.
+
+## El Overview sin scroll: la tabla flota desde View Problem List (2026-10-29)
+
+Julián: en Clinical Mode el ícono de la tabla tiene que ser igual al de las demás pantallas, en la misma ubicación y
+flotante, para ver toda la pantalla a simple vista sin scroll.
+
+- El Overview tenía la **Problem List / Procedures** fija debajo del chart (la pantalla medía 1.274px a 829 de alto, 445
+  más que la ventana). Ahora la tabla sale del flujo y se abre **flotando** desde el botón *View Problem List* (ícono
+  `Table2`), el mismo de los exámenes: arriba a la izquierda del contenido, blanco, con el texto al pasar el mouse y el
+  tooltip "Open the patient's problem list". Página: 1.274 → 891px a 1519×829 (en 1080 de alto entra entera).
+- Una sola pieza: `ProblemListFlotante` (botón + tooltip + popover con la tabla). `ExamLayout` ya no arma su propio
+  popover: la usa en la fila de acciones. Con `?procedure=` (el link del Ledger) el Overview abre la tabla ya en
+  Procedures con esa fila, como antes.
+- El botón está también con el chart ampliado, donde antes la tabla se escondía.
+- Sin cambio de contenido: las mismas pestañas, filtros, filas y acciones, ahora en el flotante.
+- **Anomalía de nombre:** el pedido habla de "Clinical Notes"; no hay pantalla con ese nombre en la app (sólo la
+  Clinical Note que se ofrece firmar al cerrar el encuentro). Se tomó como el Overview de Clinical Mode, que es donde la
+  tabla estaba fija. Confirmar con Julián.
+- **A validar con usuarios:** si el odontólogo abre seguido la tabla en el Overview (en ese caso conviene dejarla
+  anclada) o la consulta de paso; y si el botón de sólo ícono se descubre sin el texto.
+- `tests/clinical-mode.e2e.ts`: los tests que usaban la tabla del Overview abren primero *View Problem List*; los de
+  consentimiento cuentan el dialog *Consent required* (el popover de la tabla también es `dialog`).
+
+## El fondo del panel del examen llega hasta el borde de Findings (2026-10-29)
+
+Julián, con captura: en los exámenes (Extra Oral entre otros) el panel blanco de la derecha quedaba corto -terminaba
+bien antes que la lista de Findings de la izquierda y dejaba a la vista una franja del gris de la página abajo.
+
+- La fila de `ExamLayout` (columna de Findings + columna del examen) tenía `lg:items-start`: cada columna tomaba sólo
+  el alto de su propio contenido, sin importar la otra. Pasa a `lg:items-stretch` -el default de flexbox, que se había
+  pisado a propósito- así las dos columnas quedan parejas, a la altura de la más alta.
+- Eso sólo empareja la columna; el panel propio de cada examen (el borde con el gráfico, el odontograma, el
+  "Planned" de los exámenes sin armar) seguía siendo alto por su contenido. Ahora `ExamLayout` envuelve `children` en
+  un `div` `flex-1` y cada panel (`RegionExam`, `DentalAssessmentExam`, el `enConstruccion` de `ClinicalMode`) lleva
+  `h-full`: el fondo blanco (o el punteado de Extra/Intra Oral) estira hasta el final de esa columna, no sólo el
+  contenido.
+- Vitals (`findings={false}`, sin columna de Findings) no cambia: con una sola columna `items-stretch` no tiene nada
+  contra qué emparejar.
+- Cuando el examen tiene más contenido que Findings (DentAssmt con el odontograma completo), ahora es la columna de
+  Findings la que se estira pareja -antes quedaba corta del lado del examen-.
+
+Código: `clinical/{ExamLayout,RegionExam,DentalAssessmentExam}.tsx`, `pages/ClinicalMode.tsx`.
+
+## Treatment Plan: Estimate details desde el Total Amount (2026-10-28)
+
+**CON-3710 (Botón manual de calcular estimations), CON-2529 (Actualización de valores frente a cambios del plan)**, epic
+CON-3695 (indexado en `treatments.md`). Julián: el botón del precio del Treatment Plan lleva a una pantalla con el
+detalle en tabla. Referencia: su prototipo `estimate_details_interactive_1.html` (no está en el Figma). red.dev pide
+login, así que la pantalla de ahí no se pudo ver.
+
+- **Entradas:** el `Total Amount` del caso (en la fila de campos y plegado en el encabezado) y el `Total amount` de las
+  cards del Overview pasan a ser botones con chevron. La card entera sigue abriendo el caso: el botón del total va encima
+  de una capa que cubre la card (un botón no puede ir dentro de otro).
+- **Pantalla** (`EstimateDetails`): reemplaza al rail y al caso a todo el ancho —la tabla tiene nueve columnas— y se
+  vuelve con "Back to Case". Encabezado con el caso, estado de la estimación, fecha del último cálculo y la acción;
+  cinco totales (Plan case total, Deductible applied, Insurance portion, Insurance adjustments y Patient portion, este
+  resaltado); "Procedure breakdown" agrupado por visita (plegable) con Amount charged, Allowable amount, Coverage %,
+  Copayment, Deductible applied, Insurance portion, Insurance adjustment y Patient portion, y la fila Case total.
+- **Estados:** Not calculated (estado vacío + Calculate estimates), Up to date, Update needed (los números son el cálculo
+  anterior y se dice), Updating estimates… (spinner, se siguen viendo los anteriores), Update failed (Alert + Retry
+  update) y Locked (desde Pending; "Locked at presentation" desde Presented). Update failed se ve con Prototype
+  controls (abajo).
+- **Regla (CON-2529):** sólo se calcula en Planning y con permiso sobre la ubicación; después la estimación es de sólo
+  lectura. Calcular actualiza todas las alternativas en Planning del grupo ("Updates all treatment alternatives").
+  Sin amount charged no se estima.
+- **Disparador implementado:** mover un procedimiento de visita (trigger 8 de CON-2529) deja la estimación en Update
+  needed. La estimación guarda la foto del plan con la que se calculó: la tabla muestra esa foto hasta recalcular.
+- **Aviso "Ins. est. update available"** (CON-2529, paso 2-4): en el caso en Planning con la estimación desactualizada,
+  al lado del Total Amount. Abre la confirmación "Insurance Estimate Update Available" con la copia de la historia y
+  "Update" recalcula.
+- **Desviación del prototipo:** con la estimación al día el botón no desaparece, queda como secundario "Recalculate".
+  CON-3710 pide poder calcular a mano "para corroborar los resultados" mientras se arma el plan.
+- **Desviación del prototipo:** en celular la columna Procedure queda fija y los montos scrollean de costado.
+- **Dato corregido:** el `total` de cada caso sale ahora de la suma de sus fees. Era un número suelto (231.12) que no
+  cerraba con los procedimientos ($1,872.00 con 8 de $234): al abrir el desglose se iba a leer como error. Los totales
+  de cada visita ("$100.000") siguen como estaban.
+- **Mock del cálculo** (`data/estimaciones.ts`): cobertura por categoría del CDT (D0-D1 100 %, D2-D4 80 %, resto 50 %),
+  allowable del 90 % / 85 %, deducible de $50 que se consume en orden en lo no preventivo, copago 0. Charged = insurance
+  + adjustment + patient en cada fila. Arranque: Periodontists Recommended desactualizado (la foto no tiene el último
+  procedimiento de la Visit 2), Periodontist Alternative sin calcular, el resto calculado.
+
+**Segunda vuelta (Julián, mismo día):**
+
+- La pill del estado va **al lado del título**, no debajo.
+- Sin "Last calculated …", sin el texto bajo el botón ("Updates all treatment alternatives") y sin bajada en Up to date
+  ("No changes affecting estimates…"): con la pill alcanza. El resto de los estados conserva su bajada porque dice algo
+  que la pill no (que los números son del cálculo anterior, que está congelado). Calcular sigue actualizando todas las
+  alternativas del grupo; lo dice el toast.
+- El rótulo de arriba ("Treatment case · …") pasa al rótulo chico del sistema (el de ListGroup): 11px, semibold,
+  `tracking-wide`, `text-ink-muted`. Tenía 10px y `tracking-[0.12em]`, demasiado interletrado.
+- **Prototype controls**, como en su HTML: una franja punteada arriba de la pantalla con el escenario (Update needed /
+  Up to date / Not calculated / Update failed / Presented / Locked), "Simulate plan change" y "Fail next calculation".
+  Es una herramienta de demo, no parte del producto: el escenario fuerza la estimación (`forzar`) aunque el estado del
+  caso diga otra cosa, y así Update failed y Locked se pueden mostrar en cualquier caso. Antes de pasarlo a los devs
+  hay que sacarlo o esconderlo detrás de un flag.
+
+A validar con usuarios: si recepción entiende "Allowable amount" e "Insurance adjustment" sin ayuda (quizá un InfoTip en
+el encabezado); si el aviso con confirmación suma o alcanza con el botón de la pantalla; y si Patient portion es el dato
+que más buscan (hoy es el único resaltado).
+
+Código: `clinical/{EstimateDetails,TreatmentPlanSection,TreatmentPlanList}.tsx`, `pages/ClinicalMode.tsx`,
+`data/{estimaciones,treatment-plan}.ts`, `tests/treatment-plan.e2e.ts`.

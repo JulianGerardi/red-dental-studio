@@ -83,7 +83,7 @@ function RegionExamInterno<R extends string>({ examen, diagrama }: { examen: str
       examen={examen} onCondicion={() => setOpen(true)}
       regiones={{ elegidas: pending, quitar: (r) => alternar(r as R), limpiar: () => setPending([]), tipo: examen === 'Extraoral' ? 'Extraoral' : 'Intraoral' }}
     >
-      <div className="rounded-xl border border-line bg-white p-6" style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fff' }}>
+      <div className="h-full rounded-xl border border-line bg-white p-6" style={{ background: 'radial-gradient(#e4e4e7 1px, transparent 1px) 0 0 / 16px 16px, #fff' }}>
         {diagrama({ pending, active: [...activas] as R[], onToggle: alternar })}
       </div>
 

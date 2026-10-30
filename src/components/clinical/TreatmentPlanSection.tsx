@@ -1,6 +1,6 @@
 import { Fragment, useContext, useEffect, useState, type ReactNode } from 'react'
 import {
-  Bookmark, Pencil, Plus, MoreVertical, CornerUpLeft, ChevronDown, ChevronRight, Captions, Check, Eye, Save, Link2, ClipboardList, Scan, GripVertical, Trash2, TimerOff, Ban, FilePen, CheckCheck, Presentation, CircleCheck, CircleX, CalendarCheck2, CalendarX2, CalendarDays, FileCheck2, FileClock, FileMinus2, FileX2, type LucideIcon,
+  AlertTriangle, Bookmark, Pencil, Plus, MoreVertical, CornerUpLeft, ChevronDown, ChevronRight, Captions, Check, Eye, Save, Link2, ClipboardList, Scan, GripVertical, Trash2, TimerOff, Ban, FilePen, CheckCheck, Presentation, CircleCheck, CircleX, CalendarCheck2, CalendarX2, CalendarDays, FileCheck2, FileClock, FileMinus2, FileX2, type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
@@ -26,6 +26,8 @@ import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
 import { useAnchoVisible } from '@/components/patients/ledger/useAnchoColumnas'
 import { RowChevron } from '@/components/ui/data-table'
 import { DetalleRegistro, NavegacionClinica, registroDePlan, useVerRegistro, type DestinoClinico } from '@/components/clinical/RecordDetail'
+import { EstimateDetails, PrototypeControls, situacionDe, type Escenario } from '@/components/clinical/EstimateDetails'
+import { estimacionesIniciales, type Estimacion } from '@/data/estimaciones'
 
 /* Figma 4118:220403 "Treatment Plan — Section (Cases, Workflow & Dialogs)":
    el rail de estados, la tabla de no asignados, el caso con sus visitas y los
@@ -33,8 +35,48 @@ import { DetalleRegistro, NavegacionClinica, registroDePlan, useVerRegistro, typ
 
 const COLUMNAS = ['Date', 'Surface', 'Tooth', 'Location', 'Procedure', 'Provider', 'Fee', 'Status']
 
-/* La caja del total, igual abierta (en la fila de campos) y plegada (en el encabezado). */
+/* La caja del total, igual abierta (en la fila de campos) y plegada (en el encabezado). Es un botón: abre Estimate
+   details (clinical-mode.md, 2026-10-28). */
 const CAJA_TOTAL = 'bg-dash-count-bg flex h-9 shrink-0 items-center rounded-md px-3 text-[13px] font-semibold whitespace-nowrap text-ink'
+const BOTON_TOTAL = `${CAJA_TOTAL} group/total gap-1 transition-colors hover:bg-brand-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue`
+
+/* Total Amount del caso: lleva a Estimate details. */
+function BotonTotal({ total, onClick }: { total: string; onClick?: () => void }) {
+  return (
+    <button type="button" onClick={onClick} aria-label={`Total Amount ${total}. View estimate details`} className={BOTON_TOTAL}>
+      Total Amount: <span className="text-dash-blue ml-1">{total}</span>
+      <ChevronRight className="size-4 text-ink-muted transition-transform group-hover/total:translate-x-0.5" aria-hidden />
+    </button>
+  )
+}
+
+/* CON-2529: el aviso de que cambió algo que afecta las estimaciones. Pregunta antes de recalcular, con la copia de la
+   historia. */
+function AvisoEstimacion({ onActualizar }: { onActualizar: () => void }) {
+  const [abierto, setAbierto] = useState(false)
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setAbierto(true)}
+        className="border-warn-fg bg-warn-bg text-warn-fg flex h-9 shrink-0 items-center gap-1.5 rounded-md border px-3 text-[12px] font-semibold whitespace-nowrap transition-colors hover:bg-warn-fg/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
+      >
+        <AlertTriangle className="size-3.5" aria-hidden /> Ins. est. update available
+      </button>
+      {abierto && (
+        <ConfirmDialog
+          title="Insurance Estimate Update Available"
+          confirmLabel="Update"
+          onCancel={() => setAbierto(false)}
+          onConfirm={() => { setAbierto(false); onActualizar() }}
+        >
+          <p>Changes have been detected that affect insurance estimates.</p>
+          <p className="mt-1">You can update the estimates for all unpaid procedures to reflect the most current insurance plan rules.</p>
+        </ConfirmDialog>
+      )}
+    </>
+  )
+}
 
 const ESTADO_TONO: Record<Procedimiento['estado'], PillTone> = {
   Planned: 'success', Completed: 'info', Removed: 'neutral',
@@ -716,7 +758,7 @@ export function CitaVisita({ cita }: { cita?: Cita }) {
    permiso (`sinPermiso`) lleva el aviso de acceso limitado y tampoco se edita. Las filas de las visitas se marcan
    siempre; lo que se hace con ellas depende del estado. */
 export function VistaCaso({
-  caso, favorito, onFavorito, onDialogo, onMover, onCompletar, onNuevaAlternativa, onVisitas, detalle,
+  caso, favorito, onFavorito, onDialogo, onMover, onCompletar, onNuevaAlternativa, onVisitas, detalle, estimacion, onEstimado, onActualizar,
 }: {
   caso: Caso
   favorito: boolean
@@ -729,6 +771,11 @@ export function VistaCaso({
   onVisitas?: (visitas: Visita[]) => void
   /** El detalle de cada fila de las visitas (el de la Problem List). */
   detalle?: (p: Procedimiento) => ReactNode
+  estimacion?: Estimacion
+  /** Abre Estimate details desde el Total Amount. */
+  onEstimado?: () => void
+  /** Recalcula desde el aviso de CON-2529. */
+  onActualizar?: () => void
 }) {
   const [categoria, setCategoria] = useState('')
   /* Un solo Collapse all / Expand all para las filas de todas las visitas. */
@@ -787,9 +834,7 @@ export function VistaCaso({
           {colapsado && (
             <span className="flex shrink-0 items-center gap-3">
               <Pill tone={TONO_CASO[caso.estado]} className="px-2 py-[2px]">{caso.estado}</Pill>
-              <span className={CAJA_TOTAL}>
-                Total Amount: <span className="text-dash-blue ml-1">{caso.total}</span>
-              </span>
+              <BotonTotal total={caso.total} onClick={onEstimado} />
             </span>
           )}
           {/* En el orden de la app real: New Alternative Case, lápiz, ojo y Move to. */}
@@ -895,8 +940,9 @@ export function VistaCaso({
             </div>
           </div>
           {/* Sin rótulo propio: baja lo que miden el rótulo y el gap de los campos (16 + 8) para alinear con los controles. */}
-          <div className={cn(CAJA_TOTAL, 'mt-6')}>
-            Total Amount: <span className="text-dash-blue ml-1">{caso.total}</span>
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            {planificando && estimacion?.estado === 'desactualizada' && onActualizar && <AvisoEstimacion onActualizar={onActualizar} />}
+            <BotonTotal total={caso.total} onClick={onEstimado} />
           </div>
         </div>
         </>)}
@@ -972,9 +1018,13 @@ export function VistaCaso({
 
 /* ── Sección ──────────────────────────────────────────────────────── */
 
-export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) {
+export function TreatmentPlanSection({ casoInicial, estimadoInicial }: {
+  casoInicial?: string
+  /** Entra directo a Estimate details del caso (el Total amount de la card del Overview). */
+  estimadoInicial?: boolean
+}) {
   /* Se entra por Unassigned, como el frame por defecto (4118:220406), salvo que se llegue desde una card del Overview. */
-  const [vista, setVista] = useState<'unassigned' | 'caso'>(casoInicial ? 'caso' : 'unassigned')
+  const [vista, setVista] = useState<'unassigned' | 'caso' | 'estimado'>(casoInicial ? (estimadoInicial ? 'estimado' : 'caso') : 'unassigned')
   const [casoId, setCasoId] = useState(casoInicial ?? CASOS[0].id)
   const [dialogo, setDialogo] = useState<ClaveDialogo | 'delete' | null>(null)
   const [mover, setMover] = useState(false)
@@ -987,6 +1037,49 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
   const [casos, setCasos] = useState<Caso[]>(CASOS)
   const caso = casos.find((c) => c.id === casoId) ?? casos[0]!
   const cambiarCaso = (cambio: Partial<Caso>) => setCasos((cs) => cs.map((c) => (c.id === caso.id ? { ...c, ...cambio } : c)))
+
+  /* Estimaciones por caso (CON-3710, CON-2529). Calcular actualiza todas las alternativas en Planning del grupo; mover
+     un procedimiento de visita deja la estimación desactualizada. Ver clinical-mode.md (2026-10-28). */
+  const [estimaciones, setEstimaciones] = useState<Record<string, Estimacion>>(() => estimacionesIniciales(CASOS))
+  const estimacion = estimaciones[caso.id] ?? { estado: 'sin-calcular' }
+  const ponerEstimacion = (e: Estimacion) => setEstimaciones((es) => ({ ...es, [caso.id]: e }))
+  /* Prototype controls: el próximo cálculo falla y deja el anterior a la vista. */
+  const [fallar, setFallar] = useState(false)
+  const calcular = () => {
+    const alternativas = casos.filter((c) => c.grupo === caso.grupo && c.creado === caso.creado && c.estado === 'Planning' && !c.sinPermiso)
+    const grupo = alternativas.some((c) => c.id === caso.id) ? alternativas : [caso, ...alternativas]
+    const marcar = (cambio: (c: Caso) => Partial<Estimacion>) =>
+      setEstimaciones((es) => ({ ...es, ...Object.fromEntries(grupo.map((c) => [c.id, { ...es[c.id], ...cambio(c) } as Estimacion])) }))
+    const falla = fallar
+    marcar(() => ({ estado: 'calculando' }))
+    window.setTimeout(() => {
+      if (falla) {
+        setFallar(false)
+        marcar(() => ({ estado: 'fallo' }))
+        return aviso.error('Update failed. Previous calculation preserved.')
+      }
+      marcar((c) => ({ estado: 'al-dia', visitas: c.visitas }))
+      aviso.ok(grupo.length > 1 ? `Estimates updated for ${grupo.length} treatment alternatives.` : 'Estimates updated.')
+    }, 1200)
+  }
+  const cambiarVisitas = (visitas: Visita[]) => {
+    cambiarCaso({ visitas })
+    if (estimacion.visitas) ponerEstimacion({ ...estimacion, estado: 'desactualizada' })
+  }
+  const elegirEscenario = (e: Escenario) => {
+    const foto = estimacion.visitas ?? caso.visitas
+    ponerEstimacion({
+      'Update needed': { estado: 'desactualizada', visitas: foto, forzar: 'editable' },
+      'Up to date': { estado: 'al-dia', visitas: caso.visitas, forzar: 'editable' },
+      'Not calculated': { estado: 'sin-calcular', forzar: 'editable' },
+      'Update failed': { estado: 'fallo', visitas: foto, forzar: 'editable' },
+      'Presented / Locked': { estado: 'al-dia', visitas: foto, forzar: 'bloqueada' },
+    }[e] as Estimacion)
+  }
+  const simularCambio = () => {
+    ponerEstimacion({ ...estimacion, estado: 'desactualizada' })
+    aviso.info('Plan change detected. Previous estimates remain unchanged.')
+  }
 
   /* Cada fila se despliega con el detalle de la Problem List (Julián, 2026-10-13). Un hallazgo o procedimiento
      vinculado se abre en el drawer de View full record; el link a un caso lo abre acá mismo. Ver clinical-mode.md. */
@@ -1008,6 +1101,7 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
     const id = `${caso.id}-alt-${Date.now()}`
     const n = casos.filter((c) => c.grupo === caso.grupo).length
     setCasos((cs) => [...cs, { ...caso, id, nombre: `${caso.nombre.replace(/ Alternative( \d+)?$/, '')} Alternative ${n}`, estado: 'Planning' }])
+    setEstimaciones((es) => ({ ...es, [id]: { estado: 'sin-calcular' } }))
     setCasoId(id)
     aviso.ok('Alternative case created.')
   }
@@ -1048,6 +1142,19 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
 
   return (
     <NavegacionClinica.Provider value={ir}>
+    {vista === 'estimado' ? (
+      /* A todo el ancho, sin el rail: la tabla tiene nueve columnas. Se vuelve con Back to Case. */
+      <div className="flex flex-col gap-4">
+        <PrototypeControls
+          situacion={situacionDe(caso, estimacion)}
+          onEscenario={elegirEscenario}
+          onSimular={simularCambio}
+          fallar={fallar}
+          onFallar={setFallar}
+        />
+        <EstimateDetails caso={caso} estimacion={estimacion} onVolver={() => setVista('caso')} onCalcular={calcular} />
+      </div>
+    ) : (
     <div className="flex flex-col gap-4 lg:flex-row">
       <Rail
         casos={casos}
@@ -1135,8 +1242,11 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
             onMover={() => setMover(true)}
             onCompletar={setCompletar}
             onNuevaAlternativa={nuevaAlternativa}
-            onVisitas={(visitas) => cambiarCaso({ visitas })}
+            onVisitas={cambiarVisitas}
             detalle={detalle(caso)}
+            estimacion={estimacion}
+            onEstimado={() => setVista('estimado')}
+            onActualizar={calcular}
           />
         )}
       </div>
@@ -1182,6 +1292,7 @@ export function TreatmentPlanSection({ casoInicial }: { casoInicial?: string }) 
       )}
       {drawer}
     </div>
+    )}
     </NavegacionClinica.Provider>
   )
 }

@@ -5,6 +5,39 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-10-29
 
+### Clinical Mode: el panel del examen estira el fondo hasta Findings ([#111](https://github.com/JulianGerardi/red-dental-studio/pull/111))
+- En los exámenes (Extra Oral, Intra Oral, DentAssmt, los "Planned") el panel de la derecha quedaba corto frente a la
+  lista de Findings y dejaba ver el gris de la página debajo. Ahora las dos columnas se estiran a la altura de la más
+  alta y el fondo de cada panel (blanco, o el punteado de Extra/Intra Oral) llega hasta el borde.
+- **Para el dev:** `ExamLayout` pasa de `lg:items-start` a `lg:items-stretch` y envuelve `children` en un `div
+  flex-1`; `RegionExam`, `DentalAssessmentExam` y el `enConstruccion` de `ClinicalMode` suman `h-full`. Vitals
+  (sin columna de Findings) no cambia. Detalle en `clinical-mode.md` (2026-10-29).
+
+### Treatment Plan: Estimate details desde el Total Amount ([#110](https://github.com/JulianGerardi/red-dental-studio/pull/110))
+- **CON-3710 / CON-2529.** El *Total Amount* del caso y el *Total amount* de las cards del Overview de Clinical Mode
+  abren **Estimate details**: cinco totales y el desglose por visita y procedimiento (Amount charged, Allowable amount,
+  Coverage %, Copayment, Deductible applied, Insurance portion, Insurance adjustment, Patient portion).
+- Estados: Not calculated, Up to date, Update needed, Updating…, Update failed y Locked. Sólo se calcula en Planning
+  (actualiza todas las alternativas del grupo); mover un procedimiento de visita la deja desactualizada y el caso
+  muestra *Ins. est. update available*, que confirma con el modal de CON-2529.
+- **Para el dev:** `components/clinical/EstimateDetails.tsx` (`EstimateDetails`, `PrototypeControls`, `situacionDe`,
+  `estimacionEditable`) y `data/estimaciones.ts` (cálculo **mock** por categoría del CDT; el real es el de CON-2041).
+  **`PrototypeControls` es de demo y no va a producto.** `PlanCard` pasa a `div` con un botón que la cubre y otro encima
+  para el total. El `total` de cada caso ahora sale de la suma de sus fees. Storybook sin actualizar. Detalle en
+  `clinical-mode.md` (2026-10-28).
+
+### Clinical Mode: la tabla del Overview flota; Patient Dashboard termina en Address ([#109](https://github.com/JulianGerardi/red-dental-studio/pull/109))
+- **Clinical Mode, Overview:** la Problem List / Procedures ya no va fija debajo del chart: se abre flotando desde el botón
+  *View Problem List* (ícono de tabla), el mismo y en el mismo lugar que en los exámenes. La pantalla entra sin scroll en
+  ventanas de ~1080px de alto.
+- **Patient Dashboard:** la pantalla termina donde termina Address (el alto lo da el menú del paciente). Pending documents,
+  Pending Task y Appointments scrollean adentro con alto fijo y cierran en la misma línea; Appointments ya no lleva
+  "Show N more" desde `lg`, carga al scrollear.
+- **Para el dev:** pieza nueva `ProblemListFlotante` (`components/clinical/ProblemListFlotante.tsx`), que `ExamLayout` y
+  el Overview comparten. En `PatientDetail.tsx` la columna del medio es `lg:relative` con el contenido en `lg:absolute
+  inset-0` y la fila lleva `lg:min-h-[56rem]`. Los e2e que usaban la tabla del Overview abren primero *View Problem
+  List*. Storybook sin actualizar. Detalle en `clinical-mode.md` y `patient-dashboard.md` (2026-10-29).
+
 ### Pending Task/documents: vuelve el alto fijo, no salta al cambiar de tab ([#108](https://github.com/JulianGerardi/red-dental-studio/pull/108))
 - Revierte el punto de "sin espacio en blanco" del PR anterior: cambiar de tab hacía crecer o achicar la card según
   cuántos ítems traía esa categoría. Pending Task y Pending documents vuelven al alto fijo del 2026-10-25 -se
