@@ -126,3 +126,26 @@ el rótulo pasa a "Select person" y la card sólo aparece cuando `d.persona` mat
 `ManageSubscriptionModal` no cambia: su `PersonaSeleccionada` con `DIRECTORIO[0]` es un display fijo (el suscriptor y
 los dependientes ya cargados de esa suscripción, con lápiz para editar, no un buscador), y su propio bug de mostrar
 siempre el mismo nombre hardcodeado es otro tema, no el de esta tanda.
+
+## El alto queda igual al de Treatments, Ledger y Documents (2026-10-30)
+
+Julián, con una grabación de pantalla: Insurance había quedado desactualizada respecto del alto que ya tienen las
+otras pantallas del paciente -scrolleaba la página entera, con el menú del paciente yéndose junto con el contenido-,
+a diferencia de Treatments, Ledger y Documents, que desde el 2026-10-25 llenan el alto que deja el menú y scrollean
+adentro (ver patient-dashboard.md, misma fecha).
+
+- La tabla de planes (`Patients Plans`) y los dos paneles de abajo (Subscription Information, Patient Information)
+  pasan a compartir un mismo bloque que llena el alto que deja el menú y scrollea adentro, con el mismo truco de
+  Treatments: `lg:relative lg:flex-1` por fuera, `lg:absolute lg:inset-0 overflow-y-auto` por dentro -así el bloque
+  no entra en el cálculo del alto de la fila, que lo manda el menú-, y el degradé de abajo avisando que sigue.
+- El wrapper del contenido (`<div className="min-w-0 flex-1">`) no tenía `flex flex-col`: sin eso los hijos no podían
+  participar del `flex-1`. Era la pieza que faltaba para que Insurance se comportara como el resto.
+- Verificado con Playwright a 1519×829: `document.documentElement.scrollHeight` da exactamente lo mismo en Insurance
+  que en Treatments, Ledger y Documents (1101px); antes era mayor porque el bloque entero empujaba la página.
+- `tests/patient-dashboard.e2e.ts` suma un test: la región de scroll existe y, al scrollear adentro, el menú del
+  paciente (el link "Treatments") sigue visible.
+
+Julián, de paso: **"Manage Subscription" baja al piso de su card** (`mt-auto` en vez de `mt-5`) para quedar a la misma
+altura que Cancel/Save de Patient Information -la card de Subscription Information es más corta y el grid las estira
+igual, así que sin eso el botón quedaba más arriba-. Verificado con Playwright: los dos botones comparten la misma
+coordenada `y`.
