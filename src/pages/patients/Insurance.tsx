@@ -121,115 +121,125 @@ export default function Insurance() {
           basePath={`/patients/${id}`} 
         />
 
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h1 className="text-xl leading-[1.3] font-semibold text-ink">Patients Plans</h1>
             <Switch on={historial} onChange={setHistorial} label="Show plan history" />
           </div>
 
-          {/* Tabla de planes */}
-          <div className="mt-4">
-            <DataTable
-              columns={COLUMNAS}
-              rows={visibles}
-              rowKey={(p) => p.id}
-              rowLabel={(p) => p.plan}
-              reorder={{ onReorder: reordenar, canMove: (p) => planes.some((x) => x.id === p.id) }}
-              itemLabel="insurances"
-              empty={{ icon: CreditCard, title: 'No plans yet', detail: "Add a subscription to start tracking this patient's coverage." }}
-            />
-          </div>
-
-          {/* Suscripción + datos del paciente */}
-          <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <section className={cn(TARJETA_PANEL, 'flex flex-col p-4 sm:p-5')}>
-              <h2 className="text-sm font-semibold text-ink">Subscription Information</h2>
-              <p className="mt-0.5 text-[11px] text-ink-muted">
-                Select an existing subscription or create new one.
-              </p>
-
-              <span className="mt-4 block text-xs font-medium text-ink">
-                Search for an existing subscription<span className="text-required">*</span>
-              </span>
-              <div className="relative mt-2">
-                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-                {/* Borde gris como todos los buscadores del sistema; el azul
-                    queda para el foco. El frame lo dibuja siempre azul porque
-                    lo capturó enfocado. */}
-                <input
-                  placeholder="Search result"
-                  className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => setModal('nueva')}
-                className="text-dash-blue mt-2 flex items-center gap-1.5 self-end text-[13px] font-semibold hover:underline"
-              >
-                <CirclePlus className="size-4" /> Add New Subscription
-              </button>
-
-              <p className="mt-4 text-sm font-semibold text-ink">Select a subscription</p>
-              <div className="mt-3 flex flex-col gap-3">
-                <FilaDato icon={PersonStanding} label="Subscriber" value={SUSCRIPCION.subscriber} />
-                <FilaDato icon={PersonStanding} label="Subscriber ID" value={SUSCRIPCION.subscriberId} />
-                <FilaDato icon={ShieldHalf} label="Carrier" value={SUSCRIPCION.carrier} />
-                <FilaDato icon={Hospital} label="Plan" value={SUSCRIPCION.plan} />
-                <FilaDato icon={AArrowUp} label="Coverage Period" value={SUSCRIPCION.cobertura} />
-                <FilaDato icon={Eye} label="Dependents" value={SUSCRIPCION.dependientes} />
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setModal('gestionar')}
-                className="bg-dash-blue hover:bg-dash-blue-hover mt-5 h-9 self-end rounded-md px-5 text-[13px] font-medium text-white transition-colors"
-              >
-                Manage Subscription
-              </button>
-            </section>
-
-            <section className={cn(TARJETA_PANEL, 'flex flex-col p-4 sm:p-5')}>
-              <h2 className="text-sm font-semibold text-ink">Patient Information</h2>
-
-              <SelectField
-                className="mt-4" label="Relationship to Subscriber" required options={RELACIONES}
-                value={d.relacion} onChange={set('relacion')} error={req('relacion')}
+          {/* La tabla y los dos paneles llenan el alto que deja el menú y scrollean adentro, como Treatments
+              (patient-dashboard.md, 2026-10-30): antes el bloque entero empujaba la página, y el menú scrolleaba con
+              él en vez de quedarse del alto de siempre. El absolute saca el bloque del cálculo del alto de la fila:
+              lo manda el menú. */}
+          <div className="mt-4 lg:relative lg:min-h-[480px] lg:flex-1">
+            <div
+              tabIndex={0} role="region" aria-label="Insurance"
+              className="-m-1 flex flex-col gap-4 overflow-y-auto p-1 focus-visible:outline-2 focus-visible:outline-dash-blue lg:absolute lg:inset-0 lg:m-0 lg:p-1"
+            >
+              <DataTable
+                columns={COLUMNAS}
+                rows={visibles}
+                rowKey={(p) => p.id}
+                rowLabel={(p) => p.plan}
+                reorder={{ onReorder: reordenar, canMove: (p) => planes.some((x) => x.id === p.id) }}
+                itemLabel="insurances"
+                empty={{ icon: CreditCard, title: 'No plans yet', detail: "Add a subscription to start tracking this patient's coverage." }}
               />
 
-              {/* Caja de sólo lectura con el mismo rótulo que el select de
-                  abajo, y con "Cordination" mal escrito. Es del Figma. */}
-              <div className="mt-4 flex items-center gap-2.5 rounded-md bg-[#eff4ff] px-3 py-2">
-                <CreditCard className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />
-                <span className="leading-tight">
-                  <span className="block text-[11px] text-ink-faint">Cordination Order</span>
-                  <span className="block text-[13px] text-ink">Primary</span>
-                </span>
-              </div>
+              {/* Suscripción + datos del paciente */}
+              <div className="grid gap-4 lg:grid-cols-2">
+                <section className={cn(TARJETA_PANEL, 'flex flex-col p-4 sm:p-5')}>
+                  <h2 className="text-sm font-semibold text-ink">Subscription Information</h2>
+                  <p className="mt-0.5 text-[11px] text-ink-muted">
+                    Select an existing subscription or create new one.
+                  </p>
 
-              <SelectField
-                className="mt-4" label="Cordination Order" required options={ORDENES}
-                value={d.orden} onChange={set('orden')} error={req('orden')}
-              />
+                  <span className="mt-4 block text-xs font-medium text-ink">
+                    Search for an existing subscription<span className="text-required">*</span>
+                  </span>
+                  <div className="relative mt-2">
+                    <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+                    {/* Borde gris como todos los buscadores del sistema; el azul
+                        queda para el foco. El frame lo dibuja siempre azul porque
+                        lo capturó enfocado. */}
+                    <input
+                      placeholder="Search result"
+                      className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setModal('nueva')}
+                    className="text-dash-blue mt-2 flex items-center gap-1.5 self-end text-[13px] font-semibold hover:underline"
+                  >
+                    <CirclePlus className="size-4" /> Add New Subscription
+                  </button>
 
-              <div className="mt-4 flex flex-col gap-2">
-                <OptionCheckbox label="Assignment of Benefits" />
-                <OptionCheckbox label="Release of Information" />
-              </div>
+                  <p className="mt-4 text-sm font-semibold text-ink">Select a subscription</p>
+                  <div className="mt-3 flex flex-col gap-3">
+                    <FilaDato icon={PersonStanding} label="Subscriber" value={SUSCRIPCION.subscriber} />
+                    <FilaDato icon={PersonStanding} label="Subscriber ID" value={SUSCRIPCION.subscriberId} />
+                    <FilaDato icon={ShieldHalf} label="Carrier" value={SUSCRIPCION.carrier} />
+                    <FilaDato icon={Hospital} label="Plan" value={SUSCRIPCION.plan} />
+                    <FilaDato icon={AArrowUp} label="Coverage Period" value={SUSCRIPCION.cobertura} />
+                    <FilaDato icon={Eye} label="Dependents" value={SUSCRIPCION.dependientes} />
+                  </div>
 
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <DateTextField label="Coverage Start" required value={d.inicio} onChange={set('inicio')} error={req('inicio')} />
-                <DateTextField label="Coverage End" value={d.fin} onChange={set('fin')} />
-              </div>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <SelectField label="Eligibility" required options={ELEGIBILIDAD} value={d.elegibilidad} onChange={set('elegibilidad')} error={req('elegibilidad')} />
-                <DateTextField label="Verification Date" value={d.verificacion} onChange={set('verificacion')} />
-              </div>
-              <TextArea className="mt-4" label="Notes" placeholder="Add notes" value={d.notas} onChange={set('notas')} />
+                  <button
+                    type="button"
+                    onClick={() => setModal('gestionar')}
+                    className="bg-dash-blue hover:bg-dash-blue-hover mt-5 h-9 self-end rounded-md px-5 text-[13px] font-medium text-white transition-colors"
+                  >
+                    Manage Subscription
+                  </button>
+                </section>
 
-              <div className="mt-5 flex justify-end gap-3">
-                <FormFooter onCancel={() => setD({ relacion: '', orden: '', inicio: '', fin: '', elegibilidad: '', verificacion: '', notas: '' })} onSave={guardar} />
+                <section className={cn(TARJETA_PANEL, 'flex flex-col p-4 sm:p-5')}>
+                  <h2 className="text-sm font-semibold text-ink">Patient Information</h2>
+
+                  <SelectField
+                    className="mt-4" label="Relationship to Subscriber" required options={RELACIONES}
+                    value={d.relacion} onChange={set('relacion')} error={req('relacion')}
+                  />
+
+                  {/* Caja de sólo lectura con el mismo rótulo que el select de
+                      abajo, y con "Cordination" mal escrito. Es del Figma. */}
+                  <div className="mt-4 flex items-center gap-2.5 rounded-md bg-[#eff4ff] px-3 py-2">
+                    <CreditCard className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />
+                    <span className="leading-tight">
+                      <span className="block text-[11px] text-ink-faint">Cordination Order</span>
+                      <span className="block text-[13px] text-ink">Primary</span>
+                    </span>
+                  </div>
+
+                  <SelectField
+                    className="mt-4" label="Cordination Order" required options={ORDENES}
+                    value={d.orden} onChange={set('orden')} error={req('orden')}
+                  />
+
+                  <div className="mt-4 flex flex-col gap-2">
+                    <OptionCheckbox label="Assignment of Benefits" />
+                    <OptionCheckbox label="Release of Information" />
+                  </div>
+
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <DateTextField label="Coverage Start" required value={d.inicio} onChange={set('inicio')} error={req('inicio')} />
+                    <DateTextField label="Coverage End" value={d.fin} onChange={set('fin')} />
+                  </div>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <SelectField label="Eligibility" required options={ELEGIBILIDAD} value={d.elegibilidad} onChange={set('elegibilidad')} error={req('elegibilidad')} />
+                    <DateTextField label="Verification Date" value={d.verificacion} onChange={set('verificacion')} />
+                  </div>
+                  <TextArea className="mt-4" label="Notes" placeholder="Add notes" value={d.notas} onChange={set('notas')} />
+
+                  <div className="mt-5 flex justify-end gap-3">
+                    <FormFooter onCancel={() => setD({ relacion: '', orden: '', inicio: '', fin: '', elegibilidad: '', verificacion: '', notas: '' })} onSave={guardar} />
+                  </div>
+                </section>
               </div>
-            </section>
+              {/* En Mac la barra de scroll no se ve hasta que se scrollea: el degradé avisa que hay más abajo. */}
+              <div aria-hidden className="pointer-events-none sticky bottom-0 -mt-10 hidden h-10 bg-gradient-to-t from-page-background to-transparent lg:block" />
+            </div>
           </div>
         </div>
       </div>
