@@ -3,6 +3,18 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-10-30
+
+### Insurance llena el alto del menú y scrollea adentro ([#112](https://github.com/JulianGerardi/red-dental-studio/pull/112))
+- Insurance había quedado desactualizada frente a Treatments, Ledger y Documents (2026-10-25): scrolleaba la página
+  entera y el menú del paciente se iba con ella. Ahora la tabla de planes y los dos paneles de abajo llenan el alto
+  que deja el menú y scrollean adentro, igual que esas tres pantallas.
+- De paso, **"Manage Subscription" baja al piso de su card** para quedar a la misma altura que Cancel/Save del
+  panel de al lado.
+- **Para el dev:** `src/pages/patients/Insurance.tsx` suma el wrapper `flex flex-col` y el mismo truco de
+  `lg:relative/flex-1` + `lg:absolute/inset-0/overflow-y-auto` de `Treatments.tsx`; el botón Manage Subscription pasa
+  de `mt-5` a `mt-auto`. Nuevo e2e en `tests/patient-dashboard.e2e.ts`. Detalle en `insurance.md` (2026-10-30).
+
 ## 2026-10-29
 
 ### Clinical Mode: el panel del examen estira el fondo hasta Findings ([#111](https://github.com/JulianGerardi/red-dental-studio/pull/111))
