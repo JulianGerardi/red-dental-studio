@@ -2975,8 +2975,11 @@ caso y en Procedures del Overview:
 | Completed, Referred, Discarded, Discontinued | Edit | Edit | Edit | Edit | Edit |
 
 - Lo incompatible con el estado **se oculta**; Start y Complete bloqueados por el plan **se ven deshabilitados** con el
-  tooltip del ticket ("This procedure cannot be started or completed while its treatment plan is still being planned or
-  waiting for consent."). Se pueden enfocar con el teclado para leerlo; el texto también va como `aria-describedby`.
+  tooltip ("This procedure cannot be started or completed until its treatment case is accepted and its treatment plan is
+  accepted or in progress."; Julián cambió el del ticket, que hablaba de "still being planned or waiting for consent").
+  Se pueden enfocar con el teclado para leerlo; el texto también va como `aria-describedby`.
+- **Presented es igual que Planning** (Julián, mismo día; faltaba en el prototipo): Edit · Complete bloqueado · Refer ·
+  Discard · Delete, sin Start y sin columna Consent. Pending (Finish Planning) también.
 - **Start no sale de Planned** (no existe esa transición) y **Delete sólo de Planned**. **Pending** no se elige a mano:
   aceptar el caso pasa sus Planned a Pending.
 - El atajo de Complete de la fila (el ícono) sigue al menú: está si el menú lo ofrece y bloqueado si allá lo está.

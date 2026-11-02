@@ -71,6 +71,15 @@ test('Complete bloqueado mientras se planea o espera el consentimiento; aceptado
   await expect(screen.getByRole('menuitem', /Start/)).toHaveCount(0)
   await screen.getByRole('menuitem', /Delete/).press('Escape')
 
+  // Presented: igual que Planning.
+  await planes.getByRole('button', /^24\/08\/2026/).tap()
+  await planes.getByRole('button', /Crown Option, Presented/).tap()
+  await expect(screen.getByRole('columnheader', 'Consent')).toHaveCount(0)
+  await screen.getByRole('button', /Actions for D0120/).first().tap()
+  await expect(screen.getByRole('menuitem', /Complete/)).toHaveAttribute('aria-disabled', 'true')
+  await expect(screen.getByRole('menuitem', /Start/)).toHaveCount(0)
+  await screen.getByRole('menuitem', /Delete/).press('Escape')
+
   // Waiting for consent: Start y Complete deshabilitados, sin Delete.
   await planes.getByRole('button', /^26\/08\/2026/).tap()
   await planes.getByRole('button', /Restorative Plan, Waiting for consent/).tap()

@@ -26,7 +26,7 @@ export type AccionProcedimiento = 'edit' | 'start' | 'complete' | 'refer' | 'dis
     ejecutable: Accepted o In progress · cerrado: caso descartado, o plan cancelado o vencido. */
 export type ContextoPlan = 'sin-plan' | 'planificando' | 'esperando-consentimiento' | 'ejecutable' | 'cerrado'
 
-export const BLOQUEO_EJECUCION = 'This procedure cannot be started or completed while its treatment plan is still being planned or waiting for consent.'
+export const BLOQUEO_EJECUCION = 'This procedure cannot be started or completed until its treatment case is accepted and its treatment plan is accepted or in progress.'
 
 export function contextoDeCaso(estado?: EstadoCaso): ContextoPlan {
   if (!estado) return 'sin-plan'
