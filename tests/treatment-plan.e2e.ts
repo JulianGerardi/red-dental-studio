@@ -280,3 +280,13 @@ test('si el consentimiento no se puede mandar, el procedimiento no cambia', asyn
   await dialogo.getByRole('button', 'Cancel').tap()
   await expect(screen.getByRole('button', /Open consent for D1110: Not sent/)).toBeVisible()
 })
+
+/* Una sola card de Informed Consent por caso: al cambiar de caso no se apila otra debajo (antes la key repetida del bloque
+   y de la vista del caso las duplicaba). */
+test('al cambiar de caso queda una sola card de Informed Consent', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode?case=c5')
+  await screen.getByRole('button', /17\/04\/2026/).tap()
+  await screen.getByRole('button', /Implant Option/).tap()
+  await screen.getByRole('button', /Bridge Option/).tap()
+  await expect(screen.getByText('Informed Consent for Dental Treatment – Prueba 1')).toBeVisible()
+})

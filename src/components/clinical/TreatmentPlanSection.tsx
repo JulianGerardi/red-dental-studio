@@ -1308,7 +1308,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
 
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         {vista === 'caso' && !SIN_CONSENTIMIENTO_NI_TURNO.includes(caso.estado) && (
-          <ConsentBlock key={caso.id} firmado={caso.estado !== 'Waiting for consent'} onFirmado={casoFirmado} procedimientos={delCaso} onAbrirProcedimiento={abrirConsentimiento} />
+          <ConsentBlock key={`consentimiento-${caso.id}`} firmado={caso.estado !== 'Waiting for consent'} onFirmado={casoFirmado} procedimientos={delCaso} onAbrirProcedimiento={abrirConsentimiento} />
         )}
 
         {vista === 'unassigned' ? (
