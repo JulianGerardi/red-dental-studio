@@ -103,17 +103,22 @@ const ACCIONES_DOCUMENTO: { label: string; icono: LucideIcon }[] = [
 
 /* El consentimiento del caso, no el de cada procedimiento. `firmado`: el caso ya pasó Waiting for consent, las dos
    firmas están. Al juntar las dos avisa (`onFirmado`): el caso que esperaba el consentimiento pasa a Accepted (CON-2980). */
-export function ConsentBlock({ firmado = false, onFirmado, procedimientos, onAbrirProcedimiento }: {
+export function ConsentBlock({ firmado = false, onFirmado, procedimientos, onAbrirProcedimiento, historial: historialPedido, onHistorial }: {
   firmado?: boolean
   onFirmado?: () => void
   /** Los procedimientos del caso: sus consentimientos van en el historial. */
   procedimientos?: Procedimiento[]
   onAbrirProcedimiento?: (id: string) => void
+  /** El historial abierto, controlado desde afuera: al volver de un consentimiento que se abrió desde él, sigue abierto. */
+  historial?: boolean
+  onHistorial?: (abierto: boolean) => void
 } = {}) {
   const [firmas, setFirmas] = useState(() => (firmado
     ? CONSENTIMIENTO.firmas.map((f) => ({ ...f, estado: 'Signed' as const, fecha: f.fecha ?? '05/14/2026' }))
     : CONSENTIMIENTO.firmas))
-  const [historial, setHistorial] = useState(false)
+  const [historialLocal, setHistorialLocal] = useState(false)
+  const historial = historialPedido ?? historialLocal
+  const setHistorial = (abierto: boolean) => { setHistorialLocal(abierto); onHistorial?.(abierto) }
 
   const pendientes = firmas.filter((f) => f.estado === 'Pending')
   const estado = pendientes.length === 0 ? 'Signed' : CONSENTIMIENTO.estado
@@ -189,7 +194,7 @@ export function ConsentBlock({ firmado = false, onFirmado, procedimientos, onAbr
         <PanelHistorial
           onClose={() => setHistorial(false)}
           procedimientos={procedimientos}
-          onAbrirProcedimiento={onAbrirProcedimiento && ((id) => { setHistorial(false); onAbrirProcedimiento(id) })}
+          onAbrirProcedimiento={onAbrirProcedimiento}
         />
       )}
     </div>

@@ -171,6 +171,9 @@ test('el historial del caso lista los consentimientos de cada procedimiento', as
   await expect(historial.getByText(/Case consent v3/).first()).toBeVisible()
   await historial.getByRole('button', /Procedure Consent - D2950/).first().tap()
   await expect(screen.getByRole('heading', /Procedure Consent - D2950/)).toBeVisible()
+  // Back vuelve al historial, no al caso.
+  await screen.getByRole('button', 'Back').tap()
+  await expect(screen.getByRole('dialog', 'Consent history')).toBeVisible()
 })
 
 /* El menú ⋮ en un caso: Delete pregunta el alcance; Delete from Tx lo pasa a Unassigned. */
