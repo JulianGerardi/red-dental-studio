@@ -24,8 +24,7 @@ export function FilaFirma({ f }: { f: Firma }) {
         ? <CircleCheck className="size-4 shrink-0 text-dash-ok-fg" aria-hidden />
         : <CircleAlert className="size-4 shrink-0 text-warn-fg" aria-hidden />}
       <span className="font-semibold text-ink">{f.rol}</span>
-      {/* Con la card angosta el nombre se esconde para que la fila no se parta; el rol y el estado quedan. */}
-      <span className="sr-only text-ink-muted @5xl:not-sr-only">{f.nombre}</span>
+      <span className="text-ink-muted">{f.nombre}</span>
       <span className={cn('font-medium', ok ? 'text-dash-ok-fg' : 'text-warn-fg')}>
         · {ok ? `Signed ${f.fecha}` : 'Pending'}
       </span>
@@ -129,10 +128,10 @@ export function ConsentBlock({ firmado = false, onFirmado, procedimientos, onAbr
 
   return (
     <div
-      className="@container relative flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg bg-white shadow-panel py-2 pr-2 pl-4"
+      className="relative flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg bg-white shadow-panel py-2 pr-2 pl-4"
       style={{ borderLeftWidth: 3, borderLeftColor: t.bar }}
     >
-      <span className="flex min-w-0 items-center gap-2">
+      <span className="flex min-w-0 flex-1 items-center gap-2">
         <FileSignature className={cn('size-4 shrink-0', t.icono)} aria-hidden />
         <span className="text-[14px] font-bold text-ink">{CONSENTIMIENTO.titulo}</span>
         <span className={cn('shrink-0 rounded-full border px-2 py-[1px] text-[11px] font-semibold', t.pill)}>
@@ -143,11 +142,6 @@ export function ConsentBlock({ firmado = false, onFirmado, procedimientos, onAbr
             ? 'All signatures collected'
             : `${pendientes.length} of ${firmas.length} signatures pending`}
         </span>
-      </span>
-
-      {/* Quién firmó y qué falta, en la misma línea. */}
-      <span className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1">
-        {firmas.map((f) => <FilaFirma key={f.rol} f={f} />)}
       </span>
 
       <span className="flex shrink-0 items-center">
@@ -184,6 +178,11 @@ export function ConsentBlock({ firmado = false, onFirmado, procedimientos, onAbr
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+      </span>
+
+      {/* Quién firmó y qué falta, en una fila propia debajo del título (CON-4052, 4ª vuelta). */}
+      <span className="flex basis-full flex-wrap items-center gap-x-5 gap-y-1 pb-1">
+        {firmas.map((f) => <FilaFirma key={f.rol} f={f} />)}
       </span>
 
       {historial && (

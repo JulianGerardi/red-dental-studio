@@ -3119,3 +3119,10 @@ Pedido de Julián tras ver la 3ª vuelta. Jira: CON-4052 (con CON-2980 para el p
 
 **Para validar con usuarios:** si el pop up de firma en el consultorio se entiende como "portal" (¿se espera que el
 paciente firme en otra pantalla/tablet?), y si el historial mezclado se lee bien o conviene un filtro Case / Procedure.
+
+## CON-4052: el bloque Informed Consent con las firmas en su propia fila (2026-11-02)
+
+Pedido de Julián sobre una captura: con el bloque angosto los íconos (historial y menú) caían a una segunda fila a la
+izquierda. Ahora la fila de arriba es el título con su estado y, a la derecha, los dos íconos; **Patient y Provider van
+abajo, en una fila propia**, con el nombre siempre visible (antes se escondía con la card angosta). Mismo orden en
+escritorio y celular; en celular el título se parte en líneas y las firmas quedan una debajo de la otra.
