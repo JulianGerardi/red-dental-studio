@@ -3032,3 +3032,34 @@ tooltip de Start/Complete bloqueados alcanza o conviene decir qué falta ("Waiti
 
 Código: `clinical/{accionesProcedimiento,ConsentDetail,ConsentRequiredDialog,ConsentBlock,TreatmentPlanSection,ProblemList}.tsx`,
 `data/{treatment-plan,clinical-mode}.ts`, `pages/ClinicalMode.tsx`; e2e en `tests/{treatment-plan,clinical-mode}.e2e.ts`.
+
+### Cada escenario y cada consentimiento como en el prototipo, la hoja a todo el ancho (2026-11-02)
+
+Julián pidió revisar cómo reacciona cada escenario del HTML (*Scenario* × *Specific procedure consent*). El HTML del link
+de SharePoint es el mismo que pasó adjunto; ese link y el de red.dev piden login y no se pudieron abrir desde acá.
+
+1. **Un procedimiento suelto también tiene consentimiento** (hay template): no se ve en Unassigned, pero su Complete pasa
+   por Consent required como en un caso, sin la línea del caso. Los de ejemplo arrancan en Not generated (uno, Not
+   required).
+2. **Send consent and sign later** genera el documento si no había (Not generated → Not sent) y lo manda. Si el envío
+   falla, el procedimiento no cambia y el diálogo lo dice ("The consent could not be sent. The procedure has not
+   changed. Retry using the same document, or sign now."); se reintenta con el mismo documento.
+3. **Sign now** genera el documento aunque después se vuelva con Back o se cancele.
+4. **View consent** abre el documento en un drawer (*Procedure consent*: "Specific consent for this procedure — not the
+   treatment case consent.", estado y firmas) y **Back** vuelve al diálogo con el pedido intacto. Antes salía a la
+   pantalla del consentimiento y se perdía el Start o Complete.
+5. **Prototype controls** arriba de Treatment Plan, como los de Estimate details: elegir un procedimiento del caso (o de
+   Unassigned), fijar su consentimiento (los cinco estados) y *Simulate sending failure*. Es herramienta de demo: antes de
+   pasarlo a los devs hay que sacarla o esconderla detrás de un flag.
+6. **Escenarios que no tenían caso**: Night Guard Plan (In progress), Whitening Plan (Cancelled después de aceptar, con
+   la columna Consent) y Sealant Plan (Expired antes de aceptar, sin columna). Los cerrados no van a las cards del
+   Overview.
+7. **La hoja a todo el ancho** en el detalle del consentimiento (pedido de Julián): las firmas pasan arriba, en dos
+   tarjetas lado a lado, y el documento ocupa el ancho de la pantalla sin el tamaño de carta (`ConsentDocument
+   ancho="completo"`). Al pie de la hoja quedan **las dos firmas estampadas**, la del paciente (*Patient / Legal
+   Guardian*) y la del provider, cada una con el trazo dibujado (o el nombre escrito) sobre la línea y su fecha.
+
+**Pendiente:** el diseño de la firma de red.dev (el consentimiento y *Patient signature*) no se pudo ver: el link pide
+login. Lo armado sigue el patrón del documento; conviene ajustarlo con capturas.
+
+**Fuera del prototipo:** en Procedures del Overview, los sueltos no tienen datos de consentimiento y cambian directo.

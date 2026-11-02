@@ -76,7 +76,8 @@ export type Plan = {
 }
 
 const DOCTORES = ['Daniel Anderson', 'Perez Martinez', 'Michael Johnson']
-export const PLANES: Plan[] = CASOS.filter((c) => c.estado !== 'Discarded').map((c, i) => {
+/* Los cerrados (descartado, cancelado, vencido) no se muestran. */
+export const PLANES: Plan[] = CASOS.filter((c) => !['Discarded', 'Cancelled', 'Expired'].includes(c.estado)).map((c, i) => {
   const procs = c.visitas.flatMap((v) => v.procedimientos).filter((p) => p.estado !== 'Removed')
   return {
     id: c.id, doctor: DOCTORES[i % DOCTORES.length], rol: 'Dentist', nombre: c.nombre, grupo: c.grupo, estado: c.estado,

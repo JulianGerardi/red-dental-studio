@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils'
 import {
   Check, MapPin, Send, User, Stethoscope, CalendarDays, ClipboardList, X, type LucideIcon,
 } from 'lucide-react'
@@ -82,19 +83,52 @@ type Props = {
   /** El documento de un paciente (detalle del consentimiento en Treatment Plan); sin esto, los datos de ejemplo. */
   paciente?: string
   proveedor?: string
-  /** Con la firma del paciente: el nombre sobre la línea, la fecha y las casillas marcadas. */
-  firmaPaciente?: { nombre: string; fecha: string }
+  /** El documento de un paciente lleva las dos firmas (paciente y provider): el trazo o el nombre sobre la línea y la
+      fecha. Con la del paciente, las casillas quedan marcadas. Sin esto, la línea vacía del preview de Settings. */
+  firmas?: { paciente?: FirmaHoja; proveedor?: FirmaHoja }
+  /** completo: ocupa todo el ancho y crece con el contenido (el detalle del consentimiento), sin el tamaño de carta. */
+  ancho?: 'carta' | 'completo'
   className?: string
 }
 
-export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, texto, vistaPaciente, paciente = 'Sarah Stone', proveedor = 'John Lorem', firmaPaciente, className }: Props) {
+export type FirmaHoja = { fecha: string; nombre: string; imagen?: string; texto?: string }
+
+/* Una línea de firma del documento: el trazo (o el nombre escrito, o el nombre) sobre la línea, quién firma y la fecha. */
+function LineaFirma({ rol, nombre, firma }: { rol: string; nombre: string; firma?: FirmaHoja }) {
+  return (
+    <div className="grid grid-cols-[1fr_96px] items-end gap-4 text-[11px] text-ink-faint">
+      <div>
+        <div className="flex h-14 items-end pb-1">
+          {firma?.imagen
+            ? <img src={firma.imagen} alt={`Signature of ${firma.nombre}`} className="max-h-14 max-w-[260px] object-contain" />
+            : firma && <span className="font-serif text-[20px] leading-none text-ink italic">{firma.texto || firma.nombre}</span>}
+        </div>
+        <div className="relative border-t border-ink-medium pt-1">
+          {!firma && <X aria-hidden className="absolute -top-3.5 left-0 size-3 text-ink-faint" />}
+          {rol} · <span className="text-ink-muted">{nombre}</span>
+        </div>
+      </div>
+      <div>
+        <p className="pb-1 text-[12px] text-ink">{firma?.fecha}</p>
+        <div className="border-t border-ink-medium pt-1">Date</div>
+      </div>
+    </div>
+  )
+}
+
+export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, texto, vistaPaciente, paciente = 'Sarah Stone', proveedor = 'John Lorem', firmas, ancho = 'carta', className }: Props) {
+  const firmaPaciente = firmas?.paciente
   const lineasRiesgo = riesgos.split('\n').filter(Boolean)
   const vacio = <p className="text-ink-faint">No content yet.</p>
 
   return (
     <article
       aria-label="Consent document preview"
-      className={`mx-auto flex aspect-[8.5/11] w-full max-w-[520px] flex-col ${className ?? ''} bg-white px-6 pt-6 pb-3.5 text-[12px] leading-[1.5] text-ink-soft shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_2px_4px_rgb(0_0_0/0.06),0_14px_28px_-8px_rgb(0_0_0/0.22)]`}
+      className={cn(
+        'mx-auto flex w-full flex-col bg-white px-6 pt-6 pb-3.5 text-[12px] leading-[1.5] text-ink-soft shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_2px_4px_rgb(0_0_0/0.06),0_14px_28px_-8px_rgb(0_0_0/0.22)]',
+        ancho === 'carta' ? 'aspect-[8.5/11] max-w-[520px]' : 'sm:px-10 sm:pt-8',
+        className,
+      )}
     >
       <header className="flex items-center gap-3 border-b-2 border-dash-blue pb-3">
         <span aria-hidden className="bg-dash-blue grid size-9 shrink-0 place-items-center rounded-md text-[12px] font-bold text-white">LA</span>
@@ -167,17 +201,20 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, te
         <p className="mt-2 text-[11px] leading-snug font-medium text-ink-muted">{AVISO_RECONOCIMIENTOS}</p>
       </Seccion>
 
-      <div className="mt-auto grid grid-cols-[1fr_88px] gap-4 pt-7 text-[11px] text-ink-faint">
-        <div className="relative border-t border-ink-medium pt-1">
-          <X aria-hidden className="absolute -top-3.5 left-0 size-3 text-ink-faint" />
-          {firmaPaciente && <span className="absolute -top-6 left-5 text-[16px] font-semibold text-ink italic">{firmaPaciente.nombre}</span>}
-          Patient / Legal Guardian
+      {firmas ? (
+        <section aria-label="Signatures" className="mt-auto grid gap-6 pt-7 sm:grid-cols-2 sm:gap-10">
+          <LineaFirma rol="Patient / Legal Guardian" nombre={paciente} firma={firmas.paciente} />
+          <LineaFirma rol="Provider" nombre={proveedor} firma={firmas.proveedor} />
+        </section>
+      ) : (
+        <div className="mt-auto grid grid-cols-[1fr_88px] gap-4 pt-7 text-[11px] text-ink-faint">
+          <div className="relative border-t border-ink-medium pt-1">
+            <X aria-hidden className="absolute -top-3.5 left-0 size-3 text-ink-faint" />
+            Patient / Legal Guardian
+          </div>
+          <div className="border-t border-ink-medium pt-1">Date</div>
         </div>
-        <div className="relative border-t border-ink-medium pt-1">
-          {firmaPaciente && <span className="absolute -top-5 left-0 text-[12px] text-ink">{firmaPaciente.fecha}</span>}
-          Date
-        </div>
-      </div>
+      )}
 
       <footer className="mt-3 flex justify-between border-t border-line-soft pt-2 text-[10px] text-ink-faint">
         <span>{paciente} · Patient ID 12345432</span>

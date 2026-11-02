@@ -31,9 +31,12 @@ export type Procedimiento = {
   firmas?: FirmasConsentimiento
   /** Las notas de Edit procedure: no cambian el estado. */
   nota?: string
+  /** Cómo firmó cada uno: el trazo dibujado (imagen) o el nombre escrito. Sin esto, la hoja muestra el nombre. */
+  rubricas?: Partial<Record<keyof FirmasConsentimiento, Rubrica>>
 }
 
 export type FirmasConsentimiento = { Patient?: string; Provider?: string }
+export type Rubrica = { imagen?: string; texto?: string }
 
 /* El consentimiento específico del procedimiento (no el del caso), del prototipo de Julián para CON-4052:
    Not generated (hay template, no hay documento) · Not sent (generado, sin mandar ni firmar) · Pending (mandado, falta
@@ -51,6 +54,11 @@ const DEL_PACIENTE: Record<string, Partial<Procedimiento>> = {
   /* El consentimiento a medio firmar: el paciente ya firmó, falta el provider. */
   c5v2p2: { codigo: 'D2950', nombre: 'Core buildup, including any pins when required', superficie: '-', pieza: '19', ubicacion: '-', firmas: { Patient: '04/29/2026' } },
   c5v2p3: { codigo: 'D2954', nombre: 'Prefabricated post and core in addition to crown', superficie: '-', pieza: '19', ubicacion: '-' },
+  c9v1p1: { codigo: 'D9944', nombre: 'Occlusal guard – hard appliance, full arch', superficie: '-', pieza: '-', ubicacion: 'Upper Arch', estado: 'In progress' },
+  c9v1p2: { codigo: 'D1110', nombre: 'Prophylaxis – adult', superficie: '-', pieza: '-', ubicacion: '-' },
+  c10v1p1: { codigo: 'D9972', nombre: 'External bleaching – per arch – performed in office', superficie: '-', pieza: '-', ubicacion: 'Upper Arch' },
+  c10v1p2: { codigo: 'D9972', nombre: 'External bleaching – per arch – performed in office', superficie: '-', pieza: '-', ubicacion: 'Lower Arch' },
+  c11v1p1: { codigo: 'D1351', nombre: 'Sealant – per tooth', superficie: 'O', pieza: '30', ubicacion: '-' },
   c1v2p1: { codigo: 'D4341', nombre: 'Periodontal scaling and root planing – four or more teeth per quadrant', superficie: '-', pieza: '-', ubicacion: 'Upper Arch' },
   c3v1p1: { codigo: 'D2391', nombre: 'Resin-based composite – one surface, posterior', superficie: 'O', pieza: '3', ubicacion: '-' },
   c3v1p2: { codigo: 'D2392', nombre: 'Resin-based composite – two surfaces, posterior', superficie: 'O, D', pieza: '14', ubicacion: '-' },
@@ -80,7 +88,9 @@ const proc = (id: string, estado: Procedimiento['estado'] = 'Planned', consentim
 const visita = (prefijo: string, consentimientos: ConsentProcedimiento[], estado: Procedimiento['estado'] = 'Planned') =>
   consentimientos.map((c, i) => proc(`${prefijo}p${i + 1}`, estado, c))
 
-export const NO_ASIGNADOS: Procedimiento[] = Array.from({ length: 15 }, (_, i) => proc(`u${i + 1}`))
+/* Un procedimiento suelto también puede tener su consentimiento (hay template): no se ve en la tabla, pero Complete pasa
+   por él como en un caso (prototipo de CON-4052). El segundo no tiene template. */
+export const NO_ASIGNADOS: Procedimiento[] = Array.from({ length: 15 }, (_, i) => proc(`u${i + 1}`, 'Planned', i === 1 ? 'Not required' : 'Not generated'))
 
 export type Caso = {
   id: string
@@ -165,6 +175,23 @@ export const CASOS: Caso[] = ([
     visitas: [
       { id: 'v1', nombre: 'Visit 1', total: '$980.000', procedimientos: visita('c7v1', ['Signed', 'Not required'], 'Pending') },
     ],
+  },
+  /* Los escenarios del prototipo de CON-4052 que no tenía ningún caso: el plan empezado, el cancelado después de
+     aceptar y el vencido antes de aceptar. */
+  {
+    id: 'c9', nombre: 'Night Guard Plan', grupo: 'Occlusal', estado: 'In progress', aceptado: true,
+    creado: '10/04/2026', creadoPor: 'Provider 1', total: '0',
+    visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$468.000', procedimientos: visita('c9v1', ['Signed', 'Pending'], 'Pending') }],
+  },
+  {
+    id: 'c10', nombre: 'Whitening Plan', grupo: 'Cosmetic', estado: 'Cancelled', aceptado: true,
+    creado: '05/03/2026', creadoPor: 'Provider 1', total: '0',
+    visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$468.000', procedimientos: visita('c10v1', ['Pending', 'Not sent'], 'Pending') }],
+  },
+  {
+    id: 'c11', nombre: 'Sealant Plan', grupo: 'Preventive', estado: 'Expired',
+    creado: '12/02/2026', creadoPor: 'Provider 1', total: '0',
+    visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$234.000', procedimientos: visita('c11v1', ['Not generated']) }],
   },
 ] satisfies Caso[]).map(totalDeFees)
 

@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { ConsentBlock } from '@/components/clinical/ConsentBlock'
 import { useFlujoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
-import { ConsentDetail, EstadoConsentimiento, estadoTrasFirma, hoy, tieneDocumento, type Firmante } from '@/components/clinical/ConsentDetail'
+import { ConsentDetail, ControlesConsentimiento, EstadoConsentimiento, estadoTrasFirma, hoy, tieneDocumento, type Firmante } from '@/components/clinical/ConsentDetail'
 import {
   ACCION, BLOQUEO_EJECUCION, DialogoBorrar, conColumnaConsent, DialogoCambioEstado, DialogoEditar, ItemsAcciones, TONO_PROCEDIMIENTO,
   accionesDe, completarDe, contextoDeCaso, type AccionProcedimiento, type ItemAccion,
@@ -15,7 +15,7 @@ import type { EstadoProcedimiento } from '@/data/clinical-mode'
 import {
   CASOS, NO_ASIGNADOS, CATEGORIAS, DIALOGOS, OPCIONES_BORRAR_CASO, MOVER, SIN_DOCUMENTO,
   NUEVO_GRUPO, COMPLETAR, ordenFecha,
-  type Caso, type Cita, type EstadoCaso, type Procedimiento, type ClaveDialogo, type Visita,
+  type Caso, type Cita, type ConsentProcedimiento, type EstadoCaso, type Procedimiento, type ClaveDialogo, type Rubrica, type Visita,
 } from '@/data/treatment-plan'
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { SelectField } from '@/components/patients/form'
@@ -1147,105 +1147,100 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
   /* Los que se pueden completar de los pedidos: lo ya cerrado se saltea. */
   const porCompletar = (ids: string[]) => delCaso.filter((p) => ids.includes(p.id) && ['Planned', 'Pending', 'In progress'].includes(p.estado))
 
-  /* Cambia el estado de procedimientos del caso, con Undo. Con `enviar`, el consentimiento sin generar o sin mandar sale
-     al paciente (Pending). El primer Start de un plan aceptado lo pasa a In progress (CON-4052). */
+  /* Cambia procedimientos por id, estén en el caso abierto o en Unassigned (los ids no se repiten). */
+  const mapear = (ids: string[], fn: (p: Procedimiento) => Procedimiento) => {
+    setCasos((cs) => cs.map((c) => (c.id !== caso.id ? c : {
+      ...c, visitas: c.visitas.map((v) => ({ ...v, procedimientos: v.procedimientos.map((p) => (ids.includes(p.id) ? fn(p) : p)) })),
+    })))
+    setSueltos((ps) => ps.map((p) => (ids.includes(p.id) ? fn(p) : p)))
+  }
+  const buscar = (id: string) => delCaso.find((p) => p.id === id) ?? sueltos.find((p) => p.id === id)
+
+  /* Cambia el estado, con Undo. Con `enviar`, el consentimiento sin generar o sin mandar sale al paciente (Pending). El
+     primer Start de un plan aceptado lo pasa a In progress (CON-4052). */
   const aplicarEstado = (ids: string[], destino: EstadoProcedimiento, { enviar = false, nota = '', tratadas = 0 } = {}) => {
-    const antes = casos
+    const [antesCasos, antesSueltos] = [casos, sueltos]
     const sinMandar = (c?: string) => c === 'Not generated' || c === 'Not sent'
-    const empieza = destino === 'In progress' && caso.estado === 'Accepted'
-    cambiarCaso({
-      visitas: conProcs(ids, (p) => ({ ...p, estado: destino, ...(enviar && sinMandar(p.consentimiento) && { consentimiento: 'Pending' as const }) })),
-      ...(empieza && { estado: 'In progress' as const }),
-    })
-    const uno = delCaso.find((p) => p.id === ids[0])
+    const empieza = destino === 'In progress' && caso.estado === 'Accepted' && ids.some((id) => delCaso.some((p) => p.id === id))
+    mapear(ids, (p) => ({ ...p, estado: destino, ...(enviar && sinMandar(p.consentimiento) && { consentimiento: 'Pending' as const }) }))
+    if (empieza) cambiarCaso({ estado: 'In progress' })
     const texto = destino === 'Completed' ? textoCompletado(ids.length, tratadas)
       : destino === 'In progress' ? `${ids.length > 1 ? `${ids.length} procedures` : 'Procedure'} started.`
-      : `${ids.length > 1 ? `${ids.length} procedures` : uno?.codigo} moved to ${destino}.`
-    aviso.ok(`${texto}${nota}${empieza ? ` ${caso.nombre} is now In progress.` : ''}`, { label: 'Undo', onClick: () => setCasos(antes) })
+      : `${ids.length > 1 ? `${ids.length} procedures` : buscar(ids[0]!)?.codigo} moved to ${destino}.`
+    aviso.ok(`${texto}${nota}${empieza ? ` ${caso.nombre} is now In progress.` : ''}`, {
+      label: 'Undo', onClick: () => { setCasos(antesCasos); setSueltos(antesSueltos) },
+    })
   }
 
-  /* Firma todo lo requerido de esos consentimientos (Sign now); si no había documento, se genera. El estado no cambia. */
-  const firmarTodos = (ids: string[]) =>
-    cambiarCaso({ visitas: conProcs(ids, (p) => ({ ...p, consentimiento: 'Signed', firmas: { Patient: p.firmas?.Patient ?? hoy(), Provider: p.firmas?.Provider ?? hoy() } })) })
+  /* Prototype controls: el consentimiento de un procedimiento y la falla al mandar (prototipo de CON-4052). */
+  const [fallaEnvio, setFallaEnvio] = useState(false)
+  const fijarConsentimiento = (id: string, c: ConsentProcedimiento) =>
+    mapear([id], (p) => ({ ...p, consentimiento: c, firmas: c === 'Signed' ? { Patient: hoy(), Provider: hoy() } : {}, rubricas: undefined }))
 
-  /* Start y Complete pasan por el consentimiento del procedimiento (prototipo de CON-4052). */
+  /* Start y Complete pasan por el consentimiento del procedimiento, con caso o suelto (prototipo de CON-4052). */
   const [tratadas, setTratadas] = useState(0)
   const flujo = useFlujoConsentimiento({
     onAplicar: (ids, verbo, { enviar, nota }) => aplicarEstado(ids, verbo === 'Start' ? 'In progress' : 'Completed', { enviar, nota, tratadas }),
-    onFirmar: firmarTodos,
-    onVerConsentimiento: (id) => abrirConsentimiento(id),
+    onGenerar: (ids) => mapear(ids, (p) => ({ ...p, consentimiento: 'Not sent' })),
+    onFirmar: (ids, rubrica) => mapear(ids, (p) => ({
+      ...p, consentimiento: 'Signed',
+      firmas: { Patient: p.firmas?.Patient ?? hoy(), Provider: p.firmas?.Provider ?? hoy() },
+      rubricas: { ...p.rubricas, Patient: rubrica },
+    })),
+    fallaEnvio,
   })
-  const pedirEjecutar = (ids: string[], verbo: 'Start' | 'Complete') =>
-    flujo.pedir(verbo, delCaso.filter((p) => ids.includes(p.id)), caso.nombre)
-
-  /* Un procedimiento suelto cambia directo (no tiene consentimiento), con Undo. */
-  const aplicarSuelto = (id: string, destino: EstadoProcedimiento, cuantas = 0) => {
-    const antes = sueltos
-    setSueltos((ps) => ps.map((p) => (p.id === id ? { ...p, estado: destino } : p)))
-    const p = sueltos.find((x) => x.id === id)
-    aviso.ok(destino === 'Completed' ? textoCompletado(1, cuantas) : `${p?.codigo} moved to ${destino}.`, { label: 'Undo', onClick: () => setSueltos(antes) })
-  }
+  const pedirEjecutar = (ids: string[], verbo: 'Start' | 'Complete', suelto = false) =>
+    flujo.pedir(verbo, (suelto ? sueltos : delCaso).filter((p) => ids.includes(p.id)), suelto ? undefined : caso.nombre)
 
   /* Confirm del drawer de Complete (el flujo que ya existía, con las condiciones vinculadas); después, el consentimiento. */
   const pedirCompletar = (cuantas: number) => {
     if (!completar) return
     const { ids, suelto } = completar
     setCompletar(null)
-    if (suelto) return aplicarSuelto(ids[0]!, 'Completed', cuantas)
-    const procs = porCompletar(ids)
+    const procs = (suelto ? sueltos : porCompletar(ids)).filter((p) => ids.includes(p.id))
     if (procs.length === 0) return aviso.info('The selected procedures are already completed.')
     setTratadas(cuantas)
-    pedirEjecutar(procs.map((p) => p.id), 'Complete')
+    pedirEjecutar(procs.map((p) => p.id), 'Complete', suelto)
   }
 
   /* El menú ⋮ de cada fila (CON-4052). Complete abre su drawer y Start va directo al consentimiento; Edit, Refer,
      Discard, Discontinue y Delete abren lo suyo (abajo). */
   const elegirAccion = (suelto: boolean) => (p: Procedimiento, a: AccionProcedimiento) => {
     if (a === 'complete') return setCompletar({ ids: [p.id], suelto })
-    if (a === 'start') { setTratadas(0); return pedirEjecutar([p.id], 'Start') }
+    if (a === 'start') { setTratadas(0); return pedirEjecutar([p.id], 'Start', suelto) }
     setMenu({ p, a, suelto })
   }
 
   /* Lo que confirma cada diálogo del menú. */
-  const guardarNota = (p: Procedimiento, nota: string, suelto: boolean) => {
-    const poner = (x: Procedimiento) => (x.id === p.id ? { ...x, nota: nota || undefined } : x)
-    if (suelto) setSueltos((ps) => ps.map(poner))
-    else cambiarCaso({ visitas: caso.visitas.map((v) => ({ ...v, procedimientos: v.procedimientos.map(poner) })) })
+  const guardarNota = (p: Procedimiento, nota: string) => {
+    mapear([p.id], (x) => ({ ...x, nota: nota || undefined }))
     aviso.ok('Procedure notes updated. The status has not changed.')
   }
-  const cambiarDesdeMenu = (p: Procedimiento, a: 'refer' | 'discard' | 'discontinue', suelto: boolean) => {
-    const destino = ACCION[a].a!
-    if (suelto) aplicarSuelto(p.id, destino)
-    else aplicarEstado([p.id], destino)
-  }
-  /* Delete: suelto, se borra. En un caso, Delete from Tx lo saca del caso y lo deja en Unassigned; Delete Procedure lo
-     borra del paciente. Como dice el diálogo, no se deshace. */
+  const cambiarDesdeMenu = (p: Procedimiento, a: 'refer' | 'discard' | 'discontinue') => aplicarEstado([p.id], ACCION[a].a!)
+  /* Delete: suelto, se borra. En un caso, Delete from Tx lo saca del caso y lo deja en Unassigned (con su
+     consentimiento); Delete Procedure lo borra del paciente. Como dice el diálogo, no se deshace. */
   const borrarDesdeMenu = (p: Procedimiento, alcance: 'caso' | 'paciente', suelto: boolean) => {
     if (suelto) setSueltos((ps) => ps.filter((x) => x.id !== p.id))
     else {
       cambiarCaso({ visitas: caso.visitas.map((v) => ({ ...v, procedimientos: v.procedimientos.filter((x) => x.id !== p.id) })).filter((v) => v.procedimientos.length > 0) })
-      if (alcance === 'caso') setSueltos((ps) => [...ps, { ...p, consentimiento: undefined, firmas: undefined }])
+      if (alcance === 'caso') setSueltos((ps) => [...ps, p])
     }
     aviso.ok(alcance === 'caso' ? `${p.codigo} removed from the case and moved to Unassigned.` : `${p.codigo} deleted.`)
   }
 
   /* Firmar desde el detalle del consentimiento (después, sin repetir el cambio clínico). Con las dos firmas queda Signed. */
-  const firmar = (id: string, rol: Firmante) => {
-    let completo = false
-    cambiarCaso({
-      visitas: conProcs([id], (p) => {
-        const firmas = { ...p.firmas, [rol]: hoy() }
-        completo = !!(firmas.Patient && firmas.Provider)
-        return { ...p, firmas, consentimiento: estadoTrasFirma(firmas) }
-      }),
-    })
+  const firmar = (id: string, rol: Firmante, rubrica: Rubrica) => {
+    const p = buscar(id)
+    const firmas = { ...p?.firmas, [rol]: hoy() }
+    const completo = !!(firmas.Patient && firmas.Provider)
+    mapear([id], (x) => ({ ...x, firmas, consentimiento: estadoTrasFirma(firmas), rubricas: { ...x.rubricas, [rol]: rubrica } }))
     aviso.ok(completo ? 'Procedure consent signed. The procedure has not changed.' : `Consent signed as ${rol.toLowerCase()}.`)
   }
 
   /* Mandar el documento al paciente: el primero u otra vez. */
   const enviar = (id: string) => {
-    const p = delCaso.find((x) => x.id === id)
-    cambiarCaso({ visitas: conProcs([id], (x) => ({ ...x, consentimiento: 'Pending' })) })
+    const p = buscar(id)
+    mapear([id], (x) => ({ ...x, consentimiento: 'Pending' }))
     aviso.ok(p?.consentimiento === 'Pending' ? 'Consent sent to the patient again.' : 'Consent sent to the patient.')
   }
 
@@ -1278,7 +1273,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
         caso={caso}
         visita={caso.visitas.find((v) => v.procedimientos.some((p) => p.id === enConsentimiento.id))}
         onVolver={() => setVista('caso')}
-        onFirmar={(rol) => firmar(enConsentimiento.id, rol)}
+        onFirmar={(rol, r) => firmar(enConsentimiento.id, rol, r)}
         onEnviar={() => enviar(enConsentimiento.id)}
       />
     ) : vista === 'estimado' ? (
@@ -1304,6 +1299,13 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
       />
 
       <div className="flex min-w-0 flex-1 flex-col gap-4">
+        {/* Los controles del prototipo de CON-4052: elegir el consentimiento de un procedimiento y simular la falla. */}
+        <ControlesConsentimiento
+          procedimientos={vista === 'unassigned' ? sueltos : delCaso}
+          onFijar={fijarConsentimiento}
+          fallaEnvio={fallaEnvio}
+          onFallaEnvio={setFallaEnvio}
+        />
         {vista === 'caso' && !SIN_CONSENTIMIENTO_NI_TURNO.includes(caso.estado) && (
           <ConsentBlock key={caso.id} firmado={caso.estado !== 'Waiting for consent'} onFirmado={casoFirmado} />
         )}
@@ -1403,10 +1405,10 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
         const { p, a, suelto } = menu
         const cerrar = () => setMenu(null)
         const deCaso = suelto ? undefined : caso.nombre
-        if (a === 'edit') return <DialogoEditar procedimiento={p} nota={p.nota} caso={deCaso} onClose={cerrar} onGuardar={(n) => { cerrar(); guardarNota(p, n, suelto) }} />
+        if (a === 'edit') return <DialogoEditar procedimiento={p} nota={p.nota} caso={deCaso} onClose={cerrar} onGuardar={(n) => { cerrar(); guardarNota(p, n) }} />
         if (a === 'delete') return <DialogoBorrar procedimiento={p} caso={deCaso} onCancel={cerrar} onConfirm={(al) => { cerrar(); borrarDesdeMenu(p, al, suelto) }} />
         if (a === 'refer' || a === 'discard' || a === 'discontinue') {
-          return <DialogoCambioEstado accion={a} procedimiento={p} desde={p.estado} caso={deCaso} onCancel={cerrar} onConfirm={() => { cerrar(); cambiarDesdeMenu(p, a, suelto) }} />
+          return <DialogoCambioEstado accion={a} procedimiento={p} desde={p.estado} caso={deCaso} onCancel={cerrar} onConfirm={() => { cerrar(); cambiarDesdeMenu(p, a) }} />
         }
         return null
       })()}

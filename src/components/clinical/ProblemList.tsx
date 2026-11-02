@@ -126,10 +126,10 @@ export function ProblemList({ procedimientoInicial }: {
       const procCaso = fila && tratamientoDe(fila, consentimientos)?.procCaso
       if (procCaso) setConsentimientos((c) => ({ ...c, [procCaso.id]: 'Signed' }))
     },
-    onVerConsentimiento: (id) => {
+    onGenerar: ([id]) => {
       const fila = procedimientos.find((p) => p.id === id)
-      const tr = fila && tratamientoDe(fila, consentimientos)
-      if (tr?.procCaso) ir({ pestana: 'Treatment Plan', caso: tr.caso.id, consentimiento: tr.procCaso.id })
+      const procCaso = fila && tratamientoDe(fila, consentimientos)?.procCaso
+      if (procCaso) setConsentimientos((c) => ({ ...c, [procCaso.id]: 'Not sent' }))
     },
   })
   function elegirProcedimiento(fila: ProcedimientoPaciente, accion: AccionProcedimiento) {

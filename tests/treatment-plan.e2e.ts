@@ -221,3 +221,20 @@ test('Prototype controls: el cálculo que falla deja el anterior y el escenario 
   await expect(screen.getByText('Locked at presentation')).toBeVisible()
   await expect(screen.getByRole('button', /Update estimates|Recalculate/)).toHaveCount(0)
 })
+
+/* Prototipo de CON-4052: un suelto también pasa por su consentimiento; si el envío falla, el procedimiento no cambia. */
+test('Unassigned: Complete pide el consentimiento y la falla al mandar no cambia el procedimiento', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode')
+  await screen.getByRole('button', /^Exams/).tap()
+  await screen.getByRole('menuitem', 'Treatment Plan').tap()
+  await screen.getByRole('checkbox', 'Simulate sending failure').tap()
+  await screen.getByRole('button', /Actions for D0120/).first().tap()
+  await screen.getByRole('menuitem', /Complete/).tap()
+  await screen.getByRole('button', 'Confirm').tap()
+  const dialogo = screen.getByRole('dialog', 'Consent required')
+  await expect(dialogo.getByText(/This procedure requires a consent document/)).toBeVisible()
+  await dialogo.getByRole('button', 'Send consent and sign later').tap()
+  await expect(dialogo.getByText(/The consent could not be sent\. The procedure has not changed\./)).toBeVisible()
+  await dialogo.getByRole('button', 'Cancel').tap()
+  await expect(screen.getByRole('cell', 'Completed')).toHaveCount(0)
+})
