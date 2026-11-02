@@ -5,6 +5,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-02
 
+### Clinical Mode: una sola card de Informed Consent y Back del consentimiento vuelve al historial ([#116](https://github.com/JulianGerardi/red-dental-studio/pull/116))
+- **CON-4052.** Al pasar de un caso a otro en el rail se apilaba una card de Informed Consent más (el bloque y la vista del
+  caso compartían la misma `key`). Ahora hay **una sola card por caso**; versiones y consentimientos de cada procedimiento
+  viven en Consent history (el reloj).
+- Si un consentimiento se abre desde el Consent history, **Back vuelve a ese drawer**; desde la columna Consent o Sign now
+  sigue volviendo al caso.
+- **Para el dev:** el `ConsentBlock` lleva `key="consentimiento-<id>"`. `ConsentBlock` acepta `historial` / `onHistorial`
+  (controlado desde `TreatmentPlanSection`; sin ellos funciona solo, como en las stories) y
+  `abrirConsentimiento(id, desdeHistorial)`. Detalle en `clinical-mode.md` (2026-11-02). Sin Storybook todavía.
+
 ### New Patient: vincular a una persona que ya existe en el sistema ([#115](https://github.com/JulianGerardi/red-dental-studio/pull/115))
 - En el paso General, *Use this option only to link a person that already exists in the system* cambia nombre,
   nacimiento y email por el buscador **Person\*** (empleados, contactos y suscriptores; quien ya es paciente no aparece).
