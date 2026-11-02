@@ -3126,3 +3126,18 @@ Pedido de Julián sobre una captura: con el bloque angosto los íconos (historia
 izquierda. Ahora la fila de arriba es el título con su estado y, a la derecha, los dos íconos; **Patient y Provider van
 abajo, en una fila propia**, con el nombre siempre visible (antes se escondía con la card angosta). Mismo orden en
 escritorio y celular; en celular el título se parte en líneas y las firmas quedan una debajo de la otra.
+
+## CON-4052: una sola card de Informed Consent por caso (2026-11-02)
+
+Julián mostró en video que, al pasar de un caso a otro en el rail, el bloque Informed Consent se apilaba (una card más
+cada vez). Causa: el bloque y `VistaCaso` eran hermanos con la misma `key` (el id del caso) y React duplicaba el
+bloque. Ahora el bloque lleva `key="consentimiento-<id>"`. Siempre hay **una sola** card de Informed Consent arriba del
+caso; todo lo demás (versiones del caso y consentimientos de cada procedimiento) vive en **Consent history** (el reloj).
+Planning, Pending y Presented siguen sin card. e2e: "al cambiar de caso queda una sola card de Informed Consent".
+
+## CON-4052: Back del consentimiento vuelve al Consent history (2026-11-02)
+
+Si el consentimiento de un procedimiento se abrió desde el Consent history (el reloj), **Back vuelve a ese drawer** y no
+al caso. El estado del historial (`historial`) vive en `TreatmentPlanSection` y `ConsentBlock` lo recibe controlado
+(`historial` / `onHistorial`), porque el bloque se desmonta mientras se ve el consentimiento. Desde la columna Consent o
+Sign now, Back sigue volviendo al caso. e2e: "el historial del caso lista los consentimientos de cada procedimiento".

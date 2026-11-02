@@ -1128,7 +1128,9 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
   const detalle = (deCaso?: Caso) => (p: Procedimiento) => (
     <DetalleRegistro registro={registroDePlan(p, deCaso, deCaso && alternativas)} contexto={contexto} />
   )
-  const abrirConsentimiento = (id: string) => { setConsentId(id); setVista('consentimiento') }
+  /* El historial del bloque sigue abierto si el consentimiento se abrió desde él: Back vuelve al drawer. */
+  const [historial, setHistorial] = useState(false)
+  const abrirConsentimiento = (id: string, desdeHistorial = false) => { setConsentId(id); setHistorial(desdeHistorial); setVista('consentimiento') }
   const fuera = useContext(NavegacionClinica)
   const ir = (d: DestinoClinico) => {
     if (d.pestana === 'Treatment Plan') {
@@ -1308,7 +1310,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
 
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         {vista === 'caso' && !SIN_CONSENTIMIENTO_NI_TURNO.includes(caso.estado) && (
-          <ConsentBlock key={caso.id} firmado={caso.estado !== 'Waiting for consent'} onFirmado={casoFirmado} procedimientos={delCaso} onAbrirProcedimiento={abrirConsentimiento} />
+          <ConsentBlock key={`consentimiento-${caso.id}`} firmado={caso.estado !== 'Waiting for consent'} onFirmado={casoFirmado} procedimientos={delCaso} onAbrirProcedimiento={(id) => abrirConsentimiento(id, true)} historial={historial} onHistorial={setHistorial} />
         )}
 
         {vista === 'unassigned' ? (
