@@ -400,7 +400,7 @@ function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?:
    "Elegida" sale sólo de comparar `value` contra `personas` (no hay estado propio): basta con que lo tipeado sea
    exactamente un nombre de la lista. Ver design-reference/design-system.md. */
 export function PersonSearchField({
-  label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas,
+  label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas, emptyText,
 }: {
   label: string
   required?: boolean
@@ -415,6 +415,8 @@ export function PersonSearchField({
   disabled?: boolean
   /** Las líneas de abajo de una persona ("DOB: …", "Email: …"); sin esto, la card sólo lleva el nombre. */
   lineas?: (nombre: string) => string[] | undefined
+  /** Qué decir si lo escrito no coincide con nadie; sin esto, no se abre nada. */
+  emptyText?: string
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -460,6 +462,11 @@ export function PersonSearchField({
               </button>
             ))}
           </div>
+        )}
+        {abierto && emptyText && !elegida && value.trim() && !sugerencias.length && (
+          <p role="status" className="absolute top-[calc(100%+4px)] left-0 z-30 w-full rounded-md border border-line bg-white px-3 py-6 text-center text-xs text-ink-muted shadow-lg">
+            {emptyText}
+          </p>
         )}
       </div>
       {pie(error, hint)}
