@@ -121,7 +121,8 @@ export const PROBLEMAS: Problema[] = [
   { id: 'p14', fecha: '15/05/2026', ubicacion: '-', pieza: 12, superficie: '-', condicion: 'Gingival recession', examen: 'Periodontal', proveedor: 'Perez Martinez', estado: 'Discarded' },
 ]
 
-export const ESTADOS_PROCEDIMIENTO = ['Completed', 'Discarded', 'Discontinued', 'In progress', 'Planned', 'Referred'] as const
+/* Pending: el caso del procedimiento se aceptó y espera para hacerse (CON-4052); no se elige a mano. */
+export const ESTADOS_PROCEDIMIENTO = ['Completed', 'Discarded', 'Discontinued', 'In progress', 'Pending', 'Planned', 'Referred'] as const
 export type EstadoProcedimiento = (typeof ESTADOS_PROCEDIMIENTO)[number]
 
 export type ProcedimientoPaciente = {
@@ -143,8 +144,10 @@ export const PROCEDIMIENTOS: ProcedimientoPaciente[] = [
   { id: 'pr3', fecha: '25/08/2026', ubicacion: '', pieza: 31, superficie: 'B, D, M', codigo: 'D2140', nombre: 'Amalgam – one surface, primary or permanent', proveedor: 'Michael Johnson', estado: 'In progress' },
   { id: 'pr4', fecha: '14/06/2026', ubicacion: '', pieza: 16, superficie: '-', codigo: 'D7140', nombre: 'Extraction – erupted tooth or exposed root (elevation and/or forceps removal)', proveedor: 'Perez Martinez', estado: 'In progress' },
   { id: 'pr5', fecha: '15/05/2026', ubicacion: 'Soft Palate', superficie: '-', codigo: 'D7286', nombre: 'Incisional biopsy of oral tissue – soft', proveedor: 'Perez Martinez', estado: 'Discarded' },
-  { id: 'pr6', fecha: '02/05/2026', ubicacion: '', pieza: 3, superficie: 'O', codigo: 'D2391', nombre: 'Resin-based composite – one surface, posterior', proveedor: 'Perez Martinez', estado: 'Planned' },
-  { id: 'pr7', fecha: '02/05/2026', ubicacion: '', pieza: 14, superficie: 'O, D', codigo: 'D2392', nombre: 'Resin-based composite – two surfaces, posterior', proveedor: 'Perez Martinez', estado: 'Planned' },
+  { id: 'pr6', fecha: '02/05/2026', ubicacion: '', pieza: 3, superficie: 'O', codigo: 'D2391', nombre: 'Resin-based composite – one surface, posterior', proveedor: 'Perez Martinez', estado: 'Pending' },
+  { id: 'pr7', fecha: '02/05/2026', ubicacion: '', pieza: 14, superficie: 'O, D', codigo: 'D2392', nombre: 'Resin-based composite – two surfaces, posterior', proveedor: 'Perez Martinez', estado: 'Pending' },
+  { id: 'pr13', fecha: '28/04/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D2950', nombre: 'Core buildup, including any pins when required', proveedor: 'Perez Martinez', estado: 'Pending' },
+  { id: 'pr14', fecha: '28/04/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D2954', nombre: 'Prefabricated post and core in addition to crown', proveedor: 'Perez Martinez', estado: 'Pending' },
   { id: 'pr12', fecha: '28/04/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D2740', nombre: 'Crown – porcelain/ceramic', proveedor: 'Perez Martinez', estado: 'Planned' },
   { id: 'pr8', fecha: '18/04/2026', ubicacion: '', superficie: '-', codigo: 'D1110', nombre: 'Prophylaxis – adult', proveedor: 'Michael Johnson', nota: 'Light calculus on lower anteriors.', estado: 'Completed' },
   { id: 'pr9', fecha: '18/04/2026', ubicacion: '', superficie: '-', codigo: 'D0120', nombre: 'Periodic oral evaluation – established patient', proveedor: 'Michael Johnson', estado: 'Completed' },
@@ -186,6 +189,9 @@ export const VINCULOS_PROCEDIMIENTO: Record<string, VinculoProcedimiento> = {
   },
   /* Su caso (Crown Option) sigue en Presented: Start avisa que el caso todavía no se aceptó (clinical-mode.md, 2026-10-17). */
   pr12: { caso: { id: 'c4', procedimiento: 'c4v1p1' } },
+  /* Endodontic Treatment está aceptado: Start y Complete pasan por el consentimiento (uno a medio firmar, otro sin mandar). */
+  pr13: { caso: { id: 'c5', procedimiento: 'c5v2p2' } },
+  pr14: { caso: { id: 'c5', procedimiento: 'c5v2p3' } },
   /* Se discontinuó y vuelve a planearse en el plan periodontal, que todavía está en Planning: sin turno ni consentimiento. */
   pr11: { caso: { id: 'c1', procedimiento: 'c1v2p1' } },
 }

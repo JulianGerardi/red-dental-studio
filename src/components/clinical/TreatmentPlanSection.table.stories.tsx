@@ -7,6 +7,7 @@ import { esperar } from '@/design-system/play'
 import { CASOS, NO_ASIGNADOS, type Caso, type Procedimiento } from '@/data/treatment-plan'
 import { DetalleRegistro, registroDePlan, useVerRegistro } from './RecordDetail'
 import { SIN_CONSENTIMIENTO_NI_TURNO, TablaProcedimientos } from './TreatmentPlanSection'
+import { accionesDe, contextoDeCaso } from './accionesProcedimiento'
 
 /* Las filas de ejemplo: las sueltas, un caso en Planning (se arrastra) y dos aceptados (con Consent). */
 const FILAS = {
@@ -34,14 +35,14 @@ function Ejemplo({ filas: clave, detalle, seleccion, abierta, ancho }: Args) {
       <TablaProcedimientos
         key={`${clave}-${abierta}`}
         filas={[...filas]}
-        acciones={!!caso}
+        iconos={!!caso}
         consentimiento={!!caso && !SIN_CONSENTIMIENTO_NI_TURNO.includes(caso.estado)}
         arrastrable={planificando}
-        sinMenu={!!caso && !planificando}
         seleccion={seleccion ? sel : undefined}
         onSeleccion={seleccion ? setSel : undefined}
-        onAccion={(p: Procedimiento) => aviso.info(`Remove ${p.codigo}?`)}
-        onCompletar={() => aviso.info('Opens Complete.')}
+        acciones={(p) => accionesDe(p.estado, contextoDeCaso(caso?.estado))}
+        onAccion={(p: Procedimiento, a) => aviso.info(`${a} ${p.codigo}`)}
+        onConsentimiento={(p) => aviso.info(`Opens the consent of ${p.codigo}.`)}
         detalle={detalle ? (p) => <DetalleRegistro registro={registroDePlan(p, caso)} contexto={contexto} /> : undefined}
         abiertas={abiertas}
         onAlternar={(id) => setAbiertas((a) => (a.includes(id) ? a.filter((x) => x !== id) : [...a, id]))}

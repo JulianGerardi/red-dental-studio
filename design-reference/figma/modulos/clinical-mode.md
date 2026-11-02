@@ -2955,3 +2955,77 @@ que más buscan (hoy es el único resaltado).
 
 Código: `clinical/{EstimateDetails,TreatmentPlanSection,TreatmentPlanList}.tsx`, `pages/ClinicalMode.tsx`,
 `data/{estimaciones,treatment-plan}.ts`, `tests/treatment-plan.e2e.ts`.
+
+## CON-4052: acciones del procedimiento y su consentimiento (2026-11-02)
+
+**CON-4052** ([Procedure] Mostrar las acciones según el estado del procedimiento y el contexto del treatment plan), epic
+CON-3939 (indexado en `treatments.md`); se cruza con **CON-2980** (Waiting for consent → Accepted). Julián pasó dos prototipos HTML: el primero
+(*procedure_actions_prototype*) con los escenarios del ticket, y el que manda (*treatment_procedure_consent_revised*), con
+los estados del consentimiento del procedimiento y cómo funciona el menú ⋮. Pidió el estado y el comportamiento, no el
+diseño: todo va con las piezas del design system.
+
+**El menú ⋮** (`accionesProcedimiento.tsx`: `accionesDe`, `ItemsAcciones`), el mismo en Unassigned, en las visitas de un
+caso y en Procedures del Overview:
+
+| Procedimiento \ plan | Suelto | Planning / Pending / Presented | Waiting for consent | Accepted / In progress | Discarded / Cancelled / Expired |
+|---|---|---|---|---|---|
+| Planned | Edit · Complete · Refer · Discard · Delete | Edit · Complete (bloqueado) · Refer · Discard · Delete | — | — | Edit |
+| Pending | — | — | Edit · Start y Complete (bloqueados) · Refer · Discard | Edit · Start · Complete · Refer · Discard | Edit |
+| In progress | Edit · Complete · Discontinue | | | Edit · Complete · Discontinue | Edit |
+| Completed, Referred, Discarded, Discontinued | Edit | Edit | Edit | Edit | Edit |
+
+- Lo incompatible con el estado **se oculta**; Start y Complete bloqueados por el plan **se ven deshabilitados** con el
+  tooltip del ticket ("This procedure cannot be started or completed while its treatment plan is still being planned or
+  waiting for consent."). Se pueden enfocar con el teclado para leerlo; el texto también va como `aria-describedby`.
+- **Start no sale de Planned** (no existe esa transición) y **Delete sólo de Planned**. **Pending** no se elige a mano:
+  aceptar el caso pasa sus Planned a Pending.
+- El atajo de Complete de la fila (el ícono) sigue al menú: está si el menú lo ofrece y bloqueado si allá lo está.
+- **Qué abre cada acción** (del prototipo): Edit, un drawer con las notas ("Only authorized fields can be edited. Notes do
+  not change clinical state."), que en Procedures se ven en la columna Note; Refer, Discard y Discontinue, una
+  confirmación "{Acción} procedure" con el cambio de estado; Delete suelto, "Are you sure you want to delete this
+  procedure? This action cannot be undone."; Delete en un caso, el alcance con tres salidas: Cancel · **Delete from Tx**
+  (sale del caso y va a Unassigned) · **Delete Procedure**. Como dice el diálogo, Delete no tiene Undo; el resto sí.
+
+**El consentimiento del procedimiento** (no el del caso, que es el bloque de arriba):
+
+1. **Cinco estados**, los del prototipo: *Not generated* (hay template, no hay documento), *Not sent* (generado, sin
+   mandar), *Pending* (mandado, falta la firma), *Signed* y *Not required* (sin template). **Expired sale**: estaba desde
+   2026-09-30 y el prototipo no lo tiene.
+2. **La columna Consent** se ve con el caso aceptado (Waiting for consent, Accepted, In progress, y Cancelled o Expired si
+   se había aceptado: `Caso.aceptado`). No en Planning, en Unassigned ni en un caso descartado. Está también en Procedures
+   del Overview, con la misma regla.
+3. **Tocarla**: con documento (Not sent, Pending, Signed) abre el **detalle del consentimiento** (`ConsentDetail`), que es
+   lo que pidió Julián: la hoja de Consent Templates con los datos del paciente y, al lado, las firmas de paciente y
+   provider con su botón Sign (drawer con las cinco afirmaciones, y la firma dibujada o escrita). Firmar ahí no repite el
+   cambio clínico. Sin documento avisa: "No document yet. Start or Complete initiates consent management when allowed." o
+   "No mapped template: no specific consent flow.". También se abre con `?case=…&consent=…` y desde el detalle de la fila.
+4. **Start y Complete** (`useFlujoConsentimiento`, el mismo en las dos pantallas): Signed o Not required, se aplica
+   directo; Pending, Consent required con *Continue without signed consent* y *View consent*; Not generated o Not sent,
+   *Send consent and sign later* (genera si hace falta, manda y aplica). **Sign now** abre *Review and sign consent*
+   ("Opening this view does not sign the document."; Back vuelve al diálogo) y, firmado, *Consent signed*: *Cancel clinical
+   change* deja el procedimiento como estaba con el consentimiento ya firmado; *Confirm Start/Complete* lo aplica.
+5. **El plan pasa a In progress** con el primer Start de un caso Accepted. Se suman los estados de caso **In progress**,
+   **Cancelled** y **Expired**: Expire y Cancel ya no dejan el caso en Discarded.
+6. **CON-2980**: firmar el consentimiento **del caso** (el bloque de arriba, las dos firmas) pasa un caso en Waiting for
+   consent a Accepted. Firmar el de un procedimiento no lo cambia (así lo aclara el prototipo).
+
+**Lo que cambia de antes** (2026-10-17): Waiting for consent ya no cuenta como aceptado (`CASO_LISTO` sale); el aviso
+"Procedure cannot be updated" ya no aparece porque Start y Complete bloqueados no se pueden elegir (`avisarCasoNoListo`
+queda sólo en su story); "Sign now" ya no es un aviso de "not available"; Rollback sale del menú de procedimientos
+(CON-4052 no lo tiene); la columna Consent ahora también está en Procedures.
+
+**Datos de ejemplo**: Endodontic Treatment (Accepted) tiene en la Visit 2 un Signed, un Pending a medio firmar (falta el
+provider) y un Not generated; Restorative Plan (Waiting for consent) un Pending y un Not sent; Bridge Option un Not
+required. En Procedures, D2950 y D2954 son los del caso aceptado.
+
+**Anomalías / desvíos del prototipo**: el prototipo muestra la falla al mandar con un simulador; acá queda el lugar en el
+diálogo (`error` en `ConsentRequiredDialog`, Alert danger) sin disparador. Complete en Treatment Plan sigue pasando
+primero por *Complete Procedure* (las condiciones vinculadas, Figma 4122:250957): el prototipo dice que los flujos
+existentes no se reproducen. El caso Cancelled del prototipo (con el caso aceptado) se arma cancelando un caso aceptado.
+
+**A validar con usuarios:** si recepción entiende la diferencia entre el consentimiento del caso (arriba) y el de cada
+procedimiento (la columna); si *Cancel clinical change* después de firmar se lee como "no pierdo la firma"; y si el
+tooltip de Start/Complete bloqueados alcanza o conviene decir qué falta ("Waiting for the patient's consent").
+
+Código: `clinical/{accionesProcedimiento,ConsentDetail,ConsentRequiredDialog,ConsentBlock,TreatmentPlanSection,ProblemList}.tsx`,
+`data/{treatment-plan,clinical-mode}.ts`, `pages/ClinicalMode.tsx`; e2e en `tests/{treatment-plan,clinical-mode}.e2e.ts`.

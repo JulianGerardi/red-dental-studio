@@ -1,5 +1,5 @@
 import {
-  MapPin, Send, User, Stethoscope, CalendarDays, ClipboardList, X, type LucideIcon,
+  Check, MapPin, Send, User, Stethoscope, CalendarDays, ClipboardList, X, type LucideIcon,
 } from 'lucide-react'
 
 /* Preview del consentimiento como lo recibe el paciente: una hoja de papel
@@ -9,14 +9,14 @@ import {
 
 /* "Patient acknowledgment" es el mismo texto en todos los consentimientos:
    no se edita por template, sólo se muestra acá. */
-const RECONOCIMIENTOS_PACIENTE = [
+export const RECONOCIMIENTOS_PACIENTE = [
   'I have read and understand the information provided regarding the proposed treatment.',
   'I have had the opportunity to ask questions and have received satisfactory answers.',
   'I understand the potential risks, benefits, and alternatives to the proposed treatment.',
   'I understand that I may choose to decline the proposed treatment.',
   'I voluntarily consent to the proposed treatment.',
 ]
-const AVISO_RECONOCIMIENTOS = 'All acknowledgment checkboxes must be completed before the patient can sign the consent.'
+export const AVISO_RECONOCIMIENTOS = 'All acknowledgment checkboxes must be completed before the patient can sign the consent.'
 
 /* Fechas de ejemplo -no vienen del template, son del envío y de la cita del
    paciente-. */
@@ -79,16 +79,22 @@ type Props = {
   /** Sólo con el editor único (oculto en Consents): el HTML del template, en lugar de las dos secciones. */
   texto?: string
   vistaPaciente: boolean
+  /** El documento de un paciente (detalle del consentimiento en Treatment Plan); sin esto, los datos de ejemplo. */
+  paciente?: string
+  proveedor?: string
+  /** Con la firma del paciente: el nombre sobre la línea, la fecha y las casillas marcadas. */
+  firmaPaciente?: { nombre: string; fecha: string }
+  className?: string
 }
 
-export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, texto, vistaPaciente }: Props) {
+export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, texto, vistaPaciente, paciente = 'Sarah Stone', proveedor = 'John Lorem', firmaPaciente, className }: Props) {
   const lineasRiesgo = riesgos.split('\n').filter(Boolean)
   const vacio = <p className="text-ink-faint">No content yet.</p>
 
   return (
     <article
       aria-label="Consent document preview"
-      className="mx-auto flex aspect-[8.5/11] w-full max-w-[520px] flex-col bg-white px-6 pt-6 pb-3.5 text-[12px] leading-[1.5] text-ink-soft shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_2px_4px_rgb(0_0_0/0.06),0_14px_28px_-8px_rgb(0_0_0/0.22)]"
+      className={`mx-auto flex aspect-[8.5/11] w-full max-w-[520px] flex-col ${className ?? ''} bg-white px-6 pt-6 pb-3.5 text-[12px] leading-[1.5] text-ink-soft shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_2px_4px_rgb(0_0_0/0.06),0_14px_28px_-8px_rgb(0_0_0/0.22)]`}
     >
       <header className="flex items-center gap-3 border-b-2 border-dash-blue pb-3">
         <span aria-hidden className="bg-dash-blue grid size-9 shrink-0 place-items-center rounded-md text-[12px] font-bold text-white">LA</span>
@@ -105,12 +111,12 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, te
 
       <div className="mt-4 grid grid-cols-2 gap-px border border-line-strong bg-line-strong">
         <Campo icono={User} etiqueta="Patient">
-          <p className="font-bold text-ink">Sarah Stone</p>
+          <p className="font-bold text-ink">{paciente}</p>
           <p className="text-ink-muted">DOB: 04/02/1991</p>
           <p className="text-ink-muted">Patient ID: 12345432</p>
         </Campo>
         <Campo icono={Stethoscope} etiqueta="Provider">
-          <p className="font-bold text-ink">John Lorem</p>
+          <p className="font-bold text-ink">{proveedor}</p>
         </Campo>
         <Campo icono={CalendarDays} etiqueta="Appointment">
           <p className="font-bold text-ink">{FECHA_CITA}</p>
@@ -151,7 +157,9 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, te
         <ul className="flex flex-col gap-1.5">
           {RECONOCIMIENTOS_PACIENTE.map((r) => (
             <li key={r} className="flex gap-2">
-              <span aria-hidden className="mt-[3px] size-3 shrink-0 rounded-[3px] border border-ink-muted" />
+              <span aria-hidden className={`mt-[3px] grid size-3 shrink-0 place-items-center rounded-[3px] border ${firmaPaciente ? 'border-dash-blue bg-dash-blue text-white' : 'border-ink-muted'}`}>
+                {firmaPaciente && <Check className="size-2.5" strokeWidth={3} />}
+              </span>
               {r}
             </li>
           ))}
@@ -162,13 +170,17 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, te
       <div className="mt-auto grid grid-cols-[1fr_88px] gap-4 pt-7 text-[11px] text-ink-faint">
         <div className="relative border-t border-ink-medium pt-1">
           <X aria-hidden className="absolute -top-3.5 left-0 size-3 text-ink-faint" />
+          {firmaPaciente && <span className="absolute -top-6 left-5 text-[16px] font-semibold text-ink italic">{firmaPaciente.nombre}</span>}
           Patient / Legal Guardian
         </div>
-        <div className="border-t border-ink-medium pt-1">Date</div>
+        <div className="relative border-t border-ink-medium pt-1">
+          {firmaPaciente && <span className="absolute -top-5 left-0 text-[12px] text-ink">{firmaPaciente.fecha}</span>}
+          Date
+        </div>
       </div>
 
       <footer className="mt-3 flex justify-between border-t border-line-soft pt-2 text-[10px] text-ink-faint">
-        <span>Sarah Stone · Patient ID 12345432</span>
+        <span>{paciente} · Patient ID 12345432</span>
         <span>Page 1 of 1</span>
       </footer>
     </article>

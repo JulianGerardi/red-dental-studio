@@ -63,8 +63,12 @@ const ACCIONES_DOCUMENTO: { label: string; icono: LucideIcon }[] = [
   { label: 'Download PDF', icono: Download },
 ]
 
-export function ConsentBlock() {
-  const [firmas, setFirmas] = useState(CONSENTIMIENTO.firmas)
+/* El consentimiento del caso, no el de cada procedimiento. `firmado`: el caso ya pasó Waiting for consent, las dos
+   firmas están. Al juntar las dos avisa (`onFirmado`): el caso que esperaba el consentimiento pasa a Accepted (CON-2980). */
+export function ConsentBlock({ firmado = false, onFirmado }: { firmado?: boolean; onFirmado?: () => void } = {}) {
+  const [firmas, setFirmas] = useState(() => (firmado
+    ? CONSENTIMIENTO.firmas.map((f) => ({ ...f, estado: 'Signed' as const, fecha: f.fecha ?? '05/14/2026' }))
+    : CONSENTIMIENTO.firmas))
   const [historial, setHistorial] = useState(false)
 
   const pendientes = firmas.filter((f) => f.estado === 'Pending')
@@ -72,10 +76,10 @@ export function ConsentBlock() {
   const t = TONO[estado]
 
   const firmar = (rol: Firma['rol']) => {
-    setFirmas((fs) =>
-      fs.map((f) => (f.rol === rol ? { ...f, estado: 'Signed' as const, fecha: '05/14/2026' } : f)),
-    )
-    aviso.ok(`${CONSENTIMIENTO.titulo} signed as ${rol.toLowerCase()}.`)
+    const nuevas = firmas.map((f) => (f.rol === rol ? { ...f, estado: 'Signed' as const, fecha: '05/14/2026' } : f))
+    setFirmas(nuevas)
+    if (nuevas.every((f) => f.estado === 'Signed') && onFirmado) onFirmado()
+    else aviso.ok(`${CONSENTIMIENTO.titulo} signed as ${rol.toLowerCase()}.`)
   }
 
   return (

@@ -242,10 +242,10 @@ export const Specs: Story = {
       </Bloque>
       <Bloque titulo="Logic" nota="consentimientoRequerido() decide el diálogo; nada de esto se calcula en la pantalla.">
         <Tabla encabezado={['Consents of the procedures', 'Dialog']} minimo={560}>
-          <Fila a="Todos Signed (o sin consentimiento)" b={dialogo(['Signed', undefined])} />
+          <Fila a="Todos Signed o Not required" b={dialogo(['Signed', 'Not required'])} />
           <Fila a="Pending" b={dialogo(['Pending', 'Signed'])} />
           <Fila a="Not sent" b={dialogo(['Not sent'])} />
-          <Fila a="Expired" b={dialogo(['Expired', 'Pending'])} />
+          <Fila a="Not generated" b={dialogo(['Not generated', 'Pending'])} />
           <Fila a="Pending y Not sent juntos" b={dialogo(['Pending', 'Not sent'])} />
         </Tabla>
       </Bloque>

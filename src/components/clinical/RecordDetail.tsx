@@ -8,10 +8,10 @@ import { Drawer, DrawerSection } from '@/components/ui/drawer'
 import { ORDEN_TONO } from '@/components/clinical/LabOrderPanel'
 import { CitaVisita, EstadoConsentimiento, SIN_CONSENTIMIENTO_NI_TURNO, TONO_CASO, estadoGrupo } from '@/components/clinical/TreatmentPlanSection'
 import { codigoDiagnostico, type Finding, type FindingStatus } from '@/components/clinical/dental/data'
-import { CASOS, CONSENTIMIENTO, type Caso, type ConsentProcedimiento, type Procedimiento, type Visita } from '@/data/treatment-plan'
+import { CASOS, CONSENTIMIENTO, SIN_DOCUMENTO, type Caso, type ConsentProcedimiento, type Procedimiento, type Visita } from '@/data/treatment-plan'
 import {
   DERIVACIONES_PROBLEMA, PROBLEMAS, PROCEDIMIENTOS, VINCULOS_PROCEDIMIENTO,
-  type Derivacion, type EstadoDerivacion, type EstadoProblema, type EstadoProcedimiento, type OrdenVinculada, type Pestana,
+  type Derivacion, type EstadoDerivacion, type EstadoProblema, type OrdenVinculada, type Pestana,
   type Problema, type ProcedimientoPaciente,
 } from '@/data/clinical-mode'
 
@@ -25,9 +25,10 @@ export const TONO_PROBLEMA: Record<EstadoProblema, PillTone> = {
   Active: 'success', 'In treatment': 'info', Monitoring: 'warning', Treated: 'neutral', 'Externally treated': 'neutral', Referred: 'purple',
   'No treatment needed': 'neutral', 'Patient declined': 'danger', 'Clinic declined': 'danger', Discarded: 'danger',
 }
-export const TONO_PROCEDIMIENTO: Record<EstadoProcedimiento, PillTone> = {
-  'In progress': 'info', Planned: 'success', Completed: 'neutral', Discontinued: 'warning', Discarded: 'danger', Referred: 'purple',
-}
+/* Vive con las acciones del procedimiento: TreatmentPlanSection lo usa al cargarse y RecordDetail la importa a ella. */
+import { TONO_PROCEDIMIENTO, conColumnaConsent } from '@/components/clinical/accionesProcedimiento'
+import { tieneDocumento } from '@/components/clinical/ConsentDetail'
+export { TONO_PROCEDIMIENTO }
 export const TONO_DERIVACION: Record<EstadoDerivacion, PillTone> = {
   Requested: 'purple', Accepted: 'success', Scheduled: 'info', Completed: 'neutral', Declined: 'danger',
 }
@@ -36,7 +37,8 @@ export const TONO_DERIVACION: Record<EstadoDerivacion, PillTone> = {
 
 /* Adónde lleva un link del detalle: una pestaña de Clinical Mode y, para Treatment Plan, el caso. ClinicalMode lo
    provee; sin provider (Storybook) el link avisa adónde iría. */
-export type DestinoClinico = { pestana: Pestana; caso?: string }
+/** `consentimiento`: el procedimiento del caso cuyo consentimiento se abre (Treatment Plan). */
+export type DestinoClinico = { pestana: Pestana; caso?: string; consentimiento?: string }
 export const NavegacionClinica = createContext<((d: DestinoClinico) => void) | null>(null)
 
 export function useIr() {
@@ -179,12 +181,14 @@ export function ContenidoHallazgos({ hallazgos, onAbrir, completo }: { hallazgos
 export function ContenidoConsentimiento({ t }: { t?: Tratamiento }) {
   const ir = useIr()
   if (!t?.procCaso?.consentimiento) return <Vacio>No consent document.</Vacio>
-  if (SIN_CONSENTIMIENTO_NI_TURNO.includes(t.caso.estado)) return <Vacio>The consent is generated when the case is accepted.</Vacio>
+  if (!conColumnaConsent(t.caso)) return <Vacio>The consent is generated when the case is accepted.</Vacio>
   const estado = t.procCaso.consentimiento
+  /* Sin documento (Not generated, Not required) no hay nada que abrir: queda el texto de lo que pasa. */
+  if (!tieneDocumento(estado)) return <Entrada estado={<EstadoConsentimiento estado={estado} />}><span className="text-[12px] text-ink-muted">{SIN_DOCUMENTO[estado]}</span></Entrada>
   const enviado = CONSENTIMIENTO.historial.find((h) => h.evento === 'Sent to patient')?.fecha
   return (
     <Entrada estado={<EstadoConsentimiento estado={estado} />} sub={estado !== 'Not sent' && enviado && `Sent ${enviado}`}>
-      <EnlaceRegistro onClick={() => ir({ pestana: 'Treatment Plan', caso: t.caso.id })}>{CONSENTIMIENTO.titulo}</EnlaceRegistro>
+      <EnlaceRegistro onClick={() => ir({ pestana: 'Treatment Plan', caso: t.caso.id, consentimiento: t.procCaso!.id })}>{CONSENTIMIENTO.titulo}</EnlaceRegistro>
     </Entrada>
   )
 }
