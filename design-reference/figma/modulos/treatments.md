@@ -112,3 +112,8 @@ El avatar del header de la card deja el `#eff4ff` / `#0056ef` del Figma (ver *Es
 
 **CON-3710, CON-2529** (epic CON-3695). La pantalla vive en Clinical Mode › Treatment Plan: ver
 `clinical-mode.md` › *Treatment Plan: Estimate details desde el Total Amount (2026-10-28)*.
+
+## Acciones del procedimiento y su consentimiento (2026-11-02)
+
+**CON-4052** (epic CON-3939), con **CON-2980**. Vive en Clinical Mode › Treatment Plan y Procedures: ver
+`clinical-mode.md` › *CON-4052: acciones del procedimiento y su consentimiento (2026-11-02)*.

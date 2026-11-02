@@ -1,9 +1,10 @@
 import { Drawer } from '@/components/ui/drawer'
+import { tieneDocumento } from '@/components/clinical/ConsentDetail'
 import { useState } from 'react'
 import { CircleCheck, CircleAlert, Download, FileSignature, FileText, History, MoreVertical, PenLine, RefreshCw, Send, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
-import { CONSENTIMIENTO, type Firma } from '@/data/treatment-plan'
+import { CONSENTIMIENTO, type Firma, type Procedimiento } from '@/data/treatment-plan'
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
@@ -32,21 +33,59 @@ export function FilaFirma({ f }: { f: Firma }) {
   )
 }
 
-export function PanelHistorial({ onClose }: { onClose: () => void }) {
+/* El historial (el reloj del bloque): una sola línea de tiempo con el consentimiento del caso y los de cada procedimiento,
+   lo más nuevo arriba. Lo que está esperando una firma no tiene fecha y va primero. El bloque de la pantalla muestra sólo
+   el último consentimiento del caso. Ver clinical-mode.md (2026-11-02). */
+type Entrada = { id: string; fecha?: string; evento: string; documento: string; detalle?: string; abrir?: () => void }
+
+const tiempo = (f?: string) => (f ? new Date(f).getTime() : Infinity)
+
+function entradasDe(procedimientos: Pick<Procedimiento, 'id' | 'codigo' | 'nombre' | 'consentimiento' | 'firmas'>[], abrir?: (id: string) => void): Entrada[] {
+  const casos: Entrada[] = CONSENTIMIENTO.historial.map((h) => ({
+    id: h.id, fecha: h.fecha, evento: h.evento, documento: `Case consent ${h.version}`, detalle: h.autor,
+  }))
+  const procs = procedimientos.flatMap((p) => {
+    if (!tieneDocumento(p.consentimiento)) return []
+    const documento = `Procedure Consent - ${p.codigo} ${p.nombre}`
+    const abrirP = abrir && (() => abrir(p.id))
+    const firmas = p.firmas ?? {}
+    const faltan = (['Patient', 'Provider'] as const).filter((r) => !firmas[r])
+    const es: Entrada[] = []
+    if (faltan.length) {
+      es.push({
+        id: `${p.id}-espera`, evento: faltan.length === 2 ? 'Not signed yet' : `Awaiting ${faltan[0]!.toLowerCase()} signature`,
+        documento, detalle: p.consentimiento === 'Not sent' ? 'Not sent to the patient' : 'Sent to the patient', abrir: abrirP,
+      })
+    }
+    ;(['Provider', 'Patient'] as const).forEach((r) => {
+      if (firmas[r]) es.push({ id: `${p.id}-${r}`, fecha: firmas[r], evento: `Signed by ${r.toLowerCase()}`, documento, abrir: abrirP })
+    })
+    return es
+  })
+  return [...procs, ...casos].sort((a, b) => tiempo(b.fecha) - tiempo(a.fecha))
+}
+
+export function PanelHistorial({ onClose, procedimientos = [], onAbrirProcedimiento }: {
+  onClose: () => void
+  procedimientos?: Pick<Procedimiento, 'id' | 'codigo' | 'nombre' | 'consentimiento' | 'firmas'>[]
+  onAbrirProcedimiento?: (id: string) => void
+}) {
+  const entradas = entradasDe(procedimientos, onAbrirProcedimiento)
   return (
-    <Drawer open onClose={onClose} title="Consent history" description={CONSENTIMIENTO.titulo}>
-      <ol className="flex flex-col pt-2">
-        {CONSENTIMIENTO.historial.map((h, i, todos) => (
+    <Drawer open onClose={onClose} title="Consent history" description="The case consent and each procedure consent, newest first.">
+      <ol className="flex flex-col">
+        {entradas.map((h, i, todas) => (
           <li key={h.id} className="flex gap-3">
             <span className="flex flex-col items-center">
-              <span className={cn('mt-1 size-2 shrink-0 rounded-full', i === 0 ? 'bg-dash-blue' : 'bg-line-strong')} />
-              {i < todos.length - 1 && <span className="w-px flex-1 bg-line" />}
+              <span className={cn('mt-1 size-2 shrink-0 rounded-full', h.fecha ? (i === 0 ? 'bg-dash-blue' : 'bg-line-strong') : 'bg-warn-fg')} />
+              {i < todas.length - 1 && <span className="w-px flex-1 bg-line" />}
             </span>
             <span className="min-w-0 flex-1 pb-5">
               <span className="block text-[13px] font-semibold text-ink">{h.evento}</span>
-              <span className="block text-[12px] text-ink-muted">
-                {h.version} · {h.fecha} · {h.autor}
-              </span>
+              {h.abrir ? (
+                <button type="button" onClick={h.abrir} className="text-dash-blue block text-left text-[12.5px] font-medium hover:underline">{h.documento}</button>
+              ) : <span className="block text-[12.5px] font-medium text-ink-soft">{h.documento}</span>}
+              <span className="block text-[12px] text-ink-muted">{[h.fecha, h.detalle].filter(Boolean).join(' · ')}</span>
             </span>
           </li>
         ))}
@@ -63,8 +102,18 @@ const ACCIONES_DOCUMENTO: { label: string; icono: LucideIcon }[] = [
   { label: 'Download PDF', icono: Download },
 ]
 
-export function ConsentBlock() {
-  const [firmas, setFirmas] = useState(CONSENTIMIENTO.firmas)
+/* El consentimiento del caso, no el de cada procedimiento. `firmado`: el caso ya pasó Waiting for consent, las dos
+   firmas están. Al juntar las dos avisa (`onFirmado`): el caso que esperaba el consentimiento pasa a Accepted (CON-2980). */
+export function ConsentBlock({ firmado = false, onFirmado, procedimientos, onAbrirProcedimiento }: {
+  firmado?: boolean
+  onFirmado?: () => void
+  /** Los procedimientos del caso: sus consentimientos van en el historial. */
+  procedimientos?: Procedimiento[]
+  onAbrirProcedimiento?: (id: string) => void
+} = {}) {
+  const [firmas, setFirmas] = useState(() => (firmado
+    ? CONSENTIMIENTO.firmas.map((f) => ({ ...f, estado: 'Signed' as const, fecha: f.fecha ?? '05/14/2026' }))
+    : CONSENTIMIENTO.firmas))
   const [historial, setHistorial] = useState(false)
 
   const pendientes = firmas.filter((f) => f.estado === 'Pending')
@@ -72,10 +121,10 @@ export function ConsentBlock() {
   const t = TONO[estado]
 
   const firmar = (rol: Firma['rol']) => {
-    setFirmas((fs) =>
-      fs.map((f) => (f.rol === rol ? { ...f, estado: 'Signed' as const, fecha: '05/14/2026' } : f)),
-    )
-    aviso.ok(`${CONSENTIMIENTO.titulo} signed as ${rol.toLowerCase()}.`)
+    const nuevas = firmas.map((f) => (f.rol === rol ? { ...f, estado: 'Signed' as const, fecha: '05/14/2026' } : f))
+    setFirmas(nuevas)
+    if (nuevas.every((f) => f.estado === 'Signed') && onFirmado) onFirmado()
+    else aviso.ok(`${CONSENTIMIENTO.titulo} signed as ${rol.toLowerCase()}.`)
   }
 
   return (
@@ -137,7 +186,13 @@ export function ConsentBlock() {
         </DropdownMenu>
       </span>
 
-      {historial && <PanelHistorial onClose={() => setHistorial(false)} />}
+      {historial && (
+        <PanelHistorial
+          onClose={() => setHistorial(false)}
+          procedimientos={procedimientos}
+          onAbrirProcedimiento={onAbrirProcedimiento && ((id) => { setHistorial(false); onAbrirProcedimiento(id) })}
+        />
+      )}
     </div>
   )
 }

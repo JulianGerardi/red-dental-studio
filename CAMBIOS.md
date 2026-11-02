@@ -3,6 +3,28 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-02
+
+### Clinical Mode: acciones del procedimiento según su estado, columna Consent y firma del consentimiento ([#113](https://github.com/JulianGerardi/red-dental-studio/pull/113))
+- **CON-4052.** El menú ⋮ de un procedimiento muestra, oculta o deshabilita Edit, Start, Complete, Refer, Discard,
+  Discontinue y Delete según su estado y el del plan (Treatment Plan, Unassigned y Procedures del Overview). Start y
+  Complete quedan deshabilitados, con tooltip, mientras el plan se planea (Planning, Pending, Presented) o espera el
+  consentimiento; un plan descartado, cancelado o vencido sólo deja Edit.
+- **Columna Consent** en las tablas de procedimientos (plan aceptado en adelante): abre el consentimiento del
+  procedimiento (Not generated, Not sent, Pending, Signed, Not required).
+- **Start y Complete** pasan por *Consent required*. **Sign now lleva a la pantalla del consentimiento** (ya no abre un
+  drawer); con las dos firmas se confirma el cambio, y Back lo deja como estaba. Complete va directo al consentimiento
+  (ya no pasa por *Complete Procedure*).
+- **Pantalla del consentimiento** como red.dev: documento a todo el ancho y Patient Signature / Provider Signature en un
+  **pop up de portal** (`ui/dialog`, excepción a "pop ups = drawer": representa una página externa).
+- **Historial (el reloj)**: una sola línea de tiempo con el consentimiento del caso y el de cada procedimiento.
+- **Para el dev:** `src/components/clinical/accionesProcedimiento.tsx` (matriz `accionesDe(estado, contexto)`, `ItemsAcciones`,
+  diálogos Edit / Refer / Discard / Discontinue / Delete) y `ConsentDetail.tsx` (pantalla, `FirmaPaciente`, `FirmaProveedor`)
+  son nuevos; `useFlujoConsentimiento` ahora recibe `onFirmar(ids, verbo)` para llevar al detalle. `EstadoCaso` suma
+  In progress, Cancelled y Expired; `Procedimiento` suma `consentimiento`, `firmas`, `rubricas`, `nota`. Rollback ya no
+  existe para procedimientos. Las variantes del prototipo son datos reales (casos c5 y c9, Unassigned); `?consent=<id>`
+  abre el consentimiento de un procedimiento. Detalle en `clinical-mode.md` (2026-11-02). Sin Storybook todavía.
+
 ## 2026-10-30
 
 ### Insurance llena el alto del menú y scrollea adentro ([#112](https://github.com/JulianGerardi/red-dental-studio/pull/112))

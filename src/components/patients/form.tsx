@@ -535,7 +535,8 @@ export function TextArea({
   rows?: number
 }) {
   return (
-    <div className={cn('flex flex-col gap-2', className)}>
+    /* Un <label> como TextField: el rótulo nombra al campo para el lector de pantalla y lo enfoca al tocarlo. */
+    <label className={cn('flex flex-col gap-2', className)}>
       <FieldLabel required={required}>{label}</FieldLabel>
       <textarea
         rows={rows}
@@ -547,7 +548,7 @@ export function TextArea({
         className={cn(control(error), 'resize-none px-3 py-2')}
       />
       {pie(error, hint)}
-    </div>
+    </label>
   )
 }
 

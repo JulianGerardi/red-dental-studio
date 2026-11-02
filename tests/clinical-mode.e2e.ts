@@ -182,58 +182,61 @@ test('Lab Order filtra por estado y cancela una orden con Undo', async ({ app, s
   await expect(screen.getByText(/Showing 1 to 2 of 2 active prescriptions/)).toBeVisible()
 })
 
-/* Cambiar el estado de un procedimiento (Start en Procedures): sin caso aceptado avisa, y con la firma pendiente o sin
-   mandar abre Consent required (CON-3927, CON-3946, CON-3950). Ver clinical-mode.md, 2026-10-17. */
-test('Start de un procedimiento cuyo caso no está aceptado avisa y lleva al caso', async ({ app, screen }) => {
+/* Procedures del Overview con el menú de CON-4052 y el consentimiento del procedimiento (prototipo de Julián). */
+test('Procedures: Start bloqueado mientras el caso no está aceptado o espera el consentimiento', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', 'View Problem List').tap()
   await screen.getByRole('tab', 'Procedures').tap()
+  // Su caso está en Presented: Planned no tiene Start y Complete está bloqueado.
   await screen.getByPlaceholder('Search...').fill('D2740')
   await screen.getByRole('button', /Actions for D2740/).tap()
-  await screen.getByRole('menuitem', /Start/).tap()
-  await expect(screen.getByText('Procedure cannot be updated')).toBeVisible()
-  await expect(screen.getByText(/must be Accepted and its treatment plan must be Accepted or In Progress/)).toBeVisible()
-  await expect(screen.getByRole('cell', 'Planned')).toBeVisible()
-  await screen.getByRole('button', 'View case').tap()
-  await expect(screen.getByRole('navigation', 'Treatment plans')).toBeVisible()
-  await expect(screen.getByText('Crown Option').first()).toBeVisible()
-  await expect(screen.getByRole('button', /Complete D0120/)).toHaveCount(0)
+  await expect(screen.getByRole('menuitem', /Start/)).toHaveCount(0)
+  await expect(screen.getByRole('menuitem', /Complete/)).toHaveAttribute('aria-disabled', 'true')
+  await screen.getByRole('menuitem', /Edit/).press('Escape')
+  // Waiting for consent: Start bloqueado.
+  await screen.getByPlaceholder('Search...').fill('D2391')
+  await screen.getByRole('button', /Actions for D2391/).tap()
+  await expect(screen.getByRole('menuitem', /Start/)).toHaveAttribute('aria-disabled', 'true')
 })
 
-test('Start con la firma pendiente: Cancel no cambia nada y Continue sigue sin firmar', async ({ app, screen }) => {
+test('Procedures: Start con la firma pendiente, Cancel no cambia nada y Continue sigue sin firmar', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', 'View Problem List').tap()
   await screen.getByRole('tab', 'Procedures').tap()
-  await screen.getByPlaceholder('Search...').fill('D2391')
-  await screen.getByRole('button', /Actions for D2391/).tap()
+  await screen.getByPlaceholder('Search...').fill('D2950')
+  await screen.getByRole('button', /Actions for D2950/).tap()
   await screen.getByRole('menuitem', /Start/).tap()
   const dialogo = screen.getByRole('dialog', 'Consent required')
   await expect(dialogo.getByText(/A consent document already exists/)).toBeVisible()
   await expect(dialogo.getByRole('button', /View consent/)).toBeVisible()
   await dialogo.getByRole('button', 'Cancel').tap()
   await expect(screen.getByRole('dialog', 'Consent required')).toHaveCount(0)
-  await expect(screen.getByRole('cell', 'Planned')).toBeVisible()
 
-  await screen.getByRole('button', /Actions for D2391/).tap()
+  await screen.getByRole('button', /Actions for D2950/).tap()
   await screen.getByRole('menuitem', /Start/).tap()
   await screen.getByRole('button', 'Continue without signed consent').tap()
-  await expect(screen.getByText(/D2391 moved to In progress\. Consent signature pending\./)).toBeVisible()
+  await expect(screen.getByText(/D2950 moved to In progress\. Consent signature pending\./)).toBeVisible()
   await expect(screen.getByRole('cell', 'In progress')).toBeVisible()
 })
 
-test('Start sin consentimiento enviado: se manda y se sigue, sin pedir otra confirmación', async ({ app, screen }) => {
+test('Procedures: Edit guarda la nota y Refer pide confirmar', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', 'View Problem List').tap()
   await screen.getByRole('tab', 'Procedures').tap()
-  await screen.getByPlaceholder('Search...').fill('D2392')
-  await screen.getByRole('button', /Actions for D2392/).tap()
-  await screen.getByRole('menuitem', /Start/).tap()
-  const dialogo = screen.getByRole('dialog', 'Consent required')
-  await expect(dialogo.getByText(/This procedure requires a consent document/)).toBeVisible()
-  await expect(dialogo.getByRole('button', /View consent/)).toHaveCount(0)
-  await dialogo.getByRole('button', 'Send consent and sign later').tap()
-  await expect(screen.getByRole('dialog', 'Consent required')).toHaveCount(0)
-  await expect(screen.getByText(/D2392 moved to In progress\. Consent sent to the patient\./)).toBeVisible()
+  await screen.getByPlaceholder('Search...').fill('D2954')
+  await screen.getByRole('button', /Actions for D2954/).tap()
+  await screen.getByRole('menuitem', /Edit/).tap()
+  const editar = screen.getByRole('dialog', 'Edit procedure')
+  await editar.getByLabel('Procedure notes').fill('Wait for the core buildup to set.')
+  await editar.getByRole('button', /Save notes/).tap()
+  await expect(screen.getByRole('button', /Note: Wait for the core buildup to set\./)).toBeVisible()
+
+  await screen.getByRole('button', /Actions for D2954/).tap()
+  await screen.getByRole('menuitem', /Refer/).tap()
+  const dialogo = screen.getByRole('dialog', 'Refer procedure')
+  await expect(dialogo.getByText(/from Pending to Referred/)).toBeVisible()
+  await dialogo.getByRole('button', 'Refer').tap()
+  await expect(screen.getByText(/D2954 moved to Referred\./)).toBeVisible()
 })
 
 /* Parado en un examen, el menú de un finding abre lo mismo que la Problem List; un link cambia el drawer al registro. */
