@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-02
 
+### Clinical Mode: el bloque Informed Consent con las firmas en su propia fila ([#114](https://github.com/JulianGerardi/red-dental-studio/pull/114))
+- **CON-4052.** En el bloque Informed Consent de un caso, el título con su estado queda arriba con los íconos de historial
+  y menú ⋮ a la derecha, y **Patient y Provider van en una fila propia debajo**, con el nombre siempre visible (antes se
+  escondía con la card angosta). Mismo orden en escritorio y celular.
+- **Para el dev:** `ConsentBlock.tsx` ya no usa `@container` ni el `sr-only @5xl:not-sr-only` de `FilaFirma`; las firmas
+  van en un `span` con `basis-full`. Detalle en `clinical-mode.md` (2026-11-02). Sin Storybook todavía.
+
 ### Clinical Mode: acciones del procedimiento según su estado, columna Consent y firma del consentimiento ([#113](https://github.com/JulianGerardi/red-dental-studio/pull/113))
 - **CON-4052.** El menú ⋮ de un procedimiento muestra, oculta o deshabilita Edit, Start, Complete, Refer, Discard,
   Discontinue y Delete según su estado y el del plan (Treatment Plan, Unassigned y Procedures del Overview). Start y
