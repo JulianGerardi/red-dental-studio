@@ -93,7 +93,6 @@ test('Complete bloqueado mientras se planea o espera el consentimiento; aceptado
   await planes.getByRole('button', /^27\/04\/2026/).tap()
   await planes.getByRole('button', /Endodontic Treatment, Accepted/).tap()
   await screen.getByRole('button', /Complete D2954/).tap()
-  await screen.getByRole('button', 'Confirm').tap()
   const dialogo = screen.getByRole('dialog', 'Consent required')
   await expect(dialogo.getByText(/This procedure requires a consent document/)).toBeVisible()
   await expect(dialogo.getByText(/Case: Endodontic Treatment/)).toBeVisible()
@@ -111,8 +110,7 @@ test('Start con Sign now firma, confirma y deja el plan In progress', async ({ a
   const firma = screen.getByRole('dialog', 'Review and sign consent')
   await expect(firma.getByRole('button', /Record signature/)).toBeDisabled()
   for (let i = 0; i < 5; i++) await firma.getByRole('checkbox').nth(i).tap()
-  await firma.getByRole('tab', 'Type').tap()
-  await firma.getByLabel('Full name').fill('Julio Perez')
+  await expect(firma.getByLabel('Printed Name')).toHaveValue('Julio Perez')
   await firma.getByRole('button', /Record signature/).tap()
   const firmado = screen.getByRole('dialog', 'Consent signed')
   await firmado.getByRole('button', 'Confirm Start').tap()
@@ -121,22 +119,41 @@ test('Start con Sign now firma, confirma y deja el plan In progress', async ({ a
   await expect(screen.getByText('In progress').first()).toBeVisible()
 })
 
-/* La columna Consent: sin documento avisa; con documento abre el detalle, donde se firma. */
-test('la columna Consent abre el consentimiento y ahí se firma', async ({ app, screen }) => {
+/* La columna Consent: sin documento avisa; con documento abre el consentimiento, donde firman paciente y provider. */
+test('la columna Consent abre el consentimiento y ahí firman paciente y provider', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode?case=c5')
   await screen.getByRole('button', /Open consent for D2954: Not generated/).tap()
-  await expect(screen.getByText(/No document yet\. Start or Complete initiates consent management/)).toBeVisible()
+  await expect(screen.getByText(/No document yet\. Start or Complete initiates consent management/).first()).toBeVisible()
 
-  await screen.getByRole('button', /Open consent for D2950: Pending/).tap()
-  await expect(screen.getByRole('button', /Back to Case/)).toBeVisible()
-  await expect(screen.getByText('1 of 2 collected')).toBeVisible()
-  await screen.getByRole('button', /^Sign$/).tap()
-  const firma = screen.getByRole('dialog', 'Sign as provider')
-  await firma.getByRole('tab', 'Type').tap()
-  await firma.getByLabel('Full name').fill('Perez Martinez')
-  await firma.getByRole('button', /Sign consent/).tap()
-  await expect(screen.getByText('2 of 2 collected')).toBeVisible()
-  await expect(screen.getByText('All signatures collected')).toBeVisible()
+  await screen.getByRole('button', /Open consent for D2750: Not sent/).tap()
+  await expect(screen.getByRole('heading', /Procedure Consent - D2750/)).toBeVisible()
+  // El paciente marca las afirmaciones en el documento antes de firmar.
+  await expect(screen.getByRole('button', /Patient Signature/)).toBeDisabled()
+  for (let i = 0; i < 5; i++) await screen.getByRole('checkbox').nth(i).tap()
+  await screen.getByRole('button', /Patient Signature/).tap()
+  const paciente = screen.getByRole('dialog', 'Patient Signature')
+  await expect(paciente.getByLabel('Initials')).toHaveValue('JP')
+  await paciente.getByRole('button', /Adopt and Sign/).tap()
+  await expect(screen.getByText(/Patient signed/)).toBeVisible()
+
+  await screen.getByRole('button', /Provider Signature/).tap()
+  const provider = screen.getByRole('dialog', 'Provider Signature')
+  await expect(provider.getByRole('button', /^Sign$/)).toBeDisabled()
+  await provider.getByLabel('Email').fill('perez@clinic.com')
+  await provider.getByPlaceholder('Enter password').fill('secret')
+  await provider.getByRole('button', /^Sign$/).tap()
+  await expect(screen.getByText(/Provider signed/)).toBeVisible()
+  await expect(screen.getByText('Signed').first()).toBeVisible()
+})
+
+/* El historial del consentimiento del caso (el reloj) junta los consentimientos de cada procedimiento. */
+test('el historial del caso lista los consentimientos de cada procedimiento', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode?case=c5')
+  await screen.getByRole('button', 'Consent history').tap()
+  const historial = screen.getByRole('dialog', 'Consent history')
+  await expect(historial.getByText('Procedure consents')).toBeVisible()
+  await historial.getByRole('button', /Procedure Consent - D2950/).tap()
+  await expect(screen.getByRole('heading', /Procedure Consent - D2950/)).toBeVisible()
 })
 
 /* El menú ⋮ en un caso: Delete pregunta el alcance; Delete from Tx lo pasa a Unassigned. */
@@ -165,7 +182,7 @@ test('las filas del caso y las sueltas se despliegan con su detalle', async ({ a
   await planes.getByRole('button', /Restorative Plan, Waiting for consent/).tap()
   await screen.getByText(/^D2391 Resin-based composite/).tap()
   await expect(screen.getByText('Procedure consent')).toBeVisible()
-  await expect(screen.getByRole('button', /^Informed Consent for Dental Treatment/).first()).toBeVisible()
+  await expect(screen.getByRole('button', /^Procedure Consent - D2391/)).toBeVisible()
   // El hallazgo vinculado se abre en el drawer, sin salir de Treatment Plan.
   await screen.getByRole('button', /^Chronic enamel dental caries · Tooth 3/).tap()
   await expect(screen.getByRole('dialog', /Chronic enamel dental caries/)).toBeVisible()
@@ -223,18 +240,26 @@ test('Prototype controls: el cálculo que falla deja el anterior y el escenario 
 })
 
 /* Prototipo de CON-4052: un suelto también pasa por su consentimiento; si el envío falla, el procedimiento no cambia. */
-test('Unassigned: Complete pide el consentimiento y la falla al mandar no cambia el procedimiento', async ({ app, screen }) => {
+test('Unassigned: Complete pide el consentimiento del procedimiento suelto', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', /^Exams/).tap()
   await screen.getByRole('menuitem', 'Treatment Plan').tap()
-  await screen.getByRole('checkbox', 'Simulate sending failure').tap()
-  await screen.getByRole('button', /Actions for D0120/).first().tap()
+  await screen.getByRole('button', /Actions for D2330/).tap()
   await screen.getByRole('menuitem', /Complete/).tap()
-  await screen.getByRole('button', 'Confirm').tap()
   const dialogo = screen.getByRole('dialog', 'Consent required')
   await expect(dialogo.getByText(/This procedure requires a consent document/)).toBeVisible()
+  await expect(dialogo.getByText(/Case:/)).toHaveCount(0)
+  await dialogo.getByRole('button', 'Send consent and sign later').tap()
+  await expect(screen.getByText(/Procedure completed\. Consent sent to the patient\./)).toBeVisible()
+})
+
+test('si el consentimiento no se puede mandar, el procedimiento no cambia', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode?case=c9')
+  await screen.getByRole('button', /Actions for D1110/).tap()
+  await screen.getByRole('menuitem', /Start/).tap()
+  const dialogo = screen.getByRole('dialog', 'Consent required')
   await dialogo.getByRole('button', 'Send consent and sign later').tap()
   await expect(dialogo.getByText(/The consent could not be sent\. The procedure has not changed\./)).toBeVisible()
   await dialogo.getByRole('button', 'Cancel').tap()
-  await expect(screen.getByRole('cell', 'Completed')).toHaveCount(0)
+  await expect(screen.getByRole('button', /Open consent for D1110: Not sent/)).toBeVisible()
 })

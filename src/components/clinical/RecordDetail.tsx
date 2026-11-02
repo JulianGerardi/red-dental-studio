@@ -188,7 +188,7 @@ export function ContenidoConsentimiento({ t }: { t?: Tratamiento }) {
   const enviado = CONSENTIMIENTO.historial.find((h) => h.evento === 'Sent to patient')?.fecha
   return (
     <Entrada estado={<EstadoConsentimiento estado={estado} />} sub={estado !== 'Not sent' && enviado && `Sent ${enviado}`}>
-      <EnlaceRegistro onClick={() => ir({ pestana: 'Treatment Plan', caso: t.caso.id, consentimiento: t.procCaso!.id })}>{CONSENTIMIENTO.titulo}</EnlaceRegistro>
+      <EnlaceRegistro onClick={() => ir({ pestana: 'Treatment Plan', caso: t.caso.id, consentimiento: t.procCaso!.id })}>Procedure Consent - {t.procCaso.codigo} {t.procCaso.nombre}</EnlaceRegistro>
     </Entrada>
   )
 }

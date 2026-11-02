@@ -3,7 +3,7 @@ import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Alert } from '@/components/ui/alert'
-import { FirmarConsentimiento, VistaConsentimiento } from '@/components/clinical/ConsentDetail'
+import { FirmaPaciente, VistaConsentimiento } from '@/components/clinical/ConsentDetail'
 import { useState } from 'react'
 import { CONSENTIMIENTO_REQUERIDO as TEXTOS, MENU_PROCEDIMIENTO, PACIENTE, type ConsentProcedimiento, type FirmasConsentimiento, type Rubrica } from '@/data/treatment-plan'
 
@@ -101,6 +101,8 @@ export type ProcedimientoConConsentimiento = ProcedimientoResumen & {
   proveedor?: string
   firmas?: FirmasConsentimiento
   rubricas?: Partial<Record<keyof FirmasConsentimiento, Rubrica>>
+  /** El envío de este consentimiento falla (ejemplo real del prototipo). */
+  envioFalla?: boolean
 }
 /** Cómo se aplica el cambio: con `enviar`, el documento sin generar o sin mandar sale al paciente (Pending). */
 export type ComoSeAplica = { enviar?: boolean; nota?: string }
@@ -113,14 +115,12 @@ const sinDocumento = (c?: ConsentProcedimiento) => c === 'Not generated'
     Sign now genera el documento, abre la revisión y firma (Back vuelve al diálogo) y, firmado, pide confirmar: Cancel
     clinical change deja el procedimiento como estaba, con el consentimiento firmado. View consent abre el documento y
     Back vuelve al diálogo. */
-export function useFlujoConsentimiento({ onAplicar, onGenerar, onFirmar, fallaEnvio }: {
+export function useFlujoConsentimiento({ onAplicar, onGenerar, onFirmar }: {
   onAplicar: (ids: string[], verbo: 'Start' | 'Complete', como: ComoSeAplica) => void
   /** Genera el documento de los que no tenían (Not generated → Not sent); el procedimiento no cambia. */
   onGenerar: (ids: string[]) => void
   /** Registra todas las firmas requeridas (genera el documento si no había); el procedimiento no cambia. */
   onFirmar: (ids: string[], rubrica: Rubrica) => void
-  /** Prototype controls: el próximo envío falla. */
-  fallaEnvio?: boolean
 }) {
   type Pedido = {
     verbo: 'Start' | 'Complete'; procs: ProcedimientoConConsentimiento[]; caso?: string; tipo: TipoConsentimiento
@@ -157,7 +157,7 @@ export function useFlujoConsentimiento({ onAplicar, onGenerar, onFirmar, fallaEn
         onViewConsent={() => setPedido({ ...pedido, paso: 'documento' })}
         onContinue={() => {
           if (pedido.tipo === 'pendiente') return aplicar({ nota: ' Consent signature pending.' })
-          if (fallaEnvio) return setPedido({ ...generar(pedido), error: MENU_PROCEDIMIENTO.noPudoEnviarse })
+          if (pedido.procs.some((p) => p.envioFalla)) return setPedido({ ...generar(pedido), error: MENU_PROCEDIMIENTO.noPudoEnviarse })
           aplicar({ enviar: true, nota: ' Consent sent to the patient.' })
         }}
       />
@@ -166,12 +166,12 @@ export function useFlujoConsentimiento({ onAplicar, onGenerar, onFirmar, fallaEn
     elemento = <VistaConsentimiento procedimiento={pedido.procs[0]!} cerrar="Back" onClose={() => setPedido({ ...pedido, paso: 'pregunta' })} />
   } else if (pedido?.paso === 'firma') {
     elemento = (
-      <FirmarConsentimiento
-        rol="Patient"
+      <FirmaPaciente
         nombre={PACIENTE}
         titulo={MENU_PROCEDIMIENTO.revisar.titulo}
         descripcion={MENU_PROCEDIMIENTO.revisar.texto}
         resumen={resumen}
+        conReconocimientos
         cancelar="Back"
         guardar="Record signature"
         onClose={() => setPedido({ ...pedido, paso: 'pregunta' })}

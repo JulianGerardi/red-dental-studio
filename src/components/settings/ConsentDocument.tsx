@@ -86,12 +86,15 @@ type Props = {
   /** El documento de un paciente lleva las dos firmas (paciente y provider): el trazo o el nombre sobre la línea y la
       fecha. Con la del paciente, las casillas quedan marcadas. Sin esto, la línea vacía del preview de Settings. */
   firmas?: { paciente?: FirmaHoja; proveedor?: FirmaHoja }
+  /** Las afirmaciones marcadas; con `onReconocer`, el paciente las marca en la hoja (detalle del consentimiento). */
+  reconocidos?: readonly string[]
+  onReconocer?: (afirmacion: string, marcada: boolean) => void
   /** completo: ocupa todo el ancho y crece con el contenido (el detalle del consentimiento), sin el tamaño de carta. */
   ancho?: 'carta' | 'completo'
   className?: string
 }
 
-export type FirmaHoja = { fecha: string; nombre: string; imagen?: string; texto?: string }
+export type FirmaHoja = { fecha: string; nombre: string; imagen?: string; texto?: string; iniciales?: string }
 
 /* Una línea de firma del documento: el trazo (o el nombre escrito, o el nombre) sobre la línea, quién firma y la fecha. */
 function LineaFirma({ rol, nombre, firma }: { rol: string; nombre: string; firma?: FirmaHoja }) {
@@ -101,7 +104,11 @@ function LineaFirma({ rol, nombre, firma }: { rol: string; nombre: string; firma
         <div className="flex h-14 items-end pb-1">
           {firma?.imagen
             ? <img src={firma.imagen} alt={`Signature of ${firma.nombre}`} className="max-h-14 max-w-[260px] object-contain" />
-            : firma && <span className="font-serif text-[20px] leading-none text-ink italic">{firma.texto || firma.nombre}</span>}
+            : firma && (
+                <span className="font-serif text-[20px] leading-none text-dash-blue italic">
+                  {firma.texto || firma.nombre}{firma.iniciales && <span className="ml-1.5 text-[12px]">({firma.iniciales})</span>}
+                </span>
+              )}
         </div>
         <div className="relative border-t border-ink-medium pt-1">
           {!firma && <X aria-hidden className="absolute -top-3.5 left-0 size-3 text-ink-faint" />}
@@ -116,7 +123,7 @@ function LineaFirma({ rol, nombre, firma }: { rol: string; nombre: string; firma
   )
 }
 
-export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, texto, vistaPaciente, paciente = 'Sarah Stone', proveedor = 'John Lorem', firmas, ancho = 'carta', className }: Props) {
+export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, texto, vistaPaciente, paciente = 'Sarah Stone', proveedor = 'John Lorem', firmas, reconocidos, onReconocer, ancho = 'carta', className }: Props) {
   const firmaPaciente = firmas?.paciente
   const lineasRiesgo = riesgos.split('\n').filter(Boolean)
   const vacio = <p className="text-ink-faint">No content yet.</p>
@@ -189,14 +196,29 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, te
 
       <Seccion titulo="Patient acknowledgment">
         <ul className="flex flex-col gap-1.5">
-          {RECONOCIMIENTOS_PACIENTE.map((r) => (
-            <li key={r} className="flex gap-2">
-              <span aria-hidden className={`mt-[3px] grid size-3 shrink-0 place-items-center rounded-[3px] border ${firmaPaciente ? 'border-dash-blue bg-dash-blue text-white' : 'border-ink-muted'}`}>
-                {firmaPaciente && <Check className="size-2.5" strokeWidth={3} />}
+          {RECONOCIMIENTOS_PACIENTE.map((r) => {
+            const on = firmaPaciente ? true : !!reconocidos?.includes(r)
+            const casilla = (
+              <span aria-hidden className={`mt-[3px] grid size-3 shrink-0 place-items-center rounded-[3px] border ${on ? 'border-dash-blue bg-dash-blue text-white' : 'border-ink-muted'}`}>
+                {on && <Check className="size-2.5" strokeWidth={3} />}
               </span>
-              {r}
-            </li>
-          ))}
+            )
+            return (
+              <li key={r}>
+                {onReconocer ? (
+                  <button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={on}
+                    onClick={() => onReconocer(r, !on)}
+                    className="-mx-1 flex gap-2 rounded px-1 text-left hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-dash-blue"
+                  >
+                    {casilla}{r}
+                  </button>
+                ) : <span className="flex gap-2">{casilla}{r}</span>}
+              </li>
+            )
+          })}
         </ul>
         <p className="mt-2 text-[11px] leading-snug font-medium text-ink-muted">{AVISO_RECONOCIMIENTOS}</p>
       </Seccion>

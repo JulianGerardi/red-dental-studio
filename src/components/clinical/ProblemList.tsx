@@ -204,7 +204,7 @@ export function ProblemList({ procedimientoInicial }: {
       cell: (r) => {
         const c = consentimientoDe(r)
         if (!c) return <span aria-label="No consent" className="text-[13px] text-ink-faint">—</span>
-        return <EstadoConsentimiento estado={c.estado} de={r.codigo} onAbrir={() => tocarConsentimiento(c)} />
+        return <EstadoConsentimiento estado={c.estado} de={r.codigo} nombre={`${r.codigo} ${r.nombre}`} onAbrir={() => tocarConsentimiento(c)} />
       },
     },
   ]

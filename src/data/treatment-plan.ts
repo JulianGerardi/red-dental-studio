@@ -31,12 +31,14 @@ export type Procedimiento = {
   firmas?: FirmasConsentimiento
   /** Las notas de Edit procedure: no cambian el estado. */
   nota?: string
+  /** El envío del consentimiento falla (en el ejemplo, Night Guard Plan): el procedimiento no cambia y se reintenta. */
+  envioFalla?: boolean
   /** Cómo firmó cada uno: el trazo dibujado (imagen) o el nombre escrito. Sin esto, la hoja muestra el nombre. */
   rubricas?: Partial<Record<keyof FirmasConsentimiento, Rubrica>>
 }
 
 export type FirmasConsentimiento = { Patient?: string; Provider?: string }
-export type Rubrica = { imagen?: string; texto?: string }
+export type Rubrica = { imagen?: string; texto?: string; iniciales?: string }
 
 /* El consentimiento específico del procedimiento (no el del caso), del prototipo de Julián para CON-4052:
    Not generated (hay template, no hay documento) · Not sent (generado, sin mandar ni firmar) · Pending (mandado, falta
@@ -54,8 +56,11 @@ const DEL_PACIENTE: Record<string, Partial<Procedimiento>> = {
   /* El consentimiento a medio firmar: el paciente ya firmó, falta el provider. */
   c5v2p2: { codigo: 'D2950', nombre: 'Core buildup, including any pins when required', superficie: '-', pieza: '19', ubicacion: '-', firmas: { Patient: '04/29/2026' } },
   c5v2p3: { codigo: 'D2954', nombre: 'Prefabricated post and core in addition to crown', superficie: '-', pieza: '19', ubicacion: '-' },
+  c5v2p4: { codigo: 'D2750', nombre: 'Crown – porcelain fused to high noble metal', superficie: '-', pieza: '19', ubicacion: '-' },
+  c5v2p5: { codigo: 'D0230', nombre: 'Intraoral – periapical each additional radiographic image', superficie: '-', pieza: '19', ubicacion: '-' },
+  c5v2p6: { codigo: 'D9910', nombre: 'Application of desensitizing medicament', superficie: '-', pieza: '19', ubicacion: '-' },
   c9v1p1: { codigo: 'D9944', nombre: 'Occlusal guard – hard appliance, full arch', superficie: '-', pieza: '-', ubicacion: 'Upper Arch', estado: 'In progress' },
-  c9v1p2: { codigo: 'D1110', nombre: 'Prophylaxis – adult', superficie: '-', pieza: '-', ubicacion: '-' },
+  c9v1p2: { codigo: 'D1110', nombre: 'Prophylaxis – adult', superficie: '-', pieza: '-', ubicacion: '-', envioFalla: true },
   c10v1p1: { codigo: 'D9972', nombre: 'External bleaching – per arch – performed in office', superficie: '-', pieza: '-', ubicacion: 'Upper Arch' },
   c10v1p2: { codigo: 'D9972', nombre: 'External bleaching – per arch – performed in office', superficie: '-', pieza: '-', ubicacion: 'Lower Arch' },
   c11v1p1: { codigo: 'D1351', nombre: 'Sealant – per tooth', superficie: 'O', pieza: '30', ubicacion: '-' },
@@ -88,9 +93,20 @@ const proc = (id: string, estado: Procedimiento['estado'] = 'Planned', consentim
 const visita = (prefijo: string, consentimientos: ConsentProcedimiento[], estado: Procedimiento['estado'] = 'Planned') =>
   consentimientos.map((c, i) => proc(`${prefijo}p${i + 1}`, estado, c))
 
-/* Un procedimiento suelto también puede tener su consentimiento (hay template): no se ve en la tabla, pero Complete pasa
-   por él como en un caso (prototipo de CON-4052). El segundo no tiene template. */
-export const NO_ASIGNADOS: Procedimiento[] = Array.from({ length: 15 }, (_, i) => proc(`u${i + 1}`, 'Planned', i === 1 ? 'Not required' : 'Not generated'))
+/* Un procedimiento suelto también tiene su consentimiento (si hay template): no se ve en la tabla, pero Complete pasa por
+   él como en un caso (prototipo de CON-4052). Los primeros son las variantes del prototipo, una por estado; el resto,
+   como el frame. */
+const SUELTOS: [Partial<Procedimiento>, ConsentProcedimiento][] = [
+  [{ codigo: 'D2330', nombre: 'Resin-based composite – one surface, anterior', pieza: '8', superficie: 'M' }, 'Not generated'],
+  [{ codigo: 'D2331', nombre: 'Resin-based composite – two surfaces, anterior', pieza: '9', superficie: 'M, D' }, 'Not sent'],
+  [{ codigo: 'D7210', nombre: 'Extraction, erupted tooth requiring removal of bone', pieza: '17', superficie: '-' }, 'Pending'],
+  [{ codigo: 'D4910', nombre: 'Periodontal maintenance', pieza: '-', superficie: '-', ubicacion: 'Full Mouth' }, 'Signed'],
+  [{ codigo: 'D1206', nombre: 'Topical application of fluoride varnish', pieza: '-', superficie: '-', ubicacion: 'Full Mouth' }, 'Not required'],
+]
+export const NO_ASIGNADOS: Procedimiento[] = Array.from({ length: 15 }, (_, i) => {
+  const [datos, consentimiento] = SUELTOS[i] ?? [{}, 'Not generated' as const]
+  return { ...proc(`u${i + 1}`, 'Planned', consentimiento), ...datos }
+})
 
 export type Caso = {
   id: string
@@ -159,7 +175,7 @@ export const CASOS: Caso[] = ([
     creado: '27/04/2026', creadoPor: 'Provider 1', total: '640.00',
     visitas: [
       { id: 'v1', nombre: 'Visit 1', total: '$320.000', procedimientos: visita('c5v1', ['Signed', 'Signed']).map((p) => ({ ...p, estado: 'Completed' as const })), cita: { fecha: 'May 4, 2026', hora: '9:30 AM', proveedor: 'Perez Martinez' } },
-      { id: 'v2', nombre: 'Visit 2', total: '$702.000', procedimientos: visita('c5v2', ['Signed', 'Pending', 'Not generated'], 'Pending') },
+      { id: 'v2', nombre: 'Visit 2', total: '$1,404.000', procedimientos: visita('c5v2', ['Signed', 'Pending', 'Not generated', 'Not sent', 'Not required', 'Signed'], 'Pending') },
     ],
   },
   {
@@ -181,7 +197,7 @@ export const CASOS: Caso[] = ([
   {
     id: 'c9', nombre: 'Night Guard Plan', grupo: 'Occlusal', estado: 'In progress', aceptado: true,
     creado: '10/04/2026', creadoPor: 'Provider 1', total: '0',
-    visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$468.000', procedimientos: visita('c9v1', ['Signed', 'Pending'], 'Pending') }],
+    visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$468.000', procedimientos: visita('c9v1', ['Signed', 'Not generated'], 'Pending') }],
   },
   {
     id: 'c10', nombre: 'Whitening Plan', grupo: 'Cosmetic', estado: 'Cancelled', aceptado: true,

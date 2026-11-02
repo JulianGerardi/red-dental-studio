@@ -148,6 +148,8 @@ export const PROCEDIMIENTOS: ProcedimientoPaciente[] = [
   { id: 'pr6', fecha: '02/05/2026', ubicacion: '', pieza: 3, superficie: 'O', codigo: 'D2391', nombre: 'Resin-based composite – one surface, posterior', proveedor: 'Perez Martinez', estado: 'Pending' },
   { id: 'pr7', fecha: '02/05/2026', ubicacion: '', pieza: 14, superficie: 'O, D', codigo: 'D2392', nombre: 'Resin-based composite – two surfaces, posterior', proveedor: 'Perez Martinez', estado: 'Pending' },
   { id: 'pr13', fecha: '28/04/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D2950', nombre: 'Core buildup, including any pins when required', proveedor: 'Perez Martinez', estado: 'Pending' },
+  { id: 'pr15', fecha: '28/04/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D2750', nombre: 'Crown – porcelain fused to high noble metal', proveedor: 'Perez Martinez', estado: 'Pending' },
+  { id: 'pr16', fecha: '28/04/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D0230', nombre: 'Intraoral – periapical each additional radiographic image', proveedor: 'Perez Martinez', estado: 'Pending' },
   { id: 'pr14', fecha: '28/04/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D2954', nombre: 'Prefabricated post and core in addition to crown', proveedor: 'Perez Martinez', estado: 'Pending' },
   { id: 'pr12', fecha: '28/04/2026', ubicacion: '', pieza: 19, superficie: '-', codigo: 'D2740', nombre: 'Crown – porcelain/ceramic', proveedor: 'Perez Martinez', estado: 'Planned' },
   { id: 'pr8', fecha: '18/04/2026', ubicacion: '', superficie: '-', codigo: 'D1110', nombre: 'Prophylaxis – adult', proveedor: 'Michael Johnson', nota: 'Light calculus on lower anteriors.', estado: 'Completed' },
@@ -193,6 +195,8 @@ export const VINCULOS_PROCEDIMIENTO: Record<string, VinculoProcedimiento> = {
   /* Endodontic Treatment está aceptado: Start y Complete pasan por el consentimiento (uno a medio firmar, otro sin mandar). */
   pr13: { caso: { id: 'c5', procedimiento: 'c5v2p2' } },
   pr14: { caso: { id: 'c5', procedimiento: 'c5v2p3' } },
+  pr15: { caso: { id: 'c5', procedimiento: 'c5v2p4' } },
+  pr16: { caso: { id: 'c5', procedimiento: 'c5v2p5' } },
   /* Se discontinuó y vuelve a planearse en el plan periodontal, que todavía está en Planning: sin turno ni consentimiento. */
   pr11: { caso: { id: 'c1', procedimiento: 'c1v2p1' } },
 }

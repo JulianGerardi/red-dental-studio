@@ -1,19 +1,20 @@
-import { useRef, useState, type ReactNode } from 'react'
-import { ArrowLeft, CircleAlert, CircleCheck, Download, File, FileCheck2, FileClock, FileMinus2, FileText, PenLine, Send, type LucideIcon } from 'lucide-react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { ArrowLeft, CircleCheck, Eye, EyeOff, File, FileCheck2, FileClock, FileMinus2, FileText, LoaderCircle, PenLine, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
+import { TARJETA_PANEL } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
-import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Drawer, DrawerActions, DrawerSection } from '@/components/ui/drawer'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { Tabs } from '@/components/ui/tabs'
-import { SelectField, TextField } from '@/components/patients/form'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { FieldLabel, TextField, control } from '@/components/patients/form'
+import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
 import { AVISO_RECONOCIMIENTOS, ConsentDocument, RECONOCIMIENTOS_PACIENTE } from '@/components/settings/ConsentDocument'
 import {
-  AVISO_CONSENTIMIENTO, DOCUMENTO_CONSENTIMIENTO, PACIENTE,
-  type Caso, type ConsentProcedimiento, type FirmasConsentimiento, type Procedimiento, type Rubrica, type Visita,
+  DOCUMENTO_CONSENTIMIENTO, PACIENTE, SIN_DOCUMENTO,
+  type ConsentProcedimiento, type FirmasConsentimiento, type Procedimiento, type Rubrica,
 } from '@/data/treatment-plan'
 
 /* El consentimiento de un procedimiento: se abre desde la columna Consent de las tablas y ahí se firma. La hoja es la
@@ -34,16 +35,22 @@ const CONSENT: Record<ConsentProcedimiento, { icono: LucideIcon; clase: string; 
 /** Hay documento (generado, mandado o firmado): la columna lo abre. Sin documento, avisa qué pasa. */
 export const tieneDocumento = (c?: ConsentProcedimiento) => c === 'Not sent' || c === 'Pending' || c === 'Signed'
 
-export function EstadoConsentimiento({ estado, onAbrir, de }: {
+export function EstadoConsentimiento({ estado, onAbrir, de, nombre }: {
   estado: ConsentProcedimiento
   onAbrir?: () => void
   /** De qué procedimiento es, para el nombre del botón ("Open consent for D2391"). */
   de?: string
+  /** El procedimiento entero (código y nombre), para el tooltip. */
+  nombre?: string
 }) {
   const { icono: Icono, clase } = CONSENT[estado]
   const contenido = <><Icono className="size-4 shrink-0" aria-hidden /> {estado}</>
   if (!onAbrir) return <span className={cn('flex items-center gap-1.5 text-[12px] font-medium whitespace-nowrap', clase)}>{contenido}</span>
+  /* Como en red.dev: el tooltip dice de qué consentimiento se trata y qué pasa al tocarlo. */
+  const ayuda = tieneDocumento(estado) ? 'Open to present it to the patient for signature' : SIN_DOCUMENTO[estado]
   return (
+    <Tooltip>
+      <TooltipTrigger asChild>
     <button
       type="button"
       /* No despliega la fila de la tabla (DataTable abre la fila con un clic en cualquier lado). */
@@ -57,6 +64,12 @@ export function EstadoConsentimiento({ estado, onAbrir, de }: {
     >
       {contenido}
     </button>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-[320px] flex-col items-start gap-0.5 bg-ink leading-snug text-white">
+        {nombre && <span className="block font-semibold">Procedure Consent - {nombre}</span>}
+        {ayuda}
+      </TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -77,146 +90,141 @@ export function estadoTrasFirma(firmas: FirmasConsentimiento): ConsentProcedimie
   return firmas.Patient && firmas.Provider ? 'Signed' : 'Pending'
 }
 
-/* Una línea de firma del panel: quién, si firmó y, si falta, el botón para firmar. */
-function FilaFirmante({ rol, nombre, fecha, puedeFirmar, onFirmar }: { rol: Firmante; nombre: string; fecha?: string; puedeFirmar: boolean; onFirmar: () => void }) {
-  return (
-    <li className={cn(TARJETA_INTERNA, 'flex items-center gap-3 px-3 py-3')}>
-      {fecha
-        ? <CircleCheck className="size-5 shrink-0 text-dash-ok-fg" aria-hidden />
-        : <CircleAlert className="size-5 shrink-0 text-warn-fg" aria-hidden />}
-      <span className="min-w-0 flex-1">
-        <span className="block text-[13px] font-semibold text-ink">{rol}</span>
-        <span className="block truncate text-[12px] text-ink-muted">{nombre}</span>
-        <span className={cn('block text-[12px] font-medium', fecha ? 'text-dash-ok-fg' : 'text-warn-fg')}>
-          {fecha ? `Signed ${fecha}` : 'Signature pending'}
-        </span>
-      </span>
-      {!fecha && puedeFirmar && (
-        <Button size="sm" onClick={onFirmar}><PenLine /> Sign</Button>
-      )}
-    </li>
-  )
-}
-
-export function ConsentDetail({ procedimiento: p, caso, visita, onVolver, onFirmar, onEnviar }: {
+/* El consentimiento de un procedimiento, como en red.dev: arriba Back, el título y View PDF; el documento a todo el ancho
+   (con las afirmaciones que marca el paciente y las firmas estampadas al pie); abajo, Patient Signature y Provider
+   Signature. Ver clinical-mode.md (2026-11-02). */
+export function ConsentDetail({ procedimiento: p, onVolver, onFirmar }: {
   procedimiento: Procedimiento
-  caso: Caso
-  visita?: Visita
   onVolver: () => void
   onFirmar: (rol: Firmante, rubrica: Rubrica) => void
-  /** Manda el documento: el primero u otra vez. */
-  onEnviar: () => void
 }) {
   const [firmando, setFirmando] = useState<Firmante | null>(null)
-  const estado = p.consentimiento ?? 'Not sent'
+  const [preparando, setPreparando] = useState(true)
   const firmas = p.firmas ?? {}
-  const firmantes: { rol: Firmante; nombre: string }[] = [
-    { rol: 'Patient', nombre: PACIENTE },
-    { rol: 'Provider', nombre: p.proveedor },
-  ]
-  const juntas = firmantes.filter((f) => firmas[f.rol]).length
-  const aviso_ = estado === 'Not sent' || estado === 'Signed' ? AVISO_CONSENTIMIENTO[estado] : null
-  const titulo = `${DOCUMENTO_CONSENTIMIENTO.titulo} – ${p.nombre}`
-  const donde = [p.pieza && p.pieza !== '-' ? `Tooth ${p.pieza}` : '', p.superficie && p.superficie !== '-' ? `Surface ${p.superficie}` : '', visita?.nombre, `Patient ${PACIENTE}`]
-    .filter(Boolean).join(' · ')
+  /* Las afirmaciones del documento: el paciente las marca antes de firmar; firmado, quedan marcadas. */
+  const [marcadas, setMarcadas] = useState<string[]>(firmas.Patient ? RECONOCIMIENTOS_PACIENTE : [])
+  const reconocido = marcadas.length === RECONOCIMIENTOS_PACIENTE.length
+  const estado = p.consentimiento ?? 'Not sent'
+  useEffect(() => {
+    const t = window.setTimeout(() => setPreparando(false), 450)
+    return () => window.clearTimeout(t)
+  }, [])
 
   return (
+    <TooltipProvider delayDuration={200}>
     <div className="flex flex-col gap-4">
-      <div className={cn(TARJETA_PANEL, 'p-4 sm:p-6')}>
-        <Button variant="secondary" size="md" onClick={onVolver}>
-          <ArrowLeft /> Back to Case
+      <div className={cn(TARJETA_PANEL, 'flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3')}>
+        <Button variant="ghost" size="md" onClick={onVolver}><ArrowLeft /> Back</Button>
+        <span aria-hidden className="hidden h-6 w-px bg-line sm:block" />
+        <h2 className="min-w-0 flex-1 text-[15px] leading-snug font-bold text-ink">
+          Procedure Consent - {p.codigo} {p.nombre}
+        </h2>
+        <Pill tone={CONSENT[estado].tono}>{estado}</Pill>
+        <Button variant="secondary" size="md" onClick={() => aviso.info('View PDF is not available in this release.')}>
+          <FileText /> View PDF
         </Button>
-
-        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold tracking-wide text-ink-muted">Informed consent · {caso.nombre}</p>
-            <h2 className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[20px] leading-tight font-bold text-ink">
-              {p.codigo} · {p.nombre}
-              <Pill tone={CONSENT[estado].tono}>{estado}</Pill>
-            </h2>
-            <p className="mt-1 text-[13px] text-ink-muted">{donde}</p>
-          </div>
-          <div className="flex shrink-0 flex-wrap gap-2">
-            <Button variant="secondary" size="md" onClick={() => aviso.info('Download PDF is not available in this release.')}>
-              <Download /> Download PDF
-            </Button>
-            {estado === 'Not sent' && <Button size="md" onClick={onEnviar}><Send /> Send to patient</Button>}
-            {estado === 'Pending' && <Button variant="secondary" size="md" onClick={onEnviar}><Send /> Send again</Button>}
-          </div>
-        </div>
-
-        {aviso_ && (
-          <Alert tone={estado === 'Signed' ? 'success' : 'info'} title={aviso_.titulo} className="mt-4">
-            {aviso_.texto}
-          </Alert>
-        )}
-
-        {/* Quién firmó y qué falta, arriba de la hoja: es lo que se viene a hacer. */}
-        <section aria-label="Signatures" className="mt-5">
-          <div className="flex items-baseline gap-2">
-            <h3 className="text-[15px] font-bold text-ink">Signatures</h3>
-            <p className="text-[12px] text-ink-muted">{juntas} of {firmantes.length} collected</p>
-          </div>
-          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-            {firmantes.map((f) => (
-              <FilaFirmante key={f.rol} rol={f.rol} nombre={f.nombre} fecha={firmas[f.rol]} puedeFirmar onFirmar={() => setFirmando(f.rol)} />
-            ))}
-          </ul>
-        </section>
       </div>
 
-      {/* La hoja a todo el ancho, sobre el escritorio gris como el preview de Consent Templates. Las firmas quedan
-          estampadas al pie, como en el PDF. */}
+      {/* La hoja a todo el ancho, sobre el escritorio gris como el preview de Consent Templates. */}
       <div className="rounded-lg bg-surface-muted p-3 sm:p-6">
-        <ConsentDocument
-          titulo={titulo}
-          procedimiento={`${p.codigo} · ${p.nombre}`}
-          naturaleza={DOCUMENTO_CONSENTIMIENTO.naturaleza}
-          riesgos={DOCUMENTO_CONSENTIMIENTO.riesgos}
-          vistaPaciente={false}
-          paciente={PACIENTE}
-          proveedor={p.proveedor}
-          firmas={firmasHoja(p)}
-          ancho="completo"
-        />
+        {preparando ? (
+          <div role="status" className="flex min-h-[360px] flex-col items-center justify-center gap-2 bg-white text-[13px] text-ink-muted">
+            <LoaderCircle className="size-6 animate-spin text-dash-blue" aria-hidden /> Preparing document...
+          </div>
+        ) : (
+          <ConsentDocument
+            titulo={`${DOCUMENTO_CONSENTIMIENTO.titulo} – ${p.nombre}`}
+            procedimiento={`${p.codigo} · ${p.nombre}`}
+            naturaleza={DOCUMENTO_CONSENTIMIENTO.naturaleza}
+            riesgos={DOCUMENTO_CONSENTIMIENTO.riesgos}
+            vistaPaciente={false}
+            paciente={PACIENTE}
+            proveedor={p.proveedor}
+            firmas={firmasHoja(p)}
+            reconocidos={marcadas}
+            onReconocer={firmas.Patient ? undefined : (r, v) => setMarcadas((m) => (v ? [...m, r] : m.filter((x) => x !== r)))}
+            ancho="completo"
+          />
+        )}
       </div>
 
-      {firmando && (
-        <FirmarConsentimiento
-          rol={firmando}
-          nombre={firmantes.find((f) => f.rol === firmando)!.nombre}
-          titulo={`Sign as ${firmando.toLowerCase()}`}
-          descripcion={titulo}
-          onClose={() => setFirmando(null)}
-          onFirmar={(r) => { onFirmar(firmando, r); setFirmando(null) }}
-        />
+      {/* Las dos firmas al pie, fijas mientras se lee: la del paciente a la izquierda y la del provider a la derecha. */}
+      <div className={cn(TARJETA_PANEL, 'sticky bottom-0 z-10 flex flex-wrap items-center gap-3 px-4 py-3')}>
+        {firmas.Patient ? (
+          <Firmado rol="Patient" fecha={firmas.Patient} />
+        ) : (
+          <ConAyuda texto={reconocido ? 'Present the consent to the patient for signature' : 'The patient checks every acknowledgment in the document first.'}>
+            <span>
+              <Button variant="secondary" size="md" disabled={!reconocido} onClick={() => setFirmando('Patient')}>
+                <PenLine /> Patient Signature
+              </Button>
+            </span>
+          </ConAyuda>
+        )}
+        {!firmas.Patient && !reconocido && (
+          <span className="text-[12px] text-ink-muted">Check every acknowledgment in the document to enable it.</span>
+        )}
+        <span className="ml-auto">
+          {firmas.Provider ? (
+            <Firmado rol="Provider" fecha={firmas.Provider} />
+          ) : (
+            <Button size="md" onClick={() => setFirmando('Provider')}><PenLine /> Provider Signature</Button>
+          )}
+        </span>
+      </div>
+
+      {firmando === 'Patient' && (
+        <FirmaPaciente nombre={PACIENTE} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Patient', r); setFirmando(null) }} />
+      )}
+      {firmando === 'Provider' && (
+        <FirmaProveedor nombre={p.proveedor} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Provider', r); setFirmando(null) }} />
       )}
     </div>
+    </TooltipProvider>
   )
 }
 
-/* La firma: el paciente marca las cinco afirmaciones del documento y firma; el provider sólo firma. Se dibuja con el
-   mouse, el dedo o un lápiz, o se escribe el nombre (para quien no puede dibujar o usa teclado). */
-export function FirmarConsentimiento({ rol, nombre, titulo, descripcion, resumen, cancelar = 'Cancel', guardar = 'Sign consent', onClose, onFirmar }: {
-  rol: Firmante
+/* La firma ya juntada, en el lugar del botón. */
+function Firmado({ rol, fecha }: { rol: Firmante; fecha: string }) {
+  return (
+    <span className="flex h-8 items-center gap-1.5 text-[13px] font-medium text-dash-ok-fg">
+      <CircleCheck className="size-4" aria-hidden /> {rol} signed {fecha}
+    </span>
+  )
+}
+
+const iniciales = (nombre: string) => nombre.split(/\s+/).filter(Boolean).map((x) => x[0]!.toUpperCase()).join('').slice(0, 3)
+const LEGAL = 'By selecting Adopt and Sign, I agree that the signature and initials are the electronic representation of my signature and initials for all purposes when I (or my agent) use them in documents, including legally binding contracts.'
+
+/* Patient Signature, como en red.dev: nombre impreso e iniciales, la firma adoptada (el nombre en letra de firma) o
+   dibujada, la vista previa y el texto legal. Sign now la usa para revisar y firmar (con las afirmaciones arriba). */
+export function FirmaPaciente({ nombre, titulo = 'Patient Signature', descripcion, resumen, conReconocimientos, cancelar = 'Cancel', guardar = 'Adopt and Sign', onClose, onFirmar }: {
   nombre: string
-  titulo: string
+  titulo?: string
   descripcion?: string
-  /** Qué se firma, arriba de todo (Sign now: el procedimiento, el paciente y el caso). */
+  /** Qué se firma, arriba de todo. */
   resumen?: ReactNode
+  /** Las cinco afirmaciones en el drawer (Sign now: no se pasa por el documento). */
+  conReconocimientos?: boolean
   cancelar?: string
   guardar?: string
   onClose: () => void
   onFirmar: (rubrica: Rubrica) => void
 }) {
-  const paciente = rol === 'Patient'
-  const [marcadas, setMarcadas] = useState<string[]>([])
-  const [modo, setModo] = useState<'Draw' | 'Type'>('Draw')
+  const [impreso, setImpreso] = useState(nombre)
+  const [ini, setIni] = useState(iniciales(nombre))
+  const [iniTocadas, setIniTocadas] = useState(false)
+  const [modo, setModo] = useState<'Adopt Signature' | 'Draw'>('Adopt Signature')
   const [dibujada, setDibujada] = useState<string | null>(null)
-  const [escrita, setEscrita] = useState('')
-  const reconocido = !paciente || marcadas.length === RECONOCIMIENTOS_PACIENTE.length
-  const firmada = modo === 'Draw' ? !!dibujada : escrita.trim().length > 1
-  const falta = !reconocido ? 'Check every statement to continue.' : !firmada ? (modo === 'Draw' ? 'Draw the signature to continue.' : 'Type the full name to continue.') : ''
+  const [pad, setPad] = useState(0)
+  const [marcadas, setMarcadas] = useState<string[]>([])
+  const reconocido = !conReconocimientos || marcadas.length === RECONOCIMIENTOS_PACIENTE.length
+  const firmada = modo === 'Draw' ? !!dibujada : impreso.trim().length > 1
+  const falta = !reconocido ? 'Check every statement to continue.' : !impreso.trim() ? 'Type the printed name to continue.' : !firmada ? 'Draw the signature to continue.' : ''
+  const borrar = () => {
+    if (modo === 'Draw') { setDibujada(null); setPad((n) => n + 1) }
+    else { setImpreso(''); setIni(''); setIniTocadas(false) }
+  }
 
   return (
     <Drawer
@@ -224,11 +232,19 @@ export function FirmarConsentimiento({ rol, nombre, titulo, descripcion, resumen
       onClose={onClose}
       title={titulo}
       description={descripcion}
-      footer={<DrawerActions onCancel={onClose} onSave={() => onFirmar(modo === 'Draw' ? { imagen: dibujada ?? undefined } : { texto: escrita.trim() })} cancelLabel={cancelar} saveLabel={guardar} saveDisabled={!!falta} />}
+      footer={(
+        <DrawerActions
+          onCancel={onClose}
+          onSave={() => onFirmar({ ...(modo === 'Draw' ? { imagen: dibujada ?? undefined } : { texto: impreso.trim() }), iniciales: ini.trim() || undefined })}
+          cancelLabel={cancelar}
+          saveLabel={guardar}
+          saveDisabled={!!falta}
+        />
+      )}
     >
       <div className="flex flex-col gap-6">
         {resumen}
-        {paciente && (
+        {conReconocimientos && (
           <DrawerSection title="Acknowledgment" description={AVISO_RECONOCIMIENTOS}>
             <ul className="flex flex-col gap-3">
               {RECONOCIMIENTOS_PACIENTE.map((r) => {
@@ -244,22 +260,74 @@ export function FirmarConsentimiento({ rol, nombre, titulo, descripcion, resumen
             </ul>
           </DrawerSection>
         )}
-
-        <DrawerSection title="Signature" description={`${nombre} signs as ${rol.toLowerCase()}.`}>
-          <Tabs tabs={['Draw', 'Type'] as const} value={modo} onChange={setModo} size="sm" aria-label="Signature method" className="self-start" />
+        <div className="grid grid-cols-2 gap-4">
+          <TextField label="Printed Name" value={impreso} onChange={(v) => { setImpreso(v); if (!iniTocadas) setIni(iniciales(v)) }} />
+          <TextField label="Initials" value={ini} onChange={(v) => { setIni(v.toUpperCase().slice(0, 4)); setIniTocadas(true) }} />
+        </div>
+        <Tabs tabs={['Adopt Signature', 'Draw'] as const} value={modo} onChange={setModo} size="sm" aria-label="Signature method" className="self-start" />
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-ink">Preview</span>
+            <Button variant="link" size="sm" onClick={borrar}>Delete</Button>
+          </div>
           {modo === 'Draw' ? (
-            <PadFirma onCambio={setDibujada} />
+            <PadFirma key={pad} onCambio={setDibujada} />
           ) : (
-            <div className="flex flex-col gap-3">
-              <TextField label="Full name" value={escrita} onChange={setEscrita} placeholder={nombre} />
-              <p aria-hidden className={cn(TARJETA_INTERNA, 'flex h-16 items-center px-4 text-[22px] text-ink italic', !escrita && 'text-ink-faint')}>
-                {escrita || nombre}
-              </p>
+            <div className="flex h-[160px] flex-col items-center justify-center rounded-lg border border-dashed border-line-strong bg-white px-4 text-center">
+              {impreso.trim() ? (
+                <>
+                  <span className="font-serif text-[30px] leading-tight text-dash-blue italic">{impreso}</span>
+                  {ini && <span className="font-serif text-[16px] text-dash-blue/80 italic">({ini})</span>}
+                </>
+              ) : <span className="text-[13px] text-ink-faint">Type the printed name to adopt a signature.</span>}
+              <span className="mt-3 text-[11px] text-ink-faint">Electronic signature representation</span>
             </div>
           )}
-        </DrawerSection>
-
+        </div>
+        <p className="text-[12px] leading-relaxed text-ink-muted">{LEGAL}</p>
         {falta && <p role="status" className="text-[12px] text-ink-muted">{falta}</p>}
+      </div>
+    </Drawer>
+  )
+}
+
+/* Provider Signature, como en red.dev: por seguridad se vuelven a pedir las credenciales para firmar. */
+export function FirmaProveedor({ nombre, onClose, onFirmar }: { nombre: string; onClose: () => void; onFirmar: (rubrica: Rubrica) => void }) {
+  const [email, setEmail] = useState('')
+  const [clave, setClave] = useState('')
+  const [ver, setVer] = useState(false)
+  const listo = /\S+@\S+\.\S+/.test(email) && clave.length > 0
+  return (
+    <Drawer
+      open
+      onClose={onClose}
+      title="Provider Signature"
+      description="For security and legal purposes, please re-enter your credentials to sign this document electronically."
+      footer={<DrawerActions onCancel={onClose} onSave={() => onFirmar({ texto: nombre })} saveLabel="Sign" saveDisabled={!listo} />}
+    >
+      <div className="grid grid-cols-2 gap-4">
+        <TextField label="Email" value={email} onChange={setEmail} placeholder="example@example.com" />
+        <label className="flex flex-col gap-2">
+          <FieldLabel>Password</FieldLabel>
+          <span className="relative">
+            <input
+              type={ver ? 'text' : 'password'}
+              value={clave}
+              onChange={(e) => setClave(e.target.value)}
+              placeholder="Enter password"
+              autoComplete="current-password"
+              className={cn(control(), 'h-9 px-3 pr-10')}
+            />
+            <button
+              type="button"
+              onClick={() => setVer((v) => !v)}
+              aria-label={ver ? 'Hide password' : 'Show password'}
+              className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-ink-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-dash-blue"
+            >
+              {ver ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </span>
+        </label>
       </div>
     </Drawer>
   )
@@ -312,16 +380,10 @@ export function PadFirma({ onCambio }: { onCambio: (imagen: string | null) => vo
     dibujando.current = false
     if (hay && ref.current) onCambio(ref.current.toDataURL('image/png'))
   }
-  const limpiar = () => {
-    const c = ref.current
-    c?.getContext('2d')?.clearRect(0, 0, c.width, c.height)
-    setHay(false)
-    onCambio(null)
-  }
 
   return (
     <div className="flex flex-col gap-1.5">
-      <div className={cn(TARJETA_INTERNA, 'relative')}>
+      <div className="relative rounded-lg border border-dashed border-line-strong bg-white">
         <canvas
           ref={ref}
           role="img"
@@ -334,9 +396,8 @@ export function PadFirma({ onCambio }: { onCambio: (imagen: string | null) => vo
         />
         {/* La línea y el "Sign here" son guía: no capturan el puntero. */}
         <span aria-hidden className="pointer-events-none absolute right-6 bottom-9 left-6 border-b border-dashed border-line-strong" />
-        {!hay && <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-3 text-center text-[12px] text-ink-faint">Sign here</span>}
+        <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-3 text-center text-[11px] text-ink-faint">{hay ? 'Electronic signature representation' : 'Signature preview area'}</span>
       </div>
-      <Button variant="link" size="sm" onClick={limpiar} disabled={!hay} className="self-end">Clear</Button>
     </div>
   )
 }
@@ -383,47 +444,5 @@ export function VistaConsentimiento({ procedimiento: p, onClose, cerrar = 'Close
         </div>
       </div>
     </Drawer>
-  )
-}
-
-/* Los controles del prototipo de Julián (CON-4052), como los de Estimate details: el consentimiento de un procedimiento
-   y la falla al mandarlo. Es una herramienta de demo, no parte del producto. */
-export const FIXTURES_CONSENTIMIENTO: ConsentProcedimiento[] = ['Not generated', 'Not sent', 'Pending', 'Signed', 'Not required']
-
-export function ControlesConsentimiento({ procedimientos, onFijar, fallaEnvio, onFallaEnvio }: {
-  procedimientos: Pick<Procedimiento, 'id' | 'codigo' | 'nombre' | 'consentimiento'>[]
-  onFijar: (id: string, c: ConsentProcedimiento) => void
-  fallaEnvio: boolean
-  onFallaEnvio: (v: boolean) => void
-}) {
-  const etiqueta = (p: (typeof procedimientos)[number]) => `${p.codigo} · ${p.nombre}`
-  const [elegido, setElegido] = useState<string | undefined>(procedimientos[0]?.id)
-  const p = procedimientos.find((x) => x.id === elegido) ?? procedimientos[0]
-  if (!p) return null
-  return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 rounded-lg border border-dashed border-line-strong bg-white/60 px-4 py-3">
-      <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Prototype controls</span>
-      <SelectField
-        label="Procedure"
-        hideLabel
-        value={etiqueta(p)}
-        onChange={(v) => setElegido(procedimientos.find((x) => etiqueta(x) === v)?.id)}
-        options={procedimientos.map(etiqueta)}
-        className="w-[260px] max-w-full"
-      />
-      <SelectField
-        label="Specific procedure consent"
-        hideLabel
-        value={p.consentimiento ?? ''}
-        onChange={(v) => onFijar(p.id, v as ConsentProcedimiento)}
-        options={FIXTURES_CONSENTIMIENTO}
-        className="w-[170px]"
-      />
-      <span className="flex items-center gap-2 text-[13px] text-ink">
-        <Checkbox on={fallaEnvio} onChange={onFallaEnvio} label="Simulate sending failure" />
-        <span aria-hidden>Simulate sending failure</span>
-      </span>
-      <span className="ml-auto text-[11px] text-ink-faint">Demo only · Not part of the product</span>
-    </div>
   )
 }

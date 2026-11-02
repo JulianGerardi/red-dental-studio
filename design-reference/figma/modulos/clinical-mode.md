@@ -3048,9 +3048,7 @@ de SharePoint es el mismo que pasó adjunto; ese link y el de red.dev piden logi
 4. **View consent** abre el documento en un drawer (*Procedure consent*: "Specific consent for this procedure — not the
    treatment case consent.", estado y firmas) y **Back** vuelve al diálogo con el pedido intacto. Antes salía a la
    pantalla del consentimiento y se perdía el Start o Complete.
-5. **Prototype controls** arriba de Treatment Plan, como los de Estimate details: elegir un procedimiento del caso (o de
-   Unassigned), fijar su consentimiento (los cinco estados) y *Simulate sending failure*. Es herramienta de demo: antes de
-   pasarlo a los devs hay que sacarla o esconderla detrás de un flag.
+5. ~~Prototype controls~~: sacados el mismo día (ver abajo); las variantes son datos reales.
 6. **Escenarios que no tenían caso**: Night Guard Plan (In progress), Whitening Plan (Cancelled después de aceptar, con
    la columna Consent) y Sealant Plan (Expired antes de aceptar, sin columna). Los cerrados no van a las cards del
    Overview.
@@ -3063,3 +3061,36 @@ de SharePoint es el mismo que pasó adjunto; ese link y el de red.dev piden logi
 login. Lo armado sigue el patrón del documento; conviene ajustarlo con capturas.
 
 **Fuera del prototipo:** en Procedures del Overview, los sueltos no tienen datos de consentimiento y cambian directo.
+
+### Variantes reales, Complete como el HTML y la firma de red.dev (2026-11-02, 3ª vuelta)
+
+Julián, con un video de red.dev (consentimiento del procedimiento, *Patient Signature* y *Provider Signature*):
+
+1. **Sin Prototype controls.** Lo del HTML eran las variantes para ver, no controles de la pantalla: ahora son
+   procedimientos reales. Endodontic Treatment (Accepted), Visit 2: Signed (D3330, derivado), Pending a medio firmar
+   (D2950), Not generated (D2954), Not sent (D2750), Not required (D0230) y Signed (D9910, Start directo). Night Guard
+   Plan (In progress): D1110 cuyo envío **falla** (`envioFalla`). Unassigned: D2330 Not generated, D2331 Not sent, D7210
+   Pending, D4910 Signed y D1206 Not required (no se ven en la tabla; Complete actúa según cada uno).
+2. **Complete como el HTML**: de la fila, del ícono o de la barra va directo al consentimiento. Sale el paso previo
+   *Complete Procedure* (las condiciones vinculadas del Figma 4122:250957): `DialogoCompletar` queda sólo en su story.
+3. **La pantalla del consentimiento, como la de red.dev** con el design system: arriba *Back*, "Procedure Consent - código
+   nombre", el estado y *View PDF*; "Preparing document..." mientras carga; el documento a todo el ancho; abajo, fijos,
+   *Patient Signature* (secundario, izquierda) y *Provider Signature* (primario, derecha). Firmada, cada uno queda como
+   "Patient signed fecha". Las firmas quedan estampadas al pie de la hoja.
+   - **Patient Signature** (drawer): Printed Name e Initials (se completan solas), *Adopt Signature* (el nombre en letra
+     de firma con las iniciales) o *Draw*, la vista previa con *Delete*, el texto legal de red.dev y *Cancel* / *Adopt
+     and Sign*. **Desvío:** el paciente marca primero las cinco afirmaciones en el documento (el template ya dice "must be
+     completed before the patient can sign"); hasta entonces el botón está deshabilitado y lo explica.
+   - **Provider Signature** (drawer): "For security and legal purposes, please re-enter your credentials to sign this
+     document electronically.", Email y Password (con ojo); *Sign* deshabilitado hasta completar. En el mock, cualquier
+     credencial firma.
+   - *Sign now* (Consent required) usa la misma firma con las afirmaciones arriba y *Back* / *Record signature*.
+   - Salen "Send to patient" / "Send again" y los avisos de la pantalla: red.dev no los tiene; se manda desde el flujo.
+4. **Los consentimientos no van uno abajo del otro**: van en el **historial** del bloque del caso (el reloj). El
+   drawer *Consent history* lista primero cada *Procedure Consent* del caso con su estado y sus firmas (los que tienen
+   documento se abren) y después las versiones del consentimiento del caso.
+5. **Tooltip de la columna Consent**, como en red.dev: "Procedure Consent - código nombre" y "Open to present it to the
+   patient for signature" (o, sin documento, lo que pasa). El detalle de la fila nombra el consentimiento igual.
+
+A validar con usuarios: si el provider espera volver a poner la contraseña en cada firma o una vez por sesión; si
+recepción entiende que el paciente marca las afirmaciones en el documento antes de *Patient Signature*.
