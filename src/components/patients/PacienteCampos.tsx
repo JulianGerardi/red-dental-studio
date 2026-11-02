@@ -3,8 +3,9 @@ import { Check } from 'lucide-react'
 import { DrawerSection } from '@/components/ui/drawer'
 import { Pill } from '@/components/ui/pill'
 import { SectionNotice } from '@/components/ui/section-notice'
-import { DateField, OptionCheckbox, SelectField, TextField } from '@/components/patients/form'
+import { DateField, LinkPersonCheckbox, OptionCheckbox, PersonSearchField, SelectField, TextField } from '@/components/patients/form'
 import type { DatosPaciente } from '@/data/patientsStore'
+import type { PersonaSistema } from '@/data/personas'
 
 /* Las tres secciones del formulario de paciente -General, Guardian y Demography-, las mismas en New Patient (tres pasos)
    y en Edit Patient (tres pestañas). Figma 3751:73452 (New) y 5277:123056 (Edit). Decisiones y anomalías en
@@ -101,7 +102,39 @@ function CuentaPortal() {
 /* Figma: en New Patient las dos opciones; en Edit Patient, "Interpreter Required" y la cuenta del portal como estado
    ("Linked"). Si el paciente aún no tiene cuenta, Edit ofrece la misma opción que New. El Figma dibuja Email a todo el
    ancho; acá va en la grilla de a dos, como pide la regla de los drawers (Components / UI / Drawer → Specs → Fields). */
-export function CamposGeneral({ d, cambiar, errores, portalVinculado }: Props & { portalVinculado?: boolean }) {
+/* Sólo New Patient: tomar a alguien que el sistema ya tiene (empleado, contacto, suscriptor) en vez de cargar sus datos.
+   Ver modulos/patients.md, 2026-11-02. */
+export type VinculoPersona = {
+  activo: boolean
+  onActivo: (v: boolean) => void
+  /** Quienes se pueden elegir: las personas del sistema que todavía no son pacientes. */
+  personas: PersonaSistema[]
+  /** El nombre de la elegida, o lo que se está escribiendo. */
+  valor: string
+  onValor: (v: string) => void
+  error?: string
+}
+
+function BuscarPersona({ v }: { v: VinculoPersona }) {
+  const elegida = v.personas.find((p) => p.name === v.valor)
+  return (
+    <div data-campo="persona">
+      <PersonSearchField
+        label="Person" required placeholder="Search by Name or Last Name"
+        personas={v.personas.map((p) => p.name)}
+        value={v.valor} onChange={v.onValor} error={v.error}
+        emptyText="No one in the system matches this name. Untick the option to enter the patient's details."
+        hint={elegida ? "The patient record will use this person's name, birthdate and email." : undefined}
+        lineas={(n) => {
+          const p = v.personas.find((x) => x.name === n)
+          return p && [p.tipo, `DOB: ${p.dob}`, `Email: ${p.email}`]
+        }}
+      />
+    </div>
+  )
+}
+
+export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo }: Props & { portalVinculado?: boolean; vinculo?: VinculoPersona }) {
   return (
     <div className="flex flex-col gap-6">
       {portalVinculado && <CuentaPortal />}
@@ -110,13 +143,16 @@ export function CamposGeneral({ d, cambiar, errores, portalVinculado }: Props & 
         {!portalVinculado && (
           <OptionCheckbox label="Create a patient portal account using this email address" checked={d.portal} onChange={(v) => cambiar('portal', v)} />
         )}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Campo nombre="first"><TextField label="First Name" required placeholder="John" value={d.first} onChange={(v) => cambiar('first', v)} error={errores.first} /></Campo>
-          <Campo nombre="middle"><TextField label="Middle Name" placeholder="Lorem" value={d.middle} onChange={(v) => cambiar('middle', v)} /></Campo>
-          <Campo nombre="last"><TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={(v) => cambiar('last', v)} error={errores.last} /></Campo>
-          <Campo nombre="birthday"><DateField label="Birthdate" required valorInicial={d.birthday} onChange={(v) => cambiar('birthday', v)} error={errores.birthday} /></Campo>
-          <Campo nombre="email"><TextField label="Email" placeholder="john.smith@hotmail.com" value={d.email} onChange={(v) => cambiar('email', v)} error={errores.email} /></Campo>
-        </div>
+        {vinculo && <LinkPersonCheckbox checked={vinculo.activo} onChange={vinculo.onActivo} />}
+        {vinculo?.activo ? <BuscarPersona v={vinculo} /> : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Campo nombre="first"><TextField label="First Name" required placeholder="John" value={d.first} onChange={(v) => cambiar('first', v)} error={errores.first} /></Campo>
+            <Campo nombre="middle"><TextField label="Middle Name" placeholder="Lorem" value={d.middle} onChange={(v) => cambiar('middle', v)} /></Campo>
+            <Campo nombre="last"><TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={(v) => cambiar('last', v)} error={errores.last} /></Campo>
+            <Campo nombre="birthday"><DateField label="Birthdate" required valorInicial={d.birthday} onChange={(v) => cambiar('birthday', v)} error={errores.birthday} /></Campo>
+            <Campo nombre="email"><TextField label="Email" placeholder="john.smith@hotmail.com" value={d.email} onChange={(v) => cambiar('email', v)} error={errores.email} /></Campo>
+          </div>
+        )}
       </DrawerSection>
     </div>
   )
