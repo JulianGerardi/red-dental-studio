@@ -5,7 +5,7 @@ import {
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { ConsentBlock } from '@/components/clinical/ConsentBlock'
-import { useFlujoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
+import { ResumenConsentimiento, useFlujoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
 import { ConsentDetail, EstadoConsentimiento, estadoTrasFirma, hoy, tieneDocumento, type Firmante } from '@/components/clinical/ConsentDetail'
 import {
   ACCION, BLOQUEO_EJECUCION, DialogoBorrar, conColumnaConsent, DialogoCambioEstado, DialogoEditar, ItemsAcciones, TONO_PROCEDIMIENTO,
@@ -14,7 +14,7 @@ import {
 import type { EstadoProcedimiento } from '@/data/clinical-mode'
 import {
   CASOS, NO_ASIGNADOS, CATEGORIAS, DIALOGOS, OPCIONES_BORRAR_CASO, MOVER, SIN_DOCUMENTO,
-  NUEVO_GRUPO, COMPLETAR, ordenFecha,
+  NUEVO_GRUPO, COMPLETAR, MENU_PROCEDIMIENTO, ordenFecha,
   type Caso, type Cita, type EstadoCaso, type Procedimiento, type ClaveDialogo, type Rubrica, type Visita,
 } from '@/data/treatment-plan'
 import { ICONO_SUELTO } from '@/lib/estilos'
@@ -1039,12 +1039,14 @@ export function VistaCaso({
 
 /* ── Sección ──────────────────────────────────────────────────────── */
 
-export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimientoInicial }: {
+export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimientoInicial, accionInicial }: {
   casoInicial?: string
   /** Entra directo a Estimate details del caso (el Total amount de la card del Overview). */
   estimadoInicial?: boolean
   /** Entra directo al consentimiento de ese procedimiento del caso (la columna Consent de Procedures). */
   consentimientoInicial?: string
+  /** Llegó por Sign now desde Procedures: con las firmas se confirma este Start o Complete. */
+  accionInicial?: 'Start' | 'Complete'
 }) {
   /* Se entra por Unassigned, como el frame por defecto (4118:220406), salvo que se llegue desde una card del Overview. */
   const [vista, setVista] = useState<'unassigned' | 'caso' | 'estimado' | 'consentimiento'>(
@@ -1052,6 +1054,11 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
   )
   const [casoId, setCasoId] = useState(casoInicial ?? CASOS[0].id)
   const [consentId, setConsentId] = useState(consentimientoInicial)
+  /* Sign now: el cambio pedido espera a que se firme. `cola` son los consentimientos que faltan firmar (el primero es el
+     que está abierto); con todos firmados, `firmado` pide confirmar el cambio. */
+  const [pendiente, setPendiente] = useState<{ verbo: 'Start' | 'Complete'; ids: string[]; cola: string[]; suelto: boolean; firmado?: boolean } | null>(
+    () => (accionInicial && consentimientoInicial ? { verbo: accionInicial, ids: [consentimientoInicial], cola: [consentimientoInicial], suelto: false } : null),
+  )
   const [dialogo, setDialogo] = useState<ClaveDialogo | 'delete' | null>(null)
   const [mover, setMover] = useState(false)
   const [grupo, setGrupo] = useState(false)
@@ -1126,7 +1133,10 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
   const ir = (d: DestinoClinico) => {
     if (d.pestana === 'Treatment Plan') {
       if (d.caso) setCasoId(d.caso)
-      if (d.consentimiento) abrirConsentimiento(d.consentimiento)
+      if (d.consentimiento) {
+        if (d.accion) setPendiente({ verbo: d.accion, ids: [d.consentimiento], cola: [d.consentimiento], suelto: false })
+        abrirConsentimiento(d.consentimiento)
+      }
       else if (d.caso) setVista('caso')
     }
     else if (fuera) fuera(d)
@@ -1175,11 +1185,12 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
   const flujo = useFlujoConsentimiento({
     onAplicar: (ids, verbo, { enviar, nota }) => aplicarEstado(ids, verbo === 'Start' ? 'In progress' : 'Completed', { enviar, nota }),
     onGenerar: (ids) => mapear(ids, (p) => ({ ...p, consentimiento: 'Not sent' })),
-    onFirmar: (ids, rubrica) => mapear(ids, (p) => ({
-      ...p, consentimiento: 'Signed',
-      firmas: { Patient: p.firmas?.Patient ?? hoy(), Provider: p.firmas?.Provider ?? hoy() },
-      rubricas: { ...p.rubricas, Patient: rubrica },
-    })),
+    /* Sign now: al detalle del consentimiento, donde se firma; el cambio se confirma con las firmas. */
+    onFirmar: (ids, verbo) => {
+      if (ids.length === 0) return
+      setPendiente({ verbo, ids: [...ids], cola: ids, suelto: sueltos.some((p) => p.id === ids[0]) })
+      abrirConsentimiento(ids[0]!)
+    },
   })
   const pedirEjecutar = (ids: string[], verbo: 'Start' | 'Complete', suelto = false) =>
     flujo.pedir(verbo, (suelto ? sueltos : delCaso).filter((p) => ids.includes(p.id)), suelto ? undefined : caso.nombre)
@@ -1223,7 +1234,22 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
     const firmas = { ...p?.firmas, [rol]: hoy() }
     const completo = !!(firmas.Patient && firmas.Provider)
     mapear([id], (x) => ({ ...x, firmas, consentimiento: estadoTrasFirma(firmas), rubricas: { ...x.rubricas, [rol]: rubrica } }))
+    if (completo && pendiente?.cola.includes(id)) {
+      const resto = pendiente.cola.filter((x) => x !== id)
+      if (resto.length) {
+        setPendiente({ ...pendiente, cola: resto })
+        setConsentId(resto[0])
+        return aviso.ok(`${p?.codigo} signed. Next: ${buscar(resto[0]!)?.codigo}.`)
+      }
+      return setPendiente({ ...pendiente, cola: [], firmado: true })
+    }
     aviso.ok(completo ? 'Procedure consent signed. The procedure has not changed.' : `Consent signed as ${rol.toLowerCase()}.`)
+  }
+  /* Back del consentimiento: si venía de Sign now, el procedimiento queda como estaba. */
+  const volverDeConsentimiento = (suelto: boolean) => {
+    if (pendiente) aviso.info('The procedure has not changed. Its consent keeps what was signed.')
+    setPendiente(null)
+    setVista(suelto ? 'unassigned' : 'caso')
   }
 
 
@@ -1245,7 +1271,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
   const alternarFavorito = (id: string) =>
     setFavoritos((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]))
 
-  const enConsentimiento = vista === 'consentimiento' ? delCaso.find((p) => p.id === consentId) : undefined
+  const enConsentimiento = vista === 'consentimiento' ? buscar(consentId ?? '') : undefined
 
   return (
     <NavegacionClinica.Provider value={ir}>
@@ -1254,7 +1280,8 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
       <ConsentDetail
         key={enConsentimiento.id}
         procedimiento={enConsentimiento}
-        onVolver={() => setVista(caso.visitas.some((v) => v.procedimientos.some((p) => p.id === enConsentimiento.id)) ? 'caso' : 'unassigned')}
+        pendiente={pendiente && !pendiente.firmado ? { verbo: pendiente.verbo, restantes: pendiente.cola.length - 1 } : undefined}
+        onVolver={() => volverDeConsentimiento(sueltos.some((p) => p.id === enConsentimiento.id))}
         onFirmar={(rol, r) => firmar(enConsentimiento.id, rol, r)}
       />
     ) : vista === 'estimado' ? (
@@ -1417,6 +1444,22 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
       )}
       {drawer}
     </div>
+    )}
+    {pendiente?.firmado && (
+      <ConfirmDialog
+        title={MENU_PROCEDIMIENTO.firmado.titulo}
+        cancelLabel="Cancel clinical change"
+        confirmLabel={`Confirm ${pendiente.verbo}`}
+        onCancel={() => { setPendiente(null); setVista(pendiente.suelto ? 'unassigned' : 'caso'); aviso.info('Procedure consent signed. The procedure has not changed.') }}
+        onConfirm={() => {
+          aplicarEstado(pendiente.ids, pendiente.verbo === 'Start' ? 'In progress' : 'Completed', { nota: ' Consent signed.' })
+          setPendiente(null)
+          setVista(pendiente.suelto ? 'unassigned' : 'caso')
+        }}
+      >
+        <p>{MENU_PROCEDIMIENTO.firmado.texto}</p>
+        <ResumenConsentimiento procedimientos={pendiente.ids.map(buscar).filter((p): p is Procedimiento => !!p)} caso={pendiente.suelto ? undefined : caso.nombre} />
+      </ConfirmDialog>
     )}
     </NavegacionClinica.Provider>
   )

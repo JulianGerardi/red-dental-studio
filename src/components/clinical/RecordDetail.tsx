@@ -38,7 +38,8 @@ export const TONO_DERIVACION: Record<EstadoDerivacion, PillTone> = {
 /* Adónde lleva un link del detalle: una pestaña de Clinical Mode y, para Treatment Plan, el caso. ClinicalMode lo
    provee; sin provider (Storybook) el link avisa adónde iría. */
 /** `consentimiento`: el procedimiento del caso cuyo consentimiento se abre (Treatment Plan). */
-export type DestinoClinico = { pestana: Pestana; caso?: string; consentimiento?: string }
+/* `accion`: Sign now de Procedures; con las firmas, Treatment Plan confirma ese Start o Complete. */
+export type DestinoClinico = { pestana: Pestana; caso?: string; consentimiento?: string; accion?: 'Start' | 'Complete' }
 export const NavegacionClinica = createContext<((d: DestinoClinico) => void) | null>(null)
 
 export function useIr() {

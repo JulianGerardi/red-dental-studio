@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { ArrowLeft, CircleCheck, Eye, EyeOff, File, FileCheck2, FileClock, FileMinus2, FileText, LoaderCircle, PenLine, type LucideIcon } from 'lucide-react'
+import { ArrowLeft, CircleCheck, Eye, EyeOff, File, FileCheck2, FileClock, FileMinus2, FileText, LoaderCircle, Lock, PenLine, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Drawer, DrawerActions, DrawerSection } from '@/components/ui/drawer'
+import { Alert } from '@/components/ui/alert'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Drawer } from '@/components/ui/drawer'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { Tabs } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { FieldLabel, TextField, control } from '@/components/patients/form'
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
-import { AVISO_RECONOCIMIENTOS, ConsentDocument, RECONOCIMIENTOS_PACIENTE } from '@/components/settings/ConsentDocument'
+import { ConsentDocument, RECONOCIMIENTOS_PACIENTE } from '@/components/settings/ConsentDocument'
 import {
   DOCUMENTO_CONSENTIMIENTO, PACIENTE, SIN_DOCUMENTO,
   type ConsentProcedimiento, type FirmasConsentimiento, type Procedimiento, type Rubrica,
@@ -93,8 +94,10 @@ export function estadoTrasFirma(firmas: FirmasConsentimiento): ConsentProcedimie
 /* El consentimiento de un procedimiento, como en red.dev: arriba Back, el título y View PDF; el documento a todo el ancho
    (con las afirmaciones que marca el paciente y las firmas estampadas al pie); abajo, Patient Signature y Provider
    Signature. Ver clinical-mode.md (2026-11-02). */
-export function ConsentDetail({ procedimiento: p, onVolver, onFirmar }: {
+export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar }: {
   procedimiento: Procedimiento
+  /** Llegó desde Consent required (Sign now): con las firmas se confirma el Start o Complete que se pidió. */
+  pendiente?: { verbo: 'Start' | 'Complete'; restantes: number }
   onVolver: () => void
   onFirmar: (rol: Firmante, rubrica: Rubrica) => void
 }) {
@@ -124,6 +127,13 @@ export function ConsentDetail({ procedimiento: p, onVolver, onFirmar }: {
           <FileText /> View PDF
         </Button>
       </div>
+
+      {pendiente && (
+        <Alert tone="info" title={`Sign to ${pendiente.verbo.toLowerCase()} this procedure`}>
+          Collect both signatures below, then confirm the {pendiente.verbo}. Back leaves the procedure as it was.
+          {pendiente.restantes > 0 && ` ${pendiente.restantes} more consent${pendiente.restantes > 1 ? 's' : ''} to sign after this one.`}
+        </Alert>
+      )}
 
       {/* La hoja a todo el ancho, sobre el escritorio gris como el preview de Consent Templates. */}
       <div className="rounded-lg bg-surface-muted p-3 sm:p-6">
@@ -174,7 +184,7 @@ export function ConsentDetail({ procedimiento: p, onVolver, onFirmar }: {
       </div>
 
       {firmando === 'Patient' && (
-        <FirmaPaciente nombre={PACIENTE} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Patient', r); setFirmando(null) }} />
+        <FirmaPaciente nombre={PACIENTE} descripcion={`Procedure Consent - ${p.codigo} ${p.nombre}`} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Patient', r); setFirmando(null) }} />
       )}
       {firmando === 'Provider' && (
         <FirmaProveedor nombre={p.proveedor} onClose={() => setFirmando(null)} onFirmar={(r) => { onFirmar('Provider', r); setFirmando(null) }} />
@@ -196,18 +206,44 @@ function Firmado({ rol, fecha }: { rol: Firmante; fecha: string }) {
 const iniciales = (nombre: string) => nombre.split(/\s+/).filter(Boolean).map((x) => x[0]!.toUpperCase()).join('').slice(0, 3)
 const LEGAL = 'By selecting Adopt and Sign, I agree that the signature and initials are the electronic representation of my signature and initials for all purposes when I (or my agent) use them in documents, including legally binding contracts.'
 
-/* Patient Signature, como en red.dev: nombre impreso e iniciales, la firma adoptada (el nombre en letra de firma) o
-   dibujada, la vista previa y el texto legal. Sign now la usa para revisar y firmar (con las afirmaciones arriba). */
-export function FirmaPaciente({ nombre, titulo = 'Patient Signature', descripcion, resumen, conReconocimientos, cancelar = 'Cancel', guardar = 'Adopt and Sign', onClose, onFirmar }: {
-  nombre: string
-  titulo?: string
+/* Las firmas se hacen en un pop up: en red.dev el botón lleva a un portal para firmar, acá es una ventana encima del
+   consentimiento (no un drawer). Ver clinical-mode.md (2026-11-02). */
+function VentanaFirma({ titulo, descripcion, cancelar = 'Cancel', guardar, guardarDeshabilitado, onClose, onGuardar, children }: {
+  titulo: string
   descripcion?: string
-  /** Qué se firma, arriba de todo. */
-  resumen?: ReactNode
-  /** Las cinco afirmaciones en el drawer (Sign now: no se pasa por el documento). */
-  conReconocimientos?: boolean
   cancelar?: string
-  guardar?: string
+  guardar: string
+  guardarDeshabilitado?: boolean
+  onClose: () => void
+  onGuardar: () => void
+  children: ReactNode
+}) {
+  return (
+    <Dialog open onOpenChange={(o) => { if (!o) onClose() }}>
+      <DialogContent showCloseButton={false} className="flex max-h-[92vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[600px]">
+        <div className="flex items-center gap-1.5 border-b border-line bg-surface-muted px-5 py-2 text-[11.5px] font-medium text-ink-muted">
+          <Lock className="size-3.5" aria-hidden /> Secure signing portal
+        </div>
+        <DialogHeader className="gap-1 px-5 pt-4">
+          <DialogTitle className="text-[16px] leading-snug font-bold text-ink">{titulo}</DialogTitle>
+          {descripcion && <DialogDescription className="text-[13px] text-ink-muted">{descripcion}</DialogDescription>}
+        </DialogHeader>
+        <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
+        <div className="flex gap-3 border-t border-line px-5 py-3">
+          <Button variant="secondary" size="lg" className="flex-1" onClick={onClose}>{cancelar}</Button>
+          <Button size="lg" className="flex-1" disabled={guardarDeshabilitado} onClick={onGuardar}>{guardar}</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+/* Patient Signature, como en red.dev: nombre impreso e iniciales, la firma adoptada (el nombre en letra de firma) o
+   dibujada, la vista previa y el texto legal. */
+export function FirmaPaciente({ nombre, descripcion, onClose, onFirmar }: {
+  nombre: string
+  /** Qué se firma. */
+  descripcion?: string
   onClose: () => void
   onFirmar: (rubrica: Rubrica) => void
 }) {
@@ -217,49 +253,23 @@ export function FirmaPaciente({ nombre, titulo = 'Patient Signature', descripcio
   const [modo, setModo] = useState<'Adopt Signature' | 'Draw'>('Adopt Signature')
   const [dibujada, setDibujada] = useState<string | null>(null)
   const [pad, setPad] = useState(0)
-  const [marcadas, setMarcadas] = useState<string[]>([])
-  const reconocido = !conReconocimientos || marcadas.length === RECONOCIMIENTOS_PACIENTE.length
   const firmada = modo === 'Draw' ? !!dibujada : impreso.trim().length > 1
-  const falta = !reconocido ? 'Check every statement to continue.' : !impreso.trim() ? 'Type the printed name to continue.' : !firmada ? 'Draw the signature to continue.' : ''
+  const falta = !impreso.trim() ? 'Type the printed name to continue.' : !firmada ? 'Draw the signature to continue.' : ''
   const borrar = () => {
     if (modo === 'Draw') { setDibujada(null); setPad((n) => n + 1) }
     else { setImpreso(''); setIni(''); setIniTocadas(false) }
   }
 
   return (
-    <Drawer
-      open
+    <VentanaFirma
+      titulo="Patient Signature"
+      descripcion={descripcion}
+      guardar="Adopt and Sign"
+      guardarDeshabilitado={!!falta}
       onClose={onClose}
-      title={titulo}
-      description={descripcion}
-      footer={(
-        <DrawerActions
-          onCancel={onClose}
-          onSave={() => onFirmar({ ...(modo === 'Draw' ? { imagen: dibujada ?? undefined } : { texto: impreso.trim() }), iniciales: ini.trim() || undefined })}
-          cancelLabel={cancelar}
-          saveLabel={guardar}
-          saveDisabled={!!falta}
-        />
-      )}
+      onGuardar={() => onFirmar({ ...(modo === 'Draw' ? { imagen: dibujada ?? undefined } : { texto: impreso.trim() }), iniciales: ini.trim() || undefined })}
     >
-      <div className="flex flex-col gap-6">
-        {resumen}
-        {conReconocimientos && (
-          <DrawerSection title="Acknowledgment" description={AVISO_RECONOCIMIENTOS}>
-            <ul className="flex flex-col gap-3">
-              {RECONOCIMIENTOS_PACIENTE.map((r) => {
-                const on = marcadas.includes(r)
-                const cambiar = (v: boolean) => setMarcadas((m) => (v ? [...m, r] : m.filter((x) => x !== r)))
-                return (
-                  <li key={r} className="flex items-start gap-2.5">
-                    <Checkbox on={on} onChange={cambiar} label={r} className="mt-0.5" />
-                    <span onClick={() => cambiar(!on)} className="cursor-pointer text-[13px] leading-snug text-ink">{r}</span>
-                  </li>
-                )
-              })}
-            </ul>
-          </DrawerSection>
-        )}
+      <div className="flex flex-col gap-5">
         <div className="grid grid-cols-2 gap-4">
           <TextField label="Printed Name" value={impreso} onChange={(v) => { setImpreso(v); if (!iniTocadas) setIni(iniciales(v)) }} />
           <TextField label="Initials" value={ini} onChange={(v) => { setIni(v.toUpperCase().slice(0, 4)); setIniTocadas(true) }} />
@@ -287,7 +297,7 @@ export function FirmaPaciente({ nombre, titulo = 'Patient Signature', descripcio
         <p className="text-[12px] leading-relaxed text-ink-muted">{LEGAL}</p>
         {falta && <p role="status" className="text-[12px] text-ink-muted">{falta}</p>}
       </div>
-    </Drawer>
+    </VentanaFirma>
   )
 }
 
@@ -298,12 +308,13 @@ export function FirmaProveedor({ nombre, onClose, onFirmar }: { nombre: string; 
   const [ver, setVer] = useState(false)
   const listo = /\S+@\S+\.\S+/.test(email) && clave.length > 0
   return (
-    <Drawer
-      open
+    <VentanaFirma
+      titulo="Provider Signature"
+      descripcion="For security and legal purposes, please re-enter your credentials to sign this document electronically."
+      guardar="Sign"
+      guardarDeshabilitado={!listo}
       onClose={onClose}
-      title="Provider Signature"
-      description="For security and legal purposes, please re-enter your credentials to sign this document electronically."
-      footer={<DrawerActions onCancel={onClose} onSave={() => onFirmar({ texto: nombre })} saveLabel="Sign" saveDisabled={!listo} />}
+      onGuardar={() => onFirmar({ texto: nombre })}
     >
       <div className="grid grid-cols-2 gap-4">
         <TextField label="Email" value={email} onChange={setEmail} placeholder="example@example.com" />
@@ -329,7 +340,7 @@ export function FirmaProveedor({ nombre, onClose, onFirmar }: { nombre: string; 
           </span>
         </label>
       </div>
-    </Drawer>
+    </VentanaFirma>
   )
 }
 

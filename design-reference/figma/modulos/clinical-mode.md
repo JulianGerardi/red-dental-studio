@@ -3094,3 +3094,28 @@ Julián, con un video de red.dev (consentimiento del procedimiento, *Patient Sig
 
 A validar con usuarios: si el provider espera volver a poner la contraseña en cada firma o una vez por sesión; si
 recepción entiende que el paciente marca las afirmaciones en el documento antes de *Patient Signature*.
+
+## CON-4052: Sign now lleva al consentimiento, firma en pop up e historial único (4ª vuelta, 2026-11-02)
+
+Pedido de Julián tras ver la 3ª vuelta. Jira: CON-4052 (con CON-2980 para el paso a Accepted).
+
+1. **Sign now ya no abre un drawer**: genera el documento si no había y lleva a la pantalla del consentimiento del
+   procedimiento (`ConsentDetail`). Arriba, un `Alert` dice "Sign to start/complete this procedure": con las dos firmas
+   aparece *Consent signed* (Cancel clinical change / Confirm Start|Complete) y recién ahí cambia el procedimiento. Back
+   deja el procedimiento como estaba (el consentimiento conserva lo firmado). Si el pedido era de varios, se firman de a
+   uno y al terminar el último se confirma el cambio de todos (`pendiente.cola` en `TreatmentPlanSection`).
+   Desde Procedures (`ProblemList`), Sign now cambia a la pestaña Treatment Plan con `DestinoClinico.accion`; el cambio se
+   confirma ahí, en el procedimiento del caso (las dos listas del mock tienen estado propio: Procedures no se actualiza).
+2. **Firmar abre un pop up** (`ui/dialog`), no un drawer: en red.dev esos botones llevan a un portal de firma, así que
+   la ventana lleva la cinta "Secure signing portal". Es una excepción deliberada a "pop ups = drawer" porque representa
+   otra página. Mismo contenido que antes (Patient Signature: Printed Name, Initials, Adopt Signature / Draw, preview,
+   texto legal; Provider Signature: email y contraseña de nuevo); pie con dos botones del mismo ancho. El drawer de
+   "Review and sign consent" con las cinco afirmaciones desapareció: las afirmaciones se marcan en el documento.
+3. **Historial único** (el reloj): una sola línea de tiempo con el consentimiento del caso y el de cada procedimiento,
+   lo más nuevo arriba; lo que espera una firma no tiene fecha y va primero (punto ámbar). Cada ítem dice el evento, el
+   documento ("Case consent v3" o "Procedure Consent - D2950 …", este último abre su pantalla) y fecha. No son el mismo
+   documento (el del caso se firma para aceptar el plan; el del procedimiento, para actuar sobre él), por eso se integran
+   en vez de sacar uno. El bloque de la pantalla sigue mostrando sólo el último consentimiento del caso.
+
+**Para validar con usuarios:** si el pop up de firma en el consultorio se entiende como "portal" (¿se espera que el
+paciente firme en otra pantalla/tablet?), y si el historial mezclado se lee bien o conviene un filtro Case / Procedure.

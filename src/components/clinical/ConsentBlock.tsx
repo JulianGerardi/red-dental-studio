@@ -1,11 +1,11 @@
-import { Drawer, DrawerSection } from '@/components/ui/drawer'
-import { EstadoConsentimiento, tieneDocumento } from '@/components/clinical/ConsentDetail'
+import { Drawer } from '@/components/ui/drawer'
+import { tieneDocumento } from '@/components/clinical/ConsentDetail'
 import { useState } from 'react'
 import { CircleCheck, CircleAlert, Download, FileSignature, FileText, History, MoreVertical, PenLine, RefreshCw, Send, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
-import { CONSENTIMIENTO, SIN_DOCUMENTO, type Firma, type Procedimiento } from '@/data/treatment-plan'
-import { ICONO_SUELTO, TARJETA_INTERNA } from '@/lib/estilos'
+import { CONSENTIMIENTO, type Firma, type Procedimiento } from '@/data/treatment-plan'
+import { ICONO_SUELTO } from '@/lib/estilos'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 /* Figma 4122:250449, rediseñado: una sola fila con el documento, su estado y las dos firmas. Ver clinical-mode.md. */
@@ -33,55 +33,59 @@ export function FilaFirma({ f }: { f: Firma }) {
   )
 }
 
-/* El historial (el reloj del bloque): todos los consentimientos del caso juntos, no uno abajo del otro en la pantalla.
-   Primero los de cada procedimiento, que se abren para firmarlos; después las versiones del consentimiento del caso.
-   Ver clinical-mode.md (2026-11-02). */
+/* El historial (el reloj del bloque): una sola línea de tiempo con el consentimiento del caso y los de cada procedimiento,
+   lo más nuevo arriba. Lo que está esperando una firma no tiene fecha y va primero. El bloque de la pantalla muestra sólo
+   el último consentimiento del caso. Ver clinical-mode.md (2026-11-02). */
+type Entrada = { id: string; fecha?: string; evento: string; documento: string; detalle?: string; abrir?: () => void }
+
+const tiempo = (f?: string) => (f ? new Date(f).getTime() : Infinity)
+
+function entradasDe(procedimientos: Pick<Procedimiento, 'id' | 'codigo' | 'nombre' | 'consentimiento' | 'firmas'>[], abrir?: (id: string) => void): Entrada[] {
+  const casos: Entrada[] = CONSENTIMIENTO.historial.map((h) => ({
+    id: h.id, fecha: h.fecha, evento: h.evento, documento: `Case consent ${h.version}`, detalle: h.autor,
+  }))
+  const procs = procedimientos.flatMap((p) => {
+    if (!tieneDocumento(p.consentimiento)) return []
+    const documento = `Procedure Consent - ${p.codigo} ${p.nombre}`
+    const abrirP = abrir && (() => abrir(p.id))
+    const firmas = p.firmas ?? {}
+    const faltan = (['Patient', 'Provider'] as const).filter((r) => !firmas[r])
+    const es: Entrada[] = []
+    if (faltan.length) {
+      es.push({
+        id: `${p.id}-espera`, evento: faltan.length === 2 ? 'Not signed yet' : `Awaiting ${faltan[0]!.toLowerCase()} signature`,
+        documento, detalle: p.consentimiento === 'Not sent' ? 'Not sent to the patient' : 'Sent to the patient', abrir: abrirP,
+      })
+    }
+    ;(['Provider', 'Patient'] as const).forEach((r) => {
+      if (firmas[r]) es.push({ id: `${p.id}-${r}`, fecha: firmas[r], evento: `Signed by ${r.toLowerCase()}`, documento, abrir: abrirP })
+    })
+    return es
+  })
+  return [...procs, ...casos].sort((a, b) => tiempo(b.fecha) - tiempo(a.fecha))
+}
+
 export function PanelHistorial({ onClose, procedimientos = [], onAbrirProcedimiento }: {
   onClose: () => void
   procedimientos?: Pick<Procedimiento, 'id' | 'codigo' | 'nombre' | 'consentimiento' | 'firmas'>[]
   onAbrirProcedimiento?: (id: string) => void
 }) {
-  const conConsentimiento = procedimientos.filter((p) => p.consentimiento)
+  const entradas = entradasDe(procedimientos, onAbrirProcedimiento)
   return (
-    <Drawer open onClose={onClose} title="Consent history" description={CONSENTIMIENTO.titulo}>
-      {conConsentimiento.length > 0 && (
-        <DrawerSection title="Procedure consents" description="The specific consent of each procedure in this case." className="mb-6">
-          <ul className="flex flex-col gap-2">
-            {conConsentimiento.map((p) => {
-              const abrir = tieneDocumento(p.consentimiento) && onAbrirProcedimiento ? () => onAbrirProcedimiento(p.id) : undefined
-              return (
-                <li key={p.id} className={cn(TARJETA_INTERNA, 'flex items-center gap-3 px-3 py-2.5')}>
-                  <span className="min-w-0 flex-1">
-                    {abrir ? (
-                      <button type="button" onClick={abrir} className="text-dash-blue block text-left text-[13px] font-semibold hover:underline">
-                        Procedure Consent - {p.codigo} {p.nombre}
-                      </button>
-                    ) : <span className="block text-[13px] font-semibold text-ink">Procedure Consent - {p.codigo} {p.nombre}</span>}
-                    <span className="block text-[12px] text-ink-muted">
-                      {[p.firmas?.Patient && `Patient signed ${p.firmas.Patient}`, p.firmas?.Provider && `Provider signed ${p.firmas.Provider}`].filter(Boolean).join(' · ')
-                        || (p.consentimiento && SIN_DOCUMENTO[p.consentimiento]) || 'No signatures yet'}
-                    </span>
-                  </span>
-                  <EstadoConsentimiento estado={p.consentimiento!} />
-                </li>
-              )
-            })}
-          </ul>
-        </DrawerSection>
-      )}
-      <h3 className="text-[13px] font-bold text-ink">Case consent</h3>
-      <ol className="flex flex-col pt-3">
-        {CONSENTIMIENTO.historial.map((h, i, todos) => (
+    <Drawer open onClose={onClose} title="Consent history" description="The case consent and each procedure consent, newest first.">
+      <ol className="flex flex-col">
+        {entradas.map((h, i, todas) => (
           <li key={h.id} className="flex gap-3">
             <span className="flex flex-col items-center">
-              <span className={cn('mt-1 size-2 shrink-0 rounded-full', i === 0 ? 'bg-dash-blue' : 'bg-line-strong')} />
-              {i < todos.length - 1 && <span className="w-px flex-1 bg-line" />}
+              <span className={cn('mt-1 size-2 shrink-0 rounded-full', h.fecha ? (i === 0 ? 'bg-dash-blue' : 'bg-line-strong') : 'bg-warn-fg')} />
+              {i < todas.length - 1 && <span className="w-px flex-1 bg-line" />}
             </span>
             <span className="min-w-0 flex-1 pb-5">
               <span className="block text-[13px] font-semibold text-ink">{h.evento}</span>
-              <span className="block text-[12px] text-ink-muted">
-                {h.version} · {h.fecha} · {h.autor}
-              </span>
+              {h.abrir ? (
+                <button type="button" onClick={h.abrir} className="text-dash-blue block text-left text-[12.5px] font-medium hover:underline">{h.documento}</button>
+              ) : <span className="block text-[12.5px] font-medium text-ink-soft">{h.documento}</span>}
+              <span className="block text-[12px] text-ink-muted">{[h.fecha, h.detalle].filter(Boolean).join(' · ')}</span>
             </span>
           </li>
         ))}

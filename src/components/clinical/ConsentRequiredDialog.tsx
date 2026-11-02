@@ -3,7 +3,7 @@ import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Alert } from '@/components/ui/alert'
-import { FirmaPaciente, VistaConsentimiento } from '@/components/clinical/ConsentDetail'
+import { VistaConsentimiento } from '@/components/clinical/ConsentDetail'
 import { useState } from 'react'
 import { CONSENTIMIENTO_REQUERIDO as TEXTOS, MENU_PROCEDIMIENTO, PACIENTE, type ConsentProcedimiento, type FirmasConsentimiento, type Rubrica } from '@/data/treatment-plan'
 
@@ -112,19 +112,19 @@ const sinDocumento = (c?: ConsentProcedimiento) => c === 'Not generated'
 /** Start y Complete de un procedimiento, como en el prototipo de CON-4052 (con caso o suelto): firmado o sin template
     se aplica directo; si falta, Consent required. Send consent and sign later genera el documento si no había y lo
     manda; si el envío falla, el procedimiento no cambia y el diálogo lo dice (se reintenta con el mismo documento).
-    Sign now genera el documento, abre la revisión y firma (Back vuelve al diálogo) y, firmado, pide confirmar: Cancel
-    clinical change deja el procedimiento como estaba, con el consentimiento firmado. View consent abre el documento y
-    Back vuelve al diálogo. */
+    Sign now genera el documento y lleva al detalle del consentimiento (no abre un drawer): ahí se firma en el pop up
+    del portal y, con las firmas, quien llama pide confirmar el cambio. View consent abre el documento y Back vuelve al
+    diálogo. */
 export function useFlujoConsentimiento({ onAplicar, onGenerar, onFirmar }: {
   onAplicar: (ids: string[], verbo: 'Start' | 'Complete', como: ComoSeAplica) => void
   /** Genera el documento de los que no tenían (Not generated → Not sent); el procedimiento no cambia. */
   onGenerar: (ids: string[]) => void
-  /** Registra todas las firmas requeridas (genera el documento si no había); el procedimiento no cambia. */
-  onFirmar: (ids: string[], rubrica: Rubrica) => void
+  /** Sign now: ya se generó el documento; lleva al detalle del consentimiento de estos (los que piden firma). */
+  onFirmar: (ids: string[], verbo: 'Start' | 'Complete') => void
 }) {
   type Pedido = {
     verbo: 'Start' | 'Complete'; procs: ProcedimientoConConsentimiento[]; caso?: string; tipo: TipoConsentimiento
-    paso: 'pregunta' | 'firma' | 'firmado' | 'documento'; error?: string
+    paso: 'pregunta' | 'documento'; error?: string
   }
   const [pedido, setPedido] = useState<Pedido | null>(null)
   const ids = pedido?.procs.map((p) => p.id) ?? []
@@ -143,7 +143,6 @@ export function useFlujoConsentimiento({ onAplicar, onGenerar, onFirmar }: {
     setPedido({ verbo, procs, caso, tipo, paso: 'pregunta' })
   }
 
-  const resumen = pedido && <ResumenConsentimiento procedimientos={pedido.procs} caso={pedido.caso} />
   let elemento: React.ReactNode = null
   if (pedido?.paso === 'pregunta') {
     elemento = (
@@ -153,7 +152,11 @@ export function useFlujoConsentimiento({ onAplicar, onGenerar, onFirmar }: {
         caso={pedido.caso}
         error={pedido.error}
         onCancel={cerrar}
-        onSignNow={() => setPedido({ ...generar(pedido), paso: 'firma', error: undefined })}
+        onSignNow={() => {
+          const { procs } = generar(pedido)
+          cerrar()
+          onFirmar(procs.filter((p) => consentimientoRequerido([p.consentimiento])).map((p) => p.id), pedido.verbo)
+        }}
         onViewConsent={() => setPedido({ ...pedido, paso: 'documento' })}
         onContinue={() => {
           if (pedido.tipo === 'pendiente') return aplicar({ nota: ' Consent signature pending.' })
@@ -164,33 +167,6 @@ export function useFlujoConsentimiento({ onAplicar, onGenerar, onFirmar }: {
     )
   } else if (pedido?.paso === 'documento') {
     elemento = <VistaConsentimiento procedimiento={pedido.procs[0]!} cerrar="Back" onClose={() => setPedido({ ...pedido, paso: 'pregunta' })} />
-  } else if (pedido?.paso === 'firma') {
-    elemento = (
-      <FirmaPaciente
-        nombre={PACIENTE}
-        titulo={MENU_PROCEDIMIENTO.revisar.titulo}
-        descripcion={MENU_PROCEDIMIENTO.revisar.texto}
-        resumen={resumen}
-        conReconocimientos
-        cancelar="Back"
-        guardar="Record signature"
-        onClose={() => setPedido({ ...pedido, paso: 'pregunta' })}
-        onFirmar={(r) => { onFirmar(ids, r); setPedido({ ...pedido, paso: 'firmado' }) }}
-      />
-    )
-  } else if (pedido?.paso === 'firmado') {
-    elemento = (
-      <ConfirmDialog
-        title={MENU_PROCEDIMIENTO.firmado.titulo}
-        cancelLabel="Cancel clinical change"
-        confirmLabel={`Confirm ${pedido.verbo}`}
-        onCancel={() => { cerrar(); aviso.info('Procedure consent signed. The procedure has not changed.') }}
-        onConfirm={() => aplicar({ nota: ' Consent signed.' })}
-      >
-        <p>{MENU_PROCEDIMIENTO.firmado.texto}</p>
-        {resumen}
-      </ConfirmDialog>
-    )
   }
   return { pedir, elemento }
 }

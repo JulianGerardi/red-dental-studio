@@ -121,10 +121,11 @@ export function ProblemList({ procedimientoInicial }: {
       }
       cambiar(fila, verbo === 'Start' ? 'In progress' : 'Completed', nota)
     },
-    onFirmar: ([id]) => {
+    /* Sign now: lleva al consentimiento en Treatment Plan; las firmas y la confirmación del cambio se hacen ahí. */
+    onFirmar: ([id], verbo) => {
       const fila = procedimientos.find((p) => p.id === id)
-      const procCaso = fila && tratamientoDe(fila, consentimientos)?.procCaso
-      if (procCaso) setConsentimientos((c) => ({ ...c, [procCaso.id]: 'Signed' }))
+      const tr = fila && tratamientoDe(fila, consentimientos)
+      if (tr?.procCaso) ir({ pestana: 'Treatment Plan', caso: tr.caso.id, consentimiento: tr.procCaso.id, accion: verbo })
     },
     onGenerar: ([id]) => {
       const fila = procedimientos.find((p) => p.id === id)

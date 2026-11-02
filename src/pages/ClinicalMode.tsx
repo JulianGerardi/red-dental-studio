@@ -56,10 +56,12 @@ export default function ClinicalMode() {
   const [estimadoAbierto, setEstimadoAbierto] = useState(false)
   /* Desde la columna Consent de Procedures: el caso abre en el consentimiento de ese procedimiento. */
   const [consentimientoAbierto, setConsentimientoAbierto] = useState<string | undefined>(consentimientoPedido)
+  /* Con Sign now de Procedures, el Start o Complete que espera las firmas. */
+  const [accionPendiente, setAccionPendiente] = useState<'Start' | 'Complete' | undefined>()
 
-  const irA = (p: Pestana) => { setPestana(p); setEnOverview(false); setEstimadoAbierto(false); setConsentimientoAbierto(undefined) }
+  const irA = (p: Pestana) => { setPestana(p); setEnOverview(false); setEstimadoAbierto(false); setConsentimientoAbierto(undefined); setAccionPendiente(undefined) }
   /* Los links del detalle de la Problem List: la pestaña y, para Treatment Plan, el caso. */
-  const ir = ({ pestana: p, caso, consentimiento }: DestinoClinico) => { if (caso) setCasoAbierto(caso); irA(p); setConsentimientoAbierto(consentimiento) }
+  const ir = ({ pestana: p, caso, consentimiento, accion }: DestinoClinico) => { if (caso) setCasoAbierto(caso); irA(p); setConsentimientoAbierto(consentimiento); setAccionPendiente(accion) }
 
   const overview = (
     <div className="flex flex-col gap-4 lg:flex-row">
@@ -109,7 +111,7 @@ export default function ClinicalMode() {
         : pestana === 'Radiography'
           ? <RadiographyPanel />
           : pestana === 'Treatment Plan'
-            ? <TreatmentPlanSection key={`${casoAbierto ?? 'todos'}-${estimadoAbierto}-${consentimientoAbierto}`} casoInicial={casoAbierto} estimadoInicial={estimadoAbierto} consentimientoInicial={consentimientoAbierto} />
+            ? <TreatmentPlanSection key={`${casoAbierto ?? 'todos'}-${estimadoAbierto}-${consentimientoAbierto}-${accionPendiente}`} casoInicial={casoAbierto} estimadoInicial={estimadoAbierto} consentimientoInicial={consentimientoAbierto} accionInicial={accionPendiente} />
             : pestana === 'Treatment'
             ? <TreatmentPanel onTreatmentPlan={() => irA('Treatment Plan')} />
             : pestana === 'DentAssmt'

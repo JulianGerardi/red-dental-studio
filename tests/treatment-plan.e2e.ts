@@ -101,22 +101,39 @@ test('Complete bloqueado mientras se planea o espera el consentimiento; aceptado
   await expect(screen.getByRole('button', /Open consent for D2954: Pending/)).toBeVisible()
 })
 
-/* Sign now: revisar y firmar, después confirmar el Start; el plan aceptado pasa a In progress. */
-test('Start con Sign now firma, confirma y deja el plan In progress', async ({ app, screen }) => {
+/* Sign now lleva al consentimiento (no abre un drawer); ahí se firma en el pop up del portal y, con las dos firmas, se
+   confirma el Start; el plan aceptado pasa a In progress. */
+test('Start con Sign now lleva al consentimiento, se firma ahí y deja el plan In progress', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode?case=c5')
   await screen.getByRole('button', /Actions for D2950/).tap()
   await screen.getByRole('menuitem', /Start/).tap()
   await screen.getByRole('button', 'Sign now').tap()
-  const firma = screen.getByRole('dialog', 'Review and sign consent')
-  await expect(firma.getByRole('button', /Record signature/)).toBeDisabled()
-  for (let i = 0; i < 5; i++) await firma.getByRole('checkbox').nth(i).tap()
-  await expect(firma.getByLabel('Printed Name')).toHaveValue('Julio Perez')
-  await firma.getByRole('button', /Record signature/).tap()
+  await expect(screen.getByRole('heading', /Procedure Consent - D2950/)).toBeVisible()
+  await expect(screen.getByText('Sign to start this procedure')).toBeVisible()
+  // El paciente ya firmó: falta el provider, en el pop up del portal.
+  await screen.getByRole('button', /Provider Signature/).tap()
+  const provider = screen.getByRole('dialog', 'Provider Signature')
+  await expect(provider.getByText('Secure signing portal')).toBeVisible()
+  await provider.getByLabel('Email').fill('perez@clinic.com')
+  await provider.getByPlaceholder('Enter password').fill('secret')
+  await provider.getByRole('button', /^Sign$/).tap()
   const firmado = screen.getByRole('dialog', 'Consent signed')
   await firmado.getByRole('button', 'Confirm Start').tap()
   await expect(screen.getByText(/Procedure started\. Consent signed\./)).toBeVisible()
   await expect(screen.getByRole('button', /Open consent for D2950: Signed/)).toBeVisible()
   await expect(screen.getByText('In progress').first()).toBeVisible()
+})
+
+/* Back del consentimiento que vino de Sign now: el procedimiento queda como estaba. */
+test('Sign now y Back deja el procedimiento sin cambios', async ({ app, screen }) => {
+  await app.open('/patients/patient-0001/clinical-mode?case=c5')
+  await screen.getByRole('button', /Actions for D2750/).tap()
+  await screen.getByRole('menuitem', /Start/).tap()
+  await screen.getByRole('button', 'Sign now').tap()
+  await expect(screen.getByRole('heading', /Procedure Consent - D2750/)).toBeVisible()
+  await screen.getByRole('button', 'Back').tap()
+  await expect(screen.getByText(/The procedure has not changed/).first()).toBeVisible()
+  await expect(screen.getByRole('button', /Open consent for D2750: Not sent/)).toBeVisible()
 })
 
 /* La columna Consent: sin documento avisa; con documento abre el consentimiento, donde firman paciente y provider. */
@@ -146,13 +163,13 @@ test('la columna Consent abre el consentimiento y ahí firman paciente y provide
   await expect(screen.getByText('Signed').first()).toBeVisible()
 })
 
-/* El historial del consentimiento del caso (el reloj) junta los consentimientos de cada procedimiento. */
+/* El historial (el reloj) es una sola línea de tiempo: el consentimiento del caso y los de cada procedimiento. */
 test('el historial del caso lista los consentimientos de cada procedimiento', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode?case=c5')
   await screen.getByRole('button', 'Consent history').tap()
   const historial = screen.getByRole('dialog', 'Consent history')
-  await expect(historial.getByText('Procedure consents')).toBeVisible()
-  await historial.getByRole('button', /Procedure Consent - D2950/).tap()
+  await expect(historial.getByText(/Case consent v3/).first()).toBeVisible()
+  await historial.getByRole('button', /Procedure Consent - D2950/).first().tap()
   await expect(screen.getByRole('heading', /Procedure Consent - D2950/)).toBeVisible()
 })
 
