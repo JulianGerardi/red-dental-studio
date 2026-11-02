@@ -5,23 +5,14 @@ import { FieldError, ModalShell, OptionCheckbox, PersonSearchField, SelectField,
 import { useFormPasos } from '@/lib/useFormPasos'
 import { Avatar } from '@/components/ui/avatar'
 import { Alert } from '@/components/ui/alert'
+import { DIRECTORIO, type PersonaDirectorio } from '@/data/personas'
 
 /* Add Relationship: antes una pantalla aparte (Figma 3716:61372, 3716:62815 y 3716:63601); ahora el drawer de
    Confidentally 2.0 con sus tres pasos: buscar o crear a la persona, sus datos de contacto y la relación con el
    paciente. Los textos del Figma se replican tal cual, incluido "Adress". Ver modulos/relationships.md. */
 
-export type PersonaDirectorio = {
-  name: string
-  initials: string
-  dob: string
-  email: string
-}
-
-export const DIRECTORIO: PersonaDirectorio[] = [
-  { name: 'Michael Miller', initials: 'MM', dob: 'May 14, 1982', email: 'mm.thompson@yahoo.com' },
-  { name: 'Jessica Miller', initials: 'JM', dob: 'May 14, 1982', email: 'jessica.miller@gmail.com' },
-  { name: 'Robert Miller', initials: 'RM', dob: 'March 2, 1979', email: 'rob.miller@outlook.com' },
-]
+/* El directorio vive en data/personas.ts (lo comparte New Patient); se reexporta para los imports de siempre. */
+export { DIRECTORIO, type PersonaDirectorio }
 
 /* Card de persona del Figma: borde azul, avatar cuadrado y tres líneas. */
 export function PersonaSeleccionada({ p }: { p: PersonaDirectorio }) {

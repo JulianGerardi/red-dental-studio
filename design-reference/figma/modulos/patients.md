@@ -356,3 +356,34 @@ La página completa `/patients/edit` (Figma `3640:72713`) no cambia: es otra pan
 - **Menores de 18**: el paso Guardian ya no se impone. Toda la tabla de ejemplo tiene fecha de nacimiento 2025: ¿conviene un aviso o hacerlo obligatorio para un menor?
 - ¿Cancelar o cerrar Edit con cambios sin guardar debería preguntar?
 - ¿El guardián se escribe o se busca entre las personas del sistema (como en Add Relationship)? El Figma lo dibuja como texto.
+
+## New Patient: vincular a una persona que ya existe en el sistema (2026-11-02)
+
+**Jira:** no hay historia propia para esto. La más cercana es CON-2858 (*Add Guardian desde New Patient*: "buscar una
+persona existente o crear una nueva"), que es del guardián, no del paciente. Pedido de Julián sobre una grabación de
+Confidentally 2.0: en *New Patient* el checkbox *Use this option only to link a person that already exists in the system
+(e.g employee, subscriber, contact, etc)* cambia los datos personales por un buscador **Person\***. Vuelve lo que la
+anomalía 13 (2026-10-22) había sacado del alta, ahora con lógica detrás.
+
+**Qué hace:**
+- En el paso General, debajo de Interpreter Required y de la cuenta del portal, va `LinkPersonCheckbox` (el texto de 2.0,
+  ya en el DS). Tildado, la grilla de First/Middle/Last Name, Birthdate y Email se cambia por **Person\*** con
+  `PersonSearchField`: el mismo buscador de Add Relationship y New Subscription (avatar, y debajo tipo, DOB y email), no
+  el de 2.0 con el botón azul de borrar (la ✕ de la card elegida ya cumple esa función).
+- **A quién encuentra** (`data/personas.ts`, `PERSONAS_SISTEMA`): empleados (`EMPLEADOS`), contactos (`DIRECTORIO`,
+  que se mudó acá desde `AddRelationshipDrawer`, que lo reexporta) y suscriptores de seguro. **Quien ya es paciente no
+  aparece**: vincularlo crearía un duplicado. Cada resultado dice qué es (*Employee*, *Contact*, *Subscriber*) para
+  distinguir homónimos.
+- **Estados:** sin escribir, nada; sin coincidencias, *No one in the system matches this name. Untick the option to enter
+  the patient's details.* (`emptyText`, prop nueva y opcional de `PersonSearchField`); Next Step o Save sin elegir a
+  nadie marcan el campo (*Select a person or untick the option to enter the details.*) y lo enfocan; elegida, la card
+  azul con la ✕ y la ayuda *The patient record will use this person's name, birthdate and email.*
+- **Al guardar**, el paciente toma nombre, apellido, nacimiento y email de la persona; Interpreter, portal, Guardian y
+  Demography salen del formulario como siempre. Lo escrito a mano no se pierde al tildar y destildar (como en 2.0).
+- La opción está sólo en New Patient: Edit Patient comparte `CamposGeneral` pero no le pasa `vinculo`.
+
+**Para validar con usuarios / con Julián:**
+- ¿Recepción sabe de antemano que la persona ya está cargada (empleado, titular de un seguro)? Si no, convendría avisar
+  solo cuando lo escrito a mano coincide con alguien del sistema, en vez de depender del checkbox.
+- ¿Vincular debería traer también teléfono y dirección (Demography) de la persona, si el sistema los tiene?
+- Un empleado sin apellido (*Salgado*) queda como paciente sin Last Name; Edit Patient se lo va a pedir.
