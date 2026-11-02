@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-02
 
+### New Patient: vincular a una persona que ya existe en el sistema ([#115](https://github.com/JulianGerardi/red-dental-studio/pull/115))
+- En el paso General, *Use this option only to link a person that already exists in the system* cambia nombre,
+  nacimiento y email por el buscador **Person\*** (empleados, contactos y suscriptores; quien ya es paciente no aparece).
+  Al guardar, el paciente toma los datos de la persona elegida. Sin historia propia en Jira (relacionada: CON-2858).
+- **Para el dev:** `src/data/personas.ts` es nuevo (`PERSONAS_SISTEMA`); `DIRECTORIO` se mudó ahí y
+  `AddRelationshipDrawer` lo reexporta. `CamposGeneral` suma la prop opcional `vinculo` (sólo New Patient) y
+  `PersonSearchField` suma `emptyText`. e2e nuevo: `tests/new-patient.e2e.ts`.
+
 ### Clinical Mode: el bloque Informed Consent con las firmas en su propia fila ([#114](https://github.com/JulianGerardi/red-dental-studio/pull/114))
 - **CON-4052.** En el bloque Informed Consent de un caso, el título con su estado queda arriba con los íconos de historial
   y menú ⋮ a la derecha, y **Patient y Provider van en una fila propia debajo**, con el nombre siempre visible (antes se
