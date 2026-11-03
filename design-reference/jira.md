@@ -27,6 +27,31 @@ Documento: [figma/modulos/billing.md](figma/modulos/billing.md)
 
 - [CON-1060](https://confidetally.atlassian.net/browse/CON-1060) Billing
 
+## billing-profile
+
+Documento: [figma/modulos/billing-profile.md](figma/modulos/billing-profile.md) (Insurance / Billing Profile de Location
+y de provider)
+
+**Epics**
+
+- [CON-4019](https://confidetally.atlassian.net/browse/CON-4019) [Location] Billing profile
+- [CON-4003](https://confidetally.atlassian.net/browse/CON-4003) [Provider] Billing Profile
+
+**Historias**
+
+- [CON-4021](https://confidetally.atlassian.net/browse/CON-4021) [Location] Habilitar y configurar el Billing Profile · epic CON-4019
+- [CON-4026](https://confidetally.atlassian.net/browse/CON-4026) [Location] Consultar y ajustar los datos del Billing Profile · epic CON-4019
+- [CON-4027](https://confidetally.atlassian.net/browse/CON-4027) [Location] Consultar y configurar Contracted With · epic CON-4019
+- [CON-4028](https://confidetally.atlassian.net/browse/CON-4028) [Location] Deshabilitar el Billing Profile · epic CON-4019
+- [CON-4033](https://confidetally.atlassian.net/browse/CON-4033) [Carrier] Inicializar relaciones contractuales al crear un carrier · epic CON-4019
+- [CON-4004](https://confidetally.atlassian.net/browse/CON-4004) [Provider] Billing Profile al habilitar Primary Provider · epic CON-4003
+- [CON-4005](https://confidetally.atlassian.net/browse/CON-4005) [Provider] Consultar y ajustar los datos del Billing Profile · epic CON-4003
+- [CON-4006](https://confidetally.atlassian.net/browse/CON-4006) [Provider] Consultar y configurar Contracted With · epic CON-4003
+- [CON-4007](https://confidetally.atlassian.net/browse/CON-4007) [Provider] Deshabilitar el Billing Profile · epic CON-4003
+- Pendientes, sin implementar: [CON-4031](https://confidetally.atlassian.net/browse/CON-4031) y
+  [CON-4032](https://confidetally.atlassian.net/browse/CON-4032) (bloquear la desactivación si el perfil está en
+  Insurance Defaults, que el clon todavía no tiene) · epic CON-1173
+
 ## clinical-mode
 
 Documento: [figma/modulos/clinical-mode.md](figma/modulos/clinical-mode.md)

@@ -1,6 +1,6 @@
 import { Tabs } from '@/components/ui/tabs'
 import { PageTitle } from '@/components/ui/page-title'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { useParams } from 'react-router-dom'
 import { Pencil, DoorOpen, Plus, CalendarDays, ChevronRight, Trash2 } from 'lucide-react'
@@ -19,6 +19,8 @@ import { LocationHoursModal } from '@/components/settings/LocationHoursModal'
 import { NewRoomModal } from '@/components/settings/NewRoomModal'
 import { NewExceptionModal } from '@/components/settings/NewExceptionModal'
 import { LOCACIONES } from '@/pages/settings/Locations'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { LocationBillingProfile } from '@/components/settings/LocationBillingProfile'
 import {
   HORARIO_SEMANAL, SALAS_INICIALES, EXCEPCIONES_INICIALES,
   type Sala, type Excepcion,
@@ -28,7 +30,7 @@ import {
    Rooms / Exceptions. Reemplaza lo que había antes en esta ruta —la ficha de
    un empleado, que no correspondía acá y se mudó a Settings → Employees. */
 
-const TABS = ['Information', 'Working Hours', 'Rooms', 'Exceptions'] as const
+const TABS = ['Information', 'Working Hours', 'Rooms', 'Exceptions', 'Insurance / Billing Profile'] as const
 type Tab = (typeof TABS)[number]
 
 const DIAS: [string, string][] = [
@@ -364,20 +366,41 @@ export function SettingsLocationDetail() {
   const { locId = 'abril' } = useParams()
   const loc = LOCACIONES.find((l) => l.id === locId) ?? LOCACIONES[0]
   const [tab, setTab] = useState<Tab>('Information')
+  /* Insurance / Billing Profile guarda cada card por separado: salir de la pestaña con algo sin guardar lo pregunta. */
+  const [sucio, setSucio] = useState(false)
+  const [pendiente, setPendiente] = useState<Tab | null>(null)
+  const marcarSucio = useCallback((v: boolean) => setSucio(v), [])
+  const cambiarTab = (t: Tab) => (sucio && tab !== t ? setPendiente(t) : setTab(t))
 
   return (
     <div className="px-4 py-6 sm:px-8">
       <PageTitle>{tab === 'Information' ? loc.nombre : tab}</PageTitle>
       <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">Set your location name. Add the location you need.</p>
 
-      <Tabs className="mt-4" aria-label="Location sections" tabs={TABS} value={tab} onChange={setTab} />
+      <Tabs className="mt-4" aria-label="Location sections" tabs={TABS} value={tab} onChange={cambiarTab} />
 
       <div className="mt-4">
         {tab === 'Information' && <InformationTab nombreLocacion={loc.nombre} />}
         {tab === 'Working Hours' && <WorkingHoursTab />}
         {tab === 'Rooms' && <RoomsTab />}
         {tab === 'Exceptions' && <ExceptionsTab />}
+        {tab === 'Insurance / Billing Profile' && (
+          <LocationBillingProfile locId={loc.id} nombreLocacion={loc.nombre} onDirtyChange={marcarSucio} />
+        )}
       </div>
+
+      {pendiente && (
+        <ConfirmDialog
+          title="Discard unsaved changes?"
+          confirmLabel="Discard changes"
+          cancelLabel="Keep editing"
+          tone="danger"
+          onCancel={() => setPendiente(null)}
+          onConfirm={() => { setSucio(false); setTab(pendiente); setPendiente(null) }}
+        >
+          Your billing profile changes haven't been saved.
+        </ConfirmDialog>
+      )}
     </div>
   )
 }

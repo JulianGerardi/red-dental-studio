@@ -29,6 +29,7 @@ import { SettingsCarriers, SettingsCarrierEdit } from '@/pages/settings/finance/
 import { SettingsInsurancePlan } from '@/pages/settings/finance/InsurancePlan'
 import { SettingsCoverageTables, SettingsNewCoverageTable } from '@/pages/settings/finance/CoverageTables'
 import { FinanzasProvider } from '@/data/finanzasStore'
+import { BillingProfilesProvider } from '@/data/billingProfilesStore'
 import Help from '@/pages/Help'
 import Notifications from '@/pages/Notifications'
 
@@ -73,7 +74,7 @@ export function AppRoutes() {
         <Route path="notifications" element={<Notifications />} />
 
         {/* El store de Billing envuelve todo Settings: el breadcrumb lee de ahí el nombre de un carrier o un fee schedule. */}
-        <Route path="settings" element={<FinanzasProvider><SettingsLayout /></FinanzasProvider>}>
+        <Route path="settings" element={<FinanzasProvider><BillingProfilesProvider><SettingsLayout /></BillingProfilesProvider></FinanzasProvider>}>
           <Route index element={<Navigate to="/settings/general" replace />} />
           <Route path="general" element={<SettingsGeneral />} />
           <Route path="locations" element={<SettingsLocations />} />
