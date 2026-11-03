@@ -5,6 +5,20 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-03
 
+### Insurance / Billing Profile en Location y provider ([#118](https://github.com/JulianGerardi/red-dental-studio/pull/118))
+- **CON-4021 · CON-4026 · CON-4027 · CON-4028.** Location suma la pestaña *Insurance / Billing Profile*: el switch *Use this
+  Location as a Billing Provider* abre la configuración (NPI y TIN/SSN obligatorios) y se habilita con *Save and enable*.
+  Activo: nombre editable, *Replace* de dirección/teléfono, drawer *Billing credentials* y *Contracted With*. Apagarlo
+  pregunta y lo deja de lectura; reactivar conserva los contratos.
+- **CON-4004 · CON-4005 · CON-4006 · CON-4007.** *Is a Primary Provider* (Provider Info) se aplica al switchear: prender crea
+  o reactiva el perfil y muestra la pestaña; apagar pregunta y lo deja de lectura. Nombre, NPI y TIN/SSN de lectura.
+- **CON-4033.** *Contracted With* lista los carriers de Settings › Billing; el que no tiene relación cuenta como *Not
+  contracted*, así que uno nuevo aparece solo.
+- **Para el dev:** nuevos `settings/BillingProfile.tsx` (piezas compartidas), `LocationBillingProfile.tsx`,
+  `ProviderBillingProfile.tsx` y el store `data/billingProfilesStore.tsx` (`BillingProfilesProvider` envuelve Settings).
+  `Toggle` suma `ariaLabel`. Cada card guarda por separado y salir con cambios pregunta. e2e en
+  `tests/billing-profile.e2e.ts`. Detalle en `billing-profile.md`. Sin Storybook todavía.
+
 ### Relationships: sin archivado, Delete con confirmación y Contact sólo cuando falta ([#117](https://github.com/JulianGerardi/red-dental-studio/pull/117))
 - **CON-4000.** Se retiraron Archive/Reactivate, el filtro `Active | Archived`, la pill *Archived* y el aviso de relación
   archivada en Add Relationship (las historias de archivar están canceladas).
