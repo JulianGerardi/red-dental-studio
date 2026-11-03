@@ -9,12 +9,16 @@ export type PersonaDirectorio = {
   initials: string
   dob: string
   email: string
+  /** Teléfono y dirección ya cargados: Add Relationship saltea el paso Contact (relationships.md, 2026-11-03). */
+  telefono?: string
+  direccion?: string
 }
 
 /* Contactos: el directorio de Add Relationship y New Subscription. */
 export const DIRECTORIO: PersonaDirectorio[] = [
-  { name: 'Michael Miller', initials: 'MM', dob: 'May 14, 1982', email: 'mm.thompson@yahoo.com' },
-  { name: 'Jessica Miller', initials: 'JM', dob: 'May 14, 1982', email: 'jessica.miller@gmail.com' },
+  { name: 'Michael Miller', initials: 'MM', dob: 'May 14, 1982', email: 'mm.thompson@yahoo.com', telefono: '(555) 765-4321', direccion: '45 Desert View Road, Phoenix, AZ 85018' },
+  { name: 'Jessica Miller', initials: 'JM', dob: 'May 14, 1982', email: 'jessica.miller@gmail.com', telefono: '(555) 123-4567', direccion: '123 Maple Street, Phoenix, AZ 85016' },
+  /* Sin contacto cargado: al elegirlo, Add Relationship pide el paso Contact. */
   { name: 'Robert Miller', initials: 'RM', dob: 'March 2, 1979', email: 'rob.miller@outlook.com' },
 ]
 

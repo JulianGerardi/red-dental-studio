@@ -68,7 +68,7 @@ export function EditRelationshipModal({
 
         <DrawerSection
           title="Relationship"
-          description="The direction of this relationship cannot be changed. To update this, archive the relationship and create a new one."
+          description="The direction of this relationship cannot be changed. To update this, delete the relationship and create a new one."
         >
           <div className="flex flex-col gap-2">
             <FieldLabel required>Role</FieldLabel>
