@@ -1,1 +1,1 @@
-claude/epic-lamport-ddpvbo 261e86c4a69d5e01579e2569763c3ffdcd8dc0c3
+claude/pantallas-ui-integracion-y1ff6y aa6a5fc1c69e84c20ccd6263e919a33beefdebf3
