@@ -3,6 +3,20 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-03
+
+### Relationships: sin archivado, Delete con confirmación y Contact sólo cuando falta ([#117](https://github.com/JulianGerardi/red-dental-studio/pull/117))
+- **CON-4000.** Se retiraron Archive/Reactivate, el filtro `Active | Archived`, la pill *Archived* y el aviso de relación
+  archivada en Add Relationship (las historias de archivar están canceladas).
+- **CON-3999.** Vuelve *Delete relationship* con confirmación (*This action cannot be undone.*, Cancel / Delete en rojo).
+  Borrado físico: el toast no ofrece Undo.
+- **CON-3174.** Add Relationship pide el paso **Contact** con persona nueva o con una existente sin teléfono/dirección (email
+  precargado); si ya los tiene, el drawer queda en Person · Relationship y la card usa su contacto.
+- **Para el dev:** `MenuAcciones`/`PersonaCard` usan `onEdit`/`onDelete`; `RelationshipDialogs.tsx` suma
+  `DeleteRelationshipDialog` y saca `ArchiveRelationshipDialog`, `ReactivateRelationshipDrawer` y `RelacionArchivada`;
+  `AddRelationshipDrawer` ya no recibe `archivadas`/`onReactivar`. `PersonaDirectorio` suma `telefono` y `direccion`
+  opcionales. Detalle en `relationships.md` (2026-11-03). Sin Storybook todavía.
+
 ## 2026-11-02
 
 ### Clinical Mode: una sola card de Informed Consent y Back del consentimiento vuelve al historial ([#116](https://github.com/JulianGerardi/red-dental-studio/pull/116))
