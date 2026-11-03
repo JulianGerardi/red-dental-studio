@@ -22,7 +22,7 @@ de los dos epics. La lógica sale de los HTML y de Jira; los componentes, del de
 | Ruta | Qué cambia |
 |---|---|
 | `/settings/locations/:locId` | Pestaña nueva **Insurance / Billing Profile**, al final (Information · Working Hours · Rooms · Exceptions) |
-| `/settings/team/:employeeId` | **Is a Primary Provider** (Provider Info) ahora se guarda con Save; al guardarlo en Yes aparece la pestaña **Insurance / Billing Profile** |
+| `/settings/team/:employeeId` | **Is a Primary Provider** (Provider Info) se aplica al switchear: en Yes aparece la pestaña **Insurance / Billing Profile** |
 
 Código: `components/settings/LocationBillingProfile.tsx`, `ProviderBillingProfile.tsx` y las piezas compartidas en
 `BillingProfile.tsx` (`ContactoCard`, `ReplaceContactDrawer`, `CredentialsDrawer`, `ContractedWith`, `AccionesGuardado`).
@@ -51,8 +51,9 @@ Semilla para recorrerlo: **Abril** sin perfil (configuración desde cero), **Bay
 6. **Un contacto reemplazado se conserva**: el nuevo se suma a los del titular. En Location, Replace abre un menú con los
    contactos guardados + *Add a new address / phone number*; en provider va directo al drawer (CON-4005 no permite elegir
    otro existente). El nuevo lleva la pill *New · not saved* hasta guardar.
-7. **Primary Provider y el perfil se guardan juntos** con el Save de la ficha (CON-4004/4007). La pestaña aparece al
-   crearse el perfil y queda aunque se deshabilite, de lectura, con el aviso de cómo volver a habilitarlo.
+7. **Primary Provider y el perfil se guardan juntos, al switchear** (CON-4004/4007; ver la sección del 2026-11-03 más
+   abajo). La pestaña aparece al crearse el perfil y queda aunque se deshabilite, de lectura, con el aviso de cómo volver
+   a habilitarlo.
 
 ### Decisiones de diseño (desvíos de los HTML)
 
@@ -84,3 +85,19 @@ Semilla para recorrerlo: **Abril** sin perfil (configuración desde cero), **Bay
   se muestra.
 - Falta una historia para el error de credenciales del provider faltantes al habilitar Primary Provider (CON-4004 lo pone
   como precondición, sin mensaje): todos los providers de la semilla tienen NPI y TIN/SSN.
+
+## CON-4004 · CON-4007 — Primary Provider sin Save (2026-11-03)
+
+Pedido de Julián sobre el link de prueba: prender *Is a Primary Provider* tiene que habilitar el perfil y mostrar la
+pestaña en el momento, sin tocar Save.
+
+- **Prender** guarda Primary Provider y crea o reactiva el perfil a la vez; la pestaña entra con el mismo pop que Provider
+  Info y Working Hours al prender *Is Provider*. Toast: *Primary Provider enabled. Insurance / Billing Profile is now
+  available.* (o *…The billing profile is active again.* si ya existía).
+- **Apagar** pregunta con `ConfirmDialog` (*Turn off Primary Provider?*): deja al provider fuera de Rendering y Billing
+  Provider y el perfil de lectura. Cancel no cambia nada, que es la salida que pide CON-4007 › Cancelar.
+- **Desvío de Jira**: CON-4004 dice "activa y guarda". El switch pasa a ser el guardado —sigue guardando Primary Provider y
+  el perfil juntos—. Es la regla del design system (switch = efecto inmediato) y lo mismo que ya hace *Is Provider* en la
+  misma ficha. El Save del pie queda para el resto de la ficha.
+- Location no cambia: su switch abre un formulario con NPI y TIN que hay que completar, así que ahí *Save and enable*
+  sigue siendo necesario (CON-4021).

@@ -30,12 +30,11 @@ test('Location: se habilita sólo al guardar datos válidos, y deshabilitarla la
   await expect(screen.getByText('1 contracted')).toBeVisible()
 })
 
-test('Provider: guardar Primary Provider prepara el perfil y suma la pestaña', async ({ app, screen }) => {
+test('Provider: prender Primary Provider prepara el perfil y suma la pestaña, sin Save', async ({ app, screen }) => {
   await app.open('/settings/team/emily-chen')
   await expect(screen.getByRole('tab', 'Insurance / Billing Profile')).toHaveCount(0)
   await screen.getByRole('tab', 'Provider Info').tap()
   await screen.getByRole('switch').first().tap()
-  await screen.getByRole('button', 'Save').tap()
   await screen.getByRole('tab', 'Insurance / Billing Profile').tap()
   await expect(screen.getByText('1588734420')).toBeVisible()
   await expect(screen.getByText('0 contracted')).toBeVisible()
@@ -47,4 +46,16 @@ test('Provider: guardar Primary Provider prepara el perfil y suma la pestaña', 
   await screen.getByRole('button', 'Keep editing').tap()
   await screen.getByRole('button', 'Save carrier contracts').tap()
   await expect(screen.getByText('1 contracted')).toBeVisible()
+})
+
+test('Provider: apagar Primary Provider pregunta y deja el perfil de lectura', async ({ app, screen }) => {
+  await app.open('/settings/team/elena-martinez')
+  await screen.getByRole('tab', 'Provider Info').tap()
+  await screen.getByRole('switch').first().tap()
+  await screen.getByRole('button', 'Cancel').tap()
+  await expect(screen.getByRole('dialog')).toHaveCount(0)
+  await screen.getByRole('switch').first().tap()
+  await screen.getByRole('button', 'Turn off').tap()
+  await screen.getByRole('tab', 'Insurance / Billing Profile').tap()
+  await expect(screen.getByText(/This billing profile is inactive and cannot be edited/)).toBeVisible()
 })
