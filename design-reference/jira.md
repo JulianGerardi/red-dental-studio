@@ -44,6 +44,7 @@ y de provider)
 - [CON-4027](https://confidetally.atlassian.net/browse/CON-4027) [Location] Consultar y configurar Contracted With · epic CON-4019
 - [CON-4028](https://confidetally.atlassian.net/browse/CON-4028) [Location] Deshabilitar el Billing Profile · epic CON-4019
 - [CON-4033](https://confidetally.atlassian.net/browse/CON-4033) [Carrier] Inicializar relaciones contractuales al crear un carrier · epic CON-4019
+- [CON-4010](https://confidetally.atlassian.net/browse/CON-4010) DER (imagen del modelo de datos) · epic CON-4019
 - [CON-4004](https://confidetally.atlassian.net/browse/CON-4004) [Provider] Billing Profile al habilitar Primary Provider · epic CON-4003
 - [CON-4005](https://confidetally.atlassian.net/browse/CON-4005) [Provider] Consultar y ajustar los datos del Billing Profile · epic CON-4003
 - [CON-4006](https://confidetally.atlassian.net/browse/CON-4006) [Provider] Consultar y configurar Contracted With · epic CON-4003

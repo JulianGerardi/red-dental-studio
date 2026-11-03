@@ -7,8 +7,10 @@
 - Location: CON-4021 habilitar · CON-4026 consultar y ajustar · CON-4027 Contracted With · CON-4028 deshabilitar
 - Provider: CON-4004 al habilitar Primary Provider · CON-4005 consultar y ajustar · CON-4006 Contracted With · CON-4007
   deshabilitar
+- Del epic CON-4019 también: CON-4033 (relaciones al crear un carrier, cubierta por la regla 3) y CON-4010 (DER: sólo la
+  imagen del modelo; las tablas que usa cada historia están en el mock). Los dos epics no tienen descripción.
 - Sin implementar: CON-4031 / CON-4032 (bloquear la desactivación si el perfil está en Insurance Defaults: el clon no
-  tiene Insurance Defaults todavía) y CON-4033 (relaciones al crear un carrier: no hace falta, ver regla 3).
+  tiene Insurance Defaults todavía) y CON-4033 como paso aparte (no hace falta, ver regla 3).
 
 ## CON-4021 · CON-4026 · CON-4027 · CON-4028 · CON-4004 · CON-4005 · CON-4006 · CON-4007 — Primera versión (2026-11-03)
 
@@ -39,8 +41,9 @@ Semilla para recorrerlo: **Abril** sin perfil (configuración desde cero), **Bay
    drawer *Billing credentials* (guardado aparte del nombre y los contactos, como dice CON-4026). El provider toma nombre,
    NPI y TIN/SSN de su ficha y en la pestaña son de lectura: sólo se reemplazan dirección y teléfono (CON-4005).
 3. **Contracted With lista los carriers de la account** (los de Settings › Billing › Carriers, `finanzasStore`). El que no
-   tiene relación guardada cuenta como *Not contracted*: así un carrier nuevo aparece solo en todos los perfiles, que es lo
-   que pide CON-4033 sin un paso de inicialización aparte.
+   tiene relación guardada cuenta como *Not contracted*: así un carrier nuevo aparece solo en todos los perfiles, activos e
+   inactivos y sin tocar los contratos existentes, que es lo que piden CON-4033 y CON-4027 › 3.1 sin un paso de
+   inicialización aparte.
 4. **Cada card guarda por separado** —identidad/contactos y contratos—, como en los dos HTML. Buscar, filtrar o saltar
    por letra no pierde lo marcado. Salir de la pestaña con algo sin guardar pregunta (*Discard unsaved changes?*).
 5. **El guardado vuelve a mirar el estado**: si el perfil se deshabilitó con la pantalla abierta, se rechaza con
