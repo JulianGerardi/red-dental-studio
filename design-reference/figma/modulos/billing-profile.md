@@ -22,7 +22,7 @@ de los dos epics. La lógica sale de los HTML y de Jira; los componentes, del de
 | Ruta | Qué cambia |
 |---|---|
 | `/settings/locations/:locId` | Pestaña nueva **Insurance / Billing Profile**, al final (Information · Working Hours · Rooms · Exceptions) |
-| `/settings/team/:employeeId` | **Is a Primary Provider** (Provider Info) se aplica al switchear: en Yes aparece la pestaña **Insurance / Billing Profile** |
+| `/settings/team/:employeeId` | **Is a Primary Provider** (Provider Info) se guarda con Save; al guardarlo en Yes aparece la pestaña **Insurance / Billing Profile** |
 
 Código: `components/settings/LocationBillingProfile.tsx`, `ProviderBillingProfile.tsx` y las piezas compartidas en
 `BillingProfile.tsx` (`ContactoCard`, `ReplaceContactDrawer`, `CredentialsDrawer`, `ContractedWith`, `AccionesGuardado`).
@@ -51,8 +51,8 @@ Semilla para recorrerlo: **Abril** sin perfil (configuración desde cero), **Bay
 6. **Un contacto reemplazado se conserva**: el nuevo se suma a los del titular. En Location, Replace abre un menú con los
    contactos guardados + *Add a new address / phone number*; en provider va directo al drawer (CON-4005 no permite elegir
    otro existente). El nuevo lleva la pill *New · not saved* hasta guardar.
-7. **Primary Provider y el perfil se guardan juntos, al switchear** (CON-4004/4007; ver la sección del 2026-11-03 más
-   abajo). La pestaña aparece al crearse el perfil y queda aunque se deshabilite, de lectura, con el aviso de cómo volver
+7. **Primary Provider y el perfil se guardan juntos con el Save de la ficha** (CON-4004/4007; ver la sección del
+   2026-11-04 más abajo). La pestaña aparece al crearse el perfil y queda aunque se deshabilite, de lectura, con el aviso de cómo volver
    a habilitarlo.
 
 ### Decisiones de diseño (desvíos de los HTML)
@@ -88,6 +88,8 @@ Semilla para recorrerlo: **Abril** sin perfil (configuración desde cero), **Bay
 
 ## CON-4004 · CON-4007 — Primary Provider sin Save (2026-11-03)
 
+> **Revertido el 2026-11-04** (ver la sección de esa fecha): Primary Provider vuelve a aplicarse con Save.
+
 Pedido de Julián sobre el link de prueba: prender *Is a Primary Provider* tiene que habilitar el perfil y mostrar la
 pestaña en el momento, sin tocar Save.
 
@@ -101,3 +103,59 @@ pestaña en el momento, sin tocar Save.
   misma ficha. El Save del pie queda para el resto de la ficha.
 - Location no cambia: su switch abre un formulario con NPI y TIN que hay que completar, así que ahí *Save and enable*
   sigue siendo necesario (CON-4021).
+
+## CON-4004 · CON-4007 — Primary Provider vuelve a guardarse con Save (2026-11-04)
+
+Julián: "no es una funcionalidad por separado sino que está contemplada en toda la información que mandás al form": el
+switch es un dato más de la ficha. Coincide con Jira (CON-4004 "activa y guarda"; CON-4007 › 3.1 "Desactiva Primary
+Provider → Guarda los cambios", 3.6 cancelar antes de guardar no cambia nada).
+
+- **Prender:** el switch queda en Yes con la línea *Save to set up its Insurance / Billing Profile.*; al tocar **Save** se
+  crea o reactiva el perfil y aparece la pestaña (mismos toasts que antes).
+- **Apagar:** el switch queda en No con *Save to deactivate it.*; **Save** abre la confirmación, con el texto que pidió
+  Julián, más corto y formal: **Deactivate Primary Provider?** — *[Nombre] will no longer be available for selection as
+  a rendering or billing provider.* — Cancel · **Deactivate**. Cancel cierra sin guardar (el switch queda en No hasta
+  que se guarde o se descarte); Deactivate guarda y deja el perfil de lectura. Toast: *Primary Provider deactivated. The
+  billing profile is now read-only.*
+- **Cancel del pie** descarta: vuelve el switch a lo guardado.
+- El aviso del perfil inactivo vuelve a decir *…in Provider Info and save to edit it again.*
+- Se deja de lado el desvío del 2026-11-03 (switch = efecto inmediato, como *Is Provider*): Primary Provider arrastra un
+  cambio de facturación y Jira lo pide con guardado explícito.
+
+**Para validar con usuarios:** si la línea debajo del switch alcanza para que se entienda que falta Save (la pestaña no
+aparece hasta guardar).
+
+## Textos más cortos y Tax ID en una fila (2026-11-04)
+
+Pedidos de Julián sobre el link de prueba:
+
+- **Perfil inactivo**: el aviso queda sólo con el título *This billing profile is inactive and cannot be edited.*, sin la
+  bajada de cómo reactivarlo (Location y provider).
+- **Credenciales**: NPI sola en su fila; *Tax identification type* y *Tax identification number* juntos en la de abajo
+  (`CamposCredenciales`, lo usan el alta de Location y el drawer de credenciales).
+- **Alta de Location**: sale *The profile is enabled only after you save.* del pie (Cancel · Save and enable). Era un
+  estilo que no se usa en otras pantallas parecidas.
+- **"The location keeps operating"** sale de los tres lugares: el estado vacío, la confirmación *Disable this billing
+  profile?* y el toast (*Billing profile disabled.*).
+
+**Para analizar (Julián):** el banner azul a todo el ancho para el perfil inactivo no aparece en otra parte de la app. En
+el resto, la solo lectura se marca con la descripción o una línea gris (*Read-only snapshot…* en Estimates, *Read-only
+summary* en el detalle clínico) y los controles deshabilitados. Propuesta: sacar el banner y dejar la pill **Inactive**
+de la card (ya está) con el texto como descripción de la card y los botones deshabilitados. Los avisos amarillos que
+quedaban (*Complete the information…* y los de Primary Provider) se quedan (Julián, 2026-11-04).
+
+## Aviso del alta de Location con `Alert` y Contracted With con el abecedario completo (2026-11-04)
+
+- *Complete the information and save to enable this billing profile.* deja de ser una línea de texto ámbar suelta y pasa a
+  `ui/alert` tono **warning**, sólo título, dentro de la card del switch: es el componente de mensajes del design system y
+  hace juego con la pill *Pending activation*. Los de Primary Provider (*Save to set up…*, *Save to deactivate it.*) quedan
+  como están, a pedido de Julián.
+- **Más carriers en el mock** (`ASEGURADORAS`, `data/finanzas.ts`): 31 nuevos, uno o dos por letra de la A a la Z (36 en
+  total), para ver Contracted With con todas las letras habilitadas. Sólo nombre y Payer ID; el resto, el de un carrier
+  nuevo. Se evitaron los payers que sugiere *New Carrier* (Humana, Guardian, Blue Cross Blue Shield, United Concordia) para
+  que ese alta siga teniendo qué sugerir. Settings › Billing › Carriers los pagina de a 10.
+- **Scroll interno**: Contracted With ya usaba `ui/show-more` (8 cerrados, *Show 28 more* abre el resto en una caja de
+  `min(70vh, 640px)` con scroll propio, sin estirar la página). Verificado con los 36: 630 px visibles de ~2.900.
+- Se probó dejar fija la letra del grupo al scrollear (`sticky`) y se descartó: cada letra vive dentro de la fila de su
+  primer carrier, así que se soltaba enseguida y dejaba restos. Si se quiere, hay que agrupar las filas por letra.
+

@@ -3,6 +3,20 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-04
+
+### Billing Profile: Primary Provider con Save, textos más cortos y carriers de la A a la Z ([#119](https://github.com/JulianGerardi/red-dental-studio/pull/119))
+- **CON-4004 / CON-4007.** *Is a Primary Provider* vuelve a aplicarse con el **Save** de la ficha (revierte lo del #118):
+  la pestaña *Insurance / Billing Profile* aparece al guardar en Yes. Guardarlo en No pregunta **Deactivate Primary
+  Provider?** (Cancel · Deactivate); el Cancel del pie descarta.
+- Perfil inactivo: el aviso queda sólo con *This billing profile is inactive and cannot be edited.* Credenciales: *Tax
+  identification type* y *number* en la misma fila. Alta de Location: sin *The profile is enabled only after you save.* ni
+  *The location keeps operating*; *Complete the information…* pasa a `Alert` warning.
+- Mock: 31 carriers nuevos en `ASEGURADORAS` (36, de la A a la Z) para ver Contracted With completo con su scroll interno.
+- **Para el dev:** en `Employees.tsx`, `toggles.primario` es borrador y `guardar()` aplica `guardarPrimario` (con
+  `ConfirmDialog` si se apaga). `CamposCredenciales`: el select de tipo lleva `sm:col-start-1`. Detalle en
+  `billing-profile.md` (2026-11-04). Sin Storybook todavía.
+
 ## 2026-11-03
 
 ### Insurance / Billing Profile en Location y provider ([#118](https://github.com/JulianGerardi/red-dental-studio/pull/118))

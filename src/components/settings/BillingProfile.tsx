@@ -170,7 +170,7 @@ export function CamposCredenciales({
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <TextField label="NPI" required placeholder="10 digits" value={valor.npi} onChange={digitos('npi', 10)} error={errores?.npi} />
-      <SelectField label="Tax identification type" required options={TIPOS_FISCALES} value={valor.tipoFiscal} onChange={(v) => onChange({ ...valor, tipoFiscal: v as TipoFiscal })} />
+      <SelectField className="sm:col-start-1" label="Tax identification type" required options={TIPOS_FISCALES} value={valor.tipoFiscal} onChange={(v) => onChange({ ...valor, tipoFiscal: v as TipoFiscal })} />
       <TextField label="Tax identification number" required placeholder="9 digits" value={valor.fiscal} onChange={digitos('fiscal', 9)} error={errores?.fiscal} />
     </div>
   )

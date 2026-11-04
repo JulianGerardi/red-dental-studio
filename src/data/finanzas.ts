@@ -220,8 +220,49 @@ export const ASEGURADORAS: Aseguradora[] = [
   { id: 'benecare', nombre: 'BeneCare Dental Plan', payerId: '23210', formato: 'ADA 2019', diasResolucion: 21, sinDiagnosticos: false, noFacturar: false, email: 'claims@benecare.example', sitio: 'https://www.benecare.com', telefono: tel('800', '6942273'), numerosLocacion: {} },
   { id: 'metlife', nombre: 'MetLife Tricare', payerId: '89070', formato: 'ADA 2024', diasResolucion: 45, sinDiagnosticos: false, noFacturar: false, email: 'tricare@metlife.example', sitio: 'https://www.metlife.com', telefono: tel('855', '6385433'), numerosLocacion: {} },
   { id: 'delta-ca', nombre: 'Delta Dental of California', payerId: '77777', formato: 'ADA 2019', diasResolucion: 30, sinDiagnosticos: false, noFacturar: false, email: 'providers@delta.example', sitio: 'https://www.deltadentalins.com', telefono: tel('800', '7656003'), numerosLocacion: { abril: 'DD-77-104' } },
-  { id: 'cigna', nombre: 'Cigna Dental', payerId: '62308', formato: 'ADA 2012', diasResolucion: 30, sinDiagnosticos: true, noFacturar: true, email: '', sitio: 'https://www.cigna.com', telefono: tel('800', '2446224'), numerosLocacion: {} },
+  { id: 'cigna', nombre: 'Cigna Dental', payerId: '62308', formato: 'ADA 2012', diasResolucion: 30, sinDiagnosticos: true, noFacturar: true, email: '', sitio: 'https://www.cigna.com', telefono: tel('800', '2446224'), numerosLocacion: {} },  ...extras(),
 ]
+
+/* Más carriers, uno o dos por letra: Contracted With de Billing Profile con el abecedario completo y su scroll interno
+   (billing-profile.md, 2026-11-04). Sólo nombre y Payer ID; el resto, el de un carrier recién creado. */
+function extras(): Aseguradora[] {
+  return ([
+  ['Ameritas Dental', '30100'],
+  ['Assurant Dental', '30237'],
+  ['Beam Dental', '30374'],
+  ['Careington Dental', '30511'],
+  ['DentaQuest', '30648'],
+  ['Dentegra', '30785'],
+  ['Envolve Dental', '30922'],
+  ['First Dental Health', '31059'],
+  ['GEHA Connection Dental', '31196'],
+  ['Horizon Dental', '31333'],
+  ['Insight Dental Benefits', '31470'],
+  ['Jefferson Dental Plan', '31607'],
+  ['Kaiser Permanente Dental', '31744'],
+  ['Liberty Dental Plan', '31881'],
+  ['Lincoln Financial Dental', '32018'],
+  ['Medica Dental', '32155'],
+  ['Nippon Life Benefits', '32292'],
+  ['OneAmerica Dental', '32429'],
+  ['Premier Access Dental', '32566'],
+  ['Principal Dental', '32703'],
+  ['Quantum Dental Benefits', '32840'],
+  ['Renaissance Dental', '32977'],
+  ['SmileCare Dental', '33114'],
+  ['Sun Life Dental', '33251'],
+  ['TruAssure Dental', '33388'],
+  ['UnitedHealthcare Dental', '33525'],
+  ['Valley Dental Plan', '33662'],
+  ['Wellmark Dental', '33799'],
+  ['Xcel Dental Network', '33936'],
+  ['Yellowstone Dental Benefits', '34073'],
+  ['Zenith Dental Plan', '34210'],
+  ] as const).map(([nombre, payerId]) => ({
+    id: nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-'), nombre, payerId, formato: 'ADA 2019', diasResolucion: 30,
+    sinDiagnosticos: false, noFacturar: false, email: '', sitio: '', telefono: tel('800', '5550100'), numerosLocacion: {},
+  }))
+}
 
 export type Contacto = { nombre: string; apellido: string; email: string; organizacion: string }
 /* Montos de Deductibles And Benefits: Annual Individual, Annual Family y Lifetime (Individual u Ortho). */

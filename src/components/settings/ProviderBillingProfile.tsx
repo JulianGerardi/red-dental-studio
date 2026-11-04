@@ -39,9 +39,7 @@ export function ProviderBillingProfile({
   return (
     <div className="flex flex-col gap-4">
       {!editable && (
-        <Alert tone="info" title={INACTIVO}>
-          Turn on Is a Primary Provider in Provider Info to edit it again. Its data and carrier contracts are kept.
-        </Alert>
+        <Alert tone="info" title={INACTIVO} />
       )}
       <ContactosProvider key={`contactos-${editable}`} perfil={perfil} editable={editable} onGuardar={guardarSiActivo} onDirtyChange={marcarContactos} />
       <ContractedWith
