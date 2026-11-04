@@ -141,7 +141,21 @@ Pedidos de Julián sobre el link de prueba:
 **Para analizar (Julián):** el banner azul a todo el ancho para el perfil inactivo no aparece en otra parte de la app. En
 el resto, la solo lectura se marca con la descripción o una línea gris (*Read-only snapshot…* en Estimates, *Read-only
 summary* en el detalle clínico) y los controles deshabilitados. Propuesta: sacar el banner y dejar la pill **Inactive**
-de la card (ya está) con el texto como descripción de la card y los botones deshabilitados. Quedan, del mismo estilo
-amarillo, *Complete the information and save to enable this billing profile.* (Location) y *Save to set up… / Save to
-deactivate it.* (Primary Provider): a decidir si salen también.
+de la card (ya está) con el texto como descripción de la card y los botones deshabilitados. Los avisos amarillos que
+quedaban (*Complete the information…* y los de Primary Provider) se quedan (Julián, 2026-11-04).
+
+## Aviso del alta de Location con `Alert` y Contracted With con el abecedario completo (2026-11-04)
+
+- *Complete the information and save to enable this billing profile.* deja de ser una línea de texto ámbar suelta y pasa a
+  `ui/alert` tono **warning**, sólo título, dentro de la card del switch: es el componente de mensajes del design system y
+  hace juego con la pill *Pending activation*. Los de Primary Provider (*Save to set up…*, *Save to deactivate it.*) quedan
+  como están, a pedido de Julián.
+- **Más carriers en el mock** (`ASEGURADORAS`, `data/finanzas.ts`): 31 nuevos, uno o dos por letra de la A a la Z (36 en
+  total), para ver Contracted With con todas las letras habilitadas. Sólo nombre y Payer ID; el resto, el de un carrier
+  nuevo. Se evitaron los payers que sugiere *New Carrier* (Humana, Guardian, Blue Cross Blue Shield, United Concordia) para
+  que ese alta siga teniendo qué sugerir. Settings › Billing › Carriers los pagina de a 10.
+- **Scroll interno**: Contracted With ya usaba `ui/show-more` (8 cerrados, *Show 28 more* abre el resto en una caja de
+  `min(70vh, 640px)` con scroll propio, sin estirar la página). Verificado con los 36: 630 px visibles de ~2.900.
+- Se probó dejar fija la letra del grupo al scrollear (`sticky`) y se descartó: cada letra vive dentro de la fila de su
+  primer carrier, así que se soltaba enseguida y dejaba restos. Si se quiere, hay que agrupar las filas por letra.
 

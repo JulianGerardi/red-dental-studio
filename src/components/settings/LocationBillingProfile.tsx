@@ -106,7 +106,7 @@ export function LocationBillingProfile({
           </div>
         </div>
         {configurando && (
-          <p className="mt-3 text-xs font-medium text-warn-fg">Complete the information and save to enable this billing profile.</p>
+          <Alert tone="warning" title="Complete the information and save to enable this billing profile." className="mt-4" />
         )}
       </Card>
 
