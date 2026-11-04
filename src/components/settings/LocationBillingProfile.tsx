@@ -115,7 +115,7 @@ export function LocationBillingProfile({
           <EmptyState
             icon={Receipt}
             title="Set up this location's billing information"
-            detail="Turn on “Use this Location as a Billing Provider” to start. The location keeps operating without it."
+            detail="Turn on “Use this Location as a Billing Provider” to start."
             className="py-12"
           />
         </Card>
@@ -164,7 +164,6 @@ export function LocationBillingProfile({
           <CamposCredenciales valor={setup} onChange={(c) => setSetup((p) => ({ ...p, ...c }))} errores={errores} />
 
           <div className="mt-6 flex flex-wrap items-center justify-end gap-3 border-t border-line-row pt-4">
-            <span className="mr-auto text-xs text-ink-muted">The profile is enabled only after you save.</span>
             <Button variant="secondary" onClick={() => (setupSucio ? setPreguntar('descartar') : setConfigurando(false))}>Cancel</Button>
             <Button onClick={guardarSetup}>Save and enable</Button>
           </div>
@@ -174,9 +173,7 @@ export function LocationBillingProfile({
       {perfil && !configurando && (
         <>
           {!perfil.activo && (
-            <Alert tone="info" title={INACTIVO}>
-              Turn on “Use this Location as a Billing Provider” to enable it again. Its data and carrier contracts are kept.
-            </Alert>
+            <Alert tone="info" title={INACTIVO} />
           )}
           <IdentidadLocacion
             /* Al deshabilitarse se rearma con lo guardado: lo que no se guardó se descarta. */
@@ -220,11 +217,11 @@ export function LocationBillingProfile({
             setPreguntar(null)
             if (!perfil) return
             guardarPerfil(clave, { ...perfil, activo: false })
-            aviso.ok('Billing profile disabled. The location keeps operating.')
+            aviso.ok('Billing profile disabled.')
           }}
         >
-          It can no longer be chosen as Billing Provider and becomes read-only. Its data and carrier contracts are kept, and
-          the location keeps operating.{haySucios && ' Unsaved changes will be discarded.'}
+          It can no longer be chosen as Billing Provider and becomes read-only. Its data and carrier contracts are
+          kept.{haySucios && ' Unsaved changes will be discarded.'}
         </ConfirmDialog>
       )}
 

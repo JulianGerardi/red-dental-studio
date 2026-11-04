@@ -125,3 +125,23 @@ Provider → Guarda los cambios", 3.6 cancelar antes de guardar no cambia nada).
 **Para validar con usuarios:** si la línea debajo del switch alcanza para que se entienda que falta Save (la pestaña no
 aparece hasta guardar).
 
+## Textos más cortos y Tax ID en una fila (2026-11-04)
+
+Pedidos de Julián sobre el link de prueba:
+
+- **Perfil inactivo**: el aviso queda sólo con el título *This billing profile is inactive and cannot be edited.*, sin la
+  bajada de cómo reactivarlo (Location y provider).
+- **Credenciales**: NPI sola en su fila; *Tax identification type* y *Tax identification number* juntos en la de abajo
+  (`CamposCredenciales`, lo usan el alta de Location y el drawer de credenciales).
+- **Alta de Location**: sale *The profile is enabled only after you save.* del pie (Cancel · Save and enable). Era un
+  estilo que no se usa en otras pantallas parecidas.
+- **"The location keeps operating"** sale de los tres lugares: el estado vacío, la confirmación *Disable this billing
+  profile?* y el toast (*Billing profile disabled.*).
+
+**Para analizar (Julián):** el banner azul a todo el ancho para el perfil inactivo no aparece en otra parte de la app. En
+el resto, la solo lectura se marca con la descripción o una línea gris (*Read-only snapshot…* en Estimates, *Read-only
+summary* en el detalle clínico) y los controles deshabilitados. Propuesta: sacar el banner y dejar la pill **Inactive**
+de la card (ya está) con el texto como descripción de la card y los botones deshabilitados. Quedan, del mismo estilo
+amarillo, *Complete the information and save to enable this billing profile.* (Location) y *Save to set up… / Save to
+deactivate it.* (Primary Provider): a decidir si salen también.
+
