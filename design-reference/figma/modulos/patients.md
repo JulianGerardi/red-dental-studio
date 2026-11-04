@@ -475,3 +475,15 @@ Segunda vuelta de Julián sobre lo publicado (#120):
    finanzas. En Employees el campo se llama "Area Code" pero sus opciones son códigos de país: lleva bandera, con su label.
 
 **Para validar:** ¿también bandera en los selects *Country* de las direcciones? (Es una línea: el mismo `icono`.)
+
+### Año editable en los calendarios y todos los países (2026-11-04)
+
+1. **Año a mano en todos los calendarios.** `MonthCalendar` (lo usan `DatePicker` y `DateFilter`, o sea todos los
+   calendarios de la app) muestra el año como un campo: se escribe y aplica con 4 dígitos; ↑/↓ suman o restan uno; vacío o
+   fuera de 1900–2100 vuelve al que estaba; con `max`, no pasa de ese mes. Las flechas de mes y de año siguen.
+2. **Country Code con los 245 países del mundo** (`data/paises.ts`): códigos sacados una vez de libphonenumber-js 1.12.10,
+   nombres del navegador (`Intl.DisplayNames`), formato "(+54) Argentina" (el de Settings) y de la A a la Z.
+   `CountryCodeField` ya no recibe `options`: trae la lista entera, un **buscador** por nombre o código (`SelectField`
+   suma `buscable`) y abre la lista en el país elegido. Un valor viejo ("+1", "(+1) United States of America (the)") se
+   muestra como su país (`paisDe`). Las banderas son archivos aparte que se cargan al verse (`vite.config`:
+   `assetsInlineLimit`), así el JS no crece con 245 SVG.

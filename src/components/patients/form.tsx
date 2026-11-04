@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
 import { Avatar, inicialesDe } from '@/components/ui/avatar'
 import { CountryFlag } from '@/components/ui/country-flag'
+import { OPCIONES_CODIGO, paisDe } from '@/data/paises'
 
 /* Primitivos de los formularios de Patients (Figma 3640:73356 y hermanos).
    Campo = label 12px + control de 36px, alto total 56 con gap.
@@ -125,7 +126,7 @@ const MENU_ARRIBA = 'bottom-[calc(100%+4px)]'
 
 export function SelectField({
   label, placeholder = 'Select', required, className, options,
-  value: valueProp, onChange, error, hint, disabled, hideLabel, icono,
+  value: valueProp, onChange, error, hint, disabled, hideLabel, icono, buscable, buscarPlaceholder = 'Search',
 }: {
   label: string
   /** Rótulo sólo para lectores de pantalla (el botón lo lleva como aria-label): para una celda de tabla. */
@@ -141,8 +142,14 @@ export function SelectField({
   disabled?: boolean
   /** Algo a la izquierda de cada opción y de la elegida (la bandera de CountryCodeField). */
   icono?: (opcion: string) => React.ReactNode
+  /** Lista larga (los 245 países): un buscador arriba de las opciones, con el foco puesto. */
+  buscable?: boolean
+  buscarPlaceholder?: string
 }) {
-  const items = options ?? OPCIONES[label] ?? OPCIONES_GENERICAS
+  const todas = options ?? OPCIONES[label] ?? OPCIONES_GENERICAS
+  const [busqueda, setBusqueda] = useState('')
+  const q = busqueda.trim().toLowerCase()
+  const items = buscable && q ? todas.filter((o) => o.toLowerCase().includes(q)) : todas
   const [interno, setInterno] = useState<string | null>(null)
   const controlado = onChange !== undefined
   /* '' cuenta como vacío: si no, el botón se queda sin placeholder. */
@@ -150,7 +157,15 @@ export function SelectField({
   const setValue = (v: string) => (controlado ? onChange!(v) : setInterno(v))
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-  const arriba = useHaciaArriba(ref, open, Math.min(items.length * 36 + 8, 224) + 4)
+  const arriba = useHaciaArriba(ref, open, Math.min(todas.length * 36 + 8, 224) + (buscable ? 44 : 0) + 4)
+  const lista = useRef<HTMLDivElement>(null)
+
+  /* Al abrir, la lista arranca en la opción elegida (en 245 países, la de Estados Unidos queda lejos) y sin búsqueda. */
+  useLayoutEffect(() => {
+    if (!open) { setBusqueda(''); return }
+    const elegida = lista.current?.querySelector<HTMLElement>('[data-elegida]')
+    if (elegida && lista.current) lista.current.scrollTop = elegida.offsetTop - lista.current.clientHeight / 2
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -191,11 +206,30 @@ export function SelectField({
           <ChevronDown className={cn('size-4 shrink-0 text-black transition-transform', open && 'rotate-180')} />
         </button>
         {open && (
-          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 max-h-56 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
+          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex w-full flex-col overflow-hidden rounded-md border border-line bg-white shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
+            {buscable && (
+              <div className="border-b border-line p-1.5">
+                <div className="relative">
+                  <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
+                  <input
+                    autoFocus
+                    aria-label={`Search ${label}`}
+                    placeholder={buscarPlaceholder}
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && items[0]) { e.preventDefault(); setValue(items[0]); setOpen(false) } }}
+                    className="h-8 w-full rounded-md border border-line bg-white pr-2 pl-8 text-[13px] placeholder:text-ink-faint focus:border-dash-blue focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
+            <div ref={lista} className="relative max-h-56 overflow-y-auto py-1">
+            {!items.length && <p className="px-3 py-4 text-center text-xs text-ink-muted">No matches.</p>}
             {items.map((o) => (
               <button
                 key={o}
                 type="button"
+                data-elegida={value === o || undefined}
                 onClick={() => { setValue(o); setOpen(false) }}
                 className={cn(
                   'flex w-full items-center justify-between px-3 py-2 text-left text-[13px] hover:bg-surface-muted',
@@ -206,6 +240,7 @@ export function SelectField({
                 {value === o && <Check className="size-3.5 shrink-0" />}
               </button>
             ))}
+            </div>
           </div>
         )}
       </div>
@@ -214,10 +249,15 @@ export function SelectField({
   )
 }
 
-/* El código de país de un teléfono, con la bandera de cada uno (Julián, 2026-11-04). Las opciones pueden ser "+54" o
-   "(+54) Argentina"; el label por defecto es "Country Code". */
-export function CountryCodeField({ label = 'Country Code', ...props }: Omit<React.ComponentProps<typeof SelectField>, 'icono' | 'label'> & { label?: string }) {
-  return <SelectField {...props} label={label} icono={(o) => <CountryFlag opcion={o} />} />
+/* El código de país de un teléfono: los 245 países, con su bandera y un buscador por nombre o código (Julián,
+   2026-11-04; patients.md). Un valor viejo ("+1", "(+1) United States of America (the)") se muestra como su país. */
+export function CountryCodeField({ label = 'Country Code', value, ...props }: Omit<React.ComponentProps<typeof SelectField>, 'icono' | 'label' | 'options' | 'buscable'> & { label?: string }) {
+  return (
+    <SelectField
+      {...props} label={label} options={OPCIONES_CODIGO} buscable buscarPlaceholder="Search country or code"
+      value={value && (paisDe(value)?.opcion ?? value)} icono={(o) => <CountryFlag opcion={o} />}
+    />
+  )
 }
 
 export function DateField({

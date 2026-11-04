@@ -50,7 +50,8 @@ async function altaDeMenor(app: { open: (r: string) => Promise<unknown> }, scree
   await drawer.getByRole('textbox', /Last Name/).fill('Lopez')
   await drawer.getByRole('button', 'Pick a date').tap()
   await drawer.getByRole('button', /1990/).tap()
-  for (let i = 0; i < 26; i++) await screen.getByRole('button', 'Next year').tap()
+  /* El año del calendario se escribe (patients.md, 2026-11-04). */
+  await screen.getByRole('textbox', 'Year').fill('2016')
   await screen.getByRole('button', /January 15, 2016/).tap()
   await drawer.getByRole('button', /Next Step/).tap()
   await expect(drawer.getByText(/This patient is under 18/)).toBeVisible()
@@ -80,6 +81,11 @@ test('New Patient pide guardián para un menor y lo carga como persona nueva', a
   await expect(drawer.getByText('Number must be 7 digits.')).toBeVisible()
   await drawer.getByRole('textbox', /Number \(7 digits\)/).fill('3596750')
 
+  /* Country Code: los países del mundo, con buscador por nombre o código. */
+  await drawer.getByRole('button', /\(\+1\) United States/).tap()
+  await drawer.getByRole('textbox', 'Search Country Code').fill('argen')
+  await drawer.getByRole('button', '(+54) Argentina').tap()
+
   await drawer.getByRole('textbox', /Address Line 1/).fill('36 Main Street')
   await drawer.getByRole('button', /Select country/).tap()
   await drawer.getByRole('button', 'United States').tap()
@@ -92,7 +98,7 @@ test('New Patient pide guardián para un menor y lo carga como persona nueva', a
 
   /* Cerrado, el desplegable resume lo cargado. */
   await drawer.getByRole('button', /^Contact Information/).tap()
-  await expect(drawer.getByText('+1 (324) 359-6750')).toBeVisible()
+  await expect(drawer.getByText('+54 (324) 359-6750')).toBeVisible()
 
   await drawer.getByRole('button', /Next Step/).tap()
   await drawer.getByRole('button', /^Save/).tap()

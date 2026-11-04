@@ -52,7 +52,7 @@ export function NewLocationDrawer({ onClose, onGuardar }: { onClose: () => void;
       <DrawerStep index={1} step={paso}>
         <DrawerSection title="Contact Information">
           <div className="grid gap-4 sm:grid-cols-2">
-            <CountryCodeField required options={CODIGOS} value={d.codigo} onChange={set('codigo')} error={falta('codigo')} />
+            <CountryCodeField required value={d.codigo} onChange={set('codigo')} error={falta('codigo')} />
             <TextField label="Area Code (3 digits)" required placeholder="555" value={d.area} onChange={set('area')} error={falta('area')} />
             <TextField label="Number (7 digits)" required placeholder="000-0000" value={d.numero} onChange={set('numero')} error={falta('numero')} />
             <TextField label="Email" required placeholder="example@example.com" value={d.email} onChange={set('email')} error={falta('email')} />

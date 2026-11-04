@@ -62,7 +62,7 @@ export function NewAccountDrawer({ onClose, onGuardar }: { onClose: () => void; 
         </DrawerSection>
         <DrawerSection title="Contact Information">
           <div className="grid gap-4 sm:grid-cols-2">
-            <CountryCodeField required options={CODIGOS} value={d.codigo} onChange={set('codigo')} error={falta('codigo')} />
+            <CountryCodeField required value={d.codigo} onChange={set('codigo')} error={falta('codigo')} />
             <TextField label="Area Code (3 digits)" required placeholder="555" value={d.area} onChange={set('area')} error={falta('area')} />
             <TextField label="Number (7 digits)" required placeholder="000-0000" value={d.numero} onChange={set('numero')} error={falta('numero')} />
             <TextField label="Email" placeholder="example@example.com" value={d.email} onChange={set('email')} />
@@ -99,7 +99,7 @@ export function NewAccountDrawer({ onClose, onGuardar }: { onClose: () => void; 
           <OptionCheckbox label="Copy contact information from account" checked={copiarContacto} onChange={setCopiarContacto} />
           {!copiarContacto && (
             <div className="grid gap-4 sm:grid-cols-2">
-              <CountryCodeField required options={CODIGOS} value={d.ownerCodigo} onChange={set('ownerCodigo')} error={falta('ownerCodigo')} />
+              <CountryCodeField required value={d.ownerCodigo} onChange={set('ownerCodigo')} error={falta('ownerCodigo')} />
               <TextField label="Area Code (3 digits)" required placeholder="555" value={d.ownerArea} onChange={set('ownerArea')} error={falta('ownerArea')} />
               <TextField label="Number (7 digits)" required placeholder="000-0000" value={d.ownerNumero} onChange={set('ownerNumero')} error={falta('ownerNumero')} />
             </div>

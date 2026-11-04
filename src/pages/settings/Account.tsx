@@ -110,7 +110,7 @@ export function SettingsAccount() {
 
             <Card title="Contact Information">
               <div className="grid gap-4 sm:grid-cols-3">
-                <CountryCodeField required options={['+1', '+34', '+54']} value={contacto.codigo} onChange={(v) => setContacto((c) => ({ ...c, codigo: v }))} />
+                <CountryCodeField required value={contacto.codigo} onChange={(v) => setContacto((c) => ({ ...c, codigo: v }))} />
                 <TextField label="Area Code (3 digits)" required placeholder="Placeholder" value={contacto.areaCode} onChange={(v) => setContacto((c) => ({ ...c, areaCode: v }))} />
                 <TextField label="Number (7 digits)" required placeholder="Placeholder" value={contacto.numero} onChange={(v) => setContacto((c) => ({ ...c, numero: v }))} />
               </div>
@@ -248,7 +248,7 @@ export function SettingsAccount() {
                   </label>
                   <div className="grid gap-4 sm:grid-cols-3">
                     <CountryCodeField
-                      required options={['+1', '+34', '+54']}
+                      required
                       value={copiarContacto ? contacto.codigo : duenioContacto.codigo}
                       onChange={(v) => !copiarContacto && setDuenioContacto((c) => ({ ...c, codigo: v }))}
                     />
