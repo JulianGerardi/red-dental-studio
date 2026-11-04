@@ -29,16 +29,19 @@ test('New Patient vincula a una persona que ya existe en el sistema', async ({ a
   await drawer.getByRole('button', /^Michael Miller/).tap()
   await expect(drawer.getByText("The patient record will use this person's name, birthdate and email.")).toBeVisible()
 
+  /* Adulto: sin paso Guardian, de General va directo a Demography. */
   await drawer.getByRole('button', /Next Step/).tap()
-  await drawer.getByRole('button', /Next Step/).tap()
+  await expect(drawer.getByText('Demographic Information')).toBeVisible()
+  await expect(drawer.getByText('Guardian Information')).toHaveCount(0)
   await drawer.getByRole('button', /^Save/).tap()
 
   await expect(screen.getByText('Michael Miller has been added to the patient list.')).toBeVisible()
   await expect(screen.getByRole('row', /Michael Miller .*May 14, 1982 .*mm\.thompson@yahoo\.com/)).toBeVisible()
 })
 
-/* Guardian (CON-2858; patients.md, 2026-11-04): un menor necesita guardián. Se busca a alguien del sistema o se tilda
-   Add New Person; contacto y dirección van en desplegables que se abren solos si falta algo. */
+/* Guardian (CON-2858; patients.md, 2026-11-04): aparece sólo para un menor, que necesita guardián. Se busca a alguien del
+   sistema (sin pedir sus datos) o se tilda Add New Person; sus datos, contacto y dirección van en desplegables que se
+   abren solos si falta algo. */
 async function altaDeMenor(app: { open: (r: string) => Promise<unknown> }, screen: any) {
   await app.open('/patients')
   await screen.getByRole('button', /New Patient/).first().tap()
@@ -66,7 +69,7 @@ test('New Patient pide guardián para un menor y lo carga como persona nueva', a
   await drawer.getByRole('textbox', /^Email/).fill('ana.lopez@mail.com')
   await drawer.getByRole('button', 'Birthdate').tap()
 
-  /* Plegados: el contacto y la dirección no se ven hasta abrirlos o hasta que falte algo. */
+  /* Personal Information arranca abierto; contacto y dirección, plegados hasta abrirlos o hasta que falte algo. */
   await expect(drawer.getByRole('textbox', /Area Code/)).toHaveCount(0)
   await drawer.getByRole('button', /Next Step/).tap()
   await expect(drawer.getByText('Complete the phone number.')).toBeVisible()
@@ -101,8 +104,8 @@ test('New Patient toma un guardián del sistema sin volver a pedir su contacto',
 
   await drawer.getByRole('textbox', 'Guardian').fill('Jessica')
   await drawer.getByRole('button', /^Jessica Miller/).tap()
-  await expect(drawer.getByText('Contact and address are already on file for this person.')).toBeVisible()
   await expect(drawer.getByRole('button', /^Contact Information/)).toHaveCount(0)
+  await expect(drawer.getByRole('button', /^Personal Information/)).toHaveCount(0)
 
   await drawer.getByRole('checkbox', 'This person is also a guarantor').tap()
   await drawer.getByRole('button', /Next Step/).tap()

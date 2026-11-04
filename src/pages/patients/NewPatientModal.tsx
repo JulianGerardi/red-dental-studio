@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react'
 import { ModalShell } from '@/components/patients/form'
 import { DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import {
-  CamposDemography, CamposGeneral, CamposGuardian, SECCIONES_PACIENTE, limpiarPaciente, useFormPaciente,
+  CamposDemography, CamposGeneral, CamposGuardian, limpiarPaciente, useFormPaciente,
 } from '@/components/patients/PacienteCampos'
 import { usePatients, VACIO_PACIENTE, type DatosPaciente } from '@/data/patientsStore'
 import { PERSONAS_SISTEMA } from '@/data/personas'
 import { aviso } from '@/components/ui/toaster'
 
-/* Figma 3751:73452 (Patients — List): New Patient en tres pasos, General → Guardian → Demography. Guardian y Demography son
-   opcionales (cada uno lo dice en su aviso) y siempre están: ya no aparece sólo para un menor. Next revisa lo obligatorio
+/* Figma 3751:73452 (Patients — List): New Patient en pasos, General → Guardian → Demography. Guardian aparece sólo si el
+   paciente es menor de 18, y entonces es obligatorio (CON-2858); Demography es opcional. Next revisa lo obligatorio
    del paso; Save revisa los tres y vuelve al primero con algo por corregir. Para cambiar un paciente que ya existe, ver
    EditPatientModal (pestañas y Save Changes). Decisiones y anomalías del Figma en modulos/patients.md, 2026-10-22.
    Vincular a una persona que ya está en el sistema (empleado, contacto, suscriptor): modulos/patients.md, 2026-11-02.
@@ -26,8 +26,7 @@ export function NewPatientModal({
   onClose: () => void
 }) {
   const { patients, addPatient } = usePatients()
-  const [paso, setPaso] = useState(pasoInicial)
-  const actual = SECCIONES_PACIENTE[paso]!
+  const [pasoElegido, setPaso] = useState(pasoInicial)
 
   /* Lo escrito a mano no se pierde al tildar y destildar: la persona va aparte y reemplaza esos datos recién al guardar. */
   const [vincular, setVincular] = useState(!!personaInicial)
@@ -40,6 +39,10 @@ export function NewPatientModal({
   const sinPersona = vincular && !persona
   /* Un menor necesita guardián (CON-2858); vinculado, la edad sale de la persona elegida. */
   const f = useFormPaciente({ ...VACIO_PACIENTE, ...inicial }, { guardianMenor: true, nacimiento: persona?.dob })
+  /* Los pasos dependen de la edad: el nacimiento sólo se cambia en General (paso 0), así que el índice no queda colgado. */
+  const pasos = f.secciones
+  const paso = Math.min(pasoElegido, pasos.length - 1)
+  const actual = pasos[paso]!
 
   useEffect(() => {
     if (focoPersona) document.querySelector<HTMLElement>('[data-campo="persona"] input')?.focus()
@@ -55,16 +58,16 @@ export function NewPatientModal({
       if (error) { f.enfocar(error.campo); return }
     }
     f.reiniciarIntento()
-    setPaso((n) => Math.min(n + 1, SECCIONES_PACIENTE.length - 1))
+    setPaso(Math.min(paso + 1, pasos.length - 1))
   }
-  const atras = () => { f.reiniciarIntento(); setPaso((n) => Math.max(n - 1, 0)) }
+  const atras = () => { f.reiniciarIntento(); setPaso(Math.max(paso - 1, 0)) }
   const guardar = () => {
     if (sinPersona) { pedirPersona(); return }
-    const error = f.revisar(vincular ? SECCIONES_PACIENTE.filter((s) => s !== 'General') : SECCIONES_PACIENTE)
-    if (error) { setPaso(SECCIONES_PACIENTE.indexOf(error.seccion)); f.enfocar(error.campo); return }
+    const error = f.revisar(vincular ? pasos.filter((s) => s !== 'General') : pasos)
+    if (error) { setPaso(pasos.indexOf(error.seccion)); f.enfocar(error.campo); return }
     const datos = limpiarPaciente(persona
       ? { ...f.d, first: persona.first, middle: '', last: persona.last, birthday: persona.dob, email: persona.email }
-      : f.d)
+      : f.d, f.menor)
     addPatient(datos)
     aviso.ok(`${[datos.first, datos.last].filter(Boolean).join(' ')} has been added to the patient list.`)
     onClose()
@@ -77,9 +80,9 @@ export function NewPatientModal({
       description="Create the patient record"
       onClose={onClose}
       width="max-w-[560px]"
-      steps={SECCIONES_PACIENTE}
+      steps={pasos}
       step={paso}
-      actions={<DrawerActions step={paso} total={SECCIONES_PACIENTE.length} onNext={siguiente} onBack={atras} onCancel={onClose} onSave={guardar} />}
+      actions={<DrawerActions step={paso} total={pasos.length} onNext={siguiente} onBack={atras} onCancel={onClose} onSave={guardar} />}
     >
       <DrawerStep index={0} step={paso}>
         <CamposGeneral
@@ -94,8 +97,8 @@ export function NewPatientModal({
           }}
         />
       </DrawerStep>
-      <DrawerStep index={1} step={paso}><CamposGuardian {...comunes} obligatorio={f.menor} excluir={persona?.name} /></DrawerStep>
-      <DrawerStep index={2} step={paso}><CamposDemography {...comunes} /></DrawerStep>
+      {f.menor && <DrawerStep index={1} step={paso}><CamposGuardian {...comunes} obligatorio excluir={persona?.name} /></DrawerStep>}
+      <DrawerStep index={pasos.length - 1} step={paso}><CamposDemography {...comunes} /></DrawerStep>
     </ModalShell>
   )
 }

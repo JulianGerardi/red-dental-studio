@@ -438,3 +438,23 @@ de Sofia Chen) pasa a ser un contacto del directorio, con teléfono y dirección
 - CON-2858 dice "uno o más guardians": acá se carga uno; el segundo se suma desde Relationships. ¿Hace falta en el alta?
 - Edit Patient no exige guardián a un menor (para no trabar la edición de fichas viejas: toda la tabla de ejemplo es de 2025).
 - La relación y el garante todavía no crean la fila en Relationships del paciente (no hay backend; postcondición de Jira).
+
+### Ajustes de Julián sobre el link de prueba (2026-11-04, CON-2858)
+
+1. **Guardian aparece sólo para un menor de 18**, calculado con la fecha del calendario contra hoy: New Patient tiene
+   tres pasos (General → Guardian → Demography) para un menor y dos (General → Demography) para un adulto; Edit Patient,
+   lo mismo con las pestañas. Reemplaza la decisión del 2026-10-22 ("Guardian siempre está"). Si la edad cambia, los
+   datos de guardián cargados no se guardan (`limpiarPaciente(d, menor)`) ni se validan. Vinculado a una persona del
+   sistema, la edad sale de su DOB.
+2. **Orden de General:** primero *Use this option only to link a person…*, después los datos y, debajo del email, *Create a
+   patient portal account using this email address* (en Edit, el estado *Linked* va en el mismo lugar). **Interpreter
+   Required pasa a Demography**, arriba de los campos.
+3. **El aviso de Guardian** queda sólo el del menor (*This patient is under 18…*). Julián escribió "sólo si es mayor de 18";
+   como el paso ya existe sólo para menores, se tomó como "menor". A confirmar.
+4. **Persona del sistema: no se piden datos.** Sale la excepción "si el sistema no tiene su contacto, se pide" (Robert
+   Miller): elegida, queda la card y nada más. Sale también la ayuda *Contact and address are already on file…*.
+5. **Persona nueva:** First name, Last name, Email y Birthdate van en un desplegable más, **Personal Information**, como
+   Contact y Address. Arranca abierto (es lo primero que se completa); los otros dos, cerrados.
+
+**Para validar:** ¿la persona elegida del sistema sin teléfono ni dirección (Robert Miller) necesita que se los pidan en
+otro momento (Relationships)?

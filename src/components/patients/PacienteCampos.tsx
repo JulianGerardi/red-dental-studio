@@ -21,7 +21,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 /* En qué sección vive cada campo: el guardado la usa para señalar la pestaña y llevar al usuario hasta el campo. */
 const SECCION_DE_CAMPO: Record<keyof DatosPaciente, SeccionPaciente> = {
-  first: 'General', middle: 'General', last: 'General', birthday: 'General', email: 'General', interpreter: 'General', portal: 'General',
+  first: 'General', middle: 'General', last: 'General', birthday: 'General', email: 'General', interpreter: 'Demography', portal: 'General',
   guardianName: 'Guardian', guardianNuevo: 'Guardian', gFirst: 'Guardian', gLast: 'Guardian', gEmail: 'Guardian', gDob: 'Guardian',
   gCodigo: 'Guardian', gArea: 'Guardian', gNumero: 'Guardian', gExt: 'Guardian', gLinea1: 'Guardian', gLinea2: 'Guardian',
   gPais: 'Guardian', gEstado: 'Guardian', gCiudad: 'Guardian', gZip: 'Guardian', guardianGarante: 'Guardian', guardianRel: 'Guardian',
@@ -49,38 +49,40 @@ export function esMenor(nacimiento: string) {
   return hoy.getFullYear() - f.getFullYear() - (cumplio ? 0 : 1) < 18
 }
 
-/* El guardián elegido del buscador (si lo escrito coincide con alguien) y si hay que pedirle contacto y dirección:
-   sí cuando es nuevo o cuando el sistema no los tiene (como Add Relationship, CON-3174). */
+/* El guardián elegido del buscador (si lo escrito coincide con alguien), o uno nuevo. Al de sistema no se le piden datos:
+   ya están cargados (Julián, 2026-11-04). */
 export function guardianDe(d: DatosPaciente) {
   const persona = d.guardianNuevo ? undefined : PERSONAS_SISTEMA.find((p) => p.name === d.guardianName)
-  const tiene = d.guardianNuevo || !!persona
-  return { persona, tiene, pideContacto: d.guardianNuevo || (!!persona && (!persona.telefono || !persona.direccion)) }
+  return { persona, tiene: d.guardianNuevo || !!persona }
 }
+
+/* Las secciones que se ven: Guardian, sólo para un menor de 18 (CON-2858; patients.md, 2026-11-04). */
+export const seccionesDe = (menor: boolean): SeccionPaciente[] =>
+  SECCIONES_PACIENTE.filter((s) => menor || s !== 'Guardian')
 
 export const MENOR_SIN_GUARDIAN = 'This patient is a minor and must have at least one guardian assigned.'
 
-/* Obligatorios: nombre, apellido y nacimiento. Guardian (CON-2858): para un menor, en el alta, hace falta uno; si hay
-   guardián, su relación, y si es nuevo o el sistema no tiene su contacto, el contacto y la dirección (patients.md,
-   2026-11-04). Demography es opcional entero, como dice su aviso. `portalNuevo`: se pide crear la cuenta del portal con
-   este email, así que el email hace falta. */
-export function validarPaciente(d: DatosPaciente, portalNuevo: boolean, menorSinGuardian = false): ErroresPaciente {
+/* Obligatorios: nombre, apellido y nacimiento. Guardian (CON-2858), sólo para un menor: en el alta hace falta uno; si hay
+   guardián, su relación, y si es nuevo, sus datos, contacto y dirección (patients.md, 2026-11-04). Demography es opcional
+   entero, como dice su aviso. `portalNuevo`: se pide crear la cuenta del portal con este email, así que el email hace
+   falta. */
+export function validarPaciente(d: DatosPaciente, portalNuevo: boolean, menor = false, exigirGuardian = false): ErroresPaciente {
   const e: ErroresPaciente = {}
   if (!d.first.trim()) e.first = OBLIGATORIO
   if (!d.last.trim()) e.last = OBLIGATORIO
   if (!d.birthday.trim()) e.birthday = OBLIGATORIO
   if (d.email.trim() && !EMAIL.test(d.email.trim())) e.email = 'Enter a valid email.'
   else if (portalNuevo && !d.email.trim()) e.email = 'Enter an email to create the portal account.'
+  if (!menor) return e
   const g = guardianDe(d)
   if (!g.tiene) {
     if (d.guardianName.trim()) e.guardianName = 'Select a person from the list or tick Add New Person.'
-    else if (menorSinGuardian) e.guardianName = MENOR_SIN_GUARDIAN
+    else if (exigirGuardian) e.guardianName = MENOR_SIN_GUARDIAN
     return e
   }
   if (d.guardianNuevo) {
     for (const k of NUEVO_G) if (!d[k].trim()) e[k] = OBLIGATORIO
     if (d.gEmail.trim() && !EMAIL.test(d.gEmail.trim())) e.gEmail = 'Enter a valid email.'
-  }
-  if (g.pideContacto) {
     for (const k of ['gCodigo', 'gArea', 'gNumero', 'gLinea1', 'gPais', 'gEstado', 'gCiudad', 'gZip'] as const) if (!d[k].trim()) e[k] = OBLIGATORIO
     if (d.gArea.trim() && digitos(d.gArea).length !== 3) e.gArea = 'Area code must be 3 digits.'
     if (d.gNumero.trim() && digitos(d.gNumero).length !== 7) e.gNumero = 'Number must be 7 digits.'
@@ -89,16 +91,15 @@ export function validarPaciente(d: DatosPaciente, portalNuevo: boolean, menorSin
   return e
 }
 
-/* Se guarda sólo lo que corresponde al guardián que quedó: nada si no hay, sin los datos de persona nueva si se eligió a
-   alguien del sistema, y sin contacto si el sistema ya lo tiene. */
-export function limpiarPaciente(d: DatosPaciente): DatosPaciente {
+/* Se guarda sólo lo que corresponde al guardián que quedó: nada si no hay (o si el paciente no es menor), y sin los datos
+   de persona nueva si se eligió a alguien del sistema. */
+export function limpiarPaciente(d: DatosPaciente, menor: boolean): DatosPaciente {
   const g = guardianDe(d)
   const vaciar = (ks: readonly (keyof DatosPaciente)[]) => Object.fromEntries(ks.map((k) => [k, ''])) as Partial<DatosPaciente>
-  if (!g.tiene) return { ...d, guardianName: '', ...vaciar([...NUEVO_G, ...CONTACTO_G, ...DIRECCION_G, 'guardianRel']), guardianGarante: false }
+  if (!menor || !g.tiene) return { ...d, guardianName: '', ...vaciar([...NUEVO_G, ...CONTACTO_G, ...DIRECCION_G, 'guardianRel']), guardianGarante: false }
   return {
     ...d,
-    ...(d.guardianNuevo ? { guardianName: [d.gFirst.trim(), d.gLast.trim()].join(' ') } : vaciar(NUEVO_G)),
-    ...(g.pideContacto ? {} : vaciar([...CONTACTO_G, ...DIRECCION_G])),
+    ...(d.guardianNuevo ? { guardianName: [d.gFirst.trim(), d.gLast.trim()].join(' ') } : vaciar([...NUEVO_G, ...CONTACTO_G, ...DIRECCION_G])),
   }
 }
 
@@ -120,7 +121,7 @@ export function useFormPaciente(
   const [foco, setFoco] = useState<{ campo: keyof DatosPaciente; n: number } | null>(null)
   const portalNuevo = d.portal && !portalVinculado
   const menor = esMenor(nacimiento ?? d.birthday)
-  const todos = useMemo(() => validarPaciente(d, portalNuevo, guardianMenor && menor), [d, portalNuevo, guardianMenor, menor])
+  const todos = useMemo(() => validarPaciente(d, portalNuevo, menor, guardianMenor), [d, portalNuevo, guardianMenor, menor])
   const errores: ErroresPaciente = intentado ? todos : {}
 
   /* Add New Person muestra campos nuevos: arrancan limpios, no en rojo por el intento anterior (patients.md, 2026-11-04). */
@@ -144,7 +145,7 @@ export function useFormPaciente(
     document.querySelector<HTMLElement>(`[data-campo="${foco.campo}"] input, [data-campo="${foco.campo}"] button`)?.focus()
   }, [foco])
 
-  return { d, cambiar, errores, revisar, enfocar, conError, menor, reiniciarIntento: () => setIntentado(false) }
+  return { d, cambiar, errores, revisar, enfocar, conError, menor, secciones: seccionesDe(menor), reiniciarIntento: () => setIntentado(false) }
 }
 
 /* El contenedor que deja ubicar un campo desde afuera (ver el foco de useFormPaciente). */
@@ -200,27 +201,25 @@ function BuscarPersona({ v }: { v: VinculoPersona }) {
   )
 }
 
+/* Orden de Julián (2026-11-04): primero vincular a una persona del sistema, después los datos y, debajo del email, la
+   cuenta del portal. Interpreter Required pasa a Demography. */
 export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo }: Props & { portalVinculado?: boolean; vinculo?: VinculoPersona }) {
   return (
-    <div className="flex flex-col gap-6">
-      {portalVinculado && <CuentaPortal />}
-      <DrawerSection title="General Information">
-        <OptionCheckbox label="Interpreter Required" checked={d.interpreter} onChange={(v) => cambiar('interpreter', v)} />
-        {!portalVinculado && (
-          <OptionCheckbox label="Create a patient portal account using this email address" checked={d.portal} onChange={(v) => cambiar('portal', v)} />
-        )}
-        {vinculo && <LinkPersonCheckbox checked={vinculo.activo} onChange={vinculo.onActivo} />}
-        {vinculo?.activo ? <BuscarPersona v={vinculo} /> : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Campo nombre="first"><TextField label="First Name" required placeholder="John" value={d.first} onChange={(v) => cambiar('first', v)} error={errores.first} /></Campo>
-            <Campo nombre="middle"><TextField label="Middle Name" placeholder="Lorem" value={d.middle} onChange={(v) => cambiar('middle', v)} /></Campo>
-            <Campo nombre="last"><TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={(v) => cambiar('last', v)} error={errores.last} /></Campo>
-            <Campo nombre="birthday"><DateField label="Birthdate" required valorInicial={d.birthday} onChange={(v) => cambiar('birthday', v)} error={errores.birthday} /></Campo>
-            <Campo nombre="email"><TextField label="Email" placeholder="john.smith@hotmail.com" value={d.email} onChange={(v) => cambiar('email', v)} error={errores.email} /></Campo>
-          </div>
-        )}
-      </DrawerSection>
-    </div>
+    <DrawerSection title="General Information">
+      {vinculo && <LinkPersonCheckbox checked={vinculo.activo} onChange={vinculo.onActivo} />}
+      {vinculo?.activo ? <BuscarPersona v={vinculo} /> : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Campo nombre="first"><TextField label="First Name" required placeholder="John" value={d.first} onChange={(v) => cambiar('first', v)} error={errores.first} /></Campo>
+          <Campo nombre="middle"><TextField label="Middle Name" placeholder="Lorem" value={d.middle} onChange={(v) => cambiar('middle', v)} /></Campo>
+          <Campo nombre="last"><TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={(v) => cambiar('last', v)} error={errores.last} /></Campo>
+          <Campo nombre="birthday"><DateField label="Birthdate" required valorInicial={d.birthday} onChange={(v) => cambiar('birthday', v)} error={errores.birthday} /></Campo>
+          <Campo nombre="email"><TextField label="Email" placeholder="john.smith@hotmail.com" value={d.email} onChange={(v) => cambiar('email', v)} error={errores.email} /></Campo>
+        </div>
+      )}
+      {portalVinculado ? <CuentaPortal /> : (
+        <OptionCheckbox label="Create a patient portal account using this email address" checked={d.portal} onChange={(v) => cambiar('portal', v)} />
+      )}
+    </DrawerSection>
   )
 }
 
@@ -234,9 +233,10 @@ const telefono = (d: DatosPaciente) =>
     : ''
 const direccion = (d: DatosPaciente) => [d.gLinea1, d.gLinea2, d.gCiudad, d.gEstado, d.gZip].map((x) => x.trim()).filter(Boolean).join(', ')
 
-/* Guardian (CON-2858; patients.md, 2026-11-04): buscar a alguien del sistema o tildar Add New Person y cargarlo. El
-   contacto y la dirección van en dos desplegables cerrados con un resumen, para que el paso no se estire como en 2.0.
-   Relación y garante aparecen recién cuando hay guardián. `obligatorio`: alta de un menor; cambia el aviso y marca el campo.
+/* Guardian (CON-2858; patients.md, 2026-11-04), sólo para un menor: buscar a alguien del sistema (sus datos ya están
+   cargados: no se piden) o tildar Add New Person y cargarlo en tres desplegables con resumen -datos, contacto y
+   dirección-, para que el paso no se estire como en 2.0. Relación y garante aparecen recién cuando hay guardián.
+   `obligatorio`: en el alta el guardián hace falta (marca el campo).
    `excluir`: la persona del sistema que se está dando de alta como paciente (no puede ser su propio guardián). */
 export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Props & { obligatorio?: boolean; excluir?: string }) {
   const g = guardianDe(d)
@@ -244,13 +244,10 @@ export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Pr
   const errorEn = (ks: readonly (keyof DatosPaciente)[]) => ks.some((k) => errores[k])
   const tel = telefono(d)
   const dir = direccion(d)
+  const persona = [[d.gFirst, d.gLast].map((x) => x.trim()).filter(Boolean).join(' '), d.gEmail.trim(), d.gDob && `DOB: ${d.gDob}`].filter(Boolean).join(' · ')
   return (
     <DrawerSection title="Guardian Information">
-      <SectionNotice>
-        {obligatorio
-          ? 'This patient is under 18. Add at least one guardian: search for a person in the system or add a new one.'
-          : 'Optional section. Use this section when a guardian needs to be associated with the patient. It is available in both creation and editing.'}
-      </SectionNotice>
+      <SectionNotice>This patient is under 18. Add at least one guardian: search for a person in the system or add a new one.</SectionNotice>
       <Campo nombre="guardianName">
         <PersonSearchField
           label="Guardian" required={obligatorio} placeholder="Search by Name or Last Name"
@@ -258,7 +255,6 @@ export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Pr
           value={d.guardianName} onChange={(v) => cambiar('guardianName', v)}
           disabled={d.guardianNuevo} error={errores.guardianName}
           emptyText="No one in the system matches this name. Tick Add New Person to enter their details."
-          hint={g.persona && !g.pideContacto ? 'Contact and address are already on file for this person.' : undefined}
           lineas={(n) => {
             const p = personas.find((x) => x.name === n)
             return p && [p.tipo, `DOB: ${p.dob}`, `Email: ${p.email}`]
@@ -270,15 +266,18 @@ export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Pr
         onChange={(v) => { cambiar('guardianNuevo', v); if (v) cambiar('guardianName', '') }}
       />
       {d.guardianNuevo && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Campo nombre="gFirst"><TextField label="First name" required placeholder="First name" value={d.gFirst} onChange={(v) => cambiar('gFirst', v)} error={errores.gFirst} /></Campo>
-          <Campo nombre="gLast"><TextField label="Last name" required placeholder="Last name" value={d.gLast} onChange={(v) => cambiar('gLast', v)} error={errores.gLast} /></Campo>
-          <Campo nombre="gEmail"><TextField label="Email" required placeholder="Email" value={d.gEmail} onChange={(v) => cambiar('gEmail', v)} error={errores.gEmail} /></Campo>
-          <Campo nombre="gDob"><DateField label="Birthdate" required placeholder="Birthdate" valorInicial={d.gDob} onChange={(v) => cambiar('gDob', v)} error={errores.gDob} /></Campo>
-        </div>
-      )}
-      {g.pideContacto && (
         <>
+          <CollapsibleFields
+            title="Personal Information" required defaultOpen error={errorEn(NUEVO_G)}
+            summary={errorEn(NUEVO_G) ? 'Complete name, email and birthdate.' : persona || 'Add name, email and birthdate'}
+          >
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Campo nombre="gFirst"><TextField label="First name" required placeholder="First name" value={d.gFirst} onChange={(v) => cambiar('gFirst', v)} error={errores.gFirst} /></Campo>
+              <Campo nombre="gLast"><TextField label="Last name" required placeholder="Last name" value={d.gLast} onChange={(v) => cambiar('gLast', v)} error={errores.gLast} /></Campo>
+              <Campo nombre="gEmail"><TextField label="Email" required placeholder="Email" value={d.gEmail} onChange={(v) => cambiar('gEmail', v)} error={errores.gEmail} /></Campo>
+              <Campo nombre="gDob"><DateField label="Birthdate" required placeholder="Birthdate" valorInicial={d.gDob} onChange={(v) => cambiar('gDob', v)} error={errores.gDob} /></Campo>
+            </div>
+          </CollapsibleFields>
           <CollapsibleFields
             title="Contact Information" required error={errorEn(CONTACTO_G)}
             summary={errorEn(CONTACTO_G) ? 'Complete the phone number.' : tel || 'Add a phone number'}
@@ -326,6 +325,7 @@ export function CamposDemography({ d, cambiar }: Props) {
   return (
     <DrawerSection title="Demographic Information">
       <SectionNotice>Additional contact and address information. These fields are optional.</SectionNotice>
+      <OptionCheckbox label="Interpreter Required" checked={d.interpreter} onChange={(v) => cambiar('interpreter', v)} />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Campo nombre="phone"><TextField label="Phone" placeholder="408-XXX-XXXX" value={d.phone} onChange={(v) => cambiar('phone', v)} /></Campo>
         <Campo nombre="language"><TextField label="Preferred Language" placeholder="English" value={d.language} onChange={(v) => cambiar('language', v)} /></Campo>

@@ -23,7 +23,7 @@ const salir = () => {}
 
 /* New Patient: un paso por story. */
 export const NewPatient: Story = { render: () => <NewPatientModal onClose={salir} /> }
-export const NewPatientGuardian: Story = { name: 'New Patient — Guardian', render: () => <NewPatientModal pasoInicial={1} onClose={salir} /> }
+export const NewPatientGuardian: Story = { name: 'New Patient — Guardian', render: () => <NewPatientModal pasoInicial={1} inicial={{ first: 'Mia', last: 'Lopez', birthday: 'January 15, 2016' }} onClose={salir} /> }
 export const NewPatientDemography: Story = { name: 'New Patient — Demography', render: () => <NewPatientModal pasoInicial={2} onClose={salir} /> }
 /* Next Step sin lo obligatorio: marca en rojo y no avanza. */
 export const NewPatientRequired: Story = {
