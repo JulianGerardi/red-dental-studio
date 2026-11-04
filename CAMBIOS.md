@@ -5,6 +5,19 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-04
 
+### New Patient: Guardian para menores, como en 2.0 y con desplegables ([#120](https://github.com/JulianGerardi/red-dental-studio/pull/120))
+- **CON-2858.** El paso **Guardian** (pestaña en Edit Patient) aparece sólo si el paciente es **menor de 18** y en el alta es
+  obligatorio (*This patient is a minor and must have at least one guardian assigned.*). Adulto: General → Demography.
+- Guardian: buscador de personas del sistema (elegida, no se le piden datos) o **Add New Person**, con sus datos en tres
+  desplegables con resumen: *Personal Information* (abierto), *Contact Information* y *Address Information* (cerrados;
+  se abren solos si falta algo). Después, *This person is also a guarantor* y *Relationship to Patient* (relaciones de 2.0).
+- General: primero *Use this option only to link a person…*, después los datos y la cuenta del portal debajo del email.
+  **Interpreter Required pasa a Demography.**
+- **Para el dev:** pieza nueva `CollapsibleFields` (`patients/form.tsx`). `DatosPaciente` pierde `guardian` y suma
+  `guardianNuevo`, `gFirst…gZip` y `guardianGarante`. `useFormPaciente(inicial, { portalVinculado, guardianMenor, nacimiento })`
+  devuelve `menor` y `secciones`; `limpiarPaciente(d, menor)`. `PersonSearchField` ahora tiene `aria-label`. Detalle en
+  `patients.md` (2026-11-04). Sin Storybook todavía.
+
 ### Billing Profile: Primary Provider con Save, textos más cortos y carriers de la A a la Z ([#119](https://github.com/JulianGerardi/red-dental-studio/pull/119))
 - **CON-4004 / CON-4007.** *Is a Primary Provider* vuelve a aplicarse con el **Save** de la ficha (revierte lo del #118):
   la pestaña *Insurance / Billing Profile* aparece al guardar en Yes. Guardarlo en No pregunta **Deactivate Primary

@@ -23,7 +23,7 @@ const salir = () => {}
 
 /* New Patient: un paso por story. */
 export const NewPatient: Story = { render: () => <NewPatientModal onClose={salir} /> }
-export const NewPatientGuardian: Story = { name: 'New Patient — Guardian', render: () => <NewPatientModal pasoInicial={1} onClose={salir} /> }
+export const NewPatientGuardian: Story = { name: 'New Patient — Guardian', render: () => <NewPatientModal pasoInicial={1} inicial={{ first: 'Mia', last: 'Lopez', birthday: 'January 15, 2016' }} onClose={salir} /> }
 export const NewPatientDemography: Story = { name: 'New Patient — Demography', render: () => <NewPatientModal pasoInicial={2} onClose={salir} /> }
 /* Next Step sin lo obligatorio: marca en rojo y no avanza. */
 export const NewPatientRequired: Story = {
@@ -45,7 +45,7 @@ export const EditPatientErrors: Story = {
   render: () => (
     <EditPatientModal
       seccionInicial="Demography"
-      inicial={{ ...VACIO_PACIENTE, first: 'Abril', birthday: 'April 2, 2025', email: 'abril@gmail.com', guardian: true, city: 'Phoenix' }}
+      inicial={{ ...VACIO_PACIENTE, first: 'Abril', birthday: 'April 2, 2025', email: 'abril@gmail.com', guardianNuevo: true, city: 'Phoenix' }}
       onClose={salir}
     />
   ),
@@ -65,7 +65,7 @@ export const FieldsGeneral: Story = {
 }
 export const FieldsGuardian: Story = {
   name: 'Fields — Guardian', parameters: { layout: 'padded' },
-  render: () => <div className="w-[512px]"><CamposGuardian d={{ ...datos, guardian: true, guardianName: 'Elena Chen', guardianRel: 'Parent' }} cambiar={sinCambiar} errores={{}} /></div>,
+  render: () => <div className="w-[512px]"><CamposGuardian d={{ ...datos, guardianName: 'Elena Chen', guardianRel: 'Parent' }} cambiar={sinCambiar} errores={{}} /></div>,
 }
 export const FieldsDemography: Story = {
   name: 'Fields — Demography', parameters: { layout: 'padded' },

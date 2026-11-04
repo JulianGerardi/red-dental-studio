@@ -18,6 +18,8 @@ export type PersonaDirectorio = {
 export const DIRECTORIO: PersonaDirectorio[] = [
   { name: 'Michael Miller', initials: 'MM', dob: 'May 14, 1982', email: 'mm.thompson@yahoo.com', telefono: '(555) 765-4321', direccion: '45 Desert View Road, Phoenix, AZ 85018' },
   { name: 'Jessica Miller', initials: 'JM', dob: 'May 14, 1982', email: 'jessica.miller@gmail.com', telefono: '(555) 123-4567', direccion: '123 Maple Street, Phoenix, AZ 85016' },
+  /* La mamá de Sofia Chen: su guardián en Edit Patient. */
+  { name: 'Elena Chen', initials: 'EC', dob: 'September 3, 1990', email: 'elena.chen@mail.com', telefono: '(555) 987-6543', direccion: '88 Bayview Drive, Miami, FL 33131' },
   /* Sin contacto cargado: al elegirlo, Add Relationship pide el paso Contact. */
   { name: 'Robert Miller', initials: 'RM', dob: 'March 2, 1979', email: 'rob.miller@outlook.com' },
 ]

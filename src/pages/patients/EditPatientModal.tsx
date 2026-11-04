@@ -3,7 +3,7 @@ import { ModalShell } from '@/components/patients/form'
 import { DrawerActions } from '@/components/ui/drawer'
 import { Tabs } from '@/components/ui/tabs'
 import {
-  CamposDemography, CamposGeneral, CamposGuardian, SECCIONES_PACIENTE, limpiarPaciente, useFormPaciente, type SeccionPaciente,
+  CamposDemography, CamposGeneral, CamposGuardian, limpiarPaciente, useFormPaciente, type SeccionPaciente,
 } from '@/components/patients/PacienteCampos'
 import { usePatients, VACIO_PACIENTE, type DatosPaciente } from '@/data/patientsStore'
 import { aviso } from '@/components/ui/toaster'
@@ -27,13 +27,15 @@ export function EditPatientModal({
   const datos = inicial ?? (id ? datosDe(id) : undefined) ?? VACIO_PACIENTE
   /* La cuenta del portal que ya existía no se cambia desde acá: se muestra como "Linked". */
   const portalVinculado = datos.portal
-  const f = useFormPaciente(datos, portalVinculado)
-  const [seccion, setSeccion] = useState<SeccionPaciente>(seccionInicial)
+  const f = useFormPaciente(datos, { portalVinculado })
+  const [elegida, setSeccion] = useState<SeccionPaciente>(seccionInicial)
+  /* Guardian, sólo para un menor (patients.md, 2026-11-04): si deja de serlo, se vuelve a General. */
+  const seccion = f.secciones.includes(elegida) ? elegida : 'General'
 
   const guardar = () => {
-    const error = f.revisar(SECCIONES_PACIENTE)
+    const error = f.revisar(f.secciones)
     if (error) { setSeccion(error.seccion); f.enfocar(error.campo); return }
-    const guardado = limpiarPaciente(f.d)
+    const guardado = limpiarPaciente(f.d, f.menor)
     if (id) updatePatient(id, guardado)
     aviso.ok(`${[guardado.first, guardado.last].filter(Boolean).join(' ')} has been updated.`)
     onClose()
@@ -52,13 +54,13 @@ export function EditPatientModal({
       tabs={(
         <Tabs
           aria-label="Patient sections" fullWidth value={seccion} onChange={setSeccion}
-          tabs={SECCIONES_PACIENTE.map((s) => ({ value: s, alerta: f.conError(s) }))}
+          tabs={f.secciones.map((s) => ({ value: s, alerta: f.conError(s) }))}
         />
       )}
       actions={<DrawerActions onCancel={onClose} onSave={guardar} saveLabel="Save Changes" />}
     >
       {panel('General', <CamposGeneral {...comunes} portalVinculado={portalVinculado} />)}
-      {panel('Guardian', <CamposGuardian {...comunes} />)}
+      {f.menor && panel('Guardian', <CamposGuardian {...comunes} />)}
       {panel('Demography', <CamposDemography {...comunes} />)}
     </ModalShell>
   )
