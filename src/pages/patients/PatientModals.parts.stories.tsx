@@ -45,7 +45,7 @@ export const EditPatientErrors: Story = {
   render: () => (
     <EditPatientModal
       seccionInicial="Demography"
-      inicial={{ ...VACIO_PACIENTE, first: 'Abril', birthday: 'April 2, 2025', email: 'abril@gmail.com', guardian: true, city: 'Phoenix' }}
+      inicial={{ ...VACIO_PACIENTE, first: 'Abril', birthday: 'April 2, 2025', email: 'abril@gmail.com', guardianNuevo: true, city: 'Phoenix' }}
       onClose={salir}
     />
   ),
@@ -65,7 +65,7 @@ export const FieldsGeneral: Story = {
 }
 export const FieldsGuardian: Story = {
   name: 'Fields — Guardian', parameters: { layout: 'padded' },
-  render: () => <div className="w-[512px]"><CamposGuardian d={{ ...datos, guardian: true, guardianName: 'Elena Chen', guardianRel: 'Parent' }} cambiar={sinCambiar} errores={{}} /></div>,
+  render: () => <div className="w-[512px]"><CamposGuardian d={{ ...datos, guardianName: 'Elena Chen', guardianRel: 'Parent' }} cambiar={sinCambiar} errores={{}} /></div>,
 }
 export const FieldsDemography: Story = {
   name: 'Fields — Demography', parameters: { layout: 'padded' },

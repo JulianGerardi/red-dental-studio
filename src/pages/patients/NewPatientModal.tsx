@@ -13,6 +13,7 @@ import { aviso } from '@/components/ui/toaster'
    del paso; Save revisa los tres y vuelve al primero con algo por corregir. Para cambiar un paciente que ya existe, ver
    EditPatientModal (pestañas y Save Changes). Decisiones y anomalías del Figma en modulos/patients.md, 2026-10-22.
    Vincular a una persona que ya está en el sistema (empleado, contacto, suscriptor): modulos/patients.md, 2026-11-02.
+   Guardian como en 2.0 (buscar o Add New Person, obligatorio para un menor; CON-2858): modulos/patients.md, 2026-11-04.
 
    `inicial`, `pasoInicial` y `personaInicial` son para Storybook: abrir el formulario con datos, en un paso o vinculado. */
 export function NewPatientModal({
@@ -25,7 +26,6 @@ export function NewPatientModal({
   onClose: () => void
 }) {
   const { patients, addPatient } = usePatients()
-  const f = useFormPaciente({ ...VACIO_PACIENTE, ...inicial })
   const [paso, setPaso] = useState(pasoInicial)
   const actual = SECCIONES_PACIENTE[paso]!
 
@@ -38,6 +38,8 @@ export function NewPatientModal({
   const candidatos = PERSONAS_SISTEMA.filter((p) => !yaPacientes.has(p.name.toLowerCase()))
   const persona = vincular ? candidatos.find((p) => p.name === personaNombre) : undefined
   const sinPersona = vincular && !persona
+  /* Un menor necesita guardián (CON-2858); vinculado, la edad sale de la persona elegida. */
+  const f = useFormPaciente({ ...VACIO_PACIENTE, ...inicial }, { guardianMenor: true, nacimiento: persona?.dob })
 
   useEffect(() => {
     if (focoPersona) document.querySelector<HTMLElement>('[data-campo="persona"] input')?.focus()
@@ -92,7 +94,7 @@ export function NewPatientModal({
           }}
         />
       </DrawerStep>
-      <DrawerStep index={1} step={paso}><CamposGuardian {...comunes} /></DrawerStep>
+      <DrawerStep index={1} step={paso}><CamposGuardian {...comunes} obligatorio={f.menor} excluir={persona?.name} /></DrawerStep>
       <DrawerStep index={2} step={paso}><CamposDemography {...comunes} /></DrawerStep>
     </ModalShell>
   )

@@ -27,7 +27,7 @@ export function EditPatientModal({
   const datos = inicial ?? (id ? datosDe(id) : undefined) ?? VACIO_PACIENTE
   /* La cuenta del portal que ya existía no se cambia desde acá: se muestra como "Linked". */
   const portalVinculado = datos.portal
-  const f = useFormPaciente(datos, portalVinculado)
+  const f = useFormPaciente(datos, { portalVinculado })
   const [seccion, setSeccion] = useState<SeccionPaciente>(seccionInicial)
 
   const guardar = () => {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Drawer, DrawerSection, useEnDrawer, type DrawerSize } from '@/components/ui/drawer'
 import { ChevronDown, Calendar, Check, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -299,6 +299,52 @@ export function LinkPersonCheckbox(props: Omit<React.ComponentProps<typeof Optio
   )
 }
 
+/* Un grupo de campos que se pliega: cerrado muestra el título y un resumen de lo cargado, así un formulario largo (el
+   contacto y la dirección del guardián) no estira el paso. Con algo por corregir se abre solo y queda en rojo.
+   patients.md, 2026-11-04. */
+export function CollapsibleFields({
+  title, required, summary, error, defaultOpen = false, children,
+}: {
+  title: string
+  required?: boolean
+  /** Lo cargado en una línea ("+1 (324) 359-6750"), o qué falta cargar. */
+  summary: string
+  /** Hay un campo adentro con error: abre el grupo y lo pinta de rojo. */
+  error?: boolean
+  defaultOpen?: boolean
+  children: React.ReactNode
+}) {
+  const [abierto, setAbierto] = useState(defaultOpen || !!error)
+  /* Se abre en el mismo render en que aparece el error, así el foco llega al campo (useFormPaciente.enfocar). */
+  const [errorPrevio, setErrorPrevio] = useState(error)
+  if (error !== errorPrevio) {
+    setErrorPrevio(error)
+    if (error) setAbierto(true)
+  }
+  const id = useId()
+  return (
+    <div className={cn('rounded-lg border bg-white', error ? 'border-field-error' : 'border-line')}>
+      <button
+        type="button"
+        aria-expanded={abierto}
+        aria-controls={id}
+        onClick={() => setAbierto((v) => !v)}
+        className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dash-blue"
+      >
+        <span className="min-w-0 flex-1 leading-tight">
+          <span className="block text-[13px] font-semibold text-ink">
+            {title}
+            {required && <span className="text-required">*</span>}
+          </span>
+          <span className={cn('mt-0.5 block truncate text-xs', error ? 'text-field-error' : 'text-ink-muted')}>{summary}</span>
+        </span>
+        <ChevronDown aria-hidden className={cn('size-4 shrink-0 text-ink transition-transform', abierto && 'rotate-180')} />
+      </button>
+      {abierto && <div id={id} className="border-t border-line p-3 pt-4">{children}</div>}
+    </div>
+  )
+}
+
 /* Input con lupa y sugerencias, el patrón de los modales clínicos del Figma
    (3648:59976 y hermanos): el campo principal siempre es una búsqueda. */
 export function SearchField({
@@ -442,6 +488,7 @@ export function PersonSearchField({
         <input
           value={value}
           placeholder={placeholder}
+          aria-label={label}
           aria-invalid={!!error || undefined}
           disabled={disabled}
           onChange={(e) => { onChange?.(e.target.value); setAbierto(true) }}
