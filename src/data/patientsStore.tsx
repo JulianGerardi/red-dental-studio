@@ -46,7 +46,7 @@ export type DatosPaciente = {
 export const VACIO_PACIENTE: DatosPaciente = {
   first: '', middle: '', last: '', birthday: '', email: '', interpreter: false, portal: false,
   guardianName: '', guardianNuevo: false, gFirst: '', gLast: '', gEmail: '', gDob: '',
-  gCodigo: '+1', gArea: '', gNumero: '', gExt: '', gLinea1: '', gLinea2: '', gPais: '', gEstado: '', gCiudad: '', gZip: '',
+  gCodigo: '(+1) United States', gArea: '', gNumero: '', gExt: '', gLinea1: '', gLinea2: '', gPais: '', gEstado: '', gCiudad: '', gZip: '',
   guardianGarante: false, guardianRel: '', phone: '', language: '', address: '', city: '', zip: '',
 }
 

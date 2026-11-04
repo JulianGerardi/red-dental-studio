@@ -3,9 +3,10 @@ import { Check } from 'lucide-react'
 import { DrawerSection } from '@/components/ui/drawer'
 import { Pill } from '@/components/ui/pill'
 import { SectionNotice } from '@/components/ui/section-notice'
-import { CollapsibleFields, DateField, LinkPersonCheckbox, OptionCheckbox, PersonSearchField, SelectField, TextField } from '@/components/patients/form'
+import { CollapsibleFields, DateField, LinkPersonCheckbox, OptionCheckbox, PersonSearchField, CountryCodeField, SelectField, TextField } from '@/components/patients/form'
 import type { DatosPaciente } from '@/data/patientsStore'
 import { PERSONAS_SISTEMA, type PersonaSistema } from '@/data/personas'
+import { codigoDe } from '@/data/paises'
 
 /* Las tres secciones del formulario de paciente -General, Guardian y Demography-, las mismas en New Patient (tres pasos)
    y en Edit Patient (tres pestañas). Figma 3751:73452 (New) y 5277:123056 (Edit). Decisiones y anomalías en
@@ -225,12 +226,15 @@ export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo }:
 
 /* Las relaciones de Confidentally 2.0 (grabación de Julián, 2026-11-04), de la A a la Z. */
 const RELACIONES = ['Child', 'Grandchild', 'Grandparent', 'Other', 'Other Family Member', 'Parent', 'Partner', 'Sibling', 'Spouse']
-const CODIGOS = ['+1', '+44', '+52', '+54']
 
-const telefono = (d: DatosPaciente) =>
-  digitos(d.gArea).length === 3 && digitos(d.gNumero).length === 7
-    ? `${d.gCodigo || '+1'} (${digitos(d.gArea)}) ${digitos(d.gNumero).slice(0, 3)}-${digitos(d.gNumero).slice(3)}${d.gExt.trim() ? ` ext. ${d.gExt.trim()}` : ''}`
-    : ''
+/* El resumen muestra lo cargado aunque esté incompleto, como Personal y Address (Julián, 2026-11-04). */
+const telefono = (d: DatosPaciente) => {
+  const area = digitos(d.gArea)
+  const num = digitos(d.gNumero)
+  if (!area && !num) return ''
+  return [codigoDe(d.gCodigo), area && `(${area})`, num.length === 7 ? `${num.slice(0, 3)}-${num.slice(3)}` : num, d.gExt.trim() && `ext. ${d.gExt.trim()}`]
+    .filter(Boolean).join(' ')
+}
 const direccion = (d: DatosPaciente) => [d.gLinea1, d.gLinea2, d.gCiudad, d.gEstado, d.gZip].map((x) => x.trim()).filter(Boolean).join(', ')
 
 /* Guardian (CON-2858; patients.md, 2026-11-04), sólo para un menor: buscar a alguien del sistema (sus datos ya están
@@ -283,7 +287,7 @@ export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Pr
             summary={errorEn(CONTACTO_G) ? 'Complete the phone number.' : tel || 'Add a phone number'}
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Campo nombre="gCodigo"><SelectField label="Country Code" required options={CODIGOS} value={d.gCodigo} onChange={(v) => cambiar('gCodigo', v)} error={errores.gCodigo} /></Campo>
+              <Campo nombre="gCodigo"><CountryCodeField required value={d.gCodigo} onChange={(v) => cambiar('gCodigo', v)} error={errores.gCodigo} /></Campo>
               <Campo nombre="gArea"><TextField label="Area Code (3 digits)" required placeholder="555" value={d.gArea} onChange={(v) => cambiar('gArea', v)} error={errores.gArea} /></Campo>
               <Campo nombre="gNumero"><TextField label="Number (7 digits)" required placeholder="000-0000" value={d.gNumero} onChange={(v) => cambiar('gNumero', v)} error={errores.gNumero} /></Campo>
               <Campo nombre="gExt"><TextField label="Extension" placeholder="Extension" value={d.gExt} onChange={(v) => cambiar('gExt', v)} /></Campo>

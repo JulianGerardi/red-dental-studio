@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-04
 
+### Calendarios con año editable y Country Code con todos los países ([#121](https://github.com/JulianGerardi/red-dental-studio/pull/121))
+- **Todos los calendarios**: el año del encabezado se escribe (↑/↓ suma o resta uno); ya no hace falta ir con las flechas.
+- **Country Code** en toda la app (Guardian, Settings, finanzas): los **245 países** con su **bandera**, de la A a la Z y con
+  buscador por nombre o código. Formato "(+54) Argentina"; un valor viejo ("+1") se muestra como su país.
+- Los selects abren **hacia arriba** si abajo no entran (también las sugerencias del buscador de personas).
+- Guardian: el resumen de *Contact Information* muestra el teléfono aunque esté incompleto.
+- **Para el dev:** `CountryCodeField` (`patients/form.tsx`) reemplaza a `SelectField label="Country Code"` y ya no recibe
+  `options`. `SelectField` suma `icono` y `buscable`. Datos en `src/data/paises.ts` (`PAISES_TEL`, `paisDe`, `codigoDe`);
+  bandera en `ui/country-flag.tsx`. Dependencia nueva `country-flag-icons`; `vite.config` no incrusta sus SVG en el JS.
+  Detalle en `patients.md` (2026-11-04). Sin Storybook todavía.
+
 ### New Patient: Guardian para menores, como en 2.0 y con desplegables ([#120](https://github.com/JulianGerardi/red-dental-studio/pull/120))
 - **CON-2858.** El paso **Guardian** (pestaña en Edit Patient) aparece sólo si el paciente es **menor de 18** y en el alta es
   obligatorio (*This patient is a minor and must have at least one guardian assigned.*). Adulto: General → Demography.

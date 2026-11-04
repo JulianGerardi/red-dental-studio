@@ -3,7 +3,7 @@ import { PageTitle } from '@/components/ui/page-title'
 import { useParams } from 'react-router-dom'
 import { CreditCard, Crown, Building2 } from 'lucide-react'
 import { Card } from '@/components/settings/primitives'
-import { SelectField, TextField, DateField, FormFooter } from '@/components/patients/form'
+import { CountryCodeField, SelectField, TextField, DateField, FormFooter } from '@/components/patients/form'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { usePhoto } from '@/lib/usePhoto'
 import { Pill, type PillTone } from '@/components/ui/pill'
@@ -110,7 +110,7 @@ export function SettingsAccount() {
 
             <Card title="Contact Information">
               <div className="grid gap-4 sm:grid-cols-3">
-                <SelectField label="Country Code" required options={['+1', '+34', '+54']} value={contacto.codigo} onChange={(v) => setContacto((c) => ({ ...c, codigo: v }))} />
+                <CountryCodeField required value={contacto.codigo} onChange={(v) => setContacto((c) => ({ ...c, codigo: v }))} />
                 <TextField label="Area Code (3 digits)" required placeholder="Placeholder" value={contacto.areaCode} onChange={(v) => setContacto((c) => ({ ...c, areaCode: v }))} />
                 <TextField label="Number (7 digits)" required placeholder="Placeholder" value={contacto.numero} onChange={(v) => setContacto((c) => ({ ...c, numero: v }))} />
               </div>
@@ -247,8 +247,8 @@ export function SettingsAccount() {
                     Copy contact information from account
                   </label>
                   <div className="grid gap-4 sm:grid-cols-3">
-                    <SelectField
-                      label="Country Code" required options={['+1', '+34', '+54']}
+                    <CountryCodeField
+                      required
                       value={copiarContacto ? contacto.codigo : duenioContacto.codigo}
                       onChange={(v) => !copiarContacto && setDuenioContacto((c) => ({ ...c, codigo: v }))}
                     />
