@@ -10,7 +10,7 @@ import { ICONO_SUELTO } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 import { Card } from '@/components/settings/primitives'
 import {
-  SelectField, TextField, FormFooter,
+  CountryCodeField, SelectField, TextField, FormFooter,
 } from '@/components/patients/form'
 import {
   PAISES, CODIGOS, ESTADOS, ZONAS, FEES,
@@ -78,7 +78,7 @@ export function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
 
       <Card title="Contact Information">
         <div className="grid gap-4 sm:grid-cols-2">
-          <SelectField label="Country Code" required options={CODIGOS} value={d.codigo} onChange={set('codigo')} />
+          <CountryCodeField required options={CODIGOS} value={d.codigo} onChange={set('codigo')} />
           <TextField label="Number" required placeholder="Placeholder" value={d.numero} onChange={set('numero')} />
         </div>
         <TextField className="mt-4 sm:w-1/2 sm:pr-2" label="Email" placeholder="Placeholder" value={d.email} onChange={set('email')} />

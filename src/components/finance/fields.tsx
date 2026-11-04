@@ -1,7 +1,7 @@
 import { useId, useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { FieldError, FieldLabel, SelectField, TextField, control } from '@/components/patients/form'
+import { FieldError, FieldLabel, CountryCodeField, TextField, control } from '@/components/patients/form'
 import { CODIGOS } from '@/data/location-options'
 import { dinero, esNorteamerica, type Telefono } from '@/data/finanzas'
 
@@ -70,7 +70,7 @@ export function PhoneFields({
   const digitos = (k: 'area' | 'numero', max: number) => (v: string) => onChange({ ...value, [k]: v.replace(/\D/g, '').slice(0, max) })
   return (
     <div className={cn('grid gap-4 sm:grid-cols-2', className)}>
-      <SelectField label="Country Code" required={required} options={CODIGOS} value={value.codigo} onChange={(codigo) => onChange({ ...value, codigo })} />
+      <CountryCodeField required={required} options={CODIGOS} value={value.codigo} onChange={(codigo) => onChange({ ...value, codigo })} />
       {nanp && (
         <TextField label="Area Code (3 digits)" required={required} placeholder="555" value={value.area} onChange={digitos('area', 3)} error={errores?.area} />
       )}

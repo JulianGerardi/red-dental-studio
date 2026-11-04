@@ -13,7 +13,7 @@ import { usePhoto } from '@/lib/usePhoto'
 import { EMPLEADOS, type Empleado } from '@/data/employees'
 import { Card, Toggle } from '@/components/settings/primitives'
 import {
-  SelectField, TextField, DateField, DateTextField, FormFooter,
+  CountryCodeField, SelectField, TextField, DateField, DateTextField, FormFooter,
 } from '@/components/patients/form'
 import { RolesLocation } from '@/components/settings/RolesLocation'
 import { LinkExistingPerson } from '@/components/settings/LinkExistingPerson'
@@ -318,7 +318,7 @@ export function SettingsEmployeeDetail() {
 
             <Card title="Contact Information">
               <div className="grid gap-4 sm:grid-cols-2">
-                <SelectField label="Area Code" required options={['+1', '+34', '+54']} />
+                <CountryCodeField label="Area Code" required options={['+1', '+34', '+54']} />
                 <TextField label="Number" required placeholder="Placeholder" />
               </div>
               <TextField className="mt-4" label="Extension" placeholder="Placeholder" />

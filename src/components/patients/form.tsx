@@ -1,9 +1,10 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Drawer, DrawerSection, useEnDrawer, type DrawerSize } from '@/components/ui/drawer'
 import { ChevronDown, Calendar, Check, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
 import { Avatar, inicialesDe } from '@/components/ui/avatar'
+import { CountryFlag } from '@/components/ui/country-flag'
 
 /* Primitivos de los formularios de Patients (Figma 3640:73356 y hermanos).
    Campo = label 12px + control de 36px, alto total 56 con gap.
@@ -98,9 +99,33 @@ const OPCIONES: Record<string, string[]> = {
 }
 const OPCIONES_GENERICAS = ['Option A', 'Option B', 'Option C']
 
+/* Abre un desplegable hacia arriba si abajo no entra y arriba hay más lugar, así no hay que scrollear el drawer para ver
+   las opciones (Julián, 2026-11-04). Mide contra el contenedor con scroll más cercano (el cuerpo del drawer) o la ventana. */
+function useHaciaArriba(ref: React.RefObject<HTMLElement | null>, abierto: boolean, alto: number) {
+  const [arriba, setArriba] = useState(false)
+  useLayoutEffect(() => {
+    if (!abierto || !ref.current) return
+    const r = ref.current.getBoundingClientRect()
+    let techo = 0
+    let piso = window.innerHeight
+    for (let el = ref.current.parentElement; el; el = el.parentElement) {
+      if (!/(auto|scroll)/.test(getComputedStyle(el).overflowY)) continue
+      const c = el.getBoundingClientRect()
+      techo = Math.max(techo, c.top)
+      piso = Math.min(piso, c.bottom)
+      break
+    }
+    const abajo = piso - r.bottom
+    setArriba(abajo < alto && r.top - techo > abajo)
+  }, [abierto, alto, ref])
+  return arriba
+}
+const MENU_ABAJO = 'top-[calc(100%+4px)]'
+const MENU_ARRIBA = 'bottom-[calc(100%+4px)]'
+
 export function SelectField({
   label, placeholder = 'Select', required, className, options,
-  value: valueProp, onChange, error, hint, disabled, hideLabel,
+  value: valueProp, onChange, error, hint, disabled, hideLabel, icono,
 }: {
   label: string
   /** Rótulo sólo para lectores de pantalla (el botón lo lleva como aria-label): para una celda de tabla. */
@@ -114,6 +139,8 @@ export function SelectField({
   error?: string
   hint?: React.ReactNode
   disabled?: boolean
+  /** Algo a la izquierda de cada opción y de la elegida (la bandera de CountryCodeField). */
+  icono?: (opcion: string) => React.ReactNode
 }) {
   const items = options ?? OPCIONES[label] ?? OPCIONES_GENERICAS
   const [interno, setInterno] = useState<string | null>(null)
@@ -123,6 +150,7 @@ export function SelectField({
   const setValue = (v: string) => (controlado ? onChange!(v) : setInterno(v))
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const arriba = useHaciaArriba(ref, open, Math.min(items.length * 36 + 8, 224) + 4)
 
   useEffect(() => {
     if (!open) return
@@ -156,11 +184,14 @@ export function SelectField({
             value ? 'text-ink' : 'text-ink-faint',
           )}
         >
-          <span className="min-w-0 truncate text-left">{value ?? placeholder}</span>
+          <span className="flex min-w-0 items-center gap-2">
+            {value && icono?.(value)}
+            <span className="min-w-0 truncate text-left">{value ?? placeholder}</span>
+          </span>
           <ChevronDown className={cn('size-4 shrink-0 text-black transition-transform', open && 'rotate-180')} />
         </button>
         {open && (
-          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-56 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
+          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 max-h-56 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
             {items.map((o) => (
               <button
                 key={o}
@@ -171,8 +202,8 @@ export function SelectField({
                   value === o && 'text-dash-blue font-medium',
                 )}
               >
-                {o}
-                {value === o && <Check className="size-3.5" />}
+                <span className="flex min-w-0 items-center gap-2">{icono?.(o)}{o}</span>
+                {value === o && <Check className="size-3.5 shrink-0" />}
               </button>
             ))}
           </div>
@@ -181,6 +212,12 @@ export function SelectField({
       {pie(error, hint)}
     </div>
   )
+}
+
+/* El código de país de un teléfono, con la bandera de cada uno (Julián, 2026-11-04). Las opciones pueden ser "+54" o
+   "(+54) Argentina"; el label por defecto es "Country Code". */
+export function CountryCodeField({ label = 'Country Code', ...props }: Omit<React.ComponentProps<typeof SelectField>, 'icono' | 'label'> & { label?: string }) {
+  return <SelectField {...props} label={label} icono={(o) => <CountryFlag opcion={o} />} />
 }
 
 export function DateField({
@@ -470,6 +507,7 @@ export function PersonSearchField({
   const sugerencias = !elegida && value.trim()
     ? personas.filter((p) => p.toLowerCase().includes(value.trim().toLowerCase()))
     : []
+  const arriba = useHaciaArriba(ref, abierto && sugerencias.length > 0, Math.min(sugerencias.length * 60 + 8, 288) + 4)
 
   useEffect(() => {
     if (!abierto) return
@@ -496,7 +534,7 @@ export function PersonSearchField({
           className={cn(control(error), 'h-9 pr-3 pl-9')}
         />
         {abierto && sugerencias.length > 0 && (
-          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg">
+          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
             {sugerencias.map((nombre) => (
               <button
                 key={nombre}
