@@ -22,7 +22,7 @@ de los dos epics. La lógica sale de los HTML y de Jira; los componentes, del de
 | Ruta | Qué cambia |
 |---|---|
 | `/settings/locations/:locId` | Pestaña nueva **Insurance / Billing Profile**, al final (Information · Working Hours · Rooms · Exceptions) |
-| `/settings/team/:employeeId` | **Is a Primary Provider** (Provider Info) se aplica al switchear: en Yes aparece la pestaña **Insurance / Billing Profile** |
+| `/settings/team/:employeeId` | **Is a Primary Provider** (Provider Info) se guarda con Save; al guardarlo en Yes aparece la pestaña **Insurance / Billing Profile** |
 
 Código: `components/settings/LocationBillingProfile.tsx`, `ProviderBillingProfile.tsx` y las piezas compartidas en
 `BillingProfile.tsx` (`ContactoCard`, `ReplaceContactDrawer`, `CredentialsDrawer`, `ContractedWith`, `AccionesGuardado`).
@@ -51,8 +51,8 @@ Semilla para recorrerlo: **Abril** sin perfil (configuración desde cero), **Bay
 6. **Un contacto reemplazado se conserva**: el nuevo se suma a los del titular. En Location, Replace abre un menú con los
    contactos guardados + *Add a new address / phone number*; en provider va directo al drawer (CON-4005 no permite elegir
    otro existente). El nuevo lleva la pill *New · not saved* hasta guardar.
-7. **Primary Provider y el perfil se guardan juntos, al switchear** (CON-4004/4007; ver la sección del 2026-11-03 más
-   abajo). La pestaña aparece al crearse el perfil y queda aunque se deshabilite, de lectura, con el aviso de cómo volver
+7. **Primary Provider y el perfil se guardan juntos con el Save de la ficha** (CON-4004/4007; ver la sección del
+   2026-11-04 más abajo). La pestaña aparece al crearse el perfil y queda aunque se deshabilite, de lectura, con el aviso de cómo volver
    a habilitarlo.
 
 ### Decisiones de diseño (desvíos de los HTML)
@@ -88,6 +88,8 @@ Semilla para recorrerlo: **Abril** sin perfil (configuración desde cero), **Bay
 
 ## CON-4004 · CON-4007 — Primary Provider sin Save (2026-11-03)
 
+> **Revertido el 2026-11-04** (ver la sección de esa fecha): Primary Provider vuelve a aplicarse con Save.
+
 Pedido de Julián sobre el link de prueba: prender *Is a Primary Provider* tiene que habilitar el perfil y mostrar la
 pestaña en el momento, sin tocar Save.
 
@@ -101,3 +103,25 @@ pestaña en el momento, sin tocar Save.
   misma ficha. El Save del pie queda para el resto de la ficha.
 - Location no cambia: su switch abre un formulario con NPI y TIN que hay que completar, así que ahí *Save and enable*
   sigue siendo necesario (CON-4021).
+
+## CON-4004 · CON-4007 — Primary Provider vuelve a guardarse con Save (2026-11-04)
+
+Julián: "no es una funcionalidad por separado sino que está contemplada en toda la información que mandás al form": el
+switch es un dato más de la ficha. Coincide con Jira (CON-4004 "activa y guarda"; CON-4007 › 3.1 "Desactiva Primary
+Provider → Guarda los cambios", 3.6 cancelar antes de guardar no cambia nada).
+
+- **Prender:** el switch queda en Yes con la línea *Save to set up its Insurance / Billing Profile.*; al tocar **Save** se
+  crea o reactiva el perfil y aparece la pestaña (mismos toasts que antes).
+- **Apagar:** el switch queda en No con *Save to deactivate it.*; **Save** abre la confirmación, con el texto que pidió
+  Julián, más corto y formal: **Deactivate Primary Provider?** — *[Nombre] will no longer be available for selection as
+  a rendering or billing provider.* — Cancel · **Deactivate**. Cancel cierra sin guardar (el switch queda en No hasta
+  que se guarde o se descarte); Deactivate guarda y deja el perfil de lectura. Toast: *Primary Provider deactivated. The
+  billing profile is now read-only.*
+- **Cancel del pie** descarta: vuelve el switch a lo guardado.
+- El aviso del perfil inactivo vuelve a decir *…in Provider Info and save to edit it again.*
+- Se deja de lado el desvío del 2026-11-03 (switch = efecto inmediato, como *Is Provider*): Primary Provider arrastra un
+  cambio de facturación y Jira lo pide con guardado explícito.
+
+**Para validar con usuarios:** si la línea debajo del switch alcanza para que se entienda que falta Save (la pestaña no
+aparece hasta guardar).
+

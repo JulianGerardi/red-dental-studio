@@ -180,8 +180,8 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
    estaban siempre, tuviera o no sentido. */
 const TABS_BASE = ['Employee', 'Roles & Location'] as const
 const TABS_PROVIDER = ['Provider Info', 'Working Hours'] as const
-/* Aparece cuando el provider tiene Billing Profile (lo prepara prender Primary Provider, CON-4004) y queda aunque se
-   deshabilite, en modo lectura (CON-4007). Ver figma/modulos/billing-profile.md. */
+/* Aparece cuando el provider tiene Billing Profile (lo prepara guardar Primary Provider en Yes, CON-4004) y queda aunque
+   se deshabilite, en modo lectura (CON-4007). Ver figma/modulos/billing-profile.md. */
 const TAB_BILLING = 'Insurance / Billing Profile' as const
 const TABS = [...TABS_BASE, ...TABS_PROVIDER, TAB_BILLING] as const
 type Tab = (typeof TABS)[number]
@@ -211,7 +211,8 @@ export function SettingsEmployeeDetail() {
   const { perfiles, primarios, guardarPrimario } = useBillingProfiles()
   const primarioGuardado = primarios[empleado.id] ?? false
   const tienePerfil = !!perfiles[claveProvider(empleado.id)]
-  const [toggles, setToggles] = useState({ firma: true, locum: true })
+  const [toggles, setToggles] = useState({ primario: primarioGuardado, firma: true, locum: true })
+  const primarioSucio = toggles.primario !== primarioGuardado
   const [apagarPrimario, setApagarPrimario] = useState(false)
   /* La pestaña de billing guarda cada card por separado: salir con algo sin guardar lo pregunta. */
   const [billingSucio, setBillingSucio] = useState(false)
@@ -226,13 +227,19 @@ export function SettingsEmployeeDetail() {
   const tabsVisibles: readonly Tab[] = esProvider ? (tienePerfil ? TABS : [...TABS_BASE, ...TABS_PROVIDER]) : TABS_BASE
   const cambiarTab = (t: Tab) => (billingSucio && tab === TAB_BILLING && t !== tab ? setPendiente(t) : setTab(t))
 
-  /* El switch guarda en el momento, como Is Provider: Primary Provider y su Billing Profile van juntos (CON-4004,
-     CON-4007). Prender prepara o reactiva el perfil; apagar lo pregunta antes. Ver billing-profile.md. */
-  const alternarPrimario = (v: boolean) => {
-    if (!v) { setApagarPrimario(true); return }
-    const r = guardarPrimario(empleado.id, empleado.nombre, true)
-    aviso.ok(r === 'reactivado' ? 'Primary Provider enabled. The billing profile is active again.'
-      : 'Primary Provider enabled. Insurance / Billing Profile is now available.')
+  /* Primary Provider es un dato más de la ficha: se aplica con Save, junto con su Billing Profile (CON-4004, CON-4007).
+     Guardarlo apagado pregunta antes. Ver billing-profile.md, 2026-11-04. */
+  const guardarFicha = () => {
+    if (!primarioSucio) { aviso.ok('Employee information saved.'); return }
+    const r = guardarPrimario(empleado.id, empleado.nombre, toggles.primario)
+    aviso.ok(r === 'creado' ? 'Primary Provider enabled. Insurance / Billing Profile is now available.'
+      : r === 'reactivado' ? 'Primary Provider enabled. The billing profile is active again.'
+      : 'Primary Provider deactivated. The billing profile is now read-only.')
+  }
+  const guardar = () => (primarioSucio && !toggles.primario ? setApagarPrimario(true) : guardarFicha())
+  const cancelar = () => {
+    setToggles((p) => ({ ...p, primario: primarioGuardado }))
+    aviso.info('Changes discarded.')
   }
   const alternarProvider = (v: boolean) => {
     setEsProvider(v)
@@ -347,7 +354,14 @@ export function SettingsEmployeeDetail() {
 
             <Card title="Contact Information">
               <div className="grid gap-6 sm:grid-cols-3">
-                <Toggle label="Is a Primary Provider*" on={primarioGuardado} onChange={alternarPrimario} />
+                <div className="flex flex-col gap-1.5">
+                  <Toggle label="Is a Primary Provider*" on={toggles.primario} onChange={(v) => setToggles((p) => ({ ...p, primario: v }))} />
+                  {primarioSucio && (
+                    <span className="text-[11px] font-medium text-warn-fg">
+                      {toggles.primario ? 'Save to set up its Insurance / Billing Profile.' : 'Save to deactivate it.'}
+                    </span>
+                  )}
+                </div>
                 <Toggle label="Signature on file" on={toggles.firma} onChange={(v) => setToggles((p) => ({ ...p, firma: v }))} />
                 <Toggle label="Locum Tenens Treating Provider" on={toggles.locum} onChange={(v) => setToggles((p) => ({ ...p, locum: v }))} />
               </div>
@@ -467,7 +481,7 @@ export function SettingsEmployeeDetail() {
       {/* Billing guarda cada card con su propio botón: el pie de la ficha no aplica ahí. */}
       {tab !== TAB_BILLING && (
         <div className="mt-5 flex justify-end gap-3">
-          <FormFooter onCancel={() => aviso.info('Changes discarded.')} onSave={() => aviso.ok('Employee information saved.')} />
+          <FormFooter onCancel={cancelar} onSave={guardar} />
         </div>
       )}
 
@@ -486,17 +500,12 @@ export function SettingsEmployeeDetail() {
 
       {apagarPrimario && (
         <ConfirmDialog
-          title="Turn off Primary Provider?"
-          confirmLabel="Turn off"
+          title="Deactivate Primary Provider?"
+          confirmLabel="Deactivate"
           onCancel={() => setApagarPrimario(false)}
-          onConfirm={() => {
-            setApagarPrimario(false)
-            guardarPrimario(empleado.id, empleado.nombre, false)
-            aviso.ok('Primary Provider disabled. The billing profile is now read-only.')
-          }}
+          onConfirm={() => { setApagarPrimario(false); guardarFicha() }}
         >
-          {empleado.nombre} can no longer be chosen as Rendering or Billing Provider. The billing profile becomes read-only;
-          its data and carrier contracts are kept.
+          {empleado.nombre} will no longer be available for selection as a rendering or billing provider.
         </ConfirmDialog>
       )}
 
