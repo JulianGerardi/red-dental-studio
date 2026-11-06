@@ -1,53 +1,64 @@
-import { DrawerActions } from '@/components/ui/drawer'
+import { DrawerActions, DrawerSection } from '@/components/ui/drawer'
 import { useState } from 'react'
-import { ModalShell, TextField, SelectField } from '@/components/patients/form'
-import type { Sala } from '@/data/location-detail'
+import { FieldLabel, ModalShell, TextField, SelectField } from '@/components/patients/form'
+import { Switch } from '@/components/ui/switch'
+import { TIPOS_SALA, type Sala } from '@/data/location-detail'
 
-/* Figma 3864:306314 "Settings — Location (Rooms — New Room Modal)". Tres
-   campos: Name, Abreviattion (typo del frame) y Type. Mismo modal para
-   crear y para editar —con `inicial` precarga y el título cambia a "Edit
-   Room", que no viene del frame pero es la convención del resto del
-   sistema para este mismo patrón (Assign Role, New Exception). */
-
-const TIPOS = ['Operatory', 'Consultation', 'X-Ray', 'Sterilization', 'Reception']
+/* New Room / Edit Room (CON-404): Name* y Type* obligatorios, Abbreviation opcional y el estado. El nombre no se repite
+   en la locación. Desactivar desde acá pasa por las mismas preguntas que desde la tabla. Ver figma/modulos/locations.md. */
 
 export function NewRoomModal({
-  inicial, onClose, onGuardar,
+  inicial, nombresUsados = [], onClose, onGuardar,
 }: {
   inicial?: Sala
+  /** Nombres de las otras salas de la locación, para avisar el repetido. */
+  nombresUsados?: string[]
   onClose: () => void
-  onGuardar: (nombre: string, abrev: string, tipo: string) => void
+  onGuardar: (sala: Sala) => void
 }) {
   const [nombre, setNombre] = useState(inicial?.nombre ?? '')
   const [abrev, setAbrev] = useState(inicial?.abreviatura ?? '')
   const [tipo, setTipo] = useState(inicial?.tipo ?? '')
+  const [activa, setActiva] = useState(inicial?.activa ?? true)
   const [intentado, setIntentado] = useState(false)
+
+  const repetido = nombresUsados.some((n) => n.trim().toLowerCase() === nombre.trim().toLowerCase())
+  const errorNombre = !intentado ? undefined : !nombre.trim() ? 'This field is required.' : repetido ? 'Name already exists.' : undefined
+  const errorTipo = intentado && !tipo ? 'This field is required.' : undefined
 
   const guardar = () => {
     setIntentado(true)
-    if (!nombre.trim() || !abrev.trim()) return
-    onGuardar(nombre, abrev, tipo)
+    if (!nombre.trim() || !tipo || repetido) return
+    onGuardar({
+      id: inicial?.id ?? `sala-${Date.now()}`,
+      nombre: nombre.trim(), abreviatura: abrev.trim().toUpperCase(), tipo, activa,
+      turnos: inicial?.turnos ?? [],
+    })
     onClose()
   }
 
   return (
     <ModalShell
       title={inicial ? 'Edit Room' : 'New Room'}
+      description="Rooms can be booked for appointments during the location's working hours."
       onClose={onClose}
-      width="max-w-[420px]"
+      width="max-w-[560px]"
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
-      <div className="flex flex-col gap-4">
-        <TextField
-          label="Name" required placeholder="Select" value={nombre} onChange={setNombre}
-          error={intentado && !nombre.trim() ? 'This field is required.' : undefined}
-        />
-        <TextField
-          label="Abreviattion" required placeholder="Placeholder" value={abrev} onChange={setAbrev}
-          error={intentado && !abrev.trim() ? 'This field is required.' : undefined}
-        />
-        <SelectField label="Type" options={TIPOS} value={tipo} onChange={setTipo} />
-      </div>
+      <DrawerSection title="General Information">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField label="Name" required placeholder="Operatory 1" value={nombre} onChange={setNombre} error={errorNombre} />
+          <TextField label="Abbreviation" placeholder="OP1" value={abrev} onChange={setAbrev} />
+          <SelectField label="Type" required placeholder="Select a type" options={TIPOS_SALA} value={tipo} onChange={setTipo} error={errorTipo} />
+          <div className="flex flex-col gap-2">
+            <FieldLabel>Status</FieldLabel>
+            <label className="flex h-9 items-center gap-2 text-[13px] text-ink">
+              <Switch checked={activa} onCheckedChange={setActiva} aria-label="Active room" />
+              {activa ? 'Active' : 'Inactive'}
+            </label>
+          </div>
+        </div>
+      </DrawerSection>
     </ModalShell>
   )
 }

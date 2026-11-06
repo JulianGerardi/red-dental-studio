@@ -405,3 +405,35 @@ controla con `npm run ds:campos`.
    misma línea, abajo.
 2. **New Hours**: Location en la columna izquierda, del ancho de Start Time.
 3. **New Location**: Name entra en la grilla con Abbreviation y Default Fee Schedule; Time Zone, en la de la dirección.
+
+## Rooms con la lógica de red.dev (2026-11-06)
+
+CON-404 (Registrar room) · CON-1520 (Deactivate Operatory) · CON-1581 add · CON-1582 edit · CON-1583 delete · CON-1584
+active. Pedido de Julián con red.dev de guía (`/settings/locations/:id/edit?type=rooms`). Desde esta sesión red.dev pide
+login y no se pudo abrir: se armó con las historias y con el patrón de las listas de red.dev que ya están en la app
+(Insurance Plans / Employers, `red-dev/settings-billing/`). Validar contra red.dev con capturas.
+
+1. **Misma estética que Working Hours** (pedido de Julián, mismo día): caja blanca con encabezado gris Room ·
+   Abbreviation · Type · Status, una fila por sala con el switch en línea (*Active* / *Inactive*, el `SwitchOpenClose`
+   de Open/Close con otros rótulos), la inactiva en gris y las acciones como link azul (*Edit room*) + tacho. *+ New
+   Room* arriba a la derecha. Debajo de 1024px la fila se compacta: Type · Abbreviation bajo el nombre, sin encabezado.
+   Primero se armó con `ui/data-table` (buscador, filtro y ⋮, como Insurance Plans); se cambió para que las pestañas
+   de la locación se vean iguales. Una locación tiene pocas salas: sin buscador ni filtro. Vacío: *No rooms yet*.
+2. **Campos de CON-404**: Name* y Type* obligatorios, Abbreviation opcional (el drawer anterior lo tenía al revés, del
+   frame 3864:306314). Se suma Status (switch, arranca Active). Abbreviation se guarda en mayúsculas.
+3. **Validaciones**: nombre repetido en la locación (sin mayúsculas) → *Name already exists.* (texto de Jira). Para lo
+   obligatorio se usa el *This field is required.* de todo el sistema, no el *Required fields missing.* de la historia.
+4. **Desactivar con turnos (CON-1520)**: `ConfirmDialog` con aviso, el texto de la historia y *Affected Appointments
+   (N)* con fecha, provider y paciente; Cancel · Confirm. Confirm la deja inactiva, saca sus turnos y el toast dice
+   cuántos pasaron a la lista de espera (con Undo). Prender o apagar el switch sin turnos se aplica enseguida, con Undo. La historia habla de "operatory"; la app dice "room", como la pestaña.
+5. **Última sala activa** (*All operatories deactivated. Continue?*): *Deactivate all rooms?* explicando que no se van a
+   poder dar turnos en la locación. Si además tiene turnos, va como un párrafo más del mismo aviso: una sola pregunta.
+6. Desactivar desde el drawer de Edit pasa por las mismas preguntas.
+7. **Datos**: Operatory 1 a 3 (los de la agenda), X-Ray Room, Consultation Room y Sterilization (inactiva). Operatory 1
+   y 2 traen turnos de noviembre para que el aviso se vea. `TIPOS_SALA` sigue siendo la lista anterior: ni Jira ni el
+   Figma dicen qué tipos hay.
+8. **La pestaña va en la URL** como en red.dev: `?type=information|working-hours|rooms|exceptions|billing-profile`.
+
+Para validar: qué tipos de sala tiene red.dev; si Delete con turnos programados debería pedir lo mismo que Inactive
+(hoy borra con Undo, CON-1583 no tiene detalle); y que las salas inactivas salgan de los selects de New Appointment
+(postcondición de CON-404, no conectado porque la agenda no lee estas salas).
