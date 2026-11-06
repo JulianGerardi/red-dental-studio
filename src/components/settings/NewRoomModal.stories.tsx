@@ -13,7 +13,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Create: Story = {}
-export const Edit: Story = { args: { inicial: { id: 's1', nombre: 'Operatory 1', tipo: 'General', abreviatura: 'OP1' } } }
+export const Edit: Story = { args: { inicial: { id: 's1', nombre: 'Operatory 1', tipo: 'Operatory', abreviatura: 'OP1', activa: true, turnos: [] } } }
 
 /* Estado de error: Save con los campos obligatorios vacíos. */
 export const WithValidationErrors: Story = {

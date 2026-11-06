@@ -2,11 +2,15 @@ import { Tabs } from '@/components/ui/tabs'
 import { PageTitle } from '@/components/ui/page-title'
 import { useCallback, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
-import { useParams } from 'react-router-dom'
-import { Pencil, DoorOpen, Plus, CalendarDays, ChevronRight, Trash2 } from 'lucide-react'
+import { useParams, useSearchParams } from 'react-router-dom'
+import { Pencil, DoorOpen, Plus, Power, CalendarDays, ChevronRight, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
-import { ICONO_SUELTO } from '@/lib/estilos'
+import { ICONO_SUELTO, TABLA_LINK } from '@/lib/estilos'
+import { Button } from '@/components/ui/button'
+import { Pill } from '@/components/ui/pill'
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table'
+import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { aviso } from '@/components/ui/toaster'
 import { Card } from '@/components/settings/primitives'
 import {
@@ -32,6 +36,11 @@ import {
 
 const TABS = ['Information', 'Working Hours', 'Rooms', 'Exceptions', 'Insurance / Billing Profile'] as const
 type Tab = (typeof TABS)[number]
+/* La pestaña va en la URL como en red.dev (`?type=rooms`), así un link abre la pestaña justa. */
+const TIPO_URL: Record<Tab, string> = {
+  Information: 'information', 'Working Hours': 'working-hours', Rooms: 'rooms', Exceptions: 'exceptions',
+  'Insurance / Billing Profile': 'billing-profile',
+}
 
 const DIAS: [string, string][] = [
   ['Sunday', 'Sunday'], ['Monday', 'Monday'], ['Tuesday', 'Tuesday'],
@@ -209,81 +218,134 @@ export function WorkingHoursTab() {
   )
 }
 
+/* Rooms (CON-404, CON-1581…1584, CON-1520): la tabla de las listas de red.dev con su ⋮ Edit / Inactive / Delete.
+   Desactivar una sala con turnos muestra cuáles son y los pasa a la lista de espera; dejar la locación sin salas
+   activas también se pregunta. Ver figma/modulos/locations.md. */
+const fechaTurno = (d: Date) =>
+  d.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
+
 export function RoomsTab() {
   const [salas, setSalas] = useState<Sala[]>(SALAS_INICIALES)
   const [modal, setModal] = useState<'nueva' | Sala | false>(false)
+  const [baja, setBaja] = useState<Sala | null>(null)
+
+  const reemplazar = (s: Sala) => setSalas((p) => (p.some((x) => x.id === s.id) ? p.map((x) => (x.id === s.id ? s : x)) : [...p, s]))
+  const ultimaActiva = (s: Sala) => !salas.some((x) => x.id !== s.id && x.activa)
+
+  /* Todo cambio pasa por acá: si apaga una sala con turnos o la última activa, primero se pregunta. */
+  const aplicar = (s: Sala) => {
+    const antes = salas.find((x) => x.id === s.id)
+    if (antes?.activa && !s.activa && (s.turnos.length > 0 || ultimaActiva(s))) return setBaja(s)
+    reemplazar(s)
+    if (!antes) aviso.ok(`${s.nombre} was added to Rooms.`)
+    else if (antes.activa !== s.activa) aviso.ok(`${s.nombre} is now ${s.activa ? 'active' : 'inactive'}.`, { label: 'Undo', onClick: () => reemplazar(antes) })
+    else aviso.ok(`${s.nombre} was updated.`)
+  }
+
+  const confirmarBaja = () => {
+    if (!baja) return
+    const antes = salas.find((x) => x.id === baja.id)!
+    const n = baja.turnos.length
+    reemplazar({ ...baja, turnos: [] })
+    aviso.ok(
+      n ? `${baja.nombre} is now inactive. ${n} appointment${n > 1 ? 's' : ''} moved to the waiting list.` : `${baja.nombre} is now inactive.`,
+      { label: 'Undo', onClick: () => reemplazar(antes) },
+    )
+    setBaja(null)
+  }
+
+  const borrar = (s: Sala) => {
+    const indice = salas.findIndex((x) => x.id === s.id)
+    setSalas((p) => p.filter((x) => x.id !== s.id))
+    aviso.ok(`${s.nombre} was deleted.`, { label: 'Undo', onClick: () => setSalas((p) => [...p.slice(0, indice), s, ...p.slice(indice)]) })
+  }
+
+  const columnas: DataTableColumn<Sala>[] = [
+    {
+      key: 'nombre', header: 'Name', locked: true,
+      cell: (s) => <button type="button" onClick={() => setModal(s)} className={TABLA_LINK}>{s.nombre}</button>,
+    },
+    { key: 'abrev', header: 'Abbreviation', width: 140, cell: (s) => <span className="text-ink-soft">{s.abreviatura || '-'}</span> },
+    { key: 'tipo', header: 'Type', width: 160, cell: (s) => <span className="text-ink-soft">{s.tipo}</span> },
+    { key: 'estado', header: 'Status', width: 110, cell: (s) => <Pill tone={s.activa ? 'success' : 'danger'}>{s.activa ? 'Active' : 'Inactive'}</Pill> },
+  ]
+  const activas = salas.filter((s) => s.activa).length
 
   return (
-    <div className="rounded-xl border border-line bg-white p-4 sm:p-5">
-      <div className="flex items-center justify-end">
-        <button
-          type="button"
-          onClick={() => setModal('nueva')}
-          className="text-dash-blue flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
-        >
-          <Plus className="size-4" /> Add Room
-        </button>
-      </div>
-
-      {salas.length === 0 ? (
-        <EmptyState title="No Rooms" className="border-0 py-16" />
-      ) : (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {salas.map((s) => (
-            <div key={s.id} className="rounded-lg border-l-[3px] border-l-dash-blue bg-surface-subtle p-3">
-              <div className="flex items-start justify-between gap-2">
-                <span className="flex min-w-0 items-center gap-2 text-[13px] font-bold text-ink">
-                  <DoorOpen className="text-dash-blue size-4 shrink-0" /> <span className="truncate">{s.nombre}</span>
-                </span>
-                <span className="flex shrink-0 items-center gap-0.5">
-                  <button
-                    type="button"
-                    aria-label={`Edit ${s.nombre}`}
-                    onClick={() => setModal(s)}
-                    className={ICONO_SUELTO}
-                  >
-                    <Pencil className="size-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={`Delete ${s.nombre}`}
-                    onClick={() => {
-                      const indice = salas.findIndex((x) => x.id === s.id)
-                      setSalas((p) => p.filter((x) => x.id !== s.id))
-                      aviso.ok(`${s.nombre} was removed from Rooms.`, {
-                        label: 'Undo',
-                        onClick: () => setSalas((p) => [...p.slice(0, indice), s, ...p.slice(indice)]),
-                      })
-                    }}
-                    className={ICONO_SUELTO}
-                  >
-                    <Trash2 className="size-3.5" />
-                  </button>
-                </span>
-              </div>
-              <p className="mt-1.5 text-[12px] text-ink-muted">Type: {s.tipo || '-'}</p>
-              <p className="text-[12px] text-ink-muted">Abbreviation: {s.abreviatura || '-'}</p>
-            </div>
-          ))}
-        </div>
-      )}
+    <>
+      <DataTable
+        columns={columnas}
+        rows={salas}
+        rowKey={(s) => s.id}
+        rowLabel={(s) => s.nombre}
+        itemLabel="rooms"
+        search={{ placeholder: 'Search room...', match: (s, q) => `${s.nombre} ${s.abreviatura} ${s.tipo}`.toLowerCase().includes(q.toLowerCase()) }}
+        filter={{
+          label: 'Status',
+          options: [
+            { value: 'Active', count: activas, tone: 'success' },
+            { value: 'Inactive', count: salas.length - activas, tone: 'danger' },
+          ],
+          match: (s, elegidos) => elegidos.includes(s.activa ? 'Active' : 'Inactive'),
+        }}
+        actions={<Button onClick={() => setModal('nueva')}><Plus /> New Room</Button>}
+        empty={{ icon: DoorOpen, title: 'No rooms yet', detail: 'Add the rooms of this location so they can be booked for appointments.' }}
+        rowActions={(s) => (
+          <>
+            <DropdownMenuItem onSelect={() => setModal(s)}><Pencil className="size-4 shrink-0" /> Edit</DropdownMenuItem>
+            <DropdownMenuItem variant={s.activa ? 'destructive' : 'default'} onSelect={() => aplicar({ ...s, activa: !s.activa })}>
+              <Power className="size-4 shrink-0" /> {s.activa ? 'Inactive' : 'Active'}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive" onSelect={() => borrar(s)}><Trash2 className="size-4 shrink-0" /> Delete</DropdownMenuItem>
+          </>
+        )}
+      />
 
       {modal && (
         <NewRoomModal
           inicial={modal === 'nueva' ? undefined : modal}
+          nombresUsados={salas.filter((x) => modal === 'nueva' || x.id !== modal.id).map((x) => x.nombre)}
           onClose={() => setModal(false)}
-          onGuardar={(nombre, abrev, tipo) => {
-            if (modal !== 'nueva') {
-              setSalas((p) => p.map((x) => (x.id === modal.id ? { ...x, nombre, abreviatura: abrev, tipo } : x)))
-              aviso.ok(`${nombre} was updated.`)
-            } else {
-              setSalas((p) => [...p, { id: `sala-${Date.now()}`, nombre, abreviatura: abrev, tipo }])
-              aviso.ok(`${nombre} was added to Rooms.`)
-            }
-          }}
+          onGuardar={aplicar}
         />
       )}
-    </div>
+
+      {baja && (
+        <ConfirmDialog
+          icon="warning"
+          tone="danger"
+          title={baja.turnos.length ? 'This room has scheduled appointments' : 'Deactivate all rooms?'}
+          confirmLabel={baja.turnos.length ? 'Confirm' : 'Continue'}
+          onCancel={() => setBaja(null)}
+          onConfirm={confirmarBaja}
+        >
+          {baja.turnos.length > 0 && (
+            <>
+              <p>
+                There are scheduled appointments assigned to {baja.nombre}. You can review and manage each appointment
+                individually or confirm to move all of them to the waiting list.
+              </p>
+              <p className="mt-3 font-semibold text-ink">Affected Appointments ({baja.turnos.length})</p>
+              <ul className="mt-1.5 flex max-h-44 flex-col gap-2 overflow-y-auto">
+                {baja.turnos.map((t) => (
+                  <li key={t.id} className="leading-snug">
+                    <span className="block font-medium text-ink tabular-nums">{fechaTurno(t.fecha)}</span>
+                    {t.provider} · Patient: {t.paciente}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {ultimaActiva(baja) && (
+            <p className={cn(baja.turnos.length > 0 && 'mt-3')}>
+              {baja.nombre} is the last active room. New appointments can&apos;t be booked at this location until you
+              activate a room again.
+            </p>
+          )}
+        </ConfirmDialog>
+      )}
+    </>
   )
 }
 
@@ -365,7 +427,9 @@ export function ExceptionsTab() {
 export function SettingsLocationDetail() {
   const { locId = 'abril' } = useParams()
   const loc = LOCACIONES.find((l) => l.id === locId) ?? LOCACIONES[0]
-  const [tab, setTab] = useState<Tab>('Information')
+  const [params, setParams] = useSearchParams()
+  const tab = TABS.find((t) => TIPO_URL[t] === params.get('type')) ?? 'Information'
+  const setTab = (t: Tab) => setParams(t === 'Information' ? {} : { type: TIPO_URL[t] }, { replace: true })
   /* Insurance / Billing Profile guarda cada card por separado: salir de la pestaña con algo sin guardar lo pregunta. */
   const [sucio, setSucio] = useState(false)
   const [pendiente, setPendiente] = useState<Tab | null>(null)
