@@ -413,16 +413,19 @@ active. Pedido de Julián con red.dev de guía (`/settings/locations/:id/edit?ty
 login y no se pudo abrir: se armó con las historias y con el patrón de las listas de red.dev que ya están en la app
 (Insurance Plans / Employers, `red-dev/settings-billing/`). Validar contra red.dev con capturas.
 
-1. **Tabla en vez de cards.** `ui/data-table`: Name (link que abre Edit) · Abbreviation · Type · Status (pill Active
-   verde / Inactive roja) y ⋮ *Edit*, *Inactive*/*Active*, *Delete*. Buscador *Search room...*, filtro de Status con
-   cantidades y *+ New Room* a la derecha de la barra. Vacío: *No rooms yet* con qué hacer.
+1. **Misma estética que Working Hours** (pedido de Julián, mismo día): caja blanca con encabezado gris Room ·
+   Abbreviation · Type · Status, una fila por sala con el switch en línea (*Active* / *Inactive*, el `SwitchOpenClose`
+   de Open/Close con otros rótulos), la inactiva en gris y las acciones como link azul (*Edit room*) + tacho. *+ New
+   Room* arriba a la derecha. Debajo de 1024px la fila se compacta: Type · Abbreviation bajo el nombre, sin encabezado.
+   Primero se armó con `ui/data-table` (buscador, filtro y ⋮, como Insurance Plans); se cambió para que las pestañas
+   de la locación se vean iguales. Una locación tiene pocas salas: sin buscador ni filtro. Vacío: *No rooms yet*.
 2. **Campos de CON-404**: Name* y Type* obligatorios, Abbreviation opcional (el drawer anterior lo tenía al revés, del
    frame 3864:306314). Se suma Status (switch, arranca Active). Abbreviation se guarda en mayúsculas.
 3. **Validaciones**: nombre repetido en la locación (sin mayúsculas) → *Name already exists.* (texto de Jira). Para lo
    obligatorio se usa el *This field is required.* de todo el sistema, no el *Required fields missing.* de la historia.
 4. **Desactivar con turnos (CON-1520)**: `ConfirmDialog` con aviso, el texto de la historia y *Affected Appointments
    (N)* con fecha, provider y paciente; Cancel · Confirm. Confirm la deja inactiva, saca sus turnos y el toast dice
-   cuántos pasaron a la lista de espera (con Undo). La historia habla de "operatory"; la app dice "room", como la pestaña.
+   cuántos pasaron a la lista de espera (con Undo). Prender o apagar el switch sin turnos se aplica enseguida, con Undo. La historia habla de "operatory"; la app dice "room", como la pestaña.
 5. **Última sala activa** (*All operatories deactivated. Continue?*): *Deactivate all rooms?* explicando que no se van a
    poder dar turnos en la locación. Si además tiene turnos, va como un párrafo más del mismo aviso: una sola pregunta.
 6. Desactivar desde el drawer de Edit pasa por las mismas preguntas.

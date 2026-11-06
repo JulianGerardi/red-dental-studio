@@ -19,20 +19,18 @@ test('New Room pide Name y Type, y no deja repetir el nombre', async ({ app, scr
   await drawer.getByPlaceholder('Operatory 1').fill('Operatory 4')
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText('Operatory 4 was added to Rooms.')).toBeVisible()
-  await expect(screen.getByRole('button', 'Operatory 4')).toBeVisible()
+  await expect(screen.getByRole('switch', 'Operatory 4 active')).toBeVisible()
 })
 
 test('Desactivar una sala con turnos los muestra y los pasa a la lista de espera', async ({ app, screen }) => {
   await app.open('/settings/locations/abril?type=rooms')
-  await screen.getByRole('button', 'Actions for Operatory 1').tap()
-  await screen.getByRole('menuitem', 'Inactive').tap()
+  await screen.getByRole('switch', 'Operatory 1 active').tap()
   const aviso = screen.getByRole('dialog', 'This room has scheduled appointments')
   await expect(aviso.getByText('Affected Appointments (3)')).toBeVisible()
   await aviso.getByRole('button', 'Confirm').tap()
   await expect(screen.getByText(/3 appointments moved to the waiting list/)).toBeVisible()
 
   /* Una sala sin turnos se desactiva directo. */
-  await screen.getByRole('button', 'Actions for Operatory 3').tap()
-  await screen.getByRole('menuitem', 'Inactive').tap()
+  await screen.getByRole('switch', 'Operatory 3 active').tap()
   await expect(screen.getByText('Operatory 3 is now inactive.')).toBeVisible()
 })

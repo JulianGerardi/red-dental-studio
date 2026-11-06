@@ -3,14 +3,11 @@ import { PageTitle } from '@/components/ui/page-title'
 import { useCallback, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { Pencil, DoorOpen, Plus, Power, CalendarDays, ChevronRight, Trash2 } from 'lucide-react'
+import { Pencil, DoorOpen, Plus, CalendarDays, ChevronRight, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
-import { ICONO_SUELTO, TABLA_LINK } from '@/lib/estilos'
+import { ICONO_SUELTO } from '@/lib/estilos'
 import { Button } from '@/components/ui/button'
-import { Pill } from '@/components/ui/pill'
-import { DataTable, type DataTableColumn } from '@/components/ui/data-table'
-import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { aviso } from '@/components/ui/toaster'
 import { Card } from '@/components/settings/primitives'
 import {
@@ -47,12 +44,20 @@ const DIAS: [string, string][] = [
   ['Wednesday', 'Wednesday'], ['Thursday', 'Thursday'], ['Friday', 'Friday'], ['Saturday', 'Saturday'],
 ]
 
-export function SwitchOpenClose({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+export function SwitchOpenClose({ on, onChange, labels = ['Open', 'Close'], label }: {
+  on: boolean
+  onChange: (v: boolean) => void
+  /** Rótulo prendido / apagado; Rooms usa Active / Inactive. */
+  labels?: [string, string]
+  /** Nombre para lectores de pantalla cuando el rótulo solo no alcanza. */
+  label?: string
+}) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={on}
+      aria-label={label}
       onClick={() => onChange(!on)}
       className="flex items-center gap-2 text-[13px]"
     >
@@ -62,7 +67,7 @@ export function SwitchOpenClose({ on, onChange }: { on: boolean; onChange: (v: b
       {/* Azul, no verde: el switch ya es azul cuando está en Open, y el
           texto va del mismo color en vez de meter un segundo significado
           -verde- que el resto del sistema reserva para "Active"/"Completado". */}
-      <span className={cn('font-medium', on ? 'text-dash-blue' : 'text-ink-muted')}>{on ? 'Open' : 'Close'}</span>
+      <span className={cn('font-medium', on ? 'text-dash-blue' : 'text-ink-muted')}>{on ? labels[0] : labels[1]}</span>
     </button>
   )
 }
@@ -221,6 +226,7 @@ export function WorkingHoursTab() {
 /* Rooms (CON-404, CON-1581…1584, CON-1520): la tabla de las listas de red.dev con su ⋮ Edit / Inactive / Delete.
    Desactivar una sala con turnos muestra cuáles son y los pasa a la lista de espera; dejar la locación sin salas
    activas también se pregunta. Ver figma/modulos/locations.md. */
+const FILA_SALA = 'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-4 lg:grid-cols-[minmax(0,1fr)_120px_140px_130px_120px]'
 const fechaTurno = (d: Date) =>
   d.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
 
@@ -260,47 +266,48 @@ export function RoomsTab() {
     aviso.ok(`${s.nombre} was deleted.`, { label: 'Undo', onClick: () => setSalas((p) => [...p.slice(0, indice), s, ...p.slice(indice)]) })
   }
 
-  const columnas: DataTableColumn<Sala>[] = [
-    {
-      key: 'nombre', header: 'Name', locked: true,
-      cell: (s) => <button type="button" onClick={() => setModal(s)} className={TABLA_LINK}>{s.nombre}</button>,
-    },
-    { key: 'abrev', header: 'Abbreviation', width: 140, cell: (s) => <span className="text-ink-soft">{s.abreviatura || '-'}</span> },
-    { key: 'tipo', header: 'Type', width: 160, cell: (s) => <span className="text-ink-soft">{s.tipo}</span> },
-    { key: 'estado', header: 'Status', width: 110, cell: (s) => <Pill tone={s.activa ? 'success' : 'danger'}>{s.activa ? 'Active' : 'Inactive'}</Pill> },
-  ]
-  const activas = salas.filter((s) => s.activa).length
-
   return (
     <>
-      <DataTable
-        columns={columnas}
-        rows={salas}
-        rowKey={(s) => s.id}
-        rowLabel={(s) => s.nombre}
-        itemLabel="rooms"
-        search={{ placeholder: 'Search room...', match: (s, q) => `${s.nombre} ${s.abreviatura} ${s.tipo}`.toLowerCase().includes(q.toLowerCase()) }}
-        filter={{
-          label: 'Status',
-          options: [
-            { value: 'Active', count: activas, tone: 'success' },
-            { value: 'Inactive', count: salas.length - activas, tone: 'danger' },
-          ],
-          match: (s, elegidos) => elegidos.includes(s.activa ? 'Active' : 'Inactive'),
-        }}
-        actions={<Button onClick={() => setModal('nueva')}><Plus /> New Room</Button>}
-        empty={{ icon: DoorOpen, title: 'No rooms yet', detail: 'Add the rooms of this location so they can be booked for appointments.' }}
-        rowActions={(s) => (
-          <>
-            <DropdownMenuItem onSelect={() => setModal(s)}><Pencil className="size-4 shrink-0" /> Edit</DropdownMenuItem>
-            <DropdownMenuItem variant={s.activa ? 'destructive' : 'default'} onSelect={() => aplicar({ ...s, activa: !s.activa })}>
-              <Power className="size-4 shrink-0" /> {s.activa ? 'Inactive' : 'Active'}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onSelect={() => borrar(s)}><Trash2 className="size-4 shrink-0" /> Delete</DropdownMenuItem>
-          </>
+      <div className="mb-3 flex justify-end">
+        <Button onClick={() => setModal('nueva')}><Plus /> New Room</Button>
+      </div>
+      {/* Misma caja que Working Hours: encabezado gris, switch en la fila y la inactiva en gris. */}
+      <div className="overflow-hidden rounded-xl border border-line bg-white">
+        <div className={cn(FILA_SALA, 'border-b border-line bg-surface-alt py-3 text-xs font-semibold text-ink-muted max-lg:hidden')}>
+          <span>Room</span>
+          <span>Abbreviation</span>
+          <span>Type</span>
+          <span>Status</span>
+          <span className="sr-only">Actions</span>
+        </div>
+        {salas.length === 0 && (
+          <EmptyState icon={DoorOpen} title="No rooms yet" detail="Add the rooms of this location so they can be booked for appointments." className="border-0 py-16" />
         )}
-      />
+        {salas.map((s) => (
+          <div key={s.id} className={cn(FILA_SALA, 'border-b border-line-soft py-3 last:border-0', !s.activa && 'bg-surface-subtle')}>
+            <span className="min-w-0">
+              <span className="block truncate text-[13px] font-semibold text-ink">{s.nombre}</span>
+              <span className="block text-[12px] text-ink-muted lg:hidden">{[s.tipo, s.abreviatura].filter(Boolean).join(' · ')}</span>
+            </span>
+            <span className="text-[13px] text-ink-soft max-lg:hidden">{s.abreviatura || '-'}</span>
+            <span className="text-[13px] text-ink-soft max-lg:hidden">{s.tipo}</span>
+            <SwitchOpenClose on={s.activa} onChange={(v) => aplicar({ ...s, activa: v })} labels={['Active', 'Inactive']} label={`${s.nombre} active`} />
+            <span className="flex items-center justify-end gap-1">
+              <button
+                type="button"
+                onClick={() => setModal(s)}
+                aria-label={`Edit ${s.nombre}`}
+                className="text-dash-blue flex min-h-8 items-center gap-1 px-1 text-[12px] font-semibold hover:underline"
+              >
+                <Pencil className="size-3" /> <span className="max-lg:hidden">Edit room</span>
+              </button>
+              <button type="button" aria-label={`Delete ${s.nombre}`} onClick={() => borrar(s)} className={ICONO_SUELTO}>
+                <Trash2 className="size-4" />
+              </button>
+            </span>
+          </div>
+        ))}
+      </div>
 
       {modal && (
         <NewRoomModal
