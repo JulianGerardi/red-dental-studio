@@ -426,7 +426,7 @@ export function CollapsibleFields({
    (3648:59976 y hermanos): el campo principal siempre es una búsqueda. */
 export function SearchField({
   label, required, className, options = [], value = '', onChange, error,
-  placeholder = 'Search...', hint, disabled, subtext,
+  placeholder = 'Search...', hint, disabled, subtext, emptyText, clearable,
 }: {
   label: string
   required?: boolean
@@ -441,6 +441,10 @@ export function SearchField({
   /** Segunda línea por sugerencia, para desambiguar (New Appointment: fecha de nacimiento y email del paciente, email
       del provider). Sin esto, cada sugerencia es sólo el nombre, como siempre (Julián, 2026-10-19). */
   subtext?: (opcion: string) => React.ReactNode
+  /** Qué decir cuando lo escrito no coincide con nada ("Carrier not found."); sin esto, no se abre nada. */
+  emptyText?: string
+  /** ✕ a la derecha para vaciar el campo y volver a buscar (Insurance → Search for an existing subscription). */
+  clearable?: boolean
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -469,8 +473,23 @@ export function SearchField({
           disabled={disabled}
           onChange={(e) => { onChange?.(e.target.value); setAbierto(true) }}
           onFocus={() => setAbierto(true)}
-          className={cn(control(error), 'h-9 pr-3 pl-9')}
+          className={cn(control(error), 'h-9 pl-9', clearable && value ? 'pr-9' : 'pr-3')}
         />
+        {clearable && value && !disabled && (
+          <button
+            type="button"
+            aria-label={`Clear ${label}`}
+            onClick={() => { onChange?.(''); setAbierto(false) }}
+            className="absolute top-1/2 right-1.5 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-dash-blue"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+        {abierto && emptyText && value.trim() && sugerencias.length === 0 && !options.includes(value) && (
+          <div role="status" className="absolute top-[calc(100%+4px)] left-0 z-30 w-full rounded-md border border-line bg-white px-3 py-8 text-center text-[13px] text-ink shadow-lg">
+            {emptyText}
+          </div>
+        )}
         {abierto && sugerencias.length > 0 && (
           <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-60 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
             {sugerencias.map((o) => {

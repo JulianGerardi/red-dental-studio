@@ -1,8 +1,8 @@
 /* Figma 3817:865128 "Insurance" — 9 frames. Los datos de las dos variantes
    de la tabla salen de 3817:865704 y 3831:897436. */
 
-export type OrdenPlan = 'Primary' | 'Secondary'
-export type RelacionPlan = 'Child' | 'Self' | 'Spouse'
+export type OrdenPlan = 'Primary' | 'Secondary' | 'Tertiary'
+export type RelacionPlan = 'Child' | 'Self' | 'Spouse' | 'Other'
 export type EstadoPlan = 'Active' | 'Inactive'
 
 export type PlanPaciente = {
@@ -46,8 +46,40 @@ export const SUSCRIPCION = {
   dependientes: '2',
 }
 
-export const CARRIERS = ['AETNA', 'BCBS', 'Dental Dental Of California', 'Cigna', 'MetLife']
+/* Las suscripciones que trae "Search for an existing subscription" (CON-3284 / CON-3282). `enUso`: ya hay patient
+   insurances que la usan, y entonces no se puede borrar. Ver modulos/insurance.md, 2026-11-06. */
+export type Suscripcion = {
+  id: string
+  subscriber: string
+  subscriberId: string
+  carrier: string
+  plan: string
+  cobertura: string
+  dependientes: number
+  estado: EstadoPlan
+  enUso: boolean
+}
+
+export const SUSCRIPCIONES: Suscripcion[] = [
+  { id: 's1', subscriber: SUSCRIPCION.subscriber, subscriberId: SUSCRIPCION.subscriberId, carrier: SUSCRIPCION.carrier, plan: SUSCRIPCION.plan, cobertura: SUSCRIPCION.cobertura, dependientes: 2, estado: 'Active', enUso: true },
+  { id: 's2', subscriber: 'Lucas Johnson', subscriberId: 'AET-234254', carrier: 'AETNA', plan: 'Plan 234254534', cobertura: '01/12/2025 - Present', dependientes: 1, estado: 'Active', enUso: true },
+  { id: 's3', subscriber: 'Robert Johnson', subscriberId: 'BCB-891234', carrier: 'BCBS', plan: 'Plan 891234567', cobertura: '06/01/2023 - 12/31/2024', dependientes: 2, estado: 'Inactive', enUso: true },
+  { id: 's4', subscriber: 'Maria Smith', subscriberId: 'CIG-118273', carrier: 'Cigna', plan: 'HMO Basic', cobertura: '03/01/2026 - Present', dependientes: 0, estado: 'Active', enUso: false },
+]
+
+/* Lo que se ve y se busca: "Nombre - Subscriber ID", como red.dev. */
+export const etiquetaSuscripcion = (s: Suscripcion) => `${s.subscriber} - ${s.subscriberId}`
+
+/* Los planes de cada carrier: Plan Name se habilita recién con el carrier elegido. */
+export const PLANES_POR_CARRIER: Record<string, string[]> = {
+  AETNA: ['Plan 234254534', 'Aetna Dental PPO'],
+  BCBS: ['Plan 891234567', 'BCBS Dental Plus'],
+  'Dental Dental Of California': ['PPO Premiun Plan', 'HMO Basic'],
+  Cigna: ['HMO Basic', 'Cigna Dental 1000'],
+  MetLife: ['Plan 556677889', 'MetLife PDP'],
+}
+export const CARRIERS = Object.keys(PLANES_POR_CARRIER)
 export const PLANES_NOMBRE = ['PPO Premiun Plan', 'Plan 234254534', 'Plan 891234567', 'HMO Basic']
 export const RELACIONES = ['Self', 'Spouse', 'Child', 'Other']
-export const ORDENES = ['Primary', 'Secondary', 'Tertiary']
+export const ORDENES: OrdenPlan[] = ['Primary', 'Secondary', 'Tertiary']
 export const ELEGIBILIDAD = ['Verified', 'Pending', 'Not eligible']

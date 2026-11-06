@@ -149,3 +149,43 @@ Julián, de paso: **"Manage Subscription" baja al piso de su card** (`mt-auto` e
 altura que Cancel/Save de Patient Information -la card de Subscription Information es más corta y el grid las estira
 igual, así que sin eso el botón quedaba más arriba-. Verificado con Playwright: los dos botones comparten la misma
 coordenada `y`.
+
+## CON-3282 · CON-3284 — Buscar, borrar y crear suscripciones como red.dev (2026-11-06)
+
+Julián, con una grabación de red.dev (`/patients/:id/insurance`): a la card de Subscription Information le faltaba
+comportarse como allá. Reglas de Jira: CON-3282 (Delete Suscription) y CON-3284 (New Suscription).
+
+- **Buscador de suscripciones**: placeholder "Search by name or ID", desplegable con "Nombre - Subscriber ID" (mock
+  `SUSCRIPCIONES` en `data/insurance.ts`), ✕ para limpiar y "Subscription not found." sin coincidencias. Es el
+  `SearchField` de siempre con dos props nuevas: `emptyText` y `clearable`.
+- **Card sin elegir**: "Select a subscription" y guiones en cada dato; **Manage Subscription deshabilitado** y sin
+  tacho. Elegida: el nombre del plan con su pill de estado, los datos y un instante de carga (skeleton en Carrier, Plan
+  y Dependents) como red.dev. Manage Subscription ahora muestra la suscripción elegida.
+- **Borrar** (tacho rojo al lado de Manage): con patient insurances que la usan (`enUso`), toast de error "Failed to
+  delete subscription / This subscription cannot be deleted because it has dependent patient insurance records." Si
+  está libre, `ConfirmDialog` danger con los textos de red.dev y Confirm.
+  **Diferencia con red.dev, a propósito:** red.dev pregunta primero y falla después; CON-3282 (paso 3 del flujo) dice
+  que la confirmación sólo aparece si se puede borrar. Seguimos a Jira: no se pregunta algo que va a fallar.
+- **Coordination Order se calcula**: el primer orden (Primary, Secondary, Tertiary) que ningún plan activo del
+  paciente ocupa; con los tres ocupados, el último. Se fue el select duplicado (anomalías 62 y 63) y el rótulo pasa a
+  "Coordination Order", bien escrito, como red.dev.
+- **Assignment of Benefits y Release of Information** de a dos y destildados al abrir (antes arrancaban tildados).
+- **Save de Patient Information** pide además la suscripción, suma el plan a la tabla con el orden calculado y limpia
+  el formulario. Cancel también limpia la suscripción elegida.
+- **New Subscription, paso Subscription** (CON-3284): Carrier Name\*, Plan Name\* (deshabilitado hasta elegir carrier,
+  con los planes de ese carrier, "Carrier not found." / "Plan not found."), Subscriber ID\*, Coverage Start\* y
+  Coverage End. Se fue Notes (no está en Jira ni en red.dev) y "Approx Start/End Date" pasa a Coverage Start/End.
+  Validaciones: aviso "Uncompleted fields" arriba en el paso que falta (Alert, como Carriers), inicio no futuro, fin no
+  antes del inicio, y no se puede duplicar suscriptor + plan ("Duplicate subscription" con el texto de Jira). En el paso
+  Subscriber, "Use a person that already exists" pide elegir a alguien. Al guardar, toast "The subscription has been
+  successfully created." y la nueva queda elegida en la card.
+
+Anomalías de red.dev que **no** se copian:
+
+67. Los errores de campo dicen "String must contain at least 1 character(s)" (el mensaje crudo del validador). Acá:
+    "This field is required.", como el resto de la app.
+68. El toast de Jira dice "The suscription has been successfully created." Acá, "subscription".
+
+Para validar con Julián: CON-3284 también dice que **Coverage End no puede ser futura**, pero un plan suele terminar
+más adelante (12/31 del año), así que no se aplicó hasta confirmarlo. La fila de la tabla en red.dev trae un menú ⋮ que
+el video no abre: queda fuera de esta tanda.
