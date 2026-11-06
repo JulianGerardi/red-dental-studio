@@ -457,3 +457,34 @@ cancelarlos todos y poder cambiarle sólo la sala.
 
 Para validar: si en vez del drawer completo alcanza con un select de sala en la misma fila del aviso (más rápido para
 mover varios, pero no deja cambiar la fecha).
+
+### Working Hours: elegir días no es vincularlos, y Open exige horas (2026-11-06, CON-1546)
+
+Pedido de Julián. CON-1546 (*Editar Horario de Apertura/Cierre de Locación*) es la historia; CON-1578/1579 están vacías.
+
+1. **Sale "Apply change to" con "Only this day" / "All linked days".** Elegir varios días en "Repeat on days" aplica
+   las franjas a esos días *en esta operación*; no crea una relación entre ellos. Que lunes y martes tengan los mismos
+   horarios no los vincula. "All linked days" sólo tendría sentido si el producto manejara grupos de horarios
+   compartidos (crear un grupo L-M-V, y al editar el lunes elegir separarlo o editar el grupo): no existe, así que
+   la opción prometía algo que no pasaba. Una línea bajo "Repeat on days" avisa que las horas reemplazan las de cada día
+   elegido.
+2. **Un día no puede quedar Open sin horas.** Activar el switch de un día cerrado ya no lo pasa a Open: abre el panel,
+   con el día de origen elegido y una fila vacía de Start / End Time (se pueden sumar franjas y días). El día queda
+   Open recién con un Save válido; Cancel o la ✕ no guardan nada y el día sigue Closed. Sale el estado "Add New Hour"
+   (abierto sin franjas) y su botón.
+3. **El panel se llama "Set working hours"** (antes "New Availability", título del Figma 4620:115332): lo abre tanto
+   el switch como "Edit hours", y en los dos casos se fijan horas, no se crea una disponibilidad nueva.
+4. **Save guarda todo lo cargado en todos los días elegidos.** Antes guardaba sólo la primera franja y sólo en el día
+   de origen, aunque se eligieran más. Las franjas se ordenan por hora y se muestran con el formato de los chips
+   ("08:00 AM - 01:00 PM").
+5. **"Edit hours" abre con las franjas del día cargadas**, para editarlas en vez de reescribirlas de cero.
+6. **Validaciones de CON-1546** debajo de cada fila: "Start time must be earlier than end time.", "Time interval must
+   be at least 30 minutes." y "This time interval overlaps with another."; sin días elegidos, "Select at least one
+   day.".
+7. **Cerrar un día vacía sus franjas** (así reabrirlo arranca con la fila vacía del punto 2) y avisa "Monday is now
+   closed." con **Undo**, para no perder horas por un toque de más. Quitar la última franja con la ✕ del chip también
+   lo cierra, como ya pasaba.
+
+Queda afuera: el aviso de CON-1546 cuando hay turnos fuera del horario nuevo (no hay turnos por locación en los datos
+mock) y el de "All operating hours have been disabled". "New Hours" de la ficha de un empleado tiene su propio
+alcance ("All selected days" / "This and future weeks") y no se tocó.

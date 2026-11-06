@@ -13,71 +13,115 @@ const HORAS = Array.from({ length: 48 }, (_, i) => {
   return `${String(h).padStart(2, '0')}:${m} hs`
 })
 
-/* Figma 4620:115332 "Settings — Location (Information)": el modal que abre
-   "Edit hours" en la pestaña Working Hours de una locación. Se llama **"New
-   Availability"**, no "Edit Hours" —el rótulo del botón que lo abre y el
-   título del modal no coinciden en el frame; se replica tal cual—.
-
-   Es más chico que "New Hours" (3864:267207, el de la ficha de un empleado):
-   sin el aviso ámbar y sin el selector de locación, porque acá ya se está
-   adentro de una. Y el alcance tiene sólo dos opciones, no tres. */
+/* Figma 4620:115332: lo abre "Edit hours" o activar Open en un día cerrado.
+   Elegir varios días aplica estas franjas a esos días en esta operación: no
+   los deja vinculados, así que no hay "All linked days" (ver
+   figma/modulos/locations.md, 2026-11-06, CON-1546). */
 
 const DIAS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-const ALCANCES = ['Only this day', 'All linked days'] as const
+export const NOMBRES_DIA = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
+type Rango = { inicio: string; fin: string }
+
+/* "08:00 hs" (desplegable) <-> "08:00 AM" (chip de la tabla). */
+const aMinutos = (h: string) => {
+  const [hh, mm] = h.slice(0, 5).split(':').map(Number)
+  return hh * 60 + mm
+}
+const aChip = (h: string) => {
+  const m = aMinutos(h)
+  const hh = Math.floor(m / 60)
+  return `${String(hh % 12 || 12).padStart(2, '0')}:${String(m % 60).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`
+}
+const deChip = (h: string) => {
+  const [hora, ampm] = h.trim().split(' ')
+  const [hh, mm] = hora.split(':').map(Number)
+  const h24 = (hh % 12) + (ampm === 'PM' ? 12 : 0)
+  return `${String(h24).padStart(2, '0')}:${String(mm).padStart(2, '0')} hs`
+}
+const desdeChips = (rangos: string[]): Rango[] =>
+  rangos.map((r) => {
+    const [inicio, fin] = r.split(' - ')
+    return { inicio: deChip(inicio), fin: deChip(fin) }
+  })
+
+/* Validaciones de CON-1546: Start < End, mínimo 30 minutos y sin superposición en el mismo día. */
+function errorDe(r: Rango, i: number, rangos: Rango[]): string | undefined {
+  if (!r.inicio || !r.fin) return undefined
+  const a = aMinutos(r.inicio)
+  const b = aMinutos(r.fin)
+  if (a >= b) return 'Start time must be earlier than end time.'
+  if (b - a < 30) return 'Time interval must be at least 30 minutes.'
+  const pisa = rangos.some((o, j) => j !== i && o.inicio && o.fin && a < aMinutos(o.fin) && aMinutos(o.inicio) < b)
+  if (pisa) return 'This time interval overlaps with another.'
+}
 
 export function LocationHoursModal({
-  dia, onClose, onGuardar,
+  dia, iniciales, onClose, onGuardar,
 }: {
-  /** Índice 0-6 (domingo a sábado) del día que se estaba editando, si vino de
-      una fila puntual. Preselecciona ese día en "Repeat on days". */
+  /** Índice 0-6 (domingo a sábado) del día de origen: queda seleccionado en "Repeat on days". */
   dia?: number
+  /** Franjas actuales del día ("08:00 AM - 01:00 PM"), para editarlas. Sin franjas, arranca con una fila vacía. */
+  iniciales?: string[]
   onClose: () => void
-  onGuardar?: (rango: { inicio: string; fin: string }) => void
+  /** Recibe los días elegidos y sus franjas ya en formato de chip, ordenadas. */
+  onGuardar?: (dias: number[], rangos: string[]) => void
 }) {
-  const [rangos, setRangos] = useState([{ inicio: '', fin: '' }])
+  const [rangos, setRangos] = useState<Rango[]>(iniciales?.length ? desdeChips(iniciales) : [{ inicio: '', fin: '' }])
   const [dias, setDias] = useState<number[]>(dia !== undefined ? [dia] : [1, 2, 3, 4, 5])
-  const [alcance, setAlcance] = useState<(typeof ALCANCES)[number]>(ALCANCES[0])
   const [intentado, setIntentado] = useState(false)
+
+  const errores = rangos.map((r, i) => errorDe(r, i, rangos))
+  const sinDias = dias.length === 0
 
   const guardar = () => {
     setIntentado(true)
-    if (rangos.some((r) => !r.inicio.trim() || !r.fin.trim()) || dias.length === 0) return
-    onGuardar?.(rangos[0])
-    aviso.ok(`Hours saved for ${dias.length} ${dias.length === 1 ? 'day' : 'days'}.`)
+    if (rangos.some((r) => !r.inicio || !r.fin) || errores.some(Boolean) || sinDias) return
+    const ordenados = [...rangos].sort((a, b) => aMinutos(a.inicio) - aMinutos(b.inicio))
+    onGuardar?.([...dias].sort(), ordenados.map((r) => `${aChip(r.inicio)} - ${aChip(r.fin)}`))
+    aviso.ok(dias.length === 1 ? `Hours saved for ${NOMBRES_DIA[dias[0]]}.` : `Hours saved for ${dias.length} days.`)
     onClose()
   }
 
+  const cambiar = (i: number, k: keyof Rango) => (v: string) =>
+    setRangos((p) => p.map((x, j) => (j === i ? { ...x, [k]: v } : x)))
+
   return (
     <ModalShell
-      title="New Availability"
+      title="Set working hours"
       onClose={onClose}
       width="max-w-[420px]"
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-4">
         {rangos.map((r, i) => (
-          <div key={i} className="flex items-start gap-2">
-            <div className="grid flex-1 grid-cols-2 gap-4">
-              <SelectField
-                label="Start Time" placeholder="00:00 hs" options={HORAS} value={r.inicio}
-                onChange={(v) => setRangos((p) => p.map((x, j) => (j === i ? { ...x, inicio: v } : x)))}
-                error={intentado && !r.inicio.trim() ? 'Required.' : undefined}
-              />
-              <SelectField
-                label="End Time" placeholder="00:00 hs" options={HORAS} value={r.fin}
-                onChange={(v) => setRangos((p) => p.map((x, j) => (j === i ? { ...x, fin: v } : x)))}
-                error={intentado && !r.fin.trim() ? 'Required.' : undefined}
-              />
+          <div key={i} className="flex flex-col gap-1">
+            <div className="flex items-start gap-2">
+              <div className="grid flex-1 grid-cols-2 gap-4">
+                <SelectField
+                  label="Start Time" placeholder="00:00 hs" options={HORAS} value={r.inicio}
+                  onChange={cambiar(i, 'inicio')}
+                  error={intentado && !r.inicio ? 'Required.' : undefined}
+                />
+                <SelectField
+                  label="End Time" placeholder="00:00 hs" options={HORAS} value={r.fin}
+                  onChange={cambiar(i, 'fin')}
+                  error={intentado && !r.fin ? 'Required.' : undefined}
+                />
+              </div>
+              {rangos.length > 1 && (
+                <button
+                  type="button"
+                  aria-label="Remove time range"
+                  onClick={() => setRangos((p) => p.filter((_, j) => j !== i))}
+                  className="mt-7 shrink-0 rounded p-1 text-ink-muted hover:bg-surface-muted hover:text-dash-bad-fg"
+                >
+                  <X className="size-4" />
+                </button>
+              )}
             </div>
-            {rangos.length > 1 && (
-              <button
-                type="button"
-                aria-label="Remove time range"
-                onClick={() => setRangos((p) => p.filter((_, j) => j !== i))}
-                className="mt-7 shrink-0 rounded p-1 text-ink-muted hover:bg-surface-muted hover:text-dash-bad-fg"
-              >
-                <X className="size-4" />
-              </button>
+            {errores[i] && (
+              <p role="alert" className="text-[11px] text-dash-bad-fg">{errores[i]}</p>
             )}
           </div>
         ))}
@@ -92,6 +136,9 @@ export function LocationHoursModal({
 
         <div className="border-t border-line pt-4">
           <p className="text-sm font-bold text-ink">Repeat on days</p>
+          <p className="mt-0.5 text-[11px] text-ink-muted">
+            These hours replace the current hours of each selected day.
+          </p>
           <div className="mt-3 flex gap-2">
             {DIAS.map((d, i) => {
               const on = dias.includes(i)
@@ -100,12 +147,13 @@ export function LocationHoursModal({
                   key={i}
                   type="button"
                   aria-pressed={on}
+                  aria-label={NOMBRES_DIA[i]}
                   onClick={() => setDias((p) => (on ? p.filter((x) => x !== i) : [...p, i]))}
                   className={cn(
                     'flex size-8 items-center justify-center rounded-md border text-[13px] font-semibold transition-colors',
                     on
                       ? 'border-dash-blue text-dash-blue bg-white'
-                      : 'border-transparent text-[#c4c4c8] hover:bg-surface-muted',
+                      : 'border-transparent text-ink-faint hover:bg-surface-muted',
                   )}
                 >
                   {d}
@@ -113,34 +161,9 @@ export function LocationHoursModal({
               )
             })}
           </div>
-        </div>
-
-        <div className="border-t border-line pt-4">
-          <p className="text-sm font-bold text-ink">Apply change to</p>
-          <p className="mt-0.5 text-[11px] text-ink-muted">
-            Choose how you want these hours to be applied.
-          </p>
-          <div className="mt-3 flex flex-col gap-2">
-            {ALCANCES.map((a) => {
-              const on = alcance === a
-              return (
-                <button
-                  key={a}
-                  type="button"
-                  onClick={() => setAlcance(a)}
-                  className={cn(
-                    'flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-[13px]',
-                    on ? 'border-dash-blue' : 'border-line hover:bg-surface-subtle',
-                  )}
-                >
-                  <span className={cn('flex size-4 shrink-0 items-center justify-center rounded-full border-2', on ? 'border-dash-blue' : 'border-ink-faint')}>
-                    {on && <span className="bg-dash-blue size-2 rounded-full" />}
-                  </span>
-                  {a}
-                </button>
-              )
-            })}
-          </div>
+          {intentado && sinDias && (
+            <p role="alert" className="mt-2 text-[11px] text-dash-bad-fg">Select at least one day.</p>
+          )}
         </div>
       </div>
     </ModalShell>

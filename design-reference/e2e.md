@@ -29,6 +29,8 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 - `tests/locations-rooms.e2e.ts` (2026-11-06): New Room pide Name y Type y avisa el nombre repetido; desactivar una
   sala con turnos muestra los afectados y los pasa a la lista de espera; una sin turnos se desactiva directo; desde el
   aviso, Edit appointment pasa un turno a otra sala y lo saca de los afectados.
+- `tests/locations-working-hours.e2e.ts` (2026-11-06, CON-1546): activar un día cerrado abre *Set working hours* y
+  Cancel lo deja Closed; Save pide horas, avisa Start ≥ End y guarda las franjas en todos los días elegidos.
 - `tests/billing.e2e.ts` (2026-10-09): elegir un paciente en Find Patient abre su vista (sólo sus movimientos, los
   botones de pago, Guarantor View con todo su garante) y la X vuelve al resumen; una fila del resumen abre la vista de
   ese paciente en Patient View; el círculo de info de Overdue Balance muestra su texto al pasar el mouse.
