@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-06
 
+### Working Hours: elegir días no los vincula y Open exige horas ([#126](https://github.com/JulianGerardi/red-dental-studio/pull/126))
+- **Settings → Locations → Working Hours** (CON-1546): sale *Apply change to* (*All linked days*): elegir días aplica
+  las horas en esta operación, no los vincula. Activar Open en un día cerrado abre **Set working hours** y el día queda
+  Open recién al guardar (Cancel lo deja Closed). Save guarda todas las franjas en todos los días elegidos; Edit hours
+  abre con las del día; validaciones de CON-1546. Cerrar un día vacía sus franjas, con Undo.
+- **Para el dev:** `LocationHoursModal` pasa a `onGuardar(dias, rangos)` (antes un solo rango) y suma `iniciales`. El
+  switch ya no abre el día: lo hace el Save. Decisiones en `locations.md` (2026-11-06). Storybook sin actualizar.
+
 ### Insurance: buscar, borrar y crear suscripciones como red.dev ([#124](https://github.com/JulianGerardi/red-dental-studio/pull/124))
 - **Subscription Information**: el buscador es el de personas de la app. Cada resultado es una card con suscriptor,
   número de suscripción, carrier y plan, y busca en los cuatro datos. Sin elegir, la card va con guiones y **Manage
