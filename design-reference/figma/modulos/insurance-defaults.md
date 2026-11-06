@@ -24,7 +24,7 @@ del epic; el orden de la pantalla, los textos y el flujo, del HTML; los componen
 | `/settings/locations/:locId` › Insurance / Billing Profile | Deshabilitar un perfil elegido en defaults se frena (CON-4032) |
 | `/settings/team/:employeeId` › Provider Info | Guardar Primary Provider apagado se frena si está elegido en defaults (CON-4031) |
 
-Código: `components/settings/LocationInsuranceDefaults.tsx` (pestaña, drawer *Select a billing profile* y
+Código: `components/settings/LocationInsuranceDefaults.tsx` (pestaña, `SelectorPerfil` y
 `BloqueoDefaults`, el aviso compartido de los dos bloqueos). Datos: `data/insuranceDefaults.ts` (tipo, inicialización,
 catálogo `PLACES`, normalización por modo y búsqueda de referencias) y el mismo store de los perfiles
 (`data/billingProfilesStore.tsx`: `defaultsDe`, `guardarDefaults`, `providerElegible`, `perfilElegible`, `referencias`).
@@ -50,8 +50,9 @@ default: el e2e de CON-4007 la sigue desactivando sin bloqueo.
    (*Select a billing profile before saving.* / *Select a rendering provider before saving.*).
 5. **Referencia no disponible**: si lo guardado deja de ser elegible, el selector lo sigue mostrando con el error de Jira
    debajo (*The selected billing profile is no longer available…*) y no se puede guardar hasta cambiarlo.
-6. **Un solo Save para toda la pestaña** (como el HTML), en un pie fijo abajo con *Unsaved changes*. Cancel vuelve a lo
-   guardado; sin cambios queda deshabilitado. Save sin cambios avisa *There are no changes to save.* Con errores, el foco va
+6. **Un solo Save para toda la pestaña** (como el HTML), al final de la página con *Unsaved changes* (ver 2026-11-06 ›
+   Ajustes). Cancel vuelve a lo
+   guardado. Save sin cambios avisa *There are no changes to save.* Con errores, el foco va
    al primer campo con error. Toast: *Insurance defaults saved.* Salir de la pestaña con cambios pregunta (*Discard unsaved
    changes?*, con su propio texto).
 7. **Bloqueos (CON-4031, CON-4032)**: se buscan referencias en los defaults de todas las Locations. Perfil de Location:
@@ -65,7 +66,7 @@ default: el e2e de CON-4007 la sigue desactivando sin bloqueo.
 
 1. **Opciones de modo con `OpcionDireccion`** (la tarjeta radio de Add Relationship, Copy From y Exceptions), dentro de
    un `radiogroup` con nombre. Mismo look que las `.choice` del HTML, pero la pieza del sistema.
-2. **Billing Profile en drawer** (*Select a billing profile*, `ui/drawer`): buscador `SettingsSearch` y `FilterMenu` con
+2. ~~**Billing Profile en drawer**~~ (reemplazado el mismo día, ver la sección siguiente) (*Select a billing profile*, `ui/drawer`): buscador `SettingsSearch` y `FilterMenu` con
    *All / Providers / Locations* y cantidades, en vez de los botones segmentados del HTML (es el filtro único de la app,
    igual que en Contracted With). Cada perfil es una tarjeta radio con nombre, dirección, organización si difiere y la pill
    *Location / Provider*. Pie con dos botones: Cancel · **Select profile** (el HTML elegía con un click y cerraba; con el
@@ -99,3 +100,24 @@ default: el e2e de CON-4007 la sigue desactivando sin bloqueo.
 
 **Para validar con usuarios:** si "Provider of Procedures" + "Alternate …" se entiende sin explicar cuándo se usa el
 alternativo (ninguna historia lo dice; es un tema de claims).
+
+## CON-3894 · CON-3896 — Selectores que se despliegan debajo y pie estático (2026-11-06)
+
+Julián sobre la primera versión: un campo con flecha (⌄) que abre un drawer al costado no cumple lo que promete; lo mismo
+con el Rendering Provider específico del HTML, que abría un drawer. Y el pie fijo (`sticky`) no existe en otras pantallas
+parecidas.
+
+- **Billing Profile** (específico y alternativo): sale el drawer *Select a billing profile*. Ahora es un desplegable debajo
+  del campo, con el mismo panel que `SelectField` buscable (buscador *Search by name* arriba, ✓ en el elegido, Escape y
+  click afuera cierran, Enter elige el primero). Cada opción conserva nombre, dirección y organización si difiere
+  (CON-3894 › 3.3), agrupadas en **Locations** y **Providers**: los grupos reemplazan al filtro All / Providers /
+  Locations y a la pill de tipo. El campo cerrado muestra el resumen del elegido.
+- **Rendering Provider** (específico y alternativo): sigue siendo `SelectField` buscable; ninguno abre drawer. Los tres
+  selectores de referencia (dos de Billing, dos de Rendering, Place of Service) se abren igual: debajo del campo.
+- **Regla**: un selector con ⌄ se despliega debajo. El drawer queda para cargar o editar algo (formularios), no para elegir
+  de una lista; si una lista crece mucho, el panel tiene scroll propio (máx. ~290 px).
+- **Pie**: deja de ser `sticky`. Va al final, como en Information: *Unsaved changes* a la izquierda y `FormFooter`
+  (Cancel · **Save changes**) a la derecha. Cancel ya no se deshabilita (igual que `FormFooter` en el resto).
+
+**Para validar con usuarios:** con muchas Locations y providers, si el desplegable con dirección de tres renglones por
+opción sigue siendo cómodo o conviene mostrar sólo nombre + ciudad.

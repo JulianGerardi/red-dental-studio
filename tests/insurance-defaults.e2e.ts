@@ -15,8 +15,7 @@ test('Insurance Defaults: valores iniciales, perfil específico obligatorio y gu
   await expect(screen.getByText('Select a billing profile before saving.')).toBeVisible()
 
   await screen.getByText('Select a billing profile').first().tap()
-  await screen.getByRole('radio', /Bayside Dental Group/).tap()
-  await screen.getByRole('button', 'Select profile').tap()
+  await screen.getByRole('button', /Bayside Dental Group/).tap()
   await screen.getByRole('button', 'Save changes').tap()
   await expect(screen.getByText('Insurance defaults saved.')).toBeVisible()
   await expect(screen.getByText('Unsaved changes')).toHaveCount(0)
