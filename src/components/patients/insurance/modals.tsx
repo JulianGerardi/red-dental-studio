@@ -12,7 +12,8 @@ const personaLineas = (nombre: string) => {
   const p = DIRECTORIO.find((x) => x.name === nombre)
   return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
 }
-import { CARRIERS, PLANES_NOMBRE, ORDENES, SUSCRIPCION } from '@/data/insurance'
+import { CARRIERS, PLANES_POR_CARRIER, ORDENES, SUSCRIPCION, type Suscripcion } from '@/data/insurance'
+import { Alert } from '@/components/ui/alert'
 import { aviso } from '@/components/ui/toaster'
 
 /* Modales de Insurance (Figma 3817:865128).
@@ -30,16 +31,54 @@ const OPCIONES: { id: Modo; label: string }[] = [
   { id: 'nuevo', label: 'Add a new subscriber' },
 ]
 
-export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
+/* "DD / MM / YY" → fecha, o null si está incompleta. */
+const aFecha = (v: string) => {
+  const m = v.match(/^(\d{2}) \/ (\d{2}) \/ (\d{2})$/)
+  return m ? new Date(2000 + Number(m[3]), Number(m[2]) - 1, Number(m[1])) : null
+}
+const aTexto = (v: string) => v.replace(/ \/ (\d{2})$/, ' / 20$1').replaceAll(' / ', '/')
+
+const VACIO = { subId: '', carrier: '', plan: '', inicio: '', fin: '', nombre: '', medio: '', apellido: '', email: '', cumple: '', persona: '' }
+
+/* Crear la suscripción (CON-3284): quién es el suscriptor y la póliza. Las reglas y los textos, en
+   modulos/insurance.md (2026-11-06). */
+export function NewSubscriptionModal({
+  paciente = 'John Smith', existentes = [], onCreada, onClose,
+}: {
+  /** El paciente de la ficha: "Use current patient details" lo usa de suscriptor. */
+  paciente?: string
+  /** Para no crear otra igual (mismo suscriptor y mismo plan). */
+  existentes?: Suscripcion[]
+  onCreada?: (s: Suscripcion) => void
+  onClose: () => void
+}) {
   const [modo, setModo] = useState<Modo>('actual')
-  const [d, setD] = useState({ subId: '', carrier: '', plan: '', inicio: '', fin: '', notas: '', nombre: '', medio: '', apellido: '', email: '', cumple: '', persona: '' })
+  const [d, setD] = useState(VACIO)
   const [intentado, setIntentado] = useState(false)
+  const [paso, setPaso] = useState(0)
   const set = (k: keyof typeof d) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? 'This field is required.' : undefined)
 
-  /* Dos pasos, como los drawers de Confidentally 2.0: primero quién es el suscriptor, después la cobertura. */
-  const [paso, setPaso] = useState(0)
-  const faltaSuscriptor = modo === 'nuevo' && (!d.nombre.trim() || !d.apellido.trim() || !d.cumple.trim())
+  const obligatoriosSuscriptor: (keyof typeof d)[] = modo === 'nuevo' ? ['nombre', 'apellido', 'cumple'] : modo === 'existente' ? ['persona'] : []
+  const faltaSuscriptor = obligatoriosSuscriptor.some((k) => !d[k].trim()) || (modo === 'existente' && !DIRECTORIO.some((p) => p.name === d.persona))
+  const suscriptor = modo === 'actual' ? paciente : modo === 'existente' ? d.persona : [d.nombre, d.medio, d.apellido].filter((x) => x.trim()).join(' ')
+
+  /* Plan Name depende del carrier: hasta elegir uno de la lista queda deshabilitado. */
+  const carrierValido = CARRIERS.includes(d.carrier)
+  const planes = carrierValido ? PLANES_POR_CARRIER[d.carrier] : []
+  const cambiarCarrier = (v: string) => setD((p) => ({ ...p, carrier: v, plan: v === p.carrier ? p.plan : '' }))
+
+  /* Fechas (CON-3284): el inicio no puede ser futuro y el fin no puede quedar antes del inicio. */
+  const hoy = new Date()
+  const inicio = aFecha(d.inicio)
+  const fin = aFecha(d.fin)
+  const errorInicio = req('inicio') ?? (intentado && d.inicio && !inicio ? 'Enter a full date.' : intentado && inicio && inicio > hoy ? "Coverage start can't be a future date." : undefined)
+  const errorFin = intentado && d.fin && !fin ? 'Enter a full date.' : intentado && inicio && fin && fin < inicio ? "Coverage end can't be before coverage start." : undefined
+  const errorCarrier = req('carrier') ?? (intentado && !carrierValido ? 'Select a carrier from the list.' : undefined)
+  const errorPlan = req('plan') ?? (intentado && d.plan && !planes.includes(d.plan) ? 'Select a plan from the list.' : undefined)
+  const faltaSuscripcion = !!(req('subId') || errorInicio || errorFin || errorCarrier || errorPlan) || !d.subId.trim() || !inicio || !carrierValido || !planes.includes(d.plan) || inicio > hoy || (!!d.fin && (!fin || fin < inicio))
+  const duplicada = existentes.some((s) => s.subscriber === suscriptor && s.carrier === d.carrier && s.plan === d.plan)
+
   const siguiente = () => {
     if (faltaSuscriptor) { setIntentado(true); return }
     setIntentado(false)
@@ -48,17 +87,32 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
   const guardar = () => {
     setIntentado(true)
     if (faltaSuscriptor) { setPaso(0); return }
-    if (!d.carrier.trim() || !d.inicio.trim()) return
-    aviso.ok(`Subscription with ${d.carrier} created.`)
+    if (faltaSuscripcion || duplicada) return
+    onCreada?.({
+      id: `s-${Date.now()}`, subscriber: suscriptor, subscriberId: d.subId.trim(), carrier: d.carrier, plan: d.plan,
+      cobertura: `${aTexto(d.inicio)} - ${d.fin ? aTexto(d.fin) : 'Present'}`,
+      dependientes: 0, estado: fin && fin < hoy ? 'Inactive' : 'Active', enUso: false,
+    })
+    aviso.ok('The subscription has been successfully created.')
     onClose()
   }
+
+  /* El aviso de arriba sale sólo en el paso donde falta algo, como en red.dev. */
+  const avisoFaltan = intentado && (paso === 0 ? faltaSuscriptor : faltaSuscripcion)
 
   return (
     <ModalShell
       title="New Subscription" description="Subscriber and coverage" onClose={onClose} width="max-w-[560px]" steps={['Subscriber', 'Subscription']} step={paso}
-      actions={<DrawerActions step={paso} total={2} onNext={siguiente} onBack={() => setPaso(0)} onCancel={onClose} onSave={guardar} />}
+      actions={<DrawerActions step={paso} total={2} onNext={siguiente} onBack={() => { setIntentado(false); setPaso(0) }} onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-6">
+        {avisoFaltan && (
+          <Alert tone="danger" title="Uncompleted fields">All required fields marked with (*) must be completed before proceeding.</Alert>
+        )}
+        {intentado && paso === 1 && !faltaSuscripcion && duplicada && (
+          <Alert tone="danger" title="Duplicate subscription">A subscription already exists for this subscriber and insurance plan. Duplicate subscriptions are not allowed.</Alert>
+        )}
+
         <DrawerStep index={0} step={paso} className="flex flex-col gap-6">
           <SectionCard title="Subscriber">
             <p className="-mt-2 text-[11px] text-ink-muted">Choose how you want to add the subscriber</p>
@@ -67,7 +121,7 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
                 key={o.id}
                 label={o.label}
                 checked={modo === o.id}
-                onChange={() => setModo(o.id)}
+                onChange={() => { setModo(o.id); setIntentado(false) }}
               />
             ))}
           </SectionCard>
@@ -75,11 +129,13 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
           {modo === 'existente' && (
             <SectionCard title="Select Subscriber">
               <PersonSearchField
-                label="Select person" placeholder="Search by Name or Last Name"
+                label="Select person" required placeholder="Search by Name or Last Name"
                 personas={DIRECTORIO.map((p) => p.name)}
                 value={d.persona}
                 onChange={set('persona')}
                 lineas={personaLineas}
+                emptyText="No person found."
+                error={intentado && !DIRECTORIO.some((p) => p.name === d.persona) ? (d.persona.trim() ? 'Select a person from the list.' : 'This field is required.') : undefined}
               />
             </SectionCard>
           )}
@@ -100,18 +156,21 @@ export function NewSubscriptionModal({ onClose }: { onClose: () => void }) {
         </DrawerStep>
 
         <DrawerStep index={1} step={paso}>
-        <SectionCard title="Subscription Information">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <SearchField label="Subcriber ID" options={[SUSCRIPCION.subscriberId]} value={d.subId} onChange={set('subId')} />
-            <SearchField label="Carrier name" required options={CARRIERS} value={d.carrier} onChange={set('carrier')} error={req('carrier')} />
-            <SearchField label="Plan name" options={PLANES_NOMBRE} value={d.plan} onChange={set('plan')} />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <DateTextField label="Approx Start Date" required value={d.inicio} onChange={set('inicio')} error={req('inicio')} />
-            <DateTextField label="Approx End Date" value={d.fin} onChange={set('fin')} />
-          </div>
-          <TextArea label="Notes" placeholder="Add notes" value={d.notas} onChange={set('notas')} />
-        </SectionCard>
+          {/* Los campos de CON-3284, todos obligatorios menos Coverage End. */}
+          <SectionCard title="Subscription Information">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <SearchField label="Carrier Name" required placeholder="Select carrier" options={CARRIERS} value={d.carrier} onChange={cambiarCarrier} error={errorCarrier} emptyText="Carrier not found." clearable />
+              <SearchField
+                label="Plan Name" required placeholder="Select plan" options={planes} value={d.plan} onChange={set('plan')} error={errorPlan}
+                disabled={!carrierValido} emptyText="Plan not found." clearable hint={carrierValido ? undefined : 'Select a carrier first.'}
+              />
+              <TextField label="Subscriber ID" required placeholder="123456" value={d.subId} onChange={set('subId')} error={req('subId')} />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <DateTextField label="Coverage Start" required value={d.inicio} onChange={set('inicio')} error={errorInicio} />
+              <DateTextField label="Coverage End" value={d.fin} onChange={set('fin')} error={errorFin} />
+            </div>
+          </SectionCard>
         </DrawerStep>
       </div>
     </ModalShell>
@@ -133,13 +192,17 @@ export function FilaLectura({ icon: Icon, label, value }: { icon: typeof ShieldH
 }
 
 export function ManageSubscriptionModal({
+  suscripcion,
   onNuevoDependiente,
   onClose,
 }: {
+  /** La elegida en Insurance; sin esto, la del frame. */
+  suscripcion?: Suscripcion
   onNuevoDependiente: () => void
   onClose: () => void
 }) {
-  const [subId, setSubId] = useState('DTX-45839217')
+  const s = suscripcion ?? SUSCRIPCION
+  const [subId, setSubId] = useState(suscripcion?.subscriberId ?? 'DTX-45839217')
   const [fin, setFin] = useState('03/01/2025')
   const [notas, setNotas] = useState('')
   const [intentado, setIntentado] = useState(false)
@@ -189,9 +252,9 @@ export function ManageSubscriptionModal({
 
         <DrawerStep index={1} step={paso}>
         <SectionCard title="Subscription Information">
-          <FilaLectura icon={ShieldHalf} label="Carrier" value={SUSCRIPCION.carrier} />
-          <FilaLectura icon={Hospital} label="Plan" value={SUSCRIPCION.plan} />
-          <FilaLectura icon={AArrowUp} label="Coverage Period" value={SUSCRIPCION.cobertura} />
+          <FilaLectura icon={ShieldHalf} label="Carrier" value={s.carrier} />
+          <FilaLectura icon={Hospital} label="Plan" value={s.plan} />
+          <FilaLectura icon={AArrowUp} label="Coverage Period" value={s.cobertura} />
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField
               label="Subcriber ID" required value={subId} onChange={setSubId}

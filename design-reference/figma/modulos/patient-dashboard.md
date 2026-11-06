@@ -524,3 +524,10 @@ para conservar el bento".
   con muchas, subir el alto (hoy el piso es 56rem) o ceder alto a los cuatro bloques clínicos.
 - `tests/patient-overview.e2e.ts`: Pending Task ya no asume las 9 tareas montadas (arranca con 6 y suma al scrollear con
   `scrollIntoView`); Appointments tiene su región `All appointments`.
+
+## Ícono de Relationships & Billing (2026-11-06)
+
+Julián: el ícono del ítem tiene que ir con el texto. Era `Ban` (el círculo tachado de "prohibido"), que en la app se usa
+para cancelar o rechazar (Cancel order, Clinic declined), así que el ítem parecía una acción bloqueada. Pasa a
+`Handshake`: un acuerdo entre personas, que cubre las dos partes del nombre (los vínculos del paciente y quién se hace
+cargo de pagar). `Users` quedó descartado porque ya es el ícono de Patients en la barra principal.

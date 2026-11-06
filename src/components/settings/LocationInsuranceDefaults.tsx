@@ -471,7 +471,7 @@ export function BloqueoDefaults({ tipo, referencias, onClose }: { tipo: 'perfil'
         {referencias.map((r) => (
           <li key={`${r.locId}-${r.campo}`}>
             <Link
-              to={`/settings/locations/${r.locId}?tab=insurance-defaults`}
+              to={`/settings/locations/${r.locId}?type=insurance-defaults`}
               onClick={onClose}
               className="text-dash-blue block rounded-md bg-surface-subtle px-3 py-2 font-medium hover:underline"
             >

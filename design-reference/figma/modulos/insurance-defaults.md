@@ -20,7 +20,7 @@ del epic; el orden de la pantalla, los textos y el flujo, del HTML; los componen
 | Ruta | Qué cambia |
 |---|---|
 | `/settings/locations/:locId` | Pestaña nueva **Insurance Defaults**, la última (después de Insurance / Billing Profile) |
-| `/settings/locations/:locId?tab=insurance-defaults` | Entra directo a la pestaña (la usan los avisos de bloqueo) |
+| `/settings/locations/:locId?type=insurance-defaults` | Entra directo a la pestaña (la usan los avisos de bloqueo) |
 | `/settings/locations/:locId` › Insurance / Billing Profile | Deshabilitar un perfil elegido en defaults se frena (CON-4032) |
 | `/settings/team/:employeeId` › Provider Info | Guardar Primary Provider apagado se frena si está elegido en defaults (CON-4031) |
 
@@ -84,7 +84,7 @@ default: el e2e de CON-4007 la sigue desactivando sin bloqueo.
    según la referencia elegida (CON-4030 › CA-11: una sola referencia para el cálculo y para el aviso).
 7. **Autorización** con `Checkbox` del sistema y el texto al lado clickeable.
 8. **Bloqueo con `ConfirmDialog`** tono warning y un solo botón (**Close**): se suma `hideCancel` al componente. Cada
-   referencia es un link que lleva a *Insurance Defaults* de esa Location (`?tab=insurance-defaults`) para cambiarla; el
+   referencia es un link que lleva a *Insurance Defaults* de esa Location (`?type=insurance-defaults`) para cambiarla; el
    HTML sólo la listaba.
 9. **Fuera**: el panel *Prototipo · controles de demostración* (error simulado, permisos, employee inactivo, vaciar Place of
    Service) y el selector de Location del header del HTML (en el clon se cambia de Location desde la lista).
@@ -147,3 +147,9 @@ Julián preguntó si el botón **Remove** (secundario, con texto) existía en ot
 una **✕ chica dentro de la card de la selección** (`PersonSearchField` en form.tsx, `SearchPicker`, `Chip`); el tacho
 rojo (`ICONO_SUELTO` + Trash) es para borrar filas, no para desmarcar. `Seleccion` usa ahora la ✕ de `PersonSearchField`
 (misma clase, `aria-label` *Remove [rótulo]*, `title` *Remove*), a la derecha de **Change**, sólo en los opcionales.
+
+## Pestaña en la URL con `?type=` (2026-11-06)
+
+Al publicar, `main` ya llevaba la pestaña de la Location en la URL como red.dev (`?type=rooms`, PR #125/#126). Insurance
+Defaults usa ese mismo mecanismo: `?type=insurance-defaults` (sale el `?tab=` propio y su `useEffect`). Los links del aviso
+de bloqueo apuntan ahí.

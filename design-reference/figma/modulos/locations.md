@@ -405,3 +405,86 @@ controla con `npm run ds:campos`.
    misma línea, abajo.
 2. **New Hours**: Location en la columna izquierda, del ancho de Start Time.
 3. **New Location**: Name entra en la grilla con Abbreviation y Default Fee Schedule; Time Zone, en la de la dirección.
+
+## Rooms con la lógica de red.dev (2026-11-06)
+
+CON-404 (Registrar room) · CON-1520 (Deactivate Operatory) · CON-1581 add · CON-1582 edit · CON-1583 delete · CON-1584
+active. Pedido de Julián con red.dev de guía (`/settings/locations/:id/edit?type=rooms`). Desde esta sesión red.dev pide
+login y no se pudo abrir: se armó con las historias y con el patrón de las listas de red.dev que ya están en la app
+(Insurance Plans / Employers, `red-dev/settings-billing/`). Validar contra red.dev con capturas.
+
+1. **Misma estética que Working Hours** (pedido de Julián, mismo día): caja blanca con encabezado gris Room ·
+   Abbreviation · Type · Status, una fila por sala con el switch en línea (*Active* / *Inactive*, el `SwitchOpenClose`
+   de Open/Close con otros rótulos), la inactiva en gris y las acciones como link azul (*Edit room*) + tacho. *+ New
+   Room* arriba a la derecha. Debajo de 1024px la fila se compacta: Type · Abbreviation bajo el nombre, sin encabezado.
+   Primero se armó con `ui/data-table` (buscador, filtro y ⋮, como Insurance Plans); se cambió para que las pestañas
+   de la locación se vean iguales. Una locación tiene pocas salas: sin buscador ni filtro. Vacío: *No rooms yet*.
+2. **Campos de CON-404**: Name* y Type* obligatorios, Abbreviation opcional (el drawer anterior lo tenía al revés, del
+   frame 3864:306314). Se suma Status (switch, arranca Active). Abbreviation se guarda en mayúsculas.
+3. **Validaciones**: nombre repetido en la locación (sin mayúsculas) → *Name already exists.* (texto de Jira). Para lo
+   obligatorio se usa el *This field is required.* de todo el sistema, no el *Required fields missing.* de la historia.
+4. **Desactivar con turnos (CON-1520)**: `ConfirmDialog` con aviso, el texto de la historia y *Affected Appointments
+   (N)* con fecha, provider y paciente; Cancel · Confirm. Confirm la deja inactiva, saca sus turnos y el toast dice
+   cuántos pasaron a la lista de espera (con Undo). Prender o apagar el switch sin turnos se aplica enseguida, con Undo. La historia habla de "operatory"; la app dice "room", como la pestaña.
+5. **Última sala activa** (*All operatories deactivated. Continue?*): *Deactivate all rooms?* explicando que no se van a
+   poder dar turnos en la locación. Si además tiene turnos, va como un párrafo más del mismo aviso: una sola pregunta.
+6. Desactivar desde el drawer de Edit pasa por las mismas preguntas.
+7. **Datos**: Operatory 1 a 3 (los de la agenda), X-Ray Room, Consultation Room y Sterilization (inactiva). Operatory 1
+   y 2 traen turnos de noviembre para que el aviso se vea. `TIPOS_SALA` sigue siendo la lista anterior: ni Jira ni el
+   Figma dicen qué tipos hay.
+8. **La pestaña va en la URL** como en red.dev: `?type=information|working-hours|rooms|exceptions|billing-profile`.
+
+Para validar: qué tipos de sala tiene red.dev; si Delete con turnos programados debería pedir lo mismo que Inactive
+(hoy borra con Undo, CON-1583 no tiene detalle); y que las salas inactivas salgan de los selects de New Appointment
+(postcondición de CON-404, no conectado porque la agenda no lee estas salas).
+
+### Rooms: cada turno afectado se edita aparte (2026-11-06, CON-1520)
+
+Julián: "podés gestionar cada cita por separado" quiere decir que cada turno del aviso es editable, para no tener que
+cancelarlos todos y poder cambiarle sólo la sala.
+
+1. Cada turno de *Affected Appointments* lleva el link **Edit appointment** (en celular, *Edit*), que abre el mismo
+   drawer *Edit Appointment* de la agenda con el turno cargado (paciente, provider, fecha, horas, Operatory y Status
+   Booked). Mientras está abierto, el aviso se esconde y vuelve al cerrar.
+2. El select **Operatory** ofrece sólo las otras salas **activas** de la locación (`operatorios`, prop nueva de
+   `NewAppointmentModal`). Elegir otra saca el turno de los afectados y lo pasa a esa sala: toast *Appointment for X
+   moved to Operatory 3.* Guardar sin cambiar la sala deja el turno en la lista con su fecha nueva.
+3. **Confirm** sigue la historia: los que quedan se cancelan y pasan a la lista de espera (*N appointments were
+   cancelled and moved to the waiting list.*).
+4. Si se movieron todos, el aviso pasa a *Deactivate Operatory 1?* (o *Deactivate all rooms?* si es la última activa).
+5. Los turnos de ejemplo pasan a horas en punto (09:00, 11:00, 14:00, 08:00): el drawer de turnos va de hora en hora y
+   un 10:30 no se podía cargar.
+
+Para validar: si en vez del drawer completo alcanza con un select de sala en la misma fila del aviso (más rápido para
+mover varios, pero no deja cambiar la fecha).
+
+### Working Hours: elegir días no es vincularlos, y Open exige horas (2026-11-06, CON-1546)
+
+Pedido de Julián. CON-1546 (*Editar Horario de Apertura/Cierre de Locación*) es la historia; CON-1578/1579 están vacías.
+
+1. **Sale "Apply change to" con "Only this day" / "All linked days".** Elegir varios días en "Repeat on days" aplica
+   las franjas a esos días *en esta operación*; no crea una relación entre ellos. Que lunes y martes tengan los mismos
+   horarios no los vincula. "All linked days" sólo tendría sentido si el producto manejara grupos de horarios
+   compartidos (crear un grupo L-M-V, y al editar el lunes elegir separarlo o editar el grupo): no existe, así que
+   la opción prometía algo que no pasaba. Una línea bajo "Repeat on days" avisa que las horas reemplazan las de cada día
+   elegido.
+2. **Un día no puede quedar Open sin horas.** Activar el switch de un día cerrado ya no lo pasa a Open: abre el panel,
+   con el día de origen elegido y una fila vacía de Start / End Time (se pueden sumar franjas y días). El día queda
+   Open recién con un Save válido; Cancel o la ✕ no guardan nada y el día sigue Closed. Sale el estado "Add New Hour"
+   (abierto sin franjas) y su botón.
+3. **El panel se llama "Set working hours"** (antes "New Availability", título del Figma 4620:115332): lo abre tanto
+   el switch como "Edit hours", y en los dos casos se fijan horas, no se crea una disponibilidad nueva.
+4. **Save guarda todo lo cargado en todos los días elegidos.** Antes guardaba sólo la primera franja y sólo en el día
+   de origen, aunque se eligieran más. Las franjas se ordenan por hora y se muestran con el formato de los chips
+   ("08:00 AM - 01:00 PM").
+5. **"Edit hours" abre con las franjas del día cargadas**, para editarlas en vez de reescribirlas de cero.
+6. **Validaciones de CON-1546** debajo de cada fila: "Start time must be earlier than end time.", "Time interval must
+   be at least 30 minutes." y "This time interval overlaps with another."; sin días elegidos, "Select at least one
+   day.".
+7. **Cerrar un día vacía sus franjas** (así reabrirlo arranca con la fila vacía del punto 2) y avisa "Monday is now
+   closed." con **Undo**, para no perder horas por un toque de más. Quitar la última franja con la ✕ del chip también
+   lo cierra, como ya pasaba.
+
+Queda afuera: el aviso de CON-1546 cuando hay turnos fuera del horario nuevo (no hay turnos por locación en los datos
+mock) y el de "All operating hours have been disabled". "New Hours" de la ficha de un empleado tiene su propio
+alcance ("All selected days" / "This and future weeks") y no se tocó.

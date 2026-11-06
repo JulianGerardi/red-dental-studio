@@ -426,7 +426,7 @@ export function CollapsibleFields({
    (3648:59976 y hermanos): el campo principal siempre es una búsqueda. */
 export function SearchField({
   label, required, className, options = [], value = '', onChange, error,
-  placeholder = 'Search...', hint, disabled, subtext,
+  placeholder = 'Search...', hint, disabled, subtext, emptyText, clearable,
 }: {
   label: string
   required?: boolean
@@ -441,6 +441,10 @@ export function SearchField({
   /** Segunda línea por sugerencia, para desambiguar (New Appointment: fecha de nacimiento y email del paciente, email
       del provider). Sin esto, cada sugerencia es sólo el nombre, como siempre (Julián, 2026-10-19). */
   subtext?: (opcion: string) => React.ReactNode
+  /** Qué decir cuando lo escrito no coincide con nada ("Carrier not found."); sin esto, no se abre nada. */
+  emptyText?: string
+  /** ✕ a la derecha para vaciar el campo y volver a buscar (Insurance → Search for an existing subscription). */
+  clearable?: boolean
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -469,8 +473,23 @@ export function SearchField({
           disabled={disabled}
           onChange={(e) => { onChange?.(e.target.value); setAbierto(true) }}
           onFocus={() => setAbierto(true)}
-          className={cn(control(error), 'h-9 pr-3 pl-9')}
+          className={cn(control(error), 'h-9 pl-9', clearable && value ? 'pr-9' : 'pr-3')}
         />
+        {clearable && value && !disabled && (
+          <button
+            type="button"
+            aria-label={`Clear ${label}`}
+            onClick={() => { onChange?.(''); setAbierto(false) }}
+            className="absolute top-1/2 right-1.5 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-dash-blue"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+        {abierto && emptyText && value.trim() && sugerencias.length === 0 && !options.includes(value) && (
+          <div role="status" className="absolute top-[calc(100%+4px)] left-0 z-30 w-full rounded-md border border-line bg-white px-3 py-8 text-center text-[13px] text-ink shadow-lg">
+            {emptyText}
+          </div>
+        )}
         {abierto && sugerencias.length > 0 && (
           <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-60 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
             {sugerencias.map((o) => {
@@ -524,6 +543,7 @@ function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?:
    exactamente un nombre de la lista. Ver design-reference/design-system.md. */
 export function PersonSearchField({
   label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas, emptyText,
+  nombre: nombreDe = (v) => v, texto: textoDe = (v) => v,
 }: {
   label: string
   required?: boolean
@@ -540,12 +560,16 @@ export function PersonSearchField({
   lineas?: (nombre: string) => string[] | undefined
   /** Qué decir si lo escrito no coincide con nadie; sin esto, no se abre nada. */
   emptyText?: string
+  /** El nombre que muestra la card cuando `personas` trae claves únicas ("John Smith - JASD…" → "John Smith"). */
+  nombre?: (valor: string) => string
+  /** Dónde se busca lo escrito; por default, en el valor. Insurance busca en nombre, número, carrier y plan. */
+  texto?: (valor: string) => string
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const elegida = !!value.trim() && personas.includes(value)
   const sugerencias = !elegida && value.trim()
-    ? personas.filter((p) => p.toLowerCase().includes(value.trim().toLowerCase()))
+    ? personas.filter((p) => textoDe(p).toLowerCase().includes(value.trim().toLowerCase()))
     : []
   const arriba = useHaciaArriba(ref, abierto && sugerencias.length > 0, Math.min(sugerencias.length * 60 + 8, 288) + 4)
 
@@ -582,8 +606,8 @@ export function PersonSearchField({
                 onClick={() => { onChange?.(nombre); setAbierto(false) }}
                 className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-surface-muted"
               >
-                <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
-                <PersonaLineas nombre={nombre} lineas={lineas?.(nombre)} />
+                <Avatar aria-hidden initials={inicialesDe(nombreDe(nombre))} size={36} />
+                <PersonaLineas nombre={nombreDe(nombre)} lineas={lineas?.(nombre)} />
               </button>
             ))}
           </div>
@@ -598,8 +622,8 @@ export function PersonSearchField({
       {elegida && (
         <div className="relative">
           <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3 pr-11">
-            <Avatar aria-hidden initials={inicialesDe(value)} size={36} />
-            <PersonaLineas nombre={value} lineas={lineas?.(value)} />
+            <Avatar aria-hidden initials={inicialesDe(nombreDe(value))} size={36} />
+            <PersonaLineas nombre={nombreDe(value)} lineas={lineas?.(value)} />
           </div>
           {!disabled && (
             <button

@@ -1,16 +1,21 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { CirclePlus, Search, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye } from 'lucide-react'
+import { CirclePlus, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { Pill, type PillTone } from '@/components/ui/pill'
-import { SelectField, DateTextField, TextArea, OptionCheckbox, FormFooter } from '@/components/patients/form'
+import { SelectField, DateTextField, TextArea, OptionCheckbox, FormFooter, PersonSearchField } from '@/components/patients/form'
+import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import {
   NewSubscriptionModal, ManageSubscriptionModal, NewDependerModal,
 } from '@/components/patients/insurance/modals'
-import { PLANES, PLANES_HISTORICOS, SUSCRIPCION, RELACIONES, ORDENES, ELEGIBILIDAD, type PlanPaciente } from '@/data/insurance'
+import {
+  PLANES, PLANES_HISTORICOS, SUSCRIPCIONES, RELACIONES, ORDENES, ELEGIBILIDAD, etiquetaSuscripcion,
+  type PlanPaciente, type RelacionPlan, type Suscripcion,
+} from '@/data/insurance'
 import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 
@@ -28,6 +33,7 @@ const RELACION_TONO: Record<PlanPaciente['relacion'], PillTone> = {
   Child: 'success',
   Self: 'info',
   Spouse: 'neutral',
+  Other: 'neutral',
 }
 const ESTADO_TONO: Record<PlanPaciente['estado'], PillTone> = {
   Active: 'success',
@@ -65,25 +71,72 @@ export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boo
 }
 
 /* Fila de dato de la card de suscripción: icono, etiqueta chica y valor. */
-export function FilaDato({ icon: Icon, label, value }: { icon: typeof ShieldHalf; label: string; value: string }) {
+export function FilaDato({ icon: Icon, label, value, loading }: { icon: typeof ShieldHalf; label: string; value: string; loading?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
       <Icon className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />
       <span className="min-w-0 leading-tight">
         <span className="block text-[11px] text-ink-faint">{label}</span>
-        <span className="block truncate text-[13px] text-ink">{value}</span>
+        {loading
+          ? <span aria-hidden className="mt-1 block h-3 w-24 animate-pulse rounded bg-surface-muted" />
+          : <span className="block truncate text-[13px] text-ink">{value}</span>}
       </span>
     </div>
   )
 }
 
+/* Coordination Order no se elige: es el primer orden que ningún plan activo del paciente ocupa (red.dev, video del
+   2026-11-06). Con los tres ocupados, queda el último. Ver modulos/insurance.md. */
+const ordenSiguiente = (planes: PlanPaciente[]) =>
+  ORDENES.find((o) => !planes.some((p) => p.estado === 'Active' && p.orden === o)) ?? ORDENES[ORDENES.length - 1]
+
+const VACIO = { relacion: '', inicio: '', fin: '', elegibilidad: '', verificacion: '', notas: '' }
+const fechaLarga = (v: string) => v.replace(/ \/ (\d{2})$/, ' / 20$1').replaceAll(' / ', '/')
+
 export default function Insurance() {
   const { id = 'john-smith' } = useParams()
   const [historial, setHistorial] = useState(false)
   const [planes, setPlanes] = useState(PLANES)
-  const [modal, setModal] = useState<'nueva' | 'gestionar' | 'dependiente' | null>(null)
-  const [d, setD] = useState({ relacion: '', orden: '', inicio: '', fin: '', elegibilidad: '', verificacion: '', notas: '' })
+  const [modal, setModal] = useState<'nueva' | 'gestionar' | 'dependiente' | 'borrar' | null>(null)
+  const [d, setD] = useState(VACIO)
   const [intentado, setIntentado] = useState(false)
+  const [beneficios, setBeneficios] = useState(false)
+  const [informacion, setInformacion] = useState(false)
+
+  /* Suscripción: se busca por nombre o Subscriber ID; la card muestra la elegida, o guiones si no hay ninguna. */
+  const [suscripciones, setSuscripciones] = useState(SUSCRIPCIONES)
+  const [busqueda, setBusqueda] = useState('')
+  const [cargando, setCargando] = useState(false)
+  const porEtiqueta = (v: string) => suscripciones.find((s) => etiquetaSuscripcion(s) === v)
+  const elegida = porEtiqueta(busqueda)
+  const buscar = (v: string) => {
+    setBusqueda(v)
+    /* Al elegir, un instante de carga mientras llegan carrier, plan y dependientes, como red.dev. */
+    if (suscripciones.some((s) => etiquetaSuscripcion(s) === v)) {
+      setCargando(true)
+      window.setTimeout(() => setCargando(false), 400)
+    }
+  }
+  /* Borrar (CON-3282): con patient insurances que la usan no se puede, y se avisa sin preguntar. */
+  const pedirBorrar = () => {
+    if (!elegida) return
+    if (elegida.enUso) {
+      aviso.error({ titulo: 'Failed to delete subscription', texto: 'This subscription cannot be deleted because it has dependent patient insurance records.' })
+      return
+    }
+    setModal('borrar')
+  }
+  const borrar = () => {
+    setSuscripciones((prev) => prev.filter((s) => s.id !== elegida?.id))
+    setBusqueda('')
+    setModal(null)
+    aviso.ok('The subscription has been deleted.')
+  }
+  const creada = (s: Suscripcion) => {
+    setSuscripciones((prev) => [...prev, s])
+    setBusqueda(etiquetaSuscripcion(s))
+  }
+  const orden = ordenSiguiente(planes)
   const set = (k: keyof typeof d) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? 'This field is required.' : undefined)
 
@@ -105,9 +158,17 @@ export default function Insurance() {
      que el frame muestra con el switch apagado. */
   const visibles = historial ? [...planes, ...PLANES_HISTORICOS] : planes
 
+  const limpiar = () => { setD(VACIO); setBusqueda(''); setBeneficios(false); setInformacion(false); setIntentado(false) }
+  /* Guardar suma el plan a la tabla con el orden calculado y deja el formulario listo para otro. */
   const guardar = () => {
     setIntentado(true)
-    if (!d.relacion.trim() || !d.orden.trim() || !d.inicio.trim() || !d.elegibilidad.trim()) return
+    if (!elegida || !d.relacion.trim() || !d.inicio.trim() || !d.elegibilidad.trim()) return
+    const cobertura = `${fechaLarga(d.inicio)} - ${d.fin ? fechaLarga(d.fin) : 'Present'}`
+    setPlanes((prev) => [...prev, {
+      id: `p-${Date.now()}`, orden, carrier: elegida.carrier, plan: elegida.plan, subscriber: elegida.subscriber,
+      relacion: d.relacion as RelacionPlan, cobertura, prioridad: [`${orden} ${cobertura}`], estado: elegida.estado,
+    }])
+    limpiar()
     aviso.ok('Insurance information saved.')
   }
 
@@ -154,19 +215,17 @@ export default function Insurance() {
                     Select an existing subscription or create new one.
                   </p>
 
-                  <span className="mt-4 block text-xs font-medium text-ink">
-                    Search for an existing subscription<span className="text-required">*</span>
-                  </span>
-                  <div className="relative mt-2">
-                    <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-                    {/* Borde gris como todos los buscadores del sistema; el azul
-                        queda para el foco. El frame lo dibuja siempre azul porque
-                        lo capturó enfocado. */}
-                    <input
-                      placeholder="Search result"
-                      className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-                    />
-                  </div>
+                  {/* El buscador de personas de toda la app (PersonSearchField): cada resultado, una card con el suscriptor y
+                      número, carrier y plan; busca en los cuatro (Julián, 2026-11-06). */}
+                  <PersonSearchField
+                    className="mt-4" label="Search for an existing subscription" required placeholder="Search by name or ID"
+                    personas={suscripciones.map(etiquetaSuscripcion)} value={busqueda} onChange={buscar}
+                    nombre={(v) => porEtiqueta(v)?.subscriber ?? v}
+                    texto={(v) => { const x = porEtiqueta(v); return x ? `${etiquetaSuscripcion(x)} ${x.carrier} ${x.plan}` : v }}
+                    lineas={(v) => { const x = porEtiqueta(v); return x && [`Subscription: ${x.subscriberId}`, `Carrier: ${x.carrier}`, `Plan: ${x.plan}`] }}
+                    emptyText="Subscription not found."
+                    error={intentado && !elegida ? (busqueda.trim() ? 'Select a subscription from the list.' : 'This field is required.') : undefined}
+                  />
                   <button
                     type="button"
                     onClick={() => setModal('nueva')}
@@ -175,25 +234,30 @@ export default function Insurance() {
                     <CirclePlus className="size-4" /> Add New Subscription
                   </button>
 
-                  <p className="mt-4 text-sm font-semibold text-ink">Select a subscription</p>
-                  <div className="mt-3 flex flex-col gap-3">
-                    <FilaDato icon={PersonStanding} label="Subscriber" value={SUSCRIPCION.subscriber} />
-                    <FilaDato icon={PersonStanding} label="Subscriber ID" value={SUSCRIPCION.subscriberId} />
-                    <FilaDato icon={ShieldHalf} label="Carrier" value={SUSCRIPCION.carrier} />
-                    <FilaDato icon={Hospital} label="Plan" value={SUSCRIPCION.plan} />
-                    <FilaDato icon={AArrowUp} label="Coverage Period" value={SUSCRIPCION.cobertura} />
-                    <FilaDato icon={Eye} label="Dependents" value={SUSCRIPCION.dependientes} />
+                  {/* Sin elegir: "Select a subscription" y guiones. Elegida: el plan y su estado. */}
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <p className="truncate text-sm font-semibold text-ink">{elegida ? elegida.plan : 'Select a subscription'}</p>
+                    {elegida && <Pill tone={ESTADO_TONO[elegida.estado]}>{elegida.estado}</Pill>}
+                  </div>
+                  <div className="mt-3 flex flex-col gap-3" aria-busy={cargando || undefined}>
+                    <FilaDato icon={PersonStanding} label="Subscriber" value={elegida?.subscriber ?? '-'} />
+                    <FilaDato icon={CreditCard} label="Subscriber ID" value={elegida?.subscriberId ?? '-'} />
+                    <FilaDato icon={ShieldHalf} label="Carrier" value={elegida?.carrier ?? '-'} loading={cargando} />
+                    <FilaDato icon={Hospital} label="Plan" value={elegida?.plan ?? '-'} loading={cargando} />
+                    <FilaDato icon={AArrowUp} label="Coverage Period" value={elegida?.cobertura ?? '-'} />
+                    <FilaDato icon={Eye} label="Dependents" value={elegida ? String(elegida.dependientes) : '-'} loading={cargando} />
                   </div>
 
-                  {/* mt-auto: empuja el botón al piso de la card para que quede a la
-                      misma altura que Cancel/Save del panel de al lado (Julián, 2026-10-30). */}
-                  <button
-                    type="button"
-                    onClick={() => setModal('gestionar')}
-                    className="bg-dash-blue hover:bg-dash-blue-hover mt-auto h-9 self-end rounded-md px-5 text-[13px] font-medium text-white transition-colors"
-                  >
-                    Manage Subscription
-                  </button>
+                  {/* mt-auto: el pie baja al piso de la card, a la altura de Cancel/Save del panel de al lado (Julián,
+                      2026-10-30). Sin suscripción elegida, Manage queda deshabilitado y no hay qué borrar. */}
+                  <div className="mt-auto flex justify-end gap-2 pt-5">
+                    {elegida && (
+                      <Button variant="secondary" iconOnly aria-label="Delete subscription" onClick={pedirBorrar} className="text-dash-bad-fg hover:text-dash-bad-fg">
+                        <Trash2 />
+                      </Button>
+                    )}
+                    <Button disabled={!elegida || cargando} onClick={() => setModal('gestionar')}>Manage Subscription</Button>
+                  </div>
                 </section>
 
                 <section className={cn(TARJETA_PANEL, 'flex flex-col p-4 sm:p-5')}>
@@ -204,24 +268,19 @@ export default function Insurance() {
                     value={d.relacion} onChange={set('relacion')} error={req('relacion')}
                   />
 
-                  {/* Caja de sólo lectura con el mismo rótulo que el select de
-                      abajo, y con "Cordination" mal escrito. Es del Figma. */}
+                  {/* El orden lo calcula el sistema (ordenSiguiente): sólo se muestra. Antes había, además, un select con el
+                      mismo rótulo (anomalías 62 y 63); red.dev ya no lo tiene. */}
                   <div className="mt-4 flex items-center gap-2.5 rounded-md bg-[#eff4ff] px-3 py-2">
                     <CreditCard className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />
                     <span className="leading-tight">
-                      <span className="block text-[11px] text-ink-faint">Cordination Order</span>
-                      <span className="block text-[13px] text-ink">Primary</span>
+                      <span className="block text-[11px] text-ink-faint">Coordination Order</span>
+                      <span className="block text-[13px] text-ink">{orden}</span>
                     </span>
                   </div>
 
-                  <SelectField
-                    className="mt-4" label="Cordination Order" required options={ORDENES}
-                    value={d.orden} onChange={set('orden')} error={req('orden')}
-                  />
-
-                  <div className="mt-4 flex flex-col gap-2">
-                    <OptionCheckbox label="Assignment of Benefits" />
-                    <OptionCheckbox label="Release of Information" />
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                    <OptionCheckbox label="Assignment of Benefits" checked={beneficios} onChange={setBeneficios} />
+                    <OptionCheckbox label="Release of Information" checked={informacion} onChange={setInformacion} />
                   </div>
 
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -235,7 +294,7 @@ export default function Insurance() {
                   <TextArea className="mt-4" label="Notes" placeholder="Add notes" value={d.notas} onChange={set('notas')} />
 
                   <div className="mt-5 flex justify-end gap-3">
-                    <FormFooter onCancel={() => setD({ relacion: '', orden: '', inicio: '', fin: '', elegibilidad: '', verificacion: '', notas: '' })} onSave={guardar} />
+                    <FormFooter onCancel={limpiar} onSave={guardar} />
                   </div>
                 </section>
               </div>
@@ -246,9 +305,18 @@ export default function Insurance() {
         </div>
       </div>
 
-      {modal === 'nueva' && <NewSubscriptionModal onClose={() => setModal(null)} />}
+      {modal === 'nueva' && <NewSubscriptionModal paciente="John Smith" existentes={suscripciones} onCreada={creada} onClose={() => setModal(null)} />}
+      {modal === 'borrar' && (
+        <ConfirmDialog
+          tone="danger" title="Are you sure you want to delete this subscription?" confirmLabel="Confirm"
+          onConfirm={borrar} onCancel={() => setModal(null)}
+        >
+          This action cannot be undone. This will permanently delete this subscription and all associated data.
+        </ConfirmDialog>
+      )}
       {modal === 'gestionar' && (
         <ManageSubscriptionModal
+          suscripcion={elegida}
           onNuevoDependiente={() => setModal('dependiente')}
           onClose={() => setModal(null)}
         />

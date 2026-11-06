@@ -5,6 +5,45 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-06
 
+### Working Hours: elegir días no los vincula y Open exige horas ([#126](https://github.com/JulianGerardi/red-dental-studio/pull/126))
+- **Settings → Locations → Working Hours** (CON-1546): sale *Apply change to* (*All linked days*): elegir días aplica
+  las horas en esta operación, no los vincula. Activar Open en un día cerrado abre **Set working hours** y el día queda
+  Open recién al guardar (Cancel lo deja Closed). Save guarda todas las franjas en todos los días elegidos; Edit hours
+  abre con las del día; validaciones de CON-1546. Cerrar un día vacía sus franjas, con Undo.
+- **Para el dev:** `LocationHoursModal` pasa a `onGuardar(dias, rangos)` (antes un solo rango) y suma `iniciales`. El
+  switch ya no abre el día: lo hace el Save. Decisiones en `locations.md` (2026-11-06). Storybook sin actualizar.
+
+### Insurance: buscar, borrar y crear suscripciones como red.dev ([#124](https://github.com/JulianGerardi/red-dental-studio/pull/124))
+- **Subscription Information**: el buscador es el de personas de la app. Cada resultado es una card con suscriptor,
+  número de suscripción, carrier y plan, y busca en los cuatro datos. Sin elegir, la card va con guiones y **Manage
+  Subscription** queda deshabilitado. Elegida: plan, estado y el tacho para **borrar** (CON-3282). Si tiene patient
+  insurances, sale el error *Failed to delete subscription*; si no, pide confirmar.
+- **Patient Information**: **Coordination Order se calcula** (primer orden libre entre los planes activos) y se va el
+  select duplicado. Save suma el plan a la tabla.
+- **New Subscription** (CON-3284): Carrier Name → Plan Name encadenados, Subscriber ID y Coverage Start obligatorios,
+  aviso *Uncompleted fields*, fechas validadas y sin duplicados de suscriptor + plan. La nueva queda elegida. Sin Notes.
+- **Menú del paciente**: Relationships & Billing pasa del ícono `Ban` a `Handshake`.
+- **Para el dev:** `PersonSearchField` suma `nombre` y `texto` (qué nombre mostrar y dónde buscar). `SearchField` suma
+  `emptyText` y `clearable`. Datos nuevos en `data/insurance.ts`: `SUSCRIPCIONES` (`enUso` bloquea el borrado),
+  `etiquetaSuscripcion` y `PLANES_POR_CARRIER`. `ManageSubscriptionModal` recibe `suscripcion` y `NewSubscriptionModal`
+  recibe `paciente`, `existentes` y `onCreada`. e2e en `tests/insurance.e2e.ts`. Decisiones en `insurance.md` y
+  `patient-dashboard.md` (2026-11-06). Storybook sin actualizar.
+
+### Rooms: cada turno afectado se edita aparte ([#125](https://github.com/JulianGerardi/red-dental-studio/pull/125))
+- Al desactivar una sala con turnos, cada uno lleva **Edit appointment**: abre el drawer de la agenda y cambiarle el
+  Operatory a otra sala activa lo saca de los afectados. **Confirm** cancela los que quedan y los pasa a la lista de
+  espera (CON-1520).
+- **Para el dev:** `NewAppointmentModal` suma `operatorios` (opciones del select Operatory). Turnos de ejemplo en horas
+  en punto. Decisión en `locations.md` (2026-11-06). Storybook sin actualizar.
+
+### Rooms de la locación con la lógica de red.dev ([#123](https://github.com/JulianGerardi/red-dental-studio/pull/123))
+- **Settings → Locations → Rooms** (CON-404, CON-1520): misma caja que Working Hours, con switch *Active* / *Inactive*
+  en la fila, *Edit room* y tacho. New Room pide Name* y Type* (Abbreviation pasa a opcional) y avisa el nombre
+  repetido. Desactivar una sala con turnos los lista y los pasa a la lista de espera; apagar la última activa se pregunta.
+- **Para el dev:** `Sala` (`data/location-detail.ts`) suma `activa` y `turnos`, con tipos en `TIPOS_SALA`;
+  `NewRoomModal` recibe `nombresUsados` y `onGuardar(sala)`; `SwitchOpenClose` acepta `labels` y `label`. La pestaña
+  de la locación va en la URL (`?type=rooms`). Decisiones en `locations.md` (2026-11-06). Storybook sin actualizar.
+
 ### Ficha del turno: Weight en vez del Height repetido ([#122](https://github.com/JulianGerardi/red-dental-studio/pull/122))
 - La ficha flotante que abre un turno del Dashboard repetía **Height** en las dos medias filas (venía del Figma). Ahora
   la primera es **Weight** ("154 lb", ícono de pesa) y la segunda **Height** ("5 ft 8 in"), como en red.dev (CON-4072).
