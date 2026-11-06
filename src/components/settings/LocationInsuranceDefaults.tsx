@@ -1,14 +1,21 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { Check, ChevronDown, Search } from 'lucide-react'
+import { Check, Plus, RefreshCw, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { Avatar } from '@/components/ui/avatar'
+import { Drawer } from '@/components/ui/drawer'
+import { EmptyState } from '@/components/ui/empty-state'
+import { FilterMenu } from '@/components/ui/filter-menu'
+import { Pill } from '@/components/ui/pill'
 import { aviso } from '@/components/ui/toaster'
+import { InnerCard } from '@/components/dashboard/primitives'
 import { Card, Toggle } from '@/components/settings/primitives'
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { OpcionDireccion } from '@/components/patients/AddRelationshipDrawer'
-import { FieldError, FieldLabel, FormFooter, SelectField, control } from '@/components/patients/form'
+import { FieldError, FormFooter, SelectField } from '@/components/patients/form'
 import { useBillingProfiles } from '@/data/billingProfilesStore'
 import { EMPLEADOS } from '@/data/employees'
 import { LOCACIONES } from '@/pages/settings/Locations'
@@ -18,7 +25,8 @@ import {
 
 /* Location → Insurance Defaults (epic CON-1173): Billing Provider (CON-3894), Rendering Provider (CON-3896), PPO
    Write-offs (CON-4030), Place of Service (CON-3898) y autorización de nuevos subscribers (CON-3899). Todo se guarda
-   junto con un solo Save, como en el prototipo. Los tres selectores de referencia se despliegan debajo del campo. Ver figma/modulos/insurance-defaults.md. */
+   junto con un solo Save, como en el prototipo. Perfiles y providers se eligen en un drawer que abre una card con
+   Select / Change, como Replace en Billing Profile (no un input). Ver figma/modulos/insurance-defaults.md. */
 
 type Campo = 'billing' | 'rendering' | 'place'
 type Errores = Partial<Record<Campo, string>>
@@ -32,10 +40,11 @@ const nombreLocacion = (id: string) => LOCACIONES.find((l) => l.id === id)?.nomb
 const nombreEmpleado = (id: string) => EMPLEADOS.find((e) => e.id === id)?.nombre ?? id
 
 export function LocationInsuranceDefaults({ locId, onDirtyChange }: { locId: string; onDirtyChange?: (sucio: boolean) => void }) {
-  const { defaultsDe, guardarDefaults, providerElegible, perfilElegible } = useBillingProfiles()
+  const { perfiles, defaultsDe, guardarDefaults, providerElegible, perfilElegible } = useBillingProfiles()
   const guardado = defaultsDe(locId)
   const [d, setD] = useState<DefaultsSeguro>(guardado)
   const [errores, setErrores] = useState<Errores>({})
+  const [eligiendo, setEligiendo] = useState<'billing' | 'rendering' | null>(null)
   const set = <K extends keyof DefaultsSeguro>(k: K, v: DefaultsSeguro[K]) => setD((p) => ({ ...p, [k]: v }))
 
   /* Cambiar de modo y volver no pierde lo elegido: lo que no aplica al modo recién se limpia al guardar (CON-3894 › 3.4). */
@@ -91,19 +100,17 @@ export function LocationInsuranceDefaults({ locId, onDirtyChange }: { locId: str
           opciones={[['PROCEDURES', 'Provider of Procedures'], ['PROFILE', 'Specific Billing Profile']]}
           onChange={(v) => { set('billingMode', v); limpiarError('billing') }}
         />
-        <Referencia
+        <Seleccion
+          id="defaults-billing"
           rotulo={especificoBilling ? 'Billing Profile' : 'Alternate Billing Profile'}
           requerido={especificoBilling}
-          onLimpiar={!especificoBilling && perfilElegido ? () => set('alternateBillingId', null) : undefined}
+          vacio="No billing profile selected."
+          error={errores.billing ?? (perfilElegido && !perfilElegible(perfilElegido) ? NO_DISPONIBLE.billing : undefined)}
+          onElegir={() => setEligiendo('billing')}
+          onQuitar={!especificoBilling && perfilElegido ? () => set('alternateBillingId', null) : undefined}
         >
-          <SelectorPerfil
-            rotulo={especificoBilling ? 'Billing Profile' : 'Alternate Billing Profile'}
-            elegido={perfilElegido}
-            error={!!errores.billing}
-            onElegir={(clave) => { set(campoBilling, clave); limpiarError('billing') }}
-          />
-          <FieldError>{errores.billing ?? (perfilElegido && !perfilElegible(perfilElegido) ? NO_DISPONIBLE.billing : undefined)}</FieldError>
-        </Referencia>
+          {perfilElegido && perfiles[perfilElegido] && <ResumenPerfil clave={perfilElegido} />}
+        </Seleccion>
       </Card>
 
       <Card>
@@ -119,25 +126,17 @@ export function LocationInsuranceDefaults({ locId, onDirtyChange }: { locId: str
             Use the patient's Primary Provider
           </Casilla>
         )}
-        <Referencia
+        <Seleccion
+          id="defaults-rendering"
           rotulo={especificoRendering ? 'Rendering Provider' : 'Alternate Rendering Provider'}
           requerido={especificoRendering}
-          onLimpiar={!especificoRendering && providerElegido ? () => set('alternateRenderingId', null) : undefined}
+          vacio="No provider selected."
+          error={errores.rendering ?? (providerElegido && !providerElegible(providerElegido) ? NO_DISPONIBLE.rendering : undefined)}
+          onElegir={() => setEligiendo('rendering')}
+          onQuitar={!especificoRendering && providerElegido ? () => set('alternateRenderingId', null) : undefined}
         >
-          <div id="defaults-rendering-campo">
-            <SelectField
-              label={especificoRendering ? 'Rendering Provider' : 'Alternate Rendering Provider'}
-              hideLabel
-              placeholder="Select a provider"
-              buscable
-              buscarPlaceholder="Search by name"
-              options={providers.map((p) => p.nombre)}
-              value={providerElegido ? nombreEmpleado(providerElegido) : ''}
-              onChange={(v) => { set(campoRendering, EMPLEADOS.find((e) => e.nombre === v)?.id ?? null); limpiarError('rendering') }}
-              error={errores.rendering ?? (providerElegido && !providerElegible(providerElegido) ? NO_DISPONIBLE.rendering : undefined)}
-            />
-          </div>
-        </Referencia>
+          {providerElegido && <ResumenProvider id={providerElegido} />}
+        </Seleccion>
       </Card>
 
       <Card>
@@ -190,6 +189,23 @@ export function LocationInsuranceDefaults({ locId, onDirtyChange }: { locId: str
         {sucio && <span className="mr-auto text-xs font-medium text-warn-fg">Unsaved changes</span>}
         <FormFooter onCancel={cancelar} onSave={guardar} saveLabel="Save changes" />
       </div>
+
+      {eligiendo === 'billing' && (
+        <ElegirPerfilDrawer
+          elegido={perfilElegido}
+          onClose={() => setEligiendo(null)}
+          onElegir={(clave) => { set(campoBilling, clave); limpiarError('billing'); setEligiendo(null) }}
+        />
+      )}
+      {eligiendo === 'rendering' && (
+        <ElegirProviderDrawer
+          titulo={especificoRendering ? 'Select a rendering provider' : 'Select an alternate rendering provider'}
+          providers={providers.map((p) => p.id)}
+          elegido={providerElegido}
+          onClose={() => setEligiendo(null)}
+          onElegir={(id) => { set(campoRendering, id); limpiarError('rendering'); setEligiendo(null) }}
+        />
+      )}
     </div>
   )
 }
@@ -228,24 +244,39 @@ function Casilla({ on, onChange, children, className }: { on: boolean; onChange:
   )
 }
 
-/* El rótulo de un selector de referencia, con "Clear" cuando es opcional y hay algo elegido (CON-3894 › 3.2 Quitar). */
-function Referencia({ rotulo, requerido, onLimpiar, children }: {
+/* Lo elegido como card, con su acción al costado: Select si está vacío, Change si no (abre el drawer) y Remove en los
+   opcionales (CON-3894 › 3.2 Quitar). Es el patrón de Replace en Billing Profile: un input con ⌄ promete un desplegable
+   y acá se abre un drawer. Ver insurance-defaults.md, 2026-11-06. */
+function Seleccion({ id, rotulo, requerido, vacio, error, onElegir, onQuitar, children }: {
+  id: string
   rotulo: string
   requerido: boolean
-  onLimpiar?: () => void
-  children: ReactNode
+  vacio: string
+  error?: string
+  onElegir: () => void
+  onQuitar?: () => void
+  children?: ReactNode
 }) {
+  const lleno = !!children
   return (
     <div className="mt-4 flex flex-col gap-2 sm:max-w-[560px]">
-      <div className="flex items-center justify-between gap-3">
-        <FieldLabel required={requerido}>
-          {rotulo}{!requerido && <span className="font-normal text-ink-muted"> (optional)</span>}
-        </FieldLabel>
-        {onLimpiar && (
-          <Button variant="link" size="sm" onClick={onLimpiar} aria-label={`Clear ${rotulo}`}>Clear</Button>
-        )}
-      </div>
-      {children}
+      <InnerCard className={cn('flex flex-col gap-3 p-4', error && 'ring-1 ring-field-error')}>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs font-medium text-ink-muted">
+            {rotulo}{requerido ? <span className="text-field-error">*</span> : <span className="font-normal"> (optional)</span>}
+          </span>
+          <span className="flex items-center gap-2">
+            {onQuitar && (
+              <Button variant="secondary" size="sm" onClick={onQuitar} aria-label={`Remove ${rotulo}`}><X /> Remove</Button>
+            )}
+            <Button id={id} variant="secondary" size="sm" onClick={onElegir} aria-haspopup="dialog" aria-label={`${lleno ? 'Change' : 'Select'} ${rotulo}`}>
+              {lleno ? <><RefreshCw /> Change</> : <><Plus /> Select</>}
+            </Button>
+          </span>
+        </div>
+        {lleno ? children : <p className="text-[13px] text-ink-faint">{vacio}</p>}
+      </InnerCard>
+      <FieldError>{error}</FieldError>
     </div>
   )
 }
@@ -264,93 +295,148 @@ function ResumenPerfil({ clave }: { clave: string }) {
   )
 }
 
-/* Billing Profile: un desplegable debajo del campo, como SelectField, pero cada opción lleva nombre, dirección y
-   organización (hace falta para distinguir perfiles) y van agrupadas por titular. Sólo los elegibles de la account. */
-function SelectorPerfil({ rotulo, elegido, error, onElegir }: {
-  rotulo: string
-  elegido: string | null
-  error: boolean
-  onElegir: (clave: string) => void
-}) {
+function ResumenProvider({ id }: { id: string }) {
+  const e = EMPLEADOS.find((x) => x.id === id)
+  return (
+    <span className="flex min-w-0 items-center gap-3">
+      <Avatar aria-hidden initials={e?.iniciales ?? '?'} size={32} />
+      <span className="flex min-w-0 flex-col">
+        <span className="text-[13px] font-medium text-ink">{nombreEmpleado(id)}</span>
+        {e && <span className="text-xs text-ink-muted">{e.cargo}</span>}
+      </span>
+    </span>
+  )
+}
+
+/* Una opción de los drawers: tarjeta radio, azul la marcada. Doble click elige directo. */
+function OpcionDrawer({ on, onMarcar, onElegir, children }: { on: boolean; onMarcar: () => void; onElegir: () => void; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={on}
+      onClick={onMarcar}
+      onDoubleClick={onElegir}
+      className={cn(
+        'flex items-start justify-between gap-3 rounded-lg border bg-white p-3 text-left transition-colors',
+        on ? 'border-dash-blue bg-info-bg' : 'border-line hover:bg-surface-subtle',
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
+type TipoPerfil = 'All' | 'Providers' | 'Locations'
+
+/* Elegir un Billing Profile: sólo los elegibles de la account, con buscador y filtro por tipo de titular. */
+function ElegirPerfilDrawer({ elegido, onClose, onElegir }: { elegido: string | null; onClose: () => void; onElegir: (clave: string) => void }) {
   const { perfiles, perfilElegible } = useBillingProfiles()
-  const [abierto, setAbierto] = useState(false)
+  const [marcado, setMarcado] = useState(elegido)
   const [q, setQ] = useState('')
-  const ref = useRef<HTMLDivElement>(null)
-  const boton = useRef<HTMLButtonElement>(null)
-  const buscados = Object.keys(perfiles).filter(perfilElegible).filter((c) => {
+  const [tipo, setTipo] = useState<TipoPerfil>('All')
+  const elegibles = Object.keys(perfiles).filter(perfilElegible)
+  const porTipo = (t: TipoPerfil) => (c: string) => t === 'All' || (t === 'Providers' ? c.startsWith('emp:') : c.startsWith('loc:'))
+  const buscados = elegibles.filter((c) => {
     const org = c.startsWith('loc:') ? nombreLocacion(c.slice(4)) : ''
     return `${perfiles[c].nombre} ${org}`.toLowerCase().includes(q.trim().toLowerCase())
   })
-  const grupos: [string, string[]][] = [
-    ['Locations', buscados.filter((c) => c.startsWith('loc:'))],
-    ['Providers', buscados.filter((c) => c.startsWith('emp:'))],
-  ]
-
-  useEffect(() => {
-    if (!abierto) { setQ(''); return }
-    const onDown = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setAbierto(false) }
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setAbierto(false); boton.current?.focus() } }
-    document.addEventListener('mousedown', onDown)
-    document.addEventListener('keydown', onKey)
-    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey) }
-  }, [abierto])
-
-  const elegir = (c: string) => { onElegir(c); setAbierto(false); boton.current?.focus() }
+  const visibles = buscados.filter(porTipo(tipo))
 
   return (
-    <div ref={ref} className="relative">
-      <button
-        ref={boton}
-        id="defaults-billing"
-        type="button"
-        aria-label={rotulo}
-        aria-expanded={abierto}
-        aria-invalid={error || undefined}
-        onClick={() => setAbierto((v) => !v)}
-        className={cn(control(error ? 'error' : undefined), 'flex min-h-9 items-center justify-between gap-3 px-3 py-2 text-left transition-colors', abierto && !error && 'border-dash-blue')}
-      >
-        {elegido && perfiles[elegido] ? <ResumenPerfil clave={elegido} /> : <span className="text-[13px] text-ink-faint">Select a billing profile</span>}
-        <ChevronDown className={cn('size-4 shrink-0 text-black transition-transform', abierto && 'rotate-180')} />
-      </button>
-      {abierto && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 flex w-full flex-col overflow-hidden rounded-md border border-line bg-white shadow-lg">
-          <div className="border-b border-line p-1.5">
-            <div className="relative">
-              <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
-              <input
-                autoFocus
-                aria-label={`Search ${rotulo}`}
-                placeholder="Search by name"
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && buscados[0]) { e.preventDefault(); elegir(buscados[0]) } }}
-                className="h-8 w-full rounded-md border border-line bg-white pr-2 pl-8 text-[13px] placeholder:text-ink-faint focus:border-dash-blue focus:outline-none"
-              />
-            </div>
-          </div>
-          <div className="max-h-72 overflow-y-auto py-1">
-            {!buscados.length && <p className="px-3 py-4 text-center text-xs text-ink-muted">No matches.</p>}
-            {grupos.filter(([, cs]) => cs.length).map(([titulo, cs]) => (
-              <div key={titulo} role="group" aria-label={titulo}>
-                <p className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-wide text-ink-faint uppercase">{titulo}</p>
-                {cs.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    aria-pressed={c === elegido}
-                    onClick={() => elegir(c)}
-                    className={cn('flex w-full items-start justify-between gap-3 px-3 py-2 text-left hover:bg-surface-muted', c === elegido && 'bg-info-bg')}
-                  >
-                    <ResumenPerfil clave={c} />
-                    {c === elegido && <Check className="text-dash-blue mt-0.5 size-3.5 shrink-0" aria-hidden />}
-                  </button>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
+    <Drawer
+      open
+      onClose={onClose}
+      title="Select a billing profile"
+      description="Only active billing profiles of this account are listed."
+      footer={(
+        <>
+          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button onClick={() => marcado && onElegir(marcado)} disabled={!marcado || marcado === elegido}>Select profile</Button>
+        </>
       )}
-    </div>
+    >
+      <div className="flex items-center gap-2">
+        <SettingsSearch value={q} onChange={setQ} placeholder="Search by name" className="sm:max-w-none" />
+        <FilterMenu
+          label="Filter billing profiles"
+          groups={[{
+            title: 'Profile type',
+            type: 'single',
+            options: (['All', 'Providers', 'Locations'] as const).map((t) => ({ value: t, count: buscados.filter(porTipo(t)).length })),
+            value: tipo,
+            onChange: (v) => setTipo(v as TipoPerfil),
+            defaultValue: 'All',
+          }]}
+        />
+      </div>
+
+      <div role="radiogroup" aria-label="Billing profiles" className="mt-4 flex flex-col gap-2">
+        {visibles.map((c) => (
+          <OpcionDrawer key={c} on={marcado === c} onMarcar={() => setMarcado(c)} onElegir={() => onElegir(c)}>
+            <ResumenPerfil clave={c} />
+            <span className="flex shrink-0 items-center gap-2">
+              <Pill tone="neutral">{c.startsWith('emp:') ? 'Provider' : 'Location'}</Pill>
+              {marcado === c && <Check className="text-dash-blue size-4" aria-hidden />}
+            </span>
+          </OpcionDrawer>
+        ))}
+        {!visibles.length && (
+          <EmptyState
+            title={elegibles.length ? 'No billing profiles match your search.' : 'No active billing profiles yet.'}
+            detail={elegibles.length ? undefined : 'Enable a billing profile for a location or set a provider as Primary Provider.'}
+            className="py-10"
+          />
+        )}
+      </div>
+    </Drawer>
+  )
+}
+
+/* Elegir un Rendering Provider (específico o alternativo): sólo providers elegibles, nunca una Location (CON-3896). */
+function ElegirProviderDrawer({ titulo, providers, elegido, onClose, onElegir }: {
+  titulo: string
+  providers: string[]
+  elegido: string | null
+  onClose: () => void
+  onElegir: (id: string) => void
+}) {
+  const [marcado, setMarcado] = useState(elegido)
+  const [q, setQ] = useState('')
+  const visibles = providers.filter((id) => nombreEmpleado(id).toLowerCase().includes(q.trim().toLowerCase()))
+
+  return (
+    <Drawer
+      open
+      onClose={onClose}
+      title={titulo}
+      description="Only active Primary Providers with an active billing profile are listed."
+      footer={(
+        <>
+          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button onClick={() => marcado && onElegir(marcado)} disabled={!marcado || marcado === elegido}>Select provider</Button>
+        </>
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <SettingsSearch value={q} onChange={setQ} placeholder="Search by name" className="sm:max-w-none" />
+      </div>
+      <div role="radiogroup" aria-label="Providers" className="mt-4 flex flex-col gap-2">
+        {visibles.map((id) => (
+          <OpcionDrawer key={id} on={marcado === id} onMarcar={() => setMarcado(id)} onElegir={() => onElegir(id)}>
+            <ResumenProvider id={id} />
+            {marcado === id && <Check className="text-dash-blue size-4 shrink-0" aria-hidden />}
+          </OpcionDrawer>
+        ))}
+        {!visibles.length && (
+          <EmptyState
+            title={providers.length ? 'No providers match your search.' : 'No available providers yet.'}
+            detail={providers.length ? undefined : 'Set a provider as Primary Provider to select it here.'}
+            className="py-10"
+          />
+        )}
+      </div>
+    </Drawer>
   )
 }
 

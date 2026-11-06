@@ -24,7 +24,7 @@ del epic; el orden de la pantalla, los textos y el flujo, del HTML; los componen
 | `/settings/locations/:locId` › Insurance / Billing Profile | Deshabilitar un perfil elegido en defaults se frena (CON-4032) |
 | `/settings/team/:employeeId` › Provider Info | Guardar Primary Provider apagado se frena si está elegido en defaults (CON-4031) |
 
-Código: `components/settings/LocationInsuranceDefaults.tsx` (pestaña, `SelectorPerfil` y
+Código: `components/settings/LocationInsuranceDefaults.tsx` (pestaña, `Seleccion`, los drawers de perfil y provider y
 `BloqueoDefaults`, el aviso compartido de los dos bloqueos). Datos: `data/insuranceDefaults.ts` (tipo, inicialización,
 catálogo `PLACES`, normalización por modo y búsqueda de referencias) y el mismo store de los perfiles
 (`data/billingProfilesStore.tsx`: `defaultsDe`, `guardarDefaults`, `providerElegible`, `perfilElegible`, `referencias`).
@@ -103,6 +103,8 @@ alternativo (ninguna historia lo dice; es un tema de claims).
 
 ## CON-3894 · CON-3896 — Selectores que se despliegan debajo y pie estático (2026-11-06)
 
+> **Reemplazado en parte** (ver la sección siguiente): vuelven los drawers; queda el pie estático.
+
 Julián sobre la primera versión: un campo con flecha (⌄) que abre un drawer al costado no cumple lo que promete; lo mismo
 con el Rendering Provider específico del HTML, que abría un drawer. Y el pie fijo (`sticky`) no existe en otras pantallas
 parecidas.
@@ -121,3 +123,20 @@ parecidas.
 
 **Para validar con usuarios:** con muchas Locations y providers, si el desplegable con dirección de tres renglones por
 opción sigue siendo cómodo o conviene mostrar sólo nombre + ciudad.
+
+## CON-3894 · CON-3896 — Vuelven los drawers, abiertos desde una card y no desde un input (2026-11-06)
+
+Julián: los drawers le gustaban; lo raro era que un **input** (con ⌄) abriera un drawer. Se corrige el disparador, no el
+drawer, en los dos flujos que marcó: Billing Profile (el alternativo y el específico) y Rendering Provider (el específico y
+el alternativo, para que los cuatro se elijan igual).
+
+- **Disparador = card con acción** (`Seleccion`), el mismo patrón que *Billing address* / *Replace* en Billing Profile:
+  `InnerCard` con el rótulo arriba a la izquierda (*Billing Profile\** o *Alternate Billing Profile (optional)*) y el botón
+  a la derecha. Vacía: *No billing profile selected.* / *No provider selected.* y **+ Select**. Con algo elegido: el
+  resumen (perfil: nombre, dirección y organización; provider: avatar, nombre y cargo) y **Change**. En los opcionales,
+  **Remove** al lado (reemplaza al link *Clear*). Con error, la card toma el borde rojo y el mensaje va debajo.
+- **Drawers**: *Select a billing profile* (buscador, filtro All / Providers / Locations, pill de tipo) como en la primera
+  versión, y uno nuevo **Select a rendering provider** / *Select an alternate rendering provider* (buscador y tarjetas con
+  avatar, nombre y cargo; sólo providers elegibles). Los dos con Cancel · **Select profile** / **Select provider**.
+- **Regla**: un campo con ⌄ abre una lista debajo (Place of Service sigue así); cuando la elección abre un drawer, el
+  disparador es un botón dentro de la card de lo elegido, nunca un input.
