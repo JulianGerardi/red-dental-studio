@@ -140,3 +140,10 @@ el alternativo, para que los cuatro se elijan igual).
   avatar, nombre y cargo; sólo providers elegibles). Los dos con Cancel · **Select profile** / **Select provider**.
 - **Regla**: un campo con ⌄ abre una lista debajo (Place of Service sigue así); cuando la elección abre un drawer, el
   disparador es un botón dentro de la card de lo elegido, nunca un input.
+
+## CON-3894 · CON-3896 — "Remove" pasa a la ✕ de lo elegido (2026-11-06)
+
+Julián preguntó si el botón **Remove** (secundario, con texto) existía en otra parte: no. En la app, quitar lo elegido es
+una **✕ chica dentro de la card de la selección** (`PersonSearchField` en form.tsx, `SearchPicker`, `Chip`); el tacho
+rojo (`ICONO_SUELTO` + Trash) es para borrar filas, no para desmarcar. `Seleccion` usa ahora la ✕ de `PersonSearchField`
+(misma clase, `aria-label` *Remove [rótulo]*, `title` *Remove*), a la derecha de **Change**, sólo en los opcionales.

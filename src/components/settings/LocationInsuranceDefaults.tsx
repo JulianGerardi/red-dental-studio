@@ -244,7 +244,7 @@ function Casilla({ on, onChange, children, className }: { on: boolean; onChange:
   )
 }
 
-/* Lo elegido como card, con su acción al costado: Select si está vacío, Change si no (abre el drawer) y Remove en los
+/* Lo elegido como card, con su acción al costado: Select si está vacío, Change si no (abre el drawer) y la ✕ en los
    opcionales (CON-3894 › 3.2 Quitar). Es el patrón de Replace en Billing Profile: un input con ⌄ promete un desplegable
    y acá se abre un drawer. Ver insurance-defaults.md, 2026-11-06. */
 function Seleccion({ id, rotulo, requerido, vacio, error, onElegir, onQuitar, children }: {
@@ -266,12 +266,21 @@ function Seleccion({ id, rotulo, requerido, vacio, error, onElegir, onQuitar, ch
             {rotulo}{requerido ? <span className="text-field-error">*</span> : <span className="font-normal"> (optional)</span>}
           </span>
           <span className="flex items-center gap-2">
-            {onQuitar && (
-              <Button variant="secondary" size="sm" onClick={onQuitar} aria-label={`Remove ${rotulo}`}><X /> Remove</Button>
-            )}
             <Button id={id} variant="secondary" size="sm" onClick={onElegir} aria-haspopup="dialog" aria-label={`${lleno ? 'Change' : 'Select'} ${rotulo}`}>
               {lleno ? <><RefreshCw /> Change</> : <><Plus /> Select</>}
             </Button>
+            {/* La ✕ de lo elegido, la misma de PersonSearchField y SearchPicker: quita la selección, no borra nada. */}
+            {onQuitar && (
+              <button
+                type="button"
+                aria-label={`Remove ${rotulo}`}
+                title="Remove"
+                onClick={onQuitar}
+                className="flex size-6 items-center justify-center rounded-full text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dash-blue"
+              >
+                <X className="size-4" />
+              </button>
+            )}
           </span>
         </div>
         {lleno ? children : <p className="text-[13px] text-ink-faint">{vacio}</p>}
