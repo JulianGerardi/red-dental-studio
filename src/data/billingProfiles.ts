@@ -44,8 +44,9 @@ export const DATOS_PROVIDER: Record<string, { direccion: string; telefono: strin
   'michael-torres': { direccion: '61 Elm Street\nAnchorage, Alaska 99502, United States', telefono: '+1 (907) 555-0149', npi: '1902648315', tipoFiscal: 'SSN', fiscal: '219736604' },
 }
 
-/* Semilla: Abril sin perfil (para recorrer la configuración), Bayside activo y Northgate deshabilitado. Elena es Primary
-   Provider con perfil, Daniel lo fue (perfil inactivo) y Emily todavía no (lo prepara al activar Primary Provider). */
+/* Semilla: Abril sin perfil (para recorrer la configuración), Bayside activo y Northgate deshabilitado. Elena y Sarah son
+   Primary Provider con perfil (Sarah está en los Insurance Defaults de Bayside), Daniel lo fue (perfil inactivo) y Emily
+   todavía no (lo prepara al activar Primary Provider). */
 export const PERFILES_INICIALES: Record<string, PerfilFacturacion> = {
   [claveLocacion('bayside')]: {
     nombre: 'Bayside Dental Group', direccion: CONTACTOS_LOCACION.bayside.direccion, telefono: CONTACTOS_LOCACION.bayside.telefono,
@@ -58,6 +59,9 @@ export const PERFILES_INICIALES: Record<string, PerfilFacturacion> = {
   [claveProvider('elena-martinez')]: {
     nombre: 'Elena Martinez', ...DATOS_PROVIDER['elena-martinez'], activo: true, contratos: { aetna: true, metlife: true },
   },
+  [claveProvider('sarah-stone')]: {
+    nombre: 'Sarah Stone', ...DATOS_PROVIDER['sarah-stone'], activo: true, contratos: { aetna: true, 'delta-ca': true },
+  },
   [claveProvider('daniel-anderson')]: {
     nombre: 'Daniel Anderson', ...DATOS_PROVIDER['daniel-anderson'], activo: false, contratos: { benecare: true },
   },
@@ -65,7 +69,7 @@ export const PERFILES_INICIALES: Record<string, PerfilFacturacion> = {
 
 /* Primary Provider guardado de cada empleado provider. */
 export const PRIMARIOS_INICIALES: Record<string, boolean> = {
-  'elena-martinez': true, 'emily-chen': false, 'daniel-anderson': false, 'sarah-stone': false, 'julio-perez': false, 'michael-torres': false,
+  'elena-martinez': true, 'emily-chen': false, 'daniel-anderson': false, 'sarah-stone': true, 'julio-perez': false, 'michael-torres': false,
 }
 
 export const CONTACTOS_INICIALES: Record<string, ContactosTitular> = Object.fromEntries([

@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
    Confidentally 2.0. Es chica y centrada porque se contesta sin cargar nada. Ver Elements / ConfirmDialog.
    Con `otherAction` es una decisión de tres salidas antes de seguir (Consent required, clinical-mode.md 2026-10-17). */
 export function ConfirmDialog({
-  title, children, confirmLabel, onConfirm, onCancel, tone = 'primary', cancelLabel = 'Cancel', icon, otherAction, loading,
+  title, children, confirmLabel, onConfirm, onCancel, tone = 'primary', cancelLabel = 'Cancel', icon, otherAction, loading, hideCancel,
 }: {
   title: string
   children: ReactNode
@@ -24,6 +24,8 @@ export function ConfirmDialog({
   otherAction?: { label: string; onClick: () => void }
   /** La acción principal está en curso: spinner en su botón y los otros quietos. */
   loading?: boolean
+  /** Un aviso que frena la acción y no deja nada para elegir (Unable to deactivate…): sólo el botón principal. */
+  hideCancel?: boolean
 }) {
   /* Radix devuelve el foco a un Trigger que acá no hay: al cerrar vuelve al botón que abrió la pregunta (Save, Delete…). */
   const previo = useRef<HTMLElement | null>(document.activeElement as HTMLElement | null)
@@ -47,7 +49,7 @@ export function ConfirmDialog({
         </DialogDescription>
         {/* Con tres salidas, en el celular los botones crecen y la principal baja sola a lo ancho. */}
         <div className={cn('mt-2 flex flex-wrap justify-end gap-2', otherAction && 'max-sm:[&>button]:flex-1')}>
-          <Button variant="secondary" size="md" onClick={onCancel} disabled={loading}>{cancelLabel}</Button>
+          {!hideCancel && <Button variant="secondary" size="md" onClick={onCancel} disabled={loading}>{cancelLabel}</Button>}
           {otherAction && <Button variant="secondary" size="md" onClick={otherAction.onClick} disabled={loading}>{otherAction.label}</Button>}
           <Button variant={tone === 'danger' ? 'destructive' : 'primary'} size="md" onClick={onConfirm} loading={loading}>{confirmLabel}</Button>
         </div>
