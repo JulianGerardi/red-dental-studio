@@ -118,10 +118,13 @@ export type DatosTurno = Partial<typeof VACIO>
 export function NewAppointmentModal({
   titulo = 'New Appointment',
   inicial,
+  operatorios,
   onGuardar,
   onClose,
 }: {
   titulo?: string
+  /** Las salas que se pueden elegir (las activas de la locación); sin esto, las de ejemplo. */
+  operatorios?: string[]
   /** Con datos, el modal edita el turno en vez de crear uno. */
   inicial?: DatosTurno
   /** Recibe los valores al guardar. Si devuelve true, ya mostró su propio
@@ -240,7 +243,7 @@ export function NewAppointmentModal({
             <SelectField label="End Time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <SelectField label="Operatory" required value={d.operatory} onChange={set('operatory')} error={req('operatory')} />
+            <SelectField label="Operatory" required options={operatorios} value={d.operatory} onChange={set('operatory')} error={req('operatory')} />
             <SelectField label="Status" required value={d.status} onChange={set('status')} error={req('status')} />
           </div>
         </DrawerSection>
