@@ -1,4 +1,6 @@
-import { Pencil, Users } from 'lucide-react'
+import { Eye, Pencil, Users } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { clavePacienteFoto, fotoGuardada } from '@/lib/usePhoto'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { DataTable, PersonCell, TextCell, type DataTableColumn } from '@/components/ui/data-table'
@@ -30,10 +32,10 @@ export const STATUS_TONO: Record<PatientStatus, PillTone> = {
   Inactive: 'neutral',
 }
 
-/* La tabla estándar de la app (ui/data-table) con las columnas de pacientes.
-   El nombre lleva al dashboard del paciente; el kebab abre Edit. */
+/* La tabla estándar de la app (ui/data-table) con las columnas de pacientes. El nombre y Overview llevan al dashboard
+   del paciente; Edit abre el formulario. La foto es la que se subió en la ficha (patients.md, 2026-11-06). */
 const COLUMNAS: DataTableColumn<PatientRow>[] = [
-  { key: 'name', header: 'Full name', width: 220, cell: (r) => <PersonCell name={r.name} initials={r.initials} to={`/patients/${r.id}`} /> },
+  { key: 'name', header: 'Full name', width: 220, cell: (r) => <PersonCell name={r.name} initials={r.initials} photo={fotoGuardada(clavePacienteFoto(r.id))} to={`/patients/${r.id}`} /> },
   { key: 'birthday', header: 'Birthday', width: 160, cell: (r) => <TextCell>{r.birthday}</TextCell> },
   { key: 'email', header: 'Email', cell: (r) => <TextCell>{r.email}</TextCell> },
   { key: 'status', header: 'Status', width: 140, cell: (r) => <Pill tone={STATUS_TONO[r.status]}>{r.status}</Pill> },
@@ -46,6 +48,7 @@ export function PatientsTable({
   rows: PatientRow[]
   onRowAction?: (row: PatientRow) => void
 }) {
+  const navigate = useNavigate()
   return (
     <DataTable
       columns={COLUMNAS}
@@ -53,12 +56,18 @@ export function PatientsTable({
       rowKey={(r) => r.id}
       rowLabel={(r) => r.name}
       pageSize={POR_PAGINA}
+      pageSizeOptions={[10, 20, 50]}
       itemLabel="patients"
       empty={{ icon: Users, title: 'No patients found', detail: 'Try a different name or last name.' }}
       rowActions={(r) => (
-        <DropdownMenuItem onSelect={() => onRowAction?.(r)}>
-          <Pencil className="size-4 shrink-0" /> Edit
-        </DropdownMenuItem>
+        <>
+          <DropdownMenuItem onSelect={() => navigate(`/patients/${r.id}`)}>
+            <Eye className="size-4 shrink-0" /> Overview
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => onRowAction?.(r)}>
+            <Pencil className="size-4 shrink-0" /> Edit
+          </DropdownMenuItem>
+        </>
       )}
     />
   )

@@ -7,6 +7,7 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { STATUS_TONO, type PatientRow } from '@/components/patients/PatientsTable'
 import { Avatar } from '@/components/ui/avatar'
+import { clavePacienteFoto, fotoGuardada } from '@/lib/usePhoto'
 
 /* Card chica para el costado de Patients.tsx -ver Patients.tsx-: una fila,
    no la card de dos pisos de antes. Mismo avatar, nombre-link, pill y menú
@@ -23,7 +24,7 @@ export function PatientCard({
 }) {
   return (
     <article className={cn(TARJETA_INTERNA, 'flex items-center gap-2.5 p-2.5')}>
-      <Avatar initials={row.initials} />
+      <Avatar initials={row.initials} photo={fotoGuardada(clavePacienteFoto(row.id))} />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="flex items-center gap-1.5">
           <Link

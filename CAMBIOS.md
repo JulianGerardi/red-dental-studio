@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-06
 
+### Lista de Patients: sin bajada, Rows per page, Overview y foto ([#128](https://github.com/JulianGerardi/red-dental-studio/pull/128))
+- Patients ya no tiene bajada (era el texto de Locations). La tabla suma **Rows per page** (10, 20, 50) y el menú ⋮ de
+  cada fila suma **Overview**, que lleva a la ficha. Si el paciente tiene foto (subida en su ficha), se ve en el avatar
+  de la tabla y de Recent Patients. Las tres cosas, como en red.dev (CON-4080).
+- **Para el dev:** `PersonCell` suma `photo`; `lib/usePhoto.ts` suma `fotoGuardada` y `clavePacienteFoto` (la misma
+  clave que guarda la ficha). Decisiones en `patients.md` (2026-11-06). Storybook sin actualizar (pendiente de que
+  Julián lo pida).
+
 ### Location: Insurance Defaults y bloqueos de desactivación ([#127](https://github.com/JulianGerardi/red-dental-studio/pull/127))
 - **Settings → Locations → Insurance Defaults** (pestaña nueva, `?type=insurance-defaults`, epic CON-1173): Billing
   Provider (CON-3894), Rendering Provider (CON-3896), PPO Write-offs y aviso de no contratado (CON-4030), Place of
