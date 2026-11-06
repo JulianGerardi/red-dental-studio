@@ -3,6 +3,15 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-06
+
+### Ficha del turno: Weight en vez del Height repetido ([#122](https://github.com/JulianGerardi/red-dental-studio/pull/122))
+- La ficha flotante que abre un turno del Dashboard repetía **Height** en las dos medias filas (venía del Figma). Ahora
+  la primera es **Weight** ("154 lb", ícono de pesa) y la segunda **Height** ("5 ft 8 in"), como en red.dev (CON-4072).
+- **Para el dev:** sólo cambian los datos de ejemplo de `FILAS_DOBLES` en `dashboard/PatientDetailsPopover.tsx` (la
+  key pasa a ser el label). Decisión en `dashboard.md` (2026-11-06). Storybook sin actualizar (pendiente de que Julián
+  lo pida).
+
 ## 2026-11-04
 
 ### Calendarios con año editable y Country Code con todos los países ([#121](https://github.com/JulianGerardi/red-dental-studio/pull/121))
