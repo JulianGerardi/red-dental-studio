@@ -437,3 +437,23 @@ login y no se pudo abrir: se armó con las historias y con el patrón de las lis
 Para validar: qué tipos de sala tiene red.dev; si Delete con turnos programados debería pedir lo mismo que Inactive
 (hoy borra con Undo, CON-1583 no tiene detalle); y que las salas inactivas salgan de los selects de New Appointment
 (postcondición de CON-404, no conectado porque la agenda no lee estas salas).
+
+### Rooms: cada turno afectado se edita aparte (2026-11-06, CON-1520)
+
+Julián: "podés gestionar cada cita por separado" quiere decir que cada turno del aviso es editable, para no tener que
+cancelarlos todos y poder cambiarle sólo la sala.
+
+1. Cada turno de *Affected Appointments* lleva el link **Edit appointment** (en celular, *Edit*), que abre el mismo
+   drawer *Edit Appointment* de la agenda con el turno cargado (paciente, provider, fecha, horas, Operatory y Status
+   Booked). Mientras está abierto, el aviso se esconde y vuelve al cerrar.
+2. El select **Operatory** ofrece sólo las otras salas **activas** de la locación (`operatorios`, prop nueva de
+   `NewAppointmentModal`). Elegir otra saca el turno de los afectados y lo pasa a esa sala: toast *Appointment for X
+   moved to Operatory 3.* Guardar sin cambiar la sala deja el turno en la lista con su fecha nueva.
+3. **Confirm** sigue la historia: los que quedan se cancelan y pasan a la lista de espera (*N appointments were
+   cancelled and moved to the waiting list.*).
+4. Si se movieron todos, el aviso pasa a *Deactivate Operatory 1?* (o *Deactivate all rooms?* si es la última activa).
+5. Los turnos de ejemplo pasan a horas en punto (09:00, 11:00, 14:00, 08:00): el drawer de turnos va de hora en hora y
+   un 10:30 no se podía cargar.
+
+Para validar: si en vez del drawer completo alcanza con un select de sala en la misma fila del aviso (más rápido para
+mover varios, pero no deja cambiar la fecha).

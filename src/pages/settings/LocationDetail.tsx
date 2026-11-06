@@ -18,13 +18,15 @@ import {
 } from '@/data/location-options'
 import { LocationHoursModal } from '@/components/settings/LocationHoursModal'
 import { NewRoomModal } from '@/components/settings/NewRoomModal'
+import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
+import { formatDMY } from '@/components/ui/date-picker'
 import { NewExceptionModal } from '@/components/settings/NewExceptionModal'
 import { LOCACIONES } from '@/pages/settings/Locations'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { LocationBillingProfile } from '@/components/settings/LocationBillingProfile'
 import {
   HORARIO_SEMANAL, SALAS_INICIALES, EXCEPCIONES_INICIALES,
-  type Sala, type Excepcion,
+  type Sala, type TurnoSala, type Excepcion,
 } from '@/data/location-detail'
 
 /* Figma 3864:277885 "Settings — Location": Information / Working Hours /
@@ -223,17 +225,25 @@ export function WorkingHoursTab() {
   )
 }
 
-/* Rooms (CON-404, CON-1581…1584, CON-1520): la tabla de las listas de red.dev con su ⋮ Edit / Inactive / Delete.
-   Desactivar una sala con turnos muestra cuáles son y los pasa a la lista de espera; dejar la locación sin salas
-   activas también se pregunta. Ver figma/modulos/locations.md. */
+/* Rooms (CON-404, CON-1581…1584, CON-1520), con la caja de Working Hours. Desactivar una sala con turnos los muestra:
+   cada uno se edita aparte (Edit Appointment, para cambiarle la sala) y Confirm cancela los que quedan y los pasa a la
+   lista de espera. Dejar la locación sin salas activas también se pregunta. Ver figma/modulos/locations.md. */
 const FILA_SALA = 'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-4 lg:grid-cols-[minmax(0,1fr)_120px_140px_130px_120px]'
 const fechaTurno = (d: Date) =>
   d.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
+/* Las horas del drawer de turnos ("09 AM", "14 PM"): la agenda va de hora en hora. */
+const horaTurno = (h: number) => `${String(h).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`
+const fechaDeDrawer = (d: DatosTurno) => {
+  const [dd, mm, yyyy] = (d.date ?? '').split('-').map(Number)
+  return new Date(yyyy, mm - 1, dd, parseInt(d.start ?? '0', 10))
+}
 
 export function RoomsTab() {
   const [salas, setSalas] = useState<Sala[]>(SALAS_INICIALES)
   const [modal, setModal] = useState<'nueva' | Sala | false>(false)
   const [baja, setBaja] = useState<Sala | null>(null)
+  /* El turno que se edita desde el aviso: mientras el drawer está abierto, el aviso se esconde. */
+  const [turno, setTurno] = useState<TurnoSala | null>(null)
 
   const reemplazar = (s: Sala) => setSalas((p) => (p.some((x) => x.id === s.id) ? p.map((x) => (x.id === s.id ? s : x)) : [...p, s]))
   const ultimaActiva = (s: Sala) => !salas.some((x) => x.id !== s.id && x.activa)
@@ -254,10 +264,26 @@ export function RoomsTab() {
     const n = baja.turnos.length
     reemplazar({ ...baja, turnos: [] })
     aviso.ok(
-      n ? `${baja.nombre} is now inactive. ${n} appointment${n > 1 ? 's' : ''} moved to the waiting list.` : `${baja.nombre} is now inactive.`,
+      n
+        ? `${baja.nombre} is now inactive. ${n} appointment${n > 1 ? 's were' : ' was'} cancelled and moved to the waiting list.`
+        : `${baja.nombre} is now inactive.`,
       { label: 'Undo', onClick: () => reemplazar(antes) },
     )
     setBaja(null)
+  }
+
+  /* Guardar el turno: si cambió de sala sale de los afectados y pasa a esa sala; si no, queda con su fecha nueva. */
+  const guardarTurno = (d: DatosTurno) => {
+    if (!baja || !turno) return
+    const nuevo = { ...turno, fecha: fechaDeDrawer(d), provider: d.primary || turno.provider }
+    const otra = salas.find((x) => x.nombre === d.operatory && x.id !== baja.id)
+    const turnos = otra ? baja.turnos.filter((t) => t.id !== turno.id) : baja.turnos.map((t) => (t.id === turno.id ? nuevo : t))
+    setBaja({ ...baja, turnos })
+    setSalas((p) => p.map((x) =>
+      x.id === baja.id ? { ...x, turnos } : otra && x.id === otra.id ? { ...x, turnos: [...x.turnos, nuevo] } : x))
+    if (!otra) return false
+    aviso.ok(`Appointment for ${turno.paciente} moved to ${otra.nombre}.`)
+    return true
   }
 
   const borrar = (s: Sala) => {
@@ -318,31 +344,57 @@ export function RoomsTab() {
         />
       )}
 
-      {baja && (
+      {baja && turno && (
+        <NewAppointmentModal
+          titulo="Edit Appointment"
+          inicial={{
+            patient: turno.paciente, primary: turno.provider, date: formatDMY(turno.fecha),
+            start: horaTurno(turno.fecha.getHours()), end: horaTurno(turno.fecha.getHours() + 1),
+            operatory: baja.nombre, status: 'Booked',
+          }}
+          operatorios={salas.filter((x) => x.activa && x.id !== baja.id).map((x) => x.nombre)}
+          onGuardar={guardarTurno}
+          onClose={() => setTurno(null)}
+        />
+      )}
+
+      {baja && !turno && (
         <ConfirmDialog
           icon="warning"
           tone="danger"
-          title={baja.turnos.length ? 'This room has scheduled appointments' : 'Deactivate all rooms?'}
-          confirmLabel={baja.turnos.length ? 'Confirm' : 'Continue'}
+          title={baja.turnos.length ? 'This room has scheduled appointments' : ultimaActiva(baja) ? 'Deactivate all rooms?' : `Deactivate ${baja.nombre}?`}
+          confirmLabel={baja.turnos.length ? 'Confirm' : ultimaActiva(baja) ? 'Continue' : 'Deactivate'}
           onCancel={() => setBaja(null)}
           onConfirm={confirmarBaja}
         >
-          {baja.turnos.length > 0 && (
+          {baja.turnos.length > 0 ? (
             <>
               <p>
                 There are scheduled appointments assigned to {baja.nombre}. You can review and manage each appointment
                 individually or confirm to move all of them to the waiting list.
               </p>
               <p className="mt-3 font-semibold text-ink">Affected Appointments ({baja.turnos.length})</p>
-              <ul className="mt-1.5 flex max-h-44 flex-col gap-2 overflow-y-auto">
+              <ul className="mt-1.5 flex max-h-52 flex-col gap-2 overflow-y-auto">
                 {baja.turnos.map((t) => (
-                  <li key={t.id} className="leading-snug">
-                    <span className="block font-medium text-ink tabular-nums">{fechaTurno(t.fecha)}</span>
-                    {t.provider} · Patient: {t.paciente}
+                  <li key={t.id} className="flex items-start justify-between gap-3 leading-snug">
+                    <span>
+                      <span className="block font-medium text-ink tabular-nums">{fechaTurno(t.fecha)}</span>
+                      {t.provider} · Patient: {t.paciente}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setTurno(t)}
+                      aria-label={`Edit appointment for ${t.paciente}`}
+                      className="text-dash-blue flex min-h-8 shrink-0 items-center gap-1 text-[12px] font-semibold hover:underline"
+                    >
+                      <Pencil className="size-3" /> Edit<span className="max-sm:hidden"> appointment</span>
+                    </button>
                   </li>
                 ))}
               </ul>
             </>
+          ) : !ultimaActiva(baja) && (
+            <p>Its appointments were moved. {baja.nombre} won&apos;t be offered for new appointments.</p>
           )}
           {ultimaActiva(baja) && (
             <p className={cn(baja.turnos.length > 0 && 'mt-3')}>
