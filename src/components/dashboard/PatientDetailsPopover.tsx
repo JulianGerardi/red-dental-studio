@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import {
   X, ChevronDown, Play, AArrowUp, ClipboardList, Smartphone, Eye, FileCheck2,
-  Stethoscope, IdCard,
+  Stethoscope, IdCard, Weight,
   type LucideIcon,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -19,14 +19,14 @@ import { Avatar } from '@/components/ui/avatar'
    Sigue sin ser un modal centrado: se ancla a la card que lo abrió, con
    volteo automático si no entra a la derecha.
 
-   Textos tal cual el Figma, incluidos "Start Enconter" sin la u, "Height"
-   repetido y la fecha en español. La única excepción es el bloque del motivo
-   de la visita, que Julián pidió mejorar: ahí "Rsn" se escribe completo. */
+   Textos tal cual el Figma, incluidos "Start Enconter" sin la u y la fecha en
+   español. Excepciones pedidas por Julián: el motivo de la visita ("Rsn" se
+   escribe completo) y Weight en vez del "Height" repetido (dashboard.md, 2026-11-06). */
 
 type Fila = { icon: LucideIcon; label: string; value: string }
 
 const FILAS_DOBLES: Fila[] = [
-  { icon: AArrowUp, label: 'Height', value: '5 ft 8 in' },
+  { icon: Weight, label: 'Weight', value: '154 lb' },
   { icon: AArrowUp, label: 'Height', value: '5 ft 8 in' },
 ]
 const FILAS: Fila[] = [
@@ -225,10 +225,9 @@ export function PatientDetailsPopover({
         </div>
       </div>
 
-      {/* Height aparece dos veces, una en cada media fila. Es del Figma. */}
       <div className="mt-3 grid grid-cols-2 gap-2">
-        {FILAS_DOBLES.map((f, i) => (
-          <FilaDato key={i} {...f} className="rounded-lg" />
+        {FILAS_DOBLES.map((f) => (
+          <FilaDato key={f.label} {...f} className="rounded-lg" />
         ))}
       </div>
       <div className="mt-2 flex flex-col gap-2">

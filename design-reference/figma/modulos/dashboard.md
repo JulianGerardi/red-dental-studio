@@ -840,3 +840,13 @@ categoría a la vez en vez de combinarlas- para Pending Task del Dashboard y del
 **A validar con usuarios:** al perder el multi-select del Filter, ya no se puede ver "Lab Orders + Referrals" juntos sin
 el resto; si hace falta esa combinación, el camino sería volver a un Filter pero sólo para Pending Task (dejando las
 tabs en el resto) o sumar un modo "varios" a `ui/tabs`.
+
+## Weight en la ficha del turno (2026-11-06)
+
+La ficha flotante del turno (`PatientDetailsPopover`) repetía **"Height"** en las dos medias filas, con el mismo valor:
+la anomalía 55 del Figma (`4430:57474`), que se había dejado tal cual. Al comparar con red.dev para CON-4072 se vio que
+allá esa fila es **Weight** y la otra Height, que es lo que tiene sentido para un paciente. Con el ok de Julián:
+
+- La primera media fila pasa a **Weight**, con el ícono de pesa (`Weight` de lucide) y "154 lb" de ejemplo; la segunda
+  queda **Height**, "5 ft 8 in". Mismas unidades imperiales para los dos.
+- De la anomalía 55 queda sólo "Start Enconter" sin la u.
