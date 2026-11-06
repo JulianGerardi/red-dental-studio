@@ -5,6 +5,20 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-06
 
+### Location: Insurance Defaults y bloqueos de desactivación ([#127](https://github.com/JulianGerardi/red-dental-studio/pull/127))
+- **Settings → Locations → Insurance Defaults** (pestaña nueva, `?type=insurance-defaults`, epic CON-1173): Billing
+  Provider (CON-3894), Rendering Provider (CON-3896), PPO Write-offs y aviso de no contratado (CON-4030), Place of
+  Service (CON-3898) y autorización de nuevos subscribers (CON-3899), con los valores iniciales de CON-4029 y un solo
+  **Save changes** al final. Perfiles y providers se eligen en un drawer abierto desde una card (**Select / Change**);
+  los opcionales se quitan con la ✕.
+- **Bloqueos**: un Billing Profile de Location (CON-4032) o un Primary Provider (CON-4031) elegido en los defaults de
+  alguna Location no se desactiva; el aviso lista *Location — Setting* con links a esos defaults.
+- **Para el dev:** datos en `data/insuranceDefaults.ts`; el store `billingProfilesStore` suma `defaultsDe`,
+  `guardarDefaults`, `providerElegible`, `perfilElegible` y `referencias` (`guardarPrimario` puede devolver
+  `'bloqueado'`). Componente `settings/LocationInsuranceDefaults.tsx` con `BloqueoDefaults`. `ConfirmDialog` suma
+  `hideCancel`. Semilla: Sarah Stone es Primary Provider y está en los defaults de Bayside. e2e en
+  `tests/insurance-defaults.e2e.ts`. Decisiones en `insurance-defaults.md`. Storybook sin actualizar.
+
 ### Working Hours: elegir días no los vincula y Open exige horas ([#126](https://github.com/JulianGerardi/red-dental-studio/pull/126))
 - **Settings → Locations → Working Hours** (CON-1546): sale *Apply change to* (*All linked days*): elegir días aplica
   las horas en esta operación, no los vincula. Activar Open en un día cerrado abre **Set working hours** y el día queda
