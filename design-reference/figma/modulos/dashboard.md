@@ -818,3 +818,13 @@ Storybook: *Components / Dashboard / Dashboard rows → States* suma **Menu expa
 
 **Para validar con usuarios:** si conviene que la fila mantenga dos renglones también expandida (hoy no entra: Check In + provider + botón piden ~306px y hay 303), por
 ejemplo con el provider más corto o el botón sólo con ícono en angosto.
+
+## Weight en la ficha del turno (2026-11-06)
+
+La ficha flotante del turno (`PatientDetailsPopover`) repetía **"Height"** en las dos medias filas, con el mismo valor:
+la anomalía 55 del Figma (`4430:57474`), que se había dejado tal cual. Al comparar con red.dev para CON-4072 se vio que
+allá esa fila es **Weight** y la otra Height, que es lo que tiene sentido para un paciente. Con el ok de Julián:
+
+- La primera media fila pasa a **Weight**, con el ícono de pesa (`Weight` de lucide) y "154 lb" de ejemplo; la segunda
+  queda **Height**, "5 ft 8 in". Mismas unidades imperiales para los dos.
+- De la anomalía 55 queda sólo "Start Enconter" sin la u.
