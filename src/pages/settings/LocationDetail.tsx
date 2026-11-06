@@ -120,10 +120,18 @@ export function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
   )
 }
 
+/* Un día sólo queda Open con al menos una franja: activar el switch abre "Set working hours" y el día se abre recién
+   al guardar; Cancel lo deja como estaba. Ver figma/modulos/locations.md (2026-11-06, CON-1546). */
 export function WorkingHoursTab() {
   const [horario, setHorario] = useState(HORARIO_SEMANAL)
   const [expandido, setExpandido] = useState<string | null>(null)
   const [modal, setModal] = useState<string | null>(null)
+
+  const cerrar = (key: string, label: string) => {
+    const antes = horario[key]
+    setHorario((p) => ({ ...p, [key]: { abierto: false, rangos: [] } }))
+    aviso.ok(`${label} is now closed.`, { label: 'Undo', onClick: () => setHorario((p) => ({ ...p, [key]: antes })) })
+  }
 
   return (
     <div className="overflow-hidden rounded-xl border border-line bg-white">
@@ -134,7 +142,6 @@ export function WorkingHoursTab() {
       </div>
       {DIAS.map(([key, label]) => {
         const dia = horario[key]
-        const sinHoras = dia.abierto && dia.rangos.length === 0
         return (
           <div
             key={key}
@@ -146,13 +153,8 @@ export function WorkingHoursTab() {
             <span className="text-[13px] font-semibold text-ink">{label}</span>
             <SwitchOpenClose
               on={dia.abierto}
-              onChange={(v) => {
-                setHorario((p) => ({ ...p, [key]: { ...p[key], abierto: v } }))
-                /* Abrir un día sin franjas cargadas siempre termina en "Add
-                   New Hour" igual: te ahorra ese segundo click y te lleva
-                   directo al popup para cargarlas. */
-                if (v && dia.rangos.length === 0) setModal(key)
-              }}
+              label={`${label} open`}
+              onChange={(v) => (v ? setModal(key) : cerrar(key, label))}
             />
             {dia.abierto ? (
               <div className="flex flex-wrap items-center gap-2">
@@ -183,24 +185,14 @@ export function WorkingHoursTab() {
                     +{dia.rangos.length - 2}
                   </button>
                 )}
-                {sinHoras && (
-                  <button
-                    type="button"
-                    onClick={() => setModal(key)}
-                    className="text-dash-blue flex items-center gap-1 text-[12px] font-semibold hover:underline"
-                  >
-                    <Plus className="size-3.5" /> Add New Hour
-                  </button>
-                )}
-                {!sinHoras && (
-                  <button
-                    type="button"
-                    onClick={() => setModal(key)}
-                    className="text-dash-blue flex shrink-0 items-center gap-1 text-[12px] font-semibold hover:underline"
-                  >
-                    <Pencil className="size-3" /> Edit hours
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setModal(key)}
+                  aria-label={`Edit hours on ${label}`}
+                  className="text-dash-blue flex shrink-0 items-center gap-1 text-[12px] font-semibold hover:underline"
+                >
+                  <Pencil className="size-3" /> Edit hours
+                </button>
               </div>
             ) : (
               <span className="text-[12px] text-ink-faint">Closed all day.</span>
@@ -212,11 +204,12 @@ export function WorkingHoursTab() {
       {modal && (
         <LocationHoursModal
           dia={DIAS.findIndex(([key]) => key === modal)}
+          iniciales={horario[modal].rangos}
           onClose={() => setModal(null)}
-          onGuardar={(rango) =>
+          onGuardar={(dias, rangos) =>
             setHorario((p) => ({
               ...p,
-              [modal]: { abierto: true, rangos: [`${rango.inicio} - ${rango.fin}`] },
+              ...Object.fromEntries(dias.map((i) => [DIAS[i][0], { abierto: true, rangos }])),
             }))
           }
         />
