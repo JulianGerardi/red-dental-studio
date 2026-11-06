@@ -5,6 +5,13 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-06
 
+### Rooms: cada turno afectado se edita aparte ([#125](https://github.com/JulianGerardi/red-dental-studio/pull/125))
+- Al desactivar una sala con turnos, cada uno lleva **Edit appointment**: abre el drawer de la agenda y cambiarle el
+  Operatory a otra sala activa lo saca de los afectados. **Confirm** cancela los que quedan y los pasa a la lista de
+  espera (CON-1520).
+- **Para el dev:** `NewAppointmentModal` suma `operatorios` (opciones del select Operatory). Turnos de ejemplo en horas
+  en punto. Decisión en `locations.md` (2026-11-06). Storybook sin actualizar.
+
 ### Rooms de la locación con la lógica de red.dev ([#123](https://github.com/JulianGerardi/red-dental-studio/pull/123))
 - **Settings → Locations → Rooms** (CON-404, CON-1520): misma caja que Working Hours, con switch *Active* / *Inactive*
   en la fila, *Edit room* y tacho. New Room pide Name* y Type* (Abbreviation pasa a opcional) y avisa el nombre

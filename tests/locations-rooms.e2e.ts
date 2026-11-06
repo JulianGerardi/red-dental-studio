@@ -28,9 +28,26 @@ test('Desactivar una sala con turnos los muestra y los pasa a la lista de espera
   const aviso = screen.getByRole('dialog', 'This room has scheduled appointments')
   await expect(aviso.getByText('Affected Appointments (3)')).toBeVisible()
   await aviso.getByRole('button', 'Confirm').tap()
-  await expect(screen.getByText(/3 appointments moved to the waiting list/)).toBeVisible()
+  await expect(screen.getByText(/3 appointments were cancelled and moved to the waiting list/)).toBeVisible()
 
   /* Una sala sin turnos se desactiva directo. */
   await screen.getByRole('switch', 'Operatory 3 active').tap()
   await expect(screen.getByText('Operatory 3 is now inactive.')).toBeVisible()
+})
+
+test('Desde el aviso, un turno se pasa a otra sala y deja de estar entre los afectados', async ({ app, screen }) => {
+  await app.open('/settings/locations/abril?type=rooms')
+  await screen.getByRole('switch', 'Operatory 1 active').tap()
+  await screen.getByRole('button', 'Edit appointment for John Smith').tap()
+  const drawer = screen.getByRole('dialog', 'Edit Appointment')
+  await drawer.getByRole('button', 'Operatory 1').tap()
+  await drawer.getByRole('button', 'Operatory 3').tap()
+  await drawer.getByRole('button', /Next Step/).tap()
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText('Appointment for John Smith moved to Operatory 3.')).toBeVisible()
+
+  const aviso = screen.getByRole('dialog', 'This room has scheduled appointments')
+  await expect(aviso.getByText('Affected Appointments (2)')).toBeVisible()
+  await aviso.getByRole('button', 'Confirm').tap()
+  await expect(screen.getByText(/2 appointments were cancelled and moved to the waiting list/)).toBeVisible()
 })

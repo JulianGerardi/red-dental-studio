@@ -37,13 +37,13 @@ export const SALAS_INICIALES: Sala[] = [
     id: 'op1', nombre: 'Operatory 1', tipo: 'Operatory', abreviatura: 'OP1', activa: true,
     turnos: [
       { id: 't1', fecha: new Date(2026, 10, 9, 9, 0), provider: 'Dr. Elena Martinez', paciente: 'John Smith' },
-      { id: 't2', fecha: new Date(2026, 10, 9, 10, 30), provider: 'Dr. Emily Chen', paciente: 'Noah James Smith' },
+      { id: 't2', fecha: new Date(2026, 10, 9, 11, 0), provider: 'Dr. Emily Chen', paciente: 'Noah James Smith' },
       { id: 't3', fecha: new Date(2026, 10, 10, 14, 0), provider: 'Dr. Salgado', paciente: 'Maria Abril Viola' },
     ],
   },
   {
     id: 'op2', nombre: 'Operatory 2', tipo: 'Operatory', abreviatura: 'OP2', activa: true,
-    turnos: [{ id: 't4', fecha: new Date(2026, 10, 11, 8, 15), provider: 'Dr. Elena Martinez', paciente: 'Elias Aguirre' }],
+    turnos: [{ id: 't4', fecha: new Date(2026, 10, 11, 8, 0), provider: 'Dr. Elena Martinez', paciente: 'Elias Aguirre' }],
   },
   { id: 'op3', nombre: 'Operatory 3', tipo: 'Operatory', abreviatura: 'OP3', activa: true, turnos: [] },
   { id: 'xr', nombre: 'X-Ray Room', tipo: 'X-Ray', abreviatura: 'XR', activa: true, turnos: [] },
