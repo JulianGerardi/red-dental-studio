@@ -124,13 +124,8 @@ export default function Patients() {
         <div className="min-w-0 flex-1" ref={refTabla}>
           {/* El botón principal va en la fila del título, al borde derecho de la columna de la tabla. */}
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="flex min-w-0 flex-col gap-[9px]">
-              <PageTitle>Patients</PageTitle>
-              {/* Copy de locación en una pantalla de pacientes: es del Figma. */}
-              <p className="text-xs leading-[17px] text-[#a3a3a3]">
-                Set your location name. Add the location you need.
-              </p>
-            </div>
+            {/* Sin bajada: la del Figma era el texto de Locations (patients.md, 2026-11-06). */}
+            <PageTitle>Patients</PageTitle>
 
             <Button size="md" onClick={() => setModal('new')} data-tour="pat-new">
               <Plus /> New Patient

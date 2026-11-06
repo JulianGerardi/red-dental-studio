@@ -487,3 +487,20 @@ Segunda vuelta de Julián sobre lo publicado (#120):
    suma `buscable`) y abre la lista en el país elegido. Un valor viejo ("+1", "(+1) United States of America (the)") se
    muestra como su país (`paisDe`). Las banderas son archivos aparte que se cargan al verse (`vite.config`:
    `assetsInlineLimit`), así el JS no crece con 245 SVG.
+
+## CON-4080 · Lista de Patients: sin bajada, Rows per page, Overview y foto (2026-11-06)
+
+Al comparar la lista con red.dev para CON-4080, Julián confirmó que tres cosas de red.dev están bien y van también acá,
+y que la bajada no va:
+
+- **Sin bajada.** Debajo del título decía "Set your location name. Add the location you need.": era el texto de
+  Locations copiado en el Figma. Se saca; queda sólo "Patients", como en red.dev.
+- **Rows per page** en el pie de la tabla (10, 20 o 50), con el `pageSizeOptions` que ya tenía `ui/data-table`.
+- **Overview** en el menú ⋮ de cada fila, arriba de Edit: lleva a la ficha del paciente, igual que el nombre.
+- **Foto del paciente en el avatar.** Si en la ficha se subió una foto (`EditableAvatar` del panel lateral), la lista y
+  Recent Patients la muestran adentro del mismo avatar cuadrado; si no, siguen las iniciales. Se lee de la misma clave
+  que guarda la ficha (`clavePacienteFoto` y `fotoGuardada`, en `lib/usePhoto.ts`); `PersonCell` suma `photo`. No se
+  agregaron fotos de ejemplo.
+
+**A validar:** sin la bajada la tabla quedó 26 px más baja, y a 1440 px Recent Patients muestra tres pacientes y un
+hueco antes de "Show N more" (con la bajada entraban cuatro). Es el redondeo a filas enteras de `llenarAlto`.

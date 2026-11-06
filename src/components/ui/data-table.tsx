@@ -407,16 +407,18 @@ export function RowChevron({ open }: { open: boolean }) {
 }
 
 /** El Avatar (ui/avatar, 32px) y el nombre como link. Pacientes y equipo, igual. */
-export function PersonCell({ name, initials, to, onClick }: {
+export function PersonCell({ name, initials, photo, to, onClick }: {
   name: string
   initials: string
+  /** Si la persona tiene foto, va adentro del mismo avatar. */
+  photo?: string
   to?: string
   onClick?: () => void
 }) {
   const clase = cn(TABLA_LINK, 'text-[13px]')
   return (
     <span className="flex min-w-0 items-center gap-2.5">
-      <Avatar initials={initials} />
+      <Avatar initials={initials} photo={photo} />
       {to ? (
         <Link to={to} onClick={(e) => e.stopPropagation()} className={clase}>{name}</Link>
       ) : (
