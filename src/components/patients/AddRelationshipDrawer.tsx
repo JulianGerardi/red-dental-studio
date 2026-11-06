@@ -4,24 +4,15 @@ import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer
 import { FieldError, ModalShell, OptionCheckbox, PersonSearchField, SelectField, TextField } from '@/components/patients/form'
 import { useFormPasos } from '@/lib/useFormPasos'
 import { Avatar } from '@/components/ui/avatar'
-import { Alert } from '@/components/ui/alert'
+import { DIRECTORIO, type PersonaDirectorio } from '@/data/personas'
 
 /* Add Relationship: antes una pantalla aparte (Figma 3716:61372, 3716:62815 y 3716:63601); ahora el drawer de
-   Confidentally 2.0 con sus tres pasos: buscar o crear a la persona, sus datos de contacto y la relación con el
-   paciente. Los textos del Figma se replican tal cual, incluido "Adress". Ver modulos/relationships.md. */
+   Confidentally 2.0 con sus pasos: buscar o crear a la persona, sus datos de contacto y la relación con el paciente.
+   Contact sólo aparece si la persona es nueva o no tiene el contacto cargado (CON-3174; relationships.md, 2026-11-03).
+   Los textos del Figma se replican tal cual, incluido "Adress". */
 
-export type PersonaDirectorio = {
-  name: string
-  initials: string
-  dob: string
-  email: string
-}
-
-export const DIRECTORIO: PersonaDirectorio[] = [
-  { name: 'Michael Miller', initials: 'MM', dob: 'May 14, 1982', email: 'mm.thompson@yahoo.com' },
-  { name: 'Jessica Miller', initials: 'JM', dob: 'May 14, 1982', email: 'jessica.miller@gmail.com' },
-  { name: 'Robert Miller', initials: 'RM', dob: 'March 2, 1979', email: 'rob.miller@outlook.com' },
-]
+/* El directorio vive en data/personas.ts (lo comparte New Patient); se reexporta para los imports de siempre. */
+export { DIRECTORIO, type PersonaDirectorio }
 
 /* Card de persona del Figma: borde azul, avatar cuadrado y tres líneas. */
 export function PersonaSeleccionada({ p }: { p: PersonaDirectorio }) {
@@ -81,18 +72,14 @@ const VACIO = {
   rel: '',
 }
 
-const PASOS = ['Person', 'Contact', 'Relationship'] as const
+const CONTACTO = ['country', 'number', 'email', 'linea1', 'linea2', 'paisDir', 'region', 'ciudad', 'postal'] as const
 const iniciales = (nombre: string) => nombre.trim().split(/\s+/).slice(0, 2).map((x) => x[0]).join('').toUpperCase()
 
 export function AddRelationshipDrawer({
-  paciente = 'John Smith', archivadas = [], onReactivar, onClose, onGuardar,
+  paciente = 'John Smith', onClose, onGuardar,
 }: {
   /** El paciente de la ficha: aparece en las frases de Direction. */
   paciente?: string
-  /** Nombres de quienes ya tienen una relación archivada con este paciente: al elegirlos se ofrece reactivarla. */
-  archivadas?: string[]
-  /** "Open reactivation": abre la reactivación de la relación archivada de esa persona (CON-3958). */
-  onReactivar?: (nombre: string) => void
   onClose: () => void
   onGuardar: (r: NuevaRelacion) => void
 }) {
@@ -103,22 +90,36 @@ export function AddRelationshipDrawer({
   const [direccion, setDireccion] = useState<0 | 1 | null>(null)
   const [aviso, setAviso] = useState(false)
 
+  const persona = DIRECTORIO.find((p) => p.name === personaNombre)
+  /* Persona existente con teléfono y dirección: no se le vuelve a pedir el contacto. Sólo cambia en Person (paso 0). */
+  const pideContacto = !persona || !persona.telefono || !persona.direccion
+  const pasos = pideContacto ? ['Person', 'Contact', 'Relationship'] : ['Person', 'Relationship']
+  const pasoRel = pasos.length - 1
+
   const { d, set, falta, paso, siguiente, atras, listo } = useFormPasos(VACIO, [
     nueva ? ['first', 'last'] : [],
-    ['country', 'number', 'email', 'linea1', 'linea2', 'paisDir', 'region', 'ciudad', 'postal'],
+    ...(pideContacto ? [[...CONTACTO]] : []),
     ['rel'],
   ])
 
-  const persona = DIRECTORIO.find((p) => p.name === personaNombre)
+  /* El email que la persona ya tiene (o el que se escribió al crearla) llega cargado en Contact, salvo que se haya cambiado a mano. */
+  const [emailAuto, setEmailAuto] = useState('')
+  const precargarEmail = () => {
+    const e = persona?.email ?? d.emailNueva.trim()
+    if (d.email.trim() && d.email !== emailAuto) return
+    set('email')(e)
+    setEmailAuto(e)
+  }
   const nombre = persona?.name ?? [d.first.trim(), d.last.trim()].filter(Boolean).join(' ')
   const rolTexto = guardian && guarantor ? 'Guardian and Guarantor' : guarantor ? 'Guarantor' : 'Guardian'
   const sinPersona = aviso && paso === 0 && !persona && !nueva
-  const sinRol = aviso && paso === 2 && !guardian && !guarantor
-  const sinDireccion = aviso && paso === 2 && direccion === null
+  const sinRol = aviso && paso === pasoRel && !guardian && !guarantor
+  const sinDireccion = aviso && paso === pasoRel && direccion === null
 
   const seguir = () => {
     if (paso === 0 && !persona && !nueva) { setAviso(true); return }
     setAviso(false)
+    if (paso === 0 && pideContacto) precargarEmail()
     siguiente()
   }
   const guardar = () => {
@@ -127,8 +128,10 @@ export function AddRelationshipDrawer({
     if (!listo() || (!guardian && !guarantor) || direccion === null) return
     onGuardar({
       name: nombre, initials: persona?.initials ?? iniciales(nombre), dob: persona?.dob ?? '—', rol: d.rel,
-      guardian, guarantor, phone: d.number.trim(), email: d.email.trim(),
-      address: [d.linea1, d.linea2, d.ciudad, d.region, d.postal].filter(Boolean).join(', '),
+      guardian, guarantor,
+      phone: pideContacto ? d.number.trim() : persona!.telefono!,
+      email: pideContacto ? d.email.trim() : persona!.email,
+      address: pideContacto ? [d.linea1, d.linea2, d.ciudad, d.region, d.postal].filter(Boolean).join(', ') : persona!.direccion!,
     })
     onClose()
   }
@@ -139,9 +142,9 @@ export function AddRelationshipDrawer({
       description="Link a family member, guardian or guarantor to this patient."
       onClose={onClose}
       width="max-w-[560px]"
-      steps={PASOS}
+      steps={pasos}
       step={paso}
-      actions={<DrawerActions step={paso} total={PASOS.length} onNext={seguir} onBack={() => { setAviso(false); atras() }} onCancel={onClose} onSave={guardar} />}
+      actions={<DrawerActions step={paso} total={pasos.length} onNext={seguir} onBack={() => { setAviso(false); atras() }} onCancel={onClose} onSave={guardar} />}
     >
       <DrawerStep index={0} step={paso}>
         <DrawerSection title="Find or create person">
@@ -156,13 +159,6 @@ export function AddRelationshipDrawer({
               return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
             }}
           />
-          {persona && archivadas.includes(persona.name) && (
-            <Alert tone="warning" title={`An archived relationship already exists between ${paciente} and ${persona.name}.`}>
-              <button type="button" onClick={() => onReactivar?.(persona.name)} className="text-dash-blue font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue">
-                Open reactivation
-              </button>
-            </Alert>
-          )}
           <OptionCheckbox
             label="Add New Person"
             checked={nueva}
@@ -178,7 +174,7 @@ export function AddRelationshipDrawer({
         </DrawerSection>
       </DrawerStep>
 
-      <DrawerStep index={1} step={paso}>
+      {pideContacto && <DrawerStep index={1} step={paso}>
         <DrawerSection title="General Information">
           <div className="grid gap-4 sm:grid-cols-2">
             <SelectField label="Country" required value={d.country} onChange={set('country')} error={falta('country')} />
@@ -197,9 +193,9 @@ export function AddRelationshipDrawer({
             <TextField label="Postal Code" required placeholder="5678" value={d.postal} onChange={set('postal')} error={falta('postal')} />
           </div>
         </DrawerSection>
-      </DrawerStep>
+      </DrawerStep>}
 
-      <DrawerStep index={2} step={paso}>
+      <DrawerStep index={pasoRel} step={paso}>
         <DrawerSection title="Assign relationship role">
           <div className="flex flex-col gap-2">
             <OptionCheckbox label="Guardian" checked={guardian} onChange={setGuardian} />

@@ -366,3 +366,161 @@ Julián: "lo mismo hace en pending documents".
 - Antes, Pending documents mostraba 4 fijas y al abrir la card crecía y empujaba a Pending Task.
 - `PendingDocuments` suma la prop `llenar`. `ShowMore` con `filas` mide ahora con la fila **más alta** de las dibujadas (en columnas angostas unas filas envuelven a más renglones que otras) para que ninguna quede cortada.
 - **A validar:** a 1024px las filas de documentos envuelven a 3 renglones y entra una sola antes de *Show 5 more*; si molesta, subir el mínimo de la card.
+
+## CON-2643: Pending Task filtra por tipo y carga al scrollear, sin tabs (2026-10-28)
+
+Julián pasó un video de referencia (la app de red) donde Pending Task divide las tareas en tabs -Clinical Notes, Lab
+Orders, Prescriptions, Referrals- y un botón "Ver más" al pie de la lista. Pidió el mismo comportamiento pero **sin
+copiar esos dos controles**: filtro en vez de tabs ("creo que lo tenemos en formato filtro") y, en vez del botón,
+que el resto cargue solo al scrollear.
+
+Esto ya estaba resuelto del lado del Dashboard: **CON-2641** (Pending Tasks de la secretaria) pide exactamente filtro
+por tipo de tarea (CA1) y "la lista debe permitir scroll completo" (CA7), y `dashboard.md` (2026-08-28) ya había sacado
+los tabs del Figma por redundantes con el embudo. CON-2643 (Pending Tasks del paciente) no pide filtro ni scroll
+propio, así que esto es extender a la ficha del paciente el mismo patrón que ya corre en el Dashboard, no inventar uno
+nuevo -responde además al "a validar" que había quedado abierto el 2026-10-25 ("si con muchas tareas conviene agrupar o
+filtrar").
+
+1. **Filtro, no tabs.** Junto a los tabs *Pending Task / Activity* (que son otra cosa: alternan toda la sección, no
+   las tareas) va el mismo `FilterMenu` del Dashboard, por tipo (`TASK_KINDS`: Clinical Note, Lab Orders,
+   Prescriptions, Referrals), checkboxes, sin nada tildado se ve todo. Antes de esto el mock de `PatientDetail.tsx`
+   tenía las 9 tareas como `'Referrals'`: no había nada que filtrar. Pasan a repartirse entre los cuatro tipos (3/2/2/2,
+   mismo total que fijó el *Show N more* del 2026-10-25) para que el filtro tenga sentido en la demo.
+2. **Carga al scrollear, sin botón** (`ShowMore`, prop nueva `cargarAlScroll`): sólo tiene sentido junto con `enCaja` +
+   `llenarAlto` -el alto ya lo da el flex-1 del panel-. La caja arranca scrolleable con dos tandas de las que miden
+   cuántas filas entran (para que asome un poco de la próxima y se note que hay más) y, al acercarse al final, suma
+   otra tanda hasta mostrarlas todas. Nada de paginar contra un backend: son las mismas tareas ya cargadas, mostrando
+   más de a poco. El degradé de abajo (ya existía) sigue avisando que falta; sin botón no hay "Show less" -no hace
+   falta, no crece la card-. ~~Sólo lo lleva Pending Task: Pending documents y el Pending Task del Dashboard siguen
+   con el botón, que ahí sigue andando bien.~~ Pending documents se suma el mismo día (ver más abajo); el Pending
+   Task del Dashboard sigue con el botón.
+3. La región sigue siendo alcanzable con Tab y navegable con flechas/Page Down (son las mismas que ya disparan
+   `onScroll`), así que el teclado también carga más. Lo que un lector de pantalla no tiene es un control explícito
+   tipo "cargar todo": antes "Show N more" lo anunciaba con `aria-expanded`; ahora depende de que el usuario scrollee
+   la región (que sí tiene nombre, "All pending tasks"). **A validar con usuarios y con accesibilidad.**
+4. Anomalía ya anotada en Jira, no de hoy: CON-2643 sólo admite Referrals/Lab Orders/Prescriptions como tipos de
+   Pending Task del paciente; "Clinical Note" es una cuarta categoría que ya traía `TASK_KINDS` desde el Dashboard
+   (CON-2640/2641, que tampoco la listan pero el Figma sí la dibuja). No se tocó: es compartida con el Dashboard y
+   cambiarla ahí tiene que ser una decisión aparte.
+
+`tests/patient-overview.e2e.ts`: el test de layout ya no espera dos "Show N more" (uno solo, el de Pending documents) y
+un test nuevo prueba que *Filter tasks* acota a 2 tareas en Referrals, *Clear all* vuelve a las 9, y que dentro de la
+caja de Pending Task no hay botón.
+
+## Pending documents se suma al scroll de Pending Task (2026-10-28)
+
+Julián, sobre el punto 2 de arriba: el *Show more* de Pending documents "se ve mal porque no podés ver más cards"; pidió
+que las dos cards tengan **la misma funcionalidad de scroll**, fluida.
+
+- `PendingDocuments` suma `cargarAlScroll={llenar}` a su `ShowMore` -mismo condicional que ya usaba para `enCaja` /
+  `llenarAlto` / `filas="li"`-, así que se activa en el mismo lugar donde hoy se activa `llenar` (`PatientDetail.tsx`,
+  junto a Pending Task). Ningún cambio de lógica nuevo: es la pieza que ya se armó para Pending Task, aplicada acá.
+- Con los 6 documentos de la demo entran los seis sin necesitar scroll a 1519×829 -ya no hay botón ni degradé-, así
+  que para ver la carga por tandas hace falta una pantalla más baja o más documentos; igual que Pending Task, con
+  pantallas bajas sigue sumando de a tandas en vez de saltar a todos de una.
+- `tests/patient-overview.e2e.ts`: el test de layout pasa a esperar **cero** "Show N more" en toda la pantalla (antes
+  esperaba uno, el de Pending documents) y un test nuevo prueba que Pending documents tiene la misma caja scrolleable
+  con nombre ("All pending documents") que Pending Task, sin botón.
+
+## Las categorías pasan a tabs; Pending documents cambia las suyas (2026-10-29)
+
+Julián: sacar el Filter de Pending Task y ponerlo en tabs -"también aplicalo al Dashboard, que es un componente que
+tenemos ahí también"-, y en Pending documents, en vez de sus tabs de hoy, usar **Overdue / Due this week / Later**.
+Ver `dashboard.md` (misma fecha) por el lado que comparten las dos pantallas.
+
+1. **Pending Task** (acá y en el Dashboard): el `FilterMenu` del 2026-10-28 sale; en su lugar, `ui/tabs` con **All**
+   y los cuatro tipos (`TASK_KINDS`), cada uno con su cuenta. Selección única -tocar un tipo lo deja solo, **All**
+   vuelve a mostrarlos todos-, a diferencia del Filter, que combinaba varios a la vez.
+2. **Pending documents**: sus tabs *All / Patient / Office* (quién tiene que actuar) pasan a ser **Overdue / Due this
+   week / Later** -las mismas tres categorías que ya agrupaban la lista como texto plano desde el 2026-10-05-, con
+   selección única y arrancando en **Overdue**. Quién tiene que actuar (Patient, Provider, Front desk) se sigue
+   viendo en cada fila; lo que se pierde es poder filtrar por eso desde arriba.
+   - El estado vacío distingue ahora "no hay nada pendiente" de "no hay nada en este grupo" (antes sólo existía el
+     primer caso, porque *All* siempre tenía algo si había pendientes).
+3. Ninguna de las dos pantallas necesitó tocar la agrupación interna (`PendingTaskList` por tipo, `PendingDocuments`
+   por los mismos `GRUPOS` de siempre): con una sola categoría activa a la vez, esa agrupación ya hacía lo mismo que
+   iba a hacer el tab -queda un solo grupo visible, el que dice el tab-.
+
+**A validar con usuarios:**
+- Pending Task pierde el multi-select del Filter (ver, p. ej., "Lab Orders + Referrals" juntos sin el resto).
+- Pending documents pierde el filtro por **quién** actúa (Patient/Office) del header; si hace falta, podría volver
+  como un segundo control más chico, o dejar que la fila sea el único lugar donde se ve.
+
+`tests/patient-overview.e2e.ts` y `tests/dashboard.e2e.ts`: los tests de *Filter tasks* pasan a tocar las tabs
+(`getByRole('tab', …)`); un test nuevo cubre las tabs de urgencia de Pending documents (arranca en Overdue, cambiar a
+Later muestra otros documentos).
+
+## Sin Pending Task / Activity; sin espacio en blanco con pocos ítems (2026-10-29)
+
+Julián, sobre lo de arriba: sacar el tab *Pending Task / Activity* (el tab de tipo queda solo, alineado a la
+derecha), y que ni Pending Task ni Pending documents dejen espacio en blanco -la caja tiene que acomodarse a cuántos
+ítems hay; recién con muchos entra el scroll interno-. Pidió probarlo con una tab cargada de muchas cards.
+
+1. **Sin *Pending Task / Activity*.** Era un segundo tab -alternaba toda la sección, no las tareas- sin nada detrás
+   (nunca hubo una vista de Activity armada). Sale entero; el único tab que queda es el de tipo, y al quedar solo el
+   header vuelve a `justify-between` simple -el título a la izquierda, el tab a la derecha-.
+2. **Sin espacio en blanco.** Hasta ayer, Pending Task y Pending documents eran `flex-1` para repartirse el alto que
+   deja el menú y terminar a la par de Appointments (2026-10-25); con pocos ítems en una tab, esa altura fija dejaba
+   aire debajo de las filas. Las dos cards dejan de ser `flex-1` -miden lo que pide su contenido- y `ui/show-more`
+   (`cargarAlScroll`) suma un modo sin `llenarAlto`: sin alto fijo del que tirar, no hay tandas que cargar -van todas
+   las filas montadas de una- y la caja no pasa de `maxHeight` (`min(70vh, 640px)`, lo mismo que ya usaba *Treatments*
+   o *Today Appointments*); de ahí para arriba, scroll de verdad con `overflow-y-auto`. Antes `cargarAlScroll` sólo
+   tenía sentido junto con `llenarAlto`: ahora cubre los dos casos.
+   - Encontrado al probarlo: con una sola tanda chica que no llega a `maxHeight`, no hay nada para scrollear y
+     "cargar más" quedaba sin cómo dispararse -quedaban ítems sin mostrar nunca-. Por eso sin `llenarAlto` van todas
+     montadas de una en vez de a tandas: no hace falta, el navegador scrollea solo.
+   - Probado con una tab cargada (Referrals a 16 en Pending Task, Overdue a 18 en Pending documents, sólo para la
+     prueba, no quedó en el mock): la caja llega a los ~630px de `maxHeight` y scrollea con todas montadas, igual que
+     con pocas.
+   - `PendingDocuments` pierde la prop `llenar` (un solo lugar la usaba): `cargarAlScroll` queda siempre prendido.
+3. **A validar con usuarios:** las tres columnas ya no terminan siempre a la misma altura (Appointments sigue con su
+   alto de siempre); con pocos pendientes el menú y Appointments pueden terminar más abajo que Pending Task/Pending
+   documents. Es la contracara de no dejar espacio en blanco adentro de esas dos cards.
+
+`tests/patient-overview.e2e.ts`: el test de Pending documents pasa a probar el caso chico (sin región de scroll, sin
+botón, Overdue entero visible) en vez de asumir que la caja de scroll siempre existe.
+
+## Vuelve el alto fijo: no saltar al cambiar de tab (2026-10-29)
+
+Julián, después de probar lo de arriba: "el largo del background no debe acomodarse, siempre debe tener un largo ya
+estipulado -como el que definimos al inicio-". Cambiar de tab hacía que la card creciera o se achicara según cuántos
+ítems traía esa categoría; prefiere la card de alto fijo (la del 2026-10-25) aunque eso signifique aire debajo con
+pocos ítems, antes que el salto.
+
+- Pending Task y Pending documents vuelven a ser `flex-1` (se reparten el alto que deja el menú, como el
+  2026-10-25) y `PendingTaskList` / el `ShowMore` de `PendingDocuments` vuelven a `enCaja llenarAlto` **junto con**
+  `cargarAlScroll` -la combinación con la que se armó `cargarAlScroll` en #105, antes de la vuelta de ayer-.
+- `ui/show-more` pierde el modo sin `llenarAlto` que se había sumado ayer (mostrar todo montado, cap en `maxHeight`
+  sin alto fijo): no lo usa nadie más y agregaba una rama sólo para este round-trip. `cargarAlScroll` vuelve a tener
+  sentido únicamente junto con `enCaja` + `llenarAlto`, como en #105.
+- Efecto colateral correcto: con la card dividida en dos (Pending documents arriba, Pending Task abajo) y poco alto
+  de ventana, hasta un grupo de 2 ítems puede no entrar entero y pedir scroll -ya pasaba así desde el 2026-10-25,
+  antes de todo este ida y vuelta-. No es el caso que Julián pidió evitar (ítems sin mostrar): es la caja de siempre,
+  con su scroll de siempre.
+- `tests/patient-overview.e2e.ts`: el test de Pending documents deja de asumir que con pocos ítems nunca hay región
+  de scroll (depende del alto disponible, no de la cantidad); sigue probando que las tabs filtran bien y que no hay
+  botón "Show more".
+
+## La pantalla termina donde termina Address; todo lo demás scrollea adentro (2026-10-29)
+
+Julián: "que el patient dashboard corte la pantalla cuando termina el address del paciente: la idea es ver la pantalla toda
+a simple vista, así que Pending documents y Pending Task tienen el scroll interno y siempre el mismo largo de background,
+para conservar el bento".
+
+- **Antes** el alto de la fila lo ponía el contenido del medio: con las 9 tareas montadas la página medía 1.329px y el menú del
+  paciente se estiraba 250px más allá de Address, con las cards de Pending Task enteras y sin scroll. El `flex-1` del
+  2026-10-25 no fijaba nada: sin un alto del que tirar, la card simplemente crecía con lo que traía.
+- **Ahora** el alto lo da el menú del paciente: la columna del medio es `lg:relative` con el contenido en `lg:absolute
+  inset-0`, así que no aporta alto a la fila y se acomoda adentro. Piso `lg:min-h-[56rem]` (≈ el menú expandido) para que
+  colapsado -riel de 60px- el layout no se achique ni salte al alternar. Pending documents y Pending Task se reparten
+  el alto que queda abajo de los cuatro bloques clínicos (373px cada una a 1440×900) y las tres columnas -menú,
+  centro y Appointments- cierran en la misma línea (1.077px a 1024, 1519 y 1920 de ancho). Página: 1.329 → 1.101px.
+- La grilla de abajo lleva `grid-rows-[minmax(0,1fr)]` (sin eso la fila crece con su contenido) y las cards `min-h-0`.
+- **Appointments** pasa al mismo mecanismo que Pending Task desde `lg` (`enCaja` + `llenarAlto` + `cargarAlScroll`): caja de
+  alto fijo, scroll adentro y carga por tandas, sin "Show N more". Apilado (< lg) sigue con el botón y 3 turnos.
+- Efecto buscado y ya aceptado el 2026-10-29: con pocos ítems en una tab queda aire abajo (Overdue tiene 2 documentos en
+  una card de 373px); a cambio no hay saltos de alto.
+- **A validar con usuarios:** a 1440×900 entran 2 documentos o ~2 filas de tareas antes de scrollear; si recepción trabaja
+  con muchas, subir el alto (hoy el piso es 56rem) o ceder alto a los cuatro bloques clínicos.
+- `tests/patient-overview.e2e.ts`: Pending Task ya no asume las 9 tareas montadas (arranca con 6 y suma al scrollear con
+  `scrollIntoView`); Appointments tiene su región `All appointments`.

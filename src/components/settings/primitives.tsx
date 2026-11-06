@@ -11,7 +11,15 @@ export function Card({ title, children, className }: { title?: string; children:
   )
 }
 
-export function Toggle({ label, on, onChange }: { label?: string; on: boolean; onChange: (v: boolean) => void }) {
+export function Toggle({
+  label, on, onChange, ariaLabel,
+}: {
+  label?: string
+  on: boolean
+  onChange: (v: boolean) => void
+  /** Nombre para el lector de pantalla cuando el rótulo no va arriba del switch. */
+  ariaLabel?: string
+}) {
   return (
     <div className="flex flex-col gap-2">
       {label && <span className="text-xs font-medium text-ink">{label}</span>}
@@ -19,6 +27,7 @@ export function Toggle({ label, on, onChange }: { label?: string; on: boolean; o
         type="button"
         role="switch"
         aria-checked={on}
+        aria-label={ariaLabel}
         onClick={() => onChange(!on)}
         className="flex items-center gap-2 text-[13px] text-ink"
       >

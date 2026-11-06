@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Drawer, DrawerSection, useEnDrawer, type DrawerSize } from '@/components/ui/drawer'
 import { ChevronDown, Calendar, Check, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
 import { Avatar, inicialesDe } from '@/components/ui/avatar'
+import { CountryFlag } from '@/components/ui/country-flag'
+import { OPCIONES_CODIGO, paisDe } from '@/data/paises'
 
 /* Primitivos de los formularios de Patients (Figma 3640:73356 y hermanos).
    Campo = label 12px + control de 36px, alto total 56 con gap.
@@ -98,9 +100,33 @@ const OPCIONES: Record<string, string[]> = {
 }
 const OPCIONES_GENERICAS = ['Option A', 'Option B', 'Option C']
 
+/* Abre un desplegable hacia arriba si abajo no entra y arriba hay más lugar, así no hay que scrollear el drawer para ver
+   las opciones (Julián, 2026-11-04). Mide contra el contenedor con scroll más cercano (el cuerpo del drawer) o la ventana. */
+function useHaciaArriba(ref: React.RefObject<HTMLElement | null>, abierto: boolean, alto: number) {
+  const [arriba, setArriba] = useState(false)
+  useLayoutEffect(() => {
+    if (!abierto || !ref.current) return
+    const r = ref.current.getBoundingClientRect()
+    let techo = 0
+    let piso = window.innerHeight
+    for (let el = ref.current.parentElement; el; el = el.parentElement) {
+      if (!/(auto|scroll)/.test(getComputedStyle(el).overflowY)) continue
+      const c = el.getBoundingClientRect()
+      techo = Math.max(techo, c.top)
+      piso = Math.min(piso, c.bottom)
+      break
+    }
+    const abajo = piso - r.bottom
+    setArriba(abajo < alto && r.top - techo > abajo)
+  }, [abierto, alto, ref])
+  return arriba
+}
+const MENU_ABAJO = 'top-[calc(100%+4px)]'
+const MENU_ARRIBA = 'bottom-[calc(100%+4px)]'
+
 export function SelectField({
   label, placeholder = 'Select', required, className, options,
-  value: valueProp, onChange, error, hint, disabled, hideLabel,
+  value: valueProp, onChange, error, hint, disabled, hideLabel, icono, buscable, buscarPlaceholder = 'Search',
 }: {
   label: string
   /** Rótulo sólo para lectores de pantalla (el botón lo lleva como aria-label): para una celda de tabla. */
@@ -114,8 +140,16 @@ export function SelectField({
   error?: string
   hint?: React.ReactNode
   disabled?: boolean
+  /** Algo a la izquierda de cada opción y de la elegida (la bandera de CountryCodeField). */
+  icono?: (opcion: string) => React.ReactNode
+  /** Lista larga (los 245 países): un buscador arriba de las opciones, con el foco puesto. */
+  buscable?: boolean
+  buscarPlaceholder?: string
 }) {
-  const items = options ?? OPCIONES[label] ?? OPCIONES_GENERICAS
+  const todas = options ?? OPCIONES[label] ?? OPCIONES_GENERICAS
+  const [busqueda, setBusqueda] = useState('')
+  const q = busqueda.trim().toLowerCase()
+  const items = buscable && q ? todas.filter((o) => o.toLowerCase().includes(q)) : todas
   const [interno, setInterno] = useState<string | null>(null)
   const controlado = onChange !== undefined
   /* '' cuenta como vacío: si no, el botón se queda sin placeholder. */
@@ -123,6 +157,15 @@ export function SelectField({
   const setValue = (v: string) => (controlado ? onChange!(v) : setInterno(v))
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const arriba = useHaciaArriba(ref, open, Math.min(todas.length * 36 + 8, 224) + (buscable ? 44 : 0) + 4)
+  const lista = useRef<HTMLDivElement>(null)
+
+  /* Al abrir, la lista arranca en la opción elegida (en 245 países, la de Estados Unidos queda lejos) y sin búsqueda. */
+  useLayoutEffect(() => {
+    if (!open) { setBusqueda(''); return }
+    const elegida = lista.current?.querySelector<HTMLElement>('[data-elegida]')
+    if (elegida && lista.current) lista.current.scrollTop = elegida.offsetTop - lista.current.clientHeight / 2
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -156,30 +199,64 @@ export function SelectField({
             value ? 'text-ink' : 'text-ink-faint',
           )}
         >
-          <span className="min-w-0 truncate text-left">{value ?? placeholder}</span>
+          <span className="flex min-w-0 items-center gap-2">
+            {value && icono?.(value)}
+            <span className="min-w-0 truncate text-left">{value ?? placeholder}</span>
+          </span>
           <ChevronDown className={cn('size-4 shrink-0 text-black transition-transform', open && 'rotate-180')} />
         </button>
         {open && (
-          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 max-h-56 w-full overflow-y-auto rounded-md border border-line bg-white py-1 shadow-lg">
+          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex w-full flex-col overflow-hidden rounded-md border border-line bg-white shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
+            {buscable && (
+              <div className="border-b border-line p-1.5">
+                <div className="relative">
+                  <Search aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
+                  <input
+                    autoFocus
+                    aria-label={`Search ${label}`}
+                    placeholder={buscarPlaceholder}
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && items[0]) { e.preventDefault(); setValue(items[0]); setOpen(false) } }}
+                    className="h-8 w-full rounded-md border border-line bg-white pr-2 pl-8 text-[13px] placeholder:text-ink-faint focus:border-dash-blue focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
+            <div ref={lista} className="relative max-h-56 overflow-y-auto py-1">
+            {!items.length && <p className="px-3 py-4 text-center text-xs text-ink-muted">No matches.</p>}
             {items.map((o) => (
               <button
                 key={o}
                 type="button"
+                data-elegida={value === o || undefined}
                 onClick={() => { setValue(o); setOpen(false) }}
                 className={cn(
                   'flex w-full items-center justify-between px-3 py-2 text-left text-[13px] hover:bg-surface-muted',
                   value === o && 'text-dash-blue font-medium',
                 )}
               >
-                {o}
-                {value === o && <Check className="size-3.5" />}
+                <span className="flex min-w-0 items-center gap-2">{icono?.(o)}{o}</span>
+                {value === o && <Check className="size-3.5 shrink-0" />}
               </button>
             ))}
+            </div>
           </div>
         )}
       </div>
       {pie(error, hint)}
     </div>
+  )
+}
+
+/* El código de país de un teléfono: los 245 países, con su bandera y un buscador por nombre o código (Julián,
+   2026-11-04; patients.md). Un valor viejo ("+1", "(+1) United States of America (the)") se muestra como su país. */
+export function CountryCodeField({ label = 'Country Code', value, ...props }: Omit<React.ComponentProps<typeof SelectField>, 'icono' | 'label' | 'options' | 'buscable'> & { label?: string }) {
+  return (
+    <SelectField
+      {...props} label={label} options={OPCIONES_CODIGO} buscable buscarPlaceholder="Search country or code"
+      value={value && (paisDe(value)?.opcion ?? value)} icono={(o) => <CountryFlag opcion={o} />}
+    />
   )
 }
 
@@ -299,6 +376,52 @@ export function LinkPersonCheckbox(props: Omit<React.ComponentProps<typeof Optio
   )
 }
 
+/* Un grupo de campos que se pliega: cerrado muestra el título y un resumen de lo cargado, así un formulario largo (el
+   contacto y la dirección del guardián) no estira el paso. Con algo por corregir se abre solo y queda en rojo.
+   patients.md, 2026-11-04. */
+export function CollapsibleFields({
+  title, required, summary, error, defaultOpen = false, children,
+}: {
+  title: string
+  required?: boolean
+  /** Lo cargado en una línea ("+1 (324) 359-6750"), o qué falta cargar. */
+  summary: string
+  /** Hay un campo adentro con error: abre el grupo y lo pinta de rojo. */
+  error?: boolean
+  defaultOpen?: boolean
+  children: React.ReactNode
+}) {
+  const [abierto, setAbierto] = useState(defaultOpen || !!error)
+  /* Se abre en el mismo render en que aparece el error, así el foco llega al campo (useFormPaciente.enfocar). */
+  const [errorPrevio, setErrorPrevio] = useState(error)
+  if (error !== errorPrevio) {
+    setErrorPrevio(error)
+    if (error) setAbierto(true)
+  }
+  const id = useId()
+  return (
+    <div className={cn('rounded-lg border bg-white', error ? 'border-field-error' : 'border-line')}>
+      <button
+        type="button"
+        aria-expanded={abierto}
+        aria-controls={id}
+        onClick={() => setAbierto((v) => !v)}
+        className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dash-blue"
+      >
+        <span className="min-w-0 flex-1 leading-tight">
+          <span className="block text-[13px] font-semibold text-ink">
+            {title}
+            {required && <span className="text-required">*</span>}
+          </span>
+          <span className={cn('mt-0.5 block truncate text-xs', error ? 'text-field-error' : 'text-ink-muted')}>{summary}</span>
+        </span>
+        <ChevronDown aria-hidden className={cn('size-4 shrink-0 text-ink transition-transform', abierto && 'rotate-180')} />
+      </button>
+      {abierto && <div id={id} className="border-t border-line p-3 pt-4">{children}</div>}
+    </div>
+  )
+}
+
 /* Input con lupa y sugerencias, el patrón de los modales clínicos del Figma
    (3648:59976 y hermanos): el campo principal siempre es una búsqueda. */
 export function SearchField({
@@ -400,7 +523,7 @@ function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?:
    "Elegida" sale sólo de comparar `value` contra `personas` (no hay estado propio): basta con que lo tipeado sea
    exactamente un nombre de la lista. Ver design-reference/design-system.md. */
 export function PersonSearchField({
-  label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas,
+  label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas, emptyText,
 }: {
   label: string
   required?: boolean
@@ -415,6 +538,8 @@ export function PersonSearchField({
   disabled?: boolean
   /** Las líneas de abajo de una persona ("DOB: …", "Email: …"); sin esto, la card sólo lleva el nombre. */
   lineas?: (nombre: string) => string[] | undefined
+  /** Qué decir si lo escrito no coincide con nadie; sin esto, no se abre nada. */
+  emptyText?: string
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -422,6 +547,7 @@ export function PersonSearchField({
   const sugerencias = !elegida && value.trim()
     ? personas.filter((p) => p.toLowerCase().includes(value.trim().toLowerCase()))
     : []
+  const arriba = useHaciaArriba(ref, abierto && sugerencias.length > 0, Math.min(sugerencias.length * 60 + 8, 288) + 4)
 
   useEffect(() => {
     if (!abierto) return
@@ -440,6 +566,7 @@ export function PersonSearchField({
         <input
           value={value}
           placeholder={placeholder}
+          aria-label={label}
           aria-invalid={!!error || undefined}
           disabled={disabled}
           onChange={(e) => { onChange?.(e.target.value); setAbierto(true) }}
@@ -447,7 +574,7 @@ export function PersonSearchField({
           className={cn(control(error), 'h-9 pr-3 pl-9')}
         />
         {abierto && sugerencias.length > 0 && (
-          <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg">
+          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
             {sugerencias.map((nombre) => (
               <button
                 key={nombre}
@@ -460,6 +587,11 @@ export function PersonSearchField({
               </button>
             ))}
           </div>
+        )}
+        {abierto && emptyText && !elegida && value.trim() && !sugerencias.length && (
+          <p role="status" className="absolute top-[calc(100%+4px)] left-0 z-30 w-full rounded-md border border-line bg-white px-3 py-6 text-center text-xs text-ink-muted shadow-lg">
+            {emptyText}
+          </p>
         )}
       </div>
       {pie(error, hint)}
@@ -535,7 +667,8 @@ export function TextArea({
   rows?: number
 }) {
   return (
-    <div className={cn('flex flex-col gap-2', className)}>
+    /* Un <label> como TextField: el rótulo nombra al campo para el lector de pantalla y lo enfoca al tocarlo. */
+    <label className={cn('flex flex-col gap-2', className)}>
       <FieldLabel required={required}>{label}</FieldLabel>
       <textarea
         rows={rows}
@@ -547,7 +680,7 @@ export function TextArea({
         className={cn(control(error), 'resize-none px-3 py-2')}
       />
       {pie(error, hint)}
-    </div>
+    </label>
   )
 }
 

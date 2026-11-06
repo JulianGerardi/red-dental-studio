@@ -3,7 +3,218 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-04
+
+### Calendarios con año editable y Country Code con todos los países ([#121](https://github.com/JulianGerardi/red-dental-studio/pull/121))
+- **Todos los calendarios**: el año del encabezado se escribe (↑/↓ suma o resta uno); ya no hace falta ir con las flechas.
+- **Country Code** en toda la app (Guardian, Settings, finanzas): los **245 países** con su **bandera**, de la A a la Z y con
+  buscador por nombre o código. Formato "(+54) Argentina"; un valor viejo ("+1") se muestra como su país.
+- Los selects abren **hacia arriba** si abajo no entran (también las sugerencias del buscador de personas).
+- Guardian: el resumen de *Contact Information* muestra el teléfono aunque esté incompleto.
+- **Para el dev:** `CountryCodeField` (`patients/form.tsx`) reemplaza a `SelectField label="Country Code"` y ya no recibe
+  `options`. `SelectField` suma `icono` y `buscable`. Datos en `src/data/paises.ts` (`PAISES_TEL`, `paisDe`, `codigoDe`);
+  bandera en `ui/country-flag.tsx`. Dependencia nueva `country-flag-icons`; `vite.config` no incrusta sus SVG en el JS.
+  Detalle en `patients.md` (2026-11-04). Sin Storybook todavía.
+
+### New Patient: Guardian para menores, como en 2.0 y con desplegables ([#120](https://github.com/JulianGerardi/red-dental-studio/pull/120))
+- **CON-2858.** El paso **Guardian** (pestaña en Edit Patient) aparece sólo si el paciente es **menor de 18** y en el alta es
+  obligatorio (*This patient is a minor and must have at least one guardian assigned.*). Adulto: General → Demography.
+- Guardian: buscador de personas del sistema (elegida, no se le piden datos) o **Add New Person**, con sus datos en tres
+  desplegables con resumen: *Personal Information* (abierto), *Contact Information* y *Address Information* (cerrados;
+  se abren solos si falta algo). Después, *This person is also a guarantor* y *Relationship to Patient* (relaciones de 2.0).
+- General: primero *Use this option only to link a person…*, después los datos y la cuenta del portal debajo del email.
+  **Interpreter Required pasa a Demography.**
+- **Para el dev:** pieza nueva `CollapsibleFields` (`patients/form.tsx`). `DatosPaciente` pierde `guardian` y suma
+  `guardianNuevo`, `gFirst…gZip` y `guardianGarante`. `useFormPaciente(inicial, { portalVinculado, guardianMenor, nacimiento })`
+  devuelve `menor` y `secciones`; `limpiarPaciente(d, menor)`. `PersonSearchField` ahora tiene `aria-label`. Detalle en
+  `patients.md` (2026-11-04). Sin Storybook todavía.
+
+### Billing Profile: Primary Provider con Save, textos más cortos y carriers de la A a la Z ([#119](https://github.com/JulianGerardi/red-dental-studio/pull/119))
+- **CON-4004 / CON-4007.** *Is a Primary Provider* vuelve a aplicarse con el **Save** de la ficha (revierte lo del #118):
+  la pestaña *Insurance / Billing Profile* aparece al guardar en Yes. Guardarlo en No pregunta **Deactivate Primary
+  Provider?** (Cancel · Deactivate); el Cancel del pie descarta.
+- Perfil inactivo: el aviso queda sólo con *This billing profile is inactive and cannot be edited.* Credenciales: *Tax
+  identification type* y *number* en la misma fila. Alta de Location: sin *The profile is enabled only after you save.* ni
+  *The location keeps operating*; *Complete the information…* pasa a `Alert` warning.
+- Mock: 31 carriers nuevos en `ASEGURADORAS` (36, de la A a la Z) para ver Contracted With completo con su scroll interno.
+- **Para el dev:** en `Employees.tsx`, `toggles.primario` es borrador y `guardar()` aplica `guardarPrimario` (con
+  `ConfirmDialog` si se apaga). `CamposCredenciales`: el select de tipo lleva `sm:col-start-1`. Detalle en
+  `billing-profile.md` (2026-11-04). Sin Storybook todavía.
+
+## 2026-11-03
+
+### Insurance / Billing Profile en Location y provider ([#118](https://github.com/JulianGerardi/red-dental-studio/pull/118))
+- **CON-4021 · CON-4026 · CON-4027 · CON-4028.** Location suma la pestaña *Insurance / Billing Profile*: el switch *Use this
+  Location as a Billing Provider* abre la configuración (NPI y TIN/SSN obligatorios) y se habilita con *Save and enable*.
+  Activo: nombre editable, *Replace* de dirección/teléfono, drawer *Billing credentials* y *Contracted With*. Apagarlo
+  pregunta y lo deja de lectura; reactivar conserva los contratos.
+- **CON-4004 · CON-4005 · CON-4006 · CON-4007.** *Is a Primary Provider* (Provider Info) se aplica al switchear: prender crea
+  o reactiva el perfil y muestra la pestaña; apagar pregunta y lo deja de lectura. Nombre, NPI y TIN/SSN de lectura.
+- **CON-4033.** *Contracted With* lista los carriers de Settings › Billing; el que no tiene relación cuenta como *Not
+  contracted*, así que uno nuevo aparece solo.
+- **Para el dev:** nuevos `settings/BillingProfile.tsx` (piezas compartidas), `LocationBillingProfile.tsx`,
+  `ProviderBillingProfile.tsx` y el store `data/billingProfilesStore.tsx` (`BillingProfilesProvider` envuelve Settings).
+  `Toggle` suma `ariaLabel`. Cada card guarda por separado y salir con cambios pregunta. e2e en
+  `tests/billing-profile.e2e.ts`. Detalle en `billing-profile.md`. Sin Storybook todavía.
+
+### Relationships: sin archivado, Delete con confirmación y Contact sólo cuando falta ([#117](https://github.com/JulianGerardi/red-dental-studio/pull/117))
+- **CON-4000.** Se retiraron Archive/Reactivate, el filtro `Active | Archived`, la pill *Archived* y el aviso de relación
+  archivada en Add Relationship (las historias de archivar están canceladas).
+- **CON-3999.** Vuelve *Delete relationship* con confirmación (*This action cannot be undone.*, Cancel / Delete en rojo).
+  Borrado físico: el toast no ofrece Undo.
+- **CON-3174.** Add Relationship pide el paso **Contact** con persona nueva o con una existente sin teléfono/dirección (email
+  precargado); si ya los tiene, el drawer queda en Person · Relationship y la card usa su contacto.
+- **Para el dev:** `MenuAcciones`/`PersonaCard` usan `onEdit`/`onDelete`; `RelationshipDialogs.tsx` suma
+  `DeleteRelationshipDialog` y saca `ArchiveRelationshipDialog`, `ReactivateRelationshipDrawer` y `RelacionArchivada`;
+  `AddRelationshipDrawer` ya no recibe `archivadas`/`onReactivar`. `PersonaDirectorio` suma `telefono` y `direccion`
+  opcionales. Detalle en `relationships.md` (2026-11-03). Sin Storybook todavía.
+
+## 2026-11-02
+
+### Clinical Mode: una sola card de Informed Consent y Back del consentimiento vuelve al historial ([#116](https://github.com/JulianGerardi/red-dental-studio/pull/116))
+- **CON-4052.** Al pasar de un caso a otro en el rail se apilaba una card de Informed Consent más (el bloque y la vista del
+  caso compartían la misma `key`). Ahora hay **una sola card por caso**; versiones y consentimientos de cada procedimiento
+  viven en Consent history (el reloj).
+- Si un consentimiento se abre desde el Consent history, **Back vuelve a ese drawer**; desde la columna Consent o Sign now
+  sigue volviendo al caso.
+- **Para el dev:** el `ConsentBlock` lleva `key="consentimiento-<id>"`. `ConsentBlock` acepta `historial` / `onHistorial`
+  (controlado desde `TreatmentPlanSection`; sin ellos funciona solo, como en las stories) y
+  `abrirConsentimiento(id, desdeHistorial)`. Detalle en `clinical-mode.md` (2026-11-02). Sin Storybook todavía.
+
+### New Patient: vincular a una persona que ya existe en el sistema ([#115](https://github.com/JulianGerardi/red-dental-studio/pull/115))
+- En el paso General, *Use this option only to link a person that already exists in the system* cambia nombre,
+  nacimiento y email por el buscador **Person\*** (empleados, contactos y suscriptores; quien ya es paciente no aparece).
+  Al guardar, el paciente toma los datos de la persona elegida. Sin historia propia en Jira (relacionada: CON-2858).
+- **Para el dev:** `src/data/personas.ts` es nuevo (`PERSONAS_SISTEMA`); `DIRECTORIO` se mudó ahí y
+  `AddRelationshipDrawer` lo reexporta. `CamposGeneral` suma la prop opcional `vinculo` (sólo New Patient) y
+  `PersonSearchField` suma `emptyText`. e2e nuevo: `tests/new-patient.e2e.ts`.
+
+### Clinical Mode: el bloque Informed Consent con las firmas en su propia fila ([#114](https://github.com/JulianGerardi/red-dental-studio/pull/114))
+- **CON-4052.** En el bloque Informed Consent de un caso, el título con su estado queda arriba con los íconos de historial
+  y menú ⋮ a la derecha, y **Patient y Provider van en una fila propia debajo**, con el nombre siempre visible (antes se
+  escondía con la card angosta). Mismo orden en escritorio y celular.
+- **Para el dev:** `ConsentBlock.tsx` ya no usa `@container` ni el `sr-only @5xl:not-sr-only` de `FilaFirma`; las firmas
+  van en un `span` con `basis-full`. Detalle en `clinical-mode.md` (2026-11-02). Sin Storybook todavía.
+
+### Clinical Mode: acciones del procedimiento según su estado, columna Consent y firma del consentimiento ([#113](https://github.com/JulianGerardi/red-dental-studio/pull/113))
+- **CON-4052.** El menú ⋮ de un procedimiento muestra, oculta o deshabilita Edit, Start, Complete, Refer, Discard,
+  Discontinue y Delete según su estado y el del plan (Treatment Plan, Unassigned y Procedures del Overview). Start y
+  Complete quedan deshabilitados, con tooltip, mientras el plan se planea (Planning, Pending, Presented) o espera el
+  consentimiento; un plan descartado, cancelado o vencido sólo deja Edit.
+- **Columna Consent** en las tablas de procedimientos (plan aceptado en adelante): abre el consentimiento del
+  procedimiento (Not generated, Not sent, Pending, Signed, Not required).
+- **Start y Complete** pasan por *Consent required*. **Sign now lleva a la pantalla del consentimiento** (ya no abre un
+  drawer); con las dos firmas se confirma el cambio, y Back lo deja como estaba. Complete va directo al consentimiento
+  (ya no pasa por *Complete Procedure*).
+- **Pantalla del consentimiento** como red.dev: documento a todo el ancho y Patient Signature / Provider Signature en un
+  **pop up de portal** (`ui/dialog`, excepción a "pop ups = drawer": representa una página externa).
+- **Historial (el reloj)**: una sola línea de tiempo con el consentimiento del caso y el de cada procedimiento.
+- **Para el dev:** `src/components/clinical/accionesProcedimiento.tsx` (matriz `accionesDe(estado, contexto)`, `ItemsAcciones`,
+  diálogos Edit / Refer / Discard / Discontinue / Delete) y `ConsentDetail.tsx` (pantalla, `FirmaPaciente`, `FirmaProveedor`)
+  son nuevos; `useFlujoConsentimiento` ahora recibe `onFirmar(ids, verbo)` para llevar al detalle. `EstadoCaso` suma
+  In progress, Cancelled y Expired; `Procedimiento` suma `consentimiento`, `firmas`, `rubricas`, `nota`. Rollback ya no
+  existe para procedimientos. Las variantes del prototipo son datos reales (casos c5 y c9, Unassigned); `?consent=<id>`
+  abre el consentimiento de un procedimiento. Detalle en `clinical-mode.md` (2026-11-02). Sin Storybook todavía.
+
+## 2026-10-30
+
+### Insurance llena el alto del menú y scrollea adentro ([#112](https://github.com/JulianGerardi/red-dental-studio/pull/112))
+- Insurance había quedado desactualizada frente a Treatments, Ledger y Documents (2026-10-25): scrolleaba la página
+  entera y el menú del paciente se iba con ella. Ahora la tabla de planes y los dos paneles de abajo llenan el alto
+  que deja el menú y scrollean adentro, igual que esas tres pantallas.
+- De paso, **"Manage Subscription" baja al piso de su card** para quedar a la misma altura que Cancel/Save del
+  panel de al lado.
+- **Para el dev:** `src/pages/patients/Insurance.tsx` suma el wrapper `flex flex-col` y el mismo truco de
+  `lg:relative/flex-1` + `lg:absolute/inset-0/overflow-y-auto` de `Treatments.tsx`; el botón Manage Subscription pasa
+  de `mt-5` a `mt-auto`. Nuevo e2e en `tests/patient-dashboard.e2e.ts`. Detalle en `insurance.md` (2026-10-30).
+
+## 2026-10-29
+
+### Clinical Mode: el panel del examen estira el fondo hasta Findings ([#111](https://github.com/JulianGerardi/red-dental-studio/pull/111))
+- En los exámenes (Extra Oral, Intra Oral, DentAssmt, los "Planned") el panel de la derecha quedaba corto frente a la
+  lista de Findings y dejaba ver el gris de la página debajo. Ahora las dos columnas se estiran a la altura de la más
+  alta y el fondo de cada panel (blanco, o el punteado de Extra/Intra Oral) llega hasta el borde.
+- **Para el dev:** `ExamLayout` pasa de `lg:items-start` a `lg:items-stretch` y envuelve `children` en un `div
+  flex-1`; `RegionExam`, `DentalAssessmentExam` y el `enConstruccion` de `ClinicalMode` suman `h-full`. Vitals
+  (sin columna de Findings) no cambia. Detalle en `clinical-mode.md` (2026-10-29).
+
+### Treatment Plan: Estimate details desde el Total Amount ([#110](https://github.com/JulianGerardi/red-dental-studio/pull/110))
+- **CON-3710 / CON-2529.** El *Total Amount* del caso y el *Total amount* de las cards del Overview de Clinical Mode
+  abren **Estimate details**: cinco totales y el desglose por visita y procedimiento (Amount charged, Allowable amount,
+  Coverage %, Copayment, Deductible applied, Insurance portion, Insurance adjustment, Patient portion).
+- Estados: Not calculated, Up to date, Update needed, Updating…, Update failed y Locked. Sólo se calcula en Planning
+  (actualiza todas las alternativas del grupo); mover un procedimiento de visita la deja desactualizada y el caso
+  muestra *Ins. est. update available*, que confirma con el modal de CON-2529.
+- **Para el dev:** `components/clinical/EstimateDetails.tsx` (`EstimateDetails`, `PrototypeControls`, `situacionDe`,
+  `estimacionEditable`) y `data/estimaciones.ts` (cálculo **mock** por categoría del CDT; el real es el de CON-2041).
+  **`PrototypeControls` es de demo y no va a producto.** `PlanCard` pasa a `div` con un botón que la cubre y otro encima
+  para el total. El `total` de cada caso ahora sale de la suma de sus fees. Storybook sin actualizar. Detalle en
+  `clinical-mode.md` (2026-10-28).
+
+### Clinical Mode: la tabla del Overview flota; Patient Dashboard termina en Address ([#109](https://github.com/JulianGerardi/red-dental-studio/pull/109))
+- **Clinical Mode, Overview:** la Problem List / Procedures ya no va fija debajo del chart: se abre flotando desde el botón
+  *View Problem List* (ícono de tabla), el mismo y en el mismo lugar que en los exámenes. La pantalla entra sin scroll en
+  ventanas de ~1080px de alto.
+- **Patient Dashboard:** la pantalla termina donde termina Address (el alto lo da el menú del paciente). Pending documents,
+  Pending Task y Appointments scrollean adentro con alto fijo y cierran en la misma línea; Appointments ya no lleva
+  "Show N more" desde `lg`, carga al scrollear.
+- **Para el dev:** pieza nueva `ProblemListFlotante` (`components/clinical/ProblemListFlotante.tsx`), que `ExamLayout` y
+  el Overview comparten. En `PatientDetail.tsx` la columna del medio es `lg:relative` con el contenido en `lg:absolute
+  inset-0` y la fila lleva `lg:min-h-[56rem]`. Los e2e que usaban la tabla del Overview abren primero *View Problem
+  List*. Storybook sin actualizar. Detalle en `clinical-mode.md` y `patient-dashboard.md` (2026-10-29).
+
+### Pending Task/documents: vuelve el alto fijo, no salta al cambiar de tab ([#108](https://github.com/JulianGerardi/red-dental-studio/pull/108))
+- Revierte el punto de "sin espacio en blanco" del PR anterior: cambiar de tab hacía crecer o achicar la card según
+  cuántos ítems traía esa categoría. Pending Task y Pending documents vuelven al alto fijo del 2026-10-25 -se
+  reparten el alto que deja el menú, sin acomodarse al total-, combinado con la carga al scrollear sin botón.
+- **Para el dev:** `ui/show-more` pierde el modo de `cargarAlScroll` sin `llenarAlto` que se había sumado para esto
+  (nadie más lo usaba); vuelve a tener sentido sólo junto con `enCaja` + `llenarAlto`, como en #105. Detalle en
+  `patient-dashboard.md` (2026-10-29).
+
+### Pending Task: tabs en vez de Filter; sin tab Activity; sin espacio en blanco ([#107](https://github.com/JulianGerardi/red-dental-studio/pull/107))
+- Pending Task (Dashboard y Patient Dashboard) filtra por tipo con **tabs** en vez del Filter -vuelve el camino que
+  el Dashboard había dejado por el embudo (2026-08-28)-. Pending documents cambia sus tabs de *All/Patient/Office* a
+  **Overdue / Due this week / Later**, las mismas categorías que ya agrupaban la lista.
+- Sale el tab *Pending Task / Activity* del Patient Dashboard (nunca tuvo una vista de Activity armada): el tab de
+  tipo queda solo, a la derecha del título.
+- Pending Task y Pending documents ya no fuerzan su alto al de Appointments: miden lo que pide su contenido, sin
+  espacio de más, y recién pasado un alto máximo (~640px) entra el scroll interno.
+- **Para el dev:** `ui/show-more` suma un modo de `cargarAlScroll` sin `llenarAlto` -sin alto fijo del que tirar,
+  monta todas las filas de una (nada de tandas) y cap en `maxHeight`-; antes sólo tenía sentido junto con
+  `llenarAlto`. `PendingDocuments` pierde la prop `llenar`. Detalle en `dashboard.md` y `patient-dashboard.md`
+  (2026-10-29).
+
 ## 2026-10-28
+
+### Pending documents: la misma funcionalidad de scroll que Pending Task ([#106](https://github.com/JulianGerardi/red-dental-studio/pull/106))
+- El **Show more** de Pending documents se veía mal (no se notaba que había más cards). Ahora tiene la misma
+  funcionalidad que Pending Task: sin botón, la caja arranca scrolleable y carga el resto sola al acercarse al final.
+- **Para el dev:** `PendingDocuments.tsx` suma `cargarAlScroll={llenar}` a su `ShowMore` (mismo condicional que ya
+  usaba `enCaja`/`llenarAlto`/`filas`). No hay prop ni componente nuevo: es la pieza de `ui/show-more` que se armó
+  para el PR anterior. Detalle en `patient-dashboard.md` (2026-10-28).
+
+### Patient Dashboard: Pending Task filtra por tipo y carga al scrollear ([#105](https://github.com/JulianGerardi/red-dental-studio/pull/105))
+- Pending Task del Patient Dashboard suma el mismo **Filter** por tipo que ya usa el Dashboard (checkboxes Clinical
+  Note / Lab Orders / Prescriptions / Referrals, nada tildado muestra todo), junto a los tabs Pending Task / Activity.
+- La lista ya no tiene botón **"Show N more"**: la caja arranca scrolleable y, al acercarse al final, suma otra tanda
+  de tareas sola, hasta mostrarlas todas.
+- **Para el dev:** `ui/show-more` suma la prop `cargarAlScroll` (sólo tiene sentido junto con `enCaja` + `llenarAlto`);
+  por ahora sólo la usa `PendingTaskList` del Patient Dashboard (`PatientDetail.tsx`) — Pending documents y el Pending
+  Task del Dashboard siguen con el botón. El mock `TASKS` de `PatientDetail.tsx` pasa de ser las 9 tareas "Referrals"
+  a repartirse entre los cuatro tipos. Detalle, anomalía de Jira anotada y qué validar con usuarios en
+  `patient-dashboard.md` (2026-10-28).
+
+### Extraoral e Intraoral: sin región elegida no se carga nada; New Procedure va a la región ([#104](https://github.com/JulianGerardi/red-dental-studio/pull/104))
+- Como en red.dev: en Extra Oral e Intra Oral, Add Condition y Add Procedure sin región elegida en el gráfico no
+  abren el drawer y avisan "Select at least one area on the chart to add a condition/procedure." (texto provisorio:
+  no se pudo copiar el de red.dev).
+- Add Procedure en esos exámenes ya no abre el New Procedure de diente: muestra las regiones elegidas como chips, sin
+  alcance por diente ni Surfaces, y guarda el área de tratamiento Extra Oral / Intra Oral. Si se sacan todas las
+  regiones dentro del drawer, no deja guardar.
+- Se va "Not Localized" (lo pedían CON-1398/CON-1401; conflicto anotado en `clinical-mode.md`, 2026-10-28). La card
+  del finding ya no muestra "Descriptors:" vacío.
+- **Para el dev:** `ExamLayout` suma la prop `regiones` (`RegionesElegidas`) y `NewProcedureDrawer`, `regiones` /
+  `onRemoveRegion`. Storybook sin actualizar (pendiente de que Julián lo pida).
 
 ### Edit Finding: el nombre sin el ícono del diente, que ya va en la fila del área ([#103](https://github.com/JulianGerardi/red-dental-studio/pull/103))
 - En el Edit Finding de una condition en un diente, la fila del nombre ya no repite el ícono del diente: va una sola

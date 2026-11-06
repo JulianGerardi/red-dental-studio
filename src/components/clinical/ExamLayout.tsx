@@ -1,12 +1,11 @@
-import { createContext, Fragment, useContext, useState, type ReactNode } from 'react'
-import { Plus, Stethoscope, Table2, type LucideIcon } from 'lucide-react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
+import { Plus, Stethoscope, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
-import { ProblemList } from '@/components/clinical/ProblemList'
-import { NavegacionClinica, registroDeHallazgo, useVerRegistro } from '@/components/clinical/RecordDetail'
+import { ProblemListFlotante } from '@/components/clinical/ProblemListFlotante'
+import { registroDeHallazgo, useVerRegistro } from '@/components/clinical/RecordDetail'
 import { ExamPanelHeader } from './dental/ExamPanelHeader'
 import { ReviewList, type ExamReview } from './dental/ReviewList'
 import { ReviewExamDialog } from './dental/ReviewExamDialog'
@@ -43,10 +42,9 @@ const INITIAL_REVIEWS: ExamReview[] = [
 
 /* Las acciones de todos los exámenes: blancas, y al pasar el mouse se abren con su texto como Exit clinical Mode. El
    tooltip no repite el nombre, que ya se lee en el botón: dice qué hace. */
-const ACCIONES_EXAMEN: { label: string; ayuda: string; icono: LucideIcon; modo?: 'procedure' | 'condition' }[] = [
+const ACCIONES_EXAMEN: { label: string; ayuda: string; icono: LucideIcon; modo: 'procedure' | 'condition' }[] = [
   { label: 'Add Procedure', ayuda: 'Chart a planned procedure', icono: Plus, modo: 'procedure' },
   { label: 'Add Condition', ayuda: 'Chart a condition or work the patient already has', icono: Stethoscope, modo: 'condition' },
-  { label: 'View Problem List', ayuda: "Open the patient's problem list", icono: Table2 },
 ]
 const BOTON_ACCION = cn(BOTON_EXPANDIBLE, 'border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle')
 
@@ -73,7 +71,10 @@ export const useUltimaCondicion = () => useContext(FindingsCtx)?.ultima ?? ULTIM
    Intraoral: por región, no por diente). Sin provider (un story), nada -ese examen no corre fuera de ClinicalMode. */
 export const useFindingsEstado = () => useContext(FindingsCtx)
 
-export function ExamLayout({ findings: conFindings = true, examen, extra, onCondicion, children }: {
+/** Extraoral e Intraoral: las regiones elegidas en el gráfico, sobre las que se carga lo nuevo. */
+export type RegionesElegidas = { elegidas: string[]; quitar: (region: string) => void; limpiar: () => void; tipo: 'Extraoral' | 'Intraoral' }
+
+export function ExamLayout({ findings: conFindings = true, examen, extra, onCondicion, regiones, children }: {
   /** El panel de Findings a la izquierda. Vitals no lo lleva. */
   findings?: boolean
   /** El examen, como lo nombra la Problem List: es el Source exam de lo que se carga acá. */
@@ -83,6 +84,9 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
   /** Reemplaza el drawer genérico de Add Condition (NewProcedureDrawer, por diente) por el propio del examen -
      Extraoral e Intraoral cargan por región, no por pieza. Ver ExtraOralExam.tsx. */
   onCondicion?: () => void
+  /** Con regiones, Add Procedure y Add Condition piden al menos una elegida (red.dev, Julián 2026-10-28) y New
+     Procedure se carga sobre ellas en vez de sobre un diente. */
+  regiones?: RegionesElegidas
   children: ReactNode
 }) {
   /* Fuera de ClinicalMode (un story) no hay provider: el examen usa su propio estado. */
@@ -92,35 +96,44 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
   const [procedureOpen, setProcedureOpen] = useState<'procedure' | 'condition' | null>(null)
   const [editing, setEditing] = useState<Finding | null>(null)
   const [confirming, setConfirming] = useState<{ action: Exclude<FindingAction, 'edit'>; finding: Finding } | null>(null)
-  const [problemas, setProblemas] = useState(false)
-  const ir = useContext(NavegacionClinica)
   /* View full record de cada finding: el drawer de la Problem List, sin salir del examen. */
   const { ver, drawer } = useVerRegistro()
 
   function saveProcedure(draft: ProcedureDraft) {
     const id = `F-${Date.now()}`
-    const tooth = draft.tooth
+    const tooth = regiones ? null : draft.tooth
     const esCondicion = procedureOpen === 'condition'
+    const area = regiones ? regiones.elegidas.join(', ') : tooth !== null ? `Tooth ${tooth}` : draft.area
     const descriptorTexto = esCondicion ? textoDescriptores(draft.descriptors) : ''
     setFindings((f) => [
       {
         id,
-        area: tooth !== null ? `Tooth ${tooth}` : draft.area,
+        area,
         condition: `${draft.procedure.code} - ${draft.procedure.label}`,
-        descriptor: descriptorTexto || draft.surfaces.join(', ') || draft.scope,
+        descriptor: descriptorTexto || draft.surfaces.join(', ') || (regiones ? '' : draft.scope),
         date: HOY, status: draft.status === 'Existing' ? 'Externally Treated' : 'Active', tooth, provider: 'Elena Martinez',
         surfaces: draft.surfaces, notes: '', linked: draft.linked, diagnoses: draft.diagnoses, examen,
         kind: procedureOpen ?? 'procedure', descriptors: esCondicion ? draft.descriptors : undefined,
         fee: esCondicion ? undefined : precioUcr(draft.procedure.code),
-        treatmentArea: areaDeAlcance(draft.scope, draft.area, tooth),
+        treatmentArea: regiones ? { tipo: regiones.tipo, valor: area } : areaDeAlcance(draft.scope, draft.area, tooth),
       },
       ...f,
     ])
     if (procedureOpen === 'condition') {
       setUltima({ condicion: draft.procedure.label, actualizado: new Date().toLocaleDateString('en-GB'), pieza: tooth, examen })
     }
-    aviso.ok(`${draft.procedure.code} charted as ${draft.status.toLowerCase()} on ${tooth !== null ? `tooth ${tooth}` : draft.area.toLowerCase()}.`)
+    aviso.ok(`${draft.procedure.code} charted as ${draft.status.toLowerCase()} on ${regiones ? area : tooth !== null ? `tooth ${tooth}` : draft.area.toLowerCase()}.`)
     return id
+  }
+
+  /** Add Procedure / Add Condition. En Extraoral e Intraoral, sin región elegida avisa en vez de abrir. */
+  function abrir(modo: 'procedure' | 'condition') {
+    if (regiones && !regiones.elegidas.length) {
+      aviso.warn(`Select at least one area on the chart to add a ${modo}.`)
+      return
+    }
+    if (modo === 'condition' && onCondicion) onCondicion()
+    else setProcedureOpen(modo)
   }
 
   /** Link to finding / Link to diagnosis: se guardan sobre el procedimiento ya cargado con saveProcedure. */
@@ -158,7 +171,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
     : []
 
   return (
-    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-start">
+    <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-stretch">
       {conFindings && (
         <div className="order-2 flex w-full shrink-0 flex-col gap-3 rounded-lg bg-white shadow-panel p-3 lg:order-1 lg:w-[300px]">
           <ExamPanelHeader tab={reviewState.tab} onTabChange={reviewState.setTab} onNewReview={reviewState.openDialog} />
@@ -181,43 +194,23 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
         {/* Las acciones arriba del contenido del examen. La Problem list se abre flotando, sin cambiar de vista. */}
         <TooltipProvider delayDuration={400}>
         <div className="flex flex-wrap items-center gap-2">
-          {ACCIONES_EXAMEN.map(({ label, ayuda, icono: Icono, modo }) => {
-            const boton = (
-              <button
-                type="button"
-                aria-label={label}
-                onClick={modo ? () => (modo === 'condition' && onCondicion ? onCondicion() : setProcedureOpen(modo)) : undefined}
-                className={cn(BOTON_ACCION, !modo && problemas && 'border-dash-blue bg-dash-count-bg text-dash-blue-hover hover:bg-dash-count-bg')}
-              >
-                <Icono className="size-[18px] shrink-0" />
-                <span className={ETIQUETA_EXPANDIBLE}>{label}</span>
-              </button>
-            )
-            const conAyuda = (trigger: ReactNode) => (
-              <Tooltip>
-                <TooltipTrigger asChild>{trigger}</TooltipTrigger>
-                <TooltipContent side="bottom" sideOffset={6} className="bg-ink text-white">{ayuda}</TooltipContent>
-              </Tooltip>
-            )
-            return modo ? <Fragment key={label}>{conAyuda(boton)}</Fragment> : (
-              <Popover key={label} open={problemas} onOpenChange={setProblemas}>
-                {conAyuda(<PopoverTrigger asChild>{boton}</PopoverTrigger>)}
-                {/* Ancho para que la tabla entre entera, y alto hasta el borde de la pantalla con scroll adentro: con una fila
-                    abierta se salía por abajo. Ver clinical-mode.md (2026-10-09). */}
-                <PopoverContent
-                  align="start" sideOffset={8} collisionPadding={16} aria-label="Problem list"
-                  className="max-h-(--radix-popover-content-available-height) w-[min(1240px,calc(100vw-2rem))] gap-0 overflow-y-auto overscroll-contain rounded-lg bg-transparent p-0 shadow-floating ring-0"
-                >
-                  {/* Un link del detalle lleva a otra pantalla: el flotante se cierra. */}
-                  <NavegacionClinica.Provider value={ir && ((d) => { setProblemas(false); ir(d) })}><ProblemList /></NavegacionClinica.Provider>
-                </PopoverContent>
-              </Popover>
-            )
-          })}
+          {ACCIONES_EXAMEN.map(({ label, ayuda, icono: Icono, modo }) => (
+            <Tooltip key={label}>
+              <TooltipTrigger asChild>
+                <button type="button" aria-label={label} onClick={() => abrir(modo)} className={BOTON_ACCION}>
+                  <Icono className="size-[18px] shrink-0" />
+                  <span className={ETIQUETA_EXPANDIBLE}>{label}</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" sideOffset={6} className="bg-ink text-white">{ayuda}</TooltipContent>
+            </Tooltip>
+          ))}
+          <ProblemListFlotante />
           {extra && <div className="ml-auto flex items-center gap-2">{extra}</div>}
         </div>
         </TooltipProvider>
-        {children}
+        {/* El panel propio del examen estira su fondo hasta el borde de la columna de Findings (clinical-mode.md, 2026-10-29). */}
+        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
       </div>
 
       <NewProcedureDrawer
@@ -225,8 +218,10 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
         mode={procedureOpen ?? 'procedure'}
         area="Upper left"
         teeth={quadrantTeeth(9)}
+        regiones={regiones?.elegidas}
+        onRemoveRegion={regiones?.quitar}
         findings={findings}
-        onClose={() => setProcedureOpen(null)}
+        onClose={() => { setProcedureOpen(null); regiones?.limpiar() }}
         onSave={saveProcedure}
         onLink={linkProcedure}
       />

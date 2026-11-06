@@ -18,12 +18,13 @@ import {
   type CategoriaWorkflow, type Narrativa, type Pregunta, type Valor, type Workflow,
 } from '@/data/workflows'
 import { CASOS, type Caso, type Procedimiento } from '@/data/treatment-plan'
+import { TONO_PROCEDIMIENTO as TONOS_FICHA } from '@/components/clinical/accionesProcedimiento'
 
 /* Treatment — Figma 9fYLxX9h 4540:26288 "Workflow Detail & Clinical Note Confirmation", con la lógica de red.dev: a la
    izquierda el workflow elegido con sus pasos y preguntas; a la derecha Workflows, Progress y Treatment plans. Completar
    Chief Complaint o Triage pone en verde CC o TR en el header. Ver design-reference/figma/modulos/clinical-mode.md. */
 
-const TONO_PROCEDIMIENTO: Record<Procedimiento['estado'], PillTone> = { Planned: 'success', Completed: 'info', Removed: 'neutral' }
+const TONO_PROCEDIMIENTO: Record<Procedimiento['estado'], PillTone> = { ...TONOS_FICHA, Removed: 'neutral' }
 const CHIP = 'h-7 rounded-md border px-3 text-[11px] font-medium transition-colors'
 
 /* Una pregunta del paso, con sus opciones como chips; las preguntas que dependen de una opción cuelgan debajo. */

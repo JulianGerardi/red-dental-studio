@@ -7,6 +7,7 @@
   ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-1548%2CCON-2889%2CCON-3115%2CCON-3120%2CCON-3230%2CCON-3506%2CCON-3853%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
 - Historias de abril: CON-2890
   ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2890%29%20ORDER%20BY%20key%20ASC))
+- Insurance / Billing Profile del provider: ver [billing-profile.md](billing-profile.md) (CON-4003).
 
 ## "Link existing person" no hacía nada en "New Employee" (2026-09-07)
 

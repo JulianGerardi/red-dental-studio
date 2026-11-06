@@ -31,3 +31,16 @@ test('Edit Patient cuelga del paciente', async ({ app, screen }) => {
   await expect(migas.getByRole('link', 'John Smith')).toBeVisible()
   await expect(migas.getByText('Edit Patient')).toBeVisible()
 })
+
+/* Insurance llena el alto que deja el menú y scrollea adentro, como Treatments, Ledger y Documents (Julián,
+   2026-10-30: había quedado desactualizada, el bloque entero empujaba la página y el menú scrolleaba con él). */
+test('Insurance scrollea adentro, sin mover el menú del paciente', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/insurance')
+  const region = screen.getByRole('region', 'Insurance')
+  await expect(region).toBeVisible()
+  await expect(screen.getByRole('link', 'Treatments')).toBeVisible()
+
+  await region.swipe({ direction: 'up', momentum: 'fast' })
+  await expect(screen.getByRole('link', 'Treatments')).toBeVisible()
+  await expect(screen.getByText('Patient Information')).toBeVisible()
+})

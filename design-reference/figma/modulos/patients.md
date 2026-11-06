@@ -355,4 +355,135 @@ La página completa `/patients/edit` (Figma `3640:72713`) no cambia: es otra pan
 - ¿La dirección es opcional, como dice el aviso, o City y Postal Code deben serlo?
 - **Menores de 18**: el paso Guardian ya no se impone. Toda la tabla de ejemplo tiene fecha de nacimiento 2025: ¿conviene un aviso o hacerlo obligatorio para un menor?
 - ¿Cancelar o cerrar Edit con cambios sin guardar debería preguntar?
-- ¿El guardián se escribe o se busca entre las personas del sistema (como en Add Relationship)? El Figma lo dibuja como texto.
+- ¿El guardián se escribe o se busca entre las personas del sistema (como en Add Relationship)? El Figma lo dibuja como texto. **Resuelto el 2026-11-04 (CON-2858): se busca, o Add New Person.**
+
+## New Patient: vincular a una persona que ya existe en el sistema (2026-11-02)
+
+**Jira:** no hay historia propia para esto. La más cercana es CON-2858 (*Add Guardian desde New Patient*: "buscar una
+persona existente o crear una nueva"), que es del guardián, no del paciente. Pedido de Julián sobre una grabación de
+Confidentally 2.0: en *New Patient* el checkbox *Use this option only to link a person that already exists in the system
+(e.g employee, subscriber, contact, etc)* cambia los datos personales por un buscador **Person\***. Vuelve lo que la
+anomalía 13 (2026-10-22) había sacado del alta, ahora con lógica detrás.
+
+**Qué hace:**
+- En el paso General, debajo de Interpreter Required y de la cuenta del portal, va `LinkPersonCheckbox` (el texto de 2.0,
+  ya en el DS). Tildado, la grilla de First/Middle/Last Name, Birthdate y Email se cambia por **Person\*** con
+  `PersonSearchField`: el mismo buscador de Add Relationship y New Subscription (avatar, y debajo tipo, DOB y email), no
+  el de 2.0 con el botón azul de borrar (la ✕ de la card elegida ya cumple esa función).
+- **A quién encuentra** (`data/personas.ts`, `PERSONAS_SISTEMA`): empleados (`EMPLEADOS`), contactos (`DIRECTORIO`,
+  que se mudó acá desde `AddRelationshipDrawer`, que lo reexporta) y suscriptores de seguro. **Quien ya es paciente no
+  aparece**: vincularlo crearía un duplicado. Cada resultado dice qué es (*Employee*, *Contact*, *Subscriber*) para
+  distinguir homónimos.
+- **Estados:** sin escribir, nada; sin coincidencias, *No one in the system matches this name. Untick the option to enter
+  the patient's details.* (`emptyText`, prop nueva y opcional de `PersonSearchField`); Next Step o Save sin elegir a
+  nadie marcan el campo (*Select a person or untick the option to enter the details.*) y lo enfocan; elegida, la card
+  azul con la ✕ y la ayuda *The patient record will use this person's name, birthdate and email.*
+- **Al guardar**, el paciente toma nombre, apellido, nacimiento y email de la persona; Interpreter, portal, Guardian y
+  Demography salen del formulario como siempre. Lo escrito a mano no se pierde al tildar y destildar (como en 2.0).
+- La opción está sólo en New Patient: Edit Patient comparte `CamposGeneral` pero no le pasa `vinculo`.
+
+**Para validar con usuarios / con Julián:**
+- ¿Recepción sabe de antemano que la persona ya está cargada (empleado, titular de un seguro)? Si no, convendría avisar
+  solo cuando lo escrito a mano coincide con alguien del sistema, en vez de depender del checkbox.
+- ¿Vincular debería traer también teléfono y dirección (Demography) de la persona, si el sistema los tiene?
+- Un empleado sin apellido (*Salgado*) queda como paciente sin Last Name; Edit Patient se lo va a pedir.
+
+## CON-2858 · New Patient: Guardian como en 2.0, con desplegables (2026-11-04)
+
+**Jira:** CON-2858 (*Add Guardian desde New Patient*): un menor necesita al menos un guardián; se busca a una persona
+existente o se crea una nueva, con *This person is also the guarantor* y *Relationship to Patient*. Pedido de Julián sobre
+una grabación de Confidentally 2.0, con un cambio de diseño: **que no sea tan largo** (2.0 vuelca Contact Information y
+Address Information enteros debajo, en cajas grandes).
+
+**Qué hace el paso Guardian** (`CamposGuardian`, el mismo en New y en Edit Patient):
+- **Guardian** (`PersonSearchField`, personas del sistema: empleados, contactos, suscriptores; no la persona que se está
+  dando de alta) + **Add New Person** (`OptionCheckbox`). Tildarlo borra la búsqueda, la deshabilita y muestra First name,
+  Last name, Email y Birthdate, obligatorios como en 2.0. Reemplaza al checkbox *Associate a guardian* y al campo de texto
+  *Guardian Full Name* (la pregunta abierta del 2026-10-22, "¿se escribe o se busca?", queda resuelta: se busca).
+- **Contact Information** (Country Code, Area Code (3 digits), Number (7 digits), Extension) y **Address Information**
+  (Address Line 1 y 2, Country, State, City, ZIP Code) van en **desplegables cerrados** (`CollapsibleFields`, pieza nueva
+  en `patients/form.tsx`): una fila con el título y una línea de resumen (*+1 (305) 555-0142*, *36 Main Street, Miami…*,
+  o *Add a phone number* / *Add an address*). Es la reducción que pidió Julián: con todo cargado, el paso entra en una
+  pantalla. Si falta algo al apretar Next, el desplegable **se abre solo**, se pinta de rojo, el resumen dice qué
+  completar (*Complete the phone number.*) y el foco va al campo.
+- Se piden **sólo si hacen falta**: persona nueva, o una del sistema sin teléfono o dirección cargados (como Add
+  Relationship, CON-3174). Si los tiene, debajo del buscador: *Contact and address are already on file for this person.*
+- **This person is also a guarantor** y **Relationship to Patient\*** aparecen recién cuando hay guardián (en 2.0 están
+  siempre). Las relaciones son las de 2.0, de la A a la Z: Child, Grandchild, Grandparent, Other, Other Family Member,
+  Parent, Partner, Sibling, Spouse.
+- **Menor de 18** (por la fecha escrita, o la de la persona vinculada): en el alta el guardián es **obligatorio**; el aviso
+  cambia a *This patient is under 18. Add at least one guardian…* y Next sin guardián marca el campo con el mensaje de
+  Jira, *This patient is a minor and must have at least one guardian assigned.* Adulto: opcional, con el aviso de siempre.
+  El paso **sigue estando siempre** (decisión del 2026-10-22); en 2.0 aparece sólo para un menor.
+- Validación: Area Code de 3 dígitos y Number de 7 (*Number must be 7 digits.*, el texto de 2.0); se aceptan guiones y
+  espacios. Country Code arranca en +1. Tildar o destildar Add New Person arranca sin errores marcados, así los campos
+  nuevos no aparecen en rojo por el intento anterior.
+- Al guardar se limpia lo que no corresponde (datos de persona nueva si se eligió una del sistema, contacto si ya lo tenía).
+  El nombre de una persona nueva queda en `guardianName`.
+- `PersonSearchField` ahora tiene nombre accesible (`aria-label` = su label); antes el input no tenía ninguno.
+
+**Anomalías de 2.0 y cómo se resolvieron:**
+1. **Botón azul de borrar** junto al buscador: no va; la ✕ de la card elegida ya cumple esa función (igual que en General).
+2. **Al elegir a alguien, 2.0 vuelca sus datos en campos editables**: acá la card con tipo, DOB y email; editar a la persona
+   desde el alta de otro paciente no corresponde.
+3. **Relationship y guarantor visibles sin guardián**: aparecen cuando hay uno.
+4. **Contacto y dirección en cajas con borde**: desplegables (pedido de Julián).
+
+**Datos:** `DatosPaciente` pierde `guardian` y suma `guardianNuevo`, `gFirst…gZip` y `guardianGarante`. Elena Chen (guardiana
+de Sofia Chen) pasa a ser un contacto del directorio, con teléfono y dirección, para que Edit Patient la muestre elegida.
+
+**Para validar con usuarios / con Julián:**
+- ¿Recepción completa el contacto del guardián en el momento, o lo deja para después? Si lo deja, contacto y dirección
+  podrían ser opcionales y el paso quedaría todavía más corto.
+- CON-2858 dice "uno o más guardians": acá se carga uno; el segundo se suma desde Relationships. ¿Hace falta en el alta?
+- Edit Patient no exige guardián a un menor (para no trabar la edición de fichas viejas: toda la tabla de ejemplo es de 2025).
+- La relación y el garante todavía no crean la fila en Relationships del paciente (no hay backend; postcondición de Jira).
+
+### Ajustes de Julián sobre el link de prueba (2026-11-04, CON-2858)
+
+1. **Guardian aparece sólo para un menor de 18**, calculado con la fecha del calendario contra hoy: New Patient tiene
+   tres pasos (General → Guardian → Demography) para un menor y dos (General → Demography) para un adulto; Edit Patient,
+   lo mismo con las pestañas. Reemplaza la decisión del 2026-10-22 ("Guardian siempre está"). Si la edad cambia, los
+   datos de guardián cargados no se guardan (`limpiarPaciente(d, menor)`) ni se validan. Vinculado a una persona del
+   sistema, la edad sale de su DOB.
+2. **Orden de General:** primero *Use this option only to link a person…*, después los datos y, debajo del email, *Create a
+   patient portal account using this email address* (en Edit, el estado *Linked* va en el mismo lugar). **Interpreter
+   Required pasa a Demography**, arriba de los campos.
+3. **El aviso de Guardian** queda sólo el del menor (*This patient is under 18…*). Julián escribió "sólo si es mayor de 18";
+   como el paso ya existe sólo para menores, se tomó como "menor". A confirmar.
+4. **Persona del sistema: no se piden datos.** Sale la excepción "si el sistema no tiene su contacto, se pide" (Robert
+   Miller): elegida, queda la card y nada más. Sale también la ayuda *Contact and address are already on file…*.
+5. **Persona nueva:** First name, Last name, Email y Birthdate van en un desplegable más, **Personal Information**, como
+   Contact y Address. Arranca abierto (es lo primero que se completa); los otros dos, cerrados.
+
+**Para validar:** ¿la persona elegida del sistema sin teléfono ni dirección (Robert Miller) necesita que se los pidan en
+otro momento (Relationships)?
+
+## CON-2858 · Guardian: resumen del teléfono, desplegables hacia arriba y banderas (2026-11-04)
+
+Segunda vuelta de Julián sobre lo publicado (#120):
+
+1. **Resumen de Contact Information**: mostraba algo recién con el teléfono completo (3 + 7 dígitos). Ahora muestra lo
+   cargado aunque esté incompleto (*+54 (324) 3596*), como Personal y Address. La validación de 3 y 7 dígitos no cambia.
+2. **Los selects se abren hacia arriba** cuando abajo no entran y arriba hay más lugar (Relationship to Patient, al fondo
+   del paso, obligaba a scrollear). Es de `SelectField` (y de las sugerencias de `PersonSearchField`), así que vale para
+   toda la app: mide contra el contenedor con scroll más cercano (el cuerpo del drawer) o la ventana.
+3. **Banderas en todos los Country Code**: `CountryCodeField` (`patients/form.tsx`) = `SelectField` con la bandera de
+   cada opción, en el campo y en la lista. Banderas SVG de `country-flag-icons` (`ui/country-flag.tsx`): los emoji de
+   bandera no se ven en Windows. Entiende "+54", "(+54) Argentina" o "Argentina"; +1 sin nombre es Estados Unidos.
+   Reemplaza a los Country Code de Guardian, Settings (New Account, New Location, New Employee, Location, Account) y
+   finanzas. En Employees el campo se llama "Area Code" pero sus opciones son códigos de país: lleva bandera, con su label.
+
+**Para validar:** ¿también bandera en los selects *Country* de las direcciones? (Es una línea: el mismo `icono`.)
+
+### Año editable en los calendarios y todos los países (2026-11-04)
+
+1. **Año a mano en todos los calendarios.** `MonthCalendar` (lo usan `DatePicker` y `DateFilter`, o sea todos los
+   calendarios de la app) muestra el año como un campo: se escribe y aplica con 4 dígitos; ↑/↓ suman o restan uno; vacío o
+   fuera de 1900–2100 vuelve al que estaba; con `max`, no pasa de ese mes. Las flechas de mes y de año siguen.
+2. **Country Code con los 245 países del mundo** (`data/paises.ts`): códigos sacados una vez de libphonenumber-js 1.12.10,
+   nombres del navegador (`Intl.DisplayNames`), formato "(+54) Argentina" (el de Settings) y de la A a la Z.
+   `CountryCodeField` ya no recibe `options`: trae la lista entera, un **buscador** por nombre o código (`SelectField`
+   suma `buscable`) y abre la lista en el país elegido. Un valor viejo ("+1", "(+1) United States of America (the)") se
+   muestra como su país (`paisDe`). Las banderas son archivos aparte que se cargan al verse (`vite.config`:
+   `assetsInlineLimit`), así el JS no crece con 245 SVG.

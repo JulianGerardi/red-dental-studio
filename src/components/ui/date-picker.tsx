@@ -75,7 +75,10 @@ export function MonthCalendar({
           {yearNav && <NavBtn onClick={() => mover(-12)} label="Previous year"><ChevronsLeft className="size-4" /></NavBtn>}
           <NavBtn onClick={() => mover(-1)} label="Previous month"><ChevronLeft className="size-4" /></NavBtn>
         </div>
-        <span className="text-sm font-medium" aria-live="polite">{MONTHS[month.getMonth()]} {month.getFullYear()}</span>
+        <span className="flex items-center gap-1 text-sm font-medium">
+          <span aria-live="polite">{MONTHS[month.getMonth()]}</span>
+          <AnioEditable month={month} onMonthChange={onMonthChange} tope={tope} />
+        </span>
         <div className="absolute right-0 flex gap-1">
           <NavBtn onClick={() => mover(1)} label="Next month" hidden={!hayDespues(1)}><ChevronRight className="size-4" /></NavBtn>
           {yearNav && <NavBtn onClick={() => mover(12)} label="Next year" hidden={!hayDespues(12)}><ChevronsRight className="size-4" /></NavBtn>}
@@ -115,6 +118,43 @@ export function MonthCalendar({
         })}
       </div>
     </div>
+  )
+}
+
+/* El año del encabezado se escribe: saltar a 1985 con flechas son decenas de clics (Julián, 2026-11-04; patients.md).
+   Aplica con 4 dígitos; ↑/↓ suman o restan uno; si queda vacío o fuera de rango, vuelve al que estaba. Con `max`, no
+   pasa de ese mes. */
+function AnioEditable({ month, onMonthChange, tope }: { month: Date; onMonthChange: (m: Date) => void; tope?: Date }) {
+  const anio = month.getFullYear()
+  const [texto, setTexto] = useState(String(anio))
+  const [previo, setPrevio] = useState(anio)
+  if (anio !== previo) { setPrevio(anio); setTexto(String(anio)) }
+
+  const ir = (a: number) => {
+    if (a < 1900 || a > 2100) return false
+    const destino = new Date(a, month.getMonth(), 1)
+    onMonthChange(tope && destino > tope ? primeroDelMes(tope) : destino)
+    return true
+  }
+  return (
+    <input
+      aria-label="Year"
+      inputMode="numeric"
+      maxLength={4}
+      value={texto}
+      onChange={(e) => {
+        const t = e.target.value.replace(/\D/g, '').slice(0, 4)
+        setTexto(t)
+        if (t.length === 4) ir(Number(t))
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); ir(anio + (e.key === 'ArrowUp' ? 1 : -1)) }
+        if (e.key === 'Enter') { e.preventDefault(); if (!(texto.length === 4 && ir(Number(texto)))) setTexto(String(anio)) }
+      }}
+      onBlur={() => setTexto(String(anio))}
+      onFocus={(e) => e.target.select()}
+      className="w-[52px] rounded-md border border-transparent px-1.5 py-0.5 text-center text-sm font-medium tabular-nums hover:border-line focus:border-dash-blue focus:outline-none"
+    />
   )
 }
 

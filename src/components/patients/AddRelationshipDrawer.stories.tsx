@@ -13,21 +13,20 @@ const meta = {
       story: { inline: false, iframeHeight: 760 },
       description: {
         component: [
-          'Sumar un contacto relacionado desde *Relationships & Billing → Add Relationship*. Antes era una pantalla aparte; ahora es el drawer de Confidentally 2.0 con sus tres pasos.',
+          'Sumar un contacto relacionado desde *Relationships & Billing → Add Relationship*. Antes era una pantalla aparte; ahora es el drawer de Confidentally 2.0 con sus pasos.',
           '',
           '**Pasos:** buscar a la persona o crear una nueva; sus datos de contacto; y la relación: Guardian y/o Guarantor, quién es responsable de quién y el vínculo con el paciente. Al guardar aparece primera en la lista.',
           '',
-          '**Relación archivada** (CON-3958, 2026-10-22): si la persona elegida ya tiene una relación archivada con el paciente, debajo del buscador aparece *An archived relationship already exists between [Paciente] and [Persona]* con **Open reactivation**, que lleva a revisar y reactivar esa relación en vez de crear otra. Es un aviso: no bloquea seguir.',
+          '**Contact sólo cuando falta** (CON-3174, 2026-11-03): con una persona nueva siempre se pide; con una existente, sólo si no tiene teléfono y dirección cargados. Si los tiene, el drawer queda en dos pasos.',
           '',
-          '**Probalo:** en *Playground* buscá "Miller", elegí a alguien y avanzá; o tildá Add New Person. Con "Michael Miller" (archivada en la lista de ejemplo) aparece el aviso de reactivación.',
+          '**Probalo:** en *Playground* buscá "Miller", elegí a alguien y avanzá; o tildá Add New Person. Con "Michael Miller" (contacto cargado) pasa directo a Relationship; con "Robert Miller" (sin contacto) pide Contact.',
         ].join('\n'),
       },
     },
   },
-  args: { paciente: 'John Smith', archivadas: ['Michael Miller'], onReactivar: () => {}, onClose: () => {}, onGuardar: () => {} },
+  args: { paciente: 'John Smith', onClose: () => {}, onGuardar: () => {} },
   argTypes: {
     paciente: { control: 'text', description: 'El paciente de la ficha: aparece en las frases de Direction.' },
-    archivadas: { control: 'object', description: 'Nombres con una relación archivada con este paciente: al elegirlos se ofrece reactivarla.' },
   },
 } satisfies Meta<typeof AddRelationshipDrawer>
 
@@ -43,7 +42,7 @@ export const Parts: Story = {
     <div className="flex flex-col gap-8">
       <PasosDelDrawer pasos={[
         { nombre: 'Person', secciones: 'Find or create person: buscador por nombre con resultados; la persona elegida con una ✕ para quitarla; o Add New Person con First Name, Last Name y Email', obligatorios: 'Una persona elegida, o First y Last Name' },
-        { nombre: 'Contact', secciones: 'General Information: Country, Number, Email · Adress Information: líneas 1 y 2, Country, Region, City, Postal Code', obligatorios: 'Todos' },
+        { nombre: 'Contact', secciones: 'Sólo con persona nueva o sin contacto cargado. General Information: Country, Number, Email · Adress Information: líneas 1 y 2, Country, Region, City, Postal Code', obligatorios: 'Todos' },
         { nombre: 'Relationship', secciones: 'Assign relationship role: Guardian, Guarantor · Direction · Relationship to Patient', obligatorios: 'Al menos un rol, una dirección y el vínculo' },
       ]} />
       <Lienzo>
@@ -69,7 +68,7 @@ export const States: Story = {
       { estado: 'Default', cuando: 'Abre en el buscador.', story: 'Playground' },
       { estado: 'Validation errors', cuando: 'Next Step sin persona elegida ni Add New Person: aviso debajo del buscador. En los otros pasos, los obligatorios en rojo.', story: 'With Validation Errors' },
       { estado: 'Selected', cuando: 'Persona elegida: su card con borde azul y una ✕ para quitarla.', story: 'Person Selected' },
-      { estado: 'Archived relationship found', cuando: 'La persona elegida ya tiene una relación archivada con el paciente: aviso con Open reactivation debajo del buscador.', story: 'Archived Relationship Found' },
+      { estado: 'Contact on file', cuando: 'Persona existente con teléfono y dirección: el drawer queda en dos pasos (Person y Relationship).', story: 'Contact On File' },
       { estado: 'Disabled search', cuando: 'Con Add New Person tildado el buscador queda deshabilitado y aparecen los campos de la persona nueva.' },
       { estado: 'Saved', cuando: 'La relación entra primera en la lista, con Legal contact (Guardian) y/o Financial contact (Guarantor).' },
     ]} />
@@ -86,9 +85,9 @@ export const PersonSelected: Story = {
   play: secuencia(escribir(/search by name/i, 'Miller'), pulsar(/^Michael Miller/), esperar(/mm\.thompson/i)),
 }
 
-/* Michael Miller tiene una relación archivada: aparece el aviso con Open reactivation. */
-export const ArchivedRelationshipFound: Story = {
-  play: secuencia(escribir(/search by name/i, 'Michael'), pulsar(/^Michael Miller/), esperar(/An archived relationship already exists/i)),
+/* Michael Miller ya tiene el contacto cargado: sin paso Contact, Next lleva a Relationship. */
+export const ContactOnFile: Story = {
+  play: secuencia(escribir(/search by name/i, 'Michael'), pulsar(/^Michael Miller/), pulsar(/^next step$/i), esperar(/assign relationship role/i)),
 }
 
 export const Specs: Story = {

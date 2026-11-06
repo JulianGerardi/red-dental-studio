@@ -30,7 +30,8 @@ export function FindingCard({
       <div className="flex flex-col gap-0.5 pl-1">
         <p className="text-xs font-extrabold text-ink">{finding.area}</p>
         <p className="text-xs text-ink">Condition: <span className="text-ink-muted">{finding.condition}</span></p>
-        <p className="text-xs text-ink">Descriptors: <span className="text-ink-muted">{finding.descriptor}</span></p>
+        {/* Sin descriptores (una condition sin elegir ninguno, un procedimiento por región) no queda el rótulo vacío. */}
+        {finding.descriptor && <p className="text-xs text-ink">Descriptors: <span className="text-ink-muted">{finding.descriptor}</span></p>}
       </div>
     </div>
   )

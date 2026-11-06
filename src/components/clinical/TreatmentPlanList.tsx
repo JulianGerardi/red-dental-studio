@@ -9,9 +9,9 @@ import { Avatar } from '@/components/ui/avatar'
    datos (total y fecha de creación) y el avance en su caja. Toda la card abre el caso en Treatment Plan. El ícono de
    documento del frame sigue afuera, a pedido de Julián. Ver design-reference/figma/modulos/clinical-mode.md. */
 
-export function Dato({ label, valor, icono: Icono }: { label: string; valor: string; icono?: LucideIcon }) {
+export function Dato({ label, valor, icono: Icono, className }: { label: string; valor: string; icono?: LucideIcon; className?: string }) {
   return (
-    <div className="min-w-0 rounded-md bg-surface-alt px-2.5 py-2">
+    <div className={cn('min-w-0 rounded-md bg-surface-alt px-2.5 py-2', className)}>
       <span className="flex items-center gap-1 text-[9px] leading-none font-semibold tracking-wide whitespace-nowrap text-ink-muted uppercase">
         {Icono && <Icono className="size-3 shrink-0" aria-hidden />}
         {label}
@@ -23,13 +23,13 @@ export function Dato({ label, valor, icono: Icono }: { label: string; valor: str
 
 const iniciales = (n: string) => n.split(' ').map((p) => p[0]).slice(0, 2).join('')
 
-export function PlanCard({ p, onAbrir }: { p: Plan; onAbrir?: () => void }) {
+/* La card entera abre el caso; el Total amount, Estimate details (clinical-mode.md, 2026-10-28). Como un botón no puede
+   ir adentro de otro, el de la card es una capa que la cubre y el del total queda encima. */
+export function PlanCard({ p, onAbrir, onEstimado }: { p: Plan; onAbrir?: () => void; onEstimado?: () => void }) {
   const progreso = p.procedimientos ? Math.round((p.completados / p.procedimientos) * 100) : 0
   return (
-    <button
-      type="button" onClick={onAbrir} aria-label={`Open ${p.nombre}`}
-      className="hover:border-dash-blue focus-visible:outline-dash-blue group block w-full rounded-lg border border-line bg-white p-3.5 text-left transition-colors hover:shadow-[0_4px_14px_rgb(29_86_188/0.08)]"
-    >
+    <div className="hover:border-dash-blue has-[[data-abrir]:focus-visible]:outline-dash-blue group relative block w-full rounded-lg border border-line bg-white p-3.5 text-left transition-colors hover:shadow-[0_4px_14px_rgb(29_86_188/0.08)] has-[[data-abrir]:focus-visible]:outline-2">
+      <button type="button" data-abrir onClick={onAbrir} aria-label={`Open ${p.nombre}`} className="absolute inset-0 rounded-lg focus-visible:outline-none" />
       <span className="flex items-center gap-2.5">
         <Avatar initials={iniciales(p.doctor)} />
         <span className="min-w-0 flex-1">
@@ -50,7 +50,17 @@ export function PlanCard({ p, onAbrir }: { p: Plan; onAbrir?: () => void }) {
       </span>
 
       <span className="mt-3 grid grid-cols-2 gap-1.5">
-        <Dato label="Total amount" valor={p.total} icono={CircleDollarSign} />
+        {onEstimado ? (
+          <button
+            type="button" onClick={onEstimado} aria-label={`Total amount ${p.total}. View estimate details`}
+            className="group/total focus-visible:outline-dash-blue relative z-10 rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            <Dato label="Total amount" valor={p.total} icono={CircleDollarSign} className="group-hover/total:bg-dash-count-bg pr-6 transition-colors" />
+            <ChevronRight className="group-hover/total:text-dash-blue absolute top-1/2 right-1.5 size-3.5 -translate-y-1/2 text-ink-faint transition-colors" aria-hidden />
+          </button>
+        ) : (
+          <Dato label="Total amount" valor={p.total} icono={CircleDollarSign} />
+        )}
         <Dato label="Created on" valor={p.creado} icono={CalendarDays} />
       </span>
 
@@ -66,12 +76,14 @@ export function PlanCard({ p, onAbrir }: { p: Plan; onAbrir?: () => void }) {
           <span className="bg-dash-blue block h-full rounded-full" style={{ width: `${progreso}%` }} />
         </span>
       </span>
-    </button>
+    </div>
   )
 }
 
-export function TreatmentPlanList({ onAbrir, llena }: {
+export function TreatmentPlanList({ onAbrir, onEstimado, llena }: {
   onAbrir?: (casoId?: string) => void
+  /** El Total amount de una card abre Estimate details de ese caso. */
+  onEstimado?: (casoId: string) => void
   /** En desktop ocupa todo el alto de su contenedor (con `position: relative`) sin estirarlo, y la lista scrollea. */
   llena?: boolean
 }) {
@@ -85,7 +97,7 @@ export function TreatmentPlanList({ onAbrir, llena }: {
       </div>
       {/* La columna scrollea sola para no estirar la página hasta el doble del alto del odontograma. */}
       <div className={cn('mt-3 flex max-h-[560px] min-h-0 flex-col gap-3 overflow-y-auto pr-1', llena && 'lg:max-h-none lg:flex-1')}>
-        {PLANES.map((p) => <PlanCard key={p.id} p={p} onAbrir={() => onAbrir?.(p.id)} />)}
+        {PLANES.map((p) => <PlanCard key={p.id} p={p} onAbrir={() => onAbrir?.(p.id)} onEstimado={onEstimado && (() => onEstimado(p.id))} />)}
       </div>
     </div>
   )

@@ -30,6 +30,24 @@ test('Con muchos turnos las columnas scrollean adentro; sólo Pending Task lleva
   await expect(screen.getByRole('button', /^Check In/)).toHaveCount(35)
 })
 
+/* Pending Task filtra por tipo con tabs, no con el embudo (Julián, 2026-10-29; antes el Filter que había reemplazado
+   esas mismas tabs, dashboard.md 2026-08-28). Mismo control que el Pending Task del Patient Dashboard; acá sigue con
+   "Show N more" (sin cargarAlScroll, que es sólo del Patient Dashboard). */
+test('Pending Task: tabs por tipo acotan la lista', async ({ app, screen }) => {
+  await app.open('/')
+  await expect(screen.getByRole('tab', 'All (8)')).toBeVisible()
+  await expect(screen.getByRole('button', /Show \d+ more/)).toBeVisible()
+
+  await screen.getByRole('tab', /^Referrals/).tap()
+  await expect(screen.getByText('Complete this Task')).toHaveCount(2)
+  await expect(screen.getByText('Referrals · 2')).toBeVisible()
+  /* Las dos entran sin pasar el tope: sin botón. */
+  await expect(screen.getByRole('button', /Show \d+ more/)).toHaveCount(0)
+
+  await screen.getByRole('tab', /^All/).tap()
+  await expect(screen.getByRole('button', /Show \d+ more/)).toBeVisible()
+})
+
 /* Cada acción del turno avisa lo suyo y el escudo de al lado de Today lleva a las preguntas frecuentes (dashboard.md,
    2026-10-13). */
 test('Check In avisa; FAQ lleva a Help', async ({ app, screen }) => {

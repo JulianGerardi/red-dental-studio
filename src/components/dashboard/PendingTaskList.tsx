@@ -9,12 +9,12 @@ import type { PendingTask } from './PendingTaskCard'
    Ver design-reference/figma/modulos/dashboard.md. */
 const ORDEN = ['Clinical Note', 'Lab Orders', 'Prescriptions', 'Referrals']
 
-export function PendingTaskList({ tasks, limit, enCaja, llenarAlto }: { tasks: PendingTask[]; limit?: number; enCaja?: boolean; llenarAlto?: boolean }) {
+export function PendingTaskList({ tasks, limit, enCaja, llenarAlto, cargarAlScroll }: { tasks: PendingTask[]; limit?: number; enCaja?: boolean; llenarAlto?: boolean; cargarAlScroll?: boolean }) {
   const tipos = [...new Set([...ORDEN.filter((k) => tasks.some((t) => t.kind === k)), ...tasks.map((t) => t.kind)])]
   const enOrden = tipos.flatMap((k) => tasks.filter((t) => t.kind === k))
   if (enOrden.length === 0) return null
   return (
-    <ShowMore total={enOrden.length} limit={limit ?? enOrden.length} enCaja={enCaja} llenarAlto={llenarAlto} filas={llenarAlto ? 'li' : undefined} label="pending tasks" className="flex flex-col gap-4">
+    <ShowMore total={enOrden.length} limit={limit ?? enOrden.length} enCaja={enCaja} llenarAlto={llenarAlto} filas={llenarAlto ? 'li' : undefined} cargarAlScroll={cargarAlScroll} label="pending tasks" className="flex flex-col gap-4">
       {(n) => {
         const visibles = enOrden.slice(0, n)
         return tipos.map((k) => {

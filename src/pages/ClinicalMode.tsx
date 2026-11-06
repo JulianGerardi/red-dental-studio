@@ -10,7 +10,7 @@ import { DentalAssessmentExam } from '@/components/clinical/DentalAssessmentExam
 import { ExtraOralExam } from '@/components/clinical/ExtraOralExam'
 import { IntraOralExam } from '@/components/clinical/IntraOralExam'
 import { TreatmentPlanList } from '@/components/clinical/TreatmentPlanList'
-import { ProblemList } from '@/components/clinical/ProblemList'
+import { ProblemListFlotante } from '@/components/clinical/ProblemListFlotante'
 import { NavegacionClinica, examenDePestana, type DestinoClinico } from '@/components/clinical/RecordDetail'
 import { VitalsPanel } from '@/components/clinical/VitalsPanel'
 import { LabOrderPanel } from '@/components/clinical/LabOrderPanel'
@@ -41,6 +41,8 @@ export default function ClinicalMode() {
   const [busqueda] = useSearchParams()
   const casoPedido = busqueda.get('case') ?? undefined
   const procedimientoPedido = busqueda.get('procedure') ?? undefined
+  /* ?consent= abre el consentimiento de ese procedimiento del caso, donde se firma (clinical-mode.md, 2026-11-02). */
+  const consentimientoPedido = busqueda.get('consent') ?? undefined
   const patient = PATIENTS.find((p) => p.id === id) ?? PATIENTS[0]
   /* Overwiev no es una pestaña más: es el estado inicial y el botón de la
      barra vuelve acá desde cualquier examen o registro. */
@@ -50,10 +52,16 @@ export default function ClinicalMode() {
   const [ampliado, setAmpliado] = useState(false)
   /* El caso que se abrió desde una card del Overview; sin caso, Treatment Plan entra por Unassigned. */
   const [casoAbierto, setCasoAbierto] = useState<string | undefined>(casoPedido)
+  /* Desde el Total amount de una card: el caso abre en Estimate details. */
+  const [estimadoAbierto, setEstimadoAbierto] = useState(false)
+  /* Desde la columna Consent de Procedures: el caso abre en el consentimiento de ese procedimiento. */
+  const [consentimientoAbierto, setConsentimientoAbierto] = useState<string | undefined>(consentimientoPedido)
+  /* Con Sign now de Procedures, el Start o Complete que espera las firmas. */
+  const [accionPendiente, setAccionPendiente] = useState<'Start' | 'Complete' | undefined>()
 
-  const irA = (p: Pestana) => { setPestana(p); setEnOverview(false) }
+  const irA = (p: Pestana) => { setPestana(p); setEnOverview(false); setEstimadoAbierto(false); setConsentimientoAbierto(undefined); setAccionPendiente(undefined) }
   /* Los links del detalle de la Problem List: la pestaña y, para Treatment Plan, el caso. */
-  const ir = ({ pestana: p, caso }: DestinoClinico) => { if (caso) setCasoAbierto(caso); irA(p) }
+  const ir = ({ pestana: p, caso, consentimiento, accion }: DestinoClinico) => { if (caso) setCasoAbierto(caso); irA(p); setConsentimientoAbierto(consentimiento); setAccionPendiente(accion) }
 
   const overview = (
     <div className="flex flex-col gap-4 lg:flex-row">
@@ -64,12 +72,18 @@ export default function ClinicalMode() {
           de al lado (2026-10-18). */}
       {!ampliado && (
         <div className="relative shrink-0 lg:w-[360px]">
-          <TreatmentPlanList llena onAbrir={(id) => { setCasoAbierto(id); irA('Treatment Plan') }} />
+          <TreatmentPlanList
+            llena
+            onAbrir={(id) => { setCasoAbierto(id); irA('Treatment Plan') }}
+            onEstimado={(id) => { setCasoAbierto(id); irA('Treatment Plan'); setEstimadoAbierto(true) }}
+          />
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-4">
+        {/* La Problem List flota desde el mismo botón que en los exámenes: el Overview entra en la pantalla sin scroll
+            (clinical-mode.md, 2026-10-29). */}
+        <div><ProblemListFlotante procedimientoInicial={procedimientoPedido} /></div>
         <OdontogramaOverview ampliado={ampliado} onAmpliar={() => setAmpliado((v) => !v)} onDetalle={irA} />
-        {!ampliado && <ProblemList procedimientoInicial={procedimientoPedido} />}
       </div>
     </div>
   )
@@ -78,7 +92,7 @@ export default function ClinicalMode() {
      también, porque sus findings ya viven en el visor de cada placa. Los registros (Treatment Plan…) no. */
   const esExamen = (EXAMENES as readonly string[]).includes(pestana)
   const enConstruccion = (
-    <div className="rounded-lg bg-white shadow-panel">
+    <div className="flex h-full flex-col rounded-lg bg-white shadow-panel">
       <EmptyState
         icon={Stethoscope}
         title={pestana}
@@ -97,7 +111,7 @@ export default function ClinicalMode() {
         : pestana === 'Radiography'
           ? <RadiographyPanel />
           : pestana === 'Treatment Plan'
-            ? <TreatmentPlanSection key={casoAbierto ?? 'todos'} casoInicial={casoAbierto} />
+            ? <TreatmentPlanSection key={`${casoAbierto ?? 'todos'}-${estimadoAbierto}-${consentimientoAbierto}-${accionPendiente}`} casoInicial={casoAbierto} estimadoInicial={estimadoAbierto} consentimientoInicial={consentimientoAbierto} accionInicial={accionPendiente} />
             : pestana === 'Treatment'
             ? <TreatmentPanel onTreatmentPlan={() => irA('Treatment Plan')} />
             : pestana === 'DentAssmt'

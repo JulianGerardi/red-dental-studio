@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 export const SHOW_MORE_ALTO = 'min(70vh, 640px)'
 
 export function ShowMore({
-  total, limit, maxHeight = SHOW_MORE_ALTO, enCaja, llenarAlto, filas, label = 'items', fade = 'from-white', className, children,
+  total, limit, maxHeight = SHOW_MORE_ALTO, enCaja, llenarAlto, filas, cargarAlScroll, label = 'items', fade = 'from-white', className, children,
 }: {
   /** Cuántos ítems hay en total. */
   total: number
@@ -34,6 +34,11 @@ export function ShowMore({
   /** Con `llenarAlto` y filas dentro de grupos (PendingTaskList: rótulo + caja por tipo): selector de la fila ("li"). Se mide su alto y lo que
       suman los rótulos y espacios de alrededor, en vez de tomar el primer hijo como si fuera una fila. */
   filas?: string
+  /** Sin botón "Show more": la caja (sólo tiene sentido con `enCaja` + `llenarAlto`, que le dan su alto propio y fijo
+      -no se acomoda al total, así no salta de alto al cambiar de tab (Julián, 2026-10-29)-) arranca ya scrolleable y,
+      al acercarse al final, suma otra tanda de `limiteEfectivo` ítems, hasta mostrarlas todas (Pending Task del
+      Patient Dashboard, Julián 2026-10-28, sobre el video de referencia). */
+  cargarAlScroll?: boolean
   /** Nombre de lo que se lista, para el lector de pantalla ("appointments"). */
   label?: string
   /** Color del fondo de abajo, para el degradé que avisa que hay más: el de la card (blanco) o el de la página. */
@@ -46,6 +51,8 @@ export function ShowMore({
   const [abierto, setAbierto] = useState(false)
   const [altoCerrado, setAltoCerrado] = useState(0)
   const [alFinal, setAlFinal] = useState(false)
+  /* Sólo con `cargarAlScroll`: cuántos ítems sumó el scroll hasta ahora. null = todavía la primera tanda. */
+  const [visiblesScroll, setVisiblesScroll] = useState<number | null>(null)
   const ref = useRef<HTMLDivElement>(null)
   const contenidoRef = useRef<HTMLDivElement>(null)
   /* null hasta la primera medición: mientras tanto se usa `limit` para no empezar sin nada dibujado. */
@@ -53,7 +60,15 @@ export function ShowMore({
   const limiteEfectivo = llenarAlto ? (limiteMedido ?? limit) : limit
   const sobran = total - limiteEfectivo
   const conTope = sobran > 0
-  const scroll = conTope && abierto
+  const scroll = cargarAlScroll ? conTope : conTope && abierto
+  /* Arranca con dos tandas: con una sola, si entra justa en la caja no asoma nada para scrollear y no hay cómo
+     enterarse de que sigue (sin botón que lo diga). */
+  const mostrando = cargarAlScroll ? Math.min(visiblesScroll ?? limiteEfectivo * 2, total) : conTope && !abierto ? limiteEfectivo : total
+
+  /* Cambió el filtro (otro total): la próxima tanda vuelve a arrancar en `limiteEfectivo`. */
+  useLayoutEffect(() => {
+    if (cargarAlScroll) setVisiblesScroll(null)
+  }, [cargarAlScroll, total])
 
   /* Cuántas filas enteras entran en el alto que da el flex-1 del panel: se mide la primera fila ya dibujada (todas
      miden lo mismo) y el alto disponible de la caja, y se recalcula solo cuando ese alto cambia (el vecino crece o
@@ -102,6 +117,15 @@ export function ShowMore({
     setAbierto((v) => !v)
   }
 
+  /* A ~120px del final suma otra tanda, para que lleguen antes de que el usuario vea el borde de la lista. */
+  const alScrollear = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget
+    setAlFinal(el.scrollTop + el.clientHeight >= el.scrollHeight - 4)
+    if (cargarAlScroll && mostrando < total && el.scrollTop + el.clientHeight >= el.scrollHeight - 120) {
+      setVisiblesScroll(Math.min(mostrando + limiteEfectivo, total))
+    }
+  }
+
   return (
     <div className={cn('flex flex-col gap-2', llenarAlto && 'min-h-0 flex-1')}>
       {/* -m-1 p-1: aire para que el scroll no corte la sombra de las cards. */}
@@ -110,10 +134,7 @@ export function ShowMore({
         role={scroll ? 'region' : undefined}
         aria-label={scroll ? `All ${label}` : undefined}
         tabIndex={scroll ? 0 : undefined}
-        onScroll={scroll ? (e) => {
-          const el = e.currentTarget
-          setAlFinal(el.scrollTop + el.clientHeight >= el.scrollHeight - 4)
-        } : undefined}
+        onScroll={scroll ? alScrollear : undefined}
         className={cn(
           '-m-1 p-1',
           scroll && 'overflow-y-auto overscroll-contain rounded-lg focus-visible:outline-2 focus-visible:outline-dash-blue',
@@ -122,15 +143,17 @@ export function ShowMore({
              esquina de la card. */
           llenarAlto && !scroll && 'overflow-hidden',
         )}
-        style={scroll ? { maxHeight: enCaja ? `${altoCerrado}px` : `max(${altoCerrado}px, ${maxHeight})` } : undefined}
+        /* cargarAlScroll vive siempre junto a enCaja + llenarAlto (ver su doc): el alto ya lo da el flex-1 de afuera,
+           sin necesitar el alto cerrado que acá nunca se llega a medir (no hay click que lo dispare). */
+        style={scroll && !cargarAlScroll ? { maxHeight: enCaja ? `${altoCerrado}px` : `max(${altoCerrado}px, ${maxHeight})` } : undefined}
       >
-        <div ref={contenidoRef} className={className}>{children(conTope && !abierto ? limiteEfectivo : total)}</div>
+        <div ref={contenidoRef} className={className}>{children(mostrando)}</div>
         {/* En Mac la barra de scroll no se ve hasta que se scrollea: el degradé avisa que hay más abajo. */}
         {scroll && (
           <div aria-hidden className={cn('pointer-events-none sticky -bottom-1 -mt-8 h-8 bg-gradient-to-t to-transparent transition-opacity', fade, alFinal && 'opacity-0')} />
         )}
       </div>
-      {conTope && (
+      {conTope && !cargarAlScroll && (
         <button
           type="button" data-show-more aria-expanded={abierto} onClick={alternar}
           className="flex items-center gap-1 self-start rounded text-[12px] font-medium text-dash-blue hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"

@@ -9,6 +9,9 @@
   ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-2879%2CCON-3958%2CCON-3973%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
 - Historias de abril: CON-2858
   ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2858%29%20ORDER%20BY%20key%20ASC))
+- Vigentes (noviembre): CON-4000 corregir la implementación anterior (sin Archive/Reactivate), CON-3999 borrado físico,
+  CON-3985 funciones opcionales, CON-3174 contacto al crear/seleccionar Guardian o Guarantor. Las de archivar
+  (CON-3918, CON-3959 a CON-3962, CON-3971, CON-3975) están canceladas.
 
 Sección `3751:76507`, 6 frames:
 
@@ -130,6 +133,9 @@ escribiendo, elegido, deshabilitado). Ver `design-system.md` (2026-10-20).
 
 ## Archivar, reactivar y quitar el acceso de Guardian (CON-3958, 2026-10-22)
 
+> **Retirado el 2026-11-03** (ver la sección de esa fecha): archivar, reactivar, el filtro Active/Archived y el aviso
+> de Add Relationship ya no existen. Sigue vigente el pop up *Remove Guardian access* de Edit Relationship.
+
 Historias de Jira CON-3958 (Julián pegó los textos; el ticket pide login y no se pudo abrir desde acá, así que todo sale de lo que pegó):
 
 - **Archive relationship** reemplaza a *Delete relationship*: la relación no se borra, sale de la lista vigente y queda en **Archived**. Pide
@@ -165,3 +171,32 @@ Julián, sobre `PersonSearchField` (ver 2026-10-20): "esa card debe estar situad
 Las sugerencias dejaron de empujar los campos de abajo: flotan en un desplegable pegado al input (como `SearchField`, con la misma sombra y cierre al tocar afuera), con la
 card de cada persona adentro. La elegida sigue debajo del input -es el valor del campo, no algo transitorio- y la tilde verde se cambió por una **✕** que la quita y deja el campo
 vacío para buscar a otra (no aparece con el campo deshabilitado). Vale para Add Relationship, New Appointment (Patient, Primary y Additional Provider) y los modales de Insurance.
+
+## CON-4000 · Sin archivado, Delete con confirmación y Contact sólo cuando falta (2026-11-03)
+
+Julián: "lo de archivado no va más" y "siempre que se agregue una relación primero debería verse si se crea una persona
+→ carga contacto; si selecciona una persona existente, sólo si no tiene cargados los datos de contacto se muestra ese
+paso". En Jira, las historias de archivar están canceladas y CON-4000 pide "Eliminar Archive y Reactivate de los flujos"
+y "Retirar filtros Active/Archived".
+
+- **Fuera el archivado:** sin *Archive relationship* ni *Reactivate relationship*, sin el filtro `Active | Archived`, sin
+  la pill *Archived* / *Archived on* y sin el aviso *An archived relationship already exists* de Add Relationship. El mock
+  de Michael Miller archivada se quitó (la lista vuelve a las dos cards de Jessica Miller del Figma).
+- **Vuelve Delete relationship** (CON-3999, borrado físico): ítem rojo en el kebab y confirmación *Delete Relationship* /
+  *Are you sure you want to remove this relationship? This action cannot be undone.* / Cancel · **Delete** (botón rojo).
+  Como no se puede deshacer, el toast ya no ofrece *Undo*. Si se borran todas, *No related contacts* con Add Relationship.
+- **Edit Relationship** vuelve al texto del Figma: "…delete the relationship and create a new one."
+- **Paso Contact condicional** (CON-3174, regla 4: "si la persona ya existe, se debe validar si tiene contacto; en caso
+  contrario, solicitar completarlo"): persona nueva → Person · Contact · Relationship; persona existente sin teléfono o
+  dirección → los tres pasos, con el email que ya tiene precargado; persona existente con contacto → Person ·
+  Relationship, y la card nueva toma su teléfono y dirección. El indicador de pasos se ajusta solo al elegir.
+- **Mock:** `PersonaDirectorio` suma `telefono` y `direccion` opcionales (`data/personas.ts`). Michael y Jessica Miller
+  los tienen; **Robert Miller no**, para ver el paso Contact.
+
+**Pendiente (no pedido en esta tanda, está en CON-4000/CON-3985/CON-3999):** roles opcionales (sacar *Choose at least
+one role*), relación duplicada (*This person already has a relationship with this patient.*), los bloqueos de Delete
+(menor sin Guardian/Guarantor, actividad financiera o de Guardian, permiso) y que CON-3985 pide contacto sólo si se
+asigna Guardian o Guarantor (hoy el paso no depende de los roles porque los roles se eligen después).
+
+**Para validar con usuarios:** si recepción entiende por qué a veces hay dos pasos y a veces tres, y si conviene mostrar
+en el paso Person que la persona "ya tiene contacto cargado".

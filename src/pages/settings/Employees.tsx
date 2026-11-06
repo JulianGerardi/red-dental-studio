@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { PageTitle } from '@/components/ui/page-title'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
@@ -13,7 +13,7 @@ import { usePhoto } from '@/lib/usePhoto'
 import { EMPLEADOS, type Empleado } from '@/data/employees'
 import { Card, Toggle } from '@/components/settings/primitives'
 import {
-  SelectField, TextField, DateField, DateTextField, FormFooter,
+  CountryCodeField, SelectField, TextField, DateField, DateTextField, FormFooter,
 } from '@/components/patients/form'
 import { RolesLocation } from '@/components/settings/RolesLocation'
 import { LinkExistingPerson } from '@/components/settings/LinkExistingPerson'
@@ -24,6 +24,10 @@ import { Button } from '@/components/ui/button'
 import { NewEmployeeDrawer } from '@/components/settings/NewEmployeeDrawer'
 import { DataTable, PersonCell, TextCell } from '@/components/ui/data-table'
 import { Tabs } from '@/components/ui/tabs'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { ProviderBillingProfile } from '@/components/settings/ProviderBillingProfile'
+import { useBillingProfiles } from '@/data/billingProfilesStore'
+import { claveProvider } from '@/data/billingProfiles'
 
 /* Settings → Employees. La lista es propia —el Figma de 3864:235190 sólo
    tiene la ficha de un empleado, no la tabla que lleva hasta ahí—, con las
@@ -176,9 +180,12 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
    estaban siempre, tuviera o no sentido. */
 const TABS_BASE = ['Employee', 'Roles & Location'] as const
 const TABS_PROVIDER = ['Provider Info', 'Working Hours'] as const
-const TABS = [...TABS_BASE, ...TABS_PROVIDER] as const
+/* Aparece cuando el provider tiene Billing Profile (lo prepara guardar Primary Provider en Yes, CON-4004) y queda aunque
+   se deshabilite, en modo lectura (CON-4007). Ver figma/modulos/billing-profile.md. */
+const TAB_BILLING = 'Insurance / Billing Profile' as const
+const TABS = [...TABS_BASE, ...TABS_PROVIDER, TAB_BILLING] as const
 type Tab = (typeof TABS)[number]
-const esTabProvider = (t: Tab): boolean => (TABS_PROVIDER as readonly string[]).includes(t)
+const esTabProvider = (t: Tab): boolean => (TABS_PROVIDER as readonly string[]).includes(t) || t === TAB_BILLING
 
 const DIAS = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT']
 type Bloque = { dia: number; sala: string; horas: string; empresa: string; tono: 'rosa' | 'azul' }
@@ -201,14 +208,39 @@ export function SettingsEmployeeDetail() {
   const empleado = EMPLEADOS.find((e) => e.id === employeeId) ?? EMPLEADOS[0]
   const [tab, setTab] = useState<Tab>('Employee')
   const [esProvider, setEsProvider] = useState(empleado.esProvider)
-  const [toggles, setToggles] = useState({ primario: true, firma: true, locum: true })
+  const { perfiles, primarios, guardarPrimario } = useBillingProfiles()
+  const primarioGuardado = primarios[empleado.id] ?? false
+  const tienePerfil = !!perfiles[claveProvider(empleado.id)]
+  const [toggles, setToggles] = useState({ primario: primarioGuardado, firma: true, locum: true })
+  const primarioSucio = toggles.primario !== primarioGuardado
+  const [apagarPrimario, setApagarPrimario] = useState(false)
+  /* La pestaña de billing guarda cada card por separado: salir con algo sin guardar lo pregunta. */
+  const [billingSucio, setBillingSucio] = useState(false)
+  const [pendiente, setPendiente] = useState<Tab | null>(null)
+  const marcarBilling = useCallback((v: boolean) => setBillingSucio(v), [])
   const [credenciales, setCredenciales] = useState([0, 1, 2])
   const [vincular, setVincular] = useState(false)
   const [vinculado, setVinculado] = useState<Empleado | null>(null)
   const [foto, setFoto] = usePhoto(`employee-photo:${empleado.id}`)
   const [nuevaHora, setNuevaHora] = useState(false)
 
-  const tabsVisibles: readonly Tab[] = esProvider ? TABS : TABS_BASE
+  const tabsVisibles: readonly Tab[] = esProvider ? (tienePerfil ? TABS : [...TABS_BASE, ...TABS_PROVIDER]) : TABS_BASE
+  const cambiarTab = (t: Tab) => (billingSucio && tab === TAB_BILLING && t !== tab ? setPendiente(t) : setTab(t))
+
+  /* Primary Provider es un dato más de la ficha: se aplica con Save, junto con su Billing Profile (CON-4004, CON-4007).
+     Guardarlo apagado pregunta antes. Ver billing-profile.md, 2026-11-04. */
+  const guardarFicha = () => {
+    if (!primarioSucio) { aviso.ok('Employee information saved.'); return }
+    const r = guardarPrimario(empleado.id, empleado.nombre, toggles.primario)
+    aviso.ok(r === 'creado' ? 'Primary Provider enabled. Insurance / Billing Profile is now available.'
+      : r === 'reactivado' ? 'Primary Provider enabled. The billing profile is active again.'
+      : 'Primary Provider deactivated. The billing profile is now read-only.')
+  }
+  const guardar = () => (primarioSucio && !toggles.primario ? setApagarPrimario(true) : guardarFicha())
+  const cancelar = () => {
+    setToggles((p) => ({ ...p, primario: primarioGuardado }))
+    aviso.info('Changes discarded.')
+  }
   const alternarProvider = (v: boolean) => {
     setEsProvider(v)
     if (v) aviso.ok('Provider Info and Working Hours are now available for this employee.')
@@ -229,7 +261,7 @@ export function SettingsEmployeeDetail() {
            se reordenó sola. */
         tabs={tabsVisibles.map((t) => ({ value: t, className: esTabProvider(t) ? 'motion-safe:animate-[tab-in_180ms_cubic-bezier(0.16,1,0.3,1)]' : undefined }))}
         value={tab}
-        onChange={setTab}
+        onChange={cambiarTab}
       />
 
       <div className="mt-4 flex flex-col gap-4">
@@ -286,7 +318,7 @@ export function SettingsEmployeeDetail() {
 
             <Card title="Contact Information">
               <div className="grid gap-4 sm:grid-cols-2">
-                <SelectField label="Area Code" required options={['+1', '+34', '+54']} />
+                <CountryCodeField label="Area Code" required />
                 <TextField label="Number" required placeholder="Placeholder" />
               </div>
               <TextField className="mt-4" label="Extension" placeholder="Placeholder" />
@@ -322,7 +354,14 @@ export function SettingsEmployeeDetail() {
 
             <Card title="Contact Information">
               <div className="grid gap-6 sm:grid-cols-3">
-                <Toggle label="Is a Primary Provider*" on={toggles.primario} onChange={(v) => setToggles((p) => ({ ...p, primario: v }))} />
+                <div className="flex flex-col gap-1.5">
+                  <Toggle label="Is a Primary Provider*" on={toggles.primario} onChange={(v) => setToggles((p) => ({ ...p, primario: v }))} />
+                  {primarioSucio && (
+                    <span className="text-[11px] font-medium text-warn-fg">
+                      {toggles.primario ? 'Save to set up its Insurance / Billing Profile.' : 'Save to deactivate it.'}
+                    </span>
+                  )}
+                </div>
                 <Toggle label="Signature on file" on={toggles.firma} onChange={(v) => setToggles((p) => ({ ...p, firma: v }))} />
                 <Toggle label="Locum Tenens Treating Provider" on={toggles.locum} onChange={(v) => setToggles((p) => ({ ...p, locum: v }))} />
               </div>
@@ -435,11 +474,40 @@ export function SettingsEmployeeDetail() {
             </div>
           </Card>
         )}
+
+        {tab === TAB_BILLING && <ProviderBillingProfile empleadoId={empleado.id} onDirtyChange={marcarBilling} />}
       </div>
 
-      <div className="mt-5 flex justify-end gap-3">
-        <FormFooter onCancel={() => aviso.info('Changes discarded.')} onSave={() => aviso.ok('Employee information saved.')} />
-      </div>
+      {/* Billing guarda cada card con su propio botón: el pie de la ficha no aplica ahí. */}
+      {tab !== TAB_BILLING && (
+        <div className="mt-5 flex justify-end gap-3">
+          <FormFooter onCancel={cancelar} onSave={guardar} />
+        </div>
+      )}
+
+      {pendiente && (
+        <ConfirmDialog
+          title="Discard unsaved changes?"
+          confirmLabel="Discard changes"
+          cancelLabel="Keep editing"
+          tone="danger"
+          onCancel={() => setPendiente(null)}
+          onConfirm={() => { setBillingSucio(false); setTab(pendiente); setPendiente(null) }}
+        >
+          Your billing profile changes haven't been saved.
+        </ConfirmDialog>
+      )}
+
+      {apagarPrimario && (
+        <ConfirmDialog
+          title="Deactivate Primary Provider?"
+          confirmLabel="Deactivate"
+          onCancel={() => setApagarPrimario(false)}
+          onConfirm={() => { setApagarPrimario(false); guardarFicha() }}
+        >
+          {empleado.nombre} will no longer be available for selection as a rendering or billing provider.
+        </ConfirmDialog>
+      )}
 
       {nuevaHora && <NewHoursModal onClose={() => setNuevaHora(false)} />}
     </div>

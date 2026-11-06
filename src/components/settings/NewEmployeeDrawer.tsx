@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer'
-import { DateField, ModalShell, SelectField, TextField } from '@/components/patients/form'
+import { DateField, ModalShell, CountryCodeField, SelectField, TextField } from '@/components/patients/form'
 import { LinkExistingPerson } from '@/components/settings/LinkExistingPerson'
 import { useFormPasos } from '@/lib/useFormPasos'
 import { CODIGOS, PAISES, ESTADOS } from '@/data/location-options'
@@ -71,7 +71,7 @@ export function NewEmployeeDrawer({ onClose, onGuardar }: { onClose: () => void;
       <DrawerStep index={1} step={paso}>
         <DrawerSection title="Contact Information">
           <div className="grid gap-4 sm:grid-cols-2">
-            <SelectField label="Country Code" required options={CODIGOS} value={d.codigo} onChange={set('codigo')} error={falta('codigo')} />
+            <CountryCodeField required value={d.codigo} onChange={set('codigo')} error={falta('codigo')} />
             <TextField label="Area Code (3 digits)" required placeholder="555" value={d.area} onChange={set('area')} error={falta('area')} />
             <TextField label="Number (7 digits)" required placeholder="000-0000" value={d.numero} onChange={set('numero')} error={falta('numero')} />
             <TextField label="Extension" placeholder="Extension" value={d.ext} onChange={set('ext')} />

@@ -16,8 +16,25 @@ export type DatosPaciente = {
   interpreter: boolean
   /** Alta: pedir la cuenta del portal. Edición: la cuenta ya existe (se muestra "Linked"). */
   portal: boolean
-  guardian: boolean
+  /* Guardian (CON-2858; patients.md, 2026-11-04): una persona del sistema elegida en el buscador (`guardianName`) o una
+     nueva (`guardianNuevo` y sus datos `g…`). Contacto y dirección se piden si es nueva o si la elegida no los tiene. */
   guardianName: string
+  guardianNuevo: boolean
+  gFirst: string
+  gLast: string
+  gEmail: string
+  gDob: string
+  gCodigo: string
+  gArea: string
+  gNumero: string
+  gExt: string
+  gLinea1: string
+  gLinea2: string
+  gPais: string
+  gEstado: string
+  gCiudad: string
+  gZip: string
+  guardianGarante: boolean
   guardianRel: string
   phone: string
   language: string
@@ -28,14 +45,16 @@ export type DatosPaciente = {
 
 export const VACIO_PACIENTE: DatosPaciente = {
   first: '', middle: '', last: '', birthday: '', email: '', interpreter: false, portal: false,
-  guardian: false, guardianName: '', guardianRel: '', phone: '', language: '', address: '', city: '', zip: '',
+  guardianName: '', guardianNuevo: false, gFirst: '', gLast: '', gEmail: '', gDob: '',
+  gCodigo: '(+1) United States', gArea: '', gNumero: '', gExt: '', gLinea1: '', gLinea2: '', gPais: '', gEstado: '', gCiudad: '', gZip: '',
+  guardianGarante: false, guardianRel: '', phone: '', language: '', address: '', city: '', zip: '',
 }
 
 /* Lo que se sabe de cada paciente más allá de la fila de la tabla, para que Edit Patient abra con los datos cargados.
    Los que no están acá arman lo que tienen de la fila (nombre, nacimiento, email). */
 const DETALLE_SEMILLA: Record<string, Partial<DatosPaciente>> = {
   'abril-viola': { portal: true, phone: '(555) 123-4567', language: 'English', address: '123 Maple Street', city: 'Phoenix', zip: '85016' },
-  'sofia-chen': { guardian: true, guardianName: 'Elena Chen', guardianRel: 'Parent', phone: '(555) 987-6543', language: 'Spanish', city: 'Miami' },
+  'sofia-chen': { guardianName: 'Elena Chen', guardianRel: 'Parent', phone: '(555) 987-6543', language: 'Spanish', city: 'Miami' },
   'daniel-ortiz': { interpreter: true, language: 'Spanish', portal: true },
 }
 
