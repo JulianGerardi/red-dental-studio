@@ -9,8 +9,8 @@
   deshabilitar
 - Del epic CON-4019 también: CON-4033 (relaciones al crear un carrier, cubierta por la regla 3) y CON-4010 (DER: sólo la
   imagen del modelo; las tablas que usa cada historia están en el mock). Los dos epics no tienen descripción.
-- Sin implementar: CON-4031 / CON-4032 (bloquear la desactivación si el perfil está en Insurance Defaults: el clon no
-  tiene Insurance Defaults todavía) y CON-4033 como paso aparte (no hace falta, ver regla 3).
+- CON-4031 / CON-4032 (bloquear la desactivación si el perfil está en Insurance Defaults) quedaron implementadas con
+  Insurance Defaults: ver [insurance-defaults.md](insurance-defaults.md). CON-4033 como paso aparte no hace falta (regla 3).
 
 ## CON-4021 · CON-4026 · CON-4027 · CON-4028 · CON-4004 · CON-4005 · CON-4006 · CON-4007 — Primera versión (2026-11-03)
 

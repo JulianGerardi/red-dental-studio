@@ -49,9 +49,30 @@ y de provider)
 - [CON-4005](https://confidetally.atlassian.net/browse/CON-4005) [Provider] Consultar y ajustar los datos del Billing Profile · epic CON-4003
 - [CON-4006](https://confidetally.atlassian.net/browse/CON-4006) [Provider] Consultar y configurar Contracted With · epic CON-4003
 - [CON-4007](https://confidetally.atlassian.net/browse/CON-4007) [Provider] Deshabilitar el Billing Profile · epic CON-4003
-- Pendientes, sin implementar: [CON-4031](https://confidetally.atlassian.net/browse/CON-4031) y
-  [CON-4032](https://confidetally.atlassian.net/browse/CON-4032) (bloquear la desactivación si el perfil está en
-  Insurance Defaults, que el clon todavía no tiene) · epic CON-1173
+- CON-4031 y CON-4032 (bloquear la desactivación si el perfil está en Insurance Defaults) son del epic CON-1173: ver
+  **insurance-defaults**.
+
+## insurance-defaults
+
+Documento: [figma/modulos/insurance-defaults.md](figma/modulos/insurance-defaults.md) (Location → Insurance Defaults)
+
+**Epics**
+
+- [CON-1173](https://confidetally.atlassian.net/browse/CON-1173) [Location] Settings Billing (sin descripción; implementa
+  CON-1060 Billing)
+
+**Historias**
+
+- [CON-4029](https://confidetally.atlassian.net/browse/CON-4029) [Location] Inicializar, consultar y guardar Insurance Defaults · epic CON-1173
+- [CON-3894](https://confidetally.atlassian.net/browse/CON-3894) [Location] Configurar el Billing Provider predeterminado · epic CON-1173
+- [CON-3896](https://confidetally.atlassian.net/browse/CON-3896) [Location] Configurar el Rendering Provider predeterminado · epic CON-1173
+- [CON-4030](https://confidetally.atlassian.net/browse/CON-4030) [Location] Configurar la referencia contractual para los cálculos · epic CON-1173
+- [CON-3898](https://confidetally.atlassian.net/browse/CON-3898) [Location] Configure Default Place of Service · epic CON-1173
+- [CON-3899](https://confidetally.atlassian.net/browse/CON-3899) [Location] Configure Default Authorization for New Subscribers · epic CON-1173
+- [CON-4031](https://confidetally.atlassian.net/browse/CON-4031) [Provider] Bloquear la desactivación de Primary Provider cuando esté referenciado en Insurance Defaults · epic CON-1173
+- [CON-4032](https://confidetally.atlassian.net/browse/CON-4032) [Location] Bloquear la desactivación del Billing Profile cuando esté referenciado en Insurance Defaults · epic CON-1173
+- Fuera: CON-4067 DER (Back Development). Canceladas del epic viejo CON-1188 (CON-1174, CON-3237…3240, CON-3893,
+  CON-3895, CON-3897 *Default Payment Address*): no se implementan.
 
 ## clinical-mode
 

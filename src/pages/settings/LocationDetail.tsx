@@ -24,6 +24,7 @@ import { NewExceptionModal } from '@/components/settings/NewExceptionModal'
 import { LOCACIONES } from '@/pages/settings/Locations'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { LocationBillingProfile } from '@/components/settings/LocationBillingProfile'
+import { LocationInsuranceDefaults } from '@/components/settings/LocationInsuranceDefaults'
 import {
   HORARIO_SEMANAL, SALAS_INICIALES, EXCEPCIONES_INICIALES,
   type Sala, type TurnoSala, type Excepcion,
@@ -33,12 +34,12 @@ import {
    Rooms / Exceptions. Reemplaza lo que había antes en esta ruta —la ficha de
    un empleado, que no correspondía acá y se mudó a Settings → Employees. */
 
-const TABS = ['Information', 'Working Hours', 'Rooms', 'Exceptions', 'Insurance / Billing Profile'] as const
+const TABS = ['Information', 'Working Hours', 'Rooms', 'Exceptions', 'Insurance / Billing Profile', 'Insurance Defaults'] as const
 type Tab = (typeof TABS)[number]
 /* La pestaña va en la URL como en red.dev (`?type=rooms`), así un link abre la pestaña justa. */
 const TIPO_URL: Record<Tab, string> = {
   Information: 'information', 'Working Hours': 'working-hours', Rooms: 'rooms', Exceptions: 'exceptions',
-  'Insurance / Billing Profile': 'billing-profile',
+  'Insurance / Billing Profile': 'billing-profile', 'Insurance Defaults': 'insurance-defaults',
 }
 
 const DIAS: [string, string][] = [
@@ -482,7 +483,8 @@ export function SettingsLocationDetail() {
   const [params, setParams] = useSearchParams()
   const tab = TABS.find((t) => TIPO_URL[t] === params.get('type')) ?? 'Information'
   const setTab = (t: Tab) => setParams(t === 'Information' ? {} : { type: TIPO_URL[t] }, { replace: true })
-  /* Insurance / Billing Profile guarda cada card por separado: salir de la pestaña con algo sin guardar lo pregunta. */
+  /* Insurance / Billing Profile e Insurance Defaults tienen su propio guardado: salir de la pestaña con algo sin guardar
+     lo pregunta. */
   const [sucio, setSucio] = useState(false)
   const [pendiente, setPendiente] = useState<Tab | null>(null)
   const marcarSucio = useCallback((v: boolean) => setSucio(v), [])
@@ -491,7 +493,9 @@ export function SettingsLocationDetail() {
   return (
     <div className="px-4 py-6 sm:px-8">
       <PageTitle>{tab === 'Information' ? loc.nombre : tab}</PageTitle>
-      <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">Set your location name. Add the location you need.</p>
+      <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">
+        {tab === 'Insurance Defaults' ? 'Manage the insurance preferences this location uses on claims.' : 'Set your location name. Add the location you need.'}
+      </p>
 
       <Tabs className="mt-4" aria-label="Location sections" tabs={TABS} value={tab} onChange={cambiarTab} />
 
@@ -503,6 +507,7 @@ export function SettingsLocationDetail() {
         {tab === 'Insurance / Billing Profile' && (
           <LocationBillingProfile locId={loc.id} nombreLocacion={loc.nombre} onDirtyChange={marcarSucio} />
         )}
+        {tab === 'Insurance Defaults' && <LocationInsuranceDefaults key={loc.id} locId={loc.id} onDirtyChange={marcarSucio} />}
       </div>
 
       {pendiente && (
@@ -514,7 +519,7 @@ export function SettingsLocationDetail() {
           onCancel={() => setPendiente(null)}
           onConfirm={() => { setSucio(false); setTab(pendiente); setPendiente(null) }}
         >
-          Your billing profile changes haven't been saved.
+          {tab === 'Insurance Defaults' ? "Your insurance defaults changes haven't been saved." : "Your billing profile changes haven't been saved."}
         </ConfirmDialog>
       )}
     </div>

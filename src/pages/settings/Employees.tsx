@@ -28,6 +28,8 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { ProviderBillingProfile } from '@/components/settings/ProviderBillingProfile'
 import { useBillingProfiles } from '@/data/billingProfilesStore'
 import { claveProvider } from '@/data/billingProfiles'
+import { BloqueoDefaults } from '@/components/settings/LocationInsuranceDefaults'
+import type { Referencia } from '@/data/insuranceDefaults'
 
 /* Settings → Employees. La lista es propia —el Figma de 3864:235190 sólo
    tiene la ficha de un empleado, no la tabla que lleva hasta ahí—, con las
@@ -208,7 +210,8 @@ export function SettingsEmployeeDetail() {
   const empleado = EMPLEADOS.find((e) => e.id === employeeId) ?? EMPLEADOS[0]
   const [tab, setTab] = useState<Tab>('Employee')
   const [esProvider, setEsProvider] = useState(empleado.esProvider)
-  const { perfiles, primarios, guardarPrimario } = useBillingProfiles()
+  const { perfiles, primarios, guardarPrimario, referencias } = useBillingProfiles()
+  const [bloqueo, setBloqueo] = useState<Referencia[]>([])
   const primarioGuardado = primarios[empleado.id] ?? false
   const tienePerfil = !!perfiles[claveProvider(empleado.id)]
   const [toggles, setToggles] = useState({ primario: primarioGuardado, firma: true, locum: true })
@@ -232,11 +235,18 @@ export function SettingsEmployeeDetail() {
   const guardarFicha = () => {
     if (!primarioSucio) { aviso.ok('Employee information saved.'); return }
     const r = guardarPrimario(empleado.id, empleado.nombre, toggles.primario)
+    if (r === 'bloqueado') { setBloqueo(referencias(claveProvider(empleado.id), empleado.id)); return }
     aviso.ok(r === 'creado' ? 'Primary Provider enabled. Insurance / Billing Profile is now available.'
       : r === 'reactivado' ? 'Primary Provider enabled. The billing profile is active again.'
       : 'Primary Provider deactivated. The billing profile is now read-only.')
   }
-  const guardar = () => (primarioSucio && !toggles.primario ? setApagarPrimario(true) : guardarFicha())
+  /* Si el provider o su perfil están elegidos en Insurance Defaults, no se pregunta: se frena y se dice dónde (CON-4031). */
+  const guardar = () => {
+    if (!(primarioSucio && !toggles.primario)) { guardarFicha(); return }
+    const r = referencias(claveProvider(empleado.id), empleado.id)
+    if (r.length) setBloqueo(r)
+    else setApagarPrimario(true)
+  }
   const cancelar = () => {
     setToggles((p) => ({ ...p, primario: primarioGuardado }))
     aviso.info('Changes discarded.')
@@ -508,6 +518,8 @@ export function SettingsEmployeeDetail() {
           {empleado.nombre} will no longer be available for selection as a rendering or billing provider.
         </ConfirmDialog>
       )}
+
+      {bloqueo.length > 0 && <BloqueoDefaults tipo="provider" referencias={bloqueo} onClose={() => setBloqueo([])} />}
 
       {nuevaHora && <NewHoursModal onClose={() => setNuevaHora(false)} />}
     </div>

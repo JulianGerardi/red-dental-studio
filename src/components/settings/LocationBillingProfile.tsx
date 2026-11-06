@@ -11,7 +11,9 @@ import {
   AccionesGuardado, CamposCredenciales, ContactoCard, ContractedWith, CredentialsDrawer, DatoPerfil, EstadoPerfilPill,
   ReplaceContactDrawer, validarCredenciales, type Credenciales, type ErroresCredenciales, type EstadoPerfil,
 } from '@/components/settings/BillingProfile'
+import { BloqueoDefaults } from '@/components/settings/LocationInsuranceDefaults'
 import { useBillingProfiles } from '@/data/billingProfilesStore'
+import type { Referencia } from '@/data/insuranceDefaults'
 import { CONTACTOS_LOCACION, claveLocacion, fiscalOculto, type PerfilFacturacion } from '@/data/billingProfiles'
 
 /* Location → Insurance / Billing Profile (CON-4021 habilitar, CON-4026 consultar y ajustar, CON-4027 Contracted With,
@@ -28,7 +30,7 @@ export function LocationBillingProfile({
   locId, nombreLocacion, onDirtyChange,
 }: { locId: string; nombreLocacion: string; onDirtyChange?: (sucio: boolean) => void }) {
   const clave = claveLocacion(locId)
-  const { perfiles, contactos, guardarPerfil } = useBillingProfiles()
+  const { perfiles, contactos, guardarPerfil, referencias } = useBillingProfiles()
   const perfil = perfiles[clave]
   const general = CONTACTOS_LOCACION[locId] ?? CONTACTOS_LOCACION.abril
   const guardadosTitular = contactos[clave]
@@ -43,6 +45,7 @@ export function LocationBillingProfile({
   const [reemplazo, setReemplazo] = useState<Reemplazo | null>(null)
   const [preguntar, setPreguntar] = useState<'deshabilitar' | 'descartar' | null>(null)
   const [sucios, setSucios] = useState({ identidad: false, contratos: false })
+  const [bloqueo, setBloqueo] = useState<Referencia[]>([])
 
   const setupSucio = configurando && JSON.stringify(setup) !== JSON.stringify(inicialSetup())
   const haySucios = sucios.identidad || sucios.contratos
@@ -63,7 +66,10 @@ export function LocationBillingProfile({
       if (setupSucio) setPreguntar('descartar')
       else setConfigurando(false)
     } else if (!v && perfil?.activo) {
-      setPreguntar('deshabilitar')
+      /* No se deshabilita mientras esté elegido en Insurance Defaults de alguna Location (CON-4032). */
+      const r = referencias(clave)
+      if (r.length) setBloqueo(r)
+      else setPreguntar('deshabilitar')
     }
   }
 
@@ -216,6 +222,9 @@ export function LocationBillingProfile({
           onConfirm={() => {
             setPreguntar(null)
             if (!perfil) return
+            /* El guardado vuelve a mirar: lo pudieron elegir en Insurance Defaults con la pregunta abierta. */
+            const r = referencias(clave)
+            if (r.length) { setBloqueo(r); return }
             guardarPerfil(clave, { ...perfil, activo: false })
             aviso.ok('Billing profile disabled.')
           }}
@@ -224,6 +233,8 @@ export function LocationBillingProfile({
           kept.{haySucios && ' Unsaved changes will be discarded.'}
         </ConfirmDialog>
       )}
+
+      {bloqueo.length > 0 && <BloqueoDefaults tipo="perfil" referencias={bloqueo} onClose={() => setBloqueo([])} />}
 
       {preguntar === 'descartar' && (
         <ConfirmDialog
