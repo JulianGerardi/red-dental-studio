@@ -155,9 +155,13 @@ coordenada `y`.
 Julián, con una grabación de red.dev (`/patients/:id/insurance`): a la card de Subscription Information le faltaba
 comportarse como allá. Reglas de Jira: CON-3282 (Delete Suscription) y CON-3284 (New Suscription).
 
-- **Buscador de suscripciones**: placeholder "Search by name or ID", desplegable con "Nombre - Subscriber ID" (mock
-  `SUSCRIPCIONES` en `data/insurance.ts`), ✕ para limpiar y "Subscription not found." sin coincidencias. Es el
-  `SearchField` de siempre con dos props nuevas: `emptyText` y `clearable`.
+- **Buscador de suscripciones** (Julián, mismo día: "como los otros que tenemos en la aplicación, con más data"): es
+  `PersonSearchField`, el buscador de personas de toda la app. Cada resultado es una card con avatar, el suscriptor y
+  tres líneas —Subscription (número), Carrier y Plan— y se busca en los cuatro datos. La elegida queda en la card azul
+  con su ✕. Para eso `PersonSearchField` suma dos props opcionales: `nombre` (qué nombre mostrar cuando la clave es
+  "Nombre - ID", porque un suscriptor puede tener varias suscripciones) y `texto` (dónde buscar). Placeholder "Search by
+  name or ID" y "Subscription not found." sin coincidencias. Mock `SUSCRIPCIONES` en `data/insurance.ts`.
+- `SearchField` suma `emptyText` y `clearable`, que usan Carrier Name y Plan Name en New Subscription.
 - **Card sin elegir**: "Select a subscription" y guiones en cada dato; **Manage Subscription deshabilitado** y sin
   tacho. Elegida: el nombre del plan con su pill de estado, los datos y un instante de carga (skeleton en Carrier, Plan
   y Dependents) como red.dev. Manage Subscription ahora muestra la suscripción elegida.
@@ -185,6 +189,10 @@ Anomalías de red.dev que **no** se copian:
 67. Los errores de campo dicen "String must contain at least 1 character(s)" (el mensaje crudo del validador). Acá:
     "This field is required.", como el resto de la app.
 68. El toast de Jira dice "The suscription has been successfully created." Acá, "subscription".
+
+Propuesta para validar: la card de la elegida ya muestra suscriptor, número, carrier y plan, y la lista de datos de
+abajo los repite (la lista viene del Figma y de red.dev). Se podría dejar en la lista sólo Coverage Period, Dependents
+y el estado. No se tocó: espera su ok.
 
 Para validar con Julián: CON-3284 también dice que **Coverage End no puede ser futura**, pero un plan suele terminar
 más adelante (12/31 del año), así que no se aplicó hasta confirmarlo. La fila de la tabla en red.dev trae un menú ⋮ que

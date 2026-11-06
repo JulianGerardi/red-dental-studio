@@ -6,7 +6,7 @@ import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { Pill, type PillTone } from '@/components/ui/pill'
-import { SelectField, DateTextField, TextArea, OptionCheckbox, FormFooter, SearchField } from '@/components/patients/form'
+import { SelectField, DateTextField, TextArea, OptionCheckbox, FormFooter, PersonSearchField } from '@/components/patients/form'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import {
@@ -107,7 +107,8 @@ export default function Insurance() {
   const [suscripciones, setSuscripciones] = useState(SUSCRIPCIONES)
   const [busqueda, setBusqueda] = useState('')
   const [cargando, setCargando] = useState(false)
-  const elegida = suscripciones.find((s) => etiquetaSuscripcion(s) === busqueda)
+  const porEtiqueta = (v: string) => suscripciones.find((s) => etiquetaSuscripcion(s) === v)
+  const elegida = porEtiqueta(busqueda)
   const buscar = (v: string) => {
     setBusqueda(v)
     /* Al elegir, un instante de carga mientras llegan carrier, plan y dependientes, como red.dev. */
@@ -214,9 +215,14 @@ export default function Insurance() {
                     Select an existing subscription or create new one.
                   </p>
 
-                  <SearchField
+                  {/* El buscador de personas de toda la app (PersonSearchField): cada resultado, una card con el suscriptor y
+                      número, carrier y plan; busca en los cuatro (Julián, 2026-11-06). */}
+                  <PersonSearchField
                     className="mt-4" label="Search for an existing subscription" required placeholder="Search by name or ID"
-                    options={suscripciones.map(etiquetaSuscripcion)} value={busqueda} onChange={buscar} clearable
+                    personas={suscripciones.map(etiquetaSuscripcion)} value={busqueda} onChange={buscar}
+                    nombre={(v) => porEtiqueta(v)?.subscriber ?? v}
+                    texto={(v) => { const x = porEtiqueta(v); return x ? `${etiquetaSuscripcion(x)} ${x.carrier} ${x.plan}` : v }}
+                    lineas={(v) => { const x = porEtiqueta(v); return x && [`Subscription: ${x.subscriberId}`, `Carrier: ${x.carrier}`, `Plan: ${x.plan}`] }}
                     emptyText="Subscription not found."
                     error={intentado && !elegida ? (busqueda.trim() ? 'Select a subscription from the list.' : 'This field is required.') : undefined}
                   />

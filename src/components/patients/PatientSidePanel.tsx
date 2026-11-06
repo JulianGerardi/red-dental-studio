@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Ban, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen, IdCard,
+  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Handshake, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen, IdCard,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -23,7 +23,9 @@ const NAV: { key: string; icon: LucideIcon; to?: string }[] = [
   { key: 'Insurance', icon: Shield, to: '/insurance' },
   { key: 'Ledger', icon: BookOpen, to: '/ledger' },
   { key: 'Documents', icon: ClipboardList, to: '/documents' },
-  { key: 'Relationships & Billing', icon: Ban, to: '/relationships' },
+  /* Handshake: la relación con otras personas y quién se hace cargo de pagar. Antes era Ban, el de "prohibido"
+     (patient-dashboard.md, 2026-11-06). */
+  { key: 'Relationships & Billing', icon: Handshake, to: '/relationships' },
 ]
 
 const GENERAL = [
