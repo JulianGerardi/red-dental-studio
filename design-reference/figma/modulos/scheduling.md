@@ -663,3 +663,29 @@ sigue encontrando el botón y completando el campo igual que antes.
 
 Las sugerencias de Patient, Primary Provider y Additional Provider (`PersonSearchField`) ahora flotan en un desplegable pegado al input en vez de empujar los campos de abajo, y
 la persona elegida lleva una ✕ para quitarla (en Additional Provider, opcional, es la forma de dejarlo vacío otra vez). El porqué está en `relationships.md` (2026-10-21).
+
+## Detalle del turno: inicio y fin (2026-11-10)
+
+Sin historia de Jira para el formato del horario en el detalle (se buscó en CON por "appointment detail", "popover" y
+"check in": las que hay son de Check In y Encounter Status, no de cómo se muestra la hora). Lo pidió Julián sobre una
+grabación del popover.
+
+Reemplaza a **"Un solo horario"** de *Ajustes sobre la quinta propuesta* (2026-08-30). Dos problemas de esa decisión:
+
+- **No se veía a qué hora termina.** Había que sumar "08:15 AM" + "2 hr 30 min" de cabeza, y recepción mira este popover
+  justamente para saber cuándo se libera el sillón o el profesional.
+- **La hora a 15 px en negrita competía con el nombre del paciente** (también 15 px en negrita) y, a 336 px de ancho, se
+  partía en dos renglones ("08:15" / "AM") al lado de la fecha, que también se partía.
+
+Ahora la caja gris lleva dos renglones al tamaño del resto de las filas:
+
+- Arriba, **"08:15 AM – 10:45 AM"** (13 px seminegrita) y la duración a la derecha ("2 hr 30 min", 11 px).
+- Abajo, la fecha completa ("Monday, May 30, 2022", 11 px).
+
+Mismos datos que antes más la hora de fin, que sale de `start + duration`; nada más se agrega. El rótulo es el de
+`fmtExacta`, el mismo del bloque de la grilla (regla "La hora sale de un solo lado"). La caja gris se queda: separa el
+*cuándo* del *quién/dónde/qué* sin regla. Los textos chicos pasan de `ink-muted` a `ink-medium`, que sobre el gris
+llega a contraste AA. Para lectores de pantalla el rango se lee "From 08:15 AM to 10:45 AM".
+
+**Para el dev:** `AppointmentDetailsDrawer` cambia la prop `hora: string` por `inicio: number` (hora decimal, 8.25 =
+08:15 AM) y calcula el fin adentro.

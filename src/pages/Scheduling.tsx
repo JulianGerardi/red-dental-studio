@@ -304,7 +304,7 @@ export default function Scheduling() {
         <AppointmentDetailsDrawer
           patient={detail.ev.patient}
           estado={detail.ev.state}
-          hora={fmtExacta(detail.ev.start)}
+          inicio={detail.ev.start}
           duracion={detail.ev.duration}
           fecha={detail.ev.fecha}
           provider={detail.ev.provider}

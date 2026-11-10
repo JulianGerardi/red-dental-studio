@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import {
   X, TriangleAlert, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity,
 } from 'lucide-react'
-import { BLOCK_STYLE, type ApptState } from './calendar-data'
+import { BLOCK_STYLE, fmtExacta, type ApptState } from './calendar-data'
 import { useAnclaje } from '@/lib/anclaje'
 import { useEsChico } from '@/lib/media'
 import { aviso } from '@/components/ui/toaster'
@@ -17,11 +17,9 @@ import { Avatar } from '@/components/ui/avatar'
 
    Acá el contenido manda sobre la forma:
 
-   - **Un solo horario.** Mostrar inicio y fin hacía leer dos veces para
-     entender un dato que es uno: cuándo empieza. La duración va al lado, en
-     texto chico, y no compite. La hora y la fecha salen del turno que se
-     clickeó —el mismo rótulo que muestra el bloque en la grilla—, no de un
-     texto fijo.
+   - **Inicio y fin, al tamaño del resto.** La hora y la fecha salen del turno
+     que se clickeó —el mismo rótulo que muestra el bloque en la grilla—, no
+     de un texto fijo.
    - **Filas con ícono en vez de etiqueta.** Un consultorio, un profesional y
      un motivo se reconocen por el ícono; el rótulo en mayúsculas sobraba.
    - **La card sigue siendo el bloque del calendario**: mismo acento arriba y
@@ -57,7 +55,7 @@ function duracionLegible(horas: number) {
 export function AppointmentDetailsDrawer({
   patient,
   estado = 'Booked',
-  hora,
+  inicio,
   duracion,
   fecha,
   provider,
@@ -68,8 +66,8 @@ export function AppointmentDetailsDrawer({
 }: {
   patient: string
   estado?: ApptState
-  /** El rótulo del bloque, tal como se lee en la grilla. */
-  hora: string
+  /** Hora decimal de inicio (8.25 = 08:15 AM); el fin sale de sumarle la duración. */
+  inicio: number
   duracion: number
   fecha: Date
   provider: string
@@ -111,6 +109,7 @@ export function AppointmentDetailsDrawer({
 
   const initials = patient.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
   const s = BLOCK_STYLE[estado] ?? BLOCK_STYLE.Booked
+  const fin = Math.round((inicio + duracion) * 60) / 60
 
   const cuerpo = (
     <div
@@ -156,15 +155,24 @@ export function AppointmentDetailsDrawer({
       </div>
 
       <div className="flex flex-col gap-3 p-4">
-        {/* Un solo horario: el de inicio, que es el que ubica el turno. La
-            duración va al lado y en chico. Va sobre una caja gris para que se
-            despegue de las filas de abajo sin necesidad de una regla. */}
-        <div className="flex items-center gap-2.5 rounded-md bg-surface-muted px-3 py-2">
-          <Clock className="size-4 shrink-0 text-ink" />
-          <span className="text-[15px] leading-none font-bold text-ink">{hora}</span>
-          <span className="text-[11px] text-ink-muted">
-            {duracionLegible(duracion)} ·{' '}
-            {fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+        {/* Inicio y fin al tamaño de las filas, con la duración al costado y la
+            fecha abajo: ver "Detalle del turno: inicio y fin" en scheduling.md. */}
+        <div className="flex items-start gap-2.5 rounded-md bg-surface-muted px-3 py-2">
+          <Clock className="mt-px size-4 shrink-0 text-ink-medium" />
+          <span className="min-w-0 flex-1">
+            <span className="flex flex-wrap items-baseline justify-between gap-x-2">
+              <span className="text-[13px] font-semibold whitespace-nowrap text-ink">
+                <span className="sr-only">From </span>
+                {fmtExacta(inicio)}
+                <span aria-hidden> – </span>
+                <span className="sr-only"> to </span>
+                {fmtExacta(fin)}
+              </span>
+              <span className="text-[11px] whitespace-nowrap text-ink-medium">{duracionLegible(duracion)}</span>
+            </span>
+            <span className="mt-0.5 block text-[11px] text-ink-medium">
+              {fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+            </span>
           </span>
         </div>
 
