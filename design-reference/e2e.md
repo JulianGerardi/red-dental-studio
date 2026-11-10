@@ -107,6 +107,8 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 - `tests/scheduling-linked-visit.e2e.ts` (2026-10-17): en New Appointment, Visit 2 muestra el turno donde ya está
   linkeada; Save pregunta *Move treatment visit?* y Cancel deja el drawer como estaba; *Move visit* guarda y avisa que
   la visita se movió; una visita sin otro turno se guarda sin preguntar.
+- `tests/scheduling-delete.e2e.ts` (2026-11-10, CON-2990): un turno Proposed se borra desde su detalle con
+  confirmación (Cancel lo deja como estaba); en uno que no está Proposed, Delete se ve apagado y dice por qué.
 
 Los tests usan locators (`screen.getByRole(...)`, `expect(...)`): no llaman a ningún modelo.
 

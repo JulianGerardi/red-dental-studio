@@ -16,6 +16,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   `purple-bg`, sin tokens nuevos. No es un estado del botón de encuentro. Jira no tiene historia para esto: está como
   anomalía en `patient-dashboard.md` (2026-11-10). Storybook sin actualizar (pendiente de que Julián lo pida).
 
+### Detalle del turno: inicio y fin, y Delete ([#129](https://github.com/JulianGerardi/red-dental-studio/pull/129))
+- **Scheduling → detalle del turno**: el horario muestra inicio y fin al tamaño del resto de las filas ("08:15 AM –
+  10:45 AM"), con la duración a la derecha y la fecha abajo; antes sólo se veía la hora de inicio, en grande.
+- **Delete** (CON-2990), a la izquierda de Check In y del mismo ancho: sólo borra un turno `Proposed`, con
+  `ConfirmDialog`. En los demás estados se ve apagado y dice por qué (tooltip y aviso). Se suma a la grilla un turno
+  Proposed de ejemplo que no está en el Figma (Sofia Chen, miércoles 11:00 AM).
+- **Para el dev:** `AppointmentDetailsDrawer` cambia `hora: string` por `inicio: number` (hora decimal) y suma
+  `onDelete?` (sin la prop no muestra el botón; confirma adentro). `calendar-data.ts` suma `esEliminable(estado)`.
+  Check In pasa a `ui/button`. La auditoría del borrado no se muestra (no hay backend). e2e en
+  `tests/scheduling-delete.e2e.ts`. Decisiones en `scheduling.md` (2026-11-10). Storybook sin actualizar.
+
 ### Insurance: resultados del buscador de suscripciones en filas ([#130](https://github.com/JulianGerardi/red-dental-studio/pull/130))
 - **Search for an existing subscription**: cada resultado es una fila con avatar, nombre e **ID** a la izquierda, y
   **Carrier** y **Plan** en columnas alineadas entre todas las filas (antes eran cuatro renglones apilados y sobraba

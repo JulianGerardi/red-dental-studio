@@ -9,7 +9,7 @@ const meta = {
   args: {
     patient: 'Maria Abril Viola',
     estado: 'Check-in',
-    hora: '08:15 AM',
+    inicio: 8.25,
     duracion: 2.5,
     fecha: new Date(2022, 4, 30),
     provider: 'Dr. Elena Martinez',
