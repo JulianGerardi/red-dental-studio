@@ -215,19 +215,17 @@ ancho sin usar y difícil de comparar de una fila a otra.
 - `PersonSearchField` suma `columnas` (opcional). Sin esa prop se ve como siempre (New Patient, New Appointment,
   Relationships).
 
-## CON-3284 — Cada resultado del buscador, en una sola línea (2026-11-10, segunda vuelta)
+## CON-3284 — El buscador de suscripciones con chips (2026-11-10, tercera vuelta)
 
-Julián, sobre lo publicado en #130: no le gustó el ID debajo del nombre ni los rótulos arriba de cada dato. Quiere
-todo en una misma línea.
+Dos intentos el mismo día que Julián no aprobó: (1) Carrier y Plan en columnas con rótulo arriba, ID debajo del
+nombre; (2) todo en una línea con encabezado de columnas y el desplegable ensanchado sobre Patient Information (en
+media pantalla no entraba y se cortaba casi todo). Se le mostraron tres variantes armadas en la app real —A dos
+líneas, B una línea corrida, C chips— y **eligió C**.
 
-- **Lista**: cada resultado es una fila de tabla en un renglón —avatar, Subscriber, ID, Carrier, Plan—, con un
-  **encabezado de columnas** arriba (los valores ya no llevan rótulo). El avatar baja a 28 px.
-- **Ancho**: la card de Subscription Information ocupa media pantalla y en una línea no entraban los datos. Con
-  columnas, el desplegable se **ensancha hacia la derecha** (hasta 680 px, sin pasarse de la pantalla) y tapa parte de
-  Patient Information mientras está abierto, como cualquier menú flotante. En tablet ya entra en el ancho del campo.
-- **Card elegida**: también en una línea, pero sin columnas fijas (no tiene encabezado con el que alinearse): cada dato
-  ocupa lo que necesita. El ID nunca se achica; Carrier y Plan se cortan con "…" si no entran (el valor completo está
-  en el tooltip y en la lista de datos de abajo).
-- **Celular**: no entra en un renglón; los datos bajan debajo del nombre con su rótulo ("Carrier: AETNA").
-- `PersonSearchField`: `columnas` ahora arma la fila en una línea con encabezado; suma `columnaNombre` (título de la
-  columna del nombre, "Subscriber"). El ID pasó de `lineas` a ser una columna más.
+- Cada resultado: avatar, **nombre · ID** (el ID en gris al lado del nombre) y abajo **Carrier y Plan como chips**:
+  carrier neutro (gris), plan celeste, así el plan —lo que más distingue dos suscripciones del mismo suscriptor— se
+  destaca. La card elegida, igual.
+- Entra en el ancho del campo: sin encabezado ni desplegable ensanchado. En el celular los chips bajan solos.
+- Los chips llevan el rótulo para lector de pantalla ("Carrier: …") y tooltip con el texto completo.
+- `ui/chip` suma `tone` (`blue` de siempre, `neutral`) y `title`. `PersonSearchField` cambia `columnas`/
+  `columnaNombre` por `subtitulo` (texto al lado del nombre) y `chips` (`{ label, value, tone }[]`).

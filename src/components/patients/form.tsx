@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Drawer, DrawerSection, useEnDrawer, type DrawerSize } from '@/components/ui/drawer'
 import { ChevronDown, Calendar, Check, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Chip, type ChipTone } from '@/components/ui/chip'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
 import { Avatar, inicialesDe } from '@/components/ui/avatar'
 import { CountryFlag } from '@/components/ui/country-flag'
@@ -514,31 +515,12 @@ export function SearchField({
   )
 }
 
-/* Con `columnas`, cada persona es una fila de tabla en una sola línea: nombre y los datos en columnas alineadas entre
-   las filas, con un encabezado arriba de la lista. La grilla se decide por el ancho (container query): sin lugar, los
-   datos bajan debajo del nombre con su rótulo. insurance.md, 2026-11-10. */
-export type ColumnaPersona = { label: string; value: string }
-const GRILLA_COLUMNAS = '@sm:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)_minmax(0,1.3fr)_minmax(0,1fr)]'
+/* Con `chips`, la persona va en dos renglones: nombre · subtítulo (el ID) arriba y los datos como chips abajo (Insurance:
+   Carrier y Plan). Entra en el ancho del campo y en el celular los chips bajan solos. insurance.md, 2026-11-10. */
+export type ChipPersona = { label: string; value: string; tone?: ChipTone }
 
-/* Los títulos de las columnas, alineados con las filas (mismo padding y el lugar del avatar). */
-function EncabezadoColumnas({ nombre, columnas }: { nombre: string; columnas: ColumnaPersona[] }) {
-  return (
-    <div aria-hidden className="@container px-2 pt-1">
-      <div className="hidden items-center gap-3 @sm:flex">
-        <span className="w-7 shrink-0" />
-        <span className={cn('grid min-w-0 flex-1 gap-x-3 text-[11px] font-medium text-ink-faint', GRILLA_COLUMNAS)}>
-          <span>{nombre}</span>
-          {columnas.map((c) => <span key={c.label}>{c.label}</span>)}
-        </span>
-      </div>
-    </div>
-  )
-}
-
-/* `alineada`: columnas fijas, para alinear con el encabezado de la lista. Sin eso (la card elegida), cada dato ocupa lo
-   que necesita, uno detrás del otro. */
-function PersonaFila({ nombre, lineas, columnas, alineada = true }: { nombre: string; lineas?: string[]; columnas?: ColumnaPersona[]; alineada?: boolean }) {
-  if (!columnas?.length) {
+function PersonaFila({ nombre, lineas, subtitulo, chips }: { nombre: string; lineas?: string[]; subtitulo?: string; chips?: ChipPersona[] }) {
+  if (!chips?.length) {
     return (
       <>
         <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
@@ -547,18 +529,22 @@ function PersonaFila({ nombre, lineas, columnas, alineada = true }: { nombre: st
     )
   }
   return (
-    <span className="@container flex min-w-0 flex-1 items-start gap-3 @sm:items-center">
-      <Avatar aria-hidden initials={inicialesDe(nombre)} size={28} />
-      <span className={cn('min-w-0 flex-1 gap-y-0.5 leading-tight', alineada ? cn('grid gap-x-3 @sm:items-center', GRILLA_COLUMNAS) : 'flex flex-col gap-x-4 @sm:flex-row @sm:items-center')}>
-        <span title={nombre} className={cn('truncate text-[13px] font-semibold text-ink', !alineada && '@sm:max-w-[40%] @sm:shrink-0')}>{nombre}</span>
-        {/* En la card elegida, la primera columna (el ID en Insurance) no se achica: es lo que identifica a la fila. */}
-        {columnas.map((c, i) => (
-          <span key={c.label} title={`${c.label}: ${c.value}`} className={cn('min-w-0 truncate text-xs text-ink @sm:text-[13px]', !alineada && i === 0 && '@sm:shrink-0')}>
-            <span className="text-ink-faint @sm:hidden">{c.label}: </span>{c.value}
-          </span>
-        ))}
+    <>
+      <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
+      <span className="min-w-0 flex-1 leading-tight">
+        <span className="block truncate text-[13px] text-ink">
+          <span className="font-semibold">{nombre}</span>
+          {subtitulo && <span className="text-xs text-ink-muted"> · {subtitulo}</span>}
+        </span>
+        <span className="mt-1.5 flex flex-wrap gap-1.5">
+          {chips.map((c) => (
+            <Chip key={c.label} tone={c.tone} title={`${c.label}: ${c.value}`}>
+              <span className="sr-only">{c.label}: </span>{c.value}
+            </Chip>
+          ))}
+        </span>
       </span>
-    </span>
+    </>
   )
 }
 
@@ -591,7 +577,7 @@ function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?:
    exactamente un nombre de la lista. Ver design-reference/design-system.md. */
 export function PersonSearchField({
   label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas, emptyText,
-  nombre: nombreDe = (v) => v, texto: textoDe = (v) => v, columnas, columnaNombre = 'Name',
+  nombre: nombreDe = (v) => v, texto: textoDe = (v) => v, subtitulo, chips,
 }: {
   label: string
   required?: boolean
@@ -612,10 +598,10 @@ export function PersonSearchField({
   nombre?: (valor: string) => string
   /** Dónde se busca lo escrito; por default, en el valor. Insurance busca en nombre, número, carrier y plan. */
   texto?: (valor: string) => string
-  /** Datos en la misma línea que el nombre, en columnas con encabezado; sin lugar, bajan debajo con su rótulo. */
-  columnas?: (valor: string) => ColumnaPersona[] | undefined
-  /** Título de la columna del nombre en el encabezado ("Subscriber"). */
-  columnaNombre?: string
+  /** Texto corto al lado del nombre, en gris ("· JASDASD11243"). Sólo con `chips`. */
+  subtitulo?: (valor: string) => string | undefined
+  /** Datos como chips debajo del nombre (Carrier, Plan); reemplazan a `lineas`. */
+  chips?: (valor: string) => ChipPersona[] | undefined
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -650,11 +636,7 @@ export function PersonSearchField({
           className={cn(control(error), 'h-9 pr-3 pl-9')}
         />
         {abierto && sugerencias.length > 0 && (
-          /* Con columnas, la lista se ensancha (sin pasarse de la pantalla) para que cada fila entre en una línea. */
-          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg', columnas && 'lg:w-[max(100%,min(680px,calc(100vw-24rem)))]', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
-            {columnas && sugerencias[0] && columnas(sugerencias[0]) && (
-              <EncabezadoColumnas nombre={columnaNombre} columnas={columnas(sugerencias[0])!} />
-            )}
+          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
             {sugerencias.map((nombre) => (
               <button
                 key={nombre}
@@ -662,7 +644,7 @@ export function PersonSearchField({
                 onClick={() => { onChange?.(nombre); setAbierto(false) }}
                 className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-surface-muted"
               >
-                <PersonaFila nombre={nombreDe(nombre)} lineas={lineas?.(nombre)} columnas={columnas?.(nombre)} />
+                <PersonaFila nombre={nombreDe(nombre)} lineas={lineas?.(nombre)} subtitulo={subtitulo?.(nombre)} chips={chips?.(nombre)} />
               </button>
             ))}
           </div>
@@ -676,8 +658,8 @@ export function PersonSearchField({
       {pie(error, hint)}
       {elegida && (
         <div className="relative">
-          <div className={cn('border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3', columnas ? 'pr-10' : 'pr-11')}>
-            <PersonaFila nombre={nombreDe(value)} lineas={lineas?.(value)} columnas={columnas?.(value)} alineada={false} />
+          <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3 pr-11">
+            <PersonaFila nombre={nombreDe(value)} lineas={lineas?.(value)} subtitulo={subtitulo?.(value)} chips={chips?.(value)} />
           </div>
           {!disabled && (
             <button

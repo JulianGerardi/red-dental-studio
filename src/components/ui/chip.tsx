@@ -5,8 +5,19 @@ import { cn } from '@/lib/utils'
 /* Chip: algo elegido que se puede sacar (un código CDT, un filtro aplicado). Celeste con texto azul y la ✕ a la derecha.
    No es un estado (eso es Pill) ni una cuenta (Count). Julián, 2026-10-09: había seis chips a mano con colores distintos.
    Ver Elements / Chips. */
-export function Chip({ children, onRemove, removeLabel, disabled, className }: {
+/* blue: lo elegido (el de siempre). neutral: un dato al lado de otro que se quiere destacar (Carrier junto al Plan en
+   el buscador de suscripciones de Insurance, 2026-11-10). */
+export type ChipTone = 'blue' | 'neutral'
+const CHIP_TONES: Record<ChipTone, string> = {
+  blue: 'bg-dash-count-bg text-dash-blue',
+  neutral: 'bg-surface-muted text-ink-soft',
+}
+
+export function Chip({ children, onRemove, removeLabel, disabled, className, tone = 'blue', title }: {
   children: ReactNode
+  tone?: ChipTone
+  /** Tooltip con el texto completo, por si se corta. */
+  title?: string
   /** Sin onRemove el chip es sólo lectura (no lleva ✕). */
   onRemove?: () => void
   /** aria-label de la ✕, por ejemplo "Remove D0140". */
@@ -16,8 +27,10 @@ export function Chip({ children, onRemove, removeLabel, disabled, className }: {
 }) {
   return (
     <span
+      title={title}
       className={cn(
-        'inline-flex h-6 max-w-full items-center gap-1 rounded-full bg-dash-count-bg pl-2.5 text-[12px] font-medium text-dash-blue',
+        'inline-flex h-6 max-w-full items-center gap-1 rounded-full pl-2.5 text-[12px] font-medium',
+        CHIP_TONES[tone],
         onRemove ? 'pr-1' : 'pr-2.5',
         disabled && 'opacity-60',
         className,
