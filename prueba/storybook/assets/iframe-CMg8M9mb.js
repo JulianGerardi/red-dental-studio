@@ -1,0 +1,1 @@
+import{t as e}from"./iframe-BMU0_WDY.js";e();
