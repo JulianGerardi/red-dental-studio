@@ -698,7 +698,9 @@ La historia fija la regla: un turno se borra sólo en un estado temprano —`Pro
 confirmación, y tiene que quedar claro cuando no se puede.
 
 - **Dónde.** En el pie del detalle, a la izquierda de Check In: **Delete** con tacho, en rojo sobre blanco (secundario,
-  no relleno). La acción principal sigue siendo Check In, que ocupa el resto del ancho.
+  no relleno). **Los dos botones miden lo mismo** (mitad y mitad, 36 px de alto), como el pie de los drawers; lo pidió
+  Julián porque Delete, al ancho de su texto, se veía chico al lado de Check In. La jerarquía la da el relleno azul de
+  Check In, no el tamaño. Check In pasa a `ui/button` para que los dos compartan alto, radio y peso de letra.
 - **Sólo `Proposed`** (`esEliminable` en `calendar-data.ts`). `Waiting List` no es un estado de la grilla: esas
   solicitudes viven en el panel de Appointment Requests y ya tienen su Cancel.
 - **Cuando no se puede, el botón se ve apagado y dice por qué**, no desaparece: "Only Proposed or Waiting List

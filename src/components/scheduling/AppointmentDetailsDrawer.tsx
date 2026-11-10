@@ -11,7 +11,6 @@ import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { cn } from '@/lib/utils'
 
 /* Figma 3856:214039 "Appointment Details Drawer".
 
@@ -205,8 +204,8 @@ export function AppointmentDetailsDrawer({
           <span className="text-[11px] font-semibold text-warn-fg">Guarantor not assigned</span>
         </div>
 
-        <div className="flex gap-2">
-          {/* Delete (CON-2990): sólo Proposed; en el resto se ve apagado y dice por qué. */}
+        <div className={onDelete ? 'grid grid-cols-2 gap-2' : 'grid'}>
+          {/* Delete (CON-2990): sólo Proposed; en el resto se ve apagado y dice por qué. Los dos botones, del mismo ancho. */}
           {onDelete && (eliminable ? (
             <Button variant="secondary" className="text-dash-bad-fg hover:bg-dash-bad-bg" onClick={() => setConfirmando(true)}>
               <Trash2 /> Delete
@@ -230,15 +229,9 @@ export function AppointmentDetailsDrawer({
               <span id={idBloqueo} className="sr-only">{BLOQUEO_BORRAR}</span>
             </TooltipProvider>
           ))}
-          <button
-            onClick={() => aviso.ok(`${patient} has been checked in.`)}
-            className={cn(
-              'bg-dash-blue hover:bg-dash-blue-hover flex h-9 flex-1 items-center justify-center gap-2 rounded-md',
-              'text-[13px] font-semibold text-white transition-colors',
-            )}
-          >
-            Check In <ChevronDown className="size-4" />
-          </button>
+          <Button onClick={() => aviso.ok(`${patient} has been checked in.`)}>
+            Check In <ChevronDown />
+          </Button>
         </div>
       </div>
     </div>
