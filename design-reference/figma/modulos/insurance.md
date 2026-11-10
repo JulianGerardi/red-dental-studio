@@ -214,3 +214,20 @@ ancho sin usar y difícil de comparar de una fila a otra.
   número no entraba en la columna y se partía.
 - `PersonSearchField` suma `columnas` (opcional). Sin esa prop se ve como siempre (New Patient, New Appointment,
   Relationships).
+
+## CON-3284 — Cada resultado del buscador, en una sola línea (2026-11-10, segunda vuelta)
+
+Julián, sobre lo publicado en #130: no le gustó el ID debajo del nombre ni los rótulos arriba de cada dato. Quiere
+todo en una misma línea.
+
+- **Lista**: cada resultado es una fila de tabla en un renglón —avatar, Subscriber, ID, Carrier, Plan—, con un
+  **encabezado de columnas** arriba (los valores ya no llevan rótulo). El avatar baja a 28 px.
+- **Ancho**: la card de Subscription Information ocupa media pantalla y en una línea no entraban los datos. Con
+  columnas, el desplegable se **ensancha hacia la derecha** (hasta 680 px, sin pasarse de la pantalla) y tapa parte de
+  Patient Information mientras está abierto, como cualquier menú flotante. En tablet ya entra en el ancho del campo.
+- **Card elegida**: también en una línea, pero sin columnas fijas (no tiene encabezado con el que alinearse): cada dato
+  ocupa lo que necesita. El ID nunca se achica; Carrier y Plan se cortan con "…" si no entran (el valor completo está
+  en el tooltip y en la lista de datos de abajo).
+- **Celular**: no entra en un renglón; los datos bajan debajo del nombre con su rótulo ("Carrier: AETNA").
+- `PersonSearchField`: `columnas` ahora arma la fila en una línea con encabezado; suma `columnaNombre` (título de la
+  columna del nombre, "Subscriber"). El ID pasó de `lineas` a ser una columna más.

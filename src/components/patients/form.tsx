@@ -514,14 +514,30 @@ export function SearchField({
   )
 }
 
-/* Nombre + hasta dos líneas de abajo ("DOB: …", "Email: …"): la etiqueta antes de los ":" sale apagada, el valor no.
-   Una línea sin ":" se muestra entera, sin partir. */
-/* Datos a la derecha del nombre, en columnas que se alinean entre las cards (Insurance: Carrier y Plan). La grilla se
-   decide por el ancho de la card (container query): sin lugar, bajan debajo del nombre. insurance.md, 2026-11-10. */
+/* Con `columnas`, cada persona es una fila de tabla en una sola línea: nombre y los datos en columnas alineadas entre
+   las filas, con un encabezado arriba de la lista. La grilla se decide por el ancho (container query): sin lugar, los
+   datos bajan debajo del nombre con su rótulo. insurance.md, 2026-11-10. */
 export type ColumnaPersona = { label: string; value: string }
+const GRILLA_COLUMNAS = '@sm:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)_minmax(0,1.3fr)_minmax(0,1fr)]'
 
-/* Avatar, nombre y sus líneas; con `columnas`, la fila se arma como una tabla. */
-function PersonaFila({ nombre, lineas, columnas }: { nombre: string; lineas?: string[]; columnas?: ColumnaPersona[] }) {
+/* Los títulos de las columnas, alineados con las filas (mismo padding y el lugar del avatar). */
+function EncabezadoColumnas({ nombre, columnas }: { nombre: string; columnas: ColumnaPersona[] }) {
+  return (
+    <div aria-hidden className="@container px-2 pt-1">
+      <div className="hidden items-center gap-3 @sm:flex">
+        <span className="w-7 shrink-0" />
+        <span className={cn('grid min-w-0 flex-1 gap-x-3 text-[11px] font-medium text-ink-faint', GRILLA_COLUMNAS)}>
+          <span>{nombre}</span>
+          {columnas.map((c) => <span key={c.label}>{c.label}</span>)}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+/* `alineada`: columnas fijas, para alinear con el encabezado de la lista. Sin eso (la card elegida), cada dato ocupa lo
+   que necesita, uno detrás del otro. */
+function PersonaFila({ nombre, lineas, columnas, alineada = true }: { nombre: string; lineas?: string[]; columnas?: ColumnaPersona[]; alineada?: boolean }) {
   if (!columnas?.length) {
     return (
       <>
@@ -532,13 +548,13 @@ function PersonaFila({ nombre, lineas, columnas }: { nombre: string; lineas?: st
   }
   return (
     <span className="@container flex min-w-0 flex-1 items-start gap-3 @sm:items-center">
-      <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
-      <span className="grid min-w-0 flex-1 gap-x-4 gap-y-1.5 @sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1.2fr)_minmax(0,1fr)] @sm:items-center">
-        <PersonaLineas nombre={nombre} lineas={lineas} />
-        {columnas.map((c) => (
-          <span key={c.label} className="min-w-0 leading-tight">
-            <span className="block text-[11px] text-ink-faint">{c.label}</span>
-            <span className="line-clamp-2 block text-[13px] break-words text-ink">{c.value}</span>
+      <Avatar aria-hidden initials={inicialesDe(nombre)} size={28} />
+      <span className={cn('min-w-0 flex-1 gap-y-0.5 leading-tight', alineada ? cn('grid gap-x-3 @sm:items-center', GRILLA_COLUMNAS) : 'flex flex-col gap-x-4 @sm:flex-row @sm:items-center')}>
+        <span title={nombre} className={cn('truncate text-[13px] font-semibold text-ink', !alineada && '@sm:max-w-[40%] @sm:shrink-0')}>{nombre}</span>
+        {/* En la card elegida, la primera columna (el ID en Insurance) no se achica: es lo que identifica a la fila. */}
+        {columnas.map((c, i) => (
+          <span key={c.label} title={`${c.label}: ${c.value}`} className={cn('min-w-0 truncate text-xs text-ink @sm:text-[13px]', !alineada && i === 0 && '@sm:shrink-0')}>
+            <span className="text-ink-faint @sm:hidden">{c.label}: </span>{c.value}
           </span>
         ))}
       </span>
@@ -546,6 +562,8 @@ function PersonaFila({ nombre, lineas, columnas }: { nombre: string; lineas?: st
   )
 }
 
+/* Nombre + hasta dos líneas de abajo ("DOB: …", "Email: …"): la etiqueta antes de los ":" sale apagada, el valor no.
+   Una línea sin ":" se muestra entera, sin partir. */
 function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?: string[]; className?: string }) {
   return (
     <span className={cn('min-w-0 flex-1 leading-tight', className)}>
@@ -573,7 +591,7 @@ function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?:
    exactamente un nombre de la lista. Ver design-reference/design-system.md. */
 export function PersonSearchField({
   label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas, emptyText,
-  nombre: nombreDe = (v) => v, texto: textoDe = (v) => v, columnas,
+  nombre: nombreDe = (v) => v, texto: textoDe = (v) => v, columnas, columnaNombre = 'Name',
 }: {
   label: string
   required?: boolean
@@ -594,8 +612,10 @@ export function PersonSearchField({
   nombre?: (valor: string) => string
   /** Dónde se busca lo escrito; por default, en el valor. Insurance busca en nombre, número, carrier y plan. */
   texto?: (valor: string) => string
-  /** Datos en columnas a la derecha del nombre, alineados entre las cards; sin lugar, bajan debajo. */
+  /** Datos en la misma línea que el nombre, en columnas con encabezado; sin lugar, bajan debajo con su rótulo. */
   columnas?: (valor: string) => ColumnaPersona[] | undefined
+  /** Título de la columna del nombre en el encabezado ("Subscriber"). */
+  columnaNombre?: string
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -630,7 +650,11 @@ export function PersonSearchField({
           className={cn(control(error), 'h-9 pr-3 pl-9')}
         />
         {abierto && sugerencias.length > 0 && (
-          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
+          /* Con columnas, la lista se ensancha (sin pasarse de la pantalla) para que cada fila entre en una línea. */
+          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg', columnas && 'lg:w-[max(100%,min(680px,calc(100vw-24rem)))]', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
+            {columnas && sugerencias[0] && columnas(sugerencias[0]) && (
+              <EncabezadoColumnas nombre={columnaNombre} columnas={columnas(sugerencias[0])!} />
+            )}
             {sugerencias.map((nombre) => (
               <button
                 key={nombre}
@@ -652,8 +676,8 @@ export function PersonSearchField({
       {pie(error, hint)}
       {elegida && (
         <div className="relative">
-          <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3 pr-11">
-            <PersonaFila nombre={nombreDe(value)} lineas={lineas?.(value)} columnas={columnas?.(value)} />
+          <div className={cn('border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3', columnas ? 'pr-10' : 'pr-11')}>
+            <PersonaFila nombre={nombreDe(value)} lineas={lineas?.(value)} columnas={columnas?.(value)} alineada={false} />
           </div>
           {!disabled && (
             <button
