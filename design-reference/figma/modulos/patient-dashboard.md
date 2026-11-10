@@ -532,26 +532,33 @@ para cancelar o rechazar (Cancel order, Clinic declined), así que el ítem pare
 `Handshake`: un acuerdo entre personas, que cubre las dos partes del nombre (los vínculos del paciente y quién se hace
 cargo de pagar). `Users` quedó descartado porque ya es el ícono de Patients en la barra principal.
 
-## CON-4081: Pending Signature, estado del botón de encuentro (2026-11-10)
+## CON-4081: Pending Signature en el lugar del botón de encuentro (2026-11-10)
 
 Julián pasó la ficha de red.dev con **Pending Signature** en el lugar de Start Encounter (caja `#fff7ed`, borde de 2 px
 `#ff9900`, texto `#b45309`) y pidió que no quede así ni como se había dibujado en CON-4081 punto 6 (relleno `#b45309`):
 "de otra manera y con otro color". En la app el botón no existía.
 
-- **Qué es:** en red.dev aparece cuando el encuentro ya terminó (*Fulfilled*) y falta firmar. Por eso es el tercer estado
-  de `EncounterButton` (`start` · `pending` · `signature`), no un botón aparte: ocupa el mismo lugar.
+- **Cuándo aparece (Julián):** cuando se termina el encuentro y el usuario no firma la nota clínica. En la app eso ya
+  existía a medias: *End encounter* en Clinical Mode abre el diálogo *Clinical Note* (Figma 4540:27072) y **Remind me
+  later** sólo avisaba. Ahora deja la nota pendiente (`lib/notaClinica`) y la ficha muestra Pending Signature.
+- **No es un estado del botón de encuentro ni un desplegable.** Una primera vuelta lo sumó como tercera opción de
+  *Encounter options*, con el chevron; Julián lo corrigió: no se elige, pasa. Es un botón aparte
+  (`PendingSignatureButton`), sin chevron, que reemplaza a `EncounterButton` mientras la nota esté sin firmar.
+- **El click abre el mismo diálogo *Clinical Note***: *Review and sign* la firma y vuelve Start Enconter; *Remind me
+  later* (o Esc) la deja pendiente.
 - **Otro color: violeta** (`purple-fg` sobre `purple-bg`, contraste 7,2:1). El naranja se confundía con Pending
-  Encounter, que ya es ámbar en el mismo botón; verde es arrancar, rojo es lo que falta (CC y TR) y azul es navegar.
-- **Otra forma: tinte sin borde**, como Clinical Mode, que va justo debajo. Start y Pending Encounter son rellenos porque
-  son acciones sobre el encuentro (play, pausa); esto es un pendiente que quedó después. Ícono `Signature`, no el
-  documento genérico. Se descartaron el violeta relleno (competía con Overview, el ítem activo del menú) y el blanco con
-  línea violeta (volvía a la caja con borde de red.dev).
-- El chevron sigue: es el que alterna los estados en la app de muestra. El click avisa "Encounter is pending signature."
-  igual que los otros dos estados avisan el suyo.
-- De paso, las dos mitades del botón muestran el anillo de foco azul (`FOCO`): antes llevaban el del navegador.
+  Encounter, que ya es ámbar en ese lugar; verde es arrancar, rojo es lo que falta (CC y TR) y azul es navegar.
+- **Otra forma: tinte sin borde**, como Clinical Mode, que va justo debajo, con el ícono `Signature` en vez del documento
+  genérico. Se descartó el violeta relleno (competía con Overview, el ítem activo del menú).
+- **Menú colapsado:** el botón de encuentro se esconde, pero un pendiente no se puede perder: Pending Signature queda
+  como ícono violeta arriba de Clinical Mode, con su tooltip.
+- De paso, las dos mitades del botón de encuentro muestran el anillo de foco azul (`FOCO`): antes llevaban el del
+  navegador.
 
-**Anomalía / a definir:** ninguna historia de Jira dice cuándo aparece Pending Signature ni adónde lleva el click
-(CON-4081 es sólo de diseño; CON-3373 y CON-3612 hablan de consentimientos pendientes, no del encuentro). Salió de mirar
-red.dev. **A validar con usuarios:** si el provider lo lee como un pendiente suyo o como un estado del paciente.
+**Anomalía / a definir:** ninguna historia de Jira describe este botón (CON-4081 es sólo de diseño; CON-3373 y CON-3612
+hablan de consentimientos pendientes, no de la nota del encuentro). La regla sale de lo que contó Julián y de red.dev. La
+nota pendiente es una sola para toda la app de muestra, no por paciente, y se pierde al recargar. **A validar con
+usuarios:** si el provider entiende que el botón es para firmar la nota, o hace falta nombrarla ("Sign Clinical Note").
 
-`tests/patient-dashboard.e2e.ts`: el botón pasa a Pending Signature desde *Encounter options*.
+`tests/patient-dashboard.e2e.ts`: End encounter → Remind me later → la ficha muestra Pending Signature sin desplegable;
+Review and sign lo saca.

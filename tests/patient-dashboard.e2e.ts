@@ -45,12 +45,23 @@ test('Insurance scrollea adentro, sin mover el menú del paciente', async ({ app
   await expect(screen.getByText('Patient Information')).toBeVisible()
 })
 
-/* Pending Signature es un estado del botón de encuentro, en el lugar de Start Encounter (patient-dashboard.md,
-   2026-11-10). */
-test('El botón de encuentro pasa a Pending Signature desde sus opciones', async ({ app, screen }) => {
+/* Pending Signature: el encuentro terminó y la Clinical Note quedó sin firmar. Ocupa el lugar del botón de encuentro,
+   sin desplegable, y se va al firmar (patient-dashboard.md, 2026-11-10). */
+test('Pending Signature aparece al dejar la Clinical Note sin firmar y se va al firmarla', async ({ app, screen }) => {
   await app.open('/patients/1')
+  await expect(screen.getByRole('button', /Pending Signature/)).toHaveCount(0)
+  await screen.getByRole('link', 'Clinical Mode').tap()
   await screen.getByRole('button', 'Encounter options').tap()
-  await screen.getByRole('button', /Pending Signature/).tap()
+  await screen.getByRole('button', 'End encounter').tap()
+  await screen.getByRole('button', 'Remind me later').tap()
+  await screen.getByRole('link', 'Exit clinical Mode').tap()
+
   await expect(screen.getByRole('button', /Pending Signature/)).toBeVisible()
   await expect(screen.getByRole('button', /Start Enconter/)).toHaveCount(0)
+  await expect(screen.getByRole('button', 'Encounter options')).toHaveCount(0)
+
+  await screen.getByRole('button', /Pending Signature/).tap()
+  await screen.getByRole('button', 'Review and sign').tap()
+  await expect(screen.getByRole('button', /Pending Signature/)).toHaveCount(0)
+  await expect(screen.getByRole('button', /Start Enconter/)).toBeVisible()
 })

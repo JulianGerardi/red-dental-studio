@@ -8,6 +8,7 @@ import {
 import { cn } from '@/lib/utils'
 import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
+import { setNotaPendiente } from '@/lib/notaClinica'
 import { CONSTANTES, CONTADORES, type Contador } from '@/data/clinical-mode'
 import { ClinicalBadge, type TipoBadge } from '@/components/clinical/ClinicalBadge'
 import { useWorkflows } from '@/components/clinical/WorkflowsContext'
@@ -131,7 +132,8 @@ export function ResumenWorkflow({ k, progreso, onAbrir }: { k: TipoBadge; progre
 
 /* Figma 4540:27072: al cerrar el encuentro se ofrece firmar la Clinical Note ahora o más tarde. Con ui/confirm-dialog
    como el resto de la app (antes rearmaba Dialog a mano, clinical-mode.md 2026-10-19); cerrarlo con Esc o el fondo
-   cuenta como Remind me later, igual que en cualquier otro ConfirmDialog. */
+   cuenta como Remind me later, igual que en cualquier otro ConfirmDialog. Sin firmar, el panel del paciente muestra
+   Pending Signature (lib/notaClinica). */
 export function ClinicalNoteDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   if (!open) return null
   return (
@@ -139,8 +141,8 @@ export function ClinicalNoteDialog({ open, onClose }: { open: boolean; onClose: 
       title="Clinical Note"
       confirmLabel="Review and sign"
       cancelLabel="Remind me later"
-      onCancel={() => { onClose(); aviso.info('We will remind you to sign the Clinical Note.') }}
-      onConfirm={() => { onClose(); aviso.ok('Clinical Note signed.') }}
+      onCancel={() => { onClose(); setNotaPendiente(true); aviso.info('We will remind you to sign the Clinical Note.') }}
+      onConfirm={() => { onClose(); setNotaPendiente(false); aviso.ok('Clinical Note signed.') }}
     >
       <p>The clinical encounter has been completed.<br />You can sign the Clinical Note now or defer the signature and complete it later.</p>
     </ConfirmDialog>

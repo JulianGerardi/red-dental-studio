@@ -12,6 +12,8 @@ import { EditContactModal } from '@/pages/patients/EditContactModal'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { usePhoto } from '@/lib/usePhoto'
 import { PatientMenuPreview } from './patient-menu-preview'
+import { useNotaPendiente } from '@/lib/notaClinica'
+import { ClinicalNoteDialog } from '@/components/clinical/ClinicalTopBar'
 
 /* Figma 3646:58836 — panel izquierdo del dashboard del paciente. */
 
@@ -140,6 +142,9 @@ export function PatientSidePanel({
   const [colapsadoCompartido, setColapsado] = useColapso()
   const colapsado = vista.collapsed ?? colapsadoCompartido
   const [info, setInfo] = useState(false)
+  const notaGuardada = useNotaPendiente()
+  const notaPendiente = vista.pendingSignature ?? notaGuardada
+  const [firmar, setFirmar] = useState(false)
   const cierre = useRef<number | null>(null)
   const abrirInfo = () => {
     if (cierre.current) window.clearTimeout(cierre.current)
@@ -213,7 +218,7 @@ export function PatientSidePanel({
       </div>
 
       <div className={cn('mt-3 flex flex-col gap-2 sm:flex-row lg:flex-col', colapsado && 'lg:hidden')}>
-        <EncounterButton />
+        {notaPendiente ? <PendingSignatureButton onClick={() => setFirmar(true)} /> : <EncounterButton />}
         <Link
           to="/patients/john-smith/clinical-mode"
           data-tour="pat-clinical-mode"
@@ -228,6 +233,8 @@ export function PatientSidePanel({
           pueda esconder. General/Contact se leen desde un popover. */}
       {colapsado && (
         <div className="mt-2 hidden flex-col items-center gap-1 lg:flex">
+          {/* Un pendiente no se pierde al colapsar: queda como ícono, igual que Clinical Mode. */}
+          {notaPendiente && conTooltip('Pending Signature', <PendingSignatureButton soloIcono onClick={() => setFirmar(true)} />)}
           {conTooltip('Clinical Mode', (
             <Link
               to="/patients/john-smith/clinical-mode"
@@ -316,12 +323,35 @@ export function PatientSidePanel({
       </div>
 
       {contacto && <EditContactModal onClose={() => setContacto(false)} />}
+      <ClinicalNoteDialog open={firmar} onClose={() => setFirmar(false)} />
     </aside>
     </TooltipProvider>
   )
 }
 
 export { FileText }
+
+/* Pending Signature (red.dev): el encuentro terminó y la Clinical Note quedó sin firmar. Ocupa el lugar del botón de
+   encuentro, pero no es uno de sus estados ni lleva desplegable. Tinte violeta: el ámbar ya es Pending Encounter
+   (patient-dashboard.md, 2026-11-10). */
+export function PendingSignatureButton({ soloIcono, className, ...props }: React.ComponentProps<'button'> & { soloIcono?: boolean }) {
+  return (
+    <button
+      type="button"
+      aria-label={soloIcono ? 'Pending Signature' : undefined}
+      {...props}
+      className={cn(
+        'flex items-center justify-center gap-2 bg-purple-bg text-[13px] font-semibold text-purple-fg hover:bg-purple-fg/15',
+        soloIcono ? 'size-9 rounded-md' : 'w-full rounded-lg py-2',
+        FOCO,
+        className,
+      )}
+    >
+      <Signature className={cn('shrink-0', soloIcono ? 'size-4' : 'size-3.5')} />
+      {!soloIcono && 'Pending Signature'}
+    </button>
+  )
+}
 
 
 /* Figma (Design System) 7740:12244: el botón tiene dos estados, "Start
@@ -331,11 +361,8 @@ export { FileText }
    El verde queda en #1e9850, el de la plataforma, y no en el #28c563 del
    design system: es el mismo botón que el popup del paciente, que Julián pidió
    alinear. El ámbar sí es el #ffb82c del sistema, pero con texto oscuro: el
-   frame lo pone en blanco y sobre ese fondo no se lee.
-
-   "Pending Signature" (red.dev): el encuentro terminó y falta firmar. Tinte violeta sin borde, no el naranja de
-   red.dev: el ámbar ya es Pending Encounter (patient-dashboard.md, 2026-11-10). */
-export type EstadoEncuentro = 'start' | 'pending' | 'signature'
+   frame lo pone en blanco y sobre ese fondo no se lee. */
+type EstadoEncuentro = 'start' | 'pending'
 
 /* El estado vivía en el componente y el panel se vuelve a montar en cada
    pantalla del paciente, así que al ir de Treatments a Insurance volvía a
@@ -374,18 +401,7 @@ const ENCUENTRO = {
     clase: 'bg-amber text-[#7a4a00] hover:bg-[#f0a913]',
     icono: <Pause className="size-3.5 shrink-0" />,
   },
-  signature: {
-    label: 'Pending Signature',
-    clase: 'bg-purple-bg text-purple-fg hover:bg-purple-fg/15',
-    icono: <Signature className="size-3.5 shrink-0" />,
-  },
 } as const
-
-const AVISO_ENCUENTRO: Record<EstadoEncuentro, () => void> = {
-  start: () => aviso.ok('Encounter started.'),
-  pending: () => aviso.warn('Encounter is on hold.'),
-  signature: () => aviso.warn('Encounter is pending signature.'),
-}
 
 export function EncounterButton() {
   const [estadoCompartido, setEstado] = useEstadoEncuentro()
@@ -410,7 +426,11 @@ export function EncounterButton() {
       <span className={cn('flex w-full items-center rounded-lg text-[13px] font-semibold', actual.clase)}>
         <button
           type="button"
-          onClick={AVISO_ENCUENTRO[estado]}
+          onClick={() =>
+            estado === 'start'
+              ? aviso.ok('Encounter started.')
+              : aviso.warn('Encounter is on hold.')
+          }
           className={cn('flex flex-1 items-center justify-center gap-2 rounded-l-lg py-2', FOCO)}
         >
           {actual.icono} {actual.label}
