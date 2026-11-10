@@ -65,3 +65,11 @@ test('Pending Signature aparece al dejar la Clinical Note sin firmar y se va al 
   await expect(screen.getByRole('button', /Pending Signature/)).toHaveCount(0)
   await expect(screen.getByRole('button', /Start Enconter/)).toBeVisible()
 })
+
+/* Algunos pacientes arrancan con la Clinical Note sin firmar, para ver Pending Signature sin hacer el flujo
+   (patient-dashboard.md, 2026-11-10). */
+test('Los pacientes con la nota sin firmar arrancan con Pending Signature', async ({ app, screen }) => {
+  await app.open('/patients/patient-0002')
+  await expect(screen.getByRole('button', /Pending Signature/)).toBeVisible()
+  await expect(screen.getByRole('button', /Start Enconter/)).toHaveCount(0)
+})
