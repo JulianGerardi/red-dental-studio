@@ -3,6 +3,18 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-10
+
+### Ficha del paciente: Pending Signature en el botón de encuentro ([#131](https://github.com/JulianGerardi/red-dental-studio/pull/131))
+- El botón de encuentro del panel del paciente suma el estado **Pending Signature** (el encuentro terminó y falta
+  firmar), en el lugar de Start Encounter como en red.dev (CON-4081, punto 6). Va en **tinte violeta sin borde** con el
+  ícono de firma: ni la caja naranja con borde de red.dev ni el relleno `#b45309` de la historia, porque el naranja se
+  confundía con Pending Encounter (ámbar).
+- **Para el dev:** `EstadoEncuentro` es `'start' | 'pending' | 'signature'` (`ENCUENTRO.signature` en
+  `PatientSidePanel.tsx`), con `purple-fg` / `purple-bg`, sin tokens nuevos. Jira no define cuándo aparece ni adónde
+  lleva el click: está como anomalía en `patient-dashboard.md` (2026-11-10). Storybook sin actualizar (pendiente de que
+  Julián lo pida).
+
 ## 2026-11-06
 
 ### Lista de Patients: sin bajada, Rows per page, Overview y foto ([#128](https://github.com/JulianGerardi/red-dental-studio/pull/128))
