@@ -8,6 +8,8 @@ export type PatientMenuPreviewState = {
   collapsed?: boolean
   /** Fija el estado del botón de encuentro en esta instancia. */
   encounter?: 'start' | 'pending'
+  /** Fija Pending Signature en el lugar del botón de encuentro. */
+  pendingSignature?: boolean
   /** Texto del tooltip que queda abierto (rail colapsado). */
   tooltip?: string
   /** Tarjeta de General y Contact abierta (rail colapsado). */

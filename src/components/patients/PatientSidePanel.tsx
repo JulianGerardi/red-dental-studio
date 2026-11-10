@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Handshake, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen, IdCard,
+  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Handshake, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen, IdCard, Signature,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -12,6 +12,8 @@ import { EditContactModal } from '@/pages/patients/EditContactModal'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { usePhoto } from '@/lib/usePhoto'
 import { PatientMenuPreview } from './patient-menu-preview'
+import { useNotaPendiente } from '@/lib/notaClinica'
+import { ClinicalNoteDialog } from '@/components/clinical/ClinicalTopBar'
 
 /* Figma 3646:58836 — panel izquierdo del dashboard del paciente. */
 
@@ -140,6 +142,9 @@ export function PatientSidePanel({
   const [colapsadoCompartido, setColapsado] = useColapso()
   const colapsado = vista.collapsed ?? colapsadoCompartido
   const [info, setInfo] = useState(false)
+  const notaGuardada = useNotaPendiente()
+  const notaPendiente = vista.pendingSignature ?? notaGuardada
+  const [firmar, setFirmar] = useState(false)
   const cierre = useRef<number | null>(null)
   const abrirInfo = () => {
     if (cierre.current) window.clearTimeout(cierre.current)
@@ -213,7 +218,7 @@ export function PatientSidePanel({
       </div>
 
       <div className={cn('mt-3 flex flex-col gap-2 sm:flex-row lg:flex-col', colapsado && 'lg:hidden')}>
-        <EncounterButton />
+        {notaPendiente ? <PendingSignatureButton onClick={() => setFirmar(true)} /> : <EncounterButton />}
         <Link
           to="/patients/john-smith/clinical-mode"
           data-tour="pat-clinical-mode"
@@ -228,6 +233,8 @@ export function PatientSidePanel({
           pueda esconder. General/Contact se leen desde un popover. */}
       {colapsado && (
         <div className="mt-2 hidden flex-col items-center gap-1 lg:flex">
+          {/* Un pendiente no se pierde al colapsar: queda como ícono, igual que Clinical Mode. */}
+          {notaPendiente && conTooltip('Pending Signature', <PendingSignatureButton soloIcono onClick={() => setFirmar(true)} />)}
           {conTooltip('Clinical Mode', (
             <Link
               to="/patients/john-smith/clinical-mode"
@@ -316,12 +323,35 @@ export function PatientSidePanel({
       </div>
 
       {contacto && <EditContactModal onClose={() => setContacto(false)} />}
+      <ClinicalNoteDialog open={firmar} onClose={() => setFirmar(false)} />
     </aside>
     </TooltipProvider>
   )
 }
 
 export { FileText }
+
+/* Pending Signature (red.dev): el encuentro terminó y la Clinical Note quedó sin firmar. Ocupa el lugar del botón de
+   encuentro, pero no es uno de sus estados ni lleva desplegable. Tinte violeta: el ámbar ya es Pending Encounter
+   (patient-dashboard.md, 2026-11-10). */
+export function PendingSignatureButton({ soloIcono, className, ...props }: React.ComponentProps<'button'> & { soloIcono?: boolean }) {
+  return (
+    <button
+      type="button"
+      aria-label={soloIcono ? 'Pending Signature' : undefined}
+      {...props}
+      className={cn(
+        'flex items-center justify-center gap-2 bg-purple-bg text-[13px] font-semibold text-purple-fg hover:bg-purple-fg/15',
+        soloIcono ? 'size-9 rounded-md' : 'w-full rounded-lg py-2',
+        FOCO,
+        className,
+      )}
+    >
+      <Signature className={cn('shrink-0', soloIcono ? 'size-4' : 'size-3.5')} />
+      {!soloIcono && 'Pending Signature'}
+    </button>
+  )
+}
 
 
 /* Figma (Design System) 7740:12244: el botón tiene dos estados, "Start
@@ -401,7 +431,7 @@ export function EncounterButton() {
               ? aviso.ok('Encounter started.')
               : aviso.warn('Encounter is on hold.')
           }
-          className="flex flex-1 items-center justify-center gap-2 py-2"
+          className={cn('flex flex-1 items-center justify-center gap-2 rounded-l-lg py-2', FOCO)}
         >
           {actual.icono} {actual.label}
         </button>
@@ -410,7 +440,7 @@ export function EncounterButton() {
           aria-label="Encounter options"
           aria-expanded={abierto}
           onClick={() => setAbierto((v) => !v)}
-          className="px-2 py-2 opacity-80 hover:opacity-100"
+          className={cn('rounded-r-lg px-2 py-2 opacity-80 hover:opacity-100', FOCO)}
         >
           <ChevronDown className={cn('size-3.5 transition-transform', abierto && 'rotate-180')} />
         </button>
