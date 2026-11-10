@@ -214,3 +214,18 @@ ancho sin usar y difícil de comparar de una fila a otra.
   número no entraba en la columna y se partía.
 - `PersonSearchField` suma `columnas` (opcional). Sin esa prop se ve como siempre (New Patient, New Appointment,
   Relationships).
+
+## CON-3284 — El buscador de suscripciones con chips (2026-11-10, tercera vuelta)
+
+Dos intentos el mismo día que Julián no aprobó: (1) Carrier y Plan en columnas con rótulo arriba, ID debajo del
+nombre; (2) todo en una línea con encabezado de columnas y el desplegable ensanchado sobre Patient Information (en
+media pantalla no entraba y se cortaba casi todo). Se le mostraron tres variantes armadas en la app real —A dos
+líneas, B una línea corrida, C chips— y **eligió C**.
+
+- Cada resultado: avatar, **nombre · ID** (el ID en gris al lado del nombre) y abajo **Carrier y Plan como chips**:
+  carrier neutro (gris), plan celeste, así el plan —lo que más distingue dos suscripciones del mismo suscriptor— se
+  destaca. La card elegida, igual.
+- Entra en el ancho del campo: sin encabezado ni desplegable ensanchado. En el celular los chips bajan solos.
+- Los chips llevan el rótulo para lector de pantalla ("Carrier: …") y tooltip con el texto completo.
+- `ui/chip` suma `tone` (`blue` de siempre, `neutral`) y `title`. `PersonSearchField` cambia `columnas`/
+  `columnaNombre` por `subtitulo` (texto al lado del nombre) y `chips` (`{ label, value, tone }[]`).

@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Drawer, DrawerSection, useEnDrawer, type DrawerSize } from '@/components/ui/drawer'
 import { ChevronDown, Calendar, Check, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Chip, type ChipTone } from '@/components/ui/chip'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
 import { Avatar, inicialesDe } from '@/components/ui/avatar'
 import { CountryFlag } from '@/components/ui/country-flag'
@@ -514,15 +515,12 @@ export function SearchField({
   )
 }
 
-/* Nombre + hasta dos líneas de abajo ("DOB: …", "Email: …"): la etiqueta antes de los ":" sale apagada, el valor no.
-   Una línea sin ":" se muestra entera, sin partir. */
-/* Datos a la derecha del nombre, en columnas que se alinean entre las cards (Insurance: Carrier y Plan). La grilla se
-   decide por el ancho de la card (container query): sin lugar, bajan debajo del nombre. insurance.md, 2026-11-10. */
-export type ColumnaPersona = { label: string; value: string }
+/* Con `chips`, la persona va en dos renglones: nombre · subtítulo (el ID) arriba y los datos como chips abajo (Insurance:
+   Carrier y Plan). Entra en el ancho del campo y en el celular los chips bajan solos. insurance.md, 2026-11-10. */
+export type ChipPersona = { label: string; value: string; tone?: ChipTone }
 
-/* Avatar, nombre y sus líneas; con `columnas`, la fila se arma como una tabla. */
-function PersonaFila({ nombre, lineas, columnas }: { nombre: string; lineas?: string[]; columnas?: ColumnaPersona[] }) {
-  if (!columnas?.length) {
+function PersonaFila({ nombre, lineas, subtitulo, chips }: { nombre: string; lineas?: string[]; subtitulo?: string; chips?: ChipPersona[] }) {
+  if (!chips?.length) {
     return (
       <>
         <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
@@ -531,21 +529,27 @@ function PersonaFila({ nombre, lineas, columnas }: { nombre: string; lineas?: st
     )
   }
   return (
-    <span className="@container flex min-w-0 flex-1 items-start gap-3 @sm:items-center">
+    <>
       <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
-      <span className="grid min-w-0 flex-1 gap-x-4 gap-y-1.5 @sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1.2fr)_minmax(0,1fr)] @sm:items-center">
-        <PersonaLineas nombre={nombre} lineas={lineas} />
-        {columnas.map((c) => (
-          <span key={c.label} className="min-w-0 leading-tight">
-            <span className="block text-[11px] text-ink-faint">{c.label}</span>
-            <span className="line-clamp-2 block text-[13px] break-words text-ink">{c.value}</span>
-          </span>
-        ))}
+      <span className="min-w-0 flex-1 leading-tight">
+        <span className="block truncate text-[13px] text-ink">
+          <span className="font-semibold">{nombre}</span>
+          {subtitulo && <span className="text-xs text-ink-muted"> · {subtitulo}</span>}
+        </span>
+        <span className="mt-1.5 flex flex-wrap gap-1.5">
+          {chips.map((c) => (
+            <Chip key={c.label} tone={c.tone} title={`${c.label}: ${c.value}`}>
+              <span className="sr-only">{c.label}: </span>{c.value}
+            </Chip>
+          ))}
+        </span>
       </span>
-    </span>
+    </>
   )
 }
 
+/* Nombre + hasta dos líneas de abajo ("DOB: …", "Email: …"): la etiqueta antes de los ":" sale apagada, el valor no.
+   Una línea sin ":" se muestra entera, sin partir. */
 function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?: string[]; className?: string }) {
   return (
     <span className={cn('min-w-0 flex-1 leading-tight', className)}>
@@ -573,7 +577,7 @@ function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?:
    exactamente un nombre de la lista. Ver design-reference/design-system.md. */
 export function PersonSearchField({
   label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas, emptyText,
-  nombre: nombreDe = (v) => v, texto: textoDe = (v) => v, columnas,
+  nombre: nombreDe = (v) => v, texto: textoDe = (v) => v, subtitulo, chips,
 }: {
   label: string
   required?: boolean
@@ -594,8 +598,10 @@ export function PersonSearchField({
   nombre?: (valor: string) => string
   /** Dónde se busca lo escrito; por default, en el valor. Insurance busca en nombre, número, carrier y plan. */
   texto?: (valor: string) => string
-  /** Datos en columnas a la derecha del nombre, alineados entre las cards; sin lugar, bajan debajo. */
-  columnas?: (valor: string) => ColumnaPersona[] | undefined
+  /** Texto corto al lado del nombre, en gris ("· JASDASD11243"). Sólo con `chips`. */
+  subtitulo?: (valor: string) => string | undefined
+  /** Datos como chips debajo del nombre (Carrier, Plan); reemplazan a `lineas`. */
+  chips?: (valor: string) => ChipPersona[] | undefined
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -638,7 +644,7 @@ export function PersonSearchField({
                 onClick={() => { onChange?.(nombre); setAbierto(false) }}
                 className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-surface-muted"
               >
-                <PersonaFila nombre={nombreDe(nombre)} lineas={lineas?.(nombre)} columnas={columnas?.(nombre)} />
+                <PersonaFila nombre={nombreDe(nombre)} lineas={lineas?.(nombre)} subtitulo={subtitulo?.(nombre)} chips={chips?.(nombre)} />
               </button>
             ))}
           </div>
@@ -653,7 +659,7 @@ export function PersonSearchField({
       {elegida && (
         <div className="relative">
           <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3 pr-11">
-            <PersonaFila nombre={nombreDe(value)} lineas={lineas?.(value)} columnas={columnas?.(value)} />
+            <PersonaFila nombre={nombreDe(value)} lineas={lineas?.(value)} subtitulo={subtitulo?.(value)} chips={chips?.(value)} />
           </div>
           {!disabled && (
             <button

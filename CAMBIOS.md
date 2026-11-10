@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-10
 
+### Insurance: buscador de suscripciones con chips ([#132](https://github.com/JulianGerardi/red-dental-studio/pull/132))
+- **Search for an existing subscription**: cada resultado muestra **nombre · ID** y abajo **Carrier y Plan como chips**
+  (carrier gris, plan celeste). La card elegida, igual. Entra en el ancho del campo y en el celular los chips bajan.
+  Reemplaza a las columnas de #130 (Julián eligió esta variante entre tres, CON-3284).
+- **Para el dev:** `ui/chip` suma `tone` (`blue` de siempre, `neutral`) y `title`. En `PersonSearchField`, `columnas`
+  se reemplaza por `subtitulo` (texto al lado del nombre) y `chips` (`{ label, value, tone }[]`); sin esas props se ve
+  como antes. Decisión en `insurance.md` (2026-11-10). Storybook sin actualizar.
+
 ### Ficha del paciente: Pending Signature cuando la Clinical Note queda sin firmar ([#131](https://github.com/JulianGerardi/red-dental-studio/pull/131))
 - Al cerrar el encuentro en Clinical Mode (*End encounter*) y elegir **Remind me later**, la ficha del paciente muestra
   **Pending Signature** en el lugar de Start Encounter, como en red.dev (CON-4081, punto 6). Es un botón aparte, **sin

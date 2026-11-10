@@ -12,7 +12,7 @@ test('Sin suscripción elegida, la card va con guiones y Manage queda deshabilit
 
   /* Busca también por carrier: "aetna" encuentra la de Lucas Johnson. */
   await screen.getByPlaceholder('Search by name or ID').fill('aetna')
-  await screen.getByRole('button', /^Lucas Johnson ID: AET-234254/).tap()
+  await screen.getByRole('button', /^Lucas Johnson.*AET-234254/).tap()
   await expect(screen.getByText('Plan 234254534', { exact: true }).first()).toBeVisible()
   await expect(screen.getByRole('button', 'Manage Subscription')).toBeEnabled()
 })
@@ -21,14 +21,14 @@ test('Una suscripción en uso no se borra; una libre, sí, después de confirmar
   await app.open('/patients/john-smith/insurance')
   const buscador = screen.getByPlaceholder('Search by name or ID')
   await buscador.fill('john')
-  await screen.getByRole('button', /^John Smith ID: JASDASD11243/).tap()
+  await screen.getByRole('button', /^John Smith.*JASDASD11243/).tap()
   await screen.getByRole('button', 'Delete subscription').tap()
   await expect(screen.getByText(/has dependent patient insurance records/)).toBeVisible()
   await expect(screen.getByRole('dialog')).toHaveCount(0)
 
   await screen.getByRole('button', 'Remove Search for an existing subscription').tap()
   await buscador.fill('maria')
-  await screen.getByRole('button', /^Maria Smith ID: CIG-118273/).tap()
+  await screen.getByRole('button', /^Maria Smith.*CIG-118273/).tap()
   await screen.getByRole('button', 'Delete subscription').tap()
   await expect(screen.getByRole('heading', 'Are you sure you want to delete this subscription?')).toBeVisible()
   await screen.getByRole('button', 'Confirm').tap()
