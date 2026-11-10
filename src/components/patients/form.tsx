@@ -516,6 +516,36 @@ export function SearchField({
 
 /* Nombre + hasta dos líneas de abajo ("DOB: …", "Email: …"): la etiqueta antes de los ":" sale apagada, el valor no.
    Una línea sin ":" se muestra entera, sin partir. */
+/* Datos a la derecha del nombre, en columnas que se alinean entre las cards (Insurance: Carrier y Plan). La grilla se
+   decide por el ancho de la card (container query): sin lugar, bajan debajo del nombre. insurance.md, 2026-11-10. */
+export type ColumnaPersona = { label: string; value: string }
+
+/* Avatar, nombre y sus líneas; con `columnas`, la fila se arma como una tabla. */
+function PersonaFila({ nombre, lineas, columnas }: { nombre: string; lineas?: string[]; columnas?: ColumnaPersona[] }) {
+  if (!columnas?.length) {
+    return (
+      <>
+        <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
+        <PersonaLineas nombre={nombre} lineas={lineas} />
+      </>
+    )
+  }
+  return (
+    <span className="@container flex min-w-0 flex-1 items-start gap-3 @sm:items-center">
+      <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
+      <span className="grid min-w-0 flex-1 gap-x-4 gap-y-1.5 @sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1.2fr)_minmax(0,1fr)] @sm:items-center">
+        <PersonaLineas nombre={nombre} lineas={lineas} />
+        {columnas.map((c) => (
+          <span key={c.label} className="min-w-0 leading-tight">
+            <span className="block text-[11px] text-ink-faint">{c.label}</span>
+            <span className="line-clamp-2 block text-[13px] break-words text-ink">{c.value}</span>
+          </span>
+        ))}
+      </span>
+    </span>
+  )
+}
+
 function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?: string[]; className?: string }) {
   return (
     <span className={cn('min-w-0 flex-1 leading-tight', className)}>
@@ -543,7 +573,7 @@ function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?:
    exactamente un nombre de la lista. Ver design-reference/design-system.md. */
 export function PersonSearchField({
   label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas, emptyText,
-  nombre: nombreDe = (v) => v, texto: textoDe = (v) => v,
+  nombre: nombreDe = (v) => v, texto: textoDe = (v) => v, columnas,
 }: {
   label: string
   required?: boolean
@@ -564,6 +594,8 @@ export function PersonSearchField({
   nombre?: (valor: string) => string
   /** Dónde se busca lo escrito; por default, en el valor. Insurance busca en nombre, número, carrier y plan. */
   texto?: (valor: string) => string
+  /** Datos en columnas a la derecha del nombre, alineados entre las cards; sin lugar, bajan debajo. */
+  columnas?: (valor: string) => ColumnaPersona[] | undefined
 }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -606,8 +638,7 @@ export function PersonSearchField({
                 onClick={() => { onChange?.(nombre); setAbierto(false) }}
                 className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-surface-muted"
               >
-                <Avatar aria-hidden initials={inicialesDe(nombreDe(nombre))} size={36} />
-                <PersonaLineas nombre={nombreDe(nombre)} lineas={lineas?.(nombre)} />
+                <PersonaFila nombre={nombreDe(nombre)} lineas={lineas?.(nombre)} columnas={columnas?.(nombre)} />
               </button>
             ))}
           </div>
@@ -622,8 +653,7 @@ export function PersonSearchField({
       {elegida && (
         <div className="relative">
           <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3 pr-11">
-            <Avatar aria-hidden initials={inicialesDe(nombreDe(value))} size={36} />
-            <PersonaLineas nombre={nombreDe(value)} lineas={lineas?.(value)} />
+            <PersonaFila nombre={nombreDe(value)} lineas={lineas?.(value)} columnas={columnas?.(value)} />
           </div>
           {!disabled && (
             <button

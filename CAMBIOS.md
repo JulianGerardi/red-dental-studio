@@ -3,6 +3,17 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-10
+
+### Insurance: resultados del buscador de suscripciones en filas ([#130](https://github.com/JulianGerardi/red-dental-studio/pull/130))
+- **Search for an existing subscription**: cada resultado es una fila con avatar, nombre e **ID** a la izquierda, y
+  **Carrier** y **Plan** en columnas alineadas entre todas las filas (antes eran cuatro renglones apilados y sobraba
+  espacio a la derecha). La card de la elegida usa el mismo formato. En el celular, Carrier y Plan bajan debajo del
+  nombre. "Subscription:" pasa a "ID:", como el placeholder (CON-3284).
+- **Para el dev:** `PersonSearchField` (`patients/form.tsx`) suma `columnas` (opcional: `{ label, value }[]`, en una
+  grilla que se decide por el ancho de la card con `@container`). Sin esa prop se ve como antes. Decisión en
+  `insurance.md` (2026-11-10). Storybook sin actualizar.
+
 ## 2026-11-06
 
 ### Lista de Patients: sin bajada, Rows per page, Overview y foto ([#128](https://github.com/JulianGerardi/red-dental-studio/pull/128))
