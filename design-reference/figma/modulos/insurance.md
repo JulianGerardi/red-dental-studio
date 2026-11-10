@@ -197,3 +197,20 @@ y el estado. No se tocó: espera su ok.
 Para validar con Julián: CON-3284 también dice que **Coverage End no puede ser futura**, pero un plan suele terminar
 más adelante (12/31 del año), así que no se aplicó hasta confirmarlo. La fila de la tabla en red.dev trae un menú ⋮ que
 el video no abre: queda fuera de esta tanda.
+
+## CON-3284 — Los resultados del buscador de suscripciones, en filas (2026-11-10)
+
+Julián, con una grabación: los resultados quedaban "todo muy junto" y con mucho espacio libre al costado. Cada card
+apilaba cuatro renglones (nombre, Subscription, Carrier, Plan) en una columna angosta a la izquierda: alta, con el
+ancho sin usar y difícil de comparar de una fila a otra.
+
+- Cada resultado pasa a ser una **fila de tabla**: avatar, nombre e **ID** a la izquierda, y **Carrier** y **Plan**
+  en columnas (rótulo chico arriba, valor abajo) alineadas entre todas las filas. De cuatro renglones baja a dos.
+- La card de la suscripción elegida usa el mismo formato.
+- La grilla depende del **ancho de la card** (container query `@sm`), no del de la pantalla: en el celular Carrier y
+  Plan bajan debajo del nombre, con el avatar arriba. Un valor largo ("Dental Dental Of California") usa hasta dos
+  renglones en vez de cortarse.
+- "Subscription:" pasa a "**ID:**", la misma palabra del placeholder ("Search by name or ID"). Con "Subscription:" el
+  número no entraba en la columna y se partía.
+- `PersonSearchField` suma `columnas` (opcional). Sin esa prop se ve como siempre (New Patient, New Appointment,
+  Relationships).
