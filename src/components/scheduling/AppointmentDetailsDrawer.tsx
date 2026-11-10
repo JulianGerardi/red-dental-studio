@@ -1,13 +1,17 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  X, TriangleAlert, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity,
+  X, TriangleAlert, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity, Trash2,
 } from 'lucide-react'
-import { BLOCK_STYLE, fmtExacta, type ApptState } from './calendar-data'
+import { BLOCK_STYLE, esEliminable, fmtExacta, type ApptState } from './calendar-data'
 import { useAnclaje } from '@/lib/anclaje'
 import { useEsChico } from '@/lib/media'
 import { aviso } from '@/components/ui/toaster'
 import { Avatar } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
 /* Figma 3856:214039 "Appointment Details Drawer".
 
@@ -30,6 +34,9 @@ import { Avatar } from '@/components/ui/avatar'
    "Reaseon for the visit" en "Consult...". */
 
 const W = 336
+
+/* CON-2990: por qué no se puede borrar un turno que ya no está en un estado temprano. */
+const BLOQUEO_BORRAR = 'Only Proposed or Waiting List appointments can be deleted.'
 
 /* El detalle es de lectura: el turno se cambia desde "Edit appointment", no
    con lápices sueltos por fila. */
@@ -63,6 +70,7 @@ export function AppointmentDetailsDrawer({
   reason,
   anchor,
   onClose,
+  onDelete,
 }: {
   patient: string
   estado?: ApptState
@@ -75,12 +83,20 @@ export function AppointmentDetailsDrawer({
   reason: string
   anchor: DOMRect
   onClose: () => void
+  /** Borra el turno, ya confirmado. Sin esto el detalle no muestra Delete. */
+  onDelete?: () => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const chico = useEsChico()
   const { left, top, ancho } = useAnclaje(ref, anchor, W)
+  const [confirmando, setConfirmando] = useState(false)
+  const idBloqueo = useId()
+  const eliminable = esEliminable(estado)
 
   useEffect(() => {
+    /* Con la pregunta de borrar abierta, Escape y el click afuera son de la pregunta. */
+    if (confirmando) return
+
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     const onDown = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) onClose()
@@ -105,11 +121,12 @@ export function AppointmentDetailsDrawer({
       document.removeEventListener('mousedown', onDown)
       window.removeEventListener('resize', onResize)
     }
-  }, [onClose])
+  }, [onClose, confirmando])
 
   const initials = patient.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
   const s = BLOCK_STYLE[estado] ?? BLOCK_STYLE.Booked
   const fin = Math.round((inicio + duracion) * 60) / 60
+  const rotuloFecha = fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
 
   const cuerpo = (
     <div
@@ -171,7 +188,7 @@ export function AppointmentDetailsDrawer({
               <span className="text-[11px] whitespace-nowrap text-ink-medium">{duracionLegible(duracion)}</span>
             </span>
             <span className="mt-0.5 block text-[11px] text-ink-medium">
-              {fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+              {rotuloFecha}
             </span>
           </span>
         </div>
@@ -188,12 +205,41 @@ export function AppointmentDetailsDrawer({
           <span className="text-[11px] font-semibold text-warn-fg">Guarantor not assigned</span>
         </div>
 
-        <button
-          onClick={() => aviso.ok(`${patient} has been checked in.`)}
-          className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 w-full items-center justify-center gap-2 rounded-md text-[13px] font-semibold text-white transition-colors"
-        >
-          Check In <ChevronDown className="size-4" />
-        </button>
+        <div className="flex gap-2">
+          {/* Delete (CON-2990): sólo Proposed; en el resto se ve apagado y dice por qué. */}
+          {onDelete && (eliminable ? (
+            <Button variant="secondary" className="text-dash-bad-fg hover:bg-dash-bad-bg" onClick={() => setConfirmando(true)}>
+              <Trash2 /> Delete
+            </Button>
+          ) : (
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    aria-disabled
+                    aria-describedby={idBloqueo}
+                    className="cursor-not-allowed text-ink-faint hover:bg-white active:bg-white"
+                    onClick={() => aviso.info(BLOQUEO_BORRAR)}
+                  >
+                    <Trash2 /> Delete
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[240px] bg-ink leading-snug text-white">{BLOQUEO_BORRAR}</TooltipContent>
+              </Tooltip>
+              <span id={idBloqueo} className="sr-only">{BLOQUEO_BORRAR}</span>
+            </TooltipProvider>
+          ))}
+          <button
+            onClick={() => aviso.ok(`${patient} has been checked in.`)}
+            className={cn(
+              'bg-dash-blue hover:bg-dash-blue-hover flex h-9 flex-1 items-center justify-center gap-2 rounded-md',
+              'text-[13px] font-semibold text-white transition-colors',
+            )}
+          >
+            Check In <ChevronDown className="size-4" />
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -205,6 +251,19 @@ export function AppointmentDetailsDrawer({
           tocando afuera. */}
       {chico && <div className="fixed inset-0 z-40 bg-black/30" aria-hidden onClick={onClose} />}
       {cuerpo}
+      {confirmando && (
+        <ConfirmDialog
+          title="Delete Appointment"
+          confirmLabel="Delete"
+          tone="danger"
+          /* Un tick después: el mismo Escape o click que cierra la pregunta no tiene que cerrar el detalle. */
+          onCancel={() => setTimeout(() => setConfirmando(false))}
+          onConfirm={() => { setConfirmando(false); onDelete?.() }}
+        >
+          Are you sure you want to delete {patient}'s appointment on {rotuloFecha}, {fmtExacta(inicio)} – {fmtExacta(fin)}?
+          This action cannot be undone.
+        </ConfirmDialog>
+      )}
     </>,
     document.body,
   )

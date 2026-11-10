@@ -689,3 +689,36 @@ llega a contraste AA. Para lectores de pantalla el rango se lee "From 08:15 AM t
 
 **Para el dev:** `AppointmentDetailsDrawer` cambia la prop `hora: string` por `inicio: number` (hora decimal, 8.25 =
 08:15 AM) y calcula el fin adentro.
+
+## Detalle del turno: Delete (2026-11-10)
+
+**CON-2990** ([Appointment] Delete). Lo pidió Julián: "sumarle un botón que diga delete".
+
+La historia fija la regla: un turno se borra sólo en un estado temprano —`Proposed` o `Waiting List`—, con
+confirmación, y tiene que quedar claro cuando no se puede.
+
+- **Dónde.** En el pie del detalle, a la izquierda de Check In: **Delete** con tacho, en rojo sobre blanco (secundario,
+  no relleno). La acción principal sigue siendo Check In, que ocupa el resto del ancho.
+- **Sólo `Proposed`** (`esEliminable` en `calendar-data.ts`). `Waiting List` no es un estado de la grilla: esas
+  solicitudes viven en el panel de Appointment Requests y ya tienen su Cancel.
+- **Cuando no se puede, el botón se ve apagado y dice por qué**, no desaparece: "Only Proposed or Waiting List
+  appointments can be deleted." en un tooltip (mouse y teclado) y en un aviso al tocarlo (celular). Lleva
+  `aria-disabled`, no `disabled`, para que se pueda enfocar y leer el motivo. Mismo patrón que las acciones bloqueadas
+  del menú ⋮ de un procedimiento.
+- **Confirmación** con `ConfirmDialog` en tono danger: "Delete Appointment" y el paciente, la fecha y el horario del
+  turno, para que se sepa cuál se borra. El detalle queda abierto detrás; Cancel o Escape vuelven a él con el foco en
+  Delete.
+- **Al borrar**, el turno sale de la grilla, el detalle se cierra y avisa "Sofia Chen's appointment was deleted.". Sin
+  Undo: la historia pide borrado físico con confirmación previa.
+
+**Anomalías y pendientes**
+
+1. **Turno de ejemplo que no está en el Figma.** Ningún turno del frame está en `Proposed`, así que Delete habría
+   quedado apagado en todos. Se suma uno a la grilla (Sofia Chen, miércoles 11:00 AM, Dr. Emily Chen, Operatory 1,
+   Consultation). Va aparte de `EVENTS` para no cambiar el "4 today" del Login.
+2. **Auditoría.** La historia pide registrar el borrado; no hay backend, así que no se muestra nada.
+3. **El motivo nombra `Waiting List`** aunque en este detalle nunca aparece un turno en ese estado. Se deja el texto
+   completo de la regla; a validar si confunde.
+
+**Para el dev:** `AppointmentDetailsDrawer` suma `onDelete?: () => void` (sin la prop no muestra el botón); la pregunta
+la hace el propio componente y llama a `onDelete` ya confirmado. e2e en `tests/scheduling-delete.e2e.ts`.

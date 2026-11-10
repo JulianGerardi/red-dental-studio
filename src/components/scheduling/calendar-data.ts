@@ -4,6 +4,10 @@ export type ApptState =
   | 'Proposed' | 'Check-in' | 'Booked' | 'In progress'
   | 'Fulfilled' | 'No-show' | 'Cancelled'
 
+/* CON-2990: un turno se borra sólo mientras está en un estado temprano. Waiting List no es un estado de la grilla:
+   esas solicitudes viven en el panel de Appointment Requests. */
+export const esEliminable = (estado: ApptState) => estado === 'Proposed'
+
 /* Los colores son tokens de src/index.css (--color-appt-*): se cambian ahí. */
 const c = (estado: string, parte: 'bg' | 'bar' | 'fg' | 'dot') => `var(--color-appt-${estado}-${parte})`
 
@@ -98,7 +102,14 @@ export const mismoDia = (a: Date, b: Date) =>
    referencia para tener fecha propia. */
 export type EventoConFecha = Omit<CalendarEvent, 'day'> & { fecha: Date }
 
-export const EVENTOS_INICIALES: EventoConFecha[] = EVENTS.map(({ day, ...e }) => ({
+/* No está en el Figma: un turno Proposed de ejemplo, el único estado que deja probar Delete (CON-2990). Va aparte de
+   `EVENTS` para no cambiar el "4 today" del Login. */
+const PROPUESTO: CalendarEvent = {
+  day: 3, start: 11, duration: 1, patient: 'Sofia Chen', state: 'Proposed',
+  provider: 'Dr. Emily Chen', room: 'Operatory 1', reason: 'Consultation',
+}
+
+export const EVENTOS_INICIALES: EventoConFecha[] = [...EVENTS, PROPUESTO].map(({ day, ...e }) => ({
   ...e,
   fecha: sumarDias(inicioDeSemana(FECHA_ANCLA), day),
 }))
