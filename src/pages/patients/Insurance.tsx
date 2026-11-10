@@ -215,14 +215,15 @@ export default function Insurance() {
                     Select an existing subscription or create new one.
                   </p>
 
-                  {/* El buscador de personas de toda la app (PersonSearchField): cada resultado, una card con el suscriptor y
-                      número, carrier y plan; busca en los cuatro (Julián, 2026-11-06). */}
+                  {/* El buscador de personas de toda la app (PersonSearchField): cada resultado, una fila con el suscriptor y su
+                      número, y Carrier y Plan en columnas; busca en los cuatro (Julián, 2026-11-06 y 2026-11-10). */}
                   <PersonSearchField
                     className="mt-4" label="Search for an existing subscription" required placeholder="Search by name or ID"
                     personas={suscripciones.map(etiquetaSuscripcion)} value={busqueda} onChange={buscar}
                     nombre={(v) => porEtiqueta(v)?.subscriber ?? v}
                     texto={(v) => { const x = porEtiqueta(v); return x ? `${etiquetaSuscripcion(x)} ${x.carrier} ${x.plan}` : v }}
-                    lineas={(v) => { const x = porEtiqueta(v); return x && [`Subscription: ${x.subscriberId}`, `Carrier: ${x.carrier}`, `Plan: ${x.plan}`] }}
+                    lineas={(v) => { const x = porEtiqueta(v); return x && [`ID: ${x.subscriberId}`] }}
+                    columnas={(v) => { const x = porEtiqueta(v); return x && [{ label: 'Carrier', value: x.carrier }, { label: 'Plan', value: x.plan }] }}
                     emptyText="Subscription not found."
                     error={intentado && !elegida ? (busqueda.trim() ? 'Select a subscription from the list.' : 'This field is required.') : undefined}
                   />
