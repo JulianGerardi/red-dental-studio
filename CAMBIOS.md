@@ -13,6 +13,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   se reemplaza por `subtitulo` (texto al lado del nombre) y `chips` (`{ label, value, tone }[]`); sin esas props se ve
   como antes. Decisión en `insurance.md` (2026-11-10). Storybook sin actualizar.
 
+### Ficha del paciente: Pending Signature cuando la Clinical Note queda sin firmar ([#131](https://github.com/JulianGerardi/red-dental-studio/pull/131))
+- Al cerrar el encuentro en Clinical Mode (*End encounter*) y elegir **Remind me later**, la ficha del paciente muestra
+  **Pending Signature** en el lugar de Start Encounter, como en red.dev (CON-4081, punto 6). Es un botón aparte, **sin
+  desplegable**: abre el mismo diálogo *Clinical Note* y con *Review and sign* vuelve Start Enconter. Va en **tinte
+  violeta sin borde** con el ícono de firma: ni la caja naranja de red.dev ni el relleno `#b45309` de la historia,
+  porque el naranja se confundía con Pending Encounter (ámbar). Con el menú colapsado queda como ícono.
+- **Para el dev:** `PendingSignatureButton` (`PatientSidePanel.tsx`) reemplaza a `EncounterButton` mientras
+  `useNotaPendiente()` (`lib/notaClinica.ts`) sea verdadero; `ClinicalNoteDialog` lo prende y lo apaga. Usa `purple-fg` /
+  `purple-bg`, sin tokens nuevos. No es un estado del botón de encuentro. Jira no tiene historia para esto: está como
+  anomalía en `patient-dashboard.md` (2026-11-10). Storybook sin actualizar (pendiente de que Julián lo pida).
+
 ### Detalle del turno: inicio y fin, y Delete ([#129](https://github.com/JulianGerardi/red-dental-studio/pull/129))
 - **Scheduling → detalle del turno**: el horario muestra inicio y fin al tamaño del resto de las filas ("08:15 AM –
   10:45 AM"), con la duración a la derecha y la fecha abajo; antes sólo se veía la hora de inicio, en grande.
