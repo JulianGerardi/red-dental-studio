@@ -101,6 +101,7 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
 - `tests/patient-dashboard.e2e.ts` (2026-10-13): en Ledger el rastro es Patients › John Smith › Ledger (el último sin
   link); John Smith vuelve al Overview, donde termina el rastro, y Patients a la lista, que no lleva. Billing tampoco.
   Edit Patient cuelga del paciente.
+  Desde el 2026-11-10 también el botón de encuentro: *Encounter options* lo pasa a Pending Signature.
 
 - `tests/scheduling-linked-visit.e2e.ts` (2026-10-17): en New Appointment, Visit 2 muestra el turno donde ya está
   linkeada; Save pregunta *Move treatment visit?* y Cancel deja el drawer como estaba; *Move visit* guarda y avisa que

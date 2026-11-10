@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Handshake, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen, IdCard,
+  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Handshake, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen, IdCard, Signature,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -331,8 +331,11 @@ export { FileText }
    El verde queda en #1e9850, el de la plataforma, y no en el #28c563 del
    design system: es el mismo botón que el popup del paciente, que Julián pidió
    alinear. El ámbar sí es el #ffb82c del sistema, pero con texto oscuro: el
-   frame lo pone en blanco y sobre ese fondo no se lee. */
-type EstadoEncuentro = 'start' | 'pending'
+   frame lo pone en blanco y sobre ese fondo no se lee.
+
+   "Pending Signature" (red.dev): el encuentro terminó y falta firmar. Tinte violeta sin borde, no el naranja de
+   red.dev: el ámbar ya es Pending Encounter (patient-dashboard.md, 2026-11-10). */
+export type EstadoEncuentro = 'start' | 'pending' | 'signature'
 
 /* El estado vivía en el componente y el panel se vuelve a montar en cada
    pantalla del paciente, así que al ir de Treatments a Insurance volvía a
@@ -371,7 +374,18 @@ const ENCUENTRO = {
     clase: 'bg-amber text-[#7a4a00] hover:bg-[#f0a913]',
     icono: <Pause className="size-3.5 shrink-0" />,
   },
+  signature: {
+    label: 'Pending Signature',
+    clase: 'bg-purple-bg text-purple-fg hover:bg-purple-fg/15',
+    icono: <Signature className="size-3.5 shrink-0" />,
+  },
 } as const
+
+const AVISO_ENCUENTRO: Record<EstadoEncuentro, () => void> = {
+  start: () => aviso.ok('Encounter started.'),
+  pending: () => aviso.warn('Encounter is on hold.'),
+  signature: () => aviso.warn('Encounter is pending signature.'),
+}
 
 export function EncounterButton() {
   const [estadoCompartido, setEstado] = useEstadoEncuentro()
@@ -396,12 +410,8 @@ export function EncounterButton() {
       <span className={cn('flex w-full items-center rounded-lg text-[13px] font-semibold', actual.clase)}>
         <button
           type="button"
-          onClick={() =>
-            estado === 'start'
-              ? aviso.ok('Encounter started.')
-              : aviso.warn('Encounter is on hold.')
-          }
-          className="flex flex-1 items-center justify-center gap-2 py-2"
+          onClick={AVISO_ENCUENTRO[estado]}
+          className={cn('flex flex-1 items-center justify-center gap-2 rounded-l-lg py-2', FOCO)}
         >
           {actual.icono} {actual.label}
         </button>
@@ -410,7 +420,7 @@ export function EncounterButton() {
           aria-label="Encounter options"
           aria-expanded={abierto}
           onClick={() => setAbierto((v) => !v)}
-          className="px-2 py-2 opacity-80 hover:opacity-100"
+          className={cn('rounded-r-lg px-2 py-2 opacity-80 hover:opacity-100', FOCO)}
         >
           <ChevronDown className={cn('size-3.5 transition-transform', abierto && 'rotate-180')} />
         </button>

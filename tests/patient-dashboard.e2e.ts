@@ -44,3 +44,13 @@ test('Insurance scrollea adentro, sin mover el menú del paciente', async ({ app
   await expect(screen.getByRole('link', 'Treatments')).toBeVisible()
   await expect(screen.getByText('Patient Information')).toBeVisible()
 })
+
+/* Pending Signature es un estado del botón de encuentro, en el lugar de Start Encounter (patient-dashboard.md,
+   2026-11-10). */
+test('El botón de encuentro pasa a Pending Signature desde sus opciones', async ({ app, screen }) => {
+  await app.open('/patients/1')
+  await screen.getByRole('button', 'Encounter options').tap()
+  await screen.getByRole('button', /Pending Signature/).tap()
+  await expect(screen.getByRole('button', /Pending Signature/)).toBeVisible()
+  await expect(screen.getByRole('button', /Start Enconter/)).toHaveCount(0)
+})

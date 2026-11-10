@@ -531,3 +531,27 @@ Julián: el ícono del ítem tiene que ir con el texto. Era `Ban` (el círculo t
 para cancelar o rechazar (Cancel order, Clinic declined), así que el ítem parecía una acción bloqueada. Pasa a
 `Handshake`: un acuerdo entre personas, que cubre las dos partes del nombre (los vínculos del paciente y quién se hace
 cargo de pagar). `Users` quedó descartado porque ya es el ícono de Patients en la barra principal.
+
+## CON-4081: Pending Signature, estado del botón de encuentro (2026-11-10)
+
+Julián pasó la ficha de red.dev con **Pending Signature** en el lugar de Start Encounter (caja `#fff7ed`, borde de 2 px
+`#ff9900`, texto `#b45309`) y pidió que no quede así ni como se había dibujado en CON-4081 punto 6 (relleno `#b45309`):
+"de otra manera y con otro color". En la app el botón no existía.
+
+- **Qué es:** en red.dev aparece cuando el encuentro ya terminó (*Fulfilled*) y falta firmar. Por eso es el tercer estado
+  de `EncounterButton` (`start` · `pending` · `signature`), no un botón aparte: ocupa el mismo lugar.
+- **Otro color: violeta** (`purple-fg` sobre `purple-bg`, contraste 7,2:1). El naranja se confundía con Pending
+  Encounter, que ya es ámbar en el mismo botón; verde es arrancar, rojo es lo que falta (CC y TR) y azul es navegar.
+- **Otra forma: tinte sin borde**, como Clinical Mode, que va justo debajo. Start y Pending Encounter son rellenos porque
+  son acciones sobre el encuentro (play, pausa); esto es un pendiente que quedó después. Ícono `Signature`, no el
+  documento genérico. Se descartaron el violeta relleno (competía con Overview, el ítem activo del menú) y el blanco con
+  línea violeta (volvía a la caja con borde de red.dev).
+- El chevron sigue: es el que alterna los estados en la app de muestra. El click avisa "Encounter is pending signature."
+  igual que los otros dos estados avisan el suyo.
+- De paso, las dos mitades del botón muestran el anillo de foco azul (`FOCO`): antes llevaban el del navegador.
+
+**Anomalía / a definir:** ninguna historia de Jira dice cuándo aparece Pending Signature ni adónde lleva el click
+(CON-4081 es sólo de diseño; CON-3373 y CON-3612 hablan de consentimientos pendientes, no del encuentro). Salió de mirar
+red.dev. **A validar con usuarios:** si el provider lo lee como un pendiente suyo o como un estado del paciente.
+
+`tests/patient-dashboard.e2e.ts`: el botón pasa a Pending Signature desde *Encounter options*.
