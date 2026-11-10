@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-10
 
+### Pending Signature por paciente, con tres pacientes de ejemplo ([#133](https://github.com/JulianGerardi/red-dental-studio/pull/133))
+- `patient-0002`, `patient-0003` y `patient-0005` abren con **Pending Signature**, para verlo sin hacer el flujo;
+  `patient-0001` sigue con Start Enconter. La nota sin firmar queda en el paciente desde el que se cerró el encuentro.
+- Clinical Mode desde el panel abre el del paciente de la ficha (`/patients/<id>/clinical-mode`), ya no siempre el
+  primero.
+- **Para el dev:** `useNotaPendiente(paciente)` / `setNotaPendiente(paciente, v)` en `lib/notaClinica.ts`, semilla en
+  `NOTA_PENDIENTE_INICIAL`; `ClinicalNoteDialog` pide `paciente`. Decisión en `patient-dashboard.md` (2026-11-10).
+
 ### Insurance: buscador de suscripciones con chips ([#132](https://github.com/JulianGerardi/red-dental-studio/pull/132))
 - **Search for an existing subscription**: cada resultado muestra **nombre · ID** y abajo **Carrier y Plan como chips**
   (carrier gris, plan celeste). La card elegida, igual. Entra en el ancho del campo y en el celular los chips bajan.
