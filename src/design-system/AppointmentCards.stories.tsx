@@ -201,7 +201,7 @@ function Demo(a: Args) {
         <AppointmentDetailsDrawer
           patient={a.name}
           estado={a.state}
-          hora={fmtExacta(inicio)}
+          inicio={inicio}
           duracion={a.duration}
           fecha={new Date()}
           provider={a.provider}

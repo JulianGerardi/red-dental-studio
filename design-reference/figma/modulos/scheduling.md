@@ -663,3 +663,64 @@ sigue encontrando el botón y completando el campo igual que antes.
 
 Las sugerencias de Patient, Primary Provider y Additional Provider (`PersonSearchField`) ahora flotan en un desplegable pegado al input en vez de empujar los campos de abajo, y
 la persona elegida lleva una ✕ para quitarla (en Additional Provider, opcional, es la forma de dejarlo vacío otra vez). El porqué está en `relationships.md` (2026-10-21).
+
+## Detalle del turno: inicio y fin (2026-11-10)
+
+Sin historia de Jira para el formato del horario en el detalle (se buscó en CON por "appointment detail", "popover" y
+"check in": las que hay son de Check In y Encounter Status, no de cómo se muestra la hora). Lo pidió Julián sobre una
+grabación del popover.
+
+Reemplaza a **"Un solo horario"** de *Ajustes sobre la quinta propuesta* (2026-08-30). Dos problemas de esa decisión:
+
+- **No se veía a qué hora termina.** Había que sumar "08:15 AM" + "2 hr 30 min" de cabeza, y recepción mira este popover
+  justamente para saber cuándo se libera el sillón o el profesional.
+- **La hora a 15 px en negrita competía con el nombre del paciente** (también 15 px en negrita) y, a 336 px de ancho, se
+  partía en dos renglones ("08:15" / "AM") al lado de la fecha, que también se partía.
+
+Ahora la caja gris lleva dos renglones al tamaño del resto de las filas:
+
+- Arriba, **"08:15 AM – 10:45 AM"** (13 px seminegrita) y la duración a la derecha ("2 hr 30 min", 11 px).
+- Abajo, la fecha completa ("Monday, May 30, 2022", 11 px).
+
+Mismos datos que antes más la hora de fin, que sale de `start + duration`; nada más se agrega. El rótulo es el de
+`fmtExacta`, el mismo del bloque de la grilla (regla "La hora sale de un solo lado"). La caja gris se queda: separa el
+*cuándo* del *quién/dónde/qué* sin regla. Los textos chicos pasan de `ink-muted` a `ink-medium`, que sobre el gris
+llega a contraste AA. Para lectores de pantalla el rango se lee "From 08:15 AM to 10:45 AM".
+
+**Para el dev:** `AppointmentDetailsDrawer` cambia la prop `hora: string` por `inicio: number` (hora decimal, 8.25 =
+08:15 AM) y calcula el fin adentro.
+
+## Detalle del turno: Delete (2026-11-10)
+
+**CON-2990** ([Appointment] Delete). Lo pidió Julián: "sumarle un botón que diga delete".
+
+La historia fija la regla: un turno se borra sólo en un estado temprano —`Proposed` o `Waiting List`—, con
+confirmación, y tiene que quedar claro cuando no se puede.
+
+- **Dónde.** En el pie del detalle, a la izquierda de Check In: **Delete** con tacho, en rojo sobre blanco (secundario,
+  no relleno). **Los dos botones miden lo mismo** (mitad y mitad, 36 px de alto), como el pie de los drawers; lo pidió
+  Julián porque Delete, al ancho de su texto, se veía chico al lado de Check In. La jerarquía la da el relleno azul de
+  Check In, no el tamaño. Check In pasa a `ui/button` para que los dos compartan alto, radio y peso de letra.
+- **Sólo `Proposed`** (`esEliminable` en `calendar-data.ts`). `Waiting List` no es un estado de la grilla: esas
+  solicitudes viven en el panel de Appointment Requests y ya tienen su Cancel.
+- **Cuando no se puede, el botón se ve apagado y dice por qué**, no desaparece: "Only Proposed or Waiting List
+  appointments can be deleted." en un tooltip (mouse y teclado) y en un aviso al tocarlo (celular). Lleva
+  `aria-disabled`, no `disabled`, para que se pueda enfocar y leer el motivo. Mismo patrón que las acciones bloqueadas
+  del menú ⋮ de un procedimiento.
+- **Confirmación** con `ConfirmDialog` en tono danger: "Delete Appointment" y el paciente, la fecha y el horario del
+  turno, para que se sepa cuál se borra. El detalle queda abierto detrás; Cancel o Escape vuelven a él con el foco en
+  Delete.
+- **Al borrar**, el turno sale de la grilla, el detalle se cierra y avisa "Sofia Chen's appointment was deleted.". Sin
+  Undo: la historia pide borrado físico con confirmación previa.
+
+**Anomalías y pendientes**
+
+1. **Turno de ejemplo que no está en el Figma.** Ningún turno del frame está en `Proposed`, así que Delete habría
+   quedado apagado en todos. Se suma uno a la grilla (Sofia Chen, miércoles 11:00 AM, Dr. Emily Chen, Operatory 1,
+   Consultation). Va aparte de `EVENTS` para no cambiar el "4 today" del Login.
+2. **Auditoría.** La historia pide registrar el borrado; no hay backend, así que no se muestra nada.
+3. **El motivo nombra `Waiting List`** aunque en este detalle nunca aparece un turno en ese estado. Se deja el texto
+   completo de la regla; a validar si confunde.
+
+**Para el dev:** `AppointmentDetailsDrawer` suma `onDelete?: () => void` (sin la prop no muestra el botón); la pregunta
+la hace el propio componente y llama a `onDelete` ya confirmado. e2e en `tests/scheduling-delete.e2e.ts`.

@@ -1,13 +1,16 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  X, TriangleAlert, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity,
+  X, TriangleAlert, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity, Trash2,
 } from 'lucide-react'
-import { BLOCK_STYLE, type ApptState } from './calendar-data'
+import { BLOCK_STYLE, esEliminable, fmtExacta, type ApptState } from './calendar-data'
 import { useAnclaje } from '@/lib/anclaje'
 import { useEsChico } from '@/lib/media'
 import { aviso } from '@/components/ui/toaster'
 import { Avatar } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 /* Figma 3856:214039 "Appointment Details Drawer".
 
@@ -17,11 +20,9 @@ import { Avatar } from '@/components/ui/avatar'
 
    Acá el contenido manda sobre la forma:
 
-   - **Un solo horario.** Mostrar inicio y fin hacía leer dos veces para
-     entender un dato que es uno: cuándo empieza. La duración va al lado, en
-     texto chico, y no compite. La hora y la fecha salen del turno que se
-     clickeó —el mismo rótulo que muestra el bloque en la grilla—, no de un
-     texto fijo.
+   - **Inicio y fin, al tamaño del resto.** La hora y la fecha salen del turno
+     que se clickeó —el mismo rótulo que muestra el bloque en la grilla—, no
+     de un texto fijo.
    - **Filas con ícono en vez de etiqueta.** Un consultorio, un profesional y
      un motivo se reconocen por el ícono; el rótulo en mayúsculas sobraba.
    - **La card sigue siendo el bloque del calendario**: mismo acento arriba y
@@ -32,6 +33,9 @@ import { Avatar } from '@/components/ui/avatar'
    "Reaseon for the visit" en "Consult...". */
 
 const W = 336
+
+/* CON-2990: por qué no se puede borrar un turno que ya no está en un estado temprano. */
+const BLOQUEO_BORRAR = 'Only Proposed or Waiting List appointments can be deleted.'
 
 /* El detalle es de lectura: el turno se cambia desde "Edit appointment", no
    con lápices sueltos por fila. */
@@ -57,7 +61,7 @@ function duracionLegible(horas: number) {
 export function AppointmentDetailsDrawer({
   patient,
   estado = 'Booked',
-  hora,
+  inicio,
   duracion,
   fecha,
   provider,
@@ -65,11 +69,12 @@ export function AppointmentDetailsDrawer({
   reason,
   anchor,
   onClose,
+  onDelete,
 }: {
   patient: string
   estado?: ApptState
-  /** El rótulo del bloque, tal como se lee en la grilla. */
-  hora: string
+  /** Hora decimal de inicio (8.25 = 08:15 AM); el fin sale de sumarle la duración. */
+  inicio: number
   duracion: number
   fecha: Date
   provider: string
@@ -77,12 +82,20 @@ export function AppointmentDetailsDrawer({
   reason: string
   anchor: DOMRect
   onClose: () => void
+  /** Borra el turno, ya confirmado. Sin esto el detalle no muestra Delete. */
+  onDelete?: () => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const chico = useEsChico()
   const { left, top, ancho } = useAnclaje(ref, anchor, W)
+  const [confirmando, setConfirmando] = useState(false)
+  const idBloqueo = useId()
+  const eliminable = esEliminable(estado)
 
   useEffect(() => {
+    /* Con la pregunta de borrar abierta, Escape y el click afuera son de la pregunta. */
+    if (confirmando) return
+
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     const onDown = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) onClose()
@@ -107,10 +120,12 @@ export function AppointmentDetailsDrawer({
       document.removeEventListener('mousedown', onDown)
       window.removeEventListener('resize', onResize)
     }
-  }, [onClose])
+  }, [onClose, confirmando])
 
   const initials = patient.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
   const s = BLOCK_STYLE[estado] ?? BLOCK_STYLE.Booked
+  const fin = Math.round((inicio + duracion) * 60) / 60
+  const rotuloFecha = fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
 
   const cuerpo = (
     <div
@@ -156,15 +171,24 @@ export function AppointmentDetailsDrawer({
       </div>
 
       <div className="flex flex-col gap-3 p-4">
-        {/* Un solo horario: el de inicio, que es el que ubica el turno. La
-            duración va al lado y en chico. Va sobre una caja gris para que se
-            despegue de las filas de abajo sin necesidad de una regla. */}
-        <div className="flex items-center gap-2.5 rounded-md bg-surface-muted px-3 py-2">
-          <Clock className="size-4 shrink-0 text-ink" />
-          <span className="text-[15px] leading-none font-bold text-ink">{hora}</span>
-          <span className="text-[11px] text-ink-muted">
-            {duracionLegible(duracion)} ·{' '}
-            {fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+        {/* Inicio y fin al tamaño de las filas, con la duración al costado y la
+            fecha abajo: ver "Detalle del turno: inicio y fin" en scheduling.md. */}
+        <div className="flex items-start gap-2.5 rounded-md bg-surface-muted px-3 py-2">
+          <Clock className="mt-px size-4 shrink-0 text-ink-medium" />
+          <span className="min-w-0 flex-1">
+            <span className="flex flex-wrap items-baseline justify-between gap-x-2">
+              <span className="text-[13px] font-semibold whitespace-nowrap text-ink">
+                <span className="sr-only">From </span>
+                {fmtExacta(inicio)}
+                <span aria-hidden> – </span>
+                <span className="sr-only"> to </span>
+                {fmtExacta(fin)}
+              </span>
+              <span className="text-[11px] whitespace-nowrap text-ink-medium">{duracionLegible(duracion)}</span>
+            </span>
+            <span className="mt-0.5 block text-[11px] text-ink-medium">
+              {rotuloFecha}
+            </span>
           </span>
         </div>
 
@@ -180,12 +204,35 @@ export function AppointmentDetailsDrawer({
           <span className="text-[11px] font-semibold text-warn-fg">Guarantor not assigned</span>
         </div>
 
-        <button
-          onClick={() => aviso.ok(`${patient} has been checked in.`)}
-          className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 w-full items-center justify-center gap-2 rounded-md text-[13px] font-semibold text-white transition-colors"
-        >
-          Check In <ChevronDown className="size-4" />
-        </button>
+        <div className={onDelete ? 'grid grid-cols-2 gap-2' : 'grid'}>
+          {/* Delete (CON-2990): sólo Proposed; en el resto se ve apagado y dice por qué. Los dos botones, del mismo ancho. */}
+          {onDelete && (eliminable ? (
+            <Button variant="secondary" className="text-dash-bad-fg hover:bg-dash-bad-bg" onClick={() => setConfirmando(true)}>
+              <Trash2 /> Delete
+            </Button>
+          ) : (
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    aria-disabled
+                    aria-describedby={idBloqueo}
+                    className="cursor-not-allowed text-ink-faint hover:bg-white active:bg-white"
+                    onClick={() => aviso.info(BLOQUEO_BORRAR)}
+                  >
+                    <Trash2 /> Delete
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[240px] bg-ink leading-snug text-white">{BLOQUEO_BORRAR}</TooltipContent>
+              </Tooltip>
+              <span id={idBloqueo} className="sr-only">{BLOQUEO_BORRAR}</span>
+            </TooltipProvider>
+          ))}
+          <Button onClick={() => aviso.ok(`${patient} has been checked in.`)}>
+            Check In <ChevronDown />
+          </Button>
+        </div>
       </div>
     </div>
   )
@@ -197,6 +244,19 @@ export function AppointmentDetailsDrawer({
           tocando afuera. */}
       {chico && <div className="fixed inset-0 z-40 bg-black/30" aria-hidden onClick={onClose} />}
       {cuerpo}
+      {confirmando && (
+        <ConfirmDialog
+          title="Delete Appointment"
+          confirmLabel="Delete"
+          tone="danger"
+          /* Un tick después: el mismo Escape o click que cierra la pregunta no tiene que cerrar el detalle. */
+          onCancel={() => setTimeout(() => setConfirmando(false))}
+          onConfirm={() => { setConfirmando(false); onDelete?.() }}
+        >
+          Are you sure you want to delete {patient}'s appointment on {rotuloFecha}, {fmtExacta(inicio)} – {fmtExacta(fin)}?
+          This action cannot be undone.
+        </ConfirmDialog>
+      )}
     </>,
     document.body,
   )

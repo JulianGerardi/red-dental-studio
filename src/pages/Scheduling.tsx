@@ -128,6 +128,13 @@ export default function Scheduling() {
     return false
   }
 
+  /* Delete (CON-2990): el turno sale de la grilla; la pregunta la hace el detalle. */
+  const borrarTurno = (ev: EventoConFecha) => {
+    setEventos((prev) => prev.filter((e) => e !== ev))
+    setDetail(null)
+    aviso.ok(`${ev.patient}'s appointment was deleted.`)
+  }
+
   /* Las flechas y el rótulo siguen la vista, igual que en Google Calendar. */
   const paso = (n: number) => {
     setFecha((f) => {
@@ -304,7 +311,7 @@ export default function Scheduling() {
         <AppointmentDetailsDrawer
           patient={detail.ev.patient}
           estado={detail.ev.state}
-          hora={fmtExacta(detail.ev.start)}
+          inicio={detail.ev.start}
           duracion={detail.ev.duration}
           fecha={detail.ev.fecha}
           provider={detail.ev.provider}
@@ -312,6 +319,7 @@ export default function Scheduling() {
           reason={detail.ev.reason}
           anchor={detail.rect}
           onClose={() => setDetail(null)}
+          onDelete={() => borrarTurno(detail.ev)}
         />
       )}
       {panel === 'new' && <NewAppointmentModal onGuardar={crearTurno} onClose={() => setPanel(null)} />}
