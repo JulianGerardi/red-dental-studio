@@ -63,7 +63,7 @@ export const CaseViewAccepted: Story = {
 export const ConsentStatus: Story = {
   render: () => (
     <div className="flex flex-col gap-3">
-      {(['Not generated', 'Not sent', 'Pending', 'Signed', 'Not required'] as const).map((e) => <EstadoConsentimiento key={e} estado={e} />)}
+      {(['Not required', 'Not generated', 'Requested', 'Accepted', 'Rejected', 'Discarded'] as const).map((e) => <EstadoConsentimiento key={e} estado={e} />)}
     </div>
   ),
 }

@@ -166,6 +166,10 @@ Documento: [figma/modulos/consents.md](figma/modulos/consents.md)
 - [CON-2959](https://confidetally.atlassian.net/browse/CON-2959) Documento - Consent accepted
 - [CON-2960](https://confidetally.atlassian.net/browse/CON-2960) Documento - Consent reject
 
+**Después de abril**
+
+- [CON-4119](https://confidetally.atlassian.net/browse/CON-4119) [Patient Procedures] Visualización y estados de la columna Consent en el listado de procedimientos · epic CON-3118 · armado en Clinical Mode › Treatment Plan (`clinical-mode.md`, 2026-11-11)
+
 ## dashboard
 
 Documento: [figma/modulos/dashboard.md](figma/modulos/dashboard.md)
