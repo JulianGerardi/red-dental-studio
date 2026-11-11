@@ -1,7 +1,7 @@
 import { DrawerActions, DrawerSection } from '@/components/ui/drawer'
 import { useMemo, useState } from 'react'
 import {
-  ModalShell, SelectField, PersonSearchField, TextArea,
+  ModalShell, SelectField, PersonSearchField, TextArea, chipsPersona, type ChipPersona,
   OptionCheckbox, FieldLabel, FieldError,
 } from '@/components/patients/form'
 import { DatePicker, formatDMY } from '@/components/ui/date-picker'
@@ -33,22 +33,25 @@ const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado', 'Sarah
    hay una ficha única para estos cuatro nombres (son de esta pantalla, no de la tabla de Patients ni de Billing/Ledger,
    que tienen su propio mock de 271), así que es mock propio, con el mismo formato que usa la tabla de Patients
    ("Month D, YYYY" y nombre.apellido@email.com). Ver scheduling.md, 2026-10-19. */
-const DATOS_PACIENTE: Record<string, { nacimiento: string; email: string }> = {
-  'John Smith': { nacimiento: 'June 14, 1985', email: 'john.smith@email.com' },
-  'Noah James Smith': { nacimiento: 'September 2, 2018', email: 'noah.smith@email.com' },
-  'Maria Abril Viola': { nacimiento: 'November 23, 1991', email: 'maria.viola@email.com' },
-  'Elias Aguirre': { nacimiento: 'March 5, 1979', email: 'elias.aguirre@email.com' },
+/* El número de paciente va al lado del nombre (los del HTML de ejemplo de Julián, 2026-11-11). */
+const DATOS_PACIENTE: Record<string, { numero: string; nacimiento: string; email: string }> = {
+  'John Smith': { numero: 'PT-00293', nacimiento: 'June 14, 1985', email: 'john.smith@email.com' },
+  'Noah James Smith': { numero: 'PT-00218', nacimiento: 'September 2, 2018', email: 'noah.smith@email.com' },
+  'Maria Abril Viola': { numero: 'PT-00147', nacimiento: 'November 23, 1991', email: 'maria.viola@email.com' },
+  'Elias Aguirre': { numero: 'PT-00405', nacimiento: 'March 5, 1979', email: 'elias.aguirre@email.com' },
 }
-const pacienteLineas = (nombre: string) => {
+const pacienteNumero = (nombre: string) => DATOS_PACIENTE[nombre]?.numero
+const pacienteChips = (nombre: string) => {
   const d = DATOS_PACIENTE[nombre]
-  return d && [`DOB: ${d.nacimiento}`, `Email: ${d.email}`]
+  return d && chipsPersona(d.nacimiento, d.email)
 }
 
 /* El email del provider sale de la plantilla del consultorio (Settings → Employees), que ya los tiene cargados.
    "Dr. " es sólo el tratamiento que usa esta pantalla; el nombre de abajo es el que figura en Employees. */
-const providerLineas = (nombre: string) => {
-  const email = EMPLEADOS.find((e) => e.nombre === nombre.replace(/^Dr\.\s*/, ''))?.email
-  return email ? [`Email: ${email}`] : undefined
+/* El provider no es paciente: sin número; su cargo en gris y el email. */
+const providerChips = (nombre: string): ChipPersona[] | undefined => {
+  const e = EMPLEADOS.find((x) => x.nombre === nombre.replace(/^Dr\.\s*/, ''))
+  return e && [{ label: 'Role', value: e.cargo, tone: 'neutral' }, { label: 'Email', value: e.email }]
 }
 
 const VISITAS: Visita[] = [
@@ -210,15 +213,15 @@ export function NewAppointmentModal({
            dos. Al tocar la fecha o la hora se despliega al costado el calendario del día para elegir la franja. */
         <DrawerSection title="Patient and Scheduling" description="Complete the details below to schedule the appointment.">
           <PersonSearchField
-            label="Patient" required placeholder="Search by Name" personas={PACIENTES} lineas={pacienteLineas}
+            label="Patient" required placeholder="Search by name, number, DOB or email" personas={PACIENTES} subtitulo={pacienteNumero} chips={pacienteChips}
             value={d.patient} onChange={set('patient')} error={req('patient')}
           />
           <PersonSearchField
-            label="Primary Provider" required placeholder="Search by Name" personas={PROVIDERS} lineas={providerLineas}
+            label="Primary Provider" required placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
             value={d.primary} onChange={set('primary')} error={req('primary')}
           />
           <PersonSearchField
-            label="Additional Provider" placeholder="Search by Name" personas={PROVIDERS} lineas={providerLineas}
+            label="Additional Provider" placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
             value={d.additional} onChange={set('additional')}
           />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

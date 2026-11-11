@@ -504,3 +504,22 @@ y que la bajada no va:
 
 **A validar:** sin la bajada la tabla quedó 26 px más baja, y a 1440 px Recent Patients muestra tres pacientes y un
 hueco antes de "Show N more" (con la bajada entraban cuatro). Es el redondeo a filas enteras de `llenarAlto`.
+
+## El buscador de personas, igual en toda la app: nombre · número y chips (2026-11-11)
+
+Julián, con un HTML de ejemplo (Patient y Primary Provider), después de aprobar los chips del buscador de suscripciones
+de Insurance (insurance.md, 2026-11-10): llevar ese formato a New Appointment y al resto de los buscadores de personas.
+"Cuando la persona no es paciente, sólo ocultamos el patient number y listo".
+
+- `PersonSearchField` muestra cada persona igual: avatar, **nombre · número de paciente** (en gris; sólo si es
+  paciente) y abajo **chips**: DOB en gris y email en celeste (`chipsPersona(dob, email)`). Providers: cargo en gris
+  (Dentist, Hygienist) y email. En New Patient (Person, Guardian) el lugar del número lo ocupa el tipo (Employee,
+  Contact, Subscriber), porque esas personas todavía no son pacientes.
+- **Busca en todo lo que muestra** (nombre, número, DOB, email, cargo), sin acentos ni mayúsculas. Placeholders:
+  "Search by name, number, DOB or email" (pacientes) y "Search by name, role or email" (providers).
+- **La elegida reemplaza al input**, con la ✕ para cambiarla (como el HTML). Antes quedaba el texto en el input y la
+  card debajo, repitiendo lo mismo.
+- **Teclado**: ↑ ↓ recorren, Enter elige, Esc cierra; el input es `combobox` y la lista `listbox` con `option`s.
+- Números de paciente de ejemplo en New Appointment: los del HTML (PT-00293…).
+- Se va `lineas`: todos los buscadores usan `subtitulo` y `chips`. Aplica en New Appointment (Patient, Primary y
+  Additional Provider), New Patient (Person, Guardian), Add Relationship, New Subscription, New Depender e Insurance.

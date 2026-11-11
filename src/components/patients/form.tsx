@@ -515,19 +515,18 @@ export function SearchField({
   )
 }
 
-/* Con `chips`, la persona va en dos renglones: nombre · subtítulo (el ID) arriba y los datos como chips abajo (Insurance:
-   Carrier y Plan). Entra en el ancho del campo y en el celular los chips bajan solos. insurance.md, 2026-11-10. */
+/* Toda persona que se busca va igual (Julián, 2026-11-11, con un HTML de ejemplo): avatar, nombre · subtítulo (el número
+   de paciente, o el ID de la suscripción; sin él, sólo el nombre) y abajo los datos como chips: el primero en gris
+   (DOB, cargo, carrier) y el email o el plan en celeste. Ver insurance.md y patients.md, 2026-11-11. */
 export type ChipPersona = { label: string; value: string; tone?: ChipTone }
 
-function PersonaFila({ nombre, lineas, subtitulo, chips }: { nombre: string; lineas?: string[]; subtitulo?: string; chips?: ChipPersona[] }) {
-  if (!chips?.length) {
-    return (
-      <>
-        <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
-        <PersonaLineas nombre={nombre} lineas={lineas} />
-      </>
-    )
-  }
+/* DOB en gris y email en celeste: lo que desambigua a dos personas con el mismo nombre. */
+export const chipsPersona = (dob?: string, email?: string): ChipPersona[] => [
+  ...(dob ? [{ label: 'DOB', value: dob, tone: 'neutral' as const }] : []),
+  ...(email ? [{ label: 'Email', value: email }] : []),
+]
+
+function PersonaFila({ nombre, subtitulo, chips }: { nombre: string; subtitulo?: string; chips?: ChipPersona[] }) {
   return (
     <>
       <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
@@ -536,53 +535,37 @@ function PersonaFila({ nombre, lineas, subtitulo, chips }: { nombre: string; lin
           <span className="font-semibold">{nombre}</span>
           {subtitulo && <span className="text-xs text-ink-muted"> · {subtitulo}</span>}
         </span>
-        <span className="mt-1.5 flex flex-wrap gap-1.5">
-          {chips.map((c) => (
-            <Chip key={c.label} tone={c.tone} title={`${c.label}: ${c.value}`}>
-              <span className="sr-only">{c.label}: </span>{c.value}
-            </Chip>
-          ))}
-        </span>
+        {!!chips?.length && (
+          <span className="mt-1.5 flex flex-wrap gap-1.5">
+            {chips.map((c) => (
+              <Chip key={c.label} tone={c.tone} title={`${c.label}: ${c.value}`}>
+                <span className="sr-only">{c.label}: </span>{c.value}
+              </Chip>
+            ))}
+          </span>
+        )}
       </span>
     </>
   )
 }
 
-/* Nombre + hasta dos líneas de abajo ("DOB: …", "Email: …"): la etiqueta antes de los ":" sale apagada, el valor no.
-   Una línea sin ":" se muestra entera, sin partir. */
-function PersonaLineas({ nombre, lineas, className }: { nombre: string; lineas?: string[]; className?: string }) {
-  return (
-    <span className={cn('min-w-0 flex-1 leading-tight', className)}>
-      <span className="block text-[13px] font-semibold text-ink">{nombre}</span>
-      {lineas?.map((linea, i) => {
-        const corte = linea.indexOf(':')
-        return (
-          <span key={i} className="block text-[11px] text-ink-muted">
-            {corte > -1
-              ? <><span className="text-ink-faint">{linea.slice(0, corte + 1)}</span>{linea.slice(corte + 1)}</>
-              : linea}
-          </span>
-        )
-      })}
-    </span>
-  )
-}
+/* Sin acentos ni mayúsculas: "martinez" encuentra a "Martínez". */
+const normalizar = (t: string) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 
-/* Buscador de una persona (paciente, provider, contacto…): igual que SearchField, pero cada sugerencia y la elegida son
-   cards con avatar y hasta dos líneas de datos (DOB, email…) -el diseño de Add Relationship → "Select person", para que
-   buscar a alguien se vea igual en toda la app (Julián, 2026-10-20)-. Las sugerencias flotan en un desplegable pegado
-   al input, sin empujar lo de abajo (Julián, 2026-10-21); la elegida queda a la vista debajo, con una ✕ para quitarla y
-   volver a buscar. Sin resultados mientras no se escribe nada: no vuelca todo el directorio como SearchField.
-   "Elegida" sale sólo de comparar `value` contra `personas` (no hay estado propio): basta con que lo tipeado sea
-   exactamente un nombre de la lista. Ver design-reference/design-system.md. */
+/* Buscador de una persona (paciente, provider, contacto…), igual en toda la app. Cada sugerencia es una card con
+   avatar, nombre · subtítulo y los datos como chips (PersonaFila); se busca en todo eso, sin acentos. Las sugerencias
+   flotan pegadas al input (Julián, 2026-10-21) y se recorren con ↑ ↓, Enter elige y Esc cierra. La elegida
+   **reemplaza al input** con una ✕ para cambiarla (Julián, 2026-11-11, con un HTML de ejemplo): antes quedaba el texto
+   en el input y la card debajo, repitiendo lo mismo. Sin resultados mientras no se escribe nada.
+   "Elegida" sale sólo de comparar `value` contra `personas` (no hay estado propio). Ver design-reference/design-system.md. */
 export function PersonSearchField({
-  label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, lineas, emptyText,
-  nombre: nombreDe = (v) => v, texto: textoDe = (v) => v, subtitulo, chips,
+  label, required, className, personas = [], value = '', onChange, error, placeholder = 'Search by Name', hint, disabled, emptyText,
+  nombre: nombreDe = (v) => v, texto, subtitulo, chips,
 }: {
   label: string
   required?: boolean
   className?: string
-  /** Nombres buscables. */
+  /** Claves buscables (el nombre, o "Nombre - ID" si puede repetirse). */
   personas?: string[]
   value?: string
   onChange?: (v: string) => void
@@ -590,26 +573,28 @@ export function PersonSearchField({
   placeholder?: string
   hint?: React.ReactNode
   disabled?: boolean
-  /** Las líneas de abajo de una persona ("DOB: …", "Email: …"); sin esto, la card sólo lleva el nombre. */
-  lineas?: (nombre: string) => string[] | undefined
   /** Qué decir si lo escrito no coincide con nadie; sin esto, no se abre nada. */
   emptyText?: string
   /** El nombre que muestra la card cuando `personas` trae claves únicas ("John Smith - JASD…" → "John Smith"). */
   nombre?: (valor: string) => string
-  /** Dónde se busca lo escrito; por default, en el valor. Insurance busca en nombre, número, carrier y plan. */
+  /** Dónde se busca lo escrito; por default, en el nombre, el subtítulo y los chips. */
   texto?: (valor: string) => string
-  /** Texto corto al lado del nombre, en gris ("· JASDASD11243"). Sólo con `chips`. */
+  /** Al lado del nombre, en gris: el número de paciente (sólo si es paciente) o el ID de la suscripción. */
   subtitulo?: (valor: string) => string | undefined
-  /** Datos como chips debajo del nombre (Carrier, Plan); reemplazan a `lineas`. */
+  /** Los datos debajo del nombre, como chips (DOB y email con `chipsPersona`). */
   chips?: (valor: string) => ChipPersona[] | undefined
 }) {
   const [abierto, setAbierto] = useState(false)
+  const [activa, setActiva] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const listaId = useId()
   const elegida = !!value.trim() && personas.includes(value)
-  const sugerencias = !elegida && value.trim()
-    ? personas.filter((p) => textoDe(p).toLowerCase().includes(value.trim().toLowerCase()))
-    : []
-  const arriba = useHaciaArriba(ref, abierto && sugerencias.length > 0, Math.min(sugerencias.length * 60 + 8, 288) + 4)
+  const textoDe = texto ?? ((v: string) => [nombreDe(v), subtitulo?.(v), ...(chips?.(v)?.map((c) => c.value) ?? [])].join(' '))
+  const q = normalizar(value.trim())
+  const sugerencias = !elegida && q ? personas.filter((p) => normalizar(textoDe(p)).includes(q)) : []
+  const visible = abierto && sugerencias.length > 0
+  const arriba = useHaciaArriba(ref, visible, Math.min(sugerencias.length * 64 + 8, 288) + 4)
 
   useEffect(() => {
     if (!abierto) return
@@ -620,59 +605,89 @@ export function PersonSearchField({
     return () => document.removeEventListener('mousedown', onDown)
   }, [abierto])
 
+  const elegir = (v: string) => { onChange?.(v); setAbierto(false) }
+  const teclas = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault()
+      setAbierto(true)
+      setActiva((n) => Math.max(0, Math.min(sugerencias.length - 1, n + (e.key === 'ArrowDown' ? 1 : -1))))
+    } else if (e.key === 'Enter' && visible && sugerencias[activa]) {
+      e.preventDefault()
+      elegir(sugerencias[activa])
+    } else if (e.key === 'Escape' && abierto) {
+      e.stopPropagation()
+      setAbierto(false)
+    }
+  }
+
   return (
     <div className={cn('flex flex-col gap-2', className)}>
       <FieldLabel required={required}>{label}</FieldLabel>
-      <div ref={ref} className="relative">
-        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-        <input
-          value={value}
-          placeholder={placeholder}
-          aria-label={label}
-          aria-invalid={!!error || undefined}
-          disabled={disabled}
-          onChange={(e) => { onChange?.(e.target.value); setAbierto(true) }}
-          onFocus={() => setAbierto(true)}
-          className={cn(control(error), 'h-9 pr-3 pl-9')}
-        />
-        {abierto && sugerencias.length > 0 && (
-          <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
-            {sugerencias.map((nombre) => (
-              <button
-                key={nombre}
-                type="button"
-                onClick={() => { onChange?.(nombre); setAbierto(false) }}
-                className="flex items-center gap-3 rounded-md p-2 text-left hover:bg-surface-muted"
-              >
-                <PersonaFila nombre={nombreDe(nombre)} lineas={lineas?.(nombre)} subtitulo={subtitulo?.(nombre)} chips={chips?.(nombre)} />
-              </button>
-            ))}
-          </div>
-        )}
-        {abierto && emptyText && !elegida && value.trim() && !sugerencias.length && (
-          <p role="status" className="absolute top-[calc(100%+4px)] left-0 z-30 w-full rounded-md border border-line bg-white px-3 py-6 text-center text-xs text-ink-muted shadow-lg">
-            {emptyText}
-          </p>
-        )}
-      </div>
-      {pie(error, hint)}
-      {elegida && (
+      {elegida ? (
         <div className="relative">
-          <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3 pr-11">
-            <PersonaFila nombre={nombreDe(value)} lineas={lineas?.(value)} subtitulo={subtitulo?.(value)} chips={chips?.(value)} />
+          <div className={cn('flex items-center gap-3 rounded-lg border bg-white p-3 pr-11', error ? 'border-field-error' : 'border-dash-blue', disabled && 'opacity-60')}>
+            <PersonaFila nombre={nombreDe(value)} subtitulo={subtitulo?.(value)} chips={chips?.(value)} />
           </div>
           {!disabled && (
             <button
               type="button"
               aria-label={`Remove ${label}`}
-              onClick={() => { onChange?.(''); setAbierto(false) }}
+              onClick={() => { onChange?.(''); setActiva(0); setAbierto(false); requestAnimationFrame(() => inputRef.current?.focus()) }}
               className="absolute top-1/2 right-2.5 flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dash-blue"
             >
               <X className="size-4" />
             </button>
           )}
         </div>
+      ) : (
+        <div ref={ref} className="relative">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+          <input
+            ref={inputRef}
+            value={value}
+            placeholder={placeholder}
+            aria-label={label}
+            aria-invalid={!!error || undefined}
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded={visible}
+            aria-controls={listaId}
+            aria-activedescendant={visible ? `${listaId}-${activa}` : undefined}
+            autoComplete="off"
+            disabled={disabled}
+            onChange={(e) => { onChange?.(e.target.value); setActiva(0); setAbierto(true) }}
+            onFocus={() => setAbierto(true)}
+            onKeyDown={teclas}
+            className={cn(control(error), 'h-9 pr-3 pl-9')}
+          />
+          {visible && (
+            <div id={listaId} role="listbox" aria-label={label} className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
+              {sugerencias.map((v, i) => (
+                <button
+                  key={v}
+                  id={`${listaId}-${i}`}
+                  type="button"
+                  role="option"
+                  aria-selected={i === activa}
+                  tabIndex={-1}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onMouseEnter={() => setActiva(i)}
+                  onClick={() => elegir(v)}
+                  className={cn('flex items-center gap-3 rounded-md p-2 text-left', i === activa ? 'bg-dash-count-bg/40' : 'hover:bg-dash-count-bg/40')}
+                >
+                  <PersonaFila nombre={nombreDe(v)} subtitulo={subtitulo?.(v)} chips={chips?.(v)} />
+                </button>
+              ))}
+            </div>
+          )}
+          {abierto && emptyText && q && !sugerencias.length && (
+            <p role="status" className="absolute top-[calc(100%+4px)] left-0 z-30 w-full rounded-md border border-line bg-white px-3 py-6 text-center text-xs text-ink-muted shadow-lg">
+              {emptyText}
+            </p>
+          )}
+        </div>
       )}
+      {pie(error, hint)}
     </div>
   )
 }

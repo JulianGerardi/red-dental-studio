@@ -12,7 +12,7 @@ test('Sin suscripción elegida, la card va con guiones y Manage queda deshabilit
 
   /* Busca también por carrier: "aetna" encuentra la de Lucas Johnson. */
   await screen.getByPlaceholder('Search by name or ID').fill('aetna')
-  await screen.getByRole('button', /^Lucas Johnson.*AET-234254/).tap()
+  await screen.getByRole('option', /^Lucas Johnson.*AET-234254/).tap()
   await expect(screen.getByText('Plan 234254534', { exact: true }).first()).toBeVisible()
   await expect(screen.getByRole('button', 'Manage Subscription')).toBeEnabled()
 })
@@ -21,14 +21,14 @@ test('Una suscripción en uso no se borra; una libre, sí, después de confirmar
   await app.open('/patients/john-smith/insurance')
   const buscador = screen.getByPlaceholder('Search by name or ID')
   await buscador.fill('john')
-  await screen.getByRole('button', /^John Smith.*JASDASD11243/).tap()
+  await screen.getByRole('option', /^John Smith.*JASDASD11243/).tap()
   await screen.getByRole('button', 'Delete subscription').tap()
   await expect(screen.getByText(/has dependent patient insurance records/)).toBeVisible()
   await expect(screen.getByRole('dialog')).toHaveCount(0)
 
   await screen.getByRole('button', 'Remove Search for an existing subscription').tap()
   await buscador.fill('maria')
-  await screen.getByRole('button', /^Maria Smith.*CIG-118273/).tap()
+  await screen.getByRole('option', /^Maria Smith.*CIG-118273/).tap()
   await screen.getByRole('button', 'Delete subscription').tap()
   await expect(screen.getByRole('heading', 'Are you sure you want to delete this subscription?')).toBeVisible()
   await screen.getByRole('button', 'Confirm').tap()
@@ -62,5 +62,7 @@ test('New Subscription pide carrier y plan, no deja duplicar y la nueva queda el
   await drawer.getByRole('button', 'HMO Basic').tap()
   await drawer.getByRole('button', 'Save').tap()
   await expect(screen.getByText('The subscription has been successfully created.')).toBeVisible()
-  await expect(screen.getByPlaceholder('Search by name or ID')).toHaveValue('John Smith - ABC-1')
+  /* La elegida reemplaza al buscador (2026-11-11). */
+  await expect(screen.getByPlaceholder('Search by name or ID')).toHaveCount(0)
+  await expect(screen.getByText('· ABC-1')).toBeVisible()
 })

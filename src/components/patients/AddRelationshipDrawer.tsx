@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer'
-import { FieldError, ModalShell, OptionCheckbox, PersonSearchField, SelectField, TextField } from '@/components/patients/form'
+import { FieldError, ModalShell, OptionCheckbox, PersonSearchField, SelectField, TextField, chipsPersona } from '@/components/patients/form'
 import { useFormPasos } from '@/lib/useFormPasos'
 import { Avatar } from '@/components/ui/avatar'
 import { DIRECTORIO, type PersonaDirectorio } from '@/data/personas'
@@ -154,10 +154,7 @@ export function AddRelationshipDrawer({
             value={personaNombre} onChange={setPersonaNombre}
             disabled={nueva}
             error={sinPersona ? 'Select a person or tick the option to create a new one.' : undefined}
-            lineas={(n) => {
-              const p = DIRECTORIO.find((x) => x.name === n)
-              return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
-            }}
+            chips={(n) => { const p = DIRECTORIO.find((x) => x.name === n); return p && chipsPersona(p.dob, p.email) }}
           />
           <OptionCheckbox
             label="Add New Person"
