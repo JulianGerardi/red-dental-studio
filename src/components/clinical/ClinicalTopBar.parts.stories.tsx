@@ -29,4 +29,4 @@ export const BadgeCompleted: Story = { render: () => <div className="w-[300px] p
 export const BadgeEmpty: Story = { render: () => <div className="w-[300px] p-4"><ResumenWorkflow k="TR" onAbrir={() => {}} /></div> }
 
 /* Al cerrar el encuentro (Figma 4540:27072): firmar la Clinical Note ahora o más tarde. */
-export const ClinicalNote: Story = { render: () => <ClinicalNoteDialog open onClose={() => {}} /> }
+export const ClinicalNote: Story = { render: () => <ClinicalNoteDialog open onClose={() => {}} paciente="patient-0001" /> }
