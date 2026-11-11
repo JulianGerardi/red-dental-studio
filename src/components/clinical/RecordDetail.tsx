@@ -8,7 +8,7 @@ import { Drawer, DrawerSection } from '@/components/ui/drawer'
 import { ORDEN_TONO } from '@/components/clinical/LabOrderPanel'
 import { CitaVisita, EstadoConsentimiento, SIN_CONSENTIMIENTO_NI_TURNO, TONO_CASO, estadoGrupo } from '@/components/clinical/TreatmentPlanSection'
 import { codigoDiagnostico, type Finding, type FindingStatus } from '@/components/clinical/dental/data'
-import { CASOS, CONSENTIMIENTO, SIN_DOCUMENTO, type Caso, type ConsentProcedimiento, type Procedimiento, type Visita } from '@/data/treatment-plan'
+import { AYUDA_CONSENTIMIENTO, CASOS, CONSENTIMIENTO, type Caso, type ConsentProcedimiento, type Procedimiento, type Visita } from '@/data/treatment-plan'
 import {
   DERIVACIONES_PROBLEMA, PROBLEMAS, PROCEDIMIENTOS, VINCULOS_PROCEDIMIENTO,
   type Derivacion, type EstadoDerivacion, type EstadoProblema, type OrdenVinculada, type Pestana,
@@ -184,11 +184,11 @@ export function ContenidoConsentimiento({ t }: { t?: Tratamiento }) {
   if (!t?.procCaso?.consentimiento) return <Vacio>No consent document.</Vacio>
   if (!conColumnaConsent(t.caso)) return <Vacio>The consent is generated when the case is accepted.</Vacio>
   const estado = t.procCaso.consentimiento
-  /* Sin documento (Not generated, Not required) no hay nada que abrir: queda el texto de lo que pasa. */
-  if (!tieneDocumento(estado)) return <Entrada estado={<EstadoConsentimiento estado={estado} />}><span className="text-[12px] text-ink-muted">{SIN_DOCUMENTO[estado]}</span></Entrada>
+  /* Sin documento (Not generated, Not required) no hay nada que abrir: queda el texto de lo que pasa (CON-4119). */
+  if (!tieneDocumento(estado)) return <Entrada estado={<EstadoConsentimiento estado={estado} />}><span className="text-[12px] text-ink-muted">{AYUDA_CONSENTIMIENTO[estado]}</span></Entrada>
   const enviado = CONSENTIMIENTO.historial.find((h) => h.evento === 'Sent to patient')?.fecha
   return (
-    <Entrada estado={<EstadoConsentimiento estado={estado} />} sub={estado !== 'Not sent' && enviado && `Sent ${enviado}`}>
+    <Entrada estado={<EstadoConsentimiento estado={estado} />} sub={enviado && `Sent ${enviado}`}>
       <EnlaceRegistro onClick={() => ir({ pestana: 'Treatment Plan', caso: t.caso.id, consentimiento: t.procCaso!.id })}>Procedure Consent - {t.procCaso.codigo} {t.procCaso.nombre}</EnlaceRegistro>
     </Entrada>
   )

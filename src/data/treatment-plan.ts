@@ -27,7 +27,7 @@ export type Procedimiento = {
   estado: EstadoProcedimiento | 'Removed'
   /** Sólo en los procedimientos de un caso: los sueltos no tienen consentimiento. */
   consentimiento?: ConsentProcedimiento
-  /** Las firmas del consentimiento, con la fecha de cada una. Con las dos, el consentimiento queda Signed. */
+  /** Las firmas del consentimiento, con la fecha de cada una. Con las dos, el consentimiento queda Accepted. */
   firmas?: FirmasConsentimiento
   /** Las notas de Edit procedure: no cambian el estado. */
   nota?: string
@@ -40,10 +40,11 @@ export type Procedimiento = {
 export type FirmasConsentimiento = { Patient?: string; Provider?: string }
 export type Rubrica = { imagen?: string; texto?: string; iniciales?: string }
 
-/* El consentimiento específico del procedimiento (no el del caso), del prototipo de Julián para CON-4052:
-   Not generated (hay template, no hay documento) · Not sent (generado, sin mandar ni firmar) · Pending (mandado, falta
-   la firma) · Signed · Not required (el procedimiento no tiene template). */
-export type ConsentProcedimiento = 'Not generated' | 'Not sent' | 'Pending' | 'Signed' | 'Not required'
+/* El consentimiento específico del procedimiento (no el del caso), con los estados de CON-4119:
+   Not required (el procedimiento no tiene template) · Not generated (hay template, todavía no hay documento; el PENDING
+   interno del sistema también se ve así) · Requested (generado y pedido al paciente, falta la firma) · Accepted (firmado)
+   · Rejected (el paciente no quiso firmar) · Discarded (quedó sin efecto). Ver clinical-mode.md (2026-11-11). */
+export type ConsentProcedimiento = 'Not required' | 'Not generated' | 'Requested' | 'Accepted' | 'Rejected' | 'Discarded'
 
 /* El turno vinculado a la visita, si hay. Sin turno, la visita dice "No appointment". */
 export type Cita = { fecha: string; hora: string; proveedor: string }
@@ -84,7 +85,7 @@ const proc = (id: string, estado: Procedimiento['estado'] = 'Planned', consentim
   fee: '$234',
   estado,
   consentimiento,
-  firmas: consentimiento === 'Signed' ? { Patient: '04/28/2026', Provider: '04/28/2026' } : {},
+  firmas: consentimiento === 'Accepted' ? { Patient: '04/28/2026', Provider: '04/28/2026' } : {},
   ...DEL_PACIENTE[id],
 })
 
@@ -98,9 +99,9 @@ const visita = (prefijo: string, consentimientos: ConsentProcedimiento[], estado
    como el frame. */
 const SUELTOS: [Partial<Procedimiento>, ConsentProcedimiento][] = [
   [{ codigo: 'D2330', nombre: 'Resin-based composite – one surface, anterior', pieza: '8', superficie: 'M' }, 'Not generated'],
-  [{ codigo: 'D2331', nombre: 'Resin-based composite – two surfaces, anterior', pieza: '9', superficie: 'M, D' }, 'Not sent'],
-  [{ codigo: 'D7210', nombre: 'Extraction, erupted tooth requiring removal of bone', pieza: '17', superficie: '-' }, 'Pending'],
-  [{ codigo: 'D4910', nombre: 'Periodontal maintenance', pieza: '-', superficie: '-', ubicacion: 'Full Mouth' }, 'Signed'],
+  [{ codigo: 'D2331', nombre: 'Resin-based composite – two surfaces, anterior', pieza: '9', superficie: 'M, D' }, 'Rejected'],
+  [{ codigo: 'D7210', nombre: 'Extraction, erupted tooth requiring removal of bone', pieza: '17', superficie: '-' }, 'Requested'],
+  [{ codigo: 'D4910', nombre: 'Periodontal maintenance', pieza: '-', superficie: '-', ubicacion: 'Full Mouth' }, 'Accepted'],
   [{ codigo: 'D1206', nombre: 'Topical application of fluoride varnish', pieza: '-', superficie: '-', ubicacion: 'Full Mouth' }, 'Not required'],
 ]
 export const NO_ASIGNADOS: Procedimiento[] = Array.from({ length: 15 }, (_, i) => {
@@ -153,7 +154,7 @@ export const CASOS: Caso[] = ([
     id: 'c3', nombre: 'Restorative Plan', grupo: 'Restorative', estado: 'Waiting for consent', aceptado: true,
     creado: '26/08/2026', creadoPor: 'Provider 1', total: '96.00',
     visitas: [
-      { id: 'v1', nombre: 'Visit 1', total: '$96.000', procedimientos: visita('c3v1', ['Pending', 'Not sent'], 'Pending') },
+      { id: 'v1', nombre: 'Visit 1', total: '$96.000', procedimientos: visita('c3v1', ['Requested', 'Not generated'], 'Pending') },
     ],
   },
   {
@@ -174,8 +175,8 @@ export const CASOS: Caso[] = ([
     id: 'c5', nombre: 'Endodontic Treatment', grupo: 'Endodontics', estado: 'Accepted', aceptado: true,
     creado: '27/04/2026', creadoPor: 'Provider 1', total: '640.00',
     visitas: [
-      { id: 'v1', nombre: 'Visit 1', total: '$320.000', procedimientos: visita('c5v1', ['Signed', 'Signed']).map((p) => ({ ...p, estado: 'Completed' as const })), cita: { fecha: 'May 4, 2026', hora: '9:30 AM', proveedor: 'Perez Martinez' } },
-      { id: 'v2', nombre: 'Visit 2', total: '$1,404.000', procedimientos: visita('c5v2', ['Signed', 'Pending', 'Not generated', 'Not sent', 'Not required', 'Signed'], 'Pending') },
+      { id: 'v1', nombre: 'Visit 1', total: '$320.000', procedimientos: visita('c5v1', ['Accepted', 'Accepted']).map((p) => ({ ...p, estado: 'Completed' as const })), cita: { fecha: 'May 4, 2026', hora: '9:30 AM', proveedor: 'Perez Martinez' } },
+      { id: 'v2', nombre: 'Visit 2', total: '$1,404.000', procedimientos: visita('c5v2', ['Accepted', 'Requested', 'Not generated', 'Rejected', 'Not required', 'Accepted'], 'Pending') },
     ],
   },
   {
@@ -189,7 +190,7 @@ export const CASOS: Caso[] = ([
     id: 'c7', nombre: 'Bridge Option', grupo: 'Implant', estado: 'Accepted', aceptado: true,
     creado: '17/04/2026', creadoPor: 'Provider 1', total: '980.00', sinPermiso: true,
     visitas: [
-      { id: 'v1', nombre: 'Visit 1', total: '$980.000', procedimientos: visita('c7v1', ['Signed', 'Not required'], 'Pending') },
+      { id: 'v1', nombre: 'Visit 1', total: '$980.000', procedimientos: visita('c7v1', ['Accepted', 'Not required'], 'Pending') },
     ],
   },
   /* Los escenarios del prototipo de CON-4052 que no tenía ningún caso: el plan empezado, el cancelado después de
@@ -197,12 +198,13 @@ export const CASOS: Caso[] = ([
   {
     id: 'c9', nombre: 'Night Guard Plan', grupo: 'Occlusal', estado: 'In progress', aceptado: true,
     creado: '10/04/2026', creadoPor: 'Provider 1', total: '0',
-    visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$468.000', procedimientos: visita('c9v1', ['Signed', 'Not generated'], 'Pending') }],
+    visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$468.000', procedimientos: visita('c9v1', ['Accepted', 'Not generated'], 'Pending') }],
   },
   {
     id: 'c10', nombre: 'Whitening Plan', grupo: 'Cosmetic', estado: 'Cancelled', aceptado: true,
     creado: '05/03/2026', creadoPor: 'Provider 1', total: '0',
-    visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$468.000', procedimientos: visita('c10v1', ['Pending', 'Not sent'], 'Pending') }],
+    /* El plan se canceló después de aceptarlo: sus consentimientos quedaron sin efecto (CON-4119). */
+    visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$468.000', procedimientos: visita('c10v1', ['Discarded', 'Discarded'], 'Pending') }],
   },
   {
     id: 'c11', nombre: 'Sealant Plan', grupo: 'Preventive', estado: 'Expired',
@@ -307,13 +309,13 @@ export type ClaveDialogo = keyof typeof DIALOGOS
    Julián "Consent modals revised" para CON-3927, CON-3946 y CON-3950. Ver clinical-mode.md (2026-10-17). */
 export const CONSENTIMIENTO_REQUERIDO = {
   titulo: 'Consent required',
-  /* Sin documento, un borrador sin enviar o uno vencido: se manda (o se reusa el borrador) y el paciente firma después. */
+  /* Sin documento, o con el que había rechazado o descartado: se genera, se manda y el paciente firma después. */
   'sin-enviar': {
     texto: 'This procedure requires a consent document. Send it to the patient to sign later, or have it signed now.',
     textoVarios: 'These procedures require a consent document. Send it to the patient to sign later, or have it signed now.',
     accion: 'Send consent and sign later',
   },
-  /* El documento ya se mandó y falta la firma: se sigue con la firma pendiente, sin mandar otro. */
+  /* El documento ya se pidió (Requested) y falta la firma: se sigue con la firma pendiente, sin mandar otro. */
   pendiente: {
     texto: 'A consent document already exists for this procedure. You can sign it now or continue with the signature pending.',
     textoVarios: 'Consent documents already exist for these procedures. You can sign them now or continue with the signatures pending.',
@@ -391,16 +393,13 @@ export const DOCUMENTO_CONSENTIMIENTO = {
   riesgos: 'Pain, swelling or sensitivity after treatment.\nReaction to the anesthetic.\nThe tooth may need further treatment in the future.',
 } as const
 
-/* Los textos del detalle del consentimiento, según su estado. */
-export const AVISO_CONSENTIMIENTO = {
-  'Not sent': { titulo: 'Not sent to the patient yet', texto: 'Send it so the patient can sign from their phone, or collect both signatures here.' },
-  Signed: { titulo: 'All signatures collected', texto: 'The signed consent is stored in the patient documents.' },
-} as const
-
-/* La columna Consent sin documento: lo que avisa al tocarla (prototipo de CON-4052). */
-export const SIN_DOCUMENTO: Partial<Record<ConsentProcedimiento, string>> = {
-  'Not generated': 'No document yet. Start or Complete initiates consent management when allowed.',
-  'Not required': 'No mapped template: no specific consent flow.',
+/* El tooltip de la columna Consent según el estado, tal cual CON-4119. Not required no lleva tooltip. */
+export const AYUDA_CONSENTIMIENTO: Partial<Record<ConsentProcedimiento, string>> = {
+  'Not generated': 'Consent will be automatically generated 24h before the appointment, or when starting/completing the procedure.',
+  Requested: 'Consent requested, pending patient signature.',
+  Accepted: 'Consent signed and accepted.',
+  Rejected: 'Consent rejected by patient.',
+  Discarded: 'Consent discarded.',
 }
 
 /* Los textos del menú ⋮ de un procedimiento (prototipo de CON-4052). */

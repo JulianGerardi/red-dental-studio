@@ -203,3 +203,8 @@ documentación:
    iframe, porque el drawer es `position: fixed`. *Narrow footer* es un iframe de 320px con la historia `NarrowFooter`
    (fuera de la página de docs): inline, las clases `sm:` responden a la ventana de escritorio y el editor salía de
    340px, así que no mostraba lo mismo que un celular.
+
+## Estados de la columna Consent del procedimiento (2026-11-11)
+
+**CON-4119** (epic CON-3118). Vive en Clinical Mode › Treatment Plan y Procedures: ver `clinical-mode.md` ›
+*CON-4119: los estados de la columna Consent (2026-11-11)*.

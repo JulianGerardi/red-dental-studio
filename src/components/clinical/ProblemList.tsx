@@ -12,13 +12,13 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
 import { DetalleRegistro, TONO_PROBLEMA, TONO_PROCEDIMIENTO, tratamientoDe, useIr, type ContextoDetalle } from '@/components/clinical/RecordDetail'
-import { useFlujoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
+import { sinPedir, useFlujoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
 import { EstadoConsentimiento, tieneDocumento } from '@/components/clinical/ConsentDetail'
 import {
   ACCION, DialogoBorrar, DialogoCambioEstado, DialogoEditar, ItemsAcciones, accionesDe, conColumnaConsent, contextoDeCaso,
   type AccionProcedimiento,
 } from '@/components/clinical/accionesProcedimiento'
-import { SIN_DOCUMENTO, type ConsentProcedimiento } from '@/data/treatment-plan'
+import { AYUDA_CONSENTIMIENTO, type ConsentProcedimiento } from '@/data/treatment-plan'
 import {
   ESTADOS_PROBLEMA, ESTADOS_PROCEDIMIENTO, PROBLEMAS, PROCEDIMIENTOS,
   type EstadoProblema, type EstadoProcedimiento, type Problema, type ProcedimientoPaciente,
@@ -116,8 +116,8 @@ export function ProblemList({ procedimientoInicial }: {
       const fila = procedimientos.find((p) => p.id === id)
       if (!fila) return
       const procCaso = tratamientoDe(fila, consentimientos)?.procCaso
-      if (enviar && procCaso && (procCaso.consentimiento === 'Not generated' || procCaso.consentimiento === 'Not sent')) {
-        setConsentimientos((c) => ({ ...c, [procCaso.id]: 'Pending' }))
+      if (enviar && procCaso && sinPedir(procCaso.consentimiento)) {
+        setConsentimientos((c) => ({ ...c, [procCaso.id]: 'Requested' }))
       }
       cambiar(fila, verbo === 'Start' ? 'In progress' : 'Completed', nota)
     },
@@ -130,7 +130,7 @@ export function ProblemList({ procedimientoInicial }: {
     onGenerar: ([id]) => {
       const fila = procedimientos.find((p) => p.id === id)
       const procCaso = fila && tratamientoDe(fila, consentimientos)?.procCaso
-      if (procCaso) setConsentimientos((c) => ({ ...c, [procCaso.id]: 'Not sent' }))
+      if (procCaso) setConsentimientos((c) => ({ ...c, [procCaso.id]: 'Requested' }))
     },
   })
   function elegirProcedimiento(fila: ProcedimientoPaciente, accion: AccionProcedimiento) {
@@ -150,7 +150,7 @@ export function ProblemList({ procedimientoInicial }: {
   /* Con documento lleva al detalle en Treatment Plan; sin documento dice qué pasa. */
   const tocarConsentimiento = (c: NonNullable<ReturnType<typeof consentimientoDe>>) => {
     if (tieneDocumento(c.estado)) return ir({ pestana: 'Treatment Plan', caso: c.tr.caso.id, consentimiento: c.tr.procCaso!.id })
-    const texto = SIN_DOCUMENTO[c.estado]
+    const texto = AYUDA_CONSENTIMIENTO[c.estado]
     if (texto) aviso.info(texto)
   }
 

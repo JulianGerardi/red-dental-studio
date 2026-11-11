@@ -3141,3 +3141,68 @@ Si el consentimiento de un procedimiento se abrió desde el Consent history (el 
 al caso. El estado del historial (`historial`) vive en `TreatmentPlanSection` y `ConsentBlock` lo recibe controlado
 (`historial` / `onHistorial`), porque el bloque se desmonta mientras se ve el consentimiento. Desde la columna Consent o
 Sign now, Back sigue volviendo al caso. e2e: "el historial del caso lista los consentimientos de cada procedimiento".
+
+## CON-4119: los estados de la columna Consent (2026-11-11)
+
+**CON-4119** ([Patient Procedures] Visualización y estados de la columna Consent en el listado de procedimientos), epic
+CON-3118 ([Consent] Procedure). Pedido de Julián: actualizar los valores del consentimiento del procedimiento en
+Treatment Plan por los de la historia. Reemplaza los cinco estados del prototipo de CON-4052 (punto 1 de 2026-11-02).
+
+| Antes (prototipo CON-4052) | Ahora (CON-4119) | Tooltip (tal cual la historia) | Color |
+|---|---|---|---|
+| Not required | **Not required** | sin tooltip | gris atenuado (`ink-faint`) |
+| Not generated | **Not generated** | "Consent will be automatically generated 24h before the appointment, or when starting/completing the procedure." | gris (`ink-muted`) |
+| Not sent | — (se ve como Not generated) | | |
+| Pending | **Requested** | "Consent requested, pending patient signature." | ámbar (`warn-fg`) |
+| Signed | **Accepted** | "Consent signed and accepted." | verde (`dash-ok-fg`) |
+| — | **Rejected** | "Consent rejected by patient." | rojo (`dash-bad-fg`) |
+| — | **Discarded** | "Consent discarded." | gris (`ink-muted`), ícono de anulado |
+
+1. **Not sent desaparece.** Era "generado, sin mandar": el `PENDING` interno de la historia (regla 2), que no se le
+   muestra al usuario. Mientras el documento no salió al paciente, la columna sigue en *Not generated*. Por eso, si el
+   envío falla (*Send consent and sign later* en Night Guard Plan, D1110), el consentimiento queda *Not generated* y no
+   *Not sent*; el diálogo sigue diciendo que no se pudo mandar.
+2. **Se mantiene el formato de la columna** (ícono + palabra en el color del estado, no una pill con borde): es la pieza
+   que ya estaba y la historia pide el estado y el color, no un componente nuevo. El encabezado del detalle sí usa `Pill`
+   (`warning`, `success`, `danger`, `neutral`).
+3. **Tooltip**: primero el nombre del consentimiento ("Procedure Consent - código nombre", como en red.dev) y abajo el
+   texto de la historia. Reemplaza a "Open to present it to the patient for signature" y a los dos textos del prototipo
+   ("No document yet…", "No mapped template…"). *Not required* no tiene tooltip ni nada que abrir: pasa a ser texto, no
+   botón. En pantallas táctiles no hay hover: tocar *Not generated* muestra el mismo texto como aviso.
+4. **Qué abre cada uno**: *Requested* y *Accepted*, el detalle del consentimiento como antes. *Rejected* y *Discarded*
+   también abren el documento, pero **ya no se firma**: en el pie, en lugar de los dos botones, queda el texto del
+   estado + "It can no longer be signed." y las afirmaciones no se pueden marcar (`consentimientoCerrado`).
+5. **Start y Complete** (regla 4 de la historia, con CON-4052): *Accepted* o *Not required*, directo; *Requested*,
+   Consent required con *Continue without signed consent*; *Not generated*, *Rejected* o *Discarded* (`sinPedir`),
+   Consent required con *Send consent and sign later*, que genera un documento nuevo y lo deja *Requested*. *Sign now*
+   también lo deja *Requested* (generado y esperando la firma, asistida) aunque después se vuelva con Back.
+6. **Firmas**: con una firma sigue *Requested*; con las dos, *Accepted* (`estadoTrasFirma`).
+7. **Consent history** (el reloj): un consentimiento rechazado o descartado aparece como "Rejected by patient" o
+   "Discarded" (punto gris), no como "Not signed yet".
+8. **Datos de ejemplo**: Endodontic Treatment, Visit 2: Accepted (D3330), Requested a medio firmar (D2950), Not
+   generated (D2954), **Rejected** (D2750), Not required (D0230) y Accepted (D9910). Restorative Plan: Requested y Not
+   generated. Whitening Plan (cancelado después de aceptar): los dos **Discarded**. Unassigned (no se ven en la tabla):
+   Not generated, Rejected, Requested, Accepted y Not required.
+
+**No cambia:** el consentimiento **del caso** (el bloque Informed Consent de arriba: Pending / Signed / Expired) es otra
+entidad y la historia no lo nombra. Tampoco cambia dónde se ve la columna (ver anomalías).
+
+**Anomalías / lo que la historia deja abierto:**
+
+- La historia dice que la columna aplica igual en **Unassigned Items**; acá Unassigned y los casos sin aceptar siguen
+  **sin columna Consent** (decisión de Julián del 2026-10-06 y prototipo de CON-4052). Falta definir cuál manda.
+- La regla 3 ("Tooltip informativo") está vacía en Jira.
+- La historia admite "`Not required` (o `—`)": se dejó la palabra, que dice más que el guion.
+- No hay historia para lo que pasa al tocar **Start / Complete con el consentimiento Rejected o Discarded**: se resolvió
+  pidiendo uno nuevo (punto 5). CON-2928 habla del rechazo del consentimiento del caso, no del de un procedimiento.
+- La "actualización reactiva" (criterio 4) no se puede mostrar sin backend: en el mock el estado cambia al mandar o firmar.
+- *Not required* en `ink-faint` es el "gris atenuado" que pide la historia, pero su contraste sobre blanco es bajo
+  (≈2,6:1): conviene revisar si alcanza o si pasa a `ink-muted` como Discarded.
+
+**A validar con usuarios:** si recepción distingue *Not generated* de *Not required* sin leer el tooltip; si *Requested*
+se entiende como "falta que firme el paciente" (antes decía Pending); y qué esperan hacer frente a un *Rejected* (¿volver
+a pedirlo, o hablar con el paciente antes?).
+
+Código: `data/treatment-plan.ts` (`ConsentProcedimiento`, `AYUDA_CONSENTIMIENTO`; salen `SIN_DOCUMENTO` y
+`AVISO_CONSENTIMIENTO`), `clinical/{ConsentDetail,ConsentRequiredDialog,ConsentBlock,TreatmentPlanSection,ProblemList,RecordDetail}.tsx`;
+e2e en `tests/treatment-plan.e2e.ts` ("la columna Consent muestra los estados de CON-4119").

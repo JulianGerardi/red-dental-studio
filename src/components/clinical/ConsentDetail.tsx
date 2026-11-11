@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { ArrowLeft, CircleCheck, Eye, EyeOff, File, FileCheck2, FileClock, FileMinus2, FileText, LoaderCircle, Lock, PenLine, type LucideIcon } from 'lucide-react'
+import { ArrowLeft, Ban, CircleCheck, Eye, EyeOff, File, FileCheck2, FileClock, FileMinus2, FileText, FileX2, LoaderCircle, Lock, PenLine, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
@@ -14,7 +14,7 @@ import { FieldLabel, TextField, control } from '@/components/patients/form'
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
 import { ConsentDocument, RECONOCIMIENTOS_PACIENTE } from '@/components/settings/ConsentDocument'
 import {
-  DOCUMENTO_CONSENTIMIENTO, PACIENTE, SIN_DOCUMENTO,
+  AYUDA_CONSENTIMIENTO, DOCUMENTO_CONSENTIMIENTO, PACIENTE,
   type ConsentProcedimiento, type FirmasConsentimiento, type Procedimiento, type Rubrica,
 } from '@/data/treatment-plan'
 
@@ -23,18 +23,22 @@ import {
 
 export type Firmante = keyof FirmasConsentimiento
 
-/* Estado del consentimiento de un procedimiento: ícono y palabra, en el color del estado. Con `onAbrir` es un botón que
-   lleva al detalle del consentimiento. */
+/* Estado del consentimiento de un procedimiento (los seis de CON-4119): ícono y palabra, en el color del estado. Con
+   `onAbrir` es un botón que lleva al detalle del consentimiento. Ver clinical-mode.md (2026-11-11). */
 const CONSENT: Record<ConsentProcedimiento, { icono: LucideIcon; clase: string; tono: PillTone }> = {
-  'Not generated': { icono: File, clase: 'text-ink-muted', tono: 'neutral' },
-  'Not sent': { icono: FileText, clase: 'text-dash-blue', tono: 'info' },
-  Pending: { icono: FileClock, clase: 'text-warn-fg', tono: 'warning' },
-  Signed: { icono: FileCheck2, clase: 'text-dash-ok-fg', tono: 'success' },
   'Not required': { icono: FileMinus2, clase: 'text-ink-faint', tono: 'neutral' },
+  'Not generated': { icono: File, clase: 'text-ink-muted', tono: 'neutral' },
+  Requested: { icono: FileClock, clase: 'text-warn-fg', tono: 'warning' },
+  Accepted: { icono: FileCheck2, clase: 'text-dash-ok-fg', tono: 'success' },
+  Rejected: { icono: FileX2, clase: 'text-dash-bad-fg', tono: 'danger' },
+  Discarded: { icono: Ban, clase: 'text-ink-muted', tono: 'neutral' },
 }
 
-/** Hay documento (generado, mandado o firmado): la columna lo abre. Sin documento, avisa qué pasa. */
-export const tieneDocumento = (c?: ConsentProcedimiento) => c === 'Not sent' || c === 'Pending' || c === 'Signed'
+/** Hay documento (pedido, firmado, rechazado o descartado): la columna lo abre. Sin documento, avisa qué pasa. */
+export const tieneDocumento = (c?: ConsentProcedimiento) => !!c && c !== 'Not required' && c !== 'Not generated'
+
+/** Ya no se firma: el paciente lo rechazó o quedó sin efecto. */
+export const consentimientoCerrado = (c?: ConsentProcedimiento) => c === 'Rejected' || c === 'Discarded'
 
 export function EstadoConsentimiento({ estado, onAbrir, de, nombre }: {
   estado: ConsentProcedimiento
@@ -46,9 +50,10 @@ export function EstadoConsentimiento({ estado, onAbrir, de, nombre }: {
 }) {
   const { icono: Icono, clase } = CONSENT[estado]
   const contenido = <><Icono className="size-4 shrink-0" aria-hidden /> {estado}</>
-  if (!onAbrir) return <span className={cn('flex items-center gap-1.5 text-[12px] font-medium whitespace-nowrap', clase)}>{contenido}</span>
-  /* Como en red.dev: el tooltip dice de qué consentimiento se trata y qué pasa al tocarlo. */
-  const ayuda = tieneDocumento(estado) ? 'Open to present it to the patient for signature' : SIN_DOCUMENTO[estado]
+  /* El tooltip dice de qué consentimiento se trata (como en red.dev) y qué significa el estado (CON-4119). Not required
+     no tiene tooltip ni nada que abrir: queda como texto. */
+  const ayuda = AYUDA_CONSENTIMIENTO[estado]
+  if (!onAbrir || !ayuda) return <span className={cn('flex items-center gap-1.5 text-[12px] font-medium whitespace-nowrap', clase)}>{contenido}</span>
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -86,9 +91,9 @@ export function firmasHoja(p: Pick<Procedimiento, 'firmas' | 'rubricas' | 'prove
 /** La fecha de hoy como la muestran las firmas (MM/DD/YYYY). */
 export const hoy = () => new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })
 
-/** El estado después de una firma: con las dos, Signed; con una, Pending (si no se había mandado, ya está en curso). */
+/** El estado después de una firma: con las dos, Accepted; con una, sigue Requested. */
 export function estadoTrasFirma(firmas: FirmasConsentimiento): ConsentProcedimiento {
-  return firmas.Patient && firmas.Provider ? 'Signed' : 'Pending'
+  return firmas.Patient && firmas.Provider ? 'Accepted' : 'Requested'
 }
 
 /* El consentimiento de un procedimiento, como en red.dev: arriba Back, el título y View PDF; el documento a todo el ancho
@@ -107,7 +112,9 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
   /* Las afirmaciones del documento: el paciente las marca antes de firmar; firmado, quedan marcadas. */
   const [marcadas, setMarcadas] = useState<string[]>(firmas.Patient ? RECONOCIMIENTOS_PACIENTE : [])
   const reconocido = marcadas.length === RECONOCIMIENTOS_PACIENTE.length
-  const estado = p.consentimiento ?? 'Not sent'
+  const estado = p.consentimiento ?? 'Requested'
+  /* Rechazado o descartado: el documento se ve, pero ya no se firma. */
+  const cerrado = consentimientoCerrado(estado)
   useEffect(() => {
     const t = window.setTimeout(() => setPreparando(false), 450)
     return () => window.clearTimeout(t)
@@ -152,7 +159,7 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
             proveedor={p.proveedor}
             firmas={firmasHoja(p)}
             reconocidos={marcadas}
-            onReconocer={firmas.Patient ? undefined : (r, v) => setMarcadas((m) => (v ? [...m, r] : m.filter((x) => x !== r)))}
+            onReconocer={firmas.Patient || cerrado ? undefined : (r, v) => setMarcadas((m) => (v ? [...m, r] : m.filter((x) => x !== r)))}
             ancho="completo"
           />
         )}
@@ -160,6 +167,9 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
 
       {/* Las dos firmas al pie, fijas mientras se lee: la del paciente a la izquierda y la del provider a la derecha. */}
       <div className={cn(TARJETA_PANEL, 'sticky bottom-0 z-10 flex flex-wrap items-center gap-3 px-4 py-3')}>
+        {cerrado ? (
+          <p className="flex min-h-8 items-center text-[13px] text-ink-muted">{AYUDA_CONSENTIMIENTO[estado]} It can no longer be signed.</p>
+        ) : <>
         {firmas.Patient ? (
           <Firmado rol="Patient" fecha={firmas.Patient} />
         ) : (
@@ -181,6 +191,7 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
             <Button size="md" onClick={() => setFirmando('Provider')}><PenLine /> Provider Signature</Button>
           )}
         </span>
+        </>}
       </div>
 
       {firmando === 'Patient' && (

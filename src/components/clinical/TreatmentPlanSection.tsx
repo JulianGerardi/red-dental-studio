@@ -5,7 +5,7 @@ import {
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { ConsentBlock } from '@/components/clinical/ConsentBlock'
-import { ResumenConsentimiento, useFlujoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
+import { ResumenConsentimiento, sinPedir, useFlujoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
 import { ConsentDetail, EstadoConsentimiento, estadoTrasFirma, hoy, tieneDocumento, type Firmante } from '@/components/clinical/ConsentDetail'
 import {
   ACCION, BLOQUEO_EJECUCION, DialogoBorrar, conColumnaConsent, DialogoCambioEstado, DialogoEditar, ItemsAcciones, TONO_PROCEDIMIENTO,
@@ -13,7 +13,7 @@ import {
 } from '@/components/clinical/accionesProcedimiento'
 import type { EstadoProcedimiento } from '@/data/clinical-mode'
 import {
-  CASOS, NO_ASIGNADOS, CATEGORIAS, DIALOGOS, OPCIONES_BORRAR_CASO, MOVER, SIN_DOCUMENTO,
+  AYUDA_CONSENTIMIENTO, CASOS, NO_ASIGNADOS, CATEGORIAS, DIALOGOS, OPCIONES_BORRAR_CASO, MOVER,
   NUEVO_GRUPO, COMPLETAR, MENU_PROCEDIMIENTO, ordenFecha,
   type Caso, type Cita, type EstadoCaso, type Procedimiento, type ClaveDialogo, type Rubrica, type Visita,
 } from '@/data/treatment-plan'
@@ -1068,7 +1068,14 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
   const [menu, setMenu] = useState<{ p: Procedimiento; a: AccionProcedimiento; suelto: boolean } | null>(null)
   const [favoritos, setFavoritos] = useState<string[]>([])
   const [seleccion, setSeleccion] = useState<string[]>([])
-  const [casos, setCasos] = useState<Caso[]>(CASOS)
+  /* Sign now desde Procedures: el documento que faltaba ya se generó allá, acá llega pedido (Requested). */
+  const [casos, setCasos] = useState<Caso[]>(() => (accionInicial && consentimientoInicial ? CASOS.map((c) => ({
+    ...c,
+    visitas: c.visitas.map((v) => ({
+      ...v,
+      procedimientos: v.procedimientos.map((p) => (p.id === consentimientoInicial && sinPedir(p.consentimiento) ? { ...p, consentimiento: 'Requested' as const, firmas: {} } : p)),
+    })),
+  })) : CASOS))
   const [sueltos, setSueltos] = useState<Procedimiento[]>(NO_ASIGNADOS)
   const caso = casos.find((c) => c.id === casoId) ?? casos[0]!
   const cambiarCaso = (cambio: Partial<Caso>) => setCasos((cs) => cs.map((c) => (c.id === caso.id ? { ...c, ...cambio } : c)))
@@ -1167,13 +1174,12 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
   }
   const buscar = (id: string) => delCaso.find((p) => p.id === id) ?? sueltos.find((p) => p.id === id)
 
-  /* Cambia el estado, con Undo. Con `enviar`, el consentimiento sin generar o sin mandar sale al paciente (Pending). El
+  /* Cambia el estado, con Undo. Con `enviar`, el consentimiento que faltaba se genera y sale al paciente (Requested). El
      primer Start de un plan aceptado lo pasa a In progress (CON-4052). */
   const aplicarEstado = (ids: string[], destino: EstadoProcedimiento, { enviar = false, nota = '' } = {}) => {
     const [antesCasos, antesSueltos] = [casos, sueltos]
-    const sinMandar = (c?: string) => c === 'Not generated' || c === 'Not sent'
     const empieza = destino === 'In progress' && caso.estado === 'Accepted' && ids.some((id) => delCaso.some((p) => p.id === id))
-    mapear(ids, (p) => ({ ...p, estado: destino, ...(enviar && sinMandar(p.consentimiento) && { consentimiento: 'Pending' as const }) }))
+    mapear(ids, (p) => ({ ...p, estado: destino, ...(enviar && sinPedir(p.consentimiento) && { consentimiento: 'Requested' as const, firmas: {} }) }))
     if (empieza) cambiarCaso({ estado: 'In progress' })
     const texto = destino === 'Completed' ? textoCompletado(ids.length, 0)
       : destino === 'In progress' ? `${ids.length > 1 ? `${ids.length} procedures` : 'Procedure'} started.`
@@ -1186,7 +1192,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
   /* Start y Complete pasan por el consentimiento del procedimiento, con caso o suelto (prototipo de CON-4052). */
   const flujo = useFlujoConsentimiento({
     onAplicar: (ids, verbo, { enviar, nota }) => aplicarEstado(ids, verbo === 'Start' ? 'In progress' : 'Completed', { enviar, nota }),
-    onGenerar: (ids) => mapear(ids, (p) => ({ ...p, consentimiento: 'Not sent' })),
+    onGenerar: (ids) => mapear(ids, (p) => ({ ...p, consentimiento: 'Requested', firmas: {} })),
     /* Sign now: al detalle del consentimiento, donde se firma; el cambio se confirma con las firmas. */
     onFirmar: (ids, verbo) => {
       if (ids.length === 0) return
@@ -1230,7 +1236,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
     aviso.ok(alcance === 'caso' ? `${p.codigo} removed from the case and moved to Unassigned.` : `${p.codigo} deleted.`)
   }
 
-  /* Firmar desde el detalle del consentimiento (después, sin repetir el cambio clínico). Con las dos firmas queda Signed. */
+  /* Firmar desde el detalle del consentimiento (después, sin repetir el cambio clínico). Con las dos firmas queda Accepted. */
   const firmar = (id: string, rol: Firmante, rubrica: Rubrica) => {
     const p = buscar(id)
     const firmas = { ...p?.firmas, [rol]: hoy() }
@@ -1258,7 +1264,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
   /* La columna Consent: con documento abre el detalle; sin documento dice qué pasa. */
   const tocarConsentimiento = (p: Procedimiento) => {
     if (tieneDocumento(p.consentimiento)) return abrirConsentimiento(p.id)
-    const texto = p.consentimiento && SIN_DOCUMENTO[p.consentimiento]
+    const texto = p.consentimiento && AYUDA_CONSENTIMIENTO[p.consentimiento]
     if (texto) aviso.info(texto)
   }
 
