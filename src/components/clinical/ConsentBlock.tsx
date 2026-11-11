@@ -1,5 +1,5 @@
 import { Drawer } from '@/components/ui/drawer'
-import { tieneDocumento } from '@/components/clinical/ConsentDetail'
+import { consentimientoCerrado, tieneDocumento } from '@/components/clinical/ConsentDetail'
 import { useState } from 'react'
 import { CircleCheck, CircleAlert, Download, FileSignature, FileText, History, MoreVertical, PenLine, RefreshCw, Send, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -35,7 +35,7 @@ export function FilaFirma({ f }: { f: Firma }) {
 /* El historial (el reloj del bloque): una sola línea de tiempo con el consentimiento del caso y los de cada procedimiento,
    lo más nuevo arriba. Lo que está esperando una firma no tiene fecha y va primero. El bloque de la pantalla muestra sólo
    el último consentimiento del caso. Ver clinical-mode.md (2026-11-02). */
-type Entrada = { id: string; fecha?: string; evento: string; documento: string; detalle?: string; abrir?: () => void }
+type Entrada = { id: string; fecha?: string; evento: string; documento: string; detalle?: string; abrir?: () => void; cerrado?: boolean }
 
 const tiempo = (f?: string) => (f ? new Date(f).getTime() : Infinity)
 
@@ -50,10 +50,13 @@ function entradasDe(procedimientos: Pick<Procedimiento, 'id' | 'codigo' | 'nombr
     const firmas = p.firmas ?? {}
     const faltan = (['Patient', 'Provider'] as const).filter((r) => !firmas[r])
     const es: Entrada[] = []
-    if (faltan.length) {
+    /* Rechazado o descartado (CON-4119): ya no espera firmas; el evento es el estado. */
+    if (consentimientoCerrado(p.consentimiento)) {
+      es.push({ id: `${p.id}-cerrado`, evento: p.consentimiento === 'Rejected' ? 'Rejected by patient' : 'Discarded', documento, abrir: abrirP, cerrado: true })
+    } else if (faltan.length) {
       es.push({
         id: `${p.id}-espera`, evento: faltan.length === 2 ? 'Not signed yet' : `Awaiting ${faltan[0]!.toLowerCase()} signature`,
-        documento, detalle: p.consentimiento === 'Not sent' ? 'Not sent to the patient' : 'Sent to the patient', abrir: abrirP,
+        documento, detalle: 'Sent to the patient', abrir: abrirP,
       })
     }
     ;(['Provider', 'Patient'] as const).forEach((r) => {
@@ -76,7 +79,7 @@ export function PanelHistorial({ onClose, procedimientos = [], onAbrirProcedimie
         {entradas.map((h, i, todas) => (
           <li key={h.id} className="flex gap-3">
             <span className="flex flex-col items-center">
-              <span className={cn('mt-1 size-2 shrink-0 rounded-full', h.fecha ? (i === 0 ? 'bg-dash-blue' : 'bg-line-strong') : 'bg-warn-fg')} />
+              <span className={cn('mt-1 size-2 shrink-0 rounded-full', h.fecha ? (i === 0 ? 'bg-dash-blue' : 'bg-line-strong') : h.cerrado ? 'bg-ink-faint' : 'bg-warn-fg')} />
               {i < todas.length - 1 && <span className="w-px flex-1 bg-line" />}
             </span>
             <span className="min-w-0 flex-1 pb-5">

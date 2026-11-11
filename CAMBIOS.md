@@ -3,6 +3,19 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-11
+
+### Treatment Plan: estados de la columna Consent ([#135](https://github.com/JulianGerardi/red-dental-studio/pull/135))
+- La columna **Consent** de los procedimientos (Treatment Plan y Procedures) usa los seis estados de CON-4119: **Not
+  required, Not generated, Requested, Accepted, Rejected, Discarded**, cada uno con el tooltip de la historia. *Pending*
+  pasa a *Requested* y *Signed* a *Accepted*; *Not sent* desaparece (es el `PENDING` interno: se ve *Not generated*).
+- *Rejected* y *Discarded* abren el documento pero ya no se firma. Start / Complete con *Not generated*, *Rejected* o
+  *Discarded* piden un consentimiento nuevo. El consentimiento **del caso** (Pending / Signed / Expired) no cambia.
+- **Para el dev:** `ConsentProcedimiento` cambia sus valores; `AYUDA_CONSENTIMIENTO` (tooltips) reemplaza a
+  `SIN_DOCUMENTO` y sale `AVISO_CONSENTIMIENTO`. Helpers nuevos: `consentimientoCerrado()` y `sinPedir()`. La columna no
+  se sumó a Unassigned (la historia lo nombra; falta definirlo). Decisión en `clinical-mode.md` (2026-11-11). Storybook
+  sin actualizar.
+
 ## 2026-11-10
 
 ### Insurance: buscador de suscripciones con chips ([#132](https://github.com/JulianGerardi/red-dental-studio/pull/132))
