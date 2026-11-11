@@ -3,7 +3,7 @@ import { Check } from 'lucide-react'
 import { DrawerSection } from '@/components/ui/drawer'
 import { Pill } from '@/components/ui/pill'
 import { SectionNotice } from '@/components/ui/section-notice'
-import { CollapsibleFields, DateField, LinkPersonCheckbox, OptionCheckbox, PersonSearchField, CountryCodeField, SelectField, TextField } from '@/components/patients/form'
+import { CollapsibleFields, DateField, LinkPersonCheckbox, OptionCheckbox, PersonSearchField, chipsPersona, CountryCodeField, SelectField, TextField } from '@/components/patients/form'
 import type { DatosPaciente } from '@/data/patientsStore'
 import { PERSONAS_SISTEMA, type PersonaSistema } from '@/data/personas'
 import { codigoDe } from '@/data/paises'
@@ -193,10 +193,8 @@ function BuscarPersona({ v }: { v: VinculoPersona }) {
         value={v.valor} onChange={v.onValor} error={v.error}
         emptyText="No one in the system matches this name. Untick the option to enter the patient's details."
         hint={elegida ? "The patient record will use this person's name, birthdate and email." : undefined}
-        lineas={(n) => {
-          const p = v.personas.find((x) => x.name === n)
-          return p && [p.tipo, `DOB: ${p.dob}`, `Email: ${p.email}`]
-        }}
+        subtitulo={(n) => v.personas.find((x) => x.name === n)?.tipo}
+        chips={(n) => { const p = v.personas.find((x) => x.name === n); return p && chipsPersona(p.dob, p.email) }}
       />
     </div>
   )
@@ -259,10 +257,8 @@ export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Pr
           value={d.guardianName} onChange={(v) => cambiar('guardianName', v)}
           disabled={d.guardianNuevo} error={errores.guardianName}
           emptyText="No one in the system matches this name. Tick Add New Person to enter their details."
-          lineas={(n) => {
-            const p = personas.find((x) => x.name === n)
-            return p && [p.tipo, `DOB: ${p.dob}`, `Email: ${p.email}`]
-          }}
+          subtitulo={(n) => personas.find((x) => x.name === n)?.tipo}
+          chips={(n) => { const p = personas.find((x) => x.name === n); return p && chipsPersona(p.dob, p.email) }}
         />
       </Campo>
       <OptionCheckbox

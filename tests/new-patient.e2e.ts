@@ -17,16 +17,16 @@ test('New Patient vincula a una persona que ya existe en el sistema', async ({ a
   await drawer.getByRole('button', /Next Step/).tap()
   await expect(drawer.getByText('Select a person or untick the option to enter the details.')).toBeVisible()
 
-  const buscar = drawer.getByRole('textbox', 'Person')
+  const buscar = drawer.getByRole('combobox', 'Person')
   await buscar.fill('zzz')
   await expect(drawer.getByText(/No one in the system matches this name/)).toBeVisible()
 
   /* Quien ya es paciente no aparece: Abril Viola está en la tabla. */
   await buscar.fill('Abril')
-  await expect(drawer.getByRole('button', /^Abril Viola/)).toHaveCount(0)
+  await expect(drawer.getByRole('option', /^Abril Viola/)).toHaveCount(0)
 
   await buscar.fill('Miller')
-  await drawer.getByRole('button', /^Michael Miller/).tap()
+  await drawer.getByRole('option', /^Michael Miller/).tap()
   await expect(drawer.getByText("The patient record will use this person's name, birthdate and email.")).toBeVisible()
 
   /* Adulto: sin paso Guardian, de General va directo a Demography. */
@@ -108,8 +108,8 @@ test('New Patient pide guardián para un menor y lo carga como persona nueva', a
 test('New Patient toma un guardián del sistema sin volver a pedir su contacto', async ({ app, screen }) => {
   const drawer = await altaDeMenor(app, screen)
 
-  await drawer.getByRole('textbox', 'Guardian').fill('Jessica')
-  await drawer.getByRole('button', /^Jessica Miller/).tap()
+  await drawer.getByRole('combobox', 'Guardian').fill('Jessica')
+  await drawer.getByRole('option', /^Jessica Miller/).tap()
   await expect(drawer.getByRole('button', /^Contact Information/)).toHaveCount(0)
   await expect(drawer.getByRole('button', /^Personal Information/)).toHaveCount(0)
 

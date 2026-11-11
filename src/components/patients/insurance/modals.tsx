@@ -3,14 +3,14 @@ import { useState } from 'react'
 import { CirclePlus, Pencil, ShieldHalf, Hospital, AArrowUp } from 'lucide-react'
 import {
   ModalShell, SectionCard, SearchField, PersonSearchField, SelectField, TextField,
-  DateTextField, TextArea, OptionCheckbox,
+  DateTextField, TextArea, OptionCheckbox, chipsPersona,
 } from '@/components/patients/form'
 import { PersonaSeleccionada, DIRECTORIO } from '@/components/patients/AddRelationshipDrawer'
 
 /* DOB y email de quien está en el directorio (mismo diseño que Add Relationship → Select person: Julián, 2026-10-20). */
-const personaLineas = (nombre: string) => {
+const personaChips = (nombre: string) => {
   const p = DIRECTORIO.find((x) => x.name === nombre)
-  return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
+  return p && chipsPersona(p.dob, p.email)
 }
 import { CARRIERS, PLANES_POR_CARRIER, ORDENES, SUSCRIPCION, type Suscripcion } from '@/data/insurance'
 import { Alert } from '@/components/ui/alert'
@@ -133,7 +133,7 @@ export function NewSubscriptionModal({
                 personas={DIRECTORIO.map((p) => p.name)}
                 value={d.persona}
                 onChange={set('persona')}
-                lineas={personaLineas}
+                chips={personaChips}
                 emptyText="No person found."
                 error={intentado && !DIRECTORIO.some((p) => p.name === d.persona) ? (d.persona.trim() ? 'Select a person from the list.' : 'This field is required.') : undefined}
               />
@@ -292,7 +292,7 @@ export function NewDependerModal({ onClose }: { onClose: () => void }) {
       <div className="flex flex-col gap-4">
         <PersonSearchField
           label="Dependent Patient" placeholder="Search by Name or Last Name" personas={DIRECTORIO.map((p) => p.name)}
-          value={d.paciente} onChange={set('paciente')} lineas={personaLineas}
+          value={d.paciente} onChange={set('paciente')} chips={personaChips}
         />
         <div className="grid gap-4 sm:grid-cols-2">
           <SearchField label="Subcriber ID" options={[SUSCRIPCION.subscriberId]} value={d.subId} onChange={set('subId')} />

@@ -5,6 +5,15 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-11
 
+### Buscador de personas igual en toda la app: nombre · número y chips ([#134](https://github.com/JulianGerardi/red-dental-studio/pull/134))
+- Todos los buscadores de personas (New Appointment, New Patient, Add Relationship, New Subscription, New Depender,
+  Insurance) muestran **nombre · número de paciente** (sólo si es paciente) y abajo **DOB y email como chips**; los
+  providers, cargo y email. Buscan en todos esos datos sin acentos. **La elegida reemplaza al input**, con ✕ para
+  cambiarla. Teclado: ↑ ↓, Enter y Esc.
+- **Para el dev:** `PersonSearchField` pierde `lineas`; los datos van con `subtitulo` y `chips` (helper
+  `chipsPersona(dob, email)`). El input es `combobox` y las sugerencias `option` (los e2e usan esos roles). Decisión en
+  `patients.md` (2026-11-11). Storybook sin actualizar.
+
 ### Treatment Plan: estados de la columna Consent ([#135](https://github.com/JulianGerardi/red-dental-studio/pull/135))
 - La columna **Consent** de los procedimientos (Treatment Plan y Procedures) usa los seis estados de CON-4119: **Not
   required, Not generated, Requested, Accepted, Rejected, Discarded**, cada uno con el tooltip de la historia. *Pending*
