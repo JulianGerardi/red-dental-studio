@@ -132,7 +132,7 @@ export function PostPaymentDialog({
           />
         </div>
 
-        <TextArea label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
+        <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
       </DrawerStep>
 
       <DrawerStep index={1} step={paso}>

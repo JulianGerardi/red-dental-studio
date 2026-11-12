@@ -917,3 +917,11 @@ el diseño sigue siendo el del sistema.
    - El placeholder "Placeholder" de Notes sale del Figma y está igual en red.dev.
 7. A validar con usuarios: si en recepción se extraña Unapplied Credit visible de entrada; si Responsibility se entiende
    al lado de Balance.
+
+### Decisiones de Julián sobre CON-4142 (2026-11-12)
+
+- **Las acciones quedan como pestañas**: no pasan a botones con drawer.
+- **Notes** pasa de "Placeholder" a **"Add a note (optional)"** en Patient Payment, Credit Adjustment y Charge Adjustment,
+  y también en Post payment de Billing, que es el mismo campo.
+- **Título de Charge Adjustment (+)**: pasa a **"Enter Charge (+) Adjustment"**, como red.dev. Se cierra la anomalía
+  *el botón dice Charge, el modal dice Credit* de arriba.

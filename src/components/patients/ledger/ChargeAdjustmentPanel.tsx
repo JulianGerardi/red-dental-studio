@@ -5,8 +5,7 @@ import {
 import { DatePicker } from '@/components/ui/date-picker'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
 
-/* Figma 4582:25840. Título "New Credit (+) Adjustment" a propósito, ver
-   design-reference/figma/modulos/ledger.md. */
+/* Figma 4582:25840. El título es "Enter Charge (+) Adjustment", como red.dev (ledger.md, 2026-11-12). */
 
 const TIPOS_AJUSTE = ['Charge Adjustment', 'Credit Adjustment']
 const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado']
@@ -69,7 +68,7 @@ export function ChargeAdjustmentPanel({
           />
           <SelectField label="Visit date" options={visitas} value={visita} onChange={setVisita} />
         </div>
-        <TextArea className="mt-4" label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
+        <TextArea className="mt-4" label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
       </div>
 
       <div className="flex justify-end gap-3">

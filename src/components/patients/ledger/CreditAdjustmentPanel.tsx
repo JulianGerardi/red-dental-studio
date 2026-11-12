@@ -73,7 +73,7 @@ export function CreditAdjustmentPanel({
       <LedgerAllocationTable cargos={cargosAplicables} />
 
       <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
-        <TextArea label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
+        <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
       </div>
 
       <div className="flex justify-end gap-3">
