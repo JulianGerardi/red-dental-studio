@@ -117,3 +117,13 @@ El avatar del header de la card deja el `#eff4ff` / `#0056ef` del Figma (ver *Es
 
 **CON-4052** (epic CON-3939), con **CON-2980**. Vive en Clinical Mode › Treatment Plan y Procedures: ver
 `clinical-mode.md` › *CON-4052: acciones del procedimiento y su consentimiento (2026-11-02)*.
+
+## CON-4137 · "Treatment Plan" y sin botón de demo (2026-11-12)
+
+Al comparar Treatments con red.dev para CON-4137:
+
+- **Título "Treatment Plan".** El Figma decía "Treatments plan" (se había copiado tal cual); red.dev dice "Treatment Plan",
+  que es lo correcto. Se usa ese.
+- **Se va "Ver estado vacío".** Era un botón de demo, en castellano, para alternar entre la lista y el vacío. El vacío
+  ("No accepted treatment plans") queda en el código y se ve cuando el paciente no tiene planes; hoy los datos de ejemplo
+  siempre traen planes, así que en la app no aparece.

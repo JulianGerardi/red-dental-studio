@@ -63,7 +63,7 @@ Numeradas de forma continua entre módulos, para poder citarlas sin ambigüedad.
 | 26 | Scheduling | Start/End Time muestran una fecha (`12-03-2025`) |
 | 27 | Scheduling | Horas "13 PM, 14 PM…" en un frame y "01 PM, 02 PM…" en otro |
 | 28 | Scheduling | Las salas repiten las especialidades de los providers |
-| 29 | Treatments | El título dice "Treatments plan" y el breadcrumb "Treatment plan" |
+| 29 | Treatments | El título dice "Treatments plan" y el breadcrumb "Treatment plan" (en la app, "Treatment Plan" desde el 2026-11-12) |
 | 30 | Treatments | El breadcrumb termina en un chevron suelto |
 | 31 | Treatments | Badge "Expired" con nota "Cancelled" en la misma card |
 | 32 | Treatments | Un frame se llama "Empty State — Mislabeled Insurance Copy" |
