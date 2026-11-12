@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Pencil, Plus, Trash2, Calendar, Phone, Mail, MapPin, Users, type LucideIcon } from 'lucide-react'
 import { PageTitle } from '@/components/ui/page-title'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
@@ -55,6 +55,8 @@ type Campo = { icon: LucideIcon; label: string; value: string }
 
 type Persona = {
   id?: string
+  /** Si la persona también es paciente, su nombre abre su ficha. */
+  pacienteId?: string
   name: string
   initials: string
   rol: string
@@ -83,8 +85,8 @@ export const RELACIONES: Persona[] = [
   { id: 'r2', name: 'Jessica Miller', initials: 'JM', rol: 'Mother', badges: ['Legal contact', 'Financial contact'], campos: CONTACTO },
 ]
 export const HOUSEHOLD: Persona[] = [
-  { id: 'h1', name: 'Jessica Miller', initials: 'JM', rol: 'Child', badges: ['Household'], campos: HOGAR },
-  { id: 'h2', name: 'Jessica Miller', initials: 'JM', rol: 'Child', badges: ['Household'], campos: HOGAR },
+  { id: 'h1', pacienteId: 'patient-0002', name: 'Jessica Miller', initials: 'JM', rol: 'Child', badges: ['Household'], campos: HOGAR },
+  { id: 'h2', pacienteId: 'patient-0003', name: 'Jessica Miller', initials: 'JM', rol: 'Child', badges: ['Household'], campos: HOGAR },
 ]
 
 export function PersonaCard({
@@ -99,7 +101,14 @@ export function PersonaCard({
       <header className="flex flex-wrap items-center gap-3">
         <Avatar initials={p.initials} size={40} />
         <span className="leading-tight">
-          <span className="block text-[15px] font-bold text-ink">{p.name}</span>
+          {/* Paciente: el nombre es link a su ficha, como en red.dev (relationships.md, 2026-11-12). */}
+          {p.pacienteId ? (
+            <Link to={`/patients/${p.pacienteId}`} className="block rounded-sm text-[15px] font-bold text-dash-blue underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue">
+              {p.name}
+            </Link>
+          ) : (
+            <span className="block text-[15px] font-bold text-ink">{p.name}</span>
+          )}
           <span className="block text-xs text-ink-muted">{p.rol}</span>
         </span>
         <span className="flex flex-wrap items-center gap-2">
