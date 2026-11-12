@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-  Search, Receipt, CreditCard, Wallet, HandCoins, Download, MoveHorizontal,
+  Search, Receipt, Wallet, HandCoins, Download, MoveHorizontal, FileText, ListChecks,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -13,15 +13,21 @@ import { FilterMenu } from '@/components/ui/filter-menu'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import {
-  APLICACIONES, MOVIMIENTOS, TIPOS, GUARANTOR, conSaldo, moneda, pendienteDe, tieneCredito,
-  type Movimiento,
+  APLICACIONES, MOVIMIENTOS, TIPOS, GUARANTOR, DEPENDIENTES, alcanceDe, coberturaSeguro, conSaldo, fechaCorta, moneda,
+  pendienteDe, tieneCredito, type Aplicacion, type Movimiento,
 } from '@/data/ledger'
+import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
+import { Avatar, inicialesDe } from '@/components/ui/avatar'
+import { tratamientoDe } from '@/components/clinical/RecordDetail'
+import { PROCEDIMIENTOS } from '@/data/clinical-mode'
+import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
-import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip } from '@/components/patients/ledger/LedgerRowDetail'
+import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip, tipoDetalle } from '@/components/patients/ledger/LedgerRowDetail'
 import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
 import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
 import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
@@ -31,19 +37,15 @@ import { Tabs } from '@/components/ui/tabs'
 
 /* Figma 4582:28487 / 4588:84886. Ver design-reference/figma/modulos/ledger.md. */
 
-/* El Figma agrupa Payment/Adjustment en un solo tipo cada uno, pero el
-   diseño de referencia de Confidentally 2.0 distingue paciente/seguro y
-   cargo/crédito en la propia celda -mismo dato (`tipo`+signo de `monto`),
-   sólo más específico al mostrarlo-. Charge muestra el código en vez de
-   una etiqueta genérica, igual que esa referencia. */
-function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
-  if (m.tipo === 'Charge') return { texto: m.codigo, tono: 'neutral' }
-  if (m.tipo === 'Insurance') return { texto: 'Ins Payment', tono: 'purple' }
-  if (m.tipo === 'Payment') return { texto: 'Pt Payment', tono: 'info' }
-  return m.monto < 0
-    ? { texto: 'Credit Adj', tono: 'neutral' }
-    : { texto: 'Charge Adj', tono: 'danger' }
+/* Type con los nombres de CON-3753 (Procedure, Patient Payment…); el código va en su propia columna, CDT Code.
+   Ver ledger.md (2026-11-12). */
+const TONO_TIPO: Record<string, PillTone> = {
+  Procedure: 'neutral', 'Charge Adjustment': 'danger', 'Patient Payment': 'info', 'Credit Adjustment': 'neutral',
+  'Insurance Payment': 'purple',
 }
+const nombreTipo = (m: Movimiento) => tipoDetalle(m) ?? 'Insurance Payment'
+/** Un cargo (procedimiento o Charge Adjustment): lo que tiene saldo propio. */
+const esCargo = (m: Movimiento) => m.tipo !== 'Insurance' && m.monto > 0
 
 /* No es un `tipo` real -es una condición sobre `creditoDisponible`-, así que
    se agrega como una opción más al lado de Charge/Payment/Adjustment/
@@ -51,13 +53,13 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
 const FILTRO_CREDITO = 'Unapplied Credits'
 const OPCIONES_FILTRO = [...TIPOS, FILTRO_CREDITO]
 
-/* Anchos del diseño de referencia (Confidentally 2.0): 112/112/96 · desc
-   elástica · 112/80/96, gap-3 y px-3. Suman 864 con los gaps y el padding. */
-type ColLedger = 'fecha' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'credito' | 'saldo'
+/* Columnas de CON-3753 / CON-3755 (ledger.md, 2026-11-12). Unapplied Credit es opcional: arranca oculta. */
+type ColLedger = 'fecha' | 'codigo' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'pendiente' | 'saldo' | 'credito'
 
 const ANCHO_BASE: Record<ColLedger, number> = {
-  fecha: 112, paciente: 112, tipo: 96, desc: 160, provider: 112, monto: 80, credito: 136, saldo: 96,
+  fecha: 84, codigo: 64, paciente: 120, tipo: 132, desc: 180, provider: 120, monto: 88, pendiente: 88, saldo: 96, credito: 136,
 }
+const OCULTAS_DE_ENTRADA: ColLedger[] = ['credito']
 
 /* Piso de cada columna: hasta acá pueden encoger para que la tabla entre
    entera cuando el menú lateral y el panel del paciente están abiertos, en
@@ -65,7 +67,7 @@ const ANCHO_BASE: Record<ColLedger, number> = {
    "March 17, 2025" 93px, la pastilla "Ins Payment" 86, "-$9,850.00" 71.
    Patient/Description/Provider truncan y ya tienen tooltip. */
 const ANCHO_MINIMO: Record<ColLedger, number> = {
-  fecha: 96, paciente: 72, tipo: 88, desc: 120, provider: 80, monto: 76, credito: 128, saldo: 76,
+  fecha: 76, codigo: 48, paciente: 72, tipo: 124, desc: 120, provider: 80, monto: 76, pendiente: 76, saldo: 76, credito: 128,
 }
 
 /* Techo de Description: pasado eso, lo que sobra se reparte entre las
@@ -80,15 +82,17 @@ type ColumnaLedger = {
   titulo?: (m: Fila) => string
   celda: (m: Fila) => React.ReactNode
 }
-type Fila = Movimiento & { saldo: number }
+type Fila = Movimiento & { saldo: number; pendiente?: number }
 
 const COLUMNAS: ColumnaLedger[] = [
-  { id: 'fecha', label: 'Date', bloqueada: true, celda: (m) => m.fecha },
-  { id: 'paciente', label: 'Patient', claseCelda: 'truncate text-ink', titulo: (m) => m.paciente, celda: (m) => m.paciente },
+  { id: 'fecha', label: 'Trans. Date', bloqueada: true, claseCelda: 'tabular-nums', celda: (m) => fechaCorta(m.fecha) },
+  { id: 'codigo', label: 'CDT Code', claseCelda: 'text-[12px] font-medium tabular-nums', celda: (m) => (m.tipo === 'Charge' ? m.codigo : '—') },
+  /* Un pago o crédito de la cuenta (scope guarantor) no es de un paciente: CON-3755. */
   {
-    id: 'tipo', label: 'Type',
-    celda: (m) => { const t = detalleTipo(m); return <Pill tone={t.tono}>{t.texto}</Pill> },
+    id: 'paciente', label: 'Patient / Account', claseCelda: 'truncate text-ink',
+    titulo: (m) => cuentaDe(m), celda: (m) => cuentaDe(m),
   },
+  { id: 'tipo', label: 'Type', celda: (m) => <Pill tone={TONO_TIPO[nombreTipo(m)]} className="whitespace-nowrap">{nombreTipo(m)}</Pill> },
   { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-ink', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
   { id: 'provider', label: 'Provider', claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
   /* Los negativos bajan la cuenta: van en verde. */
@@ -96,12 +100,15 @@ const COLUMNAS: ColumnaLedger[] = [
     id: 'monto', label: 'Amount', derecha: true, claseCelda: 'font-medium tabular-nums',
     celda: (m) => <span className={m.monto < 0 ? 'text-dash-ok-fg' : 'text-ink'}>{moneda(m.monto)}</span>,
   },
+  /* Trans. Bal.: lo que falta del cargo; un pago o crédito no tiene saldo propio (—). Ledger Bal.: la cuenta corrida. */
   {
-    /* Quinta vuelta: columna propia "Credit available" al lado de Amount, con
-       el botón siempre a la vista -el mismo que antes aparecía recién al
-       hacer hover-. Bloqueada: es la única forma de llegar a "Apply credit"
-       desde la tabla. */
-    id: 'credito', label: 'Credit available', derecha: true, bloqueada: true,
+    id: 'pendiente', label: 'Trans. Bal.', derecha: true, claseCelda: 'tabular-nums text-ink',
+    celda: (m) => (m.pendiente === undefined ? <span className="text-ink-faint">—</span> : moneda(m.pendiente)),
+  },
+  { id: 'saldo', label: 'Ledger Bal.', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-ink', celda: (m) => moneda(m.saldo) },
+  {
+    /* Opcional (CON-3753): Apply credit también está en el ⋮ y en el detalle de la fila. */
+    id: 'credito', label: 'Unapplied Credit', derecha: true,
     celda: (m) => {
       if (!tieneCredito(m)) return null
       return (
@@ -117,8 +124,64 @@ const COLUMNAS: ColumnaLedger[] = [
       )
     },
   },
-  { id: 'saldo', label: 'Balance', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-ink', celda: (m) => moneda(m.saldo) },
 ]
+/** Saldo corrido y lo que falta de cada cargo, de lo más nuevo a lo más viejo. */
+const filasDe = (lista: Movimiento[], apls: Aplicacion[]): Fila[] =>
+  conSaldo(lista).map((m) => ({ ...m, pendiente: esCargo(m) ? pendienteDe(m, apls) : undefined })).reverse()
+const cuentaDe = (m: Movimiento) => (alcanceDe(m) === 'guarantor' ? 'Guarantor / Account' : m.paciente)
+
+/** El caso de Treatment Plan de un procedimiento, por su vínculo; de ahí sale Estimation details del ⋮. */
+const casoDelCargo = (m: Movimiento) => {
+  const pr = m.procedimiento ? PROCEDIMIENTOS.find((p) => p.id === m.procedimiento) : undefined
+  return pr ? tratamientoDe(pr)?.caso : undefined
+}
+
+/* El ⋮ de la fila (CON-3753): Apply credit con crédito sin aplicar y Estimation details en un procedimiento con caso. Sin
+   acciones no hay ⋮: un menú que dice "No actions available" es un clic perdido (ledger.md, 2026-11-12). */
+function AccionesFila({ m, onAplicar, onAbrirCaso, onOpenChange }: {
+  m: Movimiento; onAplicar: () => void; onAbrirCaso: (caso: string) => void; onOpenChange: (open: boolean) => void
+}) {
+  const caso = casoDelCargo(m)
+  const credito = tieneCredito(m)
+  if (!credito && !caso) return null
+  return (
+    <RowActionsMenu label={m.descripcion} onOpenChange={onOpenChange}>
+      {credito && (
+        <DropdownMenuItem onSelect={onAplicar}>
+          <HandCoins /> Apply credit
+        </DropdownMenuItem>
+      )}
+      {credito && caso && <DropdownMenuSeparator />}
+      {caso && (
+        <>
+          <DropdownMenuLabel className="text-xs text-ink-muted">Estimation details</DropdownMenuLabel>
+          <DropdownMenuItem onSelect={() => onAbrirCaso(caso.id)}>
+            <FileText /> <span className="truncate">{caso.nombre}</span>
+          </DropdownMenuItem>
+        </>
+      )}
+    </RowActionsMenu>
+  )
+}
+
+/* Guarantor View: quiénes comparten la cuenta, como en red.dev (CON-4076). */
+function Household() {
+  const personas = [{ nombre: GUARANTOR, rol: 'Guarantor' }, ...DEPENDIENTES.map((nombre) => ({ nombre, rol: 'Dependent' }))]
+  return (
+    <section aria-labelledby="ledger-household" className={cn(TARJETA_PANEL, 'mt-4 p-4')}>
+      <h2 id="ledger-household" className="text-[15px] font-semibold text-ink">Household</h2>
+      <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {personas.map((p) => (
+          <li key={p.nombre} className={cn(TARJETA_INTERNA, 'flex min-w-0 items-center gap-3 p-3')}>
+            <Avatar aria-hidden initials={inicialesDe(p.nombre)} size={36} />
+            <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-ink" title={p.nombre}>{p.nombre}</span>
+            <Pill tone={p.rol === 'Guarantor' ? 'info' : 'neutral'} size="sm">{p.rol}</Pill>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
 
 const VISTAS = ['Patient View', 'Guarantor View'] as const
 type Vista = (typeof VISTAS)[number]
@@ -143,7 +206,7 @@ export default function Ledger() {
   const [tab, setTab] = useState<Tab>('transacciones')
   const [pagina, setPagina] = useState(1)
   const [expandidas, setExpandidas] = useState<string[]>([])
-  const [ocultas, setOcultas] = useState<ColLedger[]>([])
+  const [ocultas, setOcultas] = useState<ColLedger[]>(OCULTAS_DE_ENTRADA)
   const alternarCol = (id: ColLedger) =>
     setOcultas((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
   const [enModal, setEnModal] = useState<Fila | null>(null)
@@ -151,6 +214,7 @@ export default function Ledger() {
   const [resaltada, setResaltada] = useState<string | null>(null)
   const navegar = useNavigate()
   const [enCredito, setEnCredito] = useState<Fila | null>(null)
+  const [menuDe, setMenuDe] = useState<string | null>(null)
   const anchos = useAnchoColumnas<ColLedger>(ANCHO_BASE)
   const refVisible = useAnchoVisible<HTMLDivElement>()
 
@@ -192,12 +256,18 @@ export default function Ledger() {
   /* + la flecha de la fila (16 y su gap). */
   const anchoMinimo = columnasVisibles.reduce(
     (a, c) => a + (anchos.manual(c.id) ?? ANCHO_MINIMO[c.id]), 0,
-  ) + columnasVisibles.length * 12 + 16 + 24
+  ) + columnasVisibles.length * 12 + 16 + 24 + 28 + 12
 
-  const conSaldoTotal = useMemo(() => conSaldo(movs), [movs])
+  /* Ledger Bal. corre en orden de fecha sobre lo que muestra la vista (en Patient View, sólo lo del paciente: así la
+     primera fila da el Patient balance), y la tabla va de lo más nuevo a lo más viejo (CON-3753, ledger.md 2026-11-12). */
+  const enOrden = useMemo(() => {
+    const fecha = (m: Movimiento) => new Date(m.fecha).getTime() || 0
+    return movs.map((m, i) => ({ m, i })).sort((a, b) => fecha(a.m) - fecha(b.m) || a.i - b.i).map((x) => x.m)
+  }, [movs])
+  const conSaldoTotal = useMemo(() => filasDe(enOrden, aplicaciones), [enOrden, aplicaciones])
   const delaVista = useMemo(
-    () => (vista === 'Guarantor View' ? conSaldoTotal : conSaldoTotal.filter((m) => m.paciente === GUARANTOR)),
-    [conSaldoTotal, vista],
+    () => (vista === 'Guarantor View' ? conSaldoTotal : filasDe(enOrden.filter((m) => m.paciente === GUARANTOR), aplicaciones)),
+    [conSaldoTotal, enOrden, vista, aplicaciones],
   )
 
   const filas = useMemo(
@@ -222,23 +292,28 @@ export default function Ledger() {
   const colapsarTodo = () =>
     setExpandidas((p) => p.filter((id) => !filasPagina.some((m) => m.id === id)))
 
+  /* Las cuatro de red.dev con los textos de sus ⓘ; las tres primeras salen de CON-3753 / CON-3755 (ledger.md, 2026-11-12). */
   const stats: Stat[] = useMemo(() => {
-    const cargos = delaVista.filter((m) => m.tipo === 'Charge').reduce((a, m) => a + m.monto, 0)
-    const seguro = delaVista.filter((m) => m.tipo === 'Insurance' && m.estado === 'Posted')
-      .reduce((a, m) => a + m.monto, 0)
+    const cuenta = vista === 'Guarantor View'
+    const abiertos = delaVista.filter((m) => (m.pendiente ?? 0) > 0)
     const saldo = delaVista.reduce((a, m) => a + m.monto, 0)
-    const denegados = delaVista.filter((m) => m.estado === 'Denied').length
-    const credito = delaVista.filter(tieneCredito).reduce((a, m) => a + (m.creditoDisponible ?? 0), 0)
+    /* Con el reclamo pendiente, el paciente debe sólo lo que el seguro no cubriría. */
+    const responsabilidad = abiertos.reduce(
+      (a, m) => a + (m.pendiente ?? 0) * (m.estado === 'Pending' ? 1 - coberturaSeguro(m.codigo) : 1), 0,
+    )
+    const credito = delaVista.filter((m) => tieneCredito(m) && (cuenta || alcanceDe(m) === 'patient'))
+      .reduce((a, m) => a + (m.creditoDisponible ?? 0), 0)
     return [
-      { label: 'Total charges', value: moneda(cargos), nota: `${delaVista.filter((m) => m.tipo === 'Charge').length} procedures`, icon: Receipt, bg: '#eef2ff', fg: '#1d56bc' },
-      { label: 'Insurance paid', value: moneda(-seguro), nota: denegados ? `${denegados} denied` : 'all posted', icon: CreditCard, bg: '#f5f3ff', fg: '#8b5cf6' },
-      { label: 'Patient balance', value: moneda(saldo), nota: 'due on next visit', icon: Wallet, bg: '#fff7ed', fg: '#f97316' },
-      /* bg/fg: StatStrip los ignora a propósito -las cuatro comparten el
-         mismo azul del ícono, ver su propio comentario-, quedan sólo por
-         las dudas de que algún día se lean. */
-      { label: 'Unapplied credits', value: moneda(credito), nota: 'Available to apply', icon: HandCoins, bg: '#eef2ff', fg: '#1d56bc' },
+      cuenta
+        ? { label: 'Guarantor balance', value: moneda(saldo), icon: Wallet, info: 'Consolidated balance of the household ledger. A negative value means available credit.' }
+        : { label: 'Patient balance', value: moneda(saldo), icon: Wallet, info: 'What the patient owes in this ledger. A negative value means available credit.' },
+      cuenta
+        ? { label: 'Guarantor responsibility', value: moneda(responsabilidad), icon: Receipt, info: 'The portion of the household balance the guarantor is responsible for.' }
+        : { label: 'Patient responsibility', value: moneda(responsabilidad), icon: Receipt, info: 'The portion of the balance the patient is responsible for.' },
+      { label: 'Unapplied credits', value: moneda(credito), icon: HandCoins, info: cuenta ? 'Household credit that is still available.' : 'Credit originated by this patient that is still available.' },
+      { label: 'Open charges', value: String(abiertos.length), icon: ListChecks, info: 'Charges with a remaining balance greater than zero.' },
     ]
-  }, [delaVista])
+  }, [delaVista, vista])
 
   const agregar = (m: Omit<Movimiento, 'id'>) => {
     setMovs((p) => [...p, { ...m, id: `m${p.length + 1}-${Date.now()}` }])
@@ -309,7 +384,8 @@ export default function Ledger() {
                     columnas={COLUMNAS}
                     ocultas={ocultas}
                     onToggle={alternarCol}
-                    onReset={() => setOcultas([])}
+                    onReset={() => setOcultas(OCULTAS_DE_ENTRADA)}
+                    porDefecto={OCULTAS_DE_ENTRADA}
                   />
                   <button
                     type="button"
@@ -341,6 +417,7 @@ export default function Ledger() {
                         <ManijaResize id={c.id} label={c.label} estado={anchos} indice={i} />
                       </span>
                     ))}
+                    <span className="relative w-7 shrink-0"><span className="sr-only">Actions</span></span>
                   </div>
 
                   {filasPagina.length === 0 ? (
@@ -359,7 +436,7 @@ export default function Ledger() {
                           tieneCredito(m) && 'relative before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-dash-blue',
                         )}
                       >
-                        <FilaConTooltip m={m} abierta={abierta}>
+                        <FilaConTooltip m={m} abierta={abierta} callado={menuDe === m.id}>
                         <div
                           role="button"
                           tabIndex={0}
@@ -393,6 +470,12 @@ export default function Ledger() {
                               {c.celda(m)}
                             </span>
                           ))}
+                          {/* El menú vive en un portal pero sus clics suben por React: se cortan acá para no abrir la fila. Las
+                              teclas no: la fila ya ignora las que no son suyas, y cortarlas acá dejaba sin Escape al menú. */}
+                          <span className="flex w-7 shrink-0 justify-end" onClick={(e) => e.stopPropagation()}>
+                            <AccionesFila m={m} onAplicar={() => setEnCredito(m)} onAbrirCaso={(caso) => abrirClinica({ caso })}
+                              onOpenChange={(open) => setMenuDe(open ? m.id : null)} />
+                          </span>
                         </div>
                         </FilaConTooltip>
                         {abierta && (
@@ -442,6 +525,7 @@ export default function Ledger() {
                 </div>
               </div>
               </TooltipProvider>
+              {vista === 'Guarantor View' && <Household />}
             </>
           )}
 

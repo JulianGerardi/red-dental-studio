@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { ChevronsDownUp, ChevronsUpDown, HandCoins } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -18,17 +18,20 @@ import {
    Reemplaza a los `title` que tenían las celdas que truncan: con los dos
    puestos aparecían dos tooltips distintos sobre la misma celda. */
 export function FilaConTooltip({
-  m, abierta, children,
+  m, abierta, callado, children,
 }: {
   m: Movimiento & { saldo?: number }
   /** Con la fila desplegada el detalle ya está a la vista: sobra el tooltip. */
   abierta?: boolean
+  /** Con el ⋮ de la fila abierto: el tooltip le quedaba encima y se comía el Escape del menú. */
+  callado?: boolean
   children: React.ReactNode
 }) {
+  const [visible, setVisible] = useState(false)
   const pieza = [m.diente && `Tooth ${m.diente}`, m.superficie].filter(Boolean).join(' · ')
   if (abierta) return <>{children}</>
   return (
-    <Tooltip>
+    <Tooltip open={visible && !callado} onOpenChange={setVisible}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       {/* Al costado, no arriba ni abajo: la fila ocupa todo el ancho de la
           tabla, así que un tooltip vertical le tapa sí o sí los datos de la

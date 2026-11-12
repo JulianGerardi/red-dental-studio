@@ -10,7 +10,7 @@ import { filterTriggerClasses } from '@/components/ui/filter-menu'
    Confidentally 2.0, donde las dos lo traen. Ver
    design-reference/figma/modulos/ledger.md. */
 export function ColumnPicker<T extends string>({
-  columnas, ocultas, onToggle, onReset, size = 'md',
+  columnas, ocultas, onToggle, onReset, size = 'md', porDefecto = [],
 }: {
   columnas: { id: T; label: string; bloqueada?: boolean }[]
   ocultas: T[]
@@ -18,13 +18,16 @@ export function ColumnPicker<T extends string>({
   onReset: () => void
   /** El del filtro que tiene al lado: md junto a buscadores, sm en encabezados de cards. */
   size?: 'sm' | 'md'
+  /** Las opcionales que arrancan ocultas (Unapplied Credit en el Ledger): con esas no se marca como cambiado. */
+  porDefecto?: T[]
 }) {
+  const cambiado = ocultas.length !== porDefecto.length || ocultas.some((c) => !porDefecto.includes(c))
   return (
     <DropdownMenu>
-      {/* Mismo botón que el filtro: azul cuando hay columnas ocultas. */}
-      <DropdownMenuTrigger className={filterTriggerClasses(size, ocultas.length > 0)}>
+      {/* Mismo botón que el filtro: azul cuando se cambiaron las columnas de entrada. */}
+      <DropdownMenuTrigger className={filterTriggerClasses(size, cambiado)}>
         <Columns3 aria-hidden /> Columns
-        {ocultas.length > 0 && (
+        {cambiado && (
           <span className="bg-dash-blue flex h-4 items-center justify-center rounded-full px-1.5 text-[10px] leading-none font-semibold text-white tabular-nums">
             {columnas.length - ocultas.length}/{columnas.length}
           </span>
@@ -45,7 +48,7 @@ export function ColumnPicker<T extends string>({
             {c.label}
           </DropdownMenuCheckboxItem>
         ))}
-        {ocultas.length > 0 && (
+        {cambiado && (
           <>
             <DropdownMenuSeparator />
             <button
@@ -53,7 +56,7 @@ export function ColumnPicker<T extends string>({
               onClick={onReset}
               className="text-dash-blue w-full rounded-md px-1.5 py-1 text-left text-sm font-semibold hover:bg-surface-muted"
             >
-              Show all columns
+              {porDefecto.length ? 'Reset to default' : 'Show all columns'}
             </button>
           </>
         )}

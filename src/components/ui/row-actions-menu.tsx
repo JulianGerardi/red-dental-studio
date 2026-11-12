@@ -10,16 +10,18 @@ import { cn } from '@/lib/utils'
    click-outside y su propio Escape. */
 
 export function RowActionsMenu({
-  label, className, abierto, children,
+  label, className, abierto, onOpenChange, children,
 }: {
   label: string
   className?: string
   /** Sólo para las stories: deja el menú abierto y sin bloquear la página. */
   abierto?: boolean
+  /** Avisa al abrir y cerrar: el Ledger apaga el tooltip de la fila mientras tanto. */
+  onOpenChange?: (open: boolean) => void
   children: ReactNode
 }) {
   return (
-    <DropdownMenu {...(abierto ? { open: true, modal: false } : {})}>
+    <DropdownMenu onOpenChange={onOpenChange} {...(abierto ? { open: true, modal: false } : {})}>
       {/* Abierto, el ⋮ queda marcado: se sabe de qué fila es el menú (relationships.md, 2026-11-12). */}
       <DropdownMenuTrigger aria-label={`Actions for ${label}`} className={cn(ICONO_SUELTO, 'data-[state=open]:bg-surface-muted', className)}>
         <MoreVertical className="size-4" />
