@@ -5,6 +5,19 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-12
 
+### Relationships, buscador con ✕ y New Appointment ordenado como CON-4090 ([#137](https://github.com/JulianGerardi/red-dental-studio/pull/137))
+- **Relationships:** el nombre de quien es paciente linkea a su ficha; el ⋮ queda marcado mientras su menú está
+  abierto; Edit Relationship pasa a 560 px como los demás drawers (CON-4139).
+- **Buscador de personas:** con texto escrito muestra una **✕** para borrarlo. La persona elegida se ve con la misma
+  card del buscador (Add Relationship, Edit e Insurance).
+- **New Appointment:** Status y Requestor arriba, después Reason y Date, Start y End, y Operatory (orden de CON-4090).
+  **Additional** (ASAP, Follow-up, Premedicate) y **Notes** pasan al paso 1; el paso 2 queda sólo para linkear la
+  visita. Date dice "Pick a date" y la agenda del costado muestra la fecha elegida en inglés (CON-4140).
+- **Horas:** las franjas van de "08 AM" a "07 PM" con 12 horas ("01 PM", no "13 PM", anomalía del Figma).
+- **Para el dev:** `hora24(franja)` en `AppointmentSlotPicker` pasa una franja a hora 0-23; usarlo en vez de
+  `parseInt` (ya está en Scheduling, Dashboard, Patients y LocationDetail). `PersonaFila` se exporta desde
+  `patients/form`. Decisiones en `relationships.md` y `scheduling.md` (2026-11-12). Storybook sin actualizar.
+
 ### Treatment Plan, Insurance Plans, ayuda en Insurance y sin "Ver estado vacío" ([#136](https://github.com/JulianGerardi/red-dental-studio/pull/136))
 - Títulos como en red.dev: **Treatment Plan** (antes "Treatments plan") e **Insurance Plans** (antes "Patients Plans").
 - Treatments y Relationships ya no muestran el botón de demo "Ver estado vacío" (estaba en castellano).

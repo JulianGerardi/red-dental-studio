@@ -206,3 +206,24 @@ en el paso Person que la persona "ya tiene contacto cargado".
 Pedido de Julián al revisar CON-4137: el botón de demo "Ver estado vacío" / "Ver poblado" (en castellano, al lado de
 *Add Relationship*) no va. Se saca junto con su vacío propio ("No relationships yet"). Queda el vacío real de la lista
 ("No related contacts"), que aparece al borrar todas las relaciones; Household no cambia.
+
+## CON-4139 · Segunda comparativa con red.dev: link al paciente, ⋮ abierto y Edit a 560 (2026-11-12)
+
+Comparativa de diseño con red.dev (pantalla, menú ⋮, Edit, Delete y los pasos de Add). Lo que red.dev tiene de diseño y
+nos faltaba se suma acá; lo demás queda en el ticket para que red.dev se alinee al sistema.
+
+- **Nombre como link a la ficha** cuando la persona también es paciente (`pacienteId` en `Persona`): azul `dash-blue`,
+  subrayado al hover y foco visible. En el mock lo tienen las de Household (por definición son pacientes); quien no es
+  paciente sigue en negro.
+- **⋮ marcado mientras su menú está abierto** (`data-[state=open]:bg-surface-muted` en `ui/row-actions-menu`): se sabe
+  de qué fila es el menú. Aplica a todas las tablas y cards.
+- **Edit Relationship a 560 px**, como Add: era 480 y en el mismo flujo cambiaba el ancho del drawer.
+- Se quedan como están (y el ticket le pide a red.dev alinearse): menú sin encabezado "Actions", Delete con los botones
+  juntos a la derecha y el destructive del sistema, select a ancho completo, casilla sin tildar en gris, etiqueta Role.
+- Funcional, sin cambio de lógica: Edit no cambia la dirección (red.dev sí, con radios); el título de Household en
+  red.dev lleva el nombre del garante ("Pat five Test's Household").
+- **Buscador de persona** (`PersonSearchField`): red.dev lo cambió. El nuestro sigue siendo la referencia (Julián,
+  2026-11-11); se le suma lo único que tenía red.dev y faltaba: la **✕ para borrar lo escrito** mientras se busca
+  ("Clear <label>"). Aplica a todos los buscadores de persona.
+- **`PersonaSeleccionada`** (Person en Edit Relationship y en los modales de Insurance) pasa a ser la misma card que deja
+  el buscador al elegir: `PersonaFila` con DOB y email como chips, en vez de "DOB:" y "Email:" sueltos.

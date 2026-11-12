@@ -13,7 +13,7 @@ import { AppointmentDetailsDrawer } from '@/components/scheduling/AppointmentDet
 import { HOUR_PX, LEGEND, fmtExacta, type ApptState } from '@/components/scheduling/calendar-data'
 import { aviso } from '@/components/ui/toaster'
 import { formatDMY } from '@/components/ui/date-picker'
-import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
+import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import { Bloque, Forzar, Lienzo, Tabla, TablaPartes, Token, medidasDe, type Medidas } from './kit'
 
 /* Las cuatro cards de un turno, cada una con su componente real: la del
@@ -63,7 +63,7 @@ const horaDecimal = (t: string) => {
 
 /* Como en el Dashboard: el modal trabaja con franjas de una hora ("10 AM"). */
 const franjaDe = (t: string) => {
-  const i = HORAS.findIndex((x) => Number(x.slice(0, 2)) === Math.floor(horaDecimal(t)))
+  const i = HORAS.findIndex((x) => hora24(x) === Math.floor(horaDecimal(t)))
   return i < 0 ? {} : { start: HORAS[i], end: HORAS[i + 1] ?? '' }
 }
 

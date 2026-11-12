@@ -20,7 +20,8 @@ export function RowActionsMenu({
 }) {
   return (
     <DropdownMenu {...(abierto ? { open: true, modal: false } : {})}>
-      <DropdownMenuTrigger aria-label={`Actions for ${label}`} className={cn(ICONO_SUELTO, className)}>
+      {/* Abierto, el ⋮ queda marcado: se sabe de qué fila es el menú (relationships.md, 2026-11-12). */}
+      <DropdownMenuTrigger aria-label={`Actions for ${label}`} className={cn(ICONO_SUELTO, 'data-[state=open]:bg-surface-muted', className)}>
         <MoreVertical className="size-4" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-max max-w-[280px] min-w-[190px]">

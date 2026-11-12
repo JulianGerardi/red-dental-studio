@@ -13,7 +13,7 @@ import { EditPatientModal } from '@/pages/patients/EditPatientModal'
 import { Panel } from '@/components/dashboard/primitives'
 import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
-import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
+import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import { formatDMY } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
 import { TURNOS_PATIENTS } from '@/components/dashboard/dashboard-data'
@@ -93,7 +93,7 @@ export default function Patients() {
   /* Edit abre el mismo modal que el Dashboard con lo que la card ya sabe. */
   const editarTurno = (a: Appointment) => {
     const h = Number(a.time.slice(0, 2))
-    const inicio = HORAS.find((x) => Number(x.slice(0, 2)) === h) ?? ''
+    const inicio = HORAS.find((x) => hora24(x) === h) ?? ''
     setTurnoEditando({
       patient: a.name, primary: a.provider, operatory: a.operatory, date: formatDMY(new Date()),
       start: inicio, end: HORAS[HORAS.indexOf(inicio) + 1] ?? '', status: 'Check-in',

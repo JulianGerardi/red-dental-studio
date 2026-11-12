@@ -25,6 +25,7 @@ import { LOCACIONES } from '@/pages/settings/Locations'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { LocationBillingProfile } from '@/components/settings/LocationBillingProfile'
 import { LocationInsuranceDefaults } from '@/components/settings/LocationInsuranceDefaults'
+import { hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import {
   HORARIO_SEMANAL, SALAS_INICIALES, EXCEPCIONES_INICIALES,
   type Sala, type TurnoSala, type Excepcion,
@@ -225,11 +226,11 @@ export function WorkingHoursTab() {
 const FILA_SALA = 'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-4 lg:grid-cols-[minmax(0,1fr)_120px_140px_130px_120px]'
 const fechaTurno = (d: Date) =>
   d.toLocaleString('en-US', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
-/* Las horas del drawer de turnos ("09 AM", "14 PM"): la agenda va de hora en hora. */
-const horaTurno = (h: number) => `${String(h).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`
+/* Las horas del drawer de turnos ("09 AM", "02 PM"): la agenda va de hora en hora. */
+const horaTurno = (h: number) => `${String(h % 12 || 12).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`
 const fechaDeDrawer = (d: DatosTurno) => {
   const [dd, mm, yyyy] = (d.date ?? '').split('-').map(Number)
-  return new Date(yyyy, mm - 1, dd, parseInt(d.start ?? '0', 10))
+  return new Date(yyyy, mm - 1, dd, hora24(d.start))
 }
 
 export function RoomsTab() {
