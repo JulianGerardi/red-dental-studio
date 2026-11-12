@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-12
 
+### Ledger: "Add a note (optional)" y "Enter Charge (+) Adjustment" ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Notes:** el placeholder de Patient Payment, Credit Adjustment, Charge Adjustment y Post payment (Billing) pasa de
+  "Placeholder" a "Add a note (optional)".
+- **Charge Adjustment (+):** el título pasa a "Enter Charge (+) Adjustment", como red.dev, en lugar de "New Credit (+)
+  Adjustment" del Figma.
+- **Pestañas:** Payment, Credit y Charge quedan como pestañas (decisión de Julián, CON-4142).
+- **Para el dev:** sólo cambian textos. Las decisiones están en `ledger.md` (2026-11-12).
+
 ### Ledger: métricas, columnas y ⋮ de CON-3753 / CON-3755, y Household ([#138](https://github.com/JulianGerardi/red-dental-studio/pull/138))
 - **Métricas:** Patient (o Guarantor) balance, Patient (o Guarantor) responsibility, Unapplied credits y Open charges,
   cada una con un ⓘ. Se van Total charges e Insurance paid (CON-4142).
