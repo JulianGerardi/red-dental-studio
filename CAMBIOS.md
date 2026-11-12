@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-12
 
+### Documents: nombres reales y Rows per page ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Nombres:** la tabla deja de repetir "Isacc Cihtepin.doc" (venía del Figma). Ahora usa nombres como los de red.dev:
+  *Procedure Consent - código y procedimiento*, *Informed Consent / Refusal of Dental Treatment – caso*, del más nuevo al
+  más viejo (CON-4143).
+- **Rows per page:** 10, 20 o 50; arranca en 10.
+- **Para el dev:** `DataTable` ya traía `pageSizeOptions`; acá sólo se activa. Hay e2e nuevo en
+  `tests/documents.e2e.ts`. Decisiones en `treatments.md` (2026-11-12). Storybook sin actualizar.
+
 ### Ledger: "Add a note (optional)" y "Enter Charge (+) Adjustment" ([#139](https://github.com/JulianGerardi/red-dental-studio/pull/139))
 - **Notes:** el placeholder de Patient Payment, Credit Adjustment, Charge Adjustment y Post payment (Billing) pasa de
   "Placeholder" a "Add a note (optional)".
