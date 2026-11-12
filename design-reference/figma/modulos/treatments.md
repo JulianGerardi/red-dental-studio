@@ -127,3 +127,21 @@ Al comparar Treatments con red.dev para CON-4137:
 - **Se va "Ver estado vacío".** Era un botón de demo, en castellano, para alternar entre la lista y el vacío. El vacío
   ("No accepted treatment plans") queda en el código y se ve cuando el paciente no tiene planes; hoy los datos de ejemplo
   siempre traen planes, así que en la app no aparece.
+
+## CON-4143 · Documents: nombres reales y Rows per page (2026-11-12)
+
+Comparativa con red.dev (ticket CON-4143, asignado a Abril). Las dos pantallas ya eran casi iguales.
+
+1. **Nombres de documento**: la tabla repetía 12 veces el "Isacc Cihtepin.doc" del Figma. Ahora usa los nombres como los
+   arma red.dev (*Procedure Consent - D2950 Core buildup…*, *Informed Consent for Dental Treatment – Endodontic
+   Treatment*, *Informed Refusal of Dental Treatment – Implant Option*), con procedimientos y casos de John Smith y las
+   fechas de más nueva a más vieja. Un nombre largo se trunca y muestra el completo con _title_.
+2. **Rows per page** (10, 20 o 50), como red.dev: `DataTable` ya lo tenía (`pageSizeOptions`). Arranca en 10, como red.dev
+   (antes 8).
+3. **Sin cambiar**:
+   - Download queda siempre habilitado y avisa si no hay nada elegido. red.dev lo deshabilita con un _title_ nativo, que
+     no se ve con teclado ni con lector.
+   - El buscador con botón *Search* sigue el patrón del sistema.
+   - La fecha queda en formato "Oct 27, 2026".
+4. **A validar con usuarios**: si se espera que la fila abra el documento (vista previa, CON-2911). Hoy no hace nada en
+   ninguna de las dos apps.
