@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-12
 
-### Ledger: "Add a note (optional)" y "Enter Charge (+) Adjustment" ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Ledger: "Add a note (optional)" y "Enter Charge (+) Adjustment" ([#139](https://github.com/JulianGerardi/red-dental-studio/pull/139))
 - **Notes:** el placeholder de Patient Payment, Credit Adjustment, Charge Adjustment y Post payment (Billing) pasa de
   "Placeholder" a "Add a note (optional)".
 - **Charge Adjustment (+):** el título pasa a "Enter Charge (+) Adjustment", como red.dev, en lugar de "New Credit (+)
