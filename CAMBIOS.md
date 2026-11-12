@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-12
 
-### Relationships, buscador con ✕ y New Appointment ordenado como CON-4090 ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Relationships, buscador con ✕ y New Appointment ordenado como CON-4090 ([#137](https://github.com/JulianGerardi/red-dental-studio/pull/137))
 - **Relationships:** el nombre de quien es paciente linkea a su ficha; el ⋮ queda marcado mientras su menú está
   abierto; Edit Relationship pasa a 560 px como los demás drawers (CON-4139).
 - **Buscador de personas:** con texto escrito muestra una **✕** para borrarlo. La persona elegida se ve con la misma
