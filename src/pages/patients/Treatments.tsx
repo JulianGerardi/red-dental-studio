@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Calendar, DollarSign, Circle } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -96,7 +95,7 @@ export function TreatmentCard({ plan }: { plan: Plan }) {
 
 export default function Treatments() {
   const { id = 'john-smith' } = useParams()
-  const [vacio, setVacio] = useState(false)
+  const vacio = PLANS.length === 0
 
   return (
     <div className={CONTENEDOR_PAGINA}>
@@ -111,16 +110,8 @@ export default function Treatments() {
         />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex items-center justify-between gap-3">
-            {/* El título dice "Treatments plan" y el breadcrumb "Treatment plan". */}
-            <PageTitle>Treatments plan</PageTitle>
-            <button
-              onClick={() => setVacio((v) => !v)}
-              className="rounded-md border border-line bg-white px-3 py-1.5 text-[11px] font-medium text-ink-muted hover:bg-surface-subtle"
-            >
-              {vacio ? 'Ver poblado' : 'Ver estado vacío'}
-            </button>
-          </div>
+          {/* "Treatment Plan", como red.dev; el Figma decía "Treatments plan" (treatments.md, 2026-11-12). */}
+          <PageTitle>Treatment Plan</PageTitle>
 
           {vacio ? (
             <div className={cn(TARJETA_PANEL, 'mt-4 flex min-h-[560px] flex-col items-center justify-center lg:flex-1')}>

@@ -200,3 +200,9 @@ asigna Guardian o Guarantor (hoy el paso no depende de los roles porque los role
 
 **Para validar con usuarios:** si recepción entiende por qué a veces hay dos pasos y a veces tres, y si conviene mostrar
 en el paso Person que la persona "ya tiene contacto cargado".
+
+## Sin botón "Ver estado vacío" (2026-11-12)
+
+Pedido de Julián al revisar CON-4137: el botón de demo "Ver estado vacío" / "Ver poblado" (en castellano, al lado de
+*Add Relationship*) no va. Se saca junto con su vacío propio ("No relationships yet"). Queda el vacío real de la lista
+("No related contacts"), que aparece al borrar todas las relaciones; Household no cambia.

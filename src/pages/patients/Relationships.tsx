@@ -132,7 +132,6 @@ const aDirectorio = (p: Persona): PersonaDirectorio => ({ name: p.name, initials
 export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
   const { id = 'john-smith' } = useParams()
   const navigate = useNavigate()
-  const [vacio, setVacio] = useState(false)
   const [agregando, setAgregando] = useState(nuevo)
   const [relaciones, setRelaciones] = useState(RELACIONES)
   const [editando, setEditando] = useState<Persona | null>(null)
@@ -153,7 +152,6 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
         { icon: MapPin, label: 'Contact Address', value: r.address },
       ],
     }, ...prev])
-    setVacio(false)
     aviso.ok(`${r.name} was added as ${r.rol}.`)
   }
   const guardarEdicion = (p: Persona, c: { guardian: boolean; guarantor: boolean; rel: string }) => {
@@ -182,55 +180,35 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <PageTitle>Relationships &amp; Billing</PageTitle>
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => setVacio((v) => !v)}
-                className="rounded-md border border-line bg-white px-3 py-1.5 text-[11px] font-medium text-ink-muted hover:bg-surface-subtle"
-              >
-                {vacio ? 'Ver poblado' : 'Ver estado vacío'}
-              </button>
-              {/* El Figma diseña "Add Relationship" pero no dibuja de dónde se
-                  entra. Este botón es una decisión propia — anomalía 42. */}
-              <Button data-tour="pat-add-relationship" onClick={() => setAgregando(true)}>
-                <Plus /> Add Relationship
-              </Button>
-            </div>
+            {/* El Figma diseña "Add Relationship" pero no dibuja de dónde se
+                entra. Este botón es una decisión propia — anomalía 42. */}
+            <Button data-tour="pat-add-relationship" onClick={() => setAgregando(true)}>
+              <Plus /> Add Relationship
+            </Button>
           </div>
 
-          {vacio ? (
-            <div className={cn(TARJETA_PANEL, 'mt-4 flex min-h-[460px]')}>
-              <EmptyState
-                icon={Users}
-                title="No relationships yet"
-                detail="This patient doesn't have any related contacts or household members yet."
-                accion={{ label: 'Add Relationship', onClick: () => setAgregando(true) }}
-              />
-            </div>
-          ) : (
-            <>
-              <div className="mt-4 flex flex-col gap-4">
-                {relaciones.length === 0 ? (
-                  <div className={TARJETA_PANEL}>
-                    <EmptyState
-                      icon={Users} title="No related contacts" detail="This patient doesn't have any related contacts yet."
-                      accion={{ label: 'Add Relationship', onClick: () => setAgregando(true) }}
-                    />
-                  </div>
-                ) : (
-                  relaciones.map((p) => (
-                    <PersonaCard key={p.id} p={p} onEdit={() => setEditando(p)} onDelete={() => setBorrando(p)} />
-                  ))
-                )}
+          {/* Sin relaciones, el vacío de la lista; sin botón de demo para verlo (relationships.md, 2026-11-12). */}
+          <div className="mt-4 flex flex-col gap-4">
+            {relaciones.length === 0 ? (
+              <div className={TARJETA_PANEL}>
+                <EmptyState
+                  icon={Users} title="No related contacts" detail="This patient doesn't have any related contacts yet."
+                  accion={{ label: 'Add Relationship', onClick: () => setAgregando(true) }}
+                />
               </div>
+            ) : (
+              relaciones.map((p) => (
+                <PersonaCard key={p.id} p={p} onEdit={() => setEditando(p)} onDelete={() => setBorrando(p)} />
+              ))
+            )}
+          </div>
 
-              <h2 className="mt-8 text-xl leading-none font-bold text-ink">
-                Household/Same Guarantor Patients
-              </h2>
-              <div className="mt-4 flex flex-col gap-4">
-                {HOUSEHOLD.map((p) => <PersonaCard key={p.id} p={p} />)}
-              </div>
-            </>
-          )}
+          <h2 className="mt-8 text-xl leading-none font-bold text-ink">
+            Household/Same Guarantor Patients
+          </h2>
+          <div className="mt-4 flex flex-col gap-4">
+            {HOUSEHOLD.map((p) => <PersonaCard key={p.id} p={p} />)}
+          </div>
         </div>
       </div>
 
