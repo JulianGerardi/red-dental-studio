@@ -22,8 +22,8 @@ import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 /* Figma 3817:865128 "Insurance", frames 3817:865704 y 3831:897436.
 
    El breadcrumb del frame termina en "Documents" en azul aunque la pantalla
-   sea Insurance, y el título dice "Patients Plans". Se replican tal cual —
-   ver modulos/insurance.md, anomalías 60 a 66. */
+   sea Insurance — ver modulos/insurance.md, anomalías 60 a 66. El título del
+   frame, "Patients Plans", pasó a "Insurance Plans" como en red.dev (2026-11-12). */
 
 /* Pills con fondo tintado, como el resto del sistema. Muestreados del frame:
    Primary y Self usan el azul, Child el verde, Spouse el neutro, Active el
@@ -48,8 +48,8 @@ const COLUMNAS: DataTableColumn<PlanPaciente>[] = [
   { key: 'plan', header: 'Plan', width: 124, cell: (p) => <TextCell>{p.plan}</TextCell> },
   { key: 'subscriber', header: 'Subscriber', width: 128, cell: (p) => <TextCell>{p.subscriber}</TextCell> },
   { key: 'relation', header: 'Relation', width: 92, cell: (p) => <Pill tone={RELACION_TONO[p.relacion]}>{p.relacion}</Pill> },
-  { key: 'coverage', header: 'Coverage Period', width: 148, cell: (p) => <span className="leading-tight">{p.cobertura}</span> },
-  { key: 'priority', header: 'Priority Period', width: 150, cell: (p) => <span className="flex flex-col gap-0.5 leading-tight">{p.prioridad.map((t) => <span key={t}>{t}</span>)}</span> },
+  { key: 'coverage', header: 'Coverage Period', width: 148, headerInfo: 'The dates during which this insurance coverage is active for the patient.', cell: (p) => <span className="leading-tight">{p.cobertura}</span> },
+  { key: 'priority', header: 'Priority Period', width: 150, headerInfo: 'The dates during which this plan has held its current coordination priority.', cell: (p) => <span className="flex flex-col gap-0.5 leading-tight">{p.prioridad.map((t) => <span key={t}>{t}</span>)}</span> },
   { key: 'status', header: 'Status', width: 92, cell: (p) => <Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill> },
 ]
 
@@ -184,7 +184,7 @@ export default function Insurance() {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-xl leading-[1.3] font-semibold text-ink">Patients Plans</h1>
+            <h1 className="text-xl leading-[1.3] font-semibold text-ink">Insurance Plans</h1>
             <Switch on={historial} onChange={setHistorial} label="Show plan history" />
           </div>
 

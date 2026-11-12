@@ -11,6 +11,7 @@ import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
 import { ManijaResize, useAnchoColumnas, useAnchoVisible } from '@/components/patients/ledger/useAnchoColumnas'
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/components/ui/avatar'
+import { InfoTip } from '@/components/ui/info-tip'
 import { TABLA_ENCABEZADO, TABLA_LINK, TABLA_TEXTO } from '@/lib/estilos'
 
 /* Tabla estándar de la app: la misma anatomía que Patients, Team, Accounts y
@@ -33,6 +34,8 @@ export type DataTableColumn<T> = {
   locked?: boolean
   /** Arranca oculta; se muestra desde Columns. */
   hidden?: boolean
+  /** Explicación de la columna: suma el ⓘ (InfoTip) al lado del encabezado. */
+  headerInfo?: string
 }
 
 /* Alto mínimo: una celda con dos líneas agranda la fila en vez de cortarse. */
@@ -237,6 +240,7 @@ export function DataTable<T>({
             {visiblesCols.map((c, i) => (
               <div key={c.key} role="columnheader" data-elastica={elastica(c) || undefined} className={celda(c)} style={ancho(c)}>
                 <span className="truncate">{c.header}</span>
+                {c.headerInfo && <InfoTip title={c.header} className="ml-0.5 [&>svg]:size-3.5">{c.headerInfo}</InfoTip>}
                 {resizable && <ManijaResize id={c.key} label={c.header} estado={anchos} indice={i} />}
               </div>
             ))}

@@ -229,3 +229,14 @@ líneas, B una línea corrida, C chips— y **eligió C**.
 - Los chips llevan el rótulo para lector de pantalla ("Carrier: …") y tooltip con el texto completo.
 - `ui/chip` suma `tone` (`blue` de siempre, `neutral`) y `title`. `PersonSearchField` cambia `columnas`/
   `columnaNombre` por `subtitulo` (texto al lado del nombre) y `chips` (`{ label, value, tone }[]`).
+
+## CON-4138 · "Insurance Plans" y ayuda en Coverage Period y Priority Period (2026-11-12)
+
+Al comparar Insurance con red.dev para CON-4138, dos cosas de red.dev están bien y se suman acá:
+
+- **Título "Insurance Plans".** El frame decía "Patients Plans" (se había copiado tal cual); red.dev dice "Insurance
+  Plans".
+- **ⓘ en Coverage Period y Priority Period**, con el mismo texto que red.dev: "The dates during which this insurance
+  coverage is active for the patient." y "The dates during which this plan has held its current coordination
+  priority.". Es el `InfoTip` del sistema (card con título y texto, abre con mouse, dedo o teclado). Para ponerlo,
+  `DataTableColumn` (`ui/data-table`) suma `headerInfo`: el texto de la explicación; sin él la columna queda igual.
