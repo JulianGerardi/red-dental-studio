@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-12
 
-### Ledger: métricas, columnas y ⋮ de CON-3753 / CON-3755, y Household ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Ledger: métricas, columnas y ⋮ de CON-3753 / CON-3755, y Household ([#138](https://github.com/JulianGerardi/red-dental-studio/pull/138))
 - **Métricas:** Patient (o Guarantor) balance, Patient (o Guarantor) responsibility, Unapplied credits y Open charges,
   cada una con un ⓘ. Se van Total charges e Insurance paid (CON-4142).
 - **Columnas:** Trans. Date, CDT Code, Patient / Account, Type (Procedure, Patient Payment…), Description, Provider,
