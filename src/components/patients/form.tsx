@@ -526,7 +526,7 @@ export const chipsPersona = (dob?: string, email?: string): ChipPersona[] => [
   ...(email ? [{ label: 'Email', value: email }] : []),
 ]
 
-function PersonaFila({ nombre, subtitulo, chips }: { nombre: string; subtitulo?: string; chips?: ChipPersona[] }) {
+export function PersonaFila({ nombre, subtitulo, chips }: { nombre: string; subtitulo?: string; chips?: ChipPersona[] }) {
   return (
     <>
       <Avatar aria-hidden initials={inicialesDe(nombre)} size={36} />
@@ -658,8 +658,19 @@ export function PersonSearchField({
             onChange={(e) => { onChange?.(e.target.value); setActiva(0); setAbierto(true) }}
             onFocus={() => setAbierto(true)}
             onKeyDown={teclas}
-            className={cn(control(error), 'h-9 pr-3 pl-9')}
+            className={cn(control(error), 'h-9 pl-9', value && !disabled ? 'pr-10' : 'pr-3')}
           />
+          {/* Con algo escrito, ✕ para borrarlo de una (como red.dev; relationships.md, 2026-11-12). */}
+          {value && !disabled && (
+            <button
+              type="button"
+              aria-label={`Clear ${label}`}
+              onClick={() => { onChange?.(''); setActiva(0); inputRef.current?.focus() }}
+              className="absolute top-1/2 right-2.5 flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dash-blue"
+            >
+              <X className="size-4" />
+            </button>
+          )}
           {visible && (
             <div id={listaId} role="listbox" aria-label={label} className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex max-h-72 w-full flex-col gap-1 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
               {sugerencias.map((v, i) => (

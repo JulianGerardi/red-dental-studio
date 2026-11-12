@@ -222,3 +222,8 @@ nos faltaba se suma acá; lo demás queda en el ticket para que red.dev se aline
   juntos a la derecha y el destructive del sistema, select a ancho completo, casilla sin tildar en gris, etiqueta Role.
 - Funcional, sin cambio de lógica: Edit no cambia la dirección (red.dev sí, con radios); el título de Household en
   red.dev lleva el nombre del garante ("Pat five Test's Household").
+- **Buscador de persona** (`PersonSearchField`): red.dev lo cambió. El nuestro sigue siendo la referencia (Julián,
+  2026-11-11); se le suma lo único que tenía red.dev y faltaba: la **✕ para borrar lo escrito** mientras se busca
+  ("Clear <label>"). Aplica a todos los buscadores de persona.
+- **`PersonaSeleccionada`** (Person en Edit Relationship y en los modales de Insurance) pasa a ser la misma card que deja
+  el buscador al elegir: `PersonaFila` con DOB y email como chips, en vez de "DOB:" y "Email:" sueltos.
