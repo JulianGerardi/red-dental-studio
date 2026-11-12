@@ -3,6 +3,16 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-12
+
+### Treatment Plan, Insurance Plans, ayuda en Insurance y sin "Ver estado vacío" ([#136](https://github.com/JulianGerardi/red-dental-studio/pull/136))
+- Títulos como en red.dev: **Treatment Plan** (antes "Treatments plan") e **Insurance Plans** (antes "Patients Plans").
+- Treatments y Relationships ya no muestran el botón de demo "Ver estado vacío" (estaba en castellano).
+- Insurance: **ⓘ** en Coverage Period y Priority Period con la explicación de cada columna (CON-4137, CON-4138).
+- **Para el dev:** `DataTableColumn` suma `headerInfo` (pone un `InfoTip` al lado del encabezado). En Relationships se
+  va el estado `vacio`. Decisiones en `treatments.md`, `relationships.md` e `insurance.md` (2026-11-12). Storybook sin
+  actualizar (pendiente de que Julián lo pida).
+
 ## 2026-11-11
 
 ### Buscador de personas igual en toda la app: nombre · número y chips ([#134](https://github.com/JulianGerardi/red-dental-studio/pull/134))
