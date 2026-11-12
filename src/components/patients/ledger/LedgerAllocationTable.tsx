@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { MoveHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ColumnPicker } from './ColumnPicker'
-import { moneda, fechaCorta, type Movimiento } from '@/data/ledger'
+import { moneda, fechaCorta, coberturaSeguro, type Movimiento } from '@/data/ledger'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
 import { LedgerRowDetail, BotonExpandirTodo, FilaConTooltip } from '@/components/patients/ledger/LedgerRowDetail'
@@ -10,10 +10,6 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { RowChevron } from '@/components/ui/data-table'
 
 /* Figma 4582:29618 / 4582:30251. Ver design-reference/figma/modulos/ledger.md. */
-function coberturaSeguro(codigo: string) {
-  const categoria = codigo.charAt(1)
-  return categoria === '0' || categoria === '1' ? 1 : 0.5
-}
 
 type ColId =
   | 'fecha' | 'paciente' | 'provider' | 'diente' | 'superficie' | 'codigo'

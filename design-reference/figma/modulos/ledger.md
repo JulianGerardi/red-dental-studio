@@ -879,3 +879,41 @@ el método de pago (efectivo, cheque, tarjeta) en el detalle; sigue en la descri
   *Applied transactions* (abren la transacción en el modal).
 - Se pierde el atajo de un cargo de procedimiento del Ledger a Clinical Mode con el procedimiento abierto; quedan el link al
   caso de la fila Treatment y el de cada hallazgo. A validar con usuarios si se extraña.
+
+## CON-4142 · Métricas, columnas y ⋮ de CON-3753 / CON-3755 (2026-11-12)
+
+Comparativa con red.dev (ticket CON-4142, asignado a Abril). Lo que la app tenía distinto de Jira y de red.dev se alinea;
+el diseño sigue siendo el del sistema.
+
+1. **Métricas**: Patient balance, Patient responsibility, Unapplied credits y Open charges (en Guarantor View, Guarantor
+   balance y Guarantor responsibility), cada una con un ⓘ (`InfoTip`) con el texto de red.dev. Antes: Total charges,
+   Insurance paid, Patient balance y Unapplied credits, con una nota abajo. `StatStrip` suma `info` y la `nota` pasa a ser
+   opcional.
+   - *Responsibility* es lo que falta de cada cargo abierto. Con el reclamo todavía pendiente (`estado: 'Pending'`), se
+     descuenta lo que el seguro cubriría (`coberturaSeguro`, que pasa a `data/ledger.ts`). Es un mock: a validar con la
+     regla real (`summary.responsibility`).
+   - En Patient View, *Unapplied credits* cuenta sólo los créditos de scope patient (CON-3753).
+2. **Columnas de la historia**: Trans. Date (MM/DD/YYYY), CDT Code, Patient / Account, Type, Description, Provider,
+   Amount, Trans. Bal., Ledger Bal. y el ⋮.
+   - *Type* usa los nombres de Jira (Procedure, Patient Payment, Credit Adjustment, Charge Adjustment, Insurance Payment):
+     antes mostraba el código.
+   - Un pago o crédito de scope guarantor se lee *Guarantor / Account*.
+   - *Trans. Bal.* es lo que falta del cargo; un pago o un crédito lleva "—".
+   - *Unapplied Credit* (antes Credit available, siempre visible) pasa a ser opcional y arranca oculta, como dice la
+     historia. Apply credit sigue en el ⋮, en el detalle de la fila y en la barra azul de la fila.
+   - `ColumnPicker` suma `porDefecto`: con las columnas de entrada no se marca como cambiado y el reset dice "Reset to
+     default".
+3. **Orden y saldo**: de lo más nuevo a lo más viejo (CON-3753). Ledger Bal. corre sobre lo que muestra la vista. Revierte
+   la decisión de 2026-09-04 (*Patient View / Guarantor View*) de correrlo sobre toda la cuenta, porque así la primera
+   fila de Patient View no daba el Patient balance ($11,113 contra $10,998).
+4. **⋮ de la fila**: Apply credit y *Estimation details* (el caso del procedimiento, que abre Treatment Plan en Clinical
+   Mode). Sin acciones no hay ⋮: red.dev muestra "No actions available", que es un clic perdido. Mientras el menú está
+   abierto se calla el tooltip de la fila (`FilaConTooltip callado`): se le ponía encima y se comía el Escape.
+5. **Household** en Guarantor View (CON-4076, como red.dev): una tarjeta por persona con avatar, nombre y Guarantor o
+   Dependent.
+6. **Sin cambiar, a definir con Julián**:
+   - Las acciones siguen como pestañas (decisión del 2026-09-07). red.dev usa botones que abren un drawer, y la regla
+     del sistema dice pop ups = drawer.
+   - El placeholder "Placeholder" de Notes sale del Figma y está igual en red.dev.
+7. A validar con usuarios: si en recepción se extraña Unapplied Credit visible de entrada; si Responsibility se entiende
+   al lado de Balance.

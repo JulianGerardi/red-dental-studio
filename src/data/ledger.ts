@@ -130,6 +130,13 @@ export function tieneCredito(m: Movimiento) {
   return (m.tipo === 'Payment' || (m.tipo === 'Adjustment' && m.monto < 0)) && (m.creditoDisponible ?? 0) > 0
 }
 
+/* Qué parte de un cargo cubre el seguro, estimada por código: diagnóstico y preventivo (D0/D1) al 100%, el resto a mitad.
+   La usan Other Credit / Guar Estimate de la tabla de aplicación y Patient Responsibility del Ledger. */
+export function coberturaSeguro(codigo: string) {
+  const categoria = codigo.charAt(1)
+  return categoria === '0' || categoria === '1' ? 1 : 0.5
+}
+
 /* La tabla de allocation muestra 12 columnas a la vez: ahí la fecha va
    numérica (04/20/2026) como en el diseño de referencia, no "March 17, 2025",
    que sola se come 30px más. */
