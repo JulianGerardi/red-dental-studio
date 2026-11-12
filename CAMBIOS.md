@@ -5,6 +5,22 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-12
 
+### Ledger: métricas, columnas y ⋮ de CON-3753 / CON-3755, y Household ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Métricas:** Patient (o Guarantor) balance, Patient (o Guarantor) responsibility, Unapplied credits y Open charges,
+  cada una con un ⓘ. Se van Total charges e Insurance paid (CON-4142).
+- **Columnas:** Trans. Date, CDT Code, Patient / Account, Type (Procedure, Patient Payment…), Description, Provider,
+  Amount, Trans. Bal. y Ledger Bal. Unapplied Credit pasa a ser opcional y arranca oculta.
+- **Orden:** de lo más nuevo a lo más viejo. Ledger Bal. corre sobre lo que muestra la vista.
+- **⋮ por fila:** Apply credit y Estimation details (abre el caso en Clinical Mode). Sin acciones, no hay ⋮.
+- **Guarantor View:** suma la card Household.
+- **Para el dev:**
+  - `Stat` suma `info` y la `nota` pasa a ser opcional.
+  - `ColumnPicker` suma `porDefecto`.
+  - `RowActionsMenu` suma `onOpenChange`.
+  - `FilaConTooltip` suma `callado`.
+  - `coberturaSeguro` pasa a `data/ledger.ts`.
+  - Decisiones en `ledger.md` (2026-11-12). Storybook sin actualizar.
+
 ### Relationships, buscador con ✕ y New Appointment ordenado como CON-4090 ([#137](https://github.com/JulianGerardi/red-dental-studio/pull/137))
 - **Relationships:** el nombre de quien es paciente linkea a su ficha; el ⋮ queda marcado mientras su menú está
   abierto; Edit Relationship pasa a 560 px como los demás drawers (CON-4139).
