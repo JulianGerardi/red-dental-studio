@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-12
 
-### Documents: nombres reales y Rows per page ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Documents: nombres reales y Rows per page ([#140](https://github.com/JulianGerardi/red-dental-studio/pull/140))
 - **Nombres:** la tabla deja de repetir "Isacc Cihtepin.doc" (venía del Figma). Ahora usa nombres como los de red.dev:
   *Procedure Consent - código y procedimiento*, *Informed Consent / Refusal of Dental Treatment – caso*, del más nuevo al
   más viejo (CON-4143).
