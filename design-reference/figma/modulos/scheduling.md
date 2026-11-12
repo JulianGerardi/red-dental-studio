@@ -724,3 +724,22 @@ confirmación, y tiene que quedar claro cuando no se puede.
 
 **Para el dev:** `AppointmentDetailsDrawer` suma `onDelete?: () => void` (sin la prop no muestra el botón); la pregunta
 la hace el propio componente y llama a `onDelete` ya confirmado. e2e en `tests/scheduling-delete.e2e.ts`.
+
+## CON-4090 · New Appointment: Status arriba, Additional y Notes en el paso 1 (2026-11-12)
+
+Comparativa con red.dev (ticket de diseño aparte) y CON-4090, que pide subir Status: de él dependen los obligatorios
+de abajo (al pasar a Booked o Proposed se piden más datos).
+
+- **Orden del paso 1**, como la imagen de CON-4090 y red.dev: Patient, Primary y Additional Provider; Status y
+  Requestor; Reason for Visit y Date; Start y End Time; Operatory. Se pierde la fecha alineada con Start Time
+  (2026-10-10): Date queda en la columna derecha, arriba de End Time.
+- **Additional (ASAP, Follow-up, Premedicate) y Notes pasan al paso 1**, en tres cajas del mismo ancho desde `sm`. El
+  paso 2 queda sólo para lo que dice su nombre: linkear la visita del plan.
+- **Placeholder de Date**: el del sistema ("Pick a date"). "12-03-2025" parecía una fecha ya cargada.
+- **Horas "01 PM, 02 PM…"** en la agenda del costado, en Start/End Time y en las solicitudes. La anomalía 27 ("13 PM…")
+  se replicaba y llegaba a un select donde se podía elegir "13 PM". `hora24()` en `AppointmentSlotPicker` convierte la
+  franja a la hora del día (Scheduling, Dashboard, Patients, Location → Rooms).
+- **Fecha de la agenda del costado**: la elegida, en inglés ("Thursday, November 19, 2026"); sin fecha, "Select a date".
+  El Figma traía "Sábado, 19 de febrero de 2022".
+- Pendiente (con el texto que apruebe Julián): la bajada "Customize the schedule you want to see" es la del filtro de la
+  agenda, en red.dev y acá.

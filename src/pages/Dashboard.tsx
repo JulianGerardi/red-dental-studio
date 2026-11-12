@@ -21,7 +21,7 @@ import {
 import {
   NewAppointmentModal, type DatosTurno,
 } from '@/components/scheduling/NewAppointmentModal'
-import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
+import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import { formatDMY } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
@@ -152,7 +152,7 @@ export default function Dashboard() {
   /* "10:00" -> "10 AM", la franja con la que trabaja el modal. */
   const franja = (t: string) => {
     const h = Number(t.slice(0, 2))
-    return HORAS.find((x) => Number(x.slice(0, 2)) === h) ?? ''
+    return HORAS.find((x) => hora24(x) === h) ?? ''
   }
 
   /* El kebab abre el mismo modal de alta, con lo que la card ya sabe. */
@@ -182,7 +182,7 @@ export default function Dashboard() {
       initials: d.patient.split(' ').map((x) => x[0]).slice(0, 2).join('').toUpperCase(),
       provider: d.primary,
       operatory: d.operatory,
-      time: d.start.replace(/ (AM|PM)$/, ':00'),
+      time: `${String(hora24(d.start)).padStart(2, '0')}:00`,
     }
     setDias((prev) => reprogramar(prev, origen, destino, turnoNuevo))
     if (destino !== origen.clave) {

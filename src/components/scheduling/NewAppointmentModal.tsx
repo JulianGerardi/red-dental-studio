@@ -163,7 +163,7 @@ export function NewAppointmentModal({
      sale de la lista, no de sumar 1: así 11 AM cae en 12 PM y no en "12 AM". */
   const elegirFranja = (hora: string) => {
     const i = HORAS.indexOf(hora)
-    setD((p) => ({ ...p, date: '12-03-2025', start: hora, end: HORAS[i + 1] ?? hora }))
+    setD((p) => ({ ...p, date: p.date || '12-03-2025', start: hora, end: HORAS[i + 1] ?? hora }))
   }
 
   /* Additional Provider dejó de ser obligatorio en este frame. */
@@ -206,11 +206,12 @@ export function NewAppointmentModal({
       steps={['Patient and Scheduling', 'Link to treatment plan visit']}
       step={paso - 1}
       actions={<DrawerActions step={paso - 1} total={2} onNext={continuar} onBack={() => setPaso(1)} onCancel={onClose} onSave={guardar} />}
-      aside={mostrarPanel ? <AppointmentSlotPicker seleccion={d.start} paciente={d.patient} onPick={elegirFranja} className="h-full rounded-none border-0" /> : undefined}
+      aside={mostrarPanel ? <AppointmentSlotPicker fecha={fecha ? fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : undefined} seleccion={d.start} paciente={d.patient} onPick={elegirFranja} className="h-full rounded-none border-0" /> : undefined}
     >
       {paso === 1 ? (
-        /* Como New Appointment de Confidentally 2.0: una columna, Requestor y Reason, Start y End, Operatory y Status de a
-           dos. Al tocar la fecha o la hora se despliega al costado el calendario del día para elegir la franja. */
+        <div className="flex flex-col gap-6">
+        {/* Una columna, campos de a dos en el orden de CON-4090: Status y Requestor, Reason y Date, Start y End, Operatory.
+           Al tocar la fecha o la hora se despliega al costado el calendario del día para elegir la franja. */}
         <DrawerSection title="Patient and Scheduling" description="Complete the details below to schedule the appointment.">
           <PersonSearchField
             label="Patient" required placeholder="Search by name, number, DOB or email" personas={PACIENTES} subtitulo={pacienteNumero} chips={pacienteChips}
@@ -224,54 +225,55 @@ export function NewAppointmentModal({
             label="Additional Provider" placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
             value={d.additional} onChange={set('additional')}
           />
+          {/* Status arriba, con Requestor: de él dependen los obligatorios de abajo (CON-4090; scheduling.md, 2026-11-12). */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <SelectField label="Status" required value={d.status} onChange={set('status')} error={req('status')} />
             <SelectField label="Requestor" placeholder="Who is requesting?" value={d.requestor} onChange={set('requestor')} />
-            <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />
           </div>
-          {/* onFocus burbujea: uno solo alcanza para la fecha y las horas. Una vez abierto, el calendario se queda. */}
-          <div onFocus={() => setTocoHorario(true)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* La fecha va en la columna izquierda, del ancho de Start Time (Drawer → Specs → Fields). */}
-            <div className="flex flex-col gap-2 sm:col-start-1">
+          {/* Tocar la fecha o una hora despliega el calendario del día al costado; una vez abierto, se queda. */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />
+            <div onFocus={() => setTocoHorario(true)} className="flex flex-col gap-2">
               <FieldLabel required>Date</FieldLabel>
               <DatePicker
                 value={fecha}
                 onChange={(nueva) => { set('date')(formatDMY(nueva)); setTocoHorario(true) }}
-                placeholder="12-03-2025"
                 error={!!req('date')}
                 className="h-9 w-full"
               />
               <FieldError>{req('date')}</FieldError>
             </div>
-            <SelectField label="Start Time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} className="sm:col-start-1" />
+          </div>
+          <div onFocus={() => setTocoHorario(true)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <SelectField label="Start Time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} />
             <SelectField label="End Time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <SelectField label="Operatory" required options={operatorios} value={d.operatory} onChange={set('operatory')} error={req('operatory')} />
-            <SelectField label="Status" required value={d.status} onChange={set('status')} error={req('status')} />
           </div>
         </DrawerSection>
-      ) : (
-        /* Paso 2 de 2.0: el link a una visita del plan (opcional), Additional y las notas. */
-        <div className="flex flex-col gap-6">
-          <DrawerSection title="Link to treatment plan visit" description="Optional. Show this only when the appointment should be tied to a planned treatment visit.">
-            <div className="flex flex-col gap-2">
-              <FieldLabel>Treatment plan</FieldLabel>
-              {PLANES.map((p) => <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />)}
-            </div>
-            <div className="flex flex-col gap-2">
-              <FieldLabel>Visit</FieldLabel>
-              {VISITAS.map((v) => <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />)}
-            </div>
-          </DrawerSection>
-          <DrawerSection title="Additional">
-            <div className="flex flex-col gap-2">
-              <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
-              <OptionCheckbox label="Follow-up" defaultChecked={false} />
-              <OptionCheckbox label="Premedicate" defaultChecked={false} />
-            </div>
-            <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
-          </DrawerSection>
+        {/* Additional y Notes pasan al paso 1, como red.dev y CON-4090: el paso 2 queda sólo para linkear la visita. */}
+        <DrawerSection title="Additional">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
+            <OptionCheckbox label="Follow-up" defaultChecked={false} />
+            <OptionCheckbox label="Premedicate" defaultChecked={false} />
+          </div>
+          <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
+        </DrawerSection>
         </div>
+      ) : (
+        /* Paso 2 de 2.0: el link a una visita del plan (opcional). */
+        <DrawerSection title="Link to treatment plan visit" description="Optional. Show this only when the appointment should be tied to a planned treatment visit.">
+          <div className="flex flex-col gap-2">
+            <FieldLabel>Treatment plan</FieldLabel>
+            {PLANES.map((p) => <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />)}
+          </div>
+          <div className="flex flex-col gap-2">
+            <FieldLabel>Visit</FieldLabel>
+            {VISITAS.map((v) => <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />)}
+          </div>
+        </DrawerSection>
       )}
       {moviendo && elegida?.vinculada && (
         <MoverVisitaDialog visita={elegida.name} turno={elegida.vinculada} onConfirm={terminar} onCancel={() => setMoviendo(false)} />

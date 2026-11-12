@@ -16,7 +16,7 @@ import {
   inicioDeSemana, sumarDias, type EventoConFecha, type ApptState,
   fmtExacta,
 } from '@/components/scheduling/calendar-data'
-import { HORAS } from '@/components/scheduling/AppointmentSlotPicker'
+import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import {
   VistaDia, VistaSemana, VistaMes, type Vista,
 } from '@/components/scheduling/CalendarViews'
@@ -96,7 +96,7 @@ export default function Scheduling() {
     const dia = new Date(yyyy, mm - 1, dd)
     const desde = HORAS.indexOf(d.start)
     const hasta = HORAS.indexOf(d.end)
-    const inicio = desde >= 0 ? Number(d.start.slice(0, 2)) : 9
+    const inicio = desde >= 0 ? hora24(d.start) : 9
     const duracion = desde >= 0 && hasta > desde ? hasta - desde : 1
     const estado = (d.status in BLOCK_STYLE ? d.status : 'Booked') as ApptState
     return {

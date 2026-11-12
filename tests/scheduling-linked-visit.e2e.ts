@@ -12,13 +12,14 @@ async function hastaElPlan(app: any, screen: any) {
   await drawer.getByRole('option', /^John Smith/).tap()
   await drawer.getByRole('combobox', 'Primary Provider').fill('Emily')
   await drawer.getByRole('option', /^Dr. Emily Chen/).tap()
+  // Con "Select": Status, Reason for Visit, Start Time, End Time y Operatory (orden de CON-4090).
   // Tocar Start Time despliega el calendario del día: elegir una franja completa la fecha y las dos horas.
-  await drawer.getByRole('button', /^Select$/).nth(1).tap()
+  await drawer.getByRole('button', /^Select$/).nth(2).tap()
   await screen.getByRole('button', 'Schedule at 10 AM').tap()
-  // Quedan Reason for Visit, Operatory y Status con "Select".
-  await drawer.getByRole('button', /^Select$/).nth(1).tap()
+  // Quedan Status, Reason for Visit y Operatory.
+  await drawer.getByRole('button', /^Select$/).nth(2).tap()
   await drawer.getByRole('button', 'Operatory 1').tap()
-  await drawer.getByRole('button', /^Select$/).nth(1).tap()
+  await drawer.getByRole('button', /^Select$/).nth(0).tap()
   await drawer.getByRole('button', 'Booked').tap()
   await drawer.getByRole('button', /Next Step/).tap()
   return drawer
