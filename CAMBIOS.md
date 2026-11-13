@@ -5,6 +5,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-13
 
+### Billing: un drawer por botón, como red.dev, y Export CSV que descarga ([#143](https://github.com/JulianGerardi/red-dental-studio/pull/143))
+- **Drawers de red.dev:** Patient Payment abre *New Patient Payment (-)*, Credit Adjustment abre *Credit Adjustment (-)* y
+  Charge Adjustment abre *Enter Charge (+) Adjustment*, cada uno con sus campos (CON-4147). Sale el "Post payment" único,
+  con su Type y su buscador de paciente.
+- **Pago:** varios métodos con + / − (Check Payment pide Check y Bank/Branch). **Credit** y **Charge:** los tipos de
+  red.dev; Charge suma Provider y Visit date y no tiene tabla de aplicación.
+- **Export CSV** descarga `billing-activity-<fecha>.csv` con las filas que se ven.
+- **Para el dev:**
+  - `PostPaymentDialog` arma el drawer según `tipoInicial`.
+  - Listas en `data/billing.ts`: `METODOS_PAGO`, `TIPOS_AJUSTE_CREDITO`, `TIPOS_AJUSTE_CARGO`, `PROVIDERS_BILLING`.
+  - Decisiones en `billing.md` (2026-11-13, "Los botones y sus drawers"). Storybook sin actualizar.
+
 ### Billing alineado con red.dev: Export CSV, filtros, Columns y Today ([#142](https://github.com/JulianGerardi/red-dental-studio/pull/142))
 - **Export CSV** arriba a la derecha; con un paciente elegido queda apagado (CON-4147).
 - **Filtros de red.dev:** All, Payments, Adjustments, Today (antes Pt Payment, Charge Adj, Credit Adj).

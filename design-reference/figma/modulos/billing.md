@@ -401,3 +401,28 @@ system: una fila que se despliega no hace otra cosa). Queda a decidir. red.dev m
 
 **Para validar con usuarios:** si Payments/Adjustments alcanza o extrañan filtrar Charge Adj vs Credit Adj; si "—" en
 Trans. Bal. de un pago se entiende mejor que $0.00.
+
+## CON-4147 · Los botones y sus drawers, como red.dev (2026-11-13)
+
+Pedido de Julián: revisar qué hace cada acción y cómo se abren los drawers.
+
+1. **Un drawer por botón.** En red.dev, Billing abre los mismos drawers que el Ledger: *New Patient Payment (-)*,
+   *Credit Adjustment (-)* y *Enter Charge (+) Adjustment*. El "Post payment" único del Figma (con un Type para elegir y
+   un buscador de paciente) sale: el botón ya dice qué se postea y los botones sólo aparecen con un paciente elegido.
+   `PostPaymentDialog` sigue con el mismo nombre y arma el de cada tipo.
+2. **Campos y listas de red.dev** (`METODOS_PAGO`, `TIPOS_AJUSTE_CREDITO`, `TIPOS_AJUSTE_CARGO`, sin las de QA):
+   - Pago: Transaction date, Apply to; Amount y Payment method con + / − para sumar métodos (Check Payment pide Check y
+     Bank/Branch); Notes. Guarda un movimiento por método.
+   - Credit: Transaction date, Apply to, Adjustment type, Amount, Notes.
+   - Charge: Transaction date, Amount, Type, Provider (`PROVIDERS_BILLING`), Apply to, Visit date, Notes. Sin tabla de
+     aplicación y sin pasos, como red.dev.
+3. **Lo que queda con las reglas del drawer:** Ledger Transactions va en un segundo paso (*Allocation*) en vez de debajo
+   de los campos; secciones sin caja; pie de dos botones del mismo ancho (`DrawerActions`, también en Charge).
+4. **Fecha** precargada con `HOY_BILLING`, como red.dev precarga hoy. **Apply to:** el paciente y los de su garante.
+5. **Export CSV** descarga `billing-activity-<fecha>.csv` con las filas que se ven (filtro incluido) y avisa cuántas.
+
+**Diferencias que quedan:** red.dev arranca el pago con el total abierto y lo reparte en Applied; acá arranca vacío
+(lógica, no diseño). El error dice "This field is required." (el del sistema) y no "Amount is required.".
+
+**Para validar con usuarios:** si separar Ledger Transactions en un segundo paso hace más lento el cobro en recepción
+frente a verlo todo junto, como en red.dev.

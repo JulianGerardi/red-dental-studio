@@ -133,6 +133,22 @@ const TIPO_LEDGER: DataTableColumn<FilaBilling> = {
 const columnasDe = (vistaPaciente: boolean) =>
   (vistaPaciente ? COLS_PACIENTE : COLS_ACTIVIDAD).map((k) => (vistaPaciente && k === 'tipo' ? TIPO_LEDGER : TODAS[k]))
 
+/* Export CSV, como red.dev: baja la actividad que se ve (con el filtro elegido), con las columnas de la tabla. */
+function exportarCsv(filas: Movimiento[]) {
+  const celda = (v: string) => `"${v.replaceAll('"', '""')}"`
+  const lineas = [
+    ['Trans. Date', 'Patient / Account', 'Type', 'Description', 'Provider', 'Amount', 'Trans. Bal.', 'Status'],
+    ...filas.map((m) => [
+      m.fecha, m.paciente, detalleTipo(m).texto, m.descripcion, m.provider, moneda(m.monto),
+      esCargo(m) ? moneda(pendienteDe(m, APLICACIONES_BILLING)) : '', m.estado,
+    ]),
+  ].map((l) => l.map(celda).join(','))
+  const url = URL.createObjectURL(new Blob([lineas.join('\n')], { type: 'text/csv' }))
+  const a = Object.assign(document.createElement('a'), { href: url, download: `billing-activity-${HOY_BILLING.replaceAll('/', '-')}.csv` })
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 const initials = (nombre: string) => nombre.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
 
 /* Un resultado de Find Patient: la InnerCard de la lista lateral de Patients. El elegido queda en el celeste del rango
@@ -433,7 +449,7 @@ export default function Billing({ inicial }: {
           variant="secondary"
           disabled={!!seleccionado}
           title={seleccionado ? 'Clear the selected patient to export all activity' : undefined}
-          onClick={() => aviso.ok('Billing activity exported.')}
+          onClick={() => { exportarCsv(filas); aviso.ok(`${filas.length} transactions exported.`) }}
         >
           <Download /> Export CSV
         </Button>

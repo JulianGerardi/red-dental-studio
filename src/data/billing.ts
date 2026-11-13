@@ -121,6 +121,25 @@ export function cargosAbiertos(paciente: string): Movimiento[] {
 export const TIPOS_AJUSTE_BILLING = ['Patient Payment', 'Credit Adjustment', 'Charge Adjustment'] as const
 export type TipoAjusteBilling = (typeof TIPOS_AJUSTE_BILLING)[number]
 
+/* Las listas de los drawers de red.dev (Settings › Ledger), sin las de QA (billing.md, 2026-11-13). */
+export const METODOS_PAGO = [
+  'Cash Payment', 'Check Payment', 'Credit Card Payment', 'Electronic Transfer Payment', 'Insurance Payment - Check',
+  'Insurance Payment - Credit Card', 'Insurance Payment - Electronic',
+] as const
+export const TIPOS_AJUSTE_CREDITO = [
+  'Credit Adjustment', 'Discount', 'Family/Friend Courtesy', 'Full Payment Courtesy', 'Initial Credit Balance Forward',
+  'In-office Write-off', 'Insurance Adjustment', 'Offsetting Adjustment', 'Professional Courtesy', 'Senior Citizen Courtesy',
+  'Staff Courtesy', 'Transfer Credit Balance', 'Write-off',
+] as const
+export const TIPOS_AJUSTE_CARGO = [
+  'Charge Adjustment', 'Collected Bad Debt', 'Credit Card Full Refund', 'Credit Card Independent Refund',
+  'Credit Card Partial Refund', 'Credit Card Void', 'Electronic Check Credit', 'Initial Balance Forward',
+  'Ins Charge Offsetting Adjustment', 'Insurance Adjustment', 'Insurance Over-pmt Refund', 'NSF Bank Fee', 'NSF Check',
+  'Patient Refund', 'Sales Tax', 'Transfer Charge Balance',
+] as const
+/** Los profesionales de la actividad de prueba, para el Provider de Enter Charge (+) Adjustment. */
+export const PROVIDERS_BILLING = [...new Set(Object.values(ACTIVIDAD_POR_PACIENTE).flat().map((m) => m.provider).filter((p) => p.startsWith('Dr')))].sort()
+
 /* Los filtros de red.dev (billing.md, 2026-11-13). */
 export const FILTROS_ACTIVIDAD = ['All', 'Payments', 'Adjustments', 'Today'] as const
 export type FiltroActividad = (typeof FILTROS_ACTIVIDAD)[number]
