@@ -3,6 +3,26 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-13
+
+### Clinical Mode: encuentro de CON-1612, exámenes de red.dev y fechas MM/DD/YYYY ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Encuentro:** tres estados (CON-1612), iguales en la barra de Clinical Mode y en la ficha, que comparten el estado:
+  - *Start Encounter*: desde la ficha lleva a Clinical Mode (CON-2994).
+  - *Complete Encounter*: ofrece firmar la Clinical Note. El menú ofrece *Pause Encounter* y *Discharge Patient*.
+  - *Pending Encounter* (en pausa, ámbar).
+  - Se van las opciones viejas (End / Discard encounter, Encounter settings) y el menú ya no se corta.
+- **Exámenes** con los nombres y el orden de red.dev: Vitals, ROS, Physical, Extraoral, Intraoral, Dental assessment,
+  Periodontal y Radiographic. Salen BMI y ATM/O-F (CON-4144).
+- **Fechas en MM/DD/YYYY** en toda la app (tablas, detalles, cards y campos de fecha; Insurance pide "MM / DD / YY").
+  Los títulos y las frases siguen en texto.
+- **Textos:** "Start Encounter" (antes "Enconter"), "Mark as…", y "Rows per page:" en las tablas de Clinical Mode y en
+  Accounts (antes "Show:" y "Mostrar:").
+- **Para el dev:**
+  - Estado del encuentro en `lib/encuentro.ts` (`useEstadoEncuentro`) y opciones en `OpcionesEncuentro`.
+  - `formatMDY` en `lib/fecha.ts` para mostrar fechas; `formatDMY` queda sólo para las claves internas de la agenda.
+  - `ordenFecha` lee MM/DD.
+  - Decisiones en `clinical-mode.md` (2026-11-13). Storybook sin actualizar.
+
 ## 2026-11-12
 
 ### Documents: nombres reales y Rows per page ([#140](https://github.com/JulianGerardi/red-dental-studio/pull/140))
