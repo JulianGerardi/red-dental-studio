@@ -5,13 +5,14 @@ import {
 import { PageTitle } from '@/components/ui/page-title'
 import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
-import { moneda, type Movimiento } from '@/data/ledger'
+import { moneda, pendienteDe, tieneCredito, type Movimiento } from '@/data/ledger'
 import {
-  APLICACIONES_BILLING, PACIENTES_BILLING, buscarPacientes, grupoDeGarante, ACTIVIDAD_RECIENTE, STATS_BILLING, STATS_HOY, FILTROS_ACTIVIDAD,
+  APLICACIONES_BILLING, PACIENTES_BILLING, buscarPacientes, grupoDeGarante, ACTIVIDAD_RECIENTE, STATS_BILLING, STATS_HOY, FILTROS_ACTIVIDAD, HOY_BILLING,
   VISTAS_PACIENTE, type FiltroActividad, type PacienteBilling, type TipoAjusteBilling, type VistaPaciente,
 } from '@/data/billing'
 import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
-import { DetalleMovimiento, LedgerRowModal } from '@/components/patients/ledger/LedgerRowDetail'
+import { DetalleMovimiento, LedgerRowModal, TONO_TIPO, nombreTipo } from '@/components/patients/ledger/LedgerRowDetail'
+import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { AmountCell, DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { CONTENEDOR_PAGINA, ICONO_SUELTO, TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
@@ -82,28 +83,55 @@ export function Stat({ label, value, caption, info, interna, enFila, compacta, c
    celular 2 + 2 y el último entero. */
 const LUGAR_NUMERO = ['sm:col-span-2', 'sm:col-span-2', 'sm:col-span-2', 'sm:col-span-3', 'col-span-2 sm:col-span-3']
 
-function coincideFiltro(m: Movimiento, f: FiltroActividad) {
+/* Los filtros de red.dev: Payments junta paciente y seguro; Today, lo del día (billing.md, 2026-11-13). */
+export function coincideFiltro(m: Movimiento, f: FiltroActividad) {
   if (f === 'All') return true
-  if (f === 'Pt Payment') return m.tipo === 'Payment'
-  if (f === 'Charge Adj') return m.tipo === 'Adjustment' && m.monto > 0
-  return m.tipo === 'Adjustment' && m.monto < 0
+  if (f === 'Payments') return m.tipo === 'Payment' || m.tipo === 'Insurance'
+  if (f === 'Adjustments') return m.tipo === 'Adjustment'
+  return m.fecha === HOY_BILLING
 }
 
-/* La tabla estándar (ui/data-table) con las columnas de actividad. Compacta:
-   vive adentro de una card. */
-const COLUMNAS: DataTableColumn<Movimiento & { saldo: number }>[] = [
-  { key: 'fecha', header: 'Date', width: 104, cell: (m) => m.fecha },
-  { key: 'paciente', header: 'Patient', width: 124, cell: (m) => <TextCell>{m.paciente}</TextCell> },
-  {
+type FilaBilling = Movimiento & { saldo: number }
+type ColBilling = 'fecha' | 'codigo' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'pendiente' | 'estado'
+
+/* Trans. Bal.: lo que falta del cargo, como el Ledger; un pago o crédito no tiene saldo propio (—). */
+const esCargo = (m: Movimiento) => m.tipo !== 'Insurance' && m.monto > 0
+const TODAS: Record<ColBilling, DataTableColumn<FilaBilling>> = {
+  fecha: { key: 'fecha', header: 'Trans. Date', width: 92, locked: true, cell: (m) => m.fecha },
+  codigo: { key: 'codigo', header: 'CDT Code', width: 64, cell: (m) => <span className="text-[12px] font-medium">{m.tipo === 'Charge' ? m.codigo : '—'}</span> },
+  paciente: { key: 'paciente', header: 'Patient / Account', width: 120, cell: (m) => <TextCell>{m.paciente}</TextCell> },
+  tipo: {
     key: 'tipo', header: 'Type', width: 92, cell: (m) => {
       const t = detalleTipo(m)
       return m.tipo === 'Charge' ? t.texto : <Pill tone={t.tono}>{t.texto}</Pill>
     },
   },
-  { key: 'desc', header: 'Description', cell: (m) => <TextCell>{m.descripcion}</TextCell> },
-  { key: 'provider', header: 'Provider', width: 124, cell: (m) => <TextCell>{m.provider}</TextCell> },
-  { key: 'monto', header: 'Amount', width: 88, align: 'right', cell: (m) => <AmountCell value={m.monto} /> },
-]
+  desc: {
+    key: 'desc', header: 'Description', locked: true, cell: (m) => (
+      <span className="flex w-full min-w-0 flex-col items-start gap-1">
+        <span title={m.descripcion} className="w-full truncate">{m.descripcion}</span>
+        {/* Plata del pago que todavía no se aplicó a un cargo, como red.dev. */}
+        {tieneCredito(m) && <Pill tone="neutral" size="sm" className="whitespace-nowrap">Credit available · {moneda(m.creditoDisponible ?? 0)}</Pill>}
+      </span>
+    ),
+  },
+  provider: { key: 'provider', header: 'Provider', width: 104, cell: (m) => <TextCell>{m.provider}</TextCell> },
+  monto: { key: 'monto', header: 'Amount', width: 84, align: 'right', locked: true, cell: (m) => <AmountCell value={m.monto} /> },
+  pendiente: {
+    key: 'pendiente', header: 'Trans. Bal.', width: 80, align: 'right',
+    cell: (m) => (esCargo(m) ? <span className="tabular-nums">{moneda(pendienteDe(m, APLICACIONES_BILLING))}</span> : <span className="text-ink-faint">—</span>),
+  },
+  estado: { key: 'estado', header: 'Status', width: 72, cell: (m) => <Pill tone={m.estado === 'Pending' ? 'warning' : 'neutral'} size="sm">{m.estado}</Pill> },
+}
+/* Resumen y Guarantor View: las columnas de actividad de red.dev. Patient View: las del Ledger del paciente (CDT Code y el
+   Type con nombre completo), como red.dev, sin Ledger Bal. (los saldos de la cuenta salieron de Billing el 2026-10-19). */
+const COLS_ACTIVIDAD: ColBilling[] = ['fecha', 'paciente', 'tipo', 'desc', 'provider', 'monto', 'pendiente', 'estado']
+const COLS_PACIENTE: ColBilling[] = ['fecha', 'codigo', 'paciente', 'tipo', 'desc', 'provider', 'monto', 'pendiente']
+const TIPO_LEDGER: DataTableColumn<FilaBilling> = {
+  key: 'tipo', header: 'Type', width: 128, cell: (m) => <Pill tone={TONO_TIPO[nombreTipo(m)]} className="whitespace-nowrap">{nombreTipo(m)}</Pill>,
+}
+const columnasDe = (vistaPaciente: boolean) =>
+  (vistaPaciente ? COLS_PACIENTE : COLS_ACTIVIDAD).map((k) => (vistaPaciente && k === 'tipo' ? TIPO_LEDGER : TODAS[k]))
 
 const initials = (nombre: string) => nombre.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
 
@@ -188,6 +216,10 @@ export function ActividadReciente({
 }) {
   /* View full record y la referencia de una aplicación abren la transacción en el registro de sólo lectura del Ledger. */
   const [enModal, setEnModal] = useState<(Movimiento & { saldo: number }) | null>(null)
+  /* Columns va en el encabezado, al lado de las Tabs, como red.dev: la tabla recibe las ocultas de afuera. */
+  const [ocultas, setOcultas] = useState<string[]>([])
+  const columnas = columnasDe(!!paciente && vista === 'Patient View')
+  const elegibles = columnas.filter((c) => !c.locked)
   const ver = (x: Movimiento) => setEnModal(filas.find((f) => f.id === x.id) ?? ACTIVIDAD_RECIENTE.find((f) => f.id === x.id) ?? null)
   return (
     <Panel
@@ -198,13 +230,25 @@ export function ActividadReciente({
           <AccionesPaciente key={paciente.nombre} onAccion={onAccion} onExportar={onExportar} />
         </div>
       )}
-      controls={paciente
-        ? <Tabs size="sm" aria-label="Whose activity" tabs={VISTAS_PACIENTE} value={vista} onChange={onVista} />
-        : <Tabs size="sm" aria-label="Filter activity" tabs={FILTROS_ACTIVIDAD} value={filtro} onChange={onFiltro} />}
+      controls={
+        <div className="flex flex-wrap items-center gap-2">
+          {paciente
+            ? <Tabs size="sm" aria-label="Whose activity" tabs={VISTAS_PACIENTE} value={vista} onChange={onVista} />
+            : <Tabs size="sm" aria-label="Filter activity" tabs={FILTROS_ACTIVIDAD} value={filtro} onChange={onFiltro} />}
+          <ColumnPicker
+            size="sm"
+            columnas={elegibles.map((c) => ({ id: c.key, label: c.header }))}
+            ocultas={ocultas.filter((k) => elegibles.some((c) => c.key === k))}
+            onToggle={(k) => setOcultas((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]))}
+            onReset={() => setOcultas([])}
+          />
+        </div>
+      }
     >
       {/* En el resumen, clic en una fila abre la vista de ese paciente. */}
       <DataTable
-        columns={COLUMNAS}
+        columns={columnas}
+        hiddenColumns={ocultas}
         rows={filas}
         rowKey={(m) => m.id}
         rowLabel={(m) => m.paciente}
@@ -215,7 +259,7 @@ export function ActividadReciente({
         ) : undefined}
         density="compact"
         pageSize={PAGINA_ACTIVIDAD}
-        itemLabel="entries"
+        pageSizeOptions={[PAGINA_ACTIVIDAD, 20, 50]}
         empty={paciente
           ? { icon: CreditCard, title: 'No billing activity yet.', detail: 'Payments and adjustments posted for this patient show up here.' }
           : sinActividad
@@ -263,7 +307,7 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
         <input
           value={busqueda}
           onChange={(e) => onBusqueda(e.target.value)}
-          placeholder="Search by Name, Last Name or Email"
+          placeholder="Search by Name, Last Name, Email or DOB"
           aria-label="Find patient"
           className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-8 pl-8 text-[12px] placeholder:text-ink-faint focus:outline-none"
         />
@@ -382,7 +426,18 @@ export default function Billing({ inicial }: {
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <PageTitle>Billing</PageTitle>
+      {/* Export CSV, como red.dev: la actividad de la clínica; con un paciente elegido se apaga (billing.md, 2026-11-13). */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <PageTitle>Billing</PageTitle>
+        <Button
+          variant="secondary"
+          disabled={!!seleccionado}
+          title={seleccionado ? 'Clear the selected patient to export all activity' : undefined}
+          onClick={() => aviso.ok('Billing activity exported.')}
+        >
+          <Download /> Export CSV
+        </Button>
+      </div>
 
       {/* Bento: la columna derecha toma el alto medido de refIzquierda (--billing-alto, de altoResumen) en vez de
           estirarse contra ella -estirarse las dos entre sí crea un bucle: cuántas filas entran en Find Patient

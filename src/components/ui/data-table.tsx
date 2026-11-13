@@ -49,7 +49,7 @@ const PADDING = 32
 
 export function DataTable<T>({
   columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail, defaultExpanded, reorder,
-  search, filter, columnPicker, resizable, actions,
+  search, filter, columnPicker, hiddenColumns, resizable, actions,
   llenar, pageSize: pageSizeInicial = 10, pageSizeOptions, pageSizeLabel = 'Rows per page:',
   itemLabel = 'results', density = 'regular', selected, onSelectedChange,
   loading, error, disabled, isRowDisabled,
@@ -82,6 +82,8 @@ export function DataTable<T>({
   filter?: { label: string; options: FilterOption[]; match: (row: T, selected: string[]) => boolean }
   /** Botón Columns para elegir qué columnas se ven. */
   columnPicker?: boolean
+  /** Columnas ocultas controladas desde afuera: el Columns va en el encabezado de la card (Billing). */
+  hiddenColumns?: string[]
   /** Bordes de columna que se arrastran para achicar o ensanchar. */
   resizable?: boolean
   /** A la derecha de la barra: acción principal, exportar… */
@@ -124,7 +126,8 @@ export function DataTable<T>({
   }
   const [q, setQ] = useState('')
   const [filtro, setFiltro] = useState<string[]>([])
-  const [ocultas, setOcultas] = useState<string[]>(() => columns.filter((c) => c.hidden && !c.locked).map((c) => c.key))
+  const [ocultasPropias, setOcultas] = useState<string[]>(() => columns.filter((c) => c.hidden && !c.locked).map((c) => c.key))
+  const ocultas = hiddenColumns ?? ocultasPropias
   const [abiertas, setAbiertas] = useState<string[]>(defaultExpanded ?? [])
   const refVisible = useAnchoVisible<HTMLDivElement>()
   const arrastrada = useRef<T | null>(null)

@@ -35,7 +35,7 @@ export function ColumnPicker<T extends string>({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
         <DropdownMenuLabel className="text-[11px] tracking-wide text-ink-muted uppercase">
-          Show columns
+          Visible columns
         </DropdownMenuLabel>
         {columnas.map((c) => (
           <DropdownMenuCheckboxItem

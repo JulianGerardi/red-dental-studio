@@ -6,7 +6,7 @@ import { expect } from 'e2e'
 test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor View y los botones; la X vuelve al resumen', async ({ app, screen }) => {
   await app.open('/billing')
   await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
-  await expect(screen.getByText(/Showing 1 to 8 of 21 entries/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 8 of 21 results/)).toBeVisible()
 
   const maria = screen.getByRole('button', /Maria Abril Viola/)
   await maria.tap()
@@ -14,15 +14,15 @@ test('Elegir un paciente muestra sólo lo suyo, Patient / Guarantor View y los b
   await expect(screen.getByRole('heading', 'Maria Abril Viola — Recent Billing Activity')).toBeVisible()
   await expect(screen.getByText(/Patient · Guarantor: John Hayes/)).toBeVisible()
   await expect(screen.getByRole('button', /Patient Payment/)).toBeVisible()
-  await expect(screen.getByText(/Showing 1 to 2 of 2 entries/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
 
   await screen.getByRole('tab', 'Guarantor View').tap()
-  await expect(screen.getByText(/Showing 1 to 8 of 8 entries/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 8 of 8 results/)).toBeVisible()
 
   await screen.getByRole('button', 'Clear selected patient').tap()
   await expect(screen.getByRole('heading', 'Recent Billing Activity')).toBeVisible()
   await expect(screen.getByRole('button', /Patient Payment/)).toHaveCount(0)
-  await expect(screen.getByText(/Showing 1 to 8 of 21 entries/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 8 of 21 results/)).toBeVisible()
   await expect(maria).not.toHaveAttribute('aria-current')
 })
 
@@ -31,7 +31,7 @@ test('En el resumen, una fila abre la vista de ese paciente en Patient View', as
   await screen.getByRole('row', /Lucía Paz/).first().tap()
   await expect(screen.getByRole('heading', 'Lucía Paz — Recent Billing Activity')).toBeVisible()
   await expect(screen.getByRole('tab', 'Patient View')).toHaveAttribute('aria-selected', 'true')
-  await expect(screen.getByText(/Showing 1 to 2 of 2 entries/)).toBeVisible()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
 })
 
 test('El círculo de info de un número explica qué cuenta', async ({ app, screen }) => {
@@ -79,4 +79,25 @@ test('Find Patient muestra algunos pacientes y Show more abre el resto', async (
   await expect(screen.getByRole('region', 'All patients')).toBeVisible()
   const despues = await filas.count()
   expect(despues).toBeGreaterThan(antes)
+})
+
+test('Filtros, Columns y Export CSV como red.dev', async ({ app, screen }) => {
+  await app.open('/billing')
+  await screen.getByRole('tab', 'Payments').tap()
+  await expect(screen.getByText(/Showing 1 to 8 of 9 results/)).toBeVisible()
+  await screen.getByRole('tab', 'Adjustments').tap()
+  await expect(screen.getByText(/Showing 1 to 4 of 4 results/)).toBeVisible()
+  await screen.getByRole('tab', 'Today').tap()
+  await expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeVisible()
+  await expect(screen.getByText(/Credit available · \$100\.00/)).toBeVisible()
+
+  await expect(screen.getByRole('columnheader', 'Status')).toBeVisible()
+  await screen.getByRole('button', /Columns/).tap()
+  await screen.getByRole('menuitemcheckbox', 'Status').tap()
+  await screen.getByRole('menuitemcheckbox', 'Status').press('Escape')
+  await expect(screen.getByRole('columnheader', 'Status')).toHaveCount(0)
+
+  await expect(screen.getByRole('button', /Export CSV/)).toBeEnabled()
+  await screen.getByRole('button', /John Hayes/).first().tap()
+  await expect(screen.getByRole('button', /Export CSV/)).toBeDisabled()
 })

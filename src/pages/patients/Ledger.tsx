@@ -23,11 +23,11 @@ import { tratamientoDe } from '@/components/clinical/RecordDetail'
 import { PROCEDIMIENTOS } from '@/data/clinical-mode'
 import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
-import { Pill, type PillTone } from '@/components/ui/pill'
+import { Pill } from '@/components/ui/pill'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
-import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip, tipoDetalle } from '@/components/patients/ledger/LedgerRowDetail'
+import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip, TONO_TIPO, nombreTipo } from '@/components/patients/ledger/LedgerRowDetail'
 import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
 import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
 import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
@@ -40,11 +40,6 @@ import { formatMDY } from '@/lib/fecha'
 
 /* Type con los nombres de CON-3753 (Procedure, Patient Payment…); el código va en su propia columna, CDT Code.
    Ver ledger.md (2026-11-12). */
-const TONO_TIPO: Record<string, PillTone> = {
-  Procedure: 'neutral', 'Charge Adjustment': 'danger', 'Patient Payment': 'info', 'Credit Adjustment': 'neutral',
-  'Insurance Payment': 'purple',
-}
-const nombreTipo = (m: Movimiento) => tipoDetalle(m) ?? 'Insurance Payment'
 /** Un cargo (procedimiento o Charge Adjustment): lo que tiene saldo propio. */
 const esCargo = (m: Movimiento) => m.tipo !== 'Insurance' && m.monto > 0
 
