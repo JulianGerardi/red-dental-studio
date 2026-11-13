@@ -51,17 +51,18 @@ test('Pending Signature aparece al dejar la Clinical Note sin firmar y se va al 
   await app.open('/patients/1')
   await expect(screen.getByRole('button', /Pending Signature/)).toHaveCount(0)
   await screen.getByRole('link', 'Clinical Mode').tap()
-  await screen.getByRole('button', 'Encounter options').tap()
-  await screen.getByRole('button', 'End encounter').tap()
+  // Encuentro de CON-1612: se empieza y se completa (clinical-mode.md, 2026-11-13).
+  await screen.getByRole('button', /Start Encounter/).first().tap()
+  await screen.getByRole('button', /Complete Encounter/).first().tap()
   await screen.getByRole('button', 'Remind me later').tap()
   await screen.getByRole('link', 'Exit clinical Mode').tap()
 
   await expect(screen.getByRole('button', /Pending Signature/)).toBeVisible()
-  await expect(screen.getByRole('button', /Start Enconter/)).toHaveCount(0)
+  await expect(screen.getByRole('button', /Start Encounter/)).toHaveCount(0)
   await expect(screen.getByRole('button', 'Encounter options')).toHaveCount(0)
 
   await screen.getByRole('button', /Pending Signature/).tap()
   await screen.getByRole('button', 'Review and sign').tap()
   await expect(screen.getByRole('button', /Pending Signature/)).toHaveCount(0)
-  await expect(screen.getByRole('button', /Start Enconter/)).toBeVisible()
+  await expect(screen.getByRole('button', /Start Encounter/)).toBeVisible()
 })

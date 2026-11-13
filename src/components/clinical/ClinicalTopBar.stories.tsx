@@ -8,14 +8,14 @@ const meta = {
   component: ClinicalTopBar,
   parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   decorators: [conPacientes],
-  args: { volverA: '/patients/patient-0001', encuentro: false, onEncuentro: () => {}, onOverview: () => {}, enOverview: false },
+  args: { volverA: '/patients/patient-0001', encuentro: 'sinEmpezar', onEncuentro: () => {}, onOverview: () => {}, enOverview: false },
 } satisfies Meta<typeof ClinicalTopBar>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
-export const EncounterStarted: Story = { args: { encuentro: true } }
+export const EncounterStarted: Story = { args: { encuentro: 'enCurso' } }
 
 /* Contador abierto: la lista de lo que tiene el paciente en un popover. */
 export const CounterOpen: Story = { play: secuencia(pulsar(/^medications/i), esperar(/ibuprofeno/i)) }

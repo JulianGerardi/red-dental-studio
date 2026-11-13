@@ -3,7 +3,7 @@ import { Drawer, DrawerSection, useEnDrawer, type DrawerSize } from '@/component
 import { ChevronDown, Calendar, Check, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Chip, type ChipTone } from '@/components/ui/chip'
-import { DatePicker, formatDMY } from '@/components/ui/date-picker'
+import { DatePicker, formatMDY } from '@/components/ui/date-picker'
 import { Avatar, inicialesDe } from '@/components/ui/avatar'
 import { CountryFlag } from '@/components/ui/country-flag'
 import { OPCIONES_CODIGO, paisDe } from '@/data/paises'
@@ -270,7 +270,7 @@ export function DateField({
   onChange?: (texto: string) => void
   error?: string
   placeholder?: string
-  /** Una fecha ya cargada, como la devuelve onChange ("April 2, 2025"): Edit Patient abre con el nacimiento puesto. */
+  /** Una fecha ya cargada, como la devuelve onChange ("04/02/2025"): Edit Patient abre con el nacimiento puesto. */
   valorInicial?: string
 }) {
   const [value, setValueRaw] = useState<Date | null>(() => {
@@ -279,7 +279,7 @@ export function DateField({
   })
   const setValue = (d: Date | null) => {
     setValueRaw(d)
-    if (d && onChange) onChange(d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }))
+    if (d && onChange) onChange(formatMDY(d))
   }
   return (
     <div className={cn('flex flex-col gap-2', className)}>
@@ -308,7 +308,7 @@ export function DateField({
         </div>
       )}
       <FieldError>{error}</FieldError>
-      <span className="sr-only">{value ? formatDMY(value) : 'sin fecha'}</span>
+      <span className="sr-only">{value ? formatMDY(value) : 'sin fecha'}</span>
     </div>
   )
 }
@@ -703,7 +703,7 @@ export function PersonSearchField({
   )
 }
 
-/* El Figma pide una fecha tipeada con placeholder "DD / MM / YY", no el
+/* El Figma pide una fecha tipeada con placeholder "DD / MM / YY" (pasó a "MM / DD / YY", como red.dev), no el
    calendario. Se formatea sola a medida que se escribe. */
 export function DateTextField({
   label, required, className, value = '', onChange, error, hint, disabled,
@@ -727,7 +727,7 @@ export function DateTextField({
       <input
         inputMode="numeric"
         value={value}
-        placeholder="DD / MM / YY"
+        placeholder="MM / DD / YY"
         aria-invalid={!!error || undefined}
         disabled={disabled}
         onChange={(e) => onChange?.(formatear(e.target.value))}

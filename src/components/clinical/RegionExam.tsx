@@ -4,7 +4,7 @@ import { ExamFindingsProvider, ExamLayout, useFindingsEstado } from './ExamLayou
 import { RegionConditionDrawer, type RegionConditionDraft } from './dental/RegionConditionDrawer'
 import { textoDescriptores } from './dental/DescriptorFields'
 
-const HOY = 'May 14, 2026'
+const HOY = '05/14/2026'
 
 /* Estados que cuentan como "la región tiene una condition activa" en el gráfico: lo mismo que marca una FindingCard
    en cualquier otro examen. */

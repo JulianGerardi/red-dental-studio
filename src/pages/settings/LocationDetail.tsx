@@ -30,6 +30,7 @@ import {
   HORARIO_SEMANAL, SALAS_INICIALES, EXCEPCIONES_INICIALES,
   type Sala, type TurnoSala, type Excepcion,
 } from '@/data/location-detail'
+import { formatMDY } from '@/lib/fecha'
 
 /* Figma 3864:277885 "Settings — Location": Information / Working Hours /
    Rooms / Exceptions. Reemplaza lo que había antes en esta ruta —la ficha de
@@ -429,7 +430,7 @@ export function ExceptionsTab() {
               <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink">{e.nombre}</span>
               <span className="flex shrink-0 items-center gap-1.5 text-[12px] text-ink-muted">
                 <CalendarDays className="size-3.5" />
-                {e.fecha.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                {formatMDY(e.fecha)}
               </span>
               <button
                 type="button"

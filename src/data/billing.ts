@@ -45,41 +45,41 @@ export function buscarPacientes(q: string): PacienteBilling[] {
    filas se intercalan por fecha para armar el feed "reciente". */
 const ACTIVIDAD_POR_PACIENTE: Record<string, Omit<Movimiento, 'id' | 'paciente' | 'saldo'>[]> = {
   'John Hayes': [
-    { fecha: 'May 15, 2026', codigo: '—', descripcion: 'Check Payment $30.00', provider: 'Dr Alison Hayes', tipo: 'Payment', monto: -30, estado: 'Posted', metodos: [{ metodo: 'Check payment', monto: 30 }] },
-    { fecha: 'May 16, 2026', codigo: '—', descripcion: 'Charge Adjustment', provider: 'Dr Alison Hayes', tipo: 'Adjustment', monto: 30, estado: 'Posted' },
-    { fecha: 'May 17, 2026', codigo: '—', descripcion: 'Family/Friend Courtesy', provider: 'Dr Alison Hayes', tipo: 'Adjustment', monto: -30, estado: 'Posted' },
-    { fecha: 'May 18, 2026', codigo: '—', descripcion: 'Electronic Payment $30.00', provider: 'Dr Alison Hayes', tipo: 'Insurance', monto: -30, estado: 'Posted' },
-    { fecha: 'May 19, 2026', codigo: 'D1231', descripcion: 'Bitewings – four radiographic images', provider: 'Dr Alison Hayes', tipo: 'Charge', monto: 210, estado: 'Posted' },
-    { fecha: 'May 20, 2026', codigo: '—', descripcion: 'Discount', provider: 'Dr Alison Hayes', tipo: 'Adjustment', monto: -30, estado: 'Posted' },
+    { fecha: '05/15/2026', codigo: '—', descripcion: 'Check Payment $30.00', provider: 'Dr Alison Hayes', tipo: 'Payment', monto: -30, estado: 'Posted', metodos: [{ metodo: 'Check payment', monto: 30 }] },
+    { fecha: '05/16/2026', codigo: '—', descripcion: 'Charge Adjustment', provider: 'Dr Alison Hayes', tipo: 'Adjustment', monto: 30, estado: 'Posted' },
+    { fecha: '05/17/2026', codigo: '—', descripcion: 'Family/Friend Courtesy', provider: 'Dr Alison Hayes', tipo: 'Adjustment', monto: -30, estado: 'Posted' },
+    { fecha: '05/18/2026', codigo: '—', descripcion: 'Electronic Payment $30.00', provider: 'Dr Alison Hayes', tipo: 'Insurance', monto: -30, estado: 'Posted' },
+    { fecha: '05/19/2026', codigo: 'D1231', descripcion: 'Bitewings – four radiographic images', provider: 'Dr Alison Hayes', tipo: 'Charge', monto: 210, estado: 'Posted' },
+    { fecha: '05/20/2026', codigo: '—', descripcion: 'Discount', provider: 'Dr Alison Hayes', tipo: 'Adjustment', monto: -30, estado: 'Posted' },
   ],
   'Maria Abril Viola': [
-    { fecha: 'May 18, 2026', codigo: 'D1110', descripcion: 'Prophylaxis – adult', provider: 'Dr Emily Chen', tipo: 'Charge', monto: 120, estado: 'Posted' },
-    { fecha: 'May 19, 2026', codigo: '—', descripcion: 'Card Payment ····5521', provider: 'Front desk', tipo: 'Payment', monto: -90, estado: 'Posted', metodos: [{ metodo: 'Card payment', ref: '····5521', monto: 90 }] },
+    { fecha: '05/18/2026', codigo: 'D1110', descripcion: 'Prophylaxis – adult', provider: 'Dr Emily Chen', tipo: 'Charge', monto: 120, estado: 'Posted' },
+    { fecha: '05/19/2026', codigo: '—', descripcion: 'Card Payment ····5521', provider: 'Front desk', tipo: 'Payment', monto: -90, estado: 'Posted', metodos: [{ metodo: 'Card payment', ref: '····5521', monto: 90 }] },
   ],
   'Brent Crosby': [
-    { fecha: 'May 12, 2026', codigo: 'D7450', descripcion: 'Removal of benign odontogenic cyst', provider: 'Dr Konstantinos Papadopoulos', tipo: 'Charge', monto: 500, estado: 'Posted', diente: '3' },
-    { fecha: 'May 14, 2026', codigo: '—', descripcion: 'Insurance Payment – Delta Dental', provider: 'Delta Dental', tipo: 'Insurance', monto: -250, estado: 'Posted' },
-    { fecha: 'May 16, 2026', codigo: '—', descripcion: 'Check Payment $30.00', provider: 'Front desk', tipo: 'Payment', monto: -30, estado: 'Posted', metodos: [{ metodo: 'Check payment', monto: 30 }] },
+    { fecha: '05/12/2026', codigo: 'D7450', descripcion: 'Removal of benign odontogenic cyst', provider: 'Dr Konstantinos Papadopoulos', tipo: 'Charge', monto: 500, estado: 'Posted', diente: '3' },
+    { fecha: '05/14/2026', codigo: '—', descripcion: 'Insurance Payment – Delta Dental', provider: 'Delta Dental', tipo: 'Insurance', monto: -250, estado: 'Posted' },
+    { fecha: '05/16/2026', codigo: '—', descripcion: 'Check Payment $30.00', provider: 'Front desk', tipo: 'Payment', monto: -30, estado: 'Posted', metodos: [{ metodo: 'Check payment', monto: 30 }] },
   ],
   'Diego Molina': [
-    { fecha: 'May 10, 2026', codigo: 'D2740', descripcion: 'Crown – porcelain/ceramic', provider: 'Dr Salgado', tipo: 'Charge', monto: 1270, estado: 'Pending', diente: '19' },
-    { fecha: 'May 13, 2026', codigo: '—', descripcion: 'Professional Courtesy', provider: 'Dr Salgado', tipo: 'Adjustment', monto: -410, estado: 'Posted' },
+    { fecha: '05/10/2026', codigo: 'D2740', descripcion: 'Crown – porcelain/ceramic', provider: 'Dr Salgado', tipo: 'Charge', monto: 1270, estado: 'Pending', diente: '19' },
+    { fecha: '05/13/2026', codigo: '—', descripcion: 'Professional Courtesy', provider: 'Dr Salgado', tipo: 'Adjustment', monto: -410, estado: 'Posted' },
   ],
   'Sophie Tran': [
-    { fecha: 'May 9, 2026', codigo: 'D6010', descripcion: 'Surgical placement of implant body', provider: 'Dr Konstantinos Papadopoulos', tipo: 'Charge', monto: 4850, estado: 'Pending', diente: '30' },
-    { fecha: 'May 15, 2026', codigo: '—', descripcion: 'Wire Transfer Received', provider: 'Front desk', tipo: 'Payment', monto: -2710, estado: 'Posted', metodos: [{ metodo: 'Wire transfer', monto: 2710 }] },
+    { fecha: '05/09/2026', codigo: 'D6010', descripcion: 'Surgical placement of implant body', provider: 'Dr Konstantinos Papadopoulos', tipo: 'Charge', monto: 4850, estado: 'Pending', diente: '30' },
+    { fecha: '05/15/2026', codigo: '—', descripcion: 'Wire Transfer Received', provider: 'Front desk', tipo: 'Payment', monto: -2710, estado: 'Posted', metodos: [{ metodo: 'Wire transfer', monto: 2710 }] },
   ],
   'Nadia Duarte': [
-    { fecha: 'May 11, 2026', codigo: 'D0150', descripcion: 'Comprehensive oral evaluation', provider: 'Dr Emily Chen', tipo: 'Charge', monto: 95, estado: 'Posted' },
-    { fecha: 'May 14, 2026', codigo: '—', descripcion: 'Card Payment ····0412', provider: 'Front desk', tipo: 'Payment', monto: -95, estado: 'Posted' },
+    { fecha: '05/11/2026', codigo: 'D0150', descripcion: 'Comprehensive oral evaluation', provider: 'Dr Emily Chen', tipo: 'Charge', monto: 95, estado: 'Posted' },
+    { fecha: '05/14/2026', codigo: '—', descripcion: 'Card Payment ····0412', provider: 'Front desk', tipo: 'Payment', monto: -95, estado: 'Posted' },
   ],
   'Tomás Rivas': [
-    { fecha: 'May 12, 2026', codigo: 'D1120', descripcion: 'Prophylaxis – child', provider: 'Dr Emily Chen', tipo: 'Charge', monto: 85, estado: 'Posted' },
-    { fecha: 'May 17, 2026', codigo: '—', descripcion: 'Insurance Payment – Cigna', provider: 'Cigna', tipo: 'Insurance', monto: -60, estado: 'Posted' },
+    { fecha: '05/12/2026', codigo: 'D1120', descripcion: 'Prophylaxis – child', provider: 'Dr Emily Chen', tipo: 'Charge', monto: 85, estado: 'Posted' },
+    { fecha: '05/17/2026', codigo: '—', descripcion: 'Insurance Payment – Cigna', provider: 'Cigna', tipo: 'Insurance', monto: -60, estado: 'Posted' },
   ],
   'Lucía Paz': [
-    { fecha: 'May 13, 2026', codigo: 'D2391', descripcion: 'Resin-based composite – one surface', provider: 'Dr Salgado', tipo: 'Charge', monto: 180, estado: 'Posted', diente: '14' },
-    { fecha: 'May 20, 2026', codigo: '—', descripcion: 'Check Payment $100.00', provider: 'Front desk', tipo: 'Payment', monto: -100, estado: 'Posted' },
+    { fecha: '05/13/2026', codigo: 'D2391', descripcion: 'Resin-based composite – one surface', provider: 'Dr Salgado', tipo: 'Charge', monto: 180, estado: 'Posted', diente: '14' },
+    { fecha: '05/20/2026', codigo: '—', descripcion: 'Check Payment $100.00', provider: 'Front desk', tipo: 'Payment', monto: -100, estado: 'Posted' },
   ],
 }
 
@@ -97,15 +97,15 @@ const aplica = (paciente: string, origen: number, cargo: number, fecha: string, 
   ({ id: `ap-${paciente}-${origen}-${cargo}`, origen: fila(paciente, origen), cargo: fila(paciente, cargo), fecha, monto })
 
 export const APLICACIONES_BILLING: Aplicacion[] = [
-  aplica('John Hayes', 0, 1, 'May 16, 2026', 30),
-  aplica('John Hayes', 2, 4, 'May 19, 2026', 30),
-  aplica('John Hayes', 3, 4, 'May 19, 2026', 30),
-  aplica('John Hayes', 5, 4, 'May 20, 2026', 30),
-  aplica('Maria Abril Viola', 1, 0, 'May 19, 2026', 90),
-  aplica('Brent Crosby', 1, 0, 'May 14, 2026', 250),
-  aplica('Brent Crosby', 2, 0, 'May 16, 2026', 30),
-  aplica('Diego Molina', 1, 0, 'May 13, 2026', 410),
-  aplica('Sophie Tran', 1, 0, 'May 15, 2026', 2710),
+  aplica('John Hayes', 0, 1, '05/16/2026', 30),
+  aplica('John Hayes', 2, 4, '05/19/2026', 30),
+  aplica('John Hayes', 3, 4, '05/19/2026', 30),
+  aplica('John Hayes', 5, 4, '05/20/2026', 30),
+  aplica('Maria Abril Viola', 1, 0, '05/19/2026', 90),
+  aplica('Brent Crosby', 1, 0, '05/14/2026', 250),
+  aplica('Brent Crosby', 2, 0, '05/16/2026', 30),
+  aplica('Diego Molina', 1, 0, '05/13/2026', 410),
+  aplica('Sophie Tran', 1, 0, '05/15/2026', 2710),
 ]
 
 export function saldoDe(paciente: string): number {

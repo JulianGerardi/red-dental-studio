@@ -4,6 +4,7 @@ import {
 } from '@/components/patients/form'
 import { DatePicker } from '@/components/ui/date-picker'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { formatMDY } from '@/lib/fecha'
 
 /* Figma 4582:25840. El título es "Enter Charge (+) Adjustment", como red.dev (ledger.md, 2026-11-12). */
 
@@ -35,7 +36,7 @@ export function ChargeAdjustmentPanel({
     if (!fecha || !monto.trim() || !aplicaA.trim()) return
     const valor = Number(monto) || 0
     onGuardar({
-      fecha: fecha.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      fecha: formatMDY(fecha),
       paciente: aplicaA,
       codigo: '—',
       descripcion: tipo,

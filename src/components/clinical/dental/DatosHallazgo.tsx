@@ -42,12 +42,12 @@ export function FilaNombre({ nombre, estado, tono = 'success' }: {
   )
 }
 
-/** "May 14, 2026" -> "14 / 05 / 2026", como lo muestra el Figma; si no se puede leer, el texto tal cual. */
+/** "05/14/2026" -> "05 / 14 / 2026", mes/día como red.dev (clinical-mode.md, 2026-11-13); si no se puede leer, el texto tal cual. */
 export function fechaCorta(texto: string) {
   const d = new Date(texto)
   if (Number.isNaN(d.getTime())) return texto
   const dd = String(d.getDate()).padStart(2, '0'), mm = String(d.getMonth() + 1).padStart(2, '0')
-  return `${dd} / ${mm} / ${d.getFullYear()}`
+  return `${mm} / ${dd} / ${d.getFullYear()}`
 }
 
 export const mayuscula = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)

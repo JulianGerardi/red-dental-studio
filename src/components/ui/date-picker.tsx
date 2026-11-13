@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Calendar, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
+import { formatMDY } from '@/lib/fecha'
 
 /* Trigger: mismo tratamiento que el resto de los inputs de la app
    (h-8, radio 6, borde `line`, sombra sutil, 13px). El Figma lo trae con
@@ -24,7 +25,9 @@ export const MONTHS = [
 export const formatDMY = (d: Date) =>
   `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`
 
-/** "Feb 28, 2026": la fecha para leer en una barra. dd-mm-aaaa queda para los formularios. */
+export { formatMDY }
+
+/** "Feb 28, 2026": la fecha para leer en una barra, como un título. */
 export const formatLargo = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 
 export const sameDay = (a: Date, b: Date) =>
@@ -200,7 +203,7 @@ export function DatePicker({
           )}
         >
           <Calendar aria-hidden />
-          {value ? (variant === 'toolbar' ? formatLargo(value) : formatDMY(value)) : placeholder}
+          {value ? (variant === 'toolbar' ? formatLargo(value) : formatMDY(value)) : placeholder}
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" collisionPadding={12} aria-label="Select date" className={POPOVER_FECHA}>

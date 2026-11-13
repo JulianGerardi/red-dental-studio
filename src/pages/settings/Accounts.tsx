@@ -128,7 +128,6 @@ export function SettingsAccounts() {
           /* "Mostrar" en castellano en una pantalla en inglés: así viene en el
              diseño y el contenido se replica tal cual. */
           pageSizeOptions={[10, 25, 50]}
-          pageSizeLabel="Mostrar:"
           empty={{ icon: Building2, title: 'No accounts', detail: 'Nothing matches the current search or filter.' }}
           rowActions={(c) => (
             <>

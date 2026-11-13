@@ -53,7 +53,7 @@ test('New Subscription pide carrier y plan, no deja duplicar y la nueva queda el
   await drawer.getByPlaceholder('Select plan').tap()
   await drawer.getByRole('button', 'PPO Premiun Plan').tap()
   await drawer.getByPlaceholder('123456').fill('ABC-1')
-  await drawer.getByPlaceholder('DD / MM / YY').first().fill('010326')
+  await drawer.getByPlaceholder('MM / DD / YY').first().fill('010326')
   await drawer.getByRole('button', 'Save').tap()
   await expect(drawer.getByText('Duplicate subscription')).toBeVisible()
 

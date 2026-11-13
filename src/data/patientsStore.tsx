@@ -60,22 +60,22 @@ const DETALLE_SEMILLA: Record<string, Partial<DatosPaciente>> = {
 
 /* El paciente del dashboard (/patients/john-smith) no está en la tabla. */
 export const DATOS_JOHN_SMITH: DatosPaciente = {
-  ...VACIO_PACIENTE, first: 'John', last: 'Smith', birthday: 'January 28, 1999', email: 'john.smith@hotmail.com', portal: true,
+  ...VACIO_PACIENTE, first: 'John', last: 'Smith', birthday: '01/28/1999', email: 'john.smith@hotmail.com', portal: true,
   phone: '(555) 010-4477', language: 'Spanish', address: '456 Oak Avenue', city: 'Los Angeles', zip: '90012',
 }
 
 const SEMILLA: PatientRow[] = [
-  { id: 'abril-viola', name: 'Abril Viola', initials: 'av', birthday: 'April 2, 2025', email: 'Abril@gmail.com', status: 'Active' },
-  { id: 'marco-rivera', name: 'Marco Rivera', initials: 'mr', birthday: 'Jan 15, 2025', email: 'marco.r@gmail.com', status: 'Active' },
-  { id: 'sofia-chen', name: 'Sofia Chen', initials: 'sc', birthday: 'Mar 8, 2025', email: 'sofia.chen@mail.com', status: 'Inactive' },
-  { id: 'daniel-ortiz', name: 'Daniel Ortiz', initials: 'do', birthday: 'Feb 20, 2025', email: 'd.ortiz@outlook.com', status: 'Active' },
-  { id: 'thomas-davis', name: 'Thomas Davis', initials: 'td', birthday: 'May 30, 2025', email: 'thomas.davis@email.com', status: 'Active' },
-  { id: 'lena-park', name: 'Lena Park', initials: 'lp', birthday: 'May 11, 2025', email: 'lena.park@email.com', status: 'Inactive' },
-  { id: 'mark-wilson', name: 'Mark Wilson', initials: 'mw', birthday: 'June 2, 2025', email: 'mark.wilson@email.com', status: 'Active' },
-  { id: 'sophia-johnson', name: 'Sophia Johnson', initials: 'sj', birthday: 'April 20, 2025', email: 'sophia.johnson@email.com', status: 'Active' },
-  { id: 'robert-brown', name: 'Robert Brown', initials: 'rb', birthday: 'March 15, 2025', email: 'robert.brown@email.com', status: 'Inactive' },
-  { id: 'emily-clark', name: 'Emily Clark', initials: 'ec', birthday: 'July 8, 2025', email: 'emily.clark@email.com', status: 'Active' },
-  { id: 'james-wilson', name: 'James Wilson', initials: 'jw', birthday: 'Jun 3, 2025', email: 'j.wilson@corp.com', status: 'Active' },
+  { id: 'abril-viola', name: 'Abril Viola', initials: 'av', birthday: '04/02/2025', email: 'Abril@gmail.com', status: 'Active' },
+  { id: 'marco-rivera', name: 'Marco Rivera', initials: 'mr', birthday: '01/15/2025', email: 'marco.r@gmail.com', status: 'Active' },
+  { id: 'sofia-chen', name: 'Sofia Chen', initials: 'sc', birthday: '03/08/2025', email: 'sofia.chen@mail.com', status: 'Inactive' },
+  { id: 'daniel-ortiz', name: 'Daniel Ortiz', initials: 'do', birthday: '02/20/2025', email: 'd.ortiz@outlook.com', status: 'Active' },
+  { id: 'thomas-davis', name: 'Thomas Davis', initials: 'td', birthday: '05/30/2025', email: 'thomas.davis@email.com', status: 'Active' },
+  { id: 'lena-park', name: 'Lena Park', initials: 'lp', birthday: '05/11/2025', email: 'lena.park@email.com', status: 'Inactive' },
+  { id: 'mark-wilson', name: 'Mark Wilson', initials: 'mw', birthday: '06/02/2025', email: 'mark.wilson@email.com', status: 'Active' },
+  { id: 'sophia-johnson', name: 'Sophia Johnson', initials: 'sj', birthday: '04/20/2025', email: 'sophia.johnson@email.com', status: 'Active' },
+  { id: 'robert-brown', name: 'Robert Brown', initials: 'rb', birthday: '03/15/2025', email: 'robert.brown@email.com', status: 'Inactive' },
+  { id: 'emily-clark', name: 'Emily Clark', initials: 'ec', birthday: '07/08/2025', email: 'emily.clark@email.com', status: 'Active' },
+  { id: 'james-wilson', name: 'James Wilson', initials: 'jw', birthday: '06/03/2025', email: 'j.wilson@corp.com', status: 'Active' },
 ]
 
 /* Se exporta: lo usa también AppointmentCardCompacta (dashboard/AppointmentCard.tsx) para armar el id del paciente a

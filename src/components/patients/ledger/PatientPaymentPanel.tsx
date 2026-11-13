@@ -6,6 +6,7 @@ import {
 import { DatePicker } from '@/components/ui/date-picker'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { formatMDY } from '@/lib/fecha'
 
 /* Figma 4582:29545 / 4582:29862. Ver design-reference/figma/modulos/ledger.md. */
 
@@ -42,7 +43,7 @@ export function PatientPaymentPanel({
       || metodos.some((f) => !f.monto.trim() || (f.metodo === 'Check payment' && (!f.cheque.trim() || !f.banco.trim())))
     if (faltaAlgo) return
 
-    const fechaTxt = fecha.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    const fechaTxt = formatMDY(fecha)
     metodos.forEach((f) => {
       const valor = Number(f.monto) || 0
       onGuardar({

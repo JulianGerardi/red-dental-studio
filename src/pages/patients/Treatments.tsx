@@ -32,7 +32,7 @@ const BADGE: Record<Estado, string> = {
 const base = {
   patient: 'Sarah Mitchell', initials: 'SM',
   code: 'TO01 - Acute / Emergency', name: 'Root Canal Treatment',
-  createdOn: 'Jun 3, 2026', total: '$1,850.00',
+  createdOn: '06/03/2026', total: '$1,850.00',
 }
 export const PLANS: Plan[] = [
   { ...base, progress: 100, note: 'Overall completion: 100%', estado: 'Completed' },

@@ -49,14 +49,14 @@ export function useIr() {
 
 /* El examen del problema, con el nombre de su pestaña. */
 const PESTANA_EXAMEN: Record<string, Pestana> = {
-  Intraoral: 'Intra Oral', Extraoral: 'Extra Oral', Physical: 'Physical', ROS: 'Ros', 'Dental Assessment': 'DentAssmt',
-  Periodontal: 'Periodontal', Radiography: 'Radiography',
+  Intraoral: 'Intraoral', Extraoral: 'Extraoral', Physical: 'Physical', ROS: 'ROS', 'Dental Assessment': 'Dental assessment',
+  Periodontal: 'Periodontal', Radiography: 'Radiographic',
 }
 
-/** La pestaña de un examen como lo escribe la Problem List (Dental Assessment → DentAssmt). */
+/** La pestaña de un examen como lo escribe la Problem List (Dental Assessment → Dental assessment). */
 export const pestanaDeExamen = (examen: string): Pestana | undefined => PESTANA_EXAMEN[examen]
 
-/** El nombre del examen como lo escribe la Problem List, desde su pestaña (DentAssmt → Dental Assessment). */
+/** El nombre del examen como lo escribe la Problem List, desde su pestaña (Dental assessment → Dental Assessment). */
 export const examenDePestana = (p: string) => Object.keys(PESTANA_EXAMEN).find((e) => PESTANA_EXAMEN[e] === p) ?? p
 
 /* ── Datos de cada registro ───────────────────────────────────────── */

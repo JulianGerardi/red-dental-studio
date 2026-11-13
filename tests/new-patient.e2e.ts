@@ -36,7 +36,7 @@ test('New Patient vincula a una persona que ya existe en el sistema', async ({ a
   await drawer.getByRole('button', /^Save/).tap()
 
   await expect(screen.getByText('Michael Miller has been added to the patient list.')).toBeVisible()
-  await expect(screen.getByRole('row', /Michael Miller .*May 14, 1982 .*mm\.thompson@yahoo\.com/)).toBeVisible()
+  await expect(screen.getByRole('row', /Michael Miller .*05\/14\/1982 .*mm\.thompson@yahoo\.com/)).toBeVisible()
 })
 
 /* Guardian (CON-2858; patients.md, 2026-11-04): aparece sólo para un menor, que necesita guardián. Se busca a alguien del

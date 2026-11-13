@@ -3206,3 +3206,52 @@ a pedirlo, o hablar con el paciente antes?).
 Código: `data/treatment-plan.ts` (`ConsentProcedimiento`, `AYUDA_CONSENTIMIENTO`; salen `SIN_DOCUMENTO` y
 `AVISO_CONSENTIMIENTO`), `clinical/{ConsentDetail,ConsentRequiredDialog,ConsentBlock,TreatmentPlanSection,ProblemList,RecordDetail}.tsx`;
 e2e en `tests/treatment-plan.e2e.ts` ("la columna Consent muestra los estados de CON-4119").
+
+## CON-4144 · El encuentro de CON-1612 y textos de red.dev (2026-11-13)
+
+Comparativa con red.dev del Overview, la barra y la Problem List (ticket CON-4144, asignado a Abril). El layout ya está
+decidido (odontograma de DentAssmt, tabla flotante, botoneras Exams/Records): se deja como está.
+
+1. **Botón del encuentro con los estados de CON-1612**. Antes el pill alternaba *Start / Pause Enconter*. Su menú tenía
+   *End encounter*, *Discard encounter* y *Encounter settings*: dos no hacían nada y ninguno sale de Jira. Además, el menú
+   no se veía, porque la barra tiene `overflow-x-auto` y lo cortaba. Ahora:
+   - Sin empezar: "Start Enconter", sin menú: no hay nada que pausar ni cerrar.
+   - En curso: "Complete Encounter" (lo cierra y ofrece firmar la Clinical Note, como hacía End encounter). El menú
+     ofrece *Pause Encounter* y *Discharge Patient*, como red.dev.
+   - En pausa (*On hold*): pill ámbar "Pending Encounter", el mismo de la ficha. Al tocarlo se retoma; el menú ofrece
+     *Complete Encounter* y *Discharge Patient*.
+   - El menú es el `DropdownMenu` del sistema: se abre en un portal y ya no lo corta la barra.
+   - `ClinicalTopBar` pasa de `encuentro: boolean` a `EstadoEncuentro` ('sinEmpezar' | 'enCurso' | 'enPausa').
+2. **"Mark as…"**: el 2026-10-05 se copió "Mark As" de red.dev, que hoy dice "Mark as". Se alinea en el menú de la
+   Problem List y en las acciones de los exámenes (`dental/actions.ts`).
+3. **"Rows per page:"** en la Problem List, Procedures, Lab Order y los registros. Decían "Show:", distinto de la tabla del
+   sistema y de red.dev. Settings › Accounts decía "Mostrar:", en castellano: también pasa a "Rows per page:".
+4. **A definir con Julián**:
+   - Los nombres de los exámenes. red.dev usa Vitals, ROS, Physical, Extraoral, Intraoral, Dental assessment, Periodontal
+     y Radiographic; nosotros, los del Figma (Ros, BMI, ATM/O-F, Intra Oral, DentAssmt, Radiography…).
+   - Un solo formato de fecha. Clinical Mode usa día/mes; red.dev y el Ledger, mes/día; Documents, "Oct 27, 2026".
+   - "Start Enconter" sin la u, que viene del Figma.
+5. **A validar con usuarios**: si en recepción se entiende la pausa por el color ámbar, y si "Discharge Patient" en el
+   mismo menú que Pause se toca por error (hoy no pide confirmación, como en red.dev).
+
+### Decisiones de Julián sobre CON-4144 (2026-11-13)
+
+1. **Exámenes con los nombres y el orden de red.dev**: Vitals, ROS, Physical, Extraoral, Intraoral, Dental assessment,
+   Periodontal y Radiographic. Salen BMI y ATM/O-F: no existen en red.dev (el BMI está adentro de Vitals, en
+   Anthropometry) y acá eran pestañas en construcción. El rótulo del área de tratamiento de los Edit también pasa a
+   Intraoral / Extraoral. La columna *Exam* de la Problem List sigue con los nombres de los datos (Dental Assessment,
+   Radiography).
+2. **Un solo formato de fecha: MM/DD/YYYY, como red.dev**, en toda la app: tablas, detalles, cards, campos de fecha
+   (DatePicker de formulario, `formatMDY` en `lib/fecha.ts`) y el campo tipeado de Insurance ("MM / DD / YY"). Los datos se
+   pasaron a ese formato y `ordenFecha` (Treatment Plan) lo lee así.
+   - Quedan en texto los títulos y las frases: el saludo ("Thursday - November 13, 2026"), el selector de la barra del
+     Dashboard ("Feb 28, 2026"), la semana de la agenda, "moved to Mar 3" en los avisos y las fechas relativas de
+     Notifications.
+   - Las claves internas dd-mm-aaaa de la agenda y del Dashboard no cambian: no se muestran.
+3. **"Start Encounter"** con la u, en la barra de Clinical Mode, en la ficha y en el popup del paciente del Dashboard.
+4. **El botón de la ficha, igual que el de Clinical Mode**, con el mismo estado (`lib/encuentro.ts`, `useEstadoEncuentro`).
+   - Sin empezar: *Start Encounter*, que además lleva a Clinical Mode (CON-2994).
+   - En curso: *Complete Encounter*, que ofrece firmar la Clinical Note; si se deja para después, queda *Pending
+     Signature*. El menú ofrece *Pause Encounter* y *Discharge Patient* (`OpcionesEncuentro`).
+   - En pausa: *Pending Encounter* en ámbar.
+   - Antes el menú de la ficha elegía directamente entre los dos estados del Figma.

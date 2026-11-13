@@ -43,8 +43,8 @@ type EstadoSuscripcion = 'Active' | 'Cancelled'
 const ESTADO_TONO: Record<EstadoSuscripcion, PillTone> = { Active: 'success', Cancelled: 'danger' }
 
 const HISTORIAL_PROPIO: { plan: string; estado: EstadoSuscripcion; vence: string; licencias: string; creado: string }[] = [
-  { plan: 'Prueba Red', estado: 'Active', vence: '31/12/2026', licencias: '3 Used / 167 Total', creado: '06/08/2026' },
-  { plan: 'Confidentally Individual User', estado: 'Cancelled', vence: '17/07/2027', licencias: '3 Used / 167 Total', creado: '17/07/2026' },
+  { plan: 'Prueba Red', estado: 'Active', vence: '12/31/2026', licencias: '3 Used / 167 Total', creado: '08/06/2026' },
+  { plan: 'Confidentally Individual User', estado: 'Cancelled', vence: '07/17/2027', licencias: '3 Used / 167 Total', creado: '07/17/2026' },
 ]
 
 const iniciales = (nombre: string) => nombre.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase()
@@ -158,7 +158,7 @@ export function SettingsAccount() {
                 <div className="rounded-lg border border-line bg-white p-4">
                   <span className="text-[13px] text-ink-muted">Expired on</span>
                   <span className="mt-2 block text-[19px] font-bold text-ink tabular-nums">
-                    {cuenta ? (cuenta.vence || '—') : '31/12/2026'}
+                    {cuenta ? (cuenta.vence || '—') : '12/31/2026'}
                   </span>
                   <span className="mt-1 block text-[12px] text-ink-faint">Subscription end date</span>
                 </div>
