@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-13
 
-### Billing alineado con red.dev: Export CSV, filtros, Columns y Today ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Billing alineado con red.dev: Export CSV, filtros, Columns y Today ([#142](https://github.com/JulianGerardi/red-dental-studio/pull/142))
 - **Export CSV** arriba a la derecha; con un paciente elegido queda apagado (CON-4147).
 - **Filtros de red.dev:** All, Payments, Adjustments, Today (antes Pt Payment, Charge Adj, Credit Adj).
 - **Columnas de red.dev:** Trans. Date, Patient / Account, Type, Description, Provider, Amount, Trans. Bal., Status, con
