@@ -3,8 +3,9 @@ import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import {
   ChevronLeft, ChevronDown, PanelsTopLeft, Link2, Activity, Users, Info,
-  Play, Pause, FileText,
+  Play, Pause, FileText, CircleCheck, LogOut,
 } from 'lucide-react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
@@ -163,20 +164,25 @@ const CATEGORIA_DE: Record<string, Categoria> = {
   allergies: 'Allergies',
 }
 
+/* Estados del encuentro de CON-1612 que se manejan desde acá: sin empezar (Planned), en curso y en pausa (On hold).
+   Complete y Discharge lo cierran. Ver clinical-mode.md (2026-11-13). */
+export type EstadoEncuentro = 'sinEmpezar' | 'enCurso' | 'enPausa'
+
 export function ClinicalTopBar({
   volverA, encuentro, onEncuentro, onOverview, enOverview,
 }: {
   volverA: string
-  encuentro: boolean
-  onEncuentro: () => void
+  encuentro: EstadoEncuentro
+  onEncuentro: (estado: EstadoEncuentro, mensaje: string) => void
   onOverview: () => void
   enOverview: boolean
 }) {
-  const [abierto, setAbierto] = useState(false)
   const [flot, setFlot] = useState<Flot | null>(null)
   const [items, setItems] = useState(ITEMS_INICIALES)
   const [clinico, setClinico] = useState<{ cat: Categoria; item?: ClinicalItem } | null>(null)
   const [nota, setNota] = useState(false)
+  /* Complete Encounter cierra el encuentro y ofrece firmar la Clinical Note (Figma 4540:27072). */
+  const completar = () => { onEncuentro('sinEmpezar', 'Encounter completed.'); setNota(true) }
 
   const cuenta = (c: Contador) =>
     CATEGORIA_DE[c.id] ? items[CATEGORIA_DE[c.id]].length : c.items.length
@@ -363,45 +369,59 @@ export function ClinicalTopBar({
           el ancho que sobre (`max-md:flex-1` adentro), en vez de repartirse
           contra la info del paciente. */}
       <span className="flex shrink-0 items-center gap-[9px] max-md:w-full">
-      {/* Un solo pill verde con el chevron adentro: 31.79 de alto, radio
-          completo, label en 10.8/600. */}
-      <div className="flex h-[31.79px] shrink-0 items-center overflow-hidden rounded-full bg-status-ok max-md:flex-1">
+      {/* Un solo pill con el chevron adentro: 31.79 de alto, radio completo, label en 10.8/600. Verde sin empezar y en
+          curso, ámbar en pausa (el Pending Encounter de la ficha). Sin empezar no hay menú: no hay nada que pausar. */}
+      <div className={cn(
+        'flex h-[31.79px] shrink-0 items-center overflow-hidden rounded-full max-md:flex-1',
+        encuentro === 'enPausa' ? 'bg-amber text-[#7a4a00]' : 'bg-status-ok text-white',
+      )}>
         <button
-          onClick={onEncuentro}
-          className="flex h-full items-center justify-center gap-[7.86px] pr-[6px] pl-[12.77px] text-[10.8px] font-semibold whitespace-nowrap text-white transition-colors hover:bg-[#1fae54] max-md:flex-1"
+          type="button"
+          onClick={() => {
+            if (encuentro === 'sinEmpezar') onEncuentro('enCurso', 'Encounter started.')
+            else if (encuentro === 'enPausa') onEncuentro('enCurso', 'Encounter resumed.')
+            else completar()
+          }}
+          className={cn(
+            'flex h-full items-center justify-center gap-[7.86px] pl-[12.77px] text-[10.8px] font-semibold whitespace-nowrap transition-colors max-md:flex-1',
+            encuentro === 'enPausa' ? 'hover:bg-[#f0a913]' : 'hover:bg-[#1fae54]',
+            encuentro === 'sinEmpezar' ? 'pr-[12.77px]' : 'pr-[6px]',
+          )}
         >
-          {encuentro ? <Pause className="size-[13.75px]" /> : <Play className="size-[13.75px]" />}
-          {encuentro ? 'Pause Enconter' : 'Start Enconter'}
+          {encuentro === 'sinEmpezar' && <><Play className="size-[13.75px]" /> Start Enconter</>}
+          {encuentro === 'enCurso' && <><CircleCheck className="size-[13.75px]" /> Complete Encounter</>}
+          {encuentro === 'enPausa' && <><Pause className="size-[13.75px]" /> Pending Encounter</>}
         </button>
-        <button
-          onClick={() => setAbierto((v) => !v)}
-          aria-label="Encounter options"
-          aria-expanded={abierto}
-          className="flex h-full items-center pr-[12.77px] pl-[2px] text-white transition-colors hover:bg-[#1fae54]"
-        >
-          <ChevronDown className={cn('size-[15.71px] transition-transform', abierto && 'rotate-180')} />
-        </button>
+        {encuentro !== 'sinEmpezar' && (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              aria-label="Encounter options"
+              className={cn(
+                'group flex h-full items-center pr-[12.77px] pl-[2px] transition-colors',
+                encuentro === 'enPausa' ? 'hover:bg-[#f0a913]' : 'hover:bg-[#1fae54]',
+              )}
+            >
+              <ChevronDown className="size-[15.71px] transition-transform group-data-[state=open]:rotate-180" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[200px]">
+              {encuentro === 'enCurso' ? (
+                <DropdownMenuItem onSelect={() => onEncuentro('enPausa', 'Encounter paused.')}>
+                  <Pause /> Pause Encounter
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onSelect={completar}>
+                  <CircleCheck /> Complete Encounter
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onSelect={() => onEncuentro('sinEmpezar', 'Patient discharged.')}>
+                <LogOut /> Discharge Patient
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
       </span>
       </span>
-
-      {abierto && (
-        <div className="absolute top-full right-0 z-40 mt-1 w-[220px] rounded-lg border border-line bg-white p-1 shadow-floating">
-          {['End encounter', 'Discard encounter', 'Encounter settings'].map((t) => (
-            <button
-              key={t}
-              onClick={() => {
-                setAbierto(false)
-                if (t === 'End encounter') setNota(true)
-                else aviso.info(`${t} is not available in this release.`)
-              }}
-              className="block w-full rounded px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-      )}
 
       {/* Categoría clínica: el popover del dashboard del paciente, con alta,
           edición y baja. Referrals: la lista simple. */}

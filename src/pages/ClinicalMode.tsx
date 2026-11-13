@@ -4,7 +4,7 @@ import { Stethoscope } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
 import { OdontogramaOverview } from '@/components/clinical/OdontogramaOverview'
-import { ClinicalTopBar } from '@/components/clinical/ClinicalTopBar'
+import { ClinicalTopBar, type EstadoEncuentro } from '@/components/clinical/ClinicalTopBar'
 import { ClinicalToolbar } from '@/components/clinical/ClinicalToolbar'
 import { DentalAssessmentExam } from '@/components/clinical/DentalAssessmentExam'
 import { ExtraOralExam } from '@/components/clinical/ExtraOralExam'
@@ -48,7 +48,7 @@ export default function ClinicalMode() {
      barra vuelve acá desde cualquier examen o registro. */
   const [enOverview, setEnOverview] = useState(!casoPedido)
   const [pestana, setPestana] = useState<Pestana>(casoPedido ? 'Treatment Plan' : 'Vitals')
-  const [encuentro, setEncuentro] = useState(false)
+  const [encuentro, setEncuentro] = useState<EstadoEncuentro>('sinEmpezar')
   const [ampliado, setAmpliado] = useState(false)
   /* El caso que se abrió desde una card del Overview; sin caso, Treatment Plan entra por Unassigned. */
   const [casoAbierto, setCasoAbierto] = useState<string | undefined>(casoPedido)
@@ -145,10 +145,7 @@ export default function ClinicalMode() {
       <ClinicalTopBar
         volverA={`/patients/${patient.id}`}
         encuentro={encuentro}
-        onEncuentro={() => {
-          setEncuentro((v) => !v)
-          aviso.ok(encuentro ? 'Encounter paused.' : 'Encounter started.')
-        }}
+        onEncuentro={(e, mensaje) => { setEncuentro(e); aviso.ok(mensaje) }}
         onOverview={() => setEnOverview(true)}
         enOverview={enOverview}
       />

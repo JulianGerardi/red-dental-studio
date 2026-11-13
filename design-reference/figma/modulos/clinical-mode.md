@@ -3206,3 +3206,30 @@ a pedirlo, o hablar con el paciente antes?).
 Código: `data/treatment-plan.ts` (`ConsentProcedimiento`, `AYUDA_CONSENTIMIENTO`; salen `SIN_DOCUMENTO` y
 `AVISO_CONSENTIMIENTO`), `clinical/{ConsentDetail,ConsentRequiredDialog,ConsentBlock,TreatmentPlanSection,ProblemList,RecordDetail}.tsx`;
 e2e en `tests/treatment-plan.e2e.ts` ("la columna Consent muestra los estados de CON-4119").
+
+## CON-4144 · El encuentro de CON-1612 y textos de red.dev (2026-11-13)
+
+Comparativa con red.dev del Overview, la barra y la Problem List (ticket CON-4144, asignado a Abril). El layout ya está
+decidido (odontograma de DentAssmt, tabla flotante, botoneras Exams/Records): se deja como está.
+
+1. **Botón del encuentro con los estados de CON-1612**. Antes el pill alternaba *Start / Pause Enconter*. Su menú tenía
+   *End encounter*, *Discard encounter* y *Encounter settings*: dos no hacían nada y ninguno sale de Jira. Además, el menú
+   no se veía, porque la barra tiene `overflow-x-auto` y lo cortaba. Ahora:
+   - Sin empezar: "Start Enconter", sin menú: no hay nada que pausar ni cerrar.
+   - En curso: "Complete Encounter" (lo cierra y ofrece firmar la Clinical Note, como hacía End encounter). El menú
+     ofrece *Pause Encounter* y *Discharge Patient*, como red.dev.
+   - En pausa (*On hold*): pill ámbar "Pending Encounter", el mismo de la ficha. Al tocarlo se retoma; el menú ofrece
+     *Complete Encounter* y *Discharge Patient*.
+   - El menú es el `DropdownMenu` del sistema: se abre en un portal y ya no lo corta la barra.
+   - `ClinicalTopBar` pasa de `encuentro: boolean` a `EstadoEncuentro` ('sinEmpezar' | 'enCurso' | 'enPausa').
+2. **"Mark as…"**: el 2026-10-05 se copió "Mark As" de red.dev, que hoy dice "Mark as". Se alinea en el menú de la
+   Problem List y en las acciones de los exámenes (`dental/actions.ts`).
+3. **"Rows per page:"** en la Problem List, Procedures, Lab Order y los registros. Decían "Show:", distinto de la tabla del
+   sistema y de red.dev. Settings › Accounts decía "Mostrar:", en castellano: también pasa a "Rows per page:".
+4. **A definir con Julián**:
+   - Los nombres de los exámenes. red.dev usa Vitals, ROS, Physical, Extraoral, Intraoral, Dental assessment, Periodontal
+     y Radiographic; nosotros, los del Figma (Ros, BMI, ATM/O-F, Intra Oral, DentAssmt, Radiography…).
+   - Un solo formato de fecha. Clinical Mode usa día/mes; red.dev y el Ledger, mes/día; Documents, "Oct 27, 2026".
+   - "Start Enconter" sin la u, que viene del Figma.
+5. **A validar con usuarios**: si en recepción se entiende la pausa por el color ámbar, y si "Discharge Patient" en el
+   mismo menú que Pause se toca por error (hoy no pide confirmación, como en red.dev).

@@ -40,11 +40,11 @@ const BORRAR = { label: 'Delete', icono: Trash2, peligro: true, borrar: true } a
 const ABIERTO_PROBLEMA: Accion<EstadoProblema>[] = [
   { label: 'Start Monitoring', icono: Eye, a: 'Monitoring' },
   { label: 'Start Treatment', icono: Play, a: 'In treatment' },
-  { label: 'Mark As Treated', icono: Check, a: 'Treated' },
-  { label: 'Mark As Externally Treated', icono: CheckCheck, a: 'Externally treated' },
-  { label: 'Mark As No Treat. Needed', icono: CircleSlash, a: 'No treatment needed', peligro: true },
-  { label: 'Mark As Patient Declined', icono: UserX, a: 'Patient declined', peligro: true },
-  { label: 'Mark As Clinic Declined', icono: Ban, a: 'Clinic declined', peligro: true },
+  { label: 'Mark as Treated', icono: Check, a: 'Treated' },
+  { label: 'Mark as Externally Treated', icono: CheckCheck, a: 'Externally treated' },
+  { label: 'Mark as No Treat. Needed', icono: CircleSlash, a: 'No treatment needed', peligro: true },
+  { label: 'Mark as Patient Declined', icono: UserX, a: 'Patient declined', peligro: true },
+  { label: 'Mark as Clinic Declined', icono: Ban, a: 'Clinic declined', peligro: true },
   { label: 'Discard', icono: XCircle, a: 'Discarded', peligro: true },
 ]
 export function accionesProblema(e: EstadoProblema): Accion<EstadoProblema>[][] {
@@ -251,7 +251,7 @@ export function ProblemList({ procedimientoInicial }: {
             rowActions={(r) => menu(accionesProblema(r.estado), (a) => aplicar(setProblemas, problemas, r, r.condicion, a))}
             rowDetail={(r) => <DetalleRegistro registro={{ tipo: 'problema', r }} contexto={contexto} />}
             defaultExpanded={enfoque ? [enfoque] : undefined}
-            pageSize={5} pageSizeOptions={[5, 10, 20]} pageSizeLabel="Show:" density="compact"
+            pageSize={5} pageSizeOptions={[5, 10, 20]} density="compact"
             empty={{ icon: Search, title: 'No problems found', detail: t ? `Nothing matches "${q}".` : `There are no ${filtroProblema.toLowerCase()} problems.` }}
           />
         ) : (
@@ -261,7 +261,7 @@ export function ProblemList({ procedimientoInicial }: {
             rowActions={(r) => <ItemsAcciones grupos={accionesDe(r.estado, contextoDe(r))} onElegir={(a) => elegirProcedimiento(r, a)} />}
             rowDetail={(r) => <DetalleRegistro registro={{ tipo: 'procedimiento', r }} contexto={contexto} />}
             defaultExpanded={enfoque ? [enfoque] : undefined}
-            pageSize={5} pageSizeOptions={[5, 10, 20]} pageSizeLabel="Show:" density="compact"
+            pageSize={5} pageSizeOptions={[5, 10, 20]} density="compact"
             empty={{ icon: Search, title: 'No procedures found', detail: t ? `Nothing matches "${q}".` : `There are no ${filtroProcedimiento.toLowerCase()} procedures.` }}
           />
         )}

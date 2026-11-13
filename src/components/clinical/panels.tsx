@@ -234,8 +234,8 @@ export function PatientSummaryPanel() {
 
         <div className="text-muted-foreground flex items-center gap-3 px-5 py-4 text-sm">
           Showing 1 to 7 of 64 results
-          {/* El original rotula este selector "Mostrar:". Corregido. */}
-          <label className="flex items-center gap-2">Show:
+          {/* "Rows per page:", como la tabla del sistema y red.dev (clinical-mode.md, 2026-11-13). */}
+          <label className="flex items-center gap-2">Rows per page:
             <select className="border-input h-9 rounded-md border px-2"><option>10</option><option>20</option></select>
           </label>
         </div>

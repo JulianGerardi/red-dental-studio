@@ -366,3 +366,18 @@ test('New Procedure: el buscador independiente elige un procedimiento de la list
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/D2740 charted as planned/)).toBeVisible()
 })
+
+/* El encuentro como en CON-1612 y red.dev: en curso se completa, se pausa o se da el alta (clinical-mode.md, 2026-11-13). */
+test('el encuentro empieza, se pausa, se retoma y se da el alta desde su menú', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/clinical-mode')
+  await expect(screen.getByRole('button', 'Encounter options')).toHaveCount(0)
+  await screen.getByRole('button', /Start Enconter/).first().tap()
+  await expect(screen.getByRole('button', /Complete Encounter/).first()).toBeVisible()
+  await screen.getByRole('button', 'Encounter options').tap()
+  await screen.getByRole('menuitem', /Pause Encounter/).tap()
+  await expect(screen.getByRole('button', /Pending Encounter/).first()).toBeVisible()
+  await screen.getByRole('button', 'Encounter options').tap()
+  await screen.getByRole('menuitem', /Discharge Patient/).tap()
+  await expect(screen.getByText('Patient discharged.')).toBeVisible()
+  await expect(screen.getByRole('button', /Start Enconter/).first()).toBeVisible()
+})
