@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-13
 
-### Billing: un drawer por botón, como red.dev, y Export CSV que descarga ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Billing: un drawer por botón, como red.dev, y Export CSV que descarga ([#143](https://github.com/JulianGerardi/red-dental-studio/pull/143))
 - **Drawers de red.dev:** Patient Payment abre *New Patient Payment (-)*, Credit Adjustment abre *Credit Adjustment (-)* y
   Charge Adjustment abre *Enter Charge (+) Adjustment*, cada uno con sus campos (CON-4147). Sale el "Post payment" único,
   con su Type y su buscador de paciente.
