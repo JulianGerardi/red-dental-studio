@@ -3,7 +3,7 @@ import { ChevronsDownUp, ChevronsUpDown, HandCoins } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { aviso } from '@/components/ui/toaster'
-import { Pill } from '@/components/ui/pill'
+import { Pill, type PillTone } from '@/components/ui/pill'
 import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, Vacio } from '@/components/ui/detail-list'
 import { cn } from '@/lib/utils'
 import { tratamientoDe } from '@/components/clinical/RecordDetail'
@@ -139,7 +139,12 @@ export const tipoDetalle = (m: Movimiento): TipoDetalle | null =>
       : m.tipo === 'Adjustment' ? (m.monto > 0 ? 'Charge Adjustment' : 'Credit Adjustment')
         : null
 
-const nombreTipo = (m: Movimiento) => tipoDetalle(m) ?? 'Insurance Payment'
+/** El nombre del tipo en la columna Type (CON-3753): lo comparten el Ledger y la Patient View de Billing. */
+export const nombreTipo = (m: Movimiento) => tipoDetalle(m) ?? 'Insurance Payment'
+export const TONO_TIPO: Record<string, PillTone> = {
+  Procedure: 'neutral', 'Charge Adjustment': 'danger', 'Patient Payment': 'info', 'Credit Adjustment': 'neutral',
+  'Insurance Payment': 'purple',
+}
 const esCargo = (m: Movimiento) => m.monto > 0
 const cuenta = (m: Movimiento) => (alcanceDe(m) === 'guarantor' ? 'Guarantor / Account' : m.paciente)
 const motivoDe = (m: Movimiento) => m.motivo ?? (m.descripcion && m.descripcion !== '—' ? m.descripcion : undefined)

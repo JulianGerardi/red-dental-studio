@@ -79,7 +79,8 @@ const ACTIVIDAD_POR_PACIENTE: Record<string, Omit<Movimiento, 'id' | 'paciente' 
   ],
   'Lucía Paz': [
     { fecha: '05/13/2026', codigo: 'D2391', descripcion: 'Resin-based composite – one surface', provider: 'Dr Salgado', tipo: 'Charge', monto: 180, estado: 'Posted', diente: '14' },
-    { fecha: '05/20/2026', codigo: '—', descripcion: 'Check Payment $100.00', provider: 'Front desk', tipo: 'Payment', monto: -100, estado: 'Posted' },
+    /* Sin aplicar a su cargo: la fila muestra "Credit available", como red.dev (billing.md, 2026-11-13). */
+    { fecha: '05/20/2026', codigo: '—', descripcion: 'Check Payment $100.00', provider: 'Front desk', tipo: 'Payment', monto: -100, estado: 'Posted', creditoDisponible: 100 },
   ],
 }
 
@@ -120,7 +121,8 @@ export function cargosAbiertos(paciente: string): Movimiento[] {
 export const TIPOS_AJUSTE_BILLING = ['Patient Payment', 'Credit Adjustment', 'Charge Adjustment'] as const
 export type TipoAjusteBilling = (typeof TIPOS_AJUSTE_BILLING)[number]
 
-export const FILTROS_ACTIVIDAD = ['All', 'Pt Payment', 'Charge Adj', 'Credit Adj'] as const
+/* Los filtros de red.dev (billing.md, 2026-11-13). */
+export const FILTROS_ACTIVIDAD = ['All', 'Payments', 'Adjustments', 'Today'] as const
 export type FiltroActividad = (typeof FILTROS_ACTIVIDAD)[number]
 
 /* Con un paciente elegido, las Tabs de Recent Billing Activity pasan a elegir de quién se ven los movimientos (red.dev). */
@@ -140,11 +142,16 @@ export const STATS_BILLING: StatBilling[] = [
   { label: 'Guarantors with Open Charges', value: '128', caption: 'Guarantors with a remaining balance', info: 'Ledgers whose charges at this location still carry a positive guarantor balance.' },
 ]
 
-/* "Unapplied credits" repetía el valor exacto de "Payments Posted Today" en
-   el Figma -misma anomalía que Overdue Balance, mismo criterio de arreglo. */
-/* Payments Posted Today usa el texto de red.dev; los otros dos son una propuesta a validar (billing.md, 2026-10-09). */
+/** El "hoy" de los datos de prueba: el día del último movimiento. Lo usan el filtro Today y la card Today. */
+export const HOY_BILLING = '05/20/2026'
+const DE_HOY = ACTIVIDAD_RECIENTE.filter((m) => m.fecha === HOY_BILLING)
+const sumaHoy = (f: (m: Movimiento) => number) => DE_HOY.reduce((t, m) => t + f(m), 0)
+const plata = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+
+/* Today sale de los movimientos de HOY_BILLING, en plata como red.dev (antes eran números sueltos del Figma). Etiquetas y
+   bajadas de red.dev; los mensajes de info de Adjustments y Unapplied siguen siendo propuesta (billing.md, 2026-11-13). */
 export const STATS_HOY: StatBilling[] = [
-  { label: 'Payments Posted Today', value: '$9,420', caption: 'Patient and insurance posting activity', info: 'Sum of payment transactions posted today (practice timezone).' },
-  { label: 'Adjustments created', value: '6', caption: 'Adjustments created today', info: 'Credit and charge adjustments created today (practice timezone).' },
-  { label: 'Unapplied credits', value: '$610', caption: 'Credits not yet applied to charges', info: 'Payments and credits received that are not applied to a charge yet.' },
+  { label: 'Payments Posted Today', value: plata(sumaHoy((m) => (m.tipo === 'Payment' || m.tipo === 'Insurance' ? -m.monto : 0))), caption: 'Patient and insurance posting activity', info: 'Sum of payment transactions posted today (practice timezone).' },
+  { label: 'Adjustments Created Today', value: plata(sumaHoy((m) => (m.tipo === 'Adjustment' ? Math.abs(m.monto) : 0))), caption: 'Charge and credit adjustments', info: 'Credit and charge adjustments created today (practice timezone).' },
+  { label: 'Unapplied Credits', value: plata(sumaHoy((m) => m.creditoDisponible ?? 0)), caption: 'Credits not yet applied to charges', info: 'Payments and credits received that are not applied to a charge yet.' },
 ]
