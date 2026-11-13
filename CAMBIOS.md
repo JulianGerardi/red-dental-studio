@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-13
 
-### Clinical Mode: encuentro de CON-1612, exámenes de red.dev y fechas MM/DD/YYYY ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Clinical Mode: encuentro de CON-1612, exámenes de red.dev y fechas MM/DD/YYYY ([#141](https://github.com/JulianGerardi/red-dental-studio/pull/141))
 - **Encuentro:** tres estados (CON-1612), iguales en la barra de Clinical Mode y en la ficha, que comparten el estado:
   - *Start Encounter*: desde la ficha lleva a Clinical Mode (CON-2994).
   - *Complete Encounter*: ofrece firmar la Clinical Note. El menú ofrece *Pause Encounter* y *Discharge Patient*.
