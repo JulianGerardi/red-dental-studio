@@ -32,7 +32,7 @@ type Abierto = 'nothing' | 'section tooltip' | 'status tooltip' | 'patient infor
 type Args = {
   section: Seccion
   collapsed: boolean
-  encounter: 'start' | 'pending'
+  encounter: 'sinEmpezar' | 'enCurso' | 'enPausa'
   name: string
   open: Abierto
 }
@@ -59,11 +59,11 @@ const meta = {
       },
     },
   },
-  args: { section: 'Overview', collapsed: false, encounter: 'start', name: 'John Smith', open: 'nothing' },
+  args: { section: 'Overview', collapsed: false, encounter: 'sinEmpezar', name: 'John Smith', open: 'nothing' },
   argTypes: {
     section: { control: 'select', options: Object.keys(SECCIONES), description: 'Sección abierta: queda en azul. En la app es la ruta; acá también cambia al tocar el menú.' },
     collapsed: { control: 'boolean', description: 'Expandido (218px) o colapsado (60px). En la app, con el botón de arriba del panel.' },
-    encounter: { control: 'inline-radio', options: ['start', 'pending'], description: 'Start Encounter (verde) o Pending Encounter (ámbar).' },
+    encounter: { control: 'inline-radio', options: ['sinEmpezar', 'enCurso', 'enPausa'], description: 'Start Encounter y Complete Encounter (verde) o Pending Encounter (ámbar).' },
     name: { control: 'text', description: 'Nombre del paciente: las iniciales de la foto salen de acá. Probá uno largo.' },
     open: {
       control: 'select',
@@ -82,7 +82,7 @@ function previewDe(open: Abierto, name: string): PatientMenuPreviewState {
     case 'section tooltip': return { collapsed: true, tooltip: 'Ledger' }
     case 'status tooltip': return { collapsed: true, tooltip: `${name} · Active · 50 years` }
     case 'patient information': return { collapsed: true, infoCard: true }
-    case 'encounter options': return { collapsed: false, encounterOptions: true }
+    case 'encounter options': return { collapsed: false, encounter: 'enCurso', encounterOptions: true }
     default: return {}
   }
 }
@@ -166,7 +166,7 @@ function Sincronizar({ collapsed, encounter }: Pick<Args, 'collapsed' | 'encount
 export const Playground: Story = {
   loaders: [async ({ args }) => {
     setPatientMenuCollapsed(!!args.collapsed)
-    setEncounterState(args.encounter ?? 'start')
+    setEncounterState(args.encounter ?? 'sinEmpezar')
     return {}
   }],
   render: (args) => (
@@ -194,7 +194,7 @@ export const Parts: Story = {
   render: () => (
     <Fondo>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <Menu preview={{ collapsed: false, encounter: 'start' }} />
+        <Menu preview={{ collapsed: false, encounter: 'sinEmpezar' }} />
         <div className="min-w-0 flex-1">
           <Tabla encabezado={['Part', 'What it does', 'When collapsed']} minimo={560} arriba>
             {PARTES.map(([parte, que, colapsado]) => (
@@ -223,8 +223,8 @@ function Estado({ titulo, nota, ancho, children }: { titulo: string; nota: strin
   )
 }
 
-const EXPANDIDO = { collapsed: false, encounter: 'start' } as const
-const COLAPSADO = { collapsed: true, encounter: 'start' } as const
+const EXPANDIDO = { collapsed: false, encounter: 'sinEmpezar' } as const
+const COLAPSADO = { collapsed: true, encounter: 'sinEmpezar' } as const
 
 export const States: Story = {
   parameters: { controls: { disable: true } },
@@ -243,10 +243,10 @@ export const States: Story = {
               <Forzar selector='a[href$="/ledger"]' estado="focus-visible"><Menu preview={EXPANDIDO} /></Forzar>
             </Estado>
             <Estado titulo="Pending encounter" nota="Ámbar con pausa: la atención quedó en espera." ancho={218}>
-              <Menu preview={{ collapsed: false, encounter: 'pending' }} />
+              <Menu preview={{ collapsed: false, encounter: 'enPausa' }} />
             </Estado>
             <Estado titulo="Encounter options" nota="El chevron abre los dos estados; el actual en azul." ancho={218}>
-              <Menu preview={{ ...EXPANDIDO, encounterOptions: true }} />
+              <Menu preview={{ ...EXPANDIDO, encounter: 'enCurso', encounterOptions: true }} />
             </Estado>
           </div>
         </Bloque>

@@ -3233,3 +3233,25 @@ decidido (odontograma de DentAssmt, tabla flotante, botoneras Exams/Records): se
    - "Start Enconter" sin la u, que viene del Figma.
 5. **A validar con usuarios**: si en recepción se entiende la pausa por el color ámbar, y si "Discharge Patient" en el
    mismo menú que Pause se toca por error (hoy no pide confirmación, como en red.dev).
+
+### Decisiones de Julián sobre CON-4144 (2026-11-13)
+
+1. **Exámenes con los nombres y el orden de red.dev**: Vitals, ROS, Physical, Extraoral, Intraoral, Dental assessment,
+   Periodontal y Radiographic. Salen BMI y ATM/O-F: no existen en red.dev (el BMI está adentro de Vitals, en
+   Anthropometry) y acá eran pestañas en construcción. El rótulo del área de tratamiento de los Edit también pasa a
+   Intraoral / Extraoral. La columna *Exam* de la Problem List sigue con los nombres de los datos (Dental Assessment,
+   Radiography).
+2. **Un solo formato de fecha: MM/DD/YYYY, como red.dev**, en toda la app: tablas, detalles, cards, campos de fecha
+   (DatePicker de formulario, `formatMDY` en `lib/fecha.ts`) y el campo tipeado de Insurance ("MM / DD / YY"). Los datos se
+   pasaron a ese formato y `ordenFecha` (Treatment Plan) lo lee así.
+   - Quedan en texto los títulos y las frases: el saludo ("Thursday - November 13, 2026"), el selector de la barra del
+     Dashboard ("Feb 28, 2026"), la semana de la agenda, "moved to Mar 3" en los avisos y las fechas relativas de
+     Notifications.
+   - Las claves internas dd-mm-aaaa de la agenda y del Dashboard no cambian: no se muestran.
+3. **"Start Encounter"** con la u, en la barra de Clinical Mode, en la ficha y en el popup del paciente del Dashboard.
+4. **El botón de la ficha, igual que el de Clinical Mode**, con el mismo estado (`lib/encuentro.ts`, `useEstadoEncuentro`).
+   - Sin empezar: *Start Encounter*, que además lleva a Clinical Mode (CON-2994).
+   - En curso: *Complete Encounter*, que ofrece firmar la Clinical Note; si se deja para después, queda *Pending
+     Signature*. El menú ofrece *Pause Encounter* y *Discharge Patient* (`OpcionesEncuentro`).
+   - En pausa: *Pending Encounter* en ámbar.
+   - Antes el menú de la ficha elegía directamente entre los dos estados del Figma.

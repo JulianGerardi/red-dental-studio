@@ -20,13 +20,14 @@ import { useExamReviews } from './dental/useExamReviews'
 import { ACTIONS, type FindingAction } from './dental/actions'
 import { areaDeAlcance, quadrantTeeth, type Finding } from './dental/data'
 import { ULTIMA_CONDICION, type UltimaCondicion } from '@/data/clinical-mode'
+import { formatMDY } from '@/lib/fecha'
 
 /* Lo que comparten todos los exámenes de Clinical Mode (Julián, 2026-10-03): el panel de Findings a la izquierda (menos
    en Vitals) y arriba del contenido las acciones Add Procedure, Add Condition y View Problem List, blancas y con el texto
    que se abre al pasar el mouse. Los findings son del paciente, no del examen: con `ExamFindingsProvider` (en
    ClinicalMode) son los mismos al pasar de un examen a otro. Ver design-reference/figma/modulos/clinical-mode.md. */
 
-const HOY = 'May 14, 2026'
+const HOY = '05/14/2026'
 
 const INITIAL_FINDINGS: Finding[] = [
   { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: HOY, status: 'Discarded', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [], examen: 'Dental Assessment', problema: 'p5', kind: 'condition' },
@@ -37,7 +38,7 @@ const INITIAL_FINDINGS: Finding[] = [
 ]
 
 const INITIAL_REVIEWS: ExamReview[] = [
-  { id: 'R-1', date: 'January 12, 2026', provider: 'Daniel Anderson', note: 'Charting checked against the radiographs. Caries on tooth 3 confirmed, the rest of the arch is unremarkable. Cleared for treatment planning.' },
+  { id: 'R-1', date: '01/12/2026', provider: 'Daniel Anderson', note: 'Charting checked against the radiographs. Caries on tooth 3 confirmed, the rest of the arch is unremarkable. Cleared for treatment planning.' },
 ]
 
 /* Las acciones de todos los exámenes: blancas, y al pasar el mouse se abren con su texto como Exit clinical Mode. El
@@ -120,7 +121,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
       ...f,
     ])
     if (procedureOpen === 'condition') {
-      setUltima({ condicion: draft.procedure.label, actualizado: new Date().toLocaleDateString('en-GB'), pieza: tooth, examen })
+      setUltima({ condicion: draft.procedure.label, actualizado: formatMDY(new Date()), pieza: tooth, examen })
     }
     aviso.ok(`${draft.procedure.code} charted as ${draft.status.toLowerCase()} on ${regiones ? area : tooth !== null ? `tooth ${tooth}` : draft.area.toLowerCase()}.`)
     return id

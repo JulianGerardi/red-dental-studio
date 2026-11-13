@@ -11,6 +11,7 @@ import { type Movimiento } from '@/data/ledger'
 import {
   PACIENTES_BILLING, buscarPacientes, cargosAbiertos, TIPOS_AJUSTE_BILLING, type TipoAjusteBilling,
 } from '@/data/billing'
+import { formatMDY } from '@/lib/fecha'
 
 /* Figma 4481:10480 "Post payment", modal sobre el Billing Overview. Ver
    design-reference/figma/modulos/billing.md. Reutiliza el mismo cuerpo que
@@ -68,7 +69,7 @@ export function PostPaymentDialog({
     if (faltaPago) { setPaso(0); return }
     const valor = Number(monto) || 0
     onGuardar({
-      fecha: fecha.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      fecha: formatMDY(fecha),
       paciente: aplicaA,
       codigo: '—',
       descripcion: tipo,

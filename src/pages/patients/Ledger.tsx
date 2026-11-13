@@ -34,6 +34,7 @@ import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjust
 import { AplicarCreditoModal } from '@/components/patients/ledger/AplicarCreditoModal'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
+import { formatMDY } from '@/lib/fecha'
 
 /* Figma 4582:28487 / 4588:84886. Ver design-reference/figma/modulos/ledger.md. */
 
@@ -228,7 +229,7 @@ export default function Ledger() {
     setMovs((prev) => prev.map((mv) =>
       mv.id === id ? { ...mv, creditoDisponible: Math.max((mv.creditoDisponible ?? 0) - monto, 0) } : mv,
     ))
-    const hoy = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    const hoy = formatMDY(new Date())
     setAplicaciones((p) => [...p, ...Object.entries(porCargo).map(([cargo, m], i) => ({ id: `a-${Date.now()}-${i}`, origen: id, cargo, fecha: hoy, monto: m }))])
     aviso.ok(`${moneda(monto)} of credit applied.`)
     setEnCredito(null)

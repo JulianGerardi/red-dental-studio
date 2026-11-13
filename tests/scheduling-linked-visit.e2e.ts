@@ -32,7 +32,7 @@ test('una visita linkeada muestra su otro turno y Cancel deja todo como estaba',
   await drawer.getByRole('button', /^Save/).tap()
 
   const pregunta = screen.getByRole('dialog', 'Move treatment visit?')
-  await expect(pregunta.getByText(/Visit 2 is linked to the appointment on Sep 28, 2026 at 1:15 PM/)).toBeVisible()
+  await expect(pregunta.getByText(/Visit 2 is linked to the appointment on 09\/28\/2026 at 1:15 PM/)).toBeVisible()
   await pregunta.getByRole('button', 'Cancel').tap()
   // Sigue el drawer, con la visita elegida.
   await expect(drawer).toBeVisible()
@@ -45,7 +45,7 @@ test('Move visit guarda el turno y avisa que la visita se movió', async ({ app,
   await drawer.getByRole('button', /^Save/).tap()
   await screen.getByRole('dialog', 'Move treatment visit?').getByRole('button', 'Move visit').tap()
 
-  await expect(screen.getByText(/Visit 2 moved from the Sep 28, 2026 appointment/)).toBeVisible()
+  await expect(screen.getByText(/Visit 2 moved from the 09\/28\/2026 appointment/)).toBeVisible()
   await expect(screen.getByText(/Appointment for John Smith booked at 10 AM/)).toBeVisible()
 })
 

@@ -18,18 +18,18 @@ type Doc = { id: string; name: string; firma: 'Signed' | 'Pending Signature'; fe
 /* Nombres como los arma red.dev (Procedure Consent - código y procedimiento; Informed Consent / Refusal – caso), con los
    procedimientos y casos de John Smith. Antes repetía el "Isacc Cihtepin.doc" del Figma (treatments.md, 2026-11-12). */
 const DOCS: Doc[] = ([
-  ['Informed Consent for Dental Treatment – Endodontic Treatment', 'Pending Signature', 'Oct 27, 2026'],
-  ['Procedure Consent - D2950 Core buildup, including any pins when required', 'Pending Signature', 'Oct 27, 2026'],
-  ['Procedure Consent - D2954 Prefabricated post and core in addition to crown', 'Pending Signature', 'Oct 27, 2026'],
-  ['Procedure Consent - D2750 Crown – porcelain fused to high noble metal', 'Signed', 'Oct 22, 2026'],
-  ['Informed Refusal of Dental Treatment – Implant Option', 'Signed', 'Oct 22, 2026'],
-  ['Informed Consent for Dental Treatment – Crown Option', 'Pending Signature', 'Oct 21, 2026'],
-  ['Procedure Consent - D7140 Extraction – erupted tooth or exposed root (elevation and/or forceps removal)', 'Signed', 'Sep 14, 2026'],
-  ['Procedure Consent - D2140 Amalgam – one surface, primary or permanent', 'Signed', 'Aug 25, 2026'],
-  ['Procedure Consent - D0220 Intraoral – periapical first radiographic image', 'Signed', 'Aug 25, 2026'],
-  ['Informed Consent for Dental Treatment – Periodontal maintenance', 'Signed', 'Aug 5, 2026'],
-  ['Procedure Consent - D1110 Prophylaxis – adult', 'Signed', 'Aug 5, 2026'],
-  ['Procedure Consent - D0120 Periodic oral evaluation – established patient', 'Signed', 'Aug 5, 2026'],
+  ['Informed Consent for Dental Treatment – Endodontic Treatment', 'Pending Signature', '10/27/2026'],
+  ['Procedure Consent - D2950 Core buildup, including any pins when required', 'Pending Signature', '10/27/2026'],
+  ['Procedure Consent - D2954 Prefabricated post and core in addition to crown', 'Pending Signature', '10/27/2026'],
+  ['Procedure Consent - D2750 Crown – porcelain fused to high noble metal', 'Signed', '10/22/2026'],
+  ['Informed Refusal of Dental Treatment – Implant Option', 'Signed', '10/22/2026'],
+  ['Informed Consent for Dental Treatment – Crown Option', 'Pending Signature', '10/21/2026'],
+  ['Procedure Consent - D7140 Extraction – erupted tooth or exposed root (elevation and/or forceps removal)', 'Signed', '09/14/2026'],
+  ['Procedure Consent - D2140 Amalgam – one surface, primary or permanent', 'Signed', '08/25/2026'],
+  ['Procedure Consent - D0220 Intraoral – periapical first radiographic image', 'Signed', '08/25/2026'],
+  ['Informed Consent for Dental Treatment – Periodontal maintenance', 'Signed', '08/05/2026'],
+  ['Procedure Consent - D1110 Prophylaxis – adult', 'Signed', '08/05/2026'],
+  ['Procedure Consent - D0120 Periodic oral evaluation – established patient', 'Signed', '08/05/2026'],
 ] as const).map(([name, firma, fecha], i) => ({ id: `doc-${i + 1}`, name, firma, fecha }))
 
 const FIRMA_TONO: Record<Doc['firma'], PillTone> = {

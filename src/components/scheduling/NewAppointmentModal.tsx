@@ -35,10 +35,10 @@ const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado', 'Sarah
    ("Month D, YYYY" y nombre.apellido@email.com). Ver scheduling.md, 2026-10-19. */
 /* El número de paciente va al lado del nombre (los del HTML de ejemplo de Julián, 2026-11-11). */
 const DATOS_PACIENTE: Record<string, { numero: string; nacimiento: string; email: string }> = {
-  'John Smith': { numero: 'PT-00293', nacimiento: 'June 14, 1985', email: 'john.smith@email.com' },
-  'Noah James Smith': { numero: 'PT-00218', nacimiento: 'September 2, 2018', email: 'noah.smith@email.com' },
-  'Maria Abril Viola': { numero: 'PT-00147', nacimiento: 'November 23, 1991', email: 'maria.viola@email.com' },
-  'Elias Aguirre': { numero: 'PT-00405', nacimiento: 'March 5, 1979', email: 'elias.aguirre@email.com' },
+  'John Smith': { numero: 'PT-00293', nacimiento: '06/14/1985', email: 'john.smith@email.com' },
+  'Noah James Smith': { numero: 'PT-00218', nacimiento: '09/02/2018', email: 'noah.smith@email.com' },
+  'Maria Abril Viola': { numero: 'PT-00147', nacimiento: '11/23/1991', email: 'maria.viola@email.com' },
+  'Elias Aguirre': { numero: 'PT-00405', nacimiento: '03/05/1979', email: 'elias.aguirre@email.com' },
 }
 const pacienteNumero = (nombre: string) => DATOS_PACIENTE[nombre]?.numero
 const pacienteChips = (nombre: string) => {
@@ -72,7 +72,7 @@ const VISITAS: Visita[] = [
   {
     id: 'v2', name: 'Visit 2', total: '$860.00',
     procedimientos: ['D0120 – Periodic oral evaluation', 'D1110 – Prophylaxis – adult'],
-    vinculada: { fecha: 'Sep 28, 2026', hora: '1:15 PM', estado: 'Fulfilled' },
+    vinculada: { fecha: '09/28/2026', hora: '1:15 PM', estado: 'Fulfilled' },
   },
   /* Las tres siguientes siguen el hilo de la Comprehensive Implant Therapy:
      cirugía, pilar y corona. */

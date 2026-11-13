@@ -5,7 +5,7 @@ import type { ExamReview } from './ReviewList'
 
 /* Todo lo que necesita el split Findings/Review exam, compartido por los
    tres exams. */
-export function useExamReviews(inicial: ExamReview[] = [], hoy = 'May 14, 2026') {
+export function useExamReviews(inicial: ExamReview[] = [], hoy = '05/14/2026') {
   const [tab, setTab] = useState<ExamPanelTab>('Findings')
   const [reviews, setReviews] = useState<ExamReview[]>(inicial)
   const [dialogOpen, setDialogOpen] = useState(false)

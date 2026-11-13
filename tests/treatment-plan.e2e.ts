@@ -14,7 +14,7 @@ test('el menú Exams abre los registros', async ({ app, screen }) => {
   // Con un registro abierto, las pestañas son los registros y "Exams" vuelve a los exámenes.
   await expect(screen.getByRole('button', 'Lab Order')).toBeVisible()
   await screen.getByRole('button', 'Exams').tap()
-  await expect(screen.getByRole('button', 'DentAssmt')).toBeVisible()
+  await expect(screen.getByRole('button', 'Dental assessment')).toBeVisible()
 })
 
 test('en Planning se edita y desde Presented no', async ({ app, screen }) => {

@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Handshake, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, PanelLeftClose, PanelLeftOpen, IdCard, Signature,
+  ChevronDown, Eye, Pencil, PanelTop, FileText, Archive, Shield, BookOpen, ClipboardList, Handshake, PersonStanding, Calendar, Languages, Phone, Mail, MapPin, type LucideIcon, Play, Pause, CircleCheck, PanelLeftClose, PanelLeftOpen, IdCard, Signature,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -13,7 +13,9 @@ import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { usePhoto } from '@/lib/usePhoto'
 import { PatientMenuPreview } from './patient-menu-preview'
 import { useNotaPendiente } from '@/lib/notaClinica'
-import { ClinicalNoteDialog } from '@/components/clinical/ClinicalTopBar'
+import { ClinicalNoteDialog, OpcionesEncuentro } from '@/components/clinical/ClinicalTopBar'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { setEstadoEncuentro, useEstadoEncuentro, type EstadoEncuentro } from '@/lib/encuentro'
 
 /* Figma 3646:58836 — panel izquierdo del dashboard del paciente. */
 
@@ -32,7 +34,7 @@ const NAV: { key: string; icon: LucideIcon; to?: string }[] = [
 
 const GENERAL = [
   { icon: PersonStanding, label: 'Gender', value: 'Male' },
-  { icon: Calendar, label: 'DOB', value: '28/01/1999' },
+  { icon: Calendar, label: 'DOB', value: '01/28/1999' },
   { icon: Languages, label: 'Language', value: 'Spanish' },
 ]
 
@@ -218,7 +220,7 @@ export function PatientSidePanel({
       </div>
 
       <div className={cn('mt-3 flex flex-col gap-2 sm:flex-row lg:flex-col', colapsado && 'lg:hidden')}>
-        {notaPendiente ? <PendingSignatureButton onClick={() => setFirmar(true)} /> : <EncounterButton />}
+        {notaPendiente ? <PendingSignatureButton onClick={() => setFirmar(true)} /> : <EncounterButton basePath={basePath} />}
         <Link
           to="/patients/john-smith/clinical-mode"
           data-tour="pat-clinical-mode"
@@ -354,115 +356,61 @@ export function PendingSignatureButton({ soloIcono, className, ...props }: React
 }
 
 
-/* Figma (Design System) 7740:12244: el botón tiene dos estados, "Start
-   Enconter" en verde con play y "Pending Encounter" en ámbar con pausa. El
-   chevron alterna entre ellos.
+/* Figma (Design System) 7740:12244, con los estados de CON-1612 y las mismas opciones que la barra de Clinical Mode
+   (clinical-mode.md, 2026-11-13): sin empezar "Start Encounter" (lleva a Clinical Mode, CON-2994), en curso "Complete
+   Encounter" y en pausa "Pending Encounter" en ámbar. El estado es uno solo para la ficha y Clinical Mode.
 
    El verde queda en #1e9850, el de la plataforma, y no en el #28c563 del
    design system: es el mismo botón que el popup del paciente, que Julián pidió
    alinear. El ámbar sí es el #ffb82c del sistema, pero con texto oscuro: el
    frame lo pone en blanco y sobre ese fondo no se lee. */
-type EstadoEncuentro = 'start' | 'pending'
-
-/* El estado vivía en el componente y el panel se vuelve a montar en cada
-   pantalla del paciente, así que al ir de Treatments a Insurance volvía a
-   "Start". Ahora vive fuera de React y todas las instancias lo comparten. */
-let estadoGlobal: EstadoEncuentro = 'start'
-const oyentes = new Set<() => void>()
+const VERDE = 'bg-green text-white hover:bg-[#18763e]'
+const ENCUENTRO: Record<EstadoEncuentro, { label: string; clase: string; icono: React.ReactNode }> = {
+  sinEmpezar: { label: 'Start Encounter', clase: VERDE, icono: <Play className="size-3.5 shrink-0" /> },
+  enCurso: { label: 'Complete Encounter', clase: VERDE, icono: <CircleCheck className="size-3.5 shrink-0" /> },
+  enPausa: { label: 'Pending Encounter', clase: 'bg-amber text-[#7a4a00] hover:bg-[#f0a913]', icono: <Pause className="size-3.5 shrink-0" /> },
+}
 
 /** Deja el botón de encuentro en un estado desde afuera (Storybook). */
-export function setEncounterState(v: EstadoEncuentro) {
-  estadoGlobal = v
-  oyentes.forEach((f) => f())
-}
+export const setEncounterState = setEstadoEncuentro
 
-function useEstadoEncuentro() {
-  const [, redibujar] = useState(0)
-  useEffect(() => {
-    const f = () => redibujar((n) => n + 1)
-    oyentes.add(f)
-    return () => { oyentes.delete(f) }
-  }, [])
-  const set = (v: EstadoEncuentro) => {
-    estadoGlobal = v
-    oyentes.forEach((f) => f())
-  }
-  return [estadoGlobal, set] as const
-}
-
-const ENCUENTRO = {
-  start: {
-    label: 'Start Enconter',
-    clase: 'bg-green text-white hover:bg-[#18763e]',
-    icono: <Play className="size-3.5 shrink-0" />,
-  },
-  pending: {
-    label: 'Pending Encounter',
-    clase: 'bg-amber text-[#7a4a00] hover:bg-[#f0a913]',
-    icono: <Pause className="size-3.5 shrink-0" />,
-  },
-} as const
-
-export function EncounterButton() {
+export function EncounterButton({ basePath = '/patients/john-smith' }: { basePath?: string }) {
   const [estadoCompartido, setEstado] = useEstadoEncuentro()
-  const [abiertoPropio, setAbierto] = useState(false)
   const vista = useContext(PatientMenuPreview)
   const estado = vista.encounter ?? estadoCompartido
-  const abierto = abiertoPropio || !!vista.encounterOptions
-  const ref = useRef<HTMLDivElement>(null)
   const actual = ENCUENTRO[estado]
-
-  useEffect(() => {
-    if (!abierto) return
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setAbierto(false)
-    }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
-  }, [abierto])
+  const navegar = useNavigate()
+  const [nota, setNota] = useState(false)
+  const cambiar = (e: EstadoEncuentro, mensaje: string) => { setEstado(e); aviso.ok(mensaje) }
+  /* Complete Encounter cierra el encuentro y ofrece firmar la Clinical Note, como en Clinical Mode. */
+  const completar = () => { cambiar('sinEmpezar', 'Encounter completed.'); setNota(true) }
 
   return (
-    <div ref={ref} className="relative w-full">
+    <div className="relative w-full">
       <span className={cn('flex w-full items-center rounded-lg text-[13px] font-semibold', actual.clase)}>
         <button
           type="button"
-          onClick={() =>
-            estado === 'start'
-              ? aviso.ok('Encounter started.')
-              : aviso.warn('Encounter is on hold.')
-          }
-          className={cn('flex flex-1 items-center justify-center gap-2 rounded-l-lg py-2', FOCO)}
+          onClick={() => {
+            if (estado === 'sinEmpezar') { cambiar('enCurso', 'Encounter started.'); navegar(`${basePath}/clinical-mode`) }
+            else if (estado === 'enPausa') cambiar('enCurso', 'Encounter resumed.')
+            else completar()
+          }}
+          className={cn('flex min-w-0 flex-1 items-center justify-center gap-2 py-2', estado === 'sinEmpezar' ? 'rounded-lg' : 'rounded-l-lg', FOCO)}
         >
-          {actual.icono} {actual.label}
+          {actual.icono} <span className="truncate">{actual.label}</span>
         </button>
-        <button
-          type="button"
-          aria-label="Encounter options"
-          aria-expanded={abierto}
-          onClick={() => setAbierto((v) => !v)}
-          className={cn('rounded-r-lg px-2 py-2 opacity-80 hover:opacity-100', FOCO)}
-        >
-          <ChevronDown className={cn('size-3.5 transition-transform', abierto && 'rotate-180')} />
-        </button>
+        {estado !== 'sinEmpezar' && (
+          <DropdownMenu {...(vista.encounterOptions ? { open: true, modal: false } : {})}>
+            <DropdownMenuTrigger aria-label="Encounter options" className={cn('group rounded-r-lg px-2 py-2 opacity-80 hover:opacity-100', FOCO)}>
+              <ChevronDown className="size-3.5 transition-transform group-data-[state=open]:rotate-180" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[200px]">
+              <OpcionesEncuentro estado={estado} onCambiar={cambiar} onCompletar={completar} />
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </span>
-
-      {abierto && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-[calc(100%+4px)] left-0 z-30 w-full overflow-hidden rounded-lg border border-line bg-white py-1 shadow-lg">
-          {(Object.keys(ENCUENTRO) as EstadoEncuentro[]).map((k) => (
-            <button
-              key={k}
-              type="button"
-              onClick={() => { setEstado(k); setAbierto(false); aviso.ok(`Encounter set to ${ENCUENTRO[k].label}.`) }}
-              className={cn(
-                'flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-surface-muted',
-                estado === k && 'text-dash-blue font-medium',
-              )}
-            >
-              {ENCUENTRO[k].icono} {ENCUENTRO[k].label}
-            </button>
-          ))}
-        </div>
-      )}
+      <ClinicalNoteDialog open={nota} onClose={() => setNota(false)} />
     </div>
   )
 }

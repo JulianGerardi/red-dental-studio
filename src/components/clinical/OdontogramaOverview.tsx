@@ -96,7 +96,7 @@ export function OdontogramaOverview({ ampliado = false, onAmpliar, onDetalle, ul
           <button
             type="button"
             onClick={() => {
-              if (pestana === 'DentAssmt' && ultima.pieza) elegirAlAbrir(ultima.pieza)
+              if (pestana === 'Dental assessment' && ultima.pieza) elegirAlAbrir(ultima.pieza)
               onDetalle?.(pestana)
             }}
             className="bg-dash-blue hover:bg-dash-blue-hover ml-auto shrink-0 rounded-md px-2.5 py-1 text-[11px] font-semibold text-white transition-colors"

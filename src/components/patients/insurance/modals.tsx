@@ -31,10 +31,10 @@ const OPCIONES: { id: Modo; label: string }[] = [
   { id: 'nuevo', label: 'Add a new subscriber' },
 ]
 
-/* "DD / MM / YY" → fecha, o null si está incompleta. */
+/* "MM / DD / YY" → fecha, o null si está incompleta. */
 const aFecha = (v: string) => {
   const m = v.match(/^(\d{2}) \/ (\d{2}) \/ (\d{2})$/)
-  return m ? new Date(2000 + Number(m[3]), Number(m[2]) - 1, Number(m[1])) : null
+  return m ? new Date(2000 + Number(m[3]), Number(m[1]) - 1, Number(m[2])) : null
 }
 const aTexto = (v: string) => v.replace(/ \/ (\d{2})$/, ' / 20$1').replaceAll(' / ', '/')
 

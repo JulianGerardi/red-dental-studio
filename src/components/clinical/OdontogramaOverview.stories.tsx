@@ -10,9 +10,9 @@ import { OdontogramaLectura, OdontogramaOverview } from './OdontogramaOverview'
 
 const CONDICIONES = {
   'Caries · tooth 3 (frame)': ULTIMA_CONDICION,
-  'Charted now · tooth 13': { condicion: 'Resin-based composite crown, anterior', actualizado: '18/10/2026', pieza: 13, examen: 'Dental Assessment' },
-  'Without a tooth': { condicion: 'Mucocele', actualizado: '21/06/2026', pieza: null, examen: 'Intraoral' },
-  'Long name': { condicion: 'Periodontal scaling and root planing – four or more teeth per quadrant', actualizado: '18/10/2026', pieza: 19, examen: 'Periodontal' },
+  'Charted now · tooth 13': { condicion: 'Resin-based composite crown, anterior', actualizado: '10/18/2026', pieza: 13, examen: 'Dental Assessment' },
+  'Without a tooth': { condicion: 'Mucocele', actualizado: '06/21/2026', pieza: null, examen: 'Intraoral' },
+  'Long name': { condicion: 'Periodontal scaling and root planing – four or more teeth per quadrant', actualizado: '10/18/2026', pieza: 19, examen: 'Periodontal' },
 } satisfies Record<string, UltimaCondicion>
 type Condicion = keyof typeof CONDICIONES
 
@@ -57,7 +57,7 @@ function Demo({ condicion, ampliado: inicial = false }: { condicion: Condicion; 
           ultima={CONDICIONES[condicion]}
           ampliado={ampliado}
           onAmpliar={() => setAmpliado((v) => !v)}
-          onDetalle={(p) => aviso.info(`Opens ${p}${p === 'DentAssmt' && CONDICIONES[condicion].pieza ? ` with tooth ${CONDICIONES[condicion].pieza} selected` : ''}.`)}
+          onDetalle={(p) => aviso.info(`Opens ${p}${p === 'Dental assessment' && CONDICIONES[condicion].pieza ? ` with tooth ${CONDICIONES[condicion].pieza} selected` : ''}.`)}
         />
       </div>
     </div>

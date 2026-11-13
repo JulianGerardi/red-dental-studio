@@ -4,7 +4,8 @@ import { Stethoscope } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
 import { OdontogramaOverview } from '@/components/clinical/OdontogramaOverview'
-import { ClinicalTopBar, type EstadoEncuentro } from '@/components/clinical/ClinicalTopBar'
+import { ClinicalTopBar } from '@/components/clinical/ClinicalTopBar'
+import { useEstadoEncuentro } from '@/lib/encuentro'
 import { ClinicalToolbar } from '@/components/clinical/ClinicalToolbar'
 import { DentalAssessmentExam } from '@/components/clinical/DentalAssessmentExam'
 import { ExtraOralExam } from '@/components/clinical/ExtraOralExam'
@@ -48,7 +49,7 @@ export default function ClinicalMode() {
      barra vuelve acá desde cualquier examen o registro. */
   const [enOverview, setEnOverview] = useState(!casoPedido)
   const [pestana, setPestana] = useState<Pestana>(casoPedido ? 'Treatment Plan' : 'Vitals')
-  const [encuentro, setEncuentro] = useState<EstadoEncuentro>('sinEmpezar')
+  const [encuentro, setEncuentro] = useEstadoEncuentro()
   const [ampliado, setAmpliado] = useState(false)
   /* El caso que se abrió desde una card del Overview; sin caso, Treatment Plan entra por Unassigned. */
   const [casoAbierto, setCasoAbierto] = useState<string | undefined>(casoPedido)
@@ -108,17 +109,17 @@ export default function ClinicalMode() {
       ? <ExamLayout findings={false}><VitalsPanel /></ExamLayout>
       : pestana === 'Lab Order'
         ? <LabOrderPanel />
-        : pestana === 'Radiography'
+        : pestana === 'Radiographic'
           ? <RadiographyPanel />
           : pestana === 'Treatment Plan'
             ? <TreatmentPlanSection key={`${casoAbierto ?? 'todos'}-${estimadoAbierto}-${consentimientoAbierto}-${accionPendiente}`} casoInicial={casoAbierto} estimadoInicial={estimadoAbierto} consentimientoInicial={consentimientoAbierto} accionInicial={accionPendiente} />
             : pestana === 'Treatment'
             ? <TreatmentPanel onTreatmentPlan={() => irA('Treatment Plan')} />
-            : pestana === 'DentAssmt'
+            : pestana === 'Dental assessment'
               ? <DentalAssessmentExam />
-              : pestana === 'Extra Oral'
+              : pestana === 'Extraoral'
                 ? <ExtraOralExam />
-                : pestana === 'Intra Oral'
+                : pestana === 'Intraoral'
                   ? <IntraOralExam />
                   : esExamen
                     ? <ExamLayout examen={examenDePestana(pestana)}>{enConstruccion}</ExamLayout>

@@ -68,13 +68,13 @@ type Persona = {
 export const esGuardian = (p: Persona) => p.badges.includes('Legal contact')
 
 const CONTACTO: Campo[] = [
-  { icon: Calendar, label: 'Date of Birth', value: 'May 14, 1982' },
+  { icon: Calendar, label: 'Date of Birth', value: '05/14/1982' },
   { icon: Phone, label: 'Phone', value: '(555) 123-4567' },
   { icon: Mail, label: 'Email', value: 'abrilviola@gmail.com' },
   { icon: MapPin, label: 'Contact Address', value: '123 Maple Street, Phoenix, AZ 85016' },
 ]
 const HOGAR: Campo[] = [
-  { icon: Calendar, label: 'Date of Birth', value: 'May 14, 1982' },
+  { icon: Calendar, label: 'Date of Birth', value: '05/14/1982' },
   { icon: Mail, label: 'Email', value: 'abrilviola@gmail.com' },
 ]
 

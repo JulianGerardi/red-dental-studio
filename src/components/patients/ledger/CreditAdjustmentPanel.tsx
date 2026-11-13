@@ -5,6 +5,7 @@ import {
 import { DatePicker } from '@/components/ui/date-picker'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { formatMDY } from '@/lib/fecha'
 
 /* Figma 4582:30209. "Amount" es texto libre por elección, ver
    design-reference/figma/modulos/ledger.md. */
@@ -37,7 +38,7 @@ export function CreditAdjustmentPanel({
     if (!fecha || !monto.trim() || !aplicaA.trim()) return
     const valor = Number(monto) || 0
     onGuardar({
-      fecha: fecha.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      fecha: formatMDY(fecha),
       paciente: aplicaA,
       codigo: '—',
       descripcion: tipo,

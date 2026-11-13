@@ -137,58 +137,58 @@ const totalDeFees = (c: Caso): Caso => ({
 export const CASOS: Caso[] = ([
   {
     id: 'c1', nombre: 'Periodontists Recommended', grupo: 'Periodontal', estado: 'Planning',
-    creado: '27/08/2026', creadoPor: 'Provider 1', total: '231.12',
+    creado: '08/27/2026', creadoPor: 'Provider 1', total: '231.12',
     visitas: [
-      { id: 'v1', nombre: 'Visit 1', total: '$100.000', procedimientos: visita('c1v1', ['Not generated', 'Not generated', 'Not generated', 'Not generated']), cita: { fecha: 'Sep 2, 2026', hora: '10:00 AM', proveedor: 'Perez Martinez' } },
+      { id: 'v1', nombre: 'Visit 1', total: '$100.000', procedimientos: visita('c1v1', ['Not generated', 'Not generated', 'Not generated', 'Not generated']), cita: { fecha: '09/02/2026', hora: '10:00 AM', proveedor: 'Perez Martinez' } },
       { id: 'v2', nombre: 'Visit 2', total: '$100.000', procedimientos: visita('c1v2', ['Not generated', 'Not generated', 'Not generated', 'Not required']) },
     ],
   },
   {
     id: 'c2', nombre: 'Periodontist Alternative', grupo: 'Periodontal', estado: 'Planning',
-    creado: '27/08/2026', creadoPor: 'Provider 1', total: '184.60',
+    creado: '08/27/2026', creadoPor: 'Provider 1', total: '184.60',
     visitas: [
       { id: 'v1', nombre: 'Visit 1', total: '$84.600', procedimientos: visita('c2v1', ['Not generated', 'Not generated', 'Not required']) },
     ],
   },
   {
     id: 'c3', nombre: 'Restorative Plan', grupo: 'Restorative', estado: 'Waiting for consent', aceptado: true,
-    creado: '26/08/2026', creadoPor: 'Provider 1', total: '96.00',
+    creado: '08/26/2026', creadoPor: 'Provider 1', total: '96.00',
     visitas: [
       { id: 'v1', nombre: 'Visit 1', total: '$96.000', procedimientos: visita('c3v1', ['Requested', 'Not generated'], 'Pending') },
     ],
   },
   {
     id: 'c8', nombre: 'Orthodontic Plan', grupo: 'Orthodontics', estado: 'Pending',
-    creado: '25/08/2026', creadoPor: 'Provider 1', total: '2,400.00',
+    creado: '08/25/2026', creadoPor: 'Provider 1', total: '2,400.00',
     visitas: [
       { id: 'v1', nombre: 'Visit 1', total: '$2,400.000', procedimientos: visita('c8v1', ['Not generated', 'Not generated']) },
     ],
   },
   {
     id: 'c4', nombre: 'Crown Option', grupo: 'Prosthodontics', estado: 'Presented',
-    creado: '24/08/2026', creadoPor: 'Provider 1', total: '412.00',
+    creado: '08/24/2026', creadoPor: 'Provider 1', total: '412.00',
     visitas: [
       { id: 'v1', nombre: 'Visit 1', total: '$412.000', procedimientos: visita('c4v1', ['Not generated', 'Not generated']) },
     ],
   },
   {
     id: 'c5', nombre: 'Endodontic Treatment', grupo: 'Endodontics', estado: 'Accepted', aceptado: true,
-    creado: '27/04/2026', creadoPor: 'Provider 1', total: '640.00',
+    creado: '04/27/2026', creadoPor: 'Provider 1', total: '640.00',
     visitas: [
-      { id: 'v1', nombre: 'Visit 1', total: '$320.000', procedimientos: visita('c5v1', ['Accepted', 'Accepted']).map((p) => ({ ...p, estado: 'Completed' as const })), cita: { fecha: 'May 4, 2026', hora: '9:30 AM', proveedor: 'Perez Martinez' } },
+      { id: 'v1', nombre: 'Visit 1', total: '$320.000', procedimientos: visita('c5v1', ['Accepted', 'Accepted']).map((p) => ({ ...p, estado: 'Completed' as const })), cita: { fecha: '05/04/2026', hora: '9:30 AM', proveedor: 'Perez Martinez' } },
       { id: 'v2', nombre: 'Visit 2', total: '$1,404.000', procedimientos: visita('c5v2', ['Accepted', 'Requested', 'Not generated', 'Rejected', 'Not required', 'Accepted'], 'Pending') },
     ],
   },
   {
     id: 'c6', nombre: 'Implant Option', grupo: 'Implant', estado: 'Discarded',
-    creado: '17/04/2026', creadoPor: 'Provider 1', total: '1,250.00', sinPermiso: true,
+    creado: '04/17/2026', creadoPor: 'Provider 1', total: '1,250.00', sinPermiso: true,
     visitas: [
       { id: 'v1', nombre: 'Visit 1', total: '$1,250.000', procedimientos: visita('c6v1', ['Not generated']) },
     ],
   },
   {
     id: 'c7', nombre: 'Bridge Option', grupo: 'Implant', estado: 'Accepted', aceptado: true,
-    creado: '17/04/2026', creadoPor: 'Provider 1', total: '980.00', sinPermiso: true,
+    creado: '04/17/2026', creadoPor: 'Provider 1', total: '980.00', sinPermiso: true,
     visitas: [
       { id: 'v1', nombre: 'Visit 1', total: '$980.000', procedimientos: visita('c7v1', ['Accepted', 'Not required'], 'Pending') },
     ],
@@ -197,18 +197,18 @@ export const CASOS: Caso[] = ([
      aceptar y el vencido antes de aceptar. */
   {
     id: 'c9', nombre: 'Night Guard Plan', grupo: 'Occlusal', estado: 'In progress', aceptado: true,
-    creado: '10/04/2026', creadoPor: 'Provider 1', total: '0',
+    creado: '04/10/2026', creadoPor: 'Provider 1', total: '0',
     visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$468.000', procedimientos: visita('c9v1', ['Accepted', 'Not generated'], 'Pending') }],
   },
   {
     id: 'c10', nombre: 'Whitening Plan', grupo: 'Cosmetic', estado: 'Cancelled', aceptado: true,
-    creado: '05/03/2026', creadoPor: 'Provider 1', total: '0',
+    creado: '03/05/2026', creadoPor: 'Provider 1', total: '0',
     /* El plan se canceló después de aceptarlo: sus consentimientos quedaron sin efecto (CON-4119). */
     visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$468.000', procedimientos: visita('c10v1', ['Discarded', 'Discarded'], 'Pending') }],
   },
   {
     id: 'c11', nombre: 'Sealant Plan', grupo: 'Preventive', estado: 'Expired',
-    creado: '12/02/2026', creadoPor: 'Provider 1', total: '0',
+    creado: '02/12/2026', creadoPor: 'Provider 1', total: '0',
     visitas: [{ id: 'v1', nombre: 'Visit 1', total: '$234.000', procedimientos: visita('c11v1', ['Not generated']) }],
   },
 ] satisfies Caso[]).map(totalDeFees)
@@ -216,9 +216,9 @@ export const CASOS: Caso[] = ([
 /* El paciente del encabezado de Clinical Mode (ClinicalTopBar), para los diálogos que lo nombran. */
 export const PACIENTE = 'Julio Perez'
 
-/* DD/MM/YYYY a un número que ordena: el más nuevo, mayor. */
+/* MM/DD/YYYY a un número que ordena: el más nuevo, mayor. */
 export const ordenFecha = (fecha: string) => {
-  const [d, m, a] = fecha.split('/').map(Number)
+  const [m, d, a] = fecha.split('/').map(Number)
   return (a ?? 0) * 10000 + (m ?? 0) * 100 + (d ?? 0)
 }
 
@@ -379,9 +379,9 @@ export const COMPLETAR = {
     'Select any linked conditions you want to mark as Treated.',
   ],
   condiciones: [
-    { id: 'cc1', estado: 'Active' as const, fecha: 'May 18, 2026', zona: 'Soft Palate', condicion: 'oral candidiasis', descriptores: 'Red' },
-    { id: 'cc2', estado: 'Active' as const, fecha: 'May 18, 2026', zona: 'Soft Palate', condicion: 'oral candidiasis', descriptores: 'Red' },
-    { id: 'cc3', estado: 'Active' as const, fecha: 'May 18, 2026', zona: 'Soft Palate', condicion: 'oral candidiasis', descriptores: 'Red' },
+    { id: 'cc1', estado: 'Active' as const, fecha: '05/18/2026', zona: 'Soft Palate', condicion: 'oral candidiasis', descriptores: 'Red' },
+    { id: 'cc2', estado: 'Active' as const, fecha: '05/18/2026', zona: 'Soft Palate', condicion: 'oral candidiasis', descriptores: 'Red' },
+    { id: 'cc3', estado: 'Active' as const, fecha: '05/18/2026', zona: 'Soft Palate', condicion: 'oral candidiasis', descriptores: 'Red' },
   ],
 }
 

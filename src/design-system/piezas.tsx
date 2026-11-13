@@ -99,7 +99,7 @@ export const PIEZAS: Pieza[] = [
     titulo: 'Patient menu', seccion: 'Elements', que: 'El panel de la ficha del paciente: secciones, encuentro y datos.', arriba: true,
     muestra: (
       <div className="w-[218px] origin-top scale-[0.62]">
-        <PatientMenuPreview.Provider value={{ collapsed: false, encounter: 'start' }}>
+        <PatientMenuPreview.Provider value={{ collapsed: false, encounter: 'sinEmpezar' }}>
           <PatientSidePanel name="John Smith" initials="JS" section="Overview" basePath="/patients/john-smith" />
         </PatientMenuPreview.Provider>
       </div>

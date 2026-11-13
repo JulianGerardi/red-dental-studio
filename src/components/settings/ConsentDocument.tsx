@@ -21,8 +21,8 @@ export const AVISO_RECONOCIMIENTOS = 'All acknowledgment checkboxes must be comp
 
 /* Fechas de ejemplo -no vienen del template, son del envío y de la cita del
    paciente-. */
-const CONSENT_ENVIADO = 'September 23, 2026 — 10:30 AM'
-const [FECHA_CITA, HORA_CITA] = 'October 15, 2026 — 9:00 AM'.split(' — ')
+const CONSENT_ENVIADO = '09/23/2026 — 10:30 AM'
+const [FECHA_CITA, HORA_CITA] = '10/15/2026 — 9:00 AM'.split(' — ')
 
 const ETIQUETA = 'text-[10px] font-semibold tracking-wide uppercase'
 

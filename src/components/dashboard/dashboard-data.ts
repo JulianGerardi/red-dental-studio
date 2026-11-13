@@ -81,7 +81,7 @@ export const DIAS: Record<string, DiaDashboard> = {
       turno('Sofia Chen', 'SC', 'Dr. Emily Chen', 'Operatory 4', '12:00'),
     ],
     rooms: salas(['Available', 'Busy', 'Busy', 'Busy', 'Unavailable', 'Available']),
-    tasks: tareas(2, 'March 17, 2025', 'March 15, 2025'),
+    tasks: tareas(2, '03/17/2025', '03/15/2025'),
     encuentros: { abiertos: 2, promedio: '18 min avg.' },
   },
 
@@ -95,7 +95,7 @@ export const DIAS: Record<string, DiaDashboard> = {
       turno('Mara Otero', 'MO', 'Dr. Elena Martinez', 'Operatory 1', '09:00', { nuevo: true }),
     ],
     rooms: salas(['Busy', 'Available', 'Available', 'Busy', 'Available', 'Unavailable']),
-    tasks: tareas(1, 'March 20, 2025', 'March 18, 2025'),
+    tasks: tareas(1, '03/20/2025', '03/18/2025'),
     encuentros: { abiertos: 1, promedio: '22 min avg.' },
   },
 
@@ -106,7 +106,7 @@ export const DIAS: Record<string, DiaDashboard> = {
     ],
     waiting: [],
     rooms: salas(['Available', 'Available', 'Busy', 'Available', 'Available', 'Available']),
-    tasks: tareas(1, 'March 24, 2025', 'March 22, 2025').slice(0, 2),
+    tasks: tareas(1, '03/24/2025', '03/22/2025').slice(0, 2),
     encuentros: { abiertos: 1, promedio: '12 min avg.' },
   },
 }
@@ -207,6 +207,6 @@ export const DIA_CARGADO: DiaDashboard = {
       nuevo: i % 3 === 0,
     })),
   rooms: salas(['Busy', 'Busy', 'Available', 'Busy', 'Unavailable', 'Busy']),
-  tasks: tareas(7, 'March 17, 2025', 'March 15, 2025'),
+  tasks: tareas(7, '03/17/2025', '03/15/2025'),
   encuentros: { abiertos: 4, promedio: '21 min avg.' },
 }

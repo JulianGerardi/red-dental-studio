@@ -35,7 +35,7 @@ const CLINICAL: { label: Categoria; icon: LucideIcon }[] = [
 /* Repartidas entre los cuatro tipos (antes las 9 eran "Referrals"): así el filtro por tipo tiene algo que filtrar
    (patient-dashboard.md, 2026-10-28). Mismo total que fijó el Show N more del 2026-10-25, sin tocar esa cuenta. */
 const TASKS: PendingTask[] = ['Clinical Note', 'Clinical Note', 'Clinical Note', 'Lab Orders', 'Lab Orders', 'Prescriptions', 'Prescriptions', 'Referrals', 'Referrals']
-  .map((kind) => ({ kind, state: 'Requested', person: 'Elena Marquez', initials: 'EM', register: 'March 17, 2025', expiration: 'March 15, 2025' }))
+  .map((kind) => ({ kind, state: 'Requested', person: 'Elena Marquez', initials: 'EM', register: '03/17/2025', expiration: '03/15/2025' }))
 
 /* Cuántos se ven en cada bloque antes de "Show N more" (ui/show-more; patient-dashboard.md, 2026-10-12). */
 export const TOPE = { tareas: 3, turnos: 3, turnosColumna: 7 }

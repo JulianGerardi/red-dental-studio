@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
+import type { EstadoEncuentro } from '@/lib/encuentro'
 import { BOTON_EXPANDIBLE, ETIQUETA_EXPANDIBLE } from '@/lib/estilos'
 import { aviso } from '@/components/ui/toaster'
 import { setNotaPendiente } from '@/lib/notaClinica'
@@ -25,7 +26,7 @@ const ICONO_CONTADOR = { link: Link2, signos: Activity, personas: Users, info: I
 
 /* Barra de 4235:135661. Todo va en una fila pegada, con la misma separación
    entre piezas: nada se estira. Antes el grupo del medio crecía y dejaba un
-   hueco enorme antes de Start Enconter.
+   hueco enorme antes de Start Encounter.
 
    Exit y Overwiev (la caja con texto del frame) van sólo con el ícono, a
    pedido de Julián: al pasar el mouse el botón muestra su caja y se abre con
@@ -164,9 +165,30 @@ const CATEGORIA_DE: Record<string, Categoria> = {
   allergies: 'Allergies',
 }
 
-/* Estados del encuentro de CON-1612 que se manejan desde acá: sin empezar (Planned), en curso y en pausa (On hold).
-   Complete y Discharge lo cierran. Ver clinical-mode.md (2026-11-13). */
-export type EstadoEncuentro = 'sinEmpezar' | 'enCurso' | 'enPausa'
+/* Las opciones del encuentro (CON-1612, como red.dev), las mismas en la barra de Clinical Mode y en la ficha: en curso se
+   pausa, en pausa se completa, y en los dos se da el alta. Ver clinical-mode.md (2026-11-13). */
+export function OpcionesEncuentro({ estado, onCambiar, onCompletar }: {
+  estado: EstadoEncuentro
+  onCambiar: (estado: EstadoEncuentro, mensaje: string) => void
+  onCompletar: () => void
+}) {
+  return (
+    <>
+      {estado === 'enCurso' ? (
+        <DropdownMenuItem onSelect={() => onCambiar('enPausa', 'Encounter paused.')}>
+          <Pause /> Pause Encounter
+        </DropdownMenuItem>
+      ) : (
+        <DropdownMenuItem onSelect={onCompletar}>
+          <CircleCheck /> Complete Encounter
+        </DropdownMenuItem>
+      )}
+      <DropdownMenuItem onSelect={() => onCambiar('sinEmpezar', 'Patient discharged.')}>
+        <LogOut /> Discharge Patient
+      </DropdownMenuItem>
+    </>
+  )
+}
 
 export function ClinicalTopBar({
   volverA, encuentro, onEncuentro, onOverview, enOverview,
@@ -322,7 +344,7 @@ export function ClinicalTopBar({
       </span>
 
       {/* Grupo 4: la info del paciente (edad/sexo/altura/peso + avatar y
-          nombre) y Start Enconter, gap 9 -el botón de nota se sacó a pedido de
+          nombre) y Start Encounter, gap 9 -el botón de nota se sacó a pedido de
           Julián-. Julián pidió esto
           al revés de como había quedado: lo que se sacaba del racimo de
           contadores -por pesado, no por chico- era este bloque, no
@@ -331,7 +353,7 @@ export function ClinicalTopBar({
       <span className="flex shrink-0 items-center gap-[9px] max-md:w-full max-md:flex-wrap md:ml-auto">
 
       {/* Subgrupo de info del paciente: detail-info-bar + user-info-bar
-          envuelven juntos, como una sola unidad, separados de Start Enconter
+          envuelven juntos, como una sola unidad, separados de Start Encounter
           -si compartieran una sola fila sin wrap propio, el `max-md:flex-1`
           del pill de abajo lo aplastaría contra lo que sobre en esa línea en
           vez de mandarlo a la suya-. */}
@@ -365,7 +387,7 @@ export function ClinicalTopBar({
       </span>
       </span>
 
-      {/* Start Enconter: en su propia fila el pill puede volver a ocupar todo
+      {/* Start Encounter: en su propia fila el pill puede volver a ocupar todo
           el ancho que sobre (`max-md:flex-1` adentro), en vez de repartirse
           contra la info del paciente. */}
       <span className="flex shrink-0 items-center gap-[9px] max-md:w-full">
@@ -388,7 +410,7 @@ export function ClinicalTopBar({
             encuentro === 'sinEmpezar' ? 'pr-[12.77px]' : 'pr-[6px]',
           )}
         >
-          {encuentro === 'sinEmpezar' && <><Play className="size-[13.75px]" /> Start Enconter</>}
+          {encuentro === 'sinEmpezar' && <><Play className="size-[13.75px]" /> Start Encounter</>}
           {encuentro === 'enCurso' && <><CircleCheck className="size-[13.75px]" /> Complete Encounter</>}
           {encuentro === 'enPausa' && <><Pause className="size-[13.75px]" /> Pending Encounter</>}
         </button>
@@ -404,18 +426,7 @@ export function ClinicalTopBar({
               <ChevronDown className="size-[15.71px] transition-transform group-data-[state=open]:rotate-180" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[200px]">
-              {encuentro === 'enCurso' ? (
-                <DropdownMenuItem onSelect={() => onEncuentro('enPausa', 'Encounter paused.')}>
-                  <Pause /> Pause Encounter
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem onSelect={completar}>
-                  <CircleCheck /> Complete Encounter
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onSelect={() => onEncuentro('sinEmpezar', 'Patient discharged.')}>
-                <LogOut /> Discharge Patient
-              </DropdownMenuItem>
+              <OpcionesEncuentro estado={encuentro} onCambiar={onEncuentro} onCompletar={completar} />
             </DropdownMenuContent>
           </DropdownMenu>
         )}
