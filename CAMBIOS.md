@@ -5,6 +5,20 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-13
 
+### Billing alineado con red.dev: Export CSV, filtros, Columns y Today ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Export CSV** arriba a la derecha; con un paciente elegido queda apagado (CON-4147).
+- **Filtros de red.dev:** All, Payments, Adjustments, Today (antes Pt Payment, Charge Adj, Credit Adj).
+- **Columnas de red.dev:** Trans. Date, Patient / Account, Type, Description, Provider, Amount, Trans. Bal., Status, con
+  **Columns** al lado de los filtros. Patient View usa las del Ledger (CDT Code y Type con nombre completo).
+- **Credit available · $X** debajo de un pago con crédito sin aplicar; pie con "results" y Rows per page (8, 20, 50).
+- **Today** con los títulos de red.dev (Adjustments Created Today, Unapplied Credits) y montos en plata.
+- **Para el dev:**
+  - `DataTable` suma `hiddenColumns` (columnas ocultas controladas desde afuera).
+  - `nombreTipo` y `TONO_TIPO` viven en `LedgerRowDetail` (los usan Ledger y Billing).
+  - El menú de `ColumnPicker` dice "Visible columns" (también en el Ledger).
+  - `HOY_BILLING` en `data/billing.ts` es el "hoy" de los datos de prueba (filtro Today y card Today).
+  - Decisiones en `billing.md` (2026-11-13). Storybook sin actualizar.
+
 ### Clinical Mode: encuentro de CON-1612, exámenes de red.dev y fechas MM/DD/YYYY ([#141](https://github.com/JulianGerardi/red-dental-studio/pull/141))
 - **Encuentro:** tres estados (CON-1612), iguales en la barra de Clinical Mode y en la ficha, que comparten el estado:
   - *Start Encounter*: desde la ficha lleva a Clinical Mode (CON-2994).
