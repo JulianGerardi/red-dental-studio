@@ -303,7 +303,7 @@ test('Intraoral: sin región elegida no deja cargar; con una, la condition va a 
   await screen.getByRole('button', /^Actions for Left Hard Palate$/).tap()
   await screen.getByRole('menuitem', 'Edit').tap()
   const editar = screen.getByRole('dialog', 'Edit Finding')
-  await expect(editar.getByText('Intraoral')).toBeVisible()
+  await expect(editar.getByText('Intraoral').first()).toBeVisible()
   await editar.getByRole('tab', 'Descriptors').tap()
   await expect(editar.getByText('Selected Descriptors')).toBeVisible()
 })
@@ -325,7 +325,7 @@ test('Extraoral: Add Procedure va a la región elegida en el gráfico', async ({
   await screen.getByRole('button', /^Actions for Scalp$/).first().tap()
   await screen.getByRole('menuitem', 'Edit').tap()
   const editar = screen.getByRole('dialog', 'Edit Procedure')
-  await expect(editar.getByText('Extraoral')).toBeVisible()
+  await expect(editar.getByText('Extraoral').first()).toBeVisible()
 })
 
 /* Edit Procedure (Figma 5294:85084): tres pestañas; Findings y Diagnostic traen lo vinculable y un solo Save guarda todo. */

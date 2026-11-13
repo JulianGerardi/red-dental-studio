@@ -30,7 +30,7 @@ test('en Planning se edita y desde Presented no', async ({ app, screen }) => {
   await expect(screen.getByRole('button', 'Rename case')).toBeVisible()
   await expect(screen.getByText('Drag procedure here to create new visit')).toBeVisible()
 
-  await planes.getByRole('button', /^24\/08\/2026, Presented/).tap()
+  await planes.getByRole('button', /^08\/24\/2026, Presented/).tap()
   await planes.getByRole('button', /Crown Option, Presented/).tap()
   await expect(screen.getByText('Crown Option').first()).toBeVisible()
   await expect(screen.getByRole('button', /Move to/)).toHaveCount(0)
@@ -72,7 +72,7 @@ test('Complete bloqueado mientras se planea o espera el consentimiento; aceptado
   await screen.getByRole('menuitem', /Delete/).press('Escape')
 
   // Presented: igual que Planning.
-  await planes.getByRole('button', /^24\/08\/2026/).tap()
+  await planes.getByRole('button', /^08\/24\/2026/).tap()
   await planes.getByRole('button', /Crown Option, Presented/).tap()
   await expect(screen.getByRole('columnheader', 'Consent')).toHaveCount(0)
   await screen.getByRole('button', /Actions for D0120/).first().tap()
@@ -81,7 +81,7 @@ test('Complete bloqueado mientras se planea o espera el consentimiento; aceptado
   await screen.getByRole('menuitem', /Delete/).press('Escape')
 
   // Waiting for consent: Start y Complete deshabilitados, sin Delete.
-  await planes.getByRole('button', /^26\/08\/2026/).tap()
+  await planes.getByRole('button', /^08\/26\/2026/).tap()
   await planes.getByRole('button', /Restorative Plan, Waiting for consent/).tap()
   await screen.getByRole('button', /Actions for D2392/).tap()
   await expect(screen.getByRole('menuitem', /Start/)).toHaveAttribute('aria-disabled', 'true')
@@ -90,7 +90,7 @@ test('Complete bloqueado mientras se planea o espera el consentimiento; aceptado
   await screen.getByRole('menuitem', /Edit/).press('Escape')
 
   // Aceptado: Complete con el consentimiento sin generar (D2954) lo manda y sigue.
-  await planes.getByRole('button', /^27\/04\/2026/).tap()
+  await planes.getByRole('button', /^04\/27\/2026/).tap()
   await planes.getByRole('button', /Endodontic Treatment, Accepted/).tap()
   await screen.getByRole('button', /Complete D2954/).tap()
   const dialogo = screen.getByRole('dialog', 'Consent required')
@@ -219,7 +219,7 @@ test('las filas del caso y las sueltas se despliegan con su detalle', async ({ a
   await expect(screen.getByRole('button', 'Collapse all')).toBeVisible()
 
   const planes = screen.getByRole('navigation', 'Treatment plans')
-  await planes.getByRole('button', /^26\/08\/2026, Waiting for consent/).tap()
+  await planes.getByRole('button', /^08\/26\/2026, Waiting for consent/).tap()
   await planes.getByRole('button', /Restorative Plan, Waiting for consent/).tap()
   await screen.getByText(/^D2391 Resin-based composite/).tap()
   await expect(screen.getByText('Procedure consent')).toBeVisible()
@@ -256,7 +256,7 @@ test('el aviso del caso pide confirmar y desde Presented la estimación queda bl
   await expect(screen.getByRole('button', /Recalculate/)).toBeVisible()
 
   await screen.getByRole('button', 'Back to Case').tap()
-  await planes.getByRole('button', /^24\/08\/2026, Presented/).tap()
+  await planes.getByRole('button', /^08\/24\/2026, Presented/).tap()
   await planes.getByRole('button', /Crown Option, Presented/).tap()
   await screen.getByRole('button', /Total Amount .* View estimate details/).last().tap()
   await expect(screen.getByText('Locked at presentation')).toBeVisible()
@@ -310,7 +310,7 @@ test('si el consentimiento no se puede mandar, el procedimiento no cambia', asyn
    y de la vista del caso las duplicaba). */
 test('al cambiar de caso queda una sola card de Informed Consent', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode?case=c5')
-  await screen.getByRole('button', /17\/04\/2026/).tap()
+  await screen.getByRole('button', /04\/17\/2026/).tap()
   await screen.getByRole('button', /Implant Option/).tap()
   await screen.getByRole('button', /Bridge Option/).tap()
   await expect(screen.getByText('Informed Consent for Dental Treatment – Prueba 1')).toBeVisible()
