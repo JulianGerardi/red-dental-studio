@@ -7,8 +7,10 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ### Documentación en Figma, Storybook al día y Jira en cada página ([#144](https://github.com/JulianGerardi/red-dental-studio/pull/144))
 - **Figma:** archivo nuevo, [Confidentally — Red Dental Studio · Flows](https://www.figma.com/design/TPh6NE9d4skn0BdId26UTR),
-  con el formato de la página 🧍 Patients de *Platform Design*: una página por módulo (19), una sección por flujo (60)
-  y 262 pantallas capturadas de la app, con auto layout y las capas nombradas como el componente de React.
+  con el formato de la página 🧍 Patients de *Platform Design*: una página por módulo (19), una sección por flujo (63)
+  y 281 pantallas capturadas de la app, con auto layout y las capas nombradas como el componente de React.
+- **Relationships & Billing completo:** Add Relationship con Person · Contact · Relationship (persona con contacto,
+  sin contacto y nueva), Edit, Delete con su vacío y el garante en Ledger y Billing (CON-4000, CON-3174, CON-3999).
 - **Happy path para el dev:** cada flujo trae resumen, quién lo usa, sus historias de Jira y los pasos numerados; cada
   pantalla, su ruta y una nota.
 - **Storybook:** quedaban 74 piezas sin story y 6 estados sin mostrar desde el 2026-10-25. `ds:check` vuelve a verde

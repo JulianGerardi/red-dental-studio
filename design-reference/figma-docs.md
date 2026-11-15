@@ -64,7 +64,8 @@ una al lado de la otra.
 | 🔔 Notifications | `7:20` | `notifications.mjs` | `notifications.md` |
 | ❓ Help | `7:21` | `help.mjs` | `help.md` |
 
-Al 2026-11-15: 19 páginas de módulo, 60 flujos y 262 pantallas.
+Al 2026-11-15: 19 páginas de módulo, 63 flujos y 281 pantallas. Relationships & Billing se completó ese día: Add
+Relationship con sus tres pasos (con y sin Contact, persona nueva), Edit, Delete y el garante en Ledger y Billing.
 
 ## Cómo se actualiza una página
 
