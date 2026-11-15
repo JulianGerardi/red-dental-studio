@@ -3,6 +3,30 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-15
+
+### Documentación en Figma, Storybook al día y Jira en cada página ([#144](https://github.com/JulianGerardi/red-dental-studio/pull/144))
+- **Figma:** archivo nuevo, [Confidentally — Red Dental Studio · Flows](https://www.figma.com/design/TPh6NE9d4skn0BdId26UTR),
+  con el formato de la página 🧍 Patients de *Platform Design*: una página por módulo (19), una sección por flujo (63)
+  y 281 pantallas capturadas de la app, con auto layout y las capas nombradas como el componente de React.
+- **Relationships & Billing completo:** Add Relationship con Person · Contact · Relationship (persona con contacto,
+  sin contacto y nueva), Edit, Delete con su vacío y el garante en Ledger y Billing (CON-4000, CON-3174, CON-3999).
+- **Happy path para el dev:** cada flujo trae resumen, quién lo usa, sus historias de Jira y los pasos numerados; cada
+  pantalla, su ruta y una nota.
+- **Storybook:** quedaban 74 piezas sin story y 6 estados sin mostrar desde el 2026-10-25. `ds:check` vuelve a verde
+  (570 de 570). Páginas nuevas: BillingProfile, LocationInsuranceDefaults, ConsentDetail, EstimateDetails, Procedure
+  actions, RegionExam, IntraOralExam, ProblemListFlotante, SearchPicker, DockFlotantes y Ledger parts, entre otras.
+- **Jira en el Storybook:** cada página suma la tarjeta *Jira* con las historias de la pieza y su link.
+- **Para el dev:**
+  - La app no cambia de comportamiento: sólo se exportaron piezas internas para poder documentarlas (lista en
+    `design-system.md`, 2026-11-15).
+  - `scripts/figma/`: `capturar.mjs` (`npm run figma:capturar -- <módulo>`), `portada.mjs`, `ordenar.figma.js` y un
+    archivo por módulo en `flujos/` con los pasos, las notas y las claves de Jira. Sirven de guía del flujo aunque no
+    se abra el Figma.
+  - `kit.tsx` suma `SpecsMedidas` (Specs leídos de la pieza dibujada) y los stories aceptan `parameters.docs.jira`.
+  - Reglas en `design-reference/figma-docs.md` y en `CLAUDE.md` (*Documentación en Figma*): documentar es Storybook y
+    Figma.
+
 ## 2026-11-13
 
 ### Billing: un drawer por botón, como red.dev, y Export CSV que descarga ([#143](https://github.com/JulianGerardi/red-dental-studio/pull/143))

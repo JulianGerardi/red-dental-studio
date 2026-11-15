@@ -1198,3 +1198,66 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
 
 - *Components / Clinical / RecordDetail*, *Ledger / LedgerRowDetail*, *Pages / Parts / Billing* y *UI / DetailList*: el pie del
   detalle de una fila ya no lleva View full record (sale `VerRegistroCompleto`); en el Ledger queda Apply credit. Decisión en `figma/modulos/ledger.md` (2026-10-25).
+
+## Puesta al día: lo implementado del 2026-10-25 al 2026-11-13 y las historias de Jira (2026-11-15)
+
+Entre esas fechas se publicaron unas 35 tandas con "Storybook sin actualizar". `ds:check` daba 74 funciones de React sin
+story y 6 estados sin mostrar; quedó en verde (570 de 570 funciones, 113 de 113 componentes con todos sus estados). Cada
+story nueva se abrió en el Storybook compilado para confirmar que renderiza.
+
+**Jira en cada página.** `DocsPage` suma una cuarta tarjeta, **Jira**, al lado de Component / Usage / Design: lista las
+historias de la pieza con link a `confidetally.atlassian.net`. Salen de `parameters.docs.jira` del story y de las
+`CON-…` que citan el código del componente, sus stories o su descripción, así que una pieza que ya nombraba su historia
+en un comentario la muestra sin tocar nada. Las páginas de pantalla (*Pages / Parts*) declaran las de su módulo, tomadas
+de `jira.md`. Sin historia, la tarjeta dice *No story linked*.
+
+**Specs medidos.** `kit.tsx` suma `SpecsMedidas`: recibe las piezas, las dibuja y arma la tabla de Specs con el tamaño,
+el padding, el radio, el texto y el borde leídos del elemento. Nada se escribe a mano.
+
+**Páginas nuevas** (Playground, Parts, States y Specs salvo donde se aclara):
+
+| Página | Qué documenta | Jira | Tanda |
+|---|---|---|---|
+| *Components / Settings / BillingProfile* | Billing Profile de Location y de provider: estado, contactos, credenciales, Contracted With, barra de guardado y los tres drawers | CON-4019, CON-4021, CON-4026 a CON-4028, CON-4033, CON-4003 a CON-4007 | 2026-11-04 |
+| *Components / Settings / LocationInsuranceDefaults* | Insurance Defaults: opciones, card de selección, drawers de perfil y de provider, y el aviso de bloqueo | CON-1173, CON-4029, CON-3894, CON-3896, CON-4030, CON-3898, CON-3899, CON-4031, CON-4032 | 2026-11-06 |
+| *Components / Clinical / ConsentDetail* | El consentimiento de un procedimiento: los seis estados, la hoja, las firmas del paciente y del provider | CON-4119, CON-2905, CON-2910, CON-2911, CON-2913, CON-2860, CON-2862, CON-2866, CON-2927, CON-2928 | 2026-11-02 y 2026-11-11 |
+| *Components / Clinical / EstimateDetails* | Estimate details desde el Total amount: cada situación de la estimación y Prototype controls (Playground, Parts, States) | CON-3695, CON-1598 | 2026-10-29 |
+| *Components / Clinical / Procedure actions* | El ⋮ de un procedimiento según su estado y el de su caso, y los diálogos Edit, Refer, Discard, Discontinue y Delete (Playground, Parts, States) | CON-2833, CON-2834, CON-2939, CON-2835, CON-4052 | 2026-11-11 |
+| *Components / Clinical / RegionExam* e *IntraOralExam* | El examen por región que comparten Extraoral e Intraoral | CON-881, CON-882, CON-810, CON-2083 | 2026-10-24 y 2026-10-28 |
+| *Components / Clinical / Dental / IntraOralDiagram* y *RegionDiagram* | El gráfico de regiones y el de Intraoral, con pending y active | CON-881, CON-882 | 2026-10-24 |
+| *Components / Clinical / ProblemListFlotante* | View Problem List y la tabla flotante; abre en Procedures desde el Ledger | CON-3114, CON-2832, CON-2833 | 2026-10-29 |
+| *Components / Clinical / Dental / EditConditionDrawer* y *EditProcedureDrawer* | Los dos Edit de un finding | CON-2770, CON-2083, CON-1751, CON-3900 | 2026-10-27 |
+| *Components / Clinical / Dental / DatosHallazgo* y *OpcionesVinculo* | Las filas de datos de un finding y las cards de los buscadores de New Procedure | CON-3700, CON-1961, CON-2083 | 2026-10-27 y 2026-10-28 |
+| *Components / Layout / DockFlotantes* | La columna de flotantes del borde derecho y su panel | — (pantalla del clon) | 2026-10-27 |
+| *Components / UI / SearchPicker* | El buscador con resultados en cards (Playground, Parts, States) | CON-3259 | 2026-11-10 y 2026-11-11 |
+| *Components / UI / CountryFlag* | La bandera del Country Code | — | 2026-11-04 |
+| *Pages / Parts / Ledger* | Household y el ⋮ de una fila del Ledger | CON-3732, CON-3753, CON-3755, CON-4076 | 2026-11-12 |
+
+**Páginas que se completaron:**
+
+- *Components / Billing / PostPaymentDialog*: reescrita con la estructura completa. Un drawer por botón, como red.dev
+  (CON-4147): New Patient Payment (-), Credit Adjustment (-) y Enter Charge (+) Adjustment; varios métodos de pago y las
+  listas de `data/billing.ts`. *Pages / Parts / Billing*, *UI / Drawer* y *Dashboard / primitives* dejan de nombrar
+  "Post payment" y los filtros viejos (Pt Payment, Charge Adj, Credit Adj).
+- *Clinical / ClinicalTopBar parts*: las opciones del encuentro en curso y en pausa (CON-1612).
+- *Clinical / TreatmentPlanSection parts*: el botón Total amount y el aviso de estimación (CON-2529).
+- *Clinical / Dental / ScopeIcon*: el ícono de cada tipo de área (CON-3700). *EditFindingDrawer*: la vista de una
+  condition fuera de un diente.
+- *Patients / Form layout*: Country Code, los grupos plegables de Guardian (CON-2858), la fila de persona y el buscador
+  sin resultados. *Pages / Parts / Patient modals*: el buscador de "link a person" (CON-2107).
+- *Patients / PatientSidePanel parts*: Pending Signature, entero y sólo ícono (CON-1611).
+- *Settings / ConsentDocument*: la línea de firma (vacía, adoptada, escrita) y la hoja firmada por el paciente con las
+  afirmaciones marcadas (CON-2913).
+- *Scheduling / AppointmentDetailsDrawer*: Delete habilitado y deshabilitado. *Insurance modals*: Plan Name apagado
+  hasta elegir carrier (CON-3259). *Settings / NewRoomModal*: sala inactiva. *UI / DatePicker*: el año editable.
+
+**Para que fueran documentables**, se exportaron piezas internas (sin cambiar su comportamiento): `Firmado` y
+`VentanaFirma` (ConsentDetail), `RegionExamInterno`, `BotonTotal` y `AvisoEstimacion` (TreatmentPlanSection),
+`EditFindingView`, `BuscarPersona`, `LineaFirma`, `IdentidadLocacion`, `ContactosProvider`, las de
+`LocationInsuranceDefaults` (`Encabezado`, `Opciones`, `Casilla`, `Seleccion`, `ResumenPerfil`, `ResumenProvider`,
+`OpcionDrawer`, `ElegirPerfilDrawer`, `ElegirProviderDrawer`), `AnioEditable`, y `AccionesFila` y `Household` del Ledger.
+
+**Exenciones de estado nuevas** (`state-waivers.json`): *ConsentDetail · loading* ("Preparing document..." dura medio
+segundo al abrir: se ve en el Playground) y *CountryFlag · loading* (el detector lee `loading="lazy"`).
+
+**Figma.** Desde esta fecha, documentar es Storybook y Figma: ver `figma-docs.md`.

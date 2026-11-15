@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { EditFindingDrawer } from './EditFindingDrawer'
+import { EditFindingDrawer, EditFindingView } from './EditFindingDrawer'
 
 const meta = {
   title: 'Components/Clinical/Dental/EditFindingDrawer',
@@ -36,3 +36,8 @@ export const WithoutTooth: Story = { args: { finding: { id: 'F-2', area: 'Soft P
 
 /* Un procedure (Add Procedure): sin la sección de Descriptors, que es sólo de una condition. */
 export const ProcedureFinding: Story = { args: { finding: { id: 'F-6', area: 'Tooth 19', condition: 'D2740 - Crown – porcelain/ceramic', descriptor: 'Tooth', date: 'May 14, 2026', status: 'Externally Treated', tooth: 19, provider: 'Emily Chen', surfaces: [], notes: '', linked: [], diagnoses: [], kind: 'procedure' } } }
+
+/* La vista de una condition fuera de un diente (Extraoral, Intraoral; Figma 5294:107675): descriptores y notas. */
+export const RegionFindingView: Story = {
+  render: () => <EditFindingView finding={{ id: 'F-2', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: 'May 14, 2026', status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [], kind: 'condition', descriptors: { colors: 'Red' }, examen: 'Intraoral' }} onClose={() => {}} onSave={() => {}} />,
+}

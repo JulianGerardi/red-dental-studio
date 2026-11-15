@@ -183,7 +183,7 @@ export type VinculoPersona = {
   error?: string
 }
 
-function BuscarPersona({ v }: { v: VinculoPersona }) {
+export function BuscarPersona({ v }: { v: VinculoPersona }) {
   const elegida = v.personas.find((p) => p.name === v.valor)
   return (
     <div data-campo="persona">

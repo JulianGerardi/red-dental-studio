@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { EstadoPill, ProviderPill } from './Employees'
 
-const meta = { title: 'Pages/Parts/Team', parameters: { layout: 'padded' } } satisfies Meta
+const meta = { title: 'Pages/Parts/Team', parameters: { docs: { jira: ['CON-1548', 'CON-2889', 'CON-4003'] }, layout: 'padded' } } satisfies Meta
 
 export default meta
 type Story = StoryObj<typeof meta>

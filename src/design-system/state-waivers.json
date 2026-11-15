@@ -66,5 +66,17 @@
       "na": true,
       "reason": "El detector confunde los `data-[state=…]` de animación de Radix con un estado de selección; el tooltip no tiene uno."
     }
+  },
+  "components/clinical/ConsentDetail.tsx": {
+    "loading": {
+      "story": "components/clinical/ConsentDetail.stories.tsx#Playground",
+      "reason": "\"Preparing document...\" se ve medio segundo al abrir el detalle, mientras se arma la hoja: es el arranque del Playground."
+    }
+  },
+  "components/ui/country-flag.tsx": {
+    "loading": {
+      "na": true,
+      "reason": "El detector lee el atributo `loading=\"lazy\"` de la imagen; la bandera no tiene un estado de carga propio."
+    }
   }
 }

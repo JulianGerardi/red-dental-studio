@@ -253,7 +253,7 @@ export function LocationBillingProfile({
 }
 
 /* El perfil guardado: nombre editable, contactos reemplazables y credenciales en su propio drawer (CON-4026). */
-function IdentidadLocacion({
+export function IdentidadLocacion({
   perfil, opciones, onReemplazar, reemplazo, onCerrarReemplazo, onGuardar, onDirtyChange,
 }: {
   perfil: PerfilFacturacion

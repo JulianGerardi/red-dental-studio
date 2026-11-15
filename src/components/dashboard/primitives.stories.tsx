@@ -50,7 +50,7 @@ const meta = {
 export default meta
 type Story = StoryObj<Args>
 
-const FILTROS = ['All', 'Pt Payment', 'Charge Adj', 'Credit Adj'] as const
+const FILTROS = ['All', 'Payments', 'Adjustments', 'Today'] as const
 
 function Controles({ tipo }: { tipo: Args['controls'] }) {
   const [filtro, setFiltro] = useState<(typeof FILTROS)[number]>('All')

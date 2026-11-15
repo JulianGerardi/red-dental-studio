@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { conPacientes } from '@/design-system/decorators'
 import { pulsar, esperar, secuencia } from '@/design-system/play'
 import { VACIO_PACIENTE } from '@/data/patientsStore'
-import { CamposDemography, CamposGeneral, CamposGuardian } from '@/components/patients/PacienteCampos'
+import { BuscarPersona, CamposDemography, CamposGeneral, CamposGuardian } from '@/components/patients/PacienteCampos'
+import { PERSONAS_SISTEMA } from '@/data/personas'
 import { EditContactModal } from './EditContactModal'
 import { EditPatientForm } from './EditPatient'
 import { EditPatientModal } from './EditPatientModal'
@@ -12,7 +13,8 @@ import { NewPatientModal } from './NewPatientModal'
    qué: design-reference/figma/modulos/patients.md, 2026-10-22. */
 const meta = {
   title: 'Pages/Parts/Patient modals',
-  parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 640 } } },
+  parameters: { layout: 'fullscreen', docs: {
+      jira: ['CON-2107', 'CON-2858'], story: { inline: false, iframeHeight: 640 } } },
   decorators: [conPacientes],
 } satisfies Meta
 
@@ -71,3 +73,9 @@ export const FieldsDemography: Story = {
   name: 'Fields — Demography', parameters: { layout: 'padded' },
   render: () => <div className="w-[512px]"><CamposDemography d={{ ...datos, phone: '(555) 123-4567', language: 'English', city: 'Phoenix' }} cambiar={sinCambiar} errores={{}} /></div>,
 }
+
+/* New Patient → "link a person that already exists" (CON-2107; patients.md, 2026-11-02): el buscador de personas del
+   sistema, vacío y con una elegida. */
+export const LinkPersonSearch: Story = { render: () => <div className="w-[420px]"><BuscarPersona v={{ activo: true, onActivo: () => {}, personas: PERSONAS_SISTEMA, valor: '', onValor: () => {} }} /></div> }
+export const LinkPersonSelected: Story = { render: () => <div className="w-[420px]"><BuscarPersona v={{ activo: true, onActivo: () => {}, personas: PERSONAS_SISTEMA, valor: PERSONAS_SISTEMA[0].name, onValor: () => {} }} /></div> }
+export const LinkPersonError: Story = { render: () => <div className="w-[420px]"><BuscarPersona v={{ activo: true, onActivo: () => {}, personas: PERSONAS_SISTEMA, valor: '', onValor: () => {}, error: 'Select a person or untick the option to enter the details.' }} /></div> }

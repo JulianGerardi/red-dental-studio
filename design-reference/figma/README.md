@@ -14,6 +14,7 @@ Archivo: `9fYLxX9hlTj5unFthG4bBg`. Relevado durante el rediseño de `red-clone`.
 | Relationships & Billing (6 pantallas) | `3751:76507` | [modulos/relationships.md](modulos/relationships.md) |
 | Consents (Settings) | `4106:170620` | [modulos/consents.md](modulos/consents.md) |
 | Design system (Storybook) | — | [../design-system.md](../design-system.md) |
+| Documentación en Figma (Screens & Flows) | archivo `TPh6NE9d4skn0BdId26UTR` | [../figma-docs.md](../figma-docs.md) |
 
 ## Historias de Jira
 

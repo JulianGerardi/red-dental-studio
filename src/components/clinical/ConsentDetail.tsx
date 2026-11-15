@@ -206,7 +206,7 @@ export function ConsentDetail({ procedimiento: p, pendiente, onVolver, onFirmar 
 }
 
 /* La firma ya juntada, en el lugar del botón. */
-function Firmado({ rol, fecha }: { rol: Firmante; fecha: string }) {
+export function Firmado({ rol, fecha }: { rol: Firmante; fecha: string }) {
   return (
     <span className="flex h-8 items-center gap-1.5 text-[13px] font-medium text-dash-ok-fg">
       <CircleCheck className="size-4" aria-hidden /> {rol} signed {fecha}
@@ -219,7 +219,7 @@ const LEGAL = 'By selecting Adopt and Sign, I agree that the signature and initi
 
 /* Las firmas se hacen en un pop up: en red.dev el botón lleva a un portal para firmar, acá es una ventana encima del
    consentimiento (no un drawer). Ver clinical-mode.md (2026-11-02). */
-function VentanaFirma({ titulo, descripcion, cancelar = 'Cancel', guardar, guardarDeshabilitado, onClose, onGuardar, children }: {
+export function VentanaFirma({ titulo, descripcion, cancelar = 'Cancel', guardar, guardarDeshabilitado, onClose, onGuardar, children }: {
   titulo: string
   descripcion?: string
   cancelar?: string

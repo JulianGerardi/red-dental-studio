@@ -25,6 +25,7 @@ const meta = {
   parameters: {
     layout: 'padded',
     docs: {
+      jira: ['CON-57', 'CON-1113', 'CON-1063'],
       decisionsFrom: ['pages/settings/finance/Carriers.tsx', 'pages/settings/finance/InsurancePlan.tsx', 'pages/settings/finance/FeeSchedules.tsx', 'pages/settings/finance/CoverageTables.tsx'],
       description: {
         component: [

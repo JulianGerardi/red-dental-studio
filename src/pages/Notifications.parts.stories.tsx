@@ -25,6 +25,7 @@ const meta = {
   parameters: {
     layout: 'padded',
     docs: {
+      jira: ['CON-3611'],
       decisionsFrom: 'pages/Notifications.tsx',
       description: {
         component: [

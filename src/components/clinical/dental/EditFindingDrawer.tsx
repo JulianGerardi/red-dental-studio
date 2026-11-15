@@ -44,7 +44,7 @@ export function EditFindingDrawer({
 export type PestanaEdicion = 'General Information' | 'Descriptors'
 export const PESTANAS_EDICION = ['General Information', 'Descriptors'] as const
 
-function EditFindingView({
+export function EditFindingView({
   finding, onClose, onSave,
 }: {
   finding: Finding | null

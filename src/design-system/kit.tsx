@@ -164,3 +164,33 @@ export function TablaPartes({ partes }: { partes: [string, string, string][] }) 
     </Tabla>
   )
 }
+
+/* Specs leídos de la pieza ya dibujada: nada se escribe a mano. `selector` elige qué nodo medir dentro de la muestra. */
+export type PiezaSpec = { nombre: string; selector?: string; children: ReactNode }
+
+function FilaSpec({ nombre, selector, children }: PiezaSpec) {
+  const { ref, m } = useMedidas(selector)
+  return (
+    <tr>
+      <td className="font-semibold whitespace-nowrap">{nombre}</td>
+      <td><div ref={ref} className="max-w-[360px]">{children}</div></td>
+      <td className="tabular-nums whitespace-nowrap">{m ? `${m.ancho} × ${m.alto}` : '—'}</td>
+      <td className="whitespace-nowrap">{m?.padding ?? '—'}</td>
+      <td className="whitespace-nowrap">{m?.radio ?? '—'}</td>
+      <td className="whitespace-nowrap">{m ? `${m.texto} · ${m.peso}` : '—'}</td>
+      <td className="whitespace-nowrap">{m?.borde ?? '—'}</td>
+    </tr>
+  )
+}
+
+export function SpecsMedidas({ piezas, nota }: { piezas: PiezaSpec[]; nota?: ReactNode }) {
+  return (
+    <Lienzo>
+      <Bloque titulo="Specs" nota={nota ?? 'Medidas leídas de cada pieza ya dibujada, al ancho de esta página.'}>
+        <Tabla encabezado={['Part', 'Sample', 'Size', 'Padding', 'Radius', 'Text', 'Border']} minimo={860}>
+          {piezas.map((p) => <FilaSpec key={p.nombre} {...p} />)}
+        </Tabla>
+      </Bloque>
+    </Lienzo>
+  )
+}

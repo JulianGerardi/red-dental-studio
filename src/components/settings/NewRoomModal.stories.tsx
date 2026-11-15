@@ -19,3 +19,6 @@ export const Edit: Story = { args: { inicial: { id: 's1', nombre: 'Operatory 1',
 export const WithValidationErrors: Story = {
   play: secuencia(pulsar(/^save$/i), esperar(/required|at least|must|invalid/i)),
 }
+
+/* El switch Active apagado (selected = on/off): la sala queda Inactive y deja de ofrecerse en la agenda. */
+export const InactiveRoom: Story = { args: { inicial: { id: 's5', nombre: 'Operatory 5', tipo: 'Operatory', abreviatura: 'OP5', activa: false, turnos: [] } } }
