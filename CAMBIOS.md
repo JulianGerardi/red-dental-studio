@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-15
 
+### Figma: Fill container, íconos de los buscadores y Relationships & Billing completo ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Fill container en las 281 pantallas:** lo que ocupa todo el ancho o el alto de su contenedor, o el espacio que sobra,
+  pasa a Fill container (con ancho máximo si lo tenía). Al quitar un elemento el resto se acomoda y al achicar la pantalla
+  el contenido la acompaña; el dock y los drawers quedan anclados a su borde.
+- **Íconos de los buscadores:** el importador los dejaba debajo del input blanco y no se veían; ahora van arriba.
+- **Para el dev:**
+  - Nuevo `scripts/figma/arreglar.figma.js` (se corre con `use_figma` después de importar y ordenar). Verifica cada
+    contenedor: si algún hijo cambiara de tamaño, lo deja como estaba.
+  - Reglas y límites en `design-reference/figma-docs.md` y en `CLAUDE.md` (*Documentación en Figma*). La app no cambia.
+
+
 ### Documentación en Figma, Storybook al día y Jira en cada página ([#144](https://github.com/JulianGerardi/red-dental-studio/pull/144))
 - **Figma:** archivo nuevo, [Confidentally — Red Dental Studio · Flows](https://www.figma.com/design/TPh6NE9d4skn0BdId26UTR),
   con el formato de la página 🧍 Patients de *Platform Design*: una página por módulo (19), una sección por flujo (63)

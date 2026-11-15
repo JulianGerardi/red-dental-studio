@@ -175,10 +175,13 @@ y los pasos están en `design-reference/figma-docs.md`; leelo antes de tocar el 
   Patients, y así con cada uno.
 - **Cada flujo lleva su guía de happy path para el dev**: resumen, quién lo usa, las historias de Jira y los pasos
   numerados con lo que hace el usuario y lo que responde la app; cada pantalla, su nombre, su ruta y una nota.
-- **Auto layout en todo y capas con nombre**: el del componente de React (`PatientsTable / DataTable`), rol y texto en
-  los controles (`Button - New Patient`) y `Icon - <nombre>` en los íconos. Nada de "Frame 12".
+- **Auto layout en todo, con Fill container, y capas con nombre**: el del componente de React (`PatientsTable / DataTable`),
+  rol y texto en los controles (`Button - New Patient`) y `Icon - <nombre>` en los íconos. Nada de "Frame 12". Lo que
+  ocupa todo su contenedor va en Fill container y lo absoluto anclado a su borde; los íconos no quedan tapados por el
+  campo (`scripts/figma/arreglar.figma.js`).
 - **Se captura de la app, no se dibuja**: el flujo se define en `scripts/figma/flujos/<módulo>.mjs`, se captura con
-  `npm run figma:capturar -- <módulo>`, se importa con `html_to_figma` y se ordena con `scripts/figma/ordenar.figma.js`.
+  `npm run figma:capturar -- <módulo>`, se importa con `html_to_figma`, se ordena con `scripts/figma/ordenar.figma.js` y se arregla (Fill container, capas)
+  con `scripts/figma/arreglar.figma.js`.
   El contenido es el de la app: nada inventado.
 - Cada historia de Jira que se implementa aparece en el flujo que documenta (`jira` del flujo) y en la página de su
   componente en el Storybook (`docs.jira`, o citada en el código: la tarjeta *Jira* la lee sola).
