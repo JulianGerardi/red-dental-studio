@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-15
 
-### Figma: Fill container, íconos de los buscadores y Relationships & Billing completo ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Figma: Fill container, íconos de los buscadores y Relationships & Billing completo ([#145](https://github.com/JulianGerardi/red-dental-studio/pull/145))
 - **Fill container en las 281 pantallas:** lo que ocupa todo el ancho o el alto de su contenedor, o el espacio que sobra,
   pasa a Fill container (con ancho máximo si lo tenía). Al quitar un elemento el resto se acomoda y al achicar la pantalla
   el contenido la acompaña; el dock y los drawers quedan anclados a su borde.
