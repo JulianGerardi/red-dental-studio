@@ -134,7 +134,7 @@ const casoDelCargo = (m: Movimiento) => {
 
 /* El ⋮ de la fila (CON-3753): Apply credit con crédito sin aplicar y Estimation details en un procedimiento con caso. Sin
    acciones no hay ⋮: un menú que dice "No actions available" es un clic perdido (ledger.md, 2026-11-12). */
-function AccionesFila({ m, onAplicar, onAbrirCaso, onOpenChange }: {
+export function AccionesFila({ m, onAplicar, onAbrirCaso, onOpenChange }: {
   m: Movimiento; onAplicar: () => void; onAbrirCaso: (caso: string) => void; onOpenChange: (open: boolean) => void
 }) {
   const caso = casoDelCargo(m)
@@ -161,7 +161,7 @@ function AccionesFila({ m, onAplicar, onAbrirCaso, onOpenChange }: {
 }
 
 /* Guarantor View: quiénes comparten la cuenta, como en red.dev (CON-4076). */
-function Household() {
+export function Household() {
   const personas = [{ nombre: GUARANTOR, rol: 'Guarantor' }, ...DEPENDIENTES.map((nombre) => ({ nombre, rol: 'Dependent' }))]
   return (
     <section aria-labelledby="ledger-household" className={cn(TARJETA_PANEL, 'mt-4 p-4')}>

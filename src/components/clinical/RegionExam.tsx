@@ -29,7 +29,7 @@ export function RegionExam<R extends string>({ examen, diagrama }: {
     : <ExamFindingsProvider><RegionExamInterno examen={examen} diagrama={diagrama} /></ExamFindingsProvider>
 }
 
-function RegionExamInterno<R extends string>({ examen, diagrama }: { examen: string; diagrama: (p: { pending: R[]; active: R[]; onToggle: (region: R) => void }) => ReactNode }) {
+export function RegionExamInterno<R extends string>({ examen, diagrama }: { examen: string; diagrama: (p: { pending: R[]; active: R[]; onToggle: (region: R) => void }) => ReactNode }) {
   const [pending, setPending] = useState<R[]>([])
   const [open, setOpen] = useState(false)
   const estado = useFindingsEstado()!

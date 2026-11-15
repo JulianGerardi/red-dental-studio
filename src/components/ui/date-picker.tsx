@@ -127,7 +127,7 @@ export function MonthCalendar({
 /* El año del encabezado se escribe: saltar a 1985 con flechas son decenas de clics (Julián, 2026-11-04; patients.md).
    Aplica con 4 dígitos; ↑/↓ suman o restan uno; si queda vacío o fuera de rango, vuelve al que estaba. Con `max`, no
    pasa de ese mes. */
-function AnioEditable({ month, onMonthChange, tope }: { month: Date; onMonthChange: (m: Date) => void; tope?: Date }) {
+export function AnioEditable({ month, onMonthChange, tope }: { month: Date; onMonthChange: (m: Date) => void; tope?: Date }) {
   const anio = month.getFullYear()
   const [texto, setTexto] = useState(String(anio))
   const [previo, setPrevio] = useState(anio)

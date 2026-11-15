@@ -97,7 +97,7 @@ type Props = {
 export type FirmaHoja = { fecha: string; nombre: string; imagen?: string; texto?: string; iniciales?: string }
 
 /* Una línea de firma del documento: el trazo (o el nombre escrito, o el nombre) sobre la línea, quién firma y la fecha. */
-function LineaFirma({ rol, nombre, firma }: { rol: string; nombre: string; firma?: FirmaHoja }) {
+export function LineaFirma({ rol, nombre, firma }: { rol: string; nombre: string; firma?: FirmaHoja }) {
   return (
     <div className="grid grid-cols-[1fr_96px] items-end gap-4 text-[11px] text-ink-faint">
       <div>

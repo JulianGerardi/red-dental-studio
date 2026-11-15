@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { CalendarDays, Mail, Phone } from 'lucide-react'
 import { conPacientes } from '@/design-system/decorators'
-import { EncounterButton, InfoBlock } from './PatientSidePanel'
+import { EncounterButton, InfoBlock, PendingSignatureButton } from './PatientSidePanel'
 
 const meta = { title: 'Components/Patients/PatientSidePanel parts', parameters: { layout: 'padded' }, decorators: [conPacientes] } satisfies Meta
 
@@ -20,3 +20,8 @@ export const InfoSection: Story = {
   ),
 }
 export const StartEncounter: Story = { render: () => <div className="h-40 w-[260px]"><EncounterButton /></div> }
+
+/* Pending Signature (patient-dashboard.md, 2026-11-10; CON-1611): el encuentro terminó y la Clinical Note quedó sin
+   firmar. Ocupa el lugar del botón de encuentro; con el menú plegado queda sólo el ícono. */
+export const PendingSignature: Story = { render: () => <div className="w-[220px]"><PendingSignatureButton /></div> }
+export const PendingSignatureIconOnly: Story = { render: () => <PendingSignatureButton soloIcono /> }

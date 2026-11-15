@@ -47,7 +47,7 @@ const CAJA_TOTAL = 'bg-dash-count-bg flex h-9 shrink-0 items-center rounded-md p
 const BOTON_TOTAL = `${CAJA_TOTAL} group/total gap-1 transition-colors hover:bg-brand-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue`
 
 /* Total Amount del caso: lleva a Estimate details. */
-function BotonTotal({ total, onClick }: { total: string; onClick?: () => void }) {
+export function BotonTotal({ total, onClick }: { total: string; onClick?: () => void }) {
   return (
     <button type="button" onClick={onClick} aria-label={`Total Amount ${total}. View estimate details`} className={BOTON_TOTAL}>
       Total Amount: <span className="text-dash-blue ml-1">{total}</span>
@@ -58,7 +58,7 @@ function BotonTotal({ total, onClick }: { total: string; onClick?: () => void })
 
 /* CON-2529: el aviso de que cambió algo que afecta las estimaciones. Pregunta antes de recalcular, con la copia de la
    historia. */
-function AvisoEstimacion({ onActualizar }: { onActualizar: () => void }) {
+export function AvisoEstimacion({ onActualizar }: { onActualizar: () => void }) {
   const [abierto, setAbierto] = useState(false)
   return (
     <>

@@ -15,6 +15,7 @@ const meta = {
   parameters: {
     layout: 'fullscreen',
     docs: {
+      jira: ['CON-2107', 'CON-2942', 'CON-2952', 'CON-2944', 'CON-2953'],
       decisionsFrom: 'pages/PatientDetail.tsx',
       description: {
         component: [

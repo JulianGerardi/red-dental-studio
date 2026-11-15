@@ -26,12 +26,13 @@ const meta = {
   parameters: {
     layout: 'padded',
     docs: {
+      jira: ['CON-1060', 'CON-4147'],
       decisionsFrom: 'pages/Billing.tsx',
       description: {
         component: [
           'Los cobros de la clínica (`@/pages/Billing`). Tiene **dos modos** en la misma pantalla:',
           '',
-          '- **Resumen** (sin paciente): los cinco números, **Recent Billing Activity** de toda la clínica con las Tabs de tipo, **Find Patient** y **Today**. No hay botones de pago.',
+          '- **Resumen** (sin paciente): los cinco números, **Recent Billing Activity** de toda la clínica con las Tabs de red.dev (All, Payments, Adjustments, Today), **Columns** y **Export CSV** (CON-4147), **Find Patient** y **Today**. No hay botones de pago.',
           '- **Paciente** (elegido desde una fila o desde Find Patient): su card baja arriba de Find Patient con una animación corta, el título dice su nombre, las Tabs pasan a **Patient View / Guarantor View**, la tabla muestra **sólo sus movimientos** (o los de todo su garante) y aparecen los botones de pago. **Cada fila se despliega** con el detalle del Ledger según el tipo: contexto, *Location*, *Financial details* y las transacciones relacionadas (2026-10-14; *Components / Ledger / LedgerRowDetail*). La X de la card vuelve al resumen.',
           '',
           '**Cards:** los paneles son `Panel` (título de 15px sin ícono, como Patients y el Dashboard); lo que va adentro (resultados y números de Today) es `InnerCard`. La pantalla completa está en *Pages*.',
@@ -61,7 +62,7 @@ const porTipo = (f: FiltroActividad) => ACTIVIDAD_RECIENTE.filter((m) => coincid
 
 const Fondo = ({ children }: { children: ReactNode }) => <div className="bg-page-background p-4 sm:p-6">{children}</div>
 
-/* La pantalla con lo que se eligió en Controls. En su propio iframe, para que el drawer de Post payment se abra adentro. */
+/* La pantalla con lo que se eligió en Controls. En su propio iframe, para que los drawers de pago y ajuste se abran adentro. */
 export const Playground: Story = {
   parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 1180 } } },
   render: (a) => (
@@ -82,14 +83,14 @@ const PARTES: [string, string, string][] = [
   ['Summary numbers', 'Cinco números de toda la clínica, cada uno en una card de página (sombra, sin borde). Cinco en fila desde 1280px, 3 + 2 antes, 2 + 2 + 1 en el celular; etiqueta, número y bajada alineados entre cards (subgrid). No cambian con el paciente.', 'Stat enFila'],
   ['Info circle', 'Arriba a la derecha de cada número de arriba y de Today: al pasar el mouse, tocar o llegar con Tab explica qué cuenta (los textos de red.dev).', 'InfoTip'],
   ['Recent Billing Activity', 'Resumen: toda la clínica y las Tabs de tipo. Paciente: los botones arriba del título, su nombre en el título, Patient View / Guarantor View y sólo sus movimientos (sin saldos: son de la cuenta entera, no de la location).', 'ActividadReciente · Panel'],
-  ['Patient actions', 'Sólo con paciente, arriba del título y a la izquierda: Patient Payment, Credit Adjustment y Charge Adjustment (abren Post payment con el tipo ya elegido) y Export statement. Button md.', 'AccionesPaciente · Panel top'],
+  ['Patient actions', 'Sólo con paciente, arriba del título y a la izquierda: Patient Payment, Credit Adjustment y Charge Adjustment (cada uno abre su drawer, como red.dev: CON-4147) y Export statement. Button md.', 'AccionesPaciente · Panel top'],
   ['Activity table', 'La tabla de la app, compacta. En el resumen, clic en una fila abre la vista de ese paciente. Con paciente, la fila se despliega (chevron, Collapse all / Expand all).', 'DataTable'],
   ['Row detail', 'Con paciente: el detalle del Ledger según el tipo (Procedure, Charge Adjustment, Patient Payment, Credit Adjustment; el pago del seguro con los datos de siempre). La acción del pie y los links abren el registro de sólo lectura.', 'DetalleMovimiento · LedgerRowModal'],
   ['Patient card', 'Sólo con paciente: de borde a borde arriba de Find Patient, con iniciales (sin borde), nombre, rol (y su garante si es Patient) y la X que vuelve al resumen. Entra sutil, estilo Apple: 2px, un desenfoque leve que se aclara y opacidad (360ms).', 'PacienteElegido · Panel top'],
   ['Find Patient', 'Panel con el buscador (nombre, apellido o email) y los resultados: se ven tres y "Show N more" abre el resto con scroll adentro, sin estirar el panel (ui/show-more, como Patients).', 'BuscarPaciente · Panel · ShowMore'],
   ['Patient result', 'InnerCard con iniciales, nombre, último pago y saldo. Hover gris; el elegido queda en celeste.', 'ResultadoPaciente'],
   ['Today', 'Panel con tres números del día, cada uno en una InnerCard baja (p-2.5, como las cards de Patients): etiqueta con su círculo de info y bajada a la izquierda, el número a la derecha.', 'Panel · Stat compacta'],
-  ['Post payment', 'Drawer para registrar el pago o el ajuste del paciente elegido.', 'PostPaymentDialog'],
+  ['Payment and adjustment drawers', 'New Patient Payment (-), Credit Adjustment (-) y Enter Charge (+) Adjustment: un drawer por botón (CON-4147).', 'PostPaymentDialog'],
 ]
 
 export const Parts: Story = {

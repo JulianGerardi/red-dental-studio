@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ExceptionsTab, InformationTab, RoomsTab, SwitchOpenClose, WorkingHoursTab } from './LocationDetail'
 
-const meta = { title: 'Pages/Parts/Location detail', parameters: { layout: 'padded' } } satisfies Meta
+const meta = { title: 'Pages/Parts/Location detail', parameters: { docs: { jira: ['CON-1590', 'CON-4019', 'CON-1173'] }, layout: 'padded' } } satisfies Meta
 
 export default meta
 type Story = StoryObj<typeof meta>

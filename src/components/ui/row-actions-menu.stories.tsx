@@ -23,7 +23,8 @@ export const Default: Story = {
   ),
 }
 
-/* `abierto` deja el menú a la vista sin bloquear la página: sólo para documentar. */
+/* `abierto` deja el menú a la vista sin bloquear la página: sólo para documentar. Mientras está abierto el botón ⋮
+   queda marcado (selected: `data-[state=open]` le pone el fondo gris). */
 export const Open: Story = {
   render: (args) => (
     <div className="h-48">

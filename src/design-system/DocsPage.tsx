@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Controls, DocsContext, Markdown, Primary, Source, Stories, Story } from '@storybook/addon-docs/blocks'
-import { Lightbulb, Puzzle, Users } from 'lucide-react'
+import { Lightbulb, Puzzle, Ticket, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Seccion as NombreSeccion } from './buscar'
 import { comentarioDe, componentes } from './catalog'
@@ -125,6 +125,8 @@ function EnEstaPagina({ raiz, clave }: { raiz: RefObject<HTMLDivElement | null>;
   )
 }
 
+const JIRA = 'https://confidetally.atlassian.net/browse/'
+
 /* Como las tarjetas React / Rails / Figma de Primer: qué es, en qué estado
    está y adónde ir. */
 function Tarjeta({ icono: Icono, titulo, etiqueta, tono = 'gris', children }: { icono: typeof Puzzle; titulo: string; etiqueta: string; tono?: 'verde' | 'ambar' | 'gris'; children: ReactNode }) {
@@ -197,6 +199,13 @@ export function DocsPage() {
   const parrafos = descripcion.split(/\n\s*\n/)
   const [lead, resto] = !parrafos[0] || /^\s*[-*\d]/.test(parrafos[0]) ? ['', descripcion] : [parrafos[0], parrafos.slice(1).join('\n\n')]
 
+  /* Las historias de Jira de la pieza: las que declara el story (`docs.jira`) y las que citan su código, sus stories
+     o su descripción (CON-1234). Ahí está la regla de negocio; ver design-reference/jira.md. */
+  const jira = [...new Set([
+    ...((historia?.parameters?.docs?.jira as string[] | undefined) ?? []),
+    ...`${componente ?? fuenteAjena ?? ''}\n${stories ?? ''}\n${descripcionDocs ?? ''}`.matchAll(/\bCON-\d+\b/g),
+  ].map(String))]
+
   const tieneControles = !!historia && Object.keys(historia.argTypes ?? {}).length > 0 && !historia.parameters?.controls?.disable
   const conDispositivos = !!historia && !informe && !historia.parameters?.docs?.devices?.disable
   const pestanas: Pestana[] = ['Overview']
@@ -255,7 +264,7 @@ export function DocsPage() {
           {pestana === 'Overview' && (
             <>
               {!informe && historia && (
-                <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                   <Tarjeta icono={Puzzle} titulo="Component" etiqueta={listo ? 'Ready' : historia.name === 'Playground' ? 'In progress' : 'Documented'} tono={listo ? 'verde' : historia.name === 'Playground' ? 'ambar' : 'gris'}>
                     <Enlace id={historia.id} className={LINK}>Full screen</Enlace>
                     {archivoFuente && <a href={`${REPO}${archivoFuente}`} target="_blank" rel="noreferrer" className={LINK}>Source</a>}
@@ -268,6 +277,10 @@ export function DocsPage() {
                   </Tarjeta>
                   <Tarjeta icono={Lightbulb} titulo="Design" etiqueta={decisiones?.length ? `${decisiones.length} ${decisiones.length === 1 ? 'decision' : 'decisions'}` : 'No decisions yet'} tono={decisiones?.length ? 'gris' : 'ambar'}>
                     {!!decisiones?.length && <button type="button" onClick={() => irA('Guidelines', 'ds-decisiones')} className={LINK}>Why it looks like this</button>}
+                  </Tarjeta>
+                  <Tarjeta icono={Ticket} titulo="Jira" etiqueta={jira.length ? `${jira.length} ${jira.length === 1 ? 'story' : 'stories'}` : 'No story linked'} tono={jira.length ? 'gris' : 'ambar'}>
+                    {jira.slice(0, 8).map((k) => <a key={k} href={`${JIRA}${k}`} target="_blank" rel="noreferrer" className={LINK}>{k}</a>)}
+                    {jira.length > 8 && <span className="text-ink-muted">+{jira.length - 8}</span>}
                   </Tarjeta>
                 </div>
               )}

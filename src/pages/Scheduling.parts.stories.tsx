@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { SOLICITUDES } from '@/components/scheduling/requests-data'
 import { SolicitudCard } from './Scheduling'
 
-const meta = { title: 'Pages/Parts/Scheduling', parameters: { layout: 'padded' } } satisfies Meta
+const meta = { title: 'Pages/Parts/Scheduling', parameters: { docs: { jira: ['CON-3119', 'CON-3600', 'CON-2934'] }, layout: 'padded' } } satisfies Meta
 
 export default meta
 type Story = StoryObj<typeof meta>

@@ -11,7 +11,8 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 const salir = () => {}
-const emergente = { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 420 } } } as const
+const emergente = { layout: 'fullscreen', docs: {
+      jira: ['CON-2879'], story: { inline: false, iframeHeight: 420 } } } as const
 
 export const RelationCard: Story = { render: () => <div className="w-[640px]"><PersonaCard p={RELACIONES[0]} onEdit={salir} onDelete={salir} /></div> }
 export const HouseholdCard: Story = { render: () => <div className="w-[640px]"><PersonaCard p={HOUSEHOLD[0]} /></div> }

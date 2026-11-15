@@ -32,3 +32,6 @@ export const NewDependentWithErrors: Story = { ...NewDependent, play: secuencia(
 export const ReadOnlyRow: Story = {
   render: () => <div className="w-[300px]"><FilaLectura icon={ShieldHalf} label="Carrier" value="Delta Dental" /></div>,
 }
+
+/* Paso Subscription: Plan Name queda disabled hasta elegir un carrier ("Select a carrier first.") (CON-3259). */
+export const PlanDisabledUntilCarrier: Story = { ...NewSubscription, play: secuencia(pulsar(/next step/i), esperar(/select a carrier first/i)) }

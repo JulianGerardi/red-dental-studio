@@ -4,7 +4,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { CASOS } from '@/data/treatment-plan'
 import { esperar, pulsar, secuencia } from '@/design-system/play'
 import {
-  Dialogo, DialogoBorrarCaso, DialogoCompletar, DialogoMover, DialogoNuevoGrupo, OpcionRadio, Rail, VistaCaso, EstadoConsentimiento, AccionCaso, CitaVisita,
+  Dialogo, DialogoBorrarCaso, DialogoCompletar, DialogoMover, DialogoNuevoGrupo, OpcionRadio, Rail, VistaCaso, EstadoConsentimiento, AccionCaso, CitaVisita, AvisoEstimacion, BotonTotal,
 } from './TreatmentPlanSection'
 
 const meta = {
@@ -100,3 +100,8 @@ export const VisitAppointment: Story = {
 export const CaseViewLimitedAccess: Story = {
   render: () => <VistaCaso caso={{ ...CASOS[0], sinPermiso: true }} favorito={false} onFavorito={() => {}} onDialogo={() => {}} onMover={() => {}} onCompletar={() => {}} />,
 }
+
+/* El Total amount del caso es un botón: abre Estimate details (clinical-mode.md, 2026-10-29; CON-3695). */
+export const TotalAmountButton: Story = { render: () => <BotonTotal total="$1,872.00" onClick={() => {}} /> }
+/* CON-2529: cambió algo que afecta las estimaciones. El aviso pregunta antes de recalcular. */
+export const EstimateNotice: Story = { render: () => <AvisoEstimacion onActualizar={() => {}} /> }
