@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-15
 
-### Documentación en Figma, Storybook al día y Jira en cada página ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Documentación en Figma, Storybook al día y Jira en cada página ([#144](https://github.com/JulianGerardi/red-dental-studio/pull/144))
 - **Figma:** archivo nuevo, [Confidentally — Red Dental Studio · Flows](https://www.figma.com/design/TPh6NE9d4skn0BdId26UTR),
   con el formato de la página 🧍 Patients de *Platform Design*: una página por módulo (19), una sección por flujo (60)
   y 262 pantallas capturadas de la app, con auto layout y las capas nombradas como el componente de React.
