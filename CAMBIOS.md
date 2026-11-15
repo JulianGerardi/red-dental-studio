@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-15
 
-### Figma: Fill container en todas las pantallas e íconos de los buscadores ([#145](https://github.com/JulianGerardi/red-dental-studio/pull/145))
+### Figma: Fill container, íconos de los buscadores y design system conectado ([#145](https://github.com/JulianGerardi/red-dental-studio/pull/145))
 - **Fill container en las 281 pantallas:** lo que ocupa todo el ancho o el alto de su contenedor, o el espacio que sobra,
   pasa a Fill container (con ancho máximo si lo tenía). Al quitar un elemento el resto se acomoda y al achicar la pantalla
   el contenido la acompaña; el dock y los drawers quedan anclados a su borde.
@@ -14,6 +14,16 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   - Nuevo `scripts/figma/arreglar.figma.js` (se corre con `use_figma` después de importar y ordenar). Verifica cada
     contenedor: si algún hijo cambiara de tamaño, lo deja como estaba.
   - Reglas y límites en `design-reference/figma-docs.md` y en `CLAUDE.md` (*Documentación en Figma*). La app no cambia.
+- **Design system en Figma** (página 🎨 Design System): 117 variables (Color 88, Radius, Spacing, Size), 23 estilos de
+  texto, 4 de sombra y 227 íconos, más 18 componentes (Button 54, IconButton 36, Pill, Chip, Count, Avatar,
+  Checkbox, Switch, Field, Tab, Alert, Card, Step, Table cell, Menu item, Tooltip, Breadcrumb). Cada propiedad de la
+  pieza de React tiene su propiedad en Figma.
+- **Pantallas conectadas:** ≈ 5.900 instancias (Button, IconButton, Pill, Avatar, Chip, Count), ≈ 85.000 rellenos y
+  trazos ligados a variables de color, radios y espaciados a sus variables y ≈ 22.000 textos a estilos, sin cambios
+  visibles (se comparó antes y después). Lo que no coincide con una variante queda como capa.
+- **Para el dev:** `design-reference/figma-design-system.md` trae la clasificación (qué se componentiza y qué no), cómo
+  retomar y los hallazgos de UX: dos contadores (Globo y Count), ≈ 5.800 de 10.700 botones fuera de la escala 28/32/36 y
+  azules sin token (`#1e58be`, `#2f6bff`). Nada de esto toca el código de la app todavía.
 
 
 ### Documentación en Figma, Storybook al día y Jira en cada página ([#144](https://github.com/JulianGerardi/red-dental-studio/pull/144))

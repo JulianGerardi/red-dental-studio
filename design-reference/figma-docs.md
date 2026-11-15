@@ -124,6 +124,10 @@ Con el dev server andando (`npm run dev`, `:5182`) y el conector de Figma.
 
 - Las piezas de documentación (`Doc / Step header`, `Doc / Chip · Jira`…) son frames con auto layout, no componentes
   de Figma con instancias. Si el archivo va a editarse a mano, conviene pasarlas a componentes.
-- Las pantallas no están vinculadas a una library de Figma: son capas, no instancias del UI kit.
+- **El design system está en la página 🎨 Design System** (`design-reference/figma-design-system.md`): variables, estilos
+  y componentes con variantes. Las pantallas ya usan sus instancias, variables y estilos; lo que no coincide con una
+  variante exacta (botones fuera de la escala 28/32/36, colores sin token) queda como capas y está listado ahí.
+- Las pantallas viven en este archivo, no en una library publicada: para usarlas desde otro archivo hay que publicar el
+  design system como library.
 - En celular y tablet la app cambia de layout; el archivo documenta el escritorio (1512). Los otros anchos están en el
   Storybook (*Devices*).
