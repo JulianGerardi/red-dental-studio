@@ -16,7 +16,8 @@ import {
 import {
   PAISES, CODIGOS, ESTADOS, ZONAS, FEES,
 } from '@/data/location-options'
-import { LocationHoursModal } from '@/components/settings/LocationHoursModal'
+import { LocationHoursModal, aMinutos, deChip } from '@/components/settings/LocationHoursModal'
+import { HoursAppointmentsDialog } from '@/components/settings/HoursAppointmentsDialog'
 import { NewRoomModal } from '@/components/settings/NewRoomModal'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
 import { formatDMY } from '@/components/ui/date-picker'
@@ -27,7 +28,7 @@ import { LocationBillingProfile } from '@/components/settings/LocationBillingPro
 import { LocationInsuranceDefaults } from '@/components/settings/LocationInsuranceDefaults'
 import { hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import {
-  HORARIO_SEMANAL, SALAS_INICIALES, EXCEPCIONES_INICIALES,
+  HORARIO_SEMANAL, SALAS_INICIALES, EXCEPCIONES_INICIALES, TURNOS_LOCACION, type TurnoLocacion,
   type Sala, type TurnoSala, type Excepcion,
 } from '@/data/location-detail'
 import { formatMDY } from '@/lib/fecha'
@@ -123,12 +124,48 @@ export function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
   )
 }
 
+/* Un turno de una hora entra si cabe entero en alguna franja del día. */
+const fueraDe = (t: TurnoLocacion, dias: number[], rangos: string[]) => {
+  if (!dias.includes(t.fecha.getDay())) return false
+  const m = t.fecha.getHours() * 60 + t.fecha.getMinutes()
+  return !rangos.some((r) => {
+    const [a, b] = r.split(' - ').map((h) => aMinutos(deChip(h)))
+    return a <= m && m + 60 <= b
+  })
+}
+
 /* Un día sólo queda Open con al menos una franja: activar el switch abre "Set working hours" y el día se abre recién
-   al guardar; Cancel lo deja como estaba. Ver figma/modulos/locations.md (2026-11-06, CON-1546). */
+   al guardar; Cancel lo deja como estaba. Si las horas nuevas dejan afuera turnos Proposed o Booked, antes se
+   resuelven (HoursAppointmentsDialog). Ver figma/modulos/locations.md (2026-11-06 y 2026-11-16, CON-1546, CON-2890). */
 export function WorkingHoursTab() {
   const [horario, setHorario] = useState(HORARIO_SEMANAL)
   const [expandido, setExpandido] = useState<string | null>(null)
   const [modal, setModal] = useState<string | null>(null)
+  const [turnos, setTurnos] = useState(TURNOS_LOCACION)
+  const [resolver, setResolver] = useState<{ dias: number[]; rangos: string[]; afectados: TurnoLocacion[] } | null>(null)
+
+  const aplicar = (dias: number[], rangos: string[]) =>
+    setHorario((p) => ({ ...p, ...Object.fromEntries(dias.map((i) => [DIAS[i][0], { abierto: true, rangos }])) }))
+
+  /* Sin turnos afectados guarda enseguida; con turnos, el panel queda abierto hasta resolverlos. */
+  const guardar = (dias: number[], rangos: string[]) => {
+    const afectados = turnos.filter((t) => (t.estado === 'Proposed' || t.estado === 'Booked') && fueraDe(t, dias, rangos))
+    if (!afectados.length) { aplicar(dias, rangos); return true }
+    setResolver({ dias, rangos, afectados })
+    return false
+  }
+
+  const confirmarTurnos = (resueltos: TurnoLocacion[]) => {
+    if (!resolver) return
+    const { dias } = resolver
+    aplicar(dias, resolver.rangos)
+    setTurnos((p) => p.map((t) => resueltos.find((r) => r.id === t.id) ?? t))
+    const n = resueltos.filter((t) => t.estado === 'Waiting List').length
+    const guardado = dias.length === 1 ? `Hours saved for ${DIAS[dias[0]][1]}.` : `Hours saved for ${dias.length} days.`
+    aviso.ok(n ? `${guardado} ${n} ${n === 1 ? 'appointment was' : 'appointments were'} moved to the waiting list.` : guardado)
+    setResolver(null)
+    setModal(null)
+  }
 
   const cerrar = (key: string, label: string) => {
     const antes = horario[key]
@@ -208,13 +245,19 @@ export function WorkingHoursTab() {
         <LocationHoursModal
           dia={DIAS.findIndex(([key]) => key === modal)}
           iniciales={horario[modal].rangos}
+          horario={DIAS.map(([key]) => horario[key])}
           onClose={() => setModal(null)}
-          onGuardar={(dias, rangos) =>
-            setHorario((p) => ({
-              ...p,
-              ...Object.fromEntries(dias.map((i) => [DIAS[i][0], { abierto: true, rangos }])),
-            }))
-          }
+          onGuardar={guardar}
+        />
+      )}
+
+      {resolver && (
+        <HoursAppointmentsDialog
+          afectados={resolver.afectados}
+          fueraDeHorario={(t) => fueraDe(t, resolver.dias, resolver.rangos)}
+          operatorios={SALAS_INICIALES.filter((s) => s.activa).map((s) => s.nombre)}
+          onCancel={() => setResolver(null)}
+          onConfirm={confirmarTurnos}
         />
       )}
     </div>

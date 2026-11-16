@@ -247,6 +247,7 @@ export function AppointmentDetailsDrawer({
       {confirmando && (
         <ConfirmDialog
           title="Delete Appointment"
+          icon="delete"
           confirmLabel="Delete"
           tone="danger"
           /* Un tick después: el mismo Escape o click que cierra la pregunta no tiene que cerrar el detalle. */

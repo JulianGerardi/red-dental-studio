@@ -488,3 +488,44 @@ Pedido de Julián. CON-1546 (*Editar Horario de Apertura/Cierre de Locación*) e
 Queda afuera: el aviso de CON-1546 cuando hay turnos fuera del horario nuevo (no hay turnos por locación en los datos
 mock) y el de "All operating hours have been disabled". "New Hours" de la ficha de un empleado tiene su propio
 alcance ("All selected days" / "This and future weeks") y no se tocó.
+
+### Working Hours: aplicar el horario a otros días y resolver turnos afectados (2026-11-16, CON-1546, CON-2890)
+
+Pedido de Julián con la historia *Aplicar los horarios a otros días* de Abril Viola. **No está cargada en Jira** (se
+buscó por título y por el texto del modal): se cita CON-1546 (editar horario de la locación) y CON-2890 (pantalla de
+resolución de turnos). Cuando exista la clave, sumarla acá, en el código y en `jira.md`.
+
+1. **El día de origen queda elegido y no se puede sacar** en *Repeat on days*: va relleno en azul, con
+   `aria-disabled` y el nombre "Sunday (day being edited)". Los demás días se eligen libres, estén Open o Closed. La línea
+   de ayuda suma "Each day can still be edited on its own later." (guardar varios días no los vincula, ver 2026-11-06).
+2. **Replace working hours?** (`ConfirmDialog`, Cancel / Confirm) sale cuando al menos un día **adicional** está Open y
+   tiene otro horario. El mensaje nombra sólo esos días, en el orden de la tabla y sin el de origen: "This will replace
+   the existing working hours for Monday and Tuesday. Do you want to continue?". No sale si sólo cambia el día de
+   origen, si los adicionales están Closed o si ya tienen el mismo horario. La comparación ordena las franjas
+   (`mismoHorario`), así que el orden de carga no cuenta. Cancel vuelve al panel con el borrador y los días elegidos;
+   no guarda nada.
+3. **Confirm sigue con el impacto en turnos** antes de guardar. Si las horas nuevas dejan afuera un turno Proposed o
+   Booked de esos días (dura una hora y tiene que caber entero en una franja), se abre **These hours affect scheduled
+   appointments** (`HoursAppointmentsDialog`) y el panel sigue abierto atrás: todavía no se guardó nada.
+4. **El texto de CON-2890 se adaptó a la locación** (decisión de Julián, 2026-11-16): la historia dice "assigned to
+   this provider" y propone cambiar el provider, pero en una locación cambiar el provider no saca el turno de fuera de
+   horario. Queda: "There are scheduled appointments outside the new working hours. You can review and manage each
+   appointment individually, or confirm to move all appointments to the waiting list." El título es propio (la historia
+   no trae uno).
+5. **Por turno**, el ⋮ (`RowActionsMenu`): *Edit appointment* abre el drawer de la agenda para moverlo de día, hora o
+   provider (si sigue afuera, un toast lo dice); *Cancel appointment* y *Mark as No Show*; *Undo changes* vuelve al
+   original. Cada fila dice qué le va a pasar: "Moves to the waiting list on Confirm.", "Now within the new working
+   hours." o "Will be marked as No Show.", y abajo cuántos pasan a la lista de espera. Los cambios son un borrador:
+   **Cancel** del aviso vuelve al panel sin aplicar ni las horas ni los turnos.
+6. **Confirm** guarda las horas en todos los días elegidos, aplica lo resuelto y pasa el resto a *Waiting List*:
+   "Hours saved for 3 days. 1 appointment was moved to the waiting list.". Sin turnos afectados guarda directo, como
+   antes.
+7. **Datos**: `TURNOS_LOCACION` (lunes 23/11 15:00 Booked, martes 24/11 08:00 Proposed y otros que quedan adentro), para
+   que Sunday 09:00–14:00 aplicado a Monday y Tuesday muestre dos afectados.
+
+Queda afuera: el bloqueo de CON-2890 con turnos Check In / In Progress ("This shift cannot be modified…"), cerrar un día
+o quitar una franja con la ✕ del chip cuando tiene turnos (CON-1547), y conectar estos turnos con la agenda real.
+
+Para validar con usuarios: si recepción entiende que el día de origen relleno "no se puede sacar" sin el tooltip; si el
+⋮ por turno se descubre o conviene dejar las acciones a la vista; y si "Waiting List" en bloque es lo que esperan como
+salida por defecto.

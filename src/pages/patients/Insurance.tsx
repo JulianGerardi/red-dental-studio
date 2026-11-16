@@ -309,7 +309,7 @@ export default function Insurance() {
       {modal === 'nueva' && <NewSubscriptionModal paciente="John Smith" existentes={suscripciones} onCreada={creada} onClose={() => setModal(null)} />}
       {modal === 'borrar' && (
         <ConfirmDialog
-          tone="danger" title="Are you sure you want to delete this subscription?" confirmLabel="Confirm"
+          tone="danger" icon="delete" title="Are you sure you want to delete this subscription?" confirmLabel="Confirm"
           onConfirm={borrar} onCancel={() => setModal(null)}
         >
           This action cannot be undone. This will permanently delete this subscription and all associated data.
