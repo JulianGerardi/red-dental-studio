@@ -5,6 +5,7 @@ import { SelectField, TextField } from '@/components/patients/form'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO } from '@/lib/estilos'
 import { TIPOS_DEDUCIBLE, excepcionesEnRango, type Excepcion, type Rango, type TipoCobertura, type TipoDeducible } from '@/data/finanzas'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* La tabla de rangos de una coverage table, la de la plantilla y la de cada plan (red.dev, Coverage Table): un rango de
    códigos, su categoría, el tipo de deducible y lo que paga. En el celular cada rango baja a dos columnas. */
@@ -31,7 +32,7 @@ export function RangesTable({
 }) {
   const cambiar = (id: string, parte: Partial<Rango>) => onChange(rangos.map((r) => (r.id === id ? { ...r, ...parte } : r)))
   const codigo = (v: string) => v.toUpperCase().replace(/[^D0-9]/g, '').slice(0, 5)
-  const falta = (v: string) => (intentado && !v.trim() ? 'Required' : undefined)
+  const falta = (v: string) => (intentado && !v.trim() ? OBLIGATORIO : undefined)
   const porcentaje = tipo === 'Percentage'
   const tabla = useRef<HTMLDivElement>(null)
 

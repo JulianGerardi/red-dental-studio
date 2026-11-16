@@ -6,6 +6,7 @@ import { ModalShell, SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { EstadoDia } from '@/data/location-detail'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Misma grilla de media hora que "New Exception": desplegable, no texto
    libre con máscara. */
@@ -131,12 +132,12 @@ export function LocationHoursModal({
                 <SelectField
                   label="Start Time" required placeholder="00:00 hs" options={HORAS} value={r.inicio}
                   onChange={cambiar(i, 'inicio')}
-                  error={intentado && !r.inicio ? 'Required.' : undefined}
+                  error={intentado && !r.inicio ? OBLIGATORIO : undefined}
                 />
                 <SelectField
                   label="End Time" required placeholder="00:00 hs" options={HORAS} value={r.fin}
                   onChange={cambiar(i, 'fin')}
-                  error={intentado && !r.fin ? 'Required.' : undefined}
+                  error={intentado && !r.fin ? OBLIGATORIO : undefined}
                 />
               </div>
               {rangos.length > 1 && (

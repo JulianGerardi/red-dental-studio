@@ -19,6 +19,7 @@ import { PhoneFields, UnitField } from '@/components/finance/fields'
 import { useFinanzas } from '@/data/finanzasStore'
 import { FORMATOS_RECLAMO, TONO_ESTADO, cantidad, esNorteamerica, type Aseguradora, type PlanSeguro } from '@/data/finanzas'
 import { TABLA_LINK } from '@/lib/estilos'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Settings → Billing → Carriers como en red.dev: la lista, Edit Carrier con las pestañas Carrier e Insurance Plans /
    Employers, y los drawers New Carrier, New Insurance Plan y Location Number. Ver figma/modulos/settings-billing.md. */
@@ -121,7 +122,7 @@ export function CarrierForm({ carrier, onGuardar }: { carrier: Aseguradora; onGu
     formato: !d.formato, dias: d.diasResolucion <= 0, email: !d.email.trim(),
     area: esNorteamerica(d.telefono.codigo) && !d.telefono.area, numero: !d.telefono.numero,
   }
-  const falta = (k: keyof typeof faltan) => (intentado && faltan[k] ? 'This field is required.' : undefined)
+  const falta = (k: keyof typeof faltan) => (intentado && faltan[k] ? OBLIGATORIO : undefined)
   const guardar = () => {
     if (Object.values(faltan).some(Boolean)) { setIntentado(true); return }
     setIntentado(false)

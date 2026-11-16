@@ -154,3 +154,14 @@ Salieron `CoverageBar`, `CoverageSummary`, `EditableAmount`, `PlansTable`, `FeeS
    *Preferred Location Fee Schedule*, pero todavía no alimenta *Assignments*.
 3. Confirmar en red.dev las confirmaciones de Inactive / Archive / Delete y la tabla Copayment.
 4. Si la pestaña Insurance del paciente (`data/insurance.ts → CARRIERS`) tiene que tomar los carriers y planes de acá.
+
+## Campo vacío: *This field is required.* (2026-11-16)
+
+Mismo texto en todos los campos obligatorios vacíos (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)):
+
+1. *Manage Exceptions*: *Please add a procedure to the exception* (texto de red.dev), *Select the procedure it is paid
+   as.*, *Enter how many times.*, *Enter the period.* y *Enter the reason.* pasan a *This field is required.* La edad
+   máxima menor que la mínima sigue con su mensaje.
+2. *Copy from fee schedule* sin elegir y *Increase fees* vacío: *This field is required.*; *Enter an amount other than
+   0.* queda para el 0.
+3. Rangos de la Coverage Table: *Required* → *This field is required.* (entra en las celdas, también en celular).
