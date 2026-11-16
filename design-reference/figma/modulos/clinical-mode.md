@@ -3255,3 +3255,37 @@ decidido (odontograma de DentAssmt, tabla flotante, botoneras Exams/Records): se
      Signature*. El menú ofrece *Pause Encounter* y *Discharge Patient* (`OpcionesEncuentro`).
    - En pausa: *Pending Encounter* en ámbar.
    - Antes el menú de la ficha elegía directamente entre los dos estados del Figma.
+
+## 2026-11-16 · CON-2212 · CON-2321 · CON-2214 · CON-1397 · Figma: segunda a cuarta tanda de Clinical Mode
+
+Documentación en el archivo de flujos (`scripts/figma/flujos/clinical-mode-2.mjs`, `-3` y `-4`):
+
+- **Capturado de la app:** Treatment — Workflows (7), Radiography — Gallery, Upload & Viewer (3), Lab Order — List & Actions
+  (4), Dental Assessment — Tooth & Findings (7) y New Procedure (4: planned, filtro por área, existing y superficies).
+- **Adecuado desde Platform Design** (en la app son placeholders «Planned»): Prescription (lista y New Prescription),
+  Referral (lista y create), ROS · General y Treatment History. Se capturó el shell real de la app con la pestaña activa y la
+  guía del flujo; el placeholder se reemplazó por el contenido del diseño, estirado a Fill container, con instancias,
+  variables y estilos del design system. Los frames crudos quedaron en 🧪 Pruebas (`· original Platform Design`).
+- **Decisión:** Physical sigue sin diseño en Platform Design; Patient Summary tampoco. Treatment History y Clinical Note
+  son pestañas del diseño que la app no tiene todavía (Treatment History se muestra sobre el shell con la pestaña
+  renombrada).
+
+Anomalías del diseño (se copian tal cual y se anotan):
+
+1. "Overwiev" y "Start Enconter" en la barra de Clinical Mode.
+2. Referral · Create lleva el link **New Laboratory** (copiado de Lab Order) y dos campos de búsqueda con el mismo valor "I".
+3. New Prescription: dos campos "Strength" (valor y unidad), "Frecuency" mal escrito, y Duration con una lista que dice "mg".
+4. La columna Actions de la lista de Prescription son tres círculos vacíos (sin íconos definidos).
+5. El pie de ROS dice "Showing 9 active prescriptions" y "View History" (copiado de Prescription).
+6. Lab Order: el botón dice "New Prescription" y el pie "active prescriptions" (ya anotado, #85).
+7. ROS · General: el interruptor "Negative" va en rojo, el mismo rojo de error; conviene validar si un síntoma negativo es una alerta.
+
+### Dental Assessment: cierre (2026-11-16, `clinical-mode-5.mjs`)
+
+- Se suman Edit Condition de región, Problem List · Procedures, Procedure actions y los drawers Edit / Complete / Discontinue
+  procedure. Con `clinical-mode-3.mjs` queda cubierto Tooth information, el menú del hallazgo, Edit Finding, Discard, Delete,
+  New Procedure (planned, existing, superficies) y el filtro por área.
+- **Sin equivalente en la app:** los pop-ups de New Condition (8) de Platform Design: la app resuelve el alta con el drawer de
+  dos pasos (Procedure · Descriptors).
+- **Para después (decisión de Julián):** Treatment Workflow (detalle y Clinical Note) y Workflow Set Up: hay que pegarlos en el
+  archivo de flujos.

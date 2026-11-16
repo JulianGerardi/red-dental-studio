@@ -27,8 +27,12 @@ una al lado de la otra.
 5. **Las pantallas van en fila**, de izquierda a derecha, cada una con su número, su nombre, la ruta de la app y una
    nota debajo. Ancho 1512 px (el de la referencia); el alto es el de la pantalla, o el de la página entera cuando
    scrollea.
-6. **Auto layout en todo.** Cada frame sale del `flex` o `grid` real de la app; la documentación alrededor también.
-   Nada se posiciona a mano salvo lo que en la app es `fixed` (drawers, toasts, flotantes).
+6. **Auto layout en todo, con Fill container.** Cada frame sale del `flex` o `grid` real de la app; la documentación
+   alrededor también. Nada se posiciona a mano salvo lo que en la app es `fixed` (drawers, toasts, flotantes). Lo que en la
+   app ocupa todo el ancho o el alto de su contenedor, o el espacio que sobra (`flex-1`, `w-full`, el `mx-auto` con `max-w`),
+   está en **Fill container** (con ancho máximo si lo tenía): al quitar un elemento el resto se acomoda y al achicar la
+   pantalla el contenido la acompaña. Lo absoluto se ancla a su borde (el dock, los drawers). Lo hace
+   `scripts/figma/arreglar.figma.js` (paso 6 de *Cómo se actualiza una página*).
 7. **Capas con nombre.** La capa se llama como el componente de React (`Topbar`, `DataTable`, `StepIndicator`); si un
    componente de la pantalla envuelve a uno del design system, los dos: `PatientsTable / DataTable`. Los controles
    llevan rol y texto (`Button - New Patient`, `Text Input - First Name`) y los íconos, su nombre de Lucide
@@ -87,9 +91,12 @@ Con el dev server andando (`npm run dev`, `:5182`) y el conector de Figma.
    `POST` del HTML a la URL que devuelve. Los lotes de una página se suben en orden.
 5. **Ordenar** con `use_figma` y el código de `scripts/figma/ordenar.figma.js` (cambiando `PAGE_ID`): arma las
    secciones y apila todo.
-6. **Mirar** una sección con `get_screenshot` y, si cambiaron las cantidades, regenerar la portada
+6. **Arreglar** con `use_figma` y el código de `scripts/figma/arreglar.figma.js` (cambiando `PAGE_IDS`): pasa lo que
+   llena su contenedor a Fill container, ancla lo absoluto a su borde y sube los íconos que el input tapaba (el ícono del
+   buscador). Verifica cada contenedor: si algún hijo cambiara de tamaño, lo deja como estaba. Se puede repetir.
+7. **Mirar** una sección con `get_screenshot` y, si cambiaron las cantidades, regenerar la portada
    (`npm run figma:portada`, importar `.figma-capturas/_portada/lote-1.html` en `0:1` y ordenar).
-7. **Anotar** en esta tabla la página nueva, si la hay.
+8. **Anotar** en esta tabla la página nueva, si la hay.
 
 ## Cómo funciona la captura
 
@@ -105,12 +112,25 @@ Con el dev server andando (`npm run dev`, `:5182`) y el conector de Figma.
   hasta mostrarlo. Con un drawer o un diálogo abierto queda al alto de la ventana.
 - **Dibujos pesados** (cada diente del odontograma, los gráficos de Extraoral e Intraoral) van como imagen: en vectores
   serían miles de capas por pantalla.
+- **Orden de capas:** en CSS lo posicionado pinta arriba de lo que está en el flujo y en Figma manda el orden de las capas.
+  El importador deja el ícono de un buscador *debajo* del input blanco, por eso no se veía: `arreglar.figma.js` lo sube.
+- **Prueba de Fill container:** se copia una pantalla, se achica a 1100 px y se mira que nada se salga ni se tape. En
+  Patients quedó sin nada fuera de los bordes; a ese ancho la tabla no entra (se cortan Status y Actions) porque no hay
+  lugar, igual que en la app.
 - Las imágenes van embebidas: el importador no baja recursos externos. `.figma-capturas/` no se versiona.
 
 ## Pendiente
 
+- Fill container es una inferencia por geometría (un hijo que ocupa todo el ancho del padre, o el espacio que sobra): no
+  lee el CSS. Figma sólo reparte el espacio por partes iguales, así que las columnas de una tabla no conservan sus
+  proporciones al achicar (la más ancha absorbe). Para algo más fino habría que medir la app a dos anchos al capturar.
+
 - Las piezas de documentación (`Doc / Step header`, `Doc / Chip · Jira`…) son frames con auto layout, no componentes
   de Figma con instancias. Si el archivo va a editarse a mano, conviene pasarlas a componentes.
-- Las pantallas no están vinculadas a una library de Figma: son capas, no instancias del UI kit.
+- **El design system está en la página 🎨 Design System** (`design-reference/figma-design-system.md`): variables, estilos
+  y componentes con variantes. Las pantallas ya usan sus instancias, variables y estilos; lo que no coincide con una
+  variante exacta (botones fuera de la escala 28/32/36, colores sin token) queda como capas y está listado ahí.
+- Las pantallas viven en este archivo, no en una library publicada: para usarlas desde otro archivo hay que publicar el
+  design system como library.
 - En celular y tablet la app cambia de layout; el archivo documenta el escritorio (1512). Los otros anchos están en el
   Storybook (*Devices*).

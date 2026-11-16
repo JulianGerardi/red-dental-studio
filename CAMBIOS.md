@@ -73,6 +73,33 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-15
 
+### Figma: Fill container, íconos de los buscadores y design system conectado ([#145](https://github.com/JulianGerardi/red-dental-studio/pull/145))
+- **Fill container en las 281 pantallas:** lo que ocupa todo el ancho o el alto de su contenedor, o el espacio que sobra,
+  pasa a Fill container (con ancho máximo si lo tenía). Al quitar un elemento el resto se acomoda y al achicar la pantalla
+  el contenido la acompaña; el dock y los drawers quedan anclados a su borde.
+- **Íconos de los buscadores:** el importador los dejaba debajo del input blanco y no se veían; ahora van arriba.
+- **Para el dev:**
+  - Nuevo `scripts/figma/arreglar.figma.js` (se corre con `use_figma` después de importar y ordenar). Verifica cada
+    contenedor: si algún hijo cambiara de tamaño, lo deja como estaba.
+  - Reglas y límites en `design-reference/figma-docs.md` y en `CLAUDE.md` (*Documentación en Figma*). La app no cambia.
+- **Clinical Mode, segunda tanda** (`scripts/figma/flujos/clinical-mode-2.mjs`): Treatment — Workflows (7 pantallas: lista y filtro de workflows, acciones, preguntas, ocultar sección, Generate Narrative), Radiography — Gallery, Upload & Viewer (3) y Lab Order — List & Actions (4: lista, filtro, acciones por fila, View History), capturados de la app y conectados al design system. Las notas de ROS, Physical, Periodontal, Patient Summary, Prescription y Referral ahora dicen que en la app son placeholders «Planned» (antes parecían pantallas hechas).
+- **Clinical Mode, tercera y cuarta tanda** (`clinical-mode-3.mjs`, `clinical-mode-4.mjs`): Dental Assessment en profundidad (información del diente, acciones de un hallazgo, Edit Finding, Discard, Delete, New Procedure planned/existing/superficies; 11 pantallas capturadas) y, desde Platform Design sobre el shell de la plataforma, Prescription (lista y New), Referral (lista y create), ROS y Treatment History (6 pantallas). Anomalías del diseño en `modulos/clinical-mode.md`.
+- **Dental Assessment, cierre** (`clinical-mode-5.mjs`): Edit Condition de un hallazgo de región (Soft Palate), Problem List · Procedures y sus acciones (Edit, Complete, Discontinue) con el drawer Edit Procedure (7 pantallas). Quedan sin equivalente en la app los pop-ups de New Condition de Platform Design, y para después Treatment Workflow y Workflow Set Up (hay que pegarlos).
+- **Foundations nuevos** en el design system: colecciones Opacity, Border, Layout (anchos de página, drawers, breakpoints), Motion y Z-index, y muestras de foco y contraste WCAG.
+- **Pantallas reconectadas a la library publicada:** instancias (≈ 9.000 cambiadas), estilos de texto y de sombra (≈ 22.000 textos) y variables (alias de las publicadas); verificado sin cambios visibles. Detalle en `design-reference/figma-design-system.md`.
+- **Design system en un archivo aparte** ([Confidentally UI · Design System](https://www.figma.com/design/iJvnuV8TLStMXpNjdwsuDe)): 11 páginas por categoría, 36 component sets (≈ 240 variantes), 227 íconos, 117 variables y los estilos de texto y sombra; suma lo que faltaba (Sidebar, Topbar, banner, menús, cards de turno y tarea, tabla, paginador, drawer, diálogo, toast…). Listo para publicar como library; falta que Julián la publique y reconectar las pantallas.
+- **Design system en Figma** (primera versión, página 🎨 Design System del archivo de flujos): 117 variables (Color 88, Radius, Spacing, Size), 23 estilos de
+  texto, 4 de sombra y 227 íconos, más 18 componentes (Button 54, IconButton 36, Pill, Chip, Count, Avatar,
+  Checkbox, Switch, Field, Tab, Alert, Card, Step, Table cell, Menu item, Tooltip, Breadcrumb). Cada propiedad de la
+  pieza de React tiene su propiedad en Figma.
+- **Pantallas conectadas:** ≈ 5.900 instancias (Button, IconButton, Pill, Avatar, Chip, Count), ≈ 85.000 rellenos y
+  trazos ligados a variables de color, radios y espaciados a sus variables y ≈ 22.000 textos a estilos, sin cambios
+  visibles (se comparó antes y después). Lo que no coincide con una variante queda como capa.
+- **Para el dev:** `design-reference/figma-design-system.md` trae la clasificación (qué se componentiza y qué no), cómo
+  retomar y los hallazgos de UX: dos contadores (Globo y Count), ≈ 5.800 de 10.700 botones fuera de la escala 28/32/36 y
+  azules sin token (`#1e58be`, `#2f6bff`). Nada de esto toca el código de la app todavía.
+
+
 ### Documentación en Figma, Storybook al día y Jira en cada página ([#144](https://github.com/JulianGerardi/red-dental-studio/pull/144))
 - **Figma:** archivo nuevo, [Confidentally — Red Dental Studio · Flows](https://www.figma.com/design/TPh6NE9d4skn0BdId26UTR),
   con el formato de la página 🧍 Patients de *Platform Design*: una página por módulo (19), una sección por flujo (63)
