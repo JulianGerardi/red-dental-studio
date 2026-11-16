@@ -5,6 +5,20 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
+### Design system: ConfirmDialog con ícono en línea, Set working hours y turnos afectados (#PR)
+- **Storybook:**
+  - *Elements / ConfirmDialog*: el control `icon` (auto · warning · delete) y una story por combinación de tono e
+    ícono.
+  - *LocationHoursModal*: ahora tiene Parts, States y Specs.
+  - *HoursAppointmentsDialog*: página nueva.
+- **Figma del design system** ([Confidentally UI · Design System](https://www.figma.com/design/iJvnuV8TLStMXpNjdwsuDe),
+  *Feedback & Overlays*): el *Confirm dialog* tiene el ícono de 16 px, las propiedades `Tone` × `Icon` (5 variantes) y
+  ejemplos reales de la app debajo.
+- **Para el dev:**
+  - La app no cambia.
+  - Para Code Connect: `tone` → `Tone`, `icon` → `Icon` (sin prop = Auto), `title` → `Title` y `children` → `Body`.
+  - El link al Figma del design system está en `CLAUDE.md`. El detalle, en `design-system.md` (2026-11-16).
+
 ### Working Hours: aplicar el horario a otros días, turnos afectados y pop-ups con ícono en línea ([#147](https://github.com/JulianGerardi/red-dental-studio/pull/147))
 - **Set working hours (Locations):** el día de origen queda elegido y no se puede sacar. Si un día adicional está Open
   con otro horario, pregunta *Replace working hours?* nombrando sólo esos días, en el orden de la tabla (CON-1546;
