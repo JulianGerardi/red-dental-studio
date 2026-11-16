@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
-### Design system: ConfirmDialog con ícono en línea, Set working hours y turnos afectados (#PR)
+### Design system: ConfirmDialog con ícono en línea, Set working hours y turnos afectados ([#148](https://github.com/JulianGerardi/red-dental-studio/pull/148))
 - **Storybook:**
   - *Elements / ConfirmDialog*: el control `icon` (auto · warning · delete) y una story por combinación de tono e
     ícono.
