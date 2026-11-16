@@ -73,6 +73,15 @@ Relationship con sus tres pasos (con y sin Contact, persona nueva), Edit, Delete
 Al 2026-11-16: 64 flujos y 288 pantallas. Settings — Locations suma *Set working hours: other days & affected
 appointments* (7 pantallas, CON-1546 y CON-2890). La portada del archivo es una tapa de diseño sin cantidades: no
 hace falta regenerarla con `figma:portada` cuando cambian los totales; se actualizan acá.
+Más tarde ese día, Settings — Locations suma *Delete hours & close a day* (9 pantallas, CON-4165, CON-4166 y CON-4167):
+la página queda con 6 flujos y 37 pantallas. Los totales del archivo cambiaron también con Clinical Mode (PR #145) y no
+se recontaron.
+
+**Recapturar una página ya conectada a la library** (Locations, 2026-11-16): después de ordenar y arreglar, correr los
+motores guardados en el archivo, en este orden y con `PAGES` = el nombre de la página: `motor`, `chipcount`, `binder`,
+`reconectarRun`, `rebindRun` y `estilosRun`. Se corren con `new AsyncFunction('PAGES', 't0', 'LIM', código)(PAGES,
+Date.now(), 45000)`. `rebindRun` puede pasarse de los 60 s de la herramienta; marca cada pantalla terminada, así que se
+vuelve a correr y sigue. Al final, verificar en la sección: 0 instancias locales y los rellenos ligados a variables.
 
 ## Cómo se actualiza una página
 

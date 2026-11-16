@@ -5,11 +5,28 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
+### Documentación: borrar una franja, cerrar un día, citas afectadas y advertencias en azul ([#153](https://github.com/JulianGerardi/red-dental-studio/pull/153))
+- **Storybook:**
+  - *Pages / Parts / Location detail* suma *Delete working hours?*, *Close working hours?*, *Unable to change* y la
+    tabla *Working Hours · States*.
+  - *HoursAppointmentsDialog* se rehízo con CON-4167: la cita resuelta sale de la lista, sin citas se vuelve al origen
+    y está el bloqueo.
+  - *ConfirmDialog*: la advertencia va en azul.
+- **Screens & Flows:** Locations suma el flujo *Delete hours & close a day* (9 pantallas). La página se recapturó y se
+  reconectó a la library del design system.
+- **Design system en Figma:** *Confirm dialog* con la advertencia en azul y dos ejemplos nuevos. Hay que republicar
+  la library.
+- **Para el dev:**
+  - La app no cambia.
+  - `pulsarRol` (`design-system/play.ts`) acepta `switch`.
+  - Recapturar una página conectada a la library tiene pasos nuevos: ver `figma-docs.md`.
+
 ### New/Edit Patient: nombre completo en una fila ([#152](https://github.com/JulianGerardi/red-dental-studio/pull/152))
 - Paso *General* (`CamposGeneral`): *First Name*, *Middle Name* y *Last Name* en una fila de tres; debajo, *Email* y
   *Birthdate*. En celular, apilados.
 - **Para el dev:** excepción deliberada a "campos de a dos" en drawers (`patients.md`, 2026-11-16). Sin cambios de datos
   ni validaciones.
+
 ### Working Hours: borrar una franja, cerrar un día y citas afectadas según la HU 8 ([#151](https://github.com/JulianGerardi/red-dental-studio/pull/151))
 - **Delete working hours?** (la ✕ de una franja, CON-4166): pregunta antes y borra sólo esa franja. Si es la última,
   el día queda Closed.

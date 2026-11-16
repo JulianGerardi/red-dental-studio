@@ -1288,3 +1288,24 @@ Overlays*, sección *Confirm dialog*), listo para conectarlo con el código (Cod
 
 Para conectar con Code Connect: `tone` → `Tone` y `icon` → `Icon` (`undefined` = Auto), `title` → `Title` y `children`
 → `Body`.
+
+## Working Hours: borrar, cerrar, citas afectadas (HU 8) y advertencias en azul (2026-11-16, CON-4165, CON-4166, CON-4167)
+
+Documenta lo publicado en los PR #149 y #151.
+
+1. **Pages / Parts / Location detail** suma:
+   - *Working Hours · Delete working hours?*, *Close working hours?* y *Unable to change*, con play que llega a cada
+     pregunta.
+   - *Working Hours · States*: qué hace cada acción de la tabla (✕, switch, Save, citas afectadas, bloqueo, "+N").
+   - *Day Hours Fit* y *Day Hours Overflow* (`FranjasDia`: "+N" sólo cuando no entra).
+2. **Components / Settings / HoursAppointmentsDialog** se rehízo con CON-4167:
+   - La demo guarda las citas afuera, como la pantalla. *Partly Managed* muestra que la resuelta sale de la lista
+     (*Appointments (1)*) y *All Managed*, que sin citas se vuelve al origen.
+   - *Blocked* muestra `HoursBlockedDialog` y *Appointment Row* la fila suelta (`FilaTurno`).
+   - Parts, States y Specs al día; sale la línea por fila y el contador del pie.
+3. **Elements / ConfirmDialog**: `icon="warning"` va en `dash-blue` (en `danger` sigue rojo); la tabla *States* y la
+   descripción lo dicen. *Where* suma Delete working hours?, Close working hours? y Unable to change working hours.
+4. `design-system/play.ts`: `pulsarRol` acepta `switch`.
+5. **Figma del design system**: la variante *Tone=Default, Icon=Warning* del *Confirm dialog* pasa a `dash-blue`, y los
+   ejemplos suman *Delete working hours?* y *Close working hours?*. Hay que **republicar la library** (*Assets → Publish
+   library*) para que lo tomen las pantallas de *Screens & Flows*.

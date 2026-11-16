@@ -626,3 +626,16 @@ afectadas, CON-4167 (HU 8).
 
 Para validar: si "The location will have no working hours." alcanza como advertencia o conviene un tono más fuerte; y si
 el Undo de borrar y cerrar tiene sentido cuando ya hubo una pregunta antes.
+
+#### Documentación (2026-11-16, CON-4165, CON-4166, CON-4167)
+
+- **Storybook:**
+  - *Pages / Parts / Location detail*: Delete working hours?, Close working hours?, Unable to change y la tabla
+    *Working Hours · States*.
+  - *HoursAppointmentsDialog* rehecho con CON-4167.
+  - *Elements / ConfirmDialog*: la advertencia en azul.
+- **Screens & Flows** (página ⚙️ Settings — Locations): flujo nuevo *Locations — Delete hours & close a day*, con 9
+  pantallas. La página se recapturó entera y se reconectó a la library del design system: 0 instancias locales y los
+  rellenos ligados a variables.
+- **Design system en Figma:** *Confirm dialog* con la advertencia en azul y los ejemplos *Delete working hours?* y
+  *Close working hours?*.
