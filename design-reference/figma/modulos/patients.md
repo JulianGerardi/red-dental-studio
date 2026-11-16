@@ -523,3 +523,10 @@ de Insurance (insurance.md, 2026-11-10): llevar ese formato a New Appointment y 
 - Números de paciente de ejemplo en New Appointment: los del HTML (PT-00293…).
 - Se va `lineas`: todos los buscadores usan `subtitulo` y `chips`. Aplica en New Appointment (Patient, Primary y
   Additional Provider), New Patient (Person, Guardian), Add Relationship, New Subscription, New Depender e Insurance.
+
+## New / Edit Patient: el nombre en una fila (2026-11-16)
+
+1. **Pedido de Julián**: *First Name*, *Middle Name* y *Last Name* van en una fila de tres; debajo, *Email* y
+   *Birthdate* de a dos, con la opción del portal justo abajo del email. Vale para New y Edit Patient (`CamposGeneral`).
+2. **Excepción a "campos de a dos"** (regla de drawers): el nombre completo se lee como una unidad y en tres columnas
+   entra con el error *This field is required.* sin cortarse (drawer de 560). En celular quedan los cinco apilados.
