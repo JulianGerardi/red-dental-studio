@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
-### Affected appointments con jerarquía clara, "+N" sólo cuando no entra y asterisco en las horas (#PR)
+### Affected appointments con jerarquía clara, "+N" sólo cuando no entra y asterisco en las horas ([#149](https://github.com/JulianGerardi/red-dental-studio/pull/149))
 - **Affected appointments** (`HoursAppointmentsDialog`): el título es *Affected appointments*. Cada fila muestra el
   paciente, la fecha con el horario completo y el provider, con el estado como badge a la derecha junto al ⋮. Queda un
   solo contador, *Appointments (N)*: salen el pie y la línea por fila.
