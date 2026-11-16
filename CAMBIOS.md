@@ -5,6 +5,18 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
+### Affected appointments con jerarquía clara, "+N" sólo cuando no entra y asterisco en las horas (#PR)
+- **Affected appointments** (`HoursAppointmentsDialog`): el título es *Affected appointments*. Cada fila muestra el
+  paciente, la fecha con el horario completo y el provider, con el estado como badge a la derecha junto al ⋮. Queda un
+  solo contador, *Appointments (N)*: salen el pie y la línea por fila.
+- **Working Hours** (`FranjasDia`): una línea con todas las franjas que entran junto a *Edit hours*. Sólo las que no
+  entran quedan en "+N", que las despliega. En celular, el día y el switch van arriba y las franjas debajo.
+- **Start Time y End Time con asterisco** en *Set working hours* y en *New Hours* (Employees).
+- **Screens & Flows:** Locations suma el flujo *Set working hours: other days & affected appointments*.
+- **Para el dev:**
+  - `FranjasDia` mide con `ResizeObserver` sobre una copia invisible (`aria-hidden`).
+  - En tests, contar las franjas por el botón *Remove …*, no por el texto: la copia lo repite.
+
 ### Design system: ConfirmDialog con ícono en línea, Set working hours y turnos afectados ([#148](https://github.com/JulianGerardi/red-dental-studio/pull/148))
 - **Storybook:**
   - *Elements / ConfirmDialog*: el control `icon` (auto · warning · delete) y una story por combinación de tono e
