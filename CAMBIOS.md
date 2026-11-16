@@ -3,6 +3,25 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-16
+
+### Working Hours: aplicar el horario a otros días, turnos afectados y pop-ups con ícono en línea (#PR)
+- **Set working hours (Locations):** el día de origen queda elegido y no se puede sacar. Si un día adicional está Open
+  con otro horario, pregunta *Replace working hours?* nombrando sólo esos días, en el orden de la tabla (CON-1546;
+  historia de Abril sin clave en Jira todavía). La comparación ordena las franjas.
+- **Turnos afectados:** si las horas nuevas dejan afuera turnos Proposed o Booked, antes de guardar se abre
+  `HoursAppointmentsDialog`: por turno, Edit appointment, Cancel appointment o Mark as No Show; Confirm guarda las
+  horas y pasa el resto a Waiting List. Cancel no guarda nada (resolución de CON-2890, con el texto adaptado a la
+  locación).
+- **`ui/confirm-dialog`:** sale el ícono de 36 px con círculo. Ahora todos llevan un ícono de 16 px junto al título que
+  sale del tono (info azul; triángulo rojo en `danger`).
+- **Para el dev:**
+  - `LocationHoursModal` suma `horario` (la semana actual, 0-6) y `onGuardar` puede devolver `false` para dejar el
+    panel abierto mientras se resuelven turnos. Exporta `mismoHorario`, `listaDias`, `aMinutos` y `deChip`.
+  - Datos nuevos: `TURNOS_LOCACION` en `src/data/location-detail.ts`.
+  - `ConfirmDialog` suma `icon="delete"` (tacho): usarlo sólo en lo que borra. `icon="warning"` sigue para avisos.
+  - Decisiones en `figma/modulos/locations.md` y `figma/README.md` (2026-11-16).
+
 ## 2026-11-15
 
 ### Documentación en Figma, Storybook al día y Jira en cada página ([#144](https://github.com/JulianGerardi/red-dental-studio/pull/144))
