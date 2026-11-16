@@ -1,5 +1,32 @@
 # Design system en Figma · Confidentally UI
 
+> **2026-11-16: el design system vive en un archivo aparte**, para publicarlo como library:
+> [Confidentally UI · Design System](https://www.figma.com/design/iJvnuV8TLStMXpNjdwsuDe) (`iJvnuV8TLStMXpNjdwsuDe`, equipo
+> *CONFI UI KIT-DS*). La página 🎨 Design System del archivo de flujos (`TPh6NE9d4skn0BdId26UTR`, abajo) queda como
+> primera versión hasta que las pantallas se reconecten a la library publicada.
+>
+> **Páginas del archivo nuevo** (una por categoría, como las páginas de módulos): 📕 Cover · 🎨 Foundations (muestras) ·
+> 🔣 Icons (227) · 👆 Actions (Button 54, IconButton 36) · 🏷️ Status & People (Pill, Chip, Count, Avatar) · 📝 Forms
+> (Field, Select, Search, Date, Textarea, Checkbox, Radio, Switch, Option card) · 🧭 Navigation (Tab/Tabs, Breadcrumb,
+> Step, Step indicator, Page button, Pagination, Menu item, Menu) · 🗂️ Cards & Layout (Card, Stat card, Appointment card ×7
+> estados, Pending task card, Clinical badge, Detail row, Empty state, Section notice, Show more) · 📊 Tables & Lists
+> (Table cell, Table toolbar, Data table, Appointment row) · 💬 Feedback & Overlays (Alert, Toast, Tooltip, Popover,
+> Confirm dialog, Drawer) · 🧩 App shell (Nav item, Sidebar ×20 variantes, Topbar, Notification banner, Page title) ·
+> 🦷 Clinical (Exam tab, Finding row, Workflow card, Lab order row).
+> Son 36 component sets (≈ 240 variantes), 16 componentes sueltos y 227 íconos, todo ligado a las mismas 117 variables, 23
+> estilos de texto y 4 de sombra.
+>
+> **Para publicarlo:** en el archivo nuevo, *Assets → Publish library* (lo hace Julián desde Figma). Después, en el archivo de
+> flujos, activar la library (*Assets → Libraries*) y reconectar: cada instancia local pasa al componente publicado con
+> `figma.importComponentByKeyAsync` (por nombre de set y variante), y las variables y estilos con
+> `importVariableByKeyAsync` / `importStyleByKeyAsync`. El mapeo es por nombre: set + `Propiedad=Valor`.
+>
+> **Todavía sin componente** (pedido de Julián: "no debe faltar nada"): Date picker (calendario), Filter menu, Hover card,
+> Dock flotante, Operatory card, Plan card y filas de Insurance/Ledger, columnas y turnos del calendario, tarjetas del
+> Treatment Plan, drawers específicos de cada módulo (se arman con Drawer + Field + Button). Siguen siendo ilustración, y no
+> componentes: odontograma/ToothGlyph, diagramas de región e intraoral, hoja de consentimiento, visor de radiografías y
+> medidores de signos vitales.
+
 Página **🎨 Design System** del archivo *Confidentally — Red Dental Studio · Flows* (`TPh6NE9d4skn0BdId26UTR`). Es el
 espejo en Figma del Storybook y de `src/components/ui` + `src/index.css`. Hecho el 2026-11-15 a pedido de Julián:
 *cada componente conectado a un design system, componetizado, con variantes*.

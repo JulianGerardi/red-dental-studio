@@ -15,7 +15,8 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
     contenedor: si algún hijo cambiara de tamaño, lo deja como estaba.
   - Reglas y límites en `design-reference/figma-docs.md` y en `CLAUDE.md` (*Documentación en Figma*). La app no cambia.
 - **Clinical Mode, segunda tanda** (`scripts/figma/flujos/clinical-mode-2.mjs`): Treatment — Workflows (7 pantallas: lista y filtro de workflows, acciones, preguntas, ocultar sección, Generate Narrative), Radiography — Gallery, Upload & Viewer (3) y Lab Order — List & Actions (4: lista, filtro, acciones por fila, View History), capturados de la app y conectados al design system. Las notas de ROS, Physical, Periodontal, Patient Summary, Prescription y Referral ahora dicen que en la app son placeholders «Planned» (antes parecían pantallas hechas).
-- **Design system en Figma** (página 🎨 Design System): 117 variables (Color 88, Radius, Spacing, Size), 23 estilos de
+- **Design system en un archivo aparte** ([Confidentally UI · Design System](https://www.figma.com/design/iJvnuV8TLStMXpNjdwsuDe)): 11 páginas por categoría, 36 component sets (≈ 240 variantes), 227 íconos, 117 variables y los estilos de texto y sombra; suma lo que faltaba (Sidebar, Topbar, banner, menús, cards de turno y tarea, tabla, paginador, drawer, diálogo, toast…). Listo para publicar como library; falta que Julián la publique y reconectar las pantallas.
+- **Design system en Figma** (primera versión, página 🎨 Design System del archivo de flujos): 117 variables (Color 88, Radius, Spacing, Size), 23 estilos de
   texto, 4 de sombra y 227 íconos, más 18 componentes (Button 54, IconButton 36, Pill, Chip, Count, Avatar,
   Checkbox, Switch, Field, Tab, Alert, Card, Step, Table cell, Menu item, Tooltip, Breadcrumb). Cada propiedad de la
   pieza de React tiene su propiedad en Figma.

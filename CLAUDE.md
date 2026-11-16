@@ -179,7 +179,7 @@ y los pasos están en `design-reference/figma-docs.md`; leelo antes de tocar el 
   rol y texto en los controles (`Button - New Patient`) y `Icon - <nombre>` en los íconos. Nada de "Frame 12". Lo que
   ocupa todo su contenedor va en Fill container y lo absoluto anclado a su borde; los íconos no quedan tapados por el
   campo (`scripts/figma/arreglar.figma.js`).
-- **Design system en Figma** (página 🎨 Design System, `design-reference/figma-design-system.md`): variables de Color,
+- **Design system en Figma** (archivo aparte *Confidentally UI · Design System*, `iJvnuV8TLStMXpNjdwsuDe`; detalle en `design-reference/figma-design-system.md`): variables de Color,
   Radius, Spacing y Size, estilos de texto y sombra, y componentes con variantes (Button, Pill, Avatar, Field…). Si se suma
   o cambia una pieza de `ui/`, se suma o cambia ahí con sus variantes; las pantallas nuevas se conectan con los motores
   guardados en el archivo (se explican en ese `.md`). Nada de hex sueltos en Figma: variable.
