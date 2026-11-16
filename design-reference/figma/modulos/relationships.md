@@ -227,3 +227,10 @@ nos faltaba se suma acá; lo demás queda en el ticket para que red.dev se aline
   ("Clear <label>"). Aplica a todos los buscadores de persona.
 - **`PersonaSeleccionada`** (Person en Edit Relationship y en los modales de Insurance) pasa a ser la misma card que deja
   el buscador al elegir: `PersonaFila` con DOB y email como chips, en vez de "DOB:" y "Email:" sueltos.
+
+## Campo vacío: *This field is required.* (2026-11-16)
+
+1. *Add Relationship* sin persona elegida decía *Select a person or tick the option to create a new one.*; ahora *This
+   field is required.* (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)). El checkbox para crear
+   una persona nueva queda justo arriba. *Choose at least one role.* y *Choose who is responsible for whom.* no
+   cambian: son grupos de opciones, no un campo.

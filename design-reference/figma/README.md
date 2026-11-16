@@ -412,6 +412,13 @@ los campos marcados, y el toast recién sale cuando el guardado se completa.
 Los campos se marcan recién después del primer intento de guardar, no mientras
 se completa el formulario.
 
+**Campo obligatorio vacío: siempre *This field is required.*** (2026-11-16, CON-4161). Un solo texto en toda la app,
+sale de `OBLIGATORIO` (`src/lib/validacion.ts`); no escribir variantes (*Required.*, *Enter the reason.*, *A billing
+name is required.*). Los mensajes específicos quedan sólo para un valor cargado pero inválido (*Enter a valid email.*,
+*Enter the 10-digit NPI.*, *Select a carrier from the list.*) y para grupos que no son un campo (*Choose at least one
+role.*, *Add at least one time range.*). Los resúmenes de secciones plegadas (*Complete the address.*) siguen
+diciendo qué falta adentro.
+
 ## Inputs funcionales con datos ficticios
 
 Todos los controles de formulario responden, no son decorativos:

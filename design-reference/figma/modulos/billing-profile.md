@@ -159,3 +159,11 @@ quedaban (*Complete the information…* y los de Primary Provider) se quedan (Ju
 - Se probó dejar fija la letra del grupo al scrollear (`sticky`) y se descartó: cada letra vive dentro de la fila de su
   primer carrier, así que se soltaba enseguida y dejaba restos. Si se quiere, hay que agrupar las filas por letra.
 
+
+## Campo vacío: *This field is required.* (2026-11-16)
+
+1. **Anomalía con Jira**: CON-4021 / CON-4026 traen *A billing name is required.*, *A billing address is required.* y
+   *A billing phone number is required.*; Julián pidió el mismo texto en todos los campos vacíos, así que ahora dicen
+   *This field is required.* (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)).
+2. NPI y TIN/SSN vacíos también dicen *This field is required.*; *Enter the 10-digit NPI.* / *Enter the 9-digit tax
+   identification number.* quedan para un número cargado con otra cantidad de dígitos.

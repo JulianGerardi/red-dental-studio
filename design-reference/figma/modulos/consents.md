@@ -208,3 +208,9 @@ documentación:
 
 **CON-4119** (epic CON-3118). Vive en Clinical Mode › Treatment Plan y Procedures: ver `clinical-mode.md` ›
 *CON-4119: los estados de la columna Consent (2026-11-11)*.
+
+## Campo vacío: *This field is required.* (2026-11-16)
+
+1. El selector de procedimientos de la plantilla decía *At least one procedure must be listed.*; ahora dice *This field
+   is required.* como el resto (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)). El aviso de
+   arriba (*All required fields marked with (\*)…*) no cambia.

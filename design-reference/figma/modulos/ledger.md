@@ -925,3 +925,8 @@ el diseño sigue siendo el del sistema.
   y también en Post payment de Billing, que es el mismo campo.
 - **Título de Charge Adjustment (+)**: pasa a **"Enter Charge (+) Adjustment"**, como red.dev. Se cierra la anomalía
   *el botón dice Charge, el modal dice Credit* de arriba.
+
+## Campo vacío: *This field is required.* (2026-11-16)
+
+1. *Patient Payment*: Amount, Check y Bank/Branch vacíos decían *Required.*; ahora *This field is required.*, como
+   Charge y Credit Adjustment (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)).

@@ -4,6 +4,7 @@ import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer
 import { FieldError, ModalShell, OptionCheckbox, PersonaFila, PersonSearchField, SelectField, TextField, chipsPersona } from '@/components/patients/form'
 import { useFormPasos } from '@/lib/useFormPasos'
 import { DIRECTORIO, type PersonaDirectorio } from '@/data/personas'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Add Relationship: antes una pantalla aparte (Figma 3716:61372, 3716:62815 y 3716:63601); ahora el drawer de
    Confidentally 2.0 con sus pasos: buscar o crear a la persona, sus datos de contacto y la relación con el paciente.
@@ -144,7 +145,7 @@ export function AddRelationshipDrawer({
             personas={DIRECTORIO.map((p) => p.name)}
             value={personaNombre} onChange={setPersonaNombre}
             disabled={nueva}
-            error={sinPersona ? 'Select a person or tick the option to create a new one.' : undefined}
+            error={sinPersona ? OBLIGATORIO : undefined}
             chips={(n) => { const p = DIRECTORIO.find((x) => x.name === n); return p && chipsPersona(p.dob, p.email) }}
           />
           <OptionCheckbox

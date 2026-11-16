@@ -26,6 +26,7 @@ import {
   ESTADOS_ARANCEL, PROCEDIMIENTOS, SIN_ASIGNAR, TIPOS_ARANCEL, TONO_ARANCEL, conImporte, dinero, etiquetaVersion, fechaDMA,
   hoyIso, idNuevo, versionVigente, type Arancel, type EstadoArancel, type TipoArancel,
 } from '@/data/finanzas'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Settings → Billing → Fee Schedules: la tabla (Name, Type, Assignments, Effective, Last updated, Status, Actions) y,
    al editar, la lista y el editor de red.dev con sus versiones. New Fee Schedule es una página sin la lista. Ver
@@ -79,10 +80,10 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
   const precios = Object.fromEntries(Object.entries(nuevos).filter(([, v]) => v !== null)) as Record<string, number>
   const preciosCambiados = JSON.stringify(precios) !== JSON.stringify(version?.precios ?? {})
   const cambiado = !arancel || preciosCambiados || nombre.trim() !== arancel.nombre || tipo !== arancel.tipo || borrador !== (arancel.estado === 'Inactive')
-  const faltaNombre = intentado && !nombre.trim() ? 'This field is required.' : undefined
-  const faltaTipo = intentado && !tipo ? 'This field is required.' : undefined
+  const faltaNombre = intentado && !nombre.trim() ? OBLIGATORIO : undefined
+  const faltaTipo = intentado && !tipo ? OBLIGATORIO : undefined
   const todas = filas.length > 0 && filas.every((p) => elegidos.includes(p.code))
-  const faltaFecha = intentado && arancel && preciosCambiados && !desde ? 'This field is required.' : undefined
+  const faltaFecha = intentado && arancel && preciosCambiados && !desde ? OBLIGATORIO : undefined
   const repetido = !!nombre.trim() && aranceles.some((a) => a.id !== arancel?.id && a.nombre.toLowerCase() === nombre.trim().toLowerCase())
 
   const elegirVersion = (etiqueta: string) => {

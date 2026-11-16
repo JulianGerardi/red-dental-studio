@@ -11,6 +11,7 @@ import {
 } from '@/components/scheduling/TreatmentPlanPicker'
 import { aviso } from '@/components/ui/toaster'
 import { EMPLEADOS } from '@/data/employees'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 4430:61940 "Scheduling — Calendar (New Appointment Modal)".
 
@@ -157,7 +158,7 @@ export function NewAppointmentModal({
   const mostrarPanel = paso === 1 && tocoHorario
   const set = (k: keyof typeof VACIO) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   const req = (k: keyof typeof VACIO) =>
-    intentado && !d[k].trim() ? 'This field is required.' : undefined
+    intentado && !d[k].trim() ? OBLIGATORIO : undefined
 
   /* Elegir una franja completa la fecha y las dos horas de una. La hora de fin
      sale de la lista, no de sumar 1: así 11 AM cae en 12 PM y no en "12 AM". */

@@ -15,6 +15,7 @@ import {
   OPCIONES_PROCEDIMIENTO, TIPOS_DEDUCIBLE, TIPOS_EXCEPCION, codigoDeOpcion, descripcionDe, opcionProcedimiento,
   type Excepcion, type TipoDeducible, type TipoExcepcion,
 } from '@/data/finanzas'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Manage Exceptions (red.dev, Coverage Table): la lista de excepciones de la plantilla y, con Add new exception, un
    asistente de cuatro pasos en el mismo drawer. Título y bajada ya no repiten el texto de red.dev (pedido de Julián). Cancel del asistente vuelve a la lista, como en red.dev. Cada excepción se
@@ -169,7 +170,7 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
           <SearchField
             label="Add Procedure" placeholder="Search for CDT Code o Description" options={OPCIONES_PROCEDIMIENTO}
             value={busqueda} onChange={agregarProcedimiento}
-            error={falta('procedimientos') ? 'Please add a procedure to the exception' : undefined}
+            error={falta('procedimientos') ? OBLIGATORIO : undefined}
           />
           <div className="flex flex-wrap gap-2">
             {b.procedimientos.map((c) => (
@@ -195,21 +196,21 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
             {b.opcionEdad === 'Coverage' ? (
               <TextField label="Coverage, %" placeholder="0" value={String(b.cobertura ?? 0)} onChange={(v) => set('cobertura', Math.min(100, Number(v.replace(/\D/g, '')) || 0))} />
             ) : (
-              <SearchField label="Downgrade to" placeholder="Search for CDT Code o Description" options={OPCIONES_PROCEDIMIENTO} value={rebaja} onChange={elegirRebaja} error={falta('rebajaA') ? 'Select the procedure it is paid as.' : undefined} />
+              <SearchField label="Downgrade to" placeholder="Search for CDT Code o Description" options={OPCIONES_PROCEDIMIENTO} value={rebaja} onChange={elegirRebaja} error={falta('rebajaA') ? OBLIGATORIO : undefined} />
             )}
             <SelectField label="Deductible Type" options={[...TIPOS_DEDUCIBLE]} value={b.deducible} onChange={(v) => set('deducible', v as TipoDeducible)} />
           </DrawerSection>
         )}
         {b.tipo === 'Downgrade' && (
           <DrawerSection title="Downgrade" description="Select the downgrade of the exception.">
-            <SearchField label="Downgrade to" required placeholder="Search for CDT Code o Description" options={OPCIONES_PROCEDIMIENTO} value={rebaja} onChange={elegirRebaja} error={falta('rebajaA') ? 'Select the procedure it is paid as.' : undefined} />
+            <SearchField label="Downgrade to" required placeholder="Search for CDT Code o Description" options={OPCIONES_PROCEDIMIENTO} value={rebaja} onChange={elegirRebaja} error={falta('rebajaA') ? OBLIGATORIO : undefined} />
           </DrawerSection>
         )}
         {b.tipo === 'Frequency' && (
           <DrawerSection title="Frequency" description="Select the frequency of the exception.">
             <div className="grid gap-4 sm:grid-cols-2">
-              <UnitField label="How many times" unit="times" value={b.veces ?? 0} onChange={(n) => set('veces', n)} error={falta('frecuencia') && !(b.veces ?? 0) ? 'Enter how many times.' : undefined} />
-              <UnitField label="Over the course of" unit="months" value={b.periodo ?? 0} onChange={(n) => set('periodo', n)} error={falta('frecuencia') && !(b.periodo ?? 0) ? 'Enter the period.' : undefined} />
+              <UnitField label="How many times" unit="times" value={b.veces ?? 0} onChange={(n) => set('veces', n)} error={falta('frecuencia') && !(b.veces ?? 0) ? OBLIGATORIO : undefined} />
+              <UnitField label="Over the course of" unit="months" value={b.periodo ?? 0} onChange={(n) => set('periodo', n)} error={falta('frecuencia') && !(b.periodo ?? 0) ? OBLIGATORIO : undefined} />
             </div>
           </DrawerSection>
         )}
@@ -223,7 +224,7 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
       <DrawerStep index={3} step={paso}>
         <TextArea
           label="Reason for exception" required placeholder="Enter a reason for the exception" hint="Select the reason for the exception."
-          value={b.motivo} onChange={(v) => set('motivo', v)} error={falta('motivo') ? 'Enter the reason.' : undefined}
+          value={b.motivo} onChange={(v) => set('motivo', v)} error={falta('motivo') ? OBLIGATORIO : undefined}
         />
       </DrawerStep>
     </ModalShell>

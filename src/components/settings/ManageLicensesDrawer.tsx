@@ -3,6 +3,7 @@ import { DrawerActions, DrawerSection } from '@/components/ui/drawer'
 import { ModalShell, TextField } from '@/components/patients/form'
 import { Alert } from '@/components/ui/alert'
 import type { Cuenta } from '@/pages/settings/Accounts'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Manage licenses (menú de una fila de Accounts): cuántas licencias tiene la cuenta. Las que usan los empleados activos
    y suspendidos son el mínimo, como dice la pestaña Subscription. Sin plan no hay licencias que ajustar. */
@@ -11,7 +12,7 @@ export function ManageLicensesDrawer({ cuenta, onClose, onGuardar }: { cuenta: C
   const sinPlan = cuenta.plan === '—'
   const [total, setTotal] = useState(cuenta.licencias === '—' ? '' : cuenta.licencias)
   const n = Number(total)
-  const error = !total.trim() ? 'This field is required.'
+  const error = !total.trim() ? OBLIGATORIO
     : !Number.isInteger(n) || n < 1 ? 'Enter a whole number.'
     : n < cuenta.empleados ? `At least ${cuenta.empleados}: that many are in use.` : undefined
   const [intentado, setIntentado] = useState(false)

@@ -6,6 +6,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
 import { formatMDY } from '@/lib/fecha'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 4582:30209. "Amount" es texto libre por elección, ver
    design-reference/figma/modulos/ledger.md. */
@@ -61,12 +62,12 @@ export function CreditAdjustmentPanel({
           </div>
           <TextField
             label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto}
-            error={intentado && !monto.trim() ? 'This field is required.' : undefined}
+            error={intentado && !monto.trim() ? OBLIGATORIO : undefined}
           />
           <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} />
           <SelectField
             label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
-            error={intentado && !aplicaA.trim() ? 'This field is required.' : undefined}
+            error={intentado && !aplicaA.trim() ? OBLIGATORIO : undefined}
           />
         </div>
       </div>

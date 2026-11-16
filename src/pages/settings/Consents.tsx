@@ -13,6 +13,7 @@ import { aviso } from '@/components/ui/toaster'
 import { ConsentDocument, textoPlano } from '@/components/settings/ConsentDocument'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Tabs } from '@/components/ui/tabs'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Settings → Consents. Figma 4106:170620 ("New Consent Template"): lista de
    templates a la izquierda y editor del texto -las tres variantes del frame son
@@ -291,7 +292,7 @@ export function SelectorProcedimientos({ elegidos, onCambiar, error }: {
         )}
       </div>
       {error ? (
-        <span className="text-[11px] leading-[1.35] text-field-error">At least one procedure must be listed.</span>
+        <span className="text-[11px] leading-[1.35] text-field-error">{OBLIGATORIO}</span>
       ) : (
         elegidos.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
@@ -423,7 +424,7 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
         options={TITULOS_SUGERIDOS}
         value={borrador.titulo}
         onChange={(v) => onBorrador({ ...borrador, titulo: v })}
-        error={faltaTitulo ? 'This field is required.' : undefined}
+        error={faltaTitulo ? OBLIGATORIO : undefined}
       />
       <SelectorProcedimientos elegidos={borrador.procedimientos} onCambiar={(procedimientos) => onBorrador({ ...borrador, procedimientos })} error={faltaProcedimiento} />
       {EDITOR_UNICO ? (

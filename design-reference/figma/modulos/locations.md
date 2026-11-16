@@ -576,6 +576,12 @@ los horarios".
 
 Para validar: si "+N" en celular, con una sola franja visible, se entiende o conviene mostrarlas todas ahí.
 
+## CON-4161 · Campo vacío: *This field is required.* (2026-11-16)
+
+1. *Set working hours*, *New Hours* y *New Exception* decían *Required.* debajo de Start/End Time vacíos; CON-4161 y
+   CON-4162 piden *This field is required.*, el texto único de la app (`OBLIGATORIO`, regla en
+   [figma/README.md › Validación](../README.md)). Los demás errores de horarios no cambian.
+
 ### Borrar una franja, cerrar un día y citas afectadas según la HU 8 (2026-11-16, CON-4165, CON-4166, CON-4167)
 
 Pedido de Julián con CON-4165 (HU 6, cerrar un día) y CON-4166 (HU 7, eliminar un intervalo). Aparecieron en Jira las

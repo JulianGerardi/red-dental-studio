@@ -8,6 +8,7 @@ import {
   type Campo, type Categoria, type ClinicalItem,
 } from '@/data/clinicalItems'
 import { aviso } from '@/components/ui/toaster'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3648:59976 (Medical Condition), 3648:60265 (Allergy),
    3648:61266 (Past Surgery) y 3648:62265 (Medication).
@@ -35,7 +36,7 @@ export function ClinicalItemModal({
   const set = (k: string) => (valor: string) => setV((p) => ({ ...p, [k]: valor }))
 
   const obligatorios = cfg.campos.filter((c) => 'req' in c && c.req).map((c) => (c as { key: string }).key)
-  const req = (k: string) => (intentado && !(v[k] ?? '').trim() ? 'This field is required.' : undefined)
+  const req = (k: string) => (intentado && !(v[k] ?? '').trim() ? OBLIGATORIO : undefined)
 
   const guardar = () => {
     setIntentado(true)

@@ -17,7 +17,7 @@ test('Open se guarda sólo con horas válidas y en todos los días elegidos', as
   await screen.getByRole('switch', 'Sunday open').tap()
   const panel = screen.getByRole('dialog', 'Set working hours')
   await panel.getByRole('button', /^Save/).tap()
-  await expect(panel.getByText('Required.')).toHaveCount(2)
+  await expect(panel.getByText('This field is required.')).toHaveCount(2)
 
   await panel.getByRole('button', '00:00 hs').first().tap()
   await panel.getByRole('button', '10:00 hs').tap()
