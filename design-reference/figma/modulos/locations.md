@@ -529,3 +529,13 @@ o quitar una franja con la ✕ del chip cuando tiene turnos (CON-1547), y conect
 Para validar con usuarios: si recepción entiende que el día de origen relleno "no se puede sacar" sin el tooltip; si el
 ⋮ por turno se descubre o conviene dejar las acciones a la vista; y si "Waiting List" en bloque es lo que esperan como
 salida por defecto.
+
+#### Documentación (2026-11-16, CON-1546, CON-2890)
+
+- **Storybook:** *LocationHoursModal* (Parts, States y Specs, con *Replace Question*), *HoursAppointmentsDialog*
+  (nuevo) y *Elements / ConfirmDialog* con el ícono en línea. Detalle en `design-system.md`, 2026-11-16.
+- **Figma, Screens & Flows** (página ⚙️ Settings — Locations, `7:16`): flujo nuevo *Locations — Set working hours:
+  other days & affected appointments*. Siete pantallas: la semana, el panel con el día de origen fijo, otros días
+  elegidos, *Replace working hours?*, los turnos afectados, uno resuelto con No Show y las horas guardadas. La página
+  se recapturó entera desde la app (`scripts/figma/flujos/settings-locations.mjs`).
+- **Figma, design system:** *Confirm dialog* con `Tone` × `Icon` en *Feedback & Overlays*.
