@@ -7,6 +7,7 @@ import { CollapsibleFields, DateField, LinkPersonCheckbox, OptionCheckbox, Perso
 import type { DatosPaciente } from '@/data/patientsStore'
 import { PERSONAS_SISTEMA, type PersonaSistema } from '@/data/personas'
 import { codigoDe } from '@/data/paises'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Las tres secciones del formulario de paciente -General, Guardian y Demography-, las mismas en New Patient (tres pasos)
    y en Edit Patient (tres pestañas). Figma 3751:73452 (New) y 5277:123056 (Edit). Decisiones y anomalías en
@@ -17,7 +18,6 @@ export type SeccionPaciente = (typeof SECCIONES_PACIENTE)[number]
 export type ErroresPaciente = Partial<Record<keyof DatosPaciente, string>>
 export type CambiarPaciente = <K extends keyof DatosPaciente>(campo: K, valor: DatosPaciente[K]) => void
 
-const OBLIGATORIO = 'This field is required.'
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 /* En qué sección vive cada campo: el guardado la usa para señalar la pestaña y llevar al usuario hasta el campo. */

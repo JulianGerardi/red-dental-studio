@@ -15,6 +15,7 @@ const personaChips = (nombre: string) => {
 import { CARRIERS, PLANES_POR_CARRIER, ORDENES, SUSCRIPCION, type Suscripcion } from '@/data/insurance'
 import { Alert } from '@/components/ui/alert'
 import { aviso } from '@/components/ui/toaster'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Modales de Insurance (Figma 3817:865128).
    Todos los textos se replican tal cual, incluidos "Suscription", "Depender",
@@ -57,7 +58,7 @@ export function NewSubscriptionModal({
   const [intentado, setIntentado] = useState(false)
   const [paso, setPaso] = useState(0)
   const set = (k: keyof typeof d) => (v: string) => setD((p) => ({ ...p, [k]: v }))
-  const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? 'This field is required.' : undefined)
+  const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? OBLIGATORIO : undefined)
 
   const obligatoriosSuscriptor: (keyof typeof d)[] = modo === 'nuevo' ? ['nombre', 'apellido', 'cumple'] : modo === 'existente' ? ['persona'] : []
   const faltaSuscriptor = obligatoriosSuscriptor.some((k) => !d[k].trim()) || (modo === 'existente' && !DIRECTORIO.some((p) => p.name === d.persona))
@@ -135,7 +136,7 @@ export function NewSubscriptionModal({
                 onChange={set('persona')}
                 chips={personaChips}
                 emptyText="No person found."
-                error={intentado && !DIRECTORIO.some((p) => p.name === d.persona) ? (d.persona.trim() ? 'Select a person from the list.' : 'This field is required.') : undefined}
+                error={intentado && !DIRECTORIO.some((p) => p.name === d.persona) ? (d.persona.trim() ? 'Select a person from the list.' : OBLIGATORIO) : undefined}
               />
             </SectionCard>
           )}
@@ -258,7 +259,7 @@ export function ManageSubscriptionModal({
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField
               label="Subcriber ID" required value={subId} onChange={setSubId}
-              error={intentado && !subId.trim() ? 'This field is required.' : undefined}
+              error={intentado && !subId.trim() ? OBLIGATORIO : undefined}
             />
             <TextField label="Coverage End" value={fin} onChange={setFin} />
           </div>
@@ -276,7 +277,7 @@ export function NewDependerModal({ onClose }: { onClose: () => void }) {
   const [d, setD] = useState({ paciente: '', subId: '', carrier: '', orden: '', inicio: '', fin: '', elegibilidad: '', verificacion: '' })
   const [intentado, setIntentado] = useState(false)
   const set = (k: keyof typeof d) => (v: string) => setD((p) => ({ ...p, [k]: v }))
-  const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? 'This field is required.' : undefined)
+  const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? OBLIGATORIO : undefined)
 
   const guardar = () => {
     setIntentado(true)

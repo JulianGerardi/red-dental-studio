@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
+### Campos obligatorios vacíos: siempre "This field is required." ([#150](https://github.com/JulianGerardi/red-dental-studio/pull/150))
+- Todo campo obligatorio vacío dice *This field is required.* debajo (CON-4161). Salen *Required.*, *Enter the reason.*,
+  *A billing name is required.*, *Please add a procedure to the exception* y las demás variantes.
+- **Para el dev:**
+  - Usar `OBLIGATORIO` de `src/lib/validacion.ts`; no escribir el texto a mano.
+  - Los mensajes de valor inválido (*Enter a valid email.*, *Enter the 10-digit NPI.*) quedan para un campo con algo
+    cargado; vacío, siempre `OBLIGATORIO`.
+
 ### Affected appointments con jerarquía clara, "+N" sólo cuando no entra y asterisco en las horas ([#149](https://github.com/JulianGerardi/red-dental-studio/pull/149))
 - **Affected appointments** (`HoursAppointmentsDialog`): el título es *Affected appointments*. Cada fila muestra el
   paciente, la fecha con el horario completo y el provider, con el estado como badge a la derecha junto al ⋮. Queda un

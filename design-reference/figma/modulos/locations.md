@@ -575,3 +575,9 @@ los horarios".
 5. Los e2e cuentan las franjas por su botón *Remove …*, no por el texto: la copia invisible repite el texto.
 
 Para validar: si "+N" en celular, con una sola franja visible, se entiende o conviene mostrarlas todas ahí.
+
+## CON-4161 · Campo vacío: *This field is required.* (2026-11-16)
+
+1. *Set working hours*, *New Hours* y *New Exception* decían *Required.* debajo de Start/End Time vacíos; CON-4161 y
+   CON-4162 piden *This field is required.*, el texto único de la app (`OBLIGATORIO`, regla en
+   [figma/README.md › Validación](../README.md)). Los demás errores de horarios no cambian.

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Formularios de drawer con pasos, como en Confidentally 2.0: Next sólo avanza con lo obligatorio del paso completo y
    marca en rojo lo que falta; Save revisa todos los pasos y vuelve al primero incompleto. */
@@ -8,7 +9,7 @@ export function useFormPasos<T extends Record<string, string>>(vacio: T, obligat
   const [intentado, setIntentado] = useState(false)
   const set = (k: keyof T) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   /* Sólo se marca lo del paso a la vista: los otros pasos siguen montados, ocultos. */
-  const falta = (k: keyof T) => (intentado && (obligatorios[paso] ?? []).includes(k) && !d[k].trim() ? 'This field is required.' : undefined)
+  const falta = (k: keyof T) => (intentado && (obligatorios[paso] ?? []).includes(k) && !d[k].trim() ? OBLIGATORIO : undefined)
   const completo = (i: number) => (obligatorios[i] ?? []).every((k) => d[k].trim())
   const siguiente = () => {
     if (!completo(paso)) { setIntentado(true); return }

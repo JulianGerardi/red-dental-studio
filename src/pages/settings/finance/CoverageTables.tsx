@@ -15,6 +15,7 @@ import { ExceptionsDrawer } from '@/components/finance/ExceptionsDrawer'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
 import { TIPOS_COBERTURA, cantidad, idNuevo, type TablaCobertura, type TipoCobertura } from '@/data/finanzas'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Settings → Billing → Coverage Table como en red.dev: plantillas de cobertura (rangos de códigos con su categoría, tipo de
    deducible y lo que paga) que cada plan copia con Copy from template, y sus excepciones. Ver settings-billing.md. */
@@ -68,7 +69,7 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
       <div className="grid gap-4 sm:grid-cols-2 lg:max-w-[560px]">
         <TextField
           label="Name" required placeholder="Insert name" value={nombre} onChange={setNombre}
-          error={intentado && !nombre.trim() ? 'This field is required.' : repetido ? 'Another coverage table has this name.' : undefined}
+          error={intentado && !nombre.trim() ? OBLIGATORIO : repetido ? 'Another coverage table has this name.' : undefined}
         />
         <SelectField
           label="Type" options={[...TIPOS_COBERTURA]} value={tipo} onChange={(v) => setTipo(v as TipoCobertura)} disabled={!!tabla}
