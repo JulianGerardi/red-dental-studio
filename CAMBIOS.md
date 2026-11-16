@@ -21,6 +21,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
   - `pulsarRol` (`design-system/play.ts`) acepta `switch`.
   - Recapturar una página conectada a la library tiene pasos nuevos: ver `figma-docs.md`.
 
+### New/Edit Patient: nombre completo en una fila ([#152](https://github.com/JulianGerardi/red-dental-studio/pull/152))
+- Paso *General* (`CamposGeneral`): *First Name*, *Middle Name* y *Last Name* en una fila de tres; debajo, *Email* y
+  *Birthdate*. En celular, apilados.
+- **Para el dev:** excepción deliberada a "campos de a dos" en drawers (`patients.md`, 2026-11-16). Sin cambios de datos
+  ni validaciones.
+
 ### Working Hours: borrar una franja, cerrar un día y citas afectadas según la HU 8 ([#151](https://github.com/JulianGerardi/red-dental-studio/pull/151))
 - **Delete working hours?** (la ✕ de una franja, CON-4166): pregunta antes y borra sólo esa franja. Si es la última,
   el día queda Closed.
