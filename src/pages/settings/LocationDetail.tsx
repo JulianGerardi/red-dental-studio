@@ -27,7 +27,7 @@ import { LocationBillingProfile } from '@/components/settings/LocationBillingPro
 import { LocationInsuranceDefaults } from '@/components/settings/LocationInsuranceDefaults'
 import { hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import {
-  HORARIO_SEMANAL, SALAS_INICIALES, EXCEPCIONES_INICIALES,
+  HORARIO_SEMANAL, CITAS_LOCACION, SALAS_INICIALES, EXCEPCIONES_INICIALES,
   type Sala, type TurnoSala, type Excepcion,
 } from '@/data/location-detail'
 import { formatMDY } from '@/lib/fecha'
@@ -129,8 +129,9 @@ export function WorkingHoursTab() {
   const [horario, setHorario] = useState(HORARIO_SEMANAL)
   const [expandido, setExpandido] = useState<string | null>(null)
   const [modal, setModal] = useState<string | null>(null)
+  const [citas, setCitas] = useState(CITAS_LOCACION)
 
-  const cerrar = (key: string, label: string) => {
+  const cerrar =(key: string, label: string) => {
     const antes = horario[key]
     setHorario((p) => ({ ...p, [key]: { abierto: false, rangos: [] } }))
     aviso.ok(`${label} is now closed.`, { label: 'Undo', onClick: () => setHorario((p) => ({ ...p, [key]: antes })) })
@@ -208,13 +209,19 @@ export function WorkingHoursTab() {
         <LocationHoursModal
           dia={DIAS.findIndex(([key]) => key === modal)}
           iniciales={horario[modal].rangos}
+          horario={horario}
+          citas={citas}
           onClose={() => setModal(null)}
-          onGuardar={(dias, rangos) =>
+          onGuardar={(dias, rangos, resueltas) => {
             setHorario((p) => ({
               ...p,
               ...Object.fromEntries(dias.map((i) => [DIAS[i][0], { abierto: true, rangos }])),
             }))
-          }
+            setCitas((p) => p.map((c) => {
+              const r = resueltas.find((x) => x.id === c.id)
+              return r ? { ...c, estado: r.estado, provider: r.provider } : c
+            }))
+          }}
         />
       )}
     </div>

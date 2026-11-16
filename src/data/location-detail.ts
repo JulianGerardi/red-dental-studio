@@ -21,6 +21,21 @@ export const HORARIO_SEMANAL: Record<string, EstadoDia> = {
   Saturday: { abierto: false, rangos: [] },
 }
 
+/* Citas Proposed / Booked de la locación: al cambiar el horario, las que quedan fuera se resuelven antes de guardar
+   (figma/modulos/locations.md, 2026-11-16). Hora de inicio en punto y una hora de duración. */
+export type EstadoCita = 'Proposed' | 'Booked' | 'Waiting List' | 'Cancelled' | 'No Show'
+export type CitaLocacion = { id: string; fecha: Date; provider: string; paciente: string; estado: EstadoCita }
+
+export const PROVIDERS_LOCACION = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado']
+
+export const CITAS_LOCACION: CitaLocacion[] = [
+  { id: 'c1', fecha: new Date(2026, 10, 23, 9, 0), provider: 'Dr. Elena Martinez', paciente: 'John Smith', estado: 'Booked' },
+  { id: 'c2', fecha: new Date(2026, 10, 23, 19, 0), provider: 'Dr. Salgado', paciente: 'Elias Aguirre', estado: 'Booked' },
+  { id: 'c3', fecha: new Date(2026, 10, 24, 15, 0), provider: 'Dr. Emily Chen', paciente: 'Noah James Smith', estado: 'Proposed' },
+  { id: 'c4', fecha: new Date(2026, 10, 24, 17, 0), provider: 'Dr. Salgado', paciente: 'Maria Abril Viola', estado: 'Booked' },
+  { id: 'c5', fecha: new Date(2026, 10, 27, 10, 0), provider: 'Dr. Elena Martinez', paciente: 'Emma Smith', estado: 'Booked' },
+]
+
 /* CON-404 "Registrar room": Name* y Type* obligatorios, Abbreviation opcional, Active / Inactive. Una sala inactiva no
    se ofrece para turnos nuevos pero queda guardada. `turnos` son los turnos programados en esa sala: desactivarla los
    pasa a la lista de espera (CON-1520). Ver figma/modulos/locations.md. */
