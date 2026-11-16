@@ -581,3 +581,48 @@ Para validar: si "+N" en celular, con una sola franja visible, se entiende o con
 1. *Set working hours*, *New Hours* y *New Exception* decían *Required.* debajo de Start/End Time vacíos; CON-4161 y
    CON-4162 piden *This field is required.*, el texto único de la app (`OBLIGATORIO`, regla en
    [figma/README.md › Validación](../README.md)). Los demás errores de horarios no cambian.
+
+### Borrar una franja, cerrar un día y citas afectadas según la HU 8 (2026-11-16, CON-4165, CON-4166, CON-4167)
+
+Pedido de Julián con CON-4165 (HU 6, cerrar un día) y CON-4166 (HU 7, eliminar un intervalo). Aparecieron en Jira las
+historias de Working Hours HU 1 a 8 (CON-4160 a CON-4167). *Aplicar a otros días* es CON-4164 (HU 5) y las citas
+afectadas, CON-4167 (HU 8).
+
+1. **Toda operación pasa por el mismo recorrido** (`Operacion` en `LocationDetail.tsx`):
+   1. Pregunta (salvo el panel, que ya tiene la suya de reemplazo).
+   2. Impacto: si alguna cita afectada está en Check In o In Progress, se bloquea; si hay otras, *Affected appointments*.
+   3. Se aplica.
+
+   Cancel en cualquier paso deja la tabla como estaba.
+2. **Borrar una franja (✕ del chip)**:
+   - *Delete working hours?* (danger, tacho): "This will delete the working hours from 08:00 AM to 01:00 PM on Monday. Do
+     you want to continue?". Si es la última del día, suma "Monday will be closed."; si además es la última de la
+     locación, "The location will have no working hours.".
+   - Al confirmar sale sólo esa franja; sin franjas, el día queda Closed. Toast con Undo.
+3. **Cerrar un día (switch)**:
+   - *Close working hours?* (danger, triángulo): "This will close the location every Monday. Do you want to continue?"
+     y, si era el último día abierto, la misma frase de la locación sin horarios. Una sola pregunta.
+   - Las franjas **se conservan** (el día queda `abierto: false` con sus `rangos`). Reabrirlo abre *Set working hours* con
+     esas franjas, y se reabre recién con Save.
+   - Antes, cerrar vaciaba las franjas sin preguntar (2026-11-06, punto 7); eso queda reemplazado.
+4. **Citas afectadas, según CON-4167**:
+   - Entran sólo las que **pierden cobertura**: estaban cubiertas por un día Open y dejan de estarlo. Las que ya estaban
+     afuera no cuentan.
+   - Lo que se hace cita por cita (Edit appointment, Cancel appointment, Mark as No Show) **se guarda en el momento** y
+     no se deshace con Cancel.
+   - La cita resuelta **sale de la lista** y *Appointments (N)* cuenta sólo las pendientes. Sale *Undo changes* del menú
+     y la línea "Now within the new working hours.".
+   - Si no queda ninguna, se vuelve a la acción de origen: el panel, o la pregunta de borrar o cerrar, que sigue sin
+     citas afectadas.
+   - Confirm pasa a *Waiting List* las que siguen afectadas, conservando la cita.
+5. **Bloqueo**: *Unable to change working hours* (`HoursBlockedDialog`, sólo Close) con el texto de CON-4167 ("Working
+   hours cannot be changed because there are affected appointments in Check In or In Progress status.") y las citas en
+   curso. No se aplica nada y el panel conserva el borrador. El título es propio, con el mismo patrón que *Unable to
+   disable billing profile*.
+6. **Datos**: `wh6`, una cita en Check In hoy (lunes 16, 10:00), para mostrar el bloqueo al borrar 08:00 AM - 01:00 PM
+   de Monday. `EstadoTurnoLocacion` suma Check In e In Progress.
+7. **Íconos de advertencia en azul** (Julián): en `ConfirmDialog`, `icon="warning"` va en `dash-blue` salvo en
+   `danger`, que sigue rojo. Afecta también a Consent required.
+
+Para validar: si "The location will have no working hours." alcanza como advertencia o conviene un tono más fuerte; y si
+el Undo de borrar y cerrar tiene sentido cuando ya hubo una pregunta antes.
