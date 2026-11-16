@@ -8,7 +8,6 @@ import { formatDMY } from '@/components/ui/date-picker'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
 import { hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import type { EstadoTurnoLocacion, TurnoLocacion } from '@/data/location-detail'
-import { cn } from '@/lib/utils'
 
 /* Turnos Proposed o Booked que quedan fuera de las horas nuevas de la locación (CON-1546, resolución de CON-2890).
    Cada uno se resuelve aparte —Edit appointment para moverlo de día, hora o provider; Cancel o No Show— o Confirm los
@@ -18,8 +17,14 @@ import { cn } from '@/lib/utils'
 const TONO: Record<EstadoTurnoLocacion, PillTone> = {
   Proposed: 'purple', Booked: 'info', Cancelled: 'danger', 'No Show': 'neutral', 'Waiting List': 'warning',
 }
-const fecha = (d: Date) =>
-  d.toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
+/* "Monday, November 23 · 3:00–4:00 PM": fecha y horario completo del turno (dura una hora). */
+const hora = (d: Date) => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+const cuando = (d: Date) => {
+  const fin = new Date(d.getTime() + 60 * 60 * 1000)
+  const [a, b] = [hora(d), hora(fin)]
+  const rango = a.slice(-2) === b.slice(-2) ? `${a.slice(0, -3)}–${b}` : `${a}–${b}`
+  return [d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }), rango] as const
+}
 /* Las horas del drawer de turnos ("09 AM"): la agenda va de hora en hora. */
 const horaTurno = (h: number) => `${String(h % 12 || 12).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`
 const pendiente = (t: TurnoLocacion) => t.estado === 'Proposed' || t.estado === 'Booked'
@@ -39,7 +44,6 @@ export function HoursAppointmentsDialog({
 }) {
   const [borrador, setBorrador] = useState(afectados)
   const [editando, setEditando] = useState<TurnoLocacion | null>(null)
-  const sinResolver = borrador.filter((t) => pendiente(t) && fueraDeHorario(t))
 
   const cambiar = (t: TurnoLocacion) => setBorrador((p) => p.map((x) => (x.id === t.id ? t : x)))
   const marcar = (t: TurnoLocacion, estado: EstadoTurnoLocacion) => cambiar({ ...t, estado })
@@ -76,7 +80,7 @@ export function HoursAppointmentsDialog({
   return (
     <ConfirmDialog
       icon="warning"
-      title="These hours affect scheduled appointments"
+      title="Affected appointments"
       confirmLabel="Confirm"
       onCancel={onCancel}
       onConfirm={() => onConfirm(borrador.map((t) => (pendiente(t) && fueraDeHorario(t) ? { ...t, estado: 'Waiting List' } : t)))}
@@ -85,40 +89,37 @@ export function HoursAppointmentsDialog({
         There are scheduled appointments outside the new working hours. You can review and manage each appointment
         individually, or confirm to move all appointments to the waiting list.
       </p>
-      <p className="mt-3 font-semibold text-ink">Affected Appointments ({borrador.length})</p>
-      <ul className="mt-1.5 flex max-h-64 flex-col divide-y divide-line-soft overflow-y-auto">
+      {/* Paciente y acciones arriba; fecha y horario; provider. El estado, badge a la derecha. Ver locations.md, 2026-11-16. */}
+      <p className="mt-3 font-semibold text-ink">Appointments ({borrador.length})</p>
+      <ul className="mt-1 flex max-h-72 flex-col divide-y divide-line-soft overflow-y-auto">
         {borrador.map((t) => {
-          const queda = pendiente(t) && fueraDeHorario(t)
+          const adentro = pendiente(t) && !fueraDeHorario(t)
           const cambio = t !== original(t)
           return (
-            <li key={t.id} className="flex items-start justify-between gap-3 py-2 leading-snug">
-              <span className="min-w-0">
-                <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <span className="font-medium text-ink tabular-nums">{fecha(t.fecha)}</span>
-                  <Pill tone={TONO[t.estado]} size="sm">{t.estado}</Pill>
+            <li key={t.id} className="flex items-start justify-between gap-3 py-3 leading-snug">
+              <span className="flex min-w-0 flex-col gap-1">
+                <span className="truncate text-[14px] font-semibold text-ink">{t.paciente}</span>
+                {/* En celular el horario baja entero, sin cortarse en el guion. */}
+                <span className="text-ink-soft tabular-nums">
+                  {cuando(t.fecha)[0]} · <span className="whitespace-nowrap">{cuando(t.fecha)[1]}</span>
                 </span>
-                <span className="block">{t.provider} · Patient: {t.paciente}</span>
-                <span className={cn('block text-[12px]', queda ? 'text-warn-fg' : 'text-dash-ok-fg')}>
-                  {queda
-                    ? 'Moves to the waiting list on Confirm.'
-                    : pendiente(t) ? 'Now within the new working hours.' : `Will be marked as ${t.estado}.`}
-                </span>
+                <span className="text-ink-muted">{t.provider}</span>
+                {/* Movido adentro del horario: el estado sigue siendo el mismo, así que se dice aparte. */}
+                {adentro && <span className="text-[12px] text-dash-ok-fg">Now within the new working hours.</span>}
               </span>
-              <RowActionsMenu label={`appointment for ${t.paciente}`} className="shrink-0">
-                <DropdownMenuItem onSelect={() => setEditando(t)}>Edit appointment</DropdownMenuItem>
-                {t.estado !== 'Cancelled' && <DropdownMenuItem onSelect={() => marcar(t, 'Cancelled')}>Cancel appointment</DropdownMenuItem>}
-                {t.estado !== 'No Show' && <DropdownMenuItem onSelect={() => marcar(t, 'No Show')}>Mark as No Show</DropdownMenuItem>}
-                {cambio && <DropdownMenuItem onSelect={() => cambiar(original(t))}>Undo changes</DropdownMenuItem>}
-              </RowActionsMenu>
+              <span className="flex shrink-0 items-center gap-2">
+                <Pill tone={TONO[t.estado]} size="sm">{t.estado}</Pill>
+                <RowActionsMenu label={`appointment for ${t.paciente}`}>
+                  <DropdownMenuItem onSelect={() => setEditando(t)}>Edit appointment</DropdownMenuItem>
+                  {t.estado !== 'Cancelled' && <DropdownMenuItem onSelect={() => marcar(t, 'Cancelled')}>Cancel appointment</DropdownMenuItem>}
+                  {t.estado !== 'No Show' && <DropdownMenuItem onSelect={() => marcar(t, 'No Show')}>Mark as No Show</DropdownMenuItem>}
+                  {cambio && <DropdownMenuItem onSelect={() => cambiar(original(t))}>Undo changes</DropdownMenuItem>}
+                </RowActionsMenu>
+              </span>
             </li>
           )
         })}
       </ul>
-      <p className="mt-2 text-[12px] text-ink-muted">
-        {sinResolver.length
-          ? `${sinResolver.length} ${sinResolver.length === 1 ? 'appointment' : 'appointments'} will move to the waiting list.`
-          : 'All affected appointments are managed.'}
-      </p>
     </ConfirmDialog>
   )
 }

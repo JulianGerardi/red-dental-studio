@@ -139,7 +139,6 @@ const fueraDe = (t: TurnoLocacion, dias: number[], rangos: string[]) => {
    resuelven (HoursAppointmentsDialog). Ver figma/modulos/locations.md (2026-11-06 y 2026-11-16, CON-1546, CON-2890). */
 export function WorkingHoursTab() {
   const [horario, setHorario] = useState(HORARIO_SEMANAL)
-  const [expandido, setExpandido] = useState<string | null>(null)
   const [modal, setModal] = useState<string | null>(null)
   const [turnos, setTurnos] = useState(TURNOS_LOCACION)
   const [resolver, setResolver] = useState<{ dias: number[]; rangos: string[]; afectados: TurnoLocacion[] } | null>(null)
@@ -175,10 +174,10 @@ export function WorkingHoursTab() {
 
   return (
     <div className="overflow-hidden rounded-xl border border-line bg-white">
-      <div className="grid grid-cols-[140px_140px_1fr] gap-3 border-b border-line bg-surface-alt px-4 py-3 text-xs font-semibold text-ink-muted">
+      <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-line bg-surface-alt px-4 py-3 text-xs font-semibold text-ink-muted sm:grid-cols-[140px_140px_1fr]">
         <span>Day</span>
         <span>Status</span>
-        <span>Hours</span>
+        <span className="max-sm:hidden">Hours</span>
       </div>
       {DIAS.map(([key, label]) => {
         const dia = horario[key]
@@ -186,7 +185,8 @@ export function WorkingHoursTab() {
           <div
             key={key}
             className={cn(
-              'grid grid-cols-[140px_140px_1fr] items-center gap-3 border-b border-line-soft px-4 py-3 last:border-0',
+              /* En celular, día y switch arriba y las franjas debajo a todo el ancho. */
+              'grid grid-cols-[1fr_auto] items-center gap-3 border-b border-line-soft px-4 py-3 last:border-0 sm:grid-cols-[140px_140px_1fr]',
               !dia.abierto && 'bg-surface-subtle',
             )}
           >
@@ -197,11 +197,9 @@ export function WorkingHoursTab() {
               onChange={(v) => (v ? setModal(key) : cerrar(key, label))}
             />
             {dia.abierto ? (
-              <div className="flex flex-wrap items-center gap-2">
-                {/* Todo "+N" se despliega: regla del sistema. Colapsado
-                    muestra sólo las dos primeras franjas y un chip "+N" con
-                    las que faltan; al tocarlo aparecen todas. */}
-                {(expandido === key ? dia.rangos : dia.rangos.slice(0, 2)).map((r, i) => (
+              <div className="col-span-2 flex flex-wrap items-center gap-2 sm:col-span-1">
+                {/* Todas las franjas a la vista; si no entran, bajan de línea. Sin "+N": ver locations.md, 2026-11-16. */}
+                {dia.rangos.map((r, i) => (
                   <Chip
                     key={i}
                     removeLabel={`Remove ${r} on ${label}`}
@@ -215,16 +213,6 @@ export function WorkingHoursTab() {
                     {r}
                   </Chip>
                 ))}
-                {expandido !== key && dia.rangos.length > 2 && (
-                  <button
-                    type="button"
-                    onClick={() => setExpandido(key)}
-                    aria-label={`Show ${dia.rangos.length - 2} more hours on ${label}`}
-                    className="inline-flex h-6 items-center rounded-full bg-dash-count-bg px-2.5 text-[12px] font-medium text-dash-blue hover:underline"
-                  >
-                    +{dia.rangos.length - 2}
-                  </button>
-                )}
                 <button
                   type="button"
                   onClick={() => setModal(key)}
@@ -235,7 +223,7 @@ export function WorkingHoursTab() {
                 </button>
               </div>
             ) : (
-              <span className="text-[12px] text-ink-faint">Closed all day.</span>
+              <span className="col-span-2 text-[12px] text-ink-faint sm:col-span-1">Closed all day.</span>
             )}
           </div>
         )

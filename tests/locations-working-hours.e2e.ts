@@ -85,11 +85,11 @@ test('Turnos fuera de las horas nuevas: se resuelven antes y Confirm pasa el res
   await panel.getByRole('button', /^Save/).tap()
   await screen.getByRole('dialog', 'Replace working hours?').getByRole('button', 'Confirm').tap()
 
-  const aviso = screen.getByRole('dialog', 'These hours affect scheduled appointments')
-  await expect(aviso.getByText('Affected Appointments (2)')).toBeVisible()
+  const aviso = screen.getByRole('dialog', 'Affected appointments')
+  await expect(aviso.getByText('Appointments (2)', { exact: true })).toBeVisible()
   await screen.getByRole('button', 'Actions for appointment for John Smith').tap()
   await screen.getByRole('menuitem', 'Mark as No Show').tap()
-  await expect(aviso.getByText('1 appointment will move to the waiting list.')).toBeVisible()
+  await expect(aviso.getByText('No Show')).toBeVisible()
   await aviso.getByRole('button', 'Confirm').tap()
 
   await expect(screen.getByText('Hours saved for 3 days. 1 appointment was moved to the waiting list.')).toBeVisible()

@@ -25,11 +25,11 @@ const meta = {
         component: [
           'Aviso previo a guardar *Set working hours* cuando las horas nuevas dejan afuera turnos **Proposed** o **Booked** de la locación. Es un `ConfirmDialog` primary con `icon="warning"` y la lista de turnos.',
           '',
-          '**Por turno**, el ⋮ (`RowActionsMenu`): *Edit appointment* abre el drawer de la agenda para moverlo de día, hora o provider; *Cancel appointment*; *Mark as No Show*; *Undo changes* vuelve al original. Cada fila dice qué le va a pasar y abajo se cuenta cuántos pasan a la lista de espera.',
+          '**Por turno**, el ⋮ (`RowActionsMenu`): *Edit appointment* abre el drawer de la agenda para moverlo de día, hora o provider; *Cancel appointment*; *Mark as No Show*; *Undo changes* vuelve al original. Cada fila: paciente, fecha y horario, provider, y el estado como badge a la derecha. El único contador es el de *Appointments (N)*.',
           '',
           '**Nada se aplica hasta Confirm**: Confirm guarda las horas y pasa los que quedan a *Waiting List*; Cancel vuelve al panel sin guardar ni las horas ni los turnos. El texto es el de CON-2890 adaptado a la locación (la historia habla del provider).',
           '',
-          '**Probalo:** en *Playground*, en el ⋮ de John Smith elegí *Mark as No Show* y mirá cómo cambia la cuenta de abajo.',
+          '**Probalo:** en *Playground*, en el ⋮ de John Smith elegí *Mark as No Show* y mirá cómo cambia su badge.',
         ].join('\n'),
       },
     },
@@ -55,7 +55,7 @@ export const Playground: Story = { render: (args) => <Demo {...args} /> }
 /* Un turno resuelto (No Show) y otro que todavía pasa a la lista de espera. */
 export const PartlyManaged: Story = {
   render: (args) => <Demo {...args} />,
-  play: secuencia(pulsar(/Actions for appointment for John Smith/), pulsarRol('menuitem', /Mark as No Show/), esperar(/1 appointment will move/)),
+  play: secuencia(pulsar(/Actions for appointment for John Smith/), pulsarRol('menuitem', /Mark as No Show/), esperar(/No Show/)),
 }
 
 /* Todos resueltos: Confirm sólo guarda las horas. */
@@ -64,7 +64,7 @@ export const AllManaged: Story = {
   play: secuencia(
     pulsar(/Actions for appointment for John Smith/), pulsarRol('menuitem', /Cancel appointment/),
     pulsar(/Actions for appointment for Maria Abril Viola/), pulsarRol('menuitem', /Mark as No Show/),
-    esperar(/All affected appointments are managed/),
+    esperar(/Cancelled/),
   ),
 }
 
@@ -74,11 +74,11 @@ export const Parts: Story = {
     <Lienzo>
       <Bloque titulo="Parts">
         <TablaPartes partes={[
-          ['Header', 'Ícono de alerta ámbar de 16 px y "These hours affect scheduled appointments".', 'ConfirmDialog icon="warning"'],
+          ['Header', 'Ícono de alerta ámbar de 16 px y "Affected appointments".', 'ConfirmDialog icon="warning"'],
           ['Message', '"There are scheduled appointments outside the new working hours. You can review and manage each appointment individually, or confirm to move all appointments to the waiting list."', 'Texto de CON-2890, adaptado'],
-          ['Affected Appointments (N)', 'Fecha y hora, estado (Pill), provider y paciente, y qué le va a pasar. Scroll adentro desde 256px.', 'Lista con divisores'],
+          ['Appointments (N)', 'El único contador. Por fila: paciente; fecha y horario completo ("Monday, November 23 · 3:00–4:00 PM"); provider. Scroll adentro desde 288px.', 'Lista con divisores'],
+          ['Status', 'Badge a la derecha, separado del texto, junto al ⋮. Cambia al resolver el turno (Cancelled, No Show).', 'Pill sm'],
           ['Row actions', 'Edit appointment · Cancel appointment · Mark as No Show · Undo changes.', 'RowActionsMenu'],
-          ['Summary', '"N appointments will move to the waiting list." o "All affected appointments are managed."', 'Texto 12px ink-muted'],
           ['Footer', 'Cancel y Confirm.', 'ConfirmDialog'],
         ]} />
       </Bloque>
@@ -90,11 +90,11 @@ export const States: Story = {
   parameters: { layout: 'padded', controls: { disable: true }, docs: { story: { inline: true } } },
   render: () => (
     <Lienzo>
-      <Bloque titulo="States" nota="Por fila. Cada uno se ve en vivo en las stories de esta página.">
-        <Tabla encabezado={['Row state', 'Line under the row', 'Color']} minimo={560}>
-          <tr><td className="font-semibold">Pending (Booked / Proposed, afuera)</td><td>Moves to the waiting list on Confirm.</td><td>warn-fg</td></tr>
-          <tr><td className="font-semibold">Moved inside the hours (Edit appointment)</td><td>Now within the new working hours.</td><td>dash-ok-fg</td></tr>
-          <tr><td className="font-semibold">Cancelled / No Show</td><td>Will be marked as Cancelled / No Show.</td><td>dash-ok-fg</td></tr>
+      <Bloque titulo="States" nota="Por fila. Cada uno se ve en vivo en las stories de esta página. El mensaje de arriba ya dice que Confirm pasa a Waiting List lo que quede: no se repite por fila ni al pie.">
+        <Tabla encabezado={['Row state', 'What the row shows']} minimo={560}>
+          <tr><td className="font-semibold">Pending (Booked / Proposed, afuera)</td><td>Su badge de siempre. Pasa a Waiting List con Confirm.</td></tr>
+          <tr><td className="font-semibold">Moved inside the hours (Edit appointment)</td><td>Mismo badge y la línea verde "Now within the new working hours.": el estado no cambia, así que se dice aparte.</td></tr>
+          <tr><td className="font-semibold">Cancelled / No Show</td><td>El badge cambia a Cancelled o No Show.</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>

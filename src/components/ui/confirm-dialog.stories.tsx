@@ -58,7 +58,7 @@ export const Primary: Story = { args: { title: 'Back to permanent dentition?', t
 
 /* Estados del ícono (2026-11-16): uno por combinación de tone e icon que usa la app. */
 export const Neutral: Story = { name: 'Neutral (info)', args: { title: 'Replace working hours?', text: 'This will replace the existing working hours for Monday and Tuesday. Do you want to continue?', confirmLabel: 'Confirm', tone: 'primary' }, render: (args) => <Demo {...args} /> }
-export const Warning: Story = { name: 'Warning (review first)', args: { title: 'These hours affect scheduled appointments', text: 'There are scheduled appointments outside the new working hours. You can review and manage each appointment individually, or confirm to move all appointments to the waiting list.', confirmLabel: 'Confirm', tone: 'primary', icon: 'warning' }, render: (args) => <Demo {...args} /> }
+export const Warning: Story = { name: 'Warning (review first)', args: { title: 'Affected appointments', text: 'There are scheduled appointments outside the new working hours. You can review and manage each appointment individually, or confirm to move all appointments to the waiting list.', confirmLabel: 'Confirm', tone: 'primary', icon: 'warning' }, render: (args) => <Demo {...args} /> }
 export const Danger: Story = { name: 'Danger (discard, deactivate)', args: { title: 'Discard unsaved changes?', text: "Your billing profile changes haven't been saved.", confirmLabel: 'Discard changes', tone: 'danger' }, render: (args) => <Demo {...args} /> }
 export const DangerWarning: Story = { name: 'Danger + warning', args: { title: 'This room has scheduled appointments', text: 'There are scheduled appointments assigned to Operatory 1. You can review and manage each appointment individually or confirm to move all of them to the waiting list.', confirmLabel: 'Confirm', tone: 'danger', icon: 'warning' }, render: (args) => <Demo {...args} /> }
 export const Delete: Story = { name: 'Delete (trash)', args: { title: 'Delete Relationship', text: 'Are you sure you want to remove this relationship? This action cannot be undone.', confirmLabel: 'Delete', tone: 'danger', icon: 'delete' }, render: (args) => <Demo {...args} /> }
@@ -129,7 +129,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Confirm procedure</td><td>primary</td></tr>
           <tr><td className="font-semibold">Consent required (Complete, Start)</td><td>primary con ícono de alerta y tercera salida</td></tr>
           <tr><td className="font-semibold">Replace working hours? (Locations → Working Hours)</td><td>primary</td></tr>
-          <tr><td className="font-semibold">These hours affect scheduled appointments (HoursAppointmentsDialog)</td><td>primary con icon warning</td></tr>
+          <tr><td className="font-semibold">Affected appointments (HoursAppointmentsDialog)</td><td>primary con icon warning</td></tr>
           <tr><td className="font-semibold">This room has scheduled appointments / Deactivate Operatory 1?</td><td>danger (con warning si hay turnos)</td></tr>
           <tr><td className="font-semibold">Delete Appointment, Delete Relationship, Delete procedure, delete subscription</td><td>danger con icon delete</td></tr>
           <tr><td className="font-semibold">Move treatment visit? (New Appointment, al guardar con una visita linkeada a otro turno)</td><td>primary</td></tr>

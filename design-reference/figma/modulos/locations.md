@@ -539,3 +539,35 @@ salida por defecto.
   elegidos, *Replace working hours?*, los turnos afectados, uno resuelto con No Show y las horas guardadas. La página
   se recapturó entera desde la app (`scripts/figma/flujos/settings-locations.mjs`).
 - **Figma, design system:** *Confirm dialog* con `Tone` × `Icon` en *Feedback & Overlays*.
+
+### Affected appointments: lista con jerarquía y un solo contador (2026-11-16, CON-1546, CON-2890)
+
+Pedido de Julián, con una referencia.
+
+1. **Título más corto**: *Affected appointments* (antes *These hours affect scheduled appointments*). Se mantiene el
+   ícono de 16 px en línea de la propuesta A: la referencia traía el círculo, que se sacó en toda la app.
+2. **Cada fila, de arriba hacia abajo**: el paciente (semibold, con el ⋮ a la derecha), la fecha con el horario
+   completo ("Monday, November 23 · 3:00–4:00 PM") y el provider en gris. El estado es un badge a la derecha, separado
+   del texto. Antes la fecha, el estado, el provider y el paciente compartían dos líneas.
+3. **Un solo contador**: *Appointments (2)*, arriba de la lista. Salen el pie "2 appointments will move to the waiting
+   list." y la línea por fila "Moves to the waiting list on Confirm.": el mensaje de arriba ya lo dice.
+4. **Lo resuelto se ve en el badge** (Cancelled, No Show). El turno movido adentro del horario con *Edit appointment*
+   conserva su estado, así que es el único que suma una línea verde, "Now within the new working hours.".
+
+Para validar: si el badge alcanza para notar que un turno ya está resuelto, sin la línea por fila. Y si el aviso de
+Rooms (*This room has scheduled appointments*, CON-1520) debería tomar la misma jerarquía: hoy la lista es igual a la
+de antes.
+
+### Working Hours: todas las franjas a la vista, sin "+N" (2026-11-16)
+
+Julián: "no entiendo por qué dice +2 cuando te sobra toda la pantalla para listar los horarios".
+
+1. **Sale el "+N"** de la tabla: mostraba siempre las dos primeras franjas y escondía el resto aunque sobrara ancho,
+   así que costaba un clic ver un horario que entraba. Un día tiene pocas franjas (4 en los datos): se ven todas y, si
+   no entran, bajan de línea (en tablet, de a dos). La regla "todo +N se despliega" sigue para las listas que de verdad
+   no entran; acá no hacía falta colapsar.
+2. **Celular** (menos de 640 px): la grilla de tres columnas se cortaba a la derecha (también con el +N). Ahora el día y
+   el switch van arriba y las franjas o *Closed all day.* debajo, a todo el ancho; el encabezado queda *Day · Status*.
+
+Para validar: si con muchas franjas (6 o más) la fila se vuelve difícil de leer; recién ahí convendría colapsar lo que
+no entra en una línea.
