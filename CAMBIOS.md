@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
-### Documentación: borrar una franja, cerrar un día, citas afectadas y advertencias en azul (#PR)
+### Documentación: borrar una franja, cerrar un día, citas afectadas y advertencias en azul ([#153](https://github.com/JulianGerardi/red-dental-studio/pull/153))
 - **Storybook:**
   - *Pages / Parts / Location detail* suma *Delete working hours?*, *Close working hours?*, *Unable to change* y la
     tabla *Working Hours · States*.
