@@ -3279,3 +3279,13 @@ Anomalías del diseño (se copian tal cual y se anotan):
 5. El pie de ROS dice "Showing 9 active prescriptions" y "View History" (copiado de Prescription).
 6. Lab Order: el botón dice "New Prescription" y el pie "active prescriptions" (ya anotado, #85).
 7. ROS · General: el interruptor "Negative" va en rojo, el mismo rojo de error; conviene validar si un síntoma negativo es una alerta.
+
+### Dental Assessment: cierre (2026-11-16, `clinical-mode-5.mjs`)
+
+- Se suman Edit Condition de región, Problem List · Procedures, Procedure actions y los drawers Edit / Complete / Discontinue
+  procedure. Con `clinical-mode-3.mjs` queda cubierto Tooth information, el menú del hallazgo, Edit Finding, Discard, Delete,
+  New Procedure (planned, existing, superficies) y el filtro por área.
+- **Sin equivalente en la app:** los pop-ups de New Condition (8) de Platform Design: la app resuelve el alta con el drawer de
+  dos pasos (Procedure · Descriptors).
+- **Para después (decisión de Julián):** Treatment Workflow (detalle y Clinical Note) y Workflow Set Up: hay que pegarlos en el
+  archivo de flujos.
