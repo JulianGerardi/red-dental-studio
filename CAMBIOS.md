@@ -5,6 +5,21 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
+### Working Hours: borrar una franja, cerrar un día y citas afectadas según la HU 8 (#PR)
+- **Delete working hours?** (la ✕ de una franja, CON-4166): pregunta antes y borra sólo esa franja. Si es la última,
+  el día queda Closed.
+- **Close working hours?** (el switch, CON-4165): pregunta antes y el día conserva sus franjas. Al reabrirlo,
+  *Set working hours* las trae.
+- **Affected appointments** (CON-4167): entran sólo las citas que pierden cobertura. Lo hecho cita por cita se guarda en
+  el momento y la cita resuelta sale de la lista. Con citas en Check In o In Progress no se aplica nada
+  (*Unable to change working hours*).
+- **`ConfirmDialog`:** el ícono de advertencia (`icon="warning"`) va en azul; en `danger` sigue rojo.
+- **Para el dev:**
+  - En `LocationDetail.tsx`, todo cambio de horarios es una `Operacion` (`panel`, `quitar`, `cerrar`) que pasa por
+    pregunta, impacto (`pierde`) y aplicación.
+  - `HoursAppointmentsDialog` recibe `afectados` ya calculados y `onCambiar`. `HoursBlockedDialog` es nuevo.
+  - `EstadoTurnoLocacion` suma Check In e In Progress.
+
 ### Affected appointments con jerarquía clara, "+N" sólo cuando no entra y asterisco en las horas ([#149](https://github.com/JulianGerardi/red-dental-studio/pull/149))
 - **Affected appointments** (`HoursAppointmentsDialog`): el título es *Affected appointments*. Cada fila muestra el
   paciente, la fecha con el horario completo y el provider, con el estado como badge a la derecha junto al ⋮. Queda un
