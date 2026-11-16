@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
-### Working Hours: borrar una franja, cerrar un día y citas afectadas según la HU 8 (#PR)
+### Working Hours: borrar una franja, cerrar un día y citas afectadas según la HU 8 ([#151](https://github.com/JulianGerardi/red-dental-studio/pull/151))
 - **Delete working hours?** (la ✕ de una franja, CON-4166): pregunta antes y borra sólo esa franja. Si es la última,
   el día queda Closed.
 - **Close working hours?** (el switch, CON-4165): pregunta antes y el día conserva sus franjas. Al reabrirlo,
