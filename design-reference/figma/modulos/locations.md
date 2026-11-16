@@ -529,3 +529,49 @@ o quitar una franja con la ✕ del chip cuando tiene turnos (CON-1547), y conect
 Para validar con usuarios: si recepción entiende que el día de origen relleno "no se puede sacar" sin el tooltip; si el
 ⋮ por turno se descubre o conviene dejar las acciones a la vista; y si "Waiting List" en bloque es lo que esperan como
 salida por defecto.
+
+#### Documentación (2026-11-16, CON-1546, CON-2890)
+
+- **Storybook:** *LocationHoursModal* (Parts, States y Specs, con *Replace Question*), *HoursAppointmentsDialog*
+  (nuevo) y *Elements / ConfirmDialog* con el ícono en línea. Detalle en `design-system.md`, 2026-11-16.
+- **Figma, Screens & Flows** (página ⚙️ Settings — Locations, `7:16`): flujo nuevo *Locations — Set working hours:
+  other days & affected appointments*. Siete pantallas: la semana, el panel con el día de origen fijo, otros días
+  elegidos, *Replace working hours?*, los turnos afectados, uno resuelto con No Show y las horas guardadas. La página
+  se recapturó entera desde la app (`scripts/figma/flujos/settings-locations.mjs`).
+- **Figma, design system:** *Confirm dialog* con `Tone` × `Icon` en *Feedback & Overlays*.
+
+### Affected appointments: lista con jerarquía y un solo contador (2026-11-16, CON-1546, CON-2890)
+
+Pedido de Julián, con una referencia.
+
+1. **Título más corto**: *Affected appointments* (antes *These hours affect scheduled appointments*). Se mantiene el
+   ícono de 16 px en línea de la propuesta A: la referencia traía el círculo, que se sacó en toda la app.
+2. **Cada fila, de arriba hacia abajo**: el paciente (semibold, con el ⋮ a la derecha), la fecha con el horario
+   completo ("Monday, November 23 · 3:00–4:00 PM") y el provider en gris. El estado es un badge a la derecha, separado
+   del texto. Antes la fecha, el estado, el provider y el paciente compartían dos líneas.
+3. **Un solo contador**: *Appointments (2)*, arriba de la lista. Salen el pie "2 appointments will move to the waiting
+   list." y la línea por fila "Moves to the waiting list on Confirm.": el mensaje de arriba ya lo dice.
+4. **Lo resuelto se ve en el badge** (Cancelled, No Show). El turno movido adentro del horario con *Edit appointment*
+   conserva su estado, así que es el único que suma una línea verde, "Now within the new working hours.".
+
+Para validar: si el badge alcanza para notar que un turno ya está resuelto, sin la línea por fila. Y si el aviso de
+Rooms (*This room has scheduled appointments*, CON-1520) debería tomar la misma jerarquía: hoy la lista es igual a la
+de antes.
+
+### Working Hours: "+N" sólo cuando las franjas no entran (2026-11-16)
+
+Julián: "no entiendo por qué dice +2 cuando te sobra toda la pantalla", y después: "el +2 debe estar cuando no entran
+los horarios".
+
+1. **Antes**, la tabla mostraba siempre las dos primeras franjas y "+N", aunque sobrara ancho.
+2. **Ahora** (`FranjasDia`), la fila muestra en una línea todas las franjas que entran junto a *Edit hours*. Sólo si no
+   entran, las que sobran quedan en "+N", que al tocarlo las despliega a todas, bajando de línea. Los anchos se miden en
+   una copia invisible (`aria-hidden`) y se recalculan con `ResizeObserver` al cambiar el ancho. En escritorio entran
+   las 4; en tablet (1024) quedan 2 y "+2"; en celular, 1 y "+3".
+3. **Celular** (menos de 640 px): la grilla de tres columnas se cortaba a la derecha. Ahora el día y el switch van arriba
+   y las franjas o *Closed all day.* debajo, a todo el ancho; el encabezado queda *Day · Status*.
+4. **Start Time y End Time llevan asterisco** en *Set working hours* y en *New Hours* (Employees): son obligatorios y
+   ya se validaban con *Required.*, pero no lo decían.
+5. Los e2e cuentan las franjas por su botón *Remove …*, no por el texto: la copia invisible repite el texto.
+
+Para validar: si "+N" en celular, con una sola franja visible, se entiende o conviene mostrarlas todas ahí.

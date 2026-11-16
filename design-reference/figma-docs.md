@@ -66,6 +66,9 @@ una al lado de la otra.
 
 Al 2026-11-15: 19 páginas de módulo, 63 flujos y 281 pantallas. Relationships & Billing se completó ese día: Add
 Relationship con sus tres pasos (con y sin Contact, persona nueva), Edit, Delete y el garante en Ledger y Billing.
+Al 2026-11-16: 64 flujos y 288 pantallas. Settings — Locations suma *Set working hours: other days & affected
+appointments* (7 pantallas, CON-1546 y CON-2890). La portada del archivo es una tapa de diseño sin cantidades: no
+hace falta regenerarla con `figma:portada` cuando cambian los totales; se actualizan acá.
 
 ## Cómo se actualiza una página
 

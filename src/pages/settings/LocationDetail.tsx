@@ -1,6 +1,6 @@
 import { Tabs } from '@/components/ui/tabs'
 import { PageTitle } from '@/components/ui/page-title'
-import { useCallback, useState } from 'react'
+import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { Pencil, DoorOpen, Plus, CalendarDays, ChevronRight, Trash2 } from 'lucide-react'
@@ -134,12 +134,90 @@ const fueraDe = (t: TurnoLocacion, dias: number[], rangos: string[]) => {
   })
 }
 
+/* Las franjas de un día en una línea: entran todas las que caben junto a Edit hours y el resto queda en "+N", que las
+   despliega. Se mide en una capa invisible y se recalcula al cambiar el ancho. Ver locations.md, 2026-11-16. */
+export function FranjasDia({ label, rangos, onQuitar, onEditar }: {
+  label: string
+  rangos: string[]
+  onQuitar: (i: number) => void
+  onEditar: () => void
+}) {
+  const caja = useRef<HTMLDivElement>(null)
+  const muestra = useRef<HTMLDivElement>(null)
+  const [entran, setEntran] = useState(rangos.length)
+  const [abierto, setAbierto] = useState(false)
+
+  useLayoutEffect(() => {
+    const el = caja.current
+    const m = muestra.current
+    if (!el || !m) return
+    const calcular = () => {
+      const gap = parseFloat(getComputedStyle(m).columnGap) || 0
+      const hijos = [...m.children] as HTMLElement[]
+      const editar = hijos[hijos.length - 1].offsetWidth
+      const mas = hijos[hijos.length - 2].offsetWidth
+      const chips = hijos.slice(0, -2).map((h) => h.offsetWidth)
+      let n = chips.length
+      for (; n > 0; n -= 1) {
+        const ocupado = chips.slice(0, n).reduce((a, w) => a + w + gap, 0) + (n < chips.length ? mas + gap : 0) + editar
+        if (ocupado <= el.clientWidth) break
+      }
+      setEntran(n)
+    }
+    calcular()
+    const ro = new ResizeObserver(calcular)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [rangos])
+
+  const visibles = abierto ? rangos.length : entran
+  const ocultas = rangos.length - visibles
+  const chip = (r: string, i: number) => (
+    <Chip key={i} removeLabel={`Remove ${r} on ${label}`} onRemove={() => onQuitar(i)}>{r}</Chip>
+  )
+  const editar = (
+    <button
+      type="button"
+      onClick={onEditar}
+      aria-label={`Edit hours on ${label}`}
+      className="text-dash-blue flex shrink-0 items-center gap-1 text-[12px] font-semibold hover:underline"
+    >
+      <Pencil className="size-3" /> Edit hours
+    </button>
+  )
+  const mas = (n: number, onClick?: () => void) => (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`Show ${n} more hours on ${label}`}
+      className="inline-flex h-6 shrink-0 items-center rounded-full bg-dash-count-bg px-2.5 text-[12px] font-medium text-dash-blue hover:underline"
+    >
+      +{n}
+    </button>
+  )
+
+  return (
+    <div ref={caja} className="relative col-span-2 min-w-0 sm:col-span-1">
+      <div className={cn('flex items-center gap-2', abierto ? 'flex-wrap' : 'flex-nowrap')}>
+        {rangos.slice(0, visibles).map(chip)}
+        {ocultas > 0 && mas(ocultas, () => setAbierto(true))}
+        {editar}
+      </div>
+      {/* Copia invisible con todo en una línea: de acá salen los anchos. */}
+      <div ref={muestra} aria-hidden className="pointer-events-none invisible absolute top-0 left-0 flex gap-2 whitespace-nowrap">
+        {rangos.map(chip)}
+        {mas(rangos.length)}
+        {editar}
+      </div>
+    </div>
+  )
+}
+
 /* Un día sólo queda Open con al menos una franja: activar el switch abre "Set working hours" y el día se abre recién
    al guardar; Cancel lo deja como estaba. Si las horas nuevas dejan afuera turnos Proposed o Booked, antes se
    resuelven (HoursAppointmentsDialog). Ver figma/modulos/locations.md (2026-11-06 y 2026-11-16, CON-1546, CON-2890). */
 export function WorkingHoursTab() {
   const [horario, setHorario] = useState(HORARIO_SEMANAL)
-  const [expandido, setExpandido] = useState<string | null>(null)
   const [modal, setModal] = useState<string | null>(null)
   const [turnos, setTurnos] = useState(TURNOS_LOCACION)
   const [resolver, setResolver] = useState<{ dias: number[]; rangos: string[]; afectados: TurnoLocacion[] } | null>(null)
@@ -175,10 +253,10 @@ export function WorkingHoursTab() {
 
   return (
     <div className="overflow-hidden rounded-xl border border-line bg-white">
-      <div className="grid grid-cols-[140px_140px_1fr] gap-3 border-b border-line bg-surface-alt px-4 py-3 text-xs font-semibold text-ink-muted">
+      <div className="grid grid-cols-[1fr_auto] gap-3 border-b border-line bg-surface-alt px-4 py-3 text-xs font-semibold text-ink-muted sm:grid-cols-[140px_140px_1fr]">
         <span>Day</span>
         <span>Status</span>
-        <span>Hours</span>
+        <span className="max-sm:hidden">Hours</span>
       </div>
       {DIAS.map(([key, label]) => {
         const dia = horario[key]
@@ -186,7 +264,8 @@ export function WorkingHoursTab() {
           <div
             key={key}
             className={cn(
-              'grid grid-cols-[140px_140px_1fr] items-center gap-3 border-b border-line-soft px-4 py-3 last:border-0',
+              /* En celular, día y switch arriba y las franjas debajo a todo el ancho. */
+              'grid grid-cols-[1fr_auto] items-center gap-3 border-b border-line-soft px-4 py-3 last:border-0 sm:grid-cols-[140px_140px_1fr]',
               !dia.abierto && 'bg-surface-subtle',
             )}
           >
@@ -197,45 +276,19 @@ export function WorkingHoursTab() {
               onChange={(v) => (v ? setModal(key) : cerrar(key, label))}
             />
             {dia.abierto ? (
-              <div className="flex flex-wrap items-center gap-2">
-                {/* Todo "+N" se despliega: regla del sistema. Colapsado
-                    muestra sólo las dos primeras franjas y un chip "+N" con
-                    las que faltan; al tocarlo aparecen todas. */}
-                {(expandido === key ? dia.rangos : dia.rangos.slice(0, 2)).map((r, i) => (
-                  <Chip
-                    key={i}
-                    removeLabel={`Remove ${r} on ${label}`}
-                    onRemove={() =>
-                      setHorario((p) => {
-                        const rangos = p[key].rangos.filter((_, j) => j !== i)
-                        return { ...p, [key]: { abierto: rangos.length > 0, rangos } }
-                      })
-                    }
-                  >
-                    {r}
-                  </Chip>
-                ))}
-                {expandido !== key && dia.rangos.length > 2 && (
-                  <button
-                    type="button"
-                    onClick={() => setExpandido(key)}
-                    aria-label={`Show ${dia.rangos.length - 2} more hours on ${label}`}
-                    className="inline-flex h-6 items-center rounded-full bg-dash-count-bg px-2.5 text-[12px] font-medium text-dash-blue hover:underline"
-                  >
-                    +{dia.rangos.length - 2}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setModal(key)}
-                  aria-label={`Edit hours on ${label}`}
-                  className="text-dash-blue flex shrink-0 items-center gap-1 text-[12px] font-semibold hover:underline"
-                >
-                  <Pencil className="size-3" /> Edit hours
-                </button>
-              </div>
+              <FranjasDia
+                label={label}
+                rangos={dia.rangos}
+                onEditar={() => setModal(key)}
+                onQuitar={(i) =>
+                  setHorario((p) => {
+                    const rangos = p[key].rangos.filter((_, j) => j !== i)
+                    return { ...p, [key]: { abierto: rangos.length > 0, rangos } }
+                  })
+                }
+              />
             ) : (
-              <span className="text-[12px] text-ink-faint">Closed all day.</span>
+              <span className="col-span-2 text-[12px] text-ink-faint sm:col-span-1">Closed all day.</span>
             )}
           </div>
         )

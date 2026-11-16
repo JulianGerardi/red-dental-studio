@@ -129,12 +129,12 @@ export function LocationHoursModal({
             <div className="flex items-start gap-2">
               <div className="grid flex-1 grid-cols-2 gap-4">
                 <SelectField
-                  label="Start Time" placeholder="00:00 hs" options={HORAS} value={r.inicio}
+                  label="Start Time" required placeholder="00:00 hs" options={HORAS} value={r.inicio}
                   onChange={cambiar(i, 'inicio')}
                   error={intentado && !r.inicio ? 'Required.' : undefined}
                 />
                 <SelectField
-                  label="End Time" placeholder="00:00 hs" options={HORAS} value={r.fin}
+                  label="End Time" required placeholder="00:00 hs" options={HORAS} value={r.fin}
                   onChange={cambiar(i, 'fin')}
                   error={intentado && !r.fin ? 'Required.' : undefined}
                 />
