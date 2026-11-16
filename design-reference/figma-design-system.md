@@ -131,3 +131,12 @@ Se aplicó a las 22 páginas de módulos (≈ 280 pantallas), sobre las capturas
   `Propiedad=Valor`; un trazo interno no suma al tamaño (el Pill lleva el borde de 1 px dentro del padding).
 - Los íconos se reconocen por el nombre de la capa (`Icon - plus` → `Icon/plus`). Si aparece uno nuevo en el código,
   agregarlo al set con el mismo nombre en kebab.
+
+## Revisión de alineación de las pantallas (2026-11-16)
+
+Auditoría de las pantallas del archivo *Flows* contra la app en vivo. Qué se rompió y por qué:
+
+- **Instancias en 0,0** (`Button - Check In/Out` en Dashboard y Header & Sidebar, `Pill` en Clinical Mode): el motor `poner` reemplazaba el nodo capturado sin copiar x/y cuando el padre no tiene auto layout. Reparado (x a la derecha de la fila) y **parchado el motor** (`motor` y `chipcount`: si el padre es `NONE`, copia x/y).
+- **Avatares estirados** (186×62 en vez de 62×62, 68 en la ficha del paciente): heredaban `layoutAlign STRETCH`. Vuelven a 62×62 centrados.
+- **Botón con ícono al final** (`Check In →`, `Complete this Task →`): el componente `Button` sólo tenía ícono antes del texto y las instancias no permiten reordenar hijos. Se agregó la variante **`Icon position` (Leading/Trailing)** al `Button` del DS (108 variantes). Hay que **republicar la library** y después pasar los botones con ícono al final a `Trailing` en las pantallas.
+- Los tamaños 1531, 1101, etc. de los frames **son los reales**: la captura crece hasta mostrar lo que quedaba en el scroll (`alto` distinto de `fijo`).
