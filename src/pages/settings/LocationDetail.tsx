@@ -1,6 +1,6 @@
 import { Tabs } from '@/components/ui/tabs'
 import { PageTitle } from '@/components/ui/page-title'
-import { useCallback, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { Pencil, DoorOpen, Plus, CalendarDays, ChevronRight, Trash2 } from 'lucide-react'
@@ -17,7 +17,7 @@ import {
   PAISES, CODIGOS, ESTADOS, ZONAS, FEES,
 } from '@/data/location-options'
 import { LocationHoursModal, aMinutos, deChip } from '@/components/settings/LocationHoursModal'
-import { HoursAppointmentsDialog } from '@/components/settings/HoursAppointmentsDialog'
+import { HoursAppointmentsDialog, HoursBlockedDialog } from '@/components/settings/HoursAppointmentsDialog'
 import { NewRoomModal } from '@/components/settings/NewRoomModal'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
 import { formatDMY } from '@/components/ui/date-picker'
@@ -28,7 +28,7 @@ import { LocationBillingProfile } from '@/components/settings/LocationBillingPro
 import { LocationInsuranceDefaults } from '@/components/settings/LocationInsuranceDefaults'
 import { hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import {
-  HORARIO_SEMANAL, SALAS_INICIALES, EXCEPCIONES_INICIALES, TURNOS_LOCACION, type TurnoLocacion,
+  HORARIO_SEMANAL, SALAS_INICIALES, EXCEPCIONES_INICIALES, TURNOS_LOCACION, type TurnoLocacion, type EstadoDia,
   type Sala, type TurnoSala, type Excepcion,
 } from '@/data/location-detail'
 import { formatMDY } from '@/lib/fecha'
@@ -124,15 +124,29 @@ export function InformationTab({ nombreLocacion }: { nombreLocacion: string }) {
   )
 }
 
-/* Un turno de una hora entra si cabe entero en alguna franja del día. */
-const fueraDe = (t: TurnoLocacion, dias: number[], rangos: string[]) => {
-  if (!dias.includes(t.fecha.getDay())) return false
+/* Un turno de una hora tiene cobertura si cabe entero en alguna franja. */
+const cubre = (t: TurnoLocacion, rangos: string[]) => {
   const m = t.fecha.getHours() * 60 + t.fecha.getMinutes()
-  return !rangos.some((r) => {
+  return rangos.some((r) => {
     const [a, b] = r.split(' - ').map((h) => aMinutos(deChip(h)))
     return a <= m && m + 60 <= b
   })
 }
+
+/* Un cambio de Working Hours: el panel (Save), borrar una franja con la ✕ o cerrar un día con el switch. `rangos` son las
+   franjas que quedan abiertas en `dias` (ninguna al cerrar). Ver locations.md, 2026-11-16 (CON-4165, CON-4166, CON-4167). */
+type Operacion = { tipo: 'panel' | 'quitar' | 'cerrar'; dias: number[]; rangos: string[]; quitada?: string }
+
+/* Pierde cobertura: su día entra en el cambio, antes estaba Open y lo cubría, y después no. Si ya estaba afuera, no
+   cuenta (CON-4167, Detección 4). */
+const pierde = (t: TurnoLocacion, antes: Record<string, EstadoDia>, op: Operacion) => {
+  const d = t.fecha.getDay()
+  if (!op.dias.includes(d)) return false
+  const previo = antes[DIAS[d][0]]
+  return previo.abierto && cubre(t, previo.rangos) && !cubre(t, op.rangos)
+}
+const pendiente = (t: TurnoLocacion) => t.estado === 'Proposed' || t.estado === 'Booked'
+const enCurso = (t: TurnoLocacion) => t.estado === 'Check In' || t.estado === 'In Progress'
 
 /* Las franjas de un día en una línea: entran todas las que caben junto a Edit hours y el resto queda en "+N", que las
    despliega. Se mide en una capa invisible y se recalcula al cambiar el ancho. Ver locations.md, 2026-11-16. */
@@ -213,42 +227,78 @@ export function FranjasDia({ label, rangos, onQuitar, onEditar }: {
   )
 }
 
-/* Un día sólo queda Open con al menos una franja: activar el switch abre "Set working hours" y el día se abre recién
-   al guardar; Cancel lo deja como estaba. Si las horas nuevas dejan afuera turnos Proposed o Booked, antes se
-   resuelven (HoursAppointmentsDialog). Ver figma/modulos/locations.md (2026-11-06 y 2026-11-16, CON-1546, CON-2890). */
+/* Un día sólo queda Open con al menos una franja: activar el switch abre "Set working hours" (con las franjas que
+   conservó al cerrarse) y se abre recién al guardar. Borrar una franja (✕) o cerrar un día (switch) pregunta antes, y
+   todo cambio pasa por las citas afectadas (HoursAppointmentsDialog) o se frena si alguna está en curso. Ver
+   figma/modulos/locations.md (2026-11-06 y 2026-11-16; CON-1546, CON-4164 a CON-4167). */
 export function WorkingHoursTab() {
   const [horario, setHorario] = useState(HORARIO_SEMANAL)
   const [modal, setModal] = useState<string | null>(null)
   const [turnos, setTurnos] = useState(TURNOS_LOCACION)
-  const [resolver, setResolver] = useState<{ dias: number[]; rangos: string[]; afectados: TurnoLocacion[] } | null>(null)
+  const [pregunta, setPregunta] = useState<Operacion | null>(null)
+  const [resolver, setResolver] = useState<Operacion | null>(null)
+  const [bloqueo, setBloqueo] = useState<TurnoLocacion[] | null>(null)
 
-  const aplicar = (dias: number[], rangos: string[]) =>
-    setHorario((p) => ({ ...p, ...Object.fromEntries(dias.map((i) => [DIAS[i][0], { abierto: true, rangos }])) }))
+  const nombre = (i: number) => DIAS[i][1]
+  const afectados = resolver ? turnos.filter((t) => pendiente(t) && pierde(t, horario, resolver)) : []
 
-  /* Sin turnos afectados guarda enseguida; con turnos, el panel queda abierto hasta resolverlos. */
-  const guardar = (dias: number[], rangos: string[]) => {
-    const afectados = turnos.filter((t) => (t.estado === 'Proposed' || t.estado === 'Booked') && fueraDe(t, dias, rangos))
-    if (!afectados.length) { aplicar(dias, rangos); return true }
-    setResolver({ dias, rangos, afectados })
-    return false
-  }
-
-  const confirmarTurnos = (resueltos: TurnoLocacion[]) => {
-    if (!resolver) return
-    const { dias } = resolver
-    aplicar(dias, resolver.rangos)
-    setTurnos((p) => p.map((t) => resueltos.find((r) => r.id === t.id) ?? t))
-    const n = resueltos.filter((t) => t.estado === 'Waiting List').length
-    const guardado = dias.length === 1 ? `Hours saved for ${DIAS[dias[0]][1]}.` : `Hours saved for ${dias.length} days.`
-    aviso.ok(n ? `${guardado} ${n} ${n === 1 ? 'appointment was' : 'appointments were'} moved to the waiting list.` : guardado)
+  /* Si no queda ninguna cita afectada, se vuelve a la acción de origen sin mover nada a Waiting List (CON-4167). */
+  useEffect(() => {
+    if (!resolver || afectados.length) return
     setResolver(null)
-    setModal(null)
+    if (resolver.tipo !== 'panel') setPregunta(resolver)
+  }, [resolver, afectados.length])
+
+  /* Aplica el cambio a la tabla. Borrar o cerrar avisa con Undo; el panel avisa por su cuenta. */
+  const aplicar = (op: Operacion, movidos: string[]) => {
+    const [antesHorario, antesTurnos] = [horario, turnos]
+    const key = DIAS[op.dias[0]][0]
+    setHorario((p) => {
+      const q = { ...p }
+      for (const i of op.dias) {
+        const k = DIAS[i][0]
+        q[k] = op.tipo === 'cerrar' ? { abierto: false, rangos: p[k].rangos } : { abierto: op.rangos.length > 0, rangos: op.rangos }
+      }
+      return q
+    })
+    if (movidos.length) setTurnos((p) => p.map((t) => (movidos.includes(t.id) ? { ...t, estado: 'Waiting List' } : t)))
+    const espera = movidos.length ? ` ${movidos.length} ${movidos.length === 1 ? 'appointment was' : 'appointments were'} moved to the waiting list.` : ''
+    if (op.tipo === 'panel') {
+      if (movidos.length) aviso.ok(`${op.dias.length === 1 ? `Hours saved for ${nombre(op.dias[0])}.` : `Hours saved for ${op.dias.length} days.`}${espera}`)
+      return
+    }
+    const texto = op.tipo === 'cerrar'
+      ? `${nombre(op.dias[0])} is now closed.`
+      : `Working hours deleted from ${nombre(op.dias[0])}.${op.rangos.length ? '' : ` ${nombre(op.dias[0])} is now closed.`}`
+    aviso.ok(`${texto}${espera}`, { label: 'Undo', onClick: () => { setHorario({ ...antesHorario, [key]: antesHorario[key] }); setTurnos(antesTurnos) } })
   }
 
-  const cerrar = (key: string, label: string) => {
-    const antes = horario[key]
-    setHorario((p) => ({ ...p, [key]: { abierto: false, rangos: [] } }))
-    aviso.ok(`${label} is now closed.`, { label: 'Undo', onClick: () => setHorario((p) => ({ ...p, [key]: antes })) })
+  /* Revisa el impacto: citas en curso → se frena todo; citas afectadas → se resuelven antes; si no, se aplica. */
+  const ejecutar = (op: Operacion) => {
+    const afectan = turnos.filter((t) => (pendiente(t) || enCurso(t)) && pierde(t, horario, op))
+    const frenan = afectan.filter(enCurso)
+    if (frenan.length) { setBloqueo(frenan); return false }
+    if (afectan.length) { setResolver(op); return false }
+    aplicar(op, [])
+    return true
+  }
+
+  const confirmarTurnos = () => {
+    if (!resolver) return
+    aplicar(resolver, afectados.map((t) => t.id))
+    if (resolver.tipo === 'panel') setModal(null)
+    setResolver(null)
+  }
+
+  /* Textos de CON-4165 y CON-4166; si el cambio deja la locación sin horarios, se dice en la misma pregunta. */
+  const textoPregunta = (op: Operacion) => {
+    const dia = nombre(op.dias[0])
+    const otrosAbiertos = DIAS.some(([k], i) => i !== op.dias[0] && horario[k].abierto)
+    const sinHorarios = !otrosAbiertos && op.rangos.length === 0 ? ' The location will have no working hours.' : ''
+    if (op.tipo === 'cerrar') return `This will close the location every ${dia}.${sinHorarios} Do you want to continue?`
+    const [desde, hasta] = (op.quitada ?? '').split(' - ')
+    const cierra = op.rangos.length === 0 ? ` ${dia} will be closed.` : ''
+    return `This will delete the working hours from ${desde} to ${hasta} on ${dia}.${cierra}${sinHorarios} Do you want to continue?`
   }
 
   return (
@@ -258,7 +308,7 @@ export function WorkingHoursTab() {
         <span>Status</span>
         <span className="max-sm:hidden">Hours</span>
       </div>
-      {DIAS.map(([key, label]) => {
+      {DIAS.map(([key, label], indice) => {
         const dia = horario[key]
         return (
           <div
@@ -273,19 +323,14 @@ export function WorkingHoursTab() {
             <SwitchOpenClose
               on={dia.abierto}
               label={`${label} open`}
-              onChange={(v) => (v ? setModal(key) : cerrar(key, label))}
+              onChange={(v) => (v ? setModal(key) : setPregunta({ tipo: 'cerrar', dias: [indice], rangos: [] }))}
             />
             {dia.abierto ? (
               <FranjasDia
                 label={label}
                 rangos={dia.rangos}
                 onEditar={() => setModal(key)}
-                onQuitar={(i) =>
-                  setHorario((p) => {
-                    const rangos = p[key].rangos.filter((_, j) => j !== i)
-                    return { ...p, [key]: { abierto: rangos.length > 0, rangos } }
-                  })
-                }
+                onQuitar={(i) => setPregunta({ tipo: 'quitar', dias: [indice], rangos: dia.rangos.filter((_, j) => j !== i), quitada: dia.rangos[i] })}
               />
             ) : (
               <span className="col-span-2 text-[12px] text-ink-faint sm:col-span-1">Closed all day.</span>
@@ -300,19 +345,35 @@ export function WorkingHoursTab() {
           iniciales={horario[modal].rangos}
           horario={DIAS.map(([key]) => horario[key])}
           onClose={() => setModal(null)}
-          onGuardar={guardar}
+          onGuardar={(dias, rangos) => ejecutar({ tipo: 'panel', dias, rangos })}
         />
       )}
 
-      {resolver && (
+      {pregunta && (
+        <ConfirmDialog
+          tone="danger"
+          icon={pregunta.tipo === 'quitar' ? 'delete' : undefined}
+          title={pregunta.tipo === 'quitar' ? 'Delete working hours?' : 'Close working hours?'}
+          confirmLabel="Confirm"
+          onCancel={() => setPregunta(null)}
+          onConfirm={() => { const op = pregunta; setPregunta(null); ejecutar(op) }}
+        >
+          {textoPregunta(pregunta)}
+        </ConfirmDialog>
+      )}
+
+      {resolver && afectados.length > 0 && (
         <HoursAppointmentsDialog
-          afectados={resolver.afectados}
-          fueraDeHorario={(t) => fueraDe(t, resolver.dias, resolver.rangos)}
+          afectados={afectados}
+          fueraDeHorario={(t) => pierde(t, horario, resolver)}
           operatorios={SALAS_INICIALES.filter((s) => s.activa).map((s) => s.nombre)}
+          onCambiar={(t) => setTurnos((p) => p.map((x) => (x.id === t.id ? t : x)))}
           onCancel={() => setResolver(null)}
           onConfirm={confirmarTurnos}
         />
       )}
+
+      {bloqueo && <HoursBlockedDialog turnos={bloqueo} onClose={() => setBloqueo(null)} />}
     </div>
   )
 }

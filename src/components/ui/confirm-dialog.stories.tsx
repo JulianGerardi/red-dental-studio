@@ -15,7 +15,7 @@ const meta = {
       story: { inline: false, iframeHeight: 420 },
       jira: ['CON-1546', 'CON-2890', 'CON-3999'],
       description: {
-        component: 'La confirmación de una sola pregunta, lo único que no se abre como drawer (igual que en Confidentally 2.0): chica y centrada, porque se contesta sí o no sin cargar nada. **danger** para lo que borra, descarta o desactiva sin vuelta. Desde el 2026-11-16 el título lleva un ícono de 16 px en línea, sin círculo, que sale solo del tono: info azul (primary) o triángulo rojo (danger). *icon* lo cambia: **warning** (alerta, ámbar o roja) cuando hay algo que revisar antes de seguir, y **delete** (tacho rojo) sólo en lo que borra. Con *otherAction* es una decisión de tres salidas (Consent required); con *loading* la acción principal muestra el spinner y los demás botones quedan deshabilitados. En Figma: *Confidentally UI · Design System* → Feedback & Overlays → Confirm dialog (Tone × Icon). **Probalo:** cambiá *tone* e *icon* en *Playground*.',
+        component: 'La confirmación de una sola pregunta, lo único que no se abre como drawer (igual que en Confidentally 2.0): chica y centrada, porque se contesta sí o no sin cargar nada. **danger** para lo que borra, descarta o desactiva sin vuelta. Desde el 2026-11-16 el título lleva un ícono de 16 px en línea, sin círculo, que sale solo del tono: info azul (primary) o triángulo rojo (danger). *icon* lo cambia: **warning** (alerta, azul o roja) cuando hay algo que revisar antes de seguir, y **delete** (tacho rojo) sólo en lo que borra. Con *otherAction* es una decisión de tres salidas (Consent required); con *loading* la acción principal muestra el spinner y los demás botones quedan deshabilitados. En Figma: *Confidentally UI · Design System* → Feedback & Overlays → Confirm dialog (Tone × Icon). **Probalo:** cambiá *tone* e *icon* en *Playground*.',
       },
     },
   },
@@ -96,7 +96,7 @@ export const States: Story = {
       <Bloque titulo="States" nota="El ícono no se elige por pantalla: sale de tone e icon. Un tacho en algo que sólo desactiva o descarta diría que se borra.">
         <Tabla encabezado={['tone', 'icon', 'Ícono', 'Cuándo', 'Story']} minimo={720}>
           <tr><td>primary</td><td>—</td><td>info, <Token nombre="dash-blue" /></td><td>Pregunta simple: Replace working hours?, Move treatment visit?</td><td>Neutral (info)</td></tr>
-          <tr><td>primary</td><td>warning</td><td>circle-alert, <Token nombre="warn-fg" /></td><td>Hay algo que revisar antes de seguir: Consent required, turnos afectados.</td><td>Warning, ThreeActions</td></tr>
+          <tr><td>primary</td><td>warning</td><td>circle-alert, <Token nombre="dash-blue" /></td><td>Hay algo que revisar antes de seguir: Consent required, turnos afectados.</td><td>Warning, ThreeActions</td></tr>
           <tr><td>danger</td><td>—</td><td>triangle-alert, <Token nombre="dash-bad-fg" /></td><td>Descarta, desactiva o deshabilita: Discard unsaved changes?, Deactivate Operatory 1?</td><td>Danger</td></tr>
           <tr><td>danger</td><td>warning</td><td>circle-alert, <Token nombre="dash-bad-fg" /></td><td>Desactivar con cosas que resolver: This room has scheduled appointments.</td><td>Danger + warning</td></tr>
           <tr><td>danger</td><td>delete</td><td>trash-2, <Token nombre="dash-bad-fg" /></td><td>Borra: Delete Appointment, Delete Relationship, Delete procedure, borrar una suscripción.</td><td>Delete (trash)</td></tr>

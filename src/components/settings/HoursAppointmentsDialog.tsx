@@ -9,13 +9,14 @@ import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/Ne
 import { hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import type { EstadoTurnoLocacion, TurnoLocacion } from '@/data/location-detail'
 
-/* Turnos Proposed o Booked que quedan fuera de las horas nuevas de la locación (CON-1546, resolución de CON-2890).
-   Cada uno se resuelve aparte —Edit appointment para moverlo de día, hora o provider; Cancel o No Show— o Confirm los
-   que quedan pasan a Waiting List. Nada se aplica hasta Confirm: Cancel vuelve al panel sin guardar. El texto de
-   CON-2890 habla del provider; acá se adaptó a la locación. Ver figma/modulos/locations.md (2026-11-16). */
+/* Citas que pierden cobertura con un cambio de Working Hours (CON-4167, HU 8). La lista la calcula la pantalla con los
+   turnos de ese momento: lo que se gestiona acá (Edit appointment, Cancel, No Show) se guarda enseguida, no se deshace
+   con Cancel y, si deja de estar afectado, sale de la lista. Confirm pasa el resto a Waiting List. Ver
+   figma/modulos/locations.md (2026-11-16). */
 
 const TONO: Record<EstadoTurnoLocacion, PillTone> = {
-  Proposed: 'purple', Booked: 'info', Cancelled: 'danger', 'No Show': 'neutral', 'Waiting List': 'warning',
+  Proposed: 'purple', Booked: 'info', 'Check In': 'success', 'In Progress': 'success',
+  Cancelled: 'danger', 'No Show': 'neutral', 'Waiting List': 'warning',
 }
 /* "Monday, November 23 · 3:00–4:00 PM": fecha y horario completo del turno (dura una hora). */
 const hora = (d: Date) => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
@@ -27,40 +28,60 @@ const cuando = (d: Date) => {
 }
 /* Las horas del drawer de turnos ("09 AM"): la agenda va de hora en hora. */
 const horaTurno = (h: number) => `${String(h % 12 || 12).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`
-const pendiente = (t: TurnoLocacion) => t.estado === 'Proposed' || t.estado === 'Booked'
+
+/* Una cita: paciente, fecha y horario, provider; el estado como badge a la derecha. */
+export function FilaTurno({ t, acciones }: { t: TurnoLocacion; acciones?: React.ReactNode }) {
+  const [dia, rango] = cuando(t.fecha)
+  return (
+    <li className="flex items-start justify-between gap-3 py-3 leading-snug">
+      <span className="flex min-w-0 flex-col gap-1">
+        <span className="truncate text-[14px] font-semibold text-ink">{t.paciente}</span>
+        {/* En celular el horario baja entero, sin cortarse en el guion. */}
+        <span className="text-ink-soft tabular-nums">{dia} · <span className="whitespace-nowrap">{rango}</span></span>
+        <span className="text-ink-muted">{t.provider}</span>
+      </span>
+      <span className="flex shrink-0 items-center gap-2">
+        <Pill tone={TONO[t.estado]} size="sm">{t.estado}</Pill>
+        {acciones}
+      </span>
+    </li>
+  )
+}
 
 export function HoursAppointmentsDialog({
-  afectados, fueraDeHorario, operatorios, onCancel, onConfirm,
+  afectados, fueraDeHorario, operatorios, onCambiar, onCancel, onConfirm,
 }: {
-  /** Los turnos que las horas nuevas dejan afuera, tal como están hoy. */
+  /** Las citas que siguen afectadas, recalculadas por la pantalla con los turnos de ese momento. */
   afectados: TurnoLocacion[]
-  /** Si un turno (ya editado) sigue fuera de las horas nuevas. */
+  /** Si una cita (ya editada) sigue perdiendo cobertura con el cambio. */
   fueraDeHorario: (t: TurnoLocacion) => boolean
   /** Salas activas de la locación, para el drawer de Edit Appointment. */
   operatorios: string[]
+  /** Guarda en el momento lo que se hizo con una cita: no espera a Confirm ni se deshace con Cancel. */
+  onCambiar: (t: TurnoLocacion) => void
   onCancel: () => void
-  /** Recibe cada turno como queda: los que siguen pendientes ya en Waiting List. */
-  onConfirm: (turnos: TurnoLocacion[]) => void
+  /** Aplica el cambio de horarios y pasa a Waiting List las citas que siguen afectadas. */
+  onConfirm: () => void
 }) {
-  const [borrador, setBorrador] = useState(afectados)
   const [editando, setEditando] = useState<TurnoLocacion | null>(null)
 
-  const cambiar = (t: TurnoLocacion) => setBorrador((p) => p.map((x) => (x.id === t.id ? t : x)))
-  const marcar = (t: TurnoLocacion, estado: EstadoTurnoLocacion) => cambiar({ ...t, estado })
-  const original = (t: TurnoLocacion) => afectados.find((x) => x.id === t.id)!
+  const marcar = (t: TurnoLocacion, estado: EstadoTurnoLocacion) => {
+    onCambiar({ ...t, estado })
+    aviso.ok(estado === 'Cancelled' ? `Appointment for ${t.paciente} cancelled.` : `Appointment for ${t.paciente} marked as No Show.`)
+  }
 
   const guardarTurno = (d: DatosTurno) => {
     if (!editando) return
     const [dd, mm, yyyy] = (d.date ?? '').split('-').map(Number)
     const estado = d.status === 'Proposed' || d.status === 'Booked' ? d.status : editando.estado
     const nuevo = { ...editando, fecha: new Date(yyyy, mm - 1, dd, hora24(d.start)), provider: d.primary || editando.provider, estado }
-    cambiar(nuevo)
+    onCambiar(nuevo)
     if (fueraDeHorario(nuevo)) aviso.info(`The appointment for ${nuevo.paciente} is still outside the new working hours.`)
     else aviso.ok(`Appointment for ${nuevo.paciente} updated.`)
     return true
   }
 
-  /* Mientras se edita un turno, el aviso se esconde y vuelve al cerrar el drawer (igual que Rooms). */
+  /* Mientras se edita una cita, el aviso se esconde y vuelve al cerrar el drawer (igual que Rooms). */
   if (editando) {
     return (
       <NewAppointmentModal
@@ -78,47 +99,39 @@ export function HoursAppointmentsDialog({
   }
 
   return (
-    <ConfirmDialog
-      icon="warning"
-      title="Affected appointments"
-      confirmLabel="Confirm"
-      onCancel={onCancel}
-      onConfirm={() => onConfirm(borrador.map((t) => (pendiente(t) && fueraDeHorario(t) ? { ...t, estado: 'Waiting List' } : t)))}
-    >
+    <ConfirmDialog icon="warning" title="Affected appointments" confirmLabel="Confirm" onCancel={onCancel} onConfirm={onConfirm}>
       <p>
         There are scheduled appointments outside the new working hours. You can review and manage each appointment
         individually, or confirm to move all appointments to the waiting list.
       </p>
-      {/* Paciente y acciones arriba; fecha y horario; provider. El estado, badge a la derecha. Ver locations.md, 2026-11-16. */}
-      <p className="mt-3 font-semibold text-ink">Appointments ({borrador.length})</p>
+      {/* El contador es el de las citas pendientes: las resueltas salen de la lista (CON-4167). */}
+      <p className="mt-3 font-semibold text-ink">Appointments ({afectados.length})</p>
       <ul className="mt-1 flex max-h-72 flex-col divide-y divide-line-soft overflow-y-auto">
-        {borrador.map((t) => {
-          const adentro = pendiente(t) && !fueraDeHorario(t)
-          const cambio = t !== original(t)
-          return (
-            <li key={t.id} className="flex items-start justify-between gap-3 py-3 leading-snug">
-              <span className="flex min-w-0 flex-col gap-1">
-                <span className="truncate text-[14px] font-semibold text-ink">{t.paciente}</span>
-                {/* En celular el horario baja entero, sin cortarse en el guion. */}
-                <span className="text-ink-soft tabular-nums">
-                  {cuando(t.fecha)[0]} · <span className="whitespace-nowrap">{cuando(t.fecha)[1]}</span>
-                </span>
-                <span className="text-ink-muted">{t.provider}</span>
-                {/* Movido adentro del horario: el estado sigue siendo el mismo, así que se dice aparte. */}
-                {adentro && <span className="text-[12px] text-dash-ok-fg">Now within the new working hours.</span>}
-              </span>
-              <span className="flex shrink-0 items-center gap-2">
-                <Pill tone={TONO[t.estado]} size="sm">{t.estado}</Pill>
-                <RowActionsMenu label={`appointment for ${t.paciente}`}>
-                  <DropdownMenuItem onSelect={() => setEditando(t)}>Edit appointment</DropdownMenuItem>
-                  {t.estado !== 'Cancelled' && <DropdownMenuItem onSelect={() => marcar(t, 'Cancelled')}>Cancel appointment</DropdownMenuItem>}
-                  {t.estado !== 'No Show' && <DropdownMenuItem onSelect={() => marcar(t, 'No Show')}>Mark as No Show</DropdownMenuItem>}
-                  {cambio && <DropdownMenuItem onSelect={() => cambiar(original(t))}>Undo changes</DropdownMenuItem>}
-                </RowActionsMenu>
-              </span>
-            </li>
-          )
-        })}
+        {afectados.map((t) => (
+          <FilaTurno
+            key={t.id}
+            t={t}
+            acciones={
+              <RowActionsMenu label={`appointment for ${t.paciente}`}>
+                <DropdownMenuItem onSelect={() => setEditando(t)}>Edit appointment</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => marcar(t, 'Cancelled')}>Cancel appointment</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => marcar(t, 'No Show')}>Mark as No Show</DropdownMenuItem>
+              </RowActionsMenu>
+            }
+          />
+        ))}
+      </ul>
+    </ConfirmDialog>
+  )
+}
+
+/* Bloqueo de CON-4167: si el cambio deja afuera una cita en Check In o In Progress, no se aplica nada. Sólo Close. */
+export function HoursBlockedDialog({ turnos, onClose }: { turnos: TurnoLocacion[]; onClose: () => void }) {
+  return (
+    <ConfirmDialog icon="warning" title="Unable to change working hours" confirmLabel="Close" hideCancel onCancel={onClose} onConfirm={onClose}>
+      <p>Working hours cannot be changed because there are affected appointments in Check In or In Progress status.</p>
+      <ul className="mt-2 flex flex-col divide-y divide-line-soft">
+        {turnos.map((t) => <FilaTurno key={t.id} t={t} />)}
       </ul>
     </ConfirmDialog>
   )
