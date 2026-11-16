@@ -14,7 +14,7 @@ export const pulsar = (nombre: RegExp) => async (c: Contexto) => {
 }
 
 /* Lo mismo para lo que no es un botón: una pestaña, un radio, una casilla, una opción de menú. */
-export const pulsarRol = (rol: 'tab' | 'radio' | 'checkbox' | 'menuitem', nombre: RegExp) => async (c: Contexto) => {
+export const pulsarRol = (rol: 'tab' | 'radio' | 'checkbox' | 'menuitem' | 'switch', nombre: RegExp) => async (c: Contexto) => {
   await userEvent.click(await en(c).findByRole(rol, { name: nombre }))
 }
 

@@ -13,7 +13,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       story: { inline: false, iframeHeight: 420 },
-      jira: ['CON-1546', 'CON-2890', 'CON-3999'],
+      jira: ['CON-1546', 'CON-2890', 'CON-3999', 'CON-4165', 'CON-4166', 'CON-4167'],
       description: {
         component: 'La confirmación de una sola pregunta, lo único que no se abre como drawer (igual que en Confidentally 2.0): chica y centrada, porque se contesta sí o no sin cargar nada. **danger** para lo que borra, descarta o desactiva sin vuelta. Desde el 2026-11-16 el título lleva un ícono de 16 px en línea, sin círculo, que sale solo del tono: info azul (primary) o triángulo rojo (danger). *icon* lo cambia: **warning** (alerta, azul o roja) cuando hay algo que revisar antes de seguir, y **delete** (tacho rojo) sólo en lo que borra. Con *otherAction* es una decisión de tres salidas (Consent required); con *loading* la acción principal muestra el spinner y los demás botones quedan deshabilitados. En Figma: *Confidentally UI · Design System* → Feedback & Overlays → Confirm dialog (Tone × Icon). **Probalo:** cambiá *tone* e *icon* en *Playground*.',
       },
@@ -132,6 +132,9 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Affected appointments (HoursAppointmentsDialog)</td><td>primary con icon warning</td></tr>
           <tr><td className="font-semibold">This room has scheduled appointments / Deactivate Operatory 1?</td><td>danger (con warning si hay turnos)</td></tr>
           <tr><td className="font-semibold">Delete Appointment, Delete Relationship, Delete procedure, delete subscription</td><td>danger con icon delete</td></tr>
+          <tr><td className="font-semibold">Delete working hours? (✕ de una franja, Working Hours)</td><td>danger con icon delete</td></tr>
+          <tr><td className="font-semibold">Close working hours? (switch de un día, Working Hours)</td><td>danger</td></tr>
+          <tr><td className="font-semibold">Unable to change working hours (HoursBlockedDialog)</td><td>primary con icon warning, sólo Close</td></tr>
           <tr><td className="font-semibold">Move treatment visit? (New Appointment, al guardar con una visita linkeada a otro turno)</td><td>primary</td></tr>
           <tr><td className="font-semibold">Clinical Note (al terminar el encuentro; Cancel es "Remind me later")</td><td>primary</td></tr>
         </Tabla>
