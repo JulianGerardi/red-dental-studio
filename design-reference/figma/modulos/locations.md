@@ -488,3 +488,32 @@ Pedido de Julián. CON-1546 (*Editar Horario de Apertura/Cierre de Locación*) e
 Queda afuera: el aviso de CON-1546 cuando hay turnos fuera del horario nuevo (no hay turnos por locación en los datos
 mock) y el de "All operating hours have been disabled". "New Hours" de la ficha de un empleado tiene su propio
 alcance ("All selected days" / "This and future weeks") y no se tocó.
+
+### Working Hours: aplicar a otros días, reemplazo y citas afectadas (2026-11-16, CON-1546)
+
+Pedido de Julián con la historia *Aplicar los horarios a otros días* (Abril Viola). No la encontré en el proyecto CON
+(búsqueda por título); la regla de las citas fuera de horario sí está en CON-1546, punto 2. Si tiene clave, linkearla acá.
+
+1. **El día de origen no se puede sacar.** En "Repeat on days" queda elegido (`aria-disabled`, fondo celeste) y una línea
+   lo dice: "Monday is the day you're editing, so it stays selected." Los demás días se eligen libres, Open o Closed.
+2. **"Replace working hours?"** (Cancel / Confirm) se abre al guardar sólo si algún día *adicional* está Open con un
+   horario distinto. Nombra esos días en el orden de la tabla ("Monday and Tuesday"), nunca el de origen ni los Closed.
+   No sale si sólo cambia el origen o si los demás ya tienen el mismo horario; las franjas se comparan **ordenadas**, no
+   en el orden en que se cargaron. Cancel vuelve al panel con lo cargado y no guarda nada.
+3. **Citas Proposed / Booked fuera del horario nuevo** (CON-1546): después de Confirm, si algún turno de los días que se
+   guardan no entra en las franjas nuevas, el mismo drawer pasa a "Scheduled appointments" (no se apila otro drawer).
+   Cada cita se resuelve a mano —otro provider, o estado Cancelled / No Show— o se deja: Confirm manda **todas las que
+   quedan** a Waiting List. Cada fila dice qué le va a pasar ("Will be moved to the waiting list.") y un contador abajo
+   cuenta las que se mueven. Cancel vuelve al panel y descarta lo elegido: nada se guarda hasta el Confirm final, así que
+   guardar horas y mover citas es una sola operación.
+4. Tras guardar, cada día se edita por separado (no quedan vinculados; ver 2026-11-06).
+
+Decisiones mías para validar:
+- El texto del mensaje dice "assigned to this **location**" y no "provider" como en la historia: acá las horas son de la
+  locación. Si la historia es la de los horarios de un provider (Employees → Working Hours), el mismo flujo aplica pero
+  "New Hours" hoy no guarda datos y no se tocó.
+- Los turnos son de ejemplo (`CITAS_LOCACION`): hay 4 afectadas al pasar Lunes y Martes a 10:00–14:00.
+- La hora de cada cita va en 24 hs como en Rooms; una cita cuenta como adentro si empieza y termina (1 h) en una franja.
+
+Para validar con usuarios: si recepción prefiere resolver una por una o casi siempre manda todo a Waiting List, y si
+conviene un resumen por día antes de guardar cuando se tocan 4 o más días.
