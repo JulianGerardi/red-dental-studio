@@ -44,7 +44,8 @@ export function ConfirmDialog({
             aria-hidden
             className={cn(
               'mt-[3px] size-4 shrink-0',
-              tone === 'danger' ? 'text-dash-bad-fg' : icon === 'warning' ? 'text-warn-fg' : 'text-dash-blue',
+              /* Rojo sólo en danger; el resto, advertencias incluidas, en azul (Julián, 2026-11-16). */
+              tone === 'danger' ? 'text-dash-bad-fg' : 'text-dash-blue',
             )}
           />
           <DialogTitle className="text-base leading-snug font-bold text-ink">{title}</DialogTitle>

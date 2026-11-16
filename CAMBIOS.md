@@ -5,6 +5,21 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
+### Working Hours: borrar una franja, cerrar un día y citas afectadas según la HU 8 ([#151](https://github.com/JulianGerardi/red-dental-studio/pull/151))
+- **Delete working hours?** (la ✕ de una franja, CON-4166): pregunta antes y borra sólo esa franja. Si es la última,
+  el día queda Closed.
+- **Close working hours?** (el switch, CON-4165): pregunta antes y el día conserva sus franjas. Al reabrirlo,
+  *Set working hours* las trae.
+- **Affected appointments** (CON-4167): entran sólo las citas que pierden cobertura. Lo hecho cita por cita se guarda en
+  el momento y la cita resuelta sale de la lista. Con citas en Check In o In Progress no se aplica nada
+  (*Unable to change working hours*).
+- **`ConfirmDialog`:** el ícono de advertencia (`icon="warning"`) va en azul; en `danger` sigue rojo.
+- **Para el dev:**
+  - En `LocationDetail.tsx`, todo cambio de horarios es una `Operacion` (`panel`, `quitar`, `cerrar`) que pasa por
+    pregunta, impacto (`pierde`) y aplicación.
+  - `HoursAppointmentsDialog` recibe `afectados` ya calculados y `onCambiar`. `HoursBlockedDialog` es nuevo.
+  - `EstadoTurnoLocacion` suma Check In e In Progress.
+
 ### Campos obligatorios vacíos: siempre "This field is required." ([#150](https://github.com/JulianGerardi/red-dental-studio/pull/150))
 - Todo campo obligatorio vacío dice *This field is required.* debajo (CON-4161). Salen *Required.*, *Enter the reason.*,
   *A billing name is required.*, *Please add a procedure to the exception* y las demás variantes.
