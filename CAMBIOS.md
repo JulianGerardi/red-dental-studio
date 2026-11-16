@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
-### Working Hours: aplicar el horario a otros días, turnos afectados y pop-ups con ícono en línea (#PR)
+### Working Hours: aplicar el horario a otros días, turnos afectados y pop-ups con ícono en línea ([#147](https://github.com/JulianGerardi/red-dental-studio/pull/147))
 - **Set working hours (Locations):** el día de origen queda elegido y no se puede sacar. Si un día adicional está Open
   con otro horario, pregunta *Replace working hours?* nombrando sólo esos días, en el orden de la tabla (CON-1546;
   historia de Abril sin clave en Jira todavía). La comparación ordena las franjas.
