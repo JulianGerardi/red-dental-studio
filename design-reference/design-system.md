@@ -1261,3 +1261,30 @@ el padding, el radio, el texto y el borde leídos del elemento. Nada se escribe 
 segundo al abrir: se ve en el Playground) y *CountryFlag · loading* (el detector lee `loading="lazy"`).
 
 **Figma.** Desde esta fecha, documentar es Storybook y Figma: ver `figma-docs.md`.
+
+## ConfirmDialog con ícono en línea, Set working hours y turnos afectados (2026-11-16, CON-1546, CON-2890)
+
+Documenta lo publicado en el PR #147. Además del Storybook, el pop-up quedó en el Figma del design system
+([Confidentally UI · Design System](https://www.figma.com/design/iJvnuV8TLStMXpNjdwsuDe), página *💬 Feedback &
+Overlays*, sección *Confirm dialog*), listo para conectarlo con el código (Code Connect).
+
+1. **Elements / ConfirmDialog**: el control `warningIcon` pasa a **icon** (`auto` · `warning` · `delete`), igual que la
+   prop. Stories nuevas por combinación: *Neutral (info)*, *Warning (review first)*, *Danger (discard, deactivate)*,
+   *Danger + warning* y *Delete (trash)*. *States* es la tabla tone × icon → ícono y token; *Parts* y *Specs* cambian el
+   círculo de 36 px por el ícono de 16 px en línea; *Where* suma los pop-ups de Locations, Rooms y los de borrar.
+2. **Components / Settings / LocationHoursModal**: ahora con la estructura completa. Playground (Sunday cerrado),
+   *Edit Hours*, *Other Days Selected* (origen fijo), *With Validation Errors* y *Replace Question* (play que llega a
+   *Replace working hours?*), más Parts, States y Specs. Recibe `horario` con la semana de `HORARIO_SEMANAL`.
+3. **Components / Settings / HoursAppointmentsDialog** (nuevo): Playground, *Partly Managed* (No Show a un turno) y
+   *All Managed*, con Parts, States (qué dice cada fila) y Specs.
+4. **Figma, Confirm dialog**: el component set (19:123) se actualizó en el lugar, sin crear otro.
+   - Propiedades: `Tone` (Default = primary, Destructive = danger) e `Icon` (Auto, Warning, Delete), en las 5
+     combinaciones que usa la app (Default + Delete no existe).
+   - Ícono de 16 px en un *Icon slot* de 16 × 22, con el color enlazado a `dash-blue`, `warn-fg` o `dash-bad-fg`; gap
+     `spacing/2`; botones MD como en el código.
+   - Debajo, *Confirm dialog / Examples* con cuatro instancias de la app: Replace working hours?, These hours affect
+     scheduled appointments, Discard unsaved changes? y Delete Relationship.
+   - La sección *Drawer* bajó para dejar lugar.
+
+Para conectar con Code Connect: `tone` → `Tone` y `icon` → `Icon` (`undefined` = Auto), `title` → `Title` y `children`
+→ `Body`.
