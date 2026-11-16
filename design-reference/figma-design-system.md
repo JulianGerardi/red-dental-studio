@@ -16,7 +16,14 @@
 > Son 36 component sets (≈ 240 variantes), 16 componentes sueltos y 227 íconos, todo ligado a las mismas 117 variables, 23
 > estilos de texto y 4 de sombra.
 >
-> **Para publicarlo:** en el archivo nuevo, *Assets → Publish library* (lo hace Julián desde Figma). Después, en el archivo de
+> **Reconectado el 2026-11-16:** la library está publicada y habilitada en el archivo de flujos. Todas las pantallas usan instancias
+> de la library (0 instancias locales verificadas en Patients, Dashboard y Clinical Mode), los estilos de texto y de sombra son los
+> publicados y las 117 variables locales del archivo de flujos son **alias** de las publicadas: cambiar un token en el archivo del
+> design system y republicar actualiza las pantallas. El motor (claves de la library, reconexión de instancias y estilos) queda
+> guardado en el archivo de flujos (`rds.ds`: `biblio`, `reconectar`, `reconectarRun`, `estilosLib`, `estilosRun`). Si se suma un
+> componente, hay que republicar y agregar su clave a `biblio`. La página 🎨 Design System del archivo de flujos quedó sin uso.
+>
+> **Para publicarlo (ya hecho, para futuras versiones):** en el archivo nuevo, *Assets → Publish library* (lo hace Julián desde Figma). Después, en el archivo de
 > flujos, activar la library (*Assets → Libraries*) y reconectar: cada instancia local pasa al componente publicado con
 > `figma.importComponentByKeyAsync` (por nombre de set y variante), y las variables y estilos con
 > `importVariableByKeyAsync` / `importStyleByKeyAsync`. El mapeo es por nombre: set + `Propiedad=Valor`.
