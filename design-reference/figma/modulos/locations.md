@@ -558,16 +558,20 @@ Para validar: si el badge alcanza para notar que un turno ya está resuelto, sin
 Rooms (*This room has scheduled appointments*, CON-1520) debería tomar la misma jerarquía: hoy la lista es igual a la
 de antes.
 
-### Working Hours: todas las franjas a la vista, sin "+N" (2026-11-16)
+### Working Hours: "+N" sólo cuando las franjas no entran (2026-11-16)
 
-Julián: "no entiendo por qué dice +2 cuando te sobra toda la pantalla para listar los horarios".
+Julián: "no entiendo por qué dice +2 cuando te sobra toda la pantalla", y después: "el +2 debe estar cuando no entran
+los horarios".
 
-1. **Sale el "+N"** de la tabla: mostraba siempre las dos primeras franjas y escondía el resto aunque sobrara ancho,
-   así que costaba un clic ver un horario que entraba. Un día tiene pocas franjas (4 en los datos): se ven todas y, si
-   no entran, bajan de línea (en tablet, de a dos). La regla "todo +N se despliega" sigue para las listas que de verdad
-   no entran; acá no hacía falta colapsar.
-2. **Celular** (menos de 640 px): la grilla de tres columnas se cortaba a la derecha (también con el +N). Ahora el día y
-   el switch van arriba y las franjas o *Closed all day.* debajo, a todo el ancho; el encabezado queda *Day · Status*.
+1. **Antes**, la tabla mostraba siempre las dos primeras franjas y "+N", aunque sobrara ancho.
+2. **Ahora** (`FranjasDia`), la fila muestra en una línea todas las franjas que entran junto a *Edit hours*. Sólo si no
+   entran, las que sobran quedan en "+N", que al tocarlo las despliega a todas, bajando de línea. Los anchos se miden en
+   una copia invisible (`aria-hidden`) y se recalculan con `ResizeObserver` al cambiar el ancho. En escritorio entran
+   las 4; en tablet (1024) quedan 2 y "+2"; en celular, 1 y "+3".
+3. **Celular** (menos de 640 px): la grilla de tres columnas se cortaba a la derecha. Ahora el día y el switch van arriba
+   y las franjas o *Closed all day.* debajo, a todo el ancho; el encabezado queda *Day · Status*.
+4. **Start Time y End Time llevan asterisco** en *Set working hours* y en *New Hours* (Employees): son obligatorios y
+   ya se validaban con *Required.*, pero no lo decían.
+5. Los e2e cuentan las franjas por su botón *Remove …*, no por el texto: la copia invisible repite el texto.
 
-Para validar: si con muchas franjas (6 o más) la fila se vuelve difícil de leer; recién ahí convendría colapsar lo que
-no entra en una línea.
+Para validar: si "+N" en celular, con una sola franja visible, se entiende o conviene mostrarlas todas ahí.

@@ -32,7 +32,8 @@ test('Open se guarda sólo con horas válidas y en todos los días elegidos', as
   await expect(screen.getByText('Hours saved for 2 days.')).toBeVisible()
   await expect(screen.getByRole('switch', 'Sunday open')).toHaveAttribute('aria-checked', 'true')
   await expect(screen.getByRole('switch', 'Saturday open')).toHaveAttribute('aria-checked', 'true')
-  await expect(screen.getByText('10:00 AM - 02:00 PM')).toHaveCount(2)
+  /* Por el botón de quitar: la copia invisible que mide el ancho de las franjas no cuenta. */
+  await expect(screen.getByRole('button', /^Remove 10:00 AM - 02:00 PM on/)).toHaveCount(2)
 })
 
 /* Aplicar el horario a otros días (2026-11-16): el de origen no se saca, pisar otro día abierto se pregunta. */
@@ -93,5 +94,11 @@ test('Turnos fuera de las horas nuevas: se resuelven antes y Confirm pasa el res
   await aviso.getByRole('button', 'Confirm').tap()
 
   await expect(screen.getByText('Hours saved for 3 days. 1 appointment was moved to the waiting list.')).toBeVisible()
-  await expect(screen.getByText('09:00 AM - 02:00 PM')).toHaveCount(3)
+  await expect(screen.getByRole('button', /^Remove 09:00 AM - 02:00 PM on/)).toHaveCount(3)
+})
+
+test('Si las franjas entran en la fila, no hay "+N"', async ({ app, screen }) => {
+  await app.open('/settings/locations/abril?type=working-hours')
+  await expect(screen.getByRole('button', /^Remove 08:15 PM - 09:00 PM on Monday/)).toBeVisible()
+  await expect(screen.getByRole('button', /more hours on Monday/)).toHaveCount(0)
 })
