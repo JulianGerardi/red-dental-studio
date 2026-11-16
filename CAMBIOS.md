@@ -5,6 +5,12 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-16
 
+### New/Edit Patient: nombre completo en una fila ([#152](https://github.com/JulianGerardi/red-dental-studio/pull/152))
+- Paso *General* (`CamposGeneral`): *First Name*, *Middle Name* y *Last Name* en una fila de tres; debajo, *Email* y
+  *Birthdate*. En celular, apilados.
+- **Para el dev:** excepción deliberada a "campos de a dos" en drawers (`patients.md`, 2026-11-16). Sin cambios de datos
+  ni validaciones.
+
 ### Campos obligatorios vacíos: siempre "This field is required." ([#150](https://github.com/JulianGerardi/red-dental-studio/pull/150))
 - Todo campo obligatorio vacío dice *This field is required.* debajo (CON-4161). Salen *Required.*, *Enter the reason.*,
   *A billing name is required.*, *Please add a procedure to the exception* y las demás variantes.
