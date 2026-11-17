@@ -3,6 +3,12 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-17 (2)
+
+### Figma: estilos de texto y sombra, Sidebar sin activo y pills conectados al design system
+- Nuevos en el DS: 7 estilos de sombra, 27 de texto, variante `Sidebar Active=None` y Pill SM con 6 px de padding. Se aplicaron ≈ 8.700 textos, ≈ 4.000 sombras y ≈ 320 pills de estado en las pantallas.
+- **Para el dev:** la app no cambia. Qué falta conectar (cards, campos, tablas, textos con interlineado automático) y cómo se corren los motores: `design-reference/figma-design-system.md`, sección *Estilos, Sidebar sin activo y pills*.
+
 ## 2026-11-17
 
 ### Figma: pantallas alineadas y shell conectado al design system ([#154](https://github.com/JulianGerardi/red-dental-studio/pull/154))
