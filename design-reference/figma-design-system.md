@@ -131,3 +131,22 @@ Se aplicó a las 22 páginas de módulos (≈ 280 pantallas), sobre las capturas
   `Propiedad=Valor`; un trazo interno no suma al tamaño (el Pill lleva el borde de 1 px dentro del padding).
 - Los íconos se reconocen por el nombre de la capa (`Icon - plus` → `Icon/plus`). Si aparece uno nuevo en el código,
   agregarlo al set con el mismo nombre en kebab.
+
+## Revisión de alineación de las pantallas (2026-11-16)
+
+Auditoría de las pantallas del archivo *Flows* contra la app en vivo. Qué se rompió y por qué:
+
+- **Instancias en 0,0** (`Button - Check In/Out` en Dashboard y Header & Sidebar, `Pill` en Clinical Mode): el motor `poner` reemplazaba el nodo capturado sin copiar x/y cuando el padre no tiene auto layout. Reparado (x a la derecha de la fila) y **parchado el motor** (`motor` y `chipcount`: si el padre es `NONE`, copia x/y).
+- **Avatares estirados** (186×62 en vez de 62×62, 68 en la ficha del paciente): heredaban `layoutAlign STRETCH`. Vuelven a 62×62 centrados.
+- **Botón con ícono al final** (`Check In →`, `Complete this Task →`): el componente `Button` sólo tenía ícono antes del texto y las instancias no permiten reordenar hijos. Se agregó la variante **`Icon position` (Leading/Trailing)** al `Button` del DS (108 variantes). Library republicada; 536 botones (Check In, Check Out, Complete this Task) pasados a `Trailing`, con texto, ícono y color del ícono igual al del texto. Al clonar variantes hay que copiar también `componentPropertyReferences` (si no, el ícono no se muestra).
+- Los tamaños 1531, 1101, etc. de los frames **son los reales**: la captura crece hasta mostrar lo que quedaba en el scroll (`alto` distinto de `fijo`).
+
+## Shell conectado al design system (2026-11-17)
+
+Auditoría de conexión (antes): texto sin estilo ~30 %, sombras sin estilo ~90 %, y el shell (Sidebar, Topbar, banner) sólo estaba como frames capturados.
+
+- Se igualaron al app los componentes **Topbar** (botón de colapsar 32×32, buscador blanco, avatar SS, campana + perfil agrupados), **Notification banner** (colapsar y cerrar a la derecha, separador del pager) y la sangría de 12 px de **Sidebar**.
+- Motor `shell` (plugin data `rds.ds/shellSrc`; marca `shell` por pantalla): reemplaza `Sidebar`, `Header - Topbar` y `Status - NotificationBanner` por instancias, copiando textos (fecha, ubicación, usuario, rol, avisos, título y detalle del banner). Si se agrega una pantalla nueva, correrlo sobre ella.
+- Resultado: ~250 pantallas con Sidebar/Topbar/banner como instancias (el banner a 55 px, como en la app).
+- Pendiente: Sidebar sin ítem activo (Notifications, Login, Header & Sidebar 01) → falta variante `Active=None`; el panel "Sidebar" de 311 px de Clinical Mode es otro componente; cards (Appointment, Operatory, PatientCard, Pending task), campos y tablas; estilos de texto y de sombra faltantes (hay ~400 firmas de texto y ~35 de sombra sin estilo).
+- Títulos de página: 91 `Heading 1 - PageTitle` pasaron a instancias de `Page title` (MD/LG); 112 quedaron como estaban porque su tamaño no coincide con ninguna variante (falta sumar variantes de otros tamaños).
