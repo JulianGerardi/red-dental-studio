@@ -538,18 +538,22 @@ la ficha de una Location.
 
 1. **Ruta `/patients/:id/edit`** (`EditPatientPage`). La abren el ⋮ → Edit de la tabla y de Recent Patients, y el lápiz
    de General en el panel del paciente. La ruta vieja `/patients/edit` (sin paciente) se va.
-2. **Como la ficha de la Location**: migas Patients / paciente / Edit Patient, título, pestañas debajo al ancho de su
+2. **Como la ficha de la Location**: migas Patients / Edit Patient, título, pestañas debajo al ancho de su
    texto (General / Guardian sólo para un menor / Demography), cada sección en una card (`TARJETA_PANEL`) y Cancel /
    Save Changes abajo a la derecha (`FormFooter`).
 3. **Misma lógica que tenía el drawer** (2026-10-22): los datos del paciente cargados, cambiar de pestaña no guarda, un
    solo Save Changes guarda todo, y si falta un obligatorio lleva a su pestaña, la marca con el punto rojo y pone el foco
-   en el campo. Al guardar o cancelar vuelve a donde se estaba (la tabla o la ficha); si se entró directo, a la ficha.
-4. Antes, en el mismo día: el drawer con las secciones apiladas y después con pestañas. Julián descartó los dos: el
+   en el campo.
+4. **Cuelga de la tabla, no del dashboard del paciente** (Julián): las migas son Patients / Edit Patient, sin el nombre
+   del paciente, y Cancel o Save Changes vuelven siempre a la tabla de Patients, también si se entró desde el lápiz del
+   panel del paciente.
+5. Antes, en el mismo día: el drawer con las secciones apiladas y después con pestañas. Julián descartó los dos: el
    pedido era una pantalla.
-5. La página del Figma 3640:72713 (`EditPatientForm`, campos fijos) y `EditPatientModal` (el drawer) quedan sólo en el
+6. La página del Figma 3640:72713 (`EditPatientForm`, campos fijos) y `EditPatientModal` (el drawer) quedan sólo en el
    Storybook; se ordenan cuando se documente.
 
 **Para el dev:** ruta nueva `patients/:id/edit`; `EditPatientModal` deja de usarse en la app. e2e en
 `tests/edit-patient.e2e.ts`.
 
-**A validar:** si al volver de la tabla conviene ir a la ficha del paciente en vez de a la tabla.
+**A validar:** al entrar desde el lápiz del dashboard del paciente, volver a la tabla saca al usuario de la ficha que
+estaba mirando; ver si recepción lo espera así.

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { PageTitle } from '@/components/ui/page-title'
 import { Tabs } from '@/components/ui/tabs'
 import { TextField, SelectField, OptionCheckbox, FormFooter } from '@/components/patients/form'
-import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
 import {
   CamposDemography, CamposGeneral, CamposGuardian, limpiarPaciente, useFormPaciente, type SeccionPaciente,
 } from '@/components/patients/PacienteCampos'
@@ -72,7 +72,8 @@ export function EditPatientForm() {
 
 /* Edit Patient como pantalla, con la lógica de la ficha de una Location (Settings → Locations): título, pestañas debajo,
    cada sección en su card y Cancel / Save Changes abajo a la derecha. Las pestañas y la validación son las de antes
-   (General / Guardian sólo para un menor / Demography; el error lleva a su pestaña). Ver patients.md, 2026-11-17. */
+   (General / Guardian sólo para un menor / Demography; el error lleva a su pestaña). Cuelga de la tabla, no del
+   dashboard del paciente: las migas y Cancel / Save vuelven a Patients (Julián; patients.md, 2026-11-17). */
 export default function EditPatientPage() {
   const { id = 'john-smith' } = useParams()
   const navigate = useNavigate()
@@ -84,10 +85,7 @@ export default function EditPatientPage() {
   const [elegida, setSeccion] = useState<SeccionPaciente>('General')
   /* Guardian, sólo para un menor (patients.md, 2026-11-04): si deja de serlo, se vuelve a General. */
   const seccion = f.secciones.includes(elegida) ? elegida : 'General'
-  const nombre = [datos.first, datos.last].filter(Boolean).join(' ') || 'Patient'
-
-  /* Se vuelve a donde se estaba (la tabla o la ficha); si se entró directo, a la ficha del paciente. */
-  const volver = () => (window.history.state?.idx > 0 ? navigate(-1) : navigate(`/patients/${id}`))
+  const volver = () => navigate('/patients')
 
   const guardar = () => {
     const error = f.revisar(f.secciones)
@@ -104,7 +102,7 @@ export default function EditPatientPage() {
   )
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <PatientBreadcrumb name={nombre} section="Edit Patient" />
+      <div className="mb-4"><Breadcrumb items={[{ label: 'Patients', to: '/patients' }, { label: 'Edit Patient' }]} /></div>
       <PageTitle>Edit Patient</PageTitle>
       <Tabs
         className="mt-4" aria-label="Patient sections" value={seccion} onChange={setSeccion}
