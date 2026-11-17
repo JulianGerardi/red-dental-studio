@@ -95,7 +95,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-17
 
-### Figma: pantallas alineadas y shell conectado al design system (PR_NUM)
+### Figma: pantallas alineadas y shell conectado al design system ([#154](https://github.com/JulianGerardi/red-dental-studio/pull/154))
 - **Alineación:** los botones Check In / Check Out (Dashboard y Header & Sidebar) quedaban en 0,0 pisando los chips; los avatares de la ficha del paciente estaban estirados (186×62) y el pill de las entradas de Clinical Mode, sobre el texto. Reparados. La causa era el motor que reemplaza lo capturado por componentes: no copiaba x/y en frames sin auto layout; ya lo hace.
 - **Button con ícono al final:** nueva propiedad de variante `Icon position` (Leading/Trailing) en el Button del design system (108 variantes). 536 botones (Check In, Check Out, Complete this Task) pasan a Trailing, como en la app.
 - **Shell como instancias:** Sidebar, Topbar y banner de notificación son instancias del design system en ~250 pantallas (el banner a 55 px). Topbar y banner se igualaron a la app (botón de colapsar, buscador blanco, avatar SS, cierre y colapso a la derecha) y el Sidebar suma la sangría de 12 px. Títulos de página: 91 pasan a instancias de `Page title`.
