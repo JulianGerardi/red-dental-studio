@@ -102,7 +102,7 @@ function LugarDePantalla({ ruta, seccion }: { ruta: string; seccion: Seccion | n
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
-  const destino = ruta.endsWith('/clinical-mode') ? 'Clinical Mode, full screen' : ruta === '/patients/edit' ? 'the patient form (General)' : ruta
+  const destino = ruta.endsWith('/clinical-mode') ? 'Clinical Mode, full screen' : ruta.endsWith('/edit') ? 'the patient form (General)' : ruta
   return (
     <div ref={ref} className="flex min-h-[220px] min-w-0 flex-1 flex-col items-center justify-center gap-1.5 self-stretch rounded-lg border border-dashed border-ink-faint/60 p-6 text-center">
       {seccion ? (

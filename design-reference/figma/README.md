@@ -594,4 +594,5 @@ Licenses (nombre de la cuenta), Exam review (provider · fecha), AI Narrative Ed
 ("Procedure · Read-only summary"), Location Number (cómo conseguir el número) y Manage Exceptions.
 
 Editar algo ya cargado no lleva pasos: pestañas al ancho de su texto, como la ficha de una Location, y un solo Save
-Changes (Edit Patient, Edit Appointment; ver patients.md y scheduling.md).
+Changes. Edit Patient es una pantalla (`/patients/:id/edit`); Edit Appointment, un drawer (ver patients.md y
+scheduling.md).

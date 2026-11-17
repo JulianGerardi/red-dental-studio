@@ -26,7 +26,7 @@ test('El rastro del paciente vuelve al Overview y a la lista; Patients y Billing
 })
 
 test('Edit Patient cuelga del paciente', async ({ app, screen }) => {
-  await app.open('/patients/edit')
+  await app.open('/patients/john-smith/edit')
   const migas = screen.getByRole('navigation', 'Breadcrumb')
   await expect(migas.getByRole('link', 'John Smith')).toBeVisible()
   await expect(migas.getByText('Edit Patient')).toBeVisible()

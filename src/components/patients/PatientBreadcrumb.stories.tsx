@@ -84,7 +84,7 @@ export const Specs: Story = {
           {SECCIONES.map((s) => (
             <tr key={s}>
               <td className="font-semibold">{s}</td>
-              <td className="font-mono text-[12px] text-ink-muted">{s === 'Edit Patient' ? '/patients/edit' : `/patients/:id${s === 'Overview' ? '' : `/${s.split(' ')[0].toLowerCase()}`}`}</td>
+              <td className="font-mono text-[12px] text-ink-muted">{s === 'Edit Patient' ? '/patients/:id/edit' : `/patients/:id${s === 'Overview' ? '' : `/${s.split(' ')[0].toLowerCase()}`}`}</td>
               <td className="text-ink-medium">{migasPaciente('John Smith', '/patients/john-smith', seccionDe(s)).map((m) => (m.to ? `${m.label} →` : m.label)).join(' / ')}</td>
             </tr>
           ))}

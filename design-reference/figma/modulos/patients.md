@@ -531,13 +531,25 @@ de Insurance (insurance.md, 2026-11-10): llevar ese formato a New Appointment y 
 2. **Excepción a "campos de a dos"** (regla de drawers): el nombre completo se lee como una unidad y en tres columnas
    entra con el error *This field is required.* sin cortarse (drawer de 560). En celular quedan los cinco apilados.
 
-## Edit Patient: pestañas como las de la ficha de una Location (2026-11-17)
+## Edit Patient pasa a pantalla, como la ficha de una Location (2026-11-17)
 
-Pedido de Julián: Edit Patient con la misma lógica de pestañas que Settings → Locations. Siguen General / Guardian
-(sólo un menor) / Demography con un solo **Save Changes** y el punto rojo en la pestaña con error (2026-10-22); cambia
-que la tira ya no ocupa todo el ancho: va al ancho de su texto y a la izquierda, como en la ficha de la Location. Sin
-bajada ("Update the patient details"): ver *Drawers sin bajada* en `figma/README.md`.
+Pedido de Julián: Edit Patient no se abre en drawer; es un formulario de pantalla con la lógica de Settings → Locations →
+la ficha de una Location.
 
-Un primer intento del mismo día apiló las secciones sin pestañas; Julián lo descartó (no era el pedido).
+1. **Ruta `/patients/:id/edit`** (`EditPatientPage`). La abren el ⋮ → Edit de la tabla y de Recent Patients, y el lápiz
+   de General en el panel del paciente. La ruta vieja `/patients/edit` (sin paciente) se va.
+2. **Como la ficha de la Location**: migas Patients / paciente / Edit Patient, título, pestañas debajo al ancho de su
+   texto (General / Guardian sólo para un menor / Demography), cada sección en una card (`TARJETA_PANEL`) y Cancel /
+   Save Changes abajo a la derecha (`FormFooter`).
+3. **Misma lógica que tenía el drawer** (2026-10-22): los datos del paciente cargados, cambiar de pestaña no guarda, un
+   solo Save Changes guarda todo, y si falta un obligatorio lleva a su pestaña, la marca con el punto rojo y pone el foco
+   en el campo. Al guardar o cancelar vuelve a donde se estaba (la tabla o la ficha); si se entró directo, a la ficha.
+4. Antes, en el mismo día: el drawer con las secciones apiladas y después con pestañas. Julián descartó los dos: el
+   pedido era una pantalla.
+5. La página del Figma 3640:72713 (`EditPatientForm`, campos fijos) y `EditPatientModal` (el drawer) quedan sólo en el
+   Storybook; se ordenan cuando se documente.
 
-Edit Patient desde la tabla: `http://localhost:5182/patients` → ⋮ → Edit.
+**Para el dev:** ruta nueva `patients/:id/edit`; `EditPatientModal` deja de usarse en la app. e2e en
+`tests/edit-patient.e2e.ts`.
+
+**A validar:** si al volver de la tabla conviene ir a la ficha del paciente en vez de a la tabla.

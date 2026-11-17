@@ -18,7 +18,7 @@ import { StepIndicator } from '@/components/ui/step-indicator'
    - Pie con dos botones del mismo ancho: a la izquierda Cancel o Return, a la derecha Next Step o Save.
    - Un panel de apoyo (`aside`, el calendario de horarios de New Appointment) se despliega al costado del drawer.
    - Al editar algo que ya existe, las secciones van en pestañas (`tabs`) en vez de pasos: se entra directo a la que hace
-     falta y un solo "Save Changes" guarda todo (Edit Patient, Edit Appointment; Julián, 2026-10-22 y 2026-11-17).
+     falta y un solo "Save Changes" guarda todo (Edit Appointment; Julián, 2026-11-17).
    Radix Dialog por dentro: el foco queda adentro, Escape y la capa lo cierran. */
 
 /* Bug: con poca altura de ventana, un paso con muchos campos (New Appointment, paso 1) quedaba cortado a mitad del

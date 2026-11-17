@@ -104,7 +104,7 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
           onSection={setSection}
           /* El lápiz de General va a la página completa de edición
              (Figma 3640:72713, "Edit Patient (Full Page)"), no a un modal. */
-          onEditGeneral={() => navigate('/patients/edit')}
+          onEditGeneral={() => navigate(`/patients/${id}/edit`)}
           onEditContact={() => setModal('contact')}
         />
 
