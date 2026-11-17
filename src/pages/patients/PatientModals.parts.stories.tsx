@@ -34,17 +34,19 @@ export const NewPatientRequired: Story = {
   play: secuencia(pulsar(/Next Step/), esperar(/This field is required/)),
 }
 
-/* Edit Patient: se abre con los datos cargados y todas las secciones una debajo de la otra. */
+/* Edit Patient: se abre con los datos cargados y a un clic de cada sección. */
 export const EditPatient: Story = { render: () => <EditPatientModal id="abril-viola" onClose={salir} /> }
-/* Un menor: suma la sección Guardian entre General y Demography. */
-export const EditPatientGuardian: Story = { name: 'Edit Patient — Guardian', render: () => <EditPatientModal id="sofia-chen" onClose={salir} /> }
+export const EditPatientGuardian: Story = { name: 'Edit Patient — Guardian', render: () => <EditPatientModal id="sofia-chen" seccionInicial="Guardian" onClose={salir} /> }
+export const EditPatientDemography: Story = { name: 'Edit Patient — Demography', render: () => <EditPatientModal id="abril-viola" seccionInicial="Demography" onClose={salir} /> }
 /* Si el paciente aún no tiene cuenta del portal, ofrece crearla en vez del estado "Linked". */
 export const EditPatientNoPortal: Story = { name: 'Edit Patient — No portal account', render: () => <EditPatientModal id="marco-rivera" onClose={salir} /> }
-/* Save Changes con un obligatorio vacío en General y otro en Guardian: los marca y lleva el foco al primero. */
+/* Save Changes desde Demography con un obligatorio vacío en General y otro en Guardian: lleva a General al campo que
+   falta y la pestaña Guardian queda marcada con un punto rojo. */
 export const EditPatientErrors: Story = {
   name: 'Edit Patient — Error in another section',
   render: () => (
     <EditPatientModal
+      seccionInicial="Demography"
       inicial={{ ...VACIO_PACIENTE, first: 'Abril', birthday: 'April 2, 2025', email: 'abril@gmail.com', guardianNuevo: true, city: 'Phoenix' }}
       onClose={salir}
     />

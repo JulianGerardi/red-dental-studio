@@ -593,5 +593,5 @@ Drawers cuya bajada era un dato y ahora no se ve (a revisar con Julián si se su
 Licenses (nombre de la cuenta), Exam review (provider · fecha), AI Narrative Editor (código y versión), Record detail
 ("Procedure · Read-only summary"), Location Number (cómo conseguir el número) y Manage Exceptions.
 
-Editar algo ya cargado tampoco lleva pasos ni pestañas: secciones apiladas y un solo Save Changes (Edit Patient, Edit
-Appointment; ver patients.md y scheduling.md).
+Editar algo ya cargado no lleva pasos: pestañas al ancho de su texto, como la ficha de una Location, y un solo Save
+Changes (Edit Patient, Edit Appointment; ver patients.md y scheduling.md).

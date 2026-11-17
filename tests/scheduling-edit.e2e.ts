@@ -1,7 +1,7 @@
 import { test } from '@e2e-dev/web'
 import { expect } from 'e2e'
 
-/* Edit appointment desde el detalle del turno (CON-3249): drawer sin pasos, con el turno cargado y Save Changes
+/* Edit appointment desde el detalle del turno (CON-3249): drawer en pestañas, sin pasos, con el turno cargado y Save Changes
    (design-reference/figma/modulos/scheduling.md, 2026-11-17). */
 
 test('un turno se edita desde su detalle, sin pasos', async ({ app, screen }) => {
@@ -10,8 +10,9 @@ test('un turno se edita desde su detalle, sin pasos', async ({ app, screen }) =>
   await screen.getByRole('dialog', /Appointment details for Noah James Smith/).getByRole('button', 'Edit appointment').tap()
 
   const drawer = screen.getByRole('dialog', 'Edit Appointment')
-  await expect(drawer.getByText('Link to treatment plan visit')).toBeVisible()
   await expect(drawer.getByRole('button', /Next Step/)).toHaveCount(0)
+  await expect(drawer.getByRole('tab', 'General')).toHaveAttribute('aria-selected', 'true')
+  await drawer.getByRole('tab', 'Schedule').tap()
   await drawer.getByRole('button', 'Operatory 3').tap()
   await drawer.getByRole('button', 'Operatory 1').tap()
   await drawer.getByRole('button', /Save Changes/).tap()
@@ -26,4 +27,16 @@ test('un turno cerrado no se edita', async ({ app, screen }) => {
   await screen.getByRole('button', /Elias Aguirre/).first().tap()
   const detalle = screen.getByRole('dialog', /Appointment details for Elias Aguirre/)
   await expect(detalle.getByRole('button', 'Edit appointment')).toHaveAttribute('aria-disabled', 'true')
+})
+
+test('al guardar con un obligatorio vacío, lleva a su pestaña y la marca', async ({ app, screen }) => {
+  await app.open('/scheduling')
+  await screen.getByRole('button', /Noah James Smith/).first().tap()
+  await screen.getByRole('dialog', /Appointment details for Noah James Smith/).getByRole('button', 'Edit appointment').tap()
+  const drawer = screen.getByRole('dialog', 'Edit Appointment')
+  await drawer.getByRole('button', 'Remove Primary Provider').tap()
+  await drawer.getByRole('tab', 'Additional').tap()
+  await drawer.getByRole('button', /Save Changes/).tap()
+  await expect(drawer.getByRole('tab', /General/)).toHaveAttribute('aria-selected', 'true')
+  await expect(drawer.getByText('This field is required.')).toBeVisible()
 })

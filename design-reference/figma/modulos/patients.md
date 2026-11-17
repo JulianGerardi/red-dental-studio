@@ -531,15 +531,13 @@ de Insurance (insurance.md, 2026-11-10): llevar ese formato a New Appointment y 
 2. **Excepción a "campos de a dos"** (regla de drawers): el nombre completo se lee como una unidad y en tres columnas
    entra con el error *This field is required.* sin cortarse (drawer de 560). En celular quedan los cinco apilados.
 
-## Edit Patient: secciones apiladas, sin pestañas (2026-11-17)
+## Edit Patient: pestañas como las de la ficha de una Location (2026-11-17)
 
-Pedido de Julián: Edit Patient con el estilo de la ficha de una Location (Settings → Locations → Information). Las
-pestañas General / Guardian / Demography (2026-10-22) se van: las secciones van una debajo de la otra con los datos
-cargados y un solo **Save Changes**. Editar es revisar y corregir, no recorrer: con todo a la vista no hace falta marcar
-la pestaña con error; al guardar, el foco va al primer campo que falta. Guardian sigue apareciendo sólo para un menor.
-Sin bajada ("Update the patient details"): ver *Drawers sin bajada* en `figma/README.md`.
+Pedido de Julián: Edit Patient con la misma lógica de pestañas que Settings → Locations. Siguen General / Guardian
+(sólo un menor) / Demography con un solo **Save Changes** y el punto rojo en la pestaña con error (2026-10-22); cambia
+que la tira ya no ocupa todo el ancho: va al ancho de su texto y a la izquierda, como en la ficha de la Location. Sin
+bajada ("Update the patient details"): ver *Drawers sin bajada* en `figma/README.md`.
 
-**Para el dev:** `EditPatientModal` pierde `seccionInicial`. Edit Patient desde la tabla:
-`http://localhost:5182/patients` → ⋮ → Edit.
+Un primer intento del mismo día apiló las secciones sin pestañas; Julián lo descartó (no era el pedido).
 
-**A validar:** con un menor el drawer queda largo (tres secciones); si molesta, un índice de anclas arriba.
+Edit Patient desde la tabla: `http://localhost:5182/patients` → ⋮ → Edit.

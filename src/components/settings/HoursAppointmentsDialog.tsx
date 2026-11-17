@@ -86,6 +86,7 @@ export function HoursAppointmentsDialog({
     return (
       <NewAppointmentModal
         edicion
+        pestanaInicial="Schedule"
         inicial={{
           patient: editando.paciente, primary: editando.provider, date: formatDMY(editando.fecha),
           start: horaTurno(editando.fecha.getHours()), end: horaTurno(editando.fecha.getHours() + 1),

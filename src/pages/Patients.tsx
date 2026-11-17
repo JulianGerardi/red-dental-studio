@@ -203,7 +203,7 @@ export default function Patients() {
         />
       )}
       {modal === 'new' && <NewPatientModal onClose={() => setModal(null)} />}
-      {/* Edit Patient: las secciones apiladas y Save Changes (patients.md, 2026-11-17), con los datos del paciente de la fila. */}
+      {/* Edit Patient: pestañas y Save Changes (Figma 5277:123056), con los datos del paciente de la fila. */}
       {editando && <EditPatientModal id={editando.id} onClose={() => setEditando(null)} />}
     </div>
   )
