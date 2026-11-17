@@ -25,7 +25,10 @@ import { OBLIGATORIO } from '@/lib/validacion'
    design-reference/design-system.md, "Pop ups".
 
    Desde 2026-10-17, una visita que ya está linkeada a otro turno lo muestra en su fila y, al guardar, pregunta si se
-   mueve (MoverVisitaDialog). Ver scheduling.md. */
+   mueve (MoverVisitaDialog). Ver scheduling.md.
+
+   Edit Appointment (2026-11-17): sin pasos. El turno ya está cargado, así que las tres secciones van una debajo de la
+   otra con un solo "Save Changes", como la ficha de una Location. Ver scheduling.md. */
 
 const PACIENTES = ['John Smith', 'Noah James Smith', 'Maria Abril Viola', 'Elias Aguirre']
 const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado', 'Sarah Stone']
@@ -120,23 +123,24 @@ const VACIO = {
 export type DatosTurno = Partial<typeof VACIO>
 
 export function NewAppointmentModal({
-  titulo = 'New Appointment',
+  edicion = false,
   inicial,
   operatorios,
   onGuardar,
   onClose,
 }: {
-  titulo?: string
+  /** Edit Appointment: el turno ya existe, sin pasos y con "Save Changes". Sin esto, New Appointment (aunque llegue con
+      `inicial`, como al agendar una solicitud). */
+  edicion?: boolean
   /** Las salas que se pueden elegir (las activas de la locación); sin esto, las de ejemplo. */
   operatorios?: string[]
-  /** Con datos, el modal edita el turno en vez de crear uno. */
+  /** Los datos con que arranca: el turno a editar o la solicitud a agendar. */
   inicial?: DatosTurno
   /** Recibe los valores al guardar. Si devuelve true, ya mostró su propio
       toast y el modal no muestra el suyo. */
   onGuardar?: (d: typeof VACIO) => boolean | void
   onClose: () => void
 }) {
-  const editando = !!inicial
   const [d, setD] = useState({ ...VACIO, ...inicial })
   /* La fecha va con el calendario, no con un select de tres opciones fijas:
      sin eso no se puede reprogramar a un día cualquiera. */
@@ -145,7 +149,8 @@ export function NewAppointmentModal({
     const [dd, mm, yyyy] = d.date.split('-').map(Number)
     return Number.isNaN(dd) ? null : new Date(yyyy, mm - 1, dd)
   }, [d.date])
-  const [asap, setAsap] = useState(true)
+  /* Al editar no se marca ASAP solo: el turno ya existe y no lo traía. */
+  const [asap, setAsap] = useState(!edicion)
   const [plan, setPlan] = useState('p1')
   const [visita, setVisita] = useState('v1')
   const elegida = VISITAS.find((v) => v.id === visita)
@@ -155,7 +160,7 @@ export function NewAppointmentModal({
   /* El calendario del día se despliega al costado cuando se toca la fecha o la hora (sólo en el paso 1). */
   const [tocoHorario, setTocoHorario] = useState(false)
   const [paso, setPaso] = useState<1 | 2>(1)
-  const mostrarPanel = paso === 1 && tocoHorario
+  const mostrarPanel = (edicion || paso === 1) && tocoHorario
   const set = (k: keyof typeof VACIO) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   const req = (k: keyof typeof VACIO) =>
     intentado && !d[k].trim() ? OBLIGATORIO : undefined
@@ -188,7 +193,7 @@ export function NewAppointmentModal({
     const manejado = onGuardar?.(d)
     if (!manejado) {
       aviso.ok(
-        editando
+        edicion
           ? `Appointment for ${d.patient} updated.`
           : `Appointment for ${d.patient} booked at ${d.start}.`,
       )
@@ -198,22 +203,38 @@ export function NewAppointmentModal({
     onClose()
   }
 
+  /* Paso 2 de 2.0: el link a una visita del plan (opcional). */
+  const seccionVisita = (
+    <DrawerSection title="Link to treatment plan visit">
+      <div className="flex flex-col gap-2">
+        <FieldLabel>Treatment plan</FieldLabel>
+        {PLANES.map((p) => <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />)}
+      </div>
+      <div className="flex flex-col gap-2">
+        <FieldLabel>Visit</FieldLabel>
+        {VISITAS.map((v) => <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />)}
+      </div>
+    </DrawerSection>
+  )
+
   return (
     <ModalShell
-      title={titulo}
-      description="Customize the schedule you want to see"
+      title={edicion ? 'Edit Appointment' : 'New Appointment'}
       onClose={onClose}
       width="max-w-[560px]"
-      steps={['Patient and Scheduling', 'Link to treatment plan visit']}
+      steps={edicion ? undefined : ['Patient and Scheduling', 'Link to treatment plan visit']}
       step={paso - 1}
-      actions={<DrawerActions step={paso - 1} total={2} onNext={continuar} onBack={() => setPaso(1)} onCancel={onClose} onSave={guardar} />}
+      actions={edicion
+        ? <DrawerActions onCancel={onClose} onSave={guardar} saveLabel="Save Changes" />
+        : <DrawerActions step={paso - 1} total={2} onNext={continuar} onBack={() => setPaso(1)} onCancel={onClose} onSave={guardar} />}
       aside={mostrarPanel ? <AppointmentSlotPicker fecha={fecha ? fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : undefined} seleccion={d.start} paciente={d.patient} onPick={elegirFranja} className="h-full rounded-none border-0" /> : undefined}
     >
-      {paso === 1 ? (
+      {/* Al editar, todo junto en una sola columna: lo del paso 1 y, abajo, la visita linkeada. */}
+      {(edicion || paso === 1) && (
         <div className="flex flex-col gap-6">
         {/* Una columna, campos de a dos en el orden de CON-4090: Status y Requestor, Reason y Date, Start y End, Operatory.
            Al tocar la fecha o la hora se despliega al costado el calendario del día para elegir la franja. */}
-        <DrawerSection title="Patient and Scheduling" description="Complete the details below to schedule the appointment.">
+        <DrawerSection title="Patient and Scheduling">
           <PersonSearchField
             label="Patient" required placeholder="Search by name, number, DOB or email" personas={PACIENTES} subtitulo={pacienteNumero} chips={pacienteChips}
             value={d.patient} onChange={set('patient')} error={req('patient')}
@@ -262,20 +283,10 @@ export function NewAppointmentModal({
           </div>
           <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
         </DrawerSection>
+        {edicion && seccionVisita}
         </div>
-      ) : (
-        /* Paso 2 de 2.0: el link a una visita del plan (opcional). */
-        <DrawerSection title="Link to treatment plan visit" description="Optional. Show this only when the appointment should be tied to a planned treatment visit.">
-          <div className="flex flex-col gap-2">
-            <FieldLabel>Treatment plan</FieldLabel>
-            {PLANES.map((p) => <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />)}
-          </div>
-          <div className="flex flex-col gap-2">
-            <FieldLabel>Visit</FieldLabel>
-            {VISITAS.map((v) => <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />)}
-          </div>
-        </DrawerSection>
       )}
+      {!edicion && paso === 2 && seccionVisita}
       {moviendo && elegida?.vinculada && (
         <MoverVisitaDialog visita={elegida.name} turno={elegida.vinculada} onConfirm={terminar} onCancel={() => setMoviendo(false)} />
       )}

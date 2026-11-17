@@ -743,3 +743,29 @@ de abajo (al pasar a Booked o Proposed se piden más datos).
   El Figma traía "Sábado, 19 de febrero de 2022".
 - Pendiente (con el texto que apruebe Julián): la bajada "Customize the schedule you want to see" es la del filtro de la
   agenda, en red.dev y acá.
+
+## CON-3249 · Edit Appointment sin pasos, también desde el calendario (2026-11-17)
+
+Pedido de Julián: si el turno ya está cargado, editarlo no tiene que pasar por los pasos de New Appointment; y al
+detalle del turno de la agenda le faltaba la forma de editarlo. CON-3249 (reprogramación por secretaría) es la historia:
+el turno se actualiza en su lugar, sin crear otro, y sólo si está activo.
+
+1. **Edit Appointment sin pasos** (`NewAppointmentModal` con `edicion`): Patient and Scheduling, Additional y Link to
+   treatment plan visit una debajo de la otra, con los datos cargados, y un solo **Save Changes**, como la ficha de una
+   Location. Vale para los cuatro lugares que ya lo abrían (Dashboard, Patients, Location → Rooms y su aviso de turnos
+   afectados) y para la agenda. Agendar una solicitud sigue siendo New Appointment con pasos: crea un turno.
+2. **Lápiz en la cabecera del detalle del turno**, al lado de la ✕, como en los calendarios conocidos: el pie queda
+   para Delete y Check In, que ya ocupan el ancho. Abre Edit Appointment y, al guardar, el bloque se actualiza en la
+   grilla con un toast con la fecha y hora nuevas.
+3. **Fulfilled, No-show y Cancelled no se editan** (CON-3249: "la cita debe estar activa"): el lápiz se ve apagado y el
+   tooltip dice por qué, igual que Delete. `esEditable()` en `calendar-data.ts`.
+4. **Horas**: el drawer va de hora en hora; un turno de las 09:30 se muestra 09 AM – 10 AM. Si al guardar no se tocaron
+   las horas, el turno conserva las exactas (no pasa a 09:00 por cambiar la sala).
+5. **ASAP** sale destildado al editar: el turno no lo traía y tildarlo solo lo marcaba como urgente.
+6. Se sacan las bajadas de New Appointment ("Customize the schedule you want to see" y las de cada sección): ver
+   *Drawers sin bajada* en `figma/README.md`.
+
+**Para el dev:** `NewAppointmentModal` cambia `titulo="Edit Appointment"` por `edicion` (booleano).
+`AppointmentDetailsDrawer` suma `onEdit?: () => void`. e2e en `tests/scheduling-edit.e2e.ts`.
+
+**A validar con usuarios:** si recepción encuentra el lápiz en la cabecera o lo busca abajo, junto a Check In.

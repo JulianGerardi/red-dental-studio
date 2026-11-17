@@ -137,7 +137,7 @@ function Demo(a: Args) {
         {ficha && <PatientDetailsPopover name={appt.name} initials={appt.initials} anchor={ficha} onClose={() => setFicha(null)} />}
         {editando && (
           <NewAppointmentModal
-            titulo="Edit Appointment"
+            edicion
             inicial={{ patient: a.name, primary: a.provider, operatory: a.operatory, reason: a.reason, status: 'Check-in', date: formatDMY(new Date()), ...franjaDe(a.time) }}
             onClose={() => setEditando(false)}
           />
@@ -150,7 +150,7 @@ function Demo(a: Args) {
         <AppointmentCard appt={appt} compact onEdit={() => setEditando(true)} />
         {editando && (
           <NewAppointmentModal
-            titulo="Edit Appointment"
+            edicion
             inicial={{ patient: a.name, primary: a.provider, operatory: a.operatory, reason: a.reason, status: 'Check-in', date: formatDMY(new Date()), ...franjaDe(a.time) }}
             onClose={() => setEditando(false)}
           />

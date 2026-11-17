@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom'
 import { ChevronDown, ChevronLeft, ChevronRight, Plus, CalendarCheck, Inbox } from 'lucide-react'
 import { AppointmentDetailsDrawer } from '@/components/scheduling/AppointmentDetailsDrawer'
 import { ViewMenu, VISTA_INICIAL, type VistaCalendario } from '@/components/scheduling/ViewFiltersPanel'
-import { NewAppointmentModal } from '@/components/scheduling/NewAppointmentModal'
+import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
+import { formatDMY } from '@/components/ui/date-picker'
 import {
   SOLICITUDES, datosDeSolicitud, fechaLegible, type Solicitud,
 } from '@/components/scheduling/requests-data'
@@ -57,6 +58,8 @@ export default function Scheduling() {
      desaparecen de la lista. */
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>(SOLICITUDES)
   const [agendando, setAgendando] = useState<Solicitud | null>(null)
+  /* Edit appointment desde el detalle: el turno y lo que el drawer recibe cargado. */
+  const [editando, setEditando] = useState<{ ev: EventoConFecha; datos: DatosTurno } | null>(null)
 
   /* Los turnos se pueden arrastrar a otro día y hora. El Figma no lo muestra
      —es un frame estático— pero es lo que se espera de un calendario. */
@@ -126,6 +129,32 @@ export default function Scheduling() {
   const crearTurno = (d: DatosGuardado) => {
     setEventos((prev) => [...prev, construirEvento(d)])
     return false
+  }
+
+  /* Turno de la grilla -> datos del drawer. El drawer va de hora en hora: 08:15 se muestra como 08 AM. */
+  const datosDeEvento = (ev: EventoConFecha): DatosTurno => {
+    const i = HORAS.findIndex((h) => hora24(h) === Math.floor(ev.start))
+    const desde = HORAS[i] ?? ''
+    const hasta = i < 0 ? '' : HORAS[Math.min(i + Math.max(1, Math.round(ev.duration)), HORAS.length - 1)]
+    return {
+      patient: ev.patient, primary: ev.provider, operatory: ev.room, reason: ev.reason, status: ev.state,
+      date: formatDMY(ev.fecha), start: desde, end: hasta,
+    }
+  }
+  const abrirEdicion = (ev: EventoConFecha) => {
+    setDetail(null)
+    setEditando({ ev, datos: datosDeEvento(ev) })
+  }
+  /* Guardar la edición (CON-3249): el turno se actualiza en su lugar. Si no se tocaron las horas, conserva las exactas
+     (08:15 no pasa a 08:00 por guardar otro dato). */
+  const guardarEdicion = (ev: EventoConFecha, inicial: DatosTurno, d: DatosGuardado) => {
+    const nuevo = construirEvento(d)
+    const mismasHoras = d.start === inicial.start && d.end === inicial.end
+    const actualizado = mismasHoras ? { ...nuevo, start: ev.start, duration: ev.duration } : nuevo
+    setEventos((prev) => prev.map((e) => (e === ev ? actualizado : e)))
+    const rotulo = actualizado.fecha.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    aviso.ok(`Appointment for ${d.patient} updated: ${rotulo}, ${fmtExacta(actualizado.start)}.`)
+    return true
   }
 
   /* Delete (CON-2990): el turno sale de la grilla; la pregunta la hace el detalle. */
@@ -320,9 +349,18 @@ export default function Scheduling() {
           anchor={detail.rect}
           onClose={() => setDetail(null)}
           onDelete={() => borrarTurno(detail.ev)}
+          onEdit={() => abrirEdicion(detail.ev)}
         />
       )}
       {panel === 'new' && <NewAppointmentModal onGuardar={crearTurno} onClose={() => setPanel(null)} />}
+      {editando && (
+        <NewAppointmentModal
+          edicion
+          inicial={editando.datos}
+          onGuardar={(d) => guardarEdicion(editando.ev, editando.datos, d)}
+          onClose={() => setEditando(null)}
+        />
+      )}
       {/* Agendar una solicitud es crear un turno, no editarlo: el modal es el
           mismo pero llega con lo que el paciente ya había pedido. */}
       {agendando && (

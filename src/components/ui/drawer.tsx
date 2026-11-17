@@ -11,13 +11,14 @@ import { StepIndicator } from '@/components/ui/step-indicator'
    plataforma. Las confirmaciones de una sola pregunta siguen siendo ConfirmDialog. Ver Components / UI / Drawer.
 
    Como en 2.0:
-   - Título y bajada arriba; si hay varias partes, los pasos debajo, sin línea que los separe. Cada paso dice su nombre
-     (General, Contact, Address…) en vez de "Step": así se sabe qué se está haciendo (Julián, 2026-10-06).
+   - Título solo arriba, sin bajada (Julián, 2026-11-17): `description` queda para el lector de pantalla. Si hay varias
+     partes, los pasos debajo, sin línea que los separe. Cada paso dice su nombre (General, Contact, Address…) en vez de
+     "Step": así se sabe qué se está haciendo (Julián, 2026-10-06).
    - Contenido en una sola columna, con secciones de título suelto -sin caja ni borde- y campos de a dos por fila.
    - Pie con dos botones del mismo ancho: a la izquierda Cancel o Return, a la derecha Next Step o Save.
    - Un panel de apoyo (`aside`, el calendario de horarios de New Appointment) se despliega al costado del drawer.
-   - Al editar algo que ya existe, las secciones van en pestañas (`tabs`) en vez de pasos: se entra directo a la que hace
-     falta y un solo "Save Changes" guarda todo (Edit Patient, Julián, 2026-10-22).
+   - Al editar algo que ya existe, sin pasos ni pestañas: todas las secciones una debajo de la otra, con los datos
+     cargados, y un solo "Save Changes" (como la ficha de una Location; Julián, 2026-11-17).
    Radix Dialog por dentro: el foco queda adentro, Escape y la capa lo cierran. */
 
 /* Bug: con poca altura de ventana, un paso con muchos campos (New Appointment, paso 1) quedaba cortado a mitad del
@@ -41,7 +42,7 @@ export function Drawer({
   open: boolean
   onClose: () => void
   title: string
-  /** Bajada del título; si no hay, el título también la describe para el lector de pantalla. */
+  /** Sólo para el lector de pantalla: el drawer no muestra bajada (2026-11-17). Sin esto, lo describe el título. */
   description?: string
   /** Los nombres de los pasos, si el formulario tiene varias partes. */
   steps?: readonly string[]
@@ -101,7 +102,7 @@ export function Drawer({
             <div className="flex items-start justify-between gap-3 px-6 pt-6">
               <div className="min-w-0">
                 <DialogPrimitive.Title className="text-[18px] leading-tight font-bold text-ink">{title}</DialogPrimitive.Title>
-                <DialogPrimitive.Description className={description ? 'mt-1 text-[12px] text-ink-muted' : 'sr-only'}>
+                <DialogPrimitive.Description className="sr-only">
                   {description ?? title}
                 </DialogPrimitive.Description>
               </div>
@@ -140,7 +141,8 @@ export function Drawer({
   )
 }
 
-/* Una sección del drawer: título suelto y sus campos debajo, sin caja (como en 2.0). */
+/* Una sección del drawer: título suelto y sus campos debajo, sin caja (como en 2.0). `description` es un dato de la
+   sección (lo elegido, un aviso), no una bajada genérica: esas se sacaron el 2026-11-17. */
 export function DrawerSection({ title, description, children, className }: { title: string; description?: string; children: React.ReactNode; className?: string }) {
   return (
     <section className={cn('flex flex-col gap-4', className)}>

@@ -581,3 +581,17 @@ línea**. Afecta a todos los `ui/confirm-dialog` (27 en la app).
 
 Para validar: si el ícono neutro (info) en preguntas simples suma o es ruido; si conviene sacarlo y dejar ícono sólo en
 rojos y avisos.
+
+## Drawers sin bajada (2026-11-17)
+
+Pedido de Julián: los drawers llevan el título solo. `ui/drawer` deja la `description` sólo para el lector de pantalla
+(el diálogo sigue teniendo su descripción accesible) y se sacan las bajadas genéricas de las secciones (New Appointment,
+Exceptions). Quedan las de sección que son un dato, no una bajada: "Selected Exception Types: …" y el aviso de "No
+covered option".
+
+Drawers cuya bajada era un dato y ahora no se ve (a revisar con Julián si se suma al título o al cuerpo): Manage
+Licenses (nombre de la cuenta), Exam review (provider · fecha), AI Narrative Editor (código y versión), Record detail
+("Procedure · Read-only summary"), Location Number (cómo conseguir el número) y Manage Exceptions.
+
+Editar algo ya cargado tampoco lleva pasos ni pestañas: secciones apiladas y un solo Save Changes (Edit Patient, Edit
+Appointment; ver patients.md y scheduling.md).
