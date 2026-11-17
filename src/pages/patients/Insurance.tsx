@@ -18,6 +18,7 @@ import {
 } from '@/data/insurance'
 import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3817:865128 "Insurance", frames 3817:865704 y 3831:897436.
 
@@ -138,7 +139,7 @@ export default function Insurance() {
   }
   const orden = ordenSiguiente(planes)
   const set = (k: keyof typeof d) => (v: string) => setD((p) => ({ ...p, [k]: v }))
-  const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? 'This field is required.' : undefined)
+  const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? OBLIGATORIO : undefined)
 
   /* Las filas llevan grip: se reordenan arrastrando (o con ↑ ↓). Sólo los
      planes vigentes; los del historial quedan fijos al final. */
@@ -225,7 +226,7 @@ export default function Insurance() {
                     subtitulo={(v) => porEtiqueta(v)?.subscriberId}
                     chips={(v) => { const x = porEtiqueta(v); return x && [{ label: 'Carrier', value: x.carrier, tone: 'neutral' }, { label: 'Plan', value: x.plan }] }}
                     emptyText="Subscription not found."
-                    error={intentado && !elegida ? (busqueda.trim() ? 'Select a subscription from the list.' : 'This field is required.') : undefined}
+                    error={intentado && !elegida ? (busqueda.trim() ? 'Select a subscription from the list.' : OBLIGATORIO) : undefined}
                   />
                   <button
                     type="button"
@@ -309,7 +310,7 @@ export default function Insurance() {
       {modal === 'nueva' && <NewSubscriptionModal paciente="John Smith" existentes={suscripciones} onCreada={creada} onClose={() => setModal(null)} />}
       {modal === 'borrar' && (
         <ConfirmDialog
-          tone="danger" title="Are you sure you want to delete this subscription?" confirmLabel="Confirm"
+          tone="danger" icon="delete" title="Are you sure you want to delete this subscription?" confirmLabel="Confirm"
           onConfirm={borrar} onCancel={() => setModal(null)}
         >
           This action cannot be undone. This will permanently delete this subscription and all associated data.

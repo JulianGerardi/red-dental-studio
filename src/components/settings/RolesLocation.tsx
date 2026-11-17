@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ModalShell, SectionCard, SelectField, FieldLabel } from '@/components/patients/form'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3864:270946 "Settings — Employee (Roles & Location)" y el modal
    "Assign Role".
@@ -160,7 +161,7 @@ export function AssignRoleModal({
           value={rol}
           onChange={setRol}
           options={ROLES_DISPONIBLES}
-          error={intentado && !rol ? 'This field is required.' : undefined}
+          error={intentado && !rol ? OBLIGATORIO : undefined}
         />
 
         <SectionCard title="Locations">

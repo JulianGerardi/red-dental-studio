@@ -3,6 +3,96 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-16
+
+### Documentación: borrar una franja, cerrar un día, citas afectadas y advertencias en azul ([#153](https://github.com/JulianGerardi/red-dental-studio/pull/153))
+- **Storybook:**
+  - *Pages / Parts / Location detail* suma *Delete working hours?*, *Close working hours?*, *Unable to change* y la
+    tabla *Working Hours · States*.
+  - *HoursAppointmentsDialog* se rehízo con CON-4167: la cita resuelta sale de la lista, sin citas se vuelve al origen
+    y está el bloqueo.
+  - *ConfirmDialog*: la advertencia va en azul.
+- **Screens & Flows:** Locations suma el flujo *Delete hours & close a day* (9 pantallas). La página se recapturó y se
+  reconectó a la library del design system.
+- **Design system en Figma:** *Confirm dialog* con la advertencia en azul y dos ejemplos nuevos. Hay que republicar
+  la library.
+- **Para el dev:**
+  - La app no cambia.
+  - `pulsarRol` (`design-system/play.ts`) acepta `switch`.
+  - Recapturar una página conectada a la library tiene pasos nuevos: ver `figma-docs.md`.
+
+### New/Edit Patient: nombre completo en una fila ([#152](https://github.com/JulianGerardi/red-dental-studio/pull/152))
+- Paso *General* (`CamposGeneral`): *First Name*, *Middle Name* y *Last Name* en una fila de tres; debajo, *Email* y
+  *Birthdate*. En celular, apilados.
+- **Para el dev:** excepción deliberada a "campos de a dos" en drawers (`patients.md`, 2026-11-16). Sin cambios de datos
+  ni validaciones.
+
+### Working Hours: borrar una franja, cerrar un día y citas afectadas según la HU 8 ([#151](https://github.com/JulianGerardi/red-dental-studio/pull/151))
+- **Delete working hours?** (la ✕ de una franja, CON-4166): pregunta antes y borra sólo esa franja. Si es la última,
+  el día queda Closed.
+- **Close working hours?** (el switch, CON-4165): pregunta antes y el día conserva sus franjas. Al reabrirlo,
+  *Set working hours* las trae.
+- **Affected appointments** (CON-4167): entran sólo las citas que pierden cobertura. Lo hecho cita por cita se guarda en
+  el momento y la cita resuelta sale de la lista. Con citas en Check In o In Progress no se aplica nada
+  (*Unable to change working hours*).
+- **`ConfirmDialog`:** el ícono de advertencia (`icon="warning"`) va en azul; en `danger` sigue rojo.
+- **Para el dev:**
+  - En `LocationDetail.tsx`, todo cambio de horarios es una `Operacion` (`panel`, `quitar`, `cerrar`) que pasa por
+    pregunta, impacto (`pierde`) y aplicación.
+  - `HoursAppointmentsDialog` recibe `afectados` ya calculados y `onCambiar`. `HoursBlockedDialog` es nuevo.
+  - `EstadoTurnoLocacion` suma Check In e In Progress.
+
+### Campos obligatorios vacíos: siempre "This field is required." ([#150](https://github.com/JulianGerardi/red-dental-studio/pull/150))
+- Todo campo obligatorio vacío dice *This field is required.* debajo (CON-4161). Salen *Required.*, *Enter the reason.*,
+  *A billing name is required.*, *Please add a procedure to the exception* y las demás variantes.
+- **Para el dev:**
+  - Usar `OBLIGATORIO` de `src/lib/validacion.ts`; no escribir el texto a mano.
+  - Los mensajes de valor inválido (*Enter a valid email.*, *Enter the 10-digit NPI.*) quedan para un campo con algo
+    cargado; vacío, siempre `OBLIGATORIO`.
+
+### Affected appointments con jerarquía clara, "+N" sólo cuando no entra y asterisco en las horas ([#149](https://github.com/JulianGerardi/red-dental-studio/pull/149))
+- **Affected appointments** (`HoursAppointmentsDialog`): el título es *Affected appointments*. Cada fila muestra el
+  paciente, la fecha con el horario completo y el provider, con el estado como badge a la derecha junto al ⋮. Queda un
+  solo contador, *Appointments (N)*: salen el pie y la línea por fila.
+- **Working Hours** (`FranjasDia`): una línea con todas las franjas que entran junto a *Edit hours*. Sólo las que no
+  entran quedan en "+N", que las despliega. En celular, el día y el switch van arriba y las franjas debajo.
+- **Start Time y End Time con asterisco** en *Set working hours* y en *New Hours* (Employees).
+- **Screens & Flows:** Locations suma el flujo *Set working hours: other days & affected appointments*.
+- **Para el dev:**
+  - `FranjasDia` mide con `ResizeObserver` sobre una copia invisible (`aria-hidden`).
+  - En tests, contar las franjas por el botón *Remove …*, no por el texto: la copia lo repite.
+
+### Design system: ConfirmDialog con ícono en línea, Set working hours y turnos afectados ([#148](https://github.com/JulianGerardi/red-dental-studio/pull/148))
+- **Storybook:**
+  - *Elements / ConfirmDialog*: el control `icon` (auto · warning · delete) y una story por combinación de tono e
+    ícono.
+  - *LocationHoursModal*: ahora tiene Parts, States y Specs.
+  - *HoursAppointmentsDialog*: página nueva.
+- **Figma del design system** ([Confidentally UI · Design System](https://www.figma.com/design/iJvnuV8TLStMXpNjdwsuDe),
+  *Feedback & Overlays*): el *Confirm dialog* tiene el ícono de 16 px, las propiedades `Tone` × `Icon` (5 variantes) y
+  ejemplos reales de la app debajo.
+- **Para el dev:**
+  - La app no cambia.
+  - Para Code Connect: `tone` → `Tone`, `icon` → `Icon` (sin prop = Auto), `title` → `Title` y `children` → `Body`.
+  - El link al Figma del design system está en `CLAUDE.md`. El detalle, en `design-system.md` (2026-11-16).
+
+### Working Hours: aplicar el horario a otros días, turnos afectados y pop-ups con ícono en línea ([#147](https://github.com/JulianGerardi/red-dental-studio/pull/147))
+- **Set working hours (Locations):** el día de origen queda elegido y no se puede sacar. Si un día adicional está Open
+  con otro horario, pregunta *Replace working hours?* nombrando sólo esos días, en el orden de la tabla (CON-1546;
+  historia de Abril sin clave en Jira todavía). La comparación ordena las franjas.
+- **Turnos afectados:** si las horas nuevas dejan afuera turnos Proposed o Booked, antes de guardar se abre
+  `HoursAppointmentsDialog`: por turno, Edit appointment, Cancel appointment o Mark as No Show; Confirm guarda las
+  horas y pasa el resto a Waiting List. Cancel no guarda nada (resolución de CON-2890, con el texto adaptado a la
+  locación).
+- **`ui/confirm-dialog`:** sale el ícono de 36 px con círculo. Ahora todos llevan un ícono de 16 px junto al título que
+  sale del tono (info azul; triángulo rojo en `danger`).
+- **Para el dev:**
+  - `LocationHoursModal` suma `horario` (la semana actual, 0-6) y `onGuardar` puede devolver `false` para dejar el
+    panel abierto mientras se resuelven turnos. Exporta `mismoHorario`, `listaDias`, `aMinutos` y `deChip`.
+  - Datos nuevos: `TURNOS_LOCACION` en `src/data/location-detail.ts`.
+  - `ConfirmDialog` suma `icon="delete"` (tacho): usarlo sólo en lo que borra. `icon="warning"` sigue para avisos.
+  - Decisiones en `figma/modulos/locations.md` y `figma/README.md` (2026-11-16).
+
 ## 2026-11-15
 
 ### Figma: Fill container, íconos de los buscadores y design system conectado ([#145](https://github.com/JulianGerardi/red-dental-studio/pull/145))

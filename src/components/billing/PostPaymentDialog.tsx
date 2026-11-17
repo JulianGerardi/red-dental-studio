@@ -12,6 +12,7 @@ import {
   type TipoAjusteBilling,
 } from '@/data/billing'
 import { formatMDY } from '@/lib/fecha'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Cada botón de Billing abre su drawer, como red.dev: New Patient Payment (-), Credit Adjustment (-) y Enter Charge (+)
    Adjustment, con los campos y las listas de cada uno (billing.md, 2026-11-13). Reemplaza al "Post payment" único del
@@ -22,7 +23,7 @@ const TITULO: Record<TipoAjusteBilling, string> = {
   'Credit Adjustment': 'Credit Adjustment (-)',
   'Charge Adjustment': 'Enter Charge (+) Adjustment',
 }
-const REQUERIDO = 'This field is required.'
+const REQUERIDO = OBLIGATORIO
 const CHEQUE = 'Check Payment'
 
 type Metodo = { id: number; monto: string; metodo: string; cheque: string; banco: string }

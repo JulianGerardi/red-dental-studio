@@ -7,6 +7,7 @@ import { CollapsibleFields, DateField, LinkPersonCheckbox, OptionCheckbox, Perso
 import type { DatosPaciente } from '@/data/patientsStore'
 import { PERSONAS_SISTEMA, type PersonaSistema } from '@/data/personas'
 import { codigoDe } from '@/data/paises'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Las tres secciones del formulario de paciente -General, Guardian y Demography-, las mismas en New Patient (tres pasos)
    y en Edit Patient (tres pestañas). Figma 3751:73452 (New) y 5277:123056 (Edit). Decisiones y anomalías en
@@ -17,7 +18,6 @@ export type SeccionPaciente = (typeof SECCIONES_PACIENTE)[number]
 export type ErroresPaciente = Partial<Record<keyof DatosPaciente, string>>
 export type CambiarPaciente = <K extends keyof DatosPaciente>(campo: K, valor: DatosPaciente[K]) => void
 
-const OBLIGATORIO = 'This field is required.'
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 /* En qué sección vive cada campo: el guardado la usa para señalar la pestaña y llevar al usuario hasta el campo. */
@@ -207,12 +207,17 @@ export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo }:
     <DrawerSection title="General Information">
       {vinculo && <LinkPersonCheckbox checked={vinculo.activo} onChange={vinculo.onActivo} />}
       {vinculo?.activo ? <BuscarPersona v={vinculo} /> : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Campo nombre="first"><TextField label="First Name" required placeholder="John" value={d.first} onChange={(v) => cambiar('first', v)} error={errores.first} /></Campo>
-          <Campo nombre="middle"><TextField label="Middle Name" placeholder="Lorem" value={d.middle} onChange={(v) => cambiar('middle', v)} /></Campo>
-          <Campo nombre="last"><TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={(v) => cambiar('last', v)} error={errores.last} /></Campo>
-          <Campo nombre="birthday"><DateField label="Birthdate" required valorInicial={d.birthday} onChange={(v) => cambiar('birthday', v)} error={errores.birthday} /></Campo>
-          <Campo nombre="email"><TextField label="Email" placeholder="john.smith@hotmail.com" value={d.email} onChange={(v) => cambiar('email', v)} error={errores.email} /></Campo>
+        /* El nombre completo en una fila de tres; debajo, email y birthdate (patients.md, 2026-11-16). */
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <Campo nombre="first"><TextField label="First Name" required placeholder="John" value={d.first} onChange={(v) => cambiar('first', v)} error={errores.first} /></Campo>
+            <Campo nombre="middle"><TextField label="Middle Name" placeholder="Lorem" value={d.middle} onChange={(v) => cambiar('middle', v)} /></Campo>
+            <Campo nombre="last"><TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={(v) => cambiar('last', v)} error={errores.last} /></Campo>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Campo nombre="email"><TextField label="Email" placeholder="john.smith@hotmail.com" value={d.email} onChange={(v) => cambiar('email', v)} error={errores.email} /></Campo>
+            <Campo nombre="birthday"><DateField label="Birthdate" required valorInicial={d.birthday} onChange={(v) => cambiar('birthday', v)} error={errores.birthday} /></Campo>
+          </div>
         </div>
       )}
       {portalVinculado ? <CuentaPortal /> : (

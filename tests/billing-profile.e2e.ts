@@ -11,6 +11,10 @@ test('Location: se habilita sólo al guardar datos válidos, y deshabilitarla la
 
   await screen.getByRole('switch', 'Use this Location as a Billing Provider').tap()
   await screen.getByRole('button', 'Save and enable').tap()
+  await expect(screen.getByText('This field is required.').first()).toBeVisible()
+
+  await screen.getByPlaceholder('10 digits').fill('123')
+  await screen.getByRole('button', 'Save and enable').tap()
   await expect(screen.getByText('Enter the 10-digit NPI.')).toBeVisible()
 
   await screen.getByPlaceholder('10 digits').fill('1234567890')

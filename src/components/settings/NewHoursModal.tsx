@@ -4,6 +4,7 @@ import { CirclePlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ModalShell, SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3864:267207 "New Hours". Aviso ámbar con barra de acento, locación,
    rangos horarios con su nota de zona horaria, los días de repetición y el
@@ -59,7 +60,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
             options={['Abril', 'Alaska Medical', 'Bayside Dental']}
             value={locacion}
             onChange={setLocacion}
-            error={intentado && !locacion.trim() ? 'This field is required.' : undefined}
+            error={intentado && !locacion.trim() ? OBLIGATORIO : undefined}
           />
           <p className="mt-1.5 text-[11px] text-ink-muted">{ZONA}</p>
           </div>
@@ -69,14 +70,14 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
           <div key={i}>
             <div className="grid gap-4 sm:grid-cols-2">
               <SelectField
-                label="Start Time" placeholder="00:00 hs" options={HORAS} value={r.inicio}
+                label="Start Time" required placeholder="00:00 hs" options={HORAS} value={r.inicio}
                 onChange={(v) => setRangos((p) => p.map((x, j) => (j === i ? { ...x, inicio: v } : x)))}
-                error={intentado && !r.inicio.trim() ? 'Required.' : undefined}
+                error={intentado && !r.inicio.trim() ? OBLIGATORIO : undefined}
               />
               <SelectField
-                label="End Time" placeholder="00:00 hs" options={HORAS} value={r.fin}
+                label="End Time" required placeholder="00:00 hs" options={HORAS} value={r.fin}
                 onChange={(v) => setRangos((p) => p.map((x, j) => (j === i ? { ...x, fin: v } : x)))}
-                error={intentado && !r.fin.trim() ? 'Required.' : undefined}
+                error={intentado && !r.fin.trim() ? OBLIGATORIO : undefined}
               />
             </div>
             <p className="mt-1.5 text-[11px] text-ink-muted">{ZONA}</p>

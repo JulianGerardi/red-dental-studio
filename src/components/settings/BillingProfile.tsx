@@ -22,6 +22,7 @@ import { TELEFONO_VACIO, esNorteamerica, type Telefono } from '@/data/finanzas'
 import {
   TIPOS_FISCALES, NPI_VALIDO, FISCAL_VALIDO, textoDireccion, textoTelefono, type TipoFiscal,
 } from '@/data/billingProfiles'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Piezas compartidas del Insurance / Billing Profile de Location y de provider. Ver figma/modulos/billing-profile.md. */
 
@@ -159,8 +160,8 @@ export type Credenciales = { npi: string; tipoFiscal: TipoFiscal; fiscal: string
 export type ErroresCredenciales = { npi?: string; fiscal?: string }
 
 export const validarCredenciales = (c: Credenciales): ErroresCredenciales => ({
-  npi: NPI_VALIDO(c.npi) ? undefined : 'Enter the 10-digit NPI.',
-  fiscal: FISCAL_VALIDO(c.fiscal) ? undefined : 'Enter the 9-digit tax identification number.',
+  npi: NPI_VALIDO(c.npi) ? undefined : c.npi ? 'Enter the 10-digit NPI.' : OBLIGATORIO,
+  fiscal: FISCAL_VALIDO(c.fiscal) ? undefined : c.fiscal ? 'Enter the 9-digit tax identification number.' : OBLIGATORIO,
 })
 
 export function CamposCredenciales({

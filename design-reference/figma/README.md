@@ -412,6 +412,13 @@ los campos marcados, y el toast recién sale cuando el guardado se completa.
 Los campos se marcan recién después del primer intento de guardar, no mientras
 se completa el formulario.
 
+**Campo obligatorio vacío: siempre *This field is required.*** (2026-11-16, CON-4161). Un solo texto en toda la app,
+sale de `OBLIGATORIO` (`src/lib/validacion.ts`); no escribir variantes (*Required.*, *Enter the reason.*, *A billing
+name is required.*). Los mensajes específicos quedan sólo para un valor cargado pero inválido (*Enter a valid email.*,
+*Enter the 10-digit NPI.*, *Select a carrier from the list.*) y para grupos que no son un campo (*Choose at least one
+role.*, *Add at least one time range.*). Los resúmenes de secciones plegadas (*Complete the address.*) siguen
+diciendo qué falta adentro.
+
 ## Inputs funcionales con datos ficticios
 
 Todos los controles de formulario responden, no son decorativos:
@@ -555,3 +562,22 @@ lateral, la reserva se queda. Verificado con Playwright a 1440, 1024 y 390px en 
 Billing: la página termina a ~24px; el botón de Confibot queda sobre el padding interno de las cards, sin tapar texto
 ni controles -el caso más justo es Billing a 1024px, donde "$610" queda a ~3px del botón-. **A validar:** si en
 pantallas con algo alineado a la derecha al pie (paginación, totales) conviene un respiro extra.
+
+## Pop-ups de confirmación: ícono en línea (2026-11-16)
+
+Julián: el ícono de 36 px con círculo de los avisos se veía demasiado grande. Se compararon cuatro variantes (ícono en
+línea, franja y rótulo de tono, aviso dentro del cuerpo, encabezado y pie como el drawer) y eligió la **A, ícono en
+línea**. Afecta a todos los `ui/confirm-dialog` (27 en la app).
+
+1. Un ícono de 16 px pegado al título, sin círculo ni fondo, alineado con la primera línea. Cuerpo y pie no cambian.
+2. **El ícono sale del tono**: neutro → `Info` azul; `tone="danger"` → `TriangleAlert` rojo. Ninguna pantalla tiene que
+   pasar nada.
+3. `icon="warning"` (hay algo que revisar antes de seguir: Consent required, turnos afectados) → `CircleAlert`, ámbar
+   en neutro y rojo si además es `danger` (Rooms con turnos).
+4. `icon="delete"` (nuevo) → tacho rojo, sólo para lo que borra: Delete Appointment, Delete Relationship, Delete
+   procedure (las dos variantes) y borrar una suscripción. Los rojos que descartan, desactivan o deshabilitan llevan el
+   triángulo: un tacho ahí diría que se borra algo que no se borra.
+5. Así, que algo no tiene vuelta atrás ya no depende sólo del color del botón (accesible a quien no distingue el rojo).
+
+Para validar: si el ícono neutro (info) en preguntas simples suma o es ruido; si conviene sacarlo y dejar ícono sólo en
+rojos y avisos.

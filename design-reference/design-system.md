@@ -1261,3 +1261,51 @@ el padding, el radio, el texto y el borde leídos del elemento. Nada se escribe 
 segundo al abrir: se ve en el Playground) y *CountryFlag · loading* (el detector lee `loading="lazy"`).
 
 **Figma.** Desde esta fecha, documentar es Storybook y Figma: ver `figma-docs.md`.
+
+## ConfirmDialog con ícono en línea, Set working hours y turnos afectados (2026-11-16, CON-1546, CON-2890)
+
+Documenta lo publicado en el PR #147. Además del Storybook, el pop-up quedó en el Figma del design system
+([Confidentally UI · Design System](https://www.figma.com/design/iJvnuV8TLStMXpNjdwsuDe), página *💬 Feedback &
+Overlays*, sección *Confirm dialog*), listo para conectarlo con el código (Code Connect).
+
+1. **Elements / ConfirmDialog**: el control `warningIcon` pasa a **icon** (`auto` · `warning` · `delete`), igual que la
+   prop. Stories nuevas por combinación: *Neutral (info)*, *Warning (review first)*, *Danger (discard, deactivate)*,
+   *Danger + warning* y *Delete (trash)*. *States* es la tabla tone × icon → ícono y token; *Parts* y *Specs* cambian el
+   círculo de 36 px por el ícono de 16 px en línea; *Where* suma los pop-ups de Locations, Rooms y los de borrar.
+2. **Components / Settings / LocationHoursModal**: ahora con la estructura completa. Playground (Sunday cerrado),
+   *Edit Hours*, *Other Days Selected* (origen fijo), *With Validation Errors* y *Replace Question* (play que llega a
+   *Replace working hours?*), más Parts, States y Specs. Recibe `horario` con la semana de `HORARIO_SEMANAL`.
+3. **Components / Settings / HoursAppointmentsDialog** (nuevo): Playground, *Partly Managed* (No Show a un turno) y
+   *All Managed*, con Parts, States (qué dice cada fila) y Specs.
+4. **Figma, Confirm dialog**: el component set (19:123) se actualizó en el lugar, sin crear otro.
+   - Propiedades: `Tone` (Default = primary, Destructive = danger) e `Icon` (Auto, Warning, Delete), en las 5
+     combinaciones que usa la app (Default + Delete no existe).
+   - Ícono de 16 px en un *Icon slot* de 16 × 22, con el color enlazado a `dash-blue`, `warn-fg` o `dash-bad-fg`; gap
+     `spacing/2`; botones MD como en el código.
+   - Debajo, *Confirm dialog / Examples* con cuatro instancias de la app: Replace working hours?, These hours affect
+     scheduled appointments, Discard unsaved changes? y Delete Relationship.
+   - La sección *Drawer* bajó para dejar lugar.
+
+Para conectar con Code Connect: `tone` → `Tone` y `icon` → `Icon` (`undefined` = Auto), `title` → `Title` y `children`
+→ `Body`.
+
+## Working Hours: borrar, cerrar, citas afectadas (HU 8) y advertencias en azul (2026-11-16, CON-4165, CON-4166, CON-4167)
+
+Documenta lo publicado en los PR #149 y #151.
+
+1. **Pages / Parts / Location detail** suma:
+   - *Working Hours · Delete working hours?*, *Close working hours?* y *Unable to change*, con play que llega a cada
+     pregunta.
+   - *Working Hours · States*: qué hace cada acción de la tabla (✕, switch, Save, citas afectadas, bloqueo, "+N").
+   - *Day Hours Fit* y *Day Hours Overflow* (`FranjasDia`: "+N" sólo cuando no entra).
+2. **Components / Settings / HoursAppointmentsDialog** se rehízo con CON-4167:
+   - La demo guarda las citas afuera, como la pantalla. *Partly Managed* muestra que la resuelta sale de la lista
+     (*Appointments (1)*) y *All Managed*, que sin citas se vuelve al origen.
+   - *Blocked* muestra `HoursBlockedDialog` y *Appointment Row* la fila suelta (`FilaTurno`).
+   - Parts, States y Specs al día; sale la línea por fila y el contador del pie.
+3. **Elements / ConfirmDialog**: `icon="warning"` va en `dash-blue` (en `danger` sigue rojo); la tabla *States* y la
+   descripción lo dicen. *Where* suma Delete working hours?, Close working hours? y Unable to change working hours.
+4. `design-system/play.ts`: `pulsarRol` acepta `switch`.
+5. **Figma del design system**: la variante *Tone=Default, Icon=Warning* del *Confirm dialog* pasa a `dash-blue`, y los
+   ejemplos suman *Delete working hours?* y *Close working hours?*. Hay que **republicar la library** (*Assets → Publish
+   library*) para que lo tomen las pantallas de *Screens & Flows*.

@@ -165,7 +165,7 @@ export function DialogoBorrar({ procedimiento, caso, onCancel, onConfirm }: {
   const t = MENU_PROCEDIMIENTO.borrarEnCaso
   if (!caso) {
     return (
-      <ConfirmDialog title="Delete procedure" confirmLabel="Delete" tone="danger" onCancel={onCancel} onConfirm={() => onConfirm('paciente')}>
+      <ConfirmDialog title="Delete procedure" confirmLabel="Delete" tone="danger" icon="delete" onCancel={onCancel} onConfirm={() => onConfirm('paciente')}>
         <p>{MENU_PROCEDIMIENTO.borrarSuelto}</p>
         <ResumenConsentimiento procedimientos={[procedimiento]} />
       </ConfirmDialog>
@@ -174,6 +174,7 @@ export function DialogoBorrar({ procedimiento, caso, onCancel, onConfirm }: {
   return (
     <ConfirmDialog
       title="Delete procedure"
+      icon="delete"
       confirmLabel={t.procedimiento.titulo}
       tone="danger"
       otherAction={{ label: t.tx.titulo, onClick: () => onConfirm('caso') }}

@@ -34,6 +34,7 @@ import { RowChevron } from '@/components/ui/data-table'
 import { DetalleRegistro, NavegacionClinica, registroDePlan, useVerRegistro, type DestinoClinico } from '@/components/clinical/RecordDetail'
 import { EstimateDetails, PrototypeControls, situacionDe, type Escenario } from '@/components/clinical/EstimateDetails'
 import { estimacionesIniciales, type Estimacion } from '@/data/estimaciones'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 4118:220403 "Treatment Plan — Section (Cases, Workflow & Dialogs)":
    el rail de estados, la tabla de no asignados, el caso con sus visitas y los
@@ -251,7 +252,7 @@ export function DialogoMover({ onClose }: { onClose: () => void }) {
           value={caso}
           onChange={setCaso}
           options={CASOS.map((c) => c.nombre)}
-          error={intentado && !caso ? 'This field is required.' : undefined}
+          error={intentado && !caso ? OBLIGATORIO : undefined}
         />
       </div>
       <p className="mt-5 text-xs font-medium text-ink">Select destination case</p>
@@ -285,7 +286,7 @@ export function DialogoNuevoGrupo({ onClose }: { onClose: () => void }) {
           value={nombre}
           onChange={setNombre}
           options={CASOS.map((c) => c.nombre)}
-          error={intentado && !nombre ? 'This field is required.' : undefined}
+          error={intentado && !nombre ? OBLIGATORIO : undefined}
         />
       </div>
     </Dialogo>

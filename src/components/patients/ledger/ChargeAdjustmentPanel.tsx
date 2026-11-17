@@ -5,6 +5,7 @@ import {
 import { DatePicker } from '@/components/ui/date-picker'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
 import { formatMDY } from '@/lib/fecha'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 4582:25840. El título es "Enter Charge (+) Adjustment", como red.dev (ledger.md, 2026-11-12). */
 
@@ -59,13 +60,13 @@ export function ChargeAdjustmentPanel({
           </div>
           <TextField
             label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto}
-            error={intentado && !monto.trim() ? 'This field is required.' : undefined}
+            error={intentado && !monto.trim() ? OBLIGATORIO : undefined}
           />
           <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} />
           <SelectField label="Provider" options={PROVIDERS} value={provider} onChange={setProvider} />
           <SelectField
             label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
-            error={intentado && !aplicaA.trim() ? 'This field is required.' : undefined}
+            error={intentado && !aplicaA.trim() ? OBLIGATORIO : undefined}
           />
           <SelectField label="Visit date" options={visitas} value={visita} onChange={setVisita} />
         </div>
