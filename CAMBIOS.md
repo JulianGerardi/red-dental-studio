@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-18
 
-### Figma: fila de tarea (Task row) conectada al design system
+### Figma: fila de tarea (Task row) conectada al design system ([#162](https://github.com/JulianGerardi/red-dental-studio/pull/162))
 - **Task row** nuevo en el design system (`📊 Tables & Lists`): fila de tarea pendiente con variantes por tipo (Clinical Note, Lab Orders, Prescriptions, Referrals). 96 filas de las pantallas pasan a instancias; en el Dashboard la diferencia con el original es < 0,1 % de los píxeles.
 - **Para el dev:** la app no cambia. Motor `tareas` guardado en el archivo de flujos; pendientes (cards de Appointments de la ficha, campos, tablas) y el detalle en `design-reference/figma-design-system.md`, sección *Fila de tarea conectada*.
 
