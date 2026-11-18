@@ -743,3 +743,9 @@ de abajo (al pasar a Booked o Proposed se piden más datos).
   El Figma traía "Sábado, 19 de febrero de 2022".
 - Pendiente (con el texto que apruebe Julián): la bajada "Customize the schedule you want to see" es la del filtro de la
   agenda, en red.dev y acá.
+
+## Detalle del turno: *Guarantor not assigned* con `ui/alert` (2026-11-18)
+
+Sin historia de Jira (devolución de diseño de Abril Viola). La franja con barra a la izquierda, hecha a mano, pasa a
+`Alert` tono warning, sólo título: el mismo aviso que el resto de la app. Detalle de la decisión en patients.md
+(2026-11-18).

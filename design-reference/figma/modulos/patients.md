@@ -530,3 +530,21 @@ de Insurance (insurance.md, 2026-11-10): llevar ese formato a New Appointment y 
    *Birthdate* de a dos, con la opción del portal justo abajo del email. Vale para New y Edit Patient (`CamposGeneral`).
 2. **Excepción a "campos de a dos"** (regla de drawers): el nombre completo se lee como una unidad y en tres columnas
    entra con el error *This field is required.* sin cortarse (drawer de 560). En celular quedan los cinco apilados.
+
+## Avisos: uno solo, `ui/alert`, y sin el de Demography (2026-11-18)
+
+Sin historia de Jira: es una devolución de diseño de Abril Viola (CON-2858 sigue siendo la del guardián).
+
+- **Se saca el aviso de Demography** (*Additional contact and address information. These fields are optional.*). Lo
+  habíamos armado juntando los dos avisos del Figma (anomalía 5) y no estaba en ningún diseño. El paso arranca directo
+  con *Interpreter Required*. La anomalía 5 queda resuelta así.
+- **Un solo estilo de aviso en la app.** Convivían la caja redondeada de `ui/alert` (Billing Profile, Insurance,
+  Finance, Clinical) y franjas con barra a la izquierda hechas a mano. Julián eligió la caja de `ui/alert`, que es el
+  componente del design system, y las franjas pasan a usarla:
+  - Guardian: `Alert` warning, título *This patient is under 18.* y el resto del texto como cuerpo.
+  - `GuarantorBanner`: `Alert` warning (sin el hex `#fffbeb`). Sigue sin usarse en la app.
+  - Los demás, en sus módulos: *Guarantor not assigned* del detalle del turno (scheduling.md), New Hours y Global access
+    (employees.md) y el aviso de presión de Vitals (clinical-mode.md).
+- Las tarjetas con barra de color (turnos, findings, Reason for Visit) **no son avisos** y se quedan como están.
+- `ui/section-notice` queda sin usos en la app. **Pendiente para cuando se documente:** sacarlo del Storybook, de
+  `design-system.md` y del Figma del design system (componente *Section notice*).

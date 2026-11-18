@@ -1,12 +1,13 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  X, TriangleAlert, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity, Trash2,
+  X, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity, Trash2,
 } from 'lucide-react'
 import { BLOCK_STYLE, esEliminable, fmtExacta, type ApptState } from './calendar-data'
 import { useAnclaje } from '@/lib/anclaje'
 import { useEsChico } from '@/lib/media'
 import { aviso } from '@/components/ui/toaster'
+import { Alert } from '@/components/ui/alert'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -199,10 +200,7 @@ export function AppointmentDetailsDrawer({
           <Fila icono={Activity}>Encounter open</Fila>
         </div>
 
-        <div className="flex items-center gap-2 rounded-r-md border-l-[3px] border-l-warn-fg bg-warn-bg px-2.5 py-1.5">
-          <TriangleAlert className="size-3.5 shrink-0 text-warn-fg" />
-          <span className="text-[11px] font-semibold text-warn-fg">Guarantor not assigned</span>
-        </div>
+        <Alert tone="warning" title="Guarantor not assigned" />
 
         <div className={onDelete ? 'grid grid-cols-2 gap-2' : 'grid'}>
           {/* Delete (CON-2990): sólo Proposed; en el resto se ve apagado y dice por qué. Los dos botones, del mismo ancho. */}
