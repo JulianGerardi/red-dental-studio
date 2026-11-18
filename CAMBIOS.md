@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-18
 
+### Relationships: todos los nombres son link y Household con ⋮ (CON-4139, CON-4113) ([#161](https://github.com/JulianGerardi/red-dental-studio/pull/161))
+- **Todos los nombres de las cards** (relaciones y Household) son link azul a la ficha de esa persona
+  (`/patients/:pacienteId`). Ya no hay nombre en negro.
+- **Household lleva el ⋮** con *Edit relationship* y *Delete relationship*, igual que las relaciones. Al editar se
+  conserva la pill *Household*. Sin pacientes en Household: *No household patients*.
+- **Para el dev:** `PersonaCard` siempre dibuja el `Link`; pasale `onEdit`/`onDelete` también en Household. Decisión en
+  `relationships.md` (2026-11-18).
+
 ### New Patient como 2.0, Edit Patient como la ficha de un empleado y tablas de Settings sólo con el ⋮ ([#160](https://github.com/JulianGerardi/red-dental-studio/pull/160))
 - **New Patient** (CON-1328): *Email* obligatorio; Demography con los campos de 2.0 (*Gender\** obligatorio, Race,
   Ethnicity, Marital Status, Profession, Nationality, Language y Religion) e *Interpreter Required* al lado de Language.
