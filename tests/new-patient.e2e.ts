@@ -33,6 +33,10 @@ test('New Patient vincula a una persona que ya existe en el sistema', async ({ a
   await drawer.getByRole('button', /Next Step/).tap()
   await expect(drawer.getByText('Demographic Information')).toBeVisible()
   await expect(drawer.getByText('Guardian Information')).toHaveCount(0)
+  /* Gender es obligatorio (CON-1328). */
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(drawer.getByText('This field is required.')).toBeVisible()
+  await elegirGenero(drawer)
   await drawer.getByRole('button', /^Save/).tap()
 
   await expect(screen.getByText('Michael Miller has been added to the patient list.')).toBeVisible()
@@ -42,12 +46,18 @@ test('New Patient vincula a una persona que ya existe en el sistema', async ({ a
 /* Guardian (CON-2858; patients.md, 2026-11-04): aparece sólo para un menor, que necesita guardián. Se busca a alguien del
    sistema (sin pedir sus datos) o se tilda Add New Person; sus datos, contacto y dirección van en desplegables que se
    abren solos si falta algo. */
+async function elegirGenero(drawer: any) {
+  await drawer.getByRole('button', 'Select gender').tap()
+  await drawer.getByRole('button', 'Female').tap()
+}
+
 async function altaDeMenor(app: { open: (r: string) => Promise<unknown> }, screen: any) {
   await app.open('/patients')
   await screen.getByRole('button', /New Patient/).first().tap()
   const drawer = screen.getByRole('dialog', 'New Patient')
   await drawer.getByRole('textbox', /First Name/).fill('Mia')
   await drawer.getByRole('textbox', /Last Name/).fill('Lopez')
+  await drawer.getByRole('textbox', /^Email/).fill('mia.lopez@mail.com')
   await drawer.getByRole('button', 'Pick a date').tap()
   await drawer.getByRole('button', /1990/).tap()
   /* El año del calendario se escribe (patients.md, 2026-11-04). */
@@ -101,6 +111,7 @@ test('New Patient pide guardián para un menor y lo carga como persona nueva', a
   await expect(drawer.getByText('+54 (324) 359-6750')).toBeVisible()
 
   await drawer.getByRole('button', /Next Step/).tap()
+  await elegirGenero(drawer)
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText('Mia Lopez has been added to the patient list.')).toBeVisible()
 })
@@ -120,6 +131,25 @@ test('New Patient toma un guardián del sistema sin volver a pedir su contacto',
   await drawer.getByRole('button', 'Parent').tap()
 
   await drawer.getByRole('button', /Next Step/).tap()
+  await elegirGenero(drawer)
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText('Mia Lopez has been added to the patient list.')).toBeVisible()
+})
+
+/* Mismo nombre y email que un paciente de la lista: no se guarda (CON-1328). */
+test('New Patient avisa si el paciente ya está registrado', async ({ app, screen }) => {
+  await app.open('/patients')
+  await screen.getByRole('button', /New Patient/).first().tap()
+  const drawer = screen.getByRole('dialog', 'New Patient')
+  await drawer.getByRole('textbox', /First Name/).fill('Abril')
+  await drawer.getByRole('textbox', /Last Name/).fill('Viola')
+  await drawer.getByRole('textbox', /^Email/).fill('abril@gmail.com')
+  await drawer.getByRole('button', 'Pick a date').tap()
+  await drawer.getByRole('button', /1990/).tap()
+  await screen.getByRole('textbox', 'Year').fill('1990')
+  await screen.getByRole('button', /January 15, 1990/).tap()
+  await drawer.getByRole('button', /Next Step/).tap()
+  await elegirGenero(drawer)
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(drawer.getByText('A patient is already registered with this name and email address.')).toBeVisible()
 })

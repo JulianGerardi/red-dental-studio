@@ -8,6 +8,7 @@
 - Epics: CON-833 Pacientes - Migracion back graphQL · CON-3910 Consultar pacientes · CON-2107 Patient
   ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-833%2CCON-3910%2CCON-2107%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
 - Historias de abril: CON-2858
+- Alta y edición: CON-1328 (New Patient) · CON-1329 (Edit Patient)
   ([Jira](https://confidetally.atlassian.net/issues?jql=key%20in%20%28CON-2858%29%20ORDER%20BY%20key%20ASC))
 
 ## Patients — List (nodo `3638:59529`) y Patient Details Modal (`3632:58405`)
@@ -576,3 +577,50 @@ Sin historia de Jira: es una devolución de diseño de Abril Viola (CON-2858 sig
 - `ui/section-notice` queda sin usos en la app y se borró al documentar (Storybook, `design-system.md` y el Figma del
   design system). *Elements / Alert* suma Parts, States y Specs con la regla. En *Screens & Flows* los avisos se cambiaron
   en el lugar por instancias de *Alert* (`figma-docs.md`, 2026-11-18).
+
+## CON-1328 · CON-1329 · New Patient como 2.0 y Edit Patient como la ficha de un empleado (2026-11-18)
+
+**Jira:** CON-1328 (*New Patient*: General, Demographic, aviso de duplicado) y CON-1329 (*Edit Patient*: General,
+Demographic, Contact y Address; *sin buscador de persona*). Pedido de Julián con una grabación de Confidentally 2.0.
+
+**New Patient** (drawer en pasos, General → Guardian sólo para un menor → Demography):
+1. **General** como en 2.0: la opción de vincular a una persona del sistema, el nombre en tres, *Email\** y
+   *Birthdate\** y la cuenta del portal. **Interpreter Required** queda en Demography, en la misma fila que *Language*
+   (Julián: van de la mano), con el checkbox a la altura del select; 2.0 lo pone en General.
+2. **Email pasa a obligatorio** (CON-1328 y 2.0). Birthdate no puede ser futura (CON-1329).
+3. **Demography** con los campos de 2.0, de a dos: *Gender\** (obligatorio), Race, Ethnicity, Marital Status,
+   Profession y Nationality (con buscador), Language (arranca en English) con Interpreter Required al lado, y Religion. Phone, Address, City y ZIP salen de
+   acá: son Contact y Address y se cargan en Edit, como en 2.0.
+4. **Duplicado** (CON-1328): mismo nombre completo y email que otro paciente → `Alert` danger arriba del drawer, *A patient
+   is already registered with this name and email address.*, y no se guarda. Con la cuenta del portal pedida y el email
+   ya usado por otro paciente: *A patient account is already registered with this email address.* 2.0 lo muestra
+   además en un toast; acá alcanza con el aviso, que queda en el lugar donde se corrige.
+5. **Los errores se marcan sólo en las secciones revisadas**: con Gender obligatorio, el paso Demography (montado y oculto)
+   ya no arranca en rojo por un intento fallido en General o Guardian.
+6. **Anomalía 21**: 2.0 y CON-1328 dicen *Create a new user account with this email address*; se mantiene el texto del
+   Figma, *Create a patient portal account using this email address*, que dice para qué es la cuenta.
+
+**Edit Patient** (`/patients/:id/edit`), con el formato de la ficha de un empleado (Settings → Employees):
+1. **Una sola pantalla, sin pestañas**: card con la foto editable (`EditableAvatar`, la misma clave que el panel del
+   paciente, `clavePacienteFoto`), el nombre y el estado; debajo *General Information*. Después las cards *Contact
+   Information*, *Address Information* y *Demographic Information*. Cancel / Save Changes abajo a la derecha.
+2. **Sin Guardian ni el buscador de personas** (CON-1329: *sin buscador de persona*). El guardián se carga en el alta y se
+   cambia desde Relationships; Edit no toca esos datos al guardar.
+3. **Obligatorios de CON-1329**: los de General, Gender, Country Code, Area Code (3 dígitos), Number (7 dígitos), Address
+   Line 1, Country, State, City y ZIP. Al guardar con algo vacío se marca todo lo que falta y el foco va al primero (con
+   scroll). Duplicado: el mismo aviso que en New, arriba de la pantalla.
+4. Contact y Address usan los mismos campos que el guardián nuevo y New Employee (`CamposContacto`, `CamposDireccion`).
+   Jira dice *Region*; queda *State*, como en el resto del módulo.
+5. **Datos**: `DatosPaciente` suma la demografía (`gender`, `race`, `ethnicity`, `marital`, `profession`,
+   `nationality`, `religion`) y el contacto y la dirección del paciente (`codigo`, `area`, `numero`, `ext`, `linea1`,
+   `linea2`, `pais`, `estado`, `ciudad`, `zip`); se van `phone`, `address` y `city`. Abril Viola, Sofia Chen y John Smith
+   traen datos completos; el resto pide teléfono, dirección y Gender al editar, como haría 2.0 con una ficha incompleta.
+
+**Para el dev:** `useFormPaciente(datos, { edicion: true })` da las secciones de Edit; `validarPaciente` recibe opciones
+(`menor`, `exigirGuardian`, `edicion`) en vez de argumentos sueltos; `duplicadoDe(pacientes, datos, excepto?)` devuelve el
+aviso. `EditPatientModal` (drawer viejo con pestañas) sigue sólo en el Storybook. e2e en `tests/new-patient.e2e.ts` y
+`tests/edit-patient.e2e.ts`.
+
+**A validar con usuarios:** si Gender obligatorio frena el alta en recepción cuando el paciente no lo dice (hay *Prefer
+not to say*); y si pedir teléfono y dirección completos para guardar cualquier cambio en Edit traba correcciones rápidas
+(por ejemplo, sólo el email) en fichas viejas.

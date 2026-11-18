@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PageTitle } from '@/components/ui/page-title'
-import { Tabs } from '@/components/ui/tabs'
 import { TextField, SelectField, OptionCheckbox, FormFooter } from '@/components/patients/form'
 import { Breadcrumb } from '@/components/ui/breadcrumb'
 import {
-  CamposDemography, CamposGeneral, CamposGuardian, limpiarPaciente, useFormPaciente, type SeccionPaciente,
+  CamposContacto, CamposDemography, CamposDireccion, CamposGeneral, duplicadoDe, useFormPaciente,
 } from '@/components/patients/PacienteCampos'
 import { DrawerSection, useEnDrawer } from '@/components/ui/drawer'
+import { Card } from '@/components/settings/primitives'
+import { EditableAvatar } from '@/components/ui/editable-avatar'
+import { Alert } from '@/components/ui/alert'
+import { Pill } from '@/components/ui/pill'
 import { aviso } from '@/components/ui/toaster'
 import { DATOS_JOHN_SMITH, usePatients } from '@/data/patientsStore'
+import { clavePacienteFoto, usePhoto } from '@/lib/usePhoto'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
@@ -70,48 +74,57 @@ export function EditPatientForm() {
   )
 }
 
-/* Edit Patient como pantalla, con la lógica de la ficha de una Location (Settings → Locations): título, pestañas debajo,
-   cada sección en su card y Cancel / Save Changes abajo a la derecha. Las pestañas y la validación son las de antes
-   (General / Guardian sólo para un menor / Demography; el error lleva a su pestaña). Cuelga de la tabla, no del
-   dashboard del paciente: las migas y Cancel / Save vuelven a Patients (Julián; patients.md, 2026-11-17). */
+/* Edit Patient con el formato de la ficha de un empleado (Settings → Employees): una sola pantalla, sin pestañas, con la
+   foto editable, el nombre y su estado arriba, y General, Contact, Address y Demographic en cards apiladas (CON-1329).
+   Sin Guardian ni el buscador de personas: la edición no vincula a nadie. Un solo Save Changes; si falta algo, lleva al
+   campo. Cuelga de la tabla: migas, Cancel y Save vuelven a Patients. Ver patients.md, 2026-11-18. */
 export default function EditPatientPage() {
   const { id = 'john-smith' } = useParams()
   const navigate = useNavigate()
-  const { datosDe, updatePatient } = usePatients()
+  const { patients, datosDe, getPatient, updatePatient } = usePatients()
   const datos = datosDe(id) ?? DATOS_JOHN_SMITH
+  const fila = getPatient(id)
   /* La cuenta del portal que ya existía no se cambia desde acá: se muestra como "Linked". */
   const portalVinculado = datos.portal
-  const f = useFormPaciente(datos, { portalVinculado })
-  const [elegida, setSeccion] = useState<SeccionPaciente>('General')
-  /* Guardian, sólo para un menor (patients.md, 2026-11-04): si deja de serlo, se vuelve a General. */
-  const seccion = f.secciones.includes(elegida) ? elegida : 'General'
+  const f = useFormPaciente(datos, { edicion: true })
+  const [foto, setFoto] = usePhoto(clavePacienteFoto(id))
+  const [duplicado, setDuplicado] = useState<string | null>(null)
+  const nombre = fila?.name ?? [datos.first, datos.last].filter(Boolean).join(' ')
+  const estado = fila?.status ?? 'Active'
   const volver = () => navigate('/patients')
 
   const guardar = () => {
     const error = f.revisar(f.secciones)
-    if (error) { setSeccion(error.seccion); f.enfocar(error.campo); return }
-    const guardado = limpiarPaciente(f.d, f.menor)
-    updatePatient(id, guardado)
-    aviso.ok(`${[guardado.first, guardado.last].filter(Boolean).join(' ')} has been updated.`)
+    if (error) { f.enfocar(error.campo); return }
+    const repetido = duplicadoDe(patients, f.d, id)
+    setDuplicado(repetido)
+    if (repetido) { window.scrollTo({ top: 0, behavior: 'smooth' }); return }
+    updatePatient(id, f.d)
+    aviso.ok(`${[f.d.first, f.d.last].filter(Boolean).join(' ')} has been updated.`)
     volver()
   }
 
-  const comunes = { d: f.d, cambiar: f.cambiar, errores: f.errores }
-  const panel = (s: SeccionPaciente, contenido: React.ReactNode) => (
-    <div role="tabpanel" aria-label={s} hidden={seccion !== s} className={cn(TARJETA_PANEL, 'p-6')}>{contenido}</div>
-  )
+  const comunes = { d: f.d, cambiar: f.cambiar, errores: f.errores, conTitulo: false }
   return (
     <div className={CONTENEDOR_PAGINA}>
       <div className="mb-4"><Breadcrumb items={[{ label: 'Patients', to: '/patients' }, { label: 'Edit Patient' }]} /></div>
       <PageTitle>Edit Patient</PageTitle>
-      <Tabs
-        className="mt-4" aria-label="Patient sections" value={seccion} onChange={setSeccion}
-        tabs={f.secciones.map((s) => ({ value: s, alerta: f.conError(s) }))}
-      />
-      <div className="mt-4">
-        {panel('General', <CamposGeneral {...comunes} portalVinculado={portalVinculado} />)}
-        {f.menor && panel('Guardian', <CamposGuardian {...comunes} />)}
-        {panel('Demography', <CamposDemography {...comunes} />)}
+      <div className="mt-4 flex flex-col gap-4">
+        {duplicado && <Alert tone="danger" title={duplicado}>Check the name and email, or find the existing patient in the list.</Alert>}
+        <Card>
+          <div className="flex items-center gap-3">
+            <EditableAvatar foto={foto} iniciales={(fila?.initials ?? nombre.split(' ').map((p) => p[0]).join('')).toUpperCase()} onChange={setFoto} label={nombre} size={56} />
+            <span className="min-w-0">
+              <span className="block truncate text-xl font-bold text-ink">{nombre}</span>
+              <Pill tone={estado === 'Active' ? 'success' : 'neutral'} className="mt-1">{estado}</Pill>
+            </span>
+          </div>
+          <h3 className="mt-5 mb-4 text-sm font-bold text-ink">General Information</h3>
+          <CamposGeneral {...comunes} portalVinculado={portalVinculado} />
+        </Card>
+        <Card title="Contact Information"><CamposContacto {...comunes} /></Card>
+        <Card title="Address Information"><CamposDireccion {...comunes} /></Card>
+        <Card title="Demographic Information"><CamposDemography {...comunes} /></Card>
       </div>
       <div className="mt-4 flex justify-end gap-3">
         <FormFooter onCancel={volver} onSave={guardar} saveLabel="Save Changes" />

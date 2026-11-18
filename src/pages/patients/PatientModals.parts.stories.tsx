@@ -47,7 +47,7 @@ export const EditPatientErrors: Story = {
   render: () => (
     <EditPatientModal
       seccionInicial="Demography"
-      inicial={{ ...VACIO_PACIENTE, first: 'Abril', birthday: 'April 2, 2025', email: 'abril@gmail.com', guardianNuevo: true, city: 'Phoenix' }}
+      inicial={{ ...VACIO_PACIENTE, first: 'Abril', birthday: 'April 2, 2025', email: 'abril@gmail.com', guardianNuevo: true, ciudad: 'Phoenix' }}
       onClose={salir}
     />
   ),
@@ -71,7 +71,7 @@ export const FieldsGuardian: Story = {
 }
 export const FieldsDemography: Story = {
   name: 'Fields — Demography', parameters: { layout: 'padded' },
-  render: () => <div className="w-[512px]"><CamposDemography d={{ ...datos, phone: '(555) 123-4567', language: 'English', city: 'Phoenix' }} cambiar={sinCambiar} errores={{}} /></div>,
+  render: () => <div className="w-[512px]"><CamposDemography d={{ ...datos, gender: 'Female', language: 'English', nationality: 'United States' }} cambiar={sinCambiar} errores={{}} /></div>,
 }
 
 /* New Patient → "link a person that already exists" (CON-2107; patients.md, 2026-11-02): el buscador de personas del

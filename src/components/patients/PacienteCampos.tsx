@@ -6,14 +6,14 @@ import { Alert } from '@/components/ui/alert'
 import { CollapsibleFields, DateField, LinkPersonCheckbox, OptionCheckbox, PersonSearchField, chipsPersona, CountryCodeField, SelectField, TextField } from '@/components/patients/form'
 import type { DatosPaciente } from '@/data/patientsStore'
 import { PERSONAS_SISTEMA, type PersonaSistema } from '@/data/personas'
-import { codigoDe } from '@/data/paises'
+import { codigoDe, PAISES_TEL } from '@/data/paises'
 import { OBLIGATORIO } from '@/lib/validacion'
 
-/* Las tres secciones del formulario de paciente -General, Guardian y Demography-, las mismas en New Patient (tres pasos)
-   y en Edit Patient (tres pestañas). Figma 3751:73452 (New) y 5277:123056 (Edit). Decisiones y anomalías en
-   design-reference/figma/modulos/patients.md, 2026-10-22. */
+/* Las secciones del formulario de paciente. New Patient (CON-1328): General, Guardian (sólo un menor) y Demography, en
+   pasos. Edit Patient (CON-1329): General, Demography, Contact y Address en una sola pantalla, sin Guardian. Decisiones
+   en design-reference/figma/modulos/patients.md, 2026-10-22 y 2026-11-18. */
 
-export const SECCIONES_PACIENTE = ['General', 'Guardian', 'Demography'] as const
+export const SECCIONES_PACIENTE = ['General', 'Guardian', 'Demography', 'Contact', 'Address'] as const
 export type SeccionPaciente = (typeof SECCIONES_PACIENTE)[number]
 export type ErroresPaciente = Partial<Record<keyof DatosPaciente, string>>
 export type CambiarPaciente = <K extends keyof DatosPaciente>(campo: K, valor: DatosPaciente[K]) => void
@@ -26,14 +26,17 @@ const SECCION_DE_CAMPO: Record<keyof DatosPaciente, SeccionPaciente> = {
   guardianName: 'Guardian', guardianNuevo: 'Guardian', gFirst: 'Guardian', gLast: 'Guardian', gEmail: 'Guardian', gDob: 'Guardian',
   gCodigo: 'Guardian', gArea: 'Guardian', gNumero: 'Guardian', gExt: 'Guardian', gLinea1: 'Guardian', gLinea2: 'Guardian',
   gPais: 'Guardian', gEstado: 'Guardian', gCiudad: 'Guardian', gZip: 'Guardian', guardianGarante: 'Guardian', guardianRel: 'Guardian',
-  phone: 'Demography', language: 'Demography', address: 'Demography', city: 'Demography', zip: 'Demography',
+  gender: 'Demography', race: 'Demography', ethnicity: 'Demography', marital: 'Demography', profession: 'Demography',
+  nationality: 'Demography', language: 'Demography', religion: 'Demography',
+  codigo: 'Contact', area: 'Contact', numero: 'Contact', ext: 'Contact',
+  linea1: 'Address', linea2: 'Address', pais: 'Address', estado: 'Address', ciudad: 'Address', zip: 'Address',
 }
 
 /* Orden en que se recorren los campos para encontrar el primero con error. */
 const ORDEN: (keyof DatosPaciente)[] = [
-  'first', 'middle', 'last', 'birthday', 'email',
+  'first', 'middle', 'last', 'email', 'birthday',
   'guardianName', 'gFirst', 'gLast', 'gEmail', 'gDob', 'gCodigo', 'gArea', 'gNumero', 'gLinea1', 'gPais', 'gEstado', 'gCiudad', 'gZip', 'guardianRel',
-  'phone', 'language', 'address', 'city', 'zip',
+  'gender', 'codigo', 'area', 'numero', 'linea1', 'pais', 'estado', 'ciudad', 'zip',
 ]
 
 const CONTACTO_G = ['gCodigo', 'gArea', 'gNumero', 'gExt'] as const
@@ -57,23 +60,37 @@ export function guardianDe(d: DatosPaciente) {
   return { persona, tiene: d.guardianNuevo || !!persona }
 }
 
-/* Las secciones que se ven: Guardian, sólo para un menor de 18 (CON-2858; patients.md, 2026-11-04). */
-export const seccionesDe = (menor: boolean): SeccionPaciente[] =>
-  SECCIONES_PACIENTE.filter((s) => menor || s !== 'Guardian')
+/* Las secciones que se ven. Alta: Guardian sólo para un menor de 18 (CON-2858; patients.md, 2026-11-04). Edición: sin
+   Guardian, con Contact y Address (CON-1329; patients.md, 2026-11-18). */
+export const seccionesDe = (menor: boolean, edicion = false): SeccionPaciente[] =>
+  edicion ? ['General', 'Demography', 'Contact', 'Address'] : (['General', 'Guardian', 'Demography'] as SeccionPaciente[]).filter((s) => menor || s !== 'Guardian')
+
+/* Una fecha de nacimiento posterior a hoy (CON-1329). */
+const esFutura = (fecha: string) => {
+  const f = new Date(fecha)
+  return !Number.isNaN(f.getTime()) && f.getTime() > Date.now()
+}
 
 export const MENOR_SIN_GUARDIAN = 'This patient is a minor and must have at least one guardian assigned.'
 
-/* Obligatorios: nombre, apellido y nacimiento. Guardian (CON-2858), sólo para un menor: en el alta hace falta uno; si hay
-   guardián, su relación, y si es nuevo, sus datos, contacto y dirección (patients.md, 2026-11-04). Demography es opcional
-   entero, como dice su aviso. `portalNuevo`: se pide crear la cuenta del portal con este email, así que el email hace
-   falta. */
-export function validarPaciente(d: DatosPaciente, portalNuevo: boolean, menor = false, exigirGuardian = false): ErroresPaciente {
+/* Obligatorios (CON-1328 y CON-1329): nombre, apellido, email, nacimiento (no futuro) y Gender. En la edición, también
+   el teléfono y la dirección. Guardian (CON-2858), sólo en el alta de un menor: hace falta uno; si hay guardián, su
+   relación, y si es nuevo, sus datos, contacto y dirección (patients.md, 2026-11-04). */
+export function validarPaciente(d: DatosPaciente, { menor = false, exigirGuardian = false, edicion = false } = {}): ErroresPaciente {
   const e: ErroresPaciente = {}
   if (!d.first.trim()) e.first = OBLIGATORIO
   if (!d.last.trim()) e.last = OBLIGATORIO
   if (!d.birthday.trim()) e.birthday = OBLIGATORIO
-  if (d.email.trim() && !EMAIL.test(d.email.trim())) e.email = 'Enter a valid email.'
-  else if (portalNuevo && !d.email.trim()) e.email = 'Enter an email to create the portal account.'
+  else if (esFutura(d.birthday)) e.birthday = 'Birthdate cannot be in the future.'
+  if (!d.email.trim()) e.email = OBLIGATORIO
+  else if (!EMAIL.test(d.email.trim())) e.email = 'Enter a valid email.'
+  if (!d.gender.trim()) e.gender = OBLIGATORIO
+  if (edicion) {
+    for (const k of ['codigo', 'area', 'numero', 'linea1', 'pais', 'estado', 'ciudad', 'zip'] as const) if (!d[k].trim()) e[k] = OBLIGATORIO
+    if (d.area.trim() && digitos(d.area).length !== 3) e.area = 'Area code must be 3 digits.'
+    if (d.numero.trim() && digitos(d.numero).length !== 7) e.numero = 'Number must be 7 digits.'
+    return e
+  }
   if (!menor) return e
   const g = guardianDe(d)
   if (!g.tiene) {
@@ -104,36 +121,49 @@ export function limpiarPaciente(d: DatosPaciente, menor: boolean): DatosPaciente
   }
 }
 
+/* Duplicados (CON-1328 y CON-1329): el mismo nombre completo y email que otro paciente, o, si se pide la cuenta del
+   portal, un email que ya usa otro paciente. Devuelve el aviso, o null. */
+export function duplicadoDe(pacientes: { id: string; name: string; email: string }[], d: DatosPaciente, excepto?: string) {
+  const norm = (x: string) => x.trim().replace(/\s+/g, ' ').toLowerCase()
+  const nombre = norm([d.first, d.middle, d.last].filter(Boolean).join(' '))
+  const email = norm(d.email)
+  const otros = pacientes.filter((p) => p.id !== excepto)
+  if (email && otros.some((p) => norm(p.name) === nombre && norm(p.email) === email)) return 'A patient is already registered with this name and email address.'
+  if (d.portal && email && otros.some((p) => norm(p.email) === email)) return 'A patient account is already registered with this email address.'
+  return null
+}
+
 /* El estado de un formulario de paciente. Los errores se ven recién después del primer intento de seguir o guardar, y
    desde ahí se actualizan solos al corregir. `revisar` devuelve dónde llevar al usuario: la sección y el campo del
    primer error. */
 export function useFormPaciente(
   inicial: DatosPaciente,
-  { portalVinculado = false, guardianMenor = false, nacimiento }: {
-    portalVinculado?: boolean
-    /** Alta (CON-2858): un menor necesita guardián. Edit no lo exige, para no trabar la edición de fichas viejas. */
+  { guardianMenor = false, nacimiento, edicion = false }: {
+    /** Alta (CON-2858): un menor necesita guardián. */
     guardianMenor?: boolean
+    /** Edit Patient (CON-1329): sin Guardian, con Contact y Address. */
+    edicion?: boolean
     /** El nacimiento que vale si no es el escrito (New Patient vinculado a una persona del sistema). */
     nacimiento?: string
   } = {},
 ) {
   const [d, setD] = useState(inicial)
-  const [intentado, setIntentado] = useState(false)
+  /* Las secciones del último intento: sólo esas se marcan, así el paso siguiente no arranca en rojo. */
+  const [intentado, setIntentado] = useState<readonly SeccionPaciente[]>([])
   const [foco, setFoco] = useState<{ campo: keyof DatosPaciente; n: number } | null>(null)
-  const portalNuevo = d.portal && !portalVinculado
   const menor = esMenor(nacimiento ?? d.birthday)
-  const todos = useMemo(() => validarPaciente(d, portalNuevo, menor, guardianMenor), [d, portalNuevo, guardianMenor, menor])
-  const errores: ErroresPaciente = intentado ? todos : {}
+  const todos = useMemo(() => validarPaciente(d, { menor, exigirGuardian: guardianMenor, edicion }), [d, guardianMenor, menor, edicion])
+  const errores: ErroresPaciente = Object.fromEntries(Object.entries(todos).filter(([k]) => intentado.includes(SECCION_DE_CAMPO[k as keyof DatosPaciente])))
 
   /* Add New Person muestra campos nuevos: arrancan limpios, no en rojo por el intento anterior (patients.md, 2026-11-04). */
   const cambiar: CambiarPaciente = (campo, valor) => {
-    if (campo === 'guardianNuevo') setIntentado(false)
+    if (campo === 'guardianNuevo') setIntentado([])
     setD((p) => ({ ...p, [campo]: valor }))
   }
 
   /* Marca los errores y devuelve el primero de esas secciones, o null si todo está bien. */
   const revisar = (secciones: readonly SeccionPaciente[]) => {
-    setIntentado(true)
+    setIntentado(secciones)
     const campo = ORDEN.find((k) => todos[k] && secciones.includes(SECCION_DE_CAMPO[k]))
     return campo ? { seccion: SECCION_DE_CAMPO[campo], campo } : null
   }
@@ -143,16 +173,22 @@ export function useFormPaciente(
   /* Después de cambiar de sección ya está montado el campo: se enfoca el primer control de su contenedor. */
   useEffect(() => {
     if (!foco) return
-    document.querySelector<HTMLElement>(`[data-campo="${foco.campo}"] input, [data-campo="${foco.campo}"] button`)?.focus()
+    const el = document.querySelector<HTMLElement>(`[data-campo="${foco.campo}"] input, [data-campo="${foco.campo}"] button`)
+    el?.focus()
+    el?.scrollIntoView?.({ block: 'center' })
   }, [foco])
 
-  return { d, cambiar, errores, revisar, enfocar, conError, menor, secciones: seccionesDe(menor), reiniciarIntento: () => setIntentado(false) }
+  return { d, cambiar, errores, revisar, enfocar, conError, menor, secciones: seccionesDe(menor, edicion), reiniciarIntento: () => setIntentado([]) }
 }
 
 /* El contenedor que deja ubicar un campo desde afuera (ver el foco de useFormPaciente). */
 const Campo = ({ nombre, children }: { nombre: keyof DatosPaciente; children: React.ReactNode }) => <div data-campo={nombre}>{children}</div>
 
-type Props = { d: DatosPaciente; cambiar: CambiarPaciente; errores: ErroresPaciente }
+type Props = { d: DatosPaciente; cambiar: CambiarPaciente; errores: ErroresPaciente; /** false: sin título, para ir en una card que ya lo tiene (Edit Patient). */ conTitulo?: boolean }
+
+/* Con título es la sección del drawer; sin título, sólo los campos, para la card de Edit Patient. */
+const Bloque = ({ titulo, conTitulo = true, children }: { titulo: string; conTitulo?: boolean; children: React.ReactNode }) =>
+  conTitulo ? <DrawerSection title={titulo}>{children}</DrawerSection> : <div className="flex flex-col gap-4">{children}</div>
 
 /* La cuenta del portal ya vinculada (sólo en Edit Patient): un estado, no una opción. */
 function CuentaPortal() {
@@ -200,11 +236,11 @@ export function BuscarPersona({ v }: { v: VinculoPersona }) {
   )
 }
 
-/* Orden de Julián (2026-11-04): primero vincular a una persona del sistema, después los datos y, debajo del email, la
-   cuenta del portal. Interpreter Required pasa a Demography. */
-export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo }: Props & { portalVinculado?: boolean; vinculo?: VinculoPersona }) {
+/* Como en 2.0 (CON-1328, grabación de Julián del 2026-11-18): vincular a una persona del sistema (sólo en el alta), los
+   datos y la cuenta del portal. Interpreter Required va en Demography, junto a Language (patients.md, 2026-11-18). */
+export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo, conTitulo }: Props & { portalVinculado?: boolean; vinculo?: VinculoPersona }) {
   return (
-    <DrawerSection title="General Information">
+    <Bloque titulo="General Information" conTitulo={conTitulo}>
       {vinculo && <LinkPersonCheckbox checked={vinculo.activo} onChange={vinculo.onActivo} />}
       {vinculo?.activo ? <BuscarPersona v={vinculo} /> : (
         /* El nombre completo en una fila de tres; debajo, email y birthdate (patients.md, 2026-11-16). */
@@ -215,7 +251,7 @@ export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo }:
             <Campo nombre="last"><TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={(v) => cambiar('last', v)} error={errores.last} /></Campo>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Campo nombre="email"><TextField label="Email" placeholder="john.smith@hotmail.com" value={d.email} onChange={(v) => cambiar('email', v)} error={errores.email} /></Campo>
+            <Campo nombre="email"><TextField label="Email" required placeholder="john.smith@hotmail.com" value={d.email} onChange={(v) => cambiar('email', v)} error={errores.email} /></Campo>
             <Campo nombre="birthday"><DateField label="Birthdate" required valorInicial={d.birthday} onChange={(v) => cambiar('birthday', v)} error={errores.birthday} /></Campo>
           </div>
         </div>
@@ -223,7 +259,7 @@ export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo }:
       {portalVinculado ? <CuentaPortal /> : (
         <OptionCheckbox label="Create a patient portal account using this email address" checked={d.portal} onChange={(v) => cambiar('portal', v)} />
       )}
-    </DrawerSection>
+    </Bloque>
   )
 }
 
@@ -326,17 +362,77 @@ export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Pr
   )
 }
 
-export function CamposDemography({ d, cambiar }: Props) {
+/* Las opciones de Demographic Information, como en 2.0 (grabación de Julián, 2026-11-18). */
+const GENEROS = ['Female', 'Male', 'Other', 'Prefer not to say']
+const RAZAS = ['American Indian or Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', 'Other', 'Prefer not to say']
+const ETNIAS = ['Hispanic or Latino', 'Not Hispanic or Latino', 'Prefer not to say']
+const ESTADOS_CIVILES = ['Single', 'Married', 'Domestic partner', 'Divorced', 'Separated', 'Widowed']
+const PROFESIONES = [
+  'Administration professionals', 'Administrative and specialized secretaries', 'Agricultural, forestry and fishery labourers',
+  'Animal producers', 'Architects, planners, surveyors and designers', 'Armed forces occupations, other ranks',
+  'Artistic, cultural and culinary associate professionals', 'Assemblers', 'Authors, journalists and linguists',
+  'Blacksmiths, toolmakers and related trades workers', 'Building and housekeeping supervisors', 'Health professionals',
+  'Teaching professionals', 'Sales workers', 'Student', 'Retired', 'Other',
+]
+const NACIONALIDADES = PAISES_TEL.map((p) => p.nombre)
+const IDIOMAS = ['English', 'Spanish', 'Portuguese', 'French', 'Chinese', 'Vietnamese', 'Arabic', 'Other']
+const RELIGIONES = ['Agnostic', 'Atheist', 'Buddhist', 'Christian', 'Hindu', 'Jewish', 'Muslim', 'Other', 'Prefer not to say']
+
+export function CamposDemography({ d, cambiar, errores, conTitulo }: Props) {
+  const sel = (campo: keyof DatosPaciente, label: string, options: string[], extra: { required?: boolean; buscable?: boolean; placeholder?: string } = {}) => (
+    <Campo nombre={campo}>
+      <SelectField
+        label={label} options={options} placeholder={extra.placeholder ?? `Select ${label.toLowerCase()}`}
+        required={extra.required} buscable={extra.buscable}
+        value={d[campo] as string} onChange={(v) => cambiar(campo, v)} error={errores[campo]}
+      />
+    </Campo>
+  )
   return (
-    <DrawerSection title="Demographic Information">
-      <OptionCheckbox label="Interpreter Required" checked={d.interpreter} onChange={(v) => cambiar('interpreter', v)} />
+    <Bloque titulo="Demographic Information" conTitulo={conTitulo}>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Campo nombre="phone"><TextField label="Phone" placeholder="408-XXX-XXXX" value={d.phone} onChange={(v) => cambiar('phone', v)} /></Campo>
-        <Campo nombre="language"><TextField label="Preferred Language" placeholder="English" value={d.language} onChange={(v) => cambiar('language', v)} /></Campo>
-        <Campo nombre="address"><TextField label="Address" placeholder="Street name and number" value={d.address} onChange={(v) => cambiar('address', v)} /></Campo>
-        <Campo nombre="city"><SelectField label="City" options={['Phoenix', 'Los Angeles', 'Miami', 'New York']} value={d.city} onChange={(v) => cambiar('city', v)} /></Campo>
-        <Campo nombre="zip"><TextField label="ZIP / Postal Code" placeholder="85016" value={d.zip} onChange={(v) => cambiar('zip', v)} /></Campo>
+        {sel('gender', 'Gender', GENEROS, { required: true })}
+        {sel('race', 'Race', RAZAS)}
+        {sel('ethnicity', 'Ethnicity', ETNIAS)}
+        {sel('marital', 'Marital Status', ESTADOS_CIVILES)}
+        {sel('profession', 'Profession', PROFESIONES, { buscable: true })}
+        {sel('nationality', 'Nationality', NACIONALIDADES, { buscable: true })}
+        {/* Language e Interpreter Required van de la mano: en la misma fila, el checkbox a la altura del select (Julián). */}
+        {sel('language', 'Language', IDIOMAS)}
+        <div className="flex flex-col justify-end">
+          <OptionCheckbox label="Interpreter Required" checked={d.interpreter} onChange={(v) => cambiar('interpreter', v)} className="h-9 items-center py-0" />
+        </div>
+        {sel('religion', 'Religion', RELIGIONES)}
       </div>
-    </DrawerSection>
+    </Bloque>
+  )
+}
+
+/* Contact y Address del paciente, en Edit Patient (CON-1329): los mismos campos que el guardián nuevo y New Employee. */
+export function CamposContacto({ d, cambiar, errores, conTitulo }: Props) {
+  return (
+    <Bloque titulo="Contact Information" conTitulo={conTitulo}>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Campo nombre="codigo"><CountryCodeField required value={d.codigo} onChange={(v) => cambiar('codigo', v)} error={errores.codigo} /></Campo>
+        <Campo nombre="area"><TextField label="Area Code (3 digits)" required placeholder="555" value={d.area} onChange={(v) => cambiar('area', v)} error={errores.area} /></Campo>
+        <Campo nombre="numero"><TextField label="Number (7 digits)" required placeholder="000-0000" value={d.numero} onChange={(v) => cambiar('numero', v)} error={errores.numero} /></Campo>
+        <Campo nombre="ext"><TextField label="Extension" placeholder="Extension" value={d.ext} onChange={(v) => cambiar('ext', v)} /></Campo>
+      </div>
+    </Bloque>
+  )
+}
+
+export function CamposDireccion({ d, cambiar, errores, conTitulo }: Props) {
+  return (
+    <Bloque titulo="Address Information" conTitulo={conTitulo}>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Campo nombre="linea1"><TextField label="Address Line 1" required placeholder="Street and number" value={d.linea1} onChange={(v) => cambiar('linea1', v)} error={errores.linea1} /></Campo>
+        <Campo nombre="linea2"><TextField label="Address Line 2" placeholder="Apt, suite, floor" value={d.linea2} onChange={(v) => cambiar('linea2', v)} /></Campo>
+        <Campo nombre="pais"><SelectField label="Country" required placeholder="Select country" value={d.pais} onChange={(v) => cambiar('pais', v)} error={errores.pais} /></Campo>
+        <Campo nombre="estado"><SelectField label="State" required placeholder="Select your region" value={d.estado} onChange={(v) => cambiar('estado', v)} error={errores.estado} /></Campo>
+        <Campo nombre="ciudad"><TextField label="City" required placeholder="City" value={d.ciudad} onChange={(v) => cambiar('ciudad', v)} error={errores.ciudad} /></Campo>
+        <Campo nombre="zip"><TextField label="ZIP Code" required placeholder="85016" value={d.zip} onChange={(v) => cambiar('zip', v)} error={errores.zip} /></Campo>
+      </div>
+    </Bloque>
   )
 }

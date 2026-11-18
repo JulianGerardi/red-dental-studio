@@ -65,3 +65,27 @@ aviso único de la app (detalle en patients.md, 2026-11-18):
 - New Hours: *Attention needed* en warning, con el texto como cuerpo; *This will update the hours…* en info, sólo título.
   Se van los hex `#fffbeb` y `#eff4ff`.
 - Assign Role: *Global access* en info, con el texto como cuerpo.
+
+## La ficha del empleado no vincula a otra persona (2026-11-18)
+
+Sin historia propia; misma regla que Edit Patient (CON-1329: *sin buscador de persona* al editar). En la ficha de un
+empleado ya cargado se saca la opción *Use this option only to link a person that already exists in the system…*
+(`LinkExistingPerson`): editar a alguien no es reemplazarlo por otra persona. Queda sólo en *New Employee*, como en 2.0.
+General Information muestra directo los campos.
+
+## Tablas de Settings: a la ficha sólo por el ⋮, menús con ícono y *Edit* (2026-11-18)
+
+Sin historia de Jira: devolución de diseño de Julián sobre Locations, Employees y Accounts.
+
+1. **Una sola forma de entrar a la ficha**: el ⋮ → *Edit*. El nombre de la fila deja de ser link (Locations y Accounts:
+   `TextCell`; Employees: `PersonCell` sin `to`, que ahora dibuja texto y no un botón vacío). Antes había dos caminos al
+   mismo lugar.
+2. **Menús alineados** con el de Patients (*Overview* / *Edit*): todos los ítems llevan ícono a la izquierda y nombre
+   corto, sin repetir la entidad de la fila.
+   - Locations: *Edit* (lápiz), *Delete* (tacho).
+   - Employees: *Edit* (lápiz), *Delete* (tacho, antes el ícono de prohibido), *Suspend*, *Terminate*, *Disable*
+     (prohibido) y *Remove Provider Role* (persona con menos, antes otro tacho).
+   - Accounts: *Edit* (lápiz), *Manage Licenses* (llave), *Suspend* (prohibido). Antes no tenían íconos.
+
+**A validar:** que recepción y administración no extrañen el clic en el nombre (es el patrón de Patients, que sí lo
+conserva). Si lo extrañan, la salida es la fila entera clickeable, no volver al link.

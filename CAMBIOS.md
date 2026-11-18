@@ -13,6 +13,27 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 - **Para el dev:** `PersonaCard` siempre dibuja el `Link`; pasale `onEdit`/`onDelete` también en Household. Decisión en
   `relationships.md` (2026-11-18).
 
+### New Patient como 2.0, Edit Patient como la ficha de un empleado y tablas de Settings sólo con el ⋮ ([#160](https://github.com/JulianGerardi/red-dental-studio/pull/160))
+- **New Patient** (CON-1328): *Email* obligatorio; Demography con los campos de 2.0 (*Gender\** obligatorio, Race,
+  Ethnicity, Marital Status, Profession, Nationality, Language y Religion) e *Interpreter Required* al lado de Language.
+  Mismo nombre y email que otro paciente: `Alert` danger y no se guarda.
+- **Edit Patient** (`/patients/:id/edit`, CON-1329): una sola pantalla sin pestañas, como la ficha de Employee: foto
+  editable, nombre y estado, y las cards General, Contact, Address y Demographic. Sin Guardian ni el buscador de personas.
+  Obligatorios de la historia: General, Gender, teléfono y dirección.
+- **Employee:** la ficha ya no tiene *Use this option only to link a person…* (sigue en New Employee).
+- **Locations, Employees y Accounts:** el nombre de la fila deja de ser link (se entra por el ⋮ → *Edit*); todos los
+  ítems del menú llevan ícono y los de editar dicen *Edit*.
+- **Para el dev:** `DatosPaciente` suma demografía (`gender`, `race`, `ethnicity`, `marital`, `profession`,
+  `nationality`, `religion`) y contacto/dirección (`codigo`, `area`, `numero`, `ext`, `linea1`, `linea2`, `pais`,
+  `estado`, `ciudad`, `zip`); salen `phone`, `address` y `city`. `useFormPaciente(datos, { edicion: true })`,
+  `validarPaciente(d, { menor, exigirGuardian, edicion })`, `duplicadoDe(...)` y los campos `CamposContacto` /
+  `CamposDireccion`. `PersonCell` sin `to` ni `onClick` dibuja texto. Detalle en `patients.md`, `employees.md`,
+  `locations.md` y `settings-accounts.md` (2026-11-18).
+
+### Figma: fila de turno y Status chip conectados al design system ([#159](https://github.com/JulianGerardi/red-dental-studio/pull/159))
+- **Appointment row** rehecho desde la app (variantes `Action=Check In|Check Out`, 408×86) y componente nuevo **Status chip** (TR/CC). ≈ 310 filas de turno de las pantallas pasan a instancias; diferencia con la pantalla original < 0,2 % de los píxeles. El ícono del Button toma el color de su texto.
+- **Para el dev:** la app no cambia. Motor `filas` guardado en el archivo de flujos; pendientes (filas de tarea, cards de la ficha, campos, tablas) y el detalle en `design-reference/figma-design-system.md`, sección *Fila de turno conectada*.
+
 ### Documentación: Alert como aviso único y sale Section notice ([#158](https://github.com/JulianGerardi/red-dental-studio/pull/158))
 - **Storybook:** *Elements / Alert* con Parts, States (tonos, título y texto, sólo título, angosto, largo y *In the app*)
   y Specs, y la regla en la descripción. Se borran `ui/section-notice` y su story.
