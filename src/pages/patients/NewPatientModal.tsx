@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react'
 import { ModalShell } from '@/components/patients/form'
 import { DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import {
-  CamposDemography, CamposGeneral, CamposGuardian, limpiarPaciente, useFormPaciente,
+  CamposDemography, CamposGeneral, CamposGuardian, duplicadoDe, limpiarPaciente, useFormPaciente,
 } from '@/components/patients/PacienteCampos'
+import { Alert } from '@/components/ui/alert'
 import { usePatients, VACIO_PACIENTE, type DatosPaciente } from '@/data/patientsStore'
 import { PERSONAS_SISTEMA } from '@/data/personas'
 import { aviso } from '@/components/ui/toaster'
 
-/* Figma 3751:73452 (Patients — List): New Patient en pasos, General → Guardian → Demography. Guardian aparece sólo si el
-   paciente es menor de 18, y entonces es obligatorio (CON-2858); Demography es opcional. Next revisa lo obligatorio
+/* New Patient en pasos, como en 2.0 (CON-1328): General → Guardian → Demography. Guardian aparece sólo si el paciente
+   es menor de 18, y entonces es obligatorio (CON-2858); en Demography, Gender es obligatorio. Next revisa lo obligatorio
    del paso; Save revisa los tres y vuelve al primero con algo por corregir. Para cambiar un paciente que ya existe, ver
    la pantalla Edit Patient (pestañas y Save Changes). Decisiones y anomalías del Figma en modulos/patients.md, 2026-10-22.
    Vincular a una persona que ya está en el sistema (empleado, contacto, suscriptor): modulos/patients.md, 2026-11-02.
@@ -33,6 +34,8 @@ export function NewPatientModal({
   const [personaNombre, setPersonaNombre] = useState(personaInicial ?? '')
   const [faltaPersona, setFaltaPersona] = useState(false)
   const [focoPersona, setFocoPersona] = useState(0)
+  /* Ya hay un paciente con ese nombre y email, o la cuenta del portal ya existe (CON-1328). */
+  const [duplicado, setDuplicado] = useState<string | null>(null)
   const yaPacientes = new Set(patients.map((p) => p.name.toLowerCase()))
   const candidatos = PERSONAS_SISTEMA.filter((p) => !yaPacientes.has(p.name.toLowerCase()))
   const persona = vincular ? candidatos.find((p) => p.name === personaNombre) : undefined
@@ -68,6 +71,9 @@ export function NewPatientModal({
     const datos = limpiarPaciente(persona
       ? { ...f.d, first: persona.first, middle: '', last: persona.last, birthday: persona.dob, email: persona.email }
       : f.d, f.menor)
+    const repetido = duplicadoDe(patients, datos)
+    setDuplicado(repetido)
+    if (repetido) return
     addPatient(datos)
     aviso.ok(`${[datos.first, datos.last].filter(Boolean).join(' ')} has been added to the patient list.`)
     onClose()
@@ -84,6 +90,7 @@ export function NewPatientModal({
       step={paso}
       actions={<DrawerActions step={paso} total={pasos.length} onNext={siguiente} onBack={atras} onCancel={onClose} onSave={guardar} />}
     >
+      {duplicado && <Alert tone="danger" title={duplicado} className="mb-6">Check the details or find the existing patient in the list.</Alert>}
       <DrawerStep index={0} step={paso}>
         <CamposGeneral
           {...comunes}

@@ -28,7 +28,7 @@ export function EditPatientModal({
   const datos = inicial ?? (id ? datosDe(id) : undefined) ?? VACIO_PACIENTE
   /* La cuenta del portal que ya existía no se cambia desde acá: se muestra como "Linked". */
   const portalVinculado = datos.portal
-  const f = useFormPaciente(datos, { portalVinculado })
+  const f = useFormPaciente(datos)
   const [elegida, setSeccion] = useState<SeccionPaciente>(seccionInicial)
   /* Guardian, sólo para un menor (patients.md, 2026-11-04): si deja de serlo, se vuelve a General. */
   const seccion = f.secciones.includes(elegida) ? elegida : 'General'

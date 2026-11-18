@@ -131,3 +131,20 @@ campos van de a dos y del mismo ancho, y vale para todo. Está en *Components / 
 controla con `npm run ds:campos`. Name, Website, Time Zone y el Email del dueño entran en la grilla de su sección
 (antes iban de ancho entero
 entre campos de media columna).
+
+## Tablas de Settings: a la ficha sólo por el ⋮, menús con ícono y *Edit* (2026-11-18)
+
+Sin historia de Jira: devolución de diseño de Julián sobre Locations, Employees y Accounts.
+
+1. **Una sola forma de entrar a la ficha**: el ⋮ → *Edit*. El nombre de la fila deja de ser link (Locations y Accounts:
+   `TextCell`; Employees: `PersonCell` sin `to`, que ahora dibuja texto y no un botón vacío). Antes había dos caminos al
+   mismo lugar.
+2. **Menús alineados** con el de Patients (*Overview* / *Edit*): todos los ítems llevan ícono a la izquierda y nombre
+   corto, sin repetir la entidad de la fila.
+   - Locations: *Edit* (lápiz), *Delete* (tacho).
+   - Employees: *Edit* (lápiz), *Delete* (tacho, antes el ícono de prohibido), *Suspend*, *Terminate*, *Disable*
+     (prohibido) y *Remove Provider Role* (persona con menos, antes otro tacho).
+   - Accounts: *Edit* (lápiz), *Manage Licenses* (llave), *Suspend* (prohibido). Antes no tenían íconos.
+
+**A validar:** que recepción y administración no extrañen el clic en el nombre (es el patrón de Patients, que sí lo
+conserva). Si lo extrañan, la salida es la fila entera clickeable, no volver al link.

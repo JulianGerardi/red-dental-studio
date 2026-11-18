@@ -428,8 +428,11 @@ export function PersonCell({ name, initials, photo, to, onClick }: {
       <Avatar initials={initials} photo={photo} />
       {to ? (
         <Link to={to} onClick={(e) => e.stopPropagation()} className={clase}>{name}</Link>
-      ) : (
+      ) : onClick ? (
         <button type="button" onClick={onClick} className={clase}>{name}</button>
+      ) : (
+        /* Sin destino, el nombre es texto: a la ficha se entra por el ⋮ (Settings, 2026-11-18). */
+        <span title={name} className="truncate text-[13px] text-ink">{name}</span>
       )}
     </span>
   )

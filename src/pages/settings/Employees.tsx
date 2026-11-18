@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import { PageTitle } from '@/components/ui/page-title'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
-  Search, CirclePlus, Trash2, FileText, Pencil, Ban,
+  Search, CirclePlus, Trash2, FileText, Pencil, Ban, UserMinus,
 } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { SearchButton } from '@/components/ui/search-button'
@@ -16,7 +16,6 @@ import {
   CountryCodeField, SelectField, TextField, DateField, DateTextField, FormFooter,
 } from '@/components/patients/form'
 import { RolesLocation } from '@/components/settings/RolesLocation'
-import { LinkExistingPerson } from '@/components/settings/LinkExistingPerson'
 import { NewHoursModal } from '@/components/settings/NewHoursModal'
 import { Pill } from '@/components/ui/pill'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
@@ -112,8 +111,8 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
       <div className="mt-4">
         <DataTable
           columns={[
-            /* El nombre es el acceso a la ficha, como en la tabla de pacientes. */
-            { key: 'nombre', header: 'Full Name', width: 240, cell: (e) => <PersonCell name={e.nombre} initials={e.iniciales} to={`/settings/team/${e.id}`} /> },
+            /* A la ficha se entra sólo por el ⋮ → Edit (employees.md, 2026-11-18). */
+            { key: 'nombre', header: 'Full Name', width: 240, cell: (e) => <PersonCell name={e.nombre} initials={e.iniciales} /> },
             { key: 'cumple', header: 'Birthdate', width: 120, cell: (e) => <TextCell>{e.cumpleanos}</TextCell> },
             { key: 'email', header: 'Email', cell: (e) => <TextCell>{e.email}</TextCell> },
             { key: 'provider', header: 'Is Provider', width: 100, cell: (e) => <ProviderPill si={e.esProvider} /> },
@@ -135,16 +134,16 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
             <>
               <DropdownMenuItem asChild>
                 <Link to={`/settings/team/${e.id}`}>
-                  <Pencil className="size-4 shrink-0" /> Edit Employee
+                  <Pencil className="size-4 shrink-0" /> Edit
                 </Link>
               </DropdownMenuItem>
               {/* "Delete Employee" borra la fila de verdad. Las otras tres son
                   del mismo peso en el frame —mismo ícono de "prohibido"— pero
                   necesitarían estados de cuenta que el sistema todavía no tiene. */}
               <DropdownMenuItem variant="destructive" onSelect={() => borrar(e)}>
-                <Ban className="size-4 shrink-0" /> Delete Employee
+                <Trash2 className="size-4 shrink-0" /> Delete
               </DropdownMenuItem>
-              {(['Suspend Employee', 'Terminate Employee', 'Disable'] as const).map((accion) => (
+              {(['Suspend', 'Terminate', 'Disable'] as const).map((accion) => (
                 <DropdownMenuItem
                   key={accion}
                   variant="destructive"
@@ -154,7 +153,7 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
                 </DropdownMenuItem>
               ))}
               <DropdownMenuItem variant="destructive" onSelect={() => quitarRolProvider(e)}>
-                <Trash2 className="size-4 shrink-0" /> Remove Provider Role
+                <UserMinus className="size-4 shrink-0" /> Remove Provider Role
               </DropdownMenuItem>
             </>
           )}
@@ -222,8 +221,6 @@ export function SettingsEmployeeDetail() {
   const [pendiente, setPendiente] = useState<Tab | null>(null)
   const marcarBilling = useCallback((v: boolean) => setBillingSucio(v), [])
   const [credenciales, setCredenciales] = useState([0, 1, 2])
-  const [vincular, setVincular] = useState(false)
-  const [vinculado, setVinculado] = useState<Empleado | null>(null)
   const [foto, setFoto] = usePhoto(`employee-photo:${empleado.id}`)
   const [nuevaHora, setNuevaHora] = useState(false)
 
@@ -300,30 +297,15 @@ export function SettingsEmployeeDetail() {
                 </span>
               </div>
 
+              {/* La ficha edita a alguien que ya existe: no vincula a otra persona (employees.md, 2026-11-18). */}
               <h3 className="mt-5 text-sm font-bold text-ink">General Information</h3>
-              <div className="mt-3 flex flex-col gap-3">
-                <LinkExistingPerson
-                  vincular={vincular}
-                  onVincular={setVincular}
-                  excluirId={empleado.id}
-                  vinculado={vinculado}
-                  onSeleccionar={setVinculado}
-                />
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <SelectField label="First Name" required options={['Michael', 'Sarah', 'Elena']} value={empleado.nombre.split(' ')[0]} />
+                {/* "Lasr Name" es del Figma. */}
+                <SelectField label="Lasr Name" required options={['John', 'Stone', 'Martinez']} value={empleado.nombre.split(' ').slice(1).join(' ')} />
+                <TextField label="Email" required placeholder="Placeholder" value={empleado.email} />
+                <DateField label="Birthdate" required placeholder={empleado.cumpleanos} />
               </div>
-
-              {/* Con el checkbox tildado esta info sale del provider elegido
-                  -ya se ve en la card de arriba-, así que estos cuatro
-                  campos manuales sobran y se ocultan en vez de quedar
-                  duplicados. */}
-              {!vincular && (
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <SelectField label="First Name" required options={['Michael', 'Sarah', 'Elena']} value={empleado.nombre.split(' ')[0]} />
-                  {/* "Lasr Name" es del Figma. */}
-                  <SelectField label="Lasr Name" required options={['John', 'Stone', 'Martinez']} value={empleado.nombre.split(' ').slice(1).join(' ')} />
-                  <TextField label="Email" required placeholder="Placeholder" value={empleado.email} />
-                  <DateField label="Birthdate" required placeholder={empleado.cumpleanos} />
-                </div>
-              )}
             </Card>
 
             <Card title="Contact Information">
