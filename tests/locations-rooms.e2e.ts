@@ -42,8 +42,7 @@ test('Desde el aviso, un turno se pasa a otra sala y deja de estar entre los afe
   const drawer = screen.getByRole('dialog', 'Edit Appointment')
   await drawer.getByRole('button', 'Operatory 1').tap()
   await drawer.getByRole('button', 'Operatory 3').tap()
-  await drawer.getByRole('button', /Next Step/).tap()
-  await drawer.getByRole('button', /^Save/).tap()
+  await drawer.getByRole('button', /Save Changes/).tap()
   await expect(screen.getByText('Appointment for John Smith moved to Operatory 3.')).toBeVisible()
 
   const aviso = screen.getByRole('dialog', 'This room has scheduled appointments')

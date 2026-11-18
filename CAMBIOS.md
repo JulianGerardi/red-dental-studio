@@ -3,11 +3,37 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
-## 2026-11-17 (2)
+## 2026-11-18
 
 ### Figma: estilos de texto y sombra, Sidebar sin activo y pills conectados al design system
 - Nuevos en el DS: 7 estilos de sombra, 27 de texto, variante `Sidebar Active=None` y Pill SM con 6 px de padding. Se aplicaron ≈ 8.700 textos, ≈ 4.000 sombras y ≈ 320 pills de estado en las pantallas.
 - **Para el dev:** la app no cambia. Qué falta conectar (cards, campos, tablas, textos con interlineado automático) y cómo se corren los motores: `design-reference/figma-design-system.md`, sección *Estilos, Sidebar sin activo y pills*.
+
+### Avisos: uno solo (`ui/alert`) y sin el de Demography ([#156](https://github.com/JulianGerardi/red-dental-studio/pull/156))
+- **Demography** (New Patient y Edit Patient) ya no muestra *Additional contact and address information. These fields
+  are optional.*: no estaba en ningún diseño.
+- **Un solo aviso en la app: `ui/alert`** (caja redondeada con ícono y título). Las franjas con barra a la izquierda
+  hechas a mano pasan a `Alert`: *Guarantor not assigned* del detalle del turno y `GuarantorBanner` (warning), Guardian
+  *This patient is under 18.* (warning), New Hours (*Attention needed* warning, *This will update the hours…* info),
+  *Global access* de Assign Role (info) y el aviso de presión de Vitals (info).
+- **Para el dev:** para un mensaje en pantalla, usar `Alert` con su tono; no armar franjas con `border-l-[3px]`. Las
+  tarjetas con barra de color (turnos, findings) no son avisos y siguen igual. `ui/section-notice` queda sin usos y se
+  saca del design system cuando se documente. Decisión en `patients.md` (2026-11-18).
+
+### Drawers sin bajada, Edit Patient como pantalla y Edit Appointment en pestañas ([#155](https://github.com/JulianGerardi/red-dental-studio/pull/155))
+- **Drawers:** el título va solo. `ui/drawer` deja `description` sólo para el lector de pantalla; se sacan las bajadas
+  genéricas de sección (New Appointment, Exceptions).
+- **Edit Patient es una pantalla** (`/patients/:id/edit`), como la ficha de una Location: pestañas General / Guardian /
+  Demography, cada sección en su card y Cancel / Save Changes abajo a la derecha; los dos vuelven a la tabla de
+  Patients. Se va la ruta vieja `/patients/edit`.
+- **Edit Appointment (CON-3249):** sin pasos, en pestañas General / Schedule / Additional / Treatment Plan y un solo Save
+  Changes. En el calendario, un lápiz en el detalle del turno lo abre; Fulfilled, No-show y Cancelled no se editan.
+- **Para el dev:**
+  - `NewAppointmentModal`: `titulo="Edit Appointment"` pasa a `edicion`; suma `pestanaInicial` (Rooms y Working Hours
+    abren en Schedule).
+  - `AppointmentDetailsDrawer` suma `onEdit`; `esEditable()` en `calendar-data.ts`.
+  - `EditPatientModal` ya no se usa en la app (queda en el Storybook hasta documentar).
+  - Decisiones en `patients.md`, `scheduling.md` y `figma/README.md` (2026-11-17).
 
 ## 2026-11-17
 

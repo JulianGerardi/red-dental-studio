@@ -184,7 +184,7 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
 
       <DrawerStep index={2} step={paso}>
         {b.tipo === 'Age limitation' && (
-          <DrawerSection title="Age Limitation" description="Select the age limitation of the exception.">
+          <DrawerSection title="Age Limitation">
             <div className="grid gap-4 sm:grid-cols-2">
               <UnitField label="Minimum age" unit="years" value={b.edadMin ?? 0} onChange={(n) => set('edadMin', n)} />
               <UnitField label="Maximum age" unit="years" value={b.edadMax ?? 0} onChange={(n) => set('edadMax', n)} error={falta('edad') ? 'The maximum age can’t be lower than the minimum.' : undefined} />
@@ -202,12 +202,12 @@ export function ExceptionsDrawer({ excepciones, onClose, onGuardar, agregando = 
           </DrawerSection>
         )}
         {b.tipo === 'Downgrade' && (
-          <DrawerSection title="Downgrade" description="Select the downgrade of the exception.">
+          <DrawerSection title="Downgrade">
             <SearchField label="Downgrade to" required placeholder="Search for CDT Code o Description" options={OPCIONES_PROCEDIMIENTO} value={rebaja} onChange={elegirRebaja} error={falta('rebajaA') ? OBLIGATORIO : undefined} />
           </DrawerSection>
         )}
         {b.tipo === 'Frequency' && (
-          <DrawerSection title="Frequency" description="Select the frequency of the exception.">
+          <DrawerSection title="Frequency">
             <div className="grid gap-4 sm:grid-cols-2">
               <UnitField label="How many times" unit="times" value={b.veces ?? 0} onChange={(n) => set('veces', n)} error={falta('frecuencia') && !(b.veces ?? 0) ? OBLIGATORIO : undefined} />
               <UnitField label="Over the course of" unit="months" value={b.periodo ?? 0} onChange={(n) => set('periodo', n)} error={falta('frecuencia') && !(b.periodo ?? 0) ? OBLIGATORIO : undefined} />

@@ -270,7 +270,7 @@ export function PatientSidePanel({
               onMouseLeave={cerrarInfo}
               className="w-64 p-4"
             >
-              <InfoBlock className="mt-0" title="General" items={GENERAL} onEdit={onEditGeneral ?? (() => navigate('/patients/edit'))} />
+              <InfoBlock className="mt-0" title="General" items={GENERAL} onEdit={onEditGeneral ?? (() => navigate(`${basePath}/edit`))} />
               <InfoBlock title="Contact" items={CONTACT} onEdit={onEditContact ?? (() => setContacto(true))} />
             </PopoverContent>
           </Popover>
@@ -320,7 +320,7 @@ export function PatientSidePanel({
       </div>
 
       <div className={cn('grid gap-x-6 sm:grid-cols-2 lg:grid-cols-1', colapsado && 'lg:hidden')}>
-        <InfoBlock title="General" items={GENERAL} onEdit={onEditGeneral ?? (() => navigate('/patients/edit'))} />
+        <InfoBlock title="General" items={GENERAL} onEdit={onEditGeneral ?? (() => navigate(`${basePath}/edit`))} />
         <InfoBlock title="Contact" items={CONTACT} onEdit={onEditContact ?? (() => setContacto(true))} />
       </div>
 

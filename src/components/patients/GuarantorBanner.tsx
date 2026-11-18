@@ -1,13 +1,12 @@
-/* Banner de garante del frame 3768:794930.
+import { Alert } from '@/components/ui/alert'
+
+/* Banner de garante del frame 3768:794930, con el aviso del design system (ver patients.md, 2026-11-18).
    NO se usa en Documents: pertenece a otro flujo (paciente menor sin garante
    asignado). Queda acá para engancharlo cuando ese flujo se implemente. */
 export function GuarantorBanner() {
   return (
-    <div className="rounded-r-md border-l-[3px] border-attn-fg bg-[#fffbeb] px-4 py-2.5">
-      <p className="text-[13px] font-bold text-attn-fg">Guarantor not assigned</p>
-      <p className="text-xs text-attn-fg">
-        This patient is a minor and does not have a guarantor assigned yet.
-      </p>
-    </div>
+    <Alert tone="warning" title="Guarantor not assigned">
+      This patient is a minor and does not have a guarantor assigned yet.
+    </Alert>
   )
 }

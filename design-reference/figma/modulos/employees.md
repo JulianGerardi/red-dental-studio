@@ -56,3 +56,12 @@ controla con `npm run ds:campos`. Email deja el `sm:col-span-2` y va en la colum
 
 La tabla (`PersonCell`, sin el tono celeste) y la ficha del empleado (`EditableAvatar` de 56) usan `ui/avatar`: azul
 con iniciales blancas y esquinas redondeadas, igual que un paciente. Regla en `../README.md`.
+
+## New Hours y Assign Role: avisos con `ui/alert` (2026-11-18)
+
+Sin historia de Jira (devolución de diseño de Abril Viola). Las franjas con barra a la izquierda pasan a `Alert`, el
+aviso único de la app (detalle en patients.md, 2026-11-18):
+
+- New Hours: *Attention needed* en warning, con el texto como cuerpo; *This will update the hours…* en info, sólo título.
+  Se van los hex `#fffbeb` y `#eff4ff`.
+- Assign Role: *Global access* en info, con el texto como cuerpo.
