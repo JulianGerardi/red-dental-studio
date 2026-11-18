@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-18
 
-### Figma: fila de turno y Status chip conectados al design system
+### Figma: fila de turno y Status chip conectados al design system ([#159](https://github.com/JulianGerardi/red-dental-studio/pull/159))
 - **Appointment row** rehecho desde la app (variantes `Action=Check In|Check Out`, 408×86) y componente nuevo **Status chip** (TR/CC). ≈ 310 filas de turno de las pantallas pasan a instancias; diferencia con la pantalla original < 0,2 % de los píxeles. El ícono del Button toma el color de su texto.
 - **Para el dev:** la app no cambia. Motor `filas` guardado en el archivo de flujos; pendientes (filas de tarea, cards de la ficha, campos, tablas) y el detalle en `design-reference/figma-design-system.md`, sección *Fila de turno conectada*.
 
