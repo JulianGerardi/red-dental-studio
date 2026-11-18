@@ -175,3 +175,10 @@ Auditoría de conexión (antes): texto sin estilo ~30 %, sombras sin estilo ~90 
 - En *Screens & Flows*, los avisos capturados como franja (Guardian en Patients, *Guarantor not assigned* en Scheduling)
   pasaron a instancias de *Alert* Warning de la library; el de Demography se borró. Detalle en `figma-docs.md`.
 
+
+## Fila de tarea conectada (2026-11-18)
+
+- **Task row** (nuevo, `📊 Tables & Lists`): fila de tarea pendiente 774×59 con `Type=Clinical Note|Lab Orders|Prescriptions|Referrals` (ícono y título), pill de estado, "Expired date", vencimiento, abrir documento y "Complete this Task". Propiedades: Detail y Due date.
+- Motor `tareas` (plugin data `rds.ds/tareasSrc`, marca `tareas` por pantalla): reemplaza cada `TaskRow` de 59 px por una instancia, copiando tipo, detalle, vencimiento y etiqueta del pill; sólo si coincide la altura y el texto es "Expired date". 96 filas convertidas (Login, Header & Sidebar, Dashboard, Overview y Notifications).
+- Pendiente: cards de Appointments de la ficha del paciente, campos y tablas; fijar el ícono flecha en el botón de `Appointment row` y `Task row` (hoy lo pone el motor, `236:3520`); borrar `Appointment row (old)`.
+- Nota de publicación: Figma no marcaba los componentes nuevos como "para publicar" hasta que se les agregó una descripción.
