@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { Minus, Plus, Paperclip, Mic } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
+import { Alert } from '@/components/ui/alert'
 import {
   VITALES, VITAL_COLOR, AVISO_PRESION, type Vital, type EstadoVital,
 } from '@/data/clinical-mode'
@@ -201,10 +202,7 @@ export function TarjetaVital({ v, aviso: conAviso }: { v: Vital; aviso?: boolean
       {/* El aviso no está por defecto: aparece cuando el valor se va del rango
           normal. Fijo, era una advertencia que nunca advertía de nada. */}
       {conAviso && estado !== 'Normal' && (
-        <div className="border-l-dash-blue bg-dash-count-bg mt-3 rounded-r-md border-l-[3px] px-3 py-2">
-          <p className="text-dash-blue-hover text-[12px] font-bold">{AVISO_PRESION.titulo}</p>
-          <p className="text-dash-blue-hover text-[12px] font-semibold">{AVISO_PRESION.texto}</p>
-        </div>
+        <Alert tone="info" title={AVISO_PRESION.titulo} className="mt-3">{AVISO_PRESION.texto}</Alert>
       )}
 
       {v.alternador && (

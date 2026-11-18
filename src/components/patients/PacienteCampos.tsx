@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Check } from 'lucide-react'
 import { DrawerSection } from '@/components/ui/drawer'
 import { Pill } from '@/components/ui/pill'
-import { SectionNotice } from '@/components/ui/section-notice'
+import { Alert } from '@/components/ui/alert'
 import { CollapsibleFields, DateField, LinkPersonCheckbox, OptionCheckbox, PersonSearchField, chipsPersona, CountryCodeField, SelectField, TextField } from '@/components/patients/form'
 import type { DatosPaciente } from '@/data/patientsStore'
 import { PERSONAS_SISTEMA, type PersonaSistema } from '@/data/personas'
@@ -254,7 +254,7 @@ export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Pr
   const persona = [[d.gFirst, d.gLast].map((x) => x.trim()).filter(Boolean).join(' '), d.gEmail.trim(), d.gDob && `DOB: ${d.gDob}`].filter(Boolean).join(' · ')
   return (
     <DrawerSection title="Guardian Information">
-      <SectionNotice>This patient is under 18. Add at least one guardian: search for a person in the system or add a new one.</SectionNotice>
+      <Alert tone="warning" title="This patient is under 18.">Add at least one guardian: search for a person in the system or add a new one.</Alert>
       <Campo nombre="guardianName">
         <PersonSearchField
           label="Guardian" required={obligatorio} placeholder="Search by Name or Last Name"
@@ -329,7 +329,6 @@ export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Pr
 export function CamposDemography({ d, cambiar }: Props) {
   return (
     <DrawerSection title="Demographic Information">
-      <SectionNotice>Additional contact and address information. These fields are optional.</SectionNotice>
       <OptionCheckbox label="Interpreter Required" checked={d.interpreter} onChange={(v) => cambiar('interpreter', v)} />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Campo nombre="phone"><TextField label="Phone" placeholder="408-XXX-XXXX" value={d.phone} onChange={(v) => cambiar('phone', v)} /></Campo>

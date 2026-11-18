@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-18
 
+### Avisos: uno solo (`ui/alert`) y sin el de Demography ([#156](https://github.com/JulianGerardi/red-dental-studio/pull/156))
+- **Demography** (New Patient y Edit Patient) ya no muestra *Additional contact and address information. These fields
+  are optional.*: no estaba en ningún diseño.
+- **Un solo aviso en la app: `ui/alert`** (caja redondeada con ícono y título). Las franjas con barra a la izquierda
+  hechas a mano pasan a `Alert`: *Guarantor not assigned* del detalle del turno y `GuarantorBanner` (warning), Guardian
+  *This patient is under 18.* (warning), New Hours (*Attention needed* warning, *This will update the hours…* info),
+  *Global access* de Assign Role (info) y el aviso de presión de Vitals (info).
+- **Para el dev:** para un mensaje en pantalla, usar `Alert` con su tono; no armar franjas con `border-l-[3px]`. Las
+  tarjetas con barra de color (turnos, findings) no son avisos y siguen igual. `ui/section-notice` queda sin usos y se
+  saca del design system cuando se documente. Decisión en `patients.md` (2026-11-18).
+
 ### Drawers sin bajada, Edit Patient como pantalla y Edit Appointment en pestañas ([#155](https://github.com/JulianGerardi/red-dental-studio/pull/155))
 - **Drawers:** el título va solo. `ui/drawer` deja `description` sólo para el lector de pantalla; se sacan las bajadas
   genéricas de sección (New Appointment, Exceptions).

@@ -781,3 +781,9 @@ como ocupadas, aunque sea el propio turno que se edita. Ya pasaba en New Appoint
 
 **A validar con usuarios:** si recepción encuentra el lápiz en la cabecera o lo busca abajo, junto a Check In; y si
 Status se busca en General o en Schedule.
+
+## Detalle del turno: *Guarantor not assigned* con `ui/alert` (2026-11-18)
+
+Sin historia de Jira (devolución de diseño de Abril Viola). La franja con barra a la izquierda, hecha a mano, pasa a
+`Alert` tono warning, sólo título: el mismo aviso que el resto de la app. Detalle de la decisión en patients.md
+(2026-11-18).

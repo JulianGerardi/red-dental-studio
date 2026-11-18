@@ -3289,3 +3289,9 @@ Anomalías del diseño (se copian tal cual y se anotan):
   dos pasos (Procedure · Descriptors).
 - **Para después (decisión de Julián):** Treatment Workflow (detalle y Clinical Note) y Workflow Set Up: hay que pegarlos en el
   archivo de flujos.
+
+## Vitals: el aviso de presión con `ui/alert` (2026-11-18)
+
+Sin historia de Jira (devolución de diseño de Abril Viola). El aviso azul que aparece cuando un valor se va del rango
+pasa de franja con barra a la izquierda a `Alert` tono info, el aviso único de la app (detalle en patients.md,
+2026-11-18). El texto sigue siendo el del Figma, que no habla de presión (anomalía ya anotada en `AVISO_PRESION`).

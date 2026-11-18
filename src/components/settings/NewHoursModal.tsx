@@ -1,4 +1,5 @@
 import { DrawerActions } from '@/components/ui/drawer'
+import { Alert } from '@/components/ui/alert'
 import { useState } from 'react'
 import { CirclePlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -43,14 +44,11 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-4">
-        <div className="rounded-r-md border-l-[3px] border-l-attn-fg bg-[#fffbeb] px-3 py-2.5">
-          <p className="text-[11px] font-bold text-attn-fg">Attention needed</p>
-          <p className="mt-1 text-[11px] leading-[1.5] font-medium text-attn-fg">
+        <Alert tone="warning" title="Attention needed">
             Select the location assigned to the provider, then set the start and end times in the
             location&apos;s local time zone. The system will automatically convert and store the
             shift in Coordinated Universal Time (UTC) for consistency across all locations.
-          </p>
-        </div>
+        </Alert>
 
         {/* De a dos como los horarios de abajo: Location va en la columna izquierda (Drawer → Specs → Fields). */}
         <div className="grid gap-4 sm:grid-cols-2">
@@ -146,11 +144,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        <div className="rounded-r-md border-l-[3px] border-l-dash-blue bg-[#eff4ff] px-3 py-2.5">
-          <p className="text-dash-blue text-[11px] leading-[1.5] font-semibold">
-            This will update the hours for all selected days with the time ranges you&apos;ve set above.
-          </p>
-        </div>
+        <Alert tone="info" title="This will update the hours for all selected days with the time ranges you've set above." />
       </div>
     </ModalShell>
   )
