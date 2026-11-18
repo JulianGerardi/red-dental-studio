@@ -357,7 +357,7 @@ export default function Dashboard() {
 
       {editando && (
         <NewAppointmentModal
-          titulo="Edit Appointment"
+          edicion
           inicial={editando.datos}
           onGuardar={guardarEdicion}
           onClose={() => setEditando(null)}

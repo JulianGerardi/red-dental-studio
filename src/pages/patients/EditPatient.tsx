@@ -1,8 +1,15 @@
+import { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { PageTitle } from '@/components/ui/page-title'
+import { Tabs } from '@/components/ui/tabs'
 import { TextField, SelectField, OptionCheckbox, FormFooter } from '@/components/patients/form'
-import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
+import {
+  CamposDemography, CamposGeneral, CamposGuardian, limpiarPaciente, useFormPaciente, type SeccionPaciente,
+} from '@/components/patients/PacienteCampos'
 import { DrawerSection, useEnDrawer } from '@/components/ui/drawer'
 import { aviso } from '@/components/ui/toaster'
+import { DATOS_JOHN_SMITH, usePatients } from '@/data/patientsStore'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
@@ -21,8 +28,8 @@ export function Section({ title, children }: { title: string; children: React.Re
   )
 }
 
-/* El cuerpo de la página completa (Figma 3640:72713). El drawer de Edit Patient que abre el menú de la tabla es otro
-   formulario, con pestañas: ver EditPatientModal (Figma 5277:123056). */
+/* El cuerpo de la página del Figma 3640:72713, con campos fijos. La app ya no lo usa: Edit Patient es EditPatientPage,
+   con los datos del paciente (patients.md, 2026-11-17). */
 export function EditPatientForm() {
   return (
     <div className="flex flex-col gap-6">
@@ -63,18 +70,51 @@ export function EditPatientForm() {
   )
 }
 
+/* Edit Patient como pantalla, con la lógica de la ficha de una Location (Settings → Locations): título, pestañas debajo,
+   cada sección en su card y Cancel / Save Changes abajo a la derecha. Las pestañas y la validación son las de antes
+   (General / Guardian sólo para un menor / Demography; el error lleva a su pestaña). Cuelga de la tabla, no del
+   dashboard del paciente: las migas y Cancel / Save vuelven a Patients (Julián; patients.md, 2026-11-17). */
 export default function EditPatientPage() {
+  const { id = 'john-smith' } = useParams()
+  const navigate = useNavigate()
+  const { datosDe, updatePatient } = usePatients()
+  const datos = datosDe(id) ?? DATOS_JOHN_SMITH
+  /* La cuenta del portal que ya existía no se cambia desde acá: se muestra como "Linked". */
+  const portalVinculado = datos.portal
+  const f = useFormPaciente(datos, { portalVinculado })
+  const [elegida, setSeccion] = useState<SeccionPaciente>('General')
+  /* Guardian, sólo para un menor (patients.md, 2026-11-04): si deja de serlo, se vuelve a General. */
+  const seccion = f.secciones.includes(elegida) ? elegida : 'General'
+  const volver = () => navigate('/patients')
+
+  const guardar = () => {
+    const error = f.revisar(f.secciones)
+    if (error) { setSeccion(error.seccion); f.enfocar(error.campo); return }
+    const guardado = limpiarPaciente(f.d, f.menor)
+    updatePatient(id, guardado)
+    aviso.ok(`${[guardado.first, guardado.last].filter(Boolean).join(' ')} has been updated.`)
+    volver()
+  }
+
+  const comunes = { d: f.d, cambiar: f.cambiar, errores: f.errores }
+  const panel = (s: SeccionPaciente, contenido: React.ReactNode) => (
+    <div role="tabpanel" aria-label={s} hidden={seccion !== s} className={cn(TARJETA_PANEL, 'p-6')}>{contenido}</div>
+  )
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <PatientBreadcrumb name="John Smith" section="Edit Patient" />
-      <div className="flex flex-col gap-[15px]">
-        <PageTitle>Edit Patient</PageTitle>
+      <div className="mb-4"><Breadcrumb items={[{ label: 'Patients', to: '/patients' }, { label: 'Edit Patient' }]} /></div>
+      <PageTitle>Edit Patient</PageTitle>
+      <Tabs
+        className="mt-4" aria-label="Patient sections" value={seccion} onChange={setSeccion}
+        tabs={f.secciones.map((s) => ({ value: s, alerta: f.conError(s) }))}
+      />
+      <div className="mt-4">
+        {panel('General', <CamposGeneral {...comunes} portalVinculado={portalVinculado} />)}
+        {f.menor && panel('Guardian', <CamposGuardian {...comunes} />)}
+        {panel('Demography', <CamposDemography {...comunes} />)}
       </div>
-      <div className="mt-6">
-        <EditPatientForm />
-      </div>
-      <div className="mt-6 flex justify-end gap-3">
-        <FormFooter onCancel={() => history.back()} onSave={() => aviso.ok('Patient details saved.')} />
+      <div className="mt-4 flex justify-end gap-3">
+        <FormFooter onCancel={volver} onSave={guardar} saveLabel="Save Changes" />
       </div>
     </div>
   )

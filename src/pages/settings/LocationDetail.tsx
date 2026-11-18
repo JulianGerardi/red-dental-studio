@@ -499,7 +499,8 @@ export function RoomsTab() {
 
       {baja && turno && (
         <NewAppointmentModal
-          titulo="Edit Appointment"
+          edicion
+          pestanaInicial="Schedule"
           inicial={{
             patient: turno.paciente, primary: turno.provider, date: formatDMY(turno.fecha),
             start: horaTurno(turno.fecha.getHours()), end: horaTurno(turno.fecha.getHours() + 1),

@@ -135,7 +135,9 @@ El código lo toman **jonatan784** y **betsyMb**, y se enteran de cada cambio po
 - **Pop ups = `ui/drawer`** (derecha, alto completo). Con más de una sección lleva pasos: `steps` + `DrawerStep` +
   `DrawerActions`, estado con `lib/useFormPasos`. Cada paso tiene un nombre corto de lo que se hace ("General",
   "Contact", "Address"), nunca "Step". Secciones sin caja ni borde, campos de a dos, pie con dos botones del mismo
-  ancho. Sólo las preguntas sí/no quedan como `ui/confirm-dialog`.
+  ancho. Sólo las preguntas sí/no quedan como `ui/confirm-dialog`. Título sin bajada. Editar algo ya cargado no lleva
+  pasos: pestañas como las de la ficha de una Location y un solo "Save Changes" (Edit Appointment en drawer; Edit
+  Patient es una pantalla, `/patients/:id/edit`, como la ficha de la Location).
 - **Cards:** la card sobre el fondo gris de la página es `TARJETA_PANEL` (sombra, **sin borde**); la que va adentro de
   otra es `TARJETA_INTERNA` / `InnerCard` (línea de 0,5 px gris tenue + sombra suave, en `shadow-inner-card`). La línea
   fina se dibuja con sombra inset: Chrome redondea `border-[0.5px]` a 1 px y una sombra externa se corta en listas con

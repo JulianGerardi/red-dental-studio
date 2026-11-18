@@ -35,7 +35,7 @@ type Story = StoryObj<typeof meta>
 export const Playground: Story = {}
 
 export const Edit: Story = {
-  args: { titulo: 'Edit Appointment', inicial: { patient: 'Maria Abril Viola', reason: 'Routine cleaning appointment' } },
+  args: { edicion: true, inicial: { patient: 'Maria Abril Viola', reason: 'Routine cleaning appointment' } },
 }
 
 /* Con el paso 1 completo: Next Step lleva directo al paso 2. */
@@ -72,13 +72,13 @@ export const WithValidationErrors: Story = {
 
 /* Paso 2 con Visit 2, que ya está linkeada a otro turno. */
 export const LinkedVisit: Story = {
-  args: { titulo: 'New Appointment', inicial: COMPLETO },
+  args: { inicial: COMPLETO },
   play: secuencia(pulsar(/^next step$/i), pulsarRol('radio', /^Visit 2/), esperar(/Linked appointment/)),
 }
 
 /* La pregunta abierta al guardar. */
 export const MoveVisitQuestion: Story = {
-  args: { titulo: 'New Appointment', inicial: COMPLETO },
+  args: { inicial: COMPLETO },
   play: secuencia(pulsar(/^next step$/i), pulsarRol('radio', /^Visit 2/), pulsar(/^save$/i), esperar(/Move treatment visit\?/)),
 }
 

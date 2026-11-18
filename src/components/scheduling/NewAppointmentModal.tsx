@@ -1,4 +1,5 @@
 import { DrawerActions, DrawerSection } from '@/components/ui/drawer'
+import { Tabs } from '@/components/ui/tabs'
 import { useMemo, useState } from 'react'
 import {
   ModalShell, SelectField, PersonSearchField, TextArea, chipsPersona, type ChipPersona,
@@ -25,7 +26,13 @@ import { OBLIGATORIO } from '@/lib/validacion'
    design-reference/design-system.md, "Pop ups".
 
    Desde 2026-10-17, una visita que ya está linkeada a otro turno lo muestra en su fila y, al guardar, pregunta si se
-   mueve (MoverVisitaDialog). Ver scheduling.md. */
+   mueve (MoverVisitaDialog). Ver scheduling.md.
+
+   Edit Appointment (2026-11-17): sin pasos. El turno ya está cargado, así que va en pestañas -General, Schedule,
+   Additional, Treatment Plan- con un solo "Save Changes", como Edit Patient. Ver scheduling.md. */
+
+const PESTANAS = ['General', 'Schedule', 'Additional', 'Treatment Plan'] as const
+export type Pestana = (typeof PESTANAS)[number]
 
 const PACIENTES = ['John Smith', 'Noah James Smith', 'Maria Abril Viola', 'Elias Aguirre']
 const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado', 'Sarah Stone']
@@ -120,23 +127,27 @@ const VACIO = {
 export type DatosTurno = Partial<typeof VACIO>
 
 export function NewAppointmentModal({
-  titulo = 'New Appointment',
+  edicion = false,
+  pestanaInicial = 'General',
   inicial,
   operatorios,
   onGuardar,
   onClose,
 }: {
-  titulo?: string
+  /** Edit Appointment: el turno ya existe, sin pasos y con "Save Changes". Sin esto, New Appointment (aunque llegue con
+      `inicial`, como al agendar una solicitud). */
+  edicion?: boolean
+  /** La pestaña con que abre Edit Appointment: Schedule cuando se viene a mover el turno (Rooms, Working Hours). */
+  pestanaInicial?: Pestana
   /** Las salas que se pueden elegir (las activas de la locación); sin esto, las de ejemplo. */
   operatorios?: string[]
-  /** Con datos, el modal edita el turno en vez de crear uno. */
+  /** Los datos con que arranca: el turno a editar o la solicitud a agendar. */
   inicial?: DatosTurno
   /** Recibe los valores al guardar. Si devuelve true, ya mostró su propio
       toast y el modal no muestra el suyo. */
   onGuardar?: (d: typeof VACIO) => boolean | void
   onClose: () => void
 }) {
-  const editando = !!inicial
   const [d, setD] = useState({ ...VACIO, ...inicial })
   /* La fecha va con el calendario, no con un select de tres opciones fijas:
      sin eso no se puede reprogramar a un día cualquiera. */
@@ -145,7 +156,8 @@ export function NewAppointmentModal({
     const [dd, mm, yyyy] = d.date.split('-').map(Number)
     return Number.isNaN(dd) ? null : new Date(yyyy, mm - 1, dd)
   }, [d.date])
-  const [asap, setAsap] = useState(true)
+  /* Al editar no se marca ASAP solo: el turno ya existe y no lo traía. */
+  const [asap, setAsap] = useState(!edicion)
   const [plan, setPlan] = useState('p1')
   const [visita, setVisita] = useState('v1')
   const elegida = VISITAS.find((v) => v.id === visita)
@@ -155,7 +167,9 @@ export function NewAppointmentModal({
   /* El calendario del día se despliega al costado cuando se toca la fecha o la hora (sólo en el paso 1). */
   const [tocoHorario, setTocoHorario] = useState(false)
   const [paso, setPaso] = useState<1 | 2>(1)
-  const mostrarPanel = paso === 1 && tocoHorario
+  const [pestana, setPestana] = useState<Pestana>(pestanaInicial)
+  /* Al editar, la pestaña Schedule es para mover el turno: el calendario del día se ve de entrada. */
+  const mostrarPanel = edicion ? pestana === 'Schedule' : paso === 1 && tocoHorario
   const set = (k: keyof typeof VACIO) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   const req = (k: keyof typeof VACIO) =>
     intentado && !d[k].trim() ? OBLIGATORIO : undefined
@@ -170,6 +184,13 @@ export function NewAppointmentModal({
   /* Additional Provider dejó de ser obligatorio en este frame. */
   const obligatorios: (keyof typeof VACIO)[] =
     ['patient', 'primary', 'date', 'start', 'end', 'operatory', 'status']
+  /* Al editar: en qué pestaña vive cada obligatorio, para marcarla y llevar ahí al guardar. */
+  const PESTANA_DE: Partial<Record<keyof typeof VACIO, Pestana>> = {
+    patient: 'General', primary: 'General', status: 'General',
+    date: 'Schedule', start: 'Schedule', end: 'Schedule', operatory: 'Schedule',
+  }
+  const faltan = intentado ? obligatorios.filter((k) => !d[k].trim()) : []
+  const conError = (t: Pestana) => faltan.some((k) => PESTANA_DE[k] === t)
 
   const continuar = () => {
     setIntentado(true)
@@ -179,7 +200,8 @@ export function NewAppointmentModal({
 
   const guardar = () => {
     setIntentado(true)
-    if (obligatorios.some((k) => !d[k].trim())) return
+    const falta = obligatorios.find((k) => !d[k].trim())
+    if (falta) { if (edicion) setPestana(PESTANA_DE[falta] ?? 'General'); return }
     if (elegida?.vinculada) setMoviendo(true)
     else terminar()
   }
@@ -188,7 +210,7 @@ export function NewAppointmentModal({
     const manejado = onGuardar?.(d)
     if (!manejado) {
       aviso.ok(
-        editando
+        edicion
           ? `Appointment for ${d.patient} updated.`
           : `Appointment for ${d.patient} booked at ${d.start}.`,
       )
@@ -198,84 +220,136 @@ export function NewAppointmentModal({
     onClose()
   }
 
+  /* Los campos sueltos: New Appointment los arma en el orden de CON-4090 y Edit Appointment los reparte en pestañas. */
+  const fPaciente = (
+    <PersonSearchField
+      label="Patient" required placeholder="Search by name, number, DOB or email" personas={PACIENTES} subtitulo={pacienteNumero} chips={pacienteChips}
+      value={d.patient} onChange={set('patient')} error={req('patient')}
+    />
+  )
+  const fPrimary = (
+    <PersonSearchField
+      label="Primary Provider" required placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
+      value={d.primary} onChange={set('primary')} error={req('primary')}
+    />
+  )
+  const fAdditional = (
+    <PersonSearchField
+      label="Additional Provider" placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
+      value={d.additional} onChange={set('additional')}
+    />
+  )
+  const fStatus = <SelectField label="Status" required value={d.status} onChange={set('status')} error={req('status')} />
+  const fRequestor = <SelectField label="Requestor" placeholder="Who is requesting?" value={d.requestor} onChange={set('requestor')} />
+  const fReason = <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />
+  /* Tocar la fecha o una hora despliega el calendario del día al costado; una vez abierto, se queda. */
+  const fFecha = (
+    <div onFocus={() => setTocoHorario(true)} className="flex flex-col gap-2">
+      <FieldLabel required>Date</FieldLabel>
+      <DatePicker
+        value={fecha}
+        onChange={(nueva) => { set('date')(formatDMY(nueva)); setTocoHorario(true) }}
+        error={!!req('date')}
+        className="h-9 w-full"
+      />
+      <FieldError>{req('date')}</FieldError>
+    </div>
+  )
+  const fHoras = (
+    <div onFocus={() => setTocoHorario(true)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <SelectField label="Start Time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} />
+      <SelectField label="End Time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
+    </div>
+  )
+  const fOperatory = <SelectField label="Operatory" required options={operatorios} value={d.operatory} onChange={set('operatory')} error={req('operatory')} />
+  const par = (a: React.ReactNode, b?: React.ReactNode) => <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">{a}{b}</div>
+
+  /* Additional y Notes, en el paso 1 como red.dev y CON-4090. */
+  const seccionAdicional = (
+    <DrawerSection title="Additional">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
+        <OptionCheckbox label="Follow-up" defaultChecked={false} />
+        <OptionCheckbox label="Premedicate" defaultChecked={false} />
+      </div>
+      <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
+    </DrawerSection>
+  )
+
+  /* Paso 2 de 2.0: el link a una visita del plan (opcional). */
+  const seccionVisita = (
+    <DrawerSection title="Link to treatment plan visit">
+      <div className="flex flex-col gap-2">
+        <FieldLabel>Treatment plan</FieldLabel>
+        {PLANES.map((p) => <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />)}
+      </div>
+      <div className="flex flex-col gap-2">
+        <FieldLabel>Visit</FieldLabel>
+        {VISITAS.map((v) => <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />)}
+      </div>
+    </DrawerSection>
+  )
+
+  /* Una pestaña de Edit Appointment: escondida y no desmontada, así lo tocado se conserva al ir y volver. */
+  const panel = (t: Pestana, contenido: React.ReactNode) => (
+    <div role="tabpanel" aria-label={t} hidden={pestana !== t}>{contenido}</div>
+  )
+
   return (
     <ModalShell
-      title={titulo}
-      description="Customize the schedule you want to see"
+      title={edicion ? 'Edit Appointment' : 'New Appointment'}
       onClose={onClose}
       width="max-w-[560px]"
-      steps={['Patient and Scheduling', 'Link to treatment plan visit']}
+      steps={edicion ? undefined : ['Patient and Scheduling', 'Link to treatment plan visit']}
       step={paso - 1}
-      actions={<DrawerActions step={paso - 1} total={2} onNext={continuar} onBack={() => setPaso(1)} onCancel={onClose} onSave={guardar} />}
+      tabs={edicion ? (
+        <Tabs
+          aria-label="Appointment sections" value={pestana} onChange={setPestana}
+          tabs={PESTANAS.map((t) => ({ value: t, alerta: conError(t) }))}
+        />
+      ) : undefined}
+      actions={edicion
+        ? <DrawerActions onCancel={onClose} onSave={guardar} saveLabel="Save Changes" />
+        : <DrawerActions step={paso - 1} total={2} onNext={continuar} onBack={() => setPaso(1)} onCancel={onClose} onSave={guardar} />}
       aside={mostrarPanel ? <AppointmentSlotPicker fecha={fecha ? fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : undefined} seleccion={d.start} paciente={d.patient} onPick={elegirFranja} className="h-full rounded-none border-0" /> : undefined}
     >
-      {paso === 1 ? (
+      {edicion ? (
+        <>
+          {/* Quién y por qué; Status primero de su fila porque de él dependen los obligatorios (CON-4090). */}
+          {panel('General', (
+            <DrawerSection title="General Information">
+              {fPaciente}
+              {fPrimary}
+              {fAdditional}
+              {par(fStatus, fRequestor)}
+              {par(fReason)}
+            </DrawerSection>
+          ))}
+          {panel('Schedule', (
+            <DrawerSection title="Scheduling">
+              {par(fFecha, fOperatory)}
+              {fHoras}
+            </DrawerSection>
+          ))}
+          {panel('Additional', seccionAdicional)}
+          {panel('Treatment Plan', seccionVisita)}
+        </>
+      ) : paso === 1 ? (
         <div className="flex flex-col gap-6">
-        {/* Una columna, campos de a dos en el orden de CON-4090: Status y Requestor, Reason y Date, Start y End, Operatory.
-           Al tocar la fecha o la hora se despliega al costado el calendario del día para elegir la franja. */}
-        <DrawerSection title="Patient and Scheduling" description="Complete the details below to schedule the appointment.">
-          <PersonSearchField
-            label="Patient" required placeholder="Search by name, number, DOB or email" personas={PACIENTES} subtitulo={pacienteNumero} chips={pacienteChips}
-            value={d.patient} onChange={set('patient')} error={req('patient')}
-          />
-          <PersonSearchField
-            label="Primary Provider" required placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
-            value={d.primary} onChange={set('primary')} error={req('primary')}
-          />
-          <PersonSearchField
-            label="Additional Provider" placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
-            value={d.additional} onChange={set('additional')}
-          />
-          {/* Status arriba, con Requestor: de él dependen los obligatorios de abajo (CON-4090; scheduling.md, 2026-11-12). */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <SelectField label="Status" required value={d.status} onChange={set('status')} error={req('status')} />
-            <SelectField label="Requestor" placeholder="Who is requesting?" value={d.requestor} onChange={set('requestor')} />
-          </div>
-          {/* Tocar la fecha o una hora despliega el calendario del día al costado; una vez abierto, se queda. */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />
-            <div onFocus={() => setTocoHorario(true)} className="flex flex-col gap-2">
-              <FieldLabel required>Date</FieldLabel>
-              <DatePicker
-                value={fecha}
-                onChange={(nueva) => { set('date')(formatDMY(nueva)); setTocoHorario(true) }}
-                error={!!req('date')}
-                className="h-9 w-full"
-              />
-              <FieldError>{req('date')}</FieldError>
-            </div>
-          </div>
-          <div onFocus={() => setTocoHorario(true)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <SelectField label="Start Time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} />
-            <SelectField label="End Time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <SelectField label="Operatory" required options={operatorios} value={d.operatory} onChange={set('operatory')} error={req('operatory')} />
-          </div>
-        </DrawerSection>
-        {/* Additional y Notes pasan al paso 1, como red.dev y CON-4090: el paso 2 queda sólo para linkear la visita. */}
-        <DrawerSection title="Additional">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
-            <OptionCheckbox label="Follow-up" defaultChecked={false} />
-            <OptionCheckbox label="Premedicate" defaultChecked={false} />
-          </div>
-          <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
-        </DrawerSection>
+          {/* Una columna, campos de a dos en el orden de CON-4090: Status y Requestor, Reason y Date, Start y End, Operatory.
+             Al tocar la fecha o la hora se despliega al costado el calendario del día para elegir la franja. */}
+          <DrawerSection title="Patient and Scheduling">
+            {fPaciente}
+            {fPrimary}
+            {fAdditional}
+            {par(fStatus, fRequestor)}
+            {par(fReason, fFecha)}
+            {fHoras}
+            {par(fOperatory)}
+          </DrawerSection>
+          {seccionAdicional}
         </div>
-      ) : (
-        /* Paso 2 de 2.0: el link a una visita del plan (opcional). */
-        <DrawerSection title="Link to treatment plan visit" description="Optional. Show this only when the appointment should be tied to a planned treatment visit.">
-          <div className="flex flex-col gap-2">
-            <FieldLabel>Treatment plan</FieldLabel>
-            {PLANES.map((p) => <PlanCard key={p.id} plan={p} on={plan === p.id} onClick={() => setPlan(p.id)} />)}
-          </div>
-          <div className="flex flex-col gap-2">
-            <FieldLabel>Visit</FieldLabel>
-            {VISITAS.map((v) => <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />)}
-          </div>
-        </DrawerSection>
-      )}
+      ) : seccionVisita}
       {moviendo && elegida?.vinculada && (
         <MoverVisitaDialog visita={elegida.name} turno={elegida.vinculada} onConfirm={terminar} onCancel={() => setMoviendo(false)} />
       )}
