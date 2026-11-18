@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-18
 
+### Relationships: todos los nombres son link y Household con ⋮ (CON-4139, CON-4113) ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+- **Todos los nombres de las cards** (relaciones y Household) son link azul a la ficha de esa persona
+  (`/patients/:pacienteId`). Ya no hay nombre en negro.
+- **Household lleva el ⋮** con *Edit relationship* y *Delete relationship*, igual que las relaciones. Al editar se
+  conserva la pill *Household*. Sin pacientes en Household: *No household patients*.
+- **Para el dev:** `PersonaCard` siempre dibuja el `Link`; pasale `onEdit`/`onDelete` también en Household. Decisión en
+  `relationships.md` (2026-11-18).
+
 ### Documentación: Alert como aviso único y sale Section notice ([#158](https://github.com/JulianGerardi/red-dental-studio/pull/158))
 - **Storybook:** *Elements / Alert* con Parts, States (tonos, título y texto, sólo título, angosto, largo y *In the app*)
   y Specs, y la regla en la descripción. Se borran `ui/section-notice` y su story.

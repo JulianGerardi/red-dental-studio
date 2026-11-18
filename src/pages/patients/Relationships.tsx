@@ -55,7 +55,7 @@ type Campo = { icon: LucideIcon; label: string; value: string }
 
 type Persona = {
   id?: string
-  /** Si la persona también es paciente, su nombre abre su ficha. */
+  /** Ficha de la persona: todos los nombres son link (CON-4139, relationships.md 2026-11-18). */
   pacienteId?: string
   name: string
   initials: string
@@ -81,8 +81,8 @@ const HOGAR: Campo[] = [
 /* Dos cards con la misma persona: es lo que muestra el frame. Se les agrega
    un id para poder borrarlas por separado. */
 export const RELACIONES: Persona[] = [
-  { id: 'r1', name: 'Jessica Miller', initials: 'JM', rol: 'Mother', badges: ['Legal contact', 'Financial contact'], campos: CONTACTO },
-  { id: 'r2', name: 'Jessica Miller', initials: 'JM', rol: 'Mother', badges: ['Legal contact', 'Financial contact'], campos: CONTACTO },
+  { id: 'r1', pacienteId: 'patient-0004', name: 'Jessica Miller', initials: 'JM', rol: 'Mother', badges: ['Legal contact', 'Financial contact'], campos: CONTACTO },
+  { id: 'r2', pacienteId: 'patient-0005', name: 'Jessica Miller', initials: 'JM', rol: 'Mother', badges: ['Legal contact', 'Financial contact'], campos: CONTACTO },
 ]
 export const HOUSEHOLD: Persona[] = [
   { id: 'h1', pacienteId: 'patient-0002', name: 'Jessica Miller', initials: 'JM', rol: 'Child', badges: ['Household'], campos: HOGAR },
@@ -101,14 +101,10 @@ export function PersonaCard({
       <header className="flex flex-wrap items-center gap-3">
         <Avatar initials={p.initials} size={40} />
         <span className="leading-tight">
-          {/* Paciente: el nombre es link a su ficha, como en red.dev (relationships.md, 2026-11-12). */}
-          {p.pacienteId ? (
-            <Link to={`/patients/${p.pacienteId}`} className="block rounded-sm text-[15px] font-bold text-dash-blue underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue">
-              {p.name}
-            </Link>
-          ) : (
-            <span className="block text-[15px] font-bold text-ink">{p.name}</span>
-          )}
+          {/* Todos los nombres abren la ficha de esa persona (CON-4139; relationships.md, 2026-11-18). */}
+          <Link to={`/patients/${p.pacienteId ?? p.id}`} className="block rounded-sm text-[15px] font-bold text-dash-blue underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue">
+            {p.name}
+          </Link>
           <span className="block text-xs text-ink-muted">{p.rol}</span>
         </span>
         <span className="flex flex-wrap items-center gap-2">
@@ -143,6 +139,7 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
   const navigate = useNavigate()
   const [agregando, setAgregando] = useState(nuevo)
   const [relaciones, setRelaciones] = useState(RELACIONES)
+  const [hogar, setHogar] = useState(HOUSEHOLD)
   const [editando, setEditando] = useState<Persona | null>(null)
   const [borrando, setBorrando] = useState<Persona | null>(null)
 
@@ -153,7 +150,7 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
   const agregar = (r: NuevaRelacion) => {
     const badges: Badge[] = [...(r.guardian ? ['Legal contact' as const] : []), ...(r.guarantor ? ['Financial contact' as const] : [])]
     setRelaciones((prev) => [{
-      id: `r${Date.now()}`, name: r.name, initials: r.initials, rol: r.rol, badges,
+      id: `r${Date.now()}`, pacienteId: `persona-${Date.now()}`, name: r.name, initials: r.initials, rol: r.rol, badges,
       campos: [
         { icon: Calendar, label: 'Date of Birth', value: r.dob },
         { icon: Phone, label: 'Phone', value: r.phone },
@@ -166,10 +163,13 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
   const guardarEdicion = (p: Persona, c: { guardian: boolean; guarantor: boolean; rel: string }) => {
     const badges: Badge[] = [...(c.guardian ? ['Legal contact' as const] : []), ...(c.guarantor ? ['Financial contact' as const] : [])]
     setRelaciones((prev) => prev.map((x) => (x.id === p.id ? { ...x, rol: c.rel, badges } : x)))
+    /* Household: la pill Household sigue (la da el Guarantor compartido, no la relación). */
+    setHogar((prev) => prev.map((x) => (x.id === p.id ? { ...x, rol: c.rel, badges: [...badges, 'Household'] } : x)))
   }
   /* Borrado físico: "This action cannot be undone", así que el aviso no ofrece Undo (CON-3999). */
   const borrar = (p: Persona) => {
     setRelaciones((prev) => prev.filter((x) => x.id !== p.id))
+    setHogar((prev) => prev.filter((x) => x.id !== p.id))
     setBorrando(null)
     aviso.ok(`Relationship with ${p.name} was deleted.`)
   }
@@ -216,7 +216,14 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
             Household/Same Guarantor Patients
           </h2>
           <div className="mt-4 flex flex-col gap-4">
-            {HOUSEHOLD.map((p) => <PersonaCard key={p.id} p={p} />)}
+            {/* Mismo ⋮ que las relaciones (CON-4113, CON-4139). */}
+            {hogar.length === 0 ? (
+              <div className={TARJETA_PANEL}>
+                <EmptyState icon={Users} title="No household patients" detail="No other patients share this patient's guarantor." />
+              </div>
+            ) : (
+              hogar.map((p) => <PersonaCard key={p.id} p={p} onEdit={() => setEditando(p)} onDelete={() => setBorrando(p)} />)
+            )}
           </div>
         </div>
       </div>
