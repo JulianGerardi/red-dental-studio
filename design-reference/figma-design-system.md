@@ -9,7 +9,7 @@
 > 🔣 Icons (227) · 👆 Actions (Button 54, IconButton 36) · 🏷️ Status & People (Pill, Chip, Count, Avatar) · 📝 Forms
 > (Field, Select, Search, Date, Textarea, Checkbox, Radio, Switch, Option card) · 🧭 Navigation (Tab/Tabs, Breadcrumb,
 > Step, Step indicator, Page button, Pagination, Menu item, Menu) · 🗂️ Cards & Layout (Card, Stat card, Appointment card ×7
-> estados, Pending task card, Clinical badge, Detail row, Empty state, Section notice, Show more) · 📊 Tables & Lists
+> estados, Pending task card, Clinical badge, Detail row, Empty state, Show more) · 📊 Tables & Lists
 > (Table cell, Table toolbar, Data table, Appointment row) · 💬 Feedback & Overlays (Alert, Toast, Tooltip, Popover,
 > Confirm dialog, Drawer) · 🧩 App shell (Nav item, Sidebar ×20 variantes, Topbar, Notification banner, Page title) ·
 > 🦷 Clinical (Exam tab, Finding row, Workflow card, Lab order row).
@@ -150,3 +150,12 @@ Auditoría de conexión (antes): texto sin estilo ~30 %, sombras sin estilo ~90 
 - Resultado: ~250 pantallas con Sidebar/Topbar/banner como instancias (el banner a 55 px, como en la app).
 - Pendiente: Sidebar sin ítem activo (Notifications, Login, Header & Sidebar 01) → falta variante `Active=None`; el panel "Sidebar" de 311 px de Clinical Mode es otro componente; cards (Appointment, Operatory, PatientCard, Pending task), campos y tablas; estilos de texto y de sombra faltantes (hay ~400 firmas de texto y ~35 de sombra sin estilo).
 - Títulos de página: 91 `Heading 1 - PageTitle` pasaron a instancias de `Page title` (MD/LG); 112 quedaron como estaban porque su tamaño no coincide con ninguna variante (falta sumar variantes de otros tamaños).
+
+## Sale Section notice; Alert es el único aviso (2026-11-18)
+
+- Se borró *Section notice* (sección y componente) de 🗂️ Cards & Layout: la app ya no lo usa (PR #156). Su clave salió de
+  `rds.ds/biblio` en el archivo de flujos. *Alert* suma la regla en su descripción. Hay que **republicar la library**
+  (*Assets → Publish library*).
+- En *Screens & Flows*, los avisos capturados como franja (Guardian en Patients, *Guarantor not assigned* en Scheduling)
+  pasaron a instancias de *Alert* Warning de la library; el de Demography se borró. Detalle en `figma-docs.md`.
+

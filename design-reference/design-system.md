@@ -1134,7 +1134,7 @@ y `PatientCard`. Decisiones en `figma/modulos/patients.md`.
 
 ## Pestañas en el drawer, aviso de sección y buscador de persona en desplegable (2026-10-21 y 22)
 
-- *Elements / Section notice* (nuevo, `ui/section-notice`): la franja cálida con barra a la izquierda que explica una sección de formulario ("Optional section. Use this section
+- *Elements / Section notice* (nuevo, `ui/section-notice`; se borró el 2026-11-18, ver *Un solo aviso*): la franja cálida con barra a la izquierda que explica una sección de formulario ("Optional section. Use this section
   when a guardian…", Figma `5277:125202`). No es un Alert: sin ícono ni título, no avisa de nada que haya pasado.
 - *Elements / Tabs → States → Needs attention*: `alerta` en una pestaña = punto rojo (y "has errors" para el lector de pantalla). Lo usa Edit Patient para señalar la sección que
   falla al guardar.
@@ -1309,3 +1309,19 @@ Documenta lo publicado en los PR #149 y #151.
 5. **Figma del design system**: la variante *Tone=Default, Icon=Warning* del *Confirm dialog* pasa a `dash-blue`, y los
    ejemplos suman *Delete working hours?* y *Close working hours?*. Hay que **republicar la library** (*Assets → Publish
    library*) para que lo tomen las pantallas de *Screens & Flows*.
+
+## Un solo aviso: Alert, y sale Section notice (2026-11-18)
+
+Documenta lo publicado en el PR #156 (devolución de diseño de Abril; sin historia de Jira). Decisión en
+`modulos/patients.md` (2026-11-18).
+
+1. **Elements / Alert** pasa a la estructura de *Elements / Buttons*:
+   - Descripción con la regla: es el único aviso de la app; no se arman franjas con barra a la izquierda. Las tarjetas
+     con barra de color (turnos, findings) no son avisos.
+   - *Parts* (caja, ícono, título, texto) y *States*: los cuatro tonos, título y texto, sólo título, angosto (la card
+     del turno, 300px), contenido largo y la tabla *In the app* con dónde va cada tono.
+   - *Specs* con medidas leídas y colores; el borde es el color del título al 25%.
+   - Sale la story *Tones* (queda dentro de *States*).
+2. **Elements / Section notice** se borra con `ui/section-notice`: la app ya no lo usa. La entrada de 2026-10 que lo
+   presentaba queda como historia.
+3. **Figma del design system**: sale el componente *Section notice* de *Feedback & Overlays*; *Alert* sigue igual.
