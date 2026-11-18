@@ -1,9 +1,9 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  X, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity, Trash2,
+  X, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity, Trash2, Pencil,
 } from 'lucide-react'
-import { BLOCK_STYLE, esEliminable, fmtExacta, type ApptState } from './calendar-data'
+import { BLOCK_STYLE, esEditable, esEliminable, fmtExacta, type ApptState } from './calendar-data'
 import { useAnclaje } from '@/lib/anclaje'
 import { useEsChico } from '@/lib/media'
 import { aviso } from '@/components/ui/toaster'
@@ -37,6 +37,7 @@ const W = 336
 
 /* CON-2990: por qué no se puede borrar un turno que ya no está en un estado temprano. */
 const BLOQUEO_BORRAR = 'Only Proposed or Waiting List appointments can be deleted.'
+const BLOQUEO_EDITAR = 'Fulfilled, No-show and Cancelled appointments cannot be edited.'
 
 /* El detalle es de lectura: el turno se cambia desde "Edit appointment", no
    con lápices sueltos por fila. */
@@ -71,6 +72,7 @@ export function AppointmentDetailsDrawer({
   anchor,
   onClose,
   onDelete,
+  onEdit,
 }: {
   patient: string
   estado?: ApptState
@@ -85,6 +87,8 @@ export function AppointmentDetailsDrawer({
   onClose: () => void
   /** Borra el turno, ya confirmado. Sin esto el detalle no muestra Delete. */
   onDelete?: () => void
+  /** Abre Edit Appointment con el turno cargado. Sin esto el detalle no muestra el lápiz. */
+  onEdit?: () => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const chico = useEsChico()
@@ -92,6 +96,7 @@ export function AppointmentDetailsDrawer({
   const [confirmando, setConfirmando] = useState(false)
   const idBloqueo = useId()
   const eliminable = esEliminable(estado)
+  const editable = esEditable(estado)
 
   useEffect(() => {
     /* Con la pregunta de borrar abierta, Escape y el click afuera son de la pregunta. */
@@ -166,6 +171,26 @@ export function AppointmentDetailsDrawer({
         >
           {estado}
         </span>
+        {/* Edit, en la cabecera como en los calendarios conocidos: el pie queda para Delete y Check In (scheduling.md,
+            2026-11-17). Una cita cerrada no se edita (CON-3249) y lo dice. */}
+        {onEdit && (
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Edit appointment"
+                  aria-disabled={!editable || undefined}
+                  onClick={() => (editable ? onEdit() : aviso.info(BLOQUEO_EDITAR))}
+                  className={editable ? 'shrink-0 rounded-md p-1 -my-1 text-ink hover:bg-surface-muted' : 'shrink-0 cursor-not-allowed rounded-md p-1 -my-1 text-ink-faint'}
+                >
+                  <Pencil className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[240px] bg-ink leading-snug text-white">{editable ? 'Edit appointment' : BLOQUEO_EDITAR}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
         <button onClick={onClose} aria-label="Close" className="shrink-0 text-ink hover:opacity-60">
           <X className="size-4" />
         </button>

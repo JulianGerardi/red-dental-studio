@@ -11,7 +11,8 @@ import { aviso } from '@/components/ui/toaster'
 /* Figma 5277:123056 (Patients — Edit): Edit Patient desde el menú de una fila de la tabla. A diferencia de New Patient, no
    va por pasos: las tres secciones están a un clic, con los datos ya cargados, y "Save Changes" está siempre y guarda
    todo junto. Cambiar de pestaña no guarda nada. Si al guardar falla algo de otra sección, esa pestaña queda marcada y
-   el foco va al campo que hay que corregir (patients.md, 2026-10-22).
+   el foco va al campo que hay que corregir (patients.md, 2026-10-22). Pestañas como las de la ficha de una Location:
+   al ancho de su texto, a la izquierda (patients.md, 2026-11-17).
 
    `id` es el paciente de la tabla; `inicial` pisa los datos (el dashboard del paciente y Storybook); `seccionInicial` abre
    en otra pestaña (Storybook). */
@@ -48,12 +49,11 @@ export function EditPatientModal({
   return (
     <ModalShell
       title="Edit Patient"
-      description="Update the patient details"
       onClose={onClose}
       width="max-w-[560px]"
       tabs={(
         <Tabs
-          aria-label="Patient sections" fullWidth value={seccion} onChange={setSeccion}
+          aria-label="Patient sections" value={seccion} onChange={setSeccion}
           tabs={f.secciones.map((s) => ({ value: s, alerta: f.conError(s) }))}
         />
       )}

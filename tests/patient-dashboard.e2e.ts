@@ -25,11 +25,14 @@ test('El rastro del paciente vuelve al Overview y a la lista; Patients y Billing
   await expect(screen.getByRole('navigation', 'Breadcrumb')).toHaveCount(0)
 })
 
-test('Edit Patient cuelga del paciente', async ({ app, screen }) => {
-  await app.open('/patients/edit')
+test('Edit Patient cuelga de la tabla, no del dashboard del paciente', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/edit')
   const migas = screen.getByRole('navigation', 'Breadcrumb')
-  await expect(migas.getByRole('link', 'John Smith')).toBeVisible()
+  await expect(migas.getByRole('link', 'Patients')).toBeVisible()
+  await expect(migas.getByRole('link', 'John Smith')).toHaveCount(0)
   await expect(migas.getByText('Edit Patient')).toBeVisible()
+  await screen.getByRole('button', 'Cancel').tap()
+  await expect(screen.getByRole('heading', 'Patients')).toBeVisible()
 })
 
 /* Insurance llena el alto que deja el menú y scrollea adentro, como Treatments, Ledger y Documents (Julián,

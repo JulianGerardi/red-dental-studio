@@ -11,7 +11,7 @@ import { aviso } from '@/components/ui/toaster'
 /* Figma 3751:73452 (Patients — List): New Patient en pasos, General → Guardian → Demography. Guardian aparece sólo si el
    paciente es menor de 18, y entonces es obligatorio (CON-2858); Demography es opcional. Next revisa lo obligatorio
    del paso; Save revisa los tres y vuelve al primero con algo por corregir. Para cambiar un paciente que ya existe, ver
-   EditPatientModal (pestañas y Save Changes). Decisiones y anomalías del Figma en modulos/patients.md, 2026-10-22.
+   la pantalla Edit Patient (pestañas y Save Changes). Decisiones y anomalías del Figma en modulos/patients.md, 2026-10-22.
    Vincular a una persona que ya está en el sistema (empleado, contacto, suscriptor): modulos/patients.md, 2026-11-02.
    Guardian como en 2.0 (buscar o Add New Person, obligatorio para un menor; CON-2858): modulos/patients.md, 2026-11-04.
 

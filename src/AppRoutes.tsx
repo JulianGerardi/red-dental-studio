@@ -52,9 +52,8 @@ export function AppRoutes() {
       <Route element={<AppShell />}>
         <Route index element={<Dashboard />} />
         <Route path="patients" element={<Patients />} />
-        {/* Antes de patients/:id, si no "edit" se toma como un id. */}
-        <Route path="patients/edit" element={<EditPatientPage />} />
         <Route path="patients/:id" element={<PatientDetail />} />
+        <Route path="patients/:id/edit" element={<EditPatientPage />} />
         <Route path="patients/:id/treatments" element={<Treatments />} />
         <Route path="patients/:id/documents" element={<PatientDocuments />} />
         <Route path="patients/:id/insurance" element={<Insurance />} />

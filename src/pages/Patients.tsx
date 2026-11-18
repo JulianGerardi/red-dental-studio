@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { Search, Plus, CalendarDays, Users } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTable'
 import { PatientCard } from '@/components/patients/PatientCard'
 import { usePatients } from '@/data/patientsStore'
@@ -9,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ShowMore } from '@/components/ui/show-more'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
-import { EditPatientModal } from '@/pages/patients/EditPatientModal'
 import { Panel } from '@/components/dashboard/primitives'
 import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
@@ -47,9 +47,11 @@ export function Globo({ n }: { n: number }) {
 
 export default function Patients() {
   const { patients } = usePatients()
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [modal, setModal] = useState<'new' | null>(null)
-  const [editando, setEditando] = useState<PatientRow | null>(null)
+  /* Edit Patient es una pantalla, como la ficha de una Location (patients.md, 2026-11-17). */
+  const editar = (r: PatientRow) => navigate(`/patients/${r.id}/edit`)
   const [buscarTurno, setBuscarTurno] = useState('')
   const [buscarReciente, setBuscarReciente] = useState('')
   const [turnoEditando, setTurnoEditando] = useState<DatosTurno | null>(null)
@@ -148,7 +150,7 @@ export default function Patients() {
 
           <div className="mt-4">
             {/* El nombre navega al dashboard del paciente; el kebab abre Edit. */}
-            <PatientsTable rows={rows} onRowAction={setEditando} />
+            <PatientsTable rows={rows} onRowAction={editar} />
           </div>
         </div>
 
@@ -187,7 +189,7 @@ export default function Patients() {
               />
             ) : (
               <ShowMore total={recientesFiltrados.length} limit={LIMITE_RECIENTES} label="recent patients" enCaja llenarAlto className="flex flex-col gap-3">
-                {(n) => recientesFiltrados.slice(0, n).map((r) => <PatientCard key={r.id} row={r} onEdit={setEditando} />)}
+                {(n) => recientesFiltrados.slice(0, n).map((r) => <PatientCard key={r.id} row={r} onEdit={editar} />)}
               </ShowMore>
             )}
           </Panel>
@@ -196,15 +198,13 @@ export default function Patients() {
 
       {turnoEditando && (
         <NewAppointmentModal
-          titulo="Edit Appointment"
+          edicion
           inicial={turnoEditando}
           onGuardar={() => { setTurnoEditando(null); aviso.ok('Appointment updated.') }}
           onClose={() => setTurnoEditando(null)}
         />
       )}
       {modal === 'new' && <NewPatientModal onClose={() => setModal(null)} />}
-      {/* Edit Patient: pestañas y Save Changes (Figma 5277:123056), con los datos del paciente de la fila. */}
-      {editando && <EditPatientModal id={editando.id} onClose={() => setEditando(null)} />}
     </div>
   )
 }
