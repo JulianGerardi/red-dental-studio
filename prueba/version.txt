@@ -1,1 +1,1 @@
-claude/determined-brown-ins1zc 5e80405f798c9aa1988be29306b05e6125aa5f87
+claude/determined-brown-ins1zc 27753b491653e5a38c136868a778f28dbbdef1ac
