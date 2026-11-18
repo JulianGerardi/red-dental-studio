@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-18
 
-### Relationships: todos los nombres son link y Household con ⋮ (CON-4139, CON-4113) ([#PR](https://github.com/JulianGerardi/red-dental-studio/pull/PR))
+### Relationships: todos los nombres son link y Household con ⋮ (CON-4139, CON-4113) ([#161](https://github.com/JulianGerardi/red-dental-studio/pull/161))
 - **Todos los nombres de las cards** (relaciones y Household) son link azul a la ficha de esa persona
   (`/patients/:pacienteId`). Ya no hay nombre en negro.
 - **Household lleva el ⋮** con *Edit relationship* y *Delete relationship*, igual que las relaciones. Al editar se
