@@ -5,6 +5,10 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-18
 
+### Figma: estilos de texto y sombra, Sidebar sin activo y pills conectados al design system ([#157](https://github.com/JulianGerardi/red-dental-studio/pull/157))
+- Nuevos en el DS: 7 estilos de sombra, 27 de texto, variante `Sidebar Active=None` y Pill SM con 6 px de padding. Se aplicaron ≈ 8.700 textos, ≈ 4.000 sombras y ≈ 320 pills de estado en las pantallas.
+- **Para el dev:** la app no cambia. Qué falta conectar (cards, campos, tablas, textos con interlineado automático) y cómo se corren los motores: `design-reference/figma-design-system.md`, sección *Estilos, Sidebar sin activo y pills*.
+
 ### Avisos: uno solo (`ui/alert`) y sin el de Demography ([#156](https://github.com/JulianGerardi/red-dental-studio/pull/156))
 - **Demography** (New Patient y Edit Patient) ya no muestra *Additional contact and address information. These fields
   are optional.*: no estaba en ningún diseño.
