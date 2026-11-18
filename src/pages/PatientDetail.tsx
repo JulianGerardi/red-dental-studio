@@ -14,8 +14,6 @@ import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
 import { TASK_KINDS } from '@/components/dashboard/dashboard-data'
 import { ShowMore } from '@/components/ui/show-more'
-import { EditPatientModal } from '@/pages/patients/EditPatientModal'
-import { DATOS_JOHN_SMITH, usePatients } from '@/data/patientsStore'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
@@ -52,7 +50,6 @@ export function Card({ className, children }: { className?: string; children: Re
 /* `turnos` sólo lo cambia el design system, para probar la columna con más o menos turnos. */
 export default function PatientDetail({ turnos = APPTS.length }: { turnos?: number }) {
   const { id = 'john-smith' } = useParams()
-  const { datosDe } = usePatients()
   const appts = Array.from({ length: turnos }, (_, i) => APPTS[i % APPTS.length])
   const navigate = useNavigate()
   const [section, setSection] = useState('Overview')
@@ -80,7 +77,7 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
       })),
     })
   }
-  const [modal, setModal] = useState<'contact' | 'edit' | null>(null)
+  const [modal, setModal] = useState<'contact' | null>(null)
   /* Igual que el Dashboard (dashboard.md, 2026-10-29): tabs por tipo, en vez del filtro. */
   const [tipoTarea, setTipoTarea] = useState('All')
   const tareas = tipoTarea === 'All' ? TASKS : TASKS.filter((t) => t.kind === tipoTarea)
@@ -224,7 +221,6 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
       )}
 
       {modal === 'contact' && <EditContactModal onClose={() => setModal(null)} />}
-      {modal === 'edit' && <EditPatientModal id={id} inicial={datosDe(id) ?? DATOS_JOHN_SMITH} onClose={() => setModal(null)} />}
     </div>
   )
 }

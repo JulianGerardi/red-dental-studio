@@ -28,7 +28,7 @@ const meta = {
         component: [
           'Las pestañas de la app (`@/components/ui/tabs`): una caja gris con la pestaña activa en azul. Cambian entre vistas de un mismo bloque —Transactions / Patient Payment en el Ledger, Patient / Guarantor View, ASAP / Waiting List— y no entre páginas.',
           '',
-          '**Una pestaña puede pedir atención** (`alerta`, 2026-10-22): un punto rojo marca la sección donde quedó un campo con error, para guardar desde cualquier pestaña sin perder de vista cuál falló. Ver *States → Needs attention* y *Pages / Parts / Patient modals → Edit Patient — Error in another section*.',
+          '**Una pestaña puede pedir atención** (`alerta`, 2026-10-22): un punto rojo marca la sección donde quedó un campo con error, para guardar desde cualquier pestaña sin perder de vista cuál falló. Ver *States → Needs attention*.',
           '',
           '**Cuándo:** 2 a 6 opciones de lo mismo. Si son más o cambian de pantalla, va otro componente (un menú, el menú del paciente, un select).',
           '',

@@ -16,7 +16,7 @@ export default {
       resumen: 'Listar al equipo y sumar a alguien: General → Contact → Address.',
       pantallas: [
         { nombre: 'Employees', ruta: '/settings/team', nota: 'Tabla del equipo, con selección múltiple y buscador.' },
-        { nombre: 'Row actions', hacer: menuFila('Emily Chen'), nota: 'El ⋮: Edit, Delete, Suspend, Terminate, Disable y Remove Provider Role.' },
+        { nombre: 'Row actions', hacer: menuFila('Emily Chen'), nota: 'El ⋮, con ícono en cada ítem: Edit (única entrada a la ficha: el nombre no es link), Delete, Suspend, Terminate, Disable y Remove Provider Role.' },
         { nombre: 'New Employee · General', ruta: '/settings/team/new', nota: 'New Employee (ruta /team/new). Se puede vincular a una persona que ya existe en el sistema.' },
         { nombre: 'General · required', hacer: clic(/Next Step/), nota: 'Obligatorios: First name, Last name, Birthdate y Email.' },
       ],
@@ -27,7 +27,7 @@ export default {
       jira: ['CON-2889', 'CON-2890', 'CON-3115'],
       resumen: 'El detalle de un empleado, en pestañas.',
       pantallas: [
-        { nombre: 'Employee', ruta: EMP, nota: 'Employee: datos personales, contacto y dirección.' },
+        { nombre: 'Employee', ruta: EMP, nota: 'Employee: foto, datos personales, contacto y dirección. Sin la opción de vincular a otra persona: eso es sólo de New Employee.' },
         { nombre: 'Roles & Location', hacer: clic('Roles & Location', 'tab'), nota: 'Roles & Location: qué rol tiene en cada sede.' },
         { nombre: 'Provider Info', hacer: clic('Provider Info', 'tab'), nota: 'Provider Info: datos del profesional. Primary Provider prepara su Billing Profile.' },
         { nombre: 'Working Hours', hacer: clic('Working Hours', 'tab'), nota: 'Working Hours: los horarios del provider por sede.' },
