@@ -5,8 +5,8 @@ import type { PatientRow, PatientStatus } from '@/components/patients/PatientsTa
    tabla al instante. No persiste entre recargas: es un prototipo de diseño y
    guardar en localStorage haría que la demo arranque con datos sucios. */
 
-/* Los datos del formulario de paciente (New Patient y Edit Patient: General, Guardian y Demography). Ver
-   design-reference/figma/modulos/patients.md, 2026-10-22. */
+/* Los datos del formulario de paciente: General, Guardian y Demography en New Patient (CON-1328); General, Demography,
+   Contact y Address en Edit Patient (CON-1329). Ver design-reference/figma/modulos/patients.md, 2026-11-18. */
 export type DatosPaciente = {
   first: string
   middle: string
@@ -36,10 +36,25 @@ export type DatosPaciente = {
   gZip: string
   guardianGarante: boolean
   guardianRel: string
-  phone: string
+  /* Demographic Information, como en 2.0 (CON-1328). */
+  gender: string
+  race: string
+  ethnicity: string
+  marital: string
+  profession: string
+  nationality: string
   language: string
-  address: string
-  city: string
+  religion: string
+  /* Contact y Address del paciente: se cargan en Edit Patient (CON-1329). */
+  codigo: string
+  area: string
+  numero: string
+  ext: string
+  linea1: string
+  linea2: string
+  pais: string
+  estado: string
+  ciudad: string
   zip: string
 }
 
@@ -47,21 +62,30 @@ export const VACIO_PACIENTE: DatosPaciente = {
   first: '', middle: '', last: '', birthday: '', email: '', interpreter: false, portal: false,
   guardianName: '', guardianNuevo: false, gFirst: '', gLast: '', gEmail: '', gDob: '',
   gCodigo: '(+1) United States', gArea: '', gNumero: '', gExt: '', gLinea1: '', gLinea2: '', gPais: '', gEstado: '', gCiudad: '', gZip: '',
-  guardianGarante: false, guardianRel: '', phone: '', language: '', address: '', city: '', zip: '',
+  guardianGarante: false, guardianRel: '',
+  gender: '', race: '', ethnicity: '', marital: '', profession: '', nationality: '', language: 'English', religion: '',
+  codigo: '(+1) United States', area: '', numero: '', ext: '', linea1: '', linea2: '', pais: '', estado: '', ciudad: '', zip: '',
 }
 
 /* Lo que se sabe de cada paciente más allá de la fila de la tabla, para que Edit Patient abra con los datos cargados.
    Los que no están acá arman lo que tienen de la fila (nombre, nacimiento, email). */
 const DETALLE_SEMILLA: Record<string, Partial<DatosPaciente>> = {
-  'abril-viola': { portal: true, phone: '(555) 123-4567', language: 'English', address: '123 Maple Street', city: 'Phoenix', zip: '85016' },
-  'sofia-chen': { guardianName: 'Elena Chen', guardianRel: 'Parent', phone: '(555) 987-6543', language: 'Spanish', city: 'Miami' },
-  'daniel-ortiz': { interpreter: true, language: 'Spanish', portal: true },
+  'abril-viola': {
+    portal: true, gender: 'Female', nationality: 'United States', area: '555', numero: '1234567',
+    linea1: '123 Maple Street', pais: 'United States', estado: 'Arizona', ciudad: 'Phoenix', zip: '85016',
+  },
+  'sofia-chen': {
+    guardianName: 'Elena Chen', guardianRel: 'Parent', gender: 'Female', language: 'Spanish', area: '555', numero: '9876543',
+    linea1: '88 Bay Road', pais: 'United States', estado: 'Florida', ciudad: 'Miami', zip: '33101',
+  },
+  'daniel-ortiz': { interpreter: true, language: 'Spanish', portal: true, gender: 'Male' },
 }
 
 /* El paciente del dashboard (/patients/john-smith) no está en la tabla. */
 export const DATOS_JOHN_SMITH: DatosPaciente = {
   ...VACIO_PACIENTE, first: 'John', last: 'Smith', birthday: '01/28/1999', email: 'john.smith@hotmail.com', portal: true,
-  phone: '(555) 010-4477', language: 'Spanish', address: '456 Oak Avenue', city: 'Los Angeles', zip: '90012',
+  gender: 'Male', language: 'Spanish', area: '555', numero: '0104477',
+  linea1: '456 Oak Avenue', pais: 'United States', estado: 'California', ciudad: 'Los Angeles', zip: '90012',
 }
 
 const SEMILLA: PatientRow[] = [

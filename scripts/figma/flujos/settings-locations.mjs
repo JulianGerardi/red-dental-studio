@@ -18,7 +18,7 @@ export default {
       pantallas: [
         { nombre: 'Settings', ruta: '/settings/general', nota: 'Settings: el índice de todo lo configurable. Los que todavía no existen llevan a un placeholder.' },
         { nombre: 'Locations', ruta: '/settings/locations', nota: 'Tabla de sedes con buscador.' },
-        { nombre: 'Row actions', hacer: menuFila('Abril'), nota: 'El ⋮: Edit location y Delete location.' },
+        { nombre: 'Row actions', hacer: menuFila('Abril'), nota: 'El ⋮: Edit y Delete.' },
         { nombre: 'New Location · General', ruta: '/settings/locations/new', nota: 'New location abre el drawer (ruta /locations/new). Obligatorios: Name y Default Fee Schedule.' },
         { nombre: 'General · required', hacer: clic(/Next Step/), nota: 'Next Step sin completar marca los obligatorios.' },
       ],

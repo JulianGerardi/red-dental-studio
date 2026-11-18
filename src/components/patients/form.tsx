@@ -89,7 +89,7 @@ const OPCIONES: Record<string, string[]> = {
   Language: ['English', 'Spanish', 'Portuguese', 'French'],
   Religion: ['Catholic', 'Protestant', 'Jewish', 'Muslim', 'None'],
   Country: ['United States', 'Argentina', 'Spain', 'Mexico'],
-  State: ['California', 'New York', 'Texas', 'Florida'],
+  State: ['Arizona', 'California', 'Florida', 'New York', 'Texas'],
   Relationship: ['Parent', 'Legal guardian', 'Sibling', 'Spouse'],
   Guardian: ['Mara Otero', 'Elias Aguirre', 'Nadia Duarte'],
   Requestor: ['Front desk', 'Provider', 'Patient', 'Referral'],

@@ -15,7 +15,7 @@ export default {
       pantallas: [
         { nombre: 'Accounts overview', ruta: '/settings/accounts', nota: 'Tabla de cuentas con buscador y filtro por estado.' },
         { nombre: 'Filter by status', hacer: clic('Filter by status'), nota: 'Filtro por estado de la cuenta.' },
-        { nombre: 'Row actions', ruta: '/settings/accounts', hacer: menuFila('caba'), nota: 'El ⋮: Edit account, Manage licenses y Suspend.' },
+        { nombre: 'Row actions', ruta: '/settings/accounts', hacer: menuFila('caba'), nota: 'El ⋮: Edit, Manage Licenses y Suspend, con íconos.' },
         { nombre: 'New Account · Information', ruta: '/settings/accounts', hacer: clic('New Account'), nota: 'New Account: nombre, subdominio y contacto.' },
         { nombre: 'Information · required', hacer: clic(/Next Step/), nota: 'Next Step marca los obligatorios.' },
       ],
