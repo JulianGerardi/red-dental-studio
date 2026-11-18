@@ -573,5 +573,6 @@ Sin historia de Jira: es una devolución de diseño de Abril Viola (CON-2858 sig
   - Los demás, en sus módulos: *Guarantor not assigned* del detalle del turno (scheduling.md), New Hours y Global access
     (employees.md) y el aviso de presión de Vitals (clinical-mode.md).
 - Las tarjetas con barra de color (turnos, findings, Reason for Visit) **no son avisos** y se quedan como están.
-- `ui/section-notice` queda sin usos en la app. **Pendiente para cuando se documente:** sacarlo del Storybook, de
-  `design-system.md` y del Figma del design system (componente *Section notice*).
+- `ui/section-notice` queda sin usos en la app y se borró al documentar (Storybook, `design-system.md` y el Figma del
+  design system). *Elements / Alert* suma Parts, States y Specs con la regla. En *Screens & Flows* los avisos se cambiaron
+  en el lugar por instancias de *Alert* (`figma-docs.md`, 2026-11-18).

@@ -9,7 +9,7 @@
 > 🔣 Icons (227) · 👆 Actions (Button 54, IconButton 36) · 🏷️ Status & People (Pill, Chip, Count, Avatar) · 📝 Forms
 > (Field, Select, Search, Date, Textarea, Checkbox, Radio, Switch, Option card) · 🧭 Navigation (Tab/Tabs, Breadcrumb,
 > Step, Step indicator, Page button, Pagination, Menu item, Menu) · 🗂️ Cards & Layout (Card, Stat card, Appointment card ×7
-> estados, Pending task card, Clinical badge, Detail row, Empty state, Section notice, Show more) · 📊 Tables & Lists
+> estados, Pending task card, Clinical badge, Detail row, Empty state, Show more) · 📊 Tables & Lists
 > (Table cell, Table toolbar, Data table, Appointment row) · 💬 Feedback & Overlays (Alert, Toast, Tooltip, Popover,
 > Confirm dialog, Drawer) · 🧩 App shell (Nav item, Sidebar ×20 variantes, Topbar, Notification banner, Page title) ·
 > 🦷 Clinical (Exam tab, Finding row, Workflow card, Lab order row).
@@ -166,3 +166,12 @@ Auditoría de conexión (antes): texto sin estilo ~30 %, sombras sin estilo ~90 
 - Motor `filas` (plugin data `rds.ds/filasSrc`, marca `filas` por pantalla): reemplaza cada `List Item` de 86 px con botón Check In/Out por una instancia, copiando textos, iniciales, tono del pill y estado de los chips; sólo reemplaza si la altura coincide. ≈ 310 filas convertidas; diferencia con la pantalla original < 0,2 % de los píxeles.
 - El ícono flecha del botón se pone desde el motor (`236:3520`); falta fijarlo en el componente.
 - Pendiente: filas de tarea (`TaskRow`), cards de Appointments de la ficha del paciente, campos y tablas.
+
+## Sale Section notice; Alert es el único aviso (2026-11-18)
+
+- Se borró *Section notice* (sección y componente) de 🗂️ Cards & Layout: la app ya no lo usa (PR #156). Su clave salió de
+  `rds.ds/biblio` en el archivo de flujos. *Alert* suma la regla en su descripción. Hay que **republicar la library**
+  (*Assets → Publish library*).
+- En *Screens & Flows*, los avisos capturados como franja (Guardian en Patients, *Guarantor not assigned* en Scheduling)
+  pasaron a instancias de *Alert* Warning de la library; el de Demography se borró. Detalle en `figma-docs.md`.
+
