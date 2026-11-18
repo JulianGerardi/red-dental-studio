@@ -9,7 +9,7 @@
 > 🔣 Icons (227) · 👆 Actions (Button 54, IconButton 36) · 🏷️ Status & People (Pill, Chip, Count, Avatar) · 📝 Forms
 > (Field, Select, Search, Date, Textarea, Checkbox, Radio, Switch, Option card) · 🧭 Navigation (Tab/Tabs, Breadcrumb,
 > Step, Step indicator, Page button, Pagination, Menu item, Menu) · 🗂️ Cards & Layout (Card, Stat card, Appointment card ×7
-> estados, Pending task card, Clinical badge, Detail row, Empty state, Section notice, Show more) · 📊 Tables & Lists
+> estados, Pending task card, Clinical badge, Detail row, Empty state, Show more) · 📊 Tables & Lists
 > (Table cell, Table toolbar, Data table, Appointment row) · 💬 Feedback & Overlays (Alert, Toast, Tooltip, Popover,
 > Confirm dialog, Drawer) · 🧩 App shell (Nav item, Sidebar ×20 variantes, Topbar, Notification banner, Page title) ·
 > 🦷 Clinical (Exam tab, Finding row, Workflow card, Lab order row).
@@ -157,3 +157,12 @@ Auditoría de conexión (antes): texto sin estilo ~30 %, sombras sin estilo ~90 
 - **Sidebar sin ítem activo:** variante `Active=None` (Expanded Yes/No). Notifications y las pantallas sin ítem activo pasan a instancia.
 - **Pills de estado:** `StatusPill` → instancia de `Pill` (Success, Danger, Warning, Info, Purple, Neutral) cuando el tamaño coincide; ≈ 320 convertidos. Se ajustó el padding horizontal del Pill SM a 6 px (era 9). Quedan como frames los pills de 19 px de alto y los de tono `dash-busy-bg` (no hay variante equivalente).
 - **Pendiente:** cards de turno y de tarea, campos y tablas. El `Appointment row` del DS es de otro layout que la fila actual del Dashboard (hora, avatar, chips TR/CC, botón): hay que rehacerlo desde la app antes de instanciarlo. Los 112 títulos de página de otros tamaños necesitan variantes de `Page title`.
+
+## Sale Section notice; Alert es el único aviso (2026-11-18)
+
+- Se borró *Section notice* (sección y componente) de 🗂️ Cards & Layout: la app ya no lo usa (PR #156). Su clave salió de
+  `rds.ds/biblio` en el archivo de flujos. *Alert* suma la regla en su descripción. Hay que **republicar la library**
+  (*Assets → Publish library*).
+- En *Screens & Flows*, los avisos capturados como franja (Guardian en Patients, *Guarantor not assigned* en Scheduling)
+  pasaron a instancias de *Alert* Warning de la library; el de Demography se borró. Detalle en `figma-docs.md`.
+

@@ -77,6 +77,16 @@ Más tarde ese día, Settings — Locations suma *Delete hours & close a day* (9
 la página queda con 6 flujos y 37 pantallas. Los totales del archivo cambiaron también con Clinical Mode (PR #145) y no
 se recontaron.
 
+2026-11-18 (PR #156, avisos con `ui/alert`): en vez de recapturar, se cambiaron en el lugar las pantallas que mostraban
+los avisos viejos, porque el cambio era sólo ese bloque. **Patients:** 6 franjas de Guardian pasan a instancias de
+*Alert* Warning (título *This patient is under 18.* y el texto como Body) y se borran las 3 del aviso de Demography, en
+New Patient (adulto, menor con guardián, guardián nuevo) y Edit. **Scheduling › Appointment details:** las 3 franjas de
+*Guarantor not assigned* pasan a *Alert* Warning sólo con título (Body oculto, alto Hug) y la card del turno crece con su
+contenido. Settings — Employees y Clinical Mode no tenían pantallas con esos avisos (el drawer Assign Role, New Hours y
+el aviso de Vitals no están capturados). Pendiente de antes: en la card del turno capturada, Check In y Delete quedan
+apilados y de distinto ancho; en la app van de a dos y del mismo ancho. Edit sigue mostrando el drawer viejo: Edit
+Patient como pantalla (PR #155) todavía no se documentó.
+
 **Recapturar una página ya conectada a la library** (Locations, 2026-11-16): después de ordenar y arreglar, correr los
 motores guardados en el archivo, en este orden y con `PAGES` = el nombre de la página: `motor`, `chipcount`, `binder`,
 `reconectarRun`, `rebindRun` y `estilosRun`. Se corren con `new AsyncFunction('PAGES', 't0', 'LIM', código)(PAGES,
