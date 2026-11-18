@@ -157,3 +157,12 @@ Auditoría de conexión (antes): texto sin estilo ~30 %, sombras sin estilo ~90 
 - **Sidebar sin ítem activo:** variante `Active=None` (Expanded Yes/No). Notifications y las pantallas sin ítem activo pasan a instancia.
 - **Pills de estado:** `StatusPill` → instancia de `Pill` (Success, Danger, Warning, Info, Purple, Neutral) cuando el tamaño coincide; ≈ 320 convertidos. Se ajustó el padding horizontal del Pill SM a 6 px (era 9). Quedan como frames los pills de 19 px de alto y los de tono `dash-busy-bg` (no hay variante equivalente).
 - **Pendiente:** cards de turno y de tarea, campos y tablas. El `Appointment row` del DS es de otro layout que la fila actual del Dashboard (hora, avatar, chips TR/CC, botón): hay que rehacerlo desde la app antes de instanciarlo. Los 112 títulos de página de otros tamaños necesitan variantes de `Page title`.
+
+## Fila de turno conectada (2026-11-18)
+
+- **Appointment row** rehecho desde la app: set con `Action=Check In|Check Out`, 408×86, hora, avatar, nombre, chips TR/CC, ⋮, pill de estado, proveedor (con puntos suspensivos) y botón en un contenedor de 90 px, como el Dashboard. Propiedades: Patient, Time, Provider. Reemplaza al `Appointment row` anterior (queda como `Appointment row (old)` para borrar).
+- **Status chip** (nuevo): chip TR/CC con `State=Done|Missing` y texto editable.
+- **Button:** el ícono (Leading y Trailing) toma el color de la etiqueta.
+- Motor `filas` (plugin data `rds.ds/filasSrc`, marca `filas` por pantalla): reemplaza cada `List Item` de 86 px con botón Check In/Out por una instancia, copiando textos, iniciales, tono del pill y estado de los chips; sólo reemplaza si la altura coincide. ≈ 310 filas convertidas; diferencia con la pantalla original < 0,2 % de los píxeles.
+- El ícono flecha del botón se pone desde el motor (`236:3520`); falta fijarlo en el componente.
+- Pendiente: filas de tarea (`TaskRow`), cards de Appointments de la ficha del paciente, campos y tablas.
