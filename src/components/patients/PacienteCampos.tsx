@@ -22,7 +22,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 /* En qué sección vive cada campo: el guardado la usa para señalar la pestaña y llevar al usuario hasta el campo. */
 const SECCION_DE_CAMPO: Record<keyof DatosPaciente, SeccionPaciente> = {
-  first: 'General', middle: 'General', last: 'General', birthday: 'General', email: 'General', interpreter: 'General', portal: 'General',
+  first: 'General', middle: 'General', last: 'General', birthday: 'General', email: 'General', interpreter: 'Demography', portal: 'General',
   guardianName: 'Guardian', guardianNuevo: 'Guardian', gFirst: 'Guardian', gLast: 'Guardian', gEmail: 'Guardian', gDob: 'Guardian',
   gCodigo: 'Guardian', gArea: 'Guardian', gNumero: 'Guardian', gExt: 'Guardian', gLinea1: 'Guardian', gLinea2: 'Guardian',
   gPais: 'Guardian', gEstado: 'Guardian', gCiudad: 'Guardian', gZip: 'Guardian', guardianGarante: 'Guardian', guardianRel: 'Guardian',
@@ -237,7 +237,7 @@ export function BuscarPersona({ v }: { v: VinculoPersona }) {
 }
 
 /* Como en 2.0 (CON-1328, grabación de Julián del 2026-11-18): vincular a una persona del sistema (sólo en el alta), los
-   datos, Interpreter Required y la cuenta del portal. */
+   datos y la cuenta del portal. Interpreter Required va en Demography, junto a Language (patients.md, 2026-11-18). */
 export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo, conTitulo }: Props & { portalVinculado?: boolean; vinculo?: VinculoPersona }) {
   return (
     <Bloque titulo="General Information" conTitulo={conTitulo}>
@@ -256,7 +256,6 @@ export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo, c
           </div>
         </div>
       )}
-      <OptionCheckbox label="Interpreter Required" checked={d.interpreter} onChange={(v) => cambiar('interpreter', v)} />
       {portalVinculado ? <CuentaPortal /> : (
         <OptionCheckbox label="Create a patient portal account using this email address" checked={d.portal} onChange={(v) => cambiar('portal', v)} />
       )}
@@ -398,7 +397,11 @@ export function CamposDemography({ d, cambiar, errores, conTitulo }: Props) {
         {sel('marital', 'Marital Status', ESTADOS_CIVILES)}
         {sel('profession', 'Profession', PROFESIONES, { buscable: true })}
         {sel('nationality', 'Nationality', NACIONALIDADES, { buscable: true })}
+        {/* Language e Interpreter Required van de la mano: en la misma fila, el checkbox a la altura del select (Julián). */}
         {sel('language', 'Language', IDIOMAS)}
+        <div className="flex flex-col justify-end">
+          <OptionCheckbox label="Interpreter Required" checked={d.interpreter} onChange={(v) => cambiar('interpreter', v)} className="h-9 items-center py-0" />
+        </div>
         {sel('religion', 'Religion', RELIGIONES)}
       </div>
     </Bloque>

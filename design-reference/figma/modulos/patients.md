@@ -585,10 +585,11 @@ Demographic, Contact y Address; *sin buscador de persona*). Pedido de Julián co
 
 **New Patient** (drawer en pasos, General → Guardian sólo para un menor → Demography):
 1. **General** como en 2.0: la opción de vincular a una persona del sistema, el nombre en tres, *Email\** y
-   *Birthdate\**, **Interpreter Required** (vuelve de Demography a General) y la cuenta del portal.
+   *Birthdate\** y la cuenta del portal. **Interpreter Required** queda en Demography, en la misma fila que *Language*
+   (Julián: van de la mano), con el checkbox a la altura del select; 2.0 lo pone en General.
 2. **Email pasa a obligatorio** (CON-1328 y 2.0). Birthdate no puede ser futura (CON-1329).
 3. **Demography** con los campos de 2.0, de a dos: *Gender\** (obligatorio), Race, Ethnicity, Marital Status,
-   Profession y Nationality (con buscador), Language (arranca en English) y Religion. Phone, Address, City y ZIP salen de
+   Profession y Nationality (con buscador), Language (arranca en English) con Interpreter Required al lado, y Religion. Phone, Address, City y ZIP salen de
    acá: son Contact y Address y se cargan en Edit, como en 2.0.
 4. **Duplicado** (CON-1328): mismo nombre completo y email que otro paciente → `Alert` danger arriba del drawer, *A patient
    is already registered with this name and email address.*, y no se guarda. Con la cuenta del portal pedida y el email

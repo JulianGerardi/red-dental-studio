@@ -321,8 +321,10 @@ export function OptionCheckbox({
   defaultChecked = true,
   onChange,
   disabled,
+  className,
 }: {
   label: React.ReactNode
+  className?: string
   /** Sólo para controlarlo desde afuera; sin esto se maneja solo. */
   checked?: boolean
   defaultChecked?: boolean
@@ -350,6 +352,7 @@ export function OptionCheckbox({
         'flex w-full items-start gap-2.5 rounded-lg border bg-white p-3 text-left transition-colors',
         'focus-visible:border-dash-blue focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
         on ? 'border-dash-blue' : 'border-line hover:bg-surface-subtle',
+        className,
       )}
     >
       <span
