@@ -1,141 +1,147 @@
-import { useMemo, useState } from 'react'
-import { Plus, X } from 'lucide-react'
-import {
-  TextField, SelectField, TextArea, FieldLabel, FormFooter,
-} from '@/components/patients/form'
-import { DatePicker } from '@/components/ui/date-picker'
+import { useState } from 'react'
+import { Minus, Plus } from 'lucide-react'
+import { TextField, SelectField, TextArea } from '@/components/patients/form'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
-import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { ApplyToSelect } from '@/components/patients/ledger/ApplyToSelect'
+import {
+  CampoFecha, SeccionLedger, ShellLedger, useAplicacion, type FormularioLedger,
+} from '@/components/patients/ledger/formulario'
+import { CAMPOS_METODO, METODOS_PAGO, type Movimiento } from '@/data/ledger'
+import {
+  ALCANCE_GUARANTOR, MENSAJES, cargosAbiertos, esFutura, limpiarImporte, numero, opcionesAplicaA, pacienteDeAlcance, soloAplicado,
+} from '@/lib/ledgerAplicacion'
 import { formatMDY } from '@/lib/fecha'
 import { OBLIGATORIO } from '@/lib/validacion'
 
-/* Figma 4582:29545 / 4582:29862. Ver design-reference/figma/modulos/ledger.md. */
+/* Patient Payment (CON-3738), como en red.dev (video de Julián, 2026-11-19): Payment Information con la fecha, Apply to y
+   uno o más métodos (+ suma otro, − lo saca) y las notas; abajo, Ledger Transactions con el pago ya repartido del más
+   viejo al más nuevo. Abre con el total abierto como importe. Un solo paso, como red.dev. Ver ledger.md (2026-11-19). */
 
-const METODOS = ['Check payment', 'Card payment', 'Cash payment', 'Electronic payment']
-
-type Metodo = { id: number; monto: string; metodo: string; cheque: string; banco: string }
-const filaVacia = (id: number): Metodo => ({ id, monto: '', metodo: METODOS[0], cheque: '', banco: '' })
+type Metodo = { id: number; monto: string; metodo: string; extra: Record<string, string> }
+const filaVacia = (id: number, monto = '', metodo: string = METODOS_PAGO[0]): Metodo => ({ id, monto, metodo, extra: {} })
 
 export function PatientPaymentPanel({
-  cargos, onCancelar, onGuardar,
-}: {
-  cargos: Movimiento[]
-  onCancelar: () => void
-  onGuardar: (m: Omit<Movimiento, 'id'>) => void
-}) {
-  const personas = [GUARANTOR, ...DEPENDIENTES]
-  const [fecha, setFecha] = useState<Date | null>(null)
-  const [aplicaA, setAplicaA] = useState(personas[0])
-  const [metodos, setMetodos] = useState<Metodo[]>([filaVacia(0)])
+  movs, aplicaciones, garante, dependientes, alcanceInicial = ALCANCE_GUARANTOR, hoy, onGuardar, onCancelar,
+}: FormularioLedger) {
+  const ahora = hoy ?? new Date()
+  const opciones = opcionesAplicaA(garante, dependientes)
+  const [fecha, setFecha] = useState<Date | null>(ahora)
+  const [aplicaA, setAplicaA] = useState(alcanceInicial)
+  /* Arranca con lo que se debe en el alcance: así el pago se reparte de entrada, como red.dev. */
+  const [metodos, setMetodos] = useState<Metodo[]>(() => {
+    const abierto = cargosAbiertos(movs, aplicaciones, pacienteDeAlcance(alcanceInicial)).reduce((a, c) => a + c.guarantor, 0)
+    return [filaVacia(0, abierto > 0 ? abierto.toFixed(2) : '')]
+  })
   const [notas, setNotas] = useState('')
   const [intentado, setIntentado] = useState(false)
 
-  const cargosAplicables = useMemo(
-    () => cargos.filter((m) => m.tipo === 'Charge' && m.paciente === aplicaA),
-    [cargos, aplicaA],
-  )
+  const total = Math.round(metodos.reduce((a, f) => a + numero(f.monto), 0) * 100) / 100
+  const ap = useAplicacion({ movs, aplicaciones, aplicaA, total, mensajeExceso: MENSAJES.pagoAplicado })
 
-  const setFila = (id: number, cambios: Partial<Metodo>) =>
-    setMetodos((p) => p.map((f) => (f.id === id ? { ...f, ...cambios } : f)))
+  const setFila = (id: number, cambios: Partial<Metodo>) => setMetodos((p) => p.map((f) => (f.id === id ? { ...f, ...cambios } : f)))
+  const errorMonto = (f: Metodo) => (!f.monto.trim() ? OBLIGATORIO : numero(f.monto) <= 0 ? MENSAJES.monto : undefined)
+  const errorExtra = (f: Metodo, id: string) => (!f.extra[id]?.trim() ? OBLIGATORIO : undefined)
+  const errorFecha = !fecha ? OBLIGATORIO : esFutura(fecha, ahora) ? MENSAJES.futura : undefined
+
+  const hayErrorDeCampos = () =>
+    !!errorFecha || metodos.some((f) => !!errorMonto(f) || (CAMPOS_METODO[f.metodo] ?? []).some((c) => !!errorExtra(f, c.id)))
 
   const guardar = () => {
     setIntentado(true)
-    const faltaAlgo = !fecha || !aplicaA.trim()
-      || metodos.some((f) => !f.monto.trim() || (f.metodo === 'Check payment' && (!f.cheque.trim() || !f.banco.trim())))
-    if (faltaAlgo) return
-
-    const fechaTxt = formatMDY(fecha)
-    metodos.forEach((f) => {
-      const valor = Number(f.monto) || 0
-      onGuardar({
-        fecha: fechaTxt,
-        paciente: aplicaA,
-        codigo: '—',
-        descripcion: f.metodo === 'Check payment' ? `Check Payment #${f.cheque}` : f.metodo.replace('payment', 'Payment'),
-        provider: 'Front desk',
-        tipo: 'Payment',
-        monto: -valor,
-        estado: 'Posted',
-      })
+    if (hayErrorDeCampos() || ap.error || ap.cargando || !fecha) return
+    const componentes = metodos.map((f) => {
+      const campos = CAMPOS_METODO[f.metodo] ?? []
+      const ref = campos.length ? (f.metodo === 'Check Payment' ? `#${f.extra.cheque}` : f.extra[campos[0].id]) : undefined
+      return { metodo: f.metodo, monto: numero(f.monto), ...(ref ? { ref } : {}) }
     })
+    const alcance = aplicaA === ALCANCE_GUARANTOR ? 'guarantor' : 'patient'
+    const m: Omit<Movimiento, 'id'> = {
+      fecha: formatMDY(fecha),
+      paciente: aplicaA === ALCANCE_GUARANTOR ? garante : aplicaA,
+      codigo: '—',
+      descripcion: componentes.length === 1
+        ? `${componentes[0].metodo}${componentes[0].ref ? ` ${componentes[0].ref}` : ''}`
+        : `Patient Payment · ${componentes.length} methods`,
+      provider: 'Front desk',
+      tipo: 'Payment',
+      monto: -total,
+      estado: 'Posted',
+      alcance,
+      metodos: componentes,
+      ...(notas.trim() ? { nota: notas.trim() } : {}),
+      ...(ap.noAplicado > 0 ? { creditoDisponible: ap.noAplicado } : {}),
+    }
+    onGuardar(m, soloAplicado(ap.aplicado))
   }
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
-        <h2 className="text-sm font-bold text-ink">Payment Information</h2>
+  const botonMetodo = 'mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-ink-muted shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-dash-blue'
+  /* Campos de a dos y del mismo ancho (Components / UI / Drawer → Specs → Fields). */
+  const grilla = 'grid flex-1 gap-4 sm:grid-cols-2'
 
-        {/* Misma grilla de cuatro que las filas de pago; el hueco de la derecha es el del botón + / ×, para que las columnas queden alineadas. */}
-        <div className="mt-4 flex items-start gap-2">
-          <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="flex flex-col gap-2">
-              <FieldLabel required>Transaction date</FieldLabel>
-              <DatePicker value={fecha} onChange={setFecha} className="h-9 w-full" error={intentado && !fecha ? true : undefined} />
-            </div>
-            <SelectField
-              label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
-              error={intentado && !aplicaA.trim() ? OBLIGATORIO : undefined}
-            />
-          </div>
-          <span aria-hidden className="w-9 shrink-0" />
+  const primero = (
+    <SeccionLedger titulo="Payment Information" caja>
+      {/* El hueco de la derecha es el del botón + / −: las columnas quedan alineadas con las de los métodos. */}
+      <div className="flex items-start gap-2">
+        <div className={grilla}>
+          <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
+          <ApplyToSelect opciones={opciones} value={aplicaA} onChange={setAplicaA} titulo="Apply payment to" />
         </div>
+        <span aria-hidden className="w-9 shrink-0" />
+      </div>
 
-        <div className="mt-4 flex flex-col gap-3">
-          {metodos.map((f, i) => (
-            <div key={f.id} className="flex items-start gap-2">
-              <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Los métodos en su propia caja gris, como red.dev: cada uno con su importe y lo que pide (cheque y banco, ID de
+          autorización o número de referencia). + suma otro y − lo saca (CON-3738). */}
+      <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface-subtle p-3">
+        {metodos.map((f, i) => (
+          <div key={f.id} className="flex items-start gap-2">
+            <div className={grilla}>
+              <TextField
+                label="Amount" required placeholder="$ 0.00" value={f.monto}
+                onChange={(v) => setFila(f.id, { monto: limpiarImporte(v) })}
+                error={intentado ? errorMonto(f) : undefined}
+              />
+              <SelectField
+                label="Payment method" required options={[...METODOS_PAGO]} value={f.metodo}
+                onChange={(v) => setFila(f.id, { metodo: v, extra: {} })}
+              />
+              {(CAMPOS_METODO[f.metodo] ?? []).map((c) => (
                 <TextField
-                  label="Amount" required placeholder="$ 0.00" value={f.monto} onChange={(v) => setFila(f.id, { monto: v })}
-                  error={intentado && !f.monto.trim() ? OBLIGATORIO : undefined}
+                  key={c.id} label={c.label} required placeholder={c.placeholder} value={f.extra[c.id] ?? ''}
+                  onChange={(v) => setFila(f.id, { extra: { ...f.extra, [c.id]: v } })}
+                  error={intentado ? errorExtra(f, c.id) : undefined}
                 />
-                <SelectField label="Payment method" required options={METODOS} value={f.metodo} onChange={(v) => setFila(f.id, { metodo: v })} />
-                {f.metodo === 'Check payment' && (
-                  <>
-                    <TextField
-                      label="Check" required placeholder="1234" value={f.cheque} onChange={(v) => setFila(f.id, { cheque: v })}
-                      error={intentado && !f.cheque.trim() ? OBLIGATORIO : undefined}
-                    />
-                    <TextField
-                      label="Bank/Branch" required placeholder="AE9323AMB" value={f.banco} onChange={(v) => setFila(f.id, { banco: v })}
-                      error={intentado && !f.banco.trim() ? OBLIGATORIO : undefined}
-                    />
-                  </>
-                )}
-              </div>
-              {i === metodos.length - 1 ? (
-                <button
-                  type="button"
-                  aria-label="Add another payment method"
-                  onClick={() => setMetodos((p) => [...p, filaVacia(Math.max(0, ...p.map((x) => x.id)) + 1)])}
-                  className="mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-line text-ink-muted hover:bg-surface-muted"
-                >
-                  <Plus className="size-4" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  aria-label="Remove this payment method"
-                  onClick={() => setMetodos((p) => p.filter((x) => x.id !== f.id))}
-                  className="mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-line text-ink-muted hover:bg-dash-bad-bg hover:text-dash-bad-fg"
-                >
-                  <X className="size-4" />
-                </button>
-              )}
+              ))}
             </div>
-          ))}
-        </div>
-
+            {metodos.length > 1 && (
+              <button type="button" aria-label="Remove this payment method" onClick={() => setMetodos((p) => p.filter((x) => x.id !== f.id))} className={botonMetodo}>
+                <Minus className="size-4" />
+              </button>
+            )}
+            {i === metodos.length - 1 && (
+              <button
+                type="button" aria-label="Add another payment method"
+                onClick={() => setMetodos((p) => [...p, filaVacia(Math.max(...p.map((x) => x.id)) + 1, '', METODOS_PAGO[1])])}
+                className={botonMetodo}
+              >
+                <Plus className="size-4" />
+              </button>
+            )}
+          </div>
+        ))}
       </div>
 
-      <LedgerAllocationTable cargos={cargosAplicables} />
+      <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
+    </SeccionLedger>
+  )
 
-      <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
-        <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
-      </div>
+  const tabla = (
+    <LedgerAllocationTable
+      cargos={ap.cargos} aplicado={ap.aplicado} onAplicado={ap.setLinea} cargando={ap.cargando}
+      aplicadoTotal={ap.aplicadoTotal} noAplicado={ap.noAplicado} error={ap.error}
+    />
+  )
 
-      <div className="flex justify-end gap-3">
-        <FormFooter onCancel={onCancelar} onSave={guardar} />
-      </div>
-    </div>
+  return (
+    <ShellLedger titulo="New Patient Payment (-)" primero={primero} segundo={tabla} onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando} />
   )
 }

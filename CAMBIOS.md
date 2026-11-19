@@ -5,6 +5,31 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
+### Patient Payment, Credit y Charge Adjustment con la lógica de red.dev, en el Ledger y en Billing; métricas en azul ([#169](https://github.com/JulianGerardi/red-dental-studio/pull/169))
+- **Un solo formulario para el Ledger y Billing** (CON-3738, CON-3739, CON-3735): los tres drawers comparten la lógica y
+  `PostPaymentDialog` sólo elige cuál abrir.
+- **Apply to** con alcance (todo el hogar, Self o un dependiente); al cambiarlo se recargan los cargos abiertos.
+- **Reparto automático** del importe del cargo más viejo al más nuevo; se vuelve a repartir al cambiar el importe o el
+  alcance. Applied se edita a mano con sus topes y mensajes (línea por encima del saldo del guarantor, total por encima del
+  importe). Lo que no se aplica queda como crédito sin aplicar y los cargos cubiertos dejan de figurar como abiertos.
+- **Patient Payment**, como el video de red.dev: un solo paso, con la card *Payment Information* (se pliega), los métodos en
+  su caja con + / −, Notes adentro y *Ledger Transactions* de 10 columnas debajo. Abre con el total abierto como importe.
+  Un movimiento por pago, con todos sus métodos; sólo los de tipo patient, cada uno con su campo (cheque y banco,
+  Authorization ID, Reference number). Fecha no futura.
+- **Credit Adjustment** sólo con tipos de crédito; **Charge Adjustment** con Provider opcional y Visit date (`[None]` y las
+  visitas del alcance), guardado como `Adjustment` positivo.
+- **Métricas en azul:** el número de `ui/stat-card` (Billing, Ledger, Edit Account) y de las del Dashboard (`StatStrip`,
+  `dashboard/StatCard`) pasa a `text-dash-blue`.
+- **Para el dev:**
+  - Lógica pura en `lib/ledgerAplicacion.ts` (`cargosAbiertos`, `autoAplicar`, `resumenAplicacion`, `MENSAJES`, `opcionesAplicaA`).
+  - Hook `useAplicacion`, `ShellLedger` y `SeccionLedger` en `ledger/formulario.tsx`; `ApplyToSelect` nuevo.
+  - `LedgerAllocationTable` es controlada y pierde la flecha de fila, Columns y el paginado.
+  - `PostPaymentDialog` recibe `movs`, `aplicaciones`, `garante`, `dependientes` y `alcanceInicial` en lugar de `pacienteInicial`.
+  - `onGuardar(m, aplicado)` trae cuánto fue a cada cargo (id → monto); `METODOS_PAGO` y los tipos de ajuste pasan a `data/ledger.ts`.
+  - `ds:check` marca sin story: `ApplyToSelect`, `CampoFecha`, `SeccionLedger`, `ShellLedger`, `WaitingRoomList`,
+    `CancelAppointmentDialog`, `NoShowDialog` y `Globo`; no frena el deploy y se resuelve al documentar.
+  - Decisiones en `modulos/ledger.md` y `billing.md` (2026-11-19).
+
 ### Ledger y Billing alineados con red.dev, Scheduling, Dashboard y Settings normalizados (CON-4142) ([#168](https://github.com/JulianGerardi/red-dental-studio/pull/168))
 - **Regla:** las acciones principales van en la fila del título; los controles de fecha y filtro, debajo. Ninguna
   pantalla lleva bajada debajo del título (`SettingsPageHeader` ya no acepta `bajada`).

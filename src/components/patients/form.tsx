@@ -836,12 +836,14 @@ export function ModalShell({
    trae su propio contenedor en vez de depender del flex de quien lo use: así
    no hay contenedor angosto, columna ni wrap que los separe. */
 export function FormFooter({
-  onCancel, onSave, cancelLabel = 'Cancel', saveLabel = 'Save',
+  onCancel, onSave, cancelLabel = 'Cancel', saveLabel = 'Save', saveDisabled,
 }: {
   onCancel: () => void
   onSave?: () => void
   cancelLabel?: string
   saveLabel?: string
+  /** Save espera algo (los cargos de Patient Payment se están recargando). */
+  saveDisabled?: boolean
 }) {
   return (
     <div data-form-footer className="flex shrink-0 flex-nowrap items-center justify-end gap-3">
@@ -855,7 +857,8 @@ export function FormFooter({
       <button
         type="button"
         onClick={onSave}
-        className="bg-dash-blue hover:bg-dash-blue-hover h-9 shrink-0 rounded-md px-6 text-[13px] font-medium whitespace-nowrap text-white transition-colors"
+        disabled={saveDisabled}
+        className="bg-dash-blue hover:bg-dash-blue-hover h-9 shrink-0 rounded-md px-6 text-[13px] font-medium whitespace-nowrap text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
       >
         {saveLabel}
       </button>

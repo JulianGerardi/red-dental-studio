@@ -58,7 +58,7 @@ export function StatStripApilada({ stats }: { stats: Stat[] }) {
                 <span className="truncate text-[10px] font-semibold tracking-wide text-dash-muted uppercase">{label}</span>
                 {info && <InfoTip title={label}>{info}</InfoTip>}
               </span>
-              <span className="mt-1 block text-[17px] leading-none font-bold text-ink tabular-nums">{value}</span>
+              <span className="mt-1 block text-[17px] leading-none font-bold text-dash-blue tabular-nums">{value}</span>
               {nota && <span className="mt-1 block truncate text-[11px] text-ink-muted">{nota}</span>}
             </span>
           </div>
@@ -103,7 +103,7 @@ export function StatStrip({ stats = STATS, apilada = false }: { stats?: Stat[]; 
               <span className="truncate text-[10px] font-semibold tracking-wide text-dash-muted uppercase lg:text-[11px]">
                 {label}
               </span>
-              <span className="text-[14px] leading-none font-bold text-ink lg:text-[15px]">
+              <span className="text-[14px] leading-none font-bold text-dash-blue lg:text-[15px]">
                 {value}
               </span>
             </span>

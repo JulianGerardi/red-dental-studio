@@ -3,7 +3,7 @@ import { InfoTip } from '@/components/ui/info-tip'
 import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 
 /* La métrica de la app: una card por número, con el rótulo, el ⓘ arriba a la derecha, el monto y una bajada opcional,
-   como las cards de red.dev: rótulo en mayúsculas y el monto en negro. La usan Billing, el Ledger y Edit Account → Subscription (ledger.md, 2026-11-19). */
+   como las cards de red.dev: rótulo en mayúsculas y el monto en azul (Julián, 2026-11-19). La usan Billing, el Ledger y Edit Account → Subscription. */
 export function StatCard({ label, value, caption, info, interna, enFila, compacta, className }: {
   label: string
   value: string
@@ -29,7 +29,7 @@ export function StatCard({ label, value, caption, info, interna, enFila, compact
           </p>
           {caption && <p className="line-clamp-2 text-[11px] leading-snug text-ink-muted" title={caption}>{caption}</p>}
         </div>
-        <p className="shrink-0 text-base font-bold text-ink tabular-nums">{value}</p>
+        <p className="shrink-0 text-base font-bold text-dash-blue tabular-nums">{value}</p>
       </div>
     )
   }
@@ -40,7 +40,7 @@ export function StatCard({ label, value, caption, info, interna, enFila, compact
         <p className="text-[11px] leading-snug font-medium tracking-wide text-ink-muted uppercase">{label}</p>
         {info && <InfoTip title={label}>{info}</InfoTip>}
       </div>
-      <p className="mt-1 truncate text-xl font-bold text-ink tabular-nums" title={value}>{value}</p>
+      <p className="mt-1 truncate text-xl font-bold text-dash-blue tabular-nums" title={value}>{value}</p>
       {caption
         ? <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-ink-faint" title={caption}>{caption}</p>
         : enFila && <span aria-hidden />}

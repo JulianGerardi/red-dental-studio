@@ -45,6 +45,8 @@ export const GUARANTOR = 'John Smith'
 /* Un dependiente de nombre largo a propósito: las columnas Patient/Provider
    truncan con tooltip, y sin un caso así el truncado no se ve nunca. */
 export const DEPENDIENTES = ['Emma Smith', 'Maximiliano Fernández-Ugarte']
+/** Los profesionales que se pueden elegir en Enter Charge (+) Adjustment. */
+export const PROVIDERS_LEDGER = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado']
 
 export const MOVIMIENTOS: Movimiento[] = [
   { id: 'm1', fecha: '03/17/2025', paciente: 'John Smith', codigo: 'D0120', descripcion: 'Periodic oral evaluation', provider: 'Dr. Elena Martinez', tipo: 'Charge', monto: 85, estado: 'Posted', procedimiento: 'pr9' },
@@ -155,3 +157,25 @@ export function conSaldo(movs: Movimiento[]) {
     return { ...m, saldo }
   })
 }
+
+/* Las listas de los drawers de red.dev (Settings › Ledger), sin las de QA (billing.md, 2026-11-13). Las usan los tres
+   formularios, en el Ledger y en Billing. */
+/** Sólo los métodos de tipo patient (CON-3738); los de seguro no entran en un Patient Payment. */
+export const METODOS_PAGO = ['Cash Payment', 'Check Payment', 'Credit Card Payment', 'Electronic Transfer Payment'] as const
+/** Los datos que pide cada método además del importe (CON-3738): cheque y banco, ID de autorización, número de referencia. */
+export const CAMPOS_METODO: Record<string, { id: 'cheque' | 'banco' | 'autorizacion' | 'referencia'; label: string; placeholder: string }[]> = {
+  'Check Payment': [{ id: 'cheque', label: 'Check', placeholder: '1234' }, { id: 'banco', label: 'Bank/Branch', placeholder: 'AE9323AMB' }],
+  'Credit Card Payment': [{ id: 'autorizacion', label: 'Authorization ID', placeholder: 'AUTH123456' }],
+  'Electronic Transfer Payment': [{ id: 'referencia', label: 'Reference number', placeholder: 'REF123456' }],
+}
+export const TIPOS_AJUSTE_CREDITO = [
+  'Credit Adjustment', 'Discount', 'Family/Friend Courtesy', 'Full Payment Courtesy', 'Initial Credit Balance Forward',
+  'In-office Write-off', 'Insurance Adjustment', 'Offsetting Adjustment', 'Professional Courtesy', 'Senior Citizen Courtesy',
+  'Staff Courtesy', 'Transfer Credit Balance', 'Write-off',
+] as const
+export const TIPOS_AJUSTE_CARGO = [
+  'Charge Adjustment', 'Collected Bad Debt', 'Credit Card Full Refund', 'Credit Card Independent Refund',
+  'Credit Card Partial Refund', 'Credit Card Void', 'Electronic Check Credit', 'Initial Balance Forward',
+  'Ins Charge Offsetting Adjustment', 'Insurance Adjustment', 'Insurance Over-pmt Refund', 'NSF Bank Fee', 'NSF Check',
+  'Patient Refund', 'Sales Tax', 'Transfer Charge Balance',
+] as const

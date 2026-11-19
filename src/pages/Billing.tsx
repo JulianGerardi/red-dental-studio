@@ -7,10 +7,11 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
 import { moneda, pendienteDe, tieneCredito, type Movimiento } from '@/data/ledger'
 import {
-  APLICACIONES_BILLING, PACIENTES_BILLING, buscarPacientes, grupoDeGarante, ACTIVIDAD_RECIENTE, STATS_BILLING, STATS_HOY, FILTROS_ACTIVIDAD, HOY_BILLING,
+  APLICACIONES_BILLING, registrarAplicaciones, PROVIDERS_BILLING, PACIENTES_BILLING, buscarPacientes, grupoDeGarante, ACTIVIDAD_RECIENTE, STATS_BILLING, STATS_HOY, FILTROS_ACTIVIDAD, HOY_BILLING,
   VISTAS_PACIENTE, type FiltroActividad, type PacienteBilling, type TipoAjusteBilling, type VistaPaciente,
 } from '@/data/billing'
 import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
+import { ALCANCE_GUARANTOR } from '@/lib/ledgerAplicacion'
 import { DetalleMovimiento, LedgerRowModal, PillTipo } from '@/components/patients/ledger/LedgerRowDetail'
 import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { Pill, type PillTone } from '@/components/ui/pill'
@@ -337,6 +338,10 @@ export function AccionesPaciente({ onAccion }: {
 }
 
 /* `inicial` sólo lo usan las stories (Pages › Parts › Billing): la ruta abre en el resumen, sin paciente. */
+const [MES_HOY, DIA_HOY, ANIO_HOY] = HOY_BILLING.split('/').map(Number)
+/** El día de hoy de los datos de prueba (un cargo no se postea con fecha futura). */
+const HOY = new Date(ANIO_HOY, MES_HOY - 1, DIA_HOY)
+
 export default function Billing({ inicial }: {
   inicial?: { seleccionado?: string; vista?: VistaPaciente; filtro?: FiltroActividad; busqueda?: string; vacia?: boolean }
 } = {}) {
@@ -351,6 +356,8 @@ export default function Billing({ inicial }: {
 
   const pacienteSeleccionado = seleccionado ? PACIENTES_BILLING.find((p) => p.nombre === seleccionado) : undefined
   const grupo = useMemo(() => (seleccionado ? grupoDeGarante(seleccionado) : []), [seleccionado])
+  /* El guarantor del paciente elegido: Apply to ofrece a él (todo el hogar) y a los pacientes a su cargo. */
+  const garanteDe = grupo.find((p) => p.rol === 'Guarantor')?.nombre ?? seleccionado ?? ''
   /* Resumen: por tipo. Paciente: lo suyo (Patient View) o todo lo de su garante (Guarantor View). */
   const filas = useMemo(() => {
     if (!seleccionado) return actividad.filter((m) => coincideFiltro(m, filtro))
@@ -381,8 +388,12 @@ export default function Billing({ inicial }: {
      postea un primer pago. */
   const saldoActual = (paciente: string) => actividad.find((m) => m.paciente === paciente)?.saldo ?? 0
 
-  const registrarPago = (m: Omit<Movimiento, 'id'>) => {
-    setActividad((p) => [{ ...m, id: `act-${Date.now()}`, saldo: saldoActual(m.paciente) + m.monto }, ...p])
+  /* Un movimiento por transacción; lo que aplicó a cada cargo se suma a las aplicaciones para que esos cargos dejen de
+     figurar como abiertos (billing.md, 2026-11-19). */
+  const registrarPago = (m: Omit<Movimiento, 'id'>, aplicado: Record<string, number>) => {
+    const id = `act-${Date.now()}`
+    registrarAplicaciones(Object.entries(aplicado).map(([cargo, monto], i) => ({ id: `ap-${id}-${i}`, origen: id, cargo, fecha: m.fecha, monto })))
+    setActividad((p) => [{ ...m, id, saldo: saldoActual(m.paciente) + m.monto }, ...p])
     aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} posted for ${m.paciente}.`)
     setModal(null)
   }
@@ -447,10 +458,16 @@ export default function Billing({ inicial }: {
         </div>
       </div>
 
-      {modal && (
+      {modal && seleccionado && (
         <PostPaymentDialog
           tipoInicial={modal}
-          pacienteInicial={seleccionado ?? undefined}
+          movs={actividad}
+          aplicaciones={APLICACIONES_BILLING}
+          garante={garanteDe}
+          dependientes={grupo.filter((p) => p.nombre !== garanteDe).map((p) => p.nombre)}
+          alcanceInicial={vista === 'Guarantor View' ? ALCANCE_GUARANTOR : seleccionado}
+          hoy={HOY}
+          providers={[...PROVIDERS_BILLING]}
           onClose={() => setModal(null)}
           onGuardar={registrarPago}
         />

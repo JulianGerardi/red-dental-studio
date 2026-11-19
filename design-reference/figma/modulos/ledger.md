@@ -1049,3 +1049,72 @@ botones abren el `PostPaymentDialog` de `main`, con sus dos pasos y los datos de
 John Smith y la fecha es la de Billing. **No se publica** lo de adentro de los drawers descripto arriba (una sola página,
 sin íconos, Ledger Transactions con Other Credit / Guar Estimate / Applied, el garante con "(Guarantor)", sin
 transacciones sin métodos y Save apagado): queda en el commit `2d8dfbd` de la rama `claude/exciting-brown-p9saph`.
+
+## Patient Payment, Credit y Charge Adjustment como red.dev (2026-11-19)
+
+**Jira:** CON-3738 *Patient Payment 2*, CON-3739 *Credit Adjustment 2*, CON-3735 *Charge adjustment 2* (epic CON-3732),
+más CON-2801 (motivos) y CON-4083 (Provider no obligatorio, cancelada). Pedido de Julián con tres videos de red.dev: el
+de Patient Payment "replicalo tal cual, no lo veo igual"; el de Credit Adjustment "la lógica, no el diseño"; el de
+Charge Adjustment "la lógica tal cual". Todo con la **misma lógica en Billing** (`billing.md`, misma fecha).
+
+**Un solo formulario para el Ledger y Billing.** Desde *CON-4142* (arriba) los tres botones del Ledger abren el mismo drawer
+que Billing, así que `PatientPaymentPanel`, `CreditAdjustmentPanel` y `ChargeAdjustmentPanel` son drawers y las usan las dos
+pantallas a través de `PostPaymentDialog` (que sólo elige cuál). La lógica pura está en `lib/ledgerAplicacion.ts`; el hook
+`useAplicacion`, el contenedor `ShellLedger` y la sección `SeccionLedger`, en `ledger/formulario.tsx`.
+
+**Lógica (CON-3738 / CON-3739)**
+1. **Apply to** (`ApplyToSelect`): *Nombre (Guarantor)* = todo el hogar, *Self* y *Dependent*, con el rótulo "Apply payment
+   to". Cambiar de alcance recarga los cargos (esqueleto de ~0,5 s y Save en espera, como en el video).
+2. **Cargos elegibles** (`cargosAbiertos`): procedimientos y Charge Adjustments con saldo del guarantor mayor a cero, del
+   paciente elegido o de toda la cuenta. El saldo es lo que falta (`pendienteDe`) menos la parte del seguro **mientras el
+   reclamo está pendiente** (antes se descontaba por código en todos: un D1 preventivo quedaba en $0 para el paciente).
+3. **Reparto automático** (`autoAplicar`): del cargo más viejo al más nuevo (fecha, y a igual fecha el orden de carga)
+   hasta gastar el importe. Se vuelve a repartir cada vez que cambia el importe o el alcance; lo editado a mano se pisa.
+4. **Patient Payment abre con el total abierto como importe**, repartido (en el video abre con 88,00 = lo que debía).
+   Credit Adjustment abre vacío.
+5. **Edición manual de Applied**: no se recorta en silencio; se marca la línea y se dice por qué: *The applied amount
+   cannot be greater than the charge's remaining guarantor balance.* o *The total applied amount cannot be greater than
+   the payment / adjustment amount.* Con el error, Save no guarda.
+6. **Amount applied / Amount not applied** se recalculan al tipear. Lo que no se aplica queda en la misma transacción como
+   `creditoDisponible` (crédito sin aplicar) y suma a *Unapplied credits*; lo aplicado va a `APLICACIONES`, así el cargo
+   baja su *Trans. Bal.* y no vuelve a ofrecerse.
+7. **Un movimiento por pago**, con un componente por método (`metodos`); antes se guardaba uno por método. El alcance
+   (`patient` / `guarantor`) queda en el movimiento: un pago al guarantor se lee *Guarantor / Account*.
+8. **Métodos de pago** (`METODOS_PAGO`): sólo los de tipo patient (Cash, Check, Credit Card, Electronic Transfer). Cada uno
+   pide lo suyo (`CAMPOS_METODO`): Check y Bank/Branch; Authorization ID; Reference number. Con más de una fila los dos
+   botones son − (todas) y + (la última); el método que suma + arranca en Check Payment, como en el video.
+9. **Validaciones** (`MENSAJES`, textos de Jira): importe mayor que 0, fecha no futura, aplicado de más. Los campos
+   vacíos siguen con el texto del sistema (*This field is required.*, `OBLIGATORIO`).
+10. **Credit Adjustment**: sólo tipos de ajuste de crédito (antes ofrecía también *Charge Adjustment*).
+
+**Charge Adjustment (CON-3735)**: Date, Amount, Type (los de cargo), Provider (opcional, sin valor de entrada), Apply to,
+Visit date (`[None]` y las visitas del alcance elegido) y Notes; no se aplica a nada, por eso no lleva tabla. Se guarda como
+`Adjustment` con monto positivo (antes, en el Ledger, como `Charge`; Billing ya lo hacía así) y queda como un cargo más
+para cubrir con un pago o un crédito.
+
+**Diseño de Patient Payment (video):** un solo paso, sin tabs. *Payment Information* en una card que se pliega con el
+cuadradito, con Date y Apply to arriba, los métodos en su caja gris y **Notes adentro de la card**; debajo, *Ledger
+Transactions* con sus **10 columnas** (Txn date, Patient, Provider, Code, Description, Charge, Other Credit, Guar Estimate,
+Applied, Balance), el resumen y "Showing N open transactions", y el pie Cancel / Save. Se ve el efecto del importe sobre la
+tabla mientras se tipea. `LedgerAllocationTable` se reescribió (es controlada) y **pierde** la flecha de fila, el detalle,
+Columns, el resize y el paginado de la tabla de 12 columnas del Figma 4582:29618: red.dev no los tiene aquí. Los campos
+siguen de a dos y del mismo ancho (regla de los drawers; en el video van de a cuatro). **Credit y Charge Adjustment** conservan
+su diseño (Julián: "la lógica, no el diseño"): Credit en dos pasos (*Adjustment* → *Allocation*), Charge en una sola sección.
+
+**Anomalías / diferencias con el video**
+- La lista de métodos del video incluye *Insurance Payment - …* y métodos de QA; la historia pide sólo los de tipo patient.
+  Se siguió la historia.
+- Apply to en el video abre con "(Guarantor)" y su lista sólo muestra a la persona ("Self"); acá se listan las dos cosas.
+- El video muestra "88,00" por el idioma del navegador; acá "88.00".
+- El video no tiene el estado del saldo de un cargo con reclamo pendiente: Other Credit sólo se ve en esos cargos.
+- La fecha de hoy y el límite de fechas futuras son los del reloj (en Billing, `HOY_BILLING`).
+
+**A validar con usuarios:** si abrir el pago con el total y Save habilitado hace fácil cobrar de más por un clic (red.dev
+lo hace igual); si recepción espera que Apply to abra en el guarantor en Patient View; y si Credit Adjustment gana con la
+tabla en el mismo paso, como Patient Payment (hoy son dos pasos).
+
+### Números de las métricas en azul (2026-11-19)
+
+Julián: "en todas las cards de las métricas el número tiene que ser azul". `ui/stat-card` (Billing, Ledger y Edit Account →
+Subscription) pasa del negro de red.dev a `text-dash-blue`, igual que las del Dashboard (`StatStrip`, `dashboard/StatCard`).
+Rótulo y bajada no cambian.

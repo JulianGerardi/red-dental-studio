@@ -1,86 +1,88 @@
-import { useMemo, useState } from 'react'
-import {
-  TextField, SelectField, TextArea, FieldLabel, FormFooter,
-} from '@/components/patients/form'
-import { DatePicker } from '@/components/ui/date-picker'
+import { useState } from 'react'
+import { TextField, SelectField, TextArea } from '@/components/patients/form'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
-import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { ApplyToSelect } from '@/components/patients/ledger/ApplyToSelect'
+import {
+  CampoFecha, SeccionLedger, ShellLedger, useAplicacion, type FormularioLedger,
+} from '@/components/patients/ledger/formulario'
+import { TIPOS_AJUSTE_CREDITO, type Movimiento } from '@/data/ledger'
+import {
+  ALCANCE_GUARANTOR, MENSAJES, esFutura, limpiarImporte, numero, opcionesAplicaA, soloAplicado,
+} from '@/lib/ledgerAplicacion'
 import { formatMDY } from '@/lib/fecha'
 import { OBLIGATORIO } from '@/lib/validacion'
 
-/* Figma 4582:30209. "Amount" es texto libre por elección, ver
-   design-reference/figma/modulos/ledger.md. */
-
-const TIPOS_AJUSTE = ['Credit Adjustment', 'Charge Adjustment']
+/* Credit Adjustment (CON-3739): la misma lógica que el pago -Apply to, el reparto del más viejo al más nuevo, lo que no
+   se aplica queda como crédito- con un tipo de ajuste de crédito en lugar del método. Sólo los tipos de crédito (los de
+   cargo van en Charge Adjustment). Empieza vacío: el importe lo pone quien lo registra. Ver ledger.md (2026-11-19). */
 
 export function CreditAdjustmentPanel({
-  cargos, onCancelar, onGuardar,
-}: {
-  /** Todos los cargos de la cuenta, para armar la tabla de aplicación. */
-  cargos: Movimiento[]
-  onCancelar: () => void
-  onGuardar: (m: Omit<Movimiento, 'id'>) => void
-}) {
-  const personas = [GUARANTOR, ...DEPENDIENTES]
-  const [fecha, setFecha] = useState<Date | null>(null)
+  movs, aplicaciones, garante, dependientes, alcanceInicial = ALCANCE_GUARANTOR, hoy, onGuardar, onCancelar,
+}: FormularioLedger) {
+  const ahora = hoy ?? new Date()
+  const opciones = opcionesAplicaA(garante, dependientes)
+  const [fecha, setFecha] = useState<Date | null>(ahora)
+  const [aplicaA, setAplicaA] = useState(alcanceInicial)
+  const [tipo, setTipo] = useState<string>(TIPOS_AJUSTE_CREDITO[0])
   const [monto, setMonto] = useState('')
-  const [tipo, setTipo] = useState(TIPOS_AJUSTE[0])
-  const [aplicaA, setAplicaA] = useState(personas[0])
   const [notas, setNotas] = useState('')
   const [intentado, setIntentado] = useState(false)
 
-  const cargosAplicables = useMemo(
-    () => cargos.filter((m) => m.tipo === 'Charge' && m.paciente === aplicaA),
-    [cargos, aplicaA],
-  )
+  const total = numero(monto)
+  const ap = useAplicacion({ movs, aplicaciones, aplicaA, total, mensajeExceso: MENSAJES.ajusteAplicado })
+
+  const errorMonto = !monto.trim() ? OBLIGATORIO : total <= 0 ? MENSAJES.monto : undefined
+  const errorFecha = !fecha ? OBLIGATORIO : esFutura(fecha, ahora) ? MENSAJES.futura : undefined
+  const validarPrimero = () => { setIntentado(true); return !errorMonto && !errorFecha && !!tipo }
 
   const guardar = () => {
     setIntentado(true)
-    if (!fecha || !monto.trim() || !aplicaA.trim()) return
-    const valor = Number(monto) || 0
-    onGuardar({
+    if (errorMonto || errorFecha || !tipo || ap.error || ap.cargando || !fecha) return
+    const m: Omit<Movimiento, 'id'> = {
       fecha: formatMDY(fecha),
-      paciente: aplicaA,
+      paciente: aplicaA === ALCANCE_GUARANTOR ? garante : aplicaA,
       codigo: '—',
       descripcion: tipo,
       provider: 'Front desk',
-      tipo: tipo === 'Charge Adjustment' ? 'Charge' : 'Adjustment',
-      monto: tipo === 'Charge Adjustment' ? valor : -valor,
+      tipo: 'Adjustment',
+      monto: -total,
       estado: 'Posted',
-    })
+      alcance: aplicaA === ALCANCE_GUARANTOR ? 'guarantor' : 'patient',
+      motivo: tipo,
+      ...(notas.trim() ? { nota: notas.trim() } : {}),
+      ...(ap.noAplicado > 0 ? { creditoDisponible: ap.noAplicado } : {}),
+    }
+    onGuardar(m, soloAplicado(ap.aplicado))
   }
 
+  const grilla = 'grid gap-4 sm:grid-cols-2'
+  const primero = (
+    <SeccionLedger titulo="Credit Adjustment Information">
+      <div className={grilla}>
+        <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
+        <ApplyToSelect opciones={opciones} value={aplicaA} onChange={setAplicaA} titulo="Apply credit to" />
+        <SelectField label="Adjustment type" required options={[...TIPOS_AJUSTE_CREDITO]} value={tipo} onChange={setTipo} />
+        <TextField
+          label="Amount" required placeholder="$ 0.00" value={monto} onChange={(v) => setMonto(limpiarImporte(v))}
+          error={intentado ? errorMonto : undefined}
+        />
+      </div>
+      <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
+    </SeccionLedger>
+  )
+
+  const tabla = (
+    <LedgerAllocationTable
+      cargos={ap.cargos} aplicado={ap.aplicado} onAplicado={ap.setLinea} cargando={ap.cargando}
+      aplicadoTotal={ap.aplicadoTotal} noAplicado={ap.noAplicado} error={ap.error}
+    />
+  )
+
   return (
-    <div className="flex flex-col gap-4">
-      <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
-        <h2 className="text-sm font-bold text-ink">Credit Information</h2>
-
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="flex flex-col gap-2">
-            <FieldLabel required>Transaction date</FieldLabel>
-            <DatePicker value={fecha} onChange={setFecha} className="h-9 w-full" error={intentado && !fecha ? true : undefined} />
-          </div>
-          <TextField
-            label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto}
-            error={intentado && !monto.trim() ? OBLIGATORIO : undefined}
-          />
-          <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} />
-          <SelectField
-            label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
-            error={intentado && !aplicaA.trim() ? OBLIGATORIO : undefined}
-          />
-        </div>
-      </div>
-
-      <LedgerAllocationTable cargos={cargosAplicables} />
-
-      <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
-        <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
-      </div>
-
-      <div className="flex justify-end gap-3">
-        <FormFooter onCancel={onCancelar} onSave={guardar} />
-      </div>
-    </div>
+    <ShellLedger
+      titulo="Credit Adjustment (-)" pasos={['Adjustment', 'Allocation']}
+      primero={primero} segundo={tabla} validarPrimero={validarPrimero}
+      onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando}
+    />
   )
 }
