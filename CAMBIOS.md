@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
-### Patient Payment, Credit y Charge Adjustment con la lógica de red.dev, en el Ledger y en Billing; métricas en azul (#PR)
+### Patient Payment, Credit y Charge Adjustment con la lógica de red.dev, en el Ledger y en Billing; métricas en azul ([#169](https://github.com/JulianGerardi/red-dental-studio/pull/169))
 - **Un solo formulario para el Ledger y Billing** (CON-3738, CON-3739, CON-3735): los tres drawers comparten la lógica y
   `PostPaymentDialog` sólo elige cuál abrir.
 - **Apply to** con alcance (todo el hogar, Self o un dependiente); al cambiarlo se recargan los cargos abiertos.
