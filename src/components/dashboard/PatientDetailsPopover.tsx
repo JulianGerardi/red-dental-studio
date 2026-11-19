@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { Pill, type PillTone } from '@/components/ui/pill'
 import { createPortal } from 'react-dom'
 import {
   X, ChevronDown, Play, AArrowUp, ClipboardList, Smartphone, Eye, FileCheck2,
@@ -68,14 +69,23 @@ export function FilaDato({
 
 const W_MAX = 360
 
+/* El color del estado del encounter, con los tonos de ui/pill. */
+const TONO_ENCOUNTER: Record<string, PillTone> = { Planned: 'success', 'On Hold': 'warning' }
+
 export function PatientDetailsPopover({
   name,
   initials,
   anchor,
+  encounter = 'Planned',
+  iniciar = true,
   onClose,
 }: {
   name: string
   initials: string
+  /** Estado del encounter de la visita; null si todavía no hay (una cita Booked): sin pill. */
+  encounter?: string | null
+  /** Start Encounter sólo cuando el estado lo permite: encounter Planned (CON-4179). */
+  iniciar?: boolean
   /** Rect de la card que lo abrió, en coordenadas de viewport. */
   anchor: DOMRect
   onClose: () => void
@@ -122,20 +132,22 @@ export function PatientDetailsPopover({
             la ficha. El alto va en el escalón md del sistema (36) y no en los
             32 del nodo, que quedaban chicos al lado del avatar.
             "Encounter" corregido: el Figma decía "Enconter" (clinical-mode.md, 2026-11-13). */}
-        <button
-          type="button"
-          className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#18763e]"
-        >
-          <Play className="size-3.5 shrink-0" /> Start Encounter
-          <ChevronDown className="size-3.5 shrink-0" />
-        </button>
+        {iniciar && (
+          <button
+            type="button"
+            className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#18763e]"
+          >
+            <Play className="size-3.5 shrink-0" /> Start Encounter
+            <ChevronDown className="size-3.5 shrink-0" />
+          </button>
+        )}
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-3">
         <p className="truncate text-xl font-bold text-ink">{name}</p>
-        <span className="shrink-0 rounded-full border border-dash-ok-fg bg-dash-ok-bg px-3 py-1 text-xs font-semibold text-dash-ok-fg">
-          Planned
-        </span>
+        {encounter && (
+          <Pill tone={TONO_ENCOUNTER[encounter] ?? 'info'} className="shrink-0 px-3 py-1 text-xs">{encounter}</Pill>
+        )}
       </div>
 
       {/* Los dos lugares a los que se va desde acá: la ficha del paciente y

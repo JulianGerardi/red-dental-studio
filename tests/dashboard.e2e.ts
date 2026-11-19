@@ -176,5 +176,32 @@ test('Tocar un turno abre la ficha flotante y Check In no', async ({ app, screen
   /* Noah James ya pasó a la Waiting Room: el primero de Appointments es Sophia Collins. */
   await screen.getByText(/Dr\. Elena Martinez/).first().tap()
   await expect(screen.getByRole('dialog', 'Details for Sophia Collins')).toBeVisible()
+  /* Una cita Booked todavía no tiene encounter: sin Start Encounter (CON-4179). */
+  await expect(screen.getByText('Start Encounter')).toHaveCount(0)
   await expect(screen.getByText('Reason for Visit')).toBeVisible()
+})
+
+/* Start Encounter sólo con el encounter Planned (Checked in); Waiting cuenta desde el check-in (CON-4178, CON-4179). */
+test('Checked in: Start Encounter en la ficha y Waiting desde el check-in', async ({ app, screen }) => {
+  await app.open('/')
+  await expect(screen.getByText(/^Waiting · 12 min$/).first()).toBeVisible()
+  await screen.getByText(/Dr\. Daniel Anderson · Operatory 1/).first().tap()
+  await expect(screen.getByRole('dialog', 'Details for Zoe Phillips')).toBeVisible()
+  await expect(screen.getByText('Start Encounter')).toBeVisible()
+  await expect(screen.getByText('Planned')).toBeVisible()
+})
+
+/* Con citas en el día pero ninguna que coincida, el vacío lo dice (CON-4176, CON-4178); el menú no lleva Edit patient. */
+test('Filtros sin resultados y menú de Booked sin Edit patient', async ({ app, screen }) => {
+  await app.open('/')
+  await screen.getByRole('button', 'Actions for Noah James').first().tap()
+  await expect(screen.getByRole('menuitem', /Edit patient/)).toHaveCount(0)
+  await screen.getByRole('menuitem', /Edit appointment/).press('Escape')
+
+  await screen.getByRole('button', /Filter appointments/).tap()
+  await screen.getByRole('menuitemcheckbox', /Dr\. Emily Chen/).tap()
+  await screen.getByRole('menuitemcheckbox', /Operatory 1/).tap()
+  await screen.getByRole('menuitemcheckbox', /Operatory 1/).press('Escape')
+  await expect(screen.getByText('No results match your filters')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Appointments 0')).toBeVisible()
 })

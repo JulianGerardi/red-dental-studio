@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { CalendarDays, Clock, Activity, ShieldQuestionMark, CalendarClock, Pencil, UserPen, UserX, CalendarX } from 'lucide-react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { CalendarDays, Clock, Activity, ShieldQuestionMark, CalendarClock, Pencil, UserX, CalendarX } from 'lucide-react'
 import { Globo, Panel } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FilterMenu } from '@/components/ui/filter-menu'
@@ -8,7 +8,6 @@ import { PageTitle } from '@/components/ui/page-title'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import type { AccionMenu, Appointment } from '@/components/dashboard/AppointmentCard'
 import { CancelAppointmentDialog, NoShowDialog } from '@/components/dashboard/AppointmentStatusDialogs'
-import { slug } from '@/data/patientsStore'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
 import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import { OperatoryList } from '@/components/dashboard/OperatoryList'
@@ -19,7 +18,7 @@ import { ListGroup } from '@/components/ui/list-group'
 import { Tabs } from '@/components/ui/tabs'
 import {
   DIAS, DIA_CARGADO, DIA_VACIO, ETAPAS_ESPERA, HOY_DEMO, TASK_KINDS, claveFecha, claveTurno, fechaDesdeClave,
-  pendientesDeLlegar, puedeNoShow, reprogramar, type DiaDashboard, type EnEspera, type EtapaEspera, type Origen,
+  horaDelDia, pendientesDeLlegar, puedeNoShow, reprogramar, type DiaDashboard, type EnEspera, type EtapaEspera, type Origen,
 } from '@/components/dashboard/dashboard-data'
 import {
   NewAppointmentModal, type CampoTurno, type DatosTurno, type Pestana,
@@ -119,6 +118,8 @@ const EDICION_POR_ETAPA: Record<EtapaEspera, { bloqueados: CampoTurno[]; pestana
   },
 }
 
+const ENCOUNTER: Record<EtapaEspera, string> = { 'Checked in': 'Planned', 'On hold': 'On Hold', 'Ready to check out': 'Completed' }
+
 /* La acción la dice el panel, no el turno (Julián, 2026-10-18): en Appointments el paciente todavía no llegó (Check In,
    verde) y en Waiting Room ya está adentro (Check Out, azul). Ver dashboard.md. */
 
@@ -141,7 +142,12 @@ export default function Dashboard() {
   const [editando, setEditando] = useState<{ datos: DatosTurno; origen: Origen; etapa?: EtapaEspera } | null>(null)
   /* La pregunta abierta del kebab: Cancel appointment o Mark as no-show. */
   const [cerrando, setCerrando] = useState<{ tipo: 'cancel' | 'noshow'; turno: Appointment } | null>(null)
-  const navigate = useNavigate()
+  /* El reloj de Waiting y Paused: se mueve cada minuto (CON-4178). */
+  const [reloj, setReloj] = useState(() => new Date())
+  useEffect(() => {
+    const id = setInterval(() => setReloj(new Date()), 60_000)
+    return () => clearInterval(id)
+  }, [])
   /* Los días viven en estado: reprogramar un turno tiene que moverlo de fecha
      y verse en el día nuevo. */
   const [dias, setDias] = useState(() => (cargado ? conDiaCargado(DIAS) : DIAS))
@@ -223,7 +229,7 @@ export default function Dashboard() {
      de bloque en el dashboard (comparativa del 2026-11-19). */
   const hacerCheckIn = (a: Appointment) => setDias((prev) => {
     const d = prev[claveFecha(date)] ?? DIA_VACIO
-    return { ...prev, [claveFecha(date)]: { ...d, waiting: [...d.waiting, { ...a, accion: undefined, etapa: 'Checked in', minutos: 0, nuevo: true }] } }
+    return { ...prev, [claveFecha(date)]: { ...d, waiting: [...d.waiting, { ...a, accion: undefined, etapa: 'Checked in', desde: horaDelDia(date, reloj) ?? undefined, nuevo: true }] } }
   })
   /* Check Out: sale de la Waiting Room y queda completado en la agenda. */
   const hacerCheckOut = (p: EnEspera) => setDias((prev) => {
@@ -261,13 +267,11 @@ export default function Dashboard() {
       : 'The appointment status has been updated to No Show.')
     setCerrando(null)
   }
-  const editarPaciente = (t: Appointment) => navigate(`/patients/${slug(t.name)}/edit`)
 
-  /* El kebab de una cita Booked: editar primero, Mark as no-show sólo si ya pasó la hora y Cancel al final. Check In
-     tiene su botón (dashboard.md, 2026-11-19). */
+  /* El kebab de una cita Booked (CON-4177): Edit appointment, Mark as no-show sólo si ya pasó la hora y Cancel al final.
+     Check In tiene su botón. */
   const accionesReservada = (a: Appointment): AccionMenu[] => [
     { label: 'Edit appointment', icon: Pencil, onSelect: () => editar(a, { clave: claveFecha(date), panel: 'appointments', index: dia.appointments.indexOf(a) }) },
-    { label: 'Edit patient', icon: UserPen, onSelect: () => editarPaciente(a) },
     ...(puedeNoShow(a, date) ? [{ label: 'Mark as no-show', icon: UserX, onSelect: () => setCerrando({ tipo: 'noshow', turno: a }) }] : []),
     { label: 'Cancel appointment', icon: CalendarX, destructiva: true, onSelect: () => setCerrando({ tipo: 'cancel', turno: a }) },
   ]
@@ -277,6 +281,16 @@ export default function Dashboard() {
     { label: 'Edit appointment', icon: Pencil, onSelect: () => editar(p, { clave: claveFecha(date), panel: 'waiting', index: dia.waiting.indexOf(p) }, p.etapa) },
     ...(p.etapa === 'Checked in' ? [{ label: 'Cancel appointment', icon: CalendarX, destructiva: true, onSelect: () => setCerrando({ tipo: 'cancel', turno: p }) }] : []),
   ]
+
+  /* Lo que dice la ficha rápida de la visita: el estado del encounter (una cita Booked todavía no tiene) y Start
+     Encounter sólo con el encounter Planned, o sea en Checked in (CON-4179). */
+  const estadoVisita = (a: Appointment): { encounter: string | null; iniciar: boolean } => {
+    const k = claveTurno(a)
+    const enSala = dia.waiting.find((w) => claveTurno(w) === k)
+    if (enSala) return { encounter: ENCOUNTER[enSala.etapa], iniciar: enSala.etapa === 'Checked in' }
+    const t = dia.appointments.find((x) => claveTurno(x) === k)
+    return { encounter: t?.enCurso ? 'In Progress' : t?.completado ? 'Fulfilled' : null, iniciar: false }
+  }
 
   /* Los números salen de las listas del día, no de un mock aparte. */
   const stats: Stat[] = useMemo(() => {
@@ -340,8 +354,11 @@ export default function Dashboard() {
             />
           }
         >
+          {/* Los vacíos de CON-4176: sin citas en el día, o con citas pero ninguna que coincida con los filtros. */}
           {turnos.length === 0 ? (
-            dia.appointments.length > 0 && porLlegar.length === 0 ? (
+            porLlegar.length > 0 ? (
+              <EmptyState icon={CalendarDays} title="No results match your filters" detail="Try other providers or rooms." />
+            ) : dia.appointments.some((a) => a.cerrado !== 'Cancelled') ? (
               <EmptyState
                 icon={CalendarDays}
                 title="Everyone has checked in"
@@ -350,12 +367,8 @@ export default function Dashboard() {
             ) : (
               <EmptyState
                 icon={CalendarDays}
-                title="No appointments today"
-                detail={
-                  providers.length > 0 || salas.length > 0
-                    ? 'No appointments match the selected providers and rooms.'
-                    : 'Your schedule is clear. Add an appointment or check pending requests.'
-                }
+                title="No appointments scheduled for today"
+                detail="Your schedule is clear. Add an appointment or check pending requests."
                 accion={{ label: 'New appointment', onClick: () => aviso.info('Use Scheduling to create an appointment.') }}
               />
             )
@@ -387,17 +400,15 @@ export default function Dashboard() {
           }
         >
           {enEspera.length === 0 ? (
-            <EmptyState
-              icon={Clock}
-              title={etapas.length > 0 ? 'No visits in this stage' : 'Waiting room is empty'}
-              detail={
-                etapas.length > 0
-                  ? 'No patients match the selected visit stages.'
-                  : 'No patients have checked in for this day yet.'
-              }
-            />
+            /* CON-4178: vacía de verdad, o con visitas que el filtro deja afuera. */
+            dia.waiting.length > 0 ? (
+              <EmptyState icon={Clock} title="No results match your filters" detail="Try other visit stages." />
+            ) : (
+              <EmptyState icon={Clock} title="Waiting room is empty" detail="No patients have checked in for this day yet." />
+            )
           ) : (
             <WaitingRoomList
+              ahora={horaDelDia(date, reloj)}
               pacientes={enEspera} limit={TOPE.espera} seleccionada={selected?.id}
               onSelect={pick} onAccion={hacerCheckOut} acciones={accionesEspera}
             />
@@ -457,6 +468,7 @@ export default function Dashboard() {
 
       {selected && (
         <PatientDetailsPopover
+          {...estadoVisita(selected.appt)}
           name={selected.appt.name}
           initials={selected.appt.initials}
           anchor={selected.rect}

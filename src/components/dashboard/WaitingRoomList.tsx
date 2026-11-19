@@ -3,16 +3,17 @@ import { Pill } from '@/components/ui/pill'
 import { TARJETA_INTERNA } from '@/lib/estilos'
 import { AppointmentRow } from './DashboardRows'
 import type { AccionMenu, Appointment } from './AppointmentCard'
-import { ETAPAS_ESPERA, claveTurno, type EnEspera, type EtapaEspera } from './dashboard-data'
+import { ETAPAS_ESPERA, claveTurno, minutosDesde, type EnEspera, type EtapaEspera } from './dashboard-data'
 
 /* La Waiting Room agrupada por etapa (comparativa del 2026-11-19, CON-1670): Checked in, On hold y Ready to check out,
    cada grupo con su cuenta total. La acción depende de la etapa: sólo Ready to check out lleva Check Out; las otras
    dicen cuánto lleva la espera o la pausa. Ver design-reference/figma/modulos/dashboard.md. */
 
-/* Primero quien más espera; los que salen, por hora. */
+/* Primero quien más espera (el `desde` más temprano); los que salen, por hora. */
+const porDesde = (a: EnEspera, b: EnEspera) => (a.desde ?? '').localeCompare(b.desde ?? '')
 const ORDEN: Record<EtapaEspera, (a: EnEspera, b: EnEspera) => number> = {
-  'Checked in': (a, b) => (b.minutos ?? 0) - (a.minutos ?? 0),
-  'On hold': (a, b) => (b.minutos ?? 0) - (a.minutos ?? 0),
+  'Checked in': porDesde,
+  'On hold': porDesde,
   'Ready to check out': (a, b) => a.time.localeCompare(b.time),
 }
 
@@ -28,13 +29,13 @@ export function repartir(tamanos: number[], tope: number) {
   })
 }
 
-const ESTADO: Partial<Record<EtapaEspera, (min: number) => string>> = {
-  'Checked in': (m) => `Waiting · ${m} min`,
-  'On hold': (m) => `Paused · ${m} min`,
-}
+/* Waiting cuenta desde el check-in y Paused desde el inicio de la pausa actual, no desde la hora de la cita (CON-4178). */
+const ESTADO: Partial<Record<EtapaEspera, string>> = { 'Checked in': 'Waiting', 'On hold': 'Paused' }
 
-export function WaitingRoomList({ pacientes, limit, seleccionada, onSelect, onEdit, onAccion, acciones }: {
+export function WaitingRoomList({ pacientes, ahora, limit, seleccionada, onSelect, onEdit, onAccion, acciones }: {
   pacientes: EnEspera[]
+  /** La hora actual del día (HH:MM) para contar los minutos; null en un día pasado o futuro. */
+  ahora: string | null
   /** Cuántas filas se ven antes de "Show N more". */
   limit?: number
   /** Id de la fila que abrió la ficha rápida. */
@@ -60,7 +61,8 @@ export function WaitingRoomList({ pacientes, limit, seleccionada, onSelect, onEd
             <ul className="flex flex-col gap-3">
               {g.filas.slice(0, cuantos[gi]).map((p) => {
                 const id = `wait-${claveTurno(p)}`
-                const texto = ESTADO[p.etapa]?.(p.minutos ?? 0)
+                const min = minutosDesde(p.desde, ahora)
+                const texto = ESTADO[p.etapa] && (min === undefined ? ESTADO[p.etapa] : `${ESTADO[p.etapa]} · ${min} min`)
                 return (
                   <li key={id} className={TARJETA_INTERNA}>
                     <AppointmentRow

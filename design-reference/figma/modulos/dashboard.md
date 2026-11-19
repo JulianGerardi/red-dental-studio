@@ -8,6 +8,7 @@
 **Jira** (funcionamiento de la app; índice en [jira.md](../../jira.md)):
 
 - Epics: CON-2639 Dashboard – Pending Tasks · CON-3116 [Post Demo] Dashboard
+- Epic CON-4175 *Dashboard 2*: CON-4176 a CON-4180 (Appointments, Waiting Room y Rooms; ver 2026-11-19, tercera tanda)
   ([historias](https://confidetally.atlassian.net/issues?jql=parent%20in%20%28CON-2639%2CCON-3116%29%20AND%20issuetype%20%21%3D%20Bug%20AND%20status%20%21%3D%20Cancelled%20AND%20%28labels%20is%20EMPTY%20OR%20labels%20%21%3D%20%22design-system%22%29%20ORDER%20BY%20created%20DESC))
 
 Relevado 2026-08-25. Nodos:
@@ -958,3 +959,47 @@ cancelación), CON-1670 (Waiting Room). Pedido de Julián con dos tablas (filtro
 no hay regla de la clínica en Jira; convendría una configuración); si en Checked in hace falta cambiar la hora
 (se dejó bloqueada: el paciente ya está y el encounter, creado); y si *Edit patient* debería depender de un permiso (hoy
 no hay permisos en la app).
+
+## Las historias de Dashboard 2 contra lo publicado (2026-11-19, tercera tanda)
+
+**Jira:** CON-4176, CON-4177, CON-4178, CON-4179 y CON-4180 (epic CON-4175 *Dashboard 2*). Julián las escribió con
+detalle después de las dos tandas anteriores; se compararon criterio por criterio con lo publicado en
+[JulianGerardi/red-dental-studio#166](https://github.com/JulianGerardi/red-dental-studio/pull/166). Lo que ya estaba
+quedó igual; esto es lo que cambió:
+
+- **CON-4177, menú ⋮ de Appointments:** la historia lista Edit appointment, Mark as no-show y Cancel appointment. Sale
+  *Edit patient* (lo había pedido la tabla anterior; la historia no lo incluye). Al paciente se sigue llegando por la
+  ficha rápida que abre el nombre.
+- **CON-4176 y CON-4178, vacíos:** *No appointments scheduled for today* cuando el día no tiene citas; *No results match
+  your filters* cuando hay pero el filtro no deja ninguna (en las dos columnas); *Waiting room is empty* sin visitas.
+  Se mantiene *Everyone has checked in* para un día con citas que ya llegaron todas: la historia no cubre ese caso y
+  decir "no hay citas agendadas" sería falso.
+- **CON-4178, Waiting y Paused:** ya no son minutos fijos del mock. Cada visita guarda `desde` (la hora del check-in en
+  Checked in, el inicio de la pausa actual en On hold) y los minutos se calculan contra la hora actual, que se actualiza
+  cada minuto. Check In guarda la hora en que se hizo. En un día pasado o futuro no hay cuenta: la pill dice sólo
+  *Waiting* o *Paused*. El orden de esos grupos es por `desde`: primero quien más espera.
+- **CON-4178 y CON-4180, contador de sala:** el `title` nativo pasa a `ui/tooltip` (*N appointments today*, en singular
+  con 1). El número sigue diciendo lo mismo al lector de pantalla.
+- **CON-4179, Start Encounter:** la ficha rápida lo muestra sólo con el encounter **Planned** (Checked in). En una cita
+  Booked (todavía sin encounter), On hold, Ready to check out o desde Rooms, no. El pill de la ficha decía siempre
+  *Planned*; ahora dice el estado real: Planned, On Hold, Completed, In Progress o Fulfilled, y ninguno en una Booked.
+  `PatientDetailsPopover` suma `encounter` e `iniciar` (por defecto, como antes, para las otras pantallas).
+
+**Propuesta para el backend (CON-4178 pide "posibles soluciones" para obtener los tiempos):**
+1. **Guardar la hora de cada cambio de estado, no los minutos.** En el Appointment, `checked_in_at` al confirmar el
+   check-in. En el Encounter, un historial de estados (`encounter_status_history`: estado, `started_at`, `ended_at`,
+   usuario) o, como mínimo, `on_hold_since` que se llena al pausar y se limpia al reanudar.
+2. **La API manda la hora, el front cuenta.** `Waiting = ahora − checked_in_at`; `Paused = ahora − on_hold_since` (la
+   pausa actual: si se pausó dos veces, cuenta la última). Con la hora del servidor en la respuesta para no depender del
+   reloj de la PC de recepción, y un tick por minuto en la pantalla, como en la réplica.
+3. El historial sirve además para reportes (espera promedio, tiempo en pausa por provider) y para la auditoría que ya
+   piden CON-1670, CON-1827 y CON-1828.
+
+**Siguen como estaban y cumplen la historia:** una tarjeta por cita Booked y por hora; Check In la pasa a Checked in
+sin duplicarla; filtros Provider + Room combinados con el total y "Show N more" al día; Visit stage con las cuentas
+por grupo que incluyen lo escondido; Cancel sólo en Checked in y al final; Check Out sólo como botón; Edit appointment
+por etapa; Rooms con Available / Busy / No bookings, Now sólo para la visita en curso y la sala libre cuando el
+encounter pasa a Completed o Fulfilled.
+
+**A validar:** la regla de elegibilidad de No Show. CON-4177 la muestra "sólo si ya existe una regla"; la réplica usa
+"ya pasó la hora de la cita". Falta que el negocio la defina (¿tolerancia de minutos?, ¿configurable por clínica?).

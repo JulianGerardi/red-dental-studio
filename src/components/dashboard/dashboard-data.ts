@@ -26,8 +26,21 @@ export type Turno = Appointment & {
 export const ETAPAS_ESPERA = ['Checked in', 'On hold', 'Ready to check out'] as const
 export type EtapaEspera = (typeof ETAPAS_ESPERA)[number]
 
-/* `minutos`: en Checked in, desde el check-in; en On hold, los de la pausa actual. */
-export type EnEspera = Appointment & { nuevo?: boolean; etapa: EtapaEspera; minutos?: number }
+/* `desde` (HH:MM): en Checked in, la hora del check-in; en On hold, el inicio de la pausa actual. Los minutos se
+   calculan contra la hora actual (CON-4178): no se guardan. */
+export type EnEspera = Appointment & { nuevo?: boolean; etapa: EtapaEspera; desde?: string }
+
+/* La hora de "ahora" del día de la demo: Zoe Phillips hizo check-in a las 10:30 y lleva 12 minutos esperando. */
+export const HORA_DEMO = '10:42'
+
+const aMin = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5))
+const aHora = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`
+
+/* Minutos desde `desde` hasta `ahora`; sin hora actual en el día (pasado o futuro), no hay cuenta. */
+export function minutosDesde(desde: string | undefined, ahora: string | null) {
+  if (!desde || !ahora) return undefined
+  return Math.max(0, aMin(ahora) - aMin(desde))
+}
 
 export type DiaDashboard = {
   appointments: Turno[]
@@ -66,9 +79,10 @@ const turno = (
 ): Turno => ({ name, initials, provider, operatory, time, ...extra })
 
 /* El que llegó sigue en la agenda y además pasa a la sala de espera con su etapa. */
-const espera = (t: Turno, etapa: EtapaEspera, minutos?: number, nuevo?: boolean): EnEspera => ({
+/* `hace`: cuántos minutos antes de la hora de la demo (10:42) fue el check-in o empezó la pausa. */
+const espera = (t: Turno, etapa: EtapaEspera, hace?: number, nuevo?: boolean): EnEspera => ({
   name: t.name, initials: t.initials, provider: t.provider, operatory: t.operatory, time: t.time, motivo: t.motivo,
-  etapa, minutos, nuevo,
+  etapa, desde: hace === undefined ? undefined : aHora(aMin(HORA_DEMO) - hace), nuevo,
 })
 
 /* El día de la demo, armado sobre el Figma de la comparativa (476:66770): los nombres y etapas de cada columna. */
@@ -231,9 +245,14 @@ export function reprogramar(
   return salida
 }
 
-/* La hora de "ahora" del día de la demo: Zoe Phillips hizo check-in a las 10:30 y lleva 12 minutos esperando. Para otros
-   días: hoy, la hora real; un día pasado ya terminó y uno futuro no empezó. */
-export const HORA_DEMO = '10:42'
+/* Para otros días que no son el de la demo: hoy, la hora real; un día pasado ya terminó y uno futuro no empezó. */
+
+/* La hora actual dentro del día elegido, o null si el día ya terminó o no empezó (no hay espera que contar). */
+export function horaDelDia(fecha: Date, ahora = new Date()) {
+  const h = horaActual(fecha, ahora)
+  return h === '24:00' || h === '00:00' ? null : h
+}
+
 export function horaActual(fecha: Date, ahora = new Date()) {
   const dia = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
   if (dia(fecha) === dia(HOY_DEMO)) return HORA_DEMO
