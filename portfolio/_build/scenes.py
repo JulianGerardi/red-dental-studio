@@ -28,8 +28,8 @@ def rise(inner, bg, length=130):
 
 
 # ---------- devices sized for a story stage ----------
-def dev_browser(p, name, w, h, url, dark=False, view="fit", alt_en="", alt_es=""):
-    return f'<div class="story__dev" style="--far:{far_browser(w, h, view)}">{browser(p, name, w, h, url, dark, alt_en, alt_es, view=view)}</div>'
+def dev_browser(p, name, w, h, url, dark=False, view="fit", alt_en="", alt_es="", body=""):
+    return f'<div class="story__dev" style="--far:{far_browser(w, h, view)}">{browser(p, name, w, h, url, dark, alt_en, alt_es, view=view, body=body)}</div>'
 
 
 def dev_phone(p, name, alt_en="", alt_es=""):

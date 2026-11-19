@@ -1,10 +1,10 @@
 """Strike: the UX/UI challenge for a multi-asset security exercise.
 
-Sources: the analysis deck and the design system in the Figma file, and the working
+Sources: the analysis deck (summarised natively) and the design system in the Figma file, and the working
 prototype (React), whose screens were captured at 2x for this page.
 """
 from common import *
-from scenes import rise, story, rail, fan, dev_browser
+from scenes import rise, story, fan, dev_browser
 from mockups import STRIKE_URL
 import os
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -49,44 +49,88 @@ b += chapter(T("The challenge", "El desafío"), h2("Many assets, one coordinated
 b += big_words("The problem isn’t picking several assets. It’s handling shared settings and individual exceptions in one flow that scales.",
                "El problema no es elegir varios activos. Es manejar la configuración compartida y las excepciones de cada uno en un solo flujo que escale.")
 
-breakdown = [("Global settings vs. settings per asset", "Configuración global vs. por activo",
-              "Some parameters apply to the whole exercise: the objective, the testing depth and the schedule. Others belong to each asset: credentials, request limits, VPN and excluded tests. Mixed together, it’s hard to tell what affects everything and what affects one asset.",
-              "Algunos parámetros aplican a todo el ejercicio: el objetivo, la profundidad de las pruebas y el cronograma. Otros son de cada activo: credenciales, límites de solicitudes, VPN y pruebas excluidas. Mezclados, cuesta entender qué afecta a todo y qué a un solo activo."),
-             ("Scale", "Escalabilidad",
-              "A flow that works with two or three assets turns slow with 20 or 40. Opening and setting each one by hand repeats work, invites errors and hides what’s still incomplete.",
-              "Un flujo que funciona con dos o tres activos se vuelve lento con 20 o 40. Abrir y configurar cada uno a mano repite trabajo, suma errores y esconde lo que quedó incompleto."),
-             ("Control", "Control",
-              "Incomplete settings and differences between assets have to show up before any test starts.",
-              "Las configuraciones incompletas y las diferencias entre activos tienen que aparecer antes de que empiece cualquier prueba.")]
-ol = '      <ol class="steps">' + "".join(f'<li data-reveal><span class="steps__n">{i + 1:02d}</span><div><h3>{T(a, c)}</h3><p>{T(d, e)}</p></div></li>' for i, (a, c, d, e) in enumerate(breakdown)) + "</ol>\n"
-b += chapter(T("Breaking it down", "Desglose del problema"), h2("Three tensions to solve.", "Tres tensiones para resolver.") + ol, "breakdown")
+# the analysis, native: what the five-page deck in Figma said, in short
+def chk(ok):
+    return ('<svg class="sa__ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5 6.5 11.5 12.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' if ok else
+            '<svg class="sa__ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.5v5.5M8 11.6v.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>')
 
-# the analysis, as it was presented
-deck = [("s-deck-cover", 1600, 893, "<b>Cover.</b> The deck opens like a Figma canvas: a selected Alert Dialog, multiplayer cursors and Strike’s pixel pattern.",
-         "<b>Portada.</b> El deck abre como un canvas de Figma: un Alert Dialog seleccionado, cursores multiplayer y el patrón de píxeles de Strike."),
-        ("s-deck-1", 1600, 1007, "<b>1 · Problem analysis.</b> From one asset at a time to many in one exercise.", "<b>1 · Análisis del problema.</b> De un activo por vez a muchos en un ejercicio."),
-        ("s-deck-2", 1600, 1376, "<b>2 · Breakdown.</b> Global vs. per-asset settings, scale and control.", "<b>2 · Desglose.</b> Configuración global vs. por activo, escala y control."),
-        ("s-deck-3", 1600, 1601, "<b>3 · Proposal.</b> Five stages, guided by a stepper.", "<b>3 · Propuesta.</b> Cinco etapas, guiadas por un stepper."),
-        ("s-deck-4", 1600, 1517, "<b>4 · Design decisions.</b> Shared settings, personalisation, bulk editing and the prototype.", "<b>4 · Decisiones de diseño.</b> Configuración compartida, personalización, edición masiva y el prototipo."),
-        ("s-deck-5", 1600, 1175, "<b>5 · Goal.</b> Clear for a few assets, efficient for 40.", "<b>5 · Objetivo.</b> Claro con pocos activos, eficiente con 40.")]
-b += rail("The analysis, as presented.", "El análisis, tal como se presentó.",
-          "Before any screen, a five-page deck in Figma framed the problem, broke it down and proposed the flow.",
-          "Antes de cualquier pantalla, un deck de cinco páginas en Figma planteó el problema, lo desglosó y propuso el flujo.",
-          [(f'<div class="deck">{screen(p, n, w, h, "Strike analysis deck", "Deck de análisis de Strike", zoom=True)}</div>', round(w / h, 4), T(ce, cs)) for n, w, h, ce, cs in deck])
+
+assets3 = [("WEB", "Commerce Web", "10 req/s", T("VPN off", "Sin VPN"), "", False),
+           ("iOS", "Commerce iOS", "5 req/s", T("VPN on", "Con VPN"), "", False),
+           ("API", "Commerce API", "20 req/s", T("VPN off", "Sin VPN"), T("No destructive", "Sin destructivas"), True)]
+
+
+def asset_chip(t, n, rate, vpn, exc, hi, i):
+    ex = f'<span class="sa__x">{exc}</span>' if exc else ""
+    return (f'<li class="sa__asset" style="--i:{i}"><span class="sa__type">{t}</span><b>{n}</b>'
+            f'<span class="sa__props"><svg class="sa__lock" aria-hidden="true"><use href="#i-lock"/></svg><span{" class=sa__hi" if hi else ""}>{rate}</span><span>{vpn}</span>{ex}</span></li>')
+
+
+today = "".join(f'<li style="--i:{i}"><span class="sa__type">{t}</span><span>{T("1 exercise", "1 ejercicio")}</span></li>' for i, (t, *_rest) in enumerate(assets3))
+ask = "".join(asset_chip(*a, i) for i, a in enumerate(assets3))
+p1 = f"""<article class="sa__card sa__card--wide" data-reveal>
+  <div class="sa__copy"><span class="sa__n">01</span><h3>{T("From one asset at a time to many in one exercise.", "De un activo por vez a muchos en un ejercicio.")}</h3>
+  <p>{T("Today every asset is tested on its own. The ask is one exercise for the whole e-commerce, where each asset keeps its own credentials, limits, VPN and exclusions.", "Hoy cada activo se prueba por separado. El pedido es un solo ejercicio para todo el e-commerce, donde cada activo mantiene sus credenciales, límites, VPN y exclusiones.")}</p></div>
+  <div class="sa__diag">
+    <div class="sa__col"><span class="sa__cap">{T("Today", "Hoy")}</span><ul class="sa__today">{today}</ul></div>
+    <span class="sa__arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-right"/></svg></span>
+    <div class="sa__col"><span class="sa__cap sa__cap--on">{T("The ask", "El pedido")}</span>
+      <div class="sa__ex"><div class="sa__exh"><b>Q4 Commerce Security Assessment</b><span>{T("Standard · May 24–25 · 09–18 h", "Standard · 24–25 may · 09–18 h")}</span></div><ul>{ask}</ul></div></div>
+  </div>
+</article>"""
+
+layers = "".join(f'<li style="--i:{i}"><span class="sa__type">{t}</span>' + "".join(
+    f'<i{" class=sa__hi" if (i == 2 and r == 1) else ""}></i>' for r in range(4)) + "</li>" for i, (t, *_r) in enumerate(assets3))
+p2 = f"""<article class="sa__card" data-reveal style="--k:1">
+  <div class="sa__viz sa__layers"><div class="sa__glob"><span>{T("Exercise", "Ejercicio")}</span><i></i><i></i><i></i></div><ul>{layers}</ul>
+    <span class="sa__tag">20 req/s · {T("custom", "propio")}</span></div>
+  <span class="sa__n">02</span><h3>{T("Global vs. per asset", "Global vs. por activo")}</h3>
+  <p>{T("Objective, depth and schedule belong to the exercise. Credentials, limits, VPN and exclusions belong to each asset. Mixed, nobody knows what a change touches.", "Objetivo, profundidad y cronograma son del ejercicio. Credenciales, límites, VPN y exclusiones, de cada activo. Mezclados, nadie sabe qué toca un cambio.")}</p>
+</article>"""
+
+dots = "".join(f'<i style="--i:{i}"></i>' for i in range(40))
+p3 = f"""<article class="sa__card" data-reveal style="--k:2">
+  <div class="sa__viz sa__scale"><div class="sa__dots" aria-hidden="true">{dots}</div><b class="sa__big">3 <span>→</span> 40</b></div>
+  <span class="sa__n">03</span><h3>{T("Scale", "Escala")}</h3>
+  <p>{T("What works with three assets turns slow with forty. Setting each one by hand repeats work and hides what’s still incomplete.", "Lo que funciona con tres activos se vuelve lento con cuarenta. Configurar cada uno a mano repite trabajo y esconde lo incompleto.")}</p>
+</article>"""
+
+checks = [(True, T("Credentials", "Credenciales")), (True, T("Rate limit", "Límite de solicitudes")), (True, "VPN"), (False, T("Testing window", "Ventana de prueba"))]
+cl = "".join(f'<li class="{"is-ok" if ok else "is-warn"}" style="--i:{i}">{chk(ok)}<span>{lab}</span></li>' for i, (ok, lab) in enumerate(checks))
+p4 = f"""<article class="sa__card" data-reveal style="--k:3">
+  <div class="sa__viz sa__control"><ul>{cl}</ul><span class="sa__pill">{T("1 issue before creating", "1 problema antes de crear")}</span></div>
+  <span class="sa__n">04</span><h3>{T("Control", "Control")}</h3>
+  <p>{T("Missing settings and differences between assets have to show up before the exercise exists, not after a test fails.", "La configuración faltante y las diferencias entre activos tienen que aparecer antes de que exista el ejercicio, no después de que falle una prueba.")}</p>
+</article>"""
+
+flow = [("Define", "Definir"), ("Select", "Seleccionar"), ("Shared settings", "Config. general"), ("One asset", "Un activo"), ("Review", "Revisar")]
+fl = "".join(f'<li style="--i:{i}"><span class="sa__sq">{i + 1}</span><span>{T(e, s)}</span></li>' for i, (e, s) in enumerate(flow))
+p5 = f"""<article class="sa__card sa__card--wide sa__card--goal" data-reveal>
+  <div class="sa__copy"><span class="sa__n">05</span><h3>{T("The proposal: five stages, one stepper.", "La propuesta: cinco etapas, un stepper.")}</h3>
+  <p>{T("Context first, then the scope, then the exceptions only where they’re needed, and a review that counts what’s missing.", "Primero el contexto, después el alcance, las excepciones solo donde hacen falta y una revisión que cuenta lo que falta.")}</p></div>
+  <ol class="sa__flow">{fl}</ol>
+  <p class="sa__goal">{T("Clear with three assets. Efficient with forty.", "Claro con tres activos. Eficiente con cuarenta.")}</p>
+</article>"""
+
+b += (f'  <section class="sa" id="analysis">\n    <div class="wrap">'
+      f'<header class="sa__head"><div class="label" data-reveal>{T("The analysis", "El análisis")}</div>'
+      f'<h2 class="lines">{T("Before any screen, the problem.", "Antes de cualquier pantalla, el problema.")}</h2>'
+      f'<p data-reveal>{T("A five-page deck in Figma framed it, broke it down and proposed the flow. Here it is, in short.", "Un deck de cinco páginas en Figma lo planteó, lo desglosó y propuso el flujo. Acá está, resumido.")}</p></header>'
+      f'<div class="sa__grid">{p1}{p2}{p3}{p4}{p5}</div></div>\n  </section>\n')
 
 # from sketch to high fidelity, the same screen
 fid = [("Sketch", "Boceto", "Structure only: the stepper, the exercise defaults on top, the table and the actions. No copy, no colour.",
         "Solo estructura: el stepper, los valores del ejercicio arriba, la tabla y las acciones. Sin textos ni color."),
        ("Low fidelity", "Baja fidelidad", "Real copy and real data in greyscale, to check that every column and every label reads before any styling.",
         "Textos y datos reales en escala de grises, para comprobar que cada columna y cada etiqueta se lean antes de cualquier estilo."),
-       ("High fidelity", "Alta fidelidad", "Strike’s cyan marks what is selected and what is active; types get their own colour so a long list scans by kind of asset.",
-        "El cian de Strike marca lo seleccionado y lo activo; los tipos tienen su propio color, así una lista larga se recorre por tipo de activo.")]
+       ("High fidelity", "Alta fidelidad", "Strike’s cyan marks what is selected and what is active, and asset types get their own colour. In the prototype, the whole happy path runs in under 40 seconds: list, details, assets, configure, review and created.",
+        "El cian de Strike marca lo seleccionado y lo activo, y los tipos de activo tienen su propio color. En el prototipo, todo el happy path corre en menos de 40 segundos: listado, detalles, activos, configuración, revisión y creado.")]
 b += scene_head(T("Process", "Proceso"), "From a sketch to high fidelity.", "Del boceto a la alta fidelidad.",
-                "Every screen of the happy path went through three passes in Figma. Here is the same one, Configure assets, in each.",
-                "Cada pantalla del happy path pasó por tres instancias en Figma. Acá está la misma, Configure assets, en cada una.", "process")
+                "Every screen of the happy path went through three passes: Configure assets as a sketch and in low fidelity, and then the high fidelity, running in the prototype.",
+                "Cada pantalla del happy path pasó por tres instancias: Configure assets en boceto y en baja fidelidad, y después la alta fidelidad, funcionando en el prototipo.", "process")
 b += story(fid, [([0], dev_browser(p, "s-sketch", 1180, 811, STRIKE_URL, alt_en="Configure assets, sketch", alt_es="Configure assets, boceto")),
                  ([1], dev_browser(p, "s-lofi", 1180, 811, STRIKE_URL, alt_en="Configure assets, low fidelity", alt_es="Configure assets, baja fidelidad")),
-                 ([2], dev_browser(p, "s-hifi", 1180, 811, STRIKE_URL, alt_en="Configure assets, high fidelity", alt_es="Configure assets, alta fidelidad"))], "strike", "Fidelity")
+                 ([2], dev_browser(p, "", 1440, 900, STRIKE_URL, body=video(p, "st-flow", 1440, 900, "The prototype, from the list of exercises to a new one", "El prototipo, del listado de ejercicios a uno nuevo")))], "strike", "Fidelity")
 
 # the proposal: five stages, then the result
 stages = [("Define the exercise", "Definir el ejercicio",
@@ -149,6 +193,30 @@ b += chapter(T("Prototype", "Prototipo"), h2("A prototype that explains itself."
              pair(swin_s("s-assistant-answer", 2000, 1250, "<b>The answer.</b> The steps to create an exercise, with “you are here”.", "<b>La respuesta.</b> Los pasos para crear un ejercicio, con “estás acá”.", "Strike Bot answering how to create an exercise", "Strike Bot respondiendo cómo crear un ejercicio"),
                   swin_s("s-tour-2", 2000, 1250, "<b>The tour.</b> Step 2 of 15, on the field it talks about.", "<b>El tour.</b> Paso 2 de 15, sobre el campo del que habla.", "Guided tour on the exercise name", "Tour guiado sobre el nombre del ejercicio"))) +
     f'      <div class="btns" data-reveal><a class="btn" href="{PROTO}" target="_blank" rel="noopener">{T("Open the prototype", "Abrir el prototipo")} {arrow()}</a></div>\n', "prototype")
+# the motion, as written in the prototype's CSS
+motion = [("st-m-smiley", 960, 420, "The smiley", "El smiley",
+           "It spins in with an overshoot, winks, and the greeting types itself letter by letter. Then it only blinks, every few seconds.",
+           "Entra girando con un rebote, guiña y el saludo se escribe letra por letra. Después solo parpadea, cada tantos segundos.",
+           "smile-intro 1.6s cubic-bezier(.3,1.2,.5,1) · greet-in .9s steps(11) · blink 4.2s"),
+          ("st-m-drawer", 540, 900, "Asset drawer", "Panel del activo",
+           "The drawer slides in from the right, and each “Set custom value” unfolds its own control right under the field.",
+           "El panel entra desde la derecha, y cada “Set custom value” despliega su propio control justo debajo del campo.",
+           "slide-in .3s cubic-bezier(.2,.8,.2,1)"),
+          ("st-m-bot", 1440, 900, "Strike Bot", "Strike Bot",
+           "The launcher floats and pings, the chat pops in from the right, and the tour dims the page and pulses on the control it talks about.",
+           "El botón flota y emite un pulso, el chat aparece desde la derecha y el tour oscurece la página y late sobre el control del que habla.",
+           "bot-float 3.2s · chat-pop .28s cubic-bezier(.3,1.2,.5,1) · tour-pulse 1.8s"),
+          ("st-m-bulk", 1440, 900, "Bulk edit", "Edición masiva",
+           "Keep, apply new or reset, field by field; the confirmation lists what will change, and a toast closes the loop.",
+           "Mantener, aplicar nuevo o volver al valor, campo por campo; la confirmación lista lo que va a cambiar y un aviso cierra el circuito.",
+           "keep · apply new · reset → confirm → toast")]
+mo = [f'<figure class="mo__item" style="--ar:{round(w / h, 4)}" data-reveal><div class="mo__frame">{video(p, n, w, h, te, ts)}</div>'
+      f'<figcaption><h3>{T(te, ts)}</h3><p>{T(ce, cs)}</p><code>{spec}</code></figcaption></figure>'
+      for n, w, h, te, ts, ce, cs, spec in motion]
+b += scene_head(T("Motion", "Animaciones"), "How it moves, up close.", "Cómo se mueve, de cerca.",
+                "I wrote the motion in the prototype as CSS keyframes: springy curves for what appears, steps for what types, and all of it off when the system asks for reduced motion.",
+                "Escribí las animaciones del prototipo como keyframes de CSS: curvas con rebote para lo que aparece, pasos para lo que se escribe, y todo apagado cuando el sistema pide menos movimiento.", "motion")
+b += f'  <section class="wrap mo"><div class="mo__row">{mo[2]}{mo[1]}</div><div class="mo__row">{mo[0]}{mo[3]}</div></section>\n'
 b += fan(p, ["s-m-list", "s-m-bulk", "s-m-review"], "The same flow on a phone.", "El mismo flujo en el celular.",
          "Tables keep their columns and scroll sideways, dialogs and drawers fill the screen, and the stepper shrinks to numbers.",
          "Las tablas mantienen sus columnas y se desplazan de costado, los diálogos y paneles ocupan la pantalla y el stepper se reduce a números.")
@@ -160,28 +228,28 @@ def sk(n, w, h, label, hi=False, disp=None):
 
 
 b += kit_section("kit", "kd--strike", ("Every component, every state.", "Cada componente, cada estado."),
-                 ("The Figma file has its own design system page: colours, type, header, sidebar, steppers, buttons, badges, fields and tables, each with its variants. The pieces from Figma are shown as exported; the interactive ones come from the prototype at 2x.",
-                  "El Figma tiene su propia página de design system: colores, tipografía, header, sidebar, steppers, botones, badges, campos y tablas, cada uno con sus variantes. Las piezas del Figma se muestran tal como se exportaron; las interactivas salen del prototipo a 2x."),
+                 ("The Figma file has its own design system page: colours, type, header, sidebar, steppers, buttons, badges, fields and tables, each with its variants. The prototype is built on the same tokens, so every piece here is captured from it at 2x, in its real states.",
+                  "El Figma tiene su propia página de design system: colores, tipografía, header, sidebar, steppers, botones, badges, campos y tablas, cada uno con sus variantes. El prototipo usa los mismos tokens, así que cada pieza está capturada de ahí a 2x, en sus estados reales."),
                  (FIGMA_DS, "Open the design system in Figma", "Abrir el design system en Figma"), [
     kit_comp("Header", "Header", "The animated smiley greets on every screen, next to the language switch and the account.", "El smiley animado saluda en cada pantalla, junto al selector de idioma y la cuenta.",
              [sk("st-kit-p-header", 2736, 96, "Default", True)], "kd__comp--span"),
-    kit_comp("Stepper", "Stepper", "Four steps and a completed state: the current one in cyan, the done ones checked in teal.", "Cuatro pasos y un estado completo: el actual en cian, los terminados con check en verde azulado.",
-             [sk("st-kit-step-1", 862, 64, T("Step 1", "Paso 1")), sk("st-kit-step-2", 862, 64, T("Step 2", "Paso 2")), sk("st-kit-step-3", 862, 64, T("Step 3", "Paso 3")),
-              sk("st-kit-step-4", 862, 64, T("Step 4", "Paso 4")), sk("st-kit-step-done", 862, 64, T("Completed", "Completo"))], "kd__comp--span kd__comp--col"),
+    kit_comp("Stepper", "Stepper", "Four steps: the current one in cyan, the done ones checked in teal.", "Cuatro pasos: el actual en cian, los terminados con check en verde azulado.",
+             [sk(f"st-kit-p-stepper-{i}", 2576, 144, T(f"Step {i}", f"Paso {i}"), True) for i in range(1, 5)], "kd__comp--span kd__comp--col"),
     kit_comp("Rate limit", "Límite de solicitudes", "Every field of an asset inherits the exercise default, with the value in brackets, or takes its own.",
              "Cada campo de un activo hereda el valor del ejercicio, con el valor entre paréntesis, o toma uno propio.",
-             [sk("st-kit-rate", 367, 96, T("Inherited", "Heredado")), sk("st-kit-rate-custom", 367, 150, T("Custom", "Propio"))], "kd__comp--col"),
+             [sk("st-kit-p-in-rateLimit", 784, 194, T("Inherited", "Heredado"), True), sk("st-kit-p-cu-rateLimit", 784, 354, T("Custom", "Propio"), True)], "kd__comp--col"),
     kit_comp("VPN access", "Acceso por VPN", "Custom opens a two-option switch.", "El valor propio abre un selector de dos opciones.",
-             [sk("st-kit-vpn", 367, 92, T("Inherited", "Heredado")), sk("st-kit-vpn-custom", 367, 142, T("Custom", "Propio"))], "kd__comp--col"),
+             [sk("st-kit-p-in-vpnRequired", 784, 194, T("Inherited", "Heredado"), True), sk("st-kit-p-cu-vpnRequired", 784, 290, T("Custom", "Propio"), True)], "kd__comp--col"),
     kit_comp("Excluded tests", "Pruebas excluidas", "Custom opens the list of tests that can be excluded.", "El valor propio abre la lista de pruebas que se pueden excluir.",
-             [sk("st-kit-excluded", 367, 93, T("Inherited", "Heredado")), sk("st-kit-excluded-custom", 367, 237, T("Custom", "Propio"))], "kd__comp--col"),
+             [sk("st-kit-p-in-excludedTests", 784, 194, T("Inherited", "Heredado"), True), sk("st-kit-p-cu-excludedTests", 784, 500, T("Custom", "Propio"), True)], "kd__comp--col"),
     kit_comp("Testing window", "Ventana de prueba", "Custom asks for its own start and end time.", "El valor propio pide su propia hora de inicio y de fin.",
-             [sk("st-kit-window", 367, 97, T("Inherited", "Heredado")), sk("st-kit-window-custom", 367, 174, T("Custom", "Propio"))], "kd__comp--col"),
-    kit_comp("Fields", "Campos", "Selects and time pickers: empty with a hint, open with the cyan border.", "Selects y selectores de hora: vacíos con una pista, abiertos con el borde cian.",
-             [sk("st-kit-select-empty", 335, 73, T("Select · empty", "Select · vacío")), sk("st-kit-select-filled", 335, 73, T("Select · open", "Select · abierto")),
-              sk("st-kit-time-start", 335, 72, T("Start time", "Hora de inicio")), sk("st-kit-time-end", 335, 75, T("End time", "Hora de fin"))], "kd__comp--col"),
+             [sk("st-kit-p-in-window", 784, 194, T("Inherited", "Heredado"), True), sk("st-kit-p-cu-window", 784, 354, T("Custom", "Propio"), True)], "kd__comp--col"),
+    kit_comp("Fields", "Campos", "Selects, dates and times: empty with a hint, then filled.", "Selects, fechas y horas: vacíos con una pista, después completos.",
+             [sk("st-kit-p-f-select-empty", 826, 144, T("Select · empty", "Select · vacío"), True), sk("st-kit-p-f-select-filled", 826, 144, T("Select · filled", "Select · completo"), True),
+              sk("st-kit-p-f-date-empty", 826, 144, T("Date · empty", "Fecha · vacía"), True), sk("st-kit-p-f-date-filled", 826, 144, T("Date · filled", "Fecha · completa"), True),
+              sk("st-kit-p-f-time-empty", 826, 144, T("Time · empty", "Hora · vacía"), True), sk("st-kit-p-f-time-filled", 826, 144, T("Time · filled", "Hora · completa"), True)], "kd__comp--col"),
     kit_comp("Badges and buttons", "Badges y botones", "Status in cyan and green, asset types in violet, and one primary action per screen.", "Los estados en cian y verde, los tipos de activo en violeta y una sola acción principal por pantalla.",
-             [sk("st-kit-badges", 117, 143, "Badges"), sk("st-kit-p-btn-create", 354, 96, T("Primary", "Primario"), True),
+             [sk("st-kit-p-badges", 294, 392, "Badges", True), sk("st-kit-p-btn-create", 354, 96, T("Primary", "Primario"), True),
               sk("st-kit-p-toggle-off", 100, 66, T("Toggle · off", "Toggle · apagado"), True), sk("st-kit-p-toggle-on", 100, 66, T("Toggle · on", "Toggle · prendido"), True)]),
     kit_comp("Testing depth", "Profundidad", "Three options as cards, with the recommended one marked.", "Tres opciones como cards, con la recomendada marcada.",
              [sk("st-kit-p-depth", 2488, 276, T("Standard selected", "Standard elegida"), True)], "kd__comp--span"),
@@ -195,9 +263,9 @@ b += kit_section("kit", "kd--strike", ("Every component, every state.", "Cada co
              [sk("st-kit-p-confirm", 1240, 962, T("Confirm", "Confirmar"), True), sk("st-kit-p-toast", 704, 90, "Toast", True)], "kd__comp--col"),
     kit_comp("Tables", "Tablas", "Exercises that expand to show their assets and configuration, the asset inventory and the configuration table, each selected and not.",
              "Ejercicios que se despliegan con sus activos y su configuración, el inventario de activos y la tabla de configuración, cada una con y sin selección.",
-             [sk("st-kit-tbl-exercises", 1028, 717, T("Exercises", "Ejercicios"), disp=760), sk("st-kit-tbl-exercises-open", 1028, 797, T("Exercise expanded", "Ejercicio desplegado"), disp=760),
-              sk("st-kit-tbl-assets", 1028, 554, T("Assets", "Activos"), disp=760), sk("st-kit-tbl-assets-selected", 1028, 572, T("Assets · selected", "Activos · seleccionados"), disp=760),
-              sk("st-kit-tbl-config", 1028, 256, T("Configuration", "Configuración"), disp=760), sk("st-kit-tbl-config-selected", 1028, 256, T("Configuration · selected", "Configuración · seleccionada"), disp=760)], "kd__comp--wide"),
+             [sk("st-kit-p-tbl-exercises", 2576, 1374, T("Exercises", "Ejercicios"), disp=860), sk("st-kit-p-tbl-exercises-open", 2576, 2050, T("Exercise expanded", "Ejercicio desplegado"), disp=860),
+              sk("st-kit-p-tbl-assets", 2576, 1122, T("Assets", "Activos"), disp=860), sk("st-kit-p-tbl-assets-selected", 2576, 1122, T("Assets · selected", "Activos · seleccionados"), disp=860),
+              sk("st-kit-p-tbl-config", 2576, 426, T("Configuration", "Configuración"), disp=860), sk("st-kit-p-tbl-config-selected", 2576, 426, T("Configuration · selected", "Configuración · seleccionada"), disp=860)], "kd__comp--wide"),
     kit_comp("Readiness", "Preparación", "What’s left before creating, counted.", "Lo que falta antes de crear, contado.",
              [sk("st-kit-p-readiness", 560, 600, T("Ready", "Listo"), True)]),
     kit_comp("Strike Bot", "Strike Bot", "The chat and the tour card that points at each control.", "El chat y la card del tour que señala cada control.",

@@ -11,6 +11,7 @@
   var desc = document.querySelector('meta[name="description"]');
   if (desc) desc.setAttribute('data-en', desc.getAttribute('content'));
   document.querySelectorAll('img[data-alt-es]').forEach(function (img) { img.setAttribute('data-alt-en', img.getAttribute('alt') || ''); });
+  document.querySelectorAll('video[data-label-es]').forEach(function (v) { v.setAttribute('data-label-en', v.getAttribute('aria-label') || ''); });
 
   function applyLang(l, save) {
     root.setAttribute('data-lang', l);
@@ -20,6 +21,7 @@
     if (desc) desc.setAttribute('content', desc.getAttribute('data-' + l) || desc.getAttribute('data-en'));
     document.querySelectorAll('[data-ph-' + l + ']').forEach(function (el) { el.setAttribute('placeholder', el.getAttribute('data-ph-' + l)); });
     document.querySelectorAll('img[data-alt-es]').forEach(function (img) { img.setAttribute('alt', img.getAttribute('data-alt-' + l)); });
+    document.querySelectorAll('video[data-label-es]').forEach(function (v) { v.setAttribute('aria-label', v.getAttribute('data-label-' + l)); });
     document.querySelectorAll('[data-set-lang]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-set-lang') === l ? 'true' : 'false'); });
     if (save) { try { localStorage.setItem('jg-lang', l); } catch (e) {} }
     document.dispatchEvent(new CustomEvent('jg:lang', { detail: l }));
@@ -947,4 +949,35 @@
   document.querySelectorAll('[data-open-agent]').forEach(function (b) {
     b.addEventListener('click', function () { document.dispatchEvent(new CustomEvent('jg:agent-open')); });
   });
+  /* ---------- Clips: play only while on screen (inside a story, only on its active layer).
+     With reduced motion nothing plays by itself: the poster shows, with controls. ---------- */
+  (function () {
+    var vids = Array.prototype.slice.call(document.querySelectorAll('video[data-autoplay]'));
+    if (!vids.length) return;
+    if (reduced || !('IntersectionObserver' in window)) { vids.forEach(function (v) { v.controls = true; }); return; }
+    var seen = new WeakMap();
+    function sync(v) {
+      v.muted = true;
+      var layer = v.closest('.story__layer');
+      var on = seen.get(v) && !document.hidden && (!layer || layer.classList.contains('is-on'));
+      if (on && v.paused) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
+      else if (!on && !v.paused) v.pause();
+    }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { seen.set(e.target, e.isIntersecting); sync(e.target); });
+    }, { threshold: 0.3 });
+    vids.forEach(function (v) { io.observe(v); });
+    var mo = new MutationObserver(function (ms) {
+      ms.forEach(function (m) {
+        m.target.querySelectorAll('video[data-autoplay]').forEach(function (v) {
+          if (m.target.classList.contains('is-on') && v.paused) { try { v.currentTime = 0; } catch (e) {} }
+          sync(v);
+        });
+      });
+    });
+    document.querySelectorAll('.story__layer').forEach(function (l) {
+      if (l.querySelector('video[data-autoplay]')) mo.observe(l, { attributes: true, attributeFilter: ['class'] });
+    });
+    document.addEventListener('visibilitychange', function () { vids.forEach(sync); });
+  })();
 })();

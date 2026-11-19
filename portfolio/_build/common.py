@@ -473,6 +473,13 @@ def swin(p, name, w, h, url, panel, cap_en="", cap_es="", alt_en="", alt_es="", 
             f'{browser(p, name, w, h, url, dark=dark, alt_en=alt_en, alt_es=alt_es, view=view)}</div></div>{c}</figure>')
 
 
+def video(p, name, w, h, label_en, label_es, cls=""):
+    """A muted clip that plays only while it's on screen (site.js); its poster stands in until then."""
+    c = f' class="{cls}"' if cls else ""
+    return (f'<video{c} src="{p}assets/video/{name}.mp4" poster="{p}assets/img/{name}-poster.webp" width="{w}" height="{h}" '
+            f'muted loop playsinline preload="none" data-autoplay aria-label="{label_en}" data-label-es="{label_es}"></video>')
+
+
 def kit_section(sid, theme, title, text, link, comps):
     """title/text: (en, es); link: (href, en, es) or None."""
     btn = (f'<a class="btn btn--ghost kd__btn" href="{link[0]}" target="_blank" rel="noopener" data-reveal>{T(link[1], link[2])} {arrow()}</a>' if link else "")
