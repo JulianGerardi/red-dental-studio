@@ -37,14 +37,16 @@ const saldoDe = (cargos: Movimiento[]) => {
 }
 
 export function PostPaymentDialog({
-  tipoInicial, pacienteInicial, personas: personasDadas, cargosDe = cargosAbiertos, providers = PROVIDERS_BILLING, hoy = HOY,
-  onClose, onGuardar,
+  tipoInicial, pacienteInicial, personas: personasDadas, garante: garanteDado, cargosDe: cargosDados, providers = PROVIDERS_BILLING,
+  hoy = HOY, onClose, onGuardar,
 }: {
   tipoInicial: TipoAjusteBilling
   /** El paciente elegido en Billing: los botones sólo aparecen con uno. */
   pacienteInicial?: string
   /** Apply to. Sin dato, el paciente y los demás de su garante en Billing. */
   personas?: string[]
+  /** El garante del grupo: en un pago o un crédito se lee "(Guarantor)" y aplica a los cargos de todo el hogar (CON-4071). */
+  garante?: string
   /** Los cargos abiertos de quien se elige en Apply to, con lo que falta de cada uno como monto. */
   cargosDe?: (persona: string) => Movimiento[]
   providers?: readonly string[]
@@ -55,14 +57,22 @@ export function PostPaymentDialog({
 }) {
   const tipo = tipoInicial
   /* Apply to: el paciente y los demás de su garante, como red.dev. */
-  const personas = personasDadas ?? (pacienteInicial ? grupoDeGarante(pacienteInicial).map((p) => p.nombre) : [])
+  const grupo = pacienteInicial ? grupoDeGarante(pacienteInicial) : []
+  const personas = personasDadas ?? grupo.map((p) => p.nombre)
+  const garante = garanteDado ?? grupo[0]?.garante
+  /* Sin cargos de afuera (Billing), el garante ve los del grupo entero y cada paciente los suyos. */
+  const cargosDe = cargosDados ?? ((p: string) => (p === garante ? personas.flatMap(cargosAbiertos) : cargosAbiertos(p)))
   const inicial = pacienteInicial ?? personas[0] ?? ''
+  /* El alcance (scope) sólo existe en un pago o un crédito; un Charge Adjustment es siempre de un paciente. */
+  const conAlcance = tipo !== 'Charge Adjustment'
+  const etiqueta = (p: string) => (conAlcance && p === garante ? `${p} (Guarantor)` : p)
   const [fecha, setFecha] = useState<Date | null>(hoy)
   const [aplicaA, setAplicaA] = useState(inicial)
   /* El pago arranca con el saldo abierto de quien se le aplica y Cash Payment, como red.dev; se reparte solo en Applied. */
   const [metodos, setMetodos] = useState<Metodo[]>(() => [filaVacia(0, tipo === 'Patient Payment' ? saldoDe(cargosDe(inicial)) : '')])
   const [monto, setMonto] = useState('')
-  const [ajuste, setAjuste] = useState<string>(tipo === 'Charge Adjustment' ? TIPOS_AJUSTE_CARGO[0] : TIPOS_AJUSTE_CREDITO[0])
+  /* Credit Adjustment arranca sin tipo, para elegirlo (red.dev); Charge Adjustment, con el primero. */
+  const [ajuste, setAjuste] = useState<string>(tipo === 'Charge Adjustment' ? TIPOS_AJUSTE_CARGO[0] : '')
   const [provider, setProvider] = useState('')
   const [visita, setVisita] = useState('')
   const [notas, setNotas] = useState('')
@@ -82,7 +92,7 @@ export function PostPaymentDialog({
 
   const faltaAlgo = !fecha || !aplicaA || (tipo === 'Patient Payment'
     ? metodos.some((f) => !f.monto.trim() || (f.metodo === CHEQUE && (!f.cheque.trim() || !f.banco.trim())))
-    : !monto.trim())
+    : !monto.trim() || !ajuste)
   const siguiente = () => {
     setIntentado(true)
     if (faltaAlgo) return
@@ -93,7 +103,10 @@ export function PostPaymentDialog({
   const guardar = () => {
     setIntentado(true)
     if (faltaAlgo || !fecha) { setPaso(0); return }
-    const base = { fecha: formatMDY(fecha), paciente: aplicaA, codigo: '—', estado: 'Posted' as const }
+    const base = {
+      fecha: formatMDY(fecha), paciente: aplicaA, codigo: '—', estado: 'Posted' as const,
+      ...(conAlcance && aplicaA === garante ? { alcance: 'guarantor' as const } : {}),
+    }
     if (tipo === 'Patient Payment') {
       metodos.forEach((f) => {
         const valor = Number(f.monto) || 0
@@ -120,7 +133,10 @@ export function PostPaymentDialog({
     </div>
   )
   const campoAplica = (
-    <SelectField label="Apply to" required options={personas} value={aplicaA} onChange={cambiarAplicaA} error={intentado && !aplicaA ? REQUERIDO : undefined} />
+    <SelectField
+      label="Apply to" required options={personas.map(etiqueta)} value={aplicaA ? etiqueta(aplicaA) : ''}
+      onChange={(v) => cambiarAplicaA(personas.find((p) => etiqueta(p) === v) ?? v)} error={intentado && !aplicaA ? REQUERIDO : undefined}
+    />
   )
   const campoMonto = (
     <TextField label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto} error={intentado && !monto.trim() ? REQUERIDO : undefined} />
@@ -162,16 +178,16 @@ export function PostPaymentDialog({
             {campoAplica}
             {tipo === 'Credit Adjustment' && (
               <>
-                <SelectField label="Adjustment type" required options={[...TIPOS_AJUSTE_CREDITO]} value={ajuste} onChange={setAjuste} />
+                <SelectField label="Adjustment type" required placeholder="Select credit type" options={[...TIPOS_AJUSTE_CREDITO]} value={ajuste} onChange={setAjuste} error={intentado && !ajuste ? REQUERIDO : undefined} />
                 {campoMonto}
               </>
             )}
           </div>
-          {tipo === 'Patient Payment' && <span aria-hidden className="w-9 shrink-0" />}
         </div>
         {/* Un pago puede venir en varios métodos: + suma otro, − lo saca (red.dev). Cheque pide número y banco. */}
         {tipo === 'Patient Payment' && metodos.map((f, i) => (
-          <div key={f.id} className="flex items-start gap-2">
+          /* Cada método en su caja gris, como red.dev. */
+          <div key={f.id} className="flex items-start gap-2 rounded-lg border border-line-row bg-surface-subtle p-3">
             <div className="grid flex-1 gap-4 sm:grid-cols-2">
               <TextField
                 label="Amount" required placeholder="$ 0.00" value={f.monto} onChange={(v) => setFila(f.id, { monto: v })}

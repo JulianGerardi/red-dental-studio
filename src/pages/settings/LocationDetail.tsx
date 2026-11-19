@@ -653,9 +653,6 @@ export function SettingsLocationDetail() {
   return (
     <div className="px-4 py-6 sm:px-8">
       <PageTitle>{tab === 'Information' ? loc.nombre : tab}</PageTitle>
-      <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">
-        {tab === 'Insurance Defaults' ? 'Manage the insurance preferences this location uses on claims.' : 'Set your location name. Add the location you need.'}
-      </p>
 
       <Tabs className="mt-4" aria-label="Location sections" tabs={TABS} value={tab} onChange={cambiarTab} />
 

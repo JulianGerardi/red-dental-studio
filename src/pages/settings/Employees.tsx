@@ -83,7 +83,6 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
     <div className="px-4 py-6 sm:px-8">
       <SettingsPageHeader
         titulo="Employees"
-        bajada="Everyone with access to the practice, across every location."
         accion={(
           <Button data-tour="set-team" onClick={() => setCreando(true)}>
             <CirclePlus /> New Employee
@@ -257,7 +256,6 @@ export function SettingsEmployeeDetail() {
   return (
     <div className="px-4 py-6 sm:px-8">
       <PageTitle>{tab === 'Employee' ? 'Employee Information' : tab}</PageTitle>
-      <p className="mt-1 text-sm text-ink-muted">Set your employee information. Update roles and hours.</p>
 
       <Tabs
         className="mt-4"

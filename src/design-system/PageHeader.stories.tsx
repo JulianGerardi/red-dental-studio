@@ -98,7 +98,7 @@ const Filtro = () => (
 
 /* Mismo margen que las pantallas: el rastro lo pone el layout de Settings
    arriba y el encabezado va debajo. */
-function Encabezado({ breadcrumb, title, tags, description, action, actionLabel, search, searchButton, filter }: Args) {
+function Encabezado({ breadcrumb, title, tags, action, actionLabel, search, searchButton, filter }: Args) {
   const barra = search || searchButton || filter
   return (
     <div>
@@ -107,7 +107,6 @@ function Encabezado({ breadcrumb, title, tags, description, action, actionLabel,
         <SettingsPageHeader
           titulo={title}
           etiquetas={tags ? <><Pill tone="info">Default</Pill><Pill tone="success">Active</Pill></> : undefined}
-          bajada={description}
           accion={action ? <Button><Plus /> {actionLabel}</Button> : undefined}
         >
           {barra ? (
@@ -184,7 +183,6 @@ export const DetailHeader: Story = {
         <SettingsPageHeader
           titulo="PPO Premium Plan"
           etiquetas={<Pill tone="success">Active</Pill>}
-          bajada="PPO · Effective Mar 1, 2026 · Contracted fees for premium PPO plans."
           accion={(
             <div className="flex items-center gap-2">
               <Button variant="secondary"><Pencil /> Edit details</Button>
@@ -196,7 +194,7 @@ export const DetailHeader: Story = {
       </div>
       <div className="px-4 pb-6 sm:px-8">
         <p className="mb-3 text-[12.5px] text-ink-muted">List of Billing: SettingsSearch in the toolbar.</p>
-        <SettingsPageHeader titulo="Carriers" bajada="The insurance companies you bill." accion={<Button><Plus /> New carrier</Button>}>
+        <SettingsPageHeader titulo="Carriers" accion={<Button><Plus /> New carrier</Button>}>
           <SettingsSearch value="" onChange={() => {}} placeholder="Search carriers or payer ID" />
         </SettingsPageHeader>
       </div>
@@ -294,8 +292,8 @@ export const Specs: Story = {
         <Bloque titulo="Type" nota="Medido sobre el encabezado dibujado.">
           <Tabla encabezado={['Part', 'Sample', 'Text', 'Height']} minimo={640}>
             <Medida nombre="Breadcrumb" selector="nav"><Breadcrumb items={migas('Settings > Accounts')} /></Medida>
-            <Medida nombre="Title" selector="h1"><SettingsPageHeader titulo="Accounts" bajada="View and manage all accounts." /></Medida>
-            <Medida nombre="Description" selector="p"><SettingsPageHeader titulo="Accounts" bajada="View and manage all accounts." /></Medida>
+            <Medida nombre="Title" selector="h1"><SettingsPageHeader titulo="Accounts" /></Medida>
+            <Medida nombre="Description" selector="p"><SettingsPageHeader titulo="Accounts" /></Medida>
           </Tabla>
         </Bloque>
         <Bloque titulo="Spacing">

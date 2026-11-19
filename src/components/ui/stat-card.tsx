@@ -3,7 +3,7 @@ import { InfoTip } from '@/components/ui/info-tip'
 import { TARJETA_INTERNA, TARJETA_PANEL } from '@/lib/estilos'
 
 /* La métrica de la app: una card por número, con el rótulo, el ⓘ arriba a la derecha, el monto y una bajada opcional,
-   como las cards de red.dev. La usan Billing, el Ledger y Edit Account → Subscription (ledger.md, 2026-11-19). */
+   como las cards de red.dev: rótulo en mayúsculas y el monto en negro. La usan Billing, el Ledger y Edit Account → Subscription (ledger.md, 2026-11-19). */
 export function StatCard({ label, value, caption, info, interna, enFila, compacta, className }: {
   label: string
   value: string
@@ -29,7 +29,7 @@ export function StatCard({ label, value, caption, info, interna, enFila, compact
           </p>
           {caption && <p className="line-clamp-2 text-[11px] leading-snug text-ink-muted" title={caption}>{caption}</p>}
         </div>
-        <p className="text-dash-blue shrink-0 text-base font-bold tabular-nums">{value}</p>
+        <p className="shrink-0 text-base font-bold text-ink tabular-nums">{value}</p>
       </div>
     )
   }
@@ -37,10 +37,10 @@ export function StatCard({ label, value, caption, info, interna, enFila, compact
     <div className={cn('min-w-0', enFila ? 'p-3' : 'p-4', interna ? TARJETA_INTERNA : TARJETA_PANEL, enFila && 'row-span-3 grid grid-rows-subgrid gap-y-0', className)}>
       {/* En una card angosta el rótulo y la bajada pasan a dos líneas en vez de cortarse (billing.md, 2026-10-13). */}
       <div className="flex items-start justify-between gap-2">
-        <p className="text-xs leading-snug text-ink-muted">{label}</p>
+        <p className="text-[11px] leading-snug font-medium tracking-wide text-ink-muted uppercase">{label}</p>
         {info && <InfoTip title={label}>{info}</InfoTip>}
       </div>
-      <p className="text-dash-blue mt-1 truncate text-xl font-bold tabular-nums" title={value}>{value}</p>
+      <p className="mt-1 truncate text-xl font-bold text-ink tabular-nums" title={value}>{value}</p>
       {caption
         ? <p className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-ink-faint" title={caption}>{caption}</p>
         : enFila && <span aria-hidden />}

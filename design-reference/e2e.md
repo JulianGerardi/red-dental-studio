@@ -95,6 +95,9 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   Desde el 2026-11-19 (CON-4142): ya no hay pestañas; Patient Payment (-) abre el drawer de Billing con 11868.00 (el
   saldo abierto) en Amount, Applied reparte el monto del cargo más viejo, y lo guardado avisa y entra a la tabla.
   Charge Adjustment (+) abre *Enter Charge (+) Adjustment* y pide el monto.
+  Segunda vuelta del mismo día: sin buscador, las filas se abren por nombre (la de Check payment, en la página 2) y el
+  link del pago lleva a su fila; el pago arranca con "John Smith (Guarantor)" y 13713.00. `scheduling-edit.e2e.ts`
+  suma: el nombre del paciente en el detalle del turno abre su ficha.
 - `tests/treatment-plan.e2e.ts` (2026-10-13): una fila de Unassigned se despliega (No treatment linked, Collapse all), y
   la fila D2391 de Restorative Plan muestra Procedure consent; su hallazgo se abre en el drawer sin salir de Treatment
   Plan.

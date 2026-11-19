@@ -87,7 +87,6 @@ export function SettingsAccount() {
   return (
     <div className="px-4 py-6 sm:px-8">
       <PageTitle>Edit Account</PageTitle>
-      <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">Manage your dental clinic general settings, upload custom graphics, and specify billing parameters.</p>
 
       <Tabs className="mt-4" aria-label="Account sections" tabs={TABS} value={tab} onChange={setTab} />
 

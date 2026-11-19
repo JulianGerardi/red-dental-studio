@@ -1,6 +1,6 @@
 import { Tabs } from '@/components/ui/tabs'
 import { useState } from 'react'
-import { ChevronDown, ChevronLeft, ChevronRight, Plus, CalendarCheck, Inbox } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, CalendarCheck, CalendarClock, Inbox } from 'lucide-react'
 import { AppointmentDetailsDrawer } from '@/components/scheduling/AppointmentDetailsDrawer'
 import { ViewMenu, VISTA_INICIAL, type VistaCalendario } from '@/components/scheduling/ViewFiltersPanel'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
@@ -12,9 +12,10 @@ import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { PageTitle } from '@/components/ui/page-title'
 import { Breadcrumb } from '@/components/ui/breadcrumb'
+import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import {
-  EVENTOS_INICIALES, FECHA_ANCLA, MESES, BLOCK_STYLE,
-  inicioDeSemana, sumarDias, type EventoConFecha, type ApptState,
+  EVENTOS_INICIALES, FECHA_ANCLA, BLOCK_STYLE,
+  sumarDias, type EventoConFecha, type ApptState,
   fmtExacta,
 } from '@/components/scheduling/calendar-data'
 import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
@@ -173,19 +174,6 @@ export default function Scheduling() {
     })
   }
 
-  const rotulo = (() => {
-    if (view === 'Day') {
-      return fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-    }
-    if (view === 'Week') {
-      const a = inicioDeSemana(fecha)
-      const b = sumarDias(a, 6)
-      const mismoMes = a.getMonth() === b.getMonth()
-      return `${MESES[a.getMonth()].slice(0, 3)} ${a.getDate()} – ${mismoMes ? '' : MESES[b.getMonth()].slice(0, 3) + ' '}${b.getDate()}, ${b.getFullYear()}`
-    }
-    return `${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`
-  })()
-
   return (
     <div className={CONTENEDOR_PAGINA}>
       <Breadcrumb items={[{ label: 'Scheduling' }]} />
@@ -236,24 +224,22 @@ export default function Scheduling() {
         </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2">
-          <button onClick={() => paso(-1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Previous">
-            <ChevronLeft className="size-4" />
-          </button>
-          <span className="text-[13px] font-semibold whitespace-nowrap text-ink">{rotulo}</span>
-          <button onClick={() => setFecha(FECHA_ANCLA)} className="flex items-center gap-1 text-[13px] text-ink-muted">
-            Today <ChevronDown className="size-3.5" />
-          </button>
-          <button onClick={() => paso(1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Next">
-            <ChevronRight className="size-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Leyenda: botón desplegable en vez de la franja a lo ancho. */}
-      <div className="mt-4">
+      {/* La fecha con el selector de la app (el del Dashboard) y las flechas de la vista; al lado, Status legend
+          (scheduling.md, 2026-11-19). */}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <Button variant="secondary" size="md" iconOnly aria-label={`Previous ${view.toLowerCase()}`} onClick={() => paso(-1)}>
+          <ChevronLeft />
+        </Button>
+        <DatePicker variant="toolbar" value={fecha} onChange={setFecha} />
+        <Button variant="secondary" size="md" iconOnly aria-label={`Next ${view.toLowerCase()}`} onClick={() => paso(1)}>
+          <ChevronRight />
+        </Button>
+        {/* Volver a hoy; desaparece cuando ya estás en hoy, como en el Dashboard. */}
+        {!sameDay(fecha, FECHA_ANCLA) && (
+          <Button variant="secondary" size="md" onClick={() => setFecha(FECHA_ANCLA)} title="Go to today">
+            <CalendarClock /> Today
+          </Button>
+        )}
         <StatusLegend />
       </div>
 

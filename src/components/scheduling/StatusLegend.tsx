@@ -34,11 +34,11 @@ export function StatusLegend() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         className={cn(
-          'flex h-8 items-center gap-1.5 rounded-md border border-line bg-white px-3 text-xs font-medium text-ink-soft transition-colors',
+          'flex h-8 items-center gap-1.5 rounded-md border border-line bg-white px-3 text-[13px] font-medium text-ink-soft shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors [&_svg]:size-4',
           open ? 'border-dash-blue' : 'hover:bg-surface-subtle',
         )}
       >
-        <Palette className="size-3.5" /> Status legend
+        <Palette /> Status legend
         <ChevronDown className={cn('size-3.5 transition-transform', open && 'rotate-180')} />
       </button>
 

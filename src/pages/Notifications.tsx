@@ -126,11 +126,8 @@ export default function Notifications() {
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <PageTitle>Notifications</PageTitle>
-          <p className="text-[13px] text-ink-muted">Open one to go where it happened, or mark it as read or unread.</p>
-        </div>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <PageTitle>Notifications</PageTitle>
         {/* Sin menú ⋮: sólo tenía acciones de archivar (notifications.md, 2026-10-13). */}
         <Button variant="secondary" size="md" disabled={!sinLeer.length} onClick={marcarTodas}>
           <CheckCheck /> Mark all as read

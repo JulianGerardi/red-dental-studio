@@ -798,3 +798,12 @@ Sin historia de Jira (pedido de Julián).
 2. El rastro de arriba era un link "Scheduling" con una flecha hacia abajo y un azul en hex. Pasa a `ui/breadcrumb`, el
    de "/" de toda la app. Como Scheduling es de primer nivel, tiene un solo tramo (la pantalla actual, sin link ni "/").
    La regla del design system dice que las pantallas de primer nivel no llevan rastro: si se confirma, se saca.
+
+### Fecha, Status legend y link al paciente (2026-11-19)
+
+Pedido de Julián, con una grabación de red.dev.
+
+1. La fecha usa el selector de la app (`DatePicker` toolbar, el del Dashboard) entre las flechas de la vista, y *Today*
+   aparece sólo fuera de hoy, como en el Dashboard. Antes era un rótulo con un "Today ⌄" que no abría nada.
+2. *Status legend* sube a la misma fila, al lado de la fecha, con la letra y la sombra de los demás controles.
+3. En el detalle del turno el nombre del paciente es un link a su ficha, como red.dev y las cards de turnos.

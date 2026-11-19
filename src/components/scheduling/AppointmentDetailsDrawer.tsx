@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Link } from 'react-router-dom'
+import { slug } from '@/data/patientsStore'
 import {
   X, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity, Trash2, Pencil,
 } from 'lucide-react'
@@ -157,9 +159,13 @@ export function AppointmentDetailsDrawer({
       <div className="flex items-start gap-2.5 px-4 pt-3.5 pb-3">
         <Avatar initials={initials} size={36} />
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[15px] leading-tight font-bold text-ink">
+          {/* El nombre lleva a la ficha del paciente, como red.dev y las cards de turnos (scheduling.md, 2026-11-19). */}
+          <Link
+            to={`/patients/${slug(patient)}`}
+            className="text-dash-blue block truncate rounded-sm text-[15px] leading-tight font-bold underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
+          >
             {patient}
-          </span>
+          </Link>
           <span className="block text-[11px] text-ink-medium">33 yrs · ID 4471</span>
         </span>
         {/* Pill igual a las del resto del sistema —Insurance, Treatment

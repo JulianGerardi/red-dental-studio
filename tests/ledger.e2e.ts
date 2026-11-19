@@ -5,23 +5,22 @@ import { expect } from 'e2e'
 
 test('el detalle de un procedimiento muestra su caso, la plata y lo que recibió', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
-  await screen.getByPlaceholder(/Search by code/).fill('D4341')
-  await screen.getByRole('button', /Toggle details/).first().tap()
+  await screen.getByRole('button', /Toggle details for Periodontal scaling/).tap()
 
   await expect(screen.getByRole('button', /^Periodontists Recommended/)).toBeVisible()
   await expect(screen.getByText('Northgate Clinic')).toBeVisible()
   await expect(screen.getByText('Outstanding transaction balance')).toBeVisible()
   // El saldo del cargo: en la columna Trans. Bal. y en el detalle, el mismo número.
   await expect(screen.getByText('$170.00')).toHaveCount(2)
-  // Con la búsqueda, el pago no está en la tabla: el link abre su registro, sin tocar los filtros.
+  // El pago está en otra página de la tabla: el link va a su fila y la despliega.
   await screen.getByRole('button', /^Patient Payment · TX-1027/).tap()
-  await expect(screen.getByRole('dialog', /Check payment/)).toBeVisible()
+  await expect(screen.getByText('Charges paid or credited by this transaction')).toBeVisible()
 })
 
 test('el detalle de un pago dice a qué cargos fue y ofrece Apply credit', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
-  await screen.getByPlaceholder(/Search by code/).fill('Check payment')
-  await screen.getByRole('button', /Toggle details/).first().tap()
+  await screen.getByRole('button', 'Next page').tap()
+  await screen.getByRole('button', /Toggle details for Check payment/).tap()
 
   await expect(screen.getByText('patient · John Smith')).toBeVisible()
   await expect(screen.getByText('Charges paid or credited by this transaction')).toBeVisible()
@@ -31,8 +30,7 @@ test('el detalle de un pago dice a qué cargos fue y ofrece Apply credit', async
 /* El detalle de la fila ya tiene todo: sin View full record (ledger.md, 2026-10-25). */
 test('el detalle de una fila del Ledger no tiene View full record', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
-  await screen.getByPlaceholder(/Search by code/).fill('D4341')
-  await screen.getByRole('button', /Toggle details/).first().tap()
+  await screen.getByRole('button', /Toggle details for Periodontal scaling/).tap()
   await expect(screen.getByText('Financial details')).toBeVisible()
   await expect(screen.getByRole('button', /View full record/)).toHaveCount(0)
 })
@@ -50,7 +48,6 @@ test('las métricas cambian con la vista y Guarantor View muestra el Household',
 
 test('el ⋮ de un procedimiento lleva a su estimación en Clinical Mode', async ({ app, screen }) => {
   await app.open('/patients/john-smith/ledger')
-  await screen.getByPlaceholder(/Search by code/).fill('D4341')
   await screen.getByRole('button', /^Actions for Periodontal scaling/).tap()
   await screen.getByRole('menuitem', /Periodontists Recommended/).tap()
   await expect(screen.getByText(/Treatment Plan/).first()).toBeVisible()
@@ -63,7 +60,9 @@ test('Patient Payment (-) abre su drawer con el saldo abierto y lo guardado entr
   await screen.getByRole('button', /^Patient Payment \(-\)/).tap()
   const drawer = screen.getByRole('dialog')
   await expect(drawer.getByRole('heading', 'New Patient Payment (-)')).toBeVisible()
-  await expect(drawer.getByRole('textbox', /Amount/)).toHaveValue('11868.00')
+  // "John Smith (Guarantor)": los cargos abiertos de todo el hogar (CON-4071).
+  await expect(drawer.getByRole('button', /John Smith \(Guarantor\)/)).toBeVisible()
+  await expect(drawer.getByRole('textbox', /Amount/)).toHaveValue('13713.00')
   await drawer.getByRole('textbox', /Amount/).fill('50')
   await drawer.getByRole('button', /Next Step/).tap()
   await expect(drawer.getByRole('textbox', /Applied to Bitewings/)).toHaveValue('35.00')

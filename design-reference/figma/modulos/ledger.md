@@ -967,3 +967,25 @@ CON-4142 (Ledger) y CON-4147 (Billing), revisadas en red.dev el mismo día.
 **A validar con usuarios:** si recepción prefiere el monto precargado con todo el saldo o vacío (con el saldo a la
 vista se cobra más rápido, pero un pago parcial obliga a borrar); si se entienden las tres acciones como botones al lado
 del título en tablet, donde bajan a una segunda línea.
+
+### Segunda vuelta, con el video de red.dev de Julián (2026-11-19)
+
+Julián: "no está del todo alineado", con una grabación del Ledger de red.dev (Guarantor View, los tres drawers y el detalle
+de una fila).
+
+1. **Patient View / Guarantor View sube a la fila del título**, a la derecha de los tres botones (Tabs sm).
+2. **Sin buscador, Search ni Filter** (tampoco están en CON-3753). La tabla va en su card y arriba a la derecha lleva
+   *Columns* y Export statement en ícono (CON-3755 lo pide; red.dev todavía no). Expand / Collapse all sigue ahí cuando
+   hay una fila abierta. El vacío pasa al texto de CON-3753: *No ledger available for this patient because no financial
+   transaction has been posted yet.*
+3. **Type con los rótulos cortos y los colores de red.dev** (`PillTipo`, también en Billing): Procedure naranja, Charge
+   Adj rojo, Credit Adj verde, Pt Payment azul, Ins Payment violeta. Revierte el punto 7 de CON-4142 (Procedure gris).
+4. **Métricas**: rótulo en mayúsculas y el monto en negro, como red.dev (`StatCard`, en las tres pantallas que la usan).
+5. **Drawers:**
+   - *Apply to* lista al garante como **"John Smith (Guarantor)"** en el pago y el crédito: elegirlo trae los cargos
+     abiertos de todo el hogar y lo guardado queda con scope guarantor (*Guarantor / Account* en la tabla). Cierra el
+     pendiente de CON-4071. En Billing, igual con el garante del paciente elegido.
+   - Cada método de pago va en su caja gris, como red.dev.
+   - *Adjustment type* del crédito arranca vacío ("Select credit type") y es obligatorio.
+   - **Sin cambiar:** red.dev muestra datos y Ledger Transactions en una sola página; acá siguen los dos pasos (Payment →
+     Allocation), por la regla de drawers con más de una sección. **A decidir con Julián.**

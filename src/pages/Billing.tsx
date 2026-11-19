@@ -11,7 +11,7 @@ import {
   VISTAS_PACIENTE, type FiltroActividad, type PacienteBilling, type TipoAjusteBilling, type VistaPaciente,
 } from '@/data/billing'
 import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
-import { DetalleMovimiento, LedgerRowModal, TONO_TIPO, nombreTipo } from '@/components/patients/ledger/LedgerRowDetail'
+import { DetalleMovimiento, LedgerRowModal, PillTipo } from '@/components/patients/ledger/LedgerRowDetail'
 import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { Pill, type PillTone } from '@/components/ui/pill'
 import { AmountCell, DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
@@ -94,7 +94,7 @@ const TODAS: Record<ColBilling, DataTableColumn<FilaBilling>> = {
 const COLS_ACTIVIDAD: ColBilling[] = ['fecha', 'paciente', 'tipo', 'desc', 'provider', 'monto', 'pendiente', 'estado']
 const COLS_PACIENTE: ColBilling[] = ['fecha', 'codigo', 'paciente', 'tipo', 'desc', 'provider', 'monto', 'pendiente']
 const TIPO_LEDGER: DataTableColumn<FilaBilling> = {
-  key: 'tipo', header: 'Type', width: 128, cell: (m) => <Pill tone={TONO_TIPO[nombreTipo(m)]} className="whitespace-nowrap">{nombreTipo(m)}</Pill>,
+  key: 'tipo', header: 'Type', width: 96, cell: (m) => <PillTipo m={m} />,
 }
 const columnasDe = (vistaPaciente: boolean) =>
   (vistaPaciente ? COLS_PACIENTE : COLS_ACTIVIDAD).map((k) => (vistaPaciente && k === 'tipo' ? TIPO_LEDGER : TODAS[k]))

@@ -96,7 +96,6 @@ export function SettingsAccounts() {
     <div className="px-4 py-6 sm:px-8">
       <SettingsPageHeader
         titulo="Accounts overview"
-        bajada="View and manage all accounts across the platform."
         accion={<Button onClick={() => setNueva(true)}><Plus /> New Account</Button>}
       >
         <div className="relative min-w-0 flex-1 sm:max-w-[300px]">

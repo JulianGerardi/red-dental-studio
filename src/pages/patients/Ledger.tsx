@@ -1,15 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-  Search, Receipt, Wallet, HandCoins, Download, MoveHorizontal, FileText, MinusCircle, PlusCircle,
+  Receipt, Wallet, HandCoins, Download, MoveHorizontal, FileText, MinusCircle, PlusCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { RowChevron } from '@/components/ui/data-table'
-import { SearchButton } from '@/components/ui/search-button'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
-import { FilterMenu } from '@/components/ui/filter-menu'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { StatCard } from '@/components/ui/stat-card'
 import { PageTitle } from '@/components/ui/page-title'
@@ -17,7 +15,7 @@ import { Button } from '@/components/ui/button'
 import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
 import type { TipoAjusteBilling } from '@/data/billing'
 import {
-  APLICACIONES, MOVIMIENTOS, TIPOS, GUARANTOR, DEPENDIENTES, alcanceDe, coberturaSeguro, conSaldo, fechaCorta, moneda,
+  APLICACIONES, MOVIMIENTOS, GUARANTOR, DEPENDIENTES, alcanceDe, coberturaSeguro, conSaldo, fechaCorta, moneda,
   pendienteDe, tieneCredito, type Aplicacion, type Movimiento,
 } from '@/data/ledger'
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
@@ -31,7 +29,7 @@ import { Pill } from '@/components/ui/pill'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
-import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip, TONO_TIPO, nombreTipo } from '@/components/patients/ledger/LedgerRowDetail'
+import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip, PillTipo } from '@/components/patients/ledger/LedgerRowDetail'
 import { AplicarCreditoModal } from '@/components/patients/ledger/AplicarCreditoModal'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
@@ -44,11 +42,6 @@ import { formatMDY } from '@/lib/fecha'
 /** Un cargo (procedimiento o Charge Adjustment): lo que tiene saldo propio. */
 const esCargo = (m: Movimiento) => m.tipo !== 'Insurance' && m.monto > 0
 
-/* No es un `tipo` real -es una condición sobre `creditoDisponible`-, así que
-   se agrega como una opción más al lado de Charge/Payment/Adjustment/
-   Insurance en el mismo filtro, no como un filtro aparte. */
-const FILTRO_CREDITO = 'Unapplied Credits'
-const OPCIONES_FILTRO = [...TIPOS, FILTRO_CREDITO]
 
 /* Columnas de CON-3753 / CON-3755 (ledger.md, 2026-11-12). Unapplied Credit es opcional: arranca oculta. */
 type ColLedger = 'fecha' | 'codigo' | 'paciente' | 'tipo' | 'desc' | 'provider' | 'monto' | 'pendiente' | 'saldo' | 'credito'
@@ -89,7 +82,7 @@ const COLUMNAS: ColumnaLedger[] = [
     id: 'paciente', label: 'Patient / Account', claseCelda: 'truncate text-ink',
     titulo: (m) => cuentaDe(m), celda: (m) => cuentaDe(m),
   },
-  { id: 'tipo', label: 'Type', celda: (m) => <Pill tone={TONO_TIPO[nombreTipo(m)]} className="whitespace-nowrap">{nombreTipo(m)}</Pill> },
+  { id: 'tipo', label: 'Type', celda: (m) => <PillTipo m={m} /> },
   { id: 'desc', label: 'Description', elastica: true, claseCelda: 'truncate text-ink', titulo: (m) => m.descripcion, celda: (m) => m.descripcion },
   { id: 'provider', label: 'Provider', claseCelda: 'truncate', titulo: (m) => m.provider, celda: (m) => m.provider },
   /* Los negativos bajan la cuenta: van en verde. */
@@ -208,8 +201,6 @@ export default function Ledger() {
      Apply credit. Ver ledger.md (2026-10-14). */
   const [aplicaciones, setAplicaciones] = useState(APLICACIONES)
   const [vista, setVista] = useState<Vista>('Patient View')
-  const [q, setQ] = useState('')
-  const [tipos, setTipos] = useState<string[]>([])
   const [accion, setAccion] = useState<TipoAjusteBilling | null>(null)
   const [pagina, setPagina] = useState(1)
   const [expandidas, setExpandidas] = useState<string[]>([])
@@ -277,14 +268,7 @@ export default function Ledger() {
     [conSaldoTotal, enOrden, vista, aplicaciones],
   )
 
-  const filas = useMemo(
-    () => delaVista.filter(
-      (m) =>
-        (tipos.length === 0 || tipos.includes(m.tipo) || (tipos.includes(FILTRO_CREDITO) && tieneCredito(m))) &&
-        `${m.codigo} ${m.descripcion} ${m.provider} ${m.paciente}`.toLowerCase().includes(q.trim().toLowerCase()),
-    ),
-    [delaVista, q, tipos],
-  )
+  const filas = delaVista
   const TAM_PAGINA = 8
   const paginas = Math.max(1, Math.ceil(filas.length / TAM_PAGINA))
   const paginaActual = Math.min(pagina, paginas)
@@ -327,9 +311,10 @@ export default function Ledger() {
   }
 
   const cargosDeLaCuenta = movs.filter((m) => m.tipo === 'Charge')
-  /* Los cargos abiertos de quien se elige en Apply to, con lo que falta como monto (como Billing). */
+  /* Los cargos abiertos de quien se elige en Apply to, con lo que falta como monto. El garante ("John Smith (Guarantor)")
+     ve los de todo el hogar, como red.dev (CON-4071). */
   const cargosAbiertosDe = (persona: string) => movs
-    .filter((m) => esCargo(m) && m.paciente === persona)
+    .filter((m) => esCargo(m) && (persona === GUARANTOR || m.paciente === persona))
     .map((m) => ({ ...m, monto: pendienteDe(m, aplicaciones) }))
     .filter((m) => m.monto > 0)
   /* El link a otra transacción (ledger.md, 2026-10-14): si está en la tabla con la búsqueda y el filtro de ahora, va a
@@ -361,10 +346,13 @@ export default function Ledger() {
         />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          {/* Los botones van a la altura del título, como en el resto de la app. */}
+          {/* Como red.dev: título, los tres botones y Patient View / Guarantor View en la misma fila (ledger.md, 2026-11-19). */}
           <div className="flex flex-wrap items-start justify-between gap-3">
             <PageTitle>Ledger</PageTitle>
-            <AccionesLedger onAccion={setAccion} />
+            <div className="flex flex-wrap items-center gap-2">
+              <AccionesLedger onAccion={setAccion} />
+              <Tabs size="sm" className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
+            </div>
           </div>
 
           {/* Una card por métrica, como red.dev, Billing y Edit Account (`ui/stat-card`). */}
@@ -374,48 +362,32 @@ export default function Ledger() {
             </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-              <input
-                value={q}
-                onChange={(e) => { setQ(e.target.value); setPagina(1) }}
-                placeholder="Search by code, description or provider"
-                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-              />
-            </div>
-            <SearchButton onClick={() => setPagina(1)} className="h-9" />
-            <FilterMenu label="Filter entries" options={OPCIONES_FILTRO} value={tipos} onChange={(v) => { setTipos(v); setPagina(1) }} />
-            {filasPagina.length > 0 && (
-              <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
-              onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
-            )}
-
-            <div className="ml-auto flex flex-wrap items-center gap-3">
-              <Tabs className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
-              <ColumnPicker
-                columnas={COLUMNAS}
-                ocultas={ocultas}
-                onToggle={alternarCol}
-                onReset={() => setOcultas(OCULTAS_DE_ENTRADA)}
-                porDefecto={OCULTAS_DE_ENTRADA}
-              />
-              <button
-                type="button"
-                onClick={() => aviso.ok('Statement exported.')}
-                className="flex h-9 items-center gap-2 rounded-md border border-line bg-white px-4 text-[13px] font-medium hover:bg-surface-subtle"
-              >
-                <Download className="size-4" /> Export statement
-              </button>
-            </div>
-          </div>
-
           {/* `skipDelayDuration={0}`: sin esto Radix deja una ventana de gracia
               y al barrer la tabla el tooltip de la fila siguiente abre al
               instante -y alcanza a mostrar el contenido de la anterior-, que
               es el parpadeo que hacía imposible leerlo. */}
           <TooltipProvider delayDuration={500} skipDelayDuration={0}>
-          <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white lg:flex lg:flex-1 lg:flex-col">
+          {/* La tabla en su card, con Columns arriba a la derecha como red.dev; sin buscador ni filtro (no están en red.dev
+              ni en CON-3753). Export statement lo pide CON-3755. */}
+          <div className="mt-4 flex w-full flex-col overflow-hidden rounded-lg border border-line-row bg-white lg:flex-1">
+          <div className="flex items-center justify-end gap-2 border-b border-line-row px-3 py-2.5">
+            {filasPagina.length > 0 && (
+              <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
+                onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
+            )}
+            <Button variant="secondary" size="sm" iconOnly aria-label="Export statement" title="Export statement" onClick={() => aviso.ok('Statement exported.')}>
+              <Download />
+            </Button>
+            <ColumnPicker
+              size="sm"
+              columnas={COLUMNAS}
+              ocultas={ocultas}
+              onToggle={alternarCol}
+              onReset={() => setOcultas(OCULTAS_DE_ENTRADA)}
+              porDefecto={OCULTAS_DE_ENTRADA}
+            />
+          </div>
+          <div ref={refVisible} data-tabla-scroll className="w-full overflow-x-auto lg:flex lg:flex-1 lg:flex-col">
             <div style={{ minWidth: anchoMinimo }} className="lg:flex lg:flex-1 lg:flex-col">
               <div data-tabla-header className="group/fila flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
                 <span className="w-4 shrink-0" aria-hidden />
@@ -434,7 +406,7 @@ export default function Ledger() {
               </div>
 
               {filasPagina.length === 0 ? (
-                <EmptyState icon={Receipt} title="No entries" detail="Nothing matches the current search or filters." />
+                <EmptyState icon={Receipt} title="No ledger available for this patient because no financial transaction has been posted yet." />
               ) : (
                 filasPagina.map((m) => {
                   const abierta = expandidas.includes(m.id)
@@ -524,6 +496,7 @@ export default function Ledger() {
               </div>
             </div>
           </div>
+          </div>
           </TooltipProvider>
           {vista === 'Guarantor View' && <Household />}
         </div>
@@ -534,6 +507,7 @@ export default function Ledger() {
           tipoInicial={accion}
           pacienteInicial={GUARANTOR}
           personas={HOGAR}
+          garante={GUARANTOR}
           cargosDe={cargosAbiertosDe}
           providers={PROVIDERS}
           hoy={new Date()}

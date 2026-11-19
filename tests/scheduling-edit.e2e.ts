@@ -40,3 +40,11 @@ test('al guardar con un obligatorio vacío, lleva a su pestaña y la marca', asy
   await expect(drawer.getByRole('tab', /General/)).toHaveAttribute('aria-selected', 'true')
   await expect(drawer.getByText('This field is required.')).toBeVisible()
 })
+
+/* El nombre del paciente en el detalle del turno lleva a su ficha, como red.dev (scheduling.md, 2026-11-19). */
+test('el nombre del paciente en el detalle del turno abre su ficha', async ({ app, screen }) => {
+  await app.open('/scheduling')
+  await screen.getByRole('button', /Noah James Smith/).first().tap()
+  await screen.getByRole('dialog', /Appointment details for Noah James Smith/).getByRole('link', 'Noah James Smith').tap()
+  await expect(screen.getByRole('link', 'Patients').first()).toBeVisible()
+})
