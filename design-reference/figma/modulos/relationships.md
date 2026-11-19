@@ -234,3 +234,22 @@ nos faltaba se suma acá; lo demás queda en el ticket para que red.dev se aline
    field is required.* (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)). El checkbox para crear
    una persona nueva queda justo arriba. *Choose at least one role.* y *Choose who is responsible for whom.* no
    cambian: son grupos de opciones, no un campo.
+
+## CON-4139 · Comentario de Abril: nombres siempre link y ⋮ en Household (2026-11-18)
+
+Abril Viola, en el ticket (comentario 31318): "todos los nombres son links para ir al perfil del otro paciente" y "en
+household deberiamos tambien agregar 3 puntitos de acciones" (es lo que pide CON-4113, *Acciones a nivel household*).
+
+- **Todos los nombres son link** a la ficha de esa persona (`/patients/:pacienteId`), con el estilo de 2026-11-12 (azul
+  `dash-blue`, subrayado al hover, foco visible). Sale la variante en negro para quien "no es paciente". En el mock las
+  relaciones de Jessica Miller apuntan a `patient-0004` y `patient-0005`, y la que se agrega con *Add Relationship* a
+  un id propio.
+- **⋮ en las cards de Household**, el mismo menú que las relaciones: *Edit relationship* y *Delete relationship*. Al
+  editar, la pill *Household* se queda (la da el Guarantor compartido, no los roles). Al borrar, la card sale con la
+  misma confirmación.
+- **Household vacío** (al borrar todas): *No household patients* / *No other patients share this patient's guarantor.*,
+  en vez de dejar el título sin nada abajo.
+
+**Para validar con Abril/usuarios:** si en Household *Delete relationship* tiene sentido (el household sale del
+Guarantor, no de una relación cargada) o si ahí el menú debería llevar otras acciones; la captura de CON-4113 no se pudo
+abrir desde acá.
