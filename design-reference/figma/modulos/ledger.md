@@ -1112,3 +1112,9 @@ su diseño (Julián: "la lógica, no el diseño"): Credit en dos pasos (*Adjustm
 **A validar con usuarios:** si abrir el pago con el total y Save habilitado hace fácil cobrar de más por un clic (red.dev
 lo hace igual); si recepción espera que Apply to abra en el guarantor en Patient View; y si Credit Adjustment gana con la
 tabla en el mismo paso, como Patient Payment (hoy son dos pasos).
+
+### Números de las métricas en azul (2026-11-19)
+
+Julián: "en todas las cards de las métricas el número tiene que ser azul". `ui/stat-card` (Billing, Ledger y Edit Account →
+Subscription) pasa del negro de red.dev a `text-dash-blue`, igual que las del Dashboard (`StatStrip`, `dashboard/StatCard`).
+Rótulo y bajada no cambian.
