@@ -23,7 +23,7 @@ const meta = {
       },
     },
   },
-  args: { titulo: 'Team', bajada: 'People who work at this clinic and what they can do.' },
+  args: { titulo: 'Team' },
   argTypes: {
     etiquetas: { control: 'select', options: ['None', 'Active', 'Default + Active'], mapping: { None: undefined, Active: <Pill tone="success">Active</Pill>, 'Default + Active': <><Pill tone="info">Default</Pill><Pill tone="success">Active</Pill></> }, description: 'Pills al lado del título.' },
     accion: { control: false },
@@ -42,7 +42,7 @@ export const Parts: Story = {
   parameters: sinControles,
   render: () => (
     <Lienzo>
-      <SettingsPageHeader titulo="Carriers" etiquetas={<Pill tone="success">Active</Pill>} bajada="The insurance companies you bill." accion={<Button><Plus /> New carrier</Button>}>
+      <SettingsPageHeader titulo="Carriers" etiquetas={<Pill tone="success">Active</Pill>} accion={<Button><Plus /> New carrier</Button>}>
         <SettingsSearch value="" onChange={() => {}} />
       </SettingsPageHeader>
       <TablaPartes partes={[
@@ -60,14 +60,14 @@ export const States: Story = {
   parameters: sinControles,
   render: () => (
     <Lienzo>
-      <Muestra titulo="Title only"><SettingsPageHeader titulo="Billing" bajada="Manage fee schedules, carriers, and coverage tables." /></Muestra>
+      <Muestra titulo="Title only"><SettingsPageHeader titulo="Billing" /></Muestra>
       <Muestra titulo="Without subtitle" nota="Documents Manager: el Figma no trae bajada; el buscador queda igual."><SettingsPageHeader titulo="Documents Manager"><span className="text-[12px] text-ink-muted">(search row)</span></SettingsPageHeader></Muestra>
       <Muestra titulo="With action and search">
-        <SettingsPageHeader titulo="Team" bajada="People who work at this clinic and what they can do." accion={<Button><Plus /> New employee</Button>}>
+        <SettingsPageHeader titulo="Team" accion={<Button><Plus /> New employee</Button>}>
           <SettingsSearch value="" onChange={() => {}} placeholder="Search employees" />
         </SettingsPageHeader>
       </Muestra>
-      <Muestra titulo="With tags (detail)"><SettingsPageHeader titulo="UCR - Red" etiquetas={<><Pill tone="info">Default</Pill><Pill tone="success">Active</Pill></>} bajada="UCR · Effective Jan 1, 2026" /></Muestra>
+      <Muestra titulo="With tags (detail)"><SettingsPageHeader titulo="UCR - Red" etiquetas={<><Pill tone="info">Default</Pill><Pill tone="success">Active</Pill></>} /></Muestra>
     </Lienzo>
   ),
 }

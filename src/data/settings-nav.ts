@@ -8,6 +8,8 @@ export type SettingsNavItem = {
   children?: { to: string; label: string }[]
 }
 
+/* Las mismas secciones que el overview de Settings: sin Parameters, Libraries, Patient Portal ni Security
+   (settings-accounts.md, 2026-11-19). */
 export const SETTINGS_NAV: SettingsNavItem[] = [
   { to: '/settings/general', label: 'General', icon: 'house' },
   /* Un solo ítem acá: el Figma lo llama "Accounts" y antes había además un
@@ -25,7 +27,6 @@ export const SETTINGS_NAV: SettingsNavItem[] = [
      breadcrumb del propio Figma (4106:170620) dice "Settings → Consents": se
      replica esa etiqueta, no la descripción verbal. */
   { to: '/settings/consents', label: 'Consents', icon: 'file-signature' },
-  { to: '/settings/parameters', label: 'Parameters', icon: 'sliders' },
   {
     to: '/settings/finance', label: 'Billing', icon: 'credit-card',
     children: [
@@ -35,8 +36,5 @@ export const SETTINGS_NAV: SettingsNavItem[] = [
     ],
   },
   { to: '/settings/ledger', label: 'Ledger', icon: 'credit-card' },
-  { to: '/settings/libraries', label: 'Libraries', icon: 'library' },
-  { to: '/settings/patient-portal', label: 'Patient Portal', icon: 'circle-user' },
-  { to: '/settings/security', label: 'Security', icon: 'lock' },
   { to: '/settings/preferences', label: 'Preferences', icon: 'sliders' },
 ]

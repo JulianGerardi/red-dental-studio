@@ -380,7 +380,6 @@ export function SettingsInsurancePlan() {
       <SettingsPageHeader
         titulo="Edit Insurance Plan"
         etiquetas={<Pill tone={TONO_ESTADO[p.estado]}>{p.estado}</Pill>}
-        bajada={`${p.nombre} · ${carrier.nombre} · Group # ${p.grupo}`}
       />
       <Tabs
         className="mt-5" aria-label="Insurance plan sections" value={seccion.nombre}

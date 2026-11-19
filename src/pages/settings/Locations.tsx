@@ -50,7 +50,6 @@ export function SettingsLocations({ nuevo = false }: { nuevo?: boolean }) {
     <div className="px-4 py-6 sm:px-8">
       <SettingsPageHeader
         titulo="Locations"
-        bajada="Set your location name. Add the location you need."
         accion={(
           <Button data-tour="set-locations" onClick={() => setCreando(true)}>
             <Plus /> New location

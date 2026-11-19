@@ -3,15 +3,13 @@ import { PageTitle } from '@/components/ui/page-title'
 /* Encabezado común de las pantallas de Settings. Antes cada una lo armaba
    por su cuenta y el botón principal caía en la fila del buscador, corrido
    del título; acá va alineado con el título y el buscador queda en su
-   propia fila. Ver design-reference/figma/modulos/settings-accounts.md. */
+   propia fila. Sin bajada debajo del título, en ninguna pantalla (settings-accounts.md, 2026-11-19). */
 export function SettingsPageHeader({
-  titulo, etiquetas, bajada, accion, children,
+  titulo, etiquetas, accion, children,
 }: {
   titulo: string
   /** Pills al lado del título (estado, Default) en el detalle de un ítem. */
   etiquetas?: React.ReactNode
-  /** La bajada gris debajo del título. Sin ella, va sólo el título (Documents Manager no la tiene en el Figma). */
-  bajada?: string
   /** Acción principal, alineada con el título. */
   accion?: React.ReactNode
   /** Buscador y filtros, en la fila de abajo. */
@@ -27,7 +25,6 @@ export function SettingsPageHeader({
               {etiquetas}
             </div>
           ) : <PageTitle>{titulo}</PageTitle>}
-          {bajada && <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">{bajada}</p>}
         </div>
         {accion}
       </div>

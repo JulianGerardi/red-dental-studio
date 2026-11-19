@@ -1,7 +1,6 @@
 import { Tabs } from '@/components/ui/tabs'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ChevronDown, ChevronLeft, ChevronRight, Plus, CalendarCheck, Inbox } from 'lucide-react'
+import { Plus, CalendarCheck, CalendarClock, Inbox } from 'lucide-react'
 import { AppointmentDetailsDrawer } from '@/components/scheduling/AppointmentDetailsDrawer'
 import { ViewMenu, VISTA_INICIAL, type VistaCalendario } from '@/components/scheduling/ViewFiltersPanel'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
@@ -12,9 +11,10 @@ import {
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { PageTitle } from '@/components/ui/page-title'
+import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import {
-  EVENTOS_INICIALES, FECHA_ANCLA, MESES, BLOCK_STYLE,
-  inicioDeSemana, sumarDias, type EventoConFecha, type ApptState,
+  EVENTOS_INICIALES, FECHA_ANCLA, BLOCK_STYLE,
+  type EventoConFecha, type ApptState,
   fmtExacta,
 } from '@/components/scheduling/calendar-data'
 import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
@@ -164,53 +164,13 @@ export default function Scheduling() {
     aviso.ok(`${ev.patient}'s appointment was deleted.`)
   }
 
-  /* Las flechas y el rótulo siguen la vista, igual que en Google Calendar. */
-  const paso = (n: number) => {
-    setFecha((f) => {
-      if (view === 'Day') return sumarDias(f, n)
-      if (view === 'Week') return sumarDias(f, n * 7)
-      return new Date(f.getFullYear(), f.getMonth() + n, 1)
-    })
-  }
-
-  const rotulo = (() => {
-    if (view === 'Day') {
-      return fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-    }
-    if (view === 'Week') {
-      const a = inicioDeSemana(fecha)
-      const b = sumarDias(a, 6)
-      const mismoMes = a.getMonth() === b.getMonth()
-      return `${MESES[a.getMonth()].slice(0, 3)} ${a.getDate()} – ${mismoMes ? '' : MESES[b.getMonth()].slice(0, 3) + ' '}${b.getDate()}, ${b.getFullYear()}`
-    }
-    return `${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`
-  })()
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <Link to="/scheduling" className="flex items-center gap-1 text-sm text-[#0056ef]">
-        Scheduling <ChevronDown className="size-[15px]" />
-      </Link>
-      <div className="mt-3">
+      {/* Los botones van a la altura del título, como en el resto de la app (scheduling.md, 2026-11-19). */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <PageTitle>Scheduling</PageTitle>
-      </div>
-
-      {/* Toolbar */}
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2">
-          <button onClick={() => paso(-1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Previous">
-            <ChevronLeft className="size-4" />
-          </button>
-          <span className="text-[13px] font-semibold whitespace-nowrap text-ink">{rotulo}</span>
-          <button onClick={() => setFecha(FECHA_ANCLA)} className="flex items-center gap-1 text-[13px] text-ink-muted">
-            Today <ChevronDown className="size-3.5" />
-          </button>
-          <button onClick={() => paso(1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Next">
-            <ChevronRight className="size-4" />
-          </button>
-        </div>
-
-        <div className="ml-auto flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {/* El Figma marca "Month" activo aunque la vista sea semanal. */}
           <div className="flex items-center gap-1">
             {(['Day', 'Week', 'Month'] as const).map((v) => (
@@ -248,18 +208,22 @@ export default function Scheduling() {
               </button>
             </>
           )}
-          <button
-            onClick={() => setPanel('new')}
-            data-tour="sched-new"
-            className="bg-dash-blue hover:bg-dash-blue-hover flex h-8 items-center gap-1.5 rounded-md px-4 text-xs font-medium text-white transition-colors"
-          >
-            <Plus className="size-3.5" /> New appointment
-          </button>
+          <Button size="md" onClick={() => setPanel('new')} data-tour="sched-new">
+            <Plus /> New appointment
+          </Button>
         </div>
       </div>
 
-      {/* Leyenda: botón desplegable en vez de la franja a lo ancho. */}
-      <div className="mt-4">
+      {/* La fecha con el selector de la app, igual que el Dashboard (sin flechas); al lado, Status legend
+          (scheduling.md, 2026-11-19). */}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <DatePicker variant="toolbar" value={fecha} onChange={setFecha} />
+        {/* Volver a hoy; desaparece cuando ya estás en hoy, como en el Dashboard. */}
+        {!sameDay(fecha, FECHA_ANCLA) && (
+          <Button variant="secondary" size="md" onClick={() => setFecha(FECHA_ANCLA)} title="Go to today">
+            <CalendarClock /> Today
+          </Button>
+        )}
         <StatusLegend />
       </div>
 

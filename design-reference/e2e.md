@@ -54,10 +54,6 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   adentro); sólo Pending Task, abajo, lo lleva.
   (2026-10-19) La tira de salas va en una fila con scroll (sin Show more); elegir una sala filtra la Waiting Room y
   una sala sin gente (Operatory 5) la deja vacía.
-  Desde 2026-11-19: cada columna lleva su total y "Show N more" (con `?day=busy`, 6 de 12 Check In); Check In pasa la
-  cita a Checked in de la Waiting Room y Check Out la saca; Rooms muestra Now / Next y No bookings.
-  Segunda tanda del mismo día: Appointments por Provider + Room; Waiting Room por Visit stage; No Show sólo con la hora
-  pasada y Cancel con motivo; el menú y Edit appointment de la Waiting Room según la etapa.
 - `tests/clinical-mode.e2e.ts`: la app abre, y Add Procedure carga un D0120 desde DentAssmt recorriendo los tres
   pasos del drawer hasta el aviso de guardado.
   Desde el 2026-10-08 también Lab Order: Filter por Requested deja 2 de 9, y Cancel order desde el menú de la fila se
@@ -96,6 +92,10 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   a qué cargos fue y Apply credit. View procedure abre Procedures en Clinical Mode con la fila abierta.
   `tests/billing.e2e.ts` suma: con Maria Abril Viola, la fila del pago dice cómo se pagó y a qué cargo fue, y el link
   abre su registro.
+  Desde el 2026-11-19 (CON-4142): ya no hay pestañas; Patient Payment (-) abre el drawer de Billing y lo guardado avisa
+  y entra a la tabla; Charge Adjustment (+) abre *Enter Charge (+) Adjustment* y pide el monto. Sin buscador, las filas
+  se abren por nombre (la de Check payment, en la página 2). `scheduling-edit.e2e.ts` suma: el nombre del paciente en el
+  detalle del turno abre su ficha.
 - `tests/treatment-plan.e2e.ts` (2026-10-13): una fila de Unassigned se despliega (No treatment linked, Collapse all), y
   la fila D2391 de Restorative Plan muestra Procedure consent; su hallazgo se abre en el drawer sin salir de Treatment
   Plan.

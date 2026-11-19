@@ -177,7 +177,7 @@ export const TOPICS: Topic[] = [
   {
     id: 'set-coming-soon', module: 'settings',
     title: 'What does "Coming soon" mean on some Settings pages?',
-    body: 'Those sections - like Finance or the Patient Portal - are reserved space for a future release and aren\'t part of this version yet.',
+    body: 'Those sections - like Roles or Preferences - are reserved space for a future release and aren\'t part of this version yet.',
     keywords: 'coming soon placeholder future not available',
     Demo: () => SettingsMenuDemo({ resaltarComingSoon: true }),
   },

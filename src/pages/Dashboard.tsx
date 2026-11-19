@@ -325,14 +325,12 @@ export default function Dashboard() {
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      {/* El día de hoy pasó al Topbar y el elegido lo dice el selector (Julián, 2026-10-13). Título, fecha y números en una
-          sola fila: así las columnas de abajo se llevan el alto (2026-10-19). La fecha manda sobre toda la pantalla y vive
-          acá arriba, no adentro de Appointments: metida en una de las columnas, parecía filtrar sólo esa. */}
-      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-          <PageTitle size="lg">Dashboard</PageTitle>
-          <FiltroFecha value={date} onChange={setDate} marked={diasConDatos} />
-        </div>
+      {/* El día de hoy pasó al Topbar y el elegido lo dice el selector (Julián, 2026-10-13). La fecha manda sobre toda la
+          pantalla y vive acá arriba, no adentro de Appointments. Los controles van debajo del título, como en el resto de
+          la app (Scheduling), y los números a la derecha de esa fila (dashboard.md, 2026-11-19). */}
+      <PageTitle size="lg">Dashboard</PageTitle>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+        <FiltroFecha value={date} onChange={setDate} marked={diasConDatos} />
         <div data-tour="dash-stats">
           <StatStrip stats={stats} />
         </div>

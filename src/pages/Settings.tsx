@@ -122,7 +122,6 @@ export function SettingsGeneral() {
   return (
     <div className="px-4 py-6 sm:px-8">
       <PageTitle>Settings</PageTitle>
-      <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">Configure and manage your workspace preferences.</p>
 
       <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {SETTINGS_SECTIONS.map((s) => {

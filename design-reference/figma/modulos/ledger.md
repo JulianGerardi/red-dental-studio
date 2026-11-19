@@ -930,3 +930,122 @@ el diseño sigue siendo el del sistema.
 
 1. *Patient Payment*: Amount, Check y Bank/Branch vacíos decían *Required.*; ahora *This field is required.*, como
    Charge y Credit Adjustment (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)).
+
+## CON-4142 · El Ledger se alinea con red.dev y con Billing (2026-11-19)
+
+Pedido de Julián: mirar el Ledger del paciente y Billing de red.dev, contrastarlos con el nuestro y alinear la pantalla,
+incluido qué hace cada botón y qué trae. Sin acceso a red.dev desde la sesión: la referencia es la comparativa de
+CON-4142 (Ledger) y CON-4147 (Billing), revisadas en red.dev el mismo día.
+
+1. **Los tres botones vuelven a ser botones, en la fila del título** (como red.dev y la regla de la app: botones a la
+   altura del título). Cada uno abre su drawer, **el mismo `PostPaymentDialog` de Billing**: *New Patient Payment (-)*
+   (Payment → Allocation), *Credit Adjustment (-)* (Adjustment → Allocation) y *Enter Charge (+) Adjustment* (una
+   sección). Revierte la decisión del 2026-11-12 (*Las acciones quedan como pestañas*): con el pedido de alinear los
+   botones con red.dev y Billing, dos formularios distintos para lo mismo no se sostenían, y la regla pop up = drawer ya
+   lo pedía. Salen la pestaña *Transactions* y el título que cambiaba con la pestaña.
+   - Con eso el Ledger toma lo que CON-4142 marcaba en los formularios: fecha de hoy cargada (16), listas de red.dev de
+     Settings › Ledger: 7 métodos de pago, 13 tipos de crédito y 16 de cargo (22), *Cash Payment* de entrada (21),
+     orden de campos de red.dev (20) y el título *Credit Adjustment (-)* (19).
+   - `PostPaymentDialog` suma `personas`, `cargosDe`, `providers` y `hoy`; sin ellos sigue con los datos de Billing.
+     *Apply to* en el Ledger: John Smith y su grupo familiar; cada persona ve sus cargos abiertos con lo que falta de
+     cada uno.
+   - **Monto precargado (red.dev, punto 21):** el pago arranca con el saldo abierto de quien está en *Apply to* y se
+     reparte solo en *Applied*, del cargo más viejo al más nuevo (`repartir` en `LedgerAllocationTable`, prop
+     `aRepartir`). Cambiar el monto lo vuelve a repartir; después se puede tocar fila por fila. Vale también en Billing.
+   - `PatientPaymentPanel`, `CreditAdjustmentPanel` y `ChargeAdjustmentPanel` quedan sin uso en la app; se borran con
+     sus stories al documentar.
+2. **Métricas: una card por número** (`ui/stat-card`, `StatCard`), como red.dev (punto 3): rótulo, ⓘ arriba a la
+   derecha y el monto, sin ícono ni divisores. Es la misma card de Billing (que se mudó de `Billing.tsx` a `ui/`) y la
+   de Edit Account › Subscription, que tenía la suya a mano. Mismos cuatro datos y textos. 2 + 2 hasta 672px de
+   contenedor, después cuatro en fila. El Ledger deja de usar `StatStrip apilada`.
+3. **Sin *Balance due* al pie de la tabla** (punto 9): no está en red.dev y repetía el *Patient balance* de las métricas.
+4. Sin cambios, porque ya estaban alineados o son decisiones del sistema: Patient / Guarantor View en la barra de la
+   tabla (2), Columns en la barra (4), ⋮ sólo con acciones (10), Search / Filter / Export statement (11), Household (14).
+5. **Pendiente, CON-4071:** *Apply at = Guarantor* (un pago de la cuenta que se aplica a los cargos de todo el hogar) no
+   está en el drawer: *Apply to* elige una persona, como Billing. Falta definir cómo se elige el alcance.
+
+**A validar con usuarios:** si recepción prefiere el monto precargado con todo el saldo o vacío (con el saldo a la
+vista se cobra más rápido, pero un pago parcial obliga a borrar); si se entienden las tres acciones como botones al lado
+del título en tablet, donde bajan a una segunda línea.
+
+### Segunda vuelta, con el video de red.dev de Julián (2026-11-19)
+
+Julián: "no está del todo alineado", con una grabación del Ledger de red.dev (Guarantor View, los tres drawers y el detalle
+de una fila).
+
+1. **Patient View / Guarantor View sube a la fila del título**, a la derecha de los tres botones (Tabs sm).
+2. **Sin buscador, Search ni Filter** (tampoco están en CON-3753). La tabla va en su card y arriba a la derecha lleva
+   *Columns* y Export statement en ícono (CON-3755 lo pide; red.dev todavía no). Expand / Collapse all sigue ahí cuando
+   hay una fila abierta. El vacío pasa al texto de CON-3753: *No ledger available for this patient because no financial
+   transaction has been posted yet.*
+3. **Type con los rótulos cortos y los colores de red.dev** (`PillTipo`, también en Billing): Procedure naranja, Charge
+   Adj rojo, Credit Adj verde, Pt Payment azul, Ins Payment violeta. Revierte el punto 7 de CON-4142 (Procedure gris).
+4. **Métricas**: rótulo en mayúsculas y el monto en negro, como red.dev (`StatCard`, en las tres pantallas que la usan).
+5. **Drawers:**
+   - *Apply to* lista al garante como **"John Smith (Guarantor)"** en el pago y el crédito: elegirlo trae los cargos
+     abiertos de todo el hogar y lo guardado queda con scope guarantor (*Guarantor / Account* en la tabla). Cierra el
+     pendiente de CON-4071. En Billing, igual con el garante del paciente elegido.
+   - Cada método de pago va en su caja gris, como red.dev.
+   - *Adjustment type* del crédito arranca vacío ("Select credit type") y es obligatorio.
+   - **Sin cambiar:** red.dev muestra datos y Ledger Transactions en una sola página; acá siguen los dos pasos (Payment →
+     Allocation), por la regla de drawers con más de una sección. **A decidir con Julián.**
+6. **Household:** el nombre de cada persona es un link a su ficha (pedido de Julián).
+
+### Los drawers, tal cual red.dev (2026-11-19)
+
+Julián: los drawers de Billing y del Ledger tienen que mostrar la información como red.dev, sin pasos. Es un solo
+componente (`PostPaymentDialog`) para las dos pantallas.
+
+1. **Una sola página, sin pasos.** Revierte los dos pasos (Payment → Allocation) del 2026-11-13: era la regla de drawers
+   con más de una sección, y Julián pidió red.dev. Arriba, una card con título e ícono (*Payment Information*, *Credit
+   Adjustment Information*, *Adjustment Information*); debajo, en el pago y el crédito, *Ledger Transactions*.
+2. **Patient Payment:** Transaction date y Apply to; cada método en su caja gris (Amount y Payment method; con cheque,
+   Check y Bank/Branch); **+ suma una fila de Check Payment en 0.00** y − la saca; Notes adentro de la card.
+3. **Credit Adjustment:** Transaction date, Apply to, Adjustment type ("Select credit type") y Amount en una fila;
+   Notes. **Enter Charge (+) Adjustment:** tres columnas (Transaction date, Amount, Type / Provider, Apply to, Visit
+   date) y Notes, sin tabla.
+4. **Ledger Transactions** (`billing/TransaccionesAbiertas`, nuevo): Txn date, Patient, Provider, Code, Description,
+   Charge, Other Credit, Guar Estimate, Applied y Balance; sin Columns, sin filas que se despliegan y sin paginado;
+   "Showing N open transactions" y el resumen *Amount not applied* / *Amount applied*. Salen Tooth y Surface (el
+   pedido del 2026-09-07 de las 12 columnas queda reemplazado por red.dev).
+   - **La lógica de red.dev:** Other Credit es lo que ya se le aplicó al cargo y Guar Estimate lo que falta. El pago
+     arranca con la suma de lo que falta y *Applied* se llena solo, del cargo más viejo al más nuevo; Balance = Guar
+     Estimate − Applied. *Amount not applied* es el monto menos lo aplicado.
+   - **Guardar aplica de verdad:** en el Ledger el pago o el crédito queda aplicado a esos cargos (bajan su Trans. Bal.)
+     y lo que sobra queda como crédito sin aplicar (CON-4073). Un pago en varios métodos es una sola transacción
+     ("Cash Payment $50.00 + Check Payment #12 $20.00", como CON-3753).
+5. **Lo que no se copió de red.dev, a propósito:** el selector de fecha es el de la app (red.dev usa el del navegador en
+   dos de los tres); Notes dice "Add a note (optional)" (decisión del 2026-11-12, red.dev dice "Placeholder"); los
+   errores se muestran al guardar con *This field is required.* en vez de apagar Save; el pie es el de los drawers de la
+   app (dos botones del mismo ancho). Con un paciente sin cargos abiertos, red.dev esconde los métodos de pago y deja la
+   tabla cargando; acá se ven los métodos y la tabla dice *No open transactions* (el pago queda como crédito).
+6. **Household en las dos vistas** (también en Patient View), con link a la ficha de cada persona.
+
+### Drawers sin íconos y con la lógica del video (2026-11-19)
+
+Julián: los íconos de los títulos de sección (*Payment Information*, *Credit Adjustment Information*, *Adjustment
+Information*) están en red.dev pero no van; el diseño es el nuestro y la lógica tiene que ser la del video (o la de
+red.dev), sin inventar.
+
+1. **Sin íconos** en el título de la card de datos.
+2. **Sin transacciones abiertas no hay a qué aplicar** (video: Apply to con un paciente sin cargos): el pago no muestra
+   los métodos de pago y Save queda apagado; en el crédito, Save también apagado. Revierte el punto 5 de la sección
+   anterior (*acá se ven los métodos y el pago queda como crédito*), que era invento. La tabla dice *No open
+   transactions* (red.dev deja el esqueleto de carga) y "Showing 0 open transactions"; sale la bajada *What you post
+   stays as unapplied credit*.
+3. **Ledger Transactions ordenada por fecha**, del cargo más viejo al más nuevo, como red.dev (antes iba agrupada por
+   persona).
+4. Igual que en el video: con transacciones, Save se prende aunque falten Check o Bank/Branch (se validan al guardar);
+   el crédito arranca sin monto ni tipo; Enter Charge (+) Adjustment tiene Save siempre prendido y valida al guardar.
+5. Siguen siendo nuestros (diseño, no lógica): el selector de fecha de la app, el placeholder *Add a note (optional)* y
+   el pie de dos botones del mismo ancho.
+
+### Lo que se publica (2026-11-19)
+
+Julián: se publica todo menos la lógica de adentro de los drawers, que se arma en otra tanda. Salen en vivo la pantalla
+del Ledger (botones y vista en la fila del título, `StatCard`, tabla en su card sin buscador ni filtro, `PillTipo`,
+Household en las dos vistas con link) y Billing (métricas de borde a borde, pagos en la fila del título). Los tres
+botones abren el `PostPaymentDialog` de `main`, con sus dos pasos y los datos de Billing: desde el Ledger, Apply to dice
+John Smith y la fecha es la de Billing. **No se publica** lo de adentro de los drawers descripto arriba (una sola página,
+sin íconos, Ledger Transactions con Other Credit / Guar Estimate / Applied, el garante con "(Guarantor)", sin
+transacciones sin métodos y Save apagado): queda en el commit `2d8dfbd` de la rama `claude/exciting-brown-p9saph`.
