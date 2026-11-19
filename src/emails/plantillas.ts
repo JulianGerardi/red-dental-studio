@@ -51,7 +51,12 @@ const VER_TURNO: Bloque[] = [
   { tipo: 'parrafo', texto: 'You can access your appointment using the button below:' },
   { tipo: 'boton', texto: 'Review Appointment', enlace: '{{portal_link}}' },
 ]
-const VENCE_24 = { tipo: 'aviso', texto: 'If you don’t confirm within 24 hours, this appointment request will expire and the time slot may no longer be available.' } as const
+const VENCE_24: Bloque = {
+  tipo: 'aviso',
+  tono: 'warning',
+  titulo: 'This request expires in 24 hours',
+  texto: 'If you don’t confirm within 24 hours, this appointment request will expire and the time slot may no longer be available.',
+}
 
 export const MAILS: Mail[] = [
   {
@@ -301,7 +306,7 @@ export const MAILS: Mail[] = [
     bloques: [
       { tipo: 'saludo', texto: 'Hello {{account_owner_first_name}},' },
       { tipo: 'parrafo', texto: 'The subscription of {{practice_name}} has been suspended.' },
-      { tipo: 'parrafo', texto: 'Your account is now in read-only mode: your team can still view and export information, but cannot create, edit or delete records until full access is restored.' },
+      { tipo: 'aviso', tono: 'warning', titulo: 'Your account is in read-only mode', texto: 'Your team can still view and export information, but cannot create, edit or delete records until full access is restored.' },
       { tipo: 'nota', texto: 'To restore full access, please contact our support team at {{support_email}}.' },
       FIRMA_PLATAFORMA,
     ],
@@ -424,5 +429,6 @@ export const EJEMPLO: Record<string, string> = {
   privacy_url: 'https://confidentally.com/privacy',
   company_address: '123 Main Street, Suite 100, City, State 12345',
   year: '2026',
-  logo_url: 'confidentally-logo.png',
+  assets_url: 'https://juliangerardi.github.io/red-dental-studio/emails',
+  practice_logo_url: 'https://juliangerardi.github.io/red-dental-studio/emails/sample-practice-logo.png',
 }

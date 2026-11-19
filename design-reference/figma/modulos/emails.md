@@ -33,18 +33,19 @@ backend y el front casi no los va a tocar**, así que el diseño se adaptó a es
 - **Entrega:** `npm run emails:exportar` deja en `public/emails/` un HTML por mail y `emails.json`. El `emails.json`
   trae, para cada mail, asunto, preheader, destinatario, remitente, variables y Jira. Se publica con la app en
   `…/red-dental-studio/emails/<id>.html`. Con `--check`, el script falla si los archivos quedaron desactualizados.
-  El logo (`confidentally-logo.png`, sacado del Figma) va con `{{logo_url}}`: el backend lo tiene que alojar.
+  Las imágenes fijas (el logo de Confidentally y los íconos del aviso) cuelgan de `{{assets_url}}`: el backend aloja
+  la carpeta `public/emails/` y pasa su URL. `node scripts/emails-recursos.mjs` regenera los íconos y el logo de
+  ejemplo.
 
 ### 2. Decisiones de diseño
 
-1. **Cabecera:** se mantiene la franja del Figma (blanco a azul claro). Baja de 179 px a unos 90 px y lleva adentro
-   **quién escribe**: el nombre de la clínica en los mails al paciente, guardian o empleado, y el logo de
-   Confidentally en los mails al dueño de la cuenta. En el Figma la franja estaba vacía y en el celular empujaba el
-   contenido fuera de la primera pantalla. En Outlook se ve el color plano.
+1. **Cabecera:** se mantiene la franja del Figma (blanco a azul claro). Baja de 179 px a unos 100 px y lleva adentro
+   **quién escribe**: el logo de la clínica en los mails al paciente, guardian o empleado, y el de Confidentally en
+   los mails al dueño de la cuenta. En el Figma la franja estaba vacía y en el celular empujaba el contenido fuera de
+   la primera pantalla. En Outlook se ve el color plano.
 2. **Datos del turno y de acceso en una caja** (`detalles`), como la *LOGIN DETAILS* del Figma: título en
    mayúsculas, línea y filas de rótulo y valor.
-3. **El vencimiento de 24 h es un aviso** (`aviso`, con los colores warn de la app). Es lo único que cambia lo que
-   tiene que hacer el paciente.
+3. **El vencimiento de 24 h es un aviso** (`aviso`). Es lo único que cambia lo que tiene que hacer el paciente.
 4. **Un solo botón primario por mail**, del color del botón primario de la app (`dash-blue`) y de 48 px de alto para
    que se toque bien. Siempre va con "If the button does not work…" y el enlace. El documento lo ponía en algunos
    mails y en otros no; quedó en todos.
@@ -101,3 +102,28 @@ La vista previa lo marca con *From the document* o *Proposal · pending approval
   Eso agregaría una variable `{{practice_logo_url}}`.
 - Con el backend: probar los HTML en Gmail, Outlook (escritorio) y Apple Mail, también en modo oscuro, antes de
   activarlos.
+
+## 2026-11-19 · Logo de la clínica y aviso con el diseño del Alert (CON-3325, CON-3268)
+
+Pedido de Julián: un logo inventado de una clínica en la cabecera y el aviso con el diseño nuevo de las alertas.
+
+1. **Logo de la clínica en la cabecera** (`{{practice_logo_url}}`), en los mails que manda la clínica. Reemplaza al
+   nombre en texto: el paciente reconoce la marca antes de leer, y eso le da confianza en un mail que le pide entrar
+   al portal. El de ejemplo (`sample-practice-logo.png`) es inventado: una muela blanca sobre un cuadrado rojo y "Red
+   Dental / STUDIO" al lado. No es el logo de ninguna clínica real. El alt es `{{practice_name}}`, así que si la
+   imagen no carga se lee el nombre.
+   - **Para el backend:** PNG de 88 px de alto (se ve a 44), fondo transparente y hasta 480 px de ancho. Outlook de
+     escritorio usa el tamaño real de la imagen, así que un logo más grande se vería enorme ahí.
+   - **Clínica sin logo:** la plantilla no tiene condicionales. El backend tiene que mandar una imagen igual (por
+     ejemplo, una que genere con el nombre). A definir con ellos.
+2. **El aviso es el `Alert` de la app** (`ui/alert`, PR #156): caja con borde redondeado de 8 px y borde fino del
+   color del tono al 25 %, ícono de lucide, título en el color del tono y texto en tinta. Sale la franja con barra a
+   la izquierda, que la app ya no usa. Tiene los cuatro tonos (info, success, warning, danger). El borde va con el
+   color ya mezclado, porque Outlook no entiende transparencias, y los íconos van en PNG (`alert-<tono>.png`) porque
+   Gmail y Outlook no muestran SVG.
+   - El de 24 h lleva el título "This request expires in 24 hours" (propuesta) y el texto del documento.
+   - El mail de suscripción suspendida (propuesta) pasa a usar un aviso warning: "Your account is in read-only
+     mode".
+3. **Variables:** sale `{{logo_url}}` y entran `{{assets_url}}` (la carpeta de las imágenes fijas) y
+   `{{practice_logo_url}}`.
+

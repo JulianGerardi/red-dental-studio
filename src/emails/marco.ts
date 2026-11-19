@@ -12,17 +12,26 @@ export const COLOR = {
   fondo: '#f4f4f5', // surface-muted
   caja: '#fafafa', // surface-subtle
   franja: '#e8eef8', // brand-tint
-  avisoFondo: '#fffaf0', // warn-bg
-  avisoTexto: '#99660d', // warn-fg
-  avisoBorde: '#b45309', // attn-fg
 } as const
+
+/* Los tonos del Alert de la app (ui/alert): fondo, color del ícono y del título, y el borde, que es ese color al 25%
+   sobre el fondo (border-<color>/25), ya mezclado porque Outlook no entiende transparencias. */
+export type TonoAviso = 'info' | 'success' | 'warning' | 'danger'
+const TONO_AVISO: Record<TonoAviso, { fondo: string; color: string }> = {
+  info: { fondo: '#f0f5ff', color: '#174596' }, // info-bg · dash-busy-fg
+  success: { fondo: '#f0fcf5', color: '#1a804d' }, // dash-ok-bg · dash-ok-fg
+  warning: { fondo: '#fffaf0', color: '#99660d' }, // warn-bg · warn-fg
+  danger: { fondo: '#fff2f2', color: '#b22626' }, // dash-bad-bg · dash-bad-fg
+}
+const mezclar = (color: string, fondo: string, a: number) =>
+  '#' + [1, 3, 5].map((i) => Math.round(parseInt(color.slice(i, i + 2), 16) * a + parseInt(fondo.slice(i, i + 2), 16) * (1 - a)).toString(16).padStart(2, '0')).join('')
 
 const FUENTE = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 export type Bloque =
   | { tipo: 'saludo'; texto: string }
   | { tipo: 'parrafo'; texto: string }
-  | { tipo: 'aviso'; texto: string }
+  | { tipo: 'aviso'; tono: TonoAviso; titulo: string; texto?: string }
   | { tipo: 'detalles'; titulo: string; filas: [rotulo: string, valor: string][] }
   | { tipo: 'boton'; texto: string; enlace: string }
   | { tipo: 'nota'; texto: string }
@@ -39,10 +48,18 @@ function bloque(b: Bloque): string {
       return `<p style="margin:0 0 16px;font-size:18px;line-height:28px;font-weight:600;color:${COLOR.tinta};">${b.texto}</p>`
     case 'parrafo':
       return `<p style="margin:0 0 16px;font-size:16px;line-height:26px;color:${COLOR.texto};">${b.texto}</p>`
-    case 'aviso':
+    case 'aviso': {
+      // El Alert de la app: caja redondeada con borde fino, ícono, título en el color del tono y texto en tinta.
+      const t = TONO_AVISO[b.tono]
       return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;"><tr>
-<td style="background:${COLOR.avisoFondo};border-left:3px solid ${COLOR.avisoBorde};border-radius:6px;padding:12px 16px;font-size:14px;line-height:22px;color:${COLOR.avisoTexto};">${b.texto}</td>
-</tr></table>`
+<td bgcolor="${t.fondo}" style="background:${t.fondo};border:1px solid ${mezclar(t.color, t.fondo, 0.25)};border-radius:8px;padding:12px 16px;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+<td valign="top" style="padding:3px 12px 0 0;width:16px;"><img src="{{assets_url}}/alert-${b.tono}.png" width="16" height="16" alt="" style="display:block;border:0;width:16px;height:16px;"></td>
+<td valign="top"><p style="margin:0;font-size:14px;line-height:22px;font-weight:600;color:${t.color};">${b.titulo}</p>${b.texto ? `
+<p style="margin:2px 0 0;font-size:14px;line-height:22px;color:${COLOR.tinta};">${b.texto}</p>` : ''}</td>
+</tr></table>
+</td></tr></table>`
+    }
     case 'detalles':
       return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 24px;"><tr>
 <td style="background:${COLOR.caja};border:1px solid ${COLOR.linea};border-radius:8px;padding:20px 20px 12px;">
@@ -69,8 +86,9 @@ ${b.lineas.map((l, i) => `<p style="margin:0;font-size:${i === 0 ? 16 : 14}px;li
 
 function cabecera(remitente: Remitente): string {
   const contenido = remitente === 'clinica'
-    ? `<p style="margin:0;font-size:20px;line-height:28px;font-weight:600;color:${COLOR.tinta};">{{practice_name}}</p>`
-    : `<img src="{{logo_url}}" width="150" height="48" alt="Confidentally" style="display:block;border:0;width:150px;height:auto;">`
+    // Logo de la clínica: PNG de 88 px de alto (se ve a 44). Si no carga, el alt muestra su nombre.
+    ? `<img src="{{practice_logo_url}}" height="44" alt="{{practice_name}}" style="display:block;border:0;height:44px;width:auto;max-width:240px;font-size:20px;line-height:28px;font-weight:600;color:${COLOR.tinta};">`
+    : `<img src="{{assets_url}}/confidentally-logo.png" width="150" height="48" alt="Confidentally" style="display:block;border:0;width:150px;height:auto;">`
   // Franja del Figma (blanco a azul claro), más baja y con quien escribe adentro. Sin degradé, queda el color plano.
   return `<tr><td class="px" bgcolor="${COLOR.franja}" style="background:${COLOR.franja};background-image:linear-gradient(120deg,#ffffff 0%,${COLOR.franja} 55%,#c9dafa 100%);padding:28px 40px;">${contenido}</td></tr>`
 }
@@ -117,7 +135,7 @@ ${bloques.map(bloque).join('\n')}
 <p style="margin:0;padding-top:20px;border-top:1px solid ${COLOR.linea};font-size:12px;line-height:20px;color:${COLOR.apagado};">This email was sent to you as a registered member of <a href="{{website_url}}" style="color:${COLOR.marca};text-decoration:none;">Confidentally.com</a>. Use of the service and website is subject to our <a href="{{terms_url}}" style="color:${COLOR.marca};text-decoration:none;">Terms of Use</a> and <a href="{{privacy_url}}" style="color:${COLOR.marca};text-decoration:none;">Privacy Statement</a>.</p>
 </td></tr>
 <tr><td align="center" class="px" bgcolor="${COLOR.caja}" style="background:${COLOR.caja};border-top:1px solid ${COLOR.linea};padding:28px 40px;font-family:${FUENTE};">
-<img src="{{logo_url}}" width="140" height="45" alt="Confidentally" style="display:block;margin:0 auto 16px;border:0;width:140px;height:auto;">
+<img src="{{assets_url}}/confidentally-logo.png" width="140" height="45" alt="Confidentally" style="display:block;margin:0 auto 16px;border:0;width:140px;height:auto;">
 <p style="margin:0 0 4px;font-size:12px;line-height:18px;color:${COLOR.apagado};">&copy; {{year}} Confidentally. All rights reserved.</p>
 <p style="margin:0 0 8px;font-size:12px;line-height:18px;color:${COLOR.apagado};">{{company_address}}</p>
 <p style="margin:0;font-size:12px;line-height:18px;"><a href="{{privacy_url}}" style="color:${COLOR.marca};text-decoration:none;">Privacy Policy</a><span style="color:${COLOR.apagado};">&nbsp;&nbsp;&bull;&nbsp;&nbsp;</span><a href="{{terms_url}}" style="color:${COLOR.marca};text-decoration:none;">Terms of Service</a></p>

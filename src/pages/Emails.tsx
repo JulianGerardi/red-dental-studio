@@ -13,7 +13,9 @@ import { EJEMPLO, MAILS, htmlDe, variablesDeMail, type Mail } from '@/emails/pla
 /* Vista previa de los mails que manda el backend (design-reference/figma/modulos/emails.md). Muestra cada plantilla
    con datos de ejemplo o con sus {{variables}} marcadas, en escritorio o en celular, y la deja bajar tal cual. */
 
-const LOGO = new URL(`${import.meta.env.BASE_URL}emails/confidentally-logo.png`, window.location.origin).href
+/* Las imágenes de la vista previa salen de esta misma app (public/emails/), así andan en localhost y en el link de prueba. */
+const ASSETS = new URL(`${import.meta.env.BASE_URL}emails`, window.location.origin).href
+const IMAGENES = { assets_url: ASSETS, practice_logo_url: `${ASSETS}/sample-practice-logo.png` }
 const CATEGORIAS = [...new Set(MAILS.map((m) => m.categoria))]
 const JIRA = 'https://confidetally.atlassian.net/browse/'
 
@@ -154,7 +156,7 @@ function VistaMail({ mail, ancho, modo }: { mail: Mail; ancho: Ancho; modo: Modo
   const [alto, setAlto] = useState(900)
   const html = useMemo(() => {
     const crudo = htmlDe(mail)
-    return modo === 'sample' ? completar(crudo, { ...EJEMPLO, logo_url: LOGO }) : completar(crudo, { logo_url: LOGO })
+    return modo === 'sample' ? completar(crudo, { ...EJEMPLO, ...IMAGENES }) : completar(crudo, IMAGENES)
   }, [mail, modo])
 
   const alCargar = () => {
