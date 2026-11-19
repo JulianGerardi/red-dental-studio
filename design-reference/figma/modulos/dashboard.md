@@ -850,3 +850,111 @@ allá esa fila es **Weight** y la otra Height, que es lo que tiene sentido para 
 - La primera media fila pasa a **Weight**, con el ícono de pesa (`Weight` de lucide) y "154 lb" de ejemplo; la segunda
   queda **Height**, "5 ft 8 in". Mismas unidades imperiales para los dos.
 - De la anomalía 55 queda sólo "Start Enconter" sin la u.
+
+## Cada columna, su momento de la visita (2026-11-19)
+
+**Jira:** CON-1670 (Waiting Room: qué encounters entran y cuándo se puede Check Out o Cancel), CON-1613 (Check In),
+CON-1682 (Check Out). Diseño: comparativa antes/después de Julián, Figma *Screens & Flows* `476:66770`.
+
+Las tres columnas se quedan, pero cada una cuenta un momento: **Appointments** a quién falta registrar, **Waiting Room**
+en qué etapa está cada visita después de llegar y **Rooms** qué pasa en cada sala. Las tres salen de la misma agenda del
+día (`dashboard-data.ts`): cada turno sabe si se completó (`completado`) o está en el sillón (`enCurso`), y los que
+llegaron están además en `waiting` con su `etapa` y `minutos`.
+
+**Appointments**
+- Sale el badge *Check In* (se confundía la acción pendiente con un estado ya registrado) y salen TR y CC (no es lo que
+  recepción necesita para registrar la llegada). Queda el botón verde.
+- Sólo los que todavía no llegaron (`pendientesDeLlegar`), en orden de hora.
+- Total en el título (`Globo`, el mismo de Patients, pasó a `dashboard/primitives`) y tope de 6 con "Show N more", en
+  todos los anchos. Antes, desde 1280px, las columnas tomaban el alto de la ventana y scrolleaban sin tope: se sacó
+  (`useAltoRestante` ya no se usa en el Dashboard).
+- **Check In** pasa la cita a Checked in de la Waiting Room (`minutos: 0`, cuenta como *new*). No sale de Scheduling: sólo
+  cambia de bloque. Si ya llegaron todos, el vacío dice *Everyone has checked in* (texto nuevo, para validar).
+
+**Waiting Room** (`WaitingRoomList`)
+- Tres grupos con su cuenta: **Checked in** (encounter Planned), **On hold** (On Hold) y **Ready to check out**
+  (Completed o Fulfilled), según CON-1670.
+- Checked in: TR y CC y *Waiting · N min* desde el check-in; primero quien más espera. On hold: *Paused · N min*, la
+  pausa actual, sin botón. Ready to check out: el Check Out azul, por hora. *Waiting* y *Paused* van en `ui/pill`
+  warning, en el lugar del botón (`estado` de `AppointmentRow`).
+- **Regla de la cuenta:** el rótulo de cada grupo dice su total, no las filas visibles. Con el tope (5), cada grupo
+  muestra al menos una fila y el resto se reparte en orden (`repartir`): ninguna etapa queda escondida detrás de "Show
+  N more" y la cuenta dice dónde están las que faltan.
+- **Check Out** la saca de la sala y la deja completada en la agenda.
+- Start Encounter sigue en la ficha que abre el turno, no en la fila.
+
+**Rooms** (`OperatoryCard` con `resumen`, calculado en `resumenSala`)
+- Contador compacto de turnos junto al nombre (cuenta turnos, no personas: el lector dice "N appointments today"); el
+  del título de Rooms cuenta salas. Sale *Patients today* y el provider fijo.
+- **Available** (verde): sin nadie en el sillón; *Next* con hora, paciente y provider. **Busy** (azul): *Now* con la
+  visita en curso y *Next* si hay. **No bookings** (gris, `StatusPill` neutral): sin turnos hoy, sin Now ni Next.
+  Reemplaza al Unavailable rojo en ese caso: no tener turnos no es estar fuera de servicio. `Unavailable` queda para una
+  sala dada de baja (no hay ninguna en la demo).
+- *Next* es el primero, por hora, que todavía no pasó por la sala: reservado o Checked in. Es la hora agendada, no una
+  estimación de cuándo se libera.
+- La línea desplegada suma *In progress* para el que está en el sillón.
+
+**Datos de la demo:** el 28-02-2026 se rearmó con los nombres del Figma (22 turnos: 2 completados, 3 en el sillón, 8 en
+la sala de espera -1 / 2 / 5- y 9 por llegar) y las salas pasan a Emergency + Operatory 1-5. `?day=busy` tiene 12
+completados, 3 en el sillón, 8 en espera y 12 por llegar. `TURNOS_PATIENTS` (Today Appointments de Patients) quedó fijo
+con su lista de antes: Patients no cambia. *Patient in session* (`PatientInSessionPopup`) lista sólo los turnos en curso.
+
+**Anomalías**
+- En el Figma la tira de números sigue en 7 / 6 / 2; acá se calcula: 22 turnos del día, 8 en espera, 5 encounters
+  abiertos (3 en curso + 2 en pausa). Quedan dos "Appointments" con números distintos (22 del día en la tira, 9 por
+  llegar en el panel).
+- En el Figma *Ready to check out · 2* tiene escondidas las 3 de "Show 3 more": contradice la regla de la cuenta. Se
+  siguió la regla.
+- En el Figma *Matthew Jenkins* es paciente en la sala de espera y provider en Operatory 1: se le dio a cada sala un
+  provider de la clínica.
+- En el celular, provider y sala se cortan con "…" cuando no entran junto al botón (el texto completo va en el title).
+
+**A validar con usuarios:** si "Appointments" en la tira (todo el día) y en el panel (por llegar) se confunden; si
+recepción quiere Cancel en el kebab de Checked in (CON-1670 lo permite sólo con el encounter Planned y el diseño no lo
+muestra); y si el orden de Ready to check out (por hora) sirve más que por quién terminó primero.
+
+## Filtros y menú ⋮ según el estado de la cita (2026-11-19, segunda tanda)
+
+**Jira:** CON-1827 (Cancel: Booked o Checked-in, motivo obligatorio), CON-1828 (No Show: sólo Booked, con confirmación,
+el lugar no se libera), CON-1995 (lo Booked sin acción pasa solo a No Show al cierre del día), CON-2801 (motivos de
+cancelación), CON-1670 (Waiting Room). Pedido de Julián con dos tablas (filtros y menú por grupo).
+
+**Appointments**
+- **Filter** con dos grupos de selección múltiple, **Provider** y **Room**, que se combinan (Dr. Elena Martinez +
+  Operatory 2 deja sólo las de esa profesional en esa sala). Sin elegir nada, todos. Las opciones salen de las citas por
+  llegar, con su cuenta. Sin filtro de estado: la columna ya es sólo Booked. *Unassigned* no aparece: en la demo toda
+  cita tiene sala.
+- **La cuenta del título pasa a ser la filtrada** (antes, el total; en Patients sigue siendo el total).
+- **Menú ⋮ de una cita Booked:** Edit appointment · Edit patient (va a `/patients/:id/edit`; el id sale de
+  `slug(nombre)`, como en la card compacta) · Mark as no-show · separador · Cancel appointment en rojo. Check In no está:
+  tiene su botón.
+- **Mark as no-show** sólo cuando la hora de la cita ya pasó (`puedeNoShow`): no para una futura. "Ahora" en el día de la
+  demo es 10:42 (`HORA_DEMO`, cuadra con Zoe Phillips esperando 12 min desde las 10:30); hoy, la hora real; un día pasado
+  ya terminó. Pregunta con `NoShowDialog` y avisa *The appointment status has been updated to No Show.*
+- **Cancel appointment** con `CancelAppointmentDialog`: el motivo (lista de CON-2801) es obligatorio y sin él el botón
+  queda deshabilitado (`ConfirmDialog` suma `confirmDisabled`). Avisa *…updated to Canceled.* con el motivo.
+- Las dos sacan la cita de la columna (`cerrado` en la agenda). Cancelled libera la sala: no cuenta en Rooms ni en la
+  tira; No Show sigue contando (el lugar no se libera) pero no es Next.
+- **Anomalía de texto:** Jira dice *Cancel | Confirm*; con una pregunta de cancelar, dos "Cancel" se confunden: los
+  botones dicen *Keep appointment* y *Cancel appointment*. Lo mismo en No Show: *Mark as No Show* en lugar de *Confirm*.
+
+**Waiting Room**
+- **Filter** con un solo grupo, **Visit stage** (Checked in, On hold, Ready to check out), de selección múltiple y con
+  la cuenta de cada etapa. Reemplaza al filtro por sala. Las cuentas del título y de cada grupo incluyen lo que está
+  detrás de "Show N more".
+- **Menú ⋮ por etapa** (Check Out tiene su botón y no se repite):
+
+| Etapa | Menú | Qué deja editar Edit appointment |
+|---|---|---|
+| Checked in | Edit appointment · Cancel appointment | Todo menos paciente, status, fecha y hora |
+| On hold | Edit appointment | Sólo la sala (abre en *Schedule*); el encounter sigue en pausa |
+| Ready to check out | Edit appointment | Sólo las notas (abre en *Additional*) |
+
+- `NewAppointmentModal` suma `bloqueados` (campos, `flags` de Additional y `plan`) y `nota`: lo bloqueado se ve en
+  sólo lectura (un `fieldset` deshabilitado) y arriba un `ui/alert` info dice por qué. Con la fecha bloqueada no se abre
+  el calendario del costado.
+
+**A validar con usuarios:** si 10–15 minutos de tolerancia antes de ofrecer No Show sirve más que "ya pasó la hora" (hoy
+no hay regla de la clínica en Jira; convendría una configuración); si en Checked in hace falta cambiar la hora
+(se dejó bloqueada: el paciente ya está y el encounter, creado); y si *Edit patient* debería depender de un permiso (hoy
+no hay permisos en la app).

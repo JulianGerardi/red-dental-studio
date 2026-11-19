@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ShowMore } from '@/components/ui/show-more'
 import { NewPatientModal } from '@/pages/patients/NewPatientModal'
-import { Panel } from '@/components/dashboard/primitives'
+import { Globo, Panel } from '@/components/dashboard/primitives'
 import { AppointmentCard, type Appointment } from '@/components/dashboard/AppointmentCard'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
 import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
@@ -32,14 +32,8 @@ const LIMITE_RECIENTES = 3
 const CANTIDAD_RECIENTES = 10
 
 /* Globo con el total -no el filtrado ni el visible- al lado del título del
-   panel, mismo color que el de notificaciones de la campana. */
-export function Globo({ n }: { n: number }) {
-  return (
-    <span className="bg-dash-blue flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold text-white">
-      {n}
-    </span>
-  )
-}
+   panel, mismo color que el de notificaciones de la campana. Vive en dashboard/primitives: lo usa también el Dashboard. */
+export { Globo }
 
 /* Figma 3638:59529 "Patients — List".
    Los formatos de fecha mezclados ("April 2" / "Jan 15" / "June 2" / "Jun 3")

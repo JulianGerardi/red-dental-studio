@@ -160,7 +160,8 @@ export function PatientInSessionPopup({ onRect }: {
   onRect?: (r: RectFlotante) => void
 }) {
   const enCurso = useMemo(
-    () => datosDelDia(HOY_DEMO).appointments.filter((a) => !a.completado),
+    /* Los que están en el sillón (`enCurso`): los Now de Rooms en el Dashboard (dashboard.md, 2026-11-19). */
+    () => datosDelDia(HOY_DEMO).appointments.filter((a) => a.enCurso),
     [],
   )
   const [ocultos, setOcultos] = useState<Set<number>>(() => new Set())

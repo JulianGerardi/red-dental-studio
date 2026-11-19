@@ -5,6 +5,30 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
+### Dashboard: cada columna, su momento de la visita; filtros y menú ⋮ según el estado ([#166](https://github.com/JulianGerardi/red-dental-studio/pull/166))
+- **Appointments** muestra sólo las citas que todavía no llegaron, en orden de hora, sin el badge *Check In* ni TR/CC.
+  Total en el título y tope de 6 con "Show N more". **Check In** pasa la cita a la Waiting Room.
+  Filter **Provider** + **Room** combinados; el título cuenta lo filtrado.
+- **Menú ⋮ de una cita Booked:** Edit appointment · Edit patient · Mark as no-show (sólo con la hora pasada, CON-1828) ·
+  Cancel appointment (motivo obligatorio, CON-1827). Check In y Check Out nunca van en el menú: tienen su botón.
+- **Waiting Room** en tres grupos por etapa del encounter (CON-1670): **Checked in** (TR, CC y *Waiting · N min*),
+  **On hold** (*Paused · N min*) y **Ready to check out** (el único con Check Out). Cada grupo muestra al menos una fila y
+  su cuenta es el total. Filter **Visit stage** en lugar del de sala. Cancel sólo en Checked in.
+- **Edit appointment desde la Waiting Room** deja campos en sólo lectura según la etapa: Checked in todo menos paciente,
+  status, fecha y hora; On hold sólo la sala; Ready to check out sólo las notas.
+- **Rooms:** contador de citas junto al nombre y, cerrada, *Now* / *Next*. Estados Available, Busy y **No bookings**
+  (gris, sala sin citas); *Unavailable* queda para una sala fuera de servicio. Sale *Patients today*.
+- **Para el dev:**
+  - Componentes nuevos: `WaitingRoomList` y `AppointmentStatusDialogs` (`CancelAppointmentDialog`, `NoShowDialog`).
+  - `MenuCard` pasa a Radix y acepta `acciones`. `AppointmentRow` suma `chips`, `estado`, `onAccion` y `acciones`.
+  - `NewAppointmentModal` suma `bloqueados` y `nota`; `ConfirmDialog` suma `confirmDisabled`.
+  - `OperatoryCard` suma `resumen`; `OperatoryStatus` suma `'No bookings'`.
+  - `Globo` se mudó a `dashboard/primitives` (Patients lo reexporta).
+  - En `dashboard-data.ts`, cada turno de la agenda lleva `completado` / `enCurso` / `cerrado`; `EnEspera` lleva
+    `etapa` y `minutos`. Helpers: `pendientesDeLlegar`, `resumenSala`, `puedeNoShow`, `HORA_DEMO` y
+    `MOTIVOS_CANCELACION` (CON-2801). `TURNOS_PATIENTS` quedó fijo.
+  - Desde 1280px las columnas ya no toman el alto de la ventana. Decisiones en `modulos/dashboard.md` (2026-11-19).
+
 ### Mails de la plataforma: plantilla única para el backend y página aparte ([#165](https://github.com/JulianGerardi/red-dental-studio/pull/165))
 - **Los 16 mails** de "Email Propuesta" (onboarding, turnos, treatment plan, firma, paciente, empleado, suscripción y
   guardian) sobre **un solo layout** con siete bloques fijos (saludo, párrafo, aviso, detalles, botón, nota y firma) y

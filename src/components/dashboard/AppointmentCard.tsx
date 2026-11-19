@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  Check, X, EllipsisVertical, Pencil, User, DoorClosed, Clock, ArrowRight, CalendarDays,
+  Check, X, EllipsisVertical, Pencil, User, DoorClosed, Clock, ArrowRight, CalendarDays, type LucideIcon,
 } from 'lucide-react'
 import { InnerCard, StatusPill } from './primitives'
 import { cn } from '@/lib/utils'
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { RowActionsMenu } from '@/components/ui/row-actions-menu'
 import { aviso } from '@/components/ui/toaster'
 import { BUTTON_VARIANTS, type ButtonVariant } from '@/components/ui/button'
@@ -214,51 +213,43 @@ export function Field({ icon, text }: { icon: React.ReactNode; text: string }) {
 }
 
 
-/* El kebab del frame está dibujado sin menú. Despliega "Edit appointment",
-   que abre el mismo modal de alta con los datos de la card ya cargados. */
-export function MenuCard({ nombre, onEdit }: { nombre: string; onEdit?: () => void }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+export type AccionMenu = {
+  label: string
+  icon: LucideIcon
+  onSelect: () => void
+  /** Cancel appointment: rojo y separado de las de edición, para no tocarlo por error. */
+  destructiva?: boolean
+}
 
-  useEffect(() => {
-    if (!open) return
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
-    document.addEventListener('mousedown', onDown)
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('mousedown', onDown)
-      document.removeEventListener('keydown', onKey)
-    }
-  }, [open])
-
+/* El kebab de la card y de la fila. Sin `acciones`, sólo "Edit appointment" (abre el mismo drawer con los datos de la
+   card). Con `acciones`, las que tocan según el estado de la cita; nunca Check In ni Check Out, que tienen su botón
+   (dashboard.md, 2026-11-19). Las destructivas van al final, después de un separador. */
+export function MenuCard({ nombre, onEdit, acciones }: { nombre: string; onEdit?: () => void; acciones?: AccionMenu[] }) {
+  const lista = acciones ?? (onEdit ? [{ label: 'Edit appointment', icon: Pencil, onSelect: onEdit }] : [])
+  const normales = lista.filter((x) => !x.destructiva)
+  const destructivas = lista.filter((x) => x.destructiva)
+  const item = (x: AccionMenu) => (
+    <DropdownMenuItem key={x.label} variant={x.destructiva ? 'destructive' : 'default'} onSelect={x.onSelect} className="text-[13px]">
+      <x.icon className="size-3.5" /> {x.label}
+    </DropdownMenuItem>
+  )
   return (
-    <div ref={ref} className="relative" onClick={(e) => e.stopPropagation()}>
-      <button
-        type="button"
-        aria-label={`Actions for ${nombre}`}
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className={cn(
-          'flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-ink shadow-sm hover:bg-surface-muted',
-          open && 'bg-surface-muted',
+    <div onClick={(e) => e.stopPropagation()}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          aria-label={`Actions for ${nombre}`}
+          className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-ink shadow-sm hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue data-[state=open]:bg-surface-muted"
+        >
+          <EllipsisVertical className="size-4" />
+        </DropdownMenuTrigger>
+        {lista.length > 0 && (
+          <DropdownMenuContent align="end" className="w-max min-w-[190px]">
+            {normales.map(item)}
+            {normales.length > 0 && destructivas.length > 0 && <DropdownMenuSeparator />}
+            {destructivas.map(item)}
+          </DropdownMenuContent>
         )}
-      >
-        <EllipsisVertical className="size-4" />
-      </button>
-      {open && onEdit && (
-        <div className="motion-safe:animate-[loc-in_120ms_ease-out] absolute top-full right-0 z-30 mt-1 w-44 overflow-hidden rounded-md border border-line bg-white py-1 shadow-lg">
-          <button
-            type="button"
-            onClick={() => { setOpen(false); onEdit() }}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-surface-muted"
-          >
-            <Pencil className="size-3.5" /> Edit appointment
-          </button>
-        </div>
-      )}
+      </DropdownMenu>
     </div>
   )
 }

@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
    Con `otherAction` es una decisión de tres salidas antes de seguir (Consent required, clinical-mode.md 2026-10-17).
    El tono lleva un ícono de 16 px junto al título, sin círculo (propuesta A, figma/README.md 2026-11-16). */
 export function ConfirmDialog({
-  title, children, confirmLabel, onConfirm, onCancel, tone = 'primary', cancelLabel = 'Cancel', icon, otherAction, loading, hideCancel,
+  title, children, confirmLabel, onConfirm, onCancel, tone = 'primary', cancelLabel = 'Cancel', icon, otherAction, loading, hideCancel, confirmDisabled,
 }: {
   title: string
   children: ReactNode
@@ -28,6 +28,8 @@ export function ConfirmDialog({
   loading?: boolean
   /** Un aviso que frena la acción y no deja nada para elegir (Unable to deactivate…): sólo el botón principal. */
   hideCancel?: boolean
+  /** Falta algo para confirmar (el motivo de Cancel appointment): la acción principal queda deshabilitada. */
+  confirmDisabled?: boolean
 }) {
   const Icono = icon === 'delete' ? Trash2 : icon === 'warning' ? CircleAlert : tone === 'danger' ? TriangleAlert : Info
   /* Radix devuelve el foco a un Trigger que acá no hay: al cerrar vuelve al botón que abrió la pregunta (Save, Delete…). */
@@ -57,7 +59,7 @@ export function ConfirmDialog({
         <div className={cn('mt-2 flex flex-wrap justify-end gap-2', otherAction && 'max-sm:[&>button]:flex-1')}>
           {!hideCancel && <Button variant="secondary" size="md" onClick={onCancel} disabled={loading}>{cancelLabel}</Button>}
           {otherAction && <Button variant="secondary" size="md" onClick={otherAction.onClick} disabled={loading}>{otherAction.label}</Button>}
-          <Button variant={tone === 'danger' ? 'destructive' : 'primary'} size="md" onClick={onConfirm} loading={loading}>{confirmLabel}</Button>
+          <Button variant={tone === 'danger' ? 'destructive' : 'primary'} size="md" onClick={onConfirm} loading={loading} disabled={confirmDisabled}>{confirmLabel}</Button>
         </div>
       </DialogContent>
     </Dialog>
