@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import { OperatoryCard, type Operatory } from './OperatoryCard'
 import type { Appointment } from './AppointmentCard'
+import { resumenSala, type DiaDashboard } from './dashboard-data'
 
 /* Las salas del Dashboard como lista de acordeones (artifact de Julián, 2026-10-19): cada una se despliega sola y puede
    haber varias abiertas. Cada sala cuenta sus turnos del día; no filtra la Waiting Room, que es independiente.
    Ver design-reference/figma/modulos/dashboard.md. */
-export function OperatoryList({ rooms, turnos, onSelect }: {
+export function OperatoryList({ rooms, turnos, dia, onSelect }: {
   rooms: Operatory[]
   /** Los turnos del día, de todas las salas: cada card toma los suyos por nombre. */
   turnos: Appointment[]
+  /** Con el día completo, cada sala calcula su estado, Now y Next (dashboard.md, 2026-11-19). */
+  dia?: DiaDashboard
   onSelect?: (appt: Appointment, el: HTMLElement) => void
 }) {
   const [abiertas, setAbiertas] = useState<string[]>([])
@@ -18,7 +21,7 @@ export function OperatoryList({ rooms, turnos, onSelect }: {
     <div role="group" aria-label="Rooms" className="flex flex-col gap-2.5">
       {rooms.map((r) => (
         <OperatoryCard
-          key={r.name} room={r} turnos={turnos.filter((t) => t.operatory === r.name)}
+          key={r.name} room={r} turnos={turnos.filter((t) => t.operatory === r.name)} resumen={dia && resumenSala(r, dia)}
           abierta={abiertas.includes(r.name)} onToggle={() => alternar(r.name)} onSelect={onSelect}
         />
       ))}
