@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
-### Dashboard: cada columna, su momento de la visita; filtros y menú ⋮ según el estado (#PR)
+### Dashboard: cada columna, su momento de la visita; filtros y menú ⋮ según el estado ([#166](https://github.com/JulianGerardi/red-dental-studio/pull/166))
 - **Appointments** muestra sólo las citas que todavía no llegaron, en orden de hora, sin el badge *Check In* ni TR/CC.
   Total en el título y tope de 6 con "Show N more". **Check In** pasa la cita a la Waiting Room.
   Filter **Provider** + **Room** combinados; el título cuenta lo filtrado.
