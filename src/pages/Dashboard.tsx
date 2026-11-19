@@ -328,7 +328,7 @@ export default function Dashboard() {
       {/* El día de hoy pasó al Topbar y el elegido lo dice el selector (Julián, 2026-10-13). La fecha manda sobre toda la
           pantalla y vive acá arriba, no adentro de Appointments. Los controles van debajo del título, como en el resto de
           la app (Scheduling), y los números a la derecha de esa fila (dashboard.md, 2026-11-19). */}
-      <PageTitle size="lg">Dashboard</PageTitle>
+      <PageTitle>Dashboard</PageTitle>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
         <FiltroFecha value={date} onChange={setDate} marked={diasConDatos} />
         <div data-tour="dash-stats">
