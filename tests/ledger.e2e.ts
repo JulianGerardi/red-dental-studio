@@ -80,3 +80,23 @@ test('Charge Adjustment (+) abre su drawer y pide el monto', async ({ app, scree
   await drawer.getByRole('button', /^Save/).tap()
   await expect(drawer.getByText(/This field is required/)).toBeVisible()
 })
+
+/* Sin transacciones abiertas no hay a qué aplicar: sin métodos de pago y Save apagado, como red.dev (ledger.md, 2026-11-19). */
+test('quien ya no tiene cargos abiertos no muestra métodos de pago y Save queda apagado', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/ledger')
+  await screen.getByRole('button', /^Patient Payment \(-\)/).tap()
+  let drawer = screen.getByRole('dialog')
+  await drawer.getByRole('button', /John Smith \(Guarantor\)/).tap()
+  await drawer.getByRole('button', /^Maximiliano Fernández-Ugarte$/).tap()
+  await expect(drawer.getByText('Showing 1 open transactions')).toBeVisible()
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText(/posted for Maximiliano Fernández-Ugarte/)).toBeVisible()
+
+  await screen.getByRole('button', /^Patient Payment \(-\)/).tap()
+  drawer = screen.getByRole('dialog')
+  await drawer.getByRole('button', /John Smith \(Guarantor\)/).tap()
+  await drawer.getByRole('button', /^Maximiliano Fernández-Ugarte$/).tap()
+  await expect(drawer.getByText('Showing 0 open transactions')).toBeVisible()
+  await expect(drawer.getByRole('textbox', /^Amount/)).toHaveCount(0)
+  await expect(drawer.getByRole('button', /^Save/)).toBeDisabled()
+})

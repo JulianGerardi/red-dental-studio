@@ -1020,3 +1020,23 @@ componente (`PostPaymentDialog`) para las dos pantallas.
    app (dos botones del mismo ancho). Con un paciente sin cargos abiertos, red.dev esconde los métodos de pago y deja la
    tabla cargando; acá se ven los métodos y la tabla dice *No open transactions* (el pago queda como crédito).
 6. **Household en las dos vistas** (también en Patient View), con link a la ficha de cada persona.
+
+### Drawers sin íconos y con la lógica del video (2026-11-19)
+
+Julián: los íconos de los títulos de sección (*Payment Information*, *Credit Adjustment Information*, *Adjustment
+Information*) están en red.dev pero no van; el diseño es el nuestro y la lógica tiene que ser la del video (o la de
+red.dev), sin inventar.
+
+1. **Sin íconos** en el título de la card de datos.
+2. **Sin transacciones abiertas no hay a qué aplicar** (video: Apply to con un paciente sin cargos): el pago no muestra
+   los métodos de pago y Save queda apagado; en el crédito, Save también apagado. Revierte el punto 5 de la sección
+   anterior (*acá se ven los métodos y el pago queda como crédito*), que era invento. La tabla dice *No open
+   transactions* (red.dev deja el esqueleto de carga) y "Showing 0 open transactions"; sale la bajada *What you post
+   stays as unapplied credit*.
+3. **Ledger Transactions ordenada por fecha**, del cargo más viejo al más nuevo, como red.dev (antes iba agrupada por
+   persona).
+4. Igual que en el video: con transacciones, Save se prende aunque falten Check o Bank/Branch (se validan al guardar);
+   el crédito arranca sin monto ni tipo; Enter Charge (+) Adjustment tiene Save siempre prendido y valida al guardar.
+5. Siguen siendo nuestros (diseño, no lógica): el selector de fecha de la app, el placeholder *Add a note (optional)* y
+   el pie de dos botones del mismo ancho.
+

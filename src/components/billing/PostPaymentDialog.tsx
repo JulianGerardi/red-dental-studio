@@ -1,6 +1,6 @@
 import { DrawerActions } from '@/components/ui/drawer'
 import { useEffect, useState } from 'react'
-import { CreditCard, Minus, MinusSquare, Plus, type LucideIcon } from 'lucide-react'
+import { Minus, Plus } from 'lucide-react'
 import {
   ModalShell, TextField, SelectField, TextArea, FieldLabel,
 } from '@/components/patients/form'
@@ -25,10 +25,10 @@ const TITULO: Record<TipoAjusteBilling, string> = {
   'Credit Adjustment': 'Credit Adjustment (-)',
   'Charge Adjustment': 'Enter Charge (+) Adjustment',
 }
-const SECCION: Record<TipoAjusteBilling, { titulo: string; icono: LucideIcon }> = {
-  'Patient Payment': { titulo: 'Payment Information', icono: MinusSquare },
-  'Credit Adjustment': { titulo: 'Credit Adjustment Information', icono: MinusSquare },
-  'Charge Adjustment': { titulo: 'Adjustment Information', icono: CreditCard },
+const SECCION: Record<TipoAjusteBilling, string> = {
+  'Patient Payment': 'Payment Information',
+  'Credit Adjustment': 'Credit Adjustment Information',
+  'Charge Adjustment': 'Adjustment Information',
 }
 const REQUERIDO = OBLIGATORIO
 const CHEQUE = 'Check Payment'
@@ -91,6 +91,8 @@ export function PostPaymentDialog({
   const [intentado, setIntentado] = useState(false)
 
   const cargos = cargosDe(aplicaA)
+  /* Sin transacciones abiertas no hay a qué aplicar: el pago no muestra métodos y Save queda apagado (red.dev, ledger.md 2026-11-19). */
+  const sinCargos = conAlcance && cargos.length === 0
   const total = tipo === 'Patient Payment' ? metodos.reduce((a, f) => a + (Number(f.monto) || 0), 0) : Number(monto) || 0
   /* Applied se reparte solo cuando cambia el monto o a quién se aplica; después se puede tocar fila por fila. */
   const [aplicado, setAplicado] = useState<Record<string, string>>(() => repartirPendiente(cargos, total))
@@ -104,7 +106,7 @@ export function PostPaymentDialog({
   const visitas = [...new Set(cargos.map((c) => `Visit - ${c.fecha}`))]
   const setFila = (id: number, cambios: Partial<Metodo>) => setMetodos((p) => p.map((f) => (f.id === id ? { ...f, ...cambios } : f)))
 
-  const faltaAlgo = !fecha || !aplicaA || (tipo === 'Patient Payment'
+  const faltaAlgo = sinCargos || !fecha || !aplicaA || (tipo === 'Patient Payment'
     ? metodos.some((f) => !f.monto.trim() || (f.metodo === CHEQUE && (!f.cheque.trim() || !f.banco.trim())))
     : !monto.trim() || !ajuste)
 
@@ -155,19 +157,17 @@ export function PostPaymentDialog({
     <TextField label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto} error={intentado && !monto.trim() ? REQUERIDO : undefined} />
   )
   const campoNotas = <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} rows={3} />
-  const { titulo: tituloSeccion, icono: Icono } = SECCION[tipo]
+  const tituloSeccion = SECCION[tipo]
 
   return (
     <ModalShell
       title={TITULO[tipo]} onClose={onClose} width={tipo === 'Charge Adjustment' ? 'max-w-[860px]' : 'max-w-[1000px]'}
-      actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
+      actions={<DrawerActions onCancel={onClose} onSave={guardar} saveDisabled={sinCargos} />}
     >
       <div className="flex flex-col gap-6">
-        {/* La card de datos, con su título e ícono, como red.dev. */}
+        {/* La card de datos con su título, sin el ícono de red.dev (pedido de Julián). */}
         <section aria-label={tituloSeccion} className={cn(TARJETA_INTERNA, 'flex flex-col gap-4 p-5')}>
-          <h3 className="flex items-center gap-2 text-[15px] font-semibold text-ink">
-            <Icono aria-hidden className="size-[18px] text-ink-muted" /> {tituloSeccion}
-          </h3>
+          <h3 className="text-[15px] font-semibold text-ink">{tituloSeccion}</h3>
 
           {tipo === 'Charge Adjustment' && (
             <div className="grid gap-4 sm:grid-cols-3">
@@ -199,7 +199,7 @@ export function PostPaymentDialog({
                 {campoAplica}
               </div>
               {/* Cada método en su caja gris: + suma otro y − lo saca. Cheque pide número y banco (red.dev). */}
-              {metodos.map((f, i) => {
+              {!sinCargos && metodos.map((f, i) => {
                 const ultimo = i === metodos.length - 1
                 return (
                   <div key={f.id} className="flex items-start gap-2 rounded-lg border border-line-row bg-surface-subtle p-3">

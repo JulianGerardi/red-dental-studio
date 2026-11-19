@@ -10,11 +10,14 @@ import { Receipt } from 'lucide-react'
 export type CargoAbierto = Movimiento & { pendiente: number }
 
 /** Reparte un monto entre los cargos, del más viejo al más nuevo, sin pasarse de lo que falta de cada uno. */
+const tiempo = (m: Movimiento) => new Date(m.fecha).getTime() || 0
+/** Del cargo más viejo al más nuevo, como la tabla de red.dev. */
+const porFecha = (cargos: CargoAbierto[]) => [...cargos].sort((a, b) => tiempo(a) - tiempo(b))
+
 export function repartirPendiente(cargos: CargoAbierto[], monto: number): Record<string, string> {
-  const fecha = (m: Movimiento) => new Date(m.fecha).getTime() || 0
   let resto = Math.round(monto * 100) / 100
   const out: Record<string, string> = {}
-  for (const m of [...cargos].sort((a, b) => fecha(a) - fecha(b))) {
+  for (const m of porFecha(cargos)) {
     if (resto <= 0) break
     const va = Math.min(resto, m.pendiente)
     out[m.id] = va.toFixed(2)
@@ -61,7 +64,7 @@ export function TransaccionesAbiertas({ cargos, aplicado, onAplicado, monto }: {
               </tr>
             </thead>
             <tbody>
-              {cargos.map((m) => {
+              {porFecha(cargos).map((m) => {
                 const ap = Number(aplicado[m.id]) || 0
                 return (
                   <tr key={m.id} className="border-t border-line-row">
@@ -94,7 +97,7 @@ export function TransaccionesAbiertas({ cargos, aplicado, onAplicado, monto }: {
             </tbody>
           </table>
           {cargos.length === 0 && (
-            <EmptyState icon={Receipt} title="No open transactions" detail="What you post stays as unapplied credit." className="border-0 py-8" />
+            <EmptyState icon={Receipt} title="No open transactions" className="border-0 py-8" />
           )}
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row bg-surface-subtle px-4 py-3">

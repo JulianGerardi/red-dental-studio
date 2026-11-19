@@ -449,3 +449,8 @@ Julián mandó cuatro grabaciones de Billing de red.dev y pidió respetar las al
 4. **A validar:** en el celular, al elegir un paciente de Find Patient (debajo de la tabla) la pantalla sube al título,
    donde están sus botones.
 5. Los drawers pasan a una sola página como red.dev (detalle en ledger.md, *Los drawers, tal cual red.dev*).
+
+### Drawers sin íconos y con la lógica del video (2026-11-19)
+
+Mismo cambio que `ledger.md` (misma fecha): sin íconos en los títulos de sección; sin transacciones abiertas, el pago
+no muestra métodos y Save queda apagado (también en el crédito); Ledger Transactions ordenada por fecha.
