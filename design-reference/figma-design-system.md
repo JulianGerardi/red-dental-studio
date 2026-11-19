@@ -182,3 +182,9 @@ Auditoría de conexión (antes): texto sin estilo ~30 %, sombras sin estilo ~90 
 - Motor `tareas` (plugin data `rds.ds/tareasSrc`, marca `tareas` por pantalla): reemplaza cada `TaskRow` de 59 px por una instancia, copiando tipo, detalle, vencimiento y etiqueta del pill; sólo si coincide la altura y el texto es "Expired date". 96 filas convertidas (Login, Header & Sidebar, Dashboard, Overview y Notifications).
 - Pendiente: cards de Appointments de la ficha del paciente, campos y tablas; fijar el ícono flecha en el botón de `Appointment row` y `Task row` (hoy lo pone el motor, `236:3520`); borrar `Appointment row (old)`.
 - Nota de publicación: Figma no marcaba los componentes nuevos como "para publicar" hasta que se les agregó una descripción.
+
+## Card de cita del paciente conectada (2026-11-19)
+
+- **Patient appointment card** (nuevo, `🗂️ Cards & Layout`): card de cita de la ficha del paciente (Overview) 248 px, con barra lateral de 3 px del color del estado, avatar, nombre, pill, servicio, fecha y lugar; `Status=Booked` suma Cancel (144 px; el resto 108). Estados: Booked, Cancelled, Fulfilled y No Show. Propiedades: Patient, Service, When, Where. El `Appointment card` anterior del DS es de otro diseño (360×150) y no se usa en las pantallas.
+- Motor `citas` (plugin data `rds.ds/citasSrc`, marca `citas` por pantalla): reemplaza cada `PatientAppointmentCard` por una instancia, copiando textos, iniciales y estado; sólo si coincide la altura. 119 cards convertidas; diferencia con la ficha original ≈ 0,16 % de los píxeles.
+- Pendiente: campos y tablas; fijar el ícono flecha en los botones de `Appointment row` y `Task row`; borrar `Appointment row (old)` y revisar si el `Appointment card` viejo se puede borrar.
