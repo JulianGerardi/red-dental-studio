@@ -5,6 +5,17 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
+### Documentación: New/Edit Patient, menús de tabla y Figma de Patients y Settings ([#164](https://github.com/JulianGerardi/red-dental-studio/pull/164))
+- **Storybook:** *Pages / Parts / Patient modals* pasa a Playground, Parts, States y Specs, con New Patient (pasos,
+  duplicado) y Edit Patient (la pantalla, completa y con datos que faltan); Fields suma *Contact* y *Address*. *Fields*
+  suma la regla y la story *Checkbox beside a field*; *Tables* la fila *Row actions* y el nombre como texto en Settings.
+- **Se borran** `EditPatientModal` (el drawer viejo con pestañas) y `EditPatientForm` (el formulario fijo del Figma): la
+  app ya no los usaba. `PatientDetail` deja el estado `'edit'` que nadie abría.
+- **Screens & Flows:** recapturadas 🧍 Patients (suma *New Patient (ya registrado)*; *Edit* es la pantalla con cards) y
+  Settings — Employees, Locations y Accounts, conectadas a la library.
+- **Para el dev:** `EditPatientPage` acepta `pacienteId` (sólo para Storybook). En Figma, los motores para conectar
+  pantallas son `motorLib` y `chipcountLib`; `motor` y `chipcount` ya no corren (`figma-docs.md`, 2026-11-19).
+
 ### Pending Signature por paciente, con tres pacientes de ejemplo ([#133](https://github.com/JulianGerardi/red-dental-studio/pull/133))
 - `patient-0002`, `patient-0003` y `patient-0005` abren con **Pending Signature**, para verlo sin hacer el flujo;
   `patient-0001` sigue con Start Encounter. La nota sin firmar queda en el paciente desde el que se cerró el encuentro.

@@ -47,6 +47,8 @@ const meta = {
           '',
           '**Date puede abrir con una fecha cargada** (`valorInicial`, 2026-10-22): Edit Patient abre con el nacimiento puesto, como lo devuelve `onChange` ("April 2, 2025"). Sin ella sigue pidiendo la fecha.',
           '',
+          '**Checkbox al lado de un campo** (2026-11-18): cuando una opción va de la mano de un select (*Interpreter Required* junto a *Language* en Demography), va en la misma fila, abajo de su celda y a 36px de alto (`className="h-9 items-center py-0"`), así queda a la altura del control y no del rótulo. Ver *States → Checkbox beside a field*.',
+          '',
           '**Probalo:** en *Playground* cambiá tipo, rótulo, valor, ayuda, error y estado desde *Controls*; en *States → Person search*, escribí un nombre de la lista para ver el desplegable, elegí uno y quitalo con la ✕.',
         ].join('\n'),
       },
@@ -193,6 +195,20 @@ export const PersonSearch: Story = {
         </div>
       </Bloque>
     </Lienzo>
+  ),
+}
+
+/* Una opción que va con un select: misma fila, a la altura del control (Interpreter Required junto a Language). */
+export const CheckboxBesideField: Story = {
+  name: 'States → Checkbox beside a field',
+  parameters: { controls: { disable: true } },
+  render: () => (
+    <div className="grid w-[560px] max-w-full grid-cols-1 gap-4 sm:grid-cols-2">
+      <SelectField label="Language" options={['English', 'Spanish']} value="Spanish" onChange={() => {}} />
+      <div className="flex flex-col justify-end">
+        <OptionCheckbox label="Interpreter Required" defaultChecked className="h-9 items-center py-0" />
+      </div>
+    </div>
   ),
 }
 
