@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { SquareMinus, SquarePlus } from 'lucide-react'
 import { DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { DatePicker } from '@/components/ui/date-picker'
-import { FieldError, FieldLabel, FormFooter, ModalShell } from '@/components/patients/form'
+import { FieldError, FieldLabel, ModalShell } from '@/components/patients/form'
 import type { Aplicacion, Movimiento } from '@/data/ledger'
 import {
   autoAplicar, cargosAbiertos, comoTexto, pacienteDeAlcance, resumenAplicacion,
@@ -26,8 +26,8 @@ export type FormularioLedger = {
   /** Un solo movimiento y, si se aplicó algo, cuánto fue a cada cargo (id → monto). */
   onGuardar: (m: Omit<Movimiento, 'id'>, aplicado: Record<string, number>) => void
   onCancelar: () => void
-  /** Ledger: pestaña con tarjetas apiladas. Billing: drawer, con pasos si hay tabla de aplicación. */
-  modo?: 'tab' | 'drawer'
+  /** Los profesionales que se pueden elegir (Enter Charge (+) Adjustment). */
+  providers?: string[]
 }
 
 /** Los cargos del alcance elegido y lo que se va aplicando: se reparten solos al cambiar el importe o el alcance. */
@@ -68,10 +68,11 @@ export function CampoFecha({ value, onChange, error }: { value: Date | null; onC
   )
 }
 
-/** Una sección del formulario: en la pestaña, una card con su título (se pliega con el cuadradito); en el drawer, sin caja. */
-export function SeccionLedger({ titulo, modo, children }: { titulo: string; modo: 'tab' | 'drawer'; children: ReactNode }) {
+/** Una sección del formulario: con `caja`, una card con su título que se pliega con el cuadradito (Payment Information, como
+    red.dev); sin ella, sólo los campos (las secciones del drawer van sin caja). */
+export function SeccionLedger({ titulo, caja, children }: { titulo: string; caja?: boolean; children: ReactNode }) {
   const [abierta, setAbierta] = useState(true)
-  if (modo === 'drawer') return <div className="flex flex-col gap-4">{children}</div>
+  if (!caja) return <div className="flex flex-col gap-4">{children}</div>
   const Icono = abierta ? SquareMinus : SquarePlus
   return (
     <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
@@ -87,16 +88,15 @@ export function SeccionLedger({ titulo, modo, children }: { titulo: string; modo
   )
 }
 
-/** El contenedor: en la pestaña todo seguido con Cancel y Save al pie; en el drawer, con título, pasos y el pie del sistema. */
+/** El drawer: con título y el pie del sistema. Con `pasos`, la tabla de aplicación es el segundo paso; sin ellos, todo junto en
+    un solo paso (Patient Payment, como red.dev); sin tabla, una sola sección (Charge Adjustment). */
 export function ShellLedger({
-  modo = 'tab', titulo, pasos, primero, segundo, validarPrimero, onGuardar, onCancelar, guardando,
+  titulo, pasos, primero, segundo, validarPrimero, onGuardar, onCancelar, guardando,
 }: {
-  modo?: 'tab' | 'drawer'
   titulo: string
-  /** Los nombres de los pasos del drawer; sin ellos (Charge Adjustment) es un solo paso. */
+  /** Los nombres de los dos pasos; sin ellos, `primero` y `segundo` van juntos. */
   pasos?: [string, string]
   primero: ReactNode
-  /** La tabla de aplicación: en la pestaña va debajo, en el drawer es el segundo paso. */
   segundo?: ReactNode
   /** Antes de pasar al segundo paso: marca los errores y dice si se puede seguir. */
   validarPrimero?: () => boolean
@@ -106,19 +106,13 @@ export function ShellLedger({
   guardando?: boolean
 }) {
   const [paso, setPaso] = useState(0)
-  if (modo === 'tab') {
+  if (!segundo || !pasos) {
     return (
-      <div className="flex flex-col gap-4">
-        {primero}
-        {segundo}
-        <div className="flex justify-end gap-3"><FormFooter onCancel={onCancelar} onSave={onGuardar} saveDisabled={guardando} /></div>
-      </div>
-    )
-  }
-  if (!pasos || !segundo) {
-    return (
-      <ModalShell title={titulo} onClose={onCancelar} actions={<DrawerActions onCancel={onCancelar} onSave={onGuardar} />}>
-        {primero}
+      <ModalShell
+        title={titulo} onClose={onCancelar} width={segundo ? 'max-w-[1000px]' : undefined}
+        actions={<DrawerActions onCancel={onCancelar} onSave={onGuardar} saveDisabled={guardando} />}
+      >
+        <div className="flex flex-col gap-6">{primero}{segundo}</div>
       </ModalShell>
     )
   }

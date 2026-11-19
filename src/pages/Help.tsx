@@ -24,7 +24,6 @@ export default function Help() {
   return (
     <div className="px-4 py-6 sm:px-8">
       <PageTitle>What can we help you with?</PageTitle>
-      <p className="mt-[9px] text-xs leading-[17px] text-ink-faint">Pick a topic and we'll take you to the screen it lives on, and explain it there.</p>
 
       <div className="mt-5 flex flex-col gap-3">
         {MODULES.map((m) => {

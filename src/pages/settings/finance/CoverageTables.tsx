@@ -14,7 +14,7 @@ import { RangesTable, rangoCompleto, rangoVacio } from '@/components/finance/Ran
 import { ExceptionsDrawer } from '@/components/finance/ExceptionsDrawer'
 import { TARJETA_PANEL } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
-import { TIPOS_COBERTURA, cantidad, idNuevo, type TablaCobertura, type TipoCobertura } from '@/data/finanzas'
+import { TIPOS_COBERTURA, idNuevo, type TablaCobertura, type TipoCobertura } from '@/data/finanzas'
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Settings → Billing → Coverage Table como en red.dev: plantillas de cobertura (rangos de códigos con su categoría, tipo de
@@ -129,7 +129,6 @@ export function SettingsCoverageTables() {
     <div className="px-4 py-6 sm:px-8">
       <SettingsPageHeader
         titulo="Search Coverage Table"
-        bajada={elegida ? `${elegida.nombre} · ${elegida.tipo} · ${cantidad(elegida.rangos.length, 'range')}` : 'Coverage templates that each insurance plan copies with Copy from template.'}
         accion={<Button onClick={() => navigate(`${LISTA_COBERTURAS}/new`)}><Plus /> New Coverage Table</Button>}
       />
       <div className={cn(TARJETA_PANEL, 'mt-5 grid gap-6 p-4 sm:p-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start')}>
@@ -151,7 +150,7 @@ export function SettingsCoverageTables() {
 export function SettingsNewCoverageTable() {
   return (
     <div className="px-4 py-6 sm:px-8">
-      <SettingsPageHeader titulo="Coverage Table" bajada="Add the code ranges and what the plan pays for each one." />
+      <SettingsPageHeader titulo="Coverage Table" />
       <div className={cn(TARJETA_PANEL, 'mt-5 p-4 sm:p-5')}>
         <CoverageTableEditor />
       </div>

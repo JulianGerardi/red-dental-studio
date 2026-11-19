@@ -289,7 +289,6 @@ export function SettingsFeeSchedules() {
     <div className="px-4 py-6 sm:px-8">
       <SettingsPageHeader
         titulo="Fee Schedules"
-        bajada="What the office charges for each procedure, with a version for each date the fees change."
         accion={<Button onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New Fee Schedule</Button>}
       >
         <SettingsSearch value={q} onChange={setQ} placeholder="Search a Fee Schedule Here..." />
@@ -354,7 +353,6 @@ export function SettingsFeeScheduleEdit() {
     <div className="px-4 py-6 sm:px-8">
       <SettingsPageHeader
         titulo="Edit Fee Schedule"
-        bajada="What the office charges for each procedure, with a version for each date the fees change."
         accion={<Button onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New Fee Schedule</Button>}
       />
       <div className={cn(TARJETA_PANEL, 'mt-5 grid gap-6 p-4 sm:p-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start')}>
@@ -382,7 +380,7 @@ export function SettingsFeeScheduleEdit() {
 export function SettingsNewFeeSchedule() {
   return (
     <div className="px-4 py-6 sm:px-8">
-      <SettingsPageHeader titulo="New Fee Schedule" bajada="Set the fee for each procedure. You can copy them from another fee schedule." />
+      <SettingsPageHeader titulo="New Fee Schedule" />
       <div className={cn(TARJETA_PANEL, 'mt-5 p-4 sm:p-5')}>
         <FeeScheduleEditor />
       </div>

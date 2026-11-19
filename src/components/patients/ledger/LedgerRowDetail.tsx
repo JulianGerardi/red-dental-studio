@@ -141,9 +141,19 @@ export const tipoDetalle = (m: Movimiento): TipoDetalle | null =>
 
 /** El nombre del tipo en la columna Type (CON-3753): lo comparten el Ledger y la Patient View de Billing. */
 export const nombreTipo = (m: Movimiento) => tipoDetalle(m) ?? 'Insurance Payment'
+/* Los colores y los rótulos cortos de la columna Type de red.dev (ledger.md, 2026-11-19). */
 export const TONO_TIPO: Record<string, PillTone> = {
-  Procedure: 'neutral', 'Charge Adjustment': 'danger', 'Patient Payment': 'info', 'Credit Adjustment': 'neutral',
+  Procedure: 'warning', 'Charge Adjustment': 'danger', 'Patient Payment': 'info', 'Credit Adjustment': 'success',
   'Insurance Payment': 'purple',
+}
+export const ROTULO_TIPO: Record<string, string> = {
+  Procedure: 'Procedure', 'Charge Adjustment': 'Charge Adj', 'Patient Payment': 'Pt Payment', 'Credit Adjustment': 'Credit Adj',
+  'Insurance Payment': 'Ins Payment',
+}
+/** La pastilla de Type en las tablas del Ledger y de Billing. */
+export function PillTipo({ m }: { m: Movimiento }) {
+  const tipo = nombreTipo(m)
+  return <Pill tone={TONO_TIPO[tipo]} size="sm" className="whitespace-nowrap">{ROTULO_TIPO[tipo] ?? tipo}</Pill>
 }
 const esCargo = (m: Movimiento) => m.monto > 0
 const cuenta = (m: Movimiento) => (alcanceDe(m) === 'guarantor' ? 'Guarantor / Account' : m.paciente)

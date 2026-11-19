@@ -17,7 +17,7 @@ import { OBLIGATORIO } from '@/lib/validacion'
    cargo van en Charge Adjustment). Empieza vacío: el importe lo pone quien lo registra. Ver ledger.md (2026-11-19). */
 
 export function CreditAdjustmentPanel({
-  movs, aplicaciones, garante, dependientes, alcanceInicial = ALCANCE_GUARANTOR, hoy, onGuardar, onCancelar, modo = 'tab',
+  movs, aplicaciones, garante, dependientes, alcanceInicial = ALCANCE_GUARANTOR, hoy, onGuardar, onCancelar,
 }: FormularioLedger) {
   const ahora = hoy ?? new Date()
   const opciones = opcionesAplicaA(garante, dependientes)
@@ -55,9 +55,9 @@ export function CreditAdjustmentPanel({
     onGuardar(m, soloAplicado(ap.aplicado))
   }
 
-  const grilla = modo === 'drawer' ? 'grid gap-4 sm:grid-cols-2' : 'grid gap-4 sm:grid-cols-2 lg:grid-cols-4'
+  const grilla = 'grid gap-4 sm:grid-cols-2'
   const primero = (
-    <SeccionLedger titulo="Credit Adjustment Information" modo={modo}>
+    <SeccionLedger titulo="Credit Adjustment Information">
       <div className={grilla}>
         <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
         <ApplyToSelect opciones={opciones} value={aplicaA} onChange={setAplicaA} titulo="Apply credit to" />
@@ -80,7 +80,7 @@ export function CreditAdjustmentPanel({
 
   return (
     <ShellLedger
-      modo={modo} titulo="Credit Adjustment (-)" pasos={['Adjustment', 'Allocation']}
+      titulo="Credit Adjustment (-)" pasos={['Adjustment', 'Allocation']}
       primero={primero} segundo={tabla} validarPrimero={validarPrimero}
       onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando}
     />

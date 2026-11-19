@@ -14,11 +14,8 @@ import { OBLIGATORIO } from '@/lib/validacion'
 export const SIN_VISITA = '[None]'
 
 export function ChargeAdjustmentPanel({
-  movs, garante, dependientes, alcanceInicial = ALCANCE_GUARANTOR, hoy, onGuardar, onCancelar, modo = 'tab', providers = [],
-}: Omit<FormularioLedger, 'aplicaciones'> & {
-  /** Los profesionales que se pueden elegir. */
-  providers?: string[]
-}) {
+  movs, garante, dependientes, alcanceInicial = ALCANCE_GUARANTOR, hoy, onGuardar, onCancelar, providers = [],
+}: Omit<FormularioLedger, 'aplicaciones'>) {
   const ahora = hoy ?? new Date()
   const opciones = opcionesAplicaA(garante, dependientes)
   const [fecha, setFecha] = useState<Date | null>(ahora)
@@ -61,9 +58,9 @@ export function ChargeAdjustmentPanel({
     onGuardar(m, {})
   }
 
-  const grilla = modo === 'drawer' ? 'grid gap-4 sm:grid-cols-2' : 'grid gap-4 sm:grid-cols-2 lg:grid-cols-4'
+  const grilla = 'grid gap-4 sm:grid-cols-2'
   const primero = (
-    <SeccionLedger titulo="Adjustment Information" modo={modo}>
+    <SeccionLedger titulo="Adjustment Information">
       <div className={grilla}>
         <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
         <TextField
@@ -79,5 +76,5 @@ export function ChargeAdjustmentPanel({
     </SeccionLedger>
   )
 
-  return <ShellLedger modo={modo} titulo="Enter Charge (+) Adjustment" primero={primero} onGuardar={guardar} onCancelar={onCancelar} />
+  return <ShellLedger titulo="Enter Charge (+) Adjustment" primero={primero} onGuardar={guardar} onCancelar={onCancelar} />
 }

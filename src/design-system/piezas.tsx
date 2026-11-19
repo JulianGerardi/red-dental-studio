@@ -120,7 +120,7 @@ export const PIEZAS: Pieza[] = [
     muestra: (
       <div className="flex w-[300px] flex-col gap-3">
         <Breadcrumb items={[{ label: 'Settings', to: '/settings' }, { label: 'Accounts' }]} />
-        <SettingsPageHeader titulo="Accounts" bajada="Who can use Confidentally." accion={<Button size="sm">Add</Button>} />
+        <SettingsPageHeader titulo="Accounts" accion={<Button size="sm">Add</Button>} />
       </div>
     ),
   },

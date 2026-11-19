@@ -852,6 +852,13 @@ allá esa fila es **Weight** y la otra Height, que es lo que tiene sentido para 
   queda **Height**, "5 ft 8 in". Mismas unidades imperiales para los dos.
 - De la anomalía 55 queda sólo "Start Enconter" sin la u.
 
+## Los controles van debajo del título (2026-11-19)
+
+Pedido de Julián, para que quede normalizado con el resto de la app: *Dashboard* queda solo en su fila y la fecha,
+*Today* y el ⓘ de ayuda bajan a la fila de abajo, con la tira de números a la derecha. Regla: las acciones principales
+(New Patient, New appointment, los pagos del Ledger y de Billing) van a la altura del título; los controles de fecha y
+filtro, debajo.
+
 ## Cada columna, su momento de la visita (2026-11-19)
 
 **Jira:** CON-1670 (Waiting Room: qué encounters entran y cuándo se puede Check Out o Cancel), CON-1613 (Check In),

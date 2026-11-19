@@ -15,13 +15,13 @@ import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Patient Payment (CON-3738), como en red.dev (video de Julián, 2026-11-19): Payment Information con la fecha, Apply to y
    uno o más métodos (+ suma otro, − lo saca) y las notas; abajo, Ledger Transactions con el pago ya repartido del más
-   viejo al más nuevo. Abre con el total abierto como importe. Ver design-reference/figma/modulos/ledger.md. */
+   viejo al más nuevo. Abre con el total abierto como importe. Un solo paso, como red.dev. Ver ledger.md (2026-11-19). */
 
 type Metodo = { id: number; monto: string; metodo: string; extra: Record<string, string> }
 const filaVacia = (id: number, monto = '', metodo: string = METODOS_PAGO[0]): Metodo => ({ id, monto, metodo, extra: {} })
 
 export function PatientPaymentPanel({
-  movs, aplicaciones, garante, dependientes, alcanceInicial = ALCANCE_GUARANTOR, hoy, onGuardar, onCancelar, modo = 'tab',
+  movs, aplicaciones, garante, dependientes, alcanceInicial = ALCANCE_GUARANTOR, hoy, onGuardar, onCancelar,
 }: FormularioLedger) {
   const ahora = hoy ?? new Date()
   const opciones = opcionesAplicaA(garante, dependientes)
@@ -45,7 +45,6 @@ export function PatientPaymentPanel({
 
   const hayErrorDeCampos = () =>
     !!errorFecha || metodos.some((f) => !!errorMonto(f) || (CAMPOS_METODO[f.metodo] ?? []).some((c) => !!errorExtra(f, c.id)))
-  const validarPrimero = () => { setIntentado(true); return !hayErrorDeCampos() }
 
   const guardar = () => {
     setIntentado(true)
@@ -76,10 +75,11 @@ export function PatientPaymentPanel({
   }
 
   const botonMetodo = 'mt-7 flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-ink-muted shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-dash-blue'
-  const grilla = modo === 'drawer' ? 'grid flex-1 gap-4 sm:grid-cols-2' : 'grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'
+  /* Campos de a dos y del mismo ancho (Components / UI / Drawer → Specs → Fields). */
+  const grilla = 'grid flex-1 gap-4 sm:grid-cols-2'
 
   const primero = (
-    <SeccionLedger titulo="Payment Information" modo={modo}>
+    <SeccionLedger titulo="Payment Information" caja>
       {/* El hueco de la derecha es el del botón + / −: las columnas quedan alineadas con las de los métodos. */}
       <div className="flex items-start gap-2">
         <div className={grilla}>
@@ -142,10 +142,6 @@ export function PatientPaymentPanel({
   )
 
   return (
-    <ShellLedger
-      modo={modo} titulo="New Patient Payment (-)" pasos={['Payment', 'Allocation']}
-      primero={primero} segundo={tabla} validarPrimero={validarPrimero}
-      onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando}
-    />
+    <ShellLedger titulo="New Patient Payment (-)" primero={primero} segundo={tabla} onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando} />
   )
 }

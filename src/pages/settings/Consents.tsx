@@ -568,7 +568,7 @@ export function SettingsConsents() {
 
   return (
     <div className="@container px-4 py-6 sm:px-8">
-      <SettingsPageHeader titulo="Consent Templates" bajada="Create a standard consent document and assign it to one or more procedures." />
+      <SettingsPageHeader titulo="Consent Templates" />
 
       {/* La lista es de 288px: con 240/260 la cuarta pestaña ("All") no entraba y quedaba cortada. */}
       <div className="mt-4 grid grid-cols-1 gap-4 @3xl:grid-cols-[288px_minmax(0,1fr)]">

@@ -612,7 +612,7 @@ export function VerBloque({ b, contenedor }: { b: Bloque; contenedor: TipoConten
   switch (b.tipo) {
     case 'encabezado': {
       const accion = b.accion ? <Button size="md"><ConIcono icono={b.icono}>{b.accion}</ConIcono></Button> : undefined
-      if (contenedor === 'page' || contenedor === 'app') return <div><SettingsPageHeader titulo={b.titulo} bajada={b.bajada} accion={accion} /></div>
+      if (contenedor === 'page' || contenedor === 'app') return <div><SettingsPageHeader titulo={b.titulo} accion={accion} /></div>
       return (
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -995,7 +995,7 @@ function codigoBloque(c: Codigo, b: Bloque, contenedor: TipoContenedor): string[
       const accion = b.accion ? `<Button size="md">${conIcono(c, b.icono, b.accion)}</Button>` : ''
       if (contenedor === 'page' || contenedor === 'app') {
         importar(c, '@/components/settings/SettingsPageHeader', 'SettingsPageHeader')
-        return [`<SettingsPageHeader`, `  titulo=${valorAttr(b.titulo)}`, `  bajada=${valorAttr(b.bajada)}`, ...(accion ? [`  accion={${accion}}`] : []), `/>`]
+        return [`<SettingsPageHeader`, `  titulo=${valorAttr(b.titulo)}`, ...(accion ? [`  accion={${accion}}`] : []), `/>`]
       }
       importar(c, '@/components/ui/card', 'CardTitle', ...(b.bajada ? ['CardDescription'] : []))
       return [

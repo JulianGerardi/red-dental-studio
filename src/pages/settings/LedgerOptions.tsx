@@ -110,7 +110,6 @@ export function SettingsLedgerOptions() {
         titulo="Ledger Options"
         /* La bajada del frame es la de Locations, copiada tal cual. Se
            replica: el contenido va como está. */
-        bajada="Set your location name. Add the location you need."
       >
         <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />

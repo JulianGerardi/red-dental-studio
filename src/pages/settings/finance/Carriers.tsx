@@ -70,7 +70,6 @@ export function SettingsCarriers({ nuevo = false }: { nuevo?: boolean }) {
     <div className="px-4 py-6 sm:px-8">
       <SettingsPageHeader
         titulo="Carriers"
-        bajada="Manage insurance carriers and their group plans."
         accion={<Button onClick={() => setCreando(true)}><Plus /> New Carrier</Button>}
       >
         <SettingsSearch value={q} onChange={setQ} placeholder="Search carrier by name or payer ID..." />
@@ -246,7 +245,6 @@ export function SettingsCarrierEdit({ tab, nuevoPlan = false }: { tab: 'carrier'
     <div className="px-4 py-6 sm:px-8">
       <SettingsPageHeader
         titulo="Edit Carrier"
-        bajada={`${c.nombre} · Payer ID ${c.payerId}`}
         accion={<Button onClick={() => setPlan(true)}><Plus /> New Insurance Plan</Button>}
       />
       <Tabs

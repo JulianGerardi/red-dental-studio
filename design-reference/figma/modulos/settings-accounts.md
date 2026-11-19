@@ -148,3 +148,23 @@ Sin historia de Jira: devolución de diseño de Julián sobre Locations, Employe
 
 **A validar:** que recepción y administración no extrañen el clic en el nombre (es el patrón de Patients, que sí lo
 conserva). Si lo extrañan, la salida es la fila entera clickeable, no volver al link.
+
+## Subscription Summary con la card de métricas de la app (2026-11-19)
+
+Pedido de Julián al alinear el Ledger (ledger.md, CON-4142): las métricas tienen un solo diseño. Las cuatro de Edit
+Account › Subscription (Current Plan, Licenses, Expired on, Status) estaban armadas a mano, con borde y el ícono de
+tarjeta sólo en la primera; pasan a `ui/stat-card` (`StatCard`), la de Billing y el Ledger: card sin borde, rótulo en mayúsculas,
+valor en negro y bajada. Mismos textos y datos; 2 + 2 en angosto, cuatro en fila desde `lg`.
+
+## Overview de Settings y títulos sin bajada (2026-11-19)
+
+1. El overview de Settings queda con las cards de red.dev (captura de Julián): Account, Locations, Employees, Roles,
+   Consents, Billing, Ledger y Preferences. Salen Parameters, Libraries, Patient Portal y Security, y entra Consents. La
+   primera dice **Account**, como la captura, y sigue llevando a la lista de cuentas. El menú de Settings del rail no se
+   tocó: todavía lista las cuatro que salieron (a definir).
+2. **Ninguna pantalla lleva bajada debajo del título.** `SettingsPageHeader` deja de aceptar `bajada` (Accounts,
+   Locations, Employees, Consents, Ledger options, Fee Schedules, Carriers, Coverage Table, Insurance Plan, Documents) y
+   salen las escritas a mano en Settings, Edit Account, Location y Employee, Help y Notifications. Quedan los textos de
+   Login y de las páginas vacías (son tarjetas, no títulos de pantalla) y la página de mails para el backend.
+3. El menú de Settings del rail también saca Parameters, Libraries, Patient Portal y Security, y sus rutas
+   (Julián, mismo día). Quedan como "Coming soon" Roles y Preferences.
