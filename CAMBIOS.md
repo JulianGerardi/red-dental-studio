@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
-### Mails de la plataforma: plantilla única para el backend y página aparte ([#PR](https://github.com/JulianGerardi/red-dental-studio/pulls))
+### Mails de la plataforma: plantilla única para el backend y página aparte ([#165](https://github.com/JulianGerardi/red-dental-studio/pull/165))
 - **Los 16 mails** de "Email Propuesta" (onboarding, turnos, treatment plan, firma, paciente, empleado, suscripción y
   guardian) sobre **un solo layout** con siete bloques fijos (saludo, párrafo, aviso, detalles, botón, nota y firma) y
   `{{variables}}`, en HTML apto para clientes de correo (tablas, estilos inline, 600 px). Los que el documento deja
