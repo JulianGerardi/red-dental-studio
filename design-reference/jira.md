@@ -178,6 +178,15 @@ Documento: [figma/modulos/dashboard.md](figma/modulos/dashboard.md)
 
 - [CON-2639](https://confidetally.atlassian.net/browse/CON-2639) Dashboard – Pending Tasks
 - [CON-3116](https://confidetally.atlassian.net/browse/CON-3116) [Post Demo] Dashboard
+- [CON-4175](https://confidetally.atlassian.net/browse/CON-4175) Dashboard 2
+
+**Historias**
+
+- [CON-4176](https://confidetally.atlassian.net/browse/CON-4176) Appointments — Ver citas pendientes de check-in · epic CON-4175
+- [CON-4177](https://confidetally.atlassian.net/browse/CON-4177) Appointments — Filtrar y gestionar las citas pendientes · epic CON-4175
+- [CON-4178](https://confidetally.atlassian.net/browse/CON-4178) Waiting Room — Ver y filtrar visitas por etapa · epic CON-4175
+- [CON-4179](https://confidetally.atlassian.net/browse/CON-4179) Waiting Room — Mostrar las acciones disponibles según el estado de la visita · epic CON-4175
+- [CON-4180](https://confidetally.atlassian.net/browse/CON-4180) Rooms — Ver la ocupación actual y la próxima cita · epic CON-4175
 
 ## emails
 
