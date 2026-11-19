@@ -5,6 +5,8 @@ import {
 import { DatePicker } from '@/components/ui/date-picker'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { formatMDY } from '@/lib/fecha'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 4582:30209. "Amount" es texto libre por elección, ver
    design-reference/figma/modulos/ledger.md. */
@@ -37,7 +39,7 @@ export function CreditAdjustmentPanel({
     if (!fecha || !monto.trim() || !aplicaA.trim()) return
     const valor = Number(monto) || 0
     onGuardar({
-      fecha: fecha.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      fecha: formatMDY(fecha),
       paciente: aplicaA,
       codigo: '—',
       descripcion: tipo,
@@ -60,12 +62,12 @@ export function CreditAdjustmentPanel({
           </div>
           <TextField
             label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto}
-            error={intentado && !monto.trim() ? 'This field is required.' : undefined}
+            error={intentado && !monto.trim() ? OBLIGATORIO : undefined}
           />
           <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} />
           <SelectField
             label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
-            error={intentado && !aplicaA.trim() ? 'This field is required.' : undefined}
+            error={intentado && !aplicaA.trim() ? OBLIGATORIO : undefined}
           />
         </div>
       </div>
@@ -73,7 +75,7 @@ export function CreditAdjustmentPanel({
       <LedgerAllocationTable cargos={cargosAplicables} />
 
       <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
-        <TextArea label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
+        <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
       </div>
 
       <div className="flex justify-end gap-3">

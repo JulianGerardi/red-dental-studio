@@ -200,3 +200,56 @@ asigna Guardian o Guarantor (hoy el paso no depende de los roles porque los role
 
 **Para validar con usuarios:** si recepción entiende por qué a veces hay dos pasos y a veces tres, y si conviene mostrar
 en el paso Person que la persona "ya tiene contacto cargado".
+
+## Sin botón "Ver estado vacío" (2026-11-12)
+
+Pedido de Julián al revisar CON-4137: el botón de demo "Ver estado vacío" / "Ver poblado" (en castellano, al lado de
+*Add Relationship*) no va. Se saca junto con su vacío propio ("No relationships yet"). Queda el vacío real de la lista
+("No related contacts"), que aparece al borrar todas las relaciones; Household no cambia.
+
+## CON-4139 · Segunda comparativa con red.dev: link al paciente, ⋮ abierto y Edit a 560 (2026-11-12)
+
+Comparativa de diseño con red.dev (pantalla, menú ⋮, Edit, Delete y los pasos de Add). Lo que red.dev tiene de diseño y
+nos faltaba se suma acá; lo demás queda en el ticket para que red.dev se alinee al sistema.
+
+- **Nombre como link a la ficha** cuando la persona también es paciente (`pacienteId` en `Persona`): azul `dash-blue`,
+  subrayado al hover y foco visible. En el mock lo tienen las de Household (por definición son pacientes); quien no es
+  paciente sigue en negro.
+- **⋮ marcado mientras su menú está abierto** (`data-[state=open]:bg-surface-muted` en `ui/row-actions-menu`): se sabe
+  de qué fila es el menú. Aplica a todas las tablas y cards.
+- **Edit Relationship a 560 px**, como Add: era 480 y en el mismo flujo cambiaba el ancho del drawer.
+- Se quedan como están (y el ticket le pide a red.dev alinearse): menú sin encabezado "Actions", Delete con los botones
+  juntos a la derecha y el destructive del sistema, select a ancho completo, casilla sin tildar en gris, etiqueta Role.
+- Funcional, sin cambio de lógica: Edit no cambia la dirección (red.dev sí, con radios); el título de Household en
+  red.dev lleva el nombre del garante ("Pat five Test's Household").
+- **Buscador de persona** (`PersonSearchField`): red.dev lo cambió. El nuestro sigue siendo la referencia (Julián,
+  2026-11-11); se le suma lo único que tenía red.dev y faltaba: la **✕ para borrar lo escrito** mientras se busca
+  ("Clear <label>"). Aplica a todos los buscadores de persona.
+- **`PersonaSeleccionada`** (Person en Edit Relationship y en los modales de Insurance) pasa a ser la misma card que deja
+  el buscador al elegir: `PersonaFila` con DOB y email como chips, en vez de "DOB:" y "Email:" sueltos.
+
+## Campo vacío: *This field is required.* (2026-11-16)
+
+1. *Add Relationship* sin persona elegida decía *Select a person or tick the option to create a new one.*; ahora *This
+   field is required.* (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)). El checkbox para crear
+   una persona nueva queda justo arriba. *Choose at least one role.* y *Choose who is responsible for whom.* no
+   cambian: son grupos de opciones, no un campo.
+
+## CON-4139 · Comentario de Abril: nombres siempre link y ⋮ en Household (2026-11-18)
+
+Abril Viola, en el ticket (comentario 31318): "todos los nombres son links para ir al perfil del otro paciente" y "en
+household deberiamos tambien agregar 3 puntitos de acciones" (es lo que pide CON-4113, *Acciones a nivel household*).
+
+- **Todos los nombres son link** a la ficha de esa persona (`/patients/:pacienteId`), con el estilo de 2026-11-12 (azul
+  `dash-blue`, subrayado al hover, foco visible). Sale la variante en negro para quien "no es paciente". En el mock las
+  relaciones de Jessica Miller apuntan a `patient-0004` y `patient-0005`, y la que se agrega con *Add Relationship* a
+  un id propio.
+- **⋮ en las cards de Household**, el mismo menú que las relaciones: *Edit relationship* y *Delete relationship*. Al
+  editar, la pill *Household* se queda (la da el Guarantor compartido, no los roles). Al borrar, la card sale con la
+  misma confirmación.
+- **Household vacío** (al borrar todas): *No household patients* / *No other patients share this patient's guarantor.*,
+  en vez de dejar el título sin nada abajo.
+
+**Para validar con Abril/usuarios:** si en Household *Delete relationship* tiene sentido (el household sale del
+Guarantor, no de una relación cargada) o si ahí el menú debería llevar otras acciones; la captura de CON-4113 no se pudo
+abrir desde acá.

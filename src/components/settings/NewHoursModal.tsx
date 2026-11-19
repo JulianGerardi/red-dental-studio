@@ -1,9 +1,11 @@
 import { DrawerActions } from '@/components/ui/drawer'
+import { Alert } from '@/components/ui/alert'
 import { useState } from 'react'
 import { CirclePlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ModalShell, SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3864:267207 "New Hours". Aviso ámbar con barra de acento, locación,
    rangos horarios con su nota de zona horaria, los días de repetición y el
@@ -42,14 +44,11 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-4">
-        <div className="rounded-r-md border-l-[3px] border-l-attn-fg bg-[#fffbeb] px-3 py-2.5">
-          <p className="text-[11px] font-bold text-attn-fg">Attention needed</p>
-          <p className="mt-1 text-[11px] leading-[1.5] font-medium text-attn-fg">
+        <Alert tone="warning" title="Attention needed">
             Select the location assigned to the provider, then set the start and end times in the
             location&apos;s local time zone. The system will automatically convert and store the
             shift in Coordinated Universal Time (UTC) for consistency across all locations.
-          </p>
-        </div>
+        </Alert>
 
         {/* De a dos como los horarios de abajo: Location va en la columna izquierda (Drawer → Specs → Fields). */}
         <div className="grid gap-4 sm:grid-cols-2">
@@ -59,7 +58,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
             options={['Abril', 'Alaska Medical', 'Bayside Dental']}
             value={locacion}
             onChange={setLocacion}
-            error={intentado && !locacion.trim() ? 'This field is required.' : undefined}
+            error={intentado && !locacion.trim() ? OBLIGATORIO : undefined}
           />
           <p className="mt-1.5 text-[11px] text-ink-muted">{ZONA}</p>
           </div>
@@ -69,14 +68,14 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
           <div key={i}>
             <div className="grid gap-4 sm:grid-cols-2">
               <SelectField
-                label="Start Time" placeholder="00:00 hs" options={HORAS} value={r.inicio}
+                label="Start Time" required placeholder="00:00 hs" options={HORAS} value={r.inicio}
                 onChange={(v) => setRangos((p) => p.map((x, j) => (j === i ? { ...x, inicio: v } : x)))}
-                error={intentado && !r.inicio.trim() ? 'Required.' : undefined}
+                error={intentado && !r.inicio.trim() ? OBLIGATORIO : undefined}
               />
               <SelectField
-                label="End Time" placeholder="00:00 hs" options={HORAS} value={r.fin}
+                label="End Time" required placeholder="00:00 hs" options={HORAS} value={r.fin}
                 onChange={(v) => setRangos((p) => p.map((x, j) => (j === i ? { ...x, fin: v } : x)))}
-                error={intentado && !r.fin.trim() ? 'Required.' : undefined}
+                error={intentado && !r.fin.trim() ? OBLIGATORIO : undefined}
               />
             </div>
             <p className="mt-1.5 text-[11px] text-ink-muted">{ZONA}</p>
@@ -145,11 +144,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        <div className="rounded-r-md border-l-[3px] border-l-dash-blue bg-[#eff4ff] px-3 py-2.5">
-          <p className="text-dash-blue text-[11px] leading-[1.5] font-semibold">
-            This will update the hours for all selected days with the time ranges you&apos;ve set above.
-          </p>
-        </div>
+        <Alert tone="info" title="This will update the hours for all selected days with the time ranges you've set above." />
       </div>
     </ModalShell>
   )

@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { ChevronsDownUp, ChevronsUpDown, HandCoins } from 'lucide-react'
 import { ModalShell } from '@/components/patients/form'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { aviso } from '@/components/ui/toaster'
-import { Pill } from '@/components/ui/pill'
+import { Pill, type PillTone } from '@/components/ui/pill'
 import { EnlaceRegistro, Entrada, FilaDetalle, ListaDetalle, Vacio } from '@/components/ui/detail-list'
 import { cn } from '@/lib/utils'
 import { tratamientoDe } from '@/components/clinical/RecordDetail'
@@ -18,17 +18,20 @@ import {
    Reemplaza a los `title` que tenían las celdas que truncan: con los dos
    puestos aparecían dos tooltips distintos sobre la misma celda. */
 export function FilaConTooltip({
-  m, abierta, children,
+  m, abierta, callado, children,
 }: {
   m: Movimiento & { saldo?: number }
   /** Con la fila desplegada el detalle ya está a la vista: sobra el tooltip. */
   abierta?: boolean
+  /** Con el ⋮ de la fila abierto: el tooltip le quedaba encima y se comía el Escape del menú. */
+  callado?: boolean
   children: React.ReactNode
 }) {
+  const [visible, setVisible] = useState(false)
   const pieza = [m.diente && `Tooth ${m.diente}`, m.superficie].filter(Boolean).join(' · ')
   if (abierta) return <>{children}</>
   return (
-    <Tooltip>
+    <Tooltip open={visible && !callado} onOpenChange={setVisible}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       {/* Al costado, no arriba ni abajo: la fila ocupa todo el ancho de la
           tabla, así que un tooltip vertical le tapa sí o sí los datos de la
@@ -136,7 +139,12 @@ export const tipoDetalle = (m: Movimiento): TipoDetalle | null =>
       : m.tipo === 'Adjustment' ? (m.monto > 0 ? 'Charge Adjustment' : 'Credit Adjustment')
         : null
 
-const nombreTipo = (m: Movimiento) => tipoDetalle(m) ?? 'Insurance Payment'
+/** El nombre del tipo en la columna Type (CON-3753): lo comparten el Ledger y la Patient View de Billing. */
+export const nombreTipo = (m: Movimiento) => tipoDetalle(m) ?? 'Insurance Payment'
+export const TONO_TIPO: Record<string, PillTone> = {
+  Procedure: 'neutral', 'Charge Adjustment': 'danger', 'Patient Payment': 'info', 'Credit Adjustment': 'neutral',
+  'Insurance Payment': 'purple',
+}
 const esCargo = (m: Movimiento) => m.monto > 0
 const cuenta = (m: Movimiento) => (alcanceDe(m) === 'guarantor' ? 'Guarantor / Account' : m.paciente)
 const motivoDe = (m: Movimiento) => m.motivo ?? (m.descripcion && m.descripcion !== '—' ? m.descripcion : undefined)

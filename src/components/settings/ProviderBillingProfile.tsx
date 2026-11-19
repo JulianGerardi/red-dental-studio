@@ -57,7 +57,7 @@ export function ProviderBillingProfile({
   )
 }
 
-function ContactosProvider({
+export function ContactosProvider({
   perfil, editable, onGuardar, onDirtyChange,
 }: {
   perfil: PerfilFacturacion

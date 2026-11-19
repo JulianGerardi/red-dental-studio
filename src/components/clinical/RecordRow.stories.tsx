@@ -5,7 +5,7 @@ const meta = {
   title: 'Components/Clinical/RecordRow',
   component: RecordRow,
   parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
-  args: { provider: 'Tomy Gi', providerRole: 'Dentist', status: 'Pending', created: '30/09/2026', updated: '30/09/2026', expires: '30/10/2026' },
+  args: { provider: 'Tomy Gi', providerRole: 'Dentist', status: 'Pending', created: '09/30/2026', updated: '09/30/2026', expires: '10/30/2026' },
   argTypes: { status: { control: 'select', options: ['Pending', 'Requested', 'Delivered', 'Active', 'Expired', 'Cancelled', 'Completed'] } },
 } satisfies Meta<typeof RecordRow>
 

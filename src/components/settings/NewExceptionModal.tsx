@@ -7,6 +7,7 @@ import {
 import { DatePicker } from '@/components/ui/date-picker'
 import { aviso } from '@/components/ui/toaster'
 import type { Excepcion } from '@/data/location-detail'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3864:317345 "Settings — Location (Exceptions — New Exception
    Modal)". Name / Abreviattion (typo del frame) / Reason y el rango (Date,
@@ -69,11 +70,11 @@ export function NewExceptionModal({
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
             label="Name" required placeholder="Select" value={nombre} onChange={setNombre}
-            error={intentado && !nombre.trim() ? 'This field is required.' : undefined}
+            error={intentado && !nombre.trim() ? OBLIGATORIO : undefined}
           />
           <TextField
             label="Abreviattion" required placeholder="Placeholder" value={abrev} onChange={setAbrev}
-            error={intentado && !abrev.trim() ? 'This field is required.' : undefined}
+            error={intentado && !abrev.trim() ? OBLIGATORIO : undefined}
           />
           <SelectField label="Reason" options={RAZONES} value={razon} onChange={setRazon} />
           <div className="flex flex-col gap-2">
@@ -86,12 +87,12 @@ export function NewExceptionModal({
           <SelectField
             label="Start Time" required placeholder="00:00 hs" options={HORAS}
             value={inicio} onChange={setInicio}
-            error={intentado && !todoElDia && !inicio.trim() ? 'Required.' : undefined}
+            error={intentado && !todoElDia && !inicio.trim() ? OBLIGATORIO : undefined}
           />
           <SelectField
             label="End Time" required placeholder="00:00 hs" options={HORAS}
             value={fin} onChange={setFin}
-            error={intentado && !todoElDia && !fin.trim() ? 'Required.' : undefined}
+            error={intentado && !todoElDia && !fin.trim() ? OBLIGATORIO : undefined}
           />
         </div>
 

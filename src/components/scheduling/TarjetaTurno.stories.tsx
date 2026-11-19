@@ -26,7 +26,7 @@ export const Appointment: Story = { args: { acciones: <Button variant="secondary
 export const Request: Story = {
   args: {
     tono: 'danger', etiqueta: 'ASAP', nombre: 'Elias Aguirre', motivo: 'Broken crown, in pain',
-    cuando: '12 Mar 2025 · 14 PM - 15 PM',
+    cuando: '12 Mar 2025 · 02 PM - 03 PM',
     acciones: <><Button variant="secondary" size="sm">Cancel</Button><Button size="sm">Schedule</Button></>,
   },
 }

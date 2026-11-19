@@ -43,12 +43,12 @@ export const INSURANCE = [
 ]
 
 export const PENDING_TASKS = [
-  { type: 'Lab Order', state: 'Requested', patient: 'Mara Otero', flag: 'Expired Date', provider: 'Dr. Salgado', register: '28/01/2026', expiration: '29/01/2026' },
-  { type: 'Lab Order', state: 'Requested', patient: 'Mara Otero', flag: 'Expired Date', provider: 'Dr. Salgado', register: '07/04/2026', expiration: '07/04/2026' },
+  { type: 'Lab Order', state: 'Requested', patient: 'Mara Otero', flag: 'Expired Date', provider: 'Dr. Salgado', register: '01/28/2026', expiration: '01/29/2026' },
+  { type: 'Lab Order', state: 'Requested', patient: 'Mara Otero', flag: 'Expired Date', provider: 'Dr. Salgado', register: '04/07/2026', expiration: '04/07/2026' },
 ]
 
 export const APPOINTMENTS = [
-  { patient: 'Mara Otero', reason: 'Emergency (toothache)', date: '06/03/2027', time: '12:30 - 01:00 PM', location: 'Abril — Aroser Allee 97, Berlin' },
+  { patient: 'Mara Otero', reason: 'Emergency (toothache)', date: '03/06/2027', time: '12:30 - 01:00 PM', location: 'Abril — Aroser Allee 97, Berlin' },
 ]
 
 export const ROOMS = [
@@ -78,38 +78,38 @@ export type RecordStatus =
   | 'Active' | 'Expired' | 'Cancelled' | 'Completed'
 
 export const LAB_ORDERS = [
-  { provider: 'Tomy Gi', subject: 'Olivos Laboratory', status: 'Pending' as RecordStatus, created: '30/09/2026', updated: '30/09/2026', expires: '30/09/2026' },
-  { provider: 'Tomy Gi', subject: 'Olivos Laboratory', status: 'Requested' as RecordStatus, created: '30/09/2026', updated: '30/09/2026', expires: '30/09/2026' },
-  { provider: 'Tomy Gi', subject: 'Northgate Lab', status: 'Pending' as RecordStatus, created: '05/06/2026', updated: '05/06/2026', expires: '05/06/2026' },
+  { provider: 'Tomy Gi', subject: 'Olivos Laboratory', status: 'Pending' as RecordStatus, created: '09/30/2026', updated: '09/30/2026', expires: '09/30/2026' },
+  { provider: 'Tomy Gi', subject: 'Olivos Laboratory', status: 'Requested' as RecordStatus, created: '09/30/2026', updated: '09/30/2026', expires: '09/30/2026' },
+  { provider: 'Tomy Gi', subject: 'Northgate Lab', status: 'Pending' as RecordStatus, created: '06/05/2026', updated: '06/05/2026', expires: '06/05/2026' },
   { provider: 'Tomy Gi', subject: 'Northgate Lab', status: 'Pending' as RecordStatus, created: '06/06/2026', updated: '06/06/2026', expires: '06/06/2026' },
-  { provider: 'Tomy Gi', subject: 'Olivos Laboratory', status: 'Pending' as RecordStatus, created: '29/05/2026', updated: '29/05/2026', expires: '29/05/2026' },
-  { provider: 'Tomy Gi', subject: 'Mark Anthony Lab', status: 'Requested' as RecordStatus, created: '13/05/2026', updated: '13/05/2026', expires: '13/05/2026' },
+  { provider: 'Tomy Gi', subject: 'Olivos Laboratory', status: 'Pending' as RecordStatus, created: '05/29/2026', updated: '05/29/2026', expires: '05/29/2026' },
+  { provider: 'Tomy Gi', subject: 'Mark Anthony Lab', status: 'Requested' as RecordStatus, created: '05/13/2026', updated: '05/13/2026', expires: '05/13/2026' },
   { provider: 'Rene Favaloro', subject: 'Northgate Lab', status: 'Delivered' as RecordStatus, created: '05/05/2026', updated: '05/05/2026', expires: '05/05/2026' },
 ]
 
 export const PRESCRIPTIONS = [
-  { provider: 'Tomy Gi', drug: 'Clonazepam 1 G', status: 'Active' as RecordStatus, created: '31/08/2026', updated: '31/08/2026', expires: '31/08/2026' },
-  { provider: 'Tomy Gi', drug: 'Ibuprofeno 1 G', status: 'Active' as RecordStatus, created: '31/08/2026', updated: '31/08/2026', expires: '31/08/2026' },
-  { provider: 'Tomy Gi', drug: 'Ibuprofeno 1 G', status: 'Active' as RecordStatus, created: '28/08/2026', updated: '28/08/2026', expires: '28/08/2026' },
-  { provider: 'Tomy Gi', drug: 'Ibuprofeno 1 G', status: 'Expired' as RecordStatus, created: '31/07/2026', updated: '31/07/2026', expires: '31/07/2026' },
-  { provider: 'Tomy Gi', drug: 'Clonazepam 2 G', status: 'Cancelled' as RecordStatus, created: '30/06/2026', updated: '30/06/2026', expires: '30/06/2026' },
-  { provider: 'Tomy Gi', drug: 'Clonazepam 2 G', status: 'Expired' as RecordStatus, created: '30/06/2026', updated: '30/06/2026', expires: '30/06/2026' },
-  { provider: 'Tomy Gi', drug: 'Clonazepam 2 G', status: 'Pending' as RecordStatus, created: '30/06/2026', updated: '30/06/2026', expires: '30/06/2026' },
+  { provider: 'Tomy Gi', drug: 'Clonazepam 1 G', status: 'Active' as RecordStatus, created: '08/31/2026', updated: '08/31/2026', expires: '08/31/2026' },
+  { provider: 'Tomy Gi', drug: 'Ibuprofeno 1 G', status: 'Active' as RecordStatus, created: '08/31/2026', updated: '08/31/2026', expires: '08/31/2026' },
+  { provider: 'Tomy Gi', drug: 'Ibuprofeno 1 G', status: 'Active' as RecordStatus, created: '08/28/2026', updated: '08/28/2026', expires: '08/28/2026' },
+  { provider: 'Tomy Gi', drug: 'Ibuprofeno 1 G', status: 'Expired' as RecordStatus, created: '07/31/2026', updated: '07/31/2026', expires: '07/31/2026' },
+  { provider: 'Tomy Gi', drug: 'Clonazepam 2 G', status: 'Cancelled' as RecordStatus, created: '06/30/2026', updated: '06/30/2026', expires: '06/30/2026' },
+  { provider: 'Tomy Gi', drug: 'Clonazepam 2 G', status: 'Expired' as RecordStatus, created: '06/30/2026', updated: '06/30/2026', expires: '06/30/2026' },
+  { provider: 'Tomy Gi', drug: 'Clonazepam 2 G', status: 'Pending' as RecordStatus, created: '06/30/2026', updated: '06/30/2026', expires: '06/30/2026' },
 ]
 
 export const REFERRALS = [
-  { provider: 'Tomy Gi', referred: 'Test Ref', specialty: 'Orthodontics', status: 'Pending' as RecordStatus, created: '20/08/2026', updated: '20/08/2026', expires: '20/08/2026' },
-  { provider: 'Tomy Gi', referred: 'Prov test', specialty: 'Orthodontics', status: 'Pending' as RecordStatus, created: '08/07/2026', updated: '08/07/2026', expires: '08/07/2026' },
-  { provider: 'Luis Leloir', referred: 'Prov test', specialty: 'Orthodontics', status: 'Pending' as RecordStatus, created: '18/06/2026', updated: '18/06/2026', expires: '18/06/2026' },
-  { provider: 'Tomy Gi', referred: 'Betsy Moreno', specialty: 'Orthodontics', status: 'Completed' as RecordStatus, created: '27/04/2026', updated: '27/04/2026', expires: '27/04/2026' },
-  { provider: 'Tomy Gi', referred: 'Betsy Moreno', specialty: 'Orthodontics', status: 'Cancelled' as RecordStatus, created: '27/04/2026', updated: '27/04/2026', expires: '27/04/2026' },
-  { provider: 'Tomy Gi', referred: 'Betsy Moreno', specialty: 'Orthodontics', status: 'Completed' as RecordStatus, created: '27/04/2026', updated: '27/04/2026', expires: '27/04/2026' },
-  { provider: 'Tomy Gi', referred: 'Betsy Moreno', specialty: 'Orthodontics', status: 'Completed' as RecordStatus, created: '20/04/2026', updated: '20/04/2026', expires: '20/04/2026' },
+  { provider: 'Tomy Gi', referred: 'Test Ref', specialty: 'Orthodontics', status: 'Pending' as RecordStatus, created: '08/20/2026', updated: '08/20/2026', expires: '08/20/2026' },
+  { provider: 'Tomy Gi', referred: 'Prov test', specialty: 'Orthodontics', status: 'Pending' as RecordStatus, created: '07/08/2026', updated: '07/08/2026', expires: '07/08/2026' },
+  { provider: 'Luis Leloir', referred: 'Prov test', specialty: 'Orthodontics', status: 'Pending' as RecordStatus, created: '06/18/2026', updated: '06/18/2026', expires: '06/18/2026' },
+  { provider: 'Tomy Gi', referred: 'Betsy Moreno', specialty: 'Orthodontics', status: 'Completed' as RecordStatus, created: '04/27/2026', updated: '04/27/2026', expires: '04/27/2026' },
+  { provider: 'Tomy Gi', referred: 'Betsy Moreno', specialty: 'Orthodontics', status: 'Cancelled' as RecordStatus, created: '04/27/2026', updated: '04/27/2026', expires: '04/27/2026' },
+  { provider: 'Tomy Gi', referred: 'Betsy Moreno', specialty: 'Orthodontics', status: 'Completed' as RecordStatus, created: '04/27/2026', updated: '04/27/2026', expires: '04/27/2026' },
+  { provider: 'Tomy Gi', referred: 'Betsy Moreno', specialty: 'Orthodontics', status: 'Completed' as RecordStatus, created: '04/20/2026', updated: '04/20/2026', expires: '04/20/2026' },
 ]
 
 /* Códigos ADA reales del catálogo público; las descripciones son las estándar. */
 export const PLAN_PROCEDURES = Array.from({ length: 9 }, (_, i) => ({
-  date: i === 0 ? '20/08/2026' : '01/12/2025',
+  date: i === 0 ? '08/20/2026' : '12/01/2025',
   location: '',
   tooth: i === 0 ? 7 : 29 - i,
   surface: '-',
@@ -123,22 +123,22 @@ export const PLAN_PROCEDURES = Array.from({ length: 9 }, (_, i) => ({
 }))
 
 export const PLAN_CASES = [
-  { date: '12/08/2026', status: 'PLANNING', items: [{ name: 'Upper arch', updated: '12/08/2026' }] },
-  { date: '14/07/2026', status: 'WAITING FOR CONSENT', items: [] },
-  { date: '14/06/2026', status: 'WAITING FOR CONSENT', items: [] },
-  { date: '21/05/2026', status: 'WAITING FOR CONSENT', items: [] },
-  { date: '15/05/2026', status: 'WAITING FOR CONSENT', items: [] },
-  { date: '15/05/2026', status: 'WAITING FOR CONSENT', items: [] },
-  { date: '08/05/2026', status: 'WAITING FOR CONSENT', items: [] },
-  { date: '07/05/2026', status: 'WAITING FOR CONSENT', items: [] },
+  { date: '08/12/2026', status: 'PLANNING', items: [{ name: 'Upper arch', updated: '08/12/2026' }] },
+  { date: '07/14/2026', status: 'WAITING FOR CONSENT', items: [] },
+  { date: '06/14/2026', status: 'WAITING FOR CONSENT', items: [] },
+  { date: '05/21/2026', status: 'WAITING FOR CONSENT', items: [] },
+  { date: '05/15/2026', status: 'WAITING FOR CONSENT', items: [] },
+  { date: '05/15/2026', status: 'WAITING FOR CONSENT', items: [] },
+  { date: '05/08/2026', status: 'WAITING FOR CONSENT', items: [] },
+  { date: '05/07/2026', status: 'WAITING FOR CONSENT', items: [] },
 ]
 
 export const TREATMENT_HISTORY = [
-  { date: '24/08/2026', latest: true, tz: 'America/Argentina/Buenos_Aires', status: 'Cancelled', note: 'Unsigned', reason: 'Crown prep', provider: 'Rene Favaloro', procedures: null, flags: [false, false, false, false] },
-  { date: '21/08/2026', latest: false, tz: 'Europe/Berlin', status: 'Fulfilled', note: 'Unsigned', reason: 'Filling', provider: 'Tomy Gi', procedures: null, flags: [false, false, false, false] },
-  { date: '20/08/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: 'D2140', flags: [true, true, true, true] },
-  { date: '17/08/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: null, flags: [false, false, false, false] },
-  { date: '14/08/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: null, flags: [false, false, false, false] },
-  { date: '12/08/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Extraction', provider: 'Andy Davis', procedures: null, flags: [false, false, false, false] },
-  { date: '11/08/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: null, flags: [false, false, false, true] },
+  { date: '08/24/2026', latest: true, tz: 'America/Argentina/Buenos_Aires', status: 'Cancelled', note: 'Unsigned', reason: 'Crown prep', provider: 'Rene Favaloro', procedures: null, flags: [false, false, false, false] },
+  { date: '08/21/2026', latest: false, tz: 'Europe/Berlin', status: 'Fulfilled', note: 'Unsigned', reason: 'Filling', provider: 'Tomy Gi', procedures: null, flags: [false, false, false, false] },
+  { date: '08/20/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: 'D2140', flags: [true, true, true, true] },
+  { date: '08/17/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: null, flags: [false, false, false, false] },
+  { date: '08/14/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: null, flags: [false, false, false, false] },
+  { date: '08/12/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Extraction', provider: 'Andy Davis', procedures: null, flags: [false, false, false, false] },
+  { date: '08/11/2026', latest: false, tz: 'America/Argentina/Buenos_Aires', status: 'Fulfilled', note: 'Unsigned', reason: 'Crown prep', provider: 'Luis Leloir', procedures: null, flags: [false, false, false, true] },
 ]

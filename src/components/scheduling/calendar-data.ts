@@ -7,6 +7,8 @@ export type ApptState =
 /* CON-2990: un turno se borra sólo mientras está en un estado temprano. Waiting List no es un estado de la grilla:
    esas solicitudes viven en el panel de Appointment Requests. */
 export const esEliminable = (estado: ApptState) => estado === 'Proposed'
+/* CON-3249: sólo se reprograma una cita activa; las cerradas quedan como historia. */
+export const esEditable = (estado: ApptState) => !['Fulfilled', 'No-show', 'Cancelled'].includes(estado)
 
 /* Los colores son tokens de src/index.css (--color-appt-*): se cambian ahí. */
 const c = (estado: string, parte: 'bg' | 'bar' | 'fg' | 'dot') => `var(--color-appt-${estado}-${parte})`

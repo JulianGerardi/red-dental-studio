@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import {
   DateTextField, OptionCheckbox, PersonSearchField, SearchField, SelectField, TextArea, TextField,
+  chipsPersona,
 } from '@/components/patients/form'
 import { Bloque, ConRotulo, Lienzo, Swatch, Tabla, TablaPartes, useMedidas } from './kit'
 import { cn } from '@/lib/utils'
@@ -146,9 +147,9 @@ const PERSONAS_DEMO = [
   { name: 'Jessica Miller', dob: 'May 14, 1982', email: 'jessica.miller@gmail.com' },
   { name: 'Robert Miller', dob: 'March 2, 1979', email: 'rob.miller@outlook.com' },
 ]
-const lineasDemo = (nombre: string) => {
+const chipsDemo = (nombre: string) => {
   const p = PERSONAS_DEMO.find((x) => x.name === nombre)
-  return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
+  return p && chipsPersona(p.dob, p.email)
 }
 
 /* `abierto`: deja el desplegable a la vista enfocando el input (sin eso, las sugerencias sólo salen al tocar el campo). */
@@ -160,7 +161,7 @@ function PersonSearchDemo({ inicial = '', disabled, abierto }: { inicial?: strin
     <div ref={ref}>
       <PersonSearchField
         label="Select person" required placeholder="Search by Name or Last Name"
-        personas={PERSONAS_DEMO.map((p) => p.name)} lineas={lineasDemo}
+        personas={PERSONAS_DEMO.map((p) => p.name)} chips={chipsDemo}
         value={v} onChange={setV} disabled={disabled}
       />
     </div>

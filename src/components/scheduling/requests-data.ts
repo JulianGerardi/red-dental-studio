@@ -38,7 +38,7 @@ export const SOLICITUDES: Solicitud[] = [
   {
     id: 's2', tipo: 'ASAP',
     patient: 'Elias Aguirre', reason: 'Broken crown, in pain',
-    date: '12-03-2025', start: '14 PM', end: '15 PM',
+    date: '12-03-2025', start: '02 PM', end: '03 PM',
     location: 'Los Angeles - 789 N Sunrise Street',
     provider: 'Dr. Emily Chen', operatory: 'Operatory 1',
   },
@@ -61,7 +61,7 @@ export const SOLICITUDES: Solicitud[] = [
   {
     id: 's5', tipo: 'Waiting List',
     patient: 'Sofia Marin', reason: 'Bitewings - four radiographic images',
-    date: '17-03-2025', start: '16 PM', end: '17 PM',
+    date: '17-03-2025', start: '04 PM', end: '05 PM',
     location: 'Los Angeles - 789 N Sunrise Street',
     provider: 'Sarah Stone', operatory: 'Operatory 1',
     espera: 'Waiting 2 weeks',

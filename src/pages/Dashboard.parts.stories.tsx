@@ -13,6 +13,7 @@ const meta = {
   parameters: {
     layout: 'padded',
     docs: {
+      jira: ['CON-3116', 'CON-2639'],
       decisionsFrom: 'pages/Dashboard.tsx',
       description: {
         component: [

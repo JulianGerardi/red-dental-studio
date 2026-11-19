@@ -1,3 +1,4 @@
+import type { EstadoEncuentro } from '@/lib/encuentro'
 import { createContext } from 'react'
 
 /* Estados del menú del paciente que en la app se abren con el mouse (tooltip,
@@ -7,7 +8,7 @@ export type PatientMenuPreviewState = {
   /** Fija colapsado o expandido en esta instancia (varios menús lado a lado). */
   collapsed?: boolean
   /** Fija el estado del botón de encuentro en esta instancia. */
-  encounter?: 'start' | 'pending'
+  encounter?: EstadoEncuentro
   /** Fija Pending Signature en el lugar del botón de encuentro. */
   pendingSignature?: boolean
   /** Texto del tooltip que queda abierto (rail colapsado). */

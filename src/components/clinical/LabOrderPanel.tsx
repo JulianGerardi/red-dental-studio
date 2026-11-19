@@ -95,7 +95,6 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES }: { /** Las órdenes 
         )}
         pageSize={10}
         pageSizeOptions={[5, 10, 20]}
-        pageSizeLabel="Show:"
         itemLabel="active prescriptions"
         empty={{ icon: FlaskConical, title: 'No lab orders yet', detail: 'Orders sent to the lab will show up here.' }}
       />

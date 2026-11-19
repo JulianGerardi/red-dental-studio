@@ -368,3 +368,61 @@ que en Patients, si el piso de 220px alcanza en una ventana angosta.
   *Applied transactions* (abren la transacción en el modal).
 - Se pierde el atajo de un cargo de procedimiento del Ledger a Clinical Mode con el procedimiento abierto; quedan el link al
   caso de la fila Treatment y el de cada hallazgo. A validar con usuarios si se extraña.
+
+## CON-4147 · Billing alineado con red.dev (2026-11-13)
+
+Comparativa con red.dev (`red.dev.confidentally.com/billing`), pantalla por pantalla. Se suma lo que red.dev tiene y
+nosotros no; las decisiones anteriores de Julián (bento, botones del paciente en el panel, 8 filas, Today bajo, sin
+saldos de la cuenta) se mantienen.
+
+1. **Export CSV** arriba a la derecha (secondary). Con un paciente elegido queda apagado, como red.dev; el `title` dice
+   por qué. Para el paciente sigue el Export statement de su panel.
+2. **Filtros de red.dev:** All, Payments (paciente y seguro), Adjustments, Today. Today usa `HOY_BILLING` (el día del
+   último movimiento de prueba, 05/20/2026).
+3. **Columns** en el encabezado del panel, al lado de los filtros (`ColumnPicker` del Ledger). `DataTable` suma
+   `hiddenColumns` para recibir las ocultas de afuera. El rótulo del menú pasa a "Visible columns" (también en el Ledger).
+4. **Columnas de red.dev:** Trans. Date, Patient / Account, Type, Description, Provider, Amount, Trans. Bal., Status.
+   Trans. Bal. es lo que falta del cargo (`pendienteDe`); pagos y créditos van con "—", como el Ledger (red.dev muestra
+   $0.00). Status con `Pill`.
+5. **Patient View con las columnas del Ledger:** CDT Code y Type con nombre completo (`nombreTipo`/`TONO_TIPO`, que
+   pasan a `LedgerRowDetail` para compartirlos). Sin Ledger Bal. (2026-10-19) ni Actions: los cargos de prueba de Billing
+   no tienen caso para Estimation details. Guarantor View vuelve a las del resumen, como red.dev.
+6. **Credit available · $X** debajo de la descripción de un pago con crédito sin aplicar (el pago de Lucía Paz del
+   05/20 suma `creditoDisponible`).
+7. **Pie:** "results" y Rows per page (8, 20, 50).
+8. **Today como red.dev:** Adjustments Created Today / Unapplied Credits, bajada "Charge and credit adjustments" y montos
+   en plata calculados de los movimientos de hoy ($100.00, $30.00, $100.00). Antes eran números sueltos del Figma.
+9. **Find Patient:** placeholder "Search by Name, Last Name, Email or DOB" (la búsqueda de prueba sigue por nombre).
+
+**Anomalías / diferencias que quedan:** red.dev despliega cada fila del resumen con un chevron y además elige al
+paciente con el clic en la fila; acá el clic elige y el detalle se despliega recién con paciente (regla del design
+system: una fila que se despliega no hace otra cosa). Queda a decidir. red.dev muestra el número de paciente
+(#P49698386) en la card del elegido; acá, el rol. Con el Export CSV el contenido mide 913 px a 1440 × 900 (antes ~890).
+
+**Para validar con usuarios:** si Payments/Adjustments alcanza o extrañan filtrar Charge Adj vs Credit Adj; si "—" en
+Trans. Bal. de un pago se entiende mejor que $0.00.
+
+## CON-4147 · Los botones y sus drawers, como red.dev (2026-11-13)
+
+Pedido de Julián: revisar qué hace cada acción y cómo se abren los drawers.
+
+1. **Un drawer por botón.** En red.dev, Billing abre los mismos drawers que el Ledger: *New Patient Payment (-)*,
+   *Credit Adjustment (-)* y *Enter Charge (+) Adjustment*. El "Post payment" único del Figma (con un Type para elegir y
+   un buscador de paciente) sale: el botón ya dice qué se postea y los botones sólo aparecen con un paciente elegido.
+   `PostPaymentDialog` sigue con el mismo nombre y arma el de cada tipo.
+2. **Campos y listas de red.dev** (`METODOS_PAGO`, `TIPOS_AJUSTE_CREDITO`, `TIPOS_AJUSTE_CARGO`, sin las de QA):
+   - Pago: Transaction date, Apply to; Amount y Payment method con + / − para sumar métodos (Check Payment pide Check y
+     Bank/Branch); Notes. Guarda un movimiento por método.
+   - Credit: Transaction date, Apply to, Adjustment type, Amount, Notes.
+   - Charge: Transaction date, Amount, Type, Provider (`PROVIDERS_BILLING`), Apply to, Visit date, Notes. Sin tabla de
+     aplicación y sin pasos, como red.dev.
+3. **Lo que queda con las reglas del drawer:** Ledger Transactions va en un segundo paso (*Allocation*) en vez de debajo
+   de los campos; secciones sin caja; pie de dos botones del mismo ancho (`DrawerActions`, también en Charge).
+4. **Fecha** precargada con `HOY_BILLING`, como red.dev precarga hoy. **Apply to:** el paciente y los de su garante.
+5. **Export CSV** descarga `billing-activity-<fecha>.csv` con las filas que se ven (filtro incluido) y avisa cuántas.
+
+**Diferencias que quedan:** red.dev arranca el pago con el total abierto y lo reparte en Applied; acá arranca vacío
+(lógica, no diseño). El error dice "This field is required." (el del sistema) y no "Amount is required.".
+
+**Para validar con usuarios:** si separar Ledger Transactions en un segundo paso hace más lento el cobro en recepción
+frente a verlo todo junto, como en red.dev.

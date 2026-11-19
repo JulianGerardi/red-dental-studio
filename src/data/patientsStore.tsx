@@ -5,8 +5,8 @@ import type { PatientRow, PatientStatus } from '@/components/patients/PatientsTa
    tabla al instante. No persiste entre recargas: es un prototipo de diseño y
    guardar en localStorage haría que la demo arranque con datos sucios. */
 
-/* Los datos del formulario de paciente (New Patient y Edit Patient: General, Guardian y Demography). Ver
-   design-reference/figma/modulos/patients.md, 2026-10-22. */
+/* Los datos del formulario de paciente: General, Guardian y Demography en New Patient (CON-1328); General, Demography,
+   Contact y Address en Edit Patient (CON-1329). Ver design-reference/figma/modulos/patients.md, 2026-11-18. */
 export type DatosPaciente = {
   first: string
   middle: string
@@ -36,10 +36,25 @@ export type DatosPaciente = {
   gZip: string
   guardianGarante: boolean
   guardianRel: string
-  phone: string
+  /* Demographic Information, como en 2.0 (CON-1328). */
+  gender: string
+  race: string
+  ethnicity: string
+  marital: string
+  profession: string
+  nationality: string
   language: string
-  address: string
-  city: string
+  religion: string
+  /* Contact y Address del paciente: se cargan en Edit Patient (CON-1329). */
+  codigo: string
+  area: string
+  numero: string
+  ext: string
+  linea1: string
+  linea2: string
+  pais: string
+  estado: string
+  ciudad: string
   zip: string
 }
 
@@ -47,35 +62,44 @@ export const VACIO_PACIENTE: DatosPaciente = {
   first: '', middle: '', last: '', birthday: '', email: '', interpreter: false, portal: false,
   guardianName: '', guardianNuevo: false, gFirst: '', gLast: '', gEmail: '', gDob: '',
   gCodigo: '(+1) United States', gArea: '', gNumero: '', gExt: '', gLinea1: '', gLinea2: '', gPais: '', gEstado: '', gCiudad: '', gZip: '',
-  guardianGarante: false, guardianRel: '', phone: '', language: '', address: '', city: '', zip: '',
+  guardianGarante: false, guardianRel: '',
+  gender: '', race: '', ethnicity: '', marital: '', profession: '', nationality: '', language: 'English', religion: '',
+  codigo: '(+1) United States', area: '', numero: '', ext: '', linea1: '', linea2: '', pais: '', estado: '', ciudad: '', zip: '',
 }
 
 /* Lo que se sabe de cada paciente más allá de la fila de la tabla, para que Edit Patient abra con los datos cargados.
    Los que no están acá arman lo que tienen de la fila (nombre, nacimiento, email). */
 const DETALLE_SEMILLA: Record<string, Partial<DatosPaciente>> = {
-  'abril-viola': { portal: true, phone: '(555) 123-4567', language: 'English', address: '123 Maple Street', city: 'Phoenix', zip: '85016' },
-  'sofia-chen': { guardianName: 'Elena Chen', guardianRel: 'Parent', phone: '(555) 987-6543', language: 'Spanish', city: 'Miami' },
-  'daniel-ortiz': { interpreter: true, language: 'Spanish', portal: true },
+  'abril-viola': {
+    portal: true, gender: 'Female', nationality: 'United States', area: '555', numero: '1234567',
+    linea1: '123 Maple Street', pais: 'United States', estado: 'Arizona', ciudad: 'Phoenix', zip: '85016',
+  },
+  'sofia-chen': {
+    guardianName: 'Elena Chen', guardianRel: 'Parent', gender: 'Female', language: 'Spanish', area: '555', numero: '9876543',
+    linea1: '88 Bay Road', pais: 'United States', estado: 'Florida', ciudad: 'Miami', zip: '33101',
+  },
+  'daniel-ortiz': { interpreter: true, language: 'Spanish', portal: true, gender: 'Male' },
 }
 
 /* El paciente del dashboard (/patients/john-smith) no está en la tabla. */
 export const DATOS_JOHN_SMITH: DatosPaciente = {
-  ...VACIO_PACIENTE, first: 'John', last: 'Smith', birthday: 'January 28, 1999', email: 'john.smith@hotmail.com', portal: true,
-  phone: '(555) 010-4477', language: 'Spanish', address: '456 Oak Avenue', city: 'Los Angeles', zip: '90012',
+  ...VACIO_PACIENTE, first: 'John', last: 'Smith', birthday: '01/28/1999', email: 'john.smith@hotmail.com', portal: true,
+  gender: 'Male', language: 'Spanish', area: '555', numero: '0104477',
+  linea1: '456 Oak Avenue', pais: 'United States', estado: 'California', ciudad: 'Los Angeles', zip: '90012',
 }
 
 const SEMILLA: PatientRow[] = [
-  { id: 'abril-viola', name: 'Abril Viola', initials: 'av', birthday: 'April 2, 2025', email: 'Abril@gmail.com', status: 'Active' },
-  { id: 'marco-rivera', name: 'Marco Rivera', initials: 'mr', birthday: 'Jan 15, 2025', email: 'marco.r@gmail.com', status: 'Active' },
-  { id: 'sofia-chen', name: 'Sofia Chen', initials: 'sc', birthday: 'Mar 8, 2025', email: 'sofia.chen@mail.com', status: 'Inactive' },
-  { id: 'daniel-ortiz', name: 'Daniel Ortiz', initials: 'do', birthday: 'Feb 20, 2025', email: 'd.ortiz@outlook.com', status: 'Active' },
-  { id: 'thomas-davis', name: 'Thomas Davis', initials: 'td', birthday: 'May 30, 2025', email: 'thomas.davis@email.com', status: 'Active' },
-  { id: 'lena-park', name: 'Lena Park', initials: 'lp', birthday: 'May 11, 2025', email: 'lena.park@email.com', status: 'Inactive' },
-  { id: 'mark-wilson', name: 'Mark Wilson', initials: 'mw', birthday: 'June 2, 2025', email: 'mark.wilson@email.com', status: 'Active' },
-  { id: 'sophia-johnson', name: 'Sophia Johnson', initials: 'sj', birthday: 'April 20, 2025', email: 'sophia.johnson@email.com', status: 'Active' },
-  { id: 'robert-brown', name: 'Robert Brown', initials: 'rb', birthday: 'March 15, 2025', email: 'robert.brown@email.com', status: 'Inactive' },
-  { id: 'emily-clark', name: 'Emily Clark', initials: 'ec', birthday: 'July 8, 2025', email: 'emily.clark@email.com', status: 'Active' },
-  { id: 'james-wilson', name: 'James Wilson', initials: 'jw', birthday: 'Jun 3, 2025', email: 'j.wilson@corp.com', status: 'Active' },
+  { id: 'abril-viola', name: 'Abril Viola', initials: 'av', birthday: '04/02/2025', email: 'Abril@gmail.com', status: 'Active' },
+  { id: 'marco-rivera', name: 'Marco Rivera', initials: 'mr', birthday: '01/15/2025', email: 'marco.r@gmail.com', status: 'Active' },
+  { id: 'sofia-chen', name: 'Sofia Chen', initials: 'sc', birthday: '03/08/2025', email: 'sofia.chen@mail.com', status: 'Inactive' },
+  { id: 'daniel-ortiz', name: 'Daniel Ortiz', initials: 'do', birthday: '02/20/2025', email: 'd.ortiz@outlook.com', status: 'Active' },
+  { id: 'thomas-davis', name: 'Thomas Davis', initials: 'td', birthday: '05/30/2025', email: 'thomas.davis@email.com', status: 'Active' },
+  { id: 'lena-park', name: 'Lena Park', initials: 'lp', birthday: '05/11/2025', email: 'lena.park@email.com', status: 'Inactive' },
+  { id: 'mark-wilson', name: 'Mark Wilson', initials: 'mw', birthday: '06/02/2025', email: 'mark.wilson@email.com', status: 'Active' },
+  { id: 'sophia-johnson', name: 'Sophia Johnson', initials: 'sj', birthday: '04/20/2025', email: 'sophia.johnson@email.com', status: 'Active' },
+  { id: 'robert-brown', name: 'Robert Brown', initials: 'rb', birthday: '03/15/2025', email: 'robert.brown@email.com', status: 'Inactive' },
+  { id: 'emily-clark', name: 'Emily Clark', initials: 'ec', birthday: '07/08/2025', email: 'emily.clark@email.com', status: 'Active' },
+  { id: 'james-wilson', name: 'James Wilson', initials: 'jw', birthday: '06/03/2025', email: 'j.wilson@corp.com', status: 'Active' },
 ]
 
 /* Se exporta: lo usa también AppointmentCardCompacta (dashboard/AppointmentCard.tsx) para armar el id del paciente a

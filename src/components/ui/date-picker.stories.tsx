@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ChevronLeft, ChevronsLeft } from 'lucide-react'
-import { DatePicker, MonthCalendar, NavBtn } from './date-picker'
+import { AnioEditable, DatePicker, MonthCalendar, NavBtn } from './date-picker'
 import { DateFilter } from './date-filter'
 import { Bloque, ConRotulo, Forzar, Lienzo, Muestra, Muestras, Tabla, TablaPartes, Token, medidasDe, useMedidas, type Medidas } from '@/design-system/kit'
 import { esperar, pulsar, secuencia } from '@/design-system/play'
@@ -227,3 +227,10 @@ export const Specs: Story = {
     </Lienzo>
   ),
 }
+
+/* El año del calendario se escribe (patients.md, 2026-11-04): cuatro dígitos y salta a ese año, sin pasar de `tope`. */
+function AnioDemo() {
+  const [mes, setMes] = useState(new Date(1990, 0, 1))
+  return <span className="flex items-center gap-3 text-[13px] text-ink"><AnioEditable month={mes} onMonthChange={setMes} tope={new Date()} /> {mes.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+}
+export const EditableYear: Story = { parameters: { controls: { disable: true } }, render: () => <AnioDemo /> }

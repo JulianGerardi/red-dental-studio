@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Search, Plus, Building2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Search, Plus, Building2, Pencil, KeyRound, Ban } from 'lucide-react'
 import { SearchButton } from '@/components/ui/search-button'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { aviso } from '@/components/ui/toaster'
@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { NewAccountDrawer } from '@/components/settings/NewAccountDrawer'
 import { ManageLicensesDrawer } from '@/components/settings/ManageLicensesDrawer'
-import { TABLA_LINK } from '@/lib/estilos'
 
 /* Settings → Accounts. Ver design-reference/figma/modulos/settings-accounts.md.
 
@@ -64,7 +63,7 @@ const FILTROS = ['All', 'Active', 'Draft', 'Pending'] as const
 /* La tabla estándar (ui/data-table) con las columnas de cuentas. Owners es la
    columna que se estira. */
 const COLUMNAS: DataTableColumn<Cuenta>[] = [
-  { key: 'nombre', header: 'Name', width: 120, cell: (c) => <Link to={`/settings/accounts/${c.id}`} className={TABLA_LINK} title={c.nombre}>{c.nombre}</Link> },
+  { key: 'nombre', header: 'Name', width: 120, cell: (c) => <TextCell>{c.nombre}</TextCell> },
   { key: 'plan', header: 'Plan', width: 130, cell: (c) => <TextCell>{c.plan}</TextCell> },
   { key: 'suscripcion', header: 'Subscription', width: 90, cell: (c) => c.suscripcion },
   { key: 'vence', header: 'Expires on', width: 95, cell: (c) => c.vence },
@@ -128,13 +127,18 @@ export function SettingsAccounts() {
           /* "Mostrar" en castellano en una pantalla en inglés: así viene en el
              diseño y el contenido se replica tal cual. */
           pageSizeOptions={[10, 25, 50]}
-          pageSizeLabel="Mostrar:"
           empty={{ icon: Building2, title: 'No accounts', detail: 'Nothing matches the current search or filter.' }}
           rowActions={(c) => (
             <>
-              <DropdownMenuItem onSelect={() => navigate(`/settings/accounts/${c.id}`)}>Edit account</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setLicencias(c)}>Manage licenses</DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" onSelect={() => aviso.warn(`${c.nombre} suspended.`)}>Suspend</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => navigate(`/settings/accounts/${c.id}`)}>
+                <Pencil className="size-4 shrink-0" /> Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setLicencias(c)}>
+                <KeyRound className="size-4 shrink-0" /> Manage Licenses
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive" onSelect={() => aviso.warn(`${c.nombre} suspended.`)}>
+                <Ban className="size-4 shrink-0" /> Suspend
+              </DropdownMenuItem>
             </>
           )}
         />

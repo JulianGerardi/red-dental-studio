@@ -119,9 +119,9 @@ export const Parts: Story = {
       <Bloque titulo="When it appears" nota="Con varios procedimientos manda el peor caso: si uno no se mandó, es No consent sent.">
         <Tabla encabezado={['Case', 'Consent', 'What happens']} minimo={640} arriba>
           <tr><td className="font-semibold">Not accepted (Planning, Pending, Presented)</td><td>—</td><td>No hay diálogo: aviso de error <em>Procedure cannot be updated</em> con <em>View case</em>.</td></tr>
-          <tr><td className="font-semibold">Accepted o Waiting for consent</td><td>Signed</td><td>No hay diálogo: el estado cambia.</td></tr>
-          <tr><td className="font-semibold">Accepted o Waiting for consent</td><td>Pending</td><td>Signature pending.</td></tr>
-          <tr><td className="font-semibold">Accepted o Waiting for consent</td><td>Not sent o Expired</td><td>No consent sent.</td></tr>
+          <tr><td className="font-semibold">Accepted o Waiting for consent</td><td>Accepted o Not required</td><td>No hay diálogo: el estado cambia.</td></tr>
+          <tr><td className="font-semibold">Accepted o Waiting for consent</td><td>Requested</td><td>Signature pending.</td></tr>
+          <tr><td className="font-semibold">Accepted o Waiting for consent</td><td>Not generated, Rejected o Discarded</td><td>No consent sent.</td></tr>
           <tr><td className="font-semibold">Procedimiento suelto (sin caso)</td><td>—</td><td>No hay diálogo: no lleva consentimiento.</td></tr>
         </Tabla>
       </Bloque>
@@ -242,11 +242,11 @@ export const Specs: Story = {
       </Bloque>
       <Bloque titulo="Logic" nota="consentimientoRequerido() decide el diálogo; nada de esto se calcula en la pantalla.">
         <Tabla encabezado={['Consents of the procedures', 'Dialog']} minimo={560}>
-          <Fila a="Todos Signed o Not required" b={dialogo(['Signed', 'Not required'])} />
-          <Fila a="Pending" b={dialogo(['Pending', 'Signed'])} />
-          <Fila a="Not sent" b={dialogo(['Not sent'])} />
-          <Fila a="Not generated" b={dialogo(['Not generated', 'Pending'])} />
-          <Fila a="Pending y Not sent juntos" b={dialogo(['Pending', 'Not sent'])} />
+          <Fila a="Todos Accepted o Not required" b={dialogo(['Accepted', 'Not required'])} />
+          <Fila a="Requested" b={dialogo(['Requested', 'Accepted'])} />
+          <Fila a="Not generated" b={dialogo(['Not generated', 'Requested'])} />
+          <Fila a="Rejected o Discarded" b={dialogo(['Rejected', 'Discarded'])} />
+          <Fila a="Requested y Rejected juntos" b={dialogo(['Requested', 'Rejected'])} />
         </Tabla>
       </Bloque>
     </Lienzo>

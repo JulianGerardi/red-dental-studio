@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ArchIcon, ScopeIcon } from './ScopeIcons'
+import { ArchIcon, IconoArea, ScopeIcon } from './ScopeIcons'
 import { CajaIcono } from './ProcedureRow'
 import { SCOPES } from './data'
 
@@ -25,3 +25,15 @@ export const AllScopes: Story = {
 
 /* El ícono de arcada del design system 2.0. */
 export const ArchGlyph: Story = { render: () => <CajaIcono estado="default"><ArchIcon /></CajaIcono> }
+
+/* El ícono de cada tipo de área de tratamiento (CON-3700): diente y rango, arcada, boca (cuadrante, boca entera,
+   intraoral) y extraoral. */
+export const TreatmentAreaIcons: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-4">
+      {(['Tooth', 'Range', 'Quadrant', 'Arch', 'Mouth', 'Intraoral', 'Extraoral'] as const).map((t) => (
+        <span key={t} className="flex items-center gap-1.5 text-sm"><CajaIcono estado="default"><IconoArea tipo={t} /></CajaIcono> {t}</span>
+      ))}
+    </div>
+  ),
+}

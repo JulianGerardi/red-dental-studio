@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { CONTADORES } from '@/data/clinical-mode'
 import { PROGRESO_INICIAL } from '@/data/workflows'
-import { ClinicalNoteDialog, Flotante, ListaContador, ResumenWorkflow } from './ClinicalTopBar'
+import { RowActionsMenu } from '@/components/ui/row-actions-menu'
+import { ClinicalNoteDialog, Flotante, ListaContador, OpcionesEncuentro, ResumenWorkflow } from './ClinicalTopBar'
 
 const meta = {
   title: 'Components/Clinical/ClinicalTopBar parts',
@@ -30,3 +31,15 @@ export const BadgeEmpty: Story = { render: () => <div className="w-[300px] p-4">
 
 /* Al cerrar el encuentro (Figma 4540:27072): firmar la Clinical Note ahora o más tarde. */
 export const ClinicalNote: Story = { render: () => <ClinicalNoteDialog open onClose={() => {}} paciente="patient-0001" /> }
+
+/* Las opciones del menú del encuentro (CON-1612; clinical-mode.md, 2026-11-13): en curso ofrece Pause Encounter y
+   Discharge Patient; en pausa, retomarlo. */
+const menuEncuentro = (estado: 'sinEmpezar' | 'enCurso' | 'enPausa') => (
+  <div className="h-40 p-4">
+    <RowActionsMenu label="Encounter options" abierto>
+      <OpcionesEncuentro estado={estado} onCambiar={() => {}} onCompletar={() => {}} />
+    </RowActionsMenu>
+  </div>
+)
+export const EncounterOptionsInProgress: Story = { render: () => menuEncuentro('enCurso') }
+export const EncounterOptionsPaused: Story = { render: () => menuEncuentro('enPausa') }

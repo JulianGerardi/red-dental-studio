@@ -3,15 +3,362 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
-## 2026-11-10
+## 2026-11-19
 
 ### Pending Signature por paciente, con tres pacientes de ejemplo ([#133](https://github.com/JulianGerardi/red-dental-studio/pull/133))
 - `patient-0002`, `patient-0003` y `patient-0005` abren con **Pending Signature**, para verlo sin hacer el flujo;
-  `patient-0001` sigue con Start Enconter. La nota sin firmar queda en el paciente desde el que se cerró el encuentro.
+  `patient-0001` sigue con Start Encounter. La nota sin firmar queda en el paciente desde el que se cerró el encuentro.
 - Clinical Mode desde el panel abre el del paciente de la ficha (`/patients/<id>/clinical-mode`), ya no siempre el
   primero.
 - **Para el dev:** `useNotaPendiente(paciente)` / `setNotaPendiente(paciente, v)` en `lib/notaClinica.ts`, semilla en
   `NOTA_PENDIENTE_INICIAL`; `ClinicalNoteDialog` pide `paciente`. Decisión en `patient-dashboard.md` (2026-11-10).
+
+## 2026-11-18
+
+### Figma: fila de tarea (Task row) conectada al design system ([#162](https://github.com/JulianGerardi/red-dental-studio/pull/162))
+- **Task row** nuevo en el design system (`📊 Tables & Lists`): fila de tarea pendiente con variantes por tipo (Clinical Note, Lab Orders, Prescriptions, Referrals). 96 filas de las pantallas pasan a instancias; en el Dashboard la diferencia con el original es < 0,1 % de los píxeles.
+- **Para el dev:** la app no cambia. Motor `tareas` guardado en el archivo de flujos; pendientes (cards de Appointments de la ficha, campos, tablas) y el detalle en `design-reference/figma-design-system.md`, sección *Fila de tarea conectada*.
+
+### Relationships: todos los nombres son link y Household con ⋮ (CON-4139, CON-4113) ([#161](https://github.com/JulianGerardi/red-dental-studio/pull/161))
+- **Todos los nombres de las cards** (relaciones y Household) son link azul a la ficha de esa persona
+  (`/patients/:pacienteId`). Ya no hay nombre en negro.
+- **Household lleva el ⋮** con *Edit relationship* y *Delete relationship*, igual que las relaciones. Al editar se
+  conserva la pill *Household*. Sin pacientes en Household: *No household patients*.
+- **Para el dev:** `PersonaCard` siempre dibuja el `Link`; pasale `onEdit`/`onDelete` también en Household. Decisión en
+  `relationships.md` (2026-11-18).
+
+### New Patient como 2.0, Edit Patient como la ficha de un empleado y tablas de Settings sólo con el ⋮ ([#160](https://github.com/JulianGerardi/red-dental-studio/pull/160))
+- **New Patient** (CON-1328): *Email* obligatorio; Demography con los campos de 2.0 (*Gender\** obligatorio, Race,
+  Ethnicity, Marital Status, Profession, Nationality, Language y Religion) e *Interpreter Required* al lado de Language.
+  Mismo nombre y email que otro paciente: `Alert` danger y no se guarda.
+- **Edit Patient** (`/patients/:id/edit`, CON-1329): una sola pantalla sin pestañas, como la ficha de Employee: foto
+  editable, nombre y estado, y las cards General, Contact, Address y Demographic. Sin Guardian ni el buscador de personas.
+  Obligatorios de la historia: General, Gender, teléfono y dirección.
+- **Employee:** la ficha ya no tiene *Use this option only to link a person…* (sigue en New Employee).
+- **Locations, Employees y Accounts:** el nombre de la fila deja de ser link (se entra por el ⋮ → *Edit*); todos los
+  ítems del menú llevan ícono y los de editar dicen *Edit*.
+- **Para el dev:** `DatosPaciente` suma demografía (`gender`, `race`, `ethnicity`, `marital`, `profession`,
+  `nationality`, `religion`) y contacto/dirección (`codigo`, `area`, `numero`, `ext`, `linea1`, `linea2`, `pais`,
+  `estado`, `ciudad`, `zip`); salen `phone`, `address` y `city`. `useFormPaciente(datos, { edicion: true })`,
+  `validarPaciente(d, { menor, exigirGuardian, edicion })`, `duplicadoDe(...)` y los campos `CamposContacto` /
+  `CamposDireccion`. `PersonCell` sin `to` ni `onClick` dibuja texto. Detalle en `patients.md`, `employees.md`,
+  `locations.md` y `settings-accounts.md` (2026-11-18).
+
+### Figma: fila de turno y Status chip conectados al design system ([#159](https://github.com/JulianGerardi/red-dental-studio/pull/159))
+- **Appointment row** rehecho desde la app (variantes `Action=Check In|Check Out`, 408×86) y componente nuevo **Status chip** (TR/CC). ≈ 310 filas de turno de las pantallas pasan a instancias; diferencia con la pantalla original < 0,2 % de los píxeles. El ícono del Button toma el color de su texto.
+- **Para el dev:** la app no cambia. Motor `filas` guardado en el archivo de flujos; pendientes (filas de tarea, cards de la ficha, campos, tablas) y el detalle en `design-reference/figma-design-system.md`, sección *Fila de turno conectada*.
+
+### Documentación: Alert como aviso único y sale Section notice ([#158](https://github.com/JulianGerardi/red-dental-studio/pull/158))
+- **Storybook:** *Elements / Alert* con Parts, States (tonos, título y texto, sólo título, angosto, largo y *In the app*)
+  y Specs, y la regla en la descripción. Se borran `ui/section-notice` y su story.
+- **Screens & Flows:** los avisos de Guardian (Patients) y *Guarantor not assigned* (Scheduling) pasan a instancias de
+  *Alert* de la library; el de Demography se borra. Se cambiaron en el lugar, sin recapturar.
+- **Design system en Figma:** sale *Section notice*; *Alert* suma la regla. Hay que **republicar la library**.
+- **Para el dev:** `@/components/ui/section-notice` ya no existe: para un mensaje en pantalla, `Alert`.
+
+### Figma: estilos de texto y sombra, Sidebar sin activo y pills conectados al design system ([#157](https://github.com/JulianGerardi/red-dental-studio/pull/157))
+- Nuevos en el DS: 7 estilos de sombra, 27 de texto, variante `Sidebar Active=None` y Pill SM con 6 px de padding. Se aplicaron ≈ 8.700 textos, ≈ 4.000 sombras y ≈ 320 pills de estado en las pantallas.
+- **Para el dev:** la app no cambia. Qué falta conectar (cards, campos, tablas, textos con interlineado automático) y cómo se corren los motores: `design-reference/figma-design-system.md`, sección *Estilos, Sidebar sin activo y pills*.
+
+### Avisos: uno solo (`ui/alert`) y sin el de Demography ([#156](https://github.com/JulianGerardi/red-dental-studio/pull/156))
+- **Demography** (New Patient y Edit Patient) ya no muestra *Additional contact and address information. These fields
+  are optional.*: no estaba en ningún diseño.
+- **Un solo aviso en la app: `ui/alert`** (caja redondeada con ícono y título). Las franjas con barra a la izquierda
+  hechas a mano pasan a `Alert`: *Guarantor not assigned* del detalle del turno y `GuarantorBanner` (warning), Guardian
+  *This patient is under 18.* (warning), New Hours (*Attention needed* warning, *This will update the hours…* info),
+  *Global access* de Assign Role (info) y el aviso de presión de Vitals (info).
+- **Para el dev:** para un mensaje en pantalla, usar `Alert` con su tono; no armar franjas con `border-l-[3px]`. Las
+  tarjetas con barra de color (turnos, findings) no son avisos y siguen igual. `ui/section-notice` queda sin usos y se
+  saca del design system cuando se documente. Decisión en `patients.md` (2026-11-18).
+
+### Drawers sin bajada, Edit Patient como pantalla y Edit Appointment en pestañas ([#155](https://github.com/JulianGerardi/red-dental-studio/pull/155))
+- **Drawers:** el título va solo. `ui/drawer` deja `description` sólo para el lector de pantalla; se sacan las bajadas
+  genéricas de sección (New Appointment, Exceptions).
+- **Edit Patient es una pantalla** (`/patients/:id/edit`), como la ficha de una Location: pestañas General / Guardian /
+  Demography, cada sección en su card y Cancel / Save Changes abajo a la derecha; los dos vuelven a la tabla de
+  Patients. Se va la ruta vieja `/patients/edit`.
+- **Edit Appointment (CON-3249):** sin pasos, en pestañas General / Schedule / Additional / Treatment Plan y un solo Save
+  Changes. En el calendario, un lápiz en el detalle del turno lo abre; Fulfilled, No-show y Cancelled no se editan.
+- **Para el dev:**
+  - `NewAppointmentModal`: `titulo="Edit Appointment"` pasa a `edicion`; suma `pestanaInicial` (Rooms y Working Hours
+    abren en Schedule).
+  - `AppointmentDetailsDrawer` suma `onEdit`; `esEditable()` en `calendar-data.ts`.
+  - `EditPatientModal` ya no se usa en la app (queda en el Storybook hasta documentar).
+  - Decisiones en `patients.md`, `scheduling.md` y `figma/README.md` (2026-11-17).
+
+## 2026-11-17
+
+### Figma: pantallas alineadas y shell conectado al design system ([#154](https://github.com/JulianGerardi/red-dental-studio/pull/154))
+- **Alineación:** los botones Check In / Check Out (Dashboard y Header & Sidebar) quedaban en 0,0 pisando los chips; los avatares de la ficha del paciente estaban estirados (186×62) y el pill de las entradas de Clinical Mode, sobre el texto. Reparados. La causa era el motor que reemplaza lo capturado por componentes: no copiaba x/y en frames sin auto layout; ya lo hace.
+- **Button con ícono al final:** nueva propiedad de variante `Icon position` (Leading/Trailing) en el Button del design system (108 variantes). 536 botones (Check In, Check Out, Complete this Task) pasan a Trailing, como en la app.
+- **Shell como instancias:** Sidebar, Topbar y banner de notificación son instancias del design system en ~250 pantallas (el banner a 55 px). Topbar y banner se igualaron a la app (botón de colapsar, buscador blanco, avatar SS, cierre y colapso a la derecha) y el Sidebar suma la sangría de 12 px. Títulos de página: 91 pasan a instancias de `Page title`.
+- **Para el dev:** la app no cambia. Motor `shell` guardado en el archivo de flujos (plugin data `rds.ds/shellSrc`). Pendiente y anomalías en `design-reference/figma-design-system.md` (*Revisión de alineación* y *Shell conectado*): Sidebar sin ítem activo, cards, campos, tablas y estilos de texto y sombra sin conectar.
+
+## 2026-11-16
+
+### Documentación: borrar una franja, cerrar un día, citas afectadas y advertencias en azul ([#153](https://github.com/JulianGerardi/red-dental-studio/pull/153))
+- **Storybook:**
+  - *Pages / Parts / Location detail* suma *Delete working hours?*, *Close working hours?*, *Unable to change* y la
+    tabla *Working Hours · States*.
+  - *HoursAppointmentsDialog* se rehízo con CON-4167: la cita resuelta sale de la lista, sin citas se vuelve al origen
+    y está el bloqueo.
+  - *ConfirmDialog*: la advertencia va en azul.
+- **Screens & Flows:** Locations suma el flujo *Delete hours & close a day* (9 pantallas). La página se recapturó y se
+  reconectó a la library del design system.
+- **Design system en Figma:** *Confirm dialog* con la advertencia en azul y dos ejemplos nuevos. Hay que republicar
+  la library.
+- **Para el dev:**
+  - La app no cambia.
+  - `pulsarRol` (`design-system/play.ts`) acepta `switch`.
+  - Recapturar una página conectada a la library tiene pasos nuevos: ver `figma-docs.md`.
+
+### New/Edit Patient: nombre completo en una fila ([#152](https://github.com/JulianGerardi/red-dental-studio/pull/152))
+- Paso *General* (`CamposGeneral`): *First Name*, *Middle Name* y *Last Name* en una fila de tres; debajo, *Email* y
+  *Birthdate*. En celular, apilados.
+- **Para el dev:** excepción deliberada a "campos de a dos" en drawers (`patients.md`, 2026-11-16). Sin cambios de datos
+  ni validaciones.
+
+### Working Hours: borrar una franja, cerrar un día y citas afectadas según la HU 8 ([#151](https://github.com/JulianGerardi/red-dental-studio/pull/151))
+- **Delete working hours?** (la ✕ de una franja, CON-4166): pregunta antes y borra sólo esa franja. Si es la última,
+  el día queda Closed.
+- **Close working hours?** (el switch, CON-4165): pregunta antes y el día conserva sus franjas. Al reabrirlo,
+  *Set working hours* las trae.
+- **Affected appointments** (CON-4167): entran sólo las citas que pierden cobertura. Lo hecho cita por cita se guarda en
+  el momento y la cita resuelta sale de la lista. Con citas en Check In o In Progress no se aplica nada
+  (*Unable to change working hours*).
+- **`ConfirmDialog`:** el ícono de advertencia (`icon="warning"`) va en azul; en `danger` sigue rojo.
+- **Para el dev:**
+  - En `LocationDetail.tsx`, todo cambio de horarios es una `Operacion` (`panel`, `quitar`, `cerrar`) que pasa por
+    pregunta, impacto (`pierde`) y aplicación.
+  - `HoursAppointmentsDialog` recibe `afectados` ya calculados y `onCambiar`. `HoursBlockedDialog` es nuevo.
+  - `EstadoTurnoLocacion` suma Check In e In Progress.
+
+### Campos obligatorios vacíos: siempre "This field is required." ([#150](https://github.com/JulianGerardi/red-dental-studio/pull/150))
+- Todo campo obligatorio vacío dice *This field is required.* debajo (CON-4161). Salen *Required.*, *Enter the reason.*,
+  *A billing name is required.*, *Please add a procedure to the exception* y las demás variantes.
+- **Para el dev:**
+  - Usar `OBLIGATORIO` de `src/lib/validacion.ts`; no escribir el texto a mano.
+  - Los mensajes de valor inválido (*Enter a valid email.*, *Enter the 10-digit NPI.*) quedan para un campo con algo
+    cargado; vacío, siempre `OBLIGATORIO`.
+
+### Affected appointments con jerarquía clara, "+N" sólo cuando no entra y asterisco en las horas ([#149](https://github.com/JulianGerardi/red-dental-studio/pull/149))
+- **Affected appointments** (`HoursAppointmentsDialog`): el título es *Affected appointments*. Cada fila muestra el
+  paciente, la fecha con el horario completo y el provider, con el estado como badge a la derecha junto al ⋮. Queda un
+  solo contador, *Appointments (N)*: salen el pie y la línea por fila.
+- **Working Hours** (`FranjasDia`): una línea con todas las franjas que entran junto a *Edit hours*. Sólo las que no
+  entran quedan en "+N", que las despliega. En celular, el día y el switch van arriba y las franjas debajo.
+- **Start Time y End Time con asterisco** en *Set working hours* y en *New Hours* (Employees).
+- **Screens & Flows:** Locations suma el flujo *Set working hours: other days & affected appointments*.
+- **Para el dev:**
+  - `FranjasDia` mide con `ResizeObserver` sobre una copia invisible (`aria-hidden`).
+  - En tests, contar las franjas por el botón *Remove …*, no por el texto: la copia lo repite.
+
+### Design system: ConfirmDialog con ícono en línea, Set working hours y turnos afectados ([#148](https://github.com/JulianGerardi/red-dental-studio/pull/148))
+- **Storybook:**
+  - *Elements / ConfirmDialog*: el control `icon` (auto · warning · delete) y una story por combinación de tono e
+    ícono.
+  - *LocationHoursModal*: ahora tiene Parts, States y Specs.
+  - *HoursAppointmentsDialog*: página nueva.
+- **Figma del design system** ([Confidentally UI · Design System](https://www.figma.com/design/iJvnuV8TLStMXpNjdwsuDe),
+  *Feedback & Overlays*): el *Confirm dialog* tiene el ícono de 16 px, las propiedades `Tone` × `Icon` (5 variantes) y
+  ejemplos reales de la app debajo.
+- **Para el dev:**
+  - La app no cambia.
+  - Para Code Connect: `tone` → `Tone`, `icon` → `Icon` (sin prop = Auto), `title` → `Title` y `children` → `Body`.
+  - El link al Figma del design system está en `CLAUDE.md`. El detalle, en `design-system.md` (2026-11-16).
+
+### Working Hours: aplicar el horario a otros días, turnos afectados y pop-ups con ícono en línea ([#147](https://github.com/JulianGerardi/red-dental-studio/pull/147))
+- **Set working hours (Locations):** el día de origen queda elegido y no se puede sacar. Si un día adicional está Open
+  con otro horario, pregunta *Replace working hours?* nombrando sólo esos días, en el orden de la tabla (CON-1546;
+  historia de Abril sin clave en Jira todavía). La comparación ordena las franjas.
+- **Turnos afectados:** si las horas nuevas dejan afuera turnos Proposed o Booked, antes de guardar se abre
+  `HoursAppointmentsDialog`: por turno, Edit appointment, Cancel appointment o Mark as No Show; Confirm guarda las
+  horas y pasa el resto a Waiting List. Cancel no guarda nada (resolución de CON-2890, con el texto adaptado a la
+  locación).
+- **`ui/confirm-dialog`:** sale el ícono de 36 px con círculo. Ahora todos llevan un ícono de 16 px junto al título que
+  sale del tono (info azul; triángulo rojo en `danger`).
+- **Para el dev:**
+  - `LocationHoursModal` suma `horario` (la semana actual, 0-6) y `onGuardar` puede devolver `false` para dejar el
+    panel abierto mientras se resuelven turnos. Exporta `mismoHorario`, `listaDias`, `aMinutos` y `deChip`.
+  - Datos nuevos: `TURNOS_LOCACION` en `src/data/location-detail.ts`.
+  - `ConfirmDialog` suma `icon="delete"` (tacho): usarlo sólo en lo que borra. `icon="warning"` sigue para avisos.
+  - Decisiones en `figma/modulos/locations.md` y `figma/README.md` (2026-11-16).
+
+## 2026-11-15
+
+### Figma: Fill container, íconos de los buscadores y design system conectado ([#145](https://github.com/JulianGerardi/red-dental-studio/pull/145))
+- **Fill container en las 281 pantallas:** lo que ocupa todo el ancho o el alto de su contenedor, o el espacio que sobra,
+  pasa a Fill container (con ancho máximo si lo tenía). Al quitar un elemento el resto se acomoda y al achicar la pantalla
+  el contenido la acompaña; el dock y los drawers quedan anclados a su borde.
+- **Íconos de los buscadores:** el importador los dejaba debajo del input blanco y no se veían; ahora van arriba.
+- **Para el dev:**
+  - Nuevo `scripts/figma/arreglar.figma.js` (se corre con `use_figma` después de importar y ordenar). Verifica cada
+    contenedor: si algún hijo cambiara de tamaño, lo deja como estaba.
+  - Reglas y límites en `design-reference/figma-docs.md` y en `CLAUDE.md` (*Documentación en Figma*). La app no cambia.
+- **Clinical Mode, segunda tanda** (`scripts/figma/flujos/clinical-mode-2.mjs`): Treatment — Workflows (7 pantallas: lista y filtro de workflows, acciones, preguntas, ocultar sección, Generate Narrative), Radiography — Gallery, Upload & Viewer (3) y Lab Order — List & Actions (4: lista, filtro, acciones por fila, View History), capturados de la app y conectados al design system. Las notas de ROS, Physical, Periodontal, Patient Summary, Prescription y Referral ahora dicen que en la app son placeholders «Planned» (antes parecían pantallas hechas).
+- **Clinical Mode, tercera y cuarta tanda** (`clinical-mode-3.mjs`, `clinical-mode-4.mjs`): Dental Assessment en profundidad (información del diente, acciones de un hallazgo, Edit Finding, Discard, Delete, New Procedure planned/existing/superficies; 11 pantallas capturadas) y, desde Platform Design sobre el shell de la plataforma, Prescription (lista y New), Referral (lista y create), ROS y Treatment History (6 pantallas). Anomalías del diseño en `modulos/clinical-mode.md`.
+- **Dental Assessment, cierre** (`clinical-mode-5.mjs`): Edit Condition de un hallazgo de región (Soft Palate), Problem List · Procedures y sus acciones (Edit, Complete, Discontinue) con el drawer Edit Procedure (7 pantallas). Quedan sin equivalente en la app los pop-ups de New Condition de Platform Design, y para después Treatment Workflow y Workflow Set Up (hay que pegarlos).
+- **Foundations nuevos** en el design system: colecciones Opacity, Border, Layout (anchos de página, drawers, breakpoints), Motion y Z-index, y muestras de foco y contraste WCAG.
+- **Pantallas reconectadas a la library publicada:** instancias (≈ 9.000 cambiadas), estilos de texto y de sombra (≈ 22.000 textos) y variables (alias de las publicadas); verificado sin cambios visibles. Detalle en `design-reference/figma-design-system.md`.
+- **Design system en un archivo aparte** ([Confidentally UI · Design System](https://www.figma.com/design/iJvnuV8TLStMXpNjdwsuDe)): 11 páginas por categoría, 36 component sets (≈ 240 variantes), 227 íconos, 117 variables y los estilos de texto y sombra; suma lo que faltaba (Sidebar, Topbar, banner, menús, cards de turno y tarea, tabla, paginador, drawer, diálogo, toast…). Listo para publicar como library; falta que Julián la publique y reconectar las pantallas.
+- **Design system en Figma** (primera versión, página 🎨 Design System del archivo de flujos): 117 variables (Color 88, Radius, Spacing, Size), 23 estilos de
+  texto, 4 de sombra y 227 íconos, más 18 componentes (Button 54, IconButton 36, Pill, Chip, Count, Avatar,
+  Checkbox, Switch, Field, Tab, Alert, Card, Step, Table cell, Menu item, Tooltip, Breadcrumb). Cada propiedad de la
+  pieza de React tiene su propiedad en Figma.
+- **Pantallas conectadas:** ≈ 5.900 instancias (Button, IconButton, Pill, Avatar, Chip, Count), ≈ 85.000 rellenos y
+  trazos ligados a variables de color, radios y espaciados a sus variables y ≈ 22.000 textos a estilos, sin cambios
+  visibles (se comparó antes y después). Lo que no coincide con una variante queda como capa.
+- **Para el dev:** `design-reference/figma-design-system.md` trae la clasificación (qué se componentiza y qué no), cómo
+  retomar y los hallazgos de UX: dos contadores (Globo y Count), ≈ 5.800 de 10.700 botones fuera de la escala 28/32/36 y
+  azules sin token (`#1e58be`, `#2f6bff`). Nada de esto toca el código de la app todavía.
+
+
+### Documentación en Figma, Storybook al día y Jira en cada página ([#144](https://github.com/JulianGerardi/red-dental-studio/pull/144))
+- **Figma:** archivo nuevo, [Confidentally — Red Dental Studio · Flows](https://www.figma.com/design/TPh6NE9d4skn0BdId26UTR),
+  con el formato de la página 🧍 Patients de *Platform Design*: una página por módulo (19), una sección por flujo (63)
+  y 281 pantallas capturadas de la app, con auto layout y las capas nombradas como el componente de React.
+- **Relationships & Billing completo:** Add Relationship con Person · Contact · Relationship (persona con contacto,
+  sin contacto y nueva), Edit, Delete con su vacío y el garante en Ledger y Billing (CON-4000, CON-3174, CON-3999).
+- **Happy path para el dev:** cada flujo trae resumen, quién lo usa, sus historias de Jira y los pasos numerados; cada
+  pantalla, su ruta y una nota.
+- **Storybook:** quedaban 74 piezas sin story y 6 estados sin mostrar desde el 2026-10-25. `ds:check` vuelve a verde
+  (570 de 570). Páginas nuevas: BillingProfile, LocationInsuranceDefaults, ConsentDetail, EstimateDetails, Procedure
+  actions, RegionExam, IntraOralExam, ProblemListFlotante, SearchPicker, DockFlotantes y Ledger parts, entre otras.
+- **Jira en el Storybook:** cada página suma la tarjeta *Jira* con las historias de la pieza y su link.
+- **Para el dev:**
+  - La app no cambia de comportamiento: sólo se exportaron piezas internas para poder documentarlas (lista en
+    `design-system.md`, 2026-11-15).
+  - `scripts/figma/`: `capturar.mjs` (`npm run figma:capturar -- <módulo>`), `portada.mjs`, `ordenar.figma.js` y un
+    archivo por módulo en `flujos/` con los pasos, las notas y las claves de Jira. Sirven de guía del flujo aunque no
+    se abra el Figma.
+  - `kit.tsx` suma `SpecsMedidas` (Specs leídos de la pieza dibujada) y los stories aceptan `parameters.docs.jira`.
+  - Reglas en `design-reference/figma-docs.md` y en `CLAUDE.md` (*Documentación en Figma*): documentar es Storybook y
+    Figma.
+
+## 2026-11-13
+
+### Billing: un drawer por botón, como red.dev, y Export CSV que descarga ([#143](https://github.com/JulianGerardi/red-dental-studio/pull/143))
+- **Drawers de red.dev:** Patient Payment abre *New Patient Payment (-)*, Credit Adjustment abre *Credit Adjustment (-)* y
+  Charge Adjustment abre *Enter Charge (+) Adjustment*, cada uno con sus campos (CON-4147). Sale el "Post payment" único,
+  con su Type y su buscador de paciente.
+- **Pago:** varios métodos con + / − (Check Payment pide Check y Bank/Branch). **Credit** y **Charge:** los tipos de
+  red.dev; Charge suma Provider y Visit date y no tiene tabla de aplicación.
+- **Export CSV** descarga `billing-activity-<fecha>.csv` con las filas que se ven.
+- **Para el dev:**
+  - `PostPaymentDialog` arma el drawer según `tipoInicial`.
+  - Listas en `data/billing.ts`: `METODOS_PAGO`, `TIPOS_AJUSTE_CREDITO`, `TIPOS_AJUSTE_CARGO`, `PROVIDERS_BILLING`.
+  - Decisiones en `billing.md` (2026-11-13, "Los botones y sus drawers"). Storybook sin actualizar.
+
+### Billing alineado con red.dev: Export CSV, filtros, Columns y Today ([#142](https://github.com/JulianGerardi/red-dental-studio/pull/142))
+- **Export CSV** arriba a la derecha; con un paciente elegido queda apagado (CON-4147).
+- **Filtros de red.dev:** All, Payments, Adjustments, Today (antes Pt Payment, Charge Adj, Credit Adj).
+- **Columnas de red.dev:** Trans. Date, Patient / Account, Type, Description, Provider, Amount, Trans. Bal., Status, con
+  **Columns** al lado de los filtros. Patient View usa las del Ledger (CDT Code y Type con nombre completo).
+- **Credit available · $X** debajo de un pago con crédito sin aplicar; pie con "results" y Rows per page (8, 20, 50).
+- **Today** con los títulos de red.dev (Adjustments Created Today, Unapplied Credits) y montos en plata.
+- **Para el dev:**
+  - `DataTable` suma `hiddenColumns` (columnas ocultas controladas desde afuera).
+  - `nombreTipo` y `TONO_TIPO` viven en `LedgerRowDetail` (los usan Ledger y Billing).
+  - El menú de `ColumnPicker` dice "Visible columns" (también en el Ledger).
+  - `HOY_BILLING` en `data/billing.ts` es el "hoy" de los datos de prueba (filtro Today y card Today).
+  - Decisiones en `billing.md` (2026-11-13). Storybook sin actualizar.
+
+### Clinical Mode: encuentro de CON-1612, exámenes de red.dev y fechas MM/DD/YYYY ([#141](https://github.com/JulianGerardi/red-dental-studio/pull/141))
+- **Encuentro:** tres estados (CON-1612), iguales en la barra de Clinical Mode y en la ficha, que comparten el estado:
+  - *Start Encounter*: desde la ficha lleva a Clinical Mode (CON-2994).
+  - *Complete Encounter*: ofrece firmar la Clinical Note. El menú ofrece *Pause Encounter* y *Discharge Patient*.
+  - *Pending Encounter* (en pausa, ámbar).
+  - Se van las opciones viejas (End / Discard encounter, Encounter settings) y el menú ya no se corta.
+- **Exámenes** con los nombres y el orden de red.dev: Vitals, ROS, Physical, Extraoral, Intraoral, Dental assessment,
+  Periodontal y Radiographic. Salen BMI y ATM/O-F (CON-4144).
+- **Fechas en MM/DD/YYYY** en toda la app (tablas, detalles, cards y campos de fecha; Insurance pide "MM / DD / YY").
+  Los títulos y las frases siguen en texto.
+- **Textos:** "Start Encounter" (antes "Enconter"), "Mark as…", y "Rows per page:" en las tablas de Clinical Mode y en
+  Accounts (antes "Show:" y "Mostrar:").
+- **Para el dev:**
+  - Estado del encuentro en `lib/encuentro.ts` (`useEstadoEncuentro`) y opciones en `OpcionesEncuentro`.
+  - `formatMDY` en `lib/fecha.ts` para mostrar fechas; `formatDMY` queda sólo para las claves internas de la agenda.
+  - `ordenFecha` lee MM/DD.
+  - Decisiones en `clinical-mode.md` (2026-11-13). Storybook sin actualizar.
+
+## 2026-11-12
+
+### Documents: nombres reales y Rows per page ([#140](https://github.com/JulianGerardi/red-dental-studio/pull/140))
+- **Nombres:** la tabla deja de repetir "Isacc Cihtepin.doc" (venía del Figma). Ahora usa nombres como los de red.dev:
+  *Procedure Consent - código y procedimiento*, *Informed Consent / Refusal of Dental Treatment – caso*, del más nuevo al
+  más viejo (CON-4143).
+- **Rows per page:** 10, 20 o 50; arranca en 10.
+- **Para el dev:** `DataTable` ya traía `pageSizeOptions`; acá sólo se activa. Hay e2e nuevo en
+  `tests/documents.e2e.ts`. Decisiones en `treatments.md` (2026-11-12). Storybook sin actualizar.
+
+### Ledger: "Add a note (optional)" y "Enter Charge (+) Adjustment" ([#139](https://github.com/JulianGerardi/red-dental-studio/pull/139))
+- **Notes:** el placeholder de Patient Payment, Credit Adjustment, Charge Adjustment y Post payment (Billing) pasa de
+  "Placeholder" a "Add a note (optional)".
+- **Charge Adjustment (+):** el título pasa a "Enter Charge (+) Adjustment", como red.dev, en lugar de "New Credit (+)
+  Adjustment" del Figma.
+- **Pestañas:** Payment, Credit y Charge quedan como pestañas (decisión de Julián, CON-4142).
+- **Para el dev:** sólo cambian textos. Las decisiones están en `ledger.md` (2026-11-12).
+
+### Ledger: métricas, columnas y ⋮ de CON-3753 / CON-3755, y Household ([#138](https://github.com/JulianGerardi/red-dental-studio/pull/138))
+- **Métricas:** Patient (o Guarantor) balance, Patient (o Guarantor) responsibility, Unapplied credits y Open charges,
+  cada una con un ⓘ. Se van Total charges e Insurance paid (CON-4142).
+- **Columnas:** Trans. Date, CDT Code, Patient / Account, Type (Procedure, Patient Payment…), Description, Provider,
+  Amount, Trans. Bal. y Ledger Bal. Unapplied Credit pasa a ser opcional y arranca oculta.
+- **Orden:** de lo más nuevo a lo más viejo. Ledger Bal. corre sobre lo que muestra la vista.
+- **⋮ por fila:** Apply credit y Estimation details (abre el caso en Clinical Mode). Sin acciones, no hay ⋮.
+- **Guarantor View:** suma la card Household.
+- **Para el dev:**
+  - `Stat` suma `info` y la `nota` pasa a ser opcional.
+  - `ColumnPicker` suma `porDefecto`.
+  - `RowActionsMenu` suma `onOpenChange`.
+  - `FilaConTooltip` suma `callado`.
+  - `coberturaSeguro` pasa a `data/ledger.ts`.
+  - Decisiones en `ledger.md` (2026-11-12). Storybook sin actualizar.
+
+### Relationships, buscador con ✕ y New Appointment ordenado como CON-4090 ([#137](https://github.com/JulianGerardi/red-dental-studio/pull/137))
+- **Relationships:** el nombre de quien es paciente linkea a su ficha; el ⋮ queda marcado mientras su menú está
+  abierto; Edit Relationship pasa a 560 px como los demás drawers (CON-4139).
+- **Buscador de personas:** con texto escrito muestra una **✕** para borrarlo. La persona elegida se ve con la misma
+  card del buscador (Add Relationship, Edit e Insurance).
+- **New Appointment:** Status y Requestor arriba, después Reason y Date, Start y End, y Operatory (orden de CON-4090).
+  **Additional** (ASAP, Follow-up, Premedicate) y **Notes** pasan al paso 1; el paso 2 queda sólo para linkear la
+  visita. Date dice "Pick a date" y la agenda del costado muestra la fecha elegida en inglés (CON-4140).
+- **Horas:** las franjas van de "08 AM" a "07 PM" con 12 horas ("01 PM", no "13 PM", anomalía del Figma).
+- **Para el dev:** `hora24(franja)` en `AppointmentSlotPicker` pasa una franja a hora 0-23; usarlo en vez de
+  `parseInt` (ya está en Scheduling, Dashboard, Patients y LocationDetail). `PersonaFila` se exporta desde
+  `patients/form`. Decisiones en `relationships.md` y `scheduling.md` (2026-11-12). Storybook sin actualizar.
+
+### Treatment Plan, Insurance Plans, ayuda en Insurance y sin "Ver estado vacío" ([#136](https://github.com/JulianGerardi/red-dental-studio/pull/136))
+- Títulos como en red.dev: **Treatment Plan** (antes "Treatments plan") e **Insurance Plans** (antes "Patients Plans").
+- Treatments y Relationships ya no muestran el botón de demo "Ver estado vacío" (estaba en castellano).
+- Insurance: **ⓘ** en Coverage Period y Priority Period con la explicación de cada columna (CON-4137, CON-4138).
+- **Para el dev:** `DataTableColumn` suma `headerInfo` (pone un `InfoTip` al lado del encabezado). En Relationships se
+  va el estado `vacio`. Decisiones en `treatments.md`, `relationships.md` e `insurance.md` (2026-11-12). Storybook sin
+  actualizar (pendiente de que Julián lo pida).
+
+## 2026-11-11
+
+### Buscador de personas igual en toda la app: nombre · número y chips ([#134](https://github.com/JulianGerardi/red-dental-studio/pull/134))
+- Todos los buscadores de personas (New Appointment, New Patient, Add Relationship, New Subscription, New Depender,
+  Insurance) muestran **nombre · número de paciente** (sólo si es paciente) y abajo **DOB y email como chips**; los
+  providers, cargo y email. Buscan en todos esos datos sin acentos. **La elegida reemplaza al input**, con ✕ para
+  cambiarla. Teclado: ↑ ↓, Enter y Esc.
+- **Para el dev:** `PersonSearchField` pierde `lineas`; los datos van con `subtitulo` y `chips` (helper
+  `chipsPersona(dob, email)`). El input es `combobox` y las sugerencias `option` (los e2e usan esos roles). Decisión en
+  `patients.md` (2026-11-11). Storybook sin actualizar.
+
+### Treatment Plan: estados de la columna Consent ([#135](https://github.com/JulianGerardi/red-dental-studio/pull/135))
+- La columna **Consent** de los procedimientos (Treatment Plan y Procedures) usa los seis estados de CON-4119: **Not
+  required, Not generated, Requested, Accepted, Rejected, Discarded**, cada uno con el tooltip de la historia. *Pending*
+  pasa a *Requested* y *Signed* a *Accepted*; *Not sent* desaparece (es el `PENDING` interno: se ve *Not generated*).
+- *Rejected* y *Discarded* abren el documento pero ya no se firma. Start / Complete con *Not generated*, *Rejected* o
+  *Discarded* piden un consentimiento nuevo. El consentimiento **del caso** (Pending / Signed / Expired) no cambia.
+- **Para el dev:** `ConsentProcedimiento` cambia sus valores; `AYUDA_CONSENTIMIENTO` (tooltips) reemplaza a
+  `SIN_DOCUMENTO` y sale `AVISO_CONSENTIMIENTO`. Helpers nuevos: `consentimientoCerrado()` y `sinPedir()`. La columna no
+  se sumó a Unassigned (la historia lo nombra; falta definirlo). Decisión en `clinical-mode.md` (2026-11-11). Storybook
+  sin actualizar.
+
+## 2026-11-10
 
 ### Insurance: buscador de suscripciones con chips ([#132](https://github.com/JulianGerardi/red-dental-studio/pull/132))
 - **Search for an existing subscription**: cada resultado muestra **nombre · ID** y abajo **Carrier y Plan como chips**

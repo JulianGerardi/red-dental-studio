@@ -18,12 +18,13 @@ import {
 } from '@/data/insurance'
 import { aviso } from '@/components/ui/toaster'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3817:865128 "Insurance", frames 3817:865704 y 3831:897436.
 
    El breadcrumb del frame termina en "Documents" en azul aunque la pantalla
-   sea Insurance, y el título dice "Patients Plans". Se replican tal cual —
-   ver modulos/insurance.md, anomalías 60 a 66. */
+   sea Insurance — ver modulos/insurance.md, anomalías 60 a 66. El título del
+   frame, "Patients Plans", pasó a "Insurance Plans" como en red.dev (2026-11-12). */
 
 /* Pills con fondo tintado, como el resto del sistema. Muestreados del frame:
    Primary y Self usan el azul, Child el verde, Spouse el neutro, Active el
@@ -48,8 +49,8 @@ const COLUMNAS: DataTableColumn<PlanPaciente>[] = [
   { key: 'plan', header: 'Plan', width: 124, cell: (p) => <TextCell>{p.plan}</TextCell> },
   { key: 'subscriber', header: 'Subscriber', width: 128, cell: (p) => <TextCell>{p.subscriber}</TextCell> },
   { key: 'relation', header: 'Relation', width: 92, cell: (p) => <Pill tone={RELACION_TONO[p.relacion]}>{p.relacion}</Pill> },
-  { key: 'coverage', header: 'Coverage Period', width: 148, cell: (p) => <span className="leading-tight">{p.cobertura}</span> },
-  { key: 'priority', header: 'Priority Period', width: 150, cell: (p) => <span className="flex flex-col gap-0.5 leading-tight">{p.prioridad.map((t) => <span key={t}>{t}</span>)}</span> },
+  { key: 'coverage', header: 'Coverage Period', width: 148, headerInfo: 'The dates during which this insurance coverage is active for the patient.', cell: (p) => <span className="leading-tight">{p.cobertura}</span> },
+  { key: 'priority', header: 'Priority Period', width: 150, headerInfo: 'The dates during which this plan has held its current coordination priority.', cell: (p) => <span className="flex flex-col gap-0.5 leading-tight">{p.prioridad.map((t) => <span key={t}>{t}</span>)}</span> },
   { key: 'status', header: 'Status', width: 92, cell: (p) => <Pill tone={ESTADO_TONO[p.estado]}>{p.estado}</Pill> },
 ]
 
@@ -138,7 +139,7 @@ export default function Insurance() {
   }
   const orden = ordenSiguiente(planes)
   const set = (k: keyof typeof d) => (v: string) => setD((p) => ({ ...p, [k]: v }))
-  const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? 'This field is required.' : undefined)
+  const req = (k: keyof typeof d) => (intentado && !d[k].trim() ? OBLIGATORIO : undefined)
 
   /* Las filas llevan grip: se reordenan arrastrando (o con ↑ ↓). Sólo los
      planes vigentes; los del historial quedan fijos al final. */
@@ -184,7 +185,7 @@ export default function Insurance() {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-xl leading-[1.3] font-semibold text-ink">Patients Plans</h1>
+            <h1 className="text-xl leading-[1.3] font-semibold text-ink">Insurance Plans</h1>
             <Switch on={historial} onChange={setHistorial} label="Show plan history" />
           </div>
 
@@ -225,7 +226,7 @@ export default function Insurance() {
                     subtitulo={(v) => porEtiqueta(v)?.subscriberId}
                     chips={(v) => { const x = porEtiqueta(v); return x && [{ label: 'Carrier', value: x.carrier, tone: 'neutral' }, { label: 'Plan', value: x.plan }] }}
                     emptyText="Subscription not found."
-                    error={intentado && !elegida ? (busqueda.trim() ? 'Select a subscription from the list.' : 'This field is required.') : undefined}
+                    error={intentado && !elegida ? (busqueda.trim() ? 'Select a subscription from the list.' : OBLIGATORIO) : undefined}
                   />
                   <button
                     type="button"
@@ -309,7 +310,7 @@ export default function Insurance() {
       {modal === 'nueva' && <NewSubscriptionModal paciente="John Smith" existentes={suscripciones} onCreada={creada} onClose={() => setModal(null)} />}
       {modal === 'borrar' && (
         <ConfirmDialog
-          tone="danger" title="Are you sure you want to delete this subscription?" confirmLabel="Confirm"
+          tone="danger" icon="delete" title="Are you sure you want to delete this subscription?" confirmLabel="Confirm"
           onConfirm={borrar} onCancel={() => setModal(null)}
         >
           This action cannot be undone. This will permanently delete this subscription and all associated data.

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { FieldLabel, ModalShell, TextField, SelectField } from '@/components/patients/form'
 import { Switch } from '@/components/ui/switch'
 import { TIPOS_SALA, type Sala } from '@/data/location-detail'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* New Room / Edit Room (CON-404): Name* y Type* obligatorios, Abbreviation opcional y el estado. El nombre no se repite
    en la locación. Desactivar desde acá pasa por las mismas preguntas que desde la tabla. Ver figma/modulos/locations.md. */
@@ -23,8 +24,8 @@ export function NewRoomModal({
   const [intentado, setIntentado] = useState(false)
 
   const repetido = nombresUsados.some((n) => n.trim().toLowerCase() === nombre.trim().toLowerCase())
-  const errorNombre = !intentado ? undefined : !nombre.trim() ? 'This field is required.' : repetido ? 'Name already exists.' : undefined
-  const errorTipo = intentado && !tipo ? 'This field is required.' : undefined
+  const errorNombre = !intentado ? undefined : !nombre.trim() ? OBLIGATORIO : repetido ? 'Name already exists.' : undefined
+  const errorTipo = intentado && !tipo ? OBLIGATORIO : undefined
 
   const guardar = () => {
     setIntentado(true)

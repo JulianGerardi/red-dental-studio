@@ -121,7 +121,7 @@ export type Finding = {
 export type TipoArea = 'Tooth' | 'Range' | 'Quadrant' | 'Arch' | 'Mouth' | 'Intraoral' | 'Extraoral'
 export type AreaTratamiento = { tipo: TipoArea; valor: string }
 export const NOMBRE_AREA: Record<TipoArea, string> = {
-  Tooth: 'Tooth', Range: 'Range', Quadrant: 'Quadrant', Arch: 'Arch', Mouth: 'Mouth', Intraoral: 'Intra Oral', Extraoral: 'Extra Oral',
+  Tooth: 'Tooth', Range: 'Range', Quadrant: 'Quadrant', Arch: 'Arch', Mouth: 'Mouth', Intraoral: 'Intraoral', Extraoral: 'Extraoral',
 }
 
 /** El área de un finding: la que se guardó o, en lo cargado antes de guardarla, la que se deduce del diente o del examen. */

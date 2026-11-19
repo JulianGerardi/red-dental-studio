@@ -40,3 +40,8 @@ export const DetailRows: Story = {
     </div>
   ),
 }
+
+/* Delete (scheduling.md, 2026-11-10): sólo un turno Proposed o Waiting List se borra. Con otro estado el botón queda
+   disabled (aria-disabled) y su tooltip explica por qué. */
+export const DeleteEnabled: Story = { args: { estado: 'Proposed', onDelete: () => {} } }
+export const DeleteDisabled: Story = { args: { estado: 'Check-in', onDelete: () => {} } }

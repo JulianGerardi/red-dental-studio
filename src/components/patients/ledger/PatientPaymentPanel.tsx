@@ -6,6 +6,8 @@ import {
 import { DatePicker } from '@/components/ui/date-picker'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { formatMDY } from '@/lib/fecha'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 4582:29545 / 4582:29862. Ver design-reference/figma/modulos/ledger.md. */
 
@@ -42,7 +44,7 @@ export function PatientPaymentPanel({
       || metodos.some((f) => !f.monto.trim() || (f.metodo === 'Check payment' && (!f.cheque.trim() || !f.banco.trim())))
     if (faltaAlgo) return
 
-    const fechaTxt = fecha.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    const fechaTxt = formatMDY(fecha)
     metodos.forEach((f) => {
       const valor = Number(f.monto) || 0
       onGuardar({
@@ -72,7 +74,7 @@ export function PatientPaymentPanel({
             </div>
             <SelectField
               label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
-              error={intentado && !aplicaA.trim() ? 'This field is required.' : undefined}
+              error={intentado && !aplicaA.trim() ? OBLIGATORIO : undefined}
             />
           </div>
           <span aria-hidden className="w-9 shrink-0" />
@@ -84,18 +86,18 @@ export function PatientPaymentPanel({
               <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <TextField
                   label="Amount" required placeholder="$ 0.00" value={f.monto} onChange={(v) => setFila(f.id, { monto: v })}
-                  error={intentado && !f.monto.trim() ? 'Required.' : undefined}
+                  error={intentado && !f.monto.trim() ? OBLIGATORIO : undefined}
                 />
                 <SelectField label="Payment method" required options={METODOS} value={f.metodo} onChange={(v) => setFila(f.id, { metodo: v })} />
                 {f.metodo === 'Check payment' && (
                   <>
                     <TextField
                       label="Check" required placeholder="1234" value={f.cheque} onChange={(v) => setFila(f.id, { cheque: v })}
-                      error={intentado && !f.cheque.trim() ? 'Required.' : undefined}
+                      error={intentado && !f.cheque.trim() ? OBLIGATORIO : undefined}
                     />
                     <TextField
                       label="Bank/Branch" required placeholder="AE9323AMB" value={f.banco} onChange={(v) => setFila(f.id, { banco: v })}
-                      error={intentado && !f.banco.trim() ? 'Required.' : undefined}
+                      error={intentado && !f.banco.trim() ? OBLIGATORIO : undefined}
                     />
                   </>
                 )}
@@ -128,7 +130,7 @@ export function PatientPaymentPanel({
       <LedgerAllocationTable cargos={cargosAplicables} />
 
       <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
-        <TextArea label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
+        <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
       </div>
 
       <div className="flex justify-end gap-3">

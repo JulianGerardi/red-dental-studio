@@ -1,5 +1,6 @@
 import { CalendarDays, Clock, Activity, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { InfoTip } from '@/components/ui/info-tip'
 
 /* Figma 4430:57451 — los tres stat cards sueltos del dashboard anterior
    pasaron a una sola tira compacta arriba a la derecha, separada por
@@ -8,7 +9,10 @@ import { cn } from '@/lib/utils'
 export type Stat = {
   label: string
   value: string
-  nota: string
+  /** Sin nota, la métrica va sola con su ⓘ (Ledger, ledger.md 2026-11-12). */
+  nota?: string
+  /** Qué cuenta el número: abre un InfoTip al lado del rótulo. */
+  info?: string
   icon: LucideIcon
 }
 
@@ -35,7 +39,7 @@ export function StatStripApilada({ stats }: { stats: Stat[] }) {
         'shadow-panel grid w-full rounded-xl bg-white',
         stats.length === 4 ? 'grid-cols-2 @2xl:grid-cols-4' : 'grid-cols-3',
       )}>
-        {stats.map(({ label, value, nota, icon: Icon }, i) => (
+        {stats.map(({ label, value, nota, info, icon: Icon }, i) => (
           <div
             key={label}
             className={cn(
@@ -50,9 +54,12 @@ export function StatStripApilada({ stats }: { stats: Stat[] }) {
               <Icon className="size-[18px]" />
             </span>
             <span className="min-w-0 leading-tight">
-              <span className="block truncate text-[10px] font-semibold tracking-wide text-dash-muted uppercase">{label}</span>
+              <span className="flex min-w-0 items-center gap-1.5">
+                <span className="truncate text-[10px] font-semibold tracking-wide text-dash-muted uppercase">{label}</span>
+                {info && <InfoTip title={label}>{info}</InfoTip>}
+              </span>
               <span className="mt-1 block text-[17px] leading-none font-bold text-ink tabular-nums">{value}</span>
-              <span className="mt-1 block truncate text-[11px] text-ink-muted">{nota}</span>
+              {nota && <span className="mt-1 block truncate text-[11px] text-ink-muted">{nota}</span>}
             </span>
           </div>
         ))}

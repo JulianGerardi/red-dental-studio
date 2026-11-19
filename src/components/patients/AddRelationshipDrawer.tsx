@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { DrawerActions, DrawerSection, DrawerStep } from '@/components/ui/drawer'
-import { FieldError, ModalShell, OptionCheckbox, PersonSearchField, SelectField, TextField } from '@/components/patients/form'
+import { FieldError, ModalShell, OptionCheckbox, PersonaFila, PersonSearchField, SelectField, TextField, chipsPersona } from '@/components/patients/form'
 import { useFormPasos } from '@/lib/useFormPasos'
-import { Avatar } from '@/components/ui/avatar'
 import { DIRECTORIO, type PersonaDirectorio } from '@/data/personas'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Add Relationship: antes una pantalla aparte (Figma 3716:61372, 3716:62815 y 3716:63601); ahora el drawer de
    Confidentally 2.0 con sus pasos: buscar o crear a la persona, sus datos de contacto y la relación con el paciente.
@@ -14,20 +14,12 @@ import { DIRECTORIO, type PersonaDirectorio } from '@/data/personas'
 /* El directorio vive en data/personas.ts (lo comparte New Patient); se reexporta para los imports de siempre. */
 export { DIRECTORIO, type PersonaDirectorio }
 
-/* Card de persona del Figma: borde azul, avatar cuadrado y tres líneas. */
+/* La persona ya elegida (Edit, Insurance): la misma card que deja el buscador al elegir, con DOB y email como chips
+   (relationships.md, 2026-11-12). */
 export function PersonaSeleccionada({ p }: { p: PersonaDirectorio }) {
   return (
-    <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-white p-3">
-      <Avatar initials={p.initials} size={36} />
-      <span className="min-w-0 flex-1 leading-tight">
-        <span className="block text-[13px] font-semibold text-ink">{p.name}</span>
-        <span className="block text-[11px] text-ink-muted">
-          <span className="text-ink-faint">DOB:</span> {p.dob}
-        </span>
-        <span className="block text-[11px] text-ink-muted">
-          <span className="text-ink-faint">Email:</span> {p.email}
-        </span>
-      </span>
+    <div className="flex items-center gap-3 rounded-lg border border-dash-blue bg-white p-3">
+      <PersonaFila nombre={p.name} chips={chipsPersona(p.dob, p.email)} />
     </div>
   )
 }
@@ -153,11 +145,8 @@ export function AddRelationshipDrawer({
             personas={DIRECTORIO.map((p) => p.name)}
             value={personaNombre} onChange={setPersonaNombre}
             disabled={nueva}
-            error={sinPersona ? 'Select a person or tick the option to create a new one.' : undefined}
-            lineas={(n) => {
-              const p = DIRECTORIO.find((x) => x.name === n)
-              return p && [`DOB: ${p.dob}`, `Email: ${p.email}`]
-            }}
+            error={sinPersona ? OBLIGATORIO : undefined}
+            chips={(n) => { const p = DIRECTORIO.find((x) => x.name === n); return p && chipsPersona(p.dob, p.email) }}
           />
           <OptionCheckbox
             label="Add New Person"

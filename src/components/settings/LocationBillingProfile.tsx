@@ -15,6 +15,7 @@ import { BloqueoDefaults } from '@/components/settings/LocationInsuranceDefaults
 import { useBillingProfiles } from '@/data/billingProfilesStore'
 import type { Referencia } from '@/data/insuranceDefaults'
 import { CONTACTOS_LOCACION, claveLocacion, fiscalOculto, type PerfilFacturacion } from '@/data/billingProfiles'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Location → Insurance / Billing Profile (CON-4021 habilitar, CON-4026 consultar y ajustar, CON-4027 Contracted With,
    CON-4028 deshabilitar). A diferencia del provider, la Location no trae NPI ni TIN: se cargan al configurarla. Ver
@@ -75,9 +76,9 @@ export function LocationBillingProfile({
 
   const guardarSetup = () => {
     const e: Errores = {
-      nombre: setup.nombre.trim() ? undefined : 'A billing name is required.',
-      direccion: setup.direccion.trim() ? undefined : 'A billing address is required.',
-      telefono: setup.telefono.trim() ? undefined : 'A billing phone number is required.',
+      nombre: setup.nombre.trim() ? undefined : OBLIGATORIO,
+      direccion: setup.direccion.trim() ? undefined : OBLIGATORIO,
+      telefono: setup.telefono.trim() ? undefined : OBLIGATORIO,
       ...validarCredenciales(setup),
     }
     setErrores(e)
@@ -253,7 +254,7 @@ export function LocationBillingProfile({
 }
 
 /* El perfil guardado: nombre editable, contactos reemplazables y credenciales en su propio drawer (CON-4026). */
-function IdentidadLocacion({
+export function IdentidadLocacion({
   perfil, opciones, onReemplazar, reemplazo, onCerrarReemplazo, onGuardar, onDirtyChange,
 }: {
   perfil: PerfilFacturacion
@@ -272,7 +273,7 @@ function IdentidadLocacion({
   useEffect(() => { onDirtyChange(sucio) }, [sucio, onDirtyChange])
 
   const guardar = () => {
-    if (!d.nombre.trim()) { setError('A billing name is required.'); return }
+    if (!d.nombre.trim()) { setError(OBLIGATORIO); return }
     if (onGuardar({ ...d, nombre: d.nombre.trim() })) aviso.ok('Billing information saved.')
   }
 

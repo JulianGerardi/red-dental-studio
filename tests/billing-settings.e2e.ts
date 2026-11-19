@@ -95,7 +95,7 @@ test('una excepción nueva se arma en cuatro pasos y se suma a la plantilla', as
   await drawer.getByRole('button', 'Add new exception').tap()
   await drawer.getByRole('button', /Next Step/).tap()
   await drawer.getByRole('button', /Next Step/).tap()
-  await expect(drawer.getByText('Please add a procedure to the exception')).toBeVisible()
+  await expect(drawer.getByText('This field is required.')).toBeVisible()
   await drawer.getByPlaceholder('Search for CDT Code o Description').fill('D2140')
   await drawer.getByRole('button', /^D2140 - Amalgam/).tap()
   await drawer.getByRole('button', /Next Step/).tap()

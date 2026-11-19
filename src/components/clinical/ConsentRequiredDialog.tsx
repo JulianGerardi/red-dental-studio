@@ -11,18 +11,21 @@ import { CONSENTIMIENTO_REQUERIDO as TEXTOS, MENU_PROCEDIMIENTO, PACIENTE, type 
    elegir cómo seguir. Prototipo de Julián "Consent modals revised" (CON-3927, CON-3946, CON-3950). Ver
    design-reference/figma/modulos/clinical-mode.md (2026-10-17). */
 
-/** sin-enviar: no hay documento, hay un borrador sin mandar o venció · pendiente: se mandó y falta la firma. */
+/** sin-enviar: no hay documento, o el que había se rechazó o se descartó · pendiente: se pidió y falta la firma. */
 export type TipoConsentimiento = 'sin-enviar' | 'pendiente'
 
 export type ProcedimientoResumen = { id: string; codigo: string; nombre: string; pieza?: string | number }
 
-/** Qué diálogo pide el cambio, o null si todos están firmados o no tienen template (Not required): ahí se aplica sin
-    preguntar. Con uno sin generar o sin mandar en el grupo, gana sin-enviar: hay algo que mandar antes de seguir. */
+/** Qué diálogo pide el cambio, o null si todos están firmados (Accepted) o no tienen template (Not required): ahí se
+    aplica sin preguntar. Con uno sin pedir en el grupo, gana sin-enviar: hay algo que mandar antes de seguir. */
 export function consentimientoRequerido(estados: (ConsentProcedimiento | undefined)[]): TipoConsentimiento | null {
-  const faltan = estados.filter((e) => e && e !== 'Signed' && e !== 'Not required')
+  const faltan = estados.filter((e) => e && e !== 'Accepted' && e !== 'Not required')
   if (faltan.length === 0) return null
-  return faltan.some((e) => e !== 'Pending') ? 'sin-enviar' : 'pendiente'
+  return faltan.some((e) => e !== 'Requested') ? 'sin-enviar' : 'pendiente'
 }
+
+/** Hace falta un documento nuevo: nunca se generó, o el que había se rechazó o se descartó (CON-4119). */
+export const sinPedir = (c?: ConsentProcedimiento) => c === 'Not generated' || c === 'Rejected' || c === 'Discarded'
 
 /** El caso no está aceptado: el procedimiento no cambia y el aviso lleva al caso. */
 export function avisarCasoNoListo(onVerCaso: () => void) {
@@ -104,20 +107,18 @@ export type ProcedimientoConConsentimiento = ProcedimientoResumen & {
   /** El envío de este consentimiento falla (ejemplo real del prototipo). */
   envioFalla?: boolean
 }
-/** Cómo se aplica el cambio: con `enviar`, el documento sin generar o sin mandar sale al paciente (Pending). */
+/** Cómo se aplica el cambio: con `enviar`, el documento que faltaba se genera y sale al paciente (Requested). */
 export type ComoSeAplica = { enviar?: boolean; nota?: string }
-
-const sinDocumento = (c?: ConsentProcedimiento) => c === 'Not generated'
 
 /** Start y Complete de un procedimiento, como en el prototipo de CON-4052 (con caso o suelto): firmado o sin template
     se aplica directo; si falta, Consent required. Send consent and sign later genera el documento si no había y lo
-    manda; si el envío falla, el procedimiento no cambia y el diálogo lo dice (se reintenta con el mismo documento).
-    Sign now genera el documento y lleva al detalle del consentimiento (no abre un drawer): ahí se firma en el pop up
-    del portal y, con las firmas, quien llama pide confirmar el cambio. View consent abre el documento y Back vuelve al
-    diálogo. */
+    manda (Requested); si el envío falla, el procedimiento no cambia, el consentimiento sigue como estaba (el PENDING
+    interno no se muestra, CON-4119) y el diálogo lo dice. Sign now genera el documento (Requested) y lleva al detalle
+    del consentimiento (no abre un drawer): ahí se firma en el pop up del portal y, con las firmas, quien llama pide
+    confirmar el cambio. View consent abre el documento y Back vuelve al diálogo. */
 export function useFlujoConsentimiento({ onAplicar, onGenerar, onFirmar }: {
   onAplicar: (ids: string[], verbo: 'Start' | 'Complete', como: ComoSeAplica) => void
-  /** Genera el documento de los que no tenían (Not generated → Not sent); el procedimiento no cambia. */
+  /** Sign now genera el documento de los que no tenían (pasan a Requested); el procedimiento no cambia. */
   onGenerar: (ids: string[]) => void
   /** Sign now: ya se generó el documento; lleva al detalle del consentimiento de estos (los que piden firma). */
   onFirmar: (ids: string[], verbo: 'Start' | 'Complete') => void
@@ -130,11 +131,11 @@ export function useFlujoConsentimiento({ onAplicar, onGenerar, onFirmar }: {
   const ids = pedido?.procs.map((p) => p.id) ?? []
   const cerrar = () => setPedido(null)
   const aplicar = (como: ComoSeAplica) => { if (pedido) onAplicar(ids, pedido.verbo, como); cerrar() }
-  /* Generar el documento de los que no tenían: queda generado aunque después se cancele (como en el prototipo). */
+  /* Generar el documento de los que no tenían: queda pedido aunque después se vuelva con Back. */
   const generar = (p: Pedido): Pedido => {
-    const sin = p.procs.filter((x) => sinDocumento(x.consentimiento)).map((x) => x.id)
+    const sin = p.procs.filter((x) => sinPedir(x.consentimiento)).map((x) => x.id)
     if (sin.length) onGenerar(sin)
-    return { ...p, procs: p.procs.map((x) => (sin.includes(x.id) ? { ...x, consentimiento: 'Not sent' as const } : x)) }
+    return { ...p, procs: p.procs.map((x) => (sin.includes(x.id) ? { ...x, consentimiento: 'Requested' as const } : x)) }
   }
 
   const pedir = (verbo: 'Start' | 'Complete', procs: ProcedimientoConConsentimiento[], caso?: string) => {
@@ -160,7 +161,7 @@ export function useFlujoConsentimiento({ onAplicar, onGenerar, onFirmar }: {
         onViewConsent={() => setPedido({ ...pedido, paso: 'documento' })}
         onContinue={() => {
           if (pedido.tipo === 'pendiente') return aplicar({ nota: ' Consent signature pending.' })
-          if (pedido.procs.some((p) => p.envioFalla)) return setPedido({ ...generar(pedido), error: MENU_PROCEDIMIENTO.noPudoEnviarse })
+          if (pedido.procs.some((p) => p.envioFalla)) return setPedido({ ...pedido, error: MENU_PROCEDIMIENTO.noPudoEnviarse })
           aplicar({ enviar: true, nota: ' Consent sent to the patient.' })
         }}
       />

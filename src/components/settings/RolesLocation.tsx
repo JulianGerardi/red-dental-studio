@@ -1,10 +1,12 @@
 import { DrawerActions } from '@/components/ui/drawer'
+import { Alert } from '@/components/ui/alert'
 import { useState } from 'react'
-import { Trash2, CirclePlus, ChevronDown, ChevronUp, Info } from 'lucide-react'
+import { Trash2, CirclePlus, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ModalShell, SectionCard, SelectField, FieldLabel } from '@/components/patients/form'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3864:270946 "Settings — Employee (Roles & Location)" y el modal
    "Assign Role".
@@ -160,19 +162,13 @@ export function AssignRoleModal({
           value={rol}
           onChange={setRol}
           options={ROLES_DISPONIBLES}
-          error={intentado && !rol ? 'This field is required.' : undefined}
+          error={intentado && !rol ? OBLIGATORIO : undefined}
         />
 
         <SectionCard title="Locations">
-          <div className="border-l-dash-blue bg-dash-count-bg flex gap-2 rounded-r-md border-l-[3px] px-3 py-2.5">
-            <Info className="text-dash-blue mt-px size-4 shrink-0" />
-            <span className="text-xs">
-              <span className="text-dash-blue-hover block font-semibold">Global access</span>
-              <span className="text-dash-blue-hover">
-                No locations selected means this role applies to all locations in the account.
-              </span>
-            </span>
-          </div>
+          <Alert tone="info" title="Global access">
+            No locations selected means this role applies to all locations in the account.
+          </Alert>
 
           {/* Tres columnas como el frame; a 780 el nombre más largo
               —"Buenos Aires Medical 1"— entra sin cortarse. */}

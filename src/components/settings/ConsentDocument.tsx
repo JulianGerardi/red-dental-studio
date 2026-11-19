@@ -21,8 +21,8 @@ export const AVISO_RECONOCIMIENTOS = 'All acknowledgment checkboxes must be comp
 
 /* Fechas de ejemplo -no vienen del template, son del envío y de la cita del
    paciente-. */
-const CONSENT_ENVIADO = 'September 23, 2026 — 10:30 AM'
-const [FECHA_CITA, HORA_CITA] = 'October 15, 2026 — 9:00 AM'.split(' — ')
+const CONSENT_ENVIADO = '09/23/2026 — 10:30 AM'
+const [FECHA_CITA, HORA_CITA] = '10/15/2026 — 9:00 AM'.split(' — ')
 
 const ETIQUETA = 'text-[10px] font-semibold tracking-wide uppercase'
 
@@ -97,7 +97,7 @@ type Props = {
 export type FirmaHoja = { fecha: string; nombre: string; imagen?: string; texto?: string; iniciales?: string }
 
 /* Una línea de firma del documento: el trazo (o el nombre escrito, o el nombre) sobre la línea, quién firma y la fecha. */
-function LineaFirma({ rol, nombre, firma }: { rol: string; nombre: string; firma?: FirmaHoja }) {
+export function LineaFirma({ rol, nombre, firma }: { rol: string; nombre: string; firma?: FirmaHoja }) {
   return (
     <div className="grid grid-cols-[1fr_96px] items-end gap-4 text-[11px] text-ink-faint">
       <div>

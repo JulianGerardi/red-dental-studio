@@ -8,6 +8,9 @@ shadcn/ui (Radix), con datos mock en `src/data/` (no hay backend). Lo pide y apr
   (`~/Desktop/Claude/red-dental-studio`, ni el viejo `~/red-clone`).
 - App publicada: https://juliangerardi.github.io/red-dental-studio/
 - Design system (Storybook, "Confidentally UI"): https://juliangerardi.github.io/red-dental-studio/storybook/
+- Design system en Figma ("Confidentally UI · Design System", una página por familia: Foundations, Actions, Forms,
+  Feedback & Overlays…): https://www.figma.com/design/iJvnuV8TLStMXpNjdwsuDe
+- Figma de la documentación ("Screens & Flows", una página por módulo): https://www.figma.com/design/TPh6NE9d4skn0BdId26UTR
 - **Link de prueba** (la última rama subida, antes de publicar): https://juliangerardi.github.io/red-dental-studio/prueba/
   y https://juliangerardi.github.io/red-dental-studio/prueba/storybook/
 - Repo: `JulianGerardi/red-dental-studio` (privado), rama `main`.
@@ -41,6 +44,7 @@ npm run ds:check                              # cobertura del design system (ver
 npm run ds:campos                             # campos de los drawers de a dos y del mismo ancho (con Storybook andando)
 npx vite build                                # build de la app
 E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el dev server
+npm run figma:capturar -- patients            # captura un módulo para el Figma (con el dev server andando)
 ```
 
 ## Dónde está cada cosa
@@ -50,6 +54,8 @@ E2E_TELEMETRY_DISABLED=1 npm run test:e2e     # e2e en tests/*.e2e.ts, reusa el 
   compartidas (cards, botones de ícono, ancho de página).
 - **`design-reference/figma/modulos/<módulo>.md`**: decisiones y anomalías numeradas de cada módulo. Es la fuente más
   confiable para retomar algo; leé el del módulo antes de tocarlo.
+- `design-reference/figma-docs.md` (cómo se documenta en Figma: parámetros, páginas y pasos) y `scripts/figma/` (los
+  flujos de cada módulo y la captura).
 - `design-reference/design-system.md` (cómo está armado el Storybook y sus reglas), `design-reference/figma/README.md`
   (reglas transversales), `design-reference/e2e.md`, `design-reference/jira.md` (historias de Jira por módulo).
 - Proyecto hermano con la lógica de 2.0: `~/Desktop/Work/dashboard-figma/src/components` (buscá ahí el `*Drawer.tsx`
@@ -102,12 +108,16 @@ la app esté aprobada y publicada.
 6. Después del merge: `gh run list` hasta que termine el deploy, confirmar que `…/red-dental-studio/version.txt` dice el
    commit del merge y que el cambio se ve en la app publicada, y pasarle el link en vivo. Pages cachea hasta ~10 min;
    para probar, agregá `?cb=<n>`.
-7. **Último paso, solo cuando Julián pida documentar** ("documentá en Storybook" o similar): story del componente, ruta
-   en `Pages.stories.tsx` y sección con fecha en `design-system.md`; correr `ds:check`; pasarle el link de localhost del
-   DS (con Storybook andando), por ejemplo `http://localhost:6006/?path=/docs/elements-cards--docs`, y el de prueba
-   `…/prueba/storybook/`. Su "subilo" publica de corrido, como en el paso 5 (otra entrada en `CAMBIOS.md`, otro PR), y
-   se confirma el Storybook publicado como en el paso 6. Si Julián no lo pide, no se hace ni se sugiere hacerlo por
-   cuenta propia.
+7. **Último paso, solo cuando Julián pida documentar** ("documentá en Storybook" o similar). Documentar es las dos
+   cosas, Storybook y Figma:
+   - **Storybook:** story del componente, ruta en `Pages.stories.tsx` y sección con fecha en `design-system.md`; correr
+     `ds:check`; pasarle el link de localhost del DS (con Storybook andando), por ejemplo
+     `http://localhost:6006/?path=/docs/elements-cards--docs`, y el de prueba `…/prueba/storybook/`.
+   - **Figma:** actualizar la página del módulo en el archivo *Screens & Flows* (ver *Documentación en Figma*) y pasarle
+     el link a la sección que cambió.
+
+   Su "subilo" publica de corrido, como en el paso 5 (otra entrada en `CAMBIOS.md`, otro PR), y se confirma el Storybook
+   publicado como en el paso 6. Si Julián no lo pide, no se hace ni se sugiere hacerlo por cuenta propia.
 
 ## Avisar al dev
 
@@ -125,7 +135,9 @@ El código lo toman **jonatan784** y **betsyMb**, y se enteran de cada cambio po
 - **Pop ups = `ui/drawer`** (derecha, alto completo). Con más de una sección lleva pasos: `steps` + `DrawerStep` +
   `DrawerActions`, estado con `lib/useFormPasos`. Cada paso tiene un nombre corto de lo que se hace ("General",
   "Contact", "Address"), nunca "Step". Secciones sin caja ni borde, campos de a dos, pie con dos botones del mismo
-  ancho. Sólo las preguntas sí/no quedan como `ui/confirm-dialog`.
+  ancho. Sólo las preguntas sí/no quedan como `ui/confirm-dialog`. Título sin bajada. Editar algo ya cargado no lleva
+  pasos: pestañas como las de la ficha de una Location y un solo "Save Changes" (Edit Appointment en drawer; Edit
+  Patient es una pantalla, `/patients/:id/edit`, como la ficha de la Location).
 - **Cards:** la card sobre el fondo gris de la página es `TARJETA_PANEL` (sombra, **sin borde**); la que va adentro de
   otra es `TARJETA_INTERNA` / `InnerCard` (línea de 0,5 px gris tenue + sombra suave, en `shadow-inner-card`). La línea
   fina se dibuja con sombra inset: Chrome redondea `border-[0.5px]` a 1 px y una sombra externa se corta en listas con
@@ -149,11 +161,38 @@ El código lo toman **jonatan784** y **betsyMb**, y se enteran de cada cambio po
   Julián (ver *Cómo se trabaja una tanda*). Ahí, cada componente, pantalla, estado, variante o regla nueva o cambiada en
   la tanda tiene su página con la estructura de abajo. `ds:check` en verde no alcanza: no exige Parts, States ni Specs.
 - Todo componente lleva su `.stories.tsx` al lado; toda ruta nueva va en `src/design-system/Pages.stories.tsx`.
+- Cada página muestra sus historias de Jira en la tarjeta *Jira*: las de `parameters.docs.jira` más las `CON-…` que citan
+  el código, las stories o la descripción. Al documentar una pieza, sumar las suyas.
 - `ds:check` falla si una función de React con mayúscula no está importada por ninguna story (o en
   `src/design-system/exentos.json`), si falta un estado soportado o si aparece un hex con token.
 - Cada página sigue la estructura de *Elements / Buttons*: descripción que termina en "**Probalo:**", Playground con
   controles, Parts, States y Specs, armados con `src/design-system/kit.tsx` (drawers: `kit-drawer.tsx`). Nada de
   listas sueltas de stories.
+
+## Documentación en Figma
+
+Además del Storybook, cada módulo queda documentado en Figma, en el archivo *Confidentally — Red Dental Studio · Flows*
+(`TPh6NE9d4skn0BdId26UTR`), con el formato de la página 🧍 Patients de *Platform Design*. El detalle, la tabla de páginas
+y los pasos están en `design-reference/figma-docs.md`; leelo antes de tocar el archivo.
+
+- **Una página por módulo y una sección por flujo**, con las pantallas del flujo en fila. Todo lo de Patients está en
+  Patients, y así con cada uno.
+- **Cada flujo lleva su guía de happy path para el dev**: resumen, quién lo usa, las historias de Jira y los pasos
+  numerados con lo que hace el usuario y lo que responde la app; cada pantalla, su nombre, su ruta y una nota.
+- **Auto layout en todo, con Fill container, y capas con nombre**: el del componente de React (`PatientsTable / DataTable`),
+  rol y texto en los controles (`Button - New Patient`) y `Icon - <nombre>` en los íconos. Nada de "Frame 12". Lo que
+  ocupa todo su contenedor va en Fill container y lo absoluto anclado a su borde; los íconos no quedan tapados por el
+  campo (`scripts/figma/arreglar.figma.js`).
+- **Design system en Figma** (archivo aparte *Confidentally UI · Design System*, `iJvnuV8TLStMXpNjdwsuDe`; detalle en `design-reference/figma-design-system.md`): variables de Color,
+  Radius, Spacing y Size, estilos de texto y sombra, y componentes con variantes (Button, Pill, Avatar, Field…). Si se suma
+  o cambia una pieza de `ui/`, se suma o cambia ahí con sus variantes; las pantallas nuevas se conectan con los motores
+  guardados en el archivo (se explican en ese `.md`). Nada de hex sueltos en Figma: variable.
+- **Se captura de la app, no se dibuja**: el flujo se define en `scripts/figma/flujos/<módulo>.mjs`, se captura con
+  `npm run figma:capturar -- <módulo>`, se importa con `html_to_figma`, se ordena con `scripts/figma/ordenar.figma.js` y se arregla (Fill container, capas)
+  con `scripts/figma/arreglar.figma.js`.
+  El contenido es el de la app: nada inventado.
+- Cada historia de Jira que se implementa aparece en el flujo que documenta (`jira` del flujo) y en la página de su
+  componente en el Storybook (`docs.jira`, o citada en el código: la tarjeta *Jira* la lee sola).
 
 ## Código
 

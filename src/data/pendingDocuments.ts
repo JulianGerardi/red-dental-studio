@@ -23,10 +23,10 @@ export type DocPendiente = {
 }
 
 export const DOCS_PENDIENTES: DocPendiente[] = [
-  { id: 'd1', nombre: 'Informed Consent – Periodontal treatment', detalle: 'Sent Sep 28 · patient has not signed', tipo: 'consent', motivo: 'Pending signature', responsable: 'Patient', vence: 'Sep 30, 2026', dias: -5, accion: 'Send reminder' },
-  { id: 'd2', nombre: 'Medical history', detalle: 'Last updated Aug 12, 2025 · older than 12 months', tipo: 'form', motivo: 'Expired', responsable: 'Patient', vence: 'Oct 2, 2026', dias: -3, accion: 'Request update' },
-  { id: 'd3', nombre: 'Insurance card – AETNA Dental PPO', detalle: 'Back side of the card is missing', tipo: 'insurance', motivo: 'Missing', responsable: 'Front desk', vence: 'Oct 7, 2026', dias: 2, accion: 'Upload' },
-  { id: 'd4', nombre: 'Referral to periodontist', detalle: 'Drafted by Perez Martinez · needs the provider signature', tipo: 'referral', motivo: 'Pending signature', responsable: 'Provider', vence: 'Oct 8, 2026', dias: 3, accion: 'Sign' },
-  { id: 'd5', nombre: 'Notice of privacy practices (HIPAA)', detalle: 'New version, acknowledgement required', tipo: 'privacy', motivo: 'Pending signature', responsable: 'Patient', vence: 'Oct 15, 2026', dias: 10, accion: 'Send reminder' },
-  { id: 'd6', nombre: 'Panoramic X-ray from previous dentist', detalle: 'Received Oct 3 · waiting to be reviewed', tipo: 'image', motivo: 'Needs review', responsable: 'Provider', vence: 'Oct 20, 2026', dias: 15, accion: 'Review' },
+  { id: 'd1', nombre: 'Informed Consent – Periodontal treatment', detalle: 'Sent Sep 28 · patient has not signed', tipo: 'consent', motivo: 'Pending signature', responsable: 'Patient', vence: '09/30/2026', dias: -5, accion: 'Send reminder' },
+  { id: 'd2', nombre: 'Medical history', detalle: 'Last updated 08/12/2025 · older than 12 months', tipo: 'form', motivo: 'Expired', responsable: 'Patient', vence: '10/02/2026', dias: -3, accion: 'Request update' },
+  { id: 'd3', nombre: 'Insurance card – AETNA Dental PPO', detalle: 'Back side of the card is missing', tipo: 'insurance', motivo: 'Missing', responsable: 'Front desk', vence: '10/07/2026', dias: 2, accion: 'Upload' },
+  { id: 'd4', nombre: 'Referral to periodontist', detalle: 'Drafted by Perez Martinez · needs the provider signature', tipo: 'referral', motivo: 'Pending signature', responsable: 'Provider', vence: '10/08/2026', dias: 3, accion: 'Sign' },
+  { id: 'd5', nombre: 'Notice of privacy practices (HIPAA)', detalle: 'New version, acknowledgement required', tipo: 'privacy', motivo: 'Pending signature', responsable: 'Patient', vence: '10/15/2026', dias: 10, accion: 'Send reminder' },
+  { id: 'd6', nombre: 'Panoramic X-ray from previous dentist', detalle: 'Received Oct 3 · waiting to be reviewed', tipo: 'image', motivo: 'Needs review', responsable: 'Provider', vence: '10/20/2026', dias: 15, accion: 'Review' },
 ]

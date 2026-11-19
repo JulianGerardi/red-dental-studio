@@ -12,13 +12,13 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { ConAyuda } from '@/components/clinical/dental/ProcedureRow'
 import { DetalleRegistro, TONO_PROBLEMA, TONO_PROCEDIMIENTO, tratamientoDe, useIr, type ContextoDetalle } from '@/components/clinical/RecordDetail'
-import { useFlujoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
+import { sinPedir, useFlujoConsentimiento } from '@/components/clinical/ConsentRequiredDialog'
 import { EstadoConsentimiento, tieneDocumento } from '@/components/clinical/ConsentDetail'
 import {
   ACCION, DialogoBorrar, DialogoCambioEstado, DialogoEditar, ItemsAcciones, accionesDe, conColumnaConsent, contextoDeCaso,
   type AccionProcedimiento,
 } from '@/components/clinical/accionesProcedimiento'
-import { SIN_DOCUMENTO, type ConsentProcedimiento } from '@/data/treatment-plan'
+import { AYUDA_CONSENTIMIENTO, type ConsentProcedimiento } from '@/data/treatment-plan'
 import {
   ESTADOS_PROBLEMA, ESTADOS_PROCEDIMIENTO, PROBLEMAS, PROCEDIMIENTOS,
   type EstadoProblema, type EstadoProcedimiento, type Problema, type ProcedimientoPaciente,
@@ -40,11 +40,11 @@ const BORRAR = { label: 'Delete', icono: Trash2, peligro: true, borrar: true } a
 const ABIERTO_PROBLEMA: Accion<EstadoProblema>[] = [
   { label: 'Start Monitoring', icono: Eye, a: 'Monitoring' },
   { label: 'Start Treatment', icono: Play, a: 'In treatment' },
-  { label: 'Mark As Treated', icono: Check, a: 'Treated' },
-  { label: 'Mark As Externally Treated', icono: CheckCheck, a: 'Externally treated' },
-  { label: 'Mark As No Treat. Needed', icono: CircleSlash, a: 'No treatment needed', peligro: true },
-  { label: 'Mark As Patient Declined', icono: UserX, a: 'Patient declined', peligro: true },
-  { label: 'Mark As Clinic Declined', icono: Ban, a: 'Clinic declined', peligro: true },
+  { label: 'Mark as Treated', icono: Check, a: 'Treated' },
+  { label: 'Mark as Externally Treated', icono: CheckCheck, a: 'Externally treated' },
+  { label: 'Mark as No Treat. Needed', icono: CircleSlash, a: 'No treatment needed', peligro: true },
+  { label: 'Mark as Patient Declined', icono: UserX, a: 'Patient declined', peligro: true },
+  { label: 'Mark as Clinic Declined', icono: Ban, a: 'Clinic declined', peligro: true },
   { label: 'Discard', icono: XCircle, a: 'Discarded', peligro: true },
 ]
 export function accionesProblema(e: EstadoProblema): Accion<EstadoProblema>[][] {
@@ -116,8 +116,8 @@ export function ProblemList({ procedimientoInicial }: {
       const fila = procedimientos.find((p) => p.id === id)
       if (!fila) return
       const procCaso = tratamientoDe(fila, consentimientos)?.procCaso
-      if (enviar && procCaso && (procCaso.consentimiento === 'Not generated' || procCaso.consentimiento === 'Not sent')) {
-        setConsentimientos((c) => ({ ...c, [procCaso.id]: 'Pending' }))
+      if (enviar && procCaso && sinPedir(procCaso.consentimiento)) {
+        setConsentimientos((c) => ({ ...c, [procCaso.id]: 'Requested' }))
       }
       cambiar(fila, verbo === 'Start' ? 'In progress' : 'Completed', nota)
     },
@@ -130,7 +130,7 @@ export function ProblemList({ procedimientoInicial }: {
     onGenerar: ([id]) => {
       const fila = procedimientos.find((p) => p.id === id)
       const procCaso = fila && tratamientoDe(fila, consentimientos)?.procCaso
-      if (procCaso) setConsentimientos((c) => ({ ...c, [procCaso.id]: 'Not sent' }))
+      if (procCaso) setConsentimientos((c) => ({ ...c, [procCaso.id]: 'Requested' }))
     },
   })
   function elegirProcedimiento(fila: ProcedimientoPaciente, accion: AccionProcedimiento) {
@@ -150,7 +150,7 @@ export function ProblemList({ procedimientoInicial }: {
   /* Con documento lleva al detalle en Treatment Plan; sin documento dice qué pasa. */
   const tocarConsentimiento = (c: NonNullable<ReturnType<typeof consentimientoDe>>) => {
     if (tieneDocumento(c.estado)) return ir({ pestana: 'Treatment Plan', caso: c.tr.caso.id, consentimiento: c.tr.procCaso!.id })
-    const texto = SIN_DOCUMENTO[c.estado]
+    const texto = AYUDA_CONSENTIMIENTO[c.estado]
     if (texto) aviso.info(texto)
   }
 
@@ -251,7 +251,7 @@ export function ProblemList({ procedimientoInicial }: {
             rowActions={(r) => menu(accionesProblema(r.estado), (a) => aplicar(setProblemas, problemas, r, r.condicion, a))}
             rowDetail={(r) => <DetalleRegistro registro={{ tipo: 'problema', r }} contexto={contexto} />}
             defaultExpanded={enfoque ? [enfoque] : undefined}
-            pageSize={5} pageSizeOptions={[5, 10, 20]} pageSizeLabel="Show:" density="compact"
+            pageSize={5} pageSizeOptions={[5, 10, 20]} density="compact"
             empty={{ icon: Search, title: 'No problems found', detail: t ? `Nothing matches "${q}".` : `There are no ${filtroProblema.toLowerCase()} problems.` }}
           />
         ) : (
@@ -261,7 +261,7 @@ export function ProblemList({ procedimientoInicial }: {
             rowActions={(r) => <ItemsAcciones grupos={accionesDe(r.estado, contextoDe(r))} onElegir={(a) => elegirProcedimiento(r, a)} />}
             rowDetail={(r) => <DetalleRegistro registro={{ tipo: 'procedimiento', r }} contexto={contexto} />}
             defaultExpanded={enfoque ? [enfoque] : undefined}
-            pageSize={5} pageSizeOptions={[5, 10, 20]} pageSizeLabel="Show:" density="compact"
+            pageSize={5} pageSizeOptions={[5, 10, 20]} density="compact"
             empty={{ icon: Search, title: 'No procedures found', detail: t ? `Nothing matches "${q}".` : `There are no ${filtroProcedimiento.toLowerCase()} procedures.` }}
           />
         )}

@@ -13,14 +13,14 @@ import { Avatar } from '@/components/ui/avatar'
 
 /* Figma 4430:57474 — rediseño del popup del paciente (357×488).
    Ya no es la tarjeta con barra azul y avatar montado: ahora es una card
-   clara con el avatar y el botón verde "Start Enconter" arriba, el plan de
+   clara con el avatar y el botón verde "Start Encounter" arriba, el plan de
    tratamiento en un panel celeste y las filas de datos abajo.
 
    Sigue sin ser un modal centrado: se ancla a la card que lo abrió, con
    volteo automático si no entra a la derecha.
 
-   Textos tal cual el Figma, incluidos "Start Enconter" sin la u y la fecha en
-   español. Excepciones pedidas por Julián: el motivo de la visita ("Rsn" se
+   Textos tal cual el Figma, incluida la fecha en español. Excepciones pedidas por Julián: "Start Encounter" con la u
+   (2026-11-13), el motivo de la visita ("Rsn" se
    escribe completo) y Weight en vez del "Height" repetido (dashboard.md, 2026-11-06). */
 
 type Fila = { icon: LucideIcon; label: string; value: string }
@@ -121,12 +121,12 @@ export function PatientDetailsPopover({
         {/* Verde y radio de 4430:57478 (#1e9850, radio 8), el mismo botón que
             la ficha. El alto va en el escalón md del sistema (36) y no en los
             32 del nodo, que quedaban chicos al lado del avatar.
-            "Enconter" es del Figma, sin la u. */}
+            "Encounter" corregido: el Figma decía "Enconter" (clinical-mode.md, 2026-11-13). */}
         <button
           type="button"
           className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#18763e]"
         >
-          <Play className="size-3.5 shrink-0" /> Start Enconter
+          <Play className="size-3.5 shrink-0" /> Start Encounter
           <ChevronDown className="size-3.5 shrink-0" />
         </button>
       </div>

@@ -724,3 +724,66 @@ confirmación, y tiene que quedar claro cuando no se puede.
 
 **Para el dev:** `AppointmentDetailsDrawer` suma `onDelete?: () => void` (sin la prop no muestra el botón); la pregunta
 la hace el propio componente y llama a `onDelete` ya confirmado. e2e en `tests/scheduling-delete.e2e.ts`.
+
+## CON-4090 · New Appointment: Status arriba, Additional y Notes en el paso 1 (2026-11-12)
+
+Comparativa con red.dev (ticket de diseño aparte) y CON-4090, que pide subir Status: de él dependen los obligatorios
+de abajo (al pasar a Booked o Proposed se piden más datos).
+
+- **Orden del paso 1**, como la imagen de CON-4090 y red.dev: Patient, Primary y Additional Provider; Status y
+  Requestor; Reason for Visit y Date; Start y End Time; Operatory. Se pierde la fecha alineada con Start Time
+  (2026-10-10): Date queda en la columna derecha, arriba de End Time.
+- **Additional (ASAP, Follow-up, Premedicate) y Notes pasan al paso 1**, en tres cajas del mismo ancho desde `sm`. El
+  paso 2 queda sólo para lo que dice su nombre: linkear la visita del plan.
+- **Placeholder de Date**: el del sistema ("Pick a date"). "12-03-2025" parecía una fecha ya cargada.
+- **Horas "01 PM, 02 PM…"** en la agenda del costado, en Start/End Time y en las solicitudes. La anomalía 27 ("13 PM…")
+  se replicaba y llegaba a un select donde se podía elegir "13 PM". `hora24()` en `AppointmentSlotPicker` convierte la
+  franja a la hora del día (Scheduling, Dashboard, Patients, Location → Rooms).
+- **Fecha de la agenda del costado**: la elegida, en inglés ("Thursday, November 19, 2026"); sin fecha, "Select a date".
+  El Figma traía "Sábado, 19 de febrero de 2022".
+- Pendiente (con el texto que apruebe Julián): la bajada "Customize the schedule you want to see" es la del filtro de la
+  agenda, en red.dev y acá.
+
+## CON-3249 · Edit Appointment en pestañas, también desde el calendario (2026-11-17)
+
+Pedido de Julián: si el turno ya está cargado, editarlo no tiene que pasar por los pasos de New Appointment, y el drawer
+no tiene que ser largo: en pestañas, como Edit Patient y la ficha de una Location. Al detalle del turno de la agenda le
+faltaba la forma de editarlo. CON-3249 (reprogramación por secretaría) es la historia: el turno se actualiza en su
+lugar, sin crear otro, y sólo si está activo.
+
+1. **Edit Appointment en pestañas** (`NewAppointmentModal` con `edicion`), con un solo **Save Changes**:
+   - **General**: Patient, Primary y Additional Provider; Status y Requestor (Status primero, CON-4090); Reason for Visit.
+   - **Schedule**: Date y Operatory; Start y End Time. El calendario del día se ve al costado de entrada: a esta pestaña
+     se viene a mover el turno.
+   - **Additional**: ASAP, Follow-up, Premedicate y Notes.
+   - **Treatment Plan**: el link a la visita del plan.
+   Mismos campos que New Appointment, reagrupados por lo que se viene a cambiar. Si al guardar falta un obligatorio,
+   lleva a su pestaña y la marca con el punto rojo (como Edit Patient). Primera pedida, intento de 2026-11-17: todo
+   apilado sin pestañas; Julián lo descartó por largo.
+2. **Desde Rooms y Working Hours abre en Schedule** (`pestanaInicial`): ahí se edita el turno para cambiarle la sala o
+   el horario.
+3. **Lápiz en la cabecera del detalle del turno**, al lado de la ✕, como en los calendarios conocidos: el pie queda
+   para Delete y Check In, que ya ocupan el ancho. Al guardar, el bloque se actualiza en la grilla y un toast dice la
+   fecha y hora nuevas.
+4. **Fulfilled, No-show y Cancelled no se editan** (CON-3249: "la cita debe estar activa"): el lápiz se ve apagado y el
+   tooltip dice por qué, igual que Delete. `esEditable()` en `calendar-data.ts`.
+5. **Horas**: el drawer va de hora en hora; un turno de las 09:30 se muestra 09 AM – 10 AM. Si al guardar no se tocaron
+   las horas, el turno conserva las exactas (no pasa a 09:00 por cambiar la sala).
+6. **ASAP** sale destildado al editar: el turno no lo traía y tildarlo solo lo marcaba como urgente.
+7. New Appointment y agendar una solicitud siguen con pasos: crean un turno. Se sacan sus bajadas ("Customize the
+   schedule you want to see" y las de cada sección): ver *Drawers sin bajada* en `figma/README.md`.
+
+**Anomalía:** el calendario del costado es mock (`AppointmentSlotPicker`): siempre dice Sarah Stone y marca las 09 AM
+como ocupadas, aunque sea el propio turno que se edita. Ya pasaba en New Appointment; ahora se ve más porque abre solo.
+
+**Para el dev:** `NewAppointmentModal` cambia `titulo="Edit Appointment"` por `edicion` (booleano) y suma
+`pestanaInicial`. `AppointmentDetailsDrawer` suma `onEdit?: () => void`. e2e en `tests/scheduling-edit.e2e.ts`.
+
+**A validar con usuarios:** si recepción encuentra el lápiz en la cabecera o lo busca abajo, junto a Check In; y si
+Status se busca en General o en Schedule.
+
+## Detalle del turno: *Guarantor not assigned* con `ui/alert` (2026-11-18)
+
+Sin historia de Jira (devolución de diseño de Abril Viola). La franja con barra a la izquierda, hecha a mano, pasa a
+`Alert` tono warning, sólo título: el mismo aviso que el resto de la app. Detalle de la decisión en patients.md
+(2026-11-18).

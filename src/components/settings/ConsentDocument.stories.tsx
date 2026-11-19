@@ -27,3 +27,7 @@ export const Empty: Story = { args: { titulo: '', procedimiento: undefined, natu
 export const DataCell: Story = {
   render: () => <div className="w-[220px] border border-line"><Campo icono={User} etiqueta="Patient"><p className="font-bold">Sarah Stone</p><p className="text-ink-muted">DOB: 04/02/1991</p></Campo></div>,
 }
+
+/* El documento de un paciente ya firmado por él (CON-2913): las afirmaciones quedan marcadas (checked) y su firma va
+   sobre la línea; falta la del provider. */
+export const SignedByPatient: Story = { args: { vistaPaciente: true, paciente: 'John Smith', proveedor: 'Dr. Perez Martinez', firmas: { paciente: { fecha: '11/13/2026', nombre: 'John Smith', iniciales: 'JS' } } } }

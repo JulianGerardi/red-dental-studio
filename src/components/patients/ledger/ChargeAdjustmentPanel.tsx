@@ -4,9 +4,10 @@ import {
 } from '@/components/patients/form'
 import { DatePicker } from '@/components/ui/date-picker'
 import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { formatMDY } from '@/lib/fecha'
+import { OBLIGATORIO } from '@/lib/validacion'
 
-/* Figma 4582:25840. Título "New Credit (+) Adjustment" a propósito, ver
-   design-reference/figma/modulos/ledger.md. */
+/* Figma 4582:25840. El título es "Enter Charge (+) Adjustment", como red.dev (ledger.md, 2026-11-12). */
 
 const TIPOS_AJUSTE = ['Charge Adjustment', 'Credit Adjustment']
 const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado']
@@ -36,7 +37,7 @@ export function ChargeAdjustmentPanel({
     if (!fecha || !monto.trim() || !aplicaA.trim()) return
     const valor = Number(monto) || 0
     onGuardar({
-      fecha: fecha.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      fecha: formatMDY(fecha),
       paciente: aplicaA,
       codigo: '—',
       descripcion: tipo,
@@ -59,17 +60,17 @@ export function ChargeAdjustmentPanel({
           </div>
           <TextField
             label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto}
-            error={intentado && !monto.trim() ? 'This field is required.' : undefined}
+            error={intentado && !monto.trim() ? OBLIGATORIO : undefined}
           />
           <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} />
           <SelectField label="Provider" options={PROVIDERS} value={provider} onChange={setProvider} />
           <SelectField
             label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
-            error={intentado && !aplicaA.trim() ? 'This field is required.' : undefined}
+            error={intentado && !aplicaA.trim() ? OBLIGATORIO : undefined}
           />
           <SelectField label="Visit date" options={visitas} value={visita} onChange={setVisita} />
         </div>
-        <TextArea className="mt-4" label="Notes" placeholder="Placeholder" value={notas} onChange={setNotas} />
+        <TextArea className="mt-4" label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
       </div>
 
       <div className="flex justify-end gap-3">

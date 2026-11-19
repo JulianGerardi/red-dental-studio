@@ -1,12 +1,13 @@
 import { useRef, type ReactNode } from 'react'
-import { CircleAlert } from 'lucide-react'
+import { CircleAlert, Info, Trash2, TriangleAlert } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
 /* Confirmación de una sola pregunta ("Discard and close?"): lo único que no se abre como drawer, igual que en
    Confidentally 2.0. Es chica y centrada porque se contesta sin cargar nada. Ver Elements / ConfirmDialog.
-   Con `otherAction` es una decisión de tres salidas antes de seguir (Consent required, clinical-mode.md 2026-10-17). */
+   Con `otherAction` es una decisión de tres salidas antes de seguir (Consent required, clinical-mode.md 2026-10-17).
+   El tono lleva un ícono de 16 px junto al título, sin círculo (propuesta A, figma/README.md 2026-11-16). */
 export function ConfirmDialog({
   title, children, confirmLabel, onConfirm, onCancel, tone = 'primary', cancelLabel = 'Cancel', icon, otherAction, loading, hideCancel,
 }: {
@@ -18,8 +19,9 @@ export function ConfirmDialog({
   /** danger: borra o descarta algo que no se recupera. */
   tone?: 'primary' | 'danger'
   cancelLabel?: string
-  /** warning: la acción pedida quedó frenada por algo que falta (Consent required). */
-  icon?: 'warning'
+  /** warning: hay algo que revisar antes de seguir (Consent required, turnos afectados). delete: borra algo (tacho).
+      Sin esto, el ícono sale del tono: info azul o alerta roja. */
+  icon?: 'warning' | 'delete'
   /** Una tercera salida, entre Cancel y la acción principal (Sign now). */
   otherAction?: { label: string; onClick: () => void }
   /** La acción principal está en curso: spinner en su botón y los otros quietos. */
@@ -27,6 +29,7 @@ export function ConfirmDialog({
   /** Un aviso que frena la acción y no deja nada para elegir (Unable to deactivate…): sólo el botón principal. */
   hideCancel?: boolean
 }) {
+  const Icono = icon === 'delete' ? Trash2 : icon === 'warning' ? CircleAlert : tone === 'danger' ? TriangleAlert : Info
   /* Radix devuelve el foco a un Trigger que acá no hay: al cerrar vuelve al botón que abrió la pregunta (Save, Delete…). */
   const previo = useRef<HTMLElement | null>(document.activeElement as HTMLElement | null)
   return (
@@ -36,12 +39,15 @@ export function ConfirmDialog({
         className={cn('gap-3 p-5', otherAction ? 'sm:max-w-[480px]' : 'sm:max-w-[420px]')}
         onCloseAutoFocus={(e) => { e.preventDefault(); if (previo.current?.isConnected) previo.current.focus() }}
       >
-        <div className="flex items-center gap-3">
-          {icon === 'warning' && (
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-warn-bg text-warn-fg ring-1 ring-warn-fg/20">
-              <CircleAlert className="size-[18px]" aria-hidden />
-            </span>
-          )}
+        <div className="flex items-start gap-2">
+          <Icono
+            aria-hidden
+            className={cn(
+              'mt-[3px] size-4 shrink-0',
+              /* Rojo sólo en danger; el resto, advertencias incluidas, en azul (Julián, 2026-11-16). */
+              tone === 'danger' ? 'text-dash-bad-fg' : 'text-dash-blue',
+            )}
+          />
           <DialogTitle className="text-base leading-snug font-bold text-ink">{title}</DialogTitle>
         </div>
         <DialogDescription asChild>

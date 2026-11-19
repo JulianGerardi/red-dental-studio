@@ -488,3 +488,171 @@ Pedido de Julián. CON-1546 (*Editar Horario de Apertura/Cierre de Locación*) e
 Queda afuera: el aviso de CON-1546 cuando hay turnos fuera del horario nuevo (no hay turnos por locación en los datos
 mock) y el de "All operating hours have been disabled". "New Hours" de la ficha de un empleado tiene su propio
 alcance ("All selected days" / "This and future weeks") y no se tocó.
+
+### Working Hours: aplicar el horario a otros días y resolver turnos afectados (2026-11-16, CON-1546, CON-2890)
+
+Pedido de Julián con la historia *Aplicar los horarios a otros días* de Abril Viola. **No está cargada en Jira** (se
+buscó por título y por el texto del modal): se cita CON-1546 (editar horario de la locación) y CON-2890 (pantalla de
+resolución de turnos). Cuando exista la clave, sumarla acá, en el código y en `jira.md`.
+
+1. **El día de origen queda elegido y no se puede sacar** en *Repeat on days*: va relleno en azul, con
+   `aria-disabled` y el nombre "Sunday (day being edited)". Los demás días se eligen libres, estén Open o Closed. La línea
+   de ayuda suma "Each day can still be edited on its own later." (guardar varios días no los vincula, ver 2026-11-06).
+2. **Replace working hours?** (`ConfirmDialog`, Cancel / Confirm) sale cuando al menos un día **adicional** está Open y
+   tiene otro horario. El mensaje nombra sólo esos días, en el orden de la tabla y sin el de origen: "This will replace
+   the existing working hours for Monday and Tuesday. Do you want to continue?". No sale si sólo cambia el día de
+   origen, si los adicionales están Closed o si ya tienen el mismo horario. La comparación ordena las franjas
+   (`mismoHorario`), así que el orden de carga no cuenta. Cancel vuelve al panel con el borrador y los días elegidos;
+   no guarda nada.
+3. **Confirm sigue con el impacto en turnos** antes de guardar. Si las horas nuevas dejan afuera un turno Proposed o
+   Booked de esos días (dura una hora y tiene que caber entero en una franja), se abre **These hours affect scheduled
+   appointments** (`HoursAppointmentsDialog`) y el panel sigue abierto atrás: todavía no se guardó nada.
+4. **El texto de CON-2890 se adaptó a la locación** (decisión de Julián, 2026-11-16): la historia dice "assigned to
+   this provider" y propone cambiar el provider, pero en una locación cambiar el provider no saca el turno de fuera de
+   horario. Queda: "There are scheduled appointments outside the new working hours. You can review and manage each
+   appointment individually, or confirm to move all appointments to the waiting list." El título es propio (la historia
+   no trae uno).
+5. **Por turno**, el ⋮ (`RowActionsMenu`): *Edit appointment* abre el drawer de la agenda para moverlo de día, hora o
+   provider (si sigue afuera, un toast lo dice); *Cancel appointment* y *Mark as No Show*; *Undo changes* vuelve al
+   original. Cada fila dice qué le va a pasar: "Moves to the waiting list on Confirm.", "Now within the new working
+   hours." o "Will be marked as No Show.", y abajo cuántos pasan a la lista de espera. Los cambios son un borrador:
+   **Cancel** del aviso vuelve al panel sin aplicar ni las horas ni los turnos.
+6. **Confirm** guarda las horas en todos los días elegidos, aplica lo resuelto y pasa el resto a *Waiting List*:
+   "Hours saved for 3 days. 1 appointment was moved to the waiting list.". Sin turnos afectados guarda directo, como
+   antes.
+7. **Datos**: `TURNOS_LOCACION` (lunes 23/11 15:00 Booked, martes 24/11 08:00 Proposed y otros que quedan adentro), para
+   que Sunday 09:00–14:00 aplicado a Monday y Tuesday muestre dos afectados.
+
+Queda afuera: el bloqueo de CON-2890 con turnos Check In / In Progress ("This shift cannot be modified…"), cerrar un día
+o quitar una franja con la ✕ del chip cuando tiene turnos (CON-1547), y conectar estos turnos con la agenda real.
+
+Para validar con usuarios: si recepción entiende que el día de origen relleno "no se puede sacar" sin el tooltip; si el
+⋮ por turno se descubre o conviene dejar las acciones a la vista; y si "Waiting List" en bloque es lo que esperan como
+salida por defecto.
+
+#### Documentación (2026-11-16, CON-1546, CON-2890)
+
+- **Storybook:** *LocationHoursModal* (Parts, States y Specs, con *Replace Question*), *HoursAppointmentsDialog*
+  (nuevo) y *Elements / ConfirmDialog* con el ícono en línea. Detalle en `design-system.md`, 2026-11-16.
+- **Figma, Screens & Flows** (página ⚙️ Settings — Locations, `7:16`): flujo nuevo *Locations — Set working hours:
+  other days & affected appointments*. Siete pantallas: la semana, el panel con el día de origen fijo, otros días
+  elegidos, *Replace working hours?*, los turnos afectados, uno resuelto con No Show y las horas guardadas. La página
+  se recapturó entera desde la app (`scripts/figma/flujos/settings-locations.mjs`).
+- **Figma, design system:** *Confirm dialog* con `Tone` × `Icon` en *Feedback & Overlays*.
+
+### Affected appointments: lista con jerarquía y un solo contador (2026-11-16, CON-1546, CON-2890)
+
+Pedido de Julián, con una referencia.
+
+1. **Título más corto**: *Affected appointments* (antes *These hours affect scheduled appointments*). Se mantiene el
+   ícono de 16 px en línea de la propuesta A: la referencia traía el círculo, que se sacó en toda la app.
+2. **Cada fila, de arriba hacia abajo**: el paciente (semibold, con el ⋮ a la derecha), la fecha con el horario
+   completo ("Monday, November 23 · 3:00–4:00 PM") y el provider en gris. El estado es un badge a la derecha, separado
+   del texto. Antes la fecha, el estado, el provider y el paciente compartían dos líneas.
+3. **Un solo contador**: *Appointments (2)*, arriba de la lista. Salen el pie "2 appointments will move to the waiting
+   list." y la línea por fila "Moves to the waiting list on Confirm.": el mensaje de arriba ya lo dice.
+4. **Lo resuelto se ve en el badge** (Cancelled, No Show). El turno movido adentro del horario con *Edit appointment*
+   conserva su estado, así que es el único que suma una línea verde, "Now within the new working hours.".
+
+Para validar: si el badge alcanza para notar que un turno ya está resuelto, sin la línea por fila. Y si el aviso de
+Rooms (*This room has scheduled appointments*, CON-1520) debería tomar la misma jerarquía: hoy la lista es igual a la
+de antes.
+
+### Working Hours: "+N" sólo cuando las franjas no entran (2026-11-16)
+
+Julián: "no entiendo por qué dice +2 cuando te sobra toda la pantalla", y después: "el +2 debe estar cuando no entran
+los horarios".
+
+1. **Antes**, la tabla mostraba siempre las dos primeras franjas y "+N", aunque sobrara ancho.
+2. **Ahora** (`FranjasDia`), la fila muestra en una línea todas las franjas que entran junto a *Edit hours*. Sólo si no
+   entran, las que sobran quedan en "+N", que al tocarlo las despliega a todas, bajando de línea. Los anchos se miden en
+   una copia invisible (`aria-hidden`) y se recalculan con `ResizeObserver` al cambiar el ancho. En escritorio entran
+   las 4; en tablet (1024) quedan 2 y "+2"; en celular, 1 y "+3".
+3. **Celular** (menos de 640 px): la grilla de tres columnas se cortaba a la derecha. Ahora el día y el switch van arriba
+   y las franjas o *Closed all day.* debajo, a todo el ancho; el encabezado queda *Day · Status*.
+4. **Start Time y End Time llevan asterisco** en *Set working hours* y en *New Hours* (Employees): son obligatorios y
+   ya se validaban con *Required.*, pero no lo decían.
+5. Los e2e cuentan las franjas por su botón *Remove …*, no por el texto: la copia invisible repite el texto.
+
+Para validar: si "+N" en celular, con una sola franja visible, se entiende o conviene mostrarlas todas ahí.
+
+## CON-4161 · Campo vacío: *This field is required.* (2026-11-16)
+
+1. *Set working hours*, *New Hours* y *New Exception* decían *Required.* debajo de Start/End Time vacíos; CON-4161 y
+   CON-4162 piden *This field is required.*, el texto único de la app (`OBLIGATORIO`, regla en
+   [figma/README.md › Validación](../README.md)). Los demás errores de horarios no cambian.
+
+### Borrar una franja, cerrar un día y citas afectadas según la HU 8 (2026-11-16, CON-4165, CON-4166, CON-4167)
+
+Pedido de Julián con CON-4165 (HU 6, cerrar un día) y CON-4166 (HU 7, eliminar un intervalo). Aparecieron en Jira las
+historias de Working Hours HU 1 a 8 (CON-4160 a CON-4167). *Aplicar a otros días* es CON-4164 (HU 5) y las citas
+afectadas, CON-4167 (HU 8).
+
+1. **Toda operación pasa por el mismo recorrido** (`Operacion` en `LocationDetail.tsx`):
+   1. Pregunta (salvo el panel, que ya tiene la suya de reemplazo).
+   2. Impacto: si alguna cita afectada está en Check In o In Progress, se bloquea; si hay otras, *Affected appointments*.
+   3. Se aplica.
+
+   Cancel en cualquier paso deja la tabla como estaba.
+2. **Borrar una franja (✕ del chip)**:
+   - *Delete working hours?* (danger, tacho): "This will delete the working hours from 08:00 AM to 01:00 PM on Monday. Do
+     you want to continue?". Si es la última del día, suma "Monday will be closed."; si además es la última de la
+     locación, "The location will have no working hours.".
+   - Al confirmar sale sólo esa franja; sin franjas, el día queda Closed. Toast con Undo.
+3. **Cerrar un día (switch)**:
+   - *Close working hours?* (danger, triángulo): "This will close the location every Monday. Do you want to continue?"
+     y, si era el último día abierto, la misma frase de la locación sin horarios. Una sola pregunta.
+   - Las franjas **se conservan** (el día queda `abierto: false` con sus `rangos`). Reabrirlo abre *Set working hours* con
+     esas franjas, y se reabre recién con Save.
+   - Antes, cerrar vaciaba las franjas sin preguntar (2026-11-06, punto 7); eso queda reemplazado.
+4. **Citas afectadas, según CON-4167**:
+   - Entran sólo las que **pierden cobertura**: estaban cubiertas por un día Open y dejan de estarlo. Las que ya estaban
+     afuera no cuentan.
+   - Lo que se hace cita por cita (Edit appointment, Cancel appointment, Mark as No Show) **se guarda en el momento** y
+     no se deshace con Cancel.
+   - La cita resuelta **sale de la lista** y *Appointments (N)* cuenta sólo las pendientes. Sale *Undo changes* del menú
+     y la línea "Now within the new working hours.".
+   - Si no queda ninguna, se vuelve a la acción de origen: el panel, o la pregunta de borrar o cerrar, que sigue sin
+     citas afectadas.
+   - Confirm pasa a *Waiting List* las que siguen afectadas, conservando la cita.
+5. **Bloqueo**: *Unable to change working hours* (`HoursBlockedDialog`, sólo Close) con el texto de CON-4167 ("Working
+   hours cannot be changed because there are affected appointments in Check In or In Progress status.") y las citas en
+   curso. No se aplica nada y el panel conserva el borrador. El título es propio, con el mismo patrón que *Unable to
+   disable billing profile*.
+6. **Datos**: `wh6`, una cita en Check In hoy (lunes 16, 10:00), para mostrar el bloqueo al borrar 08:00 AM - 01:00 PM
+   de Monday. `EstadoTurnoLocacion` suma Check In e In Progress.
+7. **Íconos de advertencia en azul** (Julián): en `ConfirmDialog`, `icon="warning"` va en `dash-blue` salvo en
+   `danger`, que sigue rojo. Afecta también a Consent required.
+
+Para validar: si "The location will have no working hours." alcanza como advertencia o conviene un tono más fuerte; y si
+el Undo de borrar y cerrar tiene sentido cuando ya hubo una pregunta antes.
+
+#### Documentación (2026-11-16, CON-4165, CON-4166, CON-4167)
+
+- **Storybook:**
+  - *Pages / Parts / Location detail*: Delete working hours?, Close working hours?, Unable to change y la tabla
+    *Working Hours · States*.
+  - *HoursAppointmentsDialog* rehecho con CON-4167.
+  - *Elements / ConfirmDialog*: la advertencia en azul.
+- **Screens & Flows** (página ⚙️ Settings — Locations): flujo nuevo *Locations — Delete hours & close a day*, con 9
+  pantallas. La página se recapturó entera y se reconectó a la library del design system: 0 instancias locales y los
+  rellenos ligados a variables.
+- **Design system en Figma:** *Confirm dialog* con la advertencia en azul y los ejemplos *Delete working hours?* y
+  *Close working hours?*.
+
+## Tablas de Settings: a la ficha sólo por el ⋮, menús con ícono y *Edit* (2026-11-18)
+
+Sin historia de Jira: devolución de diseño de Julián sobre Locations, Employees y Accounts.
+
+1. **Una sola forma de entrar a la ficha**: el ⋮ → *Edit*. El nombre de la fila deja de ser link (Locations y Accounts:
+   `TextCell`; Employees: `PersonCell` sin `to`, que ahora dibuja texto y no un botón vacío). Antes había dos caminos al
+   mismo lugar.
+2. **Menús alineados** con el de Patients (*Overview* / *Edit*): todos los ítems llevan ícono a la izquierda y nombre
+   corto, sin repetir la entidad de la fila.
+   - Locations: *Edit* (lápiz), *Delete* (tacho).
+   - Employees: *Edit* (lápiz), *Delete* (tacho, antes el ícono de prohibido), *Suspend*, *Terminate*, *Disable*
+     (prohibido) y *Remove Provider Role* (persona con menos, antes otro tacho).
+   - Accounts: *Edit* (lápiz), *Manage Licenses* (llave), *Suspend* (prohibido). Antes no tenían íconos.
+
+**A validar:** que recepción y administración no extrañen el clic en el nombre (es el patrón de Patients, que sí lo
+conserva). Si lo extrañan, la salida es la fila entera clickeable, no volver al link.

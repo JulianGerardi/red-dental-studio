@@ -8,16 +8,18 @@ import { Avatar, inicialesDe } from '@/components/ui/avatar'
    x=879 cuando el modal termina en 887, o sea que va pegada y hasta se monta
    8px encima. Los dos miden 813 de alto y empiezan en la misma y.
 
-   Las horas van 08 AM … 12 PM y siguen con 13 PM, 14 PM…: es el mismo error
-   del calendario grande, anomalía 27. Se replica. */
+   El Figma rotula la tarde "13 PM, 14 PM…" (anomalía 27): no se replica, porque estas horas llegan a Start y End
+   Time. Van 01 PM, 02 PM…, como el calendario grande (scheduling.md, 2026-11-12). */
 
 /* 4430:61940 llega hasta las 19 y repite "19 PM" en las dos últimas filas.
    La etiqueta duplicada no se replica: en un selector real serían dos franjas
    con el mismo nombre. Queda anotada como anomalía 56. */
 export const HORAS = [
-  '08 AM', '09 AM', '10 AM', '11 AM', '12 PM', '13 PM',
-  '14 PM', '15 PM', '16 PM', '17 PM', '18 PM', '19 PM',
+  '08 AM', '09 AM', '10 AM', '11 AM', '12 PM', '01 PM',
+  '02 PM', '03 PM', '04 PM', '05 PM', '06 PM', '07 PM',
 ]
+/* "02 PM" -> 14: la hora del día de una franja. */
+export const hora24 = (franja = '') => (parseInt(franja, 10) % 12) + (/PM/.test(franja) ? 12 : 0)
 
 /* Bloque rojo del frame: 09 AM ocupado. */
 const OCUPADA = '09 AM'
@@ -25,7 +27,8 @@ const OCUPADA = '09 AM'
 export function AppointmentSlotPicker({
   provider = 'Sarah Stone',
   especialidad = 'General Dentistry',
-  fecha = 'Sábado, 19 de febrero de 2022',
+  /* Sin fecha elegida todavía; el Figma traía "Sábado, 19 de febrero de 2022", en castellano (scheduling.md, 2026-11-12). */
+  fecha = 'Select a date',
   paciente,
   seleccion,
   onPick,

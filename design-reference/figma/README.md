@@ -14,6 +14,7 @@ Archivo: `9fYLxX9hlTj5unFthG4bBg`. Relevado durante el rediseño de `red-clone`.
 | Relationships & Billing (6 pantallas) | `3751:76507` | [modulos/relationships.md](modulos/relationships.md) |
 | Consents (Settings) | `4106:170620` | [modulos/consents.md](modulos/consents.md) |
 | Design system (Storybook) | — | [../design-system.md](../design-system.md) |
+| Documentación en Figma (Screens & Flows) | archivo `TPh6NE9d4skn0BdId26UTR` | [../figma-docs.md](../figma-docs.md) |
 
 ## Historias de Jira
 
@@ -63,7 +64,7 @@ Numeradas de forma continua entre módulos, para poder citarlas sin ambigüedad.
 | 26 | Scheduling | Start/End Time muestran una fecha (`12-03-2025`) |
 | 27 | Scheduling | Horas "13 PM, 14 PM…" en un frame y "01 PM, 02 PM…" en otro |
 | 28 | Scheduling | Las salas repiten las especialidades de los providers |
-| 29 | Treatments | El título dice "Treatments plan" y el breadcrumb "Treatment plan" |
+| 29 | Treatments | El título dice "Treatments plan" y el breadcrumb "Treatment plan" (en la app, "Treatment Plan" desde el 2026-11-12) |
 | 30 | Treatments | El breadcrumb termina en un chevron suelto |
 | 31 | Treatments | Badge "Expired" con nota "Cancelled" en la misma card |
 | 32 | Treatments | Un frame se llama "Empty State — Mislabeled Insurance Copy" |
@@ -411,6 +412,13 @@ los campos marcados, y el toast recién sale cuando el guardado se completa.
 Los campos se marcan recién después del primer intento de guardar, no mientras
 se completa el formulario.
 
+**Campo obligatorio vacío: siempre *This field is required.*** (2026-11-16, CON-4161). Un solo texto en toda la app,
+sale de `OBLIGATORIO` (`src/lib/validacion.ts`); no escribir variantes (*Required.*, *Enter the reason.*, *A billing
+name is required.*). Los mensajes específicos quedan sólo para un valor cargado pero inválido (*Enter a valid email.*,
+*Enter the 10-digit NPI.*, *Select a carrier from the list.*) y para grupos que no son un campo (*Choose at least one
+role.*, *Add at least one time range.*). Los resúmenes de secciones plegadas (*Complete the address.*) siguen
+diciendo qué falta adentro.
+
 ## Inputs funcionales con datos ficticios
 
 Todos los controles de formulario responden, no son decorativos:
@@ -554,3 +562,37 @@ lateral, la reserva se queda. Verificado con Playwright a 1440, 1024 y 390px en 
 Billing: la página termina a ~24px; el botón de Confibot queda sobre el padding interno de las cards, sin tapar texto
 ni controles -el caso más justo es Billing a 1024px, donde "$610" queda a ~3px del botón-. **A validar:** si en
 pantallas con algo alineado a la derecha al pie (paginación, totales) conviene un respiro extra.
+
+## Pop-ups de confirmación: ícono en línea (2026-11-16)
+
+Julián: el ícono de 36 px con círculo de los avisos se veía demasiado grande. Se compararon cuatro variantes (ícono en
+línea, franja y rótulo de tono, aviso dentro del cuerpo, encabezado y pie como el drawer) y eligió la **A, ícono en
+línea**. Afecta a todos los `ui/confirm-dialog` (27 en la app).
+
+1. Un ícono de 16 px pegado al título, sin círculo ni fondo, alineado con la primera línea. Cuerpo y pie no cambian.
+2. **El ícono sale del tono**: neutro → `Info` azul; `tone="danger"` → `TriangleAlert` rojo. Ninguna pantalla tiene que
+   pasar nada.
+3. `icon="warning"` (hay algo que revisar antes de seguir: Consent required, turnos afectados) → `CircleAlert`, ámbar
+   en neutro y rojo si además es `danger` (Rooms con turnos).
+4. `icon="delete"` (nuevo) → tacho rojo, sólo para lo que borra: Delete Appointment, Delete Relationship, Delete
+   procedure (las dos variantes) y borrar una suscripción. Los rojos que descartan, desactivan o deshabilitan llevan el
+   triángulo: un tacho ahí diría que se borra algo que no se borra.
+5. Así, que algo no tiene vuelta atrás ya no depende sólo del color del botón (accesible a quien no distingue el rojo).
+
+Para validar: si el ícono neutro (info) en preguntas simples suma o es ruido; si conviene sacarlo y dejar ícono sólo en
+rojos y avisos.
+
+## Drawers sin bajada (2026-11-17)
+
+Pedido de Julián: los drawers llevan el título solo. `ui/drawer` deja la `description` sólo para el lector de pantalla
+(el diálogo sigue teniendo su descripción accesible) y se sacan las bajadas genéricas de las secciones (New Appointment,
+Exceptions). Quedan las de sección que son un dato, no una bajada: "Selected Exception Types: …" y el aviso de "No
+covered option".
+
+Drawers cuya bajada era un dato y ahora no se ve (a revisar con Julián si se suma al título o al cuerpo): Manage
+Licenses (nombre de la cuenta), Exam review (provider · fecha), AI Narrative Editor (código y versión), Record detail
+("Procedure · Read-only summary"), Location Number (cómo conseguir el número) y Manage Exceptions.
+
+Editar algo ya cargado no lleva pasos: pestañas al ancho de su texto, como la ficha de una Location, y un solo Save
+Changes. Edit Patient es una pantalla (`/patients/:id/edit`); Edit Appointment, un drawer (ver patients.md y
+scheduling.md).

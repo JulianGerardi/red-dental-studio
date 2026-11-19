@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FormFooter, ModalShell, OptionCheckbox, SelectField, TextField } from '@/components/patients/form'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Las dos herramientas del editor de un fee schedule (red.dev): Copy form trae los precios de otro fee schedule y Bulk
    Edit ("Increase All") los sube en monto o en porcentaje. Las dos llenan la columna New Fee; nada se guarda hasta Save.
@@ -23,7 +24,7 @@ export function CopyFormDrawer({ opciones, onClose, onCopiar }: {
     >
       <SelectField
         label="Fee schedule" required placeholder="Select an option" options={opciones} value={elegido} onChange={setElegido}
-        error={intentado && !elegido ? 'Select the fee schedule to copy.' : undefined}
+        error={intentado && !elegido ? OBLIGATORIO : undefined}
         hint="Its fees replace every New Fee. Save to keep them."
       />
     </ModalShell>
@@ -66,7 +67,7 @@ export function IncreaseAllDrawer({ onClose, onAplicar, seleccionados = 0 }: {
           <TextField
             label={seleccionados ? 'Increase Selected Fees By' : 'Increase All Fees By'} required placeholder={por === '$' ? '$0.00' : '0'} value={monto}
             onChange={(v) => setMonto(v.replace(/[^\d.-]/g, ''))}
-            error={intentado && !valido ? 'Enter an amount other than 0.' : undefined}
+            error={!intentado || valido ? undefined : monto.trim() ? 'Enter an amount other than 0.' : OBLIGATORIO}
             hint="A negative number lowers the fees."
           />
           <SelectField label="By" options={['$', '%']} value={por} onChange={(v) => setPor(v as '$' | '%')} />

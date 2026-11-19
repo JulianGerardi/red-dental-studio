@@ -6,6 +6,7 @@ import {
 import { PersonaSeleccionada, type PersonaDirectorio } from '@/components/patients/AddRelationshipDrawer'
 import { RemoveGuardianDialog } from '@/components/patients/RelationshipDialogs'
 import { aviso } from '@/components/ui/toaster'
+import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 3716:81940. A diferencia de "Add Relationship", esta sí es modal y
    se abre encima de la pantalla anterior. No trae Direction: el propio
@@ -53,12 +54,12 @@ export function EditRelationshipModal({
   }
 
   return (
-    /* Como Edit Relationship de Confidentally 2.0: un paso, Person y Relationship sin caja. */
+    /* Como Edit Relationship de Confidentally 2.0: un paso, Person y Relationship sin caja. Mismo ancho que Add (relationships.md, 2026-11-12). */
     <ModalShell
       title="Edit Relationship"
       description="Update how this person is related to the patient."
       onClose={onClose}
-      width="max-w-[480px]"
+      width="max-w-[560px]"
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
     >
       <div className="flex flex-col gap-6">
@@ -82,7 +83,7 @@ export function EditRelationshipModal({
             options={['Parent', 'Guardian', 'Sibling', 'Spouse', 'Child', 'Other']}
             value={rel}
             onChange={setRel}
-            error={intentado && !rel.trim() ? 'This field is required.' : undefined}
+            error={intentado && !rel.trim() ? OBLIGATORIO : undefined}
           />
         </DrawerSection>
       </div>

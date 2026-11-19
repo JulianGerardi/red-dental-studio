@@ -3141,3 +3141,157 @@ Si el consentimiento de un procedimiento se abrió desde el Consent history (el 
 al caso. El estado del historial (`historial`) vive en `TreatmentPlanSection` y `ConsentBlock` lo recibe controlado
 (`historial` / `onHistorial`), porque el bloque se desmonta mientras se ve el consentimiento. Desde la columna Consent o
 Sign now, Back sigue volviendo al caso. e2e: "el historial del caso lista los consentimientos de cada procedimiento".
+
+## CON-4119: los estados de la columna Consent (2026-11-11)
+
+**CON-4119** ([Patient Procedures] Visualización y estados de la columna Consent en el listado de procedimientos), epic
+CON-3118 ([Consent] Procedure). Pedido de Julián: actualizar los valores del consentimiento del procedimiento en
+Treatment Plan por los de la historia. Reemplaza los cinco estados del prototipo de CON-4052 (punto 1 de 2026-11-02).
+
+| Antes (prototipo CON-4052) | Ahora (CON-4119) | Tooltip (tal cual la historia) | Color |
+|---|---|---|---|
+| Not required | **Not required** | sin tooltip | gris atenuado (`ink-faint`) |
+| Not generated | **Not generated** | "Consent will be automatically generated 24h before the appointment, or when starting/completing the procedure." | gris (`ink-muted`) |
+| Not sent | — (se ve como Not generated) | | |
+| Pending | **Requested** | "Consent requested, pending patient signature." | ámbar (`warn-fg`) |
+| Signed | **Accepted** | "Consent signed and accepted." | verde (`dash-ok-fg`) |
+| — | **Rejected** | "Consent rejected by patient." | rojo (`dash-bad-fg`) |
+| — | **Discarded** | "Consent discarded." | gris (`ink-muted`), ícono de anulado |
+
+1. **Not sent desaparece.** Era "generado, sin mandar": el `PENDING` interno de la historia (regla 2), que no se le
+   muestra al usuario. Mientras el documento no salió al paciente, la columna sigue en *Not generated*. Por eso, si el
+   envío falla (*Send consent and sign later* en Night Guard Plan, D1110), el consentimiento queda *Not generated* y no
+   *Not sent*; el diálogo sigue diciendo que no se pudo mandar.
+2. **Se mantiene el formato de la columna** (ícono + palabra en el color del estado, no una pill con borde): es la pieza
+   que ya estaba y la historia pide el estado y el color, no un componente nuevo. El encabezado del detalle sí usa `Pill`
+   (`warning`, `success`, `danger`, `neutral`).
+3. **Tooltip**: primero el nombre del consentimiento ("Procedure Consent - código nombre", como en red.dev) y abajo el
+   texto de la historia. Reemplaza a "Open to present it to the patient for signature" y a los dos textos del prototipo
+   ("No document yet…", "No mapped template…"). *Not required* no tiene tooltip ni nada que abrir: pasa a ser texto, no
+   botón. En pantallas táctiles no hay hover: tocar *Not generated* muestra el mismo texto como aviso.
+4. **Qué abre cada uno**: *Requested* y *Accepted*, el detalle del consentimiento como antes. *Rejected* y *Discarded*
+   también abren el documento, pero **ya no se firma**: en el pie, en lugar de los dos botones, queda el texto del
+   estado + "It can no longer be signed." y las afirmaciones no se pueden marcar (`consentimientoCerrado`).
+5. **Start y Complete** (regla 4 de la historia, con CON-4052): *Accepted* o *Not required*, directo; *Requested*,
+   Consent required con *Continue without signed consent*; *Not generated*, *Rejected* o *Discarded* (`sinPedir`),
+   Consent required con *Send consent and sign later*, que genera un documento nuevo y lo deja *Requested*. *Sign now*
+   también lo deja *Requested* (generado y esperando la firma, asistida) aunque después se vuelva con Back.
+6. **Firmas**: con una firma sigue *Requested*; con las dos, *Accepted* (`estadoTrasFirma`).
+7. **Consent history** (el reloj): un consentimiento rechazado o descartado aparece como "Rejected by patient" o
+   "Discarded" (punto gris), no como "Not signed yet".
+8. **Datos de ejemplo**: Endodontic Treatment, Visit 2: Accepted (D3330), Requested a medio firmar (D2950), Not
+   generated (D2954), **Rejected** (D2750), Not required (D0230) y Accepted (D9910). Restorative Plan: Requested y Not
+   generated. Whitening Plan (cancelado después de aceptar): los dos **Discarded**. Unassigned (no se ven en la tabla):
+   Not generated, Rejected, Requested, Accepted y Not required.
+
+**No cambia:** el consentimiento **del caso** (el bloque Informed Consent de arriba: Pending / Signed / Expired) es otra
+entidad y la historia no lo nombra. Tampoco cambia dónde se ve la columna (ver anomalías).
+
+**Anomalías / lo que la historia deja abierto:**
+
+- La historia dice que la columna aplica igual en **Unassigned Items**; acá Unassigned y los casos sin aceptar siguen
+  **sin columna Consent** (decisión de Julián del 2026-10-06 y prototipo de CON-4052). Falta definir cuál manda.
+- La regla 3 ("Tooltip informativo") está vacía en Jira.
+- La historia admite "`Not required` (o `—`)": se dejó la palabra, que dice más que el guion.
+- No hay historia para lo que pasa al tocar **Start / Complete con el consentimiento Rejected o Discarded**: se resolvió
+  pidiendo uno nuevo (punto 5). CON-2928 habla del rechazo del consentimiento del caso, no del de un procedimiento.
+- La "actualización reactiva" (criterio 4) no se puede mostrar sin backend: en el mock el estado cambia al mandar o firmar.
+- *Not required* en `ink-faint` es el "gris atenuado" que pide la historia, pero su contraste sobre blanco es bajo
+  (≈2,6:1): conviene revisar si alcanza o si pasa a `ink-muted` como Discarded.
+
+**A validar con usuarios:** si recepción distingue *Not generated* de *Not required* sin leer el tooltip; si *Requested*
+se entiende como "falta que firme el paciente" (antes decía Pending); y qué esperan hacer frente a un *Rejected* (¿volver
+a pedirlo, o hablar con el paciente antes?).
+
+Código: `data/treatment-plan.ts` (`ConsentProcedimiento`, `AYUDA_CONSENTIMIENTO`; salen `SIN_DOCUMENTO` y
+`AVISO_CONSENTIMIENTO`), `clinical/{ConsentDetail,ConsentRequiredDialog,ConsentBlock,TreatmentPlanSection,ProblemList,RecordDetail}.tsx`;
+e2e en `tests/treatment-plan.e2e.ts` ("la columna Consent muestra los estados de CON-4119").
+
+## CON-4144 · El encuentro de CON-1612 y textos de red.dev (2026-11-13)
+
+Comparativa con red.dev del Overview, la barra y la Problem List (ticket CON-4144, asignado a Abril). El layout ya está
+decidido (odontograma de DentAssmt, tabla flotante, botoneras Exams/Records): se deja como está.
+
+1. **Botón del encuentro con los estados de CON-1612**. Antes el pill alternaba *Start / Pause Enconter*. Su menú tenía
+   *End encounter*, *Discard encounter* y *Encounter settings*: dos no hacían nada y ninguno sale de Jira. Además, el menú
+   no se veía, porque la barra tiene `overflow-x-auto` y lo cortaba. Ahora:
+   - Sin empezar: "Start Enconter", sin menú: no hay nada que pausar ni cerrar.
+   - En curso: "Complete Encounter" (lo cierra y ofrece firmar la Clinical Note, como hacía End encounter). El menú
+     ofrece *Pause Encounter* y *Discharge Patient*, como red.dev.
+   - En pausa (*On hold*): pill ámbar "Pending Encounter", el mismo de la ficha. Al tocarlo se retoma; el menú ofrece
+     *Complete Encounter* y *Discharge Patient*.
+   - El menú es el `DropdownMenu` del sistema: se abre en un portal y ya no lo corta la barra.
+   - `ClinicalTopBar` pasa de `encuentro: boolean` a `EstadoEncuentro` ('sinEmpezar' | 'enCurso' | 'enPausa').
+2. **"Mark as…"**: el 2026-10-05 se copió "Mark As" de red.dev, que hoy dice "Mark as". Se alinea en el menú de la
+   Problem List y en las acciones de los exámenes (`dental/actions.ts`).
+3. **"Rows per page:"** en la Problem List, Procedures, Lab Order y los registros. Decían "Show:", distinto de la tabla del
+   sistema y de red.dev. Settings › Accounts decía "Mostrar:", en castellano: también pasa a "Rows per page:".
+4. **A definir con Julián**:
+   - Los nombres de los exámenes. red.dev usa Vitals, ROS, Physical, Extraoral, Intraoral, Dental assessment, Periodontal
+     y Radiographic; nosotros, los del Figma (Ros, BMI, ATM/O-F, Intra Oral, DentAssmt, Radiography…).
+   - Un solo formato de fecha. Clinical Mode usa día/mes; red.dev y el Ledger, mes/día; Documents, "Oct 27, 2026".
+   - "Start Enconter" sin la u, que viene del Figma.
+5. **A validar con usuarios**: si en recepción se entiende la pausa por el color ámbar, y si "Discharge Patient" en el
+   mismo menú que Pause se toca por error (hoy no pide confirmación, como en red.dev).
+
+### Decisiones de Julián sobre CON-4144 (2026-11-13)
+
+1. **Exámenes con los nombres y el orden de red.dev**: Vitals, ROS, Physical, Extraoral, Intraoral, Dental assessment,
+   Periodontal y Radiographic. Salen BMI y ATM/O-F: no existen en red.dev (el BMI está adentro de Vitals, en
+   Anthropometry) y acá eran pestañas en construcción. El rótulo del área de tratamiento de los Edit también pasa a
+   Intraoral / Extraoral. La columna *Exam* de la Problem List sigue con los nombres de los datos (Dental Assessment,
+   Radiography).
+2. **Un solo formato de fecha: MM/DD/YYYY, como red.dev**, en toda la app: tablas, detalles, cards, campos de fecha
+   (DatePicker de formulario, `formatMDY` en `lib/fecha.ts`) y el campo tipeado de Insurance ("MM / DD / YY"). Los datos se
+   pasaron a ese formato y `ordenFecha` (Treatment Plan) lo lee así.
+   - Quedan en texto los títulos y las frases: el saludo ("Thursday - November 13, 2026"), el selector de la barra del
+     Dashboard ("Feb 28, 2026"), la semana de la agenda, "moved to Mar 3" en los avisos y las fechas relativas de
+     Notifications.
+   - Las claves internas dd-mm-aaaa de la agenda y del Dashboard no cambian: no se muestran.
+3. **"Start Encounter"** con la u, en la barra de Clinical Mode, en la ficha y en el popup del paciente del Dashboard.
+4. **El botón de la ficha, igual que el de Clinical Mode**, con el mismo estado (`lib/encuentro.ts`, `useEstadoEncuentro`).
+   - Sin empezar: *Start Encounter*, que además lleva a Clinical Mode (CON-2994).
+   - En curso: *Complete Encounter*, que ofrece firmar la Clinical Note; si se deja para después, queda *Pending
+     Signature*. El menú ofrece *Pause Encounter* y *Discharge Patient* (`OpcionesEncuentro`).
+   - En pausa: *Pending Encounter* en ámbar.
+   - Antes el menú de la ficha elegía directamente entre los dos estados del Figma.
+
+## 2026-11-16 · CON-2212 · CON-2321 · CON-2214 · CON-1397 · Figma: segunda a cuarta tanda de Clinical Mode
+
+Documentación en el archivo de flujos (`scripts/figma/flujos/clinical-mode-2.mjs`, `-3` y `-4`):
+
+- **Capturado de la app:** Treatment — Workflows (7), Radiography — Gallery, Upload & Viewer (3), Lab Order — List & Actions
+  (4), Dental Assessment — Tooth & Findings (7) y New Procedure (4: planned, filtro por área, existing y superficies).
+- **Adecuado desde Platform Design** (en la app son placeholders «Planned»): Prescription (lista y New Prescription),
+  Referral (lista y create), ROS · General y Treatment History. Se capturó el shell real de la app con la pestaña activa y la
+  guía del flujo; el placeholder se reemplazó por el contenido del diseño, estirado a Fill container, con instancias,
+  variables y estilos del design system. Los frames crudos quedaron en 🧪 Pruebas (`· original Platform Design`).
+- **Decisión:** Physical sigue sin diseño en Platform Design; Patient Summary tampoco. Treatment History y Clinical Note
+  son pestañas del diseño que la app no tiene todavía (Treatment History se muestra sobre el shell con la pestaña
+  renombrada).
+
+Anomalías del diseño (se copian tal cual y se anotan):
+
+1. "Overwiev" y "Start Enconter" en la barra de Clinical Mode.
+2. Referral · Create lleva el link **New Laboratory** (copiado de Lab Order) y dos campos de búsqueda con el mismo valor "I".
+3. New Prescription: dos campos "Strength" (valor y unidad), "Frecuency" mal escrito, y Duration con una lista que dice "mg".
+4. La columna Actions de la lista de Prescription son tres círculos vacíos (sin íconos definidos).
+5. El pie de ROS dice "Showing 9 active prescriptions" y "View History" (copiado de Prescription).
+6. Lab Order: el botón dice "New Prescription" y el pie "active prescriptions" (ya anotado, #85).
+7. ROS · General: el interruptor "Negative" va en rojo, el mismo rojo de error; conviene validar si un síntoma negativo es una alerta.
+
+### Dental Assessment: cierre (2026-11-16, `clinical-mode-5.mjs`)
+
+- Se suman Edit Condition de región, Problem List · Procedures, Procedure actions y los drawers Edit / Complete / Discontinue
+  procedure. Con `clinical-mode-3.mjs` queda cubierto Tooth information, el menú del hallazgo, Edit Finding, Discard, Delete,
+  New Procedure (planned, existing, superficies) y el filtro por área.
+- **Sin equivalente en la app:** los pop-ups de New Condition (8) de Platform Design: la app resuelve el alta con el drawer de
+  dos pasos (Procedure · Descriptors).
+- **Para después (decisión de Julián):** Treatment Workflow (detalle y Clinical Note) y Workflow Set Up: hay que pegarlos en el
+  archivo de flujos.
+
+## Vitals: el aviso de presión con `ui/alert` (2026-11-18)
+
+Sin historia de Jira (devolución de diseño de Abril Viola). El aviso azul que aparece cuando un valor se va del rango
+pasa de franja con barra a la izquierda a `Alert` tono info, el aviso único de la app (detalle en patients.md,
+2026-11-18). El texto sigue siendo el del Figma, que no habla de presión (anomalía ya anotada en `AVISO_PRESION`).

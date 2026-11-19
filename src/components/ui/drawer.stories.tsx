@@ -95,7 +95,7 @@ export const Parts: Story = {
           </DrawerSection>
         </div>
       </Bloque>
-      <Bloque titulo="Fields" nota="Post payment: de a dos y del mismo ancho, en grid gap-4 sm:grid-cols-2. Notes ocupa el ancho entero; las casillas van una debajo de la otra.">
+      <Bloque titulo="Fields" nota="New Patient Payment (-): de a dos y del mismo ancho, en grid gap-4 sm:grid-cols-2. Notes ocupa el ancho entero; las casillas van una debajo de la otra.">
         <div className="w-[560px] max-w-full rounded-lg border border-dashed border-line p-5">
           <div className="flex flex-col gap-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -185,7 +185,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">md</td><td className="tabular-nums">480px</td><td>Formularios cortos: Edit Contact, Edit Relationship, medicamentos y alergias, New Room, New Hours, Review Exam.</td></tr>
           <tr><td className="font-semibold">lg</td><td className="tabular-nums">560px</td><td>Formularios con pasos: New Patient, Edit Patient, New Appointment, subscriptions.</td></tr>
           <tr><td className="font-semibold">xl</td><td className="tabular-nums">760px</td><td>Tablas o editores: Apply credit, Assign Role, AI Narrative Editor.</td></tr>
-          <tr><td className="font-semibold">2xl</td><td className="tabular-nums">1000px</td><td>Un paso con una tabla ancha que tiene que entrar entera: Post payment (Allocation, las 12 columnas de Ledger Transactions).</td></tr>
+          <tr><td className="font-semibold">2xl</td><td className="tabular-nums">1000px</td><td>Un paso con una tabla ancha que tiene que entrar entera: New Patient Payment (Allocation, las 12 columnas de Ledger Transactions).</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Fields" nota="Vale para todos los drawers y para los formularios dentro de una card de página. Con Storybook andando, npm run ds:campos abre cada story y mide los campos de los drawers abiertos.">
@@ -218,7 +218,7 @@ export const Specs: Story = {
           <tr><td className="font-semibold">Add Relationship</td><td>Person · Contact · Relationship</td><td>lg</td></tr>
           <tr><td className="font-semibold">New Procedure</td><td>Procedure · Surfaces (si el procedimiento lleva superficie) · Link to finding · Link to diagnosis (si es Planned)</td><td>md</td></tr>
           <tr><td className="font-semibold">Edit Patient, subscriptions</td><td>Ver cada componente</td><td>lg / xl</td></tr>
-          <tr><td className="font-semibold">Post payment</td><td>Payment · Allocation</td><td>2xl</td></tr>
+          <tr><td className="font-semibold">New Patient Payment (-) · Credit Adjustment (-)</td><td>Payment · Allocation</td><td>2xl</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>

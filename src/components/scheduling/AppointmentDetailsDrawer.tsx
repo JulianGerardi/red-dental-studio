@@ -1,12 +1,13 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  X, TriangleAlert, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity, Trash2,
+  X, ChevronDown, Clock, User, DoorOpen, ClipboardList, Activity, Trash2, Pencil,
 } from 'lucide-react'
-import { BLOCK_STYLE, esEliminable, fmtExacta, type ApptState } from './calendar-data'
+import { BLOCK_STYLE, esEditable, esEliminable, fmtExacta, type ApptState } from './calendar-data'
 import { useAnclaje } from '@/lib/anclaje'
 import { useEsChico } from '@/lib/media'
 import { aviso } from '@/components/ui/toaster'
+import { Alert } from '@/components/ui/alert'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -36,6 +37,7 @@ const W = 336
 
 /* CON-2990: por qué no se puede borrar un turno que ya no está en un estado temprano. */
 const BLOQUEO_BORRAR = 'Only Proposed or Waiting List appointments can be deleted.'
+const BLOQUEO_EDITAR = 'Fulfilled, No-show and Cancelled appointments cannot be edited.'
 
 /* El detalle es de lectura: el turno se cambia desde "Edit appointment", no
    con lápices sueltos por fila. */
@@ -70,6 +72,7 @@ export function AppointmentDetailsDrawer({
   anchor,
   onClose,
   onDelete,
+  onEdit,
 }: {
   patient: string
   estado?: ApptState
@@ -84,6 +87,8 @@ export function AppointmentDetailsDrawer({
   onClose: () => void
   /** Borra el turno, ya confirmado. Sin esto el detalle no muestra Delete. */
   onDelete?: () => void
+  /** Abre Edit Appointment con el turno cargado. Sin esto el detalle no muestra el lápiz. */
+  onEdit?: () => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const chico = useEsChico()
@@ -91,6 +96,7 @@ export function AppointmentDetailsDrawer({
   const [confirmando, setConfirmando] = useState(false)
   const idBloqueo = useId()
   const eliminable = esEliminable(estado)
+  const editable = esEditable(estado)
 
   useEffect(() => {
     /* Con la pregunta de borrar abierta, Escape y el click afuera son de la pregunta. */
@@ -165,6 +171,26 @@ export function AppointmentDetailsDrawer({
         >
           {estado}
         </span>
+        {/* Edit, en la cabecera como en los calendarios conocidos: el pie queda para Delete y Check In (scheduling.md,
+            2026-11-17). Una cita cerrada no se edita (CON-3249) y lo dice. */}
+        {onEdit && (
+          <TooltipProvider delayDuration={150}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Edit appointment"
+                  aria-disabled={!editable || undefined}
+                  onClick={() => (editable ? onEdit() : aviso.info(BLOQUEO_EDITAR))}
+                  className={editable ? 'shrink-0 rounded-md p-1 -my-1 text-ink hover:bg-surface-muted' : 'shrink-0 cursor-not-allowed rounded-md p-1 -my-1 text-ink-faint'}
+                >
+                  <Pencil className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[240px] bg-ink leading-snug text-white">{editable ? 'Edit appointment' : BLOQUEO_EDITAR}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
         <button onClick={onClose} aria-label="Close" className="shrink-0 text-ink hover:opacity-60">
           <X className="size-4" />
         </button>
@@ -199,10 +225,7 @@ export function AppointmentDetailsDrawer({
           <Fila icono={Activity}>Encounter open</Fila>
         </div>
 
-        <div className="flex items-center gap-2 rounded-r-md border-l-[3px] border-l-warn-fg bg-warn-bg px-2.5 py-1.5">
-          <TriangleAlert className="size-3.5 shrink-0 text-warn-fg" />
-          <span className="text-[11px] font-semibold text-warn-fg">Guarantor not assigned</span>
-        </div>
+        <Alert tone="warning" title="Guarantor not assigned" />
 
         <div className={onDelete ? 'grid grid-cols-2 gap-2' : 'grid'}>
           {/* Delete (CON-2990): sólo Proposed; en el resto se ve apagado y dice por qué. Los dos botones, del mismo ancho. */}
@@ -247,6 +270,7 @@ export function AppointmentDetailsDrawer({
       {confirmando && (
         <ConfirmDialog
           title="Delete Appointment"
+          icon="delete"
           confirmLabel="Delete"
           tone="danger"
           /* Un tick después: el mismo Escape o click que cierra la pregunta no tiene que cerrar el detalle. */

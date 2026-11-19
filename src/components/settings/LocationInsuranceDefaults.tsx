@@ -210,7 +210,7 @@ export function LocationInsuranceDefaults({ locId, onDirtyChange }: { locId: str
   )
 }
 
-function Encabezado({ titulo, bajada }: { titulo: string; bajada: string }) {
+export function Encabezado({ titulo, bajada }: { titulo: string; bajada: string }) {
   return (
     <div className="max-w-[640px]">
       <h2 className="text-sm font-bold text-ink">{titulo}</h2>
@@ -219,7 +219,7 @@ function Encabezado({ titulo, bajada }: { titulo: string; bajada: string }) {
   )
 }
 
-function Opciones<T extends string>({ etiqueta, valor, opciones, onChange }: {
+export function Opciones<T extends string>({ etiqueta, valor, opciones, onChange }: {
   etiqueta: string
   valor: T
   opciones: [T, string][]
@@ -235,7 +235,7 @@ function Opciones<T extends string>({ etiqueta, valor, opciones, onChange }: {
 }
 
 /* Casilla con su texto al lado: el label hace clickeable todo el renglón. */
-function Casilla({ on, onChange, children, className }: { on: boolean; onChange: (v: boolean) => void; children: string; className?: string }) {
+export function Casilla({ on, onChange, children, className }: { on: boolean; onChange: (v: boolean) => void; children: string; className?: string }) {
   return (
     <label className={cn('flex w-fit cursor-pointer items-center gap-2.5 text-[13px] text-ink', className)}>
       <Checkbox on={on} onChange={onChange} label={children} />
@@ -247,7 +247,7 @@ function Casilla({ on, onChange, children, className }: { on: boolean; onChange:
 /* Lo elegido como card, con su acción al costado: Select si está vacío, Change si no (abre el drawer) y la ✕ en los
    opcionales (CON-3894 › 3.2 Quitar). Es el patrón de Replace en Billing Profile: un input con ⌄ promete un desplegable
    y acá se abre un drawer. Ver insurance-defaults.md, 2026-11-06. */
-function Seleccion({ id, rotulo, requerido, vacio, error, onElegir, onQuitar, children }: {
+export function Seleccion({ id, rotulo, requerido, vacio, error, onElegir, onQuitar, children }: {
   id: string
   rotulo: string
   requerido: boolean
@@ -291,7 +291,7 @@ function Seleccion({ id, rotulo, requerido, vacio, error, onElegir, onQuitar, ch
 }
 
 /* Nombre de facturación, dirección y, sólo si difiere del nombre, la organización titular (CON-3894 › 3.3, CA-08). */
-function ResumenPerfil({ clave }: { clave: string }) {
+export function ResumenPerfil({ clave }: { clave: string }) {
   const { perfiles } = useBillingProfiles()
   const p = perfiles[clave]
   const org = clave.startsWith('loc:') ? nombreLocacion(clave.slice(4)) : ''
@@ -304,7 +304,7 @@ function ResumenPerfil({ clave }: { clave: string }) {
   )
 }
 
-function ResumenProvider({ id }: { id: string }) {
+export function ResumenProvider({ id }: { id: string }) {
   const e = EMPLEADOS.find((x) => x.id === id)
   return (
     <span className="flex min-w-0 items-center gap-3">
@@ -318,7 +318,7 @@ function ResumenProvider({ id }: { id: string }) {
 }
 
 /* Una opción de los drawers: tarjeta radio, azul la marcada. Doble click elige directo. */
-function OpcionDrawer({ on, onMarcar, onElegir, children }: { on: boolean; onMarcar: () => void; onElegir: () => void; children: ReactNode }) {
+export function OpcionDrawer({ on, onMarcar, onElegir, children }: { on: boolean; onMarcar: () => void; onElegir: () => void; children: ReactNode }) {
   return (
     <button
       type="button"
@@ -339,7 +339,7 @@ function OpcionDrawer({ on, onMarcar, onElegir, children }: { on: boolean; onMar
 type TipoPerfil = 'All' | 'Providers' | 'Locations'
 
 /* Elegir un Billing Profile: sólo los elegibles de la account, con buscador y filtro por tipo de titular. */
-function ElegirPerfilDrawer({ elegido, onClose, onElegir }: { elegido: string | null; onClose: () => void; onElegir: (clave: string) => void }) {
+export function ElegirPerfilDrawer({ elegido, onClose, onElegir }: { elegido: string | null; onClose: () => void; onElegir: (clave: string) => void }) {
   const { perfiles, perfilElegible } = useBillingProfiles()
   const [marcado, setMarcado] = useState(elegido)
   const [q, setQ] = useState('')
@@ -403,7 +403,7 @@ function ElegirPerfilDrawer({ elegido, onClose, onElegir }: { elegido: string | 
 }
 
 /* Elegir un Rendering Provider (específico o alternativo): sólo providers elegibles, nunca una Location (CON-3896). */
-function ElegirProviderDrawer({ titulo, providers, elegido, onClose, onElegir }: {
+export function ElegirProviderDrawer({ titulo, providers, elegido, onClose, onElegir }: {
   titulo: string
   providers: string[]
   elegido: string | null

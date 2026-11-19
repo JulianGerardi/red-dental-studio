@@ -28,7 +28,7 @@ const venceTexto = (d: DocPendiente) =>
 function useDocsPendientes(iniciales: DocPendiente[]) {
   const [docs, setDocs] = useState(iniciales)
   const resolver = (d: DocPendiente) => {
-    setDocs((ds) => ds.map((x) => (x.id === d.id ? { ...x, resuelto: 'Oct 5, 2026' } : x)))
+    setDocs((ds) => ds.map((x) => (x.id === d.id ? { ...x, resuelto: '10/05/2026' } : x)))
     const hecho = d.accion === 'Send reminder' || d.accion === 'Request update' ? 'sent to the patient' : d.accion === 'Upload' ? 'uploaded' : d.accion === 'Sign' ? 'signed' : 'reviewed'
     aviso.ok(`${d.nombre} ${hecho}.`)
   }

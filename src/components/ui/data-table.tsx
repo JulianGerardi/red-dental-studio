@@ -11,6 +11,7 @@ import { BotonExpandirTodo } from '@/components/patients/ledger/LedgerRowDetail'
 import { ManijaResize, useAnchoColumnas, useAnchoVisible } from '@/components/patients/ledger/useAnchoColumnas'
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/components/ui/avatar'
+import { InfoTip } from '@/components/ui/info-tip'
 import { TABLA_ENCABEZADO, TABLA_LINK, TABLA_TEXTO } from '@/lib/estilos'
 
 /* Tabla estándar de la app: la misma anatomía que Patients, Team, Accounts y
@@ -33,6 +34,8 @@ export type DataTableColumn<T> = {
   locked?: boolean
   /** Arranca oculta; se muestra desde Columns. */
   hidden?: boolean
+  /** Explicación de la columna: suma el ⓘ (InfoTip) al lado del encabezado. */
+  headerInfo?: string
 }
 
 /* Alto mínimo: una celda con dos líneas agranda la fila en vez de cortarse. */
@@ -46,7 +49,7 @@ const PADDING = 32
 
 export function DataTable<T>({
   columns, rows, rowKey, rowLabel, selectable, rowActions, onRowClick, rowDetail, defaultExpanded, reorder,
-  search, filter, columnPicker, resizable, actions,
+  search, filter, columnPicker, hiddenColumns, resizable, actions,
   llenar, pageSize: pageSizeInicial = 10, pageSizeOptions, pageSizeLabel = 'Rows per page:',
   itemLabel = 'results', density = 'regular', selected, onSelectedChange,
   loading, error, disabled, isRowDisabled,
@@ -79,6 +82,8 @@ export function DataTable<T>({
   filter?: { label: string; options: FilterOption[]; match: (row: T, selected: string[]) => boolean }
   /** Botón Columns para elegir qué columnas se ven. */
   columnPicker?: boolean
+  /** Columnas ocultas controladas desde afuera: el Columns va en el encabezado de la card (Billing). */
+  hiddenColumns?: string[]
   /** Bordes de columna que se arrastran para achicar o ensanchar. */
   resizable?: boolean
   /** A la derecha de la barra: acción principal, exportar… */
@@ -121,7 +126,8 @@ export function DataTable<T>({
   }
   const [q, setQ] = useState('')
   const [filtro, setFiltro] = useState<string[]>([])
-  const [ocultas, setOcultas] = useState<string[]>(() => columns.filter((c) => c.hidden && !c.locked).map((c) => c.key))
+  const [ocultasPropias, setOcultas] = useState<string[]>(() => columns.filter((c) => c.hidden && !c.locked).map((c) => c.key))
+  const ocultas = hiddenColumns ?? ocultasPropias
   const [abiertas, setAbiertas] = useState<string[]>(defaultExpanded ?? [])
   const refVisible = useAnchoVisible<HTMLDivElement>()
   const arrastrada = useRef<T | null>(null)
@@ -237,6 +243,7 @@ export function DataTable<T>({
             {visiblesCols.map((c, i) => (
               <div key={c.key} role="columnheader" data-elastica={elastica(c) || undefined} className={celda(c)} style={ancho(c)}>
                 <span className="truncate">{c.header}</span>
+                {c.headerInfo && <InfoTip title={c.header} className="ml-0.5 [&>svg]:size-3.5">{c.headerInfo}</InfoTip>}
                 {resizable && <ManijaResize id={c.key} label={c.header} estado={anchos} indice={i} />}
               </div>
             ))}
@@ -421,8 +428,11 @@ export function PersonCell({ name, initials, photo, to, onClick }: {
       <Avatar initials={initials} photo={photo} />
       {to ? (
         <Link to={to} onClick={(e) => e.stopPropagation()} className={clase}>{name}</Link>
-      ) : (
+      ) : onClick ? (
         <button type="button" onClick={onClick} className={clase}>{name}</button>
+      ) : (
+        /* Sin destino, el nombre es texto: a la ficha se entra por el ⋮ (Settings, 2026-11-18). */
+        <span title={name} className="truncate text-[13px] text-ink">{name}</span>
       )}
     </span>
   )

@@ -24,6 +24,7 @@ const meta = {
   parameters: {
     layout: 'padded',
     docs: {
+      jira: ['CON-2094', 'CON-3118', 'CON-2865'],
       decisionsFrom: 'pages/settings/Consents.tsx',
       description: {
         component: [
