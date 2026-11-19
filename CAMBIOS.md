@@ -5,6 +5,10 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
+### Dashboard: el título con el tamaño de las demás pantallas
+- *Dashboard* deja `PageTitle size="lg"` y usa el tamaño por defecto (20px semibold), como Patients, Scheduling y
+  Billing. Ninguna pantalla usa `size="lg"` ahora; la variante sigue en `ui/page-title`.
+
 ### Ledger y Billing alineados con red.dev, Scheduling, Dashboard y Settings normalizados (CON-4142) ([#168](https://github.com/JulianGerardi/red-dental-studio/pull/168))
 - **Regla:** las acciones principales van en la fila del título; los controles de fecha y filtro, debajo. Ninguna
   pantalla lleva bajada debajo del título (`SettingsPageHeader` ya no acepta `bajada`).
