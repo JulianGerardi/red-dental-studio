@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
-### Ledger y Billing alineados con red.dev, Scheduling, Dashboard y Settings normalizados (CON-4142)
+### Ledger y Billing alineados con red.dev, Scheduling, Dashboard y Settings normalizados (CON-4142) ([#168](https://github.com/JulianGerardi/red-dental-studio/pull/168))
 - **Regla:** las acciones principales van en la fila del título; los controles de fecha y filtro, debajo. Ninguna
   pantalla lleva bajada debajo del título (`SettingsPageHeader` ya no acepta `bajada`).
 - **Ledger:** Patient Payment (-), Credit Adjustment (-) y Charge Adjustment (+) son botones en la fila del título que
