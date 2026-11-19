@@ -1328,7 +1328,7 @@ Documenta lo publicado en el PR #156 (devolución de diseño de Abril; sin histo
 
 ## New Patient como 2.0, Edit Patient como la ficha de un empleado y menús de tabla (2026-11-18, CON-1328, CON-1329)
 
-Documenta lo publicado en el PR #160. Decisiones en `modulos/patients.md`, `employees.md`, `locations.md` y
+Documenta lo publicado en el PR #160 (documentación en el PR #164). Decisiones en `modulos/patients.md`, `employees.md`, `locations.md` y
 `settings-accounts.md` (2026-11-18).
 
 1. **Pages / Parts / Patient modals** pasa a la estructura de *Elements / Buttons*: descripción con las reglas y
