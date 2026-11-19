@@ -930,3 +930,20 @@ el diseño sigue siendo el del sistema.
 
 1. *Patient Payment*: Amount, Check y Bank/Branch vacíos decían *Required.*; ahora *This field is required.*, como
    Charge y Credit Adjustment (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)).
+
+## CON-4142 · Listas de los formularios y título de Credit Adjustment (2026-11-19)
+
+Revisión del ticket con los comentarios de Jona (red.dev y la app publicada, formulario contra formulario).
+
+1. **Las listas de los selects salen de una sola fuente** (`data/ledger.ts`: `METODOS_PAGO`, `TIPOS_AJUSTE_CREDITO`,
+   `TIPOS_AJUSTE_CARGO`), las de red.dev sin las de QA. Las usan Patient Payment, Credit Adjustment y Charge Adjustment
+   del Ledger y los drawers de Billing (`data/billing.ts` las re-exporta). Antes el Ledger tenía 4 métodos en minúscula
+   ("Check payment") y sólo dos tipos de ajuste en cada formulario.
+2. **Credit Adjustment** guarda siempre un ajuste que resta y **Charge Adjustment** uno que suma (`tipo: 'Adjustment'`).
+   Antes, elegir *Charge Adjustment* desde cualquiera de los dos guardaba un `Charge` y la fila salía como *Procedure*.
+3. **Título de la pestaña de crédito:** "Credit Adjustment (-)", como el drawer de red.dev (antes "New Credit (-)
+   Adjustment").
+4. Pendiente, sin tocar: el orden de los campos de Credit Adjustment, el rótulo "Adjustment type", la fecha de hoy
+   precargada y el monto del pago precargado con el saldo abierto (puntos 16, 20 y 21 del ticket). Settings › Ledger
+   (`LedgerOptions.tsx`) tiene su propia lista de prueba, que no es esta: cuando haya datos reales, las dos tienen que ser
+   la misma.

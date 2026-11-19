@@ -4,14 +4,13 @@ import {
 } from '@/components/patients/form'
 import { DatePicker } from '@/components/ui/date-picker'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
-import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { GUARANTOR, DEPENDIENTES, TIPOS_AJUSTE_CREDITO, type Movimiento } from '@/data/ledger'
 import { formatMDY } from '@/lib/fecha'
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 4582:30209. "Amount" es texto libre por elección, ver
    design-reference/figma/modulos/ledger.md. */
 
-const TIPOS_AJUSTE = ['Credit Adjustment', 'Charge Adjustment']
 
 export function CreditAdjustmentPanel({
   cargos, onCancelar, onGuardar,
@@ -24,7 +23,7 @@ export function CreditAdjustmentPanel({
   const personas = [GUARANTOR, ...DEPENDIENTES]
   const [fecha, setFecha] = useState<Date | null>(null)
   const [monto, setMonto] = useState('')
-  const [tipo, setTipo] = useState(TIPOS_AJUSTE[0])
+  const [tipo, setTipo] = useState<string>(TIPOS_AJUSTE_CREDITO[0])
   const [aplicaA, setAplicaA] = useState(personas[0])
   const [notas, setNotas] = useState('')
   const [intentado, setIntentado] = useState(false)
@@ -44,8 +43,8 @@ export function CreditAdjustmentPanel({
       codigo: '—',
       descripcion: tipo,
       provider: 'Front desk',
-      tipo: tipo === 'Charge Adjustment' ? 'Charge' : 'Adjustment',
-      monto: tipo === 'Charge Adjustment' ? valor : -valor,
+      tipo: 'Adjustment',
+      monto: -valor,
       estado: 'Posted',
     })
   }
@@ -64,7 +63,7 @@ export function CreditAdjustmentPanel({
             label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto}
             error={intentado && !monto.trim() ? OBLIGATORIO : undefined}
           />
-          <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} />
+          <SelectField label="Type" required options={[...TIPOS_AJUSTE_CREDITO]} value={tipo} onChange={setTipo} />
           <SelectField
             label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
             error={intentado && !aplicaA.trim() ? OBLIGATORIO : undefined}

@@ -185,7 +185,7 @@ type Vista = (typeof VISTAS)[number]
 const TABS = [
   { id: 'transacciones', label: 'Transactions', titulo: 'Ledger' },
   { id: 'pago', label: 'Patient Payment (-)', titulo: 'New Patient Payment (-)' },
-  { id: 'credito', label: 'Credit Adjustment (-)', titulo: 'New Credit (-) Adjustment' },
+  { id: 'credito', label: 'Credit Adjustment (-)', titulo: 'Credit Adjustment (-)' },
   { id: 'cargo', label: 'Charge Adjustment (+)', titulo: 'Enter Charge (+) Adjustment' },
 ] as const
 type Tab = (typeof TABS)[number]['id']

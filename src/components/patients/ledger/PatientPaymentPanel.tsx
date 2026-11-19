@@ -5,16 +5,16 @@ import {
 } from '@/components/patients/form'
 import { DatePicker } from '@/components/ui/date-picker'
 import { LedgerAllocationTable } from '@/components/patients/ledger/LedgerAllocationTable'
-import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { GUARANTOR, DEPENDIENTES, METODOS_PAGO, type Movimiento } from '@/data/ledger'
 import { formatMDY } from '@/lib/fecha'
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 4582:29545 / 4582:29862. Ver design-reference/figma/modulos/ledger.md. */
 
-const METODOS = ['Check payment', 'Card payment', 'Cash payment', 'Electronic payment']
+const CHEQUE = 'Check Payment'
 
 type Metodo = { id: number; monto: string; metodo: string; cheque: string; banco: string }
-const filaVacia = (id: number): Metodo => ({ id, monto: '', metodo: METODOS[0], cheque: '', banco: '' })
+const filaVacia = (id: number): Metodo => ({ id, monto: '', metodo: METODOS_PAGO[0], cheque: '', banco: '' })
 
 export function PatientPaymentPanel({
   cargos, onCancelar, onGuardar,
@@ -41,7 +41,7 @@ export function PatientPaymentPanel({
   const guardar = () => {
     setIntentado(true)
     const faltaAlgo = !fecha || !aplicaA.trim()
-      || metodos.some((f) => !f.monto.trim() || (f.metodo === 'Check payment' && (!f.cheque.trim() || !f.banco.trim())))
+      || metodos.some((f) => !f.monto.trim() || (f.metodo === CHEQUE && (!f.cheque.trim() || !f.banco.trim())))
     if (faltaAlgo) return
 
     const fechaTxt = formatMDY(fecha)
@@ -51,7 +51,7 @@ export function PatientPaymentPanel({
         fecha: fechaTxt,
         paciente: aplicaA,
         codigo: '—',
-        descripcion: f.metodo === 'Check payment' ? `Check Payment #${f.cheque}` : f.metodo.replace('payment', 'Payment'),
+        descripcion: f.metodo === CHEQUE ? `Check Payment #${f.cheque}` : f.metodo,
         provider: 'Front desk',
         tipo: 'Payment',
         monto: -valor,
@@ -88,8 +88,8 @@ export function PatientPaymentPanel({
                   label="Amount" required placeholder="$ 0.00" value={f.monto} onChange={(v) => setFila(f.id, { monto: v })}
                   error={intentado && !f.monto.trim() ? OBLIGATORIO : undefined}
                 />
-                <SelectField label="Payment method" required options={METODOS} value={f.metodo} onChange={(v) => setFila(f.id, { metodo: v })} />
-                {f.metodo === 'Check payment' && (
+                <SelectField label="Payment method" required options={[...METODOS_PAGO]} value={f.metodo} onChange={(v) => setFila(f.id, { metodo: v })} />
+                {f.metodo === CHEQUE && (
                   <>
                     <TextField
                       label="Check" required placeholder="1234" value={f.cheque} onChange={(v) => setFila(f.id, { cheque: v })}

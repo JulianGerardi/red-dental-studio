@@ -3,13 +3,12 @@ import {
   TextField, SelectField, TextArea, FieldLabel, FormFooter,
 } from '@/components/patients/form'
 import { DatePicker } from '@/components/ui/date-picker'
-import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { GUARANTOR, DEPENDIENTES, TIPOS_AJUSTE_CARGO, type Movimiento } from '@/data/ledger'
 import { formatMDY } from '@/lib/fecha'
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 4582:25840. El título es "Enter Charge (+) Adjustment", como red.dev (ledger.md, 2026-11-12). */
 
-const TIPOS_AJUSTE = ['Charge Adjustment', 'Credit Adjustment']
 const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado']
 
 export function ChargeAdjustmentPanel({
@@ -25,7 +24,7 @@ export function ChargeAdjustmentPanel({
 
   const [fecha, setFecha] = useState<Date | null>(null)
   const [monto, setMonto] = useState('')
-  const [tipo, setTipo] = useState(TIPOS_AJUSTE[0])
+  const [tipo, setTipo] = useState<string>(TIPOS_AJUSTE_CARGO[0])
   const [provider, setProvider] = useState(PROVIDERS[0])
   const [aplicaA, setAplicaA] = useState(personas[0])
   const [visita, setVisita] = useState('')
@@ -42,8 +41,9 @@ export function ChargeAdjustmentPanel({
       codigo: '—',
       descripcion: tipo,
       provider,
-      tipo: tipo === 'Charge Adjustment' ? 'Charge' : 'Adjustment',
-      monto: tipo === 'Charge Adjustment' ? valor : -valor,
+      /* Todos los tipos de Charge Adjustment suman a la cuenta: un ajuste positivo, no un procedimiento (ledger.md, 2026-11-19). */
+      tipo: 'Adjustment',
+      monto: valor,
       estado: 'Posted',
     })
   }
@@ -62,7 +62,7 @@ export function ChargeAdjustmentPanel({
             label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto}
             error={intentado && !monto.trim() ? OBLIGATORIO : undefined}
           />
-          <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} />
+          <SelectField label="Type" required options={[...TIPOS_AJUSTE_CARGO]} value={tipo} onChange={setTipo} />
           <SelectField label="Provider" options={PROVIDERS} value={provider} onChange={setProvider} />
           <SelectField
             label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}

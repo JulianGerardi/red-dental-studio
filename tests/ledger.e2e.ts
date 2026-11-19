@@ -55,3 +55,21 @@ test('el ⋮ de un procedimiento lleva a su estimación en Clinical Mode', async
   await screen.getByRole('menuitem', /Periodontists Recommended/).tap()
   await expect(screen.getByText(/Treatment Plan/).first()).toBeVisible()
 })
+
+test('Los formularios usan las listas de red.dev y Charge Adjustment suma como ajuste', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/ledger')
+  await screen.getByRole('tab', 'Credit Adjustment (-)').tap()
+  await expect(screen.getByRole('heading', 'Credit Adjustment (-)')).toBeVisible()
+  await screen.getByRole('button', 'Credit Adjustment').tap()
+  await expect(screen.getByRole('button', 'Family/Friend Courtesy')).toBeVisible()
+
+  await screen.getByRole('tab', 'Charge Adjustment (+)').tap()
+  await screen.getByRole('button', 'Charge Adjustment').tap()
+  await screen.getByRole('button', 'NSF Bank Fee').tap()
+  await screen.getByRole('button', 'Pick a date').tap()
+  await screen.getByRole('button', / 15, 20/).first().tap()
+  await screen.getByRole('textbox', /Amount/).fill('35')
+  await screen.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText(/NSF Bank Fee of \$35\.00 added/)).toBeVisible()
+  await expect(screen.getByRole('button', /NSF Bank Fee/).getByText('Charge Adjustment')).toBeVisible()
+})

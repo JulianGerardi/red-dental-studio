@@ -155,3 +155,20 @@ export function conSaldo(movs: Movimiento[]) {
     return { ...m, saldo }
   })
 }
+
+/* Las listas de los drawers de red.dev (Settings › Ledger), sin las de QA Las usan Billing y el Ledger (ledger.md, 2026-11-19). */
+export const METODOS_PAGO = [
+  'Cash Payment', 'Check Payment', 'Credit Card Payment', 'Electronic Transfer Payment', 'Insurance Payment - Check',
+  'Insurance Payment - Credit Card', 'Insurance Payment - Electronic',
+] as const
+export const TIPOS_AJUSTE_CREDITO = [
+  'Credit Adjustment', 'Discount', 'Family/Friend Courtesy', 'Full Payment Courtesy', 'Initial Credit Balance Forward',
+  'In-office Write-off', 'Insurance Adjustment', 'Offsetting Adjustment', 'Professional Courtesy', 'Senior Citizen Courtesy',
+  'Staff Courtesy', 'Transfer Credit Balance', 'Write-off',
+] as const
+export const TIPOS_AJUSTE_CARGO = [
+  'Charge Adjustment', 'Collected Bad Debt', 'Credit Card Full Refund', 'Credit Card Independent Refund',
+  'Credit Card Partial Refund', 'Credit Card Void', 'Electronic Check Credit', 'Initial Balance Forward',
+  'Ins Charge Offsetting Adjustment', 'Insurance Adjustment', 'Insurance Over-pmt Refund', 'NSF Bank Fee', 'NSF Check',
+  'Patient Refund', 'Sales Tax', 'Transfer Charge Balance',
+] as const
