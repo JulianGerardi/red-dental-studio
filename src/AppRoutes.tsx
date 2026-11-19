@@ -34,7 +34,7 @@ import Help from '@/pages/Help'
 import Notifications from '@/pages/Notifications'
 
 const SETTINGS_PLACEHOLDERS = [
-  'roles', 'parameters', 'libraries', 'patient-portal', 'security', 'preferences',
+  'roles', 'preferences',
 ]
 
 /* Las rutas de la app, separadas del router y los providers para que el design

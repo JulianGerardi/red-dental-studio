@@ -990,3 +990,33 @@ de una fila).
    - **Sin cambiar:** red.dev muestra datos y Ledger Transactions en una sola página; acá siguen los dos pasos (Payment →
      Allocation), por la regla de drawers con más de una sección. **A decidir con Julián.**
 6. **Household:** el nombre de cada persona es un link a su ficha (pedido de Julián).
+
+### Los drawers, tal cual red.dev (2026-11-19)
+
+Julián: los drawers de Billing y del Ledger tienen que mostrar la información como red.dev, sin pasos. Es un solo
+componente (`PostPaymentDialog`) para las dos pantallas.
+
+1. **Una sola página, sin pasos.** Revierte los dos pasos (Payment → Allocation) del 2026-11-13: era la regla de drawers
+   con más de una sección, y Julián pidió red.dev. Arriba, una card con título e ícono (*Payment Information*, *Credit
+   Adjustment Information*, *Adjustment Information*); debajo, en el pago y el crédito, *Ledger Transactions*.
+2. **Patient Payment:** Transaction date y Apply to; cada método en su caja gris (Amount y Payment method; con cheque,
+   Check y Bank/Branch); **+ suma una fila de Check Payment en 0.00** y − la saca; Notes adentro de la card.
+3. **Credit Adjustment:** Transaction date, Apply to, Adjustment type ("Select credit type") y Amount en una fila;
+   Notes. **Enter Charge (+) Adjustment:** tres columnas (Transaction date, Amount, Type / Provider, Apply to, Visit
+   date) y Notes, sin tabla.
+4. **Ledger Transactions** (`billing/TransaccionesAbiertas`, nuevo): Txn date, Patient, Provider, Code, Description,
+   Charge, Other Credit, Guar Estimate, Applied y Balance; sin Columns, sin filas que se despliegan y sin paginado;
+   "Showing N open transactions" y el resumen *Amount not applied* / *Amount applied*. Salen Tooth y Surface (el
+   pedido del 2026-09-07 de las 12 columnas queda reemplazado por red.dev).
+   - **La lógica de red.dev:** Other Credit es lo que ya se le aplicó al cargo y Guar Estimate lo que falta. El pago
+     arranca con la suma de lo que falta y *Applied* se llena solo, del cargo más viejo al más nuevo; Balance = Guar
+     Estimate − Applied. *Amount not applied* es el monto menos lo aplicado.
+   - **Guardar aplica de verdad:** en el Ledger el pago o el crédito queda aplicado a esos cargos (bajan su Trans. Bal.)
+     y lo que sobra queda como crédito sin aplicar (CON-4073). Un pago en varios métodos es una sola transacción
+     ("Cash Payment $50.00 + Check Payment #12 $20.00", como CON-3753).
+5. **Lo que no se copió de red.dev, a propósito:** el selector de fecha es el de la app (red.dev usa el del navegador en
+   dos de los tres); Notes dice "Add a note (optional)" (decisión del 2026-11-12, red.dev dice "Placeholder"); los
+   errores se muestran al guardar con *This field is required.* en vez de apagar Save; el pie es el de los drawers de la
+   app (dos botones del mismo ancho). Con un paciente sin cargos abiertos, red.dev esconde los métodos de pago y deja la
+   tabla cargando; acá se ven los métodos y la tabla dice *No open transactions* (el pago queda como crédito).
+6. **Household en las dos vistas** (también en Patient View), con link a la ficha de cada persona.

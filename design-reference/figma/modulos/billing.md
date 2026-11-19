@@ -448,3 +448,4 @@ Julián mandó cuatro grabaciones de Billing de red.dev y pidió respetar las al
    Ledger, con "Guarantor" en Apply to).
 4. **A validar:** en el celular, al elegir un paciente de Find Patient (debajo de la tabla) la pantalla sube al título,
    donde están sus botones.
+5. Los drawers pasan a una sola página como red.dev (detalle en ledger.md, *Los drawers, tal cual red.dev*).

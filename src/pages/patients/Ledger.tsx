@@ -314,8 +314,11 @@ export default function Ledger() {
     ]
   }, [delaVista, vista])
 
-  const agregar = (m: Omit<Movimiento, 'id'>) => {
-    setMovs((p) => [...p, { ...m, id: `m${p.length + 1}-${Date.now()}` }])
+  /* Lo guardado entra a la tabla y, si es un pago o un crédito, queda aplicado a los cargos que se eligieron en el drawer. */
+  const agregar = (m: Omit<Movimiento, 'id'>, porCargo: Record<string, number> = {}) => {
+    const id = `m-${Date.now()}`
+    setMovs((p) => [...p, { ...m, id }])
+    setAplicaciones((p) => [...p, ...Object.entries(porCargo).map(([cargo, monto], i) => ({ id: `a-${id}-${i}`, origen: id, cargo, fecha: m.fecha, monto }))])
   }
 
   const cargosDeLaCuenta = movs.filter((m) => m.tipo === 'Charge')
@@ -323,8 +326,8 @@ export default function Ledger() {
      ve los de todo el hogar, como red.dev (CON-4071). */
   const cargosAbiertosDe = (persona: string) => movs
     .filter((m) => esCargo(m) && (persona === GUARANTOR || m.paciente === persona))
-    .map((m) => ({ ...m, monto: pendienteDe(m, aplicaciones) }))
-    .filter((m) => m.monto > 0)
+    .map((m) => ({ ...m, pendiente: pendienteDe(m, aplicaciones) }))
+    .filter((m) => m.pendiente > 0)
   /* El link a otra transacción (ledger.md, 2026-10-14): si está en la tabla con la búsqueda y el filtro de ahora, va a
      su página, la despliega y la resalta; si no, abre su registro. Nunca cambia los filtros. */
   const verTransaccion = (x: Movimiento) => {
@@ -506,7 +509,8 @@ export default function Ledger() {
           </div>
           </div>
           </TooltipProvider>
-          {vista === 'Guarantor View' && <Household />}
+          {/* Household en las dos vistas, como red.dev (CON-4076), con link a la ficha de cada uno (ledger.md, 2026-11-19). */}
+          <Household />
         </div>
       </div>
 
@@ -520,7 +524,7 @@ export default function Ledger() {
           providers={PROVIDERS}
           hoy={new Date()}
           onClose={() => setAccion(null)}
-          onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} posted for ${m.paciente}.`); setAccion(null) }}
+          onGuardar={(m, porCargo) => { agregar(m, porCargo); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} posted for ${m.paciente}.`); setAccion(null) }}
         />
       )}
       {enModal && <LedgerRowModal key={enModal.id} m={enModal} aplicaciones={aplicaciones} movimientos={movs} onVerTransaccion={verTransaccion} onAbrirClinica={abrirClinica} onClose={() => setEnModal(null)} />}

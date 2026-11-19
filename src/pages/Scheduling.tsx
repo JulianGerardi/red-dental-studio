@@ -11,7 +11,6 @@ import {
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { PageTitle } from '@/components/ui/page-title'
-import { Breadcrumb } from '@/components/ui/breadcrumb'
 import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import {
   EVENTOS_INICIALES, FECHA_ANCLA, BLOCK_STYLE,
@@ -168,9 +167,8 @@ export default function Scheduling() {
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <Breadcrumb items={[{ label: 'Scheduling' }]} />
       {/* Los botones van a la altura del título, como en el resto de la app (scheduling.md, 2026-11-19). */}
-      <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <PageTitle>Scheduling</PageTitle>
         <div className="flex flex-wrap items-center gap-2">
           {/* El Figma marca "Month" activo aunque la vista sea semanal. */}

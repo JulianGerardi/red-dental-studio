@@ -166,3 +166,5 @@ valor en azul y bajada. Mismos textos y datos; 2 + 2 en angosto, cuatro en fila 
    Locations, Employees, Consents, Ledger options, Fee Schedules, Carriers, Coverage Table, Insurance Plan, Documents) y
    salen las escritas a mano en Settings, Edit Account, Location y Employee, Help y Notifications. Quedan los textos de
    Login y de las páginas vacías (son tarjetas, no títulos de pantalla) y la página de mails para el backend.
+3. El menú de Settings del rail también saca Parameters, Libraries, Patient Portal y Security, y sus rutas
+   (Julián, mismo día). Quedan como "Coming soon" Roles y Preferences.

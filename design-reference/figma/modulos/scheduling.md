@@ -809,3 +809,5 @@ Pedido de Julián, con una grabación de red.dev.
 3. En el detalle del turno el nombre del paciente es un link a su ficha, como red.dev y las cards de turnos.
 4. **Sin flechas** al lado de la fecha (mismo día): el selector queda igual al del Dashboard, sólo el campo y *Today*.
    Para moverse de semana o de mes se elige el día en el calendario.
+5. **Sin breadcrumb:** el de un solo tramo repetía el título; Scheduling es de primer nivel y no lleva rastro (regla del
+   design system).

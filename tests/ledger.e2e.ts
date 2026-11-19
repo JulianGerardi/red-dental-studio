@@ -64,8 +64,9 @@ test('Patient Payment (-) abre su drawer con el saldo abierto y lo guardado entr
   await expect(drawer.getByRole('button', /John Smith \(Guarantor\)/)).toBeVisible()
   await expect(drawer.getByRole('textbox', /Amount/)).toHaveValue('13713.00')
   await drawer.getByRole('textbox', /Amount/).fill('50')
-  await drawer.getByRole('button', /Next Step/).tap()
+  // Applied se reparte solo, del cargo más viejo al más nuevo, sin pasos.
   await expect(drawer.getByRole('textbox', /Applied to Bitewings/)).toHaveValue('35.00')
+  await expect(drawer.getByText('Showing 12 open transactions')).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/Cash Payment of \$50\.00 posted for John Smith/)).toBeVisible()
   await expect(screen.getByText('Cash Payment').first()).toBeVisible()
