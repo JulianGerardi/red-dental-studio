@@ -1,5 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Download, Monitor, Smartphone, Braces, Eye } from 'lucide-react'
 import { PageTitle } from '@/components/ui/page-title'
 import { Button } from '@/components/ui/button'
@@ -10,10 +9,12 @@ import { TARJETA_PANEL } from '@/lib/estilos'
 import { COLOR, completar } from '@/emails/marco'
 import { EJEMPLO, MAILS, htmlDe, variablesDeMail, type Mail } from '@/emails/plantillas'
 
-/* Vista previa de los mails que manda el backend (design-reference/figma/modulos/emails.md). Muestra cada plantilla
-   con datos de ejemplo o con sus {{variables}} marcadas, en escritorio o en celular, y la deja bajar tal cual. */
+/* Vista previa de los mails que manda el backend (design-reference/figma/modulos/emails.md). Es una página aparte de
+   la app, en /emails/ (los mails no son una pantalla de la plataforma), con las piezas del design system. Muestra
+   cada plantilla con datos de ejemplo o con sus {{variables}} marcadas, en escritorio o en celular, y la deja bajar
+   tal cual. El mail elegido va en el hash (/emails/#appointment-request), así cada uno tiene su link. */
 
-/* Las imágenes de la vista previa salen de esta misma app (public/emails/), así andan en localhost y en el link de prueba. */
+/* Las imágenes salen de public/emails/, la misma carpeta que se le entrega al backend. */
 const ASSETS = new URL(`${import.meta.env.BASE_URL}emails`, window.location.origin).href
 const IMAGENES = { assets_url: ASSETS, practice_logo_url: `${ASSETS}/sample-practice-logo.png` }
 const CATEGORIAS = [...new Set(MAILS.map((m) => m.categoria))]
@@ -22,17 +23,22 @@ const JIRA = 'https://confidetally.atlassian.net/browse/'
 type Ancho = 'desktop' | 'mobile'
 type Modo = 'sample' | 'variables'
 
+const mailDelHash = () => MAILS.find((m) => m.id === window.location.hash.slice(1)) ?? MAILS[0]
+
 export default function Emails() {
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const [mail, setMail] = useState(mailDelHash)
   const [ancho, setAncho] = useState<Ancho>('desktop')
   const [modo, setModo] = useState<Modo>('sample')
-  const mail = MAILS.find((m) => m.id === id)
-  if (!id) return <Navigate to={`/emails/${MAILS[0].id}`} replace />
-  if (!mail) return <Navigate to="/emails" replace />
+  useEffect(() => {
+    const alCambiar = () => setMail(mailDelHash())
+    window.addEventListener('hashchange', alCambiar)
+    return () => window.removeEventListener('hashchange', alCambiar)
+  }, [])
+  const elegir = (id: string) => { window.location.hash = id }
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-8">
+      <img src={`${ASSETS}/confidentally-logo.png`} alt="Confidentally" className="mb-5 h-11 w-auto" />
       <PageTitle>Emails</PageTitle>
       <p className="mt-[9px] max-w-[720px] text-xs leading-[17px] text-ink-faint">
         The emails the platform sends. They all share one layout; only the text and the {'{{variables}}'} change.
@@ -43,7 +49,7 @@ export default function Emails() {
         <span className="sr-only">Email</span>
         <select
           value={mail.id}
-          onChange={(e) => navigate(`/emails/${e.target.value}`)}
+          onChange={(e) => elegir(e.target.value)}
           className="h-9 w-full rounded-md border border-line bg-white px-3 text-[13px] text-ink"
         >
           {CATEGORIAS.map((c) => (
@@ -60,9 +66,9 @@ export default function Emails() {
             <div key={c} className="mb-1 last:mb-0">
               <p className="px-2.5 pt-2 pb-1 text-[11px] font-semibold tracking-wide text-ink-faint uppercase">{c}</p>
               {MAILS.filter((m) => m.categoria === c).map((m) => (
-                <Link
+                <a
                   key={m.id}
-                  to={`/emails/${m.id}`}
+                  href={`#${m.id}`}
                   aria-current={m.id === mail.id ? 'page' : undefined}
                   className={cn(
                     'flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[13px] focus-visible:outline-2 focus-visible:outline-dash-blue',
@@ -71,7 +77,7 @@ export default function Emails() {
                 >
                   <span className="min-w-0 flex-1 truncate">{m.nombre}</span>
                   {m.origen === 'propuesta' && <Pill tone="warning" size="sm">Proposal</Pill>}
-                </Link>
+                </a>
               ))}
             </div>
           ))}

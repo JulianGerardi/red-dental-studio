@@ -6,8 +6,8 @@ Subscriptions (CON-3268, CON-3498, CON-3499, CON-3501) y Scheduling (CON-478).
 
 Fuentes: el documento **"Email Propuesta" (tabla unificada)**, de SharePoint, y la página **📧 Email** del Figma
 *Screens & Flows* (`138:4`: *Welcome* y *Email onboarding*). Código: `src/emails/marco.ts` (layout y bloques),
-`src/emails/plantillas.ts` (los 16 mails, sus textos y los datos de ejemplo), `src/pages/Emails.tsx` (la vista
-previa, en `/emails/:id`) y `scripts/emails-exportar.mjs` (lo que se le entrega al backend, en `public/emails/`).
+`src/emails/plantillas.ts` (los 16 mails, sus textos y los datos de ejemplo), `src/emails/Vista.tsx` (la vista
+previa, una página aparte en `/emails/`) y `scripts/emails-exportar.mjs` (lo que se le entrega al backend, en `public/emails/`).
 
 ## 2026-11-18 · Primera versión (CON-3325, CON-2908, CON-3162, CON-3268)
 
@@ -142,4 +142,18 @@ Decisiones de Julián sobre los puntos abiertos de la primera versión:
 2. **Asunto del paciente nuevo** (anomalía 3): pasa a "Your patient portal account is ready".
 3. **Siguen igual:** los mails propuestos siguen marcados como propuesta hasta que se revisen, y el onboarding lo
    sigue firmando `{{practice_name}}`, como en el documento (anomalía 4).
+
+## 2026-11-19 · La vista previa sale de la app (CON-3325)
+
+Pedido de Julián: publicar los mails en un link aparte, porque no son parte de la app.
+
+- **Página propia en `…/red-dental-studio/emails/`**: otra entrada de Vite (`emails/index.html` →
+  `src/emails/main.tsx`), sin menú lateral, sin header y sin la ruta `/emails` de la app. Se arma con las mismas piezas
+  del design system (Tabs, Pill, Button, cards) y el logo de Confidentally arriba.
+- **Cada mail tiene su link** con el hash: `…/emails/#appointment-request`. El hash, y no una ruta, porque la página no
+  usa el router de la app.
+- **En la misma carpeta** quedan lo que se le entrega al backend (`<id>.html`, `emails.json`) y las imágenes, así un
+  solo link sirve para verlos y para bajarlos.
+- **Design system:** `emails/Vista.tsx` y `emails/main.tsx` quedan exentos en `exentos.json`. Es una página de
+  referencia para el backend, no una pantalla de la plataforma.
 

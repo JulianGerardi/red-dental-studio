@@ -5,6 +5,21 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
+### Mails de la plataforma: plantilla única para el backend y página aparte ([#PR](https://github.com/JulianGerardi/red-dental-studio/pulls))
+- **Los 16 mails** de "Email Propuesta" (onboarding, turnos, treatment plan, firma, paciente, empleado, suscripción y
+  guardian) sobre **un solo layout** con siete bloques fijos (saludo, párrafo, aviso, detalles, botón, nota y firma) y
+  `{{variables}}`, en HTML apto para clientes de correo (tablas, estilos inline, 600 px). Los que el documento deja
+  vacíos están marcados como propuesta.
+- **Página aparte de la app**: https://juliangerardi.github.io/red-dental-studio/emails/ (cada mail con su link,
+  `#<id>`): vista previa con datos de ejemplo o variables, escritorio o celular, y descarga del HTML.
+- **Para el dev / backend:** los archivos para el backend están en `public/emails/`: `<id>.html` (la plantilla con sus
+  `{{variables}}`), `emails.json` (asunto, preheader, destinatario y variables de cada mail) y las imágenes. Las
+  imágenes cuelgan de `{{assets_url}}` y el logo de la clínica va en `{{practice_logo_url}}` (PNG de 88 px de alto).
+  Los mails de paciente, empleado y guardian **no llevan contraseña**: mandan un link de un solo uso que vence
+  (`{{set_password_link}}`, `{{link_expiration}}`). El aviso es el `Alert` de la app. Fuente: `src/emails/`.
+  Se regenera con `npm run emails:exportar` (`--check` avisa si quedó desactualizado); las imágenes, con
+  `node scripts/emails-recursos.mjs`. Vite tiene una segunda entrada (`emails/index.html`). Decisiones en `emails.md`.
+
 ### Documentación: New/Edit Patient, menús de tabla y Figma de Patients y Settings ([#164](https://github.com/JulianGerardi/red-dental-studio/pull/164))
 - **Storybook:** *Pages / Parts / Patient modals* pasa a Playground, Parts, States y Specs, con New Patient (pasos,
   duplicado) y Edit Patient (la pantalla, completa y con datos que faltan); Fields suma *Contact* y *Address*. *Fields*

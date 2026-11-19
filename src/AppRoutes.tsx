@@ -32,7 +32,6 @@ import { FinanzasProvider } from '@/data/finanzasStore'
 import { BillingProfilesProvider } from '@/data/billingProfilesStore'
 import Help from '@/pages/Help'
 import Notifications from '@/pages/Notifications'
-import Emails from '@/pages/Emails'
 
 const SETTINGS_PLACEHOLDERS = [
   'roles', 'parameters', 'libraries', 'patient-portal', 'security', 'preferences',
@@ -72,9 +71,6 @@ export function AppRoutes() {
         ))}
         <Route path="help" element={<Help />} />
         <Route path="notifications" element={<Notifications />} />
-        {/* Vista previa de los mails del backend: no va en el menú (emails.md). */}
-        <Route path="emails" element={<Emails />} />
-        <Route path="emails/:id" element={<Emails />} />
 
         {/* El store de Billing envuelve todo Settings: el breadcrumb lee de ahí el nombre de un carrier o un fee schedule. */}
         <Route path="settings" element={<FinanzasProvider><BillingProfilesProvider><SettingsLayout /></BillingProfilesProvider></FinanzasProvider>}>

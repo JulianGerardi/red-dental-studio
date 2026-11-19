@@ -1,10 +1,10 @@
 import { test } from '@e2e-dev/web'
 import { expect } from 'e2e'
 
-/* Emails: la vista previa de los mails del backend. Ver design-reference/figma/modulos/emails.md (2026-11-18). */
+/* Emails: la página aparte con los mails del backend (/emails/, fuera de la app). Ver design-reference/figma/modulos/emails.md (2026-11-18). */
 
 test('Elegir un mail muestra su asunto, de dónde sale el texto y sus variables', async ({ app, screen }) => {
-  await app.open('/emails')
+  await app.open('/emails/')
   await expect(screen.getByRole('heading', /Your clinic account is ready$/)).toBeVisible()
 
   await screen.getByRole('link', 'Appointment cancelled').tap()
@@ -18,7 +18,7 @@ test('Elegir un mail muestra su asunto, de dónde sale el texto y sus variables'
 })
 
 test('La vista previa cambia entre escritorio y celular, y entre datos de ejemplo y variables', async ({ app, screen }) => {
-  await app.open('/emails/patient-welcome')
+  await app.open('/emails/#patient-welcome')
   const celular = screen.getByRole('tab', 'Mobile')
   await celular.tap()
   await expect(celular).toHaveAttribute('aria-selected', 'true')
