@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { ArrowRight, Check, ClipboardList, Clock, FileText, FlaskConical, Pill, Send, TriangleAlert, X, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { ACCION_TURNO, MenuCard, accionTurno, type Appointment } from './AppointmentCard'
+import { ACCION_TURNO, MenuCard, accionTurno, type AccionMenu, type Appointment } from './AppointmentCard'
 import { completarTarea, type PendingTask } from './PendingTaskCard'
 import { Avatar } from '@/components/ui/avatar'
 import { Pill as PillTag } from '@/components/ui/pill'
@@ -41,6 +41,8 @@ type PropsTurno = {
   estado?: ReactNode
   /** Después del aviso del botón: mover el turno (Check In lo pasa a la Waiting Room). */
   onAccion?: (appt: Appointment) => void
+  /** Las acciones del kebab según el estado de la cita; sin esto, sólo Edit appointment. */
+  acciones?: AccionMenu[]
 }
 
 /* El nombre abre la ficha rápida y es el camino con teclado: la fila entera no puede ser un botón porque tiene otros adentro. */
@@ -61,13 +63,13 @@ export function NombreTurno({ appt, id, activa, onSelect, className }: Pick<Prop
 /* Un turno: hora, iniciales, nombre, provider y operatorio, el botón de la acción que toca (o el estado de la visita)
    y el kebab con Edit appointment. Sin el badge Check In: se confundía con el botón (comparativa del 2026-11-19, ver
    dashboard.md). Angosta en dos renglones; ancha en columnas. */
-export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOperatorio, chips, estado, onAccion }: PropsTurno) {
+export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOperatorio, chips, estado, onAccion, acciones }: PropsTurno) {
   const accion = appt.accion ?? 'Check Out'
   const iniciales = <Avatar initials={appt.initials} size={28} />
   const fin = estado ?? (
     <Button size="sm" variant={ACCION_TURNO[accion]} className="shrink-0" onClick={(e) => { e.stopPropagation(); accionTurno(appt); onAccion?.(appt) }}>{accion} <ArrowRight /></Button>
   )
-  const menu = <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
+  const menu = <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} acciones={acciones} />
   const donde = ocultarOperatorio ? appt.provider : `${appt.provider} · ${appt.operatory}`
 
   return (

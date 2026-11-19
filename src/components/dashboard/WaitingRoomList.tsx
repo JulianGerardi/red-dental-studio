@@ -2,7 +2,7 @@ import { ShowMore } from '@/components/ui/show-more'
 import { Pill } from '@/components/ui/pill'
 import { TARJETA_INTERNA } from '@/lib/estilos'
 import { AppointmentRow } from './DashboardRows'
-import type { Appointment } from './AppointmentCard'
+import type { AccionMenu, Appointment } from './AppointmentCard'
 import { ETAPAS_ESPERA, claveTurno, type EnEspera, type EtapaEspera } from './dashboard-data'
 
 /* La Waiting Room agrupada por etapa (comparativa del 2026-11-19, CON-1670): Checked in, On hold y Ready to check out,
@@ -33,7 +33,7 @@ const ESTADO: Partial<Record<EtapaEspera, (min: number) => string>> = {
   'On hold': (m) => `Paused · ${m} min`,
 }
 
-export function WaitingRoomList({ pacientes, limit, seleccionada, onSelect, onEdit, onAccion }: {
+export function WaitingRoomList({ pacientes, limit, seleccionada, onSelect, onEdit, onAccion, acciones }: {
   pacientes: EnEspera[]
   /** Cuántas filas se ven antes de "Show N more". */
   limit?: number
@@ -42,6 +42,8 @@ export function WaitingRoomList({ pacientes, limit, seleccionada, onSelect, onEd
   onSelect?: (appt: Appointment, el: HTMLElement, id?: string) => void
   onEdit?: (p: EnEspera) => void
   onAccion?: (p: EnEspera) => void
+  /** El kebab según la etapa (Checked in suma Cancel appointment). */
+  acciones?: (p: EnEspera) => AccionMenu[]
 }) {
   const grupos = ETAPAS_ESPERA
     .map((etapa) => ({ etapa, filas: pacientes.filter((p) => p.etapa === etapa).sort(ORDEN[etapa]) }))
@@ -66,6 +68,7 @@ export function WaitingRoomList({ pacientes, limit, seleccionada, onSelect, onEd
                       chips={p.etapa === 'Checked in'}
                       estado={texto && <Pill tone="warning" size="sm" className="tabular-nums">{texto}</Pill>}
                       onSelect={onSelect} onEdit={onEdit && (() => onEdit(p))} onAccion={onAccion && (() => onAccion(p))}
+                      acciones={acciones?.(p)}
                     />
                   </li>
                 )

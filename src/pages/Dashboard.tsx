@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { CalendarDays, Clock, Activity, ShieldQuestionMark, CalendarClock } from 'lucide-react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { CalendarDays, Clock, Activity, ShieldQuestionMark, CalendarClock, Pencil, UserPen, UserX, CalendarX } from 'lucide-react'
 import { Globo, Panel } from '@/components/dashboard/primitives'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { PageTitle } from '@/components/ui/page-title'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
-import type { Appointment } from '@/components/dashboard/AppointmentCard'
+import type { AccionMenu, Appointment } from '@/components/dashboard/AppointmentCard'
+import { CancelAppointmentDialog, NoShowDialog } from '@/components/dashboard/AppointmentStatusDialogs'
+import { slug } from '@/data/patientsStore'
 import { PatientDetailsPopover } from '@/components/dashboard/PatientDetailsPopover'
 import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import { OperatoryList } from '@/components/dashboard/OperatoryList'
@@ -16,11 +18,11 @@ import { WaitingRoomList } from '@/components/dashboard/WaitingRoomList'
 import { ListGroup } from '@/components/ui/list-group'
 import { Tabs } from '@/components/ui/tabs'
 import {
-  DIAS, DIA_CARGADO, DIA_VACIO, HOY_DEMO, TASK_KINDS, claveFecha, claveTurno, fechaDesdeClave, pendientesDeLlegar,
-  reprogramar, type DiaDashboard, type EnEspera, type Origen,
+  DIAS, DIA_CARGADO, DIA_VACIO, ETAPAS_ESPERA, HOY_DEMO, TASK_KINDS, claveFecha, claveTurno, fechaDesdeClave,
+  pendientesDeLlegar, puedeNoShow, reprogramar, type DiaDashboard, type EnEspera, type EtapaEspera, type Origen,
 } from '@/components/dashboard/dashboard-data'
 import {
-  NewAppointmentModal, type DatosTurno,
+  NewAppointmentModal, type CampoTurno, type DatosTurno, type Pestana,
 } from '@/components/scheduling/NewAppointmentModal'
 import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
 import { formatDMY } from '@/components/ui/date-picker'
@@ -99,6 +101,24 @@ const conDiaCargado = (dias: Record<string, DiaDashboard>) => ({ ...dias, [clave
 /* Cuántas filas se ven en cada panel antes de "Show N more" (ver ui/show-more): los de la comparativa del 2026-11-19. */
 const TOPE = { turnos: 6, espera: 5, tareas: 5 }
 
+/* Qué deja editar Edit appointment desde la Waiting Room, según la etapa (dashboard.md, 2026-11-19). Lo bloqueado se ve
+   en sólo lectura. */
+const TODO: CampoTurno[] = ['patient', 'primary', 'additional', 'status', 'requestor', 'reason', 'date', 'start', 'end', 'operatory', 'notes', 'flags', 'plan']
+const EDICION_POR_ETAPA: Record<EtapaEspera, { bloqueados: CampoTurno[]; pestanaInicial?: Pestana; nota: { title: string; detail: string } }> = {
+  'Checked in': {
+    bloqueados: ['patient', 'status', 'date', 'start', 'end'],
+    nota: { title: 'The patient has checked in', detail: 'You can change the room and the other details. Patient, status, date and time stay as they are.' },
+  },
+  'On hold': {
+    bloqueados: TODO.filter((c) => c !== 'operatory'), pestanaInicial: 'Schedule',
+    nota: { title: 'This visit is on hold', detail: 'You can only change the room. The encounter stays on hold.' },
+  },
+  'Ready to check out': {
+    bloqueados: TODO.filter((c) => c !== 'notes'), pestanaInicial: 'Additional',
+    nota: { title: 'This visit is ready to check out', detail: 'You can only add notes to the appointment.' },
+  },
+}
+
 /* La acción la dice el panel, no el turno (Julián, 2026-10-18): en Appointments el paciente todavía no llegó (Check In,
    verde) y en Waiting Room ya está adentro (Check Out, azul). Ver dashboard.md. */
 
@@ -107,16 +127,21 @@ export default function Dashboard() {
   const cargado = params.get('day') === 'busy'
 
   const [date, setDate] = useState(DEFAULT_DATE)
+  /* Appointments: Provider y Room, combinados; sin elegir nada, todos (dashboard.md, 2026-11-19). */
+  const [providers, setProviders] = useState<string[]>([])
   const [salas, setSalas] = useState<string[]>([])
   /* Tabs en vez del embudo (Julián, 2026-10-29): vuelve lo que `dashboard.md` (2026-08-28) había sacado del Figma por
      redundante con el filtro -ahora el filtro se saca a favor de las tabs, en las dos pantallas que comparten
      PendingTaskList-. */
   const [tipoTarea, setTipoTarea] = useState('All')
-  /* La Waiting Room tiene su propio filtro, como Appointments; las salas ya no la filtran (dashboard.md, 2026-10-19). */
-  const [salasEspera, setSalasEspera] = useState<string[]>([])
+  /* La Waiting Room se filtra por etapa visible, no por sala (dashboard.md, 2026-11-19). */
+  const [etapas, setEtapas] = useState<string[]>([])
   const [selected, setSelected] =
     useState<{ appt: Appointment; rect: DOMRect; id?: string } | null>(null)
-  const [editando, setEditando] = useState<{ datos: DatosTurno; origen: Origen } | null>(null)
+  const [editando, setEditando] = useState<{ datos: DatosTurno; origen: Origen; etapa?: EtapaEspera } | null>(null)
+  /* La pregunta abierta del kebab: Cancel appointment o Mark as no-show. */
+  const [cerrando, setCerrando] = useState<{ tipo: 'cancel' | 'noshow'; turno: Appointment } | null>(null)
+  const navigate = useNavigate()
   /* Los días viven en estado: reprogramar un turno tiene que moverlo de fecha
      y verse en el día nuevo. */
   const [dias, setDias] = useState(() => (cargado ? conDiaCargado(DIAS) : DIAS))
@@ -151,10 +176,11 @@ export default function Dashboard() {
   }
 
   /* El kebab abre el mismo modal de alta, con lo que la card ya sabe. */
-  const editar = (a: Appointment, origen: Origen) => {
+  const editar = (a: Appointment, origen: Origen, etapa?: EtapaEspera) => {
     setSelected(null)
     setEditando({
       origen,
+      etapa,
       datos: {
         patient: a.name,
         primary: a.provider,
@@ -162,7 +188,7 @@ export default function Dashboard() {
         date: formatDMY(date),
         start: franja(a.time),
         end: HORAS[HORAS.indexOf(franja(a.time)) + 1] ?? '',
-        status: 'Check-in',
+        status: etapa === 'Checked in' ? 'Check-in' : etapa ? 'In progress' : 'Booked',
       },
     })
   }
@@ -213,13 +239,53 @@ export default function Dashboard() {
     }
   })
 
+  /* Cancel y No Show cierran la cita sin atenderla: sale de Appointments o de la Waiting Room (CON-1827, CON-1828). */
+  const cerrar = (t: Appointment, cerrado: 'Cancelled' | 'No Show') => setDias((prev) => {
+    const d = prev[claveFecha(date)] ?? DIA_VACIO
+    const k = claveTurno(t)
+    return {
+      ...prev,
+      [claveFecha(date)]: {
+        ...d,
+        waiting: d.waiting.filter((w) => claveTurno(w) !== k),
+        appointments: d.appointments.map((a) => (claveTurno(a) === k ? { ...a, cerrado } : a)),
+      },
+    }
+  })
+  const confirmarCierre = (motivo?: string) => {
+    if (!cerrando) return
+    const cancelado = cerrando.tipo === 'cancel'
+    cerrar(cerrando.turno, cancelado ? 'Cancelled' : 'No Show')
+    aviso.ok(cancelado
+      ? `The appointment status has been updated to Canceled.${motivo ? ` Reason: ${motivo}.` : ''}`
+      : 'The appointment status has been updated to No Show.')
+    setCerrando(null)
+  }
+  const editarPaciente = (t: Appointment) => navigate(`/patients/${slug(t.name)}/edit`)
+
+  /* El kebab de una cita Booked: editar primero, Mark as no-show sólo si ya pasó la hora y Cancel al final. Check In
+     tiene su botón (dashboard.md, 2026-11-19). */
+  const accionesReservada = (a: Appointment): AccionMenu[] => [
+    { label: 'Edit appointment', icon: Pencil, onSelect: () => editar(a, { clave: claveFecha(date), panel: 'appointments', index: dia.appointments.indexOf(a) }) },
+    { label: 'Edit patient', icon: UserPen, onSelect: () => editarPaciente(a) },
+    ...(puedeNoShow(a, date) ? [{ label: 'Mark as no-show', icon: UserX, onSelect: () => setCerrando({ tipo: 'noshow', turno: a }) }] : []),
+    { label: 'Cancel appointment', icon: CalendarX, destructiva: true, onSelect: () => setCerrando({ tipo: 'cancel', turno: a }) },
+  ]
+  /* En la Waiting Room: Edit appointment siempre (lo que deja editar depende de la etapa) y Cancel sólo en Checked in,
+     con el encounter Planned (CON-1670). Check Out tiene su botón. */
+  const accionesEspera = (p: EnEspera): AccionMenu[] => [
+    { label: 'Edit appointment', icon: Pencil, onSelect: () => editar(p, { clave: claveFecha(date), panel: 'waiting', index: dia.waiting.indexOf(p) }, p.etapa) },
+    ...(p.etapa === 'Checked in' ? [{ label: 'Cancel appointment', icon: CalendarX, destructiva: true, onSelect: () => setCerrando({ tipo: 'cancel', turno: p }) }] : []),
+  ]
+
   /* Los números salen de las listas del día, no de un mock aparte. */
   const stats: Stat[] = useMemo(() => {
     const completados = dia.appointments.filter((a) => a.completado).length
     const nuevos = dia.waiting.filter((w) => w.nuevo).length
     return [
       {
-        label: 'Appointments', value: String(dia.appointments.length),
+        /* Una cancelada ya no es una cita del día; un No Show sí (no libera el lugar). */
+        label: 'Appointments', value: String(dia.appointments.filter((a) => a.cerrado !== 'Cancelled').length),
         nota: `${completados} completed`, icon: CalendarDays,
       },
       {
@@ -235,17 +301,13 @@ export default function Dashboard() {
 
   /* Appointments: sólo los que todavía no llegaron, por hora. */
   const porLlegar = useMemo(() => pendientesDeLlegar(dia), [dia])
-  const operatorios = useMemo(
-    () => [...new Set(porLlegar.map((a) => a.operatory))].sort(),
-    [porLlegar],
-  )
-  const turnos = porLlegar.filter((a) => salas.length === 0 || salas.includes(a.operatory))
+  /* Las opciones salen de las citas por llegar, con cuántas tiene cada una. */
+  const opciones = (campo: 'provider' | 'operatory') =>
+    [...new Set(porLlegar.map((a) => a[campo]))].sort().map((v) => ({ value: v, count: porLlegar.filter((a) => a[campo] === v).length }))
+  const turnos = porLlegar.filter((a) =>
+    (providers.length === 0 || providers.includes(a.provider)) && (salas.length === 0 || salas.includes(a.operatory)))
   const tareas = tipoTarea === 'All' ? dia.tasks : dia.tasks.filter((t) => t.kind === tipoTarea)
-  const operatoriosEspera = useMemo(
-    () => [...new Set(dia.waiting.map((w) => w.operatory))].sort(),
-    [dia],
-  )
-  const enEspera = dia.waiting.filter((w) => salasEspera.length === 0 || salasEspera.includes(w.operatory))
+  const enEspera = dia.waiting.filter((w) => etapas.length === 0 || etapas.includes(w.etapa))
 
   return (
     <div className={CONTENEDOR_PAGINA}>
@@ -267,11 +329,14 @@ export default function Dashboard() {
           scroll interno sin tope). */}
       <div className="mt-4 grid gap-4 lg:max-[1279px]:grid-cols-2 min-[1280px]:grid-cols-3">
         <Panel
-          title={<>Appointments <Globo n={porLlegar.length} /></>}
+          title={<>Appointments <Globo n={turnos.length} /></>}
           controls={
-            <BotonFiltro
-              label="Filter appointments" options={operatorios}
-              value={salas} onChange={setSalas}
+            <FilterMenu
+              label="Filter appointments" size="sm" tour="dash-filter"
+              groups={[
+                { title: 'Provider', options: opciones('provider'), value: providers, onChange: setProviders },
+                { title: 'Room', options: opciones('operatory'), value: salas, onChange: setSalas },
+              ]}
             />
           }
         >
@@ -287,8 +352,8 @@ export default function Dashboard() {
                 icon={CalendarDays}
                 title="No appointments today"
                 detail={
-                  salas.length > 0
-                    ? 'No appointments match the selected operatories.'
+                  providers.length > 0 || salas.length > 0
+                    ? 'No appointments match the selected providers and rooms.'
                     : 'Your schedule is clear. Add an appointment or check pending requests.'
                 }
                 accion={{ label: 'New appointment', onClick: () => aviso.info('Use Scheduling to create an appointment.') }}
@@ -301,11 +366,7 @@ export default function Dashboard() {
                 return (
                   <AppointmentRow
                     key={id} appt={{ ...a, accion: 'Check In' }} id={id} activa={selected?.id === id}
-                    onSelect={pick} onAccion={hacerCheckIn}
-                    onEdit={(x) => editar(x, {
-                      clave: claveFecha(date), panel: 'appointments',
-                      index: dia.appointments.indexOf(a),
-                    })}
+                    onSelect={pick} onAccion={hacerCheckIn} acciones={accionesReservada(a)}
                   />
                 )
               })}
@@ -314,29 +375,31 @@ export default function Dashboard() {
         </Panel>
 
         <Panel
-          title={<>Waiting Room <Globo n={dia.waiting.length} /></>}
+          title={<>Waiting Room <Globo n={enEspera.length} /></>}
           controls={
-            <BotonFiltro
-              label="Filter waiting room" options={operatoriosEspera}
-              value={salasEspera} onChange={setSalasEspera}
+            <FilterMenu
+              label="Filter waiting room" size="sm"
+              groups={[{
+                title: 'Visit stage', value: etapas, onChange: setEtapas,
+                options: ETAPAS_ESPERA.map((e) => ({ value: e, count: dia.waiting.filter((w) => w.etapa === e).length })),
+              }]}
             />
           }
         >
           {enEspera.length === 0 ? (
             <EmptyState
               icon={Clock}
-              title={salasEspera.length > 0 ? 'No one is waiting there' : 'Waiting room is empty'}
+              title={etapas.length > 0 ? 'No visits in this stage' : 'Waiting room is empty'}
               detail={
-                salasEspera.length > 0
-                  ? 'No patients match the selected operatories.'
+                etapas.length > 0
+                  ? 'No patients match the selected visit stages.'
                   : 'No patients have checked in for this day yet.'
               }
             />
           ) : (
             <WaitingRoomList
               pacientes={enEspera} limit={TOPE.espera} seleccionada={selected?.id}
-              onSelect={pick} onAccion={hacerCheckOut}
-              onEdit={(p) => editar(p, { clave: claveFecha(date), panel: 'waiting', index: dia.waiting.indexOf(p) })}
+              onSelect={pick} onAccion={hacerCheckOut} acciones={accionesEspera}
             />
           )}
         </Panel>
@@ -379,9 +442,17 @@ export default function Dashboard() {
         <NewAppointmentModal
           edicion
           inicial={editando.datos}
+          {...(editando.etapa ? EDICION_POR_ETAPA[editando.etapa] : {})}
           onGuardar={guardarEdicion}
           onClose={() => setEditando(null)}
         />
+      )}
+
+      {cerrando?.tipo === 'cancel' && (
+        <CancelAppointmentDialog nombre={cerrando.turno.name} onConfirm={confirmarCierre} onCancel={() => setCerrando(null)} />
+      )}
+      {cerrando?.tipo === 'noshow' && (
+        <NoShowDialog nombre={cerrando.turno.name} hora={cerrando.turno.time} onConfirm={() => confirmarCierre()} onCancel={() => setCerrando(null)} />
       )}
 
       {selected && (

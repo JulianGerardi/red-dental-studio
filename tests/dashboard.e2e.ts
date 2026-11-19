@@ -111,13 +111,60 @@ test('Tocar una sala despliega su día sin filtrar la Waiting Room', async ({ ap
   await expect(screen.getByRole('list', 'Operatory 1 today')).toHaveCount(0)
 })
 
-test('La Waiting Room se filtra con su propio Filter', async ({ app, screen }) => {
+/* La Waiting Room se filtra por etapa visible; la cuenta del título sigue al filtro (dashboard.md, 2026-11-19). */
+test('La Waiting Room se filtra por Visit stage', async ({ app, screen }) => {
   await app.open('/')
-  await expect(screen.getByRole('button', /^Check Out/)).toHaveCount(2)
   await screen.getByRole('button', /Filter waiting room/).tap()
-  await screen.getByRole('menuitemcheckbox', /Operatory 4/).tap()
-  await screen.getByRole('menuitemcheckbox', /Operatory 4/).press('Escape')
-  await expect(screen.getByRole('button', /^Check Out/)).toHaveCount(1)
+  await screen.getByRole('menuitemcheckbox', /Ready to check out/).tap()
+  await screen.getByRole('menuitemcheckbox', /Ready to check out/).press('Escape')
+  await expect(screen.getByRole('heading', 'Waiting Room 5')).toBeVisible()
+  await expect(screen.getByText('On hold · 2')).toHaveCount(0)
+  await expect(screen.getByRole('button', /^Check Out/)).toHaveCount(5)
+})
+
+/* Provider y Room se combinan; la cuenta del título es la de las citas que quedan (dashboard.md, 2026-11-19). */
+test('Appointments se filtra por Provider y Room combinados', async ({ app, screen }) => {
+  await app.open('/')
+  await screen.getByRole('button', /Filter appointments/).tap()
+  await screen.getByRole('menuitemcheckbox', /Dr\. Elena Martinez/).tap()
+  await screen.getByRole('menuitemcheckbox', /Operatory 2/).tap()
+  await screen.getByRole('menuitemcheckbox', /Operatory 2/).press('Escape')
+  await expect(screen.getByRole('heading', 'Appointments 2')).toBeVisible()
+  await expect(screen.getByRole('button', /^Check In/)).toHaveCount(2)
+})
+
+/* El kebab de una cita Booked: Mark as no-show sólo si ya pasó la hora (CON-1828); Cancel pide motivo (CON-1827). */
+test('Booked: No Show sólo con la hora pasada y Cancel con motivo', async ({ app, screen }) => {
+  await app.open('/')
+  await screen.getByRole('button', 'Actions for Sophia Collins').first().tap()
+  await expect(screen.getByRole('menuitem', /Mark as no-show/)).toHaveCount(0)
+  await screen.getByRole('menuitem', /Cancel appointment/).tap()
+  await expect(screen.getByRole('button', 'Cancel appointment')).toBeDisabled()
+  await screen.getByText('Select a reason').tap()
+  await screen.getByText('Patient illness').tap()
+  await screen.getByRole('button', 'Cancel appointment').tap()
+  await expect(screen.getByText(/updated to Canceled/)).toBeVisible()
+  await expect(screen.getByRole('heading', 'Appointments 8')).toBeVisible()
+
+  await screen.getByRole('button', 'Actions for Noah James').first().tap()
+  await screen.getByRole('menuitem', /Mark as no-show/).tap()
+  await screen.getByRole('button', 'Mark as No Show').tap()
+  await expect(screen.getByText('The appointment status has been updated to No Show.')).toBeVisible()
+  await expect(screen.getByRole('heading', 'Appointments 7')).toBeVisible()
+})
+
+/* En la Waiting Room el menú depende de la etapa: Cancel sólo en Checked in; On hold sólo deja cambiar la sala. */
+test('Waiting Room: el menú y Edit appointment según la etapa', async ({ app, screen }) => {
+  await app.open('/')
+  await screen.getByRole('button', 'Actions for Zoe Phillips').first().tap()
+  await expect(screen.getByRole('menuitem', /Cancel appointment/)).toBeVisible()
+  await screen.getByRole('menuitem', /Cancel appointment/).press('Escape')
+
+  await screen.getByRole('button', 'Actions for Henry Richardson').first().tap()
+  await expect(screen.getByRole('menuitem', /Cancel appointment/)).toHaveCount(0)
+  await screen.getByRole('menuitem', /Edit appointment/).tap()
+  await expect(screen.getByText('This visit is on hold')).toBeVisible()
+  await expect(screen.getByRole('tab', 'Schedule')).toHaveAttribute('aria-selected', 'true')
 })
 
 /* Tocar el turno abre la ficha flotante del paciente; el botón de acción no (dashboard.md, 2026-10-19). */

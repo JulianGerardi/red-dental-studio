@@ -912,3 +912,49 @@ con su lista de antes: Patients no cambia. *Patient in session* (`PatientInSessi
 **A validar con usuarios:** si "Appointments" en la tira (todo el día) y en el panel (por llegar) se confunden; si
 recepción quiere Cancel en el kebab de Checked in (CON-1670 lo permite sólo con el encounter Planned y el diseño no lo
 muestra); y si el orden de Ready to check out (por hora) sirve más que por quién terminó primero.
+
+## Filtros y menú ⋮ según el estado de la cita (2026-11-19, segunda tanda)
+
+**Jira:** CON-1827 (Cancel: Booked o Checked-in, motivo obligatorio), CON-1828 (No Show: sólo Booked, con confirmación,
+el lugar no se libera), CON-1995 (lo Booked sin acción pasa solo a No Show al cierre del día), CON-2801 (motivos de
+cancelación), CON-1670 (Waiting Room). Pedido de Julián con dos tablas (filtros y menú por grupo).
+
+**Appointments**
+- **Filter** con dos grupos de selección múltiple, **Provider** y **Room**, que se combinan (Dr. Elena Martinez +
+  Operatory 2 deja sólo las de esa profesional en esa sala). Sin elegir nada, todos. Las opciones salen de las citas por
+  llegar, con su cuenta. Sin filtro de estado: la columna ya es sólo Booked. *Unassigned* no aparece: en la demo toda
+  cita tiene sala.
+- **La cuenta del título pasa a ser la filtrada** (antes, el total; en Patients sigue siendo el total).
+- **Menú ⋮ de una cita Booked:** Edit appointment · Edit patient (va a `/patients/:id/edit`; el id sale de
+  `slug(nombre)`, como en la card compacta) · Mark as no-show · separador · Cancel appointment en rojo. Check In no está:
+  tiene su botón.
+- **Mark as no-show** sólo cuando la hora de la cita ya pasó (`puedeNoShow`): no para una futura. "Ahora" en el día de la
+  demo es 10:42 (`HORA_DEMO`, cuadra con Zoe Phillips esperando 12 min desde las 10:30); hoy, la hora real; un día pasado
+  ya terminó. Pregunta con `NoShowDialog` y avisa *The appointment status has been updated to No Show.*
+- **Cancel appointment** con `CancelAppointmentDialog`: el motivo (lista de CON-2801) es obligatorio y sin él el botón
+  queda deshabilitado (`ConfirmDialog` suma `confirmDisabled`). Avisa *…updated to Canceled.* con el motivo.
+- Las dos sacan la cita de la columna (`cerrado` en la agenda). Cancelled libera la sala: no cuenta en Rooms ni en la
+  tira; No Show sigue contando (el lugar no se libera) pero no es Next.
+- **Anomalía de texto:** Jira dice *Cancel | Confirm*; con una pregunta de cancelar, dos "Cancel" se confunden: los
+  botones dicen *Keep appointment* y *Cancel appointment*. Lo mismo en No Show: *Mark as No Show* en lugar de *Confirm*.
+
+**Waiting Room**
+- **Filter** con un solo grupo, **Visit stage** (Checked in, On hold, Ready to check out), de selección múltiple y con
+  la cuenta de cada etapa. Reemplaza al filtro por sala. Las cuentas del título y de cada grupo incluyen lo que está
+  detrás de "Show N more".
+- **Menú ⋮ por etapa** (Check Out tiene su botón y no se repite):
+
+| Etapa | Menú | Qué deja editar Edit appointment |
+|---|---|---|
+| Checked in | Edit appointment · Cancel appointment | Todo menos paciente, status, fecha y hora |
+| On hold | Edit appointment | Sólo la sala (abre en *Schedule*); el encounter sigue en pausa |
+| Ready to check out | Edit appointment | Sólo las notas (abre en *Additional*) |
+
+- `NewAppointmentModal` suma `bloqueados` (campos, `flags` de Additional y `plan`) y `nota`: lo bloqueado se ve en
+  sólo lectura (un `fieldset` deshabilitado) y arriba un `ui/alert` info dice por qué. Con la fecha bloqueada no se abre
+  el calendario del costado.
+
+**A validar con usuarios:** si 10–15 minutos de tolerancia antes de ofrecer No Show sirve más que "ya pasó la hora" (hoy
+no hay regla de la clínica en Jira; convendría una configuración); si en Checked in hace falta cambiar la hora
+(se dejó bloqueada: el paciente ya está y el encounter, creado); y si *Edit patient* debería depender de un permiso (hoy
+no hay permisos en la app).

@@ -14,7 +14,12 @@ import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 
 /* La agenda del día: cada turno sabe si ya se atendió (`completado`) o si está en el sillón ahora (`enCurso`). Los que
    llegaron están además en `waiting`, con su etapa (dashboard.md, 2026-11-19). */
-export type Turno = Appointment & { completado?: boolean; enCurso?: boolean }
+export type Turno = Appointment & {
+  completado?: boolean
+  enCurso?: boolean
+  /** Cerrado sin atenderse: sale de Appointments y de la Waiting Room. Cancelled libera el lugar; No Show no (CON-1827, CON-1828). */
+  cerrado?: 'Cancelled' | 'No Show'
+}
 
 /* Las tres etapas de la Waiting Room, según el encounter (CON-1670): Planned → Checked in, On Hold → On hold,
    Completed o Fulfilled → Ready to check out. */
@@ -226,6 +231,29 @@ export function reprogramar(
   return salida
 }
 
+/* La hora de "ahora" del día de la demo: Zoe Phillips hizo check-in a las 10:30 y lleva 12 minutos esperando. Para otros
+   días: hoy, la hora real; un día pasado ya terminó y uno futuro no empezó. */
+export const HORA_DEMO = '10:42'
+export function horaActual(fecha: Date, ahora = new Date()) {
+  const dia = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+  if (dia(fecha) === dia(HOY_DEMO)) return HORA_DEMO
+  if (dia(fecha) < dia(ahora)) return '24:00'
+  if (dia(fecha) > dia(ahora)) return '00:00'
+  return `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`
+}
+
+/* Mark as no-show sólo para una cita Booked cuya hora ya pasó: no para una futura (comparativa del 2026-11-19, CON-1828).
+   Lo que no se marca a mano pasa solo a No Show al cierre del día (CON-1995). */
+export const puedeNoShow = (t: Appointment, fecha: Date) => t.time < horaActual(fecha)
+
+/* Los motivos de cancelación, en el orden de CON-2801. */
+export const MOTIVOS_CANCELACION = [
+  'Patient illness', 'Family emergency', 'Transportation issue', 'Work conflict', 'Financial reasons', 'Insurance change',
+  'Change of dentist', 'Rescheduled by patient', 'Patient treatment declined', 'Patient missed communication',
+  'Provider illness', 'Provider emergency', 'Clinic closure', 'Overbooking', 'Equipment unavailable', 'Clinical emergency',
+  'Provider schedule change', 'Weather/unsafe conditions', 'Staff shortage', 'Administrative error',
+]
+
 /* Identifica un turno entre la agenda y la sala de espera (los mocks no traen id). */
 export const claveTurno = (t: Appointment) => `${t.name}|${t.time}|${t.operatory}`
 
@@ -233,7 +261,7 @@ export const claveTurno = (t: Appointment) => `${t.name}|${t.time}|${t.operatory
 export const pendientesDeLlegar = (dia: DiaDashboard) => {
   const llegaron = new Set(dia.waiting.map(claveTurno))
   return dia.appointments
-    .filter((a) => !a.completado && !a.enCurso && !llegaron.has(claveTurno(a)))
+    .filter((a) => !a.completado && !a.enCurso && !a.cerrado && !llegaron.has(claveTurno(a)))
     .sort((a, b) => a.time.localeCompare(b.time))
 }
 
@@ -247,11 +275,12 @@ export type ResumenSala = {
 /* Busy si hay alguien en el sillón; No bookings si hoy no tiene turnos; si no, Available. Next es el primero que
    todavía no pasó por la sala: reservado o recién llegado (Checked in), por hora. */
 export function resumenSala(room: Operatory, dia: DiaDashboard): ResumenSala {
-  const turnos = dia.appointments.filter((a) => a.operatory === room.name)
+  /* Un turno cancelado libera la sala; un No Show sigue ocupando su lugar en la cuenta (CON-1828), pero no es Next. */
+  const turnos = dia.appointments.filter((a) => a.operatory === room.name && a.cerrado !== 'Cancelled')
   const etapa = new Map(dia.waiting.map((w) => [claveTurno(w), w.etapa]))
   const ahora = turnos.find((t) => t.enCurso)
   const siguiente = turnos
-    .filter((t) => !t.completado && !t.enCurso && (etapa.get(claveTurno(t)) ?? 'Checked in') === 'Checked in')
+    .filter((t) => !t.completado && !t.enCurso && !t.cerrado && (etapa.get(claveTurno(t)) ?? 'Checked in') === 'Checked in')
     .sort((a, b) => a.time.localeCompare(b.time))[0]
   const status = room.status === 'Unavailable' ? 'Unavailable' : ahora ? 'Busy' : turnos.length === 0 ? 'No bookings' : 'Available'
   return { status, cuantos: turnos.length, ahora, siguiente }

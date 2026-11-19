@@ -11,6 +11,7 @@ import {
   PlanCard, VisitRow, MoverVisitaDialog, type Plan, type Visita,
 } from '@/components/scheduling/TreatmentPlanPicker'
 import { aviso } from '@/components/ui/toaster'
+import { Alert } from '@/components/ui/alert'
 import { EMPLEADOS } from '@/data/employees'
 import { OBLIGATORIO } from '@/lib/validacion'
 
@@ -126,14 +127,23 @@ const VACIO = {
 
 export type DatosTurno = Partial<typeof VACIO>
 
+/* Lo que se puede dejar en sólo lectura al editar: los campos, las casillas de Additional y el link al plan. */
+export type CampoTurno = keyof typeof VACIO | 'flags' | 'plan'
+
 export function NewAppointmentModal({
   edicion = false,
   pestanaInicial = 'General',
   inicial,
   operatorios,
+  bloqueados = [],
+  nota,
   onGuardar,
   onClose,
 }: {
+  /** Edit Appointment de una visita que ya llegó: estos campos quedan en sólo lectura (dashboard.md, 2026-11-19). */
+  bloqueados?: CampoTurno[]
+  /** Por qué hay campos en sólo lectura; va arriba de las pestañas. */
+  nota?: { title: string; detail?: string }
   /** Edit Appointment: el turno ya existe, sin pasos y con "Save Changes". Sin esto, New Appointment (aunque llegue con
       `inicial`, como al agendar una solicitud). */
   edicion?: boolean
@@ -169,7 +179,11 @@ export function NewAppointmentModal({
   const [paso, setPaso] = useState<1 | 2>(1)
   const [pestana, setPestana] = useState<Pestana>(pestanaInicial)
   /* Al editar, la pestaña Schedule es para mover el turno: el calendario del día se ve de entrada. */
-  const mostrarPanel = edicion ? pestana === 'Schedule' : paso === 1 && tocoHorario
+  const fijo = (k: CampoTurno) => bloqueados.includes(k)
+  /* Un fieldset deshabilitado apaga todo lo de adentro (inputs, selects y botones) sin tocar cada campo. */
+  const lectura = (k: CampoTurno, nodo: React.ReactNode) =>
+    fijo(k) ? <fieldset disabled className="contents">{nodo}</fieldset> : nodo
+  const mostrarPanel = edicion ? pestana === 'Schedule' && !fijo('date') : paso === 1 && tocoHorario
   const set = (k: keyof typeof VACIO) => (v: string) => setD((p) => ({ ...p, [k]: v }))
   const req = (k: keyof typeof VACIO) =>
     intentado && !d[k].trim() ? OBLIGATORIO : undefined
@@ -221,29 +235,29 @@ export function NewAppointmentModal({
   }
 
   /* Los campos sueltos: New Appointment los arma en el orden de CON-4090 y Edit Appointment los reparte en pestañas. */
-  const fPaciente = (
+  const fPaciente = lectura('patient', (
     <PersonSearchField
       label="Patient" required placeholder="Search by name, number, DOB or email" personas={PACIENTES} subtitulo={pacienteNumero} chips={pacienteChips}
       value={d.patient} onChange={set('patient')} error={req('patient')}
     />
-  )
-  const fPrimary = (
+  ))
+  const fPrimary = lectura('primary', (
     <PersonSearchField
       label="Primary Provider" required placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
       value={d.primary} onChange={set('primary')} error={req('primary')}
     />
-  )
-  const fAdditional = (
+  ))
+  const fAdditional = lectura('additional', (
     <PersonSearchField
       label="Additional Provider" placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
       value={d.additional} onChange={set('additional')}
     />
-  )
-  const fStatus = <SelectField label="Status" required value={d.status} onChange={set('status')} error={req('status')} />
-  const fRequestor = <SelectField label="Requestor" placeholder="Who is requesting?" value={d.requestor} onChange={set('requestor')} />
-  const fReason = <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />
+  ))
+  const fStatus = lectura('status', <SelectField label="Status" required value={d.status} onChange={set('status')} error={req('status')} />)
+  const fRequestor = lectura('requestor', <SelectField label="Requestor" placeholder="Who is requesting?" value={d.requestor} onChange={set('requestor')} />)
+  const fReason = lectura('reason', <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />)
   /* Tocar la fecha o una hora despliega el calendario del día al costado; una vez abierto, se queda. */
-  const fFecha = (
+  const fFecha = lectura('date', (
     <div onFocus={() => setTocoHorario(true)} className="flex flex-col gap-2">
       <FieldLabel required>Date</FieldLabel>
       <DatePicker
@@ -254,30 +268,32 @@ export function NewAppointmentModal({
       />
       <FieldError>{req('date')}</FieldError>
     </div>
-  )
-  const fHoras = (
+  ))
+  const fHoras = lectura('start', (
     <div onFocus={() => setTocoHorario(true)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <SelectField label="Start Time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} />
       <SelectField label="End Time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
     </div>
-  )
-  const fOperatory = <SelectField label="Operatory" required options={operatorios} value={d.operatory} onChange={set('operatory')} error={req('operatory')} />
+  ))
+  const fOperatory = lectura('operatory', <SelectField label="Operatory" required options={operatorios} value={d.operatory} onChange={set('operatory')} error={req('operatory')} />)
   const par = (a: React.ReactNode, b?: React.ReactNode) => <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">{a}{b}</div>
 
   /* Additional y Notes, en el paso 1 como red.dev y CON-4090. */
   const seccionAdicional = (
     <DrawerSection title="Additional">
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-        <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
-        <OptionCheckbox label="Follow-up" defaultChecked={false} />
-        <OptionCheckbox label="Premedicate" defaultChecked={false} />
-      </div>
-      <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />
+      {lectura('flags', (
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <OptionCheckbox label="ASAP" checked={asap} onChange={setAsap} />
+          <OptionCheckbox label="Follow-up" defaultChecked={false} />
+          <OptionCheckbox label="Premedicate" defaultChecked={false} />
+        </div>
+      ))}
+      {lectura('notes', <TextArea label="Notes" placeholder="Add notes" value={d.notes} onChange={set('notes')} />)}
     </DrawerSection>
   )
 
   /* Paso 2 de 2.0: el link a una visita del plan (opcional). */
-  const seccionVisita = (
+  const seccionVisita = lectura('plan', (
     <DrawerSection title="Link to treatment plan visit">
       <div className="flex flex-col gap-2">
         <FieldLabel>Treatment plan</FieldLabel>
@@ -288,7 +304,7 @@ export function NewAppointmentModal({
         {VISITAS.map((v) => <VisitRow key={v.id} visita={v} on={visita === v.id} onClick={() => setVisita(v.id)} />)}
       </div>
     </DrawerSection>
-  )
+  ))
 
   /* Una pestaña de Edit Appointment: escondida y no desmontada, así lo tocado se conserva al ir y volver. */
   const panel = (t: Pestana, contenido: React.ReactNode) => (
@@ -315,6 +331,7 @@ export function NewAppointmentModal({
     >
       {edicion ? (
         <>
+          {nota && <Alert tone="info" title={nota.title} className="mb-5">{nota.detail}</Alert>}
           {/* Quién y por qué; Status primero de su fila porque de él dependen los obligatorios (CON-4090). */}
           {panel('General', (
             <DrawerSection title="General Information">
