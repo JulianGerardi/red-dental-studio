@@ -175,3 +175,11 @@ Auditoría de conexión (antes): texto sin estilo ~30 %, sombras sin estilo ~90 
 - En *Screens & Flows*, los avisos capturados como franja (Guardian en Patients, *Guarantor not assigned* en Scheduling)
   pasaron a instancias de *Alert* Warning de la library; el de Demography se borró. Detalle en `figma-docs.md`.
 
+
+## Motores con la library (2026-11-19)
+
+`motor` y `chipcount` buscaban los componentes en la página local *🎨 Design System*, que ya no está en el archivo de
+flujos. Quedan guardadas **`motorLib`** y **`chipcountLib`** (`rds.ds`): mismas reglas, pero importan Pill, Avatar,
+Button, IconButton, Chip, Count y los íconos de la library por clave (`biblio`), y el `Button` elige *Icon position*
+(Trailing si el ícono va después del texto). Se corren igual que los otros (`PAGES`, `t0`, `LIM`). Probados al
+recapturar Relationships & Billing: 180 pills, 162 avatares, 203 botones de ícono, 81 botones y 8 chips.

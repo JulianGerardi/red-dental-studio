@@ -1325,3 +1325,21 @@ Documenta lo publicado en el PR #156 (devolución de diseño de Abril; sin histo
 2. **Elements / Section notice** se borra con `ui/section-notice`: la app ya no lo usa. La entrada de 2026-10 que lo
    presentaba queda como historia.
 3. **Figma del design system**: sale el componente *Section notice* de *Feedback & Overlays*; *Alert* sigue igual.
+
+## Relationships: nombres siempre link y ⋮ en Household (2026-11-18, CON-4139, CON-4113)
+
+Documenta lo publicado en el PR #161 (comentario de Abril en CON-4139). Decisión en `modulos/relationships.md`
+(2026-11-18).
+
+1. **Pages / Parts / Relationships** pasa a la estructura de *Elements / Buttons* (antes era una lista de stories):
+   - Descripción con la regla: las cards de las relaciones y de Household son la misma `PersonaCard`; el nombre siempre
+     es link a la ficha y las dos llevan el ⋮ (*Edit relationship* / *Delete relationship*). Termina en **Probalo:**.
+   - *Playground* con grupo (Relationship / Household), nombre, rol y el ⋮.
+   - *Parts* (card, avatar, nombre-link, parentesco, pills, ⋮ y datos) y *States*: los dos grupos, hover y foco del
+     nombre, menú cerrado y abierto, Household vacío (`HogarVacio`, nuevo), nombre largo en celular, sin acciones y la
+     tabla *In the app*.
+   - *Specs* medidos: card, link del nombre (15px Bold) y ⋮ (28 × 28).
+   - Salen las stories sueltas *Relation card*, *Household card*, *Row menu* y *Row menu — open* (quedan dentro de
+     *States*). Siguen *Delete relationship* y *Remove Guardian access*.
+2. `MenuAcciones` suma `abierto` (sólo para stories), como `RowActionsMenu`.
+3. Tarjeta *Jira*: CON-2879, CON-3974, CON-3999, CON-4113 y CON-4139.

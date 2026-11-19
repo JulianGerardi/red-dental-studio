@@ -33,14 +33,16 @@ const BADGE_TONO: Record<Badge, PillTone> = {
    (3716:81940) y borrar. Archivar ya no existe: se borra, con confirmación (CON-4000 y CON-3999; relationships.md,
    2026-11-03). Anomalía 42. */
 export function MenuAcciones({
-  nombre, onEdit, onDelete,
+  nombre, onEdit, onDelete, abierto,
 }: {
   nombre: string
   onEdit: () => void
   onDelete: () => void
+  /** Sólo para las stories: el menú abierto. */
+  abierto?: boolean
 }) {
   return (
-    <RowActionsMenu label={nombre} className="ml-auto">
+    <RowActionsMenu label={nombre} className="ml-auto" abierto={abierto}>
       <DropdownMenuItem onSelect={onEdit}>
         <Pencil className="size-4 shrink-0" /> Edit relationship
       </DropdownMenuItem>
@@ -126,6 +128,15 @@ export function PersonaCard({
         </dl>
       </div>
     </article>
+  )
+}
+
+/* Household sin pacientes: al borrar todas sus cards (relationships.md, 2026-11-18). */
+export function HogarVacio() {
+  return (
+    <div className={TARJETA_PANEL}>
+      <EmptyState icon={Users} title="No household patients" detail="No other patients share this patient's guarantor." />
+    </div>
   )
 }
 
@@ -217,11 +228,7 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
           </h2>
           <div className="mt-4 flex flex-col gap-4">
             {/* Mismo ⋮ que las relaciones (CON-4113, CON-4139). */}
-            {hogar.length === 0 ? (
-              <div className={TARJETA_PANEL}>
-                <EmptyState icon={Users} title="No household patients" detail="No other patients share this patient's guarantor." />
-              </div>
-            ) : (
+            {hogar.length === 0 ? <HogarVacio /> : (
               hogar.map((p) => <PersonaCard key={p.id} p={p} onEdit={() => setEditando(p)} onDelete={() => setBorrando(p)} />)
             )}
           </div>

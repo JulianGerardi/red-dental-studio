@@ -87,6 +87,14 @@ el aviso de Vitals no están capturados). Pendiente de antes: en la card del tur
 apilados y de distinto ancho; en la app van de a dos y del mismo ancho. Edit sigue mostrando el drawer viejo: Edit
 Patient como pantalla (PR #155) todavía no se documentó.
 
+2026-11-19 (PR de documentación de CON-4139): **Relationships & Billing recapturada entera** (6 flujos, 29 pantallas).
+*Relationships — List* suma *Household · row actions* (el ⋮ de Household) y *Edit & Delete* suma *No household patients*;
+todos los nombres se ven como link. Como el design system ya no es una página de este archivo, `motor` y `chipcount`
+fallan (buscan *🎨 Design System*): se corren **`motorLib`** y **`chipcountLib`**, las mismas reglas pero importando de
+la library con `biblio` (y el `Button` con *Icon position*). Orden usado: `motorLib`, `chipcountLib`, `binder`,
+`reconectarRun`, `rebindRun`, `estilosRun`, y sobre las pantallas `shellSrc`, `estilos2Src` y `pills2Src`
+(`new AsyncFunction('PAGES', código)(pantallas)`). Resultado: 1805 instancias, todas de la library.
+
 **Recapturar una página ya conectada a la library** (Locations, 2026-11-16): después de ordenar y arreglar, correr los
 motores guardados en el archivo, en este orden y con `PAGES` = el nombre de la página: `motor`, `chipcount`, `binder`,
 `reconectarRun`, `rebindRun` y `estilosRun`. Se corren con `new AsyncFunction('PAGES', 't0', 'LIM', código)(PAGES,

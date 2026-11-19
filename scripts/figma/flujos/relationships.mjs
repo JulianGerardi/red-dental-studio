@@ -1,5 +1,5 @@
 /* Ficha del paciente → Relationships & Billing. Ver design-reference/figma/modulos/relationships.md
-   (CON-4000, CON-3174, CON-3999, CON-4139). Las historias CON-3958 y las de archivar están canceladas: no se usan. */
+   (CON-4000, CON-3174, CON-3999, CON-4139, CON-4113). Las historias CON-3958 y las de archivar están canceladas: no se usan. */
 import { clic, pasos, menuFila, escribir, enDialogo, elegirSelects } from './_util.mjs'
 
 const REL = '/patients/1/relationships'
@@ -17,17 +17,18 @@ export default {
   pagina: '🔗 Patient record — Relationships & Billing',
   orden: 6,
   resumen: 'Quién responde por el paciente: guardianes (decisiones) y garantes (pago), y los pacientes del mismo hogar. Lo que se cargue acá define de quién es la cuenta en Ledger y Billing.',
-  jira: ['CON-2879', 'CON-2858', 'CON-4000', 'CON-3999', 'CON-3174', 'CON-3985'],
+  jira: ['CON-2879', 'CON-2858', 'CON-4000', 'CON-3999', 'CON-3174', 'CON-3985', 'CON-4139', 'CON-4113'],
   flujos: [
     {
       nombre: 'Relationships — List',
       rol: 'Recepción · Administración',
-      jira: ['CON-2879'],
-      resumen: 'Ver las relaciones del paciente y el hogar que comparte garante.',
+      jira: ['CON-2879', 'CON-3974', 'CON-4139', 'CON-4113'],
+      resumen: 'Ver las relaciones del paciente y el hogar que comparte garante. Todos los nombres llevan a la ficha y todas las cards tienen ⋮.',
       pantallas: [
-        { nombre: 'Relationships & Billing', ruta: REL, nota: 'Se llega desde Relationships & Billing del menú del paciente. Cada relación es una card con su rol (Guardian, Guarantor) y sus datos de contacto; el nombre lleva a la ficha si la persona también es paciente (CON-4139).' },
+        { nombre: 'Relationships & Billing', ruta: REL, nota: 'Se llega desde Relationships & Billing del menú del paciente. Cada relación es una card con su rol (Guardian, Guarantor) y sus datos de contacto; todos los nombres son link azul a la ficha de esa persona (CON-4139).' },
         { nombre: 'Row actions', hacer: menuFila('Jessica Miller'), nota: 'El ⋮ ofrece Edit relationship y Delete relationship. Ya no hay archivar ni reactivar (CON-4000).' },
-        { nombre: 'Household', ruta: REL, hacer: (p) => p.getByRole('heading', { name: /Household/ }).scrollIntoViewIfNeeded(), nota: 'Debajo, Household / Same Guarantor Patients: los pacientes que comparten garante, sólo lectura. Es lo que suma la vista Guarantor View de Ledger y Billing.' },
+        { nombre: 'Household', ruta: REL, hacer: (p) => p.getByRole('heading', { name: /Household/ }).scrollIntoViewIfNeeded(), nota: 'Debajo, Household / Same Guarantor Patients: los pacientes que comparten garante. Misma card que las relaciones: nombre como link y ⋮. Es lo que suma la vista Guarantor View de Ledger y Billing.' },
+        { nombre: 'Household · row actions', hacer: async (p) => { await p.getByRole('button', { name: /Actions for Jessica Miller/ }).nth(2).click() }, nota: 'El ⋮ de Household ofrece lo mismo que el de las relaciones: Edit relationship y Delete relationship (CON-4113, CON-4139).' },
       ],
     },
     {
@@ -79,6 +80,7 @@ export default {
         { nombre: 'Delete Relationship', ruta: REL, hacer: menuFila('Jessica Miller', /Delete/), nota: 'Delete pide confirmación y avisa que no se puede deshacer (CON-3999, borrado físico).' },
         { nombre: 'Relationship deleted', hacer: clic('Delete'), nota: 'Confirmar quita la card y avisa con un toast, sin Undo.' },
         { nombre: 'No related contacts', ruta: REL, hacer: async (p) => { for (let i = 0; i < 2; i += 1) { await p.getByRole('button', { name: /Actions for Jessica Miller/ }).first().click(); await p.getByRole('menuitem', { name: /Delete/ }).click(); await p.getByRole('dialog').last().getByRole('button', { name: 'Delete' }).click(); await p.waitForTimeout(400) } }, nota: 'Sin relaciones queda el vacío "No related contacts" con Add Relationship. Household no cambia.' },
+        { nombre: 'No household patients', ruta: REL, hacer: async (p) => { for (let i = 0; i < 2; i += 1) { await p.getByRole('button', { name: /Actions for Jessica Miller/ }).last().click(); await p.getByRole('menuitem', { name: /Delete/ }).click(); await p.getByRole('dialog').last().getByRole('button', { name: 'Delete' }).click(); await p.waitForTimeout(400) } await p.getByRole('heading', { name: /Household/ }).scrollIntoViewIfNeeded() }, nota: 'Borrar desde el ⋮ de Household pide la misma confirmación. Sin pacientes queda "No household patients".' },
       ],
     },
     {

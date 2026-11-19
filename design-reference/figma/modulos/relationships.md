@@ -253,3 +253,7 @@ household deberiamos tambien agregar 3 puntitos de acciones" (es lo que pide CON
 **Para validar con Abril/usuarios:** si en Household *Delete relationship* tiene sentido (el household sale del
 Guarantor, no de una relación cargada) o si ahí el menú debería llevar otras acciones; la captura de CON-4113 no se pudo
 abrir desde acá.
+
+**Documentado (2026-11-19):** Storybook *Pages / Parts / Relationships* con Playground, Parts, States y Specs (los dos
+grupos, link, ⋮ abierto, Household vacío con `HogarVacio`) y Figma *Screens & Flows* recapturado con *Household · row
+actions* y *No household patients*.
