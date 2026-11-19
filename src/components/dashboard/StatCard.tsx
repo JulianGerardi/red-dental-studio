@@ -25,7 +25,7 @@ export function StatCard({
         </span>
       </div>
       <div className="flex flex-col gap-0.5">
-        <p className="text-[26px] leading-none font-bold text-black">{value}</p>
+        <p className="text-[26px] leading-none font-bold text-dash-blue">{value}</p>
         <p className="text-dash-delta text-[13px] leading-[1.5]">{delta}</p>
       </div>
     </div>

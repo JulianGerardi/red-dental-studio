@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
 import type { TipoAjusteBilling } from '@/data/billing'
 import {
-  APLICACIONES, MOVIMIENTOS, GUARANTOR, DEPENDIENTES, alcanceDe, coberturaSeguro, conSaldo, fechaCorta, moneda,
+  APLICACIONES, MOVIMIENTOS, GUARANTOR, DEPENDIENTES, PROVIDERS_LEDGER, alcanceDe, coberturaSeguro, conSaldo, fechaCorta, moneda,
   pendienteDe, tieneCredito, type Aplicacion, type Movimiento,
 } from '@/data/ledger'
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
@@ -35,6 +35,7 @@ import { AplicarCreditoModal } from '@/components/patients/ledger/AplicarCredito
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
 import { formatMDY } from '@/lib/fecha'
+import { ALCANCE_GUARANTOR } from '@/lib/ledgerAplicacion'
 
 /* Figma 4582:28487 / 4588:84886. Ver design-reference/figma/modulos/ledger.md. */
 
@@ -309,8 +310,13 @@ export default function Ledger() {
     ]
   }, [delaVista, vista])
 
-  /* Lo guardado en el drawer entra a la tabla. */
-  const agregar = (m: Omit<Movimiento, 'id'>) => setMovs((p) => [...p, { ...m, id: `m-${Date.now()}` }])
+  /* Lo guardado en el drawer entra a la tabla y, si aplicó algo, a qué cargos fue cada parte: así los cargos pagados dejan de
+     figurar como abiertos y lo que quedó sin aplicar es crédito disponible (ledger.md, 2026-11-19). */
+  const agregar = (m: Omit<Movimiento, 'id'>, aplicado: Record<string, number> = {}) => {
+    const id = `m-${Date.now()}`
+    setMovs((p) => [...p, { ...m, id }])
+    setAplicaciones((p) => [...p, ...Object.entries(aplicado).map(([cargo, monto], i) => ({ id: `a-${id}-${i}`, origen: id, cargo, fecha: m.fecha, monto }))])
+  }
 
   const cargosDeLaCuenta = movs.filter((m) => m.tipo === 'Charge')
   /* El link a otra transacción (ledger.md, 2026-10-14): si está en la tabla con la búsqueda y el filtro de ahora, va a
@@ -502,9 +508,14 @@ export default function Ledger() {
       {accion && (
         <PostPaymentDialog
           tipoInicial={accion}
-          pacienteInicial={GUARANTOR}
+          movs={movs}
+          aplicaciones={aplicaciones}
+          garante={GUARANTOR}
+          dependientes={DEPENDIENTES}
+          alcanceInicial={vista === 'Guarantor View' ? ALCANCE_GUARANTOR : GUARANTOR}
+          providers={PROVIDERS_LEDGER}
           onClose={() => setAccion(null)}
-          onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} posted for ${m.paciente}.`); setAccion(null) }}
+          onGuardar={(m, ap) => { agregar(m, ap); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} posted for ${m.paciente}.`); setAccion(null) }}
         />
       )}
       {enModal && <LedgerRowModal key={enModal.id} m={enModal} aplicaciones={aplicaciones} movimientos={movs} onVerTransaccion={verTransaccion} onAbrirClinica={abrirClinica} onClose={() => setEnModal(null)} />}

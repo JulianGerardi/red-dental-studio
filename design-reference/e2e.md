@@ -33,6 +33,9 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   Cancel lo deja Closed; Save pide horas, avisa Start ≥ End y guarda las franjas en todos los días elegidos.
   Desde 2026-11-16: el día de origen no se saca; pisar días abiertos con otro horario pregunta *Replace working hours?*
   (Cancel no guarda; un día Closed no entra) y los turnos afectados se resuelven antes (No Show + Waiting List).
+- `tests/ledger.e2e.ts` (2026-11-19): Patient Payment abre con el total abierto repartido del más viejo al más nuevo y un
+  importe menor se queda en el cargo más viejo; una línea que pasa el saldo del guarantor muestra el error; un pago de más
+  queda como crédito sin aplicar y Apply to recarga los cargos; Credit y Charge Adjustment piden el monto y guardan.
 - `tests/billing.e2e.ts` (2026-10-09): elegir un paciente en Find Patient abre su vista (sólo sus movimientos, los
   botones de pago, Guarantor View con todo su garante) y la X vuelve al resumen; una fila del resumen abre la vista de
   ese paciente en Patient View; el círculo de info de Overdue Balance muestra su texto al pasar el mouse.

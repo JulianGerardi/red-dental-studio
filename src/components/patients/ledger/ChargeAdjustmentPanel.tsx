@@ -1,81 +1,80 @@
-import { useState } from 'react'
-import {
-  TextField, SelectField, TextArea, FieldLabel, FormFooter,
-} from '@/components/patients/form'
-import { DatePicker } from '@/components/ui/date-picker'
-import { GUARANTOR, DEPENDIENTES, type Movimiento } from '@/data/ledger'
+import { useMemo, useState } from 'react'
+import { TextField, SelectField, TextArea } from '@/components/patients/form'
+import { ApplyToSelect } from '@/components/patients/ledger/ApplyToSelect'
+import { CampoFecha, SeccionLedger, ShellLedger, type FormularioLedger } from '@/components/patients/ledger/formulario'
+import { TIPOS_AJUSTE_CARGO, type Movimiento } from '@/data/ledger'
+import { ALCANCE_GUARANTOR, MENSAJES, esFutura, limpiarImporte, numero, opcionesAplicaA, pacienteDeAlcance } from '@/lib/ledgerAplicacion'
 import { formatMDY } from '@/lib/fecha'
 import { OBLIGATORIO } from '@/lib/validacion'
 
-/* Figma 4582:25840. El título es "Enter Charge (+) Adjustment", como red.dev (ledger.md, 2026-11-12). */
+/* Enter Charge (+) Adjustment (CON-3735): suma al balance y queda como un cargo más para cubrir con un pago o un crédito;
+   no se aplica a nada, por eso no lleva tabla. Provider es opcional (CON-4083). Visit date son las visitas del alcance
+   elegido más [None]. Ver design-reference/figma/modulos/ledger.md (2026-11-19). */
 
-const TIPOS_AJUSTE = ['Charge Adjustment', 'Credit Adjustment']
-const PROVIDERS = ['Dr. Elena Martinez', 'Dr. Emily Chen', 'Dr. Salgado']
+export const SIN_VISITA = '[None]'
 
 export function ChargeAdjustmentPanel({
-  cargosVisita, onCancelar, onGuardar,
-}: {
-  /** Cargos existentes para armar las opciones de "Visit date". */
-  cargosVisita: Movimiento[]
-  onCancelar: () => void
-  onGuardar: (m: Omit<Movimiento, 'id'>) => void
-}) {
-  const personas = [GUARANTOR, ...DEPENDIENTES]
-  const visitas = cargosVisita.map((m) => `${m.fecha}, ${m.paciente}, ${m.codigo !== '—' ? m.codigo : m.descripcion}, $${m.monto.toFixed(2)}`)
-
-  const [fecha, setFecha] = useState<Date | null>(null)
+  movs, garante, dependientes, alcanceInicial = ALCANCE_GUARANTOR, hoy, onGuardar, onCancelar, providers = [],
+}: Omit<FormularioLedger, 'aplicaciones'>) {
+  const ahora = hoy ?? new Date()
+  const opciones = opcionesAplicaA(garante, dependientes)
+  const [fecha, setFecha] = useState<Date | null>(ahora)
+  const [aplicaA, setAplicaA] = useState(alcanceInicial)
+  const [tipo, setTipo] = useState<string>(TIPOS_AJUSTE_CARGO[0])
   const [monto, setMonto] = useState('')
-  const [tipo, setTipo] = useState(TIPOS_AJUSTE[0])
-  const [provider, setProvider] = useState(PROVIDERS[0])
-  const [aplicaA, setAplicaA] = useState(personas[0])
+  const [provider, setProvider] = useState('')
   const [visita, setVisita] = useState('')
   const [notas, setNotas] = useState('')
   const [intentado, setIntentado] = useState(false)
 
+  /* Las visitas del alcance: las del paciente elegido o las de todos los de su guarantor. */
+  const visitas = useMemo(() => {
+    const paciente = pacienteDeAlcance(aplicaA)
+    const fechas = movs.filter((m) => m.tipo === 'Charge' && (!paciente || m.paciente === paciente)).map((m) => `Visit - ${m.fecha}`)
+    return [SIN_VISITA, ...new Set(fechas)]
+  }, [movs, aplicaA])
+
+  const valor = numero(monto)
+  const errorMonto = !monto.trim() ? OBLIGATORIO : valor <= 0 ? MENSAJES.monto : undefined
+  const errorFecha = !fecha ? OBLIGATORIO : esFutura(fecha, ahora) ? MENSAJES.futura : undefined
+  const errorTipo = !tipo ? 'An adjustment type is required for charge adjustments.' : undefined
+
   const guardar = () => {
     setIntentado(true)
-    if (!fecha || !monto.trim() || !aplicaA.trim()) return
-    const valor = Number(monto) || 0
-    onGuardar({
+    if (errorMonto || errorFecha || errorTipo || !fecha) return
+    const m: Omit<Movimiento, 'id'> = {
       fecha: formatMDY(fecha),
-      paciente: aplicaA,
+      paciente: aplicaA === ALCANCE_GUARANTOR ? garante : aplicaA,
       codigo: '—',
       descripcion: tipo,
-      provider,
-      tipo: tipo === 'Charge Adjustment' ? 'Charge' : 'Adjustment',
-      monto: tipo === 'Charge Adjustment' ? valor : -valor,
+      provider: provider || 'Front desk',
+      tipo: 'Adjustment',
+      monto: valor,
       estado: 'Posted',
-    })
+      alcance: aplicaA === ALCANCE_GUARANTOR ? 'guarantor' : 'patient',
+      motivo: tipo,
+      ...(notas.trim() ? { nota: notas.trim() } : {}),
+    }
+    onGuardar(m, {})
   }
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
-        <h2 className="text-sm font-bold text-ink">Adjustment Information</h2>
-
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="flex flex-col gap-2">
-            <FieldLabel required>Transaction date</FieldLabel>
-            <DatePicker value={fecha} onChange={setFecha} className="h-9 w-full" error={intentado && !fecha ? true : undefined} />
-          </div>
-          <TextField
-            label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto}
-            error={intentado && !monto.trim() ? OBLIGATORIO : undefined}
-          />
-          <SelectField label="Type" required options={TIPOS_AJUSTE} value={tipo} onChange={setTipo} />
-          <SelectField label="Provider" options={PROVIDERS} value={provider} onChange={setProvider} />
-          <SelectField
-            label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA}
-            error={intentado && !aplicaA.trim() ? OBLIGATORIO : undefined}
-          />
-          <SelectField label="Visit date" options={visitas} value={visita} onChange={setVisita} />
-        </div>
-        <TextArea className="mt-4" label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
+  const grilla = 'grid gap-4 sm:grid-cols-2'
+  const primero = (
+    <SeccionLedger titulo="Adjustment Information">
+      <div className={grilla}>
+        <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
+        <TextField
+          label="Amount" required placeholder="$ 0.00" value={monto} onChange={(v) => setMonto(limpiarImporte(v))}
+          error={intentado ? errorMonto : undefined}
+        />
+        <SelectField label="Type" required options={[...TIPOS_AJUSTE_CARGO]} value={tipo} onChange={setTipo} error={intentado ? errorTipo : undefined} />
+        <SelectField label="Provider" placeholder="Select" options={providers} value={provider} onChange={setProvider} />
+        <ApplyToSelect opciones={opciones} value={aplicaA} onChange={(v) => { setAplicaA(v); setVisita('') }} titulo="Apply adjustment to" />
+        <SelectField label="Visit date" placeholder="Select" options={visitas} value={visita} onChange={setVisita} />
       </div>
-
-      <div className="flex justify-end gap-3">
-        <FormFooter onCancel={onCancelar} onSave={guardar} />
-      </div>
-    </div>
+      <TextArea label="Notes" placeholder="Add a note (optional)" value={notas} onChange={setNotas} />
+    </SeccionLedger>
   )
+
+  return <ShellLedger titulo="Enter Charge (+) Adjustment" primero={primero} onGuardar={guardar} onCancelar={onCancelar} />
 }

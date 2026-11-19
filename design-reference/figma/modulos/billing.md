@@ -464,3 +464,24 @@ botones abren el `PostPaymentDialog` de `main`, con sus dos pasos y los datos de
 John Smith y la fecha es la de Billing. **No se publica** lo de adentro de los drawers descripto arriba (una sola página,
 sin íconos, Ledger Transactions con Other Credit / Guar Estimate / Applied, el garante con "(Guarantor)", sin
 transacciones sin métodos y Save apagado): queda en el commit `2d8dfbd` de la rama `claude/exciting-brown-p9saph`.
+
+## Misma lógica que el Ledger: Apply to, reparto y crédito (2026-11-19)
+
+**Jira:** CON-3738, CON-3739 y CON-3735 (epic CON-3732; ver `ledger.md`, misma fecha). Julián: los tres formularios "tienen
+la misma lógica para billing".
+
+1. **Los drawers de Billing son los formularios del Ledger**; `PostPaymentDialog` sólo elige cuál. La
+   lógica (cargos abiertos, reparto del más viejo al más nuevo, topes y mensajes, crédito sin aplicar, un movimiento por
+   pago con sus métodos) está en `lib/ledgerAplicacion.ts` y se explica en `ledger.md`.
+2. **Cierra la diferencia que quedaba** de *CON-4147*: el pago abre con el total abierto y ya repartido en Applied, no vacío.
+3. **Apply to:** el guarantor (todo el hogar), él mismo y los pacientes a su cargo (`grupoDeGarante`). Abre en el paciente
+   elegido en Patient View y en el guarantor en Guarantor View.
+4. **Los cargos abiertos salen de lo posteado en la sesión** (`actividad` + `APLICACIONES_BILLING`), no del mock fijo
+   (`cargosAbiertos` de `data/billing.ts` se borró). Lo que aplica cada pago se suma a las aplicaciones con
+   `registrarAplicaciones` para que ese cargo deje de figurar como abierto y baje su *Trans. Bal.* (mock sin backend).
+5. **Patient Payment pasa a un solo paso** (el video de red.dev lo muestra todo junto: se ve el reparto mientras se tipea el
+   importe); Credit Adjustment sigue en dos (*Adjustment* → *Allocation*) y Charge en una sección.
+6. Listas (`METODOS_PAGO`, `TIPOS_AJUSTE_CREDITO`, `TIPOS_AJUSTE_CARGO`) pasan a `data/ledger.ts`; `data/billing.ts` las
+   reexporta. `METODOS_PAGO` ya no trae los de seguro (CON-3738).
+
+**A validar con usuarios:** si Credit Adjustment también conviene en un solo paso, como Patient Payment.
