@@ -85,6 +85,8 @@ def emoji(ch, cls):
 
 GRILL_MARK = '<span class="logo-grill">G</span>'
 MP_MARK = '<span class="logo-mp">' + ICO["gift"] + '</span>'
+STRIKE_MARK = '<span class="logo-strike">S</span>'
+STRIKE_URL = "juliangerardi.github.io/Strike-Challenge"
 BATECH_MARK = ('<svg class="logo-batech" viewBox="2 2 22 28" aria-hidden="true">'
                '<path d="M12 4.4c5.6 2.6 9.2 7.6 9.2 13 0 6-4.6 10.6-11.2 11.2 2.9-2.7 4.3-6.5 4.1-10.7-.2-4.6-.9-9.1-2.1-13.5Z" fill="#2ba9e1"/>'
                '<circle cx="7.3" cy="24.3" r="2.8" fill="#fff"/></svg>')
@@ -132,5 +134,10 @@ def brand_scene(p, kind, T, big=False):
         return (f'<div class="bs bs--mp">'
                 f'<div class="bs__dev bs__dev--win">{browser(p, "mp-hero", 1440, 900, "play.mercadolibre.com", dark=True, lazy=lazy, view="fit")}</div>'
                 f'{notif(MP_MARK, T("Congratulations!", "¡Felicitaciones!"), T("Guido watched the film you recommended · <u>+213 points</u> for Mercado Envíos", "Guido vio la peli que le recomendaste · <u>Sumaste 213 puntos</u> para Mercado Envíos"), "", "bs__nt bs__nt--a nt--mp")}'
+                f'</div>')
+    if kind == "strike":
+        return (f'<div class="bs bs--strike">'
+                f'<div class="bs__dev bs__dev--win">{browser(p, "s-list-new", 2000, 1250, STRIKE_URL, lazy=lazy, view="fit")}</div>'
+                f'{notif(STRIKE_MARK, T("Exercise created", "Ejercicio creado"), T("Q4 Commerce Security Assessment · 3 assets, 3 custom exceptions", "Q4 Commerce Security Assessment · 3 assets, 3 excepciones"), T("now", "ahora"), "bs__nt bs__nt--a")}'
                 f'</div>')
     raise ValueError(kind)

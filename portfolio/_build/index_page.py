@@ -42,7 +42,11 @@ work = "".join([
             T("Corporate lunch ordering for a kitchen in Mercedes: employees pick the day’s meal on their phone, the kitchen runs tickets, labels and delivery.",
               "Pedidos de almuerzo para empresas de una cocina en Mercedes: los empleados eligen la vianda desde el celular y la cocina maneja comandas, etiquetas y reparto."),
             T("Product design — flows, UI, working prototype", "Diseño de producto — flujos, UI, prototipo funcional")),
-    wl_item(p, 5, "work/mercado-play.html", "Mercado Play", T("Streaming · UX/UI challenge", "Streaming · Challenge UX/UI"), "2026", tiles_mp(p),
+    wl_item(p, 5, "work/strike.html", "Strike", T("Cybersecurity · UX/UI challenge", "Ciberseguridad · Challenge UX/UI"), "2026", tiles_strike(p),
+            T("A UX/UI challenge for Strike: one guided flow to create a security exercise across many assets, with shared settings, exceptions per asset and a prototype that guides you through it.",
+              "Un challenge UX/UI para Strike: un flujo guiado para crear un ejercicio de seguridad sobre varios assets, con configuración compartida, excepciones por asset y un prototipo que te guía."),
+            T("Analysis, flows, wireframes, UI, design system, prototype", "Análisis, flujos, wireframes, UI, design system, prototipo")),
+    wl_item(p, 6, "work/mercado-play.html", "Mercado Play", T("Streaming · UX/UI challenge", "Streaming · Challenge UX/UI"), "2026", tiles_mp(p),
             T("A UX/UI challenge for Mercado Libre’s free streaming service: social recommendations that reward people with points when a friend watches what they shared.",
               "Un challenge UX/UI para el streaming gratuito de Mercado Libre: recomendaciones sociales que suman puntos cuando un amigo ve lo que compartiste."),
             T("Research, benchmarking, UX, UI, prototype", "Research, benchmarking, UX, UI, prototipo")),
@@ -117,7 +121,7 @@ page = head("Julián Gerardi · Senior Product Designer", "Julián Gerardi · Se
   </section>
 
   <section class="work" id="work">
-    <div class="wrap wl-top" data-reveal><b>{T("Selected work", "Trabajos seleccionados")}</b><span>{T("Five projects · 2022–2026", "Cinco proyectos · 2022–2026")}</span></div>
+    <div class="wrap wl-top" data-reveal><b>{T("Selected work", "Trabajos seleccionados")}</b><span>{T("Six projects · 2022–2026", "Seis proyectos · 2022–2026")}</span></div>
     <ol class="wl-list">
 {work}    </ol>
   </section>

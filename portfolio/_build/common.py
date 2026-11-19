@@ -30,6 +30,7 @@ PROJECTS = [  # order of the work index and of prev/next
     ("confidentally.html", "Confidentally"),
     ("confidentally-ui.html", "Confidentally UI"),
     ("grill.html", "GRILL Empresas"),
+    ("strike.html", "Strike"),
     ("mercado-play.html", "Mercado Play"),
 ]
 
@@ -166,7 +167,7 @@ def footer(p=""):
     w = f"{p}work/"
     cols = [
         (T("Work", "Trabajos"), [(f"{w}batech.html", "Batech AI Platform"), (f"{w}confidentally.html", "Confidentally"),
-                                 (f"{w}confidentally-ui.html", "Confidentally UI"), (f"{w}grill.html", "GRILL Empresas"), (f"{w}mercado-play.html", "Mercado Play")]),
+                                 (f"{w}confidentally-ui.html", "Confidentally UI"), (f"{w}grill.html", "GRILL Empresas"), (f"{w}strike.html", "Strike"), (f"{w}mercado-play.html", "Mercado Play")]),
         (T("Site", "Sitio"), [(f"{p}index.html#work", T("Selected work", "Trabajos")), (f"{p}index.html#process", T("Process", "Proceso")),
                               (f"{p}index.html#experience", T("Experience", "Experiencia")), (f"{p}index.html#about", T("About", "Sobre mí")), (f"{p}index.html#contact", T("Contact", "Contacto"))]),
         (T("Live projects", "Proyectos en vivo"), [("https://juliangerardi.github.io/red-dental-studio/#/patients/patient-0001", T("Confidentally prototype", "Prototipo de Confidentally")),
@@ -356,6 +357,16 @@ def tiles_mp(p, with_cover=False):
         tile_screen(p, "mp", "mp-s-comments", 1440, 900, 2, True),
         tile_screen(p, "mp", "mp-s-share", 1440, 900, 3, True),
         tile_screen(p, "mp", "mp-s-points", 1440, 900, 4, True),
+    ])
+
+
+def tiles_strike(p):
+    return "".join([
+        tile_screen(p, "strike", "s-list-new", 2000, 1250, 0),
+        tile_card(p, "strike", "st-kit-p-readiness", 560, 600, 1),
+        tile_screen(p, "strike", "s-bulk", 2000, 1250, 2),
+        tile_phone(p, "strike", "s-m-review", 3),
+        tile_screen(p, "strike", "s-assistant-answer", 2000, 1250, 4),
     ])
 
 
