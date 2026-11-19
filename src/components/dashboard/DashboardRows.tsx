@@ -1,7 +1,7 @@
+import type { ReactNode } from 'react'
 import { ArrowRight, Check, ClipboardList, Clock, FileText, FlaskConical, Pill, Send, TriangleAlert, X, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { StatusPill } from './primitives'
 import { ACCION_TURNO, MenuCard, accionTurno, type Appointment } from './AppointmentCard'
 import { completarTarea, type PendingTask } from './PendingTaskCard'
 import { Avatar } from '@/components/ui/avatar'
@@ -35,10 +35,16 @@ type PropsTurno = {
   onEdit?: (appt: Appointment) => void
   /** La sala de arriba ya la dice el chip del título: repetirla en cada fila es ruido (Julián, 2026-10-19). */
   ocultarOperatorio?: boolean
+  /** TR y CC: sólo en Checked in de la Waiting Room; antes del check-in no son lo que recepción necesita. */
+  chips?: boolean
+  /** En lugar del botón: el estado de la visita (Waiting · 12 min, Paused · 23 min). */
+  estado?: ReactNode
+  /** Después del aviso del botón: mover el turno (Check In lo pasa a la Waiting Room). */
+  onAccion?: (appt: Appointment) => void
 }
 
 /* El nombre abre la ficha rápida y es el camino con teclado: la fila entera no puede ser un botón porque tiene otros adentro. */
-export function NombreTurno({ appt, id, activa, onSelect, className }: Omit<PropsTurno, 'onEdit'> & { className?: string }) {
+export function NombreTurno({ appt, id, activa, onSelect, className }: Pick<PropsTurno, 'appt' | 'id' | 'activa' | 'onSelect'> & { className?: string }) {
   const texto = <span className="truncate text-[13px] font-semibold text-ink">{appt.name}</span>
   if (!onSelect) return <span className={cn('flex min-w-0', className)} title={appt.name}>{texto}</span>
   return (
@@ -52,15 +58,14 @@ export function NombreTurno({ appt, id, activa, onSelect, className }: Omit<Prop
   )
 }
 
-const CHECK_IN = <StatusPill tone="ok" className="px-1.5 py-[2px] text-[10px]">Check In</StatusPill>
-
-/* Un turno: hora, iniciales, nombre con Check In, provider y operatorio, TR y CC, Check Out o Cancel y el kebab con
-   Edit appointment. Angosta en dos renglones; ancha en columnas. */
-export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOperatorio }: PropsTurno) {
+/* Un turno: hora, iniciales, nombre, provider y operatorio, el botón de la acción que toca (o el estado de la visita)
+   y el kebab con Edit appointment. Sin el badge Check In: se confundía con el botón (comparativa del 2026-11-19, ver
+   dashboard.md). Angosta en dos renglones; ancha en columnas. */
+export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOperatorio, chips, estado, onAccion }: PropsTurno) {
   const accion = appt.accion ?? 'Check Out'
   const iniciales = <Avatar initials={appt.initials} size={28} />
-  const boton = (
-    <Button size="sm" variant={ACCION_TURNO[accion]} className="shrink-0" onClick={(e) => { e.stopPropagation(); accionTurno(appt) }}>{accion} <ArrowRight /></Button>
+  const fin = estado ?? (
+    <Button size="sm" variant={ACCION_TURNO[accion]} className="shrink-0" onClick={(e) => { e.stopPropagation(); accionTurno(appt); onAccion?.(appt) }}>{accion} <ArrowRight /></Button>
   )
   const menu = <MenuCard nombre={appt.name} onEdit={onEdit && (() => onEdit(appt))} />
   const donde = ocultarOperatorio ? appt.provider : `${appt.provider} · ${appt.operatory}`
@@ -77,8 +82,7 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOper
         })}
         className={cn('rounded-lg p-2.5 transition-colors', onSelect && 'cursor-pointer hover:bg-surface-alt', activa && 'bg-info-bg hover:bg-info-bg')}
       >
-        {/* La hora en la caja gris de la card (reloj y hora), del alto de la fila: suelta arriba quedaba descolgada
-            (Julián, 2026-10-13). */}
+        {/* La hora en la caja gris de la card (reloj y hora), del alto de la fila (Julián, 2026-10-13). */}
         <div className="flex items-stretch gap-2.5 @4xl:hidden">
           <span className="bg-dash-field flex w-12 shrink-0 flex-col items-center justify-center gap-1 rounded-lg py-2">
             <Clock className="size-3.5 text-ink-medium" />
@@ -88,21 +92,13 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOper
             <div className="flex min-h-7 items-center gap-2">
               {iniciales}
               <NombreTurno appt={appt} id={id} activa={activa} onSelect={onSelect} className="flex-1" />
-              <ChipsTurno className="@max-sm:hidden" />
+              {chips && <ChipsTurno />}
               {menu}
             </div>
-            {/* En una columna angosta (desde 1280px son cuatro) el nombre se cortaba: los chips bajan junto a Check In y el
-                provider va en su renglón (2026-10-19). Ahí el botón sube al renglón de Check In y los chips y el provider
-                queda último (`order-last`): antes el provider ocupaba el renglón del medio y el botón quedaba solo en un
-                cuarto, y al expandir el menú -de 408 a 381px de panel- la fila pasaba de 86 a 139px (Julián, 2026-10-25). Si
-                tampoco entra, el botón baja a su propio renglón. */}
+            {/* Provider y sala a la izquierda, la acción o el estado a la derecha; si no entran, el final baja. */}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-              <span className="flex items-center gap-1.5">
-                {CHECK_IN}
-                <ChipsTurno className="@sm:hidden" />
-              </span>
-              <span className="order-last min-w-0 basis-full truncate text-[11px] text-ink-muted @sm:order-none @sm:min-w-[140px] @sm:flex-1 @sm:basis-0" title={donde}>{donde}</span>
-              <span className="ml-auto">{boton}</span>
+              <span className="min-w-[120px] flex-1 truncate text-[12px] text-ink-muted" title={donde}>{donde}</span>
+              <span className="ml-auto flex shrink-0">{fin}</span>
             </div>
           </div>
         </div>
@@ -112,14 +108,11 @@ export function AppointmentRow({ appt, id, activa, onSelect, onEdit, ocultarOper
             <Clock className="size-3.5 text-ink-medium" />{appt.time}
           </span>
           {iniciales}
-          <span className="flex w-52 shrink-0 items-center gap-2">
-            <NombreTurno appt={appt} id={id} activa={activa} onSelect={onSelect} />
-            {CHECK_IN}
-          </span>
+          <NombreTurno appt={appt} id={id} activa={activa} onSelect={onSelect} className="w-52 shrink-0" />
           <span className="min-w-0 flex-1 truncate text-[12px] text-ink-soft">{appt.provider}</span>
           {!ocultarOperatorio && <span className="w-24 shrink-0 truncate text-[12px] text-ink-soft">{appt.operatory}</span>}
-          <ChipsTurno />
-          <span className="flex w-28 shrink-0 justify-end">{boton}</span>
+          {chips && <ChipsTurno />}
+          <span className="flex w-32 shrink-0 justify-end">{fin}</span>
           {menu}
         </div>
       </div>

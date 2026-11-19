@@ -100,6 +100,7 @@ const PILL = {
   ok: 'bg-dash-ok-bg border-dash-ok-fg text-dash-ok-fg',
   busy: 'bg-dash-busy-bg border-dash-busy-fg text-dash-busy-fg',
   bad: 'bg-dash-bad-bg border-dash-bad-fg text-dash-bad-fg',
+  neutral: 'bg-white border-ink-muted text-ink-medium',
 } as const
 
 export function StatusPill({
@@ -121,6 +122,16 @@ export function StatusPill({
       )}
     >
       {children}
+    </span>
+  )
+}
+
+/* La cuenta junto al título de un panel (Today Appointments y Recent Patients de Patients; Appointments, Waiting Room
+   y Rooms del Dashboard). */
+export function Globo({ n }: { n: number }) {
+  return (
+    <span className="bg-dash-blue flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold text-white">
+      {n}
     </span>
   )
 }

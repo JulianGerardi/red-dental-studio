@@ -1,10 +1,12 @@
-import { Calendar, Check, ChevronDown, User } from 'lucide-react'
+import { Check, ChevronDown, User } from 'lucide-react'
 import { StatusPill } from './primitives'
 import type { Appointment } from './AppointmentCard'
 import { Avatar } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
+import type { ResumenSala } from './dashboard-data'
 
-export type OperatoryStatus = 'Available' | 'Busy' | 'Unavailable'
+/* No bookings: hoy no tiene turnos, no que esté fuera de servicio (eso es Unavailable). Ver dashboard.md, 2026-11-19. */
+export type OperatoryStatus = 'Available' | 'Busy' | 'No bookings' | 'Unavailable'
 
 export type Operatory = {
   name: string
@@ -16,6 +18,7 @@ export type Operatory = {
 const TONE = {
   Available: 'ok',
   Busy: 'busy',
+  'No bookings': 'neutral',
   Unavailable: 'bad',
 } as const
 
@@ -24,49 +27,58 @@ const TONE = {
 export const OPERATORY_SURFACES = {
   Available: 'border-dash-ok-fg bg-dash-ok-bg',
   Busy: 'border-dash-busy-fg bg-dash-busy-bg',
+  'No bookings': 'border-ink-faint bg-surface-muted',
   Unavailable: 'border-dash-bad-fg bg-dash-bad-bg',
 } as const
 
-/* Una sala del Dashboard, con el diseño del 2026-10-19 (artifact de Julián): nombre, estado, cuántos pacientes tiene hoy y
-   el profesional. Con `onToggle` es un acordeón: tocarla despliega la línea del día de esa sala -hora, paciente, motivo,
-   profesional y si ya se atendió o viene-, y no filtra nada de afuera. Va adentro de un panel (card interna, blanca).
-   Ver design-reference/figma/modulos/dashboard.md. */
-export function OperatoryCard({ room, turnos, abierta, onToggle, onSelect }: {
+/* Una sala del Dashboard: nombre, cuántos turnos tiene hoy, estado y, cerrada, quién está ahora (Now) y quién sigue
+   (Next), para coordinar el recambio sin abrirla (comparativa del 2026-11-19). Con `onToggle` es un acordeón que
+   despliega la línea del día de la sala. Ver design-reference/figma/modulos/dashboard.md. */
+export function OperatoryCard({ room, turnos, resumen, abierta, onToggle, onSelect }: {
   room: Operatory
-  /** Los turnos del día en esta sala. Con ellos, "Patients today" es su cantidad y coincide con la línea. */
+  /** Los turnos del día en esta sala, para la línea desplegada. */
   turnos?: Appointment[]
+  /** Estado, cuenta, Now y Next calculados de la agenda (`resumenSala`). Sin él, los del dato de la sala. */
+  resumen?: ResumenSala
   abierta?: boolean
   /** La card se vuelve un botón (aria-expanded) que despliega la línea. */
   onToggle?: () => void
   /** Tocar un turno de la línea (abre la ficha del paciente). */
   onSelect?: (appt: Appointment, el: HTMLElement) => void
 }) {
-  const cuantos = turnos ? turnos.length : room.patientsToday
+  const status = resumen?.status ?? room.status
+  const cuantos = resumen ? resumen.cuantos : turnos ? turnos.length : room.patientsToday
+  const ahora = resumen?.ahora
+  const siguiente = resumen?.siguiente
   const cabecera = (
     <>
       <span className="flex items-center justify-between gap-2">
-        <span className="text-dash-name truncate text-sm leading-none font-semibold">{room.name}</span>
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="text-dash-name truncate text-sm leading-none font-semibold">{room.name}</span>
+          {/* Cuenta turnos, no personas (dashboard.md, 2026-11-19). */}
+          <span
+            title={`${cuantos} ${cuantos === 1 ? 'appointment' : 'appointments'} today`}
+            className="bg-dash-count-bg text-dash-blue-hover shrink-0 rounded-full px-2 py-[3px] text-[11px] leading-none font-medium"
+          >
+            {cuantos}<span className="sr-only"> {cuantos === 1 ? 'appointment' : 'appointments'} today</span>
+          </span>
+        </span>
         <span className="flex shrink-0 items-center gap-1.5">
-          <StatusPill tone={TONE[room.status]}>{room.status}</StatusPill>
+          <StatusPill tone={TONE[status]}>{status}</StatusPill>
           {onToggle && <ChevronDown aria-hidden className={cn('text-ink-muted size-4 transition-transform', abierta && 'rotate-180')} />}
         </span>
       </span>
-      <span className="text-dash-muted flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs">
-        <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-          <Calendar className="size-3.5 shrink-0" />
-          <span>Patients today:</span>
-          <span className="bg-dash-count-bg text-dash-blue-hover rounded-full px-2 py-[3px] text-[11px] leading-none font-medium">{cuantos}</span>
+      {(ahora || siguiente) && (
+        <span className="text-dash-muted flex min-w-0 flex-col gap-0.5 text-xs">
+          {ahora && <span className="truncate">Now: {ahora.name} · {ahora.provider}</span>}
+          {siguiente && <span className="truncate">Next: {siguiente.time} · {siguiente.name} · {siguiente.provider}</span>}
         </span>
-        <span className="flex min-w-0 items-center gap-1.5">
-          <User className="size-3.5 shrink-0" />
-          <span className="truncate">{room.provider}</span>
-        </span>
-      </span>
+      )}
     </>
   )
 
   return (
-    <div className={cn('flex flex-col overflow-hidden rounded-lg border', OPERATORY_SURFACES[room.status], abierta && 'shadow-panel')}>
+    <div className={cn('flex flex-col overflow-hidden rounded-lg border', OPERATORY_SURFACES[status], abierta && 'shadow-panel')}>
       {onToggle ? (
         <button
           type="button" aria-expanded={!!abierta} onClick={onToggle} title={abierta ? `Hide ${room.name}'s day` : `Show ${room.name}'s day`}
@@ -78,7 +90,7 @@ export function OperatoryCard({ room, turnos, abierta, onToggle, onSelect }: {
         <div className="flex w-full min-w-0 flex-col gap-1.5 px-3.5 py-3">{cabecera}</div>
       )}
       {abierta && (
-        <div className={cn('border-t bg-white', OPERATORY_SURFACES[room.status].split(' ')[0])}>
+        <div className={cn('border-t bg-white', OPERATORY_SURFACES[status].split(' ')[0])}>
           <LineaDelDia room={room} turnos={turnos ?? []} onSelect={onSelect} />
         </div>
       )}
@@ -101,6 +113,7 @@ export function LineaDelDia({ room, turnos, onSelect }: {
     <ol aria-label={`${room.name} today`} className="flex flex-col px-3.5 pt-3 pb-3 motion-safe:animate-[loc-in_160ms_ease-out]">
       {ordenados.map((t, i) => {
         const hecho = !!(t as { completado?: boolean }).completado
+        const enCurso = !!(t as { enCurso?: boolean }).enCurso
         const ultimo = i === ordenados.length - 1
         const contenido = (
           <>
@@ -110,7 +123,7 @@ export function LineaDelDia({ room, turnos, onSelect }: {
               <span className="flex items-center justify-between gap-2 text-[11px]">
                 <span className="text-ink-muted truncate">{t.motivo ?? 'Check-up'}</span>
                 <span className={cn('shrink-0 font-semibold', hecho ? 'text-dash-ok-fg' : 'text-dash-blue')}>
-                  {hecho ? 'Complete' : 'Upcoming'}
+                  {hecho ? 'Complete' : enCurso ? 'In progress' : 'Upcoming'}
                 </span>
               </span>
               <span className="text-ink-muted flex items-center gap-1 truncate text-[11px]"><User className="size-3 shrink-0" />{t.provider}</span>
