@@ -87,8 +87,20 @@ el aviso de Vitals no están capturados). Pendiente de antes: en la card del tur
 apilados y de distinto ancho; en la app van de a dos y del mismo ancho. Edit sigue mostrando el drawer viejo: Edit
 Patient como pantalla (PR #155) todavía no se documentó.
 
+2026-11-19 (PR #160, New/Edit Patient y tablas de Settings; CON-1328, CON-1329): se recapturaron enteras 🧍 Patients
+(7 flujos, 25 pantallas: suma *New Patient (ya registrado)* y *Edit* pasa a la pantalla con cards), ⚙️ Settings —
+Employees (12), Locations (37) y Accounts (9), y se reconectaron a la library. Dos cosas nuevas del proceso:
+
+- **`html_to_figma` puede responder 504 y terminar igual**: antes de reintentar, mirar la página. Si se reintenta, entran
+  frames duplicados (pasó en Patients) y hay que borrar un juego antes de ordenar.
+- **`motor` y `chipcount` ya no corren**: buscan la página 🎨 Design System, que ya no está en este archivo. Quedan
+  `motorLib` y `chipcountLib`, iguales pero con los componentes de la library (`importComponentSetByKeyAsync` con las
+  claves de `biblio`) y el Button con su propiedad *Icon position* (Leading o Trailing según dónde esté el ícono).
+  `arreglar` también quedó guardado en el archivo (`rds.ds` → `arreglar`, recibe `PAGE_IDS`). Después de los motores,
+  los botones con el texto cortado (el pie Cancel / Save de 60 px, filtros) pasan a ancho por contenido.
+
 **Recapturar una página ya conectada a la library** (Locations, 2026-11-16): después de ordenar y arreglar, correr los
-motores guardados en el archivo, en este orden y con `PAGES` = el nombre de la página: `motor`, `chipcount`, `binder`,
+motores guardados en el archivo, en este orden y con `PAGES` = el nombre de la página: `motorLib`, `chipcountLib`, `binder`,
 `reconectarRun`, `rebindRun` y `estilosRun`. Se corren con `new AsyncFunction('PAGES', 't0', 'LIM', código)(PAGES,
 Date.now(), 45000)`. `rebindRun` puede pasarse de los 60 s de la herramienta; marca cada pantalla terminada, así que se
 vuelve a correr y sigue. Al final, verificar en la sección: 0 instancias locales y los rellenos ligados a variables.

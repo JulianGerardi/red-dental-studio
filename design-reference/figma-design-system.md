@@ -121,8 +121,8 @@ Se aplicó a las 22 páginas de módulos (≈ 280 pantallas), sobre las capturas
 - **Nueva pieza**: crear el componente en la página 🎨 Design System con variantes `Propiedad=Valor`, ligado a variables
   y estilos, nombre = pieza de React, y sumarla a la portada (*Index*).
 - **Conectar pantallas nuevas** (después de capturar, ordenar y arreglar): los motores quedan guardados en el archivo, en
-  datos compartidos del plugin (`namespace rds.ds`): `motor` (instancias de Pill, Avatar, Button, IconButton),
-  `chipcount` (Chip y Count) y `binder` (variables, estilos de texto, radios, espaciados y sombras). Se corren con
+  datos compartidos del plugin (`namespace rds.ds`): `motorLib` (instancias de Pill, Avatar, Button, IconButton, desde
+  la library; `motor`, el viejo, buscaba la página 🎨 Design System que ya no está), `chipcountLib` (Chip y Count) y `binder` (variables, estilos de texto, radios, espaciados y sombras). Se corren con
   `use_figma` leyendo la clave con `figma.root.getSharedPluginData('rds.ds', '<clave>')` y evaluándola como función
   asíncrona con `PAGES` (nombres de página), `t0` y `LIM` (límite de tiempo en ms; 45.000 como máximo, el límite de la
   herramienta es 60 s por llamada).
