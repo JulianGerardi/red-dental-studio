@@ -5,6 +5,20 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
+### Dashboard según las historias de Dashboard 2 (CON-4176 a CON-4180) (#PR)
+- **Menú ⋮ de Appointments** sin *Edit patient* (CON-4177): Edit appointment, Mark as no-show y Cancel appointment.
+- **Vacíos:** *No appointments scheduled for today*, *Waiting room is empty* y, con filtros sin resultados, *No results
+  match your filters* en las dos columnas.
+- **Waiting y Paused** se calculan desde la hora del check-in y del inicio de la pausa actual, y se actualizan cada
+  minuto (CON-4178).
+- **Contador de sala** con tooltip *N appointments today* (`ui/tooltip`).
+- **Start Encounter** en la ficha rápida sólo con el encounter Planned (Checked in), y el pill dice el estado real del
+  encounter (CON-4179).
+- **Para el dev:** `EnEspera` cambia `minutos` por `desde` (HH:MM); helpers `minutosDesde` y `horaDelDia`.
+  `WaitingRoomList` pide `ahora`. `PatientDetailsPopover` suma `encounter` (null: sin pill) e `iniciar`.
+  Propuesta para el backend (`checked_in_at`, historial de estados del encounter / `on_hold_since`) en
+  `modulos/dashboard.md`, 2026-11-19, tercera tanda.
+
 ### Dashboard: cada columna, su momento de la visita; filtros y menú ⋮ según el estado ([#166](https://github.com/JulianGerardi/red-dental-studio/pull/166))
 - **Appointments** muestra sólo las citas que todavía no llegaron, en orden de hora, sin el badge *Check In* ni TR/CC.
   Total en el título y tope de 6 con "Show N more". **Check In** pasa la cita a la Waiting Room.
