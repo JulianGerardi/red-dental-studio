@@ -79,6 +79,14 @@ Mercado Play, Confidentally y Batech tienen la misma lógica: una sección con l
 - **Confidentally**: "Ficha del paciente" con el resumen, los planes de tratamiento, relaciones y facturación y el alta de paciente en dos pasos, desde las pantallas del Figma (`c-*.webp`, a 2x). Los componentes (`c-kit-*.webp`) están recortados de esas mismas pantallas. Esas pantallas también son la tira de la home y la portada del caso; la tarjeta que aparece al pasar por la palabra sigue mostrando el dashboard.
 - **Batech**: "Cada estado" con la lista de análisis, el bloque de cada fuente, la subida de video y la geocerca (`b-flow-*.webp`, recortadas del tablero del flujo). En el kit, las piezas del formulario están reconstruidas en HTML y renderizadas a 2x (`b-kit-h-*.webp`); el resto sale de las pantallas (`b-kit-*.webp`).
 
+## Strike
+
+`_build/strike_page.py` arma el caso del challenge de Strike (ciberseguridad): un flujo guiado para crear un ejercicio de seguridad sobre varios assets. Sigue la misma lógica que Mercado Play: el desafío y su desglose (desde el deck de análisis del Figma), un rail con las cinco páginas del deck, la misma pantalla en boceto, baja y alta fidelidad (`story`), las cinco etapas de la propuesta (`story`), las decisiones de diseño con sus pantallas, el prototipo con Strike Bot y su tour, el abanico de celulares, un UI Kit (`.kd--strike`, negro y cian) y el resultado.
+
+- Pantallas del prototipo (`s-*.webp`): capturadas a 2x del prototipo en React (`JulianGerardi/Strike-Challenge`, publicado en `juliangerardi.github.io/Strike-Challenge/`), recorriendo el happy path completo con Playwright; las de celular (`s-m-*.webp`) a 390 px.
+- Del Figma (`s-deck-*.webp`, `s-sketch/lofi/hifi.webp` y las piezas `st-kit-*.webp` sin `-p-`): exportadas a 1x por el MCP de Figma.
+- Piezas interactivas del kit (`st-kit-p-*.webp`): capturadas a 2x del prototipo.
+
 ## Selected work
 
 Sigue el tema: blanca en modo claro y negra en modo oscuro, con líneas finas entre filas y el número en verde. Cada fila tiene número, título y etiquetas; al pasar el mouse se invierte y se despliega una tira de 5 pantallas a todo el ancho con la descripción debajo. Al abrirse una fila, cada panel sube suave, uno tras otro, y la pantalla de adentro sube un poco más detrás, así las dos capas se leen como profundidad (en el celular pasa lo mismo cuando el proyecto aparece en pantalla). Después cada pantalla flota, y al pasar el mouse se inclina hacia el puntero y se eleva. Las tiras se arman en `_build/common.py` (`tiles_batech`, `tiles_dental`, `tiles_ds`, `tiles_grill`, `tiles_mp`) con `tile_screen` (navegador), `tile_phone` (celular) y `tile_card` (una pieza). El ancho de cada objeto se calcula en el build para que la pantalla entre **entera**, sin recortes.

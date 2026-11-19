@@ -27,6 +27,8 @@
     confidentally: { en: 'Confidentally case study', es: 'Caso Confidentally', href: base + 'work/confidentally.html' },
     'confidentally-ui': { en: 'Confidentally UI case study', es: 'Caso Confidentally UI', href: base + 'work/confidentally-ui.html' },
     grill: { en: 'GRILL case study', es: 'Caso GRILL', href: base + 'work/grill.html' },
+    strike: { en: 'Strike case study', es: 'Caso Strike', href: base + 'work/strike.html' },
+    'strike-proto': { en: 'Strike prototype', es: 'Prototipo de Strike', href: 'https://juliangerardi.github.io/Strike-Challenge/', external: true },
     'mercado-play': { en: 'Mercado Play case study', es: 'Caso Mercado Play', href: base + 'work/mercado-play.html' },
     work: { en: 'Selected work', es: 'Trabajos', href: base + 'index.html#work' },
     process: { en: 'Process', es: 'Proceso', href: base + 'index.html#process' },
@@ -50,6 +52,9 @@
     { id: 'grill', re: /(grill|lunch|almuerzo|comida|food|kitchen|cocina|vianda|gastronom)/i,
       en: 'GRILL Empresas is corporate lunch ordering for a kitchen in Mercedes: employees choose the day’s meal on their phone before the 10:30 cutoff, and the kitchen runs the morning from a panel with the ticket, tray labels, the delivery run and each company’s account. Two connected web apps, light and dark.',
       es: 'GRILL Empresas son pedidos de almuerzo para empresas de una cocina en Mercedes: los empleados eligen la vianda desde el celular antes del cierre de las 10:30 y la cocina maneja la mañana desde un panel con la comanda, las etiquetas, el reparto y la cuenta de cada empresa. Dos web apps conectadas, en claro y oscuro.', links: ['grill'] },
+    { id: 'strike', re: /(strike|ciberseguridad|cybersecurity|pentest|security exercise|ejercicio de seguridad|multi.?asset|strike bot)/i,
+      en: 'Strike is a UX/UI challenge for a cybersecurity platform: one guided flow to create a security exercise across many assets. Julián analysed the problem in a five-page Figma deck (shared settings vs. settings per asset, scale up to 40 assets, control before testing), designed sketches, low-fi wireframes, high fidelity and a design system, and built a working prototype with Claude Code in React. Assets inherit the exercise defaults and can take custom values, bulk changes are confirmed before saving, a readiness check runs before creating, and Strike Bot guides people with a 15-step tour. It works in English and Spanish, on phone and desktop.',
+      es: 'Strike es un challenge de UX/UI para una plataforma de ciberseguridad: un flujo guiado para crear un ejercicio de seguridad sobre muchos assets. Julián analizó el problema en un deck de cinco páginas en Figma (configuración compartida vs. por asset, escala hasta 40 assets, control antes de probar), diseñó bocetos, wireframes de baja, alta fidelidad y un design system, y construyó un prototipo funcional con Claude Code en React. Los assets heredan los valores del ejercicio y pueden tener valores propios, los cambios masivos se confirman antes de guardar, hay un chequeo antes de crear y Strike Bot guía con un tour de 15 pasos. Funciona en inglés y español, en celular y desktop.', links: ['strike', 'strike-proto'] },
     { id: 'mp', re: /(mercado|meli|\bplay\b|streaming|challenge)/i,
       en: 'Mercado Play is a UX/UI challenge for Mercado Libre’s free streaming service. Julián delivered it as a Figma file, now on version 2.0, with its own cover system built from a selected Alert Dialog, the product name in Mercado Libre yellow and multiplayer cursors.',
       es: 'Mercado Play es un challenge de UX/UI para el streaming gratuito de Mercado Libre. Julián lo entregó como un archivo de Figma, ya en su versión 2.0, con un sistema de portada armado con un Alert Dialog seleccionado, el nombre en el amarillo de Mercado Libre y cursores multiplayer.', links: ['mercado-play'] },
@@ -92,8 +97,8 @@
       en: 'He lives in Mercedes, Buenos Aires, Argentina (GMT-3) and works remotely with teams in the Americas and Europe.',
       es: 'Vive en Mercedes, Buenos Aires, Argentina (GMT-3) y trabaja en remoto con equipos de América y Europa.', links: ['contact'] },
     { id: 'projects', re: /(project|proyecto|portfolio|work|trabajos|casos|case)/i,
-      en: 'There are five case studies: Batech AI Platform, Confidentally (under NDA), Confidentally UI, GRILL Empresas and Mercado Play. Which one should I tell you about?',
-      es: 'Hay cinco casos: Batech AI Platform, Confidentally (bajo NDA), Confidentally UI, GRILL Empresas y Mercado Play. ¿De cuál te cuento?', links: ['work'] },
+      en: 'There are six case studies: Batech AI Platform, Confidentally (under NDA), Confidentally UI, GRILL Empresas, Strike and Mercado Play. Which one should I tell you about?',
+      es: 'Hay seis casos: Batech AI Platform, Confidentally (bajo NDA), Confidentally UI, GRILL Empresas, Strike y Mercado Play. ¿De cuál te cuento?', links: ['work'] },
     { id: 'about', re: /(who|quién|quien|about him|sobre él|sobre el|perfil|profile|summary|resum|what does he do|qué hace|que hace|present)/i,
       en: 'Julián Gerardi is a Senior Product Designer and Lead UX/UI designer from Mercedes, Buenos Aires. For 8+ years he has designed SaaS products, brands and visual systems for teams in the US, Mexico, Ireland and Argentina: user research, flows, design systems and high-fidelity UI, working with developers, stakeholders and CEOs, and using Claude Code to turn ideas into working prototypes.',
       es: 'Julián Gerardi es Senior Product Designer y Lead UX/UI de Mercedes, Buenos Aires. Hace más de 8 años diseña productos SaaS, marcas y sistemas visuales para equipos de EE. UU., México, Irlanda y Argentina: research con usuarios, flujos, design systems y UI de alta fidelidad, trabajando con devs, stakeholders y CEOs, y con Claude Code para convertir ideas en prototipos funcionales.', links: ['work', 'cv'] },
@@ -166,6 +171,7 @@
     { file: 'work/confidentally.html', en: 'Confidentally', es: 'Confidentally' },
     { file: 'work/confidentally-ui.html', en: 'Confidentally UI', es: 'Confidentally UI' },
     { file: 'work/grill.html', en: 'GRILL Empresas', es: 'GRILL Empresas' },
+    { file: 'work/strike.html', en: 'Strike', es: 'Strike' },
     { file: 'work/mercado-play.html', en: 'Mercado Play', es: 'Mercado Play' }
   ];
   var HOME = [['#process', 'Process', 'Proceso'], ['#experience', 'Experience', 'Experiencia'], ['#about', 'About', 'Sobre mí'], ['#contact', 'Contact', 'Contacto']];
