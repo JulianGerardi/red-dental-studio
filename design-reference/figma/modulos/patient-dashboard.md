@@ -562,3 +562,15 @@ usuarios:** si el provider entiende que el botón es para firmar la nota, o hace
 
 `tests/patient-dashboard.e2e.ts`: End encounter → Remind me later → la ficha muestra Pending Signature sin desplegable;
 Review and sign lo saca.
+
+### Pacientes que arrancan con Pending Signature (2026-11-10, segunda vuelta)
+
+Julián: "poné algunos con pending signature así no tengo que hacer el flujo".
+
+- La nota pendiente pasa a ser **por paciente** (`lib/notaClinica`, un conjunto de ids). Arrancan con la nota sin firmar
+  `patient-0002`, `patient-0003` y `patient-0005` (`NOTA_PENDIENTE_INICIAL`); `patient-0001`, el de los links de siempre,
+  sigue con Start Enconter para ver los dos estados.
+- **Clinical Mode** desde el panel abre el del paciente de la ficha (`/patients/<id>/clinical-mode`). Antes iba siempre a
+  `/patients/john-smith/clinical-mode` y volvía al primer paciente, así que la nota pendiente quedaba en otro.
+- Sigue perdiéndose al recargar (vuelve a la semilla). `ClinicalNoteDialog` pide `paciente`.
+- `tests/patient-dashboard.e2e.ts`: `patient-0002` abre con Pending Signature.

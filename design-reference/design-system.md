@@ -1325,3 +1325,22 @@ Documenta lo publicado en el PR #156 (devolución de diseño de Abril; sin histo
 2. **Elements / Section notice** se borra con `ui/section-notice`: la app ya no lo usa. La entrada de 2026-10 que lo
    presentaba queda como historia.
 3. **Figma del design system**: sale el componente *Section notice* de *Feedback & Overlays*; *Alert* sigue igual.
+
+## New Patient como 2.0, Edit Patient como la ficha de un empleado y menús de tabla (2026-11-18, CON-1328, CON-1329)
+
+Documenta lo publicado en el PR #160 (documentación en el PR #164). Decisiones en `modulos/patients.md`, `employees.md`, `locations.md` y
+`settings-accounts.md` (2026-11-18).
+
+1. **Pages / Parts / Patient modals** pasa a la estructura de *Elements / Buttons*: descripción con las reglas y
+   **Probalo**, *Playground* (New Patient), *Parts* (los pasos de New y las cards de Edit), *States* y *Specs*.
+   - States nuevos: *New Patient — Duplicate* (Alert danger), *Edit Patient* (la pantalla, con datos) y *Edit Patient —
+     Missing data* (Save Changes marca teléfono, dirección y Gender). Fields suma *Contact* y *Address*
+     (`CamposContacto`, `CamposDireccion`); *Demography* muestra Interpreter Required al lado de Language.
+   - Salen las stories del drawer viejo de Edit Patient (pestañas, Guardian, error en otra pestaña) y la del formulario
+     fijo del Figma 3640:72713: se borraron `EditPatientModal` y `EditPatientForm`, que la app ya no usaba.
+   - Tarjeta Jira: suma CON-1328 y CON-1329.
+2. **Fields**: regla y story *States → Checkbox beside a field*: una opción que va con un select va en su misma fila, a
+   36px de alto y abajo de la celda. `OptionCheckbox` acepta `className`.
+3. **Tables (DataTable) → Pattern for every table**: *Link* aclara que en Settings el nombre es texto (`PersonCell` sin
+   `to` dibuja texto) y suma la fila *Row actions*: ícono a la izquierda, nombre corto, *Edit* primero.
+4. **Drawer** y **Tabs**: dejan de citar el drawer de Edit Patient con pestañas.

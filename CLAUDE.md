@@ -137,7 +137,8 @@ El código lo toman **jonatan784** y **betsyMb**, y se enteran de cada cambio po
   "Contact", "Address"), nunca "Step". Secciones sin caja ni borde, campos de a dos, pie con dos botones del mismo
   ancho. Sólo las preguntas sí/no quedan como `ui/confirm-dialog`. Título sin bajada. Editar algo ya cargado no lleva
   pasos: pestañas como las de la ficha de una Location y un solo "Save Changes" (Edit Appointment en drawer; Edit
-  Patient es una pantalla, `/patients/:id/edit`, como la ficha de la Location).
+  Patient es una pantalla, `/patients/:id/edit`, con el formato de la ficha de un empleado: cards apiladas y sin
+  pestañas).
 - **Cards:** la card sobre el fondo gris de la página es `TARJETA_PANEL` (sombra, **sin borde**); la que va adentro de
   otra es `TARJETA_INTERNA` / `InnerCard` (línea de 0,5 px gris tenue + sombra suave, en `shadow-inner-card`). La línea
   fina se dibuja con sombra inset: Chrome redondea `border-[0.5px]` a 1 px y una sombra externa se corta en listas con

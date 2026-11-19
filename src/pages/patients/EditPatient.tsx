@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PageTitle } from '@/components/ui/page-title'
-import { TextField, SelectField, OptionCheckbox, FormFooter } from '@/components/patients/form'
+import { FormFooter } from '@/components/patients/form'
 import { Breadcrumb } from '@/components/ui/breadcrumb'
 import {
   CamposContacto, CamposDemography, CamposDireccion, CamposGeneral, duplicadoDe, useFormPaciente,
@@ -17,10 +17,6 @@ import { clavePacienteFoto, usePhoto } from '@/lib/usePhoto'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
 import { cn } from '@/lib/utils'
 
-/* Figma 3640:72713 "Patients — Edit Patient (Full Page)".
-   Tres secciones a 1088 de ancho: General (2×2 + 1 full), Demography
-   (7 full-width + un checkbox) y Address (3 filas de 2). */
-
 export function Section({ title, children }: { title: string; children: React.ReactNode }) {
   /* En el drawer va sin caja, como en Confidentally 2.0. */
   if (useEnDrawer()) return <DrawerSection title={title}>{children}</DrawerSection>
@@ -32,54 +28,13 @@ export function Section({ title, children }: { title: string; children: React.Re
   )
 }
 
-/* El cuerpo de la página del Figma 3640:72713, con campos fijos. La app ya no lo usa: Edit Patient es EditPatientPage,
-   con los datos del paciente (patients.md, 2026-11-17). */
-export function EditPatientForm() {
-  return (
-    <div className="flex flex-col gap-6">
-      <Section title="General Information">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <TextField label="First Name" required placeholder="John" />
-          <TextField label="Middle Name" placeholder="Lorem" />
-          <TextField label="Last Name" required placeholder="Smith" />
-          <TextField label="Preferred Name" placeholder="Johnny" />
-          <TextField label="Email" placeholder="john.smith@hotmail.com" />
-        </div>
-      </Section>
-
-      <Section title="Demography Information">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <SelectField label="Gender" required />
-          <SelectField label="Race" />
-          <SelectField label="Ethnicity" />
-          <SelectField label="Profession" />
-          <SelectField label="Nationality" />
-          <SelectField label="Language" />
-          <SelectField label="Religion" />
-        </div>
-        <OptionCheckbox label="Interpreter Required" />
-      </Section>
-
-      <Section title="Address Information">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <TextField label="Address Line 1" placeholder="Street and number" />
-          <TextField label="Address Line 2" placeholder="Apartment, suite, etc." />
-          <SelectField label="Country" required />
-          <SelectField label="State" required />
-          <TextField label="City" required placeholder="City" />
-          <TextField label="ZIP Code" placeholder="00000" />
-        </div>
-      </Section>
-    </div>
-  )
-}
-
 /* Edit Patient con el formato de la ficha de un empleado (Settings → Employees): una sola pantalla, sin pestañas, con la
    foto editable, el nombre y su estado arriba, y General, Contact, Address y Demographic en cards apiladas (CON-1329).
    Sin Guardian ni el buscador de personas: la edición no vincula a nadie. Un solo Save Changes; si falta algo, lleva al
    campo. Cuelga de la tabla: migas, Cancel y Save vuelven a Patients. Ver patients.md, 2026-11-18. */
-export default function EditPatientPage() {
-  const { id = 'john-smith' } = useParams()
+/* `pacienteId` es para Storybook: abrir la pantalla con un paciente sin pasar por la ruta. */
+export default function EditPatientPage({ pacienteId = 'john-smith' }: { pacienteId?: string }) {
+  const { id = pacienteId } = useParams()
   const navigate = useNavigate()
   const { patients, datosDe, getPatient, updatePatient } = usePatients()
   const datos = datosDe(id) ?? DATOS_JOHN_SMITH

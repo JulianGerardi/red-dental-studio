@@ -3,6 +3,31 @@
 Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber el dev. El porqué de cada decisión está en
 `design-reference/figma/modulos/<módulo>.md`; lo anterior al 2026-10-06, en `git log` y en esos mismos archivos.
 
+## 2026-11-19
+
+### Documentación: New/Edit Patient, menús de tabla y Figma de Patients y Settings ([#164](https://github.com/JulianGerardi/red-dental-studio/pull/164))
+- **Storybook:** *Pages / Parts / Patient modals* pasa a Playground, Parts, States y Specs, con New Patient (pasos,
+  duplicado) y Edit Patient (la pantalla, completa y con datos que faltan); Fields suma *Contact* y *Address*. *Fields*
+  suma la regla y la story *Checkbox beside a field*; *Tables* la fila *Row actions* y el nombre como texto en Settings.
+- **Se borran** `EditPatientModal` (el drawer viejo con pestañas) y `EditPatientForm` (el formulario fijo del Figma): la
+  app ya no los usaba. `PatientDetail` deja el estado `'edit'` que nadie abría.
+- **Screens & Flows:** recapturadas 🧍 Patients (suma *New Patient (ya registrado)*; *Edit* es la pantalla con cards) y
+  Settings — Employees, Locations y Accounts, conectadas a la library.
+- **Para el dev:** `EditPatientPage` acepta `pacienteId` (sólo para Storybook). En Figma, los motores para conectar
+  pantallas son `motorLib` y `chipcountLib`; `motor` y `chipcount` ya no corren (`figma-docs.md`, 2026-11-19).
+
+### Pending Signature por paciente, con tres pacientes de ejemplo ([#133](https://github.com/JulianGerardi/red-dental-studio/pull/133))
+- `patient-0002`, `patient-0003` y `patient-0005` abren con **Pending Signature**, para verlo sin hacer el flujo;
+  `patient-0001` sigue con Start Encounter. La nota sin firmar queda en el paciente desde el que se cerró el encuentro.
+- Clinical Mode desde el panel abre el del paciente de la ficha (`/patients/<id>/clinical-mode`), ya no siempre el
+  primero.
+- **Para el dev:** `useNotaPendiente(paciente)` / `setNotaPendiente(paciente, v)` en `lib/notaClinica.ts`, semilla en
+  `NOTA_PENDIENTE_INICIAL`; `ClinicalNoteDialog` pide `paciente`. Decisión en `patient-dashboard.md` (2026-11-10).
+
+### Figma: card de cita del paciente (Patient appointment card) conectada al design system ([#163](https://github.com/JulianGerardi/red-dental-studio/pull/163))
+- **Patient appointment card** nuevo en el design system (`🗂️ Cards & Layout`): card de cita de la ficha del paciente con estados Booked (con Cancel), Cancelled, Fulfilled y No Show. 119 cards de las pantallas pasan a instancias; diferencia con el original ≈ 0,16 % de los píxeles.
+- **Para el dev:** la app no cambia. Motor `citas` guardado en el archivo de flujos; pendientes (campos, tablas, ícono flecha en los botones) en `design-reference/figma-design-system.md`, sección *Card de cita del paciente conectada*.
+
 ## 2026-11-18
 
 ### Figma: fila de tarea (Task row) conectada al design system ([#162](https://github.com/JulianGerardi/red-dental-studio/pull/162))

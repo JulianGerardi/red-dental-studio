@@ -144,7 +144,8 @@ export function PatientSidePanel({
   const [colapsadoCompartido, setColapsado] = useColapso()
   const colapsado = vista.collapsed ?? colapsadoCompartido
   const [info, setInfo] = useState(false)
-  const notaGuardada = useNotaPendiente()
+  const paciente = basePath.split('/').pop() ?? ''
+  const notaGuardada = useNotaPendiente(paciente)
   const notaPendiente = vista.pendingSignature ?? notaGuardada
   const [firmar, setFirmar] = useState(false)
   const cierre = useRef<number | null>(null)
@@ -222,7 +223,7 @@ export function PatientSidePanel({
       <div className={cn('mt-3 flex flex-col gap-2 sm:flex-row lg:flex-col', colapsado && 'lg:hidden')}>
         {notaPendiente ? <PendingSignatureButton onClick={() => setFirmar(true)} /> : <EncounterButton basePath={basePath} />}
         <Link
-          to="/patients/john-smith/clinical-mode"
+          to={`${basePath}/clinical-mode`}
           data-tour="pat-clinical-mode"
           className="text-dash-blue flex w-full items-center justify-center gap-2 rounded-md bg-[#eef5ff] py-2 text-[13px] font-medium"
         >
@@ -239,7 +240,7 @@ export function PatientSidePanel({
           {notaPendiente && conTooltip('Pending Signature', <PendingSignatureButton soloIcono onClick={() => setFirmar(true)} />)}
           {conTooltip('Clinical Mode', (
             <Link
-              to="/patients/john-smith/clinical-mode"
+              to={`${basePath}/clinical-mode`}
               aria-label="Clinical Mode"
               className="text-dash-blue flex size-9 items-center justify-center rounded-md bg-[#eef5ff]"
             >
@@ -325,7 +326,7 @@ export function PatientSidePanel({
       </div>
 
       {contacto && <EditContactModal onClose={() => setContacto(false)} />}
-      <ClinicalNoteDialog open={firmar} onClose={() => setFirmar(false)} />
+      <ClinicalNoteDialog open={firmar} onClose={() => setFirmar(false)} paciente={paciente} />
     </aside>
     </TooltipProvider>
   )
@@ -410,7 +411,7 @@ export function EncounterButton({ basePath = '/patients/john-smith' }: { basePat
           </DropdownMenu>
         )}
       </span>
-      <ClinicalNoteDialog open={nota} onClose={() => setNota(false)} />
+      <ClinicalNoteDialog open={nota} onClose={() => setNota(false)} paciente={basePath.split('/').pop() ?? ''} />
     </div>
   )
 }
