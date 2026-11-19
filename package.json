@@ -21,7 +21,8 @@
     "prebuild": "npm run ds:scan",
     "test:e2e": "e2e run",
     "figma:capturar": "node scripts/figma/capturar.mjs",
-    "figma:portada": "node scripts/figma/portada.mjs"
+    "figma:portada": "node scripts/figma/portada.mjs",
+    "emails:exportar": "node scripts/emails-exportar.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

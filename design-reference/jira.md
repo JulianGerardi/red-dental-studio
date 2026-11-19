@@ -179,6 +179,25 @@ Documento: [figma/modulos/dashboard.md](figma/modulos/dashboard.md)
 - [CON-2639](https://confidetally.atlassian.net/browse/CON-2639) Dashboard – Pending Tasks
 - [CON-3116](https://confidetally.atlassian.net/browse/CON-3116) [Post Demo] Dashboard
 
+## emails
+
+Documento: [figma/modulos/emails.md](figma/modulos/emails.md). No hay un epic de mails: cada historia vive en el epic
+de su módulo.
+
+**Historias**
+
+- [CON-3325](https://confidetally.atlassian.net/browse/CON-3325) [Manager] Account Onboarding Email · epic CON-895
+- [CON-3451](https://confidetally.atlassian.net/browse/CON-3451) Re enviar email de onboarding · epic CON-895
+- [CON-2908](https://confidetally.atlassian.net/browse/CON-2908) [Patien] 2. Send signing email · epic CON-1132
+- [CON-2909](https://confidetally.atlassian.net/browse/CON-2909) [Patient] 3. Open document from email · epic CON-1132
+- [CON-3162](https://confidetally.atlassian.net/browse/CON-3162) Create User Account for Guardian
+- [CON-3998](https://confidetally.atlassian.net/browse/CON-3998) Crear o vincular usuario y habilitar acceso Guardian
+- [CON-3268](https://confidetally.atlassian.net/browse/CON-3268) Suspender Suscripción · epic CON-3259
+- [CON-3498](https://confidetally.atlassian.net/browse/CON-3498) [Post demo] Email nueva suscription · epic CON-3259 (sin texto)
+- [CON-3499](https://confidetally.atlassian.net/browse/CON-3499) [Post demo] Email para expired suscription · epic CON-3259 (sin texto)
+- [CON-3501](https://confidetally.atlassian.net/browse/CON-3501) [Post demo] Email para cancel suscription · epic CON-3259 (sin texto)
+- [CON-478](https://confidetally.atlassian.net/browse/CON-478) Appointment Reschedule
+
 ## employees
 
 Documento: [figma/modulos/employees.md](figma/modulos/employees.md)
