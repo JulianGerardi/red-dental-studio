@@ -127,3 +127,19 @@ Pedido de Julián: un logo inventado de una clínica en la cabecera y el aviso c
 3. **Variables:** sale `{{logo_url}}` y entran `{{assets_url}}` (la carpeta de las imágenes fijas) y
    `{{practice_logo_url}}`.
 
+## 2026-11-19 · Sin contraseña en el mail y asunto del paciente (CON-3162, CON-2895)
+
+Decisiones de Julián sobre los puntos abiertos de la primera versión:
+
+1. **Link de un solo uso en vez de contraseña temporal** (anomalía 2): en los mails de *Patient portal ready*,
+   *Employee account ready* y *Guardian invitation*, la caja *Login details* queda sólo con el usuario. Debajo va
+   "To start using your account, set your password with the button below:", el botón **Set your password**
+   (`{{set_password_link}}`) y la nota "For your security, this link can only be used once and expires in
+   {{link_expiration}}.". Salen `{{temporary_password}}`, `{{login_link}}` en esos tres mails y la nota de
+   cambiar la contraseña. **Para el backend:** el link lleva un token de un solo uso que vence; el plazo lo
+   definen ellos (en el ejemplo, 48 hours). CON-3162 ya lo prevé ("contraseña temporal o link de activación").
+   La pantalla del portal para crear la contraseña no está en este clon.
+2. **Asunto del paciente nuevo** (anomalía 3): pasa a "Your patient portal account is ready".
+3. **Siguen igual:** los mails propuestos siguen marcados como propuesta hasta que se revisen, y el onboarding lo
+   sigue firmando `{{practice_name}}`, como en el documento (anomalía 4).
+
