@@ -989,3 +989,4 @@ de una fila).
    - *Adjustment type* del crédito arranca vacío ("Select credit type") y es obligatorio.
    - **Sin cambiar:** red.dev muestra datos y Ledger Transactions en una sola página; acá siguen los dos pasos (Payment →
      Allocation), por la regla de drawers con más de una sección. **A decidir con Julián.**
+6. **Household:** el nombre de cada persona es un link a su ficha (pedido de Julián).

@@ -433,3 +433,18 @@ La card de los números (`Stat`) se muda a `src/components/ui/stat-card.tsx` com
 Account usen la misma (ledger.md, CON-4142). `Billing.tsx` la sigue exportando como `Stat`. La bajada pasa a ser
 opcional. Los drawers de los tres botones ahora arrancan el pago con el saldo abierto del paciente repartido en
 *Applied* (red.dev; detalle en ledger.md).
+
+## Billing alineado con los videos de red.dev y con el Ledger (2026-11-19)
+
+Julián mandó cuatro grabaciones de Billing de red.dev y pidió respetar las alineaciones del Ledger.
+
+1. **Las cinco métricas van de borde a borde**, arriba de la actividad y de Find Patient, como red.dev y el Ledger.
+   Revierte el bento del 2026-10-13 (números en la columna izquierda). La columna derecha deja de atarse al alto de la
+   izquierda: Find Patient tiene 440px (unos cinco pacientes y *Show N more*) y Today va debajo.
+2. **Con un paciente elegido, Patient Payment (-), Credit Adjustment (-) y Charge Adjustment (+) van en la fila del
+   título**, a la izquierda de Export CSV (que se apaga), como red.dev y el Ledger. Antes iban arriba del título del
+   panel. Sale *Export statement* de Billing: red.dev no lo tiene acá.
+3. Sin cambios: Patient View / Guarantor View y Columns en el encabezado del panel, la tabla y los drawers (los mismos del
+   Ledger, con "Guarantor" en Apply to).
+4. **A validar:** en el celular, al elegir un paciente de Find Patient (debajo de la tabla) la pantalla sube al título,
+   donde están sus botones.

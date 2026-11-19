@@ -1,6 +1,6 @@
 import { Tabs } from '@/components/ui/tabs'
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, Plus, CalendarCheck, CalendarClock, Inbox } from 'lucide-react'
+import { Plus, CalendarCheck, CalendarClock, Inbox } from 'lucide-react'
 import { AppointmentDetailsDrawer } from '@/components/scheduling/AppointmentDetailsDrawer'
 import { ViewMenu, VISTA_INICIAL, type VistaCalendario } from '@/components/scheduling/ViewFiltersPanel'
 import { NewAppointmentModal, type DatosTurno } from '@/components/scheduling/NewAppointmentModal'
@@ -15,7 +15,7 @@ import { Breadcrumb } from '@/components/ui/breadcrumb'
 import { DatePicker, sameDay } from '@/components/ui/date-picker'
 import {
   EVENTOS_INICIALES, FECHA_ANCLA, BLOCK_STYLE,
-  sumarDias, type EventoConFecha, type ApptState,
+  type EventoConFecha, type ApptState,
   fmtExacta,
 } from '@/components/scheduling/calendar-data'
 import { HORAS, hora24 } from '@/components/scheduling/AppointmentSlotPicker'
@@ -165,14 +165,6 @@ export default function Scheduling() {
     aviso.ok(`${ev.patient}'s appointment was deleted.`)
   }
 
-  /* Las flechas y el rótulo siguen la vista, igual que en Google Calendar. */
-  const paso = (n: number) => {
-    setFecha((f) => {
-      if (view === 'Day') return sumarDias(f, n)
-      if (view === 'Week') return sumarDias(f, n * 7)
-      return new Date(f.getFullYear(), f.getMonth() + n, 1)
-    })
-  }
 
   return (
     <div className={CONTENEDOR_PAGINA}>
@@ -224,16 +216,10 @@ export default function Scheduling() {
         </div>
       </div>
 
-      {/* La fecha con el selector de la app (el del Dashboard) y las flechas de la vista; al lado, Status legend
+      {/* La fecha con el selector de la app, igual que el Dashboard (sin flechas); al lado, Status legend
           (scheduling.md, 2026-11-19). */}
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Button variant="secondary" size="md" iconOnly aria-label={`Previous ${view.toLowerCase()}`} onClick={() => paso(-1)}>
-          <ChevronLeft />
-        </Button>
         <DatePicker variant="toolbar" value={fecha} onChange={setFecha} />
-        <Button variant="secondary" size="md" iconOnly aria-label={`Next ${view.toLowerCase()}`} onClick={() => paso(1)}>
-          <ChevronRight />
-        </Button>
         {/* Volver a hoy; desaparece cuando ya estás en hoy, como en el Dashboard. */}
         {!sameDay(fecha, FECHA_ANCLA) && (
           <Button variant="secondary" size="md" onClick={() => setFecha(FECHA_ANCLA)} title="Go to today">

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { slug } from '@/data/patientsStore'
 import {
   Receipt, Wallet, HandCoins, Download, MoveHorizontal, FileText, MinusCircle, PlusCircle,
 } from 'lucide-react'
@@ -164,7 +165,14 @@ export function Household() {
         {personas.map((p) => (
           <li key={p.nombre} className={cn(TARJETA_INTERNA, 'flex min-w-0 items-center gap-3 p-3')}>
             <Avatar aria-hidden initials={inicialesDe(p.nombre)} size={36} />
-            <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-ink" title={p.nombre}>{p.nombre}</span>
+            {/* El nombre lleva a la ficha de cada uno (ledger.md, 2026-11-19). */}
+            <Link
+              to={`/patients/${slug(p.nombre)}`}
+              title={p.nombre}
+              className="text-dash-blue min-w-0 flex-1 truncate rounded-sm text-[13px] font-semibold underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue"
+            >
+              {p.nombre}
+            </Link>
             <Pill tone={p.rol === 'Guarantor' ? 'info' : 'neutral'} size="sm">{p.rol}</Pill>
           </li>
         ))}

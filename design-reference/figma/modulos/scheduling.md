@@ -807,3 +807,5 @@ Pedido de Julián, con una grabación de red.dev.
    aparece sólo fuera de hoy, como en el Dashboard. Antes era un rótulo con un "Today ⌄" que no abría nada.
 2. *Status legend* sube a la misma fila, al lado de la fecha, con la letra y la sombra de los demás controles.
 3. En el detalle del turno el nombre del paciente es un link a su ficha, como red.dev y las cards de turnos.
+4. **Sin flechas** al lado de la fecha (mismo día): el selector queda igual al del Dashboard, sólo el campo y *Today*.
+   Para moverse de semana o de mes se elige el día en el calendario.

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type Ref } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   CreditCard, Search, X, Download, Wallet, MinusCircle, PlusCircle,
 } from 'lucide-react'
@@ -45,8 +45,8 @@ function detalleTipo(m: Movimiento): { texto: string; tono: PillTone } {
 /* Los números son la card de métricas de la app (`ui/stat-card`), la misma del Ledger y de Edit Account. */
 export const Stat = StatCard
 
-/* Los cinco números en la columna izquierda: cinco en fila desde 1280px; antes, 3 + 2 del mismo ancho por fila; en el
-   celular 2 + 2 y el último entero. */
+/* Los cinco números de borde a borde: cinco en fila desde lg; antes, 3 + 2 del mismo ancho por fila; en el celular 2 + 2
+   y el último entero. */
 const LUGAR_NUMERO = ['sm:col-span-2', 'sm:col-span-2', 'sm:col-span-2', 'sm:col-span-3', 'col-span-2 sm:col-span-3']
 
 /* Los filtros de red.dev: Payments junta paciente y seguro; Today, lo del día (billing.md, 2026-11-13). */
@@ -176,7 +176,7 @@ export function PacienteElegido({ paciente, onCerrar }: { paciente: PacienteBill
    su nombre en el título, Patient / Guarantor View y sólo sus movimientos, sin saldos ni columna Balance (son de la cuenta de todas las locations); cada fila se despliega
    con el detalle del Ledger según el tipo (billing.md y ledger.md, 2026-10-14). */
 export function ActividadReciente({
-  filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, onElegir, onAccion, onExportar, refElegido, className, abierta,
+  filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, onElegir, className, abierta,
 }: {
   /** Las filas ya filtradas: por tipo en el resumen, por paciente o garante con uno elegido. */
   filas: (Movimiento & { saldo: number })[]
@@ -188,10 +188,9 @@ export function ActividadReciente({
   vista: VistaPaciente
   onVista: (v: VistaPaciente) => void
   onElegir: (nombre: string) => void
-  /** Los botones de pago y ajuste, arriba del título, sólo con paciente. */
-  onAccion: (tipo: TipoAjusteBilling) => void
-  onExportar: () => void
-  refElegido?: Ref<HTMLDivElement>
+  /** Ya no se usan: los botones de pago van en la fila del título de la página (billing.md, 2026-11-19). */
+  onAccion?: (tipo: TipoAjusteBilling) => void
+  onExportar?: () => void
   className?: string
   /** Con paciente: la fila que arranca desplegada (Storybook). */
   abierta?: string
@@ -207,11 +206,6 @@ export function ActividadReciente({
     <Panel
       title={paciente ? `${paciente.nombre} — Recent Billing Activity` : 'Recent Billing Activity'}
       className={cn('min-w-0', className)}
-      top={paciente && (
-        <div ref={refElegido} className="scroll-mt-4">
-          <AccionesPaciente key={paciente.nombre} onAccion={onAccion} onExportar={onExportar} />
-        </div>
-      )}
       controls={
         <div className="flex flex-wrap items-center gap-2">
           {paciente
@@ -326,18 +320,18 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
   )
 }
 
-/* Los pagos y ajustes son de un paciente: los botones aparecen con uno elegido, arriba del título de su actividad
-   (captura de Julián, 2026-10-13). Botones del design system, md (32px) como dentro de un panel. */
-export function AccionesPaciente({ onAccion, onExportar }: {
+/* Los pagos y ajustes son de un paciente: con uno elegido, los tres botones van en la fila del título, al lado de Export
+   CSV, como red.dev y el Ledger (billing.md, 2026-11-19). */
+export function AccionesPaciente({ onAccion }: {
   onAccion: (tipo: TipoAjusteBilling) => void
-  onExportar: () => void
+  /** Ya no se usa: Export statement salió de Billing (no está en red.dev). */
+  onExportar?: () => void
 }) {
   return (
-    <div className={cn('flex flex-wrap items-center gap-2 px-4 pt-4', ENTRADA)}>
+    <div className={cn('flex flex-wrap items-center gap-2', ENTRADA)}>
       <Button size="md" onClick={() => onAccion('Patient Payment')}><Wallet /> Patient Payment (-)</Button>
       <Button size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit Adjustment (-)</Button>
       <Button size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge Adjustment (+)</Button>
-      <Button size="md" variant="secondary" iconOnly aria-label="Export statement" onClick={onExportar}><Download /></Button>
     </div>
   )
 }
@@ -354,8 +348,6 @@ export default function Billing({ inicial }: {
   const [modal, setModal] = useState<TipoAjusteBilling | null>(null)
   const refElegido = useRef<HTMLDivElement>(null)
   const subir = useRef(false)
-  const refIzquierda = useRef<HTMLDivElement>(null)
-  const [altoResumen, setAltoResumen] = useState<number>()
 
   const pacienteSeleccionado = seleccionado ? PACIENTES_BILLING.find((p) => p.nombre === seleccionado) : undefined
   const grupo = useMemo(() => (seleccionado ? grupoDeGarante(seleccionado) : []), [seleccionado])
@@ -383,17 +375,6 @@ export default function Billing({ inicial }: {
     refElegido.current?.scrollIntoView({ block: 'nearest', behavior: quieto ? 'auto' : 'smooth' })
   }, [seleccionado])
 
-  /* El alto del resumen se guarda para que el bento no se achique al entrar a un paciente (su tabla es más corta). */
-  useEffect(() => {
-    const el = refIzquierda.current
-    if (!el || seleccionado) return
-    const medir = () => setAltoResumen(el.offsetHeight)
-    medir()
-    const ro = new ResizeObserver(medir)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [seleccionado])
-
   /* `saldoDe` (de data/billing.ts) lee el mock estático: acá hace falta el
      saldo con lo que ya se posteó en esta sesión, así que se calcula sobre
      `actividad` -si no, la card de "Open Balance" se queda vieja apenas se
@@ -408,33 +389,34 @@ export default function Billing({ inicial }: {
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      {/* Export CSV, como red.dev: la actividad de la clínica; con un paciente elegido se apaga (billing.md, 2026-11-13). */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* Como red.dev y el Ledger: con un paciente, sus tres botones en la fila del título; Export CSV exporta la
+          actividad de la clínica y con un paciente se apaga (billing.md, 2026-11-13 y 2026-11-19). */}
+      <div ref={refElegido} className="flex scroll-mt-4 flex-wrap items-start justify-between gap-3">
         <PageTitle>Billing</PageTitle>
-        <Button
-          variant="secondary"
-          disabled={!!seleccionado}
-          title={seleccionado ? 'Clear the selected patient to export all activity' : undefined}
-          onClick={() => { exportarCsv(filas); aviso.ok(`${filas.length} transactions exported.`) }}
-        >
-          <Download /> Export CSV
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {pacienteSeleccionado && <AccionesPaciente key={pacienteSeleccionado.nombre} onAccion={setModal} />}
+          <Button
+            variant="secondary"
+            size="md"
+            disabled={!!seleccionado}
+            title={seleccionado ? 'Clear the selected patient to export all activity' : undefined}
+            onClick={() => { exportarCsv(filas); aviso.ok(`${filas.length} transactions exported.`) }}
+          >
+            <Download /> Export CSV
+          </Button>
+        </div>
       </div>
 
-      {/* Bento: la columna derecha toma el alto medido de refIzquierda (--billing-alto, de altoResumen) en vez de
-          estirarse contra ella -estirarse las dos entre sí crea un bucle: cuántas filas entran en Find Patient
-          dependería de su propio alto ya estirado, que a su vez depende de cuántas filas decide mostrar- (Julián,
-          2026-10-19). items-start en vez de stretch: cada columna toma sólo el alto que se le da. Adentro, Find
-          Patient (flex-1) se queda con lo que sobra después de Today (shrink-0). Con un paciente, altoResumen deja de
-          medirse (ver el efecto de arriba) y la columna derecha queda al alto del resumen, así no salta al entrar. */}
-      <div
-        className="mt-5 grid grid-cols-1 items-start gap-4 lg:min-h-[var(--billing-alto,0px)] lg:grid-cols-[minmax(0,1fr)_280px]"
-        style={altoResumen ? ({ '--billing-alto': `${altoResumen}px` } as CSSProperties) : undefined}
-      >
-        <div ref={refIzquierda} className="flex min-w-0 flex-col gap-4">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-6 xl:grid-cols-5">
-            {STATS_BILLING.map((s, i) => <Stat key={s.label} {...s} enFila className={cn(LUGAR_NUMERO[i], 'xl:col-span-1')} />)}
-          </div>
+      {/* Los cinco números de borde a borde, como red.dev y las métricas del Ledger. */}
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-6 lg:grid-cols-5">
+        {STATS_BILLING.map((s, i) => <Stat key={s.label} {...s} enFila className={cn(LUGAR_NUMERO[i], 'lg:col-span-1')} />)}
+      </div>
+
+      {/* La actividad a la izquierda; Find Patient y Today a la derecha, como red.dev. Con las métricas a todo el ancho la
+          columna derecha ya no se ata al alto de la izquierda: Find Patient tiene su alto y Today va debajo
+          (billing.md, 2026-11-19). */}
+      <div className="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="flex min-w-0 flex-col gap-4">
           <ActividadReciente
             className="flex-1"
             filas={filas}
@@ -445,18 +427,13 @@ export default function Billing({ inicial }: {
             vista={vista}
             onVista={setVista}
             onElegir={elegir}
-            onAccion={setModal}
-            onExportar={() => aviso.ok('Statement exported.')}
-            refElegido={refElegido}
           />
         </div>
 
-        <div className="flex min-w-0 flex-col gap-4 lg:h-[var(--billing-alto,auto)]">
-          {/* flex-1: abraza el resto del alto de la columna (lg:h-[var(--billing-alto)] arriba), después de Today.
-              min-h-[220px]: una actividad muy corta (un paciente con pocos movimientos) deja a Today -shrink-0- de
-              igual pidiendo más alto que toda la columna; sin este piso, Find Patient quedaba en 0 y desaparecía. */}
+        <div className="flex min-w-0 flex-col gap-4">
+          {/* Alto propio: entran unos cinco pacientes y "Show N more" abre el resto con scroll adentro. */}
           <BuscarPaciente
-            className="min-h-[220px] flex-1"
+            className="h-[440px]"
             busqueda={busqueda}
             onBusqueda={setBusqueda}
             paciente={pacienteSeleccionado}
