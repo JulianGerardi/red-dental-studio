@@ -27,3 +27,6 @@ dist-ssr
 storybook-static
 
 src/design-system/generated/
+
+# Python
+__pycache__/
