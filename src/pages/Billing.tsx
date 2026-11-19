@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { aviso } from '@/components/ui/toaster'
 import { moneda, pendienteDe, tieneCredito, type Movimiento } from '@/data/ledger'
 import {
-  APLICACIONES_BILLING, PACIENTES_BILLING, buscarPacientes, grupoDeGarante, ACTIVIDAD_RECIENTE, STATS_BILLING, STATS_HOY, FILTROS_ACTIVIDAD, HOY_BILLING,
+  APLICACIONES_BILLING, registrarAplicaciones, PACIENTES_BILLING, buscarPacientes, grupoDeGarante, ACTIVIDAD_RECIENTE, STATS_BILLING, STATS_HOY, FILTROS_ACTIVIDAD, HOY_BILLING,
   VISTAS_PACIENTE, type FiltroActividad, type PacienteBilling, type TipoAjusteBilling, type VistaPaciente,
 } from '@/data/billing'
 import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
@@ -434,8 +434,12 @@ export default function Billing({ inicial }: {
      postea un primer pago. */
   const saldoActual = (paciente: string) => actividad.find((m) => m.paciente === paciente)?.saldo ?? 0
 
-  const registrarPago = (m: Omit<Movimiento, 'id'>) => {
-    setActividad((p) => [{ ...m, id: `act-${Date.now()}`, saldo: saldoActual(m.paciente) + m.monto }, ...p])
+  /* Un movimiento por transacción; lo que aplicó a cada cargo se suma a las aplicaciones para que esos cargos dejen de
+     figurar como abiertos (billing.md, 2026-11-19). */
+  const registrarPago = (m: Omit<Movimiento, 'id'>, aplicado: Record<string, number>) => {
+    const id = `act-${Date.now()}`
+    registrarAplicaciones(Object.entries(aplicado).map(([cargo, monto], i) => ({ id: `ap-${id}-${i}`, origen: id, cargo, fecha: m.fecha, monto })))
+    setActividad((p) => [{ ...m, id, saldo: saldoActual(m.paciente) + m.monto }, ...p])
     aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} posted for ${m.paciente}.`)
     setModal(null)
   }
@@ -504,10 +508,12 @@ export default function Billing({ inicial }: {
         </div>
       </div>
 
-      {modal && (
+      {modal && seleccionado && (
         <PostPaymentDialog
           tipoInicial={modal}
-          pacienteInicial={seleccionado ?? undefined}
+          pacienteInicial={seleccionado}
+          movs={actividad}
+          alcanceGuarantor={vista === 'Guarantor View'}
           onClose={() => setModal(null)}
           onGuardar={registrarPago}
         />

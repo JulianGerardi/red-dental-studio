@@ -426,3 +426,25 @@ Pedido de Julián: revisar qué hace cada acción y cómo se abren los drawers.
 
 **Para validar con usuarios:** si separar Ledger Transactions en un segundo paso hace más lento el cobro en recepción
 frente a verlo todo junto, como en red.dev.
+
+## Misma lógica que el Ledger: Apply to, reparto y crédito (2026-11-19)
+
+**Jira:** CON-3738, CON-3739 y CON-3735 (epic CON-3732; ver `ledger.md`, misma fecha). Julián: los tres formularios "tienen
+la misma lógica para billing".
+
+1. **Los drawers de Billing son los formularios del Ledger** (`modo="drawer"`); `PostPaymentDialog` sólo elige cuál. La
+   lógica (cargos abiertos, reparto del más viejo al más nuevo, topes y mensajes, crédito sin aplicar, un movimiento por
+   pago con sus métodos) está en `lib/ledgerAplicacion.ts` y se explica en `ledger.md`.
+2. **Cierra la diferencia que quedaba** de *CON-4147*: el pago abre con el total abierto y ya repartido en Applied, no vacío.
+3. **Apply to:** el guarantor (todo el hogar), él mismo y los pacientes a su cargo (`grupoDeGarante`). Abre en el paciente
+   elegido en Patient View y en el guarantor en Guarantor View.
+4. **Los cargos abiertos salen de lo posteado en la sesión** (`actividad` + `APLICACIONES_BILLING`), no del mock fijo
+   (`cargosAbiertos` de `data/billing.ts` se borró). Lo que aplica cada pago se suma a las aplicaciones con
+   `registrarAplicaciones` para que ese cargo deje de figurar como abierto y baje su *Trans. Bal.* (mock sin backend).
+5. **Se mantienen los dos pasos** (*Payment* → *Allocation*) por la regla de los drawers; red.dev lo muestra todo junto. Si
+   se prefiere ver el efecto del importe mientras se tipea, hay que juntarlos.
+6. Listas (`METODOS_PAGO`, `TIPOS_AJUSTE_CREDITO`, `TIPOS_AJUSTE_CARGO`) pasan a `data/ledger.ts`; `data/billing.ts` las
+   reexporta. `METODOS_PAGO` ya no trae los de seguro (CON-3738).
+
+**A validar con usuarios:** si separar Allocation en un segundo paso hace más lento el cobro frente a verlo junto, como en
+red.dev.

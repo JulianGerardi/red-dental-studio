@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { MOVIMIENTOS } from '@/data/ledger'
+import { APLICACIONES, DEPENDIENTES, GUARANTOR, MOVIMIENTOS } from '@/data/ledger'
 import { CreditAdjustmentPanel } from './CreditAdjustmentPanel'
 import { esperar, pulsar, secuencia } from '@/design-system/play'
 
@@ -7,7 +7,7 @@ const meta = {
   title: 'Components/Ledger/CreditAdjustmentPanel',
   component: CreditAdjustmentPanel,
   parameters: { layout: 'padded', docs: { story: { inline: false, iframeHeight: 720 } } },
-  args: { cargos: MOVIMIENTOS.filter((m) => m.tipo === 'Charge'), onCancelar: () => {}, onGuardar: () => {} },
+  args: { movs: MOVIMIENTOS, aplicaciones: APLICACIONES, garante: GUARANTOR, dependientes: DEPENDIENTES, onCancelar: () => {}, onGuardar: () => {} },
 } satisfies Meta<typeof CreditAdjustmentPanel>
 
 export default meta

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { METODOS_PAGO, TIPOS_AJUSTE_CARGO, TIPOS_AJUSTE_CREDITO } from '@/data/billing'
+import { ACTIVIDAD_RECIENTE, METODOS_PAGO, TIPOS_AJUSTE_CARGO, TIPOS_AJUSTE_CREDITO } from '@/data/billing'
 import { PasosDelDrawer, EstadosDelDrawer, SpecsDelDrawer } from '@/design-system/kit-drawer'
 import { Bloque, Lienzo, Tabla } from '@/design-system/kit'
 import { esperar, pulsar, secuencia } from '@/design-system/play'
@@ -27,7 +27,7 @@ const meta = {
       },
     },
   },
-  args: { tipoInicial: 'Patient Payment', pacienteInicial: 'Maria Abril Viola', onClose: () => {}, onGuardar: () => {} },
+  args: { tipoInicial: 'Patient Payment', pacienteInicial: 'Maria Abril Viola', movs: ACTIVIDAD_RECIENTE, onClose: () => {}, onGuardar: () => {} },
   argTypes: {
     tipoInicial: { control: 'select', options: ['Patient Payment', 'Credit Adjustment', 'Charge Adjustment'], description: 'Qué botón se tocó: decide el título, los campos y si hay paso Allocation.' },
     pacienteInicial: { control: 'text', description: 'El paciente elegido en Billing o el de la ficha: Apply to ofrece a su grupo de garante.' },

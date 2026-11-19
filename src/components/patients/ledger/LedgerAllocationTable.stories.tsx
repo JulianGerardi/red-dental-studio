@@ -1,25 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { MOVIMIENTOS } from '@/data/ledger'
+import { useState } from 'react'
+import { APLICACIONES, MOVIMIENTOS } from '@/data/ledger'
+import { autoAplicar, cargosAbiertos, comoTexto, resumenAplicacion } from '@/lib/ledgerAplicacion'
 import { Bloque, Lienzo, Tabla, TablaPartes, Token } from '@/design-system/kit'
-import { esperar, pulsar, secuencia } from '@/design-system/play'
 import { LedgerAllocationTable } from './LedgerAllocationTable'
 
-const CARGOS = MOVIMIENTOS.filter((m) => m.tipo === 'Charge')
+const CARGOS = cargosAbiertos(MOVIMIENTOS, APLICACIONES, 'John Smith')
 const LISTAS = { open: CARGOS, few: CARGOS.slice(0, 2), none: [] }
 const ANCHOS = { panel: 1100, narrow: 360 } as const
 type Args = { cargos: keyof typeof LISTAS; ancho: keyof typeof ANCHOS }
 
 /* La tabla como en Patient Payment, Credit Adjustment y Post Payment. */
 function Ejemplo({ cargos, ancho }: Args) {
+  const lista = LISTAS[cargos]
+  const [aplicado, setAplicado] = useState(() => comoTexto(autoAplicar(lista, 300)))
+  const r = resumenAplicacion(lista, aplicado, 300, 'The total applied amount cannot be greater than the payment amount.')
   return (
     <div style={{ width: ANCHOS[ancho], maxWidth: '100%' }}>
-      <LedgerAllocationTable cargos={LISTAS[cargos]} />
+      <LedgerAllocationTable cargos={lista} aplicado={aplicado} onAplicado={(id, v) => setAplicado((p) => ({ ...p, [id]: v }))} aplicadoTotal={r.aplicadoTotal} noAplicado={r.noAplicado} error={r.error} />
     </div>
   )
 }
-
-/* Abre la primera fila: el detalle nace de un clic. */
-const abrirPrimera = secuencia(pulsar(/Toggle details for Periodic oral evaluation/), esperar(/Original charge/))
 
 const meta = {
   title: 'Components/Ledger/LedgerAllocationTable',
@@ -71,7 +72,6 @@ export const Parts: Story = {
       </Bloque>
     </Lienzo>
   ),
-  play: abrirPrimera,
 }
 
 export const States: Story = {
@@ -95,7 +95,6 @@ export const States: Story = {
 export const RowOpen: Story = {
   name: 'Row open',
   render: (a) => <Ejemplo {...a} />,
-  play: abrirPrimera,
 }
 
 export const Specs: Story = {

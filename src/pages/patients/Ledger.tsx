@@ -13,7 +13,7 @@ import { FilterMenu } from '@/components/ui/filter-menu'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
 import {
-  APLICACIONES, MOVIMIENTOS, TIPOS, GUARANTOR, DEPENDIENTES, alcanceDe, coberturaSeguro, conSaldo, fechaCorta, moneda,
+  APLICACIONES, MOVIMIENTOS, TIPOS, GUARANTOR, DEPENDIENTES, PROVIDERS_LEDGER, alcanceDe, coberturaSeguro, conSaldo, fechaCorta, moneda,
   pendienteDe, tieneCredito, type Aplicacion, type Movimiento,
 } from '@/data/ledger'
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
@@ -35,6 +35,7 @@ import { AplicarCreditoModal } from '@/components/patients/ledger/AplicarCredito
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
 import { formatMDY } from '@/lib/fecha'
+import { ALCANCE_GUARANTOR } from '@/lib/ledgerAplicacion'
 
 /* Figma 4582:28487 / 4588:84886. Ver design-reference/figma/modulos/ledger.md. */
 
@@ -311,10 +312,14 @@ export default function Ledger() {
     ]
   }, [delaVista, vista])
 
-  const agregar = (m: Omit<Movimiento, 'id'>) => {
-    setMovs((p) => [...p, { ...m, id: `m${p.length + 1}-${Date.now()}` }])
+  /* Una transacción nueva y, si aplicó algo, a qué cargos fue cada parte: así los cargos pagados dejan de figurar como
+     abiertos y lo que quedó sin aplicar es crédito disponible (ledger.md, 2026-11-19). */
+  const agregar = (m: Omit<Movimiento, 'id'>, aplicado: Record<string, number> = {}) => {
+    const id = `m${movs.length + 1}-${Date.now()}`
+    setMovs((p) => [...p, { ...m, id }])
+    const fecha = m.fecha
+    setAplicaciones((p) => [...p, ...Object.entries(aplicado).map(([cargo, monto], i) => ({ id: `a-${id}-${i}`, origen: id, cargo, fecha, monto }))])
   }
-
   const cargosDeLaCuenta = movs.filter((m) => m.tipo === 'Charge')
   /* El link a otra transacción (ledger.md, 2026-10-14): si está en la tabla con la búsqueda y el filtro de ahora, va a
      su página, la despliega y la resalta; si no, abre su registro. Nunca cambia los filtros. */
@@ -525,31 +530,24 @@ export default function Ledger() {
             </>
           )}
 
-          {tab === 'pago' && (
+          {(tab === 'pago' || tab === 'credito' || tab === 'cargo') && (
             <div className="mt-4">
-              <PatientPaymentPanel
-                cargos={cargosDeLaCuenta}
-                onCancelar={volver}
-                onGuardar={(m) => { agregar(m); aviso.ok(`Payment of ${moneda(Math.abs(m.monto))} recorded for ${m.paciente}.`); volver() }}
-              />
-            </div>
-          )}
-          {tab === 'credito' && (
-            <div className="mt-4">
-              <CreditAdjustmentPanel
-                cargos={cargosDeLaCuenta}
-                onCancelar={volver}
-                onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} applied to ${m.paciente}.`); volver() }}
-              />
-            </div>
-          )}
-          {tab === 'cargo' && (
-            <div className="mt-4">
-              <ChargeAdjustmentPanel
-                cargosVisita={cargosDeLaCuenta}
-                onCancelar={volver}
-                onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} added for ${m.paciente}.`); volver() }}
-              />
+              {/* Mismo formulario y misma lógica que el drawer de Billing (ledger.md, 2026-11-19). Abre aplicando a lo que
+                  se está viendo: el guarantor en Guarantor View, el paciente en Patient View. */}
+              {(() => {
+                const comun = {
+                  movs, aplicaciones, garante: GUARANTOR, dependientes: DEPENDIENTES, onCancelar: volver,
+                  alcanceInicial: vista === 'Guarantor View' ? ALCANCE_GUARANTOR : GUARANTOR,
+                }
+                const cerrar = (texto: string) => { aviso.ok(texto); volver() }
+                if (tab === 'pago') {
+                  return <PatientPaymentPanel {...comun} onGuardar={(m, ap) => { agregar(m, ap); cerrar(`Payment of ${moneda(Math.abs(m.monto))} recorded for ${m.paciente}.`) }} />
+                }
+                if (tab === 'credito') {
+                  return <CreditAdjustmentPanel {...comun} onGuardar={(m, ap) => { agregar(m, ap); cerrar(`${m.descripcion} of ${moneda(Math.abs(m.monto))} applied to ${m.paciente}.`) }} />
+                }
+                return <ChargeAdjustmentPanel {...comun} providers={PROVIDERS_LEDGER} onGuardar={(m) => { agregar(m); cerrar(`${m.descripcion} of ${moneda(Math.abs(m.monto))} added for ${m.paciente}.`) }} />
+              })()}
             </div>
           )}
         </div>
