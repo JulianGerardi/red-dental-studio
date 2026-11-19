@@ -5,6 +5,14 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
+### Pending Signature por paciente, con tres pacientes de ejemplo ([#133](https://github.com/JulianGerardi/red-dental-studio/pull/133))
+- `patient-0002`, `patient-0003` y `patient-0005` abren con **Pending Signature**, para verlo sin hacer el flujo;
+  `patient-0001` sigue con Start Encounter. La nota sin firmar queda en el paciente desde el que se cerró el encuentro.
+- Clinical Mode desde el panel abre el del paciente de la ficha (`/patients/<id>/clinical-mode`), ya no siempre el
+  primero.
+- **Para el dev:** `useNotaPendiente(paciente)` / `setNotaPendiente(paciente, v)` en `lib/notaClinica.ts`, semilla en
+  `NOTA_PENDIENTE_INICIAL`; `ClinicalNoteDialog` pide `paciente`. Decisión en `patient-dashboard.md` (2026-11-10).
+
 ### Figma: card de cita del paciente (Patient appointment card) conectada al design system ([#163](https://github.com/JulianGerardi/red-dental-studio/pull/163))
 - **Patient appointment card** nuevo en el design system (`🗂️ Cards & Layout`): card de cita de la ficha del paciente con estados Booked (con Cancel), Cancelled, Fulfilled y No Show. 119 cards de las pantallas pasan a instancias; diferencia con el original ≈ 0,16 % de los píxeles.
 - **Para el dev:** la app no cambia. Motor `citas` guardado en el archivo de flujos; pendientes (campos, tablas, ícono flecha en los botones) en `design-reference/figma-design-system.md`, sección *Card de cita del paciente conectada*.
