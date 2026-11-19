@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
-### Figma: card de cita del paciente (Patient appointment card) conectada al design system
+### Figma: card de cita del paciente (Patient appointment card) conectada al design system ([#163](https://github.com/JulianGerardi/red-dental-studio/pull/163))
 - **Patient appointment card** nuevo en el design system (`🗂️ Cards & Layout`): card de cita de la ficha del paciente con estados Booked (con Cancel), Cancelled, Fulfilled y No Show. 119 cards de las pantallas pasan a instancias; diferencia con el original ≈ 0,16 % de los píxeles.
 - **Para el dev:** la app no cambia. Motor `citas` guardado en el archivo de flujos; pendientes (campos, tablas, ícono flecha en los botones) en `design-reference/figma-design-system.md`, sección *Card de cita del paciente conectada*.
 
