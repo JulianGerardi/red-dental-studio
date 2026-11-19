@@ -54,10 +54,6 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   adentro); sólo Pending Task, abajo, lo lleva.
   (2026-10-19) La tira de salas va en una fila con scroll (sin Show more); elegir una sala filtra la Waiting Room y
   una sala sin gente (Operatory 5) la deja vacía.
-  Desde 2026-11-19: cada columna lleva su total y "Show N more" (con `?day=busy`, 6 de 12 Check In); Check In pasa la
-  cita a Checked in de la Waiting Room y Check Out la saca; Rooms muestra Now / Next y No bookings.
-  Segunda tanda del mismo día: Appointments por Provider + Room; Waiting Room por Visit stage; No Show sólo con la hora
-  pasada y Cancel con motivo; el menú y Edit appointment de la Waiting Room según la etapa.
 - `tests/clinical-mode.e2e.ts`: la app abre, y Add Procedure carga un D0120 desde DentAssmt recorriendo los tres
   pasos del drawer hasta el aviso de guardado.
   Desde el 2026-10-08 también Lab Order: Filter por Requested deja 2 de 9, y Cancel order desde el menú de la fila se

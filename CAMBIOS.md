@@ -5,6 +5,24 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
+### Ledger y Billing alineados con red.dev, Scheduling, Dashboard y Settings normalizados (CON-4142)
+- **Regla:** las acciones principales van en la fila del título; los controles de fecha y filtro, debajo. Ninguna
+  pantalla lleva bajada debajo del título (`SettingsPageHeader` ya no acepta `bajada`).
+- **Ledger:** Patient Payment (-), Credit Adjustment (-) y Charge Adjustment (+) son botones en la fila del título que
+  abren el `PostPaymentDialog` de Billing (sale la pestaña Transactions), con Patient View / Guarantor View al lado.
+  Sin buscador ni filtro; la tabla va en su card con Columns y Export. Type con rótulos cortos y colores de red.dev
+  (`PillTipo` en `LedgerRowDetail`, también en Billing). Household en las dos vistas, con link a la ficha.
+- **Métricas:** `ui/stat-card` (`StatCard`) es la card de métricas de Ledger, Billing y Edit Account › Subscription.
+- **Billing:** métricas de borde a borde; con un paciente elegido, los tres pagos van en la fila del título y Export CSV
+  se apaga. La lógica de adentro de los drawers no cambia en este PR: se arma aparte.
+- **Scheduling:** Day/Week/Month, View y New appointment en la fila del título; debajo, el `DatePicker` de la app (sin
+  flechas) y Status legend. Sin breadcrumb. El nombre del paciente en el detalle del turno abre su ficha.
+- **Dashboard:** la fecha, Today y los números bajan a la fila de debajo del título.
+- **Settings:** el overview queda con Account, Locations, Employees, Roles, Consents, Billing, Ledger y Preferences.
+  Salen Parameters, Libraries, Patient Portal y Security del menú y sus rutas.
+- **Para el dev:** `PatientPaymentPanel`, `CreditAdjustmentPanel` y `ChargeAdjustmentPanel` quedan sin uso en la app
+  (siguen sus stories hasta documentar). `StatCard` todavía no tiene story (va al documentar).
+
 ### Dashboard según las historias de Dashboard 2 (CON-4176 a CON-4180) ([#167](https://github.com/JulianGerardi/red-dental-studio/pull/167))
 - **Menú ⋮ de Appointments** sin *Edit patient* (CON-4177): Edit appointment, Mark as no-show y Cancel appointment.
 - **Vacíos:** *No appointments scheduled for today*, *Waiting room is empty* y, con filtros sin resultados, *No results

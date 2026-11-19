@@ -454,3 +454,13 @@ Julián mandó cuatro grabaciones de Billing de red.dev y pidió respetar las al
 
 Mismo cambio que `ledger.md` (misma fecha): sin íconos en los títulos de sección; sin transacciones abiertas, el pago
 no muestra métodos y Save queda apagado (también en el crédito); Ledger Transactions ordenada por fecha.
+
+### Lo que se publica (2026-11-19)
+
+Julián: se publica todo menos la lógica de adentro de los drawers, que se arma en otra tanda. Salen en vivo la pantalla
+del Ledger (botones y vista en la fila del título, `StatCard`, tabla en su card sin buscador ni filtro, `PillTipo`,
+Household en las dos vistas con link) y Billing (métricas de borde a borde, pagos en la fila del título). Los tres
+botones abren el `PostPaymentDialog` de `main`, con sus dos pasos y los datos de Billing: desde el Ledger, Apply to dice
+John Smith y la fecha es la de Billing. **No se publica** lo de adentro de los drawers descripto arriba (una sola página,
+sin íconos, Ledger Transactions con Other Credit / Guar Estimate / Applied, el garante con "(Guarantor)", sin
+transacciones sin métodos y Save apagado): queda en el commit `2d8dfbd` de la rama `claude/exciting-brown-p9saph`.

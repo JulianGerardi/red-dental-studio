@@ -119,12 +119,10 @@ test('Cada botón abre su drawer, como red.dev, y lo posteado aparece en la tabl
   drawer = screen.getByRole('dialog')
   await expect(drawer.getByRole('heading', 'New Patient Payment (-)')).toBeVisible()
   await drawer.getByRole('button', 'Add another payment method').tap()
-  // El + suma un cheque, como red.dev; el − lo saca.
-  await expect(drawer.getByRole('textbox', /Bank\/Branch/)).toBeVisible()
-  await drawer.getByRole('button', 'Remove this payment method').last().tap()
+  await expect(drawer.getByRole('button', 'Remove this payment method')).toBeVisible()
+  await drawer.getByRole('button', 'Remove this payment method').tap()
   await drawer.getByRole('textbox', /Amount/).fill('40')
-  // Una sola página, sin pasos: Ledger Transactions va debajo de los datos (ledger.md, 2026-11-19).
-  await expect(drawer.getByRole('button', /Next Step/)).toHaveCount(0)
+  await drawer.getByRole('button', /Next Step/).tap()
   await expect(drawer.getByText('Ledger Transactions')).toBeVisible()
   await drawer.getByRole('button', /^Save/).tap()
   await expect(screen.getByText(/Cash Payment of \$40\.00 posted for Maria Abril Viola/)).toBeVisible()

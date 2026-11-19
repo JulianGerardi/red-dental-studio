@@ -184,11 +184,6 @@ export function Household() {
 const VISTAS = ['Patient View', 'Guarantor View'] as const
 type Vista = (typeof VISTAS)[number]
 
-/* Apply to de los drawers: el paciente y su grupo familiar, como Billing. */
-const HOGAR = [GUARANTOR, ...DEPENDIENTES]
-/** Los profesionales de la cuenta, para el Provider de Enter Charge (+) Adjustment. */
-const PROVIDERS = [...new Set(MOVIMIENTOS.map((m) => m.provider).filter((p) => p.startsWith('Dr')))].sort()
-
 /* Los tres botones de red.dev, en la fila del título; cada uno abre su drawer, el mismo de Billing (ledger.md, 2026-11-19). */
 export function AccionesLedger({ onAccion }: { onAccion: (tipo: TipoAjusteBilling) => void }) {
   return (
@@ -314,20 +309,10 @@ export default function Ledger() {
     ]
   }, [delaVista, vista])
 
-  /* Lo guardado entra a la tabla y, si es un pago o un crédito, queda aplicado a los cargos que se eligieron en el drawer. */
-  const agregar = (m: Omit<Movimiento, 'id'>, porCargo: Record<string, number> = {}) => {
-    const id = `m-${Date.now()}`
-    setMovs((p) => [...p, { ...m, id }])
-    setAplicaciones((p) => [...p, ...Object.entries(porCargo).map(([cargo, monto], i) => ({ id: `a-${id}-${i}`, origen: id, cargo, fecha: m.fecha, monto }))])
-  }
+  /* Lo guardado en el drawer entra a la tabla. */
+  const agregar = (m: Omit<Movimiento, 'id'>) => setMovs((p) => [...p, { ...m, id: `m-${Date.now()}` }])
 
   const cargosDeLaCuenta = movs.filter((m) => m.tipo === 'Charge')
-  /* Los cargos abiertos de quien se elige en Apply to, con lo que falta como monto. El garante ("John Smith (Guarantor)")
-     ve los de todo el hogar, como red.dev (CON-4071). */
-  const cargosAbiertosDe = (persona: string) => movs
-    .filter((m) => esCargo(m) && (persona === GUARANTOR || m.paciente === persona))
-    .map((m) => ({ ...m, pendiente: pendienteDe(m, aplicaciones) }))
-    .filter((m) => m.pendiente > 0)
   /* El link a otra transacción (ledger.md, 2026-10-14): si está en la tabla con la búsqueda y el filtro de ahora, va a
      su página, la despliega y la resalta; si no, abre su registro. Nunca cambia los filtros. */
   const verTransaccion = (x: Movimiento) => {
@@ -518,13 +503,8 @@ export default function Ledger() {
         <PostPaymentDialog
           tipoInicial={accion}
           pacienteInicial={GUARANTOR}
-          personas={HOGAR}
-          garante={GUARANTOR}
-          cargosDe={cargosAbiertosDe}
-          providers={PROVIDERS}
-          hoy={new Date()}
           onClose={() => setAccion(null)}
-          onGuardar={(m, porCargo) => { agregar(m, porCargo); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} posted for ${m.paciente}.`); setAccion(null) }}
+          onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} posted for ${m.paciente}.`); setAccion(null) }}
         />
       )}
       {enModal && <LedgerRowModal key={enModal.id} m={enModal} aplicaciones={aplicaciones} movimientos={movs} onVerTransaccion={verTransaccion} onAbrirClinica={abrirClinica} onClose={() => setEnModal(null)} />}

@@ -1040,3 +1040,12 @@ red.dev), sin inventar.
 5. Siguen siendo nuestros (diseño, no lógica): el selector de fecha de la app, el placeholder *Add a note (optional)* y
    el pie de dos botones del mismo ancho.
 
+### Lo que se publica (2026-11-19)
+
+Julián: se publica todo menos la lógica de adentro de los drawers, que se arma en otra tanda. Salen en vivo la pantalla
+del Ledger (botones y vista en la fila del título, `StatCard`, tabla en su card sin buscador ni filtro, `PillTipo`,
+Household en las dos vistas con link) y Billing (métricas de borde a borde, pagos en la fila del título). Los tres
+botones abren el `PostPaymentDialog` de `main`, con sus dos pasos y los datos de Billing: desde el Ledger, Apply to dice
+John Smith y la fecha es la de Billing. **No se publica** lo de adentro de los drawers descripto arriba (una sola página,
+sin íconos, Ledger Transactions con Other Credit / Guar Estimate / Applied, el garante con "(Guarantor)", sin
+transacciones sin métodos y Save apagado): queda en el commit `2d8dfbd` de la rama `claude/exciting-brown-p9saph`.

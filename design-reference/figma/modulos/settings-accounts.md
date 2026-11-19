@@ -153,8 +153,8 @@ conserva). Si lo extrañan, la salida es la fila entera clickeable, no volver al
 
 Pedido de Julián al alinear el Ledger (ledger.md, CON-4142): las métricas tienen un solo diseño. Las cuatro de Edit
 Account › Subscription (Current Plan, Licenses, Expired on, Status) estaban armadas a mano, con borde y el ícono de
-tarjeta sólo en la primera; pasan a `ui/stat-card` (`StatCard`), la de Billing y el Ledger: card sin borde, rótulo,
-valor en azul y bajada. Mismos textos y datos; 2 + 2 en angosto, cuatro en fila desde `lg`.
+tarjeta sólo en la primera; pasan a `ui/stat-card` (`StatCard`), la de Billing y el Ledger: card sin borde, rótulo en mayúsculas,
+valor en negro y bajada. Mismos textos y datos; 2 + 2 en angosto, cuatro en fila desde `lg`.
 
 ## Overview de Settings y títulos sin bajada (2026-11-19)
 
