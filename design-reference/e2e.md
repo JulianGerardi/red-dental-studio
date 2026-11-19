@@ -92,6 +92,9 @@ reporte queda en `.e2e/report.json` (ignorado en git, como el resto de `.e2e/`).
   a qué cargos fue y Apply credit. View procedure abre Procedures en Clinical Mode con la fila abierta.
   `tests/billing.e2e.ts` suma: con Maria Abril Viola, la fila del pago dice cómo se pagó y a qué cargo fue, y el link
   abre su registro.
+  Desde el 2026-11-19 (CON-4142): ya no hay pestañas; Patient Payment (-) abre el drawer de Billing con 11868.00 (el
+  saldo abierto) en Amount, Applied reparte el monto del cargo más viejo, y lo guardado avisa y entra a la tabla.
+  Charge Adjustment (+) abre *Enter Charge (+) Adjustment* y pide el monto.
 - `tests/treatment-plan.e2e.ts` (2026-10-13): una fila de Unassigned se despliega (No treatment linked, Collapse all), y
   la fila D2391 de Restorative Plan muestra Procedure consent; su hallazgo se abre en el drawer sin salir de Treatment
   Plan.

@@ -1,6 +1,5 @@
 import { Tabs } from '@/components/ui/tabs'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { ChevronDown, ChevronLeft, ChevronRight, Plus, CalendarCheck, Inbox } from 'lucide-react'
 import { AppointmentDetailsDrawer } from '@/components/scheduling/AppointmentDetailsDrawer'
 import { ViewMenu, VISTA_INICIAL, type VistaCalendario } from '@/components/scheduling/ViewFiltersPanel'
@@ -12,6 +11,7 @@ import {
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { PageTitle } from '@/components/ui/page-title'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
 import {
   EVENTOS_INICIALES, FECHA_ANCLA, MESES, BLOCK_STYLE,
   inicioDeSemana, sumarDias, type EventoConFecha, type ApptState,
@@ -188,29 +188,11 @@ export default function Scheduling() {
 
   return (
     <div className={CONTENEDOR_PAGINA}>
-      <Link to="/scheduling" className="flex items-center gap-1 text-sm text-[#0056ef]">
-        Scheduling <ChevronDown className="size-[15px]" />
-      </Link>
-      <div className="mt-3">
+      <Breadcrumb items={[{ label: 'Scheduling' }]} />
+      {/* Los botones van a la altura del título, como en el resto de la app (scheduling.md, 2026-11-19). */}
+      <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
         <PageTitle>Scheduling</PageTitle>
-      </div>
-
-      {/* Toolbar */}
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2">
-          <button onClick={() => paso(-1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Previous">
-            <ChevronLeft className="size-4" />
-          </button>
-          <span className="text-[13px] font-semibold whitespace-nowrap text-ink">{rotulo}</span>
-          <button onClick={() => setFecha(FECHA_ANCLA)} className="flex items-center gap-1 text-[13px] text-ink-muted">
-            Today <ChevronDown className="size-3.5" />
-          </button>
-          <button onClick={() => paso(1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Next">
-            <ChevronRight className="size-4" />
-          </button>
-        </div>
-
-        <div className="ml-auto flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {/* El Figma marca "Month" activo aunque la vista sea semanal. */}
           <div className="flex items-center gap-1">
             {(['Day', 'Week', 'Month'] as const).map((v) => (
@@ -248,12 +230,24 @@ export default function Scheduling() {
               </button>
             </>
           )}
-          <button
-            onClick={() => setPanel('new')}
-            data-tour="sched-new"
-            className="bg-dash-blue hover:bg-dash-blue-hover flex h-8 items-center gap-1.5 rounded-md px-4 text-xs font-medium text-white transition-colors"
-          >
-            <Plus className="size-3.5" /> New appointment
+          <Button size="md" onClick={() => setPanel('new')} data-tour="sched-new">
+            <Plus /> New appointment
+          </Button>
+        </div>
+      </div>
+
+      {/* Toolbar */}
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <button onClick={() => paso(-1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Previous">
+            <ChevronLeft className="size-4" />
+          </button>
+          <span className="text-[13px] font-semibold whitespace-nowrap text-ink">{rotulo}</span>
+          <button onClick={() => setFecha(FECHA_ANCLA)} className="flex items-center gap-1 text-[13px] text-ink-muted">
+            Today <ChevronDown className="size-3.5" />
+          </button>
+          <button onClick={() => paso(1)} className="rounded-md border border-line bg-white p-1.5" aria-label="Next">
+            <ChevronRight className="size-4" />
           </button>
         </div>
       </div>

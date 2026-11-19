@@ -55,3 +55,28 @@ test('el ⋮ de un procedimiento lleva a su estimación en Clinical Mode', async
   await screen.getByRole('menuitem', /Periodontists Recommended/).tap()
   await expect(screen.getByText(/Treatment Plan/).first()).toBeVisible()
 })
+
+/* Los tres botones de red.dev abren los drawers de Billing; el pago arranca con el saldo abierto repartido (ledger.md, 2026-11-19). */
+test('Patient Payment (-) abre su drawer con el saldo abierto y lo guardado entra a la tabla', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/ledger')
+  await expect(screen.getByRole('tab', 'Transactions')).toHaveCount(0)
+  await screen.getByRole('button', /^Patient Payment \(-\)/).tap()
+  const drawer = screen.getByRole('dialog')
+  await expect(drawer.getByRole('heading', 'New Patient Payment (-)')).toBeVisible()
+  await expect(drawer.getByRole('textbox', /Amount/)).toHaveValue('11868.00')
+  await drawer.getByRole('textbox', /Amount/).fill('50')
+  await drawer.getByRole('button', /Next Step/).tap()
+  await expect(drawer.getByRole('textbox', /Applied to Bitewings/)).toHaveValue('35.00')
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(screen.getByText(/Cash Payment of \$50\.00 posted for John Smith/)).toBeVisible()
+  await expect(screen.getByText('Cash Payment').first()).toBeVisible()
+})
+
+test('Charge Adjustment (+) abre su drawer y pide el monto', async ({ app, screen }) => {
+  await app.open('/patients/john-smith/ledger')
+  await screen.getByRole('button', /^Charge Adjustment \(\+\)/).tap()
+  const drawer = screen.getByRole('dialog')
+  await expect(drawer.getByRole('heading', 'Enter Charge (+) Adjustment')).toBeVisible()
+  await drawer.getByRole('button', /^Save/).tap()
+  await expect(drawer.getByText(/This field is required/)).toBeVisible()
+})

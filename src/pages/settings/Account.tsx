@@ -12,6 +12,7 @@ import { aviso } from '@/components/ui/toaster'
 import { CUENTAS, ESTADO_TONO as ESTADO_TONO_CUENTA } from '@/pages/settings/Accounts'
 import { Tabs } from '@/components/ui/tabs'
 import { Avatar } from '@/components/ui/avatar'
+import { StatCard } from '@/components/ui/stat-card'
 
 /* Settings → Account. Calcado de red.dev.confidentally.com/settings/account
    -la referencia de flujo real, no el Figma-, tab por tab, tras poder
@@ -138,43 +139,12 @@ export function SettingsAccount() {
           <>
             <div>
               <h2 className="text-base font-bold text-ink">Subscription Summary</h2>
-              <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-lg border border-line bg-white p-4">
-                  <span className="flex items-center gap-1.5 text-[13px] text-ink-muted">
-                    <CreditCard className="size-3.5" /> Current Plan
-                  </span>
-                  <span className="mt-2 block text-[19px] font-bold text-ink">
-                    {cuenta ? (cuenta.plan === '—' ? '—' : cuenta.plan) : 'Prueba Red'}
-                  </span>
-                  <span className="mt-1 block text-[12px] text-ink-faint">Plan currently assigned to the account</span>
-                </div>
-                <div className="rounded-lg border border-line bg-white p-4">
-                  <span className="text-[13px] text-ink-muted">Licenses</span>
-                  <span className="mt-2 block text-[19px] font-bold text-ink tabular-nums">
-                    {cuenta ? (cuenta.licencias === '—' ? '—' : cuenta.licencias) : '3 Used / 170 Total'}
-                  </span>
-                  <span className="mt-1 block text-[12px] text-ink-faint">167 available licenses based on active and suspended employees.</span>
-                </div>
-                <div className="rounded-lg border border-line bg-white p-4">
-                  <span className="text-[13px] text-ink-muted">Expired on</span>
-                  <span className="mt-2 block text-[19px] font-bold text-ink tabular-nums">
-                    {cuenta ? (cuenta.vence || '—') : '12/31/2026'}
-                  </span>
-                  <span className="mt-1 block text-[12px] text-ink-faint">Subscription end date</span>
-                </div>
-                <div className="rounded-lg border border-line bg-white p-4">
-                  <span className="text-[13px] text-ink-muted">Status</span>
-                  <span className="mt-2 block">
-                    {cuenta ? (
-                      cuenta.estado in ESTADO_TONO_CUENTA ? (
-                        <span className="text-[19px] font-bold text-ink">{cuenta.estado}</span>
-                      ) : <span className="text-[19px] font-bold text-ink-faint">—</span>
-                    ) : (
-                      <span className="text-[19px] font-bold text-ink">Active</span>
-                    )}
-                  </span>
-                  <span className="mt-1 block text-[12px] text-ink-faint">Current subscription status</span>
-                </div>
+              {/* Las métricas con la card de la app (`ui/stat-card`), como el Ledger y Billing (ledger.md, 2026-11-19). */}
+              <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                <StatCard enFila label="Current Plan" value={cuenta ? cuenta.plan : 'Prueba Red'} caption="Plan currently assigned to the account" />
+                <StatCard enFila label="Licenses" value={cuenta ? cuenta.licencias : '3 Used / 170 Total'} caption="167 available licenses based on active and suspended employees." />
+                <StatCard enFila label="Expired on" value={cuenta ? (cuenta.vence || '—') : '12/31/2026'} caption="Subscription end date" />
+                <StatCard enFila label="Status" value={cuenta ? (cuenta.estado in ESTADO_TONO_CUENTA ? cuenta.estado : '—') : 'Active'} caption="Current subscription status" />
               </div>
             </div>
 

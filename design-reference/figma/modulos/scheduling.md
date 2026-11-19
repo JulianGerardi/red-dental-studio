@@ -787,3 +787,14 @@ Status se busca en General o en Schedule.
 Sin historia de Jira (devolución de diseño de Abril Viola). La franja con barra a la izquierda, hecha a mano, pasa a
 `Alert` tono warning, sólo título: el mismo aviso que el resto de la app. Detalle de la decisión en patients.md
 (2026-11-18).
+
+## Botones a la altura del título y breadcrumb con `ui/breadcrumb` (2026-11-19)
+
+Sin historia de Jira (pedido de Julián).
+
+1. Day / Week / Month, *View* y *New appointment* suben a la fila del título, alineados a la derecha, como en el resto
+   de la app (Patients, Ledger). La barra de abajo queda con la navegación de fechas. *New appointment* pasa a
+   `ui/button` md (32px, el mismo alto que tenía).
+2. El rastro de arriba era un link "Scheduling" con una flecha hacia abajo y un azul en hex. Pasa a `ui/breadcrumb`, el
+   de "/" de toda la app. Como Scheduling es de primer nivel, tiene un solo tramo (la pantalla actual, sin link ni "/").
+   La regla del design system dice que las pantallas de primer nivel no llevan rastro: si se confirma, se saca.

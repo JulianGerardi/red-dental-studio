@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-  Search, Receipt, Wallet, HandCoins, Download, MoveHorizontal, FileText, ListChecks,
+  Search, Receipt, Wallet, HandCoins, Download, MoveHorizontal, FileText, MinusCircle, PlusCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -11,7 +11,11 @@ import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
 import { PatientBreadcrumb } from '@/components/patients/PatientBreadcrumb'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { StatStrip, type Stat } from '@/components/dashboard/StatStrip'
+import { StatCard } from '@/components/ui/stat-card'
+import { PageTitle } from '@/components/ui/page-title'
+import { Button } from '@/components/ui/button'
+import { PostPaymentDialog } from '@/components/billing/PostPaymentDialog'
+import type { TipoAjusteBilling } from '@/data/billing'
 import {
   APLICACIONES, MOVIMIENTOS, TIPOS, GUARANTOR, DEPENDIENTES, alcanceDe, coberturaSeguro, conSaldo, fechaCorta, moneda,
   pendienteDe, tieneCredito, type Aplicacion, type Movimiento,
@@ -28,9 +32,6 @@ import { Pagination } from '@/components/patients/ledger/Pagination'
 import { ColumnPicker } from '@/components/patients/ledger/ColumnPicker'
 import { useAnchoColumnas, useAnchoVisible, ManijaResize } from '@/components/patients/ledger/useAnchoColumnas'
 import { LedgerRowDetail, LedgerRowModal, BotonExpandirTodo, FilaConTooltip, TONO_TIPO, nombreTipo } from '@/components/patients/ledger/LedgerRowDetail'
-import { PatientPaymentPanel } from '@/components/patients/ledger/PatientPaymentPanel'
-import { CreditAdjustmentPanel } from '@/components/patients/ledger/CreditAdjustmentPanel'
-import { ChargeAdjustmentPanel } from '@/components/patients/ledger/ChargeAdjustmentPanel'
 import { AplicarCreditoModal } from '@/components/patients/ledger/AplicarCreditoModal'
 import { CONTENEDOR_PAGINA } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
@@ -182,13 +183,23 @@ export function Household() {
 const VISTAS = ['Patient View', 'Guarantor View'] as const
 type Vista = (typeof VISTAS)[number]
 
-const TABS = [
-  { id: 'transacciones', label: 'Transactions', titulo: 'Ledger' },
-  { id: 'pago', label: 'Patient Payment (-)', titulo: 'New Patient Payment (-)' },
-  { id: 'credito', label: 'Credit Adjustment (-)', titulo: 'New Credit (-) Adjustment' },
-  { id: 'cargo', label: 'Charge Adjustment (+)', titulo: 'Enter Charge (+) Adjustment' },
-] as const
-type Tab = (typeof TABS)[number]['id']
+/* Apply to de los drawers: el paciente y su grupo familiar, como Billing. */
+const HOGAR = [GUARANTOR, ...DEPENDIENTES]
+/** Los profesionales de la cuenta, para el Provider de Enter Charge (+) Adjustment. */
+const PROVIDERS = [...new Set(MOVIMIENTOS.map((m) => m.provider).filter((p) => p.startsWith('Dr')))].sort()
+
+/* Los tres botones de red.dev, en la fila del título; cada uno abre su drawer, el mismo de Billing (ledger.md, 2026-11-19). */
+export function AccionesLedger({ onAccion }: { onAccion: (tipo: TipoAjusteBilling) => void }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <Button size="md" onClick={() => onAccion('Patient Payment')}><Wallet /> Patient Payment (-)</Button>
+      <Button size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit Adjustment (-)</Button>
+      <Button size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge Adjustment (+)</Button>
+    </div>
+  )
+}
+
+type Metrica = { label: string; value: string; info: string }
 
 export default function Ledger() {
   const { id = 'john-smith' } = useParams()
@@ -199,7 +210,7 @@ export default function Ledger() {
   const [vista, setVista] = useState<Vista>('Patient View')
   const [q, setQ] = useState('')
   const [tipos, setTipos] = useState<string[]>([])
-  const [tab, setTab] = useState<Tab>('transacciones')
+  const [accion, setAccion] = useState<TipoAjusteBilling | null>(null)
   const [pagina, setPagina] = useState(1)
   const [expandidas, setExpandidas] = useState<string[]>([])
   const [ocultas, setOcultas] = useState<ColLedger[]>(OCULTAS_DE_ENTRADA)
@@ -289,7 +300,7 @@ export default function Ledger() {
     setExpandidas((p) => p.filter((id) => !filasPagina.some((m) => m.id === id)))
 
   /* Las cuatro de red.dev con los textos de sus ⓘ; las tres primeras salen de CON-3753 / CON-3755 (ledger.md, 2026-11-12). */
-  const stats: Stat[] = useMemo(() => {
+  const stats: Metrica[] = useMemo(() => {
     const cuenta = vista === 'Guarantor View'
     const abiertos = delaVista.filter((m) => (m.pendiente ?? 0) > 0)
     const saldo = delaVista.reduce((a, m) => a + m.monto, 0)
@@ -301,13 +312,13 @@ export default function Ledger() {
       .reduce((a, m) => a + (m.creditoDisponible ?? 0), 0)
     return [
       cuenta
-        ? { label: 'Guarantor balance', value: moneda(saldo), icon: Wallet, info: 'Consolidated balance of the household ledger. A negative value means available credit.' }
-        : { label: 'Patient balance', value: moneda(saldo), icon: Wallet, info: 'What the patient owes in this ledger. A negative value means available credit.' },
+        ? { label: 'Guarantor balance', value: moneda(saldo), info: 'Consolidated balance of the household ledger. A negative value means available credit.' }
+        : { label: 'Patient balance', value: moneda(saldo), info: 'What the patient owes in this ledger. A negative value means available credit.' },
       cuenta
-        ? { label: 'Guarantor responsibility', value: moneda(responsabilidad), icon: Receipt, info: 'The portion of the household balance the guarantor is responsible for.' }
-        : { label: 'Patient responsibility', value: moneda(responsabilidad), icon: Receipt, info: 'The portion of the balance the patient is responsible for.' },
-      { label: 'Unapplied credits', value: moneda(credito), icon: HandCoins, info: cuenta ? 'Household credit that is still available.' : 'Credit originated by this patient that is still available.' },
-      { label: 'Open charges', value: String(abiertos.length), icon: ListChecks, info: 'Charges with a remaining balance greater than zero.' },
+        ? { label: 'Guarantor responsibility', value: moneda(responsabilidad), info: 'The portion of the household balance the guarantor is responsible for.' }
+        : { label: 'Patient responsibility', value: moneda(responsabilidad), info: 'The portion of the balance the patient is responsible for.' },
+      { label: 'Unapplied credits', value: moneda(credito), info: cuenta ? 'Household credit that is still available.' : 'Credit originated by this patient that is still available.' },
+      { label: 'Open charges', value: String(abiertos.length), info: 'Charges with a remaining balance greater than zero.' },
     ]
   }, [delaVista, vista])
 
@@ -316,6 +327,11 @@ export default function Ledger() {
   }
 
   const cargosDeLaCuenta = movs.filter((m) => m.tipo === 'Charge')
+  /* Los cargos abiertos de quien se elige en Apply to, con lo que falta como monto (como Billing). */
+  const cargosAbiertosDe = (persona: string) => movs
+    .filter((m) => esCargo(m) && m.paciente === persona)
+    .map((m) => ({ ...m, monto: pendienteDe(m, aplicaciones) }))
+    .filter((m) => m.monto > 0)
   /* El link a otra transacción (ledger.md, 2026-10-14): si está en la tabla con la búsqueda y el filtro de ahora, va a
      su página, la despliega y la resalta; si no, abre su registro. Nunca cambia los filtros. */
   const verTransaccion = (x: Movimiento) => {
@@ -334,8 +350,6 @@ export default function Ledger() {
     const t = setTimeout(() => setResaltada(null), 1800)
     return () => clearTimeout(t)
   }, [resaltada])
-  const volver = () => setTab('transacciones')
-  const tituloActivo = TABS.find((t) => t.id === tab)?.titulo ?? 'Ledger'
 
   return (
     <div className={CONTENEDOR_PAGINA}>
@@ -347,214 +361,186 @@ export default function Ledger() {
         />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <h1 className="text-xl leading-[1.3] font-semibold text-ink">{tituloActivo}</h1>
+          {/* Los botones van a la altura del título, como en el resto de la app. */}
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <PageTitle>Ledger</PageTitle>
+            <AccionesLedger onAccion={setAccion} />
+          </div>
 
-          <Tabs className="mt-4" aria-label="Ledger sections" tabs={TABS.map((t) => ({ value: t.id, label: t.label }))} value={tab} onChange={setTab} />
+          {/* Una card por métrica, como red.dev, Billing y Edit Account (`ui/stat-card`). */}
+          <div className="@container mt-4">
+            <div className="grid grid-cols-2 gap-3 @2xl:grid-cols-4">
+              {stats.map((s) => <StatCard key={s.label} enFila {...s} />)}
+            </div>
+          </div>
 
-          {tab === 'transacciones' && (
-            <>
-              <div className="mt-4">
-                <StatStrip stats={stats} apilada />
-              </div>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
+              <input
+                value={q}
+                onChange={(e) => { setQ(e.target.value); setPagina(1) }}
+                placeholder="Search by code, description or provider"
+                className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
+              />
+            </div>
+            <SearchButton onClick={() => setPagina(1)} className="h-9" />
+            <FilterMenu label="Filter entries" options={OPCIONES_FILTRO} value={tipos} onChange={(v) => { setTipos(v); setPagina(1) }} />
+            {filasPagina.length > 0 && (
+              <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
+              onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
+            )}
 
-              <div className="mt-4 flex flex-wrap items-center gap-3">
-                <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
-                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-                  <input
-                    value={q}
-                    onChange={(e) => { setQ(e.target.value); setPagina(1) }}
-                    placeholder="Search by code, description or provider"
-                    className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-                  />
-                </div>
-                <SearchButton onClick={() => setPagina(1)} className="h-9" />
-                <FilterMenu label="Filter entries" options={OPCIONES_FILTRO} value={tipos} onChange={(v) => { setTipos(v); setPagina(1) }} />
-                {filasPagina.length > 0 && (
-                  <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
-                  onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
-                )}
+            <div className="ml-auto flex flex-wrap items-center gap-3">
+              <Tabs className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
+              <ColumnPicker
+                columnas={COLUMNAS}
+                ocultas={ocultas}
+                onToggle={alternarCol}
+                onReset={() => setOcultas(OCULTAS_DE_ENTRADA)}
+                porDefecto={OCULTAS_DE_ENTRADA}
+              />
+              <button
+                type="button"
+                onClick={() => aviso.ok('Statement exported.')}
+                className="flex h-9 items-center gap-2 rounded-md border border-line bg-white px-4 text-[13px] font-medium hover:bg-surface-subtle"
+              >
+                <Download className="size-4" /> Export statement
+              </button>
+            </div>
+          </div>
 
-                <div className="ml-auto flex flex-wrap items-center gap-3">
-                  <Tabs className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
-                  <ColumnPicker
-                    columnas={COLUMNAS}
-                    ocultas={ocultas}
-                    onToggle={alternarCol}
-                    onReset={() => setOcultas(OCULTAS_DE_ENTRADA)}
-                    porDefecto={OCULTAS_DE_ENTRADA}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => aviso.ok('Statement exported.')}
-                    className="flex h-9 items-center gap-2 rounded-md border border-line bg-white px-4 text-[13px] font-medium hover:bg-surface-subtle"
+          {/* `skipDelayDuration={0}`: sin esto Radix deja una ventana de gracia
+              y al barrer la tabla el tooltip de la fila siguiente abre al
+              instante -y alcanza a mostrar el contenido de la anterior-, que
+              es el parpadeo que hacía imposible leerlo. */}
+          <TooltipProvider delayDuration={500} skipDelayDuration={0}>
+          <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white lg:flex lg:flex-1 lg:flex-col">
+            <div style={{ minWidth: anchoMinimo }} className="lg:flex lg:flex-1 lg:flex-col">
+              <div data-tabla-header className="group/fila flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
+                <span className="w-4 shrink-0" aria-hidden />
+                {columnasVisibles.map((c, i) => (
+                  <span
+                    key={c.id}
+                    data-elastica={c.elastica || undefined}
+                    style={estilo(c)}
+                    className={cn('relative flex items-center', c.derecha && 'justify-end')}
                   >
-                    <Download className="size-4" /> Export statement
-                  </button>
-                </div>
+                    <span className="truncate">{c.label}</span>
+                    <ManijaResize id={c.id} label={c.label} estado={anchos} indice={i} />
+                  </span>
+                ))}
+                <span className="relative w-7 shrink-0"><span className="sr-only">Actions</span></span>
               </div>
 
-              {/* `skipDelayDuration={0}`: sin esto Radix deja una ventana de gracia
-                  y al barrer la tabla el tooltip de la fila siguiente abre al
-                  instante -y alcanza a mostrar el contenido de la anterior-, que
-                  es el parpadeo que hacía imposible leerlo. */}
-              <TooltipProvider delayDuration={500} skipDelayDuration={0}>
-              <div ref={refVisible} data-tabla-scroll className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white lg:flex lg:flex-1 lg:flex-col">
-                <div style={{ minWidth: anchoMinimo }} className="lg:flex lg:flex-1 lg:flex-col">
-                  <div data-tabla-header className="group/fila flex items-center gap-3 bg-surface-alt px-3 py-3 text-[11px] font-semibold text-ink-muted">
-                    <span className="w-4 shrink-0" aria-hidden />
-                    {columnasVisibles.map((c, i) => (
-                      <span
-                        key={c.id}
-                        data-elastica={c.elastica || undefined}
-                        style={estilo(c)}
-                        className={cn('relative flex items-center', c.derecha && 'justify-end')}
-                      >
-                        <span className="truncate">{c.label}</span>
-                        <ManijaResize id={c.id} label={c.label} estado={anchos} indice={i} />
-                      </span>
-                    ))}
-                    <span className="relative w-7 shrink-0"><span className="sr-only">Actions</span></span>
-                  </div>
-
-                  {filasPagina.length === 0 ? (
-                    <EmptyState icon={Receipt} title="No entries" detail="Nothing matches the current search or filters." />
-                  ) : (
-                    filasPagina.map((m) => {
-                      const abierta = expandidas.includes(m.id)
-                      return (
-                      <div
-                        key={m.id}
-                        id={`fila-${m.id}`}
-                        className={cn(
-                          'border-t border-line-row',
-                          /* Barra azul de 4px al borde de las filas con crédito
-                             sin aplicar; cubre también el detalle si se expande. */
-                          tieneCredito(m) && 'relative before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-dash-blue',
-                        )}
-                      >
-                        <FilaConTooltip m={m} abierta={abierta} callado={menuDe === m.id}>
-                        <div
-                          role="button"
-                          tabIndex={0}
-                          aria-expanded={abierta}
-                          aria-label={`Toggle details for ${m.descripcion}`}
-                          onClick={(e) => {
-                            if ((e.target as HTMLElement).closest('[role="separator"]')) return
-                            /* El botón "Apply credit" vive adentro de la celda de
-                               Description -no tiene sentido un handler propio por
-                               columna sólo para esto-, así que se intercepta acá
-                               igual que el `separator` del resize de columnas. */
-                            if ((e.target as HTMLElement).closest('[data-apply-credit]')) { setEnCredito(m); return }
-                            alternarFila(m.id)
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.target !== e.currentTarget) return
-                            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
-                          }}
-                          className={cn(
-                            'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-ink-soft transition-colors duration-700 hover:bg-surface-subtle',
-                            resaltada === m.id ? 'bg-dash-count-bg' : abierta && 'bg-surface-subtle',
-                          )}
+              {filasPagina.length === 0 ? (
+                <EmptyState icon={Receipt} title="No entries" detail="Nothing matches the current search or filters." />
+              ) : (
+                filasPagina.map((m) => {
+                  const abierta = expandidas.includes(m.id)
+                  return (
+                  <div
+                    key={m.id}
+                    id={`fila-${m.id}`}
+                    className={cn(
+                      'border-t border-line-row',
+                      /* Barra azul de 4px al borde de las filas con crédito
+                         sin aplicar; cubre también el detalle si se expande. */
+                      tieneCredito(m) && 'relative before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-dash-blue',
+                    )}
+                  >
+                    <FilaConTooltip m={m} abierta={abierta} callado={menuDe === m.id}>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={abierta}
+                      aria-label={`Toggle details for ${m.descripcion}`}
+                      onClick={(e) => {
+                        if ((e.target as HTMLElement).closest('[role="separator"]')) return
+                        /* El botón "Apply credit" vive adentro de la celda de
+                           Description -no tiene sentido un handler propio por
+                           columna sólo para esto-, así que se intercepta acá
+                           igual que el `separator` del resize de columnas. */
+                        if ((e.target as HTMLElement).closest('[data-apply-credit]')) { setEnCredito(m); return }
+                        alternarFila(m.id)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.target !== e.currentTarget) return
+                        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarFila(m.id) }
+                      }}
+                      className={cn(
+                        'group/fila flex cursor-pointer items-center gap-3 px-3 py-3 text-[13px] text-ink-soft transition-colors duration-700 hover:bg-surface-subtle',
+                        resaltada === m.id ? 'bg-dash-count-bg' : abierta && 'bg-surface-subtle',
+                      )}
+                    >
+                      <RowChevron open={abierta} />
+                      {columnasVisibles.map((c) => (
+                        <span
+                          key={c.id}
+                          style={estilo(c)}
+                          className={cn('relative', c.derecha && 'text-right', c.claseCelda)}
                         >
-                          <RowChevron open={abierta} />
-                          {columnasVisibles.map((c) => (
-                            <span
-                              key={c.id}
-                              style={estilo(c)}
-                              className={cn('relative', c.derecha && 'text-right', c.claseCelda)}
-                            >
-                              {c.celda(m)}
-                            </span>
-                          ))}
-                          {/* El menú vive en un portal pero sus clics suben por React: se cortan acá para no abrir la fila. Las
-                              teclas no: la fila ya ignora las que no son suyas, y cortarlas acá dejaba sin Escape al menú. */}
-                          <span className="flex w-7 shrink-0 justify-end" onClick={(e) => e.stopPropagation()}>
-                            <AccionesFila m={m} onAplicar={() => setEnCredito(m)} onAbrirCaso={(caso) => abrirClinica({ caso })}
-                              onOpenChange={(open) => setMenuDe(open ? m.id : null)} />
-                          </span>
-                        </div>
-                        </FilaConTooltip>
-                        {abierta && (
-                          <LedgerRowDetail
-                            m={m}
-                            aplicaciones={aplicaciones}
-                            movimientos={movs}
-                            onVerTransaccion={verTransaccion}
-                            onAbrirClinica={abrirClinica}
-                            onAplicarCredito={tieneCredito(m) ? () => setEnCredito(m) : undefined}
-                          />
-                        )}
-                      </div>
-                      )
-                    })
-                  )}
-
-                  {/* El resumen cierra la tabla: adentro del mismo borde y
-                      arriba del paginado, no suelto afuera de la card. */}
-                  <div className="flex justify-end border-t border-line-row px-3 py-3">
-                    <dl className="w-fit overflow-hidden rounded-md border border-line text-[13px]">
-                      <div className="flex items-center">
-                        <dt className="w-36 bg-surface-alt px-3 py-2 text-right font-medium text-ink-soft">Balance due</dt>
-                        <dd className="text-dash-blue w-24 px-3 py-2 text-right font-semibold tabular-nums">
-                          {moneda(delaVista.reduce((a, m) => a + m.monto, 0))}
-                        </dd>
-                      </div>
-                    </dl>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3 lg:mt-auto">
-                    <span className="flex items-center gap-3 text-xs font-semibold text-ink-muted">
-                      Showing {filasPagina.length} of {filas.length} entries
-                      {anchos.avisando && (
-                        <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
-                          <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
+                          {c.celda(m)}
                         </span>
-                      )}
-                      {anchos.hayCambios && (
-                        <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">
-                          Reset column widths
-                        </button>
-                      )}
-                    </span>
-                    <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
+                      ))}
+                      {/* El menú vive en un portal pero sus clics suben por React: se cortan acá para no abrir la fila. Las
+                          teclas no: la fila ya ignora las que no son suyas, y cortarlas acá dejaba sin Escape al menú. */}
+                      <span className="flex w-7 shrink-0 justify-end" onClick={(e) => e.stopPropagation()}>
+                        <AccionesFila m={m} onAplicar={() => setEnCredito(m)} onAbrirCaso={(caso) => abrirClinica({ caso })}
+                          onOpenChange={(open) => setMenuDe(open ? m.id : null)} />
+                      </span>
+                    </div>
+                    </FilaConTooltip>
+                    {abierta && (
+                      <LedgerRowDetail
+                        m={m}
+                        aplicaciones={aplicaciones}
+                        movimientos={movs}
+                        onVerTransaccion={verTransaccion}
+                        onAbrirClinica={abrirClinica}
+                        onAplicarCredito={tieneCredito(m) ? () => setEnCredito(m) : undefined}
+                      />
+                    )}
                   </div>
-                </div>
-              </div>
-              </TooltipProvider>
-              {vista === 'Guarantor View' && <Household />}
-            </>
-          )}
+                  )
+                })
+              )}
 
-          {tab === 'pago' && (
-            <div className="mt-4">
-              <PatientPaymentPanel
-                cargos={cargosDeLaCuenta}
-                onCancelar={volver}
-                onGuardar={(m) => { agregar(m); aviso.ok(`Payment of ${moneda(Math.abs(m.monto))} recorded for ${m.paciente}.`); volver() }}
-              />
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3 lg:mt-auto">
+                <span className="flex items-center gap-3 text-xs font-semibold text-ink-muted">
+                  Showing {filasPagina.length} of {filas.length} entries
+                  {anchos.avisando && (
+                    <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
+                      <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
+                    </span>
+                  )}
+                  {anchos.hayCambios && (
+                    <button type="button" onClick={anchos.resetear} className="text-dash-blue hidden hover:underline lg:inline">
+                      Reset column widths
+                    </button>
+                  )}
+                </span>
+                <Pagination pagina={paginaActual} paginas={paginas} onChange={setPagina} />
+              </div>
             </div>
-          )}
-          {tab === 'credito' && (
-            <div className="mt-4">
-              <CreditAdjustmentPanel
-                cargos={cargosDeLaCuenta}
-                onCancelar={volver}
-                onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} applied to ${m.paciente}.`); volver() }}
-              />
-            </div>
-          )}
-          {tab === 'cargo' && (
-            <div className="mt-4">
-              <ChargeAdjustmentPanel
-                cargosVisita={cargosDeLaCuenta}
-                onCancelar={volver}
-                onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} added for ${m.paciente}.`); volver() }}
-              />
-            </div>
-          )}
+          </div>
+          </TooltipProvider>
+          {vista === 'Guarantor View' && <Household />}
         </div>
       </div>
 
+      {accion && (
+        <PostPaymentDialog
+          tipoInicial={accion}
+          pacienteInicial={GUARANTOR}
+          personas={HOGAR}
+          cargosDe={cargosAbiertosDe}
+          providers={PROVIDERS}
+          hoy={new Date()}
+          onClose={() => setAccion(null)}
+          onGuardar={(m) => { agregar(m); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} posted for ${m.paciente}.`); setAccion(null) }}
+        />
+      )}
       {enModal && <LedgerRowModal key={enModal.id} m={enModal} aplicaciones={aplicaciones} movimientos={movs} onVerTransaccion={verTransaccion} onAbrirClinica={abrirClinica} onClose={() => setEnModal(null)} />}
       {enCredito && (
         <AplicarCreditoModal

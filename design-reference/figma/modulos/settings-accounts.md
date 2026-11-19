@@ -148,3 +148,10 @@ Sin historia de Jira: devolución de diseño de Julián sobre Locations, Employe
 
 **A validar:** que recepción y administración no extrañen el clic en el nombre (es el patrón de Patients, que sí lo
 conserva). Si lo extrañan, la salida es la fila entera clickeable, no volver al link.
+
+## Subscription Summary con la card de métricas de la app (2026-11-19)
+
+Pedido de Julián al alinear el Ledger (ledger.md, CON-4142): las métricas tienen un solo diseño. Las cuatro de Edit
+Account › Subscription (Current Plan, Licenses, Expired on, Status) estaban armadas a mano, con borde y el ícono de
+tarjeta sólo en la primera; pasan a `ui/stat-card` (`StatCard`), la de Billing y el Ledger: card sin borde, rótulo,
+valor en azul y bajada. Mismos textos y datos; 2 + 2 en angosto, cuatro en fila desde `lg`.

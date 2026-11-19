@@ -930,3 +930,40 @@ el diseño sigue siendo el del sistema.
 
 1. *Patient Payment*: Amount, Check y Bank/Branch vacíos decían *Required.*; ahora *This field is required.*, como
    Charge y Credit Adjustment (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)).
+
+## CON-4142 · El Ledger se alinea con red.dev y con Billing (2026-11-19)
+
+Pedido de Julián: mirar el Ledger del paciente y Billing de red.dev, contrastarlos con el nuestro y alinear la pantalla,
+incluido qué hace cada botón y qué trae. Sin acceso a red.dev desde la sesión: la referencia es la comparativa de
+CON-4142 (Ledger) y CON-4147 (Billing), revisadas en red.dev el mismo día.
+
+1. **Los tres botones vuelven a ser botones, en la fila del título** (como red.dev y la regla de la app: botones a la
+   altura del título). Cada uno abre su drawer, **el mismo `PostPaymentDialog` de Billing**: *New Patient Payment (-)*
+   (Payment → Allocation), *Credit Adjustment (-)* (Adjustment → Allocation) y *Enter Charge (+) Adjustment* (una
+   sección). Revierte la decisión del 2026-11-12 (*Las acciones quedan como pestañas*): con el pedido de alinear los
+   botones con red.dev y Billing, dos formularios distintos para lo mismo no se sostenían, y la regla pop up = drawer ya
+   lo pedía. Salen la pestaña *Transactions* y el título que cambiaba con la pestaña.
+   - Con eso el Ledger toma lo que CON-4142 marcaba en los formularios: fecha de hoy cargada (16), listas de red.dev de
+     Settings › Ledger: 7 métodos de pago, 13 tipos de crédito y 16 de cargo (22), *Cash Payment* de entrada (21),
+     orden de campos de red.dev (20) y el título *Credit Adjustment (-)* (19).
+   - `PostPaymentDialog` suma `personas`, `cargosDe`, `providers` y `hoy`; sin ellos sigue con los datos de Billing.
+     *Apply to* en el Ledger: John Smith y su grupo familiar; cada persona ve sus cargos abiertos con lo que falta de
+     cada uno.
+   - **Monto precargado (red.dev, punto 21):** el pago arranca con el saldo abierto de quien está en *Apply to* y se
+     reparte solo en *Applied*, del cargo más viejo al más nuevo (`repartir` en `LedgerAllocationTable`, prop
+     `aRepartir`). Cambiar el monto lo vuelve a repartir; después se puede tocar fila por fila. Vale también en Billing.
+   - `PatientPaymentPanel`, `CreditAdjustmentPanel` y `ChargeAdjustmentPanel` quedan sin uso en la app; se borran con
+     sus stories al documentar.
+2. **Métricas: una card por número** (`ui/stat-card`, `StatCard`), como red.dev (punto 3): rótulo, ⓘ arriba a la
+   derecha y el monto, sin ícono ni divisores. Es la misma card de Billing (que se mudó de `Billing.tsx` a `ui/`) y la
+   de Edit Account › Subscription, que tenía la suya a mano. Mismos cuatro datos y textos. 2 + 2 hasta 672px de
+   contenedor, después cuatro en fila. El Ledger deja de usar `StatStrip apilada`.
+3. **Sin *Balance due* al pie de la tabla** (punto 9): no está en red.dev y repetía el *Patient balance* de las métricas.
+4. Sin cambios, porque ya estaban alineados o son decisiones del sistema: Patient / Guarantor View en la barra de la
+   tabla (2), Columns en la barra (4), ⋮ sólo con acciones (10), Search / Filter / Export statement (11), Household (14).
+5. **Pendiente, CON-4071:** *Apply at = Guarantor* (un pago de la cuenta que se aplica a los cargos de todo el hogar) no
+   está en el drawer: *Apply to* elige una persona, como Billing. Falta definir cómo se elige el alcance.
+
+**A validar con usuarios:** si recepción prefiere el monto precargado con todo el saldo o vacío (con el saldo a la
+vista se cobra más rápido, pero un pago parcial obliga a borrar); si se entienden las tres acciones como botones al lado
+del título en tablet, donde bajan a una segunda línea.

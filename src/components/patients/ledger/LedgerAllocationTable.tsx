@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { MoveHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ColumnPicker } from './ColumnPicker'
@@ -48,8 +48,31 @@ const ANCHO_MINIMO: Record<ColId, number> = {
 /** Techo de Description: pasado eso, el lugar que sobra va a las demás. */
 const MAX_ELASTICA = 240
 
-export function LedgerAllocationTable({ cargos }: { cargos: Movimiento[] }) {
-  const [aplicado, setAplicado] = useState<Record<string, string>>({})
+/** Reparte un monto entre los cargos, del más viejo al más nuevo, sin pasarse de ninguno (red.dev). */
+export function repartir(cargos: Movimiento[], monto: number): Record<string, string> {
+  const fecha = (m: Movimiento) => new Date(m.fecha).getTime() || 0
+  let resto = Math.round(monto * 100) / 100
+  const out: Record<string, string> = {}
+  for (const m of [...cargos].sort((a, b) => fecha(a) - fecha(b))) {
+    if (resto <= 0) break
+    const va = Math.min(resto, m.monto)
+    out[m.id] = va.toFixed(2)
+    resto = Math.round((resto - va) * 100) / 100
+  }
+  return out
+}
+
+export function LedgerAllocationTable({ cargos, aRepartir }: {
+  cargos: Movimiento[]
+  /** El monto del pago o del crédito: al cambiar, se reparte solo en Applied y después se puede tocar fila por fila. */
+  aRepartir?: number
+}) {
+  const [aplicado, setAplicado] = useState<Record<string, string>>(() => (aRepartir ? repartir(cargos, aRepartir) : {}))
+  const claveCargos = cargos.map((m) => m.id).join()
+  useEffect(() => {
+    if (aRepartir === undefined) return
+    setAplicado(repartir(cargos, aRepartir))
+  }, [aRepartir, claveCargos])
   /* Arrancan todas visibles: con los anchos del diseño de referencia las 12
      entran en la card sin pedir scroll. "Columns" queda para achicar, no
      para arreglar un default que no entraba. */

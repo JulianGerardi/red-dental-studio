@@ -426,3 +426,10 @@ Pedido de Julián: revisar qué hace cada acción y cómo se abren los drawers.
 
 **Para validar con usuarios:** si separar Ledger Transactions en un segundo paso hace más lento el cobro en recepción
 frente a verlo todo junto, como en red.dev.
+
+## `Stat` pasa a `ui/stat-card` (2026-11-19)
+
+La card de los números (`Stat`) se muda a `src/components/ui/stat-card.tsx` como `StatCard`, para que el Ledger y Edit
+Account usen la misma (ledger.md, CON-4142). `Billing.tsx` la sigue exportando como `Stat`. La bajada pasa a ser
+opcional. Los drawers de los tres botones ahora arrancan el pago con el saldo abierto del paciente repartido en
+*Applied* (red.dev; detalle en ledger.md).

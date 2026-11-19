@@ -16,7 +16,7 @@ import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Cada botón de Billing abre su drawer, como red.dev: New Patient Payment (-), Credit Adjustment (-) y Enter Charge (+)
    Adjustment, con los campos y las listas de cada uno (billing.md, 2026-11-13). Reemplaza al "Post payment" único del
-   Figma, que elegía el tipo adentro. */
+   Figma, que elegía el tipo adentro. El Ledger del paciente abre los mismos drawers con sus datos (ledger.md, 2026-11-19). */
 
 const TITULO: Record<TipoAjusteBilling, string> = {
   'Patient Payment': 'New Patient Payment (-)',
@@ -27,25 +27,40 @@ const REQUERIDO = OBLIGATORIO
 const CHEQUE = 'Check Payment'
 
 type Metodo = { id: number; monto: string; metodo: string; cheque: string; banco: string }
-const filaVacia = (id: number): Metodo => ({ id, monto: '', metodo: METODOS_PAGO[0], cheque: '', banco: '' })
+const filaVacia = (id: number, monto = ''): Metodo => ({ id, monto, metodo: METODOS_PAGO[0], cheque: '', banco: '' })
 const [mes, dia, anio] = HOY_BILLING.split('/').map(Number)
-const hoy = () => new Date(anio, mes - 1, dia)
+const HOY = new Date(anio, mes - 1, dia)
+/** El saldo abierto de los cargos, como monto de arranque del pago (red.dev). */
+const saldoDe = (cargos: Movimiento[]) => {
+  const total = cargos.reduce((a, m) => a + m.monto, 0)
+  return total > 0 ? total.toFixed(2) : ''
+}
 
 export function PostPaymentDialog({
-  tipoInicial, pacienteInicial, onClose, onGuardar,
+  tipoInicial, pacienteInicial, personas: personasDadas, cargosDe = cargosAbiertos, providers = PROVIDERS_BILLING, hoy = HOY,
+  onClose, onGuardar,
 }: {
   tipoInicial: TipoAjusteBilling
   /** El paciente elegido en Billing: los botones sólo aparecen con uno. */
   pacienteInicial?: string
+  /** Apply to. Sin dato, el paciente y los demás de su garante en Billing. */
+  personas?: string[]
+  /** Los cargos abiertos de quien se elige en Apply to, con lo que falta de cada uno como monto. */
+  cargosDe?: (persona: string) => Movimiento[]
+  providers?: readonly string[]
+  /** La fecha de arranque de Transaction date. */
+  hoy?: Date
   onClose: () => void
   onGuardar: (m: Omit<Movimiento, 'id'>) => void
 }) {
   const tipo = tipoInicial
   /* Apply to: el paciente y los demás de su garante, como red.dev. */
-  const personas = pacienteInicial ? grupoDeGarante(pacienteInicial).map((p) => p.nombre) : []
+  const personas = personasDadas ?? (pacienteInicial ? grupoDeGarante(pacienteInicial).map((p) => p.nombre) : [])
+  const inicial = pacienteInicial ?? personas[0] ?? ''
   const [fecha, setFecha] = useState<Date | null>(hoy)
-  const [aplicaA, setAplicaA] = useState(pacienteInicial ?? personas[0] ?? '')
-  const [metodos, setMetodos] = useState<Metodo[]>([filaVacia(0)])
+  const [aplicaA, setAplicaA] = useState(inicial)
+  /* El pago arranca con el saldo abierto de quien se le aplica y Cash Payment, como red.dev; se reparte solo en Applied. */
+  const [metodos, setMetodos] = useState<Metodo[]>(() => [filaVacia(0, tipo === 'Patient Payment' ? saldoDe(cargosDe(inicial)) : '')])
   const [monto, setMonto] = useState('')
   const [ajuste, setAjuste] = useState<string>(tipo === 'Charge Adjustment' ? TIPOS_AJUSTE_CARGO[0] : TIPOS_AJUSTE_CREDITO[0])
   const [provider, setProvider] = useState('')
@@ -54,7 +69,14 @@ export function PostPaymentDialog({
   const [intentado, setIntentado] = useState(false)
   const [paso, setPaso] = useState(0)
 
-  const cargos = cargosAbiertos(aplicaA)
+  const cargos = cargosDe(aplicaA)
+  const cambiarAplicaA = (v: string) => {
+    setAplicaA(v)
+    if (tipo === 'Patient Payment' && metodos.length === 1) setMetodos((p) => [{ ...p[0], monto: saldoDe(cargosDe(v)) }])
+  }
+  const aRepartir = tipo === 'Patient Payment'
+    ? metodos.reduce((a, f) => a + (Number(f.monto) || 0), 0)
+    : Number(monto) || 0
   const visitas = [...new Set(cargos.map((c) => `Visit - ${c.fecha}`))]
   const setFila = (id: number, cambios: Partial<Metodo>) => setMetodos((p) => p.map((f) => (f.id === id ? { ...f, ...cambios } : f)))
 
@@ -98,7 +120,7 @@ export function PostPaymentDialog({
     </div>
   )
   const campoAplica = (
-    <SelectField label="Apply to" required options={personas} value={aplicaA} onChange={setAplicaA} error={intentado && !aplicaA ? REQUERIDO : undefined} />
+    <SelectField label="Apply to" required options={personas} value={aplicaA} onChange={cambiarAplicaA} error={intentado && !aplicaA ? REQUERIDO : undefined} />
   )
   const campoMonto = (
     <TextField label="Amount" required placeholder="$ 0.00" value={monto} onChange={setMonto} error={intentado && !monto.trim() ? REQUERIDO : undefined} />
@@ -114,7 +136,7 @@ export function PostPaymentDialog({
             {campoFecha}
             {campoMonto}
             <SelectField label="Type" required options={[...TIPOS_AJUSTE_CARGO]} value={ajuste} onChange={setAjuste} />
-            <SelectField label="Provider" placeholder="Select" options={[...PROVIDERS_BILLING]} value={provider} onChange={setProvider} />
+            <SelectField label="Provider" placeholder="Select" options={[...providers]} value={provider} onChange={setProvider} />
             {campoAplica}
             <SelectField label="Visit date" placeholder="Select" options={visitas} value={visita} onChange={setVisita} />
           </div>
@@ -188,7 +210,7 @@ export function PostPaymentDialog({
       </DrawerStep>
 
       <DrawerStep index={1} step={paso}>
-        <LedgerAllocationTable cargos={cargos} />
+        <LedgerAllocationTable cargos={cargos} aRepartir={aRepartir} />
       </DrawerStep>
     </ModalShell>
   )
