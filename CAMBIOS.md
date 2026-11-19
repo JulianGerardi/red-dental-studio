@@ -5,7 +5,7 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-19
 
-### Dashboard según las historias de Dashboard 2 (CON-4176 a CON-4180) (#PR)
+### Dashboard según las historias de Dashboard 2 (CON-4176 a CON-4180) ([#167](https://github.com/JulianGerardi/red-dental-studio/pull/167))
 - **Menú ⋮ de Appointments** sin *Edit patient* (CON-4177): Edit appointment, Mark as no-show y Cancel appointment.
 - **Vacíos:** *No appointments scheduled for today*, *Waiting room is empty* y, con filtros sin resultados, *No results
   match your filters* en las dos columnas.
