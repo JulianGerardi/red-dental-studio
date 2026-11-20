@@ -26,7 +26,7 @@ test('Desactivar una sala con turnos los muestra y los pasa a la lista de espera
   await app.open('/settings/locations/abril?type=rooms')
   await screen.getByRole('switch', 'Operatory 1 active').tap()
   const aviso = screen.getByRole('dialog', 'This room has scheduled appointments')
-  await expect(aviso.getByText('Affected Appointments (3)')).toBeVisible()
+  await expect(aviso.getByText('Affected appointments (3)')).toBeVisible()
   await aviso.getByRole('button', 'Confirm').tap()
   await expect(screen.getByText(/3 appointments were cancelled and moved to the waiting list/)).toBeVisible()
 
@@ -46,7 +46,7 @@ test('Desde el aviso, un turno se pasa a otra sala y deja de estar entre los afe
   await expect(screen.getByText('Appointment for John Smith moved to Operatory 3.')).toBeVisible()
 
   const aviso = screen.getByRole('dialog', 'This room has scheduled appointments')
-  await expect(aviso.getByText('Affected Appointments (2)')).toBeVisible()
+  await expect(aviso.getByText('Affected appointments (2)')).toBeVisible()
   await aviso.getByRole('button', 'Confirm').tap()
   await expect(screen.getByText(/2 appointments were cancelled and moved to the waiting list/)).toBeVisible()
 })
