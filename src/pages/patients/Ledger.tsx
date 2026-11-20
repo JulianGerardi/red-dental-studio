@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { slug } from '@/data/patientsStore'
 import {
-  Receipt, Wallet, HandCoins, Download, MoveHorizontal, FileText, MinusCircle, PlusCircle,
+  Receipt, Wallet, HandCoins, MoveHorizontal, FileText, MinusCircle, PlusCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -370,16 +370,13 @@ export default function Ledger() {
               es el parpadeo que hacía imposible leerlo. */}
           <TooltipProvider delayDuration={500} skipDelayDuration={0}>
           {/* La tabla en su card, con Columns arriba a la derecha como red.dev; sin buscador ni filtro (no están en red.dev
-              ni en CON-3753). Export statement lo pide CON-3755. */}
+              ni en CON-3753). Sin Export statement: no está en red.dev (ledger.md, 2026-11-20). */}
           <div className="mt-4 flex w-full flex-col overflow-hidden rounded-lg border border-line-row bg-white lg:flex-1">
           <div className="flex items-center justify-end gap-2 border-b border-line-row px-3 py-2.5">
             {filasPagina.length > 0 && (
               <BotonExpandirTodo todasAbiertas={todasAbiertas} hayAlgunaAbierta={hayAlgunaAbierta}
                 onExpandirTodo={expandirTodo} onColapsarTodo={colapsarTodo} />
             )}
-            <Button variant="secondary" size="sm" iconOnly aria-label="Export statement" title="Export statement" onClick={() => aviso.ok('Statement exported.')}>
-              <Download />
-            </Button>
             <ColumnPicker
               size="sm"
               columnas={COLUMNAS}
