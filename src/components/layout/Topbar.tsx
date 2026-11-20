@@ -111,7 +111,7 @@ export function Topbar({
    diseño, y acá el contenido se replica tal cual-. */
 const CUENTA = [
   { label: 'Profile', icon: CircleUserRound, to: '/settings/account' },
-  { label: 'Suscription', icon: CreditCard, to: '/billing' },
+  { label: 'Subscription', icon: CreditCard, to: '/billing' },
   { label: 'Support', icon: CircleHelp, to: '/help' },
 ]
 
@@ -133,7 +133,7 @@ export function MenuCuenta() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-[248px]">
-        <DropdownMenuLabel className="text-[15px] font-bold text-ink">My Account</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-[15px] font-bold text-ink">My account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {CUENTA.map(({ label, icon: Icon, to }) => (
           <DropdownMenuItem key={label} onSelect={() => navigate(to)} className="gap-2.5 py-2 text-[13px]">
@@ -178,11 +178,11 @@ export function Campana({
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={sinLeer ? `Notifications (${sinLeer} unread)` : 'Notifications'}
-        className="relative shrink-0 rounded-md p-1 text-ink-soft transition-colors hover:bg-surface-muted hover:text-black"
+        className="relative shrink-0 rounded-md p-1 text-ink-soft transition-colors hover:bg-surface-muted hover:text-ink"
       >
         <BellDot className="size-5" />
         {sinLeer > 0 && (
-          <span className="bg-dash-blue absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full text-[9px] font-semibold text-white">
+          <span className="bg-dash-blue absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full text-[10px] font-semibold text-white">
             {sinLeer}
           </span>
         )}

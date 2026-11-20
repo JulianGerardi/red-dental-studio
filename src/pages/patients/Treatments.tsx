@@ -63,7 +63,7 @@ export function TreatmentCard({ plan }: { plan: Plan }) {
 
       <div className="bg-surface-subtle px-4 py-3">
         <p className="text-[11px] font-medium text-ink-muted">{plan.code}</p>
-        <button className="mt-1 text-[13px] font-bold text-[#0056ef] hover:underline">
+        <button className="mt-1 text-[13px] font-bold text-dash-blue hover:underline">
           {plan.name}
         </button>
         <div className="mt-2.5 h-[3px] w-full rounded-full bg-line">
@@ -77,15 +77,15 @@ export function TreatmentCard({ plan }: { plan: Plan }) {
 
       <footer className="flex items-center gap-8 px-4 py-3">
         <span className="leading-tight">
-          <span className="block text-[11px] text-ink-muted">Created On</span>
+          <span className="block text-[11px] text-ink-muted">Created on</span>
           <span className="mt-0.5 flex items-center gap-1.5 text-[13px] font-semibold text-ink">
-            <Calendar className="size-3.5 text-[#0056ef]" /> {plan.createdOn}
+            <Calendar className="size-3.5 text-dash-blue" /> {plan.createdOn}
           </span>
         </span>
         <span className="leading-tight">
-          <span className="block text-[11px] text-ink-muted">Total Amount</span>
+          <span className="block text-[11px] text-ink-muted">Total amount</span>
           <span className="mt-0.5 flex items-center gap-1.5 text-[13px] font-semibold text-ink">
-            <DollarSign className="size-3.5 text-[#0056ef]" /> {plan.total}
+            <DollarSign className="size-3.5 text-dash-blue" /> {plan.total}
           </span>
         </span>
       </footer>
@@ -110,12 +110,12 @@ export default function Treatments() {
         />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          {/* "Treatment Plan", como red.dev; el Figma decía "Treatments plan" (treatments.md, 2026-11-12). */}
-          <PageTitle>Treatment Plan</PageTitle>
+          {/* "Treatment plan", como red.dev; el Figma decía "Treatments plan" (treatments.md, 2026-11-12). */}
+          <PageTitle>Treatment plan</PageTitle>
 
           {vacio ? (
             <div className={cn(TARJETA_PANEL, 'mt-4 flex min-h-[560px] flex-col items-center justify-center lg:flex-1')}>
-              <span className="flex size-11 items-center justify-center rounded-lg bg-[#eff4ff]">
+              <span className="flex size-11 items-center justify-center rounded-lg bg-info-bg">
                 <Circle className="size-4 fill-dash-blue text-dash-blue" />
               </span>
               <p className="mt-3 text-[15px] font-bold text-ink">No accepted treatment plans</p>

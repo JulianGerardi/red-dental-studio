@@ -63,7 +63,7 @@ export const States: Story = {
       <Muestras>
         <Muestra titulo="Default" ancho={300}><SettingsSectionCard to="#" icon={UserCog} title="Accounts" description="Manage your account and their access." /></Muestra>
         <Muestra titulo="Hover" nota="Anillo azul tenue." ancho={300}><Forzar selector="a > div" estado="hover"><SettingsSectionCard to="#" icon={UserCog} title="Accounts" description="Manage your account and their access." /></Forzar></Muestra>
-        <Muestra titulo="With detail" ancho={300}><SettingsSectionCard to="#" icon={Receipt} title="Fee Schedules" description="What your office charges for each procedure." detail="5 active schedules · Default: UCR - Red" /></Muestra>
+        <Muestra titulo="With detail" ancho={300}><SettingsSectionCard to="#" icon={Receipt} title="Fee schedules" description="What your office charges for each procedure." detail="5 active schedules · Default: UCR - Red" /></Muestra>
       </Muestras>
       <Bloque titulo="Settings home" nota="Una card por sección.">
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -74,7 +74,7 @@ export const States: Story = {
       </Bloque>
       <Bloque titulo="Billing home" nota="Las tres tablas de Billing, con detail.">
         <div className="grid gap-5 md:grid-cols-3">
-          <SettingsSectionCard to="#" icon={Receipt} title="Fee Schedules" description="What your office charges for each procedure." detail="5 active schedules" />
+          <SettingsSectionCard to="#" icon={Receipt} title="Fee schedules" description="What your office charges for each procedure." detail="5 active schedules" />
           <SettingsSectionCard to="#" icon={Landmark} title="Carriers" description="The insurance companies you bill and their plans." detail="8 carriers · 10 plans" />
           <SettingsSectionCard to="#" icon={ShieldCheck} title="Coverage Tables" description="What each plan pays by procedure category." detail="5 active tables" />
         </div>
@@ -88,7 +88,7 @@ function Medida({ sel, parte }: { sel: string; parte: string }) {
   return (
     <tr>
       <td className="font-semibold">{parte}</td>
-      <td className="w-[260px]"><div ref={ref}><SettingsSectionCard to="#" icon={Receipt} title="Fee Schedules" description="What your office charges." detail="5 active schedules" /></div></td>
+      <td className="w-[260px]"><div ref={ref}><SettingsSectionCard to="#" icon={Receipt} title="Fee schedules" description="What your office charges." detail="5 active schedules" /></div></td>
       <td className="tabular-nums">{m?.alto}</td>
       <td className="tabular-nums">{m ? `${m.texto} · ${m.peso}` : ''}</td>
       <td className="tabular-nums">{m?.padding}</td>

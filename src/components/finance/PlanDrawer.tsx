@@ -31,7 +31,7 @@ export function PlanDrawer({ aseguradoraId, onClose, onGuardar }: {
 
   return (
     <ModalShell
-      title="New Insurance Plan"
+      title="New insurance plan"
       description="The plan or employer group. Its coverage, deductibles and benefits are set up next."
       onClose={onClose}
       width="max-w-[560px]"
@@ -43,10 +43,10 @@ export function PlanDrawer({ aseguradoraId, onClose, onGuardar }: {
         <DrawerSection title="General description"><PlanGeneralFields d={d} set={set} falta={falta} /></DrawerSection>
       </DrawerStep>
       <DrawerStep index={1} step={paso}>
-        <DrawerSection title="Contact Information"><PlanContactFields d={d} set={set} falta={falta} codigo={codigo} onCodigo={setCodigo} /></DrawerSection>
+        <DrawerSection title="Contact information"><PlanContactFields d={d} set={set} falta={falta} codigo={codigo} onCodigo={setCodigo} /></DrawerSection>
       </DrawerStep>
       <DrawerStep index={2} step={paso}>
-        <DrawerSection title="Address Information"><PlanAddressFields d={d} set={set} falta={falta} /></DrawerSection>
+        <DrawerSection title="Address information"><PlanAddressFields d={d} set={set} falta={falta} /></DrawerSection>
       </DrawerStep>
       <DrawerStep index={3} step={paso}>
         <DrawerSection title="Configurations"><PlanConfigurationFields d={d} set={set} falta={falta} aranceles={aranceles} /></DrawerSection>

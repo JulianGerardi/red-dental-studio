@@ -13,13 +13,13 @@ export const PILL_TONES: Record<PillTone, string> = {
   info: 'border-dash-busy-fg bg-info-bg text-dash-busy-fg',
   warning: 'border-warn-fg bg-warn-bg text-warn-fg',
   danger: 'border-dash-bad-fg bg-dash-bad-bg text-dash-bad-fg',
-  neutral: 'border-ink-faint bg-[#f5f5f5] text-[#595959]',
+  neutral: 'border-ink-faint bg-surface-muted text-ink-medium',
   purple: 'border-purple-fg bg-purple-bg text-purple-fg',
 }
 
 export const PILL_SIZES = {
   md: 'px-2.5 py-[3px] text-[11px]',
-  sm: 'px-2 py-[1px] text-[10px]',
+  sm: 'px-2 py-[1px] text-[11px]',
 }
 
 export function Pill({

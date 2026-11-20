@@ -60,7 +60,7 @@ export function CreditAdjustmentPanel({
   /* En una sola fila, como red.dev (ledger.md, 2026-11-20). */
   const grilla = FILA[4]
   const primero = (
-    <SeccionLedger titulo="Credit Adjustment Information">
+    <SeccionLedger titulo="Credit adjustment information">
       <div className={grilla}>
         <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
         <ApplyToSelect opciones={opciones} value={aplicaA} onChange={setAplicaA} titulo="Apply credit to" />
@@ -87,7 +87,7 @@ export function CreditAdjustmentPanel({
   return (
     /* Una sola página, como el pago y red.dev: los datos y Ledger Transactions debajo (ledger.md, 2026-11-20). */
     <ShellLedger
-      titulo="Credit Adjustment (-)" primero={primero} segundo={tabla}
+      titulo="Credit adjustment (-)" primero={primero} segundo={tabla}
       onGuardar={guardar} onCancelar={onCancelar} guardando={ap.cargando || sinCargos}
     />
   )

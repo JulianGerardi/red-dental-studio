@@ -38,7 +38,7 @@ export function ConfirmProcedureDialog({
     >
       {hasList ? (
         <>
-          <p>You are about to {copy.verb}.<br />Select any linked conditions you want to mark as Treated.</p>
+          <p>You are about to {copy.verb}.<br />Select any linked conditions you want to mark as treated.</p>
           <div className="mt-3 flex max-h-[46vh] flex-col gap-2.5 overflow-y-auto">
             {linkedConditions.map((c) => {
               const on = treated.includes(c.id)

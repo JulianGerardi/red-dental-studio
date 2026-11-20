@@ -13,12 +13,12 @@ export type RegionConditionDraft = {
   descriptors: Record<string, string>
 }
 
-/* New Condition de Extraoral/Intraoral (el mismo drawer para los dos): dos pasos, los dos titulados "New Condition" como en la app real (sin
+/* New Condition de Extraoral/Intraoral (el mismo drawer para los dos): dos pasos, los dos titulados "New condition" como en la app real (sin
    indicador de pasos -ahí no lo tiene-, pero acá sí lo mostramos: es la convención de todos los drawers de la app,
    StepIndicator con nombre de paso, y no hay motivo para sacarlo sólo en éste). Paso 1: las regiones elegidas en el
    gráfico (afuera, como chips removibles) y el catálogo de condición, propio -no el de procedimientos-, con buscador.
    Paso 2: la guía visual de descriptores (DescriptorFields), igual que Add/Edit Condition del resto de la app.
-   El botón del paso 1 dice "Select descriptors" en vez de "Next Step" -así lo dice la app real-. Sólo abre con al
+   El botón del paso 1 dice "Select descriptors" en vez de "Next step" -así lo dice la app real-. Sólo abre con al
    menos una región elegida (RegionExam); si se sacan todas acá, no deja avanzar (clinical-mode.md, 2026-10-28). Ver
    design-reference/figma/modulos/clinical-mode.md (2026-10-24). */
 export function RegionConditionDrawer({
@@ -58,7 +58,7 @@ export function RegionConditionDrawer({
   )
 
   return (
-    <Drawer open={open} onClose={onClose} title="New Condition" steps={pasos} step={paso} footer={footer}>
+    <Drawer open={open} onClose={onClose} title="New condition" steps={pasos} step={paso} footer={footer}>
       <DrawerStep key={paso === 0 ? 'Condition' : 'Descriptors'} index={paso} step={paso}>
         {paso === 0 ? (
           <div className="flex w-full flex-col items-start gap-4">
@@ -77,7 +77,7 @@ export function RegionConditionDrawer({
                 items={REGION_CONDITIONS} getId={(c) => c.code} getText={(c) => `${c.label} ${c.group}`}
                 renderOption={(c) => <OpcionCondicion nombre={c.label} grupo={c.group} />}
                 selected={condition ? [condition] : []} onSelect={(c) => setCode(c.code)} onRemove={() => setCode(null)}
-                placeholder="Search a Condition Here..." emptyText="No condition matches that search."
+                placeholder="Search conditions" emptyText="No condition matches that search."
               />
             </div>
           </div>

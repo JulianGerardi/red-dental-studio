@@ -39,7 +39,7 @@ export const Parts: Story = {
       <Bloque titulo="Parts">
         <TablaPartes partes={[
           ['Texto de ayuda', '“Enter the location number assigned by the insurance carrier…”, de red.dev, como bajada del drawer (sin un título de sección que repita el del drawer).', 'description'],
-          ['Location Name', 'Cada locación de Settings → Locations.', 'span'],
+          ['Location name', 'Cada locación de Settings → Locations.', 'span'],
           ['Number', 'Texto libre, placeholder “Enter a number”.', 'TextField hideLabel'],
           ['Pie', 'Cancel · Save.', 'FormFooter'],
         ]} />

@@ -1015,3 +1015,14 @@ encounter pasa a Completed o Fulfilled.
 
 Sin historia de Jira (pedido de Julián). *Dashboard* era el único título con `PageTitle size="lg"` (24px bold); pasa al
 tamaño por defecto (20px semibold), el de Patients, Scheduling y Billing.
+
+## Métricas: el bloque compacto, sin bajadas (2026-11-20)
+
+Sin historia de Jira; pedido de Julián con la propuesta de consistencia. La tira de arriba a la derecha vuelve a ser un
+bloque compacto: un solo bloque blanco, ancho al contenido, divisores verticales, ícono de 40, **rótulo y número en la
+misma línea** y nada debajo. Las bajadas ("2 completed", "1 new", "18 min avg.") se fueron de la vista y pasaron al ⓘ
+de cada métrica, que además dice qué cuenta: *Appointments for this day, without cancellations. N completed* · *Patients
+who checked in and have not checked out yet* · *Encounters started and not closed yet. 18 min avg.* "Waiting" pasa a
+**Waiting room**, el nombre del panel. En celular el bloque va debajo de la fecha, en columnas iguales y sin ícono.
+Es la variante compacta del Metric; la estándar (monto con contexto) es la de Ledger y Billing. Para validar: si alguien
+extraña ver "N completed" sin abrir el ⓘ.

@@ -10,7 +10,7 @@ import { OdontogramaLectura, OdontogramaOverview } from './OdontogramaOverview'
 
 const CONDICIONES = {
   'Caries · tooth 3 (frame)': ULTIMA_CONDICION,
-  'Charted now · tooth 13': { condicion: 'Resin-based composite crown, anterior', actualizado: '10/18/2026', pieza: 13, examen: 'Dental Assessment' },
+  'Charted now · tooth 13': { condicion: 'Resin-based composite crown, anterior', actualizado: '10/18/2026', pieza: 13, examen: 'Dental assessment' },
   'Without a tooth': { condicion: 'Mucocele', actualizado: '06/21/2026', pieza: null, examen: 'Intraoral' },
   'Long name': { condicion: 'Periodontal scaling and root planing – four or more teeth per quadrant', actualizado: '10/18/2026', pieza: 19, examen: 'Periodontal' },
 } satisfies Record<string, UltimaCondicion>
@@ -89,7 +89,7 @@ export const Parts: Story = {
         <Tabla encabezado={['Case', 'Last Condition', 'Tooth', 'Show details']} minimo={640} arriba>
           <tr><td className="font-semibold">Al entrar</td><td>La del frame: Caries, 20/06/2025 (Problem List p5).</td><td>3, con la caries oclusal pintada.</td><td>DentAssmt con la 3 elegida.</td></tr>
           <tr><td className="font-semibold">Add Condition en un examen</td><td>El procedimiento elegido y la fecha de hoy.</td><td>La del drawer; sin pieza, ninguna.</td><td>Ese examen.</td></tr>
-          <tr><td className="font-semibold">Add Procedure</td><td>No cambia: es algo planeado, no una condición.</td><td>—</td><td>—</td></tr>
+          <tr><td className="font-semibold">Add procedure</td><td>No cambia: es algo planeado, no una condición.</td><td>—</td><td>—</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>

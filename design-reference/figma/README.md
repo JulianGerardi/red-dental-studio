@@ -596,3 +596,116 @@ Licenses (nombre de la cuenta), Exam review (provider · fecha), AI Narrative Ed
 Editar algo ya cargado no lleva pasos: pestañas al ancho de su texto, como la ficha de una Location, y un solo Save
 Changes. Edit Patient es una pantalla (`/patients/:id/edit`); Edit Appointment, un drawer (ver patients.md y
 scheduling.md).
+
+## Normalización de UI (2026-11-20)
+
+**Jira:** no hay historia; es una tanda de diseño sobre toda la app que pidió Julián después de la auditoría de
+normalización (38 pantallas medidas en 1440, 834 y 390 px con Playwright). Cambia cómo se ve, no el contenido: títulos,
+placeholders y mayúsculas que vienen del Figma o de red.dev quedan como están hasta que Julián decida.
+
+Reglas que quedan:
+
+1. **Tamaños con un mismo nombre.** `Button`, `FilterMenu`, `SearchInput` y `SearchButton` usan sm 28 · md 32 · lg 36.
+   Antes `FilterMenu` "md" medía 36 y `Button` "md" 32. El default de `FilterMenu`, `SearchInput` y `SearchButton` es
+   `md`.
+2. **Nivel de página = 32 (md); dentro de una card = 28 (sm).** Pedido de Julián: a 36 los botones del Ledger y de
+   Billing quedaban grandes. La acción de la fila del título (New Patient, New location, New Fee Schedule, Add
+   Relationship, los pagos del Ledger y de Billing, Export CSV, Mark all as read, New appointment) y la barra de abajo
+   (buscador, Search, filtro, fecha, Today, Status legend, View) van en `md`, la misma altura que las pestañas de
+   pantalla. `PageTitle` mide 32 de alto (`min-h-8`): con o sin botón al lado, el título cae a la misma altura.
+   Las pestañas de las pantallas de edición de Settings van en `sm` y `FormFooter` en `md` (#175, settings-accounts.md).
+   Adentro de una card, todo en `sm`: el buscador de Today Appointments y Recent Patients, Find Patient de Billing, el de
+   Templates en Consents, los filtros del Dashboard. Los botones dentro de un formulario (Save y Cancel del pie, Bulk
+   Edit, Add Range, Deactivate template) siguen en `lg`, a la altura de los campos (36). Las pestañas siguen su regla
+   (`md` en la pantalla, `sm` en una card): Patient View / Guarantor View del Ledger pasa a `md`, y Day / Week / Month de
+   Scheduling deja de ser botones sueltos y usa `Tabs`.
+3. **`ui/search-input`** (nuevo): lupa, tamaños de Button, 320 px por defecto, `clearable` opcional. `SettingsSearch`
+   (buscador + Search) lo usa y ahora también lo usan Locations, Employees, Accounts y Ledger Options, que lo escribían a
+   mano. `SearchButton` es un `Button` primario con `size`. Story pendiente para cuando se documente.
+4. **Encabezado de página.** Settings y Help usan el padding de `CONTENEDOR_PAGINA` (`PADDING_PAGINA`, 24 en vez de 32), así el
+   contenido arranca en el mismo borde que el resto. El breadcrumb de Settings deja 24 arriba y 16 hasta el título, como
+   `PatientBreadcrumb`: los títulos con breadcrumb caen todos a la misma altura. Insurance usa `PageTitle` (tenía su h1).
+   Patient Dashboard y Clinical Mode suman un `h1` `sr-only`.
+5. **Títulos de card y de sección.** Card: 15/700 `ink`. Sección dentro de un formulario o una card: 14/700 `ink`, en `h2`.
+   Se van `text-black` (13 archivos), los 14/600 de Insurance y `form.tsx`, los 15/600 de Fee Schedule y Household, el
+   18/700 de Edit Template y el 20/700 de Household/Same Guarantor. General Information de Edit Patient y Employee pasa
+   de `h3` a `h2`. `CardTitle` de `ui/card` va en bold.
+6. **Escala.** Mínimo 11 px para texto común y pills (`Pill` sm, las pills del panel del paciente, fechas de findings,
+   metadatos de workflows); 10 px para etiquetas en mayúscula y contadores dentro de un círculo (el 9 del badge de
+   notificaciones, Total amount, Treatment progress). Los decimales del Figma se redondean (11.52 → 12, 12.5 → 13, 13.5 →
+   13). Quedan afuera, a propósito: las miniaturas de Help, el hero del Login, el odontograma, los chips del calendario,
+   `DescriptorFields` y `ConsentDocument` (imita la hoja impresa).
+7. **Color.** No queda ningún `-[#hex]` en `src/pages` ni `src/components` (salvo `help/demos`). Los que estaban a uno o
+   dos tonos de un token pasan al token (`#18181b` → `ink`, `#0056ef` de Treatments → `dash-blue`, grises a `surface-*`
+   y `line`); los que se repetían son tokens nuevos: `info-subtle`, `info-strong-bg`, `info-line`, `info-line-strong`,
+   `amber-hover`, `amber-fg`, `status-ok-hover`.
+8. **Botones.** `Plus` para todo "New/Add" (fuera `CirclePlus`); `PlusCircle` / `MinusCircle` siguen en los ajustes del
+   Ledger porque van en pareja. Los primarios escritos a mano (Save y Cancel de `FormFooter`, Upload de radiografías,
+   Link de Treatment Plan, Vitals, New review, View de Scheduling…) usan `buttonClasses`: foco, hover y deshabilitado del
+   sistema. Login queda como está (diseño propio del Figma).
+9. **Pantallas sueltas.** Forgot Password con el título de Login (26/700 `ink`); 404 y Under construction con tokens y
+   `Button`.
+10. **Pie de tabla.** Ledger y Ledger Options dicen "Showing X to Y of N …", como `DataTable`.
+11. **Área de toque.** `ICONO_SUELTO` e `InfoTip` crecen a 36 px en pantallas táctiles con un `::after` (`AREA_TOQUE`),
+    sin mover nada.
+
+Anomalías que quedan para decidir (contenido, no diseño): títulos distintos del menú (Treatment Plan, Documents Manager,
+Search Coverage Table…), las cuatro fórmulas de título de ficha, los placeholders y Title/Sentence case de los botones
+(New location, New template, New appointment). Tampoco se suman filtros por estado donde hoy no hay (Employees, Carriers,
+Patients): hay que confirmarlo en Jira. Los paneles viejos de Clinical Mode (`clinical/panels.tsx`, `RecordRow`) siguen
+con los tokens de shadcn.
+
+Para validar con usuarios: si 32 px alcanza como área de toque para las acciones de página en tablet; si recepción
+encuentra "Patient information" plegado en el celular.
+
+## Sentence case, columnas Name y formularios de a dos (2026-11-20)
+
+**Jira:** no hay historia; segunda tanda de normalización, a partir de la propuesta de consistencia que pasó Julián
+(`Confidentally_UI_review.html`) y de sus notas. Decisión de Julián: **sentence case en toda la app**.
+
+1. **Sentence case.** Títulos, botones, pestañas, columnas, labels, menús, drawers, estados y placeholders llevan
+   mayúscula sólo en la primera palabra: "Location hours", "New patient", "Date of birth", "In progress", "No show",
+   "Check in". Quedan con mayúscula: siglas (CDT, PPO, DOB, ZIP, UTC), nombres propios (personas, clínicas, carriers,
+   estados de EE. UU., días, meses) y **Clinical Mode**, que es el nombre de la función. Se reemplazó por literal exacto
+   en `src/` y `tests/` con un mapa revisado a mano (~1.400 textos), así que las comparaciones del código siguen
+   coincidiendo. **No se tocan los datos de catálogo**, que son contenido configurable de la clínica: tipos de ajuste y
+   de pago (Insurance Adjustment, Cash Payment…), los tipos de transacción (Patient Payment, Charge Adjustment), los
+   lugares de servicio oficiales de CMS, las categorías de etnia del censo, nombres de templates, casos y planes, y las
+   secciones de los workflows clínicos. Las frases que citan un elemento de la interfaz lo escriben como se ve
+   ("Tick Add new person", "in Check in or In progress status"). Los mails para el backend (`emails/`) no se tocaron.
+2. **Errores de tipeo del Figma corregidos** (antes se copiaban): Adress → Address, Lasr name → Last name, Suscription →
+   Subscription, Abreviattion → Abbreviation, Overwiev → Overview, "Fee Schedule's Name" → Fee schedule name.
+3. **Títulos con un mismo criterio.** El título de una lista es el ítem del menú: Coverage tables (antes "Search Coverage
+   Table", también en la ficha); New coverage table; Consent templates; Ledger options.
+4. **Placeholders "Search <lo que lista>".** Search patients by name, Search fee schedules, Search carriers by name or
+   payer ID, Search plans, Search coverage tables, Search adjustment types / Search payment methods (Ledger options
+   decía "Search patients"), Search exceptions, Search radiographs, Search problem list, Search procedures.
+5. **Tablas.** La columna que identifica cada fila se llama **Name** (Patients, Employees, Locations, Carriers, planes,
+   Adjustment types); Birthday/Birthdate → Date of birth; Is provider → Provider; Room → Rooms; Information → Address. Un
+   switch es un estado editable, no una acción: la columna de Ledger options se llama **Enabled** en las dos pestañas.
+   Un dato que navega va con `TABLA_LINK` (el Subscriber de Insurance).
+6. **Formularios de a dos.** La regla de los drawers ("campos de a dos, nunca tres por fila") vale también para las
+   pantallas. Se corrigieron: el nombre del paciente en Edit Patient y New patient (eran tres por fila), el teléfono de
+   Account y del dueño (tres por fila), Extension de Employee (iba sola a todo el ancho), Location name (sola a todo el
+   ancho) y Carrier name en New carrier. Medición en `forms.cjs` del scratchpad de la sesión: todos los campos a 36 de
+   alto y labels 12/500. Quedan a propósito: los drawers del Ledger con los campos en fila (ledger.md, 2026-11-20) y los
+   buscadores de persona de New appointment a todo el ancho (muestran resultados).
+7. **Métrica compacta (Dashboard).** El componente Metric tiene dos variantes: **compacta** (Dashboard: rótulo y número
+   en una línea, ícono, sin bajada; lo que cuenta cada número va en un ⓘ) y **estándar** (Ledger y Billing: monto
+   destacado con su contexto). Comparten tipografía, color, formato numérico y bordes. Ver dashboard.md.
+8. **Settings → Account.** Una clínica ve sólo su cuenta: el menú dice Account y abre Edit Account; la lista de cuentas
+   (Accounts overview) se fue. Ver settings-accounts.md.
+
+Propuestas funcionales de la misma revisión, **no implementadas** (cambian comportamiento; esperan el ok de Julián):
+
+- **Consents: sacar Deactivate template y los switches de la lista, y que Active sea un campo que se guarda con Save.**
+  Contradice CON-3719 (Desactivar Procedure Consent Template) y CON-3725 (Activar): desactivar es una acción propia,
+  con una confirmación que lista los procedimientos afectados, y se aplica en el momento, en una transacción con sus
+  mappings. No conviene juntarlo con el guardado del texto. Sí se puede sumar el aviso "Unsaved changes" del editor sin
+  tocar eso.
+- **Ledger options: filtros separados por Direction, Impact y Category, y una tabla mínima de Payment methods.** Las
+  historias de Ledger (CON-3877 List Ledger Payment Methods, CON-3878 List Ledger Adjustment Types) están en análisis:
+  conviene definirlo ahí.
+- **Employees: sacar los checkboxes de selección.** No hay historia de acciones masivas; la selección hoy no hace nada
+  más que contar. Decidir si se saca o si se define la acción.
+- **Fecha con formato en el encabezado ("Date of birth (MM/DD/YYYY)")**: no se aplicó; el formato ya se ve en los datos.

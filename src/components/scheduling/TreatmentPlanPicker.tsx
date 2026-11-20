@@ -50,7 +50,7 @@ export function Radio({ on, className }: { on: boolean; className?: string }) {
     <span
       className={cn(
         'flex size-[18px] shrink-0 items-center justify-center rounded-full border-2 transition-colors',
-        on ? 'border-dash-blue' : 'border-[#c4c4c8]',
+        on ? 'border-dash-blue' : 'border-line-strong',
         className,
       )}
     >
@@ -90,7 +90,7 @@ export function Seleccionable({
       className={cn(
         'flex w-full cursor-pointer gap-3 rounded-lg border text-left transition-colors',
         barra && 'border-l-[3px]',
-        on ? 'border-dash-blue bg-[#f8faff]' : 'border-line bg-white hover:bg-surface-subtle',
+        on ? 'border-dash-blue bg-info-subtle' : 'border-line bg-white hover:bg-surface-subtle',
         className,
       )}
     >
@@ -160,7 +160,7 @@ export function VisitRow({ visita, on, onClick }: { visita: Visita; on: boolean;
       {on && (
         <div className="w-full px-3 pb-3">
           <div className="overflow-hidden rounded-lg border border-line-row bg-white">
-            <div className="flex h-8 items-center gap-3 border-b border-line-row bg-surface-alt px-3 text-[10px] font-semibold tracking-wide text-ink-muted uppercase">
+            <div className="flex h-8 items-center gap-3 border-b border-line-row bg-surface-alt px-3 text-[11px] font-semibold text-ink-muted">
               <span className="w-[52px] shrink-0">Code</span>
               <span className="min-w-0 flex-1">Procedure</span>
             </div>

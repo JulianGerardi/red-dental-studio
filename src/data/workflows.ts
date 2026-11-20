@@ -44,7 +44,7 @@ export const WORKFLOWS: Workflow[] = [
     id: 'chief-complaint', codigo: 'CHIEFCOMPLAINT', nombre: 'Chief Complaint', categoria: 'Questionnaire', version: 2, fecha: 'Oct 05, 9:10 AM',
     pasos: [
       {
-        id: 'cc-motivo', nombre: 'Reason for Visit',
+        id: 'cc-motivo', nombre: 'Reason for visit',
         preguntas: [
           {
             id: 'cc-motivo-1', texto: 'What is the main reason for your visit today?', tipo: 'single',

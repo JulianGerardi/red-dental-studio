@@ -1,5 +1,6 @@
+import { SearchInput } from '@/components/ui/search-input'
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { Search, Plus, CalendarDays, Users } from 'lucide-react'
+import { Plus, CalendarDays, Users } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTable'
 import { PatientCard } from '@/components/patients/PatientCard'
@@ -96,16 +97,7 @@ export default function Patients() {
   }
 
   const buscador = (valor: string, cambiar: (v: string) => void, placeholder: string) => (
-    <div className="relative shrink-0">
-      <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
-      <input
-        value={valor}
-        onChange={(e) => cambiar(e.target.value)}
-        placeholder={placeholder}
-        aria-label={placeholder}
-        className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-2 pl-8 text-[12px] placeholder:text-ink-faint focus:outline-none"
-      />
-    </div>
+    <SearchInput size="sm" value={valor} onChange={cambiar} placeholder={placeholder} className="flex-none shrink-0 sm:max-w-none" />
   )
 
   return (
@@ -123,12 +115,12 @@ export default function Patients() {
             <PageTitle>Patients</PageTitle>
 
             <Button size="md" onClick={() => setModal('new')} data-tour="pat-new">
-              <Plus /> New Patient
+              <Plus /> New patient
             </Button>
           </div>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <SettingsSearch value={query} onChange={setQuery} placeholder="Search by Name or Last Name" tour="pat-search" />
+            <SettingsSearch value={query} onChange={setQuery} placeholder="Search patients by name" tour="pat-search" />
           </div>
 
           <div className="mt-4">
@@ -141,7 +133,7 @@ export default function Patients() {
             2026-10-10); el scroll va adentro de cada panel, en ShowMore. lg:h-[var(--alto-tabla)]: el alto de la
             tabla, medido arriba. */}
         <div className="flex w-full flex-col gap-4 lg:h-[var(--alto-tabla,auto)] lg:w-[336px] lg:shrink-0">
-          <Panel title={<>Today Appointments <Globo n={TURNOS_PATIENTS.length} /></>} bodyClassName="gap-2 pt-0" className="shrink-0 [&>header]:min-h-10">
+          <Panel title={<>Today appointments <Globo n={TURNOS_PATIENTS.length} /></>} bodyClassName="gap-2 pt-0" className="shrink-0 [&>header]:min-h-10">
             {buscador(buscarTurno, setBuscarTurno, "Search today's appointments")}
             {turnosFiltrados.length === 0 ? (
               <EmptyState
@@ -161,7 +153,7 @@ export default function Patients() {
               que no se niegue a achicarse por debajo de su contenido. min-h-[220px]: una tabla muy corta (la última
               página, con un solo paciente) deja a Today Appointments -shrink-0- de igual pidiendo más alto que toda la
               barra; sin este piso, Recent Patients quedaba en 0 y desaparecía entera. */}
-          <Panel title={<>Recent Patients <Globo n={recientes.length} /></>} bodyClassName="gap-2 pt-0" className="min-h-[220px] flex-1 [&>header]:min-h-10">
+          <Panel title={<>Recent patients <Globo n={recientes.length} /></>} bodyClassName="gap-2 pt-0" className="min-h-[220px] flex-1 [&>header]:min-h-10">
             {buscador(buscarReciente, setBuscarReciente, 'Search recent patients')}
             {recientesFiltrados.length === 0 ? (
               <EmptyState

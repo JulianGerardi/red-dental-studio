@@ -33,7 +33,7 @@ const ANCHO: Record<Card | FormaTurno, number> = {
   bloque: 160, chip: 140, fila: 340,
 }
 
-const ESTADOS_PACIENTE: PatientAppointmentStatus[] = ['Booked', 'Fulfilled', 'No Show', 'Cancelled']
+const ESTADOS_PACIENTE: PatientAppointmentStatus[] = ['Booked', 'Fulfilled', 'No show', 'Cancelled']
 
 type Args = {
   card: Card
@@ -45,7 +45,7 @@ type Args = {
   action: AccionTurno
   status: PatientAppointmentStatus
   cancellable: boolean
-  request: 'ASAP' | 'Waiting List'
+  request: 'ASAP' | 'Waiting list'
   waiting: string
   state: ApptState
   shape: Forma
@@ -95,7 +95,7 @@ const meta = {
   },
   args: {
     card: 'Dashboard', name: 'Noah James', time: '10:00', provider: 'Dr. Elena Martinez', operatory: 'Operatory 2',
-    reason: 'Routine cleaning appointment', action: 'Check Out', status: 'Booked', cancellable: true,
+    reason: 'Routine cleaning appointment', action: 'Check out', status: 'Booked', cancellable: true,
     request: 'ASAP', waiting: 'Waiting 4 days',
     state: 'Booked', shape: 'Day / Week block', duration: 1, width: 0,
   },
@@ -106,10 +106,10 @@ const meta = {
     provider: { control: 'text', description: 'Profesional. Dashboard, Patients list y el detalle del calendario.' },
     operatory: { control: 'text', description: 'Sala. Dashboard y el detalle del calendario.' },
     reason: { control: 'text', description: 'Motivo. Patient overview y el detalle del calendario.' },
-    action: { control: 'inline-radio', options: ['Check In', 'Check Out', 'Cancel'], description: 'El botón del pie: la acción que sigue. El color la dice: Check In verde, Check Out azul, Cancel rojo.', if: { arg: 'card', eq: 'Dashboard' } },
+    action: { control: 'inline-radio', options: ['Check in', 'Check out', 'Cancel'], description: 'El botón del pie: la acción que sigue. El color la dice: Check In verde, Check Out azul, Cancel rojo.', if: { arg: 'card', eq: 'Dashboard' } },
     status: { control: 'inline-radio', options: ESTADOS_PACIENTE, description: 'Estado del turno: el tono de la pill.', if: { arg: 'card', eq: 'Patient overview' } },
     cancellable: { control: 'boolean', description: 'Si todavía se puede cancelar: muestra Cancel.', if: { arg: 'card', eq: 'Patient overview' } },
-    request: { control: 'inline-radio', options: ['ASAP', 'Waiting List'], description: 'Tipo de solicitud: ASAP en rojo, lista de espera en azul (barra y pill).', if: { arg: 'card', eq: 'Appointment request' } },
+    request: { control: 'inline-radio', options: ['ASAP', 'Waiting list'], description: 'Tipo de solicitud: ASAP en rojo, lista de espera en azul (barra y pill).', if: { arg: 'card', eq: 'Appointment request' } },
     waiting: { control: 'text', description: 'Lista de espera: hace cuánto espera. Es el texto de la pill.', if: { arg: 'card', eq: 'Appointment request' } },
     state: { control: 'select', options: LEGEND.map((l) => l.state), description: 'Estado en la agenda: el color del fondo, la barra y la hora.', if: { arg: 'card', eq: 'Scheduling calendar' } },
     shape: { control: 'inline-radio', options: Object.keys(FORMAS), description: 'Bloque en Day y Week, chip en Month, fila en la lista del día del celular.', if: { arg: 'card', eq: 'Scheduling calendar' } },
@@ -218,7 +218,7 @@ function Demo(a: Args) {
 /* Elegí la card y cambiá los datos; tocala para ver qué abre. */
 export const Playground: Story = { render: (args) => <Demo {...args} /> }
 
-const NOAH: Appointment = { name: 'Noah James', initials: 'NJ', provider: 'Dr. Elena Martinez', operatory: 'Operatory 2', time: '10:00', accion: 'Check Out' }
+const NOAH: Appointment = { name: 'Noah James', initials: 'NJ', provider: 'Dr. Elena Martinez', operatory: 'Operatory 2', time: '10:00', accion: 'Check out' }
 const nada = () => {}
 
 /* Cuál va dónde: las cuatro con el mismo turno. */
@@ -235,7 +235,7 @@ export const WhichCardWhere: Story = {
       </tr>
       <tr>
         <td><div className="w-[300px]"><AppointmentCard appt={NOAH} compact /></div></td>
-        <td className="font-semibold">Patients<br /><span className="font-normal text-ink-muted">Today Appointments</span></td>
+        <td className="font-semibold">Patients<br /><span className="font-normal text-ink-muted">Today appointments</span></td>
         <td className="text-ink-medium">Paciente, hora y profesional.</td>
         <td className="text-ink-medium">El nombre lleva a la ficha del paciente. El kebab: Edit abre el modal del turno; Go to appointment lleva a Scheduling.</td>
       </tr>
@@ -324,8 +324,8 @@ export const DashboardStates: Story = {
       <Fila estado="Menu open" nota="El kebab: Edit appointment abre el modal con los datos de la card.">
         <Forzar selector='button[aria-label^="Actions for"]' estado="click" className="w-[340px] pb-12"><AppointmentCard appt={NOAH} onSelect={nada} onEdit={nada} /></Forzar>
       </Fila>
-      <Fila estado="Check In" nota="El paciente todavía no llegó: la acción que sigue es recibirlo. Verde (Button success).">
-        <div className="w-[340px]"><AppointmentCard appt={{ ...NOAH, accion: 'Check In' }} onSelect={nada} onEdit={nada} /></div>
+      <Fila estado="Check in" nota="El paciente todavía no llegó: la acción que sigue es recibirlo. Verde (Button success).">
+        <div className="w-[340px]"><AppointmentCard appt={{ ...NOAH, accion: 'Check in' }} onSelect={nada} onEdit={nada} /></div>
       </Fila>
       <Fila estado="Cancel" nota="Un turno que todavía no llegó: la acción que sigue es cancelarlo. Rojo (Button destructive).">
         <div className="w-[340px]"><AppointmentCard appt={{ ...NOAH, accion: 'Cancel' }} onSelect={nada} onEdit={nada} /></div>
@@ -368,7 +368,7 @@ export const PatientsListStates: Story = {
 const SIGNIFICADO_PACIENTE: Record<PatientAppointmentStatus, string> = {
   Booked: 'Confirmado y por venir: es el único que se puede cancelar.',
   Fulfilled: 'El paciente vino y se atendió.',
-  'No Show': 'El paciente no vino.',
+  'No show': 'El paciente no vino.',
   Cancelled: 'Se canceló.',
 }
 
@@ -403,7 +403,7 @@ export const RequestStates: Story = {
       <Fila estado="ASAP" nota="Quiere el primer lugar libre: barra y pill en rojo.">
         <div className="w-[248px]"><SolicitudCard s={ASAP} onCancel={nada} onSchedule={nada} /></div>
       </Fila>
-      <Fila estado="Waiting List" nota="En lista de espera: nada es urgente, barra y pill en azul. La pill dice cuánto espera.">
+      <Fila estado="Waiting list" nota="En lista de espera: nada es urgente, barra y pill en azul. La pill dice cuánto espera.">
         <div className="w-[248px]"><SolicitudCard s={ESPERA} onCancel={nada} onSchedule={nada} /></div>
       </Fila>
       <Fila estado="Schedule hover" nota="Schedule es la acción principal (primary sm); Cancel, la secundaria.">

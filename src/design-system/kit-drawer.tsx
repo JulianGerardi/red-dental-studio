@@ -21,8 +21,8 @@ export function PasosDelDrawer({ pasos, nota }: { pasos: PasoDoc[]; nota?: strin
       </Bloque>
       <Bloque titulo="Footer">
         <Tabla encabezado={['Where', 'Left', 'Right']} minimo={560}>
-          <tr><td className="font-semibold">First step</td><td>Cancel</td><td>Next Step</td></tr>
-          <tr><td className="font-semibold">Middle steps</td><td>Return</td><td>Next Step</td></tr>
+          <tr><td className="font-semibold">First step</td><td>Cancel</td><td>Next step</td></tr>
+          <tr><td className="font-semibold">Middle steps</td><td>Return</td><td>Next step</td></tr>
           <tr><td className="font-semibold">Last step</td><td>Return</td><td>Save</td></tr>
         </Tabla>
       </Bloque>

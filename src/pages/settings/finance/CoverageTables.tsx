@@ -12,7 +12,7 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { MasterList, type ItemMaestro } from '@/components/finance/MasterList'
 import { RangesTable, rangoCompleto, rangoVacio } from '@/components/finance/RangesTable'
 import { ExceptionsDrawer } from '@/components/finance/ExceptionsDrawer'
-import { TARJETA_PANEL } from '@/lib/estilos'
+import { TARJETA_PANEL, PADDING_PAGINA } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
 import { TIPOS_COBERTURA, idNuevo, type TablaCobertura, type TipoCobertura } from '@/data/finanzas'
 import { OBLIGATORIO } from '@/lib/validacion'
@@ -61,10 +61,10 @@ export function CoverageTableEditor({ tabla, abrirExcepciones = false }: { tabla
       <div className="flex flex-wrap justify-end gap-2">
         {tabla && (
           <Button variant="secondary" onClick={() => setExcepciones(true)}>
-            <ShieldAlert /> Manage Exceptions{tabla.excepciones.length ? ` (${tabla.excepciones.length})` : ''}
+            <ShieldAlert /> Manage exceptions{tabla.excepciones.length ? ` (${tabla.excepciones.length})` : ''}
           </Button>
         )}
-        <Button onClick={agregarRango}><Plus /> Add Range</Button>
+        <Button onClick={agregarRango}><Plus /> Add range</Button>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:max-w-[560px]">
         <TextField
@@ -126,21 +126,21 @@ export function SettingsCoverageTables() {
   if (tableId && !elegida) return <Navigate to={LISTA_COBERTURAS} replace />
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
-        titulo="Search Coverage Table"
-        accion={<Button onClick={() => navigate(`${LISTA_COBERTURAS}/new`)}><Plus /> New Coverage Table</Button>}
+        titulo="Coverage tables"
+        accion={<Button size="md" onClick={() => navigate(`${LISTA_COBERTURAS}/new`)}><Plus /> New coverage table</Button>}
       />
       <div className={cn(TARJETA_PANEL, 'mt-5 grid gap-6 p-4 sm:p-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start')}>
         <MasterList
-          items={items} elegido={tableId} q={q} onQ={setQ} placeholder="Search a Coverage Table Here..."
+          items={items} elegido={tableId} q={q} onQ={setQ} placeholder="Search coverage tables"
           vacio={`No ${tipo.toLowerCase()} coverage tables match.`}
           filtro={<SelectField hideLabel label="Type" options={[...TIPOS_COBERTURA]} value={tipo} onChange={(v) => setTipo(v as TipoCobertura)} />}
         />
         <div className="min-w-0">
           {elegida
             ? <CoverageTableEditor key={elegida.id} tabla={elegida} />
-            : <EmptyState icon={ListChecks} title="No Coverage Table Found" detail="Select an existing Coverage Table from the list on the left or create a new one by clicking the Create New button" className="py-16" />}
+            : <EmptyState icon={ListChecks} title="No coverage table found" detail="Select a coverage table from the list on the left or create one with New coverage table." className="py-16" />}
         </div>
       </div>
     </div>
@@ -149,8 +149,8 @@ export function SettingsCoverageTables() {
 
 export function SettingsNewCoverageTable() {
   return (
-    <div className="px-4 py-6 sm:px-8">
-      <SettingsPageHeader titulo="Coverage Table" />
+    <div className={PADDING_PAGINA}>
+      <SettingsPageHeader titulo="New coverage table" />
       <div className={cn(TARJETA_PANEL, 'mt-5 p-4 sm:p-5')}>
         <CoverageTableEditor />
       </div>

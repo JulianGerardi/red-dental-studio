@@ -24,8 +24,8 @@ type Story = StoryObj<typeof meta>
 export const FindingOption: Story = {
   render: () => (
     <>
-      <OpcionFinding finding={{ condition: 'chronic enamel dental caries', area: 'Tooth 3', surfaces: ['O', 'DB'], status: 'Active', date: 'May 14, 2026', examen: 'Dental Assessment' }} />
-      <OpcionFinding finding={{ condition: 'oral candidiasis', area: 'Soft Palate', surfaces: [], status: 'Active', date: 'May 14, 2026', examen: 'Intraoral' }} />
+      <OpcionFinding finding={{ condition: 'chronic enamel dental caries', area: 'Tooth 3', surfaces: ['O', 'DB'], status: 'Active', date: 'May 14, 2026', examen: 'Dental assessment' }} />
+      <OpcionFinding finding={{ condition: 'oral candidiasis', area: 'Soft palate', surfaces: [], status: 'Active', date: 'May 14, 2026', examen: 'Intraoral' }} />
     </>
   ),
 }

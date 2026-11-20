@@ -10,7 +10,7 @@ const FINDING: Finding = {
   id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: 'May 14, 2026',
   status: 'Active', tooth: 3, provider: 'Elena Martinez', surfaces: ['O'], notes: '', linked: [], diagnoses: [],
 }
-const ESTADOS: FindingStatus[] = ['Active', 'Monitoring', 'In Treatment', 'Treated', 'Externally Treated', 'No Treatment Needed', 'Patient Declined', 'Clinic Declined', 'Discarded']
+const ESTADOS: FindingStatus[] = ['Active', 'Monitoring', 'In treatment', 'Treated', 'Externally treated', 'No treatment needed', 'Patient declined', 'Clinic declined', 'Discarded']
 
 type Args = { status: FindingStatus; verRegistro: boolean }
 
@@ -98,7 +98,7 @@ export const States: Story = {
 /* El menú abierto sobre un finding activo. */
 export const Open: Story = { render: (a) => <Menu {...a} />, play: async (c) => { await abrir(c); await esperar(/View full record/)(c) } }
 
-/* En un finding ya tratado, "Start Treatment" queda deshabilitado. */
+/* En un finding ya tratado, "Start treatment" queda deshabilitado. */
 export const Treated: Story = { args: { status: 'Treated' }, render: (a) => <Menu {...a} />, play: async (c) => { await abrir(c); await esperar(/Start Treatment/)(c) } }
 
 /* Sin `onVer` no hay View full record. */

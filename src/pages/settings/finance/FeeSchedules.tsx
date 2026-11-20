@@ -20,7 +20,7 @@ import { AssignmentsCount, AssignmentsDrawer, asignacionesDe } from '@/component
 import { CompareFeesDrawer } from '@/components/finance/CompareFeesDrawer'
 import { MoneyInput } from '@/components/finance/fields'
 import { CopyFormDrawer, IncreaseAllDrawer, aumentar } from '@/components/finance/FeeScheduleTools'
-import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_LINK, TABLA_MARCO, TARJETA_PANEL } from '@/lib/estilos'
+import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_LINK, TABLA_MARCO, TARJETA_PANEL, PADDING_PAGINA } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
 import {
   ESTADOS_ARANCEL, PROCEDIMIENTOS, SIN_ASIGNAR, TIPOS_ARANCEL, TONO_ARANCEL, conImporte, dinero, etiquetaVersion, fechaDMA,
@@ -133,17 +133,17 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         <Alert tone="danger" title="Uncompleted fields">All required fields marked with (*) must be completed before proceeding</Alert>
       )}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-[15px] font-semibold text-ink">General information</h2>
+        <h2 className="text-sm font-bold text-ink">General information</h2>
         <div className="flex gap-2">
           <Button variant="secondary" onClick={() => setHerramienta('copiar')}><Copy /> Copy form</Button>
-          <Button variant="secondary" onClick={() => setHerramienta('aumentar')}><SlidersHorizontal /> Bulk Edit</Button>
+          <Button variant="secondary" onClick={() => setHerramienta('aumentar')}><SlidersHorizontal /> Bulk edit</Button>
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex items-start gap-2">
           <TextField
-            label="Fee Schedule's Name" required placeholder="Enter a fee schedule name" value={nombre} onChange={setNombre}
+            label="Fee schedule name" required placeholder="Enter a fee schedule name" value={nombre} onChange={setNombre}
             disabled={!renombrando} error={faltaNombre ?? (repetido ? 'Another fee schedule has this name.' : undefined)} className="min-w-0 flex-1"
           />
           {arancel && (
@@ -153,7 +153,7 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
           )}
         </div>
         {arancel && version && (
-          <SelectField label="Fee Schedule Version" options={arancel.versiones.map((v) => etiquetaVersion(arancel, v))} value={etiquetaVersion(arancel, version)} onChange={elegirVersion} />
+          <SelectField label="Fee schedule version" options={arancel.versiones.map((v) => etiquetaVersion(arancel, v))} value={etiquetaVersion(arancel, version)} onChange={elegirVersion} />
         )}
         {!arancel && campoTipo}
         <div className="flex flex-col gap-2">
@@ -165,7 +165,7 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         </div>
         {arancel && (
           <div className="flex flex-col gap-2">
-            <FieldLabel required>Available From</FieldLabel>
+            <FieldLabel required>Available from</FieldLabel>
             <DatePicker value={desde} onChange={setDesde} className="h-9 w-full" error={!!faltaFecha} />
             {faltaFecha && <span className="-mt-1 text-[11px] text-field-error">{faltaFecha}</span>}
           </div>
@@ -176,9 +176,9 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="relative block w-full sm:max-w-[320px]">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-          <input aria-label="Search procedure" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search procedure..." className={cn(control(), 'h-9 pr-3 pl-9')} />
+          <input aria-label="Search procedure" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search procedures" className={cn(control(), 'h-9 pr-3 pl-9')} />
         </span>
-        <span className="text-[13px] text-ink-muted tabular-nums" title="Procedures whose New Fee is more than $0.00">
+        <span className="text-[13px] text-ink-muted tabular-nums" title="Procedures whose new fee is more than $0.00">
           Non-zero fees — <span className="font-semibold text-ink">{conImporte(nuevos)} / {PROCEDIMIENTOS.length}</span>
         </span>
       </div>
@@ -186,7 +186,7 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
       {elegidos.length > 0 && (
         <div role="status" className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-info-bg px-3 py-2 text-[13px]">
           <span className="font-semibold text-ink">{elegidos.length} selected</span>
-          <span className="text-ink-muted">Bulk Edit changes only these fees.</span>
+          <span className="text-ink-muted">Bulk edit changes only these fees.</span>
           <button type="button" onClick={() => setElegidos([])} className="ml-auto font-medium text-dash-blue hover:underline">Clear selection</button>
         </div>
       )}
@@ -200,8 +200,8 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
             />
           </span>
           <span role="columnheader">Code</span><span role="columnheader">Description</span>
-          {arancel && <span role="columnheader" className="text-right">Current Fee</span>}
-          <span role="columnheader" className="text-right">New Fee</span>
+          {arancel && <span role="columnheader" className="text-right">Current fee</span>}
+          <span role="columnheader" className="text-right">New fee</span>
         </div>
         {filas.map((p) => {
           const elegido = elegidos.includes(p.code)
@@ -286,12 +286,12 @@ export function SettingsFeeSchedules() {
   ]
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
-        titulo="Fee Schedules"
-        accion={<Button onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New Fee Schedule</Button>}
+        titulo="Fee schedules"
+        accion={<Button size="md" onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New fee schedule</Button>}
       >
-        <SettingsSearch value={q} onChange={setQ} placeholder="Search a Fee Schedule Here..." />
+        <SettingsSearch value={q} onChange={setQ} placeholder="Search fee schedules" />
         <FilterMenu
           label="Filters"
           groups={[{
@@ -308,7 +308,7 @@ export function SettingsFeeSchedules() {
           rowKey={(a) => a.id}
           rowLabel={(a) => a.nombre}
           itemLabel="fee schedules"
-          empty={{ icon: ReceiptText, title: 'No Fee Schedule Found', detail: 'Try another name or state, or create a new one with New Fee Schedule.' }}
+          empty={{ icon: ReceiptText, title: 'No fee schedule found', detail: 'Try another name or state, or create a new one with New fee schedule.' }}
           rowActions={(a) => (
             <>
               <DropdownMenuItem onSelect={() => navigate(rutaArancel(a.id))}><Pencil className="size-4 shrink-0" /> Edit</DropdownMenuItem>
@@ -350,14 +350,14 @@ export function SettingsFeeScheduleEdit() {
   if (!elegido) return <Navigate to={LISTA_ARANCELES} replace />
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
-        titulo="Edit Fee Schedule"
-        accion={<Button onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New Fee Schedule</Button>}
+        titulo="Edit fee schedule"
+        accion={<Button size="md" onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New fee schedule</Button>}
       />
       <div className={cn(TARJETA_PANEL, 'mt-5 grid gap-6 p-4 sm:p-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start')}>
         <MasterList
-          items={items} elegido={feeId} q={q} onQ={setQ} placeholder="Search a Fee Schedule Here..."
+          items={items} elegido={feeId} q={q} onQ={setQ} placeholder="Search fee schedules"
           vacio="No fee schedules match the search or filters."
           filtro={(
             <FilterMenu
@@ -379,8 +379,8 @@ export function SettingsFeeScheduleEdit() {
 
 export function SettingsNewFeeSchedule() {
   return (
-    <div className="px-4 py-6 sm:px-8">
-      <SettingsPageHeader titulo="New Fee Schedule" />
+    <div className={PADDING_PAGINA}>
+      <SettingsPageHeader titulo="New fee schedule" />
       <div className={cn(TARJETA_PANEL, 'mt-5 p-4 sm:p-5')}>
         <FeeScheduleEditor />
       </div>

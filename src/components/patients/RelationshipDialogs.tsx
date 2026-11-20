@@ -20,7 +20,7 @@ export function AvisoCuentaDesactivada({ nombre }: { nombre: string }) {
 /* Delete Relationship: borrado físico, sin vuelta atrás. Textos de CON-3999. */
 export function DeleteRelationshipDialog({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
   return (
-    <ConfirmDialog title="Delete Relationship" confirmLabel="Delete" tone="danger" icon="delete" onConfirm={onConfirm} onCancel={onCancel}>
+    <ConfirmDialog title="Delete relationship" confirmLabel="Delete" tone="danger" icon="delete" onConfirm={onConfirm} onCancel={onCancel}>
       Are you sure you want to remove this relationship? This action cannot be undone.
     </ConfirmDialog>
   )
@@ -37,7 +37,7 @@ export function RemoveGuardianDialog({
   onCancel: () => void
 }) {
   return (
-    <ConfirmDialog title="Remove Guardian access" confirmLabel="Remove Guardian" onConfirm={onConfirm} onCancel={onCancel}>
+    <ConfirmDialog title="Remove guardian access" confirmLabel="Remove guardian" onConfirm={onConfirm} onCancel={onCancel}>
       <div className="flex flex-col gap-3">
         <p>{persona} will no longer have guardian access to {paciente}.</p>
         {ultimaDeGuardian && <AvisoCuentaDesactivada nombre={persona} />}

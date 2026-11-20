@@ -65,7 +65,7 @@ const slug = (s: string) => s.toLowerCase().trim().replace(/\s+/g, '-')
    2. Era una card fija abajo a la derecha que tapaba filas de la tabla o de
       Recent Patients, y cerrarla con la X la perdía hasta recargar.
    3. Moverla debajo de la campana (arriba a la derecha) no alcanzaba: ahí
-      arriba empieza el panel "Today Appointments", así que una card fija de
+      arriba empieza el panel "Today appointments", así que una card fija de
       este tamaño terminaba tapándole el encabezado igual -no hay hueco
       vacío ahí, sólo se corre el problema unos px-, y además competía con el
       botón "+ New Patient", que vive en esa misma esquina.
@@ -233,21 +233,21 @@ export function PatientInSessionPopup({ onRect }: {
               <div key={i} className="group flex items-center gap-2.5 py-2.5 first:pt-0.5 last:pb-0.5">
                 <Avatar initials={p.initials} />
                 <Link to={`/patients/${slug(p.name)}`} className="min-w-0 flex-1">
-                  <p className="truncate text-[12.5px] font-bold text-ink group-hover:underline">{p.name}</p>
+                  <p className="truncate text-[13px] font-bold text-ink group-hover:underline">{p.name}</p>
                   <div className="mt-1 flex min-w-0 items-center gap-1.5">
-                    <span className="bg-dash-count-bg text-dash-blue-hover shrink-0 rounded-full px-1.5 py-[1px] text-[10px] font-semibold whitespace-nowrap">
+                    <span className="bg-dash-count-bg text-dash-blue-hover shrink-0 rounded-full px-1.5 py-[1px] text-[11px] font-semibold whitespace-nowrap">
                       {p.operatory}
                     </span>
-                    <span className="truncate text-[10.5px] text-ink-muted">{p.provider}</span>
+                    <span className="truncate text-[11px] text-ink-muted">{p.provider}</span>
                   </div>
                 </Link>
                 <div className="flex shrink-0 flex-col items-end gap-1">
-                  <span className="text-[10px] whitespace-nowrap text-ink-faint">{p.time}</span>
+                  <span className="text-[11px] whitespace-nowrap text-ink-faint">{p.time}</span>
                   <button
                     type="button"
                     aria-label={`Check out ${p.name}`}
                     onClick={() => setOcultos((prev) => new Set(prev).add(i))}
-                    className="flex size-6 items-center justify-center rounded-md text-ink-faint hover:bg-[#eef1f5] hover:text-ink"
+                    className="flex size-6 items-center justify-center rounded-md text-ink-faint hover:bg-surface-slate hover:text-ink"
                   >
                     <LogOut className="size-3.5" />
                   </button>
@@ -257,7 +257,7 @@ export function PatientInSessionPopup({ onRect }: {
           })}
         </div>
       ) : (
-        <p className="px-1 py-3 text-[11.5px] text-ink-faint">No patients currently being seen.</p>
+        <p className="px-1 py-3 text-[12px] text-ink-faint">No patients currently being seen.</p>
       )}
     </>
   )

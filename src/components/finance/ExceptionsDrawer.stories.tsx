@@ -39,10 +39,10 @@ export const Parts: Story = {
     <PasosDelDrawer
       nota="La lista es la vista inicial; el asistente reemplaza su contenido y su pie (Cancel · Back · Next Step · Save)."
       pasos={[
-        { nombre: 'Exceptions Type', secciones: 'Age limitation · Downgrade · Frequency · Not covered (sin título de sección: lo dice el paso)', obligatorios: 'Exception Type' },
-        { nombre: 'Select Procedure', secciones: 'Add Procedures (n): buscador “Search for CDT Code o Description” y los elegidos como chips', obligatorios: 'Al menos uno (“Please add a procedure to the exception”)' },
-        { nombre: 'Specify Options', secciones: 'Age limitation: Minimum/Maximum age y Coverage % o Downgrade to + Deductible Type · Downgrade: Downgrade to · Frequency: How many times, Over the course of · Not covered: sin opciones', obligatorios: 'Los del tipo' },
-        { nombre: 'Reason For Exception', secciones: 'Reason for exception, con la ayuda “Select the reason for the exception.”', obligatorios: 'Reason' },
+        { nombre: 'Exceptions type', secciones: 'Age limitation · Downgrade · Frequency · Not covered (sin título de sección: lo dice el paso)', obligatorios: 'Exception type' },
+        { nombre: 'Select procedure', secciones: 'Add Procedures (n): buscador “Search for CDT Code o Description” y los elegidos como chips', obligatorios: 'Al menos uno (“Please add a procedure to the exception”)' },
+        { nombre: 'Specify options', secciones: 'Age limitation: Minimum/Maximum age y Coverage % o Downgrade to + Deductible Type · Downgrade: Downgrade to · Frequency: How many times, Over the course of · Not covered: sin opciones', obligatorios: 'Los del tipo' },
+        { nombre: 'Reason for exception', secciones: 'Reason for exception, con la ayuda “Select the reason for the exception.”', obligatorios: 'Reason' },
       ]}
     />
   ),

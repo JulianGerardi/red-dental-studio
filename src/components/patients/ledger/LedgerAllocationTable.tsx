@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils'
 import { moneda, fechaCorta } from '@/data/ledger'
 import { limpiarImporte, numero, type CargoAbierto } from '@/lib/ledgerAplicacion'
 
-/* "Ledger Transactions" de Patient Payment y Credit Adjustment, como red.dev (videos de Julián, 2026-11-19): los cargos
+/* "Ledger transactions" de Patient Payment y Credit Adjustment, como red.dev (videos de Julián, 2026-11-19): los cargos
    abiertos con su Charge, Other Credit y Guar Estimate, el Applied que se edita y el Balance que queda. El reparto es
    del más viejo al más nuevo (CON-3738, CON-3739) y lo calcula el formulario; acá se dibuja y se edita. Mientras se
    recargan los cargos (al cambiar Apply to) las filas son un esqueleto. Ver design-reference/figma/modulos/ledger.md. */
@@ -26,8 +26,8 @@ export function LedgerAllocationTable({
   const celda = 'flex min-w-0 items-center px-3'
   const derecha = 'justify-end text-right tabular-nums'
   return (
-    <section aria-label="Ledger Transactions" className="flex flex-col gap-3">
-      <h2 className="text-sm font-bold text-ink">Ledger Transactions</h2>
+    <section aria-label="Ledger transactions" className="flex flex-col gap-3">
+      <h2 className="text-sm font-bold text-ink">Ledger transactions</h2>
       <div className="overflow-x-auto rounded-lg border border-line bg-white" aria-busy={cargando || undefined}>
         <div className="min-w-[940px]">
           <div className={cn('grid bg-surface-alt py-2.5 text-[12px] font-semibold text-ink-muted', COLUMNAS)}>

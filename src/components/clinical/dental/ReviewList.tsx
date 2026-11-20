@@ -15,7 +15,7 @@ export function ReviewList({ reviews }: { reviews: ExamReview[] }) {
     return (
       <div className="bg-dash-count-bg flex flex-1 flex-col items-center justify-center gap-1 rounded-xl px-4 py-10 text-center">
         <p className="text-dash-blue text-xs font-medium">This exam hasn't been reviewed yet.</p>
-        <p className="text-dash-blue text-xs font-medium">Use Review Exam to sign it off.</p>
+        <p className="text-dash-blue text-xs font-medium">Use Review exam to sign it off.</p>
       </div>
     )
   }
@@ -27,7 +27,7 @@ export function ReviewList({ reviews }: { reviews: ExamReview[] }) {
           <div key={r.id} className="flex w-full flex-col gap-2.5 rounded-xl border border-line bg-white p-3">
             <div className="flex w-full items-start justify-between gap-2">
               <span className="flex flex-col rounded-lg bg-surface-subtle px-2.5 py-1.5">
-                <span className="text-[11px] text-ink-muted">Last Reviewed</span>
+                <span className="text-[11px] text-ink-muted">Last reviewed</span>
                 <span className="text-sm font-bold text-ink">{r.date}</span>
               </span>
               <button

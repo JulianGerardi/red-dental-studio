@@ -58,9 +58,9 @@ export const Parts: Story = {
     <Lienzo>
       <Bloque titulo="Parts">
         <TablaPartes partes={[
-          ['Code Ranges', 'Desde y hasta, en mayúsculas y sólo D + dígitos (D0100). Obligatorios.', 'TextField hideLabel'],
+          ['Code ranges', 'Desde y hasta, en mayúsculas y sólo D + dígitos (D0100). Obligatorios.', 'TextField hideLabel'],
           ['Category', 'Texto libre (Diagnostic, Endodontics…). Obligatoria.', 'TextField hideLabel'],
-          ['Deductible Type', 'Basic, Major, None, Orthodontic o Preventive.', 'SelectField hideLabel'],
+          ['Deductible type', 'Basic, Major, None, Orthodontic o Preventive.', 'SelectField hideLabel'],
           ['Coverage % / Copayment', 'Lo que paga: 0–100 con Percentage, un monto con Copayment.', 'TextField hideLabel'],
           ['Exc', 'Cuántas excepciones de la plantilla caen en el rango (sólo lectura).', 'span'],
           ['Tacho', 'Saca el rango; se guarda con el Save de la pantalla.', 'button'],

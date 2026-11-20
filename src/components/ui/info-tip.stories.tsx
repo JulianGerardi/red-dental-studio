@@ -103,8 +103,8 @@ export const States: Story = {
       <Estado titulo="Focus" nota="Con el teclado: anillo azul. Enter no hace falta: llegar con Tab ya lo abre.">
         <Card title="Guarantor A/R" text={TEXTO}><Forzar selector="button" estado="focus-visible"><InfoTip title="Guarantor A/R">{TEXTO}</InfoTip></Forzar></Card>
       </Estado>
-      <Estado titulo="Open" nota="La card con el título y el texto, abajo y a la derecha. En el celular se abre y se cierra tocando."><Card title="Overdue Balance" text="Open charge balances older than 30 days." abierto /></Estado>
-      <Estado titulo="Two lines" nota="El texto más largo de Billing: entra en dos líneas en 256px."><Card title="Guarantors with Open Charges" text="Ledgers whose charges at this location still carry a positive guarantor balance." abierto /></Estado>
+      <Estado titulo="Open" nota="La card con el título y el texto, abajo y a la derecha. En el celular se abre y se cierra tocando."><Card title="Overdue balance" text="Open charge balances older than 30 days." abierto /></Estado>
+      <Estado titulo="Two lines" nota="El texto más largo de Billing: entra en dos líneas en 256px."><Card title="Guarantors with open charges" text="Ledgers whose charges at this location still carry a positive guarantor balance." abierto /></Estado>
     </div>
   ),
 }

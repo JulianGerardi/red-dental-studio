@@ -27,7 +27,7 @@ export const DeleteDialog: Story = {
   render: () => <DeleteRelationshipDialog onConfirm={salir} onCancel={salir} />,
 }
 export const RemoveGuardian: Story = {
-  name: 'Remove Guardian access',
+  name: 'Remove guardian access',
   parameters: emergente,
   render: () => <RemoveGuardianDialog persona="Michael Miller" paciente="John Smith" ultimaDeGuardian onConfirm={salir} onCancel={salir} />,
 }

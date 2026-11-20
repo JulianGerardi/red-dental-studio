@@ -135,18 +135,18 @@ export function ReplaceContactDrawer({
       actions={<DrawerActions onCancel={onClose} onSave={usar} saveLabel={direccion ? 'Use new address' : 'Use new phone'} />}
     >
       {direccion ? (
-        <DrawerSection title="Address Information">
+        <DrawerSection title="Address information">
           <div className="grid gap-4 sm:grid-cols-2">
-            <TextField label="Address Line 1" required placeholder="Street name and number" value={d.linea1} onChange={set('linea1')} error={falta('linea1')} />
-            <TextField label="Address Line 2" placeholder="Suite, unit" value={d.linea2} onChange={set('linea2')} />
+            <TextField label="Address line 1" required placeholder="Street name and number" value={d.linea1} onChange={set('linea1')} error={falta('linea1')} />
+            <TextField label="Address line 2" placeholder="Suite, unit" value={d.linea2} onChange={set('linea2')} />
             <SelectField label="Country" required options={PAISES} value={d.pais} onChange={set('pais')} error={falta('pais')} />
             <SelectField label="State" required placeholder="Select your region" options={ESTADOS} value={d.estado} onChange={set('estado')} error={falta('estado')} />
             <TextField label="City" required placeholder="Your city" value={d.ciudad} onChange={set('ciudad')} error={falta('ciudad')} />
-            <TextField label="ZIP Code" required placeholder="Postal code (only numbers)" value={d.zip} onChange={(v) => set('zip')(v.replace(/\D/g, '').slice(0, 10))} error={falta('zip')} />
+            <TextField label="ZIP code" required placeholder="Postal code (only numbers)" value={d.zip} onChange={(v) => set('zip')(v.replace(/\D/g, '').slice(0, 10))} error={falta('zip')} />
           </div>
         </DrawerSection>
       ) : (
-        <DrawerSection title="Contact Information">
+        <DrawerSection title="Contact information">
           <PhoneFields required value={tel} onChange={setTel} errores={erroresTel} />
         </DrawerSection>
       )}
@@ -267,7 +267,7 @@ export function ContractedWith({
     <section className="rounded-lg bg-white p-4 shadow-panel sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold text-ink">Contracted With</h2>
+          <h2 className="text-sm font-bold text-ink">Contracted with</h2>
           <p className="mt-1 text-xs text-ink-muted">Mark the carriers this billing profile has a contract with.</p>
         </div>
         <Pill tone="info">{contratados} contracted</Pill>

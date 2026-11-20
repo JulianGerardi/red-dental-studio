@@ -84,7 +84,7 @@ export const AllManaged: Story = {
 
 /* Bloqueo: una cita afectada está en Check In. */
 export const Blocked: Story = {
-  render: () => <HoursBlockedDialog turnos={TURNOS_LOCACION.filter((t) => t.estado === 'Check In')} onClose={() => {}} />,
+  render: () => <HoursBlockedDialog turnos={TURNOS_LOCACION.filter((t) => t.estado === 'Check in')} onClose={() => {}} />,
 }
 
 export const Parts: Story = {

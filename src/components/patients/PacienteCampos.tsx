@@ -94,7 +94,7 @@ export function validarPaciente(d: DatosPaciente, { menor = false, exigirGuardia
   if (!menor) return e
   const g = guardianDe(d)
   if (!g.tiene) {
-    if (d.guardianName.trim()) e.guardianName = 'Select a person from the list or tick Add New Person.'
+    if (d.guardianName.trim()) e.guardianName = 'Select a person from the list or tick Add new person.'
     else if (exigirGuardian) e.guardianName = MENOR_SIN_GUARDIAN
     return e
   }
@@ -203,7 +203,7 @@ function CuentaPortal() {
   )
 }
 
-/* Figma: en New Patient las dos opciones; en Edit Patient, "Interpreter Required" y la cuenta del portal como estado
+/* Figma: en New Patient las dos opciones; en Edit Patient, "Interpreter required" y la cuenta del portal como estado
    ("Linked"). Si el paciente aún no tiene cuenta, Edit ofrece la misma opción que New. El Figma dibuja Email a todo el
    ancho; acá va en la grilla de a dos, como pide la regla de los drawers (Components / UI / Drawer → Specs → Fields). */
 /* Sólo New Patient: tomar a alguien que el sistema ya tiene (empleado, contacto, suscriptor) en vez de cargar sus datos.
@@ -224,7 +224,7 @@ export function BuscarPersona({ v }: { v: VinculoPersona }) {
   return (
     <div data-campo="persona">
       <PersonSearchField
-        label="Person" required placeholder="Search by Name or Last Name"
+        label="Person" required placeholder="Search patients by name"
         personas={v.personas.map((p) => p.name)}
         value={v.valor} onChange={v.onValor} error={v.error}
         emptyText="No one in the system matches this name. Untick the option to enter the patient's details."
@@ -240,17 +240,15 @@ export function BuscarPersona({ v }: { v: VinculoPersona }) {
    datos y la cuenta del portal. Interpreter Required va en Demography, junto a Language (patients.md, 2026-11-18). */
 export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo, conTitulo }: Props & { portalVinculado?: boolean; vinculo?: VinculoPersona }) {
   return (
-    <Bloque titulo="General Information" conTitulo={conTitulo}>
+    <Bloque titulo="General information" conTitulo={conTitulo}>
       {vinculo && <LinkPersonCheckbox checked={vinculo.activo} onChange={vinculo.onActivo} />}
       {vinculo?.activo ? <BuscarPersona v={vinculo} /> : (
-        /* El nombre completo en una fila de tres; debajo, email y birthdate (patients.md, 2026-11-16). */
+        /* De a dos, como todos los formularios (normalización de formularios, figma/README.md 2026-11-20). */
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Campo nombre="first"><TextField label="First Name" required placeholder="John" value={d.first} onChange={(v) => cambiar('first', v)} error={errores.first} /></Campo>
-            <Campo nombre="middle"><TextField label="Middle Name" placeholder="Lorem" value={d.middle} onChange={(v) => cambiar('middle', v)} /></Campo>
-            <Campo nombre="last"><TextField label="Last Name" required placeholder="Smith" value={d.last} onChange={(v) => cambiar('last', v)} error={errores.last} /></Campo>
-          </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Campo nombre="first"><TextField label="First name" required placeholder="John" value={d.first} onChange={(v) => cambiar('first', v)} error={errores.first} /></Campo>
+            <Campo nombre="middle"><TextField label="Middle name" placeholder="Lorem" value={d.middle} onChange={(v) => cambiar('middle', v)} /></Campo>
+            <Campo nombre="last"><TextField label="Last name" required placeholder="Smith" value={d.last} onChange={(v) => cambiar('last', v)} error={errores.last} /></Campo>
             <Campo nombre="email"><TextField label="Email" required placeholder="john.smith@hotmail.com" value={d.email} onChange={(v) => cambiar('email', v)} error={errores.email} /></Campo>
             <Campo nombre="birthday"><DateField label="Birthdate" required valorInicial={d.birthday} onChange={(v) => cambiar('birthday', v)} error={errores.birthday} /></Campo>
           </div>
@@ -264,7 +262,7 @@ export function CamposGeneral({ d, cambiar, errores, portalVinculado, vinculo, c
 }
 
 /* Las relaciones de Confidentally 2.0 (grabación de Julián, 2026-11-04), de la A a la Z. */
-const RELACIONES = ['Child', 'Grandchild', 'Grandparent', 'Other', 'Other Family Member', 'Parent', 'Partner', 'Sibling', 'Spouse']
+const RELACIONES = ['Child', 'Grandchild', 'Grandparent', 'Other', 'Other family member', 'Parent', 'Partner', 'Sibling', 'Spouse']
 
 /* El resumen muestra lo cargado aunque esté incompleto, como Personal y Address (Julián, 2026-11-04). */
 const telefono = (d: DatosPaciente) => {
@@ -289,27 +287,27 @@ export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Pr
   const dir = direccion(d)
   const persona = [[d.gFirst, d.gLast].map((x) => x.trim()).filter(Boolean).join(' '), d.gEmail.trim(), d.gDob && `DOB: ${d.gDob}`].filter(Boolean).join(' · ')
   return (
-    <DrawerSection title="Guardian Information">
+    <DrawerSection title="Guardian information">
       <Alert tone="warning" title="This patient is under 18.">Add at least one guardian: search for a person in the system or add a new one.</Alert>
       <Campo nombre="guardianName">
         <PersonSearchField
-          label="Guardian" required={obligatorio} placeholder="Search by Name or Last Name"
+          label="Guardian" required={obligatorio} placeholder="Search patients by name"
           personas={personas.map((p) => p.name)}
           value={d.guardianName} onChange={(v) => cambiar('guardianName', v)}
           disabled={d.guardianNuevo} error={errores.guardianName}
-          emptyText="No one in the system matches this name. Tick Add New Person to enter their details."
+          emptyText="No one in the system matches this name. Tick Add new person to enter their details."
           subtitulo={(n) => personas.find((x) => x.name === n)?.tipo}
           chips={(n) => { const p = personas.find((x) => x.name === n); return p && chipsPersona(p.dob, p.email) }}
         />
       </Campo>
       <OptionCheckbox
-        label="Add New Person" checked={d.guardianNuevo}
+        label="Add new person" checked={d.guardianNuevo}
         onChange={(v) => { cambiar('guardianNuevo', v); if (v) cambiar('guardianName', '') }}
       />
       {d.guardianNuevo && (
         <>
           <CollapsibleFields
-            title="Personal Information" required defaultOpen error={errorEn(NUEVO_G)}
+            title="Personal information" required defaultOpen error={errorEn(NUEVO_G)}
             summary={errorEn(NUEVO_G) ? 'Complete name, email and birthdate.' : persona || 'Add name, email and birthdate'}
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -320,27 +318,27 @@ export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Pr
             </div>
           </CollapsibleFields>
           <CollapsibleFields
-            title="Contact Information" required error={errorEn(CONTACTO_G)}
+            title="Contact information" required error={errorEn(CONTACTO_G)}
             summary={errorEn(CONTACTO_G) ? 'Complete the phone number.' : tel || 'Add a phone number'}
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Campo nombre="gCodigo"><CountryCodeField required value={d.gCodigo} onChange={(v) => cambiar('gCodigo', v)} error={errores.gCodigo} /></Campo>
-              <Campo nombre="gArea"><TextField label="Area Code (3 digits)" required placeholder="555" value={d.gArea} onChange={(v) => cambiar('gArea', v)} error={errores.gArea} /></Campo>
+              <Campo nombre="gArea"><TextField label="Area code (3 digits)" required placeholder="555" value={d.gArea} onChange={(v) => cambiar('gArea', v)} error={errores.gArea} /></Campo>
               <Campo nombre="gNumero"><TextField label="Number (7 digits)" required placeholder="000-0000" value={d.gNumero} onChange={(v) => cambiar('gNumero', v)} error={errores.gNumero} /></Campo>
               <Campo nombre="gExt"><TextField label="Extension" placeholder="Extension" value={d.gExt} onChange={(v) => cambiar('gExt', v)} /></Campo>
             </div>
           </CollapsibleFields>
           <CollapsibleFields
-            title="Address Information" required error={errorEn(DIRECCION_G)}
+            title="Address information" required error={errorEn(DIRECCION_G)}
             summary={errorEn(DIRECCION_G) ? 'Complete the address.' : dir || 'Add an address'}
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Campo nombre="gLinea1"><TextField label="Address Line 1" required placeholder="Street and number" value={d.gLinea1} onChange={(v) => cambiar('gLinea1', v)} error={errores.gLinea1} /></Campo>
-              <Campo nombre="gLinea2"><TextField label="Address Line 2" placeholder="Apt, suite, floor" value={d.gLinea2} onChange={(v) => cambiar('gLinea2', v)} /></Campo>
+              <Campo nombre="gLinea1"><TextField label="Address line 1" required placeholder="Street and number" value={d.gLinea1} onChange={(v) => cambiar('gLinea1', v)} error={errores.gLinea1} /></Campo>
+              <Campo nombre="gLinea2"><TextField label="Address line 2" placeholder="Apt, suite, floor" value={d.gLinea2} onChange={(v) => cambiar('gLinea2', v)} /></Campo>
               <Campo nombre="gPais"><SelectField label="Country" required placeholder="Select country" value={d.gPais} onChange={(v) => cambiar('gPais', v)} error={errores.gPais} /></Campo>
               <Campo nombre="gEstado"><SelectField label="State" required placeholder="Select your region" value={d.gEstado} onChange={(v) => cambiar('gEstado', v)} error={errores.gEstado} /></Campo>
               <Campo nombre="gCiudad"><TextField label="City" required placeholder="City" value={d.gCiudad} onChange={(v) => cambiar('gCiudad', v)} error={errores.gCiudad} /></Campo>
-              <Campo nombre="gZip"><TextField label="ZIP Code" required placeholder="85016" value={d.gZip} onChange={(v) => cambiar('gZip', v)} error={errores.gZip} /></Campo>
+              <Campo nombre="gZip"><TextField label="ZIP code" required placeholder="85016" value={d.gZip} onChange={(v) => cambiar('gZip', v)} error={errores.gZip} /></Campo>
             </div>
           </CollapsibleFields>
         </>
@@ -351,7 +349,7 @@ export function CamposGuardian({ d, cambiar, errores, obligatorio, excluir }: Pr
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Campo nombre="guardianRel">
               <SelectField
-                label="Relationship to Patient" required placeholder="Select a relationship type" options={RELACIONES}
+                label="Relationship to patient" required placeholder="Select a relationship type" options={RELACIONES}
                 value={d.guardianRel} onChange={(v) => cambiar('guardianRel', v)} error={errores.guardianRel}
               />
             </Campo>
@@ -389,18 +387,18 @@ export function CamposDemography({ d, cambiar, errores, conTitulo }: Props) {
     </Campo>
   )
   return (
-    <Bloque titulo="Demographic Information" conTitulo={conTitulo}>
+    <Bloque titulo="Demographic information" conTitulo={conTitulo}>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {sel('gender', 'Gender', GENEROS, { required: true })}
         {sel('race', 'Race', RAZAS)}
         {sel('ethnicity', 'Ethnicity', ETNIAS)}
-        {sel('marital', 'Marital Status', ESTADOS_CIVILES)}
+        {sel('marital', 'Marital status', ESTADOS_CIVILES)}
         {sel('profession', 'Profession', PROFESIONES, { buscable: true })}
         {sel('nationality', 'Nationality', NACIONALIDADES, { buscable: true })}
         {/* Language e Interpreter Required van de la mano: en la misma fila, el checkbox a la altura del select (Julián). */}
         {sel('language', 'Language', IDIOMAS)}
         <div className="flex flex-col justify-end">
-          <OptionCheckbox label="Interpreter Required" checked={d.interpreter} onChange={(v) => cambiar('interpreter', v)} className="h-9 items-center py-0" />
+          <OptionCheckbox label="Interpreter required" checked={d.interpreter} onChange={(v) => cambiar('interpreter', v)} className="h-9 items-center py-0" />
         </div>
         {sel('religion', 'Religion', RELIGIONES)}
       </div>
@@ -411,10 +409,10 @@ export function CamposDemography({ d, cambiar, errores, conTitulo }: Props) {
 /* Contact y Address del paciente, en Edit Patient (CON-1329): los mismos campos que el guardián nuevo y New Employee. */
 export function CamposContacto({ d, cambiar, errores, conTitulo }: Props) {
   return (
-    <Bloque titulo="Contact Information" conTitulo={conTitulo}>
+    <Bloque titulo="Contact information" conTitulo={conTitulo}>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Campo nombre="codigo"><CountryCodeField required value={d.codigo} onChange={(v) => cambiar('codigo', v)} error={errores.codigo} /></Campo>
-        <Campo nombre="area"><TextField label="Area Code (3 digits)" required placeholder="555" value={d.area} onChange={(v) => cambiar('area', v)} error={errores.area} /></Campo>
+        <Campo nombre="area"><TextField label="Area code (3 digits)" required placeholder="555" value={d.area} onChange={(v) => cambiar('area', v)} error={errores.area} /></Campo>
         <Campo nombre="numero"><TextField label="Number (7 digits)" required placeholder="000-0000" value={d.numero} onChange={(v) => cambiar('numero', v)} error={errores.numero} /></Campo>
         <Campo nombre="ext"><TextField label="Extension" placeholder="Extension" value={d.ext} onChange={(v) => cambiar('ext', v)} /></Campo>
       </div>
@@ -424,14 +422,14 @@ export function CamposContacto({ d, cambiar, errores, conTitulo }: Props) {
 
 export function CamposDireccion({ d, cambiar, errores, conTitulo }: Props) {
   return (
-    <Bloque titulo="Address Information" conTitulo={conTitulo}>
+    <Bloque titulo="Address information" conTitulo={conTitulo}>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Campo nombre="linea1"><TextField label="Address Line 1" required placeholder="Street and number" value={d.linea1} onChange={(v) => cambiar('linea1', v)} error={errores.linea1} /></Campo>
-        <Campo nombre="linea2"><TextField label="Address Line 2" placeholder="Apt, suite, floor" value={d.linea2} onChange={(v) => cambiar('linea2', v)} /></Campo>
+        <Campo nombre="linea1"><TextField label="Address line 1" required placeholder="Street and number" value={d.linea1} onChange={(v) => cambiar('linea1', v)} error={errores.linea1} /></Campo>
+        <Campo nombre="linea2"><TextField label="Address line 2" placeholder="Apt, suite, floor" value={d.linea2} onChange={(v) => cambiar('linea2', v)} /></Campo>
         <Campo nombre="pais"><SelectField label="Country" required placeholder="Select country" value={d.pais} onChange={(v) => cambiar('pais', v)} error={errores.pais} /></Campo>
         <Campo nombre="estado"><SelectField label="State" required placeholder="Select your region" value={d.estado} onChange={(v) => cambiar('estado', v)} error={errores.estado} /></Campo>
         <Campo nombre="ciudad"><TextField label="City" required placeholder="City" value={d.ciudad} onChange={(v) => cambiar('ciudad', v)} error={errores.ciudad} /></Campo>
-        <Campo nombre="zip"><TextField label="ZIP Code" required placeholder="85016" value={d.zip} onChange={(v) => cambiar('zip', v)} error={errores.zip} /></Campo>
+        <Campo nombre="zip"><TextField label="ZIP code" required placeholder="85016" value={d.zip} onChange={(v) => cambiar('zip', v)} error={errores.zip} /></Campo>
       </div>
     </Bloque>
   )

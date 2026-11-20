@@ -5,6 +5,24 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-20
 
+### Normalización de UI: tamaños, buscador único, sentence case, columnas Name, Account única y métricas compactas ([#176](https://github.com/JulianGerardi/red-dental-studio/pull/176))
+- **Tamaños:** `Button`, `FilterMenu`, `SearchInput` y `SearchButton` comparten sm 28 · md 32 · lg 36. Nivel de página
+  en `md` (acción del título, buscador, filtro, fecha); dentro de una card en `sm`; campos de formulario en 36.
+- **Buscador:** `ui/search-input` nuevo (`size`, `clearable`); `SettingsSearch` lo usa. Placeholders "Search <lo que
+  lista>". No escribir buscadores a mano.
+- **Textos en sentence case** en toda la app (títulos, botones, pestañas, columnas, labels, estados). Siglas, nombres
+  propios, Clinical Mode y los catálogos de datos (tipos de pago y ajuste, lugares de servicio, nombres de documentos)
+  quedan igual. Typos del Figma corregidos: Address, Last name, Subscription, Abbreviation, Overview.
+- **Tablas:** la columna identificadora se llama Name; Date of birth, Rooms, Address, Provider; Enabled en Ledger options;
+  cabeceras sin mayúsculas; Subscriber de Insurance como link (`TABLA_LINK`).
+- **Settings → Account** abre Edit account: una clínica ve sólo su cuenta. `/settings/accounts` redirige.
+- **Dashboard:** bloque de métricas compacto; la definición de cada número va en un ⓘ.
+- **Para el dev:** `PageTitle` mide 32 de alto; `PADDING_PAGINA` para Settings; títulos de card 15/700 y de sección
+  14/700 en `ink` (fuera `text-black`); piso de 11 px; sin `-[#hex]` en clases (tokens nuevos `info-subtle`,
+  `info-strong-bg`, `info-line`, `info-line-strong`, `amber-hover`, `amber-fg`, `status-ok-hover`); formularios de a
+  dos también en pantallas; `AREA_TOQUE` para botones de ícono. Reglas en `design-reference/figma/README.md`
+  (2026-11-20).
+
 ### Settings con los tamaños del Ledger y Billing ([#175](https://github.com/JulianGerardi/red-dental-studio/pull/175))
 - **Edit Account › Subscription:** *Subscription Summary* y *Subscription History* pasan de 16 a 15px bold, como los
   títulos de Billing. Las cards ya eran `ui/stat-card`, iguales a las del Ledger y Billing.

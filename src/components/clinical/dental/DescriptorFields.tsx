@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { DESCRIPTOR_ROWS, type DescriptorRow } from './data'
 
-/* La guía visual de descriptores de una condition, con el diseño de Figma *Platform Design* 5294:107675 ("Edit Finding",
+/* La guía visual de descriptores de una condition, con el diseño de Figma *Platform Design* 5294:107675 ("Edit finding",
    Selected Descriptors): una fila por atributo, con el rótulo a la izquierda y las opciones como un control segmentado
    -caja gris con la elegida en azul-. La lógica es la nuestra: cada fila es de una sola elección y ninguna es
    obligatoria; tocar la opción ya marcada la deselecciona, y las filas con muchas opciones (Colors) pasan a otra línea

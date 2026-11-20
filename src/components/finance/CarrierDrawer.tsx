@@ -44,7 +44,7 @@ export function CarrierDrawer({ onClose, onGuardar }: { onClose: () => void; onG
 
   return (
     <ModalShell
-      title="New Carrier"
+      title="New carrier"
       description="The insurance company you send claims to. Add its insurance plans next."
       onClose={onClose}
       width="max-w-[560px]"
@@ -53,30 +53,30 @@ export function CarrierDrawer({ onClose, onGuardar }: { onClose: () => void; onG
       actions={<DrawerActions step={paso} total={PASOS.length} onNext={() => !repetido && siguiente()} onBack={atras} onCancel={onClose} onSave={guardar} />}
     >
       <DrawerStep index={0} step={paso}>
-        <DrawerSection title="General Information">
-          <SearchField
-            label="Carrier Name" required placeholder="Select carrier" options={PAGADORES.map(opcionPagador)}
-            value={d.nombre} onChange={elegirNombre}
-            error={falta('nombre') ?? (repetido ? 'This carrier is already in your list.' : undefined)}
-            hint="Search the payer list, or type the name of a new one."
-          />
+        <DrawerSection title="General information">
           <div className="grid gap-4 sm:grid-cols-2">
+            <SearchField
+              label="Carrier name" required placeholder="Select carrier" options={PAGADORES.map(opcionPagador)}
+              value={d.nombre} onChange={elegirNombre}
+              error={falta('nombre') ?? (repetido ? 'This carrier is already in your list.' : undefined)}
+              hint="Search the payer list, or type the name of a new one."
+            />
             <TextField label="Payer ID" required placeholder="00000" value={d.payerId} onChange={set('payerId')} error={falta('payerId')} />
-            <SelectField label="Printed Claim Format" required placeholder="Select a printed claim format" options={FORMATOS_RECLAMO} value={d.formato} onChange={set('formato')} error={falta('formato')} />
+            <SelectField label="Printed claim format" required placeholder="Select a printed claim format" options={FORMATOS_RECLAMO} value={d.formato} onChange={set('formato')} error={falta('formato')} />
             <UnitField
-              label="Expected Period of Insurance Claim Resolution" required unit="days" value={Number(d.dias) || 0}
+              label="Expected period of insurance claim resolution" required unit="days" value={Number(d.dias) || 0}
               onChange={(n) => set('dias')(n > 0 ? String(n) : '')} error={falta('dias')}
             />
           </div>
           <div className="flex flex-col gap-2">
-            <OptionCheckbox label="Do not include Dental Diagnostic Codes" checked={sinDiagnosticos} onChange={setSinDiagnosticos} />
-            <OptionCheckbox label="Do not bill Insurance" checked={noFacturar} onChange={setNoFacturar} />
+            <OptionCheckbox label="Do not include dental diagnostic codes" checked={sinDiagnosticos} onChange={setSinDiagnosticos} />
+            <OptionCheckbox label="Do not bill insurance" checked={noFacturar} onChange={setNoFacturar} />
           </div>
         </DrawerSection>
       </DrawerStep>
 
       <DrawerStep index={1} step={paso}>
-        <DrawerSection title="Contact Information">
+        <DrawerSection title="Contact information">
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField label="Email" required placeholder="example@example.com" value={d.email} onChange={set('email')} error={falta('email')} />
             <TextField label="Website" placeholder="Introduce your website link" value={d.sitio} onChange={set('sitio')} />

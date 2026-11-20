@@ -17,7 +17,7 @@ import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Figma 4430:61940 "Scheduling — Calendar (New Appointment Modal)".
 
-   Rediseño sobre 3862:220908: las cards "Patient and Scheduling", "Details" y
+   Rediseño sobre 3862:220908: las cards "Patient and scheduling", "Details" y
    "Providers" se fundieron en Patient + Scheduling, y Additional Provider
    perdió el asterisco.
 
@@ -30,9 +30,9 @@ import { OBLIGATORIO } from '@/lib/validacion'
    mueve (MoverVisitaDialog). Ver scheduling.md.
 
    Edit Appointment (2026-11-17): sin pasos. El turno ya está cargado, así que va en pestañas -General, Schedule,
-   Additional, Treatment Plan- con un solo "Save Changes", como Edit Patient. Ver scheduling.md. */
+   Additional, Treatment Plan- con un solo "Save changes", como Edit Patient. Ver scheduling.md. */
 
-const PESTANAS = ['General', 'Schedule', 'Additional', 'Treatment Plan'] as const
+const PESTANAS = ['General', 'Schedule', 'Additional', 'Treatment plan'] as const
 export type Pestana = (typeof PESTANAS)[number]
 
 const PACIENTES = ['John Smith', 'Noah James Smith', 'Maria Abril Viola', 'Elias Aguirre']
@@ -144,7 +144,7 @@ export function NewAppointmentModal({
   bloqueados?: CampoTurno[]
   /** Por qué hay campos en sólo lectura; va arriba de las pestañas. */
   nota?: { title: string; detail?: string }
-  /** Edit Appointment: el turno ya existe, sin pasos y con "Save Changes". Sin esto, New Appointment (aunque llegue con
+  /** Edit Appointment: el turno ya existe, sin pasos y con "Save changes". Sin esto, New Appointment (aunque llegue con
       `inicial`, como al agendar una solicitud). */
   edicion?: boolean
   /** La pestaña con que abre Edit Appointment: Schedule cuando se viene a mover el turno (Rooms, Working Hours). */
@@ -243,19 +243,19 @@ export function NewAppointmentModal({
   ))
   const fPrimary = lectura('primary', (
     <PersonSearchField
-      label="Primary Provider" required placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
+      label="Primary provider" required placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
       value={d.primary} onChange={set('primary')} error={req('primary')}
     />
   ))
   const fAdditional = lectura('additional', (
     <PersonSearchField
-      label="Additional Provider" placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
+      label="Additional provider" placeholder="Search by name, role or email" personas={PROVIDERS} chips={providerChips}
       value={d.additional} onChange={set('additional')}
     />
   ))
   const fStatus = lectura('status', <SelectField label="Status" required value={d.status} onChange={set('status')} error={req('status')} />)
   const fRequestor = lectura('requestor', <SelectField label="Requestor" placeholder="Who is requesting?" value={d.requestor} onChange={set('requestor')} />)
-  const fReason = lectura('reason', <SelectField label="Reason for Visit" value={d.reason} onChange={set('reason')} />)
+  const fReason = lectura('reason', <SelectField label="Reason for visit" value={d.reason} onChange={set('reason')} />)
   /* Tocar la fecha o una hora despliega el calendario del día al costado; una vez abierto, se queda. */
   const fFecha = lectura('date', (
     <div onFocus={() => setTocoHorario(true)} className="flex flex-col gap-2">
@@ -271,8 +271,8 @@ export function NewAppointmentModal({
   ))
   const fHoras = lectura('start', (
     <div onFocus={() => setTocoHorario(true)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <SelectField label="Start Time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} />
-      <SelectField label="End Time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
+      <SelectField label="Start time" required placeholder="Select" options={HORAS.slice(0, -1)} value={d.start} onChange={set('start')} error={req('start')} />
+      <SelectField label="End time" required placeholder="Select" options={HORAS.slice(1)} value={d.end} onChange={set('end')} error={req('end')} />
     </div>
   ))
   const fOperatory = lectura('operatory', <SelectField label="Operatory" required options={operatorios} value={d.operatory} onChange={set('operatory')} error={req('operatory')} />)
@@ -313,10 +313,10 @@ export function NewAppointmentModal({
 
   return (
     <ModalShell
-      title={edicion ? 'Edit Appointment' : 'New Appointment'}
+      title={edicion ? 'Edit appointment' : 'New appointment'}
       onClose={onClose}
       width="max-w-[560px]"
-      steps={edicion ? undefined : ['Patient and Scheduling', 'Link to treatment plan visit']}
+      steps={edicion ? undefined : ['Patient and scheduling', 'Link to treatment plan visit']}
       step={paso - 1}
       tabs={edicion ? (
         <Tabs
@@ -325,7 +325,7 @@ export function NewAppointmentModal({
         />
       ) : undefined}
       actions={edicion
-        ? <DrawerActions onCancel={onClose} onSave={guardar} saveLabel="Save Changes" />
+        ? <DrawerActions onCancel={onClose} onSave={guardar} saveLabel="Save changes" />
         : <DrawerActions step={paso - 1} total={2} onNext={continuar} onBack={() => setPaso(1)} onCancel={onClose} onSave={guardar} />}
       aside={mostrarPanel ? <AppointmentSlotPicker fecha={fecha ? fecha.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : undefined} seleccion={d.start} paciente={d.patient} onPick={elegirFranja} className="h-full rounded-none border-0" /> : undefined}
     >
@@ -334,7 +334,7 @@ export function NewAppointmentModal({
           {nota && <Alert tone="info" title={nota.title} className="mb-5">{nota.detail}</Alert>}
           {/* Quién y por qué; Status primero de su fila porque de él dependen los obligatorios (CON-4090). */}
           {panel('General', (
-            <DrawerSection title="General Information">
+            <DrawerSection title="General information">
               {fPaciente}
               {fPrimary}
               {fAdditional}
@@ -349,13 +349,13 @@ export function NewAppointmentModal({
             </DrawerSection>
           ))}
           {panel('Additional', seccionAdicional)}
-          {panel('Treatment Plan', seccionVisita)}
+          {panel('Treatment plan', seccionVisita)}
         </>
       ) : paso === 1 ? (
         <div className="flex flex-col gap-6">
           {/* Una columna, campos de a dos en el orden de CON-4090: Status y Requestor, Reason y Date, Start y End, Operatory.
              Al tocar la fecha o la hora se despliega al costado el calendario del día para elegir la franja. */}
-          <DrawerSection title="Patient and Scheduling">
+          <DrawerSection title="Patient and scheduling">
             {fPaciente}
             {fPrimary}
             {fAdditional}

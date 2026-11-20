@@ -38,7 +38,7 @@ const meta = {
       },
     },
   },
-  args: { title: 'New Patient', description: 'Create the patient record', steps: 3, size: 'lg', open: true },
+  args: { title: 'New patient', description: 'Create the patient record', steps: 3, size: 'lg', open: true },
   argTypes: {
     title: { control: 'text', description: 'Qué se carga.' },
     description: { control: 'text', description: 'Una línea de contexto. Vacía, no se muestra.' },
@@ -69,8 +69,8 @@ function Demo({ title, description, steps, size, open }: Args) {
           <DrawerStep key={p} index={i} step={actual}>
             <DrawerSection title={`${p} Information`}>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <TextField label="First Name" required placeholder="John" />
-                <TextField label="Last Name" required placeholder="Smith" />
+                <TextField label="First name" required placeholder="John" />
+                <TextField label="Last name" required placeholder="Smith" />
                 <SelectField label="Country" options={['United States', 'Mexico', 'Argentina']} />
               </div>
             </DrawerSection>
@@ -90,8 +90,8 @@ export const Parts: Story = {
     <Lienzo>
       <Bloque titulo="Section" nota="DrawerSection: título suelto (y bajada) sin caja ni borde, como en 2.0. SectionCard se dibuja así dentro de un drawer.">
         <div className="w-[420px] rounded-lg border border-dashed border-line p-5">
-          <DrawerSection title="Contact Details" description="Update this patient's contact information">
-            <TextField label="Email Address" placeholder="john.smith@hotmail.com" />
+          <DrawerSection title="Contact details" description="Update this patient's contact information">
+            <TextField label="Email address" placeholder="john.smith@hotmail.com" />
           </DrawerSection>
         </div>
       </Bloque>
@@ -108,8 +108,8 @@ export const Parts: Story = {
               <SelectField label="Apply to" required options={['John Hayes', 'Mara Otero']} value="John Hayes" onChange={() => {}} />
             </div>
             <div className="flex flex-col gap-2">
-              <OptionCheckbox label="Do not include Dental Diagnostic Codes" />
-              <OptionCheckbox label="Do not bill Insurance" />
+              <OptionCheckbox label="Do not include dental diagnostic codes" />
+              <OptionCheckbox label="Do not bill insurance" />
             </div>
             <TextArea label="Notes" placeholder="Placeholder" />
           </div>
@@ -138,7 +138,7 @@ export const Parts: Story = {
           </ConRotulo>
           <ConRotulo rotulo="Footer">
             <div className="flex w-[320px] items-center gap-3 rounded-lg border border-line p-4 [&>button]:flex-1">
-              <DrawerActions onCancel={() => {}} onSave={() => {}} saveLabel="Save Changes" />
+              <DrawerActions onCancel={() => {}} onSave={() => {}} saveLabel="Save changes" />
             </div>
           </ConRotulo>
         </Muestras>
@@ -204,19 +204,19 @@ export const Specs: Story = {
       <Bloque titulo="Steps" nota="Elements / StepIndicator tiene la barra de pasos completa.">
         <Tabla encabezado={['Rule', 'How']} minimo={640}>
           <tr><td className="font-semibold">Label</td><td>El nombre de cada paso, en todos los drawers: lo que se está haciendo.</td></tr>
-          <tr><td className="font-semibold">Next Step</td><td>Avanza sólo con lo obligatorio del paso completo; si falta algo lo marca en rojo, sólo en el paso a la vista (<code>lib/useFormPasos</code>). Save revisa todos y vuelve al primero incompleto.</td></tr>
+          <tr><td className="font-semibold">Next step</td><td>Avanza sólo con lo obligatorio del paso completo; si falta algo lo marca en rojo, sólo en el paso a la vista (<code>lib/useFormPasos</code>). Save revisa todos y vuelve al primero incompleto.</td></tr>
           <tr><td className="font-semibold">Motion</td><td>Al avanzar, el tilde rebota, la línea se llena y el contenido entra desde la derecha; con Return, desde la izquierda (260ms).</td></tr>
           <tr><td className="font-semibold">Kept</td><td>Los pasos que no se ven no se desmontan: lo escrito se conserva al ir y volver.</td></tr>
         </Tabla>
       </Bloque>
       <Bloque titulo="Where">
         <Tabla encabezado={['Drawer', 'Steps', 'Size']} minimo={640}>
-          <tr><td className="font-semibold">New Patient</td><td>General · Guardian (si hace falta) · Demography</td><td>lg</td></tr>
-          <tr><td className="font-semibold">New Appointment</td><td>Patient and Scheduling · Link to treatment plan visit</td><td>lg + calendario al costado</td></tr>
+          <tr><td className="font-semibold">New patient</td><td>General · Guardian (si hace falta) · Demography</td><td>lg</td></tr>
+          <tr><td className="font-semibold">New appointment</td><td>Patient and Scheduling · Link to treatment plan visit</td><td>lg + calendario al costado</td></tr>
           <tr><td className="font-semibold">New Location · New Employee</td><td>General · Contact · Address</td><td>lg</td></tr>
-          <tr><td className="font-semibold">New Account</td><td>Information · Address · Owner</td><td>lg</td></tr>
-          <tr><td className="font-semibold">Add Relationship</td><td>Person · Contact · Relationship</td><td>lg</td></tr>
-          <tr><td className="font-semibold">New Procedure</td><td>Procedure · Surfaces (si el procedimiento lleva superficie) · Link to finding · Link to diagnosis (si es Planned)</td><td>md</td></tr>
+          <tr><td className="font-semibold">New account</td><td>Information · Address · Owner</td><td>lg</td></tr>
+          <tr><td className="font-semibold">Add relationship</td><td>Person · Contact · Relationship</td><td>lg</td></tr>
+          <tr><td className="font-semibold">New procedure</td><td>Procedure · Surfaces (si el procedimiento lleva superficie) · Link to finding · Link to diagnosis (si es Planned)</td><td>md</td></tr>
           <tr><td className="font-semibold">Edit Patient, subscriptions</td><td>Ver cada componente</td><td>lg / xl</td></tr>
           <tr><td className="font-semibold">New Patient Payment (-) · Credit Adjustment (-)</td><td>Payment · Allocation</td><td>2xl</td></tr>
         </Tabla>

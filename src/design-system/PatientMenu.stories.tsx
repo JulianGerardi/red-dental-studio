@@ -18,7 +18,7 @@ const SECCIONES = {
   Insurance: '/insurance',
   Ledger: '/ledger',
   Documents: '/documents',
-  'Relationships & Billing': '/relationships',
+  'Relationships & billing': '/relationships',
 } as const
 type Seccion = keyof typeof SECCIONES
 
@@ -345,8 +345,8 @@ const Colores = () => (
       <tr><td className="font-semibold">Panel</td><td><Token nombre="white" /> · border <Token nombre="line" /></td></tr>
       <tr><td className="font-semibold">Active section</td><td><Token nombre="dash-blue" /> · text <Token nombre="white" /></td></tr>
       <tr><td className="font-semibold">Hover</td><td><Token nombre="surface-muted" /></td></tr>
-      <tr><td className="font-semibold">Start Encounter</td><td><Token nombre="green" /></td></tr>
-      <tr><td className="font-semibold">Pending Encounter</td><td><Token nombre="amber" /> · text <Token nombre="[#7a4a00]" /></td></tr>
+      <tr><td className="font-semibold">Start encounter</td><td><Token nombre="green" /></td></tr>
+      <tr><td className="font-semibold">Pending encounter</td><td><Token nombre="amber" /> · text <Token nombre="[#7a4a00]" /></td></tr>
       <tr><td className="font-semibold">Clinical Mode</td><td><Token nombre="[#eef5ff]" /> · text <Token nombre="dash-blue" /></td></tr>
       <tr><td className="font-semibold">Photo</td><td><Token nombre="dash-blue-hover" /></td></tr>
       <tr><td className="font-semibold">Status</td><td><Token nombre="dash-ok-bg" /> · <Token nombre="dash-ok-fg" /> · dot <Token nombre="green" /></td></tr>

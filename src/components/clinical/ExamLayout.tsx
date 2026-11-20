@@ -30,11 +30,11 @@ import { formatMDY } from '@/lib/fecha'
 const HOY = '05/14/2026'
 
 const INITIAL_FINDINGS: Finding[] = [
-  { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: HOY, status: 'Discarded', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [], examen: 'Dental Assessment', problema: 'p5', kind: 'condition' },
-  { id: 'F-2', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Discarded', tooth: null, provider: 'Elena Martinez', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral', kind: 'condition', descriptors: { colors: 'Red' } },
+  { id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: HOY, status: 'Discarded', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [], examen: 'Dental assessment', problema: 'p5', kind: 'condition' },
+  { id: 'F-2', area: 'Soft palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Discarded', tooth: null, provider: 'Elena Martinez', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral', kind: 'condition', descriptors: { colors: 'Red' } },
   { id: 'F-3', area: 'Tooth 20', condition: 'localized periodontal pocketing', descriptor: 'Moderate', date: HOY, status: 'Active', tooth: 20, provider: 'Elena Martinez', surfaces: ['B', 'MB'], notes: '', linked: ['#10987231', '#10987232'], diagnoses: [], examen: 'Periodontal', kind: 'condition' },
-  { id: 'F-4', area: 'Tooth 30', condition: 'severe root surface decay', descriptor: 'Advanced', date: HOY, status: 'In Treatment', tooth: 30, provider: 'Emily Chen', surfaces: ['O'], notes: '', linked: ['#10987233'], diagnoses: [], examen: 'Dental Assessment', kind: 'condition' },
-  { id: 'F-5', area: 'Soft Palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral', kind: 'condition', descriptors: { colors: 'Red' } },
+  { id: 'F-4', area: 'Tooth 30', condition: 'severe root surface decay', descriptor: 'Advanced', date: HOY, status: 'In treatment', tooth: 30, provider: 'Emily Chen', surfaces: ['O'], notes: '', linked: ['#10987233'], diagnoses: [], examen: 'Dental assessment', kind: 'condition' },
+  { id: 'F-5', area: 'Soft palate', condition: 'oral candidiasis', descriptor: 'Red', date: HOY, status: 'Active', tooth: null, provider: 'Sarah Stone', surfaces: [], notes: '', linked: [], diagnoses: [], examen: 'Intraoral', kind: 'condition', descriptors: { colors: 'Red' } },
 ]
 
 const INITIAL_REVIEWS: ExamReview[] = [
@@ -44,8 +44,8 @@ const INITIAL_REVIEWS: ExamReview[] = [
 /* Las acciones de todos los exámenes: blancas, y al pasar el mouse se abren con su texto como Exit clinical Mode. El
    tooltip no repite el nombre, que ya se lee en el botón: dice qué hace. */
 const ACCIONES_EXAMEN: { label: string; ayuda: string; icono: LucideIcon; modo: 'procedure' | 'condition' }[] = [
-  { label: 'Add Procedure', ayuda: 'Chart a planned procedure', icono: Plus, modo: 'procedure' },
-  { label: 'Add Condition', ayuda: 'Chart a condition or work the patient already has', icono: Stethoscope, modo: 'condition' },
+  { label: 'Add procedure', ayuda: 'Chart a planned procedure', icono: Plus, modo: 'procedure' },
+  { label: 'Add condition', ayuda: 'Chart a condition or work the patient already has', icono: Stethoscope, modo: 'condition' },
 ]
 const BOTON_ACCION = cn(BOTON_EXPANDIBLE, 'border-line bg-white shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle')
 
@@ -112,7 +112,7 @@ export function ExamLayout({ findings: conFindings = true, examen, extra, onCond
         area,
         condition: `${draft.procedure.code} - ${draft.procedure.label}`,
         descriptor: descriptorTexto || draft.surfaces.join(', ') || (regiones ? '' : draft.scope),
-        date: HOY, status: draft.status === 'Existing' ? 'Externally Treated' : 'Active', tooth, provider: 'Elena Martinez',
+        date: HOY, status: draft.status === 'Existing' ? 'Externally treated' : 'Active', tooth, provider: 'Elena Martinez',
         surfaces: draft.surfaces, notes: '', linked: draft.linked, diagnoses: draft.diagnoses, examen,
         kind: procedureOpen ?? 'procedure', descriptors: esCondicion ? draft.descriptors : undefined,
         fee: esCondicion ? undefined : precioUcr(draft.procedure.code),

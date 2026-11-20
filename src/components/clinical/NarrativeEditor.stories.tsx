@@ -25,7 +25,7 @@ const meta = {
         component: [
           "El **AI Narrative Editor** de Treatment (Clinical Mode): arma la narrativa clínica con lo contestado y guardado en un workflow, como red.dev. Se abre con *Generate Narrative* (o *Edit Narrative* si ya hay una) y es un drawer xl.",
           "",
-          "**Flujo:** al abrir genera el borrador (skeleton mientras tanto) y lo guarda solo como *Original Clinical Draft*. Se edita con la barra de formato; *Apply Changes* se habilita recién al editar. Descartar o regenerar encima de cambios pide confirmación.",
+          "**Flujo:** al abrir genera el borrador (skeleton mientras tanto) y lo guarda solo como *Original clinical draft*. Se edita con la barra de formato; *Apply Changes* se habilita recién al editar. Descartar o regenerar encima de cambios pide confirmación.",
           "",
           "**Probalo:** en *Playground* editá el texto y aplicá los cambios.",
         ].join('\n'),
@@ -42,7 +42,7 @@ const args = { wf: CC, open: true, onClose: () => {}, onGuardar: () => {} }
 /* El editor vivo con Chief Complaint contestado. */
 export const Playground: Story = { args, render: () => <Editor wf={CC} inicial={PROGRESO_INICIAL['chief-complaint']} /> }
 
-/* Se abre generando (skeleton de loading) y deja el "Original Clinical Draft" con lo contestado en Chief Complaint.
+/* Se abre generando (skeleton de loading) y deja el "Original clinical draft" con lo contestado en Chief Complaint.
    Apply Changes queda disabled hasta editar. */
 export const Draft: Story = { args, render: () => <Editor wf={CC} inicial={PROGRESO_INICIAL['chief-complaint']} />, play: esperar(/original clinical draft/i) }
 
@@ -77,7 +77,7 @@ export const Parts: Story = {
     <Lienzo>
       <Bloque titulo="Parts">
         <Tabla encabezado={["Part", "What it does"]} minimo={560}>
-          <tr><td className="font-semibold">Status</td><td>Original Clinical Draft (generado y guardado solo) o Edited narrative (aplicada), con la fecha.</td></tr>
+          <tr><td className="font-semibold">Status</td><td>Original clinical draft (generado y guardado solo) o Edited narrative (aplicada), con la fecha.</td></tr>
           <tr><td className="font-semibold">Format bar</td><td>Bold, Title, Subtitle, Text y List. Deshabilitada mientras genera.</td></tr>
           <tr><td className="font-semibold">Editor</td><td>El texto con títulos por paso guardado y la lista de preguntas y respuestas.</td></tr>
           <tr><td className="font-semibold">Footer</td><td>Discard o Regenerate a la izquierda; Apply Changes a la derecha.</td></tr>

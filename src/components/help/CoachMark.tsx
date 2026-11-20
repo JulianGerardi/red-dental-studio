@@ -108,7 +108,7 @@ export function CoachMark({
               type="button" onClick={onBackToHelp}
               className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[12px] font-medium text-ink-muted hover:bg-surface-muted"
             >
-              <BookOpen className="size-3" /> Back to Help
+              <BookOpen className="size-3" /> Back to help
             </button>
             <span className="ml-auto flex items-center gap-2">
               {onPrev && (

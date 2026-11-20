@@ -61,7 +61,7 @@ export function Saludo({ fecha = new Date(), animar = 'sesion', fase: fija, clas
   const escribiendo = !fija && estado.fase !== 'listo'
 
   return (
-    <p className={cn('flex items-center gap-1.5 text-base whitespace-nowrap text-black', className)}>
+    <p className={cn('flex items-center gap-1.5 text-base whitespace-nowrap text-ink', className)}>
       {/* El lector de pantalla lee los dos de una vez, no letra por letra. */}
       <span className="sr-only">{SALUDO}. {textoFecha}</span>
       <span aria-hidden className="flex items-center gap-1.5">

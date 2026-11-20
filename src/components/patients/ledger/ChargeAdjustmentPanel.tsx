@@ -61,7 +61,7 @@ export function ChargeAdjustmentPanel({
   /* En una sola fila, como red.dev (ledger.md, 2026-11-20). */
   const grilla = FILA[3]
   const primero = (
-    <SeccionLedger titulo="Adjustment Information">
+    <SeccionLedger titulo="Adjustment information">
       <div className={grilla}>
         <CampoFecha value={fecha} onChange={setFecha} error={intentado ? errorFecha : undefined} />
         <TextField
@@ -77,5 +77,5 @@ export function ChargeAdjustmentPanel({
     </SeccionLedger>
   )
 
-  return <ShellLedger titulo="Enter Charge (+) Adjustment" primero={primero} onGuardar={guardar} onCancelar={onCancelar} />
+  return <ShellLedger titulo="Enter charge (+) adjustment" primero={primero} onGuardar={guardar} onCancelar={onCancelar} />
 }

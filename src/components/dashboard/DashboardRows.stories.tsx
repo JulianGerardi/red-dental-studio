@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 /* Los datos del día de la demo, los mismos de las cards. */
 const DIA = DIAS['28-02-2026']!
 const TURNO = DIA.appointments[0]!
-const CHECK_IN = { ...DIA.appointments[1]!, accion: 'Check In' as const }
+const CHECK_IN = { ...DIA.appointments[1]!, accion: 'Check in' as const }
 const CANCEL = { ...DIA.waiting[0]!, accion: 'Cancel' as const }
 const TAREA = DIA.tasks[0]!
 
@@ -42,10 +42,10 @@ const meta = {
       },
     },
   },
-  args: { piece: 'Appointment row', action: 'Check Out', width: 400, selected: false },
+  args: { piece: 'Appointment row', action: 'Check out', width: 400, selected: false },
   argTypes: {
     piece: { control: 'inline-radio', options: ['Appointment row', 'Task row'], description: 'Qué fila se ve.' },
-    action: { control: 'inline-radio', options: ['Check In', 'Check Out', 'Cancel'], description: 'El botón del turno, el mismo de la card: verde, azul o rojo.' },
+    action: { control: 'inline-radio', options: ['Check in', 'Check out', 'Cancel'], description: 'El botón del turno, el mismo de la card: verde, azul o rojo.' },
     width: { control: { type: 'range', min: 300, max: 1200, step: 10 }, description: 'Ancho de la lista: en columnas desde 896px (turno) y 1024px (tarea).' },
     selected: { control: 'boolean', description: 'Con la ficha rápida abierta desde esta fila.' },
   },
@@ -74,7 +74,7 @@ export const Parts: Story = {
           ['Initials', 'Las iniciales en el cuadrado azul de la card, a 28px.', 'appt.initials'],
           ['Row', 'Tocar la fila abre la ficha rápida flotando al lado (2026-10-19), como la card; el botón, el kebab y los links de adentro no la abren. Hover gris.', 'onSelect · data-appt-row'],
           ['Name', 'Botón: abre la misma ficha y es el camino con teclado (aria-expanded).', 'NombreTurno'],
-          ['Check In', 'La pill verde de la card.', 'StatusPill'],
+          ['Check in', 'La pill verde de la card.', 'StatusPill'],
           ['Provider · Operatory', 'Los dos campos grises de la card. Angosta, en un renglón; ancha, cada uno en su columna. Con ocultarOperatorio, sólo el provider: ver States.', 'appt.provider · appt.operatory'],
           ['TR · CC', 'Los chips de la card, a 24px de alto.', 'ChipsTurno'],
           ['Check In / Check Out / Cancel', 'El botón del pie de la card, en sm: el mismo texto, la flecha y el mismo aviso. El color dice la acción: success, primary o destructive (ACCION_TURNO).', 'Button · accionTurno'],
@@ -94,7 +94,7 @@ export const Parts: Story = {
           ['Patient · Register', 'Una línea gris: el paciente y la fecha en que se registró.', 'task.person · task.register'],
           ['Expiration date', 'A la derecha, la fecha en rojo y su rótulo debajo.', 'task.expiration'],
           ['Document', 'El botón rojo del documento.', 'Open document'],
-          ['Complete this Task', 'El botón en sm: el mismo texto y el mismo aviso.', 'Button · completarTarea'],
+          ['Complete this task', 'El botón en sm: el mismo texto y el mismo aviso.', 'Button · completarTarea'],
         ]} />
       </Bloque>
     </Lienzo>
@@ -165,8 +165,8 @@ export const Specs: Story = {
         <Tabla encabezado={['Part', 'Fill', 'Text']} minimo={560}>
           <tr><td className="font-semibold">TR chip</td><td><Token nombre="green-soft" /></td><td><Token nombre="dash-ok-fg" /></td></tr>
           <tr><td className="font-semibold">CC chip</td><td><Token nombre="dash-bad-chip" /></td><td><Token nombre="field-error" /></td></tr>
-          <tr><td className="font-semibold">Check In</td><td><Token nombre="dash-ok-fg" /></td><td><Token nombre="white" /></td></tr>
-          <tr><td className="font-semibold">Check Out</td><td><Token nombre="dash-blue" /></td><td><Token nombre="white" /></td></tr>
+          <tr><td className="font-semibold">Check in</td><td><Token nombre="dash-ok-fg" /></td><td><Token nombre="white" /></td></tr>
+          <tr><td className="font-semibold">Check out</td><td><Token nombre="dash-blue" /></td><td><Token nombre="white" /></td></tr>
           <tr><td className="font-semibold">Cancel</td><td><Token nombre="dash-bad-fg" /></td><td><Token nombre="white" /></td></tr>
           <tr><td className="font-semibold">Selected row</td><td><Token nombre="info-bg" /></td><td>—</td></tr>
         </Tabla>

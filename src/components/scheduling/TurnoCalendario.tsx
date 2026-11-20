@@ -38,19 +38,19 @@ export function TurnoCalendario({
       {forma === 'bloque' && (
         <>
           <span className="block text-[10px] font-medium" style={{ color: s.fg }}>{fmtExacta(evento.start)}</span>
-          <span className="block truncate text-[11px] text-[#18181b]">{evento.patient}</span>
+          <span className="block truncate text-[11px] text-ink">{evento.patient}</span>
         </>
       )}
       {forma === 'chip' && (
         <>
           <span className="shrink-0 text-[10px] font-medium" style={{ color: s.fg }}>{fmtExacta(evento.start).slice(0, 5)}</span>
-          <span className="truncate text-[10px] text-[#18181b]">{evento.patient}</span>
+          <span className="truncate text-[10px] text-ink">{evento.patient}</span>
         </>
       )}
       {forma === 'fila' && (
         <>
           <span className="shrink-0 text-[11px] font-semibold" style={{ color: s.fg }}>{fmtExacta(evento.start)}</span>
-          <span className="min-w-0 flex-1 truncate text-[13px] text-[#18181b]">{evento.patient}</span>
+          <span className="min-w-0 flex-1 truncate text-[13px] text-ink">{evento.patient}</span>
           <span className="shrink-0 text-[11px]" style={{ color: s.fg }}>{evento.state}</span>
         </>
       )}

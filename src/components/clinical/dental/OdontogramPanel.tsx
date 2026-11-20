@@ -241,7 +241,7 @@ export function OdontogramPanel({ card, vacio, onTocar }: {
               >
                 {c.opciones.map((o) => <option key={o.v} value={o.v}>{o.t}</option>)}
               </select>
-              <ChevronDown className={cn('pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2', c.off ? 'text-line-strong' : 'text-black')} />
+              <ChevronDown className={cn('pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2', c.off ? 'text-line-strong' : 'text-ink')} />
               </span>
             </label>
           ))}

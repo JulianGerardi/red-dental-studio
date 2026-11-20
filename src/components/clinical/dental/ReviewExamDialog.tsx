@@ -17,7 +17,7 @@ export function ReviewExamDialog({
 
   return (
     <Drawer
-      open={open} onClose={onCancel} title="Review Exam" description="Are you sure you want to review this exam?"
+      open={open} onClose={onCancel} title="Review exam" description="Are you sure you want to review this exam?"
       footer={<DrawerActions onCancel={onCancel} onSave={() => onConfirm(nota.trim())} saveLabel="Confirm" saveDisabled={!nota.trim()} />}
     >
       <div className="flex flex-col gap-3 pt-2">

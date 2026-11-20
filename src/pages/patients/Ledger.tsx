@@ -77,11 +77,11 @@ type ColumnaLedger = {
 type Fila = Movimiento & { saldo: number; pendiente?: number }
 
 const COLUMNAS: ColumnaLedger[] = [
-  { id: 'fecha', label: 'Trans. Date', bloqueada: true, claseCelda: 'tabular-nums', celda: (m) => fechaCorta(m.fecha) },
-  { id: 'codigo', label: 'CDT Code', claseCelda: 'text-[12px] font-medium tabular-nums', celda: (m) => (m.tipo === 'Charge' ? m.codigo : '—') },
+  { id: 'fecha', label: 'Trans. date', bloqueada: true, claseCelda: 'tabular-nums', celda: (m) => fechaCorta(m.fecha) },
+  { id: 'codigo', label: 'CDT code', claseCelda: 'text-[12px] font-medium tabular-nums', celda: (m) => (m.tipo === 'Charge' ? m.codigo : '—') },
   /* Un pago o crédito de la cuenta (scope guarantor) no es de un paciente: CON-3755. */
   {
-    id: 'paciente', label: 'Patient / Account', claseCelda: 'truncate text-ink',
+    id: 'paciente', label: 'Patient / account', claseCelda: 'truncate text-ink',
     titulo: (m) => cuentaDe(m), celda: (m) => cuentaDe(m),
   },
   { id: 'tipo', label: 'Type', celda: (m) => <PillTipo m={m} /> },
@@ -94,13 +94,13 @@ const COLUMNAS: ColumnaLedger[] = [
   },
   /* Trans. Bal.: lo que falta del cargo; un pago o crédito no tiene saldo propio (—). Ledger Bal.: la cuenta corrida. */
   {
-    id: 'pendiente', label: 'Trans. Bal.', derecha: true, claseCelda: 'tabular-nums text-ink',
+    id: 'pendiente', label: 'Trans. bal.', derecha: true, claseCelda: 'tabular-nums text-ink',
     celda: (m) => (m.pendiente === undefined ? <span className="text-ink-faint">—</span> : moneda(m.pendiente)),
   },
-  { id: 'saldo', label: 'Ledger Bal.', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-ink', celda: (m) => moneda(m.saldo) },
+  { id: 'saldo', label: 'Ledger bal.', derecha: true, bloqueada: true, claseCelda: 'font-semibold tabular-nums text-ink', celda: (m) => moneda(m.saldo) },
   {
     /* Opcional (CON-3753): Apply credit también está en el ⋮ y en el detalle de la fila. */
-    id: 'credito', label: 'Unapplied Credit', derecha: true,
+    id: 'credito', label: 'Unapplied credit', derecha: true,
     celda: (m) => {
       if (!tieneCredito(m)) return null
       return (
@@ -108,7 +108,7 @@ const COLUMNAS: ColumnaLedger[] = [
           type="button"
           data-apply-credit
           aria-label={`Apply ${moneda(m.creditoDisponible ?? 0)} credit from ${m.descripcion}`}
-          className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-info-bg px-1.5 py-1 text-[12px] font-medium whitespace-nowrap tabular-nums hover:bg-[#e3edff]"
+          className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-info-line bg-info-bg px-1.5 py-1 text-[12px] font-medium whitespace-nowrap tabular-nums hover:bg-info-strong-bg"
         >
           <HandCoins className="size-3.5 shrink-0" />
           {moneda(m.creditoDisponible ?? 0)} · Apply
@@ -120,7 +120,7 @@ const COLUMNAS: ColumnaLedger[] = [
 /** Saldo corrido y lo que falta de cada cargo, de lo más nuevo a lo más viejo. */
 const filasDe = (lista: Movimiento[], apls: Aplicacion[]): Fila[] =>
   conSaldo(lista).map((m) => ({ ...m, pendiente: esCargo(m) ? pendienteDe(m, apls) : undefined })).reverse()
-const cuentaDe = (m: Movimiento) => (alcanceDe(m) === 'guarantor' ? 'Guarantor / Account' : m.paciente)
+const cuentaDe = (m: Movimiento) => (alcanceDe(m) === 'guarantor' ? 'Guarantor / account' : m.paciente)
 
 /** El caso de Treatment Plan de un procedimiento, por su vínculo; de ahí sale Estimation details del ⋮. */
 const casoDelCargo = (m: Movimiento) => {
@@ -161,7 +161,7 @@ export function Household() {
   const personas = [{ nombre: GUARANTOR, rol: 'Guarantor' }, ...DEPENDIENTES.map((nombre) => ({ nombre, rol: 'Dependent' }))]
   return (
     <section aria-labelledby="ledger-household" className={cn(TARJETA_PANEL, 'mt-4 p-4')}>
-      <h2 id="ledger-household" className="text-[15px] font-semibold text-ink">Household</h2>
+      <h2 id="ledger-household" className="text-[15px] font-bold text-ink">Household</h2>
       <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {personas.map((p) => (
           <li key={p.nombre} className={cn(TARJETA_INTERNA, 'flex min-w-0 items-center gap-3 p-3')}>
@@ -182,16 +182,16 @@ export function Household() {
   )
 }
 
-const VISTAS = ['Patient View', 'Guarantor View'] as const
+const VISTAS = ['Patient view', 'Guarantor view'] as const
 type Vista = (typeof VISTAS)[number]
 
 /* Los tres botones de red.dev, en la fila del título; cada uno abre su drawer, el mismo de Billing (ledger.md, 2026-11-19). */
 export function AccionesLedger({ onAccion }: { onAccion: (tipo: TipoAjusteBilling) => void }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Button size="md" onClick={() => onAccion('Patient Payment')}><Wallet /> Patient Payment (-)</Button>
-      <Button size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit Adjustment (-)</Button>
-      <Button size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge Adjustment (+)</Button>
+      <Button size="md" onClick={() => onAccion('Patient Payment')}><Wallet /> Patient payment (-)</Button>
+      <Button size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit adjustment (-)</Button>
+      <Button size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge adjustment (+)</Button>
     </div>
   )
 }
@@ -204,7 +204,7 @@ export default function Ledger() {
   /* A qué cargo fue cada pago o ajuste: lo lee el detalle de la fila (Financial details, Applied transactions) y lo suma
      Apply credit. Ver ledger.md (2026-10-14). */
   const [aplicaciones, setAplicaciones] = useState(APLICACIONES)
-  const [vista, setVista] = useState<Vista>('Patient View')
+  const [vista, setVista] = useState<Vista>('Patient view')
   const [accion, setAccion] = useState<TipoAjusteBilling | null>(null)
   const [pagina, setPagina] = useState(1)
   const [expandidas, setExpandidas] = useState<string[]>([])
@@ -268,7 +268,7 @@ export default function Ledger() {
   }, [movs])
   const conSaldoTotal = useMemo(() => filasDe(enOrden, aplicaciones), [enOrden, aplicaciones])
   const delaVista = useMemo(
-    () => (vista === 'Guarantor View' ? conSaldoTotal : filasDe(enOrden.filter((m) => m.paciente === GUARANTOR), aplicaciones)),
+    () => (vista === 'Guarantor view' ? conSaldoTotal : filasDe(enOrden.filter((m) => m.paciente === GUARANTOR), aplicaciones)),
     [conSaldoTotal, enOrden, vista, aplicaciones],
   )
 
@@ -289,7 +289,7 @@ export default function Ledger() {
 
   /* Las cuatro de red.dev con los textos de sus ⓘ; las tres primeras salen de CON-3753 / CON-3755 (ledger.md, 2026-11-12). */
   const stats: Metrica[] = useMemo(() => {
-    const cuenta = vista === 'Guarantor View'
+    const cuenta = vista === 'Guarantor view'
     const abiertos = delaVista.filter((m) => (m.pendiente ?? 0) > 0)
     const saldo = delaVista.reduce((a, m) => a + m.monto, 0)
     /* Con el reclamo pendiente, el paciente debe sólo lo que el seguro no cubriría. */
@@ -353,7 +353,7 @@ export default function Ledger() {
             <PageTitle>Ledger</PageTitle>
             <div className="flex flex-wrap items-center gap-2">
               <AccionesLedger onAccion={setAccion} />
-              <Tabs size="sm" className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
+              <Tabs className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
             </div>
           </div>
 
@@ -479,7 +479,7 @@ export default function Ledger() {
 
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3 lg:mt-auto">
                 <span className="flex items-center gap-3 text-xs font-semibold text-ink-muted">
-                  Showing {filasPagina.length} of {filas.length} entries
+                  Showing {filas.length ? (paginaActual - 1) * TAM_PAGINA + 1 : 0} to {(paginaActual - 1) * TAM_PAGINA + filasPagina.length} of {filas.length} entries
                   {anchos.avisando && (
                     <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
                       <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset
@@ -509,7 +509,7 @@ export default function Ledger() {
           aplicaciones={aplicaciones}
           garante={GUARANTOR}
           dependientes={DEPENDIENTES}
-          alcanceInicial={vista === 'Guarantor View' ? ALCANCE_GUARANTOR : GUARANTOR}
+          alcanceInicial={vista === 'Guarantor view' ? ALCANCE_GUARANTOR : GUARANTOR}
           providers={PROVIDERS_LEDGER}
           onClose={() => setAccion(null)}
           onGuardar={(m, ap) => { agregar(m, ap); aviso.ok(`${m.descripcion} of ${moneda(Math.abs(m.monto))} posted for ${m.paciente}.`); setAccion(null) }}

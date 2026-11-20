@@ -7,7 +7,7 @@ const meta = {
   component: ClinicalItemModal,
   parameters: { layout: 'fullscreen', docs: { story: { inline: false, iframeHeight: 620 } } },
   args: { categoria: 'Allergies', onGuardar: () => {}, onClose: () => {} },
-  argTypes: { categoria: { control: 'select', options: ['Allergies', 'Medical Conditions', 'Medication', 'Past Surgery and Hospitalization'] } },
+  argTypes: { categoria: { control: 'select', options: ['Allergies', 'Medical conditions', 'Medication', 'Past surgery and hospitalization'] } },
 } satisfies Meta<typeof ClinicalItemModal>
 
 export default meta
@@ -15,8 +15,8 @@ type Story = StoryObj<typeof meta>
 
 export const Allergies: Story = {}
 export const Medication: Story = { args: { categoria: 'Medication' } }
-export const MedicalConditions: Story = { args: { categoria: 'Medical Conditions' } }
-export const PastSurgery: Story = { args: { categoria: 'Past Surgery and Hospitalization' } }
+export const MedicalConditions: Story = { args: { categoria: 'Medical conditions' } }
+export const PastSurgery: Story = { args: { categoria: 'Past surgery and hospitalization' } }
 
 /* Estado de error: Save con los campos obligatorios vacíos. */
 export const WithValidationErrors: Story = {

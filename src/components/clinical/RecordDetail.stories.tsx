@@ -135,7 +135,7 @@ function EnRegistro({ registro }: { registro: Registro }) {
 /* El finding Tooth 3 del panel de un examen: es la fila Chronic enamel dental caries de la Problem List. */
 const HALLAZGO: Finding = {
   id: 'F-1', area: 'Tooth 3', condition: 'chronic enamel dental caries', descriptor: 'Deep', date: 'May 14, 2026', status: 'Discarded',
-  tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [], examen: 'Dental Assessment', problema: 'p5',
+  tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [], examen: 'Dental assessment', problema: 'p5',
 }
 
 export const States: Story = {

@@ -40,7 +40,7 @@ export function NewEmployeeDrawer({ onClose, onGuardar }: { onClose: () => void;
 
   return (
     <ModalShell
-      title="New Employee"
+      title="New employee"
       description="Everyone with access to the practice, across every location."
       onClose={onClose}
       width="max-w-[560px]"
@@ -54,7 +54,7 @@ export function NewEmployeeDrawer({ onClose, onGuardar }: { onClose: () => void;
       )}
     >
       <DrawerStep index={0} step={paso}>
-        <DrawerSection title="General Information">
+        <DrawerSection title="General information">
           <LinkExistingPerson vincular={vincular} onVincular={setVincular} vinculado={vinculado} onSeleccionar={setVinculado} />
           {!vincular && (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -69,10 +69,10 @@ export function NewEmployeeDrawer({ onClose, onGuardar }: { onClose: () => void;
       </DrawerStep>
 
       <DrawerStep index={1} step={paso}>
-        <DrawerSection title="Contact Information">
+        <DrawerSection title="Contact information">
           <div className="grid gap-4 sm:grid-cols-2">
             <CountryCodeField required value={d.codigo} onChange={set('codigo')} error={falta('codigo')} />
-            <TextField label="Area Code (3 digits)" required placeholder="555" value={d.area} onChange={set('area')} error={falta('area')} />
+            <TextField label="Area code (3 digits)" required placeholder="555" value={d.area} onChange={set('area')} error={falta('area')} />
             <TextField label="Number (7 digits)" required placeholder="000-0000" value={d.numero} onChange={set('numero')} error={falta('numero')} />
             <TextField label="Extension" placeholder="Extension" value={d.ext} onChange={set('ext')} />
           </div>
@@ -80,14 +80,14 @@ export function NewEmployeeDrawer({ onClose, onGuardar }: { onClose: () => void;
       </DrawerStep>
 
       <DrawerStep index={2} step={paso}>
-        <DrawerSection title="Address Information">
+        <DrawerSection title="Address information">
           <div className="grid gap-4 sm:grid-cols-2">
-            <TextField label="Address Line 1" required placeholder="Street name and number" value={d.linea1} onChange={set('linea1')} error={falta('linea1')} />
-            <TextField label="Address Line 2" placeholder="Additional info" value={d.linea2} onChange={set('linea2')} />
+            <TextField label="Address line 1" required placeholder="Street name and number" value={d.linea1} onChange={set('linea1')} error={falta('linea1')} />
+            <TextField label="Address line 2" placeholder="Additional info" value={d.linea2} onChange={set('linea2')} />
             <SelectField label="Country" required options={PAISES} value={d.pais} onChange={set('pais')} error={falta('pais')} />
             <SelectField label="State" required placeholder="Select your region" options={ESTADOS} value={d.estado} onChange={set('estado')} error={falta('estado')} />
             <TextField label="City" required placeholder="Your city" value={d.ciudad} onChange={set('ciudad')} error={falta('ciudad')} />
-            <TextField label="ZIP Code" required placeholder="Postal code (only numbers)" value={d.zip} onChange={set('zip')} error={falta('zip')} />
+            <TextField label="ZIP code" required placeholder="Postal code (only numbers)" value={d.zip} onChange={set('zip')} error={falta('zip')} />
           </div>
         </DrawerSection>
       </DrawerStep>

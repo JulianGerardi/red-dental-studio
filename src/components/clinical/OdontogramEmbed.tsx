@@ -358,7 +358,7 @@ export function OdontogramEmbed({
                 ? (tocados.length > 0 ? `Set: ${tocados.slice(0, 3).join(' · ')}${tocados.length > 3 ? ` +${tocados.length - 3}` : ''}` : 'Nothing set yet')
                 : actual?.titulo}
             </span>
-            <span className="block truncate text-[10px] text-ink-faint" title={minimizado ? pendientes.join(' · ') : undefined}>
+            <span className="block truncate text-[11px] text-ink-faint" title={minimizado ? pendientes.join(' · ') : undefined}>
               {minimizado
                 ? (pendientes.length > 0 ? `${pendientes.length} left: ${pendientes.slice(0, 2).join(' · ')}${pendientes.length > 2 ? '…' : ''}` : 'All sections visited')
                 : `${paso + 1} of ${pasos.length}`}

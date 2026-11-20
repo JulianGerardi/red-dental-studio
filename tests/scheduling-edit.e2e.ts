@@ -1,7 +1,7 @@
 import { test } from '@e2e-dev/web'
 import { expect } from 'e2e'
 
-/* Edit appointment desde el detalle del turno (CON-3249): drawer en pestañas, sin pasos, con el turno cargado y Save Changes
+/* Edit appointment desde el detalle del turno (CON-3249): drawer en pestañas, sin pasos, con el turno cargado y Save changes
    (design-reference/figma/modulos/scheduling.md, 2026-11-17). */
 
 test('un turno se edita desde su detalle, sin pasos', async ({ app, screen }) => {
@@ -9,13 +9,13 @@ test('un turno se edita desde su detalle, sin pasos', async ({ app, screen }) =>
   await screen.getByRole('button', /Noah James Smith/).first().tap()
   await screen.getByRole('dialog', /Appointment details for Noah James Smith/).getByRole('button', 'Edit appointment').tap()
 
-  const drawer = screen.getByRole('dialog', 'Edit Appointment')
-  await expect(drawer.getByRole('button', /Next Step/)).toHaveCount(0)
+  const drawer = screen.getByRole('dialog', 'Edit appointment')
+  await expect(drawer.getByRole('button', /Next step/)).toHaveCount(0)
   await expect(drawer.getByRole('tab', 'General')).toHaveAttribute('aria-selected', 'true')
   await drawer.getByRole('tab', 'Schedule').tap()
   await drawer.getByRole('button', 'Operatory 3').tap()
   await drawer.getByRole('button', 'Operatory 1').tap()
-  await drawer.getByRole('button', /Save Changes/).tap()
+  await drawer.getByRole('button', /Save changes/).tap()
   await expect(screen.getByText(/Appointment for Noah James Smith updated/)).toBeVisible()
 
   await screen.getByRole('button', /Noah James Smith/).first().tap()
@@ -33,10 +33,10 @@ test('al guardar con un obligatorio vacío, lleva a su pestaña y la marca', asy
   await app.open('/scheduling')
   await screen.getByRole('button', /Noah James Smith/).first().tap()
   await screen.getByRole('dialog', /Appointment details for Noah James Smith/).getByRole('button', 'Edit appointment').tap()
-  const drawer = screen.getByRole('dialog', 'Edit Appointment')
-  await drawer.getByRole('button', 'Remove Primary Provider').tap()
+  const drawer = screen.getByRole('dialog', 'Edit appointment')
+  await drawer.getByRole('button', 'Remove Primary provider').tap()
   await drawer.getByRole('tab', 'Additional').tap()
-  await drawer.getByRole('button', /Save Changes/).tap()
+  await drawer.getByRole('button', /Save changes/).tap()
   await expect(drawer.getByRole('tab', /General/)).toHaveAttribute('aria-selected', 'true')
   await expect(drawer.getByText('This field is required.')).toBeVisible()
 })

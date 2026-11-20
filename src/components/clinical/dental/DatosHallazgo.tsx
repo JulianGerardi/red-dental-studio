@@ -54,8 +54,8 @@ export const mayuscula = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
 
 /** El tono de la píldora de estado: el mismo criterio de color que la card del finding. */
 export const TONO_ESTADO: Record<FindingStatus, PillTone> = {
-  Active: 'success', Monitoring: 'warning', 'In Treatment': 'info', Treated: 'success', 'Externally Treated': 'success',
-  'No Treatment Needed': 'danger', 'Patient Declined': 'danger', 'Clinic Declined': 'danger', Discarded: 'danger',
+  Active: 'success', Monitoring: 'warning', 'In treatment': 'info', Treated: 'success', 'Externally treated': 'success',
+  'No treatment needed': 'danger', 'Patient declined': 'danger', 'Clinic declined': 'danger', Discarded: 'danger',
 }
 
 /** El área de tratamiento: el ícono de su tipo en el cuadrado azul (como el del diente), el tipo y su valor. */

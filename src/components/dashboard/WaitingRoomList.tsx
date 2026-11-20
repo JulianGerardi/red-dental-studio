@@ -66,7 +66,7 @@ export function WaitingRoomList({ pacientes, ahora, limit, seleccionada, onSelec
                 return (
                   <li key={id} className={TARJETA_INTERNA}>
                     <AppointmentRow
-                      appt={{ ...p, accion: 'Check Out' }} id={id} activa={seleccionada === id}
+                      appt={{ ...p, accion: 'Check out' }} id={id} activa={seleccionada === id}
                       chips={p.etapa === 'Checked in'}
                       estado={texto && <Pill tone="warning" size="sm" className="tabular-nums">{texto}</Pill>}
                       onSelect={onSelect} onEdit={onEdit && (() => onEdit(p))} onAccion={onAccion && (() => onAccion(p))}

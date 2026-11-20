@@ -19,22 +19,22 @@ export type Appointment = {
   time: string
   /* Para qué viene: lo muestra la línea del día de cada sala (OperatoryCard). */
   motivo?: string
-  /* Botón del pie. En el frame casi todas dicen "Check Out" y una "Cancel"; Julián sumó "Check In" (2026-10-13). */
+  /* Botón del pie. En el frame casi todas dicen "Check out" y una "Cancel"; Julián sumó "Check in" (2026-10-13). */
   accion?: AccionTurno
 }
 
-export type AccionTurno = 'Check In' | 'Check Out' | 'Cancel'
+export type AccionTurno = 'Check in' | 'Check out' | 'Cancel'
 
 /* El color dice la acción, para no confundirlas en una lista larga (Julián, 2026-10-13): Check In verde, Check Out
    azul, Cancel rojo. Son variantes de ui/button. Ver design-reference/figma/modulos/dashboard.md. */
 export const ACCION_TURNO: Record<AccionTurno, ButtonVariant> = {
-  'Check In': 'success',
-  'Check Out': 'primary',
+  'Check in': 'success',
+  'Check out': 'primary',
   Cancel: 'destructive',
 }
 
 /* Figma 4430:57451. El card se rediseñó: sin borde, con la foto y el badge
-   "Check In" a la izquierda, los chips TR/CC y el kebab a la derecha, los dos
+   "Check in" a la izquierda, los chips TR/CC y el kebab a la derecha, los dos
    campos grises con la caja de hora al costado, y el botón de acción a lo
    ancho del pie. Ver Elements / Appointment cards.
 
@@ -64,14 +64,14 @@ export function AppointmentCard({
   onSelect?: (appt: Appointment, el: HTMLElement, id?: string) => void
   onEdit?: (appt: Appointment) => void
   /** Versión chica para una lista angosta -el costado de Patients-: una fila
-      con nombre + hora/provider, sin los chips TR/CC, sin el "Check In" y
+      con nombre + hora/provider, sin los chips TR/CC, sin el "Check in" y
       sin el botón de Check Out. Es otro layout, no el mismo con partes
       escondidas -por eso vive en su propio componente más abajo. */
   compact?: boolean
 }) {
   if (compact) return <AppointmentCardCompacta appt={appt} onEdit={onEdit} />
 
-  const accion = appt.accion ?? 'Check Out'
+  const accion = appt.accion ?? 'Check out'
   const Paciente = onSelect ? 'button' : 'div'
 
   return (
@@ -79,7 +79,7 @@ export function AppointmentCard({
       data-appt-card
       className={cn(
         'flex flex-col gap-2.5 p-3',
-        onSelect && 'cursor-pointer transition-colors hover:bg-[#fafbfe]',
+        onSelect && 'cursor-pointer transition-colors hover:bg-page-background',
         /* Mismo anillo que el FAB de Scheduling: outline + offset, con el
            hueco transparente para que se vea el fondo del panel. */
         '[outline-style:solid] outline-[3px] outline-offset-[3px] outline-transparent transition-[outline-color]',
@@ -110,7 +110,7 @@ export function AppointmentCard({
             <span className="text-dash-name truncate text-[15px] leading-none font-bold">
               {appt.name}
             </span>
-            <StatusPill tone="ok" className="self-start">Check In</StatusPill>
+            <StatusPill tone="ok" className="self-start">Check in</StatusPill>
           </span>
         </Paciente>
 
@@ -157,9 +157,9 @@ export function AppointmentCard({
 
 /* Lo que hace el botón del pie (Check In, Check Out o Cancel). Lo comparten la card y la fila (DashboardRows). */
 export function accionTurno(appt: Appointment) {
-  const accion = appt.accion ?? 'Check Out'
+  const accion = appt.accion ?? 'Check out'
   if (accion === 'Cancel') aviso.warn(`Appointment for ${appt.name} was cancelled.`)
-  else if (accion === 'Check In') aviso.ok(`${appt.name} checked in.`)
+  else if (accion === 'Check in') aviso.ok(`${appt.name} checked in.`)
   else aviso.ok(`${appt.name} checked out.`)
 }
 

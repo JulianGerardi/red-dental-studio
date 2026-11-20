@@ -22,7 +22,7 @@ import { OBLIGATORIO } from '@/lib/validacion'
    cuando "All day exception" está tildado —seguían pareciendo deshabilitados
    aunque se podía tipear igual—, sólo dejan de ser obligatorios. */
 
-const RAZONES = ['Holiday', 'Staff Training', 'Maintenance', 'Private Event', 'Other']
+const RAZONES = ['Holiday', 'Staff training', 'Maintenance', 'Private event', 'Other']
 
 const HORAS = Array.from({ length: 48 }, (_, i) => {
   const h = Math.floor(i / 2)
@@ -59,7 +59,7 @@ export function NewExceptionModal({
 
   return (
     <ModalShell
-      title="New Exception"
+      title="New exception"
       onClose={onClose}
       width="max-w-[420px]"
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
@@ -73,7 +73,7 @@ export function NewExceptionModal({
             error={intentado && !nombre.trim() ? OBLIGATORIO : undefined}
           />
           <TextField
-            label="Abreviattion" required placeholder="Placeholder" value={abrev} onChange={setAbrev}
+            label="Abbreviation" required placeholder="Placeholder" value={abrev} onChange={setAbrev}
             error={intentado && !abrev.trim() ? OBLIGATORIO : undefined}
           />
           <SelectField label="Reason" options={RAZONES} value={razon} onChange={setRazon} />
@@ -85,12 +85,12 @@ export function NewExceptionModal({
             />
           </div>
           <SelectField
-            label="Start Time" required placeholder="00:00 hs" options={HORAS}
+            label="Start time" required placeholder="00:00 hs" options={HORAS}
             value={inicio} onChange={setInicio}
             error={intentado && !todoElDia && !inicio.trim() ? OBLIGATORIO : undefined}
           />
           <SelectField
-            label="End Time" required placeholder="00:00 hs" options={HORAS}
+            label="End time" required placeholder="00:00 hs" options={HORAS}
             value={fin} onChange={setFin}
             error={intentado && !todoElDia && !fin.trim() ? OBLIGATORIO : undefined}
           />

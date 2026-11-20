@@ -14,7 +14,7 @@ import { areaDeTratamiento, type Finding } from './data'
    - un procedimiento -> Edit Procedure (5294:85084): proveedor, notas y lo que vincula;
    - una condition en un diente -> EditConditionDrawer (5301:149072): superficies, descriptores y notas;
    - el resto de las conditions (Extraoral, Intraoral) -> EditFindingView (5294:107675): los descriptores y las notas.
-   Las dos se titulan "Edit Finding": una condition cargada siempre es un finding (Julián, 2026-10-27).
+   Las dos se titulan "Edit finding": una condition cargada siempre es un finding (Julián, 2026-10-27).
    Qué se ve y qué se edita sale de CON-2770 (Edit Finding): fecha, estado, condition, examen y área de tratamiento de
    sólo lectura; superficie (si corresponde), notas y descriptores editables. Arriba: nombre, fecha, (precio), examen,
    proveedor y el área al final, como el mockup de Julián (2026-10-27); General Information y Descriptors van en dos
@@ -41,8 +41,8 @@ export function EditFindingDrawer({
   )
 }
 
-export type PestanaEdicion = 'General Information' | 'Descriptors'
-export const PESTANAS_EDICION = ['General Information', 'Descriptors'] as const
+export type PestanaEdicion = 'General information' | 'Descriptors'
+export const PESTANAS_EDICION = ['General information', 'Descriptors'] as const
 
 export function EditFindingView({
   finding, onClose, onSave,
@@ -51,12 +51,12 @@ export function EditFindingView({
   onClose: () => void
   onSave: (patch: Partial<Finding>) => void
 }) {
-  const [pestana, setPestana] = useState<PestanaEdicion>('General Information')
+  const [pestana, setPestana] = useState<PestanaEdicion>('General information')
   const [descriptors, setDescriptors] = useState<Record<string, string>>({})
   const [notes, setNotes] = useState('')
   useEffect(() => {
     if (!finding) return
-    setPestana('General Information')
+    setPestana('General information')
     setDescriptors(finding.descriptors ?? {})
     setNotes(finding.notes)
   }, [finding])
@@ -69,16 +69,16 @@ export function EditFindingView({
   const area = finding && areaDeTratamiento(finding)
   return (
     <Drawer
-      open={!!finding} onClose={onClose} title="Edit Finding" footer={<DrawerActions onCancel={onClose} onSave={guardar} />}
-      tabs={<Tabs tabs={PESTANAS_EDICION} value={pestana} onChange={setPestana} fullWidth size="sm" aria-label="Edit Finding sections" />}
+      open={!!finding} onClose={onClose} title="Edit finding" footer={<DrawerActions onCancel={onClose} onSave={guardar} />}
+      tabs={<Tabs tabs={PESTANAS_EDICION} value={pestana} onChange={setPestana} fullWidth size="sm" aria-label="Edit finding sections" />}
     >
-      {finding && pestana === 'General Information' && (
+      {finding && pestana === 'General information' && (
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-4">
             <FilaNombre nombre={mayuscula(finding.condition)} estado={finding.status} tono={TONO_ESTADO[finding.status]} />
             <FilaDato icono={<IconoFecha />} rotulo="Creation date">{fechaCorta(finding.date)}</FilaDato>
             <FilaDato icono={<IconoExamen />} rotulo="Exams">
-              <Pill tone="success" size="sm">{finding.examen ?? 'Dental Assessment'}</Pill>
+              <Pill tone="success" size="sm">{finding.examen ?? 'Dental assessment'}</Pill>
             </FilaDato>
             <FilaDato icono={<IconoProveedor />} rotulo="Provider">{finding.provider}</FilaDato>
             {area && <FilaArea area={area} />}
@@ -88,7 +88,7 @@ export function EditFindingView({
       )}
       {finding && pestana === 'Descriptors' && (
         <section className="flex flex-col gap-3.5">
-          <p className="text-xs font-medium text-ink">Selected Descriptors</p>
+          <p className="text-xs font-medium text-ink">Selected descriptors</p>
           <DescriptorFields value={descriptors} onChange={setDescriptors} />
         </section>
       )}

@@ -129,7 +129,7 @@ export function PanelLedger() {
           </span>
         </Fila>
       ))}
-      <div className="mt-1 flex items-center justify-between rounded-xl bg-[#f6f8fc] px-3.5 py-3">
+      <div className="mt-1 flex items-center justify-between rounded-xl bg-page-background px-3.5 py-3">
         <span className="text-[11px] text-ink-muted">Balance due</span>
         <span className="text-dash-blue text-[16px] leading-none font-extrabold tabular-nums">{moneda(saldo)}</span>
       </div>
@@ -144,7 +144,7 @@ const CARGADAS = new Set([19, 30, 32])
 /** La arcada inferior, llenándose diente por diente. */
 export function PanelOdontograma() {
   return (
-    <Panel title="Dental Assessment" controls={<span className="text-dash-blue shrink-0 text-[12px] font-semibold">Mandibular</span>} bodyClassName="gap-3">
+    <Panel title="Dental assessment" controls={<span className="text-dash-blue shrink-0 text-[12px] font-semibold">Mandibular</span>} bodyClassName="gap-3">
       <div className="flex justify-between gap-1">
         {MANDIBULAR.map((n, i) => (
           <span

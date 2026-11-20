@@ -20,7 +20,6 @@ import { SettingsLayout, SettingsGeneral, SettingsPlaceholder } from '@/pages/Se
 import { SettingsLocations } from '@/pages/settings/Locations'
 import { SettingsLocationDetail } from '@/pages/settings/LocationDetail'
 import { SettingsEmployees, SettingsEmployeeDetail } from '@/pages/settings/Employees'
-import { SettingsAccounts } from '@/pages/settings/Accounts'
 import { SettingsAccount } from '@/pages/settings/Account'
 import { SettingsConsents } from '@/pages/settings/Consents'
 import { SettingsLedgerOptions } from '@/pages/settings/LedgerOptions'
@@ -82,8 +81,9 @@ export function AppRoutes() {
           <Route path="team" element={<SettingsEmployees />} />
           <Route path="team/new" element={<SettingsEmployees nuevo />} />
           <Route path="team/:employeeId" element={<SettingsEmployeeDetail />} />
-          <Route path="accounts" element={<SettingsAccounts />} />
-          <Route path="accounts/:accountId" element={<SettingsAccount />} />
+          {/* Una sola cuenta: la lista de cuentas no existe para una clínica (settings-accounts.md, 2026-11-20). */}
+          <Route path="accounts" element={<Navigate to="/settings/account" replace />} />
+          <Route path="accounts/:accountId" element={<Navigate to="/settings/account" replace />} />
           <Route path="account" element={<SettingsAccount />} />
           <Route path="consents" element={<SettingsConsents />} />
           <Route path="ledger" element={<SettingsLedgerOptions />} />

@@ -1,7 +1,7 @@
 import { test } from '@e2e-dev/web'
 import { expect } from 'e2e'
 
-/* Settings → Locations → Working Hours (CON-1546). Ver design-reference/figma/modulos/locations.md (2026-11-06). */
+/* Settings → Locations → Working hours (CON-1546). Ver design-reference/figma/modulos/locations.md (2026-11-06). */
 
 test('Activar un día cerrado abre el panel y Cancel lo deja Closed', async ({ app, screen }) => {
   await app.open('/settings/locations/abril?type=working-hours')
@@ -78,7 +78,7 @@ test('Un día cerrado no entra en la pregunta', async ({ app, screen }) => {
   await expect(screen.getByText('This will replace the existing working hours for Wednesday. Do you want to continue?')).toBeVisible()
 })
 
-test('Turnos fuera de las horas nuevas: se resuelven antes y Confirm pasa el resto a Waiting List', async ({ app, screen }) => {
+test('Turnos fuera de las horas nuevas: se resuelven antes y Confirm pasa el resto a Waiting list', async ({ app, screen }) => {
   await app.open('/settings/locations/abril?type=working-hours')
   const panel = await sundayDe9a14(screen)
   await panel.getByRole('button', 'Monday').tap()
@@ -89,7 +89,7 @@ test('Turnos fuera de las horas nuevas: se resuelven antes y Confirm pasa el res
   const aviso = screen.getByRole('dialog', 'Affected appointments')
   await expect(aviso.getByText('Appointments (2)', { exact: true })).toBeVisible()
   await screen.getByRole('button', 'Actions for appointment for John Smith').tap()
-  await screen.getByRole('menuitem', 'Mark as No Show').tap()
+  await screen.getByRole('menuitem', 'Mark as no show').tap()
   /* La cita resuelta sale de la lista y el contador baja (CON-4167). */
   await expect(aviso.getByText('Appointments (1)', { exact: true })).toBeVisible()
   await expect(aviso.getByText('John Smith')).toHaveCount(0)
@@ -157,13 +157,13 @@ test('Cerrar un día pregunta, conserva sus franjas y reabrirlo las recupera', a
   await expect(panel.getByRole('button', '20:15 hs')).toBeVisible()
 })
 
-/* CON-4167: una cita afectada en Check In frena todo el cambio. */
-test('Una cita en Check In bloquea el cambio y no se borra nada', async ({ app, screen }) => {
+/* CON-4167: una cita afectada en Check in frena todo el cambio. */
+test('Una cita en Check in bloquea el cambio y no se borra nada', async ({ app, screen }) => {
   await app.open('/settings/locations/abril?type=working-hours')
   await screen.getByRole('button', /^Remove 08:00 AM - 01:00 PM on Monday/).tap()
   await screen.getByRole('dialog', 'Delete working hours?').getByRole('button', 'Confirm').tap()
   const bloqueo = screen.getByRole('dialog', 'Unable to change working hours')
-  await expect(bloqueo.getByText(/Check In or In Progress status/)).toBeVisible()
+  await expect(bloqueo.getByText(/Check in or In progress status/)).toBeVisible()
   await bloqueo.getByRole('button', 'Close').tap()
   await expect(screen.getByRole('button', /^Remove 08:00 AM - 01:00 PM on Monday/)).toBeVisible()
 })

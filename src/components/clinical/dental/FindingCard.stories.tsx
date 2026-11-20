@@ -7,7 +7,7 @@ const BASE: Finding = {
   status: 'Active', tooth: 3, provider: 'Elena Martinez', surfaces: ['O', 'DB'], notes: '', linked: [], diagnoses: [],
 }
 
-const ESTADOS: FindingStatus[] = ['Active', 'Monitoring', 'In Treatment', 'Treated', 'Externally Treated', 'No Treatment Needed', 'Patient Declined', 'Clinic Declined', 'Discarded']
+const ESTADOS: FindingStatus[] = ['Active', 'Monitoring', 'In treatment', 'Treated', 'Externally treated', 'No treatment needed', 'Patient declined', 'Clinic declined', 'Discarded']
 
 const meta = {
   title: 'Components/Clinical/Dental/FindingCard',

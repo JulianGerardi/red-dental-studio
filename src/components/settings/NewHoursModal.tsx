@@ -1,13 +1,13 @@
 import { DrawerActions } from '@/components/ui/drawer'
 import { Alert } from '@/components/ui/alert'
 import { useState } from 'react'
-import { CirclePlus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ModalShell, SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
 import { OBLIGATORIO } from '@/lib/validacion'
 
-/* Figma 3864:267207 "New Hours". Aviso ámbar con barra de acento, locación,
+/* Figma 3864:267207 "New hours". Aviso ámbar con barra de acento, locación,
    rangos horarios con su nota de zona horaria, los días de repetición y el
    alcance del cambio. Los textos van tal cual. */
 
@@ -15,7 +15,7 @@ const DIAS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const ZONA = 'Time zone in San Francisco, CA, USA (GMT-7)'
 const ALCANCES = ['Only this day', 'All selected days', 'This and future weeks']
 
-/* Misma grilla de media hora que "New Exception". */
+/* Misma grilla de media hora que "New exception". */
 const HORAS = Array.from({ length: 48 }, (_, i) => {
   const h = Math.floor(i / 2)
   const m = i % 2 === 0 ? '00' : '30'
@@ -38,7 +38,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
 
   return (
     <ModalShell
-      title="New Hours"
+      title="New hours"
       onClose={onClose}
       width="max-w-[420px]"
       actions={<DrawerActions onCancel={onClose} onSave={guardar} />}
@@ -68,12 +68,12 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
           <div key={i}>
             <div className="grid gap-4 sm:grid-cols-2">
               <SelectField
-                label="Start Time" required placeholder="00:00 hs" options={HORAS} value={r.inicio}
+                label="Start time" required placeholder="00:00 hs" options={HORAS} value={r.inicio}
                 onChange={(v) => setRangos((p) => p.map((x, j) => (j === i ? { ...x, inicio: v } : x)))}
                 error={intentado && !r.inicio.trim() ? OBLIGATORIO : undefined}
               />
               <SelectField
-                label="End Time" required placeholder="00:00 hs" options={HORAS} value={r.fin}
+                label="End time" required placeholder="00:00 hs" options={HORAS} value={r.fin}
                 onChange={(v) => setRangos((p) => p.map((x, j) => (j === i ? { ...x, fin: v } : x)))}
                 error={intentado && !r.fin.trim() ? OBLIGATORIO : undefined}
               />
@@ -87,7 +87,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
           onClick={() => setRangos((p) => [...p, { inicio: '', fin: '' }])}
           className="text-dash-blue flex items-center gap-1.5 self-start text-[13px] font-semibold hover:underline"
         >
-          <CirclePlus className="size-4" /> Add another time range
+          <Plus className="size-4" /> Add another time range
         </button>
 
         <div className="border-t border-line pt-4">
@@ -106,7 +106,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
                     'flex size-8 items-center justify-center rounded-md border text-[13px] font-semibold transition-colors',
                     on
                       ? 'border-dash-blue text-dash-blue bg-white'
-                      : 'border-transparent text-[#c4c4c8] hover:bg-surface-muted',
+                      : 'border-transparent text-ink-faint hover:bg-surface-muted',
                   )}
                 >
                   {d}

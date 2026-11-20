@@ -1,18 +1,18 @@
 import { test } from '@e2e-dev/web'
 import { expect } from 'e2e'
 
-/* Treatment Plan desde el menú Exams: los planes por fecha y qué se puede hacer según el estado del caso. */
+/* Treatment plan desde el menú Exams: los planes por fecha y qué se puede hacer según el estado del caso. */
 
 test('el menú Exams abre los registros', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', /^Exams/).tap()
-  for (const r of ['Treatment Plan', 'Treatment', 'Patient Summary', 'Lab Order', 'Prescription', 'Referral']) {
+  for (const r of ['Treatment plan', 'Treatment', 'Patient summary', 'Lab order', 'Prescription', 'Referral']) {
     await expect(screen.getByRole('menuitem', r)).toBeVisible()
   }
-  await screen.getByRole('menuitem', 'Treatment Plan').tap()
-  await expect(screen.getByRole('button', 'Unassigned Items')).toBeVisible()
+  await screen.getByRole('menuitem', 'Treatment plan').tap()
+  await expect(screen.getByRole('button', 'Unassigned items')).toBeVisible()
   // Con un registro abierto, las pestañas son los registros y "Exams" vuelve a los exámenes.
-  await expect(screen.getByRole('button', 'Lab Order')).toBeVisible()
+  await expect(screen.getByRole('button', 'Lab order')).toBeVisible()
   await screen.getByRole('button', 'Exams').tap()
   await expect(screen.getByRole('button', 'Dental assessment')).toBeVisible()
 })
@@ -20,12 +20,12 @@ test('el menú Exams abre los registros', async ({ app, screen }) => {
 test('en Planning se edita y desde Presented no', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', /^Exams/).tap()
-  await screen.getByRole('menuitem', 'Treatment Plan').tap()
+  await screen.getByRole('menuitem', 'Treatment plan').tap()
   const planes = screen.getByRole('navigation', 'Treatment plans')
 
   await planes.getByRole('button', /Periodontists Recommended, Planning/).tap()
   await expect(planes.getByRole('button', /Periodontist Alternative, Planning/)).toBeVisible()
-  await expect(screen.getByRole('button', /New Alternative Case/)).toBeVisible()
+  await expect(screen.getByRole('button', /New alternative case/)).toBeVisible()
   await expect(screen.getByRole('button', /Move to/)).toBeVisible()
   await expect(screen.getByRole('button', 'Rename case')).toBeVisible()
   await expect(screen.getByText('Drag procedure here to create new visit')).toBeVisible()
@@ -42,7 +42,7 @@ test('en Planning se edita y desde Presented no', async ({ app, screen }) => {
 test('las filas de las visitas se marcan y el menú cambia con el estado', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', /^Exams/).tap()
-  await screen.getByRole('menuitem', 'Treatment Plan').tap()
+  await screen.getByRole('menuitem', 'Treatment plan').tap()
   const planes = screen.getByRole('navigation', 'Treatment plans')
   await planes.getByRole('button', /Periodontists Recommended, Planning/).tap()
 
@@ -52,7 +52,7 @@ test('las filas de las visitas se marcan y el menú cambia con el estado', async
 
   await screen.getByRole('button', 'Case actions').tap()
   await expect(screen.getByRole('menuitem', /Delete/)).toBeVisible()
-  await expect(screen.getByRole('menuitem', /Finish Planning/)).toBeVisible()
+  await expect(screen.getByRole('menuitem', /Finish planning/)).toBeVisible()
 })
 
 /* CON-4052: el menú ⋮ según el estado del procedimiento y del plan. Antes de aceptar, Complete está pero bloqueado; en
@@ -60,7 +60,7 @@ test('las filas de las visitas se marcan y el menú cambia con el estado', async
 test('Complete bloqueado mientras se planea o espera el consentimiento; aceptado pide Consent required', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', /^Exams/).tap()
-  await screen.getByRole('menuitem', 'Treatment Plan').tap()
+  await screen.getByRole('menuitem', 'Treatment plan').tap()
   const planes = screen.getByRole('navigation', 'Treatment plans')
 
   // Planning: Complete deshabilitado, sin Start, con Delete; sin columna Consent.
@@ -111,8 +111,8 @@ test('Start con Sign now lleva al consentimiento, se firma ahí y deja el plan I
   await expect(screen.getByRole('heading', /Procedure Consent - D2950/)).toBeVisible()
   await expect(screen.getByText('Sign to start this procedure')).toBeVisible()
   // El paciente ya firmó: falta el provider, en el pop up del portal.
-  await screen.getByRole('button', /Provider Signature/).tap()
-  const provider = screen.getByRole('dialog', 'Provider Signature')
+  await screen.getByRole('button', /Provider signature/).tap()
+  const provider = screen.getByRole('dialog', 'Provider signature')
   await expect(provider.getByText('Secure signing portal')).toBeVisible()
   await provider.getByLabel('Email').fill('perez@clinic.com')
   await provider.getByPlaceholder('Enter password').fill('secret')
@@ -152,7 +152,7 @@ test('la columna Consent muestra los estados de CON-4119', async ({ app, screen 
   await screen.getByRole('button', /Open consent for D2750: Rejected/).tap()
   await expect(screen.getByRole('heading', /Procedure Consent - D2750/)).toBeVisible()
   await expect(screen.getByText(/Consent rejected by patient\. It can no longer be signed\./)).toBeVisible()
-  await expect(screen.getByRole('button', /Patient Signature/)).toHaveCount(0)
+  await expect(screen.getByRole('button', /Patient signature/)).toHaveCount(0)
 
   // El plan cancelado después de aceptar: sus consentimientos quedaron Discarded.
   await app.open('/patients/patient-0001/clinical-mode?case=c10')
@@ -165,16 +165,16 @@ test('la columna Consent abre el consentimiento y ahí firman paciente y provide
   await screen.getByRole('button', /Open consent for D2391: Requested/).tap()
   await expect(screen.getByRole('heading', /Procedure Consent - D2391/)).toBeVisible()
   // El paciente marca las afirmaciones en el documento antes de firmar.
-  await expect(screen.getByRole('button', /Patient Signature/)).toBeDisabled()
+  await expect(screen.getByRole('button', /Patient signature/)).toBeDisabled()
   for (let i = 0; i < 5; i++) await screen.getByRole('checkbox').nth(i).tap()
-  await screen.getByRole('button', /Patient Signature/).tap()
-  const paciente = screen.getByRole('dialog', 'Patient Signature')
+  await screen.getByRole('button', /Patient signature/).tap()
+  const paciente = screen.getByRole('dialog', 'Patient signature')
   await expect(paciente.getByLabel('Initials')).toHaveValue('JP')
-  await paciente.getByRole('button', /Adopt and Sign/).tap()
+  await paciente.getByRole('button', /Adopt and sign/).tap()
   await expect(screen.getByText(/Patient signed/)).toBeVisible()
 
-  await screen.getByRole('button', /Provider Signature/).tap()
-  const provider = screen.getByRole('dialog', 'Provider Signature')
+  await screen.getByRole('button', /Provider signature/).tap()
+  const provider = screen.getByRole('dialog', 'Provider signature')
   await expect(provider.getByRole('button', /^Sign$/)).toBeDisabled()
   await provider.getByLabel('Email').fill('perez@clinic.com')
   await provider.getByPlaceholder('Enter password').fill('secret')
@@ -205,15 +205,15 @@ test('Delete en un caso: Delete from Tx lo deja en Unassigned', async ({ app, sc
   const dialogo = screen.getByRole('dialog', 'Delete procedure')
   await dialogo.getByRole('button', 'Delete from Tx').tap()
   await expect(screen.getByText(/D4341 removed from the case and moved to Unassigned\./)).toBeVisible()
-  await screen.getByRole('button', 'Unassigned Items').tap()
+  await screen.getByRole('button', 'Unassigned items').tap()
   await expect(screen.getByText(/^D4341 Periodontal scaling/)).toBeVisible()
 })
 
-/* Cada fila se despliega con el detalle de la Problem List: en un caso, con el estado de su consentimiento. */
+/* Cada fila se despliega con el detalle de la Problem list: en un caso, con el estado de su consentimiento. */
 test('las filas del caso y las sueltas se despliegan con su detalle', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', /^Exams/).tap()
-  await screen.getByRole('menuitem', 'Treatment Plan').tap()
+  await screen.getByRole('menuitem', 'Treatment plan').tap()
   await screen.getByText(/^D0120 Periodic oral evaluation$/).first().tap()
   await expect(screen.getByText('No treatment linked.')).toBeVisible()
   await expect(screen.getByRole('button', 'Collapse all')).toBeVisible()
@@ -224,12 +224,12 @@ test('las filas del caso y las sueltas se despliegan con su detalle', async ({ a
   await screen.getByText(/^D2391 Resin-based composite/).tap()
   await expect(screen.getByText('Procedure consent')).toBeVisible()
   await expect(screen.getByRole('button', /^Procedure Consent - D2391/)).toBeVisible()
-  // El hallazgo vinculado se abre en el drawer, sin salir de Treatment Plan.
+  // El hallazgo vinculado se abre en el drawer, sin salir de Treatment plan.
   await screen.getByRole('button', /^Chronic enamel dental caries · Tooth 3/).tap()
   await expect(screen.getByRole('dialog', /Chronic enamel dental caries/)).toBeVisible()
 })
 
-/* Estimate details (CON-3710, CON-2529): el Total Amount abre el desglose; si el plan cambió, se actualiza desde ahí o
+/* Estimate details (CON-3710, CON-2529): el Total amount abre el desglose; si el plan cambió, se actualiza desde ahí o
    desde el aviso del caso. */
 test('el Total amount de la card abre Estimate details y se actualiza', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
@@ -238,27 +238,27 @@ test('el Total amount de la card abre Estimate details y se actualiza', async ({
   await expect(screen.getByText('Update needed').first()).toBeVisible()
   await screen.getByRole('button', /Update estimates/).tap()
   await expect(screen.getByRole('button', /Recalculate/)).toBeVisible()
-  await screen.getByRole('button', 'Back to Case').tap()
+  await screen.getByRole('button', 'Back to case').tap()
   await expect(screen.getByRole('button', /Ins\. est\. update available/)).toHaveCount(0)
 })
 
 test('el aviso del caso pide confirmar y desde Presented la estimación queda bloqueada', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', /^Exams/).tap()
-  await screen.getByRole('menuitem', 'Treatment Plan').tap()
+  await screen.getByRole('menuitem', 'Treatment plan').tap()
   const planes = screen.getByRole('navigation', 'Treatment plans')
   await planes.getByRole('button', /Periodontists Recommended, Planning/).tap()
 
   await screen.getByRole('button', /Ins\. est\. update available/).tap()
-  await expect(screen.getByText('Insurance Estimate Update Available')).toBeVisible()
+  await expect(screen.getByText('Insurance estimate update available')).toBeVisible()
   await screen.getByRole('button', 'Update').tap()
-  await screen.getByRole('button', /Total Amount .* View estimate details/).last().tap()
+  await screen.getByRole('button', /Total amount .* View estimate details/).last().tap()
   await expect(screen.getByRole('button', /Recalculate/)).toBeVisible()
 
-  await screen.getByRole('button', 'Back to Case').tap()
+  await screen.getByRole('button', 'Back to case').tap()
   await planes.getByRole('button', /^08\/24\/2026, Presented/).tap()
   await planes.getByRole('button', /Crown Option, Presented/).tap()
-  await screen.getByRole('button', /Total Amount .* View estimate details/).last().tap()
+  await screen.getByRole('button', /Total amount .* View estimate details/).last().tap()
   await expect(screen.getByText('Locked at presentation')).toBeVisible()
   await expect(screen.getByRole('button', /Update estimates|Recalculate/)).toHaveCount(0)
 })
@@ -275,7 +275,7 @@ test('Prototype controls: el cálculo que falla deja el anterior y el escenario 
   await screen.getByRole('button', /Simulate plan change/).tap()
   await expect(screen.getByRole('button', /Update estimates/)).toBeVisible()
   await screen.getByRole('button', /Estimate scenario/).tap()
-  await screen.getByRole('button', 'Presented / Locked').tap()
+  await screen.getByRole('button', 'Presented / locked').tap()
   await expect(screen.getByText('Locked at presentation')).toBeVisible()
   await expect(screen.getByRole('button', /Update estimates|Recalculate/)).toHaveCount(0)
 })
@@ -284,7 +284,7 @@ test('Prototype controls: el cálculo que falla deja el anterior y el escenario 
 test('Unassigned: Complete pide el consentimiento del procedimiento suelto', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode')
   await screen.getByRole('button', /^Exams/).tap()
-  await screen.getByRole('menuitem', 'Treatment Plan').tap()
+  await screen.getByRole('menuitem', 'Treatment plan').tap()
   await screen.getByRole('button', /Actions for D2330/).tap()
   await screen.getByRole('menuitem', /Complete/).tap()
   const dialogo = screen.getByRole('dialog', 'Consent required')
@@ -306,9 +306,9 @@ test('si el consentimiento no se puede mandar, el procedimiento no cambia', asyn
   await expect(screen.getByRole('button', /Open consent for D1110: Not generated/)).toBeVisible()
 })
 
-/* Una sola card de Informed Consent por caso: al cambiar de caso no se apila otra debajo (antes la key repetida del bloque
+/* Una sola card de Informed consent por caso: al cambiar de caso no se apila otra debajo (antes la key repetida del bloque
    y de la vista del caso las duplicaba). */
-test('al cambiar de caso queda una sola card de Informed Consent', async ({ app, screen }) => {
+test('al cambiar de caso queda una sola card de Informed consent', async ({ app, screen }) => {
   await app.open('/patients/patient-0001/clinical-mode?case=c5')
   await screen.getByRole('button', /04\/17\/2026/).tap()
   await screen.getByRole('button', /Implant Option/).tap()

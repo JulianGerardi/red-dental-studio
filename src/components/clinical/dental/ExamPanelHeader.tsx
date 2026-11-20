@@ -1,3 +1,4 @@
+import { buttonClasses } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { Tabs } from '@/components/ui/tabs'
 
@@ -18,11 +19,11 @@ export function ExamPanelHeader({
       <Tabs aria-label="Exam panel" tabs={EXAM_PANEL_TABS} value={tab} onChange={onTabChange} />
       {tab === 'Findings' ? (
         <button type="button" disabled title="Available once the exam has been charted" className="flex h-7 items-center gap-1.5 rounded-md bg-surface-muted px-2.5 text-[11px] font-semibold text-ink-faint">
-          <Plus className="size-3" /> No Finding
+          <Plus className="size-3" /> No finding
         </button>
       ) : (
-        <button type="button" onClick={onNewReview} className="bg-dash-blue hover:bg-dash-blue-hover flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[11px] font-semibold text-white">
-          <Plus className="size-3" /> Review Exam
+        <button type="button" onClick={onNewReview} className={buttonClasses({ size: 'sm' })}>
+          <Plus className="size-3" /> Review exam
         </button>
       )}
     </div>

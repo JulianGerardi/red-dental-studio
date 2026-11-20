@@ -50,12 +50,12 @@ export const Parts: Story = {
       <Bloque titulo="Regions" nota="Clickeable en cualquier vista donde se dibuje; todas sus formas marcan juntas.">
         <Tabla encabezado={['Region', 'Views']} minimo={420}>
           <tr><td className="font-semibold">Scalp</td><td>Front (pendiente en los dos perfiles: se pisaba con Forehead/Posterior Head)</td></tr>
-          <tr><td className="font-semibold">Right Forehead</td><td>Front, right profile</td></tr>
-          <tr><td className="font-semibold">Left Forehead</td><td>Front, left profile</td></tr>
-          <tr><td className="font-semibold">Right Eye</td><td>Front</td></tr>
-          <tr><td className="font-semibold">Left Eye</td><td>Front</td></tr>
-          <tr><td className="font-semibold">Right Posterior Head</td><td>Right profile, back</td></tr>
-          <tr><td className="font-semibold">Left Posterior Head</td><td>Left profile, back</td></tr>
+          <tr><td className="font-semibold">Right forehead</td><td>Front, right profile</td></tr>
+          <tr><td className="font-semibold">Left forehead</td><td>Front, left profile</td></tr>
+          <tr><td className="font-semibold">Right eye</td><td>Front</td></tr>
+          <tr><td className="font-semibold">Left eye</td><td>Front</td></tr>
+          <tr><td className="font-semibold">Right posterior head</td><td>Right profile, back</td></tr>
+          <tr><td className="font-semibold">Left posterior head</td><td>Left profile, back</td></tr>
         </Tabla>
       </Bloque>
     </Lienzo>
@@ -71,10 +71,10 @@ export const States: Story = {
           <ExtraOralDiagram pending={[]} active={[]} onToggle={() => {}} />
         </Bloque>
         <Bloque titulo="Pending" nota="Elegidas ahora, antes de guardar (ámbar) — Add Condition abierto.">
-          <ExtraOralDiagram pending={['Scalp', 'Right Forehead']} active={[]} onToggle={() => {}} />
+          <ExtraOralDiagram pending={['Scalp', 'Right forehead']} active={[]} onToggle={() => {}} />
         </Bloque>
         <Bloque titulo="Active" nota="Con una condition ya guardada (verde).">
-          <ExtraOralDiagram pending={[]} active={['Right Posterior Head', 'Left Eye'] as ExtraOralRegion[]} onToggle={() => {}} />
+          <ExtraOralDiagram pending={[]} active={['Right posterior head', 'Left eye'] as ExtraOralRegion[]} onToggle={() => {}} />
         </Bloque>
       </div>
     </Lienzo>

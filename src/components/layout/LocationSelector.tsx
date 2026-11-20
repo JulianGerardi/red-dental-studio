@@ -51,7 +51,7 @@ export function Fila({
     <div
       className={cn(
         'flex items-start gap-2.5 rounded-[10px] border border-l-[3px] p-2.5 transition-colors',
-        actual ? 'border-dash-blue bg-[#f8faff]' : 'border-transparent hover:bg-surface-subtle',
+        actual ? 'border-dash-blue bg-info-subtle' : 'border-transparent hover:bg-surface-subtle',
       )}
     >
       <button type="button" onClick={onElegir} className="flex min-w-0 flex-1 items-start gap-2.5 text-left">
@@ -153,11 +153,11 @@ export function LocationSelector() {
         <MapPin className="text-dash-blue size-3.5 shrink-0" />
         <span className="text-[13px] leading-none whitespace-nowrap">
           <span className="text-dash-blue">{elegida.name}</span>{' '}
-          <span className="font-medium text-black">- {elegida.ciudad}</span>
+          <span className="font-medium text-ink">- {elegida.ciudad}</span>
         </span>
         <ChevronDown
           className={cn(
-            'size-3.5 shrink-0 text-[#0f172a] transition-transform duration-200',
+            'size-3.5 shrink-0 text-ink transition-transform duration-200',
             open && 'rotate-180',
           )}
         />

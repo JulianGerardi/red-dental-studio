@@ -35,7 +35,7 @@ const meta = {
       },
     },
   },
-  args: { title: 'Recent Billing Activity', controls: 'tabs', top: false, cards: 2, width: 560 },
+  args: { title: 'Recent billing activity', controls: 'tabs', top: false, cards: 2, width: 560 },
   argTypes: {
     title: { control: 'text', description: 'Título del panel. Sin ícono.' },
     controls: { control: 'inline-radio', options: ['none', 'tabs', 'link'], description: 'A la derecha del título: nada, Tabs sm (Billing) o un link chico como All treatment (Treatment plans).' },
@@ -106,7 +106,7 @@ export const Parts: Story = {
     <div className="flex flex-col gap-6">
       <Parte nombre="Panel" izquierda className="w-[560px] max-w-full rounded-lg">
         <Panel
-          title={<Parte nombre="Title" className="inline-block">Recent Billing Activity</Parte>}
+          title={<Parte nombre="Title" className="inline-block">Recent billing activity</Parte>}
           controls={<Parte nombre="Controls"><Controles tipo="tabs" /></Parte>}
         >
           <Parte nombre="Body"><InnerCard className="p-3 text-[13px] text-ink-muted">InnerCard</InnerCard></Parte>
@@ -140,11 +140,11 @@ export const States: Story = {
   render: () => (
     <div className="flex flex-wrap items-start gap-x-6 gap-y-8">
       <Estado titulo="Title only" nota="Sin controles: el encabezado mide 52px igual." ancho={320}><Armado title="Today" controls="none" cards={2} /></Estado>
-      <Estado titulo="With tabs" nota="Tabs sm (36px) al lado del título: el encabezado sigue en 52px." ancho={560}><Armado title="Recent Billing Activity" controls="tabs" cards={2} /></Estado>
-      <Estado titulo="Narrow · tabs wrap" nota="En el celular (343px) las Tabs no entran al lado del título y bajan a una segunda línea. Si ni solas entran, se deslizan de costado." ancho={343}><Armado title="Recent Billing Activity" controls="tabs" cards={1} /></Estado>
-      <Estado titulo="With top band" nota="top: la franja va arriba del título, de borde a borde, con una línea abajo." ancho={320}><Armado title="Find Patient" controls="none" top cards={2} /></Estado>
+      <Estado titulo="With tabs" nota="Tabs sm (36px) al lado del título: el encabezado sigue en 52px." ancho={560}><Armado title="Recent billing activity" controls="tabs" cards={2} /></Estado>
+      <Estado titulo="Narrow · tabs wrap" nota="En el celular (343px) las Tabs no entran al lado del título y bajan a una segunda línea. Si ni solas entran, se deslizan de costado." ancho={343}><Armado title="Recent billing activity" controls="tabs" cards={1} /></Estado>
+      <Estado titulo="With top band" nota="top: la franja va arriba del título, de borde a borde, con una línea abajo." ancho={320}><Armado title="Find patient" controls="none" top cards={2} /></Estado>
       <Estado titulo="With link" nota="Un link chico a la derecha, como All treatment en Treatment plans." ancho={320}><Armado title="Treatment plans" controls="link" cards={2} /></Estado>
-      <Estado titulo="Empty" nota="Sin contenido: el EmptyState dice por qué y qué hacer." ancho={320}><Armado title="Waiting Room" controls="none" cards={0} /></Estado>
+      <Estado titulo="Empty" nota="Sin contenido: el EmptyState dice por qué y qué hacer." ancho={320}><Armado title="Waiting room" controls="none" cards={0} /></Estado>
       <Estado titulo="Scrolling body" nota="scroll: el panel toma el alto que le dan (acá 320px) y el cuerpo scrollea adentro; un degradé abajo avisa que hay más y se va al llegar al final. Así las cuatro columnas del Dashboard entran en la pantalla (2026-10-19)." ancho={320}>
         <div className="h-[320px]"><Armado title="Appointments" controls="none" cards={6} scroll /></div>
       </Estado>
@@ -181,7 +181,7 @@ export const Specs: Story = {
       <Bloque titulo="Sizes" nota="Medidas leídas de los paneles dibujados.">
         <Tabla encabezado={['Part', 'Sample', 'Height', 'Padding', 'Text']} minimo={760}>
           <Medida nombre="Header" selector="header"><Armado title="Today" controls="none" cards={1} /></Medida>
-          <Medida nombre="Header · narrow tabs" selector="header"><Armado title="Recent Billing Activity" controls="tabs" cards={1} /></Medida>
+          <Medida nombre="Header · narrow tabs" selector="header"><Armado title="Recent billing activity" controls="tabs" cards={1} /></Medida>
           <Medida nombre="Title" selector="h2"><Armado title="Today" controls="none" cards={1} /></Medida>
           <Medida nombre="Body" selector="section > div"><Armado title="Today" controls="none" cards={1} /></Medida>
         </Tabla>

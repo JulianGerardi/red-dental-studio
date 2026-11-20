@@ -52,11 +52,11 @@ export function DateDrivesPanelsDemo() {
             ))}
           </div>
         </Panel>
-        <Panel title="Waiting Room">
+        <Panel title="Waiting room">
           <div className="mt-1.5 space-y-1.5">
             {filas.map((f, i) => (
               <div key={f.n} className="flex items-center gap-1.5" style={{ animation: `tour-card-in 4s ${0.45 + i * 0.2}s ease-out infinite` }}>
-                <Badge variant="active" className="h-4 px-1.5 text-[8px]">Check In</Badge>
+                <Badge variant="active" className="h-4 px-1.5 text-[8px]">Check in</Badge>
               </div>
             ))}
           </div>
@@ -112,7 +112,7 @@ export function AddPatientDemo() {
         className="bg-dash-blue flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-medium text-white"
         style={{ animation: 'tour-pulse 4s ease-in-out infinite' }}
       >
-        <Plus className="size-3" /> New Patient
+        <Plus className="size-3" /> New patient
       </span>
       <div className="w-[150px] space-y-1.5 overflow-hidden" style={{ animation: 'tour-expand 4s ease-in-out infinite' }}>
         <div className="h-5 rounded-md border border-line bg-white px-1.5 text-[8px] leading-5 text-ink-faint">First name</div>
@@ -232,7 +232,7 @@ export function ClinicalSectionsDemo() {
     <Stage className="flex flex-col justify-center gap-2 p-3">
       <div className="flex items-center gap-2 rounded-lg border border-line bg-white p-2" style={{ animation: 'tour-card-in 4s .2s ease-out infinite' }}>
         <ClipboardList className="size-3.5 shrink-0 text-dash-blue" />
-        <span className="text-[10px] font-semibold text-ink">Treatment Plan</span>
+        <span className="text-[10px] font-semibold text-ink">Treatment plan</span>
       </div>
       <div className="flex items-center gap-2 rounded-lg border border-line bg-white p-2" style={{ animation: 'tour-card-in 4s .4s ease-out infinite' }}>
         <FileCheck2 className="size-3.5 shrink-0 text-dash-blue" />
@@ -246,7 +246,7 @@ export function NewLocationDemo() {
   return (
     <Stage className="flex flex-col items-center justify-center gap-2 p-3">
       <span className="bg-dash-blue flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[10px] font-medium text-white" style={{ animation: 'tour-pulse 4s ease-in-out infinite' }}>
-        <Plus className="size-3" /> New Location
+        <Plus className="size-3" /> New location
       </span>
       <div className="flex w-[170px] items-center justify-between rounded-md border border-line bg-white px-2 py-1.5" style={{ animation: 'tour-card-in 4s .5s ease-out infinite' }}>
         <span className="text-[9px] font-semibold text-dash-blue">Downtown Clinic</span>

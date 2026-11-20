@@ -4,7 +4,7 @@ import { LinkPersonCheckbox, FieldLabel } from '@/components/patients/form'
 import { EMPLEADOS, type Empleado } from '@/data/employees'
 import { Avatar } from '@/components/ui/avatar'
 
-/* Compartido por la ficha de empleado y "New Employee". Ver
+/* Compartido por la ficha de empleado y "New employee". Ver
    design-reference/figma/modulos/employees.md. */
 export function LinkExistingPerson({
   vincular, onVincular, excluirId, vinculado, onSeleccionar,
@@ -69,7 +69,7 @@ export function LinkExistingPerson({
           ))}
 
           {vinculado && (
-            <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-[#eff6ff] p-3">
+            <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-info-bg p-3">
               <Avatar initials={vinculado.iniciales} size={36} />
               <span className="min-w-0 leading-tight">
                 <span className="block text-[13px] font-bold text-ink uppercase">{vinculado.nombre}</span>

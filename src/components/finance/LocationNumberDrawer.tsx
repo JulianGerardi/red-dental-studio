@@ -14,7 +14,7 @@ export function LocationNumberDrawer({ numeros, onClose, onGuardar }: {
   const [d, setD] = useState(numeros)
   return (
     <ModalShell
-      title="Location Number"
+      title="Location number"
       description="Enter the location number assigned by the insurance carrier for this clinic. This identifier is required to process electronic claims correctly and avoid rejections. Contact the insurance carrier if you do not know the assigned number."
       onClose={onClose}
       width="max-w-[560px]"
@@ -22,7 +22,7 @@ export function LocationNumberDrawer({ numeros, onClose, onGuardar }: {
     >
       <div role="table" aria-label="Location numbers" className={TABLA_MARCO}>
         <div role="row" className={cn('grid grid-cols-[1fr_200px] gap-4', TABLA_ENCABEZADO)}>
-          <span role="columnheader">Location Name</span>
+          <span role="columnheader">Location name</span>
           <span role="columnheader">Number</span>
         </div>
         {LOCACIONES.map((l) => (

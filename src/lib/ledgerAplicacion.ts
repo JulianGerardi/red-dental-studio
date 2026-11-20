@@ -3,7 +3,7 @@ import { coberturaSeguro, pendienteDe, type Aplicacion, type Movimiento } from '
 /* La lógica compartida de Patient Payment y Credit Adjustment, en el Ledger y en Billing (CON-3738, CON-3739): qué cargos
    se pueden cubrir, el reparto automático del más viejo al más nuevo y las validaciones. Ver ledger.md (2026-11-19). */
 
-/** Un cargo abierto, con lo que dice la tabla "Ledger Transactions" (Charge, Other Credit, Guar Estimate). */
+/** Un cargo abierto, con lo que dice la tabla "Ledger transactions" (Charge, Other Credit, Guar Estimate). */
 export type CargoAbierto = {
   id: string
   fecha: string

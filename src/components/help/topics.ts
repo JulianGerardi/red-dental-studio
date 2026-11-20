@@ -76,7 +76,7 @@ export const TOPICS: Topic[] = [
   {
     id: 'pat-new', module: 'patients', anchor: 'pat-new',
     title: 'Where do I add a new patient?',
-    body: 'Go to Patients and use "New Patient" at the top of the list. It opens a form for the patient\'s basic and contact information.',
+    body: 'Go to Patients and use "New patient" at the top of the list. It opens a form for the patient\'s basic and contact information.',
     keywords: 'new patient add create register form',
     Demo: AddPatientDemo,
   },
@@ -97,7 +97,7 @@ export const TOPICS: Topic[] = [
   {
     id: 'pat-relationship', module: 'patients', page: '/patients/1/relationships', anchor: 'pat-add-relationship',
     title: 'Record a family or guarantor relationship',
-    body: 'From a patient\'s Relationships tab, use "Add Relationship" to link them to another patient in the system - a parent, spouse or guarantor.',
+    body: 'From a patient\'s Relationships tab, use "Add relationship" to link them to another patient in the system - a parent, spouse or guarantor.',
     keywords: 'family guarantor relationship link add relative',
     Demo: AddRelationshipDemo,
   },
@@ -156,14 +156,14 @@ export const TOPICS: Topic[] = [
   {
     id: 'set-location-new', module: 'settings', page: '/settings/locations', anchor: 'set-locations',
     title: 'How do I add another office location?',
-    body: 'Go to Settings > Locations and use "New Location" to register the address and details of an additional office.',
+    body: 'Go to Settings > Locations and use "New location" to register the address and details of an additional office.',
     keywords: 'add office location branch new site',
     Demo: NewLocationDemo,
   },
   {
     id: 'set-team', module: 'settings', page: '/settings/team', anchor: 'set-team',
     title: 'How do I invite or manage team members?',
-    body: 'Settings > Team lists everyone with access; use "New Employee" to add someone, or open an existing row to edit their details.',
+    body: 'Settings > Team lists everyone with access; use "New employee" to add someone, or open an existing row to edit their details.',
     keywords: 'invite manage team members employees staff add',
     Demo: TeamListDemo,
   },

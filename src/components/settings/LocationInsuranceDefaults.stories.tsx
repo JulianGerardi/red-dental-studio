@@ -60,11 +60,11 @@ export const WithValidationErrors: Story = {
 
 function OpcionesDemo() {
   const [v, setV] = useState<'a' | 'b'>('a')
-  return <Opciones etiqueta="Billing provider" valor={v} opciones={[['a', 'Location Billing Profile'], ['b', 'Specific Billing Profile']]} onChange={setV} />
+  return <Opciones etiqueta="Billing provider" valor={v} opciones={[['a', 'Location Billing Profile'], ['b', 'Specific billing profile']]} onChange={setV} />
 }
 function CasillaDemo({ inicial }: { inicial: boolean }) {
   const [on, setOn] = useState(inicial)
-  return <Casilla on={on} onChange={setOn}>Assignment of Benefits</Casilla>
+  return <Casilla on={on} onChange={setOn}>Assignment of benefits</Casilla>
 }
 
 export const Parts: Story = {
@@ -111,9 +111,9 @@ export const States: Story = {
     <Lienzo>
       <Bloque titulo="Selection card">
         <div className="grid gap-4">
-          <Muestra titulo="Empty" nota="Sin nada elegido: Select abre el drawer."><Seleccion id="s1" rotulo="Billing Profile" requerido vacio="No billing profile selected." onElegir={nada} /></Muestra>
-          <Muestra titulo="Selected" nota="Con algo elegido: el resumen y Change."><Seleccion id="s2" rotulo="Billing Profile" requerido vacio="No billing profile selected." onElegir={nada} onQuitar={nada}><ResumenPerfil clave={claveLocacion('bayside')} /></Seleccion></Muestra>
-          <Muestra titulo="Error" nota="Save changes sin elegir."><Seleccion id="s3" rotulo="Rendering Provider" requerido vacio="No provider selected." error="Select a rendering provider." onElegir={nada} /></Muestra>
+          <Muestra titulo="Empty" nota="Sin nada elegido: Select abre el drawer."><Seleccion id="s1" rotulo="Billing profile" requerido vacio="No billing profile selected." onElegir={nada} /></Muestra>
+          <Muestra titulo="Selected" nota="Con algo elegido: el resumen y Change."><Seleccion id="s2" rotulo="Billing profile" requerido vacio="No billing profile selected." onElegir={nada} onQuitar={nada}><ResumenPerfil clave={claveLocacion('bayside')} /></Seleccion></Muestra>
+          <Muestra titulo="Error" nota="Save changes sin elegir."><Seleccion id="s3" rotulo="Rendering provider" requerido vacio="No provider selected." error="Select a rendering provider." onElegir={nada} /></Muestra>
         </div>
       </Bloque>
       <Bloque titulo="Checkbox">
@@ -136,8 +136,8 @@ export const Specs: Story = {
   parameters: sinControles,
   render: () => (
     <SpecsMedidas piezas={[
-      { nombre: 'Selection card', children: <Seleccion id="m1" rotulo="Billing Profile" requerido vacio="No billing profile selected." onElegir={nada} /> },
-      { nombre: 'Select button', selector: 'button', children: <Seleccion id="m2" rotulo="Billing Profile" requerido vacio="No billing profile selected." onElegir={nada} /> },
+      { nombre: 'Selection card', children: <Seleccion id="m1" rotulo="Billing profile" requerido vacio="No billing profile selected." onElegir={nada} /> },
+      { nombre: 'Select button', selector: 'button', children: <Seleccion id="m2" rotulo="Billing profile" requerido vacio="No billing profile selected." onElegir={nada} /> },
       { nombre: 'Drawer option', children: <OpcionDrawer on onMarcar={nada} onElegir={nada}><ResumenProvider id="elena-martinez" /></OpcionDrawer> },
       { nombre: 'Checkbox', children: <CasillaDemo inicial /> },
     ]} />

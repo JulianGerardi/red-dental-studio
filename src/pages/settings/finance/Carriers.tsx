@@ -18,7 +18,7 @@ import { LocationNumberDrawer } from '@/components/finance/LocationNumberDrawer'
 import { PhoneFields, UnitField } from '@/components/finance/fields'
 import { useFinanzas } from '@/data/finanzasStore'
 import { FORMATOS_RECLAMO, TONO_ESTADO, cantidad, esNorteamerica, type Aseguradora, type PlanSeguro } from '@/data/finanzas'
-import { TABLA_LINK } from '@/lib/estilos'
+import { TABLA_LINK, PADDING_PAGINA } from '@/lib/estilos'
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Settings → Billing → Carriers como en red.dev: la lista, Edit Carrier con las pestañas Carrier e Insurance Plans /
@@ -61,18 +61,18 @@ export function SettingsCarriers({ nuevo = false }: { nuevo?: boolean }) {
   const planesDe = (c: Aseguradora) => planes.filter((p) => p.aseguradoraId === c.id).length
 
   const columnas: DataTableColumn<Aseguradora>[] = [
-    { key: 'nombre', header: 'Carrier Name', locked: true, cell: (c) => <Link to={rutaCarrier(c.id)} className={TABLA_LINK}>{c.nombre}</Link> },
+    { key: 'nombre', header: 'Name', locked: true, cell: (c) => <Link to={rutaCarrier(c.id)} className={TABLA_LINK}>{c.nombre}</Link> },
     { key: 'payer', header: 'Payer ID', width: 140, cell: (c) => <span className="tabular-nums">{c.payerId}</span> },
-    { key: 'planes', header: 'Group Plans #', width: 140, cell: (c) => <span className="tabular-nums">{planesDe(c)}</span> },
+    { key: 'planes', header: 'Group plans #', width: 140, cell: (c) => <span className="tabular-nums">{planesDe(c)}</span> },
   ]
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Carriers"
-        accion={<Button onClick={() => setCreando(true)}><Plus /> New Carrier</Button>}
+        accion={<Button size="md" onClick={() => setCreando(true)}><Plus /> New carrier</Button>}
       >
-        <SettingsSearch value={q} onChange={setQ} placeholder="Search carrier by name or payer ID..." />
+        <SettingsSearch value={q} onChange={setQ} placeholder="Search carriers by name or payer ID" />
       </SettingsPageHeader>
 
       <div className="mt-4">
@@ -134,26 +134,26 @@ export function CarrierForm({ carrier, onGuardar }: { carrier: Aseguradora; onGu
       {intentado && (
         <Alert tone="danger" title="Uncompleted fields">All required fields marked with (*) must be completed before proceeding</Alert>
       )}
-      <Card title="General Information">
+      <Card title="General information">
         <div className="flex flex-col gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
-            <TextField label="Carrier Name" required value={d.nombre} disabled />
+            <TextField label="Carrier name" required value={d.nombre} disabled />
             <TextField label="Payer ID" required value={d.payerId} disabled />
-            <SelectField label="Printed Claim Format" required placeholder="Select a printed claim format" options={FORMATOS_RECLAMO} value={d.formato} onChange={set('formato')} error={falta('formato')} />
-            <UnitField label="Expected Period of Insurance Claim Resolution" required unit="days" value={d.diasResolucion} onChange={set('diasResolucion')} error={falta('dias')} />
+            <SelectField label="Printed claim format" required placeholder="Select a printed claim format" options={FORMATOS_RECLAMO} value={d.formato} onChange={set('formato')} error={falta('formato')} />
+            <UnitField label="Expected period of insurance claim resolution" required unit="days" value={d.diasResolucion} onChange={set('diasResolucion')} error={falta('dias')} />
           </div>
           {/* Las dos casillas en la misma fila, bajo las dos columnas de arriba (Julián, 2026-10-13). */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <OptionCheckbox label="Do not include Dental Diagnostic Codes" checked={d.sinDiagnosticos} onChange={set('sinDiagnosticos')} />
-            <OptionCheckbox label="Do not bill Insurance" checked={d.noFacturar} onChange={set('noFacturar')} />
+            <OptionCheckbox label="Do not include dental diagnostic codes" checked={d.sinDiagnosticos} onChange={set('sinDiagnosticos')} />
+            <OptionCheckbox label="Do not bill insurance" checked={d.noFacturar} onChange={set('noFacturar')} />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Button variant="secondary" onClick={() => setNumeros(true)}><Hash /> Location Number</Button>
+            <Button variant="secondary" onClick={() => setNumeros(true)}><Hash /> Location number</Button>
             <span className="text-xs text-ink-muted">{asignados ? `${cantidad(asignados, 'location')} with a number` : 'No location numbers yet'}</span>
           </div>
         </div>
       </Card>
-      <Card title="Contact Information">
+      <Card title="Contact information">
         <div className="flex flex-col gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField label="Email" required placeholder="example@example.com" value={d.email} onChange={set('email')} error={falta('email')} />
@@ -187,14 +187,14 @@ export function CarrierPlans({ carrier }: { carrier: Aseguradora }) {
   const filas = planes.filter((p) => p.aseguradoraId === carrier.id && `${p.nombre} ${p.grupo}`.toLowerCase().includes(q.trim().toLowerCase()))
 
   const columnas: DataTableColumn<PlanSeguro>[] = [
-    { key: 'nombre', header: 'Plan/Employer Name', locked: true, cell: (p) => <Link to={rutaPlan(carrier.id, p.id)} className={TABLA_LINK}>{p.nombre}</Link> },
+    { key: 'nombre', header: 'Name', locked: true, cell: (p) => <Link to={rutaPlan(carrier.id, p.id)} className={TABLA_LINK}>{p.nombre}</Link> },
     { key: 'grupo', header: 'Group #', width: 160, cell: (p) => <span className="tabular-nums">{p.grupo}</span> },
     { key: 'estado', header: 'Status', width: 110, cell: (p) => <Pill tone={TONO_ESTADO[p.estado]}>{p.estado}</Pill> },
   ]
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2"><SettingsSearch value={q} onChange={setQ} placeholder="Search..." /></div>
+      <div className="flex gap-2"><SettingsSearch value={q} onChange={setQ} placeholder="Search plans" /></div>
       <DataTable
         columns={columnas}
         rows={filas}
@@ -225,7 +225,7 @@ export function CarrierPlans({ carrier }: { carrier: Aseguradora }) {
   )
 }
 
-const TABS = ['Information', 'Insurance Plans / Employers'] as const
+const TABS = ['Information', 'Insurance plans / employers'] as const
 type Tab = (typeof TABS)[number]
 
 export function SettingsCarrierEdit({ tab, nuevoPlan = false }: { tab: 'carrier' | 'plans'; nuevoPlan?: boolean }) {
@@ -238,18 +238,18 @@ export function SettingsCarrierEdit({ tab, nuevoPlan = false }: { tab: 'carrier'
   const c = aseguradoras.find((x) => x.id === carrierId)
   if (!c) return <Navigate to={LISTA_CARRIERS} replace />
 
-  const actual: Tab = tab === 'carrier' ? 'Information' : 'Insurance Plans / Employers'
+  const actual: Tab = tab === 'carrier' ? 'Information' : 'Insurance plans / employers'
   const cerrarPlan = () => { setPlan(false); if (nuevoPlan && !guardado.current) navigate(rutaPlanes(c.id), { replace: true }) }
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
-        titulo="Edit Carrier"
-        accion={<Button onClick={() => setPlan(true)}><Plus /> New Insurance Plan</Button>}
+        titulo="Edit carrier"
+        accion={<Button size="md" onClick={() => setPlan(true)}><Plus /> New insurance plan</Button>}
       />
       <Tabs size="sm"
         className="mt-5" aria-label="Carrier sections" value={actual}
-        tabs={['Information', { value: 'Insurance Plans / Employers', count: planes.filter((p) => p.aseguradoraId === c.id).length }]}
+        tabs={['Information', { value: 'Insurance plans / employers', count: planes.filter((p) => p.aseguradoraId === c.id).length }]}
         onChange={(t) => navigate(t === 'Information' ? rutaCarrier(c.id) : rutaPlanes(c.id))}
       />
       <div className="mt-4">

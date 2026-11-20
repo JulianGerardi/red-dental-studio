@@ -49,7 +49,7 @@ function Lista({ elegido, conFiltro = true, inicial = '', abierto, lista = items
   const visibles = lista.filter((i) => i.nombre.toLowerCase().includes(q.trim().toLowerCase()))
   return (
     <MasterList
-      items={visibles} elegido={elegido} q={q} onQ={setQ} placeholder="Search a Fee Schedule Here..." abierto={abierto}
+      items={visibles} elegido={elegido} q={q} onQ={setQ} placeholder="Search fee schedules" abierto={abierto}
       vacio="No fee schedules match the search or filters."
       filtro={conFiltro ? <SelectField hideLabel label="Type" options={['Percentage', 'Copayment']} value="Percentage" onChange={() => {}} /> : undefined}
     />

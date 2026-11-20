@@ -82,7 +82,7 @@ export function NewPatientModal({
   const comunes = { d: f.d, cambiar: f.cambiar, errores: f.errores }
   return (
     <ModalShell
-      title="New Patient"
+      title="New patient"
       description="Create the patient record"
       onClose={onClose}
       width="max-w-[560px]"
