@@ -32,14 +32,17 @@ const PUNTO: Record<PillTone, string> = {
   success: 'bg-dash-ok-fg', info: 'bg-dash-busy-fg', warning: 'bg-warn-fg', danger: 'bg-dash-bad-fg', neutral: 'bg-ink-faint', purple: 'bg-purple-fg',
 }
 
+/* Mismos nombres y altos que Button (sm 28 · md 32 · lg 36): antes "md" medía 36 acá y 32 en Button, y un filtro "md" no
+   quedaba alineado con un botón "md". lg es el default: es el de la barra de una página (auditoría de normalización). */
 const TAMANO = {
   sm: 'h-7 gap-1.5 px-2.5 text-[12px] [&_svg]:size-3.5',
-  md: 'h-9 gap-2 px-3 text-[13px] [&_svg]:size-4',
+  md: 'h-8 gap-1.5 px-3 text-[13px] [&_svg]:size-4',
+  lg: 'h-9 gap-2 px-3 text-[13px] [&_svg]:size-4',
 } as const
 
 /* El aspecto del botón del filtro. Lo comparten los otros botones de herramientas de una tabla (Columns), para que la
    fila se vea pareja. */
-export const filterTriggerClasses = (size: keyof typeof TAMANO = 'md', aplicado = false) => cn(
+export const filterTriggerClasses = (size: keyof typeof TAMANO = 'lg', aplicado = false) => cn(
   'focus-visible:outline-dash-blue inline-flex shrink-0 items-center rounded-md border font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors disabled:pointer-events-none disabled:opacity-50',
   TAMANO[size],
   aplicado ? 'border-dash-blue bg-info-bg text-dash-blue' : 'data-[state=open]:border-dash-blue border-line bg-white text-ink hover:bg-surface-subtle',
@@ -52,7 +55,7 @@ export const FilterTrigger = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<
   size?: keyof typeof TAMANO
   /** Nombre para lectores de pantalla ("Filter appointments"). */
   label?: string
-}>(({ count = 0, size = 'md', label = 'Filter', className, ...props }, ref) => (
+}>(({ count = 0, size = 'lg', label = 'Filter', className, ...props }, ref) => (
   <button
     ref={ref}
     type="button"
@@ -84,7 +87,7 @@ export function FilterOptionLabel({ o, reservar }: { o: Exclude<FilterOption, st
 }
 
 export function FilterMenu({
-  label = 'Filter', options, value, onChange, groups, search, result, size = 'md', align = 'end', tour, disabled,
+  label = 'Filter', options, value, onChange, groups, search, result, size = 'lg', align = 'end', tour, disabled,
 }: {
   /** Nombre para lectores de pantalla y título del menú. */
   label?: string

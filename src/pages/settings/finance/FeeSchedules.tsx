@@ -20,7 +20,7 @@ import { AssignmentsCount, AssignmentsDrawer, asignacionesDe } from '@/component
 import { CompareFeesDrawer } from '@/components/finance/CompareFeesDrawer'
 import { MoneyInput } from '@/components/finance/fields'
 import { CopyFormDrawer, IncreaseAllDrawer, aumentar } from '@/components/finance/FeeScheduleTools'
-import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_LINK, TABLA_MARCO, TARJETA_PANEL } from '@/lib/estilos'
+import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_LINK, TABLA_MARCO, TARJETA_PANEL, PADDING_PAGINA } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
 import {
   ESTADOS_ARANCEL, PROCEDIMIENTOS, SIN_ASIGNAR, TIPOS_ARANCEL, TONO_ARANCEL, conImporte, dinero, etiquetaVersion, fechaDMA,
@@ -133,7 +133,7 @@ export function FeeScheduleEditor({ arancel, onGuardado }: { arancel?: Arancel; 
         <Alert tone="danger" title="Uncompleted fields">All required fields marked with (*) must be completed before proceeding</Alert>
       )}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-[15px] font-semibold text-ink">General information</h2>
+        <h2 className="text-sm font-bold text-ink">General information</h2>
         <div className="flex gap-2">
           <Button variant="secondary" onClick={() => setHerramienta('copiar')}><Copy /> Copy form</Button>
           <Button variant="secondary" onClick={() => setHerramienta('aumentar')}><SlidersHorizontal /> Bulk Edit</Button>
@@ -286,7 +286,7 @@ export function SettingsFeeSchedules() {
   ]
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Fee Schedules"
         accion={<Button onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New Fee Schedule</Button>}
@@ -350,7 +350,7 @@ export function SettingsFeeScheduleEdit() {
   if (!elegido) return <Navigate to={LISTA_ARANCELES} replace />
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Edit Fee Schedule"
         accion={<Button onClick={() => navigate(`${LISTA_ARANCELES}/new`)}><Plus /> New Fee Schedule</Button>}
@@ -379,7 +379,7 @@ export function SettingsFeeScheduleEdit() {
 
 export function SettingsNewFeeSchedule() {
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader titulo="New Fee Schedule" />
       <div className={cn(TARJETA_PANEL, 'mt-5 p-4 sm:p-5')}>
         <FeeScheduleEditor />

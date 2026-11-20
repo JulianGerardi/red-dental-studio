@@ -1,7 +1,7 @@
 import { DrawerActions } from '@/components/ui/drawer'
 import { Alert } from '@/components/ui/alert'
 import { useState } from 'react'
-import { CirclePlus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ModalShell, SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
@@ -87,7 +87,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
           onClick={() => setRangos((p) => [...p, { inicio: '', fin: '' }])}
           className="text-dash-blue flex items-center gap-1.5 self-start text-[13px] font-semibold hover:underline"
         >
-          <CirclePlus className="size-4" /> Add another time range
+          <Plus className="size-4" /> Add another time range
         </button>
 
         <div className="border-t border-line pt-4">
@@ -106,7 +106,7 @@ export function NewHoursModal({ onClose }: { onClose: () => void }) {
                     'flex size-8 items-center justify-center rounded-md border text-[13px] font-semibold transition-colors',
                     on
                       ? 'border-dash-blue text-dash-blue bg-white'
-                      : 'border-transparent text-[#c4c4c8] hover:bg-surface-muted',
+                      : 'border-transparent text-ink-faint hover:bg-surface-muted',
                   )}
                 >
                   {d}

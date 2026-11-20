@@ -1,7 +1,7 @@
 import { DrawerActions } from '@/components/ui/drawer'
 import { Alert } from '@/components/ui/alert'
 import { useState } from 'react'
-import { Trash2, CirclePlus, ChevronDown, ChevronUp } from 'lucide-react'
+import { Trash2, CirclePlus, ChevronDown, ChevronUp, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -212,7 +212,7 @@ export function RolesLocation() {
           onClick={() => setModal(true)}
           className="text-dash-blue flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
         >
-          <CirclePlus className="size-4" /> Add Role
+          <Plus className="size-4" /> Add Role
         </button>
       </div>
 

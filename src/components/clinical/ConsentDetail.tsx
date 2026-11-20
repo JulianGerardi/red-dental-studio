@@ -232,7 +232,7 @@ export function VentanaFirma({ titulo, descripcion, cancelar = 'Cancel', guardar
   return (
     <Dialog open onOpenChange={(o) => { if (!o) onClose() }}>
       <DialogContent showCloseButton={false} className="flex max-h-[92vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[600px]">
-        <div className="flex items-center gap-1.5 border-b border-line bg-surface-muted px-5 py-2 text-[11.5px] font-medium text-ink-muted">
+        <div className="flex items-center gap-1.5 border-b border-line bg-surface-muted px-5 py-2 text-[12px] font-medium text-ink-muted">
           <Lock className="size-3.5" aria-hidden /> Secure signing portal
         </div>
         <DialogHeader className="gap-1 px-5 pt-4">

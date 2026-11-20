@@ -212,7 +212,7 @@ export default function Relationships({ nuevo = false }: { nuevo?: boolean }) {
             )}
           </div>
 
-          <h2 className="mt-8 text-xl leading-none font-bold text-ink">
+          <h2 className="mt-8 text-[15px] font-bold text-ink">
             Household/Same Guarantor Patients
           </h2>
           <div className="mt-4 flex flex-col gap-4">

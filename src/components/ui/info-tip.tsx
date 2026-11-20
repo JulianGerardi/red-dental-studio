@@ -36,7 +36,7 @@ export function InfoTip({ title, children, className, abierto }: {
           onPointerDown={(e) => { tactil.current = e.pointerType !== 'mouse' }}
           onClick={() => { if (tactil.current) setOpen((v) => !v) }}
           className={cn(
-            '-m-1 flex size-6 shrink-0 items-center justify-center rounded-full text-ink-muted transition-colors hover:text-dash-blue focus-visible:text-dash-blue focus-visible:outline-2 focus-visible:outline-dash-ring aria-expanded:text-dash-blue',
+            'relative -m-1 flex size-6 shrink-0 pointer-coarse:after:absolute pointer-coarse:after:-inset-1.5 items-center justify-center rounded-full text-ink-muted transition-colors hover:text-dash-blue focus-visible:text-dash-blue focus-visible:outline-2 focus-visible:outline-dash-ring aria-expanded:text-dash-blue',
             className,
           )}
         >

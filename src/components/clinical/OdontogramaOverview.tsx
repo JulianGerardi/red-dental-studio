@@ -1,3 +1,4 @@
+import { buttonClasses } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
 import { Maximize2, Minimize2, TriangleAlert } from 'lucide-react'
 import { OdontogramChartSurface, OdontogramProvider } from 'react-advanced-odontogram'
@@ -99,7 +100,7 @@ export function OdontogramaOverview({ ampliado = false, onAmpliar, onDetalle, ul
               if (pestana === 'Dental assessment' && ultima.pieza) elegirAlAbrir(ultima.pieza)
               onDetalle?.(pestana)
             }}
-            className="bg-dash-blue hover:bg-dash-blue-hover ml-auto shrink-0 rounded-md px-2.5 py-1 text-[11px] font-semibold text-white transition-colors"
+            className={buttonClasses({ size: 'sm', className: 'ml-auto' })}
           >
             Show details
           </button>

@@ -38,10 +38,10 @@ export const primeroDelMes = (d: Date) => new Date(d.getFullYear(), d.getMonth()
 
 /* El campo de fecha, compartido con DateFilter para que no se separen. */
 export const fechaTriggerClasses = (variant: 'field' | 'toolbar') => cn(
-  'flex h-8 items-center gap-2 rounded-md border border-line bg-white px-3 text-[13px] whitespace-nowrap text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors data-[state=open]:border-dash-blue disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
+  'flex items-center gap-2 rounded-md border border-line bg-white px-3 text-[13px] whitespace-nowrap text-ink shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] transition-colors data-[state=open]:border-dash-blue disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
   variant === 'field'
-    ? 'hover:border-line-strong focus:outline-none focus-visible:border-dash-blue'
-    : 'font-medium hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
+    ? 'h-8 hover:border-line-strong focus:outline-none focus-visible:border-dash-blue'
+    : 'h-9 font-medium hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dash-blue',
 )
 
 /** El popover del calendario: el de Radix, a 12px del borde de la pantalla. */

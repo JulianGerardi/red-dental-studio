@@ -32,7 +32,7 @@ export function Card({ r, onAbrir }: { r: Radiografia; onAbrir: () => void }) {
         </span>
       </button>
       <div className="mt-2 flex items-center gap-2 px-1 pb-1">
-        <span className="bg-dash-count-bg text-dash-blue-hover flex size-6 shrink-0 items-center justify-center rounded-full text-[9px] font-semibold">
+        <span className="bg-dash-count-bg text-dash-blue-hover flex size-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold">
           DT
         </span>
         <span className="min-w-0 flex-1 truncate text-[12px] text-ink-medium">{r.profesional}</span>

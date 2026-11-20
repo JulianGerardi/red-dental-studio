@@ -13,7 +13,7 @@ const TONO: Record<ResultadoBadge, Record<EstadoBadge, string>> = {
   no: { active: 'bg-required text-white', inactive: 'bg-status-bad-muted text-status-bad-strong', disabled: 'bg-surface-muted text-line-strong' },
 }
 const TAMANO = {
-  sm: 'h-[22px] gap-[5px] px-[7px] text-[10px] [&_svg]:size-[11px]',
+  sm: 'h-[22px] gap-[5px] px-[7px] text-[11px] [&_svg]:size-[11px]',
   md: 'h-7 gap-1.5 px-2.5 text-[13px] [&_svg]:size-3',
 }
 

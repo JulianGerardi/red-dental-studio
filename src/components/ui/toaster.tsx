@@ -50,7 +50,7 @@ function mostrar(tipo: keyof typeof ICONO, mensaje: MensajeToast, accion?: Accio
           {conTitulo ? (
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="text-[13px] font-semibold text-ink">{mensaje.titulo}</span>
-              <span className="mt-0.5 text-[12.5px] leading-snug text-ink-soft">{mensaje.texto}</span>
+              <span className="mt-0.5 text-[13px] leading-snug text-ink-soft">{mensaje.texto}</span>
               {boton}
             </span>
           ) : (
@@ -62,7 +62,7 @@ function mostrar(tipo: keyof typeof ICONO, mensaje: MensajeToast, accion?: Accio
           <button
             onClick={() => toast.dismiss(t)}
             aria-label="Close"
-            className="shrink-0 text-ink-muted hover:text-black"
+            className="shrink-0 text-ink-muted hover:text-ink"
           >
             <X className="size-4" />
           </button>

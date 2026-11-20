@@ -50,7 +50,7 @@ export function StatStripApilada({ stats }: { stats: Stat[] }) {
               '@2xl:border-t-0',
             )}
           >
-            <span className="text-dash-blue hidden size-9 shrink-0 items-center justify-center rounded-lg bg-[#eef2ff] @md:flex">
+            <span className="text-dash-blue hidden size-9 shrink-0 items-center justify-center rounded-lg bg-info-bg @md:flex">
               <Icon className="size-[18px]" />
             </span>
             <span className="min-w-0 leading-tight">
@@ -91,7 +91,7 @@ export function StatStrip({ stats = STATS, apilada = false }: { stats?: Stat[]; 
             i > 0 && 'border-l border-line-hair',
           )}
         >
-          <span className="text-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#eef2ff] lg:size-10">
+          <span className="text-dash-blue flex size-8 shrink-0 items-center justify-center rounded-lg bg-info-bg lg:size-10">
             <Icon className="size-4 lg:size-5" />
           </span>
           {/* Rótulo y número en la misma línea, y el detalle abajo. El número

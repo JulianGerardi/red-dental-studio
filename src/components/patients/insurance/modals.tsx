@@ -1,6 +1,6 @@
 import { DrawerActions, DrawerStep } from '@/components/ui/drawer'
 import { useState } from 'react'
-import { CirclePlus, Pencil, ShieldHalf, Hospital, AArrowUp } from 'lucide-react'
+import { Pencil, ShieldHalf, Hospital, AArrowUp, Plus } from 'lucide-react'
 import {
   ModalShell, SectionCard, SearchField, PersonSearchField, SelectField, TextField,
   DateTextField, TextArea, OptionCheckbox, chipsPersona,
@@ -231,7 +231,7 @@ export function ManageSubscriptionModal({
                 type="button"
                 aria-label="Edit subscriber"
                 onClick={() => aviso.info('Subscriber editing is not available in this release.')}
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-ink-muted hover:text-black"
+                className="absolute top-1/2 right-3 -translate-y-1/2 text-ink-muted hover:text-ink"
               >
                 <Pencil className="size-4" />
               </button>
@@ -246,7 +246,7 @@ export function ManageSubscriptionModal({
               onClick={onNuevoDependiente}
               className="text-dash-blue flex items-center gap-1.5 self-end text-[13px] font-semibold hover:underline"
             >
-              <CirclePlus className="size-4" /> Add New
+              <Plus className="size-4" /> Add New
             </button>
           </SectionCard>
         </DrawerStep>

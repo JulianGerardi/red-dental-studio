@@ -596,3 +596,60 @@ Licenses (nombre de la cuenta), Exam review (provider · fecha), AI Narrative Ed
 Editar algo ya cargado no lleva pasos: pestañas al ancho de su texto, como la ficha de una Location, y un solo Save
 Changes. Edit Patient es una pantalla (`/patients/:id/edit`); Edit Appointment, un drawer (ver patients.md y
 scheduling.md).
+
+## Normalización de UI (2026-11-20)
+
+**Jira:** no hay historia; es una tanda de diseño sobre toda la app que pidió Julián después de la auditoría de
+normalización (38 pantallas medidas en 1440, 834 y 390 px con Playwright). Cambia cómo se ve, no el contenido: títulos,
+placeholders y mayúsculas que vienen del Figma o de red.dev quedan como están hasta que Julián decida.
+
+Reglas que quedan:
+
+1. **Tamaños con un mismo nombre.** `Button`, `FilterMenu`, `SearchInput` y `SearchButton` usan sm 28 · md 32 · lg 36.
+   Antes `FilterMenu` "md" medía 36 y `Button` "md" 32. El default de `FilterMenu` pasa a `lg` (las pantallas que lo
+   usaban sin tamaño no cambian); `ColumnPicker` sigue con `sm | md` y su `md` es el `lg` del filtro.
+2. **Nivel de página = 36; dentro de una card = 28.** La acción de la fila del título (New Patient, New appointment, los
+   pagos del Ledger y de Billing, Export CSV, Mark all as read) y la barra de abajo (buscador, filtro, fecha, Today,
+   Status legend, View) van en `lg`. Adentro de una card, todo en `sm`: el buscador de Today Appointments y Recent
+   Patients, Find Patient de Billing, el de Templates en Consents, los filtros del Dashboard. Las pestañas siguen su regla
+   (`md` 32 en la pantalla, `sm` 28 en una card): Patient View / Guarantor View del Ledger pasa a `md`, y Day / Week /
+   Month de Scheduling deja de ser botones sueltos y usa `Tabs`.
+3. **`ui/search-input`** (nuevo): lupa, tamaños de Button, 320 px por defecto, `clearable` opcional. `SettingsSearch`
+   (buscador + Search) lo usa y ahora también lo usan Locations, Employees, Accounts y Ledger Options, que lo escribían a
+   mano. `SearchButton` es un `Button` primario con `size`. Story pendiente para cuando se documente.
+4. **Encabezado de página.** `PageTitle` mide siempre 36 de alto (`min-h-9`): con o sin botón al lado, el título cae a la
+   misma altura. Settings y Help usan el padding de `CONTENEDOR_PAGINA` (`PADDING_PAGINA`, 24 en vez de 32), así el
+   contenido arranca en el mismo borde que el resto. El breadcrumb de Settings deja 24 arriba y 16 hasta el título, como
+   `PatientBreadcrumb`: los títulos con breadcrumb caen todos a la misma altura. Insurance usa `PageTitle` (tenía su h1).
+   Patient Dashboard y Clinical Mode suman un `h1` `sr-only`.
+5. **Títulos de card y de sección.** Card: 15/700 `ink`. Sección dentro de un formulario o una card: 14/700 `ink`, en `h2`.
+   Se van `text-black` (13 archivos), los 14/600 de Insurance y `form.tsx`, los 15/600 de Fee Schedule y Household, el
+   18/700 de Edit Template y el 20/700 de Household/Same Guarantor. General Information de Edit Patient y Employee pasa
+   de `h3` a `h2`. `CardTitle` de `ui/card` va en bold.
+6. **Escala.** Mínimo 11 px para texto común y pills (`Pill` sm, las pills del panel del paciente, fechas de findings,
+   metadatos de workflows); 10 px para etiquetas en mayúscula y contadores dentro de un círculo (el 9 del badge de
+   notificaciones, Total amount, Treatment progress). Los decimales del Figma se redondean (11.52 → 12, 12.5 → 13, 13.5 →
+   13). Quedan afuera, a propósito: las miniaturas de Help, el hero del Login, el odontograma, los chips del calendario,
+   `DescriptorFields` y `ConsentDocument` (imita la hoja impresa).
+7. **Color.** No queda ningún `-[#hex]` en `src/pages` ni `src/components` (salvo `help/demos`). Los que estaban a uno o
+   dos tonos de un token pasan al token (`#18181b` → `ink`, `#0056ef` de Treatments → `dash-blue`, grises a `surface-*`
+   y `line`); los que se repetían son tokens nuevos: `info-subtle`, `info-strong-bg`, `info-line`, `info-line-strong`,
+   `amber-hover`, `amber-fg`, `status-ok-hover`.
+8. **Botones.** `Plus` para todo "New/Add" (fuera `CirclePlus`); `PlusCircle` / `MinusCircle` siguen en los ajustes del
+   Ledger porque van en pareja. Los primarios escritos a mano (Save y Cancel de `FormFooter`, Upload de radiografías,
+   Link de Treatment Plan, Vitals, New review, View de Scheduling…) usan `buttonClasses`: foco, hover y deshabilitado del
+   sistema. Login queda como está (diseño propio del Figma).
+9. **Pantallas sueltas.** Forgot Password con el título de Login (26/700 `ink`); 404 y Under construction con tokens y
+   `Button`.
+10. **Pie de tabla.** Ledger y Ledger Options dicen "Showing X to Y of N …", como `DataTable`.
+11. **Área de toque.** `ICONO_SUELTO` e `InfoTip` crecen a 36 px en pantallas táctiles con un `::after` (`AREA_TOQUE`),
+    sin mover nada.
+
+Anomalías que quedan para decidir (contenido, no diseño): títulos distintos del menú (Treatment Plan, Documents Manager,
+Search Coverage Table…), las cuatro fórmulas de título de ficha, los placeholders y Title/Sentence case de los botones
+(New location, New template, New appointment). Tampoco se suman filtros por estado donde hoy no hay (Employees, Carriers,
+Patients): hay que confirmarlo en Jira. Los paneles viejos de Clinical Mode (`clinical/panels.tsx`, `RecordRow`) siguen
+con los tokens de shadcn.
+
+Para validar con usuarios: si 36 px en la barra del Ledger (tres botones y las pestañas) se siente pesado en tablet; si
+recepción encuentra "Patient information" plegado en el celular.

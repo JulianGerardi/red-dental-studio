@@ -6,7 +6,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { Pencil, DoorOpen, Plus, CalendarDays, ChevronRight, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
-import { ICONO_SUELTO } from '@/lib/estilos'
+import { ICONO_SUELTO, PADDING_PAGINA } from '@/lib/estilos'
 import { Button } from '@/components/ui/button'
 import { aviso } from '@/components/ui/toaster'
 import { Card } from '@/components/settings/primitives'
@@ -651,7 +651,7 @@ export function SettingsLocationDetail() {
   const cambiarTab = (t: Tab) => (sucio && tab !== t ? setPendiente(t) : setTab(t))
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <PageTitle>{tab === 'Information' ? loc.nombre : tab}</PageTitle>
 
       <Tabs className="mt-4" aria-label="Location sections" tabs={TABS} value={tab} onChange={cambiarTab} />

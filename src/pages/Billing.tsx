@@ -1,6 +1,7 @@
+import { SearchInput } from '@/components/ui/search-input'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  CreditCard, Search, X, Download, Wallet, MinusCircle, PlusCircle,
+  CreditCard, X, Download, Wallet, MinusCircle, PlusCircle,
 } from 'lucide-react'
 import { PageTitle } from '@/components/ui/page-title'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -144,7 +145,7 @@ export function ResultadoPaciente({ paciente, saldo, elegido, onElegir }: {
         <span className="truncate text-[11px] text-ink-muted">Las payment {paciente.ultimoPago}</span>
       </span>
       <span className="shrink-0 text-right">
-        <span className="block text-[10px] text-ink-faint">Balance</span>
+        <span className="block text-[11px] text-ink-faint">Balance</span>
         <span className="text-dash-blue block text-[12px] font-semibold tabular-nums">{moneda(saldo)}</span>
       </span>
     </button>
@@ -279,26 +280,11 @@ export function BuscarPaciente({ busqueda, onBusqueda, paciente, saldoDe, onEleg
       bodyClassName="min-h-0 gap-2 pt-0"
       top={<div aria-live="polite">{paciente && <PacienteElegido key={paciente.nombre} paciente={paciente} onCerrar={onCerrar} />}</div>}
     >
-      <div className="relative shrink-0">
-        <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-ink-faint" />
-        <input
-          value={busqueda}
-          onChange={(e) => onBusqueda(e.target.value)}
-          placeholder="Search by Name, Last Name, Email or DOB"
-          aria-label="Find patient"
-          className="focus:border-dash-blue h-8 w-full rounded-md border border-line bg-white pr-8 pl-8 text-[12px] placeholder:text-ink-faint focus:outline-none"
-        />
-        {busqueda && (
-          <button
-            type="button"
-            aria-label="Clear search"
-            onClick={() => onBusqueda('')}
-            className="absolute top-1/2 right-2.5 -translate-y-1/2 text-ink-faint hover:text-ink-muted"
-          >
-            <X className="size-3.5" />
-          </button>
-        )}
-      </div>
+      <SearchInput
+        size="sm" clearable value={busqueda} onChange={onBusqueda}
+        placeholder="Search by Name, Last Name, Email or DOB" aria-label="Find patient"
+        className="flex-none shrink-0 sm:max-w-none"
+      />
 
       {resultados.length === 0 ? (
         <EmptyState title="No recent patients/guarantors to show yet." className="py-6" />
@@ -330,9 +316,9 @@ export function AccionesPaciente({ onAccion }: {
 }) {
   return (
     <div className={cn('flex flex-wrap items-center gap-2', ENTRADA)}>
-      <Button size="md" onClick={() => onAccion('Patient Payment')}><Wallet /> Patient Payment (-)</Button>
-      <Button size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit Adjustment (-)</Button>
-      <Button size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge Adjustment (+)</Button>
+      <Button onClick={() => onAccion('Patient Payment')}><Wallet /> Patient Payment (-)</Button>
+      <Button onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit Adjustment (-)</Button>
+      <Button onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge Adjustment (+)</Button>
     </div>
   )
 }
@@ -408,7 +394,6 @@ export default function Billing({ inicial }: {
           {pacienteSeleccionado && <AccionesPaciente key={pacienteSeleccionado.nombre} onAccion={setModal} />}
           <Button
             variant="secondary"
-            size="md"
             disabled={!!seleccionado}
             title={seleccionado ? 'Clear the selected patient to export all activity' : undefined}
             onClick={() => { exportarCsv(filas); aviso.ok(`${filas.length} transactions exported.`) }}

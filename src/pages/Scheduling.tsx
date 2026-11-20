@@ -172,20 +172,7 @@ export default function Scheduling() {
         <PageTitle>Scheduling</PageTitle>
         <div className="flex flex-wrap items-center gap-2">
           {/* El Figma marca "Month" activo aunque la vista sea semanal. */}
-          <div className="flex items-center gap-1">
-            {(['Day', 'Week', 'Month'] as const).map((v) => (
-              <button
-                key={v}
-                onClick={() => setView(v)}
-                className={cn(
-                  'h-8 rounded-md px-4 text-xs font-medium transition-colors',
-                  view === v ? 'bg-dash-blue text-white' : 'text-ink-slate hover:text-ink-soft',
-                )}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <Tabs aria-label="Calendar view" tabs={['Day', 'Week', 'Month'] as const} value={view} onChange={setView} />
           <ViewMenu valor={vista} onGuardar={setVista} />
           {/* Event y Register appointment quedan fuera de la barra hasta que se
               defina qué hacen. No se borran: el markup sigue acá detrás de
@@ -208,7 +195,7 @@ export default function Scheduling() {
               </button>
             </>
           )}
-          <Button size="md" onClick={() => setPanel('new')} data-tour="sched-new">
+          <Button onClick={() => setPanel('new')} data-tour="sched-new">
             <Plus /> New appointment
           </Button>
         </div>
@@ -220,7 +207,7 @@ export default function Scheduling() {
         <DatePicker variant="toolbar" value={fecha} onChange={setFecha} />
         {/* Volver a hoy; desaparece cuando ya estás en hoy, como en el Dashboard. */}
         {!sameDay(fecha, FECHA_ANCLA) && (
-          <Button variant="secondary" size="md" onClick={() => setFecha(FECHA_ANCLA)} title="Go to today">
+          <Button variant="secondary" onClick={() => setFecha(FECHA_ANCLA)} title="Go to today">
             <CalendarClock /> Today
           </Button>
         )}

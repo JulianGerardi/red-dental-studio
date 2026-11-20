@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Ban, CirclePlus, FileText, FlaskConical, History, Pencil } from 'lucide-react'
+import { Ban, FileText, FlaskConical, History, Pencil, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
 import { Button } from '@/components/ui/button'
@@ -74,7 +74,7 @@ export function LabOrderPanel({ ordenes: inicio = ORDENES }: { /** Las órdenes 
               <History /> View History
             </Button>
             <Button onClick={() => aviso.info('New Prescription is not available in this release.')}>
-              <CirclePlus /> New Prescription
+              <Plus /> New Prescription
             </Button>
           </>
         )}

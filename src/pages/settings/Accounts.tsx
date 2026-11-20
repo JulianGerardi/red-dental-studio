@@ -1,7 +1,8 @@
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
+import { PADDING_PAGINA } from '@/lib/estilos'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Plus, Building2, Pencil, KeyRound, Ban } from 'lucide-react'
-import { SearchButton } from '@/components/ui/search-button'
+import { Plus, Building2, Pencil, KeyRound, Ban } from 'lucide-react'
 import { FilterMenu } from '@/components/ui/filter-menu'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
@@ -93,21 +94,12 @@ export function SettingsAccounts() {
   )
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Accounts overview"
         accion={<Button onClick={() => setNueva(true)}><Plus /> New Account</Button>}
       >
-        <div className="relative min-w-0 flex-1 sm:max-w-[300px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search..."
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-          />
-        </div>
-        <SearchButton onClick={() => setQ((v) => v.trim())} className="h-9" />
+        <SettingsSearch value={q} onChange={setQ} placeholder="Search..." onSearch={() => setQ((v) => v.trim())} />
         <FilterMenu
           label="Filter by status"
           groups={[{

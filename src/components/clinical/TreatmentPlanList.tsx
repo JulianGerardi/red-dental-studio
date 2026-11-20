@@ -12,7 +12,7 @@ import { Avatar } from '@/components/ui/avatar'
 export function Dato({ label, valor, icono: Icono, className }: { label: string; valor: string; icono?: LucideIcon; className?: string }) {
   return (
     <div className={cn('min-w-0 rounded-md bg-surface-alt px-2.5 py-2', className)}>
-      <span className="flex items-center gap-1 text-[9px] leading-none font-semibold tracking-wide whitespace-nowrap text-ink-muted uppercase">
+      <span className="flex items-center gap-1 text-[10px] leading-none font-semibold tracking-wide whitespace-nowrap text-ink-muted uppercase">
         {Icono && <Icono className="size-3 shrink-0" aria-hidden />}
         {label}
       </span>
@@ -65,10 +65,10 @@ export function PlanCard({ p, onAbrir, onEstimado }: { p: Plan; onAbrir?: () => 
       </span>
 
       <span className="mt-1.5 block rounded-md bg-surface-alt px-2.5 py-2.5">
-        <span className="block text-[9px] leading-none font-semibold tracking-wide text-ink-muted uppercase">Treatment progress</span>
+        <span className="block text-[10px] leading-none font-semibold tracking-wide text-ink-muted uppercase">Treatment progress</span>
         <span className="mt-1.5 flex items-center justify-between gap-2">
           <span className={cn('text-[18px] leading-none font-bold tabular-nums', progreso ? 'text-dash-blue' : 'text-ink')}>{progreso}%</span>
-          <span className="bg-dash-count-bg text-dash-blue-hover flex shrink-0 items-center gap-1 rounded-full px-2 py-[2px] text-[10px] font-medium">
+          <span className="bg-dash-count-bg text-dash-blue-hover flex shrink-0 items-center gap-1 rounded-full px-2 py-[2px] text-[11px] font-medium">
             <CircleCheck className="size-3" aria-hidden /> {p.completados} of {p.procedimientos} completed
           </span>
         </span>

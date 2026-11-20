@@ -1,3 +1,4 @@
+import { PADDING_PAGINA } from '@/lib/estilos'
 import { useState } from 'react'
 import { PageTitle } from '@/components/ui/page-title'
 import { useParams } from 'react-router-dom'
@@ -85,7 +86,7 @@ export function SettingsAccount() {
   const sinDuenio = !!cuenta && cuenta.duenos === '—'
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <PageTitle>Edit Account</PageTitle>
 
       <Tabs className="mt-4" aria-label="Account sections" tabs={TABS} value={tab} onChange={setTab} />

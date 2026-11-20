@@ -15,10 +15,11 @@ export default function ForgotPassword() {
           <div className="space-y-2">
             <div className="mb-3">
               {/* La marca de la clínica, no una persona: queda redonda (Elements / Avatars es sólo para personas). */}
-              <span className="bg-primary text-primary-foreground flex size-[60px] items-center justify-center rounded-full font-medium">RD</span>
+              <span className="bg-dash-blue flex size-[60px] text-white items-center justify-center rounded-full font-medium">RD</span>
             </div>
-            <h1 className="text-card-foreground text-3xl font-bold">Forgot your password?</h1>
-            <p className="text-muted-foreground text-small">
+            {/* Mismo título que Login, que es la pantalla de al lado (auditoría de normalización). */}
+            <h1 className="text-[26px] leading-tight font-bold text-ink">Forgot your password?</h1>
+            <p className="text-sm text-ink-muted">
               Enter your email and we&apos;ll send you a reset link
             </p>
           </div>
@@ -35,13 +36,13 @@ export default function ForgotPassword() {
 
           <Link
             to="/login"
-            className="text-muted-foreground hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm"
+            className="mt-6 inline-flex items-center gap-2 text-sm text-ink-muted hover:text-ink"
           >
             <ArrowLeft className="size-4" /> Back to login
           </Link>
 
           <div className="mt-12 text-center">
-            <p className="text-xs text-gray-400">© 2025 ALL RIGHTS RESERVED | CONFIDENTALLY</p>
+            <p className="text-xs text-ink-faint">© 2025 ALL RIGHTS RESERVED | CONFIDENTALLY</p>
           </div>
         </div>
       </div>

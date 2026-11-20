@@ -69,7 +69,7 @@ export function LinkExistingPerson({
           ))}
 
           {vinculado && (
-            <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-[#eff6ff] p-3">
+            <div className="border-dash-blue flex items-center gap-3 rounded-lg border bg-info-bg p-3">
               <Avatar initials={vinculado.iniciales} size={36} />
               <span className="min-w-0 leading-tight">
                 <span className="block text-[13px] font-bold text-ink uppercase">{vinculado.nombre}</span>

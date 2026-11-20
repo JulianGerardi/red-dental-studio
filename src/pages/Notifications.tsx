@@ -71,7 +71,7 @@ export function FilaNotificacion({ n, onAbrir, onMarcar }: {
         <n.icon className="size-4" />
       </span>
       <button type="button" onClick={() => onAbrir(n)} className="min-w-0 flex-1 rounded-sm pt-2 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-dash-blue">
-        <span className={cn('block text-[13.5px] leading-5 text-ink', sinLeer ? 'font-semibold' : 'font-medium')}>
+        <span className={cn('block text-[13px] leading-5 text-ink', sinLeer ? 'font-semibold' : 'font-medium')}>
           {n.titulo}
           {sinLeer && <span className="sr-only"> (unread)</span>}
         </span>
@@ -129,7 +129,7 @@ export default function Notifications() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <PageTitle>Notifications</PageTitle>
         {/* Sin menú ⋮: sólo tenía acciones de archivar (notifications.md, 2026-10-13). */}
-        <Button variant="secondary" size="md" disabled={!sinLeer.length} onClick={marcarTodas}>
+        <Button variant="secondary" disabled={!sinLeer.length} onClick={marcarTodas}>
           <CheckCheck /> Mark all as read
         </Button>
       </div>

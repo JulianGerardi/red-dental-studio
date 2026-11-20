@@ -115,7 +115,7 @@ export function PatientDetailsPopover({
       role="dialog"
       aria-label={`Details for ${name}`}
       style={{ left, top, width: ancho }}
-      className="motion-safe:animate-[loc-in_160ms_ease-out] absolute z-50 overflow-hidden rounded-2xl bg-[#fafbfe] p-4 shadow-floating"
+      className="motion-safe:animate-[loc-in_160ms_ease-out] absolute z-50 overflow-hidden rounded-2xl bg-page-background p-4 shadow-floating"
     >
       <button
         type="button"
@@ -135,7 +135,7 @@ export function PatientDetailsPopover({
         {iniciar && (
           <button
             type="button"
-            className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#18763e]"
+            className="flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-[13px] font-semibold text-white transition-colors hover:bg-green-deep"
           >
             <Play className="size-3.5 shrink-0" /> Start Encounter
             <ChevronDown className="size-3.5 shrink-0" />
@@ -188,7 +188,7 @@ export function PatientDetailsPopover({
         {/* El motivo envuelve en vez de cortarse: con "Reason" escrito completo
             no entra en una línea, y truncarlo era justo lo que había que
             arreglar acá. */}
-        <div className="flex items-start gap-2 border-b border-[#f2f2f2] px-3 py-2.5">
+        <div className="flex items-start gap-2 border-b border-surface-muted px-3 py-2.5">
           <ClipboardList className="mt-px size-4 shrink-0 text-ink" strokeWidth={1.8} />
           <span className="shrink-0 text-[13px] font-semibold text-ink">Reason for Visit</span>
           <span className="ml-auto min-w-0 text-right text-[11px] leading-[1.4] text-ink-faint">

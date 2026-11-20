@@ -50,7 +50,7 @@ export function Radio({ on, className }: { on: boolean; className?: string }) {
     <span
       className={cn(
         'flex size-[18px] shrink-0 items-center justify-center rounded-full border-2 transition-colors',
-        on ? 'border-dash-blue' : 'border-[#c4c4c8]',
+        on ? 'border-dash-blue' : 'border-line-strong',
         className,
       )}
     >
@@ -90,7 +90,7 @@ export function Seleccionable({
       className={cn(
         'flex w-full cursor-pointer gap-3 rounded-lg border text-left transition-colors',
         barra && 'border-l-[3px]',
-        on ? 'border-dash-blue bg-[#f8faff]' : 'border-line bg-white hover:bg-surface-subtle',
+        on ? 'border-dash-blue bg-info-subtle' : 'border-line bg-white hover:bg-surface-subtle',
         className,
       )}
     >

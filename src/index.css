@@ -367,6 +367,15 @@
   --color-warn-bg: #fffaf0;
   --color-attn-fg: #b45309;
   --color-info-bg: #f0f5ff;
+  /* Auditoría de normalización (2026-11-20): los azules claros, los bordes azules y los tonos del encuentro en pausa que
+     estaban escritos a mano en varias pantallas, unificados en estos tokens (figma/README.md). */
+  --color-info-subtle: #f7faff;
+  --color-info-strong-bg: #e3edff;
+  --color-info-line: #c7d9fb;
+  --color-info-line-strong: #8eaadd;
+  --color-amber-hover: #f0a913;
+  --color-amber-fg: #7a4a00;
+  --color-status-ok-hover: #1fae54;
   --color-purple-fg: #6633a6;
 
   /* Colores de apoyo que se repiten en varias pantallas: los tintes celeste y

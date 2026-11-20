@@ -1,11 +1,10 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
+import { PADDING_PAGINA } from '@/lib/estilos'
+import { useCallback, useMemo, useState } from 'react'
 import { PageTitle } from '@/components/ui/page-title'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import {
-  Search, CirclePlus, Trash2, FileText, Pencil, Ban, UserMinus,
-} from 'lucide-react'
+import { Trash2, FileText, Pencil, Ban, UserMinus, Plus } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
-import { SearchButton } from '@/components/ui/search-button'
 import { EditableAvatar } from '@/components/ui/editable-avatar'
 import { aviso } from '@/components/ui/toaster'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
@@ -55,7 +54,6 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
   const [q, setQ] = useState('')
   const [filas, setFilas] = useState(EMPLEADOS)
   const [seleccion, setSeleccion] = useState<string[]>([])
-  const inputRef = useRef<HTMLInputElement>(null)
 
   const visibles = useMemo(
     () => filas.filter((e) => `${e.nombre} ${e.email} ${e.cargo}`.toLowerCase().includes(q.trim().toLowerCase())),
@@ -80,26 +78,16 @@ export function SettingsEmployees({ nuevo = false }: { nuevo?: boolean }) {
   }
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Employees"
         accion={(
           <Button data-tour="set-team" onClick={() => setCreando(true)}>
-            <CirclePlus /> New Employee
+            <Plus /> New Employee
           </Button>
         )}
       >
-        <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-          <input
-            ref={inputRef}
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search employees"
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-          />
-        </div>
-        <SearchButton onClick={() => inputRef.current?.focus()} className="h-9" />
+        <SettingsSearch value={q} onChange={setQ} placeholder="Search employees" />
         {seleccion.length > 0 && (
           <span className="bg-dash-count-bg text-dash-blue-hover flex h-9 items-center rounded-md px-3 text-[13px] font-semibold">
             {seleccion.length} selected
@@ -254,7 +242,7 @@ export function SettingsEmployeeDetail() {
   }
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <PageTitle>{tab === 'Employee' ? 'Employee Information' : tab}</PageTitle>
 
       <Tabs
@@ -296,7 +284,7 @@ export function SettingsEmployeeDetail() {
               </div>
 
               {/* La ficha edita a alguien que ya existe: no vincula a otra persona (employees.md, 2026-11-18). */}
-              <h3 className="mt-5 text-sm font-bold text-ink">General Information</h3>
+              <h2 className="mt-5 text-sm font-bold text-ink">General Information</h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <SelectField label="First Name" required options={['Michael', 'Sarah', 'Elena']} value={empleado.nombre.split(' ')[0]} />
                 {/* "Lasr Name" es del Figma. */}
@@ -388,7 +376,7 @@ export function SettingsEmployeeDetail() {
                     onClick={() => setCredenciales((p) => [...p, Math.max(0, ...p) + 1])}
                     className="text-dash-blue flex items-center gap-1.5 self-start text-[13px] font-semibold hover:underline"
                   >
-                    <CirclePlus className="size-4" /> Add credential
+                    <Plus className="size-4" /> Add credential
                   </button>
                 </div>
               )}
@@ -399,7 +387,7 @@ export function SettingsEmployeeDetail() {
               <button
                 type="button"
                 onClick={() => aviso.info('File upload is not available in this release.')}
-                className="flex w-full flex-col items-center gap-2 rounded-lg border-2 border-dashed border-[#93c5fd] bg-[#fafcff] px-6 py-10 sm:w-[420px]"
+                className="flex w-full flex-col items-center gap-2 rounded-lg border-2 border-dashed border-info-line-strong bg-info-subtle px-6 py-10 sm:w-[420px]"
               >
                 <FileText className="text-dash-blue size-8" strokeWidth={1.5} />
                 <span className="text-sm font-bold text-ink">Drag and drop your files</span>
@@ -421,7 +409,7 @@ export function SettingsEmployeeDetail() {
                 onClick={() => setNuevaHora(true)}
                 className="text-dash-blue flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
               >
-                <CirclePlus className="size-4" /> Add new hour
+                <Plus className="size-4" /> Add new hour
               </button>
             </div>
 
@@ -449,11 +437,11 @@ export function SettingsEmployeeDetail() {
                             className="rounded-r-[3px] border-l-[3px] px-2 py-2 text-left transition-shadow hover:shadow-md"
                             style={{ backgroundColor: t.bg, borderLeftColor: t.bar }}
                           >
-                            <span className="block text-[10px] font-medium" style={{ color: t.fg }}>
+                            <span className="block text-[11px] font-medium" style={{ color: t.fg }}>
                               {b.horas}
                             </span>
-                            <span className="block text-[11px] text-[#18181b]">{b.sala}</span>
-                            <span className="block text-[10px] text-ink-muted">{b.empresa}</span>
+                            <span className="block text-[11px] text-ink">{b.sala}</span>
+                            <span className="block text-[11px] text-ink-muted">{b.empresa}</span>
                           </button>
                         )
                       })}

@@ -1,3 +1,4 @@
+import { buttonClasses } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { Tabs } from '@/components/ui/tabs'
 
@@ -21,7 +22,7 @@ export function ExamPanelHeader({
           <Plus className="size-3" /> No Finding
         </button>
       ) : (
-        <button type="button" onClick={onNewReview} className="bg-dash-blue hover:bg-dash-blue-hover flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[11px] font-semibold text-white">
+        <button type="button" onClick={onNewReview} className={buttonClasses({ size: 'sm' })}>
           <Plus className="size-3" /> Review Exam
         </button>
       )}

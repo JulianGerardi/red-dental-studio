@@ -224,7 +224,7 @@ export function ClinicalTopBar({
         className={cn(
           /* Cápsula más alta que en el export: con 18.17 el ícono queda en
              12px y no se distingue de qué es cada contador. */
-          'flex h-[26px] shrink-0 items-center gap-[4px] rounded-full border border-[#E5E7EB] bg-[#F9FAFB] px-[6px] transition-colors hover:bg-[#f1f5ff]',
+          'flex h-[26px] shrink-0 items-center gap-[4px] rounded-full border border-line bg-surface-alt px-[6px] transition-colors hover:bg-info-bg',
           on && 'border-dash-blue bg-dash-count-bg',
         )}
       >
@@ -232,7 +232,7 @@ export function ClinicalTopBar({
         {/* El cero va en gris: un contador vacío no es una novedad. */}
         {/* El export pinta el badge de azul también con 0: no se separa el
             caso vacío. */}
-        <span className="bg-dash-blue flex size-[17px] items-center justify-center rounded-full text-[9px] leading-none text-white">
+        <span className="bg-dash-blue flex size-[17px] items-center justify-center rounded-full text-[10px] leading-none text-white">
           {cuenta(c)}
         </span>
       </button>
@@ -369,7 +369,7 @@ export function ClinicalTopBar({
           <span
             key={c.valor}
             className={cn(
-              'flex h-full items-center justify-center px-[6px] text-[11.79px] leading-[16px] whitespace-nowrap text-black',
+              'flex h-full items-center justify-center px-[6px] text-[12px] leading-[16px] whitespace-nowrap text-ink',
               i < CONSTANTES.length - 1 && 'border-r border-line',
             )}
           >
@@ -381,7 +381,7 @@ export function ClinicalTopBar({
       {/* "user-info-bar": avatar de 23.71 y el nombre en 11.95/600. */}
       <span className="flex shrink-0 items-center gap-[3.19px]">
         <Avatar initials="JP" size={24} />
-        <span className="text-[11.95px] leading-[14px] font-semibold whitespace-nowrap text-[#18181B]">
+        <span className="text-[12px] leading-[14px] font-semibold whitespace-nowrap text-ink">
           Julio Perez
         </span>
       </span>
@@ -395,7 +395,7 @@ export function ClinicalTopBar({
           curso, ámbar en pausa (el Pending Encounter de la ficha). Sin empezar no hay menú: no hay nada que pausar. */}
       <div className={cn(
         'flex h-[31.79px] shrink-0 items-center overflow-hidden rounded-full max-md:flex-1',
-        encuentro === 'enPausa' ? 'bg-amber text-[#7a4a00]' : 'bg-status-ok text-white',
+        encuentro === 'enPausa' ? 'bg-amber text-amber-fg' : 'bg-status-ok text-white',
       )}>
         <button
           type="button"
@@ -405,8 +405,8 @@ export function ClinicalTopBar({
             else completar()
           }}
           className={cn(
-            'flex h-full items-center justify-center gap-[7.86px] pl-[12.77px] text-[10.8px] font-semibold whitespace-nowrap transition-colors max-md:flex-1',
-            encuentro === 'enPausa' ? 'hover:bg-[#f0a913]' : 'hover:bg-[#1fae54]',
+            'flex h-full items-center justify-center gap-[7.86px] pl-[12.77px] text-[11px] font-semibold whitespace-nowrap transition-colors max-md:flex-1',
+            encuentro === 'enPausa' ? 'hover:bg-amber-hover' : 'hover:bg-status-ok-hover',
             encuentro === 'sinEmpezar' ? 'pr-[12.77px]' : 'pr-[6px]',
           )}
         >
@@ -420,7 +420,7 @@ export function ClinicalTopBar({
               aria-label="Encounter options"
               className={cn(
                 'group flex h-full items-center pr-[12.77px] pl-[2px] transition-colors',
-                encuentro === 'enPausa' ? 'hover:bg-[#f0a913]' : 'hover:bg-[#1fae54]',
+                encuentro === 'enPausa' ? 'hover:bg-amber-hover' : 'hover:bg-status-ok-hover',
               )}
             >
               <ChevronDown className="size-[15.71px] transition-transform group-data-[state=open]:rotate-180" />

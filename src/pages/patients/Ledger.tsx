@@ -108,7 +108,7 @@ const COLUMNAS: ColumnaLedger[] = [
           type="button"
           data-apply-credit
           aria-label={`Apply ${moneda(m.creditoDisponible ?? 0)} credit from ${m.descripcion}`}
-          className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-info-bg px-1.5 py-1 text-[12px] font-medium whitespace-nowrap tabular-nums hover:bg-[#e3edff]"
+          className="text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-info-line bg-info-bg px-1.5 py-1 text-[12px] font-medium whitespace-nowrap tabular-nums hover:bg-info-strong-bg"
         >
           <HandCoins className="size-3.5 shrink-0" />
           {moneda(m.creditoDisponible ?? 0)} · Apply
@@ -161,7 +161,7 @@ export function Household() {
   const personas = [{ nombre: GUARANTOR, rol: 'Guarantor' }, ...DEPENDIENTES.map((nombre) => ({ nombre, rol: 'Dependent' }))]
   return (
     <section aria-labelledby="ledger-household" className={cn(TARJETA_PANEL, 'mt-4 p-4')}>
-      <h2 id="ledger-household" className="text-[15px] font-semibold text-ink">Household</h2>
+      <h2 id="ledger-household" className="text-[15px] font-bold text-ink">Household</h2>
       <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {personas.map((p) => (
           <li key={p.nombre} className={cn(TARJETA_INTERNA, 'flex min-w-0 items-center gap-3 p-3')}>
@@ -189,9 +189,9 @@ type Vista = (typeof VISTAS)[number]
 export function AccionesLedger({ onAccion }: { onAccion: (tipo: TipoAjusteBilling) => void }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Button size="md" onClick={() => onAccion('Patient Payment')}><Wallet /> Patient Payment (-)</Button>
-      <Button size="md" onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit Adjustment (-)</Button>
-      <Button size="md" onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge Adjustment (+)</Button>
+      <Button onClick={() => onAccion('Patient Payment')}><Wallet /> Patient Payment (-)</Button>
+      <Button onClick={() => onAccion('Credit Adjustment')}><MinusCircle /> Credit Adjustment (-)</Button>
+      <Button onClick={() => onAccion('Charge Adjustment')}><PlusCircle /> Charge Adjustment (+)</Button>
     </div>
   )
 }
@@ -353,7 +353,7 @@ export default function Ledger() {
             <PageTitle>Ledger</PageTitle>
             <div className="flex flex-wrap items-center gap-2">
               <AccionesLedger onAccion={setAccion} />
-              <Tabs size="sm" className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
+              <Tabs className="shrink-0" aria-label="Ledger view" tabs={VISTAS} value={vista} onChange={(v) => { setVista(v); setPagina(1) }} />
             </div>
           </div>
 
@@ -479,7 +479,7 @@ export default function Ledger() {
 
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3 lg:mt-auto">
                 <span className="flex items-center gap-3 text-xs font-semibold text-ink-muted">
-                  Showing {filasPagina.length} of {filas.length} entries
+                  Showing {filas.length ? (paginaActual - 1) * TAM_PAGINA + 1 : 0} to {(paginaActual - 1) * TAM_PAGINA + filasPagina.length} of {filas.length} entries
                   {anchos.avisando && (
                     <span className="motion-safe:animate-[col-hint_2.4s_ease-in-out_both] hidden items-center gap-1.5 font-medium text-ink-faint lg:flex">
                       <MoveHorizontal className="size-3.5" /> Drag column edges to resize · double-click to reset

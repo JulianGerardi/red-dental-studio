@@ -93,7 +93,7 @@ export function InfoBlock({
           type="button"
           onClick={onEdit}
           aria-label={`Edit ${title}`}
-          className="text-ink-muted transition-colors hover:text-black"
+          className="text-ink-muted transition-colors hover:text-ink"
         >
           <Pencil className="size-3.5" />
         </button>
@@ -144,6 +144,7 @@ export function PatientSidePanel({
   const [colapsadoCompartido, setColapsado] = useColapso()
   const colapsado = vista.collapsed ?? colapsadoCompartido
   const [info, setInfo] = useState(false)
+  const [datosAbiertos, setDatosAbiertos] = useState(false)
   const paciente = basePath.split('/').pop() ?? ''
   const notaGuardada = useNotaPendiente(paciente)
   const notaPendiente = vista.pendingSignature ?? notaGuardada
@@ -182,7 +183,7 @@ export function PatientSidePanel({
         onClick={() => setColapsado((v) => !v)}
         aria-label={colapsado ? 'Expand patient menu' : 'Collapse patient menu'}
         className={cn(
-          'hidden rounded-md text-ink-muted hover:bg-surface-muted hover:text-black lg:mb-2 lg:flex lg:size-9 lg:items-center lg:justify-center',
+          'hidden rounded-md text-ink-muted hover:bg-surface-muted hover:text-ink lg:mb-2 lg:flex lg:size-9 lg:items-center lg:justify-center',
           FOCO,
           colapsado ? 'lg:mx-auto' : 'lg:ml-auto',
         )}
@@ -213,7 +214,7 @@ export function PatientSidePanel({
         </div>
         <div className={cn('flex min-w-0 flex-col items-start gap-1.5 lg:items-center', colapsado && 'lg:hidden')}>
           <p className="truncate text-lg font-bold text-ink">{name}</p>
-          <span className="rounded-full border border-dash-ok-fg bg-dash-ok-bg px-2 py-[2px] text-[10px] font-semibold text-dash-ok-fg">
+          <span className="rounded-full border border-dash-ok-fg bg-dash-ok-bg px-2 py-[2px] text-[11px] font-semibold text-dash-ok-fg">
             Active
           </span>
           <p className="text-[11px] text-ink-muted">50 years</p>
@@ -225,7 +226,7 @@ export function PatientSidePanel({
         <Link
           to={`${basePath}/clinical-mode`}
           data-tour="pat-clinical-mode"
-          className="text-dash-blue flex w-full items-center justify-center gap-2 rounded-md bg-[#eef5ff] py-2 text-[13px] font-medium"
+          className="text-dash-blue flex w-full items-center justify-center gap-2 rounded-md bg-info-bg py-2 text-[13px] font-medium"
         >
           <Eye className="size-3.5" /> Clinical Mode
         </Link>
@@ -242,7 +243,7 @@ export function PatientSidePanel({
             <Link
               to={`${basePath}/clinical-mode`}
               aria-label="Clinical Mode"
-              className="text-dash-blue flex size-9 items-center justify-center rounded-md bg-[#eef5ff]"
+              className="text-dash-blue flex size-9 items-center justify-center rounded-md bg-info-bg"
             >
               <Eye className="size-4" />
             </Link>
@@ -320,7 +321,19 @@ export function PatientSidePanel({
       />
       </div>
 
-      <div className={cn('grid gap-x-6 sm:grid-cols-2 lg:grid-cols-1', colapsado && 'lg:hidden')}>
+      {/* Por debajo de lg General y Contact van plegados: abiertos empujaban el título de la sección debajo del primer
+          scroll (auditoría de normalización, patient-dashboard.md, 2026-11-20). En desktop siempre se ven. */}
+      <button
+        type="button"
+        onClick={() => setDatosAbiertos((v) => !v)}
+        aria-expanded={datosAbiertos}
+        aria-controls="datos-paciente"
+        className={cn('mt-3 flex h-9 w-full items-center gap-1.5 rounded-md px-1 text-[13px] font-semibold text-ink hover:bg-surface-muted lg:hidden', FOCO)}
+      >
+        Patient information
+        <ChevronDown aria-hidden className={cn('size-4 text-ink-muted transition-transform', datosAbiertos && 'rotate-180')} />
+      </button>
+      <div id="datos-paciente" className={cn('gap-x-6 sm:grid-cols-2 lg:grid lg:grid-cols-1', datosAbiertos ? 'grid' : 'hidden', colapsado && 'lg:hidden')}>
         <InfoBlock title="General" items={GENERAL} onEdit={onEditGeneral ?? (() => navigate(`${basePath}/edit`))} />
         <InfoBlock title="Contact" items={CONTACT} onEdit={onEditContact ?? (() => setContacto(true))} />
       </div>
@@ -365,11 +378,11 @@ export function PendingSignatureButton({ soloIcono, className, ...props }: React
    design system: es el mismo botón que el popup del paciente, que Julián pidió
    alinear. El ámbar sí es el #ffb82c del sistema, pero con texto oscuro: el
    frame lo pone en blanco y sobre ese fondo no se lee. */
-const VERDE = 'bg-green text-white hover:bg-[#18763e]'
+const VERDE = 'bg-green text-white hover:bg-green-deep'
 const ENCUENTRO: Record<EstadoEncuentro, { label: string; clase: string; icono: React.ReactNode }> = {
   sinEmpezar: { label: 'Start Encounter', clase: VERDE, icono: <Play className="size-3.5 shrink-0" /> },
   enCurso: { label: 'Complete Encounter', clase: VERDE, icono: <CircleCheck className="size-3.5 shrink-0" /> },
-  enPausa: { label: 'Pending Encounter', clase: 'bg-amber text-[#7a4a00] hover:bg-[#f0a913]', icono: <Pause className="size-3.5 shrink-0" /> },
+  enPausa: { label: 'Pending Encounter', clase: 'bg-amber text-amber-fg hover:bg-amber-hover', icono: <Pause className="size-3.5 shrink-0" /> },
 }
 
 /** Deja el botón de encuentro en un estado desde afuera (Storybook). */

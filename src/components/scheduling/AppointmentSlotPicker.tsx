@@ -63,8 +63,8 @@ export function AppointmentSlotPicker({
             <span className="block truncate text-[13px] font-bold text-ink">{especialidad}</span>
           </span>
         </div>
-        <p className="mt-2 text-[10px] text-ink-muted">{fecha}</p>
-        <p className="text-[10px] text-ink-faint">
+        <p className="mt-2 text-[11px] text-ink-muted">{fecha}</p>
+        <p className="text-[11px] text-ink-faint">
           {seleccion ? 'Drag the card to move it' : 'Click on available time to schedule'}
         </p>
       </header>
@@ -95,19 +95,19 @@ export function AppointmentSlotPicker({
                 className={cn(
                   'relative flex-1 border-l border-line-soft p-1 text-left transition-colors',
                   ocupada
-                    ? 'cursor-not-allowed bg-[#fdf3f3]'
+                    ? 'cursor-not-allowed bg-dash-bad-bg'
                     : sobre === h
-                      ? 'bg-[#dbeafe]'
+                      ? 'bg-info-strong-bg'
                       : elegida
-                        ? 'bg-[#eff6ff]'
-                        : 'bg-[#fbfbfc] hover:bg-[#eff6ff]',
+                        ? 'bg-info-bg'
+                        : 'bg-surface-subtle hover:bg-info-bg',
                 )}
               >
                 {/* Media hora, para que la fila no quede como un bloque plano. */}
                 <span className="pointer-events-none absolute inset-x-0 top-1/2 border-t border-line-soft" />
 
                 {ocupada && (
-                  <span className="absolute inset-y-1 left-1 flex items-center rounded-r-md border-l-[3px] border-l-field-error bg-[#fde8e8] pr-2 pl-1.5">
+                  <span className="absolute inset-y-1 left-1 flex items-center rounded-r-md border-l-[3px] border-l-field-error bg-dash-bad-chip pr-2 pl-1.5">
                     <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-field-error text-white">
                       <AlarmClock className="size-3" />
                     </span>
@@ -127,7 +127,7 @@ export function AppointmentSlotPicker({
                     <GripVertical className="text-dash-blue size-3 shrink-0" />
                     <span className="min-w-0 leading-tight">
                       <span className="text-dash-blue block truncate text-[10px] font-semibold">{h}</span>
-                      <span className="block truncate text-[10px] text-[#18181b]">
+                      <span className="block truncate text-[10px] text-ink">
                         {paciente?.trim() || 'New appointment'}
                       </span>
                     </span>

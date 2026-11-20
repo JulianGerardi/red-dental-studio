@@ -1,3 +1,4 @@
+import { buttonClasses } from '@/components/ui/button'
 import { useState } from 'react'
 import { FileText, Trash2, LoaderCircle } from 'lucide-react'
 import { aviso } from '@/components/ui/toaster'
@@ -129,7 +130,7 @@ export function RadiographyUpload({ onCancel, onSave }: { onCancel: () => void; 
         </button>
         <button
           onClick={() => { aviso.ok(`${archivos.length} file${archivos.length === 1 ? '' : 's'} saved to the exam.`); onSave() }}
-          className="bg-dash-blue hover:bg-dash-blue-hover h-9 shrink-0 rounded-md px-4 text-[13px] font-semibold whitespace-nowrap text-white transition-colors"
+          className={buttonClasses()}
         >
           Save
         </button>

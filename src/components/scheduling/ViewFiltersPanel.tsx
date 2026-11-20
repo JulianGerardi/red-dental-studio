@@ -2,7 +2,7 @@ import { useId, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { ChevronDown, Search, SearchX, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { aviso } from '@/components/ui/toaster'
-import { Button } from '@/components/ui/button'
+import { Button, buttonClasses } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ICONO_SUELTO } from '@/lib/estilos'
@@ -306,7 +306,7 @@ export function ViewMenu({ valor, onGuardar }: { valor: VistaCalendario; onGuard
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="bg-dash-blue hover:bg-dash-blue-hover focus-visible:outline-dash-blue flex h-8 items-center gap-1.5 rounded-md px-4 text-xs font-medium text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+          className={buttonClasses()}
         >
           View
           <ChevronDown aria-hidden className={cn('size-3.5 transition-transform', abierto && 'rotate-180')} />

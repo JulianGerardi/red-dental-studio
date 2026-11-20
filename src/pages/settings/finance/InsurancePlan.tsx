@@ -20,7 +20,7 @@ import {
   PlanAddressFields, PlanConfigurationFields, PlanContactFields, PlanGeneralFields, formDePlan, obligatoriosPlan, planDeForm,
 } from '@/components/finance/PlanFields'
 import { useFormPasos } from '@/lib/useFormPasos'
-import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO, TARJETA_INTERNA } from '@/lib/estilos'
+import { ICONO_SUELTO, TABLA_ENCABEZADO, TABLA_FILA, TABLA_MARCO, TARJETA_INTERNA, PADDING_PAGINA } from '@/lib/estilos'
 import { LOCACIONES } from '@/pages/settings/Locations'
 import { rutaPlanes } from '@/pages/settings/finance/Carriers'
 import { useFinanzas } from '@/data/finanzasStore'
@@ -376,7 +376,7 @@ export function SettingsInsurancePlan() {
   const Pantalla = PANTALLAS[seccion.clave]
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Edit Insurance Plan"
         etiquetas={<Pill tone={TONO_ESTADO[p.estado]}>{p.estado}</Pill>}

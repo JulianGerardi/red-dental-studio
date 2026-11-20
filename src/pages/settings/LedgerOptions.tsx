@@ -1,8 +1,9 @@
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
+import { PADDING_PAGINA } from '@/lib/estilos'
 import { useMemo, useState } from 'react'
-import { Search, SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
-import { SearchButton } from '@/components/ui/search-button'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
 import { Tabs } from '@/components/ui/tabs'
@@ -105,24 +106,14 @@ export function SettingsLedgerOptions() {
   const visibles = filas.slice((actual - 1) * TAM_PAGINA, actual * TAM_PAGINA)
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Ledger Options"
         /* La bajada del frame es la de Locations, copiada tal cual. Se
            replica: el contenido va como está. */
       >
-        <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-          <input
-            value={q}
-            onChange={(e) => { setQ(e.target.value); setPagina(1) }}
-            /* El frame dice "Search patients" en las dos pestañas, donde no
-               hay pacientes. Se replica. */
-            placeholder="Search patients"
-            className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-          />
-        </div>
-        <SearchButton onClick={() => setPagina(1)} className="h-9" />
+        {/* El frame dice "Search patients" en las dos pestañas, donde no hay pacientes. Se replica. */}
+        <SettingsSearch value={q} onChange={(v) => { setQ(v); setPagina(1) }} placeholder="Search patients" onSearch={() => setPagina(1)} />
         <select
           value={tab}
           onChange={(e) => cambiarTab(e.target.value as Tab)}
@@ -188,7 +179,7 @@ export function SettingsLedgerOptions() {
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-row px-3 py-3">
             <span className="text-xs font-semibold text-ink-muted">
-              Showing {visibles.length} of {filas.length} {tab === 'Adjustments Types' ? 'adjustment types' : 'payment methods'}
+              Showing {filas.length ? (actual - 1) * TAM_PAGINA + 1 : 0} to {(actual - 1) * TAM_PAGINA + visibles.length} of {filas.length} {tab === 'Adjustments Types' ? 'adjustment types' : 'payment methods'}
             </span>
             <Pagination pagina={actual} paginas={paginas} onChange={setPagina} />
           </div>

@@ -1,3 +1,5 @@
+import { SearchInput } from '@/components/ui/search-input'
+import { PADDING_PAGINA } from '@/lib/estilos'
 import { useEffect, useId, useRef, useState } from 'react'
 import { Chip } from '@/components/ui/chip'
 import { Search, Plus, Bold, Italic, Underline, Heading1, Heading2, Pilcrow, List, ListOrdered, Eye, Power, PowerOff, ArrowLeft, Check } from 'lucide-react'
@@ -224,16 +226,7 @@ export function ListaTemplates({ templates, elegidoId, q, onQ, filtro, onFiltro,
         <h2 className="text-sm font-bold text-ink">Templates</h2>
         <Button size="sm" onClick={onNuevo}><Plus /> New template</Button>
       </div>
-      <div className="relative">
-        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-faint" />
-        <input
-          value={q}
-          onChange={(e) => onQ(e.target.value)}
-          placeholder="Search templates..."
-          aria-label="Search templates"
-          className="focus:border-dash-blue h-9 w-full rounded-md border border-line bg-white pr-3 pl-9 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] placeholder:text-ink-faint focus:outline-none"
-        />
-      </div>
+      <SearchInput size="sm" value={q} onChange={onQ} placeholder="Search templates..." aria-label="Search templates" className="flex-none sm:max-w-none" />
       <Tabs size="sm" fullWidth aria-label="Filter templates" tabs={FILTROS} value={filtro} onChange={onFiltro} />
       <div className="flex max-h-[520px] flex-col gap-2 overflow-y-auto">
         {templates.length === 0 ? (
@@ -325,12 +318,12 @@ export function TextoConsentimiento({ naturaleza, riesgos, onNaturaleza, onRiesg
         <label className="flex flex-col gap-1.5">
           <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Nature of procedure</span>
           <textarea rows={3} value={naturaleza} onChange={(e) => onNaturaleza(e.target.value)} className={caja} />
-          <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_NATURALEZA}</span>
+          <span className="text-[12px] leading-snug text-ink-muted italic">{GUIA_NATURALEZA}</span>
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase">Risk and complications</span>
           <textarea rows={4} value={riesgos} onChange={(e) => onRiesgos(e.target.value)} className={caja} />
-          <span className="text-[11.5px] leading-snug text-ink-muted italic">{GUIA_RIESGOS}</span>
+          <span className="text-[12px] leading-snug text-ink-muted italic">{GUIA_RIESGOS}</span>
         </label>
       </div>
     </div>
@@ -397,7 +390,7 @@ export function EditorTemplate({ actual, borrador, onBorrador, intentado, onAlte
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-[200px] flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-bold text-ink">{actual ? 'Edit Template' : 'New Consent Template'}</h2>
+            <h2 className="text-[15px] font-bold text-ink">{actual ? 'Edit Template' : 'New Consent Template'}</h2>
             {actual && <Pill tone={actual.activo ? 'success' : 'neutral'} size="sm">{actual.activo ? 'Active' : 'Inactive'}</Pill>}
             {actual?.sistema && <Pill tone="info" size="sm">System</Pill>}
           </div>
@@ -567,7 +560,7 @@ export function SettingsConsents() {
   }
 
   return (
-    <div className="@container px-4 py-6 sm:px-8">
+    <div className={cn('@container', PADDING_PAGINA)}>
       <SettingsPageHeader titulo="Consent Templates" />
 
       {/* La lista es de 288px: con 240/260 la cuarta pestaña ("All") no entraba y quedaba cortada. */}

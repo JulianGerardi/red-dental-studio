@@ -290,7 +290,7 @@ export function SettingsItem({
                     aria-label={`${s.label} options`}
                     aria-expanded={grupo === s.to}
                     onClick={() => setGrupo((g) => (g === s.to ? null : s.to))}
-                    className="rounded p-1 text-ink-muted hover:text-black"
+                    className="rounded p-1 text-ink-muted hover:text-ink"
                   >
                     <ChevronDown className={cn('size-4 transition-transform', grupo === s.to && 'rotate-180')} />
                   </button>

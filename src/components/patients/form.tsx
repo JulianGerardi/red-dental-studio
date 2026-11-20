@@ -1,3 +1,4 @@
+import { buttonClasses } from '@/components/ui/button'
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Drawer, DrawerSection, useEnDrawer, type DrawerSize } from '@/components/ui/drawer'
 import { ChevronDown, Calendar, Check, Search, X } from 'lucide-react'
@@ -32,7 +33,7 @@ export function FieldError({ children }: { children?: string }) {
    lugar. */
 export function FieldHint({ children }: { children?: React.ReactNode }) {
   if (!children) return null
-  return <span className="-mt-1 block text-[11.5px] leading-[1.4] text-ink-muted">{children}</span>
+  return <span className="-mt-1 block text-[12px] leading-[1.4] text-ink-muted">{children}</span>
 }
 
 /* Aspecto común de los controles: borde gris, foco azul, error rojo y
@@ -204,7 +205,7 @@ export function SelectField({
             {value && icono?.(value)}
             <span className="min-w-0 truncate text-left">{value ?? placeholder}</span>
           </span>
-          <ChevronDown className={cn('size-4 shrink-0 text-black transition-transform', open && 'rotate-180')} />
+          <ChevronDown className={cn('size-4 shrink-0 text-ink transition-transform', open && 'rotate-180')} />
         </button>
         {open && (
           <div className={cn('motion-safe:animate-[loc-in_120ms_ease-out] absolute left-0 z-30 flex w-full flex-col overflow-hidden rounded-md border border-line bg-white shadow-lg', arriba ? MENU_ARRIBA : MENU_ABAJO)}>
@@ -780,7 +781,7 @@ export function SectionCard({
   if (useEnDrawer()) return <DrawerSection title={title} className={className}>{children}</DrawerSection>
   return (
     <section className={cn('rounded-lg bg-white p-4 shadow-panel sm:p-5', className)}>
-      <h2 className="text-sm font-semibold text-ink">{title}</h2>
+      <h2 className="text-sm font-bold text-ink">{title}</h2>
       <div className="mt-4 flex flex-col gap-4">{children}</div>
     </section>
   )
@@ -850,7 +851,7 @@ export function FormFooter({
       <button
         type="button"
         onClick={onCancel}
-        className="h-9 shrink-0 rounded-md border border-line bg-white px-6 text-[13px] font-medium whitespace-nowrap shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] hover:bg-surface-subtle"
+        className={buttonClasses({ variant: 'secondary', className: 'px-6 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]' })}
       >
         {cancelLabel}
       </button>
@@ -858,7 +859,7 @@ export function FormFooter({
         type="button"
         onClick={onSave}
         disabled={saveDisabled}
-        className="bg-dash-blue hover:bg-dash-blue-hover h-9 shrink-0 rounded-md px-6 text-[13px] font-medium whitespace-nowrap text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        className={buttonClasses({ className: 'px-6' })}
       >
         {saveLabel}
       </button>

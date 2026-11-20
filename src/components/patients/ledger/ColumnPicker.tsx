@@ -25,7 +25,8 @@ export function ColumnPicker<T extends string>({
   return (
     <DropdownMenu>
       {/* Mismo botón que el filtro: azul cuando se cambiaron las columnas de entrada. */}
-      <DropdownMenuTrigger className={filterTriggerClasses(size, cambiado)}>
+      {/* Su md es el de la barra de la tabla: 36, el lg de FilterMenu. */}
+      <DropdownMenuTrigger className={filterTriggerClasses(size === 'sm' ? 'sm' : 'lg', cambiado)}>
         <Columns3 aria-hidden /> Columns
         {cambiado && (
           <span className="bg-dash-blue flex h-4 items-center justify-center rounded-full px-1.5 text-[10px] leading-none font-semibold text-white tabular-nums">

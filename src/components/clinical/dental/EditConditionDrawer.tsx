@@ -73,7 +73,7 @@ export function EditConditionDrawer({
                       {surfaces.map((s) => <Chip key={s}>{s} - {SURFACE_NAMES[s]}</Chip>)}
                     </div>
                   )}
-                  <p className="text-[10px] leading-[1.3] text-ink-muted">Select a surface to update the finding</p>
+                  <p className="text-[11px] leading-[1.3] text-ink-muted">Select a surface to update the finding</p>
                 </div>
               </div>
             </section>

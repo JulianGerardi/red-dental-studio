@@ -18,7 +18,7 @@ import { LocationNumberDrawer } from '@/components/finance/LocationNumberDrawer'
 import { PhoneFields, UnitField } from '@/components/finance/fields'
 import { useFinanzas } from '@/data/finanzasStore'
 import { FORMATOS_RECLAMO, TONO_ESTADO, cantidad, esNorteamerica, type Aseguradora, type PlanSeguro } from '@/data/finanzas'
-import { TABLA_LINK } from '@/lib/estilos'
+import { TABLA_LINK, PADDING_PAGINA } from '@/lib/estilos'
 import { OBLIGATORIO } from '@/lib/validacion'
 
 /* Settings → Billing → Carriers como en red.dev: la lista, Edit Carrier con las pestañas Carrier e Insurance Plans /
@@ -67,7 +67,7 @@ export function SettingsCarriers({ nuevo = false }: { nuevo?: boolean }) {
   ]
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Carriers"
         accion={<Button onClick={() => setCreando(true)}><Plus /> New Carrier</Button>}
@@ -242,7 +242,7 @@ export function SettingsCarrierEdit({ tab, nuevoPlan = false }: { tab: 'carrier'
   const cerrarPlan = () => { setPlan(false); if (nuevoPlan && !guardado.current) navigate(rutaPlanes(c.id), { replace: true }) }
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Edit Carrier"
         accion={<Button onClick={() => setPlan(true)}><Plus /> New Insurance Plan</Button>}

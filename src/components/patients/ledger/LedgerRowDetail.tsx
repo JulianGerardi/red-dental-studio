@@ -287,7 +287,7 @@ export function FilasTransaccion({ m, aplicaciones = APLICACIONES, movimientos =
   )
 }
 
-const BOTON_CREDITO = 'text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-[#c7d9fb] bg-info-bg px-2.5 py-1 text-[12px] font-medium hover:bg-[#e3edff]'
+const BOTON_CREDITO = 'text-dash-blue inline-flex items-center gap-1.5 rounded-md border border-info-line bg-info-bg px-2.5 py-1 text-[12px] font-medium hover:bg-info-strong-bg'
 
 /** El contenido del detalle, sin el marco. Las cuatro transacciones de la historia llevan su lista (título, filas y pie
     con su acción y Read-only summary); Insurance Payment, los datos de siempre. Lo usan el Ledger y la tabla de Billing

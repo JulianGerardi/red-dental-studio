@@ -31,7 +31,7 @@ export function TreatmentPlanPanel() {
                 <span className="text-sm font-medium">{c.date}</span>
                 <span
                   className={cn(
-                    'ml-auto rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide',
+                    'ml-auto rounded-full px-2 py-0.5 text-[11px] font-semibold tracking-wide',
                     c.status === 'PLANNING'
                       ? 'bg-amber-100 text-amber-700'
                       : 'bg-muted text-muted-foreground',
@@ -61,7 +61,7 @@ export function TreatmentPlanPanel() {
 
       <div className="min-w-0 flex-1 rounded-xl border bg-background shadow-sm">
         <div className="flex flex-wrap items-center gap-3 p-5">
-          <h2 className="text-lg font-semibold">Unassigned</h2>
+          <h2 className="text-[15px] font-bold text-ink">Unassigned</h2>
           <div className="flex w-full flex-wrap gap-3 sm:ml-auto sm:w-auto">
             {['New Treatment Group', 'New Alternative Case', 'Move to'].map((l) => (
               <button key={l} disabled
@@ -196,7 +196,7 @@ export function PatientSummaryPanel() {
                 <td className="px-4 py-4">
                   <span className="flex items-center gap-2 font-semibold whitespace-nowrap">
                     <Calendar className="text-muted-foreground size-4" /> {r.date}
-                    {r.latest && <span className="bg-accent text-primary rounded px-1.5 py-0.5 text-[10px] font-medium">Latest</span>}
+                    {r.latest && <span className="bg-accent text-primary rounded px-1.5 py-0.5 text-[11px] font-medium">Latest</span>}
                   </span>
                   <span className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
                     <MapPin className="size-3" /> {r.tz}

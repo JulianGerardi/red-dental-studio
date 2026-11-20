@@ -20,7 +20,7 @@ import {
 import { ICONO_SUELTO } from '@/lib/estilos'
 import { SelectField } from '@/components/patients/form'
 import { Pill, type PillTone } from '@/components/ui/pill'
-import { Button } from '@/components/ui/button'
+import { Button, buttonClasses } from '@/components/ui/button'
 import { Alert } from '@/components/ui/alert'
 import { Drawer, DrawerActions } from '@/components/ui/drawer'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -474,7 +474,7 @@ export function Rail({
                           </span>
                           <span className="min-w-0 flex-1">
                             <span className={cn('block truncate text-[13px] font-medium', on ? 'text-white' : 'text-ink')}>{c.nombre}</span>
-                            <span className={cn('flex items-center gap-1 text-[10px]', on ? 'text-white/80' : 'text-ink-muted')}>
+                            <span className={cn('flex items-center gap-1 text-[11px]', on ? 'text-white/80' : 'text-ink-muted')}>
                               <CalendarDays className="size-2.5" /> Update: {c.creado}
                             </span>
                           </span>
@@ -1328,7 +1328,7 @@ export function TreatmentPlanSection({ casoInicial, estimadoInicial, consentimie
                 <button
                   key={t}
                   onClick={t === 'New Alternative Case' ? () => setMover(true) : () => setGrupo(true)}
-                  className="bg-dash-blue hover:bg-dash-blue-hover flex h-9 shrink-0 items-center gap-1.5 rounded-md px-4 text-[13px] font-semibold text-white transition-colors"
+                  className={buttonClasses()}
                 >
                   <Plus className="size-3.5" /> {t}
                 </button>

@@ -178,11 +178,11 @@ export function Campana({
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={sinLeer ? `Notifications (${sinLeer} unread)` : 'Notifications'}
-        className="relative shrink-0 rounded-md p-1 text-ink-soft transition-colors hover:bg-surface-muted hover:text-black"
+        className="relative shrink-0 rounded-md p-1 text-ink-soft transition-colors hover:bg-surface-muted hover:text-ink"
       >
         <BellDot className="size-5" />
         {sinLeer > 0 && (
-          <span className="bg-dash-blue absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full text-[9px] font-semibold text-white">
+          <span className="bg-dash-blue absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full text-[10px] font-semibold text-white">
             {sinLeer}
           </span>
         )}

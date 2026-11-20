@@ -1,6 +1,6 @@
 import { DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
-import { CirclePlus, X } from 'lucide-react'
+import { X, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ModalShell, SelectField } from '@/components/patients/form'
 import { aviso } from '@/components/ui/toaster'
@@ -162,7 +162,7 @@ export function LocationHoursModal({
           onClick={() => setRangos((p) => [...p, { inicio: '', fin: '' }])}
           className="text-dash-blue -mt-2 flex items-center gap-1.5 self-start text-[13px] font-semibold hover:underline"
         >
-          <CirclePlus className="size-4" /> Add another time range
+          <Plus className="size-4" /> Add another time range
         </button>
 
         <div className="border-t border-line pt-4">

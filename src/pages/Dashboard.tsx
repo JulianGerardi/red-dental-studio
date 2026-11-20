@@ -76,7 +76,7 @@ export function FiltroFecha({
           Desaparece cuando ya estás en hoy: no tendría nada que hacer. */}
       {!sameDay(value, new Date()) && (
         <Button
-          variant="secondary" size="md" onClick={() => onChange(new Date())} title="Go to today"
+          variant="secondary" onClick={() => onChange(new Date())} title="Go to today"
           className="shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]"
         >
           <CalendarClock /> Today
@@ -85,7 +85,7 @@ export function FiltroFecha({
       {/* Las preguntas frecuentes, en Help con el Dashboard abierto (Julián, 2026-10-13). */}
       <Link
         to="/help" aria-label="Frequently asked questions" title="Frequently asked questions"
-        className={buttonClasses({ variant: 'secondary', size: 'md', iconOnly: true, className: 'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]' })}
+        className={buttonClasses({ variant: 'secondary', size: 'lg', iconOnly: true, className: 'shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]' })}
       >
         <ShieldQuestionMark />
       </Link>

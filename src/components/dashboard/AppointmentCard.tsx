@@ -79,7 +79,7 @@ export function AppointmentCard({
       data-appt-card
       className={cn(
         'flex flex-col gap-2.5 p-3',
-        onSelect && 'cursor-pointer transition-colors hover:bg-[#fafbfe]',
+        onSelect && 'cursor-pointer transition-colors hover:bg-page-background',
         /* Mismo anillo que el FAB de Scheduling: outline + offset, con el
            hueco transparente para que se vea el fondo del panel. */
         '[outline-style:solid] outline-[3px] outline-offset-[3px] outline-transparent transition-[outline-color]',

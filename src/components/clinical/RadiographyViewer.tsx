@@ -1,3 +1,4 @@
+import { buttonClasses } from '@/components/ui/button'
 import { Drawer, DrawerActions } from '@/components/ui/drawer'
 import { useState } from 'react'
 import { Chip } from '@/components/ui/chip'
@@ -217,13 +218,13 @@ export function RadiographyViewer({
               azul pleno para el alta. */}
           <button
             onClick={() => aviso.info('Review Exam is not available in this release.')}
-            className="flex h-8 shrink-0 items-center gap-1 rounded-md bg-[#8eaadd] px-2.5 text-[12px] font-semibold text-white transition-colors hover:bg-[#7b9bd6]"
+            className="flex h-8 shrink-0 items-center gap-1 rounded-md bg-info-line-strong px-2.5 text-[12px] font-semibold text-white transition-colors hover:bg-info-line-strong"
           >
             <Plus className="size-3.5" /> Review Exam
           </button>
           <button
             onClick={() => setCondicion(true)}
-            className="bg-dash-blue hover:bg-dash-blue-hover flex h-8 shrink-0 items-center gap-1 rounded-md px-2.5 text-[12px] font-semibold text-white transition-colors"
+            className={buttonClasses({ size: 'md' })}
           >
             <Plus className="size-3.5" /> No Finding
           </button>
@@ -246,7 +247,7 @@ export function RadiographyViewer({
         </div>
         <button
           onClick={() => aviso.info('The full finding list is not available in this release.')}
-          className="flex items-center gap-1 px-4 pb-4 text-[13px] font-medium text-[#8eaadd] hover:underline"
+          className="flex items-center gap-1 px-4 pb-4 text-[13px] font-medium text-info-line-strong hover:underline"
         >
           All result ({hallazgos.length}) <ChevronDown className="size-3.5" />
         </button>

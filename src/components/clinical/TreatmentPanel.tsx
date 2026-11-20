@@ -51,7 +51,7 @@ export function QuestionBlock({
             {pregunta.texto}
             {pregunta.opcional && <span className="font-normal text-ink-muted"> (optional)</span>}
           </p>
-          <p className="text-[9px] font-semibold tracking-wide text-ink-muted uppercase">{TIPO_PREGUNTA[pregunta.tipo]}</p>
+          <p className="text-[10px] font-semibold tracking-wide text-ink-muted uppercase">{TIPO_PREGUNTA[pregunta.tipo]}</p>
         </div>
         {pregunta.tipo === 'text' ? (
           <textarea
@@ -108,9 +108,9 @@ export function WorkflowCard({
       <button type="button" onClick={onElegir} aria-pressed={seleccionado} className="min-w-0 flex-1 text-left">
         <span className="flex items-center gap-2">
           <span className="truncate text-[13px] font-medium">{wf.nombre}</span>
-          <span className={cn('flex shrink-0 items-center gap-1 text-[10px]', suave)}><IconoWorkflow className="size-3" aria-hidden />{wf.categoria}</span>
+          <span className={cn('flex shrink-0 items-center gap-1 text-[11px]', suave)}><IconoWorkflow className="size-3" aria-hidden />{wf.categoria}</span>
         </span>
-        <span className={cn('mt-0.5 flex items-center gap-1 text-[10px]', suave)}><CalendarDays className="size-3" aria-hidden />{wf.fecha}</span>
+        <span className={cn('mt-0.5 flex items-center gap-1 text-[11px]', suave)}><CalendarDays className="size-3" aria-hidden />{wf.fecha}</span>
       </button>
       {completo && (
         <ConAyuda texto="Completed">
@@ -253,7 +253,7 @@ export function TreatmentPlansCard({ onTreatmentPlan }: { onTreatmentPlan?: () =
                           <Pill tone={TONO_PROCEDIMIENTO[p.estado]} size="sm">{p.estado}</Pill>
                           <span className="min-w-0 truncate"><span className="font-semibold">{p.codigo}:</span> {p.nombre}</span>
                         </p>
-                        <p className="mt-1 flex flex-wrap gap-x-3 text-[10px] text-ink-muted">
+                        <p className="mt-1 flex flex-wrap gap-x-3 text-[11px] text-ink-muted">
                           <span><span className="font-semibold text-ink">Tooth:</span> {p.pieza}</span>
                           <span><span className="font-semibold text-ink">Surface:</span> {p.superficie}</span>
                           <span><span className="font-semibold text-ink">Provider:</span> {p.proveedor}</span>

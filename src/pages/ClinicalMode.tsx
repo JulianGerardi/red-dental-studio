@@ -143,6 +143,8 @@ export default function ClinicalMode() {
     <NavegacionClinica.Provider value={ir}>
     <div className="bg-page-background min-h-svh p-4 sm:p-[30px] lg:px-12">
       <div className="mx-auto w-full max-w-[1440px]">
+      {/* Sin título visible: el h1 es para lectores de pantalla (auditoría de normalización, figma/README.md). */}
+      <h1 className="sr-only">Clinical Mode · {patient.first} {patient.last}</h1>
       <ClinicalTopBar
         volverA={`/patients/${patient.id}`}
         encuentro={encuentro}

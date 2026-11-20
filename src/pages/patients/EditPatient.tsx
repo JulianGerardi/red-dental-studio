@@ -22,7 +22,7 @@ export function Section({ title, children }: { title: string; children: React.Re
   if (useEnDrawer()) return <DrawerSection title={title}>{children}</DrawerSection>
   return (
     <section className={cn(TARJETA_PANEL, 'p-6')}>
-      <h2 className="text-sm font-semibold text-ink">{title}</h2>
+      <h2 className="text-sm font-bold text-ink">{title}</h2>
       <div className="mt-4 flex flex-col gap-4">{children}</div>
     </section>
   )
@@ -74,7 +74,7 @@ export default function EditPatientPage({ pacienteId = 'john-smith' }: { pacient
               <Pill tone={estado === 'Active' ? 'success' : 'neutral'} className="mt-1">{estado}</Pill>
             </span>
           </div>
-          <h3 className="mt-5 mb-4 text-sm font-bold text-ink">General Information</h3>
+          <h2 className="mt-5 mb-4 text-sm font-bold text-ink">General Information</h2>
           <CamposGeneral {...comunes} portalVinculado={portalVinculado} />
         </Card>
         <Card title="Contact Information"><CamposContacto {...comunes} /></Card>

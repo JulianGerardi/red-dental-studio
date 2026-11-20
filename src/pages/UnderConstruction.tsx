@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { buttonClasses } from '@/components/ui/button'
 
 /* Compartida por /billing, /message, /contacts y /documents. */
 export default function UnderConstruction() {
@@ -69,13 +70,13 @@ export default function UnderConstruction() {
         <line x1="10" y1="43" x2="450" y2="43" stroke="hsl(0 0% 80%)" strokeWidth="3.5" />
       </svg>
 
-      <h1 className="text-primary mt-10 text-2xl font-bold">Page under construction</h1>
-      <p className="text-muted-foreground mt-4 max-w-sm">
+      <h1 className="mt-10 text-2xl font-bold text-ink">Page under construction</h1>
+      <p className="mt-4 max-w-sm text-sm text-ink-muted">
         We apologize and are working to resolve the problem. Please try again later.
       </p>
       <Link
         to="/"
-        className="bg-primary text-primary-foreground hover:bg-primary-hover mt-6 rounded-full px-6 py-2.5 text-sm font-medium"
+        className={buttonClasses({ className: 'mt-6' })}
       >
         Go to Homepage
       </Link>

@@ -1,6 +1,7 @@
+import { PageTitle } from '@/components/ui/page-title'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { CirclePlus, CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye, Trash2 } from 'lucide-react'
+import { CreditCard, PersonStanding, ShieldHalf, Hospital, AArrowUp, Eye, Trash2, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { PatientSidePanel } from '@/components/patients/PatientSidePanel'
@@ -185,7 +186,7 @@ export default function Insurance() {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-xl leading-[1.3] font-semibold text-ink">Insurance Plans</h1>
+            <PageTitle>Insurance Plans</PageTitle>
             <Switch on={historial} onChange={setHistorial} label="Show plan history" />
           </div>
 
@@ -211,7 +212,7 @@ export default function Insurance() {
               {/* Suscripción + datos del paciente */}
               <div className="grid gap-4 lg:grid-cols-2">
                 <section className={cn(TARJETA_PANEL, 'flex flex-col p-4 sm:p-5')}>
-                  <h2 className="text-sm font-semibold text-ink">Subscription Information</h2>
+                  <h2 className="text-sm font-bold text-ink">Subscription Information</h2>
                   <p className="mt-0.5 text-[11px] text-ink-muted">
                     Select an existing subscription or create new one.
                   </p>
@@ -233,7 +234,7 @@ export default function Insurance() {
                     onClick={() => setModal('nueva')}
                     className="text-dash-blue mt-2 flex items-center gap-1.5 self-end text-[13px] font-semibold hover:underline"
                   >
-                    <CirclePlus className="size-4" /> Add New Subscription
+                    <Plus className="size-4" /> Add New Subscription
                   </button>
 
                   {/* Sin elegir: "Select a subscription" y guiones. Elegida: el plan y su estado. */}
@@ -263,7 +264,7 @@ export default function Insurance() {
                 </section>
 
                 <section className={cn(TARJETA_PANEL, 'flex flex-col p-4 sm:p-5')}>
-                  <h2 className="text-sm font-semibold text-ink">Patient Information</h2>
+                  <h2 className="text-sm font-bold text-ink">Patient Information</h2>
 
                   <SelectField
                     className="mt-4" label="Relationship to Subscriber" required options={RELACIONES}
@@ -272,7 +273,7 @@ export default function Insurance() {
 
                   {/* El orden lo calcula el sistema (ordenSiguiente): sólo se muestra. Antes había, además, un select con el
                       mismo rótulo (anomalías 62 y 63); red.dev ya no lo tiene. */}
-                  <div className="mt-4 flex items-center gap-2.5 rounded-md bg-[#eff4ff] px-3 py-2">
+                  <div className="mt-4 flex items-center gap-2.5 rounded-md bg-info-bg px-3 py-2">
                     <CreditCard className="size-4 shrink-0 text-ink-muted" strokeWidth={1.8} />
                     <span className="leading-tight">
                       <span className="block text-[11px] text-ink-faint">Coordination Order</span>

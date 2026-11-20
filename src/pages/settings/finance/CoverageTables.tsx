@@ -12,7 +12,7 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { MasterList, type ItemMaestro } from '@/components/finance/MasterList'
 import { RangesTable, rangoCompleto, rangoVacio } from '@/components/finance/RangesTable'
 import { ExceptionsDrawer } from '@/components/finance/ExceptionsDrawer'
-import { TARJETA_PANEL } from '@/lib/estilos'
+import { TARJETA_PANEL, PADDING_PAGINA } from '@/lib/estilos'
 import { useFinanzas } from '@/data/finanzasStore'
 import { TIPOS_COBERTURA, idNuevo, type TablaCobertura, type TipoCobertura } from '@/data/finanzas'
 import { OBLIGATORIO } from '@/lib/validacion'
@@ -126,7 +126,7 @@ export function SettingsCoverageTables() {
   if (tableId && !elegida) return <Navigate to={LISTA_COBERTURAS} replace />
 
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader
         titulo="Search Coverage Table"
         accion={<Button onClick={() => navigate(`${LISTA_COBERTURAS}/new`)}><Plus /> New Coverage Table</Button>}
@@ -149,7 +149,7 @@ export function SettingsCoverageTables() {
 
 export function SettingsNewCoverageTable() {
   return (
-    <div className="px-4 py-6 sm:px-8">
+    <div className={PADDING_PAGINA}>
       <SettingsPageHeader titulo="Coverage Table" />
       <div className={cn(TARJETA_PANEL, 'mt-5 p-4 sm:p-5')}>
         <CoverageTableEditor />
