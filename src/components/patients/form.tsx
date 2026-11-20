@@ -825,7 +825,7 @@ export function ModalShell({
       tabs={tabs}
       size={tamanoDe(width)}
       footer={actions ?? footer}
-      footerClassName={actions ? undefined : '[&_[data-form-footer]]:w-full [&_[data-form-footer]_button]:flex-1'}
+      footerClassName={actions ? undefined : '[&_[data-form-footer]]:w-full [&_[data-form-footer]_button]:flex-1 [&_[data-form-footer]_button]:h-9'}
       aside={aside}
     >
       {children}
@@ -836,6 +836,7 @@ export function ModalShell({
 /* Cancel y Save van SIEMPRE en la misma fila, uno al lado del otro. El par
    trae su propio contenedor en vez de depender del flex de quien lo use: así
    no hay contenedor angosto, columna ni wrap que los separe. */
+/* En una pantalla, 32px como los botones del Ledger y Billing; en un drawer, 36px como los demás drawers (ModalShell). */
 export function FormFooter({
   onCancel, onSave, cancelLabel = 'Cancel', saveLabel = 'Save', saveDisabled,
 }: {
@@ -851,7 +852,7 @@ export function FormFooter({
       <button
         type="button"
         onClick={onCancel}
-        className={buttonClasses({ variant: 'secondary', className: 'px-6 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]' })}
+        className={buttonClasses({ variant: 'secondary', size: 'md', className: 'px-6 shadow-[0_1px_2px_0_rgb(0_0_0/0.05)]' })}
       >
         {cancelLabel}
       </button>
@@ -859,7 +860,7 @@ export function FormFooter({
         type="button"
         onClick={onSave}
         disabled={saveDisabled}
-        className={buttonClasses({ className: 'px-6' })}
+        className={buttonClasses({ size: 'md', className: 'px-6' })}
       >
         {saveLabel}
       </button>

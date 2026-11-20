@@ -247,7 +247,7 @@ export function SettingsCarrierEdit({ tab, nuevoPlan = false }: { tab: 'carrier'
         titulo="Edit carrier"
         accion={<Button size="md" onClick={() => setPlan(true)}><Plus /> New insurance plan</Button>}
       />
-      <Tabs
+      <Tabs size="sm"
         className="mt-5" aria-label="Carrier sections" value={actual}
         tabs={['Information', { value: 'Insurance plans / employers', count: planes.filter((p) => p.aseguradoraId === c.id).length }]}
         onChange={(t) => navigate(t === 'Information' ? rutaCarrier(c.id) : rutaPlanes(c.id))}

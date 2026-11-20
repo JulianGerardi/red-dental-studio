@@ -15,7 +15,7 @@ type Estado = 'generando' | 'borrador' | 'editado' | 'aplicado' | 'vacio'
 
 const ESTADO: Record<Estado, { texto: string; punto: string }> = {
   generando: { texto: 'Generating narrative from the answered questions…', punto: 'bg-dash-blue' },
-  borrador: { texto: 'Original Clinical Draft', punto: 'bg-status-ok' },
+  borrador: { texto: 'Original clinical draft', punto: 'bg-status-ok' },
   editado: { texto: 'Unsaved changes', punto: 'bg-warn-fg' },
   aplicado: { texto: 'Edited narrative', punto: 'bg-status-ok' },
   vacio: { texto: 'No answered questions to summarize', punto: 'bg-ink-faint' },

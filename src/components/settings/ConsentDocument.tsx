@@ -225,14 +225,14 @@ export function ConsentDocument({ titulo, procedimiento, naturaleza, riesgos, te
 
       {firmas ? (
         <section aria-label="Signatures" className="mt-auto grid gap-6 pt-7 sm:grid-cols-2 sm:gap-10">
-          <LineaFirma rol="Patient / Legal Guardian" nombre={paciente} firma={firmas.paciente} />
+          <LineaFirma rol="Patient / legal guardian" nombre={paciente} firma={firmas.paciente} />
           <LineaFirma rol="Provider" nombre={proveedor} firma={firmas.proveedor} />
         </section>
       ) : (
         <div className="mt-auto grid grid-cols-[1fr_88px] gap-4 pt-7 text-[11px] text-ink-faint">
           <div className="relative border-t border-ink-medium pt-1">
             <X aria-hidden className="absolute -top-3.5 left-0 size-3 text-ink-faint" />
-            Patient / Legal Guardian
+            Patient / legal guardian
           </div>
           <div className="border-t border-ink-medium pt-1">Date</div>
         </div>

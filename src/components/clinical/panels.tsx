@@ -283,10 +283,10 @@ export function PrescriptionPanel() {
 export function ReferralPanel() {
   return (
     <div>
-      <RecordToolbar newLabel="New Referral" />
+      <RecordToolbar newLabel="New referral" />
       <div className="space-y-3">
         {REFERRALS.map((r, i) => (
-          <RecordRow key={i} provider={r.provider} providerRole="Referring Provider" status={r.status}
+          <RecordRow key={i} provider={r.provider} providerRole="Referring provider" status={r.status}
             created={r.created} updated={r.updated} expires={r.expires}>
             <span className="leading-tight">
               <span className="block text-sm">

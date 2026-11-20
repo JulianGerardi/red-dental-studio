@@ -613,6 +613,7 @@ Reglas que quedan:
    Relationship, los pagos del Ledger y de Billing, Export CSV, Mark all as read, New appointment) y la barra de abajo
    (buscador, Search, filtro, fecha, Today, Status legend, View) van en `md`, la misma altura que las pestañas de
    pantalla. `PageTitle` mide 32 de alto (`min-h-8`): con o sin botón al lado, el título cae a la misma altura.
+   Las pestañas de las pantallas de edición de Settings van en `sm` y `FormFooter` en `md` (#175, settings-accounts.md).
    Adentro de una card, todo en `sm`: el buscador de Today Appointments y Recent Patients, Find Patient de Billing, el de
    Templates en Consents, los filtros del Dashboard. Los botones dentro de un formulario (Save y Cancel del pie, Bulk
    Edit, Add Range, Deactivate template) siguen en `lg`, a la altura de los campos (36). Las pestañas siguen su regla

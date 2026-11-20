@@ -1,23 +1,21 @@
 import { forwardRef, Fragment, type ButtonHTMLAttributes } from 'react'
 import { ListFilter, Search, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { PillTone } from '@/components/ui/pill'
 import {
   DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
 /* El filtro de la app, uno solo para todas las pantallas (antes había un ícono suelto en el Dashboard, un select nativo en
    Accounts, un desplegable propio en la Problem List y un popover en Workflows). Mismo botón -ícono, "Filter" y cuántos
-   filtros hay aplicados- y mismo menú: grupos de varias opciones (casillas) o de una (radio), con cantidad, color o ícono
-   por opción, búsqueda opcional y Clear all. Se aplica al tocar, sin botón Apply. Ver Elements / Filter. */
+   filtros hay aplicados- y mismo menú: grupos de varias opciones (casillas) o de una (radio), con cantidad o ícono por
+   opción, búsqueda opcional y Clear all. Sin puntos de color: el estado se lee por el nombre (Julián, 2026-11-20). Se
+   aplica al tocar, sin botón Apply. Ver Elements / Filter. */
 
 export type FilterOption = string | {
   value: string
   label?: string
   /** Cuántas filas tiene esa opción. */
   count?: number
-  /** Punto del color del estado (el mismo de su pill). */
-  tone?: PillTone
   icon?: LucideIcon
   disabled?: boolean
 }
@@ -27,10 +25,6 @@ export type FilterGroup =
   | { title?: string; type: 'single'; options: FilterOption[]; value: string; onChange: (v: string) => void; /** El valor de "sin filtro" (All, o el que abre por defecto): no cuenta y Clear all vuelve a él. */ defaultValue?: string }
 
 export type FilterSearch = { label: string; placeholder?: string; value: string; onChange: (v: string) => void }
-
-const PUNTO: Record<PillTone, string> = {
-  success: 'bg-dash-ok-fg', info: 'bg-dash-busy-fg', warning: 'bg-warn-fg', danger: 'bg-dash-bad-fg', neutral: 'bg-ink-faint', purple: 'bg-purple-fg',
-}
 
 /* Mismos nombres y altos que Button (sm 28 · md 32 · lg 36): antes "md" medía 36 acá y 32 en Button, y un filtro "md" no
    quedaba alineado con un botón "md". md es el default: es el de la barra de una página (auditoría de normalización). */
@@ -72,14 +66,13 @@ FilterTrigger.displayName = 'FilterTrigger'
 
 const opcion = (o: FilterOption) => (typeof o === 'string' ? { value: o } : o)
 
-/* Lo que va adentro de cada opción: punto o ícono, el nombre y la cantidad. */
-export function FilterOptionLabel({ o, reservar }: { o: Exclude<FilterOption, string>; /** Otras opciones del grupo llevan punto o ícono: deja el lugar para que los nombres queden alineados. */ reservar?: 'punto' | 'icono' }) {
+/* Lo que va adentro de cada opción: ícono, el nombre y la cantidad. */
+export function FilterOptionLabel({ o, reservar }: { o: Exclude<FilterOption, string>; /** Otras opciones del grupo llevan ícono: deja el lugar para que los nombres queden alineados. */ reservar?: boolean }) {
   const Icono = o.icon
   return (
     <>
-      {o.tone ? <span aria-hidden className={cn('size-2 shrink-0 rounded-full', PUNTO[o.tone])} />
-        : Icono ? <Icono className="size-3.5 shrink-0 text-ink-muted" aria-hidden />
-        : reservar ? <span aria-hidden className={cn('shrink-0', reservar === 'punto' ? 'size-2' : 'size-3.5')} /> : null}
+      {Icono ? <Icono className="size-3.5 shrink-0 text-ink-muted" aria-hidden />
+        : reservar ? <span aria-hidden className="size-3.5 shrink-0" /> : null}
       <span className="min-w-0 flex-1 truncate">{o.label ?? o.value}</span>
       {o.count !== undefined && <span className={cn('text-[11px] tabular-nums', o.count ? 'text-ink-muted' : 'text-ink-faint')}>{o.count}</span>}
     </>
@@ -148,7 +141,7 @@ export function FilterMenu({
         )}
         {grupos.map((g, i) => {
           const opciones = g.options.map(opcion)
-          const reservar = opciones.some((o) => o.tone) ? 'punto' : opciones.some((o) => o.icon) ? 'icono' : undefined
+          const reservar = opciones.some((o) => o.icon)
           return (
           <Fragment key={i}>
             <DropdownMenuSeparator />

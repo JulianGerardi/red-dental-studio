@@ -13,7 +13,7 @@ import { OBLIGATORIO } from '@/lib/validacion'
    diseño aclara que esa parte no se puede editar.
 
    Abre con lo que la relación ya tiene (roles y vínculo). Si se destilda Guardian y se guarda, antes de revocar el acceso
-   se pregunta con "Remove Guardian access" (CON-3958, 2026-10-22; modulos/relationships.md). */
+   se pregunta con "Remove guardian access" (CON-3958, 2026-10-22; modulos/relationships.md). */
 export type CambiosRelacion = { guardian: boolean; guarantor: boolean; rel: string }
 
 export function EditRelationshipModal({

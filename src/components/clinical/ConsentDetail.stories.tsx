@@ -116,7 +116,7 @@ export const States: Story = {
 export const PatientSignature: Story = { parameters: enIframe, render: () => <FirmaPaciente nombre="John Smith" descripcion="Procedure Consent - D2391 Resin-based composite – one surface, posterior" onClose={nada} onFirmar={nada} /> }
 export const ProviderSignature: Story = { parameters: enIframe, render: () => <FirmaProveedor nombre="Dr. Perez Martinez" onClose={nada} onFirmar={nada} /> }
 /* El botón de guardar disabled hasta que haya algo que firmar. */
-export const SignatureWindowDisabled: Story = { parameters: enIframe, render: () => <VentanaFirma titulo="Patient signature" descripcion="Sign to accept this consent." guardar="Adopt and Sign" guardarDeshabilitado onClose={nada} onGuardar={nada}><p className="text-[13px] text-ink-muted">Draw or adopt a signature to continue.</p></VentanaFirma> }
+export const SignatureWindowDisabled: Story = { parameters: enIframe, render: () => <VentanaFirma titulo="Patient signature" descripcion="Sign to accept this consent." guardar="Adopt and sign" guardarDeshabilitado onClose={nada} onGuardar={nada}><p className="text-[13px] text-ink-muted">Draw or adopt a signature to continue.</p></VentanaFirma> }
 export const ViewConsent: Story = { parameters: enIframe, render: () => <VistaConsentimiento procedimiento={con('Requested')} onClose={nada} /> }
 
 /* ── Specs ─────────────────────────────────────────────────────────── */

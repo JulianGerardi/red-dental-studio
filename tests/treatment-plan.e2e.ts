@@ -170,7 +170,7 @@ test('la columna Consent abre el consentimiento y ahí firman paciente y provide
   await screen.getByRole('button', /Patient signature/).tap()
   const paciente = screen.getByRole('dialog', 'Patient signature')
   await expect(paciente.getByLabel('Initials')).toHaveValue('JP')
-  await paciente.getByRole('button', /Adopt and Sign/).tap()
+  await paciente.getByRole('button', /Adopt and sign/).tap()
   await expect(screen.getByText(/Patient signed/)).toBeVisible()
 
   await screen.getByRole('button', /Provider signature/).tap()

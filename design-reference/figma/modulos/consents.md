@@ -214,3 +214,10 @@ documentación:
 1. El selector de procedimientos de la plantilla decía *At least one procedure must be listed.*; ahora dice *This field
    is required.* como el resto (`OBLIGATORIO`, regla en [figma/README.md › Validación](../README.md)). El aviso de
    arriba (*All required fields marked with (\*)…*) no cambia.
+
+## Filtro de estado como Accounts (2026-11-20)
+
+Pedido de Julián de un solo diseño de filtro (detalle en `settings-accounts.md`, misma fecha). Las pestañas **Active /
+Inactive / System / All** de la lista de templates pasan al `FilterMenu`, al lado del buscador: grupo *Status* de una
+opción, All primero como en Accounts, sin puntos de color y con la cantidad de cada uno. Sigue arrancando en Active
+(no cuenta como filtro aplicado; Clear all vuelve a Active). `ListaTemplates` suma `todos` para las cantidades.

@@ -6,7 +6,7 @@ import { PatientsTable, type PatientRow } from '@/components/patients/PatientsTa
 import { PatientCard } from '@/components/patients/PatientCard'
 import { usePatients } from '@/data/patientsStore'
 import { PageTitle } from '@/components/ui/page-title'
-import { SearchButton } from '@/components/ui/search-button'
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ShowMore } from '@/components/ui/show-more'
@@ -50,7 +50,6 @@ export default function Patients() {
   const [buscarTurno, setBuscarTurno] = useState('')
   const [buscarReciente, setBuscarReciente] = useState('')
   const [turnoEditando, setTurnoEditando] = useState<DatosTurno | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   /* Alto de la columna de la tabla, para que la barra lateral termine a esa misma altura (más abajo). Se mide ésta,
      no al revés: si en cambio las dos columnas se estiran entre sí (`items-stretch`), cuántas filas entran en la
@@ -121,8 +120,7 @@ export default function Patients() {
           </div>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <SearchInput ref={inputRef} value={query} onChange={setQuery} placeholder="Search patients by name" data-tour="pat-search" />
-            <SearchButton onClick={() => inputRef.current?.focus()} />
+            <SettingsSearch value={query} onChange={setQuery} placeholder="Search patients by name" tour="pat-search" />
           </div>
 
           <div className="mt-4">

@@ -151,7 +151,7 @@ export function ViewFiltersPanel({
   const nombreDe = (lista: OpcionVista[], id: string) => lista.find((o) => o.id === id)?.nombre
   const nProviders = vista.provider === TODOS ? providers.length : 1
   const nSalas = vista.sala === TODOS ? salas.length : 1
-  /* Si la búsqueda esconde al provider elegido, el Tab entra por "Select all Providers". */
+  /* Si la búsqueda esconde al provider elegido, el Tab entra por "Select all providers". */
   const providerEnfocable = visibles.some((p) => p.id === vista.provider) ? vista.provider : TODOS
 
   const guardar = () => {
@@ -210,7 +210,7 @@ export function ViewFiltersPanel({
             </label>
             <GrupoFiltro etiqueta="Providers" className="mt-3 flex flex-col gap-1">
               <OpcionFiltro
-                nombre="Select all Providers"
+                nombre="Select all providers"
                 on={vista.provider === TODOS}
                 enfocable={providerEnfocable === TODOS}
                 onElegir={() => elegir('provider')(TODOS)}

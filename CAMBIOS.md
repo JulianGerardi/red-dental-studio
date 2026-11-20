@@ -5,6 +5,31 @@ Lo último arriba. Cada PR suma su entrada: qué cambió y qué tiene que saber 
 
 ## 2026-11-20
 
+### Settings con los tamaños del Ledger y Billing ([#175](https://github.com/JulianGerardi/red-dental-studio/pull/175))
+- **Edit Account › Subscription:** *Subscription Summary* y *Subscription History* pasan de 16 a 15px bold, como los
+  títulos de Billing. Las cards ya eran `ui/stat-card`, iguales a las del Ledger y Billing.
+- **Pestañas de las pantallas de edición de Settings** (Account, Location, Employee, Carriers, Insurance
+  Plan): `Tabs size="sm"` (28px).
+- **`FormFooter`:** Cancel / Save de 36 a 32px en una pantalla (Settings, Edit Patient, Insurance). En un drawer siguen en
+  36px, como `DrawerActions`: lo fija `ModalShell` con `[&_[data-form-footer]_button]:h-9`.
+- Decisiones en `modulos/settings-accounts.md` (2026-11-20).
+
+### Filtros: un solo diseño, el de Accounts, y sin puntos de color ([#174](https://github.com/JulianGerardi/red-dental-studio/pull/174))
+- **Patrón:** buscador → Search → Filter.
+  - El buscador es `settings/SettingsSearch` (36 px): Accounts, Locations, Employees, Ledger Options y Patients ya no lo
+    escriben a mano.
+  - El Filter es `ui/filter-menu`.
+- **Pestañas y select pasan al Filter:**
+  - **Ledger Options:** grupos *View* y *Type*.
+  - **Billing:** *Type*, `sm`, al lado de Columns.
+  - **Consents:** *Status*, con Active por defecto.
+- **Para el dev:**
+  - `FilterOption` ya no acepta `tone`: ningún filtro lleva puntos de color.
+  - `SettingsSearch` suma `tour`.
+  - `ActividadReciente` suma `todas` y `ListaTemplates` suma `todos`, para las cantidades.
+  - Las pestañas que cambian de vista y el `DateFilter` no cambian.
+  - Decisiones en `modulos/settings-accounts.md` (2026-11-20).
+
 ### Ledger: sin Export statement en la barra de la tabla ([#173](https://github.com/JulianGerardi/red-dental-studio/pull/173))
 - Sale el botón de descargar (*Export statement*) de la barra de la tabla del Ledger: no está en red.dev (en Billing ya
   había salido). La barra queda con Expand / Collapse all y Columns. Decisión en `modulos/ledger.md` (2026-11-20).

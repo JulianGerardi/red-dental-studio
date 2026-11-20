@@ -89,7 +89,7 @@ export function SettingsAccount() {
     <div className={PADDING_PAGINA}>
       <PageTitle>Edit account</PageTitle>
 
-      <Tabs className="mt-4" aria-label="Account sections" tabs={TABS} value={tab} onChange={setTab} />
+      <Tabs size="sm" className="mt-4" aria-label="Account sections" tabs={TABS} value={tab} onChange={setTab} />
 
       <div className="mt-4 flex flex-col gap-4">
         {tab === 'Information' && (
@@ -138,7 +138,7 @@ export function SettingsAccount() {
         {tab === 'Subscription' && (
           <>
             <div>
-              <h2 className="text-base font-bold text-ink">Subscription summary</h2>
+              <h2 className="text-[15px] font-bold text-ink">Subscription summary</h2>
               {/* Las métricas con la card de la app (`ui/stat-card`), como el Ledger y Billing (ledger.md, 2026-11-19). */}
               <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
                 <StatCard enFila label="Current plan" value={cuenta ? cuenta.plan : 'Prueba Red'} caption="Plan currently assigned to the account" />

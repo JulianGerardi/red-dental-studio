@@ -13,7 +13,7 @@ const meta = {
         component: [
           'Cambiar cómo se relaciona una persona con el paciente: sus roles (Guardian y/o Guarantor) y el vínculo. Abre con lo que la relación ya tiene.',
           '',
-          '**Quitar Guardian revoca acceso** (CON-3958, 2026-10-22): si se destilda Guardian y se guarda, antes aparece *Remove Guardian access* —"[Persona] will no longer have guardian access to [Paciente]"— y, si era su último vínculo de guardián, que se le desactiva el usuario de este consultorio. Cancel vuelve al formulario; Remove Guardian guarda.',
+          '**Quitar Guardian revoca acceso** (CON-3958, 2026-10-22): si se destilda Guardian y se guarda, antes aparece *Remove guardian access* —"[Persona] will no longer have guardian access to [Paciente]"— y, si era su último vínculo de guardián, que se le desactiva el usuario de este consultorio. Cancel vuelve al formulario; Remove Guardian guarda.',
           '',
           '**Probalo:** en *Playground* destildá Guardian y apretá Save.',
         ].join('\n'),
@@ -39,7 +39,7 @@ export const WithValidationErrors: Story = {
 
 /* Guardian destildado y Save: pide confirmar antes de revocar el acceso. */
 export const RemoveGuardianConfirm: Story = {
-  name: 'Remove Guardian access',
+  name: 'Remove guardian access',
   args: { inicial: { guardian: true, guarantor: true, rel: 'Parent' } },
   play: secuencia(pulsarRol('checkbox', /^Guardian$/), pulsar(/^save$/i), esperar(/will no longer have guardian access/i)),
 }

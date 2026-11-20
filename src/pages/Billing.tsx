@@ -19,6 +19,7 @@ import { Pill, type PillTone } from '@/components/ui/pill'
 import { AmountCell, DataTable, TextCell, type DataTableColumn } from '@/components/ui/data-table'
 import { CONTENEDOR_PAGINA, ICONO_SUELTO, TARJETA_INTERNA } from '@/lib/estilos'
 import { Tabs } from '@/components/ui/tabs'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { ShowMore } from '@/components/ui/show-more'
 import { Panel } from '@/components/dashboard/primitives'
 import { StatCard } from '@/components/ui/stat-card'
@@ -174,11 +175,11 @@ export function PacienteElegido({ paciente, onCerrar }: { paciente: PacienteBill
   )
 }
 
-/* Recent Billing Activity. Sin paciente: toda la clínica, con las Tabs de tipo y filas que eligen al paciente. Con uno:
+/* Recent Billing Activity. Sin paciente: toda la clínica, con el Filter de tipo y filas que eligen al paciente. Con uno:
    su nombre en el título, Patient / Guarantor View y sólo sus movimientos, sin saldos ni columna Balance (son de la cuenta de todas las locations); cada fila se despliega
    con el detalle del Ledger según el tipo (billing.md y ledger.md, 2026-10-14). */
 export function ActividadReciente({
-  filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, onElegir, className, abierta,
+  filas, sinActividad, filtro, onFiltro, paciente, vista, onVista, onElegir, className, abierta, todas,
 }: {
   /** Las filas ya filtradas: por tipo en el resumen, por paciente o garante con uno elegido. */
   filas: (Movimiento & { saldo: number })[]
@@ -196,10 +197,12 @@ export function ActividadReciente({
   className?: string
   /** Con paciente: la fila que arranca desplegada (Storybook). */
   abierta?: string
+  /** Toda la actividad, para la cantidad de cada opción del filtro. */
+  todas?: Movimiento[]
 }) {
   /* View full record y la referencia de una aplicación abren la transacción en el registro de sólo lectura del Ledger. */
   const [enModal, setEnModal] = useState<(Movimiento & { saldo: number }) | null>(null)
-  /* Columns va en el encabezado, al lado de las Tabs, como red.dev: la tabla recibe las ocultas de afuera. */
+  /* Columns va en el encabezado, al lado del Filter, como red.dev: la tabla recibe las ocultas de afuera. */
   const [ocultas, setOcultas] = useState<string[]>([])
   const columnas = columnasDe(!!paciente && vista === 'Patient view')
   const elegibles = columnas.filter((c) => !c.locked)
@@ -212,7 +215,17 @@ export function ActividadReciente({
         <div className="flex flex-wrap items-center gap-2">
           {paciente
             ? <Tabs size="sm" aria-label="Whose activity" tabs={VISTAS_PACIENTE} value={vista} onChange={onVista} />
-            : <Tabs size="sm" aria-label="Filter activity" tabs={FILTROS_ACTIVIDAD} value={filtro} onChange={onFiltro} />}
+            /* El tipo se filtra con el Filter de la app, como Accounts; antes era una tira de pestañas (billing.md, 2026-11-20). */
+            : (
+              <FilterMenu
+                size="sm"
+                label="Filter activity"
+                groups={[{
+                  type: 'single', title: 'Type', defaultValue: 'All', value: filtro, onChange: (v) => onFiltro(v as FiltroActividad),
+                  options: FILTROS_ACTIVIDAD.map((f) => ({ value: f, count: todas?.filter((m) => coincideFiltro(m, f)).length })),
+                }]}
+              />
+            )}
           <ColumnPicker
             size="sm"
             columnas={elegibles.map((c) => ({ id: c.key, label: c.header }))}
@@ -420,6 +433,7 @@ export default function Billing({ inicial }: {
             sinActividad={actividad.length === 0}
             filtro={filtro}
             onFiltro={setFiltro}
+            todas={actividad}
             paciente={pacienteSeleccionado}
             vista={vista}
             onVista={setVista}

@@ -215,7 +215,7 @@ export function Firmado({ rol, fecha }: { rol: Firmante; fecha: string }) {
 }
 
 const iniciales = (nombre: string) => nombre.split(/\s+/).filter(Boolean).map((x) => x[0]!.toUpperCase()).join('').slice(0, 3)
-const LEGAL = 'By selecting Adopt and Sign, I agree that the signature and initials are the electronic representation of my signature and initials for all purposes when I (or my agent) use them in documents, including legally binding contracts.'
+const LEGAL = 'By selecting Adopt and sign, I agree that the signature and initials are the electronic representation of my signature and initials for all purposes when I (or my agent) use them in documents, including legally binding contracts.'
 
 /* Las firmas se hacen en un pop up: en red.dev el botón lleva a un portal para firmar, acá es una ventana encima del
    consentimiento (no un drawer). Ver clinical-mode.md (2026-11-02). */
@@ -275,7 +275,7 @@ export function FirmaPaciente({ nombre, descripcion, onClose, onFirmar }: {
     <VentanaFirma
       titulo="Patient signature"
       descripcion={descripcion}
-      guardar="Adopt and Sign"
+      guardar="Adopt and sign"
       guardarDeshabilitado={!!falta}
       onClose={onClose}
       onGuardar={() => onFirmar({ ...(modo === 'Draw' ? { imagen: dibujada ?? undefined } : { texto: impreso.trim() }), iniciales: ini.trim() || undefined })}

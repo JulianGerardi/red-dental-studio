@@ -51,7 +51,7 @@ const BOTON_TOTAL = `${CAJA_TOTAL} group/total gap-1 transition-colors hover:bg-
 export function BotonTotal({ total, onClick }: { total: string; onClick?: () => void }) {
   return (
     <button type="button" onClick={onClick} aria-label={`Total amount ${total}. View estimate details`} className={BOTON_TOTAL}>
-      Total Amount: <span className="text-dash-blue ml-1">{total}</span>
+      Total amount: <span className="text-dash-blue ml-1">{total}</span>
       <ChevronRight className="size-4 text-ink-muted transition-transform group-hover/total:translate-x-0.5" aria-hidden />
     </button>
   )

@@ -47,7 +47,7 @@ const meta = {
   argTypes: {
     width: { control: { type: 'range', min: 320, max: 976, step: 8 }, description: 'Ancho de la caja en px. 976 en escritorio; en tablet y celular, la pantalla menos 24.' },
     status: { control: { type: 'select', labels: etiquetas(ESTADOS_VISTA, 'Select all statuses') }, options: [TODOS, ...ESTADOS_VISTA.map((o) => o.id)], description: 'Estado elegido al abrir.' },
-    provider: { control: { type: 'select', labels: etiquetas(PROVIDERS_VISTA, 'Select all Providers') }, options: [TODOS, ...PROVIDERS_VISTA.map((o) => o.id)], description: 'Provider elegido al abrir.' },
+    provider: { control: { type: 'select', labels: etiquetas(PROVIDERS_VISTA, 'Select all providers') }, options: [TODOS, ...PROVIDERS_VISTA.map((o) => o.id)], description: 'Provider elegido al abrir.' },
     room: { control: { type: 'select', labels: etiquetas(SALAS_VISTA, 'Select all rooms') }, options: [TODOS, ...SALAS_VISTA.map((o) => o.id)], description: 'Sala elegida al abrir.' },
     search: { control: 'text', description: 'Búsqueda de providers al abrir. Probá "oral" o "zzz".' },
     longNames: { control: 'boolean', description: 'El primer provider y la primera sala con nombres largos: se recortan, no bajan de renglón.' },
@@ -127,7 +127,7 @@ export const Parts: Story = {
         ['Header', '"View" (22px Bold) y la bajada "Customize the schedule you want to see". La ✕ cierra sin guardar. Una línea lo separa del cuerpo.', 'header · ICONO_SUELTO'],
         ['Status', 'Select all Status, Proposed, Check In y Cancelled en una fila que baja de renglón si no entra. Arriba a la derecha: "1 selected".', 'SeccionFiltro · GrupoFiltro · OpcionFiltro'],
         ['Providers search', 'Filtra por nombre o especialidad mientras se escribe. No cambia lo elegido.', 'input type="search"'],
-        ['Providers', 'Select all Providers y los doce, de a dos. "1 of 12 selected" arriba; "Showing all 12 providers" (o "Showing 4 of 12") abajo.', 'OpcionFiltro marca="avatar"'],
+        ['Providers', 'Select all providers y los doce, de a dos. "1 of 12 selected" arriba; "Showing all 12 providers" (o "Showing 4 of 12") abajo.', 'OpcionFiltro marca="avatar"'],
         ['No results', 'Si la búsqueda no encuentra a nadie: el estado vacío con Clear search.', 'EmptyState'],
         ['Rooms', 'Select all Rooms y las seis salas. Al costado de Providers, separadas por una línea; en angosto, debajo.', 'OpcionFiltro marca="sala"'],
         ['Current view', 'Lo que se va a ver al tocar Save: el provider (o All providers) y "estado · sala".', 'div bg-info-bg'],
@@ -182,7 +182,7 @@ export const States: Story = {
       <Muestra titulo="Search with results" nota={'"pediatric": quedan los cuatro Pediatric Specialist y el pie dice "Showing 4 of 12 providers".'}>
         <Panel busqueda="pediatric" />
       </Muestra>
-      <Muestra titulo="Selected provider hidden by the search" nota={'"oral" esconde a Dr. Martinez\'s, pero sigue elegido: 1 of 12 y Current view no cambian. Tab entra por Select all Providers.'}>
+      <Muestra titulo="Selected provider hidden by the search" nota={'"oral" esconde a Dr. Martinez\'s, pero sigue elegido: 1 of 12 y Current view no cambian. Tab entra por Select all providers.'}>
         <Panel busqueda="oral" />
       </Muestra>
       <Muestra titulo="No results" nota="Ningún provider coincide: el estado vacío con Clear search, que vuelve a mostrar los doce.">

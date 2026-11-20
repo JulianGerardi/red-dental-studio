@@ -37,7 +37,7 @@ export function RemoveGuardianDialog({
   onCancel: () => void
 }) {
   return (
-    <ConfirmDialog title="Remove Guardian access" confirmLabel="Remove Guardian" onConfirm={onConfirm} onCancel={onCancel}>
+    <ConfirmDialog title="Remove guardian access" confirmLabel="Remove guardian" onConfirm={onConfirm} onCancel={onCancel}>
       <div className="flex flex-col gap-3">
         <p>{persona} will no longer have guardian access to {paciente}.</p>
         {ultimaDeGuardian && <AvisoCuentaDesactivada nombre={persona} />}

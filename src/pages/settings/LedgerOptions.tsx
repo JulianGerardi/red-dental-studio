@@ -1,12 +1,12 @@
-import { SettingsSearch } from '@/components/settings/SettingsSearch'
 import { PADDING_PAGINA } from '@/lib/estilos'
 import { useMemo, useState } from 'react'
 import { SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
+import { SettingsSearch } from '@/components/settings/SettingsSearch'
+import { FilterMenu } from '@/components/ui/filter-menu'
 import { Pagination } from '@/components/patients/ledger/Pagination'
 import { SettingsPageHeader } from '@/components/settings/SettingsPageHeader'
-import { Tabs } from '@/components/ui/tabs'
 
 /* Settings → Ledger. Figma 4293:57917.
    Ver design-reference/figma/modulos/settings-ledger.md. */
@@ -73,6 +73,10 @@ const FILTROS_METODO = ['All', 'Patient', 'Insurance'] as const
 
 const TAM_PAGINA = 6
 
+/* Charge/Credit filtran por Direction y Production/Collections por Impact; en Payment Method, por tipo. */
+const coincide = (x: Ajuste | Metodo, f: string) =>
+  f === 'All' || ('direccion' in x ? x.direccion === f || x.impacto === f : x.tipo === f)
+
 export function SettingsLedgerOptions() {
   const [tab, setTab] = useState<Tab>('Adjustment types')
   const [q, setQ] = useState('')
@@ -90,14 +94,10 @@ export function SettingsLedgerOptions() {
   const filas = useMemo(() => {
     const texto = q.trim().toLowerCase()
     if (tab === 'Adjustment types') {
-      return AJUSTES.filter(
-        (a) =>
-          (filtro === 'All' || a.direccion === filtro || a.impacto === filtro) &&
-          `${a.tipo} ${a.descripcion}`.toLowerCase().includes(texto),
-      )
+      return AJUSTES.filter((a) => coincide(a, filtro) && `${a.tipo} ${a.descripcion}`.toLowerCase().includes(texto))
     }
     return METODOS.filter(
-      (m) => (filtro === 'All' || m.tipo === filtro) && m.nombre.toLowerCase().includes(texto),
+      (m) => coincide(m, filtro) && m.nombre.toLowerCase().includes(texto),
     )
   }, [tab, q, filtro])
 
@@ -114,17 +114,20 @@ export function SettingsLedgerOptions() {
       >
         {/* "Search <lo que lista>": el frame decía "Search patients" en las dos pestañas (corregido 2026-11-20). */}
         <SettingsSearch value={q} onChange={(v) => { setQ(v); setPagina(1) }} placeholder={tab === 'Adjustment types' ? 'Search adjustment types' : 'Search payment methods'} onSearch={() => setPagina(1)} />
-        <select
-          value={tab}
-          onChange={(e) => cambiarTab(e.target.value as Tab)}
-          aria-label="View"
-          className="focus:border-dash-blue h-8 shrink-0 rounded-md border border-line bg-white px-3 text-[13px] shadow-[0_1px_2px_0_rgb(0_0_0/0.05)] focus:outline-none"
-        >
-          {TABS.map((t) => <option key={t} value={t}>{t}</option>)}
-        </select>
+        {/* Qué lista se ve y su filtro, en el Filter de Accounts: antes un select y una tira de pestañas
+            (settings-ledger.md, 2026-11-20). */}
+        <FilterMenu
+          label="Filter ledger options"
+          groups={[
+            { type: 'single', title: 'View', defaultValue: TABS[0], value: tab, onChange: (v) => cambiarTab(v as Tab), options: [...TABS] },
+            {
+              type: 'single', title: 'Type', defaultValue: 'All', value: filtro, onChange: (f) => { setFiltro(f); setPagina(1) },
+              options: filtros.map((f) => ({ value: f, count: (tab === 'Adjustment types' ? AJUSTES : METODOS).filter((x) => coincide(x, f)).length })),
+            },
+          ]}
+        />
       </SettingsPageHeader>
 
-      <Tabs className="mt-4" aria-label="Filter options" tabs={filtros} value={filtro} onChange={(f) => { setFiltro(f); setPagina(1) }} />
 
       <div className="mt-4 w-full overflow-x-auto rounded-lg border border-line-row bg-white">
         <div className={tab === 'Adjustment types' ? 'min-w-[820px]' : 'min-w-[620px]'}>

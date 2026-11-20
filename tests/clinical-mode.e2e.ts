@@ -140,7 +140,7 @@ test('Generate narrative arma el borrador con lo guardado de Chief Complaint', a
   await screen.getByRole('button', 'Open in treatment').tap()
   await screen.getByRole('button', 'Generate narrative').tap()
   const editor = screen.getByRole('dialog', 'AI narrative editor')
-  await expect(editor.getByText(/Original Clinical Draft/)).toBeVisible()
+  await expect(editor.getByText(/Original clinical draft/)).toBeVisible()
   await expect(editor.getByRole('button', /Apply changes/)).toBeDisabled()
 })
 

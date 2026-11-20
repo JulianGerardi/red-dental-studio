@@ -110,10 +110,10 @@ const meta = {
 export default meta
 type Story = StoryObj<Args>
 
-/* Cada opción con su cantidad y el punto del color de su pill, como el filtro de Lab Order. */
+/* Cada opción con su cantidad, como el filtro de Lab Order. */
 const filtroEstado = (filas: Paciente[]) => ({
   label: 'Filter by status',
-  options: (['Active', 'Inactive', 'Pending'] as const).map((e) => ({ value: e, count: filas.filter((p) => p.estado === e).length, tone: TONO[e] })),
+  options: (['Active', 'Inactive', 'Pending'] as const).map((e) => ({ value: e, count: filas.filter((p) => p.estado === e).length })),
   match: (p: Paciente, sel: string[]) => sel.includes(p.estado),
 })
 const BUSQUEDA = { placeholder: 'Search patients', match: (p: Paciente, q: string) => `${p.nombre} ${p.email}`.toLowerCase().includes(q.toLowerCase()) }
@@ -239,7 +239,7 @@ const PASOS: { titulo: string; texto: string; codigo: string }[] = [
     codigo: `<DataTable
   columns={columns} rows={patients} rowKey={(p) => p.id}
   search={{ placeholder: 'Search patients', match: (p, q) => p.name.toLowerCase().includes(q.toLowerCase()) }}
-  filter={{ label: 'Filter by status', options: [{ value: 'Active', count: 12, tone: 'success' }, 'Inactive'], match: (p, sel) => sel.includes(p.status) }}
+  filter={{ label: 'Filter by status', options: [{ value: 'Active', count: 12 }, 'Inactive'], match: (p, sel) => sel.includes(p.status) }}
   columnPicker
   resizable
   rowDetail={(p) => <PatientSummary patient={p} />}

@@ -169,6 +169,43 @@ valor en negro y bajada. Mismos textos y datos; 2 + 2 en angosto, cuatro en fila
 3. El menú de Settings del rail también saca Parameters, Libraries, Patient Portal y Security, y sus rutas
    (Julián, mismo día). Quedan como "Coming soon" Roles y Preferences.
 
+## Subscription con los tamaños del Ledger y Billing (2026-11-20)
+
+Julián: la pestaña Subscription de Edit Account no estaba alineada en tamaños con el Ledger y Billing. Medido a 1440px:
+
+- **Las cards ya eran iguales** (`ui/stat-card`): rótulo de 11px en mayúsculas, valor de 20px en azul, padding de 12px y
+  12px entre cards. Se ven más grandes porque son cuatro a todo el ancho (315px), sin la columna de Find Patient ni la
+  ficha del paciente al lado; en Billing y el Ledger miden 252–259px.
+- **Los títulos de sección eran los distintos:** *Subscription Summary* y *Subscription History* estaban en 16px. Pasan a
+  15px bold, como *Recent Billing Activity* de Billing.
+- **Pestañas y pie, en todo Settings** (Julián: "hacelo"):
+  - Las pestañas de las pantallas de edición pasan a `Tabs size="sm"` (28px), como el Ledger y Billing: Account,
+    Location, Employee, Carriers e Insurance Plan (Ledger options ya no tiene pestañas: pasaron al Filter, settings-ledger.md).
+  - `FormFooter` (Cancel / Save) pasa a 32px en una pantalla, como los botones de acción del Ledger. Vale también para
+    Edit Patient e Insurance del paciente, que lo comparten.
+  - Adentro de un drawer el pie sigue en 36px, como `DrawerActions`: lo fija `ModalShell`.
+
+## Un solo diseño de filtro, el de Accounts (2026-11-20)
+
+Sin historia en Jira: es un pedido de diseño de Julián (*"que los filtros de accounts tengan el mismo diseño para todos
+los filtros"*). Accounts es la referencia: **buscador → Search → Filter** (`ui/filter-menu`, md de 36 px).
+
+1. **Buscador único:** Accounts, Locations, Employees, Ledger Options y Patients escribían el campo a mano (Accounts en
+   300 px, Patients en 32 px de alto); ahora usan `settings/SettingsSearch` (36 px, hasta 320 px, con su Search), el de
+   Carriers, Fee Schedules y Documents. `SettingsSearch` suma `tour` para el ancla del tour de Patients.
+2. **Sin pestañas ni selects para filtrar:** Ledger Options (select de lista + pestañas de tipo), Billing (pestañas All
+   / Payments / Adjustments / Today) y Consents (pestañas Active / Inactive / System / All) pasan al menú Filter. Mismas
+   opciones y textos; cada una con su cantidad. Ver el `.md` de cada módulo.
+3. **Sin puntos de color en ningún filtro** (Julián, mismo día): el estado se lee por el nombre, y el color queda para la
+   pill de la fila. `FilterOption` ya no acepta `tone`; salen de Accounts, Consents, Fee Schedules, Problem List y Lab
+   Orders. Las categorías de Workflows siguen con su ícono.
+4. **Quedan como están, a propósito:** las pestañas que cambian de vista y no filtran (Inbox / Unread en Notifications,
+   Problem List / Procedures, Patient / Guarantor View), el `DateFilter` de fechas (Notifications, Dashboard) y el Filter
+   chico (`sm`, 28 px) en los encabezados de cards y paneles (Dashboard, Workflows, Billing), que es el mismo menú.
+
+**A validar con usuarios:** que en Ledger Options se note qué lista se está viendo con la elección adentro del Filter
+(la pista es el encabezado de la tabla); y que en Billing nadie extrañe ver los cuatro tipos a la vista.
+
 ## Una clínica ve sólo su cuenta: Account abre Edit Account (2026-11-20)
 
 Julián, con un video de la app real: *"Lo de accounts overview está mal: sólo se puede ver la info de una sola"* cuenta.
