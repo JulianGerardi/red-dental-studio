@@ -581,3 +581,9 @@ Parte de la normalización de UI (ver `figma/README.md`, misma fecha; sin histor
 del paciente mostraba General y Contact enteros antes del contenido, y el título de la sección (Ledger, Treatments…)
 caía a 817 px en un celular de 844: tocar un ítem del menú parecía no hacer nada. Ahora esos dos bloques van detrás de
 un botón "Patient information" (cerrado al entrar) y el título queda a 495 px. En desktop no cambia nada.
+## CON-2643 · Pending Task con funcionalidad (2026-11-20)
+
+**Jira:** CON-2643. Los botones de cada tarea (⋮, PDF, Complete this Task) ya hacen lo de red.dev; detalle en
+dashboard.md (2026-11-20). Acá: las nueve tareas pasan a ser **de John Smith**, el paciente de la ficha (antes decían
+Elena Marquez; CA9), con tres Lab Orders (Pending, Requested, Delayed) y dos de cada otro tipo. Las opciones del ⋮ quedan
+deshabilitadas (con su tooltip) hasta *Start Encounter*.

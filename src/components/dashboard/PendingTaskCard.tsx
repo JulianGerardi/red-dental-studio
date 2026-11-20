@@ -4,12 +4,19 @@ import { aviso } from '@/components/ui/toaster'
 import { Avatar } from '@/components/ui/avatar'
 
 export type PendingTask = {
+  /** Identifica la tarea: el menú y Complete this Task la cambian por id (dashboard.md, 2026-11-20). */
+  id?: string
   kind: string
   state: string
   person: string
   initials: string
+  /** La ficha del paciente: Complete this Task abre su Clinical Mode. */
+  patientId?: string
+  provider?: string
   register: string
   expiration: string
+  /** Ya tiene documento (la orden se pidió, la nota se cerró): se ve el botón PDF. */
+  pdf?: boolean
 }
 
 /* Lo que hace "Complete this task". Lo comparten la card y la fila de la propuesta (DashboardRows). */

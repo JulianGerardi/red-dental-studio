@@ -1035,3 +1035,53 @@ que en Appointments. Ahora va al pie del panel (`ShowMore alPie`, también en `L
 misma altura, a 16 px del borde de abajo, aunque cada lista mida distinto. Abierto ("Show less") sigue igual. En tablet
 y celular, con los paneles uno debajo del otro, no cambia nada. Para validar: si el hueco entre la última fila de
 Waiting room y su botón se lee como "hay más", o si conviene llenar ese alto con filas (`llenarAlto`).
+## CON-2641 · CON-2643 · Pending Task con funcionalidad (2026-11-20)
+
+**Jira:** CON-2641 (Pending Tasks de la secretaria, Dashboard) y CON-2643 (Pending Tasks del paciente), epic CON-2639.
+Julián mandó cuatro videos de red.dev con cómo reacciona cada botón y pidió **seguir sólo lo que muestran**. La misma
+pieza (`PendingTaskList` → `TaskRow`) sirve al Dashboard y al Patient Dashboard; la lógica vive en
+`dashboard/tareas.tsx` y el documento (vista y PDF) en `dashboard/documentoTarea.ts`.
+
+| Botón | Qué pasa (como red.dev) |
+|---|---|
+| **Complete this Task** · Lab Order, Prescription, Referral | Abre Clinical Mode del paciente en la pestaña del tipo (`?tab=Lab%20Order&task=<id>`); la Lab Order entra a su detalle (clinical-mode.md, 2026-11-20). |
+| **Complete this Task** · Clinical Note | Abre la pantalla de la nota (`/patients/:id/clinical-note/:noteId`): *Back to History* (va a Patient Summary de Clinical Mode), *Clinical Note - <paciente>*, *View PDF*, "Preparing document..." un momento, el documento y *Sign Clinical Note*. |
+| **Sign Clinical Note** | *Login to Sign Document*: email y contraseña otra vez (*Sign* se habilita con los dos), Cancel y Sign. |
+| **⋮ Lab Order** | *Options*: Edit, Request, Cancel, Delete. |
+| **⋮ Prescription** | *Options*: Activate, Cancel. |
+| **⋮ Clinical Note / Referral** | La Clinical Note no lleva; el de Referral no aparece en los videos, así que no se puso. |
+| **PDF** (fila y *View PDF*) | Pestaña nueva con *Preparing document, please wait...* y después el PDF, con el formato de red.dev: encabezado de la clínica (logo, Red Dental Studio, Abril, dirección y contacto), *Dental Clinical Note* (Patient name, Date of birth con la edad, Date of visit, Attending dentist, Contact), *Medical History*, *Additional Notes* y la firma (*Provider*, nombre, *Date:*). Título de la pestaña: *Dental Clinical Note — <paciente>*. En la fila, sólo si ya hay documento (Requested, Fulfilled; no las Pending). |
+
+- **Sin encuentro abierto con el paciente** las opciones del ⋮ se ven apagadas y cada una muestra un tooltip con el
+  texto de red.dev (*You do not have permission to perform this action because there is no open encounter for the
+  selected patient.*). Las opciones no van `disabled` sino `aria-disabled`: así el tooltip abre también con el foco del
+  teclado. El detalle de la Lab Order se ve en *Read-only mode*.
+- **Encuentro abierto** = In progress u On hold. En el Dashboard sale del día: el paciente en el sillón (`enCurso`) o en
+  pausa en la Waiting Room. En el Patient Dashboard es el encuentro de la ficha (`lib/encuentro`).
+- **Colores de red.dev:** Pending naranja, Requested azul, Fulfilled rojo. *Expired date* cuando la fecha ya pasó, salvo
+  en la Clinical Note; la fecha de vencimiento va siempre en rojo. La Clinical Note dice *Completed* en lugar de
+  *Register*.
+- **Datos:** cada tarea tiene id, paciente, provider y estado de su tipo. En el día de la demo hay tareas de Olivia
+  Brooks y Charlotte Reed (en el sillón), Henry Richardson (en pausa), Sophia Collins y James Foster (no llegaron): se ven
+  los dos estados del ⋮. Dentro de cada tipo, por vencimiento.
+- **El PDF se arma a mano** (`pdfDeDocumento`: Helvetica, una página, sin dependencias). `jspdf` está en
+  `node_modules` porque lo trae el odontograma, pero sumarlo como dependencia directa quedó pendiente del ok de Julián.
+
+**Fuera de los videos, mínimo para que el botón haga algo:** con encuentro abierto, Request pasa la orden a Requested
+(aparece su PDF), Activate saca la receta de la lista, Cancel y Delete preguntan antes y la sacan; Edit abre el detalle.
+Firmar la Clinical Note la saca de Pending Task y completa *Date:* en la firma. Los datos del paciente que la tarea no
+trae (nacimiento, teléfono, horario de la visita) son de ejemplo, salvo los de John Smith, que salen de su ficha. El PDF
+de Lab Order, Prescription y Referral usa el mismo formato con los datos de la tarea (los videos sólo muestran el de la
+Clinical Note).
+
+**Límites del mock:** la barra de Clinical Mode muestra siempre al paciente de prueba (Julio Perez); Patient Summary,
+Prescription y Referral siguen "en construcción"; los cambios se pierden al recargar.
+
+**A validar:** qué hace cada opción del ⋮ con el encuentro abierto (los videos sólo muestran el estado deshabilitado),
+el ⋮ de Referral y el PDF de Lab Order.
+
+**Textos:** los de la app van en sentence case, como fijó #176 (*Complete this task*, *Back to history*, *Sign clinical
+note*, *Login to sign document*); el contenido del documento (vista y PDF) queda como el de red.dev (*Dental Clinical
+Note*, *Medical History*…), igual que los demás nombres de documentos.
+
+`tests/pending-tasks.e2e.ts`.

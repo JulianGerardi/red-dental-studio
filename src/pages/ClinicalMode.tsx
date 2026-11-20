@@ -20,8 +20,9 @@ import { TreatmentPlanSection } from '@/components/clinical/TreatmentPlanSection
 import { TreatmentPanel } from '@/components/clinical/TreatmentPanel'
 import { WorkflowsProvider } from '@/components/clinical/WorkflowsContext'
 import { ExamFindingsProvider, ExamLayout } from '@/components/clinical/ExamLayout'
-import { EXAMENES, type Pestana } from '@/data/clinical-mode'
+import { EXAMENES, REGISTROS, type Pestana } from '@/data/clinical-mode'
 import { PATIENTS } from '@/data/mock'
+import { buscarTarea } from '@/components/dashboard/dashboard-data'
 
 /* Clinical Mode — Figma 4235:135661 (barra, botonera y overview),
    4265:56662 (botonera de registros), 4106:205304 (Vitals),
@@ -44,11 +45,15 @@ export default function ClinicalMode() {
   const procedimientoPedido = busqueda.get('procedure') ?? undefined
   /* ?consent= abre el consentimiento de ese procedimiento del caso, donde se firma (clinical-mode.md, 2026-11-02). */
   const consentimientoPedido = busqueda.get('consent') ?? undefined
+  /* ?tab= y ?task=: Complete this Task de Pending Task abre la pestaña de su tipo y, en Lab Order, el detalle de la orden
+     (dashboard.md, 2026-11-20). */
+  const tabPedida = ([...EXAMENES, ...REGISTROS] as readonly string[]).includes(busqueda.get('tab') ?? '') ? (busqueda.get('tab') as Pestana) : undefined
+  const tareaPedida = buscarTarea(busqueda.get('task') ?? '')
   const patient = PATIENTS.find((p) => p.id === id) ?? PATIENTS[0]
   /* Overwiev no es una pestaña más: es el estado inicial y el botón de la
      barra vuelve acá desde cualquier examen o registro. */
-  const [enOverview, setEnOverview] = useState(!casoPedido)
-  const [pestana, setPestana] = useState<Pestana>(casoPedido ? 'Treatment plan' : 'Vitals')
+  const [enOverview, setEnOverview] = useState(!casoPedido && !tabPedida)
+  const [pestana, setPestana] = useState<Pestana>(casoPedido ? 'Treatment plan' : tabPedida ?? 'Vitals')
   const [encuentro, setEncuentro] = useEstadoEncuentro()
   const [ampliado, setAmpliado] = useState(false)
   /* El caso que se abrió desde una card del Overview; sin caso, Treatment Plan entra por Unassigned. */
@@ -108,7 +113,7 @@ export default function ClinicalMode() {
     : pestana === 'Vitals'
       ? <ExamLayout findings={false}><VitalsPanel /></ExamLayout>
       : pestana === 'Lab order'
-        ? <LabOrderPanel />
+        ? <LabOrderPanel tarea={tareaPedida?.kind === 'Lab orders' ? tareaPedida : undefined} encuentroAbierto={encuentro !== 'sinEmpezar'} />
         : pestana === 'Radiographic'
           ? <RadiographyPanel />
           : pestana === 'Treatment plan'
@@ -146,7 +151,7 @@ export default function ClinicalMode() {
       {/* Sin título visible: el h1 es para lectores de pantalla (auditoría de normalización, figma/README.md). */}
       <h1 className="sr-only">Clinical Mode · {patient.first} {patient.last}</h1>
       <ClinicalTopBar
-        volverA={`/patients/${patient.id}`}
+        volverA={`/patients/${id ?? patient.id}`}
         encuentro={encuentro}
         onEncuentro={(e, mensaje) => { setEncuentro(e); aviso.ok(mensaje) }}
         onOverview={() => setEnOverview(true)}

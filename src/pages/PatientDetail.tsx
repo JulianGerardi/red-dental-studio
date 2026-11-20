@@ -10,9 +10,10 @@ import { ClinicalPopover } from '@/components/patients/ClinicalPopover'
 import { ClinicalItemModal } from '@/components/patients/ClinicalItemModal'
 import { ITEMS_INICIALES, type Categoria, type ClinicalItem } from '@/data/clinicalItems'
 import { aviso } from '@/components/ui/toaster'
-import type { PendingTask } from '@/components/dashboard/PendingTaskCard'
 import { PendingTaskList } from '@/components/dashboard/PendingTaskList'
-import { TASK_KINDS } from '@/components/dashboard/dashboard-data'
+import { TASK_KINDS, TAREAS_PACIENTE } from '@/components/dashboard/dashboard-data'
+import { useAccionesTarea, useTareasVivas } from '@/components/dashboard/tareas'
+import { useEstadoEncuentro } from '@/lib/encuentro'
 import { ShowMore } from '@/components/ui/show-more'
 import { EditContactModal } from '@/pages/patients/EditContactModal'
 import { CONTENEDOR_PAGINA, TARJETA_PANEL } from '@/lib/estilos'
@@ -30,10 +31,6 @@ const CLINICAL: { label: Categoria; icon: LucideIcon }[] = [
   { label: 'Past surgery and hospitalization', icon: ClipboardList },
 ]
 
-/* Repartidas entre los cuatro tipos (antes las 9 eran "Referrals"): así el filtro por tipo tiene algo que filtrar
-   (patient-dashboard.md, 2026-10-28). Mismo total que fijó el Show N more del 2026-10-25, sin tocar esa cuenta. */
-const TASKS: PendingTask[] = ['Clinical note', 'Clinical note', 'Clinical note', 'Lab orders', 'Lab orders', 'Prescriptions', 'Prescriptions', 'Referrals', 'Referrals']
-  .map((kind) => ({ kind, state: 'Requested', person: 'Elena Marquez', initials: 'EM', register: '03/17/2025', expiration: '03/15/2025' }))
 
 /* Cuántos se ven en cada bloque antes de "Show N more" (ui/show-more; patient-dashboard.md, 2026-10-12). */
 export const TOPE = { tareas: 3, turnos: 3, turnosColumna: 7 }
@@ -80,6 +77,11 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
   const [modal, setModal] = useState<'contact' | null>(null)
   /* Igual que el Dashboard (dashboard.md, 2026-10-29): tabs por tipo, en vez del filtro. */
   const [tipoTarea, setTipoTarea] = useState('All')
+  /* Las nueve del paciente, repartidas entre los cuatro tipos (patient-dashboard.md, 2026-10-28), con sus cambios. El
+     encuentro abierto es el de la ficha: Start Encounter habilita el ⋮ de cada tarea (dashboard.md, 2026-11-20). */
+  const TASKS = useTareasVivas(TAREAS_PACIENTE)
+  const [encuentro] = useEstadoEncuentro()
+  const accionesTarea = useAccionesTarea({ paciente: id })
   const tareas = tipoTarea === 'All' ? TASKS : TASKS.filter((t) => t.kind === tipoTarea)
   const [apptTab, setApptTab] = useState<'Next' | 'Next appointments'>('Next')
   /* Desde lg Appointments es una columna del alto de Pending Task + Pending documents: entran más turnos. */
@@ -169,8 +171,9 @@ export default function PatientDetail({ turnos = APPTS.length }: { turnos?: numb
                   {tareas.length === 0 ? (
                     <EmptyState icon={Activity} title="Nothing pending" detail="No pending tasks of this type." className="py-8" />
                   ) : (
-                    <PendingTaskList tasks={tareas} limit={TOPE.tareas} enCaja llenarAlto cargarAlScroll />
+                    <PendingTaskList tasks={tareas} limit={TOPE.tareas} enCaja llenarAlto cargarAlScroll encuentroAbierto={() => encuentro !== 'sinEmpezar'} onAccion={accionesTarea.hacer} />
                   )}
+                  {accionesTarea.dialogo}
                 </div>
               </Card>
             </div>

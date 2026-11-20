@@ -12,6 +12,7 @@ import Insurance from '@/pages/patients/Insurance'
 import Ledger from '@/pages/patients/Ledger'
 import PatientDetail from '@/pages/PatientDetail'
 import ClinicalMode from '@/pages/ClinicalMode'
+import ClinicalNote from '@/pages/ClinicalNote'
 import NotFound from '@/pages/NotFound'
 import Scheduling from '@/pages/Scheduling'
 import Billing from '@/pages/Billing'
@@ -47,6 +48,8 @@ export function AppRoutes() {
 
       {/* Clinical Mode es un takeover: no usa el app shell */}
       <Route path="/patients/:id/clinical-mode" element={<ClinicalMode />} />
+      {/* La Clinical Note de Pending Task, pantalla completa como Clinical Mode (dashboard.md, 2026-11-20). */}
+      <Route path="/patients/:id/clinical-note/:noteId" element={<ClinicalNote />} />
 
       <Route element={<AppShell />}>
         <Route index element={<Dashboard />} />

@@ -3295,3 +3295,24 @@ Anomalías del diseño (se copian tal cual y se anotan):
 Sin historia de Jira (devolución de diseño de Abril Viola). El aviso azul que aparece cuando un valor se va del rango
 pasa de franja con barra a la izquierda a `Alert` tono info, el aviso único de la app (detalle en patients.md,
 2026-11-18). El texto sigue siendo el del Figma, que no habla de presión (anomalía ya anotada en `AVISO_PRESION`).
+
+## CON-2643 · El detalle de la Lab Order desde Pending Task (2026-11-20)
+
+**Jira:** CON-2643 (CA5: Complete this Task lleva al detalle), CON-2641. De los videos de red.dev de Julián; sólo lo que
+muestran.
+
+- `?tab=<pestaña>` abre Clinical Mode en esa pestaña y `?task=<id>` busca la tarea (`buscarTarea`). En Lab Order entra
+  directo a `LabOrderDetail`: *LAB ORDER* con *Delivery Expiration Date\**, estado, PDF y el ⋮ de la tarea (sin Edit);
+  **General Information** (Receiving Laboratory\* + New Laboratory, ASAP, Procedures, Teeth & Surface) y **Details**
+  (Dental Work Requested\*, Special Instructions, Attachments), cada una con su ícono; *Cancel* y *Save* abajo.
+- **Teeth & Surface** como red.dev: primero *Initialize permanent dentition* / *Initialize primary dentition*; elegida,
+  quedan *Permanent* / *Primary*, los dientes, la rueda de superficies y *Toggle all* / *Apply to unset*. La dentición se
+  puede cambiar aun en sólo lectura (en red.dev también); lo demás no.
+- **Decisión:** los dientes son botones numerados por arcada (Maxillary 1–16, Mandibular 32–17; en Primary A–J y T–K)
+  en vez del odontograma dibujado de red.dev (`react-advanced-odontogram` no admite dos instancias montadas). Cada diente
+  es un botón de 24px con `aria-pressed`. La rueda es la de New Procedure (`SurfaceWheel`).
+- **Sin encuentro abierto:** `ui/alert` warning *Read-only mode* con el texto de red.dev, todo deshabilitado y *Save*
+  apagado; *Cancel* vuelve a la lista. Con el encuentro abierto *Save* valida los tres obligatorios.
+- *New Laboratory* avisa que no está en esta versión (el modal del Figma 4070:148911 sigue pendiente). Cancelar o borrar
+  la orden desde su ⋮ vuelve a la lista. La orden de la tarea no está en la tabla de Lab Order (mocks distintos).
+- *Back to History* de la Clinical Note (dashboard.md, 2026-11-20) abre esta pantalla en Patient Summary.
